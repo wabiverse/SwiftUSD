@@ -1,0 +1,36 @@
+# format options
+
+--allman true
+--binarygrouping 4,8
+--commas always
+--decimalgrouping 3,6
+--elseposition same-line
+--voidtype void
+--exponentcase lowercase
+--exponentgrouping disabled
+--fractiongrouping disabled
+--header "/* --------------------------------------------------------------\n * :: :  K  R  A  K  E  N  :                                   ::\n * --------------------------------------------------------------\n *\n * CREDITS.\n *\n * T.Furby                @furby-tm       <devs@wabi.foundation>\n *\n *                                           Copyright (C) 2023.\n *                                          All Rights Reserved.\n * -------------------------------------------------------------\n *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .\n * ------------------------------------------------------------- */"
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--ifdef indent
+--indent 2
+--indentcase true
+--importgrouping testable-bottom
+--linebreaks lf
+--maxwidth none
+--octalgrouping 4,8
+--operatorfunc spaced
+--patternlet hoist
+--ranges spaced
+--self remove
+--semicolons inline
+--stripunusedargs always
+--swiftversion 5.9
+--trimwhitespace always
+--wraparguments preserve
+--wrapcollections preserve
+--emptybraces no-space
+
+# rules
+
+--enable blankLineAfterImports,docComments,isEmpty,spaceInsideBraces,wrapMultilineStatementBraces
