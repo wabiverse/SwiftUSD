@@ -13,9 +13,9 @@
  * ------------------------------------------------------------- */
 
 import XCTest
-@testable import SwiftUSD
+@testable import USD
 
-final class SwiftUSDTests: XCTestCase
+final class USDTests: XCTestCase
 {
   func testExample() throws
   {
