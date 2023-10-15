@@ -12,20 +12,21 @@ For more details, please visit the web site [here](http://openusd.org).
 
 <image src="https://steamuserimages-a.akamaihd.net/ugc/110734252808679209/093302F19C70C4B7421C2A43200B205A650AB9B2/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false">
 
-### To use Pixar USD with Swift, add **`SwiftUSD`** as a **`Package`** dependency in your `Package.swift` file.
+##### To use Pixar USD with Swift, add **SwiftUSD** as a **Package** dependency in your Package.swift file.
 ```swift
 dependencies: [
   .package(url: "https://github.com/wabiverse/SwiftUSD.git", branch: "main"),
 ]
 ```
 
-### Then, for any target you'd like, add **`USD`** as a **`Product`** of your **`Target`** dependencies,
+##### Then, for any target you'd like, add **USD** as a **Product** of your **Target** dependencies.
 ```swift
 targets: [
   /* 📕 For library products... */
   .target(
     name: "MyMetaverseLibrary",
     dependencies: [
+      /* add pixar usd as a library dependency. */
       .product(name: "USD", package: "SwiftUSD")
     ]
   ),
@@ -34,21 +35,26 @@ targets: [
   .executableTarget(
     name: "MyMetaverseApp",
     dependencies: [
+      /* add pixar usd as an executable dependency. */
       .product(name: "USD", package: "SwiftUSD"),
     ],
     plugins: [
-      /* 📙 And, plugins are added like this. */
-      .plugin(name: "SwiftUSDSchemaGenPlugin", package: "MetaverseSchemaGen")
-      .plugin(name: "Arnold", package: "ArnoldRenderEngine")
+      /* 📙 And, plugins are added like so. */
+      .plugin(name: "SwiftUSDSchemaGenPlugin", package: "MetaverseSchemaGen"),
+      .plugin(name: "ArnoldRenderEnginePlugin", package: "AutodeskArnold"),
+      .plugin(name: "EpicAnimationNodesPlugin", package: "EpicAnimation")
     ]
   ),
 ]
 ```
-> **Dependency Notes**<br>
->  **`Library Products`** allow clients that declare a dependency on this package to use the package’s functionality.<br>
->  **`Executable Products`** vend an executable target. Use this only if you want to make the executable available to clients.<br>
->  **`Plugin Products`** vend plugin targets. This makes the plugin available to clients that integrate the Swift package.
 
+```diff
+@@ Dependency Notes @@
+- Library Products allow clients that declare a dependency on this package to use the package’s functionality.
++ Executable Products vend an executable target. Use this only if you want to make the executable available to clients.
+! Plugin Products vend plugin targets. This makes the plugin available to clients that integrate the Swift package.
+# Swift's package manager, SwiftPM, is capabable of building Swift, Objective-C/C++, and C/C++ code.
+```
 <br>
 
 Build Status
