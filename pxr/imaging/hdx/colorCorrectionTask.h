@@ -93,7 +93,7 @@ public:
     HdxColorCorrectionTask(HdSceneDelegate* delegate, SdfPath const& id);
 
     HDX_API
-    ~HdxColorCorrectionTask() override;
+    ~HdxColorCorrectionTask() noexcept override;
 
     /// Prepare the tasks resources
     HDX_API

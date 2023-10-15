@@ -48,7 +48,7 @@ public:
     HdxTask(SdfPath const& id);
 
     HDX_API
-    ~HdxTask() override;
+    ~HdxTask() noexcept override;
 
     /// This function returns true when a (progressive) task considers its
     /// execution results converged. Usually this means that a progressive

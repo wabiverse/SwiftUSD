@@ -30,7 +30,7 @@
 #include "pxr/usd/sdf/path.h"
 #include "pxr/base/tf/hashmap.h"
 
-#include <tbb/mutex.h>
+#include <mutex>
 #include <map>
 #include <unordered_map>
 #include <vector>

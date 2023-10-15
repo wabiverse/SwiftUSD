@@ -10,8 +10,11 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     "-I/opt/homebrew/Cellar/tbb/2021.10.0/include",
-    "-I/opt/homebrew/Cellar/python@3.10/3.10.13/Frameworks/Python.framework/Versions/3.10/include/python3.10",
+    "-I/opt/homebrew/Cellar/python@3.11/3.11.5/Frameworks/Python.framework/Versions/3.11/include/python3.11",
     "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
+    "-I/opt/homebrew/include/Imath",
+    "-I/Applications/MaterialX.app/Contents/Resources/1.38.8/include",
+    "-I/Applications/OSL.app/Contents/Resources/1.12.13/include",
     "-I/opt/homebrew/include",
   ]
 #elseif os(Linux)
@@ -34,6 +37,10 @@ let package = Package(
       path: "pxr",
       exclude: [
         "base/tf/testenv/main.cpp",
+        "usd/usd/testenv",
+        "usd/usd/examples.cpp",
+        "usd/usd/codegenTemplates",
+        "imaging/plugin/hdEmbree",
         "../third_party/renderman-24/plugin/rtx_glfImage/main.cpp",
         "../third_party/renderman-25/plugin/rtx_glfImage/main.cpp",
       ],
@@ -42,6 +49,7 @@ let package = Package(
         .unsafeFlags([
           "-I.",
         ] + platformIncludes),
+        .define("OPENEXR_EXPORT", to: "static")
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),

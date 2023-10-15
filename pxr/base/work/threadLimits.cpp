@@ -29,7 +29,9 @@
 
 #include "pxr/base/tf/envSetting.h"
 
+#if WITH_TBB_LEGACY
 #include <tbb/task_scheduler_init.h>
+#endif /* WITH_TBB_LEGACY */
 #include <tbb/task_arena.h>
 
 #include <algorithm>
@@ -60,14 +62,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // We create a task_scheduler_init instance at static initialization time if
 // PXR_WORK_THREAD_LIMIT is set to a nonzero value.  Otherwise this stays NULL.
-static tbb::task_scheduler_init *_tbbTaskSchedInit;
+#if WITH_TBB_LEGACY
+static tbb::task_scheduler_init *m_tbbTaskArena;
+#else /* WITH_TBB_LEGACY */
+static tbb::task_arena *m_tbbTaskArena;
+#endif
 
 unsigned
 WorkGetPhysicalConcurrencyLimit()
 {
     // Use TBB here, since it pays attention to the affinity mask on Linux and
     // Windows.
+  #if WITH_TBB_LEGACY
     return tbb::task_scheduler_init::default_num_threads();
+  #else /* WITH_TBB_LEGACY */
+    return tbb::this_task_arena::max_concurrency();
+  #endif
 }
 
 // This function always returns an actual thread count >= 1.
@@ -123,7 +133,11 @@ Work_InitializeThreading()
     // previously initialized by the hosting environment (e.g. if we are running
     // as a plugin to another application.)
     if (settingVal) {
-        _tbbTaskSchedInit = new tbb::task_scheduler_init(threadLimit);
+    #if WITH_TBB_LEGACY
+        m_tbbTaskArena = new tbb::task_scheduler_init(threadLimit);
+    #else /* WITH_TBB_LEGACY */
+        m_tbbTaskArena = new tbb::task_arena(threadLimit);
+    #endif
     }
 }
 static int _forceInitialization = (Work_InitializeThreading(), 0);
@@ -162,11 +176,15 @@ WorkSetConcurrencyLimit(unsigned n)
     // According to the documentation that should be the case, but we should
     // make sure.  If we do decide to delete it, we have to make sure to 
     // note that it has already been initialized.
-    if (_tbbTaskSchedInit) {
-        _tbbTaskSchedInit->terminate();
-        _tbbTaskSchedInit->initialize(threadLimit);
+    if (m_tbbTaskArena) {
+        m_tbbTaskArena->terminate();
+        m_tbbTaskArena->initialize(threadLimit);
     } else {
-        _tbbTaskSchedInit = new tbb::task_scheduler_init(threadLimit);
+    #if WITH_TBB_LEGACY
+        m_tbbTaskArena = new tbb::task_scheduler_init(threadLimit);
+    #else /* WITH_TBB_LEGACY */
+        m_tbbTaskArena = new tbb::task_arena(threadLimit);
+    #endif
     }
 }
 

@@ -443,12 +443,12 @@ private:
                 startTime, endTime, outSampleTimes);
         }
 
-        VtValue GetValue(Time shutterOffset)
+        VtValue GetValue(Time shutterOffset) override
         {
             return VtValue(GetTypedValue(shutterOffset));
         }
 
-        GfMatrix4d GetTypedValue(Time shutterOffset)
+        GfMatrix4d GetTypedValue(Time shutterOffset) override
         {
             VtArray<GfVec3f> p =
                 _pointsDs->GetValue(shutterOffset)

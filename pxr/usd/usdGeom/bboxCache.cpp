@@ -99,11 +99,14 @@ public:
     explicit operator bool() const {
         return _owner;
     }
-    void operator()() {
+    void operator()() const {
         // Do not save state here; all state should be accumulated externally.
         _owner->_ResolvePrim(this, _primContext, _inverseComponentCtm);
     }
-    _ThreadXformCache* GetXformCaches() { return _xfCaches; }
+    _ThreadXformCache* GetXformCaches() const
+    { 
+        return _xfCaches;
+    }
 };
 
 // -------------------------------------------------------------------------- //
@@ -124,11 +127,25 @@ private:
 
     struct _PrototypeTask
     {
-        _PrototypeTask() : numDependencies(0) { }
+        _PrototypeTask() 
+            : numDependencies(0) 
+        { }
+
+        _PrototypeTask(const _PrototypeTask &other) 
+            : dependentPrototypes(other.dependentPrototypes)
+        {
+            numDependencies.store(other.numDependencies.load());
+        }
+
+        _PrototypeTask(_PrototypeTask &&other)
+            : dependentPrototypes(std::move(other.dependentPrototypes))
+        {
+          numDependencies.store(other.numDependencies.load());
+        }
 
         // Number of dependencies -- prototype prims that must be resolved
         // before this prototype can be resolved.
-        tbb::atomic<size_t> numDependencies;
+        std::atomic<std::size_t> numDependencies;
 
         // List of prototype prims that depend on this prototype.
         std::vector<_PrimContext> dependentPrototypes;
@@ -220,7 +237,7 @@ private:
             _PrototypeTask& dependentPrototypeData =
                 prototypeTasks->find(dependentPrototype)->second;
             if (dependentPrototypeData.numDependencies
-                .fetch_and_decrement() == 1){
+                .fetch_sub(1) == 1){
                 dispatcher->Run(
                     &_PrototypeBBoxResolver::_ExecuteTaskForPrototype,
                     this, dependentPrototype, prototypeTasks, xfCaches,
@@ -321,6 +338,9 @@ UsdGeomBBoxCache::operator=(UsdGeomBBoxCache const &other)
     _useExtentsHint = other._useExtentsHint;
     return *this;
 }
+
+UsdGeomBBoxCache::~UsdGeomBBoxCache() noexcept
+{}
 
 GfBBox3d
 UsdGeomBBoxCache::ComputeWorldBound(const UsdPrim& prim)
@@ -1166,7 +1186,7 @@ UsdGeomBBoxCache::_GetBBoxFromExtentsHint(
 }
 
 void
-UsdGeomBBoxCache::_ResolvePrim(_BBoxTask* task,
+UsdGeomBBoxCache::_ResolvePrim(const _BBoxTask* task,
                                const _PrimContext &primContext,
                                const GfMatrix4d &inverseComponentCtm)
 {

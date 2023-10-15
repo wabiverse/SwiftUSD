@@ -117,6 +117,10 @@ public:
     USDGEOM_API
     UsdGeomBBoxCache &operator=(UsdGeomBBoxCache const &other);
 
+    /// Deconstructor.
+    USDGEOM_API
+    virtual ~UsdGeomBBoxCache() noexcept;
+
     /// Compute the bound of the given prim in world space, leveraging any
     /// pre-existing, cached bounds.
     ///
@@ -471,7 +475,7 @@ private:
     //
     // \p inverseComponentCtm is used to combine all the child bboxes in
     // component-relative space.
-    void _ResolvePrim(_BBoxTask* task,
+    void _ResolvePrim(const _BBoxTask* task,
                       const _PrimContext& prim,
                       const GfMatrix4d &inverseComponentCtm);
 
