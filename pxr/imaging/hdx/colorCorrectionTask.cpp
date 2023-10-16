@@ -68,7 +68,7 @@ HdxColorCorrectionTask::HdxColorCorrectionTask(
     _params.lut3dSizeOCIO = HDX_DEFAULT_LUT3D_SIZE_OCIO;
 }
 
-HdxColorCorrectionTask::~HdxColorCorrectionTask()
+HdxColorCorrectionTask::~HdxColorCorrectionTask() noexcept
 {
     // If we had queued up work in Sync(), we expect a subsequent
     // invokation of Execute() will have waited on completion.
