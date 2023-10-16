@@ -9,6 +9,7 @@ import PackageDescription
 
 #if os(macOS)
   let platformIncludes = [
+    // macOS platform includes
     "-I/opt/homebrew/Cellar/tbb/2021.10.0/include",
     "-I/opt/homebrew/Cellar/python@3.11/3.11.5/Frameworks/Python.framework/Versions/3.11/include/python3.11",
     "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
@@ -16,6 +17,8 @@ import PackageDescription
     "-I/Applications/MaterialX.app/Contents/Resources/1.38.8/include",
     "-I/Applications/OSL.app/Contents/Resources/1.12.13/include",
     "-I/opt/homebrew/include",
+    // macOS compiler flags
+    "-fno-objc-arc", /* disable ARC, as it's done manually for objc USD source. */
   ]
 #elseif os(Linux)
   let platformIncludes = [
