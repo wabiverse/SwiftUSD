@@ -52,6 +52,7 @@ let package = Package(
         .unsafeFlags([
           "-I.",
         ] + platformIncludes),
+        .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
         .define("OPENEXR_EXPORT", to: "static")
       ],
       swiftSettings: [
