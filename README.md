@@ -19,7 +19,7 @@ as well as support for **Microsoft Windows**. To learn more about Swift, please 
 ##### To use Pixar USD with Swift, add **SwiftUSD** as a **Package** dependency in your Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.0.8"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", branch: "main"),
 ]
 ```
 
