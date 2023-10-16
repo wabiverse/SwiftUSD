@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "metaversekit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:wabiverse/MetaverseKit.git",
+      "state" : {
+        "revision" : "8dca0d70a9a2d2ad20e8b4046ae4287f10867553",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -11,9 +11,10 @@ import PackageDescription
   let platformIncludes = [
     // macOS platform includes
     "-I/opt/homebrew/Cellar/tbb/2021.10.0/include",
-    "-I/opt/homebrew/Cellar/python@3.11/3.11.5/Frameworks/Python.framework/Versions/3.11/include/python3.11",
     "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
-    "-I/opt/homebrew/include/Imath",
+    "-I/opt/homebrew/Cellar/imath/3.1.9/include",
+    "-I/opt/homebrew/Cellar/imath/3.1.9/include/Imath",
+    "-I/opt/homebrew/Cellar/alembic/1.8.6/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
@@ -22,20 +23,22 @@ import PackageDescription
     "-I/Applications/OSL.app/Contents/Resources/1.12.13/include",
     // from X11 (through XQuartz) on macOS.
     "-I/opt/X11/include",
-    "-I/opt/homebrew/include",
+    "-I./imaging/hio/OpenEXR",
+    "-I./imaging/hio/OpenEXR/deflate/lib",
+    "-I./imaging/hio/OpenEXR/deflate/lib/arm",
     // macOS compiler flags
     "-fno-objc-arc", /* disable ARC, as it's done manually for objc USD source. */
   ]
   let platformExcludes = [
-    // x11 source (diabled for all but linux but could be enabled on macOS through XQuartz).
-    "imaging/garch/glPlatformContextGLX.h",
+    // headers not intended for macOS.
+    "include/pxr/imaging/garch/glPlatformContextGLX.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowGLX.h",
+    "include/pxr/imaging/garch/glPlatformContextWindows.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowWindows.h",
+    // source not intended for macOS.
     "imaging/garch/glPlatformContextGLX.cpp",
-    "imaging/garch/glPlatformDebugWindowGLX.h",
     "imaging/garch/glPlatformDebugWindowGLX.cpp",
-    // msdos source not indended for anyone else.
-    "imaging/garch/glPlatformContextWindows.h",
     "imaging/garch/glPlatformContextWindows.cpp",
-    "imaging/garch/glPlatformDebugWindowWindows.h",
     "imaging/garch/glPlatformDebugWindowWindows.cpp",
   ]
 #elseif os(Linux)
@@ -43,29 +46,29 @@ import PackageDescription
     "-I/usr/include",
   ]
   let platformExcludes = [
-    // macos source not indended for anyone else.
-    "imaging/garch/glPlatformContextDarwin.h",
+    // headers not intended for linux.
+    "include/pxr/imaging/garch/glPlatformContextDarwin.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowDarwin.h",
+    "include/pxr/imaging/garch/glPlatformContextWindows.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowWindows.h",
+    // source not intended for linux.
     "imaging/garch/glPlatformContextDarwin.mm",
-    "imaging/garch/glPlatformDebugWindowDarwin.h",
     "imaging/garch/glPlatformDebugWindowDarwin.mm",
-    // msdos source not indended for anyone else.
-    "imaging/garch/glPlatformContextWindows.h",
     "imaging/garch/glPlatformContextWindows.cpp",
-    "imaging/garch/glPlatformDebugWindowWindows.h",
     "imaging/garch/glPlatformDebugWindowWindows.cpp",
   ]
 #else /* os(Windows) */
   let platformIncludes = []
   let platformExcludes = [
-    // x11 source (diabled for all but linux but could be enabled on msdos through XMing/Cygwin).
-    "imaging/garch/glPlatformContextGLX.h",
+    // headers not intended for windows.
+    "include/pxr/imaging/garch/glPlatformContextGLX.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowGLX.h",
+    "include/pxr/imaging/garch/glPlatformContextDarwin.h",
+    "include/pxr/imaging/garch/glPlatformDebugWindowDarwin.h",
+    // source not intended for windows.
     "imaging/garch/glPlatformContextGLX.cpp",
-    "imaging/garch/glPlatformDebugWindowGLX.h",
     "imaging/garch/glPlatformDebugWindowGLX.cpp",
-    // macos source not indended for anyone else.
-    "imaging/garch/glPlatformContextDarwin.h",
     "imaging/garch/glPlatformContextDarwin.mm",
-    "imaging/garch/glPlatformDebugWindowDarwin.h",
     "imaging/garch/glPlatformDebugWindowDarwin.mm",
   ]
 #endif /* os(Windows) */
@@ -74,14 +77,21 @@ let package = Package(
   name: "SwiftUSD",
   products: [
     .library(
-      name: "USD",
-      targets: ["USD"]
+      name: "Pixar",
+      targets: ["Pixar"]
     ),
+  ],
+  dependencies: [
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.0")
   ],
   targets: [
     .target(
-      name: "USD",
-      path: "pxr",
+      name: "Pixar",
+      dependencies: [
+        .product(name: "Draco", package: "MetaverseKit"),
+        .product(name: "Eigen", package: "MetaverseKit"),
+        .product(name: "Python", package: "MetaverseKit"),
+      ],
       exclude: [
         "base/tf/testenv/main.cpp",
         "usd/usd/testenv",
@@ -89,14 +99,10 @@ let package = Package(
         "usd/usd/codegenTemplates",
         "imaging/plugin/hdEmbree",
         "imaging/glf/testGLContext.cpp",
-        "../third_party/renderman-24/plugin/rtx_glfImage/main.cpp",
-        "../third_party/renderman-25/plugin/rtx_glfImage/main.cpp",
       ] + platformExcludes,
-      publicHeadersPath: ".",
+      publicHeadersPath: "include",
       cxxSettings: [
-        .unsafeFlags([
-          "-I.",
-        ] + platformIncludes),
+        .unsafeFlags(platformIncludes),
         .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
         .define("OPENEXR_EXPORT", to: "static"),
       ],
@@ -107,7 +113,7 @@ let package = Package(
 
     .testTarget(
       name: "USDTests",
-      dependencies: ["USD"]
+      dependencies: ["Pixar"]
     ),
   ],
   cxxLanguageStandard: .cxx17
