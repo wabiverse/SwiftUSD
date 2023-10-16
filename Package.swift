@@ -13,8 +13,11 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/tbb/2021.10.0/include",
     "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
     "-I/opt/homebrew/Cellar/imath/3.1.9/include",
+    // Imath again because alembic likes it that way.
     "-I/opt/homebrew/Cellar/imath/3.1.9/include/Imath",
     "-I/opt/homebrew/Cellar/alembic/1.8.6/include",
+    "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
+    "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
