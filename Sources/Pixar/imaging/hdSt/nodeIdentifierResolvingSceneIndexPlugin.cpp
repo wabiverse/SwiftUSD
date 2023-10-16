@@ -20,9 +20,9 @@
 // distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
-#include "nodeIdentifierResolvingSceneIndexPlugin.h"
+#include "pxr/imaging/hdSt/nodeIdentifierResolvingSceneIndexPlugin.h"
 
-#include "nodeIdentifierResolvingSceneIndex.h"
+#include "pxr/imaging/hdSt/nodeIdentifierResolvingSceneIndex.h"
 
 #include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
 

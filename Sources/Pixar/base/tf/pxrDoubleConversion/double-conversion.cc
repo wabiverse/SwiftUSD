@@ -28,14 +28,14 @@
 #include <limits.h>
 #include <math.h>
 
-#include "double-conversion.h"
+#include "pxr/base/tf/pxrDoubleConversion/double-conversion.h"
 
-#include "bignum-dtoa.h"
-#include "fast-dtoa.h"
-#include "fixed-dtoa.h"
-#include "ieee.h"
-#include "strtod.h"
-#include "utils.h"
+#include "pxr/base/tf/pxrDoubleConversion/bignum-dtoa.h"
+#include "pxr/base/tf/pxrDoubleConversion/fast-dtoa.h"
+#include "pxr/base/tf/pxrDoubleConversion/fixed-dtoa.h"
+#include "pxr/base/tf/pxrDoubleConversion/ieee.h"
+#include "pxr/base/tf/pxrDoubleConversion/strtod.h"
+#include "pxr/base/tf/pxrDoubleConversion/utils.h"
 
 #include "pxr/pxr.h"
 

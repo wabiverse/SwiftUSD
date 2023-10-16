@@ -26,8 +26,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "diy-fp.h"
-#include "utils.h"
+#include "pxr/base/tf/pxrDoubleConversion/diy-fp.h"
+#include "pxr/base/tf/pxrDoubleConversion/utils.h"
 
 #include "pxr/pxr.h"
 

@@ -22,7 +22,7 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "shaderSection.h"
+#include "pxr/imaging/hgi/shaderSection.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

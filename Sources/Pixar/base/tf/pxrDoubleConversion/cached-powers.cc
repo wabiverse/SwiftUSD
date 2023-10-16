@@ -29,9 +29,9 @@
 #include <limits.h>
 #include <math.h>
 
-#include "utils.h"
+#include "pxr/base/tf/pxrDoubleConversion/utils.h"
 
-#include "cached-powers.h"
+#include "pxr/base/tf/pxrDoubleConversion/cached-powers.h"
 
 #include "pxr/pxr.h"
 

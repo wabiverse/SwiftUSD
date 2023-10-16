@@ -24,6 +24,7 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/vulkan-headers/1.3.267/include",
     "-I/opt/homebrew/Cellar/spirv-headers/1.3.261.1/include",
     "-I/opt/homebrew/Cellar/spirv-cross/1.3.261.1/include",
+    "-I/opt/homebrew/Cellar/shaderc/2023.7/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.

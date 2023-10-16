@@ -25,11 +25,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "fast-dtoa.h"
+#include "pxr/base/tf/pxrDoubleConversion/fast-dtoa.h"
 
-#include "cached-powers.h"
-#include "diy-fp.h"
-#include "ieee.h"
+#include "pxr/base/tf/pxrDoubleConversion/cached-powers.h"
+#include "pxr/base/tf/pxrDoubleConversion/diy-fp.h"
+#include "pxr/base/tf/pxrDoubleConversion/ieee.h"
 
 #include "pxr/pxr.h"
 

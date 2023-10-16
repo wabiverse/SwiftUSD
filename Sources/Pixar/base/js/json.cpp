@@ -44,13 +44,13 @@
 #define RAPIDJSON_NAMESPACE_BEGIN namespace PXRJS { namespace rapidjson {
 #define RAPIDJSON_NAMESPACE_END } }
 
-#include "rapidjson/allocators.h"
-#include "rapidjson/document.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/ostreamwrapper.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/error/error.h"
-#include "rapidjson/error/en.h"
+#include "pxr/base/js/rapidjson/allocators.h"
+#include "pxr/base/js/rapidjson/document.h"
+#include "pxr/base/js/rapidjson/reader.h"
+#include "pxr/base/js/rapidjson/ostreamwrapper.h"
+#include "pxr/base/js/rapidjson/prettywriter.h"
+#include "pxr/base/js/rapidjson/error/error.h"
+#include "pxr/base/js/rapidjson/error/en.h"
 
 namespace rj = RAPIDJSON_NAMESPACE;
 

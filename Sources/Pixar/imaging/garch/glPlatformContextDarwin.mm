@@ -25,7 +25,7 @@
 #import <AppKit/NSOpenGL.h>
 
 #include "pxr/pxr.h"
-#include "glPlatformContextDarwin.h"
+#include "pxr/imaging/garch/glPlatformContextDarwin.h"
 
 #ifdef ARCH_OS_IOS
 typedef EAGLContext NSGLContext;

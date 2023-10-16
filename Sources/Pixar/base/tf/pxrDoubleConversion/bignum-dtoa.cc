@@ -27,10 +27,10 @@
 
 #include <math.h>
 
-#include "bignum-dtoa.h"
+#include "pxr/base/tf/pxrDoubleConversion/bignum-dtoa.h"
 
-#include "bignum.h"
-#include "ieee.h"
+#include "pxr/base/tf/pxrDoubleConversion/bignum.h"
+#include "pxr/base/tf/pxrDoubleConversion/ieee.h"
 
 #include "pxr/pxr.h"
 

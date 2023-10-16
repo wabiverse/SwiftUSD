@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "generativeProceduralPluginRegistry.h"
+#include "pxr/imaging/hdGp/generativeProceduralPluginRegistry.h"
 
 #include "pxr/base/plug/registry.h"
 #include "pxr/base/tf/getenv.h"

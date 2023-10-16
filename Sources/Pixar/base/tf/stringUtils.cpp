@@ -46,8 +46,8 @@
 #include <vector>
 #include <memory>
 
-#include "pxrDoubleConversion/double-conversion.h"
-#include "pxrDoubleConversion/utils.h"
+#include "pxr/base/tf/pxrDoubleConversion/double-conversion.h"
+#include "pxr/base/tf/pxrDoubleConversion/utils.h"
 
 #if defined(ARCH_OS_WINDOWS)
 #include <Shlwapi.h>

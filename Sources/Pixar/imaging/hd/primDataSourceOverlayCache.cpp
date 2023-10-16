@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "primDataSourceOverlayCache.h"
+#include "pxr/imaging/hd/primDataSourceOverlayCache.h"
 
 #include "pxr/base/trace/trace.h"
 #include "pxr/base/tf/denseHashSet.h"
