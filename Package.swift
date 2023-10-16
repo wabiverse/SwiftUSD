@@ -18,6 +18,9 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/alembic/1.8.6/include",
     "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
     "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
+    "-I/opt/homebrew/Cellar/ptex/2.4.2/include",
+    "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
+    "-I/opt/homebrew/Cellar/openvdb/10.0.1_2/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
