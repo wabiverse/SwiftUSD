@@ -35,21 +35,27 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
+static void
+_VerifyDirtyListSize(HdDirtyList *dl, size_t count)
+{
+    if (!TF_VERIFY(dl)) {
+        return;
+    }
+    SdfPathVector const &dirtyRprimIds = dl->GetDirtyRprims();
+    TF_VERIFY(dirtyRprimIds.size() == count, "expected %zu, found %zu",
+              count, dirtyRprimIds.size());
+}
+
 #define _VERIFY_PERF_COUNT(token, count) \
             TF_VERIFY(perfLog.GetCounter(token) == count, \
                     "expected %d found %.0f", \
                     count,\
                     perfLog.GetCounter(token));
 
-#define _VERIFY_DIRTY_SIZE(pass, count) \
+#define _VERIFY_DIRTY_SIZE(delegate, count) \
         { \
-            HdDirtyListSharedPtr dirtyList = pass->GetDirtyList(); \
-            SdfPathVector const& dirtyPaths = \
-                       dirtyList->GetDirtyRprims(); \
-            TF_VERIFY(dirtyPaths.size() == count, \
-                        "expected %d found %zu", \
-                        count,\
-                        dirtyPaths.size());\
+            HdDirtyList dirtyList(delegate.GetRenderIndex()); \
+            _VerifyDirtyListSize(&dirtyList, count); \
        }
 
 void
@@ -81,21 +87,21 @@ DirtyListTest()
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyLists, 1);
 
     // no dirty prims at this point
-    _VERIFY_DIRTY_SIZE(renderPass0, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // make dirty
     delegate.AddMesh(id);
     changeTracker.MarkRprimDirty(id, HdChangeTracker::DirtyVisibility);
 
     // 1 dirty prim
-    _VERIFY_DIRTY_SIZE(renderPass0, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
 
     // clean
     changeTracker.ResetVaryingState();
     changeTracker.MarkRprimClean(id, HdChangeTracker::Clean);
 
     // 0 dirty prim
-    _VERIFY_DIRTY_SIZE(renderPass0, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // hull repr doesn't care about Normals. 
     changeTracker.ResetVaryingState();
@@ -104,7 +110,7 @@ DirtyListTest()
     // however, the dirtylist always includes Varying prims even though
     // they are assumed clean for the repr
     // XXX: we'd like to fix this inefficiency.
-    _VERIFY_DIRTY_SIZE(renderPass0, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
 
     // more render passes
     HdRprimCollection collection(HdTokens->geometry, 
@@ -119,19 +125,19 @@ DirtyListTest()
     changeTracker.MarkRprimDirty(id, HdChangeTracker::DirtyVisibility);
 
     // new render pass. returns 1 dirty prim
-    _VERIFY_DIRTY_SIZE(renderPass1, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
 
     // renderPass0:Visibility, renderPass1:Hull, renderPass2:Hull
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyLists, 3);
 
     // new render pass. returns 1 dirty prim
-    _VERIFY_DIRTY_SIZE(renderPass2, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
 
     changeTracker.ResetVaryingState();
     changeTracker.MarkRprimDirty(id, HdChangeTracker::DirtyTopology);
-    _VERIFY_DIRTY_SIZE(renderPass0, 1);
-    _VERIFY_DIRTY_SIZE(renderPass1, 1);
-    _VERIFY_DIRTY_SIZE(renderPass2, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
 
     // clean all.
     changeTracker.ResetVaryingState();
@@ -170,30 +176,30 @@ DirtyListTest2()
 
     HdUnitTestDelegate &delegate = driver.GetDelegate();
     HdRenderPassSharedPtr const &geomPass = driver.GetRenderPass();
-    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass(true);
+    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass();
 
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     delegate.AddCube(SdfPath("/cube"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/guideCube"), identity, /*guide=*/true);
 
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // draw only cube.
     driver.Draw();
     // Even though guide cube is dirty.
     // geomAndGuidePass's dirty list will return clean as scene state hasn't
     // changed
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // draw guide
     driver.Draw(/*withGuides=*/true);
     // everything clean.
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 }
 
 static void
@@ -208,16 +214,16 @@ DirtyListTest3()
     GfMatrix4f identity(1);
 
     HdRenderPassSharedPtr const &geomPass = driver.GetRenderPass();
-    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass(true);
+    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass();
 
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     delegate.AddCube(SdfPath("/cube"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/guideCube"), identity, /*guide=*/true);
 
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // These changes should be tracked and cause no prims to be updated during
     // the following Draw() calls.
@@ -229,42 +235,42 @@ DirtyListTest3()
     driver.Draw(/*guides*/true);
 
     // Verify that our dirty lists are now empty.
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // This should trigger an update in the DirtyList to recompute its included
     // prims.
     delegate.UnhideRprim(SdfPath("/cube"));
     delegate.UnhideRprim(SdfPath("/guideCube"));
 
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // draw only cube.
     driver.Draw();
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     // Even though guide cube is dirty.
     // geomAndGuidePass's dirty list will return clean as scene state hasn't
     // changed
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // Swapping the collection (geomPass creates a new dirtyList)
     geomPass->SetRprimCollection(geomAndGuidePass->GetRprimCollection());
 
     // /cube and /guideCube is added into the dirty list.
     // note that /cube ic clean, but new dirty list contains all due to InitRepr
-    _VERIFY_DIRTY_SIZE(geomPass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // Sanity check, this pass should be unaffected.
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // Trigger a collection change :  /cube=clean, /guideCube=dirty
     driver.GetDelegate().UnhideRprim(SdfPath("/cube"));
 
     // 'Unhide' is a collection change. all dirty list will be refreshed
     // to include all items in the collection.
-    _VERIFY_DIRTY_SIZE(geomPass, 2);          // /cube, /guideCube
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);  // /cube, /guideCube
+    _VERIFY_DIRTY_SIZE(delegate, 2);          // /cube, /guideCube
+    _VERIFY_DIRTY_SIZE(delegate, 2);  // /cube, /guideCube
 
 }
 
@@ -281,7 +287,7 @@ DirtyListTest4()
 
     HdUnitTestDelegate &delegate = driver.GetDelegate();
     HdRenderPassSharedPtr const &geomPass = driver.GetRenderPass();
-    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass(true);
+    HdRenderPassSharedPtr const &geomAndGuidePass = driver.GetRenderPass();
 
     HdRprimCollection col = geomPass->GetRprimCollection();
     SdfPathVector rootPaths;
@@ -289,16 +295,16 @@ DirtyListTest4()
     col.SetRootPaths(rootPaths);
     geomPass->SetRprimCollection(col);
 
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     delegate.AddCube(SdfPath("/cube"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/guideCube"), identity, /*guide=*/true);
 
     // Expect GetSize() == 2 in both cases here because dirty lists start off
     // with all prims present, its only after drawing that the list is reduced.
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // These changes should be tracked and cause no prims to be updated during
     // the following Draw() calls.
@@ -310,16 +316,16 @@ DirtyListTest4()
     driver.Draw(/*guides*/true);
 
     // Verify that our dirty lists are now empty.
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // This should trigger an update in the DirtyList to recompute its included
     // prims.
     delegate.UnhideRprim(SdfPath("/cube"));
     delegate.UnhideRprim(SdfPath("/guideCube"));
 
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
     // draw only cube.
     driver.Draw();
@@ -331,24 +337,24 @@ DirtyListTest4()
 
     driver.Draw();
 
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     // Even though guide cube is dirty.
     // geomAndGuidePass's dirty list will return clean as scene state hasn't
     // changed
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // switch collection, create a new dirtyList
     geomPass->SetRprimCollection(geomAndGuidePass->GetRprimCollection());
-    _VERIFY_DIRTY_SIZE(geomPass, 2);  // cube:clean guideCube:dirty
+    _VERIFY_DIRTY_SIZE(delegate, 2);  // cube:clean guideCube:dirty
 
     // Sanity check, this pass should be unaffected.
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);  // cube:partially-clean, guideCube:dirty
+    _VERIFY_DIRTY_SIZE(delegate, 2);  // cube:partially-clean, guideCube:dirty
 
     // Trigger a dirty change
     // XXX: revisit this test
     delegate.UnhideRprim(SdfPath("/cube"));
-    _VERIFY_DIRTY_SIZE(geomPass, 2);          // cube:clean guideCube:dirty
-    _VERIFY_DIRTY_SIZE(geomAndGuidePass, 2);  // cube:clean guideCube:dirty
+    _VERIFY_DIRTY_SIZE(delegate, 2);          // cube:clean guideCube:dirty
+    _VERIFY_DIRTY_SIZE(delegate, 2);  // cube:clean guideCube:dirty
 }
 
 static void
@@ -371,14 +377,14 @@ DirtyListTest5()
     HdRenderPassSharedPtr const &geomPass = driver.GetRenderPass();
 
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 0);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 1);
 
     delegate.AddCube(SdfPath("/cube"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/cube2"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/cube3"), identity, /*guide=*/false);
 
-    _VERIFY_DIRTY_SIZE(geomPass, 3);
+    _VERIFY_DIRTY_SIZE(delegate, 3);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 2);
 
     // Make sure the prims are marked clean, like sync would, so we can enter
@@ -396,7 +402,7 @@ DirtyListTest5()
     // dirtylist becomes stable-set containing 2 prims,
     // since we cleared the initialization list.
 
-    _VERIFY_DIRTY_SIZE(geomPass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
 
     // Two mark dirties of the same prim is seen as a redundant sets
@@ -411,29 +417,29 @@ DirtyListTest5()
     driver.Draw();                                                // << REBUILD
 
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
 
 
     // Marking dirty should no longer trigger a rebuild, expect stable state.
     delegate.MarkRprimDirty(SdfPath("/cube"), dirtyBits);
     delegate.MarkRprimDirty(SdfPath("/cube2"), dirtyBits);
-    _VERIFY_DIRTY_SIZE(geomPass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
     tracker.MarkRprimClean(SdfPath("/cube"), HdChangeTracker::Clean);
     tracker.MarkRprimClean(SdfPath("/cube2"), HdChangeTracker::Clean);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
 
     delegate.MarkRprimDirty(SdfPath("/cube"), dirtyBits);
     delegate.MarkRprimDirty(SdfPath("/cube2"), dirtyBits);
-    _VERIFY_DIRTY_SIZE(geomPass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
     tracker.MarkRprimClean(SdfPath("/cube"), HdChangeTracker::Clean);
     tracker.MarkRprimClean(SdfPath("/cube2"), HdChangeTracker::Clean);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
 
     // ---------------------------------------------------------------------- //
@@ -443,27 +449,27 @@ DirtyListTest5()
 
     delegate.MarkRprimDirty(SdfPath("/cube3"), dirtyBits);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
     tracker.MarkRprimClean(SdfPath("/cube3"), HdChangeTracker::Clean);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
 
     delegate.MarkRprimDirty(SdfPath("/cube3"), dirtyBits);
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
     tracker.MarkRprimClean(SdfPath("/cube3"), HdChangeTracker::Clean);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
 
     delegate.MarkRprimDirty(SdfPath("/cube3"), dirtyBits);
-    _VERIFY_DIRTY_SIZE(geomPass, 1);
+    _VERIFY_DIRTY_SIZE(delegate, 1);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
     tracker.MarkRprimClean(SdfPath("/cube3"), HdChangeTracker::Clean);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
-    _VERIFY_DIRTY_SIZE(geomPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 4);
 }
 
@@ -498,9 +504,9 @@ DirtyListTest6()
         HdRenderPassSharedPtr(new Hd_UnitTestNullRenderPass(&renderIndex, col));
 
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 0);
-    _VERIFY_DIRTY_SIZE(passA, 0);
-    _VERIFY_DIRTY_SIZE(passB, 0);
-    _VERIFY_DIRTY_SIZE(passC, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     delegate.AddCube(SdfPath("/c/cube5"), identity, /*guide=*/false);
     delegate.AddCube(SdfPath("/b/cube3"), identity, /*guide=*/false);
@@ -514,9 +520,9 @@ DirtyListTest6()
 
     // The dirty lists now include all prims in the scene
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 3);
-    _VERIFY_DIRTY_SIZE(passA, 9);
-    _VERIFY_DIRTY_SIZE(passB, 9);
-    _VERIFY_DIRTY_SIZE(passC, 9);
+    _VERIFY_DIRTY_SIZE(delegate, 9);
+    _VERIFY_DIRTY_SIZE(delegate, 9);
+    _VERIFY_DIRTY_SIZE(delegate, 9);
     driver.Draw();
 
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 7);
@@ -530,7 +536,7 @@ DirtyListTest6()
     //
     // Therefore, when we run pass A's dirty list again.  It sees something has
     // changed and so it enters the varying state.
-    _VERIFY_DIRTY_SIZE(passA, 9);
+    _VERIFY_DIRTY_SIZE(delegate, 9);
     _VERIFY_PERF_COUNT(HdPerfTokens->dirtyListsRebuilt, 8);
 }
 
@@ -571,7 +577,7 @@ DirtyListTest7()
     TF_VERIFY(dirtyBits == renderIndex.GetRprim(id)->GetInitialDirtyBitsMask());
 
     // Draw flat shaded hull
-    driver.Draw(passA);
+    driver.Draw(passA, true);
     dirtyBits = renderIndex.GetChangeTracker().GetRprimDirtyBits(id);
 
     TF_VERIFY(!HdChangeTracker::IsExtentDirty(dirtyBits, id));
@@ -584,7 +590,7 @@ DirtyListTest7()
     TF_VERIFY(!HdChangeTracker::IsPrimvarDirty(dirtyBits, id, HdTokens->normals));
 
     // Draw smooth shaded hull (cleans normals)
-    driver.Draw(passB);
+    driver.Draw(passB, true);
     dirtyBits = renderIndex.GetChangeTracker().GetRprimDirtyBits(id);
 
     TF_VERIFY(!HdChangeTracker::IsPrimvarDirty(dirtyBits, id, HdTokens->normals));
@@ -619,14 +625,14 @@ DirtyListTest8()
         delegate.AddCube(id, identity, /*guide=*/false);
         ids.push_back(id);
     }
-    _VERIFY_DIRTY_SIZE(pass, 100);
+    _VERIFY_DIRTY_SIZE(delegate, 100);
 
     // clean (initial)
     for (size_t i = 0; i < ids.size(); ++i) {
         tracker.MarkRprimClean(ids[i], HdChangeTracker::Clean);
     }
 
-    _VERIFY_DIRTY_SIZE(pass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // mark half dirty
     for (int i = 0; i < 50; ++i) {
@@ -634,7 +640,7 @@ DirtyListTest8()
     }
 
     // 50 varying prims
-    _VERIFY_DIRTY_SIZE(pass, 50);
+    _VERIFY_DIRTY_SIZE(delegate, 50);
 
     // clean all prims
     for (size_t i = 0; i < ids.size(); ++i) {
@@ -647,14 +653,14 @@ DirtyListTest8()
     }
 
     // 50 varying prims
-    _VERIFY_DIRTY_SIZE(pass, 50);
+    _VERIFY_DIRTY_SIZE(delegate, 50);
 
     // clean all prims
     for (size_t i = 0; i < ids.size(); ++i) {
         tracker.MarkRprimClean(ids[i], HdChangeTracker::Clean);
     }
 
-    _VERIFY_DIRTY_SIZE(pass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // mark 2 dirty
     for (int i = 0; i < 2; ++i) {
@@ -662,15 +668,15 @@ DirtyListTest8()
     }
 
     // still 50 prims
-    _VERIFY_DIRTY_SIZE(pass, 50);
+    _VERIFY_DIRTY_SIZE(delegate, 50);
 
     // Mark one more dirty.  As varying the dirty list, reset the
     // dirty list, so Sync won't operate.
     delegate.MarkRprimDirty(ids[2], HdChangeTracker::DirtyTransform);
 
-    driver.Draw(pass);  // should reset varying state, since only < 10% prims are varying
+    driver.Draw(pass, true);  // should reset varying state, since only < 10% prims are varying
 
-    _VERIFY_DIRTY_SIZE(pass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // mark 2 dirty
     for (int i = 0; i < 2; ++i) {
@@ -678,11 +684,11 @@ DirtyListTest8()
     }
 
     // shrink dirty list
-    _VERIFY_DIRTY_SIZE(pass, 2);
+    _VERIFY_DIRTY_SIZE(delegate, 2);
 
-    driver.Draw(pass);
+    driver.Draw(pass, true);
 
-    _VERIFY_DIRTY_SIZE(pass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
 }
 

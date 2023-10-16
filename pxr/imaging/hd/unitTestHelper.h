@@ -24,6 +24,7 @@
 #ifndef PXR_IMAGING_HD_UNIT_TEST_HELPER_H
 #define PXR_IMAGING_HD_UNIT_TEST_HELPER_H
 
+#include "imaging/hd/dirtyList.h"
 #include "pxr/pxr.h"
 #include "pxr/imaging/hd/api.h"
 #include "pxr/imaging/hd/engine.h"
@@ -38,7 +39,6 @@
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class Hd_TestDriver
 ///

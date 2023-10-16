@@ -31,6 +31,8 @@
 #include <sstream>
 #include <unordered_set>
 
+PXR_NAMESPACE_USING_DIRECTIVE
+
 // ----------------------------------------------------------------------------
 
 std::ostream &operator <<(std::ostream &stream,

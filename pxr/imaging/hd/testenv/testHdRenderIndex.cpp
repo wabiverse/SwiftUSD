@@ -38,15 +38,21 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#define _VERIFY_DIRTY_SIZE(pass, count) \
+static void
+_VerifyDirtyListSize(HdDirtyList *dl, size_t count)
+{
+    if (!TF_VERIFY(dl)) {
+        return;
+    }
+    SdfPathVector const &dirtyRprimIds = dl->GetDirtyRprims();
+    TF_VERIFY(dirtyRprimIds.size() == count, "expected %zu, found %zu",
+              count, dirtyRprimIds.size());
+}
+
+#define _VERIFY_DIRTY_SIZE(delegate, count) \
         { \
-            HdDirtyListSharedPtr dirtyList = pass->GetDirtyList(); \
-            SdfPathVector const& dirtyPaths = \
-                       dirtyList->GetDirtyRprims(); \
-            TF_VERIFY(dirtyPaths.size() == count, \
-                        "expected %d found %zu", \
-                        count,\
-                        dirtyPaths.size());\
+            HdDirtyList dirtyList(delegate.GetRenderIndex()); \
+            _VerifyDirtyListSize(&dirtyList, count); \
        }
 
 static
@@ -202,9 +208,9 @@ SyncTest()
     primList.push_back(SdfPath("/E/e1"));
 
     // insert
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
     TF_FOR_ALL(it, primList) delegate.AddMesh(*it);
-    _VERIFY_DIRTY_SIZE(renderPass, 8);
+    _VERIFY_DIRTY_SIZE(delegate, 8);
 
     // ------- sync /A --------
     SdfPathVector rootA;
@@ -215,7 +221,7 @@ SyncTest()
     renderIndex.SyncAll(&tasks, &taskContext);
 
     // Render pass has been filtered to /A and we just cleaned it.
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // invalidate all
     changeTracker.ResetVaryingState();
@@ -230,7 +236,7 @@ SyncTest()
     renderIndex.SyncAll(&tasks, &taskContext);
 
     // Ok, we expect the list to be clean now.
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // invalidate all
     changeTracker.ResetVaryingState();
@@ -247,7 +253,7 @@ SyncTest()
     renderIndex.SyncAll(&tasks, &taskContext);
 
     // /A, /C remain
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // ---------------------------------------------------------------------- //
     // ApplyEdit Transition tests
@@ -261,7 +267,7 @@ SyncTest()
     roots.push_back(SdfPath("/"));
     collection.SetRootPaths(roots);
     renderPass->SetRprimCollection(collection);
-    _VERIFY_DIRTY_SIZE(renderPass, 8);
+    _VERIFY_DIRTY_SIZE(delegate, 8);
 
     // Transition from root </> to </A>, should still have 8 elements
     // as it includes all prims
@@ -271,7 +277,7 @@ SyncTest()
     renderPass->SetRprimCollection(collection);
 
     // As this doesn't effect the scene state, we expect no change
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     // --
 
@@ -283,7 +289,7 @@ SyncTest()
     roots.push_back(SdfPath("/A"));
     collection.SetRootPaths(roots);
     renderPass->SetRprimCollection(collection);
-    _VERIFY_DIRTY_SIZE(renderPass, 8);
+    _VERIFY_DIRTY_SIZE(delegate, 8);
     // Transition from root </A> to </>, should still have 8 elements
     roots.clear();
     roots.push_back(SdfPath("/"));
@@ -291,7 +297,7 @@ SyncTest()
     renderPass->SetRprimCollection(collection);
 
     // As this doesn't effect the scene state, we expect no change
-    _VERIFY_DIRTY_SIZE(renderPass, 0);
+    _VERIFY_DIRTY_SIZE(delegate, 0);
 
     return true;
 }
