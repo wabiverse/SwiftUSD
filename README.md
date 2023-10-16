@@ -31,7 +31,7 @@ targets: [
     name: "MyMetaverseLibrary",
     dependencies: [
       /* add pixar usd as a library dependency. */
-      .product(name: "USD", package: "SwiftUSD")
+      .product(name: "Pixar", package: "SwiftUSD")
     ]
   ),
 
@@ -40,7 +40,7 @@ targets: [
     name: "MyMetaverseApp",
     dependencies: [
       /* add pixar usd as an executable dependency. */
-      .product(name: "USD", package: "SwiftUSD"),
+      .product(name: "Pixar", package: "SwiftUSD"),
     ],
     plugins: [
       /* 📙 And, plugins are added like so. */
