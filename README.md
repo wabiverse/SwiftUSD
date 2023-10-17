@@ -16,12 +16,13 @@ as well as support for **Microsoft Windows**. To learn more about Swift, please 
 
 <image src="https://steamuserimages-a.akamaihd.net/ugc/110734252808679209/093302F19C70C4B7421C2A43200B205A650AB9B2/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false">
 
-##### To use Pixar USD with Swift, add **SwiftUSD** as a **Package** dependency in your Package.swift file.
+##### To use Pixar USD with Swift, add **SwiftUSD** as a **Package** dependency in your Package.swift file, [example usage](https://github.com/wabiverse/Kraken/blob/master/Package.swift).
 ```swift
 dependencies: [
   .package(url: "https://github.com/wabiverse/SwiftUSD.git", branch: "main"),
 ]
 ```
+
 
 ##### Then, for any target you'd like, add **USD** as a **Product** of your **Target** dependencies.
 ```swift
