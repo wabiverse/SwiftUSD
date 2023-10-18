@@ -101,7 +101,7 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
-        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS]))
+        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS]))
       ],
       exclude: [
         "base/tf/testenv/main.cpp",
