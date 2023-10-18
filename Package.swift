@@ -67,7 +67,7 @@ import PackageDescription
     "imaging/garch/glPlatformContextWindows.cpp",
     "imaging/garch/glPlatformDebugWindowWindows.cpp",
   ]
-#else /* os(Windows) */
+#elseif os(Windows)
   let platformIncludes = []
   let platformExcludes = [
     // headers not intended for windows.
