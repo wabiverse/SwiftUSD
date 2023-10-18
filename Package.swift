@@ -92,7 +92,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.0")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.1")
   ],
   targets: [
     .target(
@@ -101,6 +101,7 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
+        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS]))
       ],
       exclude: [
         "base/tf/testenv/main.cpp",
