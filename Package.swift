@@ -10,7 +10,6 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     // macOS platform includes
-    "-I/opt/homebrew/Cellar/tbb/2021.10.0/include",
     "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
     "-I/opt/homebrew/Cellar/imath/3.1.9/include",
     // Imath again because alembic likes it that way.
@@ -22,9 +21,6 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
     "-I/opt/homebrew/Cellar/openvdb/10.0.1_2/include",
     "-I/opt/homebrew/Cellar/vulkan-headers/1.3.267/include",
-    "-I/opt/homebrew/Cellar/spirv-headers/1.3.261.1/include",
-    "-I/opt/homebrew/Cellar/spirv-cross/1.3.261.1/include",
-    "-I/opt/homebrew/Cellar/shaderc/2023.7/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
@@ -99,7 +95,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.3")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.6")
   ],
   targets: [
     .target(
@@ -108,8 +104,10 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
-        .product(name: "Glslang", package: "MetaverseKit"),
-        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS]))
+        .product(name: "Shaderc", package: "MetaverseKit"),
+        .product(name: "SPIRVCross", package: "MetaverseKit"),
+        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
+        .product(name: "OneTBB", package: "MetaverseKit"),
       ],
       exclude: [
         "base/tf/testenv/main.cpp",
