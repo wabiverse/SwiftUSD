@@ -10,7 +10,6 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     // macOS platform includes
-    "-I/opt/homebrew/Cellar/boost/1.82.0_1/include",
     "-I/opt/homebrew/Cellar/imath/3.1.9/include",
     // Imath again because alembic likes it that way.
     "-I/opt/homebrew/Cellar/imath/3.1.9/include/Imath",
@@ -95,19 +94,20 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.6")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.7")
   ],
   targets: [
     .target(
       name: "Pixar",
       dependencies: [
+        .product(name: "OneTBB", package: "MetaverseKit"),
+        .product(name: "Boost", package: "MetaverseKit"),
+        .product(name: "Python", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
-        .product(name: "Python", package: "MetaverseKit"),
         .product(name: "Shaderc", package: "MetaverseKit"),
         .product(name: "SPIRVCross", package: "MetaverseKit"),
         .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
-        .product(name: "OneTBB", package: "MetaverseKit"),
       ],
       exclude: [
         "base/tf/testenv/main.cpp",
