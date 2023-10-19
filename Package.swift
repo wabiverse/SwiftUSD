@@ -85,6 +85,13 @@ import PackageDescription
 
 let package = Package(
   name: "SwiftUSD",
+  platforms: [
+    .macOS(.v11),
+    .visionOS(.v1),
+    .iOS(.v12),
+    .tvOS(.v12),
+    .watchOS(.v4)
+  ],
   products: [
     .library(
       name: "Pixar",
@@ -92,7 +99,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.2")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.3")
   ],
   targets: [
     .target(
@@ -101,6 +108,7 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
+        .product(name: "Glslang", package: "MetaverseKit"),
         .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS]))
       ],
       exclude: [
