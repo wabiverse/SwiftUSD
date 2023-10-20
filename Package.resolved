@@ -3,10 +3,10 @@
     {
       "identity" : "metaversekit",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:wabiverse/MetaverseKit.git",
+      "location" : "https://github.com/wabiverse/MetaverseKit.git",
       "state" : {
-        "revision" : "51bec3dbdc0b53b585cf42249939cbb62fc97260",
-        "version" : "1.0.7"
+        "revision" : "ce5c7c80fd916adf909a5a270464393d963da6dc",
+        "version" : "1.0.8"
       }
     }
   ],

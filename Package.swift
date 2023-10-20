@@ -10,9 +10,6 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     // macOS platform includes
-    "-I/opt/homebrew/Cellar/imath/3.1.9/include",
-    // Imath again because alembic likes it that way.
-    "-I/opt/homebrew/Cellar/imath/3.1.9/include/Imath",
     "-I/opt/homebrew/Cellar/alembic/1.8.6/include",
     "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
     "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
@@ -94,7 +91,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.7")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.8")
   ],
   targets: [
     .target(
@@ -103,6 +100,7 @@ let package = Package(
         .product(name: "OneTBB", package: "MetaverseKit"),
         .product(name: "Boost", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
+        .product(name: "IMath", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Shaderc", package: "MetaverseKit"),
