@@ -13,7 +13,6 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/alembic/1.8.6/include",
     "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
     "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
-    "-I/opt/homebrew/Cellar/ptex/2.4.2/include",
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
     "-I/opt/homebrew/Cellar/vulkan-headers/1.3.267/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
@@ -81,7 +80,7 @@ let package = Package(
     .visionOS(.v1),
     .iOS(.v12),
     .tvOS(.v12),
-    .watchOS(.v4)
+    .watchOS(.v4),
   ],
   products: [
     .library(
@@ -90,7 +89,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.0")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.1"),
   ],
   targets: [
     .target(
@@ -101,6 +100,7 @@ let package = Package(
         .product(name: "Python", package: "MetaverseKit"),
         .product(name: "IMath", package: "MetaverseKit"),
         .product(name: "OpenVDB", package: "MetaverseKit"),
+        .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Shaderc", package: "MetaverseKit"),
