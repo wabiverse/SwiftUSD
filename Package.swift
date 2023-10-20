@@ -14,7 +14,6 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
     "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
-    "-I/opt/homebrew/Cellar/vulkan-headers/1.3.267/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
