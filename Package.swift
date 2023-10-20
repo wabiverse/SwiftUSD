@@ -15,7 +15,6 @@ import PackageDescription
     "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
     "-I/opt/homebrew/Cellar/ptex/2.4.2/include",
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
-    "-I/opt/homebrew/Cellar/openvdb/10.0.1_2/include",
     "-I/opt/homebrew/Cellar/vulkan-headers/1.3.267/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
@@ -91,7 +90,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.9")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.0")
   ],
   targets: [
     .target(
@@ -101,6 +100,7 @@ let package = Package(
         .product(name: "Boost", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
         .product(name: "IMath", package: "MetaverseKit"),
+        .product(name: "OpenVDB", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         .product(name: "Shaderc", package: "MetaverseKit"),
