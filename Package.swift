@@ -91,7 +91,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.8")
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.0.9")
   ],
   targets: [
     .target(
