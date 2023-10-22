@@ -34,7 +34,7 @@ HdxTask::HdxTask(SdfPath const& id)
 {
 }
 
-HdxTask::~HdxTask() = default;
+HdxTask::~HdxTask() noexcept = default;
 
 bool
 HdxTask::IsConverged() const
