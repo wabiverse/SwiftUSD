@@ -228,7 +228,7 @@ HgiMetalGraphicsPipeline::_CreateRenderPipelineState(HgiMetal *hgi)
     // Color attachments
     for (size_t i = 0; i < _descriptor.colorAttachmentDescs.size(); i++) {
         HgiAttachmentDesc const &hgiColorAttachment = _descriptor.colorAttachmentDescs[i];
-        MTL::RenderPipelineColorAttachmentDescriptor *metalColorAttachment = stateDesc->colorAttachments->object(i);
+        MTL::RenderPipelineColorAttachmentDescriptor *metalColorAttachment = stateDesc->colorAttachments()->object(i);
         
         metalColorAttachment->setPixelFormat(HgiMetalConversions::GetPixelFormat(hgiColorAttachment.format, hgiColorAttachment.usage));
 
