@@ -22,9 +22,7 @@ import PackageDescription
     "-I/opt/X11/include",
     "-I./imaging/hio/OpenEXR",
     "-I./imaging/hio/OpenEXR/deflate/lib",
-    "-I./imaging/hio/OpenEXR/deflate/lib/arm",
-    // macOS compiler flags
-    "-fno-objc-arc", /* disable ARC, as it's done manually for objc USD source. */
+    "-I./imaging/hio/OpenEXR/deflate/lib/arm"
   ]
   let platformExcludes = [
     // headers not intended for macOS.

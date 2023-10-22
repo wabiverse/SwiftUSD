@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HGI_METAL_TEXTURE_H
 #define PXR_IMAGING_HGI_METAL_TEXTURE_H
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 #include "pxr/pxr.h"
 #include "pxr/imaging/hgiMetal/api.h"
@@ -54,7 +54,7 @@ public:
 
     /// Returns the handle to the Metal texture.
     HGIMETAL_API
-    id<MTLTexture> GetTextureId() const;
+    MTL::Texture *GetTextureId() const;
 
 protected:
     friend class HgiMetal;
@@ -72,7 +72,7 @@ private:
     HgiMetalTexture & operator=(const HgiMetalTexture&) = delete;
     HgiMetalTexture(const HgiMetalTexture&) = delete;
 
-    id<MTLTexture> _textureId;
+    MTL::Texture *_textureId;
 };
 
 

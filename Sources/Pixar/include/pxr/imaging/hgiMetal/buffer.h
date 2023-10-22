@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HGI_METAL_BUFFER_H
 #define PXR_IMAGING_HGI_METAL_BUFFER_H
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 #include "pxr/pxr.h"
 #include "pxr/imaging/hgiMetal/api.h"
@@ -57,14 +57,14 @@ public:
     HGIMETAL_API
     void* GetCPUStagingAddress() override;
 
-    id<MTLBuffer> GetBufferId() const {return _bufferId;}
+    MTL::Buffer* GetBufferId() const {return _bufferId;}
 
 private:
     HgiMetalBuffer() = delete;
     HgiMetalBuffer & operator=(const HgiMetalBuffer&) = delete;
     HgiMetalBuffer(const HgiMetalBuffer&) = delete;
 
-    id<MTLBuffer> _bufferId;
+    MTL::Buffer* _bufferId;
 };
 
 

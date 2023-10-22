@@ -49,7 +49,7 @@ public:
 
     /// Apply pipeline state
     HGIMETAL_API
-    void BindPipeline(id<MTLRenderCommandEncoder> renderEncoder);
+    void BindPipeline(MTL::RenderCommandEncoder *renderEncoder);
 
 private:
     HgiMetalGraphicsPipeline() = delete;
@@ -60,10 +60,10 @@ private:
     void _CreateDepthStencilState(HgiMetal *hgi);
     void _CreateRenderPipelineState(HgiMetal *hgi);
 
-    MTLVertexDescriptor *_vertexDescriptor;
-    id<MTLDepthStencilState> _depthStencilState;
-    id<MTLRenderPipelineState> _renderPipelineState;
-    id<MTLBuffer> _constantTessFactors;
+    MTL::VertexDescriptor *_vertexDescriptor;
+    MTL::DepthStencilState *_depthStencilState;
+    MTL::RenderPipelineState *_renderPipelineState;
+    MTL::Buffer *_constantTessFactors;
 };
 
 

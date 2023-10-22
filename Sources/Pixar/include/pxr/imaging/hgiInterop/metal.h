@@ -26,8 +26,9 @@
 
 #include "pxr/imaging/garch/glApi.h"
 
-#include <Metal/Metal.h>
-#include <AppKit/AppKit.h>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <AppKit/AppKit.hpp>
 
 #include "pxr/pxr.h"
 #include "pxr/base/gf/vec4i.h"
@@ -108,16 +109,16 @@ private:
 
     HgiMetal* _hgiMetal;
 
-    id<MTLDevice> _device;
+    MTL::Device* _device;
 
-    id<MTLTexture> _mtlAliasedColorTexture;
-    id<MTLTexture> _mtlAliasedDepthRegularFloatTexture;
+    MTL::Texture* _mtlAliasedColorTexture;
+    MTL::Texture* _mtlAliasedDepthRegularFloatTexture;
 
-    id<MTLLibrary> _defaultLibrary;
-    id<MTLFunction> _computeDepthCopyProgram;
-    id<MTLFunction> _computeColorCopyProgram;
-    id<MTLComputePipelineState> _computePipelineStateColor;
-    id<MTLComputePipelineState> _computePipelineStateDepth;
+    MTL::Library* _defaultLibrary;
+    MTL::Function* _computeDepthCopyProgram;
+    MTL::Function* _computeColorCopyProgram;
+    MTL::ComputePipelineState* _computePipelineStateColor;
+    MTL::ComputePipelineState* _computePipelineStateDepth;
 
     CVPixelBufferRef _pixelBuffer;
     CVPixelBufferRef _depthBuffer;
@@ -134,7 +135,7 @@ private:
     
     ShaderContext _shaderProgramContext[ShaderContextCount];
     
-    NSOpenGLContext* _currentOpenGLContext;
+    NS::OpenGLContext* _currentOpenGLContext;
 
     int32_t _restoreDrawFbo;
     int32_t _restoreVao;

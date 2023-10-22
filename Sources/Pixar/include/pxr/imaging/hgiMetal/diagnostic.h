@@ -24,6 +24,8 @@
 #ifndef PXR_IMAGING_HGI_METAL_DIAGNOSTIC_H
 #define PXR_IMAGING_HGI_METAL_DIAGNOSTIC_H
 
+#include <Foundation/Foundation.hpp>
+
 #include "pxr/pxr.h"
 #include "pxr/imaging/hgiMetal/api.h"
 #include "pxr/base/arch/functionLite.h"
@@ -42,13 +44,13 @@ HGIMETAL_API
 bool HgiMetalDebugEnabled();
 
 #define HGIMETAL_DEBUG_LABEL(_obj, label) \
-    if (HgiMetalDebugEnabled()) { [_obj setLabel:@(label)]; }
+    if (HgiMetalDebugEnabled()) { _obj->setLabel(NS::String::string(label, NS::StringEncoding::UTF8StringEncoding)); }
 
 #define HGIMETAL_DEBUG_PUSH_GROUP(_obj, label) \
-    if (HgiMetalDebugEnabled()) { [_obj pushDebugGroup:@(label)]; }
+    if (HgiMetalDebugEnabled()) { _obj->pushDebugGroup(NS::String::string(label, NS::StringEncoding::UTF8StringEncoding)); }
 
 #define HGIMETAL_DEBUG_POP_GROUP(_obj) \
-    if (HgiMetalDebugEnabled()) { [_obj popDebugGroup]; }
+    if (HgiMetalDebugEnabled()) { _obj->popDebugGroup(); }
 
 /// Posts diagnostic errors for all Metal errors in the current context.
 HGIMETAL_API

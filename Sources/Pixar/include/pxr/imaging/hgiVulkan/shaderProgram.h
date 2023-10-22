@@ -61,7 +61,7 @@ public:
 
     /// Returns the shader functions that are part of this program.
     HGIVULKAN_API
-    HgiShaderFunctionHandleVector const& GetShaderFunctions() const;
+    HgiShaderFunctionHandleVector const& GetShaderFunctions() const override;
 
     /// Returns the device used to create this object.
     HGIVULKAN_API

@@ -52,16 +52,16 @@ public:
     uint64_t GetRawResource() const override;
 
     HGIMETAL_API
-    id<MTLSamplerState> GetSamplerId() const;
+    MTL::SamplerState* GetSamplerId() const;
 
 private:
     HgiMetalSampler() = delete;
     HgiMetalSampler & operator=(const HgiMetalSampler&) = delete;
     HgiMetalSampler(const HgiMetalSampler&) = delete;
 
-private:
-    id<MTLSamplerState> _samplerId;
-    NSString* _label;
+private: 
+    MTL::SamplerState* _samplerId;
+    NS::String* _label;
 };
 
 

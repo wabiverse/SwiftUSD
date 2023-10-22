@@ -31,7 +31,8 @@
 #include "pxr/imaging/hgi/hgi.h"
 #include "pxr/imaging/hgi/tokens.h"
 
-#import <Metal/Metal.h>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 #include <stack>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -57,7 +58,7 @@ public:
     };
     
     HGIMETAL_API
-    HgiMetal(id<MTLDevice> device = nil);
+    HgiMetal(MTL::Device* device = nil);
 
     HGIMETAL_API
     ~HgiMetal() override;
@@ -160,10 +161,10 @@ public:
 
     /// Returns the primary Metal device.
     HGIMETAL_API
-    id<MTLDevice> GetPrimaryDevice() const;
+    MTL::Device* GetPrimaryDevice() const;
 
     HGIMETAL_API
-    id<MTLCommandQueue> GetQueue() const;
+    MTL::CommandQueue* GetQueue() const;
 
     // Metal Command buffers are heavy weight, while encoders are lightweight.
     // But we cannot have more than one active encoder at a time per cmd buf.
@@ -173,11 +174,11 @@ public:
     // For example, the client code may record in a HgiBlitCmds and a
     // HgiComputeCmds at the same time.
     HGIMETAL_API
-    id<MTLCommandBuffer> GetPrimaryCommandBuffer(HgiCmds *requester = nullptr,
+    MTL::CommandBuffer* GetPrimaryCommandBuffer(HgiCmds *requester = nullptr,
                                                  bool flush = true);
 
     HGIMETAL_API
-    id<MTLCommandBuffer> GetSecondaryCommandBuffer();
+    MTL::CommandBuffer* GetSecondaryCommandBuffer();
 
     HGIMETAL_API
     int GetAPIVersion() const;
@@ -189,20 +190,20 @@ public:
 
     HGIMETAL_API
     void CommitSecondaryCommandBuffer(
-        id<MTLCommandBuffer> commandBuffer,
+        MTL::CommandBuffer* commandBuffer,
         CommitCommandBufferWaitType waitType);
 
     HGIMETAL_API
-    void ReleaseSecondaryCommandBuffer(id<MTLCommandBuffer> commandBuffer);
+    void ReleaseSecondaryCommandBuffer(MTL::CommandBuffer* commandBuffer);
     
     HGIMETAL_API
-    id<MTLArgumentEncoder> GetBufferArgumentEncoder() const;
+    MTL::ArgumentEncoder* GetBufferArgumentEncoder() const;
     HGIMETAL_API
-    id<MTLArgumentEncoder> GetSamplerArgumentEncoder() const;
+    MTL::ArgumentEncoder* GetSamplerArgumentEncoder() const;
     HGIMETAL_API
-    id<MTLArgumentEncoder> GetTextureArgumentEncoder() const;
+    MTL::ArgumentEncoder* GetTextureArgumentEncoder() const;
     HGIMETAL_API
-    id<MTLBuffer> GetArgBuffer();
+    MTL::Buffer* GetArgBuffer();
 
 protected:
     HGIMETAL_API
@@ -220,16 +221,16 @@ private:
         *handle = HgiHandle<T>();
     }
 
-    id<MTLDevice> _device;
-    id<MTLCommandQueue> _commandQueue;
-    id<MTLCommandBuffer> _commandBuffer;
-    id<MTLCaptureScope> _captureScopeFullFrame;
-    id<MTLArgumentEncoder> _argEncoderBuffer;
-    id<MTLArgumentEncoder> _argEncoderSampler;
-    id<MTLArgumentEncoder> _argEncoderTexture;
+    MTL::Device *_device;
+    MTL::CommandQueue *_commandQueue;
+    MTL::CommandBuffer *_commandBuffer;
+    MTL::CaptureScope *_captureScopeFullFrame;
+    MTL::ArgumentEncoder *_argEncoderBuffer;
+    MTL::ArgumentEncoder *_argEncoderSampler;
+    MTL::ArgumentEncoder *_argEncoderTexture;
 
-    using _FreeArgStack = std::stack<id<MTLBuffer>>;
-    using _ActiveArgBuffers = std::vector<id<MTLBuffer>>;
+    using _FreeArgStack = std::stack<MTL::Buffer*>;
+    using _ActiveArgBuffers = std::vector<MTL::Buffer*>;
     _FreeArgStack _freeArgBuffers;
     _ActiveArgBuffers _activeArgBuffers;
     std::mutex _freeArgMutex;
@@ -243,7 +244,7 @@ private:
     bool _workToFlush;
 
 #if !__has_feature(objc_arc)
-    NSAutoreleasePool *_pool;
+    NS::AutoreleasePool *_pool;
 #endif
 };
 

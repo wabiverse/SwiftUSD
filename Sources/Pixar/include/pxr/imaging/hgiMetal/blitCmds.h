@@ -28,6 +28,9 @@
 #include "pxr/imaging/hgiMetal/api.h"
 #include "pxr/imaging/hgi/blitCmds.h"
 
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiMetal;
@@ -95,10 +98,10 @@ private:
 
     void _CreateEncoder();
 
-    HgiMetal* _hgi;
-    id<MTLCommandBuffer> _commandBuffer;
-    id<MTLBlitCommandEncoder> _blitEncoder;
-    NSString* _label;
+    HgiMetal *_hgi;
+    MTL::CommandBuffer *_commandBuffer;
+    MTL::BlitCommandEncoder *_blitEncoder;
+    NS::String *_label;
     bool _secondaryCommandBuffer;
 
     // BlitCmds is used only one frame so storing multi-frame state on BlitCmds

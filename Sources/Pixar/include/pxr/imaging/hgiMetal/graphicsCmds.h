@@ -31,7 +31,8 @@
 #include "pxr/imaging/hgi/graphicsCmds.h"
 #include <cstdint>
 
-#include <Metal/Metal.h>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -119,7 +120,7 @@ public:
     void EnableParallelEncoder(bool enable);
 
     // Needs to be accessible from the Metal IndirectCommandEncoder
-    id<MTLRenderCommandEncoder> GetEncoder(uint32_t encoderIndex = 0);
+    MTL::RenderCommandEncoder* GetEncoder(uint32_t encoderIndex = 0);
 
 protected:
     friend class HgiMetal;
@@ -139,7 +140,7 @@ private:
 
     uint32_t _GetNumEncoders();
     void _SetNumberParallelEncoders(uint32_t numEncoders);
-    void _SetCachedEncoderState(id<MTLRenderCommandEncoder> encoder);
+    void _SetCachedEncoderState(MTL::RenderCommandEncoder *encoder);
     mutable std::mutex _encoderLock;
     
     void _CreateArgumentBuffer();
@@ -151,25 +152,25 @@ private:
 
         void ResetCachedEncoderState();
         
-        MTLViewport viewport;
-        MTLScissorRect scissorRect;
+        MTL::Viewport viewport;
+        MTL::ScissorRect scissorRect;
         
         HgiMetalResourceBindings* resourceBindings;
         HgiMetalGraphicsPipeline* graphicsPipeline;
-        id<MTLBuffer> argumentBuffer;
+        MTL::Buffer *argumentBuffer;
         HgiVertexBufferBindingVector vertexBindings;
     } _CachedEncState;
     
     HgiMetal* _hgi;
-    MTLRenderPassDescriptor* _renderPassDescriptor;
-    id<MTLParallelRenderCommandEncoder> _parallelEncoder;
-    std::vector<id<MTLRenderCommandEncoder>> _encoders;
-    id<MTLBuffer> _argumentBuffer;
+    MTL::RenderPassDescriptor *_renderPassDescriptor;
+    MTL::ParallelRenderCommandEncoder *_parallelEncoder;
+    std::vector<MTL::RenderCommandEncoder*> _encoders;
+    MTL::Buffer *_argumentBuffer;
     HgiGraphicsCmdsDesc _descriptor;
     HgiPrimitiveType _primitiveType;
     uint32_t _primitiveIndexSize;
     uint32_t _drawBufferBindingIndex;
-    NSString* _debugLabel;
+    NS::String* _debugLabel;
     bool _hasWork;
     bool _viewportSet;
     bool _scissorRectSet;

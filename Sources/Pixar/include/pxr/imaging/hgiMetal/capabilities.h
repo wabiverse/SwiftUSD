@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 #define PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 #include "pxr/pxr.h"
 #include "pxr/imaging/hgiMetal/api.h"
 #include "pxr/imaging/hgi/capabilities.h"
@@ -48,7 +48,7 @@ public:
     HGIMETAL_API
     int GetShaderVersion() const override;
 
-    MTLResourceOptions defaultStorageMode;
+    MTL::ResourceOptions defaultStorageMode;
     bool hasVertexMemoryBarrier;
     bool useParallelEncoder;
     bool requiresIndirectDrawFix;
@@ -57,7 +57,7 @@ protected:
     friend class HgiMetal;
 
     HGIMETAL_API
-    HgiMetalCapabilities(id<MTLDevice> device);
+    HgiMetalCapabilities(MTL::Device *device);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

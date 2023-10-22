@@ -62,7 +62,7 @@ public:
     HGIMETAL_API
     HgiMetalShaderGenerator(
         const HgiShaderFunctionDesc &descriptor, 
-        id<MTLDevice> device);
+        MTL::Device *device);
 
     HGIMETAL_API
     ~HgiMetalShaderGenerator() override;

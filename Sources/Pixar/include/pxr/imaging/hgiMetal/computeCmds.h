@@ -30,7 +30,7 @@
 #include "pxr/imaging/hgi/computeCmds.h"
 #include <cstdint>
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -76,7 +76,7 @@ public:
     HgiComputeDispatch GetDispatchMethod() const override;
 
     HGIMETAL_API
-    id<MTLComputeCommandEncoder> GetEncoder();
+    MTL::ComputeCommandEncoder* GetEncoder();
 
 protected:
     friend class HgiMetal;
@@ -97,9 +97,9 @@ private:
     
     HgiMetal* _hgi;
     HgiMetalComputePipeline* _pipelineState;
-    id<MTLCommandBuffer> _commandBuffer;
-    id<MTLBuffer> _argumentBuffer;
-    id<MTLComputeCommandEncoder> _encoder;
+    MTL::CommandBuffer *_commandBuffer;
+    MTL::Buffer *_argumentBuffer;
+    MTL::ComputeCommandEncoder *_encoder;
     bool _secondaryCommandBuffer;
     bool _hasWork;
     HgiComputeDispatch _dispatchMethod;
