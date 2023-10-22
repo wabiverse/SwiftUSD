@@ -45,19 +45,19 @@ void HgiMetalShaderFunction::ShaderErrorHandler(MTL::Library *library, NS::Error
     NS::String *entryPoint = nullptr;
     switch (_descriptor.shaderStage) {
         case HgiShaderStageVertex:
-            entryPoint = NS::String::string("vertexEntryPoint");
+            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
             break;
         case HgiShaderStageFragment:
-            entryPoint = NS::String::string("fragmentEntryPoint");
+            entryPoint = NS::String::string("fragmentEntryPoint", NS::UTF8StringEncoding);
             break;
         case HgiShaderStageCompute:
-            entryPoint = NS::String::string("computeEntryPoint");
+            entryPoint = NS::String::string("computeEntryPoint", NS::UTF8StringEncoding);
             break;
         case HgiShaderStagePostTessellationControl:
-            entryPoint = NS::String::string("vertexEntryPoint");
+            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
             break;
         case HgiShaderStagePostTessellationVertex:
-            entryPoint = NS::String::string("vertexEntryPoint");
+            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
             break;
         case HgiShaderStageTessellationControl:
         case HgiShaderStageTessellationEval:
@@ -105,13 +105,15 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
         options->setFastMathEnabled(true);
         options->setLanguageVersion(MTL::LanguageVersion2_2);
         options->setPreprocessorMacros(
-          NS::Dictionary::dictionary(NS::String::string("1"), NS::String::string("ARCH_GFX_METAL"))
+          NS::Dictionary::dictionary(NS::String::string("ARCH_GFX_METAL", NS::UTF8StringEncoding),
+                                     NS::String::string("1", NS::UTF8StringEncoding))
         );
 
         // Compile the shader code into a library
         const MTL::NewLibraryCompletionHandlerFunction& errHandler = ShaderErrorHandler;
-        hgi->GetPrimaryDevice()->newLibrary(NS::String::string(shaderCode), options, errHandler);
-
+        hgi->GetPrimaryDevice()->newLibrary(NS::String::string(shaderCode, NS::UTF8StringEncoding), 
+                                            options, 
+                                            errHandler);
         options->release();
         options = nil;
     }

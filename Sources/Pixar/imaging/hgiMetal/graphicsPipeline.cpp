@@ -79,7 +79,7 @@ HgiMetalGraphicsPipeline::_CreateVertexDescriptor()
     for (HgiVertexBufferDesc const& vbo : _descriptor.vertexBuffers) {
 
         HgiVertexAttributeDescVector const& vas = vbo.vertexAttributes;
-        _vertexDescriptor->layouts->object(index)->setStride(vbo.vertexStride);
+        _vertexDescriptor->layouts()->object(index)->setStride(vbo.vertexStride);
 
         // Set the vertex step rate such that the attribute index
         // will advance only according to the base instance at the
@@ -89,23 +89,23 @@ HgiMetalGraphicsPipeline::_CreateVertexDescriptor()
         // draw commands.
         if (vbo.vertexStepFunction == HgiVertexBufferStepFunctionConstant ||
             vbo.vertexStepFunction == HgiVertexBufferStepFunctionPerDrawCommand) {
-            _vertexDescriptor->layouts->object(index)->setStepFunction(MTL::VertexStepFunctionConstant);
-            _vertexDescriptor->layouts->object(index)->setStepRate(0);
+            _vertexDescriptor->layouts()->object(index)->setStepFunction(MTL::VertexStepFunctionConstant);
+            _vertexDescriptor->layouts()->object(index)->setStepRate(0);
         } else if (vbo.vertexStepFunction == HgiVertexBufferStepFunctionPerPatchControlPoint) {
-            _vertexDescriptor->layouts->object(index)->setStepFunction(MTL::VertexStepFunctionPerPatchControlPoint);
-            _vertexDescriptor->layouts->object(index)->setStepRate(1);
+            _vertexDescriptor->layouts()->object(index)->setStepFunction(MTL::VertexStepFunctionPerPatchControlPoint);
+            _vertexDescriptor->layouts()->object(index)->setStepRate(1);
         }
         else {
-            _vertexDescriptor->layouts->object(index)->setStepFunction(MTL::VertexStepFunctionPerVertex);
-            _vertexDescriptor->layouts->object(index)->setStepRate(1);
+            _vertexDescriptor->layouts()->object(index)->setStepFunction(MTL::VertexStepFunctionPerVertex);
+            _vertexDescriptor->layouts()->object(index)->setStepRate(1);
         }
 
         // Describe each vertex attribute in the vertex buffer
         for (HgiVertexAttributeDesc const& va : vas) {
             uint32_t idx = va.shaderBindLocation;
-            _vertexDescriptor->attributes->object(idx)->setFormat(HgiMetalConversions::GetVertexFormat(va.format));
-            _vertexDescriptor->attributes->object(idx)->setBufferIndex(vbo.bindingIndex);
-            _vertexDescriptor->attributes->object(idx)->setOffset(va.offset);
+            _vertexDescriptor->attributes()->object(idx)->setFormat(HgiMetalConversions::GetVertexFormat(va.format));
+            _vertexDescriptor->attributes()->object(idx)->setBufferIndex(vbo.bindingIndex);
+            _vertexDescriptor->attributes()->object(idx)->setOffset(va.offset);
         }
 
         index++;
@@ -184,7 +184,7 @@ HgiMetalGraphicsPipeline::_CreateRenderPipelineState(HgiMetal *hgi)
                 break;
             case HgiTessellationState::TessVertex:
             {
-                stateDesc->setVertexFunction = metalProgram->GetPostTessVertexFunction();
+                stateDesc->setVertexFunction(metalProgram->GetPostTessVertexFunction());
                 stateDesc->setTessellationFactorStepFunction(MTL::TessellationFactorStepFunctionPerPatch);
                 _SetTessellationStateFromShaderFunctions(stateDesc, metalProgram->GetShaderFunctions());
                 break;
@@ -354,7 +354,7 @@ HgiMetalGraphicsPipeline::BindPipeline(MTL::RenderCommandEncoder *renderEncoder)
                 triangleFactors.edgeTessellationFactor[0] = factorOne;
                 triangleFactors.edgeTessellationFactor[1] = factorOne;
                 triangleFactors.edgeTessellationFactor[2] = factorOne;
-                _constantTessFactors = renderEncoder->device->newBuffer(&triangleFactors, sizeof(triangleFactors), MTL::ResourceStorageModeShared);
+                _constantTessFactors = renderEncoder->device()->newBuffer(&triangleFactors, sizeof(triangleFactors), MTL::ResourceStorageModeShared);
             } else { // is Quad tess factor
                 MTL::QuadTessellationFactorsHalf quadFactors;
                 quadFactors.insideTessellationFactor[0] = factorZero;
@@ -363,7 +363,7 @@ HgiMetalGraphicsPipeline::BindPipeline(MTL::RenderCommandEncoder *renderEncoder)
                 quadFactors.edgeTessellationFactor[1] = factorOne;
                 quadFactors.edgeTessellationFactor[2] = factorOne;
                 quadFactors.edgeTessellationFactor[3] = factorOne;
-                _constantTessFactors = renderEncoder->device->newBuffer(&quadFactors, sizeof(quadFactors), MTL::ResourceStorageModeShared);
+                _constantTessFactors = renderEncoder->device()->newBuffer(&quadFactors, sizeof(quadFactors), MTL::ResourceStorageModeShared);
             }
         }
         renderEncoder->setTessellationFactorBuffer(_constantTessFactors, 0, 0);
