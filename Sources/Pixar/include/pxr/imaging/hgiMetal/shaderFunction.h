@@ -72,9 +72,6 @@ private:
     HgiMetalShaderFunction & operator=(const HgiMetalShaderFunction&) = delete;
     HgiMetalShaderFunction(const HgiMetalShaderFunction&) = delete;
 
-    static void ShaderErrorHandler(MTL::Library *library, NS::Error *error);
-    static void LibraryLoadShaderFuncErrorHandler(MTL::Function *func, NS::Error *error);
-
 private:
     std::string _errors;
 

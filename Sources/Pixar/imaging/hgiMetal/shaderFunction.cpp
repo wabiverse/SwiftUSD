@@ -34,60 +34,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void HgiMetalShaderFunction::ShaderErrorHandler(MTL::Library *library, NS::Error *error)
-{
-    if (error) {
-        NS::String *err = error->localizedDescription();
-        TF_CODING_ERROR("Error compiling shader: %s", err->utf8String());
-        return;
-    }
-
-    NS::String *entryPoint = nullptr;
-    switch (_descriptor.shaderStage) {
-        case HgiShaderStageVertex:
-            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-            break;
-        case HgiShaderStageFragment:
-            entryPoint = NS::String::string("fragmentEntryPoint", NS::UTF8StringEncoding);
-            break;
-        case HgiShaderStageCompute:
-            entryPoint = NS::String::string("computeEntryPoint", NS::UTF8StringEncoding);
-            break;
-        case HgiShaderStagePostTessellationControl:
-            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-            break;
-        case HgiShaderStagePostTessellationVertex:
-            entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-            break;
-        case HgiShaderStageTessellationControl:
-        case HgiShaderStageTessellationEval:
-        case HgiShaderStageGeometry:
-            TF_CODING_ERROR("Todo: Unsupported shader stage");
-            break;
-    }
-
-    // Load the function into the library
-    const std::function<void(MTL::Function* func, NS::Error* error)>& libCompletionHandler = LibraryLoadShaderFuncErrorHandler;
-    library->newFunction(entryPoint, nil, libCompletionHandler);
-    library->release();
-}
-
-void HgiMetalShaderFunction::LibraryLoadShaderFuncErrorHandler(MTL::Function *func, NS::Error *error)
-{
-    if (error) {
-        NS::String *err = error->localizedDescription();
-        TF_CODING_ERROR("Error loading shader function: %s", err->utf8String());
-    }
-
-    if (!_shaderId) {
-        NS::String *err = error->localizedDescription();
-        _errors = err->utf8String();
-    }
-    else {
-        HGIMETAL_DEBUG_LABEL(_shaderId, _descriptor.debugName.c_str());
-    }
-}
-
 HgiMetalShaderFunction::HgiMetalShaderFunction(
     HgiMetal *hgi,
     HgiShaderFunctionDesc const& desc)
@@ -110,12 +56,53 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
         );
 
         // Compile the shader code into a library
-        const MTL::NewLibraryCompletionHandlerFunction& errHandler = ShaderErrorHandler;
-        hgi->GetPrimaryDevice()->newLibrary(NS::String::string(shaderCode, NS::UTF8StringEncoding), 
-                                            options, 
-                                            errHandler);
+        NS::Error *error = nil;
+        MTL::Library *library = hgi->GetPrimaryDevice()->newLibrary(NS::String::string(shaderCode, NS::UTF8StringEncoding), 
+                                                                    options, 
+                                                                    &error);
+        if (error) {
+            NS::String *err = error->localizedDescription();
+            TF_CODING_ERROR("Error compiling shader: %s", err->utf8String());
+        }
+        
         options->release();
         options = nil;
+
+        NS::String *entryPoint = nullptr;
+        switch (_descriptor.shaderStage) {
+            case HgiShaderStageVertex:
+                entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+                break;
+            case HgiShaderStageFragment:
+                entryPoint = NS::String::string("fragmentEntryPoint", NS::UTF8StringEncoding);
+                break;
+            case HgiShaderStageCompute:
+                entryPoint = NS::String::string("computeEntryPoint", NS::UTF8StringEncoding);
+                break;
+            case HgiShaderStagePostTessellationControl:
+                entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+                break;
+            case HgiShaderStagePostTessellationVertex:
+                entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+                break;
+            case HgiShaderStageTessellationControl:
+            case HgiShaderStageTessellationEval:
+            case HgiShaderStageGeometry:
+                TF_CODING_ERROR("Todo: Unsupported shader stage");
+                break;
+        }
+
+        _shaderId = library->newFunction(entryPoint);
+        if (!_shaderId) {
+            NS::String *err = error->localizedDescription();
+            TF_CODING_ERROR("Error loading shader function: %s", err->utf8String());
+            _errors = err->utf8String();
+        }
+        else {
+            HGIMETAL_DEBUG_LABEL(_shaderId, _descriptor.debugName.c_str());
+        }
+
+        library->release();
     }
 
     // Clear these pointers in our copy of the descriptor since we
