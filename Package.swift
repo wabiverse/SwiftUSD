@@ -11,7 +11,6 @@ import PackageDescription
   let platformIncludes = [
     // macOS platform includes
     "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
-    "-I/opt/homebrew/Cellar/opencolorio/2.2.1/include",
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
@@ -87,7 +86,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.2"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.3"),
   ],
   targets: [
     .target(
@@ -99,6 +98,7 @@ let package = Package(
         .product(name: "MetaPy", package: "MetaverseKit"),
         .product(name: "IMath", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
+        .product(name: "OpenColorIO", package: "MetaverseKit"),
         .product(name: "OpenVDB", package: "MetaverseKit"),
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
