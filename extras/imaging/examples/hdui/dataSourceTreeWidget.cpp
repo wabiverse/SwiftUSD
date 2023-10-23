@@ -247,7 +247,11 @@ private:
                 HdVectorDataSource::Cast(_dataSource)) {
             char buffer[16];
             for (size_t i = 0, e = vectorDs->GetNumElements(); i != e; ++i) {
+                #if defined(__APPLE__)
+                snprintf(buffer, sizeof(buffer), "i%d", static_cast<int>(i));
+                #else /* ARCH_OS_LINUX || ARCH_OS_WINDOWS */
                 sprintf(buffer, "i%d", static_cast<int>(i));
+                #endif /* defined(__APPLE__) */
                 new Hdui_DataSourceTreeWidgetItem(
                     _locator.Append(TfToken(buffer)),
                         this, vectorDs->GetElement(i));

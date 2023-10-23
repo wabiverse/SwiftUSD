@@ -97,7 +97,7 @@ protected:
     // for backwards compatibility.
     void emitLibraryInclude(const MaterialX::FilePath& filename,
                             MaterialX::GenContext& context,
-                            MaterialX::ShaderStage& stage) const;
+                            MaterialX::ShaderStage& stage) const override;
 
     void _EmitConstantsUniformsAndTypeDefs(
         MaterialX::GenContext& mxContext,

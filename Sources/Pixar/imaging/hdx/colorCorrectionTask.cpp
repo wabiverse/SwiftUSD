@@ -407,9 +407,16 @@ HdxColorCorrectionTask::_CreateOpenColorIOResources(
         const char* samplerName;
         uint32_t width, height;
         OCIO::GpuShaderCreator::TextureType channel;
+        OCIO::GpuShaderCreator::TextureDimensions dim;
         OCIO::Interpolation interpolation;
-        shaderDesc->getTexture(i, textureName, samplerName, width, height,
-                                channel, interpolation);
+        shaderDesc->getTexture(i, 
+                               textureName, 
+                               samplerName, 
+                               width, 
+                               height,
+                               channel, 
+                               dim, 
+                               interpolation);
         shaderDesc->getTextureValues(i, lutValues);
 
         int channelPerPix =

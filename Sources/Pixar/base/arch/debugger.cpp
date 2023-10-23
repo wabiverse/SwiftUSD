@@ -497,7 +497,7 @@ ARCH_HIDDEN
 void
 Arch_InitDebuggerAttach()
 {
-#if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
+#if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN) || defined(__APPLE__)
     // Maximum length of a pid written as a decimal.  It's okay for this
     // to be greater than that.
     static const size_t _decimalPidLength = 20;
@@ -543,7 +543,11 @@ Arch_InitDebuggerAttach()
         for (char* i = e; *i; ++i) {
             if (i[0] == '%' && i[1] == 'p') {
                 // Write the process id.
+                #if defined(__APPLE__)
+                snprintf(a, n + 1, "%d", (int)getpid());
+                #else /* ARCH_OS_LINUX || ARCH_OS_WINDOWS */
                 sprintf(a, "%d", (int)getpid());
+                #endif /* defined(__APPLE__) */
 
                 // Skip past the written process id.
                 while (*a) {

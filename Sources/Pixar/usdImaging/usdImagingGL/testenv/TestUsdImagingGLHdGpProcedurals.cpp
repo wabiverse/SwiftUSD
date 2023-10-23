@@ -344,7 +344,11 @@ public:
         char buffer[64];
         SdfPath myPath = _GetProceduralPrimPath();
         for (int i = 0; i < static_cast<int>(points.size()); ++i) {
+            #if defined(__APPLE__)
+            ::snprintf(buffer, sizeof(buffer), "c%d", i);
+            #else /* ARCH_OS_LINUX || ARCH_OS_WINDOWS */
             ::sprintf(buffer, "c%d", i);
+            #endif /* defined(__APPLE__) */
             SdfPath childPath = myPath.AppendChild(TfToken(buffer));
             result[childPath] = HdPrimTypeTokens->mesh;
 

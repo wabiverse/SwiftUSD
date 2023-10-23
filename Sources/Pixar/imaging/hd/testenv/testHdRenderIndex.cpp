@@ -93,23 +93,23 @@ public:
     virtual bool IsInCollection(SdfPath const& id,
                                 TfToken const& collectionName)
         { return true; }
-    virtual HdMeshTopology GetMeshTopology(SdfPath const& id)
+    virtual HdMeshTopology GetMeshTopology(SdfPath const& id) override
         { return HdMeshTopology(); }
-    virtual HdBasisCurvesTopology GetBasisCurvesTopology(SdfPath const& id)
+    virtual HdBasisCurvesTopology GetBasisCurvesTopology(SdfPath const& id) override
         { return HdBasisCurvesTopology(); }
-    virtual PxOsdSubdivTags GetSubdivTags(SdfPath const& id)
+    virtual PxOsdSubdivTags GetSubdivTags(SdfPath const& id) override
         { return PxOsdSubdivTags(); }
-    virtual GfRange3d GetExtent(SdfPath const & id)
+    virtual GfRange3d GetExtent(SdfPath const & id) override
         { return GfRange3d(); }
-    virtual GfMatrix4d GetTransform(SdfPath const & id)
+    virtual GfMatrix4d GetTransform(SdfPath const & id) override
         { return GfMatrix4d(); }
-    virtual bool GetVisible(SdfPath const & id)
+    virtual bool GetVisible(SdfPath const & id) override
         { return true; }
-    virtual bool GetDoubleSided(SdfPath const & id)
+    virtual bool GetDoubleSided(SdfPath const & id) override
         { return true; }
     virtual HdDisplayStyle GetDisplayStyle(SdfPath const & id) override
         { return HdDisplayStyle(); }
-    virtual VtValue Get(SdfPath const& id, TfToken const& key) {
+    virtual VtValue Get(SdfPath const& id, TfToken const& key) override {
         if (key == HdTokens->points) {
             return VtValue(0.0f);
         } else {
@@ -129,7 +129,7 @@ public:
         return result;
     }
     virtual VtIntArray GetInstanceIndices(SdfPath const& instancerId,
-                                          SdfPath const& prototypeId)
+                                          SdfPath const& prototypeId) override
         { return VtIntArray(); }
     virtual GfMatrix4d GetInstancerTransform(SdfPath const& instancerId,
                                              SdfPath const& prototypeId)

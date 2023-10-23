@@ -21,7 +21,7 @@
 #    define IMATH_HALF_SAFE_FOR_C
 /* avoid the library dependency */
 #    define IMATH_HALF_NO_LOOKUP_TABLE
-#    include <half.h>
+#    include <OpenEXR/half.h>
 #endif
 
 #ifdef _WIN32

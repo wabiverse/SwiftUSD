@@ -10,7 +10,6 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     // macOS platform includes
-    "-I/opt/homebrew/Cellar/openimageio/2.5.4.0/include",
     "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
@@ -84,7 +83,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.3"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.4"),
   ],
   targets: [
     .target(
@@ -94,9 +93,10 @@ let package = Package(
         .product(name: "Boost", package: "MetaverseKit"),
         .product(name: "Python", package: "MetaverseKit"),
         .product(name: "MetaPy", package: "MetaverseKit"),
-        .product(name: "IMath", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
+        .product(name: "OpenImageIO", package: "MetaverseKit"),
+        .product(name: "OpenEXR", package: "MetaverseKit"),
         .product(name: "OpenVDB", package: "MetaverseKit"),
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
@@ -116,10 +116,23 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .unsafeFlags(platformIncludes),
+        /* ---------- Turn everything on. ---------- */
+        .define("PXR_USE_NAMESPACES", to: "1"),
+        .define("PXR_PYTHON_SUPPORT_ENABLED", to: "1"),
+        .define("PXR_PREFER_SAFETY_OVER_SPEED", to: "1"),
+        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "1"),
+        .define("PXR_OCIO_PLUGIN_ENABLED", to: "1"),
+        .define("PXR_OIIO_PLUGIN_ENABLED", to: "1"),
+        .define("PXR_PTEX_SUPPORT_ENABLED", to: "1"),
+        .define("PXR_OPENVDB_SUPPORT_ENABLED", to: "1"),
+        .define("PXR_OSL_SUPPORT_ENABLED", to: "1"),
         .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
-        .define("OPENEXR_EXPORT", to: "static"),
+        .define("PXR_HDF5_SUPPORT_ENABLED", to: "1"),
+        /* --------- Apple platforms only. --------- */
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
       ],
       swiftSettings: [
+        /* ------ C & CXX <-> Swift Interop. ------- */
         .interoperabilityMode(.Cxx),
       ]
     ),

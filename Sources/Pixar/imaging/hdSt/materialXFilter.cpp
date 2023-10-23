@@ -178,7 +178,7 @@ HdSt_GenMaterialXShader(
 
     // Find renderable elements in the Mtlx Document.
     std::vector<mx::TypedElementPtr> renderableElements;
-    mx::findRenderableElements(mxDoc, renderableElements);
+    renderableElements = mx::findRenderableElements(mxDoc);
 
     // Should have exactly one renderable element (material).
     if (renderableElements.size() != 1) {
