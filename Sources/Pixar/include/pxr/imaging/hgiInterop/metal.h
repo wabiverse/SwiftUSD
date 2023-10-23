@@ -120,6 +120,8 @@ private:
     MTL::ComputePipelineState* _computePipelineStateColor;
     MTL::ComputePipelineState* _computePipelineStateDepth;
 
+#if 0
+  // XXX: Add these into the CXX Apple headers.
     CVPixelBufferRef _pixelBuffer;
     CVPixelBufferRef _depthBuffer;
     CVMetalTextureCacheRef _cvmtlTextureCache;
@@ -129,6 +131,7 @@ private:
     CVOpenGLTextureCacheRef _cvglTextureCache;
     CVOpenGLTextureRef _cvglColorTexture;
     CVOpenGLTextureRef _cvglDepthTexture;
+#endif // 0
 
     uint32_t _glColorTexture;
     uint32_t _glDepthTexture;

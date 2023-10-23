@@ -21,6 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 
 #include "pxr/base/tf/diagnostic.h"
 
@@ -39,44 +41,41 @@ HgiMetalComputePipeline::HgiMetalComputePipeline(
     HgiComputePipelineDesc const& desc)
     : HgiComputePipeline(desc)
 {
-    MTLComputePipelineDescriptor *stateDesc =
-        [[MTLComputePipelineDescriptor alloc] init];
+    MTL::ComputePipelineDescriptor *stateDesc = MTL::ComputePipelineDescriptor::alloc()->init();
 
     // Create a new compute pipeline state object
     HGIMETAL_DEBUG_LABEL(stateDesc, _descriptor.debugName.c_str());
     
-    HgiMetalShaderProgram const *metalProgram =
-        static_cast<HgiMetalShaderProgram*>(_descriptor.shaderProgram.Get());
+    HgiMetalShaderProgram const *metalProgram = static_cast<HgiMetalShaderProgram*>(_descriptor.shaderProgram.Get());
     
-    stateDesc.computeFunction = metalProgram->GetComputeFunction();
+    stateDesc->setComputeFunction(metalProgram->GetComputeFunction());
     
-    NSError *error = NULL;
-    _computePipelineState = [hgi->GetPrimaryDevice()
-        newComputePipelineStateWithDescriptor:stateDesc
-                                      options:MTLPipelineOptionNone
-                                   reflection:nil
-                                        error:&error];
-    [stateDesc release];
+    NS::Error *error = NULL;
+    _computePipelineState = hgi->GetPrimaryDevice()->newComputePipelineState(stateDesc,
+                                                                             MTL::PipelineOptionNone,
+                                                                             nil,
+                                                                             &error);
+    stateDesc->release();
 
     if (!_computePipelineState) {
-        NSString *err = [error localizedDescription];
-        TF_WARN("Failed to create compute pipeline state, error %s",
-            [err UTF8String]);
+        NS::String *err = error->localizedDescription();
+        TF_WARN(
+          "Failed to create compute pipeline state, error %s",
+          err->utf8String()
+        );
     }
 }
 
 HgiMetalComputePipeline::~HgiMetalComputePipeline()
-{
-}
+{}
 
 void
-HgiMetalComputePipeline::BindPipeline(
-    id<MTLComputeCommandEncoder> computeEncoder)
+HgiMetalComputePipeline::BindPipeline(MTL::ComputeCommandEncoder *computeEncoder)
 {
-    [computeEncoder setComputePipelineState:_computePipelineState];
+    computeEncoder->setComputePipelineState(_computePipelineState);
 }
 
-id<MTLComputePipelineState> HgiMetalComputePipeline::GetMetalPipelineState()
+MTL::ComputePipelineState *HgiMetalComputePipeline::GetMetalPipelineState()
 {
     return _computePipelineState;
 }

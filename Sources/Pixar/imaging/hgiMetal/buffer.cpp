@@ -21,7 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <Metal/Metal.h>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 
 #include "pxr/base/arch/defines.h"
 
@@ -42,17 +43,15 @@ HgiMetalBuffer::HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const & desc)
         TF_CODING_ERROR("Buffers must have a non-zero length");
     }
 
-    MTLResourceOptions options = MTLResourceCPUCacheModeDefaultCache |
-        hgi->GetCapabilities()->defaultStorageMode;
+    MTL::ResourceOptions options = MTL::ResourceCPUCacheModeDefaultCache | hgi->GetCapabilities()->defaultStorageMode;
     
     if (desc.initialData) {
-        _bufferId = [hgi->GetPrimaryDevice() newBufferWithBytes:desc.initialData
-                                                         length:desc.byteSize
-                                                        options:options];
+        _bufferId = hgi->GetPrimaryDevice()->newBuffer(desc.initialData,
+                                                       desc.byteSize,
+                                                       options);
     }
     else {
-        _bufferId = [hgi->GetPrimaryDevice() newBufferWithLength:desc.byteSize
-                                                         options:options];
+        _bufferId = hgi->GetPrimaryDevice()->newBuffer(desc.byteSize, options);
     }
     
     _descriptor.initialData = nullptr;
@@ -63,7 +62,7 @@ HgiMetalBuffer::HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const & desc)
 HgiMetalBuffer::~HgiMetalBuffer()
 {
     if (_bufferId != nil) {
-        [_bufferId release];
+        _bufferId->release();
         _bufferId = nil;
     }
 }
@@ -84,9 +83,10 @@ void*
 HgiMetalBuffer::GetCPUStagingAddress()
 {
     if (_bufferId) {
-        return [_bufferId contents];
+        return _bufferId->contents();
     }
 
     return nullptr;
 }
+
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -34,6 +34,9 @@
 #include "pxr/imaging/hgiMetal/resourceBindings.h"
 #include "pxr/imaging/hgiMetal/stepFunctions.h"
 
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 static const uint32_t MaxVertexBufferBindings = 64;
@@ -47,9 +50,9 @@ struct HgiMetalIndirectCommands : public HgiIndirectCommands
         uint32_t drawCount,
         HgiGraphicsPipelineHandle const &graphicsPipeline,
         HgiResourceBindingsHandle const &resourceBindings,
-        id<MTLIndirectCommandBuffer> indirectCommandBuffer,
-        id<MTLBuffer> argumentBuffer,
-        id<MTLBuffer> mainArgumentBuffer)
+        MTL::IndirectCommandBuffer* indirectCommandBuffer,
+        MTL::Buffer* argumentBuffer,
+        MTL::Buffer* mainArgumentBuffer)
         : HgiIndirectCommands(drawCount, graphicsPipeline, resourceBindings)
         , indirectCommandBuffer(indirectCommandBuffer)
         , indirectArgumentBuffer(argumentBuffer)
@@ -57,9 +60,9 @@ struct HgiMetalIndirectCommands : public HgiIndirectCommands
     {
     }
     
-    id<MTLIndirectCommandBuffer> indirectCommandBuffer;
-    id<MTLBuffer> indirectArgumentBuffer;
-    id<MTLBuffer> mainArgumentBuffer;
+    MTL::IndirectCommandBuffer *indirectCommandBuffer;
+    MTL::Buffer *indirectArgumentBuffer;
+    MTL::Buffer *mainArgumentBuffer;
 };
 
 enum ArgIndex
@@ -89,41 +92,33 @@ HgiMetalIndirectCommandEncoder::HgiMetalIndirectCommandEncoder(Hgi* hgi)
     _device = _hgi->GetPrimaryDevice();
     _bufferStorageMode = _hgi->GetCapabilities()->defaultStorageMode;
     
-    uint16_t const factorZero =
-            reinterpret_cast<uint16_t>(GfHalf(0.0f).bits());
-    uint16_t const factorOne =
-            reinterpret_cast<uint16_t>(GfHalf(1.0f).bits());
+    uint16_t const factorZero = reinterpret_cast<uint16_t>(GfHalf(0.0f).bits());
+    uint16_t const factorOne = reinterpret_cast<uint16_t>(GfHalf(1.0f).bits());
 
-    MTLTriangleTessellationFactorsHalf triangleFactors;
+    MTL::TriangleTessellationFactorsHalf triangleFactors;
     triangleFactors.insideTessellationFactor = factorZero;
     triangleFactors.edgeTessellationFactor[0] = factorOne;
     triangleFactors.edgeTessellationFactor[1] = factorOne;
     triangleFactors.edgeTessellationFactor[2] = factorOne;
-    _triangleTessFactors =
-        [_device
-            newBufferWithBytes:&triangleFactors
-                        length:sizeof(triangleFactors)
-                       options:_bufferStorageMode];
-    if (_bufferStorageMode != MTLStorageModeShared &&
-        [_triangleTessFactors respondsToSelector:@selector(didModifyRange:)]) {
-        [_triangleTessFactors didModifyRange:{0, _triangleTessFactors.length}];
+    _triangleTessFactors = _device->newBuffer(&triangleFactors,
+                                              sizeof(triangleFactors),
+                                              _bufferStorageMode);
+    if (_bufferStorageMode != MTL::StorageModeShared) {
+        _triangleTessFactors->didModifyRange(NS::Range::Make(0, _triangleTessFactors->length()));
     }
 
-    MTLQuadTessellationFactorsHalf quadFactors;
+    MTL::QuadTessellationFactorsHalf quadFactors;
     quadFactors.insideTessellationFactor[0] = factorZero;
     quadFactors.insideTessellationFactor[1] = factorZero;
     quadFactors.edgeTessellationFactor[0] = factorOne;
     quadFactors.edgeTessellationFactor[1] = factorOne;
     quadFactors.edgeTessellationFactor[2] = factorOne;
     quadFactors.edgeTessellationFactor[3] = factorOne;
-    _quadTessFactors =
-        [_device
-            newBufferWithBytes:&quadFactors
-                        length:sizeof(quadFactors)
-                       options:_bufferStorageMode];
-    if (_bufferStorageMode != MTLStorageModeShared &&
-        [_quadTessFactors respondsToSelector:@selector(didModifyRange:)]) {
-        [_quadTessFactors didModifyRange:{0, _quadTessFactors.length}];
+    _quadTessFactors = _device->newBuffer(&quadFactors, 
+                                          sizeof(quadFactors), 
+                                          _bufferStorageMode);
+    if (_bufferStorageMode != MTL::StorageModeShared) {
+        _quadTessFactors->didModifyRange(NS::Range::Make(0, _quadTessFactors->length()));
     }
 }
 
@@ -393,36 +388,35 @@ HgiMetalIndirectCommandEncoder::_GetFunction(
     ;
 
     if (!_library) {
-        NSError *error = NULL;
-        MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
-        options.fastMathEnabled = YES;
-        
-        NSString *shaderSource =
-            [NSString stringWithUTF8String:_shaderSource.c_str()];
 
-        _library = [_device newLibraryWithSource:shaderSource
-                                         options:options
-                                           error:&error];
+        MTL::CompileOptions *options = MTL::CompileOptions::alloc()->init();
+        options->setFastMathEnabled(true);
+        
+        NS::String *shaderSource = NS::String::string(_shaderSource.c_str(), NS::UTF8StringEncoding);
+
+        NS::Error *error = nil;
+        _library = _device->newLibrary(shaderSource, options, &error);
         
         _functions.resize(6);
-        [options release];
+        options->release();
         options = nil;
         
         if (!_library) {
-            NSString *errStr = [error localizedDescription];
+            NS::String *errStr = error->localizedDescription();
             TF_FATAL_CODING_ERROR(
-                "Failed to create multidraw pipeline state: %s",
-                [errStr UTF8String]);
+              "Failed to create multidraw pipeline state: %s",
+              errStr->utf8String()
+            );
         }
     }
 
-    static NSString *const _functionNames[] = {
-        @"MultiDrawPrimitives",
-        @"MultiDrawIndexedPrimitives",
-        @"MultiDrawTriPatches",
-        @"MultiDrawIndexedTriPatches",
-        @"MultiDrawQuadPatches",
-        @"MultiDrawIndexedQuadPatches"
+    static NS::String *const _functionNames[] = {
+        NS::String::string("MultiDrawPrimitives", NS::UTF8StringEncoding),
+        NS::String::string("MultiDrawIndexedPrimitives", NS::UTF8StringEncoding),
+        NS::String::string("MultiDrawTriPatches", NS::UTF8StringEncoding),
+        NS::String::string("MultiDrawIndexedTriPatches", NS::UTF8StringEncoding),
+        NS::String::string("MultiDrawQuadPatches", NS::UTF8StringEncoding),
+        NS::String::string("MultiDrawIndexedQuadPatches", NS::UTF8StringEncoding),
     };
 
     int32_t type = 0;                   
@@ -440,17 +434,13 @@ HgiMetalIndirectCommandEncoder::_GetFunction(
 
     FunctionState state = _functions[type];
     // Create a compute pipeline state for the generation of the ICB.
-    NSError *error;
-    
+    NS::Error *error;
     if (!state.function) {
-        state.function = [_library newFunctionWithName:_functionNames[type]];
-        state.function.label = _functionNames[type];
+        state.function = _library->newFunction(_functionNames[type]);
+        state.function->setLabel(_functionNames[type]);
 
-        state.pipelineState =
-            [_device newComputePipelineStateWithFunction:state.function
-                                                error:&error];
-        state.argumentEncoder =
-            [state.function newArgumentEncoderWithBufferIndex:HgiMetalArgumentIndexICB];
+        state.pipelineState = _device->newComputePipelineState(state.function, &error);
+        state.argumentEncoder = state.function->newArgumentEncoder(HgiMetalArgumentIndexICB);
 
         _functions[type] = state;
     }
@@ -473,11 +463,11 @@ static const uint32_t _RoundUpPow2(uint32_t x)
     return x;
 }
 
-id<MTLIndirectCommandBuffer>
+MTL::IndirectCommandBuffer*
 HgiMetalIndirectCommandEncoder::_AllocateCommandBuffer(uint32_t drawCount)
 {
     uint32_t roundedSize = _RoundUpPow2(drawCount);
-    id<MTLIndirectCommandBuffer> commandBuffer = nil;
+    MTL::IndirectCommandBuffer* commandBuffer = nil;
     
     {
         // Search for a buffer of the required size in the free pool.
@@ -491,33 +481,29 @@ HgiMetalIndirectCommandEncoder::_AllocateCommandBuffer(uint32_t drawCount)
     }
 
     if (!commandBuffer) {
-        MTLIndirectCommandBufferDescriptor* descriptor =
-            [MTLIndirectCommandBufferDescriptor new];
+        MTL::IndirectCommandBufferDescriptor* descriptor = MTL::IndirectCommandBufferDescriptor::alloc()->init();
         
-        descriptor.commandTypes = MTLIndirectCommandTypeDraw
-                                | MTLIndirectCommandTypeDrawIndexed
-                                | MTLIndirectCommandTypeDrawPatches
-                                | MTLIndirectCommandTypeDrawIndexedPatches;
-        descriptor.inheritBuffers = NO;
-        descriptor.inheritPipelineState = YES;
-        descriptor.maxVertexBufferBindCount = 31;
-        descriptor.maxFragmentBufferBindCount = 31;
+        descriptor->setCommandTypes(MTL::IndirectCommandTypeDraw
+                                   | MTL::IndirectCommandTypeDrawIndexed
+                                   | MTL::IndirectCommandTypeDrawPatches
+                                   | MTL::IndirectCommandTypeDrawIndexedPatches);
+        descriptor->setInheritBuffers(false);
+        descriptor->setInheritPipelineState(true);
+        descriptor->setMaxVertexBufferBindCount(31);
+        descriptor->setMaxFragmentBufferBindCount(31);
 
-        commandBuffer =
-            [_device newIndirectCommandBufferWithDescriptor:descriptor
-                                            maxCommandCount:roundedSize
-                                                    options:MTLResourceStorageModePrivate];
-        [descriptor release];
+        commandBuffer = _device->newIndirectCommandBuffer(descriptor, roundedSize, MTL::ResourceStorageModePrivate);
+        descriptor->release();
         descriptor = nil;
     }
 
     return commandBuffer;
 }
 
-id<MTLBuffer>
+MTL::Buffer*
 HgiMetalIndirectCommandEncoder::_AllocateArgumentBuffer(uint32_t encodedLength)
 {
-    id<MTLBuffer> buffer = nil;
+    MTL::Buffer* buffer = nil;
     uint32_t roundedSize = _RoundUpPow2(encodedLength);
     
     {
@@ -532,9 +518,7 @@ HgiMetalIndirectCommandEncoder::_AllocateArgumentBuffer(uint32_t encodedLength)
     }
 
     if (!buffer) {
-        buffer =
-            [_device newBufferWithLength:roundedSize
-                                 options:_bufferStorageMode];
+        buffer = _device->newBuffer(roundedSize, _bufferStorageMode);
     }
     
     return buffer;
@@ -542,11 +526,11 @@ HgiMetalIndirectCommandEncoder::_AllocateArgumentBuffer(uint32_t encodedLength)
 
 template<typename T>
 void _SetArg(
-    id<MTLArgumentEncoder> argumentEncoder,
+    MTL::ArgumentEncoder* argumentEncoder,
              ArgIndex argumentIndex,
              T value)
 {
-    *(T*)[argumentEncoder constantDataAtIndex:argumentIndex] = value;
+    *(T*)argumentEncoder->constantData(argumentIndex) = value;
 }
 
 HgiIndirectCommandsUniquePtr
@@ -572,36 +556,32 @@ HgiMetalIndirectCommandEncoder::_EncodeDraw(
             pipeline,
             resourceBindings,
             _AllocateCommandBuffer(drawCount),
-            _AllocateArgumentBuffer(function.argumentEncoder.encodedLength),
+            _AllocateArgumentBuffer(function.argumentEncoder->encodedLength()),
             _AllocateArgumentBuffer(HgiMetalArgumentOffsetSize));
 
-    [function.argumentEncoder setArgumentBuffer:commands->indirectArgumentBuffer
-                                         offset:0];
+    function.argumentEncoder->setArgumentBuffer(commands->indirectArgumentBuffer, 0);
 
     HgiMetalComputeCmds* metalComputeCmds = static_cast<HgiMetalComputeCmds*>(computeCmds);
-    id<MTLComputeCommandEncoder> encoder = metalComputeCmds->GetEncoder();
+    MTL::ComputeCommandEncoder* encoder = metalComputeCmds->GetEncoder();
 
     // Create the ICB and add it to the argument buffer.
-    [function.argumentEncoder setIndirectCommandBuffer:commands->indirectCommandBuffer
-                                                atIndex:ArgIndex_ICB];
-    [encoder useResource:commands->indirectCommandBuffer
-                   usage:(MTLResourceUsageRead | MTLResourceUsageWrite)];
+    function.argumentEncoder->setIndirectCommandBuffer(commands->indirectCommandBuffer, ArgIndex_ICB);
+    encoder->useResource(commands->indirectCommandBuffer, (MTL::ResourceUsageRead | MTL::ResourceUsageWrite));
     
     // Pass the main argument buffer through so the resources can be bound.
-    [function.argumentEncoder setBuffer:commands->mainArgumentBuffer
-                                 offset:0
-                                atIndex:ArgIndex_MainArgumentBuffer];
-    [encoder useResource:commands->mainArgumentBuffer
-                   usage:(MTLResourceUsageRead | MTLResourceUsageWrite)];
+    function.argumentEncoder->setBuffer(commands->mainArgumentBuffer, 0, ArgIndex_MainArgumentBuffer);
+    encoder->useResource(commands->mainArgumentBuffer, (MTL::ResourceUsageRead | MTL::ResourceUsageWrite));
 
     // Add the constants to argument buffer.
-    MTLPrimitiveType mtlPrimitiveType =
-        HgiMetalConversions::GetPrimitiveType(pipelineDesc.primitiveType);
+    MTL::PrimitiveType mtlPrimitiveType = HgiMetalConversions::GetPrimitiveType(pipelineDesc.primitiveType);
 
     HgiMetalStepFunctions stepFunctions(pipelineDesc, bindings);
 
-    HgiMetalStepFunctionDesc drawCommandStep
-        {stepFunctions.GetDrawBufferIndex(), drawBufferByteOffset, stride};
+    HgiMetalStepFunctionDesc drawCommandStep {
+      stepFunctions.GetDrawBufferIndex(), 
+      drawBufferByteOffset, 
+      stride,
+    };
 
     TF_VERIFY(stepFunctions.GetPatchBaseDescs().size() <= MaxStepFunctions);
     
@@ -611,56 +591,42 @@ HgiMetalIndirectCommandEncoder::_EncodeDraw(
     _SetArg(function.argumentEncoder, ArgIndex_PrimitiveType, mtlPrimitiveType);
     _SetArg(function.argumentEncoder, ArgIndex_DrawStepFunction, drawCommandStep);
     _SetArg(function.argumentEncoder, ArgIndex_NumControlPoints, controlPointCount);
-    _SetArg(function.argumentEncoder, ArgIndex_PatchBaseVertexByteOffset,
-        patchBaseVertexByteOffset);
+    _SetArg(function.argumentEncoder, ArgIndex_PatchBaseVertexByteOffset, patchBaseVertexByteOffset);
     _SetArg(function.argumentEncoder, ArgIndex_NumBuffers, bindings.size());
-    _SetArg(function.argumentEncoder, ArgIndex_NumPatchStepFuncs,
-        (uint32_t)stepFunctions.GetPatchBaseDescs().size());
-    HgiMetalStepFunctionDesc* argPatchStepDescs = (HgiMetalStepFunctionDesc*)
-        [function.argumentEncoder constantDataAtIndex:ArgIndex_PatchStepFunctions];
+    _SetArg(function.argumentEncoder, ArgIndex_NumPatchStepFuncs, (uint32_t)stepFunctions.GetPatchBaseDescs().size());
+    HgiMetalStepFunctionDesc* argPatchStepDescs = (HgiMetalStepFunctionDesc*)function.argumentEncoder->constantData(ArgIndex_PatchStepFunctions);
     for (auto const& stepFuncDesc : stepFunctions.GetPatchBaseDescs()) {
         *argPatchStepDescs = stepFuncDesc;
         ++argPatchStepDescs;
     }
 
     bool usedExplicitTessFactorBuffer = false;
-    for (const HgiBufferBindDesc &buffer :
-         resourceBindings->GetDescriptor().buffers) {
+    for (const HgiBufferBindDesc &buffer : resourceBindings->GetDescriptor().buffers) {
         if (buffer.resourceType == HgiBindResourceTypeTessFactors) {
             if (buffer.buffers[0]) {
-                HgiMetalBuffer* mtlBuffer =
-                    static_cast<HgiMetalBuffer*>(buffer.buffers[0].Get());
+                HgiMetalBuffer* mtlBuffer = static_cast<HgiMetalBuffer*>(buffer.buffers[0].Get());
 
-                [function.argumentEncoder setBuffer:mtlBuffer->GetBufferId()
-                                             offset:buffer.offsets[0]
-                                            atIndex:ArgIndex_PatchFactorsBuffer];
+                function.argumentEncoder->setBuffer(mtlBuffer->GetBufferId(),
+                                                    buffer.offsets[0],
+                                                    ArgIndex_PatchFactorsBuffer);
                 usedExplicitTessFactorBuffer = true;
             }
         }
     }
-    if (pipelineDesc.primitiveType == HgiPrimitiveTypePatchList &&
-            !usedExplicitTessFactorBuffer) {
-        id<MTLBuffer> patchFactorsBuffer = _triangleTessFactors;
-        if (pipelineDesc.tessellationState.patchType ==
-            HgiTessellationState::PatchType::Quad) {
+    if (pipelineDesc.primitiveType == HgiPrimitiveTypePatchList && !usedExplicitTessFactorBuffer) {
+        MTL::Buffer* patchFactorsBuffer = _triangleTessFactors;
+        if (pipelineDesc.tessellationState.patchType == HgiTessellationState::PatchType::Quad) {
             patchFactorsBuffer = _quadTessFactors;
         }
-        [function.argumentEncoder setBuffer:patchFactorsBuffer
-                                     offset:0
-                                    atIndex:ArgIndex_PatchFactorsBuffer];
-        [encoder useResource:patchFactorsBuffer
-                       usage:(MTLResourceUsageRead | MTLResourceUsageWrite)];
+        function.argumentEncoder->setBuffer(patchFactorsBuffer, 0, ArgIndex_PatchFactorsBuffer);
+        encoder->useResource(patchFactorsBuffer, (MTL::ResourceUsageRead | MTL::ResourceUsageWrite));
     }
 
     // Add the index buffer to the argument buffer.
     if (indexBuffer) {
-        HgiMetalBuffer* mtlIndexBuffer =
-            static_cast<HgiMetalBuffer*>(indexBuffer.Get());
-        [function.argumentEncoder setBuffer:mtlIndexBuffer->GetBufferId()
-                                     offset:0
-                                    atIndex:ArgIndex_IndexBuffer];
-        [encoder useResource:mtlIndexBuffer->GetBufferId()
-                       usage:(MTLResourceUsageRead | MTLResourceUsageWrite)];
+        HgiMetalBuffer* mtlIndexBuffer = static_cast<HgiMetalBuffer*>(indexBuffer.Get());
+        function.argumentEncoder->setBuffer(mtlIndexBuffer->GetBufferId(), 0, ArgIndex_IndexBuffer);
+        encoder->useResource(mtlIndexBuffer->GetBufferId(), (MTL::ResourceUsageRead | MTL::ResourceUsageWrite));
     }
 
     // Add the vertex buffers to the argument buffer so they can be bound.
@@ -669,34 +635,25 @@ HgiMetalIndirectCommandEncoder::_EncodeDraw(
 
     for (auto const& binding : bindings) {
         if (binding.buffer) {
-            HgiMetalBuffer* mtlBuffer =
-                static_cast<HgiMetalBuffer*>(binding.buffer.Get());
-            [function.argumentEncoder setBuffer:mtlBuffer->GetBufferId()
-                                         offset:binding.byteOffset
-                                        atIndex:ArgIndex_Buffers + index];
-            [encoder useResource:mtlBuffer->GetBufferId()
-                           usage:(MTLResourceUsageRead | MTLResourceUsageWrite)];
+            HgiMetalBuffer* mtlBuffer = static_cast<HgiMetalBuffer*>(binding.buffer.Get());
+            function.argumentEncoder->setBuffer(mtlBuffer->GetBufferId(), binding.byteOffset, ArgIndex_Buffers + index);
+            encoder->useResource(mtlBuffer->GetBufferId(), (MTL::ResourceUsageRead | MTL::ResourceUsageWrite));
         }
         index++;
     }
 
-    if (_bufferStorageMode != MTLStorageModeShared &&
-        [commands->indirectArgumentBuffer
-            respondsToSelector:@selector(didModifyRange:)]) {
-        [commands->indirectArgumentBuffer
-            didModifyRange:{0, commands->indirectArgumentBuffer.length}];
+    if (_bufferStorageMode != MTL::StorageModeShared) {
+        commands->indirectArgumentBuffer->didModifyRange(NS::Range::Make(0, commands->indirectArgumentBuffer->length()));
     }
 
     // Set pipeline state on the encoder and dispatch to populate the ICB
-    [encoder setComputePipelineState:function.pipelineState];
-    [encoder setBuffer:commands->indirectArgumentBuffer
-                offset:0
-               atIndex:HgiMetalArgumentIndexICB];
+    encoder->setComputePipelineState(function.pipelineState);
+    encoder->setBuffer(commands->indirectArgumentBuffer, 0, HgiMetalArgumentIndexICB);
 
-    NSUInteger threadExecutionWidth = function.pipelineState.threadExecutionWidth;
+    NS::UInteger threadExecutionWidth = function.pipelineState->threadExecutionWidth();
 
-    [encoder dispatchThreads:MTLSizeMake(drawCount, 1, 1)
-       threadsPerThreadgroup:MTLSizeMake(threadExecutionWidth, 1, 1)];
+    encoder->dispatchThreads(MTL::Size::Make(drawCount, 1, 1),
+                             MTL::Size::Make(threadExecutionWidth, 1, 1));
 
     return commands;
 }
@@ -707,52 +664,41 @@ HgiMetalIndirectCommandEncoder::ExecuteDraw(
     HgiIndirectCommands const* commands)
 {
     HgiMetalGraphicsCmds *metalGfxCmds = static_cast<HgiMetalGraphicsCmds*>(gfxCmds);
-    id<MTLRenderCommandEncoder> encoder = metalGfxCmds->GetEncoder();
+    MTL::RenderCommandEncoder* encoder = metalGfxCmds->GetEncoder();
 
-    id<MTLCommandBuffer> commandBuffer =
-        _hgi->GetPrimaryCommandBuffer(this, false);
-    HgiMetalIndirectCommands const* metalCommands =
-        static_cast<HgiMetalIndirectCommands const*>(commands);
+    MTL::CommandBuffer* commandBuffer = _hgi->GetPrimaryCommandBuffer(this, false);
+    HgiMetalIndirectCommands const* metalCommands = static_cast<HgiMetalIndirectCommands const*>(commands);
 
     // Bind the encoder pipeline and draw everything in the ICB
-    HgiMetalGraphicsPipeline* graphicsPipeline =
-        static_cast<HgiMetalGraphicsPipeline*>(metalCommands->graphicsPipeline.Get());
+    HgiMetalGraphicsPipeline* graphicsPipeline = static_cast<HgiMetalGraphicsPipeline*>(metalCommands->graphicsPipeline.Get());
     graphicsPipeline->BindPipeline(encoder);
 
     // Bind the resources.
-    id<MTLBuffer> mainArgumentBuffer = metalCommands->mainArgumentBuffer;
-    HgiMetalResourceBindings* resourceBindings =
-        static_cast<HgiMetalResourceBindings*>(metalCommands->resourceBindings.Get());
+    MTL::Buffer* mainArgumentBuffer = metalCommands->mainArgumentBuffer;
+    HgiMetalResourceBindings* resourceBindings = static_cast<HgiMetalResourceBindings*>(metalCommands->resourceBindings.Get());
     resourceBindings->BindResources(_hgi,
                                     encoder,
                                     mainArgumentBuffer);
-    
-    // Ensure the the main argument buffer is updated on managed hardware.
-    if (mainArgumentBuffer.storageMode != MTLStorageModeShared &&
-        [mainArgumentBuffer respondsToSelector:@selector(didModifyRange:)]) {
 
-        [mainArgumentBuffer didModifyRange:{0, mainArgumentBuffer.length}];
+    // Ensure the the main argument buffer is updated on managed hardware.
+    if (mainArgumentBuffer->storageMode() != MTL::StorageModeShared) {
+        mainArgumentBuffer->didModifyRange(NS::Range::Make(0, mainArgumentBuffer->length()));
     }
     
-    id<MTLIndirectCommandBuffer> indirectCommandBuffer =
-        metalCommands->indirectCommandBuffer;
-    id<MTLBuffer> argumentBuffer = metalCommands->indirectArgumentBuffer;
-    [encoder setVertexBuffer:argumentBuffer
-                      offset:0
-                     atIndex:HgiMetalArgumentIndexICB];
+    MTL::IndirectCommandBuffer* indirectCommandBuffer = metalCommands->indirectCommandBuffer;
+    MTL::Buffer* argumentBuffer = metalCommands->indirectArgumentBuffer;
+    encoder->setVertexBuffer(argumentBuffer, 0, HgiMetalArgumentIndexICB);
 
-    [encoder
-        executeCommandsInBuffer:indirectCommandBuffer
-                      withRange:{0, metalCommands->drawCount}];
+    encoder->executeCommandsInBuffer(indirectCommandBuffer, NS::Range::Make(0, metalCommands->drawCount));
 
-    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> cmdBuffer)
+    commandBuffer->addCompletedHandler([&](MTL::CommandBuffer *buffer) -> void
     {
         std::lock_guard<std::mutex> lock(_poolMutex);
         
-        _argumentBufferPool.insert({mainArgumentBuffer.length, mainArgumentBuffer});
-        _argumentBufferPool.insert({argumentBuffer.length, argumentBuffer});
-        _commandBufferPool.insert({indirectCommandBuffer.size, indirectCommandBuffer});
-    }];
+        _argumentBufferPool.insert({mainArgumentBuffer->length(), mainArgumentBuffer});
+        _argumentBufferPool.insert({argumentBuffer->length(), argumentBuffer});
+        _commandBufferPool.insert({indirectCommandBuffer->size(), indirectCommandBuffer});
+    });
 }
 
 HgiIndirectCommandsUniquePtr

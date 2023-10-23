@@ -33,7 +33,7 @@
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#if defined(NS_PRIVATE_IMPLEMENTATION)
+#if defined(APPKIT_PRIVATE_IMPLEMENTATION)
 
 #ifdef METALCPP_SYMBOL_VISIBILITY_HIDDEN
 #define _APPKIT_PRIVATE_VISIBILITY __attribute__((visibility("hidden")))
@@ -108,7 +108,7 @@ namespace NS::Private
 #define _APPKIT_PRIVATE_DEF_CONST(type, symbol) extern type const NS::symbol
 #define _APPKIT_PRIVATE_DEF_WEAK_CONST(type, symbol) extern type const NS::symbol
 
-#endif // NS_PRIVATE_IMPLEMENTATION
+#endif // APPKIT_PRIVATE_IMPLEMENTATION
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 

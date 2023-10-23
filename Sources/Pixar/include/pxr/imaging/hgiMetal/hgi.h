@@ -58,7 +58,7 @@ public:
     };
     
     HGIMETAL_API
-    HgiMetal(MTL::Device* device = nil);
+    HgiMetal(MTL::Device *device = nil);
 
     HGIMETAL_API
     ~HgiMetal() override;

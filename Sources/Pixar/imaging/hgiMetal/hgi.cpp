@@ -21,6 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 #include "pxr/base/arch/defines.h"
 
 #include "pxr/imaging/hgiMetal/hgi.h"
@@ -53,7 +56,7 @@ TF_REGISTRY_FUNCTION(TfType)
     t.SetFactory<HgiFactory<HgiMetal>>();
 }
 
-HgiMetal::HgiMetal(MTL::Device device)
+HgiMetal::HgiMetal(MTL::Device *device)
 : _device(device)
 , _currentCmds(nullptr)
 , _frameDepth(0)
@@ -61,8 +64,9 @@ HgiMetal::HgiMetal(MTL::Device device)
 {
     if (!_device) {
         if( TfGetenvBool("HGIMETAL_USE_INTEGRATED_GPU", false)) {
-            auto devices = MTL::CopyAllDevices();
-            for (MTL::Device *d : devices) {
+            NS::Array *devices = MTL::CopyAllDevices();
+            for (NS::UInteger dix = 0 ; dix < devices->count() ; dix++) {
+                MTL::Device *d = devices->object<MTL::Device>(dix);
                 if (d->lowPower()) {
                     _device = d;
                     break;
@@ -86,26 +90,25 @@ HgiMetal::HgiMetal(MTL::Device device)
 
     MTL::ArgumentDescriptor *argumentDescBuffer = MTL::ArgumentDescriptor::alloc()->init();
     argumentDescBuffer->setDataType(MTL::DataType::DataTypePointer);
-    _argEncoderBuffer = _device->newArgumentEncoder(argumentDescBuffer);
+    _argEncoderBuffer = _device->newArgumentEncoder(NS::Array::array(argumentDescBuffer));
     argumentDescBuffer->release();
 
     MTL::ArgumentDescriptor *argumentDescSampler = MTL::ArgumentDescriptor::alloc()->init();
-    argumentDescSampler.dataType = MTL::DataType::DataTypeSampler;
-    _argEncoderSampler = _device->newArgumentEncoder(argumentDescSampler);
+    argumentDescSampler->setDataType(MTL::DataType::DataTypeSampler);
+    _argEncoderSampler = _device->newArgumentEncoder(NS::Array::array(argumentDescSampler));
     argumentDescSampler->release();
 
     MTL::ArgumentDescriptor *argumentDescTexture = MTL::ArgumentDescriptor::alloc()->init();
-    argumentDescTexture.dataType = MTL::DataType::DataTypeTexture;
-    _argEncoderTexture = _device->newArgumentEncoder(argumentDescTexture);
+    argumentDescTexture->setDataType(MTL::DataType::DataTypeTexture);
+    _argEncoderTexture = _device->newArgumentEncoder(NS::Array::array(argumentDescTexture));
     argumentDescTexture->release();
 
     HgiMetalSetupMetalDebug();
     
     _captureScopeFullFrame = MTL::CaptureManager::sharedCaptureManager()->newCaptureScope(_device);
-    _captureScopeFullFrame->setLabel(NS::String::string("Full Hydra Frame"));
+    _captureScopeFullFrame->setLabel(NS::String::string("Full Hydra Frame", NS::UTF8StringEncoding));
     
-    [[MTLCaptureManager sharedCaptureManager]
-        setDefaultCaptureScope:_captureScopeFullFrame];
+    MTL::CaptureManager::sharedCaptureManager()->setDefaultCaptureScope(_captureScopeFullFrame);
 
 #if !__has_feature(objc_arc)
     _pool = nil;
@@ -114,19 +117,19 @@ HgiMetal::HgiMetal(MTL::Device device)
 
 HgiMetal::~HgiMetal()
 {
-    [_commandBuffer commit];
-    [_commandBuffer waitUntilCompleted];
-    [_commandBuffer release];
-    [_captureScopeFullFrame release];
-    [_commandQueue release];
-    [_argEncoderBuffer release];
-    [_argEncoderSampler release];
-    [_argEncoderTexture release];
+    _commandBuffer->commit();
+    _commandBuffer->waitUntilCompleted();
+    _commandBuffer->release();
+    _captureScopeFullFrame->release();
+    _commandQueue->release();
+    _argEncoderBuffer->release();
+    _argEncoderSampler->release();
+    _argEncoderTexture->release();
     
     {
         std::lock_guard<std::mutex> lock(_freeArgMutex);
         while(_freeArgBuffers.size()) {
-            [_freeArgBuffers.top() release];
+            _freeArgBuffers.top()->release();
             _freeArgBuffers.pop();
         }
     }
@@ -136,11 +139,14 @@ bool
 HgiMetal::IsBackendSupported() const
 {
     // Want Metal 2.0 and Metal Shading Language 2.2 or higher.
-    if (@available(macOS 10.15, ios 13.0, *)) {
-        return true;
-    }
 
+#if defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && (__MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15))
+    return true;
+#elif defined(ARCH_OS_IOS) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000)
+    return true;
+#else  /* ARCH_OS_IOS */
     return false;
+#endif /* ARCH_OS_MACOS */
 }
 
 MTL::Device*
@@ -211,11 +217,10 @@ HgiMetal::DestroyTextureView(HgiTextureViewHandle* viewHandle)
     HgiTextureHandle texHandle = (*viewHandle)->GetViewTexture();
 
     if (_workToFlush) {
-        [_commandBuffer
-         addCompletedHandler:[texHandle](id<MTLCommandBuffer> cmdBuffer)
-         {
+        _commandBuffer->addCompletedHandler([texHandle](MTL::CommandBuffer *cmdBuffer) -> void
+        {
             delete texHandle.Get();
-        }];
+        });
     } else {
         _TrashObject(&texHandle);
     }
@@ -335,13 +340,13 @@ void
 HgiMetal::StartFrame()
 {
 #if !__has_feature(objc_arc)
-    _pool = [[NSAutoreleasePool alloc] init];
+    _pool = NS::AutoreleasePool::alloc()->init();
 #endif
 
     if (_frameDepth++ == 0) {
-        [_captureScopeFullFrame beginScope];
+        _captureScopeFullFrame->beginScope();
 
-        if ([[MTLCaptureManager sharedCaptureManager] isCapturing]) {
+        if (MTL::CaptureManager::sharedCaptureManager()->isCapturing()) {
             // We need to grab a new command buffer otherwise the previous one
             // (if it was allocated at the end of the last frame) won't appear in
             // this frame's capture, and it will confuse us!
@@ -354,24 +359,24 @@ void
 HgiMetal::EndFrame()
 {
     if (--_frameDepth == 0) {
-        [_captureScopeFullFrame endScope];
+        _captureScopeFullFrame->endScope();
     }
 
 #if !__has_feature(objc_arc)
     if (_pool) {
-        [_pool drain];
+        _pool->drain();
         _pool = nil;
     }
 #endif
 }
 
-id<MTLCommandQueue>
+MTL::CommandQueue*
 HgiMetal::GetQueue() const
 {
     return _commandQueue;
 }
 
-id<MTLCommandBuffer>
+MTL::CommandBuffer*
 HgiMetal::GetPrimaryCommandBuffer(HgiCmds *requester, bool flush)
 {
     if (_workToFlush) {
@@ -385,11 +390,11 @@ HgiMetal::GetPrimaryCommandBuffer(HgiCmds *requester, bool flush)
     return _commandBuffer;
 }
 
-id<MTLCommandBuffer>
+MTL::CommandBuffer*
 HgiMetal::GetSecondaryCommandBuffer()
 {
-    id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-    [commandBuffer retain];
+    MTL::CommandBuffer *commandBuffer = _commandQueue->commandBuffer();
+    commandBuffer->retain();
     return commandBuffer;
 }
 
@@ -409,16 +414,16 @@ HgiMetal::CommitPrimaryCommandBuffer(
     }
 
     CommitSecondaryCommandBuffer(_commandBuffer, waitType);
-    [_commandBuffer release];
-    _commandBuffer = [_commandQueue commandBuffer];
-    [_commandBuffer retain];
+    _commandBuffer->release();
+    _commandBuffer = _commandQueue->commandBuffer();
+    _commandBuffer->retain();
 
     _workToFlush = false;
 }
 
 void
 HgiMetal::CommitSecondaryCommandBuffer(
-    id<MTLCommandBuffer> commandBuffer,
+    MTL::CommandBuffer *commandBuffer,
     CommitCommandBufferWaitType waitType)
 {
     // If there are active arg buffers on this command buffer, add a callback
@@ -427,65 +432,63 @@ HgiMetal::CommitSecondaryCommandBuffer(
         _ActiveArgBuffers argBuffersToFree;
         argBuffersToFree.swap(_activeArgBuffers);
 
-        [_commandBuffer
-         addCompletedHandler:^(id<MTLCommandBuffer> cmdBuffer)
-         {
+        _commandBuffer->addCompletedHandler([&](MTL::CommandBuffer *cmdBuffer) -> void
+        {
             std::lock_guard<std::mutex> lock(_freeArgMutex);
-            for (id<MTLBuffer> argBuffer : argBuffersToFree) {
+            for (MTL::Buffer *argBuffer : argBuffersToFree) {
                 _freeArgBuffers.push(argBuffer);
             }
-         }];
+        });
     }
 
-    [commandBuffer commit];
+    commandBuffer->commit();
     if (waitType == CommitCommandBuffer_WaitUntilScheduled) {
-        [commandBuffer waitUntilScheduled];
+        commandBuffer->waitUntilScheduled();
     }
     else if (waitType == CommitCommandBuffer_WaitUntilCompleted) {
-        [commandBuffer waitUntilCompleted];
+        commandBuffer->waitUntilCompleted();
     }
 }
 
 void
-HgiMetal::ReleaseSecondaryCommandBuffer(id<MTLCommandBuffer> commandBuffer)
+HgiMetal::ReleaseSecondaryCommandBuffer(MTL::CommandBuffer *commandBuffer)
 {
-    [commandBuffer release];
+    commandBuffer->release();
 }
 
-id<MTLArgumentEncoder>
+MTL::ArgumentEncoder*
 HgiMetal::GetBufferArgumentEncoder() const
 {
     return _argEncoderBuffer;
 }
 
-id<MTLArgumentEncoder>
+MTL::ArgumentEncoder*
 HgiMetal::GetSamplerArgumentEncoder() const
 {
     return _argEncoderSampler;
 }
 
-id<MTLArgumentEncoder>
+MTL::ArgumentEncoder*
 HgiMetal::GetTextureArgumentEncoder() const
 {
     return _argEncoderTexture;
 }
 
-id<MTLBuffer>
+MTL::Buffer*
 HgiMetal::GetArgBuffer()
 {
-    MTLResourceOptions options = _capabilities->defaultStorageMode;
-    id<MTLBuffer> buffer;
+    MTL::ResourceOptions options = _capabilities->defaultStorageMode;
+    MTL::Buffer *buffer = nil;
 
     {
         std::lock_guard<std::mutex> lock(_freeArgMutex);
         if (_freeArgBuffers.empty()) {
-            buffer = [_device newBufferWithLength:HgiMetalArgumentOffsetSize
-                                          options:options];
+            buffer = _device->newBuffer(HgiMetalArgumentOffsetSize, options);
         }
         else {
             buffer = _freeArgBuffers.top();
             _freeArgBuffers.pop();
-            memset(buffer.contents, 0x00, buffer.length);
+            memset(buffer->contents(), 0x00, buffer->length());
         }
     }
 

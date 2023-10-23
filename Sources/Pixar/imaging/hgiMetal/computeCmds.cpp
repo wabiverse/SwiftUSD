@@ -21,6 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 #include "pxr/imaging/hgiMetal/buffer.h"
 #include "pxr/imaging/hgiMetal/computeCmds.h"
 #include "pxr/imaging/hgiMetal/computePipeline.h"
@@ -64,12 +67,11 @@ HgiMetalComputeCmds::_CreateEncoder()
             _commandBuffer = _hgi->GetSecondaryCommandBuffer();
             _secondaryCommandBuffer = true;
         }
-        MTLDispatchType dispatchType =
-            (_dispatchMethod == HgiComputeDispatchConcurrent)
-                ? MTLDispatchTypeConcurrent
-                : MTLDispatchTypeSerial;
-        _encoder = [_commandBuffer
-                        computeCommandEncoderWithDispatchType:dispatchType];
+        MTL::DispatchType dispatchType = (_dispatchMethod == HgiComputeDispatchConcurrent)
+          ? MTL::DispatchTypeConcurrent
+          : MTL::DispatchTypeSerial;
+
+        _encoder = _commandBuffer->computeCommandEncoder(dispatchType);
     }
 }
 
@@ -92,8 +94,7 @@ HgiMetalComputeCmds::BindPipeline(HgiComputePipelineHandle pipeline)
 void
 HgiMetalComputeCmds::BindResources(HgiResourceBindingsHandle r)
 {
-    if (HgiMetalResourceBindings* rb=
-        static_cast<HgiMetalResourceBindings*>(r.Get()))
+    if (HgiMetalResourceBindings* rb = static_cast<HgiMetalResourceBindings*>(r.Get()))
     {
         _CreateEncoder();
         _CreateArgumentBuffer();
@@ -112,8 +113,11 @@ HgiMetalComputeCmds::SetConstantValues(
     _CreateEncoder();
     _CreateArgumentBuffer();
 
-    HgiMetalResourceBindings::SetConstantValues(
-        _argumentBuffer, HgiShaderStageCompute, bindIndex, byteSize, data);
+    HgiMetalResourceBindings::SetConstantValues(_argumentBuffer, 
+                                                HgiShaderStageCompute, 
+                                                bindIndex, 
+                                                byteSize, 
+                                                data);
 }
 
 void
@@ -123,10 +127,8 @@ HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
         return;
     }
 
-    uint32_t maxTotalThreads =
-        [_pipelineState->GetMetalPipelineState() maxTotalThreadsPerThreadgroup];
-    uint32_t exeWidth =
-        [_pipelineState->GetMetalPipelineState() threadExecutionWidth];
+    uint32_t maxTotalThreads = _pipelineState->GetMetalPipelineState()->maxTotalThreadsPerThreadgroup();
+    uint32_t exeWidth = _pipelineState->GetMetalPipelineState()->threadExecutionWidth();
 
     uint32_t thread_width, thread_height;
     thread_width = MIN(maxTotalThreads, exeWidth);
@@ -138,19 +140,14 @@ HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
         thread_height = maxTotalThreads / thread_width;
     }
 
-    if (_argumentBuffer.storageMode != MTLStorageModeShared &&
-        [_argumentBuffer respondsToSelector:@selector(didModifyRange:)]) {
-        NSRange range = NSMakeRange(0, _argumentBuffer.length);
-
-        ARCH_PRAGMA_PUSH
-        ARCH_PRAGMA_INSTANCE_METHOD_NOT_FOUND
-        [_argumentBuffer didModifyRange:range];
-        ARCH_PRAGMA_POP
+    if (_argumentBuffer->storageMode() != MTL::StorageModeShared) {
+        NS::Range range = NS::Range::Make(0, _argumentBuffer->length());
+        _argumentBuffer->didModifyRange(range);
     }
 
-    [_encoder dispatchThreads:MTLSizeMake(dimX, dimY, 1)
-        threadsPerThreadgroup:MTLSizeMake(MIN(thread_width, dimX),
-                                          MIN(thread_height, dimY), 1)];
+    _encoder->dispatchThreads(MTL::Size::Make(dimX, dimY, 1),
+                              MTL::Size::Make(MIN(thread_width, dimX),
+                                              MIN(thread_height, dimY), 1));
 
     _hasWork = true;
     _argumentBuffer = nil;
@@ -176,9 +173,8 @@ HgiMetalComputeCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
     if (TF_VERIFY(barrier == HgiMemoryBarrierAll)) {
         _CreateEncoder();
-        MTLBarrierScope scope = MTLBarrierScopeBuffers|
-                                MTLBarrierScopeTextures;
-        [_encoder memoryBarrierWithScope:scope];
+        MTL::BarrierScope scope = MTL::BarrierScopeBuffers | MTL::BarrierScopeTextures;
+        _encoder->memoryBarrier(scope);
     }
 }
 
@@ -193,7 +189,7 @@ HgiMetalComputeCmds::_Submit(Hgi* hgi, HgiSubmitWaitType wait)
 {
     bool submittedWork = false;
     if (_encoder) {
-        [_encoder endEncoding];
+        _encoder->endEncoding();
         _encoder = nil;
         submittedWork = true;
 
@@ -225,7 +221,7 @@ HgiMetalComputeCmds::_Submit(Hgi* hgi, HgiSubmitWaitType wait)
 }
 
 HGIMETAL_API
-id<MTLComputeCommandEncoder> HgiMetalComputeCmds::GetEncoder()
+MTL::ComputeCommandEncoder* HgiMetalComputeCmds::GetEncoder()
 {
     _CreateEncoder();
     return _encoder;
