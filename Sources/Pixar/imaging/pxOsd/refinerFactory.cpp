@@ -29,7 +29,7 @@
 #include "pxr/imaging/pxOsd/tokens.h"
 #include "pxr/base/tf/diagnostic.h"
 
-#include <opensubdiv/far/topologyRefinerFactory.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefinerFactory.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

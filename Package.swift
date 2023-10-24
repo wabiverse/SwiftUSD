@@ -10,7 +10,6 @@ import PackageDescription
 #if os(macOS)
   let platformIncludes = [
     // macOS platform includes
-    "-I/opt/homebrew/Cellar/opensubdiv/3.6.0/include",
     // this is the wabi-preferred way to install ASWF projects on macOS
     // (gives users a launchable MaterialX Viewer, etc.), which can be
     // complicated to setup, especially for non-technical users.
@@ -83,7 +82,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.4"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.1.5"),
   ],
   targets: [
     .target(
@@ -97,6 +96,7 @@ let package = Package(
         .product(name: "OpenColorIO", package: "MetaverseKit"),
         .product(name: "OpenImageIO", package: "MetaverseKit"),
         .product(name: "OpenEXR", package: "MetaverseKit"),
+        .product(name: "OpenSubdiv", package: "MetaverseKit"),
         .product(name: "OpenVDB", package: "MetaverseKit"),
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),

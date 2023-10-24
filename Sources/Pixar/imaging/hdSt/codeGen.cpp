@@ -54,9 +54,9 @@
 #include <unordered_map>
 
 #if defined(__APPLE__)
-#include <opensubdiv/osd/mtlPatchShaderSource.h>
+#include <OpenSubdiv/OSDSurfaceMTLPatchShaderSource.h>
 #else
-#include <opensubdiv/osd/glslPatchShaderSource.h>
+#include <OpenSubdiv/OSDSurfaceGLSLPatchShaderSource.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE

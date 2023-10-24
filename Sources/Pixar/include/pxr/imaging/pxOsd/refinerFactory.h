@@ -31,7 +31,7 @@
 #include "pxr/imaging/pxOsd/meshTopology.h"
 #include "pxr/base/vt/array.h"
 
-#include <opensubdiv/far/topologyRefiner.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefiner.h>
 
 #include <memory>
 #include <vector>

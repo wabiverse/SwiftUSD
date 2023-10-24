@@ -146,8 +146,8 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/weak_ptr.hpp>
-#include <opensubdiv/far/topologyRefiner.h>
-#include <opensubdiv/far/topologyRefinerFactory.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefiner.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefinerFactory.h>
 #include <tbb/cache_aligned_allocator.h>
 #include <tbb/spin_mutex.h>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED

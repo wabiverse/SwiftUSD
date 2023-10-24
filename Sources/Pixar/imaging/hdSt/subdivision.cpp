@@ -53,11 +53,11 @@
 #include "pxr/base/tf/staticTokens.h"
 #include "pxr/base/tf/stringUtils.h"
 
-#include <opensubdiv/version.h>
-#include <opensubdiv/far/patchTable.h>
-#include <opensubdiv/far/patchTableFactory.h>
-#include <opensubdiv/far/stencilTable.h>
-#include <opensubdiv/far/stencilTableFactory.h>
+#include <OpenSubdiv/OSDVersion.h>
+#include <OpenSubdiv/OSDAdaptivePatchTable.h>
+#include <OpenSubdiv/OSDAdaptivePatchTableFactory.h>
+#include <OpenSubdiv/OSDAdaptiveStencilTable.h>
+#include <OpenSubdiv/OSDAdaptiveStencilTableFactory.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

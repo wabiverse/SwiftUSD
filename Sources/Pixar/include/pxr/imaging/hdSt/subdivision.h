@@ -33,8 +33,8 @@
 #include "pxr/usd/sdf/path.h"
 #include "pxr/base/tf/token.h"
 
-#include <opensubdiv/far/patchTable.h>
-#include <opensubdiv/far/stencilTable.h>
+#include <OpenSubdiv/OSDAdaptivePatchTable.h>
+#include <OpenSubdiv/OSDAdaptiveStencilTable.h>
 
 #include <memory>
 #include <mutex>
