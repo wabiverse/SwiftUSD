@@ -79,7 +79,9 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#ifdef PXR_OSL_SUPPORT_ENABLED
 #include <OSL/oslquery.h>
+#endif // PXR_OSL_SUPPORT_ENABLED
 #include <boost/aligned_storage.hpp>
 #include <boost/any.hpp>
 #include <boost/functional/hash.hpp>

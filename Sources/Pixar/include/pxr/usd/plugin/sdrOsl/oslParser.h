@@ -26,6 +26,7 @@
 #define PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H
 
 /// \file sdrOsl/oslParser.h
+#ifdef PXR_OSL_SUPPORT_ENABLED
 
 #include "pxr/pxr.h"
 #include "pxr/usd/plugin/sdrOsl/api.h"
@@ -170,3 +171,5 @@ private:
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif // PXR_USD_PLUGIN_SDR_OSL_OSL_PARSER_H
+
+#endif /* PXR_OSL_SUPPORT_ENABLED */

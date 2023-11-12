@@ -53,6 +53,7 @@ let package = Package(
         "usd/usd/codegenTemplates",
         /* ---------- Exclude plugins files. ---------- */
         "imaging/plugin/hdEmbree", // TODO: add Embree.
+        "usd/plugin/sdrOsl",       // TODO: add OSL.
         /* ---------- Exclude testing files. ---------- */
         "imaging/glf/testGLContext.cpp",
         /* -------------------------------------------- */
