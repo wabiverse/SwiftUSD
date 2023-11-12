@@ -244,7 +244,7 @@ HgiInteropMetal::HgiInteropMetal(Hgi* hgi)
     
     GarchGLApiLoad();
     
-    _currentOpenGLContext = NS::OpenGLContext::currentContext();
+    _currentOpenGLContext = NSGL::OpenGLContext::currentContext();
     
     _ProcessGLErrors(true);
     _CaptureOpenGlState();
@@ -456,7 +456,7 @@ HgiInteropMetal::HgiInteropMetal(Hgi* hgi)
     _mtlAliasedDepthRegularFloatTexture = nil;
     
     CGLContextObj glctx = _currentOpenGLContext->CGLContextObj();
-    CGLPixelFormatObj glPixelFormat = NS::OpenGLContext::currentContext()->pixelFormat()->CGLPixelFormatObj();
+    CGLPixelFormatObj glPixelFormat = NSGL::OpenGLContext::currentContext()->pixelFormat()->CGLPixelFormatObj();
     cvret = CVOpenGLTextureCacheCreate(kCFAllocatorDefault, nil, (__bridge CGLContextObj _Nonnull)(glctx),
                                        glPixelFormat, nil, &_cvglTextureCache);
     if (cvret != kCVReturnSuccess) {
@@ -533,7 +533,7 @@ HgiInteropMetal::_ValidateGLContext()
 #if 0
     // XXX: Add these into the CXX Apple headers.
 
-    if (_currentOpenGLContext != NS::OpenGLContext::currentContext()) {
+    if (_currentOpenGLContext != NSGL::OpenGLContext::currentContext()) {
         TF_FATAL_CODING_ERROR(
           "Current OpenGL context does not match that when HgiInteropMetal "
           "was created"

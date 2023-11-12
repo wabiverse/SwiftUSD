@@ -37,7 +37,7 @@
 #ifdef ARCH_OS_IOS
 typedef EAGLContext NSGLContext;
 #else
-typedef NS::OpenGLContext NSGLContext;
+typedef NSGL::OpenGLContext NSGLContext;
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -120,15 +120,15 @@ GarchGetNullGLPlatformContextState()
 void *
 GarchSelectCoreProfileMacVisual()
 {
-    NS::OpenGLPixelFormatAttribute attribs[10];
+    NSGL::OpenGLPixelFormatAttribute attribs[10];
     int c = 0;
 
-    attribs[c++] = NS::OpenGLPixelFormatAttribute::OpenGLPFAOpenGLProfile;
-    attribs[c++] = NS::OpenGLPixelFormatAttribute::OpenGLProfileVersion3_2Core;
-    attribs[c++] = NS::OpenGLPixelFormatAttribute::OpenGLPFADoubleBuffer;
-    attribs[c++] = static_cast<NS::OpenGLPixelFormatAttribute>(0);
+    attribs[c++] = NSGL::OpenGLPixelFormatAttribute::OpenGLPFAOpenGLProfile;
+    attribs[c++] = NSGL::OpenGLPixelFormatAttribute::OpenGLProfileVersion3_2Core;
+    attribs[c++] = NSGL::OpenGLPixelFormatAttribute::OpenGLPFADoubleBuffer;
+    attribs[c++] = static_cast<NSGL::OpenGLPixelFormatAttribute>(0);
 
-    return NS::OpenGLPixelFormat::alloc()->init(attribs);
+    return NSGL::OpenGLPixelFormat::alloc()->init(attribs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

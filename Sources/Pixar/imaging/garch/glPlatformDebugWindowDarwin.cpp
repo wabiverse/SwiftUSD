@@ -61,32 +61,32 @@ Garch_GetModifierKeys(NS::UInteger flags)
     return keys;
 }
 
-class Garch_GLPlatformView : NS::Object/*NS::OpenGLView <NSWindowDelegate>*/
+class Garch_GLPlatformView : NS::Object/*NSGL::OpenGLView <NSWindowDelegate>*/
 {
     GarchGLDebugWindow *_callback;
-    NS::OpenGLContext *_ctx;
+    NSGL::OpenGLContext *_ctx;
 
-    Garch_GLPlatformView* initGL(NS::Rect frame,  GarchGLDebugWindow *cb)
+    Garch_GLPlatformView* initGL(NSGL::Rect frame,  GarchGLDebugWindow *cb)
     {
         _callback = cb;
 
         int attribs[] = {
-            NS::OpenGLPFAAccelerated,
-            NS::OpenGLPFADoubleBuffer,
-            NS::OpenGLPFADepthSize, 24,
-            NS::OpenGLPFAAlphaSize, 8,
-            NS::OpenGLPFAColorSize, 32,
-            NS::OpenGLPFANoRecovery,
-            NS::OpenGLPFAOpenGLProfile, 
-            NS::OpenGLProfileVersion3_2Core,
+            NSGL::OpenGLPFAAccelerated,
+            NSGL::OpenGLPFADoubleBuffer,
+            NSGL::OpenGLPFADepthSize, 24,
+            NSGL::OpenGLPFAAlphaSize, 8,
+            NSGL::OpenGLPFAColorSize, 32,
+            NSGL::OpenGLPFANoRecovery,
+            NSGL::OpenGLPFAOpenGLProfile, 
+            NSGL::OpenGLProfileVersion3_2Core,
             0
         };
 
-        NS::OpenGLPixelFormat *pf = NS::OpenGLPixelFormat::alloc()->init((NS::OpenGLPixelFormatAttribute*)attribs);
+        NSGL::OpenGLPixelFormat *pf = NSGL::OpenGLPixelFormat::alloc()->init((NSGL::OpenGLPixelFormatAttribute*)attribs);
 
         //this->init(/*frame.pixelFormat(pf)*/);
 
-        _ctx = NS::OpenGLContext::alloc()->init(pf, nil);
+        _ctx = NSGL::OpenGLContext::alloc()->init(pf, nil);
 
         //this->setOpenGLContext(_ctx);
 
@@ -104,7 +104,7 @@ class Garch_GLPlatformView : NS::Object/*NS::OpenGLView <NSWindowDelegate>*/
         return true;
     }
 
-    void drawRect(NS::Rect theRect)
+    void drawRect(NSGL::Rect theRect)
     {
         _ctx->makeCurrentContext();
 
@@ -120,14 +120,14 @@ class Garch_GLPlatformView : NS::Object/*NS::OpenGLView <NSWindowDelegate>*/
 
     void windowDidResize(NS::Notification *notification)
     {
-        NS::Rect r = this->frame();
+        NSGL::Rect r = this->frame();
         _callback->OnResize(r.size.width, r.size.height);
     }
 
     void mouseDown(NSEvent *event)
     {
-        NS::Point p = event->locationInWindow();
-        NS::Rect r = self->frame();
+        NSGL::Point p = event->locationInWindow();
+        NSGL::Rect r = self->frame();
         NS::UInteger modflags = event->modifierFlags();
         _callback->OnMousePress(GarchGLDebugWindow::MyButton1,
                                 p.x, r.size.height - 1 - p.y,
@@ -138,8 +138,8 @@ class Garch_GLPlatformView : NS::Object/*NS::OpenGLView <NSWindowDelegate>*/
 
     void mouseUp(NSEvent *event)
     {
-        NS::Point p = event->locationInWindow();
-        NS::Rect r = this->frame();
+        NSGL::Point p = event->locationInWindow();
+        NSGL::Rect r = this->frame();
         NS::UInteger modflags = event->modifierFlags();
         _callback->OnMouseRelease(GarchGLDebugWindow::MyButton1,
                                   p.x, r.size.height - 1 - p.y,
@@ -150,8 +150,8 @@ class Garch_GLPlatformView : NS::Object/*NS::OpenGLView <NSWindowDelegate>*/
 
     void mouseDragged(NSEvent *event)
     {
-        NS::Point p = event->locationInWindow();
-        NS::Rect r = this->frame();
+        NSGL::Point p = event->locationInWindow();
+        NSGL::Rect r = this->frame();
         NS::UInteger modflags = event->modifierFlags();
         _callback->OnMouseMove(p.x, r.size.height - 1 - p.y,
                               Garch_GetModifierKeys(modflags));
@@ -207,8 +207,8 @@ Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height, int 
     NS::App::setActivationPolicy(NS::ApplicationActivationPolicyRegular);
     id applicationName = NS::ProcessInfo::processInfo()->processName();
 
-    NS::Rect frame = NS::Rect::Make(0, 0, width, height);
-    NS::Rect viewBounds = NS::Rect::Make(0, 0, width, height);
+    NSGL::Rect frame = NSGL::Rect::Make(0, 0, width, height);
+    NSGL::Rect viewBounds = NSGL::Rect::Make(0, 0, width, height);
 
     Garch_GLPlatformView *view = Garch_GLPlatformView::alloc()->initGL(viewBounds, _callback);
 

@@ -138,7 +138,10 @@ private:
     
     ShaderContext _shaderProgramContext[ShaderContextCount];
     
-    NS::OpenGLContext* _currentOpenGLContext;
+#if 0
+  // XXX: OpenGLContext just need the inlined impl in the header left.
+    NSGL::OpenGLContext* _currentOpenGLContext;
+#endif // 0
 
     int32_t _restoreDrawFbo;
     int32_t _restoreVao;
