@@ -13,9 +13,9 @@
  * ------------------------------------------------------------- */
 
 import XCTest
-@testable import USD
+@testable import Pixar
 
-final class USDTests: XCTestCase
+final class PixarTests: XCTestCase
 {
   func testExample() throws
   {

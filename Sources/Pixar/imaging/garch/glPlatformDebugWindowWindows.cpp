@@ -21,8 +21,15 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#if defined(_WIN32)
+/* ----------------------------------------------------------------- 
+ * to reduce the need to explicitly exclude platform specific source
+ * from SwiftPM, we will just guard the compilation by its platform,
+ * thus we can prefer the ease of including all sources in the build
+ * which is far more maintainable, especially for package consumers.
+ * ----------------------------------------------------------------- */
 
-#include "pxr/imaging/garch/glPlatformDebugWindowWindows.h"
+#include "pxr/imaging/garch/GArchWindows/glPlatformDebugWindowWindows.h"
 #include "pxr/imaging/garch/glDebugWindow.h"
 #include "pxr/base/arch/defines.h"
 #include "pxr/base/tf/diagnostic.h"
@@ -264,3 +271,4 @@ Garch_GLPlatformDebugWindow::ExitApp()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
+#endif /* defined(_WIN32) */

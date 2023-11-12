@@ -32,17 +32,20 @@
 #include <cstddef>
 #include <functional>
 
-#if defined(ARCH_OS_LINUX)
+// Note: there may be cases in which you wish to build for GLX when you are
+// not on Linux, so we have left this optional define, `WITH_GLX` which will
+// override the platform detection and force the inclusion of GLX code.
+#if defined(ARCH_OS_LINUX) || defined(WITH_GLX)
 
-#include "pxr/imaging/garch/glPlatformContextGLX.h"
+#include "pxr/imaging/garch/GArchGLX/glPlatformContextGLX.h"
 
 #elif defined(ARCH_OS_DARWIN)
 
-#include "pxr/imaging/garch/glPlatformContextDarwin.h"
+#include "pxr/imaging/garch/GArchDarwin/glPlatformContextDarwin.h"
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#include "pxr/imaging/garch/glPlatformContextWindows.h"
+#include "pxr/imaging/garch/GArchWindows/glPlatformContextWindows.h"
 
 #else
 

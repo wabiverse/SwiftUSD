@@ -22,13 +22,6 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-/* generates the cxx implementation for apple cxx headers. */
-#define NS_PRIVATE_IMPLEMENTATION
-#define CA_PRIVATE_IMPLEMENTATION
-#define MTL_PRIVATE_IMPLEMENTATION
-#define MTLFX_PRIVATE_IMPLEMENTATION
-#define APPKIT_PRIVATE_IMPLEMENTATION
-
 #include "pxr/imaging/garch/glApi.h"
 
 #include "pxr/imaging/hgiInterop/metal.h"
@@ -44,7 +37,7 @@
 #include <Metal/Metal.hpp>
 #include <MetalFX/MetalFX.hpp>
 #include <QuartzCore/QuartzCore.hpp>
-#include <AppKit/AppKit.hpp>
+#include <OpenGL/OpenGL.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

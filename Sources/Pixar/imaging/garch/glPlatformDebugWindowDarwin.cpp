@@ -21,13 +21,19 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-
+#if defined(__APPLE__)
+/* ----------------------------------------------------------------- 
+ * to reduce the need to explicitly exclude platform specific source
+ * from SwiftPM, we will just guard the compilation by its platform,
+ * thus we can prefer the ease of including all sources in the build
+ * which is far more maintainable, especially for package consumers.
+ * ----------------------------------------------------------------- */
 #include "pxr/pxr.h"
 #include "pxr/imaging/garch/glDebugWindow.h"
-#include "pxr/imaging/garch/glPlatformDebugWindowDarwin.h"
+#include "pxr/imaging/garch/GArchDarwin/glPlatformDebugWindowDarwin.h"
 
 #include <Foundation/Foundation.hpp>
-#include <AppKit/AppKit.hpp>
+#include <OpenGL/OpenGL.hpp>
 #include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -245,3 +251,5 @@ Garch_GLPlatformDebugWindow::ExitApp()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif /* defined(__APPLE__) */

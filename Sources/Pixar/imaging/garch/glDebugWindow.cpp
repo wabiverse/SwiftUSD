@@ -26,12 +26,15 @@
 #include "pxr/imaging/garch/glPlatformDebugContext.h"
 #include "pxr/base/arch/defines.h"
 
-#if defined(ARCH_OS_LINUX)
-#include "pxr/imaging/garch/glPlatformDebugWindowGLX.h"
+// Note: there may be cases in which you wish to build for GLX when you are
+// not on Linux, so we have left this optional define, `WITH_GLX` which will
+// override the platform detection and force the inclusion of GLX code.
+#if defined(ARCH_OS_LINUX) || defined(WITH_GLX)
+#include "pxr/imaging/garch/GArchGLX/glPlatformDebugWindowGLX.h"
 #elif defined(ARCH_OS_DARWIN)
-#include "pxr/imaging/garch/glPlatformDebugWindowDarwin.h"
+#include "pxr/imaging/garch/GArchDarwin/glPlatformDebugWindowDarwin.h"
 #elif defined(ARCH_OS_WINDOWS)
-#include "pxr/imaging/garch/glPlatformDebugWindowWindows.h"
+#include "pxr/imaging/garch/GArchWindows/glPlatformDebugWindowWindows.h"
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE

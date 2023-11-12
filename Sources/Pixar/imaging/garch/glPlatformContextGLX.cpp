@@ -23,6 +23,16 @@
 //
 /// \file glPlatformContext.cpp
 
+// Note: there may be cases in which you wish to build for GLX when you are
+// not on Linux, so we have left this optional define, `WITH_GLX` which will
+// override the platform detection and force the inclusion of GLX code.
+#if defined(__linux__) || defined(WITH_GLX)
+/* ----------------------------------------------------------------- 
+ * to reduce the need to explicitly exclude platform specific source
+ * from SwiftPM, we will just guard the compilation by its platform,
+ * thus we can prefer the ease of including all sources in the build
+ * which is far more maintainable, especially for package consumers.
+ * ----------------------------------------------------------------- */
 #include "pxr/imaging/garch/glPlatformContext.h"
 #include <boost/functional/hash.hpp>
 
@@ -101,3 +111,4 @@ GarchGetNullGLPlatformContextState()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
+#endif /* defined(__linux__) || defined(WITH_GLX) */

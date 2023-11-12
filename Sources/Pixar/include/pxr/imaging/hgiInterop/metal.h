@@ -28,7 +28,7 @@
 
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
-#include <AppKit/AppKit.hpp>
+#include <OpenGL/OpenGL.hpp>
 
 #include "pxr/pxr.h"
 #include "pxr/base/gf/vec4i.h"
