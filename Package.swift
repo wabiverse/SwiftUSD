@@ -12,19 +12,35 @@ let package = Package(
   ],
   products: [
     .library(
+      name: "pxr",
+      targets: ["pxr"]
+    ),
+    .library(
+      name: "PXRBaseArch",
+      targets: ["PXRBaseArch"]
+    ),
+    .library(
       name: "Pixar",
       targets: ["Pixar"]
     ),
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.1"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.2"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
     .target(
-      name: "Pixar",
+      name: "pxr",
+      dependencies: [],
+      publicHeadersPath: "include"
+    ),
+
+    .target(
+      name: "PXRBaseArch",
       dependencies: [
+        /* ------------ pxr Namespace. ---------- */
+        .target(name: "pxr"),
         /* ------------ VFX Platform. ----------- */
         .product(name: "MetaTBB", package: "MetaverseKit"),
         .product(name: "MaterialX", package: "MetaverseKit"),
@@ -48,14 +64,14 @@ let package = Package(
       ],
       exclude: [
         /* ---------- Exclude example files. ---------- */
-        "usd/usd/examples.cpp",
+        // "usd/usd/examples.cpp",
         /* ---------- Exclude codegen files. ---------- */
-        "usd/usd/codegenTemplates",
+        // "usd/usd/codegenTemplates",
         /* ---------- Exclude plugins files. ---------- */
-        "imaging/plugin/hdEmbree", // TODO: add Embree.
-        "usd/plugin/sdrOsl",       // TODO: add OSL.
+        // "imaging/plugin/hdEmbree", // TODO: add Embree.
+        // "usd/plugin/sdrOsl",       // TODO: add OSL.
         /* ---------- Exclude testing files. ---------- */
-        "imaging/glf/testGLContext.cpp",
+        // "imaging/glf/testGLContext.cpp",
         /* -------------------------------------------- */
       ],
       publicHeadersPath: "include",
@@ -75,13 +91,23 @@ let package = Package(
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         /* --------- Apple platforms only. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
+      ]
+    ),
+
+    .target(
+      name: "Pixar",
+      dependencies: [
+        .target(name: "PXRBaseArch"),
       ],
       swiftSettings: [
-        /* ------ C & CXX <-> Swift Interop. ------- */
         .interoperabilityMode(.Cxx),
       ]
     ),
 
+    .testTarget(
+      name: "OpenUSDTests",
+      dependencies: ["PXRBaseArch"]
+    ),
     .testTarget(
       name: "PixarTests",
       dependencies: ["Pixar"]
@@ -104,7 +130,7 @@ let package = Package(
  * Swift Package Manager, we can now leverage the power of USD, and what it means
  * to build plugins, and applications, in a way that is much more accessible to
  * the wider community. This is a very exciting time for the USD project, and we
- * are very excited to be a part of it. 
+ * are very excited to be a part of it.
  *
  *                       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
  * ------------------------------------------------------------------------------
@@ -113,11 +139,11 @@ let package = Package(
 
 /* --- xxx --- */
 
-/* ------------------------------------------------
+/** ------------------------------------------------
  * Just to tidy up the package configuration above,
- * we define some helper functions and types below. 
+ * we define some helper functions and types below.
  * ------------------------------------------------ */
-struct Arch
+enum Arch
 {
   /** OS platforms, grouped by family. */
   enum OS
