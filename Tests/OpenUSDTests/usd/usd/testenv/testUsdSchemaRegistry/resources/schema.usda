@@ -1,0 +1,62 @@
+#usda 1.0
+(
+    "Test schema file for testUsdSchemaRegistry"
+    subLayers = [
+        @usd/schema.usda@
+    ]
+)
+
+
+def "GLOBAL" (
+    customData = {
+        string libraryName      = "testUsdSchemaRegistry"
+        string libraryPath      = "pxr/usd/usd"
+        bool skipCodeGeneration = true
+    }
+)
+{
+}
+
+class "AbstractTest" (
+    inherits = </Typed>
+    doc = "Testing documentation metadata"
+    hidden = true
+)
+{
+    string testAttr = "foo" (
+        allowedTokens = ["bar", "baz"]
+        displayName = "Display Name"
+        displayGroup = "Display Group"
+        doc = "Testing documentation metadata"
+        hidden = True
+        testCustomMetadata = "garply"
+        testDictionaryMetadata = {
+            string name = "bar"
+            int value = 3
+        }
+    )
+}
+
+class MetadataTest "MetadataTest" (
+    inherits = </AbstractTest>
+    doc = "Testing documentation metadata"
+    hidden = true
+    testCustomMetadata = "garply"
+    testDictionaryMetadata = {
+        string name = "foo"
+        int value = 2
+    }
+)
+{
+    rel testRel (
+        displayGroup = "Display Group"
+        displayName = "Display Name"
+        doc = "Testing documentation metadata"
+        hidden = true
+        testCustomMetadata = "garply"
+        testDictionaryMetadata = {
+            string name = "baz"
+            int value = 5
+        }
+    )
+}
