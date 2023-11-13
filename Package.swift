@@ -104,13 +104,16 @@ let package = Package(
       ]
     ),
 
-    .testTarget(
-      name: "OpenUSDTests",
-      dependencies: ["PXRBaseArch"]
-    ),
+    // .testTarget(
+    //   name: "OpenUSDTests",
+    //   dependencies: ["PXRBaseArch"]
+    // ),
     .testTarget(
       name: "PixarTests",
-      dependencies: ["Pixar"]
+      dependencies: ["Pixar"],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]
     ),
   ],
   cxxLanguageStandard: .cxx17

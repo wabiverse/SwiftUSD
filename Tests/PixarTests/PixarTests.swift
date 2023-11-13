@@ -28,6 +28,6 @@ final class PixarTests: XCTestCase
 {
   func testSayHello()
   {
-    Pixar.sayHello()
+    Pixar.shared.sayHello()
   }
 }
