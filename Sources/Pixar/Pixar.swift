@@ -23,6 +23,8 @@
 
 import PXRBaseArch
 
+public typealias PXR = pxrInternal_v0_23__pxrReserved__
+
 public class Pixar
 {
   private init()
@@ -33,8 +35,8 @@ public class Pixar
   public func sayHello()
   {
     print("hello scene description.")
-    
-    print("Should be printing a proper executable path by calling ArchGetExecutablePath()")
-    print(pxrInternal_v0_23__pxrReserved__.ArchGetExecutablePath())
+
+    print(PXR.ArchGetExecutablePath())
+    print("should have printed a proper executable path by calling ArchGetExecutablePath()")
   }
 }
