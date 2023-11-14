@@ -89,6 +89,8 @@ let package = Package(
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         /* --------- Apple platforms only. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
+        /* ----- Else, Boost Forces cpp_main() ----- */
+        .define("BOOST_TEST_NO_MAIN", to: "1"),
       ]
     ),
 
