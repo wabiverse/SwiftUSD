@@ -56,8 +56,6 @@ let package = Package(
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
-        .product(name: "Shaderc", package: "MetaverseKit"),
-        .product(name: "SPIRVCross", package: "MetaverseKit"),
         /* ---------- Apple only libs. ---------- */
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
