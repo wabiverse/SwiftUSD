@@ -21,37 +21,27 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import XCTest
-@testable import Pixar
-
-/* ---- xxx ----
- *  ARCH  TESTS
- * ---- xxx ---- */
-
-final class ArchTests: XCTestCase
+/**
+ * # System Functions
+ *
+ * Functions that encapsulate differing low-level system calls. */
+public extension Pixar.Arch
 {
-  func testCwd()
+  /// Return current working directory as a string.
+  static func getCwd() -> String
   {
-    PXRMSG.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
+    String(pxr.ArchGetCwd())
   }
 
-  func testExecutablePath()
+  /// Return the path to the program's executable.
+  static func getExecutablePath() -> String
   {
-    PXRMSG.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
+    String(pxr.ArchGetExecutablePath())
   }
 
-  func testPageSize()
+  /// Return the system's memory page size. Safe to assume power-of-two.
+  static func getPageSize() -> Int
   {
-    PXRMSG.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
-  }
-
-  func testIsMainThread()
-  {
-    PXRMSG.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
-  }
-
-  func testMainThreadId()
-  {
-    PXRMSG.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
+    Int(pxr.ArchGetPageSize())
   }
 }

@@ -21,37 +21,21 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import XCTest
-@testable import Pixar
-
-/* ---- xxx ----
- *  ARCH  TESTS
- * ---- xxx ---- */
-
-final class ArchTests: XCTestCase
+/**
+ * # Multithreading
+ *
+ * Functions having to do with multithreading. */
+public extension Pixar.Arch
 {
-  func testCwd()
+  /// Return true if the calling thread is the main thread, false otherwise.
+  static func isMainThread() -> Bool
   {
-    PXRMSG.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
+    pxr.ArchIsMainThread()
   }
 
-  func testExecutablePath()
+  /// Return the std::thread_id for the thread arch considers to be the "main" thread.
+  static func getMainThreadId() -> Any
   {
-    PXRMSG.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
-  }
-
-  func testPageSize()
-  {
-    PXRMSG.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
-  }
-
-  func testIsMainThread()
-  {
-    PXRMSG.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
-  }
-
-  func testMainThreadId()
-  {
-    PXRMSG.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
+    pxr.ArchGetMainThreadId()
   }
 }

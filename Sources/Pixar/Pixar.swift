@@ -21,22 +21,129 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import PXRBaseArch
+@_exported import PXRBaseArch
 
-public typealias PXR = pxrInternal_v0_23__pxrReserved__
+/* --- xxx --- */
 
-public class Pixar
+public typealias pxr = pxrInternal_v0_23__pxrReserved__
+
+/* --- xxx --- */
+
+public enum Pixar
 {
-  private init()
+  /**
+    # ``Arch``
+
+    ## Overview
+
+    **Arch** is a repository for all **architecture-dependent code**.
+    It's purpose is to isolate all platform dependencies into one small library,
+    serving as a common area for documentation of these multi-platform issues.
+   */
+  public struct Arch
   {}
 
-  public static let shared = Pixar()
+  public struct Tf
+  {}
 
-  public func sayHello()
-  {
-    print("hello scene description.")
+  public struct Gf
+  {}
 
-    print(PXR.ArchGetExecutablePath())
-    print("should have printed a proper executable path by calling ArchGetExecutablePath()")
-  }
+  public struct Trace
+  {}
+
+  public struct Work
+  {}
+
+  public struct Plug
+  {}
+
+  public struct Vt
+  {}
+
+  public struct Ar
+  {}
+
+  public struct Kind
+  {}
+
+  public struct Sdf
+  {}
+
+  public struct Ndr
+  {}
+
+  public struct Sdr
+  {}
+
+  public struct Pcp
+  {}
+
+  public struct Usd
+  {}
+
+  public struct UsdGeom
+  {}
+
+  public struct UsdVol
+  {}
+
+  public struct UsdMedia
+  {}
+
+  public struct UsdShade
+  {}
+
+  public struct UsdLux
+  {}
+
+  public struct UsdRender
+  {}
+
+  public struct UsdHydra
+  {}
+
+  public struct UsdRi
+  {}
+
+  public struct UsdSkel
+  {}
+
+  public struct UsdUI
+  {}
+
+  public struct UsdUtils
+  {}
+
+  public struct UsdPhysics
+  {}
+
+  public struct UsdAbc
+  {}
+
+  public struct UsdDraco
+  {}
+
+  public struct Garch
+  {}
+
+  public struct CameraUtil
+  {}
+
+  public struct PxOsd
+  {}
+
+  public struct Glf
+  {}
+
+  public struct UsdImagingGL
+  {}
+
+  public struct UsdAppUtils
+  {}
+
+  public struct Usdview
+  {}
 }
+
+/* --- xxx --- */
