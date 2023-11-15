@@ -54,4 +54,39 @@ final class ArchTests: XCTestCase
   {
     PXRMSG.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
   }
+
+  func testAlignMemoryOfSize()
+  {
+    let size = 1024
+    let alignedPtr = Pixar.Arch.alignMemory(of: size)
+    XCTAssert(alignedPtr >= 1024)
+  }
+
+  func testAlignMemoryOfPointer()
+  {
+    let size = 1024
+    let alignment = 16
+    let ptr = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: alignment)
+    defer { ptr.deallocate() }
+    let alignedPtr = Pixar.Arch.alignMemory(of: ptr)
+    XCTAssert(alignedPtr != nil)
+  }
+
+  func testAlignedAlloc()
+  {
+    let size = 1024
+    let alignment = 16
+    let alignedPtr = Pixar.Arch.alignedAlloc(byteCount: size, alignment: alignment)
+    XCTAssert(alignedPtr != nil)
+  }
+
+  func testAlignedFree()
+  {
+    let size = 1024
+    let alignment = 16
+    var alignedPtr = Pixar.Arch.alignedAlloc(byteCount: size, alignment: alignment)
+    XCTAssert(alignedPtr != nil)
+    Pixar.Arch.alignedFree(pointer: &alignedPtr)
+    XCTAssert(alignedPtr == nil)
+  }
 }
