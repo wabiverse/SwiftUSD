@@ -1,5 +1,5 @@
-#ifndef __USD_BASE_ARCH_H__
-#define __USD_BASE_ARCH_H__
+#ifndef __PXR_BASE_ARCH_H__
+#define __PXR_BASE_ARCH_H__
 
 // Arch
 #include <PXRBaseArch/api.h>
@@ -35,4 +35,4 @@
 #include <PXRBaseArch/virtualMemory.h>
 #include <PXRBaseArch/vsnprintf.h>
 
-#endif // __USD_BASE_ARCH_H__
+#endif // __PXR_BASE_ARCH_H__
