@@ -1,0 +1,6 @@
+if (PXR_BUILD_TUTORIALS)
+    add_subdirectory(tutorials)
+endif()
+if (PXR_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
