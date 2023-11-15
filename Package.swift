@@ -20,6 +20,10 @@ let package = Package(
       targets: ["PXRBaseArch"]
     ),
     .library(
+      name: "PXRBaseTf",
+      targets: ["PXRBaseTf"]
+    ),
+    .library(
       name: "Pixar",
       targets: ["Pixar"]
     ),
@@ -88,7 +92,14 @@ let package = Package(
         /* --------- OSL is temp disabled. --------- */
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         /* --------- Apple platforms only. --------- */
-        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: [.macOS, .iOS, .visionOS, .tvOS, .watchOS])),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+      ]
+    ),
+
+    .target(
+      name: "PXRBaseTf", 
+      dependencies: [
+        .target(name: "PXRBaseArch")
       ]
     ),
 
@@ -96,16 +107,13 @@ let package = Package(
       name: "Pixar",
       dependencies: [
         .target(name: "PXRBaseArch"),
+        .target(name: "PXRBaseTf"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
       ]
     ),
 
-    // .testTarget(
-    //   name: "OpenUSDTests",
-    //   dependencies: ["PXRBaseArch"]
-    // ),
     .testTarget(
       name: "PixarTests",
       dependencies: ["Pixar"],
