@@ -1,41 +1,64 @@
 3rd Party Library and Application Versions
 ------------------------------------------
 
-USD relies on an ecosystem of libraries and applications. This page outlines
-the versions of these libraries used and tested against at Pixar.
+SwiftUSD relies on an ecosystem of libraries and applications, which are all automatically included through the usage of
+[MetaverseKit](https://github.com/wabiverse/MetaverseKit), as a package dependency in the `Package.swift` file for **SwiftPM**.
+This makes the complicated and time-consuming step of building all these dependencies entirely automatic for all users, since
+**SwiftPM** automatically pulls in all dependencies and builds them locally at build time when users run:
 
-Note that not everything here is required, see README.md for more information
-about which are required and which are optional for the various subsystems.
+```swift
+// For building and running programs from a package
+swift run SomeMetaverseApp
+
+// Or, just for building all targets in a package
+swift build
+
+// Or, building and running package tests
+swift test
+```
+
+This page outlines the versions of these libraries used and tested against
+[MetaverseKit](https://github.com/wabiverse/MetaverseKit), our single package
+dependency which brings in this whole ecosystem from one central place.
 
 ## Tested
 
-Our test machines have the following software versions installed
+Currently, through early development, Wabi is only using (arm64) macOS running on Apple silicon.
+In the near term we will begin with (aarch64) Linux first, and Microsoft Windows support sometime after,
+or in parallel.
 
-| Software      | Linux                | macOS                        | Windows                        |
-| ------------- | -------------------- | ---------------------------- | ------------------------------ |
-| OS            | CentOS Linux 7       | 10.15.7                      | Windows 10                     |
-| C++ Compiler  | gcc 6.3.1            | Apple clang 12.0.0 (Xcode 12.4) | Visual Studio 2017 15.9     |
-| CMake         | 3.14.6               | 3.19.5                       | 3.16.5                         |
-| Python        | 3.6.8                | 3.7.7                        | 3.7.4, 3.8.10                  |
-| Boost         | 1.70.0               | 1.76.0                       | 1.70.0                         |
-| Intel TBB     | 2019 Update 6        | 2018 Update 1, 2019 Update 6 | 2019 Update 6                  |
-| OpenSubdiv    | 3.5.0                | 3.5.0                        | 3.5.0                          |
-| OpenImageIO   | 2.1.16.0             | 2.3.15.0                     | 2.1.16.0                       |
-| OpenColorIO   | 1.1.0                | 1.1.0                        | 1.1.0                          |
-| OSL           | 1.10.9               |                              |                                |
-| Ptex          | 2.3.2                | 2.1.33                       | 2.1.33                         |
-| Qt for Python | PySide2 5.14.1       | PySide6 6.3.1                | PySide2 5.14.1                 |
-| PyOpenGL      | 3.1.5                | 3.1.5                        | 3.1.5                          |
-| Embree        | 3.2.2                | 3.13.3                       | 3.2.2                          |
-| RenderMan     | 24.4, 25.0           | 24.4, 25.0                   | 24.4, 25.0                     |
-| Alembic       | 1.7.10               | 1.8.3                        | 1.7.10                         |
-| OpenEXR       | 2.4.3                | 2.4.3                        | 2.5.2                          |
-| MaterialX     | 1.38.7               | 1.38.7                       | 1.38.7                         |
-| Jinja2        | 2.0                  |                              |                                |
-| Flex          | 2.5.39               |                              |                                |
-| Bison         | 2.4.1                |                              |                                |
-| Doxygen       | 1.8.14               |                              |                                |
-| GraphViz      | 2.40.1               |                              |                                |
-| OpenVDB       | 7.1.0                | 7.1.0                        | 7.1.0                          |
-| Vulkan SDK    | 1.2.135.0            | 1.2.135.0                    | 1.2.135.0                      |
-| Draco         | 1.3.6                | 1.3.6                        | 1.3.6                          |
+| Software      | Linux                | macOS                           | Windows                        |
+| ------------- | -------------------- | ----------------------------    | ------------------------------ |
+| OS            | CentOS Linux 7       | macOS 14 (Sonoma)               | Windows 11                     |
+| C++ Compiler  | ??? (TODO)           | Apple clang 15.0.0 (Xcode 15.1) | ??? (TODO)                     |
+| Python        | 3.11.6               | 3.11.6                          | 3.11.6                         |
+| PyBind11      | 2.11.1               | 2.11.1                          | 2.11.1                         |
+| Boost         | 1.81.2               | 1.81.2                          | 1.81.2                         |
+| oneTBB        | 2021.10.0            | 2021.10.0                       | 2021.10.0                      |
+| OpenSubdiv    | 3.6.0                | 3.6.0                           | 3.6.0                          |
+| OpenImageIO   | 2.5.4.0              | 2.5.4.0                         | 2.5.4.0                        |
+| OpenColorIO   | 2.3.0                | 2.3.0                           | 2.3.0                          |
+| OSL           | 1.12.14.0 (TODO)     | 1.12.14.0 (TODO)                | 1.12.14.0 (TODO)               |
+| Ptex          | 2.4.2                | 2.4.2                           | 2.4.2                          |
+| ImGui         | 1.89.9               | 1.89.9                          | 1.89.9                         |
+| Embree        | ??? (TODO)           | ??? (TODO)                      | ??? (TODO)                     |
+| RenderMan     | 24.4, 25.0 (TODO)    | 24.4, 25.0 (TODO)               | 24.4, 25.0 (TODO)              |
+| Alembic       | 1.8.5                | 1.8.5                           | 1.8.5                          |
+| OpenEXR       | 3.2.1                | 3.2.1                           | 3.2.1                          |
+| Imath         | 3.1.9                | 3.1.9                           | 3.1.9                          |
+| MaterialX     | 1.38.8               | 1.38.8                          | 1.38.8                         |
+| OpenVDB       | 10.1.0               | 10.1.0                          | 10.1.0                         |
+| Vulkan SDK    | 1.3.268.0            | 1.3.268.0                       | 1.3.268.0                      |
+| HDF5          | 1.10.0               | 1.10.0                          | 1.10.0                         |
+| Blosc         | 1.21.5               | 1.21.5                          | 1.21.5                         |
+| Eigen         | 3.4.0                | 3.4.0                           | 3.4.0                          |
+| Draco         | 1.5.6                | 1.5.6                           | 1.5.6                          |
+| TurboJPEG     | 3.0.1                | 3.0.1                           | 3.0.1                          |
+| TIFF          | 4.6.0                | 4.6.0                           | 4.6.0                          |
+| LibPNG        | 1.6.40               | 1.6.40                          | 1.6.40                         |
+| WebP          | 1.3.2                | 1.3.2                           | 1.3.2                          |
+| RAW           | 0.21.1               | 0.21.1                          | 0.21.1                         |
+| ZStandard     | 1.5.5                | 1.5.5                           | 1.5.5                          |
+| LZMA2         | 5.4.4                | 5.4.4                           | 5.4.4                          |
+| MiniZip       | 4.0.1                | 4.0.1                           | 4.0.1                          |
+| Yaml          | 0.8.0                | 0.8.0                           | 0.8.0                          |
