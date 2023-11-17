@@ -29,7 +29,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/base/tf/diagnostic.h"
 
-#include <MaterialXFormat/XmlIo.h>
+#include <MaterialX/MXFormatXmlIo.h>
 
 namespace mx = MaterialX;
 

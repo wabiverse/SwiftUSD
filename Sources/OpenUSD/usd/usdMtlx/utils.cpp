@@ -44,8 +44,8 @@
 #include "pxr/base/tf/pathUtils.h"
 #include "pxr/base/tf/stringUtils.h"
 #include "pxr/base/vt/array.h"
-#include <MaterialXCore/Util.h>
-#include <MaterialXFormat/XmlIo.h>
+#include <MaterialX/MXCoreUtil.h>
+#include <MaterialX/MXFormatXmlIo.h>
 #include <map>
 #include <type_traits>
 

@@ -36,12 +36,12 @@
 #include "pxr/usd/usdShade/nodeDefAPI.h"
 #include "pxr/usd/usdShade/shader.h"
 
-#include <MaterialXCore/Document.h>
-#include <MaterialXCore/Generated.h>
-#include <MaterialXCore/Node.h>
-#include <MaterialXFormat/Util.h>
-#include <MaterialXFormat/XmlIo.h>
-#include <MaterialXRenderGlsl/TextureBaker.h>
+#include <MaterialX/MXCoreDocument.h>
+#include <MaterialX/MXCoreGenerated.h>
+#include <MaterialX/MXCoreNode.h>
+#include <MaterialX/MXFormatUtil.h>
+#include <MaterialX/MXFormatXmlIo.h>
+#include <MaterialX/MXRenderGlslTextureBaker.h>
 
 
 #include <fstream>

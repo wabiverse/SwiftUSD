@@ -26,10 +26,10 @@
 
 #include "pxr/pxr.h"
 
-#include <MaterialXGenGlsl/GlslShaderGenerator.h>
+#include <MaterialX/MXGenGlslShaderGenerator.h>
 #if MATERIALX_MAJOR_VERSION >= 1 && MATERIALX_MINOR_VERSION >= 38 && \
     MATERIALX_BUILD_VERSION >= 7
-#include <MaterialXGenMsl/MslShaderGenerator.h>
+#include <MaterialX/MXGenMslShaderGenerator.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE

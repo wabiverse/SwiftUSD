@@ -31,7 +31,7 @@
 #include "pxr/imaging/hd/material.h"
 #include "pxr/usd/usdShade/material.h"
 
-#include <MaterialXCore/Library.h>
+#include <MaterialX/MXCoreLibrary.h>
 
 #include "pxr/base/tf/declarePtrs.h"
 #include <string>

@@ -39,9 +39,9 @@
 
 #include "pxr/base/tf/diagnostic.h"
 
-#include <MaterialXGenShader/Util.h>
-#include <MaterialXRender/Util.h>
-#include <MaterialXRender/LightHandler.h> 
+#include <MaterialX/MXGenShaderUtil.h>
+#include <MaterialX/MXRenderUtil.h>
+#include <MaterialX/MXRenderLightHandler.h> 
 
 namespace mx = MaterialX;
 

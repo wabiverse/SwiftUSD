@@ -31,7 +31,7 @@
 #include <set>
 #include <unordered_map>
 
-#include <MaterialXCore/Library.h>
+#include <MaterialX/MXCoreLibrary.h>
 
 MATERIALX_NAMESPACE_BEGIN
     class FileSearchPath;

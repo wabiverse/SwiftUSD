@@ -28,7 +28,7 @@
 #include "pxr/usd/usdMtlx/api.h"
 #include "pxr/usd/sdf/path.h"
 #include "pxr/base/tf/declarePtrs.h"
-#include <MaterialXCore/Document.h>
+#include <MaterialX/MXCoreDocument.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

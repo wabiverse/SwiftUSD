@@ -30,8 +30,8 @@
 #include "pxr/base/tf/pathUtils.h"
 #include "pxr/base/trace/trace.h"
 
-#include <MaterialXCore/Document.h>
-#include <MaterialXFormat/XmlIo.h>
+#include <MaterialX/MXCoreDocument.h>
+#include <MaterialX/MXFormatXmlIo.h>
 
 namespace mx = MaterialX;
 

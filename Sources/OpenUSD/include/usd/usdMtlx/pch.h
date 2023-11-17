@@ -98,8 +98,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <MaterialXCore/Document.h>
-#include <MaterialXFormat/XmlIo.h>
+#include <MaterialX/MXCoreDocument.h>
+#include <MaterialX/MXFormatXmlIo.h>
 #include <boost/aligned_storage.hpp>
 #include <boost/any.hpp>
 #include <boost/call_traits.hpp>

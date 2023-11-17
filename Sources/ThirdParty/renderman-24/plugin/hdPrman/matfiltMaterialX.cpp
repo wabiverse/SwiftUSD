@@ -41,14 +41,14 @@
 #include "pxr/imaging/hd/materialNetwork2Interface.h"
 #include "pxr/imaging/hdMtlx/hdMtlx.h"
 
-#include <MaterialXCore/Node.h>
-#include <MaterialXCore/Document.h>
-#include <MaterialXFormat/Util.h>
-#include <MaterialXFormat/XmlIo.h>
-#include <MaterialXGenShader/Shader.h>
-#include <MaterialXGenShader/Util.h>
-#include <MaterialXGenOsl/OslShaderGenerator.h>
-#include <MaterialXRender/Util.h>
+#include <MaterialX/MXCoreNode.h>
+#include <MaterialX/MXCoreDocument.h>
+#include <MaterialX/MXFormatUtil.h>
+#include <MaterialX/MXFormatXmlIo.h>
+#include <MaterialX/MXGenShader.h>
+#include <MaterialX/MXGenShaderUtil.h>
+#include <MaterialX/MXGenOslShaderGenerator.h>
+#include <MaterialX/MXRenderUtil.h>
 
 #ifdef PXR_OSL_SUPPORT_ENABLED
 #include <OSL/oslcomp.h>

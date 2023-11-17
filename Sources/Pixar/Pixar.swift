@@ -22,7 +22,7 @@
  * -------------------------------------------------------------- */
 
 @_exported import PXRBaseArch
-// @_exported import PXRBaseTf
+// import PXRBaseTf
 
 /* --- xxx --- */
 

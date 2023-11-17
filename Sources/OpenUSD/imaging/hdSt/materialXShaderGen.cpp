@@ -25,18 +25,18 @@
 #include "pxr/imaging/hdSt/materialXFilter.h"
 #include "pxr/base/tf/stringUtils.h"
 
-#include <MaterialXCore/Value.h>
-#include <MaterialXGenGlsl/Nodes/SurfaceNodeGlsl.h>
-#include <MaterialXGenShader/Shader.h>
-#include <MaterialXGenShader/ShaderGenerator.h>
-#include <MaterialXGenShader/Syntax.h>
+#include <MaterialX/MXCoreValue.h>
+#include <MaterialX/MXGenGlslSurfaceNodeGlsl.h>
+#include <MaterialX/MXGenShader.h>
+#include <MaterialX/MXGenShaderGenerator.h>
+#include <MaterialX/MXGenShaderSyntax.h>
 
 // Metal support added in MaterialX v1.38.7
 #if MATERIALX_MAJOR_VERSION >= 1 && MATERIALX_MINOR_VERSION >= 38 && \
     MATERIALX_BUILD_VERSION >= 7
-#include <MaterialXGenMsl/MslShaderGenerator.h>
-#include <MaterialXGenMsl/Nodes/SurfaceNodeMsl.h>
-#include <MaterialXGenMsl/MslResourceBindingContext.h>
+#include <MaterialX/MXGenMslShaderGenerator.h>
+#include <MaterialX/MXGenMslSurfaceNodeMsl.h>
+#include <MaterialX/MXGenMslResourceBindingContext.h>
 #endif
 
 namespace mx = MaterialX;

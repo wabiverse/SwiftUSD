@@ -31,7 +31,7 @@
 #include "pxr/usd/sdf/valueTypeName.h"
 #include "pxr/base/tf/staticTokens.h"
 #include "pxr/base/vt/value.h"
-#include <MaterialXCore/Document.h>
+#include <MaterialX/MXCoreDocument.h>
 #include <string>
 #include <vector>
 

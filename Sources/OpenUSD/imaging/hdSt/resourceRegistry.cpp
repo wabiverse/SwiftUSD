@@ -45,7 +45,7 @@
 #include "pxr/base/tf/hash.h"
 
 #ifdef PXR_MATERIALX_SUPPORT_ENABLED
-#include <MaterialXGenShader/Shader.h>
+#include <MaterialX/MXGenShader.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE

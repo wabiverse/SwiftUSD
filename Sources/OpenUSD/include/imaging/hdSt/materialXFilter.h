@@ -29,9 +29,9 @@
 #include "pxr/imaging/hdSt/materialNetwork.h"
 #include "pxr/imaging/hdSt/tokens.h"
 #include "pxr/usd/sdf/path.h"
-#include <MaterialXCore/Document.h>
-#include <MaterialXFormat/Util.h>
-#include <MaterialXGenShader/Shader.h>
+#include <MaterialX/MXCoreDocument.h>
+#include <MaterialX/MXFormatUtil.h>
+#include <MaterialX/MXGenShader.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
