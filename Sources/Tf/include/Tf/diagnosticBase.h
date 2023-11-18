@@ -26,17 +26,18 @@
 
 /// \file Tf/diagnosticBase.h
 
+#include <pxr/pxrns.h>
+
 #include "Tf/api.h"
 #include "Tf/callContext.h"
 #include "Tf/enum.h"
 #include "Tf/refBase.h"
 #include "Tf/stringUtils.h"
 #include "Tf/weakPtr.h"
-#include <pxr/pxrns.h>
 
+#include "Arch/pxrinttypes.h"
 #include "Arch/attributes.h"
 #include "Arch/function.h"
-#include "Arch/pxrinttypes.h"
 
 #include <boost/any.hpp>
 #include <cstdarg>

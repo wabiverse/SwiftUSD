@@ -29,7 +29,7 @@
 
 #include <pxr/pxrns.h>
 
-#include "Arch/pxrinttypes.h"
+#include <Arch/pxrinttypes.h>
 #include "Tf/api.h"
 #include <atomic>
 

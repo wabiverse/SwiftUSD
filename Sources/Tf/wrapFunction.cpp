@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Tf/pyFunction.h"
 #include <pxr/pxrns.h>
+
+#include "Tf/pyFunction.h"
 
 #include <boost/python/object.hpp>
 

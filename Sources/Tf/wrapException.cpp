@@ -22,14 +22,17 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Arch/stackTrace.h"
+#include <pxr/pxrns.h>
+
+#include <Arch/stackTrace.h>
+
 #include "Tf/diagnostic.h"
 #include "Tf/exception.h"
+#include "Tf/stringUtils.h"
+
 #include "Tf/ostreamMethods.h"
 #include "Tf/pyCall.h"
 #include "Tf/pyErrorInternal.h"
-#include "Tf/stringUtils.h"
-#include <pxr/pxrns.h>
 
 #include <boost/python/def.hpp>
 #include <boost/python/exception_translator.hpp>

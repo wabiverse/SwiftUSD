@@ -22,21 +22,26 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Tf/diagnostic.h"
-#include "Arch/demangle.h"
-#include "Arch/stackTrace.h"
-#include "Arch/vsnprintf.h"
-#include "Tf/diagnosticMgr.h"
-#include "Tf/enum.h"
-#include "Tf/exception.h"
-#include "Tf/getenv.h"
-#include "Tf/scopeDescriptionPrivate.h"
-#include "Tf/stringUtils.h"
 #include <pxr/pxrns.h>
 
-#include <csignal>
+#include "Tf/diagnostic.h"
+
+#include "Tf/diagnosticMgr.h"
+#include "Tf/getenv.h"
+
+#include "Tf/enum.h"
+#include "Tf/exception.h"
+#include "Tf/scopeDescriptionPrivate.h"
+#include "Tf/stringUtils.h"
+
+#include "Arch/demangle.h"
+#include "Arch/vsnprintf.h"
+
+#include "Arch/stackTrace.h"
+
 #include <cstdio>
 #include <stdexcept>
+#include <csignal>
 
 using std::string;
 

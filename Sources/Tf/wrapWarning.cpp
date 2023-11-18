@@ -24,11 +24,13 @@
 
 #include <pxr/pxrns.h>
 
+#include "Tf/warning.h"
+
+#include "Tf/pyCallContext.h"
+
 #include "Tf/callContext.h"
 #include "Tf/diagnosticMgr.h"
-#include "Tf/pyCallContext.h"
 #include "Tf/stringUtils.h"
-#include "Tf/warning.h"
 
 #include <boost/python/class.hpp>
 #include <boost/python/def.hpp>

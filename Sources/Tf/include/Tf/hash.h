@@ -27,9 +27,9 @@
 /// \file Tf/hash.h
 /// \ingroup group_tf_String
 
-#include "Tf/Tf.h"
-#include "Tf/api.h"
 #include <pxr/pxrns.h>
+
+#include "Tf/api.h"
 
 #include <cstring>
 #include <map>

@@ -26,22 +26,26 @@
 
 /// \file Tf/diagnosticMgr.h
 
-#include "Tf/api.h"
+#include <pxr/pxrns.h>
+
 #include "Tf/callContext.h"
 #include "Tf/debug.h"
+
 #include "Tf/diagnosticLite.h"
-#include "Tf/enum.h"
 #include "Tf/error.h"
 #include "Tf/singleton.h"
 #include "Tf/status.h"
 #include "Tf/stringUtils.h"
 #include "Tf/warning.h"
 #include "Tf/weakPtr.h"
-#include <pxr/pxrns.h>
+
+#include "Tf/enum.h"
+#include "Tf/api.h"
+
+#include "Arch/pxrinttypes.h"
 
 #include "Arch/attributes.h"
 #include "Arch/functionLite.h"
-#include "Arch/pxrinttypes.h"
 
 #include <tbb/enumerable_thread_specific.h>
 #include <tbb/spin_rw_mutex.h>

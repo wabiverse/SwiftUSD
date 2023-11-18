@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_BASE_TF_TF_H
-#define PXR_BASE_TF_TF_H
+#ifndef __PXR_BASE_TF_H__
+#define __PXR_BASE_TF_H__
 
 /// \file Tf/Tf.h
 /// A file containing basic constants and definitions.
@@ -173,4 +173,39 @@ PXR_NAMESPACE_CLOSE_SCOPE
 /// \ingroup group_tf_TfCompilerAids
 #define TF_UNUSED(x) (void)x
 
-#endif // TF_H
+#include <Tf/api.h>
+
+#include <Tf/hash.h>
+
+#include <Tf/hashmap.h>
+#include <Tf/smallVector.h>
+
+#include <Tf/callContext.h>
+
+#include <Tf/diagnosticLite.h>
+
+#include <Tf/diagnosticHelper.h>
+
+#include <Tf/diagnostic.h>
+
+#include <Tf/preprocessorUtils.h>
+#include <Tf/preprocessorUtilsLite.h>
+#include <Tf/safeTypeCompare.h>
+#include <Tf/stringUtils.h>
+
+#include <Tf/typeFunctions.h>
+
+#include <Tf/registryManager.h>
+#include <Tf/stopwatch.h>
+
+#include <Tf/debug.h>
+
+#include <Tf/enum.h>
+
+#include <Tf/nullPtr.h>
+
+#include <Tf/refBase.h>
+
+#include <Tf/refCount.h>
+
+#endif // __PXR_BASE_TF_H__

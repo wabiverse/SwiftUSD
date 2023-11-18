@@ -27,19 +27,21 @@
 /// \file Tf/enum.h
 /// \ingroup group_tf_RuntimeTyping
 
+#include <pxr/pxrns.h>
+
 #include "Arch/defines.h"
 #include "Arch/demangle.h"
-#include "Tf/api.h"
+
 #include "Tf/hash.h"
-#include "Tf/preprocessorUtils.h"
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/safeTypeCompare.h"
-#include <pxr/pxrns.h>
+
+#include "Tf/api.h"
 
 #include <iosfwd>
 #include <string>
-#include <type_traits>
 #include <typeinfo>
+#include <type_traits>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE

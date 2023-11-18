@@ -24,6 +24,8 @@
 
 #include <pxr/pxrns.h>
 
+#include "Tf/Tf.h"
+
 #include "Tf/diagnosticMgr.h"
 #include "Tf/pyCallContext.h"
 #include "Tf/status.h"
