@@ -16,12 +16,12 @@ let package = Package(
       targets: ["pxr"]
     ),
     .library(
-      name: "PXRBaseArch",
-      targets: ["PXRBaseArch"]
+      name: "Arch",
+      targets: ["Arch"]
     ),
     .library(
-      name: "PXRBaseTf",
-      targets: ["PXRBaseTf"]
+      name: "Tf",
+      targets: ["Tf"]
     ),
     .library(
       name: "Pixar",
@@ -41,7 +41,7 @@ let package = Package(
     ),
 
     .target(
-      name: "PXRBaseArch",
+      name: "Arch",
       dependencies: [
         /* ------------ pxr Namespace. ---------- */
         .target(name: "pxr"),
@@ -96,17 +96,17 @@ let package = Package(
     ),
 
     .target(
-      name: "PXRBaseTf", 
+      name: "Tf",
       dependencies: [
-        .target(name: "PXRBaseArch")
+        .target(name: "Arch"),
       ]
     ),
 
     .target(
       name: "Pixar",
       dependencies: [
-        .target(name: "PXRBaseArch"),
-        .target(name: "PXRBaseTf"),
+        .target(name: "Arch"),
+        .target(name: "Tf"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
