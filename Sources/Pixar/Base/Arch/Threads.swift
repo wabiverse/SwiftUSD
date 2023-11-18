@@ -30,12 +30,12 @@ public extension Pixar.Arch
   /// Return true if the calling thread is the main thread, false otherwise.
   static func isMainThread() -> Bool
   {
-    pxr.ArchIsMainThread()
+    Pixar.Internal.ArchIsMainThread()
   }
 
   /// Return the std::thread_id for the thread arch considers to be the "main" thread.
   static func getMainThreadId() -> Any
   {
-    pxr.ArchGetMainThreadId()
+    Pixar.Internal.ArchGetMainThreadId()
   }
 }

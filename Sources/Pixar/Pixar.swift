@@ -24,15 +24,14 @@
 @_exported import Arch
 @_exported import Tf
 @_exported import Gf
-
-/* --- xxx --- */
-
-public typealias pxr = pxrInternal_v0_23__pxrReserved__
+@_exported import pxr
 
 /* --- xxx --- */
 
 public enum Pixar
 {
+  internal typealias Internal = pxrInternal_v0_23__pxrReserved__
+
   /**
     # ``Arch``
 
