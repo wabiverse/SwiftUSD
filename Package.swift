@@ -30,7 +30,7 @@ let package = Package(
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.8"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.9"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
@@ -49,7 +49,6 @@ let package = Package(
         .product(name: "MetaTBB", package: "MetaverseKit"),
         .product(name: "MaterialX", package: "MetaverseKit"),
         .product(name: "Boost", package: "MetaverseKit"),
-        .product(name: "Python", package: "MetaverseKit"),
         .product(name: "MetaPy", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
