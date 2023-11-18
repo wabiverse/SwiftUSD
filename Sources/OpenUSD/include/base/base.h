@@ -117,7 +117,7 @@
 #include <Base/tf/stopwatch.h>
 #include <Base/tf/stringUtils.h>
 #include <Base/tf/templateString.h>
-#include <Base/tf/tf.h>
+#include <Base/tf/Tf.h>
 #include <Base/tf/token.h>
 #include <Base/tf/type_Impl.h>
 #include <Base/tf/type.h>

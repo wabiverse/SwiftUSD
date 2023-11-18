@@ -45,7 +45,7 @@
 #include "pxr/base/tf/pyUtils.h"
 #include "pxr/base/tf/span.h"
 #include "pxr/base/tf/stringUtils.h"
-#include "pxr/base/tf/tf.h"
+#include "pxr/base/tf/Tf.h"
 #include "pxr/base/tf/wrapTypeHelpers.h"
 
 #include <boost/preprocessor/punctuation/comma_if.hpp>
