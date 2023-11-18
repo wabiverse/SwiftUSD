@@ -24,6 +24,10 @@ let package = Package(
       targets: ["Tf"]
     ),
     .library(
+      name: "Gf",
+      targets: ["Gf"]
+    ),
+    .library(
       name: "Pixar",
       targets: ["Pixar"]
     ),
@@ -99,6 +103,20 @@ let package = Package(
       name: "Tf",
       dependencies: [
         .target(name: "Arch"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Tf"),
+      ]
+    ),
+
+    .target(
+      name: "Gf",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Gf"),
       ]
     ),
 
@@ -107,6 +125,7 @@ let package = Package(
       dependencies: [
         .target(name: "Arch"),
         .target(name: "Tf"),
+        .target(name: "Gf"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),

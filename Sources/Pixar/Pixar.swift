@@ -23,6 +23,7 @@
 
 @_exported import Arch
 @_exported import Tf
+@_exported import Gf
 
 /* --- xxx --- */
 
