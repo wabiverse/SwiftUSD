@@ -21,27 +21,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-/**
- * # System Functions
- *
- * Functions that encapsulate differing low-level system calls. */
-public extension Pixar.Arch
+public protocol Dimensional
 {
-  /// Return current working directory as a string.
-  static func getCwd() -> String
-  {
-    String(CXX.ArchGetCwd())
-  }
+  /// Dimension of the vector.
+  static var dimension: Int { get }
 
-  /// Return the path to the program's executable.
-  static func getExecutablePath() -> String
-  {
-    String(CXX.ArchGetExecutablePath())
-  }
-
-  /// Return the system's memory page size. Safe to assume power-of-two.
-  static func getPageSize() -> Int
-  {
-    Int(CXX.ArchGetPageSize())
-  }
+  /// Axis of vector.
+  associatedtype AxisCount: Axis
 }

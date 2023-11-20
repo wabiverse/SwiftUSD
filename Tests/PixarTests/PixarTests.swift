@@ -90,3 +90,17 @@ final class ArchTests: XCTestCase
     XCTAssert(alignedPtr == nil)
   }
 }
+
+
+/* ---- xxx ----
+ *  Gf    TESTS
+ * ---- xxx ---- */
+
+final class GfTests: XCTestCase
+{
+  func testVec2f()
+  {
+    let vec2f = Pixar.Gf.Vec2f(1, 2)
+    PXRMSG.Log.point("Pixar.Gf.Vec2f", to: vec2f)
+  }
+}

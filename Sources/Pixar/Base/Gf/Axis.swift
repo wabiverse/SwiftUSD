@@ -21,27 +21,72 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-/**
- * # System Functions
- *
- * Functions that encapsulate differing low-level system calls. */
-public extension Pixar.Arch
+public protocol Axis: CaseIterable, Dimensional
 {
-  /// Return current working directory as a string.
-  static func getCwd() -> String
-  {
-    String(CXX.ArchGetCwd())
-  }
+  func getAxis() -> Int
 
-  /// Return the path to the program's executable.
-  static func getExecutablePath() -> String
-  {
-    String(CXX.ArchGetExecutablePath())
-  }
+  static var dimension: Int { get }
+}
 
-  /// Return the system's memory page size. Safe to assume power-of-two.
-  static func getPageSize() -> Int
+public enum Axis2: Int, Axis
+{
+  case x = 0
+  case y = 1
+
+  public typealias AxisCount = Axis2
+
+  public static var dimension: Int { 2 }
+
+  public func getAxis() -> Int
   {
-    Int(CXX.ArchGetPageSize())
+    switch self
+    {
+      case .x: 0
+      case .y: 1
+    }
+  }
+}
+
+public enum Axis3: Int
+{
+  case x = 0
+  case y = 1
+  case z = 2
+
+  public typealias AxisCount = Axis3
+
+  public static var dimension: Int { 3 }
+
+  func getAxis() -> Int
+  {
+    switch self
+    {
+      case .x: 0
+      case .y: 1
+      case .z: 2
+    }
+  }
+}
+
+public enum Axis4: Int
+{
+  case x = 0
+  case y = 1
+  case z = 2
+  case w = 3
+
+  public typealias AxisCount = Axis4
+
+  public static var dimension: Int { 4 }
+
+  func getAxis() -> Int
+  {
+    switch self
+    {
+      case .x: 0
+      case .y: 1
+      case .z: 2
+      case .w: 3
+    }
   }
 }

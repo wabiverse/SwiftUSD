@@ -28,10 +28,12 @@
 
 /* --- xxx --- */
 
+public typealias CXX = pxrInternal_v0_23__pxrReserved__
+
+/* --- xxx --- */
+
 public enum Pixar
 {
-  internal typealias Internal = pxrInternal_v0_23__pxrReserved__
-
   /**
     # ``Arch``
 
