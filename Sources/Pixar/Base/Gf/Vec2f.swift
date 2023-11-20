@@ -108,8 +108,6 @@ public extension Pixar.Gf
 
     public mutating func normalize(_ eps: Float) -> Float
     {
-      // TODO: this seems suspect... the result of the division
-      // operation is discarded.
       let length = getLength()
       self /= (length > eps) ? length : 1
       return length
