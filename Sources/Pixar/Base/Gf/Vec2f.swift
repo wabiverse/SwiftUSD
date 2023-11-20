@@ -76,12 +76,12 @@ extension GfVec2f: Scalar
     GetComplement(normal)
   }
 
-  public mutating func getLengthSq() -> Float
+  public func getLengthSq() -> Float
   {
     GetLengthSq()
   }
 
-  public mutating func getLength() -> Float
+  public func getLength() -> Float
   {
     GetLength()
   }
@@ -100,8 +100,8 @@ extension GfVec2f: Scalar
 extension GfVec2f: SIMD
 {
   public typealias Scalar = Self.ScalarType
-  public typealias SIMDStorage = SIMD2<ScalarType>
-  public typealias MaskStorage = SIMD2<ScalarType>.MaskStorage
+  public typealias SIMDStorage = SIMD2<Scalar>
+  public typealias MaskStorage = SIMD2<Scalar>.MaskStorage
 
   public var scalarCount: Int { 2 }
 
@@ -109,12 +109,15 @@ extension GfVec2f: SIMD
   {
     get
     {
-      SIMD2<Scalar>(Scalar(data()[0]), Scalar(data()[1]))
+      SIMD2<Scalar>(
+        Scalar(data()[0]), 
+        Scalar(data()[1])
+      )
     }
     set
     {
-      dataMutating()[0] = Float(newValue[0])
-      dataMutating()[1] = Float(newValue[1])
+      dataMutating()[0] = Scalar(newValue[0])
+      dataMutating()[1] = Scalar(newValue[1])
     }
   }
 

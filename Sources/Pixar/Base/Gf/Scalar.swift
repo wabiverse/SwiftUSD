@@ -41,6 +41,9 @@ public protocol Scalar: Dimensional
   /// Create a unit vector along the specified axis.
   static func axis<T>(_ axis: T) -> Self where T == AxisCount
 
+  /// Set all elements with explicit arguments.
+  mutating func set(_ s0: ScalarType, _ s1: ScalarType) -> Self
+
   // Set all elements with an array.
   mutating func set(_ a: [ScalarType]) -> Self
 
@@ -56,10 +59,10 @@ public protocol Scalar: Dimensional
   func getComplement(_ normal: Self) -> Self
 
   /// Squared length.
-  mutating func getLengthSq() -> Float
+  func getLengthSq() -> Float
 
   /// Returns the length of this vector.
-  mutating func getLength() -> Float
+  func getLength() -> Float
 
   /// Normalizes the vector in place to unit length, returning the
   /// length before normalization. If the length of the vector is
