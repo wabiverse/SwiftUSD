@@ -32,9 +32,6 @@ public protocol Scalar: Dimensional
   /// Initialize all elements to a single value.
   init(_ value: ScalarType)
 
-  /// Initialize all elements with explicit arguments.
-  init(_ s0: ScalarType, _ s1: ScalarType)
-
   /// Indexing.
   subscript(_: Int) -> ScalarType { get set }
 
