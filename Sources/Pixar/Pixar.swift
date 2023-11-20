@@ -21,19 +21,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+@_exported import CxxStdlib
+
 @_exported import Arch
-@_exported import Tf
-@_exported import Js
 @_exported import Gf
+@_exported import Js
 @_exported import pxr
+@_exported import Tf
 
-/* --- xxx --- */
+/**
+  # ``Pixar``
 
-public typealias CXX = pxrInternal_v0_23__pxrReserved__
+  ## Overview
 
-/* --- xxx --- */
-
-public enum Pixar
+  **Pixar** is the **top level** namespace, analogous to the **pxr** namespace
+  in c++. While you can use the **Pixar** namespace directly, it is recommended
+  that you use the **Pixar** namespace as a **container** for these other Pixar
+  modules, such as **Pixar.Tf** and **Pixar.Gf**, as these inner Pixar modules
+  contain the swift wrappers for the c++ classes and functions, providing a more
+  **swifty** interface to the underlying c++ code, which is far safer and more
+  convenient to use than the c++ code directly. 
+ */
+public extension Pixar
 {
   /**
     # ``Arch``
@@ -44,112 +53,112 @@ public enum Pixar
     It's purpose is to isolate all platform dependencies into one small library,
     serving as a common area for documentation of these multi-platform issues.
    */
-  public struct Arch
+  struct Arch
   {}
 
-  public struct Js
+  struct Js
   {}
 
-  public struct Tf
+  struct Tf
   {}
 
-  public struct Gf
+  struct Gf
   {}
 
-  public struct Trace
+  struct Trace
   {}
 
-  public struct Work
+  struct Work
   {}
 
-  public struct Plug
+  struct Plug
   {}
 
-  public struct Vt
+  struct Vt
   {}
 
-  public struct Ar
+  struct Ar
   {}
 
-  public struct Kind
+  struct Kind
   {}
 
-  public struct Sdf
+  struct Sdf
   {}
 
-  public struct Ndr
+  struct Ndr
   {}
 
-  public struct Sdr
+  struct Sdr
   {}
 
-  public struct Pcp
+  struct Pcp
   {}
 
-  public struct Usd
+  struct Usd
   {}
 
-  public struct UsdGeom
+  struct UsdGeom
   {}
 
-  public struct UsdVol
+  struct UsdVol
   {}
 
-  public struct UsdMedia
+  struct UsdMedia
   {}
 
-  public struct UsdShade
+  struct UsdShade
   {}
 
-  public struct UsdLux
+  struct UsdLux
   {}
 
-  public struct UsdRender
+  struct UsdRender
   {}
 
-  public struct UsdHydra
+  struct UsdHydra
   {}
 
-  public struct UsdRi
+  struct UsdRi
   {}
 
-  public struct UsdSkel
+  struct UsdSkel
   {}
 
-  public struct UsdUI
+  struct UsdUI
   {}
 
-  public struct UsdUtils
+  struct UsdUtils
   {}
 
-  public struct UsdPhysics
+  struct UsdPhysics
   {}
 
-  public struct UsdAbc
+  struct UsdAbc
   {}
 
-  public struct UsdDraco
+  struct UsdDraco
   {}
 
-  public struct Garch
+  struct Garch
   {}
 
-  public struct CameraUtil
+  struct CameraUtil
   {}
 
-  public struct PxOsd
+  struct PxOsd
   {}
 
-  public struct Glf
+  struct Glf
   {}
 
-  public struct UsdImagingGL
+  struct UsdImagingGL
   {}
 
-  public struct UsdAppUtils
+  struct UsdAppUtils
   {}
 
-  public struct Usdview
+  struct Usdview
   {}
 }
 

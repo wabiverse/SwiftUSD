@@ -45,8 +45,9 @@
 
 #include <assert.h>
 
-#include "Gf/ilmbase_half.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/ilmbase_half.h"
 
 #include <istream>
 #include <ostream>

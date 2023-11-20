@@ -24,8 +24,9 @@
 #ifndef PXR_BASE_GF_PY_BUFFER_UTILS_H
 #define PXR_BASE_GF_PY_BUFFER_UTILS_H
 
-#include "Gf/api.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Gf/half.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/half.h"
 
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/def.hpp>

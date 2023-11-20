@@ -24,10 +24,11 @@
 ///
 /// \file gf/wrapCamera.h
 
+#include <pxr/pxrns.h>
+
 #include "Gf/camera.h"
 #include "Gf/frustum.h"
 #include "Tf/pyEnum.h"
-#include <pxr/pxrns.h>
 
 #include <boost/python/operators.hpp>
 

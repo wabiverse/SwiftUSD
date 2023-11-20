@@ -21,7 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsObject = CXX.JsObject
+public typealias JsObject = Pixar.JsObject
 
 public extension Pixar.Js
 {

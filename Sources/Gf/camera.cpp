@@ -22,11 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/camera.h"
 #include "Gf/frustum.h"
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

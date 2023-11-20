@@ -27,10 +27,11 @@
 /// \file gf/transform.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/rotation.h"
 #include "Gf/vec3d.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

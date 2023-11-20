@@ -22,13 +22,14 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/bbox3d.h"
 #include "Gf/line.h"
 #include "Gf/lineSeg.h"
 #include "Gf/plane.h"
 #include "Gf/range3d.h"
 #include "Gf/ray.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"

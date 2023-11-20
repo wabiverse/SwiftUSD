@@ -1,5 +1,3 @@
-
-
 /* --------------------------------------------------------------
  * :: :  M  E  T  A  V  E  R  S  E  :                          ::
  * --------------------------------------------------------------
@@ -23,7 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsArray = CXX.JsArray
+public typealias JsArray = Pixar.JsArray
 
 public extension Pixar.Js
 {

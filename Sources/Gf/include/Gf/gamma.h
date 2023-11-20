@@ -24,8 +24,9 @@
 #ifndef PXR_BASE_GF_GAMMA_H
 #define PXR_BASE_GF_GAMMA_H
 
-#include "Gf/api.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/api.h"
 
 /// \file gf/gamma.h
 /// Utilities to map colors between gamma spaces.

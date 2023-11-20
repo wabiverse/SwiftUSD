@@ -27,8 +27,9 @@
 /// \file gf/line.h
 /// \ingroup group_gf_BasicGeometry
 
-#include "Gf/vec3d.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/vec3d.h"
 
 #include <float.h>
 #include <iosfwd>

@@ -27,10 +27,11 @@
 /// \file gf/lineSeg.h
 /// \ingroup group_gf_BasicGeometry
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/line.h"
 #include "Gf/vec3d.h"
-#include <pxr/pxrns.h>
 
 #include <float.h>
 #include <iosfwd>

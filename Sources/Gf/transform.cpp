@@ -22,9 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/transform.h"
 #include "Gf/matrix4d.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/type.h"
 

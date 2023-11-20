@@ -22,12 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/multiInterval.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/Tf.h"
 #include "Tf/iterator.h"
 #include "Tf/type.h"
-#include <pxr/pxrns.h>
 
 #include <ostream>
 

@@ -23,8 +23,9 @@
 //
 #include <boost/python/def.hpp>
 
-#include "Gf/homogeneous.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/homogeneous.h"
 
 using namespace boost::python;
 

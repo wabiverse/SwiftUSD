@@ -22,12 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/homogeneous.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4d.h"
 #include "Gf/vec4f.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -23,28 +23,23 @@
 
 /* --- xxx --- */
 
-public typealias PXRMSG = Pixar.Arch.Console
-
-public extension Pixar.Arch
+public final class PXRMsg
 {
-  final class Console
-  {
-    private init()
-    {}
+  private init()
+  {}
 
-    public static let Log = Console()
-  }
+  public static let Log = PXRMsg()
 }
 
 /* --- xxx --- */
 
-public extension Pixar.Arch.Console
+public extension PXRMsg
 {
   func point(_ subject: String, to msgArgs: Any...)
   {
     print(Colors.cyan.rawValue + subject + Colors.default.rawValue +
-          Colors.yellow.rawValue + String(repeating: " ", count: max(35 - subject.count, 1)) + "-> " + Colors.default.rawValue +
-          Colors.magenta.rawValue + "\(msgArgs)" + (Colors.default.rawValue + ""))
+      Colors.yellow.rawValue + String(repeating: " ", count: max(35 - subject.count, 1)) + "-> " + Colors.default.rawValue +
+      Colors.magenta.rawValue + "\(msgArgs)" + (Colors.default.rawValue + ""))
   }
 
   func info(_ msgArgs: Any...)
@@ -75,7 +70,7 @@ public extension Pixar.Arch.Console
 
 /* --- xxx --- */
 
-public extension Pixar.Arch.Console
+public extension PXRMsg
 {
   private func log(_ message: String, type: String, color: Colors = .default)
   {
@@ -107,7 +102,7 @@ public extension Pixar.Arch.Console
 
 /* --- xxx --- */
 
-public extension Pixar.Arch.Console
+public extension PXRMsg
 {
   enum Colors: String
   {
@@ -147,7 +142,7 @@ public extension Pixar.Arch.Console
   {
     for c in Colors.all()
     {
-      Pixar.Arch.Console.Log.log("This is printed in " + c.name(), type: "TEST", color: c)
+      PXRMsg.Log.log("This is printed in " + c.name(), type: "TEST", color: c)
     }
   }
 }

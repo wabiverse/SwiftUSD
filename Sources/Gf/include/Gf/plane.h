@@ -27,9 +27,10 @@
 /// \file gf/plane.h
 /// \ingroup group_gf_BasicGeometry
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/vec3d.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 #include <vector>

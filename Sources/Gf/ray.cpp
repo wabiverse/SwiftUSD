@@ -22,6 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/ray.h"
 #include "Gf/bbox3d.h"
 #include "Gf/line.h"
@@ -33,7 +35,6 @@
 #include "Gf/rotation.h"
 #include "Gf/vec2d.h"
 #include "Tf/type.h"
-#include <pxr/pxrns.h>
 
 #include <ostream>
 

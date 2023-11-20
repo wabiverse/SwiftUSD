@@ -28,10 +28,11 @@
 /// \ingroup group_gf_BasicMath
 /// Assorted mathematical utility functions.
 
+#include <pxr/pxrns.h>
+
 #include "Arch/pxrmath.h"
 #include "Gf/api.h"
 #include "Gf/traits.h"
-#include <pxr/pxrns.h>
 
 #include <type_traits>
 

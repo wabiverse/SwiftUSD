@@ -27,10 +27,11 @@
 /// \file gf/size2.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Arch/pxrinttypes.h"
 #include "Gf/api.h"
 #include "Gf/vec2i.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

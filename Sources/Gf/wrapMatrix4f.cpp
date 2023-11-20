@@ -28,9 +28,10 @@
 #define BOOST_PYTHON_MAX_ARITY 20
 #endif
 
+#include <pxr/pxrns.h>
+
 #include "Gf/matrix4d.h"
 #include "Gf/matrix4f.h"
-#include <pxr/pxrns.h>
 
 #include "Gf/pyBufferUtils.h"
 

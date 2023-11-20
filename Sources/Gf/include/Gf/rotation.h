@@ -27,6 +27,8 @@
 /// \file gf/rotation.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/matrix4d.h"
 #include "Gf/quatd.h"
@@ -34,7 +36,6 @@
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

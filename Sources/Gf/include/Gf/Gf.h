@@ -26,9 +26,10 @@
 
 // gf
 #include <Gf/api.h>
+#include <Gf/declare.h>
+
 #include <Gf/bbox3d.h>
 #include <Gf/camera.h>
-#include <Gf/declare.h>
 #include <Gf/dualQuatd.h>
 #include <Gf/dualQuatf.h>
 #include <Gf/dualQuath.h>

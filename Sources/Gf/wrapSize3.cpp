@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Gf/size3.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/size3.h"
 
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyUtils.h"

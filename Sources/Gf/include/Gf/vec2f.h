@@ -31,13 +31,15 @@
 /// \file gf/vec2f.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/limits.h"
 #include "Gf/math.h"
 #include "Gf/traits.h"
+
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <cmath>
 #include <cstddef>

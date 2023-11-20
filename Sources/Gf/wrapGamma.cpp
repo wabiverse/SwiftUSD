@@ -23,12 +23,13 @@
 //
 #include <boost/python/def.hpp>
 
+#include <pxr/pxrns.h>
+
 #include "Gf/gamma.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4d.h"
 #include "Gf/vec4f.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/wrapTypeHelpers.h"
 

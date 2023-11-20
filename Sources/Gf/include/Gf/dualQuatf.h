@@ -31,10 +31,11 @@
 /// \file gf/dualQuatf.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/declare.h"
 #include "Gf/traits.h"
-#include <pxr/pxrns.h>
 
 #include "Gf/quatf.h"
 #include "Tf/hash.h"

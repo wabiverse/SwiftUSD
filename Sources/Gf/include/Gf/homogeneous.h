@@ -28,12 +28,13 @@
 /// \ingroup group_gf_LinearAlgebra
 /// Utility functions for GfVec4f and GfVec4d as homogeneous vectors
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4d.h"
 #include "Gf/vec4f.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

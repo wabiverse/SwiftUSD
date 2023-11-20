@@ -22,12 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/rotation.h"
 #include "Gf/math.h"
 #include "Gf/matrix3d.h"
 #include "Gf/matrix4d.h"
 #include "Gf/ostreamHelpers.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/diagnosticLite.h"
 #include "Tf/type.h"

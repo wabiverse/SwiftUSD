@@ -27,10 +27,11 @@
 /// \file gf/quaternion.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/vec3d.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

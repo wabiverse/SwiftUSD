@@ -27,6 +27,8 @@
 /// \file gf/frustum.h
 /// \ingroup group_gf_BasicGeometry
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/bbox3d.h"
 #include "Gf/matrix4d.h"
@@ -38,7 +40,6 @@
 #include "Gf/vec2d.h"
 #include "Gf/vec3d.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <array>
 #include <atomic>

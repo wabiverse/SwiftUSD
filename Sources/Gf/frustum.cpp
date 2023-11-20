@@ -22,6 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/frustum.h"
 #include "Gf/bbox3d.h"
 #include "Gf/math.h"
@@ -32,7 +34,6 @@
 #include "Gf/vec2f.h"
 #include "Tf/enum.h"
 #include "Tf/type.h"
-#include <pxr/pxrns.h>
 
 #include <algorithm>
 #include <ostream>

@@ -22,11 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/bbox3d.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
-#include <pxr/pxrns.h>
 
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>

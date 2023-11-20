@@ -32,27 +32,27 @@ final class ArchTests: XCTestCase
 {
   func testCwd()
   {
-    PXRMSG.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
+    PXRMsg.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
   }
 
   func testExecutablePath()
   {
-    PXRMSG.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
+    PXRMsg.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
   }
 
   func testPageSize()
   {
-    PXRMSG.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
+    PXRMsg.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
   }
 
   func testIsMainThread()
   {
-    PXRMSG.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
+    PXRMsg.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
   }
 
   func testMainThreadId()
   {
-    PXRMSG.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
+    PXRMsg.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
   }
 
   func testAlignMemoryOfSize()
@@ -100,10 +100,10 @@ final class JsTests: XCTestCase
   func testArray()
   {
     let array = Pixar.Js.Array()
-    PXRMSG.Log.point("Pixar.Js.Array", to: array)
+    PXRMsg.Log.point("Pixar.Js.Array", to: array)
 
     let jsArray = JsArray()
-    PXRMSG.Log.point("JsArray", to: jsArray)
+    PXRMsg.Log.point("JsArray", to: jsArray)
 
     XCTAssertEqual(array.count, jsArray.count)
   }
@@ -111,10 +111,10 @@ final class JsTests: XCTestCase
   func testObject()
   {
     let object = Pixar.Js.Object()
-    PXRMSG.Log.point("Pixar.Js.Object", to: object)
+    PXRMsg.Log.point("Pixar.Js.Object", to: object)
 
     let jsObject = JsObject()
-    PXRMSG.Log.point("JsObject", to: jsObject)
+    PXRMsg.Log.point("JsObject", to: jsObject)
 
     XCTAssertEqual(object.empty(), jsObject.empty())
   }
@@ -122,23 +122,25 @@ final class JsTests: XCTestCase
   func testParseError()
   {
     let parseError = Pixar.Js.ParseError()
-    PXRMSG.Log.point("Pixar.Js.ParseError", to: parseError)
+    PXRMsg.Log.point("Pixar.Js.ParseError", to: parseError)
 
     let jsParseError = JsParseError()
-    PXRMSG.Log.point("ParseError", to: jsParseError)
+    PXRMsg.Log.point("ParseError", to: jsParseError)
 
     XCTAssertEqual(parseError.reason, jsParseError.reason)
   }
 
   func testValue()
   {
-    let value = Pixar.Js.Value()
-    PXRMSG.Log.point("Pixar.Js.Value", to: value)
+    let value = Pixar.Js.Value(true)
+    PXRMsg.Log.point("Pixar.Js.Value", to: value.GetBool())
+    XCTAssertEqual(value.GetBool(), true)
 
-    let jsValue = JsValue()
-    PXRMSG.Log.point("JsValue", to: jsValue)
+    let jsValue = JsValue(true)
+    PXRMsg.Log.point("JsValue", to: jsValue.GetBool())
+    XCTAssertEqual(jsValue.GetBool(), true)
 
-    XCTAssertEqual(value.GetTypeName(), jsValue.GetTypeName())
+    XCTAssertEqual(value.GetBool(), jsValue.GetBool())
   }
 }
 
@@ -151,10 +153,10 @@ final class GfTests: XCTestCase
   func testVec2f()
   {
     let vec2f = Pixar.Gf.Vec2f(1.0, 2.0)
-    PXRMSG.Log.point("Pixar.Gf.Vec2f", to: vec2f)
+    PXRMsg.Log.point("Pixar.Gf.Vec2f", to: vec2f)
 
     let gfVec2f = GfVec2f(1.0, 2.0)
-    PXRMSG.Log.point("GfVec2f", to: gfVec2f)
+    PXRMsg.Log.point("GfVec2f", to: gfVec2f)
 
     XCTAssertEqual(vec2f, gfVec2f)
   }

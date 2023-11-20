@@ -32,8 +32,9 @@
 /// These functions are useful to help with writing stream operators for
 /// Gf types.  Please do not include this file in any header.
 
-#include "Tf/stringUtils.h"
 #include <pxr/pxrns.h>
+
+#include "Tf/stringUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -21,7 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsValue = CXX.JsValue
+public typealias JsValue = Pixar.JsValue
 
 public extension Pixar.Js
 {

@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Gf/multiInterval.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/multiInterval.h"
 
 #include "Tf/iterator.h"
 #include "Tf/pyUtils.h"

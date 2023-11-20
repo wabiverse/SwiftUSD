@@ -31,13 +31,14 @@
 /// \file gf/matrix2d.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/declare.h"
 #include "Gf/matrixData.h"
 #include "Gf/traits.h"
 #include "Gf/vec2d.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 #include <vector>

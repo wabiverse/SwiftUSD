@@ -22,10 +22,11 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/matrix4d.h"
 #include "Gf/plane.h"
 #include "Gf/range3d.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyUtils.h"

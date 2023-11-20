@@ -27,11 +27,12 @@
 /// \file gf/camera.h
 /// \ingroup group_gf_BasicGeometry
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/matrix4d.h"
 #include "Gf/range1f.h"
 #include "Gf/vec4f.h"
-#include <pxr/pxrns.h>
 
 #include <vector>
 

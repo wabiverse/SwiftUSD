@@ -21,7 +21,12 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias GfVec2f = CXX.GfVec2f
+public typealias GfVec2f = Pixar.GfVec2f
+
+public extension Pixar.Gf
+{
+  typealias Vec2f = GfVec2f
+}
 
 /**
  * # GfVec2f
@@ -127,9 +132,4 @@ extension GfVec2f: SIMD
 
     self.simd = simd
   }
-}
-
-public extension Pixar.Gf
-{
-  typealias Vec2f = GfVec2f
 }

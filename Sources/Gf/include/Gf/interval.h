@@ -27,10 +27,11 @@
 /// \file gf/interval.h
 /// \ingroup group_gf_BasicMath
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/math.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <float.h>
 #include <iosfwd>

@@ -22,9 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/lineSeg2d.h"
 #include "Gf/math.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/type.h"
 

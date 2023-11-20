@@ -27,9 +27,10 @@
 /// \file gf/multiInterval.h
 /// \ingroup group_gf_BasicMath
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/interval.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 #include <set>

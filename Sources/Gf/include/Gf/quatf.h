@@ -31,12 +31,13 @@
 /// \file gf/quatf.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/declare.h"
 #include "Gf/traits.h"
 #include "Gf/vec3f.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

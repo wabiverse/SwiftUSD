@@ -22,9 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Gf/frustum.h"
 #include "Gf/ray.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/pyEnum.h"
 #include "Tf/pyResultConversions.h"

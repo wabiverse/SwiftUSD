@@ -27,11 +27,12 @@
 /// \file gf/rect2i.h
 /// \ingroup group_gf_LinearAlgebra
 
+#include <pxr/pxrns.h>
+
 #include "Gf/api.h"
 #include "Gf/math.h"
 #include "Gf/vec2i.h"
 #include "Tf/hash.h"
-#include <pxr/pxrns.h>
 
 #include <iosfwd>
 

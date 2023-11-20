@@ -21,7 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsParseError = CXX.JsParseError
+public typealias JsParseError = Pixar.JsParseError
 
 public extension Pixar.Js
 {

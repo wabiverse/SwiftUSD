@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Gf/lineSeg.h"
 #include <pxr/pxrns.h>
+
+#include "Gf/lineSeg.h"
 
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"

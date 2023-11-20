@@ -31,7 +31,7 @@ public extension Pixar.Arch
   ///
   /// Requests to ``malloc()`` or ``::new`` for a given size are often rounded
   /// upward.
-  /// 
+  ///
   /// - Parameter byteCount: The number of bytes to request.
   ///
   /// - Returns: The amount that would actually be consumed by the system to satisfy it.
@@ -39,7 +39,7 @@ public extension Pixar.Arch
   ///
   static func alignMemory(of byteCount: Int) -> Int
   {
-    CXX.ArchAlignMemorySize(byteCount)
+    Pixar.ArchAlignMemorySize(byteCount)
   }
 
   /// Align memory to the next "best" alignment value.
@@ -48,24 +48,24 @@ public extension Pixar.Arch
   /// boundary that will work for all data types.
   ///
   /// - Parameter base: The base pointer needing alignment.
-  /// 
+  ///
   /// - Returns: A pointer to the aligned memory.
   ///
   static func alignMemory(of base: UnsafeMutableRawPointer!) -> UnsafeMutableRawPointer!
   {
-    CXX.ArchAlignMemory(base)
+    Pixar.ArchAlignMemory(base)
   }
 
   /// Aligned memory allocation.
   ///
   /// - Parameter byteCount: The number of bytes to allocate.
   /// - Parameter alignment: The alignment of the new region of allocated memory.
-  /// 
+  ///
   /// - Returns: A pointer to the newly allocated memory.
   ///
   static func alignedAlloc(byteCount: Int, alignment: Int) -> UnsafeMutableRawPointer!
   {
-    CXX.ArchAlignedAlloc(alignment, byteCount)
+    Pixar.ArchAlignedAlloc(alignment, byteCount)
   }
 
   /// Free memory allocated by ArchAlignedAlloc.
@@ -76,7 +76,7 @@ public extension Pixar.Arch
   ///
   static func alignedFree(pointer: inout UnsafeMutableRawPointer!)
   {
-    CXX.ArchAlignedFree(pointer)
+    Pixar.ArchAlignedFree(pointer)
     pointer = nil
   }
 }

@@ -30,10 +30,11 @@
 /// provide a hash_value function.  For documentation, of the half type,
 /// please see the half header in ilmbase_half.h.
 
+#include <pxr/pxrns.h>
+
 #include "Gf/ilmbase_half.h"
 #include "Gf/ilmbase_halfLimits.h"
 #include "Gf/traits.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
