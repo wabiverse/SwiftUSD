@@ -53,12 +53,12 @@ public extension Pixar.Gf
       switch axis
       {
         case .x:
-          var result = Vec2f(0, 0)
+          var result = Vec2f(0)
           result[0] = 1
           return result
 
         case .y:
-          var result = Vec2f(0, 0)
+          var result = Vec2f(0)
           result[1] = 1
           return result
       }
