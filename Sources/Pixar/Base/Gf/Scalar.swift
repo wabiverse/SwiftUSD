@@ -30,10 +30,10 @@ public protocol Scalar: Dimensional
   init()
 
   /// Initialize all elements to a single value.
-  init(_ value: Float)
+  init(_ value: ScalarType)
 
   /// Initialize all elements with explicit arguments.
-  init(_ s0: Float, _ s1: Float)
+  init(_ s0: ScalarType, _ s1: ScalarType)
 
   /// Indexing.
   subscript(_: Int) -> ScalarType { get set }
@@ -59,17 +59,17 @@ public protocol Scalar: Dimensional
   func getComplement(_ normal: Self) -> Self
 
   /// Squared length.
-  func getLengthSq() -> Float
+  func getLengthSq() -> ScalarType
 
   /// Returns the length of this vector.
-  func getLength() -> Float
+  func getLength() -> ScalarType
 
   /// Normalizes the vector in place to unit length, returning the
   /// length before normalization. If the length of the vector is
   /// smaller than the supplied eps, the vector is set to the null
   /// vector and zero is returned. The vector is unchanged otherwise.
-  mutating func normalize(_ eps: Float) -> Float
+  mutating func normalize(_ eps: ScalarType) -> ScalarType
 
   /// Returns a normalized (unit-length) copy of this vector.
-  func getNormalized(_ eps: Float) -> Self
+  func getNormalized(_ eps: ScalarType) -> Self
 }
