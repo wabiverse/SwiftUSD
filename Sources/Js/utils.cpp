@@ -21,33 +21,27 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_BASE_JS_UTILS_H
-#define PXR_BASE_JS_UTILS_H
+///
+/// \file js/utils.cpp
 
-/// \file js/utils.h
-
+#include "Js/utils.h"
+#include "Tf/diagnostic.h"
 #include "pxr/pxr.h"
-#include "pxr/base/js/api.h"
-#include "pxr/base/js/value.h"
-
-#include <boost/none.hpp>
-#include <boost/optional.hpp>
-#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-typedef boost::optional<JsValue> JsOptionalValue;
+JsOptionalValue JsFindValue(const JsObject &object, const std::string &key,
+                            const JsOptionalValue &defaultValue) {
+  if (key.empty()) {
+    TF_CODING_ERROR("Key is empty");
+    return boost::none;
+  }
 
-/// Returns the value associated with \p key in the given \p object. If no
-/// such key exists, and the supplied default is not supplied, this method
-/// returns an uninitialized optional JsValue. Otherwise, the \p 
-/// defaultValue is returned.
-JS_API
-JsOptionalValue JsFindValue(
-    const JsObject& object,
-    const std::string& key,
-    const JsOptionalValue& defaultValue = boost::none);
+  JsObject::const_iterator i = object.find(key);
+  if (i != object.end())
+    return i->second;
+
+  return defaultValue;
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // PXR_BASE_JS_UTILS_H

@@ -21,31 +21,27 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-///
-/// \file js/utils.cpp
+#ifndef PXR_BASE_JS_API_H
+#define PXR_BASE_JS_API_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/js/utils.h"
-#include "pxr/base/tf/diagnostic.h"
+#include "Arch/export.h"
 
-PXR_NAMESPACE_OPEN_SCOPE
+#if defined(PXR_STATIC)
+#define JS_API
+#define JS_API_TEMPLATE_CLASS(...)
+#define JS_API_TEMPLATE_STRUCT(...)
+#define JS_LOCAL
+#else
+#if defined(JS_EXPORTS)
+#define JS_API ARCH_EXPORT
+#define JS_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
+#define JS_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
+#else
+#define JS_API ARCH_IMPORT
+#define JS_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
+#define JS_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
+#endif
+#define JS_LOCAL ARCH_HIDDEN
+#endif
 
-JsOptionalValue
-JsFindValue(
-    const JsObject& object,
-    const std::string& key,
-    const JsOptionalValue& defaultValue)
-{
-    if (key.empty()) {
-        TF_CODING_ERROR("Key is empty");
-        return boost::none;
-    }
-
-    JsObject::const_iterator i = object.find(key);
-    if (i != object.end())
-        return i->second;
-
-    return defaultValue;
-}
-
-PXR_NAMESPACE_CLOSE_SCOPE
+#endif // PXR_BASE_JS_API_H

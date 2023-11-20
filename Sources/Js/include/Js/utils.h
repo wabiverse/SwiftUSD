@@ -21,27 +21,31 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_BASE_JS_API_H
-#define PXR_BASE_JS_API_H
+#ifndef PXR_BASE_JS_UTILS_H
+#define PXR_BASE_JS_UTILS_H
 
-#include "pxr/base/arch/export.h"
+/// \file js/utils.h
 
-#if defined(PXR_STATIC)
-#   define JS_API
-#   define JS_API_TEMPLATE_CLASS(...)
-#   define JS_API_TEMPLATE_STRUCT(...)
-#   define JS_LOCAL
-#else
-#   if defined(JS_EXPORTS)
-#       define JS_API ARCH_EXPORT
-#       define JS_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
-#       define JS_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
-#   else
-#       define JS_API ARCH_IMPORT
-#       define JS_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
-#       define JS_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
-#   endif
-#   define JS_LOCAL ARCH_HIDDEN
-#endif
+#include "Js/api.h"
+#include "Js/value.h"
+#include "pxr/pxr.h"
 
-#endif // PXR_BASE_JS_API_H
+#include <boost/none.hpp>
+#include <boost/optional.hpp>
+#include <string>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+typedef boost::optional<JsValue> JsOptionalValue;
+
+/// Returns the value associated with \p key in the given \p object. If no
+/// such key exists, and the supplied default is not supplied, this method
+/// returns an uninitialized optional JsValue. Otherwise, the \p
+/// defaultValue is returned.
+JS_API
+JsOptionalValue JsFindValue(const JsObject &object, const std::string &key,
+                            const JsOptionalValue &defaultValue = boost::none);
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // PXR_BASE_JS_UTILS_H
