@@ -91,9 +91,59 @@ final class ArchTests: XCTestCase
   }
 }
 
+/* ---- xxx ----
+ *   JS  TESTS
+ * ---- xxx ---- */
+
+final class JsTests: XCTestCase
+{
+  func testArray()
+  {
+    let array = Pixar.Js.Array()
+    PXRMSG.Log.point("Pixar.Js.Array", to: array)
+
+    let jsArray = JsArray()
+    PXRMSG.Log.point("JsArray", to: jsArray)
+
+    XCTAssertEqual(array.count, jsArray.count)
+  }
+
+  func testObject()
+  {
+    let object = Pixar.Js.Object()
+    PXRMSG.Log.point("Pixar.Js.Object", to: object)
+
+    let jsObject = JsObject()
+    PXRMSG.Log.point("JsObject", to: jsObject)
+
+    XCTAssertEqual(object.empty(), jsObject.empty())
+  }
+
+  func testParseError()
+  {
+    let parseError = Pixar.Js.ParseError()
+    PXRMSG.Log.point("Pixar.Js.ParseError", to: parseError)
+
+    let jsParseError = JsParseError()
+    PXRMSG.Log.point("ParseError", to: jsParseError)
+
+    XCTAssertEqual(parseError.reason, jsParseError.reason)
+  }
+
+  func testValue()
+  {
+    let value = Pixar.Js.Value()
+    PXRMSG.Log.point("Pixar.Js.Value", to: value)
+
+    let jsValue = JsValue()
+    PXRMSG.Log.point("JsValue", to: jsValue)
+
+    XCTAssertEqual(value.GetTypeName(), jsValue.GetTypeName())
+  }
+}
 
 /* ---- xxx ----
- *  Gf    TESTS
+ *   GF  TESTS
  * ---- xxx ---- */
 
 final class GfTests: XCTestCase

@@ -26,9 +26,10 @@
 
 /// \file js/value.h
 
+#include <pxr/pxrns.h>
+
 #include "Js/api.h"
 #include "Js/types.h"
-#include "pxr/pxr.h"
 
 #include <algorithm>
 #include <cstdint>

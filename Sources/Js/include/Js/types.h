@@ -26,7 +26,7 @@
 
 /// \file js/types.h
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 
 #include <map>
 #include <string>

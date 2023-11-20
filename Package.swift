@@ -24,6 +24,10 @@ let package = Package(
       targets: ["Tf"]
     ),
     .library(
+      name: "Js",
+      targets: ["Js"]
+    ),
+    .library(
       name: "Gf",
       targets: ["Gf"]
     ),
@@ -110,6 +114,17 @@ let package = Package(
     ),
 
     .target(
+      name: "Js",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Js"),
+      ]
+    ),
+
+    .target(
       name: "Gf",
       dependencies: [
         .target(name: "Arch"),
@@ -125,6 +140,7 @@ let package = Package(
       dependencies: [
         .target(name: "Arch"),
         .target(name: "Tf"),
+        .target(name: "Js"),
         .target(name: "Gf"),
       ],
       swiftSettings: [

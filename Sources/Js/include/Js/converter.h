@@ -26,9 +26,10 @@
 
 /// \file js/converter.h
 
+#include <pxr/pxrns.h>
+
 #include "Js/value.h"
 #include "Tf/diagnostic.h"
-#include "pxr/pxr.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

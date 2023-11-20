@@ -28,9 +28,10 @@
 /// \file js/json.h
 /// Top-level entrypoints for reading and writing JSON.
 
+#include <pxr/pxrns.h>
+
 #include "Js/api.h"
 #include "Js/value.h"
-#include "pxr/pxr.h"
 
 #include <iosfwd>
 #include <string>

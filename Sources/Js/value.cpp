@@ -24,11 +24,12 @@
 ///
 /// \file js/value.cpp
 
+#include <pxr/pxrns.h>
+
 #include "Js/value.h"
 #include "Tf/diagnostic.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include "pxr/pxr.h"
 #include <boost/variant.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE

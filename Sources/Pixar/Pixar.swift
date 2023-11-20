@@ -23,6 +23,7 @@
 
 @_exported import Arch
 @_exported import Tf
+@_exported import Js
 @_exported import Gf
 @_exported import pxr
 
@@ -44,6 +45,9 @@ public enum Pixar
     serving as a common area for documentation of these multi-platform issues.
    */
   public struct Arch
+  {}
+
+  public struct Js
   {}
 
   public struct Tf

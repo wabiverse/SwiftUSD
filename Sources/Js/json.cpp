@@ -24,8 +24,9 @@
 ///
 /// \file js/json.cpp
 
+#include <pxr/pxrns.h>
+
 #include "Js/json.h"
-#include "pxr/pxr.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"

@@ -26,9 +26,10 @@
 
 /// \file js/utils.h
 
+#include <pxr/pxrns.h>
+
 #include "Js/api.h"
 #include "Js/value.h"
-#include "pxr/pxr.h"
 
 #include <boost/none.hpp>
 #include <boost/optional.hpp>
