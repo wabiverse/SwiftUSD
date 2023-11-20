@@ -45,9 +45,6 @@ public protocol Scalar: Dimensional
   mutating func set(_ a: [ScalarType]) -> Self
 
   /// Direct data access.
-  func data() -> [ScalarType]
-
-  /// Direct data access.
   func getArray() -> [ScalarType]
 
   /// Returns the projection of this onto other.
@@ -72,30 +69,4 @@ public protocol Scalar: Dimensional
 
   /// Returns a normalized (unit-length) copy of this vector.
   func getNormalized(_ eps: Float) -> Self
-
-  var _data: [ScalarType] { get set }
-}
-
-public extension Scalar
-{
-  /// Initialize all elements to a single value.
-  init(_ value: ScalarType)
-  {
-    self.init()
-    _data = .init(repeating: value, count: Self.dimension)
-  }
-
-  /// Initialize all elements with explicit arguments.
-  init(_ s0: ScalarType, _ s1: ScalarType)
-  {
-    self.init()
-    _data = [s0, s1]
-  }
-
-  /// Indexing.
-  subscript(i: Int) -> ScalarType
-  {
-    get { _data[i] }
-    set { _data[i] = newValue }
-  }
 }

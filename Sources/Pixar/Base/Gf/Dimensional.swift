@@ -23,9 +23,6 @@
 
 public protocol Dimensional
 {
-  /// Dimension of the vector.
-  static var dimension: Int { get }
-
   /// Axis of vector.
   associatedtype AxisCount: Axis
 }

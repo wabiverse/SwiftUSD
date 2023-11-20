@@ -100,7 +100,12 @@ final class GfTests: XCTestCase
 {
   func testVec2f()
   {
-    let vec2f = Pixar.Gf.Vec2f(1, 2)
+    let vec2f = Pixar.Gf.Vec2f(1.0, 2.0)
     PXRMSG.Log.point("Pixar.Gf.Vec2f", to: vec2f)
+
+    let gfVec2f = GfVec2f(1.0, 2.0)
+    PXRMSG.Log.point("GfVec2f", to: gfVec2f)
+
+    XCTAssertEqual(vec2f, gfVec2f)
   }
 }
