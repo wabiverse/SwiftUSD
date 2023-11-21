@@ -32,13 +32,30 @@ let package = Package(
       targets: ["Gf"]
     ),
     .library(
+      name: "Trace",
+      targets: ["Trace"]
+    ),
+    .library(
+      name: "Vt",
+      targets: ["Vt"]
+    ),
+    .library(
+      name: "Work",
+      targets: ["Work"]
+    ),
+    .library(
+      name: "Plug",
+      targets: ["Plug"]
+    ),
+    .library(
       name: "Pixar",
       targets: ["Pixar"]
     ),
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.9"),
+    //.package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.9"),
+    .package(path: "../MetaverseKit"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
@@ -136,12 +153,69 @@ let package = Package(
     ),
 
     .target(
-      name: "Pixar",
+      name: "Trace",
       dependencies: [
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Js"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Trace"),
+      ]
+    ),
+
+    .target(
+      name: "Vt",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
         .target(name: "Gf"),
+        .target(name: "Trace"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Vt"),
+      ]
+    ),
+
+    .target(
+      name: "Work",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Work"),
+      ]
+    ),
+
+    .target(
+      name: "Plug",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Js"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Plug"),
+      ]
+    ),
+
+    .target(
+      name: "Pixar",
+      dependencies: [
+        /* ------ base. ------ */
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Js"),
+        .target(name: "Gf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+        .target(name: "Plug"),
+        /* ------------------- */
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),

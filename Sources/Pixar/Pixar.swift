@@ -24,10 +24,15 @@
 @_exported import CxxStdlib
 
 @_exported import Arch
-@_exported import Gf
+// @_exported import Tf
 @_exported import Js
+@_exported import Gf
+// @_exported import Trace
+@_exported import Vt
+@_exported import Work
+@_exported import Plug
+
 @_exported import pxr
-@_exported import Tf
 
 /**
   # ``Pixar``

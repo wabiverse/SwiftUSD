@@ -372,13 +372,13 @@ struct WeakPtr : def_visitor<WeakPtr> {
     typedef typename CLS::metadata::held_type_arg PtrType;
     static_assert(TF_SUPPORTS_WEAKPTR(Type), "Type must support TfWeakPtr.");
     // Register conversions
-    _RegisterConversions<PtrType>((Type *)0, detail::unwrap_wrapper((Type *)0));
+    _RegisterConversions<PtrType>((Type *)0, boost::python::detail::unwrap_wrapper((Type *)0));
 
     // Register a PyObjectFinder.
     Tf_RegisterPythonObjectFinder<Type, PtrType>();
 
     // Add weak ptr api.
-    _AddAPI<PtrType>(c, (Type *)0, detail::unwrap_wrapper((Type *)0));
+    _AddAPI<PtrType>(c, (Type *)0, boost::python::detail::unwrap_wrapper((Type *)0));
   }
 };
 
@@ -398,7 +398,7 @@ struct RefAndWeakPtr : def_visitor<RefAndWeakPtr> {
     static_assert(TF_SUPPORTS_REFPTR(Type), "Type must support TfRefPtr.");
     // Same as weak ptr plus ref conversions.
     WeakPtr().visit(c);
-    _AddAPI<CLS>((Type *)0, detail::unwrap_wrapper((Type *)0));
+    _AddAPI<CLS>((Type *)0, boost::python::detail::unwrap_wrapper((Type *)0));
   }
 };
 

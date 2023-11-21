@@ -30,7 +30,7 @@
 
 #include <pxr/pxrns.h>
 
-#include "Tf/Tf.h"
+#include "Tf/api.h"
 #include "Tf/nullPtr.h"
 #include "Tf/refPtr.h"
 #include "Tf/weakBase.h"

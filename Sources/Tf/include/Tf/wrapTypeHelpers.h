@@ -54,7 +54,7 @@ public:
     // appropriately depending on whether it is a polymorphic
     // wrapper<> type.
     typedef typename CLS::wrapped_type Type;
-    _Visit(c, detail::unwrap_wrapper((Type *)0));
+    _Visit(c, boost::python::detail::unwrap_wrapper((Type *)0));
   }
 };
 

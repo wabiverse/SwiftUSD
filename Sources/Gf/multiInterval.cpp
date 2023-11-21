@@ -26,7 +26,8 @@
 
 #include "Gf/multiInterval.h"
 #include "Gf/ostreamHelpers.h"
-#include "Tf/Tf.h"
+
+#include "Tf/api.h"
 #include "Tf/iterator.h"
 #include "Tf/type.h"
 

@@ -63,7 +63,7 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
     // the wrong result. instead, implement our own version which does
     // better
 
-    PyObject *m_self = detail::wrapper_base_::get_owner(*this);
+    PyObject *m_self = boost::python::detail::wrapper_base_::get_owner(*this);
     if (m_self) {
 
       // using pythons mro, get the attribute string that represents
@@ -105,7 +105,7 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
     }
     PyErr_Clear(); // Don't leave an exception if there's no override.
 
-    return Override(handle<>(detail::none()));
+    return Override(handle<>(boost::python::detail::none()));
   }
 
   Override GetPureOverride(char const *func) const {

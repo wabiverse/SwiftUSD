@@ -19,7 +19,7 @@
  #include <fstream>
  #include <tuple>
  
-+#include "pxr/pxr.h"
++#include <pxr/pxrns.h>
 +
 +// Guard against possible conflicts if this header is included in the
 +// same file as another CLI11 header.

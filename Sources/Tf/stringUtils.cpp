@@ -27,11 +27,12 @@
 #include "Arch/pxrinttypes.h"
 #include "Arch/pxrmath.h"
 #include "Arch/vsnprintf.h"
+
+#include "Tf/api.h"
 #include "Tf/diagnostic.h"
 #include "Tf/pathUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include "Tf/Tf.h"
 #include "Tf/token.h"
 
 #include <algorithm>

@@ -45,8 +45,9 @@ namespace {
 // ////////////////////////////////
 // // optional
 
-static tuple _TakesOptional(const boost::optional<string> &optString,
-                            const boost::optional<vector<string>> &optStrvec) {
+static boost::python::tuple _TakesOptional(const boost::optional<string> &optString,
+                                           const boost::optional<vector<string>> &optStrvec)
+{
   object strObj;
   if (optString) {
     strObj = object(*optString);
@@ -55,7 +56,7 @@ static tuple _TakesOptional(const boost::optional<string> &optString,
   if (optStrvec) {
     vecObj = object(TfPyCopySequenceToList(*optStrvec));
   }
-  return make_tuple(strObj, vecObj);
+  return boost::python::make_tuple(strObj, vecObj);
 }
 
 template <typename T>

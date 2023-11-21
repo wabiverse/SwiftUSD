@@ -25,6 +25,7 @@
 #include "Tf/mallocTag.h"
 #include <pxr/pxrns.h>
 
+#include "Tf/api.h"
 #include "Tf/bigRWMutex.h"
 #include "Tf/diagnostic.h"
 #include "Tf/getenv.h"
@@ -35,7 +36,6 @@
 #include "Tf/pxrTslRobinMap/robin_set.h"
 #include "Tf/stl.h"
 #include "Tf/stringUtils.h"
-#include "Tf/Tf.h"
 
 #include "Arch/attributes.h"
 #include "Arch/debugger.h"
@@ -44,7 +44,7 @@
 #include "Arch/pxrinttypes.h"
 #include "Arch/stackTrace.h"
 
-#include <tbb/concurrent_hash_map.h>
+#include <OneTBB/tbb/concurrent_hash_map.h>
 
 #include <algorithm>
 #include <atomic>

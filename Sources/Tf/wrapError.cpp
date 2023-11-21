@@ -88,7 +88,9 @@ static void _Fatal(string const &msg, string const &moduleName,
 }
 // CODE_COVERAGE_ON
 
-static handle<> _InvokeWithErrorHandling(tuple const &args, dict const &kw) {
+static handle<> _InvokeWithErrorHandling(boost::python::tuple const &args, 
+                                         boost::python::dict const &kw)
+{
   // This function uses basically bare Python C API since it wants to be as
   // fast as it can be.
   TfErrorMark m;

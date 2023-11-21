@@ -24,161 +24,20 @@
 #ifndef __PXR_BASE_TF_H__
 #define __PXR_BASE_TF_H__
 
-/// \file Tf/Tf.h
-/// A file containing basic constants and definitions.
-
-#if defined(__cplusplus) || defined(doxygen)
-
-#include <pxr/pxrns.h>
-
-#include "Arch/buildMode.h"
-#include "Arch/pxrinttypes.h"
-#include "Arch/pxrmath.h"
-
-#include <math.h>
-#include <utility>
-
-PXR_NAMESPACE_OPEN_SCOPE
-
-// This constant will only be defined if not defined already. This is because
-// many files need a higher limit and define this constant themselves before
-// including anything else.
-
-#ifndef TF_MAX_ARITY
-#define TF_MAX_ARITY 7
-#endif // TF_MAX_ARITY
-
-/// This value may be used by functions that return a \c size_t to indicate
-/// that a special or error condition has occurred.
-/// \ingroup group_tf_TfError
-#define TF_BAD_SIZE_T SIZE_MAX
-
-/// \addtogroup group_tf_BasicMath
-///@{
-
-/// Returns the absolute value of the given \c int value.
-inline int TfAbs(int v) { return (v < 0 ? -v : v); }
-
-/// Returns the absolute value of the given \c double value.
-inline double TfAbs(double v) { return fabs(v); }
-
-/// Returns the smaller of the two given \c  values.
-template <class T> inline T TfMin(const T &v1, const T &v2) {
-  return (v1 < v2 ? v1 : v2);
-}
-
-/// Returns the larger of the two given \c  values.
-template <class T> inline T TfMax(const T &v1, const T &v2) {
-  return (v1 > v2 ? v1 : v2);
-}
-
-///@}
-
-/// \struct TfDeleter
-/// Function object for deleting any pointer.
-///
-/// An STL collection of pointers does not automatically delete each
-/// pointer when the collection itself is destroyed. Instead of writing
-/// \code
-///    for (list<Otter*>::iterator i = otters.begin(); i != otters.end(); ++i)
-///         delete *i;
-/// \endcode
-/// you can use \c TfDeleter and simply write
-/// \code
-/// #include <algorithm>
-///
-///    for_each(otters.begin(), otters.end(), TfDeleter());
-/// \endcode
-///
-/// \note \c TfDeleter calls the non-array version of \c delete.
-/// Don't use \c TfDeleter if you allocated your space using \c new[]
-/// (and consider using a \c vector<> in place of a built-in array).
-/// Also, note that you need to put parenthesis after \c TfDeleter
-/// in the call to \c for_each().
-///
-/// Finally, \c TfDeleter also works for map-like collections.
-/// Note that this works as follows: if \c TfDeleter is handed
-/// a datatype of type \c std::pair<T1,T2*>, then the second element
-/// of the pair is deleted, but the first (whether or not it is a pointer)
-/// is left alone.  In other words, if you give \c TfDeleter() a pair of
-/// pointers, it only deletes the second, but never the first.  This is the
-/// desired behavior for maps.
-///
-/// \ingroup group_tf_Stl
-struct TfDeleter {
-  template <class T> void operator()(T *t) const { delete t; }
-
-  template <class T1, class T2> void operator()(std::pair<T1, T2 *> p) const {
-    delete p.second;
-  }
-};
-
-/*
- * The compile-time constants are not part of doxygen; if you know they're here,
- * fine, but they should be used rarely, so we don't go out of our way to
- * advertise them.
- *
- * Here's the idea: you may have an axiom or conditional check which is just too
- * expensive to make part of a release build. Compilers these days will optimize
- * away expressions they can evaluate at compile-time.  So you can do
- *
- *     if (TF_DEV_BUILD)
- *         TF_AXIOM(expensiveConditional);
- *
- * to get a condition axiom.  You can even write
- *
- *     TF_AXIOM(!TF_DEV_BUILD || expensiveConditional);
- *
- * What you CANNOT do is write
- *      #if defined(TF_DEV_BUILD)
- * or
- *      #if TF_DEV_BUILD == 0
- *
- * The former compiles but always yields true; the latter doesn't compile.
- * In other words, you can change the flow of control using these constructs,
- * but we deliberately are prohibiting things like
- *
- * struct Bar {
- * #if ...
- *     int _onlyNeededForChecks;
- * #endif
- * };
- *
- * or creating functions which only show up in some builds.
- */
-
-#define TF_DEV_BUILD ARCH_DEV_BUILD
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // defined(__cplusplus)
-
-/// Stops compiler from producing unused argument or variable warnings.
-/// This is useful mainly in C, because in C++ you can just leave
-/// the variable unnamed.  However, there are situations where this
-/// can be useful even in C++, such as
-/// \code
-/// void
-/// MyClass::Method( int foo )
-/// {
-/// #if defined(__APPLE__)
-///     TF_UNUSED( foo );
-///     // do something that doesn't need foo...
-/// #else
-///     // do something that needs foo
-/// #endif
-/// }
-/// \endcode
-///
-/// \ingroup group_tf_TfCompilerAids
-#define TF_UNUSED(x) (void)x
-
 #include <Tf/api.h>
 
+#include <Tf/mallocTag.h>
+#include <Tf/singleton.h>
+
+#include <Tf/fastCompression.h>
+
 #include <Tf/hash.h>
+#include <Tf/hashset.h>
 
 #include <Tf/hashmap.h>
 #include <Tf/smallVector.h>
+
+#include <Tf/ostreamMethods.h>
 
 #include <Tf/callContext.h>
 
@@ -191,7 +50,11 @@ PXR_NAMESPACE_CLOSE_SCOPE
 #include <Tf/preprocessorUtils.h>
 #include <Tf/preprocessorUtilsLite.h>
 #include <Tf/safeTypeCompare.h>
+#include <Tf/templateString.h>
 #include <Tf/stringUtils.h>
+
+#include <Tf/pointerAndBits.h>
+#include <Tf/token.h>
 
 #include <Tf/typeFunctions.h>
 
@@ -202,10 +65,130 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 #include <Tf/enum.h>
 
+#include <Tf/cxxCast.h>
+
+#include <Tf/type.h>
+
+#include <Tf/type_Impl.h>
+
+#include <Tf/declarePtrs.h>
+
 #include <Tf/nullPtr.h>
 
+#include <Tf/refCount.h>
 #include <Tf/refBase.h>
 
-#include <Tf/refCount.h>
+#include <Tf/expiryNotifier.h>
+
+#include <Tf/refPtr.h>
+#include <Tf/refPtrTracker.h>
+
+#include <Tf/weakBase.h>
+#include <Tf/weakPtrFacade.h>
+
+#include <Tf/weakPtr.h>
+#include <Tf/anyWeakPtr.h>
+
+#include <Tf/error.h>
+#include <Tf/errorMark.h>
+#include <Tf/errorTransport.h>
+
+#include <Tf/diagnosticBase.h>
+
+#include <Tf/status.h>
+
+#include <Tf/diagnosticMgr.h>
+
+#include <Tf/anyUniquePtr.h>
+#include <Tf/atomicOfstreamWrapper.h>
+#include <Tf/atomicRenameUtil.h>
+#include <Tf/bigRWMutex.h>
+#include <Tf/bitUtils.h>
+
+#include <Tf/debugNotice.h>
+#include <Tf/denseHashMap.h>
+#include <Tf/denseHashSet.h>
+
+#include <Tf/dl.h>
+
+#include <Tf/envSetting.h>
+
+#include <Tf/exception.h>
+#include <Tf/fileUtils.h>
+#include <Tf/functionRef.h>
+#include <Tf/functionTraits.h>
+#include <Tf/getenv.h>
+
+// #include <Tf/instantiateSingleton.h>
+// #include <Tf/instantiateStacked.h>
+// #include <Tf/instantiateType.h>
+#include <Tf/iterator.h>
+
+#include <Tf/pyInterpreter.h>
+
+#include <Tf/pyLock.h>
+
+#include <Tf/pySafePython.h>
+
+#include <Tf/pyUtils.h>
+
+#include <Tf/pyObjWrapper.h>
+#include <Tf/pyTracing.h>
+
+#include <Tf/meta.h>
+
+
+#include <Tf/pathUtils.h>
+#include <Tf/patternMatcher.h>
+
+#include <Tf/regTest.h>
+#include <Tf/safeOutputFile.h>
+
+#include <Tf/scoped.h>
+#include <Tf/scopeDescription.h>
+// #include <Tf/scopeDescriptionPrivate.h>
+#include <Tf/scriptModuleLoader.h>
+#include <Tf/setenv.h>
+
+#include <Tf/span.h>
+#include <Tf/spinRWMutex.h>
+#include <Tf/stacked.h>
+#include <Tf/stackTrace.h>
+#include <Tf/staticData.h>
+#include <Tf/staticTokens.h>
+
+#include <Tf/stl.h>
+
+#include <Tf/typeInfoMap.h>
+#include <Tf/warning.h>
+
+// #include <Tf/pxrLZ4/lz4.h>
+// #include <Tf/pxrDoubleConversion/bignum-dtoa.h>
+// #include <Tf/pxrDoubleConversion/bignum.h>
+// #include <Tf/pxrDoubleConversion/cached-powers.h>
+// #include <Tf/pxrDoubleConversion/diy-fp.h>
+// #include <Tf/pxrDoubleConversion/double-conversion.h>
+// #include <Tf/pxrDoubleConversion/fast-dtoa.h>
+// #include <Tf/pxrDoubleConversion/fixed-dtoa.h>
+// #include <Tf/pxrDoubleConversion/ieee.h>
+// #include <Tf/pxrDoubleConversion/strtod.h>
+// #include <Tf/pxrDoubleConversion/utils.h>
+#include <Tf/pxrPEGTL/pegtl.h>
+#include <Tf/pxrTslRobinMap/robin_growth_policy.h>
+#include <Tf/pxrTslRobinMap/robin_hash.h>
+#include <Tf/pxrTslRobinMap/robin_map.h>
+#include <Tf/pxrTslRobinMap/robin_set.h>
+#include <Tf/pxrCLI11/CLI11.h>
+
+#include <Tf/pyPtrHelpers.h>
+
+#include <Tf/notice.h>
+#include <Tf/typeNotice.h>
+
+#include <Tf/noticeRegistry.h>
+
+#include <Tf/wrapTypeHelpers.h>
+
+#include <Tf/pyContainerConversions.h>
 
 #endif // __PXR_BASE_TF_H__

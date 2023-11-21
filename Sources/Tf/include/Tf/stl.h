@@ -29,7 +29,6 @@
 
 #include <pxr/pxrns.h>
 
-#include "Tf/Tf.h"
 #include "Tf/api.h"
 #include "Tf/hashmap.h"
 #include "Tf/hashset.h"

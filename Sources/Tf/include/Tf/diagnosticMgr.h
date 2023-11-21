@@ -47,8 +47,8 @@
 #include "Arch/attributes.h"
 #include "Arch/functionLite.h"
 
-#include <tbb/enumerable_thread_specific.h>
-#include <tbb/spin_rw_mutex.h>
+#include <OneTBB/tbb/enumerable_thread_specific.h>
+#include <OneTBB/tbb/spin_rw_mutex.h>
 
 #include <atomic>
 #include <cstdarg>

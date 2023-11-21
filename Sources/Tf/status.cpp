@@ -22,6 +22,6 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Tf/Tf.h"
+#include "Tf/api.h"
 
 #include "Tf/status.h"

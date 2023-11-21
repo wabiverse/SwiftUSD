@@ -27,7 +27,7 @@
 #include "Tf/stringUtils.h"
 #include <pxr/pxrns.h>
 
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_mutex.h>
 
 #include <set>
 #include <string>

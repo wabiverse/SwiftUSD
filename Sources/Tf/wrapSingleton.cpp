@@ -64,7 +64,11 @@ static object _GetSingletonInstance(object const &classObj) {
 }
 
 // Need an init method that accepts any arguments and does nothing.
-static object _DummyInit(tuple const &, dict const &) { return object(); }
+static object _DummyInit(boost::python::tuple const &, 
+                         boost::python::dict const &)
+{ 
+  return object();
+}
 
 } // anonymous namespace
 

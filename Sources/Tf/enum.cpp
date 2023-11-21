@@ -39,7 +39,7 @@
 
 #include "Tf/hashmap.h"
 
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_mutex.h>
 
 #include <iostream>
 #include <set>

@@ -30,7 +30,7 @@
 /// This file defines preprocessor macros for getting the current function
 /// name and related information so they can be used in a architecture
 /// independent manner.  This file needs to be public but shouldn't be
-/// included directly by anything outside of \c pxr/base/tf.
+/// included directly by anything outside of \c Tf.
 
 #include "Arch/defines.h"
 // Note: this file specifically does not include <string>.

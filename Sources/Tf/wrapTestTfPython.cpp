@@ -120,7 +120,7 @@ static Tf_TestBasePtr ReturnsBase(Tf_TestBasePtr base) { return base; }
 
 static Tf_TestBaseRefPtr ReturnsBaseRefPtr(Tf_TestBasePtr base) { return base; }
 
-static tuple TakesBase(Tf_TestBasePtr base) {
+static boost::python::tuple TakesBase(Tf_TestBasePtr base) {
   base->Virtual3("hello from TakesConstBase");
   base->Virtual2();
   bool isDerived = TfDynamic_cast<Tf_TestDerivedPtr>(base);
@@ -369,7 +369,7 @@ public:
   virtual ~Tf_ClassWithClassMethod() {}
 };
 
-static tuple _TestClassMethod(object &pyClassObj, const object &callable) {
+static boost::python::tuple _TestClassMethod(object &pyClassObj, const object &callable) {
   return boost::python::make_tuple(pyClassObj, TfPyCall<object>(callable)());
 }
 
