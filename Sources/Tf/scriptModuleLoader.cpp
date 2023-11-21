@@ -22,18 +22,22 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Tf/scriptModuleLoader.h"
 #include <pxr/pxrns.h>
 
-#include "Tf/debug.h"
-#include "Tf/debugCodes.h"
+#include "Tf/scriptModuleLoader.h"
+
+#include "Tf/stringUtils.h"
+
 #include "Tf/instantiateSingleton.h"
 #include "Tf/iterator.h"
 #include "Tf/pyUtils.h"
+
+#include "Tf/debug.h"
+#include "Tf/debugCodes.h"
+
 #include "Tf/registryManager.h"
 #include "Tf/stackTrace.h"
 #include "Tf/staticData.h"
-#include "Tf/stringUtils.h"
 
 #include "Arch/fileSystem.h"
 
