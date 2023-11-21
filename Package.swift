@@ -54,8 +54,7 @@ let package = Package(
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    //.package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.2.9"),
-    .package(path: "../MetaverseKit"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.0"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
