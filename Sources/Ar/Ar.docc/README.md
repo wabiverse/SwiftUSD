@@ -33,8 +33,8 @@ forward the call to that subclass.
 
 ### **Primary Resolver**
 
-The primary resolver is the ArResolver subclass that Ar uses to handle all
-asset paths that are not handled by the other resolvers described below.
+The primary resolver is the **ArResolver** subclass that Ar uses to handle
+all asset paths that are not handled by the other resolvers described below.
 
 > [!NOTE]
 > **Ar** does not support custom resolvers implemented

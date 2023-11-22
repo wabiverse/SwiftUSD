@@ -52,6 +52,10 @@ let package = Package(
       targets: ["Ar"]
     ),
     .library(
+      name: "Kind",
+      targets: ["Kind"]
+    ),
+    .library(
       name: "PyTf",
       type: .dynamic,
       targets: ["PyTf"]
@@ -65,6 +69,10 @@ let package = Package(
       name: "PyAr",
       type: .dynamic,
       targets: ["PyAr"]
+    ),
+    .library(
+      name: "PyKind",
+      targets: ["PyKind"]
     ),
     .executable(
       name: "UsdView",
@@ -80,7 +88,8 @@ let package = Package(
         "Pixar",
         "PyTf",
         "PyPlug",
-        "PyAr"
+        "PyAr",
+        "PyKind",
       ]
     ),
   ],
@@ -252,6 +261,18 @@ let package = Package(
     ),
 
     .target(
+      name: "Kind",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Plug"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Kind"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Tf"),
@@ -293,6 +314,21 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Ar"),
+      ]
+    ),
+
+    .target(
+      name: "PyKind",
+      dependencies: [
+        .target(name: "Kind"),
+      ],
+      path: "Python/PyKind",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Kind"),
       ]
     ),
 
@@ -352,6 +388,7 @@ let package = Package(
         .target(name: "Plug"),
         /* ------- usd. ------ */
         .target(name: "Ar"),
+        .target(name: "Kind"),
         /* ------------------- */
       ],
       swiftSettings: [

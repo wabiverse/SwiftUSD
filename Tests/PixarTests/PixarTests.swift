@@ -24,6 +24,7 @@
 import XCTest
 @testable import Pixar
 
+
 /* ---- xxx ----
  *  ARCH  TESTS
  * ---- xxx ---- */
@@ -188,5 +189,32 @@ final class ArTests: XCTestCase
         to: "\(r)"
       )
     }
+  }
+}
+
+
+/* ---- xxx ----
+ *  KIND  TESTS
+ * ---- xxx ---- */
+
+final class KindTests: XCTestCase
+{
+  func testKindTokens()
+  {
+    let tokens = Pixar.Kind.Tokens.allCases
+
+    for (i, t) in tokens.enumerated()
+    {
+      PXRMsg.Log.point(
+        "Pixar.Kind.Tokens"
+        + "\(PXRMsg.Colors.yellow.rawValue) -> " 
+        + "\(PXRMsg.Colors.default.rawValue)["
+        + "\(PXRMsg.Colors.green.rawValue)\(i+1) of \(tokens.count)"
+        + "\(PXRMsg.Colors.default.rawValue)]",
+        to: "\(t.getToken().string)"
+      )
+    }
+
+    XCTAssertEqual(tokens.count, 5)
   }
 }

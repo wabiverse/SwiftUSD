@@ -23,6 +23,7 @@
 
 @_exported import CxxStdlib
 
+/* ---- Pixar.Base ---- */
 @_exported import Arch
 // @_exported import Tf
 @_exported import Js
@@ -31,9 +32,12 @@
 @_exported import Vt
 @_exported import Work
 @_exported import Plug
+/* ----- Pixar.Usd ---- */
 @_exported import Ar
-
+@_exported import Kind
+/* ----- Pixar.NS ----- */
 @_exported import pxr
+/* -------------------- */
 
 /**
   # ``Pixar``

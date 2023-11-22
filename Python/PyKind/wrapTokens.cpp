@@ -22,32 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/usd/kind/registry.h"
-#include "pxr/base/tf/pyResultConversions.h"
-#include "pxr/base/tf/pySingleton.h"
-
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "Kind/registry.h"
+#include "Tf/pyStaticTokens.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapRegistry()
-{
-    typedef KindRegistry This;
-    typedef TfWeakPtr<KindRegistry> ThisPtr;
-
-   class_<This, ThisPtr, boost::noncopyable>("Registry", no_init)
-        .def(TfPySingleton())
-        .def("HasKind", &This::HasKind)
-        .staticmethod("HasKind")
-        .def("GetAllKinds", &This::GetAllKinds,
-             return_value_policy<TfPySequenceToList>())
-        .staticmethod("GetAllKinds")
-        .def("GetBaseKind", &This::GetBaseKind)
-        .staticmethod("GetBaseKind")
-        .def("IsA", &This::IsA)
-        .staticmethod("IsA")
-        ;
+void wrapTokens() {
+  TF_PY_WRAP_PUBLIC_TOKENS("Tokens", KindTokens, KIND_TOKENS);
 }
