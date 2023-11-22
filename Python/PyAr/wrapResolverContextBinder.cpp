@@ -21,52 +21,47 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXRNS_H__
-#define __PXRNS_H__
+#include <boost/python/class.hpp>
+#include <boost/python/object.hpp>
 
-/// \file pxr/pxr.h
+#include "Ar/resolverContextBinder.h"
+#include <pxr/pxrns.h>
 
-#define PXR_MAJOR_VERSION 0
-#define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 8
+#include <memory>
 
-#define PXR_VERSION 2308
+using namespace boost::python;
 
-#define PXR_USE_NAMESPACES 1
+PXR_NAMESPACE_USING_DIRECTIVE
 
-#if PXR_USE_NAMESPACES
+namespace {
 
-#define PXR_NS pxr
-#define PXR_INTERNAL_NS Pixar
-#define PXR_NS_GLOBAL ::PXR_NS
+class _PyResolverContextBinder : public boost::noncopyable {
+public:
+  _PyResolverContextBinder(const ArResolverContext &context)
+      : _context(context) {}
 
-namespace PXR_INTERNAL_NS { }
+  void Enter() { _binder.reset(new ArResolverContextBinder(_context)); }
 
-// The root level namespace for all source in the USD distribution.
-namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
+  bool Exit(boost::python::object & /* exc_type */,
+            boost::python::object & /* exc_val  */,
+            boost::python::object & /* exc_tb   */) {
+    _binder.reset(0);
+    // Re-raise exceptions.
+    return false;
+  }
+
+private:
+  ArResolverContext _context;
+  std::unique_ptr<ArResolverContextBinder> _binder;
+};
+
+} // anonymous namespace
+
+void wrapResolverContextBinder() {
+  typedef _PyResolverContextBinder This;
+
+  class_<This, boost::noncopyable>("ResolverContextBinder",
+                                   init<const ArResolverContext &>())
+      .def("__enter__", &This::Enter)
+      .def("__exit__", &This::Exit);
 }
-
-#define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
-#define PXR_NAMESPACE_CLOSE_SCOPE  }  
-#define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
-
-#else
-
-#define PXR_NS 
-#define PXR_NS_GLOBAL 
-#define PXR_NAMESPACE_OPEN_SCOPE   
-#define PXR_NAMESPACE_CLOSE_SCOPE 
-#define PXR_NAMESPACE_USING_DIRECTIVE
-
-#endif // PXR_USE_NAMESPACES
-
-#if 1
-#define PXR_PYTHON_SUPPORT_ENABLED 1
-#endif
-
-#if 1
-#define PXR_PREFER_SAFETY_OVER_SPEED 1
-#endif
-
-#endif // __PXRNS_H__

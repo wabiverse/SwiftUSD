@@ -187,8 +187,6 @@
 
 #include <Tf/noticeRegistry.h>
 
-#include <Tf/wrapTypeHelpers.h>
-
 #include <Tf/pyContainerConversions.h>
 
 #endif // __PXR_BASE_TF_H__

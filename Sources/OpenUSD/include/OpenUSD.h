@@ -1202,35 +1202,6 @@
 #include <OpenUSD/pxr/usd/usdLux/tokens.h>
 #include <OpenUSD/pxr/usd/usdLux/volumeLightAPI.h>
 
-// ar
-#include <OpenUSD/pxr/usd/ar/api.h>
-#include <OpenUSD/pxr/usd/ar/ar.h>
-#include <OpenUSD/pxr/usd/ar/asset.h>
-#include <OpenUSD/pxr/usd/ar/assetInfo.h>
-#include <OpenUSD/pxr/usd/ar/debugCodes.h>
-#include <OpenUSD/pxr/usd/ar/defaultResolver.h>
-#include <OpenUSD/pxr/usd/ar/defaultResolverContext.h>
-#include <OpenUSD/pxr/usd/ar/definePackageResolver.h>
-#include <OpenUSD/pxr/usd/ar/defineResolver.h>
-#include <OpenUSD/pxr/usd/ar/defineResolverContext.h>
-#include <OpenUSD/pxr/usd/ar/filesystemAsset.h>
-#include <OpenUSD/pxr/usd/ar/filesystemWritableAsset.h>
-#include <OpenUSD/pxr/usd/ar/inMemoryAsset.h>
-#include <OpenUSD/pxr/usd/ar/notice.h>
-#include <OpenUSD/pxr/usd/ar/packageResolver.h>
-#include <OpenUSD/pxr/usd/ar/packageUtils.h>
-#include <OpenUSD/pxr/usd/ar/pch.h>
-#include <OpenUSD/pxr/usd/ar/pyResolverContext.h>
-#include <OpenUSD/pxr/usd/ar/resolvedPath.h>
-#include <OpenUSD/pxr/usd/ar/resolver.h>
-#include <OpenUSD/pxr/usd/ar/resolverContext.h>
-#include <OpenUSD/pxr/usd/ar/resolverContextBinder.h>
-#include <OpenUSD/pxr/usd/ar/resolverScopedCache.h>
-#include <OpenUSD/pxr/usd/ar/TestArURIResolver_plugin.h>
-#include <OpenUSD/pxr/usd/ar/threadLocalScopedCache.h>
-#include <OpenUSD/pxr/usd/ar/timestamp.h>
-#include <OpenUSD/pxr/usd/ar/writableAsset.h>
-
 // usdGeom
 #include <OpenUSD/pxr/usd/usdGeom/api.h>
 #include <OpenUSD/pxr/usd/usdGeom/basisCurves.h>

@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2020 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,52 +21,34 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXRNS_H__
-#define __PXRNS_H__
+#ifndef PXR_USD_AR_PY_RESOLVER_CONTEXT_H
+#define PXR_USD_AR_PY_RESOLVER_CONTEXT_H
 
-/// \file pxr/pxr.h
+/// \file Ar/pyResolverContext.h
+/// Macros for creating Python bindings for objects used with
+/// ArResolverContext.
 
-#define PXR_MAJOR_VERSION 0
-#define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 8
+#include <boost/python/implicit.hpp>
 
-#define PXR_VERSION 2308
+#include <Ar/resolverContext.h>
+#include <pxr/pxrns.h>
 
-#define PXR_USE_NAMESPACES 1
+PXR_NAMESPACE_OPEN_SCOPE
 
-#if PXR_USE_NAMESPACES
+/// Register the specified type as a context object that may be converted from
+/// Python into a ArResolverContext object in C++.  This typically would be
+/// called in the source file where the Python wrapping for the context object
+/// is defined.
+template <class Context> void ArWrapResolverContextForPython();
 
-#define PXR_NS pxr
-#define PXR_INTERNAL_NS Pixar
-#define PXR_NS_GLOBAL ::PXR_NS
+#ifndef doxygen
 
-namespace PXR_INTERNAL_NS { }
+template <class Context> void ArWrapResolverContextForPython() {
+  boost::python::implicitly_convertible<Context, ArResolverContext>();
+};
 
-// The root level namespace for all source in the USD distribution.
-namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
-}
+#endif // doxygen
 
-#define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
-#define PXR_NAMESPACE_CLOSE_SCOPE  }  
-#define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
+PXR_NAMESPACE_CLOSE_SCOPE
 
-#else
-
-#define PXR_NS 
-#define PXR_NS_GLOBAL 
-#define PXR_NAMESPACE_OPEN_SCOPE   
-#define PXR_NAMESPACE_CLOSE_SCOPE 
-#define PXR_NAMESPACE_USING_DIRECTIVE
-
-#endif // PXR_USE_NAMESPACES
-
-#if 1
-#define PXR_PYTHON_SUPPORT_ENABLED 1
 #endif
-
-#if 1
-#define PXR_PREFER_SAFETY_OVER_SPEED 1
-#endif
-
-#endif // __PXRNS_H__

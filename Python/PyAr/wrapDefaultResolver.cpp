@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2017 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,52 +21,23 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXRNS_H__
-#define __PXRNS_H__
 
-/// \file pxr/pxr.h
+#include <boost/python/class.hpp>
 
-#define PXR_MAJOR_VERSION 0
-#define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 8
+#include "Ar/defaultResolver.h"
+#include <pxr/pxrns.h>
 
-#define PXR_VERSION 2308
+using namespace boost::python;
 
-#define PXR_USE_NAMESPACES 1
+PXR_NAMESPACE_USING_DIRECTIVE
 
-#if PXR_USE_NAMESPACES
+void wrapDefaultResolver() {
+  using This = ArDefaultResolver;
 
-#define PXR_NS pxr
-#define PXR_INTERNAL_NS Pixar
-#define PXR_NS_GLOBAL ::PXR_NS
+  class_<This, bases<ArResolver>, boost::noncopyable>("DefaultResolver",
+                                                      no_init)
 
-namespace PXR_INTERNAL_NS { }
-
-// The root level namespace for all source in the USD distribution.
-namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
+      .def("SetDefaultSearchPath", &This::SetDefaultSearchPath,
+           args("searchPath"))
+      .staticmethod("SetDefaultSearchPath");
 }
-
-#define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
-#define PXR_NAMESPACE_CLOSE_SCOPE  }  
-#define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
-
-#else
-
-#define PXR_NS 
-#define PXR_NS_GLOBAL 
-#define PXR_NAMESPACE_OPEN_SCOPE   
-#define PXR_NAMESPACE_CLOSE_SCOPE 
-#define PXR_NAMESPACE_USING_DIRECTIVE
-
-#endif // PXR_USE_NAMESPACES
-
-#if 1
-#define PXR_PYTHON_SUPPORT_ENABLED 1
-#endif
-
-#if 1
-#define PXR_PREFER_SAFETY_OVER_SPEED 1
-#endif
-
-#endif // __PXRNS_H__

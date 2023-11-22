@@ -21,52 +21,25 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXRNS_H__
-#define __PXRNS_H__
 
-/// \file pxr/pxr.h
+#include "Tf/pyModule.h"
+#include <pxr/pxrns.h>
 
-#define PXR_MAJOR_VERSION 0
-#define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 8
+PXR_NAMESPACE_USING_DIRECTIVE
 
-#define PXR_VERSION 2308
+TF_WRAP_MODULE {
+  TF_WRAP(AssetInfo);
+  TF_WRAP(ResolvedPath);
+  TF_WRAP(Timestamp);
 
-#define PXR_USE_NAMESPACES 1
+  TF_WRAP(Resolver);
+  TF_WRAP(ResolverContext);
+  TF_WRAP(ResolverContextBinder);
+  TF_WRAP(ResolverScopedCache);
 
-#if PXR_USE_NAMESPACES
+  TF_WRAP(DefaultResolver);
+  TF_WRAP(DefaultResolverContext);
 
-#define PXR_NS pxr
-#define PXR_INTERNAL_NS Pixar
-#define PXR_NS_GLOBAL ::PXR_NS
-
-namespace PXR_INTERNAL_NS { }
-
-// The root level namespace for all source in the USD distribution.
-namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
+  TF_WRAP(PackageUtils);
+  TF_WRAP(Notice);
 }
-
-#define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
-#define PXR_NAMESPACE_CLOSE_SCOPE  }  
-#define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
-
-#else
-
-#define PXR_NS 
-#define PXR_NS_GLOBAL 
-#define PXR_NAMESPACE_OPEN_SCOPE   
-#define PXR_NAMESPACE_CLOSE_SCOPE 
-#define PXR_NAMESPACE_USING_DIRECTIVE
-
-#endif // PXR_USE_NAMESPACES
-
-#if 1
-#define PXR_PYTHON_SUPPORT_ENABLED 1
-#endif
-
-#if 1
-#define PXR_PREFER_SAFETY_OVER_SPEED 1
-#endif
-
-#endif // __PXRNS_H__
