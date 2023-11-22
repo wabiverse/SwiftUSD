@@ -31,6 +31,7 @@
 @_exported import Vt
 @_exported import Work
 @_exported import Plug
+@_exported import Ar
 
 @_exported import pxr
 

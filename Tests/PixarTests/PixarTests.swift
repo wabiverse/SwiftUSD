@@ -161,3 +161,32 @@ final class GfTests: XCTestCase
     XCTAssertEqual(vec2f, gfVec2f)
   }
 }
+
+/* ---- xxx ----
+ *   AR  TESTS
+ * ---- xxx ---- */
+
+final class ArTests: XCTestCase
+{
+  func testGetAllResolvers()
+  {
+    let resolvers = Pixar.Ar.getAllResolvers()
+
+    if resolvers.isEmpty
+    {
+      PXRMsg.Log.point("Pixar.Ar.getAllResolvers()", to: "None")
+    }
+
+    for (i, r) in resolvers.enumerated()
+    {
+      PXRMsg.Log.point(
+        "Pixar.Ar.getAllResolvers()"
+        + "\(PXRMsg.Colors.yellow.rawValue) -> " 
+        + "\(PXRMsg.Colors.default.rawValue)["
+        + "\(PXRMsg.Colors.green.rawValue)\(i+1) of \(resolvers.count)"
+        + "\(PXRMsg.Colors.default.rawValue)]",
+        to: "\(r)"
+      )
+    }
+  }
+}
