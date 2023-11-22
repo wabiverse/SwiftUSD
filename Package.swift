@@ -72,6 +72,7 @@ let package = Package(
     ),
     .library(
       name: "PyKind",
+      type: .dynamic,
       targets: ["PyKind"]
     ),
     .executable(
