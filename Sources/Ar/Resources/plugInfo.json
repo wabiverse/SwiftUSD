@@ -1,0 +1,23 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "ArResolver": {},
+                    "ArDefaultResolver": {
+                        "bases": [
+                            "ArResolver"
+                        ],
+                        "implementsContexts": true
+                    },
+                    "ArPackageResolver": {}
+                }
+            },
+            "LibraryPath": "", 
+            "Name": "Ar", 
+            "ResourcePath": "resources", 
+            "Root": "..", 
+            "Type": "library"
+        }
+    ]
+}
