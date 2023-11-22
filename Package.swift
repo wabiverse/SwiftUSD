@@ -48,8 +48,40 @@ let package = Package(
       targets: ["Plug"]
     ),
     .library(
+      name: "Ar",
+      targets: ["Ar"]
+    ),
+    .library(
+      name: "PyTf",
+      type: .dynamic,
+      targets: ["PyTf"]
+    ),
+    .library(
+      name: "PyPlug",
+      type: .dynamic,
+      targets: ["PyPlug"]
+    ),
+    .library(
+      name: "PyAr",
+      type: .dynamic,
+      targets: ["PyAr"]
+    ),
+    .executable(
+      name: "UsdView",
+      targets: ["UsdView"]
+    ),
+    .plugin(
+      name: "UsdGenSchema",
+      targets: ["UsdGenSchema"]
+    ),
+    .library(
       name: "Pixar",
-      targets: ["Pixar"]
+      targets: [
+        "Pixar",
+        "PyTf",
+        "PyPlug",
+        "PyAr"
+      ]
     ),
   ],
   dependencies: [
@@ -203,6 +235,110 @@ let package = Package(
     ),
 
     .target(
+      name: "Ar",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Js"),
+        .target(name: "Plug"),
+        .target(name: "Vt"),
+      ],
+      resources: [
+        .process("Resources"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ar"),
+      ]
+    ),
+
+    .target(
+      name: "PyTf",
+      dependencies: [
+        .target(name: "Tf"),
+      ],
+      path: "Python/PyTf",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Tf"),
+      ]
+    ),
+
+    .target(
+      name: "PyPlug",
+      dependencies: [
+        .target(name: "Plug"),
+      ],
+      path: "Python/PyPlug",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Plug"),
+      ]
+    ),
+
+    .target(
+      name: "PyAr",
+      dependencies: [
+        .target(name: "Ar"),
+      ],
+      path: "Python/PyAr",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ar"),
+      ]
+    ),
+
+    .executableTarget(
+      name: "UsdView",
+      dependencies: [
+        .target(name: "Pixar")
+      ]
+    ),
+
+    .plugin(
+      name: "UsdGenSchema", 
+      capability: .command(
+        intent: .custom(verb: "genschema", description: """
+          Customize and extend the layers of specific named API atop
+          the underlying scene graph with schema definitions defined
+          by prims, their properties, and (optionally) their default 
+          or fallback values. 
+
+          The schema definition files are written in a simple, human
+          readable, text-based markup language from the (.usda) file
+          format. The files are then processed with this plugin tool
+          to generate their corresponding C++, Python, and Swift API
+          code.
+
+          The generated C++, Python, and Swift code are then sent to
+          the compiler to generate their corresponding API code, and
+          made available to the USD runtime. Where it can be used to
+          bring the schema definition to life, and make it available
+          to the end user for use in their own applications, plugins
+          and tools.
+          """
+        ),
+        permissions: [
+          .allowNetworkConnections(
+            scope: .all(), 
+            reason: "Pixar.Ar may require network access to load assets."
+          ),
+          .writeToPackageDirectory(
+            reason: "Generation of schema code requires write access."
+          ),
+        ]
+      )
+    ),
+
+    .target(
       name: "Pixar",
       dependencies: [
         /* ------ base. ------ */
@@ -214,6 +350,8 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Work"),
         .target(name: "Plug"),
+        /* ------- usd. ------ */
+        .target(name: "Ar"),
         /* ------------------- */
       ],
       swiftSettings: [
