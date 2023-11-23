@@ -1232,8 +1232,11 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 namespace boost {
 
-template <typename T> T *get_pointer(PXR_NS::TfRefPtr<T> const &p) {
-  return get_pointer(p);
+template<typename T>
+T *
+get_pointer(PXR_NS::TfRefPtr<T> const& p)
+{
+    return get_pointer(p);
 }
 
 } // end namespace boost

@@ -48,7 +48,6 @@
 #include <Ar/resolverContext.h>
 #include <Ar/resolverContextBinder.h>
 #include <Ar/resolverScopedCache.h>
-#include <Ar/TestArURIResolver_plugin.h>
 #include <Ar/threadLocalScopedCache.h>
 #include <Ar/timestamp.h>
 #include <Ar/writableAsset.h>

@@ -56,6 +56,10 @@ let package = Package(
       targets: ["Kind"]
     ),
     .library(
+      name: "Sdf",
+      targets: ["Sdf"]
+    ),
+    .library(
       name: "PyTf",
       type: .dynamic,
       targets: ["PyTf"]
@@ -75,6 +79,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyKind"]
     ),
+    .library(
+      name: "PySdf",
+      type: .dynamic,
+      targets: ["PySdf"]
+    ),
     .executable(
       name: "UsdView",
       targets: ["UsdView"]
@@ -91,6 +100,7 @@ let package = Package(
         "PyPlug",
         "PyAr",
         "PyKind",
+        "PySdf",
       ]
     ),
   ],
@@ -274,6 +284,23 @@ let package = Package(
     ),
 
     .target(
+      name: "Sdf",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Ar"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Sdf"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Tf"),
@@ -333,39 +360,53 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PySdf",
+      dependencies: [
+        .target(name: "Sdf"),
+      ],
+      path: "Python/PySdf",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Sdf"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
-        .target(name: "Pixar")
+        .target(name: "Pixar"),
       ]
     ),
 
     .plugin(
-      name: "UsdGenSchema", 
+      name: "UsdGenSchema",
       capability: .command(
         intent: .custom(verb: "genschema", description: """
-          Customize and extend the layers of specific named API atop
-          the underlying scene graph with schema definitions defined
-          by prims, their properties, and (optionally) their default 
-          or fallback values. 
+        Customize and extend the layers of specific named API atop
+        the underlying scene graph with schema definitions defined
+        by prims, their properties, and (optionally) their default 
+        or fallback values. 
 
-          The schema definition files are written in a simple, human
-          readable, text-based markup language from the (.usda) file
-          format. The files are then processed with this plugin tool
-          to generate their corresponding C++, Python, and Swift API
-          code.
+        The schema definition files are written in a simple, human
+        readable, text-based markup language from the (.usda) file
+        format. The files are then processed with this plugin tool
+        to generate their corresponding C++, Python, and Swift API
+        code.
 
-          The generated C++, Python, and Swift code are then sent to
-          the compiler to generate their corresponding API code, and
-          made available to the USD runtime. Where it can be used to
-          bring the schema definition to life, and make it available
-          to the end user for use in their own applications, plugins
-          and tools.
-          """
-        ),
+        The generated C++, Python, and Swift code are then sent to
+        the compiler to generate their corresponding API code, and
+        made available to the USD runtime. Where it can be used to
+        bring the schema definition to life, and make it available
+        to the end user for use in their own applications, plugins
+        and tools.
+        """),
         permissions: [
           .allowNetworkConnections(
-            scope: .all(), 
+            scope: .all(),
             reason: "Pixar.Ar may require network access to load assets."
           ),
           .writeToPackageDirectory(

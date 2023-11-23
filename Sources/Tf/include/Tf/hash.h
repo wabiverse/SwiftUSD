@@ -200,16 +200,18 @@ inline void TfHashAppend(HashState &h, TfCStrHashWrapper hcstr) {
 
 // std::hash version, attempted last.  Consider adding when we move to
 // C++17 or newer.
-/*
+
+/**
+ * @furby: 
+ * added in since i've already jumped to C++17. */
 template <class HashState, class T>
 inline auto Tf_HashImpl(HashState &h, T &&obj, ...)
     -> decltype(std::hash<typename std::decay<T>::type>()(
-                    std::forward<T>(obj)), void())
+                std::forward<T>(obj)), void())
 {
-    TfHashAppend(
-        h, std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)));
+  TfHashAppend(h, std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)));
 }
-*/
+
 
 // hash_value, attempted second.
 template <class HashState, class T>
@@ -470,13 +472,12 @@ public:
   /// Produce a hash code for \p obj.  See the class documentation for
   /// details.
   template <class T>
-  auto operator()(T &&obj) const
-      -> decltype(Tf_HashImpl(std::declval<Tf_HashState &>(),
-                              std::forward<T>(obj), 0),
-                  size_t()) {
-    Tf_HashState h;
-    Tf_HashImpl(h, std::forward<T>(obj), 0);
-    return h.GetCode();
+  auto operator()(T &&obj) const ->
+      decltype(Tf_HashImpl(std::declval<Tf_HashState &>(),
+                           std::forward<T>(obj), 0), size_t()) {
+      Tf_HashState h;
+      Tf_HashImpl(h, std::forward<T>(obj), 0);
+      return h.GetCode();
   }
 
   /// Produce a hash code by combining the hash codes of several objects.
