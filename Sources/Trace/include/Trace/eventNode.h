@@ -31,8 +31,9 @@
 #include "Trace/event.h"
 #include "Trace/eventData.h"
 
-#include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"
+
+#include "Tf/declarePtrs.h"
 #include "Tf/token.h"
 
 #include <vector>

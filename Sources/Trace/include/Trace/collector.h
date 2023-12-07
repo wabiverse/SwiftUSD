@@ -34,13 +34,15 @@
 #include "Trace/key.h"
 #include "Trace/threads.h"
 
+#include "Tf/refBase.h"
+
 #include "Tf/declarePtrs.h"
 #include "Tf/mallocTag.h"
 
 #include "Tf/pyTracing.h"
 
 #include "Tf/singleton.h"
-#include "Tf/refBase.h"
+
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
 

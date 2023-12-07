@@ -112,7 +112,7 @@ private:
                                            const boost::python::slice &index) {
     using namespace boost::python;
 
-    list result;
+    boost::python::list result;
 
     if (x._Validate()) {
       try {

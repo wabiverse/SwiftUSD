@@ -30,8 +30,9 @@
 
 #include "Vt/value.h"
 
-#include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"
+
+#include "Tf/declarePtrs.h"
 #include "Tf/staticTokens.h"
 #include "Tf/token.h"
 #include "Tf/weakBase.h"

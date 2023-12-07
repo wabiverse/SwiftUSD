@@ -45,7 +45,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class SdfLayer;
 class SdfSpec;
-template <class T> class TfRefPtr;
 class Sdf_Identity;
 
 // Sdf_Identities are held via intrusive_ptr so that we can carefully

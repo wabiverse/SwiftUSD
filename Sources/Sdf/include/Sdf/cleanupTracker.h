@@ -30,11 +30,11 @@
 #include "Sdf/spec.h"
 #include <pxr/pxrns.h>
 
+#include <vector>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 SDF_DECLARE_HANDLES(SdfSpec);
-
-#include <vector>
 
 /// \class Sdf_CleanupTracker
 ///

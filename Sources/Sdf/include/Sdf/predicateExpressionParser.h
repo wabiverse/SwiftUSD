@@ -39,7 +39,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // fwd decl, from parserHelpers.cpp.
 std::string Sdf_EvalQuotedString(const char *x, size_t n, size_t trimBothSides,
-                                 unsigned int *numLines = NULL);
+                                 unsigned int *numLines);
 
 struct SdfPredicateExprBuilder {
   SdfPredicateExprBuilder() { OpenGroup(); }
@@ -325,7 +325,7 @@ template <> struct PredAction<PredArgString> {
       trimAmount = 1;
     }
     builder.AddFuncArg(
-        VtValue(Sdf_EvalQuotedString(instr.c_str(), instr.size(), trimAmount)));
+        VtValue(Sdf_EvalQuotedString(instr.c_str(), instr.size(), trimAmount, NULL)));
   }
 };
 

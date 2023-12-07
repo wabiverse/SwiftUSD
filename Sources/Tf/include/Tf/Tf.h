@@ -119,18 +119,22 @@
 #include <Tf/functionTraits.h>
 #include <Tf/getenv.h>
 
-// #include <Tf/instantiateSingleton.h>
-// #include <Tf/instantiateStacked.h>
-// #include <Tf/instantiateType.h>
+#include <Tf/instantiateSingleton.h>
+#include <Tf/instantiateStacked.h>
+#include <Tf/instantiateType.h>
 #include <Tf/iterator.h>
 
 #include <Tf/pyInterpreter.h>
 
+#include <Tf/pyCall.h>
 #include <Tf/pyLock.h>
 
 #include <Tf/pySafePython.h>
 
+#include <Tf/pyError.h>
 #include <Tf/pyUtils.h>
+
+#include <Tf/pyResultConversions.h>
 
 #include <Tf/pyObjWrapper.h>
 #include <Tf/pyTracing.h>
@@ -146,7 +150,7 @@
 
 #include <Tf/scoped.h>
 #include <Tf/scopeDescription.h>
-// #include <Tf/scopeDescriptionPrivate.h>
+#include <Tf/scopeDescriptionPrivate.h>
 #include <Tf/scriptModuleLoader.h>
 #include <Tf/setenv.h>
 

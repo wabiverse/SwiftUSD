@@ -79,7 +79,7 @@
 
 #include "Arch/demangle.h"
 #include "Sdf/declareHandles.h"
-#include "Tf/Tf.h"
+#include "Tf/api.h"
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"
 

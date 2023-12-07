@@ -431,6 +431,7 @@ let package = Package(
         /* ------- usd. ------ */
         .target(name: "Ar"),
         .target(name: "Kind"),
+        .target(name: "Sdf"),
         /* ------------------- */
       ],
       swiftSettings: [

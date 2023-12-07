@@ -29,8 +29,10 @@
 #include "Ar/Ar.h"
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
-#include "Tf/declarePtrs.h"
+
 #include "Tf/refBase.h"
+
+#include "Tf/declarePtrs.h"
 #include "Tf/staticTokens.h"
 #include "Tf/token.h"
 #include "Tf/type.h"

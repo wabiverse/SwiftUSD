@@ -27,8 +27,10 @@
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/types.h"
-#include "Tf/declarePtrs.h"
+
 #include "Tf/refBase.h"
+
+#include "Tf/declarePtrs.h"
 #include "Tf/weakBase.h"
 #include <pxr/pxrns.h>
 
