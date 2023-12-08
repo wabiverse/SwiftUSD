@@ -37,7 +37,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class U> class TfRefPtr;
+//template <class U> class TfRefPtr;
 
 template <template <class> class PtrTemplate, class DataType>
 class TfWeakPtrFacade;

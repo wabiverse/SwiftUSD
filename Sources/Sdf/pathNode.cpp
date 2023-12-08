@@ -35,7 +35,7 @@
 #include "Tf/stl.h"
 #include <pxr/pxrns.h>
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <OneTBB/tbb/concurrent_hash_map.h>
 #include <OneTBB/tbb/spin_mutex.h>

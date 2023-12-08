@@ -36,7 +36,7 @@
 #include "Tf/stringUtils.h"
 #include "Tf/type.h"
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 #include <ostream>

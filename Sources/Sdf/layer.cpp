@@ -66,7 +66,7 @@
 #include "Tf/scopeDescription.h"
 #include "Tf/stackTrace.h"
 #include "Tf/staticData.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/withScopedParallelism.h"
 
 #include <OneTBB/tbb/queuing_rw_mutex.h>

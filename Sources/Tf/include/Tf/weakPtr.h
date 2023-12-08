@@ -42,7 +42,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class TfHash;
-template <class U> class TfRefPtr;
+//template <class U> class TfRefPtr;
 template <class T> class TfWeakPtr;
 
 /// \class TfWeakPtr

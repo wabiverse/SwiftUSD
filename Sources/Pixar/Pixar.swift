@@ -28,7 +28,7 @@
 // @_exported import Tf
 @_exported import Js
 @_exported import Gf
-// @_exported import Trace
+@_exported import Trace
 @_exported import Vt
 @_exported import Work
 @_exported import Plug

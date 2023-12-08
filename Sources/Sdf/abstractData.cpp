@@ -22,7 +22,7 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "Sdf/abstractData.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include <pxr/pxrns.h>
 
 #include <ostream>

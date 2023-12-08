@@ -23,7 +23,7 @@
 //
 
 #include "Sdf/data.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include "Work/utils.h"
 #include <pxr/pxrns.h>
 

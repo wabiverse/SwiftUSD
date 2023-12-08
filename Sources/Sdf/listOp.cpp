@@ -33,7 +33,7 @@
 #include "Tf/registryManager.h"
 #include "Tf/token.h"
 #include "Tf/type.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include <pxr/pxrns.h>
 
 #include <boost/optional.hpp>

@@ -29,7 +29,7 @@
 #include "Trace/collection.h"
 #include "Trace/collectionNotice.h"
 #include "Trace/reporter.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Arch/stackTrace.h"
 #include "Arch/timing.h"

@@ -7,7 +7,7 @@
 // #include <Sdf/abstractData.h>
 // #include <Sdf/accessorHelpers.h>
 // #include <Sdf/allowed.h>
-// #include <Sdf/assetPath.h>
+#include <Sdf/assetPath.h>
 // #include <Sdf/assetPathResolver.h>
 // #include <Sdf/attributeSpec.h>
 // #include <Sdf/changeBlock.h>
@@ -23,7 +23,7 @@
 // #include <Sdf/connectionListEditor.h>
 // #include <Sdf/copyUtils.h>
 // #include <Sdf/data.h>
-// #include <Sdf/debugCodes.h>
+#include <Sdf/debugCodes.h>
 // #include <Sdf/declareHandles.h>
 // #include <Sdf/declareSpec.h>
 // #include <Sdf/fileFormat.h>
@@ -53,13 +53,13 @@
 // #include <Sdf/parserHelpers.h>
 // #include <Sdf/parserValueContext.h>
 #include <Sdf/path.h>
-// #include <Sdf/pathExpression.h>
+#include <Sdf/pathExpression.h>
 // #include <Sdf/pathExpressionEval.h>
 // #include <Sdf/pathNode.h>
 // #include <Sdf/pathTable.h>
 // #include <Sdf/payload.h>
 // #include <Sdf/pool.h>
-// #include <Sdf/predicateExpression.h>
+#include <Sdf/predicateExpression.h>
 // #include <Sdf/predicateExpressionParser.h>
 // #include <Sdf/predicateLibrary.h>
 // #include <Sdf/predicateProgram.h>
@@ -91,7 +91,7 @@
 // // #include <Sdf/textFileFormat.yy>
 // #include <Sdf/textParserContext.h>
 // #include <Sdf/timeCode.h>
-// #include <Sdf/tokens.h>
+#include <Sdf/tokens.h>
 // #include <Sdf/types.h>
 // #include <Sdf/valueTypeName.h>
 // #include <Sdf/valueTypePrivate.h>

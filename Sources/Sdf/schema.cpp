@@ -40,7 +40,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/envSetting.h"
 #include "Tf/instantiateSingleton.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include "Vt/dictionary.h"
 
 #include <deque>

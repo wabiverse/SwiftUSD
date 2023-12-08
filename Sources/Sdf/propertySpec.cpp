@@ -35,7 +35,7 @@
 
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <ostream>
 

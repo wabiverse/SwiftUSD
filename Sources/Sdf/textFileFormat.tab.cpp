@@ -118,7 +118,7 @@
 #include "Vt/dictionary.h"
 #include <pxr/pxrns.h>
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Arch/pxrerrno.h"
 #include "Gf/matrix4d.h"

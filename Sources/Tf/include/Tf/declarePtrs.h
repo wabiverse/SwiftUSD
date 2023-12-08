@@ -29,9 +29,10 @@
 ///
 /// This file provides typedefs for standard pointer types.
 
-#include "Tf/refPtr.h"
-#include "Tf/weakPtr.h"
 #include <pxr/pxrns.h>
+
+#include "Tf/weakPtr.h"
+#include "Tf/refPtr.h"
 
 #include <vector>
 

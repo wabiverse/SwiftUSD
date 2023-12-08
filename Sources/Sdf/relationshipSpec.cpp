@@ -36,7 +36,7 @@
 #include <pxr/pxrns.h>
 
 #include "Tf/type.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <functional>
 

@@ -35,7 +35,7 @@
 #include "Tf/pathUtils.h"
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include <ostream>
 
 using namespace boost::multi_index;

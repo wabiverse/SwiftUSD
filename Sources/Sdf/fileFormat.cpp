@@ -37,7 +37,7 @@
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
 #include "Tf/type.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

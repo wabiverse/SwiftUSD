@@ -26,7 +26,7 @@
 
 #include <pxr/pxrns.h>
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 

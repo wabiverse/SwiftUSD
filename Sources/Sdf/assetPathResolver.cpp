@@ -37,7 +37,7 @@
 #include "Tf/pathUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/staticTokens.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <utility>
 #include <vector>

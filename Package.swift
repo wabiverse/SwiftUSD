@@ -89,8 +89,8 @@ let package = Package(
       targets: ["UsdView"]
     ),
     .plugin(
-      name: "UsdGenSchema",
-      targets: ["UsdGenSchema"]
+      name: "UsdGenSchemaPlugin",
+      targets: ["UsdGenSchemaPlugin"]
     ),
     .library(
       name: "Pixar",
@@ -106,7 +106,7 @@ let package = Package(
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.0"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.1"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
@@ -138,18 +138,6 @@ let package = Package(
         /* ---------- Apple only libs. ---------- */
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
-      ],
-      exclude: [
-        /* ---------- Exclude example files. ---------- */
-        // "usd/usd/examples.cpp",
-        /* ---------- Exclude codegen files. ---------- */
-        // "usd/usd/codegenTemplates",
-        /* ---------- Exclude plugins files. ---------- */
-        // "imaging/plugin/hdEmbree", // TODO: add Embree.
-        // "usd/plugin/sdrOsl",       // TODO: add OSL.
-        /* ---------- Exclude testing files. ---------- */
-        // "imaging/glf/testGLContext.cpp",
-        /* -------------------------------------------- */
       ],
       publicHeadersPath: "include",
       cxxSettings: [
@@ -383,7 +371,7 @@ let package = Package(
     ),
 
     .plugin(
-      name: "UsdGenSchema",
+      name: "UsdGenSchemaPlugin",
       capability: .command(
         intent: .custom(verb: "genschema", description: """
         Customize and extend the layers of specific named API atop

@@ -44,7 +44,7 @@
 #include "Tf/stl.h"
 #include "Tf/stringUtils.h"
 #include "Tf/type.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 #include "Tf/pyInterpreter.h"

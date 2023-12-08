@@ -32,7 +32,7 @@
 #include "Tf/iterator.h"
 #include "Tf/scopeDescription.h"
 #include "Tf/staticTokens.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include <pxr/pxrns.h>
 
 #include <algorithm>

@@ -26,7 +26,7 @@
 
 #include "Trace/collector.h"
 #include "Trace/reporter.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <boost/python/def.hpp>
 #include <boost/python/enum.hpp>

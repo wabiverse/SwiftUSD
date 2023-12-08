@@ -34,7 +34,7 @@
 
 #include "Tf/iterator.h"
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/converter/registered.hpp>

@@ -31,7 +31,7 @@
 #include "Sdf/spec.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/stackTrace.h"
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 #include <pxr/pxrns.h>
 
 using std::string;

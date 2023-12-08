@@ -81,7 +81,7 @@
 #include <Tf/expiryNotifier.h>
 
 #include <Tf/refPtr.h>
-#include <Tf/refPtrTracker.h>
+// #include <Tf/refPtrTracker.h>
 
 #include <Tf/weakBase.h>
 #include <Tf/weakPtrFacade.h>
@@ -132,6 +132,10 @@
 #include <Tf/pySafePython.h>
 
 #include <Tf/pyError.h>
+#include <Tf/pyEnum.h>
+#include <Tf/pyArg.h>
+#include <Tf/pyInvoke.h>
+#include <Tf/pyPolymorphic.h>
 #include <Tf/pyUtils.h>
 
 #include <Tf/pyResultConversions.h>

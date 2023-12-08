@@ -24,10 +24,11 @@
 #ifndef PXR_BASE_PLUG_NOTICE_H
 #define PXR_BASE_PLUG_NOTICE_H
 
+#include <pxr/pxrns.h>
+
 #include "Plug/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/notice.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
