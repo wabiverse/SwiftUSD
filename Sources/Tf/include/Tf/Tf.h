@@ -80,7 +80,6 @@
 
 #include <Tf/expiryNotifier.h>
 
-#include <Tf/refPtr.h>
 // #include <Tf/refPtrTracker.h>
 
 #include <Tf/weakBase.h>
@@ -119,9 +118,9 @@
 #include <Tf/functionTraits.h>
 #include <Tf/getenv.h>
 
-#include <Tf/instantiateSingleton.h>
-#include <Tf/instantiateStacked.h>
-#include <Tf/instantiateType.h>
+// #include <Tf/instantiateSingleton.h>
+// #include <Tf/instantiateStacked.h>
+// #include <Tf/instantiateType.h>
 #include <Tf/iterator.h>
 
 #include <Tf/pyInterpreter.h>
@@ -181,7 +180,7 @@
 // #include <Tf/pxrDoubleConversion/ieee.h>
 // #include <Tf/pxrDoubleConversion/strtod.h>
 // #include <Tf/pxrDoubleConversion/utils.h>
-#include <Tf/pxrPEGTL/pegtl.h>
+// #include <Tf/pxrPEGTL/pegtl.h>
 #include <Tf/pxrTslRobinMap/robin_growth_policy.h>
 #include <Tf/pxrTslRobinMap/robin_hash.h>
 #include <Tf/pxrTslRobinMap/robin_map.h>
@@ -196,5 +195,7 @@
 #include <Tf/noticeRegistry.h>
 
 #include <Tf/pyContainerConversions.h>
+
+#include <Tf/refPtr.h>
 
 #endif // __PXR_BASE_TF_H__

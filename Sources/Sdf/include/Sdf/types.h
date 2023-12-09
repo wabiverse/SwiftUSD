@@ -27,6 +27,8 @@
 /// \file sdf/types.h
 /// Basic Sdf data types
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/assetPath.h"
 #include "Sdf/declareHandles.h"
@@ -34,7 +36,6 @@
 #include "Sdf/opaqueValue.h"
 #include "Sdf/timeCode.h"
 #include "Sdf/valueTypeName.h"
-#include <pxr/pxrns.h>
 
 #include "Arch/demangle.h"
 #include "Arch/pxrinttypes.h"
