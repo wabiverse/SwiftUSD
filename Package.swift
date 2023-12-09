@@ -84,6 +84,26 @@ let package = Package(
       type: .dynamic,
       targets: ["PySdf"]
     ),
+    .library(
+      name: "PyGf",
+      type: .dynamic,
+      targets: ["PyGf"]
+    ),
+    .library(
+      name: "PyTrace",
+      type: .dynamic,
+      targets: ["PyTrace"]
+    ),
+    .library(
+      name: "PyVt",
+      type: .dynamic,
+      targets: ["PyVt"]
+    ),
+    .library(
+      name: "PyWork",
+      type: .dynamic,
+      targets: ["PyWork"]
+    ),
     .executable(
       name: "UsdView",
       targets: ["UsdView"]
@@ -93,15 +113,22 @@ let package = Package(
       targets: ["UsdGenSchemaPlugin"]
     ),
     .library(
-      name: "Pixar",
+      name: "PyPixar",
       targets: [
-        "Pixar",
         "PyTf",
+        "PyGf",
+        "PyTrace",
+        "PyVt",
+        "PyWork",
         "PyPlug",
         "PyAr",
         "PyKind",
         "PySdf"
       ]
+    ),
+    .library(
+      name: "Pixar",
+      targets: ["Pixar"]
     ),
   ],
   dependencies: [
@@ -325,7 +352,7 @@ let package = Package(
     .target(
       name: "PyTf",
       dependencies: [
-        .target(name: "Tf"),
+        .target(name: "Pixar"),
       ],
       path: "Python/PyTf",
       resources: [
@@ -340,9 +367,77 @@ let package = Package(
     ),
 
     .target(
+      name: "PyGf",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyGf",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Gf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
+        .define("MFB_PACKAGE_MODULE", to: "Gf"),
+      ]
+    ),
+
+    .target(
+      name: "PyTrace",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyTrace",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Trace"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
+        .define("MFB_PACKAGE_MODULE", to: "Trace"),
+      ]
+    ),
+
+    .target(
+      name: "PyVt",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyVt",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Vt"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
+        .define("MFB_PACKAGE_MODULE", to: "Vt"),
+      ]
+    ),
+
+    .target(
+      name: "PyWork",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyWork",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Work"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
+        .define("MFB_PACKAGE_MODULE", to: "Work"),
+      ]
+    ),
+
+    .target(
       name: "PyPlug",
       dependencies: [
-        .target(name: "Plug"),
+        .target(name: "Pixar"),
       ],
       path: "Python/PyPlug",
       resources: [
@@ -359,7 +454,7 @@ let package = Package(
     .target(
       name: "PyAr",
       dependencies: [
-        .target(name: "Ar"),
+        .target(name: "Pixar"),
       ],
       path: "Python/PyAr",
       resources: [
@@ -376,7 +471,7 @@ let package = Package(
     .target(
       name: "PyKind",
       dependencies: [
-        .target(name: "Kind"),
+        .target(name: "Pixar"),
       ],
       path: "Python/PyKind",
       resources: [
@@ -393,7 +488,7 @@ let package = Package(
     .target(
       name: "PySdf",
       dependencies: [
-        .target(name: "Sdf"),
+        .target(name: "Pixar"),
       ],
       path: "Python/PySdf",
       resources: [
