@@ -8,7 +8,7 @@ let package = Package(
     .visionOS(.v1),
     .iOS(.v12),
     .tvOS(.v12),
-    .watchOS(.v4),
+    .watchOS(.v4)
   ],
   products: [
     .library(
@@ -100,7 +100,7 @@ let package = Package(
         "PyPlug",
         "PyAr",
         "PyKind",
-        "PySdf",
+        "PySdf"
       ]
     ),
   ],
@@ -156,6 +156,10 @@ let package = Package(
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         /* --------- Apple platforms only. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        .define("MFB_PACKAGE_NAME", to: "Arch"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Arch"),
+        .define("MFB_PACKAGE_MODULE", to: "Arch"),
+        .define("ARCH_EXPORTS", to: "1")
       ]
     ),
 
@@ -166,6 +170,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Tf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
+        .define("MFB_PACKAGE_MODULE", to: "Tf"),
+        .define("TF_EXPORTS", to: "1")
       ]
     ),
 
@@ -177,6 +184,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Js"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Js"),
+        .define("MFB_PACKAGE_MODULE", to: "Js"),
+        .define("JS_EXPORTS", to: "1")
       ]
     ),
 
@@ -188,6 +198,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Gf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
+        .define("MFB_PACKAGE_MODULE", to: "Gf"),
+        .define("GF_EXPORTS", to: "1")
       ]
     ),
 
@@ -200,6 +213,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Trace"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
+        .define("MFB_PACKAGE_MODULE", to: "Trace"),
+        .define("TRACE_EXPORTS", to: "1")
       ]
     ),
 
@@ -213,6 +229,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Vt"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
+        .define("MFB_PACKAGE_MODULE", to: "Vt"),
+        .define("VT_EXPORTS", to: "1")
       ]
     ),
 
@@ -225,6 +244,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Work"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
+        .define("MFB_PACKAGE_MODULE", to: "Work"),
+        .define("WORK_EXPORTS", to: "1")
       ]
     ),
 
@@ -239,6 +261,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Plug"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
+        .define("MFB_PACKAGE_MODULE", to: "Plug"),
+        .define("PLUG_EXPORTS", to: "1")
       ]
     ),
 
@@ -256,6 +281,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_PACKAGE_MODULE", to: "Ar"),
+        .define("AR_EXPORTS", to: "1")
       ]
     ),
 
@@ -268,6 +296,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Kind"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
+        .define("MFB_PACKAGE_MODULE", to: "Kind"),
+        .define("KIND_EXPORTS", to: "1")
       ]
     ),
 
@@ -285,6 +316,9 @@ let package = Package(
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Sdf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
+        .define("MFB_PACKAGE_MODULE", to: "Sdf"),
+        .define("SDF_EXPORTS", to: "1")
       ]
     ),
 
@@ -300,6 +334,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Tf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
+        .define("MFB_PACKAGE_MODULE", to: "Tf"),
       ]
     ),
 
@@ -315,6 +351,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Plug"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
+        .define("MFB_PACKAGE_MODULE", to: "Plug"),
       ]
     ),
 
@@ -330,6 +368,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_PACKAGE_MODULE", to: "Ar"),
       ]
     ),
 
@@ -345,6 +385,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Kind"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
+        .define("MFB_PACKAGE_MODULE", to: "Kind"),
       ]
     ),
 
@@ -360,6 +402,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Sdf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
+        .define("MFB_PACKAGE_MODULE", to: "Sdf"),
       ]
     ),
 
@@ -374,24 +418,24 @@ let package = Package(
       name: "UsdGenSchemaPlugin",
       capability: .command(
         intent: .custom(verb: "genschema", description: """
-        Customize and extend the layers of specific named API atop
-        the underlying scene graph with schema definitions defined
-        by prims, their properties, and (optionally) their default 
-        or fallback values. 
+          Customize and extend the layers of specific named API atop
+          the underlying scene graph with schema definitions defined
+          by prims, their properties, and (optionally) their default 
+          or fallback values. 
 
-        The schema definition files are written in a simple, human
-        readable, text-based markup language from the (.usda) file
-        format. The files are then processed with this plugin tool
-        to generate their corresponding C++, Python, and Swift API
-        code.
+          The schema definition files are written in a simple, human
+          readable, text-based markup language from the (.usda) file
+          format. The files are then processed with this plugin tool
+          to generate their corresponding C++, Python, and Swift API
+          code.
 
-        The generated C++, Python, and Swift code are then sent to
-        the compiler to generate their corresponding API code, and
-        made available to the USD runtime. Where it can be used to
-        bring the schema definition to life, and make it available
-        to the end user for use in their own applications, plugins
-        and tools.
-        """),
+          The generated C++, Python, and Swift code are then sent to
+          the compiler to generate their corresponding API code, and
+          made available to the USD runtime. Where it can be used to
+          bring the schema definition to life, and make it available
+          to the end user for use in their own applications, plugins
+          and tools.
+          """),
         permissions: [
           .allowNetworkConnections(
             scope: .all(),

@@ -10,7 +10,7 @@
 #include <Plug/plugin.h>
 #include <Plug/registry.h>
 #include <Plug/staticInterface.h>
-// #include <Plug/testPlugBase.h>
+#include <Plug/testPlugBase.h>
 #include <Plug/thisPlugin.h>
 
 #endif // __PXR_BASE_PLUG_H__
