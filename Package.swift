@@ -60,6 +60,10 @@ let package = Package(
       targets: ["Sdf"]
     ),
     .library(
+      name: "Pcp",
+      targets: ["Pcp"]
+    ),
+    .library(
       name: "PyTf",
       type: .dynamic,
       targets: ["PyTf"]
@@ -78,11 +82,6 @@ let package = Package(
       name: "PyKind",
       type: .dynamic,
       targets: ["PyKind"]
-    ),
-    .library(
-      name: "PySdf",
-      type: .dynamic,
-      targets: ["PySdf"]
     ),
     .library(
       name: "PyGf",
@@ -104,6 +103,16 @@ let package = Package(
       type: .dynamic,
       targets: ["PyWork"]
     ),
+    .library(
+      name: "PySdf",
+      type: .dynamic,
+      targets: ["PySdf"]
+    ),
+    .library(
+      name: "PyPcp",
+      type: .dynamic,
+      targets: ["PyPcp"]
+    ),
     .executable(
       name: "UsdView",
       targets: ["UsdView"]
@@ -123,7 +132,8 @@ let package = Package(
         "PyPlug",
         "PyAr",
         "PyKind",
-        "PySdf"
+        "PySdf",
+        "PyPcp"
       ]
     ),
     .library(
@@ -350,6 +360,25 @@ let package = Package(
     ),
 
     .target(
+      name: "Pcp",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Pcp"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
+        .define("MFB_PACKAGE_MODULE", to: "Pcp"),
+        .define("PCP_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -502,6 +531,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyPcp",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyPcp",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Pcp"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
+        .define("MFB_PACKAGE_MODULE", to: "Pcp"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -559,6 +605,7 @@ let package = Package(
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),
+        .target(name: "Pcp"),
         /* ------------------- */
       ],
       swiftSettings: [

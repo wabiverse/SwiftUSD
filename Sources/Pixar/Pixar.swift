@@ -1,22 +1,49 @@
-/* --------------------------------------------------------------\n * :: :  K  R  A  K  E  N  :                                   ::\n * --------------------------------------------------------------\n * @wabistudios :: multiverse :: kraken\n *\n * This program is free software; you can redistribute it, and/or\n * modify it under the terms of the GNU General Public License as\n * published by the Free Software Foundation; either version 2 of\n * the License, or (at your option) any later version.\n *\n * This program is distributed in the hope that it will be useful\n * but WITHOUT ANY WARRANTY; without even the implied warranty of\n * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Check out\n * the GNU General Public License for more details.\n *\n * You should have received a copy for this software license, the\n * GNU General Public License along with this program; or, if not\n * write to the Free Software Foundation, Inc., to the address of\n * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n *\n *                            Copyright (C) 2023 Wabi Foundation. \n *                                           All Rights Reserved.\n * --------------------------------------------------------------\n *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .\n * -------------------------------------------------------------- */
+/* --------------------------------------------------------------
+ * :: :  M  E  T  A  V  E  R  S  E  :                          ::
+ * --------------------------------------------------------------
+ * This program is free software; you can redistribute it, and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Check out
+ * the GNU General Public License for more details.
+ *
+ * You should have received a copy for this software license, the
+ * GNU General Public License along with this program; or, if not
+ * write to the Free Software Foundation, Inc., to the address of
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ * --------------------------------------------------------------
+ *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
+ * -------------------------------------------------------------- */
 
 @_exported import CxxStdlib
 
 /* ---- Pixar.Base ---- */
 @_exported import Arch
+
+@_exported import Gf
+
 // @_exported import Tf
 @_exported import Js
-@_exported import Gf
+@_exported import Plug
 @_exported import Trace
 @_exported import Vt
 @_exported import Work
-@_exported import Plug
+
 /* ----- Pixar.Usd ---- */
 @_exported import Ar
 @_exported import Kind
-@_exported import Sdf
+// @_exported import Sdf
+@_exported import Pcp
+
 /* ----- Pixar.NS ----- */
 @_exported import pxr
+
 /* -------------------- */
 
 public extension Pixar
@@ -34,25 +61,24 @@ public extension Pixar
   {}
 
   /**
-    # ``Js``
+     # ``Js``
 
-    ## Overview
+     ## Overview
 
-    **Js** is the **JSON I/O** library, it contains methods for parsing and
-    writing JSON data from C++, and converting between arbitrary recursive
-    container structures.
-  */
+     **Js** is the **JSON I/O** library, it contains methods for parsing and
+     writing JSON data from C++, and converting between arbitrary recursive
+     container structures.
+   */
   struct Js
   {}
-
 
   /**
     # ``Tf``
 
     ## Overview
-    
+
     **Tf** is the **tools foundations** library, it contains foundation
-    classes and functions for all C/C++ software development.  
+    classes and functions for all C/C++ software development.
    */
   struct Tf
   {}
@@ -64,7 +90,7 @@ public extension Pixar
 
     **Gf** is the **graphics foundations** library, it contains foundation
     classes and functions for working with the basic mathematical aspects
-    of computer graphics.  
+    of computer graphics.
    */
   struct Gf
   {}
@@ -96,7 +122,7 @@ public extension Pixar
 
     ## Overview
 
-    **Plug** is the **plugin-in framework** implementation, the ``PlugPlugin`` class 
+    **Plug** is the **plugin-in framework** implementation, the ``PlugPlugin`` class
     defines the interface to plug-in modules. The ``PlugRegistry`` class defines a
     mechanism for registering and looking up plug-in modules both automatically upon
     first use and manually at runtime by client calls to ``PlugRegistry.RegisterPlugins()``.
