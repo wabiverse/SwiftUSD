@@ -36,8 +36,8 @@
 /* ----- Pixar.Usd ---- */
 @_exported import Ar
 @_exported import Kind
-// @_exported import Sdf
-// @_exported import Pcp
+@_exported import Sdf
+@_exported import Pcp
 @_exported import Usd
 
 /* ----- Pixar.NS ----- */
