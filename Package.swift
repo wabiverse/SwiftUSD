@@ -64,6 +64,10 @@ let package = Package(
       targets: ["Pcp"]
     ),
     .library(
+      name: "Usd",
+      targets: ["Usd"]
+    ),
+    .library(
       name: "PyTf",
       type: .dynamic,
       targets: ["PyTf"]
@@ -113,6 +117,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyPcp"]
     ),
+    .library(
+      name: "PyUsd",
+      type: .dynamic,
+      targets: ["PyUsd"]
+    ),
     .executable(
       name: "UsdView",
       targets: ["UsdView"]
@@ -133,7 +142,8 @@ let package = Package(
         "PyAr",
         "PyKind",
         "PySdf",
-        "PyPcp"
+        "PyPcp",
+        "PyUsd"
       ]
     ),
     .library(
@@ -379,6 +389,33 @@ let package = Package(
     ),
 
     .target(
+      name: "Usd",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Gf"),
+        .target(name: "Kind"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Pcp"),
+      ],
+      resources: [
+        .copy("codegenTemplates"),
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Usd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
+        .define("MFB_PACKAGE_MODULE", to: "Usd"),
+        .define("USD_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -548,6 +585,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyUsd",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsd",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Usd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
+        .define("MFB_PACKAGE_MODULE", to: "Usd"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -606,6 +660,7 @@ let package = Package(
         .target(name: "Kind"),
         .target(name: "Sdf"),
         .target(name: "Pcp"),
+        .target(name: "Usd"),
         /* ------------------- */
       ],
       swiftSettings: [

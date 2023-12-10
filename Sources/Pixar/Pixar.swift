@@ -25,9 +25,7 @@
 
 /* ---- Pixar.Base ---- */
 @_exported import Arch
-
 @_exported import Gf
-
 // @_exported import Tf
 @_exported import Js
 @_exported import Plug
@@ -39,7 +37,8 @@
 @_exported import Ar
 @_exported import Kind
 // @_exported import Sdf
-@_exported import Pcp
+// @_exported import Pcp
+@_exported import Usd
 
 /* ----- Pixar.NS ----- */
 @_exported import pxr
