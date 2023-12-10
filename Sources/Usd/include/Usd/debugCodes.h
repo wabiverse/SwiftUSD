@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Pixar
+// Copyright 2016 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,34 +21,23 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXR_USD_AR_H__
-#define __PXR_USD_AR_H__
+#ifndef PXR_USD_USD_DEBUG_CODES_H
+#define PXR_USD_USD_DEBUG_CODES_H
 
-#define AR_VERSION 2
+#include "Tf/debug.h"
+#include <pxr/pxrns.h>
 
-// ar
-#include <Ar/api.h>
-#include <Ar/asset.h>
-#include <Ar/assetInfo.h>
-#include <Ar/debugCodes.h>
-#include <Ar/defaultResolver.h>
-#include <Ar/defaultResolverContext.h>
-#include <Ar/definePackageResolver.h>
-#include <Ar/defineResolver.h>
-#include <Ar/defineResolverContext.h>
-#include <Ar/filesystemAsset.h>
-#include <Ar/filesystemWritableAsset.h>
-#include <Ar/inMemoryAsset.h>
-#include <Ar/notice.h>
-#include <Ar/packageResolver.h>
-#include <Ar/packageUtils.h>
-#include <Ar/resolvedPath.h>
-#include <Ar/resolver.h>
-#include <Ar/resolverContext.h>
-#include <Ar/resolverContextBinder.h>
-#include <Ar/resolverScopedCache.h>
-#include <Ar/threadLocalScopedCache.h>
-#include <Ar/timestamp.h>
-#include <Ar/writableAsset.h>
+PXR_NAMESPACE_OPEN_SCOPE
 
-#endif // __PXR_USD_AR_H__
+TF_DEBUG_CODES(USD_AUTO_APPLY_API_SCHEMAS, USD_CHANGES, USD_CLIPS,
+               USD_COMPOSITION, USD_DATA_BD, USD_DATA_BD_TRY, USD_INSTANCING,
+               USD_PATH_RESOLUTION, USD_PAYLOADS, USD_PRIM_LIFETIMES,
+               USD_SCHEMA_REGISTRATION, USD_STAGE_CACHE, USD_STAGE_LIFETIMES,
+               USD_STAGE_OPEN, USD_STAGE_INSTANTIATION_TIME,
+               USD_VALUE_RESOLUTION, USD_VALIDATE_VARIABILITY
+
+);
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // PXR_USD_USD_DEBUG_CODES_H

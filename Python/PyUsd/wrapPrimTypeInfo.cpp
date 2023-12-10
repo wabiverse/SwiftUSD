@@ -21,34 +21,34 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXR_USD_AR_H__
-#define __PXR_USD_AR_H__
+#include "Usd/primTypeInfo.h"
+#include "Usd/pyConversions.h"
+#include <pxr/pxrns.h>
 
-#define AR_VERSION 2
+#include "Tf/pyResultConversions.h"
+#include <boost/python.hpp>
 
-// ar
-#include <Ar/api.h>
-#include <Ar/asset.h>
-#include <Ar/assetInfo.h>
-#include <Ar/debugCodes.h>
-#include <Ar/defaultResolver.h>
-#include <Ar/defaultResolverContext.h>
-#include <Ar/definePackageResolver.h>
-#include <Ar/defineResolver.h>
-#include <Ar/defineResolverContext.h>
-#include <Ar/filesystemAsset.h>
-#include <Ar/filesystemWritableAsset.h>
-#include <Ar/inMemoryAsset.h>
-#include <Ar/notice.h>
-#include <Ar/packageResolver.h>
-#include <Ar/packageUtils.h>
-#include <Ar/resolvedPath.h>
-#include <Ar/resolver.h>
-#include <Ar/resolverContext.h>
-#include <Ar/resolverContextBinder.h>
-#include <Ar/resolverScopedCache.h>
-#include <Ar/threadLocalScopedCache.h>
-#include <Ar/timestamp.h>
-#include <Ar/writableAsset.h>
+using namespace boost::python;
 
-#endif // __PXR_USD_AR_H__
+PXR_NAMESPACE_USING_DIRECTIVE
+
+void wrapUsdPrimTypeInfo() {
+  typedef UsdPrimTypeInfo This;
+  class_<This, boost::noncopyable>("PrimTypeInfo", no_init)
+      .def("GetTypeName", &This::GetTypeName,
+           return_value_policy<return_by_value>())
+      .def("GetAppliedAPISchemas", &This::GetAppliedAPISchemas,
+           return_value_policy<TfPySequenceToList>())
+      .def("GetSchemaType", &This::GetSchemaType,
+           return_value_policy<return_by_value>())
+      .def("GetSchemaTypeName", &This::GetSchemaTypeName,
+           return_value_policy<return_by_value>())
+      .def("GetPrimDefinition", &This::GetPrimDefinition,
+           return_internal_reference<>())
+      .def(self == self)
+      .def(self != self)
+
+      .def("GetEmptyPrimType", &This::GetEmptyPrimType,
+           return_internal_reference<>())
+      .staticmethod("GetEmptyPrimType");
+}

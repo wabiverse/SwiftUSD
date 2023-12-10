@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Pixar
+// Copyright 2017 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,34 +21,27 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXR_USD_AR_H__
-#define __PXR_USD_AR_H__
+#ifndef USD_API_H
+#define USD_API_H
 
-#define AR_VERSION 2
+#include "Arch/export.h"
 
-// ar
-#include <Ar/api.h>
-#include <Ar/asset.h>
-#include <Ar/assetInfo.h>
-#include <Ar/debugCodes.h>
-#include <Ar/defaultResolver.h>
-#include <Ar/defaultResolverContext.h>
-#include <Ar/definePackageResolver.h>
-#include <Ar/defineResolver.h>
-#include <Ar/defineResolverContext.h>
-#include <Ar/filesystemAsset.h>
-#include <Ar/filesystemWritableAsset.h>
-#include <Ar/inMemoryAsset.h>
-#include <Ar/notice.h>
-#include <Ar/packageResolver.h>
-#include <Ar/packageUtils.h>
-#include <Ar/resolvedPath.h>
-#include <Ar/resolver.h>
-#include <Ar/resolverContext.h>
-#include <Ar/resolverContextBinder.h>
-#include <Ar/resolverScopedCache.h>
-#include <Ar/threadLocalScopedCache.h>
-#include <Ar/timestamp.h>
-#include <Ar/writableAsset.h>
+#if defined(PXR_STATIC)
+#define USD_API
+#define USD_API_TEMPLATE_CLASS(...)
+#define USD_API_TEMPLATE_STRUCT(...)
+#define USD_LOCAL
+#else
+#if defined(USD_EXPORTS)
+#define USD_API ARCH_EXPORT
+#define USD_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
+#define USD_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
+#else
+#define USD_API ARCH_IMPORT
+#define USD_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
+#define USD_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
+#endif
+#define USD_LOCAL ARCH_HIDDEN
+#endif
 
-#endif // __PXR_USD_AR_H__
+#endif

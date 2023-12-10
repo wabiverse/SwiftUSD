@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Pixar
+// Copyright 2016 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,34 +21,18 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef __PXR_USD_AR_H__
-#define __PXR_USD_AR_H__
+#include "Usd/primDataHandle.h"
+#include "Usd/primData.h"
+#include <pxr/pxrns.h>
 
-#define AR_VERSION 2
+PXR_NAMESPACE_OPEN_SCOPE
 
-// ar
-#include <Ar/api.h>
-#include <Ar/asset.h>
-#include <Ar/assetInfo.h>
-#include <Ar/debugCodes.h>
-#include <Ar/defaultResolver.h>
-#include <Ar/defaultResolverContext.h>
-#include <Ar/definePackageResolver.h>
-#include <Ar/defineResolver.h>
-#include <Ar/defineResolverContext.h>
-#include <Ar/filesystemAsset.h>
-#include <Ar/filesystemWritableAsset.h>
-#include <Ar/inMemoryAsset.h>
-#include <Ar/notice.h>
-#include <Ar/packageResolver.h>
-#include <Ar/packageUtils.h>
-#include <Ar/resolvedPath.h>
-#include <Ar/resolver.h>
-#include <Ar/resolverContext.h>
-#include <Ar/resolverContextBinder.h>
-#include <Ar/resolverScopedCache.h>
-#include <Ar/threadLocalScopedCache.h>
-#include <Ar/timestamp.h>
-#include <Ar/writableAsset.h>
+// defined in primData.cpp.
+std::string Usd_DescribePrimData(const Usd_PrimData *p);
 
-#endif // __PXR_USD_AR_H__
+std::string
+Usd_PrimDataHandle::GetDescription(SdfPath const &proxyPrimPath) const {
+  return Usd_DescribePrimData(_p.get(), proxyPrimPath);
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE
