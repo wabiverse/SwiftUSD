@@ -24,17 +24,19 @@
 #ifndef PXR_USD_SDF_PATH_H
 #define PXR_USD_SDF_PATH_H
 
-#include "Arch/defines.h"
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/pool.h"
 #include "Sdf/tokens.h"
+
+#include "Arch/defines.h"
+
 #include "Tf/stl.h"
 #include "Tf/token.h"
 #include "Vt/traits.h"
-#include <pxr/pxrns.h>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/operators.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -621,7 +623,7 @@ public:
   /// grandparent path ('../..').  Use caution writing loops that walk to
   /// parent paths since relative paths have infinitely many ancestors.  To
   /// more safely traverse ancestor paths, consider iterating over an
-  /// SdfPathAncestorsRange instead, as returend by GetAncestorsRange().
+  /// SdfPathAncestorsRange instead, as returned by GetAncestorsRange().
   SDF_API SdfPath GetParentPath() const;
 
   /// Creates a path by stripping all relational attributes, targets,

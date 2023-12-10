@@ -24,13 +24,13 @@
 #ifndef PXR_BASE_TF_STATIC_DATA_H
 #define PXR_BASE_TF_STATIC_DATA_H
 
-/// \file Tf/staticData.h
+/// \file tf/staticData.h
 /// \ingroup group_tf_Initialization
 
-#include "Arch/hints.h"
-#include "Tf/preprocessorUtils.h"
-#include "Tf/preprocessorUtilsLite.h"
 #include <pxr/pxrns.h>
+
+#include "Arch/hints.h"
+#include "Tf/preprocessorUtilsLite.h"
 
 #include <atomic>
 #include <type_traits>

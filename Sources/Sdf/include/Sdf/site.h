@@ -24,9 +24,10 @@
 #ifndef PXR_USD_SDF_SITE_H
 #define PXR_USD_SDF_SITE_H
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/layer.h"
 #include "Sdf/path.h"
-#include <pxr/pxrns.h>
 
 #include <boost/operators.hpp>
 #include <set>

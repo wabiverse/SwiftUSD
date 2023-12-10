@@ -24,6 +24,8 @@
 #ifndef PXR_USD_SDF_SCHEMA_TYPE_REGISTRATION_H
 #define PXR_USD_SDF_SCHEMA_TYPE_REGISTRATION_H
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/layerOffset.h"
 #include "Sdf/listOp.h"
 #include "Sdf/path.h"
@@ -31,7 +33,6 @@
 #include "Sdf/types.h"
 #include "Vt/dictionary.h"
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/enum.h"
 #include "Tf/token.h"
@@ -111,8 +112,8 @@ PXR_NAMESPACE_OPEN_SCOPE
       (SdfChildrenKeys->VariantChildren, std::vector<TfToken>))(               \
       (SdfChildrenKeys->VariantSetChildren, std::vector<TfToken>))
 
-#define _SDF_FIELDS_NAME(tup) BOOST_PP_TUPLE_ELEM(2, 0, tup)
-#define _SDF_FIELDS_TYPE(tup) BOOST_PP_TUPLE_ELEM(2, 1, tup)
+#define _SDF_FIELDS_NAME(tup) TF_PP_TUPLE_ELEM(0, tup)
+#define _SDF_FIELDS_TYPE(tup) TF_PP_TUPLE_ELEM(1, tup)
 
 /// Registers each built-in Sd field along with its C++ value type with
 /// \p reg. \p reg can be any type that has a member function:

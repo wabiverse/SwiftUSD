@@ -26,8 +26,6 @@
 
 #include <pxr/pxrns.h>
 
-#include "Ar/Ar.h"
-
 #include "Ar/writableAsset.h"
 #include "Tf/diagnosticLite.h"
 

@@ -24,12 +24,12 @@
 #ifndef PXR_USD_SDF_CHILDREN_H
 #define PXR_USD_SDF_CHILDREN_H
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
-#include <pxr/pxrns.h>
 
-#include <boost/iterator/iterator_facade.hpp>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE

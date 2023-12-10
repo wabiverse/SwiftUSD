@@ -24,15 +24,16 @@
 #ifndef PXR_USD_SDF_PROXY_TYPES_H
 #define PXR_USD_SDF_PROXY_TYPES_H
 
-#include "Sdf/childrenPolicies.h"
+#include <pxr/pxrns.h>
+
 #include "Sdf/childrenProxy.h"
 #include "Sdf/childrenView.h"
+#include "Sdf/childrenPolicies.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/listEditorProxy.h"
 #include "Sdf/listProxy.h"
 #include "Sdf/mapEditProxy.h"
 #include "Sdf/proxyPolicies.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

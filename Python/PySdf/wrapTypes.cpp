@@ -22,23 +22,24 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
+#include "Sdf/types.h"
 #include "Sdf/attributeSpec.h"
 #include "Sdf/listOp.h"
-#include "Sdf/path.h"
 #include "Sdf/primSpec.h"
 #include "Sdf/propertySpec.h"
-#include "Sdf/proxyTypes.h"
 #include "Sdf/pyChildrenView.h"
-#include "Sdf/pyListEditorProxy.h"
+#include "Sdf/path.h"
+#include "Sdf/proxyTypes.h"
 #include "Sdf/pyListOp.h"
+#include "Sdf/pyListEditorProxy.h"
 #include "Sdf/pyListProxy.h"
 #include "Sdf/pyMapEditProxy.h"
 #include "Sdf/reference.h"
 #include "Sdf/relationshipSpec.h"
-#include "Sdf/types.h"
 #include "Sdf/variantSetSpec.h"
 #include "Sdf/variantSpec.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyEnum.h"
@@ -320,10 +321,10 @@ void wrapTypes() {
   VtValueFromPython<SdfAuthoringError>();
 
 // Wrap all units enums.
-#define _WRAP_ENUM(r, unused, elem)                                            \
+#define _WRAP_ENUM(elem)                                                       \
   TfPyWrapEnum<_SDF_UNITSLIST_ENUM(elem)>();                                   \
   VtValueFromPython<_SDF_UNITSLIST_ENUM(elem)>();
-  BOOST_PP_LIST_FOR_EACH(_WRAP_ENUM, ~, _SDF_UNITS)
+  _SDF_FOR_EACH_UNITS(_WRAP_ENUM, _SDF_UNITS)
 #undef _WRAP_ENUM
 
   SdfPyWrapListProxy<SdfNameOrderProxy>();
@@ -416,6 +417,7 @@ void wrapTypes() {
       .def_readonly("Asset", SdfValueTypeNames->Asset)
       .def_readonly("Opaque", SdfValueTypeNames->Opaque)
       .def_readonly("Group", SdfValueTypeNames->Group)
+      .def_readonly("PathExpression", SdfValueTypeNames->PathExpression)
       .def_readonly("Int2", SdfValueTypeNames->Int2)
       .def_readonly("Int3", SdfValueTypeNames->Int3)
       .def_readonly("Int4", SdfValueTypeNames->Int4)
@@ -470,6 +472,8 @@ void wrapTypes() {
       .def_readonly("StringArray", SdfValueTypeNames->StringArray)
       .def_readonly("TokenArray", SdfValueTypeNames->TokenArray)
       .def_readonly("AssetArray", SdfValueTypeNames->AssetArray)
+      .def_readonly("PathExpressionArray",
+                    SdfValueTypeNames->PathExpressionArray)
       .def_readonly("Int2Array", SdfValueTypeNames->Int2Array)
       .def_readonly("Int3Array", SdfValueTypeNames->Int3Array)
       .def_readonly("Int4Array", SdfValueTypeNames->Int4Array)

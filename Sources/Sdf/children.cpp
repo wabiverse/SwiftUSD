@@ -22,6 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/children.h"
 #include "Sdf/attributeSpec.h"
 #include "Sdf/childrenPolicies.h"
@@ -32,8 +34,8 @@
 #include "Sdf/relationshipSpec.h"
 #include "Sdf/variantSetSpec.h"
 #include "Sdf/variantSpec.h"
+
 #include "Tf/ostreamMethods.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

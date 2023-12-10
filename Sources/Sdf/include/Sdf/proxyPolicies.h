@@ -26,11 +26,12 @@
 
 /// \file sdf/proxyPolicies.h
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
 #include "Sdf/spec.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

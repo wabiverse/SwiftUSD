@@ -24,13 +24,14 @@
 // Types.cpp
 //
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/proxyTypes.h"
 #include "Sdf/connectionListEditor.h"
 #include "Sdf/listOpListEditor.h"
 #include "Sdf/payload.h"
 #include "Sdf/reference.h"
 #include "Sdf/vectorListEditor.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/registryManager.h"
 

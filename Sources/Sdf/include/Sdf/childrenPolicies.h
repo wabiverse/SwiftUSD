@@ -28,13 +28,14 @@
 // determine how the view maps between keys (the child's name or path) and
 // values (the child's SpecHandle).
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
 #include "Sdf/proxyPolicies.h"
 #include "Sdf/schema.h"
 #include "Sdf/types.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

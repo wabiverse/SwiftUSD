@@ -26,13 +26,15 @@
 
 /// \file sdf/attributeSpec.h
 
+#include <pxr/pxrns.h>
+
+#include "Tf/enum.h"
+
 #include "Sdf/api.h"
 #include "Sdf/declareSpec.h"
 #include "Sdf/path.h"
 #include "Sdf/propertySpec.h"
 #include "Sdf/types.h"
-#include "Tf/enum.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

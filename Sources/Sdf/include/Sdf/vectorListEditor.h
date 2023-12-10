@@ -24,10 +24,11 @@
 #ifndef PXR_USD_SDF_VECTOR_LIST_EDITOR_H
 #define PXR_USD_SDF_VECTOR_LIST_EDITOR_H
 
-#include "Sdf/changeBlock.h"
-#include "Sdf/listEditor.h"
-#include "Sdf/listOp.h"
 #include <pxr/pxrns.h>
+
+#include "Sdf/listEditor.h"
+#include "Sdf/changeBlock.h"
+#include "Sdf/listOp.h"
 
 #include "Tf/ostreamMethods.h"
 #include <vector>

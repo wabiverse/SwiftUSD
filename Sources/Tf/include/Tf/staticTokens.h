@@ -75,25 +75,21 @@
 /// file, in which case they can be made file static.  In the case of the
 /// PRIVATE, you only need to use the DEFINE macro.
 
-#include "Tf/preprocessorUtils.h"
+#include <pxr/pxrns.h>
+
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
 
 #include <vector>
 
-#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/control/expr_iif.hpp>
 #include <boost/preprocessor/control/iif.hpp>
-#include <boost/preprocessor/logical/and.hpp>
-#include <boost/preprocessor/logical/not.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/seq/filter.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/size.hpp>
-#include <boost/preprocessor/tuple/elem.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -116,7 +112,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \hideinitializer
 #define TF_DECLARE_PUBLIC_TOKENS(...)                                          \
   _TF_DECLARE_PUBLIC_TOKENS_EXPAND(_TF_DECLARE_PUBLIC_TOKENS_EVAL(             \
-      _TF_DECLARE_PUBLIC_TOKENS_EXPAND(TF_NUM_ARGS(__VA_ARGS__)))(             \
+      _TF_DECLARE_PUBLIC_TOKENS_EXPAND(TF_PP_VARIADIC_SIZE(__VA_ARGS__)))(     \
       __VA_ARGS__))
 
 /// Macro to define public tokens.  Use in conjunction with
@@ -154,13 +150,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Note that this needs to be a unique struct name for each translation unit.
 //
 #define _TF_TOKENS_STRUCT_NAME_PRIVATE(key)                                    \
-  BOOST_PP_CAT(key, _PrivateStaticTokenType)
+  TF_PP_CAT(key, _PrivateStaticTokenType)
 
 // Private macro to generate struct name from key.  This version is used
 // by the public token declarations, and so key must be unique for the entire
 // namespace.
 //
-#define _TF_TOKENS_STRUCT_NAME(key) BOOST_PP_CAT(key, _StaticTokenType)
+#define _TF_TOKENS_STRUCT_NAME(key) TF_PP_CAT(key, _StaticTokenType)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration Macros
@@ -169,11 +165,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 // be a tuple on the form (name, value) or just a name.
 //
 #define _TF_TOKENS_DECLARE_MEMBER(r, data, elem)                               \
-  TfToken BOOST_PP_IIF(TF_PP_IS_TUPLE(elem), BOOST_PP_TUPLE_ELEM(2, 0, elem),  \
-                       elem)                                                   \
-      BOOST_PP_EXPR_IIF(TF_PP_IS_TUPLE(BOOST_PP_TUPLE_ELEM(2, 1, elem)),       \
-                        [BOOST_PP_SEQ_SIZE(BOOST_PP_TUPLE_ELEM(                \
-                            1, 0, BOOST_PP_TUPLE_ELEM(2, 1, elem)))]);
+  TfToken BOOST_PP_IIF(TF_PP_IS_TUPLE(elem), TF_PP_TUPLE_ELEM(0, elem), elem)  \
+      BOOST_PP_EXPR_IIF(TF_PP_IS_TUPLE(TF_PP_TUPLE_ELEM(1, elem)),             \
+                        [BOOST_PP_SEQ_SIZE(                                    \
+                            TF_PP_TUPLE_ELEM(0, TF_PP_TUPLE_ELEM(1, elem)))]);
 
 // Private macro used to declare the list of members as TfTokens
 //
@@ -212,29 +207,25 @@ PXR_NAMESPACE_OPEN_SCOPE
 //
 #define _TF_TOKENS_DEFINE_MEMBER(r, data, i, elem)                             \
   BOOST_PP_COMMA_IF(i)                                                         \
-  BOOST_PP_TUPLE_ELEM(1, 0,                                                    \
-                      BOOST_PP_IIF(TF_PP_IS_TUPLE(elem),                       \
+  TF_PP_TUPLE_ELEM(0, BOOST_PP_IIF(TF_PP_IS_TUPLE(elem),                       \
                                    (_TF_TOKENS_INITIALIZE_MEMBER_TUPLE(elem)), \
                                    (_TF_TOKENS_INITIALIZE_MEMBER(elem))))
 
 #define _TF_TOKENS_INITIALIZE_MEMBER_TUPLE(elem)                               \
-  BOOST_PP_TUPLE_ELEM(2, 0, elem)                                              \
-  (BOOST_PP_TUPLE_ELEM(2, 1, elem), TfToken::Immortal)
+  TF_PP_TUPLE_ELEM(0, elem)(TF_PP_TUPLE_ELEM(1, elem), TfToken::Immortal)
 
 #define _TF_TOKENS_INITIALIZE_MEMBER(elem)                                     \
   elem(TF_PP_STRINGIZE(elem), TfToken::Immortal)
 
 #define _TF_TOKENS_DEFINE_ARRAY_MEMBER(r, data, i, elem)                       \
-  data[i] = BOOST_PP_IIF(TF_PP_IS_TUPLE(elem),                                 \
-                         BOOST_PP_TUPLE_ELEM(2, 0, elem), elem);
+  data[i] = BOOST_PP_IIF(TF_PP_IS_TUPLE(elem), TF_PP_TUPLE_ELEM(0, elem), elem);
 
 // Private macros to append tokens to the allTokens vector.
 //
 #define _TF_TOKENS_APPEND_MEMBER(r, data, i, elem)                             \
-  BOOST_PP_IIF(                                                                \
-      TF_PP_IS_TUPLE(elem),                                                    \
-      _TF_TOKENS_APPEND_MEMBER_BODY(~, ~, BOOST_PP_TUPLE_ELEM(2, 0, elem)),    \
-      _TF_TOKENS_APPEND_MEMBER_BODY(~, ~, elem))
+  BOOST_PP_IIF(TF_PP_IS_TUPLE(elem),                                           \
+               _TF_TOKENS_APPEND_MEMBER_BODY(~, ~, TF_PP_TUPLE_ELEM(0, elem)), \
+               _TF_TOKENS_APPEND_MEMBER_BODY(~, ~, elem))
 
 #define _TF_TOKENS_APPEND_MEMBER_BODY(r, data, elem) allTokens.push_back(elem);
 
@@ -250,24 +241,23 @@ PXR_NAMESPACE_OPEN_SCOPE
   BOOST_PP_SEQ_FOR_EACH(_TF_TOKENS_DEFINE_ARRAY_MEMBERS, ~, seq)
 
 #define _TF_TOKENS_DEFINE_ARRAY_MEMBERS(r, data, elem)                         \
-  BOOST_PP_SEQ_FOR_EACH_I(                                                     \
-      _TF_TOKENS_DEFINE_ARRAY_MEMBER, BOOST_PP_TUPLE_ELEM(2, 0, elem),         \
-      BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, elem)))
+  BOOST_PP_SEQ_FOR_EACH_I(_TF_TOKENS_DEFINE_ARRAY_MEMBER,                      \
+                          TF_PP_TUPLE_ELEM(0, elem),                           \
+                          TF_PP_TUPLE_ELEM(0, TF_PP_TUPLE_ELEM(1, elem)))
 
 // Private predicate macros to be used by SEQ_FILTER that determine if an
 // element of a sequence is an array of tokens or not.
 //
 #define _TF_TOKENS_IS_ARRAY(s, data, elem)                                     \
-  BOOST_PP_AND(TF_PP_IS_TUPLE(elem),                                           \
-               TF_PP_IS_TUPLE(BOOST_PP_TUPLE_ELEM(2, 1, elem)))
+  _TF_PP_IFF(TF_PP_IS_TUPLE(elem), TF_PP_IS_TUPLE(TF_PP_TUPLE_ELEM(1, elem)), 0)
 
 #define _TF_TOKENS_IS_NOT_ARRAY(s, data, elem)                                 \
-  BOOST_PP_NOT(_TF_TOKENS_IS_ARRAY(s, data, elem))
+  _TF_PP_IFF(_TF_TOKENS_IS_ARRAY(s, data, elem), 0, 1)
 
 // Private macro to append all array elements to a sequence.
 //
 #define _TF_TOKENS_APPEND_ARRAY_ELEMENTS(r, data, elem)                        \
-  BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, elem))
+  TF_PP_TUPLE_ELEM(0, TF_PP_TUPLE_ELEM(1, elem))
 
 // Private macro to define the struct of tokens.
 //

@@ -569,7 +569,7 @@ template <class T> class TfRefPtr {
 
 public:
   /// Convenience type accessor to underlying type \c T for template code.
-  typedef T DataType;
+  using DataType = T;
 
   template <class U> struct Rebind {
     typedef TfRefPtr<U> Type;
@@ -660,11 +660,10 @@ public:
   /// NOT use this constructor (either implicitly or explicitly) from within
   /// a \c New() function.  Use \c TfCreateRefPtr() instead.
   template <class U>
-  explicit TfRefPtr(
-      U *ptr,
-      typename std::enable_if<std::is_convertible<U *, T *>::value>::type * =
-          nullptr)
-      : _refBase(ptr) {
+  explicit TfRefPtr(U *ptr,
+                    typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr)
+    : _refBase(ptr) 
+  {
     _AddRef();
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
@@ -947,8 +946,8 @@ private:
   friend inline void TfHashAppend(HashState &, const TfRefPtr<U> &);
   template <class U> friend inline size_t hash_value(const TfRefPtr<U> &);
 
-  friend T *get_pointer(TfRefPtr const &p) {
-    return static_cast<T *>(const_cast<TfRefBase *>(p._refBase));
+  friend DataType *get_pointer(TfRefPtr const &p) {
+    return static_cast<DataType *>(const_cast<TfRefBase *>(p._refBase));
   }
 
   // Used to distinguish construction in TfCreateRefPtr.

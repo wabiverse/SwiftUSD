@@ -22,21 +22,20 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Pcp/iterator.h"
 #include "Pcp/arc.h"
 #include "Pcp/primIndex.h"
 #include "Pcp/primIndex_Graph.h"
 #include "Pcp/propertyIndex.h"
 #include "Pcp/types.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 ////////////////////////////////////////////////////////////
 
-PcpPrimIterator::PcpPrimIterator() : _primIndex(NULL), _pos(PCP_INVALID_INDEX) {
-  // Do nothing
-}
+PcpPrimIterator::PcpPrimIterator() = default;
 
 PcpPrimIterator::PcpPrimIterator(const PcpPrimIndex *primIndex, size_t pos)
     : _primIndex(primIndex), _pos(pos) {
@@ -104,7 +103,7 @@ Pcp_SdSiteRef PcpPrimIterator::_GetSiteRef() const {
 
 ////////////////////////////////////////////////////////////
 
-PcpPropertyIterator::PcpPropertyIterator() : _propertyIndex(NULL), _pos(0) {}
+PcpPropertyIterator::PcpPropertyIterator() = default;
 
 PcpPropertyIterator::PcpPropertyIterator(const PcpPropertyIndex &index,
                                          size_t pos)

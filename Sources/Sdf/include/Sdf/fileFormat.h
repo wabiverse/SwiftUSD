@@ -26,7 +26,6 @@
 
 /// \file sdf/fileFormat.h
 
-#include "Ar/Ar.h"
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 

@@ -25,8 +25,9 @@
 #ifndef PXR_USD_SDF_PREDICATE_EXPRESSION_PARSER_H
 #define PXR_USD_SDF_PREDICATE_EXPRESSION_PARSER_H
 
-#include "Sdf/api.h"
 #include <pxr/pxrns.h>
+
+#include "Sdf/api.h"
 
 #include "Tf/diagnostic.h"
 #include "Vt/value.h"

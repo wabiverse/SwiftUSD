@@ -22,20 +22,18 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Usd/crateFile.h"
-#include "Usd/crateData.h"
-#include "Usd/integerCoding.h"
 #include <pxr/pxrns.h>
 
-#include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
-#include "Ar/resolver.h"
+#include "Usd/crateFile.h"
+#include "Usd/integerCoding.h"
+
 #include "Arch/demangle.h"
-#include "Arch/fileSystem.h"
 #include "Arch/pxrerrno.h"
+#include "Arch/fileSystem.h"
 #include "Arch/pxrregex.h"
 #include "Arch/systemInfo.h"
 #include "Arch/virtualMemory.h"
+
 #include "Gf/half.h"
 #include "Gf/matrix2d.h"
 #include "Gf/matrix3d.h"
@@ -56,15 +54,7 @@
 #include "Gf/vec4f.h"
 #include "Gf/vec4h.h"
 #include "Gf/vec4i.h"
-#include "Sdf/assetPath.h"
-#include "Sdf/layerOffset.h"
-#include "Sdf/listOp.h"
-#include "Sdf/path.h"
-#include "Sdf/pathTable.h"
-#include "Sdf/payload.h"
-#include "Sdf/reference.h"
-#include "Sdf/schema.h"
-#include "Sdf/types.h"
+
 #include "Tf/envSetting.h"
 #include "Tf/errorMark.h"
 #include "Tf/fastCompression.h"
@@ -78,13 +68,31 @@
 #include "Tf/stringUtils.h"
 #include "Tf/token.h"
 #include "Tf/type.h"
+
 #include "Trace/traceImpl.h"
+
 #include "Vt/dictionary.h"
 #include "Vt/value.h"
+
 #include "Work/dispatcher.h"
 #include "Work/singularTask.h"
 #include "Work/utils.h"
 #include "Work/withScopedParallelism.h"
+
+#include "Ar/asset.h"
+#include "Ar/resolvedPath.h"
+#include "Ar/resolver.h"
+
+#include "Sdf/assetPath.h"
+#include "Sdf/layerOffset.h"
+#include "Sdf/listOp.h"
+#include "Sdf/path.h"
+#include "Sdf/pathExpression.h"
+#include "Sdf/pathTable.h"
+#include "Sdf/payload.h"
+#include "Sdf/reference.h"
+#include "Sdf/schema.h"
+#include "Sdf/types.h"
 
 #include <OneTBB/tbb/concurrent_queue.h>
 
@@ -230,45 +238,50 @@ template <class T> constexpr bool _IsInlinedType() {
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -291,21 +304,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 #undef xx
 template <class T> constexpr Usd_CrateFile::TypeEnum TypeEnumFor() {
   return _TypeEnumForImpl(static_cast<T *>(nullptr));
@@ -322,45 +339,50 @@ template <class T> struct ValueTypeTraits {};
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -383,21 +405,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 #undef xx
 
 template <class T> static constexpr ValueRep ValueRepFor(uint64_t payload = 0) {
@@ -468,21 +494,22 @@ using std::unordered_map;
 using std::vector;
 
 // Version history:
-// 0.9.0: Added support for the timecode and timecode[] value types.
-// 0.8.0: Added support for SdfPayloadListOp values and SdfPayload values with
-//        layer offsets.
-// 0.7.0: Array sizes written as 64 bit ints.
-// 0.6.0: Compressed (scalar) floating point arrays that are either all ints or
-//        can be represented efficiently with a lookup table.
-// 0.5.0: Compressed (u)int & (u)int64 arrays, arrays no longer store '1' rank.
-// 0.4.0: Compressed structural sections.
-// 0.3.0: (broken, unused)
-// 0.2.0: Added support for prepend and append fields of SdfListOp.
-// 0.1.0: Fixed structure layout issue encountered in Windows port.
-//        See _PathItemHeader_0_0_1.
-// 0.0.1: Initial release.
+// 0.10.0: Added support for the pathExpression value type.
+//  0.9.0: Added support for the timecode and timecode[] value types.
+//  0.8.0: Added support for SdfPayloadListOp values and SdfPayload values with
+//         layer offsets.
+//  0.7.0: Array sizes written as 64 bit ints.
+//  0.6.0: Compressed (scalar) floating point arrays that are either all ints or
+//         can be represented efficiently with a lookup table.
+//  0.5.0: Compressed (u)int & (u)int64 arrays, arrays no longer store '1' rank.
+//  0.4.0: Compressed structural sections.
+//  0.3.0: (broken, unused)
+//  0.2.0: Added support for prepend and append fields of SdfListOp.
+//  0.1.0: Fixed structure layout issue encountered in Windows port.
+//         See _PathItemHeader_0_0_1.
+//  0.0.1: Initial release.
 constexpr uint8_t USDC_MAJOR = 0;
-constexpr uint8_t USDC_MINOR = 9;
+constexpr uint8_t USDC_MINOR = 10;
 constexpr uint8_t USDC_PATCH = 0;
 
 CrateFile::Version CrateFile::Version::FromString(char const *str) {
@@ -817,8 +844,7 @@ struct _AssetStream {
   }
   inline int64_t Tell() const { return _cur; }
   inline void Seek(int64_t offset) { _cur = offset; }
-  inline void Prefetch(int64_t offset, int64_t size) { /* no prefetch impl */
-  }
+  inline void Prefetch(int64_t offset, int64_t size) { /* no prefetch impl */ }
 
 private:
   ArAssetSharedPtr _asset;
@@ -1234,6 +1260,9 @@ public:
   VtDictionary Read(VtDictionary *) { return ReadMap<VtDictionary>(); }
   SdfAssetPath Read(SdfAssetPath *) { return SdfAssetPath(Read<string>()); }
   SdfTimeCode Read(SdfTimeCode *) { return SdfTimeCode(Read<double>()); }
+  SdfPathExpression Read(SdfPathExpression *) {
+    return SdfPathExpression(Read<std::string>());
+  }
   SdfUnregisteredValue Read(SdfUnregisteredValue *) {
     VtValue val = Read<VtValue>();
     if (val.IsHolding<string>())
@@ -1492,9 +1521,16 @@ public:
   void Write(SdfTimeCode const &tc) {
     crate->_packCtx->RequestWriteVersionUpgrade(
         Version(0, 9, 0),
-        "A timecode or timecode[] value type was detected, which requires "
+        "A timecode or timecode[] value type was detected which requires "
         "crate version 0.9.0.");
     Write(tc.GetValue());
+  }
+  void Write(SdfPathExpression const &pathExpr) {
+    crate->_packCtx->RequestWriteVersionUpgrade(
+        Version(0, 10, 0),
+        "A pathExpression value type was detected which requires crate "
+        "version 0.10.0.");
+    Write(pathExpr.GetText());
   }
   void Write(SdfUnregisteredValue const &urv) { Write(urv.GetValue()); }
   void Write(SdfVariantSelectionMap const &vsmap) { WriteMap(vsmap); }
@@ -2586,7 +2622,7 @@ void CrateFile::_WriteSection(_Writer &w, _SectionName name,
 void CrateFile::_AddDeferredSpecs() {
   // A map from sample time to VtValues within TimeSamples instances in
   // _deferredSpecs.
-  boost::container::flat_map<double, vector<VtValue *>> allValuesAtAllTimes;
+  pxr_tsl::robin_map<double, vector<VtValue *>> allValuesAtAllTimes;
 
   // Search for the TimeSamples, add to the allValuesAtAllTimes.
   for (auto &spec : _deferredSpecs) {
@@ -2600,12 +2636,21 @@ void CrateFile::_AddDeferredSpecs() {
     }
   }
 
+  // Create a sorted view of the underlying map keys.
+  std::vector<double> orderedTimes(allValuesAtAllTimes.size());
+  std::transform(std::cbegin(allValuesAtAllTimes),
+                 std::cend(allValuesAtAllTimes), std::begin(orderedTimes),
+                 [](const auto &element) { return element.first; });
+  std::sort(orderedTimes.begin(), orderedTimes.end());
+
   // Now walk through allValuesAtAllTimes in order and pack all the values,
   // swapping them out with the resulting reps.  This ensures that when we
   // pack the specs, which will re-pack the values, they'll be noops since
   // they are just holding value reps that point into the file.
-  for (auto const &p : allValuesAtAllTimes) {
-    for (VtValue *val : p.second)
+  for (auto const &t : orderedTimes) {
+    auto it = allValuesAtAllTimes.find(t);
+    TF_DEV_AXIOM(it != allValuesAtAllTimes.end());
+    for (VtValue *val : it->second)
       *val = _PackValue(*val);
   }
 
@@ -3938,45 +3983,50 @@ std::type_info const &CrateFile::GetTypeid(ValueRep rep) const {
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -3999,21 +4049,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 
 #undef xx
 
@@ -4059,45 +4113,50 @@ void CrateFile::_DoAllTypeRegistrations() {
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -4120,21 +4179,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 
 #undef xx
 }
@@ -4147,45 +4210,50 @@ void CrateFile::_DeleteValueHandlers() {
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -4208,21 +4276,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 
 #undef xx
 }
@@ -4236,45 +4308,50 @@ void CrateFile::_ClearValueHandlerDedupTables() {
 // xx(<enumerant>, <enumerant-value>, <c++ type>, <supportsArray>)
 
 // Array types.
-xx(Bool,          1, bool,         true)
-xx(UChar,         2, uint8_t,      true)
-xx(Int,           3, int,          true)
-xx(UInt,          4, unsigned int, true)
-xx(Int64,         5, int64_t,      true)
-xx(UInt64,        6, uint64_t,     true)
+xx(Bool,            1, bool,              true)
+xx(UChar,           2, uint8_t,           true)
+xx(Int,             3, int,               true)
+xx(UInt,            4, unsigned int,      true)
+xx(Int64,           5, int64_t,           true)
+xx(UInt64,          6, uint64_t,          true)
 
-xx(Half,          7, GfHalf,       true)
-xx(Float,         8, float,        true)
-xx(Double,        9, double,       true)
+xx(Half,            7, GfHalf,            true)
+xx(Float,           8, float,             true)
+xx(Double,          9, double,            true)
 
-xx(String,       10, std::string,  true)
+xx(String,         10, std::string,       true)
 
-xx(Token,        11, TfToken,      true)
+xx(Token,          11, TfToken,           true)
 
-xx(AssetPath,    12, SdfAssetPath, true)
+xx(AssetPath,      12, SdfAssetPath,      true)
 
-xx(Quatd,        16, GfQuatd,      true)
-xx(Quatf,        17, GfQuatf,      true)
-xx(Quath,        18, GfQuath,      true)
+xx(Quatd,          16, GfQuatd,           true)
+xx(Quatf,          17, GfQuatf,           true)
+xx(Quath,          18, GfQuath,           true)
 
-xx(Vec2d,        19, GfVec2d,      true)
-xx(Vec2f,        20, GfVec2f,      true)
-xx(Vec2h,        21, GfVec2h,      true)
-xx(Vec2i,        22, GfVec2i,      true)
+xx(Vec2d,          19, GfVec2d,           true)
+xx(Vec2f,          20, GfVec2f,           true)
+xx(Vec2h,          21, GfVec2h,           true)
+xx(Vec2i,          22, GfVec2i,           true)
 
-xx(Vec3d,        23, GfVec3d,      true)
-xx(Vec3f,        24, GfVec3f,      true)
-xx(Vec3h,        25, GfVec3h,      true)
-xx(Vec3i,        26, GfVec3i,      true)
+xx(Vec3d,          23, GfVec3d,           true)
+xx(Vec3f,          24, GfVec3f,           true)
+xx(Vec3h,          25, GfVec3h,           true)
+xx(Vec3i,          26, GfVec3i,           true)
 
-xx(Vec4d,        27, GfVec4d,      true)
-xx(Vec4f,        28, GfVec4f,      true)
-xx(Vec4h,        29, GfVec4h,      true)
-xx(Vec4i,        30, GfVec4i,      true)
+xx(Vec4d,          27, GfVec4d,           true)
+xx(Vec4f,          28, GfVec4f,           true)
+xx(Vec4h,          29, GfVec4h,           true)
+xx(Vec4i,          30, GfVec4i,           true)
 
-xx(Matrix2d,     13, GfMatrix2d,   true)
-xx(Matrix3d,     14, GfMatrix3d,   true)
-xx(Matrix4d,     15, GfMatrix4d,   true)
+xx(Matrix2d,       13, GfMatrix2d,        true)
+xx(Matrix3d,       14, GfMatrix3d,        true)
+xx(Matrix4d,       15, GfMatrix4d,        true)
+
+// These are array types, but are defined below, since the greatest enumerant
+// value must be last.
+// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(PathExpression, 57, SdfPathExpression, true)
 
 
 // Non-array types.
@@ -4297,21 +4374,25 @@ xx(Permission,       43, SdfPermission,         false)
 xx(Variability,      44, SdfVariability,        false)
 
 
-xx(VariantSelectionMap, 45, SdfVariantSelectionMap,      false)
-xx(TimeSamples,         46, TimeSamples,                 false)
-xx(Payload,             47, SdfPayload,                  false)
+xx(VariantSelectionMap,     45, SdfVariantSelectionMap,      false)
+xx(TimeSamples,             46, TimeSamples,                 false)
+xx(Payload,                 47, SdfPayload,                  false)
 
-xx(DoubleVector,        48, std::vector<double>,         false)
-xx(LayerOffsetVector,   49, std::vector<SdfLayerOffset>, false)
-xx(StringVector,        50, std::vector<std::string>,    false)
+xx(DoubleVector,            48, std::vector<double>,         false)
+xx(LayerOffsetVector,       49, std::vector<SdfLayerOffset>, false)
+xx(StringVector,            50, std::vector<std::string>,    false)
 
-xx(ValueBlock,          51, SdfValueBlock,               false)
-xx(Value,               52, VtValue,                     false)
+xx(ValueBlock,              51, SdfValueBlock,               false)
+xx(Value,                   52, VtValue,                     false)
 
-xx(UnregisteredValue,   53, SdfUnregisteredValue,        false)
-xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp, false)
-xx(PayloadListOp,       55, SdfPayloadListOp,            false)
-xx(TimeCode,            56, SdfTimeCode,                 true) 
+xx(UnregisteredValue,       53, SdfUnregisteredValue,        false)
+xx(UnregisteredValueListOp, 54, SdfUnregisteredValueListOp,  false)
+xx(PayloadListOp,           55, SdfPayloadListOp,            false)
+
+// These array types appear here since the greatest enumerant value must be
+// last.
+xx(TimeCode,                56, SdfTimeCode,                 true)
+xx(PathExpression,          57, SdfPathExpression,           true)
 
 #undef xx
 }

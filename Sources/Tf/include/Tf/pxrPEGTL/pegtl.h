@@ -46,7 +46,7 @@ SOFTWARE.
 // PXR_NAMESPACE_OPEN_SCOPE and PXR_NAMESPACE_CLOSE_SCOPE, but that would
 // require more invasive changes to this header since there are STL header
 // includes scattered throughout.
-#include <pxr/pxrns.h>
+#include "pxr/pxr.h"
 
 #if PXR_USE_NAMESPACES
 #define TAO_PEGTL_NAMESPACE PXR_INTERNAL_NS ## _pegtl

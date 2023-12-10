@@ -22,8 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Sdf/predicateExpression.h"
 #include <pxr/pxrns.h>
+
+#include "Sdf/predicateExpression.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/enum.h"
@@ -228,6 +229,11 @@ std::string SdfPredicateExpression::GetText() const {
   WalkWithOpStack(printLogic, printCall);
 
   return result;
+}
+
+std::ostream &operator<<(std::ostream &out, SdfPredicateExpression const &expr)
+{
+  return out << expr.GetText();
 }
 
 SdfPredicateExpression::SdfPredicateExpression(std::string const &input,

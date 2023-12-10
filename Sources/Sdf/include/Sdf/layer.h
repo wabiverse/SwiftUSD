@@ -26,7 +26,6 @@
 
 /// \file sdf/layer.h
 
-#include "Ar/Ar.h"
 #include "Ar/assetInfo.h"
 #include "Ar/resolvedPath.h"
 #include "Sdf/api.h"

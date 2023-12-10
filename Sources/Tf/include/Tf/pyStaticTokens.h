@@ -25,7 +25,7 @@
 #ifndef PXR_BASE_TF_PY_STATIC_TOKENS_H
 #define PXR_BASE_TF_PY_STATIC_TOKENS_H
 
-/// \file Tf/pyStaticTokens.h
+/// \file tf/pyStaticTokens.h
 
 #include <pxr/pxrns.h>
 
@@ -99,7 +99,7 @@ private:
   _TF_PY_TOKENS_WRAP_ATTR_MEMBER(r, key, _TF_PY_TOKEN_GET_ELEM(elem))
 
 #define _TF_PY_TOKEN_GET_ELEM(elem)                                            \
-  BOOST_PP_IIF(TF_PP_IS_TUPLE(elem), BOOST_PP_TUPLE_ELEM(2, 0, elem), elem)
+  BOOST_PP_IIF(TF_PP_IS_TUPLE(elem), TF_PP_TUPLE_ELEM(0, elem), elem)
 
 // Private macros to wrap a sequence.
 #define _TF_PY_TOKENS_WRAP_SEQ(key, seq)                                       \

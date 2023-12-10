@@ -22,9 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <pxr/pxrns.h>
+
 #include "Pcp/types.h"
 #include "Tf/pyEnum.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
