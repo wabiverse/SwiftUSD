@@ -153,7 +153,7 @@ let package = Package(
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.4"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.5"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
@@ -183,8 +183,7 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         /* ---------- Apple only libs. ---------- */
-        .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
-        .product(name: "MoltenVK", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
+        .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform))
       ],
       publicHeadersPath: "include",
       cxxSettings: [
