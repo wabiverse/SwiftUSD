@@ -160,15 +160,16 @@ final class GfTests: XCTestCase
     PXRMsg.Log.point("GfVec2f", to: gfVec2f)
 
     XCTAssertEqual(vec2f, gfVec2f)
+    XCTAssertEqual(MemoryLayout<GfVec2f>.size, MemoryLayout<(Float, Float)>.size)
   }
 
   func testVec3f()
   {
-    let vec3fA = Pixar.Gf.Vec3f(1.0, 2.0, 3.0)
-    PXRMsg.Log.point("Pixar.Gf.Vec3f(1.0, 2.0, 3.0)", to: vec3fA)
+    let vec3fA = GfVec3f(1.0, 2.0, 3.0)
+    PXRMsg.Log.point("GfVec3f(1.0, 2.0, 3.0)", to: vec3fA)
 
-    let vec3fB = Pixar.Gf.Vec3f(4.0, 5.0, 6.0)
-    PXRMsg.Log.point("Pixar.Gf.Vec3f(4.0, 5.0, 6.0)", to: vec3fB)
+    let vec3fB = GfVec3f(4.0, 5.0, 6.0)
+    PXRMsg.Log.point("GfVec3f(4.0, 5.0, 6.0)", to: vec3fB)
     
     var vec3fC = vec3fA + vec3fB
     PXRMsg.Log.point("vec3fC=(vec3fA + vec3fB)", to: vec3fC)
@@ -177,8 +178,10 @@ final class GfTests: XCTestCase
     PXRMsg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
 
     PXRMsg.Log.point("MemoryLayout<SIMD3<Float>>.size", to: MemoryLayout<SIMD3<Float>>.size)
-    PXRMsg.Log.point("MemoryLayout<Pixar.Gf.Vec3f>.size", to: MemoryLayout<Pixar.Gf.Vec3f>.size)
+    PXRMsg.Log.point("MemoryLayout<GfVec3f>.size", to: MemoryLayout<GfVec3f>.size)
     PXRMsg.Log.point("MemoryLayout<(Float, Float, Float)>.size", to: MemoryLayout<(Float, Float, Float)>.size)
+
+    XCTAssertEqual(MemoryLayout<GfVec3f>.size, MemoryLayout<(Float, Float, Float)>.size)
   }
 }
 
