@@ -176,6 +176,7 @@ final class GfTests: XCTestCase
     vec3fC *= vec3fA
     PXRMsg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
 
+    PXRMsg.Log.point("MemoryLayout<SIMD3<Float>>.size", to: MemoryLayout<SIMD3<Float>>.size)
     PXRMsg.Log.point("MemoryLayout<Pixar.Gf.Vec3f>.size", to: MemoryLayout<Pixar.Gf.Vec3f>.size)
     PXRMsg.Log.point("MemoryLayout<(Float, Float, Float)>.size", to: MemoryLayout<(Float, Float, Float)>.size)
   }
