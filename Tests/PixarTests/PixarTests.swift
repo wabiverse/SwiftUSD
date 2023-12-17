@@ -161,6 +161,24 @@ final class GfTests: XCTestCase
 
     XCTAssertEqual(vec2f, gfVec2f)
   }
+
+  func testVec3f()
+  {
+    let vec3fA = Pixar.Gf.Vec3f(1.0, 2.0, 3.0)
+    PXRMsg.Log.point("Pixar.Gf.Vec3f(1.0, 2.0, 3.0)", to: vec3fA)
+
+    let vec3fB = Pixar.Gf.Vec3f(4.0, 5.0, 6.0)
+    PXRMsg.Log.point("Pixar.Gf.Vec3f(4.0, 5.0, 6.0)", to: vec3fB)
+    
+    var vec3fC = vec3fA + vec3fB
+    PXRMsg.Log.point("vec3fC=(vec3fA + vec3fB)", to: vec3fC)
+
+    vec3fC *= vec3fA
+    PXRMsg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
+
+    print(MemoryLayout<Pixar.Gf.Vec3f>.size)
+    print(MemoryLayout<(Float, Float, Float)>.size)
+  }
 }
 
 /* ---- xxx ----

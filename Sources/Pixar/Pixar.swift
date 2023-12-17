@@ -24,7 +24,7 @@
 @_exported import CxxStdlib
 
 /* ---- Pixar.Base ---- */
-@_exported import Arch
+// @_exported import Arch
 @_exported import Gf
 // @_exported import Tf
 @_exported import Js

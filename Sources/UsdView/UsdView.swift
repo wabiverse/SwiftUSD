@@ -21,11 +21,15 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Pixar
+
 @main
 struct Creator 
 {
   static func main()
   {
+    print("Executable path:", Pixar.Arch.getExecutablePath())
+
     print("'usdview' does nothing... yet.")
   }
 }

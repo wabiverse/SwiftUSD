@@ -605,6 +605,9 @@ let package = Package(
       name: "UsdView",
       dependencies: [
         .target(name: "Pixar"),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
       ]
     ),
 

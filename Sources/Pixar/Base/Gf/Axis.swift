@@ -47,7 +47,7 @@ public enum Axis2: Int, Axis
   }
 }
 
-public enum Axis3: Int
+public enum Axis3: Int, Axis
 {
   case x = 0
   case y = 1
@@ -57,7 +57,7 @@ public enum Axis3: Int
 
   public static var dimension: Int { 3 }
 
-  func getAxis() -> Int
+  public func getAxis() -> Int
   {
     switch self
     {
@@ -68,7 +68,7 @@ public enum Axis3: Int
   }
 }
 
-public enum Axis4: Int
+public enum Axis4: Int, Axis
 {
   case x = 0
   case y = 1
@@ -79,7 +79,7 @@ public enum Axis4: Int
 
   public static var dimension: Int { 4 }
 
-  func getAxis() -> Int
+  public func getAxis() -> Int
   {
     switch self
     {

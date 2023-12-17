@@ -38,9 +38,6 @@ public protocol Scalar: Dimensional
   /// Create a unit vector along the specified axis.
   static func axis<T>(_ axis: T) -> Self where T == AxisCount
 
-  /// Set all elements with explicit arguments.
-  mutating func set(_ s0: ScalarType, _ s1: ScalarType) -> Self
-
   // Set all elements with an array.
   mutating func set(_ a: [ScalarType]) -> Self
 
