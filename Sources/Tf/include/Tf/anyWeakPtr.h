@@ -56,7 +56,7 @@ class TfAnyWeakPtr {
   };
 
 public:
-  typedef TfAnyWeakPtr This;
+  using This = TfAnyWeakPtr;
 
   /// Construct an AnyWeakPtr watching \a ptr.
   template <class Ptr, class = typename std::enable_if<Tf_SupportsWeakPtr<

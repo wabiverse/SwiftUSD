@@ -84,14 +84,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 template <typename T> class TfSpan {
 public:
   using element_type = T;
-  using value_type = typename std::remove_cv<T>::type;
-  using pointer = T *;
-  using reference = T &;
+  using value_type = typename std::remove_cv<element_type>::type;
+  using pointer = element_type *;
+  using reference = element_type &;
   using index_type = std::size_t;
   using difference_type = std::ptrdiff_t;
 
-  using iterator = T *;
-  using const_iterator = const T *;
+  using iterator = element_type *;
+  using const_iterator = const element_type *;
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 

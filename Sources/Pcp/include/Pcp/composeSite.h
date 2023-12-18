@@ -50,6 +50,8 @@
 /// Conceptually, though, they are operating on the scene description
 /// identified by a PcpSite.
 
+#include <pxr/pxrns.h>
+
 #include "Pcp/api.h"
 #include "Pcp/errors.h"
 #include "Pcp/node.h"
@@ -59,7 +61,6 @@
 #include "Sdf/reference.h"
 #include "Sdf/site.h"
 #include "Sdf/types.h"
-#include <pxr/pxrns.h>
 
 #include <set>
 #include <string>

@@ -24,14 +24,17 @@
 #ifndef PXR_USD_USD_EDIT_TARGET_H
 #define PXR_USD_USD_EDIT_TARGET_H
 
-#include "Pcp/layerStackIdentifier.h"
-#include "Pcp/mapFunction.h"
-#include "Pcp/node.h"
+#include <pxr/pxrns.h>
+
 #include "Sdf/layer.h"
 #include "Sdf/path.h"
 #include "Sdf/primSpec.h"
+
+#include "Pcp/layerStackIdentifier.h"
+#include "Pcp/mapFunction.h"
+#include "Pcp/node.h"
+
 #include "Usd/api.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

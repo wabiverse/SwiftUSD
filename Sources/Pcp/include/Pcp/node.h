@@ -65,10 +65,9 @@ TF_DECLARE_REF_PTRS(PcpPrimIndex_Graph);
 ///
 class PcpNodeRef {
 public:
-  typedef PcpNodeRef_ChildrenIterator child_const_iterator;
-  typedef PcpNodeRef_ChildrenReverseIterator child_const_reverse_iterator;
-  typedef std::pair<child_const_iterator, child_const_iterator>
-      child_const_range;
+  using child_const_iterator = PcpNodeRef_ChildrenIterator;
+  using child_const_reverse_iterator = PcpNodeRef_ChildrenReverseIterator;
+  using child_const_range = std::pair<child_const_iterator, child_const_iterator>;
 
   PcpNodeRef() : _graph(0), _nodeIdx(PCP_INVALID_INDEX) {}
 
@@ -329,8 +328,8 @@ inline void TfHashAppend(HashState &h, const PcpNodeRef &x) {
 }
 inline size_t hash_value(const PcpNodeRef &x) { return TfHash{}(x); }
 
-typedef TfHashSet<PcpNodeRef, PcpNodeRef::Hash> PcpNodeRefHashSet;
-typedef std::vector<PcpNodeRef> PcpNodeRefVector;
+using PcpNodeRefHashSet = TfHashSet<PcpNodeRef, PcpNodeRef::Hash>;
+using PcpNodeRefVector = std::vector<PcpNodeRef>;
 
 /// \class PcpNodeRef_ChildrenIterator
 ///

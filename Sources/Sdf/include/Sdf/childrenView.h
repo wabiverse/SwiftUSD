@@ -163,14 +163,14 @@ class Sdf_ChildrenViewTraits<
     SdfChildrenViewTrivialPredicate<typename _Owner::ChildPolicy::ValueType>> {
 private:
 public:
-  typedef _InnerIterator const_iterator;
+  using const_iterator = _InnerIterator;
 
   static const const_iterator &
-  GetIterator(const _Owner *, const _InnerIterator &i, size_t size) {
+  GetIterator(const _Owner *, const const_iterator &i, size_t size) {
     return i;
   }
 
-  static const _InnerIterator &GetBase(const const_iterator &i) { return i; }
+  static const const_iterator &GetBase(const const_iterator &i) { return i; }
 };
 
 /// \class SdfChildrenView
@@ -203,14 +203,14 @@ class SdfChildrenView {
 public:
   typedef SdfChildrenView<_ChildPolicy, _Predicate, _Adapter> This;
 
-  typedef _Adapter Adapter;
-  typedef _Predicate Predicate;
-  typedef _ChildPolicy ChildPolicy;
-  typedef typename ChildPolicy::KeyPolicy KeyPolicy;
-  typedef Sdf_Children<ChildPolicy> ChildrenType;
+  using Adapter = _Adapter;
+  using Predicate = _Predicate;
+  using ChildPolicy = _ChildPolicy;
+  using KeyPolicy = typename ChildPolicy::KeyPolicy;
+  using ChildrenType = Sdf_Children<ChildPolicy>;
 
-  typedef typename ChildPolicy::KeyType key_type;
-  typedef typename Adapter::PublicType value_type;
+  using key_type = typename ChildPolicy::KeyType;
+  using value_type = typename Adapter::PublicType;
 
 private:
   // An iterator type for the internal unfiltered data storage. This
@@ -342,12 +342,11 @@ private:
   };
 
 public:
-  typedef Sdf_ChildrenViewTraits<This, _InnerIterator, Predicate> _Traits;
-  typedef typename _Traits::const_iterator const_iterator;
-  typedef Tf_ProxyReferenceReverseIterator<const_iterator>
-      const_reverse_iterator;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  using _Traits = Sdf_ChildrenViewTraits<This, _InnerIterator, Predicate>;
+  using const_iterator = typename _Traits::const_iterator;
+  using const_reverse_iterator = Tf_ProxyReferenceReverseIterator<const_iterator>;
+  using size_type = size_t;
+  using difference_type = ptrdiff_t;
 
   SdfChildrenView() {}
 
@@ -560,10 +559,8 @@ private:
 /// Helper class to convert a given view of type \c _View to an
 /// adapted view using \c _Adapter as the adapter class.
 template <class _View, class _Adapter> struct SdfAdaptedChildrenViewCreator {
-  typedef _View OriginalView;
-  typedef SdfChildrenView<typename _View::ChildPolicy,
-                          typename _View::Predicate, _Adapter>
-      AdaptedView;
+  using OriginalView = _View;
+  using AdaptedView = SdfChildrenView<typename OriginalView::ChildPolicy, typename OriginalView::Predicate, _Adapter>;
 
   static AdaptedView Create(const OriginalView &view) {
     return AdaptedView(view);
@@ -575,15 +572,15 @@ template <typename C, typename P, typename A>
 struct Tf_ShouldIterateOverCopy<SdfChildrenView<C, P, A>> : std::true_type {};
 template <typename C, typename P, typename A>
 struct Tf_IteratorInterface<SdfChildrenView<C, P, A>, false> {
-  typedef SdfChildrenView<C, P, A> Type;
-  typedef typename Type::const_iterator IteratorType;
+  using Type = SdfChildrenView<C, P, A>;
+  using IteratorType = typename Type::const_iterator;
   static IteratorType Begin(Type const &c) { return c.begin(); }
   static IteratorType End(Type const &c) { return c.end(); }
 };
 template <typename C, typename P, typename A>
 struct Tf_IteratorInterface<SdfChildrenView<C, P, A>, true> {
-  typedef SdfChildrenView<C, P, A> Type;
-  typedef typename Type::const_reverse_iterator IteratorType;
+  using Type = SdfChildrenView<C, P, A>;
+  using IteratorType = typename Type::const_reverse_iterator;
   static IteratorType Begin(Type const &c) { return c.rbegin(); }
   static IteratorType End(Type const &c) { return c.rend(); }
 };

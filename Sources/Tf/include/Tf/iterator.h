@@ -396,7 +396,11 @@ class Tf_ProxyReferenceReverseIterator
     : private std::reverse_iterator<UnderlyingIterator> {
   // private API for interacting with an STL reverse_iterator of the
   // UnderlyingIterator
+public:
+  using This = Tf_ProxyReferenceReverseIterator;
   using ReverseIterator = std::reverse_iterator<UnderlyingIterator>;
+
+private:
   const ReverseIterator &_reverse_iterator() const { return *this; }
   ReverseIterator &_reverse_iterator() { return *this; }
   explicit Tf_ProxyReferenceReverseIterator(const ReverseIterator &it)
@@ -412,11 +416,12 @@ public:
   using pointer = typename ReverseIterator::pointer;
   using difference_type = typename ReverseIterator::difference_type;
 
-  static_assert(!std::is_reference<reference>::value,
-                "Tf_ProxyReferenceReverseIterator should only be used "
-                "when the underlying iterator's reference type is a "
-                "proxy (MyTypeRef) and not a true reference (MyType&)."
-                "Use std::reverse_iterator instead.");
+  /// @WABI: FIX ME
+  // static_assert(!std::is_reference<reference>::value,
+  //               "Tf_ProxyReferenceReverseIterator should only be used "
+  //               "when the underlying iterator's reference type is a "
+  //               "proxy (MyTypeRef) and not a true reference (MyType&)."
+  //               "Use std::reverse_iterator instead.");
                 
   /// @WABI: FIX ME
   // static_assert(std::is_same<iterator_category,
@@ -440,34 +445,34 @@ public:
 
   // Many  methods can use the underlying STL implementation but need to
   // avoid returning a `std::reverse_iterator`
-  Tf_ProxyReferenceReverseIterator &operator++() {
+  This &operator++() {
     ++_reverse_iterator();
     return *this;
   }
 
-  Tf_ProxyReferenceReverseIterator operator++(int) {
-    Tf_ProxyReferenceReverseIterator result{_reverse_iterator()};
+  This operator++(int) {
+    This result{_reverse_iterator()};
     ++_reverse_iterator();
     return result;
   }
 
-  Tf_ProxyReferenceReverseIterator &operator--() {
+  This &operator--() {
     --_reverse_iterator();
     return *this;
   }
 
-  Tf_ProxyReferenceReverseIterator operator--(int) {
-    Tf_ProxyReferenceReverseIterator result{_reverse_iterator()};
+  This operator--(int) {
+    This result{_reverse_iterator()};
     --_reverse_iterator();
     return result;
   }
 
-  Tf_ProxyReferenceReverseIterator operator+(difference_type increment) const {
-    return Tf_ProxyReferenceReverseIterator(_reverse_iterator() + increment);
+  This operator+(difference_type increment) const {
+    return This(_reverse_iterator() + increment);
   }
 
-  Tf_ProxyReferenceReverseIterator operator-(difference_type decrement) const {
-    return Tf_ProxyReferenceReverseIterator(_reverse_iterator() - decrement);
+  This operator-(difference_type decrement) const {
+    return This(_reverse_iterator() - decrement);
   }
 
   template <typename OtherIt>
@@ -476,19 +481,19 @@ public:
     return _reverse_iterator() - other._reverse_iterator();
   }
 
-  Tf_ProxyReferenceReverseIterator &operator+=(difference_type increment) {
+  This &operator+=(difference_type increment) {
     _reverse_iterator() += increment;
     return *this;
   }
 
-  Tf_ProxyReferenceReverseIterator &operator-=(difference_type decrement) {
+  This &operator-=(difference_type decrement) {
     _reverse_iterator() -= decrement;
     return *this;
   }
 
-  inline friend Tf_ProxyReferenceReverseIterator
+  inline friend This
   operator+(const difference_type increment,
-            const Tf_ProxyReferenceReverseIterator &iterator) {
+            const This &iterator) {
     return Tf_ProxyReferenceReverseIterator(increment +
                                             iterator._reverse_iterator());
   }
@@ -496,42 +501,42 @@ public:
   // Comparison operators defer to the STL implementation
   template <typename OtherIt>
   inline friend bool
-  operator==(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator==(const This &lhs,
              const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() == rhs._reverse_iterator();
   }
 
   template <typename OtherIt>
   inline friend bool
-  operator!=(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator!=(const This &lhs,
              const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() != rhs._reverse_iterator();
   }
 
   template <typename OtherIt>
   inline friend bool
-  operator<(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator<(const This &lhs,
             const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() < rhs._reverse_iterator();
   }
 
   template <typename OtherIt>
   inline friend bool
-  operator>(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator>(const This &lhs,
             const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() > rhs._reverse_iterator();
   }
 
   template <typename OtherIt>
   inline friend bool
-  operator<=(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator<=(const This &lhs,
              const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() <= rhs._reverse_iterator();
   }
 
   template <typename OtherIt>
   inline friend bool
-  operator>=(const Tf_ProxyReferenceReverseIterator &lhs,
+  operator>=(const This &lhs,
              const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs) {
     return lhs._reverse_iterator() >= rhs._reverse_iterator();
   }

@@ -24,10 +24,12 @@
 #ifndef PXR_USD_PCP_DYNAMIC_FILE_FORMAT_DEPENDENCY_DATA_H
 #define PXR_USD_PCP_DYNAMIC_FILE_FORMAT_DEPENDENCY_DATA_H
 
+#include <pxr/pxrns.h>
+
 #include "Pcp/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
+#include "Vt/value.h"
 
 #include <memory>
 #include <vector>
@@ -35,7 +37,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class PcpDynamicFileFormatInterface;
-class VtValue;
+//class VtValue;
 
 TF_DECLARE_WEAK_PTRS(SdfFileFormat);
 

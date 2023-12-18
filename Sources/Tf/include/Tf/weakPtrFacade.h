@@ -101,11 +101,11 @@ class TfWeakPtrFacade : public TfWeakPtrFacadeBase {
 public:
   friend class TfWeakPtrFacadeAccess;
 
-  typedef Type DataType;
-  typedef PtrTemplate<DataType> Derived;
-  typedef TfWeakPtrFacadeAccess Access;
+  using DataType = Type;
+  using Derived = PtrTemplate<DataType>;
+  using Access = TfWeakPtrFacadeAccess;
 
-  typedef Type element_type;
+  using element_type = Type;
 
   template <class Other> bool operator==(PtrTemplate<Other> const &p) const {
     if (false)

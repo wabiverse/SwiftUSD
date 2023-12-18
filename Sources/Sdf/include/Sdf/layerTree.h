@@ -26,10 +26,11 @@
 
 /// \file sdf/layerTree.h
 
+#include <pxr/pxrns.h>
+
 #include "Sdf/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/layerOffset.h"
-#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -37,8 +38,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Layer tree forward declarations.
 class SdfLayerTree;
-typedef TfRefPtr<SdfLayerTree> SdfLayerTreeHandle;
-typedef std::vector<SdfLayerTreeHandle> SdfLayerTreeHandleVector;
+using SdfLayerTreeHandle = TfRefPtr<SdfLayerTree>;
+using SdfLayerTreeHandleVector = std::vector<SdfLayerTreeHandle>;
 
 SDF_DECLARE_HANDLES(SdfLayer);
 

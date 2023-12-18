@@ -24,6 +24,15 @@
 #ifndef PXR_USD_PCP_PRIM_INDEX_H
 #define PXR_USD_PCP_PRIM_INDEX_H
 
+#include <pxr/pxrns.h>
+
+#include "Tf/declarePtrs.h"
+#include "Tf/hashmap.h"
+#include "Tf/hashset.h"
+
+#include "Sdf/declareHandles.h"
+#include "Sdf/site.h"
+
 #include "Pcp/api.h"
 #include "Pcp/composeSite.h"
 #include "Pcp/dependency.h"
@@ -33,12 +42,6 @@
 #include "Pcp/iterator.h"
 #include "Pcp/node.h"
 #include "Pcp/types.h"
-#include "Sdf/declareHandles.h"
-#include "Sdf/site.h"
-#include "Tf/declarePtrs.h"
-#include "Tf/hashmap.h"
-#include "Tf/hashset.h"
-#include <pxr/pxrns.h>
 
 #include <OneTBB/tbb/spin_rw_mutex.h>
 

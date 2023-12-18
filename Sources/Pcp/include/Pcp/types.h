@@ -24,11 +24,14 @@
 #ifndef PXR_USD_PCP_TYPES_H
 #define PXR_USD_PCP_TYPES_H
 
+#include <pxr/pxrns.h>
+
+#include "Tf/pxrTslRobinMap/robin_set.h"
+
 #include "Pcp/api.h"
 #include "Pcp/site.h"
+
 #include "Sdf/layer.h"
-#include "Tf/pxrTslRobinMap/robin_set.h"
-#include <pxr/pxrns.h>
 
 #include <limits>
 #include <vector>

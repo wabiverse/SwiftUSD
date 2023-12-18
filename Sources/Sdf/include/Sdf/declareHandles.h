@@ -26,13 +26,14 @@
 
 /// \file sdf/declareHandles.h
 
+#include <pxr/pxrns.h>
+
 #include "Arch/demangle.h"
 #include "Arch/hints.h"
-#include "Sdf/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/diagnostic.h"
 #include "Tf/weakPtrFacade.h"
-#include <pxr/pxrns.h>
+#include "Sdf/api.h"
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/operators.hpp>
@@ -50,7 +51,7 @@ class Sdf_Identity;
 // Sdf_Identities are held via intrusive_ptr so that we can carefully
 // manage the ref-count to avoid race conditions -- see
 // Sdf_IdentityRegistry::Identify().
-typedef boost::intrusive_ptr<Sdf_Identity> Sdf_IdentityRefPtr;
+using Sdf_IdentityRefPtr = boost::intrusive_ptr<Sdf_Identity>;
 
 /// \class SdfHandle
 ///
@@ -61,8 +62,8 @@ typedef boost::intrusive_ptr<Sdf_Identity> Sdf_IdentityRefPtr;
 template <class T>
 class SdfHandle : private boost::totally_ordered<SdfHandle<T>> {
 public:
-  typedef SdfHandle<T> This;
-  typedef T SpecType;
+  using SpecType = T;
+  using This = SdfHandle<SpecType>;
 
   typedef typename std::remove_const<SpecType>::type NonConstSpecType;
   typedef SdfHandle<NonConstSpecType> NonConstThis;
@@ -149,17 +150,18 @@ using PXR_NS::get_pointer;
 PXR_NAMESPACE_OPEN_SCOPE
 
 template <class T> struct SdfHandleTo {
-  typedef SdfHandle<T> Handle;
-  typedef SdfHandle<const T> ConstHandle;
-  typedef std::vector<Handle> Vector;
-  typedef std::vector<ConstHandle> ConstVector;
+  using Cls = T;
+  using Handle = SdfHandle<Cls>;
+  using ConstHandle = SdfHandle<const Cls>;
+  using Vector = std::vector<Handle>;
+  using ConstVector = std::vector<ConstHandle>;
 };
 
 template <> struct SdfHandleTo<SdfLayer> {
-  typedef TfWeakPtr<SdfLayer> Handle;
-  typedef TfWeakPtr<const SdfLayer> ConstHandle;
-  typedef std::vector<Handle> Vector;
-  typedef std::vector<ConstHandle> ConstVector;
+  using Handle = TfWeakPtr<SdfLayer>;
+  using ConstHandle = TfWeakPtr<const SdfLayer>;
+  using Vector = std::vector<Handle>;
+  using ConstVector = std::vector<ConstHandle>;
 };
 
 template <typename T> typename SdfHandleTo<T>::Handle SdfCreateHandle(T *p) {
@@ -187,8 +189,8 @@ SDF_API bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &srcSpec,
 
 template <class DST, class SRC>
 struct Sdf_SpecTypesAreDirectlyRelated
-    : std::integral_constant<bool, std::is_base_of<DST, SRC>::value ||
-                                       std::is_base_of<SRC, DST>::value> {};
+    : std::integral_constant<bool, std::is_base_of<DST, SRC>::value || std::is_base_of<SRC, DST>::value>
+{};
 
 /// Convert SdfHandle<SRC> \p x to an SdfHandle<DST>. This function
 /// behaves similar to a dynamic_cast. If class DST cannot represent
@@ -203,8 +205,8 @@ struct Sdf_SpecTypesAreDirectlyRelated
 template <typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType>
 TfDynamic_cast(const SdfHandle<SRC> &x) {
-  typedef typename DST::SpecType Spec;
-  typedef SdfHandle<Spec> Handle;
+  using Spec = typename DST::SpecType;
+  using Handle = SdfHandle<Spec>;
 
   if (Sdf_CanCastToType(x.GetSpec(), typeid(Spec))) {
     return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
@@ -226,8 +228,8 @@ TfSafeDynamic_cast(const SdfHandle<SRC> &x) {
 template <typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType>
 TfStatic_cast(const SdfHandle<SRC> &x) {
-  typedef typename DST::SpecType Spec;
-  typedef SdfHandle<Spec> Handle;
+  using Spec = typename DST::SpecType;
+  using Handle = SdfHandle<Spec>;
   static_assert(Sdf_SpecTypesAreDirectlyRelated<Spec, SRC>::value,
                 "Spec and SRC must be directly related.");
 
@@ -247,8 +249,8 @@ TfConst_cast(const SdfHandle<const typename T::SpecType> &x) {
 template <typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType>
 SdfSpecDynamic_cast(const SdfHandle<SRC> &x) {
-  typedef typename DST::SpecType Spec;
-  typedef SdfHandle<Spec> Handle;
+  using Spec = typename DST::SpecType;
+  using Handle = SdfHandle<Spec>;
 
   if (Sdf_CanCastToTypeCheckSchema(x.GetSpec(), typeid(Spec))) {
     return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
@@ -263,8 +265,8 @@ SdfSpecDynamic_cast(const SdfHandle<SRC> &x) {
 template <typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType>
 SdfSpecStatic_cast(const SdfHandle<SRC> &x) {
-  typedef typename DST::SpecType Spec;
-  typedef SdfHandle<Spec> Handle;
+  using Spec = typename DST::SpecType;
+  using Handle = SdfHandle<Spec>;
   return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
 }
 
@@ -274,15 +276,16 @@ inline DST_SPEC SdfSpecStatic_cast(const SRC_SPEC &x) {
   return Sdf_CastAccess::CastSpec<DST_SPEC, SRC_SPEC>(x);
 }
 
-typedef TfRefPtr<SdfLayer> SdfLayerRefPtr;
-typedef std::vector<TfRefPtr<SdfLayer>> SdfLayerRefPtrVector;
-typedef std::set<SdfHandleTo<SdfLayer>::Handle> SdfLayerHandleSet;
+using SdfLayerRefPtr = TfRefPtr<SdfLayer>;
+using SdfLayerRefPtrVector = std::vector<SdfLayerRefPtr>;
+using SdfLayerHandleSet = std::set<SdfHandleTo<SdfLayer>::Handle>;
 
 #define SDF_DECLARE_HANDLES(cls)                                               \
-  typedef SdfHandleTo<class cls>::Handle cls##Handle;                          \
-  typedef SdfHandleTo<class cls>::ConstHandle cls##ConstHandle;                \
-  typedef SdfHandleTo<class cls>::Vector cls##HandleVector;                    \
-  typedef SdfHandleTo<class cls>::ConstVector cls##ConstHandleVector
+  class cls;                                                                   \
+  using cls##Handle = SdfHandleTo<class cls>::Handle;                          \
+  using cls##ConstHandle = SdfHandleTo<class cls>::ConstHandle;                \
+  using cls##HandleVector = SdfHandleTo<class cls>::Vector;                    \
+  using cls##ConstHandleVector = SdfHandleTo<class cls>::ConstVector
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

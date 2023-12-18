@@ -26,9 +26,10 @@
 
 /// \file pcp/layerStackIdentifier.h
 
+#include <pxr/pxrns.h>
+
 #include "Pcp/api.h"
 #include "Pcp/expressionVariablesSource.h"
-#include <pxr/pxrns.h>
 
 #include "Ar/resolverContext.h"
 #include "Sdf/declareHandles.h"

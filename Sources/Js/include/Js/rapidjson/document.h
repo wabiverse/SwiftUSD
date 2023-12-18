@@ -188,32 +188,32 @@ class GenericMemberIterator {
     friend class GenericValue<Encoding,Allocator>;
     template <bool, typename, typename> friend class GenericMemberIterator;
 
-    typedef GenericMember<Encoding,Allocator> PlainType;
-    typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
+    using PlainType = GenericMember<Encoding, Allocator>;
+    using ValueType = typename internal::MaybeAddConst<Const,PlainType>::Type;
 
 public:
     //! Iterator type itself
-    typedef GenericMemberIterator Iterator;
+    using Iterator = GenericMemberIterator;
     //! Constant iterator type
-    typedef GenericMemberIterator<true,Encoding,Allocator>  ConstIterator;
+    using ConstIterator = GenericMemberIterator<true, Encoding, Allocator>;
     //! Non-constant iterator type
-    typedef GenericMemberIterator<false,Encoding,Allocator> NonConstIterator;
+    using NonConstIterator = GenericMemberIterator<false,Encoding,Allocator>;
 
     /** \name std::iterator_traits support */
     //@{
-    typedef ValueType      value_type;
-    typedef ValueType *    pointer;
-    typedef ValueType &    reference;
-    typedef std::ptrdiff_t difference_type;
-    typedef std::random_access_iterator_tag iterator_category;
+    using value_type = ValueType;
+    using pointer = ValueType *;
+    using reference = ValueType &;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::random_access_iterator_tag;
     //@}
 
     //! Pointer to (const) GenericMember
-    typedef pointer         Pointer;
+    using Pointer = pointer;
     //! Reference to (const) GenericMember
-    typedef reference       Reference;
+    using Reference = reference;
     //! Signed integer type (e.g. \c ptrdiff_t)
-    typedef difference_type DifferenceType;
+    using DifferenceType = difference_type;
 
     //! Default constructor (singular value)
     /*! Creates an iterator pointing to no element.

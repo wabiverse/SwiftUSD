@@ -26,13 +26,16 @@
 
 /// \file pcp/layerStack.h
 
+#include <pxr/pxrns.h>
+
+#include "Tf/declarePtrs.h"
+
+#include "Sdf/layerTree.h"
+
 #include "Pcp/api.h"
 #include "Pcp/errors.h"
 #include "Pcp/layerStackIdentifier.h"
 #include "Pcp/mapExpression.h"
-#include "Sdf/layerTree.h"
-#include "Tf/declarePtrs.h"
-#include <pxr/pxrns.h>
 
 #include <OneTBB/tbb/spin_mutex.h>
 #include <iosfwd>

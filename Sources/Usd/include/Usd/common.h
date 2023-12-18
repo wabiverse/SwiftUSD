@@ -52,7 +52,7 @@ class UsdStageCache;
 class VtValue;
 
 TF_DECLARE_WEAK_AND_REF_PTRS(UsdStage);
-typedef UsdStagePtr UsdStageWeakPtr;
+using UsdStageWeakPtr = UsdStagePtr;
 
 /// Return a human-readable description.
 USD_API

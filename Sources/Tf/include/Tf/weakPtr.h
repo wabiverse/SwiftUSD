@@ -146,7 +146,7 @@ public:
   template <class U> friend class TfWeakPtr;
 
   template <class U> struct Rebind {
-    typedef TfWeakPtr<U> Type;
+    using Type = TfWeakPtr<U>;
   };
 
   TfWeakPtr() : _rawPtr(0) {}
@@ -256,7 +256,7 @@ template <class U> TfWeakPtr<U> TfCreateNonConstWeakPtr(U const *p) {
 ///
 template <class T>
 TfRefPtr<T> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &p) {
-  typedef typename TfRefPtr<T>::_Counter Counter;
+  using Counter = typename TfRefPtr<T>::_Counter;
   if (T *rawPtr = get_pointer(p)) {
     // Atomically increment the ref-count iff it's nonzero.
     if (Counter::AddRefIfNonzero(rawPtr)) {

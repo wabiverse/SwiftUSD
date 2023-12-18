@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "robin_hash.h"
+#include "Tf/pxrTslRobinMap/robin_hash.h"
 
 // Pixar modification, modify namespace for isolation.
 #include <pxr/pxrns.h>

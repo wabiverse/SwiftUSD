@@ -145,9 +145,8 @@ private:
   public:
     using This = _Iterator<Owner, GetItem>;
     using iterator_category = std::random_access_iterator_tag;
-    using value_type = std::remove_cv_t<
-        std::remove_reference_t<typename GetItem::result_type>>;
     using reference = typename GetItem::result_type;
+    using value_type = std::remove_cv_t<std::remove_reference_t<reference>>;
     using pointer = _PtrProxy;
     using difference_type = std::ptrdiff_t;
 
