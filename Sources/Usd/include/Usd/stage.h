@@ -26,6 +26,8 @@
 
 /// \file usd/stage.h
 
+#include <pxr/pxrns.h>
+
 #include "Usd/api.h"
 #include "Usd/common.h"
 #include "Usd/editTarget.h"
@@ -35,7 +37,6 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/stageLoadRules.h"
 #include "Usd/stagePopulationMask.h"
-#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 #include "Tf/hashmap.h"
@@ -56,6 +57,8 @@
 #include <OneTBB/tbb/concurrent_unordered_set.h>
 #include <OneTBB/tbb/concurrent_vector.h>
 #include <OneTBB/tbb/spin_rw_mutex.h>
+
+#include <swift/bridging>
 
 #include <functional>
 #include <memory>
@@ -2246,7 +2249,7 @@ private:
   friend struct Usd_AttrGetUntypedValueHelper;
   template <class RefsOrPayloadsEditorType, class RefsOrPayloadsProxyType>
   friend struct Usd_ListEditImpl;
-};
+} SWIFT_SHARED_REFERENCE(retainUsdStage, releaseUsdStage);
 
 // UsdObject's typed metadata query relies on this specialization being
 // externally visible and exporting the primary template does not
@@ -2355,5 +2358,8 @@ UsdStage::_SetMetadata(const UsdObject &object, const TfToken &key,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void retainUsdStage(PXR_NS::UsdStage *);
+void releaseUsdStage(PXR_NS::UsdStage *);
 
 #endif // PXR_USD_USD_STAGE_H

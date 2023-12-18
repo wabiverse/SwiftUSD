@@ -24,11 +24,14 @@
 import Pixar
 
 @main
-struct Creator 
+enum Creator
 {
   static func main()
   {
-    print("Executable path:", Pixar.Arch.getExecutablePath())
+    print("Creating a new Usd.Stage.")
+
+    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+    print(stage)
 
     print("'usdview' does nothing... yet.")
   }

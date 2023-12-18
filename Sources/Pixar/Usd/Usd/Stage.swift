@@ -27,5 +27,13 @@ public typealias UsdStageRefPtr = Pixar.UsdStageRefPtr
 
 public extension Pixar.Usd
 {
-  typealias StageRefPtr = UsdStageRefPtr
+  typealias Stage = Pixar.UsdStage
+}
+
+public extension Pixar.Usd.Stage
+{
+  static func createNew(_ identifier: String, load: InitialLoadSet = .init(rawValue: 0)) -> UsdStageRefPtr
+  {
+    Pixar.UsdStage.CreateNew(std.string(identifier), load)
+  }
 }

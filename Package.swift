@@ -4,11 +4,11 @@ import PackageDescription
 let package = Package(
   name: "SwiftUSD",
   platforms: [
-    .macOS(.v12),
+    .macOS(.v14),
     .visionOS(.v1),
-    .iOS(.v12),
-    .tvOS(.v12),
-    .watchOS(.v4)
+    .iOS(.v16),
+    .tvOS(.v16),
+    .watchOS(.v9)
   ],
   products: [
     .library(
