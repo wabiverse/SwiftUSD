@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit.git",
       "state" : {
-        "revision" : "48404ba947dd463e876d2c7c5638b4fc6da05b41",
-        "version" : "1.3.5"
+        "revision" : "187368cad7c7c13af44903b56628d0505800e75c",
+        "version" : "1.3.6"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
       "state" : {
-        "revision" : "b15ce9743fde71cadf8d429b3fa6dad68e275e73",
-        "version" : "1.26.0"
+        "revision" : "d81c5b35576887a5e04211657cca1535b43ab0a5",
+        "version" : "1.26.1"
       }
     },
     {

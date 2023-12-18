@@ -21,6 +21,8 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Js
+
 public typealias JsValue = Pixar.JsValue
 
 public extension Pixar.Js

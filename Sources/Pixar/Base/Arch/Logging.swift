@@ -23,17 +23,17 @@
 
 /* --- xxx --- */
 
-public final class PXRMsg
+public final class Msg
 {
   private init()
   {}
 
-  public static let Log = PXRMsg()
+  public static let Log = Msg()
 }
 
 /* --- xxx --- */
 
-public extension PXRMsg
+public extension Msg
 {
   func point(_ subject: String, to msgArgs: Any...)
   {
@@ -70,7 +70,7 @@ public extension PXRMsg
 
 /* --- xxx --- */
 
-public extension PXRMsg
+public extension Msg
 {
   private func log(_ message: String, type: String, color: Colors = .default)
   {
@@ -102,7 +102,7 @@ public extension PXRMsg
 
 /* --- xxx --- */
 
-public extension PXRMsg
+public extension Msg
 {
   enum Colors: String
   {
@@ -142,7 +142,7 @@ public extension PXRMsg
   {
     for c in Colors.all()
     {
-      PXRMsg.Log.log("This is printed in " + c.name(), type: "TEST", color: c)
+      Msg.Log.log("This is printed in " + c.name(), type: "TEST", color: c)
     }
   }
 }

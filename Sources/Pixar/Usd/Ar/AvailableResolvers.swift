@@ -21,6 +21,8 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Ar
+
 public extension Pixar.Ar
 {
   static func getAllResolvers() -> [String]
@@ -31,8 +33,8 @@ public extension Pixar.Ar
     guard
       // 2. we verify the base type is valid.
       let all = base.pointee.IsUnknown() == false
-        // 3. we get all that derive from the base type.
-        ? Pixar.TfType.GetDirectlyDerivedTypes(base.pointee) : nil,
+      // 3. we get all that derive from the base type.
+      ? Pixar.TfType.GetDirectlyDerivedTypes(base.pointee) : nil,
       // 4. we ensure the list is not empty.
       all().empty() == false
     else { return [] }

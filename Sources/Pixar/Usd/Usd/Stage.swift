@@ -21,9 +21,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsParseError = Pixar.JsParseError
+import Usd
 
-public extension Pixar.Js
+public typealias UsdStageRefPtr = Pixar.UsdStageRefPtr
+
+public extension Pixar.Usd
 {
-  typealias ParseError = JsParseError
+  typealias StageRefPtr = UsdStageRefPtr
 }

@@ -24,7 +24,6 @@
 import XCTest
 @testable import Pixar
 
-
 /* ---- xxx ----
  *  ARCH  TESTS
  * ---- xxx ---- */
@@ -33,27 +32,27 @@ final class ArchTests: XCTestCase
 {
   func testCwd()
   {
-    PXRMsg.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
+    Msg.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
   }
 
   func testExecutablePath()
   {
-    PXRMsg.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
+    Msg.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
   }
 
   func testPageSize()
   {
-    PXRMsg.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
+    Msg.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
   }
 
   func testIsMainThread()
   {
-    PXRMsg.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
+    Msg.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
   }
 
   func testMainThreadId()
   {
-    PXRMsg.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
+    Msg.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
   }
 
   func testAlignMemoryOfSize()
@@ -101,10 +100,10 @@ final class JsTests: XCTestCase
   func testArray()
   {
     let array = Pixar.Js.Array()
-    PXRMsg.Log.point("Pixar.Js.Array", to: array)
+    Msg.Log.point("Pixar.Js.Array", to: array)
 
     let jsArray = JsArray()
-    PXRMsg.Log.point("JsArray", to: jsArray)
+    Msg.Log.point("JsArray", to: jsArray)
 
     XCTAssertEqual(array.count, jsArray.count)
   }
@@ -112,10 +111,10 @@ final class JsTests: XCTestCase
   func testObject()
   {
     let object = Pixar.Js.Object()
-    PXRMsg.Log.point("Pixar.Js.Object", to: object)
+    Msg.Log.point("Pixar.Js.Object", to: object)
 
     let jsObject = JsObject()
-    PXRMsg.Log.point("JsObject", to: jsObject)
+    Msg.Log.point("JsObject", to: jsObject)
 
     XCTAssertEqual(object.empty(), jsObject.empty())
   }
@@ -123,10 +122,10 @@ final class JsTests: XCTestCase
   func testParseError()
   {
     let parseError = Pixar.Js.ParseError()
-    PXRMsg.Log.point("Pixar.Js.ParseError", to: parseError)
+    Msg.Log.point("Pixar.Js.ParseError", to: parseError)
 
     let jsParseError = JsParseError()
-    PXRMsg.Log.point("ParseError", to: jsParseError)
+    Msg.Log.point("ParseError", to: jsParseError)
 
     XCTAssertEqual(parseError.reason, jsParseError.reason)
   }
@@ -134,11 +133,11 @@ final class JsTests: XCTestCase
   func testValue()
   {
     let value = Pixar.Js.Value(true)
-    PXRMsg.Log.point("Pixar.Js.Value", to: value.GetBool())
+    Msg.Log.point("Pixar.Js.Value", to: value.GetBool())
     XCTAssertEqual(value.GetBool(), true)
 
     let jsValue = JsValue(true)
-    PXRMsg.Log.point("JsValue", to: jsValue.GetBool())
+    Msg.Log.point("JsValue", to: jsValue.GetBool())
     XCTAssertEqual(jsValue.GetBool(), true)
 
     XCTAssertEqual(value.GetBool(), jsValue.GetBool())
@@ -154,10 +153,10 @@ final class GfTests: XCTestCase
   func testVec2f()
   {
     let vec2f = Pixar.Gf.Vec2f(1.0, 2.0)
-    PXRMsg.Log.point("Pixar.Gf.Vec2f", to: vec2f)
+    Msg.Log.point("Pixar.Gf.Vec2f", to: vec2f)
 
     let gfVec2f = GfVec2f(1.0, 2.0)
-    PXRMsg.Log.point("GfVec2f", to: gfVec2f)
+    Msg.Log.point("GfVec2f", to: gfVec2f)
 
     XCTAssertEqual(vec2f, gfVec2f)
     XCTAssertEqual(MemoryLayout<GfVec2f>.size, MemoryLayout<(Float, Float)>.size)
@@ -166,20 +165,20 @@ final class GfTests: XCTestCase
   func testVec3f()
   {
     let vec3fA = GfVec3f(1.0, 2.0, 3.0)
-    PXRMsg.Log.point("GfVec3f(1.0, 2.0, 3.0)", to: vec3fA)
+    Msg.Log.point("GfVec3f(1.0, 2.0, 3.0)", to: vec3fA)
 
     let vec3fB = GfVec3f(4.0, 5.0, 6.0)
-    PXRMsg.Log.point("GfVec3f(4.0, 5.0, 6.0)", to: vec3fB)
-    
+    Msg.Log.point("GfVec3f(4.0, 5.0, 6.0)", to: vec3fB)
+
     var vec3fC = vec3fA + vec3fB
-    PXRMsg.Log.point("vec3fC=(vec3fA + vec3fB)", to: vec3fC)
+    Msg.Log.point("vec3fC=(vec3fA + vec3fB)", to: vec3fC)
 
     vec3fC *= vec3fA
-    PXRMsg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
+    Msg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
 
-    PXRMsg.Log.point("MemoryLayout<SIMD3<Float>>.size", to: MemoryLayout<SIMD3<Float>>.size)
-    PXRMsg.Log.point("MemoryLayout<GfVec3f>.size", to: MemoryLayout<GfVec3f>.size)
-    PXRMsg.Log.point("MemoryLayout<(Float, Float, Float)>.size", to: MemoryLayout<(Float, Float, Float)>.size)
+    Msg.Log.point("MemoryLayout<SIMD3<Float>>.size", to: MemoryLayout<SIMD3<Float>>.size)
+    Msg.Log.point("MemoryLayout<GfVec3f>.size", to: MemoryLayout<GfVec3f>.size)
+    Msg.Log.point("MemoryLayout<(Float, Float, Float)>.size", to: MemoryLayout<(Float, Float, Float)>.size)
 
     XCTAssertEqual(MemoryLayout<GfVec3f>.size, MemoryLayout<(Float, Float, Float)>.size)
   }
@@ -197,23 +196,22 @@ final class ArTests: XCTestCase
 
     if resolvers.isEmpty
     {
-      PXRMsg.Log.point("Pixar.Ar.getAllResolvers()", to: "None")
+      Msg.Log.point("Pixar.Ar.getAllResolvers()", to: "None")
     }
 
     for (i, r) in resolvers.enumerated()
     {
-      PXRMsg.Log.point(
+      Msg.Log.point(
         "Pixar.Ar.getAllResolvers()"
-        + "\(PXRMsg.Colors.yellow.rawValue) -> " 
-        + "\(PXRMsg.Colors.default.rawValue)["
-        + "\(PXRMsg.Colors.green.rawValue)\(i+1) of \(resolvers.count)"
-        + "\(PXRMsg.Colors.default.rawValue)]",
+          + "\(Msg.Colors.yellow.rawValue) -> "
+          + "\(Msg.Colors.default.rawValue)["
+          + "\(Msg.Colors.green.rawValue)\(i + 1) of \(resolvers.count)"
+          + "\(Msg.Colors.default.rawValue)]",
         to: "\(r)"
       )
     }
   }
 }
-
 
 /* ---- xxx ----
  *  KIND  TESTS
@@ -227,12 +225,12 @@ final class KindTests: XCTestCase
 
     for (i, t) in tokens.enumerated()
     {
-      PXRMsg.Log.point(
+      Msg.Log.point(
         "Pixar.Kind.Tokens"
-        + "\(PXRMsg.Colors.yellow.rawValue) -> " 
-        + "\(PXRMsg.Colors.default.rawValue)["
-        + "\(PXRMsg.Colors.green.rawValue)\(i+1) of \(tokens.count)"
-        + "\(PXRMsg.Colors.default.rawValue)]",
+          + "\(Msg.Colors.yellow.rawValue) -> "
+          + "\(Msg.Colors.default.rawValue)["
+          + "\(Msg.Colors.green.rawValue)\(i + 1) of \(tokens.count)"
+          + "\(Msg.Colors.default.rawValue)]",
         to: "\(t.getToken().string)"
       )
     }

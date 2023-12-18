@@ -21,9 +21,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsObject = Pixar.JsObject
+import Js
+
+public typealias JsArray = Pixar.JsArray
 
 public extension Pixar.Js
 {
-  typealias Object = JsObject
+  typealias Array = JsArray
 }

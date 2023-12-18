@@ -21,50 +21,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import Kind
+import Js
 
-fileprivate extension Pixar.Kind
+public typealias JsObject = Pixar.JsObject
+
+public extension Pixar.Js
 {
-  /**
-   * Private struct to hold the static
-   * data for the Pixar.Kind library. */
-  struct StaticData
-  {
-    static let shared = StaticData()
-    private init()
-    {}
-
-    let tokens = Pixar.KindTokens_StaticTokenType()
-  }
-}
-
-public extension Pixar.Kind
-{
-  /**
-   * # Pixar.Kind.Tokens
-   *
-   * ### Overview
-   *
-   * Public, client facing api to access
-   * the static Pixar.Kind tokens. */
-  enum Tokens: CaseIterable
-  {
-    case model
-    case component
-    case group
-    case assembly
-    case subcomponent
-
-    public func getToken() -> Pixar.Tf.Token
-    {
-      switch self
-      {
-        case .model: StaticData.shared.tokens.model
-        case .component: StaticData.shared.tokens.component
-        case .group: StaticData.shared.tokens.group
-        case .assembly: StaticData.shared.tokens.assembly
-        case .subcomponent: StaticData.shared.tokens.subcomponent
-      }
-    }
-  }
+  typealias Object = JsObject
 }

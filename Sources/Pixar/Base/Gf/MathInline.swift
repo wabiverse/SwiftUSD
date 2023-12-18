@@ -21,6 +21,8 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Gf
+
 public extension Pixar.Gf
 {
   /// Check if two values are within a specified **epsilon** of each other.

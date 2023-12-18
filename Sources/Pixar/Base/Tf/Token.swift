@@ -21,25 +21,31 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import CxxStdlib
+// import Tf
+import Plug
+
+/* note: the typealiases are documented the same way twice,
+ * keep it like this so that sourcekit shows documentation
+ * regardless of which typealias a user might use in their
+ * code. */
+
+/**
+ * # TfToken
+ *
+ * ### Overview
+ *
+ * **Token** for efficient comparison, assignment, and hashing of known strings.
+ *
+ * A TfToken is a handle for a registered string, and can be compared,
+ * assigned, and hashed in constant time. It is useful when a bounded
+ * number of strings are used as fixed symbols (but never modified). */
 public typealias TfToken = Pixar.TfToken
-
-extension Pixar.TfToken 
-{
-  private borrowing func GetStringCopy() -> std.string 
-  {
-    return __GetStringUnsafe().pointee
-  }
-
-  public var string: std.string 
-  {
-    GetStringCopy()
-  }
-}
 
 public extension Pixar.Tf
 {
   /**
-   * # Pixar.Tf.Token
+   * # Tf.Token
    *
    * ### Overview
    *
@@ -49,4 +55,17 @@ public extension Pixar.Tf
    * assigned, and hashed in constant time. It is useful when a bounded
    * number of strings are used as fixed symbols (but never modified). */
   typealias Token = TfToken
+}
+
+extension TfToken
+{
+  private borrowing func GetStringCopy() -> std.string
+  {
+    __GetStringUnsafe().pointee
+  }
+
+  public var string: std.string
+  {
+    GetStringCopy()
+  }
 }

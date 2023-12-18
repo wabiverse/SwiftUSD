@@ -21,9 +21,11 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-public typealias JsArray = Pixar.JsArray
+import Js
+
+public typealias JsParseError = Pixar.JsParseError
 
 public extension Pixar.Js
 {
-  typealias Array = JsArray
+  typealias ParseError = JsParseError
 }

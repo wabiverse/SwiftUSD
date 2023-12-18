@@ -21,6 +21,8 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Gf
+
 /* note: the typealiases are documented the same way twice,
  * keep it like this so that sourcekit shows documentation
  * regardless of which typealias a user might use in their
