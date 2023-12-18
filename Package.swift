@@ -153,7 +153,7 @@ let package = Package(
   ],
   dependencies: [
     /* ----------------- a single dependency to rule them all. ----------------- */
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.6"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.7"),
     /* ------------------------------------------------------------------------- */
   ],
   targets: [
@@ -170,6 +170,7 @@ let package = Package(
         .target(name: "pxr"),
         /* ------------ VFX Platform. ----------- */
         .product(name: "MetaTBB", package: "MetaverseKit"),
+        .product(name: "PyBind11", package: "MetaverseKit"),
         .product(name: "MaterialX", package: "MetaverseKit"),
         .product(name: "Boost", package: "MetaverseKit"),
         .product(name: "MetaPy", package: "MetaverseKit"),
