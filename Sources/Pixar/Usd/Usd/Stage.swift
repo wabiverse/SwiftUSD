@@ -21,6 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Foundation
 import Usd
 
 public typealias StageRefPtr = Pixar.UsdStageRefPtr
@@ -38,15 +39,16 @@ public extension Pixar.Usd
    * compositions into richer aggregates using referencing and layering with sparse
    * overrides. Ultimately, every composition (i.e. "scene") is identifiable by its
    * root layer, i.e. the `.usd` file, and a scene is instantiated in an application
-   * on a UsdStage that presents a composed view of the scene's root layer. Each simple
+   * on a Stage that presents a composed view of the scene's root layer. Each simple
    * composition referenced into a larger composition could be presented on its own
-   * ``UsdStage``, at the same (or not) time that it is participating in the larger
-   * composition on its own UsdStage; all of the underlying layers will be shared by
-   * the two stages, while each maintains its own scenegraph of composed prims.
+   * ``Pixar.Usd.Stage``, at the same (or not) time that it is participating in the
+   * larger composition on its own Stage; all of the underlying layers will be shared
+   * by the two stages, while each maintains its own scenegraph of composed prims.
    *
-   * A UsdStage has sole ownership over the UsdPrim 's with which it is populated, and
-   * retains *shared* ownership (with other stages and direct clients of SdfLayer's, via
-   * the ``Sdf/LayerRegistry`` that underlies all ``SdfLayer`` creation methods) of layers.
+   * A UsdStage has sole ownership over the ``Pixar.Usd.Prim``'s with which it is
+   * populated, and retains *shared* ownership (with other stages and direct clients
+   * of ``Pixar.Sdf.Layer``'s, via the ``Pixar.Sdf.LayerRegistry`` that underlies all
+   * ``Pixar.Sdf.Layer`` creation methods) of layers.
    *
    * It provides roughly five categories of API that address different aspects of scene
    * management:
@@ -64,8 +66,9 @@ public extension Pixar.Usd
    * on the stage.
    * - "Layers and EditTargets" methods provide access to the layers in the stage's
    * **root LayerStack** (i.e. the root layer and all of its recursive sublayers),
-   * and the ability to set a ``UsdEditTarget`` into which all subsequent mutations
-   * to objects associated with the stage (e.g. prims, properties, etc) will go.
+   * and the ability to set a ``Pixar.Usd.EditTarget`` into which all subsequent
+   * mutations to objects associated with the stage (e.g. prims, properties, etc)
+   * will go.
    * - "Serialization" methods for "flattening" a composition (to varying degrees),
    * and exporting a completely flattened view of the stage to a string or file.
    * These methods can be very useful for targeted asset optimization and debugging,

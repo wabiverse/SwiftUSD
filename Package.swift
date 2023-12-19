@@ -131,8 +131,9 @@ let package = Package(
       targets: ["UsdGenSchemaPlugin"]
     ),
     .library(
-      name: "PyPixar",
+      name: "Pixar",
       targets: [
+        "Pixar",
         "PyTf",
         "PyGf",
         "PyTrace",
@@ -145,10 +146,6 @@ let package = Package(
         "PyPcp",
         "PyUsd"
       ]
-    ),
-    .library(
-      name: "Pixar",
-      targets: ["Pixar"]
     ),
   ],
   dependencies: [

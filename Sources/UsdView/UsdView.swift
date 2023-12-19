@@ -28,8 +28,10 @@ enum Creator
 {
   static func main()
   {
-    print("Creating a new Usd.Stage.")
+    /* all usd resources (python, plugins, resources). */
+    Pixar.Bundle.shared.setup(.resources)
 
+    print("Creating a new Usd.Stage.")
     let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
     print(stage)
 

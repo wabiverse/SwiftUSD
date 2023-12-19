@@ -32,6 +32,8 @@
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 
+#include <swift/bridging>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -69,13 +71,15 @@ public:
   AR_API
   virtual ~ArDefaultResolver();
 
+  using ArSearchPathVec = std::vector<std::string>;
+  
   /// Set the default search path that will be used during asset
   /// resolution. This must be called before the first call
   /// to \ref ArGetResolver.
   /// The specified paths will be searched *in addition to, and before*
   /// paths specified via the environment variable PXR_AR_DEFAULT_SEARCH_PATH
   AR_API
-  static void SetDefaultSearchPath(const std::vector<std::string> &searchPath);
+  static void SetDefaultSearchPath(const ArSearchPathVec &searchPath);
 
 protected:
   AR_API
@@ -140,8 +144,11 @@ private:
 
   ArDefaultResolverContext _fallbackContext;
   ArResolverContext _defaultContext;
-};
+} SWIFT_SHARED_REFERENCE(ArDefaultResolverRetain, ArDefaultResolverRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void ArDefaultResolverRetain(Pixar::ArDefaultResolver *);
+void ArDefaultResolverRelease(Pixar::ArDefaultResolver *);
 
 #endif // PXR_USD_AR_DEFAULT_RESOLVER_H
