@@ -4136,3 +4136,19 @@ bool SdfLayer::_Save(bool force) const {
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void SdfLayerRetain(Pixar::SdfLayer *layer)
+{
+#if DEBUG
+  printf("Called SdfLayerRetain()\n");
+#endif /* DEBUG */
+  Pixar::SdfLayer *ref = layer;
+}
+
+void SdfLayerRelease(Pixar::SdfLayer *layer)
+{
+#if DEBUG
+  printf("Called SdfLayerRelease()\n");
+#endif /* DEBUG */
+  layer = nullptr;
+}

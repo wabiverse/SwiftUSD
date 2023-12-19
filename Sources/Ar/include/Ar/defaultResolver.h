@@ -144,11 +144,8 @@ private:
 
   ArDefaultResolverContext _fallbackContext;
   ArResolverContext _defaultContext;
-} SWIFT_SHARED_REFERENCE(ArDefaultResolverRetain, ArDefaultResolverRelease);
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void ArDefaultResolverRetain(Pixar::ArDefaultResolver *);
-void ArDefaultResolverRelease(Pixar::ArDefaultResolver *);
 
 #endif // PXR_USD_AR_DEFAULT_RESOLVER_H

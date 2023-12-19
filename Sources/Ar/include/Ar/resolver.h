@@ -32,6 +32,8 @@
 #include "Ar/timestamp.h"
 #include <pxr/pxrns.h>
 
+#include <swift/bridging>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -824,7 +826,7 @@ private:
   // been bound via BindContext in their implementations.
   AR_API
   const ArResolverContext *_GetInternallyManagedCurrentContext() const;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 /// Returns the configured asset resolver.
 ///

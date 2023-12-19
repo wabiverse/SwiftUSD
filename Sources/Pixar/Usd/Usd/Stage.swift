@@ -22,6 +22,7 @@
  * -------------------------------------------------------------- */
 
 import Foundation
+import Sdf
 import Usd
 
 public typealias StageRefPtr = Pixar.UsdStageRefPtr
@@ -93,12 +94,30 @@ public extension Pixar.Usd
    * set that target in the stage by calling `setEditTarget()` or creating
    * a ``UsdEditContext``. */
   typealias Stage = Pixar.UsdStage
+  typealias Prim = Pixar.UsdPrim
 }
 
 public extension Pixar.Usd.Stage
 {
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  @discardableResult
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
   {
-    Pixar.UsdStage.CreateNew(std.string(identifier), load.rawValue)
+    Pixar.UsdStage.CreateNew(std.string(identifier), load.rawValue).pointee
+  }
+
+  @discardableResult
+  func definePrim(_ path: Pixar.SdfPath, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
+  {
+    DefinePrim(path, name)
+  }
+
+  func getRootLayer() -> Pixar.Sdf.LayerHandle
+  {
+    GetRootLayer()
+  }
+
+  func save()
+  {
+    Save()
   }
 }

@@ -37,6 +37,8 @@
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
 
+#include <swift/bridging>
+
 #include <mutex>
 #include <string>
 #include <vector>
@@ -352,11 +354,13 @@ public:
   PLUG_API
   PlugPluginPtrVector RegisterPlugins(const std::string &pathToPlugInfo);
 
+  using PlugPathsVector = std::vector<std::string>;
+  
   /// Registers all plug-ins discovered in any of \a pathsToPlugInfo.  Sends
   /// PlugNotice::DidRegisterPlugins with any newly registered plugins.
   PLUG_API
   PlugPluginPtrVector
-  RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo);
+  RegisterPlugins(const PlugPathsVector &pathsToPlugInfo);
 
   /// Retrieve the \c TfType corresponding to the given \c name.  See the
   /// documentation for \c TfType::FindByName for more information.  Use this
@@ -475,7 +479,7 @@ private:
   TfHashSet<std::string, TfHash> _registeredPluginPaths;
 
   std::mutex _mutex;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PLUG_API_TEMPLATE_CLASS(TfSingleton<PlugRegistry>);
 

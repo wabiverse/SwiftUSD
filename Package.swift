@@ -358,6 +358,9 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Ar"),
       ],
+      resources: [
+        .process("Resources")
+      ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),

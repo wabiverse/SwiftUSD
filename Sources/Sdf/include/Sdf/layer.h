@@ -44,6 +44,8 @@
 #include "Work/dispatcher.h"
 #include <pxr/pxrns.h>
 
+#include <swift/bridging>
+
 #include <boost/optional.hpp>
 
 #include <atomic>
@@ -1935,8 +1937,11 @@ private:
   // Give layer state delegates access to our data as well as to
   // the various _Prim functions.
   friend class SdfLayerStateDelegateBase;
-};
+} SWIFT_SHARED_REFERENCE(SdfLayerRetain, SdfLayerRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void SdfLayerRetain(Pixar::SdfLayer *);
+void SdfLayerRelease(Pixar::SdfLayer *);
 
 #endif // PXR_USD_SDF_LAYER_H

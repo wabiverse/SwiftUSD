@@ -37,6 +37,8 @@
 
 #include "Tf/hash.h"
 
+#include <swift/bridging>
+
 #include <type_traits>
 
 PXR_NAMESPACE_OPEN_SCOPE

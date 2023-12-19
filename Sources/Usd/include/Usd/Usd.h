@@ -32,9 +32,9 @@
 // #include <Usd/listEditImpl.h>
 // #include <Usd/modelAPI.h>
 // #include <Usd/notice.h>
-// #include <Usd/object.h>
+#include <Usd/object.h>
 // #include <Usd/payloads.h>
-// #include <Usd/prim.h>
+#include <Usd/prim.h>
 // #include <Usd/primCompositionQuery.h>
 // #include <Usd/primData.h>
 // #include <Usd/primDataHandle.h>

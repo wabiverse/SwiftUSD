@@ -25,14 +25,14 @@ import Sdf
 
 public extension Pixar.Sdf
 {
-  typealias LayerHandle = Pixar.SdfLayerHandle
   typealias Layer = Pixar.SdfLayer
+  typealias LayerHandle = Pixar.SdfLayerHandle
 }
 
 public extension Pixar.Sdf.Layer
 {
-  func set(documentation: String)
+  func set(doc: String)
   {
-    SetDocumentation(std.string(documentation))
+    SetDocumentation(std.string(doc))
   }
 }

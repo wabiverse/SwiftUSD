@@ -35,6 +35,8 @@
 #include "Tf/weakPtrFacade.h"
 #include "Sdf/api.h"
 
+#include <swift/bridging>
+
 #include <boost/intrusive_ptr.hpp>
 #include <boost/operators.hpp>
 #include <set>
@@ -137,7 +139,7 @@ private:
   SpecType _spec;
 
   template <class U> friend class SdfHandle;
-};
+} SWIFT_UNSAFE_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
