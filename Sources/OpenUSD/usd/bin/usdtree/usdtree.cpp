@@ -310,13 +310,13 @@ void PrintTree(const Args &args, const ArResolvedPath& resolved) {
         UsdStageRefPtr stage;
         if (!mask.IsEmpty()) {
             if (args.unloaded) {
-                stage = UsdStage::OpenMasked(resolved, mask, UsdStage::LoadNone);
+                stage = UsdStage::OpenMasked(resolved, mask, UsdStage::InitialLoadSet::LoadNone);
             } else {
                 stage = UsdStage::OpenMasked(resolved, mask);
             }
         } else {
             if (args.unloaded) {
-                stage = UsdStage::Open(resolved, UsdStage::LoadNone);
+                stage = UsdStage::Open(resolved, UsdStage::InitialLoadSet::LoadNone);
             } else {
                 stage = UsdStage::Open(resolved);
             }
@@ -328,7 +328,7 @@ void PrintTree(const Args &args, const ArResolvedPath& resolved) {
         
         PrintTree(args, stage);
     } else if (args.flattenLayerStack) {
-        UsdStageRefPtr stage = UsdStage::Open(resolved, UsdStage::LoadNone);
+        UsdStageRefPtr stage = UsdStage::Open(resolved, UsdStage::InitialLoadSet::LoadNone);
         if (!m.IsClean() || !stage) {
             return;
         }

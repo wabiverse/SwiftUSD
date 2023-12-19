@@ -95,7 +95,7 @@ My_TestGLDrawing::InitTest()
     
     std::cout << "My_TestGLDrawing::InitTest()\n";
     _stage = UsdStage::Open(GetStageFilePath(),
-        IsEnabledUnloadedAsBounds() ? UsdStage::LoadNone : UsdStage::LoadAll);
+        IsEnabledUnloadedAsBounds() ? UsdStage::InitialLoadSet::LoadNone : UsdStage::InitialLoadSet::LoadAll);
 
     UsdImagingGLEngine::Parameters parameters;
     parameters.rootPath = _stage->GetPseudoRoot().GetPath();

@@ -215,7 +215,7 @@ static int UsdCat(const Args &args) {
                 stage = UsdStage::OpenMasked(input, mask);
             }
         } else if (args.flattenLayerStack) {
-            stage = UsdStage::Open(input, UsdStage::LoadNone);
+            stage = UsdStage::Open(input, UsdStage::InitialLoadSet::LoadNone);
             layer = UsdUtilsFlattenLayerStack(stage);
         } else if (args.layerMetadata) {
             auto srcLayer = SdfLayer::OpenAsAnonymous(

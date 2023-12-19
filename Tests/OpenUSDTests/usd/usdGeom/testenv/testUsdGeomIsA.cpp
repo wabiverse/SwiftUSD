@@ -40,7 +40,7 @@ TestIsA()
     // --------------------------------------------------------------------- //
     SdfLayerRefPtr layer = SdfLayer::CreateAnonymous();
     UsdStageRefPtr stage = UsdStage::Open(layer->GetIdentifier(), 
-                                          UsdStage::LoadNone);
+                                          UsdStage::InitialLoadSet::LoadNone);
 
     // forcePopulate = false above to test Load explicitly below
     TF_VERIFY(stage->Load(), 

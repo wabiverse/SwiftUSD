@@ -314,8 +314,8 @@ public:
 // ------------------------------------------------------------------------- //
 
 TF_REGISTRY_FUNCTION(TfEnum) {
-  TF_ADD_ENUM_NAME(UsdStage::LoadAll, "Load all loadable prims");
-  TF_ADD_ENUM_NAME(UsdStage::LoadNone, "Load no loadable prims");
+  TF_ADD_ENUM_NAME(UsdStage::InitialLoadSet::LoadAll, "Load all loadable prims");
+  TF_ADD_ENUM_NAME(UsdStage::InitialLoadSet::LoadNone, "Load no loadable prims");
 }
 
 static ArResolverContext
@@ -637,8 +637,8 @@ UsdStageRefPtr UsdStage::_InstantiateStage(
   ArResolverScopedCache resolverCache;
 
   // Set the stage's load rules.
-  stage->_loadRules = (load == LoadAll) ? UsdStageLoadRules::LoadAll()
-                                        : UsdStageLoadRules::LoadNone();
+  stage->_loadRules = (load == InitialLoadSet::LoadAll) ? UsdStageLoadRules::LoadAll()
+                                                        : UsdStageLoadRules::LoadNone();
 
   Usd_InstanceChanges instanceChanges;
   const SdfPath &absoluteRootPath = SdfPath::AbsoluteRootPath();
@@ -8313,3 +8313,19 @@ UsdStage::_SetMetadataImpl(const UsdObject &, const TfToken &, const TfToken &,
                            const SdfAbstractDataConstValue &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void UsdStageRetain(Pixar::UsdStage *stage)
+{
+#if DEBUG
+  printf("Called UsdStageRetain()\n");
+#endif /* DEBUG */
+  Pixar::UsdStageRefPtr ref(stage);
+}
+
+void UsdStageRelease(Pixar::UsdStage *stage)
+{
+#if DEBUG
+  printf("Called UsdStageRelease()\n");
+#endif /* DEBUG */
+  Pixar::UsdStageRefPtr(stage).Reset();
+}

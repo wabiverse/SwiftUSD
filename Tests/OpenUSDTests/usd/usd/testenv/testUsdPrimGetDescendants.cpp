@@ -37,7 +37,7 @@ static void
 TestGetDescendants()
 {
     std::string layerFile = "test.usda";
-    UsdStageRefPtr stage = UsdStage::Open(layerFile, UsdStage::LoadNone);
+    UsdStageRefPtr stage = UsdStage::Open(layerFile, UsdStage::InitialLoadSet::LoadNone);
     if (!stage) {
         TF_FATAL_ERROR("Failed to load stage for @%s@", layerFile.c_str());
     }
