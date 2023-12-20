@@ -1,5 +1,4 @@
-/*!
-\page page_tf_MallocTag The TfMallocTag Memory Tagging System
+# The TfMallocTag Memory Tagging System
 
 \section MallocTagContents Contents
 
@@ -131,6 +130,3 @@ In particular, the C++ STL library maintains its own allocator for small request
 \section MallocTagMultithreading Multithreading
 
 The TfMallocTag system is completely thread-safe.  Each thread has its own local stack of call-site objects.  You can call TfMallocTag::GetCallTree() or TfMallocTag::GetTotalBytes() at any time and from any thread.
-
-*/
-

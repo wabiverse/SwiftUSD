@@ -400,8 +400,7 @@ const T &VtDictionaryGet(const VtDictionary &dictionary,
                          const std::string &key) {
   VtDictionary::const_iterator i = dictionary.find(key);
   if (ARCH_UNLIKELY(i == dictionary.end())) {
-    TF_FATAL_ERROR((std::string("Attempted to get value for key '") + key +
-                   "', which is not in the dictionary.").c_str());
+    TF_FATAL_ERROR("Attempted to get value for key '%s' which is not in the dictionary.", key.c_str());
   }
 
   return i->second.Get<T>();
@@ -412,8 +411,7 @@ template <typename T>
 const T &VtDictionaryGet(const VtDictionary &dictionary, const char *key) {
   VtDictionary::const_iterator i = dictionary.find(key);
   if (ARCH_UNLIKELY(i == dictionary.end())) {
-    TF_FATAL_ERROR(std::string("Attempted to get value for key '%s' which is not in the dictionary.").c_str(), 
-                   key);
+    TF_FATAL_ERROR("Attempted to get value for key '%s' which is not in the dictionary.", key);
   }
 
   return i->second.Get<T>();

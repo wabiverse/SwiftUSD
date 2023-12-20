@@ -42,7 +42,7 @@ TF_INSTANTIATE_NOTICE_WRAPPER(ArNotice::ResolverChanged,
 
 } // end anonymous namespace
 
-void wrapNotice() {
+void wrapArNotice() {
   scope s = class_<ArNotice>("Notice", no_init);
 
   TfPyNoticeWrapper<ArNotice::ResolverNotice, TfNotice>::Wrap();

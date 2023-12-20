@@ -1,5 +1,4 @@
-/*!
-\page page_tf_TfError The TfError Error Posting System
+# The TfError Error Posting System
 
 The TfError system is a developer-level mechanism used to indicate that a
 non-fatal error has occurred.  The primary benefit of this facility is that it
@@ -244,5 +243,3 @@ there is a demonstrable software error; for example, if passed arguments are
 invalid, or for an unmet precondition.  Use TF_RUNTIME_ERROR() for errors that
 are not due to software bugs; for example, corrupt or invalid data in a file,
 disk space exhausted, network server unresponsive.
-
-*/

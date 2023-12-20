@@ -54,7 +54,7 @@ TF_INSTANTIATE_NOTICE_WRAPPER(SdfNotice::LayerMutenessChanged, SdfNotice::Base);
 
 } // anonymous namespace
 
-void wrapNotice() {
+void wrapSdfNotice() {
   scope s = class_<SdfNotice>("Notice", no_init);
 
   TfPyNoticeWrapper<SdfNotice::Base, TfNotice>::Wrap();

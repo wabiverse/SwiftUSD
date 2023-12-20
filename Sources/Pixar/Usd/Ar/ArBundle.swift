@@ -27,12 +27,12 @@ import Plug
 public extension Pixar.Bundle
 {
   /**
-   * Where ``Pixar.Ar`` application bundle resources are located. */
-  static let ar = Bundle(path: "SwiftUSD_Ar.bundle")
-
-  /**
    * Where ``Pixar.Plug`` application bundle resources are located. */
   static let plug = Bundle(path: "SwiftUSD_Plug.bundle")
+
+  /**
+   * Where ``Pixar.Ar`` application bundle resources are located. */
+  static let ar = Bundle(path: "SwiftUSD_Ar.bundle")
 
   /**
    * Where ``Pixar.Sdf`` application bundle resources are located. */
@@ -41,6 +41,50 @@ public extension Pixar.Bundle
   /**
    * Where ``Pixar.Usd`` application bundle resources are located. */
   static let usd = Bundle(path: "SwiftUSD_Usd.bundle")
+
+  /**
+   * Where ``Pixar.Tf`` python bundle resources are located. */
+  static let pyTf = Bundle(path: "SwiftUSD_PyTf.bundle")
+
+  /**
+   * Where ``Pixar.Plug`` python bundle resources are located. */
+  static let pyPlug = Bundle(path: "SwiftUSD_PyPlug.bundle")
+
+  /**
+   * Where ``Pixar.Trace`` python bundle resources are located. */
+  static let pyTrace = Bundle(path: "SwiftUSD_PyTrace.bundle")
+
+  /**
+   * Where ``Pixar.Work`` python bundle resources are located. */
+  static let pyWork = Bundle(path: "SwiftUSD_PyWork.bundle")
+
+  /**
+   * Where ``Pixar.Gf`` python bundle resources are located. */
+  static let pyGf = Bundle(path: "SwiftUSD_PyGf.bundle")
+
+  /**
+   * Where ``Pixar.Vt`` python bundle resources are located. */
+  static let pyVt = Bundle(path: "SwiftUSD_PyVt.bundle")
+
+  /**
+   * Where ``Pixar.Ar`` python bundle resources are located. */
+  static let pyAr = Bundle(path: "SwiftUSD_PyAr.bundle")
+
+  /**
+   * Where ``Pixar.Kind`` python bundle resources are located. */
+  static let pyKind = Bundle(path: "SwiftUSD_PyKind.bundle")
+
+  /**
+   * Where ``Pixar.Sdf`` python bundle resources are located. */
+  static let pySdf = Bundle(path: "SwiftUSD_PySdf.bundle")
+
+  /**
+   * Where ``Pixar.Pcp`` python bundle resources are located. */
+  static let pyPcp = Bundle(path: "SwiftUSD_PyPcp.bundle")
+
+  /**
+   * Where ``Pixar.Usd`` python bundle resources are located. */
+  static let pyUsd = Bundle(path: "SwiftUSD_PyUsd.bundle")
 }
 
 public extension Pixar
@@ -81,6 +125,39 @@ public extension Pixar
           case .plug: Bundle.plug?.resourcePath
           case .sdf: Bundle.sdf?.resourcePath
           case .usd: Bundle.usd?.resourcePath
+        }
+      }
+    }
+
+    public enum BundlePython: CaseIterable
+    {
+      case pyTf
+      case pyPlug
+      case pyTrace
+      case pyWork
+      case pyGf
+      case pyVt
+      case pyAr
+      case pyKind
+      case pySdf
+      case pyPcp
+      case pyUsd
+
+      public var resourcePath: String?
+      {
+        switch self
+        {
+          case .pyTf: Bundle.pyTf?.resourcePath
+          case .pyPlug: Bundle.pyPlug?.resourcePath
+          case .pyTrace: Bundle.pyTrace?.resourcePath
+          case .pyWork: Bundle.pyWork?.resourcePath
+          case .pyGf: Bundle.pyGf?.resourcePath
+          case .pyVt: Bundle.pyVt?.resourcePath
+          case .pyAr: Bundle.pyAr?.resourcePath
+          case .pyKind: Bundle.pyKind?.resourcePath
+          case .pySdf: Bundle.pySdf?.resourcePath
+          case .pyPcp: Bundle.pyPcp?.resourcePath
+          case .pyUsd: Bundle.pyUsd?.resourcePath
         }
       }
     }

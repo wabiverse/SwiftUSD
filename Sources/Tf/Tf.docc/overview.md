@@ -1,24 +1,9 @@
-// This file is used solely to put useful information on the main
-// index page produced by doxygen.
-
-// IF YOU ADD A NEW GROUP, PLEASE ADD IT TO THE LIST BELOW!!
-
-// Comprehensive package documentation:
-
-/// \defgroup group_tf_Notification Notification System
-/// See \ref page_tf_Notification for a detailed description.
-
-/// \defgroup group_tf_TfError TfError Error-posting Facility
-/// See \ref page_tf_TfError for a detailed description.
-
-/// \defgroup group_tf_Diagnostic Diagnostic Facilities
-/// See \ref page_tf_Diagnostic for a discussion of diagnostic techniques.
-
-/// \defgroup group_tf_Initialization Initialization Facilities
-/// Functions to control initialization of resources.
-
-/// \defgroup group_tf_MallocTag Memory Tagging System
-/// See \ref page_tf_MallocTag for a discussion of memory tagging.
+# Comprehensive package documentation:
+- Notification System
+- Error-posting Facility
+- Diagnostic Facilities
+- Initialization Facilities
+- Memory Tagging System
 
 // Classes/functions by groups:
 
@@ -119,7 +104,3 @@ For a detailed explanation of topics specific to C++, see these additional Relat
     <li> \subpage page_tf_RegistryManager   </li> 
     <li> \subpage page_tf_MallocTag   </li> 
 </ul> 
-
-*/
-
-

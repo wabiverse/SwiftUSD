@@ -434,11 +434,13 @@ void SdfFileFormat::_SetLayerData(SdfLayer *layer, SdfAbstractDataRefPtr &data,
     // to have the qualities the file format dictates, even if the
     // underlying data object type is the same.
     const SdfAbstractDataConstPtr oldData = _GetLayerData(*layer);
-    const bool differentDataImpl =
-        data->StreamsData() != oldData->StreamsData() ||
-        data->IsDetached() != oldData->IsDetached() ||
-        !TfSafeTypeCompare(typeid(*get_pointer(data)),
-                           typeid(*get_pointer(oldData)));
+    const bool streamsDataDifferent = data->StreamsData() != oldData->StreamsData();
+    const bool isDetachedDifferent = data->IsDetached() != oldData->IsDetached();
+
+    const auto *dataPtr = get_pointer(data);
+    const auto *oldDataPtr = get_pointer(oldData);
+    const bool typeDifferent = !TfSafeTypeCompare(typeid(*dataPtr), typeid(*oldDataPtr));
+    const bool differentDataImpl = streamsDataDifferent || isDetachedDifferent || typeDifferent;
 
     if (differentDataImpl) {
       layer->_AdoptData(data);

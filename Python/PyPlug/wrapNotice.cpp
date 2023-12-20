@@ -41,7 +41,7 @@ TF_INSTANTIATE_NOTICE_WRAPPER(PlugNotice::DidRegisterPlugins, PlugNotice::Base);
 
 } // anonymous namespace
 
-void wrapNotice() {
+void wrapPlugNotice() {
   scope noticeScope = class_<PlugNotice>("Notice", no_init);
 
   TfPyNoticeWrapper<PlugNotice::Base, TfNotice>::Wrap();

@@ -29,4 +29,4 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapTypes() { TfPyWrapEnum<PcpArcType>(); }
+void wrapPcpTypes() { TfPyWrapEnum<PcpArcType>(); }

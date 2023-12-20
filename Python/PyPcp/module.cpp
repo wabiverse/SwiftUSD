@@ -47,5 +47,5 @@ TF_WRAP_MODULE {
   TF_WRAP(Site);
   TF_WRAP(ExpressionVariables);
   TF_WRAP(TestChangeProcessor);
-  TF_WRAP(Types);
+  TF_WRAP(PcpTypes);
 }

@@ -1,5 +1,4 @@
-/*!
-\page page_tf_Diagnostic Guide To Diagnostic Facilities
+# Guide To Diagnostic Facilities
 
 Describes the use of low-level programming macros to issue coding errors, runtime errors, warnings and status messages.
 
@@ -200,5 +199,3 @@ void YourClass::SomeMethod(int x)
 \endcode
 
 The preceding code sample should display something like: "Debugging info about function YourClass::SomeMethod."
-
-*/

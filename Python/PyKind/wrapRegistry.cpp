@@ -33,7 +33,7 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapRegistry() {
+void wrapKindRegistry() {
   typedef KindRegistry This;
   typedef TfWeakPtr<KindRegistry> ThisPtr;
 
