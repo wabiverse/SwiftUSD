@@ -24,67 +24,65 @@
 import Foundation
 import Plug
 
-public extension Pixar.Bundle
+public extension Bundle
 {
-  /**
-   * Where ``Pixar.Plug`` application bundle resources are located. */
-  static let plug = Bundle(path: "SwiftUSD_Plug.bundle")
+  static let pxr = Bundle.main.resourcePath!
 
   /**
    * Where ``Pixar.Ar`` application bundle resources are located. */
-  static let ar = Bundle(path: "SwiftUSD_Ar.bundle")
+  static let ar = Bundle(path: "\(pxr)/SwiftUSD_Ar.bundle")
 
   /**
    * Where ``Pixar.Sdf`` application bundle resources are located. */
-  static let sdf = Bundle(path: "SwiftUSD_Sdf.bundle")
+  static let sdf = Bundle(path: "\(pxr)/SwiftUSD_Sdf.bundle")
 
   /**
    * Where ``Pixar.Usd`` application bundle resources are located. */
-  static let usd = Bundle(path: "SwiftUSD_Usd.bundle")
+  static let usd = Bundle(path: "\(pxr)/SwiftUSD_Usd.bundle")
 
   /**
    * Where ``Pixar.Tf`` python bundle resources are located. */
-  static let pyTf = Bundle(path: "SwiftUSD_PyTf.bundle")
+  static let pyTf = Bundle(path: "\(pxr)/SwiftUSD_PyTf.bundle")
 
   /**
    * Where ``Pixar.Plug`` python bundle resources are located. */
-  static let pyPlug = Bundle(path: "SwiftUSD_PyPlug.bundle")
+  static let pyPlug = Bundle(path: "\(pxr)/SwiftUSD_PyPlug.bundle")
 
   /**
    * Where ``Pixar.Trace`` python bundle resources are located. */
-  static let pyTrace = Bundle(path: "SwiftUSD_PyTrace.bundle")
+  static let pyTrace = Bundle(path: "\(pxr)/SwiftUSD_PyTrace.bundle")
 
   /**
    * Where ``Pixar.Work`` python bundle resources are located. */
-  static let pyWork = Bundle(path: "SwiftUSD_PyWork.bundle")
+  static let pyWork = Bundle(path: "\(pxr)/SwiftUSD_PyWork.bundle")
 
   /**
    * Where ``Pixar.Gf`` python bundle resources are located. */
-  static let pyGf = Bundle(path: "SwiftUSD_PyGf.bundle")
+  static let pyGf = Bundle(path: "\(pxr)/SwiftUSD_PyGf.bundle")
 
   /**
    * Where ``Pixar.Vt`` python bundle resources are located. */
-  static let pyVt = Bundle(path: "SwiftUSD_PyVt.bundle")
+  static let pyVt = Bundle(path: "\(pxr)/SwiftUSD_PyVt.bundle")
 
   /**
    * Where ``Pixar.Ar`` python bundle resources are located. */
-  static let pyAr = Bundle(path: "SwiftUSD_PyAr.bundle")
+  static let pyAr = Bundle(path: "\(pxr)/SwiftUSD_PyAr.bundle")
 
   /**
    * Where ``Pixar.Kind`` python bundle resources are located. */
-  static let pyKind = Bundle(path: "SwiftUSD_PyKind.bundle")
+  static let pyKind = Bundle(path: "\(pxr)/SwiftUSD_PyKind.bundle")
 
   /**
    * Where ``Pixar.Sdf`` python bundle resources are located. */
-  static let pySdf = Bundle(path: "SwiftUSD_PySdf.bundle")
+  static let pySdf = Bundle(path: "\(pxr)/SwiftUSD_PySdf.bundle")
 
   /**
    * Where ``Pixar.Pcp`` python bundle resources are located. */
-  static let pyPcp = Bundle(path: "SwiftUSD_PyPcp.bundle")
+  static let pyPcp = Bundle(path: "\(pxr)/SwiftUSD_PyPcp.bundle")
 
   /**
    * Where ``Pixar.Usd`` python bundle resources are located. */
-  static let pyUsd = Bundle(path: "SwiftUSD_PyUsd.bundle")
+  static let pyUsd = Bundle(path: "\(pxr)/SwiftUSD_PyUsd.bundle")
 }
 
 public extension Pixar
@@ -94,7 +92,9 @@ public extension Pixar
     public static let shared = Pixar.Bundle()
 
     private init()
-    {}
+    {
+      print("Pixar.Bundle()")
+    }
 
     public enum BundleKind
     {
@@ -103,62 +103,12 @@ public extension Pixar
 
     public func setup(_ kind: BundleKind)
     {
+      print("Pixar.Bundle.setup()")
+
       switch kind
       {
         case .resources:
           resourcesInit()
-      }
-    }
-
-    public enum BundleFramework: CaseIterable
-    {
-      case ar
-      case plug
-      case sdf
-      case usd
-
-      public var resourcePath: String?
-      {
-        switch self
-        {
-          case .ar: Bundle.ar?.resourcePath
-          case .plug: Bundle.plug?.resourcePath
-          case .sdf: Bundle.sdf?.resourcePath
-          case .usd: Bundle.usd?.resourcePath
-        }
-      }
-    }
-
-    public enum BundlePython: CaseIterable
-    {
-      case pyTf
-      case pyPlug
-      case pyTrace
-      case pyWork
-      case pyGf
-      case pyVt
-      case pyAr
-      case pyKind
-      case pySdf
-      case pyPcp
-      case pyUsd
-
-      public var resourcePath: String?
-      {
-        switch self
-        {
-          case .pyTf: Bundle.pyTf?.resourcePath
-          case .pyPlug: Bundle.pyPlug?.resourcePath
-          case .pyTrace: Bundle.pyTrace?.resourcePath
-          case .pyWork: Bundle.pyWork?.resourcePath
-          case .pyGf: Bundle.pyGf?.resourcePath
-          case .pyVt: Bundle.pyVt?.resourcePath
-          case .pyAr: Bundle.pyAr?.resourcePath
-          case .pyKind: Bundle.pyKind?.resourcePath
-          case .pySdf: Bundle.pySdf?.resourcePath
-          case .pyPcp: Bundle.pyPcp?.resourcePath
-          case .pyUsd: Bundle.pyUsd?.resourcePath
-        }
       }
     }
 
@@ -171,15 +121,65 @@ public extension Pixar
       var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
       _ = resources.map
       { path in
-        #if DEBUG
+        #if DEBUG_PIXAR_BUNDLE
           Msg.Log.point("Adding usd resource", to: path)
-        #endif /* DEBUG */
+        #endif /* DEBUG_PIXAR_BUNDLE */
 
         plugPaths.push_back(std.string(path))
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */
       Pixar.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
+    }
+  }
+}
+
+public enum BundleFramework: CaseIterable
+{
+  case ar
+  case sdf
+  case usd
+
+  public var resourcePath: String?
+  {
+    switch self
+    {
+      case .ar: Bundle.ar?.resourcePath
+      case .sdf: Bundle.sdf?.resourcePath
+      case .usd: Bundle.usd?.resourcePath
+    }
+  }
+}
+
+public enum BundlePython: CaseIterable
+{
+  case pyTf
+  case pyPlug
+  case pyTrace
+  case pyWork
+  case pyGf
+  case pyVt
+  case pyAr
+  case pyKind
+  case pySdf
+  case pyPcp
+  case pyUsd
+
+  public var resourcePath: String?
+  {
+    switch self
+    {
+      case .pyTf: Bundle.pyTf?.resourcePath
+      case .pyPlug: Bundle.pyPlug?.resourcePath
+      case .pyTrace: Bundle.pyTrace?.resourcePath
+      case .pyWork: Bundle.pyWork?.resourcePath
+      case .pyGf: Bundle.pyGf?.resourcePath
+      case .pyVt: Bundle.pyVt?.resourcePath
+      case .pyAr: Bundle.pyAr?.resourcePath
+      case .pyKind: Bundle.pyKind?.resourcePath
+      case .pySdf: Bundle.pySdf?.resourcePath
+      case .pyPcp: Bundle.pyPcp?.resourcePath
+      case .pyUsd: Bundle.pyUsd?.resourcePath
     }
   }
 }

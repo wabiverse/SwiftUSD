@@ -149,9 +149,8 @@ let package = Package(
     ),
   ],
   dependencies: [
-    /* ----------------- a single dependency to rule them all. ----------------- */
+    .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.8"),
     .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.7"),
-    /* ------------------------------------------------------------------------- */
   ],
   targets: [
     .target(
@@ -667,6 +666,7 @@ let package = Package(
         /* ------------------- */
       ],
       swiftSettings: [
+        .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
         .interoperabilityMode(.Cxx),
       ]
     ),
@@ -675,6 +675,7 @@ let package = Package(
       name: "PixarTests",
       dependencies: ["Pixar"],
       swiftSettings: [
+        .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
         .interoperabilityMode(.Cxx),
       ]
     ),
