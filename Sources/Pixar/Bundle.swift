@@ -92,9 +92,7 @@ public extension Pixar
     public static let shared = Pixar.Bundle()
 
     private init()
-    {
-      print("Pixar.Bundle()")
-    }
+    {}
 
     public enum BundleKind
     {
@@ -103,8 +101,6 @@ public extension Pixar
 
     public func setup(_ kind: BundleKind)
     {
-      print("Pixar.Bundle.setup()")
-
       switch kind
       {
         case .resources:
