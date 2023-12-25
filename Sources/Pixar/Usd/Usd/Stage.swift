@@ -125,7 +125,6 @@ public extension Pixar.Usd.Stage
     Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue).pointee
   }
 
-  @discardableResult
   func traverse() -> Pixar.Usd.PrimRange
   {
     Traverse()
