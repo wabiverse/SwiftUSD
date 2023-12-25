@@ -21,6 +21,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Foundation
 import Pixar
 
 @main
@@ -28,12 +29,12 @@ enum Creator
 {
   static func main()
   {
-    print("Setup all usd resources (python, plugins, resources).")
+    NSLog("Setup all usd resources (python, plugins, resources).")
     Pixar.Bundle.shared.setup(.resources)
 
-    print("Creating a new Usd.Stage.")
+    NSLog("Creating a new Usd.Stage.")
     Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    print("'usdview' does nothing... will exit now.")
+    NSLog("'usdview' does nothing... will exit now.")
   }
 }

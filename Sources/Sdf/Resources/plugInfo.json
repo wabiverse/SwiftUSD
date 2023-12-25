@@ -28,8 +28,8 @@
             },
             "LibraryPath": "",
             "Name": "Sdf",
-            "ResourcePath": "resources",
-            "Root": "..",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
             "Type": "library"
         }
     ]

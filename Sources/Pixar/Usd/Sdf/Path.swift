@@ -21,22 +21,18 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import Usd
+import Foundation
+import Sdf
 
-public extension Pixar.Usd.Stage
+public extension Pixar.Sdf
 {
-  enum InitialLoadingSet
-  {
-    case all
-    case none
+  typealias Path = Pixar.SdfPath
+}
 
-    public var rawValue: InitialLoadSet
-    {
-      switch self
-      {
-        case .all: InitialLoadSet.LoadAll
-        case .none: InitialLoadSet.LoadNone
-      }
-    }
+public extension Pixar.Sdf.Path
+{
+  init(_ path: String)
+  {
+    self.init(std.string(path))
   }
 }

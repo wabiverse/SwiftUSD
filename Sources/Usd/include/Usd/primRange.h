@@ -30,6 +30,8 @@
 #include "Usd/primFlags.h"
 #include <pxr/pxrns.h>
 
+#include <swift/bridging>
+
 #include <iterator>
 #include <vector>
 
@@ -385,7 +387,7 @@ private:
   Usd_PrimFlagsPredicate _predicate;
   unsigned int _initDepth;
   bool _postOrder;
-};
+} SWIFT_CONFORMS_TO_PROTOCOL(Cxx.CxxConvertibleToCollection);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

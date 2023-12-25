@@ -6,9 +6,9 @@
                 }
             }, 
             "LibraryPath": "", 
-            "Name": "{{ libraryName }}", 
-            "ResourcePath": "resources", 
-            "Root": "..", 
+            "Name": "{{ libraryName }}",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
             "Type": "library"
         }
     ]

@@ -13,10 +13,10 @@
                     "ArPackageResolver": {}
                 }
             },
-            "LibraryPath": "", 
-            "Name": "Ar", 
-            "ResourcePath": "resources", 
-            "Root": "..", 
+            "LibraryPath": "",
+            "Name": "Ar",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
             "Type": "library"
         }
     ]

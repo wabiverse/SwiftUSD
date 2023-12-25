@@ -512,9 +512,11 @@ SdfLayerRefPtr SdfLayer::_CreateNew(SdfFileFormatConstPtr fileFormat,
   // based on the local path suffix,
   if (!fileFormat) {
     fileFormat = SdfFileFormat::FindByExtension(localPath, args);
-    // XXX: This should be a coding error, not a failed verify.
-    if (!TF_VERIFY(fileFormat))
+    if (!fileFormat)
+    {
+      TF_CODING_ERROR("Cannot determine file format.");
       return TfNullPtr;
+    }
   }
 
   // Restrict creating package layers via the Sdf API. These layers

@@ -3,9 +3,9 @@
 
 // usd.
 #include <Usd/api.h>
-// #include <Usd/apiSchemaBase.h>
-// #include <Usd/attribute.h>
-// #include <Usd/attributeQuery.h>
+#include <Usd/apiSchemaBase.h>
+#include <Usd/attribute.h>
+#include <Usd/attributeQuery.h>
 // #include <Usd/clip.h>
 // #include <Usd/clipCache.h>
 // #include <Usd/clipsAPI.h>
@@ -40,7 +40,7 @@
 // #include <Usd/primDataHandle.h>
 // #include <Usd/primDefinition.h>
 // #include <Usd/primFlags.h>
-// #include <Usd/primRange.h>
+#include <Usd/primRange.h>
 // #include <Usd/primTypeInfo.h>
 // #include <Usd/primTypeInfoCache.h>
 // #include <Usd/property.h>
@@ -62,15 +62,15 @@
 // #include <Usd/timeCode.h>
 // #include <Usd/tokens.h>
 // #include <Usd/typed.h>
-// #include <Usd/usdaFileFormat.h>
-// #include <Usd/usdcFileFormat.h>
-// #include <Usd/usdFileFormat.h>
-// #include <Usd/usdzFileFormat.h>
-// #include <Usd/usdzResolver.h>
+#include <Usd/usdaFileFormat.h>
+#include <Usd/usdcFileFormat.h>
+#include <Usd/usdFileFormat.h>
+#include <Usd/usdzFileFormat.h>
+#include <Usd/usdzResolver.h>
 // #include <Usd/valueUtils.h>
 // #include <Usd/variantSets.h>
 // #include <Usd/wrapUtils.h>
-// #include <Usd/zipFile.h>
+#include <Usd/zipFile.h>
 
  #include <Usd/stage.h>
 

@@ -94,21 +94,53 @@ public extension Pixar.Usd
    * set that target in the stage by calling `setEditTarget()` or creating
    * a ``UsdEditContext``. */
   typealias Stage = Pixar.UsdStage
-  typealias Prim = Pixar.UsdPrim
 }
 
 public extension Pixar.Usd.Stage
 {
-  @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
+  enum InitialLoadingSet
   {
-    Pixar.UsdStage.CreateNew(std.string(identifier), load.rawValue).pointee
+    case all
+    case none
+
+    public var rawValue: InitialLoadSet
+    {
+      switch self
+      {
+        case .all: InitialLoadSet.LoadAll
+        case .none: InitialLoadSet.LoadNone
+      }
+    }
+  }
+
+  @discardableResult
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  {
+    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+  }
+
+  @discardableResult
+  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  {
+    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue)
+  }
+
+  @discardableResult
+  func traverse() -> Pixar.Usd.PrimRange
+  {
+    Traverse()
   }
 
   @discardableResult
   func definePrim(_ path: Pixar.SdfPath, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
   {
     DefinePrim(path, name)
+  }
+
+  @discardableResult
+  func definePrim(_ path: String, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
+  {
+    DefinePrim(.init(path), name)
   }
 
   func getRootLayer() -> Pixar.Sdf.LayerHandle

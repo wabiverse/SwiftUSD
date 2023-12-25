@@ -7,8 +7,8 @@
 //#include <Sdf/abstractData.h>
 //#include <Sdf/accessorHelpers.h>
 //#include <Sdf/allowed.h>
-//#include <Sdf/assetPath.h>
-//#include <Sdf/assetPathResolver.h>
+#include <Sdf/assetPath.h>
+#include <Sdf/assetPathResolver.h>
 #include <Sdf/attributeSpec.h>
 //#include <Sdf/changeBlock.h>
 //#include <Sdf/changeList.h>
@@ -26,7 +26,7 @@
 //#include <Sdf/debugCodes.h>
 #include <Sdf/declareHandles.h>
 #include <Sdf/declareSpec.h>
-//#include <Sdf/fileFormat.h>
+#include <Sdf/fileFormat.h>
 //#include <Sdf/fileFormatRegistry.h>
 //#include <Sdf/fileIO_Common.h>
 //#include <Sdf/fileIO.h>
@@ -85,7 +85,7 @@
 //#include <Sdf/spec.h>
 #include <Sdf/specType.h>
 //#include <Sdf/subLayerListEditor.h>
-//#include <Sdf/textFileFormat.h>
+#include <Sdf/textFileFormat.h>
 //
 //#include <Sdf/textFileFormat.tab.h>
 //

@@ -142,11 +142,11 @@
                         ]
                     }
                 }
-            }, 
-            "LibraryPath": "", 
-            "Name": "Usd", 
-            "ResourcePath": "resources", 
-            "Root": "..", 
+            },
+            "LibraryPath": "",
+            "Name": "Usd",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
             "Type": "library"
         }
     ]
