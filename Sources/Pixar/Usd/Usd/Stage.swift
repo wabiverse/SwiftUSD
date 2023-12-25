@@ -114,15 +114,15 @@ public extension Pixar.Usd.Stage
   }
 
   @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
   {
-    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue).pointee
   }
 
   @discardableResult
-  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
   {
-    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue)
+    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue).pointee
   }
 
   @discardableResult
