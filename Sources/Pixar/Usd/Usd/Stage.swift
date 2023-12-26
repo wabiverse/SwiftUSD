@@ -125,28 +125,88 @@ public extension Pixar.Usd.Stage
     Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue).pointee
   }
 
+  /**
+   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
+   *
+   * Returns a ``Pixar.Usd.PrimRange`` , which allows low-latency traversal, with the
+   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
+   * one can do:
+   * ```swift
+   * for prim in stage.traverse()
+   * {
+   *   print(prim.GetPath())
+   * }
+   * ```
+   *
+   * If either a pre-and-post-order traversal or, a traversal rooted at
+   * a particular prim is desired, construct a ``Pixar.Usd.PrimRange``
+   * directly.
+   *
+   * This is equivalent to ``Pixar.Usd.PrimRange.stage()``. */
   func traverse() -> Pixar.Usd.PrimRange
   {
     Traverse()
   }
 
+  /**
+   * Attempt to ensure a UsdPrim at path is defined (according to Pixar.Usd.Prim.isDefined()) on this stage.
+   *
+   * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Pixar.Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Pixar.Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Pixar.Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * not Defined ancestors.
+   *
+   * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
+   * any of the necessary `Pixar.Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Pixar.Usd.Prim``.
+   *
+   * > [!NOTE]
+   * > This method may return a defined prim whose **type name** does not match the supplied **type name**,
+   * > in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
   @discardableResult
   func definePrim(_ path: Pixar.SdfPath, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
   {
     DefinePrim(path, name)
   }
 
+  /**
+   * Attempt to ensure a UsdPrim at path is defined (according to UsdPrim::IsDefined()) on this stage.
+   *
+   * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Pixar.Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Pixar.Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Pixar.Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * not Defined ancestors.
+   *
+   * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
+   * any of the necessary `Pixar.Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Pixar.Usd.Prim``.
+   *
+   * > [!NOTE]
+   * > This method may return a defined prim whose **type name** does not match the supplied **type name**,
+   * > in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
   @discardableResult
   func definePrim(_ path: String, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
   {
     DefinePrim(.init(path), name)
   }
 
+  /**
+   * Return this stage's root layer. */
   func getRootLayer() -> Pixar.Sdf.LayerHandle
   {
     GetRootLayer()
   }
 
+  /**
+   * Save all dirty layers contributing to this stage.
+   *
+   * Calls ``Pixar.Sdf.Layer.save()`` on all dirty layers contributing to this stage
+   * except session layers and sublayers of session layers. This function will emit a
+   * warning and skip each dirty anonymous layer it encounters, since anonymous layers
+   * cannot be saved with ``Pixar.Sdf.Layer.save()``. These layers must be manually
+   * exported by calling ``Pixar.Sdf.Layer.export()``. */
   func save()
   {
     Save()

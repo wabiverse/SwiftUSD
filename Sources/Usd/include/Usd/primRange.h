@@ -213,6 +213,9 @@ public:
   };
 
   using const_iterator = iterator;
+  /* conformance to Swift :: Cxx.CxxConvertibleToCollection */
+  using Element = UsdPrim;
+  using RawIterator = const_iterator;
 
   UsdPrimRange()
       : _begin(nullptr), _end(nullptr), _initDepth(0), _postOrder(false) {}
