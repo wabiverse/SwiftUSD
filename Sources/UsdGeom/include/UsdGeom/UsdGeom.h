@@ -1,0 +1,45 @@
+#ifndef __PXR_USD_USDGEOM_H__
+#define __PXR_USD_USDGEOM_H__
+
+// UsdGeom
+#include <UsdGeom/api.h>
+#include <UsdGeom/basisCurves.h>
+#include <UsdGeom/bboxCache.h>
+#include <UsdGeom/boundable.h>
+#include <UsdGeom/boundableComputeExtent.h>
+#include <UsdGeom/camera.h>
+#include <UsdGeom/capsule.h>
+#include <UsdGeom/cone.h>
+#include <UsdGeom/constraintTarget.h>
+#include <UsdGeom/cube.h>
+#include <UsdGeom/curves.h>
+#include <UsdGeom/cylinder.h>
+#include <UsdGeom/debugCodes.h>
+#include <UsdGeom/gprim.h>
+#include <UsdGeom/hermiteCurves.h>
+#include <UsdGeom/imageable.h>
+#include <UsdGeom/mesh.h>
+#include <UsdGeom/metrics.h>
+#include <UsdGeom/modelAPI.h>
+#include <UsdGeom/motionAPI.h>
+#include <UsdGeom/nurbsCurves.h>
+#include <UsdGeom/nurbsPatch.h>
+#include <UsdGeom/plane.h>
+#include <UsdGeom/pointBased.h>
+#include <UsdGeom/pointInstancer.h>
+#include <UsdGeom/points.h>
+#include <UsdGeom/primvar.h>
+#include <UsdGeom/primvarsAPI.h>
+#include <UsdGeom/samplingUtils.h>
+#include <UsdGeom/scope.h>
+#include <UsdGeom/sphere.h>
+#include <UsdGeom/subset.h>
+#include <UsdGeom/tokens.h>
+#include <UsdGeom/visibilityAPI.h>
+#include <UsdGeom/xform.h>
+#include <UsdGeom/xformable.h>
+#include <UsdGeom/xformCache.h>
+#include <UsdGeom/xformCommonAPI.h>
+#include <UsdGeom/xformOp.h>
+
+#endif // __PXR_USD_USDGEOM_H__

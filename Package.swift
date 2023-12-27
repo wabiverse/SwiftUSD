@@ -4,6 +4,21 @@ import PackageDescription
 let package = Package(
   name: "SwiftUSD",
   platforms: [
+    /*
+     the swiftpm docs are vague on this, however, this setting only
+     currently applies to targeting minimum apple platform versions
+     and the omission of linux and windows here (they do not exist
+     on the SupportedPlatform struct) does not mean linux & windows
+     are not supported. For now, one can disregard this setting on all
+     platforms that are not apple.
+
+     Note: the apple platform minimums are quite recent, this is due to
+     CXX interop only appearing in recent versions of these apple SDKs,
+     without setting these where they are - we would otherwise have to
+     muck up the swift apis with @availibility macros, to avoid errors
+     complaining about (ex. 'UsdStage is only available in macOS 14 or
+     later').
+    */
     .macOS(.v14),
     .visionOS(.v1),
     .iOS(.v16),
@@ -11,10 +26,12 @@ let package = Package(
     .watchOS(.v9)
   ],
   products: [
+    // ---------------- Pixar -----
     .library(
       name: "pxr",
       targets: ["pxr"]
     ),
+    // ----------- Pixar.Base -----
     .library(
       name: "Arch",
       targets: ["Arch"]
@@ -47,6 +64,7 @@ let package = Package(
       name: "Plug",
       targets: ["Plug"]
     ),
+    // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
       targets: ["Ar"]
@@ -66,6 +84,11 @@ let package = Package(
     .library(
       name: "Usd",
       targets: ["Usd"]
+    ),
+    // --------------- Python -----
+    .library(
+      name: "UsdGeom",
+      targets: ["UsdGeom"]
     ),
     .library(
       name: "PyTf",
@@ -122,14 +145,22 @@ let package = Package(
       type: .dynamic,
       targets: ["PyUsd"]
     ),
+    .library(
+      name: "PyUsdGeom",
+      type: .dynamic,
+      targets: ["PyUsdGeom"]
+    ),
+    // ----------------- Apps -----
     .executable(
       name: "UsdView",
       targets: ["UsdView"]
     ),
+    // -------- Swift Plugins -----
     .plugin(
       name: "UsdGenSchemaPlugin",
       targets: ["UsdGenSchemaPlugin"]
     ),
+    // ------- Monolithic USD -----
     .library(
       name: "Pixar",
       targets: [
@@ -144,12 +175,13 @@ let package = Package(
         "PyKind",
         "PySdf",
         "PyPcp",
-        "PyUsd"
+        "PyUsd",
+        "PyUsdGeom"
       ]
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.8"),
+    .package(url: "https://github.com/furby-tm/swift-bundler.git", from: "2.0.8"),
     .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.7"),
   ],
   targets: [
@@ -415,6 +447,33 @@ let package = Package(
     ),
 
     .target(
+      name: "UsdGeom",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Gf"),
+        .target(name: "Kind"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Pcp"),
+        .target(name: "Usd"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
+        .define("USD_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -601,6 +660,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyUsdGeom",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsdGeom",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -663,6 +739,7 @@ let package = Package(
         .target(name: "Sdf"),
         .target(name: "Pcp"),
         .target(name: "Usd"),
+        .target(name: "UsdGeom"),
         /* ------------------- */
       ],
       swiftSettings: [
@@ -682,27 +759,6 @@ let package = Package(
   ],
   cxxLanguageStandard: .cxx17
 )
-
-/* --- xxx --- */
-
-/* ------------------------------------------------------------------------------
- * :: :  M  E  T  A  V  E  R  S  E  :                                          ::
- * ------------------------------------------------------------------------------
- * Pixar's USD is a pretty complicated build. That being said, this single config
- * is less than 100 lines of code. Compare that to the ~21419 lines of CMake code
- * across ~156 files as of the current release branch, SwiftPM brings substantial
- * improvements which drive maintainability and readability, and that's before we
- * even get to the benefits of Swift, ...or the fact it's now connected to a very
- * capable package manager, in a lot of ways, this is a game changer. Through the
- * Swift Package Manager, we can now leverage the power of USD, and what it means
- * to build plugins, and applications, in a way that is much more accessible to
- * the wider community. This is a very exciting time for the USD project, and we
- * are very excited to be a part of it.
- *
- *                       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
- * ------------------------------------------------------------------------------
- *  . x x x . o o o . x x x . : : : .  o  x  o    . : : : .
- * ------------------------------------------------------------------------------ */
 
 /* --- xxx --- */
 
