@@ -38,7 +38,6 @@
 #include "Gf/math.h"
 #include "Gf/traits.h"
 
-#include "Tf/diagnostic.h"
 #include "Tf/hash.h"
 
 #include <cmath>

@@ -26,6 +26,8 @@
 
 #include "Gf/camera.h"
 #include "Gf/frustum.h"
+
+#include "Tf/diagnostic.h"
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
 

@@ -31,6 +31,8 @@
 
 #include "Gf/math.h"
 #include "Gf/ostreamHelpers.h"
+
+#include "Tf/diagnostic.h"
 #include "Tf/type.h"
 
 #include "Gf/quatd.h"

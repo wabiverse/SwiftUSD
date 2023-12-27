@@ -22,6 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#ifndef PXR_BASE_TF_PY_EXCEPTION_STATE_H
+#define PXR_BASE_TF_PY_EXCEPTION_STATE_H
+
 #include "Tf/api.h"
 #include <boost/python/handle.hpp>
 #include <pxr/pxrns.h>
@@ -52,3 +55,5 @@ private:
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif /* PXR_BASE_TF_PY_EXCEPTION_STATE_H */

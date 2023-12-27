@@ -79,3 +79,11 @@ public extension Pixar.Usd
    */
   typealias Prim = Pixar.UsdPrim
 }
+
+public extension Pixar.Usd.Prim
+{
+  func set(doc: String)
+  {
+    SetDocumentation(std.string(doc))
+  }
+}

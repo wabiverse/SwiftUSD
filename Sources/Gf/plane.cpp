@@ -32,6 +32,7 @@
 #include "Gf/vec4d.h"
 #include <pxr/pxrns.h>
 
+#include "Tf/diagnostic.h"
 #include "Tf/type.h"
 
 #include <ostream>

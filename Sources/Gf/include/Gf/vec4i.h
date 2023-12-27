@@ -36,7 +36,6 @@
 #include "Gf/api.h"
 #include "Gf/limits.h"
 #include "Gf/traits.h"
-#include "Tf/diagnostic.h"
 #include "Tf/hash.h"
 
 #include <cstddef>

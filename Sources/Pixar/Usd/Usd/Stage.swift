@@ -200,6 +200,13 @@ public extension Pixar.Usd.Stage
   }
 
   /**
+   * Return this stage's root layer. */
+  func getPseudoRoot() -> Pixar.Usd.Prim
+  {
+    GetPseudoRoot()
+  }
+
+  /**
    * Save all dirty layers contributing to this stage.
    *
    * Calls ``Pixar.Sdf.Layer.save()`` on all dirty layers contributing to this stage

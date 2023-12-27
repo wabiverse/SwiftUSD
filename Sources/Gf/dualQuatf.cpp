@@ -29,6 +29,8 @@
 
 #include "Gf/dualQuatf.h"
 #include "Gf/ostreamHelpers.h"
+
+#include "Tf/diagnostic.h"
 #include "Tf/type.h"
 
 #include "Gf/dualQuatd.h"

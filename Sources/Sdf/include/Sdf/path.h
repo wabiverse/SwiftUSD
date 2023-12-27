@@ -38,6 +38,8 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <swift/bridging>
+
 #include <algorithm>
 #include <iterator>
 #include <set>
@@ -1094,7 +1096,7 @@ public:
 
 private:
   SdfPath _path;
-};
+} SWIFT_CONFORMS_TO_PROTOCOL(Cxx.CxxRandomAccessCollection);
 
 // Overload hash_value for SdfPath.  Used by things like boost::hash.
 inline size_t hash_value(SdfPath const &path) { return path.GetHash(); }
