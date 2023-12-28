@@ -30,10 +30,11 @@ enum Creator
   static func main()
   {
     /* Setup all usd resources (python, plugins, resources). */
+    
     Pixar.Bundle.shared.setup(.resources)
 
     /* Create a new USD stage with a transform and a sphere. */
-    
+
     var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
     Pixar.UsdGeom.Xform.define(&stage, path: "/Hello")

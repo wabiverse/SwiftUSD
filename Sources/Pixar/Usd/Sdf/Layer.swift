@@ -23,16 +23,22 @@
 
 import Sdf
 
+public typealias SdfLayerHandle = Pixar.SdfLayerHandle
+
 public extension Pixar.Sdf
 {
-  typealias Layer = Pixar.SdfLayer
-  typealias LayerHandle = Pixar.SdfLayerHandle
+  typealias Layer = SdfLayerHandle
 }
 
-public extension Pixar.Sdf.Layer
+public extension SdfLayerHandle
 {
   func set(doc: String)
   {
-    SetDocumentation(std.string(doc))
+    pointee.SetDocumentation(std.string(doc))
+  }
+
+  func save(force: Bool = false)
+  {
+    pointee.Save(force)
   }
 }

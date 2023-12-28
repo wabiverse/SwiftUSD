@@ -197,7 +197,7 @@ public extension StageRefPtr
 
   /**
    * Return this stage's root layer. */
-  func getRootLayer() -> Pixar.Sdf.LayerHandle
+  func getRootLayer() -> SdfLayerHandle
   {
     pointee.GetRootLayer()
   }
