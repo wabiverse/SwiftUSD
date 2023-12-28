@@ -114,17 +114,20 @@ public extension Pixar.Usd.Stage
   }
 
   @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
   {
-    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue).pointee
+    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
   }
 
   @discardableResult
-  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> Pixar.Usd.Stage
+  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> StageRefPtr
   {
-    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue).pointee
+    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue)
   }
+}
 
+public extension StageRefPtr
+{
   /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *
@@ -145,7 +148,7 @@ public extension Pixar.Usd.Stage
    * This is equivalent to ``Pixar.Usd.PrimRange.stage()``. */
   func traverse() -> Pixar.Usd.PrimRange
   {
-    Traverse()
+    pointee.Traverse()
   }
 
   /**
@@ -167,7 +170,7 @@ public extension Pixar.Usd.Stage
   @discardableResult
   func definePrim(_ path: Pixar.SdfPath, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
   {
-    DefinePrim(path, name)
+    pointee.DefinePrim(path, name)
   }
 
   /**
@@ -189,21 +192,21 @@ public extension Pixar.Usd.Stage
   @discardableResult
   func definePrim(_ path: String, type name: Pixar.TfToken = Pixar.TfToken()) -> Pixar.Usd.Prim
   {
-    DefinePrim(.init(path), name)
+    pointee.DefinePrim(.init(path), name)
   }
 
   /**
    * Return this stage's root layer. */
   func getRootLayer() -> Pixar.Sdf.LayerHandle
   {
-    GetRootLayer()
+    pointee.GetRootLayer()
   }
 
   /**
    * Return this stage's root layer. */
   func getPseudoRoot() -> Pixar.Usd.Prim
   {
-    GetPseudoRoot()
+    pointee.GetPseudoRoot()
   }
 
   /**
@@ -216,6 +219,6 @@ public extension Pixar.Usd.Stage
    * exported by calling ``Pixar.Sdf.Layer.export()``. */
   func save()
   {
-    Save()
+    pointee.Save()
   }
 }

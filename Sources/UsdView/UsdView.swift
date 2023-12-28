@@ -38,6 +38,9 @@ enum Creator
     NSLog("Defining a new Pixar.UsdGeom.Sphere.")
     Pixar.UsdGeom.Sphere.define(&stage, path: "/World")
 
+    NSLog("Saving Pixar.Usd.Stage to disk.")
+    stage.save()
+
     NSLog("'usdview' does nothing... will exit now.")
   }
 }

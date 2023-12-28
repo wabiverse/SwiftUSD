@@ -8324,7 +8324,7 @@ void UsdStageRetain(Pixar::UsdStage *stage)
 #if DEBUG
   printf("Called UsdStageRetain()\n");
 #endif /* DEBUG */
-  Pixar::UsdStage *ref = stage;
+  // Pixar::UsdStage *ref = stage;
 }
 
 void UsdStageRelease(Pixar::UsdStage *stage)
@@ -8332,5 +8332,5 @@ void UsdStageRelease(Pixar::UsdStage *stage)
 #if DEBUG
   printf("Called UsdStageRelease()\n");
 #endif /* DEBUG */
-  stage = nullptr;
+  // stage = nullptr;
 }

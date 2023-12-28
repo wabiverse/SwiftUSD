@@ -33,13 +33,13 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Sphere
 {
   @discardableResult
-  static func define(_ stage: inout Pixar.Usd.Stage, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
+  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
   {
-    return Pixar.UsdGeom.Sphere.Define(stage.getPtr(), path)
+    return Pixar.UsdGeom.Sphere.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout Pixar.Usd.Stage, path: String) -> Pixar.UsdGeom.Sphere
+  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
   {
     return Pixar.UsdGeom.Sphere.define(&stage, path: .init(path))
   }
