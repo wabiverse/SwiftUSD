@@ -23,24 +23,24 @@
 
 import UsdGeom
 
-public typealias UsdGeomSphere = Pixar.UsdGeomSphere
+public typealias UsdGeomCapsule = Pixar.UsdGeomCapsule
 
 public extension Pixar.UsdGeom
 {
-  typealias Sphere = UsdGeomSphere
+  typealias Capsule = UsdGeomCapsule
 }
 
-public extension Pixar.UsdGeom.Sphere
+public extension Pixar.UsdGeom.Capsule
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
+  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
   {
-    Pixar.UsdGeom.Sphere.Define(stage.pointee.getPtr(), path)
+    Pixar.UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
+  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
   {
-    Pixar.UsdGeom.Sphere.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Capsule.define(&stage, path: .init(path))
   }
 }
