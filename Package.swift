@@ -469,7 +469,7 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
-        .define("USD_EXPORTS", to: "1")
+        .define("USDGEOM_EXPORTS", to: "1")
       ]
     ),
 
