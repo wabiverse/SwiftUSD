@@ -30,7 +30,7 @@ enum Creator
   static func main()
   {
     /* Setup all usd resources (python, plugins, resources). */
-    
+
     Pixar.Bundle.shared.setup(.resources)
 
     /* Create a new USD stage with a transform and a sphere. */
@@ -39,6 +39,8 @@ enum Creator
 
     Pixar.UsdGeom.Xform.define(&stage, path: "/Hello")
     Pixar.UsdGeom.Sphere.define(&stage, path: "/Hello/World")
+
+    stage.getPseudoRoot().set(doc: "Hello World Example (Swift)!")
 
     stage.save()
 

@@ -1,4 +1,7 @@
 #usda 1.0
+(
+    doc = "Hello World Example (Swift)!"
+)
 
 def Xform "Hello"
 {
