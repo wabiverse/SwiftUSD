@@ -21,26 +21,26 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import Foundation
-import Pixar
+import UsdGeom
 
-@main
-enum Creator
+public typealias UsdGeomXform = Pixar.UsdGeomXform
+
+public extension Pixar.UsdGeom
 {
-  static func main()
+  typealias Xform = UsdGeomXform
+}
+
+public extension Pixar.UsdGeom.Xform
+{
+  @discardableResult
+  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
   {
-    /* Setup all usd resources (python, plugins, resources). */
-    Pixar.Bundle.shared.setup(.resources)
+    Pixar.UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
+  }
 
-    /* Create a new USD stage with a transform and a sphere. */
-    
-    var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
-
-    Pixar.UsdGeom.Xform.define(&stage, path: "/Hello")
-    Pixar.UsdGeom.Sphere.define(&stage, path: "/Hello/World")
-
-    stage.save()
-
-    print("'usdview' does nothing... will exit now.")
+  @discardableResult
+  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
+  {
+    Pixar.UsdGeom.Xform.define(&stage, path: .init(path))
   }
 }

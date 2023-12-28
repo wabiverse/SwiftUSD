@@ -4144,7 +4144,7 @@ void SdfLayerRetain(Pixar::SdfLayer *layer)
 #if DEBUG
   printf("Called SdfLayerRetain()\n");
 #endif /* DEBUG */
-  Pixar::SdfLayer *ref = layer;
+  // Pixar::SdfLayer *ref = layer;
 }
 
 void SdfLayerRelease(Pixar::SdfLayer *layer)
@@ -4152,5 +4152,5 @@ void SdfLayerRelease(Pixar::SdfLayer *layer)
 #if DEBUG
   printf("Called SdfLayerRelease()\n");
 #endif /* DEBUG */
-  layer = nullptr;
+  // layer = nullptr;
 }
