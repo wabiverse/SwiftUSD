@@ -1,4 +1,4 @@
-## Pixar's Universal Scene Description for the Swift and the Open Source Metaverse
+## Pixar's Universal Scene Description for Swift and the Open Source Metaverse
 
 > [!IMPORTANT]
 > ### Supporting SwiftUSD ❤️
