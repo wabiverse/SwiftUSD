@@ -12,7 +12,7 @@ For more details, please visit the web site [here](http://openusd.org).
 
 # Swifting the Metaverse
 
-<image src="https://www.dropbox.com/scl/fi/znnm1ap29imk3ay2zgzd9/swiftusd.png?rlkey=f8sj270sfnaq7wo3x8sq3w7vu&raw=1">
+<image src="https://www.dropbox.com/scl/fi/cmqz171jkketkvpyojtbx/swiftyusd.png?rlkey=rosui4p7dv410eqvztmynhz56&raw=1">
 
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
