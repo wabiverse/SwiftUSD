@@ -29,18 +29,18 @@ enum Creator
 {
   static func main()
   {
-    NSLog("Setup all usd resources (python, plugins, resources).")
+    print("Setup all usd resources (python, plugins, resources).")
     Pixar.Bundle.shared.setup(.resources)
 
-    NSLog("Creating a new Pixar.Usd.Stage.")
+    print("Creating a new Pixar.Usd.Stage.")
     var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    NSLog("Defining a new Pixar.UsdGeom.Sphere.")
+    print("Defining a new Pixar.UsdGeom.Sphere.")
     Pixar.UsdGeom.Sphere.define(&stage, path: "/World")
 
-    NSLog("Saving Pixar.Usd.Stage to disk.")
+    print("Saving Pixar.Usd.Stage to disk.")
     stage.save()
 
-    NSLog("'usdview' does nothing... will exit now.")
+    print("'usdview' does nothing... will exit now.")
   }
 }
