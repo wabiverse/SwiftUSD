@@ -559,6 +559,11 @@ void UsdStage::_Close() {
   // WorkSwapDestroyAsync(_layersAndNoticeKeys);
 }
 
+UsdStagePtr UsdStage::getPtr() const 
+{
+  return TfCreateWeakPtr(const_cast<UsdStage *>(this));
+}
+
 namespace {
 
 // A predicate we pass to PcpCache::ComputePrimIndexesInParallel() to avoid

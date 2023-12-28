@@ -1569,6 +1569,9 @@ public:
   USD_API
   std::vector<UsdPrim> GetPrototypes() const;
 
+  USD_API
+  UsdStagePtr getPtr() const;
+
   /// @}
 
 private:

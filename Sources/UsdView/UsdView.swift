@@ -32,8 +32,11 @@ enum Creator
     NSLog("Setup all usd resources (python, plugins, resources).")
     Pixar.Bundle.shared.setup(.resources)
 
-    NSLog("Creating a new Usd.Stage.")
-    Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+    NSLog("Creating a new Pixar.Usd.Stage.")
+    var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+
+    NSLog("Defining a new Pixar.UsdGeom.Sphere.")
+    Pixar.UsdGeom.Sphere.define(&stage, path: "/World")
 
     NSLog("'usdview' does nothing... will exit now.")
   }

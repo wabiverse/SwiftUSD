@@ -30,3 +30,17 @@ public extension Pixar.UsdGeom
   typealias Sphere = UsdGeomSphere
 }
 
+public extension Pixar.UsdGeom.Sphere
+{
+  @discardableResult
+  static func define(_ stage: inout Pixar.Usd.Stage, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
+  {
+    return Pixar.UsdGeom.Sphere.Define(stage.getPtr(), path)
+  }
+
+  @discardableResult
+  static func define(_ stage: inout Pixar.Usd.Stage, path: String) -> Pixar.UsdGeom.Sphere
+  {
+    return Pixar.UsdGeom.Sphere.define(&stage, path: .init(path))
+  }
+}
