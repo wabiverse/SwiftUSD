@@ -27,7 +27,7 @@ public typealias SdfLayerHandle = Pixar.SdfLayerHandle
 
 public extension Pixar.Sdf
 {
-  typealias Layer = SdfLayerHandle
+  typealias LayerHandle = SdfLayerHandle
 }
 
 public extension SdfLayerHandle
