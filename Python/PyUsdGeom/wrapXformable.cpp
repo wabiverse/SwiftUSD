@@ -188,72 +188,72 @@ WRAP_CUSTOM {
     scope s = _class
         .def("AddXformOp", &This::AddXformOp, 
             (arg("opType"), 
-             arg("precision")=UsdGeomXformOp::PrecisionDouble,
+             arg("precision")=UsdGeomXformOp::Precision::PrecisionDouble,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddTranslateOp", &This::AddTranslateOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionDouble,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionDouble,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddScaleOp", &This::AddScaleOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateXOp", &This::AddRotateXOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateYOp", &This::AddRotateYOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateZOp", &This::AddRotateZOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateXYZOp", &This::AddRotateXYZOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateXZYOp", &This::AddRotateXZYOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateYXZOp", &This::AddRotateYXZOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateYZXOp", &This::AddRotateYZXOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateZXYOp", &This::AddRotateZXYOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddRotateZYXOp", &This::AddRotateZYXOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddOrientOp", &This::AddOrientOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionFloat,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionFloat,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 
         .def("AddTransformOp", &This::AddTransformOp, 
-            (arg("precision")=UsdGeomXformOp::PrecisionDouble,
+            (arg("precision")=UsdGeomXformOp::Precision::PrecisionDouble,
              arg("opSuffix")=TfToken(),
              arg("isInverseOp")=false))
 

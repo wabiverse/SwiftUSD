@@ -43,4 +43,39 @@ public extension Pixar.UsdGeom.Xform
   {
     Pixar.UsdGeom.Xform.define(&stage, path: .init(path))
   }
+
+  func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
+                      suffix: Pixar.TfToken = Pixar.TfToken(),
+                      invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddTranslateOp(precision, suffix, invert)
+  }
+
+  func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
+                  suffix: Pixar.TfToken = Pixar.TfToken(),
+                  invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddScaleOp(precision, suffix, invert)
+  }
+
+  func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
+                    suffix: Pixar.TfToken = Pixar.TfToken(),
+                    invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddRotateXOp(precision, suffix, invert)
+  }
+
+  func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
+                    suffix: Pixar.TfToken = Pixar.TfToken(),
+                    invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddRotateYOp(precision, suffix, invert)
+  }
+
+  func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
+                    suffix: Pixar.TfToken = Pixar.TfToken(),
+                    invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddRotateZOp(precision, suffix, invert)
+  }
 }

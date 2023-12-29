@@ -98,10 +98,10 @@ bool CreateAnimatedTransform(UsdGeomXformable const &gprim,
     
     static const TfToken  pivSuffix("pivot");
     UsdGeomXformOp    trans = gprim.AddTranslateOp();
-    UsdGeomXformOp    pivot = gprim.AddTranslateOp(UsdGeomXformOp::PrecisionFloat,
+    UsdGeomXformOp    pivot = gprim.AddTranslateOp(UsdGeomXformOp::Precision::PrecisionFloat,
                                                    pivSuffix);
     UsdGeomXformOp   rotate = gprim.AddRotateXYZOp();
-    UsdGeomXformOp pivotInv = gprim.AddTranslateOp(UsdGeomXformOp::PrecisionFloat,
+    UsdGeomXformOp pivotInv = gprim.AddTranslateOp(UsdGeomXformOp::Precision::PrecisionFloat,
                                                    pivSuffix,
                                                    /* isInverseOp = */ true);
     // Now that we have created all the ops, set default values.

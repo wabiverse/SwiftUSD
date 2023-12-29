@@ -33,14 +33,35 @@ enum Creator
 
     Pixar.Bundle.shared.setup(.resources)
 
-    /* Create a new USD stage with a transform and a sphere. */
+    /* Create a new USD stage with a sphere, capsule, cylinder, cube, and cone. */
 
     var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    Pixar.UsdGeom.Xform.define(&stage, path: "/Hello")
-    Pixar.UsdGeom.Sphere.define(&stage, path: "/Hello/World")
+    let xformMain = Pixar.UsdGeom.Xform.define(&stage, path: "/Main")
+    xformMain.addTranslateOp().set(Pixar.GfVec3d(0.0, 1.0, 0.0))
+    xformMain.addScaleOp().set(Pixar.GfVec3f(5, 5, 5))
 
-    stage.getPseudoRoot().set(doc: "Hello World Example (Swift)!")
+    let stageLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageLeft")
+    stageLeft.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, -5.0))
+
+    let stageUberLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberLeft")
+    stageUberLeft.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, -10.0))
+    stageUberLeft.addRotateXOp().set(-90)
+
+    let stageRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageRight")
+    stageRight.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, 5.0))
+
+    let stageUberRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberRight")
+    stageUberRight.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, 10.0))
+    stageUberRight.addRotateXOp().set(-90)
+
+    Pixar.UsdGeom.Sphere.define(&stage, path: "/Main/StageLeft/Sphere")
+    Pixar.UsdGeom.Capsule.define(&stage, path: "/Main/StageUberLeft/Capsule")
+    Pixar.UsdGeom.Cylinder.define(&stage, path: "/Main/Cylinder")
+    Pixar.UsdGeom.Cube.define(&stage, path: "/Main/StageRight/Cube")
+    Pixar.UsdGeom.Cone.define(&stage, path: "/Main/StageUberRight/Cone")
+
+    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.9")
 
     stage.save()
 

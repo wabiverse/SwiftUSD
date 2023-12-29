@@ -25,7 +25,7 @@
 #include "UsdGeom/xformCache.h"
 #include "UsdGeom/xform.h"
 
-#include "Trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Tf/diagnostic.h"
 

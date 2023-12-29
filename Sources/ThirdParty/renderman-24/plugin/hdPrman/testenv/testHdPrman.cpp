@@ -248,7 +248,7 @@ CreateFallbackCamera(
     const GfMatrix4d m =
         GfMatrix4d().SetDiagonal(GfVec4d(1.0, 1.0, -1.0, 1.0)) *
         GfMatrix4d().SetTranslate(GfVec3d(0,0,-10));
-    fallbackCamera.AddTransformOp(UsdGeomXformOp::PrecisionFloat).Set(VtValue(m));
+    fallbackCamera.AddTransformOp(UsdGeomXformOp::Precision::PrecisionFloat).Set(VtValue(m));
 
     fallbackCamera.CreateFocalLengthAttr(VtValue(1.0f));
     const float apertureSize = 2.0f * tan(GfDegreesToRadians(60.0f) / 2.0f);

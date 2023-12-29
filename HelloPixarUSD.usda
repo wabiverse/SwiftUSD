@@ -1,11 +1,57 @@
 #usda 1.0
 (
-    doc = "Hello World Example (Swift)!"
+    doc = "SwiftUSD v23.11.9"
 )
 
-def Xform "Hello"
+def Xform "Main"
 {
-    def Sphere "World"
+    float3 xformOp:scale = (5, 5, 5)
+    double3 xformOp:translate = (0, 1, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+
+    def Xform "StageLeft"
+    {
+        double3 xformOp:translate = (0, 0, -5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Sphere "Sphere"
+        {
+        }
+    }
+
+    def Xform "StageUberLeft"
+    {
+        float xformOp:rotateX = -90
+        double3 xformOp:translate = (0, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
+
+        def Capsule "Capsule"
+        {
+        }
+    }
+
+    def Xform "StageRight"
+    {
+        double3 xformOp:translate = (0, 0, 5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cube "Cube"
+        {
+        }
+    }
+
+    def Xform "StageUberRight"
+    {
+        float xformOp:rotateX = -90
+        double3 xformOp:translate = (0, 0, 10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
+
+        def Cone "Cone"
+        {
+        }
+    }
+
+    def Cylinder "Cylinder"
     {
     }
 }

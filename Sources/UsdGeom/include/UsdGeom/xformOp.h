@@ -113,7 +113,7 @@ class UsdGeomXformOp
 public:
   
     /// Enumerates the set of all transformation operation types.
-    enum Type {
+    enum class Type {
         TypeInvalid,   ///< Represents an invalid xformOp.
         TypeTranslate, ///< XYZ translation.
         TypeScale,     ///< XYZ scale.
@@ -137,7 +137,7 @@ public:
     };
 
     /// Precision with which the value of the tranformation operation is encoded.
-    enum Precision {
+    enum class Precision {
         PrecisionDouble, ///< Double precision
         PrecisionFloat,  ///< Floating-point precision 
         PrecisionHalf    ///< Half-float precision
