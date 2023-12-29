@@ -38,22 +38,22 @@ enum Creator
     var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
     let xformMain = Pixar.UsdGeom.Xform.define(&stage, path: "/Main")
-    xformMain.addTranslateOp().set(Pixar.GfVec3d(0.0, 1.0, 0.0))
-    xformMain.addScaleOp().set(Pixar.GfVec3f(5, 5, 5))
+    xformMain.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 1.0, 0.0))
+    xformMain.addXformOp(type: .scale, precision: .float).set(Pixar.GfVec3f(5, 5, 5))
 
     let stageLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageLeft")
-    stageLeft.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, -5.0))
+    stageLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -5.0))
 
     let stageUberLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberLeft")
-    stageUberLeft.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, -10.0))
-    stageUberLeft.addRotateXOp().set(-90)
+    stageUberLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -10.0))
+    stageUberLeft.addXformOp(type: .rotateX, precision: .float).set(-90)
 
     let stageRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageRight")
-    stageRight.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, 5.0))
+    stageRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 5.0))
 
     let stageUberRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberRight")
-    stageUberRight.addTranslateOp().set(Pixar.GfVec3d(0.0, 0.0, 10.0))
-    stageUberRight.addRotateXOp().set(-90)
+    stageUberRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 10.0))
+    stageUberRight.addXformOp(type: .rotateX, precision: .float).set(-90)
 
     Pixar.UsdGeom.Sphere.define(&stage, path: "/Main/StageLeft/Sphere")
     Pixar.UsdGeom.Capsule.define(&stage, path: "/Main/StageUberLeft/Capsule")

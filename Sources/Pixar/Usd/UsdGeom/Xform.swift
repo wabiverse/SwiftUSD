@@ -44,6 +44,14 @@ public extension Pixar.UsdGeom.Xform
     Pixar.UsdGeom.Xform.define(&stage, path: .init(path))
   }
 
+  func addXformOp(type: UsdGeomXformOp.`Type`,
+                  precision: UsdGeomXformOp.Precision = .double,
+                  suffix: Pixar.TfToken = Pixar.TfToken(),
+                  invert: Bool = false) -> UsdGeomXformOp
+  {
+    AddXformOp(type, precision, suffix, invert)
+  }
+
   func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
                       suffix: Pixar.TfToken = Pixar.TfToken(),
                       invert: Bool = false) -> UsdGeomXformOp
