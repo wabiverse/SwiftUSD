@@ -33,13 +33,13 @@ enum Creator
 
     Pixar.Bundle.shared.setup(.resources)
 
-    /* Create a new USD stage with a sphere, capsule, cylinder, cube, and cone. */
+    /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
 
     let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    let xformMain = Pixar.UsdGeom.Xform.define(stage, path: "/Main")
-    xformMain.addXformOp(type: .translate).set(GfVec3d(0.0, 1.0, 0.0))
-    xformMain.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
+    let xform = Pixar.UsdGeom.Xform.define(stage, path: "/Main")
+    xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
+    xform.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
 
     let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Main/Sphere")
     sphere.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -5.0))
@@ -62,6 +62,6 @@ enum Creator
 
     stage.save()
 
-    print("'usdview' does nothing... will exit now.")
+    print("'usdview' not yet implemented... will exit now.")
   }
 }
