@@ -2,7 +2,7 @@
 (
     "Test schema file for testUsdAppliedAPISchemas"
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 

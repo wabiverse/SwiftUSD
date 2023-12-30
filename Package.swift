@@ -94,11 +94,15 @@ let package = Package(
       name: "Sdr",
       targets: ["Sdr"]
     ),
-    // --------------- Python -----
     .library(
       name: "UsdGeom",
       targets: ["UsdGeom"]
     ),
+    .library(
+      name: "UsdShade",
+      targets: ["UsdShade"]
+    ),
+    // --------------- Python -----
     .library(
       name: "PyTf",
       type: .dynamic,
@@ -155,11 +159,6 @@ let package = Package(
       targets: ["PyUsd"]
     ),
     .library(
-      name: "PyUsdGeom",
-      type: .dynamic,
-      targets: ["PyUsdGeom"]
-    ),
-    .library(
       name: "PyNdr",
       type: .dynamic,
       targets: ["PyNdr"]
@@ -168,6 +167,16 @@ let package = Package(
       name: "PySdr",
       type: .dynamic,
       targets: ["PySdr"]
+    ),
+    .library(
+      name: "PyUsdGeom",
+      type: .dynamic,
+      targets: ["PyUsdGeom"]
+    ),
+    .library(
+      name: "PyUsdShade",
+      type: .dynamic,
+      targets: ["PyUsdShade"]
     ),
     // ----------------- Apps -----
     .executable(
@@ -195,9 +204,10 @@ let package = Package(
         "PySdf",
         "PyPcp",
         "PyUsd",
-        "PyUsdGeom",
         "PyNdr",
-        "PySdr"
+        "PySdr",
+        "PyUsdGeom",
+        "PyUsdShade"
       ]
     ),
   ],
@@ -469,33 +479,6 @@ let package = Package(
     ),
 
     .target(
-      name: "UsdGeom",
-      dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Trace"),
-        .target(name: "Work"),
-        .target(name: "Vt"),
-        .target(name: "Plug"),
-        .target(name: "Gf"),
-        .target(name: "Kind"),
-        .target(name: "Ar"),
-        .target(name: "Sdf"),
-        .target(name: "Pcp"),
-        .target(name: "Usd"),
-      ],
-      resources: [
-        .process("Resources")
-      ],
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
-        .define("USDGEOM_EXPORTS", to: "1")
-      ]
-    ),
-
-    .target(
       name: "Ndr",
       dependencies: [
         .target(name: "Arch"),
@@ -532,6 +515,56 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_PACKAGE_MODULE", to: "Sdr"),
         .define("SDR_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdGeom",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Gf"),
+        .target(name: "Kind"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Pcp"),
+        .target(name: "Usd"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
+        .define("USDGEOM_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdShade",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "Ndr"),
+        .target(name: "Sdr"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShade"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
+        .define("USDSHADE_EXPORTS", to: "1")
       ]
     ),
 
@@ -723,23 +756,6 @@ let package = Package(
     ),
 
     .target(
-      name: "PyUsdGeom",
-      dependencies: [
-        .target(name: "Pixar"),
-      ],
-      path: "Python/PyUsdGeom",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
-      ]
-    ),
-
-    .target(
       name: "PyNdr",
       dependencies: [
         .target(name: "Pixar"),
@@ -770,6 +786,40 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_PACKAGE_MODULE", to: "Sdr"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdGeom",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsdGeom",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdShade",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsdShade",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShade"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
       ]
     ),
 
@@ -843,9 +893,10 @@ let package = Package(
         .target(name: "Sdf"),
         .target(name: "Pcp"),
         .target(name: "Usd"),
-        .target(name: "UsdGeom"),
         .target(name: "Ndr"),
         .target(name: "Sdr"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------

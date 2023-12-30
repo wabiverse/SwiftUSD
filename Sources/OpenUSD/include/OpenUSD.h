@@ -794,26 +794,6 @@
 #include <OpenUSD/pxr/usdImaging/usdImagingGL/unitTestGLDrawing.h>
 #include <OpenUSD/pxr/usdImaging/usdImagingGL/version.h>
 
-// usdShade
-#include <OpenUSD/pxr/usd/usdShade/api.h>
-#include <OpenUSD/pxr/usd/usdShade/connectableAPI.h>
-#include <OpenUSD/pxr/usd/usdShade/connectableAPIBehavior.h>
-#include <OpenUSD/pxr/usd/usdShade/coordSysAPI.h>
-#include <OpenUSD/pxr/usd/usdShade/input.h>
-#include <OpenUSD/pxr/usd/usdShade/material.h>
-#include <OpenUSD/pxr/usd/usdShade/materialBindingAPI.h>
-#include <OpenUSD/pxr/usd/usdShade/nodeDefAPI.h>
-#include <OpenUSD/pxr/usd/usdShade/nodeGraph.h>
-#include <OpenUSD/pxr/usd/usdShade/output.h>
-#include <OpenUSD/pxr/usd/usdShade/pch.h>
-#include <OpenUSD/pxr/usd/usdShade/shader.h>
-#include <OpenUSD/pxr/usd/usdShade/shaderDefParser.h>
-#include <OpenUSD/pxr/usd/usdShade/shaderDefUtils.h>
-#include <OpenUSD/pxr/usd/usdShade/tokens.h>
-#include <OpenUSD/pxr/usd/usdShade/types.h>
-#include <OpenUSD/pxr/usd/usdShade/udimUtils.h>
-#include <OpenUSD/pxr/usd/usdShade/utils.h>
-
 // usdUI
 #include <OpenUSD/pxr/usd/usdUI/api.h>
 #include <OpenUSD/pxr/usd/usdUI/backdrop.h>

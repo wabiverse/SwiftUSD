@@ -1,15 +1,15 @@
 #usda 1.0
 (
     subLayers = [
-        @usd/schema.usda@,
-        @usdLux/schema.usda@,
-        @usdGeom/schema.usda@
+        @Usd/schema.usda@,
+        @UsdLux/schema.usda@,
+        @UsdGeom/schema.usda@
     ]
 )
 
 over "GLOBAL" (
     customData = {
-        string libraryName = "usdRiPxr"
+        string libraryName = "UsdRiPxr"
         bool skipCodeGeneration = 1
         bool useLiteralIdentifier = 1
     }

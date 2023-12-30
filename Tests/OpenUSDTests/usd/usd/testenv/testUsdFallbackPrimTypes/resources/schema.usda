@@ -2,7 +2,7 @@
 (
     "Test schema file for testUsdFallbackPrimTypes"
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
