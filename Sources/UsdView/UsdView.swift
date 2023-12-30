@@ -38,24 +38,24 @@ enum Creator
     let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
     let xformMain = Pixar.UsdGeom.Xform.define(stage, path: "/Main")
-    xformMain.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 1.0, 0.0))
-    xformMain.addXformOp(type: .scale, precision: .float).set(Pixar.GfVec3f(5, 5, 5))
+    xformMain.addXformOp(type: .translate).set(GfVec3d(0.0, 1.0, 0.0))
+    xformMain.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
 
     let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Main/Sphere")
-    sphere.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -5.0))
+    sphere.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -5.0))
 
     let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Main/Capsule")
-    capsule.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -10.0))
+    capsule.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -10.0))
     capsule.addXformOp(type: .rotateX, precision: .float).set(-90)
 
     let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
     cylinder.addXformOp(type: .rotateX, precision: .float).set(-90)
 
     let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Main/Cube")
-    cube.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 5.0))
+    cube.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 5.0))
 
     let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Main/Cone")
-    cone.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 10.0))
+    cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(-90)
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.12")
