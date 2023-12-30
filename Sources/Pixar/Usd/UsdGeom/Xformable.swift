@@ -23,29 +23,42 @@
 
 import UsdGeom
 
-public typealias UsdGeomXform = Pixar.UsdGeomXform
+public typealias UsdGeomXformable = Pixar.UsdGeomXformable
 
 public extension Pixar.UsdGeom
 {
-  typealias Xform = UsdGeomXform
+  typealias Xformable = UsdGeomXformable
 }
 
-public extension Pixar.UsdGeom.Xform
+public protocol Xformable
 {
-  @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
-  {
-    Pixar.UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
-  }
+  func addXformOp(type: UsdGeomXformOp.`Type`,
+                  precision: UsdGeomXformOp.Precision,
+                  suffix: Pixar.TfToken,
+                  invert: Bool) -> UsdGeomXformOp
 
-  @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
-  {
-    Pixar.UsdGeom.Xform.define(&stage, path: .init(path))
-  }
+  func addTranslateOp(precision: UsdGeomXformOp.Precision,
+                      suffix: Pixar.TfToken,
+                      invert: Bool) -> UsdGeomXformOp
+
+  func addScaleOp(precision: UsdGeomXformOp.Precision,
+                  suffix: Pixar.TfToken,
+                  invert: Bool) -> UsdGeomXformOp
+
+  func addRotateXOp(precision: UsdGeomXformOp.Precision,
+                    suffix: Pixar.TfToken,
+                    invert: Bool) -> UsdGeomXformOp
+
+  func addRotateYOp(precision: UsdGeomXformOp.Precision,
+                    suffix: Pixar.TfToken,
+                    invert: Bool) -> UsdGeomXformOp
+
+  func addRotateZOp(precision: UsdGeomXformOp.Precision,
+                    suffix: Pixar.TfToken,
+                    invert: Bool) -> UsdGeomXformOp
 }
 
-extension Pixar.UsdGeom.Xform: Xformable
+extension UsdGeomXformable: Xformable
 {
   public func addXformOp(type: UsdGeomXformOp.`Type`,
                          precision: UsdGeomXformOp.Precision = .double,
