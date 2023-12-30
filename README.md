@@ -105,7 +105,7 @@ enum Creator
 
     /* Create a new USD stage with a transform and a sphere. */
 
-    var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
     Pixar.UsdGeom.Xform.define(stage, path: "/Hello")
     Pixar.UsdGeom.Sphere.define(stage, path: "/Hello/World")
