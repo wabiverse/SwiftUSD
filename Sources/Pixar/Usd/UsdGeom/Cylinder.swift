@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Cylinder = UsdGeomCylinder
 }
 
-public extension Pixar.UsdGeom.Cylinder
+@Xformable
+extension Pixar.UsdGeom.Cylinder: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
   {
     Pixar.UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
   {
     Pixar.UsdGeom.Cylinder.define(stage, path: .init(path))
   }

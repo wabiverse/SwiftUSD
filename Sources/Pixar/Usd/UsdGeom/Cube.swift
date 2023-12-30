@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Cube = UsdGeomCube
 }
 
-public extension Pixar.UsdGeom.Cube
+@Xformable
+extension Pixar.UsdGeom.Cube: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cube
   {
     Pixar.UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cube
   {
     Pixar.UsdGeom.Cube.define(stage, path: .init(path))
   }

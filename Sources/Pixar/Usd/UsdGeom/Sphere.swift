@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Sphere = UsdGeomSphere
 }
 
-public extension Pixar.UsdGeom.Sphere
+@Xformable
+extension Pixar.UsdGeom.Sphere: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
   {
     Pixar.UsdGeom.Sphere.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
   {
     Pixar.UsdGeom.Sphere.define(stage, path: .init(path))
   }

@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Cone = UsdGeomCone
 }
 
-public extension Pixar.UsdGeom.Cone
+@Xformable
+extension Pixar.UsdGeom.Cone: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
   {
     Pixar.UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
   {
     Pixar.UsdGeom.Cone.define(stage, path: .init(path))
   }

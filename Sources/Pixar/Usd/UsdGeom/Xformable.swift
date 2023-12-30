@@ -30,7 +30,10 @@ public extension Pixar.UsdGeom
   typealias Xformable = UsdGeomXformable
 }
 
-public protocol Xformable
+@attached(member, names: arbitrary, conformances: GeomXformable)
+public macro Xformable() = #externalMacro(module: "PixarMacros", type: "PixarXformableMacro")
+
+public protocol GeomXformable
 {
   func addXformOp(type: UsdGeomXformOp.`Type`,
                   precision: UsdGeomXformOp.Precision,
@@ -58,48 +61,6 @@ public protocol Xformable
                     invert: Bool) -> UsdGeomXformOp
 }
 
-extension UsdGeomXformable: Xformable
-{
-  public func addXformOp(type: UsdGeomXformOp.`Type`,
-                         precision: UsdGeomXformOp.Precision = .double,
-                         suffix: Pixar.TfToken = Pixar.TfToken(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddXformOp(type, precision, suffix, invert)
-  }
-
-  public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
-                             suffix: Pixar.TfToken = Pixar.TfToken(),
-                             invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddTranslateOp(precision, suffix, invert)
-  }
-
-  public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
-                         suffix: Pixar.TfToken = Pixar.TfToken(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddScaleOp(precision, suffix, invert)
-  }
-
-  public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateXOp(precision, suffix, invert)
-  }
-
-  public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateYOp(precision, suffix, invert)
-  }
-
-  public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateZOp(precision, suffix, invert)
-  }
-}
+@Xformable
+extension UsdGeomXformable: GeomXformable
+{}

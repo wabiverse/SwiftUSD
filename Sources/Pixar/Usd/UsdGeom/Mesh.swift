@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Mesh = UsdGeomMesh
 }
 
-public extension Pixar.UsdGeom.Mesh
+@Xformable
+extension Pixar.UsdGeom.Mesh: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Mesh
   {
     Pixar.UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Mesh
   {
     Pixar.UsdGeom.Mesh.define(stage, path: .init(path))
   }

@@ -30,63 +30,18 @@ public extension Pixar.UsdGeom
   typealias Xform = UsdGeomXform
 }
 
-public extension Pixar.UsdGeom.Xform
+@Xformable
+extension Pixar.UsdGeom.Xform: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
   {
     Pixar.UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
   {
     Pixar.UsdGeom.Xform.define(stage, path: .init(path))
-  }
-}
-
-extension Pixar.UsdGeom.Xform: Xformable
-{
-  public func addXformOp(type: UsdGeomXformOp.`Type`,
-                         precision: UsdGeomXformOp.Precision = .double,
-                         suffix: Pixar.TfToken = Pixar.TfToken(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddXformOp(type, precision, suffix, invert)
-  }
-
-  public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
-                             suffix: Pixar.TfToken = Pixar.TfToken(),
-                             invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddTranslateOp(precision, suffix, invert)
-  }
-
-  public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
-                         suffix: Pixar.TfToken = Pixar.TfToken(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddScaleOp(precision, suffix, invert)
-  }
-
-  public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateXOp(precision, suffix, invert)
-  }
-
-  public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateYOp(precision, suffix, invert)
-  }
-
-  public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Pixar.TfToken = Pixar.TfToken(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    AddRotateZOp(precision, suffix, invert)
   }
 }

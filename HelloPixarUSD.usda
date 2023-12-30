@@ -1,6 +1,6 @@
 #usda 1.0
 (
-    doc = "SwiftUSD v23.11.11"
+    doc = "SwiftUSD v23.11.12"
 )
 
 def Xform "Main"
@@ -9,50 +9,36 @@ def Xform "Main"
     double3 xformOp:translate = (0, 1, 0)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
 
-    def Xform "StageLeft"
+    def Sphere "Sphere"
     {
         double3 xformOp:translate = (0, 0, -5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-
-        def Sphere "Sphere"
-        {
-        }
     }
 
-    def Xform "StageUberLeft"
+    def Capsule "Capsule"
     {
         float xformOp:rotateX = -90
         double3 xformOp:translate = (0, 0, -10)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
-
-        def Capsule "Capsule"
-        {
-        }
-    }
-
-    def Xform "StageRight"
-    {
-        double3 xformOp:translate = (0, 0, 5)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-
-        def Cube "Cube"
-        {
-        }
-    }
-
-    def Xform "StageUberRight"
-    {
-        float xformOp:rotateX = -90
-        double3 xformOp:translate = (0, 0, 10)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
-
-        def Cone "Cone"
-        {
-        }
     }
 
     def Cylinder "Cylinder"
     {
+        float xformOp:rotateX = -90
+        uniform token[] xformOpOrder = ["xformOp:rotateX"]
+    }
+
+    def Cube "Cube"
+    {
+        double3 xformOp:translate = (0, 0, 5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Cone "Cone"
+    {
+        float xformOp:rotateX = -90
+        double3 xformOp:translate = (0, 0, 10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
     }
 }
 

@@ -41,27 +41,24 @@ enum Creator
     xformMain.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 1.0, 0.0))
     xformMain.addXformOp(type: .scale, precision: .float).set(Pixar.GfVec3f(5, 5, 5))
 
-    let stageLeft = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageLeft")
-    stageLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -5.0))
+    let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Main/Sphere")
+    sphere.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -5.0))
 
-    let stageUberLeft = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageUberLeft")
-    stageUberLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -10.0))
-    stageUberLeft.addXformOp(type: .rotateX, precision: .float).set(-90)
+    let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Main/Capsule")
+    capsule.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -10.0))
+    capsule.addXformOp(type: .rotateX, precision: .float).set(-90)
 
-    let stageRight = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageRight")
-    stageRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 5.0))
+    let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
+    cylinder.addXformOp(type: .rotateX, precision: .float).set(-90)
 
-    let stageUberRight = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageUberRight")
-    stageUberRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 10.0))
-    stageUberRight.addXformOp(type: .rotateX, precision: .float).set(-90)
+    let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Main/Cube")
+    cube.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 5.0))
 
-    Pixar.UsdGeom.Sphere.define(stage, path: "/Main/StageLeft/Sphere")
-    Pixar.UsdGeom.Capsule.define(stage, path: "/Main/StageUberLeft/Capsule")
-    Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
-    Pixar.UsdGeom.Cube.define(stage, path: "/Main/StageRight/Cube")
-    Pixar.UsdGeom.Cone.define(stage, path: "/Main/StageUberRight/Cone")
+    let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Main/Cone")
+    cone.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 10.0))
+    cone.addXformOp(type: .rotateX, precision: .float).set(-90)
 
-    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.11")
+    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.12")
 
     stage.save()
 

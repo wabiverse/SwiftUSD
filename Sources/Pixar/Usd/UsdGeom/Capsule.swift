@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Capsule = UsdGeomCapsule
 }
 
-public extension Pixar.UsdGeom.Capsule
+@Xformable
+extension Pixar.UsdGeom.Capsule: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
   {
     Pixar.UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
   {
     Pixar.UsdGeom.Capsule.define(stage, path: .init(path))
   }

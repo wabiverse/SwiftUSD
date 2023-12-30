@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Camera = UsdGeomCamera
 }
 
-public extension Pixar.UsdGeom.Camera
+@Xformable
+extension Pixar.UsdGeom.Camera: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
   {
     Pixar.UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
   {
     Pixar.UsdGeom.Camera.define(stage, path: .init(path))
   }

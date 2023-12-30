@@ -30,16 +30,17 @@ public extension Pixar.UsdGeom
   typealias Plane = UsdGeomPlane
 }
 
-public extension Pixar.UsdGeom.Plane
+@Xformable
+extension Pixar.UsdGeom.Plane: GeomXformable
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Plane
   {
     Pixar.UsdGeom.Plane.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Plane
   {
     Pixar.UsdGeom.Plane.define(stage, path: .init(path))
   }

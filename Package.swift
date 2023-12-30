@@ -1,4 +1,5 @@
 // swift-tools-version: 5.9
+import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
@@ -191,7 +192,8 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/furby-tm/swift-bundler.git", from: "2.0.8"),
+    .package(url: "https://github.com/furby-tm/swift-bundler.git", from: "2.0.9"),
+    .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
     .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.7"),
   ],
   targets: [
@@ -770,6 +772,14 @@ let package = Package(
       )
     ),
 
+    .macro(
+      name: "PixarMacros",
+      dependencies: [
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+      ]
+    ),
+
     .target(
       name: "Pixar",
       dependencies: [
@@ -791,6 +801,7 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "Ndr"),
         /* ------------------- */
+        .target(name: "PixarMacros"),
       ],
       swiftSettings: [
         .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
@@ -800,7 +811,10 @@ let package = Package(
 
     .testTarget(
       name: "PixarTests",
-      dependencies: ["Pixar"],
+      dependencies: [
+        .target(name: "Pixar"),
+        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+      ],
       swiftSettings: [
         .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
         .interoperabilityMode(.Cxx),
