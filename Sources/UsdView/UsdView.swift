@@ -46,19 +46,19 @@ enum Creator
 
     let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Main/Capsule")
     capsule.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -10.0))
-    capsule.addXformOp(type: .rotateX, precision: .float).set(-90)
+    capsule.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
-    cylinder.addXformOp(type: .rotateX, precision: .float).set(-90)
+    cylinder.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Main/Cube")
     cube.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 5.0))
 
     let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Main/Cone")
     cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
-    cone.addXformOp(type: .rotateX, precision: .float).set(-90)
+    cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.12")
+    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.13")
 
     stage.save()
 
