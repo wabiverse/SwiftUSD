@@ -21,27 +21,38 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_USD_SDR_API_H
-#define PXR_USD_SDR_API_H
+#ifndef PXR_USD_SDR_DECLARE_H
+#define PXR_USD_SDR_DECLARE_H
 
-#include "pxr/base/arch/export.h"
+/// \file sdr/declare.h
 
-#if defined(PXR_STATIC)
-#   define SDR_API
-#   define SDR_API_TEMPLATE_CLASS(...)
-#   define SDR_API_TEMPLATE_STRUCT(...)
-#   define SDR_LOCAL
-#else
-#   if defined(SDR_EXPORTS)
-#       define SDR_API ARCH_EXPORT
-#       define SDR_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
-#       define SDR_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
-#   else
-#       define SDR_API ARCH_IMPORT
-#       define SDR_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
-#       define SDR_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
-#   endif
-#   define SDR_LOCAL ARCH_HIDDEN
-#endif
+#include <pxr/pxrns.h>
+#include "Ndr/declare.h"
 
-#endif
+#include <memory>
+#include <vector>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class SdrShaderNode;
+class SdrShaderProperty;
+
+/// Common typedefs that are used throughout the SDR library.
+
+// ShaderNode
+typedef SdrShaderNode *SdrShaderNodePtr;
+typedef SdrShaderNode const *SdrShaderNodeConstPtr;
+typedef std::unique_ptr<SdrShaderNode> SdrShaderNodeUniquePtr;
+typedef std::vector<SdrShaderNodeConstPtr> SdrShaderNodePtrVec;
+
+// ShaderProperty
+typedef SdrShaderProperty *SdrShaderPropertyPtr;
+typedef SdrShaderProperty const *SdrShaderPropertyConstPtr;
+typedef std::unique_ptr<SdrShaderProperty> SdrShaderPropertyUniquePtr;
+typedef std::unordered_map<TfToken, SdrShaderPropertyConstPtr,
+                           TfToken::HashFunctor>
+    SdrPropertyMap;
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // PXR_USD_SDR_DECLARE_H

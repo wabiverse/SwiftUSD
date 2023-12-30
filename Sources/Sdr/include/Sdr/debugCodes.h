@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Pixar
+// Copyright 2021 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,37 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_USD_SDR_DECLARE_H
-#define PXR_USD_SDR_DECLARE_H
+#ifndef PXR_USD_SDR_DEBUG_CODES_H
+#define PXR_USD_SDR_DEBUG_CODES_H
 
-/// \file sdr/declare.h
-
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/declare.h"
-
-#include <memory>
-#include <vector>
+#include <pxr/pxrns.h>
+#include "Tf/debug.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class SdrShaderNode;
-class SdrShaderProperty;
-
-/// Common typedefs that are used throughout the SDR library.
-
-// ShaderNode
-typedef SdrShaderNode* SdrShaderNodePtr;
-typedef SdrShaderNode const* SdrShaderNodeConstPtr;
-typedef std::unique_ptr<SdrShaderNode> SdrShaderNodeUniquePtr;
-typedef std::vector<SdrShaderNodeConstPtr> SdrShaderNodePtrVec;
-
-// ShaderProperty
-typedef SdrShaderProperty* SdrShaderPropertyPtr;
-typedef SdrShaderProperty const* SdrShaderPropertyConstPtr;
-typedef std::unique_ptr<SdrShaderProperty> SdrShaderPropertyUniquePtr;
-typedef std::unordered_map<TfToken, SdrShaderPropertyConstPtr,
-                           TfToken::HashFunctor> SdrPropertyMap;
+TF_DEBUG_CODES(
+    SDR_TYPE_CONFORMANCE);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDR_DECLARE_H
+#endif // PXR_USD_SDR_DEBUG_CODES_H

@@ -22,13 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/pyResultConversions.h"
-#include "pxr/base/tf/pySingleton.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
-#include "pxr/usd/ndr/registry.h"
-#include "pxr/usd/sdr/registry.h"
-#include "pxr/usd/sdr/shaderNode.h"
+#include <pxr/pxrns.h>
+#include "Tf/pyResultConversions.h"
+#include "Tf/pySingleton.h"
+#include "Ndr/discoveryPlugin.h"
+#include "Ndr/registry.h"
+#include "Sdr/registry.h"
+#include "Sdr/shaderNode.h"
 
 #include <boost/python.hpp>
 #include <boost/python/return_internal_reference.hpp>
@@ -38,7 +38,7 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapRegistry()
+void wrapShaderRegistry()
 {
     typedef SdrRegistry This;
     typedef TfWeakPtr<SdrRegistry> ThisPtr;

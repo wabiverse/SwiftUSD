@@ -21,11 +21,11 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/usd/sdr/debugCodes.h"
+#include <pxr/pxrns.h>
+#include "Sdr/debugCodes.h"
 
-#include "pxr/base/tf/debug.h"
-#include "pxr/base/tf/registryManager.h"
+#include "Tf/debug.h"
+#include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

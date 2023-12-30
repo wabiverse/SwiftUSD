@@ -27,11 +27,11 @@
 
 /// \file sdr/shaderNode.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/sdr/api.h"
-#include "pxr/base/tf/staticTokens.h"
-#include "pxr/usd/ndr/node.h"
-#include "pxr/usd/sdr/declare.h"
+#include <pxr/pxrns.h>
+#include "Sdr/api.h"
+#include "Tf/staticTokens.h"
+#include "Ndr/node.h"
+#include "Sdr/declare.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

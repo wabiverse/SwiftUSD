@@ -22,10 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/base/tf/staticTokens.h"
-#include "pxr/base/tf/stringUtils.h"
-#include "pxr/usd/sdr/shaderMetadataHelpers.h"
-#include "pxr/usd/sdr/shaderProperty.h"
+#include "Tf/staticTokens.h"
+#include "Tf/stringUtils.h"
+#include "Sdr/shaderMetadataHelpers.h"
+#include "Sdr/shaderProperty.h"
 
 #include <algorithm>
 #include <iostream>

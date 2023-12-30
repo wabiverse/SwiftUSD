@@ -42,7 +42,7 @@
 #include "Sdf/schema.h"
 #include "Sdf/types.h"
 
-#include "Trace/Trace.h"
+#include "Trace/traceImpl.h"
 
 #include "Arch/pxrerrno.h"
 #include "Tf/enum.h"

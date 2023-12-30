@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/base/tf/instantiateSingleton.h"
-#include "pxr/usd/sdr/registry.h"
+#include "Tf/instantiateSingleton.h"
+#include "Sdr/registry.h"
 
-#include "pxr/base/trace/trace.h"
+#include "Trace/traceImpl.h"
 
 #include <algorithm>
 

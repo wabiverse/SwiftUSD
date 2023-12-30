@@ -21,12 +21,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/refPtr.h"
-#include "pxr/usd/ndr/debugCodes.h"
-#include "pxr/usd/sdr/shaderMetadataHelpers.h"
-#include "pxr/usd/sdr/shaderNode.h"
-#include "pxr/usd/sdr/shaderProperty.h"
+#include <pxr/pxrns.h>
+#include "Tf/refPtr.h"
+#include "Ndr/debugCodes.h"
+#include "Sdr/shaderMetadataHelpers.h"
+#include "Sdr/shaderNode.h"
+#include "Sdr/shaderProperty.h"
 
 #include <algorithm>
 #include <unordered_set>

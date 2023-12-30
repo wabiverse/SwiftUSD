@@ -1,29 +1,26 @@
-/*!
-\page ndr_page_front Ndr : Node Definition Registry
-\if ( PIXAR_MFB_BUILD )
-\mainpage Ndr : Node Definition Registry
-\endif
+### <sub>Node Definition Registry</sub>
+# <sup>**Pixar.Ndr**</sup>
 
-Ndr provides a framework in which you can,
-agnostic to the node's domain (shading, lighting, compositing, etc), register
-nodes with Ndr, and subsequently ask for information about those nodes.
-The information Ndr provides about these nodes will be fairly generic, given
-that Ndr must not cater to any specific type of node. However, specialized
-registries can derive from Ndr, and it is there that domain-specific logic
-can be implemented. Additionally, node parsing and "discovery" are done via
-plugins, again to keep Ndr generic and extendable.
+### **Overview**
+
+**Ndr** provides a framework in which you can, agnostic to the node's domain
+(shading, lighting, compositing, etc), register nodes with **Ndr**, and they
+subsequently ask for information about those nodes. The information **Ndr**
+provides about these nodes will be fairly generic, given that **Ndr** must
+not cater to any specific type of node. However, specialized registries can
+derive from **Ndr**, and it is there that domain-specific logic can be
+implemented. Additionally, node parsing and "discovery" are done via
+plugins, again to keep **Ndr** generic and extendable.
 
 In addition to being able to instantiate specialized registries, domain-specific
 nodes and properties deriving from the base Ndr classes can also be created.
 This is explained in the sections below.
 
-\tableofcontents
-
-\section ndr_Organization Ndr Organization
+#### Ndr Organization
 Ndr can be split into 5 major components, as described by the following
 subsections.
 
-\subsection ndr_BaseClass Ndr Base Registry
+##### Ndr Base Registry
 The core Ndr registry, `NdrRegistry`, is where node-level queries are done.
 In practice, it will not be used directly (in almost all cases, a specialized
 registry deriving from Ndr core will be used instead). Upon initialization, the
@@ -39,7 +36,7 @@ The type of information that the base Ndr registry provides includes:
     <li>Where the nodes were found</li>
 </ul>
 
-\subsection ndr_BaseNode Ndr Base Node
+##### Ndr Base Node
 Ndr provides a base node class, `NdrNode`, which exposes domain-agnostic
 information such as:
 
@@ -62,7 +59,7 @@ sources:
   \ref ndr_ParserPlugin "parser plugin" to determine and resolve an 
   implementation from the node's definition.
 
-\subsection ndr_BaseProperty Ndr Base Property
+##### Ndr Base Property
 Ndr also provides a base property class, `NdrProperty`. Inputs and outputs are
 on a node are collectively identified as "properties".
 
@@ -74,7 +71,7 @@ The base property exposes information like:
     <li>Whether the property is connectable</li>
 </ul>
 
-\subsection ndr_DiscoveryPlugin Discovery Plugins
+##### Discovery Plugins
 Discovery plugins are how the registry finds (or "discovers") nodes. The
 registry makes no assumptions on where, or how, nodes are stored. A discovery
 plugin can be built to find file-based nodes on the filesystem (a typical case),
@@ -93,7 +90,7 @@ with that of other plugins.  The filesystem discovery machinery that the builtin
 `_NdrFilesystemDiscoveryPlugin` plugin uses is available for other discovery
 plugins to use - see NdrFsHelpersDiscoverNodes().
 
-\subsection ndr_ParserPlugin Parser Plugins
+##### Parser Plugins
 Once the registry knows about nodes via the discovery plugin(s), the parser
 plugins parse the nodes and provide the registry with the resulting information.
 The parser plugins are responsible for information such as the node's type,
@@ -103,14 +100,14 @@ that could not otherwise be determined via the discovery plugin. More
 information about parser plugins is available in the `NdrParserPlugin`
 documentation.
 
-\section custom_setup How to Set Up a Domain-Specific Registry
+#### How to Set Up a Domain-Specific Registry
 The base Ndr registry can be used as-is if only generic information about nodes
 is needed. In most cases however, more detailed information about the nodes will
 be necessary, and this is where domain-specific registries come into play. The
 process can be divided into 5 areas of customization, which echo the 5 sections
 above.
 
-\subsection ndr_customReg Custom Registry
+##### Custom Registry
 The base Ndr registry can be derived from to create a specialized registry. In
 many cases, not much will be needed here except doing dynamic casts to your
 domain-specific nodes. The registry's base class provides methods such as
@@ -119,22 +116,20 @@ provide additional methods like `GetShadingNode()` which dynamic casts the
 result from `NdrRegistry::GetNode()` to a shading node instance. See
 `SdrRegistry` for an example.
 
-\subsection ndr_customNode Custom Nodes
+##### Custom Nodes
 As mentioned before, the base node class `NdrNode` only provides generic
 information about the node. Specialized nodes can derive from `NdrNode` to
 implement any additional functionality that is needed. The parser plugin for
 the node can provide this information to the node via the constructor. Nodes
 should be immutable once created. See `SdrShaderNode` for an example.
 
-\section ndr_customProperty Custom Properties
+##### Custom Properties
 The process here is the same as for nodes: derive from `NdrProperty` and add
 new functionality, or override existing methods. See `SdrShaderProperty` for an
 example.
 
-\section ndr_customDiscovery Custom Discovery Plugin
+##### Custom Discovery Plugin
 See the documentation for `NdrDiscoveryPlugin` for more information.
 
-\section ndr_customParser Custom Parser Plugin
+##### Custom Parser Plugin
 See the documentation for `NdrParserPlugin` for more information.
-
-*/

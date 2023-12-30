@@ -1,8 +1,7 @@
-/*!
-\page sdr_page_front Sdr : Shader Definition Registry
-\if ( PIXAR_MFB_BUILD )
-\mainpage Sdr : Shader Definition Registry
-\endif
+### <sub>Shader Definition Registry</sub>
+# <sup>**Pixar.Sdr**</sup>
+
+### **Overview**
 
 Sdr is a shading-specialized version of Ndr, and provides the following
 specialized classes:
@@ -19,9 +18,7 @@ classes:
 For a high-level view of the system and how all the parts work together, see
 the overview page for Ndr.
 
-\tableofcontents
-
-# Discussion of SdrPropertyTypes {#SdrPropertyTypes}
+# Discussion of [SdrPropertyTypes](Pixar/SdrPropertyTypes)
 
 Sdr defines a limited set of types:
 - Int
@@ -147,5 +144,3 @@ Property  |SdrPropertyType            |SdfValueTypeName
 foo       |SdrPropertyTypes->Color    |SdfValueTypeNames->Color
 bar       |SdrPropertyTypes->String   |SdfValueTypeNames->String
 surface   |SdrPropertyTypes->Terminal |SdfValueTypeNames->Token
-
-*/

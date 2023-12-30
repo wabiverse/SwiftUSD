@@ -22,11 +22,11 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/pyResultConversions.h"
-#include "pxr/base/tf/pyStaticTokens.h"
-#include "pxr/base/tf/weakPtr.h"
-#include "pxr/usd/sdr/shaderProperty.h"
+#include <pxr/pxrns.h>
+#include "Tf/pyResultConversions.h"
+#include "Tf/pyStaticTokens.h"
+#include "Tf/weakPtr.h"
+#include "Sdr/shaderProperty.h"
 
 #include <boost/python.hpp>
 

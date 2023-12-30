@@ -27,10 +27,10 @@
 
 /// \file sdr/shaderMetadataHelpers.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/sdr/api.h"
-#include "pxr/base/tf/token.h"
-#include "pxr/usd/sdr/declare.h"
+#include <pxr/pxrns.h>
+#include "Sdr/api.h"
+#include "Tf/token.h"
+#include "Sdr/declare.h"
 
 #include <limits>
 

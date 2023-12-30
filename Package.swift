@@ -90,6 +90,10 @@ let package = Package(
       name: "Ndr",
       targets: ["Ndr"]
     ),
+    .library(
+      name: "Sdr",
+      targets: ["Sdr"]
+    ),
     // --------------- Python -----
     .library(
       name: "UsdGeom",
@@ -160,6 +164,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyNdr"]
     ),
+    .library(
+      name: "PySdr",
+      type: .dynamic,
+      targets: ["PySdr"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -187,7 +196,8 @@ let package = Package(
         "PyPcp",
         "PyUsd",
         "PyUsdGeom",
-        "PyNdr"
+        "PyNdr",
+        "PySdr"
       ]
     ),
   ],
@@ -508,6 +518,24 @@ let package = Package(
     ),
 
     .target(
+      name: "Sdr",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Ndr"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Sdr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
+        .define("MFB_PACKAGE_MODULE", to: "Sdr"),
+        .define("SDR_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -728,6 +756,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PySdr",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PySdr",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Sdr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
+        .define("MFB_PACKAGE_MODULE", to: "Sdr"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -783,7 +828,7 @@ let package = Package(
     .target(
       name: "Pixar",
       dependencies: [
-        /* ------ base. ------ */
+        // ---------- base. ------
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Js"),
@@ -792,7 +837,7 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Work"),
         .target(name: "Plug"),
-        /* ------- usd. ------ */
+        // ----------- usd. ------
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),
@@ -800,8 +845,10 @@ let package = Package(
         .target(name: "Usd"),
         .target(name: "UsdGeom"),
         .target(name: "Ndr"),
-        /* ------------------- */
+        .target(name: "Sdr"),
+        // -------- macros. ------
         .target(name: "PixarMacros"),
+        // -----------------------
       ],
       swiftSettings: [
         .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),

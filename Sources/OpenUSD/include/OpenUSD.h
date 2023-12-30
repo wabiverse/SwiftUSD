@@ -852,16 +852,6 @@
 #include <OpenUSD/pxr/usd/usdProc/pch.h>
 #include <OpenUSD/pxr/usd/usdProc/tokens.h>
 
-// sdr
-#include <OpenUSD/pxr/usd/sdr/api.h>
-#include <OpenUSD/pxr/usd/sdr/debugCodes.h>
-#include <OpenUSD/pxr/usd/sdr/declare.h>
-#include <OpenUSD/pxr/usd/sdr/pch.h>
-#include <OpenUSD/pxr/usd/sdr/registry.h>
-#include <OpenUSD/pxr/usd/sdr/shaderMetadataHelpers.h>
-#include <OpenUSD/pxr/usd/sdr/shaderNode.h>
-#include <OpenUSD/pxr/usd/sdr/shaderProperty.h>
-
 // usdSkel
 #include <OpenUSD/pxr/usd/usdSkel/animation.h>
 #include <OpenUSD/pxr/usd/usdSkel/animMapper.h>
