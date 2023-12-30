@@ -25,7 +25,7 @@
 #ifndef PXR_USD_NDR_NODE_DISCOVERY_RESULT_H
 #define PXR_USD_NDR_NODE_DISCOVERY_RESULT_H
 
-#include "pxr/usd/ndr/declare.h"
+#include "Ndr/declare.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

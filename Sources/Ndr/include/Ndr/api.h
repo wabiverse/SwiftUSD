@@ -24,7 +24,7 @@
 #ifndef PXR_USD_NDR_API_H
 #define PXR_USD_NDR_API_H
 
-#include "pxr/base/arch/export.h"
+#include "Arch/export.h"
 
 #if defined(PXR_STATIC)
 #   define NDR_API

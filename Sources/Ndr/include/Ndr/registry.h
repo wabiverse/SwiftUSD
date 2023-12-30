@@ -27,15 +27,15 @@
 
 /// \file ndr/registry.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/weakBase.h"
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
-#include "pxr/usd/ndr/node.h"
-#include "pxr/usd/ndr/nodeDiscoveryResult.h"
-#include "pxr/usd/ndr/parserPlugin.h"
-#include "pxr/usd/sdf/assetPath.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/weakBase.h"
+#include "Ndr/declare.h"
+#include "Ndr/discoveryPlugin.h"
+#include "Ndr/node.h"
+#include "Ndr/nodeDiscoveryResult.h"
+#include "Ndr/parserPlugin.h"
+#include "Sdf/assetPath.h"
 #include <map>
 #include <mutex>
 

@@ -5,20 +5,20 @@ let package = Package(
   name: "SwiftUSD",
   platforms: [
     /*
-     the swiftpm docs are vague on this, however, this setting only
-     currently applies to targeting minimum apple platform versions
-     and the omission of linux and windows here (they do not exist
-     on the SupportedPlatform struct) does not mean linux & windows
-     are not supported. For now, one can disregard this setting on all
-     platforms that are not apple.
+      the swiftpm docs are vague on this, however, this setting only
+      currently applies to targeting minimum apple platform versions
+      and the omission of linux and windows here (they do not exist
+      on the SupportedPlatform struct) does not mean linux & windows
+      are not supported. For now, one can disregard this setting on all
+      platforms that are not apple.
 
-     Note: the apple platform minimums are quite recent, this is due to
-     CXX interop only appearing in recent versions of these apple SDKs,
-     without setting these where they are - we would otherwise have to
-     muck up the swift apis with @availibility macros, to avoid errors
-     complaining about (ex. 'UsdStage is only available in macOS 14 or
-     later').
-    */
+      Note: the apple platform minimums are quite recent, this is due to
+      CXX interop only appearing in recent versions of these apple SDKs,
+      without setting these where they are - we would otherwise have to
+      muck up the swift apis with @availibility macros, to avoid errors
+      complaining about (ex. 'UsdStage is only available in macOS 14 or
+      later').
+     */
     .macOS(.v14),
     .visionOS(.v1),
     .iOS(.v16),
@@ -85,6 +85,10 @@ let package = Package(
       name: "Usd",
       targets: ["Usd"]
     ),
+    .library(
+      name: "Ndr",
+      targets: ["Ndr"]
+    ),
     // --------------- Python -----
     .library(
       name: "UsdGeom",
@@ -150,6 +154,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyUsdGeom"]
     ),
+    .library(
+      name: "PyNdr",
+      type: .dynamic,
+      targets: ["PyNdr"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -176,7 +185,8 @@ let package = Package(
         "PySdf",
         "PyPcp",
         "PyUsd",
-        "PyUsdGeom"
+        "PyUsdGeom",
+        "PyNdr"
       ]
     ),
   ],
@@ -474,6 +484,28 @@ let package = Package(
     ),
 
     .target(
+      name: "Ndr",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Ar"),
+        .target(name: "Sdf")
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ndr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
+        .define("MFB_PACKAGE_MODULE", to: "Ndr"),
+        .define("NDR_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -677,6 +709,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyNdr",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyNdr",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ndr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
+        .define("MFB_PACKAGE_MODULE", to: "Ndr"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -740,6 +789,7 @@ let package = Package(
         .target(name: "Pcp"),
         .target(name: "Usd"),
         .target(name: "UsdGeom"),
+        .target(name: "Ndr"),
         /* ------------------- */
       ],
       swiftSettings: [

@@ -27,11 +27,11 @@
 
 /// \file ndr/property.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/token.h"
-#include "pxr/base/vt/value.h"
-#include "pxr/usd/ndr/declare.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/token.h"
+#include "Vt/value.h"
+#include "Ndr/declare.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

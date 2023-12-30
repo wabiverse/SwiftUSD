@@ -27,9 +27,9 @@
 
 /// \file ndr/declare.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/token.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/token.h"
 
 #include <memory>
 #include <string>

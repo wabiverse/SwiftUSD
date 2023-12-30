@@ -27,12 +27,12 @@
 
 /// \file ndr/parserPlugin.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/type.h"
-#include "pxr/base/tf/weakBase.h"
-#include "pxr/base/tf/weakPtr.h"
-#include "pxr/usd/ndr/declare.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/type.h"
+#include "Tf/weakBase.h"
+#include "Tf/weakPtr.h"
+#include "Ndr/declare.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -41,11 +41,11 @@ struct NdrNodeDiscoveryResult;
 
 /// Register a parser plugin with the plugin system.
 #define NDR_REGISTER_PARSER_PLUGIN(ParserPluginClass)                   \
-TF_REGISTRY_FUNCTION(TfType)                                            \
-{                                                                       \
+  TF_REGISTRY_FUNCTION(TfType)                                          \
+  {                                                                     \
     TfType::Define<ParserPluginClass, TfType::Bases<NdrParserPlugin>>() \
         .SetFactory<NdrParserPluginFactory<ParserPluginClass>>();       \
-}
+  }
 
 /// \class NdrParserPlugin
 ///
@@ -125,44 +125,43 @@ TF_REGISTRY_FUNCTION(TfType)                                            \
 class NdrParserPlugin : public TfWeakBase
 {
 public:
-    NDR_API
-    NdrParserPlugin();
-    NDR_API
-    virtual ~NdrParserPlugin();
+  NDR_API
+  NdrParserPlugin();
+  NDR_API
+  virtual ~NdrParserPlugin();
 
-    /// Takes the specified `NdrNodeDiscoveryResult` instance, which was a
-    /// result of the discovery process, and generates a new `NdrNode`.
-    /// The node's name, source type, and family must match.
-    NDR_API
-    virtual NdrNodeUniquePtr Parse(
-        const NdrNodeDiscoveryResult& discoveryResult) = 0;
+  /// Takes the specified `NdrNodeDiscoveryResult` instance, which was a
+  /// result of the discovery process, and generates a new `NdrNode`.
+  /// The node's name, source type, and family must match.
+  NDR_API
+  virtual NdrNodeUniquePtr Parse(
+      const NdrNodeDiscoveryResult &discoveryResult) = 0;
 
-    /// Returns the types of nodes that this plugin can parse.
-    ///
-    /// "Type" here is the discovery type (in the case of files, this will
-    /// probably be the file extension, but in other systems will be data that
-    /// can be determined during discovery). This type should only be used to
-    /// match up a `NdrNodeDiscoveryResult` to its parser plugin; this value is
-    /// not exposed in the node's API.
-    NDR_API
-    virtual const NdrTokenVec& GetDiscoveryTypes() const = 0;
+  /// Returns the types of nodes that this plugin can parse.
+  ///
+  /// "Type" here is the discovery type (in the case of files, this will
+  /// probably be the file extension, but in other systems will be data that
+  /// can be determined during discovery). This type should only be used to
+  /// match up a `NdrNodeDiscoveryResult` to its parser plugin; this value is
+  /// not exposed in the node's API.
+  NDR_API
+  virtual const NdrTokenVec &GetDiscoveryTypes() const = 0;
 
-    /// Returns the source type that this parser operates on.
-    ///
-    /// A source type is the most general type for a node. The parser plugin is
-    /// responsible for parsing all discovery results that have the types
-    /// declared under `GetDiscoveryTypes()`, and those types are collectively
-    /// identified as one "source type".
-    NDR_API
-    virtual const TfToken& GetSourceType() const = 0;
+  /// Returns the source type that this parser operates on.
+  ///
+  /// A source type is the most general type for a node. The parser plugin is
+  /// responsible for parsing all discovery results that have the types
+  /// declared under `GetDiscoveryTypes()`, and those types are collectively
+  /// identified as one "source type".
+  NDR_API
+  virtual const TfToken &GetSourceType() const = 0;
 
-    /// Gets an invalid node based on the discovery result provided. An invalid
-    /// node is a node that has no properties, but may have basic data found
-    /// during discovery.
-    NDR_API
-    static NdrNodeUniquePtr GetInvalidNode(const NdrNodeDiscoveryResult& dr);
+  /// Gets an invalid node based on the discovery result provided. An invalid
+  /// node is a node that has no properties, but may have basic data found
+  /// during discovery.
+  NDR_API
+  static NdrNodeUniquePtr GetInvalidNode(const NdrNodeDiscoveryResult &dr);
 };
-
 
 /// \cond
 /// Factory classes should be hidden from the documentation.
@@ -170,17 +169,17 @@ public:
 class NdrParserPluginFactoryBase : public TfType::FactoryBase
 {
 public:
-    virtual NdrParserPlugin* New() const = 0;
+  virtual NdrParserPlugin *New() const = 0;
 };
 
 template <class T>
 class NdrParserPluginFactory : public NdrParserPluginFactoryBase
 {
 public:
-    virtual NdrParserPlugin* New() const
-    {
-        return new T;
-    }
+  virtual NdrParserPlugin *New() const
+  {
+    return new T;
+  }
 };
 
 /// \endcond

@@ -27,12 +27,12 @@
 
 /// \file ndr/node.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/token.h"
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/nodeDiscoveryResult.h"
-#include "pxr/usd/ndr/property.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/token.h"
+#include "Ndr/declare.h"
+#include "Ndr/nodeDiscoveryResult.h"
+#include "Ndr/property.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -27,13 +27,13 @@
 
 /// \file ndr/registry.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/base/tf/declarePtrs.h"
-#include "pxr/base/tf/type.h"
-#include "pxr/base/tf/weakBase.h"
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/nodeDiscoveryResult.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Tf/declarePtrs.h"
+#include "Tf/type.h"
+#include "Tf/weakBase.h"
+#include "Ndr/declare.h"
+#include "Ndr/nodeDiscoveryResult.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

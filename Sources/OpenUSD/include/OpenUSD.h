@@ -982,20 +982,6 @@
 #include <OpenUSD/pxr/usd/usdLux/tokens.h>
 #include <OpenUSD/pxr/usd/usdLux/volumeLightAPI.h>
 
-// ndr
-#include <OpenUSD/pxr/usd/ndr/api.h>
-#include <OpenUSD/pxr/usd/ndr/debugCodes.h>
-#include <OpenUSD/pxr/usd/ndr/declare.h>
-#include <OpenUSD/pxr/usd/ndr/discoveryPlugin.h>
-#include <OpenUSD/pxr/usd/ndr/filesystemDiscovery.h>
-#include <OpenUSD/pxr/usd/ndr/filesystemDiscoveryHelpers.h>
-#include <OpenUSD/pxr/usd/ndr/node.h>
-#include <OpenUSD/pxr/usd/ndr/nodeDiscoveryResult.h>
-#include <OpenUSD/pxr/usd/ndr/parserPlugin.h>
-#include <OpenUSD/pxr/usd/ndr/pch.h>
-#include <OpenUSD/pxr/usd/ndr/property.h>
-#include <OpenUSD/pxr/usd/ndr/registry.h>
-
 // usdUtils
 #include <OpenUSD/pxr/usd/usdUtils/api.h>
 #include <OpenUSD/pxr/usd/usdUtils/authoring.h>

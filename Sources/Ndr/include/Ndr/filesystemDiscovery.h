@@ -27,9 +27,9 @@
 
 /// \file ndrDiscovery/filesystemDiscovery.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/api.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
+#include <pxr/pxrns.h>
+#include "Ndr/api.h"
+#include "Ndr/discoveryPlugin.h"
 #include <functional>
 
 PXR_NAMESPACE_OPEN_SCOPE
