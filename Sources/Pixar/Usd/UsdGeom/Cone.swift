@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Cone
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
   {
     Pixar.UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
   {
-    Pixar.UsdGeom.Cone.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Cone.define(stage, path: .init(path))
   }
 }

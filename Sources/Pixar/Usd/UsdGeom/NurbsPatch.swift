@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.NurbsPatch
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.NurbsPatch
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.NurbsPatch
   {
     Pixar.UsdGeom.NurbsPatch.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.NurbsPatch
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.NurbsPatch
   {
-    Pixar.UsdGeom.NurbsPatch.define(&stage, path: .init(path))
+    Pixar.UsdGeom.NurbsPatch.define(stage, path: .init(path))
   }
 }

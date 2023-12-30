@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Subset
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Subset
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Subset
   {
     Pixar.UsdGeom.Subset.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Subset
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Subset
   {
-    Pixar.UsdGeom.Subset.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Subset.define(stage, path: .init(path))
   }
 }

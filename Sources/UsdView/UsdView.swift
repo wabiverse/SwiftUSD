@@ -35,33 +35,33 @@ enum Creator
 
     /* Create a new USD stage with a sphere, capsule, cylinder, cube, and cone. */
 
-    var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    let xformMain = Pixar.UsdGeom.Xform.define(&stage, path: "/Main")
+    let xformMain = Pixar.UsdGeom.Xform.define(stage, path: "/Main")
     xformMain.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 1.0, 0.0))
     xformMain.addXformOp(type: .scale, precision: .float).set(Pixar.GfVec3f(5, 5, 5))
 
-    let stageLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageLeft")
+    let stageLeft = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageLeft")
     stageLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -5.0))
 
-    let stageUberLeft = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberLeft")
+    let stageUberLeft = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageUberLeft")
     stageUberLeft.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, -10.0))
     stageUberLeft.addXformOp(type: .rotateX, precision: .float).set(-90)
 
-    let stageRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageRight")
+    let stageRight = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageRight")
     stageRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 5.0))
 
-    let stageUberRight = Pixar.UsdGeom.Xform.define(&stage, path: "/Main/StageUberRight")
+    let stageUberRight = Pixar.UsdGeom.Xform.define(stage, path: "/Main/StageUberRight")
     stageUberRight.addXformOp(type: .translate).set(Pixar.GfVec3d(0.0, 0.0, 10.0))
     stageUberRight.addXformOp(type: .rotateX, precision: .float).set(-90)
 
-    Pixar.UsdGeom.Sphere.define(&stage, path: "/Main/StageLeft/Sphere")
-    Pixar.UsdGeom.Capsule.define(&stage, path: "/Main/StageUberLeft/Capsule")
-    Pixar.UsdGeom.Cylinder.define(&stage, path: "/Main/Cylinder")
-    Pixar.UsdGeom.Cube.define(&stage, path: "/Main/StageRight/Cube")
-    Pixar.UsdGeom.Cone.define(&stage, path: "/Main/StageUberRight/Cone")
+    Pixar.UsdGeom.Sphere.define(stage, path: "/Main/StageLeft/Sphere")
+    Pixar.UsdGeom.Capsule.define(stage, path: "/Main/StageUberLeft/Capsule")
+    Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
+    Pixar.UsdGeom.Cube.define(stage, path: "/Main/StageRight/Cube")
+    Pixar.UsdGeom.Cone.define(stage, path: "/Main/StageUberRight/Cone")
 
-    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.9")
+    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.11")
 
     stage.save()
 

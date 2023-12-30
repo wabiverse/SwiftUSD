@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Capsule
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
   {
     Pixar.UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
   {
-    Pixar.UsdGeom.Capsule.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Capsule.define(stage, path: .init(path))
   }
 }

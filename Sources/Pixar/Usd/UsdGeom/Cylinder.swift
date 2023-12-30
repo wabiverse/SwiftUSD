@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Cylinder
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
   {
     Pixar.UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
   {
-    Pixar.UsdGeom.Cylinder.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Cylinder.define(stage, path: .init(path))
   }
 }

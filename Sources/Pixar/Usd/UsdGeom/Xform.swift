@@ -33,15 +33,15 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Xform
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
   {
     Pixar.UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
   {
-    Pixar.UsdGeom.Xform.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Xform.define(stage, path: .init(path))
   }
 }
 

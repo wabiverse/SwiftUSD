@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.BasisCurves
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.BasisCurves
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.BasisCurves
   {
     Pixar.UsdGeom.BasisCurves.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.BasisCurves
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.BasisCurves
   {
-    Pixar.UsdGeom.BasisCurves.define(&stage, path: .init(path))
+    Pixar.UsdGeom.BasisCurves.define(stage, path: .init(path))
   }
 }

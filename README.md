@@ -17,7 +17,7 @@ For more details, please visit the web site [here](http://openusd.org).
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.9"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.11"),
 ]
 ```
 
@@ -45,7 +45,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.9")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.11")
   ],
   targets: [
     /* 📕 For library products... */
@@ -107,8 +107,8 @@ enum Creator
 
     var stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    Pixar.UsdGeom.Xform.define(&stage, path: "/Hello")
-    Pixar.UsdGeom.Sphere.define(&stage, path: "/Hello/World")
+    Pixar.UsdGeom.Xform.define(stage, path: "/Hello")
+    Pixar.UsdGeom.Sphere.define(stage, path: "/Hello/World")
 
     stage.getPseudoRoot().set(doc: "Hello World Example (Swift)!")
 

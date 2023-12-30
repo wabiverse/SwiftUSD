@@ -33,14 +33,14 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Camera
 {
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
+  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
   {
     Pixar.UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: inout StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
+  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
   {
-    Pixar.UsdGeom.Camera.define(&stage, path: .init(path))
+    Pixar.UsdGeom.Camera.define(stage, path: .init(path))
   }
 }
