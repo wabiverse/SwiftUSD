@@ -58,21 +58,13 @@ enum Creator
     cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    /* Create material with a surface shader and bind it to all geometry. */
+    /* Create a different colored material for each geometry prim. */
 
-    let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/Material")
-
-    var pbrShader = Pixar.UsdShadeShader.define(stage, path: "/Materials/Material/PBRShader")
-    pbrShader.createIdAttr("UsdPreviewSurface")
-    pbrShader.createInput(for: .roughness, type: .float).set(Float(0.4))
-    pbrShader.createInput(for: .metallic, type: .float).set(Float(0.0))
-    material.createSurfaceOutput().connectTo(source: pbrShader.connectableAPI(), at: .surface)
-
-    Pixar.UsdShade.MaterialBindingAPI.apply(sphere).bind(material)
-    Pixar.UsdShade.MaterialBindingAPI.apply(capsule).bind(material)
-    Pixar.UsdShade.MaterialBindingAPI.apply(cylinder).bind(material)
-    Pixar.UsdShade.MaterialBindingAPI.apply(cube).bind(material)
-    Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(material)
+    Pixar.UsdShade.MaterialBindingAPI.apply(sphere).bind(matDef(stage, color: .red))
+    Pixar.UsdShade.MaterialBindingAPI.apply(capsule).bind(matDef(stage, color: .yellow))
+    Pixar.UsdShade.MaterialBindingAPI.apply(cylinder).bind(matDef(stage, color: .green))
+    Pixar.UsdShade.MaterialBindingAPI.apply(cube).bind(matDef(stage, color: .blue))
+    Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.13")
 
@@ -80,4 +72,54 @@ enum Creator
 
     print("'usdview' not yet implemented... will exit now.")
   }
+}
+
+enum MaterialColor: String, CaseIterable
+{
+  case red
+  case orange
+  case yellow
+  case green
+  case blue
+  case purple
+  case white
+  case black
+
+  var vec3f: GfVec3f
+  {
+    switch self
+    {
+      case .red: GfVec3f(0.992, 0.207, 0.061)
+      case .orange: GfVec3f(0.922, 0.501, 0.0)
+      case .yellow: GfVec3f(0.950, 0.800, 0.0)
+      case .green: GfVec3f(0.0, 0.766, 0.014)
+      case .blue: GfVec3f(0.132, 0.218, 0.932)
+      case .purple: GfVec3f(0.531, 0.122, 0.922)
+      case .white: GfVec3f(0.8, 0.8, 0.8)
+      case .black: GfVec3f(0.2, 0.2, 0.2)
+    }
+  }
+}
+
+/**
+ * Create a material with a surface shader.
+ *
+ * - Parameter stage: The stage to create the material on.
+ * - Parameter color: The diffuse color to set on the shader.
+ * - Returns: The newly created material.
+ */
+func matDef(_ stage: StageRefPtr, color: MaterialColor = .white) -> Pixar.UsdShade.Material
+{
+  let matName = "\(color.rawValue.capitalized)Material"
+
+  let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/\(matName)")
+
+  var pbrShader = Pixar.UsdShadeShader.define(stage, path: "/Materials/\(matName)/PBRShader")
+  pbrShader.createIdAttr(.usdPreviewSurface)
+  pbrShader.createInput(for: .diffuseColor, type: .color3f).set(color.vec3f)
+  pbrShader.createInput(for: .roughness, type: .float).set(Float(0.4))
+  pbrShader.createInput(for: .metallic, type: .float).set(Float(0.0))
+  material.createSurfaceOutput().connectTo(source: pbrShader.connectableAPI(), at: .surface)
+
+  return material
 }

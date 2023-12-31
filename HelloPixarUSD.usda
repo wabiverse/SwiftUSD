@@ -13,7 +13,7 @@ def Xform "Geometry"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        rel material:binding = </Materials/Material>
+        rel material:binding = </Materials/RedMaterial>
         double3 xformOp:translate = (0, 0, -5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -22,7 +22,7 @@ def Xform "Geometry"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        rel material:binding = </Materials/Material>
+        rel material:binding = </Materials/YellowMaterial>
         float xformOp:rotateX = -90
         double3 xformOp:translate = (0, 0, -10)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
@@ -32,7 +32,7 @@ def Xform "Geometry"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        rel material:binding = </Materials/Material>
+        rel material:binding = </Materials/GreenMaterial>
         float xformOp:rotateX = -90
         uniform token[] xformOpOrder = ["xformOp:rotateX"]
     }
@@ -41,7 +41,7 @@ def Xform "Geometry"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        rel material:binding = </Materials/Material>
+        rel material:binding = </Materials/BlueMaterial>
         double3 xformOp:translate = (0, 0, 5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -50,7 +50,7 @@ def Xform "Geometry"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        rel material:binding = </Materials/Material>
+        rel material:binding = </Materials/PurpleMaterial>
         float xformOp:rotateX = -90
         double3 xformOp:translate = (0, 0, 10)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
@@ -59,13 +59,70 @@ def Xform "Geometry"
 
 def "Materials"
 {
-    def Material "Material"
+    def Material "RedMaterial"
     {
-        token outputs:surface.connect = </Materials/Material/PBRShader.outputs:surface>
+        token outputs:surface.connect = </Materials/RedMaterial/PBRShader.outputs:surface>
 
         def Shader "PBRShader"
         {
             uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.992, 0.207, 0.061)
+            float inputs:metallic = 0
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
+    }
+
+    def Material "YellowMaterial"
+    {
+        token outputs:surface.connect = </Materials/YellowMaterial/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.95, 0.8, 0)
+            float inputs:metallic = 0
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
+    }
+
+    def Material "GreenMaterial"
+    {
+        token outputs:surface.connect = </Materials/GreenMaterial/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0, 0.766, 0.014)
+            float inputs:metallic = 0
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
+    }
+
+    def Material "BlueMaterial"
+    {
+        token outputs:surface.connect = </Materials/BlueMaterial/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.132, 0.218, 0.932)
+            float inputs:metallic = 0
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
+    }
+
+    def Material "PurpleMaterial"
+    {
+        token outputs:surface.connect = </Materials/PurpleMaterial/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.531, 0.122, 0.922)
             float inputs:metallic = 0
             float inputs:roughness = 0.4
             token outputs:surface

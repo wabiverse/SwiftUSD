@@ -62,6 +62,26 @@ public extension Pixar.UsdShade.Shader
     createIdAttr(Pixar.TfToken(defaultValue), writeSparsely: writeSparsely)
   }
 
+  /**
+   * Common shader ids, for convenience.
+   */
+  enum ShaderId: String, CaseIterable
+  {
+    case usdPreviewSurface = "UsdPreviewSurface"
+    case usdUVTexture = "UsdUVTexture"
+
+    public func getToken() -> Pixar.TfToken
+    {
+      Pixar.TfToken(rawValue)
+    }
+  }
+
+  @discardableResult
+  func createIdAttr(_ defaultValue: ShaderId, writeSparsely: Bool = false) -> Pixar.UsdAttribute
+  {
+    createIdAttr(defaultValue.getToken(), writeSparsely: writeSparsely)
+  }
+
   @discardableResult
   mutating func createInput(for name: Pixar.TfToken, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShadeInput
   {
@@ -71,24 +91,37 @@ public extension Pixar.UsdShade.Shader
   /**
    * Common shader inputs, for convenience.
    */
-  enum InputName: CaseIterable
+  enum InputName: String, CaseIterable
   {
-    case baseColor
+    /* ----- usd preview surface. ----- */
+
+    case diffuseColor
     case roughness
+    case specularColor
     case metallic
+    case emissiveColor
+    case clearcoat
+    case clearcoatRoughness
+    case opacity
+    case ior
+    case normal
+    case displacement
+    case occlusion
+
+    /* ---------- usd uv texture. ----- */
+
     case file
     case st
+    case wrapS
+    case wrapT
+    case fallback
+    case scale
+    case bias
+    case sourceColorSpace
 
     public func getToken() -> Pixar.TfToken
     {
-      switch self
-      {
-        case .baseColor: Pixar.TfToken("baseColor")
-        case .roughness: Pixar.TfToken("roughness")
-        case .metallic: Pixar.TfToken("metallic")
-        case .file: Pixar.TfToken("file")
-        case .st: Pixar.TfToken("st")
-      }
+      Pixar.TfToken(rawValue)
     }
   }
 
