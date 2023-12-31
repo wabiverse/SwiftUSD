@@ -23,36 +23,30 @@
 
 import UsdShade
 
-public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
+public typealias UsdShadeOutput = Pixar.UsdShadeOutput
 
 public extension Pixar.UsdShade
 {
-  typealias Material = UsdShadeMaterial
+  typealias Output = UsdShadeOutput
 }
 
-public extension Pixar.UsdShade.Material
+public extension Pixar.UsdShade.Output
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
+  func connectTo(source: Pixar.UsdShadeConnectableAPI, at name: Pixar.TfToken, from sourceType: Pixar.UsdShadeAttributeType = .Output, type: Pixar.SdfValueTypeName = Pixar.SdfValueTypeName()) -> Bool
   {
-    Pixar.UsdShade.Material.Define(stage.pointee.getPtr(), path)
+    ConnectToSource(source, name, sourceType, type)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdShade.Material
+  func connectTo(source: Pixar.UsdShadeConnectableAPI, at name: Pixar.UsdShade.Tokens, from sourceType: Pixar.UsdShadeAttributeType = .Output, type: Pixar.SdfValueTypeName = Pixar.SdfValueTypeName()) -> Bool
   {
-    Pixar.UsdShade.Material.define(stage, path: .init(path))
+    ConnectToSource(source, name.getToken(), sourceType, type)
   }
 
   @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.TfToken) -> Pixar.UsdShadeOutput
+  func connectTo(source: Pixar.UsdShadeConnectableAPI, at name: String, from sourceType: Pixar.UsdShadeAttributeType = .Output, type: Pixar.SdfValueTypeName = Pixar.SdfValueTypeName()) -> Bool
   {
-    CreateSurfaceOutput(renderContext)
-  }
-
-  @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.UsdShade.Tokens = .universalRenderContext) -> Pixar.UsdShadeOutput
-  {
-    createSurfaceOutput(renderContext: renderContext.getToken())
+    ConnectToSource(source, Pixar.TfToken(name), sourceType, type)
   }
 }

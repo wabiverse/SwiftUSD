@@ -23,36 +23,30 @@
 
 import UsdShade
 
-public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
+public typealias UsdShadeInput = Pixar.UsdShadeInput
 
 public extension Pixar.UsdShade
 {
-  typealias Material = UsdShadeMaterial
+  typealias Input = UsdShadeInput
 }
 
-public extension Pixar.UsdShade.Material
+public extension Pixar.UsdShade.Input
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
+  func set(_ value: Pixar.VtValue, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
-    Pixar.UsdShade.Material.Define(stage.pointee.getPtr(), path)
+    Set(value, time)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdShade.Material
+  func set(_ value: Float, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
-    Pixar.UsdShade.Material.define(stage, path: .init(path))
+    Set(value, time)
   }
 
   @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.TfToken) -> Pixar.UsdShadeOutput
+  func set(_ value: Double, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
-    CreateSurfaceOutput(renderContext)
-  }
-
-  @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.UsdShade.Tokens = .universalRenderContext) -> Pixar.UsdShadeOutput
-  {
-    createSurfaceOutput(renderContext: renderContext.getToken())
+    Set(value, time)
   }
 }

@@ -58,9 +58,16 @@ enum Creator
     cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    /* Create material and bind it to all geometry. */
+    /* Create material with a surface shader and bind it to all geometry. */
 
     let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/Material")
+
+    var pbrShader = Pixar.UsdShadeShader.define(stage, path: "/Materials/Material/PBRShader")
+    pbrShader.createIdAttr("UsdPreviewSurface")
+    pbrShader.createInput(for: .roughness, type: .float).set(Float(0.4))
+    pbrShader.createInput(for: .metallic, type: .float).set(Float(0.0))
+    material.createSurfaceOutput().connectTo(source: pbrShader.connectableAPI(), at: .surface)
+
     Pixar.UsdShade.MaterialBindingAPI.apply(sphere).bind(material)
     Pixar.UsdShade.MaterialBindingAPI.apply(capsule).bind(material)
     Pixar.UsdShade.MaterialBindingAPI.apply(cylinder).bind(material)

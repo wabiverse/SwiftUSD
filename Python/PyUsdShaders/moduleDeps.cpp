@@ -21,30 +21,26 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
-#define PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H
+////////////////////////////////////////////////////////////////////////
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/token.h"
+#include <pxr/pxrns.h>
+#include "Tf/registryManager.h"
+#include "Tf/scriptModuleLoader.h"
+#include "Tf/token.h"
 
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
-#include "pxr/usd/ndr/parserPlugin.h"
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdShadersDiscoveryPlugin : public NdrDiscoveryPlugin {
-public:
-    UsdShadersDiscoveryPlugin() = default;
-
-    ~UsdShadersDiscoveryPlugin() override = default;
-    
-    virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) 
-        override;
-
-    virtual const NdrStringVec& GetSearchURIs() const override;
-};
+TF_REGISTRY_FUNCTION(TfScriptModuleLoader)
+{
+  // List of direct dependencies for this library.
+  const std::vector<TfToken> reqs = {
+      TfToken("ar"),
+      TfToken("ndr"),
+      TfToken("sdr"),
+      TfToken("usdShade")};
+  TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("usdShaders"), TfToken("pxr.UsdShaders"), reqs);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // PXR_USD_IMAGING_PLUGIN_USD_SHADERS_DISCOVERY_PLUGIN_H

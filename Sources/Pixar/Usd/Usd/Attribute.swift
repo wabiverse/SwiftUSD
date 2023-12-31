@@ -21,38 +21,17 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import UsdShade
+public typealias UsdAttribute = Pixar.UsdAttribute
 
-public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
-
-public extension Pixar.UsdShade
+public extension Pixar.Usd
 {
-  typealias Material = UsdShadeMaterial
+  typealias Attribute = UsdAttribute
 }
 
-public extension Pixar.UsdShade.Material
+public extension Pixar.Usd.Attribute
 {
-  @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
+  func set(doc: String)
   {
-    Pixar.UsdShade.Material.Define(stage.pointee.getPtr(), path)
-  }
-
-  @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdShade.Material
-  {
-    Pixar.UsdShade.Material.define(stage, path: .init(path))
-  }
-
-  @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.TfToken) -> Pixar.UsdShadeOutput
-  {
-    CreateSurfaceOutput(renderContext)
-  }
-
-  @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.UsdShade.Tokens = .universalRenderContext) -> Pixar.UsdShadeOutput
-  {
-    createSurfaceOutput(renderContext: renderContext.getToken())
+    SetDocumentation(std.string(doc))
   }
 }

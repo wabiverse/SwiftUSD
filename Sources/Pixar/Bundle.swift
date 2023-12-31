@@ -53,6 +53,10 @@ public extension Bundle
   static let usdShade = Bundle(path: "\(pxr)/SwiftUSD_UsdShade.bundle")
 
   /**
+   * Where ``Pixar.UsdShaders`` application bundle resources are located. */
+  static let usdShaders = Bundle(path: "\(pxr)/SwiftUSD_UsdShaders.bundle")
+
+  /**
    * Where ``Pixar.UsdLux`` application bundle resources are located. */
   static let usdLux = Bundle(path: "\(pxr)/SwiftUSD_UsdLux.bundle")
 
@@ -117,6 +121,10 @@ public extension Bundle
   static let pyUsdShade = Bundle(path: "\(pxr)/SwiftUSD_PyUsdShade.bundle")
 
   /**
+   * Where ``Pixar.UsdShaders`` application bundle resources are located. */
+  static let pyUsdShaders = Bundle(path: "\(pxr)/SwiftUSD_PyUsdShaders.bundle")
+
+  /**
    * Where ``Pixar.UsdLux`` application bundle resources are located. */
   static let pyUsdLux = Bundle(path: "\(pxr)/SwiftUSD_PyUsdLux.bundle")
 }
@@ -174,6 +182,7 @@ public enum BundleFramework: CaseIterable
   case ndr
   case usdGeom
   case usdShade
+  case usdShaders
   case usdLux
 
   public var resourcePath: String?
@@ -186,6 +195,7 @@ public enum BundleFramework: CaseIterable
       case .ndr: Bundle.ndr?.resourcePath
       case .usdGeom: Bundle.usdGeom?.resourcePath
       case .usdShade: Bundle.usdShade?.resourcePath
+      case .usdShaders: Bundle.usdShaders?.resourcePath
       case .usdLux: Bundle.usdLux?.resourcePath
     }
   }
@@ -208,6 +218,7 @@ public enum BundlePython: CaseIterable
   case pySdr
   case pyUsdGeom
   case pyUsdShade
+  case pyUsdShaders
   case pyUsdLux
 
   public var resourcePath: String?
@@ -229,6 +240,7 @@ public enum BundlePython: CaseIterable
       case .pySdr: Bundle.pySdr?.resourcePath
       case .pyUsdGeom: Bundle.pyUsdGeom?.resourcePath
       case .pyUsdShade: Bundle.pyUsdShade?.resourcePath
+      case .pyUsdShaders: Bundle.pyUsdShaders?.resourcePath
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
     }
   }

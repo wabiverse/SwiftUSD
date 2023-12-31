@@ -61,6 +61,15 @@ def "Materials"
 {
     def Material "Material"
     {
+        token outputs:surface.connect = </Materials/Material/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            float inputs:metallic = 0
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
     }
 }
 

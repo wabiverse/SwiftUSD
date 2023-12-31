@@ -764,10 +764,6 @@
 #include <OpenUSD/pxr/usdImaging/usdImaging/version.h>
 #include <OpenUSD/pxr/usdImaging/usdImaging/volumeAdapter.h>
 
-// usdShaders
-#include <OpenUSD/pxr/usdImaging/plugin/usdShaders/discoveryPlugin.h>
-#include <OpenUSD/pxr/usdImaging/plugin/usdShaders/pch.h>
-
 // sdrGlslfx
 #include <OpenUSD/pxr/usdImaging/plugin/sdrGlslfx/parserPlugin.h>
 #include <OpenUSD/pxr/usdImaging/plugin/sdrGlslfx/pch.h>

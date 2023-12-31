@@ -106,6 +106,11 @@ let package = Package(
       name: "UsdLux",
       targets: ["UsdLux"]
     ),
+    // ----- Pixar.UsdImaging -----
+    .library(
+      name: "UsdShaders",
+      targets: ["UsdShaders"]
+    ),
     // --------------- Python -----
     .library(
       name: "PyTf",
@@ -183,6 +188,11 @@ let package = Package(
       targets: ["PyUsdShade"]
     ),
     .library(
+      name: "PyUsdShaders",
+      type: .dynamic,
+      targets: ["PyUsdShaders"]
+    ),
+    .library(
       name: "PyUsdLux",
       type: .dynamic,
       targets: ["PyUsdLux"]
@@ -217,14 +227,15 @@ let package = Package(
         "PySdr",
         "PyUsdGeom",
         "PyUsdShade",
+        "PyUsdShaders",
         "PyUsdLux"
       ]
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/furby-tm/swift-bundler.git", from: "2.0.9"),
+    .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.3.7"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.7"),
   ],
   targets: [
     .target(
@@ -579,6 +590,27 @@ let package = Package(
     ),
 
     .target(
+      name: "UsdShaders",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Ar"),
+        .target(name: "Ndr"),
+        .target(name: "Sdr"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
+        .define("USDSHADERS_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "UsdLux",
       dependencies: [
         .target(name: "Arch"),
@@ -860,6 +892,23 @@ let package = Package(
     ),
 
     .target(
+      name: "PyUsdShaders",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsdShaders",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
+      ]
+    ),
+
+    .target(
       name: "PyUsdLux",
       dependencies: [
         .target(name: "Pixar"),
@@ -951,6 +1000,8 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
+        // --- usd imaging. ------
+        .target(name: "UsdShaders"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
