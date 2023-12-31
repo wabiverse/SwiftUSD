@@ -672,7 +672,7 @@ enum class SdfValueTypeNameType
  * SdfValueTypeNameType enum, all of this because Swift hates the -> operator pointer
  * lookup on SdfValueTypeNames.
  */
-inline SdfValueTypeName SdfGetValueTypeNameForType(const SdfValueTypeNameType &type)
+inline SdfValueTypeName SdfGetValueType(const SdfValueTypeNameType &type)
 {
   switch (type)
   {

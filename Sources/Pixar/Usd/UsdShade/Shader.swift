@@ -85,7 +85,7 @@ public extension Pixar.UsdShade.Shader
   @discardableResult
   mutating func createInput(for name: Pixar.TfToken, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShadeInput
   {
-    CreateInput(name, Pixar.SdfGetValueTypeNameForType(type))
+    CreateInput(name, Pixar.Sdf.getValueType(for: type))
   }
 
   /**
@@ -128,13 +128,13 @@ public extension Pixar.UsdShade.Shader
   @discardableResult
   mutating func createInput(for name: InputName, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShadeInput
   {
-    CreateInput(name.getToken(), Pixar.SdfGetValueTypeNameForType(type))
+    CreateInput(name.getToken(), Pixar.Sdf.getValueType(for: type))
   }
 
   @discardableResult
   mutating func createInput(for name: String, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShadeInput
   {
-    CreateInput(Pixar.TfToken(name), Pixar.SdfGetValueTypeNameForType(type))
+    CreateInput(Pixar.TfToken(name), Pixar.Sdf.getValueType(for: type))
   }
 
   func connectableAPI() -> Pixar.UsdShadeConnectableAPI
