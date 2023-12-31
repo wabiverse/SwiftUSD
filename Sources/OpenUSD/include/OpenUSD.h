@@ -924,34 +924,6 @@
 #include <OpenUSD/pxr/usd/usdMtlx/reader.h>
 #include <OpenUSD/pxr/usd/usdMtlx/utils.h>
 
-// usdLux
-#include <OpenUSD/pxr/usd/usdLux/api.h>
-#include <OpenUSD/pxr/usd/usdLux/blackbody.h>
-#include <OpenUSD/pxr/usd/usdLux/boundableLightBase.h>
-#include <OpenUSD/pxr/usd/usdLux/cylinderLight.h>
-#include <OpenUSD/pxr/usd/usdLux/discoveryPlugin.h>
-#include <OpenUSD/pxr/usd/usdLux/diskLight.h>
-#include <OpenUSD/pxr/usd/usdLux/distantLight.h>
-#include <OpenUSD/pxr/usd/usdLux/domeLight.h>
-#include <OpenUSD/pxr/usd/usdLux/geometryLight.h>
-#include <OpenUSD/pxr/usd/usdLux/lightAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/lightDefParser.h>
-#include <OpenUSD/pxr/usd/usdLux/lightFilter.h>
-#include <OpenUSD/pxr/usd/usdLux/lightListAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/listAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/meshLightAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/nonboundableLightBase.h>
-#include <OpenUSD/pxr/usd/usdLux/pch.h>
-#include <OpenUSD/pxr/usd/usdLux/pluginLight.h>
-#include <OpenUSD/pxr/usd/usdLux/pluginLightFilter.h>
-#include <OpenUSD/pxr/usd/usdLux/portalLight.h>
-#include <OpenUSD/pxr/usd/usdLux/rectLight.h>
-#include <OpenUSD/pxr/usd/usdLux/shadowAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/shapingAPI.h>
-#include <OpenUSD/pxr/usd/usdLux/sphereLight.h>
-#include <OpenUSD/pxr/usd/usdLux/tokens.h>
-#include <OpenUSD/pxr/usd/usdLux/volumeLightAPI.h>
-
 // usdUtils
 #include <OpenUSD/pxr/usd/usdUtils/api.h>
 #include <OpenUSD/pxr/usd/usdUtils/authoring.h>

@@ -102,6 +102,10 @@ let package = Package(
       name: "UsdShade",
       targets: ["UsdShade"]
     ),
+    .library(
+      name: "UsdLux",
+      targets: ["UsdLux"]
+    ),
     // --------------- Python -----
     .library(
       name: "PyTf",
@@ -178,6 +182,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyUsdShade"]
     ),
+    .library(
+      name: "PyUsdLux",
+      type: .dynamic,
+      targets: ["PyUsdLux"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -207,7 +216,8 @@ let package = Package(
         "PyNdr",
         "PySdr",
         "PyUsdGeom",
-        "PyUsdShade"
+        "PyUsdShade",
+        "PyUsdLux"
       ]
     ),
   ],
@@ -569,6 +579,32 @@ let package = Package(
     ),
 
     .target(
+      name: "UsdLux",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "Ndr"),
+        .target(name: "Sdr"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdLux"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
+        .define("USDLUX_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "Pixar"),
@@ -823,6 +859,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyUsdLux",
+      dependencies: [
+        .target(name: "Pixar"),
+      ],
+      path: "Python/PyUsdLux",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdLux"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -897,6 +950,7 @@ let package = Package(
         .target(name: "Sdr"),
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
+        .target(name: "UsdLux"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
