@@ -41,12 +41,16 @@ public extension Bundle
   static let usd = Bundle(path: "\(pxr)/SwiftUSD_Usd.bundle")
 
   /**
-   * Where ``Pixar.Usd`` application bundle resources are located. */
+   * Where ``Pixar.Ndr`` application bundle resources are located. */
+  static let ndr = Bundle(path: "\(pxr)/SwiftUSD_Ndr.bundle")
+
+  /**
+   * Where ``Pixar.UsdGeom`` application bundle resources are located. */
   static let usdGeom = Bundle(path: "\(pxr)/SwiftUSD_UsdGeom.bundle")
 
   /**
-   * Where ``Pixar.Ndr`` application bundle resources are located. */
-  static let ndr = Bundle(path: "\(pxr)/SwiftUSD_Ndr.bundle")
+   * Where ``Pixar.UsdShade`` application bundle resources are located. */
+  static let usdShade = Bundle(path: "\(pxr)/SwiftUSD_UsdShade.bundle")
 
   /**
    * Where ``Pixar.Tf`` python bundle resources are located. */
@@ -93,12 +97,20 @@ public extension Bundle
   static let pyUsd = Bundle(path: "\(pxr)/SwiftUSD_PyUsd.bundle")
 
   /**
+   * Where ``Pixar.Ndr`` python bundle resources are located. */
+  static let pyNdr = Bundle(path: "\(pxr)/SwiftUSD_PyNdr.bundle")
+
+  /**
+   * Where ``Pixar.Sdr`` python bundle resources are located. */
+  static let pySdr = Bundle(path: "\(pxr)/SwiftUSD_PySdr.bundle")
+
+  /**
    * Where ``Pixar.UsdGeom`` python bundle resources are located. */
   static let pyUsdGeom = Bundle(path: "\(pxr)/SwiftUSD_PyUsdGeom.bundle")
 
   /**
-   * Where ``Pixar.Ndr`` python bundle resources are located. */
-  static let pyNdr = Bundle(path: "\(pxr)/SwiftUSD_PyNdr.bundle")
+   * Where ``Pixar.UsdShade`` python bundle resources are located. */
+  static let pyUsdShade = Bundle(path: "\(pxr)/SwiftUSD_PyUsdShade.bundle")
 }
 
 public extension Pixar
@@ -151,8 +163,9 @@ public enum BundleFramework: CaseIterable
   case ar
   case sdf
   case usd
-  case usdGeom
   case ndr
+  case usdGeom
+  case usdShade
 
   public var resourcePath: String?
   {
@@ -161,8 +174,9 @@ public enum BundleFramework: CaseIterable
       case .ar: Bundle.ar?.resourcePath
       case .sdf: Bundle.sdf?.resourcePath
       case .usd: Bundle.usd?.resourcePath
-      case .usdGeom: Bundle.usdGeom?.resourcePath
       case .ndr: Bundle.ndr?.resourcePath
+      case .usdGeom: Bundle.usdGeom?.resourcePath
+      case .usdShade: Bundle.usdShade?.resourcePath
     }
   }
 }
@@ -180,8 +194,10 @@ public enum BundlePython: CaseIterable
   case pySdf
   case pyPcp
   case pyUsd
-  case pyUsdGeom
   case pyNdr
+  case pySdr
+  case pyUsdGeom
+  case pyUsdShade
 
   public var resourcePath: String?
   {
@@ -198,8 +214,10 @@ public enum BundlePython: CaseIterable
       case .pySdf: Bundle.pySdf?.resourcePath
       case .pyPcp: Bundle.pyPcp?.resourcePath
       case .pyUsd: Bundle.pyUsd?.resourcePath
-      case .pyUsdGeom: Bundle.pyUsdGeom?.resourcePath
       case .pyNdr: Bundle.pyNdr?.resourcePath
+      case .pySdr: Bundle.pySdr?.resourcePath
+      case .pyUsdGeom: Bundle.pyUsdGeom?.resourcePath
+      case .pyUsdShade: Bundle.pyUsdShade?.resourcePath
     }
   }
 }
