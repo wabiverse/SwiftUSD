@@ -195,6 +195,16 @@ public extension StageRefPtr
     pointee.DefinePrim(.init(path), name)
   }
 
+  func getPrim(at path: Pixar.SdfPath) -> Pixar.Usd.Prim
+  {
+    pointee.GetPrimAtPath(path)
+  }
+
+  func getPrim(at path: String) -> Pixar.Usd.Prim
+  {
+    getPrim(at: .init(path))
+  }
+
   /**
    * Return this stage's root layer. */
   func getRootLayer() -> SdfLayerHandle

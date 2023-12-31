@@ -37,26 +37,35 @@ enum Creator
 
     let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
 
-    let xform = Pixar.UsdGeom.Xform.define(stage, path: "/Main")
+    let xform = Pixar.UsdGeom.Xform.define(stage, path: "/Geometry")
     xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
     xform.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
 
-    let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Main/Sphere")
+    let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Geometry/Sphere")
     sphere.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -5.0))
 
-    let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Main/Capsule")
+    let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Geometry/Capsule")
     capsule.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -10.0))
     capsule.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Main/Cylinder")
+    let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Geometry/Cylinder")
     cylinder.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Main/Cube")
+    let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Geometry/Cube")
     cube.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 5.0))
 
-    let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Main/Cone")
+    let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Geometry/Cone")
     cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
+
+    /* Create material and bind it to all geometry. */
+
+    let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/Material")
+    Pixar.UsdShade.MaterialBindingAPI.apply(sphere).bind(material)
+    Pixar.UsdShade.MaterialBindingAPI.apply(capsule).bind(material)
+    Pixar.UsdShade.MaterialBindingAPI.apply(cylinder).bind(material)
+    Pixar.UsdShade.MaterialBindingAPI.apply(cube).bind(material)
+    Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(material)
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.13")
 

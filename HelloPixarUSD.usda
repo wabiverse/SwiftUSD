@@ -3,42 +3,64 @@
     doc = "SwiftUSD v23.11.13"
 )
 
-def Xform "Main"
+def Xform "Geometry"
 {
     float3 xformOp:scale = (5, 5, 5)
     double3 xformOp:translate = (0, 5, 0)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
 
-    def Sphere "Sphere"
+    def Sphere "Sphere" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
+        rel material:binding = </Materials/Material>
         double3 xformOp:translate = (0, 0, -5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
 
-    def Capsule "Capsule"
+    def Capsule "Capsule" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
+        rel material:binding = </Materials/Material>
         float xformOp:rotateX = -90
         double3 xformOp:translate = (0, 0, -10)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
     }
 
-    def Cylinder "Cylinder"
+    def Cylinder "Cylinder" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
+        rel material:binding = </Materials/Material>
         float xformOp:rotateX = -90
         uniform token[] xformOpOrder = ["xformOp:rotateX"]
     }
 
-    def Cube "Cube"
+    def Cube "Cube" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
+        rel material:binding = </Materials/Material>
         double3 xformOp:translate = (0, 0, 5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
 
-    def Cone "Cone"
+    def Cone "Cone" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
+        rel material:binding = </Materials/Material>
         float xformOp:rotateX = -90
         double3 xformOp:translate = (0, 0, 10)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateX"]
+    }
+}
+
+def "Materials"
+{
+    def Material "Material"
+    {
     }
 }
 

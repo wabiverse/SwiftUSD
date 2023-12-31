@@ -86,4 +86,14 @@ public extension Pixar.Usd.Prim
   {
     SetDocumentation(std.string(doc))
   }
+
+  func getStage() -> Pixar.UsdStageWeakPtr
+  {
+    GetStage()
+  }
+
+  func getPath() -> Pixar.Sdf.Path
+  {
+    GetPath()
+  }
 }
