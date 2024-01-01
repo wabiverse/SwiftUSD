@@ -46,6 +46,10 @@ UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage,
   return ret;
 }
 
+UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage) {
+  return Stage(stage, UsdPrimDefaultPredicate);
+}
+
 void UsdPrimRange::iterator::PruneChildren() {
   if (base() == _range->_end) {
     TF_CODING_ERROR("Iterator past-the-end");

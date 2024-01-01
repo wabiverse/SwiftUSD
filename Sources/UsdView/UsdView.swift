@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -67,6 +67,15 @@ enum Creator
     Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.13")
+
+    /* Iterate the stage and print out the path to each prim. */
+
+    for prim in stage.scene
+    {
+      Msg.Log.point(String(prim.name.string), to: prim.getPath().getAsString())
+    }
+
+    /* Save the stage to disk. */
 
     stage.save()
 

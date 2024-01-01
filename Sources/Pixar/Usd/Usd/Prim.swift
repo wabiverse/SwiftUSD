@@ -16,10 +16,13 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
+
+import Foundation
+import Usd
 
 public extension Pixar.Usd
 {
@@ -80,20 +83,53 @@ public extension Pixar.Usd
   typealias Prim = Pixar.UsdPrim
 }
 
-public extension Pixar.Usd.Prim
+public protocol Prim
 {
-  func set(doc: String)
+  func set(doc: String) -> Void
+
+  func getStage() -> Pixar.UsdStageWeakPtr
+
+  func getPath() -> Pixar.Sdf.Path
+
+  var name: Pixar.TfToken { get }
+
+  var typeName: Pixar.TfToken { get }
+}
+
+extension Pixar.Usd.Prim: Prim
+{
+  public func set(doc: String)
   {
     SetDocumentation(std.string(doc))
   }
 
-  func getStage() -> Pixar.UsdStageWeakPtr
+  public func getStage() -> Pixar.UsdStageWeakPtr
   {
     GetStage()
   }
 
-  func getPath() -> Pixar.Sdf.Path
+  public func getPath() -> Pixar.Sdf.Path
   {
     GetPath()
+  }
+
+  private borrowing func GetNameCopy() -> Pixar.TfToken
+  {
+    __GetNameUnsafe().pointee
+  }
+
+  public var name: Pixar.TfToken
+  {
+    GetNameCopy()
+  }
+
+  private borrowing func GetTypeNameCopy() -> Pixar.TfToken
+  {
+    __GetTypeNameUnsafe().pointee
+  }
+
+  public var typeName: Pixar.TfToken
+  {
+    GetTypeNameCopy()
   }
 }

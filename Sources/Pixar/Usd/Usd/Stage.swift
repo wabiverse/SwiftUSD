@@ -96,9 +96,49 @@ public extension Pixar.Usd
   typealias Stage = Pixar.UsdStage
 }
 
-public extension Pixar.Usd.Stage
+public protocol Stage
 {
-  enum InitialLoadingSet
+  associatedtype Scene: Collection where Scene.Element == any Prim
+
+  @StageBuilder
+  var scene: Self.Scene { get }
+}
+
+extension Pixar.UsdPrimRange: IteratorProtocol
+{
+  public typealias Element = Pixar.Usd.Prim
+
+  public mutating func next() -> Element?
+  {
+    guard empty() == false
+    else { return nil }
+
+    let prim = front()
+
+    increment_begin()
+
+    return prim
+  }
+}
+
+extension Pixar.Usd.Stage: Stage
+{
+  public typealias Scene = [any Prim]
+
+  @StageBuilder
+  public var scene: Scene
+  {
+    getPrims()
+  }
+
+  private func getPrims() -> Scene
+  {
+    let it = Pixar.UsdPrimRange.Stage(getPtr())
+
+    return IteratorSequence(it).map { $0 }
+  }
+
+  public enum InitialLoadingSet
   {
     case all
     case none
@@ -114,13 +154,13 @@ public extension Pixar.Usd.Stage
   }
 
   @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  public static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> StageRefPtr
   {
     Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
   }
 
   @discardableResult
-  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> StageRefPtr
+  public static func open(_ filePath: String, load: InitialLoadingSet = .all) -> StageRefPtr
   {
     Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue)
   }
@@ -128,6 +168,11 @@ public extension Pixar.Usd.Stage
 
 public extension StageRefPtr
 {
+  var scene: Pixar.Usd.Stage.Scene
+  {
+    pointee.scene
+  }
+
   /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *

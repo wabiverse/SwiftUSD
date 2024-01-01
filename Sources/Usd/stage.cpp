@@ -3408,7 +3408,7 @@ bool UsdStage::IsLayerMuted(const std::string &layerIdentifier) const {
 }
 
 UsdPrimRange UsdStage::Traverse() {
-  return UsdPrimRange::Stage(UsdStagePtr(this));
+  return UsdPrimRange::Stage(UsdStagePtr(this), UsdPrimDefaultPredicate);
 }
 
 UsdPrimRange UsdStage::Traverse(const Usd_PrimFlagsPredicate &predicate) {

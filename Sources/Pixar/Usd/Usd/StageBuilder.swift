@@ -16,38 +16,59 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
 import Foundation
-import Sdf
+import Usd
 
-public extension Pixar.Sdf
+@resultBuilder
+public struct StageBuilder
 {
-  typealias Path = Pixar.SdfPath
-}
-
-public extension Pixar.Sdf.Path
-{
-  init(_ path: String)
+  public static func buildBlock(_ components: [Prim]...) -> [Prim]
   {
-    self.init(std.string(path))
+    components.flatMap { $0 }
   }
 
-  private borrowing func GetNameCopy() -> std.string
+  /// Add support for both single and collections of constraints.
+  public static func buildExpression(_ expression: Prim) -> [Prim]
   {
-    __GetNameUnsafe().pointee
+    [expression]
   }
 
-  var name: std.string
+  public static func buildExpression(_ expression: [Prim]) -> [Prim]
   {
-    GetNameCopy()
+    expression
   }
 
-  func getAsString() -> String
+  /// Add support for optionals.
+  public static func buildOptional(_ components: [Prim]?) -> [Prim]
   {
-    String(GetAsString())
+    components ?? []
+  }
+
+  /// Add support for if statements.
+  public static func buildEither(first components: [Prim]) -> [Prim]
+  {
+    components
+  }
+
+  public static func buildEither(second components: [Prim]) -> [Prim]
+  {
+    components
+  }
+
+  /// Add support for loops.
+  public static func buildArray(_ components: [[Prim]]) -> [Prim]
+  {
+    components.flatMap { $0 }
+  }
+
+  /// Add support for #availability checks.
+  public static func buildLimitedAvailability(_ components: [Prim]) -> [Prim]
+  {
+    components
   }
 }

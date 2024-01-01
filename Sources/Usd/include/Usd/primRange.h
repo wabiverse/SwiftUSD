@@ -213,9 +213,6 @@ public:
   };
 
   using const_iterator = iterator;
-  /* conformance to Swift :: Cxx.CxxConvertibleToCollection */
-  using Element = UsdPrim;
-  using RawIterator = const_iterator;
 
   UsdPrimRange()
       : _begin(nullptr), _end(nullptr), _initDepth(0), _postOrder(false) {}
@@ -294,6 +291,13 @@ public:
   static UsdPrimRange
   Stage(const UsdStagePtr &stage,
         const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate);
+
+  /// Create a PrimRange that traverses all the prims on \p stage, and
+  /// visits those that pass the default predicate (as defined by
+  /// #UsdPrimDefaultPredicate).
+  USD_API
+  static UsdPrimRange
+  Stage(const UsdStagePtr &stage);
 
   /// Return an iterator to the start of this range.
   iterator begin() const {
@@ -390,7 +394,7 @@ private:
   Usd_PrimFlagsPredicate _predicate;
   unsigned int _initDepth;
   bool _postOrder;
-} SWIFT_CONFORMS_TO_PROTOCOL(Cxx.CxxConvertibleToCollection);
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

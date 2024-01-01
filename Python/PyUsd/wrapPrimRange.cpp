@@ -68,7 +68,7 @@ public:
   }
 
   static Usd_PyPrimRange Stage(const UsdStagePtr &stage) {
-    return Usd_PyPrimRange(UsdPrimRange::Stage(stage));
+    return Usd_PyPrimRange(UsdPrimRange::Stage(stage, UsdPrimDefaultPredicate));
   }
 
   static Usd_PyPrimRange Stage(const UsdStagePtr &stage,
