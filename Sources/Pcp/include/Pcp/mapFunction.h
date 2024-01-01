@@ -196,7 +196,7 @@ private:
     _Data(){};
 
     _Data(PathPair const *begin, PathPair const *end, bool hasRootIdentity)
-        : numPairs(end - begin), hasRootIdentity(hasRootIdentity) {
+        : numPairs(static_cast<int>(end - begin)), hasRootIdentity(hasRootIdentity) {
       if (numPairs == 0)
         return;
       if (numPairs <= _MaxLocalPairs) {

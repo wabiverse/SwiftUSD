@@ -236,7 +236,7 @@ void _TraceEventFromJSON(const JsValue &jsValue,
       boost::optional<double> value = _JsGetValue<double>(js, "value");
       if (ts && value) {
         TraceEvent event(TraceEvent::CounterDelta, list.CacheKey(*keyStr),
-                         *value, *category);
+                         *value, static_cast<unsigned int>(*category));
         event.SetTimeStamp(*ts);
         unorderedEvents.emplace_back(std::move(event));
         ;
@@ -246,7 +246,7 @@ void _TraceEventFromJSON(const JsValue &jsValue,
       boost::optional<double> value = _JsGetValue<double>(js, "value");
       if (ts && value) {
         TraceEvent event(TraceEvent::CounterValue, list.CacheKey(*keyStr),
-                         *value, *category);
+                         *value, static_cast<unsigned int>(*category));
         event.SetTimeStamp(*ts);
         unorderedEvents.emplace_back(std::move(event));
         ;
@@ -257,32 +257,32 @@ void _TraceEventFromJSON(const JsValue &jsValue,
         if (boost::optional<JsValue> dataValue = JsFindValue(js, "data")) {
           if (dataValue->Is<bool>()) {
             TraceEvent event(TraceEvent::Data, list.CacheKey(*keyStr),
-                             dataValue->Get<bool>(), *category);
+                             dataValue->Get<bool>(), static_cast<unsigned int>(*category));
             event.SetTimeStamp(*ts);
             unorderedEvents.emplace_back(std::move(event));
             ;
           } else if (dataValue->Is<double>()) {
             TraceEvent event(TraceEvent::Data, list.CacheKey(*keyStr),
-                             dataValue->Get<double>(), *category);
+                             dataValue->Get<double>(), static_cast<unsigned int>(*category));
             event.SetTimeStamp(*ts);
             unorderedEvents.emplace_back(std::move(event));
             ;
           } else if (dataValue->Is<uint64_t>()) {
             TraceEvent event(TraceEvent::Data, list.CacheKey(*keyStr),
-                             dataValue->Get<uint64_t>(), *category);
+                             dataValue->Get<uint64_t>(), static_cast<unsigned int>(*category));
             event.SetTimeStamp(*ts);
             unorderedEvents.emplace_back(std::move(event));
             ;
           } else if (dataValue->Is<int64_t>()) {
             TraceEvent event(TraceEvent::Data, list.CacheKey(*keyStr),
-                             dataValue->Get<int64_t>(), *category);
+                             dataValue->Get<int64_t>(), static_cast<unsigned int>(*category));
             event.SetTimeStamp(*ts);
             unorderedEvents.emplace_back(std::move(event));
             ;
           } else if (dataValue->Is<std::string>()) {
             TraceEvent event(TraceEvent::Data, list.CacheKey(*keyStr),
                              list.StoreData(dataValue->GetString().c_str()),
-                             *category);
+                             static_cast<unsigned int>(*category));
             event.SetTimeStamp(*ts);
             unorderedEvents.emplace_back(std::move(event));
             ;

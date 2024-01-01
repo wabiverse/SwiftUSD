@@ -334,7 +334,7 @@ UsdShadeConnectableAPI::GetConnectedSources(UsdAttribute const &shadingAttr,
 
     UsdStagePtr stage = shadingAttr.GetStage();
 
-    sourceInfos.reserve(sourcePaths.size());
+    sourceInfos.reserve(static_cast<unsigned int>(sourcePaths.size()));
     for (SdfPath const &sourcePath : sourcePaths) {
 
         // Make sure the source attribute exists

@@ -302,7 +302,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::InsertChild(
 
   // If the index is -1, insert the child at the end.
   if (index == -1) {
-    index = childNames.size();
+    index = static_cast<int>(childNames.size());
   }
 
   if ((size_t)index > childNames.size()) {
@@ -426,11 +426,10 @@ bool Sdf_ChildrenUtils<ChildPolicy>::MoveChildForBatchNamespaceEdit(
   FieldType oldKey((ChildPolicy::GetKey(value)));
   SdfPath oldParentPath = ChildPolicy::GetParentPath(value->GetPath());
   if (index == SdfNamespaceEdit::Same && oldParentPath == path) {
-    index = std::find(childNames.begin(), childNames.end(), oldKey) -
-            childNames.begin();
+    index = static_cast<int>(std::find(childNames.begin(), childNames.end(), oldKey) - childNames.begin());
   } else if ((size_t)index > childNames.size()) {
     // This catches all negative indexes.
-    index = childNames.size();
+    index = static_cast<int>(childNames.size());
   }
 
   // Get the old sibling names and find the value.
@@ -450,7 +449,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::MoveChildForBatchNamespaceEdit(
     // If the name isn't changing then we can bail early if the
     // child isn't going to move.
     if (oldKey == newName) {
-      int oldIndex = oldNameIter - oldSiblingNames.begin();
+      int oldIndex = static_cast<int>(oldNameIter - oldSiblingNames.begin());
       if (oldIndex == index || oldIndex + 1 == index) {
         return true;
       }
@@ -555,7 +554,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::CanMoveChildForBatchNamespaceEdit(
 
   // If the index is AtEnd, insert the child at the end.
   if (index == SdfNamespaceEdit::AtEnd) {
-    index = childNames.size();
+    index = static_cast<int>(childNames.size());
   }
 
   // Any index not in the child name range other than Same is invalid.

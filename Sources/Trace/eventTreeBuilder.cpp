@@ -127,7 +127,7 @@ void Trace_EventTreeBuilder::_OnBegin(const TraceThreadId &threadId,
   // First, search the stack for a matching End
   _PendingNodeStack &stack = _threadStacks[threadId];
   _PendingEventNode *prevNode = &stack.back();
-  int index = stack.size() - 1;
+  int index = static_cast<int>(stack.size()) - 1;
 
   while ((prevNode->isComplete || prevNode->key != key) && stack.size() > 1) {
 

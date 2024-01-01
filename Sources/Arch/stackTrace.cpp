@@ -975,7 +975,7 @@ static void _ArchLogProcessStateHelper(bool isFatal, const char *reason,
   };
 
   const char *haltMsg = " terminated";
-  int labelSize = strlen(progname) + strlen(haltMsg);
+  int labelSize = static_cast<int>(strlen(progname) + strlen(haltMsg));
   int bannerSize = std::max<int>(80, labelSize + strlen("-- ") * 2);
 
   fputs("\n", stderr);
@@ -1266,7 +1266,7 @@ size_t ArchGetStackFrames(size_t maxdepth, size_t skip, uintptr_t *frames) {
 size_t ArchGetStackFrames(size_t maxdepth, size_t skip, uintptr_t *frames) {
   void *stack[MAX_STACK_DEPTH];
   size_t maxFrames = std::min<size_t>(MAX_STACK_DEPTH, maxdepth + skip);
-  const size_t frameCount = backtrace(stack, maxFrames);
+  const size_t frameCount = backtrace(stack, static_cast<int>(maxFrames));
   for (size_t frame = skip; frame != frameCount; ++frame) {
     *frames++ = reinterpret_cast<uintptr_t>(stack[frame]);
   }

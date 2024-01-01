@@ -209,9 +209,9 @@ static bool _TimedTryAcquire(tbb::spin_mutex::scoped_lock &lock,
     std::this_thread::yield();
     if (lock.try_acquire(mutex))
       return true;
-    msec = std::chrono::duration_cast<std::chrono::milliseconds>(
-               std::chrono::high_resolution_clock::now() - start)
-               .count();
+    msec = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                              std::chrono::high_resolution_clock::now() - start)
+                              .count());
   } while (msec < msecToTry);
   return false;
 }

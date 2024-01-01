@@ -280,7 +280,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
   };
 
   // Track the number of matching components remaining.
-  int numComponentsLeft = _components.size();
+  int numComponentsLeft = static_cast<int>(_components.size());
 
   // For each segment:
   const size_t componentsSize = _components.size();
@@ -428,7 +428,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
   // number of components must match exactly.
   if (!prevSegPtr && !_stretchBegin && numMatchComponents > curSeg.GetSize()) {
     // Too many components; we cannot match this or any descendant path.
-    search._constantDepth = pathElemCount;
+    search._constantDepth = static_cast<int>(pathElemCount);
     search._constantValue = false;
     return Result::MakeConstant(false);
   }
@@ -457,7 +457,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
             runNthPredicate(compIter->predicateIndex, workingPath);
         if (!predResult) {
           if (predResult.IsConstant()) {
-            search._constantDepth = pathElemCount;
+            search._constantDepth = static_cast<int>(pathElemCount);
             search._constantValue = false;
           }
           return predResult;
@@ -480,7 +480,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
             runNthPredicate(compIter->predicateIndex, workingPath);
         if (!predResult) {
           if (predResult.IsConstant()) {
-            search._constantDepth = pathElemCount;
+            search._constantDepth = static_cast<int>(pathElemCount);
             search._constantValue = false;
           }
           return predResult;
@@ -490,13 +490,13 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
   }
 
   // We have matched this component here, so push its match depth.
-  search._segmentMatchDepths.push_back(pathElemCount);
+  search._segmentMatchDepths.push_back(static_cast<int>(pathElemCount));
 
   // If we've completed matching, we can mark ourselves constant if we end
   // with stretch.
   if (search._segmentMatchDepths.size() == _segments.size()) {
     if (_stretchEnd) {
-      search._constantDepth = pathElemCount;
+      search._constantDepth = static_cast<int>(pathElemCount);
       search._constantValue = true;
       return Result::MakeConstant(true);
     }

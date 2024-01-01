@@ -2638,11 +2638,11 @@ bool SdfLayer::UpdateCompositionAssetDependency(const string &oldLayerPath,
   SdfSubLayerProxy subLayers = GetSubLayerPaths();
   size_t index = subLayers.Find(oldLayerPath);
   if (index != (size_t)-1) {
-    RemoveSubLayerPath(index);
+    RemoveSubLayerPath(static_cast<int>(index));
 
     // If new layer path given, do rename, otherwise it's a delete.
     if (!newLayerPath.empty()) {
-      InsertSubLayerPath(newLayerPath, index);
+      InsertSubLayerPath(newLayerPath, static_cast<int>(index));
     }
 
     return true; // sublayers are unique, do no more...

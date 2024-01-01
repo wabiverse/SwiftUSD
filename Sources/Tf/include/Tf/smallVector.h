@@ -376,7 +376,7 @@ public:
       return iterator(p);
     }
 
-    const size_type num = std::distance(p, q);
+    const size_type num = static_cast<unsigned int>(std::distance(p, q));
 
     // Move entries starting at last, down a few slots to starting a it.
     value_type *e = data() + size();
@@ -438,7 +438,7 @@ public:
             typename = _EnableIfForwardIterator<ForwardIterator>>
   void assign(ForwardIterator first, ForwardIterator last) {
     clear();
-    const size_type newSize = std::distance(first, last);
+    const size_type newSize = static_cast<unsigned int>(std::distance(first, last));
     reserve(newSize);
     std::uninitialized_copy(first, last, begin());
     _size = newSize;

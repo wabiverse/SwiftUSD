@@ -105,7 +105,7 @@ static std::string Pcp_FormatIdentifier(std::ostream &os,
     return std::string("<expired>");
   }
 
-  switch (os.iword(Pcp_IdentifierFormatIndex())) {
+  switch (os.iword(static_cast<int>(Pcp_IdentifierFormatIndex()))) {
   default:
   case Pcp_IdentifierFormatIdentifier:
     return layer->GetIdentifier();
@@ -119,17 +119,17 @@ static std::string Pcp_FormatIdentifier(std::ostream &os,
 }
 
 std::ostream &PcpIdentifierFormatBaseName(std::ostream &os) {
-  os.iword(Pcp_IdentifierFormatIndex()) = Pcp_IdentifierFormatBaseName;
+  os.iword(static_cast<int>(Pcp_IdentifierFormatIndex())) = Pcp_IdentifierFormatBaseName;
   return os;
 }
 
 std::ostream &PcpIdentifierFormatRealPath(std::ostream &os) {
-  os.iword(Pcp_IdentifierFormatIndex()) = Pcp_IdentifierFormatRealPath;
+  os.iword(static_cast<int>(Pcp_IdentifierFormatIndex())) = Pcp_IdentifierFormatRealPath;
   return os;
 }
 
 std::ostream &PcpIdentifierFormatIdentifier(std::ostream &os) {
-  os.iword(Pcp_IdentifierFormatIndex()) = Pcp_IdentifierFormatIdentifier;
+  os.iword(static_cast<int>(Pcp_IdentifierFormatIndex())) = Pcp_IdentifierFormatIdentifier;
   return os;
 }
 

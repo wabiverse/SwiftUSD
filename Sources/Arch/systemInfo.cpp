@@ -138,7 +138,7 @@ std::string ArchGetExecutablePath() {
 
   // On Darwin _NSGetExecutablePath() returns the executable path.
   return _DynamicSizedRead(ARCH_PATH_MAX, [](char *buffer, size_t *size) {
-    uint32_t bufsize = *size;
+    uint32_t bufsize = static_cast<unsigned int>(*size);
     if (_NSGetExecutablePath(buffer, &bufsize) == -1) {
       // We're told the correct size.
       *size = bufsize;
@@ -173,7 +173,7 @@ std::string ArchGetExecutablePath() {
 
 int ArchGetPageSize() {
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-  return sysconf(_SC_PAGE_SIZE);
+  return static_cast<int>(sysconf(_SC_PAGE_SIZE));
 #elif defined(ARCH_OS_WINDOWS)
   SYSTEM_INFO info;
   GetSystemInfo(&info);

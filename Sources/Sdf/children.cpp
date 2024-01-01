@@ -154,7 +154,7 @@ bool Sdf_Children<ChildPolicy>::Insert(const ValueType &value, size_t index,
   }
 
   return Sdf_ChildrenUtils<ChildPolicy>::InsertChild(_layer, _parentPath, value,
-                                                     index);
+                                                     static_cast<int>(index));
 }
 
 template <class ChildPolicy>

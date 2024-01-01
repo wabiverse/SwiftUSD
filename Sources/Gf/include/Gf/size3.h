@@ -173,7 +173,7 @@ public:
   friend GF_API std::ostream &operator<<(std::ostream &o, GfSize3 const &v);
 
   /// Conversion to GfVec3i
-  operator GfVec3i() const { return GfVec3i(_vec[0], _vec[1], _vec[2]); }
+  operator GfVec3i() const { return GfVec3i(static_cast<int>(_vec[0]), static_cast<int>(_vec[1]), static_cast<int>(_vec[2])); }
 
 private:
   size_t _vec[3];

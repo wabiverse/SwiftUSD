@@ -759,7 +759,7 @@ private:
       // Add this range to liveFieldSets.
       TfAutoMallocTag tag("field data");
       auto &fieldValuePairs =
-          liveFieldSets[FieldSetIndex(fsBegin - fieldSets.begin())];
+          liveFieldSets[FieldSetIndex(static_cast<unsigned int>(fsBegin - fieldSets.begin()))];
 
       dispatcher.Run([this, &fsBegin, fsEnd, &fields, &fieldValuePairs]() {
         // XXX Won't need first two tags when bug #132031 is

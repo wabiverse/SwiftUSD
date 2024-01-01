@@ -582,7 +582,7 @@ std::string Sdf_EvalQuotedString(const char *x, size_t n, size_t trimBothSides,
   }
 
   if (numLines) {
-    *numLines = std::count(ret.begin(), ret.end(), '\n');
+    *numLines = static_cast<unsigned int>(std::count(ret.begin(), ret.end(), '\n'));
   }
 
   return ret;

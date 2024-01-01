@@ -451,8 +451,8 @@ bool SdfPath::HasPrefix(const SdfPath &prefix) const {
 
     Sdf_PathNode const *prefixPrimNode = prefix._primPart.get();
 
-    int prefixDepth = prefixPrimNode->GetElementCount();
-    int curDepth = primNode->GetElementCount();
+    int prefixDepth = static_cast<int>(prefixPrimNode->GetElementCount());
+    int curDepth = static_cast<int>(primNode->GetElementCount());
 
     if (curDepth < prefixDepth) {
       return false;
@@ -1041,8 +1041,8 @@ SdfPath SdfPath::_ReplacePrimPrefix(SdfPath const &oldPrefix,
   Sdf_PathNodeConstPtr primNode = _primPart.get();
   Sdf_PathNodeConstPtr prefixPrimNode = oldPrefix._primPart.get();
 
-  int prefixDepth = prefixPrimNode->GetElementCount();
-  int curDepth = primNode->GetElementCount();
+  int prefixDepth = static_cast<int>(prefixPrimNode->GetElementCount());
+  int curDepth = static_cast<int>(primNode->GetElementCount());
 
   if (curDepth < prefixDepth) {
     return *this;
@@ -1157,8 +1157,8 @@ SdfPath SdfPath::_ReplacePropPrefix(SdfPath const &oldPrefix,
   Sdf_PathNodeConstPtr propNode = _propPart.get();
   Sdf_PathNodeConstPtr prefixPropNode = oldPrefix._propPart.get();
 
-  int prefixDepth = prefixPropNode->GetElementCount();
-  int curDepth = propNode->GetElementCount();
+  int prefixDepth = static_cast<int>(prefixPropNode->GetElementCount());
+  int curDepth = static_cast<int>(propNode->GetElementCount());
 
   if (curDepth < prefixDepth) {
     return (fixTargetPaths && propNode->ContainsTargetPath())

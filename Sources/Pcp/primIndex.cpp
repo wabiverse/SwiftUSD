@@ -1887,7 +1887,7 @@ static void _EvalRefOrPayloadArcs(PcpNodeRef node, Pcp_PrimIndexer *indexer,
         ARC_TYPE,
         /* parent = */ node,
         /* origin = */ node, PcpLayerStackSite(layerStack, primPath), mapExpr,
-        /* arcSiblingNum = */ arcNum, directNodeShouldContributeSpecs,
+        /* arcSiblingNum = */ static_cast<int>(arcNum), directNodeShouldContributeSpecs,
         includeAncestralOpinions,
         /* skipDuplicateNodes = */ false, indexer);
 
@@ -2592,7 +2592,7 @@ static void _AddClassBasedArcs(PcpPrimIndex *index, const PcpNodeRef &node,
 
     _AddClassBasedArc(arcType,
                       /* parent = */ node,
-                      /* origin = */ node, mapExpr, arcNum,
+                      /* origin = */ node, mapExpr, static_cast<int>(arcNum),
                       /* ignoreIfSameAsSite = */ PcpLayerStackSite(), indexer);
   }
 }
@@ -3565,7 +3565,7 @@ static void _EvalNodeVariantSets(PcpPrimIndex *index, const PcpNodeRef &node,
   std::vector<std::string> vsetNames;
   PcpComposeSiteVariantSets(node, &vsetNames);
 
-  for (int vsetNum = 0, numVsets = vsetNames.size(); vsetNum < numVsets;
+  for (int vsetNum = 0, numVsets = static_cast<int>(vsetNames.size()); vsetNum < numVsets;
        ++vsetNum) {
     indexer->AddTask(Task(Task::Type::EvalNodeVariantAuthored, node,
                           std::move(vsetNames[vsetNum]), vsetNum));

@@ -596,7 +596,7 @@ private:
           "\n</td></tr>"
           "\n</table>";
 
-      int numPhases = GetNumPhases();
+      int numPhases = static_cast<int>(GetNumPhases());
 
       // Generate the left side of the label, which shows the current
       // phase and any associated messages.

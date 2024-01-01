@@ -258,7 +258,7 @@ uint64_t Arch_MeasureExecutionTime(uint64_t maxMicroseconds,
   const uint64_t minTicksPerSample = 2000 * ArchGetTickQuantum();
   const int sampleIters =
       (estTicksPer < minTicksPerSample)
-          ? (minTicksPerSample + estTicksPer / 2) / estTicksPer
+          ? static_cast<int>((minTicksPerSample + estTicksPer / 2) / estTicksPer)
           : 1;
 
   auto measureSample = [&measureN, sampleIters]() {

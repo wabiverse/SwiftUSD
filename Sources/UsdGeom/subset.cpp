@@ -428,12 +428,12 @@ UsdGeomSubset::GetUnassignedIndices(
     if (assignedIndices.empty()) {
         result.reserve(elementCount);
         for (size_t idx = 0 ; idx < elementCount ; ++idx) 
-            result.push_back(idx);
+            result.push_back(static_cast<int>(idx));
     } else {
         std::vector<int> allIndices;
         allIndices.reserve(elementCount);
         for (size_t idx = 0 ; idx < elementCount ; ++idx) 
-            allIndices.push_back(idx);
+            allIndices.push_back(static_cast<int>(idx));
 
         const unsigned int lastAssigned = *assignedIndices.rbegin();
         if (elementCount > lastAssigned) {

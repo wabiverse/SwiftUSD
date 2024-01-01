@@ -116,7 +116,7 @@ static inline unsigned int _GetPageShift(unsigned int mask) {
 static const unsigned int CRATE_PAGESIZE = ArchGetPageSize();
 static const uint64_t CRATE_PAGEMASK =
     ~(static_cast<uint64_t>(CRATE_PAGESIZE - 1));
-static const unsigned int CRATE_PAGESHIFT = _GetPageShift(CRATE_PAGEMASK);
+static const unsigned int CRATE_PAGESHIFT = _GetPageShift(static_cast<unsigned int>(CRATE_PAGEMASK));
 
 TF_REGISTRY_FUNCTION(TfType) { TfType::Define<Usd_CrateFile::TimeSamples>(); }
 
@@ -1054,13 +1054,13 @@ struct CrateFile::_PackingContext {
     // Ensure that pathToPathIndex is correctly populated.
     wd.Run([this, crate]() {
       for (size_t i = 0; i != crate->_paths.size(); ++i)
-        pathToPathIndex[crate->_paths[i]] = PathIndex(i);
+        pathToPathIndex[crate->_paths[i]] = PathIndex(static_cast<unsigned int>(i));
     });
 
     // Ensure that fieldToFieldIndex is correctly populated.
     wd.Run([this, crate]() {
       for (size_t i = 0; i != crate->_fields.size(); ++i)
-        fieldToFieldIndex[crate->_fields[i]] = FieldIndex(i);
+        fieldToFieldIndex[crate->_fields[i]] = FieldIndex(static_cast<unsigned int>(i));
     });
 
     // Ensure that fieldsToFieldSetIndex is correctly populated.
@@ -1073,20 +1073,20 @@ struct CrateFile::_PackingContext {
                 fsEnd = find(fsBegin, fsets.end(), FieldIndex())) {
         fieldIndexes.assign(fsBegin, fsEnd);
         fieldsToFieldSetIndex[fieldIndexes] =
-            FieldSetIndex(fsBegin - fsets.begin());
+            FieldSetIndex(static_cast<unsigned int>(fsBegin - fsets.begin()));
       }
     });
 
     // Ensure that tokenToTokenIndex is correctly populated.
     wd.Run([this, crate]() {
       for (size_t i = 0; i != crate->_tokens.size(); ++i)
-        tokenToTokenIndex[crate->_tokens[i]] = TokenIndex(i);
+        tokenToTokenIndex[crate->_tokens[i]] = TokenIndex(static_cast<unsigned int>(i));
     });
 
     // Ensure that stringToStringIndex is correctly populated.
     wd.Run([this, crate]() {
       for (size_t i = 0; i != crate->_strings.size(); ++i)
-        stringToStringIndex[crate->GetString(StringIndex(i))] = StringIndex(i);
+        stringToStringIndex[crate->GetString(StringIndex(static_cast<unsigned int>(i)))] = StringIndex(static_cast<unsigned int>(i));
     });
 
     // Set file pos to start of the structural sections in the current TOC.
@@ -1833,11 +1833,11 @@ _WritePossiblyCompressedArray(Writer w, VtArray<T> const &array,
   vector<T> lut;
   // Ensure that we give up soon enough if it doesn't seem like building a
   // lookup table will be profitable.  Check the first 1024 elements at most.
-  unsigned int maxLutSize = std::min<size_t>(array.size() / 4, 1024);
+  unsigned int maxLutSize = static_cast<unsigned int>(std::min<size_t>(array.size() / 4, 1024));
   vector<uint32_t> indexes;
   for (auto elem : array) {
     auto iter = std::find(lut.begin(), lut.end(), elem);
-    uint32_t index = iter - lut.begin();
+    uint32_t index = static_cast<unsigned int>(iter - lut.begin());
     indexes.push_back(index);
     if (index == lut.size()) {
       if (lut.size() != maxLutSize) {
@@ -3083,7 +3083,7 @@ Iter CrateFile::_BuildCompressedPathDataRecursive(
     // If we have a sibling, then fill in the offset that it will be
     // written at (it will be written next).
     if (hasSibling && hasChild) {
-      jumps[thisIndex] = curIndex - thisIndex;
+      jumps[thisIndex] = static_cast<int>(curIndex - thisIndex);
     } else if (hasSibling) {
       jumps[thisIndex] = 0;
     } else if (hasChild) {
@@ -3537,7 +3537,7 @@ template <class Reader> void CrateFile::_ReadTokens(Reader reader) {
   }
   wd.Wait();
   if (i != numTokens) {
-    TF_RUNTIME_ERROR("Crate file claims %zu tokens, found %zu", numTokens, i);
+    TF_RUNTIME_ERROR("Crate file claims %zu tokens, found %zu", static_cast<size_t>(numTokens), i);
   }
 
   WorkSwapDestroyAsync(chars);
@@ -3773,7 +3773,7 @@ PathIndex CrateFile::_AddPath(const SdfPath &path) {
                                         : path.GetElementToken());
 
     // Add to the vector and insert the index.
-    iresult.first->second = PathIndex(_paths.size());
+    iresult.first->second = PathIndex(static_cast<unsigned int>(_paths.size()));
     _paths.emplace_back(path);
   }
   return iresult.first->second;
@@ -3786,7 +3786,7 @@ CrateFile::_AddFieldSet(const std::vector<FieldIndex> &fieldIndexes) {
   if (iresult.second) {
     // Not yet present.  Copy the fields to _fieldSets, terminate, and store
     // the start index.
-    iresult.first->second = FieldSetIndex(_fieldSets.size());
+    iresult.first->second = FieldSetIndex(static_cast<unsigned int>(_fieldSets.size()));
     _fieldSets.insert(_fieldSets.end(), fieldIndexes.begin(),
                       fieldIndexes.end());
     _fieldSets.push_back(FieldIndex());
@@ -3799,7 +3799,7 @@ FieldIndex CrateFile::_AddField(const FieldValuePair &fv) {
   auto iresult = _packCtx->fieldToFieldIndex.emplace(field, FieldIndex());
   if (iresult.second) {
     // Not yet present.
-    iresult.first->second = FieldIndex(_fields.size());
+    iresult.first->second = FieldIndex(static_cast<unsigned int>(_fields.size()));
     _fields.push_back(field);
   }
   return iresult.first->second;
@@ -3809,7 +3809,7 @@ TokenIndex CrateFile::_AddToken(const TfToken &token) {
   auto iresult = _packCtx->tokenToTokenIndex.emplace(token, TokenIndex());
   if (iresult.second) {
     // Not yet present.
-    iresult.first->second = TokenIndex(_tokens.size());
+    iresult.first->second = TokenIndex(static_cast<unsigned int>(_tokens.size()));
     _tokens.emplace_back(token);
   }
   return iresult.first->second;
@@ -3826,7 +3826,7 @@ StringIndex CrateFile::_AddString(const string &str) {
   auto iresult = _packCtx->stringToStringIndex.emplace(str, StringIndex());
   if (iresult.second) {
     // Not yet present.
-    iresult.first->second = StringIndex(_strings.size());
+    iresult.first->second = StringIndex(static_cast<unsigned int>(_strings.size()));
     _strings.push_back(_AddToken(TfToken(str)));
   }
   return iresult.first->second;

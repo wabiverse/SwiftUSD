@@ -301,7 +301,7 @@ bool Usd_Clip::_GetBracketingTimeSamplesForPathFromClipLayer(
     return static_cast<bool>(translated);
   };
 
-  for (int i1 = m1, i2 = m2; i1 >= 0 && i2 >= 0; --i1, --i2) {
+  for (int i1 = static_cast<int>(m1), i2 = static_cast<int>(m2); i1 >= 0 && i2 >= 0; --i1, --i2) {
     if (_CanTranslate(*times, i1, i2, /*lower=*/true)) {
       break;
     }

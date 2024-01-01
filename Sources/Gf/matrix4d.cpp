@@ -385,12 +385,12 @@ double GfMatrix4d::GetDeterminant() const {
 double GfMatrix4d::_GetDeterminant3(size_t row1, size_t row2, size_t row3,
                                     size_t col1, size_t col2,
                                     size_t col3) const {
-  return (_mtx[row1][col1] * _mtx[row2][col2] * _mtx[row3][col3] +
-          _mtx[row1][col2] * _mtx[row2][col3] * _mtx[row3][col1] +
-          _mtx[row1][col3] * _mtx[row2][col1] * _mtx[row3][col2] -
-          _mtx[row1][col1] * _mtx[row2][col3] * _mtx[row3][col2] -
-          _mtx[row1][col2] * _mtx[row2][col1] * _mtx[row3][col3] -
-          _mtx[row1][col3] * _mtx[row2][col2] * _mtx[row3][col1]);
+  return (_mtx[static_cast<int>(row1)][col1] * _mtx[static_cast<int>(row2)][col2] * _mtx[static_cast<int>(row3)][col3] +
+          _mtx[static_cast<int>(row1)][col2] * _mtx[static_cast<int>(row2)][col3] * _mtx[static_cast<int>(row3)][col1] +
+          _mtx[static_cast<int>(row1)][col3] * _mtx[static_cast<int>(row2)][col1] * _mtx[static_cast<int>(row3)][col2] -
+          _mtx[static_cast<int>(row1)][col1] * _mtx[static_cast<int>(row2)][col3] * _mtx[static_cast<int>(row3)][col2] -
+          _mtx[static_cast<int>(row1)][col2] * _mtx[static_cast<int>(row2)][col1] * _mtx[static_cast<int>(row3)][col3] -
+          _mtx[static_cast<int>(row1)][col3] * _mtx[static_cast<int>(row2)][col2] * _mtx[static_cast<int>(row3)][col1]);
 }
 
 double GfMatrix4d::GetHandedness() const {
@@ -1048,7 +1048,7 @@ GfMatrix3d GfMatrix4d::ExtractRotationMatrix() const {
 bool GfIsClose(GfMatrix4d const &m1, GfMatrix4d const &m2, double tolerance) {
   for (size_t row = 0; row < 4; ++row) {
     for (size_t col = 0; col < 4; ++col) {
-      if (!GfIsClose(m1[row][col], m2[row][col], tolerance))
+      if (!GfIsClose(m1[static_cast<int>(row)][col], m2[static_cast<int>(row)][col], tolerance))
         return false;
     }
   }

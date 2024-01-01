@@ -164,7 +164,7 @@ public:
   friend std::ostream &operator<<(std::ostream &o, GfSize2 const &v);
 
   /// Conversion to GfVec2i.
-  operator GfVec2i() const { return GfVec2i(_vec[0], _vec[1]); }
+  operator GfVec2i() const { return GfVec2i(static_cast<int>(_vec[0]), static_cast<int>(_vec[1])); }
 
 private:
   size_t _vec[2];

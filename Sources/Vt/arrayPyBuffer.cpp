@@ -277,7 +277,7 @@ int Vt_getbuffer(PyObject *self, Py_buffer *view, int flags) {
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
-    view->ndim = wrapper->shape.size();
+    view->ndim = static_cast<int>(wrapper->shape.size());
     view->shape = wrapper->shape.data();
   } else {
     view->ndim = 0;

@@ -502,7 +502,7 @@ struct InitCtorWithVarArgs<VAR_SIGNATURE> : CtorBase<VAR_SIGNATURE> {
   static bp::object __init__(const bp::tuple &args, const bp::dict &kwargs) {
     TfErrorMark m;
 
-    const unsigned int numArgs = bp::len(args);
+    const unsigned int numArgs = static_cast<unsigned int>(bp::len(args));
     if (numArgs - 1 < N) {
       // User didn't provide enough positional arguments for the factory
       // function. Complain.

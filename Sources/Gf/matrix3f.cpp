@@ -432,7 +432,7 @@ GfVec3f GfMatrix3f::DecomposeRotation(const GfVec3f &axis0,
 bool GfIsClose(GfMatrix3f const &m1, GfMatrix3f const &m2, double tolerance) {
   for (size_t row = 0; row < 3; ++row) {
     for (size_t col = 0; col < 3; ++col) {
-      if (!GfIsClose(m1[row][col], m2[row][col], tolerance))
+      if (!GfIsClose(m1[static_cast<int>(row)][col], m2[static_cast<int>(row)][col], tolerance))
         return false;
     }
   }

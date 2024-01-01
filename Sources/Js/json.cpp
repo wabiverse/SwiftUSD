@@ -246,7 +246,7 @@ JsValue JsParseString(const std::string &data, JsParseError *error) {
           nlpos = i;
         }
       }
-      error->column = eoff - nlpos;
+      error->column = static_cast<unsigned int>(eoff - nlpos);
       error->reason = rj::GetParseError_En(result.Code());
     }
     return JsValue();
@@ -364,11 +364,11 @@ public:
   bool Uint64(uint64_t u64) override { return Writer::Uint64(u64); }
   bool Double(double d) override { return Writer::Double(d); }
   bool String(const char *str, size_t length) override {
-    return Writer::String(str, length);
+    return Writer::String(str, static_cast<unsigned int>(length));
   }
   bool StartObject() override { return Writer::StartObject(); }
   bool Key(const char *str, size_t length) override {
-    return Writer::Key(str, length);
+    return Writer::Key(str, static_cast<unsigned int>(length));
   }
   bool EndObject() override { return Writer::EndObject(); }
   bool StartArray() override { return Writer::StartArray(); }

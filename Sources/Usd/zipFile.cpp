@@ -801,11 +801,11 @@ std::string UsdZipFileWriter::AddFile(const std::string &filePath,
   h.f.compressionMethod = 0; // No compression
   std::tie(h.f.lastModTime, h.f.lastModDate) = _ModTimeAndDate(filePath);
   h.f.crc32 = _Crc32(mapping);
-  h.f.compressedSize = ArchGetFileMappingLength(mapping);
-  h.f.uncompressedSize = ArchGetFileMappingLength(mapping);
+  h.f.compressedSize = static_cast<unsigned int>(ArchGetFileMappingLength(mapping));
+  h.f.uncompressedSize = static_cast<unsigned int>(ArchGetFileMappingLength(mapping));
   h.f.filenameLength = zipFilePath.length();
 
-  const uint32_t offset = outStream.Tell();
+  const uint32_t offset = static_cast<unsigned int>(outStream.Tell());
   const size_t dataOffset =
       offset + _LocalFileHeader::FixedSize + h.f.filenameLength;
   h.f.extraFieldLength = _ComputeExtraFieldPaddingSize(dataOffset);
@@ -879,8 +879,8 @@ bool UsdZipFileWriter::Save() {
     r.f.diskNumberForCentralDir = 0;
     r.f.numCentralDirEntriesOnDisk = _impl->addedFiles.size();
     r.f.numCentralDirEntries = _impl->addedFiles.size();
-    r.f.centralDirLength = (centralDirectoryEnd - centralDirectoryStart);
-    r.f.centralDirOffset = centralDirectoryStart;
+    r.f.centralDirLength = static_cast<unsigned int>((centralDirectoryEnd - centralDirectoryStart));
+    r.f.centralDirOffset = static_cast<unsigned int>(centralDirectoryStart);
     r.f.commentLength = 0;
     r.commentStart = nullptr;
 

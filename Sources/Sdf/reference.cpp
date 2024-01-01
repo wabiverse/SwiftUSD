@@ -88,7 +88,7 @@ int SdfFindReferenceByIdentity(const SdfReferenceVector &references,
                      return SdfReference::IdentityEqual()(referenceId, ref);
                    });
 
-  return it != references.end() ? it - references.begin() : -1;
+  return it != references.end() ? static_cast<int>(it - references.begin()) : -1;
 }
 
 std::ostream &operator<<(std::ostream &out, const SdfReference &reference) {

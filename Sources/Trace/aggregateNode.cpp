@@ -177,7 +177,7 @@ void TraceAggregateNode::AdjustForOverheadAndNoise(
 struct _StackNode {
   _StackNode(TraceAggregateNodePtr node, int parentIdx)
       : eventNode(node), parentIdx(parentIdx) {
-    remainingChildren = node->GetChildrenRef().size();
+    remainingChildren = static_cast<int>(node->GetChildrenRef().size());
   }
 
   TraceAggregateNodePtr eventNode;
@@ -252,7 +252,7 @@ void TraceAggregateNode::MarkRecursiveChildren() {
       // Here our node has children, so before we go on, we must
       // push our children on the child stack.  This gives us the
       // post-order traversal we need.
-      int parent = stack.size() - 1;
+      int parent = static_cast<int>(stack.size()) - 1;
       for (int i = 0; i < numKids; i++) {
         // Only process nodes that have not been previously processed
         // (by a previous call to Report() for example).  If a node

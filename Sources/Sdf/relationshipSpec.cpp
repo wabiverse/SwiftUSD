@@ -172,9 +172,9 @@ void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
   int newTargetSpecIndex = -1;
   for (size_t i = 0, n = siblingPaths.size(); i != n; ++i) {
     if (siblingPaths[i] == oldTargetPath) {
-      oldTargetSpecIndex = i;
+      oldTargetSpecIndex = static_cast<int>(i);
     } else if (siblingPaths[i] == newTargetPath) {
-      newTargetSpecIndex = i;
+      newTargetSpecIndex = static_cast<int>(i);
     }
   }
 
