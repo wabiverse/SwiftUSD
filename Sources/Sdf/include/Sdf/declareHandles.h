@@ -283,7 +283,6 @@ using SdfLayerRefPtrVector = std::vector<SdfLayerRefPtr>;
 using SdfLayerHandleSet = std::set<SdfHandleTo<SdfLayer>::Handle>;
 
 #define SDF_DECLARE_HANDLES(cls)                                               \
-  class cls;                                                                   \
   using cls##Handle = SdfHandleTo<class cls>::Handle;                          \
   using cls##ConstHandle = SdfHandleTo<class cls>::ConstHandle;                \
   using cls##HandleVector = SdfHandleTo<class cls>::Vector;                    \

@@ -21,6 +21,8 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
+import Usd
+
 public typealias UsdAttribute = Pixar.UsdAttribute
 
 public extension Pixar.Usd

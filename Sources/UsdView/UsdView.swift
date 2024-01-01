@@ -33,6 +33,8 @@ enum Creator
 
     Pixar.Bundle.shared.setup(.resources)
 
+    /* ----- Imperative api example. ----- */
+
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
 
     let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
@@ -78,6 +80,17 @@ enum Creator
     /* Save the stage to disk. */
 
     stage.save()
+
+    /* ----- Declarative api example. ----- */
+
+    UsdStage("DeclarativePixarUSD.usda")
+    {
+      UsdPrim("Hello")
+      {
+        UsdPrim("World")
+      }
+    }
+    .stage.save()
 
     print("'usdview' not yet implemented... will exit now.")
   }

@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -96,6 +96,63 @@ public protocol Prim
   var name: Pixar.TfToken { get }
 
   var typeName: Pixar.TfToken { get }
+
+  var children: [any Prim] { get }
+}
+
+public struct UsdPrim: Prim
+{
+  public init(_ path: String, type: Pixar.TfToken = Pixar.TfToken(), @StageBuilder _ children: () -> [any Prim] = { [] })
+  {
+    self.path = .init(path)
+    name = .init()
+    typeName = type
+    self.children = children()
+  }
+
+  public func set(doc _: String)
+  {}
+
+  public func getStage() -> Pixar.UsdStageWeakPtr
+  {
+    .init()
+  }
+
+  public func getPath() -> Pixar.Sdf.Path
+  {
+    .init()
+  }
+
+  public var path: Pixar.Sdf.Path
+
+  public var name: Pixar.TfToken
+
+  public var typeName: Pixar.TfToken
+
+  public var children: [any Prim]
+}
+
+extension Pixar.UsdPrimSiblingRange: IteratorProtocol
+{
+  public typealias Element = Pixar.Usd.Prim
+
+  @discardableResult
+  private mutating func advance_beginCopy() -> Pixar.UsdPrimSiblingRange
+  {
+    __advance_beginUnsafe(1).pointee
+  }
+
+  public mutating func next() -> Element?
+  {
+    guard empty() == false
+    else { return nil }
+
+    let prim = front()
+
+    advance_beginCopy()
+
+    return prim
+  }
 }
 
 extension Pixar.Usd.Prim: Prim
@@ -138,5 +195,10 @@ extension Pixar.Usd.Prim: Prim
   public var typeName: Pixar.TfToken
   {
     GetTypeNameCopy()
+  }
+
+  public var children: [any Prim]
+  {
+    IteratorSequence(GetChildren()).map { $0 }
   }
 }

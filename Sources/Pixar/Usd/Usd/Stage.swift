@@ -121,6 +121,44 @@ extension Pixar.UsdPrimRange: IteratorProtocol
   }
 }
 
+public struct UsdStage: Stage
+{
+  public typealias Scene = [any Prim]
+
+  public var stage: StageRefPtr
+
+  public init(_ identifier: String, @StageBuilder _ scene: () -> Scene)
+  {
+    stage = Pixar.Usd.Stage.createNew(identifier)
+
+    for prim in scene()
+    {
+      stage.definePrim("/\(prim.path.string)", type: prim.typeName)
+
+      if !prim.children.isEmpty
+      {
+        for child in prim.children
+        {
+          stage.definePrim("/\(prim.path.string)/\(child.path.string)", type: child.typeName)
+        }
+      }
+    }
+  }
+
+  @StageBuilder
+  public var scene: Scene
+  {
+    getPrims()
+  }
+
+  private func getPrims() -> Scene
+  {
+    let it = Pixar.UsdPrimRange.Stage(stage.pointee.getPtr())
+
+    return IteratorSequence(it).map { $0 }
+  }
+}
+
 extension Pixar.Usd.Stage: Stage
 {
   public typealias Scene = [any Prim]

@@ -63,7 +63,6 @@ template <typename T> struct TfDeclarePtrs {
 ///
 /// \hideinitializer
 #define TF_DECLARE_WEAK_PTRS(type)                                          \
-  class type;                                                               \
   using type##Ptr = TfDeclarePtrs<class type>::Ptr;                         \
   using type##ConstPtr = TfDeclarePtrs<class type>::ConstPtr;               \
   using type##PtrVector = TfDeclarePtrs<class type>::PtrVector;             \
@@ -77,7 +76,6 @@ template <typename T> struct TfDeclarePtrs {
 ///
 /// \hideinitializer
 #define TF_DECLARE_REF_PTRS(type)                                              \
-  class type;                                                                  \
   using type##RefPtr = TfDeclarePtrs<class type>::RefPtr;                      \
   using type##ConstRefPtr = TfDeclarePtrs<class type>::ConstRefPtr;            \
   using type##RefPtrVector = TfDeclarePtrs<class type>::RefPtrVector;          \
