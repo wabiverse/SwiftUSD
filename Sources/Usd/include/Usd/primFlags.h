@@ -515,10 +515,6 @@ static const Usd_PrimFlags UsdPrimHasDefiningSpecifier =
 USD_API extern const Usd_PrimFlagsConjunction UsdPrimDefaultPredicate;
 USD_API extern const Usd_PrimFlagsPredicate UsdPrimAllPrimsPredicate;
 
-inline Usd_PrimFlagsConjunction getPrimDefaultPredicate() {
-  return UsdPrimDefaultPredicate;
-}
-
 #endif // doxygen
 
 /// This function is used to allow the prim traversal functions listed under
