@@ -91,6 +91,8 @@ public protocol Prim
 
   func getPath() -> Pixar.Sdf.Path
 
+  var path: Pixar.Sdf.Path { get }
+
   var name: Pixar.TfToken { get }
 
   var typeName: Pixar.TfToken { get }
@@ -118,14 +120,19 @@ extension Pixar.Usd.Prim: Prim
     __GetNameUnsafe().pointee
   }
 
-  public var name: Pixar.TfToken
-  {
-    GetNameCopy()
-  }
-
   private borrowing func GetTypeNameCopy() -> Pixar.TfToken
   {
     __GetTypeNameUnsafe().pointee
+  }
+
+  public var path: Pixar.Sdf.Path
+  {
+    GetPath()
+  }
+
+  public var name: Pixar.TfToken
+  {
+    GetNameCopy()
   }
 
   public var typeName: Pixar.TfToken

@@ -16,12 +16,13 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
 import CxxStdlib
+
 // import Tf
 import Plug
 
@@ -57,15 +58,20 @@ public extension Pixar.Tf
   typealias Token = TfToken
 }
 
-extension TfToken
+public extension TfToken
 {
   private borrowing func GetStringCopy() -> std.string
   {
     __GetStringUnsafe().pointee
   }
 
-  public var string: std.string
+  var string: String
   {
-    GetStringCopy()
+    String(GetStringCopy())
+  }
+
+  var isEmpty: Bool
+  {
+    IsEmpty()
   }
 }

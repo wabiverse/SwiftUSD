@@ -72,7 +72,7 @@ enum Creator
 
     for prim in stage.scene
     {
-      Msg.Log.point(String(prim.name.string), to: prim.getPath().getAsString())
+      Msg.Log.point("\(prim.name.string)\(!prim.typeName.isEmpty ? "(\(prim.typeName.string))" : "")", to: prim.path.string)
     }
 
     /* Save the stage to disk. */

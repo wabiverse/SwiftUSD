@@ -41,13 +41,18 @@ public extension Pixar.Sdf.Path
     __GetNameUnsafe().pointee
   }
 
-  var name: std.string
-  {
-    GetNameCopy()
-  }
-
   func getAsString() -> String
   {
     String(GetAsString())
+  }
+
+  var string: String
+  {
+    String(GetAsString())
+  }
+
+  var name: String
+  {
+    String(GetNameCopy())
   }
 }

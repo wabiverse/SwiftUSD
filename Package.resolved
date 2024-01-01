@@ -30,7 +30,7 @@
     {
       "identity" : "metaversekit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaverseKit.git",
+      "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
         "revision" : "35be6bb25945346031f15f1d6e44e347e9318070",
         "version" : "1.3.7"
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "5da6989aae464f324eef5c5b52bdb7974725ab81",
-        "version" : "1.0.0"
+        "revision" : "bba1111185863c9288c5f047770f421c3b7793a4",
+        "version" : "1.1.3"
       }
     },
     {
