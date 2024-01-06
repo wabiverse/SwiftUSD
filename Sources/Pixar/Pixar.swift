@@ -27,6 +27,16 @@
 public extension Pixar
 {
   /**
+   * The current version of **SwiftUSD**.
+   *
+   * The semantic versioning used for **SwiftUSD** tracks both the upstream
+   * Pixar USD version, as well as the evolution iteration of the **SwiftUSD**
+   * SwiftPM package, which is setup as follows:
+   * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION``
+   */
+  static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
+  
+  /**
     # ``Arch``
 
     ## Overview

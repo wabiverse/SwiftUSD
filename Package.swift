@@ -1006,6 +1006,10 @@ let package = Package(
         .target(name: "PixarMacros"),
         // -----------------------
       ],
+      cxxSettings: [
+        // enable to debug swift retain/release calls.
+        .define("DEBUG_MEMORY_MANAGEMENT", to: "0"),
+      ],
       swiftSettings: [
         .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
         .interoperabilityMode(.Cxx),
@@ -1019,7 +1023,6 @@ let package = Package(
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ],
       swiftSettings: [
-        .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
         .interoperabilityMode(.Cxx),
       ]
     ),

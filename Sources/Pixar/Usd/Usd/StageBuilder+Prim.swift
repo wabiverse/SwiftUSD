@@ -22,42 +22,57 @@
  * -------------------------------------------------------------- */
 
 import Foundation
-import Sdf
+import Usd
 
-public extension Pixar.Sdf
+public protocol Prim
 {
-  typealias Path = Pixar.SdfPath
+  func set(doc: String) -> Void
+
+  func getStage() -> Pixar.UsdStageWeakPtr
+
+  func getPath() -> Pixar.Sdf.Path
+
+  var path: Pixar.Sdf.Path { get }
+
+  var name: Pixar.TfToken { get }
+
+  var typeName: Pixar.TfToken { get }
+
+  var children: [any Prim] { get }
 }
 
-public extension Pixar.Sdf.Path
+public struct UsdPrim: Prim
 {
-  init(_ path: String)
+  public init(_ path: String, type: Pixar.TfToken = Pixar.TfToken(), @StageBuilder children: () -> [any Prim])
   {
-    self.init(std.string(path))
+    self.path = Pixar.Sdf.Path(
+      (!path.contains("/") ? "/\(path)" : path)
+        .replacingOccurrences(of: "/\(path)/\(path)", with: "/\(path)")
+    )
+    self.children = children()
+
+    name = Pixar.TfToken()
+    typeName = type
   }
 
-  private borrowing func GetNameCopy() -> std.string
+  public func set(doc _: String)
+  {}
+
+  public func getStage() -> Pixar.UsdStageWeakPtr
   {
-    __GetNameUnsafe().pointee
+    .init()
   }
 
-  func getAsString() -> String
+  public func getPath() -> Pixar.Sdf.Path
   {
-    String(GetAsString())
-  }
-  
-  func append(path: Pixar.Sdf.Path) -> Pixar.Sdf.Path
-  {
-    AppendPath(path)
+    .init()
   }
 
-  var string: String
-  {
-    String(GetAsString())
-  }
+  public var path: Pixar.Sdf.Path
 
-  var name: String
-  {
-    String(GetNameCopy())
-  }
+  public var name: Pixar.TfToken
+
+  public var typeName: Pixar.TfToken
+
+  public var children: [any Prim]
 }

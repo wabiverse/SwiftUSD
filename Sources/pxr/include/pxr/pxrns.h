@@ -28,21 +28,27 @@
 
 #define PXR_MAJOR_VERSION 0
 #define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 8
+#define PXR_PATCH_VERSION 11
 
-#define PXR_VERSION 2308
+#define PXR_VERSION 2311
 
 #define PXR_USE_NAMESPACES 1
 
 #if PXR_USE_NAMESPACES
 
 #define PXR_NS pxr
-#define PXR_INTERNAL_NS Pixar
 #define PXR_NS_GLOBAL ::PXR_NS
 
+/* ------ swift usd. ------ */
+
+#define SWIFTUSD_EVOLUTION 14
+#define PXR_INTERNAL_NS Pixar
+
+/* ------------------------ */
+
 // A doc for the purposes of root level namespace documentation in Swift.
-// NOTE: PXR_INTERNAL_NS has been unwrapped to Pixar on L.67
-// to help the linter out.
+// NOTE: PXR_INTERNAL_NS has been unwrapped to Pixar on L.45 to help the
+// linter out.
 
 /**
   # ``Pixar``

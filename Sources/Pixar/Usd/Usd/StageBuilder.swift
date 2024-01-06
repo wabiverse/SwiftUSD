@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -32,7 +32,7 @@ public struct StageBuilder
     components.flatMap { $0 }
   }
 
-  /// Add support for both single and collections of constraints.
+  /// Add support for both single and collections of prims.
   public static func buildExpression(_ expression: Prim) -> [Prim]
   {
     [expression]

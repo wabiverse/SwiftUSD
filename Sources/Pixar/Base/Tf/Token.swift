@@ -65,6 +65,11 @@ public extension TfToken
     __GetStringUnsafe().pointee
   }
 
+  init(_ value: String)
+  {
+    self.init(std.string(value))
+  }
+
   var string: String
   {
     String(GetStringCopy())

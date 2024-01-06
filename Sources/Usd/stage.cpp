@@ -8321,16 +8321,16 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 void UsdStageRetain(Pixar::UsdStage *stage)
 {
-#if DEBUG
+#if DEBUG_MEMORY_MANAGEMENT
   printf("Called UsdStageRetain()\n");
-#endif /* DEBUG */
+#endif /* DEBUG_MEMORY_MANAGEMENT */
   // Pixar::UsdStage *ref = stage;
 }
 
 void UsdStageRelease(Pixar::UsdStage *stage)
 {
-#if DEBUG
+#if DEBUG_MEMORY_MANAGEMENT
   printf("Called UsdStageRelease()\n");
-#endif /* DEBUG */
+#endif /* DEBUG_MEMORY_MANAGEMENT */
   // stage = nullptr;
 }

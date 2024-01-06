@@ -21,43 +21,34 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
-import Foundation
-import Sdf
+import Usd
 
-public extension Pixar.Sdf
+public typealias UsdPrimSiblingRange = Pixar.UsdPrimSiblingRange
+
+public extension Pixar.Usd
 {
-  typealias Path = Pixar.SdfPath
+  typealias PrimSiblingRange = UsdPrimSiblingRange
 }
 
-public extension Pixar.Sdf.Path
+extension Pixar.UsdPrimSiblingRange: IteratorProtocol
 {
-  init(_ path: String)
+  public typealias Element = Pixar.Usd.Prim
+
+  @discardableResult
+  private mutating func advance_beginCopy() -> Pixar.UsdPrimSiblingRange
   {
-    self.init(std.string(path))
+    __advance_beginUnsafe(1).pointee
   }
 
-  private borrowing func GetNameCopy() -> std.string
+  public mutating func next() -> Element?
   {
-    __GetNameUnsafe().pointee
-  }
+    guard empty() == false
+    else { return nil }
 
-  func getAsString() -> String
-  {
-    String(GetAsString())
-  }
-  
-  func append(path: Pixar.Sdf.Path) -> Pixar.Sdf.Path
-  {
-    AppendPath(path)
-  }
+    let prim = front()
 
-  var string: String
-  {
-    String(GetAsString())
-  }
+    advance_beginCopy()
 
-  var name: String
-  {
-    String(GetNameCopy())
+    return prim
   }
 }

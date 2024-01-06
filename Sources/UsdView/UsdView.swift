@@ -37,7 +37,7 @@ enum Creator
 
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
 
-    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD.usda")
+    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
 
     let xform = Pixar.UsdGeom.Xform.define(stage, path: "/Geometry")
     xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
@@ -68,7 +68,7 @@ enum Creator
     Pixar.UsdShade.MaterialBindingAPI.apply(cube).bind(matDef(stage, color: .blue))
     Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
 
-    stage.getPseudoRoot().set(doc: "SwiftUSD v23.11.13")
+    stage.getPseudoRoot().set(doc: "SwiftUSD v\(Pixar.version)")
 
     /* Iterate the stage and print out the path to each prim. */
 
@@ -83,16 +83,28 @@ enum Creator
 
     /* ----- Declarative api example. ----- */
 
-    UsdStage("DeclarativePixarUSD.usda")
+    UsdStage("DeclarativePixarUSD", ext: .usda)
     {
       UsdPrim("Hello")
       {
-        UsdPrim("World")
+        UsdPrim("Declarative")
+        {
+          UsdPrim("Scene")
+          {
+            UsdPrim("Description")
+            {}
+          }
+        }
       }
     }
-    .stage.save()
+    .set(doc: "SwiftUSD v\(Pixar.version) | Declarative API")
+    .save()
+
+    /* ------------------------------------ */
 
     print("'usdview' not yet implemented... will exit now.")
+
+    /* ------------------------------------ */
   }
 }
 

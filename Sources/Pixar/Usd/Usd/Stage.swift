@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -96,69 +96,6 @@ public extension Pixar.Usd
   typealias Stage = Pixar.UsdStage
 }
 
-public protocol Stage
-{
-  associatedtype Scene: Collection where Scene.Element == any Prim
-
-  @StageBuilder
-  var scene: Self.Scene { get }
-}
-
-extension Pixar.UsdPrimRange: IteratorProtocol
-{
-  public typealias Element = Pixar.Usd.Prim
-
-  public mutating func next() -> Element?
-  {
-    guard empty() == false
-    else { return nil }
-
-    let prim = front()
-
-    increment_begin()
-
-    return prim
-  }
-}
-
-public struct UsdStage: Stage
-{
-  public typealias Scene = [any Prim]
-
-  public var stage: StageRefPtr
-
-  public init(_ identifier: String, @StageBuilder _ scene: () -> Scene)
-  {
-    stage = Pixar.Usd.Stage.createNew(identifier)
-
-    for prim in scene()
-    {
-      stage.definePrim("/\(prim.path.string)", type: prim.typeName)
-
-      if !prim.children.isEmpty
-      {
-        for child in prim.children
-        {
-          stage.definePrim("/\(prim.path.string)/\(child.path.string)", type: child.typeName)
-        }
-      }
-    }
-  }
-
-  @StageBuilder
-  public var scene: Scene
-  {
-    getPrims()
-  }
-
-  private func getPrims() -> Scene
-  {
-    let it = Pixar.UsdPrimRange.Stage(stage.pointee.getPtr())
-
-    return IteratorSequence(it).map { $0 }
-  }
-}
-
 extension Pixar.Usd.Stage: Stage
 {
   public typealias Scene = [any Prim]
@@ -189,6 +126,12 @@ extension Pixar.Usd.Stage: Stage
         case .none: InitialLoadSet.LoadNone
       }
     }
+  }
+
+  @discardableResult
+  public static func createNew(_ identifier: String, ext: UsdStage.FileExt, load: InitialLoadingSet = .all) -> StageRefPtr
+  {
+    Pixar.Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
   }
 
   @discardableResult

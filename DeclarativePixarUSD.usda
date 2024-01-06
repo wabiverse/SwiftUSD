@@ -1,9 +1,18 @@
 #usda 1.0
+(
+    doc = "SwiftUSD v23.11.14 | Declarative API"
+)
 
 def "Hello"
 {
-    def "World"
+    def "Declarative"
     {
+        def "Scene"
+        {
+            def "Description"
+            {
+            }
+        }
     }
 }
 

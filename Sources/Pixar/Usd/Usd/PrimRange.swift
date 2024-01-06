@@ -16,12 +16,14 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
 import Usd
+
+public typealias UsdPrimRange = Pixar.UsdPrimRange
 
 public extension Pixar.Usd
 {
@@ -49,5 +51,22 @@ public extension Pixar.Usd
    * - You may want to prune sub-trees from processing (see Usd.PrimRange.iterator.pruneChildren())
    * - You want to treat the root prim itself uniformly with its descendents (getFilteredDescendants() will not
    * return the root prim itself, while ``Usd.PrimRange`` will, see  ``Usd.PrimRange.stage`` for an exception). */
-  typealias PrimRange = Pixar.UsdPrimRange
+  typealias PrimRange = UsdPrimRange
+}
+
+extension Pixar.Usd.PrimRange: IteratorProtocol
+{
+  public typealias Element = Pixar.Usd.Prim
+
+  public mutating func next() -> Element?
+  {
+    guard empty() == false
+    else { return nil }
+
+    let prim = front()
+
+    increment_begin()
+
+    return prim
+  }
 }
