@@ -43,7 +43,7 @@ public protocol Prim
 
 public struct UsdPrim: Prim
 {
-  public init(_ path: String, type: Pixar.TfToken = Pixar.TfToken(), @StageBuilder children: () -> [any Prim])
+  public init(_ path: String, type: Pixar.TfToken = Pixar.TfToken(), @StageBuilder children: () -> [any Prim] = { [] })
   {
     self.path = Pixar.Sdf.Path(
       (!path.contains("/") ? "/\(path)" : path)
@@ -65,7 +65,7 @@ public struct UsdPrim: Prim
 
   public func getPath() -> Pixar.Sdf.Path
   {
-    .init()
+    path
   }
 
   public var path: Pixar.Sdf.Path

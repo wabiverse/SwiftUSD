@@ -92,7 +92,6 @@ enum Creator
           UsdPrim("Scene")
           {
             UsdPrim("Description")
-            {}
           }
         }
       }
@@ -148,7 +147,7 @@ func matDef(_ stage: StageRefPtr, color: MaterialColor = .white) -> Pixar.UsdSha
 
   let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/\(matName)")
 
-  var pbrShader = Pixar.UsdShadeShader.define(stage, path: "/Materials/\(matName)/PBRShader")
+  var pbrShader = Pixar.UsdShade.Shader.define(stage, path: "/Materials/\(matName)/PBRShader")
   pbrShader.createIdAttr(.usdPreviewSurface)
   pbrShader.createInput(for: .diffuseColor, type: .color3f).set(color.vec3f)
   pbrShader.createInput(for: .roughness, type: .float).set(Float(0.4))
