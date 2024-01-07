@@ -234,6 +234,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.7"),
@@ -267,7 +268,8 @@ let package = Package(
         .product(name: "Eigen", package: "MetaverseKit"),
         /* ---------- Apple only libs. ---------- */
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
-        /* ------ Terminal console colors. ------ */
+        /* ---------- Console logging. ---------- */
+        .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
       ],
       publicHeadersPath: "include",

@@ -167,8 +167,8 @@ public extension Pixar
       _ = resources.map
       { path in
 
-        if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil) &&
-            !path.contains(".app")
+        if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil),
+           !path.contains(".app")
         {
           showHelp = true
 
@@ -196,7 +196,7 @@ public extension Pixar
               }
 
               #if DEBUG_PIXAR_BUNDLE
-                Msg.Log.point("Moving resource: \(sourceFile)", to: destFile)
+                Msg.logger.log(level: .info, "Moving resource: \(sourceFile) -> \(destFile)")
               #endif /* DEBUG_PIXAR_BUNDLE */
 
               try fileManager.moveItem(atPath: sourceFile,
@@ -205,11 +205,11 @@ public extension Pixar
           }
           catch
           {
-            Msg.Log.error("Could not copy usd resource from \(src) to \(dest): ", error.localizedDescription)
+            Msg.logger.log(level: .error, "Could not copy usd resource from \(src) to \(dest): \(error.localizedDescription)")
           }
 
           #if DEBUG_PIXAR_BUNDLE
-            Msg.Log.point("Adding usd resource", to: dest)
+            Msg.logger.log(level: .info, "Adding usd resource -> \(dest)")
           #endif /* DEBUG_PIXAR_BUNDLE */
 
           plugPaths.push_back(std.string(dest))
@@ -217,7 +217,7 @@ public extension Pixar
         else
         {
           #if DEBUG_PIXAR_BUNDLE
-            Msg.Log.point("Adding usd resource", to: path)
+            Msg.logger.log(level: .info, "Adding usd resource -> \(path)")
           #endif /* DEBUG_PIXAR_BUNDLE */
 
           plugPaths.push_back(std.string(path))
@@ -312,45 +312,45 @@ public extension Pixar.Bundle
 {
   func showBundleHelp(with missing: String)
   {
-    Msg.Log.warn("\("\("MISSING USD RESOURCE".magenta) -------------------------------------------------------------------")")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("\(missing)".magenta)")
-    Msg.Log.warn("")
-    Msg.Log.warn("----------------------------------------------------------------------------------------")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("Since this path does not exist, it will be created for you, however, prefer bundling the")")
-    Msg.Log.warn("\("application bundle appropriately with https://swiftbundler.dev instead of the \("swift run".yellow)")")
-    Msg.Log.warn("\("command, this is because \("swift run".yellow) is not meant to run bundled applications, it is best")")
-    Msg.Log.warn("\("suited for command line utilities that do not require application resources or graphical")")
-    Msg.Log.warn("\("user interfaces.")")
-    Msg.Log.warn("")
-    Msg.Log.warn("----------------------------------------------------------------------------------------")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("The recommended method of running your app is to add swift bundler to the swift package")")
-    Msg.Log.warn("\("by adding the following code to your package") \("dependencies".yellow) \("array:")")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("\("dependencies: [".green)".green)")
-    Msg.Log.warn("\("\("  .package(url: \"https://github.com/furby-tm/swift-bundler\", from: \"2.0.9\")".green)".green)")
-    Msg.Log.warn("\("\("]".green)".green)")
-    Msg.Log.warn("")
-    Msg.Log.warn("----------------------------------------------------------------------------------------")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("Then, instead of running") \("swift run".yellow)\(", use swift bundler's package plugin command:")")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("\("swift package --disable-sandbox plugin bundler run -p".green) \("macOS".yellow) \("MyApp".yellow)")")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("\("NOTE:".magenta) Ensure that you replace \("MyApp".yellow) to the name of your executable target,".cyan)")
-    Msg.Log.warn("\("and change the platform (-p \("macOS".yellow)) depending on the intended platform.".cyan)")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("The following platforms are currently supported:")")
-    Msg.Log.warn("\("\("*".yellow) \("linux".magenta)")")
-    Msg.Log.warn("\("\("*".yellow) \("macOS".magenta)")")
-    Msg.Log.warn("\("\("*".yellow) \("visionOS".magenta) or \("visionOSSimulator".magenta)")")
-    Msg.Log.warn("\("\("*".yellow) \("iOS".magenta) or \("iOSSimulator".magenta)")")
-    Msg.Log.warn("")
-    Msg.Log.warn("\("When running on \("visionOSSimulator".magenta) or \("iOSSimulator".magenta), the simulator will automatically")")
-    Msg.Log.warn("\("launch with an instance of your bundled app running within it.")")
-    Msg.Log.warn("")
-    Msg.Log.warn("----------------------------------------------------------------------------------------")
+    Msg.logger.log(level: .warning, "\("\("MISSING USD RESOURCE".magenta) -------------------------------------------------------------------")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("\(missing)".magenta)")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "----------------------------------------------------------------------------------------")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("Since this path does not exist, it will be created for you, however, prefer bundling the")")
+    Msg.logger.log(level: .warning, "\("application bundle appropriately with https://swiftbundler.dev instead of the \("swift run".yellow)")")
+    Msg.logger.log(level: .warning, "\("command, this is because \("swift run".yellow) is not meant to run bundled applications, it is best")")
+    Msg.logger.log(level: .warning, "\("suited for command line utilities that do not require application resources or graphical")")
+    Msg.logger.log(level: .warning, "\("user interfaces.")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "----------------------------------------------------------------------------------------")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("The recommended method of running your app is to add swift bundler to the swift package")")
+    Msg.logger.log(level: .warning, "\("by adding the following code to your package") \("dependencies".yellow) \("array:")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("\("dependencies: [".green)".green)")
+    Msg.logger.log(level: .warning, "\("\("  .package(url: \"https://github.com/furby-tm/swift-bundler\", from: \"2.0.9\")".green)".green)")
+    Msg.logger.log(level: .warning, "\("\("]".green)".green)")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "----------------------------------------------------------------------------------------")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("Then, instead of running") \("swift run".yellow)\(", use swift bundler's package plugin command:")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("\("swift package --disable-sandbox plugin bundler run -p".green) \("macOS".yellow) \("MyApp".yellow)")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("\("NOTE:".magenta) Ensure that you replace \("MyApp".yellow) to the name of your executable target,".cyan)")
+    Msg.logger.log(level: .warning, "\("and change the platform (-p \("macOS".yellow)) depending on the intended platform.".cyan)")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("The following platforms are currently supported:")")
+    Msg.logger.log(level: .warning, "\("\("*".yellow) \("linux".magenta)")")
+    Msg.logger.log(level: .warning, "\("\("*".yellow) \("macOS".magenta)")")
+    Msg.logger.log(level: .warning, "\("\("*".yellow) \("visionOS".magenta) or \("visionOSSimulator".magenta)")")
+    Msg.logger.log(level: .warning, "\("\("*".yellow) \("iOS".magenta) or \("iOSSimulator".magenta)")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "\("When running on \("visionOSSimulator".magenta) or \("iOSSimulator".magenta), the simulator will automatically")")
+    Msg.logger.log(level: .warning, "\("launch with an instance of your bundled app running within it.")")
+    Msg.logger.log(level: .warning, "")
+    Msg.logger.log(level: .warning, "----------------------------------------------------------------------------------------")
   }
 }

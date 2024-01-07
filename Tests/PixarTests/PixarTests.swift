@@ -32,27 +32,27 @@ final class ArchTests: XCTestCase
 {
   func testCwd()
   {
-    Msg.Log.point("Pixar.Arch.getCwd()", to: Pixar.Arch.getCwd())
+    Msg.logger.log(level: .info, "Pixar.Arch.getCwd() -> \(Pixar.Arch.getCwd())")
   }
 
   func testExecutablePath()
   {
-    Msg.Log.point("Pixar.Arch.getExecutablePath()", to: Pixar.Arch.getExecutablePath())
+    Msg.logger.log(level: .info, "Pixar.Arch.getExecutablePath() -> \(Pixar.Arch.getExecutablePath())")
   }
 
   func testPageSize()
   {
-    Msg.Log.point("Pixar.Arch.getPageSize()", to: Pixar.Arch.getPageSize())
+    Msg.logger.log(level: .info, "Pixar.Arch.getPageSize() -> \(Pixar.Arch.getPageSize())")
   }
 
   func testIsMainThread()
   {
-    Msg.Log.point("Pixar.Arch.isMainThread()", to: Pixar.Arch.isMainThread())
+    Msg.logger.log(level: .info, "Pixar.Arch.isMainThread() -> \(Pixar.Arch.isMainThread())")
   }
 
   func testMainThreadId()
   {
-    Msg.Log.point("Pixar.Arch.getMainThreadId()", to: Pixar.Arch.getMainThreadId())
+    Msg.logger.log(level: .info, "Pixar.Arch.getMainThreadId() -> \(Pixar.Arch.getMainThreadId())")
   }
 
   func testAlignMemoryOfSize()
@@ -100,10 +100,10 @@ final class JsTests: XCTestCase
   func testArray()
   {
     let array = Pixar.Js.Array()
-    Msg.Log.point("Pixar.Js.Array", to: array)
+    Msg.logger.log(level: .info, "Pixar.Js.Array -> \(array)")
 
     let jsArray = JsArray()
-    Msg.Log.point("JsArray", to: jsArray)
+    Msg.logger.log(level: .info, "JsArray -> \(jsArray)")
 
     XCTAssertEqual(array.count, jsArray.count)
   }
@@ -111,10 +111,10 @@ final class JsTests: XCTestCase
   func testObject()
   {
     let object = Pixar.Js.Object()
-    Msg.Log.point("Pixar.Js.Object", to: object)
+    Msg.logger.log(level: .info, "Pixar.Js.Object -> \(object)")
 
     let jsObject = JsObject()
-    Msg.Log.point("JsObject", to: jsObject)
+    Msg.logger.log(level: .info, "JsObject -> \(jsObject)")
 
     XCTAssertEqual(object.empty(), jsObject.empty())
   }
@@ -122,10 +122,10 @@ final class JsTests: XCTestCase
   func testParseError()
   {
     let parseError = Pixar.Js.ParseError()
-    Msg.Log.point("Pixar.Js.ParseError", to: parseError)
+    Msg.logger.log(level: .info, "Pixar.Js.ParseError -> \(parseError)")
 
     let jsParseError = JsParseError()
-    Msg.Log.point("ParseError", to: jsParseError)
+    Msg.logger.log(level: .info, "ParseError -> \(jsParseError)")
 
     XCTAssertEqual(parseError.reason, jsParseError.reason)
   }
@@ -133,11 +133,11 @@ final class JsTests: XCTestCase
   func testValue()
   {
     let value = Pixar.Js.Value(true)
-    Msg.Log.point("Pixar.Js.Value", to: value.GetBool())
+    Msg.logger.log(level: .info, "Pixar.Js.Value -> \(value.GetBool())")
     XCTAssertEqual(value.GetBool(), true)
 
     let jsValue = JsValue(true)
-    Msg.Log.point("JsValue", to: jsValue.GetBool())
+    Msg.logger.log(level: .info, "JsValue -> \(jsValue.GetBool())")
     XCTAssertEqual(jsValue.GetBool(), true)
 
     XCTAssertEqual(value.GetBool(), jsValue.GetBool())
@@ -153,10 +153,10 @@ final class GfTests: XCTestCase
   func testVec2f()
   {
     let vec2f = Pixar.Gf.Vec2f(1.0, 2.0)
-    Msg.Log.point("Pixar.Gf.Vec2f", to: vec2f)
+    Msg.logger.log(level: .info, "Pixar.Gf.Vec2f -> \(vec2f)")
 
     let gfVec2f = GfVec2f(1.0, 2.0)
-    Msg.Log.point("GfVec2f", to: gfVec2f)
+    Msg.logger.log(level: .info, "GfVec2f -> \(gfVec2f)")
 
     XCTAssertEqual(vec2f, gfVec2f)
     XCTAssertEqual(MemoryLayout<GfVec2f>.size, MemoryLayout<(Float, Float)>.size)
@@ -165,20 +165,20 @@ final class GfTests: XCTestCase
   func testVec3f()
   {
     let vec3fA = GfVec3f(1.0, 2.0, 3.0)
-    Msg.Log.point("GfVec3f(1.0, 2.0, 3.0)", to: vec3fA)
+    Msg.logger.log(level: .info, "GfVec3f(1.0, 2.0, 3.0) -> \(vec3fA)")
 
     let vec3fB = GfVec3f(4.0, 5.0, 6.0)
-    Msg.Log.point("GfVec3f(4.0, 5.0, 6.0)", to: vec3fB)
+    Msg.logger.log(level: .info, "GfVec3f(4.0, 5.0, 6.0) -> \(vec3fB)")
 
     var vec3fC = vec3fA + vec3fB
-    Msg.Log.point("vec3fC=(vec3fA + vec3fB)", to: vec3fC)
+    Msg.logger.log(level: .info, "vec3fC=(vec3fA + vec3fB) -> \(vec3fC)")
 
     vec3fC *= vec3fA
-    Msg.Log.point("vec3fC*=(vec3fA)", to: vec3fC)
+    Msg.logger.log(level: .info, "vec3fC*=(vec3fA) -> \(vec3fC)")
 
-    Msg.Log.point("MemoryLayout<SIMD3<Float>>.size", to: MemoryLayout<SIMD3<Float>>.size)
-    Msg.Log.point("MemoryLayout<GfVec3f>.size", to: MemoryLayout<GfVec3f>.size)
-    Msg.Log.point("MemoryLayout<(Float, Float, Float)>.size", to: MemoryLayout<(Float, Float, Float)>.size)
+    Msg.logger.log(level: .info, "MemoryLayout<SIMD3<Float>>.size -> \(MemoryLayout<SIMD3<Float>>.size)")
+    Msg.logger.log(level: .info, "MemoryLayout<GfVec3f>.size -> \(MemoryLayout<GfVec3f>.size)")
+    Msg.logger.log(level: .info, "MemoryLayout<(Float, Float, Float)>.size -> \(MemoryLayout<(Float, Float, Float)>.size)")
 
     XCTAssertEqual(MemoryLayout<GfVec3f>.size, MemoryLayout<(Float, Float, Float)>.size)
   }
@@ -196,12 +196,12 @@ final class ArTests: XCTestCase
 
     if resolvers.isEmpty
     {
-      Msg.Log.point("Pixar.Ar.getAllResolvers()", to: "None")
+      Msg.logger.log(level: .info, "Pixar.Ar.getAllResolvers() -> None")
     }
 
     for (i, r) in resolvers.enumerated()
     {
-      Msg.Log.point("Pixar.Ar.getAllResolvers() [\(i + 1)/\(resolvers.count)]", to: r)
+      Msg.logger.log(level: .info, "Pixar.Ar.getAllResolvers() [\(i + 1)/\(resolvers.count)] -> \(r)")
     }
   }
 }
@@ -218,7 +218,7 @@ final class KindTests: XCTestCase
 
     for (i, t) in tokens.enumerated()
     {
-      Msg.Log.point("Pixar.Kind.Tokens [\(i + 1)/\(tokens.count)]", to: t.getToken().string)
+      Msg.logger.log(level: .info, "Pixar.Kind.Tokens [\(i + 1)/\(tokens.count)] -> \(t.getToken().string)")
     }
 
     XCTAssertEqual(tokens.count, 5)

@@ -75,7 +75,7 @@ enum Creator
     for prim in stage.scene
     {
       let primType = !prim.typeName.isEmpty ? "(\(prim.typeName.string))" : ""
-      Msg.Log.point("\(prim.name.string)\(primType)", to: prim.path.string)
+      Msg.logger.log(level: .info, "\(prim.name.string)\(primType) -> \(prim.path.string)")
     }
 
     /* Save the stage to disk. */
@@ -96,7 +96,7 @@ enum Creator
 
     /* ------------------------------------ */
 
-    Msg.Log.debug("UsdView is not yet implemented... will exit now.")
+    Msg.logger.log(level: .info, "UsdView is not yet implemented... will exit now.")
 
     /* ------------------------------------ */
   }

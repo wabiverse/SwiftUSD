@@ -22,21 +22,17 @@
  * -------------------------------------------------------------- */
 
 import Foundation
+import Logging
 import Rainbow
 
 /* --- xxx --- */
 
 public final class Msg
 {
-  public static let Log = Msg()
+  public static let logger = Logger(label: "foundation.wabi.metaverse")
 
   private init()
-  {
-    #if os(macOS)
-      // Disable colored output for Xcode (only applies to macOS platform).
-      Rainbow.enabled = ProcessInfo.processInfo.environment["__XCODE_BUILT_PRODUCTS_DIR_PATHS"] == nil
-    #endif /* os(macOS) */
-  }
+  {}
 }
 
 /* --- xxx --- */
@@ -45,32 +41,32 @@ public extension Msg
 {
   func point(_ subject: String, to msgArgs: Any...)
   {
-    print("\("[ INFO ] ".blue)\(subject.cyan)\(String(repeating: " ", count: max(35 - subject.count, 1)))\("-> ".yellow + msgArgs.flatMap { "\($0)".magenta })")
+    Msg.logger.info("\("[ INFO ] ".blue)\(subject.cyan)\(String(repeating: " ", count: max(35 - subject.count, 1)))\("-> ".yellow + msgArgs.flatMap { "\($0)".magenta })")
   }
 
   func info(_ msgArgs: Any...)
   {
-    print("\("[ INFO ] ".blue + msgArgs.flatMap { "\($0)".lightWhite })")
+    Msg.logger.info("\("[ INFO ] ".blue + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func debug(_ msgArgs: Any...)
   {
-    print("\("[ DEBUG ] ".magenta + msgArgs.flatMap { "\($0)".lightWhite })")
+    Msg.logger.debug("\("[ DEBUG ] ".magenta + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func success(_ msgArgs: Any...)
   {
-    print("\("[ SUCCESS ] ".green + msgArgs.flatMap { "\($0)".lightWhite })")
+    Msg.logger.info("\("[ SUCCESS ] ".green + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func warn(_ msgArgs: Any...)
   {
-    print("\("[ WARN ] ".yellow + msgArgs.flatMap { "\($0)".lightWhite })")
+    Msg.logger.warning("\("[ WARN ] ".yellow + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func error(_ msgArgs: Any...)
   {
-    print("\("[ ERROR ] ".red + msgArgs.flatMap { "\($0)".lightWhite })")
+    Msg.logger.error("\("[ ERROR ] ".red + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 }
 
