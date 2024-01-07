@@ -17,7 +17,7 @@ For more details, please visit the web site [here](http://openusd.org).
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.15"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.16"),
 ]
 ```
 
@@ -45,7 +45,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.15")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.16")
   ],
   targets: [
     /* 📕 For library products... */

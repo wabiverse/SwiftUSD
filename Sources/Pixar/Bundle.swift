@@ -167,7 +167,8 @@ public extension Pixar
       _ = resources.map
       { path in
 
-        if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil)
+        if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil) &&
+            !path.contains(".app")
         {
           showHelp = true
 
