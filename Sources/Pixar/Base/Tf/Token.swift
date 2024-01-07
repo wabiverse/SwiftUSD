@@ -58,6 +58,14 @@ public extension Pixar.Tf
   typealias Token = TfToken
 }
 
+extension TfToken: Equatable
+{
+  public static func == (lhs: TfToken, rhs: TfToken) -> Bool
+  {
+    lhs.Hash() == rhs.Hash()
+  }
+}
+
 public extension TfToken
 {
   private borrowing func GetStringCopy() -> std.string

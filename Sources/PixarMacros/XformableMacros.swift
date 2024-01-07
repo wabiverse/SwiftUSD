@@ -81,11 +81,3 @@ public struct PixarXformableMacro: MemberMacro
     return [decl]
   }
 }
-
-@main
-struct PixarMacrosPlugin: CompilerPlugin
-{
-  let providingMacros: [Macro.Type] = [
-    PixarXformableMacro.self,
-  ]
-}

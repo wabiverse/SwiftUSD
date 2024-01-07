@@ -24,51 +24,58 @@
 import Foundation
 import Usd
 
+public protocol StageConvertible
+{
+  func asPrims() -> [UsdPrim]
+}
+
+extension UsdPrim: StageConvertible
+{
+  public func asPrims() -> [UsdPrim] { [self] }
+
+  public struct Empty: StageConvertible
+  {
+    public func asPrims() -> [UsdPrim] { [] }
+  }
+}
+
+extension UsdStage: StageConvertible
+{
+  public func asPrims() -> [UsdPrim]
+  {
+    [UsdPrim(stage.getPseudoRoot().path.string, type: .group(prims))]
+  }
+}
+
+/**
+ * Here we extend Array to make it
+ * conform to our StageConvertible
+ * protocol. */
+extension [UsdPrim]: StageConvertible
+{
+  public func asPrims() -> [UsdPrim] { self }
+}
+
 @resultBuilder
 public struct StageBuilder
 {
-  public static func buildBlock(_ components: [Prim]...) -> [Prim]
+  public static func buildBlock(_ prims: StageConvertible...) -> [UsdPrim]
   {
-    components.flatMap { $0 }
+    prims.flatMap { $0.asPrims() }
   }
 
-  /// Add support for both single and collections of prims.
-  public static func buildExpression(_ expression: Prim) -> [Prim]
+  public static func buildIf(_ path: StageConvertible?) -> StageConvertible
   {
-    [expression]
+    path ?? []
   }
 
-  public static func buildExpression(_ expression: [Prim]) -> [Prim]
+  public static func buildEither(first: StageConvertible) -> StageConvertible
   {
-    expression
+    first
   }
 
-  /// Add support for optionals.
-  public static func buildOptional(_ components: [Prim]?) -> [Prim]
+  public static func buildEither(second: StageConvertible) -> StageConvertible
   {
-    components ?? []
-  }
-
-  /// Add support for if statements.
-  public static func buildEither(first components: [Prim]) -> [Prim]
-  {
-    components
-  }
-
-  public static func buildEither(second components: [Prim]) -> [Prim]
-  {
-    components
-  }
-
-  /// Add support for loops.
-  public static func buildArray(_ components: [[Prim]]) -> [Prim]
-  {
-    components.flatMap { $0 }
-  }
-
-  /// Add support for #availability checks.
-  public static func buildLimitedAvailability(_ components: [Prim]) -> [Prim]
-  {
-    components
+    second
   }
 }

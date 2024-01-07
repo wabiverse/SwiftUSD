@@ -122,7 +122,8 @@ extension Pixar.Usd.Prim: Prim
 
   public var typeName: Pixar.TfToken
   {
-    GetTypeNameCopy()
+    get { GetTypeNameCopy() }
+    set { SetTypeName(newValue) }
   }
 
   public var children: [any Prim]

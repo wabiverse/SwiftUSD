@@ -74,7 +74,8 @@ enum Creator
 
     for prim in stage.scene
     {
-      Msg.Log.point("\(prim.name.string)\(!prim.typeName.isEmpty ? "(\(prim.typeName.string))" : "")", to: prim.path.string)
+      let primType = !prim.typeName.isEmpty ? "(\(prim.typeName.string))" : ""
+      Msg.Log.point("\(prim.name.string)\(primType)", to: prim.path.string)
     }
 
     /* Save the stage to disk. */
@@ -85,16 +86,10 @@ enum Creator
 
     UsdStage("DeclarativePixarUSD", ext: .usda)
     {
-      UsdPrim("Hello")
-      {
-        UsdPrim("Declarative")
-        {
-          UsdPrim("Scene")
-          {
-            UsdPrim("Description")
-          }
-        }
-      }
+      UsdPrim("Hello", type: .xform)
+      UsdPrim("Declarative")
+      UsdPrim("World", type: .sphere)
+      UsdPrim("Box", type: .cube)
     }
     .set(doc: "SwiftUSD v\(Pixar.version) | Declarative API")
     .save()

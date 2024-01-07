@@ -25,67 +25,36 @@ import Foundation
 import Sdf
 import Usd
 
-public protocol Stage
+public struct UsdStage
 {
-  associatedtype Scene: Collection where Scene.Element == any Prim
-
-  @StageBuilder
-  var scene: Self.Scene { get }
-}
-
-public struct UsdStage: Stage
-{
-  public typealias Scene = [any Prim]
-
   public var stage: StageRefPtr
+  public var prims: [UsdPrim]
 
-  /**
-   * Common file exts, for convenience.
-   */
-  public enum FileExt: String, CaseIterable
+  public init(_ identifier: String,
+              ext: FileExt,
+              load set: Pixar.Usd.Stage.InitialLoadingSet = .all,
+              @StageBuilder prims: () -> [UsdPrim])
   {
-    case usd
-    case usda
-    case usdc
-    case usdz
-  }
+    stage = Pixar.Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
 
-  public init(_ identifier: String, ext: FileExt, @StageBuilder scene: () -> Scene)
-  {
-    self.init("\(identifier).\(ext.rawValue)", scene: scene)
-  }
-
-  public init(_ identifier: String, @StageBuilder scene: () -> Scene)
-  {
-    stage = Pixar.Usd.Stage.createNew(identifier)
-
-    scene().forEach
-    { prim in
-
-      if !prim.path.string.isEmpty
-      {
-        print("Defining prim:", prim.path.string)
-        let parent = stage.definePrim(prim.path, type: prim.typeName)
-
-        for children in prim.children
-        {
-          let child = define(prim: children, after: [parent])
-
-          for grandchildren in children.children
-          {
-            let grandchild = define(prim: grandchildren, after: [parent, child])
-
-            for n3children in grandchildren.children
-            {
-              let _ = define(prim: n3children, after: [parent, child, grandchild])
-            }
-          }
-        }
-      }
+    self.prims = []
+    for prim in prims()
+    {
+      define(prim: prim, after: self.prims)
+      self.prims.append(prim)
     }
   }
 
-  private func define(prim: any Prim, after primStack: [Pixar.Usd.Prim]) -> Pixar.Usd.Prim
+  public init(_ identifier: String,
+              load set: Pixar.Usd.Stage.InitialLoadingSet = .all,
+              @StageBuilder prims: () -> [UsdPrim])
+  {
+    stage = Pixar.Usd.Stage.createNew(identifier, load: set)
+    self.prims = prims()
+  }
+
+  @discardableResult
+  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
   {
     let primPath: Pixar.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
 
@@ -96,16 +65,39 @@ public struct UsdStage: Stage
       return p1.append(path: sdfPath)
     }
 
-    return stage.definePrim(pathDepth.append(path: primPath), type: prim.typeName)
+    switch prim.type
+    {
+      case .xform:
+        return Pixar.UsdGeom.Xform.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .sphere:
+        return Pixar.UsdGeom.Sphere.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .capsule:
+        return Pixar.UsdGeom.Capsule.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .cylinder:
+        return Pixar.UsdGeom.Cylinder.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .cube:
+        return Pixar.UsdGeom.Cube.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .cone:
+        return Pixar.UsdGeom.Cone.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .plane:
+        return Pixar.UsdGeom.Plane.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case let .token(type):
+        return stage.definePrim(pathDepth.append(path: primPath), type: type)
+      default:
+        return stage.definePrim(pathDepth.append(path: primPath))
+    }
   }
 
   @StageBuilder
-  public var scene: Scene
+  public var scene: [UsdPrim]
   {
-    getPrims()
+    getPrims().compactMap
+    {
+      UsdPrim($0.path.string, type: .token($0.typeName))
+    }
   }
 
-  private func getPrims() -> Scene
+  private func getPrims() -> [Pixar.Usd.Prim]
   {
     let it = Pixar.UsdPrimRange.Stage(stage.pointee.getPtr())
 
@@ -126,5 +118,16 @@ public struct UsdStage: Stage
     stage.save()
 
     return self
+  }
+
+  /**
+   * Common file exts, for convenience.
+   */
+  public enum FileExt: String, CaseIterable
+  {
+    case usd
+    case usda
+    case usdc
+    case usdz
   }
 }

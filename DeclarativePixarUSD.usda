@@ -3,13 +3,13 @@
     doc = "SwiftUSD v23.11.15 | Declarative API"
 )
 
-def "Hello"
+def Xform "Hello"
 {
     def "Declarative"
     {
-        def "Scene"
+        def Sphere "World"
         {
-            def "Description"
+            def Cube "Box"
             {
             }
         }
