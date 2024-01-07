@@ -16,13 +16,14 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
 
 import Foundation
 import Plug
+import Rainbow
 
 public extension Bundle
 {
@@ -133,6 +134,8 @@ public extension Pixar
 {
   struct Bundle
   {
+    let fileManager = FileManager.default
+
     public static let shared = Pixar.Bundle()
 
     private init()
@@ -154,6 +157,8 @@ public extension Pixar
 
     private func resourcesInit()
     {
+      var showHelp = false
+
       /* 1. find all resource paths (ex. Usd/Contents/Resources) */
       let resources = BundleFramework.allCases.compactMap(\.resourcePath)
 
@@ -161,11 +166,67 @@ public extension Pixar
       var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
       _ = resources.map
       { path in
-        #if DEBUG_PIXAR_BUNDLE
-          Msg.Log.point("Adding usd resource", to: path)
-        #endif /* DEBUG_PIXAR_BUNDLE */
 
-        plugPaths.push_back(std.string(path))
+        if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil)
+        {
+          showHelp = true
+
+          let src = path
+          let dest = path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources"
+          let srcEnum = fileManager.enumerator(atPath: src)
+
+          do
+          {
+            if fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents", isDirectory: nil)
+            {
+              try fileManager.removeItem(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents")
+            }
+
+            try fileManager.createDirectory(atPath: dest, withIntermediateDirectories: true)
+
+            while let file = srcEnum?.nextObject() as? String
+            {
+              let sourceFile = src.appending("/\(file)")
+              let destFile = dest.appending("/\(file)")
+
+              if sourceFile.contains("Contents")
+              {
+                continue
+              }
+
+              #if DEBUG_PIXAR_BUNDLE
+                Msg.Log.point("Moving resource: \(sourceFile)", to: destFile)
+              #endif /* DEBUG_PIXAR_BUNDLE */
+
+              try fileManager.moveItem(atPath: sourceFile,
+                                       toPath: destFile)
+            }
+          }
+          catch
+          {
+            Msg.Log.error("Could not copy usd resource from \(src) to \(dest): ", error.localizedDescription)
+          }
+
+          #if DEBUG_PIXAR_BUNDLE
+            Msg.Log.point("Adding usd resource", to: dest)
+          #endif /* DEBUG_PIXAR_BUNDLE */
+
+          plugPaths.push_back(std.string(dest))
+        }
+        else
+        {
+          #if DEBUG_PIXAR_BUNDLE
+            Msg.Log.point("Adding usd resource", to: path)
+          #endif /* DEBUG_PIXAR_BUNDLE */
+
+          plugPaths.push_back(std.string(path))
+        }
+      }
+
+      if showHelp
+      {
+        showBundleHelp(with: resources.first ?? "")
+        showHelp = false
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */
@@ -243,5 +304,52 @@ public enum BundlePython: CaseIterable
       case .pyUsdShaders: Bundle.pyUsdShaders?.resourcePath
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
     }
+  }
+}
+
+public extension Pixar.Bundle
+{
+  func showBundleHelp(with missing: String)
+  {
+    Msg.Log.warn("\("\("MISSING USD RESOURCE".magenta) -------------------------------------------------------------------")")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("\(missing)".magenta)")
+    Msg.Log.warn("")
+    Msg.Log.warn("----------------------------------------------------------------------------------------")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("Since this path does not exist, it will be created for you, however, prefer bundling the")")
+    Msg.Log.warn("\("application bundle appropriately with https://swiftbundler.dev instead of the \("swift run".yellow)")")
+    Msg.Log.warn("\("command, this is because \("swift run".yellow) is not meant to run bundled applications, it is best")")
+    Msg.Log.warn("\("suited for command line utilities that do not require application resources or graphical")")
+    Msg.Log.warn("\("user interfaces.")")
+    Msg.Log.warn("")
+    Msg.Log.warn("----------------------------------------------------------------------------------------")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("The recommended method of running your app is to add swift bundler to the swift package")")
+    Msg.Log.warn("\("by adding the following code to your package") \("dependencies".yellow) \("array:")")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("\("dependencies: [".green)".green)")
+    Msg.Log.warn("\("\("  .package(url: \"https://github.com/furby-tm/swift-bundler\", from: \"2.0.9\")".green)".green)")
+    Msg.Log.warn("\("\("]".green)".green)")
+    Msg.Log.warn("")
+    Msg.Log.warn("----------------------------------------------------------------------------------------")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("Then, instead of running") \("swift run".yellow)\(", use swift bundler's package plugin command:")")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("\("swift package --disable-sandbox plugin bundler run -p".green) \("macOS".yellow) \("MyApp".yellow)")")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("\("NOTE:".magenta) Ensure that you replace \("MyApp".yellow) to the name of your executable target,".cyan)")
+    Msg.Log.warn("\("and change the platform (-p \("macOS".yellow)) depending on the intended platform.".cyan)")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("The following platforms are currently supported:")")
+    Msg.Log.warn("\("\("*".yellow) \("linux".magenta)")")
+    Msg.Log.warn("\("\("*".yellow) \("macOS".magenta)")")
+    Msg.Log.warn("\("\("*".yellow) \("visionOS".magenta) or \("visionOSSimulator".magenta)")")
+    Msg.Log.warn("\("\("*".yellow) \("iOS".magenta) or \("iOSSimulator".magenta)")")
+    Msg.Log.warn("")
+    Msg.Log.warn("\("When running on \("visionOSSimulator".magenta) or \("iOSSimulator".magenta), the simulator will automatically")")
+    Msg.Log.warn("\("launch with an instance of your bundled app running within it.")")
+    Msg.Log.warn("")
+    Msg.Log.warn("----------------------------------------------------------------------------------------")
   }
 }

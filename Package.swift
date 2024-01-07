@@ -1015,7 +1015,7 @@ let package = Package(
       ],
       swiftSettings: [
         // enable to debug bundled (python, plugins, resources).
-        // .define("DEBUG_PIXAR_BUNDLE"),
+        .define("DEBUG_PIXAR_BUNDLE"),
         .interoperabilityMode(.Cxx),
       ]
     ),

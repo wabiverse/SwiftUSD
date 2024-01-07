@@ -45,38 +45,32 @@ public extension Msg
 {
   func point(_ subject: String, to msgArgs: Any...)
   {
-    print(
-      "[ INFO ] ".blue +
-        subject.cyan +
-        String(repeating: " ", count: max(35 - subject.count, 1)) +
-        "-> ".yellow +
-        msgArgs.flatMap { "\($0)".magenta }
-    )
+    print("\("[ INFO ] ".blue)\(subject.cyan)\(String(repeating: " ", count: max(35 - subject.count, 1)))\("-> ".yellow + msgArgs.flatMap { "\($0)".magenta })")
   }
 
   func info(_ msgArgs: Any...)
   {
-    print("[ INFO ] ".blue + msgArgs.flatMap { "\($0)".cyan })
+    print("\("[ INFO ] ".blue + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func debug(_ msgArgs: Any...)
   {
-    print("[ DEBUG ] ".magenta + msgArgs.flatMap { "\($0)".cyan })
+    print("\("[ DEBUG ] ".magenta + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func success(_ msgArgs: Any...)
   {
-    print("[ SUCCESS ] ".green + msgArgs.flatMap { "\($0)".cyan })
+    print("\("[ SUCCESS ] ".green + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func warn(_ msgArgs: Any...)
   {
-    print("[ WARN ] ".yellow + msgArgs.flatMap { "\($0)".cyan })
+    print("\("[ WARN ] ".yellow + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 
   func error(_ msgArgs: Any...)
   {
-    print("[ ERROR ] ".red + msgArgs.flatMap { "\($0)".cyan })
+    print("\("[ ERROR ] ".red + msgArgs.flatMap { "\($0)".lightWhite })")
   }
 }
 
