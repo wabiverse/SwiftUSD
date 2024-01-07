@@ -16,19 +16,27 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
+
+import Foundation
+import Rainbow
 
 /* --- xxx --- */
 
 public final class Msg
 {
-  private init()
-  {}
-
   public static let Log = Msg()
+
+  private init()
+  {
+    #if os(macOS)
+      // Disable colored output for Xcode (only applies to macOS platform).
+      Rainbow.enabled = ProcessInfo.processInfo.environment["__XCODE_BUILT_PRODUCTS_DIR_PATHS"] == nil
+    #endif /* os(macOS) */
+  }
 }
 
 /* --- xxx --- */
@@ -37,113 +45,38 @@ public extension Msg
 {
   func point(_ subject: String, to msgArgs: Any...)
   {
-    print(Colors.cyan.rawValue + subject + Colors.default.rawValue +
-      Colors.yellow.rawValue + String(repeating: " ", count: max(35 - subject.count, 1)) + "-> " + Colors.default.rawValue +
-      Colors.magenta.rawValue + "\(msgArgs)" + (Colors.default.rawValue + ""))
+    print(
+      "[ INFO ] ".blue +
+        subject.cyan +
+        String(repeating: " ", count: max(35 - subject.count, 1)) +
+        "-> ".yellow +
+        msgArgs.flatMap { "\($0)".magenta }
+    )
   }
 
   func info(_ msgArgs: Any...)
   {
-    log(parseArgs(args: msgArgs), type: "INFO", color: .blue)
+    print("[ INFO ] ".blue + msgArgs.flatMap { "\($0)".cyan })
   }
 
   func debug(_ msgArgs: Any...)
   {
-    log(parseArgs(args: msgArgs), type: "DEBUG", color: .magenta)
+    print("[ DEBUG ] ".magenta + msgArgs.flatMap { "\($0)".cyan })
   }
 
   func success(_ msgArgs: Any...)
   {
-    log(parseArgs(args: msgArgs), type: "SUCCESS", color: .green)
+    print("[ SUCCESS ] ".green + msgArgs.flatMap { "\($0)".cyan })
   }
 
   func warn(_ msgArgs: Any...)
   {
-    log(parseArgs(args: msgArgs), type: "WARNING", color: .yellow)
+    print("[ WARN ] ".yellow + msgArgs.flatMap { "\($0)".cyan })
   }
 
   func error(_ msgArgs: Any...)
   {
-    log(parseArgs(args: msgArgs), type: "ERROR", color: .red)
-  }
-}
-
-/* --- xxx --- */
-
-public extension Msg
-{
-  private func log(_ message: String, type: String, color: Colors = .default)
-  {
-    print(color.rawValue + "[ " + type + " ]" + Colors.default.rawValue + " " + color.rawValue + message + (Colors.default.rawValue + ""))
-  }
-
-  private func parseArgs(args: [Any]) -> String
-  {
-    var argIndex = 0
-    var message = ""
-    for arg in args
-    {
-      if argIndex >= 1
-      {
-        message += " "
-        message += "\(arg)"
-      }
-      else
-      {
-        message += "\(arg)"
-      }
-
-      argIndex += 1
-    }
-
-    return message
-  }
-}
-
-/* --- xxx --- */
-
-public extension Msg
-{
-  enum Colors: String
-  {
-    case black = "\u{001B}[0;30m"
-    case red = "\u{001B}[0;31m"
-    case green = "\u{001B}[0;32m"
-    case yellow = "\u{001B}[0;33m"
-    case blue = "\u{001B}[0;34m"
-    case magenta = "\u{001B}[0;35m"
-    case cyan = "\u{001B}[0;36m"
-    case white = "\u{001B}[0;37m"
-    case `default` = "\u{001B}[0;0m"
-
-    func name() -> String
-    {
-      switch self
-      {
-        case .black: "Black"
-        case .red: "Red"
-        case .green: "Green"
-        case .yellow: "Yellow"
-        case .blue: "Blue"
-        case .magenta: "Magenta"
-        case .cyan: "Cyan"
-        case .white: "White"
-        case .default: "Default"
-      }
-    }
-
-    static func all() -> [Colors]
-    {
-      [.black, .red, .green, .yellow, .blue, .magenta, .cyan, .white]
-    }
-  }
-
-  func testColors()
-  {
-    for c in Colors.all()
-    {
-      Msg.Log.log("This is printed in " + c.name(), type: "TEST", color: c)
-    }
+    print("[ ERROR ] ".red + msgArgs.flatMap { "\($0)".cyan })
   }
 }
 

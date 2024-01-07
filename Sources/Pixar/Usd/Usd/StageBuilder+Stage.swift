@@ -38,11 +38,7 @@ public struct UsdStage
     stage = Pixar.Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
 
     self.prims = []
-    for prim in prims()
-    {
-      define(prim: prim, after: self.prims)
-      self.prims.append(prim)
-    }
+    populate(prims: prims())
   }
 
   public init(_ identifier: String,
@@ -50,7 +46,18 @@ public struct UsdStage
               @StageBuilder prims: () -> [UsdPrim])
   {
     stage = Pixar.Usd.Stage.createNew(identifier, load: set)
-    self.prims = prims()
+
+    self.prims = []
+    populate(prims: prims())
+  }
+
+  private mutating func populate(prims: [UsdPrim])
+  {
+    for prim in prims
+    {
+      define(prim: prim, after: self.prims)
+      self.prims.append(prim)
+    }
   }
 
   @discardableResult

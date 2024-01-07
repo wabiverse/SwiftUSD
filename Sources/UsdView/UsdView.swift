@@ -96,7 +96,7 @@ enum Creator
 
     /* ------------------------------------ */
 
-    print("'usdview' not yet implemented... will exit now.")
+    Msg.Log.debug("UsdView is not yet implemented... will exit now.")
 
     /* ------------------------------------ */
   }

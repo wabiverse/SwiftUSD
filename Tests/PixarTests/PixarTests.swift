@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -201,14 +201,7 @@ final class ArTests: XCTestCase
 
     for (i, r) in resolvers.enumerated()
     {
-      Msg.Log.point(
-        "Pixar.Ar.getAllResolvers()"
-          + "\(Msg.Colors.yellow.rawValue) -> "
-          + "\(Msg.Colors.default.rawValue)["
-          + "\(Msg.Colors.green.rawValue)\(i + 1) of \(resolvers.count)"
-          + "\(Msg.Colors.default.rawValue)]",
-        to: "\(r)"
-      )
+      Msg.Log.point("Pixar.Ar.getAllResolvers() [\(i + 1)/\(resolvers.count)]", to: r)
     }
   }
 }
@@ -225,14 +218,7 @@ final class KindTests: XCTestCase
 
     for (i, t) in tokens.enumerated()
     {
-      Msg.Log.point(
-        "Pixar.Kind.Tokens"
-          + "\(Msg.Colors.yellow.rawValue) -> "
-          + "\(Msg.Colors.default.rawValue)["
-          + "\(Msg.Colors.green.rawValue)\(i + 1) of \(tokens.count)"
-          + "\(Msg.Colors.default.rawValue)]",
-        to: "\(t.getToken().string)"
-      )
+      Msg.Log.point("Pixar.Kind.Tokens [\(i + 1)/\(tokens.count)]", to: t.getToken().string)
     }
 
     XCTAssertEqual(tokens.count, 5)

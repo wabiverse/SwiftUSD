@@ -234,6 +234,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
+    .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.7"),
   ],
@@ -265,7 +266,9 @@ let package = Package(
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
         /* ---------- Apple only libs. ---------- */
-        .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform))
+        .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
+        /* ------ Terminal console colors. ------ */
+        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
       ],
       publicHeadersPath: "include",
       cxxSettings: [
@@ -1011,7 +1014,8 @@ let package = Package(
         .define("DEBUG_MEMORY_MANAGEMENT", to: "0"),
       ],
       swiftSettings: [
-        .define("DEBUG_PIXAR_BUNDLE", .when(configuration: .debug)),
+        // enable to debug bundled (python, plugins, resources).
+        // .define("DEBUG_PIXAR_BUNDLE"),
         .interoperabilityMode(.Cxx),
       ]
     ),
