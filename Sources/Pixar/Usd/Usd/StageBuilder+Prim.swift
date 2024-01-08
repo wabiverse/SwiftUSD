@@ -70,9 +70,20 @@ public extension UsdPrim
     case scope
     case geomSubset
     case gprim
+    case distantLight
+    case diskLight
+    case rectLight
+    case sphereLight
+    case cylinderLight
+    case geometryLight
+    case domeLight
+    case portalLight
     case xform
     case xformable
     case xformCommonAPI
+    case lightAPI
+    case meshLightAPI
+    case volumeLightAPI
     case motionAPI
     case primvarsAPI
     case geomModelAPI

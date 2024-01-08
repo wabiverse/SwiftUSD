@@ -88,6 +88,7 @@ enum Creator
     {
       UsdPrim("Hello", type: .xform)
       UsdPrim("Declarative")
+      UsdPrim("Sun", type: .distantLight)
       UsdPrim("World", type: .sphere)
       UsdPrim("Box", type: .cube)
     }

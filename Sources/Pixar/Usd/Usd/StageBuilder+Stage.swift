@@ -88,6 +88,22 @@ public struct UsdStage
         return Pixar.UsdGeom.Cone.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
       case .plane:
         return Pixar.UsdGeom.Plane.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .distantLight:
+        return Pixar.UsdLux.DistantLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .diskLight:
+        return Pixar.UsdLux.DiskLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .rectLight:
+        return Pixar.UsdLux.RectLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .sphereLight:
+        return Pixar.UsdLux.SphereLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .cylinderLight:
+        return Pixar.UsdLux.CylinderLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .geometryLight:
+        return Pixar.UsdLux.GeometryLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .domeLight:
+        return Pixar.UsdLux.DomeLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
+      case .portalLight:
+        return Pixar.UsdLux.PortalLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
       case let .token(type):
         return stage.definePrim(pathDepth.append(path: primPath), type: type)
       default:

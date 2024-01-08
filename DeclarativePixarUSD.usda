@@ -7,10 +7,13 @@ def Xform "Hello"
 {
     def "Declarative"
     {
-        def Sphere "World"
+        def DistantLight "Sun"
         {
-            def Cube "Box"
+            def Sphere "World"
             {
+                def Cube "Box"
+                {
+                }
             }
         }
     }
