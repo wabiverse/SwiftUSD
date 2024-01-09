@@ -3,18 +3,23 @@
     doc = "SwiftUSD v23.11.17 | Declarative API"
 )
 
-def Xform "Hello"
+def "DeclarativeScene"
 {
-    def "DeclarativeSceneDescription"
+    def DistantLight "Sun"
     {
-        def DistantLight "Sun"
+        def Xform "Hello"
         {
             def Sphere "World"
             {
-                def Cube "Box"
-                {
-                }
             }
+
+            def Cube "Box"
+            {
+            }
+        }
+
+        def Cone "RandomCone"
+        {
         }
     }
 }

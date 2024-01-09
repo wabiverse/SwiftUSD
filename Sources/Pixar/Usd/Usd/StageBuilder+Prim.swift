@@ -47,6 +47,14 @@ public struct UsdPrim
   }
 }
 
+extension UsdPrim: Equatable
+{
+  public static func == (lhs: UsdPrim, rhs: UsdPrim) -> Bool
+  {
+    lhs.path.string == rhs.path.string
+  }
+}
+
 public extension UsdPrim
 {
   enum PrimType

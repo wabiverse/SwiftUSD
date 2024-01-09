@@ -78,10 +78,21 @@ public struct UsdStage
     for prim in prims
     {
       define(prim: prim, after: self.prims)
-      self.prims.append(prim)
+
+      /* Step into this prims scope. */
+      if prim == prims.first
+      {
+        self.prims.append(prim)
+      }
 
       /* Recursively populate children. */
       populate(prims: prim.children)
+
+      /* Step out of this prims scope. */
+      if self.prims.contains(prim)
+      {
+        self.prims.removeAll(where: { $0 == prim })
+      }
     }
   }
 

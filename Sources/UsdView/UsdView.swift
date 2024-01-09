@@ -86,15 +86,17 @@ enum Creator
 
     UsdStage("DeclarativePixarUSD", ext: .usda)
     {
-      UsdPrim("Hello", type: .xform)
+      UsdPrim("DeclarativeScene")
       {
-        UsdPrim("DeclarativeSceneDescription")
+        UsdPrim("Sun", type: .distantLight)
         {
-          UsdPrim("Sun", type: .distantLight)
+          UsdPrim("Hello", type: .xform)
           {
             UsdPrim("World", type: .sphere)
             UsdPrim("Box", type: .cube)
           }
+          
+          UsdPrim("RandomCone", type: .cone)
         }
       }
     }
