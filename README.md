@@ -17,7 +17,7 @@ For more details, please visit the web site [here](http://openusd.org).
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.16"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.17"),
 ]
 ```
 
@@ -45,7 +45,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.16")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.17")
   ],
   targets: [
     /* 📕 For library products... */
@@ -116,6 +116,36 @@ enum Creator
   }
 }
 ```
+
+##### Or, if you prefer those swifty declarative APIs...
+```swift
+import Foundation
+import Pixar
+
+@main
+enum Creator
+{
+  static func main()
+  {
+    /* Setup all usd resources (python, plugins, resources). */
+
+    Pixar.Bundle.shared.setup(.resources)
+
+    /* Create a new USD stage with a transform and a sphere. */
+
+    UsdStage("HelloPixarUSD", ext: .usda)
+    {
+      UsdPrim("Hello", type: .xform)
+      {
+        UsdPrim("World", type: .sphere)
+      }
+    }
+    .set(doc: "Stay Swifty.")
+    .save()
+  }
+}
+```
+
 <br>
 
 > [!NOTE]
