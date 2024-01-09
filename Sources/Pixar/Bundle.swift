@@ -157,6 +157,7 @@ public extension Pixar
 
     private func resourcesInit()
     {
+      /* ?. Toggle app bundling help in console. */
       var showHelp = false
 
       /* 1. find all resource paths (ex. Usd/Contents/Resources) */
@@ -167,57 +168,26 @@ public extension Pixar
       _ = resources.map
       { path in
 
+        /* Check for the existence of usd plugins, if they do not exist, we install them automatically. */
         if !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil),
            !path.contains(".app")
         {
+          /* Tell user what we are doing. */
           showHelp = true
 
-          let src = path
-          let dest = path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources"
-          let srcEnum = fileManager.enumerator(atPath: src)
-
-          do
-          {
-            if fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents", isDirectory: nil)
-            {
-              try fileManager.removeItem(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents")
-            }
-
-            try fileManager.createDirectory(atPath: dest, withIntermediateDirectories: true)
-
-            while let file = srcEnum?.nextObject() as? String
-            {
-              let sourceFile = src.appending("/\(file)")
-              let destFile = dest.appending("/\(file)")
-
-              if sourceFile.contains("Contents")
-              {
-                continue
-              }
-
-              #if DEBUG_PIXAR_BUNDLE
-                Msg.logger.log(level: .info, "Moving resource: \(sourceFile) -> \(destFile)")
-              #endif /* DEBUG_PIXAR_BUNDLE */
-
-              try fileManager.moveItem(atPath: sourceFile,
-                                       toPath: destFile)
-            }
-          }
-          catch
-          {
-            Msg.logger.log(level: .error, "Could not copy usd resource from \(src) to \(dest): \(error.localizedDescription)")
-          }
+          /* Automatically install the plugin. */
+          let installedPlug = installPlug(at: path)
 
           #if DEBUG_PIXAR_BUNDLE
-            Msg.logger.log(level: .info, "Adding usd resource -> \(dest)")
+            Msg.logger.log(level: .info, "Adding usd resource -> \(shortenedPath(from: installedPlug).trailing)")
           #endif /* DEBUG_PIXAR_BUNDLE */
 
-          plugPaths.push_back(std.string(dest))
+          plugPaths.push_back(std.string(installedPlug))
         }
         else
         {
           #if DEBUG_PIXAR_BUNDLE
-            Msg.logger.log(level: .info, "Adding usd resource -> \(path)")
+            Msg.logger.log(level: .info, "Adding usd resource -> \(shortenedPath(from: path).trailing)")
           #endif /* DEBUG_PIXAR_BUNDLE */
 
           plugPaths.push_back(std.string(path))
@@ -226,7 +196,10 @@ public extension Pixar
 
       if showHelp
       {
-        showBundleHelp(with: resources.first ?? "")
+        showBundleHelp(
+          with: resources.map { shortenedPath(from: $0).trailing },
+          searched: shortenedPath(from: resources.first ?? "").leading
+        )
         showHelp = false
       }
 
@@ -310,17 +283,114 @@ public enum BundlePython: CaseIterable
 
 public extension Pixar.Bundle
 {
-  func showBundleHelp(with missing: String)
+  private func installPlug(at path: String) -> String
+  {
+    func strip(_ path: String) -> String
+    {
+      path.replacingOccurrences(of: "/Contents/Resources", with: "")
+    }
+
+    let dest = strip(path) + "/Contents/Resources"
+    let srcEnum = fileManager.enumerator(atPath: path)
+
+    do
+    {
+      if fileManager.fileExists(atPath: strip(path) + "/Contents", isDirectory: nil)
+      {
+        try fileManager.removeItem(atPath: strip(path) + "/Contents")
+      }
+
+      try fileManager.createDirectory(atPath: dest, withIntermediateDirectories: true)
+
+      while let file = srcEnum?.nextObject() as? String
+      {
+        let sourceFile = path.appending("/\(file)")
+        let destFile = dest.appending("/\(file)")
+
+        if sourceFile.contains("Contents")
+        {
+          continue
+        }
+
+        #if DEBUG_PIXAR_BUNDLE
+          Msg.logger.log(level: .info, "Moving resource: \(sourceFile) -> \(destFile)")
+        #endif /* DEBUG_PIXAR_BUNDLE */
+
+        try fileManager.moveItem(atPath: sourceFile,
+                                 toPath: destFile)
+      }
+    }
+    catch
+    {
+      Msg.logger.log(level: .error, "Could not move usd resource from \(path) to \(dest): \(error.localizedDescription)")
+    }
+
+    return dest
+  }
+}
+
+private extension Pixar.Bundle
+{
+  struct ShortPath
+  {
+    var leading: String
+    var trailing: String
+  }
+
+  /**
+   * Shorten a plug's long path up to its bundle dir by
+   * returning the shortened path part of the string as
+   * a struct with leading and trailing parts. Only for
+   * console logs to keep them short and readable.
+   */
+  func shortenedPath(from string: String) -> ShortPath
+  {
+    #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
+      /** xcode build directories are capitalized, swiftpm builds are not. */
+      let isXcodeBuild = string.contains("Build")
+
+      #if DEBUG
+        let shortenTo = isXcodeBuild ? "Debug/" : "debug/"
+      #else
+        let shortenTo = isXcodeBuild ? "Release/" : "release/"
+      #endif
+    #else
+      #if DEBUG
+        let shortenTo = "debug/"
+      #else
+        let shortenTo = "release/"
+      #endif
+    #endif
+
+    if let theRange = string.range(of: shortenTo, options: .backwards)
+    {
+      return ShortPath(leading: String(string[..<theRange.lowerBound]) + shortenTo,
+                       trailing: String(string[theRange.upperBound...]))
+    }
+    else
+    {
+      return ShortPath(leading: string, trailing: string)
+    }
+  }
+}
+
+private extension Pixar.Bundle
+{
+  func showBundleHelp(with missing: [String], searched: String)
   {
     Msg.logger.log(level: .warning, """
 
-      \("MISSING USD RESOURCE".magenta) -------------------------------------------------------------------
+      \("MISSING USD RESOURCES".magenta) ------------------------------------------------------------------
 
-      \(missing.magenta)
+      \("We searched for resources in the following location:".lightBlue)
+      \("*".yellow)  \(searched.magenta)
+
+      \("And the following resources were not found:".lightBlue)
+      \(missing.map { "\("*".yellow)  \($0.magenta)" }.joined(separator: "\n"))
 
       ----------------------------------------------------------------------------------------
 
-      Plugins are not installed and will be installed for you, however, you should bundle your
+      Plugins are not installed and will be installed for you, however, you should bundle the
       application bundle appropriately with \("https://swiftbundler.dev".cyan) instead of the \("swift run".yellow)
       command, this is because \("swift run".yellow) is not meant to run bundled applications, it is best
       suited for command line utilities that do not require application resources or graphical
@@ -339,10 +409,10 @@ public extension Pixar.Bundle
 
       Then, instead of running \("swift run".yellow), use swift bundler's package plugin command:
 
-      \("swift package --disable-sandbox plugin bundler run -p".green) \("macOS".yellow) \("MyApp".yellow)
+      \("$".red) \("swift".yellow) package \("--disable-sandbox".lightWhite) plugin bundler run \("-p".lightWhite) \("macOS".magenta) \("MyApp".yellow)
 
       \("NOTE:".magenta) Ensure that you replace \("MyApp".yellow) to the name of your executable target,
-      and change the platform (-p \("macOS".yellow)) depending on the intended platform.
+      and change the platform (\("-p".lightWhite) \("macOS".magenta)) depending on the intended platform.
 
       The following platforms are currently supported:
       \("*".yellow) \("linux".magenta)
