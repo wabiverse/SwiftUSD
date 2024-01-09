@@ -25,6 +25,17 @@ import Foundation
 import Sdf
 import Usd
 
+/**
+ * A Pixar.Usd.Stage for declaratively authoring scene description.
+ *
+ * This api is currently experimental and will evolve overtime, its
+ * purpose is to declaratively author scene description in a design
+ * pattern that is similiar to that of SwiftUI, while ensuring that
+ * the full range and extensibility of Pixar's USD API is preserved
+ * within a innovative, exceptionally simple and highly expressible
+ * way to author scene description using UsdPrim building blocks to
+ * compose a scenegraph that are owned & presented by the outermost
+ * UsdStage that contains them. */
 public struct UsdStage
 {
   public var stage: StageRefPtr
@@ -57,57 +68,6 @@ public struct UsdStage
     {
       define(prim: prim, after: self.prims)
       self.prims.append(prim)
-    }
-  }
-
-  @discardableResult
-  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
-  {
-    let primPath: Pixar.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
-
-    let pathDepth = primStack.reduce(Pixar.SdfPath("/"))
-    { p1, p2 in
-      let sdfPath: Pixar.SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
-
-      return p1.append(path: sdfPath)
-    }
-
-    switch prim.type
-    {
-      case .xform:
-        return Pixar.UsdGeom.Xform.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .sphere:
-        return Pixar.UsdGeom.Sphere.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .capsule:
-        return Pixar.UsdGeom.Capsule.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .cylinder:
-        return Pixar.UsdGeom.Cylinder.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .cube:
-        return Pixar.UsdGeom.Cube.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .cone:
-        return Pixar.UsdGeom.Cone.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .plane:
-        return Pixar.UsdGeom.Plane.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .distantLight:
-        return Pixar.UsdLux.DistantLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .diskLight:
-        return Pixar.UsdLux.DiskLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .rectLight:
-        return Pixar.UsdLux.RectLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .sphereLight:
-        return Pixar.UsdLux.SphereLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .cylinderLight:
-        return Pixar.UsdLux.CylinderLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .geometryLight:
-        return Pixar.UsdLux.GeometryLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .domeLight:
-        return Pixar.UsdLux.DomeLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case .portalLight:
-        return Pixar.UsdLux.PortalLight.define(stage, path: pathDepth.append(path: primPath)).GetPrim()
-      case let .token(type):
-        return stage.definePrim(pathDepth.append(path: primPath), type: type)
-      default:
-        return stage.definePrim(pathDepth.append(path: primPath))
     }
   }
 
@@ -152,5 +112,103 @@ public struct UsdStage
     case usda
     case usdc
     case usdz
+  }
+}
+
+/* 
+ * ------------------------------------------------------------------------------
+ * Private UsdStage extensions to allow users to declaratively define prim types.
+ * --- */
+
+public extension UsdStage
+{
+  /**
+   * Private internal function to allow declaratively defining prim schema types.
+   *
+   * Usage example:
+   * ```
+   * UsdStage("HelloWorldExample", ext: .usda)
+   * {
+   *   UsdPrim("Hello", type: .xform)
+   *   {
+   *     UsdPrim("World", type: .sphere)
+   *   }
+   * }
+   * ``` */
+  @discardableResult
+  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
+  {
+    let primPath: Pixar.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
+
+    let pathDepth = primStack.reduce(Pixar.SdfPath("/"))
+    { p1, p2 in
+      let sdfPath: Pixar.SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
+
+      return p1.append(path: sdfPath)
+    }
+
+    switch prim.type
+    {
+      case .xform, .sphere, .capsule, .cylinder, .cube, .cone, .plane:
+        return defGeom(prim, path: primPath, after: pathDepth)
+      case .distantLight, .diskLight, .rectLight, .sphereLight, .cylinderLight, .geometryLight, .domeLight, .portalLight:
+        return defLux(prim, path: primPath, after: pathDepth)
+      case let .token(type):
+        return stage.definePrim(pathDepth.append(path: primPath), type: type)
+      default:
+        return stage.definePrim(pathDepth.append(path: primPath))
+    }
+  }
+
+  /**
+   * Private internal function to allow declaratively defining Pixar.UsdGeom schema types. */
+  private func defGeom(_ prim: UsdPrim, path: Pixar.Sdf.Path, after pathDepth: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+  {
+    switch prim.type
+    {
+      case .xform:
+        Pixar.UsdGeom.Xform.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .sphere:
+        Pixar.UsdGeom.Sphere.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .capsule:
+        Pixar.UsdGeom.Capsule.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .cylinder:
+        Pixar.UsdGeom.Cylinder.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .cube:
+        Pixar.UsdGeom.Cube.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .cone:
+        Pixar.UsdGeom.Cone.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .plane:
+        Pixar.UsdGeom.Plane.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      default:
+        stage.definePrim(pathDepth.append(path: path))
+    }
+  }
+
+  /**
+   * Private internal function to allow declaratively defining Pixar.UsdLux schema types. */
+  private func defLux(_ prim: UsdPrim, path: Pixar.Sdf.Path, after pathDepth: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+  {
+    switch prim.type
+    {
+      case .distantLight:
+        Pixar.UsdLux.DistantLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .diskLight:
+        Pixar.UsdLux.DiskLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .rectLight:
+        Pixar.UsdLux.RectLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .sphereLight:
+        Pixar.UsdLux.SphereLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .cylinderLight:
+        Pixar.UsdLux.CylinderLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .geometryLight:
+        Pixar.UsdLux.GeometryLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .domeLight:
+        Pixar.UsdLux.DomeLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      case .portalLight:
+        Pixar.UsdLux.PortalLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+      default:
+        stage.definePrim(pathDepth.append(path: path))
+    }
   }
 }
