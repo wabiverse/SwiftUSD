@@ -87,10 +87,16 @@ enum Creator
     UsdStage("DeclarativePixarUSD", ext: .usda)
     {
       UsdPrim("Hello", type: .xform)
-      UsdPrim("Declarative")
-      UsdPrim("Sun", type: .distantLight)
-      UsdPrim("World", type: .sphere)
-      UsdPrim("Box", type: .cube)
+      {
+        UsdPrim("DeclarativeSceneDescription")
+        {
+          UsdPrim("Sun", type: .distantLight)
+          {
+            UsdPrim("World", type: .sphere)
+            UsdPrim("Box", type: .cube)
+          }
+        }
+      }
     }
     .set(doc: "SwiftUSD v\(Pixar.version) | Declarative API")
     .save()

@@ -5,7 +5,7 @@
 
 def Xform "Hello"
 {
-    def "Declarative"
+    def "DeclarativeSceneDescription"
     {
         def DistantLight "Sun"
         {

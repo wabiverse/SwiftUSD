@@ -37,11 +37,13 @@ public struct UsdPrim
 {
   public var path: Pixar.Sdf.Path
   public var type: PrimType
+  public var children: [UsdPrim]
 
-  public init(_ path: String, type: PrimType = .token(Pixar.TfToken()))
+  public init(_ path: String, type: PrimType = .token(Pixar.TfToken()), @StageBuilder children: () -> [UsdPrim] = { [] })
   {
     self.path = Pixar.Sdf.Path("/\(path)")
     self.type = type
+    self.children = children()
   }
 }
 

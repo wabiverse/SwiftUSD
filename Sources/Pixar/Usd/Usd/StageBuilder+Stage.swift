@@ -35,7 +35,18 @@ import Usd
  * within a innovative, exceptionally simple and highly expressible
  * way to author scene description using UsdPrim building blocks to
  * compose a scenegraph that are owned & presented by the outermost
- * UsdStage that contains them. */
+ * UsdStage that contains them.
+ *
+ * Usage example:
+ * ```
+ * UsdStage("HelloWorldExample", ext: .usda)
+ * {
+ *   UsdPrim("Hello", type: .xform)
+ *   {
+ *     UsdPrim("World", type: .sphere)
+ *   }
+ * }
+ * ``` */
 public struct UsdStage
 {
   public var stage: StageRefPtr
@@ -68,6 +79,9 @@ public struct UsdStage
     {
       define(prim: prim, after: self.prims)
       self.prims.append(prim)
+
+      /* Recursively populate children. */
+      populate(prims: prim.children)
     }
   }
 
@@ -115,7 +129,7 @@ public struct UsdStage
   }
 }
 
-/* 
+/*
  * ------------------------------------------------------------------------------
  * Private UsdStage extensions to allow users to declaratively define prim types.
  * --- */
@@ -123,18 +137,7 @@ public struct UsdStage
 public extension UsdStage
 {
   /**
-   * Private internal function to allow declaratively defining prim schema types.
-   *
-   * Usage example:
-   * ```
-   * UsdStage("HelloWorldExample", ext: .usda)
-   * {
-   *   UsdPrim("Hello", type: .xform)
-   *   {
-   *     UsdPrim("World", type: .sphere)
-   *   }
-   * }
-   * ``` */
+   * Private internal function to allow declaratively defining prim schema types. */
   @discardableResult
   private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
   {
