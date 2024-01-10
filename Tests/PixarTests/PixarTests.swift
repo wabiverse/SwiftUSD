@@ -50,11 +50,6 @@ final class ArchTests: XCTestCase
     Msg.logger.log(level: .info, "Pixar.Arch.isMainThread() -> \(Pixar.Arch.isMainThread())")
   }
 
-  func testMainThreadId()
-  {
-    Msg.logger.log(level: .info, "Pixar.Arch.getMainThreadId() -> \(Pixar.Arch.getMainThreadId())")
-  }
-
   func testAlignMemoryOfSize()
   {
     let size = 1024

@@ -16,7 +16,7 @@
  * write to the Free Software Foundation, Inc., to the address of
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2023 Wabi Foundation. All Rights Reserved.
+ *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * --------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * -------------------------------------------------------------- */
@@ -33,11 +33,5 @@ public extension Pixar.Arch
   static func isMainThread() -> Bool
   {
     Pixar.ArchIsMainThread()
-  }
-
-  /// Return the std::thread_id for the thread arch considers to be the "main" thread.
-  static func getMainThreadId() -> Any
-  {
-    Pixar.ArchGetMainThreadId()
   }
 }
