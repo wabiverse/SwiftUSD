@@ -58,7 +58,7 @@
 #include <OneTBB/tbb/concurrent_vector.h>
 #include <OneTBB/tbb/spin_rw_mutex.h>
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <functional>
 #include <memory>

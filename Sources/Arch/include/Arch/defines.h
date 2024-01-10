@@ -26,12 +26,16 @@
 
 #include <pxr/pxrns.h>
 
+#include "Arch/swiftInterop.h"
+
 #if defined(__APPLE__)
 /* clang modules doesn't appreciate
  * this include inside of a namespace
  * so we moved it out - @furby-tm. */
 #include "TargetConditionals.h"
 #endif // defined(__APPLE__)
+
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 

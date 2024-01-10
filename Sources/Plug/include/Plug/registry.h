@@ -37,7 +37,7 @@
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <mutex>
 #include <string>

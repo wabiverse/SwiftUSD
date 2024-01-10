@@ -68,7 +68,7 @@
 #include "Vt/dictionary.h"
 #include "Vt/value.h"
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <iosfwd>

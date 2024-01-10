@@ -37,7 +37,7 @@
 
 #include "Tf/hash.h"
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <type_traits>
 

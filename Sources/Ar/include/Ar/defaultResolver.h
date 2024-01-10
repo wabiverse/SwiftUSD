@@ -32,7 +32,7 @@
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <memory>
 #include <string>

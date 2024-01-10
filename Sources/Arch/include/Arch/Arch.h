@@ -2,8 +2,10 @@
 #define __PXR_BASE_ARCH_H__
 
 // Arch
-#include <Arch/align.h>
 #include <Arch/api.h>
+#include <Arch/swiftInterop.h>
+
+#include <Arch/align.h>
 #include <Arch/attributes.h>
 #include <Arch/buildMode.h>
 #include <Arch/daemon.h>

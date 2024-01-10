@@ -44,7 +44,7 @@
 #include "Work/dispatcher.h"
 #include <pxr/pxrns.h>
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <boost/optional.hpp>
 

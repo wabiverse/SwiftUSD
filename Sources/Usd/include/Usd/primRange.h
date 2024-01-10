@@ -30,7 +30,7 @@
 #include "Usd/primFlags.h"
 #include <pxr/pxrns.h>
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <iterator>
 #include <vector>

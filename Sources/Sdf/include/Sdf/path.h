@@ -38,7 +38,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <algorithm>
 #include <iterator>

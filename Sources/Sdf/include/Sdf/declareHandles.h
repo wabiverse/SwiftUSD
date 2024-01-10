@@ -35,7 +35,7 @@
 #include "Tf/weakPtrFacade.h"
 #include "Sdf/api.h"
 
-#include <swift/bridging>
+#include <Arch/swiftInterop.h>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/operators.hpp>
