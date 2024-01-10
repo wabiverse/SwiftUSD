@@ -237,7 +237,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.7"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.9"),
   ],
   targets: [
     .target(
