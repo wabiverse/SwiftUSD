@@ -1064,11 +1064,11 @@ enum Arch
 
     public static func dependency(_ dependency: Dependency) -> [Target.Dependency]
     {
-      #if os(macOS)
+      #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
         [dependency.product(for: .apple)].compactMap { $0 }
-      #elseif os(Linux)
+      #elseif os(Linux) || os(Android) || os(OpenBSD) || os(FreeBSD)
         [dependency.product(for: .linux)].compactMap { $0 }
-      #elseif os(Windows)
+      #elseif os(Windows) || os(Cygwin)
         [dependency.product(for: .windows)].compactMap { $0 }
       #elseif os(WASI)
         [dependency.product(for: .web)].compactMap { $0 }
