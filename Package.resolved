@@ -32,26 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "revision" : "0ed6c776d91bf926aa7fe29a2b8d28877a531480",
-        "version" : "1.3.9"
-      }
-    },
-    {
-      "identity" : "metaversepythonframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaversePythonFramework",
-      "state" : {
-        "revision" : "7e0507f8c9bd4aa18e23b62f896b0ee766d696c1",
-        "version" : "3.11.4"
-      }
-    },
-    {
-      "identity" : "metaversevulkanframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
-      "state" : {
-        "revision" : "d81c5b35576887a5e04211657cca1535b43ab0a5",
-        "version" : "1.26.1"
+        "revision" : "5f22ae41a50418f2d465017b58815455e5efac7a",
+        "version" : "1.4.0"
       }
     },
     {
@@ -61,15 +43,6 @@
       "state" : {
         "revision" : "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
         "version" : "1.0.1"
-      }
-    },
-    {
-      "identity" : "pythonkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pvieito/PythonKit.git",
-      "state" : {
-        "revision" : "41dd1e76bb31661f59efbc1784e8f60ccc32a9d5",
-        "version" : "0.4.1"
       }
     },
     {

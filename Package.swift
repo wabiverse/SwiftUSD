@@ -237,7 +237,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.3.9"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.4.0"),
   ],
   targets: [
     .target(
@@ -286,8 +286,9 @@ let package = Package(
         .define("PXR_HDF5_SUPPORT_ENABLED", to: "1"),
         /* --------- OSL is temp disabled. --------- */
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
-        /* --------- Apple platforms only. --------- */
+        /* --------- Apple build settings. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        /* --------- Standard USD defines. --------- */
         .define("MFB_PACKAGE_NAME", to: "Arch"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Arch"),
         .define("MFB_PACKAGE_MODULE", to: "Arch"),
@@ -344,6 +345,9 @@ let package = Package(
         .target(name: "Js"),
       ],
       cxxSettings: [
+        /* --------- Fix missing TBB allocator funcs. --------- */
+        .define("TBB_ALLOCATOR_TRAITS_BROKEN", to: "1", .when(platforms: Arch.OS.linux.platform)),
+        /* --------- Standard USD source definitions. --------- */
         .define("MFB_PACKAGE_NAME", to: "Trace"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
         .define("MFB_PACKAGE_MODULE", to: "Trace"),
