@@ -255,7 +255,6 @@ let package = Package(
         .product(name: "MetaTBB", package: "MetaverseKit"),
         .product(name: "PyBind11", package: "MetaverseKit"),
         .product(name: "MaterialX", package: "MetaverseKit"),
-        .product(name: "Boost", package: "MetaverseKit"),
         .product(name: "MetaPy", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
@@ -271,7 +270,7 @@ let package = Package(
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
-      ],
+      ] + Arch.OS.dependency(.boost),
       publicHeadersPath: "include",
       cxxSettings: [
         /* ---------- Turn everything on. ---------- */
@@ -1060,6 +1059,39 @@ enum Arch
         case .linux: [.linux, .android, .openbsd]
         case .windows: [.windows]
         case .web: [.wasi]
+      }
+    }
+
+    public static func dependency(_ dependency: Dependency) -> [Target.Dependency]
+    {
+      #if os(macOS)
+        [dependency.product(for: .apple)].compactMap { $0 }
+      #elseif os(Linux)
+        [dependency.product(for: .linux)].compactMap { $0 }
+      #elseif os(Windows)
+        [dependency.product(for: .windows)].compactMap { $0 }
+      #elseif os(WASI)
+        [dependency.product(for: .web)].compactMap { $0 }
+      #else
+        []
+      #endif
+    }
+
+    enum Dependency
+    {
+      case boost
+
+      public func product(for os: OS) -> Target.Dependency?
+      {
+        switch self
+        {
+          case .boost:
+            switch os
+            {
+              case .apple: .product(name: "Boost", package: "MetaverseKit")
+              default: nil
+            }
+        }
       }
     }
   }
