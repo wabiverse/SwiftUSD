@@ -1941,7 +1941,7 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-void SdfLayerRetain(Pixar::SdfLayer *);
-void SdfLayerRelease(Pixar::SdfLayer *);
+void SdfLayerRetain(PXR_NS::SdfLayer *);
+void SdfLayerRelease(PXR_NS::SdfLayer *);
 
 #endif // PXR_USD_SDF_LAYER_H

@@ -17,7 +17,7 @@ For more details, please visit the web site [here](http://openusd.org).
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.17"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.18"),
 ]
 ```
 
@@ -45,7 +45,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.17")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.18")
   ],
   targets: [
     /* 📕 For library products... */
@@ -92,7 +92,7 @@ let package = Package(
 ##### Finally, author scene description, this is a working example of creating a new USD stage with a transform and a sphere in swift.
 ```swift
 import Foundation
-import Pixar
+import PixarUSD
 
 @main
 enum Creator
@@ -101,7 +101,7 @@ enum Creator
   {
     /* Setup all usd resources (python, plugins, resources). */
 
-    Pixar.Bundle.shared.setup(.resources)
+    Pixar.Bundler.shared.setup(.resources)
 
     /* Create a new USD stage with a transform and a sphere. */
 
@@ -120,7 +120,7 @@ enum Creator
 ##### Or, if you prefer those swifty declarative APIs...
 ```swift
 import Foundation
-import Pixar
+import PixarUSD
 
 @main
 enum Creator
@@ -129,7 +129,7 @@ enum Creator
   {
     /* Setup all usd resources (python, plugins, resources). */
 
-    Pixar.Bundle.shared.setup(.resources)
+    Pixar.Bundler.shared.setup(.resources)
 
     /* Create a new USD stage with a transform and a sphere. */
 

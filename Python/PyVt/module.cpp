@@ -50,5 +50,5 @@ TF_WRAP_MODULE {
   Vt_AddBufferProtocolSupportToVtArrays();
 
   TF_WRAP(Dictionary);
-  TF_WRAP(Value);
+  TF_WRAP(VtValue);
 }

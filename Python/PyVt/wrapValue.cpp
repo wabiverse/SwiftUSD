@@ -232,7 +232,7 @@ private:
 
 } // anonymous namespace
 
-void wrapValue() {
+void wrapVtValue() {
   def("_test_ValueTypeName", _test_ValueTypeName);
   def("_test_Ident", _test_Ident);
   def("_test_Str", _test_Str);

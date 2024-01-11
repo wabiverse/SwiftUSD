@@ -22,7 +22,7 @@
  * -------------------------------------------------------------- */
 
 import Foundation
-import Pixar
+import PixarUSD
 
 @main
 enum Creator
@@ -31,7 +31,7 @@ enum Creator
   {
     /* Setup all usd resources (python, plugins, resources). */
 
-    Pixar.Bundle.shared.setup(.resources)
+    Pixar.Bundler.shared.setup(.resources)
 
     /* ----- Imperative api example. ----- */
 
@@ -95,7 +95,7 @@ enum Creator
             UsdPrim("World", type: .sphere)
             UsdPrim("Box", type: .cube)
           }
-          
+
           UsdPrim("RandomCone", type: .cone)
         }
       }
@@ -111,7 +111,7 @@ enum Creator
   }
 }
 
-enum MaterialColor: String, CaseIterable
+public enum ShadeColor: String, CaseIterable
 {
   case red
   case orange
@@ -122,7 +122,7 @@ enum MaterialColor: String, CaseIterable
   case white
   case black
 
-  var vec3f: GfVec3f
+  public var vec3f: GfVec3f
   {
     switch self
     {
@@ -145,7 +145,7 @@ enum MaterialColor: String, CaseIterable
  * - Parameter color: The diffuse color to set on the shader.
  * - Returns: The newly created material.
  */
-func matDef(_ stage: StageRefPtr, color: MaterialColor = .white) -> Pixar.UsdShade.Material
+public func matDef(_ stage: StageRefPtr, color: ShadeColor = ShadeColor.white) -> Pixar.UsdShade.Material
 {
   let matName = "\(color.rawValue.capitalized)Material"
 

@@ -8319,15 +8319,15 @@ UsdStage::_SetMetadataImpl(const UsdObject &, const TfToken &, const TfToken &,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-void UsdStageRetain(Pixar::UsdStage *stage)
+void UsdStageRetain(PXR_NS::UsdStage *stage)
 {
 #if DEBUG_MEMORY_MANAGEMENT
   printf("Called UsdStageRetain()\n");
 #endif /* DEBUG_MEMORY_MANAGEMENT */
-  // Pixar::UsdStage *ref = stage;
+  // PXR_NS::UsdStage *ref = stage;
 }
 
-void UsdStageRelease(Pixar::UsdStage *stage)
+void UsdStageRelease(PXR_NS::UsdStage *stage)
 {
 #if DEBUG_MEMORY_MANAGEMENT
   printf("Called UsdStageRelease()\n");

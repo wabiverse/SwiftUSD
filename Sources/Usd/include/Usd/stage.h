@@ -2362,7 +2362,7 @@ UsdStage::_SetMetadata(const UsdObject &object, const TfToken &key,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-void UsdStageRetain(Pixar::UsdStage *);
-void UsdStageRelease(Pixar::UsdStage *);
+void UsdStageRetain(PXR_NS::UsdStage *);
+void UsdStageRelease(PXR_NS::UsdStage *);
 
 #endif // PXR_USD_USD_STAGE_H

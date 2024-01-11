@@ -41,8 +41,8 @@
 
 /* ------ swift usd. ------ */
 
-#define SWIFTUSD_EVOLUTION 17
-#define PXR_INTERNAL_NS Pixar
+#define SWIFTUSD_EVOLUTION 18
+#define PXR_INTERNAL_NS pxrInternal_v0_23__pxrReserved__
 
 /* ------------------------ */
 
@@ -71,11 +71,11 @@
   convenience, else users would have to use the longer form of the namespace in swift
   code.
  */
-namespace Pixar { }
+namespace pxrInternal_v0_23__pxrReserved__ { }
 
 // The root level namespace for all source in the USD distribution.
-namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
+namespace pxr {
+    using namespace pxrInternal_v0_23__pxrReserved__;
 }
 
 #define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
