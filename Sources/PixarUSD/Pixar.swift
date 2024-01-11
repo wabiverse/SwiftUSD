@@ -22,11 +22,11 @@
  * -------------------------------------------------------------- */
 
 import CxxStdlib
-import pxr
+@_exported import pxr
 
-public typealias Pixar_v23 = pxrInternal_v0_23__pxrReserved__
+public typealias Pixar_v23 = Pixar
 
-public enum Pixar
+public extension Pixar
 {
   /**
    * The current version of **SwiftUSD**.
@@ -36,7 +36,7 @@ public enum Pixar
    * SwiftPM package, which is setup as follows:
    * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION``
    */
-  public static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
+  static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
 
   /**
     # ``Arch``
@@ -47,7 +47,7 @@ public enum Pixar
     It's purpose is to isolate all platform dependencies into one small library,
     serving as a common area for documentation of these multi-platform issues.
    */
-  public struct Arch
+  struct Arch
   {}
 
   /**
@@ -59,7 +59,7 @@ public enum Pixar
      writing JSON data from C++, and converting between arbitrary recursive
      container structures.
    */
-  public struct Js
+  struct Js
   {}
 
   /**
@@ -70,7 +70,7 @@ public enum Pixar
     **Tf** is the **tools foundations** library, it contains foundation
     classes and functions for all C/C++ software development.
    */
-  public struct Tf
+  struct Tf
   {}
 
   /**
@@ -82,7 +82,7 @@ public enum Pixar
     classes and functions for working with the basic mathematical aspects
     of computer graphics.
    */
-  public struct Gf
+  struct Gf
   {}
 
   /**
@@ -93,7 +93,7 @@ public enum Pixar
     **Trace** is the **performance tracking** library, it contains utility classes
     for counting, timing, measuring, and recording events.
    */
-  public struct Trace
+  struct Trace
   {}
 
   /**
@@ -104,7 +104,7 @@ public enum Pixar
     **Work** is intended to simplify the use of *multithreading* in the context of
     our software ecosystem.
    */
-  public struct Work
+  struct Work
   {}
 
   /**
@@ -117,7 +117,7 @@ public enum Pixar
     mechanism for registering and looking up plug-in modules both automatically upon
     first use and manually at runtime by client calls to ``PlugRegistry.RegisterPlugins()``.
    */
-  public struct Plug
+  struct Plug
   {}
 
   /**
@@ -130,7 +130,7 @@ public enum Pixar
     on the level of language data types and there are differences in the C++ and
     Python APIs.
    */
-  public struct Vt
+  struct Vt
   {}
 
   /**
@@ -142,7 +142,7 @@ public enum Pixar
     writing asset data. It provides several interfaces that allow **USD** to access
     an asset without knowing how that asset is physically stored.
    */
-  public struct Ar
+  struct Ar
   {}
 
   /**
@@ -156,7 +156,7 @@ public enum Pixar
     and ``KindRegistry.IsA()`` queries enable reasoning about the hierarchy and classifying
     objects by kind.
    */
-  public struct Kind
+  struct Kind
   {}
 
   /**
@@ -168,82 +168,82 @@ public enum Pixar
     or a multitude of plugin-defined formats.  It also provides the primitive abstractions for
     interacting with scene description, such as ``SdfPath``, ``SdfLayer``, ``SdfPrimSpec``.
    */
-  public struct Sdf
+  struct Sdf
   {}
 
-  public struct Ndr
+  struct Ndr
   {}
 
-  public struct Sdr
+  struct Sdr
   {}
 
-  public struct Pcp
+  struct Pcp
   {}
 
-  public struct Usd
+  struct Usd
   {}
 
-  public struct UsdGeom
+  struct UsdGeom
   {}
 
-  public struct UsdVol
+  struct UsdVol
   {}
 
-  public struct UsdMedia
+  struct UsdMedia
   {}
 
-  public struct UsdShade
+  struct UsdShade
   {}
 
-  public struct UsdLux
+  struct UsdLux
   {}
 
-  public struct UsdRender
+  struct UsdRender
   {}
 
-  public struct UsdHydra
+  struct UsdHydra
   {}
 
-  public struct UsdRi
+  struct UsdRi
   {}
 
-  public struct UsdSkel
+  struct UsdSkel
   {}
 
-  public struct UsdUI
+  struct UsdUI
   {}
 
-  public struct UsdUtils
+  struct UsdUtils
   {}
 
-  public struct UsdPhysics
+  struct UsdPhysics
   {}
 
-  public struct UsdAbc
+  struct UsdAbc
   {}
 
-  public struct UsdDraco
+  struct UsdDraco
   {}
 
-  public struct Garch
+  struct Garch
   {}
 
-  public struct CameraUtil
+  struct CameraUtil
   {}
 
-  public struct PxOsd
+  struct PxOsd
   {}
 
-  public struct Glf
+  struct Glf
   {}
 
-  public struct UsdImagingGL
+  struct UsdImagingGL
   {}
 
-  public struct UsdAppUtils
+  struct UsdAppUtils
   {}
 
-  public struct Usdview
+  struct Usdview
   {}
 }
 

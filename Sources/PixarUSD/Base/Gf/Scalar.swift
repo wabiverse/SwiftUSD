@@ -54,16 +54,4 @@ public protocol Scalar: Dimensional
 
   /// Squared length.
   func getLengthSq() -> ScalarType
-
-  /// Returns the length of this vector.
-  func getLength() -> ScalarType
-
-  /// Normalizes the vector in place to unit length, returning the
-  /// length before normalization. If the length of the vector is
-  /// smaller than the supplied eps, the vector is set to the null
-  /// vector and zero is returned. The vector is unchanged otherwise.
-  mutating func normalize(_ eps: ScalarType) -> ScalarType
-
-  /// Returns a normalized (unit-length) copy of this vector.
-  func getNormalized(_ eps: ScalarType) -> Self
 }
