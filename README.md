@@ -53,7 +53,7 @@ let package = Package(
       name: "MyMetaverseLibrary",
       dependencies: [
         /* add pixar usd as a library dependency. */
-        .product(name: "Pixar", package: "SwiftUSD")
+        .product(name: "PixarUSD", package: "SwiftUSD"),
       ],
       swiftSettings: [
         /* needed for SwiftUSD. */
@@ -66,7 +66,7 @@ let package = Package(
       name: "MyMetaverseApp",
       dependencies: [
         /* add pixar usd as an executable dependency. */
-        .product(name: "Pixar", package: "SwiftUSD"),
+        .product(name: "PixarUSD", package: "SwiftUSD"),
       ],
       swiftSettings: [
         /* needed for SwiftUSD. */
