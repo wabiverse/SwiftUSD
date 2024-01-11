@@ -41,7 +41,7 @@
 
 /* ------ swift usd. ------ */
 
-#define SWIFTUSD_EVOLUTION 18
+#define SWIFTUSD_EVOLUTION 19
 #define PXR_INTERNAL_NS pxrInternal_v0_23__pxrReserved__
 
 /* ------------------------ */

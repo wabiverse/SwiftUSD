@@ -62,7 +62,11 @@ public extension Bundle
 {
   static let pxrRoot = Bundle.main.resourcePath ?? ""
 
+  #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
+  static let ext = ".bundle"
+  #else
   static let ext = ".resources"
+  #endif
 
   /**
    * Where ``Pixar.Ar`` application bundle resources are located. */
