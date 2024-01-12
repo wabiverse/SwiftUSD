@@ -34,7 +34,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func isClose(_ a: Double, _ b: Double, within epsilon: Double) -> Bool
   {
-    Pixar_v23.GfIsClose(a, b, epsilon)
+    Pixar.GfIsClose(a, b, epsilon)
   }
 
   /// Converts an angle in radians to degrees.
@@ -44,7 +44,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func radiansToDegrees(angle radians: Double) -> Double
   {
-    Pixar_v23.GfRadiansToDegrees(radians)
+    Pixar.GfRadiansToDegrees(radians)
   }
 
   /// Converts an angle in degrees to radians.
@@ -54,7 +54,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func degreesToRadians(angle degrees: Double) -> Double
   {
-    Pixar_v23.GfDegreesToRadians(degrees)
+    Pixar.GfDegreesToRadians(degrees)
   }
 
   /* ----- Figure out why explicit type is needed ----- */
@@ -64,7 +64,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func sqr(_ x: Int) -> Double
   {
-    Pixar_v23.GfSqr(x)
+    Pixar.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -72,7 +72,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func sqr(_ x: Float) -> Double
   {
-    Pixar_v23.GfSqr(x)
+    Pixar.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -80,7 +80,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func sqr(_ x: Double) -> Double
   {
-    Pixar_v23.GfSqr(x)
+    Pixar.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -88,7 +88,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func sqr(_ x: GfVec2f) -> Double
   {
-    Pixar_v23.GfSqr(x)
+    Pixar.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -96,161 +96,161 @@ public extension Pixar.Gf
   @inline(__always)
   static func sqr(_ x: GfVec3f) -> Double
   {
-    Pixar_v23.GfSqr(x)
+    Pixar.GfSqr(x)
   }
 
   /// Return sqrt(f).
   @inline(__always)
   static func sqrt(_ f: Double) -> Double
   {
-    Pixar_v23.GfSqrt(f)
+    Pixar.GfSqrt(f)
   }
 
   /// Return sqrt(f).
   @inline(__always)
   static func sqrt(_ f: Float) -> Float
   {
-    Pixar_v23.GfSqrt(f)
+    Pixar.GfSqrt(f)
   }
 
   /// Return exp(f).
   @inline(__always)
   static func exp(_ f: Double) -> Double
   {
-    Pixar_v23.GfExp(f)
+    Pixar.GfExp(f)
   }
 
   /// Return exp(f).
   @inline(__always)
   static func exp(_ f: Float) -> Float
   {
-    Pixar_v23.GfExp(f)
+    Pixar.GfExp(f)
   }
 
   /// Return log(f).
   @inline(__always)
   static func log(_ f: Double) -> Double
   {
-    Pixar_v23.GfLog(f)
+    Pixar.GfLog(f)
   }
 
   /// Return log(f).
   @inline(__always)
   static func log(_ f: Float) -> Float
   {
-    Pixar_v23.GfLog(f)
+    Pixar.GfLog(f)
   }
 
   /// Return floor(f).
   @inline(__always)
   static func floor(_ f: Double) -> Double
   {
-    Pixar_v23.GfFloor(f)
+    Pixar.GfFloor(f)
   }
 
   /// Return floor(f).
   @inline(__always)
   static func floor(_ f: Float) -> Float
   {
-    Pixar_v23.GfFloor(f)
+    Pixar.GfFloor(f)
   }
 
   /// Return ceil(f).
   @inline(__always)
   static func ceil(_ f: Double) -> Double
   {
-    Pixar_v23.GfCeil(f)
+    Pixar.GfCeil(f)
   }
 
   /// Return ceil(f).
   @inline(__always)
   static func ceil(_ f: Float) -> Float
   {
-    Pixar_v23.GfCeil(f)
+    Pixar.GfCeil(f)
   }
 
   /// Return abs(f).
   @inline(__always)
   static func abs(_ f: Double) -> Double
   {
-    Pixar_v23.GfAbs(f)
+    Pixar.GfAbs(f)
   }
 
   /// Return abs(f).
   @inline(__always)
   static func abs(_ f: Float) -> Float
   {
-    Pixar_v23.GfAbs(f)
+    Pixar.GfAbs(f)
   }
 
   /// Return round(f).
   @inline(__always)
   static func round(_ f: Double) -> Double
   {
-    Pixar_v23.GfRound(f)
+    Pixar.GfRound(f)
   }
 
   /// Return round(f).
   @inline(__always)
   static func round(_ f: Float) -> Float
   {
-    Pixar_v23.GfRound(f)
+    Pixar.GfRound(f)
   }
 
   /// Return pow(f, p).
   @inline(__always)
   static func pow(_ f: Double, _ p: Double) -> Double
   {
-    Pixar_v23.GfPow(f, p)
+    Pixar.GfPow(f, p)
   }
 
   /// Return pow(f, p).
   @inline(__always)
   static func pow(_ f: Float, _ p: Float) -> Float
   {
-    Pixar_v23.GfPow(f, p)
+    Pixar.GfPow(f, p)
   }
 
   /// Return sin(v).
   @inline(__always)
   static func sin(_ v: Double) -> Double
   {
-    Pixar_v23.GfSin(v)
+    Pixar.GfSin(v)
   }
 
   /// Return sin(v).
   @inline(__always)
   static func sin(_ v: Float) -> Float
   {
-    Pixar_v23.GfSin(v)
+    Pixar.GfSin(v)
   }
 
   /// Return cos(v).
   @inline(__always)
   static func cos(_ v: Double) -> Double
   {
-    Pixar_v23.GfCos(v)
+    Pixar.GfCos(v)
   }
 
   /// Return cos(v).
   @inline(__always)
   static func cos(_ v: Float) -> Float
   {
-    Pixar_v23.GfCos(v)
+    Pixar.GfCos(v)
   }
 
   /// Return sin(v) in s and cos(v) in c.
   @inline(__always)
   static func sinCos(_ v: Double, _ s: inout Double, _ c: inout Double)
   {
-    Pixar_v23.GfSinCos(v, &s, &c)
+    Pixar.GfSinCos(v, &s, &c)
   }
 
   /// Return sin(v) in s and cos(v) in c.
   @inline(__always)
   static func sinCos(_ v: Float, _ s: inout Float, _ c: inout Float)
   {
-    Pixar_v23.GfSinCos(v, &s, &c)
+    Pixar.GfSinCos(v, &s, &c)
   }
 
   /// Return the resulting of clamping value to lie between
@@ -258,7 +258,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func clamp(_ value: Double, _ min: Double, _ max: Double) -> Double
   {
-    Pixar_v23.GfClamp(value, min, max)
+    Pixar.GfClamp(value, min, max)
   }
 
   /// Return the resulting of clamping value to lie between
@@ -266,7 +266,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func clamp(_ value: Float, _ min: Float, _ max: Float) -> Float
   {
-    Pixar_v23.GfClamp(value, min, max)
+    Pixar.GfClamp(value, min, max)
   }
 
   /// The mod function with "correct" behaviour for negative numbers.
@@ -277,7 +277,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func mod(_ a: Double, _ b: Double) -> Double
   {
-    Pixar_v23.GfMod(a, b)
+    Pixar.GfMod(a, b)
   }
 
   /// The mod function with "correct" behaviour for negative numbers.
@@ -288,7 +288,7 @@ public extension Pixar.Gf
   @inline(__always)
   static func mod(_ a: Float, _ b: Float) -> Float
   {
-    Pixar_v23.GfMod(a, b)
+    Pixar.GfMod(a, b)
   }
 
   /* -------------------------------------------------- */

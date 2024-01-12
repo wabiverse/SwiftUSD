@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCapsule = Pixar_v23.UsdGeomCapsule
+public typealias UsdGeomCapsule = Pixar.UsdGeomCapsule
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Capsule: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
   {
     Pixar.UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
   {
     Pixar.UsdGeom.Capsule.define(stage, path: .init(path))
   }

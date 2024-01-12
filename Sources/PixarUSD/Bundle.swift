@@ -69,103 +69,103 @@ public extension Bundle
   #endif
 
   /**
-   * Where ``Pixar.Ar`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/Ar`` application bundle resources are located. */
   static let ar = Bundle(path: "\(pxrRoot)/SwiftUSD_Ar\(ext)")
 
   /**
-   * Where ``Pixar.Sdf`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/Sdf`` application bundle resources are located. */
   static let sdf = Bundle(path: "\(pxrRoot)/SwiftUSD_Sdf\(ext)")
 
   /**
-   * Where ``Pixar.Usd`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/Usd`` application bundle resources are located. */
   static let usd = Bundle(path: "\(pxrRoot)/SwiftUSD_Usd\(ext)")
 
   /**
-   * Where ``Pixar.Ndr`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/Ndr`` application bundle resources are located. */
   static let ndr = Bundle(path: "\(pxrRoot)/SwiftUSD_Ndr\(ext)")
 
   /**
-   * Where ``Pixar.UsdGeom`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdGeom`` application bundle resources are located. */
   static let usdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdGeom\(ext)")
 
   /**
-   * Where ``Pixar.UsdShade`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdShade`` application bundle resources are located. */
   static let usdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShade\(ext)")
 
   /**
-   * Where ``Pixar.UsdShaders`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdShaders`` application bundle resources are located. */
   static let usdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShaders\(ext)")
 
   /**
-   * Where ``Pixar.UsdLux`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
   static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
 
   /**
-   * Where ``Pixar.Tf`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
   /**
-   * Where ``Pixar.Plug`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Plug`` python bundle resources are located. */
   static let pyPlug = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPlug\(ext)")
 
   /**
-   * Where ``Pixar.Trace`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Trace`` python bundle resources are located. */
   static let pyTrace = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTrace\(ext)")
 
   /**
-   * Where ``Pixar.Work`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Work`` python bundle resources are located. */
   static let pyWork = Bundle(path: "\(pxrRoot)/SwiftUSD_PyWork\(ext)")
 
   /**
-   * Where ``Pixar.Gf`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Gf`` python bundle resources are located. */
   static let pyGf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGf\(ext)")
 
   /**
-   * Where ``Pixar.Vt`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Vt`` python bundle resources are located. */
   static let pyVt = Bundle(path: "\(pxrRoot)/SwiftUSD_PyVt\(ext)")
 
   /**
-   * Where ``Pixar.Ar`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Ar`` python bundle resources are located. */
   static let pyAr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyAr\(ext)")
 
   /**
-   * Where ``Pixar.Kind`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Kind`` python bundle resources are located. */
   static let pyKind = Bundle(path: "\(pxrRoot)/SwiftUSD_PyKind\(ext)")
 
   /**
-   * Where ``Pixar.Sdf`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Sdf`` python bundle resources are located. */
   static let pySdf = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdf\(ext)")
 
   /**
-   * Where ``Pixar.Pcp`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Pcp`` python bundle resources are located. */
   static let pyPcp = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPcp\(ext)")
 
   /**
-   * Where ``Pixar.Usd`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Usd`` python bundle resources are located. */
   static let pyUsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsd\(ext)")
 
   /**
-   * Where ``Pixar.Ndr`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Ndr`` python bundle resources are located. */
   static let pyNdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyNdr\(ext)")
 
   /**
-   * Where ``Pixar.Sdr`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/Sdr`` python bundle resources are located. */
   static let pySdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdr\(ext)")
 
   /**
-   * Where ``Pixar.UsdGeom`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdGeom`` python bundle resources are located. */
   static let pyUsdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdGeom\(ext)")
 
   /**
-   * Where ``Pixar.UsdShade`` python bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdShade`` python bundle resources are located. */
   static let pyUsdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShade\(ext)")
 
   /**
-   * Where ``Pixar.UsdShaders`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdShaders`` application bundle resources are located. */
   static let pyUsdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShaders\(ext)")
 
   /**
-   * Where ``Pixar.UsdLux`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
   static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
 }
 
@@ -205,7 +205,7 @@ public extension Pixar
       let resources = BundleFramework.allCases.compactMap(\.resourcePath)
 
       /* 2. fill a std.vector of std.string plugin paths. */
-      var plugPaths = Pixar_v23.PlugRegistry.PlugPathsVector()
+      var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
       _ = resources.map
       { path in
 
@@ -250,7 +250,7 @@ public extension Pixar
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */
-      Pixar_v23.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
+      Pixar.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
     }
   }
 }

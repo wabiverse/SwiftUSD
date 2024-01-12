@@ -1,69 +1,63 @@
-# Comprehensive package documentation:
+# ``Tf``
+
+Contains foundation classes and functions for all C/C++ software development.
+
+### Comprehensive Package Documentation:
 - Notification System
 - Error-posting Facility
 - Diagnostic Facilities
 - Initialization Facilities
 - Memory Tagging System
 
-// Classes/functions by groups:
+### Classes and Functions by Groups:
 
-/// \defgroup group_tf_ObjectCreation Object Creation
-/// Classes for controlling creation of objects
+#### Object Creation
+Classes for controlling creation of objects
 
-/// \defgroup group_tf_Memory Memory Management
-/// Classes for memory management.
+#### Memory Management
+Classes for memory management.
 
-/// \defgroup group_tf_RuntimeTyping Runtime Typing
-/// Classes having to do with run-time typing.
+#### Runtime Typing
+Classes having to do with run-time typing.
 
-/// \defgroup group_tf_BasicMath Basic Mathematical Operations
-/// Functions for basic mathematical operations.
+#### Basic Mathematical Operations
+Functions for basic mathematical operations.
 
-/// \defgroup group_tf_DebuggingOutput Output for Debugging Purposes
-/// Functions/classes that generate output solely as a debugging aid
+#### Output for Debugging Purposes
+Functions/classes that generate output solely as a debugging aid
 
-/// \defgroup group_tf_Path Path Utilities
-/// Functions/classes for pathname manipulation.
+#### Path Utilities
+Functions/classes for pathname manipulation.
 
-/// \defgroup group_tf_Stl C++ STL Utilities
-/// Helper functions/classes for STL
+#### C++ STL Utilities
+Helper functions/classes for STL
 
-/// \defgroup group_tf_Preprocessor Preprocessor Utilities
-/// Preprocessor macros.
+#### Preprocessor Utilities
+Preprocessor macros.
 
-/// \defgroup group_tf_String String Utilities
-/// Functions/classes for string manipulation.
+#### String Utilities
+Functions/classes for string manipulation.
 
-/// \defgroup group_tf_File File Utilities
-/// Functions/classes for file handling.
+#### File Utilities
+Functions/classes for file handling.
 
-/// \defgroup group_tf_Performance Performance Measurements
-/// Functions/classes for measuring performance.
+#### Performance Measurements
+Functions/classes for measuring performance.
 
-/// \defgroup group_tf_SystemsExt Systems Extensions and Enhancements
-/// Functions/classes for extending/enhancing standard OS functionality.
+#### Systems Extensions and Enhancements
+Functions/classes for extending/enhancing standard OS functionality.
 
-/// \defgroup group_tf_Containers Container classes
-/// Classes that hold objects
+#### Container classes
+Classes that hold objects
 
-/// \defgroup group_tf_UiSupport UI Support
-/// Classes/functions for package-independent UI concepts
+#### UI Support
+Classes/functions for package-independent UI concepts
 
-/// \defgroup group_tf_TfCompilerAids Compiler Aids
-/// Classes/functions that help getting code compiled cleanly
+#### Compiler Aids
+Classes/functions that help getting code compiled cleanly
 
-/// \defgroup group_tf_Internal Internals Non-exported Functionality
-/// Functions/classes for libtf internal use only
-
-/*!
-\page tf_page_front Tf: Tools Foundations
-\if ( PIXAR_MFB_BUILD )
-\mainpage Tf : Tools Foundations
-\endif
-
-\anchor mainpage_tf
-
-Contains foundation classes and functions for all C/C++ software development.  
+#### Internals Non-exported Functionality
+Functions/classes for libtf internal use only
 
 The high-level grouping of C++ classes and functions is as follows:
    

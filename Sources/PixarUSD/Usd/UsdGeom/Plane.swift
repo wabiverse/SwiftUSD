@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomPlane = Pixar_v23.UsdGeomPlane
+public typealias UsdGeomPlane = Pixar.UsdGeomPlane
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Plane: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Plane
   {
     Pixar.UsdGeom.Plane.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Plane
   {
     Pixar.UsdGeom.Plane.define(stage, path: .init(path))
   }

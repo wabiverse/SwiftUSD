@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomXformable = Pixar_v23.UsdGeomXformable
+public typealias UsdGeomXformable = Pixar.UsdGeomXformable
 
 public extension Pixar.UsdGeom
 {

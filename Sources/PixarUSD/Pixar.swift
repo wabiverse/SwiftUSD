@@ -24,226 +24,313 @@
 import CxxStdlib
 @_exported import pxr
 
-public typealias Pixar_v23 = Pixar
-
 public extension Pixar
 {
   /**
-   * The current version of **SwiftUSD**.
+   * The current version of ``PixarUSD``.
    *
-   * The semantic versioning used for **SwiftUSD** tracks both the upstream
-   * Pixar USD version, as well as the evolution iteration of the **SwiftUSD**
+   * The semantic versioning used for ``PixarUSD`` tracks both the upstream
+   * Pixar USD version, as well as the evolution iteration of the ``PixarUSD``
    * SwiftPM package, which is setup as follows:
-   * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION``
-   */
+   * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION`` */
   static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
 
   /**
-    # ``Arch``
-
-    ## Overview
-
-    **Arch** is a repository for all **architecture-dependent code**.
-    It's purpose is to isolate all platform dependencies into one small library,
-    serving as a common area for documentation of these multi-platform issues.
-   */
-  struct Arch
+   * # ``Arch``
+   *
+   * **Architecture Dependent**
+   *
+   * ## Overview
+   *
+   * **Arch** is a repository for all **architecture-dependent code**.
+   * It's purpose is to isolate all platform dependencies into one small library,
+   * serving as a common area for documentation of these multi-platform issues. */
+  enum Arch
   {}
 
   /**
-     # ``Js``
-
-     ## Overview
-
-     **Js** is the **JSON I/O** library, it contains methods for parsing and
-     writing JSON data from C++, and converting between arbitrary recursive
-     container structures.
-   */
-  struct Js
+   * # ``Js``
+   *
+   * **JSON I/O**
+   *
+   * ## Overview
+   *
+   * **Js** is the **JSON I/O** library, it contains methods for parsing and
+   * writing JSON data from C++, and converting between arbitrary recursive
+   * container structures. */
+  enum Js
   {}
 
   /**
-    # ``Tf``
-
-    ## Overview
-
-    **Tf** is the **tools foundations** library, it contains foundation
-    classes and functions for all C/C++ software development.
-   */
-  struct Tf
+   * # ``Tf``
+   *
+   * **Tools Foundations**
+   *
+   * ## Overview
+   *
+   * **Tf** is the **tools foundations** library, it contains foundation
+   * classes and functions for all C/C++ software development. */
+  enum Tf
   {}
 
   /**
-    # ``Gf``
-
-    ## Overview
-
-    **Gf** is the **graphics foundations** library, it contains foundation
-    classes and functions for working with the basic mathematical aspects
-    of computer graphics.
-   */
-  struct Gf
+   * # ``Gf``
+   *
+   * **Graphics Foundations**
+   *
+   * ## Overview
+   *
+   * **Gf** is the **graphics foundations** library, it contains foundation
+   * classes and functions for working with the basic mathematical aspects
+   * of computer graphics. */
+  enum Gf
   {}
 
   /**
-    # ``Trace``
-
-    ## Overview
-
-    **Trace** is the **performance tracking** library, it contains utility classes
-    for counting, timing, measuring, and recording events.
-   */
-  struct Trace
+   * # ``Trace``
+   *
+   * **Performance Tracking**
+   *
+   * ## Overview
+   *
+   * **Trace** is the **performance tracking** library, it contains utility classes
+   * for counting, timing, measuring, and recording events. */
+  enum Trace
   {}
 
   /**
-    # ``Work``
-
-    ## Overview
-
-    **Work** is intended to simplify the use of *multithreading* in the context of
-    our software ecosystem.
-   */
-  struct Work
+   * # ``Work``
+   *
+   * **Multithreaded Dispatch**
+   *
+   * ## Overview
+   *
+   * **Work** is intended to simplify the use of *multithreading* in the context of
+   * our software ecosystem. */
+  enum Work
   {}
 
   /**
-    # ``Plug``
-
-    ## Overview
-
-    **Plug** is the **plugin-in framework** implementation, the ``PlugPlugin`` class
-    defines the interface to plug-in modules. The ``PlugRegistry`` class defines a
-    mechanism for registering and looking up plug-in modules both automatically upon
-    first use and manually at runtime by client calls to ``PlugRegistry.RegisterPlugins()``.
-   */
-  struct Plug
+   * # ``Plug``
+   *
+   * **Plugin Framework**
+   *
+   * ## Overview
+   *
+   * **Plug** is the **plugin-in framework** implementation, the ``Plug/PlugPlugin`` class
+   * defines the interface to plug-in modules. The ``Plug/PlugRegistry`` class defines a
+   * mechanism for registering and looking up plug-in modules both automatically upon
+   * first use and manually at runtime by client calls to ``Plug/PlugRegistry/registerPlugins()``. */
+  enum Plug
   {}
 
   /**
-    # ``Vt``
-
-    ## Overview
-
-    **Vt** is the **value types** library, it provides classes that represent
-    basic value types such as arrays, strings, and tokens. This library operates
-    on the level of language data types and there are differences in the C++ and
-    Python APIs.
-   */
-  struct Vt
+   * # ``Vt``
+   *
+   * **Value Types**
+   *
+   * ## Overview
+   *
+   * **Vt** is the **value types** library, it provides classes that represent
+   * basic value types such as arrays, strings, and tokens. This library operates
+   * on the level of language data types and there are differences in the C++ and
+   * Python APIs. */
+  enum Vt
   {}
 
   /**
-    # ``Ar``
-
-    ## Overview
-
-    **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
-    writing asset data. It provides several interfaces that allow **USD** to access
-    an asset without knowing how that asset is physically stored.
-   */
-  struct Ar
+   * # ``Ar``
+   *
+   * **Asset Resolution**
+   *
+   * ## Overview
+   *
+   * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
+   * writing asset data. It provides several interfaces that allow **USD** to access
+   * an asset without knowing how that asset is physically stored. */
+  enum Ar
   {}
 
   /**
-    # ``Kind``
-
-    ## Overview
-
-    The **Kind** library provides a runtime-extensible taxonomy known as **"Kinds"**.
-    **Kinds** are just **TfToken** symbols, but the ``KindRegistry`` allows for organizing
-    kinds into taxonomies of related/refined concepts, and the ``KindRegistry.GetBaseKind()``
-    and ``KindRegistry.IsA()`` queries enable reasoning about the hierarchy and classifying
-    objects by kind.
-   */
-  struct Kind
+   * # ``Kind``
+   *
+   * **Extensible Categorization**
+   *
+   * ## Overview
+   *
+   * The **Kind** library provides a runtime-extensible taxonomy known as **"Kinds"**.
+   * **Kinds** are just **TfToken** symbols, but the ``Kind/KindRegistry`` allows for organizing
+   * kinds into taxonomies of related/refined concepts, and the ``Kind/KindRegistry.GetBaseKind()``
+   * and ``Kind/KindRegistry.is(a:)`` queries enable reasoning about the hierarchy and classifying
+   * objects by kind. */
+  enum Kind
   {}
 
   /**
-    # ``Sdf``
-
-    ## Overview
-
-    **Sdf** provides the foundations for serializing scene description to a reference text format,
-    or a multitude of plugin-defined formats.  It also provides the primitive abstractions for
-    interacting with scene description, such as ``SdfPath``, ``SdfLayer``, ``SdfPrimSpec``.
-   */
-  struct Sdf
+   * # ``Sdf``
+   *
+   * **Scene Description Foundations**
+   *
+   * ## Overview
+   *
+   * **Sdf** provides the foundations for serializing scene description to a reference text format,
+   * or a multitude of plugin-defined formats.  It also provides the primitive abstractions for
+   * interacting with scene description, such as ``SdfPath``, ``SdfLayer``, ``SdfPrimSpec``. */
+  enum Sdf
   {}
 
-  struct Ndr
+  /**
+   * # ``Ndr``
+   *
+   * **Node Definition Registry**
+   *
+   * ## Overview
+   *
+   * **Ndr** provides a framework in which you can, agnostic to the node's domain
+   * (shading, lighting, compositing, etc), register nodes with **Ndr**, and they
+   * subsequently ask for information about those nodes. The information **Ndr**
+   * provides about these nodes will be fairly generic, given that **Ndr** must
+   * not cater to any specific type of node. However, specialized registries can
+   * derive from **Ndr**, and it is there that domain-specific logic can be
+   * implemented. Additionally, node parsing and "discovery" are done via
+   * plugins, again to keep **Ndr** generic and extendable. */
+  enum Ndr
   {}
 
-  struct Sdr
+  /**
+   * # ``Sdr``
+   *
+   * **Shader Definition Registry**
+   *
+   * ## Overview
+   *
+   * **Sdr** is a shading-specialized version of Ndr, and provides the following
+   * specialized classes:
+   * - ``Sdr/Registry``: A registry for nodes that describe shading information.
+   * - ``Sdr/ShaderNode``: A node that describes a shader.
+   * - ``Sdr/ShaderProperty``: A node that describes a shader property.
+   *
+   * For more details on the registry, nodes, or properties, see the base Ndr
+   * classes:
+   * - ``PixarUSD/__ObjC/Pixar/Ndr/Registry``: A registry for nodes that describe information.
+   * - ``PixarUSD/__ObjC/Pixar/Ndr/Node``: Represents an abstract node.
+   * - ``PixarUSD/__ObjC/Pixar/Ndr/Property``: Represents a property (input or output) that is part of a ``PixarUSD/__ObjC/Pixar/Ndr/Node``. */
+  enum Sdr
   {}
 
-  struct Pcp
+  /**
+   * # ``Pcp``
+   *
+   * **PrimCache Population (Composition)**
+   *
+   * ## Overview
+   *
+   * Pcp implements the core scenegraph composition semantics — the behavior
+   * informally referred to as *Layering & Referencing*. */
+  enum Pcp
   {}
 
-  struct Usd
+  /**
+   * # ``Usd``
+   *
+   * **Universal Scene Description (Core)**
+   *
+   * ## Overview
+   *
+   * **Usd** is the **universal scene description** library, it provides a
+   * high-level API for reading, authoring, and layering scene description. */
+  enum Usd
   {}
 
-  struct UsdGeom
+  /**
+   * # ``UsdGeom``
+   *
+   * **USD Geometry Schema**
+   *
+   * ## Overview
+   *
+   * **UsdGeom** defines the 3D graphics-related prim and property schemas that
+   * together form a basis for interchanging geometry between DCC tools in a
+   * graphics pipeline. */
+  enum UsdGeom
   {}
 
-  struct UsdVol
+  /**
+   * # ``UsdLux``
+   *
+   * **USD Lighting Schema**
+   *
+   * ## Overview
+   *
+   * **UsdLux** provides a representation for lights and related components that
+   * are common to many graphics environments and therefore suitable for interchange. */
+  enum UsdLux
   {}
 
-  struct UsdMedia
+  /**
+   * # ``UsdShade``
+   *
+   * **USD Shading Schema**
+   *
+   * ## Overview
+   *
+   * **UsdLux** provides a representation for lights and related components that
+   * are common to many graphics environments and therefore suitable for interchange. */
+  enum UsdShade
   {}
 
-  struct UsdShade
+  enum UsdVol
   {}
 
-  struct UsdLux
+  enum UsdMedia
   {}
 
-  struct UsdRender
+  enum UsdRender
   {}
 
-  struct UsdHydra
+  enum UsdHydra
   {}
 
-  struct UsdRi
+  enum UsdRi
   {}
 
-  struct UsdSkel
+  enum UsdSkel
   {}
 
-  struct UsdUI
+  enum UsdUI
   {}
 
-  struct UsdUtils
+  enum UsdUtils
   {}
 
-  struct UsdPhysics
+  enum UsdPhysics
   {}
 
-  struct UsdAbc
+  enum UsdAbc
   {}
 
-  struct UsdDraco
+  enum UsdDraco
   {}
 
-  struct Garch
+  enum Garch
   {}
 
-  struct CameraUtil
+  enum CameraUtil
   {}
 
-  struct PxOsd
+  enum PxOsd
   {}
 
-  struct Glf
+  enum Glf
   {}
 
-  struct UsdImagingGL
+  enum UsdImagingGL
   {}
 
-  struct UsdAppUtils
+  enum UsdAppUtils
   {}
 
-  struct Usdview
+  enum Usdview
   {}
 }
 

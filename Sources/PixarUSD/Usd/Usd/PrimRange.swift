@@ -23,7 +23,7 @@
 
 import Usd
 
-public typealias UsdPrimRange = Pixar_v23.UsdPrimRange
+public typealias UsdPrimRange = Pixar.UsdPrimRange
 
 public extension Pixar.Usd
 {
@@ -37,20 +37,20 @@ public extension Pixar.Usd
    * to traverse in depth-first pre- and post-order wher prims appear twice in
    * the range; first before all descendants and then again immediately after all
    * descendants. This is useful for maintaining state associated with subtrees,
-   * in a stack-like fashion.  See ``Usd.PrimRange.iterator.isPostVisit()`` to
+   * in a stack-like fashion.  See ``PrimRange/iterator/isPostVisit()`` to
    * detect when an iterator is visiting a prim for the second time.
    *
    * There are several constructors providing different levels of configurability;
    * ultimately, one can provide a prim predicate for a custom iteration, just as
    * one would use ``Usd.Prim.getFilteredChildren()`` in a custom recursion.
    *
-   * Why would one want to use a ``Usd.PrimRange`` rather than just iterating
-   * over the results of ``UsdPrim.getFilteredDescendants()``?  Primarily, if
+   * Why would one want to use a ``PrimRange`` rather than just iterating
+   * over the results of ``Prim/getFilteredDescendants()``?  Primarily, if
    * one of the following applies:
    * - You need to perform pre-and-post-order processing
    * - You may want to prune sub-trees from processing (see Usd.PrimRange.iterator.pruneChildren())
    * - You want to treat the root prim itself uniformly with its descendents (getFilteredDescendants() will not
-   * return the root prim itself, while ``Usd.PrimRange`` will, see  ``Usd.PrimRange.stage`` for an exception). */
+   * return the root prim itself, while ``PrimRange`` will, see  ``PrimRange/stage`` for an exception). */
   typealias PrimRange = UsdPrimRange
 }
 

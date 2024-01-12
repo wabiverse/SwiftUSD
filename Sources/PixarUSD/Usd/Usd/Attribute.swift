@@ -24,7 +24,7 @@
 import CxxStdlib
 import Usd
 
-public typealias UsdAttribute = Pixar_v23.UsdAttribute
+public typealias UsdAttribute = Pixar.UsdAttribute
 
 public extension Pixar.Usd
 {

@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomMesh = Pixar_v23.UsdGeomMesh
+public typealias UsdGeomMesh = Pixar.UsdGeomMesh
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Mesh: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Mesh
   {
     Pixar.UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Mesh
   {
     Pixar.UsdGeom.Mesh.define(stage, path: .init(path))
   }

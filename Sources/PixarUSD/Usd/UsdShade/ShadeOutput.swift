@@ -23,7 +23,7 @@
 
 import UsdShade
 
-public typealias UsdShadeOutput = Pixar_v23.UsdShadeOutput
+public typealias UsdShadeOutput = Pixar.UsdShadeOutput
 
 public extension Pixar.UsdShade
 {

@@ -23,7 +23,7 @@
 
 import Js
 
-public typealias JsParseError = Pixar_v23.JsParseError
+public typealias JsParseError = Pixar.JsParseError
 
 public extension Pixar.Js
 {

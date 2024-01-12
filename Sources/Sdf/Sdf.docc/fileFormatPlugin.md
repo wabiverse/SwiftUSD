@@ -1,5 +1,4 @@
-### <sub>Creating a File Format Plugin</sub>
-# <sup>**Pixar.Sdf**</sup>
+# ``Sdf``
 
 ### **Creating a File Format Plugin**
 
@@ -21,6 +20,7 @@ By default, the system assumes that each file format plugin supports all capabil
 Plugin authors must explicitly enumerate the capabilities that a plugin does not support.
 
 There are currently three standard file format capabilities:
+
 <table>
 <tr>
     <th>Capability</th>
@@ -66,32 +66,33 @@ Below is an example \c plugInfo.json file declaring a file format that does not 
 
 \code
 {
-    "Plugins": [
-        {
-            "Info": {
-                "Types": {
-                    "UnwritableFormat": {
-                        "bases": [
-                            "SdfTextFileFormat"
-                        ],
-                        "displayName": "Format that does not support writing",
-                        "extensions": [
-                            "unwritable"
-                        ],
-                        "supportsWriting": false,
-                        "formatId": "UnwritableFormat",
-                        "primary": true
-                    }
-                }
-            }
-        }
-    ]
+"Plugins": [
+{
+"Info": {
+"Types": {
+"UnwritableFormat": {
+"bases": [
+"SdfTextFileFormat"
+],
+"displayName": "Format that does not support writing",
+"extensions": [
+"unwritable"
+],
+"supportsWriting": false,
+"formatId": "UnwritableFormat",
+"primary": true
+}
+}
+}
+}
+]
 }
 \endcode
 
 \subsection Runtime_Access Querying Capabilities at Runtime
 
 File format capabilities can be queried at runtime using the SdfFileFormat class:
+
 <table>
 <tr>
     <th> Static Method </th>
@@ -113,4 +114,4 @@ File format capabilities can be queried at runtime using the SdfFileFormat class
 Use of the static methods when possible is preferred because these methods read the metadata authored in \c plugInfo.json to determine capabilities without loading the plugins themselves.
 This avoids a potentially costly load of large and complex plugins.
 
-*/
+\*/

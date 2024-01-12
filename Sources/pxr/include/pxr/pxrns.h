@@ -71,7 +71,7 @@
   convenience, else users would have to use the longer form of the namespace in swift
   code.
  */
-namespace PXR_INTERNAL_NS { }
+namespace Pixar { }
 
 // The root level namespace for all source in the USD distribution.
 namespace PXR_NS {

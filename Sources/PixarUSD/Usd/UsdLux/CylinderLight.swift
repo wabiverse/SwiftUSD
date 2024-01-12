@@ -23,7 +23,7 @@
 
 import UsdLux
 
-public typealias UsdLuxCylinderLight = Pixar_v23.UsdLuxCylinderLight
+public typealias UsdLuxCylinderLight = Pixar.UsdLuxCylinderLight
 
 public extension Pixar.UsdLux
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdLux
 extension Pixar.UsdLux.CylinderLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.CylinderLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.CylinderLight
   {
     Pixar.UsdLux.CylinderLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdLux.CylinderLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.CylinderLight
   {
     Pixar.UsdLux.CylinderLight.define(stage, path: .init(path))
   }

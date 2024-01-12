@@ -23,7 +23,7 @@
 
 import Js
 
-public typealias JsObject = Pixar_v23.JsObject
+public typealias JsObject = Pixar.JsObject
 
 public extension Pixar.Js
 {

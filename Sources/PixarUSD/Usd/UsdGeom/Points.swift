@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomPoints = Pixar_v23.UsdGeomPoints
+public typealias UsdGeomPoints = Pixar.UsdGeomPoints
 
 public extension Pixar.UsdGeom
 {
@@ -33,13 +33,13 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.Points
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Points
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Points
   {
     Pixar.UsdGeom.Points.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Points
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Points
   {
     Pixar.UsdGeom.Points.define(stage, path: .init(path))
   }

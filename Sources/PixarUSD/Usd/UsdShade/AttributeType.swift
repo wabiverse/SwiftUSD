@@ -23,7 +23,7 @@
 
 import UsdShade
 
-public typealias UsdShadeAttributeType = Pixar_v23.UsdShadeAttributeType
+public typealias UsdShadeAttributeType = Pixar.UsdShadeAttributeType
 
 public extension Pixar.UsdShade
 {

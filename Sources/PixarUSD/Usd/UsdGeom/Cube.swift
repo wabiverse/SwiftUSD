@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCube = Pixar_v23.UsdGeomCube
+public typealias UsdGeomCube = Pixar.UsdGeomCube
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Cube: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cube
   {
     Pixar.UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cube
   {
     Pixar.UsdGeom.Cube.define(stage, path: .init(path))
   }

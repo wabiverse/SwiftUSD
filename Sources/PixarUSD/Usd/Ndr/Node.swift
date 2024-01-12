@@ -23,7 +23,7 @@
 
 import Ndr
 
-public typealias NdrNode = Pixar_v23.NdrNode
+public typealias NdrNode = Pixar.NdrNode
 
 public extension Pixar.Ndr
 {

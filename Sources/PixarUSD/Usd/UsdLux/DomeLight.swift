@@ -23,7 +23,7 @@
 
 import UsdLux
 
-public typealias UsdLuxDomeLight = Pixar_v23.UsdLuxDomeLight
+public typealias UsdLuxDomeLight = Pixar.UsdLuxDomeLight
 
 public extension Pixar.UsdLux
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdLux
 extension Pixar.UsdLux.DomeLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.DomeLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.DomeLight
   {
     Pixar.UsdLux.DomeLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdLux.DomeLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.DomeLight
   {
     Pixar.UsdLux.DomeLight.define(stage, path: .init(path))
   }

@@ -1,7 +1,6 @@
-### <sub>Asset Resolution</sub>
-# <sup>**Pixar.Ar**</sup>
+# ``Pixar.Ar``
 
-### **Overview**
+## Overview
 
 The **Ar** (Asset Resolution) library is responsible for querying, reading, and
 writing asset data. It provides several interfaces that allow **USD** to access
@@ -36,52 +35,46 @@ forward the call to that subclass.
 The primary resolver is the **ArResolver** subclass that Ar uses to handle
 all asset paths that are not handled by the other resolvers described below.
 
-> [!NOTE]
-> **Ar** does not support custom resolvers implemented
-> in Python to avoid performance issues, especially
-> for multi-threaded consumers.
+> Warning: **Ar** does not support custom resolvers implemented in Python to avoid performance issues, especially for multi-threaded consumers.
 
 To create a custom primary resolver:
 
-  - Implement an ArResolver subclass
-    ```cpp
-    class CustomResolver : public ArResolver
-    {}
-    ```
+- Implement an ArResolver subclass
 
-  - Use `#AR_DEFINE_RESOLVER` to define the subclass as a resolver
-    ```cpp
-    // In the custom resolver's .cpp file
-    AR_DEFINE_RESOLVER(CustomResolver, ArResolver);
-    ```
+  ```cpp
+  class CustomResolver : public ArResolver
+  {}
+  ```
 
-  - Declare the subclass in the plugin's plugInfo.json file.
-    See [**Plug Registry**](PlugRegistry) for more details.
-    ```json
-    /* plugInfo.json */
-    {
-      "Plugins": [
-        {
-          "Info":
-          {
-            "Types": 
-            {
-              "CustomResolver": 
-              {
-                "bases": [ "ArResolver" ]
-              }
+- Use `#AR_DEFINE_RESOLVER` to define the subclass as a resolver
+
+  ```cpp
+  // In the custom resolver's .cpp file
+  AR_DEFINE_RESOLVER(CustomResolver, ArResolver);
+  ```
+
+- Declare the subclass in the plugin's plugInfo.json file.
+  See [**Plug Registry**](PlugRegistry) for more details.
+
+  ```json
+  /* plugInfo.json */
+  {
+    "Plugins": [
+      {
+        "Info": {
+          "Types": {
+            "CustomResolver": {
+              "bases": ["ArResolver"]
             }
-          },
-          /* ... */
+          }
         }
-      ]
+        /* ... */
+      }
+    ]
+  }
+  ```
 
-    }
-    ```
-
-    > [!IMPORTANT]
-    > Ensure that the resolver plugin is located
-    > where the plugin system can find it.
+  > Important: Ensure that the resolver plugin is located where the plugin system can find it.
 
 <br/>
 
@@ -89,7 +82,7 @@ At runtime **Ar** will query the plugin system to discover any classes that have
 **ArResolver** or another subclass of **ArResolver** declared as a base type, then
 instantiate that class when needed. Keep in mind that the class may be
 constructed at any time; at a minimum, the class will be constructed during the
-first call to ``ArGetResolver``.
+first call to `ArGetResolver`.
 
 If no custom resolver is found, **Ar** will use **ArDefaultResolver** as the
 primary resolver. This resolver assumes all asset paths it encounters are
@@ -124,33 +117,30 @@ ArGetResolver().Resolve("http://mynetwork/model.usd")
 
 To create a **URI** resolver:
 
-  - Implement a subclass of **ArResolver** as described in the 
-    [**Primary Resolver**](PrimaryResolver) section above.
+- Implement a subclass of **ArResolver** as described in the
+  [**Primary Resolver**](PrimaryResolver) section above.
 
-  - In the entry for the subclass in the plugin's plugInfo.json file,
-    add a "uriSchemes" key with a list of URI schemes associated with the
-    resolver.
-    ```json
-    /* plugInfo.json */
-    {
-      "Plugins": [
-        {
-          "Info": 
-          {
-            "Types": 
-            {
-              "HTTPResolver": 
-              {
-                "bases": ["ArResolver"],
-                "uriSchemes": ["http", "https"]
-              }
+- In the entry for the subclass in the plugin's plugInfo.json file,
+  add a "uriSchemes" key with a list of URI schemes associated with the
+  resolver.
+  ```json
+  /* plugInfo.json */
+  {
+    "Plugins": [
+      {
+        "Info": {
+          "Types": {
+            "HTTPResolver": {
+              "bases": ["ArResolver"],
+              "uriSchemes": ["http", "https"]
             }
-          },
-          /* ... */
+          }
         }
-      ]
-    }
-    ```
+        /* ... */
+      }
+    ]
+  }
+  ```
 
 ### **Asset Path Resolution**
 
@@ -162,25 +152,26 @@ description.
 One of **ArResolver's** primary responsibilities is to resolve an input asset
 path by determining if an asset exists at the given path and, if so, returning
 a resolved path that may be used by other **ArResolver** API and in other parts
-of the system. This is done via calls to ``ArResolver::Resolve``. This  process
+of the system. This is done via calls to `ArResolver::Resolve`. This process
 allows ArResolver subclasses to apply custom logic to determine the actual asset
-that a logical asset path refers to. 
+that a logical asset path refers to.
 
 For example, the filesystem-based **ArDefaultResolver** implements search-path logic
 in its asset path resolution. When **ArDefaultResolver** is given a relative filesystem
-asset path to resolve like ``Foo/Bar/Baz.usd``, it will look for that file relative to
+asset path to resolve like `Foo/Bar/Baz.usd`, it will look for that file relative to
 the current working directory, then relative to a set of search paths. Once it finds
 an existing file, it will return the absolute path to that file as the resolved path.
 
 For more details, see:
-  - [**Path Resolution Operations**](ArResolver_resolution)
-  - [**Implementation**](ArResolver_implementation)
+
+- [**Path Resolution Operations**](ArResolver_resolution)
+- [**Implementation**](ArResolver_implementation)
 
 ### **Resolver Contexts**
 
 A resolver context is an object that stores configuration or other information that
 can be used by a resolver to guide path resolution and other operations. Resolver
-contexts can be bound within blocks of code to affect resolver operations within 
+contexts can be bound within blocks of code to affect resolver operations within
 that scope via an **ArResolverContextBinder**. **UsdStage** uses this functionality
 heavily to allow different stages to resolve asset paths differently.
 
@@ -199,7 +190,7 @@ ArDefaultResolver::SetDefaultSearchPath({"/Global/assets"});
 // use it for opening the UsdStage for ShotA.usd.
 //
 // If ShotA.usd contains an asset path like "Foo/Bar/Baz.usd",
-// ArDefaultResolver will search for this file at: 
+// ArDefaultResolver will search for this file at:
 //  - <current working dir>/Foo/Bar/Baz.usd
 //  - /ShotA/assets/Foo/Bar/Baz.usd
 //  - /Global/assets/Foo/Bar/Baz.usd
@@ -210,7 +201,7 @@ UsdStageRefPtr shotA = UsdStage::Open("ShotA.usd", shotACtx);
 // use it for opening the UsdStage for ShotB.usd.
 //
 // If ShotB.usd contains the same asset path as above in ShotA,
-// ArDefaultResolver will search for this file at: 
+// ArDefaultResolver will search for this file at:
 //  - <current working dir>/Foo/Bar/Baz.usd
 //  - /ShotB/assets/Foo/Bar/Baz.usd
 //  - /Global/assets/Foo/Bar/Baz.usd
@@ -225,12 +216,12 @@ libraries that will not (or can not) have a context object bound when the resolv
 path is used to open an asset. Put another way: a resolved path should be usable by
 downstream clients that do not have a resolver context bound.
 
-Context binding and unbinding are thread-specific. If you bind a context in a 
-thread, that binding will only be visible to that thread. If you want to use 
-the same context to resolve asset paths in multiple threads, you’ll need to 
+Context binding and unbinding are thread-specific. If you bind a context in a
+thread, that binding will only be visible to that thread. If you want to use
+the same context to resolve asset paths in multiple threads, you’ll need to
 bind the context in multiple threads.
 
-For more details, see: 
+For more details, see:
 
 - [`ArResolverContext`](ArResolverContext)
 - [`ArResolverContextBinder`](ArResolverContextBinder)
@@ -247,7 +238,7 @@ Resolving asset paths may be expensive and a **UsdStage** may need to resolve
 hundreds to thousands of asset paths (or more) depending on the complexity of
 the scene, many of which may be repeated. A scoped cache helps to minimize that
 expense. A scoped cache also ensures that resolving a given asset path multiple
-times returns the same result, which is important for consistency and correctness. 
+times returns the same result, which is important for consistency and correctness.
 
 **Ar** provides default scoped cache behaviors for all ArResolver subclasses.
 However, this default behavior is very basic. Subclasses may provide their
@@ -269,17 +260,18 @@ as long as they are supported by their underlying resolver implementations. For 
 the filesystem-based **ArDefaultResolver** simply uses filesystem paths, while some other
 implementations might use special **URIs** or database identifiers.
 
-**Ar** reserves trailing bracket-enclosed paths as syntax for package-relative asset 
+**Ar** reserves trailing bracket-enclosed paths as syntax for package-relative asset
 paths.
 
 For example, paths like:
-  - ```brainfuck
-    /foo/baz.usdz[file.usd]
-    ```
-  - ```brainfuck
-    my_uri://foo/baz.usdz[file.usd]
-    ```
+
+- ```brainfuck
+  /foo/baz.usdz[file.usd]
+  ```
+- ```brainfuck
+  my_uri://foo/baz.usdz[file.usd]
+  ```
 
 Will be recognized by **Ar** as a package-relative asset path and will be split so that
 **ArResolver** subclasses will only see the path `/foo/baz.usdz` or `my_uri://foo/baz.usdz`.
-For more details, see  [**Package Relative Paths**](Ar_packagePaths).
+For more details, see [**Package Relative Paths**](Ar_packagePaths).

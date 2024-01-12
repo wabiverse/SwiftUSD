@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCylinder = Pixar_v23.UsdGeomCylinder
+public typealias UsdGeomCylinder = Pixar.UsdGeomCylinder
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Cylinder: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
   {
     Pixar.UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
   {
     Pixar.UsdGeom.Cylinder.define(stage, path: .init(path))
   }

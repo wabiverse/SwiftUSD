@@ -23,7 +23,7 @@
 
 import UsdShade
 
-public typealias UsdShadeMaterial = Pixar_v23.UsdShadeMaterial
+public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
 
 public extension Pixar.UsdShade
 {
@@ -33,13 +33,13 @@ public extension Pixar.UsdShade
 public extension Pixar.UsdShade.Material
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
   {
     Pixar.UsdShade.Material.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdShade.Material
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdShade.Material
   {
     Pixar.UsdShade.Material.define(stage, path: .init(path))
   }

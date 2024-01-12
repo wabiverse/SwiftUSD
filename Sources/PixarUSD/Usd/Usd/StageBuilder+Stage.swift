@@ -26,7 +26,7 @@ import Sdf
 import Usd
 
 /**
- * A Pixar.Usd.Stage for declaratively authoring scene description.
+ * A ``__ObjC/Pixar/UsdStage`` for declaratively authoring scene description.
  *
  * This api is currently experimental and will evolve overtime, its
  * purpose is to declaratively author scene description in a design
@@ -49,25 +49,32 @@ import Usd
  * ``` */
 public struct UsdStage
 {
-  public var stage: StageRefPtr
+  public var stage: Pixar.Usd.StageRefPtr
   public var prims: [UsdPrim]
 
   public init(_ identifier: String,
-              ext: FileExt,
+              ext: UsdStage.FileExt = .custom(""),
               load set: Pixar.Usd.Stage.InitialLoadingSet = .all,
               @StageBuilder prims: () -> [UsdPrim])
   {
-    stage = Pixar.Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
-
-    self.prims = []
-    populate(prims: prims())
-  }
-
-  public init(_ identifier: String,
-              load set: Pixar.Usd.Stage.InitialLoadingSet = .all,
-              @StageBuilder prims: () -> [UsdPrim])
-  {
-    stage = Pixar.Usd.Stage.createNew(identifier, load: set)
+    switch ext
+    {
+      case let .custom(customExt):
+        if customExt.isEmpty
+        {
+          stage = Pixar.Usd.Stage.createNew(identifier, load: set)
+        }
+        else if customExt.first == "."
+        {
+          stage = Pixar.Usd.Stage.createNew("\(identifier)\(customExt)", load: set)
+        }
+        else
+        {
+          stage = Pixar.Usd.Stage.createNew("\(identifier).\(customExt)", load: set)
+        }
+      default:
+        stage = Pixar.Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
+    }
 
     self.prims = []
     populate(prims: prims())
@@ -131,12 +138,46 @@ public struct UsdStage
   /**
    * Common file exts, for convenience.
    */
-  public enum FileExt: String, CaseIterable
+  public enum FileExt: CaseIterable
   {
+    /// The (.usd) file extension.
     case usd
+
+    /// The (.usda) file extension.
     case usda
+
+    /// The (.usdc) file extension.
     case usdc
+
+    /// The (.usdz) file extension.
     case usdz
+
+    /// Custom file extension, accepts dot prefixed or not.
+    case custom(String)
+
+    /// The raw string value of this file extension.
+    public var rawValue: String
+    {
+      switch self
+      {
+        case .usd:
+          "usd"
+        case .usda:
+          "usda"
+        case .usdc:
+          "usdc"
+        case .usdz:
+          "usdz"
+        case let .custom(ext):
+          ext
+      }
+    }
+
+    /// All cases of the FileExt enum.
+    public static var allCases: [UsdStage.FileExt]
+    {
+      [.usd, .usda, .usdc, .usdz]
+    }
   }
 }
 
@@ -152,11 +193,11 @@ public extension UsdStage
   @discardableResult
   private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
   {
-    let primPath: Pixar_v23.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
+    let primPath: Pixar.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
 
-    let pathDepth = primStack.reduce(Pixar_v23.SdfPath("/"))
+    let pathDepth = primStack.reduce(Pixar.SdfPath("/"))
     { p1, p2 in
-      let sdfPath: Pixar_v23.SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
+      let sdfPath: Pixar.SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
 
       return p1.append(path: sdfPath)
     }

@@ -30,31 +30,30 @@ public extension Pixar.Usd
   /**
    * # Pixar.Usd.Prim
    *
-   * ``Usd.Prim`` is the sole persistent scenegraph object on a UsdStage, and
+   * ``Prim`` is the sole persistent scenegraph object on a UsdStage, and
    * is the embodiment of a "Prim" as described in the *Universal Scene
    * Description Composition Compendium*.
    *
-   * A ``Usd.Prim`` is the principal container of other types of scene description.
+   * A ``Prim`` is the principal container of other types of scene description.
    * It provides API for accessing and creating all of the contained kinds of scene
    * description, which include:
-   * - ``Usd.VariantSets`` - all VariantSets on the prim (`getVariantSets()`, `getVariantSet()`).
-   * - ``Usd.References`` - all references on the prim (`getReferences()`).
-   * - ``Usd.Inherits`` - all inherits on the prim (`getInherits()`).
-   * - ``Usd.Specializes`` - all specializes on the prim (`getSpecializes()`).
+   * - ``VariantSets`` - all VariantSets on the prim (`getVariantSets()`, `getVariantSet()`).
+   * - ``References`` - all references on the prim (`getReferences()`).
+   * - ``Inherits`` - all inherits on the prim (`getInherits()`).
+   * - ``Specializes`` - all specializes on the prim (`getSpecializes()`).
    *
-   * As well as access to the API objects for properties contained within the
-   * prim - ``Usd.Prim`` as well as all of the following classes are subclasses
-   * of ``Usd.Object``:
-   * - ``Usd.Property`` - generic access to all attributes and relationships.
-   * A ``Usd.Property`` can be queried and cast to a ``Usd.Attribute`` or
-   * - ``Usd.Relationship`` using ``Usd.Object.is<T>(T.self)`` and ``Usd.Object.as<T>(T.self)``.
+   * As well as access to the API objects for properties contained within the prim - ``Prim``
+   * as well as all of the following classes are subclasses of ``Object``:
+   * - ``Property`` - generic access to all attributes and relationships.
+   * A ``Property`` can be queried and cast to a ``Usd.Attribute`` or
+   * - ``Relationship`` using ``Object/is<T>(a: T.self)`` and ``Object/as<T>(T.self)``.
    * (getPropertyNames(), getProperties(), getPropertiesInNamespace(), getPropertyOrder(), setPropertyOrder()).
-   * - ``Usd.Attribute`` - access to default and timesampled attribute values, as well as value resolution information,
+   * - ``Attribute`` - access to default and timesampled attribute values, as well as value resolution information,
    * and attribute-specific metadata (createAttribute(), getAttribute(), getAttributes(), hasAttribute()).
-   * - ``Usd.Relationship`` - access to authoring and resolving relationships to other prims and properties
+   * - ``Relationship`` - access to authoring and resolving relationships to other prims and properties
    * (createRelationship(), getRelationship(), getRelationships(), hasRelationship()).
    *
-   * ``Usd.Prim`` also provides access to iteration through its prim children,
+   * ``Prim`` also provides access to iteration through its prim children,
    * optionally making use of the **Prim Predicates Facility** (getChildren(),
    * getAllChildren(), getFilteredChildren()).
    *
@@ -62,26 +61,32 @@ public extension Pixar.Usd
    *
    * Clients acquire UsdPrim objects, which act like weak/guarded pointers
    * to persistent objects owned and managed by their originating UsdStage.
-   * We provide the following guarantees for a UsdPrim acquired via
-   * ``Pixar.Usd.Stage.getPrimAtPath()`` or ``Pixar.Usd.Stage.overridePrim()``
-   * or ``Pixar.Usd.Stage.definePrim()``:
-   * - As long as no further mutations to the structure of the UsdStage
-   * are made, the UsdPrim will still be valid. Loading and unloading are
-   * considered structural mutations.
-   * - When the ``Usd.Stage``'s structure is **mutated**, the thread performing
-   * the mutation will receive a ``UsdNotice.objectsChanged`` notice after the
-   * stage has been reconfigured, which provides details as to what prims may
-   * have been created or destroyed, and what prims may simply have changed in
-   * some structural way.
    *
-   * Prim access in "reader" threads should be limited to ``getPrimAtPath()``, which
-   * will never cause a mutation to the Stage or its layers.
+   * We provide the following guarantees for a UsdPrim acquired via any of
+   * the following:
    *
-   * Please refer to ``Pixar.Usd.Notice`` for a listing of
-   * the events that could cause ``Usd.Notice.objectsChanged``
-   * to be emitted.
+   * - ``TfRefPtr<UsdStage>/getPrim(at:)-1jtte``
+   * - ``TfRefPtr<UsdStage>/overridePrim(path:)-3liu9``
+   * - ``TfRefPtr<UsdStage>/definePrim(_:type:)-19ehc``
+   *
+   *   - As long as no further mutations to the structure of the UsdStage
+   *   are made, the UsdPrim will still be valid. Loading and unloading are
+   *   considered structural mutations.
+   *
+   *   - When the ``Stage``'s structure is **mutated**, the thread performing
+   *   the mutation will receive a ``Notice/objectsChanged`` notice after the
+   *   stage has been reconfigured, which provides details as to what prims may
+   *   have been created or destroyed, and what prims may simply have changed in
+   *   some structural way.
+   *
+   * Prim access in "reader" threads should be limited to
+   * ``TfRefPtr<UsdStage>/getPrim(at:)-1jtte``, which will never cause a
+   * mutation to the Stage or its layers.
+   *
+   * Please refer to ``Notice`` for a listing of the events that could cause
+   * ``Notice/objectsChanged`` to be emitted.
    */
-  typealias Prim = Pixar_v23.UsdPrim
+  typealias Prim = Pixar.UsdPrim
 }
 
 extension Pixar.Usd.Prim: Prim
@@ -91,7 +96,7 @@ extension Pixar.Usd.Prim: Prim
     SetDocumentation(std.string(doc))
   }
 
-  public func getStage() -> Pixar_v23.UsdStageWeakPtr
+  public func getStage() -> Pixar.UsdStageWeakPtr
   {
     GetStage()
   }

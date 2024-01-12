@@ -1,5 +1,4 @@
-### <sub>USD Shading Schema</sub>
-# <sup>**Pixar.UsdShade**</sup>
+# ``UsdShade``
 
 ### Overview
 
@@ -13,13 +12,13 @@ UsdShade provides schemas and behaviors for creating shading networks
 composed of UsdShadeShader objects, as well as other UsdShadeNodeGraph.
 
 Objects in a network are connected together and to their encapsulating Material
-using the UsdShadeConnectableAPI schema, which allows one to create 
-UsdShadeInput and UsdShadeOutput (which are UsdAttribute schemas), and *connect*
+using the UsdShadeConnectableAPI schema, which allows one to create
+UsdShadeInput and UsdShadeOutput (which are UsdAttribute schemas), and _connect_
 them using [UsdAttribute connections](http://openusd.org/docs/api/class_usd_attribute.html#af8eaf3216d67a143923b65465eac881a).
 
 Here's a python example.
 
-~~~~~~~~~~~~~{.py}
+```{.py}
     # create material
     materialPath = Sdf.Path('/Model/Materials/MyMaterial')
     material = UsdShade.Material.Define(stage, materialPath)
@@ -34,11 +33,11 @@ Here's a python example.
     inputPort = downstreamShader.CreateInput(
         'DownstreamInput', Sdf.ValueTypeNames.Float)
     inputPort.ConnectToSource(upstreamShader, 'UpstreamOutput')
-~~~~~~~~~~~~~
+```
 
 This will yield a material with two connected nodes.
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -49,7 +48,7 @@ This will yield a material with two connected nodes.
             {
                 def Shader "Downstream"
                 {
-                    float inputs:DownstreamInput.connect = 
+                    float inputs:DownstreamInput.connect =
                         </Model/Materials/MyMaterial/Upstream.outputs:UpstreamOutput>
                 }
 
@@ -60,12 +59,11 @@ This will yield a material with two connected nodes.
             }
         }
     }
-~~~~~~~~~~~~~
-
+```
 
 # Encapsulation and Sharing
 
-In UsdShade, all shaders are UsdPrims or just "prims".  However, in 
+In UsdShade, all shaders are UsdPrims or just "prims". However, in
 deference to the larger body of technical discourse on shading, we will refer
 to them as "nodes" in this discussion.
 
@@ -74,20 +72,20 @@ generally used in isolation.
 
 Shading networks can be organized into coherent packaged units
 (UsdShadeNodeGraph), with their own public parameters exposed and connected
-to the internal nodes.  In this scenario, the UsdShadeNodeGraph is a parent or
-ancestor prim (UsdShadeNodeGraph can be nested) to all of the UsdShadeShader 
-prims in the network, and serves as the point of encapsulation - the 
-UsdShadeNodeGraph prim can then be __referenced__ into other, larger networks 
-as a building block, with its entire network intact.  When referenced into 
-larger networks, NodeGraphs can also be 
+to the internal nodes. In this scenario, the UsdShadeNodeGraph is a parent or
+ancestor prim (UsdShadeNodeGraph can be nested) to all of the UsdShadeShader
+prims in the network, and serves as the point of encapsulation - the
+UsdShadeNodeGraph prim can then be **referenced** into other, larger networks
+as a building block, with its entire network intact. When referenced into
+larger networks, NodeGraphs can also be
 [instanced](http://openusd.org/docs/USD-Glossary.html#USDGlossary-Instancing)
 so that they appear as a single prim in the network, and can be processed
 more efficiently when referenced from multiple locations.
 
 If the network of shading nodes is directly consumable as a "shader" of a
-type known to some client renderer (e.g. a __surface shader__), then the
+type known to some client renderer (e.g. a **surface shader**), then the
 encapsulating parent/ancestor should be declared as a UsdShadeMaterial, which
-is a __container__ that can also be bound to geometries or collections.
+is a **container** that can also be bound to geometries or collections.
 Materials can also be reused and instanced, retaining the same network but
 allowing top-level "Material Interface" parameters to be authored uniquely.
 
@@ -101,7 +99,7 @@ are shader nodes like UsdShadeShader prims.
 Container types are identified by their UsdShadeConnectableAPI::IsContainer()
 implementation, which is an extensible API, such that other types can work as
 containers with the other UsdShade APIs, by implementing the
-UsdShadeConnectableAPIBehavior plugin interface. 
+UsdShadeConnectableAPIBehavior plugin interface.
 Refer: \ref UsdShadeRegisterConnectableAPIBehavior for more details on
 registering a UsdShadeConnectableAPIBehavior for a Type.
 
@@ -116,7 +114,7 @@ Usd.
 To expose a parameter to the container, we use the same mechanism that
 connects nodes.
 
-~~~~~~~~~~~~~{.py}
+```{.py}
     # Expose a parameter to the public interface
     internalPort = upstreamShader.CreateInput(
         'internalPort', Sdf.ValueTypeNames.Float)
@@ -124,12 +122,12 @@ connects nodes.
         'ExposedPort', Sdf.ValueTypeNames.Float)
     exposedPort.Set(1.0)
     internalPort.ConnectToSource(exposedPort)
-~~~~~~~~~~~~~
- 
+```
+
 Which will yield a public interface parameter called 'ExposedPort' on the
 UsdShadeMaterial called 'MyMaterial', and set its default value to 1.0
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -142,27 +140,27 @@ UsdShadeMaterial called 'MyMaterial', and set its default value to 1.0
 
                 def Shader "Downstream"
                 {
-                    float inputs:DownstreamInput.connect = 
+                    float inputs:DownstreamInput.connect =
                         </Model/Materials/MyMaterial/Upstream.outputs:UpstreamOutput>
                 }
 
                 def Shader "Upstream"
                 {
-                    float inputs:internalPort.connect = 
+                    float inputs:internalPort.connect =
                         </Model/Materials/MyMaterial.inputs:ExposedPort>
                     float outputs:UpstreamOutput
                 }
             }
         }
     }
-~~~~~~~~~~~~~
+```
 
 To expose an output of a node network as an output of a NodeGraph, or as a
 "terminal output" of a Material, we again use the same connection API, except
-that now we are connecting an Output to another Output (in effect, *forwarding*
+that now we are connecting an Output to another Output (in effect, _forwarding_
 the Output from a node to its encapsulating container):
 
-~~~~~~~~~~~~~{.py}
+```{.py}
     # The output represents the result of the shader's computation. For
     # complex types like "surface illumination" we use the type Token as
     # a standin for the type specific to the renderer
@@ -173,12 +171,12 @@ the Output from a node to its encapsulating container):
     # For outputs, it is the container's Output that connect's to the Node's
     # output
     surfaceTerminal.ConnectToSource(outPort)
-~~~~~~~~~~~~~
+```
 
 Which will yield a public interface parameter called 'ExposedPort' on the
 UsdShadeMaterial called 'MyMaterial', and set its default value to 1.0
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -187,7 +185,7 @@ UsdShadeMaterial called 'MyMaterial', and set its default value to 1.0
         {
             def Material "MyMaterial"
             {
-                token outputs:surface.connect = 
+                token outputs:surface.connect =
                     </Model/Materials/MyMaterial/Surface.outputs:out>
 
                 def Shader "Surface"
@@ -197,7 +195,7 @@ UsdShadeMaterial called 'MyMaterial', and set its default value to 1.0
             }
         }
     }
-~~~~~~~~~~~~~
+```
 
 # Connectability Rules for UsdShade Types
 
@@ -206,32 +204,33 @@ different UsdShade nodes providing appropriate connectivity rules described
 below:
 
 - UsdShadeShader:
-  Inputs can be connected to any Input or Output of any other shader or 
-  NodeGraph encapsulated by the same nearest-in-namespace encapsulating 
+  Inputs can be connected to any Input or Output of any other shader or
+  NodeGraph encapsulated by the same nearest-in-namespace encapsulating
   NodeGraph or Nodegraph-derived container. Outputs cannot be connected.
 
 - UsdShadeNodeGraph:
-  Inputs follow the same rule as Shaders.  Outputs can be connected to any 
-  Output on a prim (Shader or NodeGraph) encapsulated by the NodeGraph itself, 
-  or to an Input of the same NodeGraph itself, creating a "pass through" 
+  Inputs follow the same rule as Shaders. Outputs can be connected to any
+  Output on a prim (Shader or NodeGraph) encapsulated by the NodeGraph itself,
+  or to an Input of the same NodeGraph itself, creating a "pass through"
   connection.
 
 - Default behavior for NodeGraph-derived Types (e.g. UsdShadeMaterial)
-  Inputs and Outputs follow the same rule, which is that they can be connected 
-  to any Output on a prim  (Shader or NodeGraph) encapsulated by the Material 
-  itself. Note that "pass through" connections are not allowed for 
+  Inputs and Outputs follow the same rule, which is that they can be connected
+  to any Output on a prim (Shader or NodeGraph) encapsulated by the Material
+  itself. Note that "pass through" connections are not allowed for
   Nodegraph-derived container nodes.
 
-- Any new or derived Typed or single-apply API schema can register its own 
-  UsdShadeConnectableAPIBehavior to customize connectivity rules. It can also 
-  specify, in its extraPlugInfo customData, the isUsdShadeContainer and 
-  requiresUsdShadeEncapsulation booleans to customize those aspects of behavior 
+- Any new or derived Typed or single-apply API schema can register its own
+  UsdShadeConnectableAPIBehavior to customize connectivity rules. It can also
+  specify, in its extraPlugInfo customData, the isUsdShadeContainer and
+  requiresUsdShadeEncapsulation booleans to customize those aspects of behavior
   without needing to provide a UsdShadeConnectableAPIBehavior implementation.
 
-  \anchor UsdShadeConnectableAPIBehavior_ResolutionOrder Resolution order 
-  for when multiple types and apiSchemas provide a 
+  \anchor UsdShadeConnectableAPIBehavior_ResolutionOrder Resolution order
+  for when multiple types and apiSchemas provide a
   UsdShadeConnectableAPIBehavior:
-  1. Behavior defined on an authored API schemas, wins over 
+
+  1. Behavior defined on an authored API schemas, wins over
   2. Behavior defined for a prim type, wins over
   3. Behavior defined for the prim's ancestor types, wins over
   4. Behavior defined for any built-in API schemas.
@@ -239,37 +238,37 @@ below:
      providesUsdShadeConnectableAPIBehavior plug metadata then a default
      behavior is registered for the primTypeId, with its isContainer and
      requiresEncapsulation driven by extraPlugInfo metadata
- 
-Note that interface-only connections can only happen between inputs and source 
+
+Note that interface-only connections can only happen between inputs and source
 which have "interfaceOnly" connectivity.
 
 # Connections and Dataflow in UsdShade
 
-UsdShade uses UsdAttribute connections both to indicate dataflow from 
-shading node outputs to inputs, __and__ to indicate pre-rendering propagation
+UsdShade uses UsdAttribute connections both to indicate dataflow from
+shading node outputs to inputs, **and** to indicate pre-rendering propagation
 of values authored on UsdShadeNodeGraph and UsdShadeMaterial inputs to shader
-node inputs.  In USD, connections (and relationships) are authored on the
-__consumer__, and target the source or __producer__.  Therefore, data in
-a UsdShade network flows from a connection's target to its anchor.  To
-reliably translate UsdShade networks for consumption by renderers, we need to 
+node inputs. In USD, connections (and relationships) are authored on the
+**consumer**, and target the source or **producer**. Therefore, data in
+a UsdShade network flows from a connection's target to its anchor. To
+reliably translate UsdShade networks for consumption by renderers, we need to
 establish a few rules about how values propagate in the face of connections.
 
 ## Valid Shader Connections Win Over Input Values
 
-When an input on a shading node has __both__ an authored value (default or
-timeSamples), __and__ a connection to an output on another shading node, then
+When an input on a shading node has **both** an authored value (default or
+timeSamples), **and** a connection to an output on another shading node, then
 the connection alone is transmitted to the renderer - the authored value is
-irrelevant.  Connections that target an output that __does not exist in the 
-containing Material__ are ignored; if the connected input has an authored
+irrelevant. Connections that target an output that **does not exist in the
+containing Material** are ignored; if the connected input has an authored
 value, then in this case, and this case alone, we pass the value to the
 renderer and ignore the connection.
 
 In the following example, we will provide values to the renderer for inputs
-_valueOnly_ (2) and _brokenConnection_ (4), while informing the renderer of 
-a connection between _validOutput_ and _connected_, ignoring the value authored 
+_valueOnly_ (2) and _brokenConnection_ (4), while informing the renderer of
+a connection between _validOutput_ and _connected_, ignoring the value authored
 of 42 on _connected_.
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -281,11 +280,11 @@ of 42 on _connected_.
                 def Shader "Downstream"
                 {
                     float inputs:brokenConnection = 4
-                    float inputs:brokenConnection.connect = 
+                    float inputs:brokenConnection.connect =
                         </Model/Materials/MyMaterial/MissingShader.outputs:MissingOutput>
 
                     float inputs:connected = 42
-                    float inputs:connected.connect = 
+                    float inputs:connected.connect =
                         </Model/Materials/MyMaterial/Upstream.outputs:UpstreamOutput>
 
                     float inputs:valueOnly = 2
@@ -299,13 +298,13 @@ of 42 on _connected_.
             }
         }
     }
-~~~~~~~~~~~~~
+```
 
 ## Resolving Interface Connections
 
 When we create inputs on NodeGraphs or Materials to serve as "public interface"
 for shading properties, it is common to _create_ an appropriately-typed
-attribute, but __not provide a default value for it__.  When USD is the document
+attribute, but **not provide a default value for it**. When USD is the document
 for a material shading network, this "uninitialized interface attribute"
 allows the Material to continue to receive updates to published shaders made
 available through the SdrRegistry long after the Material has been created.
@@ -314,33 +313,33 @@ Why? Because of the first rule of interface value propagation:
 - If a Material or NodeGraph input provides no value, and one or more of its
   shader's inputs connects to the interface attribute, then the value supplied
   to the renderer for that shading input should be whatever value is authored
-  on the shader input, or if none is authored, then we emit __no value__ to
+  on the shader input, or if none is authored, then we emit **no value** to
   the renderer, indicating it should simply follow the shader implementation's
   own default value.
 
 NodeGraphs can be embedded inside Materials, and also as nested components
-inside other NodeGraphs.  Because of this nestability, it is posible that
+inside other NodeGraphs. Because of this nestability, it is posible that
 a deeply embedded shader node input may need to travel several connection hops
-to find an interface attribute that provides a value for it to use.  This leads
+to find an interface attribute that provides a value for it to use. This leads
 to the second and final rule of interface value propagation:
 
 - If a shader node input is connected to a containing NodeGraph input that is
   in turn connected to an outer-containing NodeGraph or Material, it is the
-  __outermost authored input default in the connection chain__ that provides the
-  shader input's value.  This allows the "user" of a NodeGraph to always be able
+  **outermost authored input default in the connection chain** that provides the
+  shader input's value. This allows the "user" of a NodeGraph to always be able
   to drive its inputs from its own public interface.
 
-Putting these two rules together, in the example below, we expect the 
+Putting these two rules together, in the example below, we expect the
 following values to be passed to the renderer for each shader input:
 
-- _spOne_ = 4, because neither of the interface attributes in its connection 
+- _spOne_ = 4, because neither of the interface attributes in its connection
   chain supply a value.
 - _spTwo_ = 14, because _matInterfaceTwo_ provides the strongest opinion, as the
   outermost value-provider in the connection chain.
-- _spThree_ = 64, because only its directly-embedding NodeGraph's interface 
+- _spThree_ = 64, because only its directly-embedding NodeGraph's interface
   attribute provides a value stronger than its own default.
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -352,10 +351,10 @@ following values to be passed to the renderer for each shader input:
                 float inputs:matInterfaceOne
                 float inputs:matInterfaceTwo = 14
                 float inputs:matInterfaceThree
- 
+
                 def NodeGraph "Package"
                 {
-                    float inputs:ngInterfaceOne.connect = 
+                    float inputs:ngInterfaceOne.connect =
                         </Model/Materials/MyMaterial.inputs:matInterfaceOne>
 
                     float inputs:ngInterfaceTwo = 28
@@ -369,15 +368,15 @@ following values to be passed to the renderer for each shader input:
                     def Shader "EmbeddedInNG"
                     {
                         float inputs:spOne = 4
-                        float inputs:spOne.connect = 
+                        float inputs:spOne.connect =
                             </Model/Materials/MyMaterial/Package.inputs:ngInterfaceOne>
 
                         float inputs:spTwo = 5
-                        float inputs:spTwo.connect = 
+                        float inputs:spTwo.connect =
                             </Model/Materials/MyMaterial/Package.inputs:ngInterfaceTwo>
 
                         float inputs:spThree = 6
-                        float inputs:spThree.connect = 
+                        float inputs:spThree.connect =
                             </Model/Materials/MyMaterial/Package.inputs:ngInterfaceThree>
 
                     }
@@ -385,7 +384,7 @@ following values to be passed to the renderer for each shader input:
             }
         }
     }
-~~~~~~~~~~~~~
+```
 
 NodeGraphs also define outputs to declare the signals that are provided for the
 rest of the network. From the outside, which is where the NodeGraph is connected
@@ -403,7 +402,7 @@ _Modifier_ shading node, which sends a modified result to _ngModifiedOut_, which
 effectively models _result2_ -> _toModify_ (on _Modifier_) and _modified_ ->
 _input2_.
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     def "Model"
@@ -421,7 +420,7 @@ _input2_.
 
                 def NodeGraph "Package"
                 {
-                    float inputs:ngPassThruIn.connect = 
+                    float inputs:ngPassThruIn.connect =
                         </Model/Materials/MyMaterial/Generator.outputs:result1>
                     float inputs:ngToModifyIn.connect =
                         </Model/Materials/MyMaterial/Generator.outputs:result2>
@@ -433,7 +432,7 @@ _input2_.
 
                     def Shader "Modifier"
                     {
-                        float inputs:toModify.connect = 
+                        float inputs:toModify.connect =
                             </Model/Materials/MyMaterial/Package.inputs:ngToModifyIn>
 
                         float outputs:modified
@@ -450,7 +449,7 @@ _input2_.
             }
         }
     }
-~~~~~~~~~~~~~
+```
 
 ## Connection Resolution Utilities
 
@@ -490,71 +489,72 @@ based on what is supported in the target rendering system.
 
 # UsdShade Based Shader Definition
 
-UsdShade has an NdrParserPlugin (\ref UsdShadeShaderDefParserPlugin) that 
-enables shader definitions to be encoded as USD scene description using the 
-schemas available in UsdShade. A discovery plugin can open a USD stage 
-containing shader definitions and populate the shader registry with nodes 
+UsdShade has an NdrParserPlugin (\ref UsdShadeShaderDefParserPlugin) that
+enables shader definitions to be encoded as USD scene description using the
+schemas available in UsdShade. A discovery plugin can open a USD stage
+containing shader definitions and populate the shader registry with nodes
 using the API \ref UsdShadeShaderDefUtils::GetNodeDiscoveryResults().
 
-A USD file containing UsdShade-based shader definitions must adhere to the 
-following rules, in order to produce valid SdrShaderNode s in the shader 
+A USD file containing UsdShade-based shader definitions must adhere to the
+following rules, in order to produce valid SdrShaderNode s in the shader
 registry:
-  - Every concrete shader prim at the root of the composed UsdStage should 
-  represent a new and complete shader definition. Inherits, references and other 
-  composition arcs may be used to avoid redundant scene description. 
-  - The shader prim's name becomes the unique <i>identifier</i> of the 
-  corresponding shader node in the registry. A shader's identifier is a 
-  concatenation of the 
-    -# family name of the shader, 
-    -# any type variations pertaining to the shader and
-    -# the shader version, which can contain one or two ints representing the 
-    major number and an optional minor number.
-  The type variations and shader version are optional parts of a shader 
+
+- Every concrete shader prim at the root of the composed UsdStage should
+  represent a new and complete shader definition. Inherits, references and other
+  composition arcs may be used to avoid redundant scene description.
+- The shader prim's name becomes the unique <i>identifier</i> of the
+  corresponding shader node in the registry. A shader's identifier is a
+  concatenation of the
+  -# family name of the shader,
+  -# any type variations pertaining to the shader and
+  -# the shader version, which can contain one or two ints representing the
+  major number and an optional minor number.
+  The type variations and shader version are optional parts of a shader
   identifier (i.e. not all shader identifiers may include them). If present,
   the different parts of the identifier are delimited by an underscore.
-  Using \ref UsdShadeShaderDefUtils::SplitShaderIdentifier, a shader's 
-  identifier can be split into the family name, implementation-name 
-  of the shader node (which includes the family name and the type information) 
+  Using \ref UsdShadeShaderDefUtils::SplitShaderIdentifier, a shader's
+  identifier can be split into the family name, implementation-name
+  of the shader node (which includes the family name and the type information)
   and the shader version. For example,
-    - if the shader prim is named "MultiTexture", the family name of the 
-    SdrShaderNode will be "MultiTexture". The corresponding shader-node's 
-    <b>implementation name</b> will also be "MultiTexture" and its version will 
+  - if the shader prim is named "MultiTexture", the family name of the
+    SdrShaderNode will be "MultiTexture". The corresponding shader-node's
+    <b>implementation name</b> will also be "MultiTexture" and its version will
     be empty.
-    - if the shader prim is named "MultiTexture_float2", the family name of the 
-    shader will be "MultiTexture" and its implementation name will be 
+  - if the shader prim is named "MultiTexture_float2", the family name of the
+    shader will be "MultiTexture" and its implementation name will be
     "MultiTexture_float2". Its version will be empty.
-    - if the shader prim is named "MultiTexture_3", the family name of 
-    the shader will be "MultiTexture". It's implementation name will also be 
+  - if the shader prim is named "MultiTexture_3", the family name of
+    the shader will be "MultiTexture". It's implementation name will also be
     "MultiTexture" and its version will be 3.
-    - if the shader prim is named "MultiTexture_float2_3_1", the family name of 
-    the shader will be "MultiTexture". The <i>implementation name</i> will 
+  - if the shader prim is named "MultiTexture_float2_3_1", the family name of
+    the shader will be "MultiTexture". The <i>implementation name</i> will
     include the type information and be set to "Primvar_float2".
-  - The info:id attribute value of the shader, if authored, must match the name 
+- The info:id attribute value of the shader, if authored, must match the name
   of the shader prim (i.e. the identifier of the SdrShaderNode).
-  - The info:implementationSource of the shader must be UsdShadeTokens->
-  sourceAsset. There must be one or more <i>"info:SOURCE_TYPE:sourceAsset"</i> 
-  attributes that point to resolvable shader implementations for different 
+- The info:implementationSource of the shader must be UsdShadeTokens->
+  sourceAsset. There must be one or more <i>"info:SOURCE_TYPE:sourceAsset"</i>
+  attributes that point to resolvable shader implementations for different
   source types (eg, glslfx, OSL etc.).
-  - Shader prims, their inputs and outputs can contain sdrMetadata values meant
+- Shader prims, their inputs and outputs can contain sdrMetadata values meant
   to be recorded in the shader registry. The keys in the sdrMetadata dictionary
-  correspond to the keys in \ref SdrNodeMetadata and \ref SdrPropertyMetadata. 
+  correspond to the keys in \ref SdrNodeMetadata and \ref SdrPropertyMetadata.
   The only exceptions are as follows:
-    - <b>defaultInput</b> metadatum on shader inputs gets translated to a 
-    more obscure key value of <b>__SDR__defaultInput</b> (which is the value of 
-    SdrPropertyMetadata->DefaultInput) in the metadata dictionary recorded by 
+  - <b>defaultInput</b> metadatum on shader inputs gets translated to a
+    more obscure key value of <b>**SDR**defaultInput</b> (which is the value of
+    SdrPropertyMetadata->DefaultInput) in the metadata dictionary recorded by
     SdrRegistry.
-    - Setting <b>sdrMetadata["primvarProperty"]="1"</b> on a shader 
-    input implies that the input names a primvar to be consumed by the shader. 
-    This causes '$' + inputName to be included in the 
-    <i>SdrShaderNode->Primvars</i> metadata on the <b>SdrShaderNode</b>. 
+  - Setting <b>sdrMetadata["primvarProperty"]="1"</b> on a shader
+    input implies that the input names a primvar to be consumed by the shader.
+    This causes '$' + inputName to be included in the
+    <i>SdrShaderNode->Primvars</i> metadata on the <b>SdrShaderNode</b>.
     Note that it's not translated to metadata on the property itself.
-    - <b>connectability</b> metadata authored on UsdShadeInputs gets translated 
+  - <b>connectability</b> metadata authored on UsdShadeInputs gets translated
     to SdrPropertyMetadata->Connectable. Connectability value of "interfaceOnly"
-    is converted to <i>connectable="0"</i>. Connectability value of "full" is 
+    is converted to <i>connectable="0"</i>. Connectability value of "full" is
     converted to <i>connectable="1"</i>.
-    - SdfAssetPath (or asset) valued shader inputs are automatically tagged with 
-    sdr metadata <i>SdrPropertyMetadata->IsAssetIdentifier="1"</i>. 
-    - <b>sdrMetadata["swizzle"]</b> is metadata that can be specified for
+  - SdfAssetPath (or asset) valued shader inputs are automatically tagged with
+    sdr metadata <i>SdrPropertyMetadata->IsAssetIdentifier="1"</i>.
+  - <b>sdrMetadata["swizzle"]</b> is metadata that can be specified for
     properties in SdrShaderProperty <b>output</b> definitions that describes
     the component(s) of the full color/vector output value produced by the
     shader property, and is necessary for shading systems that rely on
@@ -562,25 +562,25 @@ registry:
     shader-objects/closures. <b>swizzle</b> metadata is not meant to ever
     appear in user documents, and does not provide the ability to swizzle
     data on input connections.
-    - <b>sdrMetadata["implementationName"]</b> specifies the name that will be
+  - <b>sdrMetadata["implementationName"]</b> specifies the name that will be
     returned by SdrShaderProperty::GetImplementationName().
 
-Here's an example shader definition file with comments explaining the various 
+Here's an example shader definition file with comments explaining the various
 bits.
 
-~~~~~~~~~~~~~{.usd}
+```{.usd}
     #usda 1.0
 
     # The prim name becomes the SdrShaderNode's identifier.
     def Shader "Primvar_float_2" (
         doc = "Version 2 of a Primvar node that outputs a float"
         sdrMetadata = {
-            # This identifies the shader's role in the shading network as being 
+            # This identifies the shader's role in the shading network as being
             # a primvar reader.
             token role = "primvar"
 
-            # The following sdr-metadatum could be authored on the node directly 
-            # <b>in lieu of</b> authoring primvarProperty="1" on 
+            # The following sdr-metadatum could be authored on the node directly
+            # <b>in lieu of</b> authoring primvarProperty="1" on
             # inputs:primvarName.
             # string primvars = "$primvarName"
         }
@@ -588,27 +588,27 @@ bits.
     {
         uniform token info:implementationSource = "sourceAsset"
 
-        # If primvarReader.oso can be resolved to an existent asset, then a 
+        # If primvarReader.oso can be resolved to an existent asset, then a
         # SdrShaderNode is created with sourceType=OSL and sourceUri pointing
         # to the resolved primvarReader.oso file.
         uniform asset info:OSL:sourceAsset = @primvarReader.oso@
 
-        # If primvarReader.glslfx can be resolved to an existent asset, then 
-        # another SdrShaderNode is created with sourceType=glslfx and sourceUri 
+        # If primvarReader.glslfx can be resolved to an existent asset, then
+        # another SdrShaderNode is created with sourceType=glslfx and sourceUri
         # pointing to the resolved primvarReader.glslfx file.
         uniform asset info:glslfx:sourceAsset = @primvarReader.glslfx@
 
         token inputs:primvarName (
             connectability = "interfaceOnly"
             sdrMetadata = {
-                # This causes '$primvarName' to be appended to the 
+                # This causes '$primvarName' to be appended to the
                 # SdrNodeMetadata->Primvars metadata on the SdrShaderNode.
                 string primvarProperty = "1"
             }
             doc = """Name of the primvar to be fetched from the geometry."""
         )
 
-        # Asset valued inputs are automatically tagged with 
+        # Asset valued inputs are automatically tagged with
         # sdrMetadata[SdrPropertyMetadata->IsAssetIdentifier] = "1".
         asset inputs:primvarFile = @@ (
             connectability = "interfaceOnly"
@@ -623,8 +623,8 @@ bits.
                 token defaultInput = "1"
             }
         )
-        
+
         float outputs:result
 
     }
-~~~~~~~~~~~~~
+```

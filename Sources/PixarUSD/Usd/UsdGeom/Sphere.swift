@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomSphere = Pixar_v23.UsdGeomSphere
+public typealias UsdGeomSphere = Pixar.UsdGeomSphere
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Sphere: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Sphere
   {
     Pixar.UsdGeom.Sphere.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Sphere
   {
     Pixar.UsdGeom.Sphere.define(stage, path: .init(path))
   }

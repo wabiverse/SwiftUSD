@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomNurbsCurves = Pixar_v23.UsdGeomNurbsCurves
+public typealias UsdGeomNurbsCurves = Pixar.UsdGeomNurbsCurves
 
 public extension Pixar.UsdGeom
 {
@@ -33,13 +33,13 @@ public extension Pixar.UsdGeom
 public extension Pixar.UsdGeom.NurbsCurves
 {
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.NurbsCurves
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.NurbsCurves
   {
     Pixar.UsdGeom.NurbsCurves.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.NurbsCurves
+  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.NurbsCurves
   {
     Pixar.UsdGeom.NurbsCurves.define(stage, path: .init(path))
   }

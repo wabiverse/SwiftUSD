@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCone = Pixar_v23.UsdGeomCone
+public typealias UsdGeomCone = Pixar.UsdGeomCone
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Cone: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
   {
     Pixar.UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
   {
     Pixar.UsdGeom.Cone.define(stage, path: .init(path))
   }

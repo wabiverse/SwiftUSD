@@ -23,7 +23,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCamera = Pixar_v23.UsdGeomCamera
+public typealias UsdGeomCamera = Pixar.UsdGeomCamera
 
 public extension Pixar.UsdGeom
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdGeom
 extension Pixar.UsdGeom.Camera: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
   {
     Pixar.UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
   {
     Pixar.UsdGeom.Camera.define(stage, path: .init(path))
   }

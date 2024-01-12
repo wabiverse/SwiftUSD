@@ -25,7 +25,7 @@ import CxxStdlib
 import Foundation
 import Sdf
 
-public typealias SdfPath = Pixar_v23.SdfPath
+public typealias SdfPath = Pixar.SdfPath
 
 public extension Pixar.Sdf
 {

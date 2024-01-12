@@ -145,7 +145,7 @@ public enum ShadeColor: String, CaseIterable
  * - Parameter color: The diffuse color to set on the shader.
  * - Returns: The newly created material.
  */
-public func matDef(_ stage: StageRefPtr, color: ShadeColor = ShadeColor.white) -> Pixar.UsdShade.Material
+public func matDef(_ stage: Pixar.Usd.StageRefPtr, color: ShadeColor = ShadeColor.white) -> Pixar.UsdShade.Material
 {
   let matName = "\(color.rawValue.capitalized)Material"
 

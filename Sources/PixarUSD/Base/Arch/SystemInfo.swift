@@ -32,18 +32,18 @@ public extension Pixar.Arch
   /// Return current working directory as a string.
   static func getCwd() -> String
   {
-    String(Pixar_v23.ArchGetCwd())
+    String(Pixar.ArchGetCwd())
   }
 
   /// Return the path to the program's executable.
   static func getExecutablePath() -> String
   {
-    String(Pixar_v23.ArchGetExecutablePath())
+    String(Pixar.ArchGetExecutablePath())
   }
 
   /// Return the system's memory page size. Safe to assume power-of-two.
   static func getPageSize() -> Int
   {
-    Int(Pixar_v23.ArchGetPageSize())
+    Int(Pixar.ArchGetPageSize())
   }
 }

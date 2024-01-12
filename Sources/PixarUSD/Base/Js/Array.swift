@@ -23,7 +23,7 @@
 
 import Js
 
-public typealias JsArray = Pixar_v23.JsArray
+public typealias JsArray = Pixar.JsArray
 
 public extension Pixar.Js
 {

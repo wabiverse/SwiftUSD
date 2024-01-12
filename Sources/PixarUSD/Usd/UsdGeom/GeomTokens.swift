@@ -34,7 +34,7 @@ private extension Pixar.UsdGeom
     private init()
     {}
 
-    let tokens = Pixar_v23.UsdGeomTokensType()
+    let tokens = Pixar.UsdGeomTokensType()
   }
 }
 

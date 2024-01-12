@@ -1,32 +1,32 @@
-# Arch: Architecture Dependent
+# ``Arch`` Architecture Dependent
 
 The ``Arch`` library is a repository for all architecture-dependent
 code. It isolates all platform dependencies (and confusing `#ifdefs`)
 into one small library and also serves as a common area for
 documentation of these multi-platform issues.
 
-# ``Arch/Bits``
+### ``Arch/Bits``
 Functions having to do with how bits are laid out on a machine.
 
-# ``Arch/Multithreading``
+### ``Arch/Multithreading``
 Functions having to do with multithreading.
 
-# ``Arch/Math``
+### ``Arch/Math``
 Functions for math.
 
-# ``Arch/Strings``
+### ``Arch/Strings``
 Functions having to do with string massaging/manipulation
 
-# ``Arch/System``
+### ``Arch/System``
 Functions that encapsulate differing low-level system calls.
 
-# ``Arch/Memory``
+### ``Arch/Memory``
 Functions having to do with memory allocation/handling.
 
-# ``Arch/Diagnostics``
+### ``Arch/Diagnostics``
 Functions having to do with error reporting/handling.
 
-# ``Arch/Symbols``
+### ``Arch/Symbols``
 Macros having to do with symbol visibility
 
 Symbols for use within Arch:

@@ -23,7 +23,7 @@
 
 import UsdLux
 
-public typealias UsdLuxSphereLight = Pixar_v23.UsdLuxSphereLight
+public typealias UsdLuxSphereLight = Pixar.UsdLuxSphereLight
 
 public extension Pixar.UsdLux
 {
@@ -34,13 +34,13 @@ public extension Pixar.UsdLux
 extension Pixar.UsdLux.SphereLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.SphereLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.SphereLight
   {
     Pixar.UsdLux.SphereLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: StageRefPtr, path: String) -> Pixar.UsdLux.SphereLight
+  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.SphereLight
   {
     Pixar.UsdLux.SphereLight.define(stage, path: .init(path))
   }

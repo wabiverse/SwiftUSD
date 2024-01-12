@@ -34,7 +34,7 @@ private extension Pixar.Kind
     private init()
     {}
 
-    let tokens = Pixar_v23.KindTokens_StaticTokenType()
+    let tokens = Pixar.KindTokens_StaticTokenType()
   }
 }
 

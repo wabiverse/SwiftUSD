@@ -23,7 +23,7 @@
 
 import UsdShade
 
-public typealias UsdShadeInput = Pixar_v23.UsdShadeInput
+public typealias UsdShadeInput = Pixar.UsdShadeInput
 
 public extension Pixar.UsdShade
 {
@@ -33,43 +33,43 @@ public extension Pixar.UsdShade
 public extension Pixar.UsdShade.Input
 {
   @discardableResult
-  func set(_ value: Pixar_v23.VtValue, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: Pixar.VtValue, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec2d, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec2d, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec2f, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec2f, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec3d, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec3d, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec3f, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec3f, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: Double, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: Double, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: Float, time: Pixar_v23.UsdTimeCode = Pixar_v23.UsdTimeCode.Default()) -> Bool
+  func set(_ value: Float, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }

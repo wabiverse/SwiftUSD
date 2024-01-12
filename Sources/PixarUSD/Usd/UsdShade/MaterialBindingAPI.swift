@@ -23,7 +23,7 @@
 
 import UsdShade
 
-public typealias UsdShadeMaterialBindingAPI = Pixar_v23.UsdShadeMaterialBindingAPI
+public typealias UsdShadeMaterialBindingAPI = Pixar.UsdShadeMaterialBindingAPI
 
 public extension Pixar.UsdShade
 {

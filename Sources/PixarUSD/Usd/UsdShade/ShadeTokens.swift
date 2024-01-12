@@ -34,7 +34,7 @@ public extension Pixar.UsdShade
     private init()
     {}
 
-    let tokens = Pixar_v23.UsdShadeTokensType()
+    let tokens = Pixar.UsdShadeTokensType()
   }
 }
 

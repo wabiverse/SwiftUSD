@@ -23,7 +23,7 @@
 
 import Js
 
-public typealias JsValue = Pixar_v23.JsValue
+public typealias JsValue = Pixar.JsValue
 
 public extension Pixar.Js
 {

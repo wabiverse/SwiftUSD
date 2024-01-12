@@ -32,6 +32,6 @@ public extension Pixar.Arch
   /// Return true if the calling thread is the main thread, false otherwise.
   static func isMainThread() -> Bool
   {
-    Pixar_v23.ArchIsMainThread()
+    Pixar.ArchIsMainThread()
   }
 }

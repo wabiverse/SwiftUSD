@@ -36,7 +36,7 @@ import Gf
  * Represents a vector of 3 components of type **double**.
  * It is intended to be fast and simple.
  */
-public typealias GfVec3d = Pixar_v23.GfVec3d
+public typealias GfVec3d = Pixar.GfVec3d
 
 public extension Pixar.Gf
 {

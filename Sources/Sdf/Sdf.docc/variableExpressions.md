@@ -1,6 +1,5 @@
-### <sub>Variable Expressions</sub>
-# <sup>**Pixar.Sdf**</sup>
+# Variable Expressions
 
-### **Overview**
+## Overview
 
 **TBD**

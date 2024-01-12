@@ -23,7 +23,7 @@
 
 import UsdLux
 
-public typealias UsdLuxMeshLightAPI = Pixar_v23.UsdLuxMeshLightAPI
+public typealias UsdLuxMeshLightAPI = Pixar.UsdLuxMeshLightAPI
 
 public extension Pixar.UsdLux
 {

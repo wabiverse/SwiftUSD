@@ -24,7 +24,7 @@
 import CxxStdlib
 import Sdf
 
-public typealias SdfLayerHandle = Pixar_v23.SdfLayerHandle
+public typealias SdfLayerHandle = Pixar.SdfLayerHandle
 
 public extension Pixar.Sdf
 {

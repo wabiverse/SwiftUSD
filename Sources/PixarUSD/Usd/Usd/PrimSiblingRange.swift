@@ -23,7 +23,7 @@
 
 import Usd
 
-public typealias UsdPrimSiblingRange = Pixar_v23.UsdPrimSiblingRange
+public typealias UsdPrimSiblingRange = Pixar.UsdPrimSiblingRange
 
 public extension Pixar.Usd
 {
