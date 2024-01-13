@@ -22,9 +22,9 @@ let package = Package(
      */
     .macOS(.v14),
     .visionOS(.v1),
-    .iOS(.v16),
-    .tvOS(.v16),
-    .watchOS(.v9)
+    .iOS(.v17),
+    .tvOS(.v17),
+    .watchOS(.v10)
   ],
   products: [
     // ---------------- Pixar -----
