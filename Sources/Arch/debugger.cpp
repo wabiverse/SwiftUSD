@@ -40,7 +40,17 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string>
-#include <sys/ptrace.h>
+#if !defined(ARCH_OS_IOS)
+/**
+ * These headers should not be included
+ * for these devices (iPhone, Vision, TV, Watch):
+ *   1. These includes from these paths fail.
+ *   2. If taken from an alternative path prefix,
+ *      apple will reject app store submissions
+ *      from any app that includes these symbols.
+ */
+# include <sys/ptrace.h>
+#endif /* !defined(ARCH_OS_IOS) */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>

@@ -34,9 +34,13 @@
 #include <cstring>
 
 #if defined(ARCH_OS_DARWIN)
-#include <sys/malloc.h>
+# if defined(ARCH_OS_IOS)
+#  include <stdlib.h>
+# else
+#  include <sys/malloc.h>
+# endif
 #else
-#include <malloc.h>
+# include <malloc.h>
 #endif /* defined(ARCH_OS_DARWIN) */
 
 PXR_NAMESPACE_OPEN_SCOPE
