@@ -1,8 +1,22 @@
-## Pixar's Universal Scene Description for Swift and the Metaverse
+# <sub>Universal Scene Description (USD) for Swift</sub>
+<sup>
+  <div>
+    <a href="https://wabi.foundation/pixarusd/documentation/pixarusd">
+      <img align=top src="https://img.shields.io/badge/Swift_USD_API_Docs-DocumentationSource?style=for-the-badge&color=F05138&logo=swift&logoColor=white">
+    </a>
+    <a href="mailto:devs@wabi.foundation?subject=%5BSwiftUSD%20Linux%20Inquiry%5D%20">
+      <img align=right src="https://img.shields.io/badge/Linux_|_Support-LinuxAttr?style=for-the-badge&color=003366&logo=linuxFoundation">
+    </a>
+  </div>
+</sup>
+
+<image align=top src="https://www.dropbox.com/scl/fi/cmqz171jkketkvpyojtbx/swiftyusd.png?rlkey=rosui4p7dv410eqvztmynhz56&raw=1">
 
 > [!IMPORTANT]
-> ### Supporting SwiftUSD ❤️
+> #### Supporting SwiftUSD ❤️
 > If you find **SwiftUSD** useful, please consider supporting me by [becoming a sponsor](https://github.com/sponsors/wabiverse). I spend a tremendous amount of time dedicating my life to open source projects, and each sponsorship helps me focus more time on making quality tools and software for the community.
+
+### Pixar's Universal Scene Description for Swift and the Metaverse
 
 Universal Scene Description (**USD**) is an efficient, scalable system for
 authoring, reading, and streaming time-sampled scene description for
@@ -10,14 +24,10 @@ interchange between graphics applications.
 
 For more details, please visit the web site [here](http://openusd.org).
 
-# Swifting the Metaverse
-
-<image src="https://www.dropbox.com/scl/fi/cmqz171jkketkvpyojtbx/swiftyusd.png?rlkey=rosui4p7dv410eqvztmynhz56&raw=1">
-
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.20"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.21"),
 ]
 ```
 
@@ -45,7 +55,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.20")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.21")
   ],
   targets: [
     /* 📕 For library products... */
