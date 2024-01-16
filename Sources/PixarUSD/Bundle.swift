@@ -1,25 +1,32 @@
-/* --------------------------------------------------------------
- * :: :  M  E  T  A  V  E  R  S  E  :                          ::
- * --------------------------------------------------------------
- * This program is free software; you can redistribute it, and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
+/* ----------------------------------------------------------------
+ * :: :  M  E  T  A  V  E  R  S  E  :                            ::
+ * ----------------------------------------------------------------
+ * This software is Licensed under the terms of the Apache License,
+ * version 2.0 (the "Apache License") with the following additional
+ * modification; you may not use this file except within compliance
+ * of the Apache License and the following modification made to it.
+ * Section 6. Trademarks. is deleted and replaced with:
  *
- * This program is distributed in the hope that it will be useful
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Check out
- * the GNU General Public License for more details.
+ * Trademarks. This License does not grant permission to use any of
+ * its trade names, trademarks, service marks, or the product names
+ * of this Licensor or its affiliates, except as required to comply
+ * with Section 4(c.) of this License, and to reproduce the content
+ * of the NOTICE file.
  *
- * You should have received a copy for this software license, the
- * GNU General Public License along with this program; or, if not
- * write to the Free Software Foundation, Inc., to the address of
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND without even an
+ * implied warranty of MERCHANTABILITY, or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy for this software license of the
+ * Apache License along with this program; or, if not, please write
+ * to the Free Software Foundation Inc., with the following address
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *       Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
- * --------------------------------------------------------------
+ *         Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
+ * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
- * -------------------------------------------------------------- */
+ * ---------------------------------------------------------------- */
 
 import CxxStdlib
 import Foundation
@@ -27,9 +34,9 @@ import Plug
 import Rainbow
 
 #if os(Linux)
-  /*
+  /**
    * On Linux there is no ``Foundation.Bundle``, so we create one.
-   **/
+   */
   public struct Bundle
   {
     public static let main = Bundle()
@@ -63,9 +70,9 @@ public extension Bundle
   static let pxrRoot = Bundle.main.resourcePath ?? ""
 
   #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-  static let ext = ".bundle"
+    static let ext = ".bundle"
   #else
-  static let ext = ".resources"
+    static let ext = ".resources"
   #endif
 
   /**
@@ -210,9 +217,9 @@ public extension Pixar
       { path in
 
         #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let doInstallPlugs = !path.contains(".app") && !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil)
+          let doInstallPlugs = !path.contains(".app") && !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil)
         #else /* os(Linux) */
-        let doInstallPlugs = true
+          let doInstallPlugs = true
         #endif /* os(Linux) */
 
         /* Check for the existence of usd plugins, if they do not exist, we install them automatically. */
@@ -392,7 +399,7 @@ public extension Pixar.Bundler
   private func shortenedPath(from string: String) -> ShortPath
   {
     #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-      /*  xcode build directories are capitalized, swiftpm builds are not. */
+      /**  xcode build directories are capitalized, swiftpm builds are not. */
       let isXcodeBuild = string.contains("Build")
 
       #if DEBUG
