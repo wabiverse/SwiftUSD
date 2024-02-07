@@ -101,8 +101,8 @@ public extension Pixar.Usd
    * `stage.getEditTarget(for: .localLayer, stage.getSessionLayer())` and
    * set that target in the stage by calling `setEditTarget()` or creating
    * a ``UsdEditContext``. */
-  typealias StageRefPtr = Pixar.UsdStageRefPtr
   typealias Stage = Pixar.UsdStage
+  typealias StageRefPtr = Pixar.UsdStageRefPtr
 }
 
 public extension Pixar.Usd.Stage
