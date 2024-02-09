@@ -1,6 +1,6 @@
 #usda 1.0
 (
-    doc = "SwiftUSD v23.11.21"
+    doc = "SwiftUSD v23.11.22"
 )
 
 def Xform "Geometry"
