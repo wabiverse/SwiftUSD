@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/cameraUtil/framing.h"
+#include "CameraUtil/framing.h"
 
-#include "pxr/base/gf/matrix4d.h"
+#include "Gf/matrix4d.h"
 
-#include "pxr/base/tf/pyUtils.h"
-#include "pxr/base/tf/stringUtils.h"
+#include "Tf/pyUtils.h"
+#include "Tf/stringUtils.h"
 
 #include <boost/python.hpp>
 
@@ -34,10 +34,11 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace {
-
-std::string _Repr(const CameraUtilFraming &self)
+namespace
 {
+
+  std::string _Repr(const CameraUtilFraming &self)
+  {
     static const std::string prefix =
         TF_PY_REPR_PREFIX + "Framing(";
     static const std::string separator =
@@ -46,46 +47,45 @@ std::string _Repr(const CameraUtilFraming &self)
     std::vector<std::string> kwargs;
     kwargs.push_back("displayWindow = " + TfPyRepr(self.displayWindow));
     kwargs.push_back("dataWindow = " + TfPyRepr(self.dataWindow));
-    if (self.pixelAspectRatio != 1.0f) {
-        kwargs.push_back(
-            "pixelAspectRatio = " + TfPyRepr(self.pixelAspectRatio));
+    if (self.pixelAspectRatio != 1.0f)
+    {
+      kwargs.push_back(
+          "pixelAspectRatio = " + TfPyRepr(self.pixelAspectRatio));
     }
 
     return prefix + TfStringJoin(kwargs, separator.c_str()) + ")";
-}
+  }
 
 }
 
-void
-wrapFraming()
+void wrapFraming()
 {
-    using This = CameraUtilFraming;
+  using This = CameraUtilFraming;
 
-    class_<This>("Framing")
-        .def(init<>())
-        .def(init<const This &>())
-        .def(init<const GfRange2f&,
-                  const GfRect2i&,
-                  float>(
-                      (args("displayWindow"),
-                       args("dataWindow"),
-                       args("pixelAspectRatio") = 1.0)))
-        .def(init<const GfRect2i>(
-                      ((args("dataWindow")))))
-        .def("ApplyToProjectionMatrix",
-             &This::ApplyToProjectionMatrix,
-             ((args("projectionMatrix"), args("windowPolicy"))))
-        .def("ComputeFilmbackWindow",
-             &This::ComputeFilmbackWindow,
-             ((args("cameraAspectRatio"), args("windowPolicy"))))
-        .def("IsValid", &This::IsValid)
-        .def_readwrite("displayWindow", &This::displayWindow)
-        .def_readwrite("dataWindow", &This::dataWindow)
-        .def_readwrite("pixelAspectRatio", &This::pixelAspectRatio)
+  class_<This>("Framing")
+      .def(init<>())
+      .def(init<const This &>())
+      .def(init<const GfRange2f &,
+                const GfRect2i &,
+                float>(
+          (args("displayWindow"),
+           args("dataWindow"),
+           args("pixelAspectRatio") = 1.0)))
+      .def(init<const GfRect2i>(
+          ((args("dataWindow")))))
+      .def("ApplyToProjectionMatrix",
+           &This::ApplyToProjectionMatrix,
+           ((args("projectionMatrix"), args("windowPolicy"))))
+      .def("ComputeFilmbackWindow",
+           &This::ComputeFilmbackWindow,
+           ((args("cameraAspectRatio"), args("windowPolicy"))))
+      .def("IsValid", &This::IsValid)
+      .def_readwrite("displayWindow", &This::displayWindow)
+      .def_readwrite("dataWindow", &This::dataWindow)
+      .def_readwrite("pixelAspectRatio", &This::pixelAspectRatio)
 
-        .def(self == self)
-        .def(self != self)
+      .def(self == self)
+      .def(self != self)
 
-        .def("__repr__", _Repr)
-    ;
+      .def("__repr__", _Repr);
 }

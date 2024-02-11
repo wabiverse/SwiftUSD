@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2017 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,34 +21,27 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-///
-/// \file camera/wrapScreenWindowParameters.h
+#ifndef PXR_IMAGING_CAMERA_UTIL_API_H
+#define PXR_IMAGING_CAMERA_UTIL_API_H
 
+#include "Arch/export.h"
 
-#include "pxr/imaging/cameraUtil/screenWindowParameters.h"
+#if defined(PXR_STATIC)
+#   define CAMERAUTIL_API
+#   define CAMERAUTIL_API_TEMPLATE_CLASS(...)
+#   define CAMERAUTIL_API_TEMPLATE_STRUCT(...)
+#   define CAMERAUTIL_LOCAL
+#else
+#   if defined(CAMERAUTIL_EXPORTS)
+#       define CAMERAUTIL_API ARCH_EXPORT
+#       define CAMERAUTIL_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
+#       define CAMERAUTIL_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
+#   else
+#       define CAMERAUTIL_API ARCH_IMPORT
+#       define CAMERAUTIL_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
+#       define CAMERAUTIL_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
+#   endif
+#   define CAMERAUTIL_LOCAL ARCH_HIDDEN
+#endif
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
-
-PXR_NAMESPACE_USING_DIRECTIVE
-
-void
-wrapScreenWindowParameters()
-{
-    object getScreenWindowFunc =
-        make_function(&CameraUtilScreenWindowParameters::GetScreenWindow,
-                      return_value_policy<copy_const_reference>());
-
-    object getZFacingViewMatrixFunc =
-        make_function(&CameraUtilScreenWindowParameters::GetZFacingViewMatrix,
-                      return_value_policy<copy_const_reference>());
-
-    class_<CameraUtilScreenWindowParameters>("ScreenWindowParameters", no_init)
-        .def(init<const GfCamera&>())
-        .add_property("screenWindow", getScreenWindowFunc)
-        .add_property("fieldOfView",
-                      &CameraUtilScreenWindowParameters::GetFieldOfView)
-        .add_property("zFacingViewMatrix", getZFacingViewMatrixFunc);
-
-}
+#endif // PXR_IMAGING_CAMERA_UTIL_API_H

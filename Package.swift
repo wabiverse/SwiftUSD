@@ -106,6 +106,11 @@ let package = Package(
       name: "UsdLux",
       targets: ["UsdLux"]
     ),
+    // -------- Pixar.Imaging -----
+    .library(
+      name: "CameraUtil",
+      targets: ["CameraUtil"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -197,6 +202,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyUsdLux"]
     ),
+    .library(
+      name: "PyCameraUtil",
+      type: .dynamic,
+      targets: ["PyCameraUtil"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -228,7 +238,8 @@ let package = Package(
         "PyUsdGeom",
         "PyUsdShade",
         "PyUsdShaders",
-        "PyUsdLux"
+        "PyUsdLux",
+        "PyCameraUtil"
       ]
     ),
   ],
@@ -645,6 +656,21 @@ let package = Package(
     ),
 
     .target(
+      name: "CameraUtil",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
+        .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
+        .define("CAMERAUTIL_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -933,6 +959,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyCameraUtil",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyCameraUtil",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
+        .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -1008,6 +1051,8 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
+        // ------- imaging. ------
+        .target(name: "CameraUtil"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------

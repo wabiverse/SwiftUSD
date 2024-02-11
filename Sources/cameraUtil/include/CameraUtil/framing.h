@@ -24,13 +24,13 @@
 #ifndef PXR_IMAGING_CAMERA_UTIL_FRAMING_H
 #define PXR_IMAGING_CAMERA_UTIL_FRAMING_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/cameraUtil/api.h"
+#include <pxr/pxrns.h>
+#include "CameraUtil/api.h"
 
-#include "pxr/imaging/cameraUtil/conformWindow.h"
+#include "CameraUtil/conformWindow.h"
 
-#include "pxr/base/gf/rect2i.h"
-#include "pxr/base/gf/range2f.h"
+#include "Gf/rect2i.h"
+#include "Gf/range2f.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

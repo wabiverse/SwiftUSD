@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/cameraUtil/conformWindow.h"
+#include "CameraUtil/conformWindow.h"
 
-#include "pxr/base/gf/camera.h"
-#include "pxr/base/gf/vec2d.h"
-#include "pxr/base/gf/vec4d.h"
-#include "pxr/base/gf/matrix4d.h"
-#include "pxr/base/gf/range2d.h"
-#include "pxr/base/gf/frustum.h"
+#include "Gf/camera.h"
+#include "Gf/vec2d.h"
+#include "Gf/vec4d.h"
+#include "Gf/matrix4d.h"
+#include "Gf/range2d.h"
+#include "Gf/frustum.h"
 
-#include "pxr/base/tf/enum.h"
-#include "pxr/base/tf/registryManager.h"
+#include "Tf/enum.h"
+#include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

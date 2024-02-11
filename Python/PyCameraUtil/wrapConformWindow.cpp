@@ -24,15 +24,15 @@
 ///
 /// \file camera/wrapConformWindow.h
 
-#include "pxr/imaging/cameraUtil/conformWindow.h"
+#include "CameraUtil/conformWindow.h"
 
-#include "pxr/base/gf/camera.h"
-#include "pxr/base/gf/vec2d.h"
-#include "pxr/base/gf/vec4d.h"
-#include "pxr/base/gf/range2d.h"
-#include "pxr/base/gf/frustum.h"
+#include "Gf/camera.h"
+#include "Gf/vec2d.h"
+#include "Gf/vec4d.h"
+#include "Gf/range2d.h"
+#include "Gf/frustum.h"
 
-#include "pxr/base/tf/pyEnum.h"
+#include "Tf/pyEnum.h"
 
 #include <boost/python.hpp>
 

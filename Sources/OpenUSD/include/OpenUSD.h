@@ -318,13 +318,6 @@
 #include <OpenUSD/pxr/imaging/pxOsd/subdivTags.h>
 #include <OpenUSD/pxr/imaging/pxOsd/tokens.h>
 
-// cameraUtil
-#include <OpenUSD/pxr/imaging/cameraUtil/api.h>
-#include <OpenUSD/pxr/imaging/cameraUtil/conformWindow.h>
-#include <OpenUSD/pxr/imaging/cameraUtil/framing.h>
-#include <OpenUSD/pxr/imaging/cameraUtil/pch.h>
-#include <OpenUSD/pxr/imaging/cameraUtil/screenWindowParameters.h>
-
 // hgiInterop
 #include <OpenUSD/pxr/imaging/hgiInterop/api.h>
 #include <OpenUSD/pxr/imaging/hgiInterop/hgiInterop.h>

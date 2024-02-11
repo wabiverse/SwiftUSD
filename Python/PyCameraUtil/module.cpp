@@ -21,28 +21,14 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-////////////////////////////////////////////////////////////////////////
+#include <pxr/pxrns.h>
+#include "Tf/pyModule.h"
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/registryManager.h"
-#include "pxr/base/tf/scriptModuleLoader.h"
-#include "pxr/base/tf/token.h"
+PXR_NAMESPACE_USING_DIRECTIVE
 
-#include <vector>
-
-PXR_NAMESPACE_OPEN_SCOPE
-
-TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
-    // List of direct dependencies for this library.
-    const std::vector<TfToken> reqs = {
-        TfToken("arch"),
-        TfToken("gf"),
-        TfToken("tf")
-    };
-    TfScriptModuleLoader::GetInstance().
-        RegisterLibrary(TfToken("cameraUtil"), TfToken("pxr.CameraUtil"), reqs);
+TF_WRAP_MODULE
+{
+    TF_WRAP(ScreenWindowParameters);
+    TF_WRAP(ConformWindow);
+    TF_WRAP(Framing);
 }
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
-

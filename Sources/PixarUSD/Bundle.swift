@@ -174,6 +174,10 @@ public extension Bundle
   /**
    * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
   static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
+  static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
 }
 
 public enum BundleKind
@@ -308,6 +312,7 @@ public enum BundlePython: CaseIterable
   case pyUsdShade
   case pyUsdShaders
   case pyUsdLux
+  case pyCameraUtil
 
   public var resourcePath: String?
   {
@@ -330,6 +335,7 @@ public enum BundlePython: CaseIterable
       case .pyUsdShade: Bundle.pyUsdShade?.resourcePath
       case .pyUsdShaders: Bundle.pyUsdShaders?.resourcePath
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
+      case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
     }
   }
 }

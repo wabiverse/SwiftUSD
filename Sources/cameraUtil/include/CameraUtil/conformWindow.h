@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_CAMERA_UTIL_CONFORM_WINDOW_H
 #define PXR_IMAGING_CAMERA_UTIL_CONFORM_WINDOW_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/cameraUtil/api.h"
+#include <pxr/pxrns.h>
+#include "CameraUtil/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
