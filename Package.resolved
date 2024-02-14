@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "revision" : "6a16805b8d1a1b4fa98438dcda7c6d7d41fd8dd8",
-        "version" : "1.4.4"
+        "revision" : "0649f06cd182f948a0377e15ad10bcb21aa4fffe",
+        "version" : "1.4.8"
       }
     },
     {
@@ -147,7 +147,7 @@
     {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
+      "location" : "https://github.com/apple/swift-log",
       "state" : {
         "revision" : "532d8b529501fb73a2455b179e0bbb6d49b652ed",
         "version" : "1.5.3"
