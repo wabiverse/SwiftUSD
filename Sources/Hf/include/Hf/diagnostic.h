@@ -24,13 +24,12 @@
 #ifndef PXR_IMAGING_HF_DIAGNOSTIC_H
 #define PXR_IMAGING_HF_DIAGNOSTIC_H
 
-#include "pxr/pxrns.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 ///
 /// Issues a warning with a message.  This differs from just calling TF_WARN
@@ -38,11 +37,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// and a place holder for when we develop a true validation system where we
 /// can plumb this information back to the application.
 ///
-#define HF_VALIDATION_WARN(id, ...) \
-    TF_WARN("Invalid Hydra prim '%s': %s", \
-            id.GetText(), \
-            TfStringPrintf(__VA_ARGS__).c_str())
-
+#define HF_VALIDATION_WARN(id, ...)      \
+  TF_WARN("Invalid Hydra prim '%s': %s", \
+          id.GetText(),                  \
+          TfStringPrintf(__VA_ARGS__).c_str())
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
