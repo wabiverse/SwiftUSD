@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomCamera = Pixar.UsdGeomCamera
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Camera = UsdGeomCamera
 }
 
 @Xformable
-extension Pixar.UsdGeom.Camera: GeomXformable
+extension UsdGeom.Camera: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Camera
   {
-    Pixar.UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Camera
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Camera
   {
-    Pixar.UsdGeom.Camera.define(stage, path: .init(path))
+    UsdGeom.Camera.define(stage, path: .init(path))
   }
 }

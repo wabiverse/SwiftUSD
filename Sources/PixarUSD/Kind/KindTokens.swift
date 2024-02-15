@@ -29,12 +29,13 @@
  * ---------------------------------------------------------------- */
 
 import Kind
+import PixarBase
 
-private extension Pixar.Kind
+private extension Kind
 {
   /**
    * Private struct to hold the static
-   * data for the Pixar.Kind library. */
+   * data for the Kind library. */
   struct StaticData
   {
     static let shared = StaticData()
@@ -45,15 +46,15 @@ private extension Pixar.Kind
   }
 }
 
-public extension Pixar.Kind
+public extension Kind
 {
   /**
-   * # Pixar.Kind.Tokens
+   * # Kind.Tokens
    *
    * ### Overview
    *
    * Public, client facing api to access
-   * the static Pixar.Kind tokens. */
+   * the static Kind tokens. */
   enum Tokens: CaseIterable
   {
     case model
@@ -62,7 +63,7 @@ public extension Pixar.Kind
     case assembly
     case subcomponent
 
-    public func getToken() -> Pixar.Tf.Token
+    public func getToken() -> Tf.Token
     {
       switch self
       {

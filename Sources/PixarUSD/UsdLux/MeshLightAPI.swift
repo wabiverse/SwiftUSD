@@ -28,20 +28,21 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxMeshLightAPI = Pixar.UsdLuxMeshLightAPI
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias MeshLightAPI = UsdLuxMeshLightAPI
 }
 
-extension Pixar.UsdLux.MeshLightAPI
+extension UsdLux.MeshLightAPI
 {
   @discardableResult
-  static func apply(_ prim: Pixar.Usd.Prim) -> Pixar.UsdLux.MeshLightAPI
+  static func apply(_ prim: Usd.Prim) -> UsdLux.MeshLightAPI
   {
-    Pixar.UsdLux.MeshLightAPI.Apply(prim)
+    UsdLux.MeshLightAPI.Apply(prim)
   }
 }

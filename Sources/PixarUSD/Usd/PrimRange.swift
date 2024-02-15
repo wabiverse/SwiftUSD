@@ -32,10 +32,10 @@ import Usd
 
 public typealias UsdPrimRange = Pixar.UsdPrimRange
 
-public extension Pixar.Usd
+public extension Usd
 {
   /**
-   * # Pixar.Usd.PrimRange
+   * # Usd.PrimRange
    *
    * An forward-iterable range that traverses a subtree of prims rooted at a
    * given prim in depth-first order.
@@ -61,9 +61,9 @@ public extension Pixar.Usd
   typealias PrimRange = UsdPrimRange
 }
 
-extension Pixar.Usd.PrimRange: IteratorProtocol
+extension Usd.PrimRange: IteratorProtocol
 {
-  public typealias Element = Pixar.Usd.Prim
+  public typealias Element = Usd.Prim
 
   public mutating func next() -> Element?
   {

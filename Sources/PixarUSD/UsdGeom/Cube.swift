@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomCube = Pixar.UsdGeomCube
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Cube = UsdGeomCube
 }
 
 @Xformable
-extension Pixar.UsdGeom.Cube: GeomXformable
+extension UsdGeom.Cube: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cube
   {
-    Pixar.UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cube
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cube
   {
-    Pixar.UsdGeom.Cube.define(stage, path: .init(path))
+    UsdGeom.Cube.define(stage, path: .init(path))
   }
 }

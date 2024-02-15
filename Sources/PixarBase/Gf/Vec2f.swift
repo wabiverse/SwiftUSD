@@ -45,7 +45,7 @@ import Gf
  */
 public typealias GfVec2f = Pixar.GfVec2f
 
-public extension Pixar.Gf
+public extension Gf
 {
   /**
    * # GfVec2f

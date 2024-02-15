@@ -28,39 +28,40 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdShade
 
 public typealias UsdShadeShader = Pixar.UsdShadeShader
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   typealias Shader = UsdShadeShader
 }
 
-public extension Pixar.UsdShade.Shader
+public extension UsdShade.Shader
 {
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Shader
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdShade.Shader
   {
-    Pixar.UsdShade.Shader.Define(stage.pointee.getPtr(), path)
+    UsdShade.Shader.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdShade.Shader
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdShade.Shader
   {
-    Pixar.UsdShade.Shader.define(stage, path: .init(path))
+    UsdShade.Shader.define(stage, path: .init(path))
   }
 
   @discardableResult
-  func createIdAttr(_ defaultValue: Pixar.Tf.Token, writeSparsely: Bool = false) -> Pixar.Usd.Attribute
+  func createIdAttr(_ defaultValue: Tf.Token, writeSparsely: Bool = false) -> Usd.Attribute
   {
-    CreateIdAttr(Pixar.VtValue(defaultValue), writeSparsely)
+    CreateIdAttr(VtValue(defaultValue), writeSparsely)
   }
 
   @discardableResult
-  func createIdAttr(_ defaultValue: String, writeSparsely: Bool = false) -> Pixar.Usd.Attribute
+  func createIdAttr(_ defaultValue: String, writeSparsely: Bool = false) -> Usd.Attribute
   {
-    CreateIdAttr(Pixar.VtValue(std.string(defaultValue)), writeSparsely)
+    CreateIdAttr(VtValue(std.string(defaultValue)), writeSparsely)
   }
 
   /**
@@ -71,22 +72,22 @@ public extension Pixar.UsdShade.Shader
     case usdPreviewSurface = "UsdPreviewSurface"
     case usdUVTexture = "UsdUVTexture"
 
-    public func getToken() -> Pixar.Tf.Token
+    public func getToken() -> Tf.Token
     {
-      Pixar.Tf.Token(rawValue)
+      Tf.Token(rawValue)
     }
   }
 
   @discardableResult
-  func createIdAttr(_ defaultValue: ShaderId, writeSparsely: Bool = false) -> Pixar.Usd.Attribute
+  func createIdAttr(_ defaultValue: ShaderId, writeSparsely: Bool = false) -> Usd.Attribute
   {
-    CreateIdAttr(Pixar.VtValue(defaultValue.getToken()), writeSparsely)
+    CreateIdAttr(VtValue(defaultValue.getToken()), writeSparsely)
   }
 
   @discardableResult
-  mutating func createInput(for name: Pixar.Tf.Token, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShade.Input
+  mutating func createInput(for name: Tf.Token, type: SdfValueTypeNameType) -> UsdShade.Input
   {
-    CreateInput(name, Pixar.Sdf.getValueType(for: type))
+    CreateInput(name, Sdf.getValueType(for: type))
   }
 
   /**
@@ -120,25 +121,25 @@ public extension Pixar.UsdShade.Shader
     case bias
     case sourceColorSpace
 
-    public func getToken() -> Pixar.Tf.Token
+    public func getToken() -> Tf.Token
     {
-      Pixar.Tf.Token(rawValue)
+      Tf.Token(rawValue)
     }
   }
 
   @discardableResult
-  mutating func createInput(for name: InputName, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShade.Input
+  mutating func createInput(for name: InputName, type: SdfValueTypeNameType) -> UsdShade.Input
   {
-    CreateInput(name.getToken(), Pixar.Sdf.getValueType(for: type))
+    CreateInput(name.getToken(), Sdf.getValueType(for: type))
   }
 
   @discardableResult
-  mutating func createInput(for name: String, type: Pixar.SdfValueTypeNameType) -> Pixar.UsdShade.Input
+  mutating func createInput(for name: String, type: SdfValueTypeNameType) -> UsdShade.Input
   {
-    CreateInput(Pixar.Tf.Token(name), Pixar.Sdf.getValueType(for: type))
+    CreateInput(Tf.Token(name), Sdf.getValueType(for: type))
   }
 
-  func connectableAPI() -> Pixar.UsdShade.ConnectableAPI
+  func connectableAPI() -> UsdShade.ConnectableAPI
   {
     ConnectableAPI()
   }

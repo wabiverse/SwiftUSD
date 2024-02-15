@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxPortalLight = Pixar.UsdLuxPortalLight
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias PortalLight = UsdLuxPortalLight
 }
 
 @Xformable
-extension Pixar.UsdLux.PortalLight: GeomXformable
+extension UsdLux.PortalLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.PortalLight
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.PortalLight
   {
-    Pixar.UsdLux.PortalLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.PortalLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.PortalLight
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.PortalLight
   {
-    Pixar.UsdLux.PortalLight.define(stage, path: .init(path))
+    UsdLux.PortalLight.define(stage, path: .init(path))
   }
 }

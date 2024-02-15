@@ -29,6 +29,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
+import PixarBase
 import PixarUSD
 
 @main
@@ -44,36 +45,36 @@ enum Creator
 
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
 
-    let stage = Pixar.Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
+    let stage = Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
 
-    let xform = Pixar.UsdGeom.Xform.define(stage, path: "/Geometry")
+    let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
     xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
     xform.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
 
-    let sphere = Pixar.UsdGeom.Sphere.define(stage, path: "/Geometry/Sphere")
+    let sphere = UsdGeom.Sphere.define(stage, path: "/Geometry/Sphere")
     sphere.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -5.0))
 
-    let capsule = Pixar.UsdGeom.Capsule.define(stage, path: "/Geometry/Capsule")
+    let capsule = UsdGeom.Capsule.define(stage, path: "/Geometry/Capsule")
     capsule.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -10.0))
     capsule.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    let cylinder = Pixar.UsdGeom.Cylinder.define(stage, path: "/Geometry/Cylinder")
+    let cylinder = UsdGeom.Cylinder.define(stage, path: "/Geometry/Cylinder")
     cylinder.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    let cube = Pixar.UsdGeom.Cube.define(stage, path: "/Geometry/Cube")
+    let cube = UsdGeom.Cube.define(stage, path: "/Geometry/Cube")
     cube.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 5.0))
 
-    let cone = Pixar.UsdGeom.Cone.define(stage, path: "/Geometry/Cone")
+    let cone = UsdGeom.Cone.define(stage, path: "/Geometry/Cone")
     cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     /* Create a different colored material for each geometry prim. */
 
-    Pixar.UsdShade.MaterialBindingAPI.apply(sphere).bind(matDef(stage, color: .red))
-    Pixar.UsdShade.MaterialBindingAPI.apply(capsule).bind(matDef(stage, color: .yellow))
-    Pixar.UsdShade.MaterialBindingAPI.apply(cylinder).bind(matDef(stage, color: .green))
-    Pixar.UsdShade.MaterialBindingAPI.apply(cube).bind(matDef(stage, color: .blue))
-    Pixar.UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
+    UsdShade.MaterialBindingAPI.apply(sphere).bind(matDef(stage, color: .red))
+    UsdShade.MaterialBindingAPI.apply(capsule).bind(matDef(stage, color: .yellow))
+    UsdShade.MaterialBindingAPI.apply(cylinder).bind(matDef(stage, color: .green))
+    UsdShade.MaterialBindingAPI.apply(cube).bind(matDef(stage, color: .blue))
+    UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v\(Pixar.version)")
 
@@ -152,13 +153,13 @@ public enum ShadeColor: String, CaseIterable
  * - Parameter color: The diffuse color to set on the shader.
  * - Returns: The newly created material.
  */
-public func matDef(_ stage: Pixar.Usd.StageRefPtr, color: ShadeColor = ShadeColor.white) -> Pixar.UsdShade.Material
+public func matDef(_ stage: UsdStageRefPtr, color: ShadeColor = ShadeColor.white) -> UsdShade.Material
 {
   let matName = "\(color.rawValue.capitalized)Material"
 
-  let material = Pixar.UsdShade.Material.define(stage, path: "/Materials/\(matName)")
+  let material = UsdShade.Material.define(stage, path: "/Materials/\(matName)")
 
-  var pbrShader = Pixar.UsdShade.Shader.define(stage, path: "/Materials/\(matName)/PBRShader")
+  var pbrShader = UsdShade.Shader.define(stage, path: "/Materials/\(matName)/PBRShader")
   pbrShader.createIdAttr(.usdPreviewSurface)
   pbrShader.createInput(for: .diffuseColor, type: .color3f).set(color.vec3f)
   pbrShader.createInput(for: .roughness, type: .float).set(Float(0.4))

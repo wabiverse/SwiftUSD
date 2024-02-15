@@ -28,11 +28,12 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomXformable = Pixar.UsdGeomXformable
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Xformable = UsdGeomXformable
 }
@@ -44,27 +45,27 @@ public protocol GeomXformable
 {
   func addXformOp(type: UsdGeomXformOp.`Type`,
                   precision: UsdGeomXformOp.Precision,
-                  suffix: Pixar.Tf.Token,
+                  suffix: Tf.Token,
                   invert: Bool) -> UsdGeomXformOp
 
   func addTranslateOp(precision: UsdGeomXformOp.Precision,
-                      suffix: Pixar.Tf.Token,
+                      suffix: Tf.Token,
                       invert: Bool) -> UsdGeomXformOp
 
   func addScaleOp(precision: UsdGeomXformOp.Precision,
-                  suffix: Pixar.Tf.Token,
+                  suffix: Tf.Token,
                   invert: Bool) -> UsdGeomXformOp
 
   func addRotateXOp(precision: UsdGeomXformOp.Precision,
-                    suffix: Pixar.Tf.Token,
+                    suffix: Tf.Token,
                     invert: Bool) -> UsdGeomXformOp
 
   func addRotateYOp(precision: UsdGeomXformOp.Precision,
-                    suffix: Pixar.Tf.Token,
+                    suffix: Tf.Token,
                     invert: Bool) -> UsdGeomXformOp
 
   func addRotateZOp(precision: UsdGeomXformOp.Precision,
-                    suffix: Pixar.Tf.Token,
+                    suffix: Tf.Token,
                     invert: Bool) -> UsdGeomXformOp
 }
 

@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxSphereLight = Pixar.UsdLuxSphereLight
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias SphereLight = UsdLuxSphereLight
 }
 
 @Xformable
-extension Pixar.UsdLux.SphereLight: GeomXformable
+extension UsdLux.SphereLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.SphereLight
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.SphereLight
   {
-    Pixar.UsdLux.SphereLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.SphereLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.SphereLight
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.SphereLight
   {
-    Pixar.UsdLux.SphereLight.define(stage, path: .init(path))
+    UsdLux.SphereLight.define(stage, path: .init(path))
   }
 }

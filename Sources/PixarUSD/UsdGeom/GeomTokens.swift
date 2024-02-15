@@ -28,13 +28,14 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
-private extension Pixar.UsdGeom
+private extension UsdGeom
 {
   /**
    * Private struct to hold the static
-   * data for the Pixar.UsdGeom library. */
+   * data for the UsdGeom library. */
   struct StaticData
   {
     static let shared = StaticData()
@@ -45,15 +46,15 @@ private extension Pixar.UsdGeom
   }
 }
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   /**
-   * # Pixar.UsdGeom.Tokens
+   * # UsdGeom.Tokens
    *
    * ### Overview
    *
    * Public, client facing api to access
-   * the static Pixar.UsdGeom tokens. */
+   * the static UsdGeom tokens. */
   enum Tokens: CaseIterable
   {
     case basisCurves
@@ -85,7 +86,7 @@ public extension Pixar.UsdGeom
     case geomModelAPI
     case visibilityAPI
 
-    public var token: Pixar.Tf.Token
+    public var token: Tf.Token
     {
       switch self
       {

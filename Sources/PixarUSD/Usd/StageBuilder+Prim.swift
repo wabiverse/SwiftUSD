@@ -29,26 +29,27 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
+import PixarBase
 import Usd
 
 public protocol Prim
 {
-  var path: Pixar.Sdf.Path { get }
+  var path: Sdf.Path { get }
 
-  var name: Pixar.Tf.Token { get }
+  var name: Tf.Token { get }
 
   var children: [any Prim] { get }
 }
 
 public struct UsdPrim
 {
-  public var path: Pixar.Sdf.Path
+  public var path: Sdf.Path
   public var type: PrimType
   public var children: [UsdPrim]
 
-  public init(_ path: String, type: PrimType = .token(Pixar.Tf.Token()), @StageBuilder children: () -> [UsdPrim] = { [] })
+  public init(_ path: String, type: PrimType = .token(Tf.Token()), @StageBuilder children: () -> [UsdPrim] = { [] })
   {
-    self.path = Pixar.Sdf.Path("/\(path)")
+    self.path = Sdf.Path("/\(path)")
     self.type = type
     self.children = children()
   }
@@ -105,7 +106,7 @@ public extension UsdPrim
     case primvarsAPI
     case geomModelAPI
     case visibilityAPI
-    case token(Pixar.Tf.Token)
+    case token(Tf.Token)
     case group([UsdPrim])
   }
 }

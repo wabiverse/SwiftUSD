@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomCapsule = Pixar.UsdGeomCapsule
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Capsule = UsdGeomCapsule
 }
 
 @Xformable
-extension Pixar.UsdGeom.Capsule: GeomXformable
+extension UsdGeom.Capsule: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdGeom.Capsule
   {
-    Pixar.UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Capsule
+  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdGeom.Capsule
   {
-    Pixar.UsdGeom.Capsule.define(stage, path: .init(path))
+    UsdGeom.Capsule.define(stage, path: .init(path))
   }
 }

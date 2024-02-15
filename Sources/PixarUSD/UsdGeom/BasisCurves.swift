@@ -28,26 +28,27 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomBasisCurves = Pixar.UsdGeomBasisCurves
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias BasisCurves = UsdGeomBasisCurves
 }
 
-public extension Pixar.UsdGeom.BasisCurves
+public extension UsdGeom.BasisCurves
 {
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.BasisCurves
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.BasisCurves
   {
-    Pixar.UsdGeom.BasisCurves.Define(stage.pointee.getPtr(), path)
+    UsdGeom.BasisCurves.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.BasisCurves
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.BasisCurves
   {
-    Pixar.UsdGeom.BasisCurves.define(stage, path: .init(path))
+    UsdGeom.BasisCurves.define(stage, path: .init(path))
   }
 }

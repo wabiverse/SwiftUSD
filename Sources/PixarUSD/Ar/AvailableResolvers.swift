@@ -29,8 +29,9 @@
  * ---------------------------------------------------------------- */
 
 import Ar
+import PixarBase
 
-public extension Pixar.Ar
+public extension Ar
 {
   static func getAllResolvers() -> [String]
   {

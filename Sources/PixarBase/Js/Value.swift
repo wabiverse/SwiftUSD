@@ -32,7 +32,7 @@ import Js
 
 public typealias JsValue = Pixar.JsValue
 
-public extension Pixar.Js
+public extension Js
 {
   typealias Value = JsValue
 }

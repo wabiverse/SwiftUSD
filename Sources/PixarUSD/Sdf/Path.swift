@@ -34,12 +34,12 @@ import Sdf
 
 public typealias SdfPath = Pixar.SdfPath
 
-public extension Pixar.Sdf
+public extension Sdf
 {
   typealias Path = SdfPath
 }
 
-public extension Pixar.Sdf.Path
+public extension Sdf.Path
 {
   init(_ path: String)
   {
@@ -56,7 +56,7 @@ public extension Pixar.Sdf.Path
     String(GetAsString())
   }
 
-  func append(path: Pixar.Sdf.Path) -> Pixar.Sdf.Path
+  func append(path: Sdf.Path) -> Sdf.Path
   {
     AppendPath(path)
   }

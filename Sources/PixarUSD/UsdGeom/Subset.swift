@@ -28,26 +28,27 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomSubset = Pixar.UsdGeomSubset
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Subset = UsdGeomSubset
 }
 
-public extension Pixar.UsdGeom.Subset
+public extension UsdGeom.Subset
 {
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Subset
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Subset
   {
-    Pixar.UsdGeom.Subset.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Subset.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Subset
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Subset
   {
-    Pixar.UsdGeom.Subset.define(stage, path: .init(path))
+    UsdGeom.Subset.define(stage, path: .init(path))
   }
 }

@@ -30,7 +30,7 @@
 
 import Gf
 
-public extension Pixar.Gf
+public extension Gf
 {
   /// Check if two values are within a specified **epsilon** of each other.
   /// - Parameter a: A value to compare.

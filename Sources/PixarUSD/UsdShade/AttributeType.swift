@@ -32,7 +32,7 @@ import UsdShade
 
 public typealias UsdShadeAttributeType = Pixar.UsdShadeAttributeType
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   typealias AttributeType = UsdShadeAttributeType
 }

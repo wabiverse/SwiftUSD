@@ -32,17 +32,17 @@ import Usd
 
 public typealias UsdPrimSiblingRange = Pixar.UsdPrimSiblingRange
 
-public extension Pixar.Usd
+public extension Usd
 {
   typealias PrimSiblingRange = UsdPrimSiblingRange
 }
 
-extension Pixar.Usd.PrimSiblingRange: IteratorProtocol
+extension Usd.PrimSiblingRange: IteratorProtocol
 {
-  public typealias Element = Pixar.Usd.Prim
+  public typealias Element = Usd.Prim
 
   @discardableResult
-  private mutating func advance_beginCopy() -> Pixar.Usd.PrimSiblingRange
+  private mutating func advance_beginCopy() -> Usd.PrimSiblingRange
   {
     __advance_beginUnsafe(1).pointee
   }

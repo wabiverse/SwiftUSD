@@ -56,12 +56,12 @@ import Usd
  * ``` */
 public struct UsdStage
 {
-  public var stage: Pixar.Usd.StageRefPtr
+  public var stage: UsdStageRefPtr
   public var prims: [UsdPrim]
 
   public init(_ identifier: String,
               ext: UsdStage.FileExt = .custom(""),
-              load set: Pixar.Usd.Stage.InitialLoadingSet = .all,
+              load set: Usd.Stage.InitialLoadingSet = .all,
               @StageBuilder prims: () -> [UsdPrim])
   {
     switch ext
@@ -69,18 +69,18 @@ public struct UsdStage
       case let .custom(customExt):
         if customExt.isEmpty
         {
-          stage = Pixar.Usd.Stage.createNew(identifier, load: set)
+          stage = Usd.Stage.createNew(identifier, load: set)
         }
         else if customExt.first == "."
         {
-          stage = Pixar.Usd.Stage.createNew("\(identifier)\(customExt)", load: set)
+          stage = Usd.Stage.createNew("\(identifier)\(customExt)", load: set)
         }
         else
         {
-          stage = Pixar.Usd.Stage.createNew("\(identifier).\(customExt)", load: set)
+          stage = Usd.Stage.createNew("\(identifier).\(customExt)", load: set)
         }
       default:
-        stage = Pixar.Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
+        stage = Usd.Stage.createNew("\(identifier).\(ext.rawValue)", load: set)
     }
 
     self.prims = []
@@ -119,9 +119,9 @@ public struct UsdStage
     }
   }
 
-  private func getPrims() -> [Pixar.Usd.Prim]
+  private func getPrims() -> [Usd.Prim]
   {
-    let it = Pixar.Usd.PrimRange.Stage(stage.pointee.getPtr())
+    let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
 
     return IteratorSequence(it).map { $0 }
   }
@@ -198,13 +198,13 @@ public extension UsdStage
   /**
    * Private internal function to allow declaratively defining prim schema types. */
   @discardableResult
-  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Pixar.Usd.Prim
+  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Usd.Prim
   {
-    let primPath: Pixar.SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
+    let primPath: SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
 
-    let pathDepth = primStack.reduce(Pixar.SdfPath("/"))
+    let pathDepth = primStack.reduce(SdfPath("/"))
     { p1, p2 in
-      let sdfPath: Pixar.SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
+      let sdfPath: SdfPath = .init(p2.path.string.components(separatedBy: "/").last?.replacingOccurrences(of: "/", with: "") ?? "")
 
       return p1.append(path: sdfPath)
     }
@@ -223,52 +223,52 @@ public extension UsdStage
   }
 
   /**
-   * Private internal function to allow declaratively defining Pixar.UsdGeom schema types. */
-  private func defGeom(_ prim: UsdPrim, path: Pixar.Sdf.Path, after pathDepth: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+   * Private internal function to allow declaratively defining UsdGeom schema types. */
+  private func defGeom(_ prim: UsdPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
   {
     switch prim.type
     {
       case .xform:
-        Pixar.UsdGeom.Xform.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Xform.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .sphere:
-        Pixar.UsdGeom.Sphere.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Sphere.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .capsule:
-        Pixar.UsdGeom.Capsule.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Capsule.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .cylinder:
-        Pixar.UsdGeom.Cylinder.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Cylinder.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .cube:
-        Pixar.UsdGeom.Cube.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Cube.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .cone:
-        Pixar.UsdGeom.Cone.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Cone.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .plane:
-        Pixar.UsdGeom.Plane.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdGeom.Plane.define(stage, path: pathDepth.append(path: path)).GetPrim()
       default:
         stage.definePrim(pathDepth.append(path: path))
     }
   }
 
   /**
-   * Private internal function to allow declaratively defining Pixar.UsdLux schema types. */
-  private func defLux(_ prim: UsdPrim, path: Pixar.Sdf.Path, after pathDepth: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+   * Private internal function to allow declaratively defining UsdLux schema types. */
+  private func defLux(_ prim: UsdPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
   {
     switch prim.type
     {
       case .distantLight:
-        Pixar.UsdLux.DistantLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.DistantLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .diskLight:
-        Pixar.UsdLux.DiskLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.DiskLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .rectLight:
-        Pixar.UsdLux.RectLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.RectLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .sphereLight:
-        Pixar.UsdLux.SphereLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.SphereLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .cylinderLight:
-        Pixar.UsdLux.CylinderLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.CylinderLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .geometryLight:
-        Pixar.UsdLux.GeometryLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.GeometryLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .domeLight:
-        Pixar.UsdLux.DomeLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.DomeLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       case .portalLight:
-        Pixar.UsdLux.PortalLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
+        UsdLux.PortalLight.define(stage, path: pathDepth.append(path: path)).GetPrim()
       default:
         stage.definePrim(pathDepth.append(path: path))
     }

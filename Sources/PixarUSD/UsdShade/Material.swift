@@ -28,37 +28,38 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdShade
 
 public typealias UsdShadeMaterial = Pixar.UsdShadeMaterial
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   typealias Material = UsdShadeMaterial
 }
 
-public extension Pixar.UsdShade.Material
+public extension UsdShade.Material
 {
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdShade.Material
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdShade.Material
   {
-    Pixar.UsdShade.Material.Define(stage.pointee.getPtr(), path)
+    UsdShade.Material.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdShade.Material
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdShade.Material
   {
-    Pixar.UsdShade.Material.define(stage, path: .init(path))
+    UsdShade.Material.define(stage, path: .init(path))
   }
 
   @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.Tf.Token) -> Pixar.UsdShade.Output
+  func createSurfaceOutput(renderContext: Tf.Token) -> UsdShade.Output
   {
     CreateSurfaceOutput(renderContext)
   }
 
   @discardableResult
-  func createSurfaceOutput(renderContext: Pixar.UsdShade.Tokens = .universalRenderContext) -> Pixar.UsdShade.Output
+  func createSurfaceOutput(renderContext: UsdShade.Tokens = .universalRenderContext) -> UsdShade.Output
   {
     createSurfaceOutput(renderContext: renderContext.getToken())
   }

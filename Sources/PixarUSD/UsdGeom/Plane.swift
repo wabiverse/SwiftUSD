@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomPlane = Pixar.UsdGeomPlane
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Plane = UsdGeomPlane
 }
 
 @Xformable
-extension Pixar.UsdGeom.Plane: GeomXformable
+extension UsdGeom.Plane: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Plane
   {
-    Pixar.UsdGeom.Plane.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Plane.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Plane
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Plane
   {
-    Pixar.UsdGeom.Plane.define(stage, path: .init(path))
+    UsdGeom.Plane.define(stage, path: .init(path))
   }
 }

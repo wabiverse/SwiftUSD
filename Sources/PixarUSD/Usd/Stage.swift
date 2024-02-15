@@ -30,12 +30,13 @@
 
 import CxxStdlib
 import Foundation
+import PixarBase
 import Sdf
 import Usd
 
 public typealias UsdStageRefPtr = Pixar.UsdStageRefPtr
 
-public extension Pixar.Usd
+public extension Usd
 {
   /**
    * # ``Stage``
@@ -105,16 +106,16 @@ public extension Pixar.Usd
   typealias StageRefPtr = Pixar.UsdStageRefPtr
 }
 
-public extension Pixar.Usd.Stage
+public extension Usd.Stage
 {
-  var scene: [Pixar.Usd.Prim]
+  var scene: [Usd.Prim]
   {
     getPrims()
   }
 
-  func getPrims() -> [Pixar.Usd.Prim]
+  func getPrims() -> [Usd.Prim]
   {
-    let it = Pixar.Usd.PrimRange.Stage(getPtr())
+    let it = Usd.PrimRange.Stage(getPtr())
 
     return IteratorSequence(it).map { $0 }
   }
@@ -135,27 +136,27 @@ public extension Pixar.Usd.Stage
   }
 
   @discardableResult
-  static func createNew(_ identifier: String, ext: UsdStage.FileExt, load: InitialLoadingSet = .all) -> Pixar.Usd.StageRefPtr
+  static func createNew(_ identifier: String, ext: UsdStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
-    Pixar.Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
+    Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
   }
 
   @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> Pixar.Usd.StageRefPtr
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
-    Pixar.Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+    Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
   }
 
   @discardableResult
-  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> Pixar.Usd.StageRefPtr
+  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
-    Pixar.Usd.Stage.Open(std.string(filePath), load.rawValue)
+    Usd.Stage.Open(std.string(filePath), load.rawValue)
   }
 }
 
-public extension Pixar.Usd.StageRefPtr
+public extension Usd.StageRefPtr
 {
-  var scene: [Pixar.Usd.Prim]
+  var scene: [Usd.Prim]
   {
     pointee.scene
   }
@@ -163,7 +164,7 @@ public extension Pixar.Usd.StageRefPtr
   /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *
-   * Returns a ``Pixar.Usd.PrimRange`` , which allows low-latency traversal, with the
+   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
    * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
    * one can do:
    * ```swift
@@ -174,32 +175,32 @@ public extension Pixar.Usd.StageRefPtr
    * ```
    *
    * If either a pre-and-post-order traversal or, a traversal rooted at
-   * a particular prim is desired, construct a ``Pixar.Usd.PrimRange``
+   * a particular prim is desired, construct a ``Usd.PrimRange``
    * directly.
    *
-   * This is equivalent to ``Pixar.Usd.PrimRange.stage()``. */
-  func traverse() -> Pixar.Usd.PrimRange
+   * This is equivalent to ``Usd.PrimRange.stage()``. */
+  func traverse() -> Usd.PrimRange
   {
     pointee.Traverse()
   }
 
   /**
-   * Attempt to ensure a UsdPrim at path is defined (according to Pixar.Usd.Prim.isDefined()) on this stage.
+   * Attempt to ensure a UsdPrim at path is defined (according to Usd.Prim.isDefined()) on this stage.
    *
    * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
-   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Pixar.Sdf.SpecifierDef` and typeName for
-   * the prim at **path** at the current EditTarget. Lastly, author `Pixar.Sdf.PrimSpec`s with the **specifier** set equal
-   * to `Pixar.Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
    * not Defined ancestors.
    *
    * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
-   * any of the necessary `Pixar.Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
-   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Pixar.Usd.Prim``.
+   * any of the necessary `Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Usd.Prim``.
    *
    * > Note: This method may return a defined prim whose **type name** does not match the supplied **type name**,
    *   in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
   @discardableResult
-  func definePrim(_ path: Pixar.Sdf.Path, type name: Pixar.Tf.Token = Pixar.Tf.Token()) -> Pixar.Usd.Prim
+  func definePrim(_ path: Sdf.Path, type name: Tf.Token = Tf.Token()) -> Usd.Prim
   {
     pointee.DefinePrim(path, name)
   }
@@ -208,42 +209,42 @@ public extension Pixar.Usd.StageRefPtr
    * Attempt to ensure a UsdPrim at path is defined (according to UsdPrim::IsDefined()) on this stage.
    *
    * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
-   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Pixar.Sdf.SpecifierDef` and typeName for
-   * the prim at **path** at the current EditTarget. Lastly, author `Pixar.Sdf.PrimSpec`s with the **specifier** set equal
-   * to `Pixar.Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
    * not Defined ancestors.
    *
    * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
-   * any of the necessary `Pixar.Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
-   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Pixar.Usd.Prim``.
+   * any of the necessary `Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Usd.Prim``.
    *
    * > [!NOTE]
    * > This method may return a defined prim whose **type name** does not match the supplied **type name**,
    * > in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
   @discardableResult
-  func definePrim(_ path: String, type name: Pixar.Tf.Token = Pixar.Tf.Token()) -> Pixar.Usd.Prim
+  func definePrim(_ path: String, type name: Tf.Token = Tf.Token()) -> Usd.Prim
   {
     pointee.DefinePrim(.init(path), name)
   }
 
-  func getPrim(at path: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+  func getPrim(at path: Sdf.Path) -> Usd.Prim
   {
     pointee.GetPrimAtPath(path)
   }
 
-  func getPrim(at path: String) -> Pixar.Usd.Prim
+  func getPrim(at path: String) -> Usd.Prim
   {
-    pointee.GetPrimAtPath(Pixar.Sdf.Path(path))
+    pointee.GetPrimAtPath(Sdf.Path(path))
   }
 
-  func overridePrim(path: Pixar.Sdf.Path) -> Pixar.Usd.Prim
+  func overridePrim(path: Sdf.Path) -> Usd.Prim
   {
     pointee.OverridePrim(path)
   }
 
-  func overridePrim(path: String) -> Pixar.Usd.Prim
+  func overridePrim(path: String) -> Usd.Prim
   {
-    pointee.OverridePrim(Pixar.Sdf.Path(path))
+    pointee.OverridePrim(Sdf.Path(path))
   }
 
   /**
@@ -255,7 +256,7 @@ public extension Pixar.Usd.StageRefPtr
 
   /**
    * Return this stage's root layer. */
-  func getPseudoRoot() -> Pixar.Usd.Prim
+  func getPseudoRoot() -> Usd.Prim
   {
     pointee.GetPseudoRoot()
   }
@@ -263,11 +264,11 @@ public extension Pixar.Usd.StageRefPtr
   /**
    * Save all dirty layers contributing to this stage.
    *
-   * Calls ``Pixar.Sdf.Layer.save()`` on all dirty layers contributing to this stage
+   * Calls ``Sdf.Layer.save()`` on all dirty layers contributing to this stage
    * except session layers and sublayers of session layers. This function will emit a
    * warning and skip each dirty anonymous layer it encounters, since anonymous layers
-   * cannot be saved with ``Pixar.Sdf.Layer.save()``. These layers must be manually
-   * exported by calling ``Pixar.Sdf.Layer.export()``. */
+   * cannot be saved with ``Sdf.Layer.save()``. These layers must be manually
+   * exported by calling ``Sdf.Layer.export()``. */
   func save()
   {
     pointee.Save()

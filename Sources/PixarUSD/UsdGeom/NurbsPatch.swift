@@ -28,26 +28,27 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomNurbsPatch = Pixar.UsdGeomNurbsPatch
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias NurbsPatch = UsdGeomNurbsPatch
 }
 
-public extension Pixar.UsdGeom.NurbsPatch
+public extension UsdGeom.NurbsPatch
 {
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.NurbsPatch
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.NurbsPatch
   {
-    Pixar.UsdGeom.NurbsPatch.Define(stage.pointee.getPtr(), path)
+    UsdGeom.NurbsPatch.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.NurbsPatch
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.NurbsPatch
   {
-    Pixar.UsdGeom.NurbsPatch.define(stage, path: .init(path))
+    UsdGeom.NurbsPatch.define(stage, path: .init(path))
   }
 }

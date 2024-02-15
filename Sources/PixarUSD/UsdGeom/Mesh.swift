@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomMesh = Pixar.UsdGeomMesh
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Mesh = UsdGeomMesh
 }
 
 @Xformable
-extension Pixar.UsdGeom.Mesh: GeomXformable
+extension UsdGeom.Mesh: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Mesh
   {
-    Pixar.UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Mesh
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Mesh
   {
-    Pixar.UsdGeom.Mesh.define(stage, path: .init(path))
+    UsdGeom.Mesh.define(stage, path: .init(path))
   }
 }

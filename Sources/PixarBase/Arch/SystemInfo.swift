@@ -34,7 +34,7 @@ import Arch
  * # System Functions
  *
  * Functions that encapsulate differing low-level system calls. */
-public extension Pixar.Arch
+public extension Arch
 {
   /// Return current working directory as a string.
   static func getCwd() -> String

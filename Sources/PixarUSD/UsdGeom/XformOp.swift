@@ -28,49 +28,50 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomXformOp = Pixar.UsdGeomXformOp
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias XformOp = UsdGeomXformOp
 }
 
-public extension Pixar.UsdGeom.XformOp
+public extension UsdGeom.XformOp
 {
   @discardableResult
-  func set(_ value: Float, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: Float, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: Double, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: Double, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec2f, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec2f, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec2d, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec2d, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec3f, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec3f, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }
 
   @discardableResult
-  func set(_ value: GfVec3d, time: Pixar.UsdTimeCode = Pixar.UsdTimeCode.Default()) -> Bool
+  func set(_ value: GfVec3d, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)
   }

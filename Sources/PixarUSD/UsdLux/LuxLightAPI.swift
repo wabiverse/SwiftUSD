@@ -28,20 +28,21 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxLightAPI = Pixar.UsdLuxLightAPI
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias LuxLightAPI = UsdLuxLightAPI
 }
 
-public extension Pixar.UsdLux.LuxLightAPI
+public extension UsdLux.LuxLightAPI
 {
   @discardableResult
-  static func apply(_ prim: Pixar.Usd.Prim) -> Pixar.UsdLux.LuxLightAPI
+  static func apply(_ prim: Usd.Prim) -> UsdLux.LuxLightAPI
   {
-    Pixar.UsdLux.LuxLightAPI.Apply(prim)
+    UsdLux.LuxLightAPI.Apply(prim)
   }
 }

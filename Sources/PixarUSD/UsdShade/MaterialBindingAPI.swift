@@ -32,63 +32,63 @@ import UsdShade
 
 public typealias UsdShadeMaterialBindingAPI = Pixar.UsdShadeMaterialBindingAPI
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   typealias MaterialBindingAPI = UsdShadeMaterialBindingAPI
 }
 
-public extension Pixar.UsdShade.MaterialBindingAPI
+public extension UsdShade.MaterialBindingAPI
 {
   @discardableResult
-  static func apply(_ prim: Pixar.Usd.Prim) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: Usd.Prim) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim)
+    UsdShade.MaterialBindingAPI.Apply(prim)
   }
 
   /* ----- convenience. -----  */
 
   @discardableResult
-  static func apply(_ prim: UsdGeomSphere) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomSphere) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   @discardableResult
-  static func apply(_ prim: UsdGeomCapsule) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomCapsule) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   @discardableResult
-  static func apply(_ prim: UsdGeomCylinder) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomCylinder) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   @discardableResult
-  static func apply(_ prim: UsdGeomCube) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomCube) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   @discardableResult
-  static func apply(_ prim: UsdGeomCone) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomCone) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   @discardableResult
-  static func apply(_ prim: UsdGeomPlane) -> Pixar.UsdShade.MaterialBindingAPI
+  static func apply(_ prim: UsdGeomPlane) -> UsdShade.MaterialBindingAPI
   {
-    Pixar.UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim())
   }
 
   /* ------------------------  */
 
   @discardableResult
-  func bind(_ material: Pixar.UsdShade.Material,
-            strength: Pixar.UsdShade.Tokens = .fallbackStrength,
-            purpose: Pixar.UsdShade.Tokens = .allPurpose) -> Bool
+  func bind(_ material: UsdShade.Material,
+            strength: UsdShade.Tokens = .fallbackStrength,
+            purpose: UsdShade.Tokens = .allPurpose) -> Bool
   {
     Bind(material, strength.getToken(), purpose.getToken())
   }

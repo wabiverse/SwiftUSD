@@ -30,6 +30,7 @@
 
 import CxxStdlib
 import Foundation
+import PixarBase
 import Plug
 import Rainbow
 

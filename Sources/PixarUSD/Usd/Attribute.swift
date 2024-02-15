@@ -33,12 +33,12 @@ import Usd
 
 public typealias UsdAttribute = Pixar.UsdAttribute
 
-public extension Pixar.Usd
+public extension Usd
 {
   typealias Attribute = UsdAttribute
 }
 
-public extension Pixar.Usd.Attribute
+public extension Usd.Attribute
 {
   func set(doc: String)
   {

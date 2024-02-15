@@ -34,7 +34,7 @@ import Arch
  * # Multithreading
  *
  * Functions having to do with multithreading. */
-public extension Pixar.Arch
+public extension Arch
 {
   /// Return true if the calling thread is the main thread, false otherwise.
   static func isMainThread() -> Bool

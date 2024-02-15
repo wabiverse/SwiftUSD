@@ -32,7 +32,7 @@ import Js
 
 public typealias JsArray = Pixar.JsArray
 
-public extension Pixar.Js
+public extension Js
 {
   typealias Array = JsArray
 }

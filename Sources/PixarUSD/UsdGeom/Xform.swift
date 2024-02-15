@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomXform = Pixar.UsdGeomXform
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Xform = UsdGeomXform
 }
 
 @Xformable
-extension Pixar.UsdGeom.Xform: GeomXformable
+extension UsdGeom.Xform: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Xform
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Xform
   {
-    Pixar.UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Xform
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Xform
   {
-    Pixar.UsdGeom.Xform.define(stage, path: .init(path))
+    UsdGeom.Xform.define(stage, path: .init(path))
   }
 }

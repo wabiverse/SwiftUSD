@@ -33,7 +33,7 @@ import Sdf
 
 public typealias SdfLayerHandle = Pixar.SdfLayerHandle
 
-public extension Pixar.Sdf
+public extension Sdf
 {
   typealias LayerHandle = SdfLayerHandle
 }

@@ -32,7 +32,7 @@ import Js
 
 public typealias JsParseError = Pixar.JsParseError
 
-public extension Pixar.Js
+public extension Js
 {
   typealias ParseError = JsParseError
 }

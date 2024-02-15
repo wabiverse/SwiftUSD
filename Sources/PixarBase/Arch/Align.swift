@@ -34,7 +34,7 @@ import Arch
  * # Memory Management
  *
  * Functions having to do with memory allocation / handling. */
-public extension Pixar.Arch
+public extension Arch
 {
   /// Return suitably aligned memory size.
   ///

@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomCylinder = Pixar.UsdGeomCylinder
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Cylinder = UsdGeomCylinder
 }
 
 @Xformable
-extension Pixar.UsdGeom.Cylinder: GeomXformable
+extension UsdGeom.Cylinder: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cylinder
   {
-    Pixar.UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cylinder
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cylinder
   {
-    Pixar.UsdGeom.Cylinder.define(stage, path: .init(path))
+    UsdGeom.Cylinder.define(stage, path: .init(path))
   }
 }

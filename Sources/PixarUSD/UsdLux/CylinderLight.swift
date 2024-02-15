@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxCylinderLight = Pixar.UsdLuxCylinderLight
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias CylinderLight = UsdLuxCylinderLight
 }
 
 @Xformable
-extension Pixar.UsdLux.CylinderLight: GeomXformable
+extension UsdLux.CylinderLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.CylinderLight
+  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdLux.CylinderLight
   {
-    Pixar.UsdLux.CylinderLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.CylinderLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.CylinderLight
+  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdLux.CylinderLight
   {
-    Pixar.UsdLux.CylinderLight.define(stage, path: .init(path))
+    UsdLux.CylinderLight.define(stage, path: .init(path))
   }
 }

@@ -30,12 +30,15 @@
 
 import CxxStdlib
 import Foundation
+import PixarBase
 import Usd
 
-public extension Pixar.Usd
+public typealias UsdStageWeakPtr = Pixar.UsdStageWeakPtr
+
+public extension Usd
 {
   /**
-   * # Pixar.Usd.Prim
+   * # Usd.Prim
    *
    * ``Prim`` is the sole persistent scenegraph object on a UsdStage, and
    * is the embodiment of a "Prim" as described in the *Universal Scene
@@ -93,47 +96,48 @@ public extension Pixar.Usd
    * Please refer to ``Notice`` for a listing of the events that could cause
    * ``Notice/objectsChanged`` to be emitted.
    */
+  typealias StageWeakPtr = UsdStageWeakPtr
   typealias Prim = Pixar.UsdPrim
 }
 
-extension Pixar.Usd.Prim: Prim
+extension Usd.Prim: Prim
 {
   public func set(doc: String)
   {
     SetDocumentation(std.string(doc))
   }
 
-  public func getStage() -> Pixar.UsdStageWeakPtr
+  public func getStage() -> UsdStageWeakPtr
   {
     GetStage()
   }
 
-  public func getPath() -> Pixar.Sdf.Path
+  public func getPath() -> Sdf.Path
   {
     GetPath()
   }
 
-  private borrowing func GetNameCopy() -> Pixar.Tf.Token
+  private borrowing func GetNameCopy() -> Tf.Token
   {
     __GetNameUnsafe().pointee
   }
 
-  private borrowing func GetTypeNameCopy() -> Pixar.Tf.Token
+  private borrowing func GetTypeNameCopy() -> Tf.Token
   {
     __GetTypeNameUnsafe().pointee
   }
 
-  public var path: Pixar.Sdf.Path
+  public var path: Sdf.Path
   {
     GetPath()
   }
 
-  public var name: Pixar.Tf.Token
+  public var name: Tf.Token
   {
     GetNameCopy()
   }
 
-  public var typeName: Pixar.Tf.Token
+  public var typeName: Tf.Token
   {
     get { GetTypeNameCopy() }
     set { SetTypeName(newValue) }

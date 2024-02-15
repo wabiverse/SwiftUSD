@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdLux
 
 public typealias UsdLuxRectLight = Pixar.UsdLuxRectLight
 
-public extension Pixar.UsdLux
+public extension UsdLux
 {
   typealias RectLight = UsdLuxRectLight
 }
 
 @Xformable
-extension Pixar.UsdLux.RectLight: GeomXformable
+extension UsdLux.RectLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdLux.RectLight
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.RectLight
   {
-    Pixar.UsdLux.RectLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.RectLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdLux.RectLight
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.RectLight
   {
-    Pixar.UsdLux.RectLight.define(stage, path: .init(path))
+    UsdLux.RectLight.define(stage, path: .init(path))
   }
 }

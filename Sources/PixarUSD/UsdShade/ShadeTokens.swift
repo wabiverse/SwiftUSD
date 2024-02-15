@@ -28,13 +28,14 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdShade
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   /**
    * Private struct to hold the static
-   * data for the Pixar.UsdShade library. */
+   * data for the UsdShade library. */
   private struct StaticData
   {
     static let shared = StaticData()
@@ -45,15 +46,15 @@ public extension Pixar.UsdShade
   }
 }
 
-public extension Pixar.UsdShade
+public extension UsdShade
 {
   /**
-   * # Pixar.UsdShade.Tokens
+   * # UsdShade.Tokens
    *
    * ### Overview
    *
    * Public, client facing api to access
-   * the static Pixar.UsdShade tokens. */
+   * the static UsdShade tokens. */
   enum Tokens: CaseIterable
   {
     case allPurpose
@@ -95,7 +96,7 @@ public extension Pixar.UsdShade
     case nodeGraph
     case shader
 
-    public func getToken() -> Pixar.Tf.Token
+    public func getToken() -> Tf.Token
     {
       switch self
       {

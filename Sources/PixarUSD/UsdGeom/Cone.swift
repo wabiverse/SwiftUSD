@@ -28,27 +28,28 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import PixarBase
 import UsdGeom
 
 public typealias UsdGeomCone = Pixar.UsdGeomCone
 
-public extension Pixar.UsdGeom
+public extension UsdGeom
 {
   typealias Cone = UsdGeomCone
 }
 
 @Xformable
-extension Pixar.UsdGeom.Cone: GeomXformable
+extension UsdGeom.Cone: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: Pixar.Sdf.Path) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cone
   {
-    Pixar.UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Pixar.Usd.StageRefPtr, path: String) -> Pixar.UsdGeom.Cone
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cone
   {
-    Pixar.UsdGeom.Cone.define(stage, path: .init(path))
+    UsdGeom.Cone.define(stage, path: .init(path))
   }
 }
