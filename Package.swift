@@ -221,17 +221,22 @@ let package = Package(
       name: "UsdGenSchemaPlugin",
       targets: ["UsdGenSchemaPlugin"]
     ),
-    // ------- Monolithic USD -----
+    // ------------- Pixar Base -----
     .library(
-      name: "PixarUSD",
+      name: "PixarBase",
       targets: [
-        "PixarUSD",
         "PyTf",
         "PyGf",
         "PyTrace",
         "PyVt",
         "PyWork",
         "PyPlug",
+      ]
+    ),
+    // ------------- Pixar USD -----
+    .library(
+      name: "PixarUSD",
+      targets: [
         "PyAr",
         "PyKind",
         "PySdf",
@@ -241,9 +246,21 @@ let package = Package(
         "PySdr",
         "PyUsdGeom",
         "PyUsdShade",
-        "PyUsdShaders",
         "PyUsdLux",
-        "PyCameraUtil"
+      ]
+    ),
+    // ---------- Pixar Imaging -----
+    .library(
+      name: "PixarImaging",
+      targets: [
+        "PyCameraUtil",
+      ]
+    ),
+    // ------ Pixar Usd Imaging -----
+    .library(
+      name: "UsdImaging",
+      targets: [
+        "PyUsdShaders",
       ]
     ),
   ],
@@ -673,7 +690,7 @@ let package = Package(
         .define("CAMERAUTIL_EXPORTS", to: "1")
       ]
     ),
-    
+
     .target(
       name: "Hf",
       dependencies: [
@@ -692,7 +709,7 @@ let package = Package(
     .target(
       name: "PyTf",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyTf",
       resources: [
@@ -709,7 +726,7 @@ let package = Package(
     .target(
       name: "PyGf",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyGf",
       resources: [
@@ -726,7 +743,7 @@ let package = Package(
     .target(
       name: "PyTrace",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyTrace",
       resources: [
@@ -743,7 +760,7 @@ let package = Package(
     .target(
       name: "PyVt",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyVt",
       resources: [
@@ -760,7 +777,7 @@ let package = Package(
     .target(
       name: "PyWork",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyWork",
       resources: [
@@ -777,7 +794,7 @@ let package = Package(
     .target(
       name: "PyPlug",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyPlug",
       resources: [
@@ -794,7 +811,7 @@ let package = Package(
     .target(
       name: "PyAr",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyAr",
       resources: [
@@ -811,7 +828,7 @@ let package = Package(
     .target(
       name: "PyKind",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyKind",
       resources: [
@@ -828,7 +845,7 @@ let package = Package(
     .target(
       name: "PySdf",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PySdf",
       resources: [
@@ -845,7 +862,7 @@ let package = Package(
     .target(
       name: "PyPcp",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyPcp",
       resources: [
@@ -862,7 +879,7 @@ let package = Package(
     .target(
       name: "PyUsd",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyUsd",
       resources: [
@@ -879,7 +896,7 @@ let package = Package(
     .target(
       name: "PyNdr",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyNdr",
       resources: [
@@ -896,7 +913,7 @@ let package = Package(
     .target(
       name: "PySdr",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PySdr",
       resources: [
@@ -913,7 +930,7 @@ let package = Package(
     .target(
       name: "PyUsdGeom",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyUsdGeom",
       resources: [
@@ -930,7 +947,7 @@ let package = Package(
     .target(
       name: "PyUsdShade",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyUsdShade",
       resources: [
@@ -947,7 +964,7 @@ let package = Package(
     .target(
       name: "PyUsdShaders",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyUsdShaders",
       resources: [
@@ -964,7 +981,7 @@ let package = Package(
     .target(
       name: "PyUsdLux",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyUsdLux",
       resources: [
@@ -981,7 +998,7 @@ let package = Package(
     .target(
       name: "PyCameraUtil",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
       ],
       path: "Python/PyCameraUtil",
       resources: [
@@ -1048,7 +1065,7 @@ let package = Package(
     ),
 
     .target(
-      name: "PixarUSD",
+      name: "PixarBase",
       dependencies: [
         // ---------- base. ------
         .target(name: "Arch"),
@@ -1059,6 +1076,17 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Work"),
         .target(name: "Plug"),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]
+    ),
+
+    .target(
+      name: "PixarUSD",
+      dependencies: [
+        // ---------- base. ------
+        .target(name: "PixarBase"),
         // ----------- usd. ------
         .target(name: "Ar"),
         .target(name: "Kind"),
@@ -1070,11 +1098,6 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
-        // ------- imaging. ------
-        .target(name: "CameraUtil"),
-        .target(name: "Hf"),
-        // --- usd imaging. ------
-        .target(name: "UsdShaders"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
@@ -1090,10 +1113,37 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PixarImaging",
+      dependencies: [
+        // ----------- usd. ------
+//        .target(name: "PixarUsd"),
+        // ------- imaging. ------
+        .target(name: "CameraUtil"),
+        .target(name: "Hf"),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]
+    ),
+
+    .target(
+      name: "UsdImaging",
+      dependencies: [
+        // ------- imaging. ------
+        .target(name: "PixarImaging"),
+        // --- usd imaging. ------
+        .target(name: "UsdShaders"),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]
+    ),
+
     .testTarget(
       name: "PixarUSDTests",
       dependencies: [
-        .target(name: "PixarUSD"),
+        //        .target(name: "PixarUSD"),
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ],
       swiftSettings: [
