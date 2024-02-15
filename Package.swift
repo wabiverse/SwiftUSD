@@ -248,7 +248,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.0"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.1"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -273,7 +273,7 @@ let package = Package(
         .product(name: "MetaPy", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
-        //.product(name: "OpenImageIO", package: "MetaverseKit"),
+        .product(name: "OpenImageIO", package: "MetaverseKit"),
         .product(name: "OpenEXR", package: "MetaverseKit"),
         .product(name: "OpenSubdiv", package: "MetaverseKit"),
         .product(name: "OpenVDB", package: "MetaverseKit"),
