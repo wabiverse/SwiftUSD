@@ -21,39 +21,41 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_IMAGING_HF_PERF_LOG_H
-#define PXR_IMAGING_HF_PERF_LOG_H
+#ifndef PXR_IMAGING_HF_PLUGIN_BASE_H
+#define PXR_IMAGING_HF_PLUGIN_BASE_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/mallocTag.h"
-#include "pxr/base/tf/preprocessorUtilsLite.h"
+#include "pxr/pxrns.h"
+#include "Hf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+///
+/// \class HfPluginBase
+///
+/// Base class for all hydra plugin classes. This class provides no
+/// functionality other than to serve as a polymorphic type for the
+/// plugin registry.
+///
+class HfPluginBase
+{
+public:
+    HF_API
+    virtual ~HfPluginBase();  // = default: See workaround in cpp file
 
-///
-/// Creates an auto-mallocTag with the function, including template params.
-///
-#define HF_MALLOC_TAG_FUNCTION() \
-    TfAutoMallocTag2 tagFunc(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), \
-                             __ARCH_PRETTY_FUNCTION__);
+protected:
+    // Pure virtual class, must be derived
+    HF_API
+    HfPluginBase() = default;
 
-///
-/// Creates an auto-mallocTag with the given named tag.
-///
-#define HF_MALLOC_TAG(x) \
-    TfAutoMallocTag2 tag2(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), x);
+private:
+    ///
+    /// This class is not intended to be copied.
+    ///
+    HfPluginBase(const HfPluginBase &)            = delete;
+    HfPluginBase &operator=(const HfPluginBase &) = delete;
+};
 
-///
-/// Overrides operator new/delete and injects malloc tags.
-///
-#define HF_MALLOC_TAG_NEW(x) \
-    TF_MALLOC_TAG_NEW(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), x);
-
-
-#define HF_TRACE_FUNCTION_SCOPE(tag)                                  \
-  TRACE_FUNCTION_SCOPE(tag)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PERF_LOG_H
+#endif // PXR_IMAGING_HF_PLUGIN_BASE_H

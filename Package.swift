@@ -111,6 +111,10 @@ let package = Package(
       name: "CameraUtil",
       targets: ["CameraUtil"]
     ),
+    .library(
+      name: "Hf",
+      targets: ["Hf"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -669,6 +673,21 @@ let package = Package(
         .define("CAMERAUTIL_EXPORTS", to: "1")
       ]
     ),
+    
+    .target(
+      name: "Hf",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Hf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Hf"),
+        .define("MFB_PACKAGE_MODULE", to: "Hf"),
+        .define("HF_EXPORTS", to: "1")
+      ]
+    ),
 
     .target(
       name: "PyTf",
@@ -1053,6 +1072,7 @@ let package = Package(
         .target(name: "UsdLux"),
         // ------- imaging. ------
         .target(name: "CameraUtil"),
+        .target(name: "Hf"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------

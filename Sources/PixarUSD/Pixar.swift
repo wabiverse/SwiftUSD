@@ -236,6 +236,18 @@ public extension Pixar
    * informally referred to as *Layering & Referencing*. */
   enum Pcp
   {}
+    
+  /**
+   * # ``Hf``
+   *
+   * **Hydra Foundations**
+   *
+   * ## Overview
+   *
+   * **Hf** provides utilities to handle tasks such as **Render Delegate** 
+   * plugin registration and exploration. */
+  enum Hf
+  {}
 
   /**
    * # ``Usd``
@@ -322,6 +334,15 @@ public extension Pixar
   enum Garch
   {}
 
+  /**
+   * # ``Hf``
+   *
+   * **Camera Utilities**
+   *
+   * ## Overview
+   *
+   * **CameraUtil** provides utilities to handle different types of Camera-to-Screen
+   * conformity policies. */
   enum CameraUtil
   {}
 

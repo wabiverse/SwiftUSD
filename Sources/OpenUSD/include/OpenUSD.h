@@ -326,16 +326,6 @@
 #include <OpenUSD/pxr/imaging/hgiInterop/pch.h>
 #include <OpenUSD/pxr/imaging/hgiInterop/vulkan.h>
 
-// hf
-#include <OpenUSD/pxr/imaging/hf/api.h>
-#include <OpenUSD/pxr/imaging/hf/diagnostic.h>
-#include <OpenUSD/pxr/imaging/hf/pch.h>
-#include <OpenUSD/pxr/imaging/hf/perfLog.h>
-#include <OpenUSD/pxr/imaging/hf/pluginBase.h>
-#include <OpenUSD/pxr/imaging/hf/pluginDesc.h>
-#include <OpenUSD/pxr/imaging/hf/pluginEntry.h>
-#include <OpenUSD/pxr/imaging/hf/pluginRegistry.h>
-
 // hioOpenVDB
 #include <OpenUSD/pxr/imaging/hioOpenVDB/api.h>
 #include <OpenUSD/pxr/imaging/hioOpenVDB/debugCodes.h>
