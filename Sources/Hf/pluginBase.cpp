@@ -1,5 +1,5 @@
 //
-// Copyright 2017 Pixar
+// Copyright 2016 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,27 +21,32 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_IMAGING_HF_API_H
-#define PXR_IMAGING_HF_API_H
+#include "Hf/pluginBase.h"
 
-#include "pxr/base/arch/export.h"
+#include "Tf/registryManager.h"
+#include "Tf/type.h"
 
-#if defined(PXR_STATIC)
-#   define HF_API
-#   define HF_API_TEMPLATE_CLASS(...)
-#   define HF_API_TEMPLATE_STRUCT(...)
-#   define HF_LOCAL
-#else
-#   if defined(HF_EXPORTS)
-#       define HF_API ARCH_EXPORT
-#       define HF_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
-#       define HF_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
-#   else
-#       define HF_API ARCH_IMPORT
-#       define HF_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
-#       define HF_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
-#   endif
-#   define HF_LOCAL ARCH_HIDDEN
-#endif
+PXR_NAMESPACE_OPEN_SCOPE
 
-#endif // PXR_IMAGING_HF_API_H
+
+// Register the base type with Tf.
+TF_REGISTRY_FUNCTION(TfType)
+{
+    TfType::Define<HfPluginBase>();
+}
+
+//
+// WORKAROUND: As this class is a pure interface class, it does not need a
+// vtable.  However, it is possible that some users will use rtti.
+// This will cause a problem for some of our compilers:
+//
+// In particular clang will throw a warning: -wweak-vtables
+// For gcc, there is an issue were the rtti typeid's are different.
+//
+// As destruction of the class is not on the performance path,
+// the body of the deleter is provided here, so a vtable is created
+// in this compilation unit.
+HfPluginBase::~HfPluginBase() = default;
+
+PXR_NAMESPACE_CLOSE_SCOPE
+

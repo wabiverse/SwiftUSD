@@ -24,12 +24,15 @@
 #ifndef PXR_IMAGING_HF_PLUGIN_REGISTRY_H
 #define PXR_IMAGING_HF_PLUGIN_REGISTRY_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hf/api.h"
-#include "pxr/imaging/hf/perfLog.h"
-#include "pxr/imaging/hf/pluginDesc.h"
-#include "pxr/base/plug/registry.h"
-#include "pxr/base/tf/type.h"
+#include "pxr/pxrns.h"
+
+#include "Hf/api.h"
+#include "Hf/perfLog.h"
+#include "Hf/pluginDesc.h"
+
+#include "Plug/registry.h"
+
+#include "Tf/type.h"
 
 #include <map>
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2018 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,38 +21,29 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_IMAGING_HF_PLUGIN_DESC_H
-#define PXR_IMAGING_HF_PLUGIN_DESC_H
+#ifndef PXR_IMAGING_HF_DIAGNOSTIC_H
+#define PXR_IMAGING_HF_DIAGNOSTIC_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/token.h"
+#include "pxr/pxrns.h"
 
-#include <vector>
+#include "Tf/diagnostic.h"
+#include "Tf/stringUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 
 ///
-/// Common structure used to report registered plugins in one of the plugin 
-/// registries.  The id token is used for internal api communication
-/// about the name of the plugin.
-/// displayName is a human readable name given to the plugin intended
-/// to be used in menus.
-/// priority is used to provide an ordering of plugins.  The plugin
-/// with the highest priority is determined to be the default (unless
-/// overridden by the application).  In the event of a tie
-/// the string version of id is used to sort alphabetically ('a' has priority
-/// over 'b').
+/// Issues a warning with a message.  This differs from just calling TF_WARN
+/// in that it tags the warning as actually needing to be a validation error,
+/// and a place holder for when we develop a true validation system where we
+/// can plumb this information back to the application.
 ///
-struct HfPluginDesc {
-    TfToken     id;
-    std::string displayName;
-    int         priority;
-};
-
-typedef std::vector<HfPluginDesc> HfPluginDescVector;
+#define HF_VALIDATION_WARN(id, ...) \
+    TF_WARN("Invalid Hydra prim '%s': %s", \
+            id.GetText(), \
+            TfStringPrintf(__VA_ARGS__).c_str())
 
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PLUGIN_DESC_H
+#endif // PXR_IMAGING_HF_DIAGNOSTIC_H

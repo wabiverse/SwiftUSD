@@ -24,10 +24,12 @@
 #ifndef PXR_IMAGING_HF_PLUGIN_ENTRY_H
 #define PXR_IMAGING_HF_PLUGIN_ENTRY_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/token.h"
-#include "pxr/base/tf/type.h"
-#include "pxr/imaging/hf/perfLog.h"
+#include "pxr/pxrns.h"
+
+#include "Tf/token.h"
+#include "Tf/type.h"
+#include "Hf/perfLog.h"
+
 #include <string>
 #include <functional>
 

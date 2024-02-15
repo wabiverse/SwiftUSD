@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Pixar
+// Copyright 2016 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,28 +21,40 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_IMAGING_HF_DIAGNOSTIC_H
-#define PXR_IMAGING_HF_DIAGNOSTIC_H
+#ifndef PXR_IMAGING_HF_PERF_LOG_H
+#define PXR_IMAGING_HF_PERF_LOG_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/stringUtils.h"
+#include "pxr/pxrns.h"
+
+#include "Tf/mallocTag.h"
+#include "Tf/preprocessorUtilsLite.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 
 ///
-/// Issues a warning with a message.  This differs from just calling TF_WARN
-/// in that it tags the warning as actually needing to be a validation error,
-/// and a place holder for when we develop a true validation system where we
-/// can plumb this information back to the application.
+/// Creates an auto-mallocTag with the function, including template params.
 ///
-#define HF_VALIDATION_WARN(id, ...) \
-    TF_WARN("Invalid Hydra prim '%s': %s", \
-            id.GetText(), \
-            TfStringPrintf(__VA_ARGS__).c_str())
+#define HF_MALLOC_TAG_FUNCTION() \
+    TfAutoMallocTag2 tagFunc(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), \
+                             __ARCH_PRETTY_FUNCTION__);
 
+///
+/// Creates an auto-mallocTag with the given named tag.
+///
+#define HF_MALLOC_TAG(x) \
+    TfAutoMallocTag2 tag2(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), x);
+
+///
+/// Overrides operator new/delete and injects malloc tags.
+///
+#define HF_MALLOC_TAG_NEW(x) \
+    TF_MALLOC_TAG_NEW(TF_PP_STRINGIZE(MFB_PACKAGE_NAME), x);
+
+
+#define HF_TRACE_FUNCTION_SCOPE(tag)                                  \
+  TRACE_FUNCTION_SCOPE(tag)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_DIAGNOSTIC_H
+#endif // PXR_IMAGING_HF_PERF_LOG_H

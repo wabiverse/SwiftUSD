@@ -21,11 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/hf/pluginEntry.h"
-#include "pxr/imaging/hf/pluginBase.h"
-#include "pxr/imaging/hf/pluginDesc.h"
-#include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/type.h"
+#include "Hf/pluginEntry.h"
+#include "Hf/pluginBase.h"
+#include "Hf/pluginDesc.h"
+
+#include "Tf/diagnostic.h"
+#include "Tf/type.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
