@@ -751,7 +751,7 @@ let package = Package(
         .define("HF_EXPORTS", to: "1")
       ]
     ),
-    
+
     .target(
       name: "PxOsd",
       dependencies: [
@@ -766,7 +766,7 @@ let package = Package(
         .define("PXOSD_EXPORTS", to: "1"),
       ]
     ),
-    
+
     .target(
       name: "Hd",
       dependencies: [
@@ -779,6 +779,9 @@ let package = Package(
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
         .target(name: "PxOsd"),
+      ],
+      resources: [
+        .process("Resources"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Hd"),
@@ -1110,7 +1113,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
       ]
     ),
-    
+
     .target(
       name: "PyPxOsd",
       dependencies: [
@@ -1132,6 +1135,7 @@ let package = Package(
       name: "UsdView",
       dependencies: [
         .target(name: "PixarUSD"),
+        .target(name: "PixarImaging"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
@@ -1234,10 +1238,10 @@ let package = Package(
       name: "PixarImaging",
       dependencies: [
         // ------- imaging. ------
-        .target(name: "Hd"),
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
         .target(name: "PxOsd"),
+        .target(name: "Hd"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),

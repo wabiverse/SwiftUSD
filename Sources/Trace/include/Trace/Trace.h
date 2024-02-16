@@ -31,7 +31,7 @@
 #include <Trace/api.h>
 // #include <Trace/collector.h>
 
-// #include <Trace/traceImpl.h>
+#include <Trace/traceImpl.h>
 
 #include <Trace/concurrentList.h>
 
