@@ -109,12 +109,12 @@ public extension Bundle
   static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Hd`` application bundle resources are located. */
-  static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
-
-  /**
    * Where ``__ObjC/Pixar/UsdHydra`` application bundle resources are located. */
   static let usdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdHydra\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/Hd`` application bundle resources are located. */
+  static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
 
   /**
    * Where ``__ObjC/Pixar/Tf`` python bundle resources are located. */
@@ -335,6 +335,7 @@ public enum BundlePython: CaseIterable
   case pyUsdLux
   case pyUsdHydra
   case pyCameraUtil
+  case pyPxOsd
 
   public var resourcePath: String?
   {
@@ -359,6 +360,7 @@ public enum BundlePython: CaseIterable
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
       case .pyUsdHydra: Bundle.pyUsdHydra?.resourcePath
       case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
+      case .pyPxOsd: Bundle.pyPxOsd?.resourcePath
     }
   }
 }
