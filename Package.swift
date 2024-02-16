@@ -1158,8 +1158,6 @@ let package = Package(
     .target(
       name: "PixarImaging",
       dependencies: [
-        // ----------- usd. ------
-//        .target(name: "PixarUsd"),
         // ------- imaging. ------
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
