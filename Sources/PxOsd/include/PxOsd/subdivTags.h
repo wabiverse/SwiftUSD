@@ -26,10 +26,11 @@
 
 /// \file pxOsd/subdivTags.h
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/pxOsd/api.h"
-#include "pxr/base/vt/array.h"
-#include "pxr/base/tf/token.h"
+#include <pxr/pxrns.h>
+#include "PxOsd/api.h"
+
+#include "Vt/array.h"
+#include "Tf/token.h"
 
 #include <iosfwd>
 

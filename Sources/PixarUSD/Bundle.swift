@@ -179,6 +179,10 @@ public extension Bundle
   /**
    * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
   static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
+  
+  /**
+   * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
+  static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
 }
 
 public enum BundleKind

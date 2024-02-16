@@ -26,15 +26,15 @@
 
 /// \file pxOsd/meshTopology.h
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/pxOsd/api.h"
-#include "pxr/imaging/pxOsd/subdivTags.h"
-#include "pxr/imaging/pxOsd/meshTopologyValidation.h"
+#include <pxr/pxrns.h>
+#include "PxOsd/api.h"
+#include "PxOsd/subdivTags.h"
+#include "PxOsd/meshTopologyValidation.h"
 
-#include "pxr/base/vt/array.h"
-#include "pxr/base/vt/value.h"
+#include "Vt/array.h"
+#include "Vt/value.h"
 
-#include "pxr/base/tf/token.h"
+#include "Tf/token.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

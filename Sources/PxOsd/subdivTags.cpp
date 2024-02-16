@@ -25,8 +25,8 @@
 /// \file pxOsd/subdivTags.h
 ///
 
-#include "pxr/imaging/pxOsd/subdivTags.h"
-#include "pxr/base/arch/hash.h"
+#include "PxOsd/subdivTags.h"
+#include "Arch/hash.h"
 
 #include <ostream>
 

@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/pxOsd/meshTopology.h"
+#include "PxOsd/meshTopology.h"
 
-#include "pxr/base/tf/pyUtils.h"
+#include "Tf/pyUtils.h"
 
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>
@@ -41,11 +41,11 @@ _ReprMeshTopology(
 {
     std::ostringstream repr(std::ostringstream::ate);
     repr << "PxOsd.MeshTopology("
-         << TfPyRepr(topology.GetScheme()) << ", "
-         << TfPyRepr(topology.GetOrientation()) << ", "
-         << TfPyRepr(topology.GetFaceVertexCounts()) << ", "
+         << TfPyRepr(topology.GetScheme())            << ", "
+         << TfPyRepr(topology.GetOrientation())       << ", "
+         << TfPyRepr(topology.GetFaceVertexCounts())  << ", "
          << TfPyRepr(topology.GetFaceVertexIndices()) << ", "
-         << TfPyRepr(topology.GetHoleIndices()) << ")"
+         << TfPyRepr(topology.GetHoleIndices())       << ")"
     ;
     return repr.str();
 }
@@ -58,8 +58,7 @@ void wrapMeshTopology()
     const PxOsdSubdivTags& (This::*getSubdivTags)() const =
         &This::GetSubdivTags;
 
-    class_<This>("MeshTopology",
-                 init<TfToken, TfToken, VtIntArray, VtIntArray>())
+    class_<This>("MeshTopology", init<TfToken, TfToken, VtIntArray, VtIntArray>())
         .def(init<TfToken, TfToken, VtIntArray, VtIntArray, VtIntArray>())
         .def(init<TfToken, TfToken, VtIntArray, VtIntArray, VtIntArray, PxOsdSubdivTags>())
         .def(init<TfToken, TfToken, VtIntArray, VtIntArray, PxOsdSubdivTags>())

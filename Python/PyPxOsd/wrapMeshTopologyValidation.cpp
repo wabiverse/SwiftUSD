@@ -22,12 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
-#include "pxr/imaging/pxOsd/meshTopologyValidation.h"
+#include "PxOsd/meshTopology.h"
+#include "PxOsd/meshTopologyValidation.h"
 
-#include "pxr/base/tf/pyContainerConversions.h"
-#include "pxr/base/tf/pyEnum.h"
-#include "pxr/base/tf/pyUtils.h"
+#include "Tf/pyContainerConversions.h"
+#include "Tf/pyEnum.h"
+#include "Tf/pyUtils.h"
 
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>

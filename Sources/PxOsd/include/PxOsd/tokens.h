@@ -26,9 +26,10 @@
 
 /// \file pxOsd/tokens.h
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/pxOsd/api.h"
-#include "pxr/base/tf/staticTokens.h"
+#include <pxr/pxrns.h>
+#include "PxOsd/api.h"
+
+#include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

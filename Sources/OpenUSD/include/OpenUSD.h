@@ -309,15 +309,6 @@
 #include <OpenUSD/pxr/imaging/geomUtil/pch.h>
 #include <OpenUSD/pxr/imaging/geomUtil/sphereMeshGenerator.h>
 
-// pxOsd
-#include <OpenUSD/pxr/imaging/pxOsd/api.h>
-#include <OpenUSD/pxr/imaging/pxOsd/meshTopology.h>
-#include <OpenUSD/pxr/imaging/pxOsd/meshTopologyValidation.h>
-#include <OpenUSD/pxr/imaging/pxOsd/pch.h>
-#include <OpenUSD/pxr/imaging/pxOsd/refinerFactory.h>
-#include <OpenUSD/pxr/imaging/pxOsd/subdivTags.h>
-#include <OpenUSD/pxr/imaging/pxOsd/tokens.h>
-
 // hgiInterop
 #include <OpenUSD/pxr/imaging/hgiInterop/api.h>
 #include <OpenUSD/pxr/imaging/hgiInterop/hgiInterop.h>

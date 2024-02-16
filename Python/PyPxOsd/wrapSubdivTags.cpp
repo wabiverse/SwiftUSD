@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/pxOsd/subdivTags.h"
+#include "PxOsd/subdivTags.h"
 
-#include "pxr/base/tf/pyUtils.h"
+#include "Tf/pyUtils.h"
 
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>
@@ -41,15 +41,15 @@ _ReprSubdivTags(
 {
     std::ostringstream repr(std::ostringstream::ate);
     repr << "PxOsd.SubdivTags("
-         << TfPyRepr(tags.GetVertexInterpolationRule()) << ", "
+         << TfPyRepr(tags.GetVertexInterpolationRule())      << ", "
          << TfPyRepr(tags.GetFaceVaryingInterpolationRule()) << ", "
-         << TfPyRepr(tags.GetCreaseMethod()) << ", "
-         << TfPyRepr(tags.GetTriangleSubdivision()) << ", "
-         << TfPyRepr(tags.GetCreaseIndices()) << ", "
-         << TfPyRepr(tags.GetCreaseLengths()) << ", "
-         << TfPyRepr(tags.GetCreaseWeights()) << ", "
-         << TfPyRepr(tags.GetCornerIndices()) << ", "
-         << TfPyRepr(tags.GetCornerWeights()) << ")"
+         << TfPyRepr(tags.GetCreaseMethod())                 << ", "
+         << TfPyRepr(tags.GetTriangleSubdivision())          << ", "
+         << TfPyRepr(tags.GetCreaseIndices())                << ", "
+         << TfPyRepr(tags.GetCreaseLengths())                << ", "
+         << TfPyRepr(tags.GetCreaseWeights())                << ", "
+         << TfPyRepr(tags.GetCornerIndices())                << ", "
+         << TfPyRepr(tags.GetCornerWeights())                << ")"
     ;
     return repr.str();
 }

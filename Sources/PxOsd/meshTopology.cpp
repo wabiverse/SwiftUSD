@@ -25,14 +25,15 @@
 /// \file pxOsd/meshTopology.h
 ///
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
-#include "pxr/imaging/pxOsd/meshTopologyValidation.h"
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/meshTopology.h"
+#include "PxOsd/meshTopologyValidation.h"
+#include "PxOsd/tokens.h"
 
-#include "pxr/base/arch/hash.h"
-#include "pxr/base/trace/trace.h"
-#include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/debug.h"
+#include "Arch/hash.h"
+#include "Trace/traceImpl.h"
+
+#include "Tf/diagnostic.h"
+#include "Tf/debug.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -141,10 +142,10 @@ std::ostream&
 operator << (std::ostream &out, PxOsdMeshTopology const &topo)
 {
     out << "(" << topo.GetOrientation().GetString() << ", "
-        << topo.GetScheme().GetString() << ", ("
-        << topo.GetFaceVertexCounts() << "), ("
-        << topo.GetFaceVertexIndices() << "), ("
-        << topo.GetHoleIndices() << "))";
+        << topo.GetScheme().GetString()             << ", ("
+        << topo.GetFaceVertexCounts()               << "), ("
+        << topo.GetFaceVertexIndices()              << "), ("
+        << topo.GetHoleIndices()                    << "))";
     return out;
 }
 
