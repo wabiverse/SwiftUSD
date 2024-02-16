@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Pixar
+// Copyright 2016 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,31 +21,29 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
-#define PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
+////////////////////////////////////////////////////////////////////////
 
-#include "pxr/pxr.h"
-#include "pxr/usd/usdHydra/api.h"
-#include "pxr/base/tf/token.h"
+#include <pxr/pxrns.h>
+#include "Tf/registryManager.h"
+#include "Tf/scriptModuleLoader.h"
+#include "Tf/token.h"
 
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
-#include "pxr/usd/ndr/parserPlugin.h"
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdHydraDiscoveryPlugin : public NdrDiscoveryPlugin {
-public:
-    UsdHydraDiscoveryPlugin() = default;
-
-    ~UsdHydraDiscoveryPlugin() override = default;
-    
-    virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) 
-        override;
-
-    virtual const NdrStringVec& GetSearchURIs() const override;
-};
+TF_REGISTRY_FUNCTION(TfScriptModuleLoader)
+{
+  // List of direct dependencies for this library.
+  const std::vector<TfToken> reqs = {
+      TfToken("ar"),
+      TfToken("arch"),
+      TfToken("ndr"),
+      TfToken("plug"),
+      TfToken("tf"),
+      TfToken("usd"),
+      TfToken("usdShade")};
+  TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("usdHydra"), TfToken("pxr.UsdHydra"), reqs);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H

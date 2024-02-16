@@ -109,6 +109,10 @@ public extension Bundle
   static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
 
   /**
+   * Where ``__ObjC/Pixar/UsdHydra`` application bundle resources are located. */
+  static let usdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdHydra\(ext)")
+
+  /**
    * Where ``__ObjC/Pixar/Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
@@ -175,6 +179,10 @@ public extension Bundle
   /**
    * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
   static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdHydra`` application bundle resources are located. */
+  static let pyUsdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdHydra\(ext)")
 
   /**
    * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
@@ -281,6 +289,7 @@ public enum BundleFramework: CaseIterable
   case usdShade
   case usdShaders
   case usdLux
+  case usdHydra
 
   public var resourcePath: String?
   {
@@ -294,6 +303,7 @@ public enum BundleFramework: CaseIterable
       case .usdShade: Bundle.usdShade?.resourcePath
       case .usdShaders: Bundle.usdShaders?.resourcePath
       case .usdLux: Bundle.usdLux?.resourcePath
+      case .usdHydra: Bundle.usdHydra?.resourcePath
     }
   }
 }
@@ -317,6 +327,7 @@ public enum BundlePython: CaseIterable
   case pyUsdShade
   case pyUsdShaders
   case pyUsdLux
+  case pyUsdHydra
   case pyCameraUtil
 
   public var resourcePath: String?
@@ -340,6 +351,7 @@ public enum BundlePython: CaseIterable
       case .pyUsdShade: Bundle.pyUsdShade?.resourcePath
       case .pyUsdShaders: Bundle.pyUsdShaders?.resourcePath
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
+      case .pyUsdHydra: Bundle.pyUsdHydra?.resourcePath
       case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
     }
   }

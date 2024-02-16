@@ -106,6 +106,10 @@ let package = Package(
       name: "UsdLux",
       targets: ["UsdLux"]
     ),
+    .library(
+      name: "UsdHydra",
+      targets: ["UsdHydra"]
+    ),
     // -------- Pixar.Imaging -----
     .library(
       name: "CameraUtil",
@@ -196,19 +200,24 @@ let package = Package(
       targets: ["PyUsdGeom"]
     ),
     .library(
+      name: "PyUsdLux",
+      type: .dynamic,
+      targets: ["PyUsdLux"]
+    ),
+    .library(
       name: "PyUsdShade",
       type: .dynamic,
       targets: ["PyUsdShade"]
     ),
     .library(
+      name: "PyUsdHydra",
+      type: .dynamic,
+      targets: ["PyUsdHydra"]
+    ),
+    .library(
       name: "PyUsdShaders",
       type: .dynamic,
       targets: ["PyUsdShaders"]
-    ),
-    .library(
-      name: "PyUsdLux",
-      type: .dynamic,
-      targets: ["PyUsdLux"]
     ),
     .library(
       name: "PyCameraUtil",
@@ -256,6 +265,7 @@ let package = Package(
         "PyUsdGeom",
         "PyUsdShade",
         "PyUsdLux",
+        "PyUsdHydra",
       ]
     ),
     // ---------- Pixar Imaging -----
@@ -687,6 +697,28 @@ let package = Package(
     ),
 
     .target(
+      name: "UsdHydra",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Ar"),
+        .target(name: "Tf"),
+        .target(name: "Plug"),
+        .target(name: "Ndr"),
+        .target(name: "Usd"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
+        .define("USDHYDRA_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "CameraUtil",
       dependencies: [
         .target(name: "Arch"),
@@ -1021,6 +1053,23 @@ let package = Package(
     ),
 
     .target(
+      name: "PyUsdHydra",
+      dependencies: [
+        .target(name: "UsdHydra"),
+      ],
+      path: "Python/PyUsdHydra",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
+      ]
+    ),
+
+    .target(
       name: "PyCameraUtil",
       dependencies: [
         .target(name: "CameraUtil"),
@@ -1140,6 +1189,7 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
+        .target(name: "UsdHydra"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------

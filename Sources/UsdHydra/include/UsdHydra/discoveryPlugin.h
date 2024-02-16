@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2018 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,14 +21,32 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/pyModule.h"
+#ifndef PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
+#define PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H
 
-PXR_NAMESPACE_USING_DIRECTIVE
+#include <pxr/pxrns.h>
+#include "UsdHydra/api.h"
+#include "Tf/token.h"
 
-TF_WRAP_MODULE
+#include "Ndr/declare.h"
+#include "Ndr/discoveryPlugin.h"
+#include "Ndr/parserPlugin.h"
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class UsdHydraDiscoveryPlugin : public NdrDiscoveryPlugin
 {
-    TF_WRAP(UsdHydraTokens); 
-    TF_WRAP(UsdHydraGenerativeProceduralAPI); 
-    
-}
+public:
+  UsdHydraDiscoveryPlugin() = default;
+
+  ~UsdHydraDiscoveryPlugin() override = default;
+
+  virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context)
+      override;
+
+  virtual const NdrStringVec &GetSearchURIs() const override;
+};
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // PXR_USD_USD_HYDRA_DISCOVERY_PLUGIN_H

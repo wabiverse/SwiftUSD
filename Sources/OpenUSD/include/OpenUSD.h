@@ -828,13 +828,6 @@
 #include <OpenUSD/pxr/usd/usdSkel/topology.h>
 #include <OpenUSD/pxr/usd/usdSkel/utils.h>
 
-// usdHydra
-#include <OpenUSD/pxr/usd/usdHydra/api.h>
-#include <OpenUSD/pxr/usd/usdHydra/discoveryPlugin.h>
-#include <OpenUSD/pxr/usd/usdHydra/generativeProceduralAPI.h>
-#include <OpenUSD/pxr/usd/usdHydra/pch.h>
-#include <OpenUSD/pxr/usd/usdHydra/tokens.h>
-
 // usdMedia
 #include <OpenUSD/pxr/usd/usdMedia/api.h>
 #include <OpenUSD/pxr/usd/usdMedia/assetPreviewsAPI.h>
