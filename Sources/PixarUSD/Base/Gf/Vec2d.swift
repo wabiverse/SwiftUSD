@@ -156,6 +156,17 @@ extension Gf.Vec2d: Scalar
   {
     GetNormalized(eps)
   }
+  
+  /// Returns an iterator over this scalar.
+  ///
+  /// Since this type can return its own iterator, it conforms
+  /// this scalar to a sequence to enable many useful operations,
+  /// like for-in looping and the contains method, without much
+  /// effort.
+  public func makeIterator() -> ScalarIterator<Self>
+  {
+    ScalarIterator(self)
+  }
 }
 
 extension Gf.Vec2d: SIMD

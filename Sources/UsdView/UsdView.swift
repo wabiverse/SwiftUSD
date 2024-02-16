@@ -29,7 +29,6 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarBase
 import PixarUSD
 
 @main
