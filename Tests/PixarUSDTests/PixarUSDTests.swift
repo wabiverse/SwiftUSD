@@ -29,7 +29,6 @@
  * ---------------------------------------------------------------- */
 
 import XCTest
-@testable import PixarBase
 @testable import PixarUSD
 
 /* ---- xxx ----

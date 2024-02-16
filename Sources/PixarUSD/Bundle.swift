@@ -30,7 +30,7 @@
 
 import CxxStdlib
 import Foundation
-import PixarBase
+import Arch
 import Plug
 import Rainbow
 
@@ -43,7 +43,7 @@ import Rainbow
     public static let main = Bundle()
     private init()
     {
-      resourcePath = "/" + Pixar.Arch.getExecutablePath().split(separator: "/").dropLast().joined(separator: "/")
+      resourcePath = "/" + Arch.getExecutablePath().split(separator: "/").dropLast().joined(separator: "/")
 
       Msg.logger.log(level: .info, "Bundle path: \(resourcePath ?? "")")
     }

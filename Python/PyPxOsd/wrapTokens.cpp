@@ -28,7 +28,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapTokens()
+void wrapPxOsdTokens()
 {
     TF_PY_WRAP_PUBLIC_TOKENS(
         "OpenSubdivTokens",
