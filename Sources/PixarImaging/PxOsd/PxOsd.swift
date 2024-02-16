@@ -28,7 +28,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CameraUtil
+import PxOsd
 
-public enum CameraUtil
+public enum PxOsd
 {}
