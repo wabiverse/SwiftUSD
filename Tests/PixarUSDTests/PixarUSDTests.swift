@@ -29,6 +29,7 @@
  * ---------------------------------------------------------------- */
 
 import XCTest
+@testable import PixarBase
 @testable import PixarUSD
 
 /* ---- xxx ----
@@ -39,28 +40,28 @@ final class ArchTests: XCTestCase
 {
   func testCwd()
   {
-    Msg.logger.log(level: .info, "Pixar.Arch.getCwd() -> \(Pixar.Arch.getCwd())")
+    Msg.logger.log(level: .info, "Arch.getCwd() -> \(Arch.getCwd())")
   }
 
   func testExecutablePath()
   {
-    Msg.logger.log(level: .info, "Pixar.Arch.getExecutablePath() -> \(Pixar.Arch.getExecutablePath())")
+    Msg.logger.log(level: .info, "Arch.getExecutablePath() -> \(Arch.getExecutablePath())")
   }
 
   func testPageSize()
   {
-    Msg.logger.log(level: .info, "Pixar.Arch.getPageSize() -> \(Pixar.Arch.getPageSize())")
+    Msg.logger.log(level: .info, "Arch.getPageSize() -> \(Arch.getPageSize())")
   }
 
   func testIsMainThread()
   {
-    Msg.logger.log(level: .info, "Pixar.Arch.isMainThread() -> \(Pixar.Arch.isMainThread())")
+    Msg.logger.log(level: .info, "Arch.isMainThread() -> \(Arch.isMainThread())")
   }
 
   func testAlignMemoryOfSize()
   {
     let size = 1024
-    let alignedPtr = Pixar.Arch.alignMemory(of: size)
+    let alignedPtr = Arch.alignMemory(of: size)
     XCTAssert(alignedPtr >= 1024)
   }
 
@@ -70,7 +71,7 @@ final class ArchTests: XCTestCase
     let alignment = 16
     let ptr = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: alignment)
     defer { ptr.deallocate() }
-    let alignedPtr = Pixar.Arch.alignMemory(of: ptr)
+    let alignedPtr = Arch.alignMemory(of: ptr)
     XCTAssert(alignedPtr != nil)
   }
 
@@ -78,7 +79,7 @@ final class ArchTests: XCTestCase
   {
     let size = 1024
     let alignment = 16
-    let alignedPtr = Pixar.Arch.alignedAlloc(byteCount: size, alignment: alignment)
+    let alignedPtr = Arch.alignedAlloc(byteCount: size, alignment: alignment)
     XCTAssert(alignedPtr != nil)
   }
 
@@ -86,9 +87,9 @@ final class ArchTests: XCTestCase
   {
     let size = 1024
     let alignment = 16
-    var alignedPtr = Pixar.Arch.alignedAlloc(byteCount: size, alignment: alignment)
+    var alignedPtr = Arch.alignedAlloc(byteCount: size, alignment: alignment)
     XCTAssert(alignedPtr != nil)
-    Pixar.Arch.alignedFree(pointer: &alignedPtr)
+    Arch.alignedFree(pointer: &alignedPtr)
     XCTAssert(alignedPtr == nil)
   }
 }
@@ -101,8 +102,8 @@ final class JsTests: XCTestCase
 {
   func testArray()
   {
-    let array = Pixar.Js.Array()
-    Msg.logger.log(level: .info, "Pixar.Js.Array -> \(array)")
+    let array = Js.Array()
+    Msg.logger.log(level: .info, "Js.Array -> \(array)")
 
     let jsArray = JsArray()
     Msg.logger.log(level: .info, "JsArray -> \(jsArray)")
@@ -112,8 +113,8 @@ final class JsTests: XCTestCase
 
   func testObject()
   {
-    let object = Pixar.Js.Object()
-    Msg.logger.log(level: .info, "Pixar.Js.Object -> \(object)")
+    let object = Js.Object()
+    Msg.logger.log(level: .info, "Js.Object -> \(object)")
 
     let jsObject = JsObject()
     Msg.logger.log(level: .info, "JsObject -> \(jsObject)")
@@ -123,8 +124,8 @@ final class JsTests: XCTestCase
 
   func testParseError()
   {
-    let parseError = Pixar.Js.ParseError()
-    Msg.logger.log(level: .info, "Pixar.Js.ParseError -> \(parseError)")
+    let parseError = Js.ParseError()
+    Msg.logger.log(level: .info, "Js.ParseError -> \(parseError)")
 
     let jsParseError = JsParseError()
     Msg.logger.log(level: .info, "ParseError -> \(jsParseError)")
@@ -134,8 +135,8 @@ final class JsTests: XCTestCase
 
   func testValue()
   {
-    let value = Pixar.Js.Value(true)
-    Msg.logger.log(level: .info, "Pixar.Js.Value -> \(value.GetBool())")
+    let value = Js.Value(true)
+    Msg.logger.log(level: .info, "Js.Value -> \(value.GetBool())")
     XCTAssertEqual(value.GetBool(), true)
 
     let jsValue = JsValue(true)
@@ -154,8 +155,8 @@ final class GfTests: XCTestCase
 {
   func testVec2f()
   {
-    let vec2f = Pixar.Gf.Vec2f(1.0, 2.0)
-    Msg.logger.log(level: .info, "Pixar.Gf.Vec2f -> \(vec2f)")
+    let vec2f = Gf.Vec2f(1.0, 2.0)
+    Msg.logger.log(level: .info, "Gf.Vec2f -> \(vec2f)")
 
     let gfVec2f = GfVec2f(1.0, 2.0)
     Msg.logger.log(level: .info, "GfVec2f -> \(gfVec2f)")
@@ -194,16 +195,16 @@ final class ArTests: XCTestCase
 {
   func testGetAllResolvers()
   {
-    let resolvers = Pixar.Ar.getAllResolvers()
+    let resolvers = Ar.getAllResolvers()
 
     if resolvers.isEmpty
     {
-      Msg.logger.log(level: .info, "Pixar.Ar.getAllResolvers() -> None")
+      Msg.logger.log(level: .info, "Ar.getAllResolvers() -> None")
     }
 
     for (i, r) in resolvers.enumerated()
     {
-      Msg.logger.log(level: .info, "Pixar.Ar.getAllResolvers() [\(i + 1)/\(resolvers.count)] -> \(r)")
+      Msg.logger.log(level: .info, "Ar.getAllResolvers() [\(i + 1)/\(resolvers.count)] -> \(r)")
     }
   }
 }
@@ -216,11 +217,11 @@ final class KindTests: XCTestCase
 {
   func testKindTokens()
   {
-    let tokens = Pixar.Kind.Tokens.allCases
+    let tokens = Kind.Tokens.allCases
 
     for (i, t) in tokens.enumerated()
     {
-      Msg.logger.log(level: .info, "Pixar.Kind.Tokens [\(i + 1)/\(tokens.count)] -> \(t.getToken().string)")
+      Msg.logger.log(level: .info, "Kind.Tokens [\(i + 1)/\(tokens.count)] -> \(t.getToken().string)")
     }
 
     XCTAssertEqual(tokens.count, 5)
