@@ -58,7 +58,7 @@ public extension Gf
   typealias Vec2f = GfVec2f
 }
 
-extension GfVec2f: Scalar
+extension Gf.Vec2f: Scalar
 {
   /// Axis count of the vector.
   public typealias AxisCount = Axis2
@@ -158,7 +158,7 @@ extension GfVec2f: Scalar
   }
 }
 
-extension GfVec2f: SIMD
+extension Gf.Vec2f: SIMD
 {
   public typealias Scalar = Self.ScalarType
   public typealias SIMDStorage = SIMD2<Scalar>

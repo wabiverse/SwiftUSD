@@ -58,7 +58,7 @@ public extension Gf
   typealias Vec3d = GfVec3d
 }
 
-extension GfVec3d: Scalar
+extension Gf.Vec3d: Scalar
 {
   /// Axis count of the vector.
   public typealias AxisCount = Axis3
@@ -161,7 +161,7 @@ extension GfVec3d: Scalar
   }
 }
 
-extension GfVec3d: SIMD
+extension Gf.Vec3d: SIMD
 {
   public typealias Scalar = Self.ScalarType
   public typealias SIMDStorage = SIMD3<Scalar>
