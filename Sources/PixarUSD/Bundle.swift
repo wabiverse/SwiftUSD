@@ -107,6 +107,10 @@ public extension Bundle
   /**
    * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
   static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
+    
+  /**
+   * Where ``__ObjC/Pixar/Hd`` application bundle resources are located. */
+  static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
 
   /**
    * Where ``__ObjC/Pixar/Tf`` python bundle resources are located. */
@@ -181,7 +185,7 @@ public extension Bundle
   static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
   
   /**
-   * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
+   * Where ``__ObjC/Pixar/PxOsd`` application bundle resources are located. */
   static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
 }
 

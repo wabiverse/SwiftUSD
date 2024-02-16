@@ -108,6 +108,10 @@ let package = Package(
     ),
     // -------- Pixar.Imaging -----
     .library(
+      name: "Hd",
+      targets: ["Hd"]
+    ),
+    .library(
       name: "CameraUtil",
       targets: ["CameraUtil"]
     ),
@@ -730,6 +734,27 @@ let package = Package(
         .define("PXOSD_EXPORTS", to: "1"),
       ]
     ),
+    
+    .target(
+      name: "Hd",
+      dependencies: [
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+        .target(name: "Sdf"),
+        .target(name: "CameraUtil"),
+        .target(name: "Hf"),
+        .target(name: "PxOsd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Hd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Hd"),
+        .define("MFB_PACKAGE_MODULE", to: "Hd"),
+        .define("HD_EXPORTS", to: "1"),
+      ]
+    ),
 
     .target(
       name: "PyTf",
@@ -1159,6 +1184,7 @@ let package = Package(
       name: "PixarImaging",
       dependencies: [
         // ------- imaging. ------
+        .target(name: "Hd"),
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
         .target(name: "PxOsd"),
