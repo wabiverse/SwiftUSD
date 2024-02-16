@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2020 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,29 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-////////////////////////////////////////////////////////////////////////
+#include <pxr/pxrns.h>
+#include "PxOsd/tokens.h"
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/registryManager.h"
-#include "pxr/base/tf/scriptModuleLoader.h"
-#include "pxr/base/tf/token.h"
+#include "Tf/pyStaticTokens.h"
 
-#include <vector>
+PXR_NAMESPACE_USING_DIRECTIVE
 
-PXR_NAMESPACE_OPEN_SCOPE
-
-TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
-    // List of direct dependencies for this library.
-    const std::vector<TfToken> reqs = {
-        TfToken("arch"),
-        TfToken("tf"),
-        TfToken("trace"),
-        TfToken("vt")
-    };
-    TfScriptModuleLoader::GetInstance().
-        RegisterLibrary(TfToken("pxOsd"), TfToken("pxr.PxOsd"), reqs);
+void wrapTokens()
+{
+    TF_PY_WRAP_PUBLIC_TOKENS(
+        "OpenSubdivTokens",
+        PxOsdOpenSubdivTokens, PXOSD_OPENSUBDIV_TOKENS);
 }
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
 

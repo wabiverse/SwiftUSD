@@ -26,7 +26,7 @@
 #ifndef PXR_IMAGING_PX_OSD_MESH_TOPOLOGY_VALIDATION_H
 #define PXR_IMAGING_PX_OSD_MESH_TOPOLOGY_VALIDATION_H
 
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/tokens.h"
 
 #include <array>
 #include <memory>

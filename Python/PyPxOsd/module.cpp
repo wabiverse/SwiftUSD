@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2019 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,16 +21,15 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-///
-/// \file pxOsd/tokens.cpp
-///
+#include <pxr/pxrns.h>
+#include "Tf/pyModule.h"
 
-#include "pxr/imaging/pxOsd/tokens.h"
+PXR_NAMESPACE_USING_DIRECTIVE
 
-PXR_NAMESPACE_OPEN_SCOPE
-
-
-TF_DEFINE_PUBLIC_TOKENS(PxOsdOpenSubdivTokens, PXOSD_OPENSUBDIV_TOKENS);
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
+TF_WRAP_MODULE
+{
+    TF_WRAP(Tokens);
+    TF_WRAP(MeshTopologyValidation);
+    TF_WRAP(MeshTopology);
+    TF_WRAP(SubdivTags);
+}

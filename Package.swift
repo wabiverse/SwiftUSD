@@ -115,6 +115,10 @@ let package = Package(
       name: "Hf",
       targets: ["Hf"]
     ),
+    .library(
+      name: "PxOsd",
+      targets: ["PxOsd"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -211,6 +215,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyCameraUtil"]
     ),
+    .library(
+      name: "PyPxOsd",
+      type: .dynamic,
+      targets: ["PyPxOsd"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -254,6 +263,7 @@ let package = Package(
       name: "PixarImaging",
       targets: [
         "PyCameraUtil",
+        "PyPxOsd",
       ]
     ),
     // ------ Pixar Usd Imaging -----
@@ -705,6 +715,21 @@ let package = Package(
         .define("HF_EXPORTS", to: "1")
       ]
     ),
+    
+    .target(
+      name: "PxOsd",
+      dependencies: [
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "PxOsd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
+        .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
+        .define("PXOSD_EXPORTS", to: "1"),
+      ]
+    ),
 
     .target(
       name: "PyTf",
@@ -1011,6 +1036,23 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
       ]
     ),
+    
+    .target(
+      name: "PyPxOsd",
+      dependencies: [
+        .target(name: "PxOsd"),
+      ],
+      path: "Python/PyPxOsd",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "PxOsd"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
+        .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
+      ]
+    ),
 
     .executableTarget(
       name: "UsdView",
@@ -1121,6 +1163,7 @@ let package = Package(
         // ------- imaging. ------
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
+        .target(name: "PxOsd"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),

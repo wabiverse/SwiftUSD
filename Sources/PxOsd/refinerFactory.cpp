@@ -25,9 +25,10 @@
 /// \file pxOsd/refinerFactory.cpp
 ///
 
-#include "pxr/imaging/pxOsd/refinerFactory.h"
-#include "pxr/imaging/pxOsd/tokens.h"
-#include "pxr/base/tf/diagnostic.h"
+#include "PxOsd/refinerFactory.h"
+#include "PxOsd/tokens.h"
+
+#include "Tf/diagnostic.h"
 
 #include <OpenSubdiv/OSDAdaptiveTopologyRefinerFactory.h>
 

@@ -23,15 +23,15 @@
 //
 
 
-#include "pxr/imaging/pxOsd/meshTopologyValidation.h"
-#include "pxr/imaging/pxOsd/meshTopology.h"
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/meshTopologyValidation.h"
+#include "PxOsd/meshTopology.h"
+#include "PxOsd/tokens.h"
 
-#include "pxr/base/trace/trace.h"
+#include "Trace/traceImpl.h"
 
-#include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/enum.h"
-#include "pxr/base/tf/registryManager.h"
+#include "Tf/diagnostic.h"
+#include "Tf/enum.h"
+#include "Tf/registryManager.h"
 
 #include <algorithm>
 #include <numeric>
