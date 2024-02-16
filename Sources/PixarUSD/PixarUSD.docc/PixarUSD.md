@@ -27,6 +27,7 @@ Robustly and scalably interchange 3D scenes while fostering highly collaborative
 - ``__ObjC/Pixar/UsdLux``
 
 ### Rendering & Imaging
+- ``__ObjC/Pixar/Hd``
 - ``__ObjC/Pixar/Hf``
 - ``__ObjC/Pixar/CameraUtil``
 - ``__ObjC/Pixar/PxOsd``
