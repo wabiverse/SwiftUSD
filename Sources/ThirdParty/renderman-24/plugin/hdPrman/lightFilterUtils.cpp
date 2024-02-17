@@ -30,14 +30,14 @@
 #include "hdPrman/material.h"
 #include "hdPrman/rixStrings.h"
 
-#include "pxr/imaging/hd/material.h"
-#include "pxr/imaging/hd/sceneDelegate.h"
-#include "pxr/imaging/hd/tokens.h"
+#include "Hd/material.h"
+#include "Hd/sceneDelegate.h"
+#include "Hd/tokens.h"
 
-#include "pxr/base/gf/vec3f.h"
-#include "pxr/base/tf/debug.h"
-#include "pxr/base/tf/envSetting.h"
-#include "pxr/base/tf/staticTokens.h"
+#include "Gf/vec3f.h"
+#include "Tf/debug.h"
+#include "Tf/envSetting.h"
+#include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -50,52 +50,55 @@ void HdPrmanLightFilterGenerateCoordSysAndLinks(
     HdPrman_RenderParam *renderParam,
     riley::Riley *riley)
 {
-    // Sample filter transform
-    HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> xf;
-    sceneDelegate->SampleTransform(filterPath, &xf);
-    TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES> 
-        xf_rt_values(xf.count);
-    for (size_t i=0; i < xf.count; ++i) {
-        xf_rt_values[i] = HdPrman_GfMatrixToRtMatrix(xf.values[i]);
-    }
-    const riley::Transform xform = {
-        unsigned(xf.count), xf_rt_values.data(), xf.times.data()};
+  // Sample filter transform
+  HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> xf;
+  sceneDelegate->SampleTransform(filterPath, &xf);
+  TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>
+      xf_rt_values(xf.count);
+  for (size_t i = 0; i < xf.count; ++i)
+  {
+    xf_rt_values[i] = HdPrman_GfMatrixToRtMatrix(xf.values[i]);
+  }
+  const riley::Transform xform = {
+      unsigned(xf.count), xf_rt_values.data(), xf.times.data()};
 
-    // To ensure the coordsys name is unique, use the full filter path.
-    RtUString coordsysName = RtUString(filterPath.GetText());
+  // To ensure the coordsys name is unique, use the full filter path.
+  RtUString coordsysName = RtUString(filterPath.GetText());
 
-    RtParamList attrs;
-    attrs.SetString(RixStr.k_name, coordsysName);
+  RtParamList attrs;
+  attrs.SetString(RixStr.k_name, coordsysName);
 
-    riley::CoordinateSystemId csId = riley->CreateCoordinateSystem(
-        riley::UserId(stats::AddDataLocation(filterPath.GetText()).GetValue()),
-        xform, attrs);
-    (*coordsysIds).push_back(csId);
+  riley::CoordinateSystemId csId = riley->CreateCoordinateSystem(
+      riley::UserId(stats::AddDataLocation(filterPath.GetText()).GetValue()),
+      xform, attrs);
+  (*coordsysIds).push_back(csId);
 
-    // Only certain light filters require a coordsys, but we do not
-    // know which, here, so we provide it in all cases.
-    filter->params.SetString(RtUString("coordsys"), coordsysName);
+  // Only certain light filters require a coordsys, but we do not
+  // know which, here, so we provide it in all cases.
+  filter->params.SetString(RtUString("coordsys"), coordsysName);
 
-    // Light filter linking
-    VtValue val = sceneDelegate->GetLightParamValue(filterPath,
-                                    HdTokens->lightFilterLink);
-    TfToken lightFilterLink = TfToken();
-    if (val.IsHolding<TfToken>()) {
-        lightFilterLink = val.UncheckedGet<TfToken>();
-    }
-    
-    if (!lightFilterLink.IsEmpty()) {
-        renderParam->IncrementLightFilterCount(lightFilterLink);
-        (*filterLinks).push_back(lightFilterLink);
-        // For light filters to link geometry, the light filters must
-        // be assigned a grouping membership, and the
-        // geometry must subscribe to that grouping.
-        filter->params.SetString(RtUString("linkingGroups"),
-                            RtUString(lightFilterLink.GetText()));
-        TF_DEBUG(HDPRMAN_LIGHT_LINKING)
-            .Msg("HdPrman: Light filter <%s> linkingGroups \"%s\"\n",
-                    filterPath.GetText(), lightFilterLink.GetText());
-    }
+  // Light filter linking
+  VtValue val = sceneDelegate->GetLightParamValue(filterPath,
+                                                  HdTokens->lightFilterLink);
+  TfToken lightFilterLink = TfToken();
+  if (val.IsHolding<TfToken>())
+  {
+    lightFilterLink = val.UncheckedGet<TfToken>();
+  }
+
+  if (!lightFilterLink.IsEmpty())
+  {
+    renderParam->IncrementLightFilterCount(lightFilterLink);
+    (*filterLinks).push_back(lightFilterLink);
+    // For light filters to link geometry, the light filters must
+    // be assigned a grouping membership, and the
+    // geometry must subscribe to that grouping.
+    filter->params.SetString(RtUString("linkingGroups"),
+                             RtUString(lightFilterLink.GetText()));
+    TF_DEBUG(HDPRMAN_LIGHT_LINKING)
+        .Msg("HdPrman: Light filter <%s> linkingGroups \"%s\"\n",
+             filterPath.GetText(), lightFilterLink.GetText());
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

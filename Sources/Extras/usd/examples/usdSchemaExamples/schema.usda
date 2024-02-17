@@ -4,7 +4,7 @@
         usdGenSchema.
     """
     subLayers = [
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 ) 
 

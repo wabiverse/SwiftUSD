@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 
 #include "resolverContext.h"
 
-#include "pxr/usd/ar/pyResolverContext.h"
-#include "pxr/base/tf/pyUtils.h"
+#include "Ar/pyResolverContext.h"
+#include "Tf/pyUtils.h"
 
 #include <boost/python/class.hpp>
 #include <boost/python/return_value_policy.hpp>
@@ -37,36 +37,31 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace boost::python;
 
-static
-size_t
-_Hash(const UsdResolverExampleResolverContext& ctx)
+static size_t
+_Hash(const UsdResolverExampleResolverContext &ctx)
 {
-    return hash_value(ctx);
+  return hash_value(ctx);
 }
 
-static
-std::string
-_Repr(const UsdResolverExampleResolverContext& ctx)
+static std::string
+_Repr(const UsdResolverExampleResolverContext &ctx)
 {
-    return TF_PY_REPR_PREFIX + "ResolverContext" +
-        (ctx.GetMappingFile().empty() ? "()" : 
-            "('" + ctx.GetMappingFile() + "')");
+  return TF_PY_REPR_PREFIX + "ResolverContext" +
+         (ctx.GetMappingFile().empty() ? "()" : "('" + ctx.GetMappingFile() + "')");
 }
 
-void
-wrapResolverContext()
+void wrapResolverContext()
 {
-    using This = UsdResolverExampleResolverContext;
+  using This = UsdResolverExampleResolverContext;
 
-    class_<UsdResolverExampleResolverContext>("ResolverContext")
-        .def(init<const std::string&>(args("mappingFile")))
-        
-        .def("__hash__", _Hash)
-        .def("__repr__", _Repr)
+  class_<UsdResolverExampleResolverContext>("ResolverContext")
+      .def(init<const std::string &>(args("mappingFile")))
 
-        .def("GetMappingFile", &This::GetMappingFile,
-            return_value_policy<return_by_value>())
-        ;
+      .def("__hash__", _Hash)
+      .def("__repr__", _Repr)
 
-    ArWrapResolverContextForPython<This>();
+      .def("GetMappingFile", &This::GetMappingFile,
+           return_value_policy<return_by_value>());
+
+  ArWrapResolverContextForPython<This>();
 }

@@ -24,7 +24,7 @@
 #ifndef HDPRMAN_XCPT_H
 #define HDPRMAN_XCPT_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
 #include "ri.hpp"
 
@@ -37,9 +37,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdPrman_Xcpt : public RixXcpt::XcptHandler
 {
 public:
-    HDPRMAN_API virtual void HandleXcpt(int code, int severity,
-                                        const char* msg);
-    HDPRMAN_API virtual void HandleExitRequest(int code);
+  HDPRMAN_API virtual void HandleXcpt(int code, int severity,
+                                      const char *msg);
+  HDPRMAN_API virtual void HandleExitRequest(int code);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

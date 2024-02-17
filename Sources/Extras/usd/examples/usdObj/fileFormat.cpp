@@ -21,14 +21,14 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "fileFormat.h"
 
-#include "pxr/usd/usd/usdaFileFormat.h"
-#include "pxr/usd/sdf/layer.h"
+#include "Usd/usdaFileFormat.h"
+#include "Sdf/layer.h"
 
-#include "pxr/base/tf/fileUtils.h"
-#include "pxr/base/tf/registryManager.h"
+#include "Tf/fileUtils.h"
+#include "Tf/registryManager.h"
 
 #include "stream.h"
 #include "streamIO.h"
@@ -39,24 +39,23 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 using std::string;
 
 TF_DEFINE_PUBLIC_TOKENS(
-    UsdObjFileFormatTokens, 
+    UsdObjFileFormatTokens,
     USDOBJ_FILE_FORMAT_TOKENS);
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    SDF_DEFINE_FILE_FORMAT(UsdObjFileFormat, SdfFileFormat);
+  SDF_DEFINE_FILE_FORMAT(UsdObjFileFormat, SdfFileFormat);
 }
 
 UsdObjFileFormat::UsdObjFileFormat()
     : SdfFileFormat(
-        UsdObjFileFormatTokens->Id,
-        UsdObjFileFormatTokens->Version,
-        UsdObjFileFormatTokens->Target,
-        UsdObjFileFormatTokens->Id)
+          UsdObjFileFormatTokens->Id,
+          UsdObjFileFormatTokens->Version,
+          UsdObjFileFormatTokens->Target,
+          UsdObjFileFormatTokens->Id)
 {
 }
 
@@ -64,96 +63,93 @@ UsdObjFileFormat::~UsdObjFileFormat()
 {
 }
 
-bool
-UsdObjFileFormat::CanRead(const string& filePath) const
+bool UsdObjFileFormat::CanRead(const string &filePath) const
 {
-    // Could check to see if it looks like valid obj data...
-    return true;
+  // Could check to see if it looks like valid obj data...
+  return true;
 }
 
-bool
-UsdObjFileFormat::_ReadFromStream(
-    SdfLayer* layer,
+bool UsdObjFileFormat::_ReadFromStream(
+    SdfLayer *layer,
     std::istream &input,
     bool metadataOnly,
     string *outErr) const
 {
-    // Read Obj data stream.
-    UsdObjStream objStream;
-    if (!UsdObjReadDataFromStream(input, &objStream, outErr))
-        return false;
+  // Read Obj data stream.
+  UsdObjStream objStream;
+  if (!UsdObjReadDataFromStream(input, &objStream, outErr))
+    return false;
 
-    // Translate obj to usd schema.
-    SdfLayerRefPtr objAsUsd = UsdObjTranslateObjToUsd(objStream);
-    if (!objAsUsd)
-        return false;
-    
-    // Move generated content into final layer.
-    layer->TransferContent(objAsUsd);
-    return true;
+  // Translate obj to usd schema.
+  SdfLayerRefPtr objAsUsd = UsdObjTranslateObjToUsd(objStream);
+  if (!objAsUsd)
+    return false;
+
+  // Move generated content into final layer.
+  layer->TransferContent(objAsUsd);
+  return true;
 }
 
-bool
-UsdObjFileFormat::Read(
-    SdfLayer* layer,
-    const string& resolvedPath,
+bool UsdObjFileFormat::Read(
+    SdfLayer *layer,
+    const string &resolvedPath,
     bool metadataOnly) const
 {
-    // try and open the file
-    std::ifstream fin(resolvedPath.c_str());
-    if (!fin.is_open()) {
-        TF_RUNTIME_ERROR("Failed to open file \"%s\"", resolvedPath.c_str());
-        return false;
-    }
+  // try and open the file
+  std::ifstream fin(resolvedPath.c_str());
+  if (!fin.is_open())
+  {
+    TF_RUNTIME_ERROR("Failed to open file \"%s\"", resolvedPath.c_str());
+    return false;
+  }
 
-    string error;
-    if (!_ReadFromStream(layer, fin, metadataOnly, &error)) {
-        TF_RUNTIME_ERROR("Failed to read OBJ from file \"%s\": %s",
-                         resolvedPath.c_str(), error.c_str());
-        return false;
-    }
-    return true;
+  string error;
+  if (!_ReadFromStream(layer, fin, metadataOnly, &error))
+  {
+    TF_RUNTIME_ERROR("Failed to read OBJ from file \"%s\": %s",
+                     resolvedPath.c_str(), error.c_str());
+    return false;
+  }
+  return true;
 }
 
-bool 
-UsdObjFileFormat::ReadFromString(
-    SdfLayer* layer,
-    const std::string& str) const
+bool UsdObjFileFormat::ReadFromString(
+    SdfLayer *layer,
+    const std::string &str) const
 {
-    string error;
-    std::stringstream ss(str);
-    if (!_ReadFromStream(layer, ss, /*metadataOnly=*/false, &error)) {
-        TF_RUNTIME_ERROR("Failed to read OBJ data from string: %s",
-                         error.c_str());
-        return false;
-    }
-    return true;
+  string error;
+  std::stringstream ss(str);
+  if (!_ReadFromStream(layer, ss, /*metadataOnly=*/false, &error))
+  {
+    TF_RUNTIME_ERROR("Failed to read OBJ data from string: %s",
+                     error.c_str());
+    return false;
+  }
+  return true;
 }
 
-
-bool 
-UsdObjFileFormat::WriteToString(
-    const SdfLayer& layer,
-    std::string* str,
-    const std::string& comment) const
+bool UsdObjFileFormat::WriteToString(
+    const SdfLayer &layer,
+    std::string *str,
+    const std::string &comment) const
 {
-    // XXX: For now, defer to the usda file format for this.  We don't support
-    // writing Usd content as a OBJ.
-    return SdfFileFormat::FindById(
-        UsdUsdaFileFormatTokens->Id)->WriteToString(layer, str, comment);
+  // XXX: For now, defer to the usda file format for this.  We don't support
+  // writing Usd content as a OBJ.
+  return SdfFileFormat::FindById(
+             UsdUsdaFileFormatTokens->Id)
+      ->WriteToString(layer, str, comment);
 }
 
-bool
-UsdObjFileFormat::WriteToStream(
+bool UsdObjFileFormat::WriteToStream(
     const SdfSpecHandle &spec,
-    std::ostream& out,
+    std::ostream &out,
     size_t indent) const
 {
-    // XXX: For now, defer to the usda file format for this.  We don't support
-    // writing Usd content as a OBJ.
-    return SdfFileFormat::FindById(
-        UsdUsdaFileFormatTokens->Id)->WriteToStream(spec, out, indent);
+  // XXX: For now, defer to the usda file format for this.  We don't support
+  // writing Usd content as a OBJ.
+  return SdfFileFormat::FindById(
+             UsdUsdaFileFormatTokens->Id)
+      ->WriteToStream(spec, out, indent);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

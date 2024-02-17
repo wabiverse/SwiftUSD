@@ -27,8 +27,8 @@
 #include "hdPrman/instancer.h"
 #include "hdPrman/material.h"
 #include "hdPrman/rixStrings.h"
-#include "pxr/base/gf/matrix4f.h"
-#include "pxr/base/gf/matrix4d.h"
+#include "Gf/matrix4f.h"
+#include "Gf/matrix4d.h"
 
 #include "Riley.h"
 #include "RiTypesHelper.h"
@@ -37,7 +37,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdPrman_Points::HdPrman_Points(SdfPath const& id)
+HdPrman_Points::HdPrman_Points(SdfPath const &id)
     : BASE(id)
 {
 }
@@ -45,40 +45,31 @@ HdPrman_Points::HdPrman_Points(SdfPath const& id)
 HdDirtyBits
 HdPrman_Points::GetInitialDirtyBitsMask() const
 {
-    // The initial dirty bits control what data is available on the first
-    // run through _PopulateRtPoints(), so it should list every data item
-    // that _PopluateRtPoints requests.
-    int mask = HdChangeTracker::Clean
-        | HdChangeTracker::DirtyPoints
-        | HdChangeTracker::DirtyTransform
-        | HdChangeTracker::DirtyVisibility
-        | HdChangeTracker::DirtyPrimvar
-        | HdChangeTracker::DirtyNormals
-        | HdChangeTracker::DirtyWidths
-        | HdChangeTracker::DirtyMaterialId
-        | HdChangeTracker::DirtyInstancer
-        ;
+  // The initial dirty bits control what data is available on the first
+  // run through _PopulateRtPoints(), so it should list every data item
+  // that _PopluateRtPoints requests.
+  int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyVisibility | HdChangeTracker::DirtyPrimvar | HdChangeTracker::DirtyNormals | HdChangeTracker::DirtyWidths | HdChangeTracker::DirtyMaterialId | HdChangeTracker::DirtyInstancer;
 
-    return (HdDirtyBits)mask;
+  return (HdDirtyBits)mask;
 }
 
 RtPrimVarList
 HdPrman_Points::_ConvertGeometry(HdPrman_RenderParam *renderParam,
-                                  HdSceneDelegate *sceneDelegate,
-                                  const SdfPath &id,
-                                  RtUString *primType,
-                                  std::vector<HdGeomSubset> *geomSubsets)
+                                 HdSceneDelegate *sceneDelegate,
+                                 const SdfPath &id,
+                                 RtUString *primType,
+                                 std::vector<HdGeomSubset> *geomSubsets)
 {
-    RtPrimVarList primvars;
+  RtPrimVarList primvars;
 
-    const size_t npoints =
-        HdPrman_ConvertPointsPrimvarForPoints(sceneDelegate, id, primvars);
+  const size_t npoints =
+      HdPrman_ConvertPointsPrimvarForPoints(sceneDelegate, id, primvars);
 
-    *primType = RixStr.k_Ri_Points;
+  *primType = RixStr.k_Ri_Points;
 
-    HdPrman_ConvertPrimvars(sceneDelegate, id, primvars, 1,
-                            npoints, npoints, npoints);
-    return primvars;
+  HdPrman_ConvertPrimvars(sceneDelegate, id, primvars, 1,
+                          npoints, npoints, npoints);
+  return primvars;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

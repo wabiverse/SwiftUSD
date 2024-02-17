@@ -41,11 +41,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// If registered, the discovery plugin will execute its discovery process when
 /// the registry is instantiated.
 #define NDR_REGISTER_DISCOVERY_PLUGIN(DiscoveryPluginClass)                   \
-TF_REGISTRY_FUNCTION(TfType)                                                  \
-{                                                                             \
+  TF_REGISTRY_FUNCTION(TfType)                                                \
+  {                                                                           \
     TfType::Define<DiscoveryPluginClass, TfType::Bases<NdrDiscoveryPlugin>>() \
         .SetFactory<NdrDiscoveryPluginFactory<DiscoveryPluginClass>>();       \
-}
+  }
 
 TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPluginContext);
 
@@ -55,13 +55,13 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPluginContext);
 class NdrDiscoveryPluginContext : public TfRefBase, public TfWeakBase
 {
 public:
-    NDR_API
-    virtual ~NdrDiscoveryPluginContext() = default;
+  NDR_API
+  virtual ~NdrDiscoveryPluginContext() = default;
 
-    /// Returns the source type associated with the discovery type.
-    /// This may return an empty token if there is no such association.
-    NDR_API
-    virtual TfToken GetSourceType(const TfToken& discoveryType) const = 0;
+  /// Returns the source type associated with the discovery type.
+  /// This may return an empty token if there is no such association.
+  NDR_API
+  virtual TfToken GetSourceType(const TfToken &discoveryType) const = 0;
 };
 
 TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPlugin);
@@ -114,9 +114,9 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPlugin);
 ///             "Plugins": [{
 ///                 "Type": "library",
 ///                 "Name": "YOUR_LIBRARY_NAME",
-///                 "Root": "@PLUG_INFO_ROOT@",
-///                 "LibraryPath": "@PLUG_INFO_LIBRARY_PATH@",
-///                 "ResourcePath": "@PLUG_INFO_RESOURCE_PATH@",
+///                 "Root": "../..",
+///                 "LibraryPath": "",
+///                 "ResourcePath": "Contents/Resources",
 ///                 "Info": {
 ///                     "Types": {
 ///                         "YOUR_CLASS_NAME" : {
@@ -143,23 +143,22 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPlugin);
 class NdrDiscoveryPlugin : public TfRefBase, public TfWeakBase
 {
 public:
-    using Context = NdrDiscoveryPluginContext;
+  using Context = NdrDiscoveryPluginContext;
 
-    NDR_API
-    NdrDiscoveryPlugin();
-    NDR_API
-    virtual ~NdrDiscoveryPlugin();
+  NDR_API
+  NdrDiscoveryPlugin();
+  NDR_API
+  virtual ~NdrDiscoveryPlugin();
 
-    /// Finds and returns all nodes that the implementing plugin should be
-    /// aware of.
-    NDR_API
-    virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context&) = 0;
+  /// Finds and returns all nodes that the implementing plugin should be
+  /// aware of.
+  NDR_API
+  virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &) = 0;
 
-    /// Gets the URIs that this plugin is searching for nodes in.
-    NDR_API
-    virtual const NdrStringVec& GetSearchURIs() const = 0;
+  /// Gets the URIs that this plugin is searching for nodes in.
+  NDR_API
+  virtual const NdrStringVec &GetSearchURIs() const = 0;
 };
-
 
 /// \cond
 /// Factory classes should be hidden from the documentation.
@@ -167,18 +166,18 @@ public:
 class NdrDiscoveryPluginFactoryBase : public TfType::FactoryBase
 {
 public:
-    NDR_API
-    virtual NdrDiscoveryPluginRefPtr New() const = 0;
+  NDR_API
+  virtual NdrDiscoveryPluginRefPtr New() const = 0;
 };
 
 template <class T>
 class NdrDiscoveryPluginFactory : public NdrDiscoveryPluginFactoryBase
 {
 public:
-    NdrDiscoveryPluginRefPtr New() const override
-    {
-        return TfCreateRefPtr(new T);
-    }
+  NdrDiscoveryPluginRefPtr New() const override
+  {
+    return TfCreateRefPtr(new T);
+  }
 };
 
 /// \endcond

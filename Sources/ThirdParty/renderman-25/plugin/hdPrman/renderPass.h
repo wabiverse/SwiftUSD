@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/renderPass.h"
+#include <pxr/pxrns.h>
+#include "Hd/renderPass.h"
 
 #include "Riley.h"
 
@@ -38,32 +38,32 @@ class HdPrman_RenderParam;
 class HdPrman_RenderPass final : public HdRenderPass
 {
 public:
-    HdPrman_RenderPass(
-        HdRenderIndex *index,
-        HdRprimCollection const &collection,
-        std::shared_ptr<HdPrman_RenderParam> renderParam);
-    ~HdPrman_RenderPass() override;
+  HdPrman_RenderPass(
+      HdRenderIndex *index,
+      HdRprimCollection const &collection,
+      std::shared_ptr<HdPrman_RenderParam> renderParam);
+  ~HdPrman_RenderPass() override;
 
-    bool IsConverged() const override;
+  bool IsConverged() const override;
 
 protected:
-    void _Execute(HdRenderPassStateSharedPtr const& renderPassState,
-                  TfTokenVector const &renderTags) override;
+  void _Execute(HdRenderPassStateSharedPtr const &renderPassState,
+                TfTokenVector const &renderTags) override;
 
 private:
-    void _RenderInMainThread();
-    void _RestartRenderIfNecessary(HdRenderDelegate * renderDelegate);
-    std::shared_ptr<HdPrman_RenderParam> _renderParam;
-    bool _converged;
-    int _lastRenderedVersion;
-    int _lastTaskRenderTagsVersion;
-    int _lastRprimRenderTagVersion;
+  void _RenderInMainThread();
+  void _RestartRenderIfNecessary(HdRenderDelegate *renderDelegate);
+  std::shared_ptr<HdPrman_RenderParam> _renderParam;
+  bool _converged;
+  int _lastRenderedVersion;
+  int _lastTaskRenderTagsVersion;
+  int _lastRprimRenderTagVersion;
 
-    unsigned int _lastRenderSettingsPrimVersion;
-    SdfPath _lastRenderSettingsPrimPath;
+  unsigned int _lastRenderSettingsPrimVersion;
+  SdfPath _lastRenderSettingsPrimPath;
 
-    std::chrono::steady_clock::time_point _frameStart;
-    float _quickIntegrateTime;
+  std::chrono::steady_clock::time_point _frameStart;
+  float _quickIntegrateTime;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

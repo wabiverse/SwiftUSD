@@ -24,41 +24,39 @@
 #include "rendererPlugin.h"
 #include "renderDelegate.h"
 
-#include "pxr/imaging/hd/rendererPluginRegistry.h"
+#include "Hd/rendererPluginRegistry.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the plugin with the renderer plugin system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdRendererPluginRegistry::Define<HdTinyRendererPlugin>();
+  HdRendererPluginRegistry::Define<HdTinyRendererPlugin>();
 }
 
-HdRenderDelegate*
+HdRenderDelegate *
 HdTinyRendererPlugin::CreateRenderDelegate()
 {
-    return new HdTinyRenderDelegate();
+  return new HdTinyRenderDelegate();
 }
 
-HdRenderDelegate*
+HdRenderDelegate *
 HdTinyRendererPlugin::CreateRenderDelegate(
-    HdRenderSettingsMap const& settingsMap)
+    HdRenderSettingsMap const &settingsMap)
 {
-    return new HdTinyRenderDelegate(settingsMap);
+  return new HdTinyRenderDelegate(settingsMap);
 }
 
-void
-HdTinyRendererPlugin::DeleteRenderDelegate(HdRenderDelegate *renderDelegate)
+void HdTinyRendererPlugin::DeleteRenderDelegate(HdRenderDelegate *renderDelegate)
 {
-    delete renderDelegate;
+  delete renderDelegate;
 }
 
-bool 
-HdTinyRendererPlugin::IsSupported(bool /* gpuEnabled */) const
+bool HdTinyRendererPlugin::IsSupported(bool /* gpuEnabled */) const
 {
-    // Nothing more to check for now, we assume if the plugin loads correctly
-    // it is supported.
-    return true;
+  // Nothing more to check for now, we assume if the plugin loads correctly
+  // it is supported.
+  return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -25,9 +25,9 @@
 #include "hdPrman/renderParam.h"
 #include "hdPrman/debugCodes.h"
 #include "hdPrman/rixStrings.h"
-#include "pxr/usd/sdf/types.h"
-#include "pxr/base/tf/staticTokens.h"
-#include "pxr/imaging/hd/sceneDelegate.h"
+#include "Sdf/types.h"
+#include "Tf/staticTokens.h"
+#include "Hd/sceneDelegate.h"
 #include "pxr/imaging/hf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -40,66 +40,60 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Also, for now base the HdPrmanLightFilter class on HdSprim as there
 // currently is no HdLightFilter class.
 
-HdPrmanLightFilter::HdPrmanLightFilter(SdfPath const& id,
-                                       TfToken const& lightFilterType)
-    : HdSprim(id)
-    , _hdLightFilterType(lightFilterType)
-    , _lightFilter(NULL)
+HdPrmanLightFilter::HdPrmanLightFilter(SdfPath const &id,
+                                       TfToken const &lightFilterType)
+    : HdSprim(id), _hdLightFilterType(lightFilterType), _lightFilter(NULL)
 {
-    /* NOTHING */
+  /* NOTHING */
 }
 
 HdPrmanLightFilter::~HdPrmanLightFilter() = default;
 
-void
-HdPrmanLightFilter::Finalize(HdRenderParam *renderParam)
+void HdPrmanLightFilter::Finalize(HdRenderParam *renderParam)
 {
-    HdPrman_RenderParam *param =
-        static_cast<HdPrman_RenderParam*>(renderParam);
-    _ResetLightFilter(param);
+  HdPrman_RenderParam *param =
+      static_cast<HdPrman_RenderParam *>(renderParam);
+  _ResetLightFilter(param);
 }
 
-void
-HdPrmanLightFilter::_ResetLightFilter(HdPrman_RenderParam *renderParam)
+void HdPrmanLightFilter::_ResetLightFilter(HdPrman_RenderParam *renderParam)
 {
-    // Currently, light filters are managed in light.cpp as part
-    // of the lights.  Eventually, we will probably want to add
-    // code here that deletes the light filter via 
-    //     if (_lightFilter) {
-    //        riley->DeleteLightFilter()
-    //        _lightFilter = NULL;
-    //     }
-    // or something like that. 
+  // Currently, light filters are managed in light.cpp as part
+  // of the lights.  Eventually, we will probably want to add
+  // code here that deletes the light filter via
+  //     if (_lightFilter) {
+  //        riley->DeleteLightFilter()
+  //        _lightFilter = NULL;
+  //     }
+  // or something like that.
 }
 
 /* virtual */
-void
-HdPrmanLightFilter::Sync(HdSceneDelegate *sceneDelegate,
-                      HdRenderParam   *renderParam,
-                      HdDirtyBits     *dirtyBits)
-{  
-    HdPrman_RenderParam *param =
-        static_cast<HdPrman_RenderParam*>(renderParam);
+void HdPrmanLightFilter::Sync(HdSceneDelegate *sceneDelegate,
+                              HdRenderParam *renderParam,
+                              HdDirtyBits *dirtyBits)
+{
+  HdPrman_RenderParam *param =
+      static_cast<HdPrman_RenderParam *>(renderParam);
 
-    if (*dirtyBits) {
-        _ResetLightFilter(param);
-    }
+  if (*dirtyBits)
+  {
+    _ResetLightFilter(param);
+  }
 
-    *dirtyBits = HdChangeTracker::Clean;
+  *dirtyBits = HdChangeTracker::Clean;
 }
 
 /* virtual */
 HdDirtyBits
 HdPrmanLightFilter::GetInitialDirtyBitsMask() const
 {
-    return HdChangeTracker::AllDirty;
+  return HdChangeTracker::AllDirty;
 }
 
-bool
-HdPrmanLightFilter::IsValid() const
+bool HdPrmanLightFilter::IsValid() const
 {
-    return _lightFilter != NULL;
+  return _lightFilter != NULL;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

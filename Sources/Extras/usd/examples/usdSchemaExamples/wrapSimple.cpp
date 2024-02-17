@@ -22,15 +22,15 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "./simple.h"
-#include "pxr/usd/usd/schemaBase.h"
+#include "Usd/schemaBase.h"
 
-#include "pxr/usd/sdf/primSpec.h"
+#include "Sdf/primSpec.h"
 
-#include "pxr/usd/usd/pyConversions.h"
-#include "pxr/base/tf/pyContainerConversions.h"
-#include "pxr/base/tf/pyResultConversions.h"
-#include "pxr/base/tf/pyUtils.h"
-#include "pxr/base/tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
+#include "Tf/pyContainerConversions.h"
+#include "Tf/pyResultConversions.h"
+#include "Tf/pyUtils.h"
+#include "Tf/wrapTypeHelpers.h"
 
 #include <boost/python.hpp>
 
@@ -40,81 +40,80 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace {
+namespace
+{
 
-#define WRAP_CUSTOM                                                     \
-    template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM    \
+  template <class Cls> \
+  static void _CustomWrapCode(Cls &_class)
 
-// fwd decl.
-WRAP_CUSTOM;
+  // fwd decl.
+  WRAP_CUSTOM;
 
-        
-static UsdAttribute
-_CreateIntAttrAttr(UsdSchemaExamplesSimple &self,
-                                      object defaultVal, bool writeSparsely) {
+  static UsdAttribute
+  _CreateIntAttrAttr(UsdSchemaExamplesSimple &self,
+                     object defaultVal, bool writeSparsely)
+  {
     return self.CreateIntAttrAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int), writeSparsely);
-}
+  }
 
-static std::string
-_Repr(const UsdSchemaExamplesSimple &self)
-{
+  static std::string
+  _Repr(const UsdSchemaExamplesSimple &self)
+  {
     std::string primRepr = TfPyRepr(self.GetPrim());
     return TfStringPrintf(
         "UsdSchemaExamples.Simple(%s)",
         primRepr.c_str());
-}
+  }
 
 } // anonymous namespace
 
 void wrapUsdSchemaExamplesSimple()
 {
-    typedef UsdSchemaExamplesSimple This;
+  typedef UsdSchemaExamplesSimple This;
 
-    class_<This, bases<UsdTyped> >
-        cls("Simple");
+  class_<This, bases<UsdTyped>>
+      cls("Simple");
 
-    cls
-        .def(init<UsdPrim>(arg("prim")))
-        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
-        .def(TfTypePythonClass())
+  cls
+      .def(init<UsdPrim>(arg("prim")))
+      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
+      .def(TfTypePythonClass())
 
-        .def("Get", &This::Get, (arg("stage"), arg("path")))
-        .staticmethod("Get")
+      .def("Get", &This::Get, (arg("stage"), arg("path")))
+      .staticmethod("Get")
 
-        .def("GetSchemaAttributeNames",
-             &This::GetSchemaAttributeNames,
-             arg("includeInherited")=true,
-             return_value_policy<TfPySequenceToList>())
-        .staticmethod("GetSchemaAttributeNames")
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
+           arg("includeInherited") = true,
+           return_value_policy<TfPySequenceToList>())
+      .staticmethod("GetSchemaAttributeNames")
 
-        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
-             return_value_policy<return_by_value>())
-        .staticmethod("_GetStaticTfType")
+      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+           return_value_policy<return_by_value>())
+      .staticmethod("_GetStaticTfType")
 
-        .def(!self)
+      .def(!self)
 
-        
-        .def("GetIntAttrAttr",
-             &This::GetIntAttrAttr)
-        .def("CreateIntAttrAttr",
-             &_CreateIntAttrAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
+      .def("GetIntAttrAttr",
+           &This::GetIntAttrAttr)
+      .def("CreateIntAttrAttr",
+           &_CreateIntAttrAttr,
+           (arg("defaultValue") = object(),
+            arg("writeSparsely") = false))
 
-        
-        .def("GetTargetRel",
-             &This::GetTargetRel)
-        .def("CreateTargetRel",
-             &This::CreateTargetRel)
-        .def("__repr__", ::_Repr)
-    ;
+      .def("GetTargetRel",
+           &This::GetTargetRel)
+      .def("CreateTargetRel",
+           &This::CreateTargetRel)
+      .def("__repr__", ::_Repr);
 
-    _CustomWrapCode(cls);
+  _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by 
+// Feel free to add custom code below this line, it will be preserved by
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -125,16 +124,18 @@ void wrapUsdSchemaExamplesSimple()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-// 
+//
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace {
+namespace
+{
 
-WRAP_CUSTOM {
-}
+  WRAP_CUSTOM
+  {
+  }
 
-} // anonymous namespace 
+} // anonymous namespace

@@ -24,13 +24,13 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
 
 #include "Riley.h"
 
-#include "pxr/base/gf/vec2i.h"
-#include "pxr/base/gf/vec2f.h"
+#include "Gf/vec2i.h"
+#include "Gf/vec2f.h"
 
 #include <vector>
 
@@ -41,38 +41,38 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 struct HdPrman_RenderViewDesc
 {
-    riley::CameraId cameraId;
-    riley::IntegratorId integratorId;
-    riley::SampleFilterList sampleFilterList;
-    riley::DisplayFilterList displayFilterList;
-    GfVec2i resolution;
-    
-    struct RenderOutputDesc
-    {
-        RenderOutputDesc();
+  riley::CameraId cameraId;
+  riley::IntegratorId integratorId;
+  riley::SampleFilterList sampleFilterList;
+  riley::DisplayFilterList displayFilterList;
+  GfVec2i resolution;
 
-        RtUString name;
-        riley::RenderOutputType type;
-        RtUString sourceName;
-        RtUString rule;
-        RtUString filter;
-        GfVec2f filterWidth;
-        float relativePixelVariance;
-        RtParamList params;
-    };
+  struct RenderOutputDesc
+  {
+    RenderOutputDesc();
 
-    std::vector<RenderOutputDesc> renderOutputDescs;
+    RtUString name;
+    riley::RenderOutputType type;
+    RtUString sourceName;
+    RtUString rule;
+    RtUString filter;
+    GfVec2f filterWidth;
+    float relativePixelVariance;
+    RtParamList params;
+  };
 
-    struct DisplayDesc
-    {
-        RtUString name;
-        RtUString driver;
-        RtParamList params;
+  std::vector<RenderOutputDesc> renderOutputDescs;
 
-        std::vector<size_t> renderOutputIndices;
-    };
-    
-    std::vector<DisplayDesc> displayDescs;
+  struct DisplayDesc
+  {
+    RtUString name;
+    RtUString driver;
+    RtParamList params;
+
+    std::vector<size_t> renderOutputIndices;
+  };
+
+  std::vector<DisplayDesc> displayDescs;
 };
 
 /// Manages a render man render view together with associated
@@ -81,32 +81,31 @@ struct HdPrman_RenderViewDesc
 class HdPrman_RenderViewContext final
 {
 public:
-    HdPrman_RenderViewContext();
+  HdPrman_RenderViewContext();
 
-    void CreateRenderView(
-        const HdPrman_RenderViewDesc &desc,
-        riley::Riley * riley);
-    void SetIntegratorId(
-        riley::IntegratorId id,
-        riley::Riley * riley);
-    void SetResolution(
-        const GfVec2i &resolution,
-        riley::Riley * riley);
+  void CreateRenderView(
+      const HdPrman_RenderViewDesc &desc,
+      riley::Riley *riley);
+  void SetIntegratorId(
+      riley::IntegratorId id,
+      riley::Riley *riley);
+  void SetResolution(
+      const GfVec2i &resolution,
+      riley::Riley *riley);
 
-    riley::RenderViewId GetRenderViewId() const { return _renderViewId; }
+  riley::RenderViewId GetRenderViewId() const { return _renderViewId; }
 
 private:
-    HdPrman_RenderViewContext(const HdPrman_RenderViewContext &) = delete;
+  HdPrman_RenderViewContext(const HdPrman_RenderViewContext &) = delete;
 
-    void _DestroyRenderView(riley::Riley * riley);
+  void _DestroyRenderView(riley::Riley *riley);
 
-    std::vector<riley::RenderOutputId> _renderOutputIds;
-    std::vector<riley::DisplayId> _displayIds;
-    riley::RenderTargetId _renderTargetId;
-    riley::RenderViewId _renderViewId;
+  std::vector<riley::RenderOutputId> _renderOutputIds;
+  std::vector<riley::DisplayId> _displayIds;
+  riley::RenderTargetId _renderTargetId;
+  riley::RenderViewId _renderViewId;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  //EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
-
+#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H

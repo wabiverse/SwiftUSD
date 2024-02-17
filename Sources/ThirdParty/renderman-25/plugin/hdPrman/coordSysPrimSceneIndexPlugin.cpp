@@ -24,45 +24,44 @@
 #include "hdPrman/coordSysPrimSceneIndexPlugin.h"
 
 #include "pxr/imaging/hdsi/coordSysPrimSceneIndex.h"
-#include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
+#include "Hd/sceneIndexPluginRegistry.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    ((sceneIndexPluginName, "HdPrman_CoordSysPrimSceneIndexPlugin"))
-);
+    ((sceneIndexPluginName, "HdPrman_CoordSysPrimSceneIndexPlugin")));
 
-static const char * const _pluginDisplayName = "Prman";
+static const char *const _pluginDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdSceneIndexPluginRegistry::Define<
-        HdPrman_CoordSysPrimSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<
+      HdPrman_CoordSysPrimSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1000;
+  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1000;
 
-    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-        _pluginDisplayName,
-        _tokens->sceneIndexPluginName,
-        nullptr,
-        insertionPhase,
-        HdSceneIndexPluginRegistry::InsertionOrderAtEnd);
+  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+      _pluginDisplayName,
+      _tokens->sceneIndexPluginName,
+      nullptr,
+      insertionPhase,
+      HdSceneIndexPluginRegistry::InsertionOrderAtEnd);
 }
 
 HdPrman_CoordSysPrimSceneIndexPlugin::
-HdPrman_CoordSysPrimSceneIndexPlugin() = default;
+    HdPrman_CoordSysPrimSceneIndexPlugin() = default;
 
 HdSceneIndexBaseRefPtr
 HdPrman_CoordSysPrimSceneIndexPlugin::_AppendSceneIndex(
     const HdSceneIndexBaseRefPtr &inputScene,
     const HdContainerDataSourceHandle &inputArgs)
 {
-//    return inputScene;
-    return HdsiCoordSysPrimSceneIndex::New(inputScene);
+  //    return inputScene;
+  return HdsiCoordSysPrimSceneIndex::New(inputScene);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

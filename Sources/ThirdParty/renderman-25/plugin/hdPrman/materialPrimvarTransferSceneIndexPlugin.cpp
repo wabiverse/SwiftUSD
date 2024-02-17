@@ -23,41 +23,40 @@
 //
 #include "hdPrman/materialPrimvarTransferSceneIndexPlugin.h"
 
-#include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
+#include "Hd/sceneIndexPluginRegistry.h"
 #include "pxr/imaging/hdsi/materialPrimvarTransferSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    ((sceneIndexPluginName, "HdPrman_MaterialPrimvarTransferSceneIndexPlugin"))
-);
+    ((sceneIndexPluginName, "HdPrman_MaterialPrimvarTransferSceneIndexPlugin")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plugin registrations
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char * const _rendererDisplayName = "Prman";
+static const char *const _rendererDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdSceneIndexPluginRegistry::Define<
-        HdPrman_MaterialPrimvarTransferSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<
+      HdPrman_MaterialPrimvarTransferSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    // Should be chained _after_ the extComputationPrimvarPruningSceneIndex.
-    // XXX when should this run?!?  dunno
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
+  // Should be chained _after_ the extComputationPrimvarPruningSceneIndex.
+  // XXX when should this run?!?  dunno
+  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
 
-    // Register the plugins conditionally.
-    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-        _rendererDisplayName,
-        _tokens->sceneIndexPluginName,
-        nullptr, // no argument data necessary
-        insertionPhase,
-        HdSceneIndexPluginRegistry::InsertionOrderAtStart);
+  // Register the plugins conditionally.
+  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+      _rendererDisplayName,
+      _tokens->sceneIndexPluginName,
+      nullptr, // no argument data necessary
+      insertionPhase,
+      HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,15 +64,15 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 ////////////////////////////////////////////////////////////////////////////////
 
 HdPrman_MaterialPrimvarTransferSceneIndexPlugin::
-HdPrman_MaterialPrimvarTransferSceneIndexPlugin() = default;
+    HdPrman_MaterialPrimvarTransferSceneIndexPlugin() = default;
 
 HdSceneIndexBaseRefPtr
 HdPrman_MaterialPrimvarTransferSceneIndexPlugin::_AppendSceneIndex(
     const HdSceneIndexBaseRefPtr &inputScene,
     const HdContainerDataSourceHandle &inputArgs)
 {
-    TF_UNUSED(inputArgs);
-    return HdsiMaterialPrimvarTransferSceneIndex::New(inputScene);
+  TF_UNUSED(inputArgs);
+  return HdsiMaterialPrimvarTransferSceneIndex::New(inputScene);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

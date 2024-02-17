@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_GPRIMBASE_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_GPRIMBASE_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/rprim.h"
+#include <pxr/pxrns.h>
+#include "Hd/rprim.h"
 
 #include "Riley.h"
 
@@ -37,14 +37,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdPrman_GprimBase
 {
 public:
-    HdPrman_GprimBase() = default;
-    virtual ~HdPrman_GprimBase() = 0;
-    void UpdateInstanceVisibility(bool vis, riley::Riley *riley ) const;
-    std::vector<riley::GeometryPrototypeId> GetPrototypeIds() const;
+  HdPrman_GprimBase() = default;
+  virtual ~HdPrman_GprimBase() = 0;
+  void UpdateInstanceVisibility(bool vis, riley::Riley *riley) const;
+  std::vector<riley::GeometryPrototypeId> GetPrototypeIds() const;
 
 protected:
-    std::vector<riley::GeometryPrototypeId> _prototypeIds;
-    std::vector<riley::GeometryInstanceId> _instanceIds;
+  std::vector<riley::GeometryPrototypeId> _prototypeIds;
+  std::vector<riley::GeometryInstanceId> _instanceIds;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

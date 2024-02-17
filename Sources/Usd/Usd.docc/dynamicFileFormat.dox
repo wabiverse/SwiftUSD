@@ -76,10 +76,10 @@ protected:
                     }
                 }
             },
-            "LibraryPath": "@PLUG_INFO_LIBRARY_PATH@",
+            "LibraryPath": "",
             "Name": "myDynamicFileFormat",
-            "ResourcePath": "@PLUG_INFO_RESOURCE_PATH@",
-            "Root": "@PLUG_INFO_ROOT@",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
             "Type": "library"
         }
     ]

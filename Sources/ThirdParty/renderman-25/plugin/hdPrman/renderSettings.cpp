@@ -28,11 +28,11 @@
 #include "hdPrman/rixStrings.h"
 #include "hdPrman/utils.h"
 
-#include "pxr/imaging/hd/cameraSchema.h"
-#include "pxr/imaging/hd/dataSourceTypeDefs.h"
-#include "pxr/imaging/hd/sceneDelegate.h"
-#include "pxr/imaging/hd/sceneIndex.h"
-#include "pxr/imaging/hd/utils.h"
+#include "Hd/cameraSchema.h"
+#include "Hd/dataSourceTypeDefs.h"
+#include "Hd/sceneDelegate.h"
+#include "Hd/sceneIndex.h"
+#include "Hd/utils.h"
 
 #include <string>
 #include <iostream> // XXX
@@ -41,64 +41,63 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _renderTerminalTokens, // properties in PxrRenderTerminalsAPI
-    ((outputsRiIntegrator, "outputs:ri:integrator"))
-    ((outputsRiSampleFilters, "outputs:ri:sampleFilters"))
-    ((outputsRiDisplayFilters, "outputs:ri:displayFilters"))
-);
+    ((outputsRiIntegrator, "outputs:ri:integrator"))((outputsRiSampleFilters, "outputs:ri:sampleFilters"))((outputsRiDisplayFilters, "outputs:ri:displayFilters")));
 
-
-namespace {
-
-// Translate properties in PxrOptionsAPI to the Riley name.
-RtUString
-_GetRiName(std::string const &propertyName)
+namespace
 {
+
+  // Translate properties in PxrOptionsAPI to the Riley name.
+  RtUString
+  _GetRiName(std::string const &propertyName)
+  {
     // strip the "ri:" prefix if present, but don't strip the "Ri:" namespace.
     // e.g. schema attribute "ri:hider:maxsamples" maps to "hider:maxsamples"
     //      (or the pre-defined UString Rix::k_hider_maxsamples)
     //      while "ri:Ri:CropWindow" maps to "Ri:CropWindow" (or
     //      the UString k_riCropWindow)
     //
-    if (TfStringStartsWith(propertyName, "ri:")) {
-        return RtUString(propertyName.c_str() + 3);
+    if (TfStringStartsWith(propertyName, "ri:"))
+    {
+      return RtUString(propertyName.c_str() + 3);
     }
 
-    // Unhandled property. This likely indicates an issue with namespace 
+    // Unhandled property. This likely indicates an issue with namespace
     // filtering upstream.
     TF_WARN("Could not translate settings property %s to RtUString.",
             propertyName.c_str());
     return RtUString(propertyName.c_str());
-}
+  }
 
-RtParamList
-_GenerateParamList(VtDictionary const &settings)
-{
+  RtParamList
+  _GenerateParamList(VtDictionary const &settings)
+  {
     RtParamList options;
 
-    for (auto const &pair : settings) {
-        // Skip render terminal connections.
-        const std::string &name = pair.first;
-        const TfToken tokenName(name);
-        if (tokenName == _renderTerminalTokens->outputsRiIntegrator    ||
-            tokenName == _renderTerminalTokens->outputsRiSampleFilters ||
-            tokenName == _renderTerminalTokens->outputsRiDisplayFilters) {
+    for (auto const &pair : settings)
+    {
+      // Skip render terminal connections.
+      const std::string &name = pair.first;
+      const TfToken tokenName(name);
+      if (tokenName == _renderTerminalTokens->outputsRiIntegrator ||
+          tokenName == _renderTerminalTokens->outputsRiSampleFilters ||
+          tokenName == _renderTerminalTokens->outputsRiDisplayFilters)
+      {
 
-            continue;
-        }
+        continue;
+      }
 
-        RtUString const riName = _GetRiName(name);
-        VtValue const &val = pair.second;
-        HdPrman_Utils::SetParamFromVtValue(
-            riName, val, /* role */ TfToken(), &options);
+      RtUString const riName = _GetRiName(name);
+      VtValue const &val = pair.second;
+      HdPrman_Utils::SetParamFromVtValue(
+          riName, val, /* role */ TfToken(), &options);
     }
 
     return options;
-}
+  }
 
 }
 
-
-HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const& id)
+HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const &id)
     : HdRenderSettings(id)
 {
 }
@@ -114,72 +113,72 @@ void HdPrman_RenderSettings::_Sync(
     HdRenderParam *renderParam,
     const HdDirtyBits *dirtyBits)
 {
-    HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam*>(renderParam);
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
-    // XXX Preserve existing data flow for clients that don't populate the
-    //     sceneGlobals.activeRenderSettingsPrim locator at the root prim of the
-    //     scene index. In this scenario, integrator, sample and display
-    //     filters connected to the render settings prim are used. This works
-    //     only when a single render settings prim is present in the scene.
-    //     When multiple render settings prims are present in the scene, because
-    //     the Sync order is non-deterministic, the last sync'd prim's opinions
-    //     would be used.
-    //
+  // XXX Preserve existing data flow for clients that don't populate the
+  //     sceneGlobals.activeRenderSettingsPrim locator at the root prim of the
+  //     scene index. In this scenario, integrator, sample and display
+  //     filters connected to the render settings prim are used. This works
+  //     only when a single render settings prim is present in the scene.
+  //     When multiple render settings prims are present in the scene, because
+  //     the Sync order is non-deterministic, the last sync'd prim's opinions
+  //     would be used.
+  //
 
-    const bool hasActiveRsp = HdUtils::HasActiveRenderSettingsPrim(
-        sceneDelegate->GetRenderIndex().GetTerminalSceneIndex());
-     
-    if (IsActive() || !hasActiveRsp) {
-        if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings) {
-            // NamespacedSettings contains all the Prman-specific render
-            // settings opinions.
-            const VtDictionary& namespacedSettings = GetNamespacedSettings();
-        
-            // Handle attributes ...
-            // Note: We don't get fine-grained invalidation per-setting, so we
-            //       recompute all settings.
-            _settingsOptions = _GenerateParamList(namespacedSettings);
+  const bool hasActiveRsp = HdUtils::HasActiveRenderSettingsPrim(
+      sceneDelegate->GetRenderIndex().GetTerminalSceneIndex());
 
-            TF_DEBUG(HDPRMAN_RENDER_SETTINGS).Msg(
-                "Processed dirty namespaced settings for %s and generated the "
-                "param list %s", GetId().GetText(),
-                HdPrmanDebugUtil::RtParamListToString(_settingsOptions).c_str()
-            );
+  if (IsActive() || !hasActiveRsp)
+  {
+    if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings)
+    {
+      // NamespacedSettings contains all the Prman-specific render
+      // settings opinions.
+      const VtDictionary &namespacedSettings = GetNamespacedSettings();
 
-            // ... and connections.
-            // Set the integrator connected to this Render Settings prim
-            {
-                // XXX Should use SdfPath rather than a vector.
-                const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
-                    namespacedSettings,
-                    _renderTerminalTokens->outputsRiIntegrator.GetString(),
-                    VtDefault = SdfPathVector());
+      // Handle attributes ...
+      // Note: We don't get fine-grained invalidation per-setting, so we
+      //       recompute all settings.
+      _settingsOptions = _GenerateParamList(namespacedSettings);
 
-                param->SetRenderSettingsIntegratorPath(sceneDelegate,
-                    paths.empty()? SdfPath::EmptyPath() : paths.front());
-            }
+      TF_DEBUG(HDPRMAN_RENDER_SETTINGS).Msg("Processed dirty namespaced settings for %s and generated the "
+                                            "param list %s",
+                                            GetId().GetText(), HdPrmanDebugUtil::RtParamListToString(_settingsOptions).c_str());
 
-            // Set the SampleFilters connected to this Render Settings prim
-            {
-                const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
-                    namespacedSettings,
-                    _renderTerminalTokens->outputsRiSampleFilters.GetString(),
-                    VtDefault = SdfPathVector());
+      // ... and connections.
+      // Set the integrator connected to this Render Settings prim
+      {
+        // XXX Should use SdfPath rather than a vector.
+        const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
+            namespacedSettings,
+            _renderTerminalTokens->outputsRiIntegrator.GetString(),
+            VtDefault = SdfPathVector());
 
-                param->SetConnectedSampleFilterPaths(sceneDelegate, paths);
-            }
+        param->SetRenderSettingsIntegratorPath(sceneDelegate,
+                                               paths.empty() ? SdfPath::EmptyPath() : paths.front());
+      }
 
-            // Set the DisplayFilters connected to this Render Settings prim
-            {
-                const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
-                    namespacedSettings,
-                    _renderTerminalTokens->outputsRiDisplayFilters.GetString(),
-                    VtDefault = SdfPathVector());
+      // Set the SampleFilters connected to this Render Settings prim
+      {
+        const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
+            namespacedSettings,
+            _renderTerminalTokens->outputsRiSampleFilters.GetString(),
+            VtDefault = SdfPathVector());
 
-                param->SetConnectedDisplayFilterPaths(sceneDelegate, paths);
-            }
-        }
+        param->SetConnectedSampleFilterPaths(sceneDelegate, paths);
+      }
+
+      // Set the DisplayFilters connected to this Render Settings prim
+      {
+        const SdfPathVector paths = VtDictionaryGet<SdfPathVector>(
+            namespacedSettings,
+            _renderTerminalTokens->outputsRiDisplayFilters.GetString(),
+            VtDefault = SdfPathVector());
+
+        param->SetConnectedDisplayFilterPaths(sceneDelegate, paths);
+      }
     }
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

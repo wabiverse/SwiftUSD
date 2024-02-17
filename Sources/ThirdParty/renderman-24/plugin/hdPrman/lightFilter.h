@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
 #define EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/sprim.h"
+#include <pxr/pxrns.h>
+#include "Hd/sprim.h"
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -45,37 +45,36 @@ class HdPrman_RenderParam;
 ///
 /// A representation for light filters.
 ///
-class HdPrmanLightFilter final : public HdSprim 
+class HdPrmanLightFilter final : public HdSprim
 {
 public:
-    HdPrmanLightFilter(SdfPath const& id, TfToken const& lightFilterType);
-    ~HdPrmanLightFilter() override;
+  HdPrmanLightFilter(SdfPath const &id, TfToken const &lightFilterType);
+  ~HdPrmanLightFilter() override;
 
-    /// Synchronizes state from the delegate to this object.
-    void Sync(HdSceneDelegate *sceneDelegate,
-                      HdRenderParam   *renderParam,
-                      HdDirtyBits     *dirtyBits) override;
+  /// Synchronizes state from the delegate to this object.
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits) override;
 
-    /// Returns the minimal set of dirty bits to place in the
-    /// change tracker for use in the first sync of this prim.
-    /// Typically this would be all dirty bits.
-    HdDirtyBits GetInitialDirtyBitsMask() const override;
+  /// Returns the minimal set of dirty bits to place in the
+  /// change tracker for use in the first sync of this prim.
+  /// Typically this would be all dirty bits.
+  HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-    riley::ShadingNode *GetLightFilter() const { return _lightFilter; }
+  riley::ShadingNode *GetLightFilter() const { return _lightFilter; }
 
-    /// Return true if this light filter is valid.
-    bool IsValid() const;
+  /// Return true if this light filter is valid.
+  bool IsValid() const;
 
-    void Finalize(HdRenderParam *renderParam) override;
+  void Finalize(HdRenderParam *renderParam) override;
 
 private:
-    void _ResetLightFilter(HdPrman_RenderParam *renderParam);
+  void _ResetLightFilter(HdPrman_RenderParam *renderParam);
 
-    const TfToken _hdLightFilterType;
-    riley::ShadingNode *_lightFilter;
+  const TfToken _hdLightFilterType;
+  riley::ShadingNode *_lightFilter;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
+#endif // EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H

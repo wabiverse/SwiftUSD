@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_PRIMVAR_TRANSFER_SCENE_INDEX_PLUGIN_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_PRIMVAR_TRANSFER_SCENE_INDEX_PLUGIN_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/sceneIndexPlugin.h"
+#include <pxr/pxrns.h>
+#include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -35,18 +35,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Prman scene index plugin that transfers primvars/attributes
 /// from materials to the geometry that binds the material.
 ///
-class HdPrman_MaterialPrimvarTransferSceneIndexPlugin :
-    public HdSceneIndexPlugin
+class HdPrman_MaterialPrimvarTransferSceneIndexPlugin : public HdSceneIndexPlugin
 {
 public:
-    HdPrman_MaterialPrimvarTransferSceneIndexPlugin();
+  HdPrman_MaterialPrimvarTransferSceneIndexPlugin();
 
 protected:
-    HdSceneIndexBaseRefPtr _AppendSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputScene,
-        const HdContainerDataSourceHandle &inputArgs) override;
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(
+      const HdSceneIndexBaseRefPtr &inputScene,
+      const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_PRIMVAR_TRANSFER_SCENE_INDEX_PLUGIN_H
+#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_PRIMVAR_TRANSFER_SCENE_INDEX_PLUGIN_H

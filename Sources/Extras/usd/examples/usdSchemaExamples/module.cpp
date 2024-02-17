@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/base/tf/pySafePython.h"
-#include "pxr/pxr.h"
-#include "pxr/base/tf/pyModule.h"
+#include "Tf/pySafePython.h"
+#include <pxr/pxrns.h>
+#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 TF_WRAP_MODULE
 {
-    TF_WRAP(UsdSchemaExamplesSimple);
-    TF_WRAP(UsdSchemaExamplesComplex);
-    TF_WRAP(UsdSchemaExamplesParamsAPI);
-    TF_WRAP(UsdSchemaExamplesTokens);
+  TF_WRAP(UsdSchemaExamplesSimple);
+  TF_WRAP(UsdSchemaExamplesComplex);
+  TF_WRAP(UsdSchemaExamplesParamsAPI);
+  TF_WRAP(UsdSchemaExamplesTokens);
 }

@@ -24,10 +24,10 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/types.h"
+#include <pxr/pxrns.h>
+#include "Hd/types.h"
 
-#include "pxr/base/gf/matrix4d.h"
+#include "Gf/matrix4d.h"
 
 #include "Riley.h"
 
@@ -42,81 +42,82 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This lives in a separate small library so it can be accessible to
 /// both the hdPrman hydra plgin at the d_hydra display driver plugin,
 /// without requiring either to know about the other.
-class HdPrmanFramebuffer 
+class HdPrmanFramebuffer
 {
 public:
-    enum HdPrmanAccumulationRule {
-        k_accumulationRuleFilter,
-        k_accumulationRuleAverage,
-        k_accumulationRuleMin,
-        k_accumulationRuleMax,
-        k_accumulationRuleZmin,
-        k_accumulationRuleZmax,
-        k_accumulationRuleSum
-    };
+  enum HdPrmanAccumulationRule
+  {
+    k_accumulationRuleFilter,
+    k_accumulationRuleAverage,
+    k_accumulationRuleMin,
+    k_accumulationRuleMax,
+    k_accumulationRuleZmin,
+    k_accumulationRuleZmax,
+    k_accumulationRuleSum
+  };
 
-    struct AovDesc
+  struct AovDesc
+  {
+    TfToken name;
+    HdFormat format;
+    VtValue clearValue;
+    HdPrmanAccumulationRule rule;
+
+    bool ShouldNormalizeBySampleCount() const
     {
-        TfToken name;
-        HdFormat format;
-        VtValue clearValue;
-        HdPrmanAccumulationRule rule;
+      return format != HdFormatInt32 && rule != k_accumulationRuleMin &&
+             rule != k_accumulationRuleMax && rule != k_accumulationRuleZmin &&
+             rule != k_accumulationRuleZmax;
+    }
+  };
 
-        bool ShouldNormalizeBySampleCount() const
-        {
-            return format != HdFormatInt32 && rule != k_accumulationRuleMin &&
-                   rule != k_accumulationRuleMax && rule != k_accumulationRuleZmin &&
-                   rule != k_accumulationRuleZmax;
-        }
-    };
+  struct AovBuffer
+  {
+    AovDesc desc;
+    std::vector<uint32_t> pixels;
+  };
 
-    struct AovBuffer
-    {
-        AovDesc desc;
-        std::vector<uint32_t> pixels;
-    };
+  using AovDescVector = std::vector<AovDesc>;
+  using AovBufferVector = std::vector<AovBuffer>;
 
-    using AovDescVector = std::vector<AovDesc>;
-    using AovBufferVector = std::vector<AovBuffer>;
+  HdPrmanFramebuffer();
+  ~HdPrmanFramebuffer();
 
-    HdPrmanFramebuffer();
-    ~HdPrmanFramebuffer();
+  /// Find a buffer instance with the given ID.
+  /// The expectation is that the buffer will exist, so
+  /// this raises a runtime error if the ID is not found.
+  static HdPrmanFramebuffer *GetByID(int32_t id);
+  static void Register(RixContext *);
 
-    /// Find a buffer instance with the given ID.
-    /// The expectation is that the buffer will exist, so
-    /// this raises a runtime error if the ID is not found.
-    static HdPrmanFramebuffer* GetByID(int32_t id);
-    static void Register(RixContext*);
+  /// Convert the accumulation rule string to the HdPrmanAccumulationRule enum
+  static HdPrmanAccumulationRule ToAccumulationRule(RtUString name);
 
-    /// Convert the accumulation rule string to the HdPrmanAccumulationRule enum
-    static HdPrmanAccumulationRule ToAccumulationRule(RtUString name);
+  /// (Re-)Creates Aov buffers without allocating pixel storage
+  /// (allocated through Resize).
+  void CreateAovBuffers(const AovDescVector &aovDescs);
 
-    /// (Re-)Creates Aov buffers without allocating pixel storage
-    /// (allocated through Resize).
-    void CreateAovBuffers(const AovDescVector &aovDescs);
+  /// Resize the buffer.
+  void Resize(int width, int height,
+              int cropXMin = 0, int cropYMin = 0,
+              int cropWidth = 0, int cropHeight = 0);
 
-    /// Resize the buffer.
-    void Resize(int width, int height,
-                int cropXMin=0, int cropYMin=0,
-                int cropWidth=0, int cropHeight=0);
+  void Clear();
 
-    void Clear();
+  std::mutex mutex;
+  AovBufferVector aovBuffers;
 
-    std::mutex mutex;
-    AovBufferVector aovBuffers;
+  int w, h;
+  int cropOrigin[2];
+  int cropRes[2];
+  int32_t id;
 
-    int w, h;
-    int cropOrigin[2];
-    int cropRes[2];
-    int32_t id;
+  // Projection matrix (for the depth output).
+  GfMatrix4d proj;
 
-    // Projection matrix (for the depth output).
-    GfMatrix4d proj;
+  // Clear functionality.
+  bool pendingClear;
 
-    // Clear functionality.
-    bool pendingClear;
-
-    std::atomic<bool> newData;
+  std::atomic<bool> newData;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

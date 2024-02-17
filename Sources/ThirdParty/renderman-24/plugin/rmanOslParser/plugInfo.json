@@ -3,9 +3,9 @@
         {
             "Type": "library",
             "Name": "rmanOslParser",
-            "Root": "@PLUG_INFO_ROOT@",
-            "LibraryPath": "@PLUG_INFO_LIBRARY_PATH@",
-            "ResourcePath": "@PLUG_INFO_RESOURCE_PATH@",
+            "Root": "../..",
+            "LibraryPath": "",
+            "ResourcePath": "Contents/Resources",
             "Info": {
                 "Types": {
                     "RmanOslParserPlugin" : {

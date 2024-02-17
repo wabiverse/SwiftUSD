@@ -29,9 +29,9 @@
 #include "sceneIndexObserverLoggingWidget.h"
 #include "sceneIndexObserverLoggingTreeView.h"
 
-#include "pxr/imaging/hd/filteringSceneIndex.h"
+#include "Hd/filteringSceneIndex.h"
 
-#include "pxr/base/tf/stringUtils.h"
+#include "Tf/stringUtils.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -45,208 +45,221 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HduiSceneIndexDebuggerWidget::HduiSceneIndexDebuggerWidget(QWidget *parent)
-: QWidget(parent)
+    : QWidget(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QHBoxLayout *toolbarLayout = new QHBoxLayout;
-    mainLayout->addLayout(toolbarLayout);
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  QHBoxLayout *toolbarLayout = new QHBoxLayout;
+  mainLayout->addLayout(toolbarLayout);
 
-    _siChooser = new HduiRegisteredSceneIndexChooser;
-    toolbarLayout->addWidget(_siChooser);
+  _siChooser = new HduiRegisteredSceneIndexChooser;
+  toolbarLayout->addWidget(_siChooser);
 
-    _goToInputButton = new QPushButton("Inputs");
-    _goToInputButton->setEnabled(false);
-    _goToInputButtonMenu = new QMenu(this);
-    _goToInputButton->setMenu(_goToInputButtonMenu);
+  _goToInputButton = new QPushButton("Inputs");
+  _goToInputButton->setEnabled(false);
+  _goToInputButtonMenu = new QMenu(this);
+  _goToInputButton->setMenu(_goToInputButtonMenu);
 
-    toolbarLayout->addWidget(_goToInputButton);
+  toolbarLayout->addWidget(_goToInputButton);
 
-    _nameLabel = new QLabel;
-    toolbarLayout->addWidget(_nameLabel, 10);
+  _nameLabel = new QLabel;
+  toolbarLayout->addWidget(_nameLabel, 10);
 
-    QPushButton * loggerButton = new QPushButton("Show Notice Logger");
-    toolbarLayout->addWidget(loggerButton);
+  QPushButton *loggerButton = new QPushButton("Show Notice Logger");
+  toolbarLayout->addWidget(loggerButton);
 
-    toolbarLayout->addStretch();
+  toolbarLayout->addStretch();
 
-    QSplitter * splitter = new QSplitter(Qt::Horizontal);
-    mainLayout->addWidget(splitter, 10);
+  QSplitter *splitter = new QSplitter(Qt::Horizontal);
+  mainLayout->addWidget(splitter, 10);
 
-    _siTreeWidget = new HduiSceneIndexTreeWidget;
-    splitter->addWidget(_siTreeWidget);
+  _siTreeWidget = new HduiSceneIndexTreeWidget;
+  splitter->addWidget(_siTreeWidget);
 
-    _dsTreeWidget = new HduiDataSourceTreeWidget;
-    splitter->addWidget(_dsTreeWidget);
+  _dsTreeWidget = new HduiDataSourceTreeWidget;
+  splitter->addWidget(_dsTreeWidget);
 
-    _valueTreeView = new HduiDataSourceValueTreeView;
-    splitter->addWidget(_valueTreeView);
+  _valueTreeView = new HduiDataSourceValueTreeView;
+  splitter->addWidget(_valueTreeView);
 
-    QObject::connect(_siTreeWidget, &HduiSceneIndexTreeWidget::PrimSelected,
-        [this](const SdfPath &primPath,
-                HdContainerDataSourceHandle dataSource) {
-            this->_valueTreeView->SetDataSource(nullptr);
-            this->_dsTreeWidget->SetPrimDataSource(primPath, dataSource);
-    });
+  QObject::connect(_siTreeWidget, &HduiSceneIndexTreeWidget::PrimSelected,
+                   [this](const SdfPath &primPath,
+                          HdContainerDataSourceHandle dataSource)
+                   {
+                     this->_valueTreeView->SetDataSource(nullptr);
+                     this->_dsTreeWidget->SetPrimDataSource(primPath, dataSource);
+                   });
 
-    QObject::connect(_dsTreeWidget,
-            &HduiDataSourceTreeWidget::DataSourceSelected,
-        [this](HdDataSourceBaseHandle dataSource) {
-            this->_valueTreeView->SetDataSource(
-                    HdSampledDataSource::Cast(dataSource));
-    });
+  QObject::connect(_dsTreeWidget,
+                   &HduiDataSourceTreeWidget::DataSourceSelected,
+                   [this](HdDataSourceBaseHandle dataSource)
+                   {
+                     this->_valueTreeView->SetDataSource(
+                         HdSampledDataSource::Cast(dataSource));
+                   });
 
-    QObject::connect(_siTreeWidget, &HduiSceneIndexTreeWidget::PrimDirtied,
-            [this] (const SdfPath &primPath,
-                const HdDataSourceLocatorSet &locators){
-        HdSceneIndexPrim prim = this->_currentSceneIndex->GetPrim(primPath);
-        this->_dsTreeWidget->PrimDirtied(primPath, prim.dataSource, locators);
-    });
+  QObject::connect(_siTreeWidget, &HduiSceneIndexTreeWidget::PrimDirtied,
+                   [this](const SdfPath &primPath,
+                          const HdDataSourceLocatorSet &locators)
+                   {
+                     HdSceneIndexPrim prim = this->_currentSceneIndex->GetPrim(primPath);
+                     this->_dsTreeWidget->PrimDirtied(primPath, prim.dataSource, locators);
+                   });
 
-    QObject::connect(_siChooser,
-            &HduiRegisteredSceneIndexChooser::SceneIndexSelected,
-        [this](const std::string &name,
-                HdSceneIndexBaseRefPtr sceneIndex) {
-            this->SetSceneIndex(name, sceneIndex, true);
-    });
+  QObject::connect(_siChooser,
+                   &HduiRegisteredSceneIndexChooser::SceneIndexSelected,
+                   [this](const std::string &name,
+                          HdSceneIndexBaseRefPtr sceneIndex)
+                   {
+                     this->SetSceneIndex(name, sceneIndex, true);
+                   });
 
-    QObject::connect(_goToInputButtonMenu, &QMenu::aboutToShow, this,
-            &HduiSceneIndexDebuggerWidget::_FillGoToInputMenu);
+  QObject::connect(_goToInputButtonMenu, &QMenu::aboutToShow, this,
+                   &HduiSceneIndexDebuggerWidget::_FillGoToInputMenu);
 
+  QObject::connect(loggerButton, &QPushButton::clicked,
+                   [this]()
+                   {
+                     HduiSceneIndexObserverLoggingWidget *loggingWidget =
+                         new HduiSceneIndexObserverLoggingWidget();
 
-    QObject::connect(loggerButton, &QPushButton::clicked,
-        [this](){
-
-            HduiSceneIndexObserverLoggingWidget *loggingWidget = 
-                new HduiSceneIndexObserverLoggingWidget();
-
-            loggingWidget->SetLabel(_nameLabel->text().toStdString());
-            loggingWidget->show();
-            if (this->_currentSceneIndex) {
-                loggingWidget->GetTreeView()->SetSceneIndex(
-                    this->_currentSceneIndex);
-            }
-    });
+                     loggingWidget->SetLabel(_nameLabel->text().toStdString());
+                     loggingWidget->show();
+                     if (this->_currentSceneIndex)
+                     {
+                       loggingWidget->GetTreeView()->SetSceneIndex(
+                           this->_currentSceneIndex);
+                     }
+                   });
 }
 
-void
-HduiSceneIndexDebuggerWidget::SetSceneIndex(const std::string &displayName,
-    HdSceneIndexBaseRefPtr sceneIndex, bool pullRoot)
+void HduiSceneIndexDebuggerWidget::SetSceneIndex(const std::string &displayName,
+                                                 HdSceneIndexBaseRefPtr sceneIndex, bool pullRoot)
 {
-    _currentSceneIndex = sceneIndex;
+  _currentSceneIndex = sceneIndex;
 
-    bool inputsPresent = false;
-    if (HdFilteringSceneIndexBaseRefPtr filteringSi =
-            TfDynamic_cast<HdFilteringSceneIndexBaseRefPtr>(sceneIndex)) {
-        if (!filteringSi->GetInputScenes().empty()) {
-            inputsPresent = true;
-        }
+  bool inputsPresent = false;
+  if (HdFilteringSceneIndexBaseRefPtr filteringSi =
+          TfDynamic_cast<HdFilteringSceneIndexBaseRefPtr>(sceneIndex))
+  {
+    if (!filteringSi->GetInputScenes().empty())
+    {
+      inputsPresent = true;
     }
+  }
 
-    _goToInputButton->setEnabled(inputsPresent);
+  _goToInputButton->setEnabled(inputsPresent);
 
-    std::ostringstream buffer;
-    if (sceneIndex) {
-        buffer << "<b><i>(";
-        buffer << sceneIndex->GetDisplayName();
-        buffer << ")</i></b> ";
-    }
-    buffer << displayName;
+  std::ostringstream buffer;
+  if (sceneIndex)
+  {
+    buffer << "<b><i>(";
+    buffer << sceneIndex->GetDisplayName();
+    buffer << ")</i></b> ";
+  }
+  buffer << displayName;
 
-    _nameLabel->setText(buffer.str().c_str());
+  _nameLabel->setText(buffer.str().c_str());
 
-    this->_nameLabel->setText(buffer.str().c_str());
-    this->_dsTreeWidget->SetPrimDataSource(SdfPath(), nullptr);
-    this->_valueTreeView->SetDataSource(nullptr);
+  this->_nameLabel->setText(buffer.str().c_str());
+  this->_dsTreeWidget->SetPrimDataSource(SdfPath(), nullptr);
+  this->_valueTreeView->SetDataSource(nullptr);
 
-    _siTreeWidget->SetSceneIndex(sceneIndex);
+  _siTreeWidget->SetSceneIndex(sceneIndex);
 
-    if (pullRoot) {
-        _siTreeWidget->Requery();
-    }
+  if (pullRoot)
+  {
+    _siTreeWidget->Requery();
+  }
 }
 
 namespace
 {
-    class _InputSelectionItem : public QTreeWidgetItem
-    {
-    public:
-        _InputSelectionItem(QTreeWidgetItem * parent)
+  class _InputSelectionItem : public QTreeWidgetItem
+  {
+  public:
+    _InputSelectionItem(QTreeWidgetItem *parent)
         : QTreeWidgetItem(parent)
-        {}
+    {
+    }
 
-        HdSceneIndexBasePtr sceneIndex;
-    };
+    HdSceneIndexBasePtr sceneIndex;
+  };
 }
 
-void
-HduiSceneIndexDebuggerWidget::_FillGoToInputMenu()
+void HduiSceneIndexDebuggerWidget::_FillGoToInputMenu()
 {
-    QMenu *menu = _goToInputButtonMenu;
-    menu->clear();
+  QMenu *menu = _goToInputButtonMenu;
+  menu->clear();
 
-    QTreeWidget *menuTreeWidget = new QTreeWidget;
-    menuTreeWidget->setHeaderHidden(true);
-    menuTreeWidget->setAllColumnsShowFocus(true);
-    menuTreeWidget->setMouseTracking(true);
-    menuTreeWidget->setSizeAdjustPolicy(
-            QAbstractScrollArea::AdjustToContentsOnFirstShow);
+  QTreeWidget *menuTreeWidget = new QTreeWidget;
+  menuTreeWidget->setHeaderHidden(true);
+  menuTreeWidget->setAllColumnsShowFocus(true);
+  menuTreeWidget->setMouseTracking(true);
+  menuTreeWidget->setSizeAdjustPolicy(
+      QAbstractScrollArea::AdjustToContentsOnFirstShow);
 
-    QObject::connect(menuTreeWidget, &QTreeWidget::itemEntered,
-        [menuTreeWidget](QTreeWidgetItem *item, int column) {
-            menuTreeWidget->setCurrentItem(
-                item, 0, QItemSelectionModel::Select | QItemSelectionModel::Clear);
-    });
+  QObject::connect(menuTreeWidget, &QTreeWidget::itemEntered,
+                   [menuTreeWidget](QTreeWidgetItem *item, int column)
+                   {
+                     menuTreeWidget->setCurrentItem(
+                         item, 0, QItemSelectionModel::Select | QItemSelectionModel::Clear);
+                   });
 
-    QObject::connect(menuTreeWidget, &QTreeWidget::itemClicked,
-        [this, menu, menuTreeWidget](QTreeWidgetItem *item, int column) {
+  QObject::connect(menuTreeWidget, &QTreeWidget::itemClicked,
+                   [this, menu, menuTreeWidget](QTreeWidgetItem *item, int column)
+                   {
+                     if (_InputSelectionItem *selectionItem =
+                             dynamic_cast<_InputSelectionItem *>(item))
+                     {
 
-            if (_InputSelectionItem *selectionItem =
-                    dynamic_cast<_InputSelectionItem*>(item)) {
+                       this->SetSceneIndex("", selectionItem->sceneIndex, true);
+                       menu->close();
+                     }
+                   });
 
-                this->SetSceneIndex("", selectionItem->sceneIndex, true);
-                menu->close();
-            }
-    });
+  _AddSceneIndexToTreeMenu(menuTreeWidget->invisibleRootItem(),
+                           _currentSceneIndex, false);
 
-    _AddSceneIndexToTreeMenu(menuTreeWidget->invisibleRootItem(),
-            _currentSceneIndex, false);
-
-    QWidgetAction *widgetAction = new QWidgetAction(menu);
-    widgetAction->setDefaultWidget(menuTreeWidget);
-    menu->addAction(widgetAction);
+  QWidgetAction *widgetAction = new QWidgetAction(menu);
+  widgetAction->setDefaultWidget(menuTreeWidget);
+  menu->addAction(widgetAction);
 }
 
-void
-HduiSceneIndexDebuggerWidget::_AddSceneIndexToTreeMenu(
+void HduiSceneIndexDebuggerWidget::_AddSceneIndexToTreeMenu(
     QTreeWidgetItem *parentItem, HdSceneIndexBaseRefPtr sceneIndex,
-        bool includeSelf)
+    bool includeSelf)
 {
-    if (!sceneIndex) {
-        return;
-    }
+  if (!sceneIndex)
+  {
+    return;
+  }
 
-    if (includeSelf) {
-        _InputSelectionItem *item = new _InputSelectionItem(parentItem);
-        item->setText(0,
-            sceneIndex->GetDisplayName().c_str());
+  if (includeSelf)
+  {
+    _InputSelectionItem *item = new _InputSelectionItem(parentItem);
+    item->setText(0,
+                  sceneIndex->GetDisplayName().c_str());
 
-        item->sceneIndex = sceneIndex;
-        
-        parentItem = item;
-    }
+    item->sceneIndex = sceneIndex;
 
-    if (HdFilteringSceneIndexBaseRefPtr filteringSi =
-            TfDynamic_cast<HdFilteringSceneIndexBaseRefPtr>(sceneIndex)) {
-        // TODO, handling multi-input branching
-        std::vector<HdSceneIndexBaseRefPtr> sceneIndices =
-            filteringSi->GetInputScenes();
-        if (!sceneIndices.empty()) {
-            parentItem->setExpanded(true);
-            for (HdSceneIndexBaseRefPtr childSceneIndex : sceneIndices) {
-                _AddSceneIndexToTreeMenu(parentItem, childSceneIndex, true);
-            }
-        } 
+    parentItem = item;
+  }
+
+  if (HdFilteringSceneIndexBaseRefPtr filteringSi =
+          TfDynamic_cast<HdFilteringSceneIndexBaseRefPtr>(sceneIndex))
+  {
+    // TODO, handling multi-input branching
+    std::vector<HdSceneIndexBaseRefPtr> sceneIndices =
+        filteringSi->GetInputScenes();
+    if (!sceneIndices.empty())
+    {
+      parentItem->setExpanded(true);
+      for (HdSceneIndexBaseRefPtr childSceneIndex : sceneIndices)
+      {
+        _AddSceneIndexToTreeMenu(parentItem, childSceneIndex, true);
+      }
     }
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

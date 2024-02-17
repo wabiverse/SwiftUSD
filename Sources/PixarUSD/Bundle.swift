@@ -28,9 +28,9 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import Arch
 import CxxStdlib
 import Foundation
-import Arch
 import Plug
 import Rainbow
 
@@ -113,6 +113,54 @@ public extension Bundle
   static let usdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdHydra\(ext)")
 
   /**
+   * Where ``__ObjC/Pixar/SdrOsl`` application bundle resources are located. */
+  static let sdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_SdrOsl\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdAbc`` application bundle resources are located. */
+  static let usdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdAbc\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdDraco`` application bundle resources are located. */
+  static let usdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdDraco\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdMedia`` application bundle resources are located. */
+  static let usdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMedia\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdMtlx`` application bundle resources are located. */
+  static let usdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMtlx\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdPhysics`` application bundle resources are located. */
+  static let usdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdPhysics\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdProc`` application bundle resources are located. */
+  static let usdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdProc\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdRender`` application bundle resources are located. */
+  static let usdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRender\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdRi`` application bundle resources are located. */
+  static let usdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRi\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdSkel`` application bundle resources are located. */
+  static let usdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdSkel\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdUI`` application bundle resources are located. */
+  static let usdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdUI\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdVol`` application bundle resources are located. */
+  static let usdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdVol\(ext)")
+
+  /**
    * Where ``__ObjC/Pixar/Hd`` application bundle resources are located. */
   static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
 
@@ -169,6 +217,10 @@ public extension Bundle
   static let pySdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdr\(ext)")
 
   /**
+   * Where ``__ObjC/Pixar/SdrOsl`` application bundle resources are located. */
+  static let pySdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_PySdrOsl\(ext)")
+
+  /**
    * Where ``__ObjC/Pixar/UsdGeom`` python bundle resources are located. */
   static let pyUsdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdGeom\(ext)")
 
@@ -195,6 +247,54 @@ public extension Bundle
   /**
    * Where ``__ObjC/Pixar/PxOsd`` application bundle resources are located. */
   static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdAbc`` application bundle resources are located. */
+  static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdAbc\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdDraco`` application bundle resources are located. */
+  static let pyUsdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdDraco\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdMedia`` application bundle resources are located. */
+  static let pyUsdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMedia\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdMtlx`` application bundle resources are located. */
+  static let pyUsdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMtlx\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdPhysics`` application bundle resources are located. */
+  static let pyUsdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdPhysics\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdProc`` application bundle resources are located. */
+  static let pyUsdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdProc\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdRender`` application bundle resources are located. */
+  static let pyUsdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRender\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdRi`` application bundle resources are located. */
+  static let pyUsdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRi\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdSkel`` application bundle resources are located. */
+  static let pyUsdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdSkel\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdUI`` application bundle resources are located. */
+  static let pyUsdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUI\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdUtils`` application bundle resources are located. */
+  static let pyUsdUtils = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUtils\(ext)")
+
+  /**
+   * Where ``__ObjC/Pixar/UsdVol`` application bundle resources are located. */
+  static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdVol\(ext)")
 }
 
 public enum BundleKind
@@ -294,6 +394,18 @@ public enum BundleFramework: CaseIterable
   case usdShaders
   case usdLux
   case usdHydra
+  case sdrOsl
+  case usdAbc
+  case usdDraco
+  case usdMedia
+  case usdMtlx
+  case usdPhysics
+  case usdProc
+  case usdRender
+  case usdRi
+  case usdSkel
+  case usdUI
+  case usdVol
   case hd
 
   public var resourcePath: String?
@@ -309,6 +421,18 @@ public enum BundleFramework: CaseIterable
       case .usdShaders: Bundle.usdShaders?.resourcePath
       case .usdLux: Bundle.usdLux?.resourcePath
       case .usdHydra: Bundle.usdHydra?.resourcePath
+      case .sdrOsl: Bundle.sdrOsl?.resourcePath
+      case .usdAbc: Bundle.usdAbc?.resourcePath
+      case .usdDraco: Bundle.usdDraco?.resourcePath
+      case .usdMedia: Bundle.usdMedia?.resourcePath
+      case .usdMtlx: Bundle.usdMtlx?.resourcePath
+      case .usdPhysics: Bundle.usdPhysics?.resourcePath
+      case .usdProc: Bundle.usdProc?.resourcePath
+      case .usdRender: Bundle.usdRender?.resourcePath
+      case .usdRi: Bundle.usdRi?.resourcePath
+      case .usdSkel: Bundle.usdSkel?.resourcePath
+      case .usdUI: Bundle.usdUI?.resourcePath
+      case .usdVol: Bundle.usdVol?.resourcePath
       case .hd: Bundle.hd?.resourcePath
     }
   }
@@ -329,11 +453,24 @@ public enum BundlePython: CaseIterable
   case pyUsd
   case pyNdr
   case pySdr
+  case pySdrOsl
   case pyUsdGeom
   case pyUsdShade
   case pyUsdShaders
   case pyUsdLux
   case pyUsdHydra
+  case pyUsdAbc
+  case pyUsdDraco
+  case pyUsdMedia
+  case pyUsdMtlx
+  case pyUsdPhysics
+  case pyUsdProc
+  case pyUsdRender
+  case pyUsdRi
+  case pyUsdSkel
+  case pyUsdUI
+  case pyUsdUtils
+  case pyUsdVol
   case pyCameraUtil
   case pyPxOsd
 
@@ -354,11 +491,24 @@ public enum BundlePython: CaseIterable
       case .pyUsd: Bundle.pyUsd?.resourcePath
       case .pyNdr: Bundle.pyNdr?.resourcePath
       case .pySdr: Bundle.pySdr?.resourcePath
+      case .pySdrOsl: Bundle.pySdrOsl?.resourcePath
       case .pyUsdGeom: Bundle.pyUsdGeom?.resourcePath
       case .pyUsdShade: Bundle.pyUsdShade?.resourcePath
       case .pyUsdShaders: Bundle.pyUsdShaders?.resourcePath
       case .pyUsdLux: Bundle.pyUsdLux?.resourcePath
       case .pyUsdHydra: Bundle.pyUsdHydra?.resourcePath
+      case .pyUsdAbc: Bundle.pyUsdAbc?.resourcePath
+      case .pyUsdDraco: Bundle.pyUsdDraco?.resourcePath
+      case .pyUsdMedia: Bundle.pyUsdMedia?.resourcePath
+      case .pyUsdMtlx: Bundle.pyUsdMtlx?.resourcePath
+      case .pyUsdPhysics: Bundle.pyUsdPhysics?.resourcePath
+      case .pyUsdProc: Bundle.pyUsdProc?.resourcePath
+      case .pyUsdRender: Bundle.pyUsdRender?.resourcePath
+      case .pyUsdRi: Bundle.pyUsdRi?.resourcePath
+      case .pyUsdSkel: Bundle.pyUsdSkel?.resourcePath
+      case .pyUsdUI: Bundle.pyUsdUI?.resourcePath
+      case .pyUsdUtils: Bundle.pyUsdUtils?.resourcePath
+      case .pyUsdVol: Bundle.pyUsdVol?.resourcePath
       case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
       case .pyPxOsd: Bundle.pyPxOsd?.resourcePath
     }

@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 
 #include "api.h"
 
-#include "pxr/usd/ar/defineResolverContext.h"
-#include "pxr/usd/ar/resolverContext.h"
+#include "Ar/defineResolverContext.h"
+#include "Ar/resolverContext.h"
 
 #include <string>
 
@@ -39,36 +39,36 @@
 class UsdResolverExampleResolverContext
 {
 public:
-    /// Create a context that specifies that the version mappings in
-    /// \p mappingFile should be used when resolving asset paths with
-    /// this context bound. \p mappingFile may be an absolute or
-    /// relative file path; if relative, it will be anchored to the
-    /// current working directory.
-    USDRESOLVEREXAMPLE_API
-    explicit UsdResolverExampleResolverContext(
-        const std::string& mappingFile);
+  /// Create a context that specifies that the version mappings in
+  /// \p mappingFile should be used when resolving asset paths with
+  /// this context bound. \p mappingFile may be an absolute or
+  /// relative file path; if relative, it will be anchored to the
+  /// current working directory.
+  USDRESOLVEREXAMPLE_API
+  explicit UsdResolverExampleResolverContext(
+      const std::string &mappingFile);
 
-    USDRESOLVEREXAMPLE_API
-    UsdResolverExampleResolverContext();
+  USDRESOLVEREXAMPLE_API
+  UsdResolverExampleResolverContext();
 
-    USDRESOLVEREXAMPLE_API
-    UsdResolverExampleResolverContext(
-        const UsdResolverExampleResolverContext& rhs);
+  USDRESOLVEREXAMPLE_API
+  UsdResolverExampleResolverContext(
+      const UsdResolverExampleResolverContext &rhs);
 
-    USDRESOLVEREXAMPLE_API
-    bool operator<(const UsdResolverExampleResolverContext& rhs) const;
+  USDRESOLVEREXAMPLE_API
+  bool operator<(const UsdResolverExampleResolverContext &rhs) const;
 
-    USDRESOLVEREXAMPLE_API
-    bool operator==(const UsdResolverExampleResolverContext& rhs) const;
-    
-    USDRESOLVEREXAMPLE_API
-    friend size_t hash_value(const UsdResolverExampleResolverContext& ctx);
+  USDRESOLVEREXAMPLE_API
+  bool operator==(const UsdResolverExampleResolverContext &rhs) const;
 
-    USDRESOLVEREXAMPLE_API
-    const std::string& GetMappingFile() const;
+  USDRESOLVEREXAMPLE_API
+  friend size_t hash_value(const UsdResolverExampleResolverContext &ctx);
+
+  USDRESOLVEREXAMPLE_API
+  const std::string &GetMappingFile() const;
 
 private:
-    std::string _mappingFile;
+  std::string _mappingFile;
 };
 
 PXR_NAMESPACE_OPEN_SCOPE

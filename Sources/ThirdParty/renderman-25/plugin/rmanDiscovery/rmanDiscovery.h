@@ -27,8 +27,8 @@
 
 /// \file rmanDiscovery/rmanDiscovery.h
 
-#include "pxr/pxr.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
+#include <pxr/pxrns.h>
+#include "Ndr/discoveryPlugin.h"
 #include <functional>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -40,50 +40,48 @@ PXR_NAMESPACE_OPEN_SCOPE
 class RmanDiscoveryPlugin final : public NdrDiscoveryPlugin
 {
 public:
-    /// A filter for discovered nodes.  If the function returns false
-    /// then the discovered node is discarded.  Otherwise the function
-    /// can modify the discovery result.
-    using Filter = std::function<bool(NdrNodeDiscoveryResult&)>;
+  /// A filter for discovered nodes.  If the function returns false
+  /// then the discovered node is discarded.  Otherwise the function
+  /// can modify the discovery result.
+  using Filter = std::function<bool(NdrNodeDiscoveryResult &)>;
 
-    /// Constructor.
-    RmanDiscoveryPlugin();
+  /// Constructor.
+  RmanDiscoveryPlugin();
 
-    /// DiscoverNodes() will pass each result to the given function for
-    /// modification.  If the function returns false then the result is
-    /// discarded.
-    RmanDiscoveryPlugin(Filter filter);
+  /// DiscoverNodes() will pass each result to the given function for
+  /// modification.  If the function returns false then the result is
+  /// discarded.
+  RmanDiscoveryPlugin(Filter filter);
 
-    /// Virtual destructor
-    ~RmanDiscoveryPlugin();
+  /// Virtual destructor
+  ~RmanDiscoveryPlugin();
 
-    /// Discover all of the nodes that appear within the the search paths
-    /// provided and match the extensions provided.
-    NdrNodeDiscoveryResultVec DiscoverNodes(const Context&) override;
+  /// Discover all of the nodes that appear within the the search paths
+  /// provided and match the extensions provided.
+  NdrNodeDiscoveryResultVec DiscoverNodes(const Context &) override;
 
-    /// Gets the paths that this plugin is searching for nodes in.
-    const NdrStringVec& GetSearchURIs() const override;
+  /// Gets the paths that this plugin is searching for nodes in.
+  const NdrStringVec &GetSearchURIs() const override;
 
 private:
-    /// The paths (abs) indicating where the plugin should search for nodes.
-    NdrStringVec _searchPaths;
+  /// The paths (abs) indicating where the plugin should search for nodes.
+  NdrStringVec _searchPaths;
 
-    /// The extensions (excluding leading '.') that signify a valid node file.
-    /// The extension will be used as the `type` member in the resulting
-    /// `NdrNodeDiscoveryResult` instance.
-    NdrStringVec _allowedExtensions;
+  /// The extensions (excluding leading '.') that signify a valid node file.
+  /// The extension will be used as the `type` member in the resulting
+  /// `NdrNodeDiscoveryResult` instance.
+  NdrStringVec _allowedExtensions;
 
-    /// Whether or not to follow symlinks while scanning directories for files.
-    bool _followSymlinks;
+  /// Whether or not to follow symlinks while scanning directories for files.
+  bool _followSymlinks;
 
-    // The filter to run on the results.
-    Filter _filter;
+  // The filter to run on the results.
+  Filter _filter;
 };
 
-void
-RmanDiscoveryPlugin_SetDefaultSearchPaths(const NdrStringVec &paths);
+void RmanDiscoveryPlugin_SetDefaultSearchPaths(const NdrStringVec &paths);
 
-void
-RmanDiscoveryPlugin_SetDefaultFollowSymlinks(bool followSymlinks);
+void RmanDiscoveryPlugin_SetDefaultFollowSymlinks(bool followSymlinks);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -36,7 +36,7 @@ to compile and work with USD Core successfully.
       "foo_bar", hence violating the One-to-One mapping of token identifiers
       mentioned in \ref Usd_NameSpacedPropertiesInCodeGen below.
 
-See pxr/usd/lib/usdGeom/schema.usda for an example.
+See UsdGeom/schema.usda for an example.
 
 \section Usd_IsAVsAPISchemas IsA Vs. API Schemas
 
@@ -660,7 +660,7 @@ class PxHairman "PxHairman" (
         string className = "Hairman"
         string fileName = "_hairman"
         string extraIncludes = """
-#include "pxr/usd/usdGeom/primvar.h"
+#include "UsdGeom/primvar.h"
 """
         dictionary extraPlugInfo = {
             string customString = "metadata"
@@ -805,7 +805,7 @@ dictionary:
     """
     subLayers = [
         # This is mainly needed for definition of UsdTyped.
-        @usd/schema.usda@
+        @Usd/schema.usda@
     ]
 )
 
@@ -866,7 +866,7 @@ class MyCustomPrim "MyCustomPrim" (
         customData = {
             string extraIncludes = """
                 #include "Gf/bbox3d.h"
-                #include "pxr/usd/usdGeom/primvar.h" """
+                #include "UsdGeom/primvar.h" """
         }
     }
 )  {

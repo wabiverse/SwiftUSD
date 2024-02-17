@@ -24,17 +24,17 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_TOKENS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_TOKENS_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
-#include "pxr/base/tf/staticTokens.h"
+#include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HD_PRMAN_TOKENS                         \
-    (meshLightSourceGeom)                       
+#define HD_PRMAN_TOKENS \
+  (meshLightSourceGeom)
 
 TF_DECLARE_PUBLIC_TOKENS(HdPrmanTokens, HDPRMAN_API, HD_PRMAN_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_TOKENS_H
+#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_TOKENS_H

@@ -24,15 +24,15 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PARAM_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PARAM_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
 #include "hdPrman/prmanArchDefs.h"
 #include "hdPrman/xcpt.h"
 #include "hdPrman/cameraContext.h"
 #include "hdPrman/renderViewContext.h"
-#include "pxr/imaging/hd/sceneDelegate.h"
-#include "pxr/imaging/hd/renderDelegate.h"
-#include "pxr/imaging/hd/material.h"
+#include "Hd/sceneDelegate.h"
+#include "Hd/renderDelegate.h"
+#include "Hd/material.h"
 
 #include "Riley.h"
 #include <unordered_map>
@@ -40,8 +40,9 @@
 
 class RixRiCtl;
 
-namespace stats {
-class Session;
+namespace stats
+{
+  class Session;
 };
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -64,431 +65,436 @@ constexpr int HDPRMAN_MAX_TIME_SAMPLES = 4;
 class HdPrman_RenderParam : public HdRenderParam
 {
 public:
-    HDPRMAN_API
-    HdPrman_RenderParam(
-        HdPrmanRenderDelegate *renderDelegate,
-        const std::string &rileyVariant, 
-        const std::string &xpuDevices,
-        const std::vector<std::string>& extraArgs);
+  HDPRMAN_API
+  HdPrman_RenderParam(
+      HdPrmanRenderDelegate *renderDelegate,
+      const std::string &rileyVariant,
+      const std::string &xpuDevices,
+      const std::vector<std::string> &extraArgs);
 
-    HDPRMAN_API
-    ~HdPrman_RenderParam() override;
+  HDPRMAN_API
+  ~HdPrman_RenderParam() override;
 
-    HDPRMAN_API
-    void Begin(HdPrmanRenderDelegate *renderDelegate); 
+  HDPRMAN_API
+  void Begin(HdPrmanRenderDelegate *renderDelegate);
 
-    // Convert any Hydra primvars that should be Riley instance attributes.
-    HDPRMAN_API
-    RtParamList
-    ConvertAttributes(HdSceneDelegate *sceneDelegate,
-        SdfPath const& id, bool isGeometry);
+  // Convert any Hydra primvars that should be Riley instance attributes.
+  HDPRMAN_API
+  RtParamList
+  ConvertAttributes(HdSceneDelegate *sceneDelegate,
+                    SdfPath const &id, bool isGeometry);
 
-    // A vector of Riley coordinate system id's.
-    using RileyCoordSysIdVec = std::vector<riley::CoordinateSystemId>;
-    // A ref-counting ptr to a vector of coordinate systems.
-    using RileyCoordSysIdVecRefPtr = std::shared_ptr<RileyCoordSysIdVec>;
+  // A vector of Riley coordinate system id's.
+  using RileyCoordSysIdVec = std::vector<riley::CoordinateSystemId>;
+  // A ref-counting ptr to a vector of coordinate systems.
+  using RileyCoordSysIdVecRefPtr = std::shared_ptr<RileyCoordSysIdVec>;
 
-    /// Convert any coordinate system bindings for the given rprim id
-    /// into a Riley equivalent form.  Retain the result internally
-    /// in a cache, so that we may re-use the result with other
-    /// rprims with the same set of bindings.
-    HDPRMAN_API
-    RileyCoordSysIdVecRefPtr ConvertAndRetainCoordSysBindings(
-        HdSceneDelegate *sceneDelegate,
-        SdfPath const& id);
+  /// Convert any coordinate system bindings for the given rprim id
+  /// into a Riley equivalent form.  Retain the result internally
+  /// in a cache, so that we may re-use the result with other
+  /// rprims with the same set of bindings.
+  HDPRMAN_API
+  RileyCoordSysIdVecRefPtr ConvertAndRetainCoordSysBindings(
+      HdSceneDelegate *sceneDelegate,
+      SdfPath const &id);
 
-    /// Convert a list of categories returned by Hydra to
-    /// equivalent Prman grouping attributes.
-    HDPRMAN_API
-    void ConvertCategoriesToAttributes(
-        SdfPath const& id,
-        VtArray<TfToken> const& categories,
-        RtParamList& attrs);
+  /// Convert a list of categories returned by Hydra to
+  /// equivalent Prman grouping attributes.
+  HDPRMAN_API
+  void ConvertCategoriesToAttributes(
+      SdfPath const &id,
+      VtArray<TfToken> const &categories,
+      RtParamList &attrs);
 
-    /// Release any coordinate system bindings cached for the given
-    /// rprim id.
-    HDPRMAN_API
-    void ReleaseCoordSysBindings(SdfPath const& id);
+  /// Release any coordinate system bindings cached for the given
+  /// rprim id.
+  HDPRMAN_API
+  void ReleaseCoordSysBindings(SdfPath const &id);
 
-    HDPRMAN_API
-    void IncrementLightLinkCount(TfToken const& name);
+  HDPRMAN_API
+  void IncrementLightLinkCount(TfToken const &name);
 
-    HDPRMAN_API
-    void DecrementLightLinkCount(TfToken const& name);
+  HDPRMAN_API
+  void DecrementLightLinkCount(TfToken const &name);
 
-    HDPRMAN_API
-    bool IsLightLinkUsed(TfToken const& name);
+  HDPRMAN_API
+  bool IsLightLinkUsed(TfToken const &name);
 
-    HDPRMAN_API
-    void IncrementLightFilterCount(TfToken const& name);
+  HDPRMAN_API
+  void IncrementLightFilterCount(TfToken const &name);
 
-    HDPRMAN_API
-    void DecrementLightFilterCount(TfToken const& name);
+  HDPRMAN_API
+  void DecrementLightFilterCount(TfToken const &name);
 
-    HDPRMAN_API
-    bool IsLightFilterUsed(TfToken const& name);
+  HDPRMAN_API
+  bool IsLightFilterUsed(TfToken const &name);
 
-    HDPRMAN_API
-    void SetOptionsFromRenderSettingsMap(
-        HdRenderSettingsMap const &renderSettingsMap,
-        RtParamList& options);
+  HDPRMAN_API
+  void SetOptionsFromRenderSettingsMap(
+      HdRenderSettingsMap const &renderSettingsMap,
+      RtParamList &options);
 
-    // Set integrator params from the HdRenderSettingsMap
-    HDPRMAN_API
-    void SetIntegratorParamsFromRenderSettingsMap(
-        HdPrmanRenderDelegate *renderDelegate,
-        const std::string& integratorName,
-        RtParamList& params);
+  // Set integrator params from the HdRenderSettingsMap
+  HDPRMAN_API
+  void SetIntegratorParamsFromRenderSettingsMap(
+      HdPrmanRenderDelegate *renderDelegate,
+      const std::string &integratorName,
+      RtParamList &params);
 
-    // Set integrator params from the camera.
-    // This invokes any callbacks registered with
-    // RegisterIntegratorCallbackForCamera().
-    HDPRMAN_API
-    void SetIntegratorParamsFromCamera(
-        HdPrmanRenderDelegate *renderDelegate,
-        const HdPrmanCamera *camera,
-        std::string const& integratorName,
-        RtParamList& params);
+  // Set integrator params from the camera.
+  // This invokes any callbacks registered with
+  // RegisterIntegratorCallbackForCamera().
+  HDPRMAN_API
+  void SetIntegratorParamsFromCamera(
+      HdPrmanRenderDelegate *renderDelegate,
+      const HdPrmanCamera *camera,
+      std::string const &integratorName,
+      RtParamList &params);
 
-    HDPRMAN_API
-    void SetBatchCommandLineArgs(
-        VtValue const &cmdLine,
-        RtParamList * options);
+  HDPRMAN_API
+  void SetBatchCommandLineArgs(
+      VtValue const &cmdLine,
+      RtParamList *options);
 
-    // Callback to convert any camera settings that should become
-    // parameters on the integrator.
-    using IntegratorCameraCallback = void (*)
-        (HdPrmanRenderDelegate *renderDelegate,
-         const HdPrmanCamera *camera,
-         std::string const& integratorName,
-         RtParamList &integratorParams);
+  // Callback to convert any camera settings that should become
+  // parameters on the integrator.
+  using IntegratorCameraCallback = void (*)(HdPrmanRenderDelegate *renderDelegate,
+                                            const HdPrmanCamera *camera,
+                                            std::string const &integratorName,
+                                            RtParamList &integratorParams);
 
-    // Register a callback to process integrator settings
-    HDPRMAN_API
-    static void 
-    RegisterIntegratorCallbackForCamera(
-        IntegratorCameraCallback const& callback);
+  // Register a callback to process integrator settings
+  HDPRMAN_API
+  static void
+  RegisterIntegratorCallbackForCamera(
+      IntegratorCameraCallback const &callback);
 
-    // Get RIX vs XPU
-    bool IsXpu() const { return _xpu; }
+  // Get RIX vs XPU
+  bool IsXpu() const { return _xpu; }
 
-    // Request edit access to the Riley scene and return it.
-    riley::Riley * AcquireRiley();
+  // Request edit access to the Riley scene and return it.
+  riley::Riley *AcquireRiley();
 
-    // Provides external access to resources used to set parameters for
-    // options and the active integrator.
-    riley::IntegratorId GetActiveIntegratorId();
+  // Provides external access to resources used to set parameters for
+  // options and the active integrator.
+  riley::IntegratorId GetActiveIntegratorId();
 
-    const riley::MaterialId GetFallbackMaterialId() const {
-        return _fallbackMaterialId;
-    }
+  const riley::MaterialId GetFallbackMaterialId() const
+  {
+    return _fallbackMaterialId;
+  }
 
-    const riley::MaterialId GetFallbackVolumeMaterialId() const {
-        return _fallbackVolumeMaterialId;
-    }
+  const riley::MaterialId GetFallbackVolumeMaterialId() const
+  {
+    return _fallbackVolumeMaterialId;
+  }
 
-    int GetLastLegacySettingsVersion() const {
-        return _lastLegacySettingsVersion;
-    }
-    void SetLastLegacySettingsVersion(int version);
+  int GetLastLegacySettingsVersion() const
+  {
+    return _lastLegacySettingsVersion;
+  }
+  void SetLastLegacySettingsVersion(int version);
 
-    // Invalidate texture at path.
-    void InvalidateTexture(const std::string &path);
+  // Invalidate texture at path.
+  void InvalidateTexture(const std::string &path);
 
-    void UpdateIntegrator(const HdRenderIndex * renderIndex);
+  void UpdateIntegrator(const HdRenderIndex *renderIndex);
 
-    riley::IntegratorId GetIntegratorId() const { return _integratorId; }
+  riley::IntegratorId GetIntegratorId() const { return _integratorId; }
 
-    RtParamList &GetIntegratorParams() { return _integratorParams; }
+  RtParamList &GetIntegratorParams() { return _integratorParams; }
 
-    bool HasSceneLights() const { return _sceneLightCount > 0; }
-    void IncreaseSceneLightCount() { ++_sceneLightCount; }
-    void DecreaseSceneLightCount() { --_sceneLightCount; }
-    
-    // Provides external access to resources used to set parameters for
-    // options and the active integrator.
-    RtParamList &GetOptions() { return _options; }
-    HdPrman_CameraContext &GetCameraContext() { return _cameraContext; }
+  bool HasSceneLights() const { return _sceneLightCount > 0; }
+  void IncreaseSceneLightCount() { ++_sceneLightCount; }
+  void DecreaseSceneLightCount() { --_sceneLightCount; }
 
-    HdPrman_RenderViewContext &GetRenderViewContext() {
-        return _renderViewContext;
-    }
+  // Provides external access to resources used to set parameters for
+  // options and the active integrator.
+  RtParamList &GetOptions() { return _options; }
+  HdPrman_CameraContext &GetCameraContext() { return _cameraContext; }
 
-    void CreateRenderViewFromRenderSpec(const VtDictionary &renderSpec);
+  HdPrman_RenderViewContext &GetRenderViewContext()
+  {
+    return _renderViewContext;
+  }
 
-    void CreateRenderViewFromRenderSettingsPrim(
-        HdPrman_RenderSettings const &renderSettingsPrim);
+  void CreateRenderViewFromRenderSpec(const VtDictionary &renderSpec);
 
-    // Starts the render thread (if needed), and tells the render thread to
-    // call into riley and start a render.
-    void StartRender();
+  void CreateRenderViewFromRenderSettingsPrim(
+      HdPrman_RenderSettings const &renderSettingsPrim);
 
-    // Requests riley stop rendering; if blocking is true, waits until riley
-    // has exited and the render thread is idle before returning.  Note that
-    // after the render stops, the render thread will be running but idle;
-    // to stop the thread itself, call DeleteRenderThread. If the render thread
-    // is not running, this call does nothing.
-    void StopRender(bool blocking = true);
+  // Starts the render thread (if needed), and tells the render thread to
+  // call into riley and start a render.
+  void StartRender();
 
-    // Returns whether the render thread is active and rendering currently.
-    // Returns false if the render thread is active but idle (not in riley).
-    bool IsRendering();
+  // Requests riley stop rendering; if blocking is true, waits until riley
+  // has exited and the render thread is idle before returning.  Note that
+  // after the render stops, the render thread will be running but idle;
+  // to stop the thread itself, call DeleteRenderThread. If the render thread
+  // is not running, this call does nothing.
+  void StopRender(bool blocking = true);
 
-    // Returns whether the user has requested pausing the render.
-    bool IsPauseRequested();
+  // Returns whether the render thread is active and rendering currently.
+  // Returns false if the render thread is active but idle (not in riley).
+  bool IsRendering();
 
-    // Deletes the render thread if there is one.
-    void DeleteRenderThread();
+  // Returns whether the user has requested pausing the render.
+  bool IsPauseRequested();
 
-    // Checks whether render param was successfully initialized.
-    // ie. riley was created
-    bool IsValid() const;
+  // Deletes the render thread if there is one.
+  void DeleteRenderThread();
 
-    // Creates displays in riley based on aovBindings vector together
-    // with HdPrmanFramebuffer to transfer the result between the
-    // render thread and the hydra render buffers.
-    void CreateFramebufferAndRenderViewFromAovs(
-        const HdRenderPassAovBindingVector& aovBindings);
+  // Checks whether render param was successfully initialized.
+  // ie. riley was created
+  bool IsValid() const;
 
-    // Deletes HdPrmanFramebuffer (created with
-    // CreateRenderViewFromAovs). Can be called if there is no frame
-    // buffer (returning false).
-    bool DeleteFramebuffer();
+  // Creates displays in riley based on aovBindings vector together
+  // with HdPrmanFramebuffer to transfer the result between the
+  // render thread and the hydra render buffers.
+  void CreateFramebufferAndRenderViewFromAovs(
+      const HdRenderPassAovBindingVector &aovBindings);
 
-    // Returns HdPrmanFramebuffer
-    HdPrmanFramebuffer * GetFramebuffer() const {
-        return _framebuffer.get();
-    }
+  // Deletes HdPrmanFramebuffer (created with
+  // CreateRenderViewFromAovs). Can be called if there is no frame
+  // buffer (returning false).
+  bool DeleteFramebuffer();
 
-    // Creates displays in riley based on rendersettings map
-    void CreateRenderViewFromProducts(
-        const VtArray<HdRenderSettingsMap>& renderProducts, int frame);
+  // Returns HdPrmanFramebuffer
+  HdPrmanFramebuffer *GetFramebuffer() const
+  {
+    return _framebuffer.get();
+  }
 
-    // Scene version counter.
-    std::atomic<int> sceneVersion;
+  // Creates displays in riley based on rendersettings map
+  void CreateRenderViewFromProducts(
+      const VtArray<HdRenderSettingsMap> &renderProducts, int frame);
 
-    // For now, the renderPass needs the render target for each view, for
-    // resolution edits, so we need to keep track of these too.
-    void SetActiveIntegratorId(riley::IntegratorId integratorId);
+  // Scene version counter.
+  std::atomic<int> sceneVersion;
 
-    GfVec2i resolution;
+  // For now, the renderPass needs the render target for each view, for
+  // resolution edits, so we need to keep track of these too.
+  void SetActiveIntegratorId(riley::IntegratorId integratorId);
 
-    void UpdateQuickIntegrator(const HdRenderIndex * renderIndex);
+  GfVec2i resolution;
 
-    riley::IntegratorId GetQuickIntegratorId() const {
-        return _quickIntegratorId;
-    }
+  void UpdateQuickIntegrator(const HdRenderIndex *renderIndex);
 
-    // Compute shutter interval from render settings and camera and
-    // immediately set it as riley option.
-    void UpdateRileyShutterInterval(const HdRenderIndex * renderIndex);
+  riley::IntegratorId GetQuickIntegratorId() const
+  {
+    return _quickIntegratorId;
+  }
 
-    // Path to the Integrator from the Render Settings Prim
-    void SetRenderSettingsIntegratorPath(HdSceneDelegate *sceneDelegate,
-        SdfPath const &renderSettingsIntegratorPath);
-    SdfPath GetRenderSettingsIntegratorPath() {
-        return _renderSettingsIntegratorPath;
-    }
-    void SetRenderSettingsIntegratorNode(
-        HdRenderIndex *renderIndex, HdMaterialNode2 const &integratorNode);
-    HdMaterialNode2 GetRenderSettingsIntegratorNode() {
-        return _renderSettingsIntegratorNode;
-    };
+  // Compute shutter interval from render settings and camera and
+  // immediately set it as riley option.
+  void UpdateRileyShutterInterval(const HdRenderIndex *renderIndex);
 
-    // Path to the connected Sample Filter from the Render Settings Prim
-    void SetConnectedSampleFilterPaths(HdSceneDelegate *sceneDelegate,
-        SdfPathVector const& connectedSampleFilterPaths);
-    SdfPathVector GetConnectedSampleFilterPaths() {
-        return _connectedSampleFilterPaths;
-    }
+  // Path to the Integrator from the Render Settings Prim
+  void SetRenderSettingsIntegratorPath(HdSceneDelegate *sceneDelegate,
+                                       SdfPath const &renderSettingsIntegratorPath);
+  SdfPath GetRenderSettingsIntegratorPath()
+  {
+    return _renderSettingsIntegratorPath;
+  }
+  void SetRenderSettingsIntegratorNode(
+      HdRenderIndex *renderIndex, HdMaterialNode2 const &integratorNode);
+  HdMaterialNode2 GetRenderSettingsIntegratorNode()
+  {
+    return _renderSettingsIntegratorNode;
+  };
 
-    // Riley Data from the Sample Filter Prim
-    void AddSampleFilter(
-        HdSceneDelegate *sceneDelegate, 
-        SdfPath const& path, 
-        riley::ShadingNode const& node);
-    void CreateSampleFilterNetwork(HdSceneDelegate *sceneDelegate);
-    riley::SampleFilterList GetSampleFilterList();
+  // Path to the connected Sample Filter from the Render Settings Prim
+  void SetConnectedSampleFilterPaths(HdSceneDelegate *sceneDelegate,
+                                     SdfPathVector const &connectedSampleFilterPaths);
+  SdfPathVector GetConnectedSampleFilterPaths()
+  {
+    return _connectedSampleFilterPaths;
+  }
 
-    // Path to the connected Display Filter from the Render Settings Prim
-    void SetConnectedDisplayFilterPaths(HdSceneDelegate *sceneDelegate,
-        SdfPathVector const& connectedDisplayFilterPaths);
-    SdfPathVector GetConnectedDisplayFilterPaths() {
-        return _connectedDisplayFilterPaths;
-    }
+  // Riley Data from the Sample Filter Prim
+  void AddSampleFilter(
+      HdSceneDelegate *sceneDelegate,
+      SdfPath const &path,
+      riley::ShadingNode const &node);
+  void CreateSampleFilterNetwork(HdSceneDelegate *sceneDelegate);
+  riley::SampleFilterList GetSampleFilterList();
 
-    // Riley Data from the Display Filter Prim
-    void AddDisplayFilter(
-        HdSceneDelegate *sceneDelegate, 
-        SdfPath const& path, 
-        riley::ShadingNode const& node);
-    void CreateDisplayFilterNetwork(HdSceneDelegate *sceneDelegate);
-    riley::DisplayFilterList GetDisplayFilterList();
+  // Path to the connected Display Filter from the Render Settings Prim
+  void SetConnectedDisplayFilterPaths(HdSceneDelegate *sceneDelegate,
+                                      SdfPathVector const &connectedDisplayFilterPaths);
+  SdfPathVector GetConnectedDisplayFilterPaths()
+  {
+    return _connectedDisplayFilterPaths;
+  }
 
-    // Instancer by id
-    HdPrmanInstancer* GetInstancer(const SdfPath& id);
+  // Riley Data from the Display Filter Prim
+  void AddDisplayFilter(
+      HdSceneDelegate *sceneDelegate,
+      SdfPath const &path,
+      riley::ShadingNode const &node);
+  void CreateDisplayFilterNetwork(HdSceneDelegate *sceneDelegate);
+  riley::DisplayFilterList GetDisplayFilterList();
+
+  // Instancer by id
+  HdPrmanInstancer *GetInstancer(const SdfPath &id);
 
 private:
-    void _CreateStatsSession();
-    void _CreateRiley(const std::string &rileyVariant, 
-        const std::string &xpuVariant,
-        const std::vector<std::string>& extraArgs);
-    void _CreateFallbackMaterials();
-    void _CreateFallbackLight();
-    void _CreateIntegrator(HdRenderDelegate * renderDelegate);
-    
-    void _DestroyRiley();
-    void _DestroyStatsSession();
+  void _CreateStatsSession();
+  void _CreateRiley(const std::string &rileyVariant,
+                    const std::string &xpuVariant,
+                    const std::vector<std::string> &extraArgs);
+  void _CreateFallbackMaterials();
+  void _CreateFallbackLight();
+  void _CreateIntegrator(HdRenderDelegate *renderDelegate);
 
-    // Updates clear colors of AOV descriptors of framebuffer.
-    // If this is not possible because the set of AOVs changed,
-    // returns false.
-    bool _UpdateFramebufferClearValues(
-        const HdRenderPassAovBindingVector& aovBindings);
+  void _DestroyRiley();
+  void _DestroyStatsSession();
 
-    // Top-level entrypoint to PRMan.
-    // Singleton used to access RixInterfaces.
-    RixContext *_rix;
+  // Updates clear colors of AOV descriptors of framebuffer.
+  // If this is not possible because the set of AOVs changed,
+  // returns false.
+  bool _UpdateFramebufferClearValues(
+      const HdRenderPassAovBindingVector &aovBindings);
 
-    // RixInterface for PRManBegin/End.
-    RixRiCtl *_ri;
+  // Top-level entrypoint to PRMan.
+  // Singleton used to access RixInterfaces.
+  RixContext *_rix;
 
-    // RixInterface for Riley.
-    RixRileyManager *_mgr;
+  // RixInterface for PRManBegin/End.
+  RixRiCtl *_ri;
 
-    // Xcpt Handler
-    HdPrman_Xcpt _xcpt;
+  // RixInterface for Riley.
+  RixRileyManager *_mgr;
 
-    // Roz stats session
-    stats::Session *_statsSession;
+  // Xcpt Handler
+  HdPrman_Xcpt _xcpt;
 
-    // Riley instance.
-    riley::Riley *_riley;
+  // Roz stats session
+  stats::Session *_statsSession;
 
-    riley::ShadingNode _ComputeIntegratorNode(
-        HdRenderDelegate * renderDelegate,
-        const HdPrmanCamera * cam);
+  // Riley instance.
+  riley::Riley *_riley;
 
-    riley::ShadingNode _ComputeQuickIntegratorNode(
-        HdRenderDelegate * renderDelegate,
-        const HdPrmanCamera * cam);
+  riley::ShadingNode _ComputeIntegratorNode(
+      HdRenderDelegate *renderDelegate,
+      const HdPrmanCamera *cam);
 
-    void _CreateQuickIntegrator(HdRenderDelegate * renderDelegate);
+  riley::ShadingNode _ComputeQuickIntegratorNode(
+      HdRenderDelegate *renderDelegate,
+      const HdPrmanCamera *cam);
 
-    void _RenderThreadCallback();
+  void _CreateQuickIntegrator(HdRenderDelegate *renderDelegate);
 
-    void _CreateRileyDisplay(
-        const RtUString& productName, const RtUString& productType,
-        HdPrman_RenderViewDesc& renderViewDesc,
-        const std::vector<size_t>& renderOutputIndices,
-        RtParamList& displayParams, bool isXpu);
+  void _RenderThreadCallback();
 
-    std::unique_ptr<class HdRenderThread> _renderThread;
-    std::unique_ptr<HdPrmanFramebuffer> _framebuffer;
+  void _CreateRileyDisplay(
+      const RtUString &productName, const RtUString &productType,
+      HdPrman_RenderViewDesc &renderViewDesc,
+      const std::vector<size_t> &renderOutputIndices,
+      RtParamList &displayParams, bool isXpu);
 
-    int _sceneLightCount;
+  std::unique_ptr<class HdRenderThread> _renderThread;
+  std::unique_ptr<HdPrmanFramebuffer> _framebuffer;
 
-    // Refcounts for each category mentioned by a light link.
-    // This is used to convey information from lights back to the
-    // geometry -- in Renderman, geometry must subscribe
-    // to the linked lights.
-    std::unordered_map<TfToken, size_t, TfToken::HashFunctor> _lightLinkRefs;
+  int _sceneLightCount;
 
-    // Mutex protecting lightLinkRefs.
-    std::mutex _lightLinkMutex;
+  // Refcounts for each category mentioned by a light link.
+  // This is used to convey information from lights back to the
+  // geometry -- in Renderman, geometry must subscribe
+  // to the linked lights.
+  std::unordered_map<TfToken, size_t, TfToken::HashFunctor> _lightLinkRefs;
 
-    std::unordered_map<TfToken, size_t, TfToken::HashFunctor> _lightFilterRefs;
+  // Mutex protecting lightLinkRefs.
+  std::mutex _lightLinkMutex;
 
-    // Mutex protecting lightFilterRefs.
-    std::mutex _lightFilterMutex;
+  std::unordered_map<TfToken, size_t, TfToken::HashFunctor> _lightFilterRefs;
 
-    // Map from Hydra coordinate system vector pointer to Riley equivalent.
-    using _HdToRileyCoordSysMap =
-        std::unordered_map<HdIdVectorSharedPtr, RileyCoordSysIdVecRefPtr>;
-    // Map from Hydra id to cached, converted coordinate systems.
-    using _GeomToHdCoordSysMap =
-        std::unordered_map<SdfPath, HdIdVectorSharedPtr, SdfPath::Hash>;
+  // Mutex protecting lightFilterRefs.
+  std::mutex _lightFilterMutex;
 
-    // A fallback material to use for any geometry that
-    // does not have a bound material.
-    riley::MaterialId _fallbackMaterialId;
+  // Map from Hydra coordinate system vector pointer to Riley equivalent.
+  using _HdToRileyCoordSysMap =
+      std::unordered_map<HdIdVectorSharedPtr, RileyCoordSysIdVecRefPtr>;
+  // Map from Hydra id to cached, converted coordinate systems.
+  using _GeomToHdCoordSysMap =
+      std::unordered_map<SdfPath, HdIdVectorSharedPtr, SdfPath::Hash>;
 
-    // Fallback material for volumes that don't have materials.
-    riley::MaterialId _fallbackVolumeMaterialId;
+  // A fallback material to use for any geometry that
+  // does not have a bound material.
+  riley::MaterialId _fallbackMaterialId;
 
-    riley::IntegratorId _quickIntegratorId;
-    RtParamList _quickIntegratorParams;
+  // Fallback material for volumes that don't have materials.
+  riley::MaterialId _fallbackVolumeMaterialId;
 
-    // The integrator to use.
-    // Updated from render pass state.
-    riley::IntegratorId _activeIntegratorId;
+  riley::IntegratorId _quickIntegratorId;
+  RtParamList _quickIntegratorParams;
 
-    // Coordinate system conversion cache.
-    _GeomToHdCoordSysMap _geomToHdCoordSysMap;
-    _HdToRileyCoordSysMap _hdToRileyCoordSysMap;
-    std::mutex _coordSysMutex;
+  // The integrator to use.
+  // Updated from render pass state.
+  riley::IntegratorId _activeIntegratorId;
 
-    RtParamList _options;
-    HdPrman_CameraContext _cameraContext;
-    HdPrman_RenderViewContext _renderViewContext;
+  // Coordinate system conversion cache.
+  _GeomToHdCoordSysMap _geomToHdCoordSysMap;
+  _HdToRileyCoordSysMap _hdToRileyCoordSysMap;
+  std::mutex _coordSysMutex;
 
-    // Integrator
-    SdfPath _renderSettingsIntegratorPath;
-    HdMaterialNode2 _renderSettingsIntegratorNode;
-    riley::IntegratorId _integratorId;
-    RtParamList _integratorParams; // XXX: this is mainly here for ParamsSetter
+  RtParamList _options;
+  HdPrman_CameraContext _cameraContext;
+  HdPrman_RenderViewContext _renderViewContext;
 
-    // SampleFilter
-    SdfPathVector _connectedSampleFilterPaths;
-    std::map<SdfPath, riley::ShadingNode> _sampleFilterNodes;
-    riley::SampleFilterId _sampleFiltersId;
+  // Integrator
+  SdfPath _renderSettingsIntegratorPath;
+  HdMaterialNode2 _renderSettingsIntegratorNode;
+  riley::IntegratorId _integratorId;
+  RtParamList _integratorParams; // XXX: this is mainly here for ParamsSetter
 
-    // DisplayFilter
-    SdfPathVector _connectedDisplayFilterPaths;
-    std::map<SdfPath, riley::ShadingNode> _displayFilterNodes;
-    riley::DisplayFilterId _displayFiltersId;
+  // SampleFilter
+  SdfPathVector _connectedSampleFilterPaths;
+  std::map<SdfPath, riley::ShadingNode> _sampleFilterNodes;
+  riley::SampleFilterId _sampleFiltersId;
 
-    // RIX or XPU
-    bool _xpu;
-    std::vector<int> _xpuGpuConfig;
+  // DisplayFilter
+  SdfPathVector _connectedDisplayFilterPaths;
+  std::map<SdfPath, riley::ShadingNode> _displayFilterNodes;
+  riley::DisplayFilterId _displayFiltersId;
 
-    int _lastLegacySettingsVersion;
+  // RIX or XPU
+  bool _xpu;
+  std::vector<int> _xpuGpuConfig;
 
-    std::vector<std::string> _outputNames;
+  int _lastLegacySettingsVersion;
 
-    HdPrmanRenderDelegate* _renderDelegate;
+  std::vector<std::string> _outputNames;
+
+  HdPrmanRenderDelegate *_renderDelegate;
 };
 
 // Convert Hydra points to Riley point primvar.
-void
-HdPrman_ConvertPointsPrimvar(HdSceneDelegate *sceneDelegate, SdfPath const &id,
-                             RtPrimVarList& primvars, size_t npoints);
+void HdPrman_ConvertPointsPrimvar(HdSceneDelegate *sceneDelegate, SdfPath const &id,
+                                  RtPrimVarList &primvars, size_t npoints);
 
 // Count hydra points to set element count on primvars and then
 // convert them to Riley point primvar.
 size_t
 HdPrman_ConvertPointsPrimvarForPoints(HdSceneDelegate *sceneDelegate, SdfPath const &id,
-                                      RtPrimVarList& primvars);
+                                      RtPrimVarList &primvars);
 
 // Convert any Hydra primvars that should be Riley primvars.
-void
-HdPrman_ConvertPrimvars(HdSceneDelegate *sceneDelegate, SdfPath const& id,
-                        RtPrimVarList& primvars, int numUniform, int numVertex,
-                        int numVarying, int numFaceVarying);
+void HdPrman_ConvertPrimvars(HdSceneDelegate *sceneDelegate, SdfPath const &id,
+                             RtPrimVarList &primvars, int numUniform, int numVertex,
+                             int numVarying, int numFaceVarying);
 
 // Check for any primvar opinions on the material that should be Riley primvars.
-void
-HdPrman_TransferMaterialPrimvarOpinions(HdSceneDelegate *sceneDelegate,
-                                        SdfPath const& hdMaterialId,
-                                        RtPrimVarList& primvars);
+void HdPrman_TransferMaterialPrimvarOpinions(HdSceneDelegate *sceneDelegate,
+                                             SdfPath const &hdMaterialId,
+                                             RtPrimVarList &primvars);
 
 // Resolve Hd material ID to the corresponding Riley material & displacement
-bool
-HdPrman_ResolveMaterial(HdSceneDelegate *sceneDelegate,
-                        SdfPath const& hdMaterialId,
-                        riley::Riley *riley,
-                        riley::MaterialId *materialId,
-                        riley::DisplacementId *dispId);
+bool HdPrman_ResolveMaterial(HdSceneDelegate *sceneDelegate,
+                             SdfPath const &hdMaterialId,
+                             riley::Riley *riley,
+                             riley::MaterialId *materialId,
+                             riley::DisplacementId *dispId);
 
 /// Update the supplied list of options using searchpaths
 /// pulled from envrionment variables:
@@ -499,8 +505,7 @@ HdPrman_ResolveMaterial(HdSceneDelegate *sceneDelegate,
 /// - RMAN_PROCEDURALPATH
 ///
 HDPRMAN_API
-void 
-HdPrman_UpdateSearchPathsFromEnvironment(RtParamList& options);
+void HdPrman_UpdateSearchPathsFromEnvironment(RtParamList &options);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

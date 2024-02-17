@@ -29,9 +29,9 @@
 // is built, are defined in the build script and passed to the compiler as -D
 // commandline params. Some of the header files in rman/libpxrcore expose these
 // dependencies and so we recreate these nonstandard defines here using the more
-// standard architecture defines from pxr/base/arch/defines.h to guide us.
+// standard architecture defines from Arch/defines.h to guide us.
 
-#include "pxr/base/arch/defines.h"
+#include "Arch/defines.h"
 
 // Platform | Standard Define   | pxr/base Define | Prman Define
 //==========+===================+=================+==============
@@ -44,17 +44,17 @@
 //----------+-------------------+-----------------+--------------
 
 #if defined(ARCH_OS_LINUX)
-    #if !defined(LINUX)
-        #define LINUX
-    #endif
+#if !defined(LINUX)
+#define LINUX
+#endif
 #elif defined(ARCH_OS_OSX)
-    #if !defined(OSX)
-        #define OSX
-    #endif
+#if !defined(OSX)
+#define OSX
+#endif
 #elif defined(ARCH_OS_WINDOWS)
-    #if !defined(WIN32)
-        #define WIN32
-    #endif
+#if !defined(WIN32)
+#define WIN32
+#endif
 #endif
 
 #endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_ARCH_DEFS_H

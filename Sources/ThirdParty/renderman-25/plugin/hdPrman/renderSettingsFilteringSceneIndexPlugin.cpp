@@ -23,51 +23,48 @@
 //
 #include "hdPrman/renderSettingsFilteringSceneIndexPlugin.h"
 
-#include "pxr/imaging/hd/retainedDataSource.h"
-#include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
+#include "Hd/retainedDataSource.h"
+#include "Hd/sceneIndexPluginRegistry.h"
 #include "pxr/imaging/hdsi/renderSettingsFilteringSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    ((sceneIndexPluginName, "HdPrman_RenderSettingsFilteringSceneIndexPlugin"))
-);
+    ((sceneIndexPluginName, "HdPrman_RenderSettingsFilteringSceneIndexPlugin")));
 
 TF_DEFINE_PRIVATE_TOKENS(
     _namespaceTokens,
-    (ri)
-    ((outputsRi, "outputs:ri"))
-);
+    (ri)((outputsRi, "outputs:ri")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plugin registrations
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char * const _rendererDisplayName = "Prman";
+static const char *const _rendererDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdSceneIndexPluginRegistry::Define<
-        HdPrman_RenderSettingsFilteringSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<
+      HdPrman_RenderSettingsFilteringSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
+  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
 
-    const HdContainerDataSourceHandle inputArgs =
-        HdRetainedContainerDataSource::New(
-            HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes,
-            HdRetainedTypedSampledDataSource<VtArray<TfToken>>::New(
-                {_namespaceTokens->ri, _namespaceTokens->outputsRi}));
+  const HdContainerDataSourceHandle inputArgs =
+      HdRetainedContainerDataSource::New(
+          HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes,
+          HdRetainedTypedSampledDataSource<VtArray<TfToken>>::New(
+              {_namespaceTokens->ri, _namespaceTokens->outputsRi}));
 
-    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-        _rendererDisplayName,
-        _tokens->sceneIndexPluginName,
-        inputArgs,
-        insertionPhase,
-        HdSceneIndexPluginRegistry::InsertionOrderAtStart);
+  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+      _rendererDisplayName,
+      _tokens->sceneIndexPluginName,
+      inputArgs,
+      insertionPhase,
+      HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,14 +72,14 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 ////////////////////////////////////////////////////////////////////////////////
 
 HdPrman_RenderSettingsFilteringSceneIndexPlugin::
-HdPrman_RenderSettingsFilteringSceneIndexPlugin() = default;
+    HdPrman_RenderSettingsFilteringSceneIndexPlugin() = default;
 
 HdSceneIndexBaseRefPtr
 HdPrman_RenderSettingsFilteringSceneIndexPlugin::_AppendSceneIndex(
     const HdSceneIndexBaseRefPtr &inputScene,
     const HdContainerDataSourceHandle &inputArgs)
 {
-    return HdsiRenderSettingsFilteringSceneIndex::New(inputScene, inputArgs);
+  return HdsiRenderSettingsFilteringSceneIndex::New(inputScene, inputArgs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HDPRMAN_OUTPUT_FILTER_INVALIDATING_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HDPRMAN_OUTPUT_FILTER_INVALIDATING_SCENE_INDEX_PLUGIN_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/sceneIndexPlugin.h"
+#include <pxr/pxrns.h>
+#include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -33,19 +33,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \class HdPrman_OutputFilterInvalidatingSceneIndexPlugin
 ///
 /// Plugin adds a filtering scene index to the Prman render delegate to
-/// dirty the Sample and Display Filters connected to the Render Settings Prim 
+/// dirty the Sample and Display Filters connected to the Render Settings Prim
 /// when changed.
 ///
 class HdPrman_OutputFilterInvalidatingSceneIndexPlugin
     : public HdSceneIndexPlugin
 {
 public:
-    HdPrman_OutputFilterInvalidatingSceneIndexPlugin();    
+  HdPrman_OutputFilterInvalidatingSceneIndexPlugin();
 
 protected:
-    HdSceneIndexBaseRefPtr _AppendSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputScene,
-        const HdContainerDataSourceHandle &inputArgs) override;
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(
+      const HdSceneIndexBaseRefPtr &inputScene,
+      const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

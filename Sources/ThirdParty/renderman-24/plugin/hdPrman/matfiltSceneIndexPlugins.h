@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MAT_FILT_SCENE_INDEX_PLUGINS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MAT_FILT_SCENE_INDEX_PLUGINS_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/sceneIndexPlugin.h"
+#include <pxr/pxrns.h>
+#include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -38,16 +38,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// This plugin is registered with the scene index plugin registry for Prman.
 ///
-class HdPrman_PreviewMaterialFilteringSceneIndexPlugin :
-    public HdSceneIndexPlugin
+class HdPrman_PreviewMaterialFilteringSceneIndexPlugin : public HdSceneIndexPlugin
 {
 public:
-    HdPrman_PreviewMaterialFilteringSceneIndexPlugin();
+  HdPrman_PreviewMaterialFilteringSceneIndexPlugin();
 
 protected:
-    HdSceneIndexBaseRefPtr _AppendSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputScene,
-        const HdContainerDataSourceHandle &inputArgs) override;
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(
+      const HdSceneIndexBaseRefPtr &inputScene,
+      const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 /// ----------------------------------------------------------------------------
@@ -64,12 +63,12 @@ protected:
 class HdPrman_MaterialXFilteringSceneIndexPlugin : public HdSceneIndexPlugin
 {
 public:
-    HdPrman_MaterialXFilteringSceneIndexPlugin();
+  HdPrman_MaterialXFilteringSceneIndexPlugin();
 
 protected:
-    HdSceneIndexBaseRefPtr _AppendSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputScene,
-        const HdContainerDataSourceHandle &inputArgs) override;
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(
+      const HdSceneIndexBaseRefPtr &inputScene,
+      const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 /// ----------------------------------------------------------------------------
@@ -83,14 +82,14 @@ protected:
 class HdPrman_VirtualStructResolvingSceneIndexPlugin : public HdSceneIndexPlugin
 {
 public:
-    HdPrman_VirtualStructResolvingSceneIndexPlugin();
+  HdPrman_VirtualStructResolvingSceneIndexPlugin();
 
 protected:
-    HdSceneIndexBaseRefPtr _AppendSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputScene,
-        const HdContainerDataSourceHandle &inputArgs) override;
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(
+      const HdSceneIndexBaseRefPtr &inputScene,
+      const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MAT_FILT_SCENE_INDEX_PLUGINS_H
+#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MAT_FILT_SCENE_INDEX_PLUGINS_H

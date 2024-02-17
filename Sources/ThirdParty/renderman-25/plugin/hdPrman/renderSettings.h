@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/renderSettings.h"
+#include <pxr/pxrns.h>
+#include "Hd/renderSettings.h"
 
 #include "RiTypesHelper.h" // for RtParamList
 
@@ -34,24 +34,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdPrman_RenderSettings final : public HdRenderSettings
 {
 public:
-    HdPrman_RenderSettings(SdfPath const& id);
+  HdPrman_RenderSettings(SdfPath const &id);
 
-    ~HdPrman_RenderSettings() override;
+  ~HdPrman_RenderSettings() override;
 
-    const RtParamList& GetOptions() const {
-        return _settingsOptions;
-    }
+  const RtParamList &GetOptions() const
+  {
+    return _settingsOptions;
+  }
 
-    void Finalize(HdRenderParam *renderParam) override;
+  void Finalize(HdRenderParam *renderParam) override;
 
-    void _Sync(HdSceneDelegate *sceneDelegate,
-               HdRenderParam *renderParam,
-               const HdDirtyBits *dirtyBits) override;
+  void _Sync(HdSceneDelegate *sceneDelegate,
+             HdRenderParam *renderParam,
+             const HdDirtyBits *dirtyBits) override;
 
 private:
-    RtParamList _settingsOptions;
+  RtParamList _settingsOptions;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

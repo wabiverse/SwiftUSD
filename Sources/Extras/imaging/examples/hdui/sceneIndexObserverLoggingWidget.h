@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H
 #define PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 
 #include <QPushButton>
 #include <QLabel>
@@ -35,22 +35,23 @@ class HduiSceneIndexObserverLoggingTreeView;
 
 class HduiSceneIndexObserverLoggingWidget : public QWidget
 {
-    Q_OBJECT;
+  Q_OBJECT;
+
 public:
-    HduiSceneIndexObserverLoggingWidget(QWidget *parent = Q_NULLPTR);
+  HduiSceneIndexObserverLoggingWidget(QWidget *parent = Q_NULLPTR);
 
-    HduiSceneIndexObserverLoggingTreeView * GetTreeView();
+  HduiSceneIndexObserverLoggingTreeView *GetTreeView();
 
-    void SetLabel(const std::string &labelText);
+  void SetLabel(const std::string &labelText);
 
 private:
-    QPushButton *_startStopButton;
-    QPushButton *_clearButton;
-    HduiSceneIndexObserverLoggingTreeView *_treeView;
+  QPushButton *_startStopButton;
+  QPushButton *_clearButton;
+  HduiSceneIndexObserverLoggingTreeView *_treeView;
 
-    QLabel *_label;
+  QLabel *_label;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H
+#endif // PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H

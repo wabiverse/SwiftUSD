@@ -24,15 +24,14 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H
 
-#include "pxr/pxr.h"
-#include "pxr/base/gf/vec2f.h"
-#include "pxr/base/gf/vec3f.h"
+#include <pxr/pxrns.h>
+#include "Gf/vec2f.h"
+#include "Gf/vec3f.h"
 
 #include <string>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdObjStream
 ///
@@ -54,239 +53,245 @@ PXR_NAMESPACE_OPEN_SCOPE
 class UsdObjStream
 {
 public:
-    /// A "Point" identifies a vertex, a uv, and a normal by indexes into
-    /// arrays.  NOTE!  These indexes are 0-based, unlike in the OBJ file format
-    /// where indexes are 1-based.  A point can have -1 for its normal and uv.
-    /// This indicates that the point has no normal or uv.
-    struct Point {
-        int vertIndex;
-        int uvIndex;
-        int normalIndex;
+  /// A "Point" identifies a vertex, a uv, and a normal by indexes into
+  /// arrays.  NOTE!  These indexes are 0-based, unlike in the OBJ file format
+  /// where indexes are 1-based.  A point can have -1 for its normal and uv.
+  /// This indicates that the point has no normal or uv.
+  struct Point
+  {
+    int vertIndex;
+    int uvIndex;
+    int normalIndex;
 
-        /// Default constructor leaves all indexes invalid.
-        Point() : vertIndex(-1), uvIndex(-1), normalIndex(-1) {}
+    /// Default constructor leaves all indexes invalid.
+    Point() : vertIndex(-1), uvIndex(-1), normalIndex(-1) {}
 
-        /// Construct with indexes \a v, \a uv, and \a n.
-        Point(int v, int uv, int n)
-            : vertIndex(v), uvIndex(uv), normalIndex(n) {}
+    /// Construct with indexes \a v, \a uv, and \a n.
+    Point(int v, int uv, int n)
+        : vertIndex(v), uvIndex(uv), normalIndex(n) {}
+  };
+
+  /// A face is a pair of indices denoting a range in a vector of Points.  The
+  /// first element indexes the first Point in the face, the second element is
+  /// one past the last Point in the face.
+  struct Face
+  {
+    int pointsBegin;
+    int pointsEnd;
+
+    /// Default constructor leaves range == [0, 0).
+    Face();
+
+    /// Construct with range specified by [\a begin, \a end).
+    Face(int begin, int end) : pointsBegin(begin), pointsEnd(end) {}
+
+    /// Return the number of points in this face.
+    inline int size() const { return pointsEnd - pointsBegin; }
+
+    /// Return true if \a lhs has the same range as \a rhs.
+    friend bool operator==(Face const &lhs, Face const &rhs);
+
+    /// Return true if \a lhs has a different range from \a rhs.
+    friend bool operator!=(Face const &lhs, Face const &rhs);
+  };
+
+  /// A group is a sequence of faces wtih a name.
+  struct Group
+  {
+    std::string name;
+    std::vector<Face> faces;
+  };
+
+  /// A sequence element, indicating a series of one or more data elements in
+  /// order.
+  struct SequenceElem
+  {
+    /// Data element type.
+    enum ElemType
+    {
+      Verts,
+      UVs,
+      Normals,
+      Groups,
+      Comments,
+      ArbitraryText,
     };
 
-    /// A face is a pair of indices denoting a range in a vector of Points.  The
-    /// first element indexes the first Point in the face, the second element is
-    /// one past the last Point in the face.
-    struct Face {
-        int pointsBegin;
-        int pointsEnd;
+    // This element's type.
+    ElemType type;
 
-        /// Default constructor leaves range == [0, 0).
-        Face();
+    /// Number of \a type elements in order.  For example, 100 verts would
+    /// be type: ElemVerts, repeat: 100.
+    int repeat;
 
-        /// Construct with range specified by [\a begin, \a end).
-        Face(int begin, int end) : pointsBegin(begin), pointsEnd(end) {}
+    /// Default constructor leaves members uninitialized.
+    SequenceElem() {}
 
-        /// Return the number of points in this face.
-        inline int size() const { return pointsEnd - pointsBegin; }
+    /// Construct with \a ElemType \p t, and an optional repeat count \a r.
+    explicit SequenceElem(ElemType t, int r = 1) : type(t), repeat(r) {}
+  };
 
-        /// Return true if \a lhs has the same range as \a rhs.
-        friend bool operator==(Face const &lhs, Face const &rhs);
+  /// Construct with an optional epsilon value.
+  explicit UsdObjStream();
 
-        /// Return true if \a lhs has a different range from \a rhs.
-        friend bool operator!=(Face const &lhs, Face const &rhs);
-    };
+  /// Clear the contents of this data object.  Leaves no verts, uvs, points,
+  /// or groups.
+  void clear();
 
-    /// A group is a sequence of faces wtih a name.
-    struct Group {
-        std::string name;
-        std::vector<Face> faces;
-    };
+  /// Swap the contents of this data object with \a other.
+  void swap(UsdObjStream &other);
 
-    /// A sequence element, indicating a series of one or more data elements in
-    /// order.
-    struct SequenceElem {
-        /// Data element type.
-        enum ElemType {
-            Verts,
-            UVs,
-            Normals,
-            Groups,
-            Comments,
-            ArbitraryText,
-        };
+  /// Add the contents of \a data into this data object.  Group names are
+  /// uniqued if necessary, by adding numerical suffixes, e.g. groupName ->
+  /// groupName_1.
+  void AddData(UsdObjStream const &other);
 
-        // This element's type.
-        ElemType type;
+  ////////////////////////////////////////////////////////////////////////
+  // Verts
 
-        /// Number of \a type elements in order.  For example, 100 verts would
-        /// be type: ElemVerts, repeat: 100.
-        int repeat;
+  /// Unconditionally add \a vert and return the new index.
+  int AddVert(GfVec3f const &vert);
 
-        /// Default constructor leaves members uninitialized.
-        SequenceElem() {}
+  /// Add a range of vertices.
+  template <class Iter>
+  void AddVerts(Iter begin, Iter end)
+  {
+    size_t oldSize = _verts.size();
+    _verts.insert(_verts.end(), begin, end);
+    _AddVertsInternal(_verts.begin() + oldSize);
+  }
 
-        /// Construct with \a ElemType \p t, and an optional repeat count \a r.
-        explicit SequenceElem(ElemType t, int r = 1) : type(t), repeat(r) {}
-    };
+  /// Return a const reference to the verts in this data object.
+  std::vector<GfVec3f> const &GetVerts() const;
 
-    /// Construct with an optional epsilon value.
-    explicit UsdObjStream();
+  ////////////////////////////////////////////////////////////////////////
+  // UVs
 
-    /// Clear the contents of this data object.  Leaves no verts, uvs, points,
-    /// or groups.
-    void clear();
+  /// Unconditionally add \a UV and return the new index.
+  int AddUV(GfVec2f const &uv);
 
-    /// Swap the contents of this data object with \a other.
-    void swap(UsdObjStream &other);
+  /// Add a range of UVs.
+  template <class Iter>
+  void AddUVs(Iter begin, Iter end)
+  {
+    size_t oldSize = _uvs.size();
+    _uvs.insert(_uvs.end(), begin, end);
+    _AddUVsInternal(_uvs.begin() + oldSize);
+  }
 
-    /// Add the contents of \a data into this data object.  Group names are
-    /// uniqued if necessary, by adding numerical suffixes, e.g. groupName ->
-    /// groupName_1.
-    void AddData(UsdObjStream const &other);
+  /// Return a const reference to the UVs in this data object.
+  std::vector<GfVec2f> const &GetUVs() const;
 
-    ////////////////////////////////////////////////////////////////////////
-    // Verts
+  ////////////////////////////////////////////////////////////////////////
+  // Normals
 
-    /// Unconditionally add \a vert and return the new index.
-    int AddVert(GfVec3f const &vert);
+  /// Unconditionally add \a normal and return the new index.
+  int AddNormal(GfVec3f const &normal);
 
-    /// Add a range of vertices.
-    template <class Iter>
-    void AddVerts(Iter begin, Iter end) {
-        size_t oldSize = _verts.size();
-        _verts.insert(_verts.end(), begin, end);
-        _AddVertsInternal(_verts.begin() + oldSize);
-    }
+  /// Add a range of normals.
+  template <class Iter>
+  void AddNormals(Iter begin, Iter end)
+  {
+    size_t oldSize = _normals.size();
+    _normals.insert(_normals.end(), begin, end);
+    _AddNormalsInternal(_normals.begin() + oldSize);
+  }
 
-    /// Return a const reference to the verts in this data object.
-    std::vector<GfVec3f> const &GetVerts() const;
+  /// Return a const reference to the normals in this data object.
+  std::vector<GfVec3f> const &GetNormals() const;
 
-    ////////////////////////////////////////////////////////////////////////
-    // UVs
+  ////////////////////////////////////////////////////////////////////////
+  // Points
 
-    /// Unconditionally add \a UV and return the new index.
-    int AddUV(GfVec2f const &uv);
+  /// Add a single point.
+  void AddPoint(Point const &point);
 
-    /// Add a range of UVs.
-    template <class Iter>
-    void AddUVs(Iter begin, Iter end) {
-        size_t oldSize = _uvs.size();
-        _uvs.insert(_uvs.end(), begin, end);
-        _AddUVsInternal(_uvs.begin() + oldSize);
-    }
+  /// Add a range of points.
+  template <class Iter>
+  void AddPoints(Iter begin, Iter end)
+  {
+    _points.insert(_points.end(), begin, end);
+  }
 
-    /// Return a const reference to the UVs in this data object.
-    std::vector<GfVec2f> const &GetUVs() const;
+  /// Return a const reference to the points in this data object.
+  std::vector<Point> const &GetPoints() const;
 
-    ////////////////////////////////////////////////////////////////////////
-    // Normals
+  ////////////////////////////////////////////////////////////////////////
+  // Groups
 
-    /// Unconditionally add \a normal and return the new index.
-    int AddNormal(GfVec3f const &normal);
+  /// Append \a group with \a name.  Return true if the group was successfully
+  /// appended.  Do nothing and return false if there already exists a group
+  /// with \a name in this data object.
+  bool AddGroup(std::string const &name);
 
-    /// Add a range of normals.
-    template <class Iter>
-    void AddNormals(Iter begin, Iter end) {
-        size_t oldSize = _normals.size();
-        _normals.insert(_normals.end(), begin, end);
-        _AddNormalsInternal(_normals.begin() + oldSize);
-    }
+  /// Add \a face to the most recently appended group.  If no group has been
+  /// appended, append one with an empty name.
+  void AddFace(Face const &face);
 
-    /// Return a const reference to the normals in this data object.
-    std::vector<GfVec3f> const &GetNormals() const;
+  /// Find a group by name and return a pointer to it.  Return null if no such
+  /// group exists.
+  Group const *FindGroup(std::string const &name) const;
 
-    ////////////////////////////////////////////////////////////////////////
-    // Points
+  /// Return all the groups in this data object in order.
+  std::vector<Group> const &GetGroups() const;
 
-    /// Add a single point.
-    void AddPoint(Point const &point);
+  ////////////////////////////////////////////////////////////////////////
+  // Comments
 
-    /// Add a range of points.
-    template <class Iter>
-    void AddPoints(Iter begin, Iter end) {
-        _points.insert(_points.end(), begin, end);
-    }
+  /// Append a comment with \a text.  Prepend '#' to each line of \a text
+  /// whose first non-whitespace character is not '#'.
+  void AppendComments(std::string const &text);
 
-    /// Return a const reference to the points in this data object.
-    std::vector<Point> const &GetPoints() const;
+  /// Prepend a comment with \a text.  Prepend '#' to each line of \a text
+  /// whose first non-whitespace character is not '#'.
+  void PrependComments(std::string const &text);
 
-    ////////////////////////////////////////////////////////////////////////
-    // Groups
+  /// Return the comments in this data object in order.
+  std::vector<std::string> const &GetComments() const;
 
-    /// Append \a group with \a name.  Return true if the group was successfully
-    /// appended.  Do nothing and return false if there already exists a group
-    /// with \a name in this data object.
-    bool AddGroup(std::string const &name);
+  ////////////////////////////////////////////////////////////////////////
+  // Arbitrary Text
 
-    /// Add \a face to the most recently appended group.  If no group has been
-    /// appended, append one with an empty name.
-    void AddFace(Face const &face);
+  /// Append arbitrary text.  Append any lines of \a text that are comments
+  /// (first non-whitespace character is '#') as comments instead.
+  void AppendArbitraryText(std::string const &text);
 
-    /// Find a group by name and return a pointer to it.  Return null if no such
-    /// group exists.
-    Group const *FindGroup(std::string const &name) const;
+  /// Prepend arbitrary text.  Append any lines of \a text that are comments
+  /// (first non-whitespace character is '#') as comments instead.
+  void PrependArbitraryText(std::string const &text);
 
-    /// Return all the groups in this data object in order.
-    std::vector<Group> const &GetGroups() const;
+  /// Return all the arbitrary text in this data object in order.
+  std::vector<std::string> const &GetArbitraryText() const;
 
-    ////////////////////////////////////////////////////////////////////////
-    // Comments
-
-    /// Append a comment with \a text.  Prepend '#' to each line of \a text
-    /// whose first non-whitespace character is not '#'.
-    void AppendComments(std::string const &text);
-
-    /// Prepend a comment with \a text.  Prepend '#' to each line of \a text
-    /// whose first non-whitespace character is not '#'.
-    void PrependComments(std::string const &text);
-
-    /// Return the comments in this data object in order.
-    std::vector<std::string> const &GetComments() const;
-
-    ////////////////////////////////////////////////////////////////////////
-    // Arbitrary Text
-
-    /// Append arbitrary text.  Append any lines of \a text that are comments
-    /// (first non-whitespace character is '#') as comments instead.
-    void AppendArbitraryText(std::string const &text);
-
-    /// Prepend arbitrary text.  Append any lines of \a text that are comments
-    /// (first non-whitespace character is '#') as comments instead.
-    void PrependArbitraryText(std::string const &text);
-
-    /// Return all the arbitrary text in this data object in order.
-    std::vector<std::string> const &GetArbitraryText() const;
-
-    ////////////////////////////////////////////////////////////////////////
-    // Sequence elements.
-    std::vector<SequenceElem> const &GetSequence() const;
+  ////////////////////////////////////////////////////////////////////////
+  // Sequence elements.
+  std::vector<SequenceElem> const &GetSequence() const;
 
 private:
+  // Helper functions that add ranges of newly inserted elements.
+  void _AddVertsInternal(std::vector<GfVec3f>::iterator begin);
+  void _AddUVsInternal(std::vector<GfVec2f>::iterator begin);
+  void _AddNormalsInternal(std::vector<GfVec3f>::iterator begin);
 
-    // Helper functions that add ranges of newly inserted elements.
-    void _AddVertsInternal(std::vector<GfVec3f>::iterator begin);
-    void _AddUVsInternal(std::vector<GfVec2f>::iterator begin);
-    void _AddNormalsInternal(std::vector<GfVec3f>::iterator begin);
+  // Helper functions to add sequence elements.
+  void _AddSequence(SequenceElem::ElemType type, int repeat = 1);
+  void _PrependSequence(SequenceElem::ElemType type, int repeat = 1);
 
-    // Helper functions to add sequence elements.
-    void _AddSequence(SequenceElem::ElemType type, int repeat = 1);
-    void _PrependSequence(SequenceElem::ElemType type, int repeat = 1);
+  // Helper function to produce a unique group name.
+  std::string _GetUniqueGroupName(std::string const &name) const;
 
-    // Helper function to produce a unique group name.
-    std::string _GetUniqueGroupName(std::string const &name) const;
+  // Data members storing geometry.
+  std::vector<GfVec3f> _verts;
+  std::vector<GfVec2f> _uvs;
+  std::vector<GfVec3f> _normals;
+  std::vector<Point> _points;
+  std::vector<std::string> _comments;
+  std::vector<std::string> _arbitraryText;
+  std::vector<Group> _groups;
 
-    // Data members storing geometry.
-    std::vector<GfVec3f> _verts;
-    std::vector<GfVec2f> _uvs;
-    std::vector<GfVec3f> _normals;
-    std::vector<Point> _points;
-    std::vector<std::string> _comments;
-    std::vector<std::string> _arbitraryText;
-    std::vector<Group> _groups;
-
-    // Order of objects specified.
-    std::vector<SequenceElem> _sequence;
+  // Order of objects specified.
+  std::vector<SequenceElem> _sequence;
 };
-
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

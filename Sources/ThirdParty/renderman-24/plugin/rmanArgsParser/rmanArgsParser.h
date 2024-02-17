@@ -27,9 +27,9 @@
 
 /// \file rmanArgsParser/rmanArgsParser.h
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "rmanArgsParser/api.h"
-#include "pxr/usd/ndr/parserPlugin.h"
+#include "Ndr/parserPlugin.h"
 
 #include <map>
 
@@ -93,7 +93,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// * <usdSchemaDef>
 ///   * <metadataKey> (this specified a metadata key with an appropriate
 ///                    value, example "schemaName", schemaKind", etc. Refer
-///                    UsdUtilsUpdateSchemaFromSdr for all valid metadata keys 
+///                    UsdUtilsUpdateSchemaFromSdr for all valid metadata keys
 ///                    for usdSchemaDef)
 ///     * _value_
 ///   * <apiSchemaAutoApplyTo>
@@ -118,21 +118,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 class RmanArgsParserPlugin : public NdrParserPlugin
 {
 public:
-    RMAN_ARGS_PARSER_API
-    RmanArgsParserPlugin();
-    RMAN_ARGS_PARSER_API
-    ~RmanArgsParserPlugin();
+  RMAN_ARGS_PARSER_API
+  RmanArgsParserPlugin();
+  RMAN_ARGS_PARSER_API
+  ~RmanArgsParserPlugin();
 
-    RMAN_ARGS_PARSER_API
-    NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult& discoveryRes) override;
+  RMAN_ARGS_PARSER_API
+  NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult &discoveryRes) override;
 
-    RMAN_ARGS_PARSER_API
-    const NdrTokenVec& GetDiscoveryTypes() const override;
+  RMAN_ARGS_PARSER_API
+  const NdrTokenVec &GetDiscoveryTypes() const override;
 
-    RMAN_ARGS_PARSER_API
-    const TfToken& GetSourceType() const override;
+  RMAN_ARGS_PARSER_API
+  const TfToken &GetSourceType() const override;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

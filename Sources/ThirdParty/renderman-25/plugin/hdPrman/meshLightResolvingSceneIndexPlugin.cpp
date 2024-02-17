@@ -23,47 +23,46 @@
 
 #include "hdPrman/meshLightResolvingSceneIndexPlugin.h"
 
-#include "pxr/imaging/hd/retainedDataSource.h"
-#include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
-#include "pxr/imaging/hd/tokens.h"
+#include "Hd/retainedDataSource.h"
+#include "Hd/sceneIndexPluginRegistry.h"
+#include "Hd/tokens.h"
 #include "hdPrman/meshLightResolvingSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    ((sceneIndexPluginName, "HdPrman_MeshLightResolvingSceneIndexPlugin"))
-);
+    ((sceneIndexPluginName, "HdPrman_MeshLightResolvingSceneIndexPlugin")));
 
-static const char * const _pluginDisplayName = "Prman";
+static const char *const _pluginDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdSceneIndexPluginRegistry::Define<HdPrman_MeshLightResolvingSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_MeshLightResolvingSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    // We need an "insertion point" that's *after* general material resolve.
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 115;
+  // We need an "insertion point" that's *after* general material resolve.
+  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 115;
 
-    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-        _pluginDisplayName,
-        _tokens->sceneIndexPluginName,
-        nullptr, // No input args.
-        insertionPhase,
-        HdSceneIndexPluginRegistry::InsertionOrderAtStart);
+  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+      _pluginDisplayName,
+      _tokens->sceneIndexPluginName,
+      nullptr, // No input args.
+      insertionPhase,
+      HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
 HdPrman_MeshLightResolvingSceneIndexPlugin::
-HdPrman_MeshLightResolvingSceneIndexPlugin() = default;
+    HdPrman_MeshLightResolvingSceneIndexPlugin() = default;
 
 HdSceneIndexBaseRefPtr
 HdPrman_MeshLightResolvingSceneIndexPlugin::_AppendSceneIndex(
     const HdSceneIndexBaseRefPtr &inputScene,
     const HdContainerDataSourceHandle &inputArgs)
 {
-    return HdPrmanMeshLightResolvingSceneIndex::New(inputScene);
+  return HdPrmanMeshLightResolvingSceneIndex::New(inputScene);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

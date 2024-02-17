@@ -41,7 +41,7 @@
 
 /* ------ swift usd. ------ */
 
-#define SWIFTUSD_EVOLUTION 24
+#define SWIFTUSD_EVOLUTION 25
 #define PXR_INTERNAL_NS Pixar
 
 /* ------------------------ */

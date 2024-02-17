@@ -31,8 +31,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_ENV_SETTING(
-    USD_SHADING_MODEL, "usdRi",
-    "Set to usdRi when models can interchange UsdShade prims.");
+    USD_SHADING_MODEL, "UsdRi",
+    "Set to UsdRi when models can interchange UsdShade prims.");
 
 TF_REGISTRY_FUNCTION(TfEnum) {
   TF_ADD_ENUM_NAME(UsdListPositionFrontOfPrependList,

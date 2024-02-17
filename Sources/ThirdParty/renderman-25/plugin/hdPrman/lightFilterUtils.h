@@ -24,7 +24,7 @@
 #ifndef EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERSIONS_H
 #define EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERSIONS_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "Riley.h"
 #include <vector>
 

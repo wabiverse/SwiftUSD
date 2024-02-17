@@ -24,10 +24,10 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_RESOLVE_VSTRUCTS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_RESOLVE_VSTRUCTS_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/material.h"
-#include "pxr/imaging/hd/materialNetworkInterface.h"
-#include "pxr/usd/ndr/declare.h"
+#include <pxr/pxrns.h>
+#include "Hd/material.h"
+#include "Hd/materialNetworkInterface.h"
+#include "Ndr/declare.h"
 
 #include <memory>
 
@@ -36,8 +36,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Expands "virtual struct" connections for RenderMan.
 /// If requested, conditional actions are evaluated.
 void MatfiltResolveVstructs(
-        HdMaterialNetworkInterface *networkInterface,
-        bool enableConditions = true);
+    HdMaterialNetworkInterface *networkInterface,
+    bool enableConditions = true);
 
 class MatfiltVstructConditionalEvaluatorImpl;
 
@@ -49,30 +49,31 @@ class MatfiltVstructConditionalEvaluatorImpl;
 class MatfiltVstructConditionalEvaluator
 {
 public:
-    typedef std::shared_ptr<MatfiltVstructConditionalEvaluator> Ptr;
+  typedef std::shared_ptr<MatfiltVstructConditionalEvaluator> Ptr;
 
-    ~MatfiltVstructConditionalEvaluator();
+  ~MatfiltVstructConditionalEvaluator();
 
-    static Ptr Parse(const std::string &inputExpr);
+  static Ptr Parse(const std::string &inputExpr);
 
-    /// Runs the conditional actions specified by the parsed inputExpr.
-    /// 
-    /// Because this evaluates the conditional actions (connect, ignore,
-    /// set constant, copy upstream parameter value), this is sent the context
-    /// of the current connected nodes as well as the mutable network to
-    /// directly change.
-    /// 
-    void Evaluate(
-            const TfToken &nodeId,
-            const TfToken &nodeInputId,
-            const TfToken &upstreamNodeId,
-            const TfToken &upstreamNodeOutput,
-            const NdrTokenVec &shaderTypePriority,
-            HdMaterialNetworkInterface *networkInterface) const;
+  /// Runs the conditional actions specified by the parsed inputExpr.
+  ///
+  /// Because this evaluates the conditional actions (connect, ignore,
+  /// set constant, copy upstream parameter value), this is sent the context
+  /// of the current connected nodes as well as the mutable network to
+  /// directly change.
+  ///
+  void Evaluate(
+      const TfToken &nodeId,
+      const TfToken &nodeInputId,
+      const TfToken &upstreamNodeId,
+      const TfToken &upstreamNodeOutput,
+      const NdrTokenVec &shaderTypePriority,
+      HdMaterialNetworkInterface *networkInterface) const;
+
 private:
-    MatfiltVstructConditionalEvaluator() = default;
+  MatfiltVstructConditionalEvaluator() = default;
 
-    MatfiltVstructConditionalEvaluatorImpl *_impl = nullptr;
+  MatfiltVstructConditionalEvaluatorImpl *_impl = nullptr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

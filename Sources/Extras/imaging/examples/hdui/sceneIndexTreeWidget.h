@@ -24,8 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_SCENE_INDEX_TREE_WIDGET_H
 #define PXR_IMAGING_HDUI_SCENE_INDEX_TREE_WIDGET_H
 
-
-#include "pxr/imaging/hd/sceneIndex.h"
+#include "Hd/sceneIndex.h"
 
 #include <QTreeWidget>
 #include <unordered_map>
@@ -38,64 +37,59 @@ class Hdui_SceneIndexPrimTreeWidgetItem;
 
 class HduiSceneIndexTreeWidget : public QTreeWidget, public HdSceneIndexObserver
 {
-    Q_OBJECT;
+  Q_OBJECT;
+
 public:
+  HduiSceneIndexTreeWidget(QWidget *parent = Q_NULLPTR);
 
-    HduiSceneIndexTreeWidget(QWidget *parent = Q_NULLPTR);
+  void PrimsAdded(
+      const HdSceneIndexBase &sender,
+      const AddedPrimEntries &entries) override;
 
-    void PrimsAdded(
-            const HdSceneIndexBase &sender,
-            const AddedPrimEntries &entries) override;
+  void PrimsRemoved(
+      const HdSceneIndexBase &sender,
+      const RemovedPrimEntries &entries) override;
 
-    void PrimsRemoved(
-            const HdSceneIndexBase &sender,
-            const RemovedPrimEntries &entries) override;
+  void PrimsDirtied(
+      const HdSceneIndexBase &sender,
+      const DirtiedPrimEntries &entries) override;
 
-    void PrimsDirtied(
-            const HdSceneIndexBase &sender,
-            const DirtiedPrimEntries &entries) override;
+  void PrimsRenamed(
+      const HdSceneIndexBase &sender,
+      const RenamedPrimEntries &entries) override;
 
-    void PrimsRenamed(
-        const HdSceneIndexBase &sender,
-        const RenamedPrimEntries &entries) override;
+  void SetSceneIndex(HdSceneIndexBaseRefPtr inputSceneIndex);
 
-    void SetSceneIndex(HdSceneIndexBaseRefPtr inputSceneIndex);
-
-    void Requery(bool lazy=true);
+  void Requery(bool lazy = true);
 
 Q_SIGNALS:
-    void PrimSelected(const SdfPath &primPath,
-            HdContainerDataSourceHandle dataSource);
+  void PrimSelected(const SdfPath &primPath,
+                    HdContainerDataSourceHandle dataSource);
 
-    void PrimDirtied(const SdfPath &primPath,
-            const HdDataSourceLocatorSet &locators);
+  void PrimDirtied(const SdfPath &primPath,
+                   const HdDataSourceLocatorSet &locators);
 
 protected:
-
-    void contextMenuEvent(QContextMenuEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
+  friend Hdui_SceneIndexPrimTreeWidgetItem;
 
-    friend Hdui_SceneIndexPrimTreeWidgetItem;
+  void _RemoveSubtree(const SdfPath &primPath);
 
+  void _AddPrimItem(const SdfPath &primPath,
+                    Hdui_SceneIndexPrimTreeWidgetItem *item);
 
-    void _RemoveSubtree(const SdfPath &primPath);
+  Hdui_SceneIndexPrimTreeWidgetItem *_GetPrimItem(
+      const SdfPath &primPath,
+      bool createIfNecessary = true);
 
-    void _AddPrimItem(const SdfPath &primPath,
-        Hdui_SceneIndexPrimTreeWidgetItem *item);
+  using _ItemMap = std::unordered_map<SdfPath,
+                                      Hdui_SceneIndexPrimTreeWidgetItem *, SdfPath::Hash>;
 
+  _ItemMap _primItems;
 
-    Hdui_SceneIndexPrimTreeWidgetItem * _GetPrimItem(
-        const SdfPath &primPath,
-        bool createIfNecessary=true);
-
-    using _ItemMap = std::unordered_map<SdfPath,
-        Hdui_SceneIndexPrimTreeWidgetItem *, SdfPath::Hash>;
-
-    _ItemMap _primItems;
-
-    HdSceneIndexBaseRefPtr _inputSceneIndex;
-
+  HdSceneIndexBaseRefPtr _inputSceneIndex;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

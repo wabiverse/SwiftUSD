@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_DATA_SOURCE_TREE_WIDGET_H
 #define PXR_IMAGING_HDUI_DATA_SOURCE_TREE_WIDGET_H
 
-#include "pxr/imaging/hd/sceneIndex.h"
+#include "Hd/sceneIndex.h"
 
 #include <QTreeWidget>
 
@@ -32,25 +32,25 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HduiDataSourceTreeWidget : public QTreeWidget
 {
-    Q_OBJECT;
+  Q_OBJECT;
 
 public:
-    HduiDataSourceTreeWidget(QWidget *parent = Q_NULLPTR);
+  HduiDataSourceTreeWidget(QWidget *parent = Q_NULLPTR);
 
-    void SetPrimDataSource(const SdfPath &primPath,
-                           HdContainerDataSourceHandle const & dataSource);
+  void SetPrimDataSource(const SdfPath &primPath,
+                         HdContainerDataSourceHandle const &dataSource);
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 public Q_SLOTS:
-    void PrimDirtied(
-        const SdfPath &primPath,
-        const HdContainerDataSourceHandle &primDataSource,
-        const HdDataSourceLocatorSet &locators);
+  void PrimDirtied(
+      const SdfPath &primPath,
+      const HdContainerDataSourceHandle &primDataSource,
+      const HdDataSourceLocatorSet &locators);
 
 Q_SIGNALS:
-    void DataSourceSelected(HdDataSourceBaseHandle dataSource);
+  void DataSourceSelected(HdDataSourceBaseHandle dataSource);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

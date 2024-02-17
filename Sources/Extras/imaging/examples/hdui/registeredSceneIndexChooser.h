@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_REGISTERED_SCENE_INDEX_CHOOSER_H
 #define PXR_IMAGING_HDUI_REGISTERED_SCENE_INDEX_CHOOSER_H
 
-#include "pxr/imaging/hd/sceneIndex.h"
+#include "Hd/sceneIndex.h"
 
 #include <QPushButton>
 #include <QMenu>
@@ -33,18 +33,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HduiRegisteredSceneIndexChooser : public QPushButton
 {
-    Q_OBJECT;
+  Q_OBJECT;
+
 public:
-    HduiRegisteredSceneIndexChooser(QWidget *parent = nullptr);
-    ~HduiRegisteredSceneIndexChooser() override;
+  HduiRegisteredSceneIndexChooser(QWidget *parent = nullptr);
+  ~HduiRegisteredSceneIndexChooser() override;
 
 Q_SIGNALS:
-    void SceneIndexSelected(
-        const std::string &name,
-        HdSceneIndexBaseRefPtr sceneIndex);
+  void SceneIndexSelected(
+      const std::string &name,
+      HdSceneIndexBaseRefPtr sceneIndex);
 
 private:
-    QMenu * _menu;
+  QMenu *_menu;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

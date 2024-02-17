@@ -23,28 +23,27 @@
 //
 #include "hdPrman/debugCodes.h"
 
-#include "pxr/base/tf/registryManager.h"
+#include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfDebug)
 {
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_PRIMVARS, "Primvars");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_MATERIALS, "Materials");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_DUMP_MATERIALX_OSL_SHADER, 
-        "Print MaterialX Generated Osl Shaders");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_LINKING, "Light linking");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_LIST, "Light list");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_VSTRUCTS, "Vstruct expansion");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_FILTER_LINKING,
-        "Light filter linking");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_IMAGE_ASSET_RESOLVE,
-        "Resolved image asset paths");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_INSTANCERS, "Instancers");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_MESHLIGHT, "Mesh lights");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_RENDER_SETTINGS,
-        "Debug logging for all things render settings.");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_PRIMVARS, "Primvars");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_MATERIALS, "Materials");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_DUMP_MATERIALX_OSL_SHADER,
+                              "Print MaterialX Generated Osl Shaders");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_LINKING, "Light linking");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_LIST, "Light list");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_VSTRUCTS, "Vstruct expansion");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_LIGHT_FILTER_LINKING,
+                              "Light filter linking");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_IMAGE_ASSET_RESOLVE,
+                              "Resolved image asset paths");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_INSTANCERS, "Instancers");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_MESHLIGHT, "Mesh lights");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(HDPRMAN_RENDER_SETTINGS,
+                              "Debug logging for all things render settings.");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

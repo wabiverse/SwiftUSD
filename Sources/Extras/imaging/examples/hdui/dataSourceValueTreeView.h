@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_DATA_SOURCE_VALUE_TREE_VIEW_H
 #define PXR_IMAGING_HDUI_DATA_SOURCE_VALUE_TREE_VIEW_H
 
-#include "pxr/imaging/hd/dataSource.h"
+#include "Hd/dataSource.h"
 
 #include <QTreeView>
 
@@ -32,13 +32,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HduiDataSourceValueTreeView : public QTreeView
 {
-    Q_OBJECT;
+  Q_OBJECT;
+
 public:
-    HduiDataSourceValueTreeView(QWidget *parent = Q_NULLPTR);
-    void SetDataSource(const HdSampledDataSourceHandle &dataSource);
-    void Refresh();
+  HduiDataSourceValueTreeView(QWidget *parent = Q_NULLPTR);
+  void SetDataSource(const HdSampledDataSourceHandle &dataSource);
+  void Refresh();
+
 private:
-    HdSampledDataSourceHandle _dataSource;
+  HdSampledDataSourceHandle _dataSource;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

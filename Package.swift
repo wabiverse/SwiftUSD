@@ -110,6 +110,58 @@ let package = Package(
       name: "UsdHydra",
       targets: ["UsdHydra"]
     ),
+    .library(
+      name: "SdrOsl",
+      targets: ["SdrOsl"]
+    ),
+    .library(
+      name: "UsdAbc",
+      targets: ["UsdAbc"]
+    ),
+    .library(
+      name: "UsdDraco",
+      targets: ["UsdDraco"]
+    ),
+    .library(
+      name: "UsdMedia",
+      targets: ["UsdMedia"]
+    ),
+    .library(
+      name: "UsdMtlx",
+      targets: ["UsdMtlx"]
+    ),
+    .library(
+      name: "UsdPhysics",
+      targets: ["UsdPhysics"]
+    ),
+    .library(
+      name: "UsdProc",
+      targets: ["UsdProc"]
+    ),
+    .library(
+      name: "UsdRender",
+      targets: ["UsdRender"]
+    ),
+    .library(
+      name: "UsdRi",
+      targets: ["UsdRi"]
+    ),
+    .library(
+      name: "UsdSkel",
+      targets: ["UsdSkel"]
+    ),
+    .library(
+      name: "UsdUI",
+      targets: ["UsdUI"]
+    ),
+    .library(
+      name: "UsdUtils",
+      targets: ["UsdUtils"]
+    ),
+    .library(
+      name: "UsdVol",
+      targets: ["UsdVol"]
+    ),
     // -------- Pixar.Imaging -----
     .library(
       name: "Hd",
@@ -219,6 +271,71 @@ let package = Package(
       targets: ["PyUsdHydra"]
     ),
     .library(
+      name: "PySdrOsl",
+      type: .dynamic,
+      targets: ["PySdrOsl"]
+    ),
+    .library(
+      name: "PyUsdAbc",
+      type: .dynamic,
+      targets: ["PyUsdAbc"]
+    ),
+    .library(
+      name: "PyUsdDraco",
+      type: .dynamic,
+      targets: ["PyUsdDraco"]
+    ),
+    .library(
+      name: "PyUsdMedia",
+      type: .dynamic,
+      targets: ["PyUsdMedia"]
+    ),
+    .library(
+      name: "PyUsdMtlx",
+      type: .dynamic,
+      targets: ["PyUsdMtlx"]
+    ),
+    .library(
+      name: "PyUsdPhysics",
+      type: .dynamic,
+      targets: ["PyUsdPhysics"]
+    ),
+    .library(
+      name: "PyUsdProc",
+      type: .dynamic,
+      targets: ["PyUsdProc"]
+    ),
+    .library(
+      name: "PyUsdRender",
+      type: .dynamic,
+      targets: ["PyUsdRender"]
+    ),
+    .library(
+      name: "PyUsdRi",
+      type: .dynamic,
+      targets: ["PyUsdRi"]
+    ),
+    .library(
+      name: "PyUsdSkel",
+      type: .dynamic,
+      targets: ["PyUsdSkel"]
+    ),
+    .library(
+      name: "PyUsdUI",
+      type: .dynamic,
+      targets: ["PyUsdUI"]
+    ),
+    .library(
+      name: "PyUsdUtils",
+      type: .dynamic,
+      targets: ["PyUsdUtils"]
+    ),
+    .library(
+      name: "PyUsdVol",
+      type: .dynamic,
+      targets: ["PyUsdVol"]
+    ),
+    .library(
       name: "PyUsdShaders",
       type: .dynamic,
       targets: ["PyUsdShaders"]
@@ -260,10 +377,23 @@ let package = Package(
         "PyUsd",
         "PyNdr",
         "PySdr",
+        "PySdrOsl",
         "PyUsdGeom",
         "PyUsdShade",
         "PyUsdLux",
         "PyUsdHydra",
+        "PyUsdAbc",
+        "PyUsdDraco",
+        "PyUsdMedia",
+        "PyUsdMtlx",
+        "PyUsdPhysics",
+        "PyUsdProc",
+        "PyUsdRender",
+        "PyUsdRi",
+        "PyUsdSkel",
+        "PyUsdUI",
+        "PyUsdUtils",
+        "PyUsdVol",
         "PyCameraUtil",
         "PyPxOsd",
         "PyUsdShaders",
@@ -271,7 +401,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.1"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.2"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -705,6 +835,305 @@ let package = Package(
     ),
 
     .target(
+      name: "SdrOsl",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Ar"),
+        .target(name: "Ndr"),
+        .target(name: "Sdr"),
+        .target(name: "Vt"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
+        .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
+        .define("SDROSL_EXPORTS", to: "1"),
+        .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
+      ]
+    ),
+
+    .target(
+      name: "UsdAbc",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
+        .define("USDABC_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdDraco",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
+        .define("USDDRACO_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdMedia",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
+        .define("USDMEDIA_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdMtlx",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Trace"),
+        .target(name: "Ar"),
+        .target(name: "Ndr"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdUI"),
+        .target(name: "UsdUtils"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdMtlx"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
+        .define("USDMTLX_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
+      name: "UsdPhysics",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Plug"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
+        .define("USDPHYSICS_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdProc",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdProc"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
+        .define("USDPROC_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdRender",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdRender"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
+        .define("USDRENDER_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdRi",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdRi"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
+        .define("USDRI_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdSkel",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
+        .define("USDSKEL_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdUI",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdUI"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
+        .define("USDUI_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdUtils",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+        .target(name: "Trace"),
+        .target(name: "Plug"),
+        .target(name: "Ar"),
+        .target(name: "Kind"),
+        .target(name: "Pcp"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdShade"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
+        .define("USDUTILS_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
+      name: "UsdVol",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Plug"),
+        .target(name: "Work"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdVol"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
+        .define("USDVOL_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "CameraUtil",
       dependencies: [
         .target(name: "Arch"),
@@ -1029,23 +1458,6 @@ let package = Package(
     ),
 
     .target(
-      name: "PyUsdShaders",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdShaders",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
-      ]
-    ),
-
-    .target(
       name: "PyUsdLux",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -1076,6 +1488,244 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
+      ]
+    ),
+
+    .target(
+      name: "PySdrOsl",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PySdrOsl",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
+        .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdAbc",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdAbc",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdDraco",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdDraco",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdMedia",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdMedia",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdMtlx",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdMtlx",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdMtlx"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdPhysics",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdPhysics",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdProc",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdProc",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdProc"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdRender",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdRender",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdRender"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdRi",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdRi",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdRi"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdSkel",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdSkel",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdUI",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdUI",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdUI"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdUtils",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdUtils",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdVol",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdVol",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdVol"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
+      ]
+    ),
+
+    .target(
+      name: "PyUsdShaders",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyUsdShaders",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
       ]
     ),
 
@@ -1129,8 +1779,8 @@ let package = Package(
         intent: .custom(verb: "genschema", description: """
           Customize and extend the layers of specific named API atop
           the underlying scene graph with schema definitions defined
-          by prims, their properties, and (optionally) their default 
-          or fallback values. 
+          by prims, their properties, and (optionally) their default
+          or fallback values.
 
           The schema definition files are written in a simple, human
           readable, text-based markup language from the (.usda) file
@@ -1185,10 +1835,23 @@ let package = Package(
         .target(name: "Usd"),
         .target(name: "Ndr"),
         .target(name: "Sdr"),
+        .target(name: "SdrOsl"),
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
         .target(name: "UsdHydra"),
+        .target(name: "UsdAbc"),
+        .target(name: "UsdDraco"),
+        .target(name: "UsdMedia"),
+        .target(name: "UsdMtlx"),
+        .target(name: "UsdPhysics"),
+        .target(name: "UsdProc"),
+        .target(name: "UsdRender"),
+        .target(name: "UsdRi"),
+        .target(name: "UsdSkel"),
+        .target(name: "UsdUI"),
+        .target(name: "UsdUtils"),
+        .target(name: "UsdVol"),
         // ------- imaging. ------
         .target(name: "CameraUtil"),
         .target(name: "Hf"),

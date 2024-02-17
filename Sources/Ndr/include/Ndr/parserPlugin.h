@@ -75,7 +75,7 @@ struct NdrNodeDiscoveryResult;
 /// <ul>
 ///     <li>
 ///         Implement the parser plugin interface. An example parser plugin is
-///         available in the plugin folder under `sdrOsl`. The `Parse()` method
+///         available in the plugin folder under `SdrOsl`. The `Parse()` method
 ///         should return the specialized node that derives from `NdrNode` (and
 ///         this node should also be constructed with its specialized
 ///         properties). Examples of a specialized node and property class are
@@ -98,9 +98,9 @@ struct NdrNodeDiscoveryResult;
 ///             "Plugins": [{
 ///                 "Type": "library",
 ///                 "Name": "YOUR_LIBRARY_NAME",
-///                 "Root": "@PLUG_INFO_ROOT@",
-///                 "LibraryPath": "@PLUG_INFO_LIBRARY_PATH@",
-///                 "ResourcePath": "@PLUG_INFO_RESOURCE_PATH@",
+///                 "Root": "../..",
+///                 "LibraryPath": "",
+///                 "ResourcePath": "Contents/Resources",
 ///                 "Info": {
 ///                     "Types": {
 ///                         "YOUR_CLASS_NAME" : {

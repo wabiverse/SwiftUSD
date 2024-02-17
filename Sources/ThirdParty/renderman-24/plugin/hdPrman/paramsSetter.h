@@ -24,12 +24,11 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/sprim.h"
+#include <pxr/pxrns.h>
+#include "Hd/sprim.h"
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 class HdSceneDelegate;
 
@@ -37,21 +36,19 @@ class HdSceneDelegate;
 ///
 /// A container for maps of VtValues for use as Options, etc
 ///
-class HdPrmanParamsSetter final : public HdSprim 
+class HdPrmanParamsSetter final : public HdSprim
 {
 public:
-    HdPrmanParamsSetter(SdfPath const &id);
+  HdPrmanParamsSetter(SdfPath const &id);
 
-    void Sync(HdSceneDelegate *sceneDelegate,
-        HdRenderParam *renderParam,
-        HdDirtyBits  *dirtyBits) override;
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits) override;
 
-    void Finalize(HdRenderParam *renderParam) override;
+  void Finalize(HdRenderParam *renderParam) override;
 
-    HdDirtyBits GetInitialDirtyBitsMask() const override;
+  HdDirtyBits GetInitialDirtyBitsMask() const override;
 };
-
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

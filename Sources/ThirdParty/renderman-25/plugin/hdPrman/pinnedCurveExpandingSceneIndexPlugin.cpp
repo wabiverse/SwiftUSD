@@ -23,40 +23,39 @@
 //
 #include "hdPrman/pinnedCurveExpandingSceneIndexPlugin.h"
 
-#include "pxr/imaging/hd/sceneIndexPluginRegistry.h"
+#include "Hd/sceneIndexPluginRegistry.h"
 #include "pxr/imaging/hdsi/pinnedCurveExpandingSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    ((sceneIndexPluginName, "HdPrman_PinnedCurveExpandingSceneIndexPlugin"))
-);
+    ((sceneIndexPluginName, "HdPrman_PinnedCurveExpandingSceneIndexPlugin")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plugin registrations
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char * const _rendererDisplayName = "Prman";
+static const char *const _rendererDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdSceneIndexPluginRegistry::Define<
-        HdPrman_PinnedCurveExpandingSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<
+      HdPrman_PinnedCurveExpandingSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    // Should be chained _after_ the extComputationPrimvarPruningSceneIndex.
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
+  // Should be chained _after_ the extComputationPrimvarPruningSceneIndex.
+  const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
 
-    // Register the plugins conditionally.
-    HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
-        _rendererDisplayName,
-        _tokens->sceneIndexPluginName,
-        nullptr, // no argument data necessary
-        insertionPhase,
-        HdSceneIndexPluginRegistry::InsertionOrderAtStart);
+  // Register the plugins conditionally.
+  HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
+      _rendererDisplayName,
+      _tokens->sceneIndexPluginName,
+      nullptr, // no argument data necessary
+      insertionPhase,
+      HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,15 +63,15 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 ////////////////////////////////////////////////////////////////////////////////
 
 HdPrman_PinnedCurveExpandingSceneIndexPlugin::
-HdPrman_PinnedCurveExpandingSceneIndexPlugin() = default;
+    HdPrman_PinnedCurveExpandingSceneIndexPlugin() = default;
 
 HdSceneIndexBaseRefPtr
 HdPrman_PinnedCurveExpandingSceneIndexPlugin::_AppendSceneIndex(
     const HdSceneIndexBaseRefPtr &inputScene,
     const HdContainerDataSourceHandle &inputArgs)
 {
-    TF_UNUSED(inputArgs);
-    return HdsiPinnedCurveExpandingSceneIndex::New(inputScene);
+  TF_UNUSED(inputArgs);
+  return HdsiPinnedCurveExpandingSceneIndex::New(inputScene);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

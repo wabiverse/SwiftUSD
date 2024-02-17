@@ -40,11 +40,11 @@
 #include "hdPrman/debugCodes.h"
 #include "hdPrman/matfiltResolveVstructs.h"
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hd/material.h"
-#include "pxr/usd/sdr/shaderNode.h"
-#include "pxr/usd/sdr/shaderProperty.h"
-#include "pxr/usd/sdr/registry.h"
+#include <pxr/pxrns.h>
+#include "Hd/material.h"
+#include "Sdr/shaderNode.h"
+#include "Sdr/shaderProperty.h"
+#include "Sdr/registry.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

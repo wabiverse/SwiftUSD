@@ -26,87 +26,90 @@
 #include "hdPrman/renderParam.h"
 #include "hdPrman/debugCodes.h"
 #include "hdPrman/rixStrings.h"
-#include "pxr/usd/sdf/types.h"
-#include "pxr/base/tf/staticTokens.h"
-#include "pxr/imaging/hd/sceneDelegate.h"
+#include "Sdf/types.h"
+#include "Tf/staticTokens.h"
+#include "Hd/sceneDelegate.h"
 #include "pxr/imaging/hf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    (Options)
-    (ActiveIntegrator)
-);
+    (Options)(ActiveIntegrator));
 
 HdPrmanParamsSetter::HdPrmanParamsSetter(SdfPath const &id)
-: HdSprim(id)
-{}
-
-void
-HdPrmanParamsSetter::Sync(HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    HdDirtyBits  *dirtyBits)
+    : HdSprim(id)
 {
-    HdDirtyBits bits = *dirtyBits;
-    if (bits == HdChangeTracker::Clean) {
-        return;
-    }
-
-    HdPrman_RenderParam * const param =
-        static_cast<HdPrman_RenderParam*>(renderParam);
-
-    riley::Riley * const riley = param->AcquireRiley();
-
-    const SdfPath id = GetId();
-
-    VtValue optionsValue = sceneDelegate->Get(id, _tokens->Options);
-    if (optionsValue.IsHolding<std::map<TfToken, VtValue>>()) {
-        std::map<TfToken, VtValue> valueDict = 
-            optionsValue.UncheckedGet<std::map<TfToken, VtValue>>();
-
-        if (!valueDict.empty()) {
-            RtParamList &options = param->GetOptions();
-            for (const auto &tokenvalpair : valueDict) {
-                param->SetParamFromVtValue(
-                    RtUString(tokenvalpair.first.data()), tokenvalpair.second,
-                        TfToken(), options);
-            }
-
-            riley->SetOptions(options);
-        }
-    }
-
-    VtValue intergratorParamsValue =
-        sceneDelegate->Get(id, _tokens->ActiveIntegrator);
-    if (intergratorParamsValue.IsHolding<std::map<TfToken, VtValue>>()) {
-        std::map<TfToken, VtValue> valueDict = 
-            intergratorParamsValue.UncheckedGet<std::map<TfToken, VtValue>>();
-
-        if (!valueDict.empty()) {
-            for (const auto &tokenvalpair : valueDict) {
-                param->SetParamFromVtValue(
-                    RtUString(tokenvalpair.first.data()), tokenvalpair.second,
-                    TfToken(), param->GetIntegratorParams());
-            }
-
-            param->UpdateIntegrator(&sceneDelegate->GetRenderIndex());
-        }
-    }
-
-    *dirtyBits = HdChangeTracker::Clean;
 }
 
-void
-HdPrmanParamsSetter::Finalize(HdRenderParam *renderParam)
+void HdPrmanParamsSetter::Sync(HdSceneDelegate *sceneDelegate,
+                               HdRenderParam *renderParam,
+                               HdDirtyBits *dirtyBits)
 {
+  HdDirtyBits bits = *dirtyBits;
+  if (bits == HdChangeTracker::Clean)
+  {
+    return;
+  }
 
+  HdPrman_RenderParam *const param =
+      static_cast<HdPrman_RenderParam *>(renderParam);
+
+  riley::Riley *const riley = param->AcquireRiley();
+
+  const SdfPath id = GetId();
+
+  VtValue optionsValue = sceneDelegate->Get(id, _tokens->Options);
+  if (optionsValue.IsHolding<std::map<TfToken, VtValue>>())
+  {
+    std::map<TfToken, VtValue> valueDict =
+        optionsValue.UncheckedGet<std::map<TfToken, VtValue>>();
+
+    if (!valueDict.empty())
+    {
+      RtParamList &options = param->GetOptions();
+      for (const auto &tokenvalpair : valueDict)
+      {
+        param->SetParamFromVtValue(
+            RtUString(tokenvalpair.first.data()), tokenvalpair.second,
+            TfToken(), options);
+      }
+
+      riley->SetOptions(options);
+    }
+  }
+
+  VtValue intergratorParamsValue =
+      sceneDelegate->Get(id, _tokens->ActiveIntegrator);
+  if (intergratorParamsValue.IsHolding<std::map<TfToken, VtValue>>())
+  {
+    std::map<TfToken, VtValue> valueDict =
+        intergratorParamsValue.UncheckedGet<std::map<TfToken, VtValue>>();
+
+    if (!valueDict.empty())
+    {
+      for (const auto &tokenvalpair : valueDict)
+      {
+        param->SetParamFromVtValue(
+            RtUString(tokenvalpair.first.data()), tokenvalpair.second,
+            TfToken(), param->GetIntegratorParams());
+      }
+
+      param->UpdateIntegrator(&sceneDelegate->GetRenderIndex());
+    }
+  }
+
+  *dirtyBits = HdChangeTracker::Clean;
+}
+
+void HdPrmanParamsSetter::Finalize(HdRenderParam *renderParam)
+{
 }
 
 HdDirtyBits
 HdPrmanParamsSetter::GetInitialDirtyBitsMask() const
 {
-    return HdChangeTracker::AllDirty;
+  return HdChangeTracker::AllDirty;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -24,11 +24,11 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
 #include "hdPrman/renderParam.h"
-#include "pxr/imaging/hd/camera.h"
-#include "pxr/imaging/hd/timeSampleArray.h"
+#include "Hd/camera.h"
+#include "Hd/timeSampleArray.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,62 +45,67 @@ class HdSceneDelegate;
 class HdPrmanCamera final : public HdCamera
 {
 public:
-    HDPRMAN_API
-    HdPrmanCamera(SdfPath const& id);
+  HDPRMAN_API
+  HdPrmanCamera(SdfPath const &id);
 
-    HDPRMAN_API
-    ~HdPrmanCamera() override;
+  HDPRMAN_API
+  ~HdPrmanCamera() override;
 
-    /// Synchronizes state from the delegate to this object.
-    HDPRMAN_API
-    void Sync(HdSceneDelegate *sceneDelegate,
-              HdRenderParam   *renderParam,
-              HdDirtyBits     *dirtyBits) override;
-    
-    /// Returns the time sampled xforms that were queried during Sync.
-    HDPRMAN_API
-    HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> const&
-    GetTimeSampleXforms() const {
-        return _sampleXforms;
-    }
+  /// Synchronizes state from the delegate to this object.
+  HDPRMAN_API
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits) override;
 
-    float GetLensDistortionK1() const {
-        return _lensDistortionK1;
-    }
+  /// Returns the time sampled xforms that were queried during Sync.
+  HDPRMAN_API
+  HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> const &
+  GetTimeSampleXforms() const
+  {
+    return _sampleXforms;
+  }
 
-    float GetLensDistortionK2() const {
-        return _lensDistortionK2;
-    }
+  float GetLensDistortionK1() const
+  {
+    return _lensDistortionK1;
+  }
 
-    const GfVec2f &GetLensDistortionCenter() const {
-        return _lensDistortionCenter;
-    }
+  float GetLensDistortionK2() const
+  {
+    return _lensDistortionK2;
+  }
 
-    float GetLensDistortionAnaSq() const {
-        return _lensDistortionAnaSq;
-    }
+  const GfVec2f &GetLensDistortionCenter() const
+  {
+    return _lensDistortionCenter;
+  }
 
-    const GfVec2f &GetLensDistortionAsym() const {
-        return _lensDistortionAsym;
-    }
+  float GetLensDistortionAnaSq() const
+  {
+    return _lensDistortionAnaSq;
+  }
 
-    float GetLensDistortionScale() const {
-        return _lensDistortionScale;
-    }
-    
+  const GfVec2f &GetLensDistortionAsym() const
+  {
+    return _lensDistortionAsym;
+  }
+
+  float GetLensDistortionScale() const
+  {
+    return _lensDistortionScale;
+  }
 
 private:
-    HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> _sampleXforms;
+  HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> _sampleXforms;
 
-    float _lensDistortionK1;
-    float _lensDistortionK2;
-    GfVec2f _lensDistortionCenter;
-    float _lensDistortionAnaSq;
-    GfVec2f _lensDistortionAsym;
-    float _lensDistortionScale;
+  float _lensDistortionK1;
+  float _lensDistortionK2;
+  GfVec2f _lensDistortionCenter;
+  float _lensDistortionAnaSq;
+  GfVec2f _lensDistortionAsym;
+  float _lensDistortionScale;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
+#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H

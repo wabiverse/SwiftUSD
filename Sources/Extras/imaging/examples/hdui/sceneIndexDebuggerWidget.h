@@ -24,7 +24,7 @@
 #ifndef PXR_IMAGING_HDUI_SCENE_INDEX_DEBUGGING_WIDGET_H
 #define PXR_IMAGING_HDUI_SCENE_INDEX_DEBUGGING_WIDGET_H
 
-#include "pxr/imaging/hd/sceneIndex.h"
+#include "Hd/sceneIndex.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -40,29 +40,29 @@ class HduiRegisteredSceneIndexChooser;
 
 class HduiSceneIndexDebuggerWidget : public QWidget, public TfWeakBase
 {
-    Q_OBJECT;
+  Q_OBJECT;
+
 public:
+  HduiSceneIndexDebuggerWidget(QWidget *parent = Q_NULLPTR);
 
-    HduiSceneIndexDebuggerWidget(QWidget *parent = Q_NULLPTR);
-
-    void SetSceneIndex(const std::string &displayName,
-        HdSceneIndexBaseRefPtr sceneIndex, bool pullRoot);
+  void SetSceneIndex(const std::string &displayName,
+                     HdSceneIndexBaseRefPtr sceneIndex, bool pullRoot);
 
 private Q_SLOTS:
-    void _FillGoToInputMenu();
-    void _AddSceneIndexToTreeMenu(QTreeWidgetItem *parentItem,
-            HdSceneIndexBaseRefPtr sceneIndex, bool includeSelf);
+  void _FillGoToInputMenu();
+  void _AddSceneIndexToTreeMenu(QTreeWidgetItem *parentItem,
+                                HdSceneIndexBaseRefPtr sceneIndex, bool includeSelf);
 
 private:
-    HduiSceneIndexTreeWidget *_siTreeWidget;
-    HduiDataSourceTreeWidget *_dsTreeWidget;
-    HduiRegisteredSceneIndexChooser *_siChooser;
-    HduiDataSourceValueTreeView *_valueTreeView;
-    QLabel *_nameLabel;
-    QPushButton *_goToInputButton;
-    QMenu *_goToInputButtonMenu;
+  HduiSceneIndexTreeWidget *_siTreeWidget;
+  HduiDataSourceTreeWidget *_dsTreeWidget;
+  HduiRegisteredSceneIndexChooser *_siChooser;
+  HduiDataSourceValueTreeView *_valueTreeView;
+  QLabel *_nameLabel;
+  QPushButton *_goToInputButton;
+  QMenu *_goToInputButtonMenu;
 
-    HdSceneIndexBasePtr _currentSceneIndex;
+  HdSceneIndexBasePtr _currentSceneIndex;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

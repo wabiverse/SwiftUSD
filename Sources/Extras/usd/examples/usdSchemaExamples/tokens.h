@@ -27,20 +27,19 @@
 /// \file usdSchemaExamples/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-// 
+//
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-// 
+//
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 #include "./api.h"
-#include "pxr/base/tf/staticData.h"
-#include "pxr/base/tf/token.h"
+#include "Tf/staticData.h"
+#include "Tf/token.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdSchemaExamplesTokensType
 ///
@@ -60,46 +59,47 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdSchemaExamplesTokens->complexString);
 /// \endcode
-struct UsdSchemaExamplesTokensType {
-    USDSCHEMAEXAMPLES_API UsdSchemaExamplesTokensType();
-    /// \brief "complexString"
-    /// 
-    /// UsdSchemaExamplesComplex
-    const TfToken complexString;
-    /// \brief "intAttr"
-    /// 
-    /// UsdSchemaExamplesSimple
-    const TfToken intAttr;
-    /// \brief "params:mass"
-    /// 
-    /// UsdSchemaExamplesParamsAPI
-    const TfToken paramsMass;
-    /// \brief "params:velocity"
-    /// 
-    /// UsdSchemaExamplesParamsAPI
-    const TfToken paramsVelocity;
-    /// \brief "params:volume"
-    /// 
-    /// UsdSchemaExamplesParamsAPI
-    const TfToken paramsVolume;
-    /// \brief "target"
-    /// 
-    /// UsdSchemaExamplesSimple
-    const TfToken target;
-    /// \brief "ComplexPrim"
-    /// 
-    /// Schema identifer and family for UsdSchemaExamplesComplex
-    const TfToken ComplexPrim;
-    /// \brief "ParamsAPI"
-    /// 
-    /// Schema identifer and family for UsdSchemaExamplesParamsAPI
-    const TfToken ParamsAPI;
-    /// \brief "SimplePrim"
-    /// 
-    /// Schema identifer and family for UsdSchemaExamplesSimple
-    const TfToken SimplePrim;
-    /// A vector of all of the tokens listed above.
-    const std::vector<TfToken> allTokens;
+struct UsdSchemaExamplesTokensType
+{
+  USDSCHEMAEXAMPLES_API UsdSchemaExamplesTokensType();
+  /// \brief "complexString"
+  ///
+  /// UsdSchemaExamplesComplex
+  const TfToken complexString;
+  /// \brief "intAttr"
+  ///
+  /// UsdSchemaExamplesSimple
+  const TfToken intAttr;
+  /// \brief "params:mass"
+  ///
+  /// UsdSchemaExamplesParamsAPI
+  const TfToken paramsMass;
+  /// \brief "params:velocity"
+  ///
+  /// UsdSchemaExamplesParamsAPI
+  const TfToken paramsVelocity;
+  /// \brief "params:volume"
+  ///
+  /// UsdSchemaExamplesParamsAPI
+  const TfToken paramsVolume;
+  /// \brief "target"
+  ///
+  /// UsdSchemaExamplesSimple
+  const TfToken target;
+  /// \brief "ComplexPrim"
+  ///
+  /// Schema identifer and family for UsdSchemaExamplesComplex
+  const TfToken ComplexPrim;
+  /// \brief "ParamsAPI"
+  ///
+  /// Schema identifer and family for UsdSchemaExamplesParamsAPI
+  const TfToken ParamsAPI;
+  /// \brief "SimplePrim"
+  ///
+  /// Schema identifer and family for UsdSchemaExamplesSimple
+  const TfToken SimplePrim;
+  /// A vector of all of the tokens listed above.
+  const std::vector<TfToken> allTokens;
 };
 
 /// \var UsdSchemaExamplesTokens

@@ -25,8 +25,8 @@
 //
 
 #define TF_MAX_ARITY 7
-#include "pxr/pxr.h"
-#include "pxr/base/arch/defines.h"
+#include <pxr/pxrns.h>
+#include "Arch/defines.h"
 #if defined(ARCH_OS_DARWIN)
 #include <mach/mach_time.h>
 #endif
@@ -178,5 +178,5 @@
 #include <OneTBB/tbb/task.h>
 #include <OneTBB/tbb/task_arena.h>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "pxr/base/tf/pySafePython.h"
+#include "Tf/pySafePython.h"
 #endif // PXR_PYTHON_SUPPORT_ENABLED

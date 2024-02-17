@@ -21,49 +21,44 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include <pxr/pxrns.h>
 
-#include "pxr/base/tf/pathUtils.h"
+#include "Tf/pathUtils.h"
 
 #include "resolverContext.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-UsdResolverExampleResolverContext::UsdResolverExampleResolverContext()
-    = default;
+UsdResolverExampleResolverContext::UsdResolverExampleResolverContext() = default;
 
 UsdResolverExampleResolverContext::UsdResolverExampleResolverContext(
-    const UsdResolverExampleResolverContext&) = default;
+    const UsdResolverExampleResolverContext &) = default;
 
 UsdResolverExampleResolverContext::UsdResolverExampleResolverContext(
-    const std::string& mappingFile)
+    const std::string &mappingFile)
     : _mappingFile(TfAbsPath(mappingFile))
 {
 }
 
-bool
-UsdResolverExampleResolverContext::operator<(
-    const UsdResolverExampleResolverContext& rhs) const
+bool UsdResolverExampleResolverContext::operator<(
+    const UsdResolverExampleResolverContext &rhs) const
 {
-    return _mappingFile < rhs._mappingFile;
+  return _mappingFile < rhs._mappingFile;
 }
 
-bool
-UsdResolverExampleResolverContext::operator==(
-    const UsdResolverExampleResolverContext& rhs) const
+bool UsdResolverExampleResolverContext::operator==(
+    const UsdResolverExampleResolverContext &rhs) const
 {
-    return _mappingFile == rhs._mappingFile;
-}
-    
-size_t hash_value(const UsdResolverExampleResolverContext& ctx)
-{
-    return TfHash()(ctx._mappingFile);
+  return _mappingFile == rhs._mappingFile;
 }
 
-const std::string& 
+size_t hash_value(const UsdResolverExampleResolverContext &ctx)
+{
+  return TfHash()(ctx._mappingFile);
+}
+
+const std::string &
 UsdResolverExampleResolverContext::GetMappingFile() const
 {
-    return _mappingFile;
+  return _mappingFile;
 }
-
-
