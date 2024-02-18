@@ -30,6 +30,8 @@
 
 #include <boost/python.hpp>
 
+#if PXR_OSL_SUPPORT_ENABLED
+
 using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -56,3 +58,12 @@ void wrapOslParser()
       .def("GetDiscoveryTypes", &This::GetDiscoveryTypes, copyRefPolicy)
       .def("GetSourceType", &This::GetSourceType, copyRefPolicy);
 }
+
+#else /* PXR_OSL_SUPPORT_ENABLED */
+
+void wrapOslParser()
+{
+  // Do nothing.
+}
+
+#endif /* PXR_OSL_SUPPORT_ENABLED */

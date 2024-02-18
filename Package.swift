@@ -1505,6 +1505,7 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
         .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
         .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
+        .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
       ]
     ),
 
