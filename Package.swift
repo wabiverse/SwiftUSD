@@ -164,10 +164,6 @@ let package = Package(
     ),
     // -------- Pixar.Imaging -----
     .library(
-      name: "Hd",
-      targets: ["Hd"]
-    ),
-    .library(
       name: "CameraUtil",
       targets: ["CameraUtil"]
     ),
@@ -178,6 +174,14 @@ let package = Package(
     .library(
       name: "PxOsd",
       targets: ["PxOsd"]
+    ),
+    .library(
+      name: "Hd",
+      targets: ["Hd"]
+    ),
+    .library(
+      name: "Hgi",
+      targets: ["Hgi"]
     ),
     // ----- Pixar.UsdImaging -----
     .library(
@@ -1203,6 +1207,23 @@ let package = Package(
     ),
 
     .target(
+      name: "Hgi",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Trace"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Hgi"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Hgi"),
+        .define("MFB_PACKAGE_MODULE", to: "Hgi"),
+        .define("HGI_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -1858,6 +1879,7 @@ let package = Package(
         .target(name: "Hf"),
         .target(name: "PxOsd"),
         .target(name: "Hd"),
+        .target(name: "Hgi"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------
