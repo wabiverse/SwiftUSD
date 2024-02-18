@@ -87,7 +87,8 @@ let package = Package(
         .plugin(name: "UsdGenSchemaPlugin", package: "SwiftUSD")
       ]
     ),
-  ]
+  ],
+  cxxLanguageStandard: .cxx17
 )
 ```
 
