@@ -28,17 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+import Pcp
 
 /**
- * # ``Gf``
+ * # ``Pcp``
  *
- * **Graphics Foundations**
+ * **PrimCache Population (Composition)**
  *
  * ## Overview
  *
- * **Gf** is the **graphics foundations** library, it contains foundation
- * classes and functions for working with the basic mathematical aspects
- * of computer graphics. */
-public enum Gf
+ * Pcp implements the core scenegraph composition semantics — the behavior
+ * informally referred to as *Layering & Referencing*. */
+public enum Pcp
 {}

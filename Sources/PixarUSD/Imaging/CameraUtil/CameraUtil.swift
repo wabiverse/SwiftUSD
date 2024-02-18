@@ -30,5 +30,14 @@
 
 import CameraUtil
 
+/**
+ * # ``CameraUtil``
+ *
+ * **Camera Utilities**
+ *
+ * ## Overview
+ *
+ * **CameraUtil** provides utilities to handle different types of Camera-to-Screen
+ * conformity policies. */
 public enum CameraUtil
 {}

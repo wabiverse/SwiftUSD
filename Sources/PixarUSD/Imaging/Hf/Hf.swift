@@ -30,5 +30,14 @@
 
 import Hf
 
+/**
+ * # ``Hf``
+ *
+ * **Hydra Foundations**
+ *
+ * ## Overview
+ *
+ * **Hf** provides utilities to handle tasks such as **Render Delegate**
+ * plugin registration and exploration. */
 public enum Hf
 {}

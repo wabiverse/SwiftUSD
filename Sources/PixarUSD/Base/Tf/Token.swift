@@ -50,9 +50,6 @@ import Plug
  * number of strings are used as fixed symbols (but never modified). */
 public typealias TfToken = Pixar.TfToken
 
-public enum Tf
-{}
-
 public extension Tf
 {
   /**

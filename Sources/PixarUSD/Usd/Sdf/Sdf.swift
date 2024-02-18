@@ -30,5 +30,15 @@
 
 import Sdf
 
+/**
+ * # ``Sdf``
+ *
+ * **Scene Description Foundations**
+ *
+ * ## Overview
+ *
+ * **Sdf** provides the foundations for serializing scene description to a reference text format,
+ * or a multitude of plugin-defined formats.  It also provides the primitive abstractions for
+ * interacting with scene description, such as ``SdfPath``, ``SdfLayer``, ``SdfPrimSpec``. */
 public enum Sdf
 {}

@@ -30,5 +30,14 @@
 
 import UsdLux
 
+/**
+ * # ``UsdLux``
+ *
+ * **USD Lighting Schema**
+ *
+ * ## Overview
+ *
+ * **UsdLux** provides a representation for lights and related components that
+ * are common to many graphics environments and therefore suitable for interchange. */
 public enum UsdLux
 {}

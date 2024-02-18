@@ -30,5 +30,16 @@
 
 import Vt
 
+/**
+ * # ``Vt``
+ *
+ * **Value Types**
+ *
+ * ## Overview
+ *
+ * **Vt** is the **value types** library, it provides classes that represent
+ * basic value types such as arrays, strings, and tokens. This library operates
+ * on the level of language data types and there are differences in the C++ and
+ * Python APIs. */
 public enum Vt
 {}

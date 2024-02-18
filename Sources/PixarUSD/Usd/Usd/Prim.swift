@@ -74,9 +74,9 @@ public extension Usd
    * We provide the following guarantees for a UsdPrim acquired via any of
    * the following:
    *
-   * - ``TfRefPtr<UsdStage>/getPrim(at:)-1jtte``
-   * - ``TfRefPtr<UsdStage>/overridePrim(path:)-3liu9``
-   * - ``TfRefPtr<UsdStage>/definePrim(_:type:)-19ehc``
+   * - ``__ObjC/Pixar/TfRefPtr<UsdStage>/getPrim(at:)-1jtte``
+   * - ``__ObjC/Pixar/TfRefPtr<UsdStage>/overridePrim(path:)-3liu9``
+   * - ``__ObjC/Pixar/TfRefPtr<UsdStage>/definePrim(_:type:)-19ehc``
    *
    *   - As long as no further mutations to the structure of the UsdStage
    *   are made, the UsdPrim will still be valid. Loading and unloading are
@@ -89,14 +89,14 @@ public extension Usd
    *   some structural way.
    *
    * Prim access in "reader" threads should be limited to
-   * ``TfRefPtr<UsdStage>/getPrim(at:)-1jtte``, which will never cause a
-   * mutation to the Stage or its layers.
+   * ``__ObjC/Pixar/TfRefPtr<UsdStage>/getPrim(at:)-1jtte``,
+   * which will never cause a mutation to the Stage or its layers.
    *
    * Please refer to ``Notice`` for a listing of the events that could cause
    * ``Notice/objectsChanged`` to be emitted.
    */
-  typealias StageWeakPtr = UsdStageWeakPtr
   typealias Prim = Pixar.UsdPrim
+  typealias StageWeakPtr = UsdStageWeakPtr
 }
 
 extension Usd.Prim: Prim

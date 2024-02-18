@@ -28,17 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+import Foundation
 
 /**
- * # ``Gf``
+ * # ``Tf``
  *
- * **Graphics Foundations**
+ * **Tools Foundations**
  *
  * ## Overview
  *
- * **Gf** is the **graphics foundations** library, it contains foundation
- * classes and functions for working with the basic mathematical aspects
- * of computer graphics. */
-public enum Gf
+ * **Tf** is the **tools foundations** library, it contains foundation
+ * classes and functions for all C/C++ software development. */
+public enum Tf
 {}

@@ -1,4 +1,4 @@
-# ``Pixar.Ar``
+# ``Ar``
 
 ## Overview
 

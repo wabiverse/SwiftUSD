@@ -28,17 +28,18 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+import Plug
 
 /**
- * # ``Gf``
+ * # ``Plug``
  *
- * **Graphics Foundations**
+ * **Plugin Framework**
  *
  * ## Overview
  *
- * **Gf** is the **graphics foundations** library, it contains foundation
- * classes and functions for working with the basic mathematical aspects
- * of computer graphics. */
-public enum Gf
+ * **Plug** is the **plugin-in framework** implementation, the ``Plug/PlugPlugin`` class
+ * defines the interface to plug-in modules. The ``Plug/PlugRegistry`` class defines a
+ * mechanism for registering and looking up plug-in modules both automatically upon
+ * first use and manually at runtime by client calls to ``Plug/PlugRegistry/registerPlugins()``. */
+public enum Plug
 {}

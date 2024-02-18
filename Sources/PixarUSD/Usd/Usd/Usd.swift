@@ -30,5 +30,14 @@
 
 import Usd
 
+/**
+ * # ``Usd``
+ *
+ * **Universal Scene Description (Core)**
+ *
+ * ## Overview
+ *
+ * **Usd** is the **universal scene description** library, it provides a
+ * high-level API for reading, authoring, and layering scene description. */
 public enum Usd
 {}

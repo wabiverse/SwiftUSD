@@ -30,5 +30,15 @@
 
 import Ar
 
+/**
+ * # ``Ar``
+ *
+ * **Asset Resolution**
+ *
+ * ## Overview
+ *
+ * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
+ * writing asset data. It provides several interfaces that allow **USD** to access
+ * an asset without knowing how that asset is physically stored. */
 public enum Ar
 {}

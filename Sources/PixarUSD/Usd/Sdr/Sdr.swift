@@ -30,5 +30,23 @@
 
 import Sdr
 
+/**
+ * # ``Sdr``
+ *
+ * **Shader Definition Registry**
+ *
+ * ## Overview
+ *
+ * **Sdr** is a shading-specialized version of Ndr, and provides the following
+ * specialized classes:
+ * - ``Sdr/Registry``: A registry for nodes that describe shading information.
+ * - ``Sdr/ShaderNode``: A node that describes a shader.
+ * - ``Sdr/ShaderProperty``: A node that describes a shader property.
+ *
+ * For more details on the registry, nodes, or properties, see the base Ndr
+ * classes:
+ * - ``Ndr/Registry``: A registry for nodes that describe information.
+ * - ``Ndr/Node``: Represents an abstract node.
+ * - ``Ndr/Property``: Represents a property (input or output) that is part of a ``Ndr/Node``. */
 public enum Sdr
 {}

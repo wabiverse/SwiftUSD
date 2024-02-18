@@ -77,223 +77,223 @@ public extension Bundle
   #endif
 
   /**
-   * Where ``__ObjC/Pixar/Ar`` application bundle resources are located. */
+   * Where ``Ar`` application bundle resources are located. */
   static let ar = Bundle(path: "\(pxrRoot)/SwiftUSD_Ar\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Sdf`` application bundle resources are located. */
+   * Where ``Sdf`` application bundle resources are located. */
   static let sdf = Bundle(path: "\(pxrRoot)/SwiftUSD_Sdf\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Usd`` application bundle resources are located. */
+   * Where ``Usd`` application bundle resources are located. */
   static let usd = Bundle(path: "\(pxrRoot)/SwiftUSD_Usd\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Ndr`` application bundle resources are located. */
+   * Where ``Ndr`` application bundle resources are located. */
   static let ndr = Bundle(path: "\(pxrRoot)/SwiftUSD_Ndr\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdGeom`` application bundle resources are located. */
+   * Where ``UsdGeom`` application bundle resources are located. */
   static let usdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdGeom\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdShade`` application bundle resources are located. */
+   * Where ``UsdShade`` application bundle resources are located. */
   static let usdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShade\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdShaders`` application bundle resources are located. */
+   * Where ``UsdShaders`` application bundle resources are located. */
   static let usdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdShaders\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
+   * Where ``UsdLux`` application bundle resources are located. */
   static let usdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdLux\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdHydra`` application bundle resources are located. */
+   * Where ``UsdHydra`` application bundle resources are located. */
   static let usdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdHydra\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/SdrOsl`` application bundle resources are located. */
+   * Where ``SdrOsl`` application bundle resources are located. */
   static let sdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_SdrOsl\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdAbc`` application bundle resources are located. */
+   * Where ``UsdAbc`` application bundle resources are located. */
   static let usdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdAbc\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdDraco`` application bundle resources are located. */
+   * Where ``UsdDraco`` application bundle resources are located. */
   static let usdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdDraco\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdMedia`` application bundle resources are located. */
+   * Where ``UsdMedia`` application bundle resources are located. */
   static let usdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMedia\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdMtlx`` application bundle resources are located. */
+   * Where ``UsdMtlx`` application bundle resources are located. */
   static let usdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMtlx\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdPhysics`` application bundle resources are located. */
+   * Where ``UsdPhysics`` application bundle resources are located. */
   static let usdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdPhysics\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdProc`` application bundle resources are located. */
+   * Where ``UsdProc`` application bundle resources are located. */
   static let usdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdProc\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdRender`` application bundle resources are located. */
+   * Where ``UsdRender`` application bundle resources are located. */
   static let usdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRender\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdRi`` application bundle resources are located. */
+   * Where ``UsdRi`` application bundle resources are located. */
   static let usdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRi\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdSkel`` application bundle resources are located. */
+   * Where ``UsdSkel`` application bundle resources are located. */
   static let usdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdSkel\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdUI`` application bundle resources are located. */
+   * Where ``UsdUI`` application bundle resources are located. */
   static let usdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdUI\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdVol`` application bundle resources are located. */
+   * Where ``UsdVol`` application bundle resources are located. */
   static let usdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdVol\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Hd`` application bundle resources are located. */
+   * Where ``Hd`` application bundle resources are located. */
   static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Tf`` python bundle resources are located. */
+   * Where ``Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Plug`` python bundle resources are located. */
+   * Where ``Plug`` python bundle resources are located. */
   static let pyPlug = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPlug\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Trace`` python bundle resources are located. */
+   * Where ``Trace`` python bundle resources are located. */
   static let pyTrace = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTrace\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Work`` python bundle resources are located. */
+   * Where ``Work`` python bundle resources are located. */
   static let pyWork = Bundle(path: "\(pxrRoot)/SwiftUSD_PyWork\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Gf`` python bundle resources are located. */
+   * Where ``Gf`` python bundle resources are located. */
   static let pyGf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGf\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Vt`` python bundle resources are located. */
+   * Where ``Vt`` python bundle resources are located. */
   static let pyVt = Bundle(path: "\(pxrRoot)/SwiftUSD_PyVt\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Ar`` python bundle resources are located. */
+   * Where ``Ar`` python bundle resources are located. */
   static let pyAr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyAr\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Kind`` python bundle resources are located. */
+   * Where ``Kind`` python bundle resources are located. */
   static let pyKind = Bundle(path: "\(pxrRoot)/SwiftUSD_PyKind\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Sdf`` python bundle resources are located. */
+   * Where ``Sdf`` python bundle resources are located. */
   static let pySdf = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdf\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Pcp`` python bundle resources are located. */
+   * Where ``Pcp`` python bundle resources are located. */
   static let pyPcp = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPcp\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Usd`` python bundle resources are located. */
+   * Where ``Usd`` python bundle resources are located. */
   static let pyUsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsd\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Ndr`` python bundle resources are located. */
+   * Where ``Ndr`` python bundle resources are located. */
   static let pyNdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PyNdr\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/Sdr`` python bundle resources are located. */
+   * Where ``Sdr`` python bundle resources are located. */
   static let pySdr = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdr\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/SdrOsl`` application bundle resources are located. */
+   * Where ``SdrOsl`` application bundle resources are located. */
   static let pySdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_PySdrOsl\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdGeom`` python bundle resources are located. */
+   * Where ``UsdGeom`` python bundle resources are located. */
   static let pyUsdGeom = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdGeom\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdShade`` python bundle resources are located. */
+   * Where ``UsdShade`` python bundle resources are located. */
   static let pyUsdShade = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShade\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdShaders`` application bundle resources are located. */
+   * Where ``UsdShaders`` application bundle resources are located. */
   static let pyUsdShaders = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdShaders\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdLux`` application bundle resources are located. */
+   * Where ``UsdLux`` application bundle resources are located. */
   static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdHydra`` application bundle resources are located. */
+   * Where ``UsdHydra`` application bundle resources are located. */
   static let pyUsdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdHydra\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/CameraUtil`` application bundle resources are located. */
+   * Where ``CameraUtil`` application bundle resources are located. */
   static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/PxOsd`` application bundle resources are located. */
+   * Where ``PxOsd`` application bundle resources are located. */
   static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdAbc`` application bundle resources are located. */
+   * Where ``UsdAbc`` application bundle resources are located. */
   static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdAbc\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdDraco`` application bundle resources are located. */
+   * Where ``UsdDraco`` application bundle resources are located. */
   static let pyUsdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdDraco\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdMedia`` application bundle resources are located. */
+   * Where ``UsdMedia`` application bundle resources are located. */
   static let pyUsdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMedia\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdMtlx`` application bundle resources are located. */
+   * Where ``UsdMtlx`` application bundle resources are located. */
   static let pyUsdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMtlx\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdPhysics`` application bundle resources are located. */
+   * Where ``UsdPhysics`` application bundle resources are located. */
   static let pyUsdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdPhysics\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdProc`` application bundle resources are located. */
+   * Where ``UsdProc`` application bundle resources are located. */
   static let pyUsdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdProc\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdRender`` application bundle resources are located. */
+   * Where ``UsdRender`` application bundle resources are located. */
   static let pyUsdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRender\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdRi`` application bundle resources are located. */
+   * Where ``UsdRi`` application bundle resources are located. */
   static let pyUsdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRi\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdSkel`` application bundle resources are located. */
+   * Where ``UsdSkel`` application bundle resources are located. */
   static let pyUsdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdSkel\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdUI`` application bundle resources are located. */
+   * Where ``UsdUI`` application bundle resources are located. */
   static let pyUsdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUI\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdUtils`` application bundle resources are located. */
+   * Where ``UsdUtils`` application bundle resources are located. */
   static let pyUsdUtils = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUtils\(ext)")
 
   /**
-   * Where ``__ObjC/Pixar/UsdVol`` application bundle resources are located. */
+   * Where ``UsdVol`` application bundle resources are located. */
   static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdVol\(ext)")
 }
 

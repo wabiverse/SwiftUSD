@@ -28,17 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+import Work
 
 /**
- * # ``Gf``
+ * # ``Work``
  *
- * **Graphics Foundations**
+ * **Multithreaded Dispatch**
  *
  * ## Overview
  *
- * **Gf** is the **graphics foundations** library, it contains foundation
- * classes and functions for working with the basic mathematical aspects
- * of computer graphics. */
-public enum Gf
+ * **Work** is intended to simplify the use of *multithreading* in the context of
+ * our software ecosystem. */
+public enum Work
 {}

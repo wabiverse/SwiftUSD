@@ -31,10 +31,12 @@
 import CxxStdlib
 import Sdf
 
+public typealias SdfLayer = Pixar.SdfLayer
 public typealias SdfLayerHandle = Pixar.SdfLayerHandle
 
 public extension Sdf
 {
+  typealias Layer = SdfLayer
   typealias LayerHandle = SdfLayerHandle
 }
 

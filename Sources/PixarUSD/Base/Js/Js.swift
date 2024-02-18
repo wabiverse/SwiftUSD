@@ -30,5 +30,15 @@
 
 import Js
 
+/**
+ * # ``Js``
+ *
+ * **JSON I/O**
+ *
+ * ## Overview
+ *
+ * **Js** is the **JSON I/O** library, it contains methods for parsing and
+ * writing JSON data from C++, and converting between arbitrary recursive
+ * container structures. */
 public enum Js
 {}

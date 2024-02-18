@@ -56,8 +56,8 @@ public extension Usd
    *
    * A UsdStage has sole ownership over the ``Prim``'s with which it is
    * populated, and retains *shared* ownership (with other stages and direct clients
-   * of ``PixarUSD/__ObjC/Pixar/Sdf/Layer``'s, via the ``PixarUSD/__ObjC/Pixar/Sdf/LayerRegistry``
-   * that underlies all ``PixarUSD/__ObjC/Pixar/Sdf/Layer`` creation methods) of layers.
+   * of ``Sdf/Layer``'s, via the ``Sdf/LayerRegistry``
+   * that underlies all ``Sdf/Layer`` creation methods) of layers.
    *
    * It provides roughly five categories of API that address different aspects of scene
    * management:

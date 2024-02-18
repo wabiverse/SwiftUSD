@@ -28,17 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Gf
+import Trace
 
 /**
- * # ``Gf``
+ * # ``Trace``
  *
- * **Graphics Foundations**
+ * **Performance Tracking**
  *
  * ## Overview
  *
- * **Gf** is the **graphics foundations** library, it contains foundation
- * classes and functions for working with the basic mathematical aspects
- * of computer graphics. */
-public enum Gf
+ * **Trace** is the **performance tracking** library, it contains utility classes
+ * for counting, timing, measuring, and recording events. */
+public enum Trace
 {}

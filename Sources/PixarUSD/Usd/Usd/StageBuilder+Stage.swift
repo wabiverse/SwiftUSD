@@ -33,7 +33,7 @@ import Sdf
 import Usd
 
 /**
- * A ``__ObjC/Pixar/UsdStage`` for declaratively authoring scene description.
+ * A ``Usd/Stage`` for declaratively authoring scene description.
  *
  * This api is currently experimental and will evolve overtime, its
  * purpose is to declaratively author scene description in a design
@@ -45,7 +45,7 @@ import Usd
  * UsdStage that contains them.
  *
  * Usage example:
- * ```
+ * ```swift
  * UsdStage("HelloWorldExample", ext: .usda)
  * {
  *   UsdPrim("Hello", type: .xform)

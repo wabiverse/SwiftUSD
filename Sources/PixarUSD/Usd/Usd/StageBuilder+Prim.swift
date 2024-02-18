@@ -40,6 +40,9 @@ public protocol Prim
   var children: [any Prim] { get }
 }
 
+/**
+ * A ``Usd/Prim`` for declaratively authoring scene description
+ * on a ``UsdStage``. */
 public struct UsdPrim
 {
   public var path: Sdf.Path
