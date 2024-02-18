@@ -162,6 +162,9 @@ You can even run it in a tiny script, no package necessary, the comments next to
 statements describe the git sources to pull from, and everything transitively linked will come flying
 on in - checkout [**swift-sh**](https://github.com/mxcl/swift-sh)!
 
+> [!IMPORTANT]
+> You will need to use the **Wabi** [**fork of swift-sh**](https://github.com/wabiverse/swift-sh)
+> in order for this to work with **Swift 5.9** cxx interop.
 
 
 ![image](https://github.com/wabiverse/SwiftUSD/assets/18516968/1ee63339-b0b3-4f50-920b-9f6beb7cc227)
