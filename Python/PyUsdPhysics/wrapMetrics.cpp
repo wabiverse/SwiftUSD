@@ -35,7 +35,7 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapMetrics()
+void wrapUsdPhysicsMetrics()
 {
   def("GetStageKilogramsPerUnit", UsdPhysicsGetStageKilogramsPerUnit,
       arg("stage"));
