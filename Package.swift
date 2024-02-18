@@ -1220,6 +1220,8 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Hgi"),
         .define("MFB_PACKAGE_MODULE", to: "Hgi"),
         .define("HGI_EXPORTS", to: "1"),
+        // enable when swift supports std.unique_ptr
+        .define("SWIFT_HAS_UNIQUE_PTR", to: "0"),
       ]
     ),
 

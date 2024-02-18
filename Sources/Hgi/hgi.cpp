@@ -119,9 +119,11 @@ _MakeNewPlatformDefaultHgi()
 
 Hgi *Hgi::GetPlatformDefaultHgi()
 {
+#if SWIFT_HAS_UNIQUE_PTR
   TF_WARN("GetPlatformDefaultHgi is deprecated. "
           "Please use CreatePlatformDefaultHgi");
-
+#endif /* SWIFT_HAS_UNIQUE_PTR */
+  
   return _MakeNewPlatformDefaultHgi();
 }
 

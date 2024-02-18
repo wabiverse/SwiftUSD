@@ -25,6 +25,9 @@
 #define PXR_IMAGING_HGI_HGIIMPL_H
 
 #include <pxr/pxrns.h>
+
+#include "Arch/swiftInterop.h"
+
 #include "Tf/token.h"
 #include "Tf/type.h"
 
@@ -336,7 +339,7 @@ private:
   Hgi(const Hgi &) = delete;
 
   std::atomic<uint64_t> _uniqueIdCounter;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 ///
 /// Hgi factory for plugin system
