@@ -40,6 +40,12 @@ enum Creator
 
     Pixar.Bundler.shared.setup(.resources)
 
+    /* ---------- Hydra Engine. ---------- */
+
+    _ = Hgi.createPlatformDefaultHgi()
+
+    Msg.logger.log(level: .info, "Platform hgi created.")
+
     /* ----- Imperative api example. ----- */
 
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */

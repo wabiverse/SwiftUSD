@@ -1,6 +1,6 @@
 #usda 1.0
 (
-    doc = "SwiftUSD v23.11.27 | Declarative API"
+    doc = "SwiftUSD v23.11.28 | Declarative API"
 )
 
 def "DeclarativeScene"

@@ -165,6 +165,18 @@ public extension Bundle
   static let hd = Bundle(path: "\(pxrRoot)/SwiftUSD_Hd\(ext)")
 
   /**
+   * Where ``HgiMetal`` application bundle resources are located. */
+  static let hgiMetal = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiMetal\(ext)")
+
+  /**
+   * Where ``HgiVulkan`` application bundle resources are located. */
+  static let hgiVulkan = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiVulkan\(ext)")
+
+  /**
+   * Where ``HgiGL`` application bundle resources are located. */
+  static let hgiGL = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiGL\(ext)")
+
+  /**
    * Where ``Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
@@ -237,18 +249,6 @@ public extension Bundle
   static let pyUsdLux = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdLux\(ext)")
 
   /**
-   * Where ``UsdHydra`` application bundle resources are located. */
-  static let pyUsdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdHydra\(ext)")
-
-  /**
-   * Where ``CameraUtil`` application bundle resources are located. */
-  static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
-
-  /**
-   * Where ``PxOsd`` application bundle resources are located. */
-  static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
-
-  /**
    * Where ``UsdAbc`` application bundle resources are located. */
   static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdAbc\(ext)")
 
@@ -295,6 +295,22 @@ public extension Bundle
   /**
    * Where ``UsdVol`` application bundle resources are located. */
   static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdVol\(ext)")
+
+  /**
+   * Where ``UsdHydra`` application bundle resources are located. */
+  static let pyUsdHydra = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdHydra\(ext)")
+
+  /**
+   * Where ``CameraUtil`` application bundle resources are located. */
+  static let pyCameraUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyCameraUtil\(ext)")
+
+  /**
+   * Where ``PxOsd`` application bundle resources are located. */
+  static let pyPxOsd = Bundle(path: "\(pxrRoot)/SwiftUSD_PyPxOsd\(ext)")
+
+  /**
+   * Where ``Garch`` application bundle resources are located. */
+  static let pyGarch = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGarch\(ext)")
 }
 
 public enum BundleKind
@@ -407,6 +423,9 @@ public enum BundleFramework: CaseIterable
   case usdUI
   case usdVol
   case hd
+  case hgiMetal
+  case hgiVulkan
+  case hgiGL
 
   public var resourcePath: String?
   {
@@ -434,6 +453,9 @@ public enum BundleFramework: CaseIterable
       case .usdUI: Bundle.usdUI?.resourcePath
       case .usdVol: Bundle.usdVol?.resourcePath
       case .hd: Bundle.hd?.resourcePath
+      case .hgiMetal: Bundle.hgiMetal?.resourcePath
+      case .hgiVulkan: Bundle.hgiVulkan?.resourcePath
+      case .hgiGL: Bundle.hgiGL?.resourcePath
     }
   }
 }
@@ -473,6 +495,7 @@ public enum BundlePython: CaseIterable
   case pyUsdVol
   case pyCameraUtil
   case pyPxOsd
+  case pyGarch
 
   public var resourcePath: String?
   {
@@ -511,6 +534,7 @@ public enum BundlePython: CaseIterable
       case .pyUsdVol: Bundle.pyUsdVol?.resourcePath
       case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
       case .pyPxOsd: Bundle.pyPxOsd?.resourcePath
+      case .pyGarch: Bundle.pyGarch?.resourcePath
     }
   }
 }

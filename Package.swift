@@ -180,8 +180,28 @@ let package = Package(
       targets: ["Hd"]
     ),
     .library(
+      name: "Garch",
+      targets: ["Garch"]
+    ),
+    .library(
       name: "Hgi",
       targets: ["Hgi"]
+    ),
+    .library(
+      name: "HgiMetal",
+      targets: ["HgiMetal"]
+    ),
+    // .library(
+    //   name: "HgiVulkan",
+    //   targets: ["HgiVulkan"]
+    // ),
+    .library(
+      name: "HgiGL",
+      targets: ["HgiGL"]
+    ),
+    .library(
+      name: "HgiInterop",
+      targets: ["HgiInterop"]
     ),
     // ----- Pixar.UsdImaging -----
     .library(
@@ -354,6 +374,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyPxOsd"]
     ),
+    .library(
+      name: "PyGarch",
+      type: .dynamic,
+      targets: ["PyGarch"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -400,12 +425,13 @@ let package = Package(
         "PyUsdVol",
         "PyCameraUtil",
         "PyPxOsd",
+        "PyGarch",
         "PyUsdShaders",
       ]
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.2"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.5.3"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -449,7 +475,6 @@ let package = Package(
         .define("PXR_USE_NAMESPACES", to: "1"),
         .define("PXR_PYTHON_SUPPORT_ENABLED", to: "1"),
         .define("PXR_PREFER_SAFETY_OVER_SPEED", to: "1"),
-        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "1"),
         .define("PXR_OCIO_PLUGIN_ENABLED", to: "1"),
         .define("PXR_OIIO_PLUGIN_ENABLED", to: "1"),
         .define("PXR_PTEX_SUPPORT_ENABLED", to: "1"),
@@ -458,8 +483,10 @@ let package = Package(
         .define("PXR_HDF5_SUPPORT_ENABLED", to: "1"),
         /* --------- OSL is temp disabled. --------- */
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
-        /* --------- Apple build settings. --------- */
+        /* --------- GXAPI build settings. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
         /* --------- Standard USD defines. --------- */
         .define("MFB_PACKAGE_NAME", to: "Arch"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Arch"),
@@ -1207,6 +1234,29 @@ let package = Package(
     ),
 
     .target(
+      name: "Garch",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Garch"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
+        .define("MFB_PACKAGE_MODULE", to: "Garch"),
+        .define("GARCH_EXPORTS", to: "1"),
+      ],
+      linkerSettings: [
+        .linkedFramework("OpenGL", .when(platforms: Arch.OS.apple.platform)),
+        .linkedLibrary("glut", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("GL", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("GLU", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("m", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("X11", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("Xt", .when(platforms: Arch.OS.linux.platform)),
+      ]
+    ),
+
+    .target(
       name: "Hgi",
       dependencies: [
         .target(name: "Arch"),
@@ -1222,6 +1272,104 @@ let package = Package(
         .define("HGI_EXPORTS", to: "1"),
         // enable when swift supports std.unique_ptr
         .define("SWIFT_HAS_UNIQUE_PTR", to: "0"),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+      ]
+    ),
+
+    .target(
+      name: "HgiMetal",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Hgi"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HgiMetal"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HgiMetal"),
+        .define("MFB_PACKAGE_MODULE", to: "HgiMetal"),
+        .define("HGIMETAL_EXPORTS", to: "1"),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+      ],
+      linkerSettings: [
+        .linkedFramework("Metal", .when(platforms: Arch.OS.apple.platform)),
+        .linkedFramework("AppKit", .when(platforms: [.macOS])),
+      ]
+    ),
+
+    // .target(
+    //   name: "HgiVulkan",
+    //   dependencies: [
+    //     .target(name: "Arch"),
+    //     .target(name: "Tf"),
+    //     .target(name: "Trace"),
+    //     .target(name: "Hgi"),
+    //   ],
+    //   resources: [
+    //     .process("Resources")
+    //   ],
+    //   cxxSettings: [
+    //     .define("MFB_PACKAGE_NAME", to: "HgiVulkan"),
+    //     .define("MFB_ALT_PACKAGE_NAME", to: "HgiVulkan"),
+    //     .define("MFB_PACKAGE_MODULE", to: "HgiVulkan"),
+    //     .define("HGIVULKAN_EXPORTS", to: "1"),
+    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+    //     .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+    //   ]
+    // ),
+
+    .target(
+      name: "HgiGL",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Garch"),
+        .target(name: "Hgi"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HgiGL"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HgiGL"),
+        .define("MFB_PACKAGE_MODULE", to: "HgiGL"),
+        .define("HGIGL_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
+      name: "HgiInterop",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Gf"),
+        .target(name: "Garch"),
+        .target(name: "Hgi"),
+        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
+        // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
+        .target(name: "HgiGL"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HgiInterop"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HgiInterop"),
+        .define("MFB_PACKAGE_MODULE", to: "HgiInterop"),
+        .define("HGIINTEROP_EXPORTS", to: "1"),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+      ],
+      linkerSettings: [
+        .linkedFramework("CoreVideo", .when(platforms: Arch.OS.apple.platform))
       ]
     ),
 
@@ -1787,6 +1935,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyGarch",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyGarch",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Garch"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
+        .define("MFB_PACKAGE_MODULE", to: "Garch"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -1881,7 +2046,12 @@ let package = Package(
         .target(name: "Hf"),
         .target(name: "PxOsd"),
         .target(name: "Hd"),
+        .target(name: "Garch"),
         .target(name: "Hgi"),
+        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
+        // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
+        .target(name: "HgiGL"),
+        .target(name: "HgiInterop"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------
