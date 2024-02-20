@@ -42,9 +42,15 @@ enum Creator
 
     /* ---------- Hydra Engine. ---------- */
 
-    _ = Hgi.createPlatformDefaultHgi()
+    #if canImport(Metal)
 
-    Msg.logger.log(level: .info, "Platform hgi created.")
+      let hgi = HgiMetal.createPlatformDefaultHgi()
+
+      let driver = HdDriver(name: Hgi.Tokens.renderDriver.token, driver: VtValue(hgi))
+
+      Msg.logger.log(level: .info, "Metal HGI \(driver.name.string) created. Metal API v\(hgi.apiVersion).")
+
+    #endif /* canImport(Metal) */
 
     /* ----- Imperative api example. ----- */
 

@@ -138,6 +138,15 @@ HgiMetal::~HgiMetal()
   }
 }
 
+HgiMetalPtr HgiMetal::GetPlatformDefaultHgi()
+{
+  HgiMetalPtr hgi = std::make_shared<HgiMetal>();
+  
+  hgi.reset(reinterpret_cast<HgiMetal*>(Hgi::GetPlatformDefaultHgi()));
+  
+  return hgi;
+}
+
 bool HgiMetal::IsBackendSupported() const
 {
   // Want Metal 2.0 and Metal Shading Language 2.2 or higher.
@@ -523,3 +532,13 @@ bool HgiMetal::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiMetalRetain(PXR_NS::HgiMetal *)
+{
+  
+}
+
+void HgiMetalRelease(PXR_NS::HgiMetal *)
+{
+  
+}

@@ -28,30 +28,33 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(Metal)
-  import HgiMetal
+import Hd
 
-  public enum HgiMetal
-  {
-    public static func createPlatformDefaultHgi() -> Pixar.HgiMetalPtr
-    {
-      Pixar.HgiMetal.GetPlatformDefaultHgi()
-    }
-  }
+/**
+ * ``HdDriver``
+ *
+ * ### Overview
+ *
+ * Represents a device object, commonly a render
+ * device, that is owned by the application and passed to
+ * HdRenderIndex. The RenderIndex passes it to the render
+ * delegate and rendering tasks. The application manages
+ * the lifetime (destruction) of HdDriver and must ensure
+ * it remains valid while Hydra is running. */
+public typealias HdDriver = Pixar.HdDriver
 
-  public extension Pixar.HgiMetal
-  {
-    var apiVersion: Int
-    {
-      Int(GetAPIVersion())
-    }
-  }
-
-  public extension Pixar.HgiMetalPtr
-  {
-    var apiVersion: Int
-    {
-      pointee.apiVersion
-    }
-  }
-#endif /* canImport(Metal) */
+public extension Hd
+{
+  /**
+   * ``Driver``
+   *
+   * ### Overview
+   *
+   * Represents a device object, commonly a render
+   * device, that is owned by the application and passed to
+   * HdRenderIndex. The RenderIndex passes it to the render
+   * delegate and rendering tasks. The application manages
+   * the lifetime (destruction) of HdDriver and must ensure
+   * it remains valid while Hydra is running. */
+  typealias Driver = HdDriver
+}

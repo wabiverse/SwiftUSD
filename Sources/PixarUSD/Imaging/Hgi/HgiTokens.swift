@@ -28,30 +28,42 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(Metal)
-  import HgiMetal
+import Hgi
 
-  public enum HgiMetal
+private extension Hgi
+{
+  /**
+   * Private struct to hold the static
+   * data for the ``Hgi`` library. */
+  struct StaticData
   {
-    public static func createPlatformDefaultHgi() -> Pixar.HgiMetalPtr
+    static let shared = StaticData()
+    private init()
+    {}
+
+    let tokens = Pixar.HgiTokens_StaticTokenType()
+  }
+}
+
+public extension Hgi
+{
+  /**
+   * # ``Tokens``
+   *
+   * ### Overview
+   *
+   * Public, client facing api to access
+   * the static ``Hgi`` tokens. */
+  enum Tokens: CaseIterable
+  {
+    case renderDriver
+
+    public var token: Tf.Token
     {
-      Pixar.HgiMetal.GetPlatformDefaultHgi()
+      switch self
+      {
+        case .renderDriver: StaticData.shared.tokens.renderDriver
+      }
     }
   }
-
-  public extension Pixar.HgiMetal
-  {
-    var apiVersion: Int
-    {
-      Int(GetAPIVersion())
-    }
-  }
-
-  public extension Pixar.HgiMetalPtr
-  {
-    var apiVersion: Int
-    {
-      pointee.apiVersion
-    }
-  }
-#endif /* canImport(Metal) */
+}

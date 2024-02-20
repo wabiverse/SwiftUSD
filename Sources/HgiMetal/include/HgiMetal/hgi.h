@@ -25,6 +25,8 @@
 #define PXR_IMAGING_HGI_METAL_HGI_H
 
 #include <pxr/pxrns.h>
+#include "Arch/swiftInterop.h"
+
 #include "HgiMetal/api.h"
 #include "HgiMetal/capabilities.h"
 #include "HgiMetal/indirectCommandEncoder.h"
@@ -34,8 +36,11 @@
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 #include <stack>
+#include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
 
 enum
 {
@@ -63,6 +68,9 @@ public:
 
   HGIMETAL_API
   ~HgiMetal() override;
+  
+  HGIMETAL_API
+  static HgiMetalPtr GetPlatformDefaultHgi();
 
   HGIMETAL_API
   bool IsBackendSupported() const override;
@@ -248,8 +256,11 @@ private:
 #if !__has_feature(objc_arc)
   NS::AutoreleasePool *_pool;
 #endif
-};
+} SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiMetalRetain(PXR_NS::HgiMetal *);
+void HgiMetalRelease(PXR_NS::HgiMetal *);
 
 #endif /* PXR_IMAGING_HGI_METAL_HGI_H */
