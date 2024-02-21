@@ -1,4 +1,19 @@
-# <sub>Universal Scene Description (USD) for Swift</sub>
+<!-- markdownlint-configure-file {
+  "MD013": {
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD033": false,
+  "MD041": false
+} -->
+
+
+<div align="center">
+
+# Universal Scene Description (USD) for Swift
+
+</div>
+
 <sup>
   <div>
     <a href="https://wabi.foundation/pixarusd/documentation/pixarusd">
@@ -16,7 +31,19 @@
 > #### Supporting SwiftUSD ❤️
 > If you find **SwiftUSD** useful, please consider supporting me by [becoming a sponsor](https://github.com/sponsors/wabiverse). I spend a tremendous amount of time dedicating my life to open source projects, and each sponsorship helps me focus more time on making quality tools and software for the community.
 
-### Pixar's Universal Scene Description for Swift and the Metaverse
+<br/>
+
+<div align="center">
+
+# Swifting the Metaverse
+
+</div>
+
+<div align="center">
+
+# <img width="350" src="https://www.dropbox.com/scl/fi/96fxs64ap4aaq9f7vp0yf/swiftusdcropped.png?rlkey=wvgzfodi8skub1svqf1w4g07g&raw=1">
+
+</div>
 
 Universal Scene Description (**USD**) is an efficient, scalable system for
 authoring, reading, and streaming time-sampled scene description for

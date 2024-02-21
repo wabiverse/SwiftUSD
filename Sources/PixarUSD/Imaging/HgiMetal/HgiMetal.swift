@@ -29,8 +29,8 @@
  * ---------------------------------------------------------------- */
 
 #if canImport(Metal)
+  import CosmoGraph
   import HgiMetal
-  import Metal
 
   public enum HgiMetal
   {
@@ -46,6 +46,16 @@
     {
       Int(GetAPIVersion())
     }
+
+    private borrowing func GetPrimaryDeviceCopy() -> MTL.Device
+    {
+      GetPrimaryDevice()
+    }
+
+    var device: MTL.Device
+    {
+      GetPrimaryDeviceCopy()
+    }
   }
 
   public extension Pixar.HgiMetalPtr
@@ -53,6 +63,11 @@
     var apiVersion: Int
     {
       pointee.apiVersion
+    }
+
+    var device: MTL.Device
+    {
+      pointee.device
     }
   }
 #endif /* canImport(Metal) */

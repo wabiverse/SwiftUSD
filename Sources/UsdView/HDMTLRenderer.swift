@@ -58,6 +58,7 @@ import PixarUSD
     func info()
     {
       Msg.logger.log(level: .info, "Created HGI -> Metal API v\(hgi.apiVersion).")
+      Msg.logger.log(level: .info, "GPU Architecture -> \(hgi.device.arch)")
     }
 
     func mtkView(_: MTKView, drawableSizeWillChange size: CGSize)
