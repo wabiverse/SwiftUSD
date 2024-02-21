@@ -28,41 +28,44 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Hd
+import Foundation
+import PixarUSD
+#if canImport(Metal) && !os(visionOS)
+  import Metal
+  import MetalKit
 
-/**
- * ``HdDriver``
- *
- * ### Overview
- *
- * Represents a device object, commonly a render
- * device, that is owned by the application and passed to
- * HdRenderIndex. The RenderIndex passes it to the render
- * delegate and rendering tasks. The application manages
- * the lifetime (destruction) of HdDriver and must ensure
- * it remains valid while Hydra is running. */
-public typealias HdDriver = Pixar.HdDriver
-
-public extension Hd
-{
   /**
-   * ``Driver``
+   * ``HDMTLRenderer``
    *
    * ### Overview
    *
-   * Represents a device object, commonly a render
-   * device, that is owned by the application and passed to
-   * HdRenderIndex. The RenderIndex passes it to the render
-   * delegate and rendering tasks. The application manages
-   * the lifetime (destruction) of HdDriver and must ensure
-   * it remains valid while Hydra is running. */
-  typealias Driver = HdDriver
-}
-
-public extension Hd.Driver
-{
-  init(name: Hgi.Tokens, driver: Vt.Value)
+   * The Hydra Engine (``Hd``) Metal renderer for the ``UsdView``
+   * application conforms to the ``MTKViewDelegate`` protocol,
+   * allowing it to be set as a ``MTKView`` object's delegate to
+   * provide a drawing method to a ``MTKView`` object and respond
+   * to rendering events. */
+  class HDMTLRenderer: NSObject, MTKViewDelegate
   {
-    self.init(name: name.token, driver: driver)
+    let hgi: Pixar.HgiMetalPtr
+    let driver: HdDriver
+
+    init?(device _: MTLDevice)
+    {
+      hgi = HgiMetal.createHgi()
+      driver = HdDriver(name: .renderDriver, driver: VtValue(hgi))
+    }
+
+    func info()
+    {
+      Msg.logger.log(level: .info, "Created HGI -> Metal API v\(hgi.apiVersion).")
+    }
+
+    func mtkView(_: MTKView, drawableSizeWillChange size: CGSize)
+    {
+      print("drawableSizeWillChange", size)
+    }
+
+    func draw(in _: MTKView)
+    {}
   }
-}
+#endif /* canImport(Metal) && !os(visionOS) */

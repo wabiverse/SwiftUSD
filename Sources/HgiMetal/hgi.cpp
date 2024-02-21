@@ -138,11 +138,11 @@ HgiMetal::~HgiMetal()
   }
 }
 
-HgiMetalPtr HgiMetal::GetPlatformDefaultHgi()
+HgiMetalPtr HgiMetal::CreateHgi()
 {
   HgiMetalPtr hgi = std::make_shared<HgiMetal>();
   
-  hgi.reset(reinterpret_cast<HgiMetal*>(Hgi::GetPlatformDefaultHgi()));
+  hgi.reset(dynamic_cast<HgiMetal*>(Hgi::GetPlatformDefaultHgi()));
   
   return hgi;
 }
@@ -532,13 +532,3 @@ bool HgiMetal::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void HgiMetalRetain(PXR_NS::HgiMetal *)
-{
-  
-}
-
-void HgiMetalRelease(PXR_NS::HgiMetal *)
-{
-  
-}

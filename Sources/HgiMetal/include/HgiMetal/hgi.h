@@ -70,7 +70,7 @@ public:
   ~HgiMetal() override;
   
   HGIMETAL_API
-  static HgiMetalPtr GetPlatformDefaultHgi();
+  static HgiMetalPtr CreateHgi();
 
   HGIMETAL_API
   bool IsBackendSupported() const override;
@@ -256,11 +256,8 @@ private:
 #if !__has_feature(objc_arc)
   NS::AutoreleasePool *_pool;
 #endif
-} SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease);
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void HgiMetalRetain(PXR_NS::HgiMetal *);
-void HgiMetalRelease(PXR_NS::HgiMetal *);
 
 #endif /* PXR_IMAGING_HGI_METAL_HGI_H */

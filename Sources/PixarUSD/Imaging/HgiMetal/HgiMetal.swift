@@ -30,12 +30,13 @@
 
 #if canImport(Metal)
   import HgiMetal
+  import Metal
 
   public enum HgiMetal
   {
-    public static func createPlatformDefaultHgi() -> Pixar.HgiMetalPtr
+    public static func createHgi() -> Pixar.HgiMetalPtr
     {
-      Pixar.HgiMetal.GetPlatformDefaultHgi()
+      Pixar.HgiMetal.CreateHgi()
     }
   }
 

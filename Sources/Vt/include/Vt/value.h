@@ -35,6 +35,7 @@
 #include "Arch/demangle.h"
 #include "Arch/hints.h"
 #include "Arch/pragmas.h"
+#include "Arch/swiftInterop.h"
 #include "Tf/api.h"
 #include "Tf/anyUniquePtr.h"
 #include "Tf/pointerAndBits.h"
@@ -1337,7 +1338,7 @@ private:
 
   _Storage _storage;
   TfPointerAndBits<const _TypeInfo> _info;
-};
+} SWIFT_SELF_CONTAINED;
 
 #ifndef doxygen
 

@@ -30,27 +30,55 @@
 
 import Foundation
 import PixarUSD
+#if canImport(Python)
+  import PyBundle
+#endif /* canImport(Python) */
+#if canImport(Metal)
+  import Metal
+#endif /* canImport(Metal) */
 
+/**
+ * ``UsdView``
+ *
+ * ### Overview
+ *
+ * A ``UsdView`` application written in Swift for
+ * the purposes of demonstrating the usage of USD,
+ * from the Swift programming language. */
 @main
-enum Creator
+class UsdView
 {
-  static func main()
+  #if canImport(Metal) && !os(visionOS)
+    let hydra: HDMTLRenderer
+  #endif /* canImport(Metal) && !os(visionOS) */
+
+  public init()
   {
     /* Setup all usd resources (python, plugins, resources). */
-
     Pixar.Bundler.shared.setup(.resources)
+
+    #if canImport(Python)
+      /* embed & init python. */
+      PyBundler.shared.pyInit()
+      PyBundler.shared.pyInfo()
+    #endif /* canImport(Python) */
+
+    #if canImport(Metal) && !os(visionOS)
+      hydra = HDMTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
+    #endif /* canImport(Metal) && !os(visionOS) */
+  }
+
+  static func main()
+  {
+    let app = UsdView()
 
     /* ---------- Hydra Engine. ---------- */
 
-    #if canImport(Metal)
+    #if canImport(Metal) && !os(visionOS)
 
-      let hgi = HgiMetal.createPlatformDefaultHgi()
+      app.hydra.info()
 
-      let driver = HdDriver(name: Hgi.Tokens.renderDriver.token, driver: VtValue(hgi))
-
-      Msg.logger.log(level: .info, "Metal HGI \(driver.name.string) created. Metal API v\(hgi.apiVersion).")
-
-    #endif /* canImport(Metal) */
+    #endif /* canImport(Metal) && !os(visionOS) */
 
     /* ----- Imperative api example. ----- */
 
