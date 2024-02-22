@@ -119,7 +119,7 @@ class UsdView
 
     /* Iterate the stage and print out the path to each prim. */
 
-    for prim in stage.scene
+    for prim in stage.traverse()
     {
       let primType = !prim.typeName.isEmpty ? "(\(prim.typeName.string))" : ""
       Msg.logger.log(level: .info, "\(prim.name.string)\(primType) -> \(prim.path.string)")

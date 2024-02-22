@@ -107,12 +107,7 @@ public extension Usd
 
 public extension Usd.Stage
 {
-  var scene: [Usd.Prim]
-  {
-    getPrims()
-  }
-
-  func getPrims() -> [Usd.Prim]
+  func traverse() -> [Usd.Prim]
   {
     let it = Usd.PrimRange.Stage(getPtr())
 
@@ -155,11 +150,6 @@ public extension Usd.Stage
 
 public extension Usd.StageRefPtr
 {
-  var scene: [Usd.Prim]
-  {
-    pointee.scene
-  }
-
   /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *
@@ -178,9 +168,9 @@ public extension Usd.StageRefPtr
    * directly.
    *
    * This is equivalent to ``Usd.PrimRange.stage()``. */
-  func traverse() -> Usd.PrimRange
+  func traverse() -> [Usd.Prim]
   {
-    pointee.Traverse()
+    pointee.traverse()
   }
 
   /**

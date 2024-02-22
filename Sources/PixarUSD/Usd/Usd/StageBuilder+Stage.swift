@@ -110,16 +110,7 @@ public struct UsdStage
     }
   }
 
-  @StageBuilder
-  public var scene: [UsdPrim]
-  {
-    getPrims().compactMap
-    {
-      UsdPrim($0.path.string, type: .token($0.typeName))
-    }
-  }
-
-  private func getPrims() -> [Usd.Prim]
+  public func traverse() -> [Usd.Prim]
   {
     let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
 
