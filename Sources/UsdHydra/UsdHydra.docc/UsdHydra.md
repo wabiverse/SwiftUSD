@@ -1,6 +1,6 @@
-# ``UsdHydra`` USD Hydra Schemas
+# `UsdHydra` USD Hydra Schemas
 
-### Overview
+## Overview
 
 **UsdHydra** provides the **UsdHydraGenerativeProceduralAPI** schema for
 extending the definition of **UsdProcGenerativeProcedural** prims to provide

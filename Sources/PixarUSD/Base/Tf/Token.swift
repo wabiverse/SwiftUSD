@@ -41,7 +41,7 @@ import Plug
 /**
  * # TfToken
  *
- * ### Overview
+ * ## Overview
  *
  * **Token** for efficient comparison, assignment, and hashing of known strings.
  *
@@ -55,7 +55,7 @@ public extension Tf
   /**
    * # Tf.Token
    *
-   * ### Overview
+   * ## Overview
    *
    * **Token** for efficient comparison, assignment, and hashing of known strings.
    *

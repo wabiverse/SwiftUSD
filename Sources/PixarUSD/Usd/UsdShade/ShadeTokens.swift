@@ -50,7 +50,7 @@ public extension UsdShade
   /**
    * # UsdShade.Tokens
    *
-   * ### Overview
+   * ## Overview
    *
    * Public, client facing api to access
    * the static UsdShade tokens. */

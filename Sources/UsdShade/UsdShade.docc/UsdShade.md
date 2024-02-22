@@ -1,6 +1,6 @@
-# ``UsdShade``
+# `UsdShade`
 
-### Overview
+## Overview
 
 UsdShade provides schemas and behaviors for creating and binding materials,
 which encapsulate shading networks.

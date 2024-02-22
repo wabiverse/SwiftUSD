@@ -107,6 +107,24 @@ public extension Usd
 
 public extension Usd.Stage
 {
+  /**
+   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
+   *
+   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
+   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
+   * one can do:
+   * ```swift
+   * for prim in stage.traverse()
+   * {
+   *   print(prim.GetPath())
+   * }
+   * ```
+   *
+   * If either a pre-and-post-order traversal or, a traversal rooted at
+   * a particular prim is desired, construct a ``Usd.PrimRange``
+   * directly.
+   *
+   * This is equivalent to ``Usd.PrimRange.stage()``. */
   func traverse() -> [Usd.Prim]
   {
     let it = Usd.PrimRange.Stage(getPtr())
@@ -114,6 +132,13 @@ public extension Usd.Stage
     return IteratorSequence(it).map { $0 }
   }
 
+  /**
+   * ``InitialLoadingSet``
+   *
+   * ## Overview
+   *
+   * Specifies the initial set of prims
+   * to load when opening a UsdStage. */
   enum InitialLoadingSet
   {
     case all
@@ -129,18 +154,80 @@ public extension Usd.Stage
     }
   }
 
+  /**
+   * Create a new stage with root layer `identifier`, destroying
+   * potentially existing files with that identifier; it is considered an
+   * error if an existing, open layer is present with this identifier.
+   *
+   * ``SdfLayer.CreateNew()``
+   *
+   * Invoking an overload that does not take a `sessionLayer`` argument will
+   * create a stage with an anonymous in-memory session layer. To create a
+   * stage without a session layer, pass TfNullPtr (or None in python) as the
+   * `sessionLayer` argument.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   *
+   * If `pathResolverContext` is provided it will be bound when creating the
+   * root layer at `identifier` and whenever asset path resolution is done
+   * for this stage, regardless of what other context may be bound at that
+   * time. Otherwise Usd will create the root layer with no context bound,
+   * then create a context for all future asset path resolution for the stage
+   * by calling ``ArResolver.createDefaultContextForAsset()`` with the root
+   * layer's repository path if the layer has one, otherwise its resolved
+   * path. */
   @discardableResult
   static func createNew(_ identifier: String, ext: UsdStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
     Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
   }
 
+  /**
+   * Create a new stage with root layer `identifier`, destroying
+   * potentially existing files with that identifier; it is considered an
+   * error if an existing, open layer is present with this identifier.
+   *
+   * ``SdfLayer.CreateNew()``
+   *
+   * Invoking an overload that does not take a `sessionLayer`` argument will
+   * create a stage with an anonymous in-memory session layer. To create a
+   * stage without a session layer, pass TfNullPtr (or None in python) as the
+   * `sessionLayer` argument.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   *
+   * If `pathResolverContext` is provided it will be bound when creating the
+   * root layer at `identifier` and whenever asset path resolution is done
+   * for this stage, regardless of what other context may be bound at that
+   * time. Otherwise Usd will create the root layer with no context bound,
+   * then create a context for all future asset path resolution for the stage
+   * by calling ``ArResolver.createDefaultContextForAsset()`` with the root
+   * layer's repository path if the layer has one, otherwise its resolved
+   * path. */
   @discardableResult
   static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
     Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
   }
 
+  /**
+   * Attempt to find a matching existing stage in a cache if
+   * ``UsdStageCacheContext`` objects exist on the stack. Failing that, create
+   * a new stage and recursively compose prims defined within and referenced by
+   * the layer at `filePath`, which must already exist.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   *
+   * If `pathResolverContext` is provided it will be bound when opening the
+   * root layer at `filePath` and whenever asset path resolution is done for
+   * this stage, regardless of what other context may be bound at that time.
+   * Otherwise Usd will open the root layer with no context bound, then create
+   * a context for all future asset path resolution for the stage by calling
+   * ``ArResolver.CreateDefaultContextForAsset()`` with the layer's repository
+   * path if the layer has one, otherwise its resolved path. */
   @discardableResult
   static func open(_ filePath: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
@@ -174,7 +261,7 @@ public extension Usd.StageRefPtr
   }
 
   /**
-   * Attempt to ensure a UsdPrim at path is defined (according to Usd.Prim.isDefined()) on this stage.
+   * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
    *
    * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
    * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
@@ -195,7 +282,7 @@ public extension Usd.StageRefPtr
   }
 
   /**
-   * Attempt to ensure a UsdPrim at path is defined (according to UsdPrim::IsDefined()) on this stage.
+   * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
    *
    * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
    * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
@@ -207,30 +294,85 @@ public extension Usd.StageRefPtr
    * any of the necessary `Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
    * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Usd.Prim``.
    *
-   * > [!NOTE]
-   * > This method may return a defined prim whose **type name** does not match the supplied **type name**,
-   * > in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
+   * > Note: This method may return a defined prim whose **type name** does not match the supplied **type name**,
+   *   in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
   @discardableResult
   func definePrim(_ path: String, type name: Tf.Token = Tf.Token()) -> Usd.Prim
   {
     pointee.DefinePrim(.init(path), name)
   }
 
+  /**
+   * Return the ``Usd.Prim`` at `path`, or an invalid ``Usd.Prim`` if none exists.
+   *
+   * If path indicates a prim beneath an instance, returns an instance
+   * proxy prim if a prim exists at the corresponding path in that instance's
+   * prototype.
+   *
+   * Unlike ``UsdStage.overridePrim()`` and ``UsdStage.definePrim()``, this
+   * method will never author scene description, and therefore is safe to
+   * use as a "reader" in the Usd multi-threading model. */
   func getPrim(at path: Sdf.Path) -> Usd.Prim
   {
     pointee.GetPrimAtPath(path)
   }
 
+  /**
+   * Return the ``Usd.Prim`` at `path`, or an invalid ``Usd.Prim`` if none exists.
+   *
+   * If path indicates a prim beneath an instance, returns an instance
+   * proxy prim if a prim exists at the corresponding path in that instance's
+   * prototype.
+   *
+   * Unlike ``UsdStage.overridePrim()`` and ``UsdStage.definePrim()``, this
+   * method will never author scene description, and therefore is safe to
+   * use as a "reader" in the Usd multi-threading model. */
   func getPrim(at path: String) -> Usd.Prim
   {
     pointee.GetPrimAtPath(Sdf.Path(path))
   }
 
+  /**
+   * Attempt to ensure a ``Usd.Prim`` at path exists on this stage.
+   *
+   * If a prim already exists at path, return it. Otherwise author
+   * ``SdfPrimSpecs`` with `specifier == SdfSpecifierOver` and empty
+   * `typeName` at the current ``EditTarget`` to create this prim and any
+   * nonexistent ancestors, then return it.
+   *
+   * The given path must be an absolute prim path that does not contain
+   * any variant selections.
+   *
+   * If it is impossible to author any of the necessary PrimSpecs, (for
+   * example, in case `path` cannot map to the current UsdEditTarget's
+   * namespace) issue an error and return an invalid ``Usd.Prim``.
+   *
+   * If an ancestor of `path` identifies an inactive prim, author scene
+   * description as described above but return an invalid prim, since the
+   * resulting prim is descendant to an inactive prim. */
   func overridePrim(path: Sdf.Path) -> Usd.Prim
   {
     pointee.OverridePrim(path)
   }
 
+  /**
+   * Attempt to ensure a ``Usd.Prim`` at path exists on this stage.
+   *
+   * If a prim already exists at path, return it. Otherwise author
+   * ``SdfPrimSpecs`` with `specifier == SdfSpecifierOver` and empty
+   * `typeName` at the current ``EditTarget`` to create this prim and any
+   * nonexistent ancestors, then return it.
+   *
+   * The given path must be an absolute prim path that does not contain
+   * any variant selections.
+   *
+   * If it is impossible to author any of the necessary PrimSpecs, (for
+   * example, in case `path` cannot map to the current UsdEditTarget's
+   * namespace) issue an error and return an invalid ``Usd.Prim``.
+   *
+   * If an ancestor of `path` identifies an inactive prim, author scene
+   * description as described above but return an invalid prim, since the
+   * resulting prim is descendant to an inactive prim. */
   func overridePrim(path: String) -> Usd.Prim
   {
     pointee.OverridePrim(Sdf.Path(path))

@@ -40,7 +40,7 @@ import PixarUSD
 /**
  * ``UsdView``
  *
- * ### Overview
+ * ## Overview
  *
  * A ``UsdView`` application written in Swift for
  * the purposes of demonstrating the usage of USD,

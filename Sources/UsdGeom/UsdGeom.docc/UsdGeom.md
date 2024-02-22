@@ -1,6 +1,6 @@
-# ``UsdGeom``
+# `UsdGeom`
 
-### Overview
+## Overview
 
 **UsdGeom** defines the 3D graphics-related prim and property schemas that
 together form a basis for interchanging geometry between DCC tools in a

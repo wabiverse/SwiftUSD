@@ -33,7 +33,7 @@ import Hd
 /**
  * ``HdDriver``
  *
- * ### Overview
+ * ## Overview
  *
  * Represents a device object, commonly a render
  * device, that is owned by the application and passed to
@@ -48,7 +48,7 @@ public extension Hd
   /**
    * ``Driver``
    *
-   * ### Overview
+   * ## Overview
    *
    * Represents a device object, commonly a render
    * device, that is owned by the application and passed to

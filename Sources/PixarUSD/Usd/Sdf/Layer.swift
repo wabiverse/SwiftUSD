@@ -42,11 +42,18 @@ public extension Sdf
 
 public extension SdfLayerHandle
 {
+  /**
+   * Sets the documentation string for this layer. */
   func set(doc: String)
   {
     pointee.SetDocumentation(std.string(doc))
   }
 
+  /**
+   * Returns `true` if successful, `false` if an error occurred.
+   * Returns `false` if the layer has no remembered file name or the
+   * layer type cannot be saved. The layer will not be overwritten if the
+   * file exists and the layer is not dirty unless `force` is true. */
   func save(force: Bool = false)
   {
     pointee.Save(force)

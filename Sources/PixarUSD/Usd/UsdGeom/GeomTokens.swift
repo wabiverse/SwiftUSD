@@ -50,7 +50,7 @@ public extension UsdGeom
   /**
    * # UsdGeom.Tokens
    *
-   * ### Overview
+   * ## Overview
    *
    * Public, client facing api to access
    * the static UsdGeom tokens. */

@@ -110,6 +110,24 @@ public struct UsdStage
     }
   }
 
+  /**
+   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
+   *
+   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
+   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
+   * one can do:
+   * ```swift
+   * for prim in stage.traverse()
+   * {
+   *   print(prim.GetPath())
+   * }
+   * ```
+   *
+   * If either a pre-and-post-order traversal or, a traversal rooted at
+   * a particular prim is desired, construct a ``Usd.PrimRange``
+   * directly.
+   *
+   * This is equivalent to ``Usd.PrimRange.stage()``. */
   public func traverse() -> [Usd.Prim]
   {
     let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
@@ -117,6 +135,8 @@ public struct UsdStage
     return IteratorSequence(it).map { $0 }
   }
 
+  /**
+   * Sets the documentation string for this layer. */
   @discardableResult
   public func set(doc: String) -> UsdStage
   {
@@ -125,6 +145,14 @@ public struct UsdStage
     return self
   }
 
+  /**
+   * Save all dirty layers contributing to this stage.
+   *
+   * Calls ``Sdf.Layer.save()`` on all dirty layers contributing to this stage
+   * except session layers and sublayers of session layers. This function will emit a
+   * warning and skip each dirty anonymous layer it encounters, since anonymous layers
+   * cannot be saved with ``Sdf.Layer.save()``. These layers must be manually
+   * exported by calling ``Sdf.Layer.export()``. */
   @discardableResult
   public func save() -> UsdStage
   {

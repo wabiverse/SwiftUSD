@@ -101,6 +101,8 @@ public extension Usd
 
 extension Usd.Prim: Prim
 {
+  /**
+   * Sets the documentation string for this layer. */
   public func set(doc: String)
   {
     SetDocumentation(std.string(doc))

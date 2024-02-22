@@ -50,7 +50,7 @@ public extension Kind
   /**
    * # Kind.Tokens
    *
-   * ### Overview
+   * ## Overview
    *
    * Public, client facing api to access
    * the static Kind tokens. */

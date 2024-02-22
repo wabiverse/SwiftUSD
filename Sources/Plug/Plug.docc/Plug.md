@@ -1,28 +1,28 @@
 # Plug: Plugin Framework
 
-### Overview
+## Overview
 
-Provides a plug-in framework implementation. The ``PlugPlugin`` class defines
-the interface to plug-in modules. The ``PlugRegistry`` class defines a mechanism
+Provides a plug-in framework implementation. The `PlugPlugin` class defines
+the interface to plug-in modules. The `PlugRegistry` class defines a mechanism
 for discovering and registering plug-in modules both automatically upon first use
-and manually at run-time by client calls to ``PlugRegistry::RegisterPlugins``.
-``PlugRegistry`` sends the ``PlugNotice::DidRegisterPlugins`` notice when new
-plug-ins are registered (both when ``Plug`` is first used and again for additional subsequent calls to ``PlugRegistry::RegisterPlugins``).
+and manually at run-time by client calls to `PlugRegistry::RegisterPlugins`.
+`PlugRegistry` sends the `PlugNotice::DidRegisterPlugins` notice when new
+plug-ins are registered (both when `Plug` is first used and again for additional subsequent calls to `PlugRegistry::RegisterPlugins`).
 
-``PlugRegistry`` also provides a mechanism to find ``TfType`` objects for types
+`PlugRegistry` also provides a mechanism to find `TfType` objects for types
 defined in plug-ins, then find the plug-ins that provide those types, and read
 metadata related to those plug-ins and the contained types, and load the plug-ins.
 
-The ``PlugPlugin`` class contains properties that indicate whether or not a plug-in
+The `PlugPlugin` class contains properties that indicate whether or not a plug-in
 is currently loaded and whether a plug-in is a Python module or a C++ shared library.
 It also includes functions that return a plug-in's name, location in the file system,
 the names of its base classes, its metadata, and any existing dependencies.
 
 ### Plug-In Discovery & Registration
 
-The ``PlugRegistry`` class discovers plug-ins both on first use and in response to
-calls to ``PlugRegistry::RegisterPlugins``. This means that plugin-dependent code
-should listen to the ``PlugNotice::DidRegisterPlugins`` notification in order to
+The `PlugRegistry` class discovers plug-ins both on first use and in response to
+calls to `PlugRegistry::RegisterPlugins`. This means that plugin-dependent code
+should listen to the `PlugNotice::DidRegisterPlugins` notification in order to
 update appropriately if new plugins are registered during the course of a running
 program.
 
@@ -36,5 +36,5 @@ as editor plug-ins.
 ### Plug-In Metadata
 
 Plug-ins are found and described using `plugInfo.json` files that may be read
-without loading the plugin.  The structure of a `plugInfo.json` file is described
-in detail in the ``PlugRegistry`` class.
+without loading the plugin. The structure of a `plugInfo.json` file is described
+in detail in the `PlugRegistry` class.

@@ -37,7 +37,7 @@ import PixarUSD
   /**
    * ``HDMTLRenderer``
    *
-   * ### Overview
+   * ## Overview
    *
    * The Hydra Engine (``Hd``) Metal renderer for the ``UsdView``
    * application conforms to the ``MTKViewDelegate`` protocol,
