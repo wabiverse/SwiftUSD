@@ -30,9 +30,7 @@
 
 import Js
 
-public typealias JsValue = Pixar.JsValue
-
 public extension Js
 {
-  typealias Value = JsValue
+  typealias Value = pxr.JsValue
 }

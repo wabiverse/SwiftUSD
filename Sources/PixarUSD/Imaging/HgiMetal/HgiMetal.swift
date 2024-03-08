@@ -29,45 +29,49 @@
  * ---------------------------------------------------------------- */
 
 #if canImport(Metal)
-  import CosmoGraph
   import HgiMetal
 
-  public enum HgiMetal
+  /**
+   * ``HgiMetal``
+   *
+   * ## Overview
+   *
+   * Represents the Metal graphics API
+   * for use with Hgi. */
+  public enum HgiMetal: HgiRepresentable
   {
-    public static func createHgi() -> Pixar.HgiMetalPtr
+    /**
+     * ``Platform``
+     *
+     * ## Overview
+     *
+     * Represents the platform for the
+     * respective graphics API, such as
+     * Metal, Vulkan, DX3D, or OpenGL. */
+    public typealias Platform = pxr.HgiMetal
+
+    /**
+     * Creates a new Metal graphics API object. */
+    public static func createHgi() -> Platform.Ptr
     {
-      Pixar.HgiMetal.CreateHgi()
+      pxr.HgiMetal.CreateHgi()
     }
   }
 
-  public extension Pixar.HgiMetal
+  /** ----------------------
+   * Conform HgiMetal to the
+   * HgiPlatform protocol. */
+  extension pxr.HgiMetal: HgiPlatform
   {
-    var apiVersion: Int
-    {
-      Int(GetAPIVersion())
-    }
-
-    private borrowing func GetPrimaryDeviceCopy() -> MTL.Device
-    {
-      GetPrimaryDevice()
-    }
-
-    var device: MTL.Device
-    {
-      GetPrimaryDeviceCopy()
-    }
-  }
-
-  public extension Pixar.HgiMetalPtr
-  {
-    var apiVersion: Int
-    {
-      pointee.apiVersion
-    }
-
-    var device: MTL.Device
-    {
-      pointee.device
-    }
+    /**
+     * ``Ptr``
+     *
+     * ## Overview
+     *
+     * The shared pointer to the
+     * Metal graphics API object.
+     * Swift does not yet support
+     * ``std.unique_ptr``. */
+    public typealias Ptr = pxr.HgiMetalPtr
   }
 #endif /* canImport(Metal) */

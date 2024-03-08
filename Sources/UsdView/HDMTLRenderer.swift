@@ -39,14 +39,14 @@ import PixarUSD
    *
    * ## Overview
    *
-   * The Hydra Engine (``Hd``) Metal renderer for the ``UsdView``
-   * application conforms to the ``MTKViewDelegate`` protocol,
-   * allowing it to be set as a ``MTKView`` object's delegate to
-   * provide a drawing method to a ``MTKView`` object and respond
+   * The Hydra Engine (``PixarUSD/Hd``) Metal renderer for the ``UsdView``
+   * application conforms to the ``MetalKit/MTKViewDelegate`` protocol,
+   * allowing it to be set as a ``MetalKit/MTKView`` object's delegate to
+   * provide a drawing method to a ``MetalKit/MTKView`` object and respond
    * to rendering events. */
   class HDMTLRenderer: NSObject, MTKViewDelegate
   {
-    let hgi: Pixar.HgiMetalPtr
+    let hgi: HgiMetal.Platform.Ptr
     let driver: HdDriver
 
     init?(device _: MTLDevice)

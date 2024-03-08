@@ -41,7 +41,7 @@ import Hd
  * delegate and rendering tasks. The application manages
  * the lifetime (destruction) of HdDriver and must ensure
  * it remains valid while Hydra is running. */
-public typealias HdDriver = Pixar.HdDriver
+public typealias HdDriver = pxr.HdDriver
 
 public extension Hd
 {

@@ -33,8 +33,11 @@ import CxxStdlib
 
 /* --- xxx --- */
 
-public extension Pixar
+public extension pxr
 {
+  /** The Pixar USD v0.23 C++ API. */
+  typealias v23 = pxr_v0_23
+
   /**
    * The current version of ``PixarUSD``.
    *

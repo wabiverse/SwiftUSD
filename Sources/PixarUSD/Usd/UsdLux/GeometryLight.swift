@@ -30,7 +30,7 @@
 
 import UsdLux
 
-public typealias UsdLuxGeometryLight = Pixar.UsdLuxGeometryLight
+public typealias UsdLuxGeometryLight = pxr.UsdLuxGeometryLight
 
 public extension UsdLux
 {

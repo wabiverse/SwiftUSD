@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCamera = Pixar.UsdGeomCamera
+public typealias UsdGeomCamera = pxr.UsdGeomCamera
 
 public extension UsdGeom
 {

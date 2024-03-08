@@ -31,7 +31,7 @@
 import CxxStdlib
 import Usd
 
-public typealias UsdAttribute = Pixar.UsdAttribute
+public typealias UsdAttribute = pxr.UsdAttribute
 
 public extension Usd
 {

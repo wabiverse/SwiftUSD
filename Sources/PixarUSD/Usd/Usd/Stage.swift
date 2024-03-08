@@ -33,7 +33,7 @@ import Foundation
 import Sdf
 import Usd
 
-public typealias UsdStageRefPtr = Pixar.UsdStageRefPtr
+public typealias UsdStageRefPtr = pxr.UsdStageRefPtr
 
 public extension Usd
 {
@@ -101,8 +101,8 @@ public extension Usd
    * `stage.getEditTarget(for: .localLayer, stage.getSessionLayer())` and
    * set that target in the stage by calling `setEditTarget()` or creating
    * a ``UsdEditContext``. */
-  typealias Stage = Pixar.UsdStage
-  typealias StageRefPtr = Pixar.UsdStageRefPtr
+  typealias Stage = pxr.UsdStage
+  typealias StageRefPtr = pxr.UsdStageRefPtr
 }
 
 public extension Usd.Stage

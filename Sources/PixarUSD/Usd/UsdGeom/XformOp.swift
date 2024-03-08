@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomXformOp = Pixar.UsdGeomXformOp
+public typealias UsdGeomXformOp = pxr.UsdGeomXformOp
 
 public extension UsdGeom
 {

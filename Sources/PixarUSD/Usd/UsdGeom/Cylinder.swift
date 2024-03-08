@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomCylinder = Pixar.UsdGeomCylinder
+public typealias UsdGeomCylinder = pxr.UsdGeomCylinder
 
 public extension UsdGeom
 {

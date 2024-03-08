@@ -55,7 +55,7 @@ class UsdView
   public init()
   {
     /* Setup all usd resources (python, plugins, resources). */
-    Pixar.Bundler.shared.setup(.resources)
+    Usd.Bundler.shared.setup(.resources)
 
     #if canImport(Python)
       /* embed & init python. */
@@ -87,24 +87,24 @@ class UsdView
     let stage = Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
 
     let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
-    xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
+    xform.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 5.0, 0.0))
     xform.addXformOp(type: .scale, precision: .float).set(GfVec3f(5, 5, 5))
 
     let sphere = UsdGeom.Sphere.define(stage, path: "/Geometry/Sphere")
-    sphere.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -5.0))
+    sphere.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 0.0, -5.0))
 
     let capsule = UsdGeom.Capsule.define(stage, path: "/Geometry/Capsule")
-    capsule.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, -10.0))
+    capsule.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 0.0, -10.0))
     capsule.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     let cylinder = UsdGeom.Cylinder.define(stage, path: "/Geometry/Cylinder")
     cylinder.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     let cube = UsdGeom.Cube.define(stage, path: "/Geometry/Cube")
-    cube.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 5.0))
+    cube.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 0.0, 5.0))
 
     let cone = UsdGeom.Cone.define(stage, path: "/Geometry/Cone")
-    cone.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 10.0))
+    cone.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
     /* Create a different colored material for each geometry prim. */
@@ -115,7 +115,7 @@ class UsdView
     UsdShade.MaterialBindingAPI.apply(cube).bind(matDef(stage, color: .blue))
     UsdShade.MaterialBindingAPI.apply(cone).bind(matDef(stage, color: .purple))
 
-    stage.getPseudoRoot().set(doc: "SwiftUSD v\(Pixar.version)")
+    stage.getPseudoRoot().set(doc: "SwiftUSD v\(pxr.version)")
 
     /* Iterate the stage and print out the path to each prim. */
 
@@ -147,7 +147,7 @@ class UsdView
         }
       }
     }
-    .set(doc: "SwiftUSD v\(Pixar.version) | Declarative API")
+    .set(doc: "SwiftUSD v\(pxr.version) | Declarative API")
     .save()
 
     /* ------------------------------------ */

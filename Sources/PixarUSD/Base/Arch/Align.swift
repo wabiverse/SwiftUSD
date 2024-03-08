@@ -48,7 +48,7 @@ public extension Arch
   ///
   static func alignMemory(of byteCount: Int) -> Int
   {
-    Pixar.ArchAlignMemorySize(byteCount)
+    pxr.ArchAlignMemorySize(byteCount)
   }
 
   /// Align memory to the next "best" alignment value.
@@ -62,7 +62,7 @@ public extension Arch
   ///
   static func alignMemory(of base: UnsafeMutableRawPointer!) -> UnsafeMutableRawPointer!
   {
-    Pixar.ArchAlignMemory(base)
+    pxr.ArchAlignMemory(base)
   }
 
   /// Aligned memory allocation.
@@ -74,7 +74,7 @@ public extension Arch
   ///
   static func alignedAlloc(byteCount: Int, alignment: Int) -> UnsafeMutableRawPointer!
   {
-    Pixar.ArchAlignedAlloc(alignment, byteCount)
+    pxr.ArchAlignedAlloc(alignment, byteCount)
   }
 
   /// Free memory allocated by ArchAlignedAlloc.
@@ -85,7 +85,7 @@ public extension Arch
   ///
   static func alignedFree(pointer: inout UnsafeMutableRawPointer!)
   {
-    Pixar.ArchAlignedFree(pointer)
+    pxr.ArchAlignedFree(pointer)
     pointer = nil
   }
 }

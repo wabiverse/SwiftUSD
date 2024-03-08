@@ -40,14 +40,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
-
 enum
 {
   APIVersion_Metal1_0 = 0,
   APIVersion_Metal2_0,
   APIVersion_Metal3_0
 };
+
+using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
 
 /// \class HgiMetal
 ///
@@ -68,7 +68,7 @@ public:
 
   HGIMETAL_API
   ~HgiMetal() override;
-  
+
   HGIMETAL_API
   static HgiMetalPtr CreateHgi();
 

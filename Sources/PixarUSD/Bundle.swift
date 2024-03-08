@@ -318,7 +318,7 @@ public enum BundleKind
   case resources
 }
 
-public extension Pixar
+public extension Usd
 {
   struct Bundler
   {
@@ -349,7 +349,7 @@ public extension Pixar
       let resources = BundleFramework.allCases.compactMap(\.resourcePath)
 
       /* 2. fill a std.vector of std.string plugin paths. */
-      var plugPaths = Pixar.PlugRegistry.PlugPathsVector()
+      var plugPaths = pxr.PlugPathsVector()
       _ = resources.map
       { path in
 
@@ -394,7 +394,7 @@ public extension Pixar
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */
-      Pixar.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
+      pxr.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
     }
   }
 }
@@ -539,7 +539,7 @@ public enum BundlePython: CaseIterable
   }
 }
 
-public extension Pixar.Bundler
+public extension Usd.Bundler
 {
   private func installPlug(at path: String) -> String
   {
@@ -587,7 +587,7 @@ public extension Pixar.Bundler
   }
 }
 
-public extension Pixar.Bundler
+public extension Usd.Bundler
 {
   private struct ShortPath
   {
@@ -632,7 +632,7 @@ public extension Pixar.Bundler
   }
 }
 
-public extension Pixar.Bundler
+public extension Usd.Bundler
 {
   private func showBundleHelp(with missing: [String], searched: String)
   {

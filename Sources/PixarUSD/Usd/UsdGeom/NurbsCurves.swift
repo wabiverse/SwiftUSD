@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomNurbsCurves = Pixar.UsdGeomNurbsCurves
+public typealias UsdGeomNurbsCurves = pxr.UsdGeomNurbsCurves
 
 public extension UsdGeom
 {

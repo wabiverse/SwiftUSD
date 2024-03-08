@@ -30,7 +30,7 @@
 
 import Usd
 
-public typealias UsdTimeCode = Pixar.UsdTimeCode
+public typealias UsdTimeCode = pxr.UsdTimeCode
 
 public extension Usd
 {

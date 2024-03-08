@@ -30,21 +30,60 @@
 
 import Hgi
 
-public enum Hgi
-{}
-
-public extension Hgi
+/**
+ * ``Hgi``
+ *
+ * ## Overview
+ *
+ * Represents the graphics API for
+ * use with Hgi. */
+public enum Hgi: HgiRepresentable
 {
-  /// Helper function to return a ``__ObjC/Pixar/Hgi`` object for the current
-  /// platform. For example on Linux this may return HgiGL while on macOS, it
-  /// may return HgiMetal. Caller, usually the application, owns the lifetime
-  /// of the Hgi object and the object is destroyed when the caller drops the
-  /// unique ptr. Thread safety: Not thread safe.
-  static func createPlatformDefaultHgi() -> Pixar.Hgi
+  /**
+   * ``Platform``
+   *
+   * ## Overview
+   *
+   * Represents the platform for the
+   * respective graphics API, such as
+   * Metal, Vulkan, DX3D, or OpenGL. */
+  public typealias Platform = pxr.Hgi
+
+  /**
+   * Creates a new Hgi graphics API object. */
+  public static func createHgi() -> Platform.Ptr
+  {
+    pxr.Hgi.CreateHgi()
+  }
+
+  /**
+   * Helper function to return a ``__ObjC/pxr/Hgi`` object for the current
+   * platform. For example on Linux this may return HgiGL while on macOS, it
+   * may return HgiMetal. Caller, usually the application, owns the lifetime
+   * of the Hgi object and the object is destroyed when the caller drops the
+   * unique ptr. Thread safety: Not thread safe. */
+  public static func createPlatformDefaultHgi() -> pxr.Hgi
   {
     /* Currently swift does not support std.unique_ptr,
      * use the deprecated GetPlatformDefaultHgi() call
      * instead of CreatePlatformDefaultHgi() for now. */
-    Pixar.Hgi.GetPlatformDefaultHgi()
+    pxr.Hgi.GetPlatformDefaultHgi()
   }
+}
+
+/** --------------------
+ * Conform Hgi to the
+ * HgiPlatform protocol. */
+extension pxr.Hgi: HgiPlatform
+{
+  /**
+   * ``Ptr``
+   *
+   * ## Overview
+   *
+   * The shared pointer to the
+   * Metal graphics API object.
+   * Swift does not yet support
+   * ``std.unique_ptr``. */
+  public typealias Ptr = pxr.HgiSharedPtr
 }

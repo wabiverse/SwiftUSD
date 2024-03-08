@@ -48,6 +48,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 TF_DECLARE_WEAK_PTRS(PlugPlugin);
 class Plug_RegistrationMetadata;
 
+using PlugPathsVector = std::vector<std::string>;
+
 /// \class PlugRegistry
 ///
 /// Defines an interface for registering plugins.
@@ -353,8 +355,6 @@ public:
   /// PlugNotice::DidRegisterPlugins with any newly registered plugins.
   PLUG_API
   PlugPluginPtrVector RegisterPlugins(const std::string &pathToPlugInfo);
-
-  using PlugPathsVector = std::vector<std::string>;
   
   /// Registers all plug-ins discovered in any of \a pathsToPlugInfo.  Sends
   /// PlugNotice::DidRegisterPlugins with any newly registered plugins.
@@ -463,7 +463,7 @@ private:
   // pathsAreOrdered.
   PLUG_LOCAL
   PlugPluginPtrVector
-  _RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
+  _RegisterPlugins(const PlugPathsVector &pathsToPlugInfo,
                    bool pathsAreOrdered);
 
   template <class ConcurrentVector>

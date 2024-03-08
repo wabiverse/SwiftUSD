@@ -32,7 +32,7 @@ import CxxStdlib
 import Foundation
 import Sdf
 
-public typealias SdfPath = Pixar.SdfPath
+public typealias SdfPath = pxr.SdfPath
 
 public extension Sdf
 {

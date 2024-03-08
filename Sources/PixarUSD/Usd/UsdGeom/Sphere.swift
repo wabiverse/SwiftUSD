@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomSphere = Pixar.UsdGeomSphere
+public typealias UsdGeomSphere = pxr.UsdGeomSphere
 
 public extension UsdGeom
 {

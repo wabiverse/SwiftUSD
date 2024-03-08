@@ -43,7 +43,7 @@ import Gf
  * Represents a vector of 3 components of type **double**.
  * It is intended to be fast and simple.
  */
-public typealias GfVec3d = Pixar.GfVec3d
+public typealias GfVec3d = pxr.GfVec3d
 
 public extension Gf
 {
@@ -159,7 +159,7 @@ extension Gf.Vec3d: Scalar
   {
     GetNormalized(eps)
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms

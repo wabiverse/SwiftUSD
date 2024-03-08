@@ -43,7 +43,7 @@ import Gf
  * Represents a vector of 3 components of type **int**.
  * It is intended to be fast and simple.
  */
-public typealias GfVec3i = Pixar.GfVec3i
+public typealias GfVec3i = pxr.GfVec3i
 
 public extension Gf
 {
@@ -128,7 +128,7 @@ extension Gf.Vec3i: Scalar
   {
     GetLengthSq()
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms

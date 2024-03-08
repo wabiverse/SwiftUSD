@@ -31,8 +31,8 @@
 import CxxStdlib
 import Sdf
 
-public typealias SdfLayer = Pixar.SdfLayer
-public typealias SdfLayerHandle = Pixar.SdfLayerHandle
+public typealias SdfLayer = pxr.SdfLayer
+public typealias SdfLayerHandle = pxr.SdfLayerHandle
 
 public extension Sdf
 {

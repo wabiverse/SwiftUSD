@@ -30,20 +30,15 @@
 
 import Gf
 
-/* note: the typealiases are documented the same way twice,
- * keep it like this so that sourcekit shows documentation
- * regardless of which typealias a user might use in their
- * code. */
-
 /**
- * # GfVec3f
+ * # ``GfVec3f``
  *
  * Basic type for a vector of 3 float components.
  *
  * Represents a vector of 3 components of type **float**.
  * It is intended to be fast and simple.
  */
-public typealias GfVec3f = Pixar.GfVec3f
+public typealias GfVec3f = pxr.GfVec3f
 
 public extension Gf
 {
@@ -159,7 +154,7 @@ extension Gf.Vec3f: Scalar
   {
     GetNormalized(eps)
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms
@@ -172,7 +167,7 @@ extension Gf.Vec3f: Scalar
   }
 }
 
-extension Gf.Vec3f: SIMD
+extension GfVec3f: SIMD
 {
   public typealias Scalar = Self.ScalarType
   public typealias SIMDStorage = SIMD3<Scalar>

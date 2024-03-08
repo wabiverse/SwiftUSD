@@ -1,5 +1,7 @@
 # ``Arch`` Architecture Dependent
 
+## Overview
+
 The ``Arch`` library is a repository for all architecture-dependent
 code. It isolates all platform dependencies (and confusing `#ifdefs`)
 into one small library and also serves as a common area for

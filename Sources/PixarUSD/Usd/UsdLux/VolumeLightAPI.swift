@@ -30,7 +30,7 @@
 
 import UsdLux
 
-public typealias UsdLuxVolumeLightAPI = Pixar.UsdLuxVolumeLightAPI
+public typealias UsdLuxVolumeLightAPI = pxr.UsdLuxVolumeLightAPI
 
 public extension UsdLux
 {

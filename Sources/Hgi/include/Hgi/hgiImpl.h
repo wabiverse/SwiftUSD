@@ -55,6 +55,7 @@ class HgiCapabilities;
 class HgiIndirectCommandEncoder;
 
 using HgiUniquePtr = std::unique_ptr<class Hgi>;
+using HgiSharedPtr = std::shared_ptr<std::nullptr_t>;
 
 /// \class Hgi
 ///
@@ -117,6 +118,9 @@ public:
 
   HGI_API
   virtual ~Hgi();
+
+  HGI_API
+  static HgiSharedPtr CreateHgi();
 
   /// Submit one HgiCmds objects.
   /// Once the cmds object is submitted it cannot be re-used to record cmds.

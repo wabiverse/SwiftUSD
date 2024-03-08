@@ -28,17 +28,45 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Arch
+import Hgi
+
+public protocol HgiPlatform
+{
+  /**
+   * ``Ptr``
+   *
+   * ## Overview
+   *
+   * The shared pointer to the
+   * graphics API object, such
+   * as Metal, Vulkan, DX3D or
+   * OpenGL. Swift does not yet
+   * support ``std.unique_ptr``. */
+  associatedtype Ptr
+}
 
 /**
- * # Multithreading
+ * ``HgiRepresentable``
  *
- * Functions having to do with multithreading. */
-public extension Arch
+ * ## Overview
+ *
+ * Represents a type that can be represented
+ * by Hgi, such as Metal, OpenGL, or Vulkan.
+ * This is used to create the Hgi platforms
+ * for each variant of the graphics API. */
+public protocol HgiRepresentable
 {
-  /// Return true if the calling thread is the main thread, false otherwise.
-  static func isMainThread() -> Bool
-  {
-    pxr.ArchIsMainThread()
-  }
+  /**
+   * ``Platform``
+   *
+   * ## Overview
+   *
+   * Represents the platform for the
+   * respective graphics API, such as
+   * Metal, Vulkan, DX3D, or OpenGL. */
+  associatedtype Platform: HgiPlatform
+
+  /**
+   * Creates a new Hgi graphics API object. */
+  static func createHgi() -> Platform.Ptr
 }

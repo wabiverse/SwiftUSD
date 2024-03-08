@@ -35,13 +35,13 @@ public extension Ar
   static func getAllResolvers() -> [String]
   {
     // 1. we get the base type.
-    let base = Pixar.TfType.FindByName("ArResolver")
+    let base = pxr.TfType.FindByName("ArResolver")
 
     guard
       // 2. we verify the base type is valid.
       let all = base.pointee.IsUnknown() == false
       // 3. we get all that derive from the base type.
-      ? Pixar.TfType.GetDirectlyDerivedTypes(base.pointee) : nil,
+      ? pxr.TfType.GetDirectlyDerivedTypes(base.pointee) : nil,
       // 4. we ensure the list is not empty.
       all().empty() == false
     else { return [] }

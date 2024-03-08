@@ -30,7 +30,7 @@
 
 import UsdLux
 
-public typealias UsdLuxLightAPI = Pixar.UsdLuxLightAPI
+public typealias UsdLuxLightAPI = pxr.UsdLuxLightAPI
 
 public extension UsdLux
 {

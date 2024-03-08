@@ -41,7 +41,7 @@ public extension Gf
   @inline(__always)
   static func isClose(_ a: Double, _ b: Double, within epsilon: Double) -> Bool
   {
-    Pixar.GfIsClose(a, b, epsilon)
+    pxr.GfIsClose(a, b, epsilon)
   }
 
   /// Converts an angle in radians to degrees.
@@ -51,7 +51,7 @@ public extension Gf
   @inline(__always)
   static func radiansToDegrees(angle radians: Double) -> Double
   {
-    Pixar.GfRadiansToDegrees(radians)
+    pxr.GfRadiansToDegrees(radians)
   }
 
   /// Converts an angle in degrees to radians.
@@ -61,7 +61,7 @@ public extension Gf
   @inline(__always)
   static func degreesToRadians(angle degrees: Double) -> Double
   {
-    Pixar.GfDegreesToRadians(degrees)
+    pxr.GfDegreesToRadians(degrees)
   }
 
   /* ----- Figure out why explicit type is needed ----- */
@@ -71,7 +71,7 @@ public extension Gf
   @inline(__always)
   static func sqr(_ x: Int) -> Double
   {
-    Pixar.GfSqr(x)
+    pxr.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -79,7 +79,7 @@ public extension Gf
   @inline(__always)
   static func sqr(_ x: Float) -> Double
   {
-    Pixar.GfSqr(x)
+    pxr.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -87,7 +87,7 @@ public extension Gf
   @inline(__always)
   static func sqr(_ x: Double) -> Double
   {
-    Pixar.GfSqr(x)
+    pxr.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -95,7 +95,7 @@ public extension Gf
   @inline(__always)
   static func sqr(_ x: GfVec2f) -> Double
   {
-    Pixar.GfSqr(x)
+    pxr.GfSqr(x)
   }
 
   /// Returns the inner product of **x** with itself: specifically, `x * x`.
@@ -103,161 +103,161 @@ public extension Gf
   @inline(__always)
   static func sqr(_ x: GfVec3f) -> Double
   {
-    Pixar.GfSqr(x)
+    pxr.GfSqr(x)
   }
 
   /// Return sqrt(f).
   @inline(__always)
   static func sqrt(_ f: Double) -> Double
   {
-    Pixar.GfSqrt(f)
+    pxr.GfSqrt(f)
   }
 
   /// Return sqrt(f).
   @inline(__always)
   static func sqrt(_ f: Float) -> Float
   {
-    Pixar.GfSqrt(f)
+    pxr.GfSqrt(f)
   }
 
   /// Return exp(f).
   @inline(__always)
   static func exp(_ f: Double) -> Double
   {
-    Pixar.GfExp(f)
+    pxr.GfExp(f)
   }
 
   /// Return exp(f).
   @inline(__always)
   static func exp(_ f: Float) -> Float
   {
-    Pixar.GfExp(f)
+    pxr.GfExp(f)
   }
 
   /// Return log(f).
   @inline(__always)
   static func log(_ f: Double) -> Double
   {
-    Pixar.GfLog(f)
+    pxr.GfLog(f)
   }
 
   /// Return log(f).
   @inline(__always)
   static func log(_ f: Float) -> Float
   {
-    Pixar.GfLog(f)
+    pxr.GfLog(f)
   }
 
   /// Return floor(f).
   @inline(__always)
   static func floor(_ f: Double) -> Double
   {
-    Pixar.GfFloor(f)
+    pxr.GfFloor(f)
   }
 
   /// Return floor(f).
   @inline(__always)
   static func floor(_ f: Float) -> Float
   {
-    Pixar.GfFloor(f)
+    pxr.GfFloor(f)
   }
 
   /// Return ceil(f).
   @inline(__always)
   static func ceil(_ f: Double) -> Double
   {
-    Pixar.GfCeil(f)
+    pxr.GfCeil(f)
   }
 
   /// Return ceil(f).
   @inline(__always)
   static func ceil(_ f: Float) -> Float
   {
-    Pixar.GfCeil(f)
+    pxr.GfCeil(f)
   }
 
   /// Return abs(f).
   @inline(__always)
   static func abs(_ f: Double) -> Double
   {
-    Pixar.GfAbs(f)
+    pxr.GfAbs(f)
   }
 
   /// Return abs(f).
   @inline(__always)
   static func abs(_ f: Float) -> Float
   {
-    Pixar.GfAbs(f)
+    pxr.GfAbs(f)
   }
 
   /// Return round(f).
   @inline(__always)
   static func round(_ f: Double) -> Double
   {
-    Pixar.GfRound(f)
+    pxr.GfRound(f)
   }
 
   /// Return round(f).
   @inline(__always)
   static func round(_ f: Float) -> Float
   {
-    Pixar.GfRound(f)
+    pxr.GfRound(f)
   }
 
   /// Return pow(f, p).
   @inline(__always)
   static func pow(_ f: Double, _ p: Double) -> Double
   {
-    Pixar.GfPow(f, p)
+    pxr.GfPow(f, p)
   }
 
   /// Return pow(f, p).
   @inline(__always)
   static func pow(_ f: Float, _ p: Float) -> Float
   {
-    Pixar.GfPow(f, p)
+    pxr.GfPow(f, p)
   }
 
   /// Return sin(v).
   @inline(__always)
   static func sin(_ v: Double) -> Double
   {
-    Pixar.GfSin(v)
+    pxr.GfSin(v)
   }
 
   /// Return sin(v).
   @inline(__always)
   static func sin(_ v: Float) -> Float
   {
-    Pixar.GfSin(v)
+    pxr.GfSin(v)
   }
 
   /// Return cos(v).
   @inline(__always)
   static func cos(_ v: Double) -> Double
   {
-    Pixar.GfCos(v)
+    pxr.GfCos(v)
   }
 
   /// Return cos(v).
   @inline(__always)
   static func cos(_ v: Float) -> Float
   {
-    Pixar.GfCos(v)
+    pxr.GfCos(v)
   }
 
   /// Return sin(v) in s and cos(v) in c.
   @inline(__always)
   static func sinCos(_ v: Double, _ s: inout Double, _ c: inout Double)
   {
-    Pixar.GfSinCos(v, &s, &c)
+    pxr.GfSinCos(v, &s, &c)
   }
 
   /// Return sin(v) in s and cos(v) in c.
   @inline(__always)
   static func sinCos(_ v: Float, _ s: inout Float, _ c: inout Float)
   {
-    Pixar.GfSinCos(v, &s, &c)
+    pxr.GfSinCos(v, &s, &c)
   }
 
   /// Return the resulting of clamping value to lie between
@@ -265,7 +265,7 @@ public extension Gf
   @inline(__always)
   static func clamp(_ value: Double, _ min: Double, _ max: Double) -> Double
   {
-    Pixar.GfClamp(value, min, max)
+    pxr.GfClamp(value, min, max)
   }
 
   /// Return the resulting of clamping value to lie between
@@ -273,7 +273,7 @@ public extension Gf
   @inline(__always)
   static func clamp(_ value: Float, _ min: Float, _ max: Float) -> Float
   {
-    Pixar.GfClamp(value, min, max)
+    pxr.GfClamp(value, min, max)
   }
 
   /// The mod function with "correct" behaviour for negative numbers.
@@ -284,7 +284,7 @@ public extension Gf
   @inline(__always)
   static func mod(_ a: Double, _ b: Double) -> Double
   {
-    Pixar.GfMod(a, b)
+    pxr.GfMod(a, b)
   }
 
   /// The mod function with "correct" behaviour for negative numbers.
@@ -295,7 +295,7 @@ public extension Gf
   @inline(__always)
   static func mod(_ a: Float, _ b: Float) -> Float
   {
-    Pixar.GfMod(a, b)
+    pxr.GfMod(a, b)
   }
 
   /* -------------------------------------------------- */

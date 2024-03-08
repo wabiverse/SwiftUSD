@@ -1,6 +1,4 @@
-### <sub>Definitions and Implementations of Usd Shader Nodes</sub>
-
-# <sup>**Pixar.UsdShaders**</sup>
+# ``UsdShaders`` Definitions and Implementations of Usd Shader Nodes
 
 ## Overview
 

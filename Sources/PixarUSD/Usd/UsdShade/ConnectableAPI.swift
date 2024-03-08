@@ -30,7 +30,7 @@
 
 import UsdShade
 
-public typealias UsdShadeConnectableAPI = Pixar.UsdShadeConnectableAPI
+public typealias UsdShadeConnectableAPI = pxr.UsdShadeConnectableAPI
 
 public extension UsdShade
 {

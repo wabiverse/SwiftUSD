@@ -117,6 +117,15 @@ _MakeNewPlatformDefaultHgi()
   return instance;
 }
 
+HgiSharedPtr Hgi::CreateHgi()
+{
+  HgiSharedPtr hgi = std::make_shared<std::nullptr_t>();
+  
+  hgi.reset();
+  
+  return hgi;
+}
+
 Hgi *Hgi::GetPlatformDefaultHgi()
 {
 #if SWIFT_HAS_UNIQUE_PTR

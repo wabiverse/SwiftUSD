@@ -30,7 +30,7 @@
 
 import Sdr
 
-public typealias SdrShaderNode = Pixar.SdrShaderNode
+public typealias SdrShaderNode = pxr.SdrShaderNode
 
 public extension Sdr
 {

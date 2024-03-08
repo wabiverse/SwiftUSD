@@ -1,6 +1,4 @@
-### <sub>USD Lighting Schema</sub>
-
-# <sup>**Pixar.UsdLux**</sup>
+# ``UsdLux`` USD Lighting Schema
 
 ## Overview
 

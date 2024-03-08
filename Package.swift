@@ -32,7 +32,7 @@ let package = Package(
       name: "pxr",
       targets: ["pxr"]
     ),
-    // ----------- Pixar.Base -----
+    // ----------- pxr.Base -----
     .library(
       name: "Arch",
       targets: ["Arch"]
@@ -65,7 +65,7 @@ let package = Package(
       name: "Plug",
       targets: ["Plug"]
     ),
-    // ------------ Pixar.Usd -----
+    // ------------ pxr.Usd -----
     .library(
       name: "Ar",
       targets: ["Ar"]
@@ -162,7 +162,7 @@ let package = Package(
       name: "UsdVol",
       targets: ["UsdVol"]
     ),
-    // -------- Pixar.Imaging -----
+    // -------- pxr.Imaging -----
     .library(
       name: "CameraUtil",
       targets: ["CameraUtil"]
@@ -203,7 +203,7 @@ let package = Package(
       name: "HgiInterop",
       targets: ["HgiInterop"]
     ),
-    // ----- Pixar.UsdImaging -----
+    // ----- pxr.UsdImaging -----
     .library(
       name: "UsdShaders",
       targets: ["UsdShaders"]
@@ -1988,7 +1988,7 @@ let package = Package(
         permissions: [
           .allowNetworkConnections(
             scope: .all(),
-            reason: "Pixar.Ar may require network access to load assets."
+            reason: "Ar may require network access to load assets."
           ),
           .writeToPackageDirectory(
             reason: "Generation of schema code requires write access."

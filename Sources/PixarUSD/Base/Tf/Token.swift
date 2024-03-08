@@ -48,7 +48,7 @@ import Plug
  * A TfToken is a handle for a registered string, and can be compared,
  * assigned, and hashed in constant time. It is useful when a bounded
  * number of strings are used as fixed symbols (but never modified). */
-public typealias TfToken = Pixar.TfToken
+public typealias TfToken = pxr.TfToken
 
 public extension Tf
 {

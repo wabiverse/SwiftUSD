@@ -30,7 +30,7 @@
 
 import UsdLux
 
-public typealias UsdLuxCylinderLight = Pixar.UsdLuxCylinderLight
+public typealias UsdLuxCylinderLight = pxr.UsdLuxCylinderLight
 
 public extension UsdLux
 {

@@ -30,7 +30,7 @@
 
 import Vt
 
-public typealias VtValue = Pixar.VtValue
+public typealias VtValue = pxr.VtValue
 
 public extension Vt
 {

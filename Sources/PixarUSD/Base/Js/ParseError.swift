@@ -30,7 +30,7 @@
 
 import Js
 
-public typealias JsParseError = Pixar.JsParseError
+public typealias JsParseError = pxr.JsParseError
 
 public extension Js
 {

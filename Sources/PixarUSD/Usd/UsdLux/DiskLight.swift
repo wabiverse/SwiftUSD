@@ -30,7 +30,7 @@
 
 import UsdLux
 
-public typealias UsdLuxDiskLight = Pixar.UsdLuxDiskLight
+public typealias UsdLuxDiskLight = pxr.UsdLuxDiskLight
 
 public extension UsdLux
 {

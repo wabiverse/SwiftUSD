@@ -30,8 +30,8 @@
 
 import Sdf
 
-public typealias SdfValueTypeNameType = Pixar.SdfValueTypeNameType
-public typealias SdfValueTypeName = Pixar.SdfValueTypeName
+public typealias SdfValueTypeNameType = pxr.SdfValueTypeNameType
+public typealias SdfValueTypeName = pxr.SdfValueTypeName
 
 public extension Sdf
 {
@@ -43,6 +43,6 @@ public extension Sdf
 {
   static func getValueType(for type: SdfValueTypeNameType) -> Sdf.ValueTypeName
   {
-    Pixar.SdfGetValueType(type)
+    pxr.SdfGetValueType(type)
   }
 }

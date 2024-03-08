@@ -28,17 +28,42 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Arch
+#if canImport(Metal)
+  import CosmoGraph
+  import CxxStdlib
+  import Foundation
+  import HgiMetal
 
-/**
- * # Multithreading
- *
- * Functions having to do with multithreading. */
-public extension Arch
-{
-  /// Return true if the calling thread is the main thread, false otherwise.
-  static func isMainThread() -> Bool
+  /** --------------------
+   * Metal API extensions. */
+  public extension pxr.HgiMetal
   {
-    pxr.ArchIsMainThread()
+    var apiVersion: Int
+    {
+      Int(GetAPIVersion())
+    }
+
+    var device: MTL.Device
+    {
+      GetPrimaryDevice()
+    }
   }
-}
+
+  /** -------------------------------
+   * Metal Hgi pointer extensions,
+   * so that we can access the Metal
+   * api withour having to use the
+   * unsafe C++ API. */
+  public extension pxr.HgiMetalPtr
+  {
+    var apiVersion: Int
+    {
+      pointee.apiVersion
+    }
+
+    var device: MTL.Device
+    {
+      pointee.device
+    }
+  }
+#endif /* canImport(Metal) */

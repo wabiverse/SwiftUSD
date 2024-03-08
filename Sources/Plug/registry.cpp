@@ -106,7 +106,7 @@ PlugRegistry::RegisterPlugins(const std::string &pathToPlugInfo) {
 }
 
 PlugPluginPtrVector
-PlugRegistry::RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo) {
+PlugRegistry::RegisterPlugins(const PlugPathsVector &pathsToPlugInfo) {
   const bool pathsAreOrdered = true;
   PlugPluginPtrVector result =
       _RegisterPlugins(pathsToPlugInfo, pathsAreOrdered);
@@ -117,7 +117,7 @@ PlugRegistry::RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo) {
 }
 
 PlugPluginPtrVector
-PlugRegistry::_RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
+PlugRegistry::_RegisterPlugins(const PlugPathsVector &pathsToPlugInfo,
                                bool pathsAreOrdered) {
   TF_DESCRIBE_SCOPE("Registering plugins");
   TfAutoMallocTag2 tag2("Plug", "PlugRegistry::RegisterPlugins");

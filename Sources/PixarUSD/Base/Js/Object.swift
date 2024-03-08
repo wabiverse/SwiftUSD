@@ -30,7 +30,7 @@
 
 import Js
 
-public typealias JsObject = Pixar.JsObject
+public typealias JsObject = pxr.JsObject
 
 public extension Js
 {

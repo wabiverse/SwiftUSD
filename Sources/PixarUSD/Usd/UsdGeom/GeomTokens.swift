@@ -41,7 +41,7 @@ private extension UsdGeom
     private init()
     {}
 
-    let tokens = Pixar.UsdGeomTokensType()
+    let tokens = pxr.UsdGeomTokensType()
   }
 }
 

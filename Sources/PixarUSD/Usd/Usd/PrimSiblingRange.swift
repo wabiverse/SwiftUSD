@@ -30,7 +30,7 @@
 
 import Usd
 
-public typealias UsdPrimSiblingRange = Pixar.UsdPrimSiblingRange
+public typealias UsdPrimSiblingRange = pxr.UsdPrimSiblingRange
 
 public extension Usd
 {

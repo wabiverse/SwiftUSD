@@ -43,7 +43,7 @@ import Gf
  * Represents a vector of 2 components of type **float**.
  * It is intended to be fast and simple.
  */
-public typealias GfVec2f = Pixar.GfVec2f
+public typealias GfVec2f = pxr.GfVec2f
 
 public extension Gf
 {
@@ -156,7 +156,7 @@ extension Gf.Vec2f: Scalar
   {
     GetNormalized(eps)
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms

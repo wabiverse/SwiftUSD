@@ -30,7 +30,7 @@
 
 import UsdGeom
 
-public typealias UsdGeomNurbsPatch = Pixar.UsdGeomNurbsPatch
+public typealias UsdGeomNurbsPatch = pxr.UsdGeomNurbsPatch
 
 public extension UsdGeom
 {
