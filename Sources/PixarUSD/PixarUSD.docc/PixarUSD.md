@@ -47,6 +47,11 @@ Robustly and scalably interchange 3D scenes while fostering highly collaborative
 ### Rendering & Imaging
 
 - ``Hd``
+- ``Hgi``
+- ``HgiInterop``
+- ``HgiMetal``
+- ``HgiGL``
+- ``Garch``
 - ``Hf``
 - ``CameraUtil``
 - ``PxOsd``

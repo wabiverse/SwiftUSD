@@ -31,28 +31,35 @@
 import Hgi
 
 /**
- * ``Hgi``
- *
- * ## Overview
- *
  * Represents the graphics API for
  * use with Hgi. */
 public enum Hgi: HgiRepresentable
 {
   /**
-   * ``Platform``
-   *
-   * ## Overview
-   *
    * Represents the platform for the
    * respective graphics API, such as
    * Metal, Vulkan, DX3D, or OpenGL. */
   public typealias Platform = pxr.Hgi
 
   /**
-   * Creates a new Hgi graphics API object. */
+   * Creates a new Hgi graphics API object.
+   *
+   * - Returns: The newly created Hydra graphics interface. */
   public static func createHgi() -> Platform.Ptr
   {
+    pxr.Hgi.CreateHgi()
+  }
+
+  /**
+   * Creates a new Hgi graphics API object.
+   *
+   * - Parameter device: A raw pointer to the graphics API's GPU device.
+   *
+   * - Returns: The newly created Hydra graphics interface. */
+  public static func createHgi(device _: inout UnsafeMutableRawPointer?) -> Platform.Ptr
+  {
+    /* device is not used in the base Hgi class. */
+
     pxr.Hgi.CreateHgi()
   }
 
@@ -71,19 +78,14 @@ public enum Hgi: HgiRepresentable
   }
 }
 
-/** --------------------
- * Conform Hgi to the
- * HgiPlatform protocol. */
+/** ---------------------------------------
+ * Conform Hgi to the HgiPlatform protocol. */
 extension pxr.Hgi: HgiPlatform
 {
   /**
-   * ``Ptr``
-   *
-   * ## Overview
-   *
    * The shared pointer to the
    * Metal graphics API object.
    * Swift does not yet support
    * ``std.unique_ptr``. */
-  public typealias Ptr = pxr.HgiSharedPtr
+  public typealias Ptr = pxr.HgiPtr
 }

@@ -29,49 +29,66 @@
  * ---------------------------------------------------------------- */
 
 #if canImport(Metal)
+  import Apple
+  import CosmoGraph
   import HgiMetal
 
   /**
-   * ``HgiMetal``
-   *
-   * ## Overview
-   *
    * Represents the Metal graphics API
-   * for use with Hgi. */
+   * for use with ``Hgi``. */
   public enum HgiMetal: HgiRepresentable
   {
     /**
-     * ``Platform``
-     *
-     * ## Overview
-     *
      * Represents the platform for the
-     * respective graphics API, such as
-     * Metal, Vulkan, DX3D, or OpenGL. */
+     * respective graphics API, which
+     * is the Metal graphics API here. */
     public typealias Platform = pxr.HgiMetal
 
     /**
-     * Creates a new Metal graphics API object. */
+     * Creates a new Metal graphics API object.
+     *
+     * - Returns: The newly created Metal graphics interface. */
     public static func createHgi() -> Platform.Ptr
     {
-      pxr.HgiMetal.CreateHgi()
+      pxr.HgiMetal.CreateHgi(nil)
+    }
+
+    /**
+     * Creates a new Metal graphics API object.
+     *
+     * - Parameter device: A Metal GPU device.
+     *
+     * - Returns: The newly created Metal graphics interface. */
+    public static func createHgi(device: inout MTL.Device?) -> Platform.Ptr
+    {
+      pxr.HgiMetal.CreateHgi(device)
+    }
+
+    /**
+     * Creates a new Metal graphics API object.
+     *
+     * - Parameter device: A raw pointer to the Metal GPU device.
+     *
+     * - Returns: The newly created Metal graphics interface. */
+    public static func createHgi(device: inout UnsafeMutableRawPointer?) -> Platform.Ptr
+    {
+      let opaque = OpaquePointer(device)
+      let devicePtr = UnsafeMutablePointer<MTL.Device>(opaque)
+
+      var mtlDevice: MTL.Device? = devicePtr.pointee
+
+      return HgiMetal.createHgi(device: &mtlDevice)
     }
   }
 
-  /** ----------------------
-   * Conform HgiMetal to the
-   * HgiPlatform protocol. */
+  /** --------------------------------------------
+   * Conform HgiMetal to the HgiPlatform protocol. */
   extension pxr.HgiMetal: HgiPlatform
   {
     /**
-     * ``Ptr``
-     *
-     * ## Overview
-     *
-     * The shared pointer to the
-     * Metal graphics API object.
-     * Swift does not yet support
-     * ``std.unique_ptr``. */
+     * The shared pointer to the Metal graphics
+     * API object. Swift does not yet support the
+     * usage of `std.unique_ptr`. */
     public typealias Ptr = pxr.HgiMetalPtr
   }
 #endif /* canImport(Metal) */

@@ -33,40 +33,32 @@ import Hgi
 public protocol HgiPlatform
 {
   /**
-   * ``Ptr``
-   *
-   * ## Overview
-   *
    * The shared pointer to the
    * graphics API object, such
    * as Metal, Vulkan, DX3D or
    * OpenGL. Swift does not yet
-   * support ``std.unique_ptr``. */
+   * support `std.unique_ptr`. */
   associatedtype Ptr
 }
 
 /**
- * ``HgiRepresentable``
- *
- * ## Overview
- *
  * Represents a type that can be represented
- * by Hgi, such as Metal, OpenGL, or Vulkan.
- * This is used to create the Hgi platforms
+ * by ``Hgi``, such as Metal, OpenGL, or Vulkan.
+ * This is used to create the **Hgi** platforms
  * for each variant of the graphics API. */
 public protocol HgiRepresentable
 {
   /**
-   * ``Platform``
-   *
-   * ## Overview
-   *
    * Represents the platform for the
    * respective graphics API, such as
    * Metal, Vulkan, DX3D, or OpenGL. */
   associatedtype Platform: HgiPlatform
 
   /**
-   * Creates a new Hgi graphics API object. */
+   * Creates a new ``Hgi`` graphics API object. */
   static func createHgi() -> Platform.Ptr
+
+  /**
+   * Creates a new ``Hgi`` graphics API object with the specified device. */
+  static func createHgi(device: inout UnsafeMutableRawPointer?) -> Platform.Ptr
 }

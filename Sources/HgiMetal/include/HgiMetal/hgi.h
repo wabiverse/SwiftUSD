@@ -70,7 +70,7 @@ public:
   ~HgiMetal() override;
 
   HGIMETAL_API
-  static HgiMetalPtr CreateHgi();
+  static HgiMetalPtr CreateHgi(MTL::Device *device = nil);
 
   HGIMETAL_API
   bool IsBackendSupported() const override;

@@ -117,9 +117,9 @@ _MakeNewPlatformDefaultHgi()
   return instance;
 }
 
-HgiSharedPtr Hgi::CreateHgi()
+HgiPtr Hgi::CreateHgi()
 {
-  HgiSharedPtr hgi = std::make_shared<std::nullptr_t>();
+  HgiPtr hgi = std::make_shared<std::nullptr_t>();
   
   hgi.reset();
   

@@ -48,10 +48,6 @@ private extension Hgi
 public extension Hgi
 {
   /**
-   * # ``Tokens``
-   *
-   * ## Overview
-   *
    * Public, client facing api to access
    * the static ``Hgi`` tokens. */
   enum Tokens: CaseIterable

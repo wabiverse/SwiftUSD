@@ -33,18 +33,11 @@ import PixarUSD
 #if canImport(Python)
   import PyBundle
 #endif /* canImport(Python) */
-#if canImport(Metal)
-  import Metal
-#endif /* canImport(Metal) */
 
 /**
- * ``UsdView``
- *
- * ## Overview
- *
- * A ``UsdView`` application written in Swift for
- * the purposes of demonstrating the usage of USD,
- * from the Swift programming language. */
+ * An application written in Swift for the purposes
+ * of demonstrating the usage of USD, from the Swift
+ * programming language. */
 @main
 class UsdView
 {
@@ -64,7 +57,7 @@ class UsdView
     #endif /* canImport(Python) */
 
     #if canImport(Metal) && !os(visionOS)
-      hydra = HDMTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
+      hydra = HDMTLRenderer()
     #endif /* canImport(Metal) && !os(visionOS) */
   }
 
@@ -158,6 +151,10 @@ class UsdView
   }
 }
 
+/**
+ * Shader diffuse colors for the convenience of
+ * quickly assigning them when creating a new
+ * material. */
 public enum ShadeColor: String, CaseIterable
 {
   case red
@@ -190,8 +187,7 @@ public enum ShadeColor: String, CaseIterable
  *
  * - Parameter stage: The stage to create the material on.
  * - Parameter color: The diffuse color to set on the shader.
- * - Returns: The newly created material.
- */
+ * - Returns: The newly created material. */
 public func matDef(_ stage: UsdStageRefPtr, color: ShadeColor = ShadeColor.white) -> UsdShade.Material
 {
   let matName = "\(color.rawValue.capitalized)Material"

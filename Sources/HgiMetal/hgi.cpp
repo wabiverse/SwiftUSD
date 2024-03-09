@@ -138,9 +138,9 @@ HgiMetal::~HgiMetal()
   }
 }
 
-HgiMetalPtr HgiMetal::CreateHgi()
+HgiMetalPtr HgiMetal::CreateHgi(MTL::Device *device)
 {
-  HgiMetalPtr hgi = std::make_shared<HgiMetal>();
+  HgiMetalPtr hgi = std::make_shared<HgiMetal>(device);
   
   hgi.reset(dynamic_cast<HgiMetal*>(Hgi::GetPlatformDefaultHgi()));
   

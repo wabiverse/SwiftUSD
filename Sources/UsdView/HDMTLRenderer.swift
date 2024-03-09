@@ -28,31 +28,32 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import CosmoGraph
 import Foundation
 import PixarUSD
 #if canImport(Metal) && !os(visionOS)
+  import Apple
   import Metal
   import MetalKit
 
   /**
-   * ``HDMTLRenderer``
-   *
-   * ## Overview
-   *
-   * The Hydra Engine (``PixarUSD/Hd``) Metal renderer for the ``UsdView``
-   * application conforms to the ``MetalKit/MTKViewDelegate`` protocol,
-   * allowing it to be set as a ``MetalKit/MTKView`` object's delegate to
-   * provide a drawing method to a ``MetalKit/MTKView`` object and respond
-   * to rendering events. */
+   * The Hydra Engine (**Hd**) Metal renderer for the ``UsdView``
+   * application conforms to the `MTKViewDelegate` protocol, allowing
+   * it to be set as a `MTKView` object's delegate to provide a drawing
+   * method to a `MTKView` object and respond to rendering events. */
   class HDMTLRenderer: NSObject, MTKViewDelegate
   {
     let hgi: HgiMetal.Platform.Ptr
     let driver: HdDriver
+    var device: MTL.Device?
 
-    init?(device _: MTLDevice)
+    override init()
     {
-      hgi = HgiMetal.createHgi()
+      device = MTL.CreateSystemDefaultDevice()
+      hgi = HgiMetal.createHgi(device: &device)
       driver = HdDriver(name: .renderDriver, driver: VtValue(hgi))
+
+      super.init()
     }
 
     func info()
