@@ -22,7 +22,6 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "pxr/pxr.h"
-#include "pxr/usd/ar/ar.h"
 #include "pxr/usd/ar/defineResolverContext.h"
 #include "pxr/usd/ar/resolverContext.h"
 #include "pxr/base/tf/diagnostic.h"

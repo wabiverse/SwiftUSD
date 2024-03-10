@@ -35,7 +35,6 @@
 #include "Tf/weakPtr.h"
 #include "Vt/types.h"
 #include "Vt/array.h"
-#include "Ar/ar.h"
 #include "Ar/asset.h"
 #include "Ar/resolvedPath.h"
 #include "Ar/resolver.h"

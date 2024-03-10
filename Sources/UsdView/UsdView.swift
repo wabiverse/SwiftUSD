@@ -47,11 +47,11 @@ class UsdView
 
   public init()
   {
-    /* Setup all usd resources (python, plugins, resources). */
+    // Setup all usd resources (python, plugins, resources).
     Usd.Bundler.shared.setup(.resources)
 
     #if canImport(Python)
-      /* embed & init python. */
+      // embed & init python.
       PyBundler.shared.pyInit()
       PyBundler.shared.pyInfo()
     #endif /* canImport(Python) */
@@ -65,7 +65,7 @@ class UsdView
   {
     let app = UsdView()
 
-    /* ---------- Hydra Engine. ---------- */
+    // ---------- Hydra Engine. ----------
 
     #if canImport(Metal) && !os(visionOS)
 
@@ -73,9 +73,9 @@ class UsdView
 
     #endif /* canImport(Metal) && !os(visionOS) */
 
-    /* ----- Imperative api example. ----- */
+    // ----- Imperative api example. -----
 
-    /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
+    // Create stage with a sphere, capsule, cylinder, cube, and cone on a transform.
 
     let stage = Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
 
@@ -100,7 +100,7 @@ class UsdView
     cone.addXformOp(type: .translate).set(Gf.Vec3d(0.0, 0.0, 10.0))
     cone.addXformOp(type: .rotateX, precision: .float).set(Float(-90))
 
-    /* Create a different colored material for each geometry prim. */
+    // Create a different colored material for each geometry prim.
 
     UsdShade.MaterialBindingAPI.apply(sphere).bind(matDef(stage, color: .red))
     UsdShade.MaterialBindingAPI.apply(capsule).bind(matDef(stage, color: .yellow))
@@ -110,7 +110,7 @@ class UsdView
 
     stage.getPseudoRoot().set(doc: "SwiftUSD v\(pxr.version)")
 
-    /* Iterate the stage and print out the path to each prim. */
+    // Iterate the stage and print out the path to each prim.
 
     for prim in stage.traverse()
     {
@@ -118,11 +118,11 @@ class UsdView
       Msg.logger.log(level: .info, "\(prim.name.string)\(primType) -> \(prim.path.string)")
     }
 
-    /* Save the stage to disk. */
+    // Save the stage to disk.
 
     stage.save()
 
-    /* ----- Declarative api example. ----- */
+    // ----- Declarative api example. -----
 
     UsdStage("DeclarativePixarUSD", ext: .usda)
     {
@@ -143,11 +143,11 @@ class UsdView
     .set(doc: "SwiftUSD v\(pxr.version) | Declarative API")
     .save()
 
-    /* ------------------------------------ */
+    // ------------------------------------
 
     Msg.logger.log(level: .info, "UsdView is not yet implemented... will exit now.")
 
-    /* ------------------------------------ */
+    // ------------------------------------
   }
 }
 

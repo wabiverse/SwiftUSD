@@ -35,9 +35,7 @@ import Plug
 import Rainbow
 
 #if os(Linux)
-  /**
-   * On Linux there is no ``Foundation.Bundle``, so we create one.
-   */
+  /// On Linux there is no ``Foundation.Bundle``, so we create one.
   public struct Bundle
   {
     public static let main = Bundle()

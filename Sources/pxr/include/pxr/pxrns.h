@@ -44,9 +44,7 @@
 
 #define SWIFTUSD_EVOLUTION 29
 
-inline namespace PXR_INTERNAL_NS
-{
-}
+namespace PXR_INTERNAL_NS {}
 
 /**
  * # ``pxr``
@@ -56,14 +54,11 @@ inline namespace PXR_INTERNAL_NS
  * The **pxr** namespace is the top level
  * cxx namespace for all **USD** modules.
  */
-namespace PXR_NS
-{
-  using namespace PXR_INTERNAL_NS;
+namespace PXR_NS {
+using namespace PXR_INTERNAL_NS;
 }
 
-#define PXR_NAMESPACE_OPEN_SCOPE   \
-  inline namespace PXR_INTERNAL_NS \
-  {
+#define PXR_NAMESPACE_OPEN_SCOPE namespace PXR_INTERNAL_NS {
 #define PXR_NAMESPACE_CLOSE_SCOPE }
 #define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
 
