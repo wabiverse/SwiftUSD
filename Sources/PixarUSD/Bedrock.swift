@@ -216,8 +216,23 @@ public protocol PxrUsd
 
 public protocol PxrUsdGeom
 {
-  associatedtype Subset
   associatedtype BasisCurves
+  associatedtype Camera
+  associatedtype Capsule
+  associatedtype Cone
+  associatedtype Cube
+  associatedtype Cylinder
+  associatedtype Tokens
+  associatedtype Mesh
+  associatedtype NurbsCurves
+  associatedtype NurbsPatch
+  associatedtype Plane
+  associatedtype Points
+  associatedtype Sphere
+  associatedtype Subset
+  associatedtype Xform
+  associatedtype Xformable
+  associatedtype XformOp
 }
 
 /// Represents all USD modules which
