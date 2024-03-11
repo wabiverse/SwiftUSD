@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomSphere = pxr.UsdGeomSphere
 
-public extension UsdGeom
-{
-  typealias Sphere = UsdGeomSphere
-}
-
 @Xformable
-extension UsdGeom.Sphere: GeomXformable
+extension UsdGeomSphere: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Sphere
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomSphere
   {
-    UsdGeom.Sphere.Define(stage.pointee.getPtr(), path)
+    UsdGeomSphere.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Sphere
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomSphere
   {
-    UsdGeom.Sphere.define(stage, path: .init(path))
+    UsdGeomSphere.define(stage, path: .init(path))
   }
 }

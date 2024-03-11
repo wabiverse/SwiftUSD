@@ -31,16 +31,16 @@
 import CxxStdlib
 @_exported import pxr
 
-public extension pxr
+extension pxr: VersionedUsd
 {
   /// The Pixar USD v0.23 C++ API.
-  typealias v23 = pxr_v0_23
+  public typealias v23 = pxr_v0_23
 
-   /// The current version of ``PixarUSD``.
-   ///
-   /// The semantic versioning used for ``PixarUSD`` tracks both the upstream
-   /// Pixar USD version, as well as the evolution iteration of the ``PixarUSD``
-   /// SwiftPM package, which is setup as follows:
-   /// - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION`` */
-  static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
+  /// The current version of ``PixarUSD``.
+  ///
+  /// The semantic versioning used for ``PixarUSD`` tracks both the upstream
+  /// Pixar USD version, as well as the evolution iteration of the ``PixarUSD``
+  /// SwiftPM package, which is setup as follows:
+  /// - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION``.
+  public static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
 }

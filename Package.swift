@@ -2051,6 +2051,8 @@ let package = Package(
       swiftSettings: [
         // enable to debug bundled (python, plugins, resources).
         .define("DEBUG_PIXAR_BUNDLE"),
+        // add visionOS once determining available metal apis.
+        .define("WITH_METAL", .when(platforms: [.macOS, .iOS])),
         .interoperabilityMode(.Cxx),
       ]
     ),

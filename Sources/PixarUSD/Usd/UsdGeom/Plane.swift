@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomPlane = pxr.UsdGeomPlane
 
-public extension UsdGeom
-{
-  typealias Plane = UsdGeomPlane
-}
-
 @Xformable
-extension UsdGeom.Plane: GeomXformable
+extension UsdGeomPlane: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Plane
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomPlane
   {
-    UsdGeom.Plane.Define(stage.pointee.getPtr(), path)
+    UsdGeomPlane.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Plane
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomPlane
   {
-    UsdGeom.Plane.define(stage, path: .init(path))
+    UsdGeomPlane.define(stage, path: .init(path))
   }
 }

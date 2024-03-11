@@ -32,22 +32,17 @@ import UsdGeom
 
 public typealias UsdGeomNurbsPatch = pxr.UsdGeomNurbsPatch
 
-public extension UsdGeom
-{
-  typealias NurbsPatch = UsdGeomNurbsPatch
-}
-
-public extension UsdGeom.NurbsPatch
+public extension UsdGeomNurbsPatch
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.NurbsPatch
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomNurbsPatch
   {
-    UsdGeom.NurbsPatch.Define(stage.pointee.getPtr(), path)
+    UsdGeomNurbsPatch.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.NurbsPatch
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomNurbsPatch
   {
-    UsdGeom.NurbsPatch.define(stage, path: .init(path))
+    UsdGeomNurbsPatch.define(stage, path: .init(path))
   }
 }

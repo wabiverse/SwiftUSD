@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomXform = pxr.UsdGeomXform
 
-public extension UsdGeom
-{
-  typealias Xform = UsdGeomXform
-}
-
 @Xformable
-extension UsdGeom.Xform: GeomXformable
+extension UsdGeomXform: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Xform
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomXform
   {
-    UsdGeom.Xform.Define(stage.pointee.getPtr(), path)
+    UsdGeomXform.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Xform
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomXform
   {
-    UsdGeom.Xform.define(stage, path: .init(path))
+    UsdGeomXform.define(stage, path: .init(path))
   }
 }

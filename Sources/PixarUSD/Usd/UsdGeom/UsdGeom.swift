@@ -40,5 +40,23 @@ import UsdGeom
  * **UsdGeom** defines the 3D graphics-related prim and property schemas that
  * together form a basis for interchanging geometry between DCC tools in a
  * graphics pipeline. */
-public enum UsdGeom
-{}
+public enum UsdGeom: PxrUsdGeom
+{
+  public typealias BasisCurves = PixarUSD.UsdGeomBasisCurves
+  public typealias Camera = PixarUSD.UsdGeomCamera
+  public typealias Capsule = PixarUSD.UsdGeomCapsule
+  public typealias Cone = PixarUSD.UsdGeomCone
+  public typealias Cube = PixarUSD.UsdGeomCube
+  public typealias Cylinder = PixarUSD.UsdGeomCylinder
+  public typealias Tokens = PixarUSD.UsdGeomTokens
+  public typealias Mesh = PixarUSD.UsdGeomMesh
+  public typealias NurbsCurves = PixarUSD.UsdGeomNurbsCurves
+  public typealias NurbsPatch = PixarUSD.UsdGeomNurbsPatch
+  public typealias Plane = PixarUSD.UsdGeomPlane
+  public typealias Points = PixarUSD.UsdGeomPoints
+  public typealias Sphere = PixarUSD.UsdGeomSphere
+  public typealias Subset = PixarUSD.UsdGeomSubset
+  public typealias Xform = PixarUSD.UsdGeomXform
+  public typealias Xformable = PixarUSD.UsdGeomXformable
+  public typealias XformOp = PixarUSD.UsdGeomXformOp
+}

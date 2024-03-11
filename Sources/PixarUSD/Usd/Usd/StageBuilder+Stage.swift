@@ -56,7 +56,7 @@ import Usd
  * ``` */
 public struct UsdStage
 {
-  public var stage: UsdStageRefPtr
+  public var stage: Usd.StageRefPtr
   public var prims: [UsdPrim]
 
   public init(_ identifier: String,

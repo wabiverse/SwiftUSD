@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomCube = pxr.UsdGeomCube
 
-public extension UsdGeom
-{
-  typealias Cube = UsdGeomCube
-}
-
 @Xformable
-extension UsdGeom.Cube: GeomXformable
+extension UsdGeomCube: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cube
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomCube
   {
-    UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
+    UsdGeomCube.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cube
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomCube
   {
-    UsdGeom.Cube.define(stage, path: .init(path))
+    UsdGeomCube.define(stage, path: .init(path))
   }
 }

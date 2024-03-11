@@ -28,21 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdGeom
+import Foundation
 
-public typealias UsdGeomPoints = pxr.UsdGeomPoints
-
-public extension UsdGeomPoints
+public enum Base: PxrBase
 {
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomPoints
-  {
-    UsdGeomPoints.Define(stage.pointee.getPtr(), path)
-  }
-
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomPoints
-  {
-    UsdGeomPoints.define(stage, path: .init(path))
-  }
+  public typealias Arch = PixarUSD.Arch
+  public typealias Gf = PixarUSD.Gf
+  public typealias Js = PixarUSD.Js
+  public typealias Plug = PixarUSD.Plug
+  public typealias Tf = PixarUSD.Tf
+  public typealias Trace = PixarUSD.Trace
+  public typealias Vt = PixarUSD.Vt
+  public typealias Work = PixarUSD.Work
 }

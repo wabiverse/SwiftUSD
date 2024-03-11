@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomCylinder = pxr.UsdGeomCylinder
 
-public extension UsdGeom
-{
-  typealias Cylinder = UsdGeomCylinder
-}
-
 @Xformable
-extension UsdGeom.Cylinder: GeomXformable
+extension UsdGeomCylinder: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cylinder
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomCylinder
   {
-    UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
+    UsdGeomCylinder.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cylinder
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomCylinder
   {
-    UsdGeom.Cylinder.define(stage, path: .init(path))
+    UsdGeomCylinder.define(stage, path: .init(path))
   }
 }

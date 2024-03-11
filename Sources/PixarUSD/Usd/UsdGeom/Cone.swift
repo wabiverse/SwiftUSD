@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomCone = pxr.UsdGeomCone
 
-public extension UsdGeom
-{
-  typealias Cone = UsdGeomCone
-}
-
 @Xformable
-extension UsdGeom.Cone: GeomXformable
+extension UsdGeomCone: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cone
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomCone
   {
-    UsdGeom.Cone.Define(stage.pointee.getPtr(), path)
+    UsdGeomCone.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cone
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomCone
   {
-    UsdGeom.Cone.define(stage, path: .init(path))
+    UsdGeomCone.define(stage, path: .init(path))
   }
 }

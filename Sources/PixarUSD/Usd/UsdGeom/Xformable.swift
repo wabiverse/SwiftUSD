@@ -32,11 +32,6 @@ import UsdGeom
 
 public typealias UsdGeomXformable = pxr.UsdGeomXformable
 
-public extension UsdGeom
-{
-  typealias Xformable = UsdGeomXformable
-}
-
 @attached(member, names: arbitrary, conformances: GeomXformable)
 public macro Xformable() = #externalMacro(module: "PixarMacros", type: "PixarXformableMacro")
 

@@ -28,7 +28,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(Metal)
+#if WITH_METAL
   import Apple
   import CosmoGraph
   import HgiMetal
@@ -91,4 +91,4 @@
      * usage of `std.unique_ptr`. */
     public typealias Ptr = pxr.HgiMetalPtr
   }
-#endif /* canImport(Metal) */
+#endif /* WITH_METAL */

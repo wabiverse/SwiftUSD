@@ -28,7 +28,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(Metal)
+#if WITH_METAL
   import CosmoGraph
   import CxxStdlib
   import Foundation
@@ -66,4 +66,4 @@
       pointee.device
     }
   }
-#endif /* canImport(Metal) */
+#endif /* WITH_METAL */

@@ -32,22 +32,17 @@ import UsdGeom
 
 public typealias UsdGeomBasisCurves = pxr.UsdGeomBasisCurves
 
-public extension UsdGeom
-{
-  typealias BasisCurves = UsdGeomBasisCurves
-}
-
-public extension UsdGeom.BasisCurves
+public extension UsdGeomBasisCurves
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.BasisCurves
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomBasisCurves
   {
-    UsdGeom.BasisCurves.Define(stage.pointee.getPtr(), path)
+    UsdGeomBasisCurves.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.BasisCurves
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomBasisCurves
   {
-    UsdGeom.BasisCurves.define(stage, path: .init(path))
+    UsdGeomBasisCurves.define(stage, path: .init(path))
   }
 }

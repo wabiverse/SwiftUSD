@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomCapsule = pxr.UsdGeomCapsule
 
-public extension UsdGeom
-{
-  typealias Capsule = UsdGeomCapsule
-}
-
 @Xformable
-extension UsdGeom.Capsule: GeomXformable
+extension UsdGeomCapsule: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdGeom.Capsule
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomCapsule
   {
-    UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
+    UsdGeomCapsule.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdGeom.Capsule
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomCapsule
   {
-    UsdGeom.Capsule.define(stage, path: .init(path))
+    UsdGeomCapsule.define(stage, path: .init(path))
   }
 }

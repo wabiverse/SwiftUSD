@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomMesh = pxr.UsdGeomMesh
 
-public extension UsdGeom
-{
-  typealias Mesh = UsdGeomMesh
-}
-
 @Xformable
-extension UsdGeom.Mesh: GeomXformable
+extension UsdGeomMesh: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Mesh
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomMesh
   {
-    UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
+    UsdGeomMesh.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Mesh
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomMesh
   {
-    UsdGeom.Mesh.define(stage, path: .init(path))
+    UsdGeomMesh.define(stage, path: .init(path))
   }
 }

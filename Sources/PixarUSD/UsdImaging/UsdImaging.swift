@@ -28,21 +28,13 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdGeom
+import Foundation
 
-public typealias UsdGeomPoints = pxr.UsdGeomPoints
-
-public extension UsdGeomPoints
+/// Represents all USD modules which make up the
+/// main API for graphics DCC apps and tools that
+/// view and/or record images (including streaming
+/// playback) of ``Usd/Stage``s.
+public enum UsdImaging: PxrUsdImaging
 {
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomPoints
-  {
-    UsdGeomPoints.Define(stage.pointee.getPtr(), path)
-  }
-
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomPoints
-  {
-    UsdGeomPoints.define(stage, path: .init(path))
-  }
+  public typealias UsdShaders = PixarUSD.UsdShaders
 }

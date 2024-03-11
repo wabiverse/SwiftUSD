@@ -41,13 +41,13 @@ public extension UsdLux
 extension UsdLux.DistantLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdLux.DistantLight
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.DistantLight
   {
     UsdLux.DistantLight.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdLux.DistantLight
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.DistantLight
   {
     UsdLux.DistantLight.define(stage, path: .init(path))
   }

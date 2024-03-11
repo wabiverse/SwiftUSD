@@ -28,21 +28,23 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdGeom
+import Foundation
 
-public typealias UsdGeomPoints = pxr.UsdGeomPoints
-
-public extension UsdGeomPoints
+/// Represents all USD modules which
+/// make up the graphics and rendering
+/// foundation of Pixar USD.
+public enum Imaging: PxrImaging
 {
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomPoints
-  {
-    UsdGeomPoints.Define(stage.pointee.getPtr(), path)
-  }
+  public typealias CameraUtil = PixarUSD.CameraUtil
+  public typealias Garch = PixarUSD.Garch
+  public typealias Hd = PixarUSD.Hd
+  public typealias Hf = PixarUSD.Hf
+  public typealias Hgi = PixarUSD.Hgi
+  public typealias HgiGL = PixarUSD.HgiGL
+  public typealias HgiInterop = PixarUSD.HgiInterop
+  public typealias PxOsd = PixarUSD.PxOsd
 
-  @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomPoints
-  {
-    UsdGeomPoints.define(stage, path: .init(path))
-  }
+  #if WITH_METAL
+    public typealias HgiMetal = PixarUSD.HgiMetal
+  #endif
 }

@@ -32,12 +32,7 @@ import UsdGeom
 
 public typealias UsdGeomXformOp = pxr.UsdGeomXformOp
 
-public extension UsdGeom
-{
-  typealias XformOp = UsdGeomXformOp
-}
-
-public extension UsdGeom.XformOp
+public extension UsdGeomXformOp
 {
   @discardableResult
   func set(_ value: Float, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool

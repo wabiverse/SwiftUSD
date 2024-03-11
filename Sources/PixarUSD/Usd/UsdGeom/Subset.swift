@@ -32,22 +32,17 @@ import UsdGeom
 
 public typealias UsdGeomSubset = pxr.UsdGeomSubset
 
-public extension UsdGeom
-{
-  typealias Subset = UsdGeomSubset
-}
-
-public extension UsdGeom.Subset
+public extension UsdGeomSubset
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Subset
+  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomSubset
   {
-    UsdGeom.Subset.Define(stage.pointee.getPtr(), path)
+    UsdGeomSubset.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Subset
+  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomSubset
   {
-    UsdGeom.Subset.define(stage, path: .init(path))
+    UsdGeomSubset.define(stage, path: .init(path))
   }
 }

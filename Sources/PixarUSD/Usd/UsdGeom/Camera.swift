@@ -32,23 +32,18 @@ import UsdGeom
 
 public typealias UsdGeomCamera = pxr.UsdGeomCamera
 
-public extension UsdGeom
-{
-  typealias Camera = UsdGeomCamera
-}
-
 @Xformable
-extension UsdGeom.Camera: GeomXformable
+extension UsdGeomCamera: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Camera
+  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeomCamera
   {
-    UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
+    UsdGeomCamera.Define(stage.pointee.getPtr(), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Camera
+  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeomCamera
   {
-    UsdGeom.Camera.define(stage, path: .init(path))
+    UsdGeomCamera.define(stage, path: .init(path))
   }
 }

@@ -31,7 +31,7 @@
 import CosmoGraph
 import Foundation
 import PixarUSD
-#if canImport(Metal) && !os(visionOS)
+#if WITH_METAL
   import Apple
   import Metal
   import MetalKit
@@ -70,4 +70,4 @@ import PixarUSD
     func draw(in _: MTKView)
     {}
   }
-#endif /* canImport(Metal) && !os(visionOS) */
+#endif /* WITH_METAL */

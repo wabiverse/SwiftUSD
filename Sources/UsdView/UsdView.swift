@@ -41,9 +41,9 @@ import PixarUSD
 @main
 class UsdView
 {
-  #if canImport(Metal) && !os(visionOS)
+  #if WITH_METAL
     let hydra: HDMTLRenderer
-  #endif /* canImport(Metal) && !os(visionOS) */
+  #endif /* WITH_METAL */
 
   public init()
   {
@@ -56,9 +56,9 @@ class UsdView
       PyBundler.shared.pyInfo()
     #endif /* canImport(Python) */
 
-    #if canImport(Metal) && !os(visionOS)
+    #if WITH_METAL
       hydra = HDMTLRenderer()
-    #endif /* canImport(Metal) && !os(visionOS) */
+    #endif /* WITH_METAL */
   }
 
   static func main()
@@ -67,11 +67,11 @@ class UsdView
 
     // ---------- Hydra Engine. ----------
 
-    #if canImport(Metal) && !os(visionOS)
+    #if WITH_METAL
 
       app.hydra.info()
 
-    #endif /* canImport(Metal) && !os(visionOS) */
+    #endif /* WITH_METAL */
 
     // ----- Imperative api example. -----
 
@@ -188,7 +188,7 @@ public enum ShadeColor: String, CaseIterable
  * - Parameter stage: The stage to create the material on.
  * - Parameter color: The diffuse color to set on the shader.
  * - Returns: The newly created material. */
-public func matDef(_ stage: UsdStageRefPtr, color: ShadeColor = ShadeColor.white) -> UsdShade.Material
+public func matDef(_ stage: Usd.StageRefPtr, color: ShadeColor = ShadeColor.white) -> UsdShade.Material
 {
   let matName = "\(color.rawValue.capitalized)Material"
 
