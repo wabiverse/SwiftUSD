@@ -416,7 +416,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.5.4"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit.git", from: "1.5.5"),
     .package(url: "https://github.com/furby-tm/swift-bundler.git", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),

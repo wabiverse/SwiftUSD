@@ -134,7 +134,7 @@ public enum Usd: PxrUsd
   public typealias StageWeakPtr = pxr.UsdStageWeakPtr
 
   /**
-   * # Usd.Prim
+   * # ``Prim``
    *
    * ``Prim`` is the sole persistent scenegraph object on a UsdStage, and
    * is the embodiment of a "Prim" as described in the *Universal Scene
