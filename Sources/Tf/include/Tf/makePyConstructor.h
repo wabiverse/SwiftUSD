@@ -306,6 +306,10 @@ template <typename SIG> struct InitCtorWithBackReference;
 template <typename SIG> struct InitCtorWithVarArgs;
 template <typename SIG> struct NewCtor;
 template <typename SIG> struct NewCtorWithClassReference;
+} // namespace Tf_MakePyConstructor
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
 #define BOOST_PP_ITERATION_LIMITS (0, TF_MAX_ARITY)
 #define BOOST_PP_FILENAME_1 "Tf/makePyConstructor.h"
 #include BOOST_PP_ITERATE()
@@ -313,7 +317,7 @@ template <typename SIG> struct NewCtorWithClassReference;
 #include "Tf/makePyConstructor.h"
 */
 
-} // namespace Tf_MakePyConstructor
+PXR_NAMESPACE_OPEN_SCOPE
 
 template <typename T>
 Tf_MakePyConstructor::InitVisitor<typename Tf_MakePyConstructor::InitCtor<T>>
@@ -405,6 +409,11 @@ PXR_NAMESPACE_CLOSE_SCOPE
 #endif // PXR_BASE_TF_MAKE_PY_CONSTRUCTOR_H
 
 #else // BOOST_PP_IS_ITERATING
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+namespace Tf_MakePyConstructor
+{
 
 #define N BOOST_PP_ITERATION()
 
@@ -587,7 +596,7 @@ struct NewCtorWithClassReference<SIGNATURE> : CtorBase<SIGNATURE> {
   }
 };
 
-#endif
+#endif /* N > 0 */
 
 #undef N
 #undef SIGNATURE
@@ -597,5 +606,9 @@ struct NewCtorWithClassReference<SIGNATURE> : CtorBase<SIGNATURE> {
 #undef FORMAT_STR
 #undef ARG_TYPE_STR_A
 #undef EXTRACT_REQ_ARG_A
+
+} // namespace Tf_MakePyConstructor
+
+PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif // BOOST_PP_IS_ITERATING
