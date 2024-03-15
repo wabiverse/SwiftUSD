@@ -53,7 +53,9 @@
  */
 
 #ifdef __APPLE__
-# include <swift/bridging>
+# if __has_include(<swift/bridging>)
+#  include <swift/bridging>
+# endif /* __has_include(<swift/bridging>) */
 #endif /* __APPLE__ */
 
 /** ----------
