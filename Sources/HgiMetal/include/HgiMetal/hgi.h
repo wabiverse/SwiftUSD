@@ -36,6 +36,7 @@
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 #include <stack>
+#include <mutex>
 #include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE

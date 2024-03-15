@@ -30,6 +30,7 @@
 #include "HgiMetal/stepFunctions.h"
 #include "Hgi/graphicsCmds.h"
 #include <cstdint>
+#include <mutex>
 
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
