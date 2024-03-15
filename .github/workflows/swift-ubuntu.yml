@@ -1,0 +1,29 @@
+name: Swift (Ubuntu)
+
+on: [push]
+
+jobs:
+  build:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        swift: ["5.9"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+      - uses: actions/checkout@v4
+      - name: Install BZ2
+        run: sudo apt install libbz2-dev
+      - name: Install ZLib
+        run: sudo apt install zlib1g-dev
+      - name: Install Python
+        run: sudo apt install python3-dev
+      - name: Install Boost
+        run: sudo apt install libboost-all-dev
+      - name: Build
+        run: swift build -c release --target UsdView
+      - name: Run tests
+        run: swift test
