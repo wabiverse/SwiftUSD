@@ -33,7 +33,7 @@
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
         "branch" : "main",
-        "revision" : "4bb556e4ac54e9bc4c4d06ff002040830c022467"
+        "revision" : "69b388f61e67fef81a66aa70de89aecd961d7c66"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
-        "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
-        "version" : "1.3.0"
+        "revision" : "46989693916f56d1186bd59ac15124caef896560",
+        "version" : "1.3.1"
       }
     },
     {
