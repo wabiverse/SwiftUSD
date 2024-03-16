@@ -38,9 +38,6 @@
     <img src="https://img.shields.io/github/contributors-anon/wabiverse/SwiftUSD?color=8A2BE2&style=flat-square" alt="contributors" style="height: 20px;">
   </a>
   <br>
-  <a href="https://opensource.org/licenses/Apache-2.0">
-    <img src="https://img.shields.io/badge/apache%202.0-gold.svg?style=flat-square&label=license" alt="license" style="height: 20px;">
-  </a>
   <a href="https://discord.gg/yKmkdf3a9V">
     <img src="https://img.shields.io/badge/discord-7289da.svg?style=flat-square&logo=discord" alt="discord" style="height: 20px;">
   </a>
