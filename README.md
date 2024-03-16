@@ -11,10 +11,10 @@
 
 <h1 align="center">
     <a href="https://wabi.foundation/pixarusd/documentation/pixarusd#gh-light-mode-only">
-      <img width="350" src="https://www.dropbox.com/scl/fi/vdrqpu843i1p6ik8sogve/swiftlymetaversingwordslight.svg?rlkey=2vyi45yabypi447wj0lzcnf54&raw=1">
+      <img width="350" src="swiftlymetaversingwordslight.svg">
     </a>
     <a href="https://wabi.foundation/pixarusd/documentation/pixarusd#gh-dark-mode-only">
-      <img width="350" src="https://www.dropbox.com/scl/fi/zu48kv7apt0rul39fpy0t/swiftlymetaversingwordsdark.svg?rlkey=hn9sxb8dw8ing4j3xmbz1l7jl&raw=1">
+      <img width="350" src="swiftlymetaversingwordsdark.svg">
     </a>
 </h1>
 
