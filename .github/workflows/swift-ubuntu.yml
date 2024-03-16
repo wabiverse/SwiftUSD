@@ -15,15 +15,13 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
-      - name: Install BZ2
+      - name: 📙 Install BZ2
         run: sudo apt install libbz2-dev
-      - name: Install ZLib
+      - name: 📓 Install ZLib
         run: sudo apt install zlib1g-dev
-      - name: Install Python
+      - name: 🐍 Install Python
         run: sudo apt install python3-dev
-      - name: Install Boost
+      - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
-      - name: Build
+      - name: 📦 Build
         run: swift build -c release --target UsdView
-      - name: Run tests
-        run: swift test

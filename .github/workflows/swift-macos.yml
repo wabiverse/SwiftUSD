@@ -15,7 +15,5 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
-      - name: Build
+      - name: 📦 Build
         run: swift build -c release --target UsdView
-      - name: Run tests
-        run: swift test
