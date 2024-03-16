@@ -1,4 +1,4 @@
-name: Swift (macOS)
+name: Swift (macOS arm64)
 
 on: [push]
 

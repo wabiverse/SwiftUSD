@@ -1,4 +1,4 @@
-name: Swift (Ubuntu)
+name: Swift (Ubuntu x86/64)
 
 on: [push]
 
