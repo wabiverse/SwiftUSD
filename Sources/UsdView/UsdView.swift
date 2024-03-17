@@ -30,9 +30,9 @@
 
 import Foundation
 import PixarUSD
-#if canImport(Python)
+#if canImport(PyBundle)
   import PyBundle
-#endif /* canImport(Python) */
+#endif /* canImport(PyBundle) */
 #if canImport(Metal)
   import Metal
 #endif /* canImport(Metal) */
