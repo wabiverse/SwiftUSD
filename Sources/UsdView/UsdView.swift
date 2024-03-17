@@ -57,11 +57,11 @@ class UsdView
     /* Setup all usd resources (python, plugins, resources). */
     Pixar.Bundler.shared.setup(.resources)
 
-    #if canImport(Python)
+    #if canImport(PyBundle)
       /* embed & init python. */
       PyBundler.shared.pyInit()
       PyBundler.shared.pyInfo()
-    #endif /* canImport(Python) */
+    #endif /* canImport(PyBundle) */
 
     #if canImport(Metal) && !os(visionOS)
       hydra = HDMTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
