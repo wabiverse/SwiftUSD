@@ -21,6 +21,8 @@ jobs:
         run: sudo apt install zlib1g-dev
       - name: 🐍 Install Python
         run: sudo apt install python3-dev
+      - name: 🖼 Install FreeGLUT
+        run: sudo apt install freeglut3-dev
       - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
       - name: 📦 Build
