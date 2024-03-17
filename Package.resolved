@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "branch" : "main",
-        "revision" : "de4a89d68a4584a94b3eb2655e658c3474863bc5"
+        "revision" : "de4a89d68a4584a94b3eb2655e658c3474863bc5",
+        "version" : "1.6.7"
       }
     },
     {
