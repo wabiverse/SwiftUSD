@@ -32,7 +32,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
   </a>
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-macos.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-macos.yml?style=flat-square&label=%E1%B4%8D%E1%B4%80%E1%B4%84OS&labelColor=000000&logo=apple">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-macos.yml?style=flat-square&label=macOS&labelColor=000000&logo=apple">
   </a>
   <a href="https://github.com/wabiverse/SwiftUSD/graphs/contributors">
     <img src="https://img.shields.io/github/contributors-anon/wabiverse/SwiftUSD?color=8A2BE2&style=flat-square" alt="contributors" style="height: 20px;">
