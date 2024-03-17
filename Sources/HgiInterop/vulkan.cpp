@@ -31,6 +31,8 @@
 #include "HgiInterop/vulkan.h"
 #include "Vt/value.h"
 
+#include "Tf/diagnostic.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 static const char *_vertexFullscreen =

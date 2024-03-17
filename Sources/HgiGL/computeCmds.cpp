@@ -32,6 +32,8 @@
 #include "HgiGL/graphicsPipeline.h"
 #include "HgiGL/resourceBindings.h"
 
+#include "Tf/diagnostic.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiGLComputeCmds::HgiGLComputeCmds(

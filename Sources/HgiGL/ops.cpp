@@ -33,6 +33,8 @@
 #include "HgiGL/resourceBindings.h"
 #include "HgiGL/shaderProgram.h"
 #include "HgiGL/texture.h"
+
+#include "Tf/diagnostic.h"
 #include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

@@ -28,6 +28,8 @@
 #include "HgiGL/resourceBindings.h"
 #include "HgiGL/texture.h"
 
+#include "Tf/diagnostic.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiGLResourceBindings::HgiGLResourceBindings(

@@ -35,6 +35,8 @@
 #include "HgiGL/resourceBindings.h"
 #include "HgiGL/scopedStateHolder.h"
 
+#include "Tf/diagnostic.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiGLGraphicsCmds::HgiGLGraphicsCmds(
