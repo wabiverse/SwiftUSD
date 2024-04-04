@@ -16,7 +16,7 @@ jobs:
           swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
       - name: 👨‍💻 Install CxxStdlib
-        run: sudo apt install build-essential libstdc++-12-dev
+        run: sudo apt install libstdc++-12-dev
       - name: 📙 Install BZ2
         run: sudo apt install libbz2-dev
       - name: 📓 Install ZLib
