@@ -1,4 +1,4 @@
-name: Swift Debug (macOS arm64)
+name: Run Tests (macOS arm64)
 
 on: [push]
 
@@ -16,4 +16,4 @@ jobs:
           swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
       - name: 📦 Build
-        run: swift build -c debug --target UsdView
+        run: swift test

@@ -1,4 +1,4 @@
-name: Swift Debug (Ubuntu x86/64)
+name: Run Tests (Ubuntu x86/64)
 
 on: [push]
 
@@ -26,4 +26,4 @@ jobs:
       - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
       - name: 📦 Build
-        run: swift build -c debug --target UsdView
+        run: swift test
