@@ -227,17 +227,16 @@ public:
         PointAndTangentArrays() = default;
         PointAndTangentArrays(const PointAndTangentArrays&) = default;
         PointAndTangentArrays(PointAndTangentArrays&&) = default;
-        PointAndTangentArrays& operator=(const PointAndTangentArrays&) =
-            default;
+        PointAndTangentArrays& operator=(const PointAndTangentArrays&) = default;
         PointAndTangentArrays& operator=(PointAndTangentArrays&&) = default;
 
         /// Initializes \p points and \p tangents if they are the same size.
         ///
         /// If points and tangents are not the same size, an empty container
         /// is created.
-        PointAndTangentArrays(const VtVec3fArray& points,
-                              const VtVec3fArray& tangents)
-            : _points(points), _tangents(tangents) {
+        explicit PointAndTangentArrays(const VtVec3fArray& points,
+                                       const VtVec3fArray& tangents)
+          : _points(points), _tangents(tangents) {
             if (_points.size() != _tangents.size()) {
                 TF_RUNTIME_ERROR("Points and tangents must be the same size.");
                 _points.clear();
@@ -271,12 +270,15 @@ public:
         /// Get separated tangents array
         const VtVec3fArray& GetTangents() const { return _tangents; }
 
-        bool operator==(const PointAndTangentArrays& other) const {
-            return (GetPoints() == other.GetPoints()) &&
-                   (GetTangents() == other.GetTangents());
+        friend bool operator==(const PointAndTangentArrays &lhs, 
+                               const PointAndTangentArrays &rhs) {
+            return (lhs.GetPoints() == rhs.GetPoints()) &&
+                   (lhs.GetTangents() == rhs.GetTangents());
         }
-        bool operator!=(const PointAndTangentArrays& other) const {
-            return !((*this) == other);
+
+        friend bool operator!=(const PointAndTangentArrays &lhs, 
+                               const PointAndTangentArrays &rhs) {
+            return !(lhs == rhs);
         }
     };
 };
