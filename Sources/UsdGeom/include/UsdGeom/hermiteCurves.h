@@ -271,11 +271,11 @@ public:
         /// Get separated tangents array
         const VtVec3fArray& GetTangents() const { return _tangents; }
 
-        bool operator==(const PointAndTangentArrays& other) {
+        bool operator==(const PointAndTangentArrays& other) const {
             return (GetPoints() == other.GetPoints()) &&
                    (GetTangents() == other.GetTangents());
         }
-        bool operator!=(const PointAndTangentArrays& other) {
+        bool operator!=(const PointAndTangentArrays& other) const {
             return !((*this) == other);
         }
     };
