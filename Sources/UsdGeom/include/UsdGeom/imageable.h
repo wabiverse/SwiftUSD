@@ -414,12 +414,12 @@ public:
         /// Returns true if this represents a purpose that has been computed.
         explicit operator bool() const { return !purpose.IsEmpty(); }
 
-        bool operator==(const PurposeInfo &rhs) { 
-            return purpose == rhs.purpose && isInheritable == rhs.isInheritable;
+        friend bool operator==(const PurposeInfo &lhs, const PurposeInfo &rhs) { 
+            return lhs.purpose == rhs.purpose && lhs.isInheritable == rhs.isInheritable;
         }
 
-        bool operator!=(const PurposeInfo &rhs) { 
-            return !(*this == rhs);
+        friend bool operator!=(const PurposeInfo &lhs, const PurposeInfo &rhs) { 
+            return !(lhs == rhs);
         }
 
         /// Returns the purpose if it's inheritable, returns empty if it is not.
