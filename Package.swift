@@ -2074,7 +2074,6 @@ let package = Package(
       name: "PixarUSDTests",
       dependencies: [
         .target(name: "PixarUSD"),
-        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
