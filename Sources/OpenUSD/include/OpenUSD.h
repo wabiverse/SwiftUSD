@@ -17,22 +17,6 @@
 #include <OpenUSD/pxr/imaging/garch/GarchWindows/glPlatformContextWindows.h>
 #include <OpenUSD/pxr/imaging/garch/GarchWindows/glPlatformDebugWindowWindows.h>
 
-// hio
-#include <OpenUSD/pxr/imaging/hio/api.h>
-#include <OpenUSD/pxr/imaging/hio/debugCodes.h>
-#include <OpenUSD/pxr/imaging/hio/dictionary.h>
-#include <OpenUSD/pxr/imaging/hio/fieldTextureData.h>
-#include <OpenUSD/pxr/imaging/hio/glslfx.h>
-#include <OpenUSD/pxr/imaging/hio/glslfxConfig.h>
-#include <OpenUSD/pxr/imaging/hio/image.h>
-#include <OpenUSD/pxr/imaging/hio/imageRegistry.h>
-#include <OpenUSD/pxr/imaging/hio/pch.h>
-#include <OpenUSD/pxr/imaging/hio/rankedTypeMap.h>
-#include <OpenUSD/pxr/imaging/hio/types.h>
-#include <OpenUSD/pxr/imaging/hio/stb/stb_image_resize.h>
-#include <OpenUSD/pxr/imaging/hio/stb/stb_image_write.h>
-#include <OpenUSD/pxr/imaging/hio/stb/stb_image.h>
-
 // hgi
 #include <OpenUSD/pxr/imaging/hgi/api.h>
 #include <OpenUSD/pxr/imaging/hgi/attachmentDesc.h>

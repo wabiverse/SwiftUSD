@@ -21,58 +21,58 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/hio/image.h"
-#include "pxr/imaging/hio/imageRegistry.h"
+#include "Hio/image.h"
+#include "Hio/imageRegistry.h"
 
-#include "pxr/base/tf/type.h"
+#include "Tf/type.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<HioImage>();
+  TfType::Define<HioImage>();
 }
 
 HioImage::~HioImage() = default;
 
 /* static */
-bool
-HioImage::IsSupportedImageFile(std::string const & filename)
+bool HioImage::IsSupportedImageFile(std::string const &filename)
 {
-    HioImageRegistry & registry = HioImageRegistry::GetInstance();
-    return registry.IsSupportedImageFile(filename);
+  HioImageRegistry &registry = HioImageRegistry::GetInstance();
+  return registry.IsSupportedImageFile(filename);
 }
 
 /* static */
 HioImageSharedPtr
-HioImage::OpenForReading(std::string const & filename, int subimage,
-                         int mip, SourceColorSpace sourceColorSpace, 
+HioImage::OpenForReading(std::string const &filename, int subimage,
+                         int mip, SourceColorSpace sourceColorSpace,
                          bool suppressErrors)
 {
-    HioImageRegistry & registry = HioImageRegistry::GetInstance();
+  HioImageRegistry &registry = HioImageRegistry::GetInstance();
 
-    HioImageSharedPtr image = registry._ConstructImage(filename);
-    if (!image || !image->_OpenForReading(filename, subimage, mip, 
-                                          sourceColorSpace, suppressErrors)) {
-        return HioImageSharedPtr();
-    }
+  HioImageSharedPtr image = registry._ConstructImage(filename);
+  if (!image || !image->_OpenForReading(filename, subimage, mip,
+                                        sourceColorSpace, suppressErrors))
+  {
+    return HioImageSharedPtr();
+  }
 
-    return image;
+  return image;
 }
 
 /* static */
 HioImageSharedPtr
-HioImage::OpenForWriting(std::string const & filename)
+HioImage::OpenForWriting(std::string const &filename)
 {
-    HioImageRegistry & registry = HioImageRegistry::GetInstance();
+  HioImageRegistry &registry = HioImageRegistry::GetInstance();
 
-    HioImageSharedPtr image = registry._ConstructImage(filename);
-    if (!image || !image->_OpenForWriting(filename)) {
-        return HioImageSharedPtr();
-    }
+  HioImageSharedPtr image = registry._ConstructImage(filename);
+  if (!image || !image->_OpenForWriting(filename))
+  {
+    return HioImageSharedPtr();
+  }
 
-    return image;
+  return image;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

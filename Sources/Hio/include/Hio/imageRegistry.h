@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HIO_IMAGE_REGISTRY_H
 #define PXR_IMAGING_HIO_IMAGE_REGISTRY_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hio/api.h"
-#include "pxr/base/tf/singleton.h"
+#include <pxr/pxrns.h>
+#include "Hio/api.h"
+#include "Tf/singleton.h"
 
 #include <memory>
 #include <string>
@@ -44,22 +44,22 @@ class HioRankedTypeMap;
 class HioImageRegistry : public TfSingleton<HioImageRegistry>
 {
 public:
-    HIO_API
-    static HioImageRegistry& GetInstance();
+  HIO_API
+  static HioImageRegistry &GetInstance();
 
-    HIO_API
-    bool IsSupportedImageFile(std::string const & filename);
-
-private:
-    friend class TfSingleton<HioImageRegistry>;
-    HioImageRegistry();
-
-    friend class HioImage;
-
-    HioImageSharedPtr _ConstructImage(std::string const & filename);
+  HIO_API
+  bool IsSupportedImageFile(std::string const &filename);
 
 private:
-    std::unique_ptr<HioRankedTypeMap> const _typeMap;
+  friend class TfSingleton<HioImageRegistry>;
+  HioImageRegistry();
+
+  friend class HioImage;
+
+  HioImageSharedPtr _ConstructImage(std::string const &filename);
+
+private:
+  std::unique_ptr<HioRankedTypeMap> const _typeMap;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

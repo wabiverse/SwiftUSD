@@ -1,5 +1,5 @@
 //
-// Copyright 2019 Pixar
+// Copyright 2020 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,25 +21,24 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-/// \file debugCodes.cpp
+#ifndef PXR_IMAGING_HIO_DICTIONARY_H
+#define PXR_IMAGING_HIO_DICTIONARY_H
 
-#include "pxr/imaging/hio/debugCodes.h"
+/// \file hio/dictionary.h
 
-#include "pxr/base/tf/debug.h"
-#include "pxr/base/tf/registryManager.h"
+#include <pxr/pxrns.h>
+
+#include "Vt/dictionary.h"
+#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_REGISTRY_FUNCTION(TfDebug)
-{
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HIO_DEBUG_GLSLFX,
-        "Hio GLSLFX info");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HIO_DEBUG_TEXTURE_IMAGE_PLUGINS,
-        "Hio image texture plugin registration and loading");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(HIO_DEBUG_FIELD_TEXTURE_DATA_PLUGINS,
-        "Hio field texture data plugin registration and loading");
-}
-
+VtDictionary
+Hio_GetDictionaryFromInput(
+    const std::string &input,
+    const std::string &filename,
+    std::string *errorStr);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif

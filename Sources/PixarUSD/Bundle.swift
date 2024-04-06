@@ -177,6 +177,10 @@ public extension Bundle
   static let hgiGL = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiGL\(ext)")
 
   /**
+   * Where ``Hio`` application bundle resources are located. */
+  static let hio = Bundle(path: "\(pxrRoot)/SwiftUSD_Hio\(ext)")
+
+  /**
    * Where ``Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
@@ -426,6 +430,7 @@ public enum BundleFramework: CaseIterable
   case hgiMetal
   case hgiVulkan
   case hgiGL
+  case hio
 
   public var resourcePath: String?
   {
@@ -456,6 +461,7 @@ public enum BundleFramework: CaseIterable
       case .hgiMetal: Bundle.hgiMetal?.resourcePath
       case .hgiVulkan: Bundle.hgiVulkan?.resourcePath
       case .hgiGL: Bundle.hgiGL?.resourcePath
+      case .hio: Bundle.hio?.resourcePath
     }
   }
 }

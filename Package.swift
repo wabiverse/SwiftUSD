@@ -188,6 +188,10 @@ let package = Package(
       name: "HgiInterop",
       targets: ["HgiInterop"]
     ),
+    .library(
+      name: "Hio",
+      targets: ["Hio"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -1360,6 +1364,29 @@ let package = Package(
     ),
 
     .target(
+      name: "Hio",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Js"),
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Vt"),
+        .target(name: "Trace"),
+        .target(name: "Ar"),
+        .target(name: "Hf"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Hio"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Hio"),
+        .define("MFB_PACKAGE_MODULE", to: "Hio"),
+        .define("HIO_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -2038,6 +2065,7 @@ let package = Package(
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
         .target(name: "HgiGL"),
         .target(name: "HgiInterop"),
+        .target(name: "Hio"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------
