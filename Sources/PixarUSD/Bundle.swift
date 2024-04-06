@@ -181,6 +181,10 @@ public extension Bundle
   static let hio = Bundle(path: "\(pxrRoot)/SwiftUSD_Hio\(ext)")
 
   /**
+   * Where ``Glf`` application bundle resources are located. */
+  static let glf = Bundle(path: "\(pxrRoot)/SwiftUSD_Glf\(ext)")
+
+  /**
    * Where ``Tf`` python bundle resources are located. */
   static let pyTf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyTf\(ext)")
 
@@ -315,6 +319,10 @@ public extension Bundle
   /**
    * Where ``Garch`` application bundle resources are located. */
   static let pyGarch = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGarch\(ext)")
+
+  /**
+   * Where ``Glf`` application bundle resources are located. */
+  static let pyGlf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGlf\(ext)")
 }
 
 public enum BundleKind
@@ -431,6 +439,7 @@ public enum BundleFramework: CaseIterable
   case hgiVulkan
   case hgiGL
   case hio
+  case glf
 
   public var resourcePath: String?
   {
@@ -462,6 +471,7 @@ public enum BundleFramework: CaseIterable
       case .hgiVulkan: Bundle.hgiVulkan?.resourcePath
       case .hgiGL: Bundle.hgiGL?.resourcePath
       case .hio: Bundle.hio?.resourcePath
+      case .glf: Bundle.glf?.resourcePath
     }
   }
 }
@@ -502,6 +512,7 @@ public enum BundlePython: CaseIterable
   case pyCameraUtil
   case pyPxOsd
   case pyGarch
+  case pyGlf
 
   public var resourcePath: String?
   {
@@ -541,6 +552,7 @@ public enum BundlePython: CaseIterable
       case .pyCameraUtil: Bundle.pyCameraUtil?.resourcePath
       case .pyPxOsd: Bundle.pyPxOsd?.resourcePath
       case .pyGarch: Bundle.pyGarch?.resourcePath
+      case .pyGlf: Bundle.pyGlf?.resourcePath
     }
   }
 }

@@ -83,27 +83,6 @@
 #include <OpenUSD/pxr/imaging/plugin/hdPrmanLoader/rendererPlugin.h>
 #endif // defined(PXR_PRMAN_SUPPORT_ENABLED)
 
-// glf
-#include <OpenUSD/pxr/imaging/glf/api.h>
-#include <OpenUSD/pxr/imaging/glf/bindingMap.h>
-#include <OpenUSD/pxr/imaging/glf/contextCaps.h>
-#include <OpenUSD/pxr/imaging/glf/debugCodes.h>
-#include <OpenUSD/pxr/imaging/glf/diagnostic.h>
-#include <OpenUSD/pxr/imaging/glf/drawTarget.h>
-#include <OpenUSD/pxr/imaging/glf/glContext.h>
-#include <OpenUSD/pxr/imaging/glf/glContextRegistry.h>
-#include <OpenUSD/pxr/imaging/glf/glRawContext.h>
-#include <OpenUSD/pxr/imaging/glf/info.h>
-#include <OpenUSD/pxr/imaging/glf/pch.h>
-#include <OpenUSD/pxr/imaging/glf/simpleLight.h>
-#include <OpenUSD/pxr/imaging/glf/simpleLightingContext.h>
-#include <OpenUSD/pxr/imaging/glf/simpleMaterial.h>
-#include <OpenUSD/pxr/imaging/glf/simpleShadowArray.h>
-#include <OpenUSD/pxr/imaging/glf/testGLContext.h>
-#include <OpenUSD/pxr/imaging/glf/texture.h>
-#include <OpenUSD/pxr/imaging/glf/uniformBlock.h>
-#include <OpenUSD/pxr/imaging/glf/utils.h>
-
 // geomUtil
 #include <OpenUSD/pxr/imaging/geomUtil/api.h>
 #include <OpenUSD/pxr/imaging/geomUtil/capsuleMeshGenerator.h>

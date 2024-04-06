@@ -192,6 +192,10 @@ let package = Package(
       name: "Hio",
       targets: ["Hio"]
     ),
+    .library(
+      name: "Glf",
+      targets: ["Glf"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -368,6 +372,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyGarch"]
     ),
+    .library(
+      name: "PyGlf",
+      type: .dynamic,
+      targets: ["PyGlf"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -415,6 +424,7 @@ let package = Package(
         "PyCameraUtil",
         "PyPxOsd",
         "PyGarch",
+        "PyGlf",
         "PyUsdShaders",
       ]
     ),
@@ -1387,6 +1397,31 @@ let package = Package(
     ),
 
     .target(
+      name: "Glf",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Plug"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Trace"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Garch"),
+        .target(name: "Hf"),
+        .target(name: "Hio"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Glf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
+        .define("MFB_PACKAGE_MODULE", to: "Glf"),
+        .define("GLF_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -1965,6 +2000,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyGlf",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyGlf",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Glf"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
+        .define("MFB_PACKAGE_MODULE", to: "Glf"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -2066,6 +2118,7 @@ let package = Package(
         .target(name: "HgiGL"),
         .target(name: "HgiInterop"),
         .target(name: "Hio"),
+        .target(name: "Glf"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------
