@@ -114,51 +114,51 @@ public extension Bundle
 
   /**
    * Where ``SdrOsl`` application bundle resources are located. */
-  static let sdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_SdrOsl\(ext)")
+  static let sdrOsl = Bundle(path: "\(pxrRoot)/SwiftUSD_SdrOsl\(ext)")
 
   /**
    * Where ``UsdAbc`` application bundle resources are located. */
-  static let usdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdAbc\(ext)")
+  static let usdAbc = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdAbc\(ext)")
 
   /**
    * Where ``UsdDraco`` application bundle resources are located. */
-  static let usdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdDraco\(ext)")
+  static let usdDraco = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdDraco\(ext)")
 
   /**
    * Where ``UsdMedia`` application bundle resources are located. */
-  static let usdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMedia\(ext)")
+  static let usdMedia = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdMedia\(ext)")
 
   /**
    * Where ``UsdMtlx`` application bundle resources are located. */
-  static let usdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdMtlx\(ext)")
+  static let usdMtlx = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdMtlx\(ext)")
 
   /**
    * Where ``UsdPhysics`` application bundle resources are located. */
-  static let usdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdPhysics\(ext)")
+  static let usdPhysics = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdPhysics\(ext)")
 
   /**
    * Where ``UsdProc`` application bundle resources are located. */
-  static let usdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdProc\(ext)")
+  static let usdProc = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdProc\(ext)")
 
   /**
    * Where ``UsdRender`` application bundle resources are located. */
-  static let usdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRender\(ext)")
+  static let usdRender = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdRender\(ext)")
 
   /**
    * Where ``UsdRi`` application bundle resources are located. */
-  static let usdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdRi\(ext)")
+  static let usdRi = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdRi\(ext)")
 
   /**
    * Where ``UsdSkel`` application bundle resources are located. */
-  static let usdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdSkel\(ext)")
+  static let usdSkel = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdSkel\(ext)")
 
   /**
    * Where ``UsdUI`` application bundle resources are located. */
-  static let usdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdUI\(ext)")
+  static let usdUI = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdUI\(ext)")
 
   /**
    * Where ``UsdVol`` application bundle resources are located. */
-  static let usdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_UsdVol\(ext)")
+  static let usdVol = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdVol\(ext)")
 
   /**
    * Where ``Hd`` application bundle resources are located. */
@@ -230,7 +230,7 @@ public extension Bundle
 
   /**
    * Where ``SdrOsl`` application bundle resources are located. */
-  static let pySdrOsl = Bundle(path: "\(pxrRoot)/SwiftUsd_PySdrOsl\(ext)")
+  static let pySdrOsl = Bundle(path: "\(pxrRoot)/SwiftUSD_PySdrOsl\(ext)")
 
   /**
    * Where ``UsdGeom`` python bundle resources are located. */
@@ -250,51 +250,51 @@ public extension Bundle
 
   /**
    * Where ``UsdAbc`` application bundle resources are located. */
-  static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdAbc\(ext)")
+  static let pyUsdAbc = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdAbc\(ext)")
 
   /**
    * Where ``UsdDraco`` application bundle resources are located. */
-  static let pyUsdDraco = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdDraco\(ext)")
+  static let pyUsdDraco = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdDraco\(ext)")
 
   /**
    * Where ``UsdMedia`` application bundle resources are located. */
-  static let pyUsdMedia = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMedia\(ext)")
+  static let pyUsdMedia = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdMedia\(ext)")
 
   /**
    * Where ``UsdMtlx`` application bundle resources are located. */
-  static let pyUsdMtlx = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdMtlx\(ext)")
+  static let pyUsdMtlx = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdMtlx\(ext)")
 
   /**
    * Where ``UsdPhysics`` application bundle resources are located. */
-  static let pyUsdPhysics = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdPhysics\(ext)")
+  static let pyUsdPhysics = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdPhysics\(ext)")
 
   /**
    * Where ``UsdProc`` application bundle resources are located. */
-  static let pyUsdProc = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdProc\(ext)")
+  static let pyUsdProc = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdProc\(ext)")
 
   /**
    * Where ``UsdRender`` application bundle resources are located. */
-  static let pyUsdRender = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRender\(ext)")
+  static let pyUsdRender = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdRender\(ext)")
 
   /**
    * Where ``UsdRi`` application bundle resources are located. */
-  static let pyUsdRi = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdRi\(ext)")
+  static let pyUsdRi = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdRi\(ext)")
 
   /**
    * Where ``UsdSkel`` application bundle resources are located. */
-  static let pyUsdSkel = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdSkel\(ext)")
+  static let pyUsdSkel = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdSkel\(ext)")
 
   /**
    * Where ``UsdUI`` application bundle resources are located. */
-  static let pyUsdUI = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUI\(ext)")
+  static let pyUsdUI = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdUI\(ext)")
 
   /**
    * Where ``UsdUtils`` application bundle resources are located. */
-  static let pyUsdUtils = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdUtils\(ext)")
+  static let pyUsdUtils = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdUtils\(ext)")
 
   /**
    * Where ``UsdVol`` application bundle resources are located. */
-  static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUsd_PyUsdVol\(ext)")
+  static let pyUsdVol = Bundle(path: "\(pxrRoot)/SwiftUSD_PyUsdVol\(ext)")
 
   /**
    * Where ``UsdHydra`` application bundle resources are located. */
