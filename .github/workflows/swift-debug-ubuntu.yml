@@ -30,6 +30,9 @@ jobs:
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 🧪 Test
-        run: echo "::notice:: Disabled Tests - Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux."
+        run: |
+          echo "### Disabled Tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux." >> $GITHUB_STEP_SUMMARY
       - name: 🎬 Run
         run: swift run
