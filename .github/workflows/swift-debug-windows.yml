@@ -1,0 +1,20 @@
+name: Run Tests (Microsoft Windows)
+
+on: [push]
+
+jobs:
+  build:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        swift: ["5.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          branch: release/5.10
+          tag: swift-5.10-RELEASE
+      - uses: actions/checkout@v4
+      - name: 📦 Build
+        run: swift build -c release --target UsdView
