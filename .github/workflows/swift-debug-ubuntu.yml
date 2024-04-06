@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        swift: ["5.9"]
+        swift: ["5.10"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: swift-actions/setup-swift@v2
@@ -29,5 +29,7 @@ jobs:
         run: sudo apt install libboost-all-dev
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
-      - name: 📦 Build
-        run: swift test
+      - name: 🧪 Test
+        run: echo "::notice:: Disabled Tests - Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux."
+      - name: 🎬 Run
+        run: swift run

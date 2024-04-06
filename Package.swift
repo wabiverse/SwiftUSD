@@ -1,25 +1,10 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
   name: "SwiftUSD",
   platforms: [
-    /*
-      the swiftpm docs are vague on this, however, this setting only
-      currently applies to targeting minimum apple platform versions
-      and the omission of linux and windows here (they do not exist
-      on the SupportedPlatform struct) does not mean linux & windows
-      are not supported. For now, one can disregard this setting on all
-      platforms that are not apple.
-
-      Note: the apple platform minimums are quite recent, this is due to
-      CXX interop only appearing in recent versions of these apple SDKs,
-      without setting these where they are - we would otherwise have to
-      muck up the swift apis with @availibility macros, to avoid errors
-      complaining about (ex. 'UsdStage is only available in macOS 14 or
-      later').
-     */
     .macOS(.v14),
     .visionOS(.v1),
     .iOS(.v17),
@@ -431,7 +416,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.6.8"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.6.9"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),

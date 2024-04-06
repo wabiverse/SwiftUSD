@@ -85,6 +85,9 @@ dependencies: [
 
 ##### Then, for any target you'd like, add the monolithic USD **Pixar** product as a target dependency, a complete example.
 ```swift
+// swift-tools-version: 5.10
+import PackageDescription
+
 let package = Package(
   name: "MyMetaversePackage",
   platforms: [
