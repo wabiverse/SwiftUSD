@@ -28,7 +28,7 @@
 #include "pxr/usdImaging/usdImaging/indexProxy.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
 
-#include "pxr/imaging/geomUtil/cylinderMeshGenerator.h"
+#include "GeomUtil/cylinderMeshGenerator.h"
 #include "pxr/imaging/hd/cylinderSchema.h"
 #include "pxr/imaging/hd/mesh.h"
 #include "pxr/imaging/hd/meshTopology.h"
@@ -42,193 +42,200 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace {
-using _PrimSource = UsdImagingDataSourceImplicitsPrim<UsdGeomCylinder, HdCylinderSchema>;
+namespace
+{
+  using _PrimSource = UsdImagingDataSourceImplicitsPrim<UsdGeomCylinder, HdCylinderSchema>;
 }
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    using Adapter = UsdImagingCylinderAdapter;
-    TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter> >();
-    t.SetFactory< UsdImagingPrimAdapterFactory<Adapter> >();
+  using Adapter = UsdImagingCylinderAdapter;
+  TfType t = TfType::Define<Adapter, TfType::Bases<Adapter::BaseAdapter>>();
+  t.SetFactory<UsdImagingPrimAdapterFactory<Adapter>>();
 }
 
 UsdImagingCylinderAdapter::~UsdImagingCylinderAdapter() = default;
 
 TfTokenVector
-UsdImagingCylinderAdapter::GetImagingSubprims(UsdPrim const& prim)
+UsdImagingCylinderAdapter::GetImagingSubprims(UsdPrim const &prim)
 {
-    return { TfToken() };
+  return {TfToken()};
 }
 
 TfToken
 UsdImagingCylinderAdapter::GetImagingSubprimType(
-        UsdPrim const& prim,
-        TfToken const& subprim)
+    UsdPrim const &prim,
+    TfToken const &subprim)
 {
-    if (subprim.IsEmpty()) {
-        return HdPrimTypeTokens->cylinder;
-    }
-    return TfToken();
+  if (subprim.IsEmpty())
+  {
+    return HdPrimTypeTokens->cylinder;
+  }
+  return TfToken();
 }
 
 HdContainerDataSourceHandle
 UsdImagingCylinderAdapter::GetImagingSubprimData(
-        UsdPrim const& prim,
-        TfToken const& subprim,
-        const UsdImagingDataSourceStageGlobals &stageGlobals)
+    UsdPrim const &prim,
+    TfToken const &subprim,
+    const UsdImagingDataSourceStageGlobals &stageGlobals)
 {
-    if (subprim.IsEmpty()) {
-        return _PrimSource::New(
-            prim.GetPath(),
-            prim,
-            stageGlobals);
-    }
-    return nullptr;
+  if (subprim.IsEmpty())
+  {
+    return _PrimSource::New(
+        prim.GetPath(),
+        prim,
+        stageGlobals);
+  }
+  return nullptr;
 }
 
 HdDataSourceLocatorSet
 UsdImagingCylinderAdapter::InvalidateImagingSubprim(
-        UsdPrim const& prim,
-        TfToken const& subprim,
-        TfTokenVector const& properties,
-        const UsdImagingPropertyInvalidationType invalidationType)
+    UsdPrim const &prim,
+    TfToken const &subprim,
+    TfTokenVector const &properties,
+    const UsdImagingPropertyInvalidationType invalidationType)
 {
-    if (subprim.IsEmpty()) {
-        return _PrimSource::Invalidate(
-            prim, subprim, properties, invalidationType);
-    }
-    
-    return HdDataSourceLocatorSet();
+  if (subprim.IsEmpty())
+  {
+    return _PrimSource::Invalidate(
+        prim, subprim, properties, invalidationType);
+  }
+
+  return HdDataSourceLocatorSet();
 }
 
-bool
-UsdImagingCylinderAdapter::IsSupported(UsdImagingIndexProxy const* index) const
+bool UsdImagingCylinderAdapter::IsSupported(UsdImagingIndexProxy const *index) const
 {
-    return index->IsRprimTypeSupported(HdPrimTypeTokens->mesh);
+  return index->IsRprimTypeSupported(HdPrimTypeTokens->mesh);
 }
 
 SdfPath
-UsdImagingCylinderAdapter::Populate(UsdPrim const& prim, 
-                            UsdImagingIndexProxy* index,
-                            UsdImagingInstancerContext const* instancerContext)
+UsdImagingCylinderAdapter::Populate(UsdPrim const &prim,
+                                    UsdImagingIndexProxy *index,
+                                    UsdImagingInstancerContext const *instancerContext)
 
 {
-    return _AddRprim(HdPrimTypeTokens->mesh,
-                     prim, index, GetMaterialUsdPath(prim), instancerContext);
+  return _AddRprim(HdPrimTypeTokens->mesh,
+                   prim, index, GetMaterialUsdPath(prim), instancerContext);
 }
 
-void 
-UsdImagingCylinderAdapter::TrackVariability(UsdPrim const& prim,
-                                          SdfPath const& cachePath,
-                                          HdDirtyBits* timeVaryingBits,
-                                          UsdImagingInstancerContext const* 
-                                              instancerContext) const
+void UsdImagingCylinderAdapter::TrackVariability(UsdPrim const &prim,
+                                                 SdfPath const &cachePath,
+                                                 HdDirtyBits *timeVaryingBits,
+                                                 UsdImagingInstancerContext const *
+                                                     instancerContext) const
 {
-    BaseAdapter::TrackVariability(
-        prim, cachePath, timeVaryingBits, instancerContext);
-    // WARNING: This method is executed from multiple threads, the value cache
-    // has been carefully pre-populated to avoid mutating the underlying
-    // container during update.
+  BaseAdapter::TrackVariability(
+      prim, cachePath, timeVaryingBits, instancerContext);
+  // WARNING: This method is executed from multiple threads, the value cache
+  // has been carefully pre-populated to avoid mutating the underlying
+  // container during update.
 
-    // IMPORTANT: Calling _IsVarying will clear the specified bit if the given
-    // attribute is _not_ varying.  Since we have multiple attributes (and the
-    // base adapter invocation) that might result in the bit being set, we need
-    // to be careful not to reset it.  Translation: only check _IsVarying for a
-    // given cause IFF the bit wasn't already set by a previous invocation.
-    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-        _IsVarying(prim, UsdGeomTokens->height,
-                   HdChangeTracker::DirtyPoints,
-                   UsdImagingTokens->usdVaryingPrimvar,
-                   timeVaryingBits, /*inherited*/false);
-    }
-    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-        _IsVarying(prim, UsdGeomTokens->radius,
-                   HdChangeTracker::DirtyPoints,
-                   UsdImagingTokens->usdVaryingPrimvar,
-                   timeVaryingBits, /*inherited*/false);
-    }
-    if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0) {
-        _IsVarying(prim, UsdGeomTokens->axis,
-                   HdChangeTracker::DirtyPoints,
-                   UsdImagingTokens->usdVaryingPrimvar,
-                   timeVaryingBits, /*inherited*/false);
-    }
+  // IMPORTANT: Calling _IsVarying will clear the specified bit if the given
+  // attribute is _not_ varying.  Since we have multiple attributes (and the
+  // base adapter invocation) that might result in the bit being set, we need
+  // to be careful not to reset it.  Translation: only check _IsVarying for a
+  // given cause IFF the bit wasn't already set by a previous invocation.
+  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0)
+  {
+    _IsVarying(prim, UsdGeomTokens->height,
+               HdChangeTracker::DirtyPoints,
+               UsdImagingTokens->usdVaryingPrimvar,
+               timeVaryingBits, /*inherited*/ false);
+  }
+  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0)
+  {
+    _IsVarying(prim, UsdGeomTokens->radius,
+               HdChangeTracker::DirtyPoints,
+               UsdImagingTokens->usdVaryingPrimvar,
+               timeVaryingBits, /*inherited*/ false);
+  }
+  if ((*timeVaryingBits & HdChangeTracker::DirtyPoints) == 0)
+  {
+    _IsVarying(prim, UsdGeomTokens->axis,
+               HdChangeTracker::DirtyPoints,
+               UsdImagingTokens->usdVaryingPrimvar,
+               timeVaryingBits, /*inherited*/ false);
+  }
 }
 
 HdDirtyBits
-UsdImagingCylinderAdapter::ProcessPropertyChange(UsdPrim const& prim,
-                                                 SdfPath const& cachePath,
-                                                 TfToken const& propertyName)
+UsdImagingCylinderAdapter::ProcessPropertyChange(UsdPrim const &prim,
+                                                 SdfPath const &cachePath,
+                                                 TfToken const &propertyName)
 {
-    if (propertyName == UsdGeomTokens->height ||
-        propertyName == UsdGeomTokens->radius ||
-        propertyName == UsdGeomTokens->axis) {
-        return HdChangeTracker::DirtyPoints;
-    }
+  if (propertyName == UsdGeomTokens->height ||
+      propertyName == UsdGeomTokens->radius ||
+      propertyName == UsdGeomTokens->axis)
+  {
+    return HdChangeTracker::DirtyPoints;
+  }
 
-    // Allow base class to handle change processing.
-    return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
+  // Allow base class to handle change processing.
+  return BaseAdapter::ProcessPropertyChange(prim, cachePath, propertyName);
 }
 
 /*virtual*/
 VtValue
-UsdImagingCylinderAdapter::GetPoints(UsdPrim const& prim,
+UsdImagingCylinderAdapter::GetPoints(UsdPrim const &prim,
                                      UsdTimeCode time) const
 {
-    UsdGeomCylinder cylinder(prim);
+  UsdGeomCylinder cylinder(prim);
 
-    double height = 2.0;
-    UsdGeomSphere sphere(prim);
-    if (!cylinder.GetHeightAttr().Get(&height, time)) {
-        TF_WARN("Could not evaluate double-valued height attribute on prim %s",
+  double height = 2.0;
+  UsdGeomSphere sphere(prim);
+  if (!cylinder.GetHeightAttr().Get(&height, time))
+  {
+    TF_WARN("Could not evaluate double-valued height attribute on prim %s",
             prim.GetPath().GetText());
-    }
-    double radius = 1.0;
-    if (!cylinder.GetRadiusAttr().Get(&radius, time)) {
-        TF_WARN("Could not evaluate double-valued radius attribute on prim %s",
+  }
+  double radius = 1.0;
+  if (!cylinder.GetRadiusAttr().Get(&radius, time))
+  {
+    TF_WARN("Could not evaluate double-valued radius attribute on prim %s",
             prim.GetPath().GetText());
-    }
-    TfToken axis = UsdGeomTokens->z;
-    if (!cylinder.GetAxisAttr().Get(&axis, time)) {
-        TF_WARN("Could not evaluate token-valued axis attribute on prim %s",
+  }
+  TfToken axis = UsdGeomTokens->z;
+  if (!cylinder.GetAxisAttr().Get(&axis, time))
+  {
+    TF_WARN("Could not evaluate token-valued axis attribute on prim %s",
             prim.GetPath().GetText());
-    }
+  }
 
-    const GfMatrix4d basis = UsdImagingGprimAdapter::GetImplicitBasis(axis);
+  const GfMatrix4d basis = UsdImagingGprimAdapter::GetImplicitBasis(axis);
 
-    const size_t numPoints =
-        GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
+  const size_t numPoints =
+      GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
 
-    VtVec3fArray points(numPoints);
-        
-    GeomUtilCylinderMeshGenerator::GeneratePoints(
-        points.begin(),
-        numRadial,
-        radius,
-        height,
-        &basis
-    );
+  VtVec3fArray points(numPoints);
 
-    return VtValue(points);
+  GeomUtilCylinderMeshGenerator::GeneratePoints(
+      points.begin(),
+      numRadial,
+      radius,
+      height,
+      &basis);
+
+  return VtValue(points);
 }
 
-/*virtual*/ 
+/*virtual*/
 VtValue
-UsdImagingCylinderAdapter::GetTopology(UsdPrim const& prim,
-                                       SdfPath const& cachePath,
+UsdImagingCylinderAdapter::GetTopology(UsdPrim const &prim,
+                                       SdfPath const &cachePath,
                                        UsdTimeCode time) const
 {
-    TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
-    
-    // All cylinders share the same topology.
-    static const HdMeshTopology topology =
-        HdMeshTopology(GeomUtilCylinderMeshGenerator::GenerateTopology(
-                            numRadial));
+  TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
 
-    return VtValue(topology);
+  // All cylinders share the same topology.
+  static const HdMeshTopology topology =
+      HdMeshTopology(GeomUtilCylinderMeshGenerator::GenerateTopology(
+          numRadial));
+
+  return VtValue(topology);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

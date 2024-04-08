@@ -21,13 +21,13 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/geomUtil/capsuleMeshGenerator.h"
+#include "GeomUtil/capsuleMeshGenerator.h"
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/meshTopology.h"
+#include "PxOsd/tokens.h"
 
-#include "pxr/base/arch/pxrmath.h"
-#include "pxr/base/vt/types.h"
+#include "Arch/pxrmath.h"
+#include "Vt/types.h"
 
 #include <array>
 #include <cmath>
@@ -38,8 +38,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 // static
 size_t GeomUtilCapsuleMeshGenerator::ComputeNumPoints(const size_t numRadial,
                                                       const size_t numCapAxial,
-                                                      const bool closedSweep) {
-  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial)) {
+                                                      const bool closedSweep)
+{
+  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial))
+  {
     return 0;
   }
 
@@ -51,8 +53,10 @@ size_t GeomUtilCapsuleMeshGenerator::ComputeNumPoints(const size_t numRadial,
 
 // static
 PxOsdMeshTopology GeomUtilCapsuleMeshGenerator::GenerateTopology(
-    const size_t numRadial, const size_t numCapAxial, const bool closedSweep) {
-  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial)) {
+    const size_t numRadial, const size_t numCapAxial, const bool closedSweep)
+{
+  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial))
+  {
     return PxOsdMeshTopology();
   }
 
@@ -73,10 +77,12 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const typename PointType::ScalarType bottomCapHeight,
     const typename PointType::ScalarType topCapHeight,
     const typename PointType::ScalarType sweepDegrees,
-    const _PointWriter<PointType> &ptWriter) {
+    const _PointWriter<PointType> &ptWriter)
+{
   using ScalarType = typename PointType::ScalarType;
 
-  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial)) {
+  if ((numRadial < minNumRadial) || (numCapAxial < minNumCapAxial))
+  {
     return;
   }
 
@@ -90,7 +96,8 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
       _ComputeNumRadialPoints(numRadial, closedSweep);
   std::vector<std::array<ScalarType, 2>> ringXY(numRadialPoints);
 
-  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+  {
     // Longitude range: [0, sweep]
     const ScalarType longAngle =
         (ScalarType(radIdx) / ScalarType(numRadial)) * sweepRadians;
@@ -102,7 +109,8 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
   ptWriter.Write(PointType(0.0, 0.0, -(bottomCapHeight + (0.5 * height))));
 
   // Bottom hemisphere latitude rings:
-  for (size_t axIdx = 1; axIdx < (numCapAxial + 1); ++axIdx) {
+  for (size_t axIdx = 1; axIdx < (numCapAxial + 1); ++axIdx)
+  {
     // Latitude range: (-0.5pi, 0]
     const ScalarType latAngle =
         ((ScalarType(axIdx) / ScalarType(numCapAxial)) - 1.0) * (0.5 * M_PI);
@@ -111,7 +119,8 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const ScalarType latitude =
         -(0.5 * height) + (bottomCapHeight * sin(latAngle));
 
-    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+    {
       ptWriter.Write(PointType(radScale * bottomRadius * ringXY[radIdx][0],
                                radScale * bottomRadius * ringXY[radIdx][1],
                                latitude));
@@ -119,7 +128,8 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
   }
 
   // Top hemisphere latitude rings:
-  for (size_t axIdx = 0; axIdx < numCapAxial; ++axIdx) {
+  for (size_t axIdx = 0; axIdx < numCapAxial; ++axIdx)
+  {
     // Latitude range: [0, 0.5pi)
     const ScalarType latAngle =
         (ScalarType(axIdx) / ScalarType(numCapAxial)) * (0.5 * M_PI);
@@ -127,7 +137,8 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const ScalarType radScale = cos(latAngle);
     const ScalarType latitude = (0.5 * height) + (topCapHeight * sin(latAngle));
 
-    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+    {
       ptWriter.Write(PointType(radScale * topRadius * ringXY[radIdx][0],
                                radScale * topRadius * ringXY[radIdx][1],
                                latitude));

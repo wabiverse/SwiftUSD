@@ -24,12 +24,12 @@
 
 #include "pxr/pxr.h"
 
-#include "pxr/imaging/geomUtil/capsuleMeshGenerator.h"
-#include "pxr/imaging/geomUtil/coneMeshGenerator.h"
-#include "pxr/imaging/geomUtil/cuboidMeshGenerator.h"
-#include "pxr/imaging/geomUtil/cylinderMeshGenerator.h"
-#include "pxr/imaging/geomUtil/sphereMeshGenerator.h"
-#include "pxr/imaging/pxOsd/meshTopology.h"
+#include "GeomUtil/capsuleMeshGenerator.h"
+#include "GeomUtil/coneMeshGenerator.h"
+#include "GeomUtil/cuboidMeshGenerator.h"
+#include "GeomUtil/cylinderMeshGenerator.h"
+#include "GeomUtil/sphereMeshGenerator.h"
+#include "PxOsd/meshTopology.h"
 
 #include "pxr/base/tf/errorMark.h"
 #include "pxr/base/gf/vec3d.h"
@@ -41,209 +41,224 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE;
 
-namespace {
-
-static void
-_LogHeader(std::string const &msg, std::ofstream &out)
+namespace
 {
+
+  static void
+  _LogHeader(std::string const &msg, std::ofstream &out)
+  {
     out << msg << std::endl;
     out << std::string(msg.length(), '-') << std::endl;
-}
+  }
 
-static void
-_LogFooter(std::ofstream &out)
-{
-    out << std::endl << std::endl;
-}
+  static void
+  _LogFooter(std::ofstream &out)
+  {
+    out << std::endl
+        << std::endl;
+  }
 
-template <typename T>
-static void
-_Log(PxOsdMeshTopology const &topology,
-     VtArray<T> const &points,
-     std::ofstream &out)
-{
+  template <typename T>
+  static void
+  _Log(PxOsdMeshTopology const &topology,
+       VtArray<T> const &points,
+       std::ofstream &out)
+  {
     out << "Topology:\n";
-    out << "  " << topology << std::endl << std::endl;
+    out << "  " << topology << std::endl
+        << std::endl;
 
     out << "Points:\n";
-    out << "  " << points << std::endl << std::endl;
-}
+    out << "  " << points << std::endl
+        << std::endl;
+  }
 
 }
 
 static bool TestTopologyAndPointGeneration(
     const float sweep, std::ofstream &out)
 {
-    const bool closedSweep =
-        GfIsClose(cos(GfDegreesToRadians(sweep)), 1.0, 1e-4);
+  const bool closedSweep =
+      GfIsClose(cos(GfDegreesToRadians(sweep)), 1.0, 1e-4);
+  {
+    _LogHeader("1. Capsule", out);
+
+    using MeshGen = GeomUtilCapsuleMeshGenerator;
+
+    const size_t numRadial = 10, numCapAxial = 4;
+    const float radius = 0.5, height = 2;
+
+    out << "radius = " << radius
+        << ", height = " << height
+        << ", sweep = " << sweep
+        << std::endl
+        << std::endl;
+
+    const PxOsdMeshTopology topology =
+        MeshGen::GenerateTopology(numRadial, numCapAxial, closedSweep);
+
+    const size_t numPoints =
+        MeshGen::ComputeNumPoints(numRadial, numCapAxial, closedSweep);
+    VtVec3fArray points(numPoints);
+    if (closedSweep)
     {
-        _LogHeader("1. Capsule", out);
-
-        using MeshGen = GeomUtilCapsuleMeshGenerator;
-
-        const size_t numRadial = 10, numCapAxial = 4;
-        const float radius = 0.5, height = 2;
-
-        out << "radius = "   << radius
-            << ", height = " << height
-            << ", sweep = "  << sweep
-            << std::endl << std::endl;
-
-        const PxOsdMeshTopology topology =
-            MeshGen::GenerateTopology(numRadial, numCapAxial, closedSweep);
-
-        const size_t numPoints =
-            MeshGen::ComputeNumPoints(numRadial, numCapAxial, closedSweep);
-        VtVec3fArray points(numPoints);
-        if (closedSweep) {
-            MeshGen::GeneratePoints(
-                points.begin(), numRadial, numCapAxial, radius, height);
-
-        } else {
-            MeshGen::GeneratePoints(
-                points.begin(), numRadial, numCapAxial,
-                /* bottomRadius =    */ radius,
-                /* topRadius    =    */ radius,
-                height,
-                /* bottomCapHeight = */ radius,
-                /* topCapHeight =    */ radius,
-                sweep);
-        }
-        
-        _Log(topology, points, out);
-
-        _LogFooter(out);
+      MeshGen::GeneratePoints(
+          points.begin(), numRadial, numCapAxial, radius, height);
+    }
+    else
+    {
+      MeshGen::GeneratePoints(
+          points.begin(), numRadial, numCapAxial,
+          /* bottomRadius =    */ radius,
+          /* topRadius    =    */ radius,
+          height,
+          /* bottomCapHeight = */ radius,
+          /* topCapHeight =    */ radius,
+          sweep);
     }
 
+    _Log(topology, points, out);
+
+    _LogFooter(out);
+  }
+
+  {
+    _LogHeader("2. Cone", out);
+
+    using MeshGen = GeomUtilConeMeshGenerator;
+
+    const size_t numRadial = 10;
+    const float radius = 0.5, height = 2;
+
+    out << "radius = " << radius
+        << ", height = " << height
+        << ", sweep = " << sweep
+        << std::endl
+        << std::endl;
+
+    const PxOsdMeshTopology topology =
+        MeshGen::GenerateTopology(numRadial, closedSweep);
+
+    const size_t numPoints =
+        MeshGen::ComputeNumPoints(numRadial, closedSweep);
+    VtVec3fArray points(numPoints);
+    MeshGen::GeneratePoints(
+        points.begin(), numRadial, radius, height, sweep);
+
+    _Log(topology, points, out);
+
+    _LogFooter(out);
+  }
+
+  {
+    _LogHeader("3. Cube", out);
+
+    using MeshGen = GeomUtilCuboidMeshGenerator;
+
+    const float side = 1.0;
+
+    out << "side = " << side << std::endl
+        << std::endl;
+
+    const PxOsdMeshTopology topology = MeshGen::GenerateTopology();
+
+    const size_t numPoints = MeshGen::ComputeNumPoints();
+    VtVec3fArray points(numPoints);
+    MeshGen::GeneratePoints(points.begin(), side, side, side);
+
+    _Log(topology, points, out);
+
+    _LogFooter(out);
+  }
+
+  {
+    _LogHeader("4. Cylinder", out);
+
+    using MeshGen = GeomUtilCylinderMeshGenerator;
+
+    const size_t numRadial = 10;
+    const float radius = 0.5, height = 2;
+
+    out << "radius = " << radius
+        << ", height = " << height
+        << ", sweep = " << sweep
+        << std::endl
+        << std::endl;
+
+    const PxOsdMeshTopology topology =
+        MeshGen::GenerateTopology(numRadial, closedSweep);
+
+    const size_t numPoints =
+        MeshGen::ComputeNumPoints(numRadial, closedSweep);
+    VtVec3fArray points(numPoints);
+    if (closedSweep)
     {
-        _LogHeader("2. Cone", out);
-
-        using MeshGen = GeomUtilConeMeshGenerator;
-
-        const size_t numRadial = 10;
-        const float radius = 0.5, height = 2;
-
-        out << "radius = "   << radius 
-            << ", height = " << height
-            << ", sweep = "  << sweep
-            << std::endl << std::endl;
-
-        const PxOsdMeshTopology topology =
-            MeshGen::GenerateTopology(numRadial, closedSweep);
-
-        const size_t numPoints =
-            MeshGen::ComputeNumPoints(numRadial, closedSweep);
-        VtVec3fArray points(numPoints);
-        MeshGen::GeneratePoints(
-            points.begin(), numRadial, radius, height, sweep);
-        
-        _Log(topology, points, out);
-
-        _LogFooter(out);
+      MeshGen::GeneratePoints(
+          points.begin(), numRadial, radius, height);
+    }
+    else
+    {
+      MeshGen::GeneratePoints(
+          points.begin(), numRadial,
+          /* bottomRadius = */ radius,
+          /* topRadius =    */ radius,
+          height, sweep);
     }
 
-    {
-        _LogHeader("3. Cube", out);
+    _Log(topology, points, out);
 
-        using MeshGen = GeomUtilCuboidMeshGenerator;
+    _LogFooter(out);
+  }
 
-        const float side = 1.0;
+  {
+    _LogHeader("5. Sphere", out);
 
-        out << "side = " << side << std::endl << std::endl;
+    using MeshGen = GeomUtilSphereMeshGenerator;
 
-        const PxOsdMeshTopology topology = MeshGen::GenerateTopology();
+    const size_t numRadial = 10, numAxial = 10;
+    const float radius = 0.5;
 
-        const size_t numPoints = MeshGen::ComputeNumPoints();
-        VtVec3fArray points(numPoints);
-        MeshGen::GeneratePoints(points.begin(), side, side, side);
-        
-        _Log(topology, points, out);
+    out << "radius = " << radius
+        << ", sweep = " << sweep
+        << std::endl
+        << std::endl;
 
-        _LogFooter(out);
-    }
+    const PxOsdMeshTopology topology =
+        MeshGen::GenerateTopology(numRadial, numAxial, closedSweep);
 
-    {
-        _LogHeader("4. Cylinder", out);
+    const size_t numPoints =
+        MeshGen::ComputeNumPoints(numRadial, numAxial, closedSweep);
+    VtVec3fArray points(numPoints);
+    MeshGen::GeneratePoints(
+        points.begin(), numRadial, numAxial, radius, sweep);
 
-        using MeshGen = GeomUtilCylinderMeshGenerator;
+    _Log(topology, points, out);
 
-        const size_t numRadial = 10;
-        const float radius = 0.5, height = 2;
+    _LogFooter(out);
+  }
 
-        out << "radius = "   << radius 
-            << ", height = " << height
-            << ", sweep = "  << sweep
-            << std::endl << std::endl;
-
-        const PxOsdMeshTopology topology =
-            MeshGen::GenerateTopology(numRadial, closedSweep);
-
-        const size_t numPoints =
-            MeshGen::ComputeNumPoints(numRadial, closedSweep);
-        VtVec3fArray points(numPoints);
-        if (closedSweep) {
-            MeshGen::GeneratePoints(
-                points.begin(), numRadial, radius, height);
-
-        } else {
-            MeshGen::GeneratePoints(
-                points.begin(), numRadial,
-                /* bottomRadius = */ radius,
-                /* topRadius =    */ radius,
-                height, sweep);
-        }
-        
-        _Log(topology, points, out);
-
-        _LogFooter(out);
-    }
-
-    {
-         _LogHeader("5. Sphere", out);
-
-        using MeshGen = GeomUtilSphereMeshGenerator;
-
-        const size_t numRadial = 10, numAxial = 10;
-        const float radius = 0.5;
-
-        out << "radius = "   << radius 
-            << ", sweep = "  << sweep
-            << std::endl << std::endl;
-
-        const PxOsdMeshTopology topology =
-            MeshGen::GenerateTopology(numRadial, numAxial, closedSweep);
-
-        const size_t numPoints =
-            MeshGen::ComputeNumPoints(numRadial, numAxial, closedSweep);
-        VtVec3fArray points(numPoints);
-        MeshGen::GeneratePoints(
-            points.begin(), numRadial, numAxial, radius, sweep);
-        
-        _Log(topology, points, out);
-
-        _LogFooter(out);
-    }
-
-    return true;
+  return true;
 }
 
 int main()
-{ 
-    TfErrorMark mark;
+{
+  TfErrorMark mark;
 
-    std::ofstream out1("generatedMeshes_closed.txt");
-    std::ofstream out2("generatedMeshes_open.txt");
+  std::ofstream out1("generatedMeshes_closed.txt");
+  std::ofstream out2("generatedMeshes_open.txt");
 
-    bool success =    TestTopologyAndPointGeneration(/*sweep = */ 360, out1)
-                   && TestTopologyAndPointGeneration(/*sweep = */ 120, out2);
+  bool success = TestTopologyAndPointGeneration(/*sweep = */ 360, out1) && TestTopologyAndPointGeneration(/*sweep = */ 120, out2);
 
-    TF_VERIFY(mark.IsClean());
+  TF_VERIFY(mark.IsClean());
 
-    if (success && mark.IsClean()) {
-        std::cout << "OK" << std::endl;
-        return EXIT_SUCCESS;
-    } else {
-        std::cout << "FAILED" << std::endl;
-        return EXIT_FAILURE;
-    }
+  if (success && mark.IsClean())
+  {
+    std::cout << "OK" << std::endl;
+    return EXIT_SUCCESS;
+  }
+  else
+  {
+    std::cout << "FAILED" << std::endl;
+    return EXIT_FAILURE;
+  }
 }

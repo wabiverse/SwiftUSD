@@ -21,13 +21,13 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/geomUtil/coneMeshGenerator.h"
+#include "GeomUtil/coneMeshGenerator.h"
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/meshTopology.h"
+#include "PxOsd/tokens.h"
 
-#include "pxr/base/arch/pxrmath.h"
-#include "pxr/base/vt/types.h"
+#include "Arch/pxrmath.h"
+#include "Vt/types.h"
 
 #include <algorithm>
 #include <array>
@@ -38,8 +38,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // static
 size_t GeomUtilConeMeshGenerator::ComputeNumPoints(const size_t numRadial,
-                                                   const bool closedSweep) {
-  if (numRadial < minNumRadial) {
+                                                   const bool closedSweep)
+{
+  if (numRadial < minNumRadial)
+  {
     return 0;
   }
 
@@ -52,8 +54,10 @@ size_t GeomUtilConeMeshGenerator::ComputeNumPoints(const size_t numRadial,
 // static
 PxOsdMeshTopology
 GeomUtilConeMeshGenerator::GenerateTopology(const size_t numRadial,
-                                            const bool closedSweep) {
-  if (numRadial < minNumRadial) {
+                                            const bool closedSweep)
+{
+  if (numRadial < minNumRadial)
+  {
     return PxOsdMeshTopology();
   }
 
@@ -70,10 +74,12 @@ void GeomUtilConeMeshGenerator::_GeneratePointsImpl(
     const size_t numRadial, const typename PointType::ScalarType radius,
     const typename PointType::ScalarType height,
     const typename PointType::ScalarType sweepDegrees,
-    const _PointWriter<PointType> &ptWriter) {
+    const _PointWriter<PointType> &ptWriter)
+{
   using ScalarType = typename PointType::ScalarType;
 
-  if (numRadial < minNumRadial) {
+  if (numRadial < minNumRadial)
+  {
     return;
   }
 
@@ -87,7 +93,8 @@ void GeomUtilConeMeshGenerator::_GeneratePointsImpl(
       _ComputeNumRadialPoints(numRadial, closedSweep);
   std::vector<std::array<ScalarType, 2>> ringXY(numRadialPoints);
 
-  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+  {
     // Longitude range: [0, 2pi)
     const ScalarType longAngle =
         (ScalarType(radIdx) / ScalarType(numRadial)) * sweepRadians;
@@ -104,8 +111,10 @@ void GeomUtilConeMeshGenerator::_GeneratePointsImpl(
   // Bottom rings; two consecutive rings at the same point locations, the
   // first for the bottom triangle fan and the second for the main
   // cone quads (for normals reasons the bottom "edge" is not shared):
-  for (size_t ringIdx = 0; ringIdx < 2; ++ringIdx) {
-    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+  for (size_t ringIdx = 0; ringIdx < 2; ++ringIdx)
+  {
+    for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+    {
       ptWriter.Write(PointType(ringXY[radIdx][0], ringXY[radIdx][1], zMin));
     }
   }
@@ -114,7 +123,8 @@ void GeomUtilConeMeshGenerator::_GeneratePointsImpl(
   // quads, so edges between left/right faces generate smooth normals but
   // there's no continuity over the top "point" as would happen with a
   // triangle fan.
-  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
+  for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx)
+  {
     ptWriter.Write(PointType(0.0, 0.0, zMax));
   }
 }

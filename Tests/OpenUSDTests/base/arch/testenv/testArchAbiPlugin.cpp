@@ -21,15 +21,14 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/base/arch/export.h"
+#include "Arch/export.h"
 #include "pxr/pxr.h"
-#include "pxr/base/arch/testArchAbi.h"
-
+#include "Arch/testArchAbi.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-extern "C" {
+extern "C"
+{
 
-ARCH_EXPORT ArchAbiBase2* newDerived() { return new ArchAbiDerived<int>; }
-
+  ARCH_EXPORT ArchAbiBase2 *newDerived() { return new ArchAbiDerived<int>; }
 }

@@ -23,15 +23,14 @@
 //
 
 #include "pxr/pxr.h"
-#include "pxr/base/arch/threads.h"
-#include "pxr/base/arch/error.h"
+#include "Arch/threads.h"
+#include "Arch/error.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 int main()
 {
-    ARCH_AXIOM(ArchIsMainThread());
+  ARCH_AXIOM(ArchIsMainThread());
 
-    return 0;
+  return 0;
 }
-

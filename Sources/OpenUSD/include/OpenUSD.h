@@ -83,16 +83,6 @@
 #include <OpenUSD/pxr/imaging/plugin/hdPrmanLoader/rendererPlugin.h>
 #endif // defined(PXR_PRMAN_SUPPORT_ENABLED)
 
-// geomUtil
-#include <OpenUSD/pxr/imaging/geomUtil/api.h>
-#include <OpenUSD/pxr/imaging/geomUtil/capsuleMeshGenerator.h>
-#include <OpenUSD/pxr/imaging/geomUtil/coneMeshGenerator.h>
-#include <OpenUSD/pxr/imaging/geomUtil/cuboidMeshGenerator.h>
-#include <OpenUSD/pxr/imaging/geomUtil/cylinderMeshGenerator.h>
-#include <OpenUSD/pxr/imaging/geomUtil/meshGeneratorBase.h>
-#include <OpenUSD/pxr/imaging/geomUtil/pch.h>
-#include <OpenUSD/pxr/imaging/geomUtil/sphereMeshGenerator.h>
-
 // hgiInterop
 #include <OpenUSD/pxr/imaging/hgiInterop/api.h>
 #include <OpenUSD/pxr/imaging/hgiInterop/hgiInterop.h>

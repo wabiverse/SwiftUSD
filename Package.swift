@@ -196,6 +196,10 @@ let package = Package(
       name: "Glf",
       targets: ["Glf"]
     ),
+    .library(
+      name: "GeomUtil",
+      targets: ["GeomUtil"]
+    ),
     // ----- Pixar.UsdImaging -----
     .library(
       name: "UsdShaders",
@@ -377,6 +381,11 @@ let package = Package(
       type: .dynamic,
       targets: ["PyGlf"]
     ),
+    .library(
+      name: "PyGeomUtil",
+      type: .dynamic,
+      targets: ["PyGeomUtil"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -424,6 +433,7 @@ let package = Package(
         "PyCameraUtil",
         "PyPxOsd",
         "PyGarch",
+        "PyGeomUtil",
         "PyGlf",
         "PyUsdShaders",
       ]
@@ -1422,6 +1432,23 @@ let package = Package(
     ),
 
     .target(
+      name: "GeomUtil",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "PxOsd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "GeomUtil"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
+        .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
+        .define("GEOMUTIL_EXPORTS", to: "1"),
+      ]
+    ),
+
+    .target(
       name: "PyTf",
       dependencies: [
         .target(name: "PixarUSD"),
@@ -2017,6 +2044,23 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "PyGeomUtil",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      path: "Python/PyGeomUtil",
+      resources: [
+        .process("Resources"),
+      ],
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "GeomUtil"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
+        .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
+      ]
+    ),
+
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -2119,6 +2163,7 @@ let package = Package(
         .target(name: "HgiInterop"),
         .target(name: "Hio"),
         .target(name: "Glf"),
+        .target(name: "GeomUtil"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         // -------- macros. ------

@@ -22,16 +22,18 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/base/arch/error.h"
-#include "pxr/base/arch/pxrerrno.h"
+#include "Arch/error.h"
+#include "Arch/pxrerrno.h"
 #include "pxr/pxr.h"
 
 #include <cstdio>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-int main(int /*argc*/, char ** /*argv*/) {
-  for (int i = -1; i < 10; i++) {
+int main(int /*argc*/, char ** /*argv*/)
+{
+  for (int i = -1; i < 10; i++)
+  {
     const std::string msg = ArchStrerror(i);
     ARCH_AXIOM(!msg.empty());
     printf("%d -> '%s'\n", i, msg.c_str());

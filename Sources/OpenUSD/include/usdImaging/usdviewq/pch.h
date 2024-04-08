@@ -26,7 +26,7 @@
 
 #define TF_MAX_ARITY 7
 #include "pxr/pxr.h"
-#include "pxr/base/arch/defines.h"
+#include "Arch/defines.h"
 #if defined(ARCH_OS_DARWIN)
 #include <mach/mach_time.h>
 #endif
@@ -37,7 +37,6 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-
 
 #endif
 #include <algorithm>

@@ -36,8 +36,8 @@
 #include "Hd/coordSys.h"
 #include "Hd/meshTopology.h"
 #include "Hd/meshUtil.h"
-#include "pxr/imaging/pxOsd/subdivTags.h"
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/subdivTags.h"
+#include "PxOsd/tokens.h"
 #include "UsdRi/rmanUtilities.h"
 
 #include "Riley.h"

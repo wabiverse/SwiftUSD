@@ -23,7 +23,7 @@
 //
 #include "pxr/imaging/plugin/hdPrmanLoader/rendererPlugin.h"
 
-#include "pxr/base/arch/library.h"
+#include "Arch/library.h"
 #include "pxr/base/plug/plugin.h"
 #include "pxr/base/plug/registry.h"
 #include "pxr/base/tf/getenv.h"
@@ -32,10 +32,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-typedef HdRenderDelegate* (*CreateDelegateFunc)(
-    HdRenderSettingsMap const& settingsMap);
+typedef HdRenderDelegate *(*CreateDelegateFunc)(
+    HdRenderSettingsMap const &settingsMap);
 typedef void (*DeleteDelegateFunc)(
-    HdRenderDelegate* renderDelegate);
+    HdRenderDelegate *renderDelegate);
 
 static const std::string k_RMANTREE("RMANTREE");
 #if defined(ARCH_OS_WINDOWS)
@@ -45,153 +45,162 @@ static const std::string k_PATH("PATH");
 // This holds the OS specific plugin info data
 static struct HdPrmanLoader
 {
-    static void Load();
-    ~HdPrmanLoader();
+  static void Load();
+  ~HdPrmanLoader();
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-    void* libprman = nullptr;
+  void *libprman = nullptr;
 #endif
-    void* hdPrman = nullptr;
-    CreateDelegateFunc createFunc = nullptr;
-    DeleteDelegateFunc deleteFunc = nullptr;
-    bool valid = false;
+  void *hdPrman = nullptr;
+  CreateDelegateFunc createFunc = nullptr;
+  DeleteDelegateFunc deleteFunc = nullptr;
+  bool valid = false;
 } _hdPrman;
 
-void 
-HdPrmanLoader::Load()
+void HdPrmanLoader::Load()
 {
-    static bool inited = false;
-    if (inited) {
-        return;
-    }
-    inited = true;
+  static bool inited = false;
+  if (inited)
+  {
+    return;
+  }
+  inited = true;
 
-    const std::string rmantree = TfGetenv(k_RMANTREE);
-    if (rmantree.empty()) {
-        TF_WARN("The hdPrmanLoader backend requires $RMANTREE to be set.");
-        return;
-    }
+  const std::string rmantree = TfGetenv(k_RMANTREE);
+  if (rmantree.empty())
+  {
+    TF_WARN("The hdPrmanLoader backend requires $RMANTREE to be set.");
+    return;
+  }
 
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-    // Open $RMANTREE/lib/libprman.so into the global namespace
-    const std::string libprmanPath =
-        TfStringCatPaths(rmantree, "lib/libprman" ARCH_LIBRARY_SUFFIX);
-    _hdPrman.libprman = ArchLibraryOpen(
-        libprmanPath,
-        ARCH_LIBRARY_NOW | ARCH_LIBRARY_GLOBAL);
-    if (!_hdPrman.libprman) {
-        TF_WARN("Could not load libprman.");
-        return;
-    }
+  // Open $RMANTREE/lib/libprman.so into the global namespace
+  const std::string libprmanPath =
+      TfStringCatPaths(rmantree, "lib/libprman" ARCH_LIBRARY_SUFFIX);
+  _hdPrman.libprman = ArchLibraryOpen(
+      libprmanPath,
+      ARCH_LIBRARY_NOW | ARCH_LIBRARY_GLOBAL);
+  if (!_hdPrman.libprman)
+  {
+    TF_WARN("Could not load libprman.");
+    return;
+  }
 
 #elif defined(ARCH_OS_WINDOWS)
-    // Append PATH environment with %RMANTREE%\bin and %RMANTREE%\lib
-    std::string path = TfGetenv(k_PATH);
-    path += ';' + TfStringCatPaths(rmantree, "bin");
-    path += ';' + TfStringCatPaths(rmantree, "lib");
-    TfSetenv(k_PATH, path.c_str());
+  // Append PATH environment with %RMANTREE%\bin and %RMANTREE%\lib
+  std::string path = TfGetenv(k_PATH);
+  path += ';' + TfStringCatPaths(rmantree, "bin");
+  path += ';' + TfStringCatPaths(rmantree, "lib");
+  TfSetenv(k_PATH, path.c_str());
 #endif
 
-    // HdPrman is assumed to be next to hdPrmanLoader (this plugin)
-    PlugPluginPtr plugin =
-        PlugRegistry::GetInstance().GetPluginWithName("hdPrman");
+  // HdPrman is assumed to be next to hdPrmanLoader (this plugin)
+  PlugPluginPtr plugin =
+      PlugRegistry::GetInstance().GetPluginWithName("hdPrman");
 
-    // Backwards compatibility for hdxPrman.
-    // hdxPrman is deprecated, since it's been merged into hdPrman now.
-    if (!plugin) {
-        plugin = PlugRegistry::GetInstance().GetPluginWithName("hdxPrman");
-    }
+  // Backwards compatibility for hdxPrman.
+  // hdxPrman is deprecated, since it's been merged into hdPrman now.
+  if (!plugin)
+  {
+    plugin = PlugRegistry::GetInstance().GetPluginWithName("hdxPrman");
+  }
 
-    if (plugin) {
-        _hdPrman.hdPrman = ArchLibraryOpen(
-            plugin->GetPath(),
-            ARCH_LIBRARY_NOW | ARCH_LIBRARY_LOCAL);
-    }
+  if (plugin)
+  {
+    _hdPrman.hdPrman = ArchLibraryOpen(
+        plugin->GetPath(),
+        ARCH_LIBRARY_NOW | ARCH_LIBRARY_LOCAL);
+  }
 
-    if (!_hdPrman.hdPrman) {
-        TF_WARN("Could not load versioned hdPrman backend: %s",
-                ArchLibraryError().c_str());
-        return;
-    }
+  if (!_hdPrman.hdPrman)
+  {
+    TF_WARN("Could not load versioned hdPrman backend: %s",
+            ArchLibraryError().c_str());
+    return;
+  }
 
-    _hdPrman.createFunc = reinterpret_cast<CreateDelegateFunc>(
-        ArchLibraryGetSymbolAddress(_hdPrman.hdPrman,
-                                    "HdPrmanLoaderCreateDelegate"));
-    _hdPrman.deleteFunc = reinterpret_cast<DeleteDelegateFunc>(
-        ArchLibraryGetSymbolAddress(_hdPrman.hdPrman,
-                                    "HdPrmanLoaderDeleteDelegate"));
+  _hdPrman.createFunc = reinterpret_cast<CreateDelegateFunc>(
+      ArchLibraryGetSymbolAddress(_hdPrman.hdPrman,
+                                  "HdPrmanLoaderCreateDelegate"));
+  _hdPrman.deleteFunc = reinterpret_cast<DeleteDelegateFunc>(
+      ArchLibraryGetSymbolAddress(_hdPrman.hdPrman,
+                                  "HdPrmanLoaderDeleteDelegate"));
 
-    if (!_hdPrman.createFunc || !_hdPrman.deleteFunc) {
-        TF_WARN("hdPrmanLoader factory methods could not be found.");
-        return;
-    }
+  if (!_hdPrman.createFunc || !_hdPrman.deleteFunc)
+  {
+    TF_WARN("hdPrmanLoader factory methods could not be found.");
+    return;
+  }
 
-    _hdPrman.valid = true;
+  _hdPrman.valid = true;
 }
 
 HdPrmanLoader::~HdPrmanLoader()
 {
-    if (hdPrman) {
-        // Note: OSX does not support clean unloading of hdPrman.dylib symbols
-        ArchLibraryClose(hdPrman);
-        hdPrman = nullptr;
-    }
+  if (hdPrman)
+  {
+    // Note: OSX does not support clean unloading of hdPrman.dylib symbols
+    ArchLibraryClose(hdPrman);
+    hdPrman = nullptr;
+  }
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-    if (libprman) {
-        ArchLibraryClose(libprman);
-        libprman = nullptr;
-    }
+  if (libprman)
+  {
+    ArchLibraryClose(libprman);
+    libprman = nullptr;
+  }
 #endif
 }
 
 // Register the hdPrman loader plugin
 TF_REGISTRY_FUNCTION(TfType)
 {
-    HdRendererPluginRegistry::Define<HdPrmanLoaderRendererPlugin>();
+  HdRendererPluginRegistry::Define<HdPrmanLoaderRendererPlugin>();
 }
 
 HdPrmanLoaderRendererPlugin::HdPrmanLoaderRendererPlugin()
 {
-    HdPrmanLoader::Load();
+  HdPrmanLoader::Load();
 }
 
 HdPrmanLoaderRendererPlugin::~HdPrmanLoaderRendererPlugin()
 {
 }
 
-HdRenderDelegate*
+HdRenderDelegate *
 HdPrmanLoaderRendererPlugin::CreateRenderDelegate()
 {
-    if (_hdPrman.valid) {
-        HdRenderSettingsMap settingsMap;
-        return _hdPrman.createFunc(settingsMap);
-    }
-    return nullptr;
+  if (_hdPrman.valid)
+  {
+    HdRenderSettingsMap settingsMap;
+    return _hdPrman.createFunc(settingsMap);
+  }
+  return nullptr;
 }
 
-HdRenderDelegate*
+HdRenderDelegate *
 HdPrmanLoaderRendererPlugin::CreateRenderDelegate(
-    HdRenderSettingsMap const& settingsMap)
+    HdRenderSettingsMap const &settingsMap)
 {
-    if (_hdPrman.valid) {
-        return _hdPrman.createFunc(settingsMap);
-    }
-    return nullptr;
+  if (_hdPrman.valid)
+  {
+    return _hdPrman.createFunc(settingsMap);
+  }
+  return nullptr;
 }
 
-void
-HdPrmanLoaderRendererPlugin::DeleteRenderDelegate(
+void HdPrmanLoaderRendererPlugin::DeleteRenderDelegate(
     HdRenderDelegate *renderDelegate)
 {
-    if (_hdPrman.valid) {
-        _hdPrman.deleteFunc(renderDelegate);
-    }
+  if (_hdPrman.valid)
+  {
+    _hdPrman.deleteFunc(renderDelegate);
+  }
 }
 
-bool
-HdPrmanLoaderRendererPlugin::IsSupported(bool /* gpuEnabled */) const
+bool HdPrmanLoaderRendererPlugin::IsSupported(bool /* gpuEnabled */) const
 {
-    // Eventually will need to make this deal with whether RIS or XPU is used.
-    return _hdPrman.valid;
+  // Eventually will need to make this deal with whether RIS or XPU is used.
+  return _hdPrman.valid;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

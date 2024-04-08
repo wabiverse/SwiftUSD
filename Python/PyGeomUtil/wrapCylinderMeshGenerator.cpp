@@ -21,11 +21,11 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/geomUtil/cylinderMeshGenerator.h"
+#include "GeomUtil/cylinderMeshGenerator.h"
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
+#include "PxOsd/meshTopology.h"
 
-#include "pxr/base/vt/types.h"
+#include "Vt/types.h"
 
 #include <boost/python/class.hpp>
 
@@ -39,38 +39,38 @@ _WrapGeneratePoints(
     const float radius,
     const float height)
 {
-    const size_t numPoints =
-        GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
-    if (numPoints == 0) {
-        return VtVec3fArray();
-    }
+  const size_t numPoints =
+      GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
+  if (numPoints == 0)
+  {
+    return VtVec3fArray();
+  }
 
-    VtVec3fArray points(numPoints);
-    GeomUtilCylinderMeshGenerator::GeneratePoints(
-        points.begin(), numRadial, radius, height);
+  VtVec3fArray points(numPoints);
+  GeomUtilCylinderMeshGenerator::GeneratePoints(
+      points.begin(), numRadial, radius, height);
 
-    return points;
+  return points;
 }
 
 void wrapCylinderMeshGenerator()
 {
-    using This = GeomUtilCylinderMeshGenerator;
+  using This = GeomUtilCylinderMeshGenerator;
 
-    // Pull the constexpr values into variables so boost can odr-use them.
-    static constexpr size_t minNumRadial = This::minNumRadial;
+  // Pull the constexpr values into variables so boost can odr-use them.
+  static constexpr size_t minNumRadial = This::minNumRadial;
 
-    // Note: These are only "classes" for name scoping, and are uninstantiable;
-    // hence no need to bother declaring bases.
-    class_<This>("CylinderMeshGenerator", no_init)
-        .def_readonly("minNumRadial", minNumRadial)
+  // Note: These are only "classes" for name scoping, and are uninstantiable;
+  // hence no need to bother declaring bases.
+  class_<This>("CylinderMeshGenerator", no_init)
+      .def_readonly("minNumRadial", minNumRadial)
 
-        .def("ComputeNumPoints", &This::ComputeNumPoints)
-        .staticmethod("ComputeNumPoints")
+      .def("ComputeNumPoints", &This::ComputeNumPoints)
+      .staticmethod("ComputeNumPoints")
 
-        .def("GenerateTopology", &This::GenerateTopology)
-        .staticmethod("GenerateTopology")
+      .def("GenerateTopology", &This::GenerateTopology)
+      .staticmethod("GenerateTopology")
 
-        .def("GeneratePoints", &_WrapGeneratePoints)
-        .staticmethod("GeneratePoints")
-    ;
+      .def("GeneratePoints", &_WrapGeneratePoints)
+      .staticmethod("GeneratePoints");
 }

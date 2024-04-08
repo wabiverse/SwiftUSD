@@ -24,7 +24,7 @@
 
 #include "pxr/pxr.h"
 #include "pxr/base/tf/errorMark.h"
-#include "pxr/base/arch/stackTrace.h"
+#include "Arch/stackTrace.h"
 
 #include <unistd.h>
 
@@ -47,52 +47,50 @@ static std::atomic_int synchronizer;
 static void
 _ThreadTask()
 {
-    TfErrorMark m;
-    TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");
+  TfErrorMark m;
+  TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");
 
-    // Wait for synchronizer to become 0
-    while (synchronizer) {
-        // spin!
-    }
+  // Wait for synchronizer to become 0
+  while (synchronizer)
+  {
+    // spin!
+  }
 
-    // Dereference a null pointer!
-    int* bunk(0);
-    std::cout << *bunk << '\n';
+  // Dereference a null pointer!
+  int *bunk(0);
+  std::cout << *bunk << '\n';
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    ArchSetFatalStackLogging( true );
+  ArchSetFatalStackLogging(true);
 
-    TfErrorMark m;
+  TfErrorMark m;
 
-    TF_RUNTIME_ERROR("Pending error to report in crash output!");
+  TF_RUNTIME_ERROR("Pending error to report in crash output!");
 
-    // Make sure the threads don't run off and generate segmentation faults
-    // before we're ready.
-    //
-    synchronizer = 1;
+  // Make sure the threads don't run off and generate segmentation faults
+  // before we're ready.
+  //
+  synchronizer = 1;
 
-    // Spawn 2 threads, each of which will wait for synchronizer to
-    // become 0 and then generate a SIGSEGV. The desire is to produce
-    // two SIGSEGV signals in two different threads at very nearly the
-    // same time.
-    //
-    std::thread t1(_ThreadTask);
-    std::thread t2(_ThreadTask);
+  // Spawn 2 threads, each of which will wait for synchronizer to
+  // become 0 and then generate a SIGSEGV. The desire is to produce
+  // two SIGSEGV signals in two different threads at very nearly the
+  // same time.
+  //
+  std::thread t1(_ThreadTask);
+  std::thread t2(_ThreadTask);
 
-    // Wait to ensure the threads are spinning on synchronizer
-    sleep(1);
+  // Wait to ensure the threads are spinning on synchronizer
+  sleep(1);
 
-    // Release them.
-    synchronizer = 0;
+  // Release them.
+  synchronizer = 0;
 
-    // Wait for them to die
-    t1.join();
-    t2.join();
+  // Wait for them to die
+  t1.join();
+  t2.join();
 
-    return 0;
+  return 0;
 }
-
-

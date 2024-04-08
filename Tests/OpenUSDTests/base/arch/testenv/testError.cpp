@@ -25,13 +25,13 @@
 //
 
 #include "pxr/pxr.h"
-#include "pxr/base/arch/error.h"
-#include "pxr/base/arch/testArchUtil.h"
+#include "Arch/error.h"
+#include "Arch/testArchUtil.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    ArchTestCrashArgParse(argc, argv);
-    ArchTestCrash(ArchTestCrashMode::Error);
+  ArchTestCrashArgParse(argc, argv);
+  ArchTestCrash(ArchTestCrashMode::Error);
 }

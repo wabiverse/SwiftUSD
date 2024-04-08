@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_GEOM_UTIL_SPHERE_MESH_GENERATOR_H
 #define PXR_IMAGING_GEOM_UTIL_SPHERE_MESH_GENERATOR_H
 
-#include "pxr/imaging/geomUtil/api.h"
-#include "pxr/imaging/geomUtil/meshGeneratorBase.h"
+#include "GeomUtil/api.h"
+#include "GeomUtil/meshGeneratorBase.h"
 
-#include "pxr/pxr.h"
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,7 +37,7 @@ class PxOsdMeshTopology;
 /// This class provides an implementation for generating topology and point
 /// positions on a sphere with a given radius.  The sphere is made up of
 /// circular cross-sections in the XY plane and is centered at the origin.
-/// Each cross-section has numRadial segments.  Successive cross-sections are 
+/// Each cross-section has numRadial segments.  Successive cross-sections are
 /// generated at numAxial locations along the Z axis, with the bottom of the
 /// sphere at Z = -r and top at Z = r.
 ///
@@ -45,7 +45,7 @@ class PxOsdMeshTopology;
 /// sphere as necessary (e.g., cross-sections in the YZ plane).
 ///
 /// An additional overload of GeneratePoints is provided to specify a sweep
-/// angle for the sphere about the +Z axis.  When the sweep is less than 360 
+/// angle for the sphere about the +Z axis.  When the sweep is less than 360
 /// degrees, the generated geometry is not closed.
 ///
 /// Usage:
@@ -67,67 +67,66 @@ class GeomUtilSphereMeshGenerator final
     : public GeomUtilMeshGeneratorBase
 {
 public:
-    static constexpr size_t minNumRadial = 3;
-    static constexpr size_t minNumAxial = 2;
+  static constexpr size_t minNumRadial = 3;
+  static constexpr size_t minNumAxial = 2;
 
-    GEOMUTIL_API
-    static size_t ComputeNumPoints(
-        const size_t numRadial,
-        const size_t numAxial,
-        const bool closedSweep = true);
+  GEOMUTIL_API
+  static size_t ComputeNumPoints(
+      const size_t numRadial,
+      const size_t numAxial,
+      const bool closedSweep = true);
 
-    GEOMUTIL_API
-    static PxOsdMeshTopology GenerateTopology(
-        const size_t numRadial,
-        const size_t numAxial,
-        const bool closedSweep = true);
+  GEOMUTIL_API
+  static PxOsdMeshTopology GenerateTopology(
+      const size_t numRadial,
+      const size_t numAxial,
+      const bool closedSweep = true);
 
-    template<typename PointIterType,
-             typename ScalarType,
-             typename Enabled =
+  template <typename PointIterType,
+            typename ScalarType,
+            typename Enabled =
                 typename _EnableIfGfVec3Iterator<PointIterType>::type>
-    static void GeneratePoints(
-        PointIterType iter,
-        const size_t numRadial,
-        const size_t numAxial,
-        const ScalarType radius,
-        const GfMatrix4d* framePtr = nullptr)
-    {
-        constexpr ScalarType sweep = 360;
-        GeneratePoints(iter, numRadial, numAxial, radius, sweep, framePtr);
-    }
+  static void GeneratePoints(
+      PointIterType iter,
+      const size_t numRadial,
+      const size_t numAxial,
+      const ScalarType radius,
+      const GfMatrix4d *framePtr = nullptr)
+  {
+    constexpr ScalarType sweep = 360;
+    GeneratePoints(iter, numRadial, numAxial, radius, sweep, framePtr);
+  }
 
-    template<typename PointIterType,
-             typename ScalarType,
-             typename Enabled =
+  template <typename PointIterType,
+            typename ScalarType,
+            typename Enabled =
                 typename _EnableIfGfVec3Iterator<PointIterType>::type>
-    static void GeneratePoints(
-        PointIterType iter,
-        const size_t numRadial,
-        const size_t numAxial,
-        const ScalarType radius,
-        const ScalarType sweepDegrees,
-        const GfMatrix4d* framePtr = nullptr)
-    {
-        using PointType =
-            typename std::iterator_traits<PointIterType>::value_type;
+  static void GeneratePoints(
+      PointIterType iter,
+      const size_t numRadial,
+      const size_t numAxial,
+      const ScalarType radius,
+      const ScalarType sweepDegrees,
+      const GfMatrix4d *framePtr = nullptr)
+  {
+    using PointType =
+        typename std::iterator_traits<PointIterType>::value_type;
 
-        _GeneratePointsImpl(numRadial, numAxial, radius, sweepDegrees,
-            framePtr ? _PointWriter<PointType>(iter, framePtr)
-                     : _PointWriter<PointType>(iter));
-    }
+    _GeneratePointsImpl(numRadial, numAxial, radius, sweepDegrees,
+                        framePtr ? _PointWriter<PointType>(iter, framePtr)
+                                 : _PointWriter<PointType>(iter));
+  }
 
-    using GeomUtilMeshGeneratorBase::GeneratePoints;
+  using GeomUtilMeshGeneratorBase::GeneratePoints;
 
 private:
-    
-    template<typename PointType>
-    static void _GeneratePointsImpl(
-        const size_t numRadial,
-        const size_t numAxial,
-        const typename PointType::ScalarType radius,
-        const typename PointType::ScalarType sweepDegrees,
-        const _PointWriter<PointType>& ptWriter);
+  template <typename PointType>
+  static void _GeneratePointsImpl(
+      const size_t numRadial,
+      const size_t numAxial,
+      const typename PointType::ScalarType radius,
+      const typename PointType::ScalarType sweepDegrees,
+      const _PointWriter<PointType> &ptWriter);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

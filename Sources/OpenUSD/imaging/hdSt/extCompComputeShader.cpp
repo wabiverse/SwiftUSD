@@ -28,17 +28,15 @@
 
 #include "pxr/imaging/hd/tokens.h"
 
-#include "pxr/base/arch/hash.h"
+#include "Arch/hash.h"
 
 #include <boost/functional/hash.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-
 HdSt_ExtCompComputeShader::HdSt_ExtCompComputeShader(
     HdExtComputation const *extComp)
- : _extComp(extComp)
+    : _extComp(extComp)
 {
 }
 
@@ -52,62 +50,63 @@ HdSt_ExtCompComputeShader::~HdSt_ExtCompComputeShader() = default;
 std::string
 HdSt_ExtCompComputeShader::GetSource(TfToken const &shaderStageKey) const
 {
-    if (shaderStageKey == HdShaderTokens->computeShader) {
-         if (TF_VERIFY(_extComp)) {
-            return _extComp->GetGpuKernelSource();
-         }
+  if (shaderStageKey == HdShaderTokens->computeShader)
+  {
+    if (TF_VERIFY(_extComp))
+    {
+      return _extComp->GetGpuKernelSource();
     }
+  }
 
-    return std::string();
+  return std::string();
 }
 
 /*virtual*/
-void
-HdSt_ExtCompComputeShader::BindResources(const int program,
-                                         HdSt_ResourceBinder const &binder)
+void HdSt_ExtCompComputeShader::BindResources(const int program,
+                                              HdSt_ResourceBinder const &binder)
 {
-    // Compute shaders currently serve GPU ExtComputations, wherein
-    // resource binding is managed explicitly.
-    // See HdStExtCompGpuComputationResource::Resolve() and
-    // HdStExtCompGpuComputation::Execute(..)
+  // Compute shaders currently serve GPU ExtComputations, wherein
+  // resource binding is managed explicitly.
+  // See HdStExtCompGpuComputationResource::Resolve() and
+  // HdStExtCompGpuComputation::Execute(..)
 }
 
 /*virtual*/
-void
-HdSt_ExtCompComputeShader::UnbindResources(const int program,
-                                           HdSt_ResourceBinder const &binder)
+void HdSt_ExtCompComputeShader::UnbindResources(const int program,
+                                                HdSt_ResourceBinder const &binder)
 {
-    // Resource binding is managed explicitly. See above comment.
+  // Resource binding is managed explicitly. See above comment.
 }
 
 /*virtual*/
-void
-HdSt_ExtCompComputeShader::AddBindings(HdStBindingRequestVector *customBindings)
+void HdSt_ExtCompComputeShader::AddBindings(HdStBindingRequestVector *customBindings)
 {
-    // Resource binding is managed explicitly. See above comment.
+  // Resource binding is managed explicitly. See above comment.
 }
 
 /*virtual*/
 HdStShaderCode::ID
 HdSt_ExtCompComputeShader::ComputeHash() const
 {
-    if (!TF_VERIFY(_extComp)) {
-        return 0;
-    }
+  if (!TF_VERIFY(_extComp))
+  {
+    return 0;
+  }
 
-    size_t hash = 0;
-    std::string const & kernel = _extComp->GetGpuKernelSource();
-    boost::hash_combine(hash, ArchHash(kernel.c_str(), kernel.size()));
-    return hash;
+  size_t hash = 0;
+  std::string const &kernel = _extComp->GetGpuKernelSource();
+  boost::hash_combine(hash, ArchHash(kernel.c_str(), kernel.size()));
+  return hash;
 }
 
-SdfPath const&
+SdfPath const &
 HdSt_ExtCompComputeShader::GetExtComputationId() const
 {
-    if (!TF_VERIFY(_extComp)) {
-        return SdfPath::EmptyPath();
-    }
-    return _extComp->GetId();
+  if (!TF_VERIFY(_extComp))
+  {
+    return SdfPath::EmptyPath();
+  }
+  return _extComp->GetId();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

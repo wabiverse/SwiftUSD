@@ -23,17 +23,16 @@
 //
 
 #include "pxr/pxr.h"
-#include "pxr/base/arch/systemInfo.h"
-#include "pxr/base/arch/error.h"
+#include "Arch/systemInfo.h"
+#include "Arch/error.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 using std::string;
 
-//most of these tests are just for code coverage
-int main(int /*argc*/, char const** /*argv*/)
+// most of these tests are just for code coverage
+int main(int /*argc*/, char const ** /*argv*/)
 {
-    ARCH_AXIOM(ArchGetExecutablePath().find("testArch", 0) != string::npos);
-    return 0;
+  ARCH_AXIOM(ArchGetExecutablePath().find("testArch", 0) != string::npos);
+  return 0;
 }
-

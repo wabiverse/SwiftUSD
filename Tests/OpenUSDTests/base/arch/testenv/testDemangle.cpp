@@ -23,89 +23,109 @@
 //
 
 #include "pxr/pxr.h"
-#include "pxr/base/arch/demangle.h"
-#include "pxr/base/arch/error.h"
+#include "Arch/demangle.h"
+#include "Arch/error.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class DummyClassInNamespace {};
-class OtherDummyClassInNamespace {
-    public: class SubClass { };
+class DummyClassInNamespace
+{
+};
+class OtherDummyClassInNamespace
+{
+public:
+  class SubClass
+  {
+  };
 };
 
 template <class T>
-class TemplatedDummyClassInNamespace { };
+class TemplatedDummyClassInNamespace
+{
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 template <class T>
-class TemplatedDummyClass { };
+class TemplatedDummyClass
+{
+};
 
-struct Mangled {};
+struct Mangled
+{
+};
 
-struct FooSsSsSsBar {};
+struct FooSsSsSsBar
+{
+};
 
 template <class T>
-class MangledAlso {};
+class MangledAlso
+{
+};
 
 typedef Mangled Remangled;
 
-enum MangleEnum { ONE, TWO, THREE };
+enum MangleEnum
+{
+  ONE,
+  TWO,
+  THREE
+};
 
 template <typename T>
 static bool
-TestDemangle(const std::string& typeName)
+TestDemangle(const std::string &typeName)
 {
-    const std::type_info& typeInfo = typeid(T);
-    std::string mangledName = typeInfo.name();
-    std::string toBeDemangledName = typeInfo.name();
+  const std::type_info &typeInfo = typeid(T);
+  std::string mangledName = typeInfo.name();
+  std::string toBeDemangledName = typeInfo.name();
 
-    ARCH_AXIOM(ArchDemangle(&toBeDemangledName));
+  ARCH_AXIOM(ArchDemangle(&toBeDemangledName));
 
-    printf("ArchDemangle('%s') => '%s', expected '%s'\n",
-        mangledName.c_str(), toBeDemangledName.c_str(), typeName.c_str());
+  printf("ArchDemangle('%s') => '%s', expected '%s'\n",
+         mangledName.c_str(), toBeDemangledName.c_str(), typeName.c_str());
 
-    ARCH_AXIOM(toBeDemangledName == typeName);
-    ARCH_AXIOM(ArchGetDemangled(mangledName) == typeName);
-    ARCH_AXIOM(ArchGetDemangled(typeInfo) == typeName);
-    ARCH_AXIOM(ArchGetDemangled<T>() == typeName);
+  ARCH_AXIOM(toBeDemangledName == typeName);
+  ARCH_AXIOM(ArchGetDemangled(mangledName) == typeName);
+  ARCH_AXIOM(ArchGetDemangled(typeInfo) == typeName);
+  ARCH_AXIOM(ArchGetDemangled<T>() == typeName);
 
-    return true;
+  return true;
 }
 
 int main()
 {
-    TestDemangle<bool>("bool");
-    TestDemangle<Mangled>("Mangled");
-    TestDemangle<Remangled>("Mangled");
-    TestDemangle<MangleEnum>("MangleEnum");
-    // We have special case code for std::string.
-    TestDemangle<std::string>("string");
-    TestDemangle<TemplatedDummyClass<std::string>>(
-        "TemplatedDummyClass<string>");
-    // This one is a regression test for a demangle bug on Linux.
-    TestDemangle<FooSsSsSsBar>("FooSsSsSsBar");
+  TestDemangle<bool>("bool");
+  TestDemangle<Mangled>("Mangled");
+  TestDemangle<Remangled>("Mangled");
+  TestDemangle<MangleEnum>("MangleEnum");
+  // We have special case code for std::string.
+  TestDemangle<std::string>("string");
+  TestDemangle<TemplatedDummyClass<std::string>>(
+      "TemplatedDummyClass<string>");
+  // This one is a regression test for a demangle bug on Linux.
+  TestDemangle<FooSsSsSsBar>("FooSsSsSsBar");
 
-    TestDemangle<DummyClassInNamespace>("DummyClassInNamespace"); 
-    TestDemangle<OtherDummyClassInNamespace::SubClass>("OtherDummyClassInNamespace::SubClass");
-    TestDemangle<TemplatedDummyClassInNamespace<DummyClassInNamespace>>(
-        "TemplatedDummyClassInNamespace<DummyClassInNamespace>");
-    TestDemangle<TemplatedDummyClassInNamespace<OtherDummyClassInNamespace::SubClass>>(
-        "TemplatedDummyClassInNamespace<OtherDummyClassInNamespace::SubClass>");
+  TestDemangle<DummyClassInNamespace>("DummyClassInNamespace");
+  TestDemangle<OtherDummyClassInNamespace::SubClass>("OtherDummyClassInNamespace::SubClass");
+  TestDemangle<TemplatedDummyClassInNamespace<DummyClassInNamespace>>(
+      "TemplatedDummyClassInNamespace<DummyClassInNamespace>");
+  TestDemangle<TemplatedDummyClassInNamespace<OtherDummyClassInNamespace::SubClass>>(
+      "TemplatedDummyClassInNamespace<OtherDummyClassInNamespace::SubClass>");
 
-    TestDemangle<unsigned long>("unsigned long");
-    TestDemangle<MangledAlso<int> >("MangledAlso<int>");
-    TestDemangle<MangledAlso<MangledAlso<int> > >("MangledAlso<MangledAlso<int> >");
+  TestDemangle<unsigned long>("unsigned long");
+  TestDemangle<MangledAlso<int>>("MangledAlso<int>");
+  TestDemangle<MangledAlso<MangledAlso<int>>>("MangledAlso<MangledAlso<int> >");
 
-    const char* const badType = "type_that_doesnt_exist";
+  const char *const badType = "type_that_doesnt_exist";
 #if defined(ARCH_OS_WINDOWS)
-    ARCH_AXIOM(ArchGetDemangled(badType) == badType);
+  ARCH_AXIOM(ArchGetDemangled(badType) == badType);
 #else
-    ARCH_AXIOM(ArchGetDemangled(badType) == "");
+  ARCH_AXIOM(ArchGetDemangled(badType) == "");
 #endif
-   
-    return 0;
+
+  return 0;
 }

@@ -323,6 +323,10 @@ public extension Bundle
   /**
    * Where ``Glf`` application bundle resources are located. */
   static let pyGlf = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGlf\(ext)")
+
+  /**
+   * Where ``GeomUtil`` application bundle resources are located. */
+  static let pyGeomUtil = Bundle(path: "\(pxrRoot)/SwiftUSD_PyGeomUtil\(ext)")
 }
 
 public enum BundleKind
@@ -513,6 +517,7 @@ public enum BundlePython: CaseIterable
   case pyPxOsd
   case pyGarch
   case pyGlf
+  case pyGeomUtil
 
   public var resourcePath: String?
   {
@@ -553,6 +558,7 @@ public enum BundlePython: CaseIterable
       case .pyPxOsd: Bundle.pyPxOsd?.resourcePath
       case .pyGarch: Bundle.pyGarch?.resourcePath
       case .pyGlf: Bundle.pyGlf?.resourcePath
+      case .pyGeomUtil: Bundle.pyGeomUtil?.resourcePath
     }
   }
 }

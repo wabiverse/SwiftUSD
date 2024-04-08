@@ -23,7 +23,7 @@
 //
 
 #include "pxr/pxr.h"
-#include "pxr/base/arch/stackTrace.h"
+#include "Arch/stackTrace.h"
 #include "pxr/base/tf/diagnostic.h"
 
 #include <csignal>
@@ -33,21 +33,20 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 // This test raises SIGFPE to test the Tf crash handler
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    ArchSetFatalStackLogging( true );
+  ArchSetFatalStackLogging(true);
 
-    // Make sure handlers have been installed
-    // This isn't guaranteed in external environments
-    // as we leave them off by default.
-    TfInstallTerminateAndCrashHandlers();
+  // Make sure handlers have been installed
+  // This isn't guaranteed in external environments
+  // as we leave them off by default.
+  TfInstallTerminateAndCrashHandlers();
 
-    // Raise SIGFPE.
-    raise(SIGFPE);
+  // Raise SIGFPE.
+  raise(SIGFPE);
 
-    // We shouldn't get here.  Exit with zero because we expect a non-zero
-    // exit code from this test.
-    printf("failed\n");
-    exit(0);
+  // We shouldn't get here.  Exit with zero because we expect a non-zero
+  // exit code from this test.
+  printf("failed\n");
+  exit(0);
 }

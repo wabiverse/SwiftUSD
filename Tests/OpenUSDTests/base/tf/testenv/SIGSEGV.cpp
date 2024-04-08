@@ -25,7 +25,7 @@
 #include "pxr/pxr.h"
 #include "pxr/base/tf/errorMark.h"
 #include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/arch/stackTrace.h"
+#include "Arch/stackTrace.h"
 
 #include <chrono>
 #include <iostream>
@@ -41,31 +41,28 @@ PXR_NAMESPACE_USING_DIRECTIVE
 static void
 _ThreadTask()
 {
-    TfErrorMark m;
-    TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");
-    std::this_thread::sleep_for(std::chrono::minutes(10));
+  TfErrorMark m;
+  TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");
+  std::this_thread::sleep_for(std::chrono::minutes(10));
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    ArchSetFatalStackLogging( true );
+  ArchSetFatalStackLogging(true);
 
-    // Make sure handlers have been installed
-    // This isn't guaranteed in external environments
-    // as we leave them off by default.
-    TfInstallTerminateAndCrashHandlers();
+  // Make sure handlers have been installed
+  // This isn't guaranteed in external environments
+  // as we leave them off by default.
+  TfInstallTerminateAndCrashHandlers();
 
-    TfErrorMark m;
+  TfErrorMark m;
 
-    TF_RUNTIME_ERROR("Pending error to report in crash output!");
+  TF_RUNTIME_ERROR("Pending error to report in crash output!");
 
-    std::thread t(_ThreadTask);
+  std::thread t(_ThreadTask);
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    int* bunk(0);
-    std::cout << *bunk << '\n';
+  int *bunk(0);
+  std::cout << *bunk << '\n';
 }
-
-

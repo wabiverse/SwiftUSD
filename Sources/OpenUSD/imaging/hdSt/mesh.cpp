@@ -45,7 +45,7 @@
 
 #include "pxr/imaging/hgi/capabilities.h"
 
-#include "pxr/base/arch/hash.h"
+#include "Arch/hash.h"
 
 #include "pxr/base/gf/matrix4d.h"
 #include "pxr/base/gf/matrix4f.h"
@@ -61,7 +61,7 @@
 
 #include "pxr/imaging/hf/diagnostic.h"
 
-#include "pxr/imaging/pxOsd/tokens.h"
+#include "PxOsd/tokens.h"
 
 #include "pxr/base/vt/value.h"
 

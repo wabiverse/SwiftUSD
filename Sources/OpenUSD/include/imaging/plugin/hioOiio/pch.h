@@ -26,7 +26,7 @@
 
 #define TF_MAX_ARITY 7
 #include "pxr/pxr.h"
-#include "pxr/base/arch/defines.h"
+#include "Arch/defines.h"
 #if defined(ARCH_OS_DARWIN)
 #include <glob.h>
 #include <limits.h>

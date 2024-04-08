@@ -21,11 +21,11 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/imaging/geomUtil/coneMeshGenerator.h"
+#include "GeomUtil/capsuleMeshGenerator.h"
 
-#include "pxr/imaging/pxOsd/meshTopology.h"
+#include "PxOsd/meshTopology.h"
 
-#include "pxr/base/vt/types.h"
+#include "Vt/types.h"
 
 #include <boost/python/class.hpp>
 
@@ -36,41 +36,44 @@ PXR_NAMESPACE_USING_DIRECTIVE
 static VtVec3fArray
 _WrapGeneratePoints(
     const size_t numRadial,
+    const size_t numCapAxial,
     const float radius,
     const float height)
 {
-    const size_t numPoints =
-        GeomUtilConeMeshGenerator::ComputeNumPoints(numRadial);
-    if (numPoints == 0) {
-        return VtVec3fArray();
-    }
+  const size_t numPoints =
+      GeomUtilCapsuleMeshGenerator::ComputeNumPoints(numRadial, numCapAxial);
+  if (numPoints == 0)
+  {
+    return VtVec3fArray();
+  }
 
-    VtVec3fArray points(numPoints);
-    GeomUtilConeMeshGenerator::GeneratePoints(
-        points.begin(), numRadial, radius, height);
+  VtVec3fArray points(numPoints);
+  GeomUtilCapsuleMeshGenerator::GeneratePoints(
+      points.begin(), numRadial, numCapAxial, radius, height);
 
-    return points;
+  return points;
 }
 
-void wrapConeMeshGenerator()
+void wrapCapsuleMeshGenerator()
 {
-    using This = GeomUtilConeMeshGenerator;
+  using This = GeomUtilCapsuleMeshGenerator;
 
-    // Pull the constexpr values into variables so boost can odr-use them.
-    static constexpr size_t minNumRadial = This::minNumRadial;
+  // Pull the constexpr values into variables so boost can odr-use them.
+  static constexpr size_t minNumRadial = This::minNumRadial;
+  static constexpr size_t minNumCapAxial = This::minNumCapAxial;
 
-    // Note: These are only "classes" for name scoping, and are uninstantiable;
-    // hence no need to bother declaring bases.
-    class_<This>("ConeMeshGenerator", no_init)
-        .def_readonly("minNumRadial", minNumRadial)
+  // Note: These are only "classes" for name scoping, and are uninstantiable;
+  // hence no need to bother declaring bases.
+  class_<This>("CapsuleMeshGenerator", no_init)
+      .def_readonly("minNumRadial", minNumRadial)
+      .def_readonly("minNumCapAxial", minNumCapAxial)
 
-        .def("ComputeNumPoints", &This::ComputeNumPoints)
-        .staticmethod("ComputeNumPoints")
+      .def("ComputeNumPoints", &This::ComputeNumPoints)
+      .staticmethod("ComputeNumPoints")
 
-        .def("GenerateTopology", &This::GenerateTopology)
-        .staticmethod("GenerateTopology")
+      .def("GenerateTopology", &This::GenerateTopology)
+      .staticmethod("GenerateTopology")
 
-        .def("GeneratePoints", &_WrapGeneratePoints)
-        .staticmethod("GeneratePoints")
-    ;
+      .def("GeneratePoints", &_WrapGeneratePoints)
+      .staticmethod("GeneratePoints");
 }

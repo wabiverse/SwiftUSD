@@ -22,30 +22,34 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/base/arch/error.h"
-#include "pxr/base/arch/pxrmath.h"
+#include "Arch/error.h"
+#include "Arch/pxrmath.h"
 #include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#define AXIOM(cond)                                                            \
-  if (!(cond)) {                                                               \
-    ARCH_ERROR("failed: " #cond);                                              \
+#define AXIOM(cond)               \
+  if (!(cond))                    \
+  {                               \
+    ARCH_ERROR("failed: " #cond); \
   }
 
-int main() {
+int main()
+{
   /*
    * Verify that the exponent and significand of float and double are
    * IEEE-754 compliant.
    */
   if (ArchFloatToBitPattern(5.6904566e-28f) != 0x12345678 ||
-      ArchBitPatternToFloat(0x12345678) != 5.6904566e-28f) {
+      ArchBitPatternToFloat(0x12345678) != 5.6904566e-28f)
+  {
     ARCH_ERROR("float is not IEEE-754 compliant");
   }
   if (ArchDoubleToBitPattern(5.6263470058989390e-221) !=
           0x1234567811223344ULL ||
       ArchBitPatternToDouble(0x1234567811223344ULL) !=
-          5.6263470058989390e-221) {
+          5.6263470058989390e-221)
+  {
     ARCH_ERROR("double is not IEEE-754 compliant");
   }
 
