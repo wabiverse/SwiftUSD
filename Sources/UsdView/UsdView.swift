@@ -36,6 +36,15 @@ import PixarUSD
 #if canImport(Metal)
   import Metal
 #endif /* canImport(Metal) */
+#if canImport(SwiftUI)
+  import SwiftUI
+
+  public protocol PixarApp: App
+  {}
+#else /* canImport(SwiftUI) */
+  public protocol PixarApp
+  {}
+#endif /* canImport(SwiftUI) */
 
 /**
  * ``UsdView``
@@ -46,7 +55,7 @@ import PixarUSD
  * the purposes of demonstrating the usage of USD,
  * from the Swift programming language. */
 @main
-class UsdView
+struct UsdView: PixarApp
 {
   #if canImport(Metal) && !os(visionOS)
     let hydra: HDMTLRenderer
@@ -66,12 +75,33 @@ class UsdView
     #if canImport(Metal) && !os(visionOS)
       hydra = HDMTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
     #endif /* canImport(Metal) && !os(visionOS) */
+
+    #if canImport(SwiftUI)
+      runDemo(with: self)
+    #endif /* canImport(SwiftUI) */
   }
 
-  static func main()
-  {
-    let app = UsdView()
+  #if canImport(SwiftUI)
+    var body: some Scene
+    {
+      WindowGroup("UsdView", id: "usdview")
+      {
+        Text("UsdView Under Construction...")
+          .font(.system(size: 24, weight: .black))
+          .padding()
+      }
+    }
+  #else /* canImport(SwiftUI) */
+    static func main()
+    {
+      let app = UsdView()
 
+      app.runDemo(with: app)
+    }
+  #endif /* canImport(SwiftUI) */
+
+  func runDemo(with app: Self)
+  {
     /* ---------- Hydra Engine. ---------- */
 
     #if canImport(Metal) && !os(visionOS)
@@ -152,7 +182,7 @@ class UsdView
 
     /* ------------------------------------ */
 
-    Msg.logger.log(level: .info, "UsdView is not yet implemented... will exit now.")
+    Msg.logger.log(level: .info, "UsdView launched.")
 
     /* ------------------------------------ */
   }

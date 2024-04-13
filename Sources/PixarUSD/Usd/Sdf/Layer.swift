@@ -58,4 +58,29 @@ public extension SdfLayerHandle
   {
     pointee.Save(force)
   }
+
+  /**
+   * Reloads the layer from its persistent representation.
+   *
+   * This restores the layer to a state as if it had just been created
+   * with ``SdfLayer/findOrOpen()``. This operation is undoable.
+   *
+   * The fileName and whether journaling is enabled are not affected
+   * by this method.
+   *
+   * When called with force = false (the default), Reload attempts to
+   * avoid reloading layers that have not changed on disk. It does so
+   * by comparing the file's modification time (mtime) to when the
+   * file was loaded. If the layer has unsaved modifications, this
+   * mechanism is not used, and the layer is reloaded from disk. If the
+   * layer has any ``SdfLayer/getExternalAssetDependencies()`` "external
+   * asset dependencies", their modification state will also be consulted
+   * when determining if the layer needs to be reloaded.
+   *
+   * Passing true to the `force` parameter overrides this behavior, forcing
+   * the layer to be reloaded from disk regardless of whether it has changed. */
+  func reload(force: Bool = false)
+  {
+    pointee.Reload(force)
+  }
 }

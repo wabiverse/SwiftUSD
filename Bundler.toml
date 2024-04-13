@@ -5,6 +5,7 @@ identifier = 'foundation.wabi.UsdView'
 product = 'UsdView'
 version = '1.0.0'
 category = 'public.app-category.graphics-design'
+icon = 'usdview.png'
 
 [apps.UsdView.plist]
 commit = '$(COMMIT_HASH)'

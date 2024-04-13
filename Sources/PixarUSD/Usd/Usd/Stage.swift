@@ -108,31 +108,6 @@ public extension Usd
 public extension Usd.Stage
 {
   /**
-   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
-   *
-   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
-   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
-   * one can do:
-   * ```swift
-   * for prim in stage.traverse()
-   * {
-   *   print(prim.GetPath())
-   * }
-   * ```
-   *
-   * If either a pre-and-post-order traversal or, a traversal rooted at
-   * a particular prim is desired, construct a ``Usd.PrimRange``
-   * directly.
-   *
-   * This is equivalent to ``Usd.PrimRange.stage()``. */
-  func traverse() -> [Usd.Prim]
-  {
-    let it = Usd.PrimRange.Stage(getPtr())
-
-    return IteratorSequence(it).map { $0 }
-  }
-
-  /**
    * ``InitialLoadingSet``
    *
    * ## Overview
@@ -233,10 +208,7 @@ public extension Usd.Stage
   {
     Usd.Stage.Open(std.string(filePath), load.rawValue)
   }
-}
 
-public extension Usd.StageRefPtr
-{
   /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *
@@ -257,9 +229,37 @@ public extension Usd.StageRefPtr
    * This is equivalent to ``Usd.PrimRange.stage()``. */
   func traverse() -> [Usd.Prim]
   {
-    pointee.traverse()
+    let it = Usd.PrimRange.Stage(getPtr())
+
+    return IteratorSequence(it).map { $0 }
   }
 
+  /**
+   * Calls Sdf/Layer/reload() on all layers contributing to this stage,
+   * except session layers and sublayers of session layers.
+   *
+   * This includes non-session sublayers, references and payloads.
+   * Note that reloading anonymous layers clears their content, so
+   * invoking Reload() on a stage constructed via CreateInMemory()
+   * will clear its root layer.
+   *
+   * \note This method is considered a mutation, which has potentially
+   * global effect!  Unlike the various Load() methods whose actions
+   * affect only **this stage**, Reload() may cause layers to change their
+   * contents, and because layers are global resources shared by
+   * potentially many Stages, calling Reload() on one stage may result in
+   * a mutation to any number of stages.  In general, unless you are
+   * highly confident your stage is the only consumer of its layers, you
+   * should only call Reload() when you are assured no other threads may
+   * be reading from any Stages. */
+  func reload()
+  {
+    Reload()
+  }
+}
+
+public extension Usd.StageRefPtr
+{
   /**
    * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
    *
@@ -403,5 +403,52 @@ public extension Usd.StageRefPtr
   func save()
   {
     pointee.Save()
+  }
+
+  /**
+   * Calls ``Sdf/Layer/reload()`` on all layers contributing to this
+   * stage, except session layers and sublayers of session layers.
+   *
+   * This includes non-session sublayers, references and payloads.
+   * Note that reloading anonymous layers clears their content, so
+   * invoking ``reload()`` on a stage constructed via 
+   * ``__ObjC/Pixar/TfRefPtr<UsdStage>/createInMemory()`` will clear its
+   * root layer.
+   *
+   * > Note: This method is considered a mutation, which has potentially
+   *   global effect!  Unlike the various Load() methods whose actions
+   *   affect only **this stage**, Reload() may cause layers to change
+   *   their contents, and because layers are global resources shared by
+   *   potentially many Stages, calling Reload() on one stage may resul
+   *   in a mutation to any number of stages.  In general, unless you are
+   *   highly confident your stage is the only consumer of its layers, you
+   *   should only call ``reload()`` when you are assured no other threads
+   *   may be reading from any Stages. */
+  func reload()
+  {
+    pointee.reload()
+  }
+
+  /**
+   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
+   *
+   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
+   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
+   * one can do:
+   * ```swift
+   * for prim in stage.traverse()
+   * {
+   *   print(prim.GetPath())
+   * }
+   * ```
+   *
+   * If either a pre-and-post-order traversal or, a traversal rooted at
+   * a particular prim is desired, construct a ``Usd.PrimRange``
+   * directly.
+   *
+   * This is equivalent to ``Usd.PrimRange.stage()``. */
+  func traverse() -> [Usd.Prim]
+  {
+    pointee.traverse()
   }
 }
