@@ -161,19 +161,19 @@ struct UsdView: PixarApp
 
     /* ----- Declarative api example. ----- */
 
-    UsdStage("DeclarativePixarUSD", ext: .usda)
+    USDStage("DeclarativePixarUSD", ext: .usda)
     {
-      UsdPrim("DeclarativeScene")
+      USDPrim("DeclarativeScene")
       {
-        UsdPrim("Sun", type: .distantLight)
+        USDPrim("Sun", type: .distantLight)
         {
-          UsdPrim("Hello", type: .xform)
+          USDPrim("Hello", type: .xform)
           {
-            UsdPrim("World", type: .sphere)
-            UsdPrim("Box", type: .cube)
+            USDPrim("World", type: .sphere)
+            USDPrim("Box", type: .cube)
           }
 
-          UsdPrim("RandomCone", type: .cone)
+          USDPrim("RandomCone", type: .cone)
         }
       }
     }
