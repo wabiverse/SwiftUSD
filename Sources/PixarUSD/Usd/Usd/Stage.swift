@@ -34,6 +34,7 @@ import Sdf
 import Usd
 
 public typealias UsdStageRefPtr = Pixar.UsdStageRefPtr
+public typealias UsdStage = Pixar.UsdStage
 
 public extension Usd
 {
@@ -153,7 +154,7 @@ public extension Usd.Stage
    * layer's repository path if the layer has one, otherwise its resolved
    * path. */
   @discardableResult
-  static func createNew(_ identifier: String, ext: UsdStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func createNew(_ identifier: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
   {
     Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
   }
@@ -210,6 +211,138 @@ public extension Usd.Stage
   }
 
   /**
+   * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
+   *
+   * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * not Defined ancestors.
+   *
+   * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
+   * any of the necessary `Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Usd.Prim``.
+   *
+   * > Note: This method may return a defined prim whose **type name** does not match the supplied **type name**,
+   *   in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
+  @discardableResult
+  func definePrim(_ path: Sdf.Path, type name: Tf.Token = Tf.Token()) -> Usd.Prim
+  {
+    DefinePrim(path, name)
+  }
+
+  /**
+   * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
+   *
+   * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
+   * return that prim. Otherwise, author an SdfPrimSpec with **specifier** == `Sdf.SpecifierDef` and typeName for
+   * the prim at **path** at the current EditTarget. Lastly, author `Sdf.PrimSpec`s with the **specifier** set equal
+   * to `Sdf.SpecifierDef` and an empty typeName at the current **edit target** for any nonexistent, or existing but
+   * not Defined ancestors.
+   *
+   * The given path must be an absolute prim path that does not contain any variant selections. If it is impossible to author
+   * any of the necessary `Sdf.PrimSpec`s (for example, in case path cannot map to the current UsdEditTarget's namespace
+   * or one of the ancestors of path is inactive on the UsdStage), issue an error and return an invalid ``Usd.Prim``.
+   *
+   * > Note: This method may return a defined prim whose **type name** does not match the supplied **type name**,
+   *   in case a stronger **type name** opinion overrides the opinion at the current **edit target**. */
+  @discardableResult
+  func definePrim(_ path: String, type name: Tf.Token = Tf.Token()) -> Usd.Prim
+  {
+    DefinePrim(.init(path), name)
+  }
+
+  /**
+   * Return the ``Usd.Prim`` at `path`, or an invalid ``Usd.Prim`` if none exists.
+   *
+   * If path indicates a prim beneath an instance, returns an instance
+   * proxy prim if a prim exists at the corresponding path in that instance's
+   * prototype.
+   *
+   * Unlike ``UsdStage.overridePrim()`` and ``UsdStage.definePrim()``, this
+   * method will never author scene description, and therefore is safe to
+   * use as a "reader" in the Usd multi-threading model. */
+  func getPrim(at path: Sdf.Path) -> Usd.Prim
+  {
+    GetPrimAtPath(path)
+  }
+
+  /**
+   * Return the ``Usd.Prim`` at `path`, or an invalid ``Usd.Prim`` if none exists.
+   *
+   * If path indicates a prim beneath an instance, returns an instance
+   * proxy prim if a prim exists at the corresponding path in that instance's
+   * prototype.
+   *
+   * Unlike ``UsdStage.overridePrim()`` and ``UsdStage.definePrim()``, this
+   * method will never author scene description, and therefore is safe to
+   * use as a "reader" in the Usd multi-threading model. */
+  func getPrim(at path: String) -> Usd.Prim
+  {
+    GetPrimAtPath(Sdf.Path(path))
+  }
+
+  /**
+   * Attempt to ensure a ``Usd.Prim`` at path exists on this stage.
+   *
+   * If a prim already exists at path, return it. Otherwise author
+   * ``SdfPrimSpecs`` with `specifier == SdfSpecifierOver` and empty
+   * `typeName` at the current ``EditTarget`` to create this prim and any
+   * nonexistent ancestors, then return it.
+   *
+   * The given path must be an absolute prim path that does not contain
+   * any variant selections.
+   *
+   * If it is impossible to author any of the necessary PrimSpecs, (for
+   * example, in case `path` cannot map to the current UsdEditTarget's
+   * namespace) issue an error and return an invalid ``Usd.Prim``.
+   *
+   * If an ancestor of `path` identifies an inactive prim, author scene
+   * description as described above but return an invalid prim, since the
+   * resulting prim is descendant to an inactive prim. */
+  func overridePrim(path: Sdf.Path) -> Usd.Prim
+  {
+    OverridePrim(path)
+  }
+
+  /**
+   * Attempt to ensure a ``Usd.Prim`` at path exists on this stage.
+   *
+   * If a prim already exists at path, return it. Otherwise author
+   * ``SdfPrimSpecs`` with `specifier == SdfSpecifierOver` and empty
+   * `typeName` at the current ``EditTarget`` to create this prim and any
+   * nonexistent ancestors, then return it.
+   *
+   * The given path must be an absolute prim path that does not contain
+   * any variant selections.
+   *
+   * If it is impossible to author any of the necessary PrimSpecs, (for
+   * example, in case `path` cannot map to the current UsdEditTarget's
+   * namespace) issue an error and return an invalid ``Usd.Prim``.
+   *
+   * If an ancestor of `path` identifies an inactive prim, author scene
+   * description as described above but return an invalid prim, since the
+   * resulting prim is descendant to an inactive prim. */
+  func overridePrim(path: String) -> Usd.Prim
+  {
+    OverridePrim(Sdf.Path(path))
+  }
+
+  /**
+   * Return this stage's root layer. */
+  func getRootLayer() -> SdfLayerHandle
+  {
+    GetRootLayer()
+  }
+
+  /**
+   * Return this stage's root layer. */
+  func getPseudoRoot() -> Usd.Prim
+  {
+    GetPseudoRoot()
+  }
+
+  /**
    * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
    *
    * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
@@ -256,6 +389,72 @@ public extension Usd.Stage
   {
     Reload()
   }
+
+  /**
+   * Save all dirty layers contributing to this stage.
+   *
+   * Calls ``Sdf.Layer.save()`` on all dirty layers contributing to this stage
+   * except session layers and sublayers of session layers. This function will emit a
+   * warning and skip each dirty anonymous layer it encounters, since anonymous layers
+   * cannot be saved with ``Sdf.Layer.save()``. These layers must be manually
+   * exported by calling ``Sdf.Layer.export()``. */
+  func save()
+  {
+    Save()
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Double) -> Bool
+  {
+    GetMetadata(Tf.Token(key), &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Int) -> Bool
+  {
+    GetMetadata(Tf.Token(key), &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Float) -> Bool
+  {
+    GetMetadata(Tf.Token(key), &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Tf.Token) -> Bool
+  {
+    GetMetadata(Tf.Token(key), &value)
+  }
+
+  func hasAuthoredMetadata(_ key: String) -> Bool
+  {
+    HasAuthoredMetadata(Tf.Token(key))
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Double) -> Bool
+  {
+    SetMetadata(Tf.Token(key), value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Int) -> Bool
+  {
+    SetMetadata(Tf.Token(key), value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Float) -> Bool
+  {
+    SetMetadata(Tf.Token(key), value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Tf.Token) -> Bool
+  {
+    SetMetadata(Tf.Token(key), value)
+  }
 }
 
 public extension Usd.StageRefPtr
@@ -278,7 +477,7 @@ public extension Usd.StageRefPtr
   @discardableResult
   func definePrim(_ path: Sdf.Path, type name: Tf.Token = Tf.Token()) -> Usd.Prim
   {
-    pointee.DefinePrim(path, name)
+    pointee.definePrim(path, type: name)
   }
 
   /**
@@ -299,7 +498,7 @@ public extension Usd.StageRefPtr
   @discardableResult
   func definePrim(_ path: String, type name: Tf.Token = Tf.Token()) -> Usd.Prim
   {
-    pointee.DefinePrim(.init(path), name)
+    pointee.definePrim(.init(path), type: name)
   }
 
   /**
@@ -314,7 +513,7 @@ public extension Usd.StageRefPtr
    * use as a "reader" in the Usd multi-threading model. */
   func getPrim(at path: Sdf.Path) -> Usd.Prim
   {
-    pointee.GetPrimAtPath(path)
+    pointee.getPrim(at: path)
   }
 
   /**
@@ -329,7 +528,7 @@ public extension Usd.StageRefPtr
    * use as a "reader" in the Usd multi-threading model. */
   func getPrim(at path: String) -> Usd.Prim
   {
-    pointee.GetPrimAtPath(Sdf.Path(path))
+    pointee.getPrim(at: Sdf.Path(path))
   }
 
   /**
@@ -352,7 +551,7 @@ public extension Usd.StageRefPtr
    * resulting prim is descendant to an inactive prim. */
   func overridePrim(path: Sdf.Path) -> Usd.Prim
   {
-    pointee.OverridePrim(path)
+    pointee.overridePrim(path: path)
   }
 
   /**
@@ -375,21 +574,21 @@ public extension Usd.StageRefPtr
    * resulting prim is descendant to an inactive prim. */
   func overridePrim(path: String) -> Usd.Prim
   {
-    pointee.OverridePrim(Sdf.Path(path))
+    pointee.overridePrim(path: Sdf.Path(path))
   }
 
   /**
    * Return this stage's root layer. */
   func getRootLayer() -> SdfLayerHandle
   {
-    pointee.GetRootLayer()
+    pointee.getRootLayer()
   }
 
   /**
    * Return this stage's root layer. */
   func getPseudoRoot() -> Usd.Prim
   {
-    pointee.GetPseudoRoot()
+    pointee.getPseudoRoot()
   }
 
   /**
@@ -402,7 +601,7 @@ public extension Usd.StageRefPtr
    * exported by calling ``Sdf.Layer.export()``. */
   func save()
   {
-    pointee.Save()
+    pointee.save()
   }
 
   /**
@@ -450,5 +649,58 @@ public extension Usd.StageRefPtr
   func traverse() -> [Usd.Prim]
   {
     pointee.traverse()
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Double) -> Bool
+  {
+    pointee.getMetadata(key, &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Int) -> Bool
+  {
+    pointee.getMetadata(key, &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Float) -> Bool
+  {
+    pointee.getMetadata(key, &value)
+  }
+
+  @discardableResult
+  func getMetadata(_ key: String, _ value: inout Tf.Token) -> Bool
+  {
+    pointee.getMetadata(key, &value)
+  }
+
+  func hasAuthoredMetadata(_ key: String) -> Bool
+  {
+    pointee.hasAuthoredMetadata(key)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Double) -> Bool
+  {
+    pointee.setMetadata(key, value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Int) -> Bool
+  {
+    pointee.setMetadata(key, value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Float) -> Bool
+  {
+    pointee.setMetadata(key, value)
+  }
+
+  @discardableResult
+  func setMetadata(_ key: String, _ value: Tf.Token) -> Bool
+  {
+    pointee.setMetadata(key, value)
   }
 }

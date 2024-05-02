@@ -33,24 +33,24 @@ import Usd
 
 public protocol StageConvertible
 {
-  func asPrims() -> [UsdPrim]
+  func asPrims() -> [USDPrim]
 }
 
-extension UsdPrim: StageConvertible
+extension USDPrim: StageConvertible
 {
-  public func asPrims() -> [UsdPrim] { [self] }
+  public func asPrims() -> [USDPrim] { [self] }
 
   public struct Empty: StageConvertible
   {
-    public func asPrims() -> [UsdPrim] { [] }
+    public func asPrims() -> [USDPrim] { [] }
   }
 }
 
-extension UsdStage: StageConvertible
+extension USDStage: StageConvertible
 {
-  public func asPrims() -> [UsdPrim]
+  public func asPrims() -> [USDPrim]
   {
-    [UsdPrim(stage.getPseudoRoot().path.string, type: .group(prims))]
+    [USDPrim(stage.getPseudoRoot().path.string, type: .group(prims))]
   }
 }
 
@@ -58,15 +58,15 @@ extension UsdStage: StageConvertible
  * Here we extend Array to make it
  * conform to our StageConvertible
  * protocol. */
-extension [UsdPrim]: StageConvertible
+extension [USDPrim]: StageConvertible
 {
-  public func asPrims() -> [UsdPrim] { self }
+  public func asPrims() -> [USDPrim] { self }
 }
 
 @resultBuilder
 public enum StageBuilder
 {
-  public static func buildBlock(_ prims: StageConvertible...) -> [UsdPrim]
+  public static func buildBlock(_ prims: StageConvertible...) -> [USDPrim]
   {
     prims.flatMap { $0.asPrims() }
   }

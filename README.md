@@ -198,11 +198,11 @@ enum Creator
 
     /* Create a new USD stage with a transform and a sphere. */
 
-    UsdStage("HelloPixarUSD", ext: .usda)
+    USDStage("HelloPixarUSD", ext: .usda)
     {
-      UsdPrim("Hello", type: .xform)
+      USDPrim("Hello", type: .xform)
       {
-        UsdPrim("World", type: .sphere)
+        USDPrim("World", type: .sphere)
       }
     }
     .set(doc: "Stay Swifty.")

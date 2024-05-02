@@ -33,6 +33,7 @@ import Foundation
 import Usd
 
 public typealias UsdStageWeakPtr = Pixar.UsdStageWeakPtr
+public typealias UsdPrim = Pixar.UsdPrim
 
 public extension Usd
 {
@@ -95,7 +96,7 @@ public extension Usd
    * Please refer to ``Notice`` for a listing of the events that could cause
    * ``Notice/objectsChanged`` to be emitted.
    */
-  typealias Prim = Pixar.UsdPrim
+  typealias Prim = UsdPrim
   typealias StageWeakPtr = UsdStageWeakPtr
 }
 

@@ -42,14 +42,14 @@ public protocol Prim
 
 /**
  * A ``Usd/Prim`` for declaratively authoring scene description
- * on a ``UsdStage``. */
-public struct UsdPrim
+ * on a ``USDStage``. */
+public struct USDPrim
 {
   public var path: Sdf.Path
   public var type: PrimType
-  public var children: [UsdPrim]
+  public var children: [USDPrim]
 
-  public init(_ path: String, type: PrimType = .token(Tf.Token()), @StageBuilder children: () -> [UsdPrim] = { [] })
+  public init(_ path: String, type: PrimType = .token(Tf.Token()), @StageBuilder children: () -> [USDPrim] = { [] })
   {
     self.path = Sdf.Path("/\(path)")
     self.type = type
@@ -57,15 +57,15 @@ public struct UsdPrim
   }
 }
 
-extension UsdPrim: Equatable
+extension USDPrim: Equatable
 {
-  public static func == (lhs: UsdPrim, rhs: UsdPrim) -> Bool
+  public static func == (lhs: USDPrim, rhs: USDPrim) -> Bool
   {
     lhs.path.string == rhs.path.string
   }
 }
 
-public extension UsdPrim
+public extension USDPrim
 {
   enum PrimType
   {
@@ -109,6 +109,6 @@ public extension UsdPrim
     case geomModelAPI
     case visibilityAPI
     case token(Tf.Token)
-    case group([UsdPrim])
+    case group([USDPrim])
   }
 }

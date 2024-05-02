@@ -46,23 +46,23 @@ import Usd
  *
  * Usage example:
  * ```swift
- * UsdStage("HelloWorldExample", ext: .usda)
+ * USDStage("HelloWorldExample", ext: .usda)
  * {
- *   UsdPrim("Hello", type: .xform)
+ *   USDPrim("Hello", type: .xform)
  *   {
- *     UsdPrim("World", type: .sphere)
+ *     USDPrim("World", type: .sphere)
  *   }
  * }
  * ``` */
-public struct UsdStage
+public struct USDStage
 {
   public var stage: UsdStageRefPtr
-  public var prims: [UsdPrim]
+  public var prims: [USDPrim]
 
   public init(_ identifier: String,
-              ext: UsdStage.FileExt = .custom(""),
+              ext: USDStage.FileExt = .custom(""),
               load set: Usd.Stage.InitialLoadingSet = .all,
-              @StageBuilder prims: () -> [UsdPrim])
+              @StageBuilder prims: () -> [USDPrim])
   {
     switch ext
     {
@@ -87,7 +87,7 @@ public struct UsdStage
     populate(prims: prims())
   }
 
-  private mutating func populate(prims: [UsdPrim])
+  private mutating func populate(prims: [USDPrim])
   {
     for prim in prims
     {
@@ -138,7 +138,7 @@ public struct UsdStage
   /**
    * Sets the documentation string for this layer. */
   @discardableResult
-  public func set(doc: String) -> UsdStage
+  public func set(doc: String) -> USDStage
   {
     stage.getPseudoRoot().set(doc: doc)
 
@@ -154,7 +154,7 @@ public struct UsdStage
    * cannot be saved with ``Sdf.Layer.save()``. These layers must be manually
    * exported by calling ``Sdf.Layer.export()``. */
   @discardableResult
-  public func save() -> UsdStage
+  public func save() -> USDStage
   {
     stage.save()
 
@@ -200,7 +200,7 @@ public struct UsdStage
     }
 
     /// All cases of the FileExt enum.
-    public static var allCases: [UsdStage.FileExt]
+    public static var allCases: [USDStage.FileExt]
     {
       [.usd, .usda, .usdc, .usdz]
     }
@@ -209,15 +209,15 @@ public struct UsdStage
 
 /*
  * ------------------------------------------------------------------------------
- * Private UsdStage extensions to allow users to declaratively define prim types.
+ * Private USDStage extensions to allow users to declaratively define prim types.
  * --- */
 
-public extension UsdStage
+public extension USDStage
 {
   /**
    * Private internal function to allow declaratively defining prim schema types. */
   @discardableResult
-  private func define(prim: UsdPrim, after primStack: [UsdPrim]) -> Usd.Prim
+  private func define(prim: USDPrim, after primStack: [USDPrim]) -> Usd.Prim
   {
     let primPath: SdfPath = .init(prim.path.string.replacingOccurrences(of: "/", with: ""))
 
@@ -243,7 +243,7 @@ public extension UsdStage
 
   /**
    * Private internal function to allow declaratively defining UsdGeom schema types. */
-  private func defGeom(_ prim: UsdPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
+  private func defGeom(_ prim: USDPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
   {
     switch prim.type
     {
@@ -268,7 +268,7 @@ public extension UsdStage
 
   /**
    * Private internal function to allow declaratively defining UsdLux schema types. */
-  private func defLux(_ prim: UsdPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
+  private func defLux(_ prim: USDPrim, path: Sdf.Path, after pathDepth: Sdf.Path) -> Usd.Prim
   {
     switch prim.type
     {
