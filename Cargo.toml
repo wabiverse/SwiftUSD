@@ -1,0 +1,17 @@
+[package]
+name = "rust-usd"
+version = "23.11.36"
+edition = "2021"
+publish = []
+
+build = "Sources/Rust/build.rs"
+
+[[bin]]
+name = "usd"
+path = "Sources/Rust/main.rs"
+
+[build-dependencies]
+swift-bridge-build = { git = "https://github.com/chinedufn/swift-bridge", version = "0.1.55" }
+
+[dependencies]
+swift-bridge = { git = "https://github.com/chinedufn/swift-bridge", version = "0.1.55" }

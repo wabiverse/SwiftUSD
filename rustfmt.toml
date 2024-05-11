@@ -1,0 +1,3 @@
+indent_style = "Block"
+tab_spaces = 2
+brace_style = "AlwaysNextLine"
