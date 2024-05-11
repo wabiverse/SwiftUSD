@@ -49,19 +49,7 @@ fn compile_swift() {
 
   cmd
     .current_dir(swift_package_dir)
-    .arg("build")
-    .args(&["-Xcc", "-std=c++17"])
-    .args(&[      
-      "-Xswiftc",
-      "-cxx-interoperability-mode=default",
-      "-Xswiftc",
-      "-I",
-      "-Xswiftc",
-      swift_source_dir()
-        .join("include")
-        .to_str()
-        .unwrap(),
-    ]);
+    .arg("build");
 
   if is_release_build() {
     cmd.args(&["-c", "release"]);
