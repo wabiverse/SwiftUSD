@@ -30,6 +30,8 @@
 
 import Ar
 
+public typealias ArResolver = Pixar.ArResolver
+
 /**
  * # ``Ar``
  *
@@ -41,4 +43,6 @@ import Ar
  * writing asset data. It provides several interfaces that allow **USD** to access
  * an asset without knowing how that asset is physically stored. */
 public enum Ar
-{}
+{
+  public typealias Resolver = ArResolver
+}

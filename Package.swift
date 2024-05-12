@@ -205,187 +205,6 @@ let package = Package(
       name: "UsdShaders",
       targets: ["UsdShaders"]
     ),
-    // --------------- Python -----
-    .library(
-      name: "PyTf",
-      type: .dynamic,
-      targets: ["PyTf"]
-    ),
-    .library(
-      name: "PyPlug",
-      type: .dynamic,
-      targets: ["PyPlug"]
-    ),
-    .library(
-      name: "PyAr",
-      type: .dynamic,
-      targets: ["PyAr"]
-    ),
-    .library(
-      name: "PyKind",
-      type: .dynamic,
-      targets: ["PyKind"]
-    ),
-    .library(
-      name: "PyGf",
-      type: .dynamic,
-      targets: ["PyGf"]
-    ),
-    .library(
-      name: "PyTrace",
-      type: .dynamic,
-      targets: ["PyTrace"]
-    ),
-    .library(
-      name: "PyVt",
-      type: .dynamic,
-      targets: ["PyVt"]
-    ),
-    .library(
-      name: "PyWork",
-      type: .dynamic,
-      targets: ["PyWork"]
-    ),
-    .library(
-      name: "PySdf",
-      type: .dynamic,
-      targets: ["PySdf"]
-    ),
-    .library(
-      name: "PyPcp",
-      type: .dynamic,
-      targets: ["PyPcp"]
-    ),
-    .library(
-      name: "PyUsd",
-      type: .dynamic,
-      targets: ["PyUsd"]
-    ),
-    .library(
-      name: "PyNdr",
-      type: .dynamic,
-      targets: ["PyNdr"]
-    ),
-    .library(
-      name: "PySdr",
-      type: .dynamic,
-      targets: ["PySdr"]
-    ),
-    .library(
-      name: "PyUsdGeom",
-      type: .dynamic,
-      targets: ["PyUsdGeom"]
-    ),
-    .library(
-      name: "PyUsdLux",
-      type: .dynamic,
-      targets: ["PyUsdLux"]
-    ),
-    .library(
-      name: "PyUsdShade",
-      type: .dynamic,
-      targets: ["PyUsdShade"]
-    ),
-    .library(
-      name: "PyUsdHydra",
-      type: .dynamic,
-      targets: ["PyUsdHydra"]
-    ),
-    .library(
-      name: "PySdrOsl",
-      type: .dynamic,
-      targets: ["PySdrOsl"]
-    ),
-    .library(
-      name: "PyUsdAbc",
-      type: .dynamic,
-      targets: ["PyUsdAbc"]
-    ),
-    .library(
-      name: "PyUsdDraco",
-      type: .dynamic,
-      targets: ["PyUsdDraco"]
-    ),
-    .library(
-      name: "PyUsdMedia",
-      type: .dynamic,
-      targets: ["PyUsdMedia"]
-    ),
-    .library(
-      name: "PyUsdMtlx",
-      type: .dynamic,
-      targets: ["PyUsdMtlx"]
-    ),
-    .library(
-      name: "PyUsdPhysics",
-      type: .dynamic,
-      targets: ["PyUsdPhysics"]
-    ),
-    .library(
-      name: "PyUsdProc",
-      type: .dynamic,
-      targets: ["PyUsdProc"]
-    ),
-    .library(
-      name: "PyUsdRender",
-      type: .dynamic,
-      targets: ["PyUsdRender"]
-    ),
-    .library(
-      name: "PyUsdRi",
-      type: .dynamic,
-      targets: ["PyUsdRi"]
-    ),
-    .library(
-      name: "PyUsdSkel",
-      type: .dynamic,
-      targets: ["PyUsdSkel"]
-    ),
-    .library(
-      name: "PyUsdUI",
-      type: .dynamic,
-      targets: ["PyUsdUI"]
-    ),
-    .library(
-      name: "PyUsdUtils",
-      type: .dynamic,
-      targets: ["PyUsdUtils"]
-    ),
-    .library(
-      name: "PyUsdVol",
-      type: .dynamic,
-      targets: ["PyUsdVol"]
-    ),
-    .library(
-      name: "PyUsdShaders",
-      type: .dynamic,
-      targets: ["PyUsdShaders"]
-    ),
-    .library(
-      name: "PyCameraUtil",
-      type: .dynamic,
-      targets: ["PyCameraUtil"]
-    ),
-    .library(
-      name: "PyPxOsd",
-      type: .dynamic,
-      targets: ["PyPxOsd"]
-    ),
-    .library(
-      name: "PyGarch",
-      type: .dynamic,
-      targets: ["PyGarch"]
-    ),
-    .library(
-      name: "PyGlf",
-      type: .dynamic,
-      targets: ["PyGlf"]
-    ),
-    .library(
-      name: "PyGeomUtil",
-      type: .dynamic,
-      targets: ["PyGeomUtil"]
-    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -399,44 +218,7 @@ let package = Package(
     // ------- Monolithic USD -----
     .library(
       name: "PixarUSD",
-      targets: [
-        "PyTf",
-        "PyGf",
-        "PyTrace",
-        "PyVt",
-        "PyWork",
-        "PyPlug",
-        "PyAr",
-        "PyKind",
-        "PySdf",
-        "PyPcp",
-        "PyUsd",
-        "PyNdr",
-        "PySdr",
-        "PySdrOsl",
-        "PyUsdGeom",
-        "PyUsdShade",
-        "PyUsdLux",
-        "PyUsdHydra",
-        "PyUsdAbc",
-        "PyUsdDraco",
-        "PyUsdMedia",
-        "PyUsdMtlx",
-        "PyUsdPhysics",
-        "PyUsdProc",
-        "PyUsdRender",
-        "PyUsdRi",
-        "PyUsdSkel",
-        "PyUsdUI",
-        "PyUsdUtils",
-        "PyUsdVol",
-        "PyCameraUtil",
-        "PyPxOsd",
-        "PyGarch",
-        "PyGeomUtil",
-        "PyGlf",
-        "PyUsdShaders",
-      ]
+      targets: ["PixarUSD"]
     ),
   ],
   dependencies: [
@@ -2250,6 +2032,251 @@ enum Arch
               case .apple: .product(name: "Boost", package: "MetaverseKit")
               default: nil
             }
+        }
+      }
+    }
+
+    enum Python
+    {
+      public static func products(enabled: Bool = false) -> [Product]
+      {
+        if enabled
+        {
+          [
+            .library(
+              name: "PyTf",
+              type: .dynamic,
+              targets: ["PyTf"]
+            ),
+            .library(
+              name: "PyPlug",
+              type: .dynamic,
+              targets: ["PyPlug"]
+            ),
+            .library(
+              name: "PyAr",
+              type: .dynamic,
+              targets: ["PyAr"]
+            ),
+            .library(
+              name: "PyKind",
+              type: .dynamic,
+              targets: ["PyKind"]
+            ),
+            .library(
+              name: "PyGf",
+              type: .dynamic,
+              targets: ["PyGf"]
+            ),
+            .library(
+              name: "PyTrace",
+              type: .dynamic,
+              targets: ["PyTrace"]
+            ),
+            .library(
+              name: "PyVt",
+              type: .dynamic,
+              targets: ["PyVt"]
+            ),
+            .library(
+              name: "PyWork",
+              type: .dynamic,
+              targets: ["PyWork"]
+            ),
+            .library(
+              name: "PySdf",
+              type: .dynamic,
+              targets: ["PySdf"]
+            ),
+            .library(
+              name: "PyPcp",
+              type: .dynamic,
+              targets: ["PyPcp"]
+            ),
+            .library(
+              name: "PyUsd",
+              type: .dynamic,
+              targets: ["PyUsd"]
+            ),
+            .library(
+              name: "PyNdr",
+              type: .dynamic,
+              targets: ["PyNdr"]
+            ),
+            .library(
+              name: "PySdr",
+              type: .dynamic,
+              targets: ["PySdr"]
+            ),
+            .library(
+              name: "PyUsdGeom",
+              type: .dynamic,
+              targets: ["PyUsdGeom"]
+            ),
+            .library(
+              name: "PyUsdLux",
+              type: .dynamic,
+              targets: ["PyUsdLux"]
+            ),
+            .library(
+              name: "PyUsdShade",
+              type: .dynamic,
+              targets: ["PyUsdShade"]
+            ),
+            .library(
+              name: "PyUsdHydra",
+              type: .dynamic,
+              targets: ["PyUsdHydra"]
+            ),
+            .library(
+              name: "PySdrOsl",
+              type: .dynamic,
+              targets: ["PySdrOsl"]
+            ),
+            .library(
+              name: "PyUsdAbc",
+              type: .dynamic,
+              targets: ["PyUsdAbc"]
+            ),
+            .library(
+              name: "PyUsdDraco",
+              type: .dynamic,
+              targets: ["PyUsdDraco"]
+            ),
+            .library(
+              name: "PyUsdMedia",
+              type: .dynamic,
+              targets: ["PyUsdMedia"]
+            ),
+            .library(
+              name: "PyUsdMtlx",
+              type: .dynamic,
+              targets: ["PyUsdMtlx"]
+            ),
+            .library(
+              name: "PyUsdPhysics",
+              type: .dynamic,
+              targets: ["PyUsdPhysics"]
+            ),
+            .library(
+              name: "PyUsdProc",
+              type: .dynamic,
+              targets: ["PyUsdProc"]
+            ),
+            .library(
+              name: "PyUsdRender",
+              type: .dynamic,
+              targets: ["PyUsdRender"]
+            ),
+            .library(
+              name: "PyUsdRi",
+              type: .dynamic,
+              targets: ["PyUsdRi"]
+            ),
+            .library(
+              name: "PyUsdSkel",
+              type: .dynamic,
+              targets: ["PyUsdSkel"]
+            ),
+            .library(
+              name: "PyUsdUI",
+              type: .dynamic,
+              targets: ["PyUsdUI"]
+            ),
+            .library(
+              name: "PyUsdUtils",
+              type: .dynamic,
+              targets: ["PyUsdUtils"]
+            ),
+            .library(
+              name: "PyUsdVol",
+              type: .dynamic,
+              targets: ["PyUsdVol"]
+            ),
+            .library(
+              name: "PyUsdShaders",
+              type: .dynamic,
+              targets: ["PyUsdShaders"]
+            ),
+            .library(
+              name: "PyCameraUtil",
+              type: .dynamic,
+              targets: ["PyCameraUtil"]
+            ),
+            .library(
+              name: "PyPxOsd",
+              type: .dynamic,
+              targets: ["PyPxOsd"]
+            ),
+            .library(
+              name: "PyGarch",
+              type: .dynamic,
+              targets: ["PyGarch"]
+            ),
+            .library(
+              name: "PyGlf",
+              type: .dynamic,
+              targets: ["PyGlf"]
+            ),
+            .library(
+              name: "PyGeomUtil",
+              type: .dynamic,
+              targets: ["PyGeomUtil"]
+            ),
+          ]
+        }
+        else
+        {
+          []
+        }
+      }
+
+      public static func all(enabled: Bool = false) -> [String]
+      {
+        if enabled
+        {
+          [
+            "PyTf",
+            "PyGf",
+            "PyTrace",
+            "PyVt",
+            "PyWork",
+            "PyPlug",
+            "PyAr",
+            "PyKind",
+            "PySdf",
+            "PyPcp",
+            "PyUsd",
+            "PyNdr",
+            "PySdr",
+            "PySdrOsl",
+            "PyUsdGeom",
+            "PyUsdShade",
+            "PyUsdLux",
+            "PyUsdHydra",
+            "PyUsdAbc",
+            "PyUsdDraco",
+            "PyUsdMedia",
+            "PyUsdMtlx",
+            "PyUsdPhysics",
+            "PyUsdProc",
+            "PyUsdRender",
+            "PyUsdRi",
+            "PyUsdSkel",
+            "PyUsdUI",
+            "PyUsdUtils",
+            "PyUsdVol",
+            "PyCameraUtil",
+            "PyPxOsd",
+            "PyGarch",
+            "PyGeomUtil",
+            "PyGlf",
+            "PyUsdShaders",
+          ]
+        }
+        else
+        {
+          []
         }
       }
     }

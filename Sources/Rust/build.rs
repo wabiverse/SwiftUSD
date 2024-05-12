@@ -83,7 +83,7 @@ fn is_release_build() -> bool {
 }
 
 fn swift_source_dir() -> PathBuf {
-  manifest_dir().join("Sources/PixarUSD")
+  manifest_dir().join("Sources/RustUSD")
 }
 
 fn generated_code_dir() -> PathBuf {

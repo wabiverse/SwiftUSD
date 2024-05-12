@@ -47,6 +47,9 @@ class ArWritableAsset;
 class TfType;
 class VtValue;
 
+using ArAssetSharedPtr = std::shared_ptr<ArAsset>;
+using ArWritableAssetSharedPtr = std::shared_ptr<ArWritableAsset>;
+
 /// \class ArResolver
 ///
 /// Interface for the asset resolution system. An asset resolver is
@@ -293,7 +296,7 @@ public:
   /// The returned ArAsset object provides functions for accessing the
   /// contents of the specified asset.
   AR_API
-  std::shared_ptr<ArAsset> OpenAsset(const ArResolvedPath &resolvedPath) const;
+  ArAssetSharedPtr OpenAsset(const ArResolvedPath &resolvedPath) const;
 
   /// Enumeration of write modes for OpenAssetForWrite
   enum class WriteMode {
@@ -320,7 +323,7 @@ public:
   /// an asset may or may not be immediately visible to other threads or
   /// processes depending on the implementation.
   AR_API
-  std::shared_ptr<ArWritableAsset>
+  ArWritableAssetSharedPtr
   OpenAssetForWrite(const ArResolvedPath &resolvedPath,
                     WriteMode writeMode) const;
 
