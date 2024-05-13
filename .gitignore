@@ -4,6 +4,5 @@
 .build
 .vscode
 .swiftpm
-.zed
 generated
 target

@@ -26,7 +26,7 @@
 
 #include "Sdf/textFileFormat.h"
 #include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include "Sdf/fileIO.h"
 #include "Sdf/fileIO_Common.h"

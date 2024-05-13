@@ -11,7 +11,7 @@ fn main() {
   compile_swift();
 
   // 3. Link to Swift library
-  println!("cargo:rustc-link-lib=static=swift-library");
+  println!("cargo:rustc-link-lib=static=rust-usd");
   println!(
     "cargo:rustc-link-search={}",
     swift_library_static_lib_dir().to_str().unwrap()
@@ -47,9 +47,22 @@ fn compile_swift() {
 
   let mut cmd = Command::new("swift");
 
-  cmd
-    .current_dir(swift_package_dir)
-    .arg("build");
+  cmd.current_dir(swift_package_dir)
+    .arg("build")
+    .args(&["--target", "rust-usd"])
+    .args(&["-Xswiftc", "-static"])
+    .args(&["-Xswiftc", "-emit-library"])
+    .args(&["-Xswiftc", "-o"])
+    .args(&["-Xswiftc", swift_library_static_lib_dir().join("librust-usd.a").to_str().unwrap()])
+    .args(&[
+      "-Xswiftc",
+      "-import-objc-header",
+      "-Xswiftc",
+      swift_source_dir()
+          .join("bridging-header.h")
+          .to_str()
+          .unwrap(),
+    ]);
 
   if is_release_build() {
     cmd.args(&["-c", "release"]);
@@ -83,7 +96,7 @@ fn is_release_build() -> bool {
 }
 
 fn swift_source_dir() -> PathBuf {
-  manifest_dir().join("Sources/RustUSD")
+  manifest_dir().join("Sources/rust-usd")
 }
 
 fn generated_code_dir() -> PathBuf {

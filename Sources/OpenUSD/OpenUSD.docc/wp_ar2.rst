@@ -91,16 +91,16 @@ and replaced with:
    ArIdentifier
    ArResolver::CreateIdentifier(
        const std::string& assetPath) const;
-   
+
    ArIdentifier
    ArResolver::CreateIdentifier(
        const ArIdentifier& anchorIdentifier,
        const std::string& assetPath) const;
-   
+
    ArIdentifier
    ArResolver::CreateIdentifierForNewAsset(
        const std::string& assetPath) const;
-   
+
    ArIdentifier
    ArResolver::CreateIdentifierForNewAsset(
        const ArIdentifier& anchorIdentifier,
@@ -180,7 +180,7 @@ The Resolve functions on :cpp:`ArResolver` will be modified to:
    ArResolvedPath Resolve(
        const ArIdentifier& identifier,
        ArAssetInfo* assetInfo = nullptr) const;
-   
+
    ArResolvedPath ResolveForNewAsset(
        const ArIdentifier& identifier,
        ArAssetInfo* assetInfo = nullptr) const;
@@ -285,11 +285,11 @@ added to :cpp:`ArResolver:`
    std::shared_ptr<ArWritableAsset>
    ArResolver::OpenAssetForUpdate(
        const ArResolvedPath& resolvedPath) const;
-   
+
    std::shared_ptr<ArWritableAsset>
    ArResolver::OpenAssetForReplace(
        const ArResolvedPath& resolvedPath) const;
-   
+
    /// \class ArWritableAsset
    /// Interface for writing to an asset.
    class ArWritableAsset
@@ -337,14 +337,14 @@ For example, a user might implement an :cpp:`HTTPResolver` that handles
    :caption: URI Resolver Example
 
    httpResolver.h/.cpp:
-   
+
    /// \class HTTPResolver
    /// ArResolver implementation handling http and https asset paths.
    class HTTPResolver : public ArResolver
    {
        // ... implementation!
    };
-   
+
    plugInfo.json:
    {
        "Plugins": [
@@ -383,7 +383,7 @@ specify credentials for retrieving assets from a web server:
 .. code-block:: cpp
 
    httpResolverContext.h/.cpp:
-   
+
    /// \class HTTPResolverContext
    /// Context object for use with ArResolverContext that provides extra
    /// information when resolving http and https asset paths.
@@ -401,7 +401,7 @@ A client could create a :cpp:`UsdStage` using these context objects like:
        HTTPResolverContext("user", "12345"),
        ArDefaultResolverContext({"/search/dir/1", "/search/dir/2"})
    });
-   
+
    UsdStage newStage = UsdStage::Open(..., ctx);
 
 Note that binding an :cpp:`ArResolverContext` via :cpp:`ArResolverContextBinder`
@@ -413,14 +413,14 @@ behavior ensures consistency, for example:
    ArResolverContext ctx_1({
        ArDefaultResolverContext({"/search/dir/3", "/search/dir/4"})
    });
-   
+
    ArResolverContext ctx_2({
        HTTPResolverContext("user", "12345"),
        ArDefaultResolverContext({"/search/dir/1", "/search/dir/2"})
    });
-   
+
    ArResolverContextBinder binder_2(ctx_2);
-   
+
    // Create a new UsdStage that will bind ctx_1 when resolving asset paths.
    // In particular, this means that the HTTPResolverContext specified in
    // ctx_2 should not be used when resolving asset paths on this stage,
@@ -444,7 +444,7 @@ implementation. To support this, a new function will be added to allow
    static ArResolverContext
    ArResolverContext::CreateFromString(
        const std::string& str);
-   
+
    static ArResolverContext
    ArResolverContext::CreateFromString(
        const std::vector<std::pair<std::string, std::string> >& strs);
@@ -487,7 +487,7 @@ default contexts will also be moved to :cpp:`ArResolverContext`.
 
    static ArResolverContext
    ArResolverContext::CreateDefault();
-   
+
    static ArResolverContext
    ArResolverContext::CreateDefaultForAsset(
        const std::string& assetPath);
@@ -555,175 +555,175 @@ change.
    public:
        ArIdentifier CreateIdentifier(
            const std::string& assetPath) const;
-   
+
        ArIdentifier CreateIdentifier(
            const ArIdentifier& anchorIdentifier,
            const std::string& assetPath) const;
-   
+
        ArIdentifier CreateIdentifierForNewAsset(
            const std::string& assetPath) const;
-   
+
        ArIdentifier CreateIdentifierForNewAsset(
            const ArIdentifier& anchorIdentifier,
            const std::string& assetPath) const;
-   
+
    protected:
        virtual ArIdentifier _CreateIdentifier(
            const std::string& assetPath) const = 0;
-   
+
        virtual ArIdentifier _CreateIdentifier(
            const ArIdentifier& anchorIdentifier,
            const std::string& assetPath) const = 0;
-   
+
        virtual ArIdentifier _CreateIdentifierForNewAsset(
            const std::string& assetPath) const = 0;
-   
+
        virtual ArIdentifier _CreateIdentifierForNewAsset(
            const ArIdentifier& anchorIdentifier,
            const std::string& assetPath) const = 0;
        /// @}
-   
+
        /// Resolve
        /// @{
    public:
        ArResolvedPath Resolve(
            const ArIdentifier& identifier,
            ArAssetInfo* assetInfo = nullptr) const;
-   
+
        /// By default this function is just a convenience wrapper that
        /// is equivalent to Resolve(CreateIdentifier(assetPath), assetInfo);
        ArResolvedPath Resolve(
            const std::string& assetPath,
            ArAssetInfo* assetInfo = nullptr) const;
-   
+
        ArResolvedPath ResolveForNewAsset(
            const ArIdentifier& identifier,
            ArAssetInfo* assetInfo = nullptr) const;
-   
+
        /// By default this function is just a convenience wrapper that
        /// is equivalent to Resolve(CreateIdentifierForNewAsset(assetPath), assetInfo);
        ArResolvedPath ResolveForNewAsset(
            const std::string& assetPath,
            ArAssetInfo* assetInfo = nullptr) const;
-   
+
    protected:
        virtual ArResolvedPath _Resolve(
            const std::string& assetPath
            ArAssetInfo* assetInfo) const
        { return _Resolve(CreateIdentifier(assetPath), assetInfo); }
-   
+
        virtual ArResolvedPath _Resolve(
            const ArIdentifier& identifier,
            ArAssetInfo* assetInfo) const = 0;
-   
+
        virtual ArResolvedPath _ResolveForNewAsset(
            const std::string& assetPath
            ArAssetInfo* assetInfo) const
        { return _ResolveForNewAsset(CreateIdentifierForNewAsset(assetPath), assetInfo); }
-   
+
        virtual ArResolvedPath _ResolveForNewAsset(
            const ArIdentifier& identifier,
            ArAssetInfo* assetInfo) const = 0;
-   
+
        /// @}
-   
+
        /// Asset Access and Metadata
        /// @{
    public:
        std::shared_ptr<ArAsset> OpenAsset(
            const ArResolvedPath& resolvedPath) const;
-   
+
        // By default returns NULL pointer to indicate that the
        // resolver has no write capabilities.
        std::shared_ptr<ArWritableAsset> OpenAssetForReplace(
            const ArResolvedPath& resolvedPath) const;
-   
+
        // By default returns NULL pointer to indicate that the
        // resolver has no write capabilities.
        std::shared_ptr<ArWritableAsset> OpenAssetForUpdate(
            const ArResolvedPath& resolvedPath) const;
-   
+
        std::string GetExtension(
            const ArResolvedPath& resolvedPath) const;
-   
+
        VtValue GetModificationTimestamp(
            const ArResolvedPath& resolvedPath) const;
-   
+
    protected:
        virtual std::shared_ptr<ArAsset> _OpenAsset(
            const ArResolvedPath& resolvedPath) const = 0;
-   
+
        virtual std::shared_ptr<ArWritableAsset> _OpenAssetForReplace(
            const ArResolvedPath& resolvedPath) const
        { return nullptr; }
-   
+
        virtual std::shared_ptr<ArWritableAsset> _OpenAssetForUpdate(
            const ArResolvedPath& resolvedPath) const
        { return nullptr; }
-   
+
        virtual std::string _GetExtension(
            const ArResolvedPath& resolvedPath) const = 0;
-   
+
        virtual VtValue _GetModificationTimestamp(
            const ArResolvedPath& resolvedPath) const = 0;
-   
+
        /// @}
-   
+
        /// Context Management
        /// @{
    public:
        void BindContext(
            const ArResolverContext& context,
            VtValue* bindingData);
-   
+
        void UnbindContext(
            const ArResolverContext& context,
            VtValue* bindingData);
-   
+
        void RefreshContext(
            const ArResolverContext& context);
-   
+
        ArResolverContext GetCurrentContext() const;
-   
+
    protected:
        virtual void _BindContext(
            const ArResolverContext& context,
            VtValue* bindingData) = 0;
-   
+
        virtual void _UnbindContext(
            const ArResolverContext& context,
            VtValue* bindingData) = 0;
-   
+
        virtual void _RefreshContext(
            const ArResolverContext& context) = 0;
-   
+
        virtual ArResolverContext _GetCurrentContext() const = 0;
-   
+
        // These functions are called by public API on ArResolverContext
        virtual ArResolverContext _CreateDefaultContext() const = 0;
        virtual ArResolverContext _CreateContextForAsset(
            const std::string& assetPath) const = 0;
        virtual ArResolverContext _CreateContextFromString(
            const std::string& configStr) const = 0;
-   
+
        /// @}
-   
+
        /// Scoped Caches
        /// @{
    public:
        void BeginCacheScope(
            VtValue* cacheScopeData);
-   
+
        void EndCacheScope(
            VtValue* cacheScopeData);
-   
+
    protected:
        virtual void BeginCacheScope(
            VtValue* cacheScopeData) = 0;
-   
+
        virtual void EndCacheScope(
            VtValue* cacheScopeData) = 0;
-   
+
        /// @}
    };
 
@@ -738,21 +738,21 @@ change.
        ArIdentifier(const ArIdentifier&);
        ArIdentifier(ArIdentifier&&);
        ~ArIdentifier();
-   
+
        ArIdentifier& operator=(const ArIdentifier&);
-       ArIdentifier& operator=(ArIdentifier&&); 
+       ArIdentifier& operator=(ArIdentifier&&);
        bool operator<(const ArIdentifier&) const;
        bool operator==(const ArIdentifier&) const;
-    
+
        // Return true if this identifier has a value, false if empty.
        explicit operator bool() const;
-    
+
        // Return the identifier's value.
        const std::string& GetValue() const;
    };
 
 .. code-block:: cpp
-   :caption: ar/resolvedPath.h
+   :caption: ArPrototypes/resolvedPath.h
 
    class ArResolvedPath
    {
@@ -761,16 +761,16 @@ change.
        ArResolvedPath(const ArResolvedPath&);
        ArResolvedPath(ArResolvedPath&&);
        ~ArResolvedPath();
-   
+
        ArResolvedPath& operator=(const ArResolvedPath&);
-       ArResolvedPath& operator=(ArResolvedPath&&); 
+       ArResolvedPath& operator=(ArResolvedPath&&);
        bool operator<(const ArResolvedPath&) const;
        bool operator==(const ArResolvedPath&) const;
-   
-   
+
+
        // Return true if this object has a non-empty resolved path, false otherwise.
        explicit operator bool() const;
-   
+
        // Return resolved path.
        const std::string& GetValue() const;
    };
@@ -788,15 +788,15 @@ change.
        static ArResolverContext CreateFromString(const std::string& configStr);
        static ArResolverContext CreateFromString(
            const std::vector<std::pair<std::string, std::string>>& configStr);
-   
-   
+
+
        ArResolverContext();
-   
-   
+
+
        template <class ... Context>
        ArResolverContext(const Context&... contexts);
-   
-   
+
+
        // ...
    };
 
@@ -809,4 +809,3 @@ change.
        virtual ~ArWritableAsset();
        virtual size_t Write(const void* buffer, size_t count, size_t offset) = 0;
    };
-

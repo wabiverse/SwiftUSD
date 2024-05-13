@@ -27,7 +27,6 @@
 #define AR_VERSION 2
 
 // ar
-#include <Ar/api.h>
 #include <Ar/asset.h>
 #include <Ar/assetInfo.h>
 #include <Ar/debugCodes.h>
@@ -42,7 +41,6 @@
 #include <Ar/notice.h>
 #include <Ar/packageResolver.h>
 #include <Ar/packageUtils.h>
-#include <Ar/resolvedPath.h>
 #include <Ar/resolver.h>
 #include <Ar/resolverContext.h>
 #include <Ar/resolverContextBinder.h>

@@ -610,7 +610,7 @@ public extension Usd.StageRefPtr
    *
    * This includes non-session sublayers, references and payloads.
    * Note that reloading anonymous layers clears their content, so
-   * invoking ``reload()`` on a stage constructed via 
+   * invoking ``reload()`` on a stage constructed via
    * ``__ObjC/Pixar/TfRefPtr<UsdStage>/createInMemory()`` will clear its
    * root layer.
    *

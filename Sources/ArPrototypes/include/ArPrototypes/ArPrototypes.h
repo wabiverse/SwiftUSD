@@ -1,5 +1,5 @@
 //
-// Copyright 2016 Pixar
+// Copyright 2020 Pixar
 //
 // Licensed under the Apache License, Version 2.0 (the "Apache License")
 // with the following modification; you may not use this file except in
@@ -21,17 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef PXR_USD_AR_DEBUG_CODES_H
-#define PXR_USD_AR_DEBUG_CODES_H
+#ifndef __PXR_USD_AR_PROTOTYPES_H__
+#define __PXR_USD_AR_PROTOTYPES_H__
 
-#include "ArPrototypes/api.h"
-#include "Tf/debug.h"
-#include <pxr/pxrns.h>
+#include <ArPrototypes/api.h>
+#include <ArPrototypes/resolvedPath.h>
 
-PXR_NAMESPACE_OPEN_SCOPE
-
-TF_DEBUG_CODES(AR_RESOLVER_INIT);
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // PXR_USD_AR_DEBUG_CODES_H
+#endif /* __PXR_USD_AR_PROTOTYPES_H__ */

@@ -30,7 +30,7 @@
 #include "Ar/defineResolver.h"
 #include "Ar/packageResolver.h"
 #include "Ar/packageUtils.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/threadLocalScopedCache.h"
 #include <pxr/pxrns.h>
 

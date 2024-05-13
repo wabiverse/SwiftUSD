@@ -156,7 +156,7 @@ extension Gf.Vec2d: Scalar
   {
     GetNormalized(eps)
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms

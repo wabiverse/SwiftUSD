@@ -24,7 +24,7 @@
 #ifndef PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H
 #define PXR_USD_AR_THREAD_LOCAL_SCOPED_CACHE_H
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include <pxr/pxrns.h>
 
 #include "Tf/diagnostic.h"

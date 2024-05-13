@@ -24,9 +24,9 @@
 #ifndef PXR_USD_AR_RESOLVED_PATH_H
 #define PXR_USD_AR_RESOLVED_PATH_H
 
-/// \file ar/resolvedPath.h
+/// \file ArPrototypes/resolvedPath.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Tf/hash.h"
 #include <pxr/pxrns.h>
 
@@ -37,14 +37,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \class ArResolvedPath
 /// Represents a resolved asset path.
 class ArResolvedPath {
-public:
+ public:
   /// Construct an ArResolvedPath holding the given \p resolvedPath.
-  explicit ArResolvedPath(const std::string &resolvedPath)
-      : _resolvedPath(resolvedPath) {}
+  explicit ArResolvedPath(const std::string &resolvedPath) : _resolvedPath(resolvedPath) {}
 
   /// \overload
-  explicit ArResolvedPath(std::string &&resolvedPath)
-      : _resolvedPath(std::move(resolvedPath)) {}
+  explicit ArResolvedPath(std::string &&resolvedPath) : _resolvedPath(std::move(resolvedPath)) {}
 
   ArResolvedPath() = default;
 
@@ -54,69 +52,111 @@ public:
   ArResolvedPath &operator=(const ArResolvedPath &rhs) = default;
   ArResolvedPath &operator=(ArResolvedPath &&rhs) = default;
 
-  bool operator==(const ArResolvedPath &rhs) const {
+  bool operator==(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath == rhs._resolvedPath;
   }
 
-  bool operator!=(const ArResolvedPath &rhs) const {
+  bool operator!=(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath != rhs._resolvedPath;
   }
 
-  bool operator<(const ArResolvedPath &rhs) const {
+  bool operator<(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath < rhs._resolvedPath;
   }
 
-  bool operator>(const ArResolvedPath &rhs) const {
+  bool operator>(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath > rhs._resolvedPath;
   }
 
-  bool operator<=(const ArResolvedPath &rhs) const {
+  bool operator<=(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath <= rhs._resolvedPath;
   }
 
-  bool operator>=(const ArResolvedPath &rhs) const {
+  bool operator>=(const ArResolvedPath &rhs) const
+  {
     return _resolvedPath >= rhs._resolvedPath;
   }
 
-  bool operator==(const std::string &rhs) const { return _resolvedPath == rhs; }
+  bool operator==(const std::string &rhs) const
+  {
+    return _resolvedPath == rhs;
+  }
 
-  bool operator!=(const std::string &rhs) const { return _resolvedPath != rhs; }
+  bool operator!=(const std::string &rhs) const
+  {
+    return _resolvedPath != rhs;
+  }
 
-  bool operator<(const std::string &rhs) const { return _resolvedPath < rhs; }
+  bool operator<(const std::string &rhs) const
+  {
+    return _resolvedPath < rhs;
+  }
 
-  bool operator>(const std::string &rhs) const { return _resolvedPath > rhs; }
+  bool operator>(const std::string &rhs) const
+  {
+    return _resolvedPath > rhs;
+  }
 
-  bool operator<=(const std::string &rhs) const { return _resolvedPath <= rhs; }
+  bool operator<=(const std::string &rhs) const
+  {
+    return _resolvedPath <= rhs;
+  }
 
-  bool operator>=(const std::string &rhs) const { return _resolvedPath >= rhs; }
+  bool operator>=(const std::string &rhs) const
+  {
+    return _resolvedPath >= rhs;
+  }
 
   /// Return hash value for this object.
-  size_t GetHash() const { return TfHash()(*this); }
+  size_t GetHash() const
+  {
+    return TfHash()(*this);
+  }
 
   /// Return true if this object is holding a non-empty resolved path,
   /// false otherwise.
-  explicit operator bool() const { return !IsEmpty(); }
+  explicit operator bool() const
+  {
+    return !IsEmpty();
+  }
 
   /// Return true if this object is holding an empty resolved path,
   /// false otherwise.
-  bool IsEmpty() const { return _resolvedPath.empty(); }
+  bool IsEmpty() const
+  {
+    return _resolvedPath.empty();
+  }
 
   /// Equivalent to IsEmpty. This exists primarily for backwards
   /// compatibility.
-  bool empty() const { return IsEmpty(); }
+  bool empty() const
+  {
+    return IsEmpty();
+  }
 
   /// Return the resolved path held by this object as a string.
-  operator const std::string &() const { return GetPathString(); }
+  operator const std::string &() const
+  {
+    return GetPathString();
+  }
 
   /// Return the resolved path held by this object as a string.
-  const std::string &GetPathString() const { return _resolvedPath; }
+  const std::string &GetPathString() const
+  {
+    return _resolvedPath;
+  }
 
-private:
+ private:
   std::string _resolvedPath;
 };
 
-template <class HashState>
-void TfHashAppend(HashState &h, const ArResolvedPath &p) {
+template<class HashState> void TfHashAppend(HashState &h, const ArResolvedPath &p)
+{
   h.Append(p.GetPathString());
 }
 

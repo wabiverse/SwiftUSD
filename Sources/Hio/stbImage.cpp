@@ -26,7 +26,7 @@
 #include "Hio/types.h"
 
 #include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
 // use gf types to read and write metadata

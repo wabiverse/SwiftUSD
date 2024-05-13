@@ -1,17 +1,19 @@
 fn main() {
-  let start_num = 100;
+  let mesh_type: u32 = 1;
 
-  println!("The Rust starting number is {}.", start_num);
+  println!("rust main: will convert a value of {} to a Ptex MeshType.", mesh_type);
 
-  let num = ffi::AlignMemorySize(start_num);
+  println!("converting to Ptex.MeshType in swift...");
 
-  println!("Printing the number from Rust...");
-  println!("The number is now {}.", num)
+  let mesh = ffi::Ptex_MeshType(mesh_type);
+
+  println!("swift sent back: {}", mesh);
+  println!("program successfully completed.");
 }
 
 #[swift_bridge::bridge]
 mod ffi {
   extern "Swift" {
-      fn AlignMemorySize(byteCount: i64) -> i64;
+      fn Ptex_MeshType(value: u32) -> u32;
   }
 }

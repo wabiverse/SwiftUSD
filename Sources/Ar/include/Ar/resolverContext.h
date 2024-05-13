@@ -26,7 +26,7 @@
 
 /// \file ar/resolverContext.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include <pxr/pxrns.h>
 
 #include "Tf/hash.h"

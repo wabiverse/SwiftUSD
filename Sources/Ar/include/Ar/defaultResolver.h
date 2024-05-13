@@ -26,9 +26,9 @@
 
 /// \file ar/defaultResolver.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Ar/defaultResolverContext.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 
@@ -72,7 +72,7 @@ public:
   virtual ~ArDefaultResolver();
 
   using ArSearchPathVec = std::vector<std::string>;
-  
+
   /// Set the default search path that will be used during asset
   /// resolution. This must be called before the first call
   /// to \ref ArGetResolver.

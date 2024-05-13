@@ -25,7 +25,7 @@
 #include "pxr/imaging/hio/types.h"
 
 #include "pxr/usd/ar/asset.h"
-#include "pxr/usd/ar/resolvedPath.h"
+#include "pxr/usd/ArPrototypes/resolvedPath.h"
 #include "pxr/usd/ar/resolver.h"
 
 // use gf types to read and write metadata

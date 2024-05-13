@@ -23,7 +23,7 @@
 #ifndef PXR_USD_AR_IN_MEMORY_ASSET_H
 #define PXR_USD_AR_IN_MEMORY_ASSET_H
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Ar/asset.h"
 #include <pxr/pxrns.h>
 

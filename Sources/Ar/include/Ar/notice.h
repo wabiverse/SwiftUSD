@@ -26,7 +26,7 @@
 
 #include <pxr/pxrns.h>
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Ar/resolverContext.h"
 
 #include "Tf/notice.h"

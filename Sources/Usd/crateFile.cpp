@@ -80,7 +80,7 @@
 #include "Work/withScopedParallelism.h"
 
 #include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
 #include "Sdf/assetPath.h"
@@ -280,7 +280,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 
@@ -381,7 +381,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 
@@ -4025,7 +4025,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 
@@ -4155,7 +4155,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 
@@ -4252,7 +4252,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 
@@ -4350,7 +4350,7 @@ xx(Matrix4d,       15, GfMatrix4d,        true)
 
 // These are array types, but are defined below, since the greatest enumerant
 // value must be last.
-// xx(TimeCode,       56, SdfTimeCode,       true)   
+// xx(TimeCode,       56, SdfTimeCode,       true)
 // xx(PathExpression, 57, SdfPathExpression, true)
 
 

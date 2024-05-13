@@ -25,7 +25,7 @@
 
 /// \file ar/filesystemAsset.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Ar/asset.h"
 #include "Ar/timestamp.h"
 #include <pxr/pxrns.h>

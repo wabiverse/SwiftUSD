@@ -23,7 +23,7 @@
 //
 #include "Usd/zipFile.h"
 #include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 

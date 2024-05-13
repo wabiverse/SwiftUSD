@@ -27,7 +27,7 @@
 #include "pxr/base/trace/trace.h"
 #include "pxr/usd/ar/asset.h"
 #include "pxr/usd/ar/resolver.h"
-#include "pxr/usd/ar/resolvedPath.h"
+#include "pxr/usd/ArPrototypes/resolvedPath.h"
 
 #include "openvdb/io/Stream.h"
 
@@ -153,7 +153,7 @@ HioOpenVDBGridsFromAsset(const std::string& assetPath)
 
     } else {
         // As a fallback, attempt to read the vdb grids from asset's buffer.
-        TRACE_FUNCTION_SCOPE("Reading VDB grids from ArAsset buffer");   
+        TRACE_FUNCTION_SCOPE("Reading VDB grids from ArAsset buffer");
         return _ReadVDBGridsFromAssetBuffer(asset);
     }
 }

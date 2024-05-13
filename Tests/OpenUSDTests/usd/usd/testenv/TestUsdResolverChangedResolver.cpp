@@ -29,7 +29,7 @@
 #include "pxr/usd/ar/defineResolverContext.h"
 #include "pxr/usd/ar/filesystemAsset.h"
 #include "pxr/usd/ar/notice.h"
-#include "pxr/usd/ar/resolvedPath.h"
+#include "pxr/usd/ArPrototypes/resolvedPath.h"
 #include "pxr/usd/ar/resolver.h"
 #include "pxr/usd/ar/timestamp.h"
 
@@ -74,12 +74,12 @@ public:
     {
         _pendingConfigNameToVersionMap[configName] = version;
     }
-    
+
     static const AssetNameToPathMap& GetAssetPathsForConfig(
         const std::string& configName)
     {
         static const AssetNameToPathMap empty;
-        const AssetNameToPathMap* result = 
+        const AssetNameToPathMap* result =
             TfMapLookupPtr(_configNameToAssetPathMap, configName);
         return result ? *result : empty;
     }
@@ -109,7 +109,7 @@ protected:
             if (assetPathMap.find(assetPathIn) != assetPathMap.end()) {
                 return assetPathIn;
             }
-            
+
             // Otherwise replace the {version} string and fall through.
             assetPath = TfStringReplace(
                 assetPathIn, "{version}", GetVersionForConfig(ctx->configName));
@@ -139,10 +139,10 @@ protected:
         if (const _TestResolverContext* ctx =
             _GetCurrentContextObject<_TestResolverContext>()) {
 
-            const AssetNameToPathMap& assetPathMap = 
+            const AssetNameToPathMap& assetPathMap =
                 GetAssetPathsForConfig(ctx->configName);
 
-            if (const std::string* filePath = 
+            if (const std::string* filePath =
                 TfMapLookupPtr(assetPathMap, assetPath)) {
                 return ArResolvedPath(TfAbsPath(*filePath));
             }
@@ -164,10 +164,10 @@ protected:
 
         bool didChange = false;
 
-        auto pendingMapIter = 
+        auto pendingMapIter =
             _pendingConfigNameToAssetPathMap.find(ctx->configName);
         if (pendingMapIter != _pendingConfigNameToAssetPathMap.end()) {
-            _configNameToAssetPathMap[ctx->configName] = 
+            _configNameToAssetPathMap[ctx->configName] =
                 std::move(pendingMapIter->second);
             _pendingConfigNameToAssetPathMap.erase(pendingMapIter);
             didChange = true;
@@ -230,7 +230,7 @@ protected:
     }
 
 private:
-    using _ConfigNameToAssetPathMap = 
+    using _ConfigNameToAssetPathMap =
         std::unordered_map<std::string, AssetNameToPathMap>;
     static _ConfigNameToAssetPathMap _configNameToAssetPathMap;
     static _ConfigNameToAssetPathMap _pendingConfigNameToAssetPathMap;

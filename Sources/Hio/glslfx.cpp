@@ -27,7 +27,7 @@
 #include "Hio/dictionary.h"
 
 #include "Ar/asset.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
 #include "Arch/systemInfo.h"

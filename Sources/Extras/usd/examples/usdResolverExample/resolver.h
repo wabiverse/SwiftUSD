@@ -25,7 +25,7 @@
 
 #include "Ar/asset.h"
 #include "Ar/resolver.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/writableAsset.h"
 #include "Vt/value.h"
 

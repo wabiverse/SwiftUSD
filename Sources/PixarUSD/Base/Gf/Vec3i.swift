@@ -128,7 +128,7 @@ extension Gf.Vec3i: Scalar
   {
     GetLengthSq()
   }
-  
+
   /// Returns an iterator over this scalar.
   ///
   /// Since this type can return its own iterator, it conforms

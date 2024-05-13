@@ -26,8 +26,8 @@
 
 /// \file ar/resolver.h
 
-#include "Ar/api.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/api.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolverContext.h"
 #include "Ar/timestamp.h"
 #include <pxr/pxrns.h>

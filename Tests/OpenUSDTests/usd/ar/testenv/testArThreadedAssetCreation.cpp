@@ -25,7 +25,7 @@
 
 #include "pxr/usd/ar/asset.h"
 #include "pxr/usd/ar/filesystemAsset.h"
-#include "pxr/usd/ar/resolvedPath.h"
+#include "pxr/usd/ArPrototypes/resolvedPath.h"
 #include "pxr/usd/ar/resolver.h"
 #include "pxr/usd/ar/defaultResolver.h"
 #include "pxr/usd/ar/writableAsset.h"

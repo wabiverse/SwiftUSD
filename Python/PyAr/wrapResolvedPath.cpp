@@ -23,7 +23,7 @@
 //
 #include <pxr/pxrns.h>
 
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"

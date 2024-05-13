@@ -31,7 +31,7 @@
 #include <pxr/pxrns.h>
 
 #include "Ar/assetInfo.h"
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"
 #include "Ar/resolverContext.h"
 #include "Vt/value.h"
 

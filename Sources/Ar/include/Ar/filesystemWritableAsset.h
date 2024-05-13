@@ -25,7 +25,7 @@
 
 /// \file ar/filesystemWritableAsset.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Ar/resolver.h"
 #include "Ar/writableAsset.h"
 #include <pxr/pxrns.h>

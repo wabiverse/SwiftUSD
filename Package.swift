@@ -53,7 +53,7 @@ let package = Package(
     // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
-      targets: ["Ar"]
+      targets: ["ArPrototypes", "Ar"]
     ),
     .library(
       name: "Kind",
@@ -214,6 +214,12 @@ let package = Package(
     .plugin(
       name: "UsdGenSchemaPlugin",
       targets: ["UsdGenSchemaPlugin"]
+    ),
+    // ------------- Rust USD -----
+    .library(
+      name: "rust-usd",
+      type: .static,
+      targets: ["rust-usd"]
     ),
     // ------- Monolithic USD -----
     .library(
@@ -395,8 +401,26 @@ let package = Package(
     ),
 
     .target(
+      name: "ArPrototypes",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Js"),
+        .target(name: "Plug"),
+        .target(name: "Vt"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
+        .define("MFB_PACKAGE_MODULE", to: "Ar"),
+        .define("AR_EXPORTS", to: "1")
+      ]
+    ),
+
+    .target(
       name: "Ar",
       dependencies: [
+        .target(name: "ArPrototypes"),
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Js"),
@@ -1230,619 +1254,6 @@ let package = Package(
       ]
     ),
 
-    .target(
-      name: "PyTf",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyTf",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Tf"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
-        .define("MFB_PACKAGE_MODULE", to: "Tf"),
-      ]
-    ),
-
-    .target(
-      name: "PyGf",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyGf",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Gf"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
-        .define("MFB_PACKAGE_MODULE", to: "Gf"),
-      ]
-    ),
-
-    .target(
-      name: "PyTrace",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyTrace",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Trace"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
-        .define("MFB_PACKAGE_MODULE", to: "Trace"),
-      ]
-    ),
-
-    .target(
-      name: "PyVt",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyVt",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Vt"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
-        .define("MFB_PACKAGE_MODULE", to: "Vt"),
-      ]
-    ),
-
-    .target(
-      name: "PyWork",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyWork",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Work"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
-        .define("MFB_PACKAGE_MODULE", to: "Work"),
-      ]
-    ),
-
-    .target(
-      name: "PyPlug",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyPlug",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Plug"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
-        .define("MFB_PACKAGE_MODULE", to: "Plug"),
-      ]
-    ),
-
-    .target(
-      name: "PyAr",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyAr",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Ar"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
-        .define("MFB_PACKAGE_MODULE", to: "Ar"),
-      ]
-    ),
-
-    .target(
-      name: "PyKind",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyKind",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Kind"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
-        .define("MFB_PACKAGE_MODULE", to: "Kind"),
-      ]
-    ),
-
-    .target(
-      name: "PySdf",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PySdf",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Sdf"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
-        .define("MFB_PACKAGE_MODULE", to: "Sdf"),
-      ]
-    ),
-
-    .target(
-      name: "PyPcp",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyPcp",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Pcp"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
-        .define("MFB_PACKAGE_MODULE", to: "Pcp"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsd",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsd",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Usd"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
-        .define("MFB_PACKAGE_MODULE", to: "Usd"),
-      ]
-    ),
-
-    .target(
-      name: "PyNdr",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyNdr",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Ndr"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
-        .define("MFB_PACKAGE_MODULE", to: "Ndr"),
-      ]
-    ),
-
-    .target(
-      name: "PySdr",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PySdr",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Sdr"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
-        .define("MFB_PACKAGE_MODULE", to: "Sdr"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdGeom",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdGeom",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdShade",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdShade",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdShade"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdLux",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdLux",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdLux"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdHydra",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdHydra",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
-      ]
-    ),
-
-    .target(
-      name: "PySdrOsl",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PySdrOsl",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
-        .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
-        .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdAbc",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdAbc",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdDraco",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdDraco",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdMedia",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdMedia",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdMtlx",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdMtlx",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdMtlx"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdPhysics",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdPhysics",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdProc",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdProc",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdProc"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdRender",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdRender",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdRender"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdRi",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdRi",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdRi"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdSkel",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdSkel",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdUI",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdUI",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdUI"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdUtils",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdUtils",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdVol",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdVol",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdVol"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
-      ]
-    ),
-
-    .target(
-      name: "PyUsdShaders",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyUsdShaders",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
-        .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
-      ]
-    ),
-
-    .target(
-      name: "PyCameraUtil",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyCameraUtil",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
-        .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
-      ]
-    ),
-
-    .target(
-      name: "PyPxOsd",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyPxOsd",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "PxOsd"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
-        .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
-      ]
-    ),
-
-    .target(
-      name: "PyGarch",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyGarch",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Garch"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
-        .define("MFB_PACKAGE_MODULE", to: "Garch"),
-      ]
-    ),
-
-    .target(
-      name: "PyGlf",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyGlf",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Glf"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
-        .define("MFB_PACKAGE_MODULE", to: "Glf"),
-      ]
-    ),
-
-    .target(
-      name: "PyGeomUtil",
-      dependencies: [
-        .target(name: "PixarUSD"),
-      ],
-      path: "Python/PyGeomUtil",
-      resources: [
-        .process("Resources"),
-      ],
-      publicHeadersPath: "include",
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "GeomUtil"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
-        .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
-      ]
-    ),
-
     .executableTarget(
       name: "UsdView",
       dependencies: [
@@ -1896,6 +1307,17 @@ let package = Package(
     ),
 
     .target(
+      name: "rust-usd",
+      dependencies: [
+        .product(name: "Ptex", package: "MetaverseKit"),
+        .target(name: "pxr"),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]
+    ),
+      
+    .target(
       name: "PixarUSD",
       dependencies: [
         // ---------- base. ------
@@ -1908,6 +1330,7 @@ let package = Package(
         .target(name: "Work"),
         .target(name: "Plug"),
         // ----------- usd. ------
+        .target(name: "ArPrototypes"),
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),
@@ -2038,6 +1461,631 @@ enum Arch
 
     enum Python
     {
+      public static func targets(enabled: Bool = false) -> [Target]
+      {
+        if enabled
+        {
+          [
+            .target(
+              name: "PyTf",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyTf",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Tf"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
+                .define("MFB_PACKAGE_MODULE", to: "Tf"),
+              ]
+            ),
+
+            .target(
+              name: "PyGf",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyGf",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Gf"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
+                .define("MFB_PACKAGE_MODULE", to: "Gf"),
+              ]
+            ),
+
+            .target(
+              name: "PyTrace",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyTrace",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Trace"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
+                .define("MFB_PACKAGE_MODULE", to: "Trace"),
+              ]
+            ),
+
+            .target(
+              name: "PyVt",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyVt",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Vt"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
+                .define("MFB_PACKAGE_MODULE", to: "Vt"),
+              ]
+            ),
+
+            .target(
+              name: "PyWork",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyWork",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Work"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
+                .define("MFB_PACKAGE_MODULE", to: "Work"),
+              ]
+            ),
+
+            .target(
+              name: "PyPlug",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyPlug",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Plug"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
+                .define("MFB_PACKAGE_MODULE", to: "Plug"),
+              ]
+            ),
+
+            .target(
+              name: "PyAr",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyAr",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Ar"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
+                .define("MFB_PACKAGE_MODULE", to: "Ar"),
+              ]
+            ),
+
+            .target(
+              name: "PyKind",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyKind",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Kind"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
+                .define("MFB_PACKAGE_MODULE", to: "Kind"),
+              ]
+            ),
+
+            .target(
+              name: "PySdf",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PySdf",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Sdf"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
+                .define("MFB_PACKAGE_MODULE", to: "Sdf"),
+              ]
+            ),
+
+            .target(
+              name: "PyPcp",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyPcp",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Pcp"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
+                .define("MFB_PACKAGE_MODULE", to: "Pcp"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsd",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsd",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Usd"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
+                .define("MFB_PACKAGE_MODULE", to: "Usd"),
+              ]
+            ),
+
+            .target(
+              name: "PyNdr",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyNdr",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Ndr"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
+                .define("MFB_PACKAGE_MODULE", to: "Ndr"),
+              ]
+            ),
+
+            .target(
+              name: "PySdr",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PySdr",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Sdr"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
+                .define("MFB_PACKAGE_MODULE", to: "Sdr"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdGeom",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdGeom",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdShade",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdShade",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdShade"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdLux",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdLux",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdLux"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdHydra",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdHydra",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
+              ]
+            ),
+
+            .target(
+              name: "PySdrOsl",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PySdrOsl",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "SdrOsl"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "SdrOsl"),
+                .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
+                .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdAbc",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdAbc",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdDraco",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdDraco",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdMedia",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdMedia",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdMtlx",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdMtlx",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdMtlx"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdPhysics",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdPhysics",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdProc",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdProc",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdProc"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdRender",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdRender",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdRender"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdRi",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdRi",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdRi"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdSkel",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdSkel",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdUI",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdUI",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdUI"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdUtils",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdUtils",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdVol",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdVol",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdVol"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
+              ]
+            ),
+
+            .target(
+              name: "PyUsdShaders",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyUsdShaders",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
+                .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
+              ]
+            ),
+
+            .target(
+              name: "PyCameraUtil",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyCameraUtil",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
+                .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
+              ]
+            ),
+
+            .target(
+              name: "PyPxOsd",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyPxOsd",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "PxOsd"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
+                .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
+              ]
+            ),
+
+            .target(
+              name: "PyGarch",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyGarch",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Garch"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
+                .define("MFB_PACKAGE_MODULE", to: "Garch"),
+              ]
+            ),
+
+            .target(
+              name: "PyGlf",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyGlf",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "Glf"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
+                .define("MFB_PACKAGE_MODULE", to: "Glf"),
+              ]
+            ),
+
+            .target(
+              name: "PyGeomUtil",
+              dependencies: [
+                .target(name: "PixarUSD"),
+              ],
+              path: "Python/PyGeomUtil",
+              resources: [
+                .process("Resources"),
+              ],
+              publicHeadersPath: "include",
+              cxxSettings: [
+                .define("MFB_PACKAGE_NAME", to: "GeomUtil"),
+                .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
+                .define("MFB_PACKAGE_MODULE", to: "GeomUtil")
+              ]
+            )
+          ]
+        }
+        else
+        {
+          []
+        }
+      }
+
       public static func products(enabled: Bool = false) -> [Product]
       {
         if enabled

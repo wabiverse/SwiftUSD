@@ -131,13 +131,13 @@ extension Gf.Matrix4d: SIMD
   public var scalarCount: Int { 16 }
 
   public subscript(index: Int) -> Self.Scalar
-  { 
+  {
     get
     {
       getArray()[index]
     }
 
-    set 
+    set
     {
       dataMutating()[index] = Scalar(newValue)
     }

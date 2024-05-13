@@ -1,0 +1,31 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific
+// settings, see the documentation:
+// https://zed.dev/docs/configuring-zed#folder-specific-settings
+{
+  "file_types": {
+    "C++": ["c", "h", "cpp", "hpp"]
+  },
+  "language_overrides": {
+    "C++": {
+      "format_on_save": "on",
+      "preferred_line_length": 99,
+      "formatter": {
+        "external": {
+          "command": "clang-format",
+          "arguments": ["-style=file"]
+        }
+      }
+    },
+    "Swift": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "swiftformat",
+          "arguments": ["--config", ".swiftformat", "--output", "stdout"]
+        }
+      }
+    }
+  }
+}

@@ -23,4 +23,4 @@
 //
 #include <pxr/pxrns.h>
 
-#include "Ar/resolvedPath.h"
+#include "ArPrototypes/resolvedPath.h"

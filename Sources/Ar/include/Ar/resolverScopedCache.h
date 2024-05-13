@@ -26,7 +26,7 @@
 
 /// \file ar/resolverScopedCache.h
 
-#include "Ar/api.h"
+#include "ArPrototypes/api.h"
 #include "Vt/value.h"
 #include <pxr/pxrns.h>
 
