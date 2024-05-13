@@ -20,160 +20,199 @@ let package = Package(
     // ----------- Pixar.Base -----
     .library(
       name: "Arch",
+      type: .dynamic,
       targets: ["Arch"]
     ),
     .library(
       name: "Tf",
+      type: .dynamic,
       targets: ["Tf"]
     ),
     .library(
       name: "Js",
+      type: .dynamic,
       targets: ["Js"]
     ),
     .library(
       name: "Gf",
+      type: .dynamic,
       targets: ["Gf"]
     ),
     .library(
       name: "Trace",
+      type: .dynamic,
       targets: ["Trace"]
     ),
     .library(
       name: "Vt",
+      type: .dynamic,
       targets: ["Vt"]
     ),
     .library(
       name: "Work",
+      type: .dynamic,
       targets: ["Work"]
     ),
     .library(
       name: "Plug",
+      type: .dynamic,
       targets: ["Plug"]
     ),
     // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
+      type: .dynamic,
       targets: ["Ar"]
     ),
     .library(
       name: "Kind",
+      type: .dynamic,
       targets: ["Kind"]
     ),
     .library(
       name: "Sdf",
+      type: .dynamic,
       targets: ["Sdf"]
     ),
     .library(
       name: "Pcp",
+      type: .dynamic,
       targets: ["Pcp"]
     ),
     .library(
       name: "Usd",
+      type: .dynamic,
       targets: ["Usd"]
     ),
     .library(
       name: "Ndr",
+      type: .dynamic,
       targets: ["Ndr"]
     ),
     .library(
       name: "Sdr",
+      type: .dynamic,
       targets: ["Sdr"]
     ),
     .library(
       name: "UsdGeom",
+      type: .dynamic,
       targets: ["UsdGeom"]
     ),
     .library(
       name: "UsdShade",
+      type: .dynamic,
       targets: ["UsdShade"]
     ),
     .library(
       name: "UsdLux",
+      type: .dynamic,
       targets: ["UsdLux"]
     ),
     .library(
       name: "UsdHydra",
+      type: .dynamic,
       targets: ["UsdHydra"]
     ),
     .library(
       name: "SdrOsl",
+      type: .dynamic,
       targets: ["SdrOsl"]
     ),
     .library(
       name: "UsdAbc",
+      type: .dynamic,
       targets: ["UsdAbc"]
     ),
     .library(
       name: "UsdDraco",
+      type: .dynamic,
       targets: ["UsdDraco"]
     ),
     .library(
       name: "UsdMedia",
+      type: .dynamic,
       targets: ["UsdMedia"]
     ),
     .library(
       name: "UsdMtlx",
+      type: .dynamic,
       targets: ["UsdMtlx"]
     ),
     .library(
       name: "UsdPhysics",
+      type: .dynamic,
       targets: ["UsdPhysics"]
     ),
     .library(
       name: "UsdProc",
+      type: .dynamic,
       targets: ["UsdProc"]
     ),
     .library(
       name: "UsdRender",
+      type: .dynamic,
       targets: ["UsdRender"]
     ),
     .library(
       name: "UsdRi",
+      type: .dynamic,
       targets: ["UsdRi"]
     ),
     .library(
       name: "UsdSkel",
+      type: .dynamic,
       targets: ["UsdSkel"]
     ),
     .library(
       name: "UsdUI",
+      type: .dynamic,
       targets: ["UsdUI"]
     ),
     .library(
       name: "UsdUtils",
+      type: .dynamic,
       targets: ["UsdUtils"]
     ),
     .library(
       name: "UsdVol",
+      type: .dynamic,
       targets: ["UsdVol"]
     ),
     // -------- Pixar.Imaging -----
     .library(
       name: "CameraUtil",
+      type: .dynamic,
       targets: ["CameraUtil"]
     ),
     .library(
       name: "Hf",
+      type: .dynamic,
       targets: ["Hf"]
     ),
     .library(
       name: "PxOsd",
+      type: .dynamic,
       targets: ["PxOsd"]
     ),
     .library(
       name: "Hd",
+      type: .dynamic,
       targets: ["Hd"]
     ),
     .library(
       name: "Garch",
+      type: .dynamic,
       targets: ["Garch"]
     ),
     .library(
       name: "Hgi",
+      type: .dynamic,
       targets: ["Hgi"]
     ),
     .library(
       name: "HgiMetal",
+      type: .dynamic,
       targets: ["HgiMetal"]
     ),
     // .library(
@@ -182,22 +221,27 @@ let package = Package(
     // ),
     .library(
       name: "HgiGL",
+      type: .dynamic,
       targets: ["HgiGL"]
     ),
     .library(
       name: "HgiInterop",
+      type: .dynamic,
       targets: ["HgiInterop"]
     ),
     .library(
       name: "Hio",
+      type: .dynamic,
       targets: ["Hio"]
     ),
     .library(
       name: "Glf",
+      type: .dynamic,
       targets: ["Glf"]
     ),
     .library(
       name: "GeomUtil",
+      type: .dynamic,
       targets: ["GeomUtil"]
     ),
     // ----- Pixar.UsdImaging -----
