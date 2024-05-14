@@ -1,5 +1,5 @@
 {
-  "originHash" : "59d39886eac8e047522fd0eb91f9c70a7efd2b41edc15bcf020f8ba5a2e51594",
+  "originHash" : "a3659916019ba6187983ff25cb7c2b3ec9c6924435e3ee3a876876fdef2d9e52",
   "pins" : [
     {
       "identity" : "aexml",
@@ -69,14 +69,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pvieito/PythonKit.git",
       "state" : {
-        "revision" : "41dd1e76bb31661f59efbc1784e8f60ccc32a9d5",
-        "version" : "0.4.1"
+        "revision" : "6fd4817e33c31a57760e285228ef8f81cd359062",
+        "version" : "0.4.2"
       }
     },
     {
       "identity" : "rainbow",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/onevcat/Rainbow",
+      "location" : "https://github.com/onevcat/Rainbow.git",
       "state" : {
         "revision" : "626c3d4b6b55354b4af3aa309f998fae9b31a3d9",
         "version" : "3.2.0"
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "e593aba2c6222daad7c4f2732a431eed2c09bb07",
-        "version" : "1.3.0"
+        "revision" : "8d712376c99fc0267aa0e41fea732babe365270a",
+        "version" : "1.3.3"
       }
     },
     {
@@ -240,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b13b1d1a8e787a5ffc71ac19dcaf52183ab27ba2",
-        "version" : "1.1.1"
+        "revision" : "6f30bdba373bbd7fbfe241dddd732651f2fbd1e2",
+        "version" : "1.1.2"
       }
     },
     {
@@ -249,8 +249,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/Yams.git",
       "state" : {
-        "revision" : "0d9ee7ea8c4ebd4a489ad7a73d5c6cad55d6fed3",
-        "version" : "5.0.6"
+        "revision" : "9234124cff5e22e178988c18d8b95a8ae8007f76",
+        "version" : "5.1.2"
       }
     }
   ],
