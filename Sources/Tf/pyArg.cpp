@@ -86,7 +86,7 @@ std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
   }
 
   if (numArgs > numExpectedArgs) {
-    rval.first = tuple(args[slice(numExpectedArgs, numArgs)]);
+    rval.first = tuple(args.slice(numExpectedArgs, numArgs));
   }
 
   return rval;
