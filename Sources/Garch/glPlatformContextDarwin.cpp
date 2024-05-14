@@ -47,7 +47,8 @@ class GarchNSGLContextState::Detail
 public:
   Detail()
   {
-    context = NSGLContext::currentContext();
+    //NSGLContext::currentContext();
+    context = nil;
   }
   Detail(NullState)
   {
@@ -100,14 +101,14 @@ void GarchNSGLContextState::MakeCurrent()
 #if ARCH_OS_IOS
   EAGLContext::setCurrentContext(_detail->context);
 #else
-  _detail->context->makeCurrentContext();
+  //_detail->context->makeCurrentContext();
 #endif
 }
 
 /// Make no context current.
 void GarchNSGLContextState::DoneCurrent()
 {
-  NSGLContext::clearCurrentContext();
+  //NSGLContext::clearCurrentContext();
 }
 
 GarchGLPlatformContextState
@@ -126,8 +127,10 @@ GarchSelectCoreProfileMacVisual()
   attribs[c++] = NSGL::OpenGLPixelFormatAttribute::OpenGLProfileVersion3_2Core;
   attribs[c++] = NSGL::OpenGLPixelFormatAttribute::OpenGLPFADoubleBuffer;
   attribs[c++] = static_cast<NSGL::OpenGLPixelFormatAttribute>(0);
+  
+  //NSGL::OpenGLPixelFormat::alloc()->init(attribs);
 
-  return NSGL::OpenGLPixelFormat::alloc()->init(attribs);
+  return nil;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
