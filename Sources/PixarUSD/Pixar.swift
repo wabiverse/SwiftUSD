@@ -31,6 +31,8 @@
 import CxxStdlib
 @_exported import pxr
 
+public typealias Pixar = pxrInternal_v0_23__pxrReserved__
+
 /* --- xxx --- */
 
 public extension Pixar
