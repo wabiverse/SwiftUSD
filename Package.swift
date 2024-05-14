@@ -334,7 +334,7 @@ let package = Package(
     .target(
       name: "Tf",
       dependencies: [
-        .target(name: "Arch"),
+        .product(name: "Arch"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Tf"),
@@ -347,8 +347,8 @@ let package = Package(
     .target(
       name: "Js",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Js"),
@@ -361,8 +361,8 @@ let package = Package(
     .target(
       name: "Gf",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Gf"),
@@ -375,9 +375,9 @@ let package = Package(
     .target(
       name: "Trace",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Js"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Js"),
       ],
       cxxSettings: [
         /* --------- Fix missing TBB allocator funcs. --------- */
@@ -393,10 +393,10 @@ let package = Package(
     .target(
       name: "Vt",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Gf"),
-        .target(name: "Trace"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Gf"),
+        .product(name: "Trace"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Vt"),
@@ -409,9 +409,9 @@ let package = Package(
     .target(
       name: "Work",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Trace"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Trace"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Work"),
@@ -424,11 +424,11 @@ let package = Package(
     .target(
       name: "Plug",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Js"),
-        .target(name: "Trace"),
-        .target(name: "Work"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Js"),
+        .product(name: "Trace"),
+        .product(name: "Work"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Plug"),
@@ -441,11 +441,11 @@ let package = Package(
     .target(
       name: "Ar",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Js"),
-        .target(name: "Plug"),
-        .target(name: "Vt"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Js"),
+        .product(name: "Plug"),
+        .product(name: "Vt"),
       ],
       resources: [
         .process("Resources"),
@@ -461,9 +461,9 @@ let package = Package(
     .target(
       name: "Kind",
       dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Plug"),
+        .product(name: "Arch"),
+        .product(name: "Tf"),
+        .product(name: "Plug"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Kind"),
@@ -1018,9 +1018,9 @@ let package = Package(
     .target(
       name: "Hf",
       dependencies: [
-        .target(name: "Plug"),
-        .target(name: "Tf"),
-        .target(name: "Trace"),
+        .product(name: "Plug"),
+        .product(name: "Tf"),
+        .product(name: "Trace"),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "Hf"),
