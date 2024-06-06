@@ -231,3 +231,8 @@ on in - checkout [**swift-sh**](https://github.com/mxcl/swift-sh)!
 > Swift is an open source programming language that is fully supported across **Linux** and [**Swift on Server**](https://www.swift.org/server/), the entire **Apple** family of devices: **macOS**, **visionOS**, **iOS**, **tvOS**, **watchOS**, as well as support for **Microsoft Windows**. To learn more about Swift, please visit [swift.org](https://www.swift.org).
 
 <br>
+
+<hr/>
+
+###### *if you can `mmap` a **pixel**, you can `mmap` a **metaverse**.*
+###### SwiftUSD is licensed under the terms of the Apache 2.0 License.
