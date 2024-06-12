@@ -64,7 +64,11 @@ struct UsdView: PixarApp
   public init()
   {
     /* Setup all usd resources (python, plugins, resources). */
-    Pixar.Bundler.shared.setup(.resources)
+    #if os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
+      Pixar.Bundler.shared.setup(.resources, installPlugins: true)
+    #else
+      Pixar.Bundler.shared.setup(.resources, installPlugins: false)
+    #endif
 
     #if canImport(PyBundle)
       /* embed & init python. */
@@ -86,9 +90,12 @@ struct UsdView: PixarApp
     {
       WindowGroup("UsdView", id: "usdview")
       {
-        Text("UsdView Under Construction...")
-          .font(.system(size: 24, weight: .black))
-          .padding()
+        VStack
+        {
+          Text("UsdView Under Construction...")
+            .font(.system(size: 24, weight: .black))
+            .padding()
+        }
       }
     }
   #else /* canImport(SwiftUI) */
@@ -114,7 +121,7 @@ struct UsdView: PixarApp
 
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
 
-    let stage = Usd.Stage.createNew("HelloPixarUSD", ext: .usda)
+    let stage = Usd.Stage.createNew("\(documentsDirPath())/HelloPixarUSD", ext: .usda)
 
     let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
     xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))
@@ -161,7 +168,7 @@ struct UsdView: PixarApp
 
     /* ----- Declarative api example. ----- */
 
-    USDStage("DeclarativePixarUSD", ext: .usda)
+    USDStage("\(documentsDirPath())/DeclarativePixarUSD", ext: .usda)
     {
       USDPrim("DeclarativeScene")
       {
@@ -213,6 +220,16 @@ public enum ShadeColor: String, CaseIterable
       case .black: GfVec3f(0.2, 0.2, 0.2)
     }
   }
+}
+
+public func documentsDirPath() -> String
+{
+  #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    return paths[0].path
+  #else
+    return "."
+  #endif
 }
 
 /**

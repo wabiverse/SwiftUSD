@@ -347,16 +347,16 @@ public extension Pixar
       fileManager = FileManager.default
     }
 
-    public func setup(_ kind: BundleKind)
+    public func setup(_ kind: BundleKind, installPlugins: Bool = false)
     {
       switch kind
       {
         case .resources:
-          resourcesInit()
+          resourcesInit(installPlugins: installPlugins)
       }
     }
 
-    private func resourcesInit()
+    private func resourcesInit(installPlugins: Bool)
     {
       /* ?. Toggle app bundling help in console. */
       var showHelp = false
@@ -370,7 +370,7 @@ public extension Pixar
       { path in
 
         #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-          let doInstallPlugs = !path.contains(".app") && !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil)
+          let doInstallPlugs = installPlugins || (!path.contains(".app") && !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil))
         #else /* os(Linux) */
           let doInstallPlugs = true
         #endif /* os(Linux) */
