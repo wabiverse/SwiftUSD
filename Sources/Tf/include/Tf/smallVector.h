@@ -159,7 +159,7 @@ public:
   /// \name Relevant Typedefs.
   /// @{
 
-  typedef T value_type;
+  using value_type = T;
   typedef T &reference;
   typedef const T &const_reference;
 

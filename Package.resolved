@@ -1,5 +1,5 @@
 {
-  "originHash" : "59d39886eac8e047522fd0eb91f9c70a7efd2b41edc15bcf020f8ba5a2e51594",
+  "originHash" : "70deee79ee16663ba73e566e36333e17fe8cabc7bda0e29b00e27b0a2dd99652",
   "pins" : [
     {
       "identity" : "aexml",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "revision" : "736a3abc651e298576bc3574849b55c500128b16",
-        "version" : "1.7.2"
+        "revision" : "a149db49b58fc135b7339c9a7ce4f0f0e382bcc1",
+        "version" : "1.7.3"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaversePythonFramework",
       "state" : {
-        "revision" : "fc6d15f768b0a675207aecea248bd4f63f4c4133",
-        "version" : "3.11.6"
+        "revision" : "e2f4ba867b7e287a283a27a0005ab64deef14279",
+        "version" : "3.11.7"
       }
     },
     {

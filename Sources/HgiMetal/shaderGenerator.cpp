@@ -379,7 +379,7 @@ namespace
       header << "#define METAL_FEATURESET_IOS_GPUFAMILY1_v5\n";
     }
 
-    if (device->supportsFeatureSet(MTL::FeatureSet_iOS_GPUFamily2_v5)
+    if (device->supportsFeatureSet(MTL::FeatureSet_iOS_GPUFamily2_v5))
     {
       header << "#define METAL_FEATURESET_IOS_GPUFAMILY2_v5\n";
     }

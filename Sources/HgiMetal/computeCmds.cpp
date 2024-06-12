@@ -123,7 +123,7 @@ void HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
   uint32_t exeWidth = _pipelineState->GetMetalPipelineState()->threadExecutionWidth();
 
   uint32_t thread_width, thread_height;
-  thread_width = MIN(maxTotalThreads, exeWidth);
+  thread_width = maxTotalThreads < exeWidth ? maxTotalThreads : exeWidth;
   if (dimY == 1)
   {
     thread_height = 1;
@@ -141,8 +141,9 @@ void HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
   }
 
   _encoder->dispatchThreads(MTL::Size::Make(dimX, dimY, 1),
-                            MTL::Size::Make(MIN(thread_width, dimX),
-                                            MIN(thread_height, dimY), 1));
+                            MTL::Size::Make(thread_width < dimX ? thread_width : dimX,
+                                            thread_height < dimY ? thread_height : dimY,
+                                            1));
 
   _hasWork = true;
   _argumentBuffer = nil;

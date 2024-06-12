@@ -78,7 +78,7 @@ public:
     {
         SdfPath primPath;
         
-        RemovedPrimEntry(const SdfPath &primPath)
+        RemovedPrimEntry(const SdfPath &primPath = SdfPath())
         : primPath(primPath)
         {}
     };
@@ -98,8 +98,8 @@ public:
         HdDataSourceLocatorSet dirtyLocators;
 
         DirtiedPrimEntry(
-            const SdfPath &primPath,
-            const HdDataSourceLocatorSet &dirtyLocators)
+            const SdfPath &primPath = SdfPath(),
+            const HdDataSourceLocatorSet &dirtyLocators = HdDataSourceLocatorSet())
         : primPath(primPath)
         , dirtyLocators(dirtyLocators)
         {}
@@ -116,8 +116,8 @@ public:
         SdfPath oldPrimPath;
         SdfPath newPrimPath;
         RenamedPrimEntry(
-            const SdfPath &oldPrimPath,
-            const SdfPath &newPrimPath)
+            const SdfPath &oldPrimPath = SdfPath(),
+            const SdfPath &newPrimPath = SdfPath())
         : oldPrimPath(oldPrimPath)
         , newPrimPath(newPrimPath)
         {}

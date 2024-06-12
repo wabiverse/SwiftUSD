@@ -228,7 +228,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.2"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.3"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -1062,7 +1062,7 @@ let package = Package(
         .define("GARCH_EXPORTS", to: "1"),
       ],
       linkerSettings: [
-        .linkedFramework("OpenGL", .when(platforms: Arch.OS.apple.platform)),
+        .linkedFramework("OpenGL", .when(platforms: [.macOS, .iOS])),
         .linkedLibrary("glut", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GL", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GLU", .when(platforms: Arch.OS.linux.platform)),
@@ -1316,7 +1316,7 @@ let package = Package(
         .interoperabilityMode(.Cxx),
       ]
     ),
-      
+
     .target(
       name: "PixarUSD",
       dependencies: [
