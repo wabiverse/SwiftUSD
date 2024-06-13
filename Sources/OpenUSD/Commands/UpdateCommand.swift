@@ -62,17 +62,87 @@ struct UpdateCommand: AsyncCommand
 
   func wrappedRun() async throws
   {
-    var packageDirectory: URL?
+    var packageDirectory: URL = URL(fileURLWithPath: ".")
 
     // Start timing
     let elapsed = try await Stopwatch.time
     {
-      packageDirectory = arguments.packageDirectory ?? URL(fileURLWithPath: ".")
+      if let pkgDir = arguments.packageDirectory
+      {
+        packageDirectory = pkgDir
+      }
+
+      // 1. clone the pixar usd repository.
+      try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/USD.git", "\(packageDirectory.path)/.build/OpenUSD"])
+
+      // 2. loop pxr.base and copy respective library source to Sources/**.
+      try Pxr.base.enumerate(packagePath: packageDirectory.path)
+
+      // 3. loop pxr.imaging and copy respective library source to Sources/**.
+      try Pxr.imaging.enumerate(packagePath: packageDirectory.path)
+
+      // 4. loop pxr.usd and copy respective library source to Sources/**.
+      try Pxr.usd.enumerate(packagePath: packageDirectory.path)
+
+      // 5. loop pxr.usdImaging and copy respective library source to Sources/**.
+      try Pxr.usdImaging.enumerate(packagePath: packageDirectory.path)
     }
 
     // Output the time elapsed and app bundle location
     log.info(
-      "Done in \(elapsed.secondsString). USD source updated at '\(packageDirectory?.relativePath ?? "unknown")'"
+      "Done in \(elapsed.secondsString). USD source updated at '\(packageDirectory.relativePath)'"
     )
+  }
+}
+
+func path(from enumerated: NSEnumerator.Element) -> String
+{
+  return enumerated as? String ?? ""
+}
+
+public enum Pxr: String
+{
+  case base
+  case imaging
+  case usd
+  case usdImaging
+
+  public func enumerate(packagePath: String) throws
+  {
+    var list: NSEnumerator? = nil
+
+    switch self
+    {
+      case .base:
+        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/base")
+      case .imaging:
+        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/imaging")
+      case .usd:
+        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/usd")
+      case .usdImaging:
+        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/usdImaging")
+    }
+
+    try list?.forEach
+    { pxrPath in
+      let suffix = path(from: pxrPath).split(separator: "pxr/\(rawValue)/").last ?? ""
+      let target = (suffix.split(separator: "/").first ?? "").capitalized
+
+      let source = URL(fileURLWithPath: path(from: pxrPath))
+      let cxxDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(source.lastPathComponent)")
+      let hppDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(source.lastPathComponent)")
+
+      // copy source files to destination (Sources/Target/*)
+      if ["cpp", "cc", "c", "cxx"].contains(source.pathExtension)
+      {
+        try FileManager.default.moveItem(at: source, to: cxxDestination) 
+      }
+
+      // copy header files to destination (Sources/Target/include/Target/*)
+      if ["h", "hpp", "hxx"].contains(source.pathExtension)
+      {
+        try FileManager.default.moveItem(at: source, to: hppDestination)
+      }
+    }
   }
 }
