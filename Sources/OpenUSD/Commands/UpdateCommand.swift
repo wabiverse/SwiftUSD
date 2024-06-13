@@ -31,7 +31,10 @@
 import ArgumentParser
 import Foundation
 
-/// The subcommand for creating app bundles for a package.
+/**
+ * The subcommand for changing the pixar
+ * usd version for a specified package.
+ */
 struct UpdateCommand: AsyncCommand
 {
   static var configuration = CommandConfiguration(
@@ -56,144 +59,185 @@ struct UpdateCommand: AsyncCommand
   static func validateArguments(_: UpdateArguments) -> Bool
   {
     // Validate parameters
-
     true
   }
 
   func wrappedRun() async throws
   {
-    var packageDirectory: URL = URL(fileURLWithPath: ".")
+    // get the package directory.
+    var packageDirectory = URL(fileURLWithPath: ".")
+    if let selectedPackage = arguments.packageDirectory
+    {
+      packageDirectory = selectedPackage
+    }
+
+    // get the package directory path.
+    let pkgDir = packageDirectory.path
+
+    // remove possibly existing openusd directory.
+    if FileManager.default.fileExists(atPath: "\(pkgDir)/.build/OpenUSD", isDirectory: nil)
+    {
+      try FileManager.default.removeItem(atPath: "\(pkgDir)/.build/OpenUSD")
+    }
 
     // Start timing
     let elapsed = try await Stopwatch.time
     {
-      if let pkgDir = arguments.packageDirectory
-      {
-        packageDirectory = pkgDir
-      }
+      // 1. clone pixar official openusd repository.
+      try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/USD.git", "\(pkgDir)/.build/OpenUSD"])
 
-      // 1. clone the pixar usd repository.
-      if FileManager.default.fileExists(atPath: "\(packageDirectory.path)/.build/OpenUSD", isDirectory: nil)
-      {
-        try FileManager.default.removeItem(atPath: "\(packageDirectory.path)/.build/OpenUSD")
-      }
-      try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/USD.git", "\(packageDirectory.path)/.build/OpenUSD"])
+      // 2. update all usd source in this package, in parallel.
+      async let bse = try Pxr.base.enumerate(packagePath: pkgDir)
+      async let img = try Pxr.imaging.enumerate(packagePath: pkgDir)
+      async let usd = try Pxr.usd.enumerate(packagePath: pkgDir)
+      async let uim = try Pxr.usdImaging.enumerate(packagePath: pkgDir)
 
-      // 2. loop pxr.base and copy respective library source to Sources/**.
-      try Pxr.base.enumerate(packagePath: packageDirectory.path)
-
-      // 3. loop pxr.imaging and copy respective library source to Sources/**.
-      try Pxr.imaging.enumerate(packagePath: packageDirectory.path)
-
-      // 4. loop pxr.usd and copy respective library source to Sources/**.
-      try Pxr.usd.enumerate(packagePath: packageDirectory.path)
-
-      // 5. loop pxr.usdImaging and copy respective library source to Sources/**.
-      try Pxr.usdImaging.enumerate(packagePath: packageDirectory.path)
+      // 3. wait for all usd source to be updated.
+      let _ = try await [bse, img, usd, uim]
     }
 
     // Output the time elapsed and app bundle location
-    log.info(
-      "Done in \(elapsed.secondsString). USD source updated at '\(packageDirectory.relativePath)'"
-    )
+    log.info("done in \(elapsed.secondsString). usd source updated at '\(pkgDir)'.")
   }
 }
 
-func path(from enumerated: NSEnumerator.Element) -> String
+/**
+ * The Pixar packages to update.
+ */
+public enum Pxr: String, CaseIterable
 {
-  return enumerated as? String ?? ""
-}
-
-public enum Pxr: String
-{
+  /** The pxr.base package. */
   case base
+  /** The pxr.imaging package. */
   case imaging
+  /** The pxr.usd package. */
   case usd
+  /** The pxr.usdImaging imaging package. */
   case usdImaging
 
-  public func enumerate(packagePath: String) throws
+  /**
+   * List the given package path, updating the source files for this
+   * package from upstream pixar, and return a list of updated files.
+   */
+  public func enumerate(packagePath: String) async throws -> [URL]
   {
-    var list: NSEnumerator? = nil
+    // ------------- list all files in the directory -------------
 
-    switch self
-    {
-      case .base:
-        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/base")
-      case .imaging:
-        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/imaging")
-      case .usd:
-        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/usd")
-      case .usdImaging:
-        list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/usdImaging")
-    }
+    guard let list = FileManager.default.enumerator(atPath: "\(packagePath)/.build/OpenUSD/pxr/\(rawValue)")
+    else { log.critical("Failed to list \(rawValue) directory."); return [] }
 
-    try list?.forEach
+    // ---------------- process each file in list ----------------
+
+    return try list.compactMap
     { pxrPath in
+
+      // ----------- determine target and source paths -----------
+
       let suffix = path(from: pxrPath).split(separator: "pxr/\(rawValue)/").last ?? ""
       let target = (suffix.split(separator: "/").first ?? "").capitalized
-
       let source = URL(fileURLWithPath: ".build/OpenUSD/pxr/\(rawValue)/\(path(from: pxrPath))")
-      if source.path.contains("testenv")
-      {
-        return
-      }
-      print("updating source:", source.path)
 
-      // create target directory, if it doesn't exist.
-      let targetDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)")
-      if FileManager.default.fileExists(atPath: targetDir.path, isDirectory: nil) == false
-      {
-        try FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true, attributes: nil)
-      }
+      // ---------------- skip testenv directories ---------------
 
-      // create target include directory, if it doesn't exist.
-      let targetIncDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)")
-      if FileManager.default.fileExists(atPath: targetIncDir.path, isDirectory: nil) == false
-      {
-        try FileManager.default.createDirectory(at: targetIncDir, withIntermediateDirectories: true, attributes: nil)
-      }
+      if source.path.contains("testenv") { return nil }
 
-      // create python target directory, if it doesn't exist.
-      let targetPyDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)")
-      if FileManager.default.fileExists(atPath: targetPyDir.path, isDirectory: nil) == false
-      {
-        try FileManager.default.createDirectory(at: targetPyDir, withIntermediateDirectories: true, attributes: nil)
-      }
+      // --------------- create target directories ---------------
 
-      // create python target include directory, if it doesn't exist.
-      let targetPyIncDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/include/Py\(target)")
-      if FileManager.default.fileExists(atPath: targetPyIncDir.path, isDirectory: nil) == false
-      {
-        try FileManager.default.createDirectory(at: targetPyIncDir, withIntermediateDirectories: true, attributes: nil)
-      }
+      try createTargetDirectories(packagePath: packagePath, target: target)
+      try createPythonDirectories(packagePath: packagePath, target: target)
 
-      let cxxDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(source.lastPathComponent)")
-      let hppDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(source.lastPathComponent)")
-      let pyCxxDestination = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(source.lastPathComponent)")
+      // ------ copy source files to dest (Sources/Target/*) -----
 
-      // copy source files to destination (Sources/Target/*)
       if ["cpp", "cc", "c", "cxx"].contains(source.pathExtension)
       {
         if source.lastPathComponent.contains("wrap") || source.lastPathComponent.contains("module")
         {
+          let dest = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(source.lastPathComponent)")
+
           // move wrap and module files to Python/PyTarget/*
-          try? FileManager.default.removeItem(at: pyCxxDestination)
-          try FileManager.default.moveItem(at: source, to: pyCxxDestination) 
+          try? FileManager.default.removeItem(at: dest)
+          try FileManager.default.moveItem(at: source, to: dest)
+          log.info("updating python module: \(dest.path)")
+
+          return dest
         }
         else
         {
+          let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(source.lastPathComponent)")
+
           // move source files to Sources/Target/*
-          try? FileManager.default.removeItem(at: cxxDestination)
-          try FileManager.default.moveItem(at: source, to: cxxDestination) 
+          try? FileManager.default.removeItem(at: dest)
+          try FileManager.default.moveItem(at: source, to: dest)
+          log.info("updating source: \(dest.path)")
+
+          return dest
         }
       }
 
-      // copy header files to destination (Sources/Target/include/Target/*)
+      // ----- copy headers (Sources/Target/include/Target/*) -----
+
       if ["h", "hpp", "hxx"].contains(source.pathExtension)
       {
-        try? FileManager.default.removeItem(at: hppDestination)
-        try FileManager.default.moveItem(at: source, to: hppDestination)
+        let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(source.lastPathComponent)")
+
+        try? FileManager.default.removeItem(at: dest)
+        try FileManager.default.moveItem(at: source, to: dest)
+        log.info("updating header: \(dest.path)")
+
+        return dest
       }
+
+      // ----------------------------------------------------------
+
+      return nil
     }
+  }
+
+  /**
+   * Create target directories for the given package.
+   */
+  private func createTargetDirectories(packagePath: String, target: String) throws
+  {
+    // create target directory, if it doesn't exist.
+    let targetDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)")
+    if FileManager.default.fileExists(atPath: targetDir.path, isDirectory: nil) == false
+    {
+      try FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true, attributes: nil)
+    }
+
+    // create target include directory, if it doesn't exist.
+    let targetIncDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)")
+    if FileManager.default.fileExists(atPath: targetIncDir.path, isDirectory: nil) == false
+    {
+      try FileManager.default.createDirectory(at: targetIncDir, withIntermediateDirectories: true, attributes: nil)
+    }
+  }
+
+  /**
+   * Create python target directories for the given package.
+   */
+  private func createPythonDirectories(packagePath: String, target: String) throws
+  {
+    // create python target directory, if it doesn't exist.
+    let targetPyDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)")
+    if FileManager.default.fileExists(atPath: targetPyDir.path, isDirectory: nil) == false
+    {
+      try FileManager.default.createDirectory(at: targetPyDir, withIntermediateDirectories: true, attributes: nil)
+    }
+
+    // create python target include directory, if it doesn't exist.
+    let targetPyIncDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/include/Py\(target)")
+    if FileManager.default.fileExists(atPath: targetPyIncDir.path, isDirectory: nil) == false
+    {
+      try FileManager.default.createDirectory(at: targetPyIncDir, withIntermediateDirectories: true, attributes: nil)
+    }
+  }
+
+  /**
+   * Get the path from the given enumerator element.
+   */
+  private func path(from enumerated: NSEnumerator.Element) -> String
+  {
+    enumerated as? String ?? ""
   }
 }
