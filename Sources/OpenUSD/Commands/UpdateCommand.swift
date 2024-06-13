@@ -73,6 +73,10 @@ struct UpdateCommand: AsyncCommand
       }
 
       // 1. clone the pixar usd repository.
+      if FileManager.default.fileExists(atPath: "\(packageDirectory.path)/.build/OpenUSD", isDirectory: nil)
+      {
+        try FileManager.default.removeItem(atPath: "\(packageDirectory.path)/.build/OpenUSD")
+      }
       try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/USD.git", "\(packageDirectory.path)/.build/OpenUSD"])
 
       // 2. loop pxr.base and copy respective library source to Sources/**.
@@ -128,19 +132,66 @@ public enum Pxr: String
       let suffix = path(from: pxrPath).split(separator: "pxr/\(rawValue)/").last ?? ""
       let target = (suffix.split(separator: "/").first ?? "").capitalized
 
-      let source = URL(fileURLWithPath: path(from: pxrPath))
+      let source = URL(fileURLWithPath: ".build/OpenUSD/pxr/\(rawValue)/\(path(from: pxrPath))")
+      if source.path.contains("testenv")
+      {
+        return
+      }
+      print("updating source:", source.path)
+
+      // create target directory, if it doesn't exist.
+      let targetDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)")
+      if FileManager.default.fileExists(atPath: targetDir.path, isDirectory: nil) == false
+      {
+        try FileManager.default.createDirectory(at: targetDir, withIntermediateDirectories: true, attributes: nil)
+      }
+
+      // create target include directory, if it doesn't exist.
+      let targetIncDir = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)")
+      if FileManager.default.fileExists(atPath: targetIncDir.path, isDirectory: nil) == false
+      {
+        try FileManager.default.createDirectory(at: targetIncDir, withIntermediateDirectories: true, attributes: nil)
+      }
+
+      // create python target directory, if it doesn't exist.
+      let targetPyDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)")
+      if FileManager.default.fileExists(atPath: targetPyDir.path, isDirectory: nil) == false
+      {
+        try FileManager.default.createDirectory(at: targetPyDir, withIntermediateDirectories: true, attributes: nil)
+      }
+
+      // create python target include directory, if it doesn't exist.
+      let targetPyIncDir = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/include/Py\(target)")
+      if FileManager.default.fileExists(atPath: targetPyIncDir.path, isDirectory: nil) == false
+      {
+        try FileManager.default.createDirectory(at: targetPyIncDir, withIntermediateDirectories: true, attributes: nil)
+      }
+
       let cxxDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(source.lastPathComponent)")
       let hppDestination = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(source.lastPathComponent)")
+      let pyCxxDestination = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(source.lastPathComponent)")
 
       // copy source files to destination (Sources/Target/*)
       if ["cpp", "cc", "c", "cxx"].contains(source.pathExtension)
       {
-        try FileManager.default.moveItem(at: source, to: cxxDestination) 
+        if source.lastPathComponent.contains("wrap") || source.lastPathComponent.contains("module")
+        {
+          // move wrap and module files to Python/PyTarget/*
+          try? FileManager.default.removeItem(at: pyCxxDestination)
+          try FileManager.default.moveItem(at: source, to: pyCxxDestination) 
+        }
+        else
+        {
+          // move source files to Sources/Target/*
+          try? FileManager.default.removeItem(at: cxxDestination)
+          try FileManager.default.moveItem(at: source, to: cxxDestination) 
+        }
       }
 
       // copy header files to destination (Sources/Target/include/Target/*)
       if ["h", "hpp", "hxx"].contains(source.pathExtension)
       {
+        try? FileManager.default.removeItem(at: hppDestination)
         try FileManager.default.moveItem(at: source, to: hppDestination)
       }
     }
