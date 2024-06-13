@@ -1281,6 +1281,9 @@ let package = Package(
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
+      ],
+      swiftSettings: [
+        .enableUpcomingFeature("BareSlashRegexLiterals"),
       ]
     ),
 

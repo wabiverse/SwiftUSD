@@ -84,7 +84,7 @@ struct UpdateCommand: AsyncCommand
     let elapsed = try await Stopwatch.time
     {
       // 1. clone pixar official openusd repository.
-      try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/USD.git", "\(pkgDir)/.build/OpenUSD"])
+      try Command.git.run(with: ["clone", "https://github.com/PixarAnimationStudios/OpenUSD.git", "\(pkgDir)/.build/OpenUSD"])
 
       // 2. update all usd source in this package, in parallel.
       async let bse = try Pxr.base.enumerate(packagePath: pkgDir)
@@ -201,14 +201,27 @@ public enum Pxr: String, CaseIterable
     do
     {
       let contents = try String(contentsOf: fileURL, encoding: .utf8)
-      let pxrns = contents.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
+      var pxrSrc = contents.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
-      var source = pxrns.replacingOccurrences(of: "pxr/\(Pxr.base.rawValue)/", with: "")
-      source = source.replacingOccurrences(of: "pxr/\(Pxr.imaging.rawValue)/", with: "")
-      source = source.replacingOccurrences(of: "pxr/\(Pxr.usd.rawValue)/", with: "")
-      source = source.replacingOccurrences(of: "pxr/\(Pxr.usdImaging.rawValue)/", with: "")
+      /* 1. match includes such as:
+       * #include "[pxr/base/tf]/token.h"
+       * #include "[pxr/imaging/glf]/texture.h"
+       * #include "[pxr/usd/sdf]/layer.h"
+       * #include "[pxr/usdImaging/hd]/engine.h" */
+      let includeMatch = /(?:\G(?!\A)\s*,\s*|\b(?:pxr\/base\/|pxr\/imaging\/|pxr\/usd\/|pxr\/usdImaging\/)+)(\w+)/
+      while let match = try includeMatch.firstMatch(in: pxrSrc)
+      {
+        /* 2. replace include with capitalized version.
+         * #include "[pxr/base/tf]/token.h"        -> #include "Tf/token.h"
+         * #include "[pxr/imaging/glf]/texture.h"  -> #include "Glf/texture.h"
+         * #include "[pxr/usd/sdf]/layer.h"        -> #include "Sdf/layer.h"
+         * #include "[pxr/usdImaging/hd]/engine.h" -> #include "Hd/engine.h" */
+        let include = pxrSrc[match.range]
+        let newInclude = (include.split(separator: "/").last ?? "").capitalized
+        pxrSrc = pxrSrc.replacingOccurrences(of: include, with: newInclude)
+      }
 
-      try source.write(to: fileURL, atomically: true, encoding: .utf8)
+      try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
     }
     catch
     {
