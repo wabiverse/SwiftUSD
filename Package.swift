@@ -210,7 +210,15 @@ let package = Package(
       name: "UsdView",
       targets: ["UsdView"]
     ),
+    .executable(
+      name: "OpenUSD",
+      targets: ["OpenUSD"]
+    ),
     // -------- Swift Plugins -----
+    .plugin(
+      name: "OpenUSDPlugin",
+      targets: ["OpenUSDPlugin"]
+    ),
     .plugin(
       name: "UsdGenSchemaPlugin",
       targets: ["UsdGenSchemaPlugin"]
@@ -232,7 +240,9 @@ let package = Package(
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
+    .package(url: "https://github.com/mxcl/Version.git", from: "2.0.0"),
   ],
   targets: [
     .target(
@@ -1261,6 +1271,40 @@ let package = Package(
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
+      ]
+    ),
+
+    .executableTarget(
+      name: "OpenUSD",
+      dependencies: [
+        .product(name: "Version", package: "Version"),
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        .product(name: "Logging", package: "swift-log"),
+        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
+      ]
+    ),
+
+    .plugin(
+      name: "OpenUSDPlugin",
+      capability: .command(
+        intent: .custom(verb: "openusd", description: """
+          Update the version of USD in the current package,
+          this will fetch the latest version of USD from the
+          Pixar USD repository and update this packages source
+          code to the latest version.
+          """),
+        permissions: [
+          .allowNetworkConnections(
+            scope: .all(),
+            reason: "Updating USD requires network access."
+          ),
+          .writeToPackageDirectory(
+            reason: "Updating USD requires write access."
+          ),
+        ]
+      ),
+      dependencies: [
+        .target(name: "OpenUSD")
       ]
     ),
 
