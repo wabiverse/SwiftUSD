@@ -81,9 +81,9 @@ func Ptex_MeshType(value: UInt32) -> UInt32
   defer { print("The mesh type is: \(swiftString).") }
   switch meshType
   {
-    case (Ptex.v2_4.mt_triangle):
+    case Ptex.v2_4.mt_triangle:
       swiftString = "triangle"
-    case (Ptex.v2_4.mt_quad):
+    case Ptex.v2_4.mt_quad:
       swiftString = "quad"
     default:
       swiftString = "unknown"
