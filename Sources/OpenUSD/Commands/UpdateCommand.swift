@@ -134,12 +134,17 @@ public enum Pxr: String, CaseIterable
       // ----------- determine target and source paths -----------
 
       let suffix = path(from: pxrPath).split(separator: "pxr/\(rawValue)/").last ?? ""
-      let target = (suffix.split(separator: "/").first ?? "").capitalized
       let source = URL(fileURLWithPath: ".build/OpenUSD/pxr/\(rawValue)/\(path(from: pxrPath))")
+      var target = (suffix.split(separator: "/").first ?? "").capitalized
 
-      // ---------------- skip testenv directories ---------------
+      ensureCasing(for: &target)
 
-      if source.path.contains("testenv") { return nil }
+      // --------------------- skipped source --------------------
+
+      if source.path.contains("testenv") ||
+        source.path.lowercased().contains("cmakelists") ||
+        source.path.lowercased().contains("pch.h")
+      { return nil }
 
       // --------------- create target directories ---------------
 
@@ -275,5 +280,60 @@ public enum Pxr: String, CaseIterable
   private func path(from enumerated: NSEnumerator.Element) -> String
   {
     enumerated as? String ?? ""
+  }
+
+  /**
+   * Ensure the casing is correct for the given target.
+   */
+  private func ensureCasing(for target: inout String)
+  {
+    for suffix in ["imaging", "app", "utils", "st", "si", "mtlx", "gp", "proc", "vol", "skel"]
+    {
+      if target.contains(suffix)
+      {
+        target = target.replacingOccurrences(of: suffix, with: suffix.capitalized)
+      }
+    }
+
+    if target.contains("Geom")
+    {
+      target = target.replacingOccurrences(of: "util", with: "Util")
+    }
+
+    if target.contains("Hgi")
+    {
+      target = target.replacingOccurrences(of: "metal", with: "Metal")
+      target = target.replacingOccurrences(of: "gl", with: "GL")
+      target = target.replacingOccurrences(of: "vulkan", with: "Vulkan")
+      target = target.replacingOccurrences(of: "interop", with: "Interop")
+    }
+
+    if target.contains("Hio")
+    {
+      target = target.replacingOccurrences(of: "open", with: "Open")
+      target = target.replacingOccurrences(of: "vdb", with: "VDB")
+    }
+
+    if target.contains("Px")
+    {
+      target = target.replacingOccurrences(of: "osd", with: "Osd")
+    }
+
+    if target.contains("Usd")
+    {
+      target = target.replacingOccurrences(of: "geom", with: "Geom")
+      target = target.replacingOccurrences(of: "lux", with: "Lux")
+      target = target.replacingOccurrences(of: "ri", with: "Ri")
+      target = target.replacingOccurrences(of: "pxr", with: "Pxr")
+      target = target.replacingOccurrences(of: "gl", with: "GL")
+      target = target.replacingOccurrences(of: "render", with: "Render")
+      target = target.replacingOccurrences(of: "hydra", with: "Hydra")
+      target = target.replacingOccurrences(of: "viewq", with: "ViewQ")
+    }
+
+    if target.contains("Hd")
+    {
+      target = target.replacingOccurrences(of: "ar", with: "Ar")
+    }
   }
 }
