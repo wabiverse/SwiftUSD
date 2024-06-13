@@ -158,6 +158,7 @@ public enum Pxr: String, CaseIterable
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
           log.info("updating python module: \(dest.path)")
+          updateSource(fileURL: dest)
 
           return dest
         }
@@ -169,6 +170,7 @@ public enum Pxr: String, CaseIterable
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
           log.info("updating source: \(dest.path)")
+          updateSource(fileURL: dest)
 
           return dest
         }
@@ -183,6 +185,7 @@ public enum Pxr: String, CaseIterable
         try? FileManager.default.removeItem(at: dest)
         try FileManager.default.moveItem(at: source, to: dest)
         log.info("updating header: \(dest.path)")
+        updateSource(fileURL: dest)
 
         return dest
       }
@@ -190,6 +193,26 @@ public enum Pxr: String, CaseIterable
       // ----------------------------------------------------------
 
       return nil
+    }
+  }
+
+  private func updateSource(fileURL: URL)
+  {
+    do
+    {
+      let contents = try String(contentsOf: fileURL, encoding: .utf8)
+      let pxrns = contents.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
+
+      var source = pxrns.replacingOccurrences(of: "pxr/\(Pxr.base.rawValue)/", with: "")
+      source = source.replacingOccurrences(of: "pxr/\(Pxr.imaging.rawValue)/", with: "")
+      source = source.replacingOccurrences(of: "pxr/\(Pxr.usd.rawValue)/", with: "")
+      source = source.replacingOccurrences(of: "pxr/\(Pxr.usdImaging.rawValue)/", with: "")
+
+      try source.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
+    catch
+    {
+      log.error("error: failed to update source '\(fileURL.path)'. \(error.localizedDescription).")
     }
   }
 
