@@ -163,7 +163,7 @@ public enum Pxr: String, CaseIterable
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
           log.info("updating python module: \(dest.path)")
-          updateSource(fileURL: dest)
+          updateSource(fileURL: dest, target: target)
 
           return dest
         }
@@ -175,7 +175,7 @@ public enum Pxr: String, CaseIterable
           try? FileManager.default.removeItem(at: dest)
           try FileManager.default.moveItem(at: source, to: dest)
           log.info("updating source: \(dest.path)")
-          updateSource(fileURL: dest)
+          updateSource(fileURL: dest, target: target)
 
           return dest
         }
@@ -190,7 +190,7 @@ public enum Pxr: String, CaseIterable
         try? FileManager.default.removeItem(at: dest)
         try FileManager.default.moveItem(at: source, to: dest)
         log.info("updating header: \(dest.path)")
-        updateSource(fileURL: dest)
+        updateSource(fileURL: dest, target: target)
 
         return dest
       }
@@ -201,15 +201,15 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  private func updateSource(fileURL: URL)
+  private func updateSource(fileURL: URL, target: String)
   {
     do
     {
       let contents = try String(contentsOf: fileURL, encoding: .utf8)
       var pxrSrc = contents.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
-      /* apply patches to source files. */
-      Patches.tbb.apply(to: &pxrSrc)
+      /* apply any/all potential patches to upstream source files. */
+      Patch.apply(to: &pxrSrc, fileURL: fileURL, target: target)
 
       /* 1. match includes such as:
        * #include "[pxr/base/tf]/token.h"
@@ -340,130 +340,29 @@ public enum Pxr: String, CaseIterable
     }
   }
 
-  private enum Patches
+  private enum Patch
   {
-    case tbb
-
-    public func apply(to source: inout String)
+    /**
+     * Patches upstream pixar's openusd source code, with the contents of
+     * any matching target/filename(.h|.cpp) in resources, this is so that
+     * any changes that are required for openusd to work with swift, will
+     * survive future releases of openusd, while also making any potential
+     * modifications to openusd source code easy to maintain, and clearly
+     * defined, all wabi openusd source code modifications will live here. */
+    public static func apply(to source: inout String, fileURL: URL, target: String)
     {
-      switch self
-      {
-        case .tbb: applyTBBPatch(to: &source)
-      }
-    }
+      // if a upstream source file matches a existing file in resources...
 
-    private func applyTBBPatch(to source: inout String)
-    {
-      source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
-      source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
+      let resourceDir = (Bundle.module.resourceURL?.path ?? ".") + "/\(target)/\(fileURL.lastPathComponent)"
+      guard 
+        FileManager.default.fileExists(atPath: resourceDir),
+        let patch = FileManager.default.contents(atPath: resourceDir)
+      else { return }
 
-      let dispatcher = """
-        PXR_NAMESPACE_OPEN_SCOPE
+      // then, patch the upstream source with our resources file contents.
 
-        #if !WITH_TBB_LEGACY
-        class WorkDispatcher {
-        public:
-          /// Construct a new dispatcher.
-          WORK_API WorkDispatcher();
-
-          /// Wait() for any pending tasks to complete, then destroy the dispatcher.
-          WORK_API ~WorkDispatcher();
-
-          WorkDispatcher(WorkDispatcher const &) = delete;
-          WorkDispatcher &operator=(WorkDispatcher const &) = delete;
-
-        #ifdef doxygen
-
-          /// Add work for the dispatcher to run.
-          ///
-          /// Before a call to Wait() is made it is safe for any client to invoke
-          /// Run().  Once Wait() is invoked, it is \\b only safe to invoke Run() from
-          /// within the execution of tasks already added via Run().
-          ///
-          /// This function does not block, in general.  It may block if concurrency
-          /// is limited to 1.  The added work may be not yet started, may be started
-          /// but not completed, or may be completed upon return.  No guarantee is
-          /// made.
-          template <class Callable, class A1, class A2, ... class AN>
-          void Run(Callable &&c, A1 &&a1, A2 &&a2, ... AN &&aN);
-
-        #else // doxygen
-
-          template <class Callable> inline void Run(Callable &&c) {
-            _tg.run(_InvokerTask<typename std::remove_reference<Callable>::type>(
-                std::forward<Callable>(c), &_errors));
-          }
-
-          template <class Callable, class A0, class... Args>
-          inline void Run(Callable &&c, A0 &&a0, Args &&...args) {
-            Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0),
-                          std::forward<Args>(args)...));
-          }
-
-        #endif // doxygen
-
-          /// Block until the work started by Run() completes.
-          WORK_API void Wait();
-
-          /// Cancel remaining work and return immediately.
-          ///
-          /// Calling this function affects task that are being run directly
-          /// by this dispatcher. If any of these tasks are using their own
-          /// dispatchers to run tasks, these dispatchers will not be affected
-          /// and these tasks will run to completion, unless they are also
-          /// explicitly cancelled.
-          ///
-          /// This call does not block.  Call Wait() after Cancel() to wait for
-          /// pending tasks to complete.
-          WORK_API void Cancel();
-
-        private:
-          typedef tbb::concurrent_vector<TfErrorTransport> _ErrorTransports;
-
-          // Function invoker helper that wraps the invocation with an ErrorMark so we
-          // can transmit errors that occur back to the thread that Wait() s for tasks
-          // to complete.
-          template <class Fn> struct _InvokerTask {
-            explicit _InvokerTask(Fn &&fn, _ErrorTransports *err)
-                : _fn(std::move(fn)), _errors(err) {}
-
-            explicit _InvokerTask(Fn const &fn, _ErrorTransports *err)
-                : _fn(fn), _errors(err) {}
-
-            void operator()() const {
-              TfErrorMark m;
-              _fn();
-              if (!m.IsClean())
-                WorkDispatcher::_TransportErrors(m, _errors);
-            }
-
-          private:
-            Fn _fn;
-            _ErrorTransports *_errors;
-          };
-
-          // Helper function that removes errors from \\p m and stores them in a new
-          // entry in \\p errors.
-          WORK_API static void _TransportErrors(const TfErrorMark &m,
-                                                _ErrorTransports *errors);
-
-          // Task group.
-          tbb::task_group _tg;
-
-          // The error transports we use to transmit errors in other threads back to
-          // this thread.
-          _ErrorTransports _errors;
-
-          // Concurrent calls to Wait() have to serialize certain cleanup operations.
-          std::atomic_flag _waitCleanupFlag;
-        };
-        #else /* WITH_TBB_LEGACY */
-
-        /// \\class WorkDispatcher
-        """
-
-      source = source.replacingOccurrences(of: "PXR_NAMESPACE_OPEN_SCOPE\n\n/// \\class WorkDispatcher", with: dispatcher)
-      source = source.replacingOccurrences(of: "};\n\n///////////////////////////////////////////////////////////////////////////////\n\nPXR_NAMESPACE_CLOSE_SCOPE", with: "};\n#endif /* !WITH_TBB_LEGACY */\n///////////////////////////////////////////////////////////////////////////////\n\nPXR_NAMESPACE_CLOSE_SCOPE")
+      log.info("patching source: \(fileURL.path)")
+      source = String(decoding: patch, as: UTF8.self)
     }
   }
 }

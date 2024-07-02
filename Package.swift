@@ -1282,6 +1282,14 @@ let package = Package(
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
       ],
+      resources: [
+        // usd source files that need modifications to work with swift are maintained out of these
+        // directories, if a usd source file from upstream pixar is matching any of the respective
+        // target/filename(.h|.cpp) patterns within any of these resource directories, the contents
+        // of each of the matching upstream pixar files will have their contents replaced with each
+        // of the respective source code files found in any of these directories.
+        .copy("Resources/Work")
+      ],
       swiftSettings: [
         .enableUpcomingFeature("BareSlashRegexLiterals"),
       ]
