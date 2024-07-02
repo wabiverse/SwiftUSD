@@ -205,10 +205,11 @@ public enum Pxr: String, CaseIterable
   {
     do
     {
-      let contents = try String(contentsOf: fileURL, encoding: .utf8)
-      var pxrSrc = contents.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
+      var pxrSrc = try String(contentsOf: fileURL, encoding: .utf8)
 
       /* apply any/all potential patches to upstream source files. */
+
+      Patch.headers(to: &pxrSrc)
       Patch.apply(to: &pxrSrc, fileURL: fileURL, target: target)
 
       /* 1. match includes such as:
@@ -225,7 +226,9 @@ public enum Pxr: String, CaseIterable
          * #include "[pxr/usd/sdf]/layer.h"        -> #include "Sdf/layer.h"
          * #include "[pxr/usdImaging/hd]/engine.h" -> #include "Hd/engine.h" */
         let include = pxrSrc[match.range]
-        let newInclude = (include.split(separator: "/").last ?? "").capitalized
+        var newInclude = (include.split(separator: "/").last ?? "").capitalized
+
+        ensureCasing(for: &newInclude)
         pxrSrc = pxrSrc.replacingOccurrences(of: include, with: newInclude)
       }
 
@@ -290,7 +293,7 @@ public enum Pxr: String, CaseIterable
    */
   private func ensureCasing(for target: inout String)
   {
-    for suffix in ["imaging", "app", "utils", "st", "si", "mtlx", "gp", "proc", "vol", "skel"]
+    for suffix in ["imaging", "app", "utils", "st", "si", "mtlx", "gp", "proc", "vol", "skel", "util"]
     {
       if target.contains(suffix)
       {
@@ -363,6 +366,26 @@ public enum Pxr: String, CaseIterable
 
       log.info("patching source: \(fileURL.path)")
       source = String(decoding: patch, as: UTF8.self)
+    }
+
+    /**
+     * Patches openusd headers for the pxr namespace, tbb headers, etc. */
+    public static func headers(to source: inout String)
+    {
+      /* ----- pxr namespace headers. ----- */
+
+      source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
+
+      /* ----- tbb headers. --------------- */
+
+      // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
+      source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
+      // modern versions of tbb no longer have atomic, get it from std.
+      source = source.replacingOccurrences(of: "<OneTBB/tbb/atomic.h>", with: "<atomic>")
+      // modern versions of tbb no longer have mutex, get it from std.
+      source = source.replacingOccurrences(of: "<OneTBB/tbb/mutex.h>", with: "<mutex>")
+      // modern versions of tbb no longer contain a task_scheduler_init.
+      source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
     }
   }
 }
