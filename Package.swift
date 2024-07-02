@@ -224,11 +224,11 @@ let package = Package(
       targets: ["UsdGenSchemaPlugin"]
     ),
     // ------------- Rust USD -----
-    .library(
-      name: "rust-usd",
-      type: .static,
-      targets: ["rust-usd"]
-    ),
+    // .library(
+    //   name: "rust-usd",
+    //   type: .static,
+    //   targets: ["rust-usd"]
+    // ),
     // ------- Monolithic USD -----
     .library(
       name: "PixarUSD",
@@ -312,7 +312,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Tf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
         .define("MFB_PACKAGE_MODULE", to: "Tf"),
-        .define("TF_EXPORTS", to: "1")
+        .define("TF_EXPORTS", to: "1"),
+        .headerSearchPath("include/Tf")
       ]
     ),
 
@@ -1361,16 +1362,16 @@ let package = Package(
       ]
     ),
 
-    .target(
-      name: "rust-usd",
-      dependencies: [
-        .product(name: "Ptex", package: "MetaverseKit"),
-        .target(name: "pxr"),
-      ],
-      swiftSettings: [
-        .interoperabilityMode(.Cxx),
-      ]
-    ),
+    // .target(
+    //   name: "rust-usd",
+    //   dependencies: [
+    //     .product(name: "Ptex", package: "MetaverseKit"),
+    //     .target(name: "pxr"),
+    //   ],
+    //   swiftSettings: [
+    //     .interoperabilityMode(.Cxx),
+    //   ]
+    // ),
 
     .target(
       name: "PixarUSD",

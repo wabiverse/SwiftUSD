@@ -143,7 +143,10 @@ public enum Pxr: String, CaseIterable
 
       if source.path.contains("testenv") ||
         source.path.lowercased().contains("cmakelists") ||
-        source.path.lowercased().contains("pch.h")
+        source.path.lowercased().contains("pch.h") ||
+        source.path.lowercased().contains(".template.") ||
+        source.path.lowercased().contains("codegenTemplates") ||
+        source.path.lowercased().contains("unitTest")
       { return nil }
 
       // --------------- create target directories ---------------

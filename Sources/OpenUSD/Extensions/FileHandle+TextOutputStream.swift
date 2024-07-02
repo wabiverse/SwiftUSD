@@ -30,7 +30,7 @@
 
 import Foundation
 
-extension FileHandle: TextOutputStream
+extension FileHandle: @retroactive TextOutputStream
 {
   public func write(_ string: String)
   {
