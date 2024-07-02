@@ -327,7 +327,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Js"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Js"),
         .define("MFB_PACKAGE_MODULE", to: "Js"),
-        .define("JS_EXPORTS", to: "1")
+        .define("JS_EXPORTS", to: "1"),
+        .headerSearchPath("include/Js")
       ]
     ),
 
@@ -893,7 +894,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdRi"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
         .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
-        .define("USDRI_EXPORTS", to: "1")
+        .define("USDRI_EXPORTS", to: "1"),
+        .headerSearchPath("include/UsdRi")
       ]
     ),
 

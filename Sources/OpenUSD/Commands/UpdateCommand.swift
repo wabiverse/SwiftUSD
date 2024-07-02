@@ -141,12 +141,18 @@ public enum Pxr: String, CaseIterable
 
       // --------------------- skipped source --------------------
 
+      #if os(Windows)
+        let platformExcludes = false
+      #else /* !os(Windows) */
+        let platformExcludes = source.path.lowercased().contains("msinttypes")
+      #endif
       if source.path.contains("testenv") ||
         source.path.lowercased().contains("cmakelists") ||
         source.path.lowercased().contains("pch.h") ||
         source.path.lowercased().contains(".template.") ||
-        source.path.lowercased().contains("codegenTemplates") ||
-        source.path.lowercased().contains("unitTest")
+        source.path.lowercased().contains("codegentemplates") ||
+        source.path.lowercased().contains("unittest") ||
+        platformExcludes
       { return nil }
 
       // --------------- create target directories ---------------
@@ -296,7 +302,7 @@ public enum Pxr: String, CaseIterable
    */
   private func ensureCasing(for target: inout String)
   {
-    for suffix in ["imaging", "app", "utils", "st", "si", "mtlx", "gp", "proc", "vol", "skel", "util"]
+    for suffix in ["imaging", "app", "utils", "st", "physics", "mtlx", "gp", "proc", "vol", "skel", "util", "media"]
     {
       if target.contains(suffix)
       {
@@ -338,11 +344,14 @@ public enum Pxr: String, CaseIterable
       target = target.replacingOccurrences(of: "render", with: "Render")
       target = target.replacingOccurrences(of: "hydra", with: "Hydra")
       target = target.replacingOccurrences(of: "viewq", with: "ViewQ")
+      target = target.replacingOccurrences(of: "shade", with: "Shade")
+      target = target.replacingOccurrences(of: "ui", with: "UI")
     }
 
     if target.contains("Hd")
     {
       target = target.replacingOccurrences(of: "ar", with: "Ar")
+      target = target.replacingOccurrences(of: "si", with: "Si")
     }
   }
 
@@ -360,7 +369,7 @@ public enum Pxr: String, CaseIterable
       // if a upstream source file matches a existing file in resources...
 
       let resourceDir = (Bundle.module.resourceURL?.path ?? ".") + "/\(target)/\(fileURL.lastPathComponent)"
-      guard 
+      guard
         FileManager.default.fileExists(atPath: resourceDir),
         let patch = FileManager.default.contents(atPath: resourceDir)
       else { return }
@@ -379,16 +388,32 @@ public enum Pxr: String, CaseIterable
 
       source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
+      /* ----- sdf dtor ------------------- */
+
+      source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
+      source = source.replacingOccurrences(of: "virtual ~UsdStage();", with: "virtual ~UsdStage() noexcept;")
+
       /* ----- tbb headers. --------------- */
 
       // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
       source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
       // modern versions of tbb no longer have atomic, get it from std.
       source = source.replacingOccurrences(of: "<OneTBB/tbb/atomic.h>", with: "<atomic>")
+      source = source.replacingOccurrences(of: "tbb::atomic", with: "std::atomic")
+      source = source.replacingOccurrences(of: "fetch_and_decrement()", with: "fetch_sub(1)")
+      source = source.replacingOccurrences(of: "fetch_and_increment()", with: "fetch_add(1)")
       // modern versions of tbb no longer have mutex, get it from std.
       source = source.replacingOccurrences(of: "<OneTBB/tbb/mutex.h>", with: "<mutex>")
+      source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
       // modern versions of tbb no longer contain a task_scheduler_init.
       source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
+
+      /* ---- materialx headers ----------- */
+
+      source = source.replacingOccurrences(of: "#include <MaterialXCore/Document.h>", with: "#include <MaterialX/MXCoreDocument.h>")
+      source = source.replacingOccurrences(of: "#include <MaterialXCore/Util.h>", with: "#include <MaterialX/MXCoreUtil.h>")
+      source = source.replacingOccurrences(of: "#include <MaterialXFormat/Util.h>", with: "#include <MaterialX/MXFormatUtil.h>")
+      source = source.replacingOccurrences(of: "#include <MaterialXFormat/XmlIo.h>", with: "#include <MaterialX/MXFormatXmlIo.h>")
     }
   }
 }
