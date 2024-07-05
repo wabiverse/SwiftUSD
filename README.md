@@ -25,8 +25,8 @@
 </div>
 
 <h4 align="center">
-  <a href="https://wabi.foundation/pixarusd/documentation/pixarusd">
-    <img src="https://img.shields.io/badge/v23%2E11%2E32-DocumentationSource?style=flat-square&label=docs&labelColor=F05138&logo=swift&color=gray&logoColor=white">
+  <a href="https://wabiverse.github.io/SwiftUSD/documentation/pixarusd/">
+    <img src="https://img.shields.io/badge/v23%2E11%2E35-DocumentationSource?style=flat-square&label=docs&labelColor=F05138&logo=swift&color=gray&logoColor=white">
   </a>
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ubuntu.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
