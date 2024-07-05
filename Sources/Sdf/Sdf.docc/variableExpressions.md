@@ -1,5 +1,0 @@
-# Variable Expressions
-
-## Overview
-
-**TBD**
