@@ -41,17 +41,17 @@ final class CustomResolver: ArDefaultResolver
   public init()
   {}
 
-  private func _Resolve(path: String) -> ArResolvedPath
+  func _Resolve(_ assetPath: std.string) -> ArResolvedPath
   {
-    Msg.logger.info("resolving path: \(path)")
+    Msg.logger.info("resolving path: \(assetPath)")
 
-    let asset = _resolve(path: String(path))
+    let asset = _resolve(path: String(assetPath))
     if !asset.empty()
     {
       return asset
     }
 
-    return .init(std.string(path))
+    return .init(assetPath)
   }
 }
 
