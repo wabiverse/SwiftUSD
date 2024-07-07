@@ -1100,7 +1100,7 @@ let package = Package(
         .define("GARCH_EXPORTS", to: "1"),
       ],
       linkerSettings: [
-        .linkedFramework("OpenGL", .when(platforms: [.macOS, .iOS])),
+        .linkedFramework("OpenGL", .when(platforms: [.macOS])),
         .linkedLibrary("glut", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GL", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GLU", .when(platforms: Arch.OS.linux.platform)),
