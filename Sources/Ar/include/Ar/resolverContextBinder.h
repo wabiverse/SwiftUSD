@@ -26,7 +26,7 @@
 
 /// \file ar/resolverContextBinder.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Ar/resolverContext.h"
 #include "Vt/value.h"
 #include <pxr/pxrns.h>

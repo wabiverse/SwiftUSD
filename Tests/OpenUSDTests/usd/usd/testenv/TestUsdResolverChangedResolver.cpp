@@ -29,7 +29,7 @@
 #include "pxr/usd/ar/defineResolverContext.h"
 #include "pxr/usd/ar/filesystemAsset.h"
 #include "pxr/usd/ar/notice.h"
-#include "pxr/usd/ArPrototypes/resolvedPath.h"
+#include "pxr/usd/ArTypes/resolvedPath.h"
 #include "pxr/usd/ar/resolver.h"
 #include "pxr/usd/ar/timestamp.h"
 

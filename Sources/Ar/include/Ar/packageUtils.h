@@ -27,7 +27,7 @@
 /// \file ar/packageUtils.h
 /// Utility functions for working with package assets
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include <string>

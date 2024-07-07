@@ -27,7 +27,7 @@
 /// \file sdf/layer.h
 
 #include "Ar/assetInfo.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Sdf/api.h"
 #include "Sdf/data.h"
 #include "Sdf/declareHandles.h"

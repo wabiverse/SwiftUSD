@@ -80,7 +80,7 @@
 #include "Work/withScopedParallelism.h"
 
 #include "Ar/asset.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
 #include "Sdf/assetPath.h"

@@ -116,10 +116,16 @@
 
 #include "Arch/hints.h"
 #include "Tf/registryManager.h"
+#include "Tf/hash.h"
+#include "Tf/hashmap.h"
 #include <pxr/pxrns.h>
+
+#include <boost/variant/get.hpp>
+#include <boost/variant/variant.hpp>
 
 #include <atomic>
 #include <string>
+#include <mutex>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -129,7 +135,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 // cannot use aggregate-initialization on a struct holding an atomic, but we
 // can value-initialize a single std::atomic.
 template <class T> struct TfEnvSetting {
-  std::atomic<T *> *_value;
+  using AtomicValue = std::atomic<T *>;
+  
+  AtomicValue *_value;
   T _default;
   char const *_name;
   char const *_description;
@@ -138,7 +146,9 @@ template <class T> struct TfEnvSetting {
 // Specialize for string, default is stored as char const * (pointing to a
 // literal).
 template <> struct TfEnvSetting<std::string> {
-  std::atomic<std::string *> *_value;
+  using AtomicValue = std::atomic<std::string *>;
+  
+  AtomicValue *_value;
   char const *_default;
   char const *_name;
   char const *_description;
@@ -164,7 +174,29 @@ bool Tf_ChooseEnvSettingType(bool);
 int Tf_ChooseEnvSettingType(int);
 std::string Tf_ChooseEnvSettingType(char const *);
 
-class Tf_EnvSettingRegistry;
+class Tf_EnvSettingRegistry 
+{
+ public:
+  Tf_EnvSettingRegistry(const Tf_EnvSettingRegistry &) = delete;
+  Tf_EnvSettingRegistry &operator=(const Tf_EnvSettingRegistry &) = delete;
+  
+  static Tf_EnvSettingRegistry &GetInstance();
+  
+  Tf_EnvSettingRegistry();
+  
+  using VariantType = boost::variant<int, bool, std::string>;
+  
+  template <typename U>
+  bool Define(std::string const &varName, U const &value,
+              std::atomic<U *> *cachedValue);
+  
+  VariantType const *LookupByName(std::string const &name) const;
+  
+ private:
+  mutable std::mutex _lock;
+  TfHashMap<std::string, VariantType, TfHash> _valuesByName;
+  bool _printAlerts;
+} SWIFT_IMMORTAL_REFERENCE;
 
 /// Define an env setting named \p envVar with default value \p defValue and a
 /// descriptive string \p description.

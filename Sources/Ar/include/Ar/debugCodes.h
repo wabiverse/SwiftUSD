@@ -24,7 +24,7 @@
 #ifndef PXR_USD_AR_DEBUG_CODES_H
 #define PXR_USD_AR_DEBUG_CODES_H
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Tf/debug.h"
 #include <pxr/pxrns.h>
 

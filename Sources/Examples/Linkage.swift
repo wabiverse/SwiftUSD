@@ -28,24 +28,41 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Ar
-import ArPrototypes
+import Foundation
+import PixarUSD
 
-public typealias ArResolver = Pixar.ArResolver & ArResolvable
-public typealias ArDefaultResolver = Pixar.ArDefaultResolver & ArResolvable
+#if LOW_LEVEL_LINKAGE
+  /**
+   * todo, figure out low level linkage strategy in swift.
+   */
+  func defineEnvSetting(_ name: ArHttpEnvSetting, value: String, description: String)
+  {
+    var val: Pixar.TfEnvSetting.AtomicValue = .init()
+    var envVar: Pixar.TfEnvSetting<std.string> = .init(&val, value, name.rawValue, description)
 
-/**
- * # ``Ar``
- *
- * **Asset Resolution**
- *
- * ## Overview
- *
- * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
- * writing asset data. It provides several interfaces that allow **USD** to access
- * an asset without knowing how that asset is physically stored. */
-public enum Ar
-{
-  public typealias Resolver = ArResolver
-  public typealias DefaultResolver = ArDefaultResolver
-}
+    func _Tf_RegistryFunctionNAME(_: Pixar.Tf_EnvSettingRegistry, _: OpaquePointer)
+    {
+      Pixar.TfGetEnvSetting(envVar)
+    }
+
+    let _tfRegistryInit = Pixar.Arch_PerLibInit<Pixar.Tf_RegistryStaticInit>()
+  }
+
+  func _Tf_RegistryAddNAME(_: Pixar.Tf_EnvSettingRegistry)
+  {
+    Tf_RegistryInit.Add(
+      "arHttp",
+      _Tf_RegistryFunctionNAME as RegistrationFunctionType<Pixar.Tf_EnvSettingRegistry, OpaquePointer>,
+      "Tf_EnvSettingRegistry"
+    )
+  }
+
+  public enum ArchInitializer
+  {
+    @used @section("__DATA,pxrctor") private static let arch_ctor_NAME = Pixar.Arch_ConstructorEntry(
+      function: _Tf_RegistryAddNAME,
+      version: 0,
+      priority: TF_REGISTRY_PRIORITY
+    )
+  }
+#endif /* LOW_LEVEL_LINKAGE */

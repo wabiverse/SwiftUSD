@@ -53,7 +53,7 @@ let package = Package(
     // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
-      targets: ["ArPrototypes", "Ar"]
+      targets: ["ArTypes", "ArPrototypes", "Ar"]
     ),
     .library(
       name: "Kind",
@@ -213,6 +213,10 @@ let package = Package(
     .executable(
       name: "OpenUSD",
       targets: ["OpenUSD"]
+    ),
+    .executable(
+      name: "Examples",
+      targets: ["Examples"]
     ),
     // -------- Swift Plugins -----
     .plugin(
@@ -414,7 +418,7 @@ let package = Package(
     ),
 
     .target(
-      name: "ArPrototypes",
+      name: "ArTypes",
       dependencies: [
         .target(name: "Arch"),
         .target(name: "Tf"),
@@ -431,9 +435,20 @@ let package = Package(
     ),
 
     .target(
+      name: "ArPrototypes",
+      dependencies: [
+        .target(name: "ArTypes")
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
+
+    .target(
       name: "Ar",
       dependencies: [
         .target(name: "ArPrototypes"),
+        .target(name: "ArTypes"),
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Js"),
@@ -1390,6 +1405,7 @@ let package = Package(
         .target(name: "Plug"),
         // ----------- usd. ------
         .target(name: "ArPrototypes"),
+        .target(name: "ArTypes"),
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),
@@ -1441,6 +1457,16 @@ let package = Package(
       swiftSettings: [
         // enable to debug bundled (python, plugins, resources).
         .define("DEBUG_PIXAR_BUNDLE"),
+        .interoperabilityMode(.Cxx),
+      ]
+    ),
+
+    .executableTarget(
+      name: "Examples",
+      dependencies: [
+        .target(name: "PixarUSD"),
+      ],
+      swiftSettings: [
         .interoperabilityMode(.Cxx),
       ]
     ),

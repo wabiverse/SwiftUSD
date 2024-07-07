@@ -26,7 +26,7 @@
 
 /// \file ar/assetInfo.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Tf/hash.h"
 #include "Vt/value.h"
 #include <pxr/pxrns.h>

@@ -28,7 +28,7 @@
 
 #include <pxr/pxrns.h>
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 
 #include <cstdio>
 

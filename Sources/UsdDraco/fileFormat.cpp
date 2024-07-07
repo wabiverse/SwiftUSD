@@ -29,7 +29,7 @@
 #include "Tf/fileUtils.h"
 #include "Tf/registryManager.h"
 #include "Ar/asset.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include "Usd/usdaFileFormat.h"
 #include "Sdf/layer.h"

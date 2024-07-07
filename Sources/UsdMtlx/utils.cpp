@@ -26,7 +26,7 @@
 #include "Ar/asset.h"
 #include "Ar/packageUtils.h"
 #include "Ar/resolver.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ndr/debugCodes.h"
 #include "Ndr/filesystemDiscoveryHelpers.h"
 #include "Sdf/assetPath.h"

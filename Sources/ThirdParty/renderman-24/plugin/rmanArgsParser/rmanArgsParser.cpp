@@ -36,7 +36,7 @@
 #include "Vt/types.h"
 #include "Vt/array.h"
 #include "Ar/asset.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include "Ndr/debugCodes.h"
 #include "Ndr/nodeDiscoveryResult.h"

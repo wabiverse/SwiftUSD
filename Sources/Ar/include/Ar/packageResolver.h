@@ -26,7 +26,7 @@
 
 /// \file ar/packageResolver.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include <memory>

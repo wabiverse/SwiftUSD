@@ -28,24 +28,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Ar
-import ArPrototypes
+import Foundation
 
-public typealias ArResolver = Pixar.ArResolver & ArResolvable
-public typealias ArDefaultResolver = Pixar.ArDefaultResolver & ArResolvable
-
-/**
- * # ``Ar``
+/** 
+ * A macro that produces a string containing
+ * the source code that generated the value.
  *
- * **Asset Resolution**
+ * For example:
  *
- * ## Overview
+ *   #stringify(x + y)
  *
- * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
- * writing asset data. It provides several interfaces that allow **USD** to access
- * an asset without knowing how that asset is physically stored. */
-public enum Ar
-{
-  public typealias Resolver = ArResolver
-  public typealias DefaultResolver = ArDefaultResolver
-}
+ * produces a string `"x + y"`. */
+@freestanding(expression)
+public macro stringify<T>(_ value: T) -> String = #externalMacro(module: "PixarMacros", type: "StringifyMacro")

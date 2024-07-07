@@ -22,7 +22,7 @@
 // language governing permissions and limitations under the Apache License.
 
 #include "Ar/filesystemAsset.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include <pxr/pxrns.h>
 
 #include "Arch/fileSystem.h"

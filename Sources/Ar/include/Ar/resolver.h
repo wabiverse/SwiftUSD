@@ -26,10 +26,11 @@
 
 /// \file ar/resolver.h
 
-#include "ArPrototypes/api.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/api.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolverContext.h"
 #include "Ar/timestamp.h"
+#include "Arch/swiftInterop.h"
 #include <pxr/pxrns.h>
 
 #include <Arch/swiftInterop.h>
@@ -829,7 +830,7 @@ private:
   // been bound via BindContext in their implementations.
   AR_API
   const ArResolverContext *_GetInternallyManagedCurrentContext() const;
-} SWIFT_IMMORTAL_REFERENCE;
+} SWIFT_CONFORMS_TO_PROTOCOL(ArPrototypes.ArResolvable) SWIFT_IMMORTAL_REFERENCE;
 
 /// Returns the configured asset resolver.
 ///

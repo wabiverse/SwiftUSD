@@ -28,24 +28,18 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Ar
-import ArPrototypes
+import Foundation
+import PixarUSD
 
-public typealias ArResolver = Pixar.ArResolver & ArResolvable
-public typealias ArDefaultResolver = Pixar.ArDefaultResolver & ArResolvable
-
-/**
- * # ``Ar``
- *
- * **Asset Resolution**
- *
- * ## Overview
- *
- * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
- * writing asset data. It provides several interfaces that allow **USD** to access
- * an asset without knowing how that asset is physically stored. */
-public enum Ar
+@main
+enum USDExamples
 {
-  public typealias Resolver = ArResolver
-  public typealias DefaultResolver = ArDefaultResolver
+  static func main()
+  {
+    Msg.logger.info("launched test program 'USDExamples'.")
+
+    ArResolverExamples.run()
+
+    Msg.logger.info("program completed succesfully, exiting...")
+  }
 }

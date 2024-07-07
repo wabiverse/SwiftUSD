@@ -26,7 +26,7 @@
 
 /// \file ar/timestamp.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include "Arch/hints.h"

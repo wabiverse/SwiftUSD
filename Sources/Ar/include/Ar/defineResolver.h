@@ -27,7 +27,7 @@
 /// \file ar/defineResolver.h
 /// Macros for defining a custom resolver implementation.
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 

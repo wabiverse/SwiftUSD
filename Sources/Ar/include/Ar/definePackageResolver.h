@@ -27,7 +27,7 @@
 /// \file ar/definePackageResolver.h
 /// Macros for defining a package resolver implementation.
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Ar/packageResolver.h"
 #include <pxr/pxrns.h>
 

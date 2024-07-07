@@ -24,9 +24,9 @@
 #ifndef PXR_USD_AR_RESOLVED_PATH_H
 #define PXR_USD_AR_RESOLVED_PATH_H
 
-/// \file ArPrototypes/resolvedPath.h
+/// \file ArTypes/resolvedPath.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Tf/hash.h"
 #include <pxr/pxrns.h>
 

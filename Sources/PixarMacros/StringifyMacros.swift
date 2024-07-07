@@ -28,24 +28,23 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Ar
-import ArPrototypes
+import SwiftSyntax
+import SwiftSyntaxBuilder
+import SwiftSyntaxMacros
 
-public typealias ArResolver = Pixar.ArResolver & ArResolvable
-public typealias ArDefaultResolver = Pixar.ArDefaultResolver & ArResolvable
-
-/**
- * # ``Ar``
- *
- * **Asset Resolution**
- *
- * ## Overview
- *
- * **Ar** is the **asset resolution** library, and is responsible for querying, reading, and
- * writing asset data. It provides several interfaces that allow **USD** to access
- * an asset without knowing how that asset is physically stored. */
-public enum Ar
+public struct StringifyMacro: ExpressionMacro
 {
-  public typealias Resolver = ArResolver
-  public typealias DefaultResolver = ArDefaultResolver
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in _: some MacroExpansionContext
+  ) -> ExprSyntax
+  {
+    guard let argument = node.argumentList.first?.expression
+    else
+    {
+      fatalError("compiler bug: the macro does not have any arguments")
+    }
+
+    return "\(literal: argument.description)"
+  }
 }

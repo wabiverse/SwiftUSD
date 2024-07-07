@@ -26,9 +26,9 @@
 
 /// \file ar/defaultResolver.h
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Ar/defaultResolverContext.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 #include <pxr/pxrns.h>
 

@@ -21,6 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
+#ifndef __PXR_USD_AR_TYPES_H__
+#define __PXR_USD_AR_TYPES_H__
 
-#include "ArPrototypes/resolvedPath.h"
+#include <ArTypes/api.h>
+#include <ArTypes/resolvedPath.h>
+
+#endif /* __PXR_USD_AR_TYPES_H__ */

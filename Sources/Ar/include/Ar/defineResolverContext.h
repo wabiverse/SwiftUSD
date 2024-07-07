@@ -24,7 +24,7 @@
 #ifndef PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H
 #define PXR_USD_AR_DEFINE_RESOLVER_CONTEXT_H
 
-#include "ArPrototypes/api.h"
+#include "ArTypes/api.h"
 #include "Ar/resolverContext.h"
 #include <pxr/pxrns.h>
 

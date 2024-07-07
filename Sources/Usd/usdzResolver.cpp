@@ -28,7 +28,7 @@
 
 #include "Ar/asset.h"
 #include "Ar/definePackageResolver.h"
-#include "ArPrototypes/resolvedPath.h"
+#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
 #include <OneTBB/tbb/concurrent_hash_map.h>
