@@ -49,3 +49,64 @@ public enum Ar
   public typealias Resolver = ArResolver
   public typealias DefaultResolver = ArDefaultResolver
 }
+
+public extension Pixar.ArDefaultResolver
+{
+  private borrowing func GetCurrentContextPtrCopy() -> ArDefaultResolverContext
+  {
+    __GetCurrentContextPtrUnsafe().pointee
+  }
+
+  var currentContext: ArDefaultResolverContext
+  {
+    GetCurrentContextPtrCopy()
+  }
+
+  func _Resolve(_ path: std.string) -> Pixar.ArResolvedPath
+  {
+    print("woohoo!")
+
+    if path.empty()
+    {
+      return Pixar.ArResolvedPath()
+    }
+
+    if !path.empty(), Pixar.TfIsRelativePath(path)
+    {
+      // First try to resolve relative paths against the current
+      // working directory.
+      var resolvedPath = Pixar.ArDefaultResolver._ResolveAnchored(Pixar.ArchGetCwd(), path)
+      if !resolvedPath.empty()
+      {
+        return resolvedPath
+      }
+
+      // If that fails and the path is a search path, try to resolve
+      // against each directory in the specified search paths.
+      if !path.empty() && Pixar.TfIsRelativePath(path),
+         path.find(std.string("./")) == 0 || path.find(std.string("../")) == 0
+      {
+        let contexts: [Pixar.ArDefaultResolverContext] = [
+          currentContext,
+          GetFallbackContext()
+        ]
+
+        for ctx in contexts
+        {
+          for searchPath in ctx.searchPath
+          {
+            resolvedPath = Pixar.ArDefaultResolver._ResolveAnchored(std.string(searchPath), path)
+            if !resolvedPath.empty()
+            {
+              return resolvedPath
+            }
+          }
+        }
+      }
+
+      return Pixar.ArResolvedPath()
+    }
+
+    return Pixar.ArDefaultResolver._ResolveAnchored(std.string(), path)
+  }
+}

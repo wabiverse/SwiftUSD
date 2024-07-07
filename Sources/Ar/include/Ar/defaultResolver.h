@@ -80,7 +80,17 @@ public:
   /// paths specified via the environment variable PXR_AR_DEFAULT_SEARCH_PATH
   AR_API
   static void SetDefaultSearchPath(const ArSearchPathVec &searchPath);
+  
+  AR_API
+  static ArResolvedPath _ResolveAnchored(const std::string &anchorPath,
+                                         const std::string &path);
 
+  AR_API
+  const ArDefaultResolverContext GetFallbackContext() const;
+  
+  AR_API
+  const ArDefaultResolverContext *GetCurrentContextPtr() const;
+  
 protected:
   AR_API
   std::string

@@ -29,18 +29,42 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
+import GalahInterpreter
 import PixarUSD
 
-@main
-enum USDExamples
+func embedGalahInterpreter() throws
 {
-  static func main()
+  let interpreter = try Interpreter(
+    """
+    fn fibonacci(n: Int) -> Int {
+        if n == 1 || n == 2 {
+            return 1
+        } else {
+            return fibonacci(n - 1) + fibonacci(n - 2)
+        }
+    }
+    """
+  )
+
+  Msg.logger.info("successfully embedded the galah interpreter.")
+
+  Msg.logger.info("running a test fibnonacci script in galah...")
+  let result: Int = try interpreter.fibonacci(20)
+  Msg.logger.info("got result: interpreter.fibonacci(20) = \(result)")
+}
+
+public enum GalahInterpreterExamples
+{
+  static func run()
   {
-    Msg.logger.info("launched test program 'USDExamples'.")
-
-    ArResolverExamples.run()
-    GalahInterpreterExamples.run()
-
-    Msg.logger.info("program completed succesfully, exiting...")
+    do
+    {
+      Msg.logger.info("embedding the galah interpreter...")
+      try embedGalahInterpreter()
+    }
+    catch
+    {
+      Msg.logger.error("could not embed the galah interpreter: \(error.localizedDescription)")
+    }
   }
 }

@@ -73,9 +73,11 @@ public:
   AR_API bool operator<(const ArDefaultResolverContext &rhs) const;
   AR_API bool operator==(const ArDefaultResolverContext &rhs) const;
   AR_API bool operator!=(const ArDefaultResolverContext &rhs) const;
+  
+  using SearchPaths = std::vector<std::string>;
 
   /// Return this context's search path.
-  const std::vector<std::string> &GetSearchPath() const { return _searchPath; }
+  const SearchPaths &GetSearchPath() const { return _searchPath; }
 
   /// Return a string representation of this context for debugging.
   AR_API std::string GetAsString() const;

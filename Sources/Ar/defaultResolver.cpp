@@ -99,6 +99,11 @@ ArDefaultResolver::ArDefaultResolver() {
 
 ArDefaultResolver::~ArDefaultResolver() {}
 
+const ArDefaultResolverContext ArDefaultResolver::GetFallbackContext() const
+{
+  return _fallbackContext;
+}
+
 void ArDefaultResolver::SetDefaultSearchPath(
     const std::vector<std::string> &searchPath) {
   *_SearchPath = searchPath;
@@ -150,8 +155,9 @@ std::string ArDefaultResolver::_CreateIdentifierForNewAsset(
   return TfNormPath(assetPath);
 }
 
-static ArResolvedPath _ResolveAnchored(const std::string &anchorPath,
-                                       const std::string &path) {
+// static
+ArResolvedPath ArDefaultResolver::_ResolveAnchored(const std::string &anchorPath,
+                                                   const std::string &path) {
   std::string resolvedPath = path;
   if (!anchorPath.empty()) {
     // XXX - CLEANUP:
@@ -253,6 +259,11 @@ ArResolverContext ArDefaultResolver::_CreateDefaultContextForAsset(
 
   return ArResolverContext(
       ArDefaultResolverContext(std::vector<std::string>(1, assetDir)));
+}
+
+const ArDefaultResolverContext *
+ArDefaultResolver::GetCurrentContextPtr() const {
+  return _GetCurrentContextPtr();
 }
 
 const ArDefaultResolverContext *

@@ -38,20 +38,17 @@ import PixarUSD
 
 final class CustomResolver: ArDefaultResolver
 {
-  public init()
-  {}
-
-  func _Resolve(_ assetPath: std.string) -> ArResolvedPath
+  func _resolve(_ path: std.string) -> Pixar.ArResolvedPath
   {
-    Msg.logger.info("resolving path: \(assetPath)")
+    Msg.logger.info("resolving path: \(path)")
 
-    let asset = _resolve(path: String(assetPath))
+    let asset = _Resolve(path)
     if !asset.empty()
     {
       return asset
     }
 
-    return .init(assetPath)
+    return .init()
   }
 }
 
@@ -63,8 +60,8 @@ public enum ArResolverExamples
 
     Msg.logger.info("creating new ar custom resolver.")
     let resolver = CustomResolver()
-
-    resolver.resolve(path: "")
+    let resolvedPath = resolver._resolve(std.string("HelloPixarUSD.usda"))
+    print("resolved path: \(resolvedPath.empty() ? "empty" : resolvedPath.path)")
 
     Msg.logger.info("ar resolver examples succesfully completed.")
   }

@@ -28,19 +28,23 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import Ar
 import Foundation
-import PixarUSD
 
-@main
-enum USDExamples
+public typealias ArDefaultResolverContext = Pixar.ArDefaultResolverContext
+
+public extension ArDefaultResolverContext
 {
-  static func main()
+  private borrowing func GetSearchPathCopy() -> ArDefaultResolverContext.SearchPaths
   {
-    Msg.logger.info("launched test program 'USDExamples'.")
+    __GetSearchPathUnsafe().pointee
+  }
 
-    ArResolverExamples.run()
-    GalahInterpreterExamples.run()
-
-    Msg.logger.info("program completed succesfully, exiting...")
+  var searchPath: [String]
+  {
+    GetSearchPathCopy().map
+    {
+      String($0)
+    }
   }
 }

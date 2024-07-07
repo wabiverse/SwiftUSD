@@ -32,58 +32,49 @@ import ArTypes
 import CxxStdlib
 import Foundation
 
-public typealias ArResolvedPath = Pixar.ArResolvedPath
-
 /* ----
  cxx implementation.
  ---- */
 
 public protocol ArResolvable
 {
-  init()
+  func CreateIdentifier(_ assetPath: std.string, _ anchorAssetPath: Pixar.ArResolvedPath) -> std.string
 
-  func CreateIdentifier(_ assetPath: std.string, _ anchorAssetPath: ArResolvedPath) -> std.string
+  func CreateIdentifierForNewAsset(_ assetPath: std.string, _ anchorAssetPath: Pixar.ArResolvedPath) -> std.string
 
-  func CreateIdentifierForNewAsset(_ assetPath: std.string, _ anchorAssetPath: ArResolvedPath) -> std.string
+  func Resolve(_ assetPath: std.string) -> Pixar.ArResolvedPath
 
-  func Resolve(_ assetPath: std.string) -> ArResolvedPath
-
-  func ResolveForNewAsset(_ assetPath: std.string) -> ArResolvedPath
+  func ResolveForNewAsset(_ assetPath: std.string) -> Pixar.ArResolvedPath
 
   /* ----
    virtual functions.
                  ---- */
 
-  func _CreateIdentifier(_ assetPath: std.string, _ anchorAssetPath: ArResolvedPath) -> std.string
+  func _CreateIdentifier(_ assetPath: std.string, _ anchorAssetPath: Pixar.ArResolvedPath) -> std.string
 
-  func _CreateIdentifierForNewAsset(_ assetPath: std.string, _ anchorAssetPath: ArResolvedPath) -> std.string
+  func _CreateIdentifierForNewAsset(_ assetPath: std.string, _ anchorAssetPath: Pixar.ArResolvedPath) -> std.string
 
-  func _Resolve(_ assetPath: std.string) -> ArResolvedPath
+  func _Resolve(_ path: std.string) -> Pixar.ArResolvedPath
 }
 
 public extension ArResolvable
 {
-  private init()
-  {
-    self.init()
-  }
-
-  func createIdentifier(_ path: std.string, anchorPath: ArResolvedPath = .init()) -> std.string
+  func createIdentifier(_ path: std.string, anchorPath: Pixar.ArResolvedPath = .init()) -> std.string
   {
     CreateIdentifier(path, anchorPath)
   }
 
-  func createIdentifierForNewAsset(_ path: std.string, anchorPath: ArResolvedPath = .init()) -> std.string
+  func createIdentifierForNewAsset(_ path: std.string, anchorPath: Pixar.ArResolvedPath = .init()) -> std.string
   {
     CreateIdentifierForNewAsset(path, anchorPath)
   }
 
-  func resolve(path: String) -> ArResolvedPath
+  func resolve(path: String) -> Pixar.ArResolvedPath
   {
     Resolve(std.string(path))
   }
 
-  func resolveForNewAsset(path: String) -> ArResolvedPath
+  func resolveForNewAsset(path: String) -> Pixar.ArResolvedPath
   {
     ResolveForNewAsset(std.string(path))
   }
@@ -92,52 +83,47 @@ public extension ArResolvable
    virtual functions.
                  ---- */
 
-  func _createIdentifier(_ path: std.string, _ anchorPath: ArResolvedPath) -> std.string
+  func _createIdentifier(_ path: std.string, _ anchorPath: Pixar.ArResolvedPath) -> std.string
   {
     _CreateIdentifier(path, anchorPath)
   }
 
-  func _createIdentifierForNewAsset(_ path: std.string, _ anchorPath: ArResolvedPath) -> std.string
+  func _createIdentifierForNewAsset(_ path: std.string, _ anchorPath: Pixar.ArResolvedPath) -> std.string
   {
     _CreateIdentifierForNewAsset(path, anchorPath)
   }
 
-  func _resolve(path: String) -> ArResolvedPath
-  {
-    _Resolve(std.string(path))
-  }
-
-  func CreateIdentifier(_: std.string, _: ArPrototypes.ArResolvedPath) -> std.string
+  func CreateIdentifier(_: std.string, _: Pixar.ArResolvedPath) -> std.string
   {
     .init()
   }
 
-  func CreateIdentifierForNewAsset(_: std.string, _: ArPrototypes.ArResolvedPath) -> std.string
+  func CreateIdentifierForNewAsset(_: std.string, _: Pixar.ArResolvedPath) -> std.string
   {
     .init()
   }
 
-  func Resolve(_: std.string) -> ArPrototypes.ArResolvedPath
+  func Resolve(_: std.string) -> Pixar.ArResolvedPath
   {
     .init()
   }
 
-  func ResolveForNewAsset(_: std.string) -> ArPrototypes.ArResolvedPath
+  func ResolveForNewAsset(_: std.string) -> Pixar.ArResolvedPath
   {
     .init()
   }
 
-  func _CreateIdentifier(_: std.string, _: ArPrototypes.ArResolvedPath) -> std.string
+  func _CreateIdentifier(_: std.string, _: Pixar.ArResolvedPath) -> std.string
   {
     .init()
   }
 
-  func _CreateIdentifierForNewAsset(_: std.string, _: ArPrototypes.ArResolvedPath) -> std.string
+  func _CreateIdentifierForNewAsset(_: std.string, _: Pixar.ArResolvedPath) -> std.string
   {
     .init()
   }
 
-  func _Resolve(_: std.string) -> ArResolvedPath
+  func _Resolve(_: std.string) -> Pixar.ArResolvedPath
   {
     .init()
   }
