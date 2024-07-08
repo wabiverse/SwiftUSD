@@ -1,5 +1,5 @@
 {
-  "originHash" : "b7790a0acf474c23d9215e1446d87ec640a51c44c2d33bb5d0d64add06b570ee",
+  "originHash" : "3a0fb0dc42367f16a069dcfea1537bcd74604710afc9d41c8ff70cfe4c8fe6b9",
   "pins" : [
     {
       "identity" : "aexml",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "38f7d00b23ecd891e1ee656fa6aeebd6ba04ecc3",
         "version" : "4.6.1"
+      }
+    },
+    {
+      "identity" : "galah",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/galah.git",
+      "state" : {
+        "revision" : "a90d086184e8e0fb3d32803b051acf75ff50d66d",
+        "version" : "1.0.0"
       }
     },
     {
@@ -170,6 +179,15 @@
       "state" : {
         "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
         "version" : "1.6.1"
+      }
+    },
+    {
+      "identity" : "swift-macro-toolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stackotter/swift-macro-toolkit",
+      "state" : {
+        "revision" : "106daeb38eb3f52b1540aed981fc63fa22274576",
+        "version" : "0.3.1"
       }
     },
     {

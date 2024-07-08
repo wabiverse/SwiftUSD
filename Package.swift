@@ -1,6 +1,15 @@
 // swift-tools-version: 5.10
 import CompilerPluginSupport
+import Foundation
 import PackageDescription
+
+/// previous versions of swift before 6.0 have issues
+/// compiling swift macros, so galah is only supported
+/// for swift 6.0+.
+var galahDeps: [Package.Dependency] = []
+var galahSettings: [SwiftSetting] = [.interoperabilityMode(.Cxx)]
+var galahTargetDeps: [Target.Dependency] = [.target(name: "PixarUSD")]
+_ = Galah()
 
 let package = Package(
   name: "SwiftUSD",
@@ -241,7 +250,6 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.3"),
-    // .package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -249,7 +257,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/mxcl/Version.git", from: "2.0.0"),
-  ],
+  ] + galahDeps,
   targets: [
     .target(
       name: "pxr",
@@ -1464,14 +1472,8 @@ let package = Package(
 
     .executableTarget(
       name: "Examples",
-      dependencies: [
-        .target(name: "PixarUSD"),
-        // .product(name: "GalahInterpreter", package: "galah")
-      ],
-      swiftSettings: [
-        .interoperabilityMode(.Cxx),
-        // .define("WITH_GALAH"),
-      ]
+      dependencies: galahTargetDeps,
+      swiftSettings: galahSettings
     ),
 
     .testTarget(
@@ -2416,5 +2418,45 @@ enum Arch
         }
       }
     }
+  }
+}
+
+struct Galah
+{
+  /**
+   * hacky way to detect if swift 6 might be available on your platform,
+   * sadly there is no other way since swiftpm got even more restrictive
+   * by not allowing executables to be called via Process() inside swift
+   * package manifests anymore, as this now errors with a lovely output
+   * of: ["error: permissionDenied\n"], so we cannot just simply call
+   * 'swift --version' either. */
+  init(supported: Bool = false)
+  {
+    var withGalah = supported
+    
+    // if we are on these platforms, we are on swift 6, enable galah.
+#if os(macOS)
+    if #available(macOS 15, visionOS 2, iOS 18, tvOS 18, watchOS 18, *)
+    {
+      withGalah = true
+    }
+#endif
+    
+    // if swift is version 6 or later, enable galah. need to check how
+    // this preprocesses if linux has swift 6.0 installed (we want to
+    // continue to allow a minimum swift-tools-version of 5.10, while
+    // opening up features for later swift versions, if available).
+#if swift(>=6.0)
+    withGalah = true
+#endif /* swift(>=6.0) */
+    
+    if withGalah { Galah.enableGalah() }
+  }
+  
+  static func enableGalah()
+  {
+    galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0")]
+    galahSettings = [.interoperabilityMode(.Cxx), .define("WITH_GALAH")]
+    galahTargetDeps = [.target(name: "PixarUSD"), .product(name: "GalahInterpreter", package: "galah")]
   }
 }
