@@ -39,7 +39,9 @@ enum USDExamples
     Msg.logger.info("launched test program 'USDExamples'.")
 
     ArResolverExamples.run()
-    GalahInterpreterExamples.run()
+    #if WITH_GALAH
+      GalahInterpreterExamples.run()
+    #endif /* WITH_GALAH */
 
     Msg.logger.info("program completed succesfully, exiting...")
   }

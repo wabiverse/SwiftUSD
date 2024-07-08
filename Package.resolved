@@ -1,5 +1,5 @@
 {
-  "originHash" : "37f8f5ea8cc8d58c3a725f03a91acbb8ffd6e8f7c19740c1b5cceae5d089e27a",
+  "originHash" : "b7790a0acf474c23d9215e1446d87ec640a51c44c2d33bb5d0d64add06b570ee",
   "pins" : [
     {
       "identity" : "aexml",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "38f7d00b23ecd891e1ee656fa6aeebd6ba04ecc3",
         "version" : "4.6.1"
-      }
-    },
-    {
-      "identity" : "galah",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/galah.git",
-      "state" : {
-        "revision" : "a90d086184e8e0fb3d32803b051acf75ff50d66d",
-        "version" : "1.0.0"
       }
     },
     {
@@ -85,7 +76,7 @@
     {
       "identity" : "rainbow",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/onevcat/Rainbow",
+      "location" : "https://github.com/onevcat/Rainbow.git",
       "state" : {
         "revision" : "626c3d4b6b55354b4af3aa309f998fae9b31a3d9",
         "version" : "3.2.0"
@@ -179,15 +170,6 @@
       "state" : {
         "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
         "version" : "1.6.1"
-      }
-    },
-    {
-      "identity" : "swift-macro-toolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stackotter/swift-macro-toolkit",
-      "state" : {
-        "revision" : "106daeb38eb3f52b1540aed981fc63fa22274576",
-        "version" : "0.3.1"
       }
     },
     {

@@ -241,7 +241,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.3"),
-    .package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0"),
+    // .package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -1466,10 +1466,11 @@ let package = Package(
       name: "Examples",
       dependencies: [
         .target(name: "PixarUSD"),
-        .product(name: "GalahInterpreter", package: "galah")
+        // .product(name: "GalahInterpreter", package: "galah")
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
+        // .define("WITH_GALAH"),
       ]
     ),
 
