@@ -61,7 +61,7 @@ public enum ArResolverExamples
     Msg.logger.info("creating new ar custom resolver.")
     let resolver = CustomResolver()
     let resolvedPath = resolver._resolve(std.string("HelloPixarUSD.usda"))
-    print("resolved path: \(resolvedPath.empty() ? "empty" : resolvedPath.path)")
+    Msg.logger.info("resolved path: \(resolvedPath.empty() ? "empty" : resolvedPath.path)")
 
     Msg.logger.info("ar resolver examples succesfully completed.")
   }

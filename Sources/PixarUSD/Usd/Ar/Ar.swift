@@ -64,8 +64,6 @@ public extension Pixar.ArDefaultResolver
 
   func _Resolve(_ path: std.string) -> Pixar.ArResolvedPath
   {
-    print("woohoo!")
-
     if path.empty()
     {
       return Pixar.ArResolvedPath()
@@ -81,10 +79,18 @@ public extension Pixar.ArDefaultResolver
         return resolvedPath
       }
 
+      #if swift(>=6.0)
+        /**
+         * std.string's find function only works in Swift 6.0 and later.
+         */
+        let found = path.find(std.string("./")) == 0 || path.find(std.string("../")) == 0
+      #else
+        let found = Pixar.ArResolvedPathUtils.FindCwdOrPrevDir(path)
+      #endif
+
       // If that fails and the path is a search path, try to resolve
       // against each directory in the specified search paths.
-      if !path.empty() && Pixar.TfIsRelativePath(path),
-         path.find(std.string("./")) == 0 || path.find(std.string("../")) == 0
+      if !path.empty(), Pixar.TfIsRelativePath(path), found
       {
         let contexts: [Pixar.ArDefaultResolverContext] = [
           currentContext,

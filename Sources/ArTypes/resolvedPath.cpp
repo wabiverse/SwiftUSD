@@ -24,3 +24,15 @@
 #include <pxr/pxrns.h>
 
 #include "ArTypes/resolvedPath.h"
+
+#include <string>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+// static
+bool ArResolvedPathUtils::FindCwdOrPrevDir(const std::string &path)
+{
+  return path.find("./") == 0 || path.find("../") == 0;
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE

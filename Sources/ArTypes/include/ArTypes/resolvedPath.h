@@ -150,7 +150,7 @@ class ArResolvedPath {
   {
     return _resolvedPath;
   }
-
+  
  private:
   std::string _resolvedPath;
 };
@@ -159,6 +159,24 @@ template<class HashState> void TfHashAppend(HashState &h, const ArResolvedPath &
 {
   h.Append(p.GetPathString());
 }
+
+struct ArResolvedPathUtils
+{
+  /// Return true if the path is relative to this directory
+  /// or its parent directory.
+  ///
+  /// NOTE: This function is only meant to be called in swift
+  /// 5.10 and earlier, as you can directly call the following
+  /// as of version 6.0 and later:
+  ///
+  /// ```swift
+  /// let path = std.string("./Some/Path")
+  /// let isRelative = path.find(std.string("./")) == 0 || path.find(std.string("../")) == 0
+  /// print(isRelative) // prints: 'true'.
+  /// ```
+  AR_API
+  static bool FindCwdOrPrevDir(const std::string &path);
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
