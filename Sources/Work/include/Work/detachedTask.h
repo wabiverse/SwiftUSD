@@ -26,17 +26,19 @@
 
 /// \file work/detachedTask.h
 
+#include "pxr/pxrns.h"
 #include "Tf/errorMark.h"
 #include "Work/api.h"
 #include "Work/dispatcher.h"
-#include <pxr/pxrns.h>
 
 #include <type_traits>
 #include <utility>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class Fn> struct Work_DetachedTask {
+template <class Fn>
+struct Work_DetachedTask
+{
   explicit Work_DetachedTask(Fn &&fn) : _fn(std::move(fn)) {}
   explicit Work_DetachedTask(Fn const &fn) : _fn(fn) {}
   void operator()() const {
@@ -44,7 +46,6 @@ template <class Fn> struct Work_DetachedTask {
     _fn();
     m.Clear();
   }
-
 private:
   Fn _fn;
 };
@@ -57,13 +58,16 @@ void Work_EnsureDetachedTaskProgress();
 
 /// Invoke \p fn asynchronously, discard any errors it produces, and provide
 /// no way to wait for it to complete.
-template <class Fn> void WorkRunDetachedTask(Fn &&fn) {
+template <class Fn>
+void WorkRunDetachedTask(Fn &&fn)
+{
   using FnType = typename std::remove_reference<Fn>::type;
   Work_DetachedTask<FnType> task(std::forward<Fn>(fn));
   if (WorkHasConcurrency()) {
     Work_GetDetachedDispatcher().Run(std::move(task));
     Work_EnsureDetachedTaskProgress();
-  } else {
+  }
+  else {
     task();
   }
 }

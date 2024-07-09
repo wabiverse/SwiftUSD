@@ -35,7 +35,7 @@ func createScene()
 {
   /* Create stage with a sphere on a transform. */
 
-  let stage = Usd.Stage.createNew("\(documentsDirPath())/HelloWorldExample", ext: .usda)
+  let stage = Usd.Stage.createNew("\(documentsDirPath())/HelloWorldExample", ext: .usd)
 
   let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
   xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))

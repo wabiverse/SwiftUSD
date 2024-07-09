@@ -167,7 +167,7 @@ void Sdf_ChangeManager::_SendNotices(_Data *data) {
 
   // Obtain a serial number for this round of change processing.
   static std::atomic<size_t> &changeSerialNumber = _InitChangeSerialNumber();
-  size_t serialNumber = changeSerialNumber.fetch_add(1);
+  size_t serialNumber = changeSerialNumber.fetch_add(1, std::memory_order_relaxed);
 
   // Send global notice.
   SdfNotice::LayersDidChange(changes, serialNumber).Send();

@@ -22,63 +22,43 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include "pxr/pxrns.h"
 #include "Work/dispatcher.h"
-#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#if !WITH_TBB_LEGACY
-WorkDispatcher::WorkDispatcher() { _waitCleanupFlag.clear(); }
-
-WorkDispatcher::~WorkDispatcher() { Wait(); }
-
-void WorkDispatcher::Wait() {
-  _tg.wait();
-
-  // If we take the flag from false -> true, we do the cleanup.
-  if (_waitCleanupFlag.test_and_set() == false) {
-    // Post all diagnostics to this thread's list.
-    for (auto &et : _errors) {
-      et.Post();
-    }
-    _errors.clear();
-    _waitCleanupFlag.clear();
-  }
-}
-
-void WorkDispatcher::Cancel() { _tg.cancel(); }
-#else  /* WITH_TBB_LEGACY */
 WorkDispatcher::WorkDispatcher()
-    : _context(tbb::task_group_context::isolated,
-               tbb::task_group_context::concurrent_wait |
-                   tbb::task_group_context::default_traits) {
+: _context(
+           tbb::task_group_context::isolated,
+           tbb::task_group_context::concurrent_wait |
+           tbb::task_group_context::default_traits)
+{
   _waitCleanupFlag.clear();
-
-  // The concurrent_wait flag used with the task_group_context ensures
-  // the ref count will remain at 1 after all predecessor tasks are
-  // completed, so we don't need to keep resetting it in Wait().
-  _rootTask = new (tbb::task::allocate_root(_context)) tbb::empty_task;
-  _rootTask->set_ref_count(1);
+  
+  _taskGroup = new tbb::task_group(_context);
 }
 
-WorkDispatcher::~WorkDispatcher() {
+WorkDispatcher::~WorkDispatcher()
+{
   Wait();
-  tbb::task::destroy(*_rootTask);
+  delete _taskGroup;
 }
 
-void WorkDispatcher::Wait() {
+void
+WorkDispatcher::Wait()
+{
   // Wait for tasks to complete.
-  _rootTask->wait_for_all();
-
+  _taskGroup->wait();
+  
   // If we take the flag from false -> true, we do the cleanup.
   if (_waitCleanupFlag.test_and_set() == false) {
     // Reset the context if canceled.
     if (_context.is_group_execution_cancelled()) {
       _context.reset();
     }
-
+    
     // Post all diagnostics to this thread's list.
-    for (auto &et : _errors) {
+    for (auto &et: _errors) {
       et.Post();
     }
     _errors.clear();
@@ -86,12 +66,17 @@ void WorkDispatcher::Wait() {
   }
 }
 
-void WorkDispatcher::Cancel() { _context.cancel_group_execution(); }
-#endif /* WITH_TBB_LEGACY */
+void
+WorkDispatcher::Cancel()
+{
+  _context.cancel_group_execution();
+}
 
 /* static */
-void WorkDispatcher::_TransportErrors(const TfErrorMark &mark,
-                                      _ErrorTransports *errors) {
+void
+WorkDispatcher::_TransportErrors(const TfErrorMark &mark,
+                                 _ErrorTransports *errors)
+{
   TfErrorTransport transport = mark.Transport();
   errors->grow_by(1)->swap(transport);
 }

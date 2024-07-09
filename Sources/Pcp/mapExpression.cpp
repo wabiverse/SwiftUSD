@@ -214,7 +214,7 @@ PcpMapExpression::_Node::New(_Op op_, const _NodeRefPtr &arg1_,
     // Check for existing instance to re-use
     _NodeMap::accessor accessor;
     if (_nodeRegistry->map.insert(accessor, key) ||
-        accessor->second->_refCount.fetch_add(1) == 0) {
+        accessor->second->_refCount.fetch_add(1, std::memory_order_relaxed) == 0) {
       // Either there was no node in the table, or there was but it had
       // begun dying (another client dropped its refcount to 0).  We have
       // to create a new node in the table.  When the client that is
@@ -337,7 +337,7 @@ bool PcpMapExpression::_Node::Key::operator==(const Key &key) const {
 void intrusive_ptr_add_ref(PcpMapExpression::_Node *p) { ++p->_refCount; }
 
 void intrusive_ptr_release(PcpMapExpression::_Node *p) {
-  if (p->_refCount.fetch_sub(1) == 1)
+  if (p->_refCount.fetch_sub(1, std::memory_order_relaxed) == 1)
     delete p;
 }
 
