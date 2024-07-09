@@ -30,36 +30,27 @@
 
 import Foundation
 import PixarUSD
+#if canImport(PyBundle)
+  import PyBundle
+#endif /* canImport(PyBundle) */
 
-@main
-enum USDExamples
+func embedPython()
 {
-  static func main()
+  #if canImport(PyBundle)
+    /* embed & init python. */
+    PyBundler.shared.pyInit()
+    PyBundler.shared.pyInfo()
+  #endif /* canImport(PyBundle) */
+}
+
+enum PythonInterpreterExamples
+{
+  static func run()
   {
-    Msg.logger.info("launched test program 'USDExamples'.")
+    Msg.logger.info("running python interpreter examples...")
 
-    /* Setup all usd resources (python, plugins, resources). */
-    #if os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-      Pixar.Bundler.shared.setup(.resources, installPlugins: true)
-    #else
-      Pixar.Bundler.shared.setup(.resources, installPlugins: false)
-    #endif
+    embedPython()
 
-    Msg.logger.info("succesfully registered all usd plugins.")
-
-    // ar resolver examples.
-    ArResolverExamples.run()
-
-    // galah interpreter examples.
-    #if WITH_GALAH
-      GalahInterpreterExamples.run()
-    #endif /* WITH_GALAH */
-
-    PythonInterpreterExamples.run()
-
-    // scene description examples.
-    SceneDescriptionExamples.run()
-
-    Msg.logger.info("program completed succesfully, exiting...")
+    Msg.logger.info("python interpreter examples complete.")
   }
 }
