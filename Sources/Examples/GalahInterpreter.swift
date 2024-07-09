@@ -37,12 +37,16 @@
   {
     let interpreter = try Interpreter(
       """
-      fn fibonacci(n: Int) -> Int {
-          if n == 1 || n == 2 {
-              return 1
-          } else {
-              return fibonacci(n - 1) + fibonacci(n - 2)
-          }
+      fn fibonacci(n: Int) -> Int 
+      {
+        if n == 1 || n == 2 
+        {
+          return 1
+        } 
+        else 
+        {
+          return fibonacci(n - 1) + fibonacci(n - 2)
+        }
       }
       """
     )
@@ -58,6 +62,8 @@
   {
     static func run()
     {
+      Msg.logger.info("running galah interpreter examples...")
+
       do
       {
         Msg.logger.info("embedding the galah interpreter...")
@@ -67,6 +73,8 @@
       {
         Msg.logger.error("could not embed the galah interpreter: \(error.localizedDescription)")
       }
+
+      Msg.logger.info("galah interpreter examples complete.")
     }
   }
 #endif /* WITH_GALAH */

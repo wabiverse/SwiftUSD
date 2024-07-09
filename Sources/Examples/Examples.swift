@@ -38,10 +38,25 @@ enum USDExamples
   {
     Msg.logger.info("launched test program 'USDExamples'.")
 
+    /* Setup all usd resources (python, plugins, resources). */
+    #if os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
+      Pixar.Bundler.shared.setup(.resources, installPlugins: true)
+    #else
+      Pixar.Bundler.shared.setup(.resources, installPlugins: false)
+    #endif
+
+    Msg.logger.info("succesfully registered all usd plugins.")
+
+    // ar resolver examples.
     ArResolverExamples.run()
+
+    // galah interpreter examples.
     #if WITH_GALAH
       GalahInterpreterExamples.run()
     #endif /* WITH_GALAH */
+
+    // scene description examples.
+    SceneDescriptionExamples.run()
 
     Msg.logger.info("program completed succesfully, exiting...")
   }
