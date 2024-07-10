@@ -108,6 +108,11 @@ extension Usd.Prim: Prim
   {
     SetDocumentation(std.string(doc))
   }
+  
+  public func set(active: Bool)
+  {
+    SetActive(active)
+  }
 
   public func getStage() -> UsdStageWeakPtr
   {

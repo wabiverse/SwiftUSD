@@ -28,42 +28,27 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import CxxStdlib
 import Foundation
-import PixarUSD
+import Sdf
+import Usd
 
-@main
-enum USDExamples
+public typealias UsdStageCache = Pixar.UsdStageCache
+public typealias UsdStageCacheContext = Pixar.UsdStageCacheContext
+
+public extension UsdStageCache
 {
-  static func main()
+  func contains(_ stage: UsdStageRefPtr) -> Bool
   {
-    Msg.logger.info("launched test program 'USDExamples'.")
+    Contains(stage)
+  }
+}
 
-    /* Setup all usd resources (python, plugins, resources). */
-    #if os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-      Pixar.Bundler.shared.setup(.resources, installPlugins: true)
-    #else
-      Pixar.Bundler.shared.setup(.resources, installPlugins: false)
-    #endif
-
-    Msg.logger.info("succesfully registered all usd plugins.")
-
-    // custom ar resolver examples.
-    ArResolverExamples.run()
-
-    // galah interpreter embedding examples.
-    #if WITH_GALAH
-      GalahInterpreterExamples.run()
-    #endif /* WITH_GALAH */
-
-    // python interpreter embedding examples.
-    PythonInterpreterExamples.run()
-
-    // scene description examples.
-    SceneDescriptionExamples.run()
-
-    // scene cache examples.
-    StageCacheExamples.run()
-
-    Msg.logger.info("program completed succesfully, exiting...")
+public extension UsdStageCacheContext
+{
+  @discardableResult
+  static func bind(cache: inout UsdStageCache) -> UsdStageCacheContext
+  {
+    UsdStageCacheContext.CreateCache(&cache)
   }
 }

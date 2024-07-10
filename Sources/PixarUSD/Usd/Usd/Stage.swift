@@ -211,6 +211,28 @@ public extension Usd.Stage
   }
 
   /**
+   * Attempt to find a matching existing stage in a cache if
+   * ``UsdStageCacheContext`` objects exist on the stack. Failing that, create
+   * a new stage and recursively compose prims defined within and referenced by
+   * the layer at `filePath`, which must already exist.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   *
+   * If `pathResolverContext` is provided it will be bound when opening the
+   * root layer at `filePath` and whenever asset path resolution is done for
+   * this stage, regardless of what other context may be bound at that time.
+   * Otherwise Usd will open the root layer with no context bound, then create
+   * a context for all future asset path resolution for the stage by calling
+   * ``ArResolver.CreateDefaultContextForAsset()`` with the layer's repository
+   * path if the layer has one, otherwise its resolved path. */
+  @discardableResult
+  static func open(_ filePath: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  {
+    Usd.Stage.Open(std.string("\(filePath).\(ext.rawValue)"), load.rawValue)
+  }
+
+  /**
    * Attempt to ensure a ``Usd.Prim`` at path is defined (according to ``Usd.Prim.isDefined()``) on this stage.
    *
    * If a prim at path is already defined on this stage and typeName is empty or equal to the existing prim's typeName,
@@ -454,6 +476,14 @@ public extension Usd.Stage
   func setMetadata(_ key: String, _ value: Tf.Token) -> Bool
   {
     SetMetadata(Tf.Token(key), value)
+  }
+
+  func exportToString(_ result: inout String, addSourceFileComment: Bool = true)
+  {
+    var str = std.string()
+    ExportToString(&str, addSourceFileComment)
+
+    result = String(str)
   }
 }
 
@@ -702,5 +732,10 @@ public extension Usd.StageRefPtr
   func setMetadata(_ key: String, _ value: Tf.Token) -> Bool
   {
     pointee.setMetadata(key, value)
+  }
+
+  func exportToString(_ result: inout String, addSourceFileComment: Bool = true)
+  {
+    pointee.exportToString(&result, addSourceFileComment: addSourceFileComment)
   }
 }

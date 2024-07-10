@@ -31,39 +31,42 @@
 import Foundation
 import PixarUSD
 
-@main
-enum USDExamples
+func stageCacheBind()
 {
-  static func main()
+  /* Create new stage for this example. */
+
+  let newStage: UsdStageRefPtr = Usd.Stage.createNew("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
+  newStage.save()
+
+  Msg.logger.info("created a new stage.")
+
+  /* Create the cache and bind the cache context. */
+
+  var stageCache = UsdStageCache()
+  UsdStageCacheContext.bind(cache: &stageCache)
+
+  Msg.logger.info("created a new usd stage cache, and bound it to a cache context.")
+
+  Msg.logger.info("inserting stage into usd stage cache...")
+  let stage = Usd.Stage.open("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
+  Msg.logger.info("checking if usd stage cache contains stage: \(stageCache.contains(stage))")
+
+  Msg.logger.info("attempting to retrieve stage from the cache.")
+  let stage2 = Usd.Stage.open("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
+
+  let id1 = stageCache.GetId(stage).ToLongInt()
+  let id2 = stageCache.GetId(stage2).ToLongInt()
+  Msg.logger.info("stage successfully retrieved from the cache: \(id1 == id2)")
+}
+
+public enum StageCacheExamples
+{
+  static func run()
   {
-    Msg.logger.info("launched test program 'USDExamples'.")
+    Msg.logger.info("running scene cache examples...")
 
-    /* Setup all usd resources (python, plugins, resources). */
-    #if os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-      Pixar.Bundler.shared.setup(.resources, installPlugins: true)
-    #else
-      Pixar.Bundler.shared.setup(.resources, installPlugins: false)
-    #endif
+    stageCacheBind()
 
-    Msg.logger.info("succesfully registered all usd plugins.")
-
-    // custom ar resolver examples.
-    ArResolverExamples.run()
-
-    // galah interpreter embedding examples.
-    #if WITH_GALAH
-      GalahInterpreterExamples.run()
-    #endif /* WITH_GALAH */
-
-    // python interpreter embedding examples.
-    PythonInterpreterExamples.run()
-
-    // scene description examples.
-    SceneDescriptionExamples.run()
-
-    // scene cache examples.
-    StageCacheExamples.run()
-
-    Msg.logger.info("program completed succesfully, exiting...")
+    Msg.logger.info("scene cache examples complete.")
   }
 }

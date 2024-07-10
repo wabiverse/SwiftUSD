@@ -89,16 +89,6 @@ public enum ShadeColor: String, CaseIterable
   }
 }
 
-public func documentsDirPath() -> String
-{
-  #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0].path
-  #else
-    return "."
-  #endif
-}
-
 /**
  * Create a material with a surface shader.
  *
