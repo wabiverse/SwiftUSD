@@ -30,7 +30,9 @@
 
 import Foundation
 import Logging
+#if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS) || os(Linux)
 import Rainbow
+#endif
 
 /* --- xxx --- */
 

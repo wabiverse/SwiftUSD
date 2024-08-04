@@ -249,7 +249,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.5"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.6"),
     .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -289,7 +289,7 @@ let package = Package(
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
-        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
+        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.nix.platform))
       ] + Arch.OS.dependency(.boost),
       publicHeadersPath: "include",
       cxxSettings: [
@@ -307,7 +307,7 @@ let package = Package(
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         /* --------- GXAPI build settings. --------- */
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
         /* --------- Standard USD defines. --------- */
         .define("MFB_PACKAGE_NAME", to: "Arch"),
@@ -1107,6 +1107,7 @@ let package = Package(
         .linkedLibrary("m", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("X11", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("Xt", .when(platforms: Arch.OS.linux.platform)),
+        .linkedLibrary("opengl32", .when(platforms: Arch.OS.windows.platform)),
       ]
     ),
 
@@ -1127,7 +1128,7 @@ let package = Package(
         // enable when swift supports std.unique_ptr
         .define("SWIFT_HAS_UNIQUE_PTR", to: "0"),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
       ]
     ),
@@ -1149,7 +1150,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HgiMetal"),
         .define("HGIMETAL_EXPORTS", to: "1"),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
       ],
       linkerSettings: [
@@ -1175,7 +1176,7 @@ let package = Package(
     //     .define("MFB_PACKAGE_MODULE", to: "HgiVulkan"),
     //     .define("HGIVULKAN_EXPORTS", to: "1"),
     //     .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+    //     .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
     //     .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
     //   ]
     // ),
@@ -1219,7 +1220,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HgiInterop"),
         .define("HGIINTEROP_EXPORTS", to: "1"),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
-        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linux.platform)),
+        .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
       ],
       linkerSettings: [
@@ -1308,7 +1309,7 @@ let package = Package(
         .product(name: "Version", package: "Version"),
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
         .product(name: "Logging", package: "swift-log"),
-        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.apple.platform + Arch.OS.linux.platform))
+        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.nix.platform))
       ],
       resources: [
         // usd source files that need modifications to work with swift are maintained out of these
@@ -1500,10 +1501,18 @@ enum Arch
   /** OS platforms, grouped by family. */
   enum OS
   {
+    /// apple devices (macOS, visionOS, iOS, etc).
     case apple
+    /// linux distros (ubuntu, centos, etc).
     case linux
+    /// microsoft windows.
     case windows
+    /// web (wasm).
     case web
+    /// everything not windows (apple + linux).
+    case nix
+    /// everything not apple (linux + windows).
+    case linwin
 
     public var platform: [Platform]
     {
@@ -1513,6 +1522,8 @@ enum Arch
         case .linux: [.linux, .android, .openbsd]
         case .windows: [.windows]
         case .web: [.wasi]
+        case .nix: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .linux, .android, .openbsd]
+        case .linwin: [.linux, .android, .openbsd, .windows]
       }
     }
 
