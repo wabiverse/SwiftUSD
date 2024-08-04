@@ -272,9 +272,8 @@ let package = Package(
         .target(name: "pxr"),
         /* ------------ VFX Platform. ----------- */
         .product(name: "MetaTBB", package: "MetaverseKit"),
-        .product(name: "PyBind11", package: "MetaverseKit"),
+        .product(name: "PyBind11", package: "MetaverseKit", condition: .when(platforms: Arch.OS.nix.platform)),
         .product(name: "MaterialX", package: "MetaverseKit"),
-        .product(name: "MetaPy", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
         .product(name: "OpenImageIO", package: "MetaverseKit"),
