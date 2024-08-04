@@ -168,15 +168,15 @@
 #include <boost/unordered_map.hpp>
 #include <boost/utility.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <OneTBB/tbb/cache_aligned_allocator.h>
-#include <OneTBB/tbb/concurrent_queue.h>
-#include <OneTBB/tbb/concurrent_unordered_set.h>
-#include <OneTBB/tbb/concurrent_vector.h>
-#include <OneTBB/tbb/enumerable_thread_specific.h>
-#include <OneTBB/tbb/spin_mutex.h>
-#include <OneTBB/tbb/spin_rw_mutex.h>
-#include <OneTBB/tbb/task.h>
-#include <OneTBB/tbb/task_arena.h>
+#include <tbb/cache_aligned_allocator.h>
+#include <tbb/concurrent_queue.h>
+#include <tbb/concurrent_unordered_set.h>
+#include <tbb/concurrent_vector.h>
+#include <tbb/enumerable_thread_specific.h>
+#include <tbb/spin_mutex.h>
+#include <tbb/spin_rw_mutex.h>
+#include <tbb/task.h>
+#include <tbb/task_arena.h>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 #include "Tf/pySafePython.h"
 #endif // PXR_PYTHON_SUPPORT_ENABLED

@@ -34,7 +34,7 @@
 #include "Tf/singleton.h"
 #include "Tf/weakBase.h"
 
-#include <OneTBB/tbb/queuing_rw_mutex.h>
+#include <tbb/queuing_rw_mutex.h>
 #include <memory>
 #include <unordered_map>
 

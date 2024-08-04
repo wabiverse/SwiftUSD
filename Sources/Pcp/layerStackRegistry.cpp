@@ -33,7 +33,7 @@
 #include "Tf/diagnostic.h"
 #include "Tf/staticData.h"
 
-#include <OneTBB/tbb/queuing_rw_mutex.h>
+#include <tbb/queuing_rw_mutex.h>
 
 #include <boost/unordered_map.hpp>
 

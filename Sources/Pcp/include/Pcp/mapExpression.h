@@ -30,7 +30,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
-#include <OneTBB/tbb/spin_mutex.h>
+#include <tbb/spin_mutex.h>
 
 #include <atomic>
 #include <memory>

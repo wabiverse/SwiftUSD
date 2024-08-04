@@ -30,9 +30,9 @@
 #include "Tf/envSetting.h"
 
 #if WITH_TBB_LEGACY
-#include <OneTBB/tbb/task_scheduler_init.h>
+#include <tbb/task_scheduler_init.h>
 #endif /* WITH_TBB_LEGACY */
-#include <OneTBB/tbb/task_arena.h>
+#include <tbb/task_arena.h>
 
 #include <algorithm>
 #include <atomic>

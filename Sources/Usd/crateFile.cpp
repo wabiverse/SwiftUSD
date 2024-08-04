@@ -94,7 +94,7 @@
 #include "Sdf/schema.h"
 #include "Sdf/types.h"
 
-#include <OneTBB/tbb/concurrent_queue.h>
+#include <tbb/concurrent_queue.h>
 
 #include <iostream>
 #include <memory>

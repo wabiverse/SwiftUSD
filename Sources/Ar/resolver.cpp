@@ -50,7 +50,7 @@
 #include "Tf/type.h"
 #include "Vt/value.h"
 
-#include <OneTBB/tbb/concurrent_hash_map.h>
+#include <tbb/concurrent_hash_map.h>
 
 #include <memory>
 #include <mutex>

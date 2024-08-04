@@ -51,8 +51,8 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/intrusive_ptr.hpp>
 
-#include <OneTBB/tbb/concurrent_unordered_set.h>
-#include <OneTBB/tbb/spin_rw_mutex.h>
+#include <tbb/concurrent_unordered_set.h>
+#include <tbb/spin_rw_mutex.h>
 
 #include <cstdint>
 #include <iosfwd>

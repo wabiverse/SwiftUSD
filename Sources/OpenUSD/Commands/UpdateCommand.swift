@@ -396,17 +396,17 @@ public enum Pxr: String, CaseIterable
       /* ----- tbb headers. --------------- */
 
       // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
-      source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
+      source = source.replacingOccurrences(of: "<tbb/", with: "<tbb/")
       // modern versions of tbb no longer have atomic, get it from std.
-      source = source.replacingOccurrences(of: "<OneTBB/tbb/atomic.h>", with: "<atomic>")
+      source = source.replacingOccurrences(of: "<tbb/atomic.h>", with: "<atomic>")
       source = source.replacingOccurrences(of: "tbb::atomic", with: "std::atomic")
       source = source.replacingOccurrences(of: "fetch_and_decrement()", with: "fetch_sub(1)")
       source = source.replacingOccurrences(of: "fetch_and_increment()", with: "fetch_add(1)")
       // modern versions of tbb no longer have mutex, get it from std.
-      source = source.replacingOccurrences(of: "<OneTBB/tbb/mutex.h>", with: "<mutex>")
+      source = source.replacingOccurrences(of: "<tbb/mutex.h>", with: "<mutex>")
       source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
       // modern versions of tbb no longer contain a task_scheduler_init.
-      source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
+      source = source.replacingOccurrences(of: "#include <tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
 
       /* ---- materialx headers ----------- */
 

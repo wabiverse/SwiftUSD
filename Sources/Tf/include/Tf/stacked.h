@@ -29,7 +29,7 @@
 #include "Tf/diagnostic.h"
 #include <pxr/pxrns.h>
 
-#include <OneTBB/tbb/enumerable_thread_specific.h>
+#include <tbb/enumerable_thread_specific.h>
 
 #include <atomic>
 #include <type_traits>

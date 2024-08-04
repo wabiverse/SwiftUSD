@@ -33,7 +33,7 @@
 
 #include <memory>
 
-#include <OneTBB/tbb/spin_mutex.h>
+#include <tbb/spin_mutex.h>
 
 // These are from python, needed for PyFrameObject.
 #include <frameobject.h>

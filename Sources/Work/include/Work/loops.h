@@ -29,10 +29,10 @@
 #include "Work/threadLimits.h"
 #include <pxr/pxrns.h>
 
-#include <OneTBB/tbb/blocked_range.h>
-#include <OneTBB/tbb/parallel_for.h>
-#include <OneTBB/tbb/parallel_for_each.h>
-#include <OneTBB/tbb/task.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_for.h>
+#include <tbb/parallel_for_each.h>
+#include <tbb/task.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

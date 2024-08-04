@@ -69,7 +69,7 @@
 #include "Trace/traceImpl.h"
 #include "Work/withScopedParallelism.h"
 
-#include <OneTBB/tbb/queuing_rw_mutex.h>
+#include <tbb/queuing_rw_mutex.h>
 
 #include <atomic>
 #include <fstream>

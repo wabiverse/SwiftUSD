@@ -32,7 +32,7 @@
 #include "Arch/hints.h"
 #include "Arch/threads.h"
 
-#include <OneTBB/tbb/spin_mutex.h>
+#include <tbb/spin_mutex.h>
 
 #include <algorithm>
 #include <chrono>

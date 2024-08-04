@@ -32,7 +32,7 @@
 #include "Tf/type.h"
 #include <pxr/pxrns.h>
 
-#include <OneTBB/tbb/spin_rw_mutex.h>
+#include <tbb/spin_rw_mutex.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

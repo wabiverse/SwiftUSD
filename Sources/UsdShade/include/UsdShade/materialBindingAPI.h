@@ -36,7 +36,7 @@
 #include "Usd/collectionAPI.h"
 #include "UsdGeom/subset.h"
 #include "UsdShade/material.h"
-#include <OneTBB/tbb/concurrent_unordered_map.h>
+#include <tbb/concurrent_unordered_map.h>
 
 #include "Vt/value.h"
 

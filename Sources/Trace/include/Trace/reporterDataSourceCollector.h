@@ -34,7 +34,7 @@
 
 #include "Tf/declarePtrs.h"
 
-#include <OneTBB/tbb/concurrent_queue.h>
+#include <tbb/concurrent_queue.h>
 
 #include <vector>
 

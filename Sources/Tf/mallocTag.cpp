@@ -44,7 +44,7 @@
 #include "Arch/pxrinttypes.h"
 #include "Arch/stackTrace.h"
 
-#include <OneTBB/tbb/concurrent_hash_map.h>
+#include <tbb/concurrent_hash_map.h>
 
 #include <algorithm>
 #include <atomic>

@@ -52,7 +52,7 @@
 #include <string>
 #include <vector>
 
-#include <OneTBB/tbb/spin_mutex.h>
+#include <tbb/spin_mutex.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

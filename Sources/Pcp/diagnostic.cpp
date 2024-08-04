@@ -42,7 +42,7 @@
 #include "Tf/enum.h"
 #include "Tf/stringUtils.h"
 
-#include <OneTBB/tbb/concurrent_hash_map.h>
+#include <tbb/concurrent_hash_map.h>
 #include <fstream>
 #include <mutex>
 #include <sstream>

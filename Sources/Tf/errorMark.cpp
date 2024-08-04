@@ -30,7 +30,7 @@
 #include "Tf/hashmap.h"
 #include "Tf/iterator.h"
 
-#include <OneTBB/tbb/spin_mutex.h>
+#include <tbb/spin_mutex.h>
 
 #include <sstream>
 #include <string>

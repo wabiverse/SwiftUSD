@@ -53,8 +53,8 @@
 #include "Work/utils.h"
 #include "Work/withScopedParallelism.h"
 
-#include <OneTBB/tbb/concurrent_queue.h>
-#include <OneTBB/tbb/spin_rw_mutex.h>
+#include <tbb/concurrent_queue.h>
+#include <tbb/spin_rw_mutex.h>
 
 #include <algorithm>
 #include <iostream>

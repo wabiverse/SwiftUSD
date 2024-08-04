@@ -31,7 +31,7 @@
 #include "Vt/value.h"
 
 #include <memory>
-#include <OneTBB/tbb/enumerable_thread_specific.h>
+#include <tbb/enumerable_thread_specific.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE

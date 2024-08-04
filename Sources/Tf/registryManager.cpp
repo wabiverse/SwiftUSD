@@ -129,7 +129,7 @@
 #include "Tf/registryManager.h"
 #include "Tf/stringUtils.h"
 
-#include <OneTBB/tbb/enumerable_thread_specific.h>
+#include <tbb/enumerable_thread_specific.h>
 
 #include <cstdlib>
 #include <list>
