@@ -24,8 +24,8 @@
 #ifndef PXR_USD_PLUGIN_USD_ABC_ALEMBIC_TEST_H
 #define PXR_USD_PLUGIN_USD_ABC_ALEMBIC_TEST_H
 
-#include <pxr/pxrns.h>
 #include "UsdAbc/api.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -36,9 +36,8 @@ bool UsdAbc_TestAlembic(const std::string &pathname);
 
 /// Read Usd file from \p srcPathname and write as Alembic to \p dstPathname.
 USDABC_API
-bool UsdAbc_WriteAlembic(const std::string &srcPathname,
-                         const std::string &dstPathname);
+bool UsdAbc_WriteAlembic(const std::string &srcPathname, const std::string &dstPathname);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_TEST_H
+#endif  // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_TEST_H

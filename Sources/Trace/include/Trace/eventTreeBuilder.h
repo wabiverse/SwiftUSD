@@ -42,22 +42,26 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// TraceCollection instances.
 ///
 class Trace_EventTreeBuilder : protected TraceCollection::Visitor {
-public:
+ public:
   /// Constructor.
   Trace_EventTreeBuilder();
 
   /// Returns the created tree.
-  TraceEventTreeRefPtr GetTree() { return _tree; }
+  TraceEventTreeRefPtr GetTree()
+  {
+    return _tree;
+  }
 
   /// Creates a TraceEventTree from the data in /p collection.
   TRACE_API void CreateTree(const TraceCollection &collection);
 
   /// Set the value of the counters.
-  void SetCounterValues(const TraceEventTree::CounterMap &counterValues) {
+  void SetCounterValues(const TraceEventTree::CounterMap &counterValues)
+  {
     _counterAccum.SetCurrentValues(counterValues);
   }
 
-protected:
+ protected:
   /// \name TraceCollection::Visitor Interface
   /// @{
   virtual void OnBeginCollection() override;
@@ -65,11 +69,10 @@ protected:
   virtual bool AcceptsCategory(TraceCategoryId) override;
   virtual void OnBeginThread(const TraceThreadId &) override;
   virtual void OnEndThread(const TraceThreadId &) override;
-  virtual void OnEvent(const TraceThreadId &, const TfToken &,
-                       const TraceEvent &) override;
+  virtual void OnEvent(const TraceThreadId &, const TfToken &, const TraceEvent &) override;
   /// @}
 
-private:
+ private:
   // Helper class for event graph creation.
   struct _PendingEventNode {
     using TimeStamp = TraceEvent::TimeStamp;
@@ -80,8 +83,11 @@ private:
       TraceEventNode::AttributeData data;
     };
 
-    _PendingEventNode(const TfToken &key, TraceCategoryId category,
-                      TimeStamp start, TimeStamp end, bool separateEvents,
+    _PendingEventNode(const TfToken &key,
+                      TraceCategoryId category,
+                      TimeStamp start,
+                      TimeStamp end,
+                      bool separateEvents,
                       bool isComplete);
     TraceEventNodeRefPtr Close();
 
@@ -118,7 +124,7 @@ private:
   TraceEventTreeRefPtr _tree;
 
   class _CounterAccumulator : public TraceCounterAccumulator {
-  protected:
+   protected:
     bool _AcceptsCategory(TraceCategoryId) override;
   };
   _CounterAccumulator _counterAccum;
@@ -128,4 +134,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_EVENT_TREE_BUILDER_H
+#endif  // PXR_BASE_TRACE_EVENT_TREE_BUILDER_H

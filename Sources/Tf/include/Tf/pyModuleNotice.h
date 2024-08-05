@@ -41,19 +41,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// course, is good practice in general.
 ///
 class TfPyModuleWasLoaded : public TfNotice {
-public:
+ public:
   explicit TfPyModuleWasLoaded(std::string const &name) : _name(name) {}
 
   TF_API
   virtual ~TfPyModuleWasLoaded();
 
   /// Return the name of the module that was loaded.
-  std::string const &GetName() { return _name; }
+  std::string const &GetName()
+  {
+    return _name;
+  }
 
-private:
+ private:
   std::string _name;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_MODULE_NOTICE_H
+#endif  // PXR_BASE_TF_PY_MODULE_NOTICE_H

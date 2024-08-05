@@ -28,12 +28,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _lensDistortionTokens,
-    ((k1, "lensDistortion:k1"))((k2, "lensDistortion:k2"))((center, "lensDistortion:center"))((anaSq, "lensDistortion:anaSq"))((asym, "lensDistortion:asym"))((scale, "lensDistortion:scale")));
+TF_DEFINE_PRIVATE_TOKENS(_lensDistortionTokens,
+                         ((k1, "lensDistortion:k1"))((k2, "lensDistortion:k2"))(
+                             (center, "lensDistortion:center"))((anaSq, "lensDistortion:anaSq"))(
+                             (asym, "lensDistortion:asym"))((scale, "lensDistortion:scale")));
 
 HdPrmanCamera::HdPrmanCamera(SdfPath const &id)
-    : HdCamera(id), _lensDistortionK1(0.0f), _lensDistortionK2(0.0f), _lensDistortionCenter(0.0f), _lensDistortionAnaSq(1.0f), _lensDistortionAsym(0.0f), _lensDistortionScale(1.0f)
+    : HdCamera(id),
+      _lensDistortionK1(0.0f),
+      _lensDistortionK2(0.0f),
+      _lensDistortionCenter(0.0f),
+      _lensDistortionAnaSq(1.0f),
+      _lensDistortionAsym(0.0f),
+      _lensDistortionScale(1.0f)
 {
 }
 
@@ -47,67 +54,48 @@ void HdPrmanCamera::Sync(HdSceneDelegate *sceneDelegate,
   HD_TRACE_FUNCTION();
   HF_MALLOC_TAG_FUNCTION();
 
-  if (!TF_VERIFY(sceneDelegate))
-  {
+  if (!TF_VERIFY(sceneDelegate)) {
     return;
   }
 
-  HdPrman_RenderParam *const param =
-      static_cast<HdPrman_RenderParam *>(renderParam);
+  HdPrman_RenderParam *const param = static_cast<HdPrman_RenderParam *>(renderParam);
 
   SdfPath const &id = GetId();
   // Save state of dirtyBits before HdCamera::Sync clears them.
   const HdDirtyBits bits = *dirtyBits;
 
-  if (bits & DirtyTransform)
-  {
+  if (bits & DirtyTransform) {
     sceneDelegate->SampleTransform(id, &_sampleXforms);
   }
 
-  if (bits & AllDirty)
-  {
+  if (bits & AllDirty) {
     param->GetCameraContext().MarkCameraInvalid(id);
   }
 
   HdCamera::Sync(sceneDelegate, renderParam, dirtyBits);
 
-  if (bits & DirtyParams)
-  {
-    _lensDistortionK1 =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->k1)
-            .GetWithDefault<float>(0.0f);
-    _lensDistortionK2 =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->k2)
-            .GetWithDefault<float>(0.0f);
-    _lensDistortionCenter =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->center)
-            .GetWithDefault<GfVec2f>(GfVec2f(0.0f));
-    _lensDistortionAnaSq =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->anaSq)
-            .GetWithDefault<float>(1.0f);
-    _lensDistortionAsym =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->asym)
-            .GetWithDefault<GfVec2f>(GfVec2f(0.0f));
-    _lensDistortionScale =
-        sceneDelegate
-            ->GetCameraParamValue(id, _lensDistortionTokens->scale)
-            .GetWithDefault<float>(1.0f);
+  if (bits & DirtyParams) {
+    _lensDistortionK1 = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->k1)
+                            .GetWithDefault<float>(0.0f);
+    _lensDistortionK2 = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->k2)
+                            .GetWithDefault<float>(0.0f);
+    _lensDistortionCenter = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->center)
+                                .GetWithDefault<GfVec2f>(GfVec2f(0.0f));
+    _lensDistortionAnaSq = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->anaSq)
+                               .GetWithDefault<float>(1.0f);
+    _lensDistortionAsym = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->asym)
+                              .GetWithDefault<GfVec2f>(GfVec2f(0.0f));
+    _lensDistortionScale = sceneDelegate->GetCameraParamValue(id, _lensDistortionTokens->scale)
+                               .GetWithDefault<float>(1.0f);
 
-    if (id == param->GetCameraContext().GetCameraPath())
-    {
+    if (id == param->GetCameraContext().GetCameraPath()) {
       // Motion blur in Riley only works correctly if the
       // shutter interval is set before any rprims are synced
       // (and the transform of the riley camera is updated).
       //
       // Thus, we immediately call UpdateRileyShutterInterval
       // here.
-      param->UpdateRileyShutterInterval(
-          &sceneDelegate->GetRenderIndex());
+      param->UpdateRileyShutterInterval(&sceneDelegate->GetRenderIndex());
     }
   }
 

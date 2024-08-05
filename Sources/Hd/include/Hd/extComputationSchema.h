@@ -33,176 +33,155 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDEXTCOMPUTATION_SCHEMA_TOKENS \
-    (extComputation) \
-    (inputValues) \
-    (inputComputations) \
-    (outputs) \
-    (glslKernel) \
-    (cpuCallback) \
-    (dispatchCount) \
-    (elementCount) \
+  (extComputation)(inputValues)( \
+      inputComputations)(outputs)(glslKernel)(cpuCallback)(dispatchCount)(elementCount)
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationSchemaTokens, HD_API,
-    HDEXTCOMPUTATION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationSchemaTokens, HD_API, HDEXTCOMPUTATION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationSchema : public HdSchema
-{
-public:
-    HdExtComputationSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdExtComputationSchema : public HdSchema {
+ public:
+  HdExtComputationSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdContainerDataSourceHandle GetInputValues();
+  HD_API
+  HdVectorDataSourceHandle GetInputComputations();
+  HD_API
+  HdVectorDataSourceHandle GetOutputs();
+  HD_API
+  HdStringDataSourceHandle GetGlslKernel();
+  HD_API
+  HdDataSourceBaseHandle GetCpuCallback();
+  HD_API
+  HdSizetDataSourceHandle GetDispatchCount();
+  HD_API
+  HdSizetDataSourceHandle GetElementCount();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdContainerDataSourceHandle &inputValues,
+      const HdVectorDataSourceHandle &inputComputations,
+      const HdVectorDataSourceHandle &outputs,
+      const HdStringDataSourceHandle &glslKernel,
+      const HdDataSourceBaseHandle &cpuCallback,
+      const HdSizetDataSourceHandle &dispatchCount,
+      const HdSizetDataSourceHandle &elementCount);
+
+  /// \class HdExtComputationSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdContainerDataSourceHandle GetInputValues();
+    Builder &SetInputValues(const HdContainerDataSourceHandle &inputValues);
     HD_API
-    HdVectorDataSourceHandle GetInputComputations();
+    Builder &SetInputComputations(const HdVectorDataSourceHandle &inputComputations);
     HD_API
-    HdVectorDataSourceHandle GetOutputs();
+    Builder &SetOutputs(const HdVectorDataSourceHandle &outputs);
     HD_API
-    HdStringDataSourceHandle GetGlslKernel();
+    Builder &SetGlslKernel(const HdStringDataSourceHandle &glslKernel);
     HD_API
-    HdDataSourceBaseHandle GetCpuCallback();
+    Builder &SetCpuCallback(const HdDataSourceBaseHandle &cpuCallback);
     HD_API
-    HdSizetDataSourceHandle GetDispatchCount();
+    Builder &SetDispatchCount(const HdSizetDataSourceHandle &dispatchCount);
     HD_API
-    HdSizetDataSourceHandle GetElementCount();
+    Builder &SetElementCount(const HdSizetDataSourceHandle &elementCount);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdContainerDataSourceHandle &inputValues,
-        const HdVectorDataSourceHandle &inputComputations,
-        const HdVectorDataSourceHandle &outputs,
-        const HdStringDataSourceHandle &glslKernel,
-        const HdDataSourceBaseHandle &cpuCallback,
-        const HdSizetDataSourceHandle &dispatchCount,
-        const HdSizetDataSourceHandle &elementCount
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdExtComputationSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetInputValues(
-            const HdContainerDataSourceHandle &inputValues);
-        HD_API
-        Builder &SetInputComputations(
-            const HdVectorDataSourceHandle &inputComputations);
-        HD_API
-        Builder &SetOutputs(
-            const HdVectorDataSourceHandle &outputs);
-        HD_API
-        Builder &SetGlslKernel(
-            const HdStringDataSourceHandle &glslKernel);
-        HD_API
-        Builder &SetCpuCallback(
-            const HdDataSourceBaseHandle &cpuCallback);
-        HD_API
-        Builder &SetDispatchCount(
-            const HdSizetDataSourceHandle &dispatchCount);
-        HD_API
-        Builder &SetElementCount(
-            const HdSizetDataSourceHandle &elementCount);
+   private:
+    HdContainerDataSourceHandle _inputValues;
+    HdVectorDataSourceHandle _inputComputations;
+    HdVectorDataSourceHandle _outputs;
+    HdStringDataSourceHandle _glslKernel;
+    HdDataSourceBaseHandle _cpuCallback;
+    HdSizetDataSourceHandle _dispatchCount;
+    HdSizetDataSourceHandle _elementCount;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "extComputation" from the parent container and constructs a
+  /// HdExtComputationSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdExtComputationSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdContainerDataSourceHandle _inputValues;
-        HdVectorDataSourceHandle _inputComputations;
-        HdVectorDataSourceHandle _outputs;
-        HdStringDataSourceHandle _glslKernel;
-        HdDataSourceBaseHandle _cpuCallback;
-        HdSizetDataSourceHandle _dispatchCount;
-        HdSizetDataSourceHandle _elementCount;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "extComputation" from the parent container and constructs a
-    /// HdExtComputationSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdExtComputationSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the inputvalues data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetInputValuesLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the inputcomputations data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetInputComputationsLocator();
 
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the outputs data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetOutputsLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the inputvalues data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetInputValuesLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the dispatchcount data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetDispatchCountLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the inputcomputations data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetInputComputationsLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the elementcount data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetElementCountLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the outputs data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetOutputsLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the dispatchcount data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetDispatchCountLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the elementcount data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetElementCountLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the glslkernel data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetGlslKernelLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the glslkernel data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetGlslKernelLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

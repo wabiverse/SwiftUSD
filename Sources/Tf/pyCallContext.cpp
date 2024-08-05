@@ -39,7 +39,7 @@ struct _Cache {
   tbb::spin_mutex lock;
   set<string> data;
 };
-} // namespace
+}  // namespace
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,8 +47,11 @@ PXR_NAMESPACE_OPEN_SCOPE
  * TfCallContext's contain const char*'s which are assumed to be program
  * literals. That assumption fails badly when it comes to python.
  */
-TfCallContext Tf_PythonCallContext(char const *fileName, char const *moduleName,
-                                   char const *functionName, size_t line) {
+TfCallContext Tf_PythonCallContext(char const *fileName,
+                                   char const *moduleName,
+                                   char const *functionName,
+                                   size_t line)
+{
   static _Cache cache;
 
   string const &fullName = TfStringPrintf("%s.%s", moduleName, functionName);

@@ -44,7 +44,7 @@ SDF_DECLARE_HANDLES(SdfSpec);
 /// from the layer if they are inert.
 ///
 class Sdf_CleanupTracker : public TfWeakBase {
-public:
+ public:
   /// Retrieves singleton instance.
   static Sdf_CleanupTracker &GetInstance();
 
@@ -55,7 +55,7 @@ public:
   /// Return the authoring monitor identified by the index
   void CleanupSpecs();
 
-private:
+ private:
   Sdf_CleanupTracker();
   ~Sdf_CleanupTracker();
 
@@ -66,4 +66,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CLEANUP_TRACKER_H
+#endif  // PXR_USD_SDF_CLEANUP_TRACKER_H

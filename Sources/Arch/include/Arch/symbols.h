@@ -48,10 +48,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ingroup group_arch_Diagnostics
 ARCH_API
-bool ArchGetAddressInfo(void *address, std::string *objectPath,
-                        void **baseAddress, std::string *symbolName,
+bool ArchGetAddressInfo(void *address,
+                        std::string *objectPath,
+                        void **baseAddress,
+                        std::string *symbolName,
                         void **symbolAddress);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_SYMBOLS_H
+#endif  // PXR_BASE_ARCH_SYMBOLS_H

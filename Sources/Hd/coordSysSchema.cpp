@@ -33,81 +33,60 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCoordSysSchemaTokens,
-    HDCOORDSYS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCoordSysSchemaTokens, HDCOORDSYS_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdCoordSysSchema::GetName()
+HdTokenDataSourceHandle HdCoordSysSchema::GetName()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdCoordSysSchemaTokens->name);
+  return _GetTypedDataSource<HdTokenDataSource>(HdCoordSysSchemaTokens->name);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdCoordSysSchema::BuildRetained(
-        const HdTokenDataSourceHandle &name
-)
+HdContainerDataSourceHandle HdCoordSysSchema::BuildRetained(const HdTokenDataSourceHandle &name)
 {
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
 
-    size_t count = 0;
-    if (name) {
-        names[count] = HdCoordSysSchemaTokens->name;
-        values[count++] = name;
-    }
+  size_t count = 0;
+  if (name) {
+    names[count] = HdCoordSysSchemaTokens->name;
+    values[count++] = name;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdCoordSysSchema
-HdCoordSysSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdCoordSysSchema HdCoordSysSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdCoordSysSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdCoordSysSchemaTokens->coordSys))
-        : nullptr);
+  return HdCoordSysSchema(
+      fromParentContainer ?
+          HdContainerDataSource::Cast(fromParentContainer->Get(HdCoordSysSchemaTokens->coordSys)) :
+          nullptr);
 }
 
 /*static*/
-const TfToken &
-HdCoordSysSchema::GetSchemaToken()
+const TfToken &HdCoordSysSchema::GetSchemaToken()
 {
-    return HdCoordSysSchemaTokens->coordSys;
-} 
+  return HdCoordSysSchemaTokens->coordSys;
+}
 /*static*/
-const HdDataSourceLocator &
-HdCoordSysSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdCoordSysSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdCoordSysSchemaTokens->coordSys
-    );
-    return locator;
-} 
-HdCoordSysSchema::Builder &
-HdCoordSysSchema::Builder::SetName(
-    const HdTokenDataSourceHandle &name)
+  static const HdDataSourceLocator locator(HdCoordSysSchemaTokens->coordSys);
+  return locator;
+}
+HdCoordSysSchema::Builder &HdCoordSysSchema::Builder::SetName(const HdTokenDataSourceHandle &name)
 {
-    _name = name;
-    return *this;
+  _name = name;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdCoordSysSchema::Builder::Build()
+HdContainerDataSourceHandle HdCoordSysSchema::Builder::Build()
 {
-    return HdCoordSysSchema::BuildRetained(
-        _name
-    );
+  return HdCoordSysSchema::BuildRetained(_name);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -29,10 +29,10 @@
 #include <boost/python/scope.hpp>
 #include <boost/python/tuple.hpp>
 
-#include "UsdShade/utils.h"
 #include "UsdShade/connectableAPI.h"
 #include "UsdShade/input.h"
 #include "UsdShade/output.h"
+#include "UsdShade/utils.h"
 
 using namespace boost::python;
 
@@ -40,48 +40,46 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static object 
-_GetBaseNameAndType(const TfToken &fullName)
+static object _GetBaseNameAndType(const TfToken &fullName)
 {
-    const auto &result = UsdShadeUtils::GetBaseNameAndType(fullName);
-    return make_tuple(result.first, result.second);
+  const auto &result = UsdShadeUtils::GetBaseNameAndType(fullName);
+  return make_tuple(result.first, result.second);
 }
 
-} // anonymous namespace 
+}  // anonymous namespace
 
 void wrapUsdShadeUtils()
 {
-    UsdShadeAttributeVector (*GetValueProducingAttributes_Input)(
-        const UsdShadeInput &input, bool includeAuthoredValues) = 
-            &UsdShadeUtils::GetValueProducingAttributes;
-    UsdShadeAttributeVector (*GetValueProducingAttributes_Output)(
-        const UsdShadeOutput &output, bool includeAuthoredValues) = 
-            &UsdShadeUtils::GetValueProducingAttributes;
+  UsdShadeAttributeVector (*GetValueProducingAttributes_Input)(
+      const UsdShadeInput &input,
+      bool includeAuthoredValues) = &UsdShadeUtils::GetValueProducingAttributes;
+  UsdShadeAttributeVector (*GetValueProducingAttributes_Output)(
+      const UsdShadeOutput &output,
+      bool includeAuthoredValues) = &UsdShadeUtils::GetValueProducingAttributes;
 
-    scope thisScope = class_<UsdShadeUtils>("Utils", no_init)
-        .def("GetPrefixForAttributeType", 
-            UsdShadeUtils::GetPrefixForAttributeType)
-        .staticmethod("GetPrefixForAttributeType")
+  scope thisScope = class_<UsdShadeUtils>("Utils", no_init)
+                        .def("GetPrefixForAttributeType", UsdShadeUtils::GetPrefixForAttributeType)
+                        .staticmethod("GetPrefixForAttributeType")
 
-        .def("GetConnectedSourcePath", 
-             UsdShadeUtils::GetConnectedSourcePath, 
-             (arg("connectionSourceInfo")))
-        .staticmethod("GetConnectedSourcePath")
+                        .def("GetConnectedSourcePath",
+                             UsdShadeUtils::GetConnectedSourcePath,
+                             (arg("connectionSourceInfo")))
+                        .staticmethod("GetConnectedSourcePath")
 
-        .def("GetBaseNameAndType", _GetBaseNameAndType)
-        .staticmethod("GetBaseNameAndType")
+                        .def("GetBaseNameAndType", _GetBaseNameAndType)
+                        .staticmethod("GetBaseNameAndType")
 
-        .def("GetType", UsdShadeUtils::GetType)
-        .staticmethod("GetType")
+                        .def("GetType", UsdShadeUtils::GetType)
+                        .staticmethod("GetType")
 
-        .def("GetFullName", UsdShadeUtils::GetFullName)
-        .staticmethod("GetFullName")
+                        .def("GetFullName", UsdShadeUtils::GetFullName)
+                        .staticmethod("GetFullName")
 
-        .def("GetValueProducingAttributes", GetValueProducingAttributes_Input,
-            (arg("input"), arg("shaderOutputsOnly")=false))
-        .def("GetValueProducingAttributes", GetValueProducingAttributes_Output,
-            (arg("output"), arg("shaderOutputsOnly")=false))
-        .staticmethod("GetValueProducingAttributes")
-        ;
-
+                        .def("GetValueProducingAttributes",
+                             GetValueProducingAttributes_Input,
+                             (arg("input"), arg("shaderOutputsOnly") = false))
+                        .def("GetValueProducingAttributes",
+                             GetValueProducingAttributes_Output,
+                             (arg("output"), arg("shaderOutputsOnly") = false))
+                        .staticmethod("GetValueProducingAttributes");
 }

@@ -31,7 +31,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapThreadLimits() {
+void wrapThreadLimits()
+{
   def("GetConcurrencyLimit", &WorkGetConcurrencyLimit);
   def("HasConcurrency", &WorkHasConcurrency);
   def("GetPhysicalConcurrencyLimit", &WorkGetPhysicalConcurrencyLimit);

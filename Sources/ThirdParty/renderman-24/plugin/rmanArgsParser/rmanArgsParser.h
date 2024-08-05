@@ -27,9 +27,9 @@
 
 /// \file rmanArgsParser/rmanArgsParser.h
 
-#include <pxr/pxrns.h>
-#include "rmanArgsParser/api.h"
 #include "Ndr/parserPlugin.h"
+#include "rmanArgsParser/api.h"
+#include <pxr/pxrns.h>
 
 #include <map>
 
@@ -115,9 +115,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// attributes mean, see the Renderman documentation on the Args format. Items
 /// marked with a '!' are deprecated and will output a warning.
 ///
-class RmanArgsParserPlugin : public NdrParserPlugin
-{
-public:
+class RmanArgsParserPlugin : public NdrParserPlugin {
+ public:
   RMAN_ARGS_PARSER_API
   RmanArgsParserPlugin();
   RMAN_ARGS_PARSER_API
@@ -135,4 +134,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_ARGS_PARSER_RMAN_ARGS_PARSER_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_ARGS_PARSER_RMAN_ARGS_PARSER_H

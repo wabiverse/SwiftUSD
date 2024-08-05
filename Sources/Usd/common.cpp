@@ -30,19 +30,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(
-    USD_SHADING_MODEL, "UsdRi",
-    "Set to UsdRi when models can interchange UsdShade prims.");
+TF_DEFINE_ENV_SETTING(USD_SHADING_MODEL,
+                      "UsdRi",
+                      "Set to UsdRi when models can interchange UsdShade prims.");
 
-TF_REGISTRY_FUNCTION(TfEnum) {
-  TF_ADD_ENUM_NAME(UsdListPositionFrontOfPrependList,
-                   "The front of the prepend list.");
-  TF_ADD_ENUM_NAME(UsdListPositionBackOfPrependList,
-                   "The back of the prepend list.");
-  TF_ADD_ENUM_NAME(UsdListPositionFrontOfAppendList,
-                   "The front of the append list.");
-  TF_ADD_ENUM_NAME(UsdListPositionBackOfAppendList,
-                   "The back of the append list.");
+TF_REGISTRY_FUNCTION(TfEnum)
+{
+  TF_ADD_ENUM_NAME(UsdListPositionFrontOfPrependList, "The front of the prepend list.");
+  TF_ADD_ENUM_NAME(UsdListPositionBackOfPrependList, "The back of the prepend list.");
+  TF_ADD_ENUM_NAME(UsdListPositionFrontOfAppendList, "The front of the append list.");
+  TF_ADD_ENUM_NAME(UsdListPositionBackOfAppendList, "The back of the append list.");
 
   TF_ADD_ENUM_NAME(UsdLoadWithDescendants, "Load prim and all descendants");
   TF_ADD_ENUM_NAME(UsdLoadWithoutDescendants, "Load prim and no descendants");

@@ -81,8 +81,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is modelled after std::span (C++20), but does not currently include
 /// any specialization for static extents.
 ///
-template <typename T> class TfSpan {
-public:
+template<typename T> class TfSpan {
+ public:
   using element_type = T;
   using value_type = typename std::remove_cv<element_type>::type;
   using pointer = element_type *;
@@ -100,96 +100,129 @@ public:
   /// Construct a span over the range of [ptr, ptr+count).
   /// In debug builds, a runtime assertion will fail if \p count > 0 and
   /// \p ptr is null. The behavior is otherwise undefined for invalid ranges.
-  TfSpan(pointer ptr, index_type count) : _data(ptr), _size(count) {
+  TfSpan(pointer ptr, index_type count) : _data(ptr), _size(count)
+  {
     TF_DEV_AXIOM(count == 0 || ptr);
   }
 
   /// Construct a span over the range [first, last).
-  TfSpan(pointer first, pointer last)
-      : TfSpan(first, index_type(last - first)) {
+  TfSpan(pointer first, pointer last) : TfSpan(first, index_type(last - first))
+  {
     TF_DEV_AXIOM(last >= first);
   }
 
   /// Construct a span from a container.
   /// The resulting span has a range of
   /// [cont.data(), cont.data()+cont.size())
-  template <class Container>
+  template<class Container>
   TfSpan(
       Container &cont,
-      typename std::enable_if<
-          !std::is_const<element_type>::value &&
-              std::is_same<typename Container::value_type, value_type>::value,
-          Container>::type * = 0)
-      : _data(cont.data()), _size(cont.size()) {
+      typename std::enable_if<!std::is_const<element_type>::value &&
+                                  std::is_same<typename Container::value_type, value_type>::value,
+                              Container>::type * = 0)
+      : _data(cont.data()), _size(cont.size())
+  {
     TF_DEV_AXIOM(_size == 0 || _data);
   }
 
   /// Construct a span from a container.
   /// The resulting span has a range of
   /// [cont.data(), cont.data()+cont.size())
-  template <class Container>
+  template<class Container>
   TfSpan(const Container &cont,
-         typename std::enable_if<
-             std::is_same<typename Container::value_type, value_type>::value,
-             Container>::type * = 0)
-      : _data(cont.data()), _size(cont.size()) {
+         typename std::enable_if<std::is_same<typename Container::value_type, value_type>::value,
+                                 Container>::type * = 0)
+      : _data(cont.data()), _size(cont.size())
+  {
     TF_DEV_AXIOM(_size == 0 || _data);
   }
 
   /// Return a pointer to the first element of the span.
-  pointer data() const noexcept { return _data; }
+  pointer data() const noexcept
+  {
+    return _data;
+  }
 
   /// Return the total number of elements in the span.
-  index_type size() const noexcept { return _size; }
+  index_type size() const noexcept
+  {
+    return _size;
+  }
 
   /// Returns true if this span contains no elements, false otherwise.
-  bool empty() const noexcept { return _size == 0; }
+  bool empty() const noexcept
+  {
+    return _size == 0;
+  }
 
   /// Returns a reference to the \p idx'th element of the span.
   /// In debug builds, a runtime assertion will fail if \p idx is out of
   /// range. The behavior is otherwise undefined if \p idx is out of range.
-  reference operator[](index_type idx) const {
+  reference operator[](index_type idx) const
+  {
     TF_DEV_AXIOM(idx < _size);
     return _data[idx];
   }
 
   /// Return a reference to the first element in the span.
-  reference front() const {
+  reference front() const
+  {
     TF_DEV_AXIOM(!empty());
     return *begin();
   }
 
   /// Return a reference to the last element in the span.
-  reference back() const {
+  reference back() const
+  {
     TF_DEV_AXIOM(!empty());
     return *(end() - 1);
   }
 
   /// Returns a non-const iterator the start of the span.
-  iterator begin() const noexcept { return _data; }
+  iterator begin() const noexcept
+  {
+    return _data;
+  }
 
   /// Returns a cons iterator to the start of the span.
-  const_iterator cbegin() const noexcept { return _data; }
+  const_iterator cbegin() const noexcept
+  {
+    return _data;
+  }
 
   /// Returns a non-const iterator to the end of the span.
-  iterator end() const noexcept { return _data + _size; }
+  iterator end() const noexcept
+  {
+    return _data + _size;
+  }
 
   /// Returns a const iterator to the end of the span.
-  const_iterator cend() const noexcept { return _data + _size; }
+  const_iterator cend() const noexcept
+  {
+    return _data + _size;
+  }
 
   /// Returns a non-const reverse iterator the start of the span.
-  reverse_iterator rbegin() const noexcept { return reverse_iterator(end()); }
+  reverse_iterator rbegin() const noexcept
+  {
+    return reverse_iterator(end());
+  }
 
   /// Returns a cons reverse iterator to the start of the span.
-  const_reverse_iterator crbegin() const noexcept {
+  const_reverse_iterator crbegin() const noexcept
+  {
     return const_reverse_iterator(cend());
   }
 
   /// Returns a non-const reverse iterator to the end of the span.
-  reverse_iterator rend() const noexcept { return reverse_iterator(begin()); }
+  reverse_iterator rend() const noexcept
+  {
+    return reverse_iterator(begin());
+  }
 
   /// Returns a const reverse iterator to the end of the span.
-  const_reverse_iterator crend() const noexcept {
+  const_reverse_iterator crend() const noexcept
+  {
     return const_reverse_iterator(cbegin());
   }
 
@@ -197,11 +230,13 @@ public:
   /// If \p count == -1 (or std::dynamic_extent in C++20), the new span
   /// has a range of [data()+offset, data()+size()). Otherwise, the new
   /// span has range [data()+offset, data()+offset+count).
-  TfSpan<T> subspan(difference_type offset, difference_type count = -1) const {
+  TfSpan<T> subspan(difference_type offset, difference_type count = -1) const
+  {
     TF_DEV_AXIOM(offset >= 0 && (index_type)offset < _size);
     if (count == -1) {
       return TfSpan<T>(_data + offset, _size - offset);
-    } else {
+    }
+    else {
       TF_DEV_AXIOM(count >= 0);
       TF_DEV_AXIOM(((index_type)offset + (index_type)count) <= _size);
       return TfSpan<T>(_data + offset, count);
@@ -209,32 +244,36 @@ public:
   }
 
   /// Return a subspan consisting of the first \p count elements of this span.
-  TfSpan<T> first(size_t count) const { return subspan(0, count); }
+  TfSpan<T> first(size_t count) const
+  {
+    return subspan(0, count);
+  }
 
   /// Return a subspan consisting of the last \p count elements of this span.
-  TfSpan<T> last(size_t count) const {
+  TfSpan<T> last(size_t count) const
+  {
     TF_DEV_AXIOM(_size >= count);
     return TfSpan<T>(end() - count, count);
   }
 
-private:
+ private:
   pointer _data = nullptr;
   index_type _size = 0;
 };
 
 /// Helper for constructing a non-const TfSpan from a container.
-template <typename Container>
-TfSpan<typename Container::value_type> TfMakeSpan(Container &cont) {
+template<typename Container> TfSpan<typename Container::value_type> TfMakeSpan(Container &cont)
+{
   return TfSpan<typename Container::value_type>(cont);
 }
 
 /// Helper for constructing a const TfSpan from a container.
-template <typename Container>
-TfSpan<const typename Container::value_type>
-TfMakeConstSpan(const Container &cont) {
+template<typename Container>
+TfSpan<const typename Container::value_type> TfMakeConstSpan(const Container &cont)
+{
   return TfSpan<const typename Container::value_type>(cont);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SPAN_H
+#endif  // PXR_BASE_TF_SPAN_H

@@ -29,13 +29,13 @@
 
 #include <pxr/pxrns.h>
 
-#include <Arch/pxrinttypes.h>
 #include "Tf/api.h"
+#include <Arch/pxrinttypes.h>
 #include <atomic>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <typename T> class TfRefPtr;
+template<typename T> class TfRefPtr;
 
 /// \class TfRefCount
 /// \ingroup group_tf_Memory
@@ -69,7 +69,7 @@ template <typename T> class TfRefPtr;
 /// unless the functionality of \c TfRefBase is insufficient for your needs.
 ///
 class TfRefCount {
-public:
+ public:
   /// Initialize counter to one.
   TfRefCount() : _counter(1) {}
 
@@ -80,25 +80,37 @@ public:
   TfRefCount(const TfRefCount &) : _counter(1) {}
 
   /// Returns counter's value.
-  int Get() const { return _counter; }
+  int Get() const
+  {
+    return _counter;
+  }
 
   /// Assignment to a reference counter has no effect.
-  const TfRefCount &operator=(const TfRefCount &) const { return *this; }
+  const TfRefCount &operator=(const TfRefCount &) const
+  {
+    return *this;
+  }
 
-private:
+ private:
   /// Decrements counter by \c 1, returning true if the result is 0.
-  bool _DecrementAndTestIfZero() const { return (--_counter == 0); }
+  bool _DecrementAndTestIfZero() const
+  {
+    return (--_counter == 0);
+  }
 
   /// Adds \c amount to the count, returning the prior value.
-  int _FetchAndAdd(int amount) const { return _counter.fetch_add(amount); }
+  int _FetchAndAdd(int amount) const
+  {
+    return _counter.fetch_add(amount);
+  }
 
-private:
+ private:
   mutable std::atomic<int> _counter;
-  template <typename T> friend class TfRefPtr;
+  template<typename T> friend class TfRefPtr;
   friend struct Tf_RefPtr_UniqueChangedCounter;
   friend struct Tf_RefPtr_Counter;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_REF_COUNT_H
+#endif  // PXR_BASE_TF_REF_COUNT_H

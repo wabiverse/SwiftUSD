@@ -32,17 +32,22 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfLineSeg2d>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfLineSeg2d>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfVec2d GfLineSeg2d::FindClosestPoint(const GfVec2d &point, double *t) const {
+GfVec2d GfLineSeg2d::FindClosestPoint(const GfVec2d &point, double *t) const
+{
   // Find the parametric distance, lt, of the closest point on the line
   // and then clamp lt to be on the line segment.
 
   double lt;
   if (_length == 0.0) {
     lt = 0.0;
-  } else {
+  }
+  else {
     _line.FindClosestPoint(point, &lt);
 
     lt = GfClamp(lt / _length, 0, 1);
@@ -54,8 +59,9 @@ GfVec2d GfLineSeg2d::FindClosestPoint(const GfVec2d &point, double *t) const {
   return GetPoint(lt);
 }
 
-bool GfFindClosestPoints(const GfLine2d &line, const GfLineSeg2d &seg,
-                         GfVec2d *p1, GfVec2d *p2, double *t1, double *t2) {
+bool GfFindClosestPoints(
+    const GfLine2d &line, const GfLineSeg2d &seg, GfVec2d *p1, GfVec2d *p2, double *t1, double *t2)
+{
   GfVec2d cp1, cp2;
   double lt1, lt2;
   if (!GfFindClosestPoints(line, seg._line, &cp1, &cp2, &lt1, &lt2))
@@ -85,8 +91,13 @@ bool GfFindClosestPoints(const GfLine2d &line, const GfLineSeg2d &seg,
   return true;
 }
 
-bool GfFindClosestPoints(const GfLineSeg2d &seg1, const GfLineSeg2d &seg2,
-                         GfVec2d *p1, GfVec2d *p2, double *t1, double *t2) {
+bool GfFindClosestPoints(const GfLineSeg2d &seg1,
+                         const GfLineSeg2d &seg2,
+                         GfVec2d *p1,
+                         GfVec2d *p2,
+                         double *t1,
+                         double *t2)
+{
   GfVec2d cp1, cp2;
   double lt1, lt2;
   if (!GfFindClosestPoints(seg1._line, seg2._line, &cp1, &cp2, &lt1, &lt2))

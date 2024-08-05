@@ -23,190 +23,170 @@
 //
 #include "Garch/glApi.h"
 
-#include "HgiGL/diagnostic.h"
 #include "HgiGL/conversions.h"
+#include "HgiGL/diagnostic.h"
 #include "HgiGL/texture.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static void
-_GlTextureStorageND(
-    const HgiTextureType textureType,
-    const GLuint texture,
-    const GLsizei levels,
-    const GLenum internalformat,
-    const GfVec3i &dimensions,
-    const GLsizei layerCount)
+static void _GlTextureStorageND(const HgiTextureType textureType,
+                                const GLuint texture,
+                                const GLsizei levels,
+                                const GLenum internalformat,
+                                const GfVec3i &dimensions,
+                                const GLsizei layerCount)
 {
-  switch (textureType)
-  {
-  case HgiTextureType1D:
-    glTextureStorage1D(texture,
-                       levels,
-                       internalformat,
-                       dimensions[0]);
-    break;
-  case HgiTextureType2D:
-    glTextureStorage2D(texture,
-                       levels,
-                       internalformat,
-                       dimensions[0], dimensions[1]);
-    break;
-  case HgiTextureType3D:
-    glTextureStorage3D(texture,
-                       levels,
-                       internalformat,
-                       dimensions[0], dimensions[1], dimensions[2]);
-    break;
-  case HgiTextureType1DArray:
-    glTextureStorage2D(texture,
-                       levels,
-                       internalformat,
-                       dimensions[0], layerCount);
-    break;
-  case HgiTextureType2DArray:
-    glTextureStorage3D(texture,
-                       levels,
-                       internalformat,
-                       dimensions[0], dimensions[1], layerCount);
-    break;
-  default:
-    TF_CODING_ERROR("Unsupported HgiTextureType enum value");
-    break;
+  switch (textureType) {
+    case HgiTextureType1D:
+      glTextureStorage1D(texture, levels, internalformat, dimensions[0]);
+      break;
+    case HgiTextureType2D:
+      glTextureStorage2D(texture, levels, internalformat, dimensions[0], dimensions[1]);
+      break;
+    case HgiTextureType3D:
+      glTextureStorage3D(
+          texture, levels, internalformat, dimensions[0], dimensions[1], dimensions[2]);
+      break;
+    case HgiTextureType1DArray:
+      glTextureStorage2D(texture, levels, internalformat, dimensions[0], layerCount);
+      break;
+    case HgiTextureType2DArray:
+      glTextureStorage3D(
+          texture, levels, internalformat, dimensions[0], dimensions[1], layerCount);
+      break;
+    default:
+      TF_CODING_ERROR("Unsupported HgiTextureType enum value");
+      break;
   }
 }
 
-static void
-_GlTextureSubImageND(
-    const HgiTextureType textureType,
-    const GLuint texture,
-    const GLint level,
-    const GfVec3i &offsets,
-    const GfVec3i &dimensions,
-    const uint32_t layerCount,
-    const GLenum format,
-    const GLenum type,
-    const void *pixels)
+static void _GlTextureSubImageND(const HgiTextureType textureType,
+                                 const GLuint texture,
+                                 const GLint level,
+                                 const GfVec3i &offsets,
+                                 const GfVec3i &dimensions,
+                                 const uint32_t layerCount,
+                                 const GLenum format,
+                                 const GLenum type,
+                                 const void *pixels)
 {
-  switch (textureType)
-  {
-  case HgiTextureType1D:
-    glTextureSubImage1D(texture,
-                        level,
-                        offsets[0],
-                        dimensions[0],
-                        format,
-                        type,
-                        pixels);
-    break;
-  case HgiTextureType2D:
-    glTextureSubImage2D(texture,
-                        level,
-                        offsets[0], offsets[1],
-                        dimensions[0], dimensions[1],
-                        format,
-                        type,
-                        pixels);
-    break;
-  case HgiTextureType3D:
-    glTextureSubImage3D(texture,
-                        level,
-                        offsets[0], offsets[1], offsets[2],
-                        dimensions[0], dimensions[1], dimensions[2],
-                        format,
-                        type,
-                        pixels);
-    break;
-  case HgiTextureType1DArray:
-    glTextureSubImage2D(texture,
-                        level,
-                        offsets[0], offsets[1],
-                        dimensions[0], layerCount,
-                        format,
-                        type,
-                        pixels);
-    break;
-  case HgiTextureType2DArray:
-    glTextureSubImage3D(texture,
-                        level,
-                        offsets[0], offsets[1], offsets[2],
-                        dimensions[0], dimensions[1], layerCount,
-                        format,
-                        type,
-                        pixels);
-    break;
-  default:
-    TF_CODING_ERROR("Unsupported HgiTextureType enum value");
-    break;
+  switch (textureType) {
+    case HgiTextureType1D:
+      glTextureSubImage1D(texture, level, offsets[0], dimensions[0], format, type, pixels);
+      break;
+    case HgiTextureType2D:
+      glTextureSubImage2D(texture,
+                          level,
+                          offsets[0],
+                          offsets[1],
+                          dimensions[0],
+                          dimensions[1],
+                          format,
+                          type,
+                          pixels);
+      break;
+    case HgiTextureType3D:
+      glTextureSubImage3D(texture,
+                          level,
+                          offsets[0],
+                          offsets[1],
+                          offsets[2],
+                          dimensions[0],
+                          dimensions[1],
+                          dimensions[2],
+                          format,
+                          type,
+                          pixels);
+      break;
+    case HgiTextureType1DArray:
+      glTextureSubImage2D(
+          texture, level, offsets[0], offsets[1], dimensions[0], layerCount, format, type, pixels);
+      break;
+    case HgiTextureType2DArray:
+      glTextureSubImage3D(texture,
+                          level,
+                          offsets[0],
+                          offsets[1],
+                          offsets[2],
+                          dimensions[0],
+                          dimensions[1],
+                          layerCount,
+                          format,
+                          type,
+                          pixels);
+      break;
+    default:
+      TF_CODING_ERROR("Unsupported HgiTextureType enum value");
+      break;
   }
 }
 
-static void
-_GlCompressedTextureSubImageND(
-    const HgiTextureType textureType,
-    const GLuint texture,
-    const GLint level,
-    const GfVec3i &offsets,
-    const GfVec3i &dimensions,
-    const GLenum format,
-    const GLsizei imageSize,
-    const void *pixels)
+static void _GlCompressedTextureSubImageND(const HgiTextureType textureType,
+                                           const GLuint texture,
+                                           const GLint level,
+                                           const GfVec3i &offsets,
+                                           const GfVec3i &dimensions,
+                                           const GLenum format,
+                                           const GLsizei imageSize,
+                                           const void *pixels)
 {
-  switch (textureType)
-  {
-  case HgiTextureType2D:
-    glCompressedTextureSubImage2D(
-        texture,
-        level,
-        offsets[0], offsets[1],
-        dimensions[0], dimensions[1],
-        format,
-        imageSize,
-        pixels);
-    break;
-  case HgiTextureType3D:
-    glCompressedTextureSubImage3D(
-        texture,
-        level,
-        offsets[0], offsets[1], offsets[2],
-        dimensions[0], dimensions[1], dimensions[2],
-        format,
-        imageSize,
-        pixels);
-    break;
-  default:
-    TF_CODING_ERROR("Unsupported HgiTextureType enum value");
-    break;
+  switch (textureType) {
+    case HgiTextureType2D:
+      glCompressedTextureSubImage2D(texture,
+                                    level,
+                                    offsets[0],
+                                    offsets[1],
+                                    dimensions[0],
+                                    dimensions[1],
+                                    format,
+                                    imageSize,
+                                    pixels);
+      break;
+    case HgiTextureType3D:
+      glCompressedTextureSubImage3D(texture,
+                                    level,
+                                    offsets[0],
+                                    offsets[1],
+                                    offsets[2],
+                                    dimensions[0],
+                                    dimensions[1],
+                                    dimensions[2],
+                                    format,
+                                    imageSize,
+                                    pixels);
+      break;
+    default:
+      TF_CODING_ERROR("Unsupported HgiTextureType enum value");
+      break;
   }
 }
 
 static bool _IsValidCompression(HgiTextureDesc const &desc)
 {
-  switch (desc.type)
-  {
-  case HgiTextureType2D:
-    if (desc.dimensions[0] % 4 != 0 ||
-        desc.dimensions[1] % 4 != 0)
-    {
-      TF_CODING_ERROR("Compressed texture with width or height "
-                      "not a multiple of 4");
+  switch (desc.type) {
+    case HgiTextureType2D:
+      if (desc.dimensions[0] % 4 != 0 || desc.dimensions[1] % 4 != 0) {
+        TF_CODING_ERROR(
+            "Compressed texture with width or height "
+            "not a multiple of 4");
+        return false;
+      }
+      return true;
+    case HgiTextureType3D:
+      if (desc.dimensions[0] % 4 != 0 || desc.dimensions[1] % 4 != 0 ||
+          desc.dimensions[2] % 4 != 0)
+      {
+        TF_CODING_ERROR(
+            "Compressed texture with width, height or depth"
+            "not a multiple of 4");
+        return false;
+      }
+      return true;
+    default:
+      TF_CODING_ERROR(
+          "Compression not supported for given texture "
+          "type");
       return false;
-    }
-    return true;
-  case HgiTextureType3D:
-    if (desc.dimensions[0] % 4 != 0 ||
-        desc.dimensions[1] % 4 != 0 ||
-        desc.dimensions[2] % 4 != 0)
-    {
-      TF_CODING_ERROR("Compressed texture with width, height or depth"
-                      "not a multiple of 4");
-      return false;
-    }
-    return true;
-  default:
-    TF_CODING_ERROR("Compression not supported for given texture "
-                    "type");
-    return false;
   }
 }
 
@@ -216,42 +196,28 @@ HgiGLTexture::HgiGLTexture(HgiTextureDesc const &desc)
   GLenum glInternalFormat = 0;
   GLenum glFormat = 0;
   GLenum glPixelType = 0;
-  HgiGLConversions::GetFormat(
-      desc.format,
-      desc.usage,
-      &glFormat,
-      &glPixelType,
-      &glInternalFormat);
+  HgiGLConversions::GetFormat(desc.format, desc.usage, &glFormat, &glPixelType, &glInternalFormat);
 
   const bool isCompressed = HgiIsCompressed(desc.format);
-  if (isCompressed && !_IsValidCompression(desc))
-  {
+  if (isCompressed && !_IsValidCompression(desc)) {
     return;
   }
 
-  if (desc.sampleCount == HgiSampleCount1)
-  {
-    glCreateTextures(
-        HgiGLConversions::GetTextureType(desc.type),
-        1,
-        &_textureId);
+  if (desc.sampleCount == HgiSampleCount1) {
+    glCreateTextures(HgiGLConversions::GetTextureType(desc.type), 1, &_textureId);
   }
-  else
-  {
-    if (desc.type != HgiTextureType2D)
-    {
+  else {
+    if (desc.type != HgiTextureType2D) {
       TF_CODING_ERROR("Only 2d multisample textures are supported");
     }
     glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &_textureId);
   }
 
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     HgiGLObjectLabel(GL_TEXTURE, _textureId, _descriptor.debugName);
   }
 
-  if (desc.sampleCount == HgiSampleCount1)
-  {
+  if (desc.sampleCount == HgiSampleCount1) {
     glTextureParameteri(_textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(_textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTextureParameteri(_textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -268,70 +234,51 @@ HgiGLTexture::HgiGLTexture(HgiTextureDesc const &desc)
     glTextureParameteri(_textureId, GL_TEXTURE_MAX_LEVEL, /*hi-mip*/ mips - 1);
 
     _GlTextureStorageND(
-        desc.type,
-        _textureId,
-        mips,
-        glInternalFormat,
-        desc.dimensions,
-        desc.layerCount);
+        desc.type, _textureId, mips, glInternalFormat, desc.dimensions, desc.layerCount);
 
     // Upload texel data
-    if (desc.initialData && desc.pixelsByteSize > 0)
-    {
+    if (desc.initialData && desc.pixelsByteSize > 0) {
       // Upload each (available) mip
-      const std::vector<HgiMipInfo> mipInfos =
-          HgiGetMipInfos(
-              desc.format,
-              desc.dimensions,
-              desc.layerCount,
-              desc.pixelsByteSize);
-      const size_t mipLevels = std::min(
-          mipInfos.size(), size_t(desc.mipLevels));
-      const char *const initialData = reinterpret_cast<const char *>(
-          desc.initialData);
+      const std::vector<HgiMipInfo> mipInfos = HgiGetMipInfos(
+          desc.format, desc.dimensions, desc.layerCount, desc.pixelsByteSize);
+      const size_t mipLevels = std::min(mipInfos.size(), size_t(desc.mipLevels));
+      const char *const initialData = reinterpret_cast<const char *>(desc.initialData);
 
-      for (size_t mip = 0; mip < mipLevels; mip++)
-      {
+      for (size_t mip = 0; mip < mipLevels; mip++) {
         const HgiMipInfo &mipInfo = mipInfos[mip];
 
-        if (isCompressed)
-        {
-          _GlCompressedTextureSubImageND(
-              desc.type,
-              _textureId,
-              mip,
-              /*offsets*/ GfVec3i(0),
-              mipInfo.dimensions,
-              glInternalFormat,
-              mipInfo.byteSizePerLayer * desc.layerCount,
-              initialData + mipInfo.byteOffset);
+        if (isCompressed) {
+          _GlCompressedTextureSubImageND(desc.type,
+                                         _textureId,
+                                         mip,
+                                         /*offsets*/ GfVec3i(0),
+                                         mipInfo.dimensions,
+                                         glInternalFormat,
+                                         mipInfo.byteSizePerLayer * desc.layerCount,
+                                         initialData + mipInfo.byteOffset);
         }
-        else
-        {
-          _GlTextureSubImageND(
-              desc.type,
-              _textureId,
-              mip,
-              /*offsets*/ GfVec3i(0),
-              mipInfo.dimensions,
-              desc.layerCount,
-              glFormat,
-              glPixelType,
-              initialData + mipInfo.byteOffset);
+        else {
+          _GlTextureSubImageND(desc.type,
+                               _textureId,
+                               mip,
+                               /*offsets*/ GfVec3i(0),
+                               mipInfo.dimensions,
+                               desc.layerCount,
+                               glFormat,
+                               glPixelType,
+                               initialData + mipInfo.byteOffset);
         }
       }
     }
   }
-  else
-  {
+  else {
     // Note: Setting sampler state values on multi-sample texture is invalid
-    glTextureStorage2DMultisample(
-        _textureId,
-        desc.sampleCount,
-        glInternalFormat,
-        desc.dimensions[0],
-        desc.dimensions[1],
-        GL_TRUE);
+    glTextureStorage2DMultisample(_textureId,
+                                  desc.sampleCount,
+                                  glInternalFormat,
+                                  desc.dimensions[0],
+                                  desc.dimensions[1],
+                                  GL_TRUE);
   }
 
   const GLint swizzleMask[] = {
@@ -340,10 +287,7 @@ HgiGLTexture::HgiGLTexture(HgiTextureDesc const &desc)
       GLint(HgiGLConversions::GetComponentSwizzle(desc.componentMapping.b)),
       GLint(HgiGLConversions::GetComponentSwizzle(desc.componentMapping.a))};
 
-  glTextureParameteriv(
-      _textureId,
-      GL_TEXTURE_SWIZZLE_RGBA,
-      swizzleMask);
+  glTextureParameteriv(_textureId, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
 
   HGIGL_POST_PENDING_GL_ERRORS();
 }
@@ -357,36 +301,27 @@ HgiGLTexture::HgiGLTexture(HgiTextureViewDesc const &desc)
   _descriptor.layerCount = desc.layerCount;
   _descriptor.mipLevels = desc.mipLevels;
 
-  HgiGLTexture *srcTexture =
-      static_cast<HgiGLTexture *>(desc.sourceTexture.Get());
+  HgiGLTexture *srcTexture = static_cast<HgiGLTexture *>(desc.sourceTexture.Get());
   GLenum glInternalFormat = 0;
 
-  HgiGLConversions::GetFormat(
-      desc.format,
-      _descriptor.usage,
-      nullptr,
-      nullptr,
-      &glInternalFormat);
+  HgiGLConversions::GetFormat(desc.format, _descriptor.usage, nullptr, nullptr, &glInternalFormat);
 
   // Note we must use glGenTextures, not glCreateTextures.
   // glTextureView requires the textureId to be unbound and not given a type.
   glGenTextures(1, &_textureId);
 
-  GLenum textureType =
-      HgiGLConversions::GetTextureType(srcTexture->GetDescriptor().type);
+  GLenum textureType = HgiGLConversions::GetTextureType(srcTexture->GetDescriptor().type);
 
-  glTextureView(
-      _textureId,
-      textureType,
-      srcTexture->GetTextureId(),
-      glInternalFormat,
-      desc.sourceFirstMip,
-      desc.mipLevels,
-      desc.sourceFirstLayer,
-      desc.layerCount);
+  glTextureView(_textureId,
+                textureType,
+                srcTexture->GetTextureId(),
+                glInternalFormat,
+                desc.sourceFirstMip,
+                desc.mipLevels,
+                desc.sourceFirstLayer,
+                desc.layerCount);
 
-  if (!desc.debugName.empty())
-  {
+  if (!desc.debugName.empty()) {
     HgiGLObjectLabel(GL_TEXTURE, _textureId, desc.debugName);
   }
 
@@ -410,8 +345,7 @@ HgiGLTexture::HgiGLTexture(HgiTextureViewDesc const &desc)
 
 HgiGLTexture::~HgiGLTexture()
 {
-  if (_textureId > 0)
-  {
+  if (_textureId > 0) {
     glDeleteTextures(1, &_textureId);
     _textureId = 0;
   }
@@ -419,26 +353,21 @@ HgiGLTexture::~HgiGLTexture()
   HGIGL_POST_PENDING_GL_ERRORS();
 }
 
-size_t
-HgiGLTexture::GetByteSizeOfResource() const
+size_t HgiGLTexture::GetByteSizeOfResource() const
 {
   return _GetByteSizeOfResource(_descriptor);
 }
 
-uint64_t
-HgiGLTexture::GetRawResource() const
+uint64_t HgiGLTexture::GetRawResource() const
 {
   return (uint64_t)_textureId;
 }
 
-uint64_t
-HgiGLTexture::GetBindlessHandle()
+uint64_t HgiGLTexture::GetBindlessHandle()
 {
-  if (!_bindlessHandle)
-  {
+  if (!_bindlessHandle) {
     const GLuint64EXT result = glGetTextureHandleARB(_textureId);
-    if (!glIsTextureHandleResidentARB(result))
-    {
+    if (!glIsTextureHandleResidentARB(result)) {
       glMakeTextureHandleResidentARB(result);
     }
 

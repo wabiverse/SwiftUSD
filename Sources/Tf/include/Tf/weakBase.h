@@ -42,10 +42,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 // initialized with, and there are no weak pointers left pointing to that
 // remnant.
 class Tf_Remnant : public TfSimpleRefBase {
-public:
+ public:
   TF_API virtual ~Tf_Remnant();
 
-  void _Forget() {
+  void _Forget()
+  {
     _alive = false;
 
     if (_notify2)
@@ -53,7 +54,10 @@ public:
   }
 
   // Note that only "false" is of value in a multi-threaded world...
-  bool _IsAlive() const { return _alive; }
+  bool _IsAlive() const
+  {
+    return _alive;
+  }
 
   // Must return an object's address whose lifetime is as long or longer than
   // this object.  Default implementation returns 'this'.
@@ -61,11 +65,13 @@ public:
 
   // Note: this initializes a class member -- the parameter is a non-const
   // reference.
-  static TfRefPtr<Tf_Remnant> Register(std::atomic<Tf_Remnant *> &remnantPtr) {
+  static TfRefPtr<Tf_Remnant> Register(std::atomic<Tf_Remnant *> &remnantPtr)
+  {
     if (Tf_Remnant *remnant = remnantPtr.load()) {
       // Remnant exists.  Return additional reference.
       return TfRefPtr<Tf_Remnant>(remnant);
-    } else {
+    }
+    else {
       // Allocate a remnant and attempt to register it.
       return Register(remnantPtr, new Tf_Remnant);
     }
@@ -73,15 +79,15 @@ public:
 
   // Note: this initializes a class member -- the parameter is a non-const
   // reference.
-  template <class T>
-  static TfRefPtr<Tf_Remnant> Register(std::atomic<Tf_Remnant *> &remnantPtr,
-                                       T *candidate) {
+  template<class T>
+  static TfRefPtr<Tf_Remnant> Register(std::atomic<Tf_Remnant *> &remnantPtr, T *candidate)
+  {
     Tf_Remnant *existing = nullptr;
-    if (remnantPtr.compare_exchange_strong(
-            existing, static_cast<Tf_Remnant *>(candidate))) {
+    if (remnantPtr.compare_exchange_strong(existing, static_cast<Tf_Remnant *>(candidate))) {
       // Candidate registered.  Return additional reference.
       return TfRefPtr<Tf_Remnant>(candidate);
-    } else {
+    }
+    else {
       // Somebody beat us to it.
       // Discard candidate and return additional reference.
       delete candidate;
@@ -93,12 +99,12 @@ public:
   // it dies.  See ExpiryNotifier.h
   TF_API virtual void EnableNotification() const;
 
-protected:
+ protected:
   friend class TfWeakBase;
 
   Tf_Remnant() : _notify(false), _notify2(false), _alive(true) {}
 
-private:
+ private:
   mutable bool _notify, _notify2;
   bool _alive;
 };
@@ -127,10 +133,11 @@ private:
 /// object of type \c TfWeakPtr<Simple>.
 ///
 class TfWeakBase {
-public:
+ public:
   TfWeakBase() : _remnantPtr(nullptr) {}
 
-  TfWeakBase(const TfWeakBase &) : _remnantPtr(nullptr) {
+  TfWeakBase(const TfWeakBase &) : _remnantPtr(nullptr)
+  {
     // A newly created copy of a weak base doesn't start with a remnant
   }
 
@@ -138,9 +145,13 @@ public:
   // method is used by TfWeakPtr and related classes to determine whether a
   // class may be pointed to by a TfWeakPtr.  It is named nonstandardly to
   // avoid any possible conflict with other names in derived classes.
-  const TfWeakBase &__GetTfWeakBase__() const { return *this; }
+  const TfWeakBase &__GetTfWeakBase__() const
+  {
+    return *this;
+  }
 
-  const TfWeakBase &operator=(const TfWeakBase &) {
+  const TfWeakBase &operator=(const TfWeakBase &)
+  {
     // Do nothing.  An assignment should NOT assign the other object's
     // remnant and should NOT create a new remnant.  We want to keep
     // the one we already have (if any).
@@ -152,12 +163,13 @@ public:
 
   TF_API void const *GetUniqueIdentifier() const;
 
-protected:
+ protected:
   /*
    * Prohibit deletion through a TfWeakBase pointer.
    */
 
-  ~TfWeakBase() {
+  ~TfWeakBase()
+  {
     if (Tf_Remnant *remnant = _remnantPtr.load(std::memory_order_relaxed)) {
       remnant->_Forget();
       // Briefly forge a TfRefPtr to handle dropping our implied
@@ -169,19 +181,22 @@ protected:
   /*
    * This needs to be atomic, for multithreading.
    */
-  TfRefPtr<Tf_Remnant> _Register() const {
+  TfRefPtr<Tf_Remnant> _Register() const
+  {
     return Tf_Remnant::Register(_remnantPtr);
   }
 
-  template <class T> TfRefPtr<Tf_Remnant> _Register(T *tempRmnt) const {
+  template<class T> TfRefPtr<Tf_Remnant> _Register(T *tempRmnt) const
+  {
     return Tf_Remnant::Register<T>(_remnantPtr, tempRmnt);
   }
 
-  bool _HasRemnant() const {
+  bool _HasRemnant() const
+  {
     return _remnantPtr.load(std::memory_order_relaxed) ? true : false;
   }
 
-private:
+ private:
   // XXX Conceptually this plays the same role as a TfRefPtr to the
   // Tf_Remnant, in the sense that we want TfWeakBase to participate
   // in the ref-counted lifetime tracking of its remnant.
@@ -192,15 +207,16 @@ private:
 };
 
 class Tf_WeakBaseAccess {
-public:
-  static TfRefPtr<Tf_Remnant> GetRemnant(TfWeakBase const &wb) {
+ public:
+  static TfRefPtr<Tf_Remnant> GetRemnant(TfWeakBase const &wb)
+  {
     return wb._Register();
   }
 
-private:
+ private:
   Tf_WeakBaseAccess();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_WEAK_BASE_H
+#endif  // PXR_BASE_TF_WEAK_BASE_H

@@ -33,85 +33,77 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDINSTANCECATEGORIES_SCHEMA_TOKENS \
-    (instanceCategories) \
-    (categoriesValues) \
+#define HDINSTANCECATEGORIES_SCHEMA_TOKENS (instanceCategories)(categoriesValues)
 
-TF_DECLARE_PUBLIC_TOKENS(HdInstanceCategoriesSchemaTokens, HD_API,
-    HDINSTANCECATEGORIES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdInstanceCategoriesSchemaTokens,
+                         HD_API,
+                         HDINSTANCECATEGORIES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdInstanceCategoriesSchema : public HdSchema
-{
-public:
-    HdInstanceCategoriesSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdInstanceCategoriesSchema : public HdSchema {
+ public:
+  HdInstanceCategoriesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdVectorDataSourceHandle GetCategoriesValues();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdVectorDataSourceHandle &categoriesValues);
+
+  /// \class HdInstanceCategoriesSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdVectorDataSourceHandle GetCategoriesValues();
+    Builder &SetCategoriesValues(const HdVectorDataSourceHandle &categoriesValues);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdVectorDataSourceHandle &categoriesValues
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdInstanceCategoriesSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetCategoriesValues(
-            const HdVectorDataSourceHandle &categoriesValues);
+   private:
+    HdVectorDataSourceHandle _categoriesValues;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "instanceCategories" from the parent container and constructs a
+  /// HdInstanceCategoriesSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdInstanceCategoriesSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdVectorDataSourceHandle _categoriesValues;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "instanceCategories" from the parent container and constructs a
-    /// HdInstanceCategoriesSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdInstanceCategoriesSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

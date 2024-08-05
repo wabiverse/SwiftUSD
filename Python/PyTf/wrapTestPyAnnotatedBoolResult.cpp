@@ -36,19 +36,23 @@ namespace {
 
 struct Tf_TestAnnotatedBoolResult : TfPyAnnotatedBoolResult<std::string> {
   Tf_TestAnnotatedBoolResult(bool value, const std::string &annotation)
-      : TfPyAnnotatedBoolResult<std::string>(value, annotation) {}
+      : TfPyAnnotatedBoolResult<std::string>(value, annotation)
+  {
+  }
 };
 
-static Tf_TestAnnotatedBoolResult
-_TestAnnotatedBoolResult(bool value, const std::string &annotation) {
+static Tf_TestAnnotatedBoolResult _TestAnnotatedBoolResult(bool value,
+                                                           const std::string &annotation)
+{
   return Tf_TestAnnotatedBoolResult(value, annotation);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapTf_TestPyAnnotatedBoolResult() {
+void wrapTf_TestPyAnnotatedBoolResult()
+{
   def("_TestAnnotatedBoolResult", &_TestAnnotatedBoolResult);
 
-  Tf_TestAnnotatedBoolResult::Wrap<Tf_TestAnnotatedBoolResult>(
-      "Tf_TestAnnotatedBoolResult", "annotation");
+  Tf_TestAnnotatedBoolResult::Wrap<Tf_TestAnnotatedBoolResult>("Tf_TestAnnotatedBoolResult",
+                                                               "annotation");
 }

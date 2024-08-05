@@ -22,14 +22,14 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "hdPrman/coordSys.h"
-#include "hdPrman/renderParam.h"
-#include "hdPrman/debugCodes.h"
-#include "hdPrman/rixStrings.h"
+#include "Hd/sceneDelegate.h"
+#include "RiTypesHelper.h"
 #include "Sdf/types.h"
 #include "Tf/staticTokens.h"
-#include "Hd/sceneDelegate.h"
+#include "hdPrman/debugCodes.h"
+#include "hdPrman/renderParam.h"
+#include "hdPrman/rixStrings.h"
 #include "pxr/imaging/hf/diagnostic.h"
-#include "RiTypesHelper.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -43,16 +43,14 @@ HdPrmanCoordSys::~HdPrmanCoordSys() = default;
 
 void HdPrmanCoordSys::Finalize(HdRenderParam *renderParam)
 {
-  HdPrman_RenderParam *param =
-      static_cast<HdPrman_RenderParam *>(renderParam);
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
   _ResetCoordSys(param);
 }
 
 void HdPrmanCoordSys::_ResetCoordSys(HdPrman_RenderParam *param)
 {
   riley::Riley *riley = param->AcquireRiley();
-  if (_coordSysId != riley::CoordinateSystemId::InvalidId())
-  {
+  if (_coordSysId != riley::CoordinateSystemId::InvalidId()) {
     riley->DeleteCoordinateSystem(_coordSysId);
     _coordSysId = riley::CoordinateSystemId::InvalidId();
   }
@@ -63,42 +61,33 @@ void HdPrmanCoordSys::Sync(HdSceneDelegate *sceneDelegate,
                            HdRenderParam *renderParam,
                            HdDirtyBits *dirtyBits)
 {
-  HdPrman_RenderParam *param =
-      static_cast<HdPrman_RenderParam *>(renderParam);
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
   SdfPath id = GetId();
 
   riley::Riley *riley = param->AcquireRiley();
 
-  if (*dirtyBits)
-  {
+  if (*dirtyBits) {
     // Sample transform
     HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> xf;
     sceneDelegate->SampleTransform(id, &xf);
-    TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>
-        xf_rt_values(xf.count);
-    for (size_t i = 0; i < xf.count; ++i)
-    {
+    TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES> xf_rt_values(xf.count);
+    for (size_t i = 0; i < xf.count; ++i) {
       xf_rt_values[i] = HdPrman_GfMatrixToRtMatrix(xf.values[i]);
     }
-    const riley::Transform xform = {
-        unsigned(xf.count), xf_rt_values.data(), xf.times.data()};
+    const riley::Transform xform = {unsigned(xf.count), xf_rt_values.data(), xf.times.data()};
 
     RtParamList attrs;
     // The coordSys name is the final component of the id,
     // after stripping namespaces.
     RtUString coordSysName(GetName().GetText());
     attrs.SetString(RixStr.k_name, coordSysName);
-    if (_coordSysId != riley::CoordinateSystemId::InvalidId())
-    {
+    if (_coordSysId != riley::CoordinateSystemId::InvalidId()) {
       riley->ModifyCoordinateSystem(_coordSysId, &xform, &attrs);
     }
-    else
-    {
+    else {
       _coordSysId = riley->CreateCoordinateSystem(
-          riley::UserId(
-              stats::AddDataLocation(id.GetText()).GetValue()),
-          xform, attrs);
+          riley::UserId(stats::AddDataLocation(id.GetText()).GetValue()), xform, attrs);
     }
   }
 
@@ -107,8 +96,7 @@ void HdPrmanCoordSys::Sync(HdSceneDelegate *sceneDelegate,
 
 #if HD_API_VERSION < 53
 /* virtual */
-HdDirtyBits
-HdPrmanCoordSys::GetInitialDirtyBitsMask() const
+HdDirtyBits HdPrmanCoordSys::GetInitialDirtyBitsMask() const
 {
   return HdChangeTracker::AllDirty;
 }

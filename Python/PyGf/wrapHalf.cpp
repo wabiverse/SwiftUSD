@@ -39,20 +39,24 @@ namespace {
 
 // Registers to and from python conversions with boost.python for half.
 struct HalfPythonConversions {
-  static void Register() {
+  static void Register()
+  {
     // to-python
     to_python_converter<GfHalf, HalfPythonConversions>();
     // from-python
-    converter::registry::push_back(&_convertible, &_construct,
-                                   boost::python::type_id<GfHalf>());
+    converter::registry::push_back(&_convertible, &_construct, boost::python::type_id<GfHalf>());
   }
 
   // to-python
-  static PyObject *convert(GfHalf h) { return PyFloat_FromDouble(h); }
+  static PyObject *convert(GfHalf h)
+  {
+    return PyFloat_FromDouble(h);
+  }
 
-private:
+ private:
   // from-python
-  static void *_convertible(PyObject *obj_ptr) {
+  static void *_convertible(PyObject *obj_ptr)
+  {
     // Must be number-like.
     if (!PyNumber_Check(obj_ptr))
       return NULL;
@@ -65,14 +69,13 @@ private:
       PyErr_Clear();
     return NULL;
   }
-  static void _construct(PyObject *obj_ptr,
-                         converter::rvalue_from_python_stage1_data *data) {
+  static void _construct(PyObject *obj_ptr, converter::rvalue_from_python_stage1_data *data)
+  {
     // Pull out the python float we returned from _convertible().
     PyObject *flt = (PyObject *)data->convertible;
     // Turn the python float into a C++ double, make a GfHalf from that
     // double, and store it where boost.python expects it.
-    void *storage =
-        ((converter::rvalue_from_python_storage<GfHalf> *)data)->storage.bytes;
+    void *storage = ((converter::rvalue_from_python_storage<GfHalf> *)data)->storage.bytes;
     new (storage) GfHalf(static_cast<float>(PyFloat_AsDouble(flt)));
     data->convertible = storage;
     // Drop our reference to the python float we created.
@@ -81,11 +84,15 @@ private:
 };
 
 // Simple test function that takes and returns a GfHalf.
-static GfHalf _HalfRoundTrip(GfHalf in) { return in; }
+static GfHalf _HalfRoundTrip(GfHalf in)
+{
+  return in;
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapHalf() {
+void wrapHalf()
+{
   HalfPythonConversions::Register();
   boost::python::def("_HalfRoundTrip", _HalfRoundTrip);
 }

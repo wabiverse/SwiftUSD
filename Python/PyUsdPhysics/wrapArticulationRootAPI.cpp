@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/articulationRootAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/articulationRootAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,39 +41,34 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static std::string _Repr(const UsdPhysicsArticulationRootAPI &self)
 {
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.ArticulationRootAPI(%s)", primRepr.c_str());
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
-
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static std::string
-  _Repr(const UsdPhysicsArticulationRootAPI &self)
+struct UsdPhysicsArticulationRootAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdPhysicsArticulationRootAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.ArticulationRootAPI(%s)",
-        primRepr.c_str());
   }
+};
 
-  struct UsdPhysicsArticulationRootAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdPhysicsArticulationRootAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
+static UsdPhysicsArticulationRootAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdPhysicsArticulationRootAPI::CanApply(prim, &whyNot);
+  return UsdPhysicsArticulationRootAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdPhysicsArticulationRootAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdPhysicsArticulationRootAPI::CanApply(prim, &whyNot);
-    return UsdPhysicsArticulationRootAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsArticulationRootAPI()
 {
@@ -82,11 +77,9 @@ void wrapUsdPhysicsArticulationRootAPI()
   UsdPhysicsArticulationRootAPI_CanApplyResult::Wrap<UsdPhysicsArticulationRootAPI_CanApplyResult>(
       "_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("ArticulationRootAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("ArticulationRootAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -105,7 +98,8 @@ void wrapUsdPhysicsArticulationRootAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -135,11 +129,8 @@ void wrapUsdPhysicsArticulationRootAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

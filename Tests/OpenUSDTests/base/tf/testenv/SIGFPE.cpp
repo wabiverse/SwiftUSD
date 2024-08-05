@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "Arch/stackTrace.h"
 #include "pxr/base/tf/diagnostic.h"
+#include "pxr/pxr.h"
 
 #include <csignal>
 #include <cstdio>

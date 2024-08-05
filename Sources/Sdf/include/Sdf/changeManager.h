@@ -57,33 +57,32 @@ class Sdf_ChangeManager {
   Sdf_ChangeManager(const Sdf_ChangeManager &) = delete;
   Sdf_ChangeManager &operator=(const Sdf_ChangeManager &) = delete;
 
-public:
+ public:
   SDF_API
-  static Sdf_ChangeManager &Get() {
+  static Sdf_ChangeManager &Get()
+  {
     return TfSingleton<Sdf_ChangeManager>::GetInstance();
   }
 
   // Queue notifications.
   void DidReplaceLayerContent(const SdfLayerHandle &layer);
   void DidReloadLayerContent(const SdfLayerHandle &layer);
-  void DidChangeLayerIdentifier(const SdfLayerHandle &layer,
-                                const std::string &oldIdentifier);
+  void DidChangeLayerIdentifier(const SdfLayerHandle &layer, const std::string &oldIdentifier);
   void DidChangeLayerResolvedPath(const SdfLayerHandle &layer);
-  void DidChangeField(const SdfLayerHandle &layer, const SdfPath &path,
-                      const TfToken &field, VtValue &&oldValue,
+  void DidChangeField(const SdfLayerHandle &layer,
+                      const SdfPath &path,
+                      const TfToken &field,
+                      VtValue &&oldValue,
                       const VtValue &newValue);
-  void DidChangeAttributeTimeSamples(const SdfLayerHandle &layer,
-                                     const SdfPath &attrPath);
+  void DidChangeAttributeTimeSamples(const SdfLayerHandle &layer, const SdfPath &attrPath);
 
   // Spec changes.
-  void DidMoveSpec(const SdfLayerHandle &layer, const SdfPath &oldPath,
-                   const SdfPath &newPath);
+  void DidMoveSpec(const SdfLayerHandle &layer, const SdfPath &oldPath, const SdfPath &newPath);
   void DidAddSpec(const SdfLayerHandle &layer, const SdfPath &path, bool inert);
-  void DidRemoveSpec(const SdfLayerHandle &layer, const SdfPath &path,
-                     bool inert);
+  void DidRemoveSpec(const SdfLayerHandle &layer, const SdfPath &path, bool inert);
   void RemoveSpecIfInert(const SdfSpec &);
 
-private:
+ private:
   friend class SdfChangeBlock;
 
   struct _Data {
@@ -104,16 +103,14 @@ private:
   SDF_API
   void _CloseChangeBlock(SdfChangeBlock const *block, void const *openKey);
 
-  void _SendNoticesForChangeList(const SdfLayerHandle &layer,
-                                 const SdfChangeList &changeList);
+  void _SendNoticesForChangeList(const SdfLayerHandle &layer, const SdfChangeList &changeList);
   void _SendNotices(_Data *data);
 
   void _ProcessRemoveIfInert(_Data *data);
 
-  SdfChangeList &_GetListFor(SdfLayerChangeListVec &changeList,
-                             SdfLayerHandle const &layer);
+  SdfChangeList &_GetListFor(SdfLayerChangeListVec &changeList, SdfLayerHandle const &layer);
 
-private:
+ private:
   tbb::enumerable_thread_specific<_Data> _data;
 
   friend class TfSingleton<Sdf_ChangeManager>;
@@ -123,4 +120,4 @@ SDF_API_TEMPLATE_CLASS(TfSingleton<Sdf_ChangeManager>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CHANGE_MANAGER_H
+#endif  // PXR_USD_SDF_CHANGE_MANAGER_H

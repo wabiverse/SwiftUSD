@@ -23,287 +23,255 @@
 //
 #include "Hd/selection.h"
 
-#include "Tf/diagnostic.h"
 #include "Hd/debugCodes.h"
+#include "Tf/diagnostic.h"
 
-#include <iterator> // std::distance
+#include <iterator>  // std::distance
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdSelection::~HdSelection() = default;
 
-void 
-HdSelection::AddRprim(HdSelection::HighlightMode const &mode,
-                      SdfPath const &renderIndexPath)
+void HdSelection::AddRprim(HdSelection::HighlightMode const &mode, SdfPath const &renderIndexPath)
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
+  _selMap[mode][path].fullySelected = true;
+  TF_DEBUG(HD_SELECTION_UPDATE)
+      .Msg("Adding Rprim %s to HdSelection (mode %d)", path.GetText(), mode);
+}
+
+void HdSelection::AddInstance(HdSelection::HighlightMode const &mode,
+                              SdfPath const &renderIndexPath,
+                              VtIntArray const &instanceIndices /*=VtIntArray()*/)
+{
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
+
+  if (instanceIndices.empty()) {
+    // Since instances are tied to an rprim (i.e., they share the same
+    // primId), empty instance indices effectively means that all
+    // instances of the rprim are selected.
     _selMap[mode][path].fullySelected = true;
-    TF_DEBUG(HD_SELECTION_UPDATE).Msg(
-            "Adding Rprim %s to HdSelection (mode %d)", path.GetText(), mode);
+  }
+  _selMap[mode][path].instanceIndices.push_back(instanceIndices);
+  TF_DEBUG(HD_SELECTION_UPDATE)
+      .Msg("Adding instances of Rprim %s to HdSelection (mode %d)", path.GetText(), mode);
 }
 
-void 
-HdSelection::AddInstance(HdSelection::HighlightMode const &mode,
-                         SdfPath const &renderIndexPath,
-                         VtIntArray const &instanceIndices/*=VtIntArray()*/)
+void HdSelection::AddElements(HdSelection::HighlightMode const &mode,
+                              SdfPath const &renderIndexPath,
+                              VtIntArray const &elementIndices)
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
 
-    if (instanceIndices.empty()) {
-        // Since instances are tied to an rprim (i.e., they share the same 
-        // primId), empty instance indices effectively means that all
-        // instances of the rprim are selected.
-        _selMap[mode][path].fullySelected = true;
-    }
-    _selMap[mode][path].instanceIndices.push_back(instanceIndices);
-    TF_DEBUG(HD_SELECTION_UPDATE).Msg(
-            "Adding instances of Rprim %s to HdSelection (mode %d)",
-            path.GetText(), mode);
+  if (elementIndices.empty()) {
+    // For element (faces) subprims alone, we use an empty indices array to
+    // succintly encode that all elements are selected.
+    _selMap[mode][path].fullySelected = true;
+    TF_DEBUG(HD_SELECTION_UPDATE)
+        .Msg("Adding Rprim (via AddElements) %s to HdSelection (mode %d)", path.GetText(), mode);
+  }
+  else {
+    _selMap[mode][path].elementIndices.push_back(elementIndices);
+    TF_DEBUG(HD_SELECTION_UPDATE)
+        .Msg("Adding elements of Rprim %s to HdSelection (mode %d)", path.GetText(), mode);
+  }
 }
 
-void 
-HdSelection::AddElements(HdSelection::HighlightMode const &mode,
-                         SdfPath const &renderIndexPath,
-                         VtIntArray const &elementIndices)
+void HdSelection::AddEdges(HdSelection::HighlightMode const &mode,
+                           SdfPath const &renderIndexPath,
+                           VtIntArray const &edgeIndices)
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
 
-    if (elementIndices.empty()) {
-        // For element (faces) subprims alone, we use an empty indices array to
-        // succintly encode that all elements are selected.
-        _selMap[mode][path].fullySelected = true;
-        TF_DEBUG(HD_SELECTION_UPDATE).Msg(
-            "Adding Rprim (via AddElements) %s to HdSelection (mode %d)",
-            path.GetText(), mode);
-    } else {
-        _selMap[mode][path].elementIndices.push_back(elementIndices);
-        TF_DEBUG(HD_SELECTION_UPDATE).Msg(
-            "Adding elements of Rprim %s to HdSelection (mode %d)",
-            path.GetText(), mode);
-    }
+  // For edges & points, we skip empty indices arrays
+  if (!edgeIndices.empty()) {
+    _selMap[mode][path].edgeIndices.push_back(edgeIndices);
+    TF_DEBUG(HD_SELECTION_UPDATE)
+        .Msg("Adding edges of Rprim %s to HdSelection (mode %d)", path.GetText(), mode);
+  }
 }
 
-void 
-HdSelection::AddEdges(HdSelection::HighlightMode const &mode,
-                      SdfPath const &renderIndexPath,
-                      VtIntArray const &edgeIndices)
+void HdSelection::AddPoints(HdSelection::HighlightMode const &mode,
+                            SdfPath const &renderIndexPath,
+                            VtIntArray const &pointIndices)
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
 
-    // For edges & points, we skip empty indices arrays
-    if (!edgeIndices.empty()) {
-        _selMap[mode][path].edgeIndices.push_back(edgeIndices);
-        TF_DEBUG(HD_SELECTION_UPDATE).Msg(
-            "Adding edges of Rprim %s to HdSelection (mode %d)",
-            path.GetText(), mode);
-    }
+  // When points are added without a color, we use -1 to encode this.
+  _AddPoints(mode, path, pointIndices, /*pointColorIndex=*/-1);
 }
 
-void 
-HdSelection::AddPoints(HdSelection::HighlightMode const &mode,
-                       SdfPath const &renderIndexPath,
-                       VtIntArray const &pointIndices)
+void HdSelection::AddPoints(HdSelection::HighlightMode const &mode,
+                            SdfPath const &renderIndexPath,
+                            VtIntArray const &pointIndices,
+                            GfVec4f const &pointColor)
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return;
+  }
+  SdfPath const &path = renderIndexPath;
 
-    // When points are added without a color, we use -1 to encode this.
-    _AddPoints(mode, path, pointIndices, /*pointColorIndex=*/-1);
+  // When points are added with a color, add it to the tracked colors if
+  // needed, and use the resulting index
+  auto const &pointColorIt = std::find(
+      _selectedPointColors.begin(), _selectedPointColors.end(), pointColor);
+  size_t pointColorId = 0;
+  if (pointColorIt == _selectedPointColors.end()) {
+    pointColorId = _selectedPointColors.size();
+    _selectedPointColors.push_back(pointColor);
+  }
+  else {
+    pointColorId = std::distance(_selectedPointColors.begin(), pointColorIt);
+  }
+  _AddPoints(mode, path, pointIndices, (int)pointColorId);
 }
 
-void 
-HdSelection::AddPoints(HdSelection::HighlightMode const &mode,
-                       SdfPath const &renderIndexPath,
-                       VtIntArray const &pointIndices,
-                       GfVec4f const &pointColor)
+HdSelection::PrimSelectionState const *HdSelection::GetPrimSelectionState(
+    HdSelection::HighlightMode const &mode, SdfPath const &renderIndexPath) const
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return;
-    }
-    SdfPath const &path = renderIndexPath;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
+    return nullptr;
+  }
+  SdfPath const &path = renderIndexPath;
 
-    // When points are added with a color, add it to the tracked colors if
-    // needed, and use the resulting index 
-    auto const & pointColorIt = std::find(_selectedPointColors.begin(),
-                                          _selectedPointColors.end(),
-                                          pointColor);
-    size_t pointColorId = 0;
-    if (pointColorIt == _selectedPointColors.end()) {
-        pointColorId = _selectedPointColors.size();
-        _selectedPointColors.push_back(pointColor);
-    } else {
-        pointColorId =
-            std::distance(_selectedPointColors.begin(), pointColorIt);
-    }
-    _AddPoints(mode, path, pointIndices, (int) pointColorId);
+  auto const &it = _selMap[mode].find(path);
+  if (it != _selMap[mode].end()) {
+    return &(it->second);
+  }
+  else {
+    return nullptr;
+  }
 }
 
-HdSelection::PrimSelectionState const *
-HdSelection::GetPrimSelectionState(HdSelection::HighlightMode const &mode,
-                                   SdfPath const &renderIndexPath) const
+SdfPathVector HdSelection::GetAllSelectedPrimPaths() const
 {
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return nullptr;
-    }
-    SdfPath const &path = renderIndexPath;
-
-    auto const &it = _selMap[mode].find(path);
-    if (it != _selMap[mode].end()) {
-        return &(it->second);
-    } else {
-        return nullptr;
-    }
+  SdfPathVector paths;
+  for (int mode = HdSelection::HighlightModeSelect; mode < HdSelection::HighlightModeCount; mode++)
+  {
+    _GetSelectionPrimPathsForMode(HighlightMode(mode), &paths);
+  }
+  return paths;
 }
 
-SdfPathVector
-HdSelection::GetAllSelectedPrimPaths() const
+SdfPathVector HdSelection::GetSelectedPrimPaths(HdSelection::HighlightMode const &mode) const
 {
-    SdfPathVector paths;
-    for (int mode = HdSelection::HighlightModeSelect;
-             mode < HdSelection::HighlightModeCount; mode++) {
-        _GetSelectionPrimPathsForMode(HighlightMode(mode), &paths);
-    }
+  SdfPathVector paths;
+  if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
     return paths;
+  }
+  _GetSelectionPrimPathsForMode(mode, &paths);
+  return paths;
 }
 
-SdfPathVector
-HdSelection::GetSelectedPrimPaths(HdSelection::HighlightMode const &mode) const
+std::vector<GfVec4f> const &HdSelection::GetSelectedPointColors() const
 {
-    SdfPathVector paths;
-    if (!TF_VERIFY(mode < HdSelection::HighlightModeCount)) {
-        return paths;
+  return _selectedPointColors;
+}
+
+bool HdSelection::IsEmpty() const
+{
+  for (auto const &mode : _selMap) {
+    if (!mode.empty()) {
+      return false;
     }
-    _GetSelectionPrimPathsForMode(mode, &paths);
-    return paths;
+  }
+  return true;
 }
 
-std::vector<GfVec4f> const&
-HdSelection::GetSelectedPointColors() const
+void HdSelection::_AddPoints(HdSelection::HighlightMode const &mode,
+                             SdfPath const &renderIndexPath,
+                             VtIntArray const &pointIndices,
+                             int pointColorIndex)
 {
-    return _selectedPointColors;
-}
+  SdfPath const &path = renderIndexPath;
 
-bool
-HdSelection::IsEmpty() const
-{
-    for (auto const &mode : _selMap) {
-        if (!mode.empty()) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void
-HdSelection::_AddPoints(HdSelection::HighlightMode const &mode,
-                       SdfPath const &renderIndexPath,
-                       VtIntArray const &pointIndices,
-                       int pointColorIndex)
-{
-    SdfPath const &path = renderIndexPath;
-
-    // For edges & points, we skip empty indices arrays
-    if (!pointIndices.empty()) {
-        _selMap[mode][path].pointIndices.push_back(pointIndices);
-        _selMap[mode][path].pointColorIndices.push_back(pointColorIndex);
-        TF_DEBUG(HD_SELECTION_UPDATE).Msg(
+  // For edges & points, we skip empty indices arrays
+  if (!pointIndices.empty()) {
+    _selMap[mode][path].pointIndices.push_back(pointIndices);
+    _selMap[mode][path].pointColorIndices.push_back(pointColorIndex);
+    TF_DEBUG(HD_SELECTION_UPDATE)
+        .Msg(
             "Adding points of Rprim %s to HdSelection (mode %d) with point"
-            " color index %d", path.GetText(), mode, pointColorIndex);
-    }
+            " color index %d",
+            path.GetText(),
+            mode,
+            pointColorIndex);
+  }
 }
 
-void HdSelection::_GetSelectionPrimPathsForMode(
-    HdSelection::HighlightMode const &mode,
-    SdfPathVector *paths) const
+void HdSelection::_GetSelectionPrimPathsForMode(HdSelection::HighlightMode const &mode,
+                                                SdfPathVector *paths) const
 {
-    if (!TF_VERIFY(paths)) {
-        return;
-    }
+  if (!TF_VERIFY(paths)) {
+    return;
+  }
 
-    for (auto const &pair : _selMap[mode]) {
-        SdfPath const &rprimPath = pair.first;
-        paths->push_back(rprimPath);
-    }
+  for (auto const &pair : _selMap[mode]) {
+    SdfPath const &rprimPath = pair.first;
+    paths->push_back(rprimPath);
+  }
 }
 
-template<typename T>
-static
-void
-_Append(std::vector<T> * result,
-        const std::vector<T> &other)
+template<typename T> static void _Append(std::vector<T> *result, const std::vector<T> &other)
 {
-    result->insert(result->end(), other.begin(), other.end());
+  result->insert(result->end(), other.begin(), other.end());
 }
 
-static
-void
-_AppendWithOffset(std::vector<int> * result,
-                  const std::vector<int> &other,
-                  const int offset)
+static void _AppendWithOffset(std::vector<int> *result,
+                              const std::vector<int> &other,
+                              const int offset)
 {
-    result->reserve(result->size() + other.size());
-    for (const int i : other) {
-        result->push_back(i + offset);
-    }
+  result->reserve(result->size() + other.size());
+  for (const int i : other) {
+    result->push_back(i + offset);
+  }
 }
-    
 
-HdSelectionSharedPtr
-HdSelection::Merge(HdSelectionSharedPtr const &a,
-                   HdSelectionSharedPtr const &b)
+HdSelectionSharedPtr HdSelection::Merge(HdSelectionSharedPtr const &a,
+                                        HdSelectionSharedPtr const &b)
 {
-    if (!a || a->IsEmpty()) {
-        return b;
+  if (!a || a->IsEmpty()) {
+    return b;
+  }
+  if (!b || b->IsEmpty()) {
+    return a;
+  }
+
+  HdSelectionSharedPtr result = std::make_shared<HdSelection>(*a);
+  const size_t ptOffset = result->_selectedPointColors.size();
+
+  _Append(&result->_selectedPointColors, b->_selectedPointColors);
+
+  for (size_t mode = 0; mode < HighlightModeCount; mode++) {
+    for (const auto &pathAndState : b->_selMap[mode]) {
+      const SdfPath &path = pathAndState.first;
+      const PrimSelectionState &state = pathAndState.second;
+      PrimSelectionState &resultState = result->_selMap[mode][path];
+      resultState.fullySelected |= state.fullySelected;
+      _Append(&resultState.instanceIndices, state.instanceIndices);
+      _Append(&resultState.elementIndices, state.elementIndices);
+      _Append(&resultState.edgeIndices, state.edgeIndices);
+      _Append(&resultState.pointIndices, state.pointIndices);
+      _AppendWithOffset(&resultState.pointColorIndices, state.pointColorIndices, ptOffset);
     }
-    if (!b || b->IsEmpty()) {
-        return a;
-    }
+  }
 
-    HdSelectionSharedPtr result = std::make_shared<HdSelection>(*a);
-    const size_t ptOffset = result->_selectedPointColors.size();
-
-    _Append(&result->_selectedPointColors, b->_selectedPointColors);
-
-    for (size_t mode = 0; mode < HighlightModeCount; mode++) {
-        for (const auto &pathAndState : b->_selMap[mode]) {
-            const SdfPath &path = pathAndState.first;
-            const PrimSelectionState &state = pathAndState.second;
-            PrimSelectionState &resultState = result->_selMap[mode][path];
-            resultState.fullySelected |= state.fullySelected;
-            _Append(
-                &resultState.instanceIndices,
-                state.instanceIndices);
-            _Append(
-                &resultState.elementIndices,
-                state.elementIndices);
-            _Append(
-                &resultState.edgeIndices,
-                state.edgeIndices);
-            _Append(
-                &resultState.pointIndices,
-                state.pointIndices);
-            _AppendWithOffset(
-                &resultState.pointColorIndices,
-                state.pointColorIndices,
-                ptOffset);
-        }
-    }
-
-    return result;
+  return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

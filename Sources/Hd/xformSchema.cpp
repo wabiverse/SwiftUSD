@@ -33,103 +33,76 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdXformSchemaTokens,
-    HDXFORM_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdXformSchemaTokens, HDXFORM_SCHEMA_TOKENS);
 
-
-
-HdMatrixDataSourceHandle
-HdXformSchema::GetMatrix()
+HdMatrixDataSourceHandle HdXformSchema::GetMatrix()
 {
-    return _GetTypedDataSource<HdMatrixDataSource>(
-        HdXformSchemaTokens->matrix);
+  return _GetTypedDataSource<HdMatrixDataSource>(HdXformSchemaTokens->matrix);
 }
 
-HdBoolDataSourceHandle
-HdXformSchema::GetResetXformStack()
+HdBoolDataSourceHandle HdXformSchema::GetResetXformStack()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdXformSchemaTokens->resetXformStack);
+  return _GetTypedDataSource<HdBoolDataSource>(HdXformSchemaTokens->resetXformStack);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdXformSchema::BuildRetained(
-        const HdMatrixDataSourceHandle &matrix,
-        const HdBoolDataSourceHandle &resetXformStack
-)
+HdContainerDataSourceHandle HdXformSchema::BuildRetained(
+    const HdMatrixDataSourceHandle &matrix, const HdBoolDataSourceHandle &resetXformStack)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (matrix) {
-        names[count] = HdXformSchemaTokens->matrix;
-        values[count++] = matrix;
-    }
+  size_t count = 0;
+  if (matrix) {
+    names[count] = HdXformSchemaTokens->matrix;
+    values[count++] = matrix;
+  }
 
-    if (resetXformStack) {
-        names[count] = HdXformSchemaTokens->resetXformStack;
-        values[count++] = resetXformStack;
-    }
+  if (resetXformStack) {
+    names[count] = HdXformSchemaTokens->resetXformStack;
+    values[count++] = resetXformStack;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdXformSchema
-HdXformSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdXformSchema HdXformSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdXformSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdXformSchemaTokens->xform))
-        : nullptr);
+  return HdXformSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                 HdXformSchemaTokens->xform)) :
+                                             nullptr);
 }
 
 /*static*/
-const TfToken &
-HdXformSchema::GetSchemaToken()
+const TfToken &HdXformSchema::GetSchemaToken()
 {
-    return HdXformSchemaTokens->xform;
-} 
+  return HdXformSchemaTokens->xform;
+}
 /*static*/
-const HdDataSourceLocator &
-HdXformSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdXformSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdXformSchemaTokens->xform
-    );
-    return locator;
-} 
-HdXformSchema::Builder &
-HdXformSchema::Builder::SetMatrix(
-    const HdMatrixDataSourceHandle &matrix)
+  static const HdDataSourceLocator locator(HdXformSchemaTokens->xform);
+  return locator;
+}
+HdXformSchema::Builder &HdXformSchema::Builder::SetMatrix(const HdMatrixDataSourceHandle &matrix)
 {
-    _matrix = matrix;
-    return *this;
+  _matrix = matrix;
+  return *this;
 }
 
-HdXformSchema::Builder &
-HdXformSchema::Builder::SetResetXformStack(
+HdXformSchema::Builder &HdXformSchema::Builder::SetResetXformStack(
     const HdBoolDataSourceHandle &resetXformStack)
 {
-    _resetXformStack = resetXformStack;
-    return *this;
+  _resetXformStack = resetXformStack;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdXformSchema::Builder::Build()
+HdContainerDataSourceHandle HdXformSchema::Builder::Build()
 {
-    return HdXformSchema::BuildRetained(
-        _matrix,
-        _resetXformStack
-    );
+  return HdXformSchema::BuildRetained(_matrix, _resetXformStack);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

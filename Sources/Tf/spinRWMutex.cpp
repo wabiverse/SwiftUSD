@@ -33,7 +33,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 static constexpr int SpinsBeforeBackoff = 32;
 
-template <class Fn> static void WaitWithBackoff(Fn &&fn) {
+template<class Fn> static void WaitWithBackoff(Fn &&fn)
+{
   // Hope for the best...
   if (ARCH_LIKELY(fn())) {
     return;
@@ -51,12 +52,14 @@ template <class Fn> static void WaitWithBackoff(Fn &&fn) {
   } while (!fn());
 }
 
-void TfSpinRWMutex::_WaitForWriter() const {
+void TfSpinRWMutex::_WaitForWriter() const
+{
   // Wait until we see a cleared WriterFlag.
   WaitWithBackoff([this]() { return !(_lockState.load() & WriterFlag); });
 }
 
-void TfSpinRWMutex::_WaitForReaders() const {
+void TfSpinRWMutex::_WaitForReaders() const
+{
   // Wait until we see zero readers.
   WaitWithBackoff([this]() { return _lockState.load() == WriterFlag; });
 }

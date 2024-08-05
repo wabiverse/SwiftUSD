@@ -33,14 +33,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Walk the entire expression tree under node, looking for either a or b.
 // This is a helper used for resolving implied inherit strength.
-static int _OriginIsStronger(const PcpNodeRef &node, const PcpNodeRef &a,
-                             const PcpNodeRef &b) {
+static int _OriginIsStronger(const PcpNodeRef &node, const PcpNodeRef &a, const PcpNodeRef &b)
+{
   if (node == a)
     return -1;
   if (node == b)
     return 1;
 
-  TF_FOR_ALL(child, Pcp_GetChildrenRange(node)) {
+  TF_FOR_ALL(child, Pcp_GetChildrenRange(node))
+  {
     int result = _OriginIsStronger(*child, a, b);
     if (result != 0)
       return result;
@@ -51,8 +52,8 @@ static int _OriginIsStronger(const PcpNodeRef &node, const PcpNodeRef &a,
 // Walk the chain of origins for the given node and return the start
 // of that chain, along with the number of origin nodes encountered
 // along the way. This is similar to PcpNodeRef::GetOriginRootNode.
-static std::pair<PcpNodeRef, size_t>
-_GetOriginRootNode(const PcpNodeRef &node) {
+static std::pair<PcpNodeRef, size_t> _GetOriginRootNode(const PcpNodeRef &node)
+{
   std::pair<PcpNodeRef, size_t> result(node, 0);
 
   while (result.first.GetOriginNode() != result.first.GetParentNode()) {
@@ -63,7 +64,8 @@ _GetOriginRootNode(const PcpNodeRef &node) {
 }
 
 // Return true if node a is a descendent of node b or vice-versa.
-static bool _OriginsAreNestedArcs(const PcpNodeRef &a, const PcpNodeRef &b) {
+static bool _OriginsAreNestedArcs(const PcpNodeRef &a, const PcpNodeRef &b)
+{
   for (PcpNodeRef n = a; n; n = n.GetParentNode()) {
     if (n == b) {
       return true;
@@ -81,7 +83,8 @@ static bool _OriginsAreNestedArcs(const PcpNodeRef &a, const PcpNodeRef &b) {
 
 // Returns the namespace depth of the node that inherits or specializes
 // the class hierarchy that n is a member of.
-static int _GetNamespaceDepthForClassHierarchy(const PcpNodeRef &n) {
+static int _GetNamespaceDepthForClassHierarchy(const PcpNodeRef &n)
+{
   PcpNodeRef instanceNode, classNode;
   std::tie(instanceNode, classNode) = Pcp_FindStartingNodeOfClassHierarchy(n);
 
@@ -95,7 +98,8 @@ static int _GetNamespaceDepthForClassHierarchy(const PcpNodeRef &n) {
   return instanceNode.GetNamespaceDepth();
 }
 
-int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
+int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b)
+{
   if (a.GetParentNode() != b.GetParentNode()) {
     TF_CODING_ERROR("Nodes are not siblings");
     return 0;
@@ -155,14 +159,14 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       //   same as its origin. For more info on the propagation process,
       //   see documentation on _EvalImpliedSpecializes.
       if (!aIsAuthoredArc && !bIsAuthoredArc) {
-        TF_VERIFY(a.GetParentNode() == a.GetRootNode() &&
-                  b.GetParentNode() == b.GetRootNode());
+        TF_VERIFY(a.GetParentNode() == a.GetRootNode() && b.GetParentNode() == b.GetRootNode());
 
         const bool aIsImplied = (a.GetSite() != aOrigin.GetSite());
         const bool bIsImplied = (b.GetSite() != bOrigin.GetSite());
         if (aIsImplied && !bIsImplied) {
           return -1;
-        } else if (!aIsImplied && bIsImplied) {
+        }
+        else if (!aIsImplied && bIsImplied) {
           return 1;
         }
 
@@ -171,13 +175,14 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       }
 
       TF_VERIFY(aIsAuthoredArc && bIsAuthoredArc);
-    } else {
+    }
+    else {
       // If a and b originate from different authored specialize
       // arcs, use the strength ordering of the corresponding origin
       // root nodes to determine whether a or b is stronger.
       if (aOriginRoot.first != bOriginRoot.first) {
-        const int result = _OriginIsStronger(a.GetRootNode(), aOriginRoot.first,
-                                             bOriginRoot.first);
+        const int result = _OriginIsStronger(
+            a.GetRootNode(), aOriginRoot.first, bOriginRoot.first);
         TF_VERIFY(result != 0, "Did not find either origin root");
         return result;
       }
@@ -187,22 +192,20 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       // children of the root node. a and b may have been propagated or
       // implied from elsewhere in the composition graph or they may be
       // specialize arcs authored directly on the prim.
-      TF_VERIFY(a.GetParentNode() == a.GetRootNode() &&
-                b.GetParentNode() == b.GetRootNode());
+      TF_VERIFY(a.GetParentNode() == a.GetRootNode() && b.GetParentNode() == b.GetRootNode());
 
       // First, look at the namespace depth of the 'instance' node that
       // inherits or specializes the class hierarchy that a and b's origin
       // is a member of. This accounts for specializes arcs that have
       // been implied to to ancestral hierarchies. This shows up in
       // the museum test case SpecializesAndAncestralArcs2.
-      const int aDepth =
-          aIsAuthoredArc ? 0 : _GetNamespaceDepthForClassHierarchy(aOrigin);
-      const int bDepth =
-          bIsAuthoredArc ? 0 : _GetNamespaceDepthForClassHierarchy(bOrigin);
+      const int aDepth = aIsAuthoredArc ? 0 : _GetNamespaceDepthForClassHierarchy(aOrigin);
+      const int bDepth = bIsAuthoredArc ? 0 : _GetNamespaceDepthForClassHierarchy(bOrigin);
 
       if (aDepth < bDepth) {
         return -1;
-      } else if (bDepth < aDepth) {
+      }
+      else if (bDepth < aDepth) {
         return 1;
       }
 
@@ -235,7 +238,8 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       // closer to the root and more local the opinion is.
       if (aOriginRoot.second > bOriginRoot.second) {
         return -1;
-      } else if (bOriginRoot.second > aOriginRoot.second) {
+      }
+      else if (bOriginRoot.second > aOriginRoot.second) {
         return 1;
       }
 
@@ -250,14 +254,16 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       // This is similar to the special case above. See
       // the TrickySpecializesAndInherits3 test case for an example.
       if (a.GetLayerStack() == a.GetRootNode().GetLayerStack() &&
-          b.GetLayerStack() == b.GetRootNode().GetLayerStack() &&
-          !aIsAuthoredArc && !bIsAuthoredArc) {
+          b.GetLayerStack() == b.GetRootNode().GetLayerStack() && !aIsAuthoredArc &&
+          !bIsAuthoredArc)
+      {
 
         const bool aIsImplied = (a.GetSite() != aOrigin.GetSite());
         const bool bIsImplied = (b.GetSite() != bOrigin.GetSite());
         if (aIsImplied && !bIsImplied) {
           return -1;
-        } else if (!aIsImplied && bIsImplied) {
+        }
+        else if (!aIsImplied && bIsImplied) {
           return 1;
         }
       }
@@ -268,7 +274,8 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       TF_VERIFY(result != 0, "Did not find either origin");
       return result;
     }
-  } else {
+  }
+  else {
     // Origin namespace depth.
     // Higher values (deeper opinions) are stronger.
     if (a.GetNamespaceDepth() > b.GetNamespaceDepth())
@@ -287,7 +294,8 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
       int result = _OriginIsStronger(a.GetRootNode(), aOrigin, bOrigin);
       if (result < 0) {
         return -1;
-      } else if (result > 0) {
+      }
+      else if (result > 0) {
         return 1;
       }
       TF_VERIFY(false, "Did not find either origin");
@@ -306,7 +314,8 @@ int PcpCompareSiblingNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
 
 // Walk from the given node to the root, collecting all of the nodes
 // encountered along the way.
-static PcpNodeRefVector _CollectNodesFromNodeToRoot(PcpNodeRef node) {
+static PcpNodeRefVector _CollectNodesFromNodeToRoot(PcpNodeRef node)
+{
   PcpNodeRefVector nodes;
   for (; node; node = node.GetParentNode()) {
     nodes.push_back(node);
@@ -318,7 +327,8 @@ static PcpNodeRefVector _CollectNodesFromNodeToRoot(PcpNodeRef node) {
 static int _CompareNodeStrength(const PcpNodeRef &a,
                                 const PcpNodeRefVector &aNodes,
                                 const PcpNodeRef &b,
-                                const PcpNodeRefVector &bNodes) {
+                                const PcpNodeRefVector &bNodes)
+{
   // std::mismatch iterates through every nodes in aNodes. So, ensure that
   // there are enough corresponding elements in bNodes, flipping the
   // arguments and return value if necessary.
@@ -330,10 +340,8 @@ static int _CompareNodeStrength(const PcpNodeRef &a,
 
   // Search the two paths through the prim index graph to find the
   // lowest common parent node and the two siblings beneath that parent.
-  std::pair<PcpNodeRefVector::const_reverse_iterator,
-            PcpNodeRefVector::const_reverse_iterator>
-      nodesUnderCommonParent =
-          std::mismatch(aNodes.rbegin(), aNodes.rend(), bNodes.rbegin());
+  std::pair<PcpNodeRefVector::const_reverse_iterator, PcpNodeRefVector::const_reverse_iterator>
+      nodesUnderCommonParent = std::mismatch(aNodes.rbegin(), aNodes.rend(), bNodes.rbegin());
 
   // If the two paths through the graph diverge at some point, we should
   // have found a mismatch above. If we didn't, it must mean that the two
@@ -355,7 +363,8 @@ static int _CompareNodeStrength(const PcpNodeRef &a,
                                        *nodesUnderCommonParent.second);
 }
 
-int PcpCompareNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b) {
+int PcpCompareNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b)
+{
   if (a.GetRootNode() != b.GetRootNode()) {
     TF_CODING_ERROR("Nodes are not part of the same prim index");
     return 0;

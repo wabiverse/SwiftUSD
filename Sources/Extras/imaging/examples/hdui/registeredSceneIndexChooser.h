@@ -26,25 +26,22 @@
 
 #include "Hd/sceneIndex.h"
 
-#include <QPushButton>
 #include <QMenu>
+#include <QPushButton>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HduiRegisteredSceneIndexChooser : public QPushButton
-{
+class HduiRegisteredSceneIndexChooser : public QPushButton {
   Q_OBJECT;
 
-public:
+ public:
   HduiRegisteredSceneIndexChooser(QWidget *parent = nullptr);
   ~HduiRegisteredSceneIndexChooser() override;
 
-Q_SIGNALS:
-  void SceneIndexSelected(
-      const std::string &name,
-      HdSceneIndexBaseRefPtr sceneIndex);
+ Q_SIGNALS:
+  void SceneIndexSelected(const std::string &name, HdSceneIndexBaseRefPtr sceneIndex);
 
-private:
+ private:
   QMenu *_menu;
 };
 

@@ -37,11 +37,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 static const size_t _MinDeadThreshold = 64;
 
 class Sdf_IdRegistryImpl {
-public:
+ public:
   explicit Sdf_IdRegistryImpl(SdfLayerHandle const &layer)
-      : _layer(layer), _deadCount(0), _deadThreshold(_MinDeadThreshold) {}
+      : _layer(layer), _deadCount(0), _deadThreshold(_MinDeadThreshold)
+  {
+  }
 
-  ~Sdf_IdRegistryImpl() {
+  ~Sdf_IdRegistryImpl()
+  {
     tbb::spin_mutex::scoped_lock lock(_idsMutex);
 
     for (auto &id : _ids) {
@@ -49,9 +52,13 @@ public:
     }
   }
 
-  SdfLayerHandle const &GetLayer() const { return _layer; }
+  SdfLayerHandle const &GetLayer() const
+  {
+    return _layer;
+  }
 
-  Sdf_IdentityRefPtr Identify(const SdfPath &path) {
+  Sdf_IdentityRefPtr Identify(const SdfPath &path)
+  {
 
     tbb::spin_mutex::scoped_lock lock(_idsMutex);
 
@@ -71,7 +78,8 @@ public:
     return rawId;
   }
 
-  void UnregisterOrDelete() {
+  void UnregisterOrDelete()
+  {
     if (++_deadCount >= _deadThreshold) {
       // Clean house!
       _deadCount = 0;
@@ -81,7 +89,8 @@ public:
         if (iter->second->_refCount == 0) {
           delete iter->second;
           iter = _ids.erase(iter);
-        } else {
+        }
+        else {
           ++iter;
         }
       }
@@ -89,7 +98,8 @@ public:
     }
   }
 
-  void MoveIdentity(const SdfPath &oldPath, const SdfPath &newPath) {
+  void MoveIdentity(const SdfPath &oldPath, const SdfPath &newPath)
+  {
     // We hold the mutex, but note that per our Sdf thread-safety rules, no
     // other thread is allowed to be reading or writing this layer at the
     // same time that the layer is being mutated.
@@ -103,8 +113,8 @@ public:
 
     // Insert an entry in the identity map for the new path. If an identity
     // already exists there, make sure we stomp it first.
-    std::pair<_IdMap::iterator, bool> newIdStatus =
-        _ids.insert(std::make_pair(newPath, (Sdf_Identity *)nullptr));
+    std::pair<_IdMap::iterator, bool> newIdStatus = _ids.insert(
+        std::make_pair(newPath, (Sdf_Identity *)nullptr));
     if (!newIdStatus.second) {
       if (TF_VERIFY(newIdStatus.first->second)) {
         newIdStatus.first->second->_Forget();
@@ -121,7 +131,7 @@ public:
     _ids.erase(oldIdIt);
   }
 
-private:
+ private:
   /// The identities being managed by this registry
   using _IdMap = pxr_tsl::robin_map<SdfPath, Sdf_Identity *, SdfPath::Hash>;
   _IdMap _ids;
@@ -141,7 +151,8 @@ private:
 // Sdf_Identity
 //
 
-const SdfLayerHandle &Sdf_Identity::GetLayer() const {
+const SdfLayerHandle &Sdf_Identity::GetLayer() const
+{
   if (ARCH_LIKELY(_regImpl)) {
     return _regImpl->GetLayer();
   }
@@ -150,16 +161,18 @@ const SdfLayerHandle &Sdf_Identity::GetLayer() const {
   return empty;
 }
 
-void Sdf_Identity::_Forget() {
+void Sdf_Identity::_Forget()
+{
   _path = SdfPath();
   _regImpl = nullptr;
 }
 
-void Sdf_Identity::_UnregisterOrDelete(Sdf_IdRegistryImpl *regImpl,
-                                       Sdf_Identity *id) {
+void Sdf_Identity::_UnregisterOrDelete(Sdf_IdRegistryImpl *regImpl, Sdf_Identity *id)
+{
   if (regImpl) {
     regImpl->UnregisterOrDelete();
-  } else {
+  }
+  else {
     delete id;
   }
 }
@@ -169,20 +182,24 @@ void Sdf_Identity::_UnregisterOrDelete(Sdf_IdRegistryImpl *regImpl,
 //
 
 Sdf_IdentityRegistry::Sdf_IdentityRegistry(const SdfLayerHandle &layer)
-    : _layer(layer), _impl(new Sdf_IdRegistryImpl(layer)) {}
+    : _layer(layer), _impl(new Sdf_IdRegistryImpl(layer))
+{
+}
 
 Sdf_IdentityRegistry::~Sdf_IdentityRegistry() = default;
 
-Sdf_IdentityRefPtr Sdf_IdentityRegistry::Identify(const SdfPath &path) {
+Sdf_IdentityRefPtr Sdf_IdentityRegistry::Identify(const SdfPath &path)
+{
   return _impl->Identify(path);
 }
 
-void Sdf_IdentityRegistry::MoveIdentity(const SdfPath &oldPath,
-                                        const SdfPath &newPath) {
+void Sdf_IdentityRegistry::MoveIdentity(const SdfPath &oldPath, const SdfPath &newPath)
+{
   return _impl->MoveIdentity(oldPath, newPath);
 }
 
-void Sdf_IdentityRegistry::_UnregisterOrDelete() {
+void Sdf_IdentityRegistry::_UnregisterOrDelete()
+{
   _impl->UnregisterOrDelete();
 }
 

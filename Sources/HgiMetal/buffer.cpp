@@ -26,10 +26,10 @@
 
 #include "Arch/defines.h"
 
-#include "HgiMetal/hgi.h"
+#include "HgiMetal/buffer.h"
 #include "HgiMetal/capabilities.h"
 #include "HgiMetal/diagnostic.h"
-#include "HgiMetal/buffer.h"
+#include "HgiMetal/hgi.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,21 +37,17 @@ HgiMetalBuffer::HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const &desc)
     : HgiBuffer(desc), _bufferId(nil)
 {
 
-  if (desc.byteSize == 0)
-  {
+  if (desc.byteSize == 0) {
     TF_CODING_ERROR("Buffers must have a non-zero length");
   }
 
-  MTL::ResourceOptions options = MTL::ResourceCPUCacheModeDefaultCache | hgi->GetCapabilities()->defaultStorageMode;
+  MTL::ResourceOptions options = MTL::ResourceCPUCacheModeDefaultCache |
+                                 hgi->GetCapabilities()->defaultStorageMode;
 
-  if (desc.initialData)
-  {
-    _bufferId = hgi->GetPrimaryDevice()->newBuffer(desc.initialData,
-                                                   desc.byteSize,
-                                                   options);
+  if (desc.initialData) {
+    _bufferId = hgi->GetPrimaryDevice()->newBuffer(desc.initialData, desc.byteSize, options);
   }
-  else
-  {
+  else {
     _bufferId = hgi->GetPrimaryDevice()->newBuffer(desc.byteSize, options);
   }
 
@@ -62,30 +58,25 @@ HgiMetalBuffer::HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const &desc)
 
 HgiMetalBuffer::~HgiMetalBuffer()
 {
-  if (_bufferId != nil)
-  {
+  if (_bufferId != nil) {
     _bufferId->release();
     _bufferId = nil;
   }
 }
 
-size_t
-HgiMetalBuffer::GetByteSizeOfResource() const
+size_t HgiMetalBuffer::GetByteSizeOfResource() const
 {
   return _descriptor.byteSize;
 }
 
-uint64_t
-HgiMetalBuffer::GetRawResource() const
+uint64_t HgiMetalBuffer::GetRawResource() const
 {
   return (uint64_t)_bufferId;
 }
 
-void *
-HgiMetalBuffer::GetCPUStagingAddress()
+void *HgiMetalBuffer::GetCPUStagingAddress()
 {
-  if (_bufferId)
-  {
+  if (_bufferId) {
     return _bufferId->contents();
   }
 

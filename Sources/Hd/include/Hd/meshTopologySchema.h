@@ -35,119 +35,101 @@
 
 #include "Hd/subdivisionTagsSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDMESHTOPOLOGY_SCHEMA_TOKENS \
-    (topology) \
-    (faceVertexCounts) \
-    (faceVertexIndices) \
-    (holeIndices) \
-    (orientation) \
-    (leftHanded) \
-    (rightHanded) \
+  (topology)(faceVertexCounts)( \
+      faceVertexIndices)(holeIndices)(orientation)(leftHanded)(rightHanded)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMeshTopologySchemaTokens, HD_API,
-    HDMESHTOPOLOGY_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMeshTopologySchemaTokens, HD_API, HDMESHTOPOLOGY_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMeshTopologySchema : public HdSchema
-{
-public:
-    HdMeshTopologySchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMeshTopologySchema : public HdSchema {
+ public:
+  HdMeshTopologySchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdIntArrayDataSourceHandle GetFaceVertexCounts();
+  HD_API
+  HdIntArrayDataSourceHandle GetFaceVertexIndices();
+  HD_API
+  HdIntArrayDataSourceHandle GetHoleIndices();
+  HD_API
+  HdTokenDataSourceHandle GetOrientation();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdIntArrayDataSourceHandle &faceVertexCounts,
+      const HdIntArrayDataSourceHandle &faceVertexIndices,
+      const HdIntArrayDataSourceHandle &holeIndices,
+      const HdTokenDataSourceHandle &orientation);
+
+  /// \class HdMeshTopologySchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdIntArrayDataSourceHandle GetFaceVertexCounts();
+    Builder &SetFaceVertexCounts(const HdIntArrayDataSourceHandle &faceVertexCounts);
     HD_API
-    HdIntArrayDataSourceHandle GetFaceVertexIndices();
+    Builder &SetFaceVertexIndices(const HdIntArrayDataSourceHandle &faceVertexIndices);
     HD_API
-    HdIntArrayDataSourceHandle GetHoleIndices();
+    Builder &SetHoleIndices(const HdIntArrayDataSourceHandle &holeIndices);
     HD_API
-    HdTokenDataSourceHandle GetOrientation();
+    Builder &SetOrientation(const HdTokenDataSourceHandle &orientation);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdIntArrayDataSourceHandle &faceVertexCounts,
-        const HdIntArrayDataSourceHandle &faceVertexIndices,
-        const HdIntArrayDataSourceHandle &holeIndices,
-        const HdTokenDataSourceHandle &orientation
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMeshTopologySchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetFaceVertexCounts(
-            const HdIntArrayDataSourceHandle &faceVertexCounts);
-        HD_API
-        Builder &SetFaceVertexIndices(
-            const HdIntArrayDataSourceHandle &faceVertexIndices);
-        HD_API
-        Builder &SetHoleIndices(
-            const HdIntArrayDataSourceHandle &holeIndices);
-        HD_API
-        Builder &SetOrientation(
-            const HdTokenDataSourceHandle &orientation);
+   private:
+    HdIntArrayDataSourceHandle _faceVertexCounts;
+    HdIntArrayDataSourceHandle _faceVertexIndices;
+    HdIntArrayDataSourceHandle _holeIndices;
+    HdTokenDataSourceHandle _orientation;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "topology" from the parent container and constructs a
+  /// HdMeshTopologySchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdMeshTopologySchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdIntArrayDataSourceHandle _faceVertexCounts;
-        HdIntArrayDataSourceHandle _faceVertexIndices;
-        HdIntArrayDataSourceHandle _holeIndices;
-        HdTokenDataSourceHandle _orientation;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "topology" from the parent container and constructs a
-    /// HdMeshTopologySchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdMeshTopologySchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-    /// Returns token data source for use as orientation value.
-    /// Values of...
-    /// - HdMeshTopologySchemaTokens->leftHanded
-    /// - HdMeshTopologySchemaTokens->rightHanded
-    ///     ...will be stored statically and reused for future calls.
-    HD_API
-    static HdTokenDataSourceHandle BuildOrientationDataSource(
-        const TfToken &orientation);
-
+  /// Returns token data source for use as orientation value.
+  /// Values of...
+  /// - HdMeshTopologySchemaTokens->leftHanded
+  /// - HdMeshTopologySchemaTokens->rightHanded
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildOrientationDataSource(const TfToken &orientation);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

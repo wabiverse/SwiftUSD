@@ -37,43 +37,38 @@
 static void *(*libdeflate_malloc_func)(size_t) = malloc;
 static void (*libdeflate_free_func)(void *) = free;
 
-static void *
-libdeflate_malloc(size_t size)
+static void *libdeflate_malloc(size_t size)
 {
-	return (*libdeflate_malloc_func)(size);
+  return (*libdeflate_malloc_func)(size);
 }
 
-static void
-libdeflate_free(void *ptr)
+static void libdeflate_free(void *ptr)
 {
-	(*libdeflate_free_func)(ptr);
+  (*libdeflate_free_func)(ptr);
 }
 
-static void *
-libdeflate_aligned_malloc(size_t alignment, size_t size)
+static void *libdeflate_aligned_malloc(size_t alignment, size_t size)
 {
-	void *ptr = libdeflate_malloc(sizeof(void *) + alignment - 1 + size);
-	if (ptr) {
-		void *orig_ptr = ptr;
-		ptr = (void *)ALIGN((uintptr_t)ptr + sizeof(void *), alignment);
-		((void **)ptr)[-1] = orig_ptr;
-	}
-	return ptr;
+  void *ptr = libdeflate_malloc(sizeof(void *) + alignment - 1 + size);
+  if (ptr) {
+    void *orig_ptr = ptr;
+    ptr = (void *)ALIGN((uintptr_t)ptr + sizeof(void *), alignment);
+    ((void **)ptr)[-1] = orig_ptr;
+  }
+  return ptr;
 }
 
-static void
-libdeflate_aligned_free(void *ptr)
+static void libdeflate_aligned_free(void *ptr)
 {
-	if (ptr)
-		libdeflate_free(((void **)ptr)[-1]);
+  if (ptr)
+    libdeflate_free(((void **)ptr)[-1]);
 }
 
-LIBDEFLATEAPI void
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *))
+LIBDEFLATEAPI void libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
+                                                   void (*free_func)(void *))
 {
-	libdeflate_malloc_func = malloc_func;
-	libdeflate_free_func = free_func;
+  libdeflate_malloc_func = malloc_func;
+  libdeflate_free_func = free_func;
 }
 
 /*
@@ -82,70 +77,65 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
  * compiler expands these functions and doesn't actually call them anyway.
  */
 #ifdef FREESTANDING
-#undef memset
-void * __attribute__((weak))
-memset(void *s, int c, size_t n)
+#  undef memset
+void *__attribute__((weak)) memset(void *s, int c, size_t n)
 {
-	u8 *p = s;
-	size_t i;
+  u8 *p = s;
+  size_t i;
 
-	for (i = 0; i < n; i++)
-		p[i] = c;
-	return s;
+  for (i = 0; i < n; i++)
+    p[i] = c;
+  return s;
 }
 
-#undef memcpy
-void * __attribute__((weak))
-memcpy(void *dest, const void *src, size_t n)
+#  undef memcpy
+void *__attribute__((weak)) memcpy(void *dest, const void *src, size_t n)
 {
-	u8 *d = dest;
-	const u8 *s = src;
-	size_t i;
+  u8 *d = dest;
+  const u8 *s = src;
+  size_t i;
 
-	for (i = 0; i < n; i++)
-		d[i] = s[i];
-	return dest;
+  for (i = 0; i < n; i++)
+    d[i] = s[i];
+  return dest;
 }
 
-#undef memmove
-void * __attribute__((weak))
-memmove(void *dest, const void *src, size_t n)
+#  undef memmove
+void *__attribute__((weak)) memmove(void *dest, const void *src, size_t n)
 {
-	u8 *d = dest;
-	const u8 *s = src;
-	size_t i;
+  u8 *d = dest;
+  const u8 *s = src;
+  size_t i;
 
-	if (d <= s)
-		return memcpy(d, s, n);
+  if (d <= s)
+    return memcpy(d, s, n);
 
-	for (i = n; i > 0; i--)
-		d[i - 1] = s[i - 1];
-	return dest;
+  for (i = n; i > 0; i--)
+    d[i - 1] = s[i - 1];
+  return dest;
 }
 
-#undef memcmp
-int __attribute__((weak))
-memcmp(const void *s1, const void *s2, size_t n)
+#  undef memcmp
+int __attribute__((weak)) memcmp(const void *s1, const void *s2, size_t n)
 {
-	const u8 *p1 = s1;
-	const u8 *p2 = s2;
-	size_t i;
+  const u8 *p1 = s1;
+  const u8 *p2 = s2;
+  size_t i;
 
-	for (i = 0; i < n; i++) {
-		if (p1[i] != p2[i])
-			return (int)p1[i] - (int)p2[i];
-	}
-	return 0;
+  for (i = 0; i < n; i++) {
+    if (p1[i] != p2[i])
+      return (int)p1[i] - (int)p2[i];
+  }
+  return 0;
 }
 #endif /* FREESTANDING */
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-#include <stdio.h>
-#include <stdlib.h>
-void
-libdeflate_assertion_failed(const char *expr, const char *file, int line)
+#  include <stdio.h>
+#  include <stdlib.h>
+void libdeflate_assertion_failed(const char *expr, const char *file, int line)
 {
-	fprintf(stderr, "Assertion failed: %s at %s:%d\n", expr, file, line);
-	abort();
+  fprintf(stderr, "Assertion failed: %s at %s:%d\n", expr, file, line);
+  abort();
 }
 #endif /* LIBDEFLATE_ENABLE_ASSERTIONS */

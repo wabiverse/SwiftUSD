@@ -48,20 +48,23 @@ TF_DECLARE_WEAK_PTRS(TraceReporterDataSourceCollector);
 /// This class is an implementation of TraceReporterDataSourceBase which
 /// retrieves TraceCollections from the TraceCollector singleton.
 ///
-class TraceReporterDataSourceCollector : public TraceReporterDataSourceBase,
-                                         public TfWeakBase {
-public:
+class TraceReporterDataSourceCollector : public TraceReporterDataSourceBase, public TfWeakBase {
+ public:
   using This = TraceReporterDataSourceCollector;
   using ThisPtr = TraceReporterDataSourceCollectorPtr;
   using ThisRefPtr = std::unique_ptr<This>;
 
   /// Creates a new TraceReporterDataSourceCollector.
-  static ThisRefPtr New() { return ThisRefPtr(new This()); }
+  static ThisRefPtr New()
+  {
+    return ThisRefPtr(new This());
+  }
 
   /// Creates a new TraceReporterDataSourceCollector which will only listen to
   /// the TraceCollectionAvailable notice when \p accept returns true.
   /// \p accept must be thread-safe.
-  static ThisRefPtr New(std::function<bool()> accept) {
+  static ThisRefPtr New(std::function<bool()> accept)
+  {
     return ThisRefPtr(new This(std::move(accept)));
   }
 
@@ -71,7 +74,7 @@ public:
   /// Returns the next TraceCollections which need to be processed.
   TRACE_API std::vector<CollectionPtr> ConsumeData() override;
 
-private:
+ private:
   TRACE_API TraceReporterDataSourceCollector();
   TRACE_API TraceReporterDataSourceCollector(std::function<bool()> accept);
 
@@ -84,4 +87,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_COLLECTOR_H
+#endif  // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_COLLECTOR_H

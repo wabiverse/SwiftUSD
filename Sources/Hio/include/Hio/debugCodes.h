@@ -26,16 +26,14 @@
 
 /// \file hio/debugCodes.h
 
-#include <pxr/pxrns.h>
 #include "Tf/debug.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEBUG_CODES(
 
-    HIO_DEBUG_GLSLFX,
-    HIO_DEBUG_TEXTURE_IMAGE_PLUGINS,
-    HIO_DEBUG_FIELD_TEXTURE_DATA_PLUGINS
+    HIO_DEBUG_GLSLFX, HIO_DEBUG_TEXTURE_IMAGE_PLUGINS, HIO_DEBUG_FIELD_TEXTURE_DATA_PLUGINS
 
 );
 

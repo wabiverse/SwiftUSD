@@ -86,18 +86,15 @@ enum PcpDependencyType {
 
   /// Combined mask value representing both pure and partly direct
   /// deps.
-  PcpDependencyTypeDirect =
-      PcpDependencyTypePartlyDirect | PcpDependencyTypePurelyDirect,
+  PcpDependencyTypeDirect = PcpDependencyTypePartlyDirect | PcpDependencyTypePurelyDirect,
 
   /// Combined mask value representing any kind of dependency,
   /// except virtual ones.
-  PcpDependencyTypeAnyNonVirtual =
-      PcpDependencyTypeRoot | PcpDependencyTypeDirect |
-      PcpDependencyTypeAncestral | PcpDependencyTypeNonVirtual,
+  PcpDependencyTypeAnyNonVirtual = PcpDependencyTypeRoot | PcpDependencyTypeDirect |
+                                   PcpDependencyTypeAncestral | PcpDependencyTypeNonVirtual,
 
   /// Combined mask value representing any kind of dependency.
-  PcpDependencyTypeAnyIncludingVirtual =
-      PcpDependencyTypeAnyNonVirtual | PcpDependencyTypeVirtual,
+  PcpDependencyTypeAnyIncludingVirtual = PcpDependencyTypeAnyNonVirtual | PcpDependencyTypeVirtual,
 };
 
 /// A typedef for a bitmask of flags from PcpDependencyType.
@@ -114,11 +111,14 @@ struct PcpDependency {
   /// The map function that applies to values from the site.
   PcpMapFunction mapFunc;
 
-  bool operator==(const PcpDependency &rhs) const {
-    return indexPath == rhs.indexPath && sitePath == rhs.sitePath &&
-           mapFunc == rhs.mapFunc;
+  bool operator==(const PcpDependency &rhs) const
+  {
+    return indexPath == rhs.indexPath && sitePath == rhs.sitePath && mapFunc == rhs.mapFunc;
   }
-  bool operator!=(const PcpDependency &rhs) const { return !(*this == rhs); }
+  bool operator!=(const PcpDependency &rhs) const
+  {
+    return !(*this == rhs);
+  }
 };
 
 using PcpDependencyVector = std::vector<PcpDependency>;
@@ -161,4 +161,4 @@ std::string PcpDependencyFlagsToString(const PcpDependencyFlags flags);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_DEPENDENCY_H
+#endif  // PXR_USD_PCP_DEPENDENCY_H

@@ -26,36 +26,19 @@
 
 /// \file pxOsd/tokens.h
 
-#include <pxr/pxrns.h>
 #include "PxOsd/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+#define PXOSD_OPENSUBDIV_TOKENS \
+  (all)(none)( \
+      cornersOnly)(cornersPlus1)(cornersPlus2)(boundaries)(bilinear)(catmullClark)(loop)(edgeOnly)(edgeAndCorner)(uniform)(chaikin)(leftHanded)(rightHanded)(smooth)
 
-#define PXOSD_OPENSUBDIV_TOKENS  \
-    (all)                        \
-    (none)                       \
-    (cornersOnly)                \
-    (cornersPlus1)               \
-    (cornersPlus2)               \
-    (boundaries)                 \
-    (bilinear)                   \
-    (catmullClark)               \
-    (loop)                       \
-    (edgeOnly)                   \
-    (edgeAndCorner)              \
-    (uniform)                    \
-    (chaikin)                    \
-    (leftHanded)                 \
-    (rightHanded)                \
-    (smooth)
-
-TF_DECLARE_PUBLIC_TOKENS(PxOsdOpenSubdivTokens,
-                         PXOSD_API, PXOSD_OPENSUBDIV_TOKENS);
-
+TF_DECLARE_PUBLIC_TOKENS(PxOsdOpenSubdivTokens, PXOSD_API, PXOSD_OPENSUBDIV_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXOSD_REFINER_FACTORY_H
+#endif  // PXOSD_REFINER_FACTORY_H

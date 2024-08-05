@@ -34,448 +34,394 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class PrimType>
-Hd_PrimTypeIndex<PrimType>::Hd_PrimTypeIndex()
- : _entries()
- , _index()
+template<class PrimType> Hd_PrimTypeIndex<PrimType>::Hd_PrimTypeIndex() : _entries(), _index() {}
+
+template<class PrimType> Hd_PrimTypeIndex<PrimType>::~Hd_PrimTypeIndex() {}
+
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::InitPrimTypes(const TfTokenVector &primTypes)
 {
+  size_t primTypeCount = primTypes.size();
+  _entries.resize(primTypeCount);
+
+  for (size_t typeIdx = 0; typeIdx < primTypeCount; ++typeIdx) {
+    _index.emplace(primTypes[typeIdx], typeIdx);
+  }
 }
 
-template <class PrimType>
-Hd_PrimTypeIndex<PrimType>::~Hd_PrimTypeIndex()
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::Clear(HdChangeTracker &tracker, HdRenderDelegate *renderDelegate)
 {
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
+
+  size_t primTypeCount = _entries.size();
+  for (size_t typeIdx = 0; typeIdx < primTypeCount; ++typeIdx) {
+    _PrimTypeEntry &typeEntry = _entries[typeIdx];
+
+    for (typename _PrimMap::iterator primIt = typeEntry.primMap.begin();
+         primIt != typeEntry.primMap.end();
+         ++primIt)
+    {
+      _TrackerRemovePrim(tracker, primIt->first);
+      _PrimInfo &primInfo = primIt->second;
+      _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
+      primInfo.prim = nullptr;
+    }
+    typeEntry.primMap.clear();
+    typeEntry.primIds.Clear();
+  }
 }
 
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::InitPrimTypes(const TfTokenVector &primTypes)
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::InsertPrim(const TfToken &typeId,
+                                            HdSceneDelegate *sceneDelegate,
+                                            const SdfPath &primId,
+                                            HdChangeTracker &tracker,
+                                            HdRenderDelegate *renderDelegate)
 {
-    size_t primTypeCount = primTypes.size();
-    _entries.resize(primTypeCount);
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
 
-    for (size_t typeIdx = 0; typeIdx < primTypeCount; ++typeIdx) {
-        _index.emplace(primTypes[typeIdx], typeIdx);
-    }
+  typename _TypeIndex::iterator typeIt = _index.find(typeId);
+  if (typeIt == _index.end()) {
+    TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
+    return;
+  }
+
+  SdfPath const &sceneDelegateId = sceneDelegate->GetDelegateID();
+  if (!primId.HasPrefix(sceneDelegateId)) {
+    TF_CODING_ERROR("Scene Delegate Id (%s) must prefix prim Id (%s)",
+                    sceneDelegateId.GetText(),
+                    primId.GetText());
+    return;
+  }
+
+  PrimType *prim = _RenderDelegateCreatePrim(renderDelegate, typeId, primId);
+
+  if (prim == nullptr) {
+    // Render Delegate is responsible for reporting reason creation failed.
+    return;
+  }
+
+  HdDirtyBits initialDirtyState = prim->GetInitialDirtyBitsMask();
+  _TrackerInsertPrim(tracker, primId, initialDirtyState);
+
+  _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+  const bool emplaced = typeEntry.primMap.emplace(primId, _PrimInfo{sceneDelegate, prim}).second;
+
+  if (emplaced) {
+    // Only add the primId if this is the first instance in the map.
+    typeEntry.primIds.Insert(primId);
+  }
+  else {
+    // The emplace failed so we should destroy the render prim.
+    _RenderDelegateDestroyPrim(renderDelegate, prim);
+  }
 }
 
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::Clear(HdChangeTracker &tracker,
-                                  HdRenderDelegate *renderDelegate)
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::RemovePrim(const TfToken &typeId,
+                                            const SdfPath &primId,
+                                            HdChangeTracker &tracker,
+                                            HdRenderDelegate *renderDelegate)
 {
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
 
-    size_t primTypeCount = _entries.size();
-    for (size_t typeIdx = 0; typeIdx < primTypeCount; ++typeIdx) {
-        _PrimTypeEntry &typeEntry = _entries[typeIdx];
+  typename _TypeIndex::iterator typeIt = _index.find(typeId);
+  if (typeIt == _index.end()) {
+    TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
+    return;
+  }
 
-        for (typename _PrimMap::iterator primIt  = typeEntry.primMap.begin();
-                                         primIt != typeEntry.primMap.end();
-                                       ++primIt) {
-            _TrackerRemovePrim(tracker, primIt->first);
-            _PrimInfo &primInfo = primIt->second;
-            _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
-            primInfo.prim = nullptr;
-        }
-        typeEntry.primMap.clear();
-        typeEntry.primIds.Clear();
-    }
+  _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+  typename _PrimMap::iterator primIt = typeEntry.primMap.find(primId);
+  if (primIt == typeEntry.primMap.end()) {
+    return;
+  }
+
+  _TrackerRemovePrim(tracker, primId);
+  _PrimInfo &primInfo = primIt->second;
+  _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
+  primInfo.prim = nullptr;
+
+  typeEntry.primMap.erase(primIt);
+  typeEntry.primIds.Remove(primId);
 }
 
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::InsertPrim(const TfToken    &typeId,
-                                       HdSceneDelegate  *sceneDelegate,
-                                       const SdfPath    &primId,
-                                       HdChangeTracker  &tracker,
-                                       HdRenderDelegate *renderDelegate)
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::RemoveSubtree(const SdfPath &root,
+                                               HdSceneDelegate *sceneDelegate,
+                                               HdChangeTracker &tracker,
+                                               HdRenderDelegate *renderDelegate)
 {
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
 
-    typename _TypeIndex::iterator typeIt = _index.find(typeId);
-    if (typeIt ==_index.end()) {
-        TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
-        return;
-    }
+  struct _Range {
+    size_t _start;
+    size_t _end;
 
-    SdfPath const &sceneDelegateId = sceneDelegate->GetDelegateID();
-    if (!primId.HasPrefix(sceneDelegateId)) {
-        TF_CODING_ERROR("Scene Delegate Id (%s) must prefix prim Id (%s)",
-                        sceneDelegateId.GetText(), primId.GetText());
-        return;
-    }
+    _Range() = default;
+    _Range(size_t start, size_t end) : _start(start), _end(end) {}
+  };
 
-
-    PrimType *prim = _RenderDelegateCreatePrim(renderDelegate, typeId, primId);
-
-    if (prim == nullptr) {
-        // Render Delegate is responsible for reporting reason creation failed.
-        return;
-    }
-
-    HdDirtyBits initialDirtyState = prim->GetInitialDirtyBitsMask();
-    _TrackerInsertPrim(tracker, primId, initialDirtyState);
-
-    _PrimTypeEntry &typeEntry = _entries[typeIt->second];
-
-    const bool emplaced = typeEntry.primMap.emplace(primId,
-            _PrimInfo{sceneDelegate, prim}).second;
-        
-    if (emplaced) {
-        // Only add the primId if this is the first instance in the map.
-        typeEntry.primIds.Insert(primId);
-        
-    } else {
-        // The emplace failed so we should destroy the render prim.
-        _RenderDelegateDestroyPrim(renderDelegate, prim);
-    }
-}
-
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::RemovePrim(const TfToken    &typeId,
-                                       const SdfPath    &primId,
-                                       HdChangeTracker  &tracker,
-                                       HdRenderDelegate *renderDelegate)
-{
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
-
-    typename _TypeIndex::iterator typeIt = _index.find(typeId);
-    if (typeIt ==_index.end()) {
-        TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
-        return;
-    }
-
-    _PrimTypeEntry &typeEntry = _entries[typeIt->second];
-
-    typename _PrimMap::iterator primIt = typeEntry.primMap.find(primId);
-    if (primIt == typeEntry.primMap.end()) {
-        return;
-    }
-
-    _TrackerRemovePrim(tracker, primId);
-    _PrimInfo &primInfo = primIt->second;
-    _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
-    primInfo.prim = nullptr;
-
-    typeEntry.primMap.erase(primIt);
-    typeEntry.primIds.Remove(primId);
-}
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::RemoveSubtree(const SdfPath &root,
-                                          HdSceneDelegate* sceneDelegate,
-                                          HdChangeTracker &tracker,
-                                          HdRenderDelegate *renderDelegate)
-{
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
-
-    struct _Range {
-        size_t _start;
-        size_t _end;
-
-        _Range() = default;
-        _Range(size_t start, size_t end)
-         : _start(start)
-         , _end(end)
-        {
-        }
-    };
-
-
-    size_t numTypes = _entries.size();
-    for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
-        _PrimTypeEntry &typeEntry = _entries[typeIdx];
-
-        HdPrimGather gather;
-        _Range totalRange;
-        std::vector<_Range> rangesToRemove;
-
-        const SdfPathVector &ids = typeEntry.primIds.GetIds();
-        if (gather.SubtreeAsRange(ids,
-                                   root,
-                                   &totalRange._start,
-                                   &totalRange._end)) {
-
-            // end is inclusive!
-            size_t currentRangeStart = totalRange._start;
-            for (size_t primIdIdx  = totalRange._start;
-                        primIdIdx <= totalRange._end;
-                      ++primIdIdx) {
-                const SdfPath &primId = ids[primIdIdx];
-
-                typename _PrimMap::iterator primIt = typeEntry.primMap.find(primId);
-                if (primIt == typeEntry.primMap.end()) {
-                    TF_CODING_ERROR("Prim in id list not in info map: %s",
-                                    primId.GetText());
-                } else {
-                    _PrimInfo &primInfo = primIt->second;
-
-                    if (primInfo.sceneDelegate == sceneDelegate) {
-                        _TrackerRemovePrim(tracker, primId);
-                        _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
-                        primInfo.prim = nullptr;
-
-                        typeEntry.primMap.erase(primIt);
-                    } else {
-                        if (currentRangeStart < primIdIdx) {
-                            rangesToRemove.emplace_back(currentRangeStart,
-                                                        primIdIdx - 1);
-                        }
-
-                        currentRangeStart = primIdIdx + 1;
-                    }
-                }
-            }
-
-            // Remove final range
-            if (currentRangeStart <= totalRange._end) {
-                rangesToRemove.emplace_back(currentRangeStart,
-                                            totalRange._end);
-            }
-
-            // Remove ranges from id's in back to front order to not invalidate indices
-            while (!rangesToRemove.empty()) {
-                _Range &range = rangesToRemove.back();
-
-                typeEntry.primIds.RemoveRange(range._start, range._end);
-                rangesToRemove.pop_back();
-            }
-        }
-    }
-}
-
-
-template <class PrimType>
-PrimType *
-Hd_PrimTypeIndex<PrimType>::GetPrim(const TfToken &typeId,
-                                    const SdfPath &primId) const
-{
-    HD_TRACE_FUNCTION();
-
-    typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
-    if (typeIt ==_index.end()) {
-        TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
-        return nullptr;
-    }
-
-    const _PrimTypeEntry &typeEntry = _entries[typeIt->second];
-
-    typename _PrimMap::const_iterator it = typeEntry.primMap.find(primId);
-    if (it != typeEntry.primMap.end()) {
-        return it->second.prim;
-    }
-
-    return nullptr;
-}
-
-template <class PrimType>
-PrimType *
-Hd_PrimTypeIndex<PrimType>::GetFallbackPrim(const TfToken &typeId) const
-{
-    HD_TRACE_FUNCTION();
-
-    typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
-    if (typeIt ==_index.end()) {
-        TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
-        return nullptr;
-    }
-
-    const _PrimTypeEntry &typeEntry = _entries[typeIt->second];
-
-    return typeEntry.fallbackPrim;
-}
-
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::GetPrimSubtree(const TfToken &typeId,
-                                           const SdfPath &rootPath,
-                                           SdfPathVector *outPaths)
-{
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
-
-    typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
-    if (typeIt ==_index.end()) {
-        TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
-        return;
-    }
-
-    _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+  size_t numTypes = _entries.size();
+  for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
+    _PrimTypeEntry &typeEntry = _entries[typeIdx];
 
     HdPrimGather gather;
-    gather.Subtree(typeEntry.primIds.GetIds(), rootPath, outPaths);
-}
+    _Range totalRange;
+    std::vector<_Range> rangesToRemove;
 
-template <class PrimType>
-bool
-Hd_PrimTypeIndex<PrimType>::CreateFallbackPrims(HdRenderDelegate *renderDelegate)
-{
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
+    const SdfPathVector &ids = typeEntry.primIds.GetIds();
+    if (gather.SubtreeAsRange(ids, root, &totalRange._start, &totalRange._end)) {
 
-    bool success = true;
-    for (_TypeIndex::const_iterator typeIt  = _index.begin();
-                                    typeIt != _index.end();
-                                  ++typeIt) {
-        _PrimTypeEntry &typeEntry =  _entries[typeIt->second];
+      // end is inclusive!
+      size_t currentRangeStart = totalRange._start;
+      for (size_t primIdIdx = totalRange._start; primIdIdx <= totalRange._end; ++primIdIdx) {
+        const SdfPath &primId = ids[primIdIdx];
 
-        typeEntry.fallbackPrim =
-                           _RenderDelegateCreateFallbackPrim(renderDelegate,
-                                                             typeIt->first);
-
-        success &= (typeEntry.fallbackPrim != nullptr);
-    }
-
-    return success;
-}
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::DestroyFallbackPrims(HdRenderDelegate *renderDelegate)
-{
-    HD_TRACE_FUNCTION();
-    HF_MALLOC_TAG_FUNCTION();
-
-    size_t numTypes = _entries.size();
-    for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
-        _PrimTypeEntry &typeEntry =  _entries[typeIdx];
-
-       _RenderDelegateDestroyPrim(renderDelegate, typeEntry.fallbackPrim);
-       typeEntry.fallbackPrim = nullptr;
-    }
-}
-
-template <class PrimType>
-void
-Hd_PrimTypeIndex<PrimType>::SyncPrims(HdChangeTracker  &tracker,
-                                      HdRenderParam    *renderParam)
-{
-    size_t numTypes = _entries.size();
-
-    _dirtyPrimDelegates.clear();
-    HdSceneDelegate *prevDelegate = nullptr;
-
-    for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
-        _PrimTypeEntry &typeEntry =  _entries[typeIdx];
-
-        for (typename _PrimMap::iterator primIt  = typeEntry.primMap.begin();
-                                         primIt != typeEntry.primMap.end();
-                                       ++primIt) {
-            const SdfPath &primPath = primIt->first;
-
-            HdDirtyBits dirtyBits = _TrackerGetPrimDirtyBits(tracker, primPath);
-
-            if (dirtyBits != HdChangeTracker::Clean) {
-
-                _PrimInfo &primInfo = primIt->second;
-
-                primInfo.prim->Sync(primInfo.sceneDelegate,
-                                    renderParam,
-                                    &dirtyBits);
-
-                _TrackerMarkPrimClean(tracker, primPath, dirtyBits);
-
-                if (prevDelegate != primInfo.sceneDelegate) {
-                    _dirtyPrimDelegates.push_back(primInfo.sceneDelegate);
-                    prevDelegate = primInfo.sceneDelegate;
-                }
-            }
+        typename _PrimMap::iterator primIt = typeEntry.primMap.find(primId);
+        if (primIt == typeEntry.primMap.end()) {
+          TF_CODING_ERROR("Prim in id list not in info map: %s", primId.GetText());
         }
+        else {
+          _PrimInfo &primInfo = primIt->second;
+
+          if (primInfo.sceneDelegate == sceneDelegate) {
+            _TrackerRemovePrim(tracker, primId);
+            _RenderDelegateDestroyPrim(renderDelegate, primInfo.prim);
+            primInfo.prim = nullptr;
+
+            typeEntry.primMap.erase(primIt);
+          }
+          else {
+            if (currentRangeStart < primIdIdx) {
+              rangesToRemove.emplace_back(currentRangeStart, primIdIdx - 1);
+            }
+
+            currentRangeStart = primIdIdx + 1;
+          }
+        }
+      }
+
+      // Remove final range
+      if (currentRangeStart <= totalRange._end) {
+        rangesToRemove.emplace_back(currentRangeStart, totalRange._end);
+      }
+
+      // Remove ranges from id's in back to front order to not invalidate indices
+      while (!rangesToRemove.empty()) {
+        _Range &range = rangesToRemove.back();
+
+        typeEntry.primIds.RemoveRange(range._start, range._end);
+        rangesToRemove.pop_back();
+      }
     }
+  }
 }
 
-template <class PrimType>
-const HdSceneDelegatePtrVector&
-Hd_PrimTypeIndex<PrimType>::GetSceneDelegatesForDirtyPrims()
+template<class PrimType>
+PrimType *Hd_PrimTypeIndex<PrimType>::GetPrim(const TfToken &typeId, const SdfPath &primId) const
 {
-    // For readability
-    HdSceneDelegatePtrVector& delegates = _dirtyPrimDelegates;
+  HD_TRACE_FUNCTION();
 
-    std::sort(delegates.begin(), delegates.end());
-    HdSceneDelegatePtrVector::iterator last =
-        std::unique(delegates.begin(), delegates.end());
-    delegates.erase(last, delegates.end());
-    return delegates;
+  typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
+  if (typeIt == _index.end()) {
+    TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
+    return nullptr;
+  }
+
+  const _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+  typename _PrimMap::const_iterator it = typeEntry.primMap.find(primId);
+  if (it != typeEntry.primMap.end()) {
+    return it->second.prim;
+  }
+
+  return nullptr;
 }
 
+template<class PrimType>
+PrimType *Hd_PrimTypeIndex<PrimType>::GetFallbackPrim(const TfToken &typeId) const
+{
+  HD_TRACE_FUNCTION();
+
+  typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
+  if (typeIt == _index.end()) {
+    TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
+    return nullptr;
+  }
+
+  const _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+  return typeEntry.fallbackPrim;
+}
+
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::GetPrimSubtree(const TfToken &typeId,
+                                                const SdfPath &rootPath,
+                                                SdfPathVector *outPaths)
+{
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
+
+  typename _TypeIndex::const_iterator typeIt = _index.find(typeId);
+  if (typeIt == _index.end()) {
+    TF_CODING_ERROR("Unsupported prim type: %s", typeId.GetText());
+    return;
+  }
+
+  _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+  HdPrimGather gather;
+  gather.Subtree(typeEntry.primIds.GetIds(), rootPath, outPaths);
+}
+
+template<class PrimType>
+bool Hd_PrimTypeIndex<PrimType>::CreateFallbackPrims(HdRenderDelegate *renderDelegate)
+{
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
+
+  bool success = true;
+  for (_TypeIndex::const_iterator typeIt = _index.begin(); typeIt != _index.end(); ++typeIt) {
+    _PrimTypeEntry &typeEntry = _entries[typeIt->second];
+
+    typeEntry.fallbackPrim = _RenderDelegateCreateFallbackPrim(renderDelegate, typeIt->first);
+
+    success &= (typeEntry.fallbackPrim != nullptr);
+  }
+
+  return success;
+}
+
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::DestroyFallbackPrims(HdRenderDelegate *renderDelegate)
+{
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
+
+  size_t numTypes = _entries.size();
+  for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
+    _PrimTypeEntry &typeEntry = _entries[typeIdx];
+
+    _RenderDelegateDestroyPrim(renderDelegate, typeEntry.fallbackPrim);
+    typeEntry.fallbackPrim = nullptr;
+  }
+}
+
+template<class PrimType>
+void Hd_PrimTypeIndex<PrimType>::SyncPrims(HdChangeTracker &tracker, HdRenderParam *renderParam)
+{
+  size_t numTypes = _entries.size();
+
+  _dirtyPrimDelegates.clear();
+  HdSceneDelegate *prevDelegate = nullptr;
+
+  for (size_t typeIdx = 0; typeIdx < numTypes; ++typeIdx) {
+    _PrimTypeEntry &typeEntry = _entries[typeIdx];
+
+    for (typename _PrimMap::iterator primIt = typeEntry.primMap.begin();
+         primIt != typeEntry.primMap.end();
+         ++primIt)
+    {
+      const SdfPath &primPath = primIt->first;
+
+      HdDirtyBits dirtyBits = _TrackerGetPrimDirtyBits(tracker, primPath);
+
+      if (dirtyBits != HdChangeTracker::Clean) {
+
+        _PrimInfo &primInfo = primIt->second;
+
+        primInfo.prim->Sync(primInfo.sceneDelegate, renderParam, &dirtyBits);
+
+        _TrackerMarkPrimClean(tracker, primPath, dirtyBits);
+
+        if (prevDelegate != primInfo.sceneDelegate) {
+          _dirtyPrimDelegates.push_back(primInfo.sceneDelegate);
+          prevDelegate = primInfo.sceneDelegate;
+        }
+      }
+    }
+  }
+}
+
+template<class PrimType>
+const HdSceneDelegatePtrVector &Hd_PrimTypeIndex<PrimType>::GetSceneDelegatesForDirtyPrims()
+{
+  // For readability
+  HdSceneDelegatePtrVector &delegates = _dirtyPrimDelegates;
+
+  std::sort(delegates.begin(), delegates.end());
+  HdSceneDelegatePtrVector::iterator last = std::unique(delegates.begin(), delegates.end());
+  delegates.erase(last, delegates.end());
+  return delegates;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Sprim Template Specialization
 //
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdSprim>::_TrackerInsertPrim(HdChangeTracker &tracker,
-                                              const SdfPath  &path,
-                                              HdDirtyBits initialDirtyState)
+void Hd_PrimTypeIndex<HdSprim>::_TrackerInsertPrim(HdChangeTracker &tracker,
+                                                   const SdfPath &path,
+                                                   HdDirtyBits initialDirtyState)
 {
-    tracker.SprimInserted(path, initialDirtyState);
+  tracker.SprimInserted(path, initialDirtyState);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdSprim>::_TrackerRemovePrim(HdChangeTracker &tracker,
-                                              const SdfPath &path)
+void Hd_PrimTypeIndex<HdSprim>::_TrackerRemovePrim(HdChangeTracker &tracker, const SdfPath &path)
 {
-    tracker.RemoveSprimFromSprimSprimDependencies(path);
-    tracker.SprimRemoved(path);
+  tracker.RemoveSprimFromSprimSprimDependencies(path);
+  tracker.SprimRemoved(path);
 }
 
-template <>
+template<>
 // static
-HdDirtyBits
-Hd_PrimTypeIndex<HdSprim>::_TrackerGetPrimDirtyBits(HdChangeTracker &tracker,
-                                                   const SdfPath &path)
+HdDirtyBits Hd_PrimTypeIndex<HdSprim>::_TrackerGetPrimDirtyBits(HdChangeTracker &tracker,
+                                                                const SdfPath &path)
 {
-    return tracker.GetSprimDirtyBits(path);
+  return tracker.GetSprimDirtyBits(path);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdSprim>::_TrackerMarkPrimClean(
-                                           HdChangeTracker &tracker,
-                                           const SdfPath &path,
-                                           HdDirtyBits dirtyBits)
+void Hd_PrimTypeIndex<HdSprim>::_TrackerMarkPrimClean(HdChangeTracker &tracker,
+                                                      const SdfPath &path,
+                                                      HdDirtyBits dirtyBits)
 {
-    tracker.MarkSprimClean(path, dirtyBits);
+  tracker.MarkSprimClean(path, dirtyBits);
 }
 
-template <>
+template<>
 // static
-HdSprim *
-Hd_PrimTypeIndex<HdSprim>::_RenderDelegateCreatePrim(HdRenderDelegate *renderDelegate,
-                                                     const TfToken &typeId,
-                                                     const SdfPath &primId)
+HdSprim *Hd_PrimTypeIndex<HdSprim>::_RenderDelegateCreatePrim(HdRenderDelegate *renderDelegate,
+                                                              const TfToken &typeId,
+                                                              const SdfPath &primId)
 {
-    return renderDelegate->CreateSprim(typeId, primId);
+  return renderDelegate->CreateSprim(typeId, primId);
 }
 
-template <>
+template<>
 // static
-HdSprim *
-Hd_PrimTypeIndex<HdSprim>::_RenderDelegateCreateFallbackPrim(HdRenderDelegate *renderDelegate,
-                                                             const TfToken &typeId)
+HdSprim *Hd_PrimTypeIndex<HdSprim>::_RenderDelegateCreateFallbackPrim(
+    HdRenderDelegate *renderDelegate, const TfToken &typeId)
 {
-    return renderDelegate->CreateFallbackSprim(typeId);
+  return renderDelegate->CreateFallbackSprim(typeId);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdSprim>::_RenderDelegateDestroyPrim(HdRenderDelegate *renderDelegate,
-                                                      HdSprim *prim)
+void Hd_PrimTypeIndex<HdSprim>::_RenderDelegateDestroyPrim(HdRenderDelegate *renderDelegate,
+                                                           HdSprim *prim)
 {
   if (prim != nullptr) {
     prim->Finalize(renderDelegate->GetRenderParam());
@@ -488,69 +434,60 @@ template class Hd_PrimTypeIndex<HdSprim>;
 //
 // Bprim Template Specialization
 //
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdBprim>::_TrackerInsertPrim(HdChangeTracker &tracker,
-                                              const SdfPath   &path,
-                                              HdDirtyBits     initialDirtyState)
+void Hd_PrimTypeIndex<HdBprim>::_TrackerInsertPrim(HdChangeTracker &tracker,
+                                                   const SdfPath &path,
+                                                   HdDirtyBits initialDirtyState)
 {
-    tracker.BprimInserted(path, initialDirtyState);
+  tracker.BprimInserted(path, initialDirtyState);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdBprim>::_TrackerRemovePrim(HdChangeTracker &tracker,
-                                              const SdfPath &path)
+void Hd_PrimTypeIndex<HdBprim>::_TrackerRemovePrim(HdChangeTracker &tracker, const SdfPath &path)
 {
-    tracker.BprimRemoved(path);
+  tracker.BprimRemoved(path);
 }
 
-template <>
+template<>
 // static
-HdDirtyBits
-Hd_PrimTypeIndex<HdBprim>::_TrackerGetPrimDirtyBits(HdChangeTracker &tracker,
-                                                    const SdfPath   &path)
+HdDirtyBits Hd_PrimTypeIndex<HdBprim>::_TrackerGetPrimDirtyBits(HdChangeTracker &tracker,
+                                                                const SdfPath &path)
 {
-    return tracker.GetBprimDirtyBits(path);
+  return tracker.GetBprimDirtyBits(path);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdBprim>::_TrackerMarkPrimClean(
-                                           HdChangeTracker &tracker,
-                                           const SdfPath &path,
-                                           HdDirtyBits dirtyBits)
+void Hd_PrimTypeIndex<HdBprim>::_TrackerMarkPrimClean(HdChangeTracker &tracker,
+                                                      const SdfPath &path,
+                                                      HdDirtyBits dirtyBits)
 {
-    tracker.MarkBprimClean(path, dirtyBits);
+  tracker.MarkBprimClean(path, dirtyBits);
 }
 
-template <>
+template<>
 // static
-HdBprim *
-Hd_PrimTypeIndex<HdBprim>::_RenderDelegateCreatePrim(HdRenderDelegate *renderDelegate,
-                                                     const TfToken &typeId,
-                                                     const SdfPath &primId)
+HdBprim *Hd_PrimTypeIndex<HdBprim>::_RenderDelegateCreatePrim(HdRenderDelegate *renderDelegate,
+                                                              const TfToken &typeId,
+                                                              const SdfPath &primId)
 {
-    return renderDelegate->CreateBprim(typeId, primId);
+  return renderDelegate->CreateBprim(typeId, primId);
 }
 
-template <>
+template<>
 // static
-HdBprim *
-Hd_PrimTypeIndex<HdBprim>::_RenderDelegateCreateFallbackPrim(HdRenderDelegate *renderDelegate,
-                                                             const TfToken &typeId)
+HdBprim *Hd_PrimTypeIndex<HdBprim>::_RenderDelegateCreateFallbackPrim(
+    HdRenderDelegate *renderDelegate, const TfToken &typeId)
 {
-    return renderDelegate->CreateFallbackBprim(typeId);
+  return renderDelegate->CreateFallbackBprim(typeId);
 }
 
-template <>
+template<>
 // static
-void
-Hd_PrimTypeIndex<HdBprim>::_RenderDelegateDestroyPrim(HdRenderDelegate *renderDelegate,
-                                                      HdBprim *prim)
+void Hd_PrimTypeIndex<HdBprim>::_RenderDelegateDestroyPrim(HdRenderDelegate *renderDelegate,
+                                                           HdBprim *prim)
 {
   if (prim != nullptr) {
     prim->Finalize(renderDelegate->GetRenderParam());

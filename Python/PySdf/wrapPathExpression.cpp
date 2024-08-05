@@ -24,11 +24,11 @@
 
 #include <pxr/pxrns.h>
 
-#include "Tf/pySignatureExt.h" // wrap lvalue-ref-qualified mem fns.
+#include "Tf/pySignatureExt.h"  // wrap lvalue-ref-qualified mem fns.
 
-#include "Vt/valueFromPython.h"
 #include "Tf/pyEnum.h"
 #include "Tf/pyFunction.h"
+#include "Vt/valueFromPython.h"
 
 #include "Sdf/pathExpression.h"
 
@@ -48,7 +48,8 @@ using PathExpr = SdfPathExpression;
 using ExpressionReference = PathExpr::ExpressionReference;
 using PathPattern = PathExpr::PathPattern;
 
-void wrapPathExpression() {
+void wrapPathExpression()
+{
   // For ResolveReferences.
   TfPyFunctionFromPython<PathExpr(ExpressionReference const &)>{};
 
@@ -57,72 +58,68 @@ void wrapPathExpression() {
   TfPyFunctionFromPython<void(ExpressionReference const &, int)>{};
   TfPyFunctionFromPython<void(PathPattern const &, int)>{};
 
-  scope s =
-      class_<PathExpr>("PathExpression")
-          .def(init<PathExpr const &>())
-          .def(init<std::string, optional<std::string>>(
-              args("patternString", "parseContext")))
+  scope s = class_<PathExpr>("PathExpression")
+                .def(init<PathExpr const &>())
+                .def(init<std::string, optional<std::string>>(
+                    args("patternString", "parseContext")))
 
-          .def("GetText", &PathExpr::GetText)
+                .def("GetText", &PathExpr::GetText)
 
-          .def(
-              "ReplacePrefix",
-              +[](PathExpr const &self, SdfPath const &oldPrefix,
-                  SdfPath const &newPrefix) {
-                return self.ReplacePrefix(oldPrefix, newPrefix);
-              },
-              (arg("oldPrefix"), arg("newPrefix")))
+                .def(
+                    "ReplacePrefix",
+                    +[](PathExpr const &self, SdfPath const &oldPrefix, SdfPath const &newPrefix) {
+                      return self.ReplacePrefix(oldPrefix, newPrefix);
+                    },
+                    (arg("oldPrefix"), arg("newPrefix")))
 
-          .def(
-              "MakeAbsolute",
-              +[](PathExpr const &self, SdfPath const &anchor) {
-                return self.MakeAbsolute(anchor);
-              },
-              (arg("anchor")))
+                .def(
+                    "MakeAbsolute",
+                    +[](PathExpr const &self, SdfPath const &anchor) {
+                      return self.MakeAbsolute(anchor);
+                    },
+                    (arg("anchor")))
 
-          .def("ContainsExpressionReferences",
-               &PathExpr::ContainsExpressionReferences)
+                .def("ContainsExpressionReferences", &PathExpr::ContainsExpressionReferences)
 
-          .def(
-              "ResolveReferences",
-              +[](PathExpr const &self,
-                  std::function<PathExpr(ExpressionReference const &)>
-                      resolve) { return self.ResolveReferences(resolve); },
-              (arg("resolve")))
+                .def(
+                    "ResolveReferences",
+                    +[](PathExpr const &self,
+                        std::function<PathExpr(ExpressionReference const &)> resolve) {
+                      return self.ResolveReferences(resolve);
+                    },
+                    (arg("resolve")))
 
-          .def(
-              "ComposeOver",
-              +[](PathExpr const &self, SdfPathExpression const &weaker) {
-                return self.ComposeOver(weaker);
-              },
-              (arg("weaker")))
+                .def(
+                    "ComposeOver",
+                    +[](PathExpr const &self, SdfPathExpression const &weaker) {
+                      return self.ComposeOver(weaker);
+                    },
+                    (arg("weaker")))
 
-          .def(
-              "Walk",
-              +[](PathExpr const &self,
-                  std::function<void(PathExpr::Op, int)> logic,
-                  std::function<void(ExpressionReference const &)> ref,
-                  std::function<void(PathPattern const &)> pattern) {
-                return self.Walk(logic, ref, pattern);
-              },
-              (arg("logic"), arg("ref"), arg("pattern")))
+                .def(
+                    "Walk",
+                    +[](PathExpr const &self,
+                        std::function<void(PathExpr::Op, int)> logic,
+                        std::function<void(ExpressionReference const &)> ref,
+                        std::function<void(PathPattern const &)> pattern) {
+                      return self.Walk(logic, ref, pattern);
+                    },
+                    (arg("logic"), arg("ref"), arg("pattern")))
 
-          .def("__bool__", &SdfPathExpression::operator bool);
+                .def("__bool__", &SdfPathExpression::operator bool);
 
   TfPyWrapEnum<PathExpr::Op>();
 
   class_<PathPattern>("PathPattern")
       .def(
           "AppendChild",
-          +[](PathPattern &self, std::string text,
-              SdfPredicateExpression const &predExpr) {
+          +[](PathPattern &self, std::string text, SdfPredicateExpression const &predExpr) {
             self.AppendChild(text, predExpr);
           },
           (arg("text"), arg("predExpr") = SdfPredicateExpression()))
       .def(
           "AppendProperty",
-          +[](PathPattern &self, std::string text,
-              SdfPredicateExpression const &predExpr) {
+          +[](PathPattern &self, std::string text, SdfPredicateExpression const &predExpr) {
             self.AppendProperty(text, predExpr);
           },
           (arg("text"), arg("predExpr") = SdfPredicateExpression()))
@@ -132,9 +129,7 @@ void wrapPathExpression() {
           return_value_policy<return_by_value>())
       .def(
           "SetPrefix",
-          +[](PathPattern &self, SdfPath const &prefix) {
-            self.SetPrefix(prefix);
-          },
+          +[](PathPattern &self, SdfPath const &prefix) { self.SetPrefix(prefix); },
           (arg("prefix")))
       .def("GetText", &PathPattern::GetText)
       .def("__bool__", &PathPattern::operator bool);

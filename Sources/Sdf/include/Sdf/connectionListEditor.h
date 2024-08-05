@@ -42,20 +42,21 @@ class TfToken;
 /// specs are created or destroyed when connection/relationship targets are
 /// added to the underlying list operation.
 ///
-template <class ConnectionChildPolicy>
+template<class ConnectionChildPolicy>
 class Sdf_ConnectionListEditor : public Sdf_ListOpListEditor<SdfPathKeyPolicy> {
-protected:
+ protected:
   virtual ~Sdf_ConnectionListEditor();
 
-  Sdf_ConnectionListEditor(
-      const SdfSpecHandle &connectionOwner, const TfToken &connectionListField,
-      const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
+  Sdf_ConnectionListEditor(const SdfSpecHandle &connectionOwner,
+                           const TfToken &connectionListField,
+                           const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
 
-  void _OnEditShared(SdfListOpType op, SdfSpecType specType,
+  void _OnEditShared(SdfListOpType op,
+                     SdfSpecType specType,
                      const std::vector<SdfPath> &oldItems,
                      const std::vector<SdfPath> &newItems) const;
 
-private:
+ private:
   typedef Sdf_ListOpListEditor<SdfPathKeyPolicy> Parent;
 };
 
@@ -65,17 +66,17 @@ private:
 ///
 class Sdf_AttributeConnectionListEditor
     : public Sdf_ConnectionListEditor<Sdf_AttributeConnectionChildPolicy> {
-public:
+ public:
   virtual ~Sdf_AttributeConnectionListEditor();
 
-  Sdf_AttributeConnectionListEditor(
-      const SdfSpecHandle &owner,
-      const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
+  Sdf_AttributeConnectionListEditor(const SdfSpecHandle &owner,
+                                    const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
 
-  virtual void _OnEdit(SdfListOpType op, const std::vector<SdfPath> &oldItems,
+  virtual void _OnEdit(SdfListOpType op,
+                       const std::vector<SdfPath> &oldItems,
                        const std::vector<SdfPath> &newItems) const;
 
-private:
+ private:
   typedef Sdf_ConnectionListEditor<Sdf_AttributeConnectionChildPolicy> Parent;
 };
 
@@ -85,20 +86,20 @@ private:
 ///
 class Sdf_RelationshipTargetListEditor
     : public Sdf_ConnectionListEditor<Sdf_RelationshipTargetChildPolicy> {
-public:
+ public:
   virtual ~Sdf_RelationshipTargetListEditor();
 
-  Sdf_RelationshipTargetListEditor(
-      const SdfSpecHandle &owner,
-      const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
+  Sdf_RelationshipTargetListEditor(const SdfSpecHandle &owner,
+                                   const SdfPathKeyPolicy &typePolicy = SdfPathKeyPolicy());
 
-  virtual void _OnEdit(SdfListOpType op, const std::vector<SdfPath> &oldItems,
+  virtual void _OnEdit(SdfListOpType op,
+                       const std::vector<SdfPath> &oldItems,
                        const std::vector<SdfPath> &newItems) const;
 
-private:
+ private:
   typedef Sdf_ConnectionListEditor<Sdf_RelationshipTargetChildPolicy> Parent;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CONNECTION_LIST_EDITOR_H
+#endif  // PXR_USD_SDF_CONNECTION_LIST_EDITOR_H

@@ -29,13 +29,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((sceneIndexPluginName, "HdPrman_RenderSettingsFilteringSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((sceneIndexPluginName,
+                           "HdPrman_RenderSettingsFilteringSceneIndexPlugin")));
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _namespaceTokens,
-    (ri)((outputsRi, "outputs:ri")));
+TF_DEFINE_PRIVATE_TOKENS(_namespaceTokens, (ri)((outputsRi, "outputs:ri")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plugin registrations
@@ -45,19 +43,17 @@ static const char *const _rendererDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_RenderSettingsFilteringSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_RenderSettingsFilteringSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
   const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 1;
 
-  const HdContainerDataSourceHandle inputArgs =
-      HdRetainedContainerDataSource::New(
-          HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes,
-          HdRetainedTypedSampledDataSource<VtArray<TfToken>>::New(
-              {_namespaceTokens->ri, _namespaceTokens->outputsRi}));
+  const HdContainerDataSourceHandle inputArgs = HdRetainedContainerDataSource::New(
+      HdsiRenderSettingsFilteringSceneIndexTokens->namespacePrefixes,
+      HdRetainedTypedSampledDataSource<VtArray<TfToken>>::New(
+          {_namespaceTokens->ri, _namespaceTokens->outputsRi}));
 
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _rendererDisplayName,
@@ -74,10 +70,8 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 HdPrman_RenderSettingsFilteringSceneIndexPlugin::
     HdPrman_RenderSettingsFilteringSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_RenderSettingsFilteringSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_RenderSettingsFilteringSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   return HdsiRenderSettingsFilteringSceneIndex::New(inputScene, inputArgs);
 }

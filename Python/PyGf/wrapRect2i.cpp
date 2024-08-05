@@ -44,23 +44,26 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfRect2i const &self) {
-  return TF_PY_REPR_PREFIX + "Rect2i(" + TfPyRepr(self.GetMin()) + ", " +
-         TfPyRepr(self.GetMax()) + ")";
+static string _Repr(GfRect2i const &self)
+{
+  return TF_PY_REPR_PREFIX + "Rect2i(" + TfPyRepr(self.GetMin()) + ", " + TfPyRepr(self.GetMax()) +
+         ")";
 }
 
-static size_t __hash__(GfRect2i const &self) { return TfHash()(self); }
+static size_t __hash__(GfRect2i const &self)
+{
+  return TfHash()(self);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRect2i() {
+void wrapRect2i()
+{
   using This = GfRect2i;
 
-  object getMin =
-      make_function(&This::GetMin, return_value_policy<return_by_value>());
+  object getMin = make_function(&This::GetMin, return_value_policy<return_by_value>());
 
-  object getMax =
-      make_function(&This::GetMax, return_value_policy<return_by_value>());
+  object getMax = make_function(&This::GetMax, return_value_policy<return_by_value>());
 
   class_<This>("Rect2i", init<>())
       .def(init<const This &>())
@@ -118,6 +121,5 @@ void wrapRect2i() {
 
       .def("__repr__", _Repr)
       .def("__hash__", __hash__);
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 }

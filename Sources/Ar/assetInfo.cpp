@@ -27,13 +27,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool operator==(const ArAssetInfo &lhs, const ArAssetInfo &rhs) {
+bool operator==(const ArAssetInfo &lhs, const ArAssetInfo &rhs)
+{
   return (lhs.version == rhs.version) && (lhs.assetName == rhs.assetName) &&
-         (lhs.repoPath == rhs.repoPath) &&
-         (lhs.resolverInfo == rhs.resolverInfo);
+         (lhs.repoPath == rhs.repoPath) && (lhs.resolverInfo == rhs.resolverInfo);
 }
 
-bool operator!=(const ArAssetInfo &lhs, const ArAssetInfo &rhs) {
+bool operator!=(const ArAssetInfo &lhs, const ArAssetInfo &rhs)
+{
   return !(lhs == rhs);
 }
 

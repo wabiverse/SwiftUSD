@@ -44,7 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// issue a TfError and produce the default-constructed empty asset path.
 ///
 class SdfAssetPath {
-public:
+ public:
   /// \name Constructors
   /// @{
   ///
@@ -73,38 +73,60 @@ public:
   /// @{
 
   /// Equality, including the resolved path.
-  bool operator==(const SdfAssetPath &rhs) const {
+  bool operator==(const SdfAssetPath &rhs) const
+  {
     return _assetPath == rhs._assetPath && _resolvedPath == rhs._resolvedPath;
   }
 
   /// Inequality operator
   /// \sa SdfAssetPath::operator==(const SdfAssetPath&)
-  bool operator!=(const SdfAssetPath &rhs) const { return !(*this == rhs); }
+  bool operator!=(const SdfAssetPath &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// Ordering first by asset path, then by resolved path.
   SDF_API bool operator<(const SdfAssetPath &rhs) const;
 
   /// Less than or equal operator
   /// \sa SdfAssetPath::operator<(const SdfAssetPath&)
-  bool operator<=(const SdfAssetPath &rhs) const { return !(rhs < *this); }
+  bool operator<=(const SdfAssetPath &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
   /// Greater than operator
   /// \sa SdfAssetPath::operator<(const SdfAssetPath&)
-  bool operator>(const SdfAssetPath &rhs) const { return rhs < *this; }
+  bool operator>(const SdfAssetPath &rhs) const
+  {
+    return rhs < *this;
+  }
 
   /// Greater than or equal operator
   /// \sa SdfAssetPath::operator<(const SdfAssetPath&)
-  bool operator>=(const SdfAssetPath &rhs) const { return !(*this < rhs); }
+  bool operator>=(const SdfAssetPath &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   /// Hash function
-  size_t GetHash() const { return TfHash::Combine(_assetPath, _resolvedPath); }
+  size_t GetHash() const
+  {
+    return TfHash::Combine(_assetPath, _resolvedPath);
+  }
 
   /// \class Hash
   struct Hash {
-    size_t operator()(const SdfAssetPath &ap) const { return ap.GetHash(); }
+    size_t operator()(const SdfAssetPath &ap) const
+    {
+      return ap.GetHash();
+    }
   };
 
-  friend size_t hash_value(const SdfAssetPath &ap) { return ap.GetHash(); }
+  friend size_t hash_value(const SdfAssetPath &ap)
+  {
+    return ap.GetHash();
+  }
 
   /// @}
 
@@ -112,25 +134,38 @@ public:
   /// @{
 
   /// Return the asset path.
-  const std::string &GetAssetPath() const & { return _assetPath; }
+  const std::string &GetAssetPath() const &
+  {
+    return _assetPath;
+  }
 
   /// Overload for rvalues, move out the asset path.
-  std::string GetAssetPath() const && { return std::move(_assetPath); }
+  std::string GetAssetPath() const &&
+  {
+    return std::move(_assetPath);
+  }
 
   /// Return the resolved asset path, if any.
   ///
   /// Note that SdfAssetPath carries a resolved path only if its creator
   /// passed one to the constructor.  SdfAssetPath never performs resolution
   /// itself.
-  const std::string &GetResolvedPath() const & { return _resolvedPath; }
+  const std::string &GetResolvedPath() const &
+  {
+    return _resolvedPath;
+  }
 
   /// Overload for rvalues, move out the asset path.
-  std::string GetResolvedPath() const && { return std::move(_resolvedPath); }
+  std::string GetResolvedPath() const &&
+  {
+    return std::move(_resolvedPath);
+  }
 
   /// @}
 
-private:
-  friend inline void swap(SdfAssetPath &lhs, SdfAssetPath &rhs) {
+ private:
+  friend inline void swap(SdfAssetPath &lhs, SdfAssetPath &rhs)
+  {
     lhs._assetPath.swap(rhs._assetPath);
     lhs._resolvedPath.swap(rhs._resolvedPath);
   }
@@ -154,4 +189,4 @@ SDF_API std::ostream &operator<<(std::ostream &out, const SdfAssetPath &ap);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_ASSET_PATH_H
+#endif  // PXR_USD_SDF_ASSET_PATH_H

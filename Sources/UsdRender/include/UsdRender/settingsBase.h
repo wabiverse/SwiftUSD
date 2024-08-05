@@ -26,18 +26,18 @@
 
 /// \file usdRender/settingsBase.h
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdRender/api.h"
 #include "UsdRender/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -61,9 +61,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRenderTokens->rightHanded
 /// as the value.
 ///
-class UsdRenderSettingsBase : public UsdTyped
-{
-public:
+class UsdRenderSettingsBase : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -73,18 +72,12 @@ public:
   /// Equivalent to UsdRenderSettingsBase::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRenderSettingsBase(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdRenderSettingsBase(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdRenderSettingsBase on the prim held by \p schemaObj .
   /// Should be preferred over UsdRenderSettingsBase(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRenderSettingsBase(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdRenderSettingsBase(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDRENDER_API
@@ -94,8 +87,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRENDER_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRenderSettingsBase holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -107,17 +99,16 @@ public:
   /// \endcode
   ///
   USDRENDER_API
-  static UsdRenderSettingsBase
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderSettingsBase Get(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRENDER_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRENDER_API
@@ -129,7 +120,7 @@ private:
   USDRENDER_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // RESOLUTION
   // --------------------------------------------------------------------- //
@@ -151,9 +142,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateResolutionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateResolutionAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PIXELASPECTRATIO
   // --------------------------------------------------------------------- //
@@ -175,9 +167,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreatePixelAspectRatioAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreatePixelAspectRatioAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // ASPECTRATIOCONFORMPOLICY
   // --------------------------------------------------------------------- //
@@ -212,7 +205,8 @@ public:
   /// | C++ Type | TfToken |
   /// | \ref Usd_Datatypes "Usd Type" | SdfValueTypeNames->Token |
   /// | \ref SdfVariability "Variability" | SdfVariabilityUniform |
-  /// | \ref UsdRenderTokens "Allowed Values" | expandAperture, cropAperture, adjustApertureWidth, adjustApertureHeight, adjustPixelAspectRatio |
+  /// | \ref UsdRenderTokens "Allowed Values" | expandAperture, cropAperture, adjustApertureWidth,
+  /// adjustApertureHeight, adjustPixelAspectRatio |
   USDRENDER_API
   UsdAttribute GetAspectRatioConformPolicyAttr() const;
 
@@ -222,9 +216,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateAspectRatioConformPolicyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateAspectRatioConformPolicyAttr(VtValue const &defaultValue = VtValue(),
+                                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DATAWINDOWNDC
   // --------------------------------------------------------------------- //
@@ -274,9 +269,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateDataWindowNDCAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateDataWindowNDCAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INSTANTANEOUSSHUTTER
   // --------------------------------------------------------------------- //
@@ -301,9 +297,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateInstantaneousShutterAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateInstantaneousShutterAttr(VtValue const &defaultValue = VtValue(),
+                                              bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DISABLEMOTIONBLUR
   // --------------------------------------------------------------------- //
@@ -326,9 +323,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateDisableMotionBlurAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateDisableMotionBlurAttr(VtValue const &defaultValue = VtValue(),
+                                           bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // CAMERA
   // --------------------------------------------------------------------- //
@@ -343,7 +341,7 @@ public:
   USDRENDER_API
   UsdRelationship CreateCameraRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

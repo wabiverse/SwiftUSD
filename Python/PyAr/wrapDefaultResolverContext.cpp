@@ -35,7 +35,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static std::string _Repr(const ArDefaultResolverContext &ctx) {
+static std::string _Repr(const ArDefaultResolverContext &ctx)
+{
   std::string repr = TF_PY_REPR_PREFIX;
   repr += "DefaultResolverContext(";
   if (!ctx.GetSearchPath().empty()) {
@@ -45,11 +46,13 @@ static std::string _Repr(const ArDefaultResolverContext &ctx) {
   return repr;
 }
 
-static size_t _Hash(const ArDefaultResolverContext &ctx) {
+static size_t _Hash(const ArDefaultResolverContext &ctx)
+{
   return hash_value(ctx);
 }
 
-void wrapDefaultResolverContext() {
+void wrapDefaultResolverContext()
+{
   using This = ArDefaultResolverContext;
 
   class_<This>("DefaultResolverContext", no_init)
@@ -59,8 +62,7 @@ void wrapDefaultResolverContext() {
       .def(self == self)
       .def(self != self)
 
-      .def("GetSearchPath", &This::GetSearchPath,
-           return_value_policy<return_by_value>())
+      .def("GetSearchPath", &This::GetSearchPath, return_value_policy<return_by_value>())
 
       .def("__str__", &This::GetAsString)
       .def("__repr__", &_Repr)

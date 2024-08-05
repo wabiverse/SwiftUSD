@@ -36,8 +36,8 @@
 #include "Vt/array.h"
 
 #include "Ar/resolverContext.h"
-#include "Sdf/path.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/path.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -134,4 +134,4 @@ using HdResolverContextDataSourceHandle = HdResolverContextDataSource::Handle;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_DATASOURCETYPEDEFS_H
+#endif  // PXR_IMAGING_HD_DATASOURCETYPEDEFS_H

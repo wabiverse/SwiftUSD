@@ -26,8 +26,8 @@
 
 /// \file ar/defaultResolverContext.h
 
-#include "ArTypes/api.h"
 #include "Ar/defineResolverContext.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include <string>
@@ -61,7 +61,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 class ArDefaultResolverContext {
-public:
+ public:
   /// Default construct a context with no search path.
   ArDefaultResolverContext() = default;
 
@@ -73,22 +73,26 @@ public:
   AR_API bool operator<(const ArDefaultResolverContext &rhs) const;
   AR_API bool operator==(const ArDefaultResolverContext &rhs) const;
   AR_API bool operator!=(const ArDefaultResolverContext &rhs) const;
-  
+
   using SearchPaths = std::vector<std::string>;
 
   /// Return this context's search path.
-  const SearchPaths &GetSearchPath() const { return _searchPath; }
+  const SearchPaths &GetSearchPath() const
+  {
+    return _searchPath;
+  }
 
   /// Return a string representation of this context for debugging.
   AR_API std::string GetAsString() const;
 
-private:
+ private:
   std::vector<std::string> _searchPath;
 };
 
 AR_API size_t hash_value(const ArDefaultResolverContext &context);
 
-inline std::string ArGetDebugString(const ArDefaultResolverContext &context) {
+inline std::string ArGetDebugString(const ArDefaultResolverContext &context)
+{
   return context.GetAsString();
 }
 
@@ -96,4 +100,4 @@ AR_DECLARE_RESOLVER_CONTEXT(ArDefaultResolverContext);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_DEFAULT_RESOLVER_CONTEXT_H
+#endif  // PXR_USD_AR_DEFAULT_RESOLVER_CONTEXT_H

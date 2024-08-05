@@ -30,65 +30,63 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static bool
-HdCommandBasicTest()
+static bool HdCommandBasicTest()
 {
-    Hd_TestDriver driver;
-    HdUnitTestDelegate &sceneDelegate = driver.GetDelegate();
+  Hd_TestDriver driver;
+  HdUnitTestDelegate &sceneDelegate = driver.GetDelegate();
 
-    driver.Draw();
+  driver.Draw();
 
-    HdRenderDelegate *renderDelegate = 
-        sceneDelegate.GetRenderIndex().GetRenderDelegate();
+  HdRenderDelegate *renderDelegate = sceneDelegate.GetRenderIndex().GetRenderDelegate();
 
-    if (!renderDelegate) {
-        std::cout << "Failed to get a render delegate" << std::endl;
-        return false;
+  if (!renderDelegate) {
+    std::cout << "Failed to get a render delegate" << std::endl;
+    return false;
+  }
+
+  HdCommandDescriptors commands = renderDelegate->GetCommandDescriptors();
+
+  if (commands.empty()) {
+    std::cout << "Failed to get commands" << std::endl;
+    return false;
+  }
+
+  if (commands.size() == 1) {
+    std::cout << "Got the following command: " << std::endl;
+    std::cout << "    " << commands.front().commandName << std::endl;
+  }
+  else {
+    std::cout << "Got the following commands: " << std::endl;
+    for (const HdCommandDescriptor &cmd : commands) {
+      std::cout << "    " << cmd.commandName << std::endl;
     }
+  }
+  std::cout << std::endl;
 
-    HdCommandDescriptors commands = renderDelegate->GetCommandDescriptors();
+  // Try to invoke the print command
+  HdCommandArgs args;
+  args[TfToken("message")] = "Hello from test.";
+  if (!renderDelegate->InvokeCommand(TfToken("print"), args)) {
+    return false;
+  }
 
-    if (commands.empty()) {
-        std::cout << "Failed to get commands" << std::endl;
-        return false;
-    }
-
-    if (commands.size() == 1) {
-        std::cout << "Got the following command: " << std::endl;
-        std::cout << "    " << commands.front().commandName << std::endl;
-    } else {
-        std::cout << "Got the following commands: " << std::endl;
-        for (const HdCommandDescriptor &cmd : commands) {
-            std::cout << "    " << cmd.commandName << std::endl;
-        }
-    }
-    std::cout << std::endl;
-
-    // Try to invoke the print command
-    HdCommandArgs args;
-    args[TfToken("message")] = "Hello from test.";
-    if (!renderDelegate->InvokeCommand(TfToken("print"), args)) {
-        return false;
-    }
-
-    return true;
+  return true;
 }
 
-int 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    TfErrorMark mark;
+  TfErrorMark mark;
 
-    bool success = HdCommandBasicTest();
+  bool success = HdCommandBasicTest();
 
-    TF_VERIFY(mark.IsClean());
+  TF_VERIFY(mark.IsClean());
 
-    if (success && mark.IsClean()) {
-        std::cout << "OK" << std::endl;
-        return EXIT_SUCCESS;
-    } else {
-        std::cout << "FAILED" << std::endl;
-        return EXIT_FAILURE;
-    }
+  if (success && mark.IsClean()) {
+    std::cout << "OK" << std::endl;
+    return EXIT_SUCCESS;
+  }
+  else {
+    std::cout << "FAILED" << std::endl;
+    return EXIT_FAILURE;
+  }
 }
-

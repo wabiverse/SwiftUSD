@@ -46,7 +46,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceEventTree);
 ///
 
 class TraceAggregateTree : public TfRefBase, public TfWeakBase {
-public:
+ public:
   using This = TraceAggregateTree;
   using ThisPtr = TraceAggregateTreePtr;
   using ThisRefPtr = TraceAggregateTreeRefPtr;
@@ -56,18 +56,30 @@ public:
   using CounterMap = TfHashMap<TfToken, double, TfToken::HashFunctor>;
 
   /// Create an empty tree
-  static ThisRefPtr New() { return TfCreateRefPtr(new This()); }
+  static ThisRefPtr New()
+  {
+    return TfCreateRefPtr(new This());
+  }
 
   /// Returns the root node of the tree.
-  TraceAggregateNodePtr GetRoot() { return _root; }
+  TraceAggregateNodePtr GetRoot()
+  {
+    return _root;
+  }
 
   /// Returns a map of event keys to total inclusive time.
-  const EventTimes &GetEventTimes() const { return _eventTimes; }
+  const EventTimes &GetEventTimes() const
+  {
+    return _eventTimes;
+  }
 
   /// Returns a map of counters (counter keys), associated with their total
   /// accumulated value. Each individual event node in the tree may also hold
   /// on to an inclusive and exclusive value for the given counter.
-  const CounterMap &GetCounters() const { return _counters; }
+  const CounterMap &GetCounters() const
+  {
+    return _counters;
+  }
 
   /// Returns the numeric index associated with a counter key. Counter values
   /// on the event nodes will have to be looked up by the numeric index.
@@ -84,10 +96,9 @@ public:
 
   /// Creates new nodes and counter data from data in \p eventTree and \p
   /// collection.
-  TRACE_API void Append(const TraceEventTreeRefPtr &eventTree,
-                        const TraceCollection &collection);
+  TRACE_API void Append(const TraceEventTreeRefPtr &eventTree, const TraceCollection &collection);
 
-private:
+ private:
   TRACE_API TraceAggregateTree();
 
   using _CounterIndexMap = TfHashMap<TfToken, int, TfToken::HashFunctor>;
@@ -103,4 +114,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_AGGREGATE_TREE_H
+#endif  // PXR_BASE_TRACE_AGGREGATE_TREE_H

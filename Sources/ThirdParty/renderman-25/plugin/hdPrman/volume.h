@@ -24,18 +24,17 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/gprim.h"
 #include "Hd/field.h"
 #include "Hd/volume.h"
+#include "hdPrman/gprim.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_Field final : public HdField
-{
-public:
+class HdPrman_Field final : public HdField {
+ public:
   HdPrman_Field(TfToken const &typeId, SdfPath const &id);
   void Sync(HdSceneDelegate *sceneDelegate,
             HdRenderParam *renderParam,
@@ -43,16 +42,15 @@ public:
   void Finalize(HdRenderParam *renderParam) override;
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-private:
+ private:
   TfToken const _typeId;
 };
 
-class HdPrman_Volume final : public HdPrman_Gprim<HdVolume>
-{
-public:
+class HdPrman_Volume final : public HdPrman_Gprim<HdVolume> {
+ public:
   using BASE = HdPrman_Gprim<HdVolume>;
 
-public:
+ public:
   HF_MALLOC_TAG_NEW("new HdPrman_Volume");
 
   HdPrman_Volume(SdfPath const &id, const bool isMeshLight);
@@ -76,11 +74,10 @@ public:
   /// the RtParamList list with the k_Ri_type (name of the blobbydso) and any
   /// parameters to this plugin (k_blobbydso_stringargs). The function is also
   /// responsible for declaring the primvar for each field.
-  using HdPrman_VolumeTypeEmitter =
-      void (*)(HdSceneDelegate *sceneDelegate,
-               SdfPath const &id,
-               HdVolumeFieldDescriptorVector const &fields,
-               RtPrimVarList *primvars);
+  using HdPrman_VolumeTypeEmitter = void (*)(HdSceneDelegate *sceneDelegate,
+                                             SdfPath const &id,
+                                             HdVolumeFieldDescriptorVector const &fields,
+                                             RtPrimVarList *primvars);
 
   /// Registers a new volume emitter. Returns true if the handler was
   /// registered as the new handler. When \p overrideExisting is false, then
@@ -90,8 +87,7 @@ public:
                                    bool overrideExisting = false);
 
   /// Specialized subset of primvar types for volume fields
-  enum FieldType
-  {
+  enum FieldType {
     FloatType = 0,
     IntType,
     Float2Type,
@@ -112,16 +108,14 @@ public:
                                   RtUString const &fieldName,
                                   FieldType type);
 
-protected:
-  RtPrimVarList
-  _ConvertGeometry(HdPrman_RenderParam *renderParam,
-                   HdSceneDelegate *sceneDelegate,
-                   const SdfPath &id,
-                   RtUString *primType,
-                   std::vector<HdGeomSubset> *geomSubsets) override;
+ protected:
+  RtPrimVarList _ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                 HdSceneDelegate *sceneDelegate,
+                                 const SdfPath &id,
+                                 RtUString *primType,
+                                 std::vector<HdGeomSubset> *geomSubsets) override;
 
-  riley::MaterialId
-  _GetFallbackMaterial(HdPrman_RenderParam *renderParam) override
+  riley::MaterialId _GetFallbackMaterial(HdPrman_RenderParam *renderParam) override
   {
     return renderParam->GetFallbackVolumeMaterialId();
   }
@@ -131,10 +125,10 @@ protected:
   using _VolumeEmitterMap = std::map<TfToken, HdPrman_VolumeTypeEmitter>;
   static _VolumeEmitterMap &_GetVolumeEmitterMap();
 
-private:
+ private:
   bool _isMeshLight;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H

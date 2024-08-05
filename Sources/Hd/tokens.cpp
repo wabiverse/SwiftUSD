@@ -61,70 +61,56 @@ TF_DEFINE_PUBLIC_TOKENS(HdAovTokens, HD_AOV_TOKENS);
 
 TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsTokens, HD_RENDER_SETTINGS_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens,
-                        HD_RENDER_SETTINGS_PRIM_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens, HD_RENDER_SETTINGS_PRIM_TOKENS);
 
 TF_DEFINE_PUBLIC_TOKENS(HdResourceTypeTokens, HD_RESOURCE_TYPE_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, 
-    HD_SCENE_INDEX_EMULATION_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, HD_SCENE_INDEX_EMULATION_TOKENS);
 
-bool HdPrimTypeIsGprim(TfToken const& primType)
+bool HdPrimTypeIsGprim(TfToken const &primType)
 {
-    return (primType == HdPrimTypeTokens->mesh ||
-            primType == HdPrimTypeTokens->basisCurves ||
-            primType == HdPrimTypeTokens->points ||
-            primType == HdPrimTypeTokens->volume);
+  return (primType == HdPrimTypeTokens->mesh || primType == HdPrimTypeTokens->basisCurves ||
+          primType == HdPrimTypeTokens->points || primType == HdPrimTypeTokens->volume);
 }
 
 const TfTokenVector &HdLightPrimTypeTokens()
 {
-    static const TfTokenVector vec = {
-        HdPrimTypeTokens->simpleLight,
-        HdPrimTypeTokens->cylinderLight,
-        HdPrimTypeTokens->diskLight,
-        HdPrimTypeTokens->distantLight,
-        HdPrimTypeTokens->domeLight,
-        HdPrimTypeTokens->light,
-        HdPrimTypeTokens->pluginLight,
-        HdPrimTypeTokens->rectLight,
-        HdPrimTypeTokens->sphereLight,
-        HdPrimTypeTokens->meshLight
-    };
-    return vec;
+  static const TfTokenVector vec = {HdPrimTypeTokens->simpleLight,
+                                    HdPrimTypeTokens->cylinderLight,
+                                    HdPrimTypeTokens->diskLight,
+                                    HdPrimTypeTokens->distantLight,
+                                    HdPrimTypeTokens->domeLight,
+                                    HdPrimTypeTokens->light,
+                                    HdPrimTypeTokens->pluginLight,
+                                    HdPrimTypeTokens->rectLight,
+                                    HdPrimTypeTokens->sphereLight,
+                                    HdPrimTypeTokens->meshLight};
+  return vec;
 }
 
-
-bool HdPrimTypeIsLight(TfToken const& primType)
+bool HdPrimTypeIsLight(TfToken const &primType)
 {
-    for (const TfToken &lightPrimType : HdLightPrimTypeTokens()) {
-        if (primType == lightPrimType) {
-            return true;
-        }
+  for (const TfToken &lightPrimType : HdLightPrimTypeTokens()) {
+    if (primType == lightPrimType) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
-TfToken HdAovTokensMakePrimvar(TfToken const& primvar)
+TfToken HdAovTokensMakePrimvar(TfToken const &primvar)
 {
-    return TfToken(
-        HdAovTokens->primvars.GetString() +
-        primvar.GetString());
+  return TfToken(HdAovTokens->primvars.GetString() + primvar.GetString());
 }
 
-TfToken HdAovTokensMakeLpe(TfToken const& lpe)
+TfToken HdAovTokensMakeLpe(TfToken const &lpe)
 {
-    return TfToken(
-        HdAovTokens->lpe.GetString() +
-        lpe.GetString());
+  return TfToken(HdAovTokens->lpe.GetString() + lpe.GetString());
 }
 
-TfToken HdAovTokensMakeShader(TfToken const& shader)
+TfToken HdAovTokensMakeShader(TfToken const &shader)
 {
-    return TfToken(
-        HdAovTokens->shader.GetString() +
-        shader.GetString());
+  return TfToken(HdAovTokens->shader.GetString() + shader.GetString());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

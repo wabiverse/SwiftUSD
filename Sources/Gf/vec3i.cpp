@@ -44,21 +44,27 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfVec3i>(); }
-
-std::ostream &operator<<(std::ostream &out, GfVec3i const &v) {
-  return out << '(' << Gf_OstreamHelperP(v[0]) << ", "
-             << Gf_OstreamHelperP(v[1]) << ", " << Gf_OstreamHelperP(v[2])
-             << ')';
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfVec3i>();
 }
 
-bool GfVec3i::operator==(GfVec3d const &other) const {
+std::ostream &operator<<(std::ostream &out, GfVec3i const &v)
+{
+  return out << '(' << Gf_OstreamHelperP(v[0]) << ", " << Gf_OstreamHelperP(v[1]) << ", "
+             << Gf_OstreamHelperP(v[2]) << ')';
+}
+
+bool GfVec3i::operator==(GfVec3d const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
-bool GfVec3i::operator==(GfVec3f const &other) const {
+bool GfVec3i::operator==(GfVec3f const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
-bool GfVec3i::operator==(GfVec3h const &other) const {
+bool GfVec3i::operator==(GfVec3h const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
 

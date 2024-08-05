@@ -32,17 +32,23 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static VtValue _GetResolverInfo(const ArAssetInfo &info) {
+static VtValue _GetResolverInfo(const ArAssetInfo &info)
+{
   return info.resolverInfo;
 }
 
-static void _SetResolverInfo(ArAssetInfo &info, const VtValue &resolverInfo) {
+static void _SetResolverInfo(ArAssetInfo &info, const VtValue &resolverInfo)
+{
   info.resolverInfo = resolverInfo;
 }
 
-static size_t _GetHash(const ArAssetInfo &info) { return hash_value(info); }
+static size_t _GetHash(const ArAssetInfo &info)
+{
+  return hash_value(info);
+}
 
-void wrapAssetInfo() {
+void wrapAssetInfo()
+{
   using This = ArAssetInfo;
 
   class_<This>("AssetInfo")

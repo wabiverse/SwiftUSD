@@ -50,17 +50,24 @@ namespace bp = boost::python;
 TF_API
 bp::object _DummyInit(bp::tuple const & /* args */, bp::dict const & /* kw */);
 
-template <class T> TfWeakPtr<T> GetWeakPtr(T &t) { return TfCreateWeakPtr(&t); }
+template<class T> TfWeakPtr<T> GetWeakPtr(T &t)
+{
+  return TfCreateWeakPtr(&t);
+}
 
-template <class T> TfWeakPtr<T> GetWeakPtr(T const &t) {
+template<class T> TfWeakPtr<T> GetWeakPtr(T const &t)
+{
   // cast away constness for python...
   return TfConst_cast<TfWeakPtr<T>>(TfCreateWeakPtr(&t));
 }
 
-template <class T> TfWeakPtr<T> GetWeakPtr(TfWeakPtr<T> const &t) { return t; }
+template<class T> TfWeakPtr<T> GetWeakPtr(TfWeakPtr<T> const &t)
+{
+  return t;
+}
 
-template <typename PtrType>
-PtrType _GetSingletonWeakPtr(bp::object const & /* classObj */) {
+template<typename PtrType> PtrType _GetSingletonWeakPtr(bp::object const & /* classObj */)
+{
   typedef typename PtrType::DataType Singleton;
   return GetWeakPtr(Singleton::GetInstance());
 }
@@ -69,11 +76,11 @@ TF_API
 std::string _Repr(bp::object const &self, std::string const &prefix);
 
 struct Visitor : bp::def_visitor<Visitor> {
-  explicit Visitor(std::string const &reprPrefix = std::string())
-      : _reprPrefix(reprPrefix) {}
+  explicit Visitor(std::string const &reprPrefix = std::string()) : _reprPrefix(reprPrefix) {}
 
   friend class bp::def_visitor_access;
-  template <typename CLS> void visit(CLS &c) const {
+  template<typename CLS> void visit(CLS &c) const
+  {
     typedef typename CLS::metadata::held_type PtrType;
 
     // Singleton implies WeakPtr.
@@ -87,17 +94,16 @@ struct Visitor : bp::def_visitor<Visitor> {
     // If they supplied a repr prefix, provide a repr implementation.
     if (!_reprPrefix.empty())
       c.def("__repr__",
-            make_function(
-                std::bind(_Repr, std::placeholders::_1, _reprPrefix),
-                bp::default_call_policies(),
-                boost::mpl::vector2<std::string, bp::object const &>()));
+            make_function(std::bind(_Repr, std::placeholders::_1, _reprPrefix),
+                          bp::default_call_policies(),
+                          boost::mpl::vector2<std::string, bp::object const &>()));
   }
 
-private:
+ private:
   std::string _reprPrefix;
 };
 
-} // namespace Tf_PySingleton
+}  // namespace Tf_PySingleton
 
 TF_API
 Tf_PySingleton::Visitor TfPySingleton();
@@ -106,4 +112,4 @@ Tf_PySingleton::Visitor TfPySingleton(std::string const &reprPrefix);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_SINGLETON_H
+#endif  // PXR_BASE_TF_PY_SINGLETON_H

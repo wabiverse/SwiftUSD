@@ -26,18 +26,18 @@
 
 /// \file usdRender/product.h
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
-#include "UsdRender/settingsBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdRender/api.h"
+#include "UsdRender/settingsBase.h"
 #include "UsdRender/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -70,9 +70,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRenderTokens->rightHanded
 /// as the value.
 ///
-class UsdRenderProduct : public UsdRenderSettingsBase
-{
-public:
+class UsdRenderProduct : public UsdRenderSettingsBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -82,18 +81,12 @@ public:
   /// Equivalent to UsdRenderProduct::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRenderProduct(const UsdPrim &prim = UsdPrim())
-      : UsdRenderSettingsBase(prim)
-  {
-  }
+  explicit UsdRenderProduct(const UsdPrim &prim = UsdPrim()) : UsdRenderSettingsBase(prim) {}
 
   /// Construct a UsdRenderProduct on the prim held by \p schemaObj .
   /// Should be preferred over UsdRenderProduct(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRenderProduct(const UsdSchemaBase &schemaObj)
-      : UsdRenderSettingsBase(schemaObj)
-  {
-  }
+  explicit UsdRenderProduct(const UsdSchemaBase &schemaObj) : UsdRenderSettingsBase(schemaObj) {}
 
   /// Destructor.
   USDRENDER_API
@@ -103,8 +96,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRENDER_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRenderProduct holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -116,8 +108,7 @@ public:
   /// \endcode
   ///
   USDRENDER_API
-  static UsdRenderProduct
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderProduct Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -142,17 +133,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDRENDER_API
-  static UsdRenderProduct
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderProduct Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRENDER_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRENDER_API
@@ -164,7 +154,7 @@ private:
   USDRENDER_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PRODUCTTYPE
   // --------------------------------------------------------------------- //
@@ -189,9 +179,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateProductTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateProductTypeAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PRODUCTNAME
   // --------------------------------------------------------------------- //
@@ -214,9 +205,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateProductNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateProductNameAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // ORDEREDVARS
   // --------------------------------------------------------------------- //
@@ -233,7 +225,7 @@ public:
   USDRENDER_API
   UsdRelationship CreateOrderedVarsRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

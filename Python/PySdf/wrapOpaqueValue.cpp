@@ -34,15 +34,18 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static std::string _SdfOpaqueValueRepr(const SdfOpaqueValue &self) {
+static std::string _SdfOpaqueValueRepr(const SdfOpaqueValue &self)
+{
   return TF_PY_REPR_PREFIX + "OpaqueValue()";
 }
 
-static size_t _SdfOpaqueValueHash(const SdfOpaqueValue &self) {
+static size_t _SdfOpaqueValueHash(const SdfOpaqueValue &self)
+{
   return TfHash()(self);
 }
 
-void wrapOpaqueValue() {
+void wrapOpaqueValue()
+{
   class_<SdfOpaqueValue>("OpaqueValue")
       .def(self == self)
       .def(self != self)

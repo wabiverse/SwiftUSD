@@ -25,110 +25,97 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdGeomBoundable,
-        TfType::Bases< UsdGeomXformable > >();
-    
+  TfType::Define<UsdGeomBoundable, TfType::Bases<UsdGeomXformable>>();
 }
 
 /* virtual */
-UsdGeomBoundable::~UsdGeomBoundable()
-{
-}
+UsdGeomBoundable::~UsdGeomBoundable() {}
 
 /* static */
-UsdGeomBoundable
-UsdGeomBoundable::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdGeomBoundable UsdGeomBoundable::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdGeomBoundable();
-    }
-    return UsdGeomBoundable(stage->GetPrimAtPath(path));
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdGeomBoundable();
+  }
+  return UsdGeomBoundable(stage->GetPrimAtPath(path));
 }
-
 
 /* virtual */
 UsdSchemaKind UsdGeomBoundable::_GetSchemaKind() const
 {
-    return UsdGeomBoundable::schemaKind;
+  return UsdGeomBoundable::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomBoundable::_GetStaticTfType()
+const TfType &UsdGeomBoundable::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdGeomBoundable>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdGeomBoundable>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdGeomBoundable::_IsTypedSchema()
+bool UsdGeomBoundable::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomBoundable::_GetTfType() const
+const TfType &UsdGeomBoundable::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomBoundable::GetExtentAttr() const
+UsdAttribute UsdGeomBoundable::GetExtentAttr() const
 {
-    return GetPrim().GetAttribute(UsdGeomTokens->extent);
+  return GetPrim().GetAttribute(UsdGeomTokens->extent);
 }
 
-UsdAttribute
-UsdGeomBoundable::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdGeomBoundable::CreateExtentAttr(VtValue const &defaultValue,
+                                                bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
+                                    SdfValueTypeNames->Float3Array,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomBoundable::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdGeomBoundable::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-        UsdGeomTokens->extent,
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomXformable::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {
+      UsdGeomTokens->extent,
+  };
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdGeomXformable::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -142,43 +129,47 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-#include "UsdGeom/debugCodes.h" 
+#include "UsdGeom/debugCodes.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-UsdGeomBoundable::ComputeExtent(const UsdTimeCode &time, VtVec3fArray *extent)
+bool UsdGeomBoundable::ComputeExtent(const UsdTimeCode &time, VtVec3fArray *extent)
 {
-    UsdAttributeQuery extentAttrQuery = UsdAttributeQuery(GetExtentAttr());
+  UsdAttributeQuery extentAttrQuery = UsdAttributeQuery(GetExtentAttr());
 
-    bool success = false;
-    if (extentAttrQuery.HasAuthoredValue()) {
-        success = extentAttrQuery.Get(extent, time);
-        if (success) {
-            //validate the result
-            success = extent->size() == 2;
-            if (!success) {
-                TF_WARN("[Boundable Extent] Authored extent for <%s> is of "
-                        "size %zu instead of 2.\n", 
-                        GetPath().GetString().c_str(), extent->size());
-            }
-        }
+  bool success = false;
+  if (extentAttrQuery.HasAuthoredValue()) {
+    success = extentAttrQuery.Get(extent, time);
+    if (success) {
+      // validate the result
+      success = extent->size() == 2;
+      if (!success) {
+        TF_WARN(
+            "[Boundable Extent] Authored extent for <%s> is of "
+            "size %zu instead of 2.\n",
+            GetPath().GetString().c_str(),
+            extent->size());
+      }
     }
+  }
 
-    if (!success) {
-        TF_DEBUG(USDGEOM_EXTENT).Msg(
+  if (!success) {
+    TF_DEBUG(USDGEOM_EXTENT)
+        .Msg(
             "[Boundable Extent] WARNING: No valid extent authored for "
-            "<%s>. Computing extent from source geometry data dynamically..\n", 
+            "<%s>. Computing extent from source geometry data dynamically..\n",
             GetPath().GetString().c_str());
-        success = ComputeExtentFromPlugins(*this, time, extent);
-        if (!success) {
-            TF_DEBUG(USDGEOM_EXTENT).Msg(
-                "[Boundable Extent] WARNING: Unable to compute extent for "
-                "<%s>.\n", GetPath().GetString().c_str());
-        }
+    success = ComputeExtentFromPlugins(*this, time, extent);
+    if (!success) {
+      TF_DEBUG(USDGEOM_EXTENT)
+          .Msg(
+              "[Boundable Extent] WARNING: Unable to compute extent for "
+              "<%s>.\n",
+              GetPath().GetString().c_str());
     }
+  }
 
-    return success;
+  return success;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

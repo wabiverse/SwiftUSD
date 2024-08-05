@@ -47,33 +47,33 @@ PXR_NAMESPACE_OPEN_SCOPE
 // UsdRelationship
 // ------------------------------------------------------------------------- //
 
-static SdfPath _MapTargetPath(const UsdStage *stage, const SdfPath &anchor,
-                              const SdfPath &target) {
+static SdfPath _MapTargetPath(const UsdStage *stage, const SdfPath &anchor, const SdfPath &target)
+{
   // If this is a relative target path, we have to map both the anchor
   // and target path and then re-relativize them.
   const UsdEditTarget &editTarget = stage->GetEditTarget();
   if (target.IsAbsolutePath()) {
     return editTarget.MapToSpecPath(target).StripAllVariantSelections();
-  } else {
+  }
+  else {
     const SdfPath anchorPrim = anchor.GetPrimPath();
     const SdfPath translatedAnchorPrim =
         editTarget.MapToSpecPath(anchorPrim).StripAllVariantSelections();
     const SdfPath translatedTarget =
-        editTarget.MapToSpecPath(target.MakeAbsolutePath(anchorPrim))
-            .StripAllVariantSelections();
+        editTarget.MapToSpecPath(target.MakeAbsolutePath(anchorPrim)).StripAllVariantSelections();
     return translatedTarget.MakeRelativePath(translatedAnchorPrim);
   }
 }
 
-SdfPath UsdRelationship::_GetTargetForAuthoring(const SdfPath &target,
-                                                std::string *whyNot) const {
+SdfPath UsdRelationship::_GetTargetForAuthoring(const SdfPath &target, std::string *whyNot) const
+{
   if (!target.IsEmpty()) {
-    SdfPath absTarget =
-        target.MakeAbsolutePath(GetPath().GetAbsoluteRootOrPrimPath());
+    SdfPath absTarget = target.MakeAbsolutePath(GetPath().GetAbsoluteRootOrPrimPath());
     if (Usd_InstanceCache::IsPathInPrototype(absTarget)) {
       if (whyNot) {
-        *whyNot = "Cannot target a prototype or an object within a "
-                  "prototype.";
+        *whyNot =
+            "Cannot target a prototype or an object within a "
+            "prototype.";
       }
       return SdfPath();
     }
@@ -94,13 +94,15 @@ SdfPath UsdRelationship::_GetTargetForAuthoring(const SdfPath &target,
   return mappedPath;
 }
 
-bool UsdRelationship::AddTarget(const SdfPath &target,
-                                UsdListPosition position) const {
+bool UsdRelationship::AddTarget(const SdfPath &target, UsdListPosition position) const
+{
   std::string errMsg;
   const SdfPath targetToAuthor = _GetTargetForAuthoring(target, &errMsg);
   if (targetToAuthor.IsEmpty()) {
     TF_CODING_ERROR("Cannot add target <%s> to relationship <%s>: %s",
-                    target.GetText(), GetPath().GetText(), errMsg.c_str());
+                    target.GetText(),
+                    GetPath().GetText(),
+                    errMsg.c_str());
     return false;
   }
 
@@ -120,12 +122,15 @@ bool UsdRelationship::AddTarget(const SdfPath &target,
   return true;
 }
 
-bool UsdRelationship::RemoveTarget(const SdfPath &target) const {
+bool UsdRelationship::RemoveTarget(const SdfPath &target) const
+{
   std::string errMsg;
   const SdfPath targetToAuthor = _GetTargetForAuthoring(target, &errMsg);
   if (targetToAuthor.IsEmpty()) {
     TF_CODING_ERROR("Cannot remove target <%s> from relationship <%s>: %s",
-                    target.GetText(), GetPath().GetText(), errMsg.c_str());
+                    target.GetText(),
+                    GetPath().GetText(),
+                    errMsg.c_str());
     return false;
   }
 
@@ -145,7 +150,8 @@ bool UsdRelationship::RemoveTarget(const SdfPath &target) const {
   return true;
 }
 
-bool UsdRelationship::SetTargets(const SdfPathVector &targets) const {
+bool UsdRelationship::SetTargets(const SdfPathVector &targets) const
+{
   SdfPathVector mappedPaths;
   mappedPaths.reserve(targets.size());
   for (const SdfPath &target : targets) {
@@ -153,7 +159,9 @@ bool UsdRelationship::SetTargets(const SdfPathVector &targets) const {
     mappedPaths.push_back(_GetTargetForAuthoring(target, &errMsg));
     if (mappedPaths.back().IsEmpty()) {
       TF_CODING_ERROR("Cannot set target <%s> on relationship <%s>: %s",
-                      target.GetText(), GetPath().GetText(), errMsg.c_str());
+                      target.GetText(),
+                      GetPath().GetText(),
+                      errMsg.c_str());
       return false;
     }
   }
@@ -176,7 +184,8 @@ bool UsdRelationship::SetTargets(const SdfPathVector &targets) const {
   return true;
 }
 
-bool UsdRelationship::ClearTargets(bool removeSpec) const {
+bool UsdRelationship::ClearTargets(bool removeSpec) const
+{
   // NOTE! Do not insert any code that modifies scene description between the
   // changeblock and the call to _CreateSpec!  Explanation: _CreateSpec calls
   // code that inspects the composition graph and then does some authoring.
@@ -190,27 +199,30 @@ bool UsdRelationship::ClearTargets(bool removeSpec) const {
     return false;
 
   if (removeSpec) {
-    SdfPrimSpecHandle owner =
-        TfDynamic_cast<SdfPrimSpecHandle>(relSpec->GetOwner());
+    SdfPrimSpecHandle owner = TfDynamic_cast<SdfPrimSpecHandle>(relSpec->GetOwner());
     owner->RemoveProperty(relSpec);
-  } else {
+  }
+  else {
     relSpec->GetTargetPathList().ClearEdits();
   }
   return true;
 }
 
-bool UsdRelationship::GetTargets(SdfPathVector *targets) const {
+bool UsdRelationship::GetTargets(SdfPathVector *targets) const
+{
   TRACE_FUNCTION();
   return _GetTargets(SdfSpecTypeRelationship, targets);
 }
 
-bool UsdRelationship::_GetForwardedTargetsImpl(
-    SdfPathSet *visited, SdfPathSet *uniqueTargets, SdfPathVector *targets,
-    bool *foundAnyErrors, bool includeForwardingRels) const {
+bool UsdRelationship::_GetForwardedTargetsImpl(SdfPathSet *visited,
+                                               SdfPathSet *uniqueTargets,
+                                               SdfPathVector *targets,
+                                               bool *foundAnyErrors,
+                                               bool includeForwardingRels) const
+{
   SdfPathVector curTargets;
   // Get the targets for this relationship first.
-  const bool foundTargets =
-      _GetTargets(SdfSpecTypeRelationship, &curTargets, foundAnyErrors);
+  const bool foundTargets = _GetTargets(SdfSpecTypeRelationship, &curTargets, foundAnyErrors);
   // If there are no targets we can just return the return value of
   // _GetTargets. Note that this may be true if there are explicit opinions
   // that make the targets empty.
@@ -231,9 +243,8 @@ bool UsdRelationship::_GetForwardedTargetsImpl(
         if (UsdRelationship rel = prim.GetRelationship(target.GetNameToken())) {
           // Only do this rel if we've not yet seen it.
           if (visited->insert(rel.GetPath()).second) {
-            success |= rel._GetForwardedTargetsImpl(visited, uniqueTargets,
-                                                    targets, foundAnyErrors,
-                                                    includeForwardingRels);
+            success |= rel._GetForwardedTargetsImpl(
+                visited, uniqueTargets, targets, foundAnyErrors, includeForwardingRels);
           }
           if (!includeForwardingRels)
             continue;
@@ -254,18 +265,19 @@ bool UsdRelationship::_GetForwardedTargetsImpl(
 }
 
 bool UsdRelationship::_GetForwardedTargets(SdfPathVector *targets,
-                                           bool includeForwardingRels) const {
+                                           bool includeForwardingRels) const
+{
   SdfPathSet visited, uniqueTargets;
   bool foundAnyErrors = false;
-  return _GetForwardedTargetsImpl(&visited, &uniqueTargets, targets,
-                                  &foundAnyErrors, includeForwardingRels) &&
+  return _GetForwardedTargetsImpl(
+             &visited, &uniqueTargets, targets, &foundAnyErrors, includeForwardingRels) &&
          !foundAnyErrors;
 }
 
-bool UsdRelationship::GetForwardedTargets(SdfPathVector *targets) const {
+bool UsdRelationship::GetForwardedTargets(SdfPathVector *targets) const
+{
   if (!targets) {
-    TF_CODING_ERROR("Passed null pointer for targets on <%s>",
-                    GetPath().GetText());
+    TF_CODING_ERROR("Passed null pointer for targets on <%s>", GetPath().GetText());
     return false;
   }
   targets->clear();
@@ -273,18 +285,18 @@ bool UsdRelationship::GetForwardedTargets(SdfPathVector *targets) const {
                               /*includeForwardingRels=*/false);
 }
 
-bool UsdRelationship::HasAuthoredTargets() const {
+bool UsdRelationship::HasAuthoredTargets() const
+{
   return HasAuthoredMetadata(SdfFieldKeys->TargetPaths);
 }
 
-SdfRelationshipSpecHandle
-UsdRelationship::_CreateSpec(bool fallbackCustom) const {
+SdfRelationshipSpecHandle UsdRelationship::_CreateSpec(bool fallbackCustom) const
+{
   UsdStage *stage = _GetStage();
   // Try to create a spec for editing either from the definition or from
   // copying existing spec info.
   TfErrorMark m;
-  if (SdfRelationshipSpecHandle relSpec =
-          stage->_CreateRelationshipSpecForEditing(*this)) {
+  if (SdfRelationshipSpecHandle relSpec = stage->_CreateRelationshipSpecForEditing(*this)) {
     return relSpec;
   }
 
@@ -294,14 +306,16 @@ UsdRelationship::_CreateSpec(bool fallbackCustom) const {
   // spec with the provided default values.
   if (m.IsClean()) {
     SdfChangeBlock block;
-    return SdfRelationshipSpec::New(
-        stage->_CreatePrimSpecForEditing(GetPrim()), _PropName().GetString(),
-        /* custom = */ fallbackCustom, SdfVariabilityUniform);
+    return SdfRelationshipSpec::New(stage->_CreatePrimSpecForEditing(GetPrim()),
+                                    _PropName().GetString(),
+                                    /* custom = */ fallbackCustom,
+                                    SdfVariabilityUniform);
   }
   return TfNullPtr;
 }
 
-bool UsdRelationship::_Create(bool fallbackCustom) const {
+bool UsdRelationship::_Create(bool fallbackCustom) const
+{
   return bool(_CreateSpec(fallbackCustom));
 }
 

@@ -38,13 +38,13 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapExpressionVariablesSource() {
+void wrapExpressionVariablesSource()
+{
   using This = PcpExpressionVariablesSource;
 
   class_<This>("ExpressionVariablesSource")
       .def(init<>())
-      .def(init<const PcpLayerStackIdentifier &,
-                const PcpLayerStackIdentifier &>(
+      .def(init<const PcpLayerStackIdentifier &, const PcpLayerStackIdentifier &>(
           (args("layerStackId"), args("rootLayerStackId"))))
 
       .def(self == self)
@@ -58,8 +58,7 @@ void wrapExpressionVariablesSource() {
             return id ? object(*id) : object();
           })
       .def("ResolveLayerStackIdentifier",
-           (const PcpLayerStackIdentifier &(
-               This::*)(const PcpLayerStackIdentifier &) const) &
+           (const PcpLayerStackIdentifier &(This::*)(const PcpLayerStackIdentifier &) const) &
                This::ResolveLayerStackIdentifier,
            return_value_policy<return_by_value>())
 
@@ -71,9 +70,8 @@ void wrapExpressionVariablesSource() {
       .def(
           "__repr__", +[](const PcpExpressionVariablesSource &s) {
             return TfStringPrintf(
-                "%sExpressionVariablesSource(%s)", TF_PY_REPR_PREFIX.c_str(),
-                s.IsRootLayerStack()
-                    ? ""
-                    : TfPyRepr(*s.GetLayerStackIdentifier()).c_str());
+                "%sExpressionVariablesSource(%s)",
+                TF_PY_REPR_PREFIX.c_str(),
+                s.IsRootLayerStack() ? "" : TfPyRepr(*s.GetLayerStackIdentifier()).c_str());
           });
 }

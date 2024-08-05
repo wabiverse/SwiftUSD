@@ -26,8 +26,8 @@
 
 /// \file usdSkel/skinningQuery.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/attribute.h"
 #include "Usd/prim.h"
@@ -44,9 +44,8 @@ class UsdGeomBoundable;
 /// \class UsdSkelSkinningQuery
 ///
 /// Object used for querying resolved bindings for skinning.
-class UsdSkelSkinningQuery
-{
-public:
+class UsdSkelSkinningQuery {
+ public:
   USDSKEL_API
   UsdSkelSkinningQuery();
 
@@ -67,12 +66,21 @@ public:
                        const UsdRelationship &blendShapeTargets);
 
   /// Returns true if this query is valid.
-  bool IsValid() const { return bool(_prim); }
+  bool IsValid() const
+  {
+    return bool(_prim);
+  }
 
   /// Boolean conversion operator. Equivalent to IsValid().
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
-  const UsdPrim &GetPrim() const { return _prim; }
+  const UsdPrim &GetPrim() const
+  {
+    return _prim;
+  }
 
   /// Returns true if there are blend shapes associated with this prim.
   USDSKEL_API
@@ -92,7 +100,10 @@ public:
     return _numInfluencesPerComponent;
   }
 
-  const TfToken &GetInterpolation() const { return _interpolation; }
+  const TfToken &GetInterpolation() const
+  {
+    return _interpolation;
+  }
 
   /// Returns true if the held prim has the same joint influences
   /// across all points, or false otherwise.
@@ -141,7 +152,10 @@ public:
   }
 
   /// \deprecated Use GetJointMapper.
-  const UsdSkelAnimMapperRefPtr &GetMapper() const { return _jointMapper; }
+  const UsdSkelAnimMapperRefPtr &GetMapper() const
+  {
+    return _jointMapper;
+  }
 
   /// Return the mapper for remapping blend shapes from the order of the
   /// bound SkelAnimation to the local blend shape order of this prim.
@@ -176,8 +190,7 @@ public:
   ///
   /// \sa UsdAttribute::GetTimeSamplesInInterval
   USDSKEL_API
-  bool GetTimeSamplesInInterval(const GfInterval &interval,
-                                std::vector<double> *times) const;
+  bool GetTimeSamplesInInterval(const GfInterval &interval, std::vector<double> *times) const;
 
   /// Convenience method for computing joint influences.
   /// In addition to querying influences, this will also perform
@@ -194,11 +207,10 @@ public:
   /// validation of the basic form of the weight data -- although
   /// the array contents is not validated.
   USDSKEL_API
-  bool ComputeVaryingJointInfluences(
-      size_t numPoints,
-      VtIntArray *indices,
-      VtFloatArray *weights,
-      UsdTimeCode time = UsdTimeCode::Default()) const;
+  bool ComputeVaryingJointInfluences(size_t numPoints,
+                                     VtIntArray *indices,
+                                     VtFloatArray *weights,
+                                     UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Compute skinned points using specified skinning method attr
   /// (fallback to linear blend skinning if not specified)
@@ -208,7 +220,7 @@ public:
   /// at time \p time (which will typically be unvarying).
   ///
   /// \sa UsdSkelSkeletonQuery::ComputeSkinningTransforms
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeSkinnedPoints(const VtArray<Matrix4> &xforms,
                                         VtVec3fArray *points,
                                         UsdTimeCode time = UsdTimeCode::Default()) const;
@@ -221,7 +233,7 @@ public:
   /// at time \p time (which will typically be unvarying).
   ///
   /// \sa UsdSkelSkeletonQuery::ComputeSkinningTransforms
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeSkinnedNormals(const VtArray<Matrix4> &xforms,
                                          VtVec3fArray *points,
                                          UsdTimeCode time = UsdTimeCode::Default()) const;
@@ -236,7 +248,7 @@ public:
   /// no transform will be computed, and the function will return false.
   ///
   /// \sa UsdSkelSkeletonQuery::ComputeSkinningTransforms
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeSkinnedTransform(const VtArray<Matrix4> &xforms,
                                            Matrix4 *xform,
                                            UsdTimeCode time = UsdTimeCode::Default()) const;
@@ -247,7 +259,7 @@ public:
   /// at rest -- and the extents of the skinned primitive.
   /// This is intended to provide a suitable, constant metric for padding
   /// joint extents as computed by UsdSkelComputeJointsExtent.
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API float ComputeExtentsPadding(const VtArray<Matrix4> &skelRestXforms,
                                           const UsdGeomBoundable &boundable) const;
 
@@ -255,20 +267,17 @@ public:
   TfToken GetSkinningMethod() const;
 
   USDSKEL_API
-  GfMatrix4d
-  GetGeomBindTransform(UsdTimeCode time = UsdTimeCode::Default()) const;
+  GfMatrix4d GetGeomBindTransform(UsdTimeCode time = UsdTimeCode::Default()) const;
 
   USDSKEL_API
   std::string GetDescription() const;
 
-private:
-  void _InitializeJointInfluenceBindings(
-      const UsdAttribute &jointIndices,
-      const UsdAttribute &jointWeights);
+ private:
+  void _InitializeJointInfluenceBindings(const UsdAttribute &jointIndices,
+                                         const UsdAttribute &jointWeights);
 
-  void _InitializeBlendShapeBindings(
-      const UsdAttribute &blendShapes,
-      const UsdRelationship &blendShapeTargets);
+  void _InitializeBlendShapeBindings(const UsdAttribute &blendShapes,
+                                     const UsdRelationship &blendShapeTargets);
 
   UsdPrim _prim;
   int _numInfluencesPerComponent = 1;
@@ -289,4 +298,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_SKINNING_QUERY_H
+#endif  // PXR_USD_USD_SKEL_SKINNING_QUERY_H

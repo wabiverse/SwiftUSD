@@ -22,10 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/errorMark.h"
-#include "pxr/base/tf/diagnostic.h"
 #include "Arch/stackTrace.h"
+#include "pxr/base/tf/diagnostic.h"
+#include "pxr/base/tf/errorMark.h"
+#include "pxr/pxr.h"
 
 #include <chrono>
 #include <iostream>
@@ -38,8 +38,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
  * for testing of the Tf crash handler
  */
 
-static void
-_ThreadTask()
+static void _ThreadTask()
 {
   TfErrorMark m;
   TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");

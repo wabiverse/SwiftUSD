@@ -26,21 +26,17 @@
 
 #if defined(__APPLE__)
 
-#include <pxr/pxrns.h>
-#include <memory>
+#  include <memory>
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchNSGLContextState
-{
-public:
+class GarchNSGLContextState {
+ public:
   /// Construct with the current state.
   GarchNSGLContextState();
 
-  enum class NullState
-  {
-    nullstate
-  };
+  enum class NullState { nullstate };
   GarchNSGLContextState(NullState);
 
   /// Compare for equality.
@@ -58,7 +54,7 @@ public:
   /// Make no context current.
   static void DoneCurrent();
 
-private:
+ private:
   class Detail;
   std::shared_ptr<Detail> _detail;
 };
@@ -68,6 +64,6 @@ typedef GarchNSGLContextState GarchGLPlatformContextState;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__APPLE__)
+#endif  // defined(__APPLE__)
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_DARWIN_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_DARWIN_H

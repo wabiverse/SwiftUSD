@@ -29,16 +29,16 @@
  * ----------------------------------------------------------------
  * Portions of this file derive from an original work of Apple Inc.
  * from the swift/bridging file.
- * 
+ *
  * This source file is apart of the Swift.org open source project &
  * under the terms of the Apache License version 2.0 with a Runtime
  * Library Exception modification.
  *
  * See more license information here: https://swift.org/LICENSE.txt
- * 
+ *
  * See the list of Swift project authors by visiting this resource:
  * https://swift.org/CONTRIBUTORS.txt
- * 
+ *
  *     Copyright (C) 2017 Apple Inc. and the Swift project authors.
  * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
@@ -47,59 +47,60 @@
 #define __PXR_BASE_ARCH_SWIFT_INTEROP_H__
 
 /**
- * @brief 
+ * @brief
  * This file provides common utilities and annotations that are
  * useful for C++ codebases that interoperate with Swift.
  */
 
 #ifdef __APPLE__
-# if __has_include(<swift/bridging>)
-#  include <swift/bridging>
-# endif /* __has_include(<swift/bridging>) */
-#endif /* __APPLE__ */
+#  if __has_include(<swift/bridging>)
+#    include <swift/bridging>
+#  endif /* __has_include(<swift/bridging>) */
+#endif   /* __APPLE__ */
 
 /** ----------
- * 
+ *
  * Carefully define the swift cxx interop macros, by first checking
  * if they have already been defined by the Swift compiler, if not,
  * then we define them ourselves.
  *                                                    ---------- */
 
 #if defined(__has_attribute) && !defined(_CXX_INTEROP_HAS_ATTRIBUTE)
-#define _CXX_INTEROP_HAS_ATTRIBUTE(x) __has_attribute(x)
+#  define _CXX_INTEROP_HAS_ATTRIBUTE(x) __has_attribute(x)
 #elif !defined(_CXX_INTEROP_HAS_ATTRIBUTE)
-#define _CXX_INTEROP_HAS_ATTRIBUTE(x) 0
+#  define _CXX_INTEROP_HAS_ATTRIBUTE(x) 0
 #endif
 
 #if _CXX_INTEROP_HAS_ATTRIBUTE(swift_attr)
 
-#if !defined(SWIFT_SELF_CONTAINED)
+#  if !defined(SWIFT_SELF_CONTAINED)
 /// Specifies that a C++ `class` or `struct` owns and controls the lifetime of all
 /// of the objects it references. Such type should not reference any objects whose
 /// lifetime is controlled externally. This annotation allows Swift to import methods
 /// that return a `class` or `struct` type that is annotated with this macro.
-#define SWIFT_SELF_CONTAINED __attribute__((swift_attr("import_owned")))
-#endif /* SWIFT_SELF_CONTAINED */
+#    define SWIFT_SELF_CONTAINED __attribute__((swift_attr("import_owned")))
+#  endif /* SWIFT_SELF_CONTAINED */
 
-#if !defined(SWIFT_RETURNS_INDEPENDENT_VALUE)
+#  if !defined(SWIFT_RETURNS_INDEPENDENT_VALUE)
 /// Specifies that a C++ method returns a value that is presumed to contain
 /// objects whose lifetime is not dependent on `this` or other parameters passed
 /// to the method.
-#define SWIFT_RETURNS_INDEPENDENT_VALUE __attribute__((swift_attr("import_unsafe")))
-#endif /* SWIFT_RETURNS_INDEPENDENT_VALUE */
+#    define SWIFT_RETURNS_INDEPENDENT_VALUE __attribute__((swift_attr("import_unsafe")))
+#  endif /* SWIFT_RETURNS_INDEPENDENT_VALUE */
 
-#if !defined(_CXX_INTEROP_STRINGIFY)
-#define _CXX_INTEROP_STRINGIFY(_x) #_x
-#endif /* _CXX_INTEROP_STRINGIFY */
+#  if !defined(_CXX_INTEROP_STRINGIFY)
+#    define _CXX_INTEROP_STRINGIFY(_x) #_x
+#  endif /* _CXX_INTEROP_STRINGIFY */
 
-#if !defined(SWIFT_SHARED_REFERENCE)
+#  if !defined(SWIFT_SHARED_REFERENCE)
 /// Specifies that a C++ `class` or `struct` is reference-counted using
 /// the given `retain` and `release` functions. This annotation lets Swift import
 /// such a type as reference counted type in Swift, taking advantage of Swift's
 /// automatic reference counting.
 ///
 /// This example shows how to use this macro to let Swift know that
-/// a non-copyable reference counted C++ class can be imported as a reference counted type in Swift:
+/// a non-copyable reference counted C++ class can be imported as a reference counted type in
+/// Swift:
 ///  ```c++
 ///    class SWIFT_SHARED_REFERENCE(retainSharedObject, releaseSharedObject)
 ///    SharedObject : NonCopyable, IntrusiveReferenceCounted<SharedObject> {
@@ -119,13 +120,15 @@
 ///    object.doSomething()
 ///    // The Swift compiler will release object here.
 ///  ```
-#define SWIFT_SHARED_REFERENCE(_retain, _release)                                \
-  __attribute__((swift_attr("import_reference")))                          \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:_retain))))      \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release:_release))))
-#endif /* SWIFT_SHARED_REFERENCE */
+#    define SWIFT_SHARED_REFERENCE(_retain, _release) \
+      __attribute__((swift_attr("import_reference"))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain \
+                                                       : _retain)))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release \
+                                                       : _release))))
+#  endif /* SWIFT_SHARED_REFERENCE */
 
-#if !defined(SWIFT_IMMORTAL_REFERENCE)
+#  if !defined(SWIFT_IMMORTAL_REFERENCE)
 /// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
 /// is presumed to be immortal, i.e. the reference to such object is presumed to
 /// always be valid. This annotation lets Swift import such a type as a reference
@@ -148,28 +151,33 @@
 ///    let logger = LoggerSingleton.getInstance()
 ///    logger.log(123)
 ///  ```
-#define SWIFT_IMMORTAL_REFERENCE                                                \
-  __attribute__((swift_attr("import_reference")))                         \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release:immortal))))
-#endif /* SWIFT_IMMORTAL_REFERENCE */
+#    define SWIFT_IMMORTAL_REFERENCE \
+      __attribute__((swift_attr("import_reference"))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain \
+                                                       : immortal)))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release \
+                                                       : immortal))))
+#  endif /* SWIFT_IMMORTAL_REFERENCE */
 
-#if !defined(SWIFT_UNSAFE_REFERENCE)
+#  if !defined(SWIFT_UNSAFE_REFERENCE)
 /// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
 /// is not managed automatically. The programmer must validate that any reference
-/// to such object is valid themselves. This annotation lets Swift import such a type as a reference type in Swift.
-#define SWIFT_UNSAFE_REFERENCE                                                  \
-  __attribute__((swift_attr("import_reference")))                         \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release:immortal))))
-#endif /* SWIFT_UNSAFE_REFERENCE */
+/// to such object is valid themselves. This annotation lets Swift import such a type as a
+/// reference type in Swift.
+#    define SWIFT_UNSAFE_REFERENCE \
+      __attribute__((swift_attr("import_reference"))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(retain \
+                                                       : immortal)))) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release \
+                                                       : immortal))))
+#  endif /* SWIFT_UNSAFE_REFERENCE */
 
-#if !defined(SWIFT_NAME)
+#  if !defined(SWIFT_NAME)
 /// Specifies a name that will be used in Swift for this declaration instead of its original name.
-#define SWIFT_NAME(_name) __attribute__((swift_name(#_name)))
-#endif /* SWIFT_NAME */
+#    define SWIFT_NAME(_name) __attribute__((swift_name(#_name)))
+#  endif /* SWIFT_NAME */
 
-#if !defined(SWIFT_CONFORMS_TO_PROTOCOL)
+#  if !defined(SWIFT_CONFORMS_TO_PROTOCOL)
 /// Specifies that a specific C++ `class` or `struct` conforms to a
 /// a specific Swift protocol.
 ///
@@ -179,11 +187,11 @@
 ///    class SWIFT_CONFORMS_TO_PROTOCOL(SwiftModule.ProtocolName)
 ///    CustomClass {};
 ///  ```
-#define SWIFT_CONFORMS_TO_PROTOCOL(_moduleName_protocolName) \
-  __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(conforms_to:_moduleName_protocolName))))
-#endif /* SWIFT_CONFORMS_TO_PROTOCOL */
+#    define SWIFT_CONFORMS_TO_PROTOCOL(_moduleName_protocolName) \
+      __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(conforms_to : _moduleName_protocolName))))
+#  endif /* SWIFT_CONFORMS_TO_PROTOCOL */
 
-#if !defined(SWIFT_COMPUTED_PROPERTY)
+#  if !defined(SWIFT_COMPUTED_PROPERTY)
 /// Specifies that a specific C++ method should be imported as a computed
 /// property. If this macro is specified on a getter, a getter will be
 /// synthesized. If this macro is specified on a setter, both a getter and
@@ -194,63 +202,61 @@
 ///    int getX() SWIFT_COMPUTED_PROPERTY;
 ///  ```
 /// Will be imported as `var x: CInt {...}`.
-#define SWIFT_COMPUTED_PROPERTY \
-  __attribute__((swift_attr("import_computed_property")))
-#endif /* SWIFT_COMPUTED_PROPERTY */
+#    define SWIFT_COMPUTED_PROPERTY __attribute__((swift_attr("import_computed_property")))
+#  endif /* SWIFT_COMPUTED_PROPERTY */
 
-#if !defined(SWIFT_MUTATING)
+#  if !defined(SWIFT_MUTATING)
 /// Specifies that a specific **constant** C++ member function should be imported as
 /// `mutating` Swift method. This annotation should be added to constant C++ member functions
-/// that mutate `mutable` fields in a C++ object, to let Swift know that this function is still mutating
-/// and thus that it should become a `mutating` method in Swift.
-#define SWIFT_MUTATING \
-  __attribute__((swift_attr("mutating")))
-#endif /* SWIFT_MUTATING */
+/// that mutate `mutable` fields in a C++ object, to let Swift know that this function is still
+/// mutating and thus that it should become a `mutating` method in Swift.
+#    define SWIFT_MUTATING __attribute__((swift_attr("mutating")))
+#  endif /* SWIFT_MUTATING */
 
 #else /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
 // Empty defines for compilers that don't support `attribute(swift_attr)`.
 
-#if !defined(SWIFT_SELF_CONTAINED)
-#define SWIFT_SELF_CONTAINED
-#endif // SWIFT_SELF_CONTAINED
+#  if !defined(SWIFT_SELF_CONTAINED)
+#    define SWIFT_SELF_CONTAINED
+#  endif  // SWIFT_SELF_CONTAINED
 
-#if !defined(SWIFT_RETURNS_INDEPENDENT_VALUE)
-#define SWIFT_RETURNS_INDEPENDENT_VALUE
-#endif // SWIFT_RETURNS_INDEPENDENT_VALUE
+#  if !defined(SWIFT_RETURNS_INDEPENDENT_VALUE)
+#    define SWIFT_RETURNS_INDEPENDENT_VALUE
+#  endif  // SWIFT_RETURNS_INDEPENDENT_VALUE
 
-#if !defined(SWIFT_SHARED_REFERENCE)
-#define SWIFT_SHARED_REFERENCE(_retain, _release)
-#endif // SWIFT_SHARED_REFERENCE
+#  if !defined(SWIFT_SHARED_REFERENCE)
+#    define SWIFT_SHARED_REFERENCE(_retain, _release)
+#  endif  // SWIFT_SHARED_REFERENCE
 
-#if !defined(SWIFT_IMMORTAL_REFERENCE)
-#define SWIFT_IMMORTAL_REFERENCE
-#endif // SWIFT_IMMORTAL_REFERENCE
+#  if !defined(SWIFT_IMMORTAL_REFERENCE)
+#    define SWIFT_IMMORTAL_REFERENCE
+#  endif  // SWIFT_IMMORTAL_REFERENCE
 
-#if !defined(SWIFT_UNSAFE_REFERENCE)
-#define SWIFT_UNSAFE_REFERENCE
-#endif // SWIFT_UNSAFE_REFERENCE
+#  if !defined(SWIFT_UNSAFE_REFERENCE)
+#    define SWIFT_UNSAFE_REFERENCE
+#  endif  // SWIFT_UNSAFE_REFERENCE
 
-#if !defined(SWIFT_NAME)
-#define SWIFT_NAME(_name)
-#endif // SWIFT_NAME
+#  if !defined(SWIFT_NAME)
+#    define SWIFT_NAME(_name)
+#  endif  // SWIFT_NAME
 
-#if !defined(SWIFT_CONFORMS_TO_PROTOCOL)
-#define SWIFT_CONFORMS_TO_PROTOCOL(_moduleName_protocolName)
-#endif // SWIFT_CONFORMS_TO_PROTOCOL
+#  if !defined(SWIFT_CONFORMS_TO_PROTOCOL)
+#    define SWIFT_CONFORMS_TO_PROTOCOL(_moduleName_protocolName)
+#  endif  // SWIFT_CONFORMS_TO_PROTOCOL
 
-#if !defined(SWIFT_COMPUTED_PROPERTY)
-#define SWIFT_COMPUTED_PROPERTY
-#endif // SWIFT_COMPUTED_PROPERTY
+#  if !defined(SWIFT_COMPUTED_PROPERTY)
+#    define SWIFT_COMPUTED_PROPERTY
+#  endif  // SWIFT_COMPUTED_PROPERTY
 
-#if !defined(SWIFT_MUTATING)
-#define SWIFT_MUTATING
-#endif // SWIFT_MUTATING
+#  if !defined(SWIFT_MUTATING)
+#    define SWIFT_MUTATING
+#  endif  // SWIFT_MUTATING
 
 #endif /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
 #if defined(_CXX_INTEROP_HAS_ATTRIBUTE)
-#undef _CXX_INTEROP_HAS_ATTRIBUTE
+#  undef _CXX_INTEROP_HAS_ATTRIBUTE
 #endif /* _CXX_INTEROP_HAS_ATTRIBUTE */
 
 #endif /* __PXR_BASE_ARCH_SWIFT_INTEROP_H__ */

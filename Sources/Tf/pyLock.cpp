@@ -26,21 +26,24 @@
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Tf/diagnosticLite.h"
-#include "Tf/pyLock.h"
+#  include "Tf/diagnosticLite.h"
+#  include "Tf/pyLock.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfPyLock::TfPyLock() : _acquired(false), _allowingThreads(false) {
+TfPyLock::TfPyLock() : _acquired(false), _allowingThreads(false)
+{
   // Acquire the lock on construction
   Acquire();
 }
 
-TfPyLock::TfPyLock(_UnlockedTag) : _acquired(false), _allowingThreads(false) {
+TfPyLock::TfPyLock(_UnlockedTag) : _acquired(false), _allowingThreads(false)
+{
   // Do not acquire the lock.
 }
 
-TfPyLock::~TfPyLock() {
+TfPyLock::~TfPyLock()
+{
   // Restore thread state if it's been saved to allow other threads.
   if (_allowingThreads)
     EndAllowThreads();
@@ -50,7 +53,8 @@ TfPyLock::~TfPyLock() {
     Release();
 }
 
-void TfPyLock::Acquire() {
+void TfPyLock::Acquire()
+{
   // If already acquired, emit a warning and do nothing
   if (_acquired) {
     TF_WARN("Cannot recursively acquire a TfPyLock.");
@@ -65,7 +69,8 @@ void TfPyLock::Acquire() {
   _acquired = true;
 }
 
-void TfPyLock::Release() {
+void TfPyLock::Release()
+{
   // If not acquired, emit a warning and do nothing
   if (!_acquired) {
     if (Py_IsInitialized())
@@ -84,7 +89,8 @@ void TfPyLock::Release() {
   _acquired = false;
 }
 
-void TfPyLock::BeginAllowThreads() {
+void TfPyLock::BeginAllowThreads()
+{
   // If already allowing threads, emit a warning and do nothing
   if (_allowingThreads) {
     TF_WARN("Cannot recursively allow threads on a TfPyLock.\n");
@@ -94,8 +100,9 @@ void TfPyLock::BeginAllowThreads() {
   // If not acquired, emit a warning and do nothing
   if (!_acquired) {
     if (Py_IsInitialized())
-      TF_WARN("Cannot allow threads on a TfPyLock that is not "
-              "acquired.\n");
+      TF_WARN(
+          "Cannot allow threads on a TfPyLock that is not "
+          "acquired.\n");
     return;
   }
 
@@ -104,11 +111,13 @@ void TfPyLock::BeginAllowThreads() {
   _allowingThreads = true;
 }
 
-void TfPyLock::EndAllowThreads() {
+void TfPyLock::EndAllowThreads()
+{
   // If not allowing threads, emit a warning and do nothing
   if (!_allowingThreads) {
-    TF_WARN("Cannot end allowing threads on a TfPyLock that is not "
-            "currently allowing threads.\n");
+    TF_WARN(
+        "Cannot end allowing threads on a TfPyLock that is not "
+        "currently allowing threads.\n");
     return;
   }
 
@@ -116,8 +125,8 @@ void TfPyLock::EndAllowThreads() {
   _allowingThreads = false;
 }
 
-TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj()
-    : _lock(TfPyLock::_ConstructUnlocked) {
+TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj() : _lock(TfPyLock::_ConstructUnlocked)
+{
   if (PyGILState_Check()) {
     _lock.Acquire();
     _lock.BeginAllowThreads();
@@ -126,4 +135,4 @@ TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED

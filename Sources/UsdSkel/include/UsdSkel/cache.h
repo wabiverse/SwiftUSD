@@ -26,8 +26,8 @@
 
 /// \file usdSkel/cache.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/prim.h"
 #include "Usd/primFlags.h"
@@ -51,9 +51,8 @@ TF_DECLARE_REF_PTRS(UsdSkelBinding);
 ///
 /// This provides caching of major structural components, such as skeletal
 /// topology. In a streaming context, this cache is intended to persist.
-class UsdSkelCache
-{
-public:
+class UsdSkelCache {
+ public:
   USDSKEL_API
   UsdSkelCache();
 
@@ -67,8 +66,7 @@ public:
   /// UsdSkelBindingAPI, making resolved bindings available through
   /// GetSkinningQuery(), ComputeSkelBinding() and ComputeSkelBindings().
   USDSKEL_API
-  bool Populate(const UsdSkelRoot &root,
-                Usd_PrimFlagsPredicate predicate) const;
+  bool Populate(const UsdSkelRoot &root, Usd_PrimFlagsPredicate predicate) const;
 
   /// Get a skel query for computing properties of \p skel.
   ///
@@ -119,7 +117,7 @@ public:
                           UsdSkelBinding *binding,
                           Usd_PrimFlagsPredicate predicate) const;
 
-private:
+ private:
   std::shared_ptr<class UsdSkel_CacheImpl> _impl;
 
   friend class UsdSkelAnimQuery;
@@ -128,4 +126,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // USDSKEL_EVALCACHE_H
+#endif  // USDSKEL_EVALCACHE_H

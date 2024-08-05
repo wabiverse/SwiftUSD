@@ -93,7 +93,7 @@ class VtValue;
 /// \endcode
 ///
 class ArPackageResolver {
-public:
+ public:
   ArPackageResolver(const ArPackageResolver &) = delete;
   ArPackageResolver &operator=(const ArPackageResolver &) = delete;
 
@@ -138,9 +138,8 @@ public:
   ///
   /// \see ArResolver::OpenAsset
   AR_API
-  virtual std::shared_ptr<ArAsset>
-  OpenAsset(const std::string &resolvedPackagePath,
-            const std::string &resolvedPackagedPath) = 0;
+  virtual std::shared_ptr<ArAsset> OpenAsset(const std::string &resolvedPackagePath,
+                                             const std::string &resolvedPackagedPath) = 0;
 
   // --------------------------------------------------------------------- //
   /// \name Scoped Resolution Cache
@@ -164,11 +163,11 @@ public:
   AR_API
   virtual void EndCacheScope(VtValue *cacheScopeData) = 0;
 
-protected:
+ protected:
   AR_API
   ArPackageResolver();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_PACKAGE_RESOLVER_H
+#endif  // PXR_USD_AR_PACKAGE_RESOLVER_H

@@ -33,57 +33,47 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDMATERIAL_SCHEMA_TOKENS \
-    (material) \
-    ((universalRenderContext, "")) \
+#define HDMATERIAL_SCHEMA_TOKENS (material)((universalRenderContext, ""))
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialSchemaTokens, HD_API,
-    HDMATERIAL_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialSchemaTokens, HD_API, HDMATERIAL_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialSchema : public HdSchema
-{
-public:
-    HdMaterialSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMaterialSchema : public HdSchema {
+ public:
+  HdMaterialSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        size_t count,
-        TfToken *names,
-        HdDataSourceBaseHandle *values);
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(size_t count,
+                                                   TfToken *names,
+                                                   HdDataSourceBaseHandle *values);
 
-    HdContainerDataSourceHandle GetMaterialNetwork();
-    HdContainerDataSourceHandle GetMaterialNetwork(TfToken const &context);
+  HdContainerDataSourceHandle GetMaterialNetwork();
+  HdContainerDataSourceHandle GetMaterialNetwork(TfToken const &context);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "material" from the parent container and constructs a
+  /// HdMaterialSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdMaterialSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "material" from the parent container and constructs a
-    /// HdMaterialSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdMaterialSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

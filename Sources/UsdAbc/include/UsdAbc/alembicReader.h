@@ -26,12 +26,12 @@
 
 /// \file usdAbc/alembicReader.h
 
-#include <pxr/pxrns.h>
 #include "Sdf/abstractData.h"
 #include "Sdf/fileFormat.h"
 #include "Tf/token.h"
 #include <boost/noncopyable.hpp>
 #include <memory>
+#include <pxr/pxrns.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -45,9 +45,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// An alembic reader suitable for an SdfAbstractData.
 ///
-class UsdAbc_AlembicDataReader : boost::noncopyable
-{
-public:
+class UsdAbc_AlembicDataReader : boost::noncopyable {
+ public:
   typedef int64_t Index;
 
   UsdAbc_AlembicDataReader();
@@ -55,8 +54,7 @@ public:
 
   /// Open a file.  Returns \c true on success;  errors are reported by
   /// \c GetErrors().
-  bool Open(const std::string &filePath,
-            const SdfFileFormat::FileFormatArguments &);
+  bool Open(const std::string &filePath, const SdfFileFormat::FileFormatArguments &);
 
   /// Close the file.
   void Close();
@@ -75,40 +73,32 @@ public:
 
   /// Test for the existence of and optionally return the value at
   /// (\p path,\p fieldName).
-  bool HasField(const SdfPath &path,
-                const TfToken &fieldName,
-                SdfAbstractDataValue *value) const;
+  bool HasField(const SdfPath &path, const TfToken &fieldName, SdfAbstractDataValue *value) const;
 
   /// Test for the existence of and optionally return the value at
   /// (\p path,\p fieldName).
-  bool HasField(const SdfPath &path,
-                const TfToken &fieldName,
-                VtValue *value) const;
+  bool HasField(const SdfPath &path, const TfToken &fieldName, VtValue *value) const;
 
   /// Test for the existence of and optionally return the value of the
   /// property at \p path at index \p index.
-  bool HasValue(const SdfPath &path, Index index,
-                SdfAbstractDataValue *value) const;
+  bool HasValue(const SdfPath &path, Index index, SdfAbstractDataValue *value) const;
 
   /// Test for the existence of and optionally return the value of the
   /// property at \p path at index \p index.
-  bool HasValue(const SdfPath &path, Index index,
-                VtValue *value) const;
+  bool HasValue(const SdfPath &path, Index index, VtValue *value) const;
 
   /// Visit the specs.
-  void VisitSpecs(const SdfAbstractData &owner,
-                  SdfAbstractDataSpecVisitor *visitor) const;
+  void VisitSpecs(const SdfAbstractData &owner, SdfAbstractDataSpecVisitor *visitor) const;
 
   /// List the fields.
   TfTokenVector List(const SdfPath &path) const;
 
   /// The type holds a set of Usd times and can return an Alembic index
   /// for each time.
-  class TimeSamples
-  {
+  class TimeSamples {
     typedef std::vector<double> _UsdTimeCodes;
 
-  public:
+   public:
     typedef _UsdTimeCodes::const_iterator const_iterator;
 
     /// Construct an empty set of samples.
@@ -144,11 +134,10 @@ public:
     bool Bracket(double usdTime, double *tLower, double *tUpper) const;
 
     /// Returns the times bracketing \p time.
-    template <class T>
-    static bool Bracket(const T &, double usdTime,
-                        double *tLower, double *tUpper);
+    template<class T>
+    static bool Bracket(const T &, double usdTime, double *tLower, double *tUpper);
 
-  private:
+   private:
     // The monotonically increasing Usd times.
     _UsdTimeCodes _times;
   };
@@ -157,10 +146,9 @@ public:
   const std::set<double> &ListAllTimeSamples() const;
 
   /// Returns the sampled times for the property at \p path.
-  const TimeSamples &
-  ListTimeSamplesForPath(const SdfPath &path) const;
+  const TimeSamples &ListTimeSamplesForPath(const SdfPath &path) const;
 
-private:
+ private:
   std::unique_ptr<class UsdAbc_AlembicDataReaderImpl> _impl;
   std::string _errorLog;
 };

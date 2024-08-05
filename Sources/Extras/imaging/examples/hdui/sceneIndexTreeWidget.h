@@ -35,57 +35,43 @@ class Hdui_SceneIndexPrimTreeWidgetItem;
 
 //-----------------------------------------------------------------------------
 
-class HduiSceneIndexTreeWidget : public QTreeWidget, public HdSceneIndexObserver
-{
+class HduiSceneIndexTreeWidget : public QTreeWidget, public HdSceneIndexObserver {
   Q_OBJECT;
 
-public:
+ public:
   HduiSceneIndexTreeWidget(QWidget *parent = Q_NULLPTR);
 
-  void PrimsAdded(
-      const HdSceneIndexBase &sender,
-      const AddedPrimEntries &entries) override;
+  void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
 
-  void PrimsRemoved(
-      const HdSceneIndexBase &sender,
-      const RemovedPrimEntries &entries) override;
+  void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
 
-  void PrimsDirtied(
-      const HdSceneIndexBase &sender,
-      const DirtiedPrimEntries &entries) override;
+  void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
 
-  void PrimsRenamed(
-      const HdSceneIndexBase &sender,
-      const RenamedPrimEntries &entries) override;
+  void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
 
   void SetSceneIndex(HdSceneIndexBaseRefPtr inputSceneIndex);
 
   void Requery(bool lazy = true);
 
-Q_SIGNALS:
-  void PrimSelected(const SdfPath &primPath,
-                    HdContainerDataSourceHandle dataSource);
+ Q_SIGNALS:
+  void PrimSelected(const SdfPath &primPath, HdContainerDataSourceHandle dataSource);
 
-  void PrimDirtied(const SdfPath &primPath,
-                   const HdDataSourceLocatorSet &locators);
+  void PrimDirtied(const SdfPath &primPath, const HdDataSourceLocatorSet &locators);
 
-protected:
+ protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
 
-private:
+ private:
   friend Hdui_SceneIndexPrimTreeWidgetItem;
 
   void _RemoveSubtree(const SdfPath &primPath);
 
-  void _AddPrimItem(const SdfPath &primPath,
-                    Hdui_SceneIndexPrimTreeWidgetItem *item);
+  void _AddPrimItem(const SdfPath &primPath, Hdui_SceneIndexPrimTreeWidgetItem *item);
 
-  Hdui_SceneIndexPrimTreeWidgetItem *_GetPrimItem(
-      const SdfPath &primPath,
-      bool createIfNecessary = true);
+  Hdui_SceneIndexPrimTreeWidgetItem *_GetPrimItem(const SdfPath &primPath,
+                                                  bool createIfNecessary = true);
 
-  using _ItemMap = std::unordered_map<SdfPath,
-                                      Hdui_SceneIndexPrimTreeWidgetItem *, SdfPath::Hash>;
+  using _ItemMap = std::unordered_map<SdfPath, Hdui_SceneIndexPrimTreeWidgetItem *, SdfPath::Hash>;
 
   _ItemMap _primItems;
 

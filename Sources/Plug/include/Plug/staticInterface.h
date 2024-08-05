@@ -37,21 +37,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Base class for common stuff.
 class Plug_StaticInterfaceBase {
-public:
+ public:
   /// Returns \c true if we've tried to initialize the interface pointer,
   /// even if we failed.  This will not attempt to load the plugin or
   /// initialize the interface pointer.
-  bool IsInitialized() const { return _initialized; }
+  bool IsInitialized() const
+  {
+    return _initialized;
+  }
 
 #if !defined(doxygen)
   typedef void *Plug_StaticInterfaceBase::*UnspecifiedBoolType;
 #endif
 
-protected:
+ protected:
   PLUG_API
   void _LoadAndInstantiate(const std::type_info &type) const;
 
-protected:
+ protected:
   // POD types only!
   mutable std::atomic<bool> _initialized;
   mutable void *_ptr;
@@ -153,11 +156,9 @@ protected:
 /// declare a \c PlugStaticInterface object as a local variable, as a member of
 /// a class or structure, or as a function parameter.
 ///
-template <class Interface>
-class PlugStaticInterface : private Plug_StaticInterfaceBase {
-public:
-  static_assert(std::is_abstract<Interface>::value,
-                "Interface type must be abstract.");
+template<class Interface> class PlugStaticInterface : private Plug_StaticInterfaceBase {
+ public:
+  static_assert(std::is_abstract<Interface>::value, "Interface type must be abstract.");
 
   typedef PlugStaticInterface<Interface> This;
 
@@ -165,29 +166,43 @@ public:
 
   /// Load and instantiate then return \c true if the interface is valid,
   /// \c false otherwise.
-  operator UnspecifiedBoolType() const {
+  operator UnspecifiedBoolType() const
+  {
     return _GetPtr() ? &This::_ptr : nullptr;
   }
 
   /// Load and instantiate then return \c false if the interface is valid,
   /// \c true otherwise.
-  bool operator!() const { return !*this; }
+  bool operator!() const
+  {
+    return !*this;
+  }
 
   /// Returns the interface pointer, loading the plugin if necessary.
   /// Returns \c nullptr if the interface could not be initialized.
-  Interface *Get() const { return _GetPtr(); }
+  Interface *Get() const
+  {
+    return _GetPtr();
+  }
 
   /// Returns the interface pointer, loading the plugin if necessary.
   /// Returns \c nullptr if the interface could not be initialized.
-  Interface *operator->() const { return _GetPtr(); }
+  Interface *operator->() const
+  {
+    return _GetPtr();
+  }
 
   /// Returns the interface pointer as a reference, loading the plugin
   /// if necessary.  Returns \c nullptr if the interface could not be
   /// initialized.
-  Interface &operator*() const { return *_GetPtr(); }
+  Interface &operator*() const
+  {
+    return *_GetPtr();
+  }
 
-private:
-  Interface *_GetPtr() const {
+ private:
+  Interface *_GetPtr() const
+  {
     if (!_initialized) {
       _LoadAndInstantiate(typeid(Interface));
     }
@@ -200,4 +215,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_STATIC_INTERFACE_H
+#endif  // PXR_BASE_PLUG_STATIC_INTERFACE_H

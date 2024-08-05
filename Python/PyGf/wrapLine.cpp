@@ -45,34 +45,40 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfLine const &self) {
+static string _Repr(GfLine const &self)
+{
   return TF_PY_REPR_PREFIX + "Line(" + TfPyRepr(self.GetPoint(0.0)) + ", " +
          TfPyRepr(self.GetDirection()) + ")";
 }
 
-static tuple FindClosestPointsHelper(const GfLine &l1, const GfLine &l2) {
+static tuple FindClosestPointsHelper(const GfLine &l1, const GfLine &l2)
+{
   GfVec3d p1(0), p2(0);
   double t1 = 0.0, t2 = 0.0;
   bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
   return boost::python::make_tuple(result, p1, p2, t1, t2);
 }
 
-static tuple FindClosestPointHelper(const GfLine &self, const GfVec3d &point) {
+static tuple FindClosestPointHelper(const GfLine &self, const GfVec3d &point)
+{
   double t;
   GfVec3d result = self.FindClosestPoint(point, &t);
   return boost::python::make_tuple(result, t);
 }
 
-static void SetDirectionHelper(GfLine &self, const GfVec3d &dir) {
+static void SetDirectionHelper(GfLine &self, const GfVec3d &dir)
+{
   self.Set(self.GetPoint(0.0), dir);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapLine() {
+void wrapLine()
+{
   typedef GfLine This;
 
-  def("FindClosestPoints", FindClosestPointsHelper,
+  def("FindClosestPoints",
+      FindClosestPointsHelper,
       "FindClosestPoints( l1, l2 ) -> tuple<intersects = bool, p1 = GfVec3d, "
       "p2 = GfVec3d,"
       " t1 = double, t2 = double>\n"
@@ -96,13 +102,12 @@ void wrapLine() {
 
       .def("GetPoint", &This::GetPoint)
 
-      .def("GetDirection", &This::GetDirection,
-           return_value_policy<copy_const_reference>())
+      .def("GetDirection", &This::GetDirection, return_value_policy<copy_const_reference>())
 
-      .add_property("direction",
-                    make_function(&This::GetDirection,
-                                  return_value_policy<copy_const_reference>()),
-                    SetDirectionHelper)
+      .add_property(
+          "direction",
+          make_function(&This::GetDirection, return_value_policy<copy_const_reference>()),
+          SetDirectionHelper)
 
       .def("FindClosestPoint", FindClosestPointHelper)
 

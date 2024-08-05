@@ -48,30 +48,32 @@ TF_DECLARE_WEAK_PTRS(PcpLayerStack);
 /// Collection of metadata from scene description and other information that
 /// uniquely defines a clip set.
 class Usd_ClipSetDefinition {
-public:
+ public:
   Usd_ClipSetDefinition()
-      : interpolateMissingClipValues(false),
-        indexOfLayerWhereAssetPathsFound(0) {}
+      : interpolateMissingClipValues(false), indexOfLayerWhereAssetPathsFound(0)
+  {
+  }
 
-  bool operator==(const Usd_ClipSetDefinition &rhs) const {
+  bool operator==(const Usd_ClipSetDefinition &rhs) const
+  {
     return (clipAssetPaths == rhs.clipAssetPaths &&
             clipManifestAssetPath == rhs.clipManifestAssetPath &&
             clipPrimPath == rhs.clipPrimPath && clipActive == rhs.clipActive &&
             clipTimes == rhs.clipTimes &&
             interpolateMissingClipValues == rhs.interpolateMissingClipValues &&
-            sourceLayerStack == rhs.sourceLayerStack &&
-            sourcePrimPath == rhs.sourcePrimPath &&
-            indexOfLayerWhereAssetPathsFound ==
-                rhs.indexOfLayerWhereAssetPathsFound);
+            sourceLayerStack == rhs.sourceLayerStack && sourcePrimPath == rhs.sourcePrimPath &&
+            indexOfLayerWhereAssetPathsFound == rhs.indexOfLayerWhereAssetPathsFound);
   }
 
-  bool operator!=(const Usd_ClipSetDefinition &rhs) const {
+  bool operator!=(const Usd_ClipSetDefinition &rhs) const
+  {
     return !(*this == rhs);
   }
 
-  size_t GetHash() const {
-    size_t hash = TfHash::Combine(indexOfLayerWhereAssetPathsFound,
-                                  sourceLayerStack, sourcePrimPath);
+  size_t GetHash() const
+  {
+    size_t hash = TfHash::Combine(
+        indexOfLayerWhereAssetPathsFound, sourceLayerStack, sourcePrimPath);
 
     if (clipAssetPaths) {
       hash = TfHash::Combine(hash, *clipAssetPaths);
@@ -94,9 +96,9 @@ public:
     return hash;
   }
 
-  template <typename HashState>
-  friend void TfHashAppend(HashState &h,
-                           const Usd_ClipSetDefinition &definition) {
+  template<typename HashState>
+  friend void TfHashAppend(HashState &h, const Usd_ClipSetDefinition &definition)
+  {
     h.Append(definition.GetHash());
   }
 

@@ -28,7 +28,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<TfPyModuleWasLoaded, TfType::Bases<TfNotice>>();
 }
 

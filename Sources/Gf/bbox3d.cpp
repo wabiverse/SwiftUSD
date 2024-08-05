@@ -32,9 +32,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfBBox3d>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfBBox3d>();
+}
 
-void GfBBox3d::_SetMatrices(const GfMatrix4d &matrix) {
+void GfBBox3d::_SetMatrices(const GfMatrix4d &matrix)
+{
   const double PRECISION_LIMIT = 1.0e-13;
   double det;
 
@@ -49,7 +53,8 @@ void GfBBox3d::_SetMatrices(const GfMatrix4d &matrix) {
   }
 }
 
-double GfBBox3d::GetVolume() const {
+double GfBBox3d::GetVolume() const
+{
   if (_box.IsEmpty())
     return 0.0;
 
@@ -60,7 +65,8 @@ double GfBBox3d::GetVolume() const {
   return fabs(_matrix.GetDeterminant3() * size[0] * size[1] * size[2]);
 }
 
-GfRange3d GfBBox3d::ComputeAlignedRange() const {
+GfRange3d GfBBox3d::ComputeAlignedRange() const
+{
   if (_box.IsEmpty())
     return _box;
 
@@ -81,7 +87,8 @@ GfRange3d GfBBox3d::ComputeAlignedRange() const {
       if (a < b) {
         alignedMin[j] += a;
         alignedMax[j] += b;
-      } else {
+      }
+      else {
         alignedMin[j] += b;
         alignedMax[j] += a;
       }
@@ -91,7 +98,8 @@ GfRange3d GfBBox3d::ComputeAlignedRange() const {
   return GfRange3d(alignedMin, alignedMax);
 }
 
-GfBBox3d GfBBox3d::Combine(const GfBBox3d &b1, const GfBBox3d &b2) {
+GfBBox3d GfBBox3d::Combine(const GfBBox3d &b1, const GfBBox3d &b2)
+{
   GfBBox3d result;
 
   // If either box is empty, use the other as is
@@ -105,11 +113,11 @@ GfBBox3d GfBBox3d::Combine(const GfBBox3d &b1, const GfBBox3d &b2) {
   // of the other box and combine the results in that space.
   else if (b1._isDegenerate) {
     if (b2._isDegenerate)
-      result = GfBBox3d(GfRange3d::GetUnion(b1.ComputeAlignedRange(),
-                                            b2.ComputeAlignedRange()));
+      result = GfBBox3d(GfRange3d::GetUnion(b1.ComputeAlignedRange(), b2.ComputeAlignedRange()));
     else
       result = _CombineInOrder(b2, b1);
-  } else if (b2._isDegenerate)
+  }
+  else if (b2._isDegenerate)
     result = _CombineInOrder(b1, b2);
 
   // Non-degenerate case: Neither box is empty and they are in
@@ -130,19 +138,18 @@ GfBBox3d GfBBox3d::Combine(const GfBBox3d &b1, const GfBBox3d &b2) {
     double v2 = result2.GetVolume();
     double tolerance = GfMax(1e-10, 1e-6 * GfAbs(GfMax(v1, v2)));
 
-    result =
-        (GfAbs(v1 - v2) <= tolerance ? result1 : (v1 < v2 ? result1 : result2));
+    result = (GfAbs(v1 - v2) <= tolerance ? result1 : (v1 < v2 ? result1 : result2));
   }
 
   // The _hasZeroAreaPrimitives is set to true if either of the
   // input boxes has it set to true.
-  result.SetHasZeroAreaPrimitives(b1.HasZeroAreaPrimitives() ||
-                                  b2.HasZeroAreaPrimitives());
+  result.SetHasZeroAreaPrimitives(b1.HasZeroAreaPrimitives() || b2.HasZeroAreaPrimitives());
 
   return result;
 }
 
-GfBBox3d GfBBox3d::_CombineInOrder(const GfBBox3d &b1, const GfBBox3d &b2) {
+GfBBox3d GfBBox3d::_CombineInOrder(const GfBBox3d &b1, const GfBBox3d &b2)
+{
   // Transform b2 into b1's space to get b2t
   GfBBox3d b2t;
   b2t._box = b2._box;
@@ -158,14 +165,16 @@ GfBBox3d GfBBox3d::_CombineInOrder(const GfBBox3d &b1, const GfBBox3d &b2) {
   return result;
 }
 
-GfVec3d GfBBox3d::ComputeCentroid() const {
+GfVec3d GfBBox3d::ComputeCentroid() const
+{
   GfVec3d a = GetRange().GetMax();
   GfVec3d b = GetRange().GetMin();
 
   return GetMatrix().Transform(.5 * (a + b));
 }
 
-std::ostream &operator<<(std::ostream &out, const GfBBox3d &b) {
+std::ostream &operator<<(std::ostream &out, const GfBBox3d &b)
+{
   return out << "[(" << Gf_OstreamHelperP(b.GetRange()) << ") ("
              << Gf_OstreamHelperP(b.GetMatrix()) << ") "
              << (b.HasZeroAreaPrimitives() ? "true" : "false") << ']';

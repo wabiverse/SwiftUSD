@@ -29,54 +29,50 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 HdPluginRenderDelegateUniqueHandle::HdPluginRenderDelegateUniqueHandle(
     HdPluginRenderDelegateUniqueHandle &&other)
-  : _plugin(other._plugin)
-  , _delegate(other._delegate)
+    : _plugin(other._plugin), _delegate(other._delegate)
 {
-    other._delegate = nullptr;
+  other._delegate = nullptr;
 }
 
 HdPluginRenderDelegateUniqueHandle::~HdPluginRenderDelegateUniqueHandle()
 {
-    if (_delegate) {
-        _plugin->DeleteRenderDelegate(_delegate);
-    }
+  if (_delegate) {
+    _plugin->DeleteRenderDelegate(_delegate);
+  }
 }
 
-HdPluginRenderDelegateUniqueHandle &
-HdPluginRenderDelegateUniqueHandle::operator=(
+HdPluginRenderDelegateUniqueHandle &HdPluginRenderDelegateUniqueHandle::operator=(
     HdPluginRenderDelegateUniqueHandle &&other)
 {
-    if (_delegate) {
-        _plugin->DeleteRenderDelegate(_delegate);
-    }
-    _plugin = other._plugin;
-    _delegate = other._delegate;
-    other._delegate = nullptr;
-    
-    return *this;
+  if (_delegate) {
+    _plugin->DeleteRenderDelegate(_delegate);
+  }
+  _plugin = other._plugin;
+  _delegate = other._delegate;
+  other._delegate = nullptr;
+
+  return *this;
 }
 
-HdPluginRenderDelegateUniqueHandle &
-HdPluginRenderDelegateUniqueHandle::operator=(
+HdPluginRenderDelegateUniqueHandle &HdPluginRenderDelegateUniqueHandle::operator=(
     const std::nullptr_t &)
 {
-    if (_delegate) {
-        _plugin->DeleteRenderDelegate(_delegate);
-        _delegate = nullptr;
-    }
-    _plugin = nullptr;
-    
-    return *this;
+  if (_delegate) {
+    _plugin->DeleteRenderDelegate(_delegate);
+    _delegate = nullptr;
+  }
+  _plugin = nullptr;
+
+  return *this;
 }
 
-TfToken
-HdPluginRenderDelegateUniqueHandle::GetPluginId() const
+TfToken HdPluginRenderDelegateUniqueHandle::GetPluginId() const
 {
-    if (_plugin) {
-        return _plugin->GetPluginId();
-    }
-    
-    return TfToken();
+  if (_plugin) {
+    return _plugin->GetPluginId();
+  }
+
+  return TfToken();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

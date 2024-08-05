@@ -56,43 +56,48 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(PlugRegistry);
 
-PlugRegistry &PlugRegistry::GetInstance() {
+PlugRegistry &PlugRegistry::GetInstance()
+{
   return TfSingleton<This>::GetInstance();
 }
 
-PlugRegistry::PlugRegistry() {
+PlugRegistry::PlugRegistry()
+{
   TfSingleton<This>::SetInstanceConstructed(*this);
 }
 
-bool PlugRegistry::_InsertRegisteredPluginPath(const std::string &path) {
+bool PlugRegistry::_InsertRegisteredPluginPath(const std::string &path)
+{
   static tbb::spin_mutex mutex;
   tbb::spin_mutex::scoped_lock lock(mutex);
   return _registeredPluginPaths.insert(path).second;
 }
 
-template <class ConcurrentVector>
+template<class ConcurrentVector>
 void PlugRegistry::_RegisterPlugin(const Plug_RegistrationMetadata &metadata,
-                                   ConcurrentVector *newPlugins) {
+                                   ConcurrentVector *newPlugins)
+{
   std::pair<PlugPluginPtr, bool> newPlugin(TfNullPtr, false);
   switch (metadata.type) {
-  default:
-  case Plug_RegistrationMetadata::UnknownType:
-    TF_CODING_ERROR("Tried to register a plugin of unknown type "
-                    "(maybe from %s)",
-                    metadata.pluginPath.c_str());
-    break;
+    default:
+    case Plug_RegistrationMetadata::UnknownType:
+      TF_CODING_ERROR(
+          "Tried to register a plugin of unknown type "
+          "(maybe from %s)",
+          metadata.pluginPath.c_str());
+      break;
 
-  case Plug_RegistrationMetadata::LibraryType:
-    newPlugin = PlugPlugin::_NewDynamicLibraryPlugin(metadata);
-    break;
+    case Plug_RegistrationMetadata::LibraryType:
+      newPlugin = PlugPlugin::_NewDynamicLibraryPlugin(metadata);
+      break;
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-  case Plug_RegistrationMetadata::PythonType:
-    newPlugin = PlugPlugin::_NewPythonModulePlugin(metadata);
-    break;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
-  case Plug_RegistrationMetadata::ResourceType:
-    newPlugin = PlugPlugin::_NewResourcePlugin(metadata);
-    break;
+    case Plug_RegistrationMetadata::PythonType:
+      newPlugin = PlugPlugin::_NewPythonModulePlugin(metadata);
+      break;
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+    case Plug_RegistrationMetadata::ResourceType:
+      newPlugin = PlugPlugin::_NewResourcePlugin(metadata);
+      break;
   }
 
   if (newPlugin.second) {
@@ -100,25 +105,24 @@ void PlugRegistry::_RegisterPlugin(const Plug_RegistrationMetadata &metadata,
   }
 }
 
-PlugPluginPtrVector
-PlugRegistry::RegisterPlugins(const std::string &pathToPlugInfo) {
+PlugPluginPtrVector PlugRegistry::RegisterPlugins(const std::string &pathToPlugInfo)
+{
   return RegisterPlugins(vector<string>(1, pathToPlugInfo));
 }
 
-PlugPluginPtrVector
-PlugRegistry::RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo) {
+PlugPluginPtrVector PlugRegistry::RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo)
+{
   const bool pathsAreOrdered = true;
-  PlugPluginPtrVector result =
-      _RegisterPlugins(pathsToPlugInfo, pathsAreOrdered);
+  PlugPluginPtrVector result = _RegisterPlugins(pathsToPlugInfo, pathsAreOrdered);
   if (!result.empty()) {
     PlugNotice::DidRegisterPlugins(result).Send(TfCreateWeakPtr(this));
   }
   return result;
 }
 
-PlugPluginPtrVector
-PlugRegistry::_RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
-                               bool pathsAreOrdered) {
+PlugPluginPtrVector PlugRegistry::_RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
+                                                   bool pathsAreOrdered)
+{
   TF_DESCRIBE_SCOPE("Registering plugins");
   TfAutoMallocTag2 tag2("Plug", "PlugRegistry::RegisterPlugins");
 
@@ -131,11 +135,13 @@ PlugRegistry::_RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
     WorkWithScopedParallelism(
         [&]() {
           Plug_ReadPlugInfo(
-              pathsToPlugInfo, pathsAreOrdered,
-              std::bind(&PlugRegistry::_InsertRegisteredPluginPath, this,
-                        std::placeholders::_1),
-              std::bind(&PlugRegistry::_RegisterPlugin<NewPluginsVec>, this,
-                        std::placeholders::_1, &newPlugins),
+              pathsToPlugInfo,
+              pathsAreOrdered,
+              std::bind(&PlugRegistry::_InsertRegisteredPluginPath, this, std::placeholders::_1),
+              std::bind(&PlugRegistry::_RegisterPlugin<NewPluginsVec>,
+                        this,
+                        std::placeholders::_1,
+                        &newPlugins),
               &taskArena);
         },
         /*dropPythonGIL=*/false);
@@ -163,7 +169,8 @@ PlugRegistry::_RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
   return PlugPluginPtrVector();
 }
 
-PlugPluginPtr PlugRegistry::GetPluginForType(TfType t) const {
+PlugPluginPtr PlugRegistry::GetPluginForType(TfType t) const
+{
   if (t.IsUnknown()) {
     TF_CODING_ERROR("Unknown base type");
     return TfNullPtr;
@@ -171,16 +178,18 @@ PlugPluginPtr PlugRegistry::GetPluginForType(TfType t) const {
   return PlugPlugin::_GetPluginForType(t);
 }
 
-PlugPluginPtrVector PlugRegistry::GetAllPlugins() const {
+PlugPluginPtrVector PlugRegistry::GetAllPlugins() const
+{
   return PlugPlugin::_GetAllPlugins();
 }
 
-PlugPluginPtr PlugRegistry::GetPluginWithName(const string &name) const {
+PlugPluginPtr PlugRegistry::GetPluginWithName(const string &name) const
+{
   return PlugPlugin::_GetPluginWithName(name);
 }
 
-JsValue PlugRegistry::GetDataFromPluginMetaData(TfType type,
-                                                const string &key) const {
+JsValue PlugRegistry::GetDataFromPluginMetaData(TfType type, const string &key) const
+{
   JsValue result;
 
   string typeName = type.GetTypeName();
@@ -192,29 +201,32 @@ JsValue PlugRegistry::GetDataFromPluginMetaData(TfType type,
   return result;
 }
 
-string PlugRegistry::GetStringFromPluginMetaData(TfType type,
-                                                 const string &key) const {
+string PlugRegistry::GetStringFromPluginMetaData(TfType type, const string &key) const
+{
   JsValue v = GetDataFromPluginMetaData(type, key);
   return v.IsString() ? v.GetString() : string();
 }
 
-TfType PlugRegistry::FindTypeByName(std::string const &typeName) {
+TfType PlugRegistry::FindTypeByName(std::string const &typeName)
+{
   PlugPlugin::_RegisterAllPlugins();
   return TfType::FindByName(typeName);
 }
 
-TfType PlugRegistry::FindDerivedTypeByName(TfType base,
-                                           std::string const &typeName) {
+TfType PlugRegistry::FindDerivedTypeByName(TfType base, std::string const &typeName)
+{
   PlugPlugin::_RegisterAllPlugins();
   return base.FindDerivedByName(typeName);
 }
 
-std::vector<TfType> PlugRegistry::GetDirectlyDerivedTypes(TfType base) {
+std::vector<TfType> PlugRegistry::GetDirectlyDerivedTypes(TfType base)
+{
   PlugPlugin::_RegisterAllPlugins();
   return base.GetDirectlyDerivedTypes();
 }
 
-void PlugRegistry::GetAllDerivedTypes(TfType base, std::set<TfType> *result) {
+void PlugRegistry::GetAllDerivedTypes(TfType base, std::set<TfType> *result)
+{
   PlugPlugin::_RegisterAllPlugins();
   base.GetAllDerivedTypes(result);
 }
@@ -228,7 +240,8 @@ struct PathsInfo {
 };
 
 // Return a static vector<string> that holds the bootstrap plugin paths.
-static PathsInfo &Plug_GetPathsInfo() {
+static PathsInfo &Plug_GetPathsInfo()
+{
   // This is a static local variable since the function is called from
   // ARCH_CONSTRUCTOR methods, potentially before module-level static
   // initialization.
@@ -236,11 +249,12 @@ static PathsInfo &Plug_GetPathsInfo() {
   return pathsInfo;
 }
 
-} // namespace
+}  // namespace
 
 void Plug_SetPaths(const std::vector<std::string> &paths,
                    const std::vector<std::string> &debugMessages,
-                   bool pathsAreOrdered) {
+                   bool pathsAreOrdered)
+{
   auto &pathsInfo = Plug_GetPathsInfo();
   pathsInfo.paths = paths;
   pathsInfo.debugMessages = debugMessages;
@@ -248,7 +262,8 @@ void Plug_SetPaths(const std::vector<std::string> &paths,
 }
 
 // This is here so plugin.cpp doesn't have to include info.h or registry.h.
-void PlugPlugin::_RegisterAllPlugins() {
+void PlugPlugin::_RegisterAllPlugins()
+{
   PlugPluginPtrVector result;
 
   static std::once_flag once;
@@ -269,11 +284,13 @@ void PlugPlugin::_RegisterAllPlugins() {
   // Send a notice outside of the call_once.  We don't want to be holding
   // a lock (even an implicit one) when sending a notice.
   if (!result.empty()) {
-    PlugNotice::DidRegisterPlugins(result).Send(
-        TfCreateWeakPtr(&PlugRegistry::GetInstance()));
+    PlugNotice::DidRegisterPlugins(result).Send(TfCreateWeakPtr(&PlugRegistry::GetInstance()));
   }
 }
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<PlugRegistry>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<PlugRegistry>();
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -3,9 +3,9 @@
 
 // js
 #if defined(_WIN32)
-#include <Js/rapidjson/msinttypes/inttypes.h>
-#include <Js/rapidjson/msinttypes/stdint.h>
-#endif // defined(_WIN32)
+#  include <Js/rapidjson/msinttypes/inttypes.h>
+#  include <Js/rapidjson/msinttypes/stdint.h>
+#endif  // defined(_WIN32)
 #include <Js/rapidjson/allocators.h>
 #include <Js/rapidjson/cursorstreamwrapper.h>
 #include <Js/rapidjson/document.h>
@@ -51,4 +51,4 @@
 #include <Js/json.h>
 #include <Js/utils.h>
 
-#endif // __PXR_BASE_JS_H__
+#endif  // __PXR_BASE_JS_H__

@@ -70,7 +70,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// or whitespace, and may be complemented with '~', and grouped with '(' and
 /// ')'.
 class SdfPathExpression {
-public:
+ public:
   /// \class PathPattern
   ///
   /// Objects of this class represent SdfPath matching patterns, consisting of
@@ -78,7 +78,7 @@ public:
   /// contain wildcards and optional embedded predicate expressions (see
   /// SdfPredicateExpression).
   class PathPattern {
-  public:
+   public:
     /// Construct the empty pattern whose bool-conversion operator returns
     /// false.
     SDF_API
@@ -91,27 +91,33 @@ public:
     /// of expressions.  A component whose text is empty represents an
     /// "arbitrary levels of hierarchy" element (the //) in a path pattern.
     struct Component {
-      bool IsStretch() const { return predicateIndex == -1 && text.empty(); }
+      bool IsStretch() const
+      {
+        return predicateIndex == -1 && text.empty();
+      }
 
       std::string text;
       int predicateIndex = -1;
       bool isLiteral = false;
 
-      friend bool operator==(Component const &l, Component const &r) {
+      friend bool operator==(Component const &l, Component const &r)
+      {
         return std::tie(l.text, l.predicateIndex, l.isLiteral) ==
                std::tie(r.text, r.predicateIndex, r.isLiteral);
       }
 
-      friend bool operator!=(Component const &l, Component const &r) {
+      friend bool operator!=(Component const &l, Component const &r)
+      {
         return !(l == r);
       }
 
-      template <class HashState>
-      friend void TfHashAppend(HashState &h, Component const &c) {
+      template<class HashState> friend void TfHashAppend(HashState &h, Component const &c)
+      {
         h.Append(c.text, c.predicateIndex, c.isLiteral);
       }
 
-      friend void swap(Component &l, Component &r) {
+      friend void swap(Component &l, Component &r)
+      {
         auto lt = std::tie(l.text, l.predicateIndex, l.isLiteral);
         auto rt = std::tie(r.text, r.predicateIndex, r.isLiteral);
         swap(lt, rt);
@@ -126,12 +132,10 @@ public:
     /// GetPrefix()).  Otherwise append this component to the sequence of
     /// components.
     SDF_API
-    void AppendChild(std::string const &text,
-                     SdfPredicateExpression &&predExpr);
+    void AppendChild(std::string const &text, SdfPredicateExpression &&predExpr);
     /// \overload
     SDF_API
-    void AppendChild(std::string const &text,
-                     SdfPredicateExpression const &predExpr);
+    void AppendChild(std::string const &text, SdfPredicateExpression const &predExpr);
     /// \overload
     SDF_API
     void AppendChild(std::string const &text);
@@ -144,22 +148,26 @@ public:
     /// GetPrefix()). Otherwise append this component to the sequence of
     /// components.
     SDF_API
-    void AppendProperty(std::string const &text,
-                        SdfPredicateExpression &&predExpr);
+    void AppendProperty(std::string const &text, SdfPredicateExpression &&predExpr);
     /// \overload
     SDF_API
-    void AppendProperty(std::string const &text,
-                        SdfPredicateExpression const &predExpr);
+    void AppendProperty(std::string const &text, SdfPredicateExpression const &predExpr);
     /// \overload
     SDF_API
     void AppendProperty(std::string const &text);
 
     /// Return this pattern's non-speculative prefix (leading path
     /// components with no wildcards and no predicates).
-    SdfPath const &GetPrefix() const & { return _prefix; }
+    SdfPath const &GetPrefix() const &
+    {
+      return _prefix;
+    }
 
     /// \overload.
-    SdfPath GetPrefix() && { return std::move(_prefix); }
+    SdfPath GetPrefix() &&
+    {
+      return std::move(_prefix);
+    }
 
     /// Set this pattern's non-speculative prefix (leading path
     /// components with no wildcards and no predicates).
@@ -167,47 +175,65 @@ public:
     void SetPrefix(SdfPath &&p);
 
     /// \overload
-    void SetPrefix(SdfPath const &p) { SetPrefix(SdfPath(p)); }
+    void SetPrefix(SdfPath const &p)
+    {
+      SetPrefix(SdfPath(p));
+    }
 
     /// Return the string representation of this pattern.
     SDF_API
     std::string GetText() const;
 
-    std::vector<Component> const &GetComponents() const & {
+    std::vector<Component> const &GetComponents() const &
+    {
       return _components;
     }
 
-    std::vector<Component> GetComponents() && { return _components; }
+    std::vector<Component> GetComponents() &&
+    {
+      return _components;
+    }
 
-    std::vector<SdfPredicateExpression> const &GetPredicateExprs() const & {
+    std::vector<SdfPredicateExpression> const &GetPredicateExprs() const &
+    {
       return _predExprs;
     }
 
-    std::vector<SdfPredicateExpression> GetPredicateExprs() && {
+    std::vector<SdfPredicateExpression> GetPredicateExprs() &&
+    {
       return _predExprs;
     }
 
-    bool IsProperty() const { return _isProperty; }
+    bool IsProperty() const
+    {
+      return _isProperty;
+    }
 
     /// Return true if this pattern is not empty, false if it is.
-    explicit operator bool() const { return !_prefix.IsEmpty(); }
+    explicit operator bool() const
+    {
+      return !_prefix.IsEmpty();
+    }
 
-  private:
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, PathPattern const &pat) {
+   private:
+    template<class HashState> friend void TfHashAppend(HashState &h, PathPattern const &pat)
+    {
       h.Append(pat._prefix, pat._components, pat._predExprs, pat._isProperty);
     }
 
-    friend bool operator==(PathPattern const &l, PathPattern const &r) {
+    friend bool operator==(PathPattern const &l, PathPattern const &r)
+    {
       return std::tie(l._prefix, l._components, l._predExprs, l._isProperty) ==
              std::tie(r._prefix, r._components, r._predExprs, r._isProperty);
     }
 
-    friend bool operator!=(PathPattern const &l, PathPattern const &r) {
+    friend bool operator!=(PathPattern const &l, PathPattern const &r)
+    {
       return !(l == r);
     }
 
-    friend void swap(PathPattern &l, PathPattern &r) {
+    friend void swap(PathPattern &l, PathPattern &r)
+    {
       auto lt = std::tie(l._prefix, l._components, l._predExprs, l._isProperty);
       auto rt = std::tie(r._prefix, r._components, r._predExprs, r._isProperty);
       swap(lt, rt);
@@ -225,7 +251,7 @@ public:
   /// which will be resolved later by a call to ResolveReferences() or
   /// ComposeOver().
   class ExpressionReference {
-  public:
+   public:
     /// Return the special "weaker" reference, whose syntax in an
     /// SdfPathExpression is "%_".  An ExpressionReference represents this
     /// as the empty \p path, and the name "_".
@@ -240,22 +266,23 @@ public:
     // collection).  If the name is "_", the path must be empty.
     std::string name;
 
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, ExpressionReference const &er) {
+    template<class HashState> friend void TfHashAppend(HashState &h, ExpressionReference const &er)
+    {
       h.Append(er.path, er.name);
     }
 
-    friend bool operator==(ExpressionReference const &l,
-                           ExpressionReference const &r) {
+    friend bool operator==(ExpressionReference const &l, ExpressionReference const &r)
+    {
       return std::tie(l.path, l.name) == std::tie(r.path, r.name);
     }
 
-    friend bool operator!=(ExpressionReference const &l,
-                           ExpressionReference const &r) {
+    friend bool operator!=(ExpressionReference const &l, ExpressionReference const &r)
+    {
       return !(l == r);
     }
 
-    friend void swap(ExpressionReference &l, ExpressionReference &r) {
+    friend void swap(ExpressionReference &l, ExpressionReference &r)
+    {
       auto lt = std::tie(l.path, l.name);
       auto rt = std::tie(r.path, r.name);
       swap(lt, rt);
@@ -285,8 +312,7 @@ public:
   /// GetParseError().  See the class documentation for details on expression
   /// syntax.
   SDF_API
-  explicit SdfPathExpression(std::string const &expr,
-                             std::string const &parseContext = {});
+  explicit SdfPathExpression(std::string const &expr, std::string const &parseContext = {});
 
   /// Return the expression "//" which matches all paths.
   SDF_API
@@ -313,7 +339,8 @@ public:
   static SdfPathExpression MakeComplement(SdfPathExpression &&right);
 
   /// \overload
-  static SdfPathExpression MakeComplement(SdfPathExpression const &right) {
+  static SdfPathExpression MakeComplement(SdfPathExpression const &right)
+  {
     return MakeComplement(SdfPathExpression(right));
   }
 
@@ -321,12 +348,13 @@ public:
   /// with operands \p left and \p right.  The \p op must be one of
   /// ImpliedUnion, Union, Intersection, or Difference.
   SDF_API
-  static SdfPathExpression MakeOp(Op op, SdfPathExpression &&left,
-                                  SdfPathExpression &&right);
+  static SdfPathExpression MakeOp(Op op, SdfPathExpression &&left, SdfPathExpression &&right);
 
   /// \overload
-  static SdfPathExpression MakeOp(Op op, SdfPathExpression const &left,
-                                  SdfPathExpression const &right) {
+  static SdfPathExpression MakeOp(Op op,
+                                  SdfPathExpression const &left,
+                                  SdfPathExpression const &right)
+  {
     return MakeOp(op, SdfPathExpression(left), SdfPathExpression(right));
   }
 
@@ -335,7 +363,8 @@ public:
   static SdfPathExpression MakeAtom(ExpressionReference &&ref);
 
   /// \overload
-  static SdfPathExpression MakeAtom(ExpressionReference const &ref) {
+  static SdfPathExpression MakeAtom(ExpressionReference const &ref)
+  {
     return MakeAtom(ExpressionReference(ref));
   }
 
@@ -344,7 +373,8 @@ public:
   static SdfPathExpression MakeAtom(PathPattern &&pattern);
 
   /// \overload
-  static SdfPathExpression MakeAtom(PathPattern const &pattern) {
+  static SdfPathExpression MakeAtom(PathPattern const &pattern)
+  {
     return MakeAtom(PathPattern(pattern));
   }
 
@@ -392,23 +422,21 @@ public:
   /// the processing code needs to understand the context in which an Op
   /// appears.
   SDF_API
-  void WalkWithOpStack(
-      TfFunctionRef<void(std::vector<std::pair<Op, int>> const &)> logic,
-      TfFunctionRef<void(ExpressionReference const &)> ref,
-      TfFunctionRef<void(PathPattern const &)> pattern) const;
+  void WalkWithOpStack(TfFunctionRef<void(std::vector<std::pair<Op, int>> const &)> logic,
+                       TfFunctionRef<void(ExpressionReference const &)> ref,
+                       TfFunctionRef<void(PathPattern const &)> pattern) const;
 
   /// Return a new expression created by replacing literal path prefixes that
   /// start with \p oldPrefix with \p newPrefix.
-  SdfPathExpression ReplacePrefix(SdfPath const &oldPrefix,
-                                  SdfPath const &newPrefix) const & {
+  SdfPathExpression ReplacePrefix(SdfPath const &oldPrefix, SdfPath const &newPrefix) const &
+  {
     return SdfPathExpression(*this).ReplacePrefix(oldPrefix, newPrefix);
   }
 
   /// Return a new expression created by replacing literal path prefixes that
   /// start with \p oldPrefix with \p newPrefix.
   SDF_API
-  SdfPathExpression ReplacePrefix(SdfPath const &oldPrefix,
-                                  SdfPath const &newPrefix) &&;
+  SdfPathExpression ReplacePrefix(SdfPath const &oldPrefix, SdfPath const &newPrefix) &&;
 
   /// Return true if all contained pattern prefixes are absolute, false
   /// otherwise.  Call MakeAbsolute() to anchor any relative paths and make
@@ -418,7 +446,8 @@ public:
 
   /// Return a new expression created by making any relative path prefixes in
   /// this expression absolute by SdfPath::MakeAbsolutePath().
-  SdfPathExpression MakeAbsolute(SdfPath const &anchor) const & {
+  SdfPathExpression MakeAbsolute(SdfPath const &anchor) const &
+  {
     return SdfPathExpression(*this).MakeAbsolute(anchor);
   }
 
@@ -429,7 +458,10 @@ public:
 
   /// Return true if this expression contains any references to other
   /// collections.
-  bool ContainsExpressionReferences() const { return !_refs.empty(); }
+  bool ContainsExpressionReferences() const
+  {
+    return !_refs.empty();
+  }
 
   /// Return true if this expression contains one or more "weaker" expression
   /// references, expressed as '%_' in the expression language.  Return false
@@ -443,8 +475,8 @@ public:
   /// reference unchanged, return an expression containing the passed argument
   /// by calling MakeAtom().
   SdfPathExpression ResolveReferences(
-      TfFunctionRef<SdfPathExpression(ExpressionReference const &)> resolve)
-      const & {
+      TfFunctionRef<SdfPathExpression(ExpressionReference const &)> resolve) const &
+  {
     return SdfPathExpression(*this).ResolveReferences(resolve);
   }
 
@@ -459,7 +491,8 @@ public:
   /// references, replacing them by \p weaker, leaving other references
   /// unmodified.  As a special case, if this expression IsEmpty(), return \p
   /// weaker.
-  SdfPathExpression ComposeOver(SdfPathExpression const &weaker) const & {
+  SdfPathExpression ComposeOver(SdfPathExpression const &weaker) const &
+  {
     return SdfPathExpression(*this).ComposeOver(weaker);
   }
 
@@ -477,7 +510,8 @@ public:
   ///
   /// To complete an expression, call MakeAbsolute(), ResolveReferences()
   /// and/or ComposeOver().
-  bool IsComplete() const {
+  bool IsComplete() const
+  {
     return !ContainsExpressionReferences() && IsAbsolute();
   }
 
@@ -488,36 +522,46 @@ public:
 
   /// Return true if this is the empty expression; i.e. default-constructed or
   /// constructed from a string with invalid syntax.
-  bool IsEmpty() const { return _ops.empty(); }
+  bool IsEmpty() const
+  {
+    return _ops.empty();
+  }
 
   /// Return true if this expression contains any operations, false otherwise.
-  explicit operator bool() const { return !IsEmpty(); }
+  explicit operator bool() const
+  {
+    return !IsEmpty();
+  }
 
   /// Return parsing errors as a string if this function was constructed from
   /// a string and parse errors were encountered.
-  std::string const &GetParseError() const & { return _parseError; }
+  std::string const &GetParseError() const &
+  {
+    return _parseError;
+  }
 
-private:
-  template <class HashState>
-  friend void TfHashAppend(HashState &h, SdfPathExpression const &expr) {
+ private:
+  template<class HashState> friend void TfHashAppend(HashState &h, SdfPathExpression const &expr)
+  {
     h.Append(expr._ops, expr._refs, expr._patterns, expr._parseError);
   }
 
   SDF_API
   friend std::ostream &operator<<(std::ostream &, SdfPathExpression const &);
 
-  friend bool operator==(SdfPathExpression const &l,
-                         SdfPathExpression const &r) {
+  friend bool operator==(SdfPathExpression const &l, SdfPathExpression const &r)
+  {
     return std::tie(l._ops, l._refs, l._patterns, l._parseError) ==
            std::tie(r._ops, r._refs, r._patterns, r._parseError);
   }
 
-  friend bool operator!=(SdfPathExpression const &l,
-                         SdfPathExpression const &r) {
+  friend bool operator!=(SdfPathExpression const &l, SdfPathExpression const &r)
+  {
     return !(l == r);
   }
 
-  friend void swap(SdfPathExpression &l, SdfPathExpression &r) {
+  friend void swap(SdfPathExpression &l, SdfPathExpression &r)
+  {
     auto lt = std::tie(l._ops, l._refs, l._patterns, l._parseError);
     auto rt = std::tie(r._ops, r._refs, r._patterns, r._parseError);
     swap(lt, rt);
@@ -534,4 +578,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PATH_EXPRESSION_H
+#endif  // PXR_USD_SDF_PATH_EXPRESSION_H

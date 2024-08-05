@@ -23,56 +23,50 @@
 //
 #include "hdPrman/sphere.h"
 
-#include "hdPrman/renderParam.h"
+#include "Gf/matrix4d.h"
+#include "Gf/matrix4f.h"
+#include "Hd/sphereSchema.h"
 #include "hdPrman/instancer.h"
 #include "hdPrman/material.h"
+#include "hdPrman/renderParam.h"
 #include "hdPrman/rixStrings.h"
-#include "Hd/sphereSchema.h"
-#include "Gf/matrix4f.h"
-#include "Gf/matrix4d.h"
 
-#include "Riley.h"
 #include "RiTypesHelper.h"
-#include "RixShadingUtils.h"
+#include "Riley.h"
 #include "RixPredefinedStrings.hpp"
+#include "RixShadingUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdPrman_Sphere::HdPrman_Sphere(SdfPath const &id)
-    : BASE(id)
-{
-}
+HdPrman_Sphere::HdPrman_Sphere(SdfPath const &id) : BASE(id) {}
 
-HdDirtyBits
-HdPrman_Sphere::GetInitialDirtyBitsMask() const
+HdDirtyBits HdPrman_Sphere::GetInitialDirtyBitsMask() const
 {
-  constexpr int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyVisibility | HdChangeTracker::DirtyPrimvar | HdChangeTracker::DirtyMaterialId | HdChangeTracker::DirtyInstancer;
+  constexpr int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyTransform |
+                       HdChangeTracker::DirtyVisibility | HdChangeTracker::DirtyPrimvar |
+                       HdChangeTracker::DirtyMaterialId | HdChangeTracker::DirtyInstancer;
 
   return (HdDirtyBits)mask;
 }
 
-TfTokenVector const &
-HdPrman_Sphere::GetBuiltinPrimvarNames() const
+TfTokenVector const &HdPrman_Sphere::GetBuiltinPrimvarNames() const
 {
-  static TfTokenVector result{
-      HdSphereSchemaTokens->radius};
+  static TfTokenVector result{HdSphereSchemaTokens->radius};
   return result;
 }
 
-RtPrimVarList
-HdPrman_Sphere::_ConvertGeometry(HdPrman_RenderParam *renderParam,
-                                 HdSceneDelegate *sceneDelegate,
-                                 const SdfPath &id,
-                                 RtUString *primType,
-                                 std::vector<HdGeomSubset> *geomSubsets)
+RtPrimVarList HdPrman_Sphere::_ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                               HdSceneDelegate *sceneDelegate,
+                                               const SdfPath &id,
+                                               RtUString *primType,
+                                               std::vector<HdGeomSubset> *geomSubsets)
 {
   RtPrimVarList primvars;
 
   *primType = RixStr.k_Ri_Sphere;
 
   const float radius =
-      sceneDelegate->Get(id, HdSphereSchemaTokens->radius)
-          .GetWithDefault<double>(0.0);
+      sceneDelegate->Get(id, HdSphereSchemaTokens->radius).GetWithDefault<double>(0.0);
 
   primvars.SetFloat(RixStr.k_Ri_radius, radius);
 

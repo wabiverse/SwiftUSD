@@ -34,93 +34,90 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<NdrVersionFilter>();
+  TfType::Define<NdrVersionFilter>();
 }
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-    TF_ADD_ENUM_NAME(NdrVersionFilterDefaultOnly, "DefaultOnly");
-    TF_ADD_ENUM_NAME(NdrVersionFilterAllVersions, "AllVersions");
+  TF_ADD_ENUM_NAME(NdrVersionFilterDefaultOnly, "DefaultOnly");
+  TF_ADD_ENUM_NAME(NdrVersionFilterAllVersions, "AllVersions");
 }
 
 namespace {
 
-NdrVersion
-_ParseVersionString(const std::string& x)
+NdrVersion _ParseVersionString(const std::string &x)
 {
-    try {
-        std::size_t i;
-        auto major = std::stoi(x, &i);
-        if (i == x.size()) {
-            return NdrVersion(major);
-        }
-        if (i < x.size() && x[i] == '.') {
-            std::size_t j;
-            auto minor = std::stoi(x.substr(i + 1), &j);
-            if (i + j + 1 == x.size()) {
-                return NdrVersion(major, minor);
-            }
-        }
+  try {
+    std::size_t i;
+    auto major = std::stoi(x, &i);
+    if (i == x.size()) {
+      return NdrVersion(major);
     }
-    catch (std::invalid_argument&) {
+    if (i < x.size() && x[i] == '.') {
+      std::size_t j;
+      auto minor = std::stoi(x.substr(i + 1), &j);
+      if (i + j + 1 == x.size()) {
+        return NdrVersion(major, minor);
+      }
     }
-    catch (std::out_of_range&) {
-    }
-    auto result = NdrVersion();
-    TF_CODING_ERROR("Invalid version string '%s'", x.c_str());
-    return result;
+  }
+  catch (std::invalid_argument &) {
+  }
+  catch (std::out_of_range &) {
+  }
+  auto result = NdrVersion();
+  TF_CODING_ERROR("Invalid version string '%s'", x.c_str());
+  return result;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-NdrVersion::NdrVersion(int major, int minor)
-    : _major(major), _minor(minor)
+NdrVersion::NdrVersion(int major, int minor) : _major(major), _minor(minor)
 {
-    if (_major < 0 || _minor < 0 || (_major == 0 && _minor == 0)) {
-        *this = NdrVersion();
-        TF_CODING_ERROR("Invalid version %d.%d: both components must be " 
-                        "non-negative and at least one non-zero",
-                        major,  minor);
-    }
+  if (_major < 0 || _minor < 0 || (_major == 0 && _minor == 0)) {
+    *this = NdrVersion();
+    TF_CODING_ERROR(
+        "Invalid version %d.%d: both components must be "
+        "non-negative and at least one non-zero",
+        major,
+        minor);
+  }
 }
 
-NdrVersion::NdrVersion(const std::string& x)
-    : NdrVersion(_ParseVersionString(x))
+NdrVersion::NdrVersion(const std::string &x) : NdrVersion(_ParseVersionString(x))
 {
-    // Do nothing
+  // Do nothing
 }
 
-std::string
-NdrVersion::GetString() const
+std::string NdrVersion::GetString() const
 {
-    if (!*this) {
-        return "<invalid version>";
-    }
-    else if (_minor) {
-        return std::to_string(_major) + "." + std::to_string(_minor);
-    }
-    else {
-        return std::to_string(_major);
-    }
+  if (!*this) {
+    return "<invalid version>";
+  }
+  else if (_minor) {
+    return std::to_string(_major) + "." + std::to_string(_minor);
+  }
+  else {
+    return std::to_string(_major);
+  }
 }
 
-std::string
-NdrVersion::GetStringSuffix() const
+std::string NdrVersion::GetStringSuffix() const
 {
-    if (IsDefault()) {
-        return "";
-    }
-    else if (!*this) {
-        // XXX -- It's not clear what to do here.  For now we return the
-        //        same result as for a default version.
-        return "";
-    }
-    else if (_minor) {
-        return '_' + std::to_string(_major) + "." + std::to_string(_minor);
-    }
-    else {
-        return '_' + std::to_string(_major);
-    }
+  if (IsDefault()) {
+    return "";
+  }
+  else if (!*this) {
+    // XXX -- It's not clear what to do here.  For now we return the
+    //        same result as for a default version.
+    return "";
+  }
+  else if (_minor) {
+    return '_' + std::to_string(_major) + "." + std::to_string(_minor);
+  }
+  else {
+    return '_' + std::to_string(_major);
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

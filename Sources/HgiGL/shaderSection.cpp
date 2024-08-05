@@ -28,16 +28,15 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLShaderSection::HgiGLShaderSection(
-    const std::string &identifier,
-    const HgiShaderSectionAttributeVector &attributes,
-    const std::string &storageQualifier,
-    const std::string &defaultValue,
-    const std::string &arraySize,
-    const std::string &blockInstanceIdentifier)
-    : HgiShaderSection(identifier, attributes, defaultValue,
-                       arraySize, blockInstanceIdentifier),
-      _storageQualifier(storageQualifier), _arraySize(arraySize)
+HgiGLShaderSection::HgiGLShaderSection(const std::string &identifier,
+                                       const HgiShaderSectionAttributeVector &attributes,
+                                       const std::string &storageQualifier,
+                                       const std::string &defaultValue,
+                                       const std::string &arraySize,
+                                       const std::string &blockInstanceIdentifier)
+    : HgiShaderSection(identifier, attributes, defaultValue, arraySize, blockInstanceIdentifier),
+      _storageQualifier(storageQualifier),
+      _arraySize(arraySize)
 {
 }
 
@@ -49,26 +48,21 @@ void HgiGLShaderSection::WriteDeclaration(std::ostream &ss) const
   // identifiers and indicies
   const HgiShaderSectionAttributeVector &attributes = GetAttributes();
 
-  if (!attributes.empty())
-  {
+  if (!attributes.empty()) {
     ss << "layout(";
-    for (size_t i = 0; i < attributes.size(); i++)
-    {
-      if (i > 0)
-      {
+    for (size_t i = 0; i < attributes.size(); i++) {
+      if (i > 0) {
         ss << ", ";
       }
       const HgiShaderSectionAttribute &a = attributes[i];
       ss << a.identifier;
-      if (!a.index.empty())
-      {
+      if (!a.index.empty()) {
         ss << " = " << a.index;
       }
     }
     ss << ") ";
   }
-  if (!_storageQualifier.empty())
-  {
+  if (!_storageQualifier.empty()) {
     ss << _storageQualifier << " ";
   }
   WriteType(ss);
@@ -111,9 +105,8 @@ bool HgiGLShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
   return false;
 }
 
-HgiGLMacroShaderSection::HgiGLMacroShaderSection(
-    const std::string &macroDeclaration,
-    const std::string &macroComment)
+HgiGLMacroShaderSection::HgiGLMacroShaderSection(const std::string &macroDeclaration,
+                                                 const std::string &macroComment)
     : HgiGLShaderSection(macroDeclaration), _macroComment(macroComment)
 {
 }
@@ -143,7 +136,10 @@ HgiGLMemberShaderSection::HgiGLMemberShaderSection(
                          defaultValue,
                          arraySize,
                          blockInstanceIdentifier),
-      _typeName(typeName), _interpolation(interpolation), _sampling(sampling), _storage(storage)
+      _typeName(typeName),
+      _interpolation(interpolation),
+      _sampling(sampling),
+      _storage(storage)
 {
 }
 
@@ -151,40 +147,36 @@ HgiGLMemberShaderSection::~HgiGLMemberShaderSection() = default;
 
 bool HgiGLMemberShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
 {
-  if (HasBlockInstanceIdentifier())
-  {
+  if (HasBlockInstanceIdentifier()) {
     return true;
   }
 
-  switch (_interpolation)
-  {
-  case HgiInterpolationDefault:
-    break;
-  case HgiInterpolationFlat:
-    ss << "flat ";
-    break;
-  case HgiInterpolationNoPerspective:
-    ss << "noperspective ";
-    break;
+  switch (_interpolation) {
+    case HgiInterpolationDefault:
+      break;
+    case HgiInterpolationFlat:
+      ss << "flat ";
+      break;
+    case HgiInterpolationNoPerspective:
+      ss << "noperspective ";
+      break;
   }
-  switch (_sampling)
-  {
-  case HgiSamplingDefault:
-    break;
-  case HgiSamplingCentroid:
-    ss << "centroid ";
-    break;
-  case HgiSamplingSample:
-    ss << "sample ";
-    break;
+  switch (_sampling) {
+    case HgiSamplingDefault:
+      break;
+    case HgiSamplingCentroid:
+      ss << "centroid ";
+      break;
+    case HgiSamplingSample:
+      ss << "sample ";
+      break;
   }
-  switch (_storage)
-  {
-  case HgiStorageDefault:
-    break;
-  case HgiStoragePatch:
-    ss << "patch ";
-    break;
+  switch (_storage) {
+    case HgiStorageDefault:
+      break;
+    case HgiStoragePatch:
+      ss << "patch ";
+      break;
   }
   WriteDeclaration(ss);
   return true;
@@ -207,15 +199,13 @@ HgiGLBlockShaderSection::~HgiGLBlockShaderSection() = default;
 
 bool HgiGLBlockShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
 {
-  ss << "layout(std140, binding = "
-     << _bindingNo << ") "
+  ss << "layout(std140, binding = " << _bindingNo << ") "
      << "uniform"
      << " ";
   WriteIdentifier(ss);
   ss << "\n";
   ss << "{\n";
-  for (const HgiShaderFunctionParamDesc &param : _parameters)
-  {
+  for (const HgiShaderFunctionParamDesc &param : _parameters) {
     ss << "        " << param.type << " " << param.nameInShader << ";\n";
   }
   ss << "\n};\n";
@@ -239,78 +229,66 @@ HgiGLTextureShaderSection::HgiGLTextureShaderSection(
                          _storageQualifier,
                          defaultValue,
                          arraySize > 0 ? "[" + std::to_string(arraySize) + "]" : ""),
-      _dimensions(dimensions), _format(format), _textureType(textureType), _arraySize(arraySize), _writable(writable)
+      _dimensions(dimensions),
+      _format(format),
+      _textureType(textureType),
+      _arraySize(arraySize),
+      _writable(writable)
 {
 }
 
 HgiGLTextureShaderSection::~HgiGLTextureShaderSection() = default;
 
-static std::string
-_GetTextureTypePrefix(HgiFormat const &format)
+static std::string _GetTextureTypePrefix(HgiFormat const &format)
 {
-  if (format >= HgiFormatUInt16 && format <= HgiFormatUInt16Vec4)
-  {
-    return "u"; // e.g., usampler, uvec4
+  if (format >= HgiFormatUInt16 && format <= HgiFormatUInt16Vec4) {
+    return "u";  // e.g., usampler, uvec4
   }
-  if (format >= HgiFormatInt32 && format <= HgiFormatInt32Vec4)
-  {
-    return "i"; // e.g., isampler, ivec4
+  if (format >= HgiFormatInt32 && format <= HgiFormatInt32Vec4) {
+    return "i";  // e.g., isampler, ivec4
   }
-  return ""; // e.g., sampler, vec4
+  return "";  // e.g., sampler, vec4
 }
 
 void HgiGLTextureShaderSection::_WriteSamplerType(std::ostream &ss) const
 {
-  if (_writable)
-  {
-    if (_textureType == HgiShaderTextureTypeArrayTexture)
-    {
+  if (_writable) {
+    if (_textureType == HgiShaderTextureTypeArrayTexture) {
       ss << "image" << _dimensions << "DArray";
     }
-    else
-    {
+    else {
       ss << "image" << _dimensions << "D";
     }
   }
-  else
-  {
-    if (_textureType == HgiShaderTextureTypeShadowTexture)
-    {
-      ss << _GetTextureTypePrefix(_format) << "sampler"
-         << _dimensions << "DShadow";
+  else {
+    if (_textureType == HgiShaderTextureTypeShadowTexture) {
+      ss << _GetTextureTypePrefix(_format) << "sampler" << _dimensions << "DShadow";
     }
-    else if (_textureType == HgiShaderTextureTypeArrayTexture)
-    {
-      ss << _GetTextureTypePrefix(_format) << "sampler"
-         << _dimensions << "DArray";
+    else if (_textureType == HgiShaderTextureTypeArrayTexture) {
+      ss << _GetTextureTypePrefix(_format) << "sampler" << _dimensions << "DArray";
     }
-    else
-    {
-      ss << _GetTextureTypePrefix(_format) << "sampler"
-         << _dimensions << "D";
+    else {
+      ss << _GetTextureTypePrefix(_format) << "sampler" << _dimensions << "D";
     }
   }
 }
 
 void HgiGLTextureShaderSection::_WriteSampledDataType(std::ostream &ss) const
 {
-  if (_textureType == HgiShaderTextureTypeShadowTexture)
-  {
+  if (_textureType == HgiShaderTextureTypeShadowTexture) {
     ss << "float";
   }
-  else
-  {
+  else {
     ss << _GetTextureTypePrefix(_format) << "vec4";
   }
 }
 
 void HgiGLTextureShaderSection::WriteType(std::ostream &ss) const
 {
-  if (_dimensions < 1 || _dimensions > 3)
-  {
+  if (_dimensions < 1 || _dimensions > 3) {
     TF_CODING_ERROR("Invalid texture dimension");
   }
-  _WriteSamplerType(ss); // e.g. sampler<N>D, isampler<N>D, usampler<N>D
+  _WriteSamplerType(ss);  // e.g. sampler<N>D, isampler<N>D, usampler<N>D
 }
 
 bool HgiGLTextureShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
@@ -323,20 +301,18 @@ bool HgiGLTextureShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
 {
   // Used to unify texture sampling and writing across platforms that depend
   // on samplers and don't store textures in global space.
-  const uint32_t sizeDim =
-      (_textureType == HgiShaderTextureTypeArrayTexture) ? (_dimensions + 1) : _dimensions;
-  const uint32_t coordDim =
-      (_textureType == HgiShaderTextureTypeShadowTexture ||
-       _textureType == HgiShaderTextureTypeArrayTexture)
-          ? (_dimensions + 1)
-          : _dimensions;
+  const uint32_t sizeDim = (_textureType == HgiShaderTextureTypeArrayTexture) ? (_dimensions + 1) :
+                                                                                _dimensions;
+  const uint32_t coordDim = (_textureType == HgiShaderTextureTypeShadowTexture ||
+                             _textureType == HgiShaderTextureTypeArrayTexture) ?
+                                (_dimensions + 1) :
+                                _dimensions;
 
   const std::string sizeType = sizeDim == 1 ? "int" : "ivec" + std::to_string(sizeDim);
   const std::string intCoordType = coordDim == 1 ? "int" : "ivec" + std::to_string(coordDim);
   const std::string floatCoordType = coordDim == 1 ? "float" : "vec" + std::to_string(coordDim);
 
-  if (_arraySize > 0)
-  {
+  if (_arraySize > 0) {
     WriteType(ss);
     ss << " HgiGetSampler_";
     WriteIdentifier(ss);
@@ -345,8 +321,7 @@ bool HgiGLTextureShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
     WriteIdentifier(ss);
     ss << "[index];\n}\n";
   }
-  else
-  {
+  else {
     ss << "#define HgiGetSampler_";
     WriteIdentifier(ss);
     ss << "() ";
@@ -354,8 +329,7 @@ bool HgiGLTextureShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
     ss << "\n";
   }
 
-  if (_writable)
-  {
+  if (_writable) {
     // Write a function that lets you write to the texture with
     // HgiSet_texName(uv, data).
     ss << "void HgiSet_";
@@ -377,14 +351,13 @@ bool HgiGLTextureShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
     ss << ");\n";
     ss << "}\n";
   }
-  else
-  {
+  else {
     const std::string arrayInput = (_arraySize > 0) ? "uint index, " : "";
     const std::string arrayIndex = (_arraySize > 0) ? "[index]" : "";
 
     // Write a function that lets you query the texture with
     // HgiGet_texName(uv).
-    _WriteSampledDataType(ss); // e.g., vec4, ivec4, uvec4
+    _WriteSampledDataType(ss);  // e.g., vec4, ivec4, uvec4
     ss << " HgiGet_";
     WriteIdentifier(ss);
     ss << "(" << arrayInput << floatCoordType << " uv) {\n";
@@ -418,8 +391,7 @@ bool HgiGLTextureShaderSection::VisitGlobalFunctionDefinitions(std::ostream &ss)
     ss << "}\n";
 
     // HgiTexelFetch_texName()
-    if (_textureType != HgiShaderTextureTypeShadowTexture)
-    {
+    if (_textureType != HgiShaderTextureTypeShadowTexture) {
       _WriteSampledDataType(ss);
       ss << " HgiTexelFetch_";
       WriteIdentifier(ss);
@@ -444,11 +416,10 @@ HgiGLBufferShaderSection::HgiGLBufferShaderSection(
     const HgiBindingType binding,
     const std::string arraySize,
     const HgiShaderSectionAttributeVector &attributes)
-    : HgiGLShaderSection(identifier,
-                         attributes,
-                         "buffer",
-                         ""),
-      _type(type), _binding(binding), _arraySize(arraySize)
+    : HgiGLShaderSection(identifier, attributes, "buffer", ""),
+      _type(type),
+      _binding(binding),
+      _arraySize(arraySize)
 {
 }
 
@@ -465,32 +436,25 @@ bool HgiGLBufferShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
   // identifiers and indicies
   const HgiShaderSectionAttributeVector &attributes = GetAttributes();
 
-  if (!attributes.empty())
-  {
+  if (!attributes.empty()) {
     ss << "layout(";
-    for (size_t i = 0; i < attributes.size(); i++)
-    {
-      if (i > 0)
-      {
+    for (size_t i = 0; i < attributes.size(); i++) {
+      if (i > 0) {
         ss << ", ";
       }
       const HgiShaderSectionAttribute &a = attributes[i];
       ss << a.identifier;
-      if (!a.index.empty())
-      {
+      if (!a.index.empty()) {
         ss << " = " << a.index;
       }
     }
     ss << ") ";
   }
   // If it has a storage qualifier, declare it
-  if (_binding == HgiBindingTypeUniformValue ||
-      _binding == HgiBindingTypeUniformArray)
-  {
+  if (_binding == HgiBindingTypeUniformValue || _binding == HgiBindingTypeUniformArray) {
     ss << "uniform ubo_";
   }
-  else
-  {
+  else {
     ss << "buffer ssbo_";
   }
   WriteIdentifier(ss);
@@ -499,23 +463,19 @@ bool HgiGLBufferShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
   ss << " ";
   WriteIdentifier(ss);
 
-  if (_binding == HgiBindingTypeValue ||
-      _binding == HgiBindingTypeUniformValue)
-  {
+  if (_binding == HgiBindingTypeValue || _binding == HgiBindingTypeUniformValue) {
     ss << "; };\n";
   }
-  else
-  {
+  else {
     ss << "[" << _arraySize << "]; };\n";
   }
 
   return true;
 }
 
-HgiGLKeywordShaderSection::HgiGLKeywordShaderSection(
-    const std::string &identifier,
-    const std::string &type,
-    const std::string &keyword)
+HgiGLKeywordShaderSection::HgiGLKeywordShaderSection(const std::string &identifier,
+                                                     const std::string &type,
+                                                     const std::string &keyword)
     : HgiGLShaderSection(identifier), _type(type), _keyword(keyword)
 {
 }
@@ -551,18 +511,17 @@ HgiGLInterstageBlockShaderSection::HgiGLInterstageBlockShaderSection(
                          std::string(),
                          arraySize,
                          blockInstanceIdentifier),
-      _qualifier(qualifier), _members(members)
+      _qualifier(qualifier),
+      _members(members)
 {
 }
 
-bool HgiGLInterstageBlockShaderSection::VisitGlobalMemberDeclarations(
-    std::ostream &ss)
+bool HgiGLInterstageBlockShaderSection::VisitGlobalMemberDeclarations(std::ostream &ss)
 {
   ss << _qualifier << " ";
   WriteIdentifier(ss);
   ss << " {\n";
-  for (const HgiGLShaderSection *member : _members)
-  {
+  for (const HgiGLShaderSection *member : _members) {
     ss << "  ";
     member->WriteType(ss);
     ss << " ";

@@ -39,9 +39,8 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiShaderFunction
 ///
-class HgiMetalShaderFunction final : public HgiShaderFunction
-{
-public:
+class HgiMetalShaderFunction final : public HgiShaderFunction {
+ public:
   HGIMETAL_API
   ~HgiMetalShaderFunction() override;
 
@@ -61,18 +60,18 @@ public:
   HGIMETAL_API
   MTL::Function *GetShaderId() const;
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API
   HgiMetalShaderFunction(HgiMetal *hgi, HgiShaderFunctionDesc const &desc);
 
-private:
+ private:
   HgiMetalShaderFunction() = delete;
   HgiMetalShaderFunction &operator=(const HgiMetalShaderFunction &) = delete;
   HgiMetalShaderFunction(const HgiMetalShaderFunction &) = delete;
 
-private:
+ private:
   std::string _errors;
 
   MTL::Function *_shaderId;

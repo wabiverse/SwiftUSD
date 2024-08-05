@@ -31,10 +31,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage,
-                                 const Usd_PrimFlagsPredicate &predicate) {
-  Usd_PrimDataConstPtr firstChild =
-      stage->GetPseudoRoot()._Prim()->GetFirstChild();
+UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage, const Usd_PrimFlagsPredicate &predicate)
+{
+  Usd_PrimDataConstPtr firstChild = stage->GetPseudoRoot()._Prim()->GetFirstChild();
   UsdPrimRange ret(firstChild, /* end = */ nullptr, SdfPath(), predicate);
   // The PrimRange uses a depth count to know when it's about to pop out of
   // the subtree it was walking so it can stop and avoid walking into siblings
@@ -46,52 +45,58 @@ UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage,
   return ret;
 }
 
-UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage) {
+UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage)
+{
   return Stage(stage, UsdPrimDefaultPredicate);
 }
 
-void UsdPrimRange::iterator::PruneChildren() {
+void UsdPrimRange::iterator::PruneChildren()
+{
   if (base() == _range->_end) {
     TF_CODING_ERROR("Iterator past-the-end");
     return;
   }
   if (_isPost) {
-    TF_CODING_ERROR("Cannot prune children during post-visit because the"
-                    "children have already been processed. "
-                    "Current node: %s",
-                    (*this)->GetPath().GetText());
+    TF_CODING_ERROR(
+        "Cannot prune children during post-visit because the"
+        "children have already been processed. "
+        "Current node: %s",
+        (*this)->GetPath().GetText());
     return;
   }
   _pruneChildrenFlag = true;
 }
 
-void UsdPrimRange::iterator::increment() {
+void UsdPrimRange::iterator::increment()
+{
   base_type &base = base_reference();
   base_type end = _range->_end;
   if (ARCH_UNLIKELY(_isPost)) {
     _isPost = false;
-    if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end,
-                                      _range->_predicate)) {
+    if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end, _range->_predicate)) {
       if (_depth) {
         --_depth;
         _isPost = true;
-      } else {
+      }
+      else {
         base = end;
         _proxyPrimPath = SdfPath();
       }
     }
-  } else if (!_pruneChildrenFlag &&
-             Usd_MoveToChild(base, _proxyPrimPath, end, _range->_predicate)) {
+  }
+  else if (!_pruneChildrenFlag && Usd_MoveToChild(base, _proxyPrimPath, end, _range->_predicate)) {
     ++_depth;
-  } else {
+  }
+  else {
     if (_range->_postOrder) {
       _isPost = true;
-    } else {
-      while (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end,
-                                           _range->_predicate)) {
+    }
+    else {
+      while (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end, _range->_predicate)) {
         if (_depth) {
           --_depth;
-        } else {
+        }
+        else {
           base = end;
           _proxyPrimPath = SdfPath();
           break;

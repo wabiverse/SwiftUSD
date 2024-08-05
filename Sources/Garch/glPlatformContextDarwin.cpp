@@ -28,23 +28,22 @@
  * thus we can prefer the ease of including all sources in the build
  * which is far more maintainable, especially for package consumers.
  * ----------------------------------------------------------------- */
-#include <Foundation/Foundation.hpp>
-#include <OpenGL/OpenGL.hpp>
+#  include <Foundation/Foundation.hpp>
+#  include <OpenGL/OpenGL.hpp>
 
-#include <pxr/pxrns.h>
-#include "Garch/GarchDarwin/glPlatformContextDarwin.h"
+#  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
+#  include <pxr/pxrns.h>
 
-#ifdef ARCH_OS_IOS
+#  ifdef ARCH_OS_IOS
 typedef EAGLContext NSGLContext;
-#else
+#  else
 typedef NSGL::OpenGLContext NSGLContext;
-#endif
+#  endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchNSGLContextState::Detail
-{
-public:
+class GarchNSGLContextState::Detail {
+ public:
   Detail()
   {
     context = NSGLContext::currentContext();
@@ -55,7 +54,7 @@ public:
   }
   ~Detail()
   {
-    context = nil; // garbage collect
+    context = nil;  // garbage collect
   }
   NSGLContext *context;
 };
@@ -67,8 +66,7 @@ GarchNSGLContextState::GarchNSGLContextState()
 }
 
 GarchNSGLContextState::GarchNSGLContextState(NullState)
-    : _detail(std::make_shared<GarchNSGLContextState::Detail>(
-          NullState::nullstate))
+    : _detail(std::make_shared<GarchNSGLContextState::Detail>(NullState::nullstate))
 {
 }
 
@@ -82,8 +80,7 @@ bool GarchNSGLContextState::operator==(const GarchNSGLContextState &rhs) const
 }
 
 /// Returns a hash value for the state.
-size_t
-GarchNSGLContextState::GetHash() const
+size_t GarchNSGLContextState::GetHash() const
 {
   return static_cast<size_t>(reinterpret_cast<uintptr_t>(_detail->context));
 }
@@ -97,11 +94,11 @@ bool GarchNSGLContextState::IsValid() const
 /// Make the context current.
 void GarchNSGLContextState::MakeCurrent()
 {
-#if ARCH_OS_IOS
+#  if ARCH_OS_IOS
   EAGLContext::setCurrentContext(_detail->context);
-#else
+#  else
   _detail->context->makeCurrentContext();
-#endif
+#  endif
 }
 
 /// Make no context current.
@@ -110,14 +107,12 @@ void GarchNSGLContextState::DoneCurrent()
   NSGLContext::clearCurrentContext();
 }
 
-GarchGLPlatformContextState
-GarchGetNullGLPlatformContextState()
+GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 {
   return GarchNSGLContextState(GarchNSGLContextState::NullState::nullstate);
 }
 
-void *
-GarchSelectCoreProfileMacVisual()
+void *GarchSelectCoreProfileMacVisual()
 {
   NSGL::OpenGLPixelFormatAttribute attribs[10];
   int c = 0;

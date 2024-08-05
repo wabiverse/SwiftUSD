@@ -12,4 +12,4 @@
 #include <UsdDraco/importTranslator.h>
 #include <UsdDraco/writer.h>
 
-#endif // __PXR_USD_PLUGIN_USDDRACO_H__
+#endif  // __PXR_USD_PLUGIN_USDDRACO_H__

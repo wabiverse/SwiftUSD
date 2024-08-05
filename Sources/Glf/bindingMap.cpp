@@ -40,8 +40,7 @@ int GlfBindingMap::GetSamplerUnit(std::string const &name)
 int GlfBindingMap::GetSamplerUnit(TfToken const &name)
 {
   int samplerUnit = -1;
-  if (!TfMapLookup(_samplerBindings, name, &samplerUnit))
-  {
+  if (!TfMapLookup(_samplerBindings, name, &samplerUnit)) {
     // XXX error check < MAX_TEXTURE_IMAGE_UNITS
     samplerUnit = _samplerBindingBaseIndex + (int)_samplerBindings.size();
     _samplerBindings[name] = samplerUnit;
@@ -58,8 +57,7 @@ int GlfBindingMap::GetAttributeIndex(std::string const &name)
 int GlfBindingMap::GetAttributeIndex(TfToken const &name)
 {
   int attribIndex = -1;
-  if (!TfMapLookup(_attribBindings, name, &attribIndex))
-  {
+  if (!TfMapLookup(_attribBindings, name, &attribIndex)) {
     return -1;
   }
   return attribIndex;
@@ -67,11 +65,9 @@ int GlfBindingMap::GetAttributeIndex(TfToken const &name)
 
 void GlfBindingMap::AssignSamplerUnitsToProgram(GLuint program)
 {
-  for (BindingMap::value_type const &p : _samplerBindings)
-  {
+  for (BindingMap::value_type const &p : _samplerBindings) {
     GLint loc = glGetUniformLocation(program, p.first.GetText());
-    if (loc != -1)
-    {
+    if (loc != -1) {
       glProgramUniform1i(program, loc, p.second);
     }
   }
@@ -85,8 +81,7 @@ int GlfBindingMap::GetUniformBinding(std::string const &name)
 int GlfBindingMap::GetUniformBinding(TfToken const &name)
 {
   int binding = -1;
-  if (!TfMapLookup(_uniformBindings, name, &binding))
-  {
+  if (!TfMapLookup(_uniformBindings, name, &binding)) {
     binding = _uniformBindingBaseIndex + (int)_uniformBindings.size();
     _uniformBindings[name] = binding;
   }
@@ -106,11 +101,9 @@ bool GlfBindingMap::HasUniformBinding(TfToken const &name) const
 
 void GlfBindingMap::AssignUniformBindingsToProgram(GLuint program)
 {
-  for (BindingMap::value_type const &p : _uniformBindings)
-  {
+  for (BindingMap::value_type const &p : _uniformBindings) {
     GLuint uboIndex = glGetUniformBlockIndex(program, p.first.GetText());
-    if (uboIndex != GL_INVALID_INDEX)
-    {
+    if (uboIndex != GL_INVALID_INDEX) {
       glUniformBlockBinding(program, uboIndex, p.second);
     }
   }
@@ -141,19 +134,16 @@ void GlfBindingMap::_AddActiveAttributeBindings(GLuint program)
   GLenum type;
   char *name = new char[maxNameLength];
 
-  for (int i = 0; i < numAttributes; ++i)
-  {
+  for (int i = 0; i < numAttributes; ++i) {
     glGetActiveAttrib(program, i, maxNameLength, NULL, &size, &type, name);
     GLint location = glGetAttribLocation(program, name);
     TfToken token(name);
 
     BindingMap::iterator it = _attribBindings.find(token);
-    if (it == _attribBindings.end())
-    {
+    if (it == _attribBindings.end()) {
       _attribBindings[token] = location;
     }
-    else if (it->second != location)
-    {
+    else if (it->second != location) {
       TF_RUNTIME_ERROR("Inconsistent attribute binding detected.");
     }
   }
@@ -174,49 +164,47 @@ void GlfBindingMap::_AddActiveUniformBindings(GLuint program)
   GLenum type;
   char *name = new char[maxNameLength];
 
-  for (int i = 0; i < numUniforms; ++i)
-  {
+  for (int i = 0; i < numUniforms; ++i) {
     glGetActiveUniform(program, i, maxNameLength, NULL, &size, &type, name);
-    switch (type)
-    {
-    case GL_SAMPLER_1D:
-    case GL_SAMPLER_2D:
-    case GL_SAMPLER_3D:
-    case GL_SAMPLER_CUBE:
-    case GL_SAMPLER_1D_SHADOW:
-    case GL_SAMPLER_2D_SHADOW:
-    case GL_SAMPLER_1D_ARRAY:
-    case GL_SAMPLER_2D_ARRAY:
-    case GL_SAMPLER_1D_ARRAY_SHADOW:
-    case GL_SAMPLER_2D_ARRAY_SHADOW:
-    case GL_SAMPLER_2D_MULTISAMPLE:
-    case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
-    case GL_SAMPLER_CUBE_SHADOW:
-    case GL_SAMPLER_BUFFER:
-    case GL_SAMPLER_2D_RECT:
-    case GL_SAMPLER_2D_RECT_SHADOW:
-    case GL_INT_SAMPLER_1D:
-    case GL_INT_SAMPLER_2D:
-    case GL_INT_SAMPLER_3D:
-    case GL_INT_SAMPLER_CUBE:
-    case GL_INT_SAMPLER_1D_ARRAY:
-    case GL_INT_SAMPLER_2D_ARRAY:
-    case GL_INT_SAMPLER_2D_MULTISAMPLE:
-    case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-    case GL_INT_SAMPLER_BUFFER:
-    case GL_INT_SAMPLER_2D_RECT:
-    case GL_UNSIGNED_INT_SAMPLER_1D:
-    case GL_UNSIGNED_INT_SAMPLER_2D:
-    case GL_UNSIGNED_INT_SAMPLER_3D:
-    case GL_UNSIGNED_INT_SAMPLER_CUBE:
-    case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:
-    case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
-    case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
-    case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-    case GL_UNSIGNED_INT_SAMPLER_BUFFER:
-    case GL_UNSIGNED_INT_SAMPLER_2D_RECT:
-      GetSamplerUnit(name);
-      break;
+    switch (type) {
+      case GL_SAMPLER_1D:
+      case GL_SAMPLER_2D:
+      case GL_SAMPLER_3D:
+      case GL_SAMPLER_CUBE:
+      case GL_SAMPLER_1D_SHADOW:
+      case GL_SAMPLER_2D_SHADOW:
+      case GL_SAMPLER_1D_ARRAY:
+      case GL_SAMPLER_2D_ARRAY:
+      case GL_SAMPLER_1D_ARRAY_SHADOW:
+      case GL_SAMPLER_2D_ARRAY_SHADOW:
+      case GL_SAMPLER_2D_MULTISAMPLE:
+      case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_SAMPLER_CUBE_SHADOW:
+      case GL_SAMPLER_BUFFER:
+      case GL_SAMPLER_2D_RECT:
+      case GL_SAMPLER_2D_RECT_SHADOW:
+      case GL_INT_SAMPLER_1D:
+      case GL_INT_SAMPLER_2D:
+      case GL_INT_SAMPLER_3D:
+      case GL_INT_SAMPLER_CUBE:
+      case GL_INT_SAMPLER_1D_ARRAY:
+      case GL_INT_SAMPLER_2D_ARRAY:
+      case GL_INT_SAMPLER_2D_MULTISAMPLE:
+      case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_INT_SAMPLER_BUFFER:
+      case GL_INT_SAMPLER_2D_RECT:
+      case GL_UNSIGNED_INT_SAMPLER_1D:
+      case GL_UNSIGNED_INT_SAMPLER_2D:
+      case GL_UNSIGNED_INT_SAMPLER_3D:
+      case GL_UNSIGNED_INT_SAMPLER_CUBE:
+      case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
+      case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
+      case GL_UNSIGNED_INT_SAMPLER_BUFFER:
+      case GL_UNSIGNED_INT_SAMPLER_2D_RECT:
+        GetSamplerUnit(name);
+        break;
     }
   }
   delete[] name;
@@ -233,8 +221,7 @@ void GlfBindingMap::_AddActiveUniformBlockBindings(GLuint program)
   glGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &maxNameLength);
   char *name = new char[maxNameLength];
 
-  for (int i = 0; i < numUniformBlocks; ++i)
-  {
+  for (int i = 0; i < numUniformBlocks; ++i) {
     glGetActiveUniformBlockName(program, i, maxNameLength, NULL, name);
     GetUniformBinding(name);
   }
@@ -247,32 +234,26 @@ void GlfBindingMap::Debug() const
 
   // sort for comparing baseline in testGlfBindingMap
   std::map<TfToken, int> attribBindings, samplerBindings, uniformBindings;
-  for (BindingMap::value_type const &p : _attribBindings)
-  {
+  for (BindingMap::value_type const &p : _attribBindings) {
     attribBindings.insert(p);
   }
-  for (BindingMap::value_type const &p : _samplerBindings)
-  {
+  for (BindingMap::value_type const &p : _samplerBindings) {
     samplerBindings.insert(p);
   }
-  for (BindingMap::value_type const &p : _uniformBindings)
-  {
+  for (BindingMap::value_type const &p : _uniformBindings) {
     uniformBindings.insert(p);
   }
 
   printf(" Attribute bindings\n");
-  for (BindingMap::value_type const &p : attribBindings)
-  {
+  for (BindingMap::value_type const &p : attribBindings) {
     printf("  %s : %d\n", p.first.GetText(), p.second);
   }
   printf(" Sampler bindings\n");
-  for (BindingMap::value_type const &p : samplerBindings)
-  {
+  for (BindingMap::value_type const &p : samplerBindings) {
     printf("  %s : %d\n", p.first.GetText(), p.second);
   }
   printf(" Uniform bindings\n");
-  for (BindingMap::value_type const &p : uniformBindings)
-  {
+  for (BindingMap::value_type const &p : uniformBindings) {
     printf("  %s : %d\n", p.first.GetText(), p.second);
   }
 }

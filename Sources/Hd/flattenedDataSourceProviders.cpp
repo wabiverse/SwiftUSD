@@ -24,13 +24,13 @@
 
 #include "Hd/flattenedDataSourceProviders.h"
 
+#include "Hd/coordSysBindingSchema.h"
 #include "Hd/flattenedMaterialBindingsDataSourceProvider.h"
 #include "Hd/flattenedOverlayDataSourceProvider.h"
 #include "Hd/flattenedPrimvarsDataSourceProvider.h"
 #include "Hd/flattenedPurposeDataSourceProvider.h"
 #include "Hd/flattenedVisibilityDataSourceProvider.h"
 #include "Hd/flattenedXformDataSourceProvider.h"
-#include "Hd/coordSysBindingSchema.h"
 #include "Hd/materialBindingsSchema.h"
 #include "Hd/primvarSchema.h"
 #include "Hd/primvarsSchema.h"
@@ -40,27 +40,25 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle
-HdFlattenedDataSourceProviders()
+HdContainerDataSourceHandle HdFlattenedDataSourceProviders()
 {
-    using namespace HdMakeDataSourceContainingFlattenedDataSourceProvider;
+  using namespace HdMakeDataSourceContainingFlattenedDataSourceProvider;
 
-    static HdContainerDataSourceHandle const result =
-        HdRetainedContainerDataSource::New(
-            HdCoordSysBindingSchema::GetSchemaToken(),
-            Make<HdFlattenedOverlayDataSourceProvider>(),
-            HdMaterialBindingsSchema::GetSchemaToken(),
-            Make<HdFlattenedMaterialBindingsDataSourceProvider>(),
-            HdPrimvarsSchema::GetSchemaToken(),
-            Make<HdFlattenedPrimvarsDataSourceProvider>(),
-            HdPurposeSchema::GetSchemaToken(),
-            Make<HdFlattenedPurposeDataSourceProvider>(),
-            HdVisibilitySchema::GetSchemaToken(),
-            Make<HdFlattenedVisibilityDataSourceProvider>(),
-            HdXformSchema::GetSchemaToken(),
-            Make<HdFlattenedXformDataSourceProvider>());
+  static HdContainerDataSourceHandle const result = HdRetainedContainerDataSource::New(
+      HdCoordSysBindingSchema::GetSchemaToken(),
+      Make<HdFlattenedOverlayDataSourceProvider>(),
+      HdMaterialBindingsSchema::GetSchemaToken(),
+      Make<HdFlattenedMaterialBindingsDataSourceProvider>(),
+      HdPrimvarsSchema::GetSchemaToken(),
+      Make<HdFlattenedPrimvarsDataSourceProvider>(),
+      HdPurposeSchema::GetSchemaToken(),
+      Make<HdFlattenedPurposeDataSourceProvider>(),
+      HdVisibilitySchema::GetSchemaToken(),
+      Make<HdFlattenedVisibilityDataSourceProvider>(),
+      HdXformSchema::GetSchemaToken(),
+      Make<HdFlattenedXformDataSourceProvider>());
 
-    return result;
+  return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

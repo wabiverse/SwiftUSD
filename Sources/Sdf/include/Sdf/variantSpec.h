@@ -55,15 +55,14 @@ class SdfPath;
 class SdfVariantSpec : public SdfSpec {
   SDF_DECLARE_SPEC(SdfVariantSpec, SdfSpec);
 
-public:
+ public:
   ///
   /// \name Spec construction
   /// @{
 
   /// Constructs a new instance.
   SDF_API
-  static SdfVariantSpecHandle New(const SdfVariantSetSpecHandle &owner,
-                                  const std::string &name);
+  static SdfVariantSpecHandle New(const SdfVariantSetSpecHandle &owner, const std::string &name);
 
   /// @}
 
@@ -114,9 +113,10 @@ public:
 ///
 /// It creates a variant spec with the given name under the specified variant
 /// set if it doesn't already exist.
-SDF_API SdfVariantSpecHandle SdfCreateVariantInLayer(
-    const SdfLayerHandle &layer, const SdfPath &primPath,
-    const std::string &variantSetName, const std::string &variantName);
+SDF_API SdfVariantSpecHandle SdfCreateVariantInLayer(const SdfLayerHandle &layer,
+                                                     const SdfPath &primPath,
+                                                     const std::string &variantSetName,
+                                                     const std::string &variantName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

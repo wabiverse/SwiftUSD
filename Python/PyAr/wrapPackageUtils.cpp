@@ -33,27 +33,23 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapPackageUtils() {
+void wrapPackageUtils()
+{
   def("IsPackageRelativePath", &ArIsPackageRelativePath, arg("path"));
 
   def("JoinPackageRelativePath",
-      (std::string(*)(const std::vector<std::string> &)) &
-          ArJoinPackageRelativePath,
+      (std::string(*)(const std::vector<std::string> &)) & ArJoinPackageRelativePath,
       arg("paths"));
 
   def("JoinPackageRelativePath",
-      (std::string(*)(const std::pair<std::string, std::string> &)) &
-          ArJoinPackageRelativePath,
+      (std::string(*)(const std::pair<std::string, std::string> &)) & ArJoinPackageRelativePath,
       arg("paths"));
 
   def("JoinPackageRelativePath",
-      (std::string(*)(const std::string &, const std::string &)) &
-          ArJoinPackageRelativePath,
+      (std::string(*)(const std::string &, const std::string &)) & ArJoinPackageRelativePath,
       (arg("packagePath"), arg("packagedPath")));
 
-  def("SplitPackageRelativePathOuter", &ArSplitPackageRelativePathOuter,
-      arg("path"));
+  def("SplitPackageRelativePathOuter", &ArSplitPackageRelativePathOuter, arg("path"));
 
-  def("SplitPackageRelativePathInner", &ArSplitPackageRelativePathInner,
-      arg("path"));
+  def("SplitPackageRelativePathInner", &ArSplitPackageRelativePathInner, arg("path"));
 }

@@ -115,57 +115,73 @@ typedef std::bitset<Usd_PrimNumFlags> Usd_PrimFlagBits;
 struct Usd_Term {
   Usd_Term(Usd_PrimFlags flag) : flag(flag), negated(false) {}
   Usd_Term(Usd_PrimFlags flag, bool negated) : flag(flag), negated(negated) {}
-  Usd_Term operator!() const { return Usd_Term(flag, !negated); }
-  bool operator==(Usd_Term other) const {
+  Usd_Term operator!() const
+  {
+    return Usd_Term(flag, !negated);
+  }
+  bool operator==(Usd_Term other) const
+  {
     return flag == other.flag && negated == other.negated;
   }
-  bool operator!=(Usd_Term other) const { return !(*this == other); }
+  bool operator!=(Usd_Term other) const
+  {
+    return !(*this == other);
+  }
   Usd_PrimFlags flag;
   bool negated;
 };
 
-inline Usd_Term operator!(Usd_PrimFlags flag) {
+inline Usd_Term operator!(Usd_PrimFlags flag)
+{
   return Usd_Term(flag, /*negated=*/true);
 }
 
 // Predicate functor class that tests a prim's flags against desired values.
 class Usd_PrimFlagsPredicate {
-public:
+ public:
   // Functor result type.
   typedef bool result_type;
 
   // Default ctor produces a tautology.
   Usd_PrimFlagsPredicate() : _negate(false) {}
 
-  Usd_PrimFlagsPredicate(Usd_PrimFlags flag) : _negate(false) {
+  Usd_PrimFlagsPredicate(Usd_PrimFlags flag) : _negate(false)
+  {
     _mask[flag] = 1;
     _values[flag] = true;
   }
 
   // Implicit conversion from a single term.
-  Usd_PrimFlagsPredicate(Usd_Term term) : _negate(false) {
+  Usd_PrimFlagsPredicate(Usd_Term term) : _negate(false)
+  {
     _mask[term.flag] = 1;
     _values[term.flag] = !term.negated;
   }
 
   // Convenience to produce a tautological predicate.  Returns a
   // default-constructed predicate.
-  static Usd_PrimFlagsPredicate Tautology() { return Usd_PrimFlagsPredicate(); }
+  static Usd_PrimFlagsPredicate Tautology()
+  {
+    return Usd_PrimFlagsPredicate();
+  }
 
   // Convenience to produce a contradictory predicate.  Returns a negated
   // default-constructed predicate.
-  static Usd_PrimFlagsPredicate Contradiction() {
+  static Usd_PrimFlagsPredicate Contradiction()
+  {
     return Usd_PrimFlagsPredicate()._Negate();
   }
 
   // Set flag to indicate whether prim traversal functions using this
   // predicate should traverse beneath instances and return descendants
   // that pass this predicate as instance proxy prims.
-  Usd_PrimFlagsPredicate &TraverseInstanceProxies(bool traverse) {
+  Usd_PrimFlagsPredicate &TraverseInstanceProxies(bool traverse)
+  {
     if (traverse) {
       _mask[Usd_PrimInstanceProxyFlag] = 0;
       _values[Usd_PrimInstanceProxyFlag] = 1;
-    } else {
+    }
+    else {
       _mask[Usd_PrimInstanceProxyFlag] = 1;
       _values[Usd_PrimInstanceProxyFlag] = 0;
     }
@@ -174,36 +190,50 @@ public:
 
   // Returns true if this predicate was explicitly set to include
   // instance proxies, false otherwise.
-  bool IncludeInstanceProxiesInTraversal() const {
-    return !_mask[Usd_PrimInstanceProxyFlag] &&
-           _values[Usd_PrimInstanceProxyFlag];
+  bool IncludeInstanceProxiesInTraversal() const
+  {
+    return !_mask[Usd_PrimInstanceProxyFlag] && _values[Usd_PrimInstanceProxyFlag];
   }
 
   // Invoke boolean predicate on UsdPrim \p prim.
   USD_API
   bool operator()(const class UsdPrim &prim) const;
 
-protected:
+ protected:
   // Return true if this predicate is a tautology, false otherwise.
-  bool _IsTautology() const { return *this == Tautology(); }
+  bool _IsTautology() const
+  {
+    return *this == Tautology();
+  }
 
   // Set this predicate to be a tautology.
-  void _MakeTautology() { *this = Tautology(); }
+  void _MakeTautology()
+  {
+    *this = Tautology();
+  }
 
   // Return true if this predicate is a contradiction, false otherwise.
-  bool _IsContradiction() const { return *this == Contradiction(); }
+  bool _IsContradiction() const
+  {
+    return *this == Contradiction();
+  }
 
   // Set this predicate to be a contradiction.
-  void _MakeContradiction() { *this = Contradiction(); }
+  void _MakeContradiction()
+  {
+    *this = Contradiction();
+  }
 
   // Negate this predicate.
-  Usd_PrimFlagsPredicate &_Negate() {
+  Usd_PrimFlagsPredicate &_Negate()
+  {
     _negate = !_negate;
     return *this;
   }
 
   // Return a negated copy of this predicate.
-  Usd_PrimFlagsPredicate _GetNegated() const {
+  Usd_PrimFlagsPredicate _GetNegated() const
+  {
     return Usd_PrimFlagsPredicate(*this)._Negate();
   }
 
@@ -213,16 +243,15 @@ protected:
   // Desired values for prim flags.
   Usd_PrimFlagBits _values;
 
-private:
+ private:
   // Evaluate this predicate with prim data \p prim. \p isInstanceProxy
   // should be true if this is being evaluated for an instance proxy prim.
-  template <class PrimPtr>
-  bool _Eval(const PrimPtr &prim, bool isInstanceProxy) const {
+  template<class PrimPtr> bool _Eval(const PrimPtr &prim, bool isInstanceProxy) const
+  {
     // Manually set the instance proxy bit, since instance proxy
     // state is never stored in Usd_PrimData's flags.
     const Usd_PrimFlagBits primFlags =
-        Usd_PrimFlagBits(prim->_GetFlags())
-            .set(Usd_PrimInstanceProxyFlag, isInstanceProxy);
+        Usd_PrimFlagBits(prim->_GetFlags()).set(Usd_PrimInstanceProxyFlag, isInstanceProxy);
 
     // Mask the prim's flags, compare to desired values, then optionally
     // negate the result.
@@ -231,36 +260,39 @@ private:
 
   // Evaluate the predicate \p pred with prim data \p prim. \p isInstanceProxy
   // should be true if this is being evaluated for an instance proxy prim.
-  template <class PrimPtr>
+  template<class PrimPtr>
   friend bool Usd_EvalPredicate(const Usd_PrimFlagsPredicate &pred,
-                                const PrimPtr &prim, bool isInstanceProxy) {
+                                const PrimPtr &prim,
+                                bool isInstanceProxy)
+  {
     return pred._Eval(prim, isInstanceProxy);
   }
 
   // Convenience method for evaluating \p pred using \p prim and
   // \p proxyPrimPath to determine whether this is for an instance proxy
   // prim.
-  template <class PrimPtr>
+  template<class PrimPtr>
   friend bool Usd_EvalPredicate(const Usd_PrimFlagsPredicate &pred,
                                 const PrimPtr &prim,
-                                const SdfPath &proxyPrimPath) {
+                                const SdfPath &proxyPrimPath)
+  {
     return pred._Eval(prim, Usd_IsInstanceProxy(prim, proxyPrimPath));
   }
 
   // Equality comparison.
-  friend bool operator==(const Usd_PrimFlagsPredicate &lhs,
-                         const Usd_PrimFlagsPredicate &rhs) {
-    return lhs._mask == rhs._mask && lhs._values == rhs._values &&
-           lhs._negate == rhs._negate;
+  friend bool operator==(const Usd_PrimFlagsPredicate &lhs, const Usd_PrimFlagsPredicate &rhs)
+  {
+    return lhs._mask == rhs._mask && lhs._values == rhs._values && lhs._negate == rhs._negate;
   }
   // Inequality comparison.
-  friend bool operator!=(const Usd_PrimFlagsPredicate &lhs,
-                         const Usd_PrimFlagsPredicate &rhs) {
+  friend bool operator!=(const Usd_PrimFlagsPredicate &lhs, const Usd_PrimFlagsPredicate &rhs)
+  {
     return !(lhs == rhs);
   }
 
   // hash overload.
-  friend size_t hash_value(const Usd_PrimFlagsPredicate &p) {
+  friend size_t hash_value(const Usd_PrimFlagsPredicate &p)
+  {
     return TfHash::Combine(p._mask.to_ulong(), p._values.to_ulong(), p._negate);
   }
 
@@ -279,15 +311,19 @@ private:
 ///
 /// See primFlags.h for more details.
 class Usd_PrimFlagsConjunction : public Usd_PrimFlagsPredicate {
-public:
+ public:
   /// Default constructed conjunction is a tautology.
-  Usd_PrimFlagsConjunction(){};
+  Usd_PrimFlagsConjunction() {};
 
   /// Construct with a term.
-  explicit Usd_PrimFlagsConjunction(Usd_Term term) { *this &= term; }
+  explicit Usd_PrimFlagsConjunction(Usd_Term term)
+  {
+    *this &= term;
+  }
 
   /// Add an additional term to this conjunction.
-  Usd_PrimFlagsConjunction &operator&=(Usd_Term term) {
+  Usd_PrimFlagsConjunction &operator&=(Usd_Term term)
+  {
     // If this conjunction is a contradiction, do nothing.
     if (ARCH_UNLIKELY(_IsContradiction()))
       return *this;
@@ -296,7 +332,8 @@ public:
     if (!_mask[term.flag]) {
       _mask[term.flag] = 1;
       _values[term.flag] = !term.negated;
-    } else if (_values[term.flag] != !term.negated) {
+    }
+    else if (_values[term.flag] != !term.negated) {
       // If we do have the bit and the values disagree, then this entire
       // conjunction becomes a contradiction.  If the values agree, it's
       // redundant and we do nothing.
@@ -325,43 +362,45 @@ public:
   USD_API
   class Usd_PrimFlagsDisjunction operator!() const;
 
-private:
+ private:
   // Let Usd_PrimFlagsDisjunction produce conjunctions when negated
   friend class Usd_PrimFlagsDisjunction;
-  Usd_PrimFlagsConjunction(const Usd_PrimFlagsPredicate &base)
-      : Usd_PrimFlagsPredicate(base) {}
+  Usd_PrimFlagsConjunction(const Usd_PrimFlagsPredicate &base) : Usd_PrimFlagsPredicate(base) {}
 
   /// Combine two terms to make a conjunction.
   friend Usd_PrimFlagsConjunction operator&&(Usd_Term lhs, Usd_Term rhs);
 
   /// Create a new conjunction with the term \p rhs added.
-  friend Usd_PrimFlagsConjunction
-  operator&&(const Usd_PrimFlagsConjunction &conjunction, Usd_Term rhs);
+  friend Usd_PrimFlagsConjunction operator&&(const Usd_PrimFlagsConjunction &conjunction,
+                                             Usd_Term rhs);
 
   /// Create a new conjunction with the term \p lhs added.
-  friend Usd_PrimFlagsConjunction
-  operator&&(Usd_Term lhs, const Usd_PrimFlagsConjunction &conjunction);
+  friend Usd_PrimFlagsConjunction operator&&(Usd_Term lhs,
+                                             const Usd_PrimFlagsConjunction &conjunction);
 };
 
-inline Usd_PrimFlagsConjunction operator&&(Usd_Term lhs, Usd_Term rhs) {
+inline Usd_PrimFlagsConjunction operator&&(Usd_Term lhs, Usd_Term rhs)
+{
   // Apparently gcc 4.8.x doesn't like this as:
   // return (Usd_PrimFlagsConjunction() && lhs) && rhs;
   Usd_PrimFlagsConjunction tmp;
   return (tmp && lhs) && rhs;
 }
 
-inline Usd_PrimFlagsConjunction
-operator&&(const Usd_PrimFlagsConjunction &conjunction, Usd_Term rhs) {
+inline Usd_PrimFlagsConjunction operator&&(const Usd_PrimFlagsConjunction &conjunction,
+                                           Usd_Term rhs)
+{
   return Usd_PrimFlagsConjunction(conjunction) &= rhs;
 }
 
-inline Usd_PrimFlagsConjunction
-operator&&(Usd_Term lhs, const Usd_PrimFlagsConjunction &conjunction) {
+inline Usd_PrimFlagsConjunction operator&&(Usd_Term lhs,
+                                           const Usd_PrimFlagsConjunction &conjunction)
+{
   return Usd_PrimFlagsConjunction(conjunction) &= lhs;
 }
 
-inline Usd_PrimFlagsConjunction operator&&(Usd_PrimFlags lhs,
-                                           Usd_PrimFlags rhs) {
+inline Usd_PrimFlagsConjunction operator&&(Usd_PrimFlags lhs, Usd_PrimFlags rhs)
+{
   return Usd_Term(lhs) && Usd_Term(rhs);
 }
 
@@ -376,18 +415,23 @@ inline Usd_PrimFlagsConjunction operator&&(Usd_PrimFlags lhs,
 ///
 /// See primFlags.h for more details.
 class Usd_PrimFlagsDisjunction : public Usd_PrimFlagsPredicate {
-public:
+ public:
   // Default constructed disjunction is a contradiction.
-  Usd_PrimFlagsDisjunction() { _Negate(); };
+  Usd_PrimFlagsDisjunction()
+  {
+    _Negate();
+  };
 
   // Construct with a term.
-  explicit Usd_PrimFlagsDisjunction(Usd_Term term) {
+  explicit Usd_PrimFlagsDisjunction(Usd_Term term)
+  {
     _Negate();
     *this |= term;
   }
 
   /// Add an additional term to this disjunction.
-  Usd_PrimFlagsDisjunction &operator|=(Usd_Term term) {
+  Usd_PrimFlagsDisjunction &operator|=(Usd_Term term)
+  {
     // If this disjunction is a tautology, do nothing.
     if (ARCH_UNLIKELY(_IsTautology()))
       return *this;
@@ -396,7 +440,8 @@ public:
     if (!_mask[term.flag]) {
       _mask[term.flag] = 1;
       _values[term.flag] = term.negated;
-    } else if (_values[term.flag] != term.negated) {
+    }
+    else if (_values[term.flag] != term.negated) {
       // If we do have the bit and the values disagree, then this entire
       // disjunction becomes a tautology.  If the values agree, it's
       // redundant and we do nothing.
@@ -425,40 +470,42 @@ public:
   USD_API
   class Usd_PrimFlagsConjunction operator!() const;
 
-private:
+ private:
   // Let Usd_PrimFlagsDisjunction produce conjunctions when negated.
   friend class Usd_PrimFlagsConjunction;
-  Usd_PrimFlagsDisjunction(const Usd_PrimFlagsPredicate &base)
-      : Usd_PrimFlagsPredicate(base) {}
+  Usd_PrimFlagsDisjunction(const Usd_PrimFlagsPredicate &base) : Usd_PrimFlagsPredicate(base) {}
 
   /// Combine two terms to make a disjunction.
   friend Usd_PrimFlagsDisjunction operator||(Usd_Term lhs, Usd_Term rhs);
 
   /// Create a new disjunction with the term \p rhs added.
-  friend Usd_PrimFlagsDisjunction
-  operator||(const Usd_PrimFlagsDisjunction &disjunction, Usd_Term rhs);
+  friend Usd_PrimFlagsDisjunction operator||(const Usd_PrimFlagsDisjunction &disjunction,
+                                             Usd_Term rhs);
 
   /// Create a new disjunction with the term \p lhs added.
-  friend Usd_PrimFlagsDisjunction
-  operator||(Usd_Term lhs, const Usd_PrimFlagsDisjunction &disjunction);
+  friend Usd_PrimFlagsDisjunction operator||(Usd_Term lhs,
+                                             const Usd_PrimFlagsDisjunction &disjunction);
 };
 
-inline Usd_PrimFlagsDisjunction operator||(Usd_Term lhs, Usd_Term rhs) {
+inline Usd_PrimFlagsDisjunction operator||(Usd_Term lhs, Usd_Term rhs)
+{
   return (Usd_PrimFlagsDisjunction() || lhs) || rhs;
 }
 
-inline Usd_PrimFlagsDisjunction
-operator||(const Usd_PrimFlagsDisjunction &disjunction, Usd_Term rhs) {
+inline Usd_PrimFlagsDisjunction operator||(const Usd_PrimFlagsDisjunction &disjunction,
+                                           Usd_Term rhs)
+{
   return Usd_PrimFlagsDisjunction(disjunction) |= rhs;
 }
 
-inline Usd_PrimFlagsDisjunction
-operator||(Usd_Term lhs, const Usd_PrimFlagsDisjunction &disjunction) {
+inline Usd_PrimFlagsDisjunction operator||(Usd_Term lhs,
+                                           const Usd_PrimFlagsDisjunction &disjunction)
+{
   return Usd_PrimFlagsDisjunction(disjunction) |= lhs;
 }
 
-inline Usd_PrimFlagsDisjunction operator||(Usd_PrimFlags lhs,
-                                           Usd_PrimFlags rhs) {
+inline Usd_PrimFlagsDisjunction operator||(Usd_PrimFlags lhs, Usd_PrimFlags rhs)
+{
   return Usd_Term(lhs) || Usd_Term(rhs);
 }
 
@@ -509,13 +556,12 @@ static const Usd_PrimFlags UsdPrimIsGroup = Usd_PrimGroupFlag;
 static const Usd_PrimFlags UsdPrimIsAbstract = Usd_PrimAbstractFlag;
 static const Usd_PrimFlags UsdPrimIsDefined = Usd_PrimDefinedFlag;
 static const Usd_PrimFlags UsdPrimIsInstance = Usd_PrimInstanceFlag;
-static const Usd_PrimFlags UsdPrimHasDefiningSpecifier =
-    Usd_PrimHasDefiningSpecifierFlag;
+static const Usd_PrimFlags UsdPrimHasDefiningSpecifier = Usd_PrimHasDefiningSpecifierFlag;
 
 USD_API extern const Usd_PrimFlagsConjunction UsdPrimDefaultPredicate;
 USD_API extern const Usd_PrimFlagsPredicate UsdPrimAllPrimsPredicate;
 
-#endif // doxygen
+#endif  // doxygen
 
 /// This function is used to allow the prim traversal functions listed under
 /// \ref Usd_PrimFlags "Prim predicate flags" to traverse beneath instance
@@ -547,8 +593,8 @@ USD_API extern const Usd_PrimFlagsPredicate UsdPrimAllPrimsPredicate;
 ///
 /// However, this function may be more convenient, especially when calling
 /// a prim traversal function with a default-constructed tautology predicate.
-inline Usd_PrimFlagsPredicate
-UsdTraverseInstanceProxies(Usd_PrimFlagsPredicate predicate) {
+inline Usd_PrimFlagsPredicate UsdTraverseInstanceProxies(Usd_PrimFlagsPredicate predicate)
+{
   return predicate.TraverseInstanceProxies(true);
 }
 
@@ -556,10 +602,11 @@ UsdTraverseInstanceProxies(Usd_PrimFlagsPredicate predicate) {
 /// Convenience method equivalent to calling UsdTraverseInstanceProxies
 /// with the UsdPrimDefaultPredicate that is used by default for prim
 /// traversals.
-inline Usd_PrimFlagsPredicate UsdTraverseInstanceProxies() {
+inline Usd_PrimFlagsPredicate UsdTraverseInstanceProxies()
+{
   return UsdTraverseInstanceProxies(UsdPrimDefaultPredicate);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_FLAGS_H
+#endif  // PXR_USD_USD_PRIM_FLAGS_H

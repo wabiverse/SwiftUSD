@@ -28,9 +28,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#define AXIOM(cond)               \
-  if (!(cond))                    \
-  {                               \
+#define AXIOM(cond) \
+  if (!(cond)) { \
     ARCH_ERROR("failed: " #cond); \
   }
 
@@ -45,10 +44,8 @@ int main()
   {
     ARCH_ERROR("float is not IEEE-754 compliant");
   }
-  if (ArchDoubleToBitPattern(5.6263470058989390e-221) !=
-          0x1234567811223344ULL ||
-      ArchBitPatternToDouble(0x1234567811223344ULL) !=
-          5.6263470058989390e-221)
+  if (ArchDoubleToBitPattern(5.6263470058989390e-221) != 0x1234567811223344ULL ||
+      ArchBitPatternToDouble(0x1234567811223344ULL) != 5.6263470058989390e-221)
   {
     ARCH_ERROR("double is not IEEE-754 compliant");
   }

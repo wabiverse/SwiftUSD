@@ -36,12 +36,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 // also uses const member variables, using an explicit empty c'tor guards
 // against the above issue should any members be added or changed.
 
-HdCommandArgDescriptor::HdCommandArgDescriptor()
-{
-}
+HdCommandArgDescriptor::HdCommandArgDescriptor() {}
 
-HdCommandDescriptor::HdCommandDescriptor()
-{
-}
+HdCommandDescriptor::HdCommandDescriptor() {}
 
 PXR_NAMESPACE_CLOSE_SCOPE

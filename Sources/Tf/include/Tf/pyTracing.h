@@ -27,8 +27,8 @@
 #include <pxr/pxrns.h>
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "Tf/pySafePython.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "Tf/pySafePython.h"
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/api.h"
 
@@ -68,8 +68,8 @@ void Tf_PyTracingPythonInitialized();
 struct TfPyTraceInfo;
 typedef std::function<void(TfPyTraceInfo const &)> TfPyTraceFn;
 typedef std::shared_ptr<TfPyTraceFn> TfPyTraceFnId;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_TRACING_H
+#endif  // PXR_BASE_TF_PY_TRACING_H

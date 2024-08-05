@@ -48,7 +48,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class GfVec3f;
 
-template <> struct GfIsGfVec<class GfVec3f> {
+template<> struct GfIsGfVec<class GfVec3f> {
   static const bool value = true;
 };
 
@@ -61,7 +61,7 @@ template <> struct GfIsGfVec<class GfVec3f> {
 /// It is intended to be fast and simple.
 ///
 class GfVec3f {
-public:
+ public:
   /// Scalar element type and dimension.
   typedef float ScalarType;
   static const size_t dimension = 3;
@@ -76,8 +76,7 @@ public:
   constexpr GfVec3f(float s0, float s1, float s2) : _data{s0, s1, s2} {}
 
   /// Construct with pointer to values.
-  template <class Scl>
-  constexpr explicit GfVec3f(Scl const *p) : _data{p[0], p[1], p[2]} {}
+  template<class Scl> constexpr explicit GfVec3f(Scl const *p) : _data{p[0], p[1], p[2]} {}
 
   /// Construct from GfVec3d.
   explicit GfVec3f(class GfVec3d const &other);
@@ -89,19 +88,22 @@ public:
   GfVec3f(class GfVec3i const &other);
 
   /// Create a unit vector along the X-axis.
-  static GfVec3f XAxis() {
+  static GfVec3f XAxis()
+  {
     GfVec3f result(0);
     result[0] = 1;
     return result;
   }
   /// Create a unit vector along the Y-axis.
-  static GfVec3f YAxis() {
+  static GfVec3f YAxis()
+  {
     GfVec3f result(0);
     result[1] = 1;
     return result;
   }
   /// Create a unit vector along the Z-axis.
-  static GfVec3f ZAxis() {
+  static GfVec3f ZAxis()
+  {
     GfVec3f result(0);
     result[2] = 1;
     return result;
@@ -109,7 +111,8 @@ public:
 
   /// Create a unit vector along the i-th axis, zero-based.  Return the zero
   /// vector if \p i is greater than or equal to 3.
-  static GfVec3f Axis(size_t i) {
+  static GfVec3f Axis(size_t i)
+  {
     GfVec3f result(0);
     if (i < 3)
       result[i] = 1;
@@ -117,7 +120,8 @@ public:
   }
 
   /// Set all elements with passed arguments.
-  GfVec3f &Set(float s0, float s1, float s2) {
+  GfVec3f &Set(float s0, float s1, float s2)
+  {
     _data[0] = s0;
     _data[1] = s1;
     _data[2] = s2;
@@ -125,27 +129,50 @@ public:
   }
 
   /// Set all elements with a pointer to data.
-  GfVec3f &Set(float const *a) { return Set(a[0], a[1], a[2]); }
+  GfVec3f &Set(float const *a)
+  {
+    return Set(a[0], a[1], a[2]);
+  }
 
   /// Direct data access.
-  float const *data() const { return _data; }
-  float *data() { return _data; }
-  float const *GetArray() const { return data(); }
+  float const *data() const
+  {
+    return _data;
+  }
+  float *data()
+  {
+    return _data;
+  }
+  float const *GetArray() const
+  {
+    return data();
+  }
 
   /// Indexing.
-  float const &operator[](size_t i) const { return _data[i]; }
-  float &operator[](size_t i) { return _data[i]; }
+  float const &operator[](size_t i) const
+  {
+    return _data[i];
+  }
+  float &operator[](size_t i)
+  {
+    return _data[i];
+  }
 
   /// Hash.
-  friend inline size_t hash_value(GfVec3f const &vec) {
+  friend inline size_t hash_value(GfVec3f const &vec)
+  {
     return TfHash::Combine(vec[0], vec[1], vec[2]);
   }
 
   /// Equality comparison.
-  bool operator==(GfVec3f const &other) const {
+  bool operator==(GfVec3f const &other) const
+  {
     return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
   }
-  bool operator!=(GfVec3f const &other) const { return !(*this == other); }
+  bool operator!=(GfVec3f const &other) const
+  {
+    return !(*this == other);
+  }
 
   // TODO Add inequality for other vec types...
   /// Equality comparison.
@@ -159,52 +186,71 @@ public:
   bool operator==(class GfVec3i const &other) const;
 
   /// Create a vec with negated elements.
-  GfVec3f operator-() const { return GfVec3f(-_data[0], -_data[1], -_data[2]); }
+  GfVec3f operator-() const
+  {
+    return GfVec3f(-_data[0], -_data[1], -_data[2]);
+  }
 
   /// Addition.
-  GfVec3f &operator+=(GfVec3f const &other) {
+  GfVec3f &operator+=(GfVec3f const &other)
+  {
     _data[0] += other[0];
     _data[1] += other[1];
     _data[2] += other[2];
     return *this;
   }
-  friend GfVec3f operator+(GfVec3f const &l, GfVec3f const &r) {
+  friend GfVec3f operator+(GfVec3f const &l, GfVec3f const &r)
+  {
     return GfVec3f(l) += r;
   }
 
   /// Subtraction.
-  GfVec3f &operator-=(GfVec3f const &other) {
+  GfVec3f &operator-=(GfVec3f const &other)
+  {
     _data[0] -= other[0];
     _data[1] -= other[1];
     _data[2] -= other[2];
     return *this;
   }
-  friend GfVec3f operator-(GfVec3f const &l, GfVec3f const &r) {
+  friend GfVec3f operator-(GfVec3f const &l, GfVec3f const &r)
+  {
     return GfVec3f(l) -= r;
   }
 
   /// Multiplication by scalar.
-  GfVec3f &operator*=(double s) {
+  GfVec3f &operator*=(double s)
+  {
     _data[0] *= s;
     _data[1] *= s;
     _data[2] *= s;
     return *this;
   }
-  GfVec3f operator*(double s) const { return GfVec3f(*this) *= s; }
-  friend GfVec3f operator*(double s, GfVec3f const &v) { return v * s; }
+  GfVec3f operator*(double s) const
+  {
+    return GfVec3f(*this) *= s;
+  }
+  friend GfVec3f operator*(double s, GfVec3f const &v)
+  {
+    return v * s;
+  }
 
   /// Division by scalar.
   // TODO should divide by the scalar type.
-  GfVec3f &operator/=(double s) {
+  GfVec3f &operator/=(double s)
+  {
     // TODO This should not multiply by 1/s, it should do the division.
     // Doing the division is more numerically stable when s is close to
     // zero.
     return *this *= (1.0 / s);
   }
-  GfVec3f operator/(double s) const { return *this * (1.0 / s); }
+  GfVec3f operator/(double s) const
+  {
+    return *this * (1.0 / s);
+  }
 
   /// See GfDot().
-  float operator*(GfVec3f const &v) const {
+  float operator*(GfVec3f const &v) const
+  {
     return _data[0] * v[0] + _data[1] * v[1] + _data[2] * v[2];
   }
 
@@ -212,22 +258,32 @@ public:
   /// \code
   /// v * (*this * v)
   /// \endcode
-  GfVec3f GetProjection(GfVec3f const &v) const { return v * (*this * v); }
+  GfVec3f GetProjection(GfVec3f const &v) const
+  {
+    return v * (*this * v);
+  }
 
   /// Returns the orthogonal complement of \p this->GetProjection(b).
   /// That is:
   /// \code
   ///  *this - this->GetProjection(b)
   /// \endcode
-  GfVec3f GetComplement(GfVec3f const &b) const {
+  GfVec3f GetComplement(GfVec3f const &b) const
+  {
     return *this - this->GetProjection(b);
   }
 
   /// Squared length.
-  float GetLengthSq() const { return *this * *this; }
+  float GetLengthSq() const
+  {
+    return *this * *this;
+  }
 
   /// Length
-  float GetLength() const { return GfSqrt(GetLengthSq()); }
+  float GetLength() const
+  {
+    return GfSqrt(GetLengthSq());
+  }
 
   /// Normalizes the vector in place to unit length, returning the
   /// length before normalization. If the length of the vector is
@@ -237,7 +293,8 @@ public:
   /// \todo This was fixed for bug 67777. This is a gcc64 optimizer bug.
   /// By tickling the code, it no longer tries to write into
   /// an illegal memory address (in the code section of memory).
-  float Normalize(float eps = GF_MIN_VECTOR_LENGTH) {
+  float Normalize(float eps = GF_MIN_VECTOR_LENGTH)
+  {
     // TODO this seems suspect...  suggest dividing by length so long as
     // length is not zero.
     float length = GetLength();
@@ -245,7 +302,8 @@ public:
     return length;
   }
 
-  GfVec3f GetNormalized(float eps = GF_MIN_VECTOR_LENGTH) const {
+  GfVec3f GetNormalized(float eps = GF_MIN_VECTOR_LENGTH) const
+  {
     GfVec3f normalized(*this);
     normalized.Normalize(eps);
     return normalized;
@@ -261,7 +319,9 @@ public:
   /// iteration limit. Colinear vectors will be unaltered, and the method
   /// will return false.
   GF_API
-  static bool OrthogonalizeBasis(GfVec3f *tx, GfVec3f *ty, GfVec3f *tz,
+  static bool OrthogonalizeBasis(GfVec3f *tx,
+                                 GfVec3f *ty,
+                                 GfVec3f *tz,
                                  const bool normalize,
                                  double eps = GF_MIN_ORTHO_TOLERANCE);
 
@@ -270,10 +330,9 @@ public:
   /// then v1 and v2 will have magnitude L/eps.  As a result, the function
   /// delivers a continuous result as *this shrinks in length.
   GF_API
-  void BuildOrthonormalFrame(GfVec3f *v1, GfVec3f *v2,
-                             float eps = GF_MIN_VECTOR_LENGTH) const;
+  void BuildOrthonormalFrame(GfVec3f *v1, GfVec3f *v2, float eps = GF_MIN_VECTOR_LENGTH) const;
 
-private:
+ private:
   float _data[3];
 };
 
@@ -289,50 +348,62 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-inline GfVec3f::GfVec3f(class GfVec3d const &other) {
+inline GfVec3f::GfVec3f(class GfVec3d const &other)
+{
   _data[0] = other[0];
   _data[1] = other[1];
   _data[2] = other[2];
 }
-inline GfVec3f::GfVec3f(class GfVec3h const &other) {
+inline GfVec3f::GfVec3f(class GfVec3h const &other)
+{
   _data[0] = other[0];
   _data[1] = other[1];
   _data[2] = other[2];
 }
-inline GfVec3f::GfVec3f(class GfVec3i const &other) {
+inline GfVec3f::GfVec3f(class GfVec3i const &other)
+{
   _data[0] = other[0];
   _data[1] = other[1];
   _data[2] = other[2];
 }
 
 /// Returns component-wise multiplication of vectors \p v1 and \p v2.
-inline GfVec3f GfCompMult(GfVec3f const &v1, GfVec3f const &v2) {
+inline GfVec3f GfCompMult(GfVec3f const &v1, GfVec3f const &v2)
+{
   return GfVec3f(v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2]);
 }
 
 /// Returns component-wise quotient of vectors \p v1 and \p v2.
-inline GfVec3f GfCompDiv(GfVec3f const &v1, GfVec3f const &v2) {
+inline GfVec3f GfCompDiv(GfVec3f const &v1, GfVec3f const &v2)
+{
   return GfVec3f(v1[0] / v2[0], v1[1] / v2[1], v1[2] / v2[2]);
 }
 
 /// Returns the dot (inner) product of two vectors.
-inline float GfDot(GfVec3f const &v1, GfVec3f const &v2) { return v1 * v2; }
+inline float GfDot(GfVec3f const &v1, GfVec3f const &v2)
+{
+  return v1 * v2;
+}
 
 /// Returns the geometric length of \c v.
-inline float GfGetLength(GfVec3f const &v) { return v.GetLength(); }
+inline float GfGetLength(GfVec3f const &v)
+{
+  return v.GetLength();
+}
 
 /// Normalizes \c *v in place to unit length, returning the length before
 /// normalization. If the length of \c *v is smaller than \p eps then \c *v is
 /// set to \c *v/eps.  The original length of \c *v is returned.
-inline float GfNormalize(GfVec3f *v, float eps = GF_MIN_VECTOR_LENGTH) {
+inline float GfNormalize(GfVec3f *v, float eps = GF_MIN_VECTOR_LENGTH)
+{
   return v->Normalize(eps);
 }
 
 /// Returns a normalized (unit-length) vector with the same direction as \p v.
 /// If the length of this vector is smaller than \p eps, the vector divided by
 /// \p eps is returned.
-inline GfVec3f GfGetNormalized(GfVec3f const &v,
-                               float eps = GF_MIN_VECTOR_LENGTH) {
+inline GfVec3f GfGetNormalized(GfVec3f const &v, float eps = GF_MIN_VECTOR_LENGTH)
+{
   return v.GetNormalized(eps);
 }
 
@@ -340,7 +411,8 @@ inline GfVec3f GfGetNormalized(GfVec3f const &v,
 /// \code
 /// b * (a * b)
 /// \endcode
-inline GfVec3f GfGetProjection(GfVec3f const &a, GfVec3f const &b) {
+inline GfVec3f GfGetProjection(GfVec3f const &a, GfVec3f const &b)
+{
   return a.GetProjection(b);
 }
 
@@ -348,33 +420,38 @@ inline GfVec3f GfGetProjection(GfVec3f const &a, GfVec3f const &b) {
 /// \code
 ///  a - a.GetProjection(b)
 /// \endcode
-inline GfVec3f GfGetComplement(GfVec3f const &a, GfVec3f const &b) {
+inline GfVec3f GfGetComplement(GfVec3f const &a, GfVec3f const &b)
+{
   return a.GetComplement(b);
 }
 
 /// Tests for equality within a given tolerance, returning \c true if the
 /// length of the difference vector is less than or equal to \p tolerance.
-inline bool GfIsClose(GfVec3f const &v1, GfVec3f const &v2, double tolerance) {
+inline bool GfIsClose(GfVec3f const &v1, GfVec3f const &v2, double tolerance)
+{
   GfVec3f delta = v1 - v2;
   return delta.GetLengthSq() <= tolerance * tolerance;
 }
 
-GF_API bool GfOrthogonalizeBasis(GfVec3f *tx, GfVec3f *ty, GfVec3f *tz,
-                                 bool normalize,
-                                 double eps = GF_MIN_ORTHO_TOLERANCE);
+GF_API bool GfOrthogonalizeBasis(
+    GfVec3f *tx, GfVec3f *ty, GfVec3f *tz, bool normalize, double eps = GF_MIN_ORTHO_TOLERANCE);
 
-GF_API void GfBuildOrthonormalFrame(GfVec3f const &v0, GfVec3f *v1, GfVec3f *v2,
+GF_API void GfBuildOrthonormalFrame(GfVec3f const &v0,
+                                    GfVec3f *v1,
+                                    GfVec3f *v2,
                                     float eps = GF_MIN_VECTOR_LENGTH);
 
 /// Returns the cross product of \p v1 and \p v2.
-inline GfVec3f GfCross(GfVec3f const &v1, GfVec3f const &v2) {
-  return GfVec3f(v1[1] * v2[2] - v1[2] * v2[1], v1[2] * v2[0] - v1[0] * v2[2],
-                 v1[0] * v2[1] - v1[1] * v2[0]);
+inline GfVec3f GfCross(GfVec3f const &v1, GfVec3f const &v2)
+{
+  return GfVec3f(
+      v1[1] * v2[2] - v1[2] * v2[1], v1[2] * v2[0] - v1[0] * v2[2], v1[0] * v2[1] - v1[1] * v2[0]);
 }
 
 /// Returns the cross product of \p v1 and \p v2.
 /// \see GfCross()
-inline GfVec3f operator^(GfVec3f const &v1, GfVec3f const &v2) {
+inline GfVec3f operator^(GfVec3f const &v1, GfVec3f const &v2)
+{
   return GfCross(v1, v2);
 }
 
@@ -383,4 +460,4 @@ GF_API GfVec3f GfSlerp(double alpha, GfVec3f const &v0, GfVec3f const &v1);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_VEC3F_H
+#endif  // PXR_BASE_GF_VEC3F_H

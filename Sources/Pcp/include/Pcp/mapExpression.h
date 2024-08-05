@@ -53,7 +53,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// computation when one of the inputs changes.
 ///
 class PcpMapExpression {
-public:
+ public:
   /// The value type of PcpMapExpression is a PcpMapFunction.
   typedef PcpMapFunction Value;
 
@@ -68,10 +68,16 @@ public:
   PcpMapExpression() noexcept = default;
 
   /// Swap this expression with the other.
-  void Swap(PcpMapExpression &other) noexcept { _node.swap(other._node); }
+  void Swap(PcpMapExpression &other) noexcept
+  {
+    _node.swap(other._node);
+  }
 
   /// Return true if this is a null expression.
-  bool IsNull() const noexcept { return !_node; }
+  bool IsNull() const noexcept
+  {
+    return !_node;
+  }
 
   /// \name Creating expressions
   /// @{
@@ -91,7 +97,7 @@ public:
     Variable(Variable const &) = delete;
     Variable &operator=(Variable const &) = delete;
 
-  public:
+   public:
     Variable() = default;
     virtual ~Variable();
     /// Return the current value.
@@ -131,9 +137,9 @@ public:
   PcpMapExpression AddRootIdentity() const;
 
   /// Return true if the map function is the constant identity function.
-  bool IsConstantIdentity() const {
-    return _node && _node->key.op == _OpConstant &&
-           _node->key.valueForConstant.IsIdentity();
+  bool IsConstantIdentity() const
+  {
+    return _node && _node->key.op == _OpConstant && _node->key.valueForConstant.IsIdentity();
   }
 
   /// @}
@@ -145,32 +151,41 @@ public:
 
   /// Return true if the evaluated map function is the identity function.
   /// For identity, MapSourceToTarget() always returns the path unchanged.
-  bool IsIdentity() const { return Evaluate().IsIdentity(); }
+  bool IsIdentity() const
+  {
+    return Evaluate().IsIdentity();
+  }
 
   /// Map a path in the source namespace to the target.
   /// If the path is not in the domain, returns an empty path.
-  SdfPath MapSourceToTarget(const SdfPath &path) const {
+  SdfPath MapSourceToTarget(const SdfPath &path) const
+  {
     return Evaluate().MapSourceToTarget(path);
   }
 
   /// Map a path in the target namespace to the source.
   /// If the path is not in the co-domain, returns an empty path.
-  SdfPath MapTargetToSource(const SdfPath &path) const {
+  SdfPath MapTargetToSource(const SdfPath &path) const
+  {
     return Evaluate().MapTargetToSource(path);
   }
 
   /// The time offset of the mapping.
-  const SdfLayerOffset &GetTimeOffset() const {
+  const SdfLayerOffset &GetTimeOffset() const
+  {
     return Evaluate().GetTimeOffset();
   }
 
   /// Returns a string representation of this mapping for debugging
   /// purposes.
-  std::string GetString() const { return Evaluate().GetString(); }
+  std::string GetString() const
+  {
+    return Evaluate().GetString();
+  }
 
   /// @}
 
-private:
+ private:
   // Allow Pcp_Statistics access to internal data for diagnostics.
   friend class Pcp_Statistics;
   friend struct Pcp_VariableImpl;
@@ -180,20 +195,14 @@ private:
 
   explicit PcpMapExpression(const _NodeRefPtr &node) : _node(node) {}
 
-private: // data
-  enum _Op {
-    _OpConstant,
-    _OpVariable,
-    _OpInverse,
-    _OpCompose,
-    _OpAddRootIdentity
-  };
+ private:  // data
+  enum _Op { _OpConstant, _OpVariable, _OpInverse, _OpCompose, _OpAddRootIdentity };
 
   class _Node {
     _Node(const _Node &) = delete;
     _Node &operator=(const _Node &) = delete;
 
-  public:
+   public:
     // The Key holds all the state needed to uniquely identify
     // this (sub-)expression.
     struct Key {
@@ -201,10 +210,13 @@ private: // data
       const _NodeRefPtr arg1, arg2;
       const Value valueForConstant;
 
-      Key(_Op op_, const _NodeRefPtr &arg1_, const _NodeRefPtr &arg2_,
+      Key(_Op op_,
+          const _NodeRefPtr &arg1_,
+          const _NodeRefPtr &arg2_,
           const Value &valueForConstant_)
-          : op(op_), arg1(arg1_), arg2(arg2_),
-            valueForConstant(valueForConstant_) {}
+          : op(op_), arg1(arg1_), arg2(arg2_), valueForConstant(valueForConstant_)
+      {
+      }
       inline size_t GetHash() const;
       bool operator==(const Key &key) const;
     };
@@ -217,7 +229,8 @@ private: // data
     const bool expressionTreeAlwaysHasIdentity;
 
     // Factory method to create new nodes.
-    static _NodeRefPtr New(_Op op, const _NodeRefPtr &arg1 = _NodeRefPtr(),
+    static _NodeRefPtr New(_Op op,
+                           const _NodeRefPtr &arg1 = _NodeRefPtr(),
                            const _NodeRefPtr &arg2 = _NodeRefPtr(),
                            const Value &valueForConstant = Value());
     ~_Node();
@@ -229,9 +242,12 @@ private: // data
     void SetValueForVariable(Value &&newValue);
 
     // For _OpVariable nodes, returns the variable's value.
-    const Value &GetValueForVariable() const { return _valueForVariable; }
+    const Value &GetValueForVariable() const
+    {
+      return _valueForVariable;
+    }
 
-  private:
+   private:
     explicit _Node(const Key &key_);
     void _Invalidate();
     Value _EvaluateUncached() const;
@@ -267,4 +283,4 @@ private: // data
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_MAP_EXPRESSION_H
+#endif  // PXR_USD_PCP_MAP_EXPRESSION_H

@@ -48,7 +48,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 ///     void LoopCallback(size_t begin, size_t end);
 ///
-template <typename Fn> void WorkSerialForN(size_t n, Fn &&fn) {
+template<typename Fn> void WorkSerialForN(size_t n, Fn &&fn)
+{
   std::forward<Fn>(fn)(0, n);
 }
 
@@ -67,8 +68,8 @@ template <typename Fn> void WorkSerialForN(size_t n, Fn &&fn) {
 /// you want to have at least 10,000 instructions to count for the overhead of
 /// launching a thread.
 ///
-template <typename Fn>
-void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize) {
+template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize)
+{
   if (n == 0)
     return;
 
@@ -76,10 +77,11 @@ void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize) {
   if (WorkHasConcurrency()) {
 
     class Work_ParallelForN_TBB {
-    public:
+     public:
       Work_ParallelForN_TBB(Fn &fn) : _fn(fn) {}
 
-      void operator()(const tbb::blocked_range<size_t> &r) const {
+      void operator()(const tbb::blocked_range<size_t> &r) const
+      {
         // Note that we std::forward _fn using Fn in order get the
         // right operator().
         // We maintain the right type in this way:
@@ -88,17 +90,17 @@ void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize) {
         std::forward<Fn>(_fn)(r.begin(), r.end());
       }
 
-    private:
+     private:
       Fn &_fn;
     };
 
     // In most cases we do not want to inherit cancellation state from the
     // parent context, so we create an isolated task group context.
     tbb::task_group_context ctx(tbb::task_group_context::isolated);
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, n, grainSize),
-                      Work_ParallelForN_TBB(callback), ctx);
-
-  } else {
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, n, grainSize), Work_ParallelForN_TBB(callback), ctx);
+  }
+  else {
 
     // If concurrency is limited to 1, execute serially.
     WorkSerialForN(n, std::forward<Fn>(callback));
@@ -116,7 +118,8 @@ void WorkParallelForN(size_t n, Fn &&callback, size_t grainSize) {
 ///     void LoopCallback(size_t begin, size_t end);
 ///
 ///
-template <typename Fn> void WorkParallelForN(size_t n, Fn &&callback) {
+template<typename Fn> void WorkParallelForN(size_t n, Fn &&callback)
+{
   WorkParallelForN(n, std::forward<Fn>(callback), 1);
 }
 
@@ -133,13 +136,13 @@ template <typename Fn> void WorkParallelForN(size_t n, Fn &&callback) {
 ///
 ///
 ///
-template <typename InputIterator, typename Fn>
-inline void WorkParallelForEach(InputIterator first, InputIterator last,
-                                Fn &&fn) {
+template<typename InputIterator, typename Fn>
+inline void WorkParallelForEach(InputIterator first, InputIterator last, Fn &&fn)
+{
   tbb::task_group_context ctx(tbb::task_group_context::isolated);
   tbb::parallel_for_each(first, last, std::forward<Fn>(fn), ctx);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_LOOPS_H
+#endif  // PXR_BASE_WORK_LOOPS_H

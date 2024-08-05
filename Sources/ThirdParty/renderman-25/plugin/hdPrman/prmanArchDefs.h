@@ -44,17 +44,17 @@
 //----------+-------------------+-----------------+--------------
 
 #if defined(ARCH_OS_LINUX)
-#if !defined(LINUX)
-#define LINUX
-#endif
+#  if !defined(LINUX)
+#    define LINUX
+#  endif
 #elif defined(ARCH_OS_OSX)
-#if !defined(OSX)
-#define OSX
-#endif
+#  if !defined(OSX)
+#    define OSX
+#  endif
 #elif defined(ARCH_OS_WINDOWS)
-#if !defined(WIN32)
-#define WIN32
-#endif
+#  if !defined(WIN32)
+#    define WIN32
+#  endif
 #endif
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_ARCH_DEFS_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_ARCH_DEFS_H

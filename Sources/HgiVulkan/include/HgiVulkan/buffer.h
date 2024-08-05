@@ -39,9 +39,8 @@ class HgiVulkanDevice;
 ///
 /// Vulkan implementation of HgiBuffer
 ///
-class HgiVulkanBuffer final : public HgiBuffer
-{
-public:
+class HgiVulkanBuffer final : public HgiBuffer {
+ public:
   HGIVULKAN_API
   ~HgiVulkanBuffer() override;
 
@@ -81,29 +80,23 @@ public:
   /// Creates a staging buffer.
   /// The caller is responsible for the lifetime (destruction) of the buffer.
   HGIVULKAN_API
-  static HgiVulkanBuffer *CreateStagingBuffer(
-      HgiVulkanDevice *device,
-      HgiBufferDesc const &desc);
+  static HgiVulkanBuffer *CreateStagingBuffer(HgiVulkanDevice *device, HgiBufferDesc const &desc);
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   // Constructor for making buffers
   HGIVULKAN_API
-  HgiVulkanBuffer(
-      HgiVulkan *hgi,
-      HgiVulkanDevice *device,
-      HgiBufferDesc const &desc);
+  HgiVulkanBuffer(HgiVulkan *hgi, HgiVulkanDevice *device, HgiBufferDesc const &desc);
 
   // Constructor for making staging buffers
   HGIVULKAN_API
-  HgiVulkanBuffer(
-      HgiVulkanDevice *device,
-      VkBuffer vkBuffer,
-      VmaAllocation vmaAllocation,
-      HgiBufferDesc const &desc);
+  HgiVulkanBuffer(HgiVulkanDevice *device,
+                  VkBuffer vkBuffer,
+                  VmaAllocation vmaAllocation,
+                  HgiBufferDesc const &desc);
 
-private:
+ private:
   HgiVulkanBuffer() = delete;
   HgiVulkanBuffer &operator=(const HgiVulkanBuffer &) = delete;
   HgiVulkanBuffer(const HgiVulkanBuffer &) = delete;

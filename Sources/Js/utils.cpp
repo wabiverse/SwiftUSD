@@ -31,8 +31,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-JsOptionalValue JsFindValue(const JsObject &object, const std::string &key,
-                            const JsOptionalValue &defaultValue) {
+JsOptionalValue JsFindValue(const JsObject &object,
+                            const std::string &key,
+                            const JsOptionalValue &defaultValue)
+{
   if (key.empty()) {
     TF_CODING_ERROR("Key is empty");
     return boost::none;

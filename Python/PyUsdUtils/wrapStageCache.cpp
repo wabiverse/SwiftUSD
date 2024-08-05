@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
-#include <boost/python/def.hpp>
 #include <boost/python.hpp>
+#include <boost/python/def.hpp>
+#include <pxr/pxrns.h>
 
 #include "UsdUtils/stageCache.h"
 
@@ -39,8 +39,7 @@ void wrapStageCache()
 {
   class_<UsdUtilsStageCache>("StageCache")
 
-      .def("Get", &UsdUtilsStageCache::Get,
-           return_value_policy<reference_existing_object>())
+      .def("Get", &UsdUtilsStageCache::Get, return_value_policy<reference_existing_object>())
       .staticmethod("Get")
 
       .def("GetSessionLayerForVariantSelections",

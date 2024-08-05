@@ -26,8 +26,8 @@
 
 /// \file usdSkel/skeletonQuery.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 #include "Vt/types.h"
@@ -65,30 +65,32 @@ TF_DECLARE_REF_PTRS(UsdSkel_SkelDefinition);
 /// }
 /// \endcode
 ///
-class UsdSkelSkeletonQuery
-{
-public:
+class UsdSkelSkeletonQuery {
+ public:
   UsdSkelSkeletonQuery() {}
 
   /// Return true if this query is valid.
-  bool IsValid() const { return _definition; }
+  bool IsValid() const
+  {
+    return _definition;
+  }
 
   /// Boolean conversion operator. Equivalent to IsValid().
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
   /// Equality comparison.  Return true if \a lhs and \a rhs represent the
   /// same UsdSkelSkeletonQuery, false otherwise.
-  friend bool operator==(const UsdSkelSkeletonQuery &lhs,
-                         const UsdSkelSkeletonQuery &rhs)
+  friend bool operator==(const UsdSkelSkeletonQuery &lhs, const UsdSkelSkeletonQuery &rhs)
   {
-    return lhs._definition == rhs._definition &&
-           lhs._animQuery == rhs._animQuery;
+    return lhs._definition == rhs._definition && lhs._animQuery == rhs._animQuery;
   }
 
   /// Inequality comparison. Return false if \a lhs and \a rhs represent the
   /// same UsdSkelSkeletonQuery, true otherwise.
-  friend bool operator!=(const UsdSkelSkeletonQuery &lhs,
-                         const UsdSkelSkeletonQuery &rhs)
+  friend bool operator!=(const UsdSkelSkeletonQuery &lhs, const UsdSkelSkeletonQuery &rhs)
   {
     return !(lhs == rhs);
   }
@@ -145,7 +147,7 @@ public:
   /// from the rest pose as a fallback value.
   /// If valid transforms cannot be computed for the animation source, the
   /// \p xforms are instead set to the rest transforms.
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeJointLocalTransforms(VtArray<Matrix4> *xforms,
                                                UsdTimeCode time,
                                                bool atRest = false) const;
@@ -155,7 +157,7 @@ public:
   /// ComputeJointLocalTransforms(). If \p atRest is true, any bound animation
   /// source is ignored, and transforms are computed from the rest pose.
   /// The skeleton-space transforms of the rest pose are cached internally.
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeJointSkelTransforms(VtArray<Matrix4> *xforms,
                                               UsdTimeCode time,
                                               bool atRest = false) const;
@@ -166,7 +168,7 @@ public:
   /// \code
   ///     restRelativeTransform * restTransform = jointLocalTransform
   /// \endcode
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeJointRestRelativeTransforms(VtArray<Matrix4> *xforms,
                                                       UsdTimeCode time) const;
 
@@ -177,7 +179,7 @@ public:
   /// by the local-to-world transform of the Skeleton prim.
   /// If \p atRest is true, any bound animation source is ignored, and
   /// transforms are computed from the rest pose.
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool ComputeJointWorldTransforms(VtArray<Matrix4> *xforms,
                                                UsdGeomXformCache *xfCache,
                                                bool atRest = false) const;
@@ -191,39 +193,37 @@ public:
   /// \endcode
   ///
   /// These are the transforms usually required for skinning.
-  template <typename Matrix4>
-  USDSKEL_API bool ComputeSkinningTransforms(VtArray<Matrix4> *xforms,
-                                             UsdTimeCode time) const;
+  template<typename Matrix4>
+  USDSKEL_API bool ComputeSkinningTransforms(VtArray<Matrix4> *xforms, UsdTimeCode time) const;
 
   /// Returns the world space joint transforms at bind time.
-  template <typename Matrix4>
+  template<typename Matrix4>
   USDSKEL_API bool GetJointWorldBindTransforms(VtArray<Matrix4> *xforms) const;
 
   USDSKEL_API
   std::string GetDescription() const;
 
-private:
+ private:
   USDSKEL_API
   UsdSkelSkeletonQuery(const UsdSkel_SkelDefinitionRefPtr &definition,
                        const UsdSkelAnimQuery &anim = UsdSkelAnimQuery());
 
   bool _HasMappableAnim() const;
 
-  template <typename Matrix4>
+  template<typename Matrix4>
   bool _ComputeJointLocalTransforms(VtArray<Matrix4> *xforms,
                                     UsdTimeCode time,
                                     bool atRest = false) const;
 
-  template <typename Matrix4>
+  template<typename Matrix4>
   bool _ComputeJointSkelTransforms(VtArray<Matrix4> *xforms,
                                    UsdTimeCode time,
                                    bool atRest = false) const;
 
-  template <typename Matrix4>
-  bool _ComputeSkinningTransforms(VtArray<Matrix4> *xforms,
-                                  UsdTimeCode time) const;
+  template<typename Matrix4>
+  bool _ComputeSkinningTransforms(VtArray<Matrix4> *xforms, UsdTimeCode time) const;
 
-private:
+ private:
   UsdSkel_SkelDefinitionRefPtr _definition;
   UsdSkelAnimQuery _animQuery;
   UsdSkelAnimMapper _animToSkelMapper;
@@ -233,4 +233,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_SKELETON_QUERY_H
+#endif  // PXR_USD_USD_SKEL_SKELETON_QUERY_H

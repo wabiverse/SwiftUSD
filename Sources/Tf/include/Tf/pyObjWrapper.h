@@ -32,18 +32,18 @@
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 // Include this header first to pick up additional mitigations
 // for build issues when including Python.h
-#include "Tf/pySafePython.h"
+#  include "Tf/pySafePython.h"
 
-#include <boost/functional/hash.hpp>
-#include <boost/python/object_fwd.hpp>
-#include <boost/python/object_operators.hpp>
+#  include <boost/functional/hash.hpp>
+#  include <boost/python/object_fwd.hpp>
+#  include <boost/python/object_operators.hpp>
 
-#include <iosfwd>
-#include <memory>
+#  include <iosfwd>
+#  include <memory>
 
 #else
 
-#include <type_traits>
+#  include <type_traits>
 
 #endif
 
@@ -52,11 +52,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 // We define the empty stub for ABI compatibility even if Python support is
 // enabled so we can make sure size and alignment is the same.
 class TfPyObjWrapperStub {
-public:
+ public:
   static constexpr std::size_t Size = 16;
   static constexpr std::size_t Align = 8;
 
-private:
+ private:
   ARCH_PRAGMA_PUSH
   ARCH_PRAGMA_UNUSED_PRIVATE_FIELD
   std::aligned_storage<Size, Align>::type _stub;
@@ -90,11 +90,10 @@ private:
 /// boost::python::api::object_operators<T>. However it is important to note
 /// that callers must ensure the GIL is held before using these operators!
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-class TfPyObjWrapper
-    : public boost::python::api::object_operators<TfPyObjWrapper> {
+class TfPyObjWrapper : public boost::python::api::object_operators<TfPyObjWrapper> {
   typedef boost::python::object object;
 
-public:
+ public:
   /// Default construct a TfPyObjWrapper holding a reference to python None.
   /// The GIL need not be held by the caller.
   TF_API TfPyObjWrapper();
@@ -109,7 +108,10 @@ public:
   /// held to call this.  However, the caller is strongly advised to ensure
   /// the GIL is held, since assigning this object to another or otherwise
   /// operating on the returned object requires it.
-  object const &Get() const { return *_objectPtr; }
+  object const &Get() const
+  {
+    return *_objectPtr;
+  }
 
   /// Underlying PyObject* access.
   /// This method returns a pointer, so technically, the GIL need not be
@@ -124,7 +126,8 @@ public:
   /// Note that this does not attempt to hash the underlying python object,
   /// it returns a hash code that's suitable for hash-table lookup of
   /// TfPyObjWrapper instances, and does not require taking the python lock.
-  friend inline size_t hash_value(TfPyObjWrapper const &o) {
+  friend inline size_t hash_value(TfPyObjWrapper const &o)
+  {
     return (size_t)o.ptr();
   }
 
@@ -136,11 +139,14 @@ public:
   /// Returns false if \a other refers to the same python object.
   TF_API bool operator!=(TfPyObjWrapper const &other) const;
 
-private:
+ private:
   // Befriend object_operators to allow it access to implicit conversion to
   // boost::python::object.
   friend class boost::python::api::object_operators<TfPyObjWrapper>;
-  operator object const &() const { return Get(); }
+  operator object const &() const
+  {
+    return Get();
+  }
 
   // Store a shared_ptr to a python object.
   std::shared_ptr<object> _objectPtr;
@@ -151,12 +157,12 @@ static_assert(sizeof(TfPyObjWrapper) == sizeof(TfPyObjWrapperStub),
 static_assert(alignof(TfPyObjWrapper) == alignof(TfPyObjWrapperStub),
               "ABI break: Incompatible class alignments.");
 
-#else // PXR_PYTHON_SUPPORT_ENABLED
+#else  // PXR_PYTHON_SUPPORT_ENABLED
 
 class TfPyObjWrapper : TfPyObjWrapperStub {};
 
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_OBJ_WRAPPER_H
+#endif  // PXR_BASE_TF_PY_OBJ_WRAPPER_H

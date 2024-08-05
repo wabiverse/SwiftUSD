@@ -26,18 +26,18 @@
 
 /// \file usdPhysics/revoluteJoint.h
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
-#include "UsdPhysics/joint.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdPhysics/api.h"
+#include "UsdPhysics/joint.h"
 #include "UsdPhysics/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -60,9 +60,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdPhysicsTokens->rightHanded
 /// as the value.
 ///
-class UsdPhysicsRevoluteJoint : public UsdPhysicsJoint
-{
-public:
+class UsdPhysicsRevoluteJoint : public UsdPhysicsJoint {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -72,18 +71,12 @@ public:
   /// Equivalent to UsdPhysicsRevoluteJoint::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdPhysicsRevoluteJoint(const UsdPrim &prim = UsdPrim())
-      : UsdPhysicsJoint(prim)
-  {
-  }
+  explicit UsdPhysicsRevoluteJoint(const UsdPrim &prim = UsdPrim()) : UsdPhysicsJoint(prim) {}
 
   /// Construct a UsdPhysicsRevoluteJoint on the prim held by \p schemaObj .
   /// Should be preferred over UsdPhysicsRevoluteJoint(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdPhysicsRevoluteJoint(const UsdSchemaBase &schemaObj)
-      : UsdPhysicsJoint(schemaObj)
-  {
-  }
+  explicit UsdPhysicsRevoluteJoint(const UsdSchemaBase &schemaObj) : UsdPhysicsJoint(schemaObj) {}
 
   /// Destructor.
   USDPHYSICS_API
@@ -93,8 +86,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPHYSICS_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdPhysicsRevoluteJoint holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -106,8 +98,7 @@ public:
   /// \endcode
   ///
   USDPHYSICS_API
-  static UsdPhysicsRevoluteJoint
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsRevoluteJoint Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -132,17 +123,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDPHYSICS_API
-  static UsdPhysicsRevoluteJoint
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsRevoluteJoint Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPHYSICS_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPHYSICS_API
@@ -154,7 +144,7 @@ private:
   USDPHYSICS_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // AXIS
   // --------------------------------------------------------------------- //
@@ -176,9 +166,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateAxisAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateAxisAttr(VtValue const &defaultValue = VtValue(),
+                              bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // LOWERLIMIT
   // --------------------------------------------------------------------- //
@@ -199,9 +190,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateLowerLimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateLowerLimitAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // UPPERLIMIT
   // --------------------------------------------------------------------- //
@@ -222,9 +214,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateUpperLimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateUpperLimitAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

@@ -31,9 +31,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <int N>
-TfRefPtr<_TestPlugBase<N>>
-_TestPlugBase<N>::Manufacture(const std::string &subclass) {
+template<int N>
+TfRefPtr<_TestPlugBase<N>> _TestPlugBase<N>::Manufacture(const std::string &subclass)
+{
   // Lookup TfType for subclass
   const TfType &t = PlugRegistry::FindTypeByName(subclass);
   if (t.IsUnknown()) {
@@ -42,8 +42,7 @@ _TestPlugBase<N>::Manufacture(const std::string &subclass) {
   }
 
   // Manufacture an instance.
-  if (_TestPlugFactoryBase<N> *factory =
-          t.GetFactory<_TestPlugFactoryBase<N>>()) {
+  if (_TestPlugFactoryBase<N> *factory = t.GetFactory<_TestPlugFactoryBase<N>>()) {
     return factory->New();
   }
 
@@ -59,7 +58,7 @@ template class _TestPlugBase<4>;
 // This derived class should be discovered as an available subclass
 // of _TestPlugBase1 even though it is compiled into the base library.
 class _TestPlugDerived0 : public _TestPlugBase1 {
-public:
+ public:
   typedef _TestPlugDerived0 This;
   typedef TfRefPtr<This> RefPtr;
   typedef TfWeakPtr<This> Ptr;
@@ -67,21 +66,21 @@ public:
   virtual ~_TestPlugDerived0() {}
 
   // Return our base type, since this class is not wrapped for Python.
-  static TfRefPtr<_TestPlugBase1> New() { return TfCreateRefPtr(new This()); }
+  static TfRefPtr<_TestPlugBase1> New()
+  {
+    return TfCreateRefPtr(new This());
+  }
 
-protected:
+ protected:
   _TestPlugDerived0() {}
 };
 
-TF_REGISTRY_FUNCTION(TfType) {
-  TfType::Define<_TestPlugBase1>()
-      .SetFactory<_TestPlugFactory<_TestPlugBase1>>();
-  TfType::Define<_TestPlugBase2>()
-      .SetFactory<_TestPlugFactory<_TestPlugBase2>>();
-  TfType::Define<_TestPlugBase3>()
-      .SetFactory<_TestPlugFactory<_TestPlugBase3>>();
-  TfType::Define<_TestPlugBase4>()
-      .SetFactory<_TestPlugFactory<_TestPlugBase4>>();
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<_TestPlugBase1>().SetFactory<_TestPlugFactory<_TestPlugBase1>>();
+  TfType::Define<_TestPlugBase2>().SetFactory<_TestPlugFactory<_TestPlugBase2>>();
+  TfType::Define<_TestPlugBase3>().SetFactory<_TestPlugFactory<_TestPlugBase3>>();
+  TfType::Define<_TestPlugBase4>().SetFactory<_TestPlugFactory<_TestPlugBase4>>();
 
   TfType::Define<_TestPlugDerived0, TfType::Bases<_TestPlugBase1>>()
       .SetFactory<_TestPlugFactory<_TestPlugDerived0>>();

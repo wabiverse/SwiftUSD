@@ -38,9 +38,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// OpenGL implementation of HgiShaderProgram
 ///
-class HgiGLShaderProgram final : public HgiShaderProgram
-{
-public:
+class HgiGLShaderProgram final : public HgiShaderProgram {
+ public:
   HGIGL_API
   ~HgiGLShaderProgram() override;
 
@@ -72,18 +71,18 @@ public:
   HGIGL_API
   uint32_t GetUniformBuffer(size_t sizeHint);
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
   HgiGLShaderProgram(HgiShaderProgramDesc const &desc);
 
-private:
+ private:
   HgiGLShaderProgram() = delete;
   HgiGLShaderProgram &operator=(const HgiGLShaderProgram &) = delete;
   HgiGLShaderProgram(const HgiGLShaderProgram &) = delete;
 
-private:
+ private:
   std::string _errors;
   uint32_t _programId;
   size_t _programByteSize;

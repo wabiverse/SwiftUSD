@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGI_VULKAN_COMPUTE_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/computePipeline.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -40,9 +40,8 @@ using VkDescriptorSetLayoutVector = std::vector<VkDescriptorSetLayout>;
 ///
 /// Vulkan implementation of HgiComputePipeline.
 ///
-class HgiVulkanComputePipeline final : public HgiComputePipeline
-{
-public:
+class HgiVulkanComputePipeline final : public HgiComputePipeline {
+ public:
   HGIVULKAN_API
   ~HgiVulkanComputePipeline() override;
 
@@ -62,15 +61,13 @@ public:
   HGIVULKAN_API
   uint64_t &GetInflightBits();
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
-  HgiVulkanComputePipeline(
-      HgiVulkanDevice *device,
-      HgiComputePipelineDesc const &desc);
+  HgiVulkanComputePipeline(HgiVulkanDevice *device, HgiComputePipelineDesc const &desc);
 
-private:
+ private:
   HgiVulkanComputePipeline() = delete;
   HgiVulkanComputePipeline &operator=(const HgiVulkanComputePipeline &) = delete;
   HgiVulkanComputePipeline(const HgiVulkanComputePipeline &) = delete;

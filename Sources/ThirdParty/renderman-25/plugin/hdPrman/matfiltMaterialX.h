@@ -24,10 +24,10 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_MATERIALX_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_MATERIALX_H
 
-#include <pxr/pxrns.h>
 #include "Hd/material.h"
 #include "Hd/materialNetworkInterface.h"
 #include "Ndr/declare.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,10 +38,9 @@ class HdMaterialNetworkInterface;
 /// The terminal nodes are converted to PxrSurface, PxrDisplacement,
 /// and PxrVolume respectively, and any input graphs that use MaterialX
 /// shader code-generation are compiled and replaced with a single node.
-void MatfiltMaterialX(
-    HdMaterialNetworkInterface *netInterface,
-    std::vector<std::string> *outputErrorMessages);
+void MatfiltMaterialX(HdMaterialNetworkInterface *netInterface,
+                      std::vector<std::string> *outputErrorMessages);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_MATERIALX_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_MATERIALX_H

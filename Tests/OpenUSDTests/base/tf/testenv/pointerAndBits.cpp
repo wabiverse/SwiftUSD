@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include "pxr/base/tf/pointerAndBits.h"
 #include "pxr/base/tf/diagnosticLite.h"
 #include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/pointerAndBits.h"
+#include "pxr/pxr.h"
 
 #include <cstring>
 
@@ -33,49 +33,43 @@ PXR_NAMESPACE_USING_DIRECTIVE
 // Ensure that we can make a TfPointerAndBits with an incomplete type.
 class Incomplete;
 struct Container {
-    TfPointerAndBits<Incomplete> member;
+  TfPointerAndBits<Incomplete> member;
 };
 
-static bool
-Test_TfPointerAndBits()
+static bool Test_TfPointerAndBits()
 {
-    {
-        // short and bits (we expect at least one bit available).
-        TfPointerAndBits<short> pbs;
-        TF_AXIOM(pbs.GetMaxValue() > 0);
-        TF_AXIOM(pbs.GetNumBitsValues() > 1);
+  {
+    // short and bits (we expect at least one bit available).
+    TfPointerAndBits<short> pbs;
+    TF_AXIOM(pbs.GetMaxValue() > 0);
+    TF_AXIOM(pbs.GetNumBitsValues() > 1);
 
-        short data(1234);
-        pbs = &data;
-        TF_AXIOM(pbs.Get() == &data);
-        pbs.SetBits(1);
-        TF_AXIOM(pbs.BitsAs<int>() == 1);
-        TF_AXIOM(pbs.BitsAs<bool>() == true);
-        TF_AXIOM(pbs.Get() == &data);
+    short data(1234);
+    pbs = &data;
+    TF_AXIOM(pbs.Get() == &data);
+    pbs.SetBits(1);
+    TF_AXIOM(pbs.BitsAs<int>() == 1);
+    TF_AXIOM(pbs.BitsAs<bool>() == true);
+    TF_AXIOM(pbs.Get() == &data);
 
-        short data2(4321);
+    short data2(4321);
 
-        // Copy and swap.
-        TfPointerAndBits<short>(&data2).Swap(pbs);
-        TF_AXIOM(pbs.Get() == &data2);
-        TF_AXIOM(pbs.BitsAs<bool>() == false);
+    // Copy and swap.
+    TfPointerAndBits<short>(&data2).Swap(pbs);
+    TF_AXIOM(pbs.Get() == &data2);
+    TF_AXIOM(pbs.BitsAs<bool>() == false);
 
-        TF_AXIOM(TfPointerAndBits<short>(&data, 1).BitsAs<bool>() == true);
-        TF_AXIOM(TfPointerAndBits<short>(&data, 1).Get() == &data);
+    TF_AXIOM(TfPointerAndBits<short>(&data, 1).BitsAs<bool>() == true);
+    TF_AXIOM(TfPointerAndBits<short>(&data, 1).Get() == &data);
 
-        // GetLiteral.
-        TF_AXIOM(TfPointerAndBits<short>(&data, 1).GetLiteral() !=
-                 pbs.GetLiteral());
-        TF_AXIOM(TfPointerAndBits<short>(&data, 0).GetLiteral() !=
-                 pbs.GetLiteral());
-        TF_AXIOM(TfPointerAndBits<short>(&data2, 1).GetLiteral() !=
-                 pbs.GetLiteral());
-        TF_AXIOM(TfPointerAndBits<short>(&data2, 0).GetLiteral() ==
-                 pbs.GetLiteral());
-    }
+    // GetLiteral.
+    TF_AXIOM(TfPointerAndBits<short>(&data, 1).GetLiteral() != pbs.GetLiteral());
+    TF_AXIOM(TfPointerAndBits<short>(&data, 0).GetLiteral() != pbs.GetLiteral());
+    TF_AXIOM(TfPointerAndBits<short>(&data2, 1).GetLiteral() != pbs.GetLiteral());
+    TF_AXIOM(TfPointerAndBits<short>(&data2, 0).GetLiteral() == pbs.GetLiteral());
+  }
 
-    return true;
+  return true;
 }
 
 TF_ADD_REGTEST(TfPointerAndBits);
-

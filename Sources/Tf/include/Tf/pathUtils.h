@@ -69,8 +69,7 @@ std::string TfRealPath(std::string const &path,
 /// specifiers (e.g., "C:") are lower-cased. If \p stripDriveSpecifier
 /// is \c true, these drive specifiers are removed from the path.
 TF_API
-std::string TfNormPath(std::string const &path,
-                       bool stripDriveSpecifier = false);
+std::string TfNormPath(std::string const &path, bool stripDriveSpecifier = false);
 
 /// Return the index delimiting the longest accessible prefix of \a path.
 ///
@@ -148,8 +147,7 @@ std::vector<std::string> TfGlob(std::vector<std::string> const &paths,
 /// if flags is not set, the default glob flags are GLOB_MARK and
 /// GLOB_NOCHECK.
 TF_API
-std::vector<std::string> TfGlob(std::string const &path,
-                                unsigned int flags = ARCH_GLOB_DEFAULT);
+std::vector<std::string> TfGlob(std::string const &path, unsigned int flags = ARCH_GLOB_DEFAULT);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

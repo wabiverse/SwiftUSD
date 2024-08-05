@@ -34,8 +34,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class T> class TfRefPtr;
-template <class T> class TfWeakPtr;
+template<class T> class TfRefPtr;
+template<class T> class TfWeakPtr;
 
 /// \class TfRefBase
 /// \ingroup group_tf_Memory
@@ -69,7 +69,7 @@ template <class T> class TfWeakPtr;
 /// from TfSimpleRefBase instead.
 ///
 class TfRefBase {
-public:
+ public:
   typedef void (*UniqueChangedFuncPtr)(TfRefBase const *, bool);
   struct UniqueChangedListener {
     void (*lock)();
@@ -80,36 +80,45 @@ public:
   TfRefBase() : _shouldInvokeUniqueChangedListener(false) {}
 
   /// Return the current reference count of this object.
-  size_t GetCurrentCount() const { return GetRefCount().Get(); }
+  size_t GetCurrentCount() const
+  {
+    return GetRefCount().Get();
+  }
 
   /// Return true if only one \c TfRefPtr points to this object.
-  bool IsUnique() const { return GetRefCount().Get() == 1; }
+  bool IsUnique() const
+  {
+    return GetRefCount().Get() == 1;
+  }
 
-  const TfRefCount &GetRefCount() const { return _refCount; }
+  const TfRefCount &GetRefCount() const
+  {
+    return _refCount;
+  }
 
-  void SetShouldInvokeUniqueChangedListener(bool shouldCall) {
+  void SetShouldInvokeUniqueChangedListener(bool shouldCall)
+  {
     _shouldInvokeUniqueChangedListener = shouldCall;
   }
 
   TF_API static void SetUniqueChangedListener(UniqueChangedListener listener);
 
-protected:
+ protected:
   /*
    * Prohibit deletion through a TfRefBase pointer.
    */
   TF_API virtual ~TfRefBase();
 
-private:
+ private:
   TfRefCount _refCount;
   bool _shouldInvokeUniqueChangedListener;
 
   static UniqueChangedListener _uniqueChangedListener;
-  template <typename T> friend class TfRefPtr;
+  template<typename T> friend class TfRefPtr;
   friend struct Tf_RefPtr_UniqueChangedCounter;
   friend struct Tf_RefPtr_Counter;
 
-  template <typename T>
-  friend TfRefPtr<T> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &);
+  template<typename T> friend TfRefPtr<T> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &);
 };
 
 /// \class TfSimpleRefBase
@@ -122,10 +131,10 @@ private:
 /// reference-counted object via boost::python.
 ///
 class TfSimpleRefBase : public TfRefBase {
-public:
+ public:
   TF_API virtual ~TfSimpleRefBase();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_REF_BASE_H
+#endif  // PXR_BASE_TF_REF_BASE_H

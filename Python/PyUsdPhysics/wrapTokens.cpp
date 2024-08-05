@@ -22,50 +22,45 @@
 // language governing permissions and limitations under the Apache License.
 //
 // GENERATED FILE.  DO NOT EDIT.
-#include <boost/python/class.hpp>
 #include "UsdPhysics/tokens.h"
+#include <boost/python/class.hpp>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
-{
+namespace {
 
-  // Helper to return a static token as a string.  We wrap tokens as Python
-  // strings and for some reason simply wrapping the token using def_readonly
-  // bypasses to-Python conversion, leading to the error that there's no
-  // Python type for the C++ TfToken type.  So we wrap this functor instead.
-  class _WrapStaticToken
+// Helper to return a static token as a string.  We wrap tokens as Python
+// strings and for some reason simply wrapping the token using def_readonly
+// bypasses to-Python conversion, leading to the error that there's no
+// Python type for the C++ TfToken type.  So we wrap this functor instead.
+class _WrapStaticToken {
+ public:
+  _WrapStaticToken(const TfToken *token) : _token(token) {}
+
+  std::string operator()() const
   {
-  public:
-    _WrapStaticToken(const TfToken *token) : _token(token) {}
-
-    std::string operator()() const
-    {
-      return _token->GetString();
-    }
-
-  private:
-    const TfToken *_token;
-  };
-
-  template <typename T>
-  void
-  _AddToken(T &cls, const char *name, const TfToken &token)
-  {
-    cls.add_static_property(name,
-                            boost::python::make_function(
-                                _WrapStaticToken(&token),
-                                boost::python::return_value_policy<
-                                    boost::python::return_by_value>(),
-                                boost::mpl::vector1<std::string>()));
+    return _token->GetString();
   }
 
-} // anonymous
+ private:
+  const TfToken *_token;
+};
+
+template<typename T> void _AddToken(T &cls, const char *name, const TfToken &token)
+{
+  cls.add_static_property(name,
+                          boost::python::make_function(
+                              _WrapStaticToken(&token),
+                              boost::python::return_value_policy<boost::python::return_by_value>(),
+                              boost::mpl::vector1<std::string>()));
+}
+
+}  // namespace
 
 void wrapUsdPhysicsTokens()
 {
-  boost::python::class_<UsdPhysicsTokensType, boost::noncopyable>
-      cls("Tokens", boost::python::no_init);
+  boost::python::class_<UsdPhysicsTokensType, boost::noncopyable> cls("Tokens",
+                                                                      boost::python::no_init);
   _AddToken(cls, "acceleration", UsdPhysicsTokens->acceleration);
   _AddToken(cls, "angular", UsdPhysicsTokens->angular);
   _AddToken(cls, "boundingCube", UsdPhysicsTokens->boundingCube);
@@ -75,17 +70,33 @@ void wrapUsdPhysicsTokens()
   _AddToken(cls, "convexHull", UsdPhysicsTokens->convexHull);
   _AddToken(cls, "distance", UsdPhysicsTokens->distance);
   _AddToken(cls, "drive", UsdPhysicsTokens->drive);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsDamping", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsDamping);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsMaxForce", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsMaxForce);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsStiffness", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsStiffness);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsTargetPosition", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsTargetPosition);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsTargetVelocity", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsTargetVelocity);
-  _AddToken(cls, "drive_MultipleApplyTemplate_PhysicsType", UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsType);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsDamping",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsDamping);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsMaxForce",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsMaxForce);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsStiffness",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsStiffness);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsTargetPosition",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsTargetPosition);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsTargetVelocity",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsTargetVelocity);
+  _AddToken(cls,
+            "drive_MultipleApplyTemplate_PhysicsType",
+            UsdPhysicsTokens->drive_MultipleApplyTemplate_PhysicsType);
   _AddToken(cls, "force", UsdPhysicsTokens->force);
   _AddToken(cls, "kilogramsPerUnit", UsdPhysicsTokens->kilogramsPerUnit);
   _AddToken(cls, "limit", UsdPhysicsTokens->limit);
-  _AddToken(cls, "limit_MultipleApplyTemplate_PhysicsHigh", UsdPhysicsTokens->limit_MultipleApplyTemplate_PhysicsHigh);
-  _AddToken(cls, "limit_MultipleApplyTemplate_PhysicsLow", UsdPhysicsTokens->limit_MultipleApplyTemplate_PhysicsLow);
+  _AddToken(cls,
+            "limit_MultipleApplyTemplate_PhysicsHigh",
+            UsdPhysicsTokens->limit_MultipleApplyTemplate_PhysicsHigh);
+  _AddToken(cls,
+            "limit_MultipleApplyTemplate_PhysicsLow",
+            UsdPhysicsTokens->limit_MultipleApplyTemplate_PhysicsLow);
   _AddToken(cls, "linear", UsdPhysicsTokens->linear);
   _AddToken(cls, "meshSimplification", UsdPhysicsTokens->meshSimplification);
   _AddToken(cls, "none", UsdPhysicsTokens->none);
@@ -103,7 +114,8 @@ void wrapUsdPhysicsTokens()
   _AddToken(cls, "physicsDensity", UsdPhysicsTokens->physicsDensity);
   _AddToken(cls, "physicsDiagonalInertia", UsdPhysicsTokens->physicsDiagonalInertia);
   _AddToken(cls, "physicsDynamicFriction", UsdPhysicsTokens->physicsDynamicFriction);
-  _AddToken(cls, "physicsExcludeFromArticulation", UsdPhysicsTokens->physicsExcludeFromArticulation);
+  _AddToken(
+      cls, "physicsExcludeFromArticulation", UsdPhysicsTokens->physicsExcludeFromArticulation);
   _AddToken(cls, "physicsFilteredGroups", UsdPhysicsTokens->physicsFilteredGroups);
   _AddToken(cls, "physicsFilteredPairs", UsdPhysicsTokens->physicsFilteredPairs);
   _AddToken(cls, "physicsGravityDirection", UsdPhysicsTokens->physicsGravityDirection);

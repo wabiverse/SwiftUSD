@@ -50,15 +50,21 @@
 
 namespace std {
 
-template <> class numeric_limits<PXR_NS::pxr_half::half> {
-private:
+template<> class numeric_limits<PXR_NS::pxr_half::half> {
+ private:
   using half = PXR_NS::pxr_half::half;
 
-public:
+ public:
   static const bool is_specialized = true;
 
-  static half min() throw() { return PXR_HALF_NRM_MIN; }
-  static half max() throw() { return PXR_HALF_MAX; }
+  static half min() throw()
+  {
+    return PXR_HALF_NRM_MIN;
+  }
+  static half max() throw()
+  {
+    return PXR_HALF_MAX;
+  }
 
   static const int digits = PXR_HALF_MANT_DIG;
   static const int digits10 = PXR_HALF_DIG;
@@ -66,8 +72,14 @@ public:
   static const bool is_integer = false;
   static const bool is_exact = false;
   static const int radix = PXR_HALF_RADIX;
-  static half epsilon() throw() { return PXR_HALF_EPSILON; }
-  static half round_error() throw() { return PXR_HALF_EPSILON / 2; }
+  static half epsilon() throw()
+  {
+    return PXR_HALF_EPSILON;
+  }
+  static half round_error() throw()
+  {
+    return PXR_HALF_EPSILON / 2;
+  }
 
   static const int min_exponent = PXR_HALF_MIN_EXP;
   static const int min_exponent10 = PXR_HALF_MIN_10_EXP;
@@ -79,10 +91,22 @@ public:
   static const bool has_signaling_NaN = true;
   static const float_denorm_style has_denorm = denorm_present;
   static const bool has_denorm_loss = false;
-  static half infinity() throw() { return half::posInf(); }
-  static half quiet_NaN() throw() { return half::qNan(); }
-  static half signaling_NaN() throw() { return half::sNan(); }
-  static half denorm_min() throw() { return PXR_HALF_MIN; }
+  static half infinity() throw()
+  {
+    return half::posInf();
+  }
+  static half quiet_NaN() throw()
+  {
+    return half::qNan();
+  }
+  static half signaling_NaN() throw()
+  {
+    return half::sNan();
+  }
+  static half denorm_min() throw()
+  {
+    return PXR_HALF_MIN;
+  }
 
   static const bool is_iec559 = false;
   static const bool is_bounded = false;
@@ -96,11 +120,14 @@ public:
 
   // C++11 additions.
   static constexpr int max_digits10 = PXR_HALF_DECIMAL_DIG;
-  static half lowest() { return -PXR_HALF_MAX; }
+  static half lowest()
+  {
+    return -PXR_HALF_MAX;
+  }
 
 #endif
 };
 
-} // namespace std
+}  // namespace std
 
 #endif

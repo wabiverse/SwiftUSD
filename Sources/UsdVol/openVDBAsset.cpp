@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdVolOpenVDBAsset,
-                 TfType::Bases<UsdVolFieldAsset>>();
+  TfType::Define<UsdVolOpenVDBAsset, TfType::Bases<UsdVolFieldAsset>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdVolOpenVDBAsset::~UsdVolOpenVDBAsset()
-{
-}
+UsdVolOpenVDBAsset::~UsdVolOpenVDBAsset() {}
 
 /* static */
-UsdVolOpenVDBAsset
-UsdVolOpenVDBAsset::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdVolOpenVDBAsset UsdVolOpenVDBAsset::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdVolOpenVDBAsset();
   }
@@ -62,18 +57,14 @@ UsdVolOpenVDBAsset::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdVolOpenVDBAsset
-UsdVolOpenVDBAsset::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdVolOpenVDBAsset UsdVolOpenVDBAsset::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("OpenVDBAsset");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdVolOpenVDBAsset();
   }
-  return UsdVolOpenVDBAsset(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdVolOpenVDBAsset(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdVolOpenVDBAsset::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdVolOpenVDBAsset::_GetStaticTfType()
+const TfType &UsdVolOpenVDBAsset::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdVolOpenVDBAsset>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdVolOpenVDBAsset::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdVolOpenVDBAsset::_GetTfType() const
+const TfType &UsdVolOpenVDBAsset::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdVolOpenVDBAsset::GetFieldDataTypeAttr() const
+UsdAttribute UsdVolOpenVDBAsset::GetFieldDataTypeAttr() const
 {
   return GetPrim().GetAttribute(UsdVolTokens->fieldDataType);
 }
 
-UsdAttribute
-UsdVolOpenVDBAsset::CreateFieldDataTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdVolOpenVDBAsset::CreateFieldDataTypeAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdVolTokens->fieldDataType,
                                     SdfValueTypeNames->Token,
@@ -121,14 +109,13 @@ UsdVolOpenVDBAsset::CreateFieldDataTypeAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdVolOpenVDBAsset::GetFieldClassAttr() const
+UsdAttribute UsdVolOpenVDBAsset::GetFieldClassAttr() const
 {
   return GetPrim().GetAttribute(UsdVolTokens->fieldClass);
 }
 
-UsdAttribute
-UsdVolOpenVDBAsset::CreateFieldClassAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdVolOpenVDBAsset::CreateFieldClassAttr(VtValue const &defaultValue,
+                                                      bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdVolTokens->fieldClass,
                                     SdfValueTypeNames->Token,
@@ -138,31 +125,27 @@ UsdVolOpenVDBAsset::CreateFieldClassAttr(VtValue const &defaultValue, bool write
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdVolOpenVDBAsset::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdVolOpenVDBAsset::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdVolTokens->fieldDataType,
       UsdVolTokens->fieldClass,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdVolFieldAsset::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdVolFieldAsset::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

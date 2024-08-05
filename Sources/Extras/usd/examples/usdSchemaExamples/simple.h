@@ -26,18 +26,18 @@
 
 /// \file usdSchemaExamples/simple.h
 
-#include <pxr/pxrns.h>
 #include "./api.h"
-#include "Usd/typed.h"
+#include "./tokens.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
-#include "./tokens.h"
+#include "Usd/typed.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -55,9 +55,8 @@ class SdfAssetPath;
 /// An example of an untyped schema prim. Note that it does not
 /// specify a typeName
 ///
-class UsdSchemaExamplesSimple : public UsdTyped
-{
-public:
+class UsdSchemaExamplesSimple : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -67,18 +66,12 @@ public:
   /// Equivalent to UsdSchemaExamplesSimple::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdSchemaExamplesSimple(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdSchemaExamplesSimple(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdSchemaExamplesSimple on the prim held by \p schemaObj .
   /// Should be preferred over UsdSchemaExamplesSimple(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdSchemaExamplesSimple(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdSchemaExamplesSimple(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDSCHEMAEXAMPLES_API
@@ -88,8 +81,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSCHEMAEXAMPLES_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSchemaExamplesSimple holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -101,17 +93,16 @@ public:
   /// \endcode
   ///
   USDSCHEMAEXAMPLES_API
-  static UsdSchemaExamplesSimple
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSchemaExamplesSimple Get(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSCHEMAEXAMPLES_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSCHEMAEXAMPLES_API
@@ -123,7 +114,7 @@ private:
   USDSCHEMAEXAMPLES_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INTATTR
   // --------------------------------------------------------------------- //
@@ -143,9 +134,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSCHEMAEXAMPLES_API
-  UsdAttribute CreateIntAttrAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateIntAttrAttr(VtValue const &defaultValue = VtValue(),
+                                 bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // TARGET
   // --------------------------------------------------------------------- //
@@ -160,7 +152,7 @@ public:
   USDSCHEMAEXAMPLES_API
   UsdRelationship CreateTargetRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

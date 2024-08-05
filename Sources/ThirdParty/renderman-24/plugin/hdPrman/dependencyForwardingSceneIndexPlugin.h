@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HDPRMAN_DEPENDENCY_FORWARDING_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HDPRMAN_DEPENDENCY_FORWARDING_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,17 +35,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Plugin adds a dependency forwarding scene index to the Prman render
 /// delegate to resolve any dependencies introduced by other scene indices.
 ///
-class HdPrman_DependencyForwardingSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_DependencyForwardingSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_DependencyForwardingSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HDPRMAN_DEPENDENCY_FORWARDING_SCENE_INDEX_PLUGIN_H
+#endif  // PXR_IMAGING_HDPRMAN_DEPENDENCY_FORWARDING_SCENE_INDEX_PLUGIN_H

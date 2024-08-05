@@ -35,8 +35,8 @@
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
-#include "Tf/pyLock.h"
-#include <locale>
+#  include "Tf/pyLock.h"
+#  include <locale>
 #endif
 
 #include "Tf/pyObjWrapper.h"
@@ -55,27 +55,26 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Metafunction to determine whether the templated object type is a
 /// valid context object.
 ///
-template <class T> struct ArIsContextObject {
+template<class T> struct ArIsContextObject {
   static const bool value = false;
 };
 
 /// Default implementation for providing debug info on the contained context.
-template <class Context> std::string ArGetDebugString(const Context &context);
+template<class Context> std::string ArGetDebugString(const Context &context);
 
 // Metafunctions for determining if a variadic list of objects
 // are valid for use with the ArResolverContext c'tor.
 class ArResolverContext;
 
-template <class... Objects> struct Ar_AllValidForContext;
+template<class... Objects> struct Ar_AllValidForContext;
 
-template <class Object, class... Other>
-struct Ar_AllValidForContext<Object, Other...> {
+template<class Object, class... Other> struct Ar_AllValidForContext<Object, Other...> {
   static const bool value = (std::is_same<Object, ArResolverContext>::value ||
                              ArIsContextObject<Object>::value) &&
                             Ar_AllValidForContext<Other...>::value;
 };
 
-template <> struct Ar_AllValidForContext<> {
+template<> struct Ar_AllValidForContext<> {
   static const bool value = true;
 };
 
@@ -114,7 +113,7 @@ template <> struct Ar_AllValidForContext<> {
 /// \sa ArResolver::UnbindContext
 /// \sa ArResolverContextBinder
 class ArResolverContext {
-public:
+ public:
   /// Construct an empty asset resolver context.
   ArResolverContext() {}
 
@@ -133,9 +132,10 @@ public:
   /// encountered with the same type as a previously-added object, the
   /// previously-added object will remain and the other context object
   /// will be ignored.
-  template <class... Objects, typename std::enable_if<Ar_AllValidForContext<
-                                  Objects...>::value>::type * = nullptr>
-  ArResolverContext(const Objects &...objs) {
+  template<class... Objects,
+           typename std::enable_if<Ar_AllValidForContext<Objects...>::value>::type * = nullptr>
+  ArResolverContext(const Objects &...objs)
+  {
     _AddObjects(objs...);
   }
 
@@ -152,12 +152,16 @@ public:
   explicit ArResolverContext(const std::vector<ArResolverContext> &ctxs);
 
   /// Returns whether this resolver context is empty.
-  bool IsEmpty() const { return _contexts.empty(); }
+  bool IsEmpty() const
+  {
+    return _contexts.empty();
+  }
 
   /// Returns pointer to the context object of the given type
   /// held in this resolver context. Returns NULL if this resolver
   /// context is not holding an object of the requested type.
-  template <class ContextObj> const ContextObj *Get() const {
+  template<class ContextObj> const ContextObj *Get() const
+  {
     for (const auto &context : _contexts) {
       if (context->IsHolding(typeid(ContextObj))) {
         return &_GetTyped<ContextObj>(*context)._context;
@@ -175,7 +179,8 @@ public:
   AR_API
   bool operator==(const ArResolverContext &rhs) const;
 
-  bool operator!=(const ArResolverContext &rhs) const {
+  bool operator!=(const ArResolverContext &rhs) const
+  {
     return !(*this == rhs);
   }
 
@@ -185,21 +190,23 @@ public:
   /// @}
 
   /// Returns hash value for this asset resolver context.
-  friend size_t hash_value(const ArResolverContext &context) {
+  friend size_t hash_value(const ArResolverContext &context)
+  {
     return TfHash()(context._contexts);
   }
 
-private:
+ private:
   // Type-erased storage for context objects.
   struct _Untyped;
-  template <class Context> struct _Typed;
+  template<class Context> struct _Typed;
 
-  void _AddObjects() {
+  void _AddObjects()
+  {
     // Empty base case for unpacking parameter pack
   }
 
-  template <class Object, class... Other>
-  void _AddObjects(const Object &obj, const Other &...other) {
+  template<class Object, class... Other> void _AddObjects(const Object &obj, const Other &...other)
+  {
     _Add(obj);
     _AddObjects(other...);
   }
@@ -207,15 +214,16 @@ private:
   AR_API
   void _Add(const ArResolverContext &ctx);
 
-  template <class Object> void _Add(const Object &obj) {
+  template<class Object> void _Add(const Object &obj)
+  {
     _Add(std::shared_ptr<_Untyped>(new _Typed<Object>(obj)));
   }
 
   AR_API
   void _Add(std::shared_ptr<_Untyped> &&context);
 
-  template <class Context>
-  static const _Typed<Context> &_GetTyped(const _Untyped &untyped) {
+  template<class Context> static const _Typed<Context> &_GetTyped(const _Untyped &untyped)
+  {
     return static_cast<const _Typed<Context> &>(untyped);
   }
 
@@ -223,7 +231,8 @@ private:
     AR_API
     virtual ~_Untyped();
 
-    bool IsHolding(const std::type_info &ti) const {
+    bool IsHolding(const std::type_info &ti) const
+    {
       return TfSafeTypeCompare(ti, GetTypeid());
     }
 
@@ -236,30 +245,43 @@ private:
     virtual TfPyObjWrapper GetPythonObj() const = 0;
   };
 
-  template <class Context> struct _Typed : public _Untyped {
+  template<class Context> struct _Typed : public _Untyped {
     virtual ~_Typed() {}
 
     _Typed(const Context &context) : _context(context) {}
 
-    virtual _Untyped *Clone() const { return new _Typed<Context>(_context); }
+    virtual _Untyped *Clone() const
+    {
+      return new _Typed<Context>(_context);
+    }
 
-    virtual const std::type_info &GetTypeid() const { return typeid(Context); }
+    virtual const std::type_info &GetTypeid() const
+    {
+      return typeid(Context);
+    }
 
-    virtual bool LessThan(const _Untyped &rhs) const {
+    virtual bool LessThan(const _Untyped &rhs) const
+    {
       return _context < _GetTyped<Context>(rhs)._context;
     }
 
-    virtual bool Equals(const _Untyped &rhs) const {
+    virtual bool Equals(const _Untyped &rhs) const
+    {
       return _context == _GetTyped<Context>(rhs)._context;
     }
 
-    virtual size_t Hash() const { return hash_value(_context); }
+    virtual size_t Hash() const
+    {
+      return hash_value(_context);
+    }
 
-    virtual std::string GetDebugString() const {
+    virtual std::string GetDebugString() const
+    {
       return ArGetDebugString(_context);
     }
 
-    virtual TfPyObjWrapper GetPythonObj() const {
+    virtual TfPyObjWrapper GetPythonObj() const
+    {
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
       TfPyLock lock;
       return boost::python::object(_context);
@@ -271,9 +293,9 @@ private:
     Context _context;
   };
 
-  template <class HashState>
-  friend void TfHashAppend(HashState &h,
-                           const std::shared_ptr<_Untyped> &context) {
+  template<class HashState>
+  friend void TfHashAppend(HashState &h, const std::shared_ptr<_Untyped> &context)
+  {
     h.Append(context->Hash());
   }
 
@@ -288,9 +310,9 @@ private:
 AR_API
 std::string Ar_GetDebugString(const std::type_info &, void const *);
 
-template <class Context> std::string ArGetDebugString(const Context &context) {
-  return Ar_GetDebugString(typeid(Context),
-                           static_cast<void const *>(&context));
+template<class Context> std::string ArGetDebugString(const Context &context)
+{
+  return Ar_GetDebugString(typeid(Context), static_cast<void const *>(&context));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

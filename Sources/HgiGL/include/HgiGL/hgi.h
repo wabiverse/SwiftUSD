@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_GL_HGI_H
 #define PXR_IMAGING_HGI_GL_HGI_H
 
-#include <pxr/pxrns.h>
+#include "Hgi/hgiImpl.h"
+#include "Hgi/tokens.h"
 #include "HgiGL/api.h"
 #include "HgiGL/capabilities.h"
 #include "HgiGL/garbageCollector.h"
-#include "Hgi/hgiImpl.h"
-#include "Hgi/tokens.h"
+#include <pxr/pxrns.h>
 
 #include <functional>
 #include <memory>
@@ -68,9 +68,8 @@ using HgiGLContextArenaHandle = HgiHandle<class HgiGLContextArena>;
 /// is used with the implied expectation that the same GL context is valid
 /// and current for the lifetime of the HgiGL instance.
 ///
-class HgiGL final : public Hgi
-{
-public:
+class HgiGL final : public Hgi {
+ public:
   HGIGL_API
   HgiGL();
 
@@ -85,15 +84,13 @@ public:
   bool IsBackendSupported() const override;
 
   HGIGL_API
-  HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(
-      HgiGraphicsCmdsDesc const &desc) override;
+  HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc) override;
 
   HGIGL_API
   HgiBlitCmdsUniquePtr CreateBlitCmds() override;
 
   HGIGL_API
-  HgiComputeCmdsUniquePtr CreateComputeCmds(
-      HgiComputeCmdsDesc const &desc) override;
+  HgiComputeCmdsUniquePtr CreateComputeCmds(HgiComputeCmdsDesc const &desc) override;
 
   HGIGL_API
   HgiTextureHandle CreateTexture(HgiTextureDesc const &desc) override;
@@ -102,8 +99,7 @@ public:
   void DestroyTexture(HgiTextureHandle *texHandle) override;
 
   HGIGL_API
-  HgiTextureViewHandle CreateTextureView(
-      HgiTextureViewDesc const &desc) override;
+  HgiTextureViewHandle CreateTextureView(HgiTextureViewDesc const &desc) override;
 
   HGIGL_API
   void DestroyTextureView(HgiTextureViewHandle *viewHandle) override;
@@ -121,24 +117,19 @@ public:
   void DestroyBuffer(HgiBufferHandle *bufHandle) override;
 
   HGIGL_API
-  HgiShaderFunctionHandle CreateShaderFunction(
-      HgiShaderFunctionDesc const &desc) override;
+  HgiShaderFunctionHandle CreateShaderFunction(HgiShaderFunctionDesc const &desc) override;
 
   HGIGL_API
-  void DestroyShaderFunction(
-      HgiShaderFunctionHandle *shaderFunctionHandle) override;
+  void DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHandle) override;
 
   HGIGL_API
-  HgiShaderProgramHandle CreateShaderProgram(
-      HgiShaderProgramDesc const &desc) override;
+  HgiShaderProgramHandle CreateShaderProgram(HgiShaderProgramDesc const &desc) override;
 
   HGIGL_API
-  void DestroyShaderProgram(
-      HgiShaderProgramHandle *shaderProgramHandle) override;
+  void DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle) override;
 
   HGIGL_API
-  HgiResourceBindingsHandle CreateResourceBindings(
-      HgiResourceBindingsDesc const &desc) override;
+  HgiResourceBindingsHandle CreateResourceBindings(HgiResourceBindingsDesc const &desc) override;
 
   HGIGL_API
   void DestroyResourceBindings(HgiResourceBindingsHandle *resHandle) override;
@@ -148,12 +139,10 @@ public:
       HgiGraphicsPipelineDesc const &pipeDesc) override;
 
   HGIGL_API
-  void DestroyGraphicsPipeline(
-      HgiGraphicsPipelineHandle *pipeHandle) override;
+  void DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle) override;
 
   HGIGL_API
-  HgiComputePipelineHandle CreateComputePipeline(
-      HgiComputePipelineDesc const &pipeDesc) override;
+  HgiComputePipelineHandle CreateComputePipeline(HgiComputePipelineDesc const &pipeDesc) override;
 
   HGIGL_API
   void DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle) override;
@@ -201,20 +190,18 @@ public:
   void SetContextArena(HgiGLContextArenaHandle const &arenaHandle);
   // -------------------------------------------------------------------------
 
-protected:
+ protected:
   HGIGL_API
   bool _SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiGL &operator=(const HgiGL &) = delete;
   HgiGL(const HgiGL &) = delete;
 
   /// Invalidates the resource handle and places the object in the garbage
   /// collector vector for future destruction.
   /// This is helpful to avoid destroying GPU resources still in-flight.
-  template <class T>
-  void _TrashObject(
-      HgiHandle<T> *handle, std::vector<HgiHandle<T>> *collector)
+  template<class T> void _TrashObject(HgiHandle<T> *handle, std::vector<HgiHandle<T>> *collector)
   {
     collector->push_back(HgiHandle<T>(handle->Get(), /*id*/ 0));
     *handle = HgiHandle<T>();

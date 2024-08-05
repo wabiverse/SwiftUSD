@@ -42,29 +42,28 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfInterval const &self) {
+static string _Repr(GfInterval const &self)
+{
   string r = TF_PY_REPR_PREFIX + "Interval(";
   if (!self.IsEmpty()) {
     r += TfPyRepr(self.GetMin()) + ", " + TfPyRepr(self.GetMax());
     if (!self.IsMinClosed() || !self.IsMaxClosed()) {
-      r += ", " + TfPyRepr(self.IsMinClosed()) + ", " +
-           TfPyRepr(self.IsMaxClosed());
+      r += ", " + TfPyRepr(self.IsMinClosed()) + ", " + TfPyRepr(self.IsMaxClosed());
     }
   }
   r += ")";
   return r;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapInterval() {
+void wrapInterval()
+{
   typedef GfInterval This;
 
   class_<This>("Interval", "Basic mathematical interval class", init<>())
-      .def(init<double>(
-          "Create a closed interval representing the single point [val,val]."))
-      .def(init<double, double>(
-          "Create a closed interval representing the range [v1,v2]."))
+      .def(init<double>("Create a closed interval representing the single point [val,val]."))
+      .def(init<double, double>("Create a closed interval representing the range [v1,v2]."))
       .def(init<double, double, bool, bool>("Create the interval."))
       .def(init<This>())
 
@@ -87,11 +86,13 @@ void wrapInterval() {
       .def("Contains",
            (bool(This::*)(const GfInterval &) const) & This::Contains,
            "Returns true if x is inside the interval.")
-      .def("Contains", (bool(This::*)(double) const) & This::Contains,
+      .def("Contains",
+           (bool(This::*)(double) const) & This::Contains,
            "Returns true if x is inside the interval.")
 
       // For 2x compatibility
-      .def("In", (bool(This::*)(double) const) & This::Contains,
+      .def("In",
+           (bool(This::*)(double) const) & This::Contains,
            "Returns true if x is inside the interval.")
 
       .def("GetFullInterval", &This::GetFullInterval)
@@ -116,14 +117,14 @@ void wrapInterval() {
 
       .def("GetSize", &This::GetSize, "The width of the interval")
 
-      .def("SetMax", (void(This::*)(double)) & This::SetMax,
-           "Set the maximum value.")
-      .def("SetMax", (void(This::*)(double, bool)) & This::SetMax,
+      .def("SetMax", (void(This::*)(double)) & This::SetMax, "Set the maximum value.")
+      .def("SetMax",
+           (void(This::*)(double, bool)) & This::SetMax,
            "Set the maximum value and boundary condition.")
 
-      .def("SetMin", (void(This::*)(double)) & This::SetMin,
-           "Set the minimum value.")
-      .def("SetMin", (void(This::*)(double, bool)) & This::SetMin,
+      .def("SetMin", (void(This::*)(double)) & This::SetMin, "Set the minimum value.")
+      .def("SetMin",
+           (void(This::*)(double, bool)) & This::SetMin,
            "Set the minimum value and boundary condition.")
 
       // ring_operators

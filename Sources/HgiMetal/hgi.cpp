@@ -26,16 +26,16 @@
 
 #include "Arch/defines.h"
 
-#include "HgiMetal/hgi.h"
-#include "HgiMetal/buffer.h"
 #include "HgiMetal/blitCmds.h"
+#include "HgiMetal/buffer.h"
+#include "HgiMetal/capabilities.h"
 #include "HgiMetal/computeCmds.h"
 #include "HgiMetal/computePipeline.h"
-#include "HgiMetal/capabilities.h"
 #include "HgiMetal/conversions.h"
 #include "HgiMetal/diagnostic.h"
 #include "HgiMetal/graphicsCmds.h"
 #include "HgiMetal/graphicsPipeline.h"
+#include "HgiMetal/hgi.h"
 #include "HgiMetal/resourceBindings.h"
 #include "HgiMetal/sampler.h"
 #include "HgiMetal/shaderFunction.h"
@@ -59,24 +59,19 @@ TF_REGISTRY_FUNCTION(TfType)
 HgiMetal::HgiMetal(MTL::Device *device)
     : _device(device), _currentCmds(nullptr), _frameDepth(0), _workToFlush(false)
 {
-  if (!_device)
-  {
-    if (TfGetenvBool("HGIMETAL_USE_INTEGRATED_GPU", false))
-    {
+  if (!_device) {
+    if (TfGetenvBool("HGIMETAL_USE_INTEGRATED_GPU", false)) {
       NS::Array *devices = MTL::CopyAllDevices();
-      for (NS::UInteger dix = 0; dix < devices->count(); dix++)
-      {
+      for (NS::UInteger dix = 0; dix < devices->count(); dix++) {
         MTL::Device *d = devices->object<MTL::Device>(dix);
-        if (d->lowPower())
-        {
+        if (d->lowPower()) {
           _device = d;
           break;
         }
       }
     }
 
-    if (!_device)
-    {
+    if (!_device) {
       _device = MTL::CreateSystemDefaultDevice();
     }
   }
@@ -130,8 +125,7 @@ HgiMetal::~HgiMetal()
 
   {
     std::lock_guard<std::mutex> lock(_freeArgMutex);
-    while (_freeArgBuffers.size())
-    {
+    while (_freeArgBuffers.size()) {
       _freeArgBuffers.top()->release();
       _freeArgBuffers.pop();
     }
@@ -141,9 +135,9 @@ HgiMetal::~HgiMetal()
 HgiMetalPtr HgiMetal::CreateHgi()
 {
   HgiMetalPtr hgi = std::make_shared<HgiMetal>();
-  
-  hgi.reset(dynamic_cast<HgiMetal*>(Hgi::GetPlatformDefaultHgi()));
-  
+
+  hgi.reset(dynamic_cast<HgiMetal *>(Hgi::GetPlatformDefaultHgi()));
+
   return hgi;
 }
 
@@ -151,7 +145,8 @@ bool HgiMetal::IsBackendSupported() const
 {
   // Want Metal 2.0 and Metal Shading Language 2.2 or higher.
 
-#if defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && (__MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15))
+#if defined(ARCH_OS_OSX) && \
+    (defined(__MAC_10_15) && (__MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15))
   return true;
 #elif defined(ARCH_OS_IOS) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000)
   return true;
@@ -160,45 +155,36 @@ bool HgiMetal::IsBackendSupported() const
 #endif /* ARCH_OS_MACOS */
 }
 
-MTL::Device *
-HgiMetal::GetPrimaryDevice() const
+MTL::Device *HgiMetal::GetPrimaryDevice() const
 {
   return _device;
 }
 
-HgiGraphicsCmdsUniquePtr
-HgiMetal::CreateGraphicsCmds(
-    HgiGraphicsCmdsDesc const &desc)
+HgiGraphicsCmdsUniquePtr HgiMetal::CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc)
 {
   HgiMetalGraphicsCmds *gfxCmds(new HgiMetalGraphicsCmds(this, desc));
   return HgiGraphicsCmdsUniquePtr(gfxCmds);
 }
 
-HgiComputeCmdsUniquePtr
-HgiMetal::CreateComputeCmds(
-    HgiComputeCmdsDesc const &desc)
+HgiComputeCmdsUniquePtr HgiMetal::CreateComputeCmds(HgiComputeCmdsDesc const &desc)
 {
   HgiComputeCmds *computeCmds = new HgiMetalComputeCmds(this, desc);
-  if (!_currentCmds)
-  {
+  if (!_currentCmds) {
     _currentCmds = computeCmds;
   }
   return HgiComputeCmdsUniquePtr(computeCmds);
 }
 
-HgiBlitCmdsUniquePtr
-HgiMetal::CreateBlitCmds()
+HgiBlitCmdsUniquePtr HgiMetal::CreateBlitCmds()
 {
   HgiMetalBlitCmds *blitCmds = new HgiMetalBlitCmds(this);
-  if (!_currentCmds)
-  {
+  if (!_currentCmds) {
     _currentCmds = blitCmds;
   }
   return HgiBlitCmdsUniquePtr(blitCmds);
 }
 
-HgiTextureHandle
-HgiMetal::CreateTexture(HgiTextureDesc const &desc)
+HgiTextureHandle HgiMetal::CreateTexture(HgiTextureDesc const &desc)
 {
   return HgiTextureHandle(new HgiMetalTexture(this, desc), GetUniqueId());
 }
@@ -208,16 +194,13 @@ void HgiMetal::DestroyTexture(HgiTextureHandle *texHandle)
   _TrashObject(texHandle);
 }
 
-HgiTextureViewHandle
-HgiMetal::CreateTextureView(HgiTextureViewDesc const &desc)
+HgiTextureViewHandle HgiMetal::CreateTextureView(HgiTextureViewDesc const &desc)
 {
-  if (!desc.sourceTexture)
-  {
+  if (!desc.sourceTexture) {
     TF_CODING_ERROR("Source texture is null");
   }
 
-  HgiTextureHandle src =
-      HgiTextureHandle(new HgiMetalTexture(this, desc), GetUniqueId());
+  HgiTextureHandle src = HgiTextureHandle(new HgiMetalTexture(this, desc), GetUniqueId());
   HgiTextureView *view = new HgiTextureView(desc);
   view->SetViewTexture(src);
   return HgiTextureViewHandle(view, GetUniqueId());
@@ -228,13 +211,11 @@ void HgiMetal::DestroyTextureView(HgiTextureViewHandle *viewHandle)
   // Trash the texture inside the view and invalidate the view handle.
   HgiTextureHandle texHandle = (*viewHandle)->GetViewTexture();
 
-  if (_workToFlush)
-  {
-    _commandBuffer->addCompletedHandler([texHandle](MTL::CommandBuffer *cmdBuffer) -> void
-                                        { delete texHandle.Get(); });
+  if (_workToFlush) {
+    _commandBuffer->addCompletedHandler(
+        [texHandle](MTL::CommandBuffer *cmdBuffer) -> void { delete texHandle.Get(); });
   }
-  else
-  {
+  else {
     _TrashObject(&texHandle);
   }
   (*viewHandle)->SetViewTexture(HgiTextureHandle());
@@ -242,8 +223,7 @@ void HgiMetal::DestroyTextureView(HgiTextureViewHandle *viewHandle)
   *viewHandle = HgiTextureViewHandle();
 }
 
-HgiSamplerHandle
-HgiMetal::CreateSampler(HgiSamplerDesc const &desc)
+HgiSamplerHandle HgiMetal::CreateSampler(HgiSamplerDesc const &desc)
 {
   return HgiSamplerHandle(new HgiMetalSampler(this, desc), GetUniqueId());
 }
@@ -253,8 +233,7 @@ void HgiMetal::DestroySampler(HgiSamplerHandle *smpHandle)
   _TrashObject(smpHandle);
 }
 
-HgiBufferHandle
-HgiMetal::CreateBuffer(HgiBufferDesc const &desc)
+HgiBufferHandle HgiMetal::CreateBuffer(HgiBufferDesc const &desc)
 {
   return HgiBufferHandle(new HgiMetalBuffer(this, desc), GetUniqueId());
 }
@@ -264,11 +243,9 @@ void HgiMetal::DestroyBuffer(HgiBufferHandle *bufHandle)
   _TrashObject(bufHandle);
 }
 
-HgiShaderFunctionHandle
-HgiMetal::CreateShaderFunction(HgiShaderFunctionDesc const &desc)
+HgiShaderFunctionHandle HgiMetal::CreateShaderFunction(HgiShaderFunctionDesc const &desc)
 {
-  return HgiShaderFunctionHandle(
-      new HgiMetalShaderFunction(this, desc), GetUniqueId());
+  return HgiShaderFunctionHandle(new HgiMetalShaderFunction(this, desc), GetUniqueId());
 }
 
 void HgiMetal::DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHandle)
@@ -276,11 +253,9 @@ void HgiMetal::DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHand
   _TrashObject(shaderFunctionHandle);
 }
 
-HgiShaderProgramHandle
-HgiMetal::CreateShaderProgram(HgiShaderProgramDesc const &desc)
+HgiShaderProgramHandle HgiMetal::CreateShaderProgram(HgiShaderProgramDesc const &desc)
 {
-  return HgiShaderProgramHandle(
-      new HgiMetalShaderProgram(desc), GetUniqueId());
+  return HgiShaderProgramHandle(new HgiMetalShaderProgram(desc), GetUniqueId());
 }
 
 void HgiMetal::DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle)
@@ -288,11 +263,9 @@ void HgiMetal::DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle)
   _TrashObject(shaderProgramHandle);
 }
 
-HgiResourceBindingsHandle
-HgiMetal::CreateResourceBindings(HgiResourceBindingsDesc const &desc)
+HgiResourceBindingsHandle HgiMetal::CreateResourceBindings(HgiResourceBindingsDesc const &desc)
 {
-  return HgiResourceBindingsHandle(
-      new HgiMetalResourceBindings(desc), GetUniqueId());
+  return HgiResourceBindingsHandle(new HgiMetalResourceBindings(desc), GetUniqueId());
 }
 
 void HgiMetal::DestroyResourceBindings(HgiResourceBindingsHandle *resHandle)
@@ -300,11 +273,9 @@ void HgiMetal::DestroyResourceBindings(HgiResourceBindingsHandle *resHandle)
   _TrashObject(resHandle);
 }
 
-HgiGraphicsPipelineHandle
-HgiMetal::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const &desc)
+HgiGraphicsPipelineHandle HgiMetal::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const &desc)
 {
-  return HgiGraphicsPipelineHandle(
-      new HgiMetalGraphicsPipeline(this, desc), GetUniqueId());
+  return HgiGraphicsPipelineHandle(new HgiMetalGraphicsPipeline(this, desc), GetUniqueId());
 }
 
 void HgiMetal::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle)
@@ -312,11 +283,9 @@ void HgiMetal::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle)
   _TrashObject(pipeHandle);
 }
 
-HgiComputePipelineHandle
-HgiMetal::CreateComputePipeline(HgiComputePipelineDesc const &desc)
+HgiComputePipelineHandle HgiMetal::CreateComputePipeline(HgiComputePipelineDesc const &desc)
 {
-  return HgiComputePipelineHandle(
-      new HgiMetalComputePipeline(this, desc), GetUniqueId());
+  return HgiComputePipelineHandle(new HgiMetalComputePipeline(this, desc), GetUniqueId());
 }
 
 void HgiMetal::DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle)
@@ -324,20 +293,17 @@ void HgiMetal::DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle)
   _TrashObject(pipeHandle);
 }
 
-TfToken const &
-HgiMetal::GetAPIName() const
+TfToken const &HgiMetal::GetAPIName() const
 {
   return HgiTokens->Metal;
 }
 
-HgiMetalCapabilities const *
-HgiMetal::GetCapabilities() const
+HgiMetalCapabilities const *HgiMetal::GetCapabilities() const
 {
   return _capabilities.get();
 }
 
-HgiMetalIndirectCommandEncoder *
-HgiMetal::GetIndirectCommandEncoder() const
+HgiMetalIndirectCommandEncoder *HgiMetal::GetIndirectCommandEncoder() const
 {
   return _indirectCommandEncoder.get();
 }
@@ -348,12 +314,10 @@ void HgiMetal::StartFrame()
   _pool = NS::AutoreleasePool::alloc()->init();
 #endif
 
-  if (_frameDepth++ == 0)
-  {
+  if (_frameDepth++ == 0) {
     _captureScopeFullFrame->beginScope();
 
-    if (MTL::CaptureManager::sharedCaptureManager()->isCapturing())
-    {
+    if (MTL::CaptureManager::sharedCaptureManager()->isCapturing()) {
       // We need to grab a new command buffer otherwise the previous one
       // (if it was allocated at the end of the last frame) won't appear in
       // this frame's capture, and it will confuse us!
@@ -364,45 +328,37 @@ void HgiMetal::StartFrame()
 
 void HgiMetal::EndFrame()
 {
-  if (--_frameDepth == 0)
-  {
+  if (--_frameDepth == 0) {
     _captureScopeFullFrame->endScope();
   }
 
 #if !__has_feature(objc_arc)
-  if (_pool)
-  {
+  if (_pool) {
     _pool->drain();
     _pool = nil;
   }
 #endif
 }
 
-MTL::CommandQueue *
-HgiMetal::GetQueue() const
+MTL::CommandQueue *HgiMetal::GetQueue() const
 {
   return _commandQueue;
 }
 
-MTL::CommandBuffer *
-HgiMetal::GetPrimaryCommandBuffer(HgiCmds *requester, bool flush)
+MTL::CommandBuffer *HgiMetal::GetPrimaryCommandBuffer(HgiCmds *requester, bool flush)
 {
-  if (_workToFlush)
-  {
-    if (_currentCmds && requester != _currentCmds)
-    {
+  if (_workToFlush) {
+    if (_currentCmds && requester != _currentCmds) {
       return nil;
     }
   }
-  if (flush)
-  {
+  if (flush) {
     _workToFlush = true;
   }
   return _commandBuffer;
 }
 
-MTL::CommandBuffer *
-HgiMetal::GetSecondaryCommandBuffer()
+MTL::CommandBuffer *HgiMetal::GetSecondaryCommandBuffer()
 {
   MTL::CommandBuffer *commandBuffer = _commandQueue->commandBuffer();
   commandBuffer->retain();
@@ -414,12 +370,10 @@ int HgiMetal::GetAPIVersion() const
   return GetCapabilities()->GetAPIVersion();
 }
 
-void HgiMetal::CommitPrimaryCommandBuffer(
-    CommitCommandBufferWaitType waitType,
-    bool forceNewBuffer)
+void HgiMetal::CommitPrimaryCommandBuffer(CommitCommandBufferWaitType waitType,
+                                          bool forceNewBuffer)
 {
-  if (!_workToFlush && !forceNewBuffer)
-  {
+  if (!_workToFlush && !forceNewBuffer) {
     return;
   }
 
@@ -431,32 +385,28 @@ void HgiMetal::CommitPrimaryCommandBuffer(
   _workToFlush = false;
 }
 
-void HgiMetal::CommitSecondaryCommandBuffer(
-    MTL::CommandBuffer *commandBuffer,
-    CommitCommandBufferWaitType waitType)
+void HgiMetal::CommitSecondaryCommandBuffer(MTL::CommandBuffer *commandBuffer,
+                                            CommitCommandBufferWaitType waitType)
 {
   // If there are active arg buffers on this command buffer, add a callback
   // to release them back to the free pool.
-  if (!_activeArgBuffers.empty())
-  {
+  if (!_activeArgBuffers.empty()) {
     _ActiveArgBuffers argBuffersToFree;
     argBuffersToFree.swap(_activeArgBuffers);
 
-    _commandBuffer->addCompletedHandler([&](MTL::CommandBuffer *cmdBuffer) -> void
-                                        {
-            std::lock_guard<std::mutex> lock(_freeArgMutex);
-            for (MTL::Buffer *argBuffer : argBuffersToFree) {
-                _freeArgBuffers.push(argBuffer);
-            } });
+    _commandBuffer->addCompletedHandler([&](MTL::CommandBuffer *cmdBuffer) -> void {
+      std::lock_guard<std::mutex> lock(_freeArgMutex);
+      for (MTL::Buffer *argBuffer : argBuffersToFree) {
+        _freeArgBuffers.push(argBuffer);
+      }
+    });
   }
 
   commandBuffer->commit();
-  if (waitType == CommitCommandBuffer_WaitUntilScheduled)
-  {
+  if (waitType == CommitCommandBuffer_WaitUntilScheduled) {
     commandBuffer->waitUntilScheduled();
   }
-  else if (waitType == CommitCommandBuffer_WaitUntilCompleted)
-  {
+  else if (waitType == CommitCommandBuffer_WaitUntilCompleted) {
     commandBuffer->waitUntilCompleted();
   }
 }
@@ -466,46 +416,39 @@ void HgiMetal::ReleaseSecondaryCommandBuffer(MTL::CommandBuffer *commandBuffer)
   commandBuffer->release();
 }
 
-MTL::ArgumentEncoder *
-HgiMetal::GetBufferArgumentEncoder() const
+MTL::ArgumentEncoder *HgiMetal::GetBufferArgumentEncoder() const
 {
   return _argEncoderBuffer;
 }
 
-MTL::ArgumentEncoder *
-HgiMetal::GetSamplerArgumentEncoder() const
+MTL::ArgumentEncoder *HgiMetal::GetSamplerArgumentEncoder() const
 {
   return _argEncoderSampler;
 }
 
-MTL::ArgumentEncoder *
-HgiMetal::GetTextureArgumentEncoder() const
+MTL::ArgumentEncoder *HgiMetal::GetTextureArgumentEncoder() const
 {
   return _argEncoderTexture;
 }
 
-MTL::Buffer *
-HgiMetal::GetArgBuffer()
+MTL::Buffer *HgiMetal::GetArgBuffer()
 {
   MTL::ResourceOptions options = _capabilities->defaultStorageMode;
   MTL::Buffer *buffer = nil;
 
   {
     std::lock_guard<std::mutex> lock(_freeArgMutex);
-    if (_freeArgBuffers.empty())
-    {
+    if (_freeArgBuffers.empty()) {
       buffer = _device->newBuffer(HgiMetalArgumentOffsetSize, options);
     }
-    else
-    {
+    else {
       buffer = _freeArgBuffers.top();
       _freeArgBuffers.pop();
       memset(buffer->contents(), 0x00, buffer->length());
     }
   }
 
-  if (!_commandBuffer)
-  {
+  if (!_commandBuffer) {
     TF_CODING_ERROR("_commandBuffer is null");
   }
 
@@ -519,11 +462,9 @@ bool HgiMetal::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
 {
   TRACE_FUNCTION();
 
-  if (cmds)
-  {
+  if (cmds) {
     _workToFlush = Hgi::_SubmitCmds(cmds, wait);
-    if (cmds == _currentCmds)
-    {
+    if (cmds == _currentCmds) {
       _currentCmds = nullptr;
     }
   }

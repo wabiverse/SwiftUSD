@@ -37,17 +37,16 @@ PXR_NAMESPACE_USING_DIRECTIVE
 namespace {
 
 TF_INSTANTIATE_NOTICE_WRAPPER(ArNotice::ResolverNotice, TfNotice);
-TF_INSTANTIATE_NOTICE_WRAPPER(ArNotice::ResolverChanged,
-                              ArNotice::ResolverNotice);
+TF_INSTANTIATE_NOTICE_WRAPPER(ArNotice::ResolverChanged, ArNotice::ResolverNotice);
 
-} // end anonymous namespace
+}  // end anonymous namespace
 
-void wrapArNotice() {
+void wrapArNotice()
+{
   scope s = class_<ArNotice>("Notice", no_init);
 
   TfPyNoticeWrapper<ArNotice::ResolverNotice, TfNotice>::Wrap();
 
-  TfPyNoticeWrapper<ArNotice::ResolverChanged, ArNotice::ResolverNotice>::Wrap()
-      .def("AffectsContext", &ArNotice::ResolverChanged::AffectsContext,
-           args("context"));
+  TfPyNoticeWrapper<ArNotice::ResolverChanged, ArNotice::ResolverNotice>::Wrap().def(
+      "AffectsContext", &ArNotice::ResolverChanged::AffectsContext, args("context"));
 }

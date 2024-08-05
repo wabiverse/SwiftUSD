@@ -45,7 +45,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ordered set of non-intersecting GfIntervals.
 ///
 class GfMultiInterval {
-public:
+ public:
   typedef std::set<GfInterval> Set;
   typedef Set::const_iterator const_iterator;
   typedef Set::const_iterator iterator;
@@ -60,22 +60,28 @@ public:
   GF_API explicit GfMultiInterval(const std::vector<GfInterval> &intervals);
   /// @}
 
-  GF_API bool operator==(const GfMultiInterval &that) const {
+  GF_API bool operator==(const GfMultiInterval &that) const
+  {
     return _set == that._set;
   }
-  GF_API bool operator!=(const GfMultiInterval &that) const {
+  GF_API bool operator!=(const GfMultiInterval &that) const
+  {
     return !(*this == that);
   }
-  GF_API bool operator<(const GfMultiInterval &that) const {
+  GF_API bool operator<(const GfMultiInterval &that) const
+  {
     return _set < that._set;
   }
-  GF_API bool operator>=(const GfMultiInterval &that) const {
+  GF_API bool operator>=(const GfMultiInterval &that) const
+  {
     return !(*this < that);
   }
-  GF_API bool operator>(const GfMultiInterval &that) const {
+  GF_API bool operator>(const GfMultiInterval &that) const
+  {
     return (that < *this);
   }
-  GF_API bool operator<=(const GfMultiInterval &that) const {
+  GF_API bool operator<=(const GfMultiInterval &that) const
+  {
     return !(that < *this);
   }
 
@@ -83,7 +89,8 @@ public:
   /// Just a basic hash function, not particularly high quality.
   GF_API size_t Hash() const;
 
-  friend inline size_t hash_value(const GfMultiInterval &mi) {
+  friend inline size_t hash_value(const GfMultiInterval &mi)
+  {
     return mi.Hash();
   }
 
@@ -91,10 +98,16 @@ public:
   /// @{
 
   /// Returns true if the multi-interval is empty.
-  GF_API bool IsEmpty() const { return _set.empty(); }
+  GF_API bool IsEmpty() const
+  {
+    return _set.empty();
+  }
 
   /// Returns the number of intervals in the set.
-  GF_API size_t GetSize() const { return _set.size(); }
+  GF_API size_t GetSize() const
+  {
+    return _set.size();
+  }
 
   /// Returns an interval bounding the entire multi-interval.
   /// Returns an empty interval if the multi-interval is empty.
@@ -116,7 +129,10 @@ public:
   /// @{
 
   /// Clear the multi-interval.
-  GF_API void Clear() { _set.clear(); }
+  GF_API void Clear()
+  {
+    _set.clear();
+  }
 
   /// Add the given interval to the multi-interval.
   GF_API void Add(const GfInterval &i);
@@ -146,8 +162,14 @@ public:
   /// the multi-interval, changes must be made via the public mutation API.
   /// @{
 
-  GF_API const_iterator begin() const { return _set.begin(); }
-  GF_API const_iterator end() const { return _set.end(); }
+  GF_API const_iterator begin() const
+  {
+    return _set.begin();
+  }
+  GF_API const_iterator end() const
+  {
+    return _set.end();
+  }
 
   /// Returns an iterator identifying the first (lowest) interval whose
   /// minimum value is >= x.  If no such interval exists, returns end().
@@ -172,14 +194,18 @@ public:
   /// @}
 
   /// Returns the full interval (-inf, inf).
-  static GfMultiInterval GetFullInterval() {
+  static GfMultiInterval GetFullInterval()
+  {
     return GfMultiInterval(GfInterval::GetFullInterval());
   }
 
   /// Swap two multi-intervals
-  void swap(GfMultiInterval &other) { _set.swap(other._set); }
+  void swap(GfMultiInterval &other)
+  {
+    _set.swap(other._set);
+  }
 
-private:
+ private:
   void _AssertInvariants() const;
 
   Set _set;
@@ -191,4 +217,4 @@ GF_API std::ostream &operator<<(std::ostream &out, const GfMultiInterval &s);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_MULTI_INTERVAL_H
+#endif  // PXR_BASE_GF_MULTI_INTERVAL_H

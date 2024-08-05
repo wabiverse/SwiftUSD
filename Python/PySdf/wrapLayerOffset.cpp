@@ -39,7 +39,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static std::string _Repr(const SdfLayerOffset &self) {
+static std::string _Repr(const SdfLayerOffset &self)
+{
   double offset = self.GetOffset();
   double scale = self.GetScale();
 
@@ -54,9 +55,10 @@ static std::string _Repr(const SdfLayerOffset &self) {
   return s.str();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapLayerOffset() {
+void wrapLayerOffset()
+{
   typedef SdfLayerOffset This;
 
   TfPyContainerConversions::from_python_sequence<

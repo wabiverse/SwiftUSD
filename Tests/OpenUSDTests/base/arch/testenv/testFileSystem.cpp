@@ -22,10 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/fileSystem.h"
 #include "Arch/error.h"
+#include "Arch/fileSystem.h"
 #include "Arch/pragmas.h"
+#include "pxr/pxr.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -36,8 +36,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 ARCH_PRAGMA_DEPRECATED_POSIX_NAME
 
-static bool
-TestArchNormPath()
+static bool TestArchNormPath()
 {
   ARCH_AXIOM(ArchNormPath("") == ".");
   ARCH_AXIOM(ArchNormPath(".") == ".");
@@ -49,40 +48,34 @@ TestArchNormPath()
   ARCH_AXIOM(ArchNormPath("///foo/.//bar//") == "/foo/bar");
   ARCH_AXIOM(ArchNormPath("///foo/.//bar//.//..//.//baz") == "/foo/baz");
   ARCH_AXIOM(ArchNormPath("///..//./foo/.//bar") == "/foo/bar");
-  ARCH_AXIOM(ArchNormPath(
-                 "foo/bar/../../../../../../baz") == "../../../../baz");
+  ARCH_AXIOM(ArchNormPath("foo/bar/../../../../../../baz") == "../../../../baz");
 
 #if defined(ARCH_OS_WINDOWS)
   ARCH_AXIOM(ArchNormPath("C:\\foo\\bar") == "c:/foo/bar");
   ARCH_AXIOM(ArchNormPath("C:foo\\bar") == "c:foo/bar");
-  ARCH_AXIOM(ArchNormPath(
-                 "C:\\foo\\bar", /* stripDriveSpecifier = */ true) == "/foo/bar");
-  ARCH_AXIOM(ArchNormPath(
-                 "C:foo\\bar", /* stripDriveSpecifier = */ true) == "foo/bar");
+  ARCH_AXIOM(ArchNormPath("C:\\foo\\bar", /* stripDriveSpecifier = */ true) == "/foo/bar");
+  ARCH_AXIOM(ArchNormPath("C:foo\\bar", /* stripDriveSpecifier = */ true) == "foo/bar");
 #endif
 
   return true;
 }
 
-namespace
+namespace {
+std::string _AbsPathFilter(const std::string &path)
 {
-  std::string
-  _AbsPathFilter(const std::string &path)
-  {
 #if defined(ARCH_OS_WINDOWS)
-    // Strip drive specifier and convert backslashes to forward slashes.
-    std::string result = path.substr(2);
-    std::replace(result.begin(), result.end(), '\\', '/');
-    return result;
+  // Strip drive specifier and convert backslashes to forward slashes.
+  std::string result = path.substr(2);
+  std::replace(result.begin(), result.end(), '\\', '/');
+  return result;
 #else
-    // Return path as-is.
-    return path;
+  // Return path as-is.
+  return path;
 #endif
-  }
 }
+}  // namespace
 
-static bool
-TestArchAbsPath()
+static bool TestArchAbsPath()
 {
   ARCH_AXIOM(ArchAbsPath("") == "");
   ARCH_AXIOM(ArchAbsPath("foo") != "foo");
@@ -137,11 +130,12 @@ int main()
   ARCH_AXIOM(ArchPRead(firstFile, buf.get(), len, 0) == len);
   ARCH_AXIOM(memcmp(testContent, buf.get(), len) == 0);
   char const *const newText = "overwritten in a file";
-  ARCH_AXIOM(ArchPWrite(firstFile, newText, strlen(newText),
-                        5 /*index of 'in a file'*/) == strlen(newText));
+  ARCH_AXIOM(ArchPWrite(firstFile, newText, strlen(newText), 5 /*index of 'in a file'*/) ==
+             strlen(newText));
   std::unique_ptr<char[]> buf2(new char[strlen("written in a")]);
-  ARCH_AXIOM(ArchPRead(firstFile, buf2.get(), strlen("written in a"),
-                       9 /*index of 'written in a'*/) == strlen("written in a"));
+  ARCH_AXIOM(
+      ArchPRead(firstFile, buf2.get(), strlen("written in a"), 9 /*index of 'written in a'*/) ==
+      strlen("written in a"));
   ARCH_AXIOM(memcmp("written in a", buf2.get(), strlen("written in a")) == 0);
 
   // create and remove a tmp subdir

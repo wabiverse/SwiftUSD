@@ -35,4 +35,4 @@
 #include <Kind/api.h>
 #include <Kind/registry.h>
 
-#endif // __PXR_USD_KIND_H__
+#endif  // __PXR_USD_KIND_H__

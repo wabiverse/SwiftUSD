@@ -27,20 +27,23 @@
 #include "Arch/fileSystem.h"
 #include <pxr/pxrns.h>
 #if defined(ARCH_OS_LINUX)
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #elif defined(ARCH_OS_DARWIN)
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #elif defined(ARCH_OS_WINDOWS)
-#include <DbgHelp.h>
-#include <Psapi.h>
-#include <Windows.h>
+#  include <DbgHelp.h>
+#  include <Psapi.h>
+#  include <Windows.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool ArchGetAddressInfo(void *address, std::string *objectPath,
-                        void **baseAddress, std::string *symbolName,
-                        void **symbolAddress) {
+bool ArchGetAddressInfo(void *address,
+                        std::string *objectPath,
+                        void **baseAddress,
+                        std::string *symbolName,
+                        void **symbolAddress)
+{
 #if defined(_GNU_SOURCE) || defined(ARCH_OS_DARWIN)
 
   Dl_info info;
@@ -78,7 +81,9 @@ bool ArchGetAddressInfo(void *address, std::string *objectPath,
   HMODULE module = nullptr;
   if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
                                GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           reinterpret_cast<LPCSTR>(address), &module)) {
+                           reinterpret_cast<LPCSTR>(address),
+                           &module))
+  {
     return false;
   }
 
@@ -95,8 +100,7 @@ bool ArchGetAddressInfo(void *address, std::string *objectPath,
     SymInitialize(process, NULL, TRUE);
 
     // Symbol
-    ULONG64 symBuffer[(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR) +
-                       sizeof(ULONG64) - 1) /
+    ULONG64 symBuffer[(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR) + sizeof(ULONG64) - 1) /
                       sizeof(ULONG64)];
     SYMBOL_INFO *symbol = (SYMBOL_INFO *)symBuffer;
     symbol->MaxNameLen = MAX_SYM_NAME;
@@ -114,8 +118,7 @@ bool ArchGetAddressInfo(void *address, std::string *objectPath,
 
     if (baseAddress) {
       MODULEINFO moduleInfo = {0};
-      if (!GetModuleInformation(process, module, &moduleInfo,
-                                sizeof(moduleInfo))) {
+      if (!GetModuleInformation(process, module, &moduleInfo, sizeof(moduleInfo))) {
         return false;
       }
       *baseAddress = moduleInfo.lpBaseOfDll;

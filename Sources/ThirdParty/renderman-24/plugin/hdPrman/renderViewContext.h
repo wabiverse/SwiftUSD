@@ -24,13 +24,13 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
 
-#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
-#include "Gf/vec2i.h"
 #include "Gf/vec2f.h"
+#include "Gf/vec2i.h"
 
 #include <vector>
 
@@ -39,16 +39,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Descriptor to create a render man render view together
 /// with associated render outputs and displays.
 ///
-struct HdPrman_RenderViewDesc
-{
+struct HdPrman_RenderViewDesc {
   riley::CameraId cameraId;
   riley::IntegratorId integratorId;
   riley::SampleFilterList sampleFilterList;
   riley::DisplayFilterList displayFilterList;
   GfVec2i resolution;
 
-  struct RenderOutputDesc
-  {
+  struct RenderOutputDesc {
     RenderOutputDesc();
 
     RtUString name;
@@ -63,8 +61,7 @@ struct HdPrman_RenderViewDesc
 
   std::vector<RenderOutputDesc> renderOutputDescs;
 
-  struct DisplayDesc
-  {
+  struct DisplayDesc {
     RtUString name;
     RtUString driver;
     RtParamList params;
@@ -78,24 +75,20 @@ struct HdPrman_RenderViewDesc
 /// Manages a render man render view together with associated
 /// render target, render ouputs and displays.
 ///
-class HdPrman_RenderViewContext final
-{
-public:
+class HdPrman_RenderViewContext final {
+ public:
   HdPrman_RenderViewContext();
 
-  void CreateRenderView(
-      const HdPrman_RenderViewDesc &desc,
-      riley::Riley *riley);
-  void SetIntegratorId(
-      riley::IntegratorId id,
-      riley::Riley *riley);
-  void SetResolution(
-      const GfVec2i &resolution,
-      riley::Riley *riley);
+  void CreateRenderView(const HdPrman_RenderViewDesc &desc, riley::Riley *riley);
+  void SetIntegratorId(riley::IntegratorId id, riley::Riley *riley);
+  void SetResolution(const GfVec2i &resolution, riley::Riley *riley);
 
-  riley::RenderViewId GetRenderViewId() const { return _renderViewId; }
+  riley::RenderViewId GetRenderViewId() const
+  {
+    return _renderViewId;
+  }
 
-private:
+ private:
   HdPrman_RenderViewContext(const HdPrman_RenderViewContext &) = delete;
 
   void _DestroyRenderView(riley::Riley *riley);
@@ -108,4 +101,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_VIEW_CONTEXT_H

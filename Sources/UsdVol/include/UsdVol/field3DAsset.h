@@ -26,18 +26,18 @@
 
 /// \file usdVol/field3DAsset.h
 
-#include <pxr/pxrns.h>
-#include "UsdVol/api.h"
-#include "UsdVol/fieldAsset.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdVol/api.h"
+#include "UsdVol/fieldAsset.h"
 #include "UsdVol/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -60,9 +60,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdVolTokens->rightHanded
 /// as the value.
 ///
-class UsdVolField3DAsset : public UsdVolFieldAsset
-{
-public:
+class UsdVolField3DAsset : public UsdVolFieldAsset {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -72,18 +71,12 @@ public:
   /// Equivalent to UsdVolField3DAsset::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdVolField3DAsset(const UsdPrim &prim = UsdPrim())
-      : UsdVolFieldAsset(prim)
-  {
-  }
+  explicit UsdVolField3DAsset(const UsdPrim &prim = UsdPrim()) : UsdVolFieldAsset(prim) {}
 
   /// Construct a UsdVolField3DAsset on the prim held by \p schemaObj .
   /// Should be preferred over UsdVolField3DAsset(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdVolField3DAsset(const UsdSchemaBase &schemaObj)
-      : UsdVolFieldAsset(schemaObj)
-  {
-  }
+  explicit UsdVolField3DAsset(const UsdSchemaBase &schemaObj) : UsdVolFieldAsset(schemaObj) {}
 
   /// Destructor.
   USDVOL_API
@@ -93,8 +86,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDVOL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdVolField3DAsset holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -106,8 +98,7 @@ public:
   /// \endcode
   ///
   USDVOL_API
-  static UsdVolField3DAsset
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdVolField3DAsset Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -132,17 +123,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDVOL_API
-  static UsdVolField3DAsset
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdVolField3DAsset Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDVOL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDVOL_API
@@ -154,7 +144,7 @@ private:
   USDVOL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FIELDDATATYPE
   // --------------------------------------------------------------------- //
@@ -179,9 +169,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDVOL_API
-  UsdAttribute CreateFieldDataTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFieldDataTypeAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FIELDPURPOSE
   // --------------------------------------------------------------------- //
@@ -203,9 +194,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDVOL_API
-  UsdAttribute CreateFieldPurposeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFieldPurposeAttr(VtValue const &defaultValue = VtValue(),
+                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

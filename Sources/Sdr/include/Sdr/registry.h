@@ -27,12 +27,12 @@
 
 /// \file sdr/registry.h
 
-#include <pxr/pxrns.h>
-#include "Tf/singleton.h"
-#include "Sdr/api.h"
 #include "Ndr/registry.h"
+#include "Sdr/api.h"
 #include "Sdr/declare.h"
 #include "Sdr/shaderNode.h"
+#include "Tf/singleton.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// The shading-specialized version of `NdrRegistry`.
 ///
-class SdrRegistry : public NdrRegistry
-{
-public:
+class SdrRegistry : public NdrRegistry {
+ public:
   /// Get the single `SdrRegistry` instance.
   SDR_API
   static SdrRegistry &GetInstance();
@@ -50,24 +49,21 @@ public:
   /// Exactly like `NdrRegistry::GetNodeByIdentifier()`, but returns a
   /// `SdrShaderNode` pointer instead of a `NdrNode` pointer.
   SDR_API
-  SdrShaderNodeConstPtr GetShaderNodeByIdentifier(
-      const NdrIdentifier &identifier,
-      const NdrTokenVec &typePriority = NdrTokenVec());
+  SdrShaderNodeConstPtr GetShaderNodeByIdentifier(const NdrIdentifier &identifier,
+                                                  const NdrTokenVec &typePriority = NdrTokenVec());
 
   /// Exactly like `NdrRegistry::GetNodeByIdentifierAndType()`, but returns
   /// a `SdrShaderNode` pointer instead of a `NdrNode` pointer.
   SDR_API
-  SdrShaderNodeConstPtr GetShaderNodeByIdentifierAndType(
-      const NdrIdentifier &identifier,
-      const TfToken &nodeType);
+  SdrShaderNodeConstPtr GetShaderNodeByIdentifierAndType(const NdrIdentifier &identifier,
+                                                         const TfToken &nodeType);
 
   /// Exactly like `NdrRegistry::GetNodeByName()`, but returns a
   /// `SdrShaderNode` pointer instead of a `NdrNode` pointer.
   SDR_API
-  SdrShaderNodeConstPtr GetShaderNodeByName(
-      const std::string &name,
-      const NdrTokenVec &typePriority = NdrTokenVec(),
-      NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
+  SdrShaderNodeConstPtr GetShaderNodeByName(const std::string &name,
+                                            const NdrTokenVec &typePriority = NdrTokenVec(),
+                                            NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
   /// Exactly like `NdrRegistry::GetNodeByNameAndType()`, but returns a
   /// `SdrShaderNode` pointer instead of a `NdrNode` pointer.
@@ -80,19 +76,17 @@ public:
   /// Wrapper method for NdrRegistry::GetNodeFromAsset().
   /// Returns a valid SdrShaderNode pointer upon success.
   SDR_API
-  SdrShaderNodeConstPtr GetShaderNodeFromAsset(
-      const SdfAssetPath &shaderAsset,
-      const NdrTokenMap &metadata = NdrTokenMap(),
-      const TfToken &subIdentifier = TfToken(),
-      const TfToken &sourceType = TfToken());
+  SdrShaderNodeConstPtr GetShaderNodeFromAsset(const SdfAssetPath &shaderAsset,
+                                               const NdrTokenMap &metadata = NdrTokenMap(),
+                                               const TfToken &subIdentifier = TfToken(),
+                                               const TfToken &sourceType = TfToken());
 
   /// Wrapper method for NdrRegistry::GetNodeFromSourceCode().
   /// Returns a valid SdrShaderNode pointer upon success.
   SDR_API
-  SdrShaderNodeConstPtr GetShaderNodeFromSourceCode(
-      const std::string &sourceCode,
-      const TfToken &sourceType,
-      const NdrTokenMap &metadata = NdrTokenMap());
+  SdrShaderNodeConstPtr GetShaderNodeFromSourceCode(const std::string &sourceCode,
+                                                    const TfToken &sourceType,
+                                                    const NdrTokenMap &metadata = NdrTokenMap());
 
   /// Exactly like `NdrRegistry::GetNodesByIdentifier()`, but returns a vector
   /// of `SdrShaderNode` pointers instead of a vector of `NdrNode` pointers.
@@ -102,18 +96,16 @@ public:
   /// Exactly like `NdrRegistry::GetNodesByName()`, but returns a vector of
   /// `SdrShaderNode` pointers instead of a vector of `NdrNode` pointers.
   SDR_API
-  SdrShaderNodePtrVec GetShaderNodesByName(
-      const std::string &name,
-      NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
+  SdrShaderNodePtrVec GetShaderNodesByName(const std::string &name,
+                                           NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
   /// Exactly like `NdrRegistry::GetNodesByFamily()`, but returns a vector of
   /// `SdrShaderNode` pointers instead of a vector of `NdrNode` pointers.
   SDR_API
   SdrShaderNodePtrVec GetShaderNodesByFamily(
-      const TfToken &family = TfToken(),
-      NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
+      const TfToken &family = TfToken(), NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
-protected:
+ protected:
   // Allow TF to construct the class
   friend class TfSingleton<SdrRegistry>;
 
@@ -123,4 +115,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDR_REGISTRY_H
+#endif  // PXR_USD_SDR_REGISTRY_H

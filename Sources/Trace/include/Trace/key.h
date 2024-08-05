@@ -37,30 +37,36 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// instances.
 ///
 class TraceKey {
-public:
+ public:
   /// Constructor.
   constexpr TraceKey(const TraceStaticKeyData &data) : _ptr(&data) {}
 
   /// Equality comparison.
-  bool operator==(const TraceKey &other) const {
+  bool operator==(const TraceKey &other) const
+  {
     if (_ptr == other._ptr) {
       return true;
-    } else {
+    }
+    else {
       return *_ptr == *other._ptr;
     }
   }
 
   /// Hash function.
-  size_t Hash() const {
+  size_t Hash() const
+  {
     return reinterpret_cast<size_t>(_ptr) / sizeof(TraceStaticKeyData);
   }
 
   /// A Hash functor which may be used to store keys in a TfHashMap.
   struct HashFunctor {
-    size_t operator()(const TraceKey &key) const { return key.Hash(); }
+    size_t operator()(const TraceKey &key) const
+    {
+      return key.Hash();
+    }
   };
 
-private:
+ private:
   const TraceStaticKeyData *_ptr;
 
   // TraceCollection converts TraceKeys to TfTokens for visitors.
@@ -69,4 +75,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_KEY_H
+#endif  // PXR_BASE_TRACE_KEY_H

@@ -30,10 +30,10 @@
 /// Future additions might include full-on dependency extraction, queries like
 /// "Does this stage contain this asset?", "usd grep" functionality, etc.
 
-#include <pxr/pxrns.h>
-#include "UsdUtils/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
+#include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/stage.h"
 
@@ -44,12 +44,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 SDF_DECLARE_HANDLES(SdfLayer);
 
-#define USDUTILS_USDSTAGE_STATS                                                                                                                                                             \
-  (approxMemoryInMb)(totalPrimCount)(modelCount)(instancedModelCount)(assetCount)(prototypeCount)(totalInstanceCount)(usedLayerCount)(primary)(prototypes)(primCounts) /*(totalPrimCount)*/ \
+#define USDUTILS_USDSTAGE_STATS \
+  (approxMemoryInMb)(totalPrimCount)( \
+      modelCount)(instancedModelCount)(assetCount)(prototypeCount)(totalInstanceCount)(usedLayerCount)(primary)(prototypes)(primCounts) /*(totalPrimCount)*/ \
       (activePrimCount)(inactivePrimCount)(pureOverCount)(instanceCount)(primCountsByType)(untyped)
 
-TF_DECLARE_PUBLIC_TOKENS(UsdUtilsUsdStageStatsKeys,
-                         USDUTILS_API, USDUTILS_USDSTAGE_STATS);
+TF_DECLARE_PUBLIC_TOKENS(UsdUtilsUsdStageStatsKeys, USDUTILS_API, USDUTILS_USDSTAGE_STATS);
 
 /// Opens the given layer on a USD stage and collects various stats.
 /// The stats are populated in the dictionary-valued output param \p stats.
@@ -91,8 +91,7 @@ TF_DECLARE_PUBLIC_TOKENS(UsdUtilsUsdStageStatsKeys,
 /// 'instancedModelCount'.
 ///
 USDUTILS_API
-UsdStageRefPtr UsdUtilsComputeUsdStageStats(const std::string &rootLayerPath,
-                                            VtDictionary *stats);
+UsdStageRefPtr UsdUtilsComputeUsdStageStats(const std::string &rootLayerPath, VtDictionary *stats);
 
 /// \overload
 /// Computes stats on an already opened USD stage.
@@ -101,8 +100,7 @@ UsdStageRefPtr UsdUtilsComputeUsdStageStats(const std::string &rootLayerPath,
 /// pure overs, prims inside prototypes etc.
 ///
 USDUTILS_API
-size_t UsdUtilsComputeUsdStageStats(const UsdStageWeakPtr &stage,
-                                    VtDictionary *stats);
+size_t UsdUtilsComputeUsdStageStats(const UsdStageWeakPtr &stage, VtDictionary *stats);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

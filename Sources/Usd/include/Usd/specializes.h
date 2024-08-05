@@ -53,13 +53,12 @@ class UsdSpecializes {
 
   explicit UsdSpecializes(const UsdPrim &prim) : _prim(prim) {}
 
-public:
+ public:
   /// Adds a path to the specializes listOp at the current EditTarget,
   /// in the position specified by \p position.
   USD_API
-  bool
-  AddSpecialize(const SdfPath &primPath,
-                UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddSpecialize(const SdfPath &primPath,
+                     UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// Removes the specified path from the specializes listOp at the
   /// current EditTarget.
@@ -78,18 +77,27 @@ public:
   bool SetSpecializes(const SdfPathVector &items);
 
   /// Return the prim this object is bound to.
-  const UsdPrim &GetPrim() const { return _prim; }
-  UsdPrim GetPrim() { return _prim; }
+  const UsdPrim &GetPrim() const
+  {
+    return _prim;
+  }
+  UsdPrim GetPrim()
+  {
+    return _prim;
+  }
 
-  explicit operator bool() { return bool(_prim); }
+  explicit operator bool()
+  {
+    return bool(_prim);
+  }
 
   // ---------------------------------------------------------------------- //
   // Private Methods and Members
   // ---------------------------------------------------------------------- //
-private:
+ private:
   UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SPECIALIZES_H
+#endif  // PXR_USD_USD_SPECIALIZES_H

@@ -28,17 +28,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-ArResolverScopedCache::ArResolverScopedCache() {
+ArResolverScopedCache::ArResolverScopedCache()
+{
   ArGetResolver().BeginCacheScope(&_cacheScopeData);
 }
 
-ArResolverScopedCache::ArResolverScopedCache(
-    const ArResolverScopedCache *parent)
-    : _cacheScopeData(parent->_cacheScopeData) {
+ArResolverScopedCache::ArResolverScopedCache(const ArResolverScopedCache *parent)
+    : _cacheScopeData(parent->_cacheScopeData)
+{
   ArGetResolver().BeginCacheScope(&_cacheScopeData);
 }
 
-ArResolverScopedCache::~ArResolverScopedCache() {
+ArResolverScopedCache::~ArResolverScopedCache()
+{
   ArGetResolver().EndCacheScope(&_cacheScopeData);
 }
 

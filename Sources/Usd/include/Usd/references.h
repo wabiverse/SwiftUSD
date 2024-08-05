@@ -221,7 +221,7 @@ class UsdReferences {
 
   explicit UsdReferences(const UsdPrim &prim) : _prim(prim) {}
 
-public:
+ public:
   /// Adds a reference to the reference listOp at the current EditTarget,
   /// in the position specified by \p position.
   /// \sa \ref Usd_Failing_References "Why adding references may fail" for
@@ -229,32 +229,29 @@ public:
   /// to expect, and \ref Usd_OM_ListOps for details on list editing and
   /// composition of listOps.
   USD_API
-  bool
-  AddReference(const SdfReference &ref,
-               UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddReference(const SdfReference &ref,
+                    UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// \overload
   USD_API
-  bool
-  AddReference(const std::string &identifier, const SdfPath &primPath,
-               const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-               UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddReference(const std::string &identifier,
+                    const SdfPath &primPath,
+                    const SdfLayerOffset &layerOffset = SdfLayerOffset(),
+                    UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// \overload
   /// \sa \ref Usd_DefaultPrim_References "References Without Prim Paths"
   USD_API
-  bool
-  AddReference(const std::string &identifier,
-               const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-               UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddReference(const std::string &identifier,
+                    const SdfLayerOffset &layerOffset = SdfLayerOffset(),
+                    UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// Add an internal reference to the specified prim.
   /// \sa \ref Usd_Internal_References "Internal References"
   USD_API
-  bool AddInternalReference(
-      const SdfPath &primPath,
-      const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-      UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddInternalReference(const SdfPath &primPath,
+                            const SdfLayerOffset &layerOffset = SdfLayerOffset(),
+                            UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// Removes the specified reference from the references listOp at the
   /// current EditTarget.  This does not necessarily eliminate the
@@ -282,17 +279,26 @@ public:
   bool SetReferences(const SdfReferenceVector &items);
 
   /// Return the prim this object is bound to.
-  const UsdPrim &GetPrim() const { return _prim; }
+  const UsdPrim &GetPrim() const
+  {
+    return _prim;
+  }
 
   /// \overload
-  UsdPrim GetPrim() { return _prim; }
+  UsdPrim GetPrim()
+  {
+    return _prim;
+  }
 
-  explicit operator bool() { return bool(_prim); }
+  explicit operator bool()
+  {
+    return bool(_prim);
+  }
 
-private:
+ private:
   UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_REFERENCES_H
+#endif  // PXR_USD_USD_REFERENCES_H

@@ -66,7 +66,8 @@ namespace {
 // Python buffer protocol support.
 
 // Python's getbuffer interface function.
-static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
+static int getbuffer(PyObject *self, Py_buffer *view, int flags)
+{
   if (view == NULL) {
     PyErr_SetString(PyExc_ValueError, "NULL view in getbuffer");
     return -1;
@@ -87,27 +88,30 @@ static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
   view->itemsize = sizeof(double);
   if ((flags & PyBUF_FORMAT) == PyBUF_FORMAT) {
     view->format = Gf_GetPyBufferFmtFor<double>();
-  } else {
+  }
+  else {
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
     view->ndim = 1;
     static Py_ssize_t shape = 4;
     view->shape = &shape;
-  } else {
+  }
+  else {
     view->ndim = 0;
     view->shape = NULL;
   }
   if ((flags & PyBUF_STRIDES) == PyBUF_STRIDES) {
     static Py_ssize_t strides = sizeof(double);
     view->strides = &strides;
-  } else {
+  }
+  else {
     view->strides = NULL;
   }
   view->suboffsets = NULL;
   view->internal = NULL;
 
-  Py_INCREF(self); // need to retain a reference to self.
+  Py_INCREF(self);  // need to retain a reference to self.
   return 0;
 }
 
@@ -121,7 +125,8 @@ static PyBufferProcs bufferProcs = {
 // End python buffer protocol support.
 ////////////////////////////////////////////////////////////////////////
 
-static string __repr__(GfVec4d const &self) {
+static string __repr__(GfVec4d const &self)
+{
   string elems;
   for (size_t i = 0; i < self.dimension; ++i)
     elems += (i ? ", " : "") + TfPyRepr(self[i]);
@@ -129,32 +134,41 @@ static string __repr__(GfVec4d const &self) {
   return TF_PY_REPR_PREFIX + "Vec4d(" + elems + ")";
 }
 
-static size_t __hash__(GfVec4d const &self) { return TfHash{}(self); }
+static size_t __hash__(GfVec4d const &self)
+{
+  return TfHash{}(self);
+}
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VecGetNormalized_overloads,
-                                       GetNormalized, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VecGetNormalized_overloads, GetNormalized, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VecNormalize_overloads, Normalize, 0, 1);
 BOOST_PYTHON_FUNCTION_OVERLOADS(GetNormalized_overloads, GfGetNormalized, 1, 2);
 
-static double NormalizeHelper(GfVec4d *vec, double eps = GF_MIN_VECTOR_LENGTH) {
+static double NormalizeHelper(GfVec4d *vec, double eps = GF_MIN_VECTOR_LENGTH)
+{
   return GfNormalize(vec, eps);
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(Normalize_overloads, NormalizeHelper, 1, 2);
 
-static int normalizeIndex(int index) {
+static int normalizeIndex(int index)
+{
   return TfPyNormalizeIndex(index, 4, true /*throw error*/);
 }
 
-static int __len__(const GfVec4d &self) { return 4; }
+static int __len__(const GfVec4d &self)
+{
+  return 4;
+}
 
 // Implements __getitem__ for a single index
-static double __getitem__(const GfVec4d &self, int index) {
+static double __getitem__(const GfVec4d &self, int index)
+{
   return self[normalizeIndex(index)];
 }
 
 // Implements __getitem__ for a slice
-static list __getslice__(const GfVec4d &self, slice indices) {
+static list __getslice__(const GfVec4d &self, slice indices)
+{
   list result;
 
   const double *begin = self.data();
@@ -166,7 +180,8 @@ static list __getslice__(const GfVec4d &self, slice indices) {
     // name should be "get_indices".
     //
     bounds = indices.get_indicies<>(begin, end);
-  } catch (std::invalid_argument const &) {
+  }
+  catch (std::invalid_argument const &) {
     return result;
   }
 
@@ -183,23 +198,27 @@ static list __getslice__(const GfVec4d &self, slice indices) {
   return result;
 }
 
-static void __setitem__(GfVec4d &self, int index, double value) {
+static void __setitem__(GfVec4d &self, int index, double value)
+{
   self[normalizeIndex(index)] = value;
 }
 
 // Handles refcounting & extraction for PySequence_GetItem.
-static double _SequenceGetItem(PyObject *seq, Py_ssize_t i) {
+static double _SequenceGetItem(PyObject *seq, Py_ssize_t i)
+{
   boost::python::handle<> h(PySequence_GetItem(seq, i));
   return extract<double>(boost::python::object(h));
 }
 
-static bool _SequenceCheckItem(PyObject *seq, Py_ssize_t i) {
+static bool _SequenceCheckItem(PyObject *seq, Py_ssize_t i)
+{
   boost::python::handle<> h(PySequence_GetItem(seq, i));
   extract<double> e((boost::python::object(h)));
   return e.check();
 }
 
-static void __setslice__(GfVec4d &self, slice indices, object values) {
+static void __setslice__(GfVec4d &self, slice indices, object values)
+{
   // Verify our arguments
   //
   PyObject *valuesObj = values.ptr();
@@ -226,7 +245,8 @@ static void __setslice__(GfVec4d &self, slice indices, object values) {
     // name should be "get_indices".
     //
     bounds = indices.get_indicies<>(begin, end);
-  } catch (std::invalid_argument const &) {
+  }
+  catch (std::invalid_argument const &) {
     sliceLength = 0;
   }
 
@@ -238,9 +258,10 @@ static void __setslice__(GfVec4d &self, slice indices, object values) {
   }
 
   if (PySequence_Length(valuesObj) != sliceLength) {
-    TfPyThrowValueError(TfStringPrintf(
-        "attempt to assign sequence of size %zd to slice of size %zd",
-        PySequence_Length(valuesObj), sliceLength));
+    TfPyThrowValueError(
+        TfStringPrintf("attempt to assign sequence of size %zd to slice of size %zd",
+                       PySequence_Length(valuesObj),
+                       sliceLength));
   }
 
   // Short circuit for empty slices
@@ -262,7 +283,8 @@ static void __setslice__(GfVec4d &self, slice indices, object values) {
   }
 }
 
-static bool __contains__(const GfVec4d &self, double value) {
+static bool __contains__(const GfVec4d &self, double value)
+{
   for (size_t i = 0; i < 4; ++i) {
     if (self[i] == value)
       return true;
@@ -270,27 +292,31 @@ static bool __contains__(const GfVec4d &self, double value) {
   return false;
 }
 
-static GfVec4d __truediv__(const GfVec4d &self, double value) {
+static GfVec4d __truediv__(const GfVec4d &self, double value)
+{
   return self / value;
 }
 
-static GfVec4d &__itruediv__(GfVec4d &self, double value) {
+static GfVec4d &__itruediv__(GfVec4d &self, double value)
+{
   return self /= value;
 }
 
-template <class V> static V *__init__() {
+template<class V> static V *__init__()
+{
   // Default contstructor zero-initializes from python.
   return new V(0);
 }
 
 struct FromPythonTuple {
-  FromPythonTuple() {
-    converter::registry::push_back(&_convertible, &_construct,
-                                   boost::python::type_id<GfVec4d>());
+  FromPythonTuple()
+  {
+    converter::registry::push_back(&_convertible, &_construct, boost::python::type_id<GfVec4d>());
   }
 
-private:
-  static void *_convertible(PyObject *obj_ptr) {
+ private:
+  static void *_convertible(PyObject *obj_ptr)
+  {
     // If this object is a GfVec already, disregard.
     if (PyObject_HasAttrString(obj_ptr, "__isGfVec"))
       return 0;
@@ -299,23 +325,23 @@ private:
 
     // XXX: Would like to allow general sequences, but currently clients
     // depend on this behavior.
-    if ((PyTuple_Check(obj_ptr) || PyList_Check(obj_ptr)) &&
-        PySequence_Size(obj_ptr) == 4 && _SequenceCheckItem(obj_ptr, 0) &&
-        _SequenceCheckItem(obj_ptr, 1) && _SequenceCheckItem(obj_ptr, 2) &&
-        _SequenceCheckItem(obj_ptr, 3)) {
+    if ((PyTuple_Check(obj_ptr) || PyList_Check(obj_ptr)) && PySequence_Size(obj_ptr) == 4 &&
+        _SequenceCheckItem(obj_ptr, 0) && _SequenceCheckItem(obj_ptr, 1) &&
+        _SequenceCheckItem(obj_ptr, 2) && _SequenceCheckItem(obj_ptr, 3))
+    {
       return obj_ptr;
     }
     return 0;
   }
 
-  static void _construct(PyObject *obj_ptr,
-                         converter::rvalue_from_python_stage1_data *data) {
+  static void _construct(PyObject *obj_ptr, converter::rvalue_from_python_stage1_data *data)
+  {
     typedef double Scalar;
-    void *storage =
-        ((converter::rvalue_from_python_storage<GfVec4d> *)data)->storage.bytes;
-    new (storage)
-        GfVec4d(_SequenceGetItem(obj_ptr, 0), _SequenceGetItem(obj_ptr, 1),
-                _SequenceGetItem(obj_ptr, 2), _SequenceGetItem(obj_ptr, 3));
+    void *storage = ((converter::rvalue_from_python_storage<GfVec4d> *)data)->storage.bytes;
+    new (storage) GfVec4d(_SequenceGetItem(obj_ptr, 0),
+                          _SequenceGetItem(obj_ptr, 1),
+                          _SequenceGetItem(obj_ptr, 2),
+                          _SequenceGetItem(obj_ptr, 3));
     data->convertible = storage;
   }
 };
@@ -324,14 +350,16 @@ private:
 // This is used by our Shake plugins which need to pickle entire classes
 // (including code), which we don't support in pxml.
 struct PickleSuite : boost::python::pickle_suite {
-  static boost::python::tuple getinitargs(const GfVec4d &v) {
+  static boost::python::tuple getinitargs(const GfVec4d &v)
+  {
     return boost::python::make_tuple(v[0], v[1], v[2], v[3]);
   }
 };
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapVec4d() {
+void wrapVec4d()
+{
   typedef GfVec4d Vec;
   typedef double Scalar;
 
@@ -343,7 +371,8 @@ void wrapVec4d() {
   def("CompDiv", (Vec(*)(const Vec &v1, const Vec &v2))GfCompDiv);
   def("CompMult", (Vec(*)(const Vec &v1, const Vec &v2))GfCompMult);
   def("GetLength", (Scalar(*)(const Vec &v))GfGetLength);
-  def("GetNormalized", (Vec(*)(const Vec &v, Scalar eps))GfGetNormalized,
+  def("GetNormalized",
+      (Vec(*)(const Vec &v, Scalar eps))GfGetNormalized,
       GetNormalized_overloads());
   def("GetProjection", (Vec(*)(const Vec &a, const Vec &b))GfGetProjection);
   def("GetComplement", (Vec(*)(const Vec &a, const Vec &b))GfGetComplement);
@@ -423,8 +452,7 @@ void wrapVec4d() {
 
       .def("__repr__", __repr__)
       .def("__hash__", __hash__);
-  to_python_converter<std::vector<GfVec4d>,
-                      TfPySequenceToPython<std::vector<GfVec4d>>>();
+  to_python_converter<std::vector<GfVec4d>, TfPySequenceToPython<std::vector<GfVec4d>>>();
 
   // Install buffer protocol: set the tp_as_buffer slot to point to a
   // structure of function pointers that implement the buffer protocol for

@@ -94,4 +94,4 @@
 #include <Gf/vec4h.h>
 #include <Gf/vec4i.h>
 
-#endif // __PXR_BASE_GF_H__
+#endif  // __PXR_BASE_GF_H__

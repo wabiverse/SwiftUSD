@@ -25,236 +25,214 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdLuxShapingAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+  TfType::Define<UsdLuxShapingAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdLuxShapingAPI::~UsdLuxShapingAPI()
-{
-}
+UsdLuxShapingAPI::~UsdLuxShapingAPI() {}
 
 /* static */
-UsdLuxShapingAPI
-UsdLuxShapingAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxShapingAPI UsdLuxShapingAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxShapingAPI();
-    }
-    return UsdLuxShapingAPI(stage->GetPrimAtPath(path));
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxShapingAPI();
+  }
+  return UsdLuxShapingAPI(stage->GetPrimAtPath(path));
 }
-
 
 /* virtual */
 UsdSchemaKind UsdLuxShapingAPI::_GetSchemaKind() const
 {
-    return UsdLuxShapingAPI::schemaKind;
+  return UsdLuxShapingAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdLuxShapingAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdLuxShapingAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
-    return prim.CanApplyAPI<UsdLuxShapingAPI>(whyNot);
+  return prim.CanApplyAPI<UsdLuxShapingAPI>(whyNot);
 }
 
 /* static */
-UsdLuxShapingAPI
-UsdLuxShapingAPI::Apply(const UsdPrim &prim)
+UsdLuxShapingAPI UsdLuxShapingAPI::Apply(const UsdPrim &prim)
 {
-    if (prim.ApplyAPI<UsdLuxShapingAPI>()) {
-        return UsdLuxShapingAPI(prim);
-    }
-    return UsdLuxShapingAPI();
+  if (prim.ApplyAPI<UsdLuxShapingAPI>()) {
+    return UsdLuxShapingAPI(prim);
+  }
+  return UsdLuxShapingAPI();
 }
 
 /* static */
-const TfType &
-UsdLuxShapingAPI::_GetStaticTfType()
+const TfType &UsdLuxShapingAPI::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdLuxShapingAPI>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdLuxShapingAPI>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdLuxShapingAPI::_IsTypedSchema()
+bool UsdLuxShapingAPI::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxShapingAPI::_GetTfType() const
+const TfType &UsdLuxShapingAPI::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingFocusAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingFocusAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingFocus);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingFocus);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingFocusAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingFocusAttr(VtValue const &defaultValue,
+                                                      bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingFocus,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingFocus,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingFocusTintAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingFocusTintAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingFocusTint);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingFocusTint);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingFocusTintAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingFocusTintAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingFocusTint,
-                       SdfValueTypeNames->Color3f,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingFocusTint,
+                                    SdfValueTypeNames->Color3f,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingConeAngleAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingConeAngleAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingConeAngle);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingConeAngle);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingConeAngleAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingConeAngleAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingConeAngle,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingConeAngle,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingConeSoftnessAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingConeSoftnessAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingConeSoftness);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingConeSoftness);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingConeSoftnessAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingConeSoftnessAttr(VtValue const &defaultValue,
+                                                             bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingConeSoftness,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingConeSoftness,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingIesFileAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingIesFileAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesFile);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesFile);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingIesFileAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingIesFileAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesFile,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesFile,
+                                    SdfValueTypeNames->Asset,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingIesAngleScaleAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingIesAngleScaleAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesAngleScale);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesAngleScale);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingIesAngleScaleAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingIesAngleScaleAttr(VtValue const &defaultValue,
+                                                              bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesAngleScale,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesAngleScale,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::GetShapingIesNormalizeAttr() const
+UsdAttribute UsdLuxShapingAPI::GetShapingIesNormalizeAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesNormalize);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsShapingIesNormalize);
 }
 
-UsdAttribute
-UsdLuxShapingAPI::CreateShapingIesNormalizeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxShapingAPI::CreateShapingIesNormalizeAttr(VtValue const &defaultValue,
+                                                             bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesNormalize,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsShapingIesNormalize,
+                                    SdfValueTypeNames->Bool,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxShapingAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdLuxShapingAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-        UsdLuxTokens->inputsShapingFocus,
-        UsdLuxTokens->inputsShapingFocusTint,
-        UsdLuxTokens->inputsShapingConeAngle,
-        UsdLuxTokens->inputsShapingConeSoftness,
-        UsdLuxTokens->inputsShapingIesFile,
-        UsdLuxTokens->inputsShapingIesAngleScale,
-        UsdLuxTokens->inputsShapingIesNormalize,
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {
+      UsdLuxTokens->inputsShapingFocus,
+      UsdLuxTokens->inputsShapingFocusTint,
+      UsdLuxTokens->inputsShapingConeAngle,
+      UsdLuxTokens->inputsShapingConeSoftness,
+      UsdLuxTokens->inputsShapingIesFile,
+      UsdLuxTokens->inputsShapingIesAngleScale,
+      UsdLuxTokens->inputsShapingIesNormalize,
+  };
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -277,48 +255,40 @@ UsdLuxShapingAPI::UsdLuxShapingAPI(const UsdShadeConnectableAPI &connectable)
 {
 }
 
-UsdShadeConnectableAPI 
-UsdLuxShapingAPI::ConnectableAPI() const
+UsdShadeConnectableAPI UsdLuxShapingAPI::ConnectableAPI() const
 {
-    return UsdShadeConnectableAPI(GetPrim());
+  return UsdShadeConnectableAPI(GetPrim());
 }
 
-UsdShadeOutput
-UsdLuxShapingAPI::CreateOutput(const TfToken& name,
-                                const SdfValueTypeName& typeName)
+UsdShadeOutput UsdLuxShapingAPI::CreateOutput(const TfToken &name,
+                                              const SdfValueTypeName &typeName)
 {
-    return UsdShadeConnectableAPI(GetPrim()).CreateOutput(name, typeName);
+  return UsdShadeConnectableAPI(GetPrim()).CreateOutput(name, typeName);
 }
 
-UsdShadeOutput
-UsdLuxShapingAPI::GetOutput(const TfToken &name) const
+UsdShadeOutput UsdLuxShapingAPI::GetOutput(const TfToken &name) const
 {
-    return UsdShadeConnectableAPI(GetPrim()).GetOutput(name);
+  return UsdShadeConnectableAPI(GetPrim()).GetOutput(name);
 }
 
-std::vector<UsdShadeOutput>
-UsdLuxShapingAPI::GetOutputs(bool onlyAuthored) const
+std::vector<UsdShadeOutput> UsdLuxShapingAPI::GetOutputs(bool onlyAuthored) const
 {
-    return UsdShadeConnectableAPI(GetPrim()).GetOutputs(onlyAuthored);
+  return UsdShadeConnectableAPI(GetPrim()).GetOutputs(onlyAuthored);
 }
 
-UsdShadeInput
-UsdLuxShapingAPI::CreateInput(const TfToken& name,
-                               const SdfValueTypeName& typeName)
+UsdShadeInput UsdLuxShapingAPI::CreateInput(const TfToken &name, const SdfValueTypeName &typeName)
 {
-    return UsdShadeConnectableAPI(GetPrim()).CreateInput(name, typeName);
+  return UsdShadeConnectableAPI(GetPrim()).CreateInput(name, typeName);
 }
 
-UsdShadeInput
-UsdLuxShapingAPI::GetInput(const TfToken &name) const
+UsdShadeInput UsdLuxShapingAPI::GetInput(const TfToken &name) const
 {
-    return UsdShadeConnectableAPI(GetPrim()).GetInput(name);
+  return UsdShadeConnectableAPI(GetPrim()).GetInput(name);
 }
 
-std::vector<UsdShadeInput>
-UsdLuxShapingAPI::GetInputs(bool onlyAuthored) const
+std::vector<UsdShadeInput> UsdLuxShapingAPI::GetInputs(bool onlyAuthored) const
 {
-    return UsdShadeConnectableAPI(GetPrim()).GetInputs(onlyAuthored);
+  return UsdShadeConnectableAPI(GetPrim()).GetInputs(onlyAuthored);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

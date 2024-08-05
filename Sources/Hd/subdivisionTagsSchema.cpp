@@ -29,241 +29,207 @@
 /* ************************************************************************** */
 
 #include "Hd/subdivisionTagsSchema.h"
-#include "Hd/retainedDataSource.h"
 #include "Hd/meshSchema.h"
+#include "Hd/retainedDataSource.h"
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSubdivisionTagsSchemaTokens,
-    HDSUBDIVISIONTAGS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSubdivisionTagsSchemaTokens, HDSUBDIVISIONTAGS_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdSubdivisionTagsSchema::GetFaceVaryingLinearInterpolation()
+HdTokenDataSourceHandle HdSubdivisionTagsSchema::GetFaceVaryingLinearInterpolation()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdSubdivisionTagsSchemaTokens->faceVaryingLinearInterpolation);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdSubdivisionTagsSchemaTokens->faceVaryingLinearInterpolation);
 }
 
-HdTokenDataSourceHandle
-HdSubdivisionTagsSchema::GetInterpolateBoundary()
+HdTokenDataSourceHandle HdSubdivisionTagsSchema::GetInterpolateBoundary()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdSubdivisionTagsSchemaTokens->interpolateBoundary);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdSubdivisionTagsSchemaTokens->interpolateBoundary);
 }
 
-HdTokenDataSourceHandle
-HdSubdivisionTagsSchema::GetTriangleSubdivisionRule()
+HdTokenDataSourceHandle HdSubdivisionTagsSchema::GetTriangleSubdivisionRule()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdSubdivisionTagsSchemaTokens->triangleSubdivisionRule);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdSubdivisionTagsSchemaTokens->triangleSubdivisionRule);
 }
 
-HdIntArrayDataSourceHandle
-HdSubdivisionTagsSchema::GetCornerIndices()
+HdIntArrayDataSourceHandle HdSubdivisionTagsSchema::GetCornerIndices()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdSubdivisionTagsSchemaTokens->cornerIndices);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdSubdivisionTagsSchemaTokens->cornerIndices);
 }
 
-HdFloatArrayDataSourceHandle
-HdSubdivisionTagsSchema::GetCornerSharpnesses()
+HdFloatArrayDataSourceHandle HdSubdivisionTagsSchema::GetCornerSharpnesses()
 {
-    return _GetTypedDataSource<HdFloatArrayDataSource>(
-        HdSubdivisionTagsSchemaTokens->cornerSharpnesses);
+  return _GetTypedDataSource<HdFloatArrayDataSource>(
+      HdSubdivisionTagsSchemaTokens->cornerSharpnesses);
 }
 
-HdIntArrayDataSourceHandle
-HdSubdivisionTagsSchema::GetCreaseIndices()
+HdIntArrayDataSourceHandle HdSubdivisionTagsSchema::GetCreaseIndices()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdSubdivisionTagsSchemaTokens->creaseIndices);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdSubdivisionTagsSchemaTokens->creaseIndices);
 }
 
-HdIntArrayDataSourceHandle
-HdSubdivisionTagsSchema::GetCreaseLengths()
+HdIntArrayDataSourceHandle HdSubdivisionTagsSchema::GetCreaseLengths()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdSubdivisionTagsSchemaTokens->creaseLengths);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdSubdivisionTagsSchemaTokens->creaseLengths);
 }
 
-HdFloatArrayDataSourceHandle
-HdSubdivisionTagsSchema::GetCreaseSharpnesses()
+HdFloatArrayDataSourceHandle HdSubdivisionTagsSchema::GetCreaseSharpnesses()
 {
-    return _GetTypedDataSource<HdFloatArrayDataSource>(
-        HdSubdivisionTagsSchemaTokens->creaseSharpnesses);
+  return _GetTypedDataSource<HdFloatArrayDataSource>(
+      HdSubdivisionTagsSchemaTokens->creaseSharpnesses);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdSubdivisionTagsSchema::BuildRetained(
-        const HdTokenDataSourceHandle &faceVaryingLinearInterpolation,
-        const HdTokenDataSourceHandle &interpolateBoundary,
-        const HdTokenDataSourceHandle &triangleSubdivisionRule,
-        const HdIntArrayDataSourceHandle &cornerIndices,
-        const HdFloatArrayDataSourceHandle &cornerSharpnesses,
-        const HdIntArrayDataSourceHandle &creaseIndices,
-        const HdIntArrayDataSourceHandle &creaseLengths,
-        const HdFloatArrayDataSourceHandle &creaseSharpnesses
-)
-{
-    TfToken names[8];
-    HdDataSourceBaseHandle values[8];
-
-    size_t count = 0;
-    if (faceVaryingLinearInterpolation) {
-        names[count] = HdSubdivisionTagsSchemaTokens->faceVaryingLinearInterpolation;
-        values[count++] = faceVaryingLinearInterpolation;
-    }
-
-    if (interpolateBoundary) {
-        names[count] = HdSubdivisionTagsSchemaTokens->interpolateBoundary;
-        values[count++] = interpolateBoundary;
-    }
-
-    if (triangleSubdivisionRule) {
-        names[count] = HdSubdivisionTagsSchemaTokens->triangleSubdivisionRule;
-        values[count++] = triangleSubdivisionRule;
-    }
-
-    if (cornerIndices) {
-        names[count] = HdSubdivisionTagsSchemaTokens->cornerIndices;
-        values[count++] = cornerIndices;
-    }
-
-    if (cornerSharpnesses) {
-        names[count] = HdSubdivisionTagsSchemaTokens->cornerSharpnesses;
-        values[count++] = cornerSharpnesses;
-    }
-
-    if (creaseIndices) {
-        names[count] = HdSubdivisionTagsSchemaTokens->creaseIndices;
-        values[count++] = creaseIndices;
-    }
-
-    if (creaseLengths) {
-        names[count] = HdSubdivisionTagsSchemaTokens->creaseLengths;
-        values[count++] = creaseLengths;
-    }
-
-    if (creaseSharpnesses) {
-        names[count] = HdSubdivisionTagsSchemaTokens->creaseSharpnesses;
-        values[count++] = creaseSharpnesses;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdSubdivisionTagsSchema
-HdSubdivisionTagsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdSubdivisionTagsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdSubdivisionTagsSchemaTokens->subdivisionTags))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdSubdivisionTagsSchema::GetSchemaToken()
-{
-    return HdSubdivisionTagsSchemaTokens->subdivisionTags;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdSubdivisionTagsSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdSubdivisionTagsSchemaTokens->subdivisionTags
-    );
-    return locator;
-} 
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetFaceVaryingLinearInterpolation(
-    const HdTokenDataSourceHandle &faceVaryingLinearInterpolation)
-{
-    _faceVaryingLinearInterpolation = faceVaryingLinearInterpolation;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetInterpolateBoundary(
-    const HdTokenDataSourceHandle &interpolateBoundary)
-{
-    _interpolateBoundary = interpolateBoundary;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetTriangleSubdivisionRule(
-    const HdTokenDataSourceHandle &triangleSubdivisionRule)
-{
-    _triangleSubdivisionRule = triangleSubdivisionRule;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetCornerIndices(
-    const HdIntArrayDataSourceHandle &cornerIndices)
-{
-    _cornerIndices = cornerIndices;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetCornerSharpnesses(
-    const HdFloatArrayDataSourceHandle &cornerSharpnesses)
-{
-    _cornerSharpnesses = cornerSharpnesses;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetCreaseIndices(
-    const HdIntArrayDataSourceHandle &creaseIndices)
-{
-    _creaseIndices = creaseIndices;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetCreaseLengths(
-    const HdIntArrayDataSourceHandle &creaseLengths)
-{
-    _creaseLengths = creaseLengths;
-    return *this;
-}
-
-HdSubdivisionTagsSchema::Builder &
-HdSubdivisionTagsSchema::Builder::SetCreaseSharpnesses(
+HdContainerDataSourceHandle HdSubdivisionTagsSchema::BuildRetained(
+    const HdTokenDataSourceHandle &faceVaryingLinearInterpolation,
+    const HdTokenDataSourceHandle &interpolateBoundary,
+    const HdTokenDataSourceHandle &triangleSubdivisionRule,
+    const HdIntArrayDataSourceHandle &cornerIndices,
+    const HdFloatArrayDataSourceHandle &cornerSharpnesses,
+    const HdIntArrayDataSourceHandle &creaseIndices,
+    const HdIntArrayDataSourceHandle &creaseLengths,
     const HdFloatArrayDataSourceHandle &creaseSharpnesses)
 {
-    _creaseSharpnesses = creaseSharpnesses;
-    return *this;
+  TfToken names[8];
+  HdDataSourceBaseHandle values[8];
+
+  size_t count = 0;
+  if (faceVaryingLinearInterpolation) {
+    names[count] = HdSubdivisionTagsSchemaTokens->faceVaryingLinearInterpolation;
+    values[count++] = faceVaryingLinearInterpolation;
+  }
+
+  if (interpolateBoundary) {
+    names[count] = HdSubdivisionTagsSchemaTokens->interpolateBoundary;
+    values[count++] = interpolateBoundary;
+  }
+
+  if (triangleSubdivisionRule) {
+    names[count] = HdSubdivisionTagsSchemaTokens->triangleSubdivisionRule;
+    values[count++] = triangleSubdivisionRule;
+  }
+
+  if (cornerIndices) {
+    names[count] = HdSubdivisionTagsSchemaTokens->cornerIndices;
+    values[count++] = cornerIndices;
+  }
+
+  if (cornerSharpnesses) {
+    names[count] = HdSubdivisionTagsSchemaTokens->cornerSharpnesses;
+    values[count++] = cornerSharpnesses;
+  }
+
+  if (creaseIndices) {
+    names[count] = HdSubdivisionTagsSchemaTokens->creaseIndices;
+    values[count++] = creaseIndices;
+  }
+
+  if (creaseLengths) {
+    names[count] = HdSubdivisionTagsSchemaTokens->creaseLengths;
+    values[count++] = creaseLengths;
+  }
+
+  if (creaseSharpnesses) {
+    names[count] = HdSubdivisionTagsSchemaTokens->creaseSharpnesses;
+    values[count++] = creaseSharpnesses;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdSubdivisionTagsSchema::Builder::Build()
+/*static*/
+HdSubdivisionTagsSchema HdSubdivisionTagsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdSubdivisionTagsSchema::BuildRetained(
-        _faceVaryingLinearInterpolation,
-        _interpolateBoundary,
-        _triangleSubdivisionRule,
-        _cornerIndices,
-        _cornerSharpnesses,
-        _creaseIndices,
-        _creaseLengths,
-        _creaseSharpnesses
-    );
+  return HdSubdivisionTagsSchema(fromParentContainer ?
+                                     HdContainerDataSource::Cast(fromParentContainer->Get(
+                                         HdSubdivisionTagsSchemaTokens->subdivisionTags)) :
+                                     nullptr);
 }
 
+/*static*/
+const TfToken &HdSubdivisionTagsSchema::GetSchemaToken()
+{
+  return HdSubdivisionTagsSchemaTokens->subdivisionTags;
+}
+/*static*/
+const HdDataSourceLocator &HdSubdivisionTagsSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdSubdivisionTagsSchemaTokens->subdivisionTags);
+  return locator;
+}
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::
+    SetFaceVaryingLinearInterpolation(
+        const HdTokenDataSourceHandle &faceVaryingLinearInterpolation)
+{
+  _faceVaryingLinearInterpolation = faceVaryingLinearInterpolation;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetInterpolateBoundary(
+    const HdTokenDataSourceHandle &interpolateBoundary)
+{
+  _interpolateBoundary = interpolateBoundary;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetTriangleSubdivisionRule(
+    const HdTokenDataSourceHandle &triangleSubdivisionRule)
+{
+  _triangleSubdivisionRule = triangleSubdivisionRule;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetCornerIndices(
+    const HdIntArrayDataSourceHandle &cornerIndices)
+{
+  _cornerIndices = cornerIndices;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetCornerSharpnesses(
+    const HdFloatArrayDataSourceHandle &cornerSharpnesses)
+{
+  _cornerSharpnesses = cornerSharpnesses;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetCreaseIndices(
+    const HdIntArrayDataSourceHandle &creaseIndices)
+{
+  _creaseIndices = creaseIndices;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetCreaseLengths(
+    const HdIntArrayDataSourceHandle &creaseLengths)
+{
+  _creaseLengths = creaseLengths;
+  return *this;
+}
+
+HdSubdivisionTagsSchema::Builder &HdSubdivisionTagsSchema::Builder::SetCreaseSharpnesses(
+    const HdFloatArrayDataSourceHandle &creaseSharpnesses)
+{
+  _creaseSharpnesses = creaseSharpnesses;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdSubdivisionTagsSchema::Builder::Build()
+{
+  return HdSubdivisionTagsSchema::BuildRetained(_faceVaryingLinearInterpolation,
+                                                _interpolateBoundary,
+                                                _triangleSubdivisionRule,
+                                                _cornerIndices,
+                                                _cornerSharpnesses,
+                                                _creaseIndices,
+                                                _creaseLengths,
+                                                _creaseSharpnesses);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

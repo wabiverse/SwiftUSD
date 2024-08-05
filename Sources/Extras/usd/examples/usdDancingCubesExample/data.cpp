@@ -22,61 +22,50 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "data.h"
 #include "dataImpl.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(
-    UsdDancingCubesExample_DataParamsTokens,
-    USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(UsdDancingCubesExample_DataParamsTokens,
+                        USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_TOKENS);
 
 ////////////////////////////////////////////////////////////////////////
 // UsdDancingCubesExample_DataParams
 
-namespace
+namespace {
+
+// Sets an arbitrary param type value from a string arg.
+template<class T> static void _SetParamFromArg(T *param, const std::string &arg)
 {
+  *param = TfUnstringify<T>(arg);
+}
 
-  // Sets an arbitrary param type value from a string arg.
-  template <class T>
-  static void
-  _SetParamFromArg(T *param, const std::string &arg)
-  {
-    *param = TfUnstringify<T>(arg);
+// Specialization for TfToken which doesn't have an istream method for
+// TfUnstringify.
+template<> void _SetParamFromArg<TfToken>(TfToken *param, const std::string &arg)
+{
+  *param = TfToken(arg);
+}
+
+// Helper for setting a parameter value from a VtValue, casting if the value type
+// is not an exact match.
+template<class T> static void _SetParamFromValue(T *param, const VtValue &dictVal)
+{
+  if (dictVal.IsHolding<T>()) {
+    *param = dictVal.UncheckedGet<T>();
   }
-
-  // Specialization for TfToken which doesn't have an istream method for
-  // TfUnstringify.
-  template <>
-  void
-  _SetParamFromArg<TfToken>(TfToken *param, const std::string &arg)
-  {
-    *param = TfToken(arg);
+  else if (dictVal.CanCast<T>()) {
+    VtValue castVal = VtValue::Cast<T>(dictVal);
+    *param = castVal.UncheckedGet<T>();
   }
+}
 
-  // Helper for setting a parameter value from a VtValue, casting if the value type
-  // is not an exact match.
-  template <class T>
-  static void
-  _SetParamFromValue(T *param, const VtValue &dictVal)
-  {
-    if (dictVal.IsHolding<T>())
-    {
-      *param = dictVal.UncheckedGet<T>();
-    }
-    else if (dictVal.CanCast<T>())
-    {
-      VtValue castVal = VtValue::Cast<T>(dictVal);
-      *param = castVal.UncheckedGet<T>();
-    }
-  }
-
-};
+};  // namespace
 
 /*static*/
-UsdDancingCubesExample_DataParams
-UsdDancingCubesExample_DataParams::FromArgs(
+UsdDancingCubesExample_DataParams UsdDancingCubesExample_DataParams::FromArgs(
     const SdfFileFormat::FileFormatArguments &args)
 {
   UsdDancingCubesExample_DataParams params;
@@ -84,11 +73,11 @@ UsdDancingCubesExample_DataParams::FromArgs(
 // For each param in the struct, try to find an arg with the same name
 // and convert its string value to a new value for the param. Falls back
 // to leaving the param as its default value if the arg isn't there.
-#define xx(UNUSED_1, NAME, UNUSED_2)                            \
-  if (const std::string *argValue = TfMapLookupPtr(             \
+#define xx(UNUSED_1, NAME, UNUSED_2) \
+  if (const std::string *argValue = TfMapLookupPtr( \
           args, UsdDancingCubesExample_DataParamsTokens->NAME)) \
-  {                                                             \
-    _SetParamFromArg(&params.NAME, *argValue);                  \
+  { \
+    _SetParamFromArg(&params.NAME, *argValue); \
   }
   USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_X_FIELDS
 #undef xx
@@ -97,25 +86,23 @@ UsdDancingCubesExample_DataParams::FromArgs(
 }
 
 /*static*/
-UsdDancingCubesExample_DataParams
-UsdDancingCubesExample_DataParams::FromDict(const VtDictionary &dict)
+UsdDancingCubesExample_DataParams UsdDancingCubesExample_DataParams::FromDict(
+    const VtDictionary &dict)
 {
   UsdDancingCubesExample_DataParams params;
 
 // Same as FromArgs, but values are extracted from a VtDictionary.
-#define xx(UNUSED_1, NAME, UNUSED_2)                            \
-  if (const VtValue *dictVal = TfMapLookupPtr(                  \
-          dict, UsdDancingCubesExample_DataParamsTokens->NAME)) \
-  {                                                             \
-    _SetParamFromValue(&params.NAME, *dictVal);                 \
+#define xx(UNUSED_1, NAME, UNUSED_2) \
+  if (const VtValue *dictVal = TfMapLookupPtr(dict, \
+                                              UsdDancingCubesExample_DataParamsTokens->NAME)) { \
+    _SetParamFromValue(&params.NAME, *dictVal); \
   }
   USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_X_FIELDS
 #undef xx
   return params;
 }
 
-SdfFileFormat::FileFormatArguments
-UsdDancingCubesExample_DataParams::ToArgs() const
+SdfFileFormat::FileFormatArguments UsdDancingCubesExample_DataParams::ToArgs() const
 {
   SdfFileFormat::FileFormatArguments args;
 
@@ -131,22 +118,19 @@ UsdDancingCubesExample_DataParams::ToArgs() const
 // UsdDancingCubesExample_Data
 
 /*static*/
-UsdDancingCubesExample_DataRefPtr
-UsdDancingCubesExample_Data::New()
+UsdDancingCubesExample_DataRefPtr UsdDancingCubesExample_Data::New()
 {
   return TfCreateRefPtr(new UsdDancingCubesExample_Data());
 }
 
-UsdDancingCubesExample_Data::UsdDancingCubesExample_Data() : _impl(new UsdDancingCubesExample_DataImpl())
+UsdDancingCubesExample_Data::UsdDancingCubesExample_Data()
+    : _impl(new UsdDancingCubesExample_DataImpl())
 {
 }
 
-UsdDancingCubesExample_Data::~UsdDancingCubesExample_Data()
-{
-}
+UsdDancingCubesExample_Data::~UsdDancingCubesExample_Data() {}
 
-void UsdDancingCubesExample_Data::SetParams(
-    const UsdDancingCubesExample_DataParams &params)
+void UsdDancingCubesExample_Data::SetParams(const UsdDancingCubesExample_DataParams &params)
 {
   _impl.reset(new UsdDancingCubesExample_DataImpl(params));
 }
@@ -168,20 +152,17 @@ void UsdDancingCubesExample_Data::EraseSpec(const SdfPath &path)
   TF_RUNTIME_ERROR("UsdDancingCubesExample file EraseSpec() not supported");
 }
 
-void UsdDancingCubesExample_Data::MoveSpec(const SdfPath &oldPath,
-                                           const SdfPath &newPath)
+void UsdDancingCubesExample_Data::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath)
 {
   TF_RUNTIME_ERROR("UsdDancingCubesExample file MoveSpec() not supported");
 }
 
-SdfSpecType
-UsdDancingCubesExample_Data::GetSpecType(const SdfPath &path) const
+SdfSpecType UsdDancingCubesExample_Data::GetSpecType(const SdfPath &path) const
 {
   return _impl->GetSpecType(path);
 }
 
-void UsdDancingCubesExample_Data::CreateSpec(const SdfPath &path,
-                                             SdfSpecType specType)
+void UsdDancingCubesExample_Data::CreateSpec(const SdfPath &path, SdfSpecType specType)
 {
   TF_RUNTIME_ERROR("UsdDancingCubesExample file CreateSpec() not supported");
 }
@@ -195,17 +176,14 @@ bool UsdDancingCubesExample_Data::Has(const SdfPath &path,
                                       const TfToken &field,
                                       SdfAbstractDataValue *value) const
 {
-  if (value)
-  {
+  if (value) {
     VtValue val;
-    if (_impl->Has(path, field, &val))
-    {
+    if (_impl->Has(path, field, &val)) {
       return value->StoreValue(val);
     }
     return false;
   }
-  else
-  {
+  else {
     return _impl->Has(path, field, nullptr);
   }
   return false;
@@ -218,9 +196,7 @@ bool UsdDancingCubesExample_Data::Has(const SdfPath &path,
   return _impl->Has(path, field, value);
 }
 
-VtValue
-UsdDancingCubesExample_Data::Get(const SdfPath &path,
-                                 const TfToken &field) const
+VtValue UsdDancingCubesExample_Data::Get(const SdfPath &path, const TfToken &field) const
 {
   VtValue value;
   _impl->Has(path, field, &value);
@@ -228,7 +204,8 @@ UsdDancingCubesExample_Data::Get(const SdfPath &path,
 }
 
 void UsdDancingCubesExample_Data::Set(const SdfPath &path,
-                                      const TfToken &field, const VtValue &value)
+                                      const TfToken &field,
+                                      const VtValue &value)
 {
   TF_RUNTIME_ERROR("UsdDancingCubesExample file Set() not supported");
 }
@@ -240,52 +217,49 @@ void UsdDancingCubesExample_Data::Set(const SdfPath &path,
   TF_RUNTIME_ERROR("UsdDancingCubesExample file Set() not supported");
 }
 
-void UsdDancingCubesExample_Data::Erase(const SdfPath &path,
-                                        const TfToken &field)
+void UsdDancingCubesExample_Data::Erase(const SdfPath &path, const TfToken &field)
 {
   TF_RUNTIME_ERROR("UsdDancingCubesExample file Erase() not supported");
 }
 
-std::vector<TfToken>
-UsdDancingCubesExample_Data::List(const SdfPath &path) const
+std::vector<TfToken> UsdDancingCubesExample_Data::List(const SdfPath &path) const
 {
   return _impl->List(path);
 }
 
-std::set<double>
-UsdDancingCubesExample_Data::ListAllTimeSamples() const
+std::set<double> UsdDancingCubesExample_Data::ListAllTimeSamples() const
 {
   return _impl->ListAllTimeSamples();
 }
 
-std::set<double>
-UsdDancingCubesExample_Data::ListTimeSamplesForPath(const SdfPath &path) const
+std::set<double> UsdDancingCubesExample_Data::ListTimeSamplesForPath(const SdfPath &path) const
 {
   return _impl->ListTimeSamplesForPath(path);
 }
 
-bool UsdDancingCubesExample_Data::GetBracketingTimeSamples(
-    double time, double *tLower, double *tUpper) const
+bool UsdDancingCubesExample_Data::GetBracketingTimeSamples(double time,
+                                                           double *tLower,
+                                                           double *tUpper) const
 {
   return _impl->GetBracketingTimeSamples(time, tLower, tUpper);
 }
 
-size_t
-UsdDancingCubesExample_Data::GetNumTimeSamplesForPath(
-    const SdfPath &path) const
+size_t UsdDancingCubesExample_Data::GetNumTimeSamplesForPath(const SdfPath &path) const
 {
   return _impl->GetNumTimeSamplesForPath(path);
 }
 
-bool UsdDancingCubesExample_Data::GetBracketingTimeSamplesForPath(
-    const SdfPath &path, double time,
-    double *tLower, double *tUpper) const
+bool UsdDancingCubesExample_Data::GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                                                  double time,
+                                                                  double *tLower,
+                                                                  double *tUpper) const
 {
   return _impl->GetBracketingTimeSamplesForPath(path, time, tLower, tUpper);
 }
 
 bool UsdDancingCubesExample_Data::QueryTimeSample(const SdfPath &path,
-                                                  double time, VtValue *value) const
+                                                  double time,
+                                                  VtValue *value) const
 {
   return _impl->QueryTimeSample(path, time, value);
 }
@@ -294,23 +268,21 @@ bool UsdDancingCubesExample_Data::QueryTimeSample(const SdfPath &path,
                                                   double time,
                                                   SdfAbstractDataValue *value) const
 {
-  if (value)
-  {
+  if (value) {
     VtValue val;
-    if (_impl->QueryTimeSample(path, time, &val))
-    {
+    if (_impl->QueryTimeSample(path, time, &val)) {
       return value->StoreValue(val);
     }
     return false;
   }
-  else
-  {
+  else {
     return _impl->QueryTimeSample(path, time, nullptr);
   }
 }
 
 void UsdDancingCubesExample_Data::SetTimeSample(const SdfPath &path,
-                                                double time, const VtValue &value)
+                                                double time,
+                                                const VtValue &value)
 {
   TF_RUNTIME_ERROR("UsdDancingCubesExample file SetTimeSample() not supported");
 }

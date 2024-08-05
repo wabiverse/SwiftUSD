@@ -31,7 +31,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<UsdTyped, TfType::Bases<UsdSchemaBase>>();
 }
 
@@ -39,7 +40,8 @@ TF_REGISTRY_FUNCTION(TfType) {
 UsdTyped::~UsdTyped() {}
 
 /* static */
-UsdTyped UsdTyped::Get(const UsdStagePtr &stage, const SdfPath &path) {
+UsdTyped UsdTyped::Get(const UsdStagePtr &stage, const SdfPath &path)
+{
   if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdTyped();
@@ -48,25 +50,34 @@ UsdTyped UsdTyped::Get(const UsdStagePtr &stage, const SdfPath &path) {
 }
 
 /* virtual */
-UsdSchemaKind UsdTyped::_GetSchemaKind() const { return UsdTyped::schemaKind; }
+UsdSchemaKind UsdTyped::_GetSchemaKind() const
+{
+  return UsdTyped::schemaKind;
+}
 
 /* static */
-const TfType &UsdTyped::_GetStaticTfType() {
+const TfType &UsdTyped::_GetStaticTfType()
+{
   static TfType tfType = TfType::Find<UsdTyped>();
   return tfType;
 }
 
 /* static */
-bool UsdTyped::_IsTypedSchema() {
+bool UsdTyped::_IsTypedSchema()
+{
   static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
   return isTyped;
 }
 
 /* virtual */
-const TfType &UsdTyped::_GetTfType() const { return _GetStaticTfType(); }
+const TfType &UsdTyped::_GetTfType() const
+{
+  return _GetStaticTfType();
+}
 
 /*static*/
-const TfTokenVector &UsdTyped::GetSchemaAttributeNames(bool includeInherited) {
+const TfTokenVector &UsdTyped::GetSchemaAttributeNames(bool includeInherited)
+{
   static TfTokenVector localNames;
   static TfTokenVector allNames = UsdSchemaBase::GetSchemaAttributeNames(true);
 
@@ -89,7 +100,8 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool UsdTyped::_IsCompatible() const {
+bool UsdTyped::_IsCompatible() const
+{
   if (!UsdSchemaBase::_IsCompatible())
     return false;
 

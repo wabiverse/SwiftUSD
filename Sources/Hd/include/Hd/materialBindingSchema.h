@@ -33,73 +33,61 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDMATERIALBINDING_SCHEMA_TOKENS \
-    (path) \
-    (bindingStrength) \
+#define HDMATERIALBINDING_SCHEMA_TOKENS (path)(bindingStrength)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens, HD_API,
-    HDMATERIALBINDING_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens, HD_API, HDMATERIALBINDING_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialBindingSchema : public HdSchema
-{
-public:
-    HdMaterialBindingSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMaterialBindingSchema : public HdSchema {
+ public:
+  HdMaterialBindingSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdPathDataSourceHandle GetPath();
+  HD_API
+  HdTokenDataSourceHandle GetBindingStrength();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdPathDataSourceHandle &path,
+                                                   const HdTokenDataSourceHandle &bindingStrength);
+
+  /// \class HdMaterialBindingSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetPath();
+    Builder &SetPath(const HdPathDataSourceHandle &path);
     HD_API
-    HdTokenDataSourceHandle GetBindingStrength();
+    Builder &SetBindingStrength(const HdTokenDataSourceHandle &bindingStrength);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &path,
-        const HdTokenDataSourceHandle &bindingStrength
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMaterialBindingSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetPath(
-            const HdPathDataSourceHandle &path);
-        HD_API
-        Builder &SetBindingStrength(
-            const HdTokenDataSourceHandle &bindingStrength);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdPathDataSourceHandle _path;
-        HdTokenDataSourceHandle _bindingStrength;
-    };
-
+   private:
+    HdPathDataSourceHandle _path;
+    HdTokenDataSourceHandle _bindingStrength;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

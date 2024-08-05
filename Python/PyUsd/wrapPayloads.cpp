@@ -33,27 +33,30 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdPayloads() {
+void wrapUsdPayloads()
+{
   class_<UsdPayloads>("Payloads", no_init)
       .def("AddPayload",
-           (bool(UsdPayloads::*)(const SdfPayload &, UsdListPosition)) &
-               UsdPayloads::AddPayload,
+           (bool(UsdPayloads::*)(const SdfPayload &, UsdListPosition)) & UsdPayloads::AddPayload,
            (arg("payload"), arg("position") = UsdListPositionBackOfPrependList))
       .def("AddPayload",
-           (bool(UsdPayloads::*)(const string &, const SdfPath &,
-                                 const SdfLayerOffset &, UsdListPosition)) &
+           (bool(UsdPayloads::*)(
+               const string &, const SdfPath &, const SdfLayerOffset &, UsdListPosition)) &
                UsdPayloads::AddPayload,
-           (arg("assetPath"), arg("primPath"),
+           (arg("assetPath"),
+            arg("primPath"),
             arg("layerOffset") = SdfLayerOffset(),
             arg("position") = UsdListPositionBackOfPrependList))
       .def("AddPayload",
-           (bool(UsdPayloads::*)(const string &, const SdfLayerOffset &,
-                                 UsdListPosition)) &
+           (bool(UsdPayloads::*)(const string &, const SdfLayerOffset &, UsdListPosition)) &
                UsdPayloads::AddPayload,
-           (arg("assetPath"), arg("layerOffset") = SdfLayerOffset(),
+           (arg("assetPath"),
+            arg("layerOffset") = SdfLayerOffset(),
             arg("position") = UsdListPositionBackOfPrependList))
-      .def("AddInternalPayload", &UsdPayloads::AddInternalPayload,
-           (arg("primPath"), arg("layerOffset") = SdfLayerOffset(),
+      .def("AddInternalPayload",
+           &UsdPayloads::AddInternalPayload,
+           (arg("primPath"),
+            arg("layerOffset") = SdfLayerOffset(),
             arg("position") = UsdListPositionBackOfPrependList))
 
       .def("RemovePayload", &UsdPayloads::RemovePayload, arg("payload"))

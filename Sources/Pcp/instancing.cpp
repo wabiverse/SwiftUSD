@@ -30,20 +30,21 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(
-    PCP_OVERRIDE_INSTANCEABLE, -1,
-    "Overrides Pcp's default computation for whether a PrimIndex is "
-    "instanceable:\n"
-    " -1: (the default) computes instanceable only in USD mode\n"
-    "  0: NEVER computes instanceable (always returns false)\n"
-    "  1: always compute instanceable, whether in USD mode or not.");
+TF_DEFINE_ENV_SETTING(PCP_OVERRIDE_INSTANCEABLE,
+                      -1,
+                      "Overrides Pcp's default computation for whether a PrimIndex is "
+                      "instanceable:\n"
+                      " -1: (the default) computes instanceable only in USD mode\n"
+                      "  0: NEVER computes instanceable (always returns false)\n"
+                      "  1: always compute instanceable, whether in USD mode or not.");
 
 // Visitor to determine if a prim index has instanceable data.
 // This essentially checks if a prim index had a direct composition arc
 // (e.g. a reference or class) that could be shared with other prims.
 struct Pcp_FindInstanceableDataVisitor {
   Pcp_FindInstanceableDataVisitor() : hasInstanceableData(false) {}
-  bool Visit(PcpNodeRef node, bool nodeIsInstanceable) {
+  bool Visit(PcpNodeRef node, bool nodeIsInstanceable)
+  {
     if (nodeIsInstanceable) {
       hasInstanceableData = true;
     }
@@ -57,7 +58,8 @@ struct Pcp_FindInstanceableDataVisitor {
   bool hasInstanceableData;
 };
 
-bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex &primIndex) {
+bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex &primIndex)
+{
   TRACE_FUNCTION();
 
   // For now, instancing functionality is limited to USD mode,
@@ -105,7 +107,8 @@ bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex &primIndex) {
         break;
       }
     }
-    TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(node)) {
+    TF_REVERSE_FOR_ALL(childIt, Pcp_GetChildrenRange(node))
+    {
       nodesToVisit.push_back(*childIt);
     }
   }

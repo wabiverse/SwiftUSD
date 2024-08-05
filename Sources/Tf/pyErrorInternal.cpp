@@ -36,19 +36,27 @@ using namespace boost::python;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) { TF_ADD_ENUM_NAME(TF_PYTHON_EXCEPTION); }
+TF_REGISTRY_FUNCTION(TfEnum)
+{
+  TF_ADD_ENUM_NAME(TF_PYTHON_EXCEPTION);
+}
 
 // Should probably use a better mechanism.
 
 static handle<> _ExceptionClass;
 
-handle<> Tf_PyGetErrorExceptionClass() { return _ExceptionClass; }
+handle<> Tf_PyGetErrorExceptionClass()
+{
+  return _ExceptionClass;
+}
 
-void Tf_PySetErrorExceptionClass(object const &cls) {
+void Tf_PySetErrorExceptionClass(object const &cls)
+{
   _ExceptionClass = handle<>(borrowed(cls.ptr()));
 }
 
-TfPyExceptionState Tf_PyFetchPythonExceptionState() {
+TfPyExceptionState Tf_PyFetchPythonExceptionState()
+{
   PyObject *excType, *excValue, *excTrace;
   PyErr_Fetch(&excType, &excValue, &excTrace);
   return TfPyExceptionState(handle<>(allow_null(excType)),
@@ -56,25 +64,29 @@ TfPyExceptionState Tf_PyFetchPythonExceptionState() {
                             handle<>(allow_null(excTrace)));
 }
 
-void Tf_PyRestorePythonExceptionState(TfPyExceptionState state) {
-  PyErr_Restore(state.GetType().get(), state.GetValue().get(),
-                state.GetTrace().get());
+void Tf_PyRestorePythonExceptionState(TfPyExceptionState state)
+{
+  PyErr_Restore(state.GetType().get(), state.GetValue().get(), state.GetTrace().get());
   // PyErr_Restore decrements the reference counts of each of the items passed
   // to it, so we need to make sure that we release our handles to them
   // *without* decrementing the reference count (since it has been stolen).
   state.Release();
 }
 
-TfPyExceptionStateScope::TfPyExceptionStateScope()
-    : _state(Tf_PyFetchPythonExceptionState()) {
+TfPyExceptionStateScope::TfPyExceptionStateScope() : _state(Tf_PyFetchPythonExceptionState())
+{
   // Tf_PyFetchPythonExceptionState() clears the exception state
   // but we want it back.
   Restore();
 }
 
-TfPyExceptionStateScope::~TfPyExceptionStateScope() { Restore(); }
+TfPyExceptionStateScope::~TfPyExceptionStateScope()
+{
+  Restore();
+}
 
-void TfPyExceptionStateScope::Restore() {
+void TfPyExceptionStateScope::Restore()
+{
   // Note that Tf_PyRestorePythonExceptionState() leaves _state with
   // a reference to the state, unlike PyErr_Restore, because it makes
   // a copy of _state and that bumps the reference counts.

@@ -27,8 +27,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanPipelineCache::HgiVulkanPipelineCache(
-    HgiVulkanDevice *device)
+HgiVulkanPipelineCache::HgiVulkanPipelineCache(HgiVulkanDevice *device)
     : _device(device), _vkPipelineCache(nullptr)
 {
   // xxx we need to add a pipeline cache to avoid app having to keep compiling
@@ -37,12 +36,9 @@ HgiVulkanPipelineCache::HgiVulkanPipelineCache(
   // where we create the pipeline. So a pipeline cache can be helpful.
 }
 
-HgiVulkanPipelineCache::~HgiVulkanPipelineCache()
-{
-}
+HgiVulkanPipelineCache::~HgiVulkanPipelineCache() {}
 
-VkPipelineCache
-HgiVulkanPipelineCache::GetVulkanPipelineCache() const
+VkPipelineCache HgiVulkanPipelineCache::GetVulkanPipelineCache() const
 {
   return _vkPipelineCache;
 }

@@ -47,36 +47,40 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(GetNormalized_overloads, GetNormalized,
-                                       0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(GetNormalized_overloads, GetNormalized, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(Normalize_overloads, Normalize, 0, 1);
 
-static GfQuaternion __truediv__(const GfQuaternion &self, double value) {
+static GfQuaternion __truediv__(const GfQuaternion &self, double value)
+{
   return self / value;
 }
 
-static GfQuaternion &__itruediv__(GfQuaternion &self, double value) {
+static GfQuaternion &__itruediv__(GfQuaternion &self, double value)
+{
   return self /= value;
 }
 
-static string _Repr(GfQuaternion const &self) {
+static string _Repr(GfQuaternion const &self)
+{
   return TF_PY_REPR_PREFIX + "Quaternion(" + TfPyRepr(self.GetReal()) + ", " +
          TfPyRepr(self.GetImaginary()) + ")";
 }
 
-static size_t __hash__(GfQuaternion const &self) { return TfHash{}(self); }
+static size_t __hash__(GfQuaternion const &self)
+{
+  return TfHash{}(self);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapQuaternion() {
+void wrapQuaternion()
+{
   typedef GfQuaternion This;
 
-  object getImaginary = make_function(&This::GetImaginary,
-                                      return_value_policy<return_by_value>());
+  object getImaginary = make_function(&This::GetImaginary, return_value_policy<return_by_value>());
 
   def("Dot", (double (*)(const GfQuaternion &, const GfQuaternion &))GfDot);
-  def("Slerp", (GfQuaternion(*)(double, const GfQuaternion &,
-                                const GfQuaternion &))GfSlerp);
+  def("Slerp", (GfQuaternion(*)(double, const GfQuaternion &, const GfQuaternion &))GfSlerp);
 
   class_<This> cls("Quaternion", "Quaternion class", init<>());
   cls
@@ -104,8 +108,7 @@ void wrapQuaternion() {
       .def("GetReal", &This::GetReal)
 
       .def("GetNormalized", &This::GetNormalized, GetNormalized_overloads())
-      .def("Normalize", &This::Normalize,
-           Normalize_overloads()[return_self<>()])
+      .def("Normalize", &This::Normalize, Normalize_overloads()[return_self<>()])
 
       .def(str(self))
       .def(self == self)
@@ -125,8 +128,7 @@ void wrapQuaternion() {
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / double() ) above, which

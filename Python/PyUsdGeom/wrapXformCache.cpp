@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdGeom/xformCache.h"
+#include <pxr/pxrns.h>
 
 #include <boost/python/class.hpp>
 
@@ -32,52 +32,39 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static
-tuple
-_GetLocalTransformation(
-        UsdGeomXformCache& self,
-        const UsdPrim& prim)
+static tuple _GetLocalTransformation(UsdGeomXformCache &self, const UsdPrim &prim)
 {
-    bool resetsXformStack;
-    GfMatrix4d localXform = self.GetLocalTransformation(prim, &resetsXformStack);
+  bool resetsXformStack;
+  GfMatrix4d localXform = self.GetLocalTransformation(prim, &resetsXformStack);
 
-    return make_tuple(localXform, resetsXformStack);
+  return make_tuple(localXform, resetsXformStack);
 }
 
-static
-tuple
-_ComputeRelativeTransform(UsdGeomXformCache& self,
-                          const UsdPrim& prim,
-                          const UsdPrim& ancestor)
+static tuple _ComputeRelativeTransform(UsdGeomXformCache &self,
+                                       const UsdPrim &prim,
+                                       const UsdPrim &ancestor)
 {
-    bool resetXformStack;
-    GfMatrix4d xform =
-        self.ComputeRelativeTransform(prim, ancestor, &resetXformStack);
-    
-    return make_tuple(xform, resetXformStack);
+  bool resetXformStack;
+  GfMatrix4d xform = self.ComputeRelativeTransform(prim, ancestor, &resetXformStack);
+
+  return make_tuple(xform, resetXformStack);
 }
 
-} // anonymous namespace 
+}  // anonymous namespace
 
 void wrapUsdGeomXformCache()
 {
-    typedef UsdGeomXformCache XformCache;
+  typedef UsdGeomXformCache XformCache;
 
-    class_<XformCache>("XformCache")
-        .def(init<UsdTimeCode>(arg("time")))
-        .def("GetLocalToWorldTransform",
-             &XformCache::GetLocalToWorldTransform, arg("prim"))
-        .def("GetParentToWorldTransform",
-             &XformCache::GetParentToWorldTransform, arg("prim"))
-        .def("GetLocalTransformation",
-             &_GetLocalTransformation, arg("prim"))
-        .def("ComputeRelativeTransform",
-             &_ComputeRelativeTransform, (arg("prim"), arg("ancestor")))
-        .def("Clear", &XformCache::Clear)
-        .def("SetTime", &XformCache::SetTime, arg("time"))
-        .def("GetTime", &XformCache::GetTime)
+  class_<XformCache>("XformCache")
+      .def(init<UsdTimeCode>(arg("time")))
+      .def("GetLocalToWorldTransform", &XformCache::GetLocalToWorldTransform, arg("prim"))
+      .def("GetParentToWorldTransform", &XformCache::GetParentToWorldTransform, arg("prim"))
+      .def("GetLocalTransformation", &_GetLocalTransformation, arg("prim"))
+      .def("ComputeRelativeTransform", &_ComputeRelativeTransform, (arg("prim"), arg("ancestor")))
+      .def("Clear", &XformCache::Clear)
+      .def("SetTime", &XformCache::SetTime, arg("time"))
+      .def("GetTime", &XformCache::GetTime)
 
-        .def("Swap", &XformCache::Swap, arg("other"))
-        ;
+      .def("Swap", &XformCache::Swap, arg("other"));
 }
-

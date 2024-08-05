@@ -71,8 +71,10 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// will be remapped to target objects beneath \p dstPath.
 ///
 SDF_API
-bool SdfCopySpec(const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
-                 const SdfLayerHandle &dstLayer, const SdfPath &dstPath);
+bool SdfCopySpec(const SdfLayerHandle &srcLayer,
+                 const SdfPath &srcPath,
+                 const SdfLayerHandle &dstLayer,
+                 const SdfPath &dstPath);
 
 /// @}
 
@@ -94,11 +96,15 @@ bool SdfCopySpec(const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
 /// Note that if this function returns true and the source spec has no value
 /// for \p field (e.g., fieldInSrc == false), the field in the destination
 /// spec will also be set to no value.
-using SdfShouldCopyValueFn = std::function<bool(
-    SdfSpecType specType, const TfToken &field, const SdfLayerHandle &srcLayer,
-    const SdfPath &srcPath, bool fieldInSrc, const SdfLayerHandle &dstLayer,
-    const SdfPath &dstPath, bool fieldInDst,
-    boost::optional<VtValue> *valueToCopy)>;
+using SdfShouldCopyValueFn = std::function<bool(SdfSpecType specType,
+                                                const TfToken &field,
+                                                const SdfLayerHandle &srcLayer,
+                                                const SdfPath &srcPath,
+                                                bool fieldInSrc,
+                                                const SdfLayerHandle &dstLayer,
+                                                const SdfPath &dstPath,
+                                                bool fieldInDst,
+                                                boost::optional<VtValue> *valueToCopy)>;
 
 /// \class SdfCopySpecsValueEdit
 /// Value containing an editing operation for SdfCopySpecs.
@@ -112,21 +118,29 @@ using SdfShouldCopyValueFn = std::function<bool(
 /// scene description edit in \p valueToCopy via an SdfCopySpecsValueEdit
 /// object.
 class SdfCopySpecsValueEdit {
-public:
+ public:
   /// Callback to apply a scene description edit to the specified layer and
   /// spec path.
-  using EditFunction =
-      std::function<void(const SdfLayerHandle &, const SdfPath &)>;
+  using EditFunction = std::function<void(const SdfLayerHandle &, const SdfPath &)>;
 
   explicit SdfCopySpecsValueEdit(const EditFunction &edit) : _edit(edit) {}
-  const EditFunction &GetEditFunction() const { return _edit; }
+  const EditFunction &GetEditFunction() const
+  {
+    return _edit;
+  }
 
   /// SdfCopySpecsValueEdit objects are not comparable, but must provide
   /// operator== to be stored in a VtValue.
-  bool operator==(const SdfCopySpecsValueEdit &rhs) const { return false; }
-  bool operator!=(const SdfCopySpecsValueEdit &rhs) const { return true; }
+  bool operator==(const SdfCopySpecsValueEdit &rhs) const
+  {
+    return false;
+  }
+  bool operator!=(const SdfCopySpecsValueEdit &rhs) const
+  {
+    return true;
+  }
 
-private:
+ private:
   EditFunction _edit;
 };
 
@@ -145,12 +159,15 @@ private:
 /// for \p childrenField (e.g., fieldInSrc == false), the field in the
 /// destination spec will also be set to no value, causing any existing children
 /// to be removed.
-using SdfShouldCopyChildrenFn = std::function<bool(
-    const TfToken &childrenField, const SdfLayerHandle &srcLayer,
-    const SdfPath &srcPath, bool fieldInSrc, const SdfLayerHandle &dstLayer,
-    const SdfPath &dstPath, bool fieldInDst,
-    boost::optional<VtValue> *srcChildren,
-    boost::optional<VtValue> *dstChildren)>;
+using SdfShouldCopyChildrenFn = std::function<bool(const TfToken &childrenField,
+                                                   const SdfLayerHandle &srcLayer,
+                                                   const SdfPath &srcPath,
+                                                   bool fieldInSrc,
+                                                   const SdfLayerHandle &dstLayer,
+                                                   const SdfPath &dstPath,
+                                                   bool fieldInDst,
+                                                   boost::optional<VtValue> *srcChildren,
+                                                   boost::optional<VtValue> *dstChildren)>;
 
 /// SdfShouldCopyValueFn used by the simple version of SdfCopySpec.
 ///
@@ -161,11 +178,16 @@ using SdfShouldCopyChildrenFn = std::function<bool(
 /// source.  Any fields in the destination that aren't in the source will be
 /// cleared.
 SDF_API
-bool SdfShouldCopyValue(const SdfPath &srcRootPath, const SdfPath &dstRootPath,
-                        SdfSpecType specType, const TfToken &field,
-                        const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
-                        bool fieldInSrc, const SdfLayerHandle &dstLayer,
-                        const SdfPath &dstPath, bool fieldInDst,
+bool SdfShouldCopyValue(const SdfPath &srcRootPath,
+                        const SdfPath &dstRootPath,
+                        SdfSpecType specType,
+                        const TfToken &field,
+                        const SdfLayerHandle &srcLayer,
+                        const SdfPath &srcPath,
+                        bool fieldInSrc,
+                        const SdfLayerHandle &dstLayer,
+                        const SdfPath &dstPath,
+                        bool fieldInDst,
                         boost::optional<VtValue> *valueToCopy);
 
 /// SdfShouldCopyChildrenFn used by the simple version of SdfCopySpec.
@@ -181,9 +203,11 @@ bool SdfShouldCopyChildren(const SdfPath &srcRootPath,
                            const SdfPath &dstRootPath,
                            const TfToken &childrenField,
                            const SdfLayerHandle &srcLayer,
-                           const SdfPath &srcPath, bool fieldInSrc,
+                           const SdfPath &srcPath,
+                           bool fieldInSrc,
                            const SdfLayerHandle &dstLayer,
-                           const SdfPath &dstPath, bool fieldInDst,
+                           const SdfPath &dstPath,
+                           bool fieldInDst,
                            boost::optional<VtValue> *srcChildren,
                            boost::optional<VtValue> *dstChildren);
 
@@ -211,8 +235,10 @@ bool SdfShouldCopyChildren(const SdfPath &srcRootPath,
 /// be specified as prepended, appended, deleted, and/or ordered, as needed.
 ///
 SDF_API
-bool SdfCopySpec(const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
-                 const SdfLayerHandle &dstLayer, const SdfPath &dstPath,
+bool SdfCopySpec(const SdfLayerHandle &srcLayer,
+                 const SdfPath &srcPath,
+                 const SdfLayerHandle &dstLayer,
+                 const SdfPath &dstPath,
                  const SdfShouldCopyValueFn &shouldCopyValueFn,
                  const SdfShouldCopyChildrenFn &shouldCopyChildrenFn);
 
@@ -220,4 +246,4 @@ bool SdfCopySpec(const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_COPY_UTILS_H
+#endif  // PXR_USD_SDF_COPY_UTILS_H

@@ -34,7 +34,8 @@ TF_INSTANTIATE_SINGLETON(Vt_ValueFromPythonRegistry);
 
 Vt_ValueFromPythonRegistry::~Vt_ValueFromPythonRegistry() = default;
 
-VtValue Vt_ValueFromPythonRegistry::Invoke(PyObject *obj) {
+VtValue Vt_ValueFromPythonRegistry::Invoke(PyObject *obj)
+{
   TfPyLock lock;
   // Iterate over the extractors in reverse registration order.  We walk the
   // lvalue extractors first, looking for an exact match.  If none match, we
@@ -57,8 +58,7 @@ VtValue Vt_ValueFromPythonRegistry::Invoke(PyObject *obj) {
     VtValue result = self._lvalueExtractors[i - 1].Invoke(obj);
     if (!result.IsEmpty()) {
       // Cache the result.
-      self._lvalueExtractorCache.insert(
-          {PyObject_Type(obj), self._lvalueExtractors[i - 1]});
+      self._lvalueExtractorCache.insert({PyObject_Type(obj), self._lvalueExtractors[i - 1]});
       return result;
     }
   }
@@ -72,11 +72,13 @@ VtValue Vt_ValueFromPythonRegistry::Invoke(PyObject *obj) {
   return VtValue();
 }
 
-void Vt_ValueFromPythonRegistry::_RegisterLValue(_Extractor const &e) {
+void Vt_ValueFromPythonRegistry::_RegisterLValue(_Extractor const &e)
+{
   _lvalueExtractors.push_back(e);
 }
 
-void Vt_ValueFromPythonRegistry::_RegisterRValue(_Extractor const &e) {
+void Vt_ValueFromPythonRegistry::_RegisterRValue(_Extractor const &e)
+{
   _rvalueExtractors.push_back(e);
 }
 

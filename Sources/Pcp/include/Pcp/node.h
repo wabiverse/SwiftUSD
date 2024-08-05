@@ -64,7 +64,7 @@ TF_DECLARE_REF_PTRS(PcpPrimIndex_Graph);
 /// from a model to use in a particular instance.
 ///
 class PcpNodeRef {
-public:
+ public:
   using child_const_iterator = PcpNodeRef_ChildrenIterator;
   using child_const_reverse_iterator = PcpNodeRef_ChildrenReverseIterator;
   using child_const_range = std::pair<child_const_iterator, child_const_iterator>;
@@ -76,19 +76,21 @@ public:
 
   /// Returns true if this is a valid node reference, false otherwise.
   typedef size_t PcpNodeRef::*UnspecifiedBoolType;
-  inline operator UnspecifiedBoolType() const {
-    return (_graph && _nodeIdx != PCP_INVALID_INDEX) ? &PcpNodeRef::_nodeIdx
-                                                     : 0;
+  inline operator UnspecifiedBoolType() const
+  {
+    return (_graph && _nodeIdx != PCP_INVALID_INDEX) ? &PcpNodeRef::_nodeIdx : 0;
   }
 
   /// Returns true if this references the same node as \p rhs.
-  inline bool operator==(const PcpNodeRef &rhs) const {
+  inline bool operator==(const PcpNodeRef &rhs) const
+  {
     return _nodeIdx == rhs._nodeIdx && _graph == rhs._graph;
   }
 
   /// Inequality operator
   /// \sa PcpNodeRef::operator==(const PcpNodeRef&)
-  inline bool operator!=(const PcpNodeRef &rhs) const {
+  inline bool operator!=(const PcpNodeRef &rhs) const
+  {
     return !(*this == rhs);
   }
 
@@ -100,25 +102,38 @@ public:
 
   /// Less than or equal operator
   /// \sa PcpNodeRef::operator<(const PcpNodeRef&)
-  bool operator<=(const PcpNodeRef &rhs) const { return !(rhs < *this); }
+  bool operator<=(const PcpNodeRef &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
   /// Greater than operator
   /// \sa PcpNodeRef::operator<(const PcpNodeRef&)
-  bool operator>(const PcpNodeRef &rhs) const { return rhs < *this; }
+  bool operator>(const PcpNodeRef &rhs) const
+  {
+    return rhs < *this;
+  }
 
   /// Greater than or equal operator
   /// \sa PcpNodeRef::operator<(const PcpNodeRef&)
-  bool operator>=(const PcpNodeRef &rhs) const { return !(*this < rhs); }
+  bool operator>=(const PcpNodeRef &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   /// Hash functor.
   struct Hash {
-    size_t operator()(const PcpNodeRef &rhs) const {
+    size_t operator()(const PcpNodeRef &rhs) const
+    {
       return (size_t)rhs.GetUniqueIdentifier();
     }
   };
 
   /// Returns the graph that this node belongs to.
-  PcpPrimIndex_Graph *GetOwningGraph() const { return _graph; }
+  PcpPrimIndex_Graph *GetOwningGraph() const
+  {
+    return _graph;
+  }
 
   /// Returns a value that uniquely identifies this node.
   PCP_API
@@ -148,14 +163,14 @@ public:
   /// Inserts a new child node for \p site, connected to this node via
   /// \p arc.
   PCP_API
-  PcpNodeRef InsertChild(const PcpLayerStackSite &site, const PcpArc &arc,
-                         PcpErrorBasePtr *error);
+  PcpNodeRef InsertChild(const PcpLayerStackSite &site, const PcpArc &arc, PcpErrorBasePtr *error);
 
   /// Inserts \p subgraph as a child of this node, with the root node of
   /// \p subtree connected to this node via \p arc.
   PCP_API
   PcpNodeRef InsertChildSubgraph(const PcpPrimIndex_GraphRefPtr &subgraph,
-                                 const PcpArc &arc, PcpErrorBasePtr *error);
+                                 const PcpArc &arc,
+                                 PcpErrorBasePtr *error);
 
   /// Returns the immediate origin node for this node. The origin node
   /// is the node that caused this node to be brought into the prim index.
@@ -295,11 +310,12 @@ public:
   /// @}
 
   // Returns a compressed Sd site.  For internal use only.
-  Pcp_CompressedSdSite GetCompressedSdSite(size_t layerIndex) const {
+  Pcp_CompressedSdSite GetCompressedSdSite(size_t layerIndex) const
+  {
     return Pcp_CompressedSdSite(_nodeIdx, layerIndex);
   }
 
-private:
+ private:
   friend class PcpPrimIndex_Graph;
   friend class PcpNodeIterator;
   friend class PcpNodeRef_ChildrenIterator;
@@ -308,25 +324,30 @@ private:
   friend class PcpNodeRef_PrivateChildrenConstReverseIterator;
 
   // Private constructor for internal use.
-  PcpNodeRef(PcpPrimIndex_Graph *graph, size_t idx)
-      : _graph(graph), _nodeIdx(idx) {}
+  PcpNodeRef(PcpPrimIndex_Graph *graph, size_t idx) : _graph(graph), _nodeIdx(idx) {}
 
-  size_t _GetNodeIndex() const { return _nodeIdx; }
+  size_t _GetNodeIndex() const
+  {
+    return _nodeIdx;
+  }
 
   inline size_t _GetParentIndex() const;
   inline size_t _GetOriginIndex() const;
 
-private: // Data
+ private:  // Data
   PcpPrimIndex_Graph *_graph;
   size_t _nodeIdx;
 };
 
 /// Typedefs and support functions
-template <typename HashState>
-inline void TfHashAppend(HashState &h, const PcpNodeRef &x) {
+template<typename HashState> inline void TfHashAppend(HashState &h, const PcpNodeRef &x)
+{
   h.Append((size_t)(x.GetUniqueIdentifier()));
 }
-inline size_t hash_value(const PcpNodeRef &x) { return TfHash{}(x); }
+inline size_t hash_value(const PcpNodeRef &x)
+{
+  return TfHash{}(x);
+}
 
 using PcpNodeRefHashSet = TfHashSet<PcpNodeRef, PcpNodeRef::Hash>;
 using PcpNodeRefVector = std::vector<PcpNodeRef>;
@@ -336,13 +357,12 @@ using PcpNodeRefVector = std::vector<PcpNodeRef>;
 /// Object used to iterate over child nodes (not all descendant nodes) of a
 /// node in the prim index graph in strong-to-weak order.
 ///
-class PcpNodeRef_ChildrenIterator
-    : public boost::iterator_facade<
-          /* Derived =   */ PcpNodeRef_ChildrenIterator,
-          /* ValueType = */ PcpNodeRef,
-          /* Category =  */ boost::forward_traversal_tag,
-          /* RefType =   */ PcpNodeRef> {
-public:
+class PcpNodeRef_ChildrenIterator : public boost::iterator_facade<
+                                        /* Derived =   */ PcpNodeRef_ChildrenIterator,
+                                        /* ValueType = */ PcpNodeRef,
+                                        /* Category =  */ boost::forward_traversal_tag,
+                                        /* RefType =   */ PcpNodeRef> {
+ public:
   /// Constructs an invalid iterator.
   PCP_API
   PcpNodeRef_ChildrenIterator();
@@ -352,18 +372,22 @@ public:
   PCP_API
   PcpNodeRef_ChildrenIterator(const PcpNodeRef &node, bool end = false);
 
-private:
+ private:
   friend class boost::iterator_core_access;
   PCP_API
   void increment();
-  bool equal(const PcpNodeRef_ChildrenIterator &other) const {
+  bool equal(const PcpNodeRef_ChildrenIterator &other) const
+  {
     // Note: The default constructed iterator is *not* equal to any
     //       other iterator.
     return (_node == other._node && _index == other._index);
   }
-  reference dereference() const { return reference(_node._graph, _index); }
+  reference dereference() const
+  {
+    return reference(_node._graph, _index);
+  }
 
-private:
+ private:
   // Current graph node this iterator is pointing at.
   PcpNodeRef _node;
 
@@ -384,7 +408,7 @@ class PcpNodeRef_ChildrenReverseIterator
           /* ValueType = */ PcpNodeRef,
           /* Category =  */ boost::forward_traversal_tag,
           /* RefType =   */ PcpNodeRef> {
-public:
+ public:
   /// Constructs an invalid iterator.
   PCP_API
   PcpNodeRef_ChildrenReverseIterator();
@@ -398,18 +422,22 @@ public:
   PCP_API
   PcpNodeRef_ChildrenReverseIterator(const PcpNodeRef &node, bool end = false);
 
-private:
+ private:
   friend class boost::iterator_core_access;
   PCP_API
   void increment();
-  bool equal(const PcpNodeRef_ChildrenReverseIterator &other) const {
+  bool equal(const PcpNodeRef_ChildrenReverseIterator &other) const
+  {
     // Note: The default constructed iterator is *not* equal to any
     //       other iterator.
     return (_node == other._node && _index == other._index);
   }
-  reference dereference() const { return reference(_node._graph, _index); }
+  reference dereference() const
+  {
+    return reference(_node._graph, _index);
+  }
 
-private:
+ private:
   // Current graph node this iterator is pointing at.
   PcpNodeRef _node;
 
@@ -417,38 +445,41 @@ private:
   size_t _index;
 };
 
-template <> struct Tf_IteratorInterface<PcpNodeRef::child_const_range, false> {
+template<> struct Tf_IteratorInterface<PcpNodeRef::child_const_range, false> {
   typedef PcpNodeRef::child_const_iterator IteratorType;
-  static IteratorType Begin(PcpNodeRef::child_const_range const &c) {
+  static IteratorType Begin(PcpNodeRef::child_const_range const &c)
+  {
     return c.first;
   }
-  static IteratorType End(PcpNodeRef::child_const_range const &c) {
+  static IteratorType End(PcpNodeRef::child_const_range const &c)
+  {
     return c.second;
   }
 };
 
-template <> struct Tf_IteratorInterface<PcpNodeRef::child_const_range, true> {
+template<> struct Tf_IteratorInterface<PcpNodeRef::child_const_range, true> {
   typedef PcpNodeRef::child_const_reverse_iterator IteratorType;
-  static IteratorType Begin(PcpNodeRef::child_const_range const &c) {
+  static IteratorType Begin(PcpNodeRef::child_const_range const &c)
+  {
     return c.second;
   }
-  static IteratorType End(PcpNodeRef::child_const_range const &c) {
+  static IteratorType End(PcpNodeRef::child_const_range const &c)
+  {
     return c.first;
   }
 };
 
-template <>
-struct Tf_ShouldIterateOverCopy<PcpNodeRef::child_const_range>
-    : std::true_type {};
+template<> struct Tf_ShouldIterateOverCopy<PcpNodeRef::child_const_range> : std::true_type {};
 
 /// Support for range-based for loops for PcpNodeRef children ranges.
-inline PcpNodeRef_ChildrenIterator
-begin(const PcpNodeRef::child_const_range &r) {
+inline PcpNodeRef_ChildrenIterator begin(const PcpNodeRef::child_const_range &r)
+{
   return r.first;
 }
 
 /// Support for range-based for loops for PcpNodeRef children ranges.
-inline PcpNodeRef_ChildrenIterator end(const PcpNodeRef::child_const_range &r) {
+inline PcpNodeRef_ChildrenIterator end(const PcpNodeRef::child_const_range &r)
+{
   return r.second;
 }
 
@@ -459,4 +490,4 @@ int PcpNode_GetNonVariantPathElementCount(const SdfPath &path);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_NODE_H
+#endif  // PXR_USD_PCP_NODE_H

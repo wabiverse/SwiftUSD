@@ -46,7 +46,7 @@ class Usd_ClipCache {
   Usd_ClipCache(Usd_ClipCache const &) = delete;
   Usd_ClipCache &operator=(Usd_ClipCache const &) = delete;
 
-public:
+ public:
   Usd_ClipCache();
   ~Usd_ClipCache();
 
@@ -88,8 +88,7 @@ public:
   /// The returned vector contains all clips that affect the prim at \p path
   /// in strength order. Each individual list of value clips will be ordered
   /// by start time.
-  const std::vector<Usd_ClipSetRefPtr> &
-  GetClipsForPrim(const SdfPath &path) const;
+  const std::vector<Usd_ClipSetRefPtr> &GetClipsForPrim(const SdfPath &path) const;
 
   /// \struct Lifeboat
   ///
@@ -115,13 +114,12 @@ public:
   /// function on this object.
   void InvalidateClipsForPrim(const SdfPath &path);
 
-private:
+ private:
   void _ComputeClipsFromPrimIndex(const SdfPath &usdPrimPath,
                                   const PcpPrimIndex &primIndex,
                                   std::vector<Usd_ClipSetRefPtr> *clips) const;
 
-  inline const std::vector<Usd_ClipSetRefPtr> &
-  _GetClipsForPrim_NoLock(const SdfPath &path) const;
+  inline const std::vector<Usd_ClipSetRefPtr> &_GetClipsForPrim_NoLock(const SdfPath &path) const;
 
   // Map from prim path to all clips that apply to that prim, including
   // ancestral clips. This map is sparse; only prims where clips are
@@ -135,4 +133,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_CLIP_CACHE_H
+#endif  // PXR_USD_USD_CLIP_CACHE_H

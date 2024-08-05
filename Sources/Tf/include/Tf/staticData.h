@@ -105,34 +105,47 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// }
 /// \endcode
 ///
-template <class T> struct Tf_StaticDataDefaultFactory {
-  static T *New() { return new T; }
+template<class T> struct Tf_StaticDataDefaultFactory {
+  static T *New()
+  {
+    return new T;
+  }
 };
 
-template <class T, class Factory = Tf_StaticDataDefaultFactory<T>>
-class TfStaticData {
-public:
+template<class T, class Factory = Tf_StaticDataDefaultFactory<T>> class TfStaticData {
+ public:
   /// Return a pointer to the underlying data object. It is created and
   /// initialized if necessary.
-  inline T *operator->() const { return Get(); }
+  inline T *operator->() const
+  {
+    return Get();
+  }
 
   /// Member lookup. The underlying data object is created and initialized
   /// if necessary.
-  inline T &operator*() const { return *Get(); }
+  inline T &operator*() const
+  {
+    return *Get();
+  }
 
   /// Return a pointer to the underlying object, creating and initializing
   /// it if necessary.
-  inline T *Get() const {
+  inline T *Get() const
+  {
     T *p = _data;
     return ARCH_LIKELY(p) ? p : _TryToCreateData();
   }
 
   /// Return true if the underlying data object is created and initialized.
   /// Return false otherwise.
-  inline bool IsInitialized() const { return _data.load() != nullptr; }
+  inline bool IsInitialized() const
+  {
+    return _data.load() != nullptr;
+  }
 
-private:
-  T *_TryToCreateData() const {
+ private:
+  T *_TryToCreateData() const
+  {
     // Allocate an instance.
     T *tmp = Factory::New();
 
@@ -195,22 +208,21 @@ private:
 /// not have side-effects, but you should be aware of it.
 ///
 /// \hideinitializer
-#define TF_MAKE_STATIC_DATA(Type, Name)                                        \
-  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)(                      \
-      std::remove_const_t<TF_PP_EAT_PARENS(Type)> *);                          \
-  namespace {                                                                  \
-  struct TF_PP_CAT(Name, _Tf_StaticDataFactory) {                              \
-    static TF_PP_EAT_PARENS(Type) * New() {                                    \
-      auto *p = new std::remove_const_t<TF_PP_EAT_PARENS(Type)>;               \
-      TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)(p);                           \
-      return p;                                                                \
-    }                                                                          \
-  };                                                                           \
-  }                                                                            \
-  static TfStaticData<TF_PP_EAT_PARENS(Type),                                  \
-                      TF_PP_CAT(Name, _Tf_StaticDataFactory)>                  \
-      Name;                                                                    \
-  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)(                      \
+#define TF_MAKE_STATIC_DATA(Type, Name) \
+  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)( \
+      std::remove_const_t<TF_PP_EAT_PARENS(Type)> *); \
+  namespace { \
+  struct TF_PP_CAT(Name, _Tf_StaticDataFactory) { \
+    static TF_PP_EAT_PARENS(Type) * New() \
+    { \
+      auto *p = new std::remove_const_t<TF_PP_EAT_PARENS(Type)>; \
+      TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)(p); \
+      return p; \
+    } \
+  }; \
+  } \
+  static TfStaticData<TF_PP_EAT_PARENS(Type), TF_PP_CAT(Name, _Tf_StaticDataFactory)> Name; \
+  static void TF_PP_CAT(Name, _Tf_StaticDataFactoryImpl)( \
       std::remove_const_t<TF_PP_EAT_PARENS(Type)> * Name)
 
 PXR_NAMESPACE_CLOSE_SCOPE

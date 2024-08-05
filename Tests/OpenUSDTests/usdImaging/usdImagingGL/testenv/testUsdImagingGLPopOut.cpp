@@ -33,265 +33,252 @@
 #include "pxr/imaging/hgi/hgi.h"
 #include "pxr/imaging/hgi/tokens.h"
 
+#include "pxr/imaging/garch/glDebugWindow.h"
+#include "pxr/imaging/glf/contextCaps.h"
+#include "pxr/imaging/glf/drawTarget.h"
+#include "pxr/imaging/glf/glContext.h"
 #include "pxr/imaging/hd/driver.h"
 #include "pxr/imaging/hd/engine.h"
 #include "pxr/imaging/hd/renderIndex.h"
 #include "pxr/imaging/hd/task.h"
 #include "pxr/imaging/hd/tokens.h"
-#include "pxr/imaging/garch/glDebugWindow.h"
-#include "pxr/imaging/glf/contextCaps.h"
-#include "pxr/imaging/glf/drawTarget.h"
-#include "pxr/imaging/glf/glContext.h"
 
-#include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/prim.h"
+#include "pxr/usd/usd/stage.h"
 
-#include "pxr/base/gf/matrix4d.h"
 #include "pxr/base/gf/frustum.h"
+#include "pxr/base/gf/matrix4d.h"
 
 #include <iostream>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 /// A simple drawing task that just executes a render pass.
-class UsdImagingGL_DrawTask final : public HdTask
-{
-public:
-    UsdImagingGL_DrawTask(HdRenderPassSharedPtr const &renderPass,
+class UsdImagingGL_DrawTask final : public HdTask {
+ public:
+  UsdImagingGL_DrawTask(HdRenderPassSharedPtr const &renderPass,
                         HdRenderPassStateSharedPtr const &renderPassState)
-        : HdTask(SdfPath::EmptyPath())
-        , _renderPass(renderPass)
-        , _renderPassState(renderPassState)
-    {
-    }
+      : HdTask(SdfPath::EmptyPath()), _renderPass(renderPass), _renderPassState(renderPassState)
+  {
+  }
 
-    virtual void Sync(HdSceneDelegate* delegate,
-                      HdTaskContext* ctx,
-                      HdDirtyBits* dirtyBits) override {
-        _renderPass->Sync();
+  virtual void Sync(HdSceneDelegate *delegate, HdTaskContext *ctx, HdDirtyBits *dirtyBits) override
+  {
+    _renderPass->Sync();
 
-        *dirtyBits = HdChangeTracker::Clean;
-    }
+    *dirtyBits = HdChangeTracker::Clean;
+  }
 
-    virtual void Prepare(HdTaskContext* ctx,
-                         HdRenderIndex* renderIndex) override {
-        _renderPassState->Prepare(renderIndex->GetResourceRegistry());
-    }
+  virtual void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override
+  {
+    _renderPassState->Prepare(renderIndex->GetResourceRegistry());
+  }
 
-    virtual void Execute(HdTaskContext* ctx) override {
-        _renderPass->Execute(_renderPassState, GetRenderTags());
-    }
+  virtual void Execute(HdTaskContext *ctx) override
+  {
+    _renderPass->Execute(_renderPassState, GetRenderTags());
+  }
 
-private:
-    HdRenderPassSharedPtr _renderPass;
-    HdRenderPassStateSharedPtr _renderPassState;
+ private:
+  HdRenderPassSharedPtr _renderPass;
+  HdRenderPassStateSharedPtr _renderPassState;
 };
 
 class Offscreen {
-public:
-    Offscreen(std::string const &outPrefix) {
-        _count = 0;
-        _outPrefix = outPrefix;
-        _drawTarget = GlfDrawTarget::New(GfVec2i(512, 512));
-        _drawTarget->Bind();
-        _drawTarget->AddAttachment("color", GL_RGBA, GL_FLOAT, GL_RGBA);
-        _drawTarget->AddAttachment("depth", GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8,
-                                   GL_DEPTH24_STENCIL8);
-        _drawTarget->Unbind();
+ public:
+  Offscreen(std::string const &outPrefix)
+  {
+    _count = 0;
+    _outPrefix = outPrefix;
+    _drawTarget = GlfDrawTarget::New(GfVec2i(512, 512));
+    _drawTarget->Bind();
+    _drawTarget->AddAttachment("color", GL_RGBA, GL_FLOAT, GL_RGBA);
+    _drawTarget->AddAttachment(
+        "depth", GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, GL_DEPTH24_STENCIL8);
+    _drawTarget->Unbind();
+  }
+
+  void Begin()
+  {
+    GLfloat clearColor[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+    GLfloat clearDepth[1] = {1.0f};
+
+    _drawTarget->Bind();
+    glClearBufferfv(GL_COLOR, 0, clearColor);
+    glClearBufferfv(GL_DEPTH, 0, clearDepth);
+  }
+
+  void End()
+  {
+    _drawTarget->Unbind();
+
+    if (_outPrefix.size() > 0) {
+      std::string filename = TfStringPrintf("%s_%d.png", _outPrefix.c_str(), _count);
+      _drawTarget->WriteToFile("color", filename);
+      std::cerr << "**Write to " << filename << "\n";
     }
+    ++_count;
+  }
 
-    void Begin() {
-        GLfloat clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-        GLfloat clearDepth[1] = { 1.0f };
-
-        _drawTarget->Bind();
-        glClearBufferfv(GL_COLOR, 0, clearColor);
-        glClearBufferfv(GL_DEPTH, 0, clearDepth);
-    }
-
-    void End() {
-        _drawTarget->Unbind();
-
-        if (_outPrefix.size() > 0) {
-            std::string filename = TfStringPrintf(
-                "%s_%d.png", _outPrefix.c_str(), _count);
-            _drawTarget->WriteToFile("color", filename);
-            std::cerr << "**Write to " << filename << "\n";
-        }
-        ++_count;
-    }
-
-private:
-    int _count;
-    std::string _outPrefix;
-    GlfDrawTargetRefPtr _drawTarget;
-
+ private:
+  int _count;
+  std::string _outPrefix;
+  GlfDrawTargetRefPtr _drawTarget;
 };
 
 int main(int argc, char *argv[])
 {
-    GarchGLDebugWindow window("UsdImaging Test", 512, 512);
-    window.Init();
-    GarchGLApiLoad();
+  GarchGLDebugWindow window("UsdImaging Test", 512, 512);
+  window.Init();
+  GarchGLApiLoad();
 
-    // wrap into GlfGLContext so that GlfDrawTarget works
-    GlfGLContextSharedPtr ctx = GlfGLContext::GetCurrentGLContext();
-    GlfContextCaps::InitInstance();
+  // wrap into GlfGLContext so that GlfDrawTarget works
+  GlfGLContextSharedPtr ctx = GlfGLContext::GetCurrentGLContext();
+  GlfContextCaps::InitInstance();
 
-
-    std::string outPrefix;
-    std::string filePath;
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "--output") {
-            outPrefix = argv[++i];
-        } else {
-            filePath = argv[i];
-        }
+  std::string outPrefix;
+  std::string filePath;
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
+    if (arg == "--output") {
+      outPrefix = argv[++i];
     }
-
-    if (filePath.empty()) {
-        std::cout << "Usage: " << argv[0] << " [--output <filename>] stage.usd\n";
-        return EXIT_FAILURE;
+    else {
+      filePath = argv[i];
     }
+  }
 
-    UsdStageRefPtr stage = UsdStage::Open(filePath);
+  if (filePath.empty()) {
+    std::cout << "Usage: " << argv[0] << " [--output <filename>] stage.usd\n";
+    return EXIT_FAILURE;
+  }
 
-    // Hgi and HdDriver should be constructed before HdEngine to ensure they
-    // are destructed last. Hgi may be used during engine/delegate destruction.
-    HgiUniquePtr hgi = Hgi::CreatePlatformDefaultHgi();
-    HdDriver driver{HgiTokens->renderDriver, VtValue(hgi.get())};
+  UsdStageRefPtr stage = UsdStage::Open(filePath);
 
-    HdEngine engine;
-    HdStRenderDelegate renderDelegate;
+  // Hgi and HdDriver should be constructed before HdEngine to ensure they
+  // are destructed last. Hgi may be used during engine/delegate destruction.
+  HgiUniquePtr hgi = Hgi::CreatePlatformDefaultHgi();
+  HdDriver driver{HgiTokens->renderDriver, VtValue(hgi.get())};
 
-    std::unique_ptr<HdRenderIndex> renderIndex(
-        HdRenderIndex::New(&renderDelegate, {&driver}));
-    TF_VERIFY(renderIndex);
-    std::unique_ptr<UsdImagingDelegate> delegate(
-                          new UsdImagingDelegate(renderIndex.get(),
-                                                  SdfPath::AbsoluteRootPath()));
-    delegate->Populate(stage->GetPseudoRoot());
-    delegate->SetTime(1.0);
+  HdEngine engine;
+  HdStRenderDelegate renderDelegate;
 
-    // prep draw target
-    Offscreen offscreen(outPrefix);
+  std::unique_ptr<HdRenderIndex> renderIndex(HdRenderIndex::New(&renderDelegate, {&driver}));
+  TF_VERIFY(renderIndex);
+  std::unique_ptr<UsdImagingDelegate> delegate(
+      new UsdImagingDelegate(renderIndex.get(), SdfPath::AbsoluteRootPath()));
+  delegate->Populate(stage->GetPseudoRoot());
+  delegate->SetTime(1.0);
 
-    HdRenderPassSharedPtr renderPass(
-        new HdSt_RenderPass(
-            &delegate->GetRenderIndex(),
-            HdRprimCollection(HdTokens->geometry, 
-                HdReprSelector(HdReprTokens->smoothHull))));
-    HdStRenderPassStateSharedPtr state(new HdStRenderPassState());
+  // prep draw target
+  Offscreen offscreen(outPrefix);
 
-    HdTaskSharedPtr drawTask = std::make_shared<UsdImagingGL_DrawTask>(
-        renderPass, state);
-    HdTaskSharedPtrVector tasks = { drawTask };
+  HdRenderPassSharedPtr renderPass(new HdSt_RenderPass(
+      &delegate->GetRenderIndex(),
+      HdRprimCollection(HdTokens->geometry, HdReprSelector(HdReprTokens->smoothHull))));
+  HdStRenderPassStateSharedPtr state(new HdStRenderPassState());
 
-    GfMatrix4d viewMatrix;
-    viewMatrix.SetLookAt(GfVec3d(10, 20, 20),
-                         GfVec3d(10, 0, 0),
-                         GfVec3d(0, 1, 0));
-    GfFrustum frustum;
-    frustum.SetPerspective(60.0, true, 1.0, 0.1, 100.0);
-    state->SetCameraFramingState(viewMatrix,
-                                 frustum.ComputeProjectionMatrix(),
-                                 GfVec4d(0, 0, 512, 512),
-                                 HdRenderPassState::ClipPlanesVector());
+  HdTaskSharedPtr drawTask = std::make_shared<UsdImagingGL_DrawTask>(renderPass, state);
+  HdTaskSharedPtrVector tasks = {drawTask};
 
-    // initial draw
-    glViewport(0, 0, 512, 512);
-    glEnable(GL_DEPTH_TEST);
+  GfMatrix4d viewMatrix;
+  viewMatrix.SetLookAt(GfVec3d(10, 20, 20), GfVec3d(10, 0, 0), GfVec3d(0, 1, 0));
+  GfFrustum frustum;
+  frustum.SetPerspective(60.0, true, 1.0, 0.1, 100.0);
+  state->SetCameraFramingState(viewMatrix,
+                               frustum.ComputeProjectionMatrix(),
+                               GfVec4d(0, 0, 512, 512),
+                               HdRenderPassState::ClipPlanesVector());
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // initial draw
+  glViewport(0, 0, 512, 512);
+  glEnable(GL_DEPTH_TEST);
 
-    /*  in test.usda
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-       /Cube
-       /Foo/X1/C1     (instance)
-       /Foo/X2/C2     (instance)
-       /Foo/X3/C3     (instance)
-       /Foo/Bar/C
-       /Foo/Bar/X4/C4 (instance)
-       /Bar/C
-       /Bar/X5/C5     (instance)
-     */
+  /*  in test.usda
 
-    // Set root transform
-    delegate->SetRootTransform(GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,1));
+     /Cube
+     /Foo/X1/C1     (instance)
+     /Foo/X2/C2     (instance)
+     /Foo/X3/C3     (instance)
+     /Foo/Bar/C
+     /Foo/Bar/X4/C4 (instance)
+     /Bar/C
+     /Bar/X5/C5     (instance)
+   */
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // Set root transform
+  delegate->SetRootTransform(GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1));
 
-    // Reset root transform
-    delegate->SetRootTransform(GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1));
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // Reset root transform
+  delegate->SetRootTransform(GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
-    // Set rigid xform override
-    UsdImagingDelegate::RigidXformOverridesMap overrides;
-    overrides[SdfPath("/Foo/X2")] = GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0, 1,0, 0,1);
-    overrides[SdfPath("/Bar")]    = GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0, 0,5,-5,1);
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    delegate->SetRigidXformOverrides(overrides);
+  // Set rigid xform override
+  UsdImagingDelegate::RigidXformOverridesMap overrides;
+  overrides[SdfPath("/Foo/X2")] = GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1);
+  overrides[SdfPath("/Bar")] = GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 5, -5, 1);
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  delegate->SetRigidXformOverrides(overrides);
 
-    // Set root transform again (+rigid xform)
-    delegate->SetRootTransform(GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,2,0,0,1));
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // Set root transform again (+rigid xform)
+  delegate->SetRootTransform(GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 0, 1));
 
-    // Invis cube
-    SdfPathVector invisedPaths;
-    invisedPaths.push_back(SdfPath("/Cube"));
-    delegate->SetInvisedPrimPaths(invisedPaths);
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // Invis cube
+  SdfPathVector invisedPaths;
+  invisedPaths.push_back(SdfPath("/Cube"));
+  delegate->SetInvisedPrimPaths(invisedPaths);
 
-    // Invis instances
-    invisedPaths.push_back(SdfPath("/Foo/X2"));
-    invisedPaths.push_back(SdfPath("/Foo/Bar/X4/C4"));
-    delegate->SetInvisedPrimPaths(invisedPaths);
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  // Invis instances
+  invisedPaths.push_back(SdfPath("/Foo/X2"));
+  invisedPaths.push_back(SdfPath("/Foo/Bar/X4/C4"));
+  delegate->SetInvisedPrimPaths(invisedPaths);
 
-    // un-invis
-    delegate->SetInvisedPrimPaths(SdfPathVector());
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    // Set rigid xform override, overlapped
-    overrides.clear();
+  // un-invis
+  delegate->SetInvisedPrimPaths(SdfPathVector());
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
 
-    overrides[SdfPath("/Foo")]
-        = GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,1);
-    overrides[SdfPath("/Foo/Bar")]
-        = GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1);
-    overrides[SdfPath("/Foo/Bar/X4")]
-        = GfMatrix4d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,6,1);
+  // Set rigid xform override, overlapped
+  overrides.clear();
 
-    delegate->SetRigidXformOverrides(overrides);
+  overrides[SdfPath("/Foo")] = GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1);
+  overrides[SdfPath("/Foo/Bar")] = GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+  overrides[SdfPath("/Foo/Bar/X4")] = GfMatrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 6, 1);
 
-    offscreen.Begin();
-    engine.Execute(&delegate->GetRenderIndex(), &tasks);
-    offscreen.End();
+  delegate->SetRigidXformOverrides(overrides);
 
-    std::cout << "OK" << std::endl;
-    return EXIT_SUCCESS;
+  offscreen.Begin();
+  engine.Execute(&delegate->GetRenderIndex(), &tasks);
+  offscreen.End();
+
+  std::cout << "OK" << std::endl;
+  return EXIT_SUCCESS;
 }
-

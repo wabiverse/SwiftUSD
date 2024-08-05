@@ -36,8 +36,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapFileUtils() {
+void wrapFileUtils()
+{
 
-  def("TouchFile", &TfTouchFile,
-      (arg("fileName"), arg("create") = bool(false)));
+  def("TouchFile", &TfTouchFile, (arg("fileName"), arg("create") = bool(false)));
 }

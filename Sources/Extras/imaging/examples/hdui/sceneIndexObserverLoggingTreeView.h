@@ -30,33 +30,31 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HduiSceneIndexObserverLoggingTreeView : public QTreeView
-{
+class HduiSceneIndexObserverLoggingTreeView : public QTreeView {
   Q_OBJECT;
 
-public:
+ public:
   HduiSceneIndexObserverLoggingTreeView(QWidget *parent = Q_NULLPTR);
 
   void SetSceneIndex(HdSceneIndexBaseRefPtr inputSceneIndex);
-  bool IsRecording() { return _model.IsRecording(); }
+  bool IsRecording()
+  {
+    return _model.IsRecording();
+  }
 
-Q_SIGNALS:
+ Q_SIGNALS:
   void RecordingStarted();
   void RecordingStopped();
 
-public Q_SLOTS:
+ public Q_SLOTS:
   void StartRecording();
   void StopRecording();
   void Clear();
 
-private:
-  class _ObserverModel : public HdSceneIndexObserver, public QAbstractItemModel
-  {
-  public:
-    _ObserverModel()
-        : _isRecording(false)
-    {
-    }
+ private:
+  class _ObserverModel : public HdSceneIndexObserver, public QAbstractItemModel {
+   public:
+    _ObserverModel() : _isRecording(false) {}
 
     void StartRecording();
     void StopRecording();
@@ -64,89 +62,70 @@ private:
     void Clear();
 
     // satisfying HdSceneIndexObserver
-    void PrimsAdded(
-        const HdSceneIndexBase &sender,
-        const AddedPrimEntries &entries) override;
+    void PrimsAdded(const HdSceneIndexBase &sender, const AddedPrimEntries &entries) override;
 
-    void PrimsRemoved(
-        const HdSceneIndexBase &sender,
-        const RemovedPrimEntries &entries) override;
+    void PrimsRemoved(const HdSceneIndexBase &sender, const RemovedPrimEntries &entries) override;
 
-    void PrimsDirtied(
-        const HdSceneIndexBase &sender,
-        const DirtiedPrimEntries &entries) override;
+    void PrimsDirtied(const HdSceneIndexBase &sender, const DirtiedPrimEntries &entries) override;
 
-    void PrimsRenamed(
-        const HdSceneIndexBase &sender,
-        const RenamedPrimEntries &entries) override;
+    void PrimsRenamed(const HdSceneIndexBase &sender, const RenamedPrimEntries &entries) override;
 
     // satisfying QAbstractItemModel
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
-        const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    QVariant headerData(int section, Qt::Orientation orientation,
+    QVariant headerData(int section,
+                        Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const override;
 
     QModelIndex parent(const QModelIndex &index) const override;
 
-    int columnCount(
-        const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    int rowCount(
-        const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QModelIndex index(int row, int column,
+    QModelIndex index(int row,
+                      int column,
                       const QModelIndex &parent = QModelIndex()) const override;
 
-  private:
+   private:
     bool _isRecording;
 
-    struct _NoticeModelBase
-    {
+    struct _NoticeModelBase {
       virtual ~_NoticeModelBase() = default;
       virtual const char *noticeTypeString() = 0;
       virtual int rowCount() = 0;
-      virtual QVariant data(const QModelIndex &index,
-                            int role = Qt::DisplayRole) = 0;
+      virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) = 0;
 
       size_t _index;
     };
 
-    struct _AddedPrimsNoticeModel : _NoticeModelBase
-    {
+    struct _AddedPrimsNoticeModel : _NoticeModelBase {
       const char *noticeTypeString() override;
       int rowCount() override;
-      QVariant data(const QModelIndex &index,
-                    int role = Qt::DisplayRole) override;
+      QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) override;
 
       AddedPrimEntries _entries;
     };
 
-    struct _DirtiedPrimsNoticeModel : _NoticeModelBase
-    {
+    struct _DirtiedPrimsNoticeModel : _NoticeModelBase {
       const char *noticeTypeString() override;
       int rowCount() override;
-      QVariant data(const QModelIndex &index,
-                    int role = Qt::DisplayRole) override;
+      QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) override;
       DirtiedPrimEntries _entries;
     };
 
-    struct _RemovedPrimsNoticeModel : _NoticeModelBase
-    {
+    struct _RemovedPrimsNoticeModel : _NoticeModelBase {
       const char *noticeTypeString() override;
       int rowCount() override;
-      QVariant data(const QModelIndex &index,
-                    int role = Qt::DisplayRole) override;
+      QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) override;
 
       RemovedPrimEntries _entries;
     };
 
-    struct _RenamedPrimsNoticeModel : _NoticeModelBase
-    {
+    struct _RenamedPrimsNoticeModel : _NoticeModelBase {
       const char *noticeTypeString() override;
       int rowCount() override;
-      QVariant data(const QModelIndex &index,
-                    int role = Qt::DisplayRole) override;
+      QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) override;
 
       RenamedPrimEntries _entries;
     };

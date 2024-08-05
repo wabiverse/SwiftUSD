@@ -25,110 +25,94 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdLuxMeshLightAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+  TfType::Define<UsdLuxMeshLightAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdLuxMeshLightAPI::~UsdLuxMeshLightAPI()
-{
-}
+UsdLuxMeshLightAPI::~UsdLuxMeshLightAPI() {}
 
 /* static */
-UsdLuxMeshLightAPI
-UsdLuxMeshLightAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxMeshLightAPI UsdLuxMeshLightAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxMeshLightAPI();
-    }
-    return UsdLuxMeshLightAPI(stage->GetPrimAtPath(path));
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxMeshLightAPI();
+  }
+  return UsdLuxMeshLightAPI(stage->GetPrimAtPath(path));
 }
-
 
 /* virtual */
 UsdSchemaKind UsdLuxMeshLightAPI::_GetSchemaKind() const
 {
-    return UsdLuxMeshLightAPI::schemaKind;
+  return UsdLuxMeshLightAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdLuxMeshLightAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdLuxMeshLightAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
-    return prim.CanApplyAPI<UsdLuxMeshLightAPI>(whyNot);
+  return prim.CanApplyAPI<UsdLuxMeshLightAPI>(whyNot);
 }
 
 /* static */
-UsdLuxMeshLightAPI
-UsdLuxMeshLightAPI::Apply(const UsdPrim &prim)
+UsdLuxMeshLightAPI UsdLuxMeshLightAPI::Apply(const UsdPrim &prim)
 {
-    if (prim.ApplyAPI<UsdLuxMeshLightAPI>()) {
-        return UsdLuxMeshLightAPI(prim);
-    }
-    return UsdLuxMeshLightAPI();
+  if (prim.ApplyAPI<UsdLuxMeshLightAPI>()) {
+    return UsdLuxMeshLightAPI(prim);
+  }
+  return UsdLuxMeshLightAPI();
 }
 
 /* static */
-const TfType &
-UsdLuxMeshLightAPI::_GetStaticTfType()
+const TfType &UsdLuxMeshLightAPI::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdLuxMeshLightAPI>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdLuxMeshLightAPI>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdLuxMeshLightAPI::_IsTypedSchema()
+bool UsdLuxMeshLightAPI::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxMeshLightAPI::_GetTfType() const
+const TfType &UsdLuxMeshLightAPI::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxMeshLightAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdLuxMeshLightAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {};
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

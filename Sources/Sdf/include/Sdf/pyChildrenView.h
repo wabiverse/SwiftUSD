@@ -35,8 +35,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class _View> class SdfPyWrapChildrenView {
-public:
+template<class _View> class SdfPyWrapChildrenView {
+ public:
   typedef _View View;
   typedef typename View::ChildPolicy ChildPolicy;
   typedef typename View::Predicate Predicate;
@@ -45,38 +45,51 @@ public:
   typedef typename View::const_iterator const_iterator;
   typedef SdfPyWrapChildrenView<View> This;
 
-  SdfPyWrapChildrenView() { TfPyWrapOnce<View>(&This::_Wrap); }
+  SdfPyWrapChildrenView()
+  {
+    TfPyWrapOnce<View>(&This::_Wrap);
+  }
 
-private:
+ private:
   struct _ExtractItem {
-    static boost::python::object Get(const View &x, const const_iterator &i) {
+    static boost::python::object Get(const View &x, const const_iterator &i)
+    {
       return boost::python::make_tuple(x.key(i), *i);
     }
   };
 
   struct _ExtractKey {
-    static boost::python::object Get(const View &x, const const_iterator &i) {
+    static boost::python::object Get(const View &x, const const_iterator &i)
+    {
       return boost::python::object(x.key(i));
     }
   };
 
   struct _ExtractValue {
-    static boost::python::object Get(const View &x, const const_iterator &i) {
+    static boost::python::object Get(const View &x, const const_iterator &i)
+    {
       return boost::python::object(*i);
     }
   };
 
-  template <class E> class _Iterator {
-  public:
+  template<class E> class _Iterator {
+   public:
     _Iterator(const boost::python::object &object)
-        : _object(object), _owner(boost::python::extract<const View &>(object)),
-          _cur(_owner.begin()), _end(_owner.end()) {
+        : _object(object),
+          _owner(boost::python::extract<const View &>(object)),
+          _cur(_owner.begin()),
+          _end(_owner.end())
+    {
       // Do nothing
     }
 
-    _Iterator<E> GetCopy() const { return *this; }
+    _Iterator<E> GetCopy() const
+    {
+      return *this;
+    }
 
-    boost::python::object GetNext() {
+    boost::python::object GetNext()
+    {
       if (_cur == _end) {
         TfPyThrowStopIteration("End of ChildrenProxy iteration");
       }
@@ -85,14 +98,15 @@ private:
       return result;
     }
 
-  private:
+   private:
     boost::python::object _object;
     const View &_owner;
     const_iterator _cur;
     const_iterator _end;
   };
 
-  static void _Wrap() {
+  static void _Wrap()
+  {
     using namespace boost::python;
 
     std::string name = _GetName();
@@ -131,7 +145,8 @@ private:
         .def("__next__", &This::template _Iterator<_ExtractValue>::GetNext);
   }
 
-  static std::string _GetName() {
+  static std::string _GetName()
+  {
     std::string name = "ChildrenView_" + ArchGetDemangled<ChildPolicy>() + "_" +
                        ArchGetDemangled<Predicate>();
     name = TfStringReplace(name, " ", "_");
@@ -142,7 +157,8 @@ private:
     return name;
   }
 
-  static std::string _GetRepr(const View &x) {
+  static std::string _GetRepr(const View &x)
+  {
     std::string result("{");
     if (!x.empty()) {
       const_iterator i = x.begin(), n = x.end();
@@ -155,52 +171,59 @@ private:
     return result;
   }
 
-  static value_type _GetItemByKey(const View &x, const key_type &key) {
+  static value_type _GetItemByKey(const View &x, const key_type &key)
+  {
     const_iterator i = x.find(key);
     if (i == x.end()) {
       TfPyThrowIndexError(TfPyRepr(key));
       return value_type();
-    } else {
+    }
+    else {
       return *i;
     }
   }
 
-  static value_type _GetItemByIndex(const View &x, size_t index) {
+  static value_type _GetItemByIndex(const View &x, size_t index)
+  {
     if (index >= x.size()) {
       TfPyThrowIndexError("list index out of range");
     }
     return x[index];
   }
 
-  static boost::python::object _PyGet(const View &x, const key_type &key) {
+  static boost::python::object _PyGet(const View &x, const key_type &key)
+  {
     const_iterator i = x.find(key);
     return i == x.end() ? boost::python::object() : boost::python::object(*i);
   }
 
-  static bool _HasKey(const View &x, const key_type &key) {
+  static bool _HasKey(const View &x, const key_type &key)
+  {
     return x.find(key) != x.end();
   }
 
-  static bool _HasValue(const View &x, const value_type &value) {
+  static bool _HasValue(const View &x, const value_type &value)
+  {
     return x.find(value) != x.end();
   }
 
-  static _Iterator<_ExtractItem>
-  _GetItemIterator(const boost::python::object &x) {
+  static _Iterator<_ExtractItem> _GetItemIterator(const boost::python::object &x)
+  {
     return _Iterator<_ExtractItem>(x);
   }
 
-  static _Iterator<_ExtractKey>
-  _GetKeyIterator(const boost::python::object &x) {
+  static _Iterator<_ExtractKey> _GetKeyIterator(const boost::python::object &x)
+  {
     return _Iterator<_ExtractKey>(x);
   }
 
-  static _Iterator<_ExtractValue>
-  _GetValueIterator(const boost::python::object &x) {
+  static _Iterator<_ExtractValue> _GetValueIterator(const boost::python::object &x)
+  {
     return _Iterator<_ExtractValue>(x);
   }
 
-  template <class E> static boost::python::list _Get(const View &x) {
+  template<class E> static boost::python::list _Get(const View &x)
+  {
     boost::python::list result;
     for (const_iterator i = x.begin(), n = x.end(); i != n; ++i) {
       result.append(E::Get(x, i));
@@ -208,12 +231,14 @@ private:
     return result;
   }
 
-  static int _FindIndexByKey(const View &x, const key_type &key) {
+  static int _FindIndexByKey(const View &x, const key_type &key)
+  {
     size_t i = std::distance(x.begin(), x.find(key));
     return i == x.size() ? -1 : i;
   }
 
-  static int _FindIndexByValue(const View &x, const value_type &value) {
+  static int _FindIndexByValue(const View &x, const value_type &value)
+  {
     size_t i = std::distance(x.begin(), x.find(value));
     return i == x.size() ? -1 : i;
   }
@@ -221,4 +246,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PY_CHILDREN_VIEW_H
+#endif  // PXR_USD_SDF_PY_CHILDREN_VIEW_H

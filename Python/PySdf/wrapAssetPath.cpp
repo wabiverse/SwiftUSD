@@ -40,17 +40,20 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_REGISTRY_FUNCTION(VtValue) {
+TF_REGISTRY_FUNCTION(VtValue)
+{
   VtRegisterValueCastsFromPythonSequencesToArray<SdfAssetPath>();
 }
 
 namespace {
 
-static std::string _Str(SdfAssetPath const &self) {
+static std::string _Str(SdfAssetPath const &self)
+{
   return boost::lexical_cast<std::string>(self);
 }
 
-static std::string _Repr(SdfAssetPath const &self) {
+static std::string _Repr(SdfAssetPath const &self)
+{
   std::ostringstream repr;
   repr << TF_PY_REPR_PREFIX << "AssetPath(" << TfPyRepr(self.GetAssetPath());
 
@@ -62,23 +65,30 @@ static std::string _Repr(SdfAssetPath const &self) {
   return repr.str();
 }
 
-static bool _Nonzero(SdfAssetPath const &self) {
+static bool _Nonzero(SdfAssetPath const &self)
+{
   return !self.GetAssetPath().empty();
 }
 
-static size_t _Hash(SdfAssetPath const &self) { return self.GetHash(); }
+static size_t _Hash(SdfAssetPath const &self)
+{
+  return self.GetHash();
+}
 
-static std::string GetAssetPath(SdfAssetPath const &ap) {
+static std::string GetAssetPath(SdfAssetPath const &ap)
+{
   return ap.GetAssetPath();
 }
 
-static std::string GetResolvedPath(SdfAssetPath const &ap) {
+static std::string GetResolvedPath(SdfAssetPath const &ap)
+{
   return ap.GetResolvedPath();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapAssetPath() {
+void wrapAssetPath()
+{
   typedef SdfAssetPath This;
 
   class_<This>("AssetPath", init<>())

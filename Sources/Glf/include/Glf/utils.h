@@ -26,10 +26,10 @@
 
 /// \file glf/utils.h
 
-#include <pxr/pxrns.h>
-#include "Glf/api.h"
 #include "Garch/glApi.h"
+#include "Glf/api.h"
 #include "Hio/types.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 

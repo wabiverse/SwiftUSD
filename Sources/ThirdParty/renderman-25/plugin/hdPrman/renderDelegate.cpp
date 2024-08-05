@@ -25,25 +25,24 @@
 #include "hdPrman/basisCurves.h"
 #include "hdPrman/camera.h"
 #include "hdPrman/cone.h"
-#include "hdPrman/cylinder.h"
-#include "hdPrman/sphere.h"
-#include "hdPrman/renderParam.h"
-#include "hdPrman/renderBuffer.h"
-#include "hdPrman/renderSettings.h"
-#include "hdPrman/integrator.h"
-#include "hdPrman/sampleFilter.h"
-#include "hdPrman/displayFilter.h"
 #include "hdPrman/coordSys.h"
+#include "hdPrman/cylinder.h"
+#include "hdPrman/displayFilter.h"
 #include "hdPrman/instancer.h"
-#include "hdPrman/renderParam.h"
-#include "hdPrman/renderPass.h"
+#include "hdPrman/integrator.h"
 #include "hdPrman/light.h"
 #include "hdPrman/lightFilter.h"
 #include "hdPrman/material.h"
 #include "hdPrman/mesh.h"
 #include "hdPrman/paramsSetter.h"
 #include "hdPrman/points.h"
+#include "hdPrman/renderBuffer.h"
+#include "hdPrman/renderParam.h"
+#include "hdPrman/renderPass.h"
+#include "hdPrman/renderSettings.h"
 #include "hdPrman/resourceRegistry.h"
+#include "hdPrman/sampleFilter.h"
+#include "hdPrman/sphere.h"
 #include "hdPrman/tokens.h"
 #include "hdPrman/volume.h"
 
@@ -63,102 +62,86 @@ extern TfEnvSetting<bool> HD_PRMAN_ENABLE_QUICKINTEGRATE;
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
-    (openvdbAsset)(field3dAsset)(ri)((outputsRi, "outputs:ri"))((mtlxRenderContext, "mtlx"))(prmanParams) /* XXX currently duplicated whereever used as to not yet */
-                                                                                                          /* establish a formal convention */
+    (openvdbAsset)(field3dAsset)(ri)((outputsRi, "outputs:ri"))((mtlxRenderContext, "mtlx"))(
+        prmanParams) /* XXX currently duplicated whereever used as to not yet */
+                     /* establish a formal convention */
 );
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrmanRenderSettingsTokens,
-                        HDPRMAN_RENDER_SETTINGS_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrmanRenderSettingsTokens, HDPRMAN_RENDER_SETTINGS_TOKENS);
 
 TF_DEFINE_PUBLIC_TOKENS(HdPrmanExperimentalRenderSpecTokens,
                         HDPRMAN_EXPERIMENTAL_RENDER_SPEC_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrmanIntegratorTokens,
-                        HDPRMAN_INTEGRATOR_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrmanIntegratorTokens, HDPRMAN_INTEGRATOR_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrmanRenderProductTokens,
-                        HDPRMAN_RENDER_PRODUCT_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrmanRenderProductTokens, HDPRMAN_RENDER_PRODUCT_TOKENS);
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrmanAovSettingsTokens,
-                        HDPRMAN_AOV_SETTINGS_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrmanAovSettingsTokens, HDPRMAN_AOV_SETTINGS_TOKENS);
 
-const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_RPRIM_TYPES =
-    {
-        HdPrimTypeTokens->cone,
-        HdPrimTypeTokens->cylinder,
-        HdPrimTypeTokens->sphere,
-        HdPrimTypeTokens->mesh,
-        HdPrimTypeTokens->basisCurves,
-        HdPrimTypeTokens->points,
-        HdPrimTypeTokens->volume,
+const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_RPRIM_TYPES = {
+    HdPrimTypeTokens->cone,
+    HdPrimTypeTokens->cylinder,
+    HdPrimTypeTokens->sphere,
+    HdPrimTypeTokens->mesh,
+    HdPrimTypeTokens->basisCurves,
+    HdPrimTypeTokens->points,
+    HdPrimTypeTokens->volume,
 
-        // New type, specific to mesh light source geom.
-        HdPrmanTokens->meshLightSourceMesh,
-        HdPrmanTokens->meshLightSourceVolume};
+    // New type, specific to mesh light source geom.
+    HdPrmanTokens->meshLightSourceMesh,
+    HdPrmanTokens->meshLightSourceVolume};
 
-const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_SPRIM_TYPES =
-    {
-        HdPrimTypeTokens->camera,
-        HdPrimTypeTokens->material,
-        HdPrimTypeTokens->distantLight,
-        HdPrimTypeTokens->domeLight,
-        HdPrimTypeTokens->light,
-        HdPrimTypeTokens->lightFilter,
-        HdPrimTypeTokens->rectLight,
-        HdPrimTypeTokens->diskLight,
-        HdPrimTypeTokens->cylinderLight,
-        HdPrimTypeTokens->sphereLight,
-        HdPrimTypeTokens->meshLight,
-        HdPrimTypeTokens->pluginLight,
-        HdPrimTypeTokens->extComputation,
-        HdPrimTypeTokens->coordSys,
-        HdPrimTypeTokens->integrator,
-        HdPrimTypeTokens->sampleFilter,
-        HdPrimTypeTokens->displayFilter,
-        _tokens->prmanParams,
+const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_SPRIM_TYPES = {
+    HdPrimTypeTokens->camera,
+    HdPrimTypeTokens->material,
+    HdPrimTypeTokens->distantLight,
+    HdPrimTypeTokens->domeLight,
+    HdPrimTypeTokens->light,
+    HdPrimTypeTokens->lightFilter,
+    HdPrimTypeTokens->rectLight,
+    HdPrimTypeTokens->diskLight,
+    HdPrimTypeTokens->cylinderLight,
+    HdPrimTypeTokens->sphereLight,
+    HdPrimTypeTokens->meshLight,
+    HdPrimTypeTokens->pluginLight,
+    HdPrimTypeTokens->extComputation,
+    HdPrimTypeTokens->coordSys,
+    HdPrimTypeTokens->integrator,
+    HdPrimTypeTokens->sampleFilter,
+    HdPrimTypeTokens->displayFilter,
+    _tokens->prmanParams,
 };
 
-const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_BPRIM_TYPES =
-    {
-        HdPrimTypeTokens->renderBuffer,
-        HdPrimTypeTokens->renderSettings,
-        _tokens->openvdbAsset,
-        _tokens->field3dAsset,
+const TfTokenVector HdPrmanRenderDelegate::SUPPORTED_BPRIM_TYPES = {
+    HdPrimTypeTokens->renderBuffer,
+    HdPrimTypeTokens->renderSettings,
+    _tokens->openvdbAsset,
+    _tokens->field3dAsset,
 };
 
-static std::string
-_ToLower(const std::string &s)
+static std::string _ToLower(const std::string &s)
 {
   std::string result = s;
-  for (auto &c : result)
-  {
+  for (auto &c : result) {
     c = tolower(c);
   }
   return result;
 }
 
-static std::vector<std::string>
-_GetExtraArgs(const HdRenderSettingsMap &settingsMap)
+static std::vector<std::string> _GetExtraArgs(const HdRenderSettingsMap &settingsMap)
 {
   std::string extraArgs;
 
   auto it = settingsMap.find(HdPrmanRenderSettingsTokens->batchCommandLine);
-  if (it != settingsMap.end())
-  {
+  if (it != settingsMap.end()) {
     // husk's --delegate-options arg allows users to pass an arbitrary
     // string of args which we pass along to PRManBegin.
-    if (it->second.IsHolding<VtArray<std::string>>())
-    {
-      const VtArray<std::string> &v =
-          it->second.UncheckedGet<VtArray<std::string>>();
-      for (VtArray<std::string>::const_iterator i = v.cbegin();
-           i != v.cend(); ++i)
-      {
-        if (*i == "--delegate-options")
-        {
+    if (it->second.IsHolding<VtArray<std::string>>()) {
+      const VtArray<std::string> &v = it->second.UncheckedGet<VtArray<std::string>>();
+      for (VtArray<std::string>::const_iterator i = v.cbegin(); i != v.cend(); ++i) {
+        if (*i == "--delegate-options") {
           ++i;
-          if (i != v.cend())
-          {
+          if (i != v.cend()) {
             extraArgs = *i;
           }
         }
@@ -168,17 +151,14 @@ _GetExtraArgs(const HdRenderSettingsMap &settingsMap)
   return TfStringTokenize(extraArgs, " ");
 }
 
-HdPrmanRenderDelegate::HdPrmanRenderDelegate(
-    HdRenderSettingsMap const &settingsMap)
+HdPrmanRenderDelegate::HdPrmanRenderDelegate(HdRenderSettingsMap const &settingsMap)
     : HdRenderDelegate(settingsMap)
 {
-  std::string rileyVariant = _ToLower(
-      GetRenderSetting<std::string>(
-          HdPrmanRenderSettingsTokens->rileyVariant,
-          TfGetenv("RILEY_VARIANT")));
+  std::string rileyVariant = _ToLower(GetRenderSetting<std::string>(
+      HdPrmanRenderSettingsTokens->rileyVariant, TfGetenv("RILEY_VARIANT")));
 
-  std::string xpuDevices = GetRenderSetting<std::string>(
-      HdPrmanRenderSettingsTokens->xpuDevices, std::string());
+  std::string xpuDevices = GetRenderSetting<std::string>(HdPrmanRenderSettingsTokens->xpuDevices,
+                                                         std::string());
 
   _renderParam = std::make_unique<HdPrman_RenderParam>(
       this, rileyVariant, xpuDevices, _GetExtraArgs(settingsMap));
@@ -188,16 +168,14 @@ HdPrmanRenderDelegate::HdPrmanRenderDelegate(
 
 bool HdPrmanRenderDelegate::IsInteractive() const
 {
-  return GetRenderSetting<bool>(
-      HdRenderSettingsTokens->enableInteractive, true);
+  return GetRenderSetting<bool>(HdRenderSettingsTokens->enableInteractive, true);
 }
 
 void HdPrmanRenderDelegate::_Initialize()
 {
   std::string integrator = HdPrmanIntegratorTokens->PxrPathTracer;
   std::string integratorEnv = TfGetenv("HD_PRMAN_INTEGRATOR");
-  if (!integratorEnv.empty())
-  {
+  if (!integratorEnv.empty()) {
     integrator = integratorEnv;
   }
 
@@ -213,10 +191,8 @@ void HdPrmanRenderDelegate::_Initialize()
                                  HdPrmanRenderSettingsTokens->integratorName,
                                  VtValue(integrator)});
 
-  if (TfGetEnvSetting(HD_PRMAN_ENABLE_QUICKINTEGRATE))
-  {
-    const std::string interactiveIntegrator =
-        HdPrmanIntegratorTokens->PxrDirectLighting;
+  if (TfGetEnvSetting(HD_PRMAN_ENABLE_QUICKINTEGRATE)) {
+    const std::string interactiveIntegrator = HdPrmanIntegratorTokens->PxrDirectLighting;
     _settingDescriptors.push_back({std::string("Interactive Integrator"),
                                    HdPrmanRenderSettingsTokens->interactiveIntegrator,
                                    VtValue(interactiveIntegrator)});
@@ -248,8 +224,7 @@ void HdPrmanRenderDelegate::_Initialize()
 
   _renderParam->Begin(this);
 
-  _resourceRegistry = std::make_shared<HdPrman_ResourceRegistry>(
-      _renderParam);
+  _resourceRegistry = std::make_shared<HdPrman_ResourceRegistry>(_renderParam);
 }
 
 HdPrmanRenderDelegate::~HdPrmanRenderDelegate()
@@ -257,20 +232,17 @@ HdPrmanRenderDelegate::~HdPrmanRenderDelegate()
   _renderParam.reset();
 }
 
-HdRenderSettingsMap
-HdPrmanRenderDelegate::GetRenderSettingsMap() const
+HdRenderSettingsMap HdPrmanRenderDelegate::GetRenderSettingsMap() const
 {
   return _settingsMap;
 }
 
-HdRenderSettingDescriptorList
-HdPrmanRenderDelegate::GetRenderSettingDescriptors() const
+HdRenderSettingDescriptorList HdPrmanRenderDelegate::GetRenderSettingDescriptors() const
 {
   return _settingDescriptors;
 }
 
-HdRenderParam *
-HdPrmanRenderDelegate::GetRenderParam() const
+HdRenderParam *HdPrmanRenderDelegate::GetRenderParam() const
 {
   return _renderParam.get();
 }
@@ -280,45 +252,36 @@ void HdPrmanRenderDelegate::CommitResources(HdChangeTracker *tracker)
   // Do nothing
 }
 
-TfTokenVector const &
-HdPrmanRenderDelegate::GetSupportedRprimTypes() const
+TfTokenVector const &HdPrmanRenderDelegate::GetSupportedRprimTypes() const
 {
   return SUPPORTED_RPRIM_TYPES;
 }
 
-TfTokenVector const &
-HdPrmanRenderDelegate::GetSupportedSprimTypes() const
+TfTokenVector const &HdPrmanRenderDelegate::GetSupportedSprimTypes() const
 {
   return SUPPORTED_SPRIM_TYPES;
 }
 
-TfTokenVector const &
-HdPrmanRenderDelegate::GetSupportedBprimTypes() const
+TfTokenVector const &HdPrmanRenderDelegate::GetSupportedBprimTypes() const
 {
   return SUPPORTED_BPRIM_TYPES;
 }
 
-HdResourceRegistrySharedPtr
-HdPrmanRenderDelegate::GetResourceRegistry() const
+HdResourceRegistrySharedPtr HdPrmanRenderDelegate::GetResourceRegistry() const
 {
   return _resourceRegistry;
 }
 
-HdRenderPassSharedPtr
-HdPrmanRenderDelegate::CreateRenderPass(HdRenderIndex *index,
-                                        HdRprimCollection const &collection)
+HdRenderPassSharedPtr HdPrmanRenderDelegate::CreateRenderPass(HdRenderIndex *index,
+                                                              HdRprimCollection const &collection)
 {
-  if (!_renderPass)
-  {
-    _renderPass = std::make_shared<HdPrman_RenderPass>(
-        index, collection, _renderParam);
+  if (!_renderPass) {
+    _renderPass = std::make_shared<HdPrman_RenderPass>(index, collection, _renderParam);
   }
   return _renderPass;
 }
 
-HdInstancer *
-HdPrmanRenderDelegate::CreateInstancer(HdSceneDelegate *delegate,
-                                       SdfPath const &id)
+HdInstancer *HdPrmanRenderDelegate::CreateInstancer(HdSceneDelegate *delegate, SdfPath const &id)
 {
   return new HdPrmanInstancer(delegate, id);
 }
@@ -328,51 +291,39 @@ void HdPrmanRenderDelegate::DestroyInstancer(HdInstancer *instancer)
   delete instancer;
 }
 
-HdRprim *
-HdPrmanRenderDelegate::CreateRprim(TfToken const &typeId,
-                                   SdfPath const &rprimId)
+HdRprim *HdPrmanRenderDelegate::CreateRprim(TfToken const &typeId, SdfPath const &rprimId)
 {
   bool isMeshLight = false;
-  if (typeId == HdPrmanTokens->meshLightSourceMesh)
-  {
+  if (typeId == HdPrmanTokens->meshLightSourceMesh) {
     isMeshLight = true;
     return new HdPrman_Mesh(rprimId, isMeshLight);
   }
-  else if (typeId == HdPrmanTokens->meshLightSourceVolume)
-  {
+  else if (typeId == HdPrmanTokens->meshLightSourceVolume) {
     isMeshLight = true;
     return new HdPrman_Volume(rprimId, isMeshLight);
   }
-  else if (typeId == HdPrimTypeTokens->mesh)
-  {
+  else if (typeId == HdPrimTypeTokens->mesh) {
     return new HdPrman_Mesh(rprimId, isMeshLight);
   }
-  else if (typeId == HdPrimTypeTokens->basisCurves)
-  {
+  else if (typeId == HdPrimTypeTokens->basisCurves) {
     return new HdPrman_BasisCurves(rprimId);
   }
-  if (typeId == HdPrimTypeTokens->cone)
-  {
+  if (typeId == HdPrimTypeTokens->cone) {
     return new HdPrman_Cone(rprimId);
   }
-  if (typeId == HdPrimTypeTokens->cylinder)
-  {
+  if (typeId == HdPrimTypeTokens->cylinder) {
     return new HdPrman_Cylinder(rprimId);
   }
-  if (typeId == HdPrimTypeTokens->sphere)
-  {
+  if (typeId == HdPrimTypeTokens->sphere) {
     return new HdPrman_Sphere(rprimId);
   }
-  else if (typeId == HdPrimTypeTokens->points)
-  {
+  else if (typeId == HdPrimTypeTokens->points) {
     return new HdPrman_Points(rprimId);
   }
-  else if (typeId == HdPrimTypeTokens->volume)
-  {
+  else if (typeId == HdPrimTypeTokens->volume) {
     return new HdPrman_Volume(rprimId, isMeshLight);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
   }
 
@@ -384,128 +335,96 @@ void HdPrmanRenderDelegate::DestroyRprim(HdRprim *rPrim)
   delete rPrim;
 }
 
-HdSprim *
-HdPrmanRenderDelegate::CreateSprim(TfToken const &typeId,
-                                   SdfPath const &sprimId)
+HdSprim *HdPrmanRenderDelegate::CreateSprim(TfToken const &typeId, SdfPath const &sprimId)
 {
   HdSprim *sprim = nullptr;
-  if (typeId == HdPrimTypeTokens->camera)
-  {
+  if (typeId == HdPrimTypeTokens->camera) {
     sprim = new HdPrmanCamera(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->material)
-  {
+  else if (typeId == HdPrimTypeTokens->material) {
     sprim = new HdPrmanMaterial(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->coordSys)
-  {
+  else if (typeId == HdPrimTypeTokens->coordSys) {
     sprim = new HdPrmanCoordSys(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->lightFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->lightFilter) {
     sprim = new HdPrmanLightFilter(sprimId, typeId);
   }
-  else if (typeId == HdPrimTypeTokens->light ||
-           typeId == HdPrimTypeTokens->distantLight ||
-           typeId == HdPrimTypeTokens->domeLight ||
-           typeId == HdPrimTypeTokens->rectLight ||
-           typeId == HdPrimTypeTokens->diskLight ||
-           typeId == HdPrimTypeTokens->cylinderLight ||
-           typeId == HdPrimTypeTokens->sphereLight ||
-           typeId == HdPrimTypeTokens->meshLight ||
+  else if (typeId == HdPrimTypeTokens->light || typeId == HdPrimTypeTokens->distantLight ||
+           typeId == HdPrimTypeTokens->domeLight || typeId == HdPrimTypeTokens->rectLight ||
+           typeId == HdPrimTypeTokens->diskLight || typeId == HdPrimTypeTokens->cylinderLight ||
+           typeId == HdPrimTypeTokens->sphereLight || typeId == HdPrimTypeTokens->meshLight ||
            typeId == HdPrimTypeTokens->pluginLight)
   {
     sprim = new HdPrmanLight(sprimId, typeId);
 
     // Disregard fallback prims in count.
-    if (sprim->GetId() != SdfPath())
-    {
+    if (sprim->GetId() != SdfPath()) {
       _renderParam->IncreaseSceneLightCount();
     }
   }
-  else if (typeId == HdPrimTypeTokens->extComputation)
-  {
+  else if (typeId == HdPrimTypeTokens->extComputation) {
     sprim = new HdExtComputation(sprimId);
   }
-  else if (typeId == _tokens->prmanParams)
-  {
+  else if (typeId == _tokens->prmanParams) {
     sprim = new HdPrmanParamsSetter(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->integrator)
-  {
+  else if (typeId == HdPrimTypeTokens->integrator) {
     sprim = new HdPrman_Integrator(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->sampleFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->sampleFilter) {
     sprim = new HdPrman_SampleFilter(sprimId);
   }
-  else if (typeId == HdPrimTypeTokens->displayFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->displayFilter) {
     sprim = new HdPrman_DisplayFilter(sprimId);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
   }
 
   return sprim;
 }
 
-HdSprim *
-HdPrmanRenderDelegate::CreateFallbackSprim(TfToken const &typeId)
+HdSprim *HdPrmanRenderDelegate::CreateFallbackSprim(TfToken const &typeId)
 {
   // For fallback sprims, create objects with an empty scene path.
   // They'll use default values and won't be updated by a scene delegate.
-  if (typeId == HdPrimTypeTokens->camera)
-  {
+  if (typeId == HdPrimTypeTokens->camera) {
     return new HdPrmanCamera(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->material)
-  {
+  else if (typeId == HdPrimTypeTokens->material) {
     return new HdPrmanMaterial(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->coordSys)
-  {
+  else if (typeId == HdPrimTypeTokens->coordSys) {
     return new HdPrmanCoordSys(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->lightFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->lightFilter) {
     return new HdPrmanLightFilter(SdfPath::EmptyPath(), typeId);
   }
-  else if (typeId == HdPrimTypeTokens->light ||
-           typeId == HdPrimTypeTokens->distantLight ||
-           typeId == HdPrimTypeTokens->domeLight ||
-           typeId == HdPrimTypeTokens->rectLight ||
-           typeId == HdPrimTypeTokens->diskLight ||
-           typeId == HdPrimTypeTokens->cylinderLight ||
-           typeId == HdPrimTypeTokens->sphereLight ||
-           typeId == HdPrimTypeTokens->meshLight ||
+  else if (typeId == HdPrimTypeTokens->light || typeId == HdPrimTypeTokens->distantLight ||
+           typeId == HdPrimTypeTokens->domeLight || typeId == HdPrimTypeTokens->rectLight ||
+           typeId == HdPrimTypeTokens->diskLight || typeId == HdPrimTypeTokens->cylinderLight ||
+           typeId == HdPrimTypeTokens->sphereLight || typeId == HdPrimTypeTokens->meshLight ||
            typeId == HdPrimTypeTokens->pluginLight)
   {
     return new HdPrmanLight(SdfPath::EmptyPath(), typeId);
   }
-  else if (typeId == HdPrimTypeTokens->extComputation)
-  {
+  else if (typeId == HdPrimTypeTokens->extComputation) {
     return new HdExtComputation(SdfPath::EmptyPath());
   }
-  else if (typeId == _tokens->prmanParams)
-  {
+  else if (typeId == _tokens->prmanParams) {
     return new HdPrmanParamsSetter(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->integrator)
-  {
+  else if (typeId == HdPrimTypeTokens->integrator) {
     return new HdPrman_Integrator(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->sampleFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->sampleFilter) {
     return new HdPrman_SampleFilter(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->displayFilter)
-  {
+  else if (typeId == HdPrimTypeTokens->displayFilter) {
     return new HdPrman_DisplayFilter(SdfPath::EmptyPath());
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
   }
 
@@ -515,56 +434,41 @@ HdPrmanRenderDelegate::CreateFallbackSprim(TfToken const &typeId)
 void HdPrmanRenderDelegate::DestroySprim(HdSprim *sprim)
 {
   // Disregard fallback prims in count.
-  if (sprim->GetId() != SdfPath())
-  {
+  if (sprim->GetId() != SdfPath()) {
     _renderParam->DecreaseSceneLightCount();
   }
   delete sprim;
 }
 
-HdBprim *
-HdPrmanRenderDelegate::CreateBprim(
-    TfToken const &typeId,
-    SdfPath const &bprimId)
+HdBprim *HdPrmanRenderDelegate::CreateBprim(TfToken const &typeId, SdfPath const &bprimId)
 {
-  if (typeId == _tokens->openvdbAsset ||
-      typeId == _tokens->field3dAsset)
-  {
+  if (typeId == _tokens->openvdbAsset || typeId == _tokens->field3dAsset) {
     return new HdPrman_Field(typeId, bprimId);
   }
-  else if (typeId == HdPrimTypeTokens->renderBuffer)
-  {
+  else if (typeId == HdPrimTypeTokens->renderBuffer) {
     return new HdPrmanRenderBuffer(bprimId);
   }
-  else if (typeId == HdPrimTypeTokens->renderSettings)
-  {
+  else if (typeId == HdPrimTypeTokens->renderSettings) {
     return new HdPrman_RenderSettings(bprimId);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
   }
   return nullptr;
 }
 
-HdBprim *
-HdPrmanRenderDelegate::CreateFallbackBprim(TfToken const &typeId)
+HdBprim *HdPrmanRenderDelegate::CreateFallbackBprim(TfToken const &typeId)
 {
-  if (typeId == _tokens->openvdbAsset ||
-      typeId == _tokens->field3dAsset)
-  {
+  if (typeId == _tokens->openvdbAsset || typeId == _tokens->field3dAsset) {
     return new HdPrman_Field(typeId, SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->renderBuffer)
-  {
+  else if (typeId == HdPrimTypeTokens->renderBuffer) {
     return new HdPrmanRenderBuffer(SdfPath::EmptyPath());
   }
-  else if (typeId == HdPrimTypeTokens->renderSettings)
-  {
+  else if (typeId == HdPrimTypeTokens->renderSettings) {
     return new HdPrman_RenderSettings(SdfPath::EmptyPath());
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
   }
   return nullptr;
@@ -575,70 +479,53 @@ void HdPrmanRenderDelegate::DestroyBprim(HdBprim *bPrim)
   delete bPrim;
 }
 
-HdAovDescriptor
-HdPrmanRenderDelegate::GetDefaultAovDescriptor(
-    TfToken const &name) const
+HdAovDescriptor HdPrmanRenderDelegate::GetDefaultAovDescriptor(TfToken const &name) const
 {
-  if (IsInteractive())
-  {
-    if (name == HdAovTokens->color)
-    {
-      return HdAovDescriptor(
-          HdFormatFloat32Vec4,
-          false,
-          VtValue(GfVec4f(0.0f)));
+  if (IsInteractive()) {
+    if (name == HdAovTokens->color) {
+      return HdAovDescriptor(HdFormatFloat32Vec4, false, VtValue(GfVec4f(0.0f)));
     }
-    else if (name == HdAovTokens->depth)
-    {
+    else if (name == HdAovTokens->depth) {
       return HdAovDescriptor(HdFormatFloat32, false, VtValue(1.0f));
     }
-    else if (name == HdAovTokens->primId ||
-             name == HdAovTokens->instanceId ||
+    else if (name == HdAovTokens->primId || name == HdAovTokens->instanceId ||
              name == HdAovTokens->elementId)
     {
       return HdAovDescriptor(HdFormatInt32, false, VtValue(-1));
     }
-    return HdAovDescriptor(
-        HdFormatFloat32Vec3,
-        false,
-        VtValue(GfVec3f(0.0f)));
+    return HdAovDescriptor(HdFormatFloat32Vec3, false, VtValue(GfVec3f(0.0f)));
   }
   return HdAovDescriptor();
 }
 
-TfToken
-HdPrmanRenderDelegate::GetMaterialBindingPurpose() const
+TfToken HdPrmanRenderDelegate::GetMaterialBindingPurpose() const
 {
   return HdTokens->full;
 }
 
 #if HD_API_VERSION < 41
-TfToken
-HdPrmanRenderDelegate::GetMaterialNetworkSelector() const
+TfToken HdPrmanRenderDelegate::GetMaterialNetworkSelector() const
 {
   return _tokens->ri;
 }
 #else
-TfTokenVector
-HdPrmanRenderDelegate::GetMaterialRenderContexts() const
+TfTokenVector HdPrmanRenderDelegate::GetMaterialRenderContexts() const
 {
-#if PXR_MATERIALX_SUPPORT_ENABLED
+#  if PXR_MATERIALX_SUPPORT_ENABLED
   return {_tokens->ri, _tokens->mtlxRenderContext};
-#else
+#  else
   return {_tokens->ri};
-#endif
+#  endif
 }
 #endif
 
-TfTokenVector
-HdPrmanRenderDelegate::GetShaderSourceTypes() const
+TfTokenVector HdPrmanRenderDelegate::GetShaderSourceTypes() const
 {
   return HdPrmanMaterial::GetShaderSourceTypes();
 }
 
 #if HD_API_VERSION > 46
-TfTokenVector
-HdPrmanRenderDelegate::GetRenderSettingsNamespaces() const
+TfTokenVector HdPrmanRenderDelegate::GetRenderSettingsNamespaces() const
 {
   return {_tokens->ri, _tokens->outputsRi};
 }
@@ -646,8 +533,7 @@ HdPrmanRenderDelegate::GetRenderSettingsNamespaces() const
 
 bool HdPrmanRenderDelegate::IsStopSupported() const
 {
-  if (IsInteractive())
-  {
+  if (IsInteractive()) {
     return true;
   }
   return false;
@@ -655,8 +541,7 @@ bool HdPrmanRenderDelegate::IsStopSupported() const
 
 bool HdPrmanRenderDelegate::IsStopped() const
 {
-  if (IsInteractive())
-  {
+  if (IsInteractive()) {
     return !_renderParam->IsRendering();
   }
   return true;
@@ -664,8 +549,7 @@ bool HdPrmanRenderDelegate::IsStopped() const
 
 bool HdPrmanRenderDelegate::Stop(bool blocking)
 {
-  if (IsInteractive())
-  {
+  if (IsInteractive()) {
     _renderParam->StopRender(blocking);
     return !_renderParam->IsRendering();
   }
@@ -674,8 +558,7 @@ bool HdPrmanRenderDelegate::Stop(bool blocking)
 
 bool HdPrmanRenderDelegate::Restart()
 {
-  if (IsInteractive())
-  {
+  if (IsInteractive()) {
     // Next call into HdPrman_RenderPass::_Execute will do a StartRender
     _renderParam->sceneVersion++;
     return true;
@@ -683,11 +566,9 @@ bool HdPrmanRenderDelegate::Restart()
   return false;
 }
 
-HdRenderIndex *
-HdPrmanRenderDelegate::GetRenderIndex() const
+HdRenderIndex *HdPrmanRenderDelegate::GetRenderIndex() const
 {
-  if (_renderPass)
-  {
+  if (_renderPass) {
     return _renderPass->GetRenderIndex();
   }
   return nullptr;

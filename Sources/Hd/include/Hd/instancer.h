@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_INSTANCER_H
 #define PXR_IMAGING_HD_INSTANCER_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/types.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/path.h"
 
@@ -47,7 +47,7 @@ class HdRenderParam;
 /// which Rprim you're drawing and what instance-specific primvars you're
 /// binding.
 ///
-///     "/InstancerA": prototypes = ["/sphere", "/cube", "/sphere"]; 
+///     "/InstancerA": prototypes = ["/sphere", "/cube", "/sphere"];
 ///                    translate  = [  <0,0,0>, <1,0,0>,   <0,1,0>]
 ///
 /// Hydra stores this in reverse: Rprims store which instancer is drawing them,
@@ -122,60 +122,64 @@ class HdRenderParam;
 ///
 
 class HdInstancer {
-public:
-    /// Constructor.
-    HD_API
-    HdInstancer(HdSceneDelegate* delegate, SdfPath const& id);
+ public:
+  /// Constructor.
+  HD_API
+  HdInstancer(HdSceneDelegate *delegate, SdfPath const &id);
 
-    HD_API
-    virtual ~HdInstancer();
+  HD_API
+  virtual ~HdInstancer();
 
-    /// Returns the identifier.
-    SdfPath const& GetId() const { return _id; }
+  /// Returns the identifier.
+  SdfPath const &GetId() const
+  {
+    return _id;
+  }
 
-    /// Returns the parent instancer identifier.
-    SdfPath const& GetParentId() const { return _parentId; }
+  /// Returns the parent instancer identifier.
+  SdfPath const &GetParentId() const
+  {
+    return _parentId;
+  }
 
-    HdSceneDelegate* GetDelegate() const { return _delegate; }
+  HdSceneDelegate *GetDelegate() const
+  {
+    return _delegate;
+  }
 
-    HD_API
-    static int GetInstancerNumLevels(HdRenderIndex& index,
-                                     HdRprim const& rprim);
+  HD_API
+  static int GetInstancerNumLevels(HdRenderIndex &index, HdRprim const &rprim);
 
-    HD_API
-    static TfTokenVector const & GetBuiltinPrimvarNames();
+  HD_API
+  static TfTokenVector const &GetBuiltinPrimvarNames();
 
-    HD_API
-    virtual void Sync(HdSceneDelegate *sceneDelegate,
-                      HdRenderParam   *renderParam,
-                      HdDirtyBits     *dirtyBits);
+  HD_API
+  virtual void Sync(HdSceneDelegate *sceneDelegate,
+                    HdRenderParam *renderParam,
+                    HdDirtyBits *dirtyBits);
 
-    HD_API
-    virtual void Finalize(HdRenderParam *renderParam);
+  HD_API
+  virtual void Finalize(HdRenderParam *renderParam);
 
-    HD_API
-    virtual HdDirtyBits GetInitialDirtyBitsMask() const;
+  HD_API
+  virtual HdDirtyBits GetInitialDirtyBitsMask() const;
 
-    HD_API
-    static void _SyncInstancerAndParents(
-        HdRenderIndex &renderIndex,
-        SdfPath const& instancerId);
+  HD_API
+  static void _SyncInstancerAndParents(HdRenderIndex &renderIndex, SdfPath const &instancerId);
 
-protected:
-    HD_API
-    void _UpdateInstancer(HdSceneDelegate *delegate,
-                          HdDirtyBits *dirtyBits);
+ protected:
+  HD_API
+  void _UpdateInstancer(HdSceneDelegate *delegate, HdDirtyBits *dirtyBits);
 
-private:
-    HdSceneDelegate* _delegate;
-    SdfPath _id;
-    SdfPath _parentId;
+ private:
+  HdSceneDelegate *_delegate;
+  SdfPath _id;
+  SdfPath _parentId;
 
-    // XXX: This mutex exists for _SyncInstancerAndParents, which will go
-    // away when the render index calls sync on instancers.
-    std::mutex _instanceLock;
+  // XXX: This mutex exists for _SyncInstancerAndParents, which will go
+  // away when the render index calls sync on instancers.
+  std::mutex _instanceLock;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

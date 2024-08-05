@@ -33,6 +33,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayQuaternion() {
+void wrapArrayQuaternion()
+{
   BOOST_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_QUATERNION_VALUE_TYPES);
 }

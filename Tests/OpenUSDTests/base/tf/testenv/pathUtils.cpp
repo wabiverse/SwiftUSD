@@ -35,55 +35,50 @@
 #include <vector>
 
 #if defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
+#  include <Windows.h>
 #endif
 
 using namespace std;
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
-{
+namespace {
 #if defined(ARCH_OS_WINDOWS)
-  const char *knownDirPath = "c:\\Windows";
-  const char *knownFilePath = "c:\\Windows\\System32\\notepad.exe";
-  const char *knownFilePath2 =
-      "c:\\.\\Windows\\.\\..\\Windows\\System32\\notepad.exe";
-  const char *knownNoSuchPath = "c:\\nosuch";
+const char *knownDirPath = "c:\\Windows";
+const char *knownFilePath = "c:\\Windows\\System32\\notepad.exe";
+const char *knownFilePath2 = "c:\\.\\Windows\\.\\..\\Windows\\System32\\notepad.exe";
+const char *knownNoSuchPath = "c:\\nosuch";
 #elif defined(ARCH_OS_DARWIN)
-  const char *knownDirPath = "/private/etc";
-  const char *knownFilePath = "/private/etc/passwd";
-  const char *knownFilePath2 = "/./private/./etc/./../etc/passwd";
-  const char *knownNoSuchPath = "/nosuch";
+const char *knownDirPath = "/private/etc";
+const char *knownFilePath = "/private/etc/passwd";
+const char *knownFilePath2 = "/./private/./etc/./../etc/passwd";
+const char *knownNoSuchPath = "/nosuch";
 #else
-  const char *knownDirPath = "/etc";
-  const char *knownFilePath = "/etc/passwd";
-  const char *knownFilePath2 = "/./etc/./../etc/passwd";
-  const char *knownNoSuchPath = "/nosuch";
+const char *knownDirPath = "/etc";
+const char *knownFilePath = "/etc/passwd";
+const char *knownFilePath2 = "/./etc/./../etc/passwd";
+const char *knownNoSuchPath = "/nosuch";
 #endif
-  const char *knownNoSuchRelPath = "nosuch";
+const char *knownNoSuchRelPath = "nosuch";
 
-  bool testSymlinks = true;
+bool testSymlinks = true;
 
-  // Wrap TfSymlink in code to check if we should do symlink tests.
-  bool _Symlink(const std::string &src, const std::string &dst)
-  {
-    if (testSymlinks)
-    {
-      if (!TfSymlink(src, dst))
-      {
-        if (errno == EPERM)
-        {
-          testSymlinks = false;
-          TF_WARN("Not testing symlinks");
-          return true;
-        }
-        return false;
+// Wrap TfSymlink in code to check if we should do symlink tests.
+bool _Symlink(const std::string &src, const std::string &dst)
+{
+  if (testSymlinks) {
+    if (!TfSymlink(src, dst)) {
+      if (errno == EPERM) {
+        testSymlinks = false;
+        TF_WARN("Not testing symlinks");
+        return true;
       }
+      return false;
     }
-    return true;
   }
+  return true;
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
 static bool TestTfRealPath()
 {
@@ -96,8 +91,7 @@ static bool TestTfRealPath()
   TF_AXIOM(TfRealPath("subdir", true) == TfAbsPath("subdir"));
 
   // Create a nest of links for testing.
-  if (testSymlinks)
-  {
+  if (testSymlinks) {
     TF_AXIOM(TfIsLink("b") || _Symlink("subdir", "b"));
     TF_AXIOM(TfIsLink("c") || _Symlink("b", "c"));
     TF_AXIOM(TfIsLink("d") || _Symlink("c", "d"));
@@ -106,8 +100,7 @@ static bool TestTfRealPath()
     TF_AXIOM(TfIsLink("g") || _Symlink("f", "g"));
   }
 
-  if (testSymlinks)
-  {
+  if (testSymlinks) {
     // Leaf dir is symlink
     TF_AXIOM(TfRealPath("d", true) == TfAbsPath("subdir"));
     // Symlinks through to dir
@@ -123,11 +116,9 @@ static bool TestTfRealPath()
   // Nonexistent absolute
   TF_AXIOM(TfRealPath(knownNoSuchPath, true) == knownNoSuchPath);
   // Nonexistent relative
-  TF_AXIOM(TfRealPath(knownNoSuchRelPath, true) ==
-           TfAbsPath(knownNoSuchRelPath));
+  TF_AXIOM(TfRealPath(knownNoSuchRelPath, true) == TfAbsPath(knownNoSuchRelPath));
 
-  if (testSymlinks)
-  {
+  if (testSymlinks) {
     string error;
     string::size_type split = TfFindLongestAccessiblePrefix("g", &error);
     TF_AXIOM(split == 0);
@@ -144,8 +135,7 @@ static bool TestTfRealPath()
   string testdir = thisdir;
   testdir.erase(0, 2);
   TF_AXIOM(TfRealPath(testdir) == thisdir);
-  if (testSymlinks)
-  {
+  if (testSymlinks) {
     // Call Windows function to change the current working directory to
     // put us inside a directory that is a symlink. Then validate that
     // the symlink is resolved properly when getting the real path to
@@ -187,19 +177,18 @@ static bool TestTfNormPath()
   return true;
 }
 
-namespace
+namespace {
+std::string _AbsPathFilter(const std::string &path)
 {
-  std::string _AbsPathFilter(const std::string &path)
-  {
 #if defined(ARCH_OS_WINDOWS)
-    // Strip driver specifier and convert backslashes to forward slashes.
-    return TfStringReplace(path.substr(2), "\\", "/");
+  // Strip driver specifier and convert backslashes to forward slashes.
+  return TfStringReplace(path.substr(2), "\\", "/");
 #else
-    // Return path as-is.
-    return path;
+  // Return path as-is.
+  return path;
 #endif
-  }
-} // namespace
+}
+}  // namespace
 
 static bool TestTfAbsPath()
 {
@@ -215,13 +204,10 @@ static bool TestTfReadLink()
 {
   TF_AXIOM(TfReadLink("") == "");
 
-  if (testSymlinks)
-  {
+  if (testSymlinks) {
     ArchUnlinkFile("test-link");
-    if (!_Symlink(knownDirPath, "test-link"))
-    {
-      TF_RUNTIME_ERROR("failed to create test link: %s",
-                       ArchStrerror(errno).c_str());
+    if (!_Symlink(knownDirPath, "test-link")) {
+      TF_RUNTIME_ERROR("failed to create test link: %s", ArchStrerror(errno).c_str());
       return false;
     }
 
@@ -233,19 +219,18 @@ static bool TestTfReadLink()
   return true;
 }
 
-namespace
+namespace {
+std::string _GlobFilter(const std::string &lhs, const std::string &rhs)
 {
-  std::string _GlobFilter(const std::string &lhs, const std::string &rhs)
-  {
 #if defined(ARCH_OS_WINDOWS)
-    // Join and convert backslashes to forward slashes.
-    return TfStringReplace(lhs + rhs, "\\", "/");
+  // Join and convert backslashes to forward slashes.
+  return TfStringReplace(lhs + rhs, "\\", "/");
 #else
-    // Simply join the paths.
-    return lhs + rhs;
+  // Simply join the paths.
+  return lhs + rhs;
 #endif
-  }
-} // namespace
+}
+}  // namespace
 
 static bool TestTfGlob()
 {
@@ -310,8 +295,8 @@ static bool TestTfGetExtension()
 
 static bool Test_TfPathUtils()
 {
-  return TestTfRealPath() && TestTfNormPath() && TestTfAbsPath() &&
-         TestTfReadLink() && TestTfGetExtension() && TestTfGlob();
+  return TestTfRealPath() && TestTfNormPath() && TestTfAbsPath() && TestTfReadLink() &&
+         TestTfGetExtension() && TestTfGlob();
 }
 
 TF_ADD_REGTEST(TfPathUtils);

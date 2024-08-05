@@ -32,7 +32,10 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiVulkanInstance::HgiVulkanInstance()
-    : vkDebugMessenger(nullptr), vkCreateDebugUtilsMessengerEXT(nullptr), vkDestroyDebugUtilsMessengerEXT(nullptr), _vkInstance(nullptr)
+    : vkDebugMessenger(nullptr),
+      vkCreateDebugUtilsMessengerEXT(nullptr),
+      vkDestroyDebugUtilsMessengerEXT(nullptr),
+      _vkInstance(nullptr)
 {
   VkApplicationInfo appInfo = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
   appInfo.apiVersion = VK_API_VERSION_1_0;
@@ -42,34 +45,32 @@ HgiVulkanInstance::HgiVulkanInstance()
 
   // Setup instance extensions.
   std::vector<const char *> extensions = {
-    VK_KHR_SURFACE_EXTENSION_NAME,
+      VK_KHR_SURFACE_EXTENSION_NAME,
 
 // Pick platform specific surface extension
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-    VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+      VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-    VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+      VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
-    VK_MVK_MACOS_SURFACE_EXTENSION_NAME,
+      VK_MVK_MACOS_SURFACE_EXTENSION_NAME,
 #else
-#error Unsupported Platform
+#  error Unsupported Platform
 #endif
 
-    // Extensions for interop with OpenGL
-    VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
-    VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+      // Extensions for interop with OpenGL
+      VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+      VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
 
-    VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+      VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
   };
 
   // Enable validation layers extension.
   // Requires VK_LAYER_PATH to be set.
-  if (HgiVulkanIsDebugEnabled())
-  {
+  if (HgiVulkanIsDebugEnabled()) {
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    const char *debugLayers[] = {
-        // XXX Use "VK_LAYER_KHRONOS_validation" when upgrading SDK
-        "VK_LAYER_LUNARG_standard_validation"};
+    const char *debugLayers[] = {// XXX Use "VK_LAYER_KHRONOS_validation" when upgrading SDK
+                                 "VK_LAYER_LUNARG_standard_validation"};
     createInfo.ppEnabledLayerNames = debugLayers;
     createInfo.enabledLayerCount = (uint32_t)TfArraySize(debugLayers);
   }
@@ -77,11 +78,7 @@ HgiVulkanInstance::HgiVulkanInstance()
   createInfo.ppEnabledExtensionNames = extensions.data();
   createInfo.enabledExtensionCount = (uint32_t)extensions.size();
 
-  TF_VERIFY(
-      vkCreateInstance(
-          &createInfo,
-          HgiVulkanAllocator(),
-          &_vkInstance) == VK_SUCCESS);
+  TF_VERIFY(vkCreateInstance(&createInfo, HgiVulkanAllocator(), &_vkInstance) == VK_SUCCESS);
 
   HgiVulkanCreateDebug(this);
 }
@@ -92,8 +89,7 @@ HgiVulkanInstance::~HgiVulkanInstance()
   vkDestroyInstance(_vkInstance, HgiVulkanAllocator());
 }
 
-VkInstance const &
-HgiVulkanInstance::GetVulkanInstance() const
+VkInstance const &HgiVulkanInstance::GetVulkanInstance() const
 {
   return _vkInstance;
 }

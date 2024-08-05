@@ -25,9 +25,9 @@
 #ifndef PXR_IMAGING_HGI_SHADERGENERATOR_H
 #define PXR_IMAGING_HGI_SHADERGENERATOR_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
+#include <pxr/pxrns.h>
 
 #include <iosfwd>
 #include <string>
@@ -44,9 +44,8 @@ struct HgiShaderFunctionDesc;
 /// for different APIs. It's main role is to make GLSLFX a write once language,
 /// no matter the API
 ///
-class HgiShaderGenerator
-{
-public:
+class HgiShaderGenerator {
+ public:
   HGI_API
   virtual ~HgiShaderGenerator();
 
@@ -58,7 +57,7 @@ public:
   HGI_API
   const char *GetGeneratedShaderCode() const;
 
-protected:
+ protected:
   HGI_API
   explicit HgiShaderGenerator(const HgiShaderFunctionDesc &descriptor);
 
@@ -74,7 +73,7 @@ protected:
   HGI_API
   HgiShaderStage _GetShaderStage() const;
 
-private:
+ private:
   const HgiShaderFunctionDesc &_descriptor;
 
   // This is used if the descriptor does not specify a string

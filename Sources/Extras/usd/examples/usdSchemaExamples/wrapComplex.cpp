@@ -26,11 +26,11 @@
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,44 +40,36 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateComplexStringAttr(UsdSchemaExamplesComplex &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
 {
+  return self.CreateComplexStringAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String),
+                                      writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static std::string _Repr(const UsdSchemaExamplesComplex &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSchemaExamples.Complex(%s)", primRepr.c_str());
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static UsdAttribute
-  _CreateComplexStringAttr(UsdSchemaExamplesComplex &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreateComplexStringAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdSchemaExamplesComplex &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSchemaExamples.Complex(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSchemaExamplesComplex()
 {
   typedef UsdSchemaExamplesComplex This;
 
-  class_<This, bases<UsdSchemaExamplesSimple>>
-      cls("Complex");
+  class_<This, bases<UsdSchemaExamplesSimple>> cls("Complex");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -93,18 +85,17 @@ void wrapUsdSchemaExamplesComplex()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetComplexStringAttr",
-           &This::GetComplexStringAttr)
+      .def("GetComplexStringAttr", &This::GetComplexStringAttr)
       .def("CreateComplexStringAttr",
            &_CreateComplexStringAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -130,11 +121,8 @@ void wrapUsdSchemaExamplesComplex()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-} // anonymous namespace
+}  // anonymous namespace

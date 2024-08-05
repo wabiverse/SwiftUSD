@@ -35,76 +35,64 @@
 
 #include "Hd/primvarSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDPRIMVARS_SCHEMA_TOKENS \
-    (primvars) \
-    (points) \
-    (normals) \
-    (widths) \
+#define HDPRIMVARS_SCHEMA_TOKENS (primvars)(points)(normals)(widths)
 
-TF_DECLARE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens, HD_API,
-    HDPRIMVARS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens, HD_API, HDPRIMVARS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdPrimvarsSchema : public HdSchema
-{
-public:
-    HdPrimvarsSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdPrimvarsSchema : public HdSchema {
+ public:
+  HdPrimvarsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    HD_API
-    TfTokenVector GetPrimvarNames();
+  HD_API
+  TfTokenVector GetPrimvarNames();
 
-    HD_API
-    HdPrimvarSchema GetPrimvar(TfToken name);
+  HD_API
+  HdPrimvarSchema GetPrimvar(TfToken name);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "primvars" from the parent container and constructs a
+  /// HdPrimvarsSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdPrimvarsSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "primvars" from the parent container and constructs a
-    /// HdPrimvarsSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdPrimvarsSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the points data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetPointsLocator();
 
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the normals data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetNormalsLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the points data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetPointsLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the normals data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetNormalsLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the widths data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetWidthsLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the widths data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetWidthsLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -38,28 +38,40 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class Annotation>
+template<class Annotation>
 struct TfPyAnnotatedBoolResult
     : boost::equality_comparable<TfPyAnnotatedBoolResult<Annotation>, bool> {
   TfPyAnnotatedBoolResult() {}
 
   TfPyAnnotatedBoolResult(bool val, Annotation const &annotation)
-      : _val(val), _annotation(annotation) {}
+      : _val(val), _annotation(annotation)
+  {
+  }
 
-  bool GetValue() const { return _val; }
+  bool GetValue() const
+  {
+    return _val;
+  }
 
-  Annotation const &GetAnnotation() const { return _annotation; }
+  Annotation const &GetAnnotation() const
+  {
+    return _annotation;
+  }
 
-  std::string GetRepr() const {
+  std::string GetRepr() const
+  {
     return GetValue() ? "True" : "(False, " + TfPyRepr(GetAnnotation()) + ")";
   }
 
   /// Returns \c true if the result is the same as \p rhs.
-  bool operator==(bool rhs) const { return _val == rhs; }
+  bool operator==(bool rhs) const
+  {
+    return _val == rhs;
+  }
 
-  template <class Derived>
-  static boost::python::class_<Derived> Wrap(char const *name,
-                                             char const *annotationName) {
+  template<class Derived>
+  static boost::python::class_<Derived> Wrap(char const *name, char const *annotationName)
+  {
     typedef TfPyAnnotatedBoolResult<Annotation> This;
     using namespace boost::python;
     TfPyLock lock;
@@ -91,14 +103,15 @@ struct TfPyAnnotatedBoolResult
 
   using AnnotationType = Annotation;
 
-private:
+ private:
   // Helper function for wrapper.
-  template <class Derived> static Annotation _GetAnnotation(const Derived &x) {
+  template<class Derived> static Annotation _GetAnnotation(const Derived &x)
+  {
     return x.GetAnnotation();
   }
 
-  template <class Derived>
-  static boost::python::object _GetItem(const Derived &x, int i) {
+  template<class Derived> static boost::python::object _GetItem(const Derived &x, int i)
+  {
     if (i == 0) {
       return boost::python::object(x._val);
     }
@@ -112,23 +125,23 @@ private:
     return boost::python::object();
   }
 
-private:
+ private:
   bool _val;
   Annotation _annotation;
 };
 
 /// Returns \c true if the result of \p lhs is the same as \p rhs.
-template <class Annotation>
-bool operator==(bool lhs, TfPyAnnotatedBoolResult<Annotation> &rhs) {
+template<class Annotation> bool operator==(bool lhs, TfPyAnnotatedBoolResult<Annotation> &rhs)
+{
   return rhs == lhs;
 }
 
 /// Returns \c false if the result of \p lhs is the same as \p rhs.
-template <class Annotation>
-bool operator!=(bool lhs, TfPyAnnotatedBoolResult<Annotation> &rhs) {
+template<class Annotation> bool operator!=(bool lhs, TfPyAnnotatedBoolResult<Annotation> &rhs)
+{
   return rhs != lhs;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_ANNOTATED_BOOL_RESULT_H
+#endif  // PXR_BASE_TF_PY_ANNOTATED_BOOL_RESULT_H

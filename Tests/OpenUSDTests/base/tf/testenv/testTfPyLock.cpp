@@ -24,56 +24,53 @@
 // testTfPyLock.mm
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/pyLock.h"
 #include "pxr/base/tf/pyInterpreter.h"
+#include "pxr/base/tf/pyLock.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static unsigned int
-testLock(bool verbose)
+static unsigned int testLock(bool verbose)
 {
-    unsigned int numErrors = 0;
-    
-    TfPyLock lock;
-    
-    TfPyInitialize();
+  unsigned int numErrors = 0;
 
-    lock.Acquire();
-    
-    printf("===== Expected error output =====\n");
-    lock.Acquire();
-    printf("===== End expected output =====\n");
+  TfPyLock lock;
 
-    {
-        TF_PY_ALLOW_THREADS_IN_SCOPE();
-    }
-    
-    lock.Release();
+  TfPyInitialize();
 
-    printf("===== Expected error output =====\n");
-    lock.Release();
-    printf("===== End expected output =====\n");
-    
-    return numErrors;
+  lock.Acquire();
+
+  printf("===== Expected error output =====\n");
+  lock.Acquire();
+  printf("===== End expected output =====\n");
+
+  {
+    TF_PY_ALLOW_THREADS_IN_SCOPE();
+  }
+
+  lock.Release();
+
+  printf("===== Expected error output =====\n");
+  lock.Release();
+  printf("===== End expected output =====\n");
+
+  return numErrors;
 }
 
-
-
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    bool verbose = ((argc == 2) && (strcmp(argv[1], "-v") == 0));
-    unsigned int numErrors = 0;
-    
-    numErrors += testLock(verbose);
+  bool verbose = ((argc == 2) && (strcmp(argv[1], "-v") == 0));
+  unsigned int numErrors = 0;
 
-    // Print status
-    if (numErrors > 0) {
-        printf("\nTest FAILED\n");
-    } else if (verbose) {
-        printf("\nTest SUCCEEDED\n");
-    }
-    
-    return numErrors;
+  numErrors += testLock(verbose);
+
+  // Print status
+  if (numErrors > 0) {
+    printf("\nTest FAILED\n");
+  }
+  else if (verbose) {
+    printf("\nTest SUCCEEDED\n");
+  }
+
+  return numErrors;
 }

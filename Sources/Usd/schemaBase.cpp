@@ -30,49 +30,63 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<UsdSchemaBase>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<UsdSchemaBase>();
+}
 
 UsdSchemaBase::UsdSchemaBase(const UsdPrim &prim)
-    : _primData(prim._Prim()), _proxyPrimPath(prim._ProxyPrimPath()) {
+    : _primData(prim._Prim()), _proxyPrimPath(prim._ProxyPrimPath())
+{
   /* NOTHING */
 }
 
 UsdSchemaBase::UsdSchemaBase(const UsdSchemaBase &schema)
-    : _primData(schema._primData), _proxyPrimPath(schema._proxyPrimPath) {
+    : _primData(schema._primData), _proxyPrimPath(schema._proxyPrimPath)
+{
   /* NOTHING YET */
 }
 
 /*virtual*/
-UsdSchemaBase::~UsdSchemaBase() {
+UsdSchemaBase::~UsdSchemaBase()
+{
   // This only exists to avoid memory leaks in derived classes which may
   // define new members.
 }
 
-const UsdPrimDefinition *UsdSchemaBase::GetSchemaClassPrimDefinition() const {
+const UsdPrimDefinition *UsdSchemaBase::GetSchemaClassPrimDefinition() const
+{
   const UsdSchemaRegistry &reg = UsdSchemaRegistry::GetInstance();
   const TfToken usdTypeName = reg.GetSchemaTypeName(_GetType());
-  return IsAppliedAPISchema() ? reg.FindAppliedAPIPrimDefinition(usdTypeName)
-                              : reg.FindConcretePrimDefinition(usdTypeName);
+  return IsAppliedAPISchema() ? reg.FindAppliedAPIPrimDefinition(usdTypeName) :
+                                reg.FindConcretePrimDefinition(usdTypeName);
 }
 
-bool UsdSchemaBase::_IsCompatible() const {
+bool UsdSchemaBase::_IsCompatible() const
+{
   // By default, schema objects are compatible with any valid prim.
   return true;
 }
 
 /* static */
-const TfType &UsdSchemaBase::_GetStaticTfType() {
+const TfType &UsdSchemaBase::_GetStaticTfType()
+{
   static TfType tfType = TfType::Find<UsdSchemaBase>();
   return tfType;
 }
 
-const TfType &UsdSchemaBase::_GetTfType() const { return _GetStaticTfType(); }
+const TfType &UsdSchemaBase::_GetTfType() const
+{
+  return _GetStaticTfType();
+}
 
 UsdAttribute UsdSchemaBase::_CreateAttr(TfToken const &attrName,
                                         SdfValueTypeName const &typeName,
-                                        bool custom, SdfVariability variability,
+                                        bool custom,
+                                        SdfVariability variability,
                                         VtValue const &defaultValue,
-                                        bool writeSparsely) const {
+                                        bool writeSparsely) const
+{
   UsdPrim prim(GetPrim());
 
   if (writeSparsely && !custom) {
@@ -82,14 +96,13 @@ UsdAttribute UsdSchemaBase::_CreateAttr(TfToken const &attrName,
     UsdAttribute attr = prim.GetAttribute(attrName);
     VtValue fallback;
     if (defaultValue.IsEmpty() ||
-        (!attr.HasAuthoredValue() && attr.Get(&fallback) &&
-         fallback == defaultValue)) {
+        (!attr.HasAuthoredValue() && attr.Get(&fallback) && fallback == defaultValue))
+    {
       return attr;
     }
   }
 
-  UsdAttribute attr(
-      prim.CreateAttribute(attrName, typeName, custom, variability));
+  UsdAttribute attr(prim.CreateAttribute(attrName, typeName, custom, variability));
   if (attr && !defaultValue.IsEmpty()) {
     attr.Set(defaultValue);
   }

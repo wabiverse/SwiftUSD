@@ -33,22 +33,17 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static VtVec3fArray
-_WrapGeneratePoints(
-    const size_t numRadial,
-    const float radius,
-    const float height)
+static VtVec3fArray _WrapGeneratePoints(const size_t numRadial,
+                                        const float radius,
+                                        const float height)
 {
-  const size_t numPoints =
-      GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
-  if (numPoints == 0)
-  {
+  const size_t numPoints = GeomUtilCylinderMeshGenerator::ComputeNumPoints(numRadial);
+  if (numPoints == 0) {
     return VtVec3fArray();
   }
 
   VtVec3fArray points(numPoints);
-  GeomUtilCylinderMeshGenerator::GeneratePoints(
-      points.begin(), numRadial, radius, height);
+  GeomUtilCylinderMeshGenerator::GeneratePoints(points.begin(), numRadial, radius, height);
 
   return points;
 }

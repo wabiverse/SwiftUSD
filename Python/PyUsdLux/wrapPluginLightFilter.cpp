@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdLux/pluginLightFilter.h"
 #include "Usd/schemaBase.h"
+#include "UsdLux/pluginLightFilter.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -42,63 +42,55 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define WRAP_CUSTOM                                                     \
-    template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-
-static std::string
-_Repr(const UsdLuxPluginLightFilter &self)
+static std::string _Repr(const UsdLuxPluginLightFilter &self)
 {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdLux.PluginLightFilter(%s)",
-        primRepr.c_str());
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdLux.PluginLightFilter(%s)", primRepr.c_str());
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdLuxPluginLightFilter()
 {
-    typedef UsdLuxPluginLightFilter This;
+  typedef UsdLuxPluginLightFilter This;
 
-    class_<This, bases<UsdLuxLightFilter> >
-        cls("PluginLightFilter");
+  class_<This, bases<UsdLuxLightFilter>> cls("PluginLightFilter");
 
-    cls
-        .def(init<UsdPrim>(arg("prim")))
-        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
-        .def(TfTypePythonClass())
+  cls.def(init<UsdPrim>(arg("prim")))
+      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
+      .def(TfTypePythonClass())
 
-        .def("Get", &This::Get, (arg("stage"), arg("path")))
-        .staticmethod("Get")
+      .def("Get", &This::Get, (arg("stage"), arg("path")))
+      .staticmethod("Get")
 
-        .def("Define", &This::Define, (arg("stage"), arg("path")))
-        .staticmethod("Define")
+      .def("Define", &This::Define, (arg("stage"), arg("path")))
+      .staticmethod("Define")
 
-        .def("GetSchemaAttributeNames",
-             &This::GetSchemaAttributeNames,
-             arg("includeInherited")=true,
-             return_value_policy<TfPySequenceToList>())
-        .staticmethod("GetSchemaAttributeNames")
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
+           arg("includeInherited") = true,
+           return_value_policy<TfPySequenceToList>())
+      .staticmethod("GetSchemaAttributeNames")
 
-        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
-             return_value_policy<return_by_value>())
-        .staticmethod("_GetStaticTfType")
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
+           return_value_policy<return_by_value>())
+      .staticmethod("_GetStaticTfType")
 
-        .def(!self)
+      .def(!self)
 
+      .def("__repr__", ::_Repr);
 
-        .def("__repr__", ::_Repr)
-    ;
-
-    _CustomWrapCode(cls);
+  _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by 
+// Feel free to add custom code below this line, it will be preserved by
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -109,7 +101,7 @@ void wrapUsdLuxPluginLightFilter()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-// 
+//
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -118,10 +110,9 @@ void wrapUsdLuxPluginLightFilter()
 
 namespace {
 
-WRAP_CUSTOM {
-    _class
-        .def("GetNodeDefAPI", &UsdLuxPluginLightFilter::GetNodeDefAPI)
-    ;
+WRAP_CUSTOM
+{
+  _class.def("GetNodeDefAPI", &UsdLuxPluginLightFilter::GetNodeDefAPI);
 }
 
-}
+}  // namespace

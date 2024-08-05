@@ -12,4 +12,4 @@
 #include <Work/utils.h>
 #include <Work/withScopedParallelism.h>
 
-#endif // __PXR_BASE_WORK_H__
+#endif  // __PXR_BASE_WORK_H__

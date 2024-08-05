@@ -30,56 +30,40 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (resource)
-);
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (resource));
 
-HdPrman_Integrator::HdPrman_Integrator(
-    SdfPath const& id)
-    : HdSprim(id)
+HdPrman_Integrator::HdPrman_Integrator(SdfPath const &id) : HdSprim(id) {}
+
+void HdPrman_Integrator::Finalize(HdRenderParam *renderParam) {}
+
+void HdPrman_Integrator::Sync(HdSceneDelegate *sceneDelegate,
+                              HdRenderParam *renderParam,
+                              HdDirtyBits *dirtyBits)
 {
-}
+  const SdfPath &id = GetId();
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
-void
-HdPrman_Integrator::Finalize(HdRenderParam *renderParam)
-{
-}
-
-void
-HdPrman_Integrator::Sync(
-    HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    HdDirtyBits *dirtyBits)
-{
-    const SdfPath &id = GetId();
-    HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam*>(renderParam);
-
-    if (*dirtyBits & HdChangeTracker::DirtyParams) {
-        // Only Create the Integrator if connected to the RenderSettings
-        // Note that this works because the RenderSettings, being a Bprim,
-        // always gets synced before the Integrator Sprim.
-        SdfPath integratorPath = param->GetRenderSettingsIntegratorPath();
-        if (id == integratorPath) {
-            const VtValue integratorResourceValue =
-                sceneDelegate->Get(id, _tokens->resource);
-            if (integratorResourceValue.IsHolding<HdMaterialNode2>()) {
-                HdMaterialNode2 integratorNode =
-                    integratorResourceValue.UncheckedGet<HdMaterialNode2>();
-                param->SetRenderSettingsIntegratorNode(
-                    &sceneDelegate->GetRenderIndex(), integratorNode);
-            }
-        }
+  if (*dirtyBits & HdChangeTracker::DirtyParams) {
+    // Only Create the Integrator if connected to the RenderSettings
+    // Note that this works because the RenderSettings, being a Bprim,
+    // always gets synced before the Integrator Sprim.
+    SdfPath integratorPath = param->GetRenderSettingsIntegratorPath();
+    if (id == integratorPath) {
+      const VtValue integratorResourceValue = sceneDelegate->Get(id, _tokens->resource);
+      if (integratorResourceValue.IsHolding<HdMaterialNode2>()) {
+        HdMaterialNode2 integratorNode = integratorResourceValue.UncheckedGet<HdMaterialNode2>();
+        param->SetRenderSettingsIntegratorNode(&sceneDelegate->GetRenderIndex(), integratorNode);
+      }
     }
+  }
 
-    *dirtyBits = HdChangeTracker::Clean;
+  *dirtyBits = HdChangeTracker::Clean;
 }
-
 
 HdDirtyBits HdPrman_Integrator::GetInitialDirtyBitsMask() const
 {
-    int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyParams;
-    return (HdDirtyBits)mask;
+  int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyParams;
+  return (HdDirtyBits)mask;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

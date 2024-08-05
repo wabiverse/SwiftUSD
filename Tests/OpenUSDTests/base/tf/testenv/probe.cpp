@@ -22,17 +22,17 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/notice.h"
-#include "pxr/base/tf/type.h"
-#include "pxr/base/tf/diagnosticLite.h"
 #include "Arch/systemInfo.h"
-#include <string>
-#include <vector>
-#include <stdio.h>
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/notice.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/base/tf/type.h"
+#include "pxr/pxr.h"
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -43,11 +43,10 @@ int beginDeliveryCount = 0;
 int endDeliveryCount = 0;
 int processedNoticeCount = 0;
 
-class _NoticeProbe : public TfNotice::Probe
-{
-public:
-  _NoticeProbe(){};
-  virtual ~_NoticeProbe(){};
+class _NoticeProbe : public TfNotice::Probe {
+ public:
+  _NoticeProbe() {};
+  virtual ~_NoticeProbe() {};
 
   virtual void BeginSend(const TfNotice &notice,
                          const TfWeakBase *sender,
@@ -74,13 +73,9 @@ public:
   }
 };
 
-class ProbeNotice : public TfNotice
-{
-public:
-  ProbeNotice(const string &what)
-      : _what(what)
-  {
-  }
+class ProbeNotice : public TfNotice {
+ public:
+  ProbeNotice(const string &what) : _what(what) {}
   ~ProbeNotice();
 
   const string &GetWhat() const
@@ -88,16 +83,13 @@ public:
     return _what;
   }
 
-private:
+ private:
   const string _what;
 };
 
-class ProbeListener : public TfWeakBase
-{
-public:
-  explicit ProbeListener()
-  {
-  }
+class ProbeListener : public TfWeakBase {
+ public:
+  explicit ProbeListener() {}
 
   //! Called when a notice of any type is sent
   void ProcessNotice(const TfNotice &)
@@ -113,8 +105,7 @@ TF_REGISTRY_FUNCTION(TfType)
 
 ProbeNotice::~ProbeNotice() {}
 
-static bool
-Test_TfProbe()
+static bool Test_TfProbe()
 {
   _NoticeProbe _probe;
   ProbeListener *l1 = new ProbeListener();

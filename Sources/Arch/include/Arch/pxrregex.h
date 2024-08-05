@@ -33,7 +33,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class ArchRegex {
-public:
+ public:
   enum : unsigned int { CASE_INSENSITIVE = 1u, GLOB = 2u };
 
   /// Create an empty regex.
@@ -59,7 +59,7 @@ public:
   /// returns \c false.
   ARCH_API bool Match(const std::string &query) const;
 
-private:
+ private:
   class _Impl;
   unsigned int _flags = 0;
   std::string _error;
@@ -68,4 +68,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_REGEX_H
+#endif  // PXR_BASE_ARCH_REGEX_H

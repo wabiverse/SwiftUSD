@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdRi/renderPassAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdRi/renderPassAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,52 +41,45 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static std::string _Repr(const UsdRiRenderPassAPI &self)
 {
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdRi.RenderPassAPI(%s)", primRepr.c_str());
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
-
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static std::string
-  _Repr(const UsdRiRenderPassAPI &self)
+struct UsdRiRenderPassAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdRiRenderPassAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdRi.RenderPassAPI(%s)",
-        primRepr.c_str());
   }
+};
 
-  struct UsdRiRenderPassAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdRiRenderPassAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
+static UsdRiRenderPassAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdRiRenderPassAPI::CanApply(prim, &whyNot);
+  return UsdRiRenderPassAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdRiRenderPassAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdRiRenderPassAPI::CanApply(prim, &whyNot);
-    return UsdRiRenderPassAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdRiRenderPassAPI()
 {
   typedef UsdRiRenderPassAPI This;
 
-  UsdRiRenderPassAPI_CanApplyResult::Wrap<UsdRiRenderPassAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+  UsdRiRenderPassAPI_CanApplyResult::Wrap<UsdRiRenderPassAPI_CanApplyResult>("_CanApplyResult",
+                                                                             "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("RenderPassAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("RenderPassAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -105,7 +98,8 @@ void wrapUsdRiRenderPassAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -135,16 +129,14 @@ void wrapUsdRiRenderPassAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
+namespace {
+
+WRAP_CUSTOM
 {
-
-  WRAP_CUSTOM
-  {
-    _class
-        .def("GetCameraVisibilityCollectionAPI",
-             &UsdRiRenderPassAPI::GetCameraVisibilityCollectionAPI)
-        .def("GetMatteCollectionAPI",
-             &UsdRiRenderPassAPI::GetMatteCollectionAPI);
-  }
-
+  _class
+      .def("GetCameraVisibilityCollectionAPI",
+           &UsdRiRenderPassAPI::GetCameraVisibilityCollectionAPI)
+      .def("GetMatteCollectionAPI", &UsdRiRenderPassAPI::GetMatteCollectionAPI);
 }
+
+}  // namespace

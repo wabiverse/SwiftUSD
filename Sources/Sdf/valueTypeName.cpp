@@ -32,7 +32,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 
-template <typename C, typename V> bool IsValueIn(const C &container, V value) {
+template<typename C, typename V> bool IsValueIn(const C &container, V value)
+{
   for (const auto &element : container) {
     if (element == value) {
       return true;
@@ -41,13 +42,14 @@ template <typename C, typename V> bool IsValueIn(const C &container, V value) {
   return false;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 //
 // SdfTupleDimensions
 //
 
-bool SdfTupleDimensions::operator==(const SdfTupleDimensions &rhs) const {
+bool SdfTupleDimensions::operator==(const SdfTupleDimensions &rhs) const
+{
   if (size != rhs.size) {
     return false;
   }
@@ -64,55 +66,73 @@ bool SdfTupleDimensions::operator==(const SdfTupleDimensions &rhs) const {
 // SdfValueTypeName
 //
 
-SdfValueTypeName::SdfValueTypeName()
-    : _impl(Sdf_ValueTypePrivate::GetEmptyTypeName()) {
+SdfValueTypeName::SdfValueTypeName() : _impl(Sdf_ValueTypePrivate::GetEmptyTypeName())
+{
   // Do nothing
 }
 
-SdfValueTypeName::SdfValueTypeName(const Sdf_ValueTypeImpl *impl)
-    : _impl(impl) {
+SdfValueTypeName::SdfValueTypeName(const Sdf_ValueTypeImpl *impl) : _impl(impl)
+{
   // Do nothing
 }
 
-TfToken SdfValueTypeName::GetAsToken() const { return _impl->name; }
+TfToken SdfValueTypeName::GetAsToken() const
+{
+  return _impl->name;
+}
 
-const TfType &SdfValueTypeName::GetType() const { return _impl->type->type; }
+const TfType &SdfValueTypeName::GetType() const
+{
+  return _impl->type->type;
+}
 
-const std::string &SdfValueTypeName::GetCPPTypeName() const {
+const std::string &SdfValueTypeName::GetCPPTypeName() const
+{
   return _impl->type->cppTypeName;
 }
 
-const TfToken &SdfValueTypeName::GetRole() const { return _impl->type->role; }
+const TfToken &SdfValueTypeName::GetRole() const
+{
+  return _impl->type->role;
+}
 
-const VtValue &SdfValueTypeName::GetDefaultValue() const {
+const VtValue &SdfValueTypeName::GetDefaultValue() const
+{
   return _impl->type->value;
 }
 
-const TfEnum &SdfValueTypeName::GetDefaultUnit() const {
+const TfEnum &SdfValueTypeName::GetDefaultUnit() const
+{
   return _impl->type->unit;
 }
 
-SdfValueTypeName SdfValueTypeName::GetScalarType() const {
+SdfValueTypeName SdfValueTypeName::GetScalarType() const
+{
   return SdfValueTypeName(_impl->scalar);
 }
 
-SdfValueTypeName SdfValueTypeName::GetArrayType() const {
+SdfValueTypeName SdfValueTypeName::GetArrayType() const
+{
   return SdfValueTypeName(_impl->array);
 }
 
-bool SdfValueTypeName::IsScalar() const {
+bool SdfValueTypeName::IsScalar() const
+{
   return *this && _impl == _impl->scalar;
 }
 
-bool SdfValueTypeName::IsArray() const {
+bool SdfValueTypeName::IsArray() const
+{
   return *this && _impl == _impl->array;
 }
 
-SdfTupleDimensions SdfValueTypeName::GetDimensions() const {
+SdfTupleDimensions SdfValueTypeName::GetDimensions() const
+{
   return _impl->type->dim;
 }
 
-bool SdfValueTypeName::operator==(const SdfValueTypeName &rhs) const {
+bool SdfValueTypeName::operator==(const SdfValueTypeName &rhs) const
+{
   // Do equality comparisons on core type to ensure that
   // equivalent type names from different registries compare
   // equal. The registry ensures that type and role are
@@ -121,28 +141,34 @@ bool SdfValueTypeName::operator==(const SdfValueTypeName &rhs) const {
           _impl->type->role == rhs._impl->type->role);
 }
 
-bool SdfValueTypeName::operator==(const std::string &rhs) const {
+bool SdfValueTypeName::operator==(const std::string &rhs) const
+{
   return IsValueIn(_impl->type->aliases, rhs);
 }
 
-bool SdfValueTypeName::operator==(const TfToken &rhs) const {
+bool SdfValueTypeName::operator==(const TfToken &rhs) const
+{
   return IsValueIn(_impl->type->aliases, rhs);
 }
 
-size_t SdfValueTypeName::GetHash() const {
+size_t SdfValueTypeName::GetHash() const
+{
   // See comment in operator==.
   return TfHash::Combine(_impl->type->type, _impl->type->role);
 }
 
-bool SdfValueTypeName::_IsEmpty() const {
+bool SdfValueTypeName::_IsEmpty() const
+{
   return _impl == Sdf_ValueTypePrivate::GetEmptyTypeName();
 }
 
-std::vector<TfToken> SdfValueTypeName::GetAliasesAsTokens() const {
+std::vector<TfToken> SdfValueTypeName::GetAliasesAsTokens() const
+{
   return _impl->type->aliases;
 }
 
-std::ostream &operator<<(std::ostream &s, const SdfValueTypeName &typeName) {
+std::ostream &operator<<(std::ostream &s, const SdfValueTypeName &typeName)
+{
   return s << typeName.GetAsToken().GetString();
 }
 

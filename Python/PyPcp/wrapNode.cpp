@@ -36,10 +36,11 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define PCP_GET_NODE_FN(nodeFn)                                                \
-  static boost::python::object _##nodeFn(const PcpNodeRef &node) {             \
-    PcpNodeRef n = node.nodeFn();                                              \
-    return n ? boost::python::object(n) : boost::python::object();             \
+#define PCP_GET_NODE_FN(nodeFn) \
+  static boost::python::object _##nodeFn(const PcpNodeRef &node) \
+  { \
+    PcpNodeRef n = node.nodeFn(); \
+    return n ? boost::python::object(n) : boost::python::object(); \
   }
 
 PCP_GET_NODE_FN(GetParentNode);
@@ -47,13 +48,15 @@ PCP_GET_NODE_FN(GetOriginNode);
 PCP_GET_NODE_FN(GetRootNode);
 PCP_GET_NODE_FN(GetOriginRootNode);
 
-static PcpNodeRefVector _GetChildren(const PcpNodeRef &node) {
+static PcpNodeRefVector _GetChildren(const PcpNodeRef &node)
+{
   return Pcp_GetChildren(node);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapNode() {
+void wrapNode()
+{
   typedef PcpNodeRef This;
 
   scope s =
@@ -61,26 +64,22 @@ void wrapNode() {
 
           .add_property("site", &This::GetSite)
           .add_property("path",
-                        make_function(&This::GetPath,
-                                      return_value_policy<return_by_value>()))
-          .add_property("layerStack",
-                        make_function(&This::GetLayerStack,
-                                      return_value_policy<return_by_value>()))
+                        make_function(&This::GetPath, return_value_policy<return_by_value>()))
+          .add_property(
+              "layerStack",
+              make_function(&This::GetLayerStack, return_value_policy<return_by_value>()))
 
           .add_property("parent", &_GetParentNode)
           .add_property("origin", &_GetOriginNode)
-          .add_property(
-              "children",
-              make_function(&_GetChildren,
-                            return_value_policy<TfPySequenceToList>()))
+          .add_property("children",
+                        make_function(&_GetChildren, return_value_policy<TfPySequenceToList>()))
 
           .add_property("arcType", &This::GetArcType)
-          .add_property("mapToParent",
-                        make_function(&This::GetMapToParent,
-                                      return_value_policy<return_by_value>()))
+          .add_property(
+              "mapToParent",
+              make_function(&This::GetMapToParent, return_value_policy<return_by_value>()))
           .add_property("mapToRoot",
-                        make_function(&This::GetMapToRoot,
-                                      return_value_policy<return_by_value>()))
+                        make_function(&This::GetMapToRoot, return_value_policy<return_by_value>()))
 
           .add_property("siblingNumAtOrigin", &This::GetSiblingNumAtOrigin)
           .add_property("namespaceDepth", &This::GetNamespaceDepth)

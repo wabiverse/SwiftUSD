@@ -28,16 +28,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((sceneIndexPluginName, "HdPrman_DependencyForwardingSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((sceneIndexPluginName, "HdPrman_DependencyForwardingSceneIndexPlugin")));
 
 static const char *const _pluginDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_DependencyForwardingSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_DependencyForwardingSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
@@ -52,13 +50,11 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
       HdSceneIndexPluginRegistry::InsertionOrderAtEnd);
 }
 
-HdPrman_DependencyForwardingSceneIndexPlugin::
-    HdPrman_DependencyForwardingSceneIndexPlugin() = default;
+HdPrman_DependencyForwardingSceneIndexPlugin::HdPrman_DependencyForwardingSceneIndexPlugin() =
+    default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_DependencyForwardingSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_DependencyForwardingSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   return HdDependencyForwardingSceneIndex::New(inputScene);
 }

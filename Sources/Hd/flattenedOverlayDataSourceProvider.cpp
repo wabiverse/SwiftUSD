@@ -27,21 +27,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle
-HdFlattenedOverlayDataSourceProvider::GetFlattenedDataSource(
+HdContainerDataSourceHandle HdFlattenedOverlayDataSourceProvider::GetFlattenedDataSource(
     const Context &ctx) const
 {
-    return
-        HdOverlayContainerDataSource::OverlayedContainerDataSources(
-            ctx.GetInputDataSource(),
-            ctx.GetFlattenedDataSourceFromParentPrim());
+  return HdOverlayContainerDataSource::OverlayedContainerDataSources(
+      ctx.GetInputDataSource(), ctx.GetFlattenedDataSourceFromParentPrim());
 }
 
-void
-HdFlattenedOverlayDataSourceProvider::ComputeDirtyLocatorsForDescendants(
-    HdDataSourceLocatorSet * const locators) const
+void HdFlattenedOverlayDataSourceProvider::ComputeDirtyLocatorsForDescendants(
+    HdDataSourceLocatorSet *const locators) const
 {
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

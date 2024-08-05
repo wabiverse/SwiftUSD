@@ -51,96 +51,112 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static void SetStartPointHelper(GfRay &self, const GfVec3d &startPoint) {
+static void SetStartPointHelper(GfRay &self, const GfVec3d &startPoint)
+{
   self.SetPointAndDirection(startPoint, self.GetDirection());
 }
 
-static void SetDirectionHelper(GfRay &self, const GfVec3d &direction) {
+static void SetDirectionHelper(GfRay &self, const GfVec3d &direction)
+{
   self.SetPointAndDirection(self.GetStartPoint(), direction);
 }
 
-static tuple FindClosestPointHelper(const GfRay &self, const GfVec3d &point) {
+static tuple FindClosestPointHelper(const GfRay &self, const GfVec3d &point)
+{
   double rayDist;
   GfVec3d result = self.FindClosestPoint(point, &rayDist);
   return make_tuple(result, rayDist);
 }
 
-static tuple FindClosestPointsHelper1(const GfRay &l1, const GfLine &l2) {
+static tuple FindClosestPointsHelper1(const GfRay &l1, const GfLine &l2)
+{
   GfVec3d p1(0), p2(0);
   double t1 = 0.0, t2 = 0.0;
   bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
   return make_tuple(result, p1, p2, t1, t2);
 }
 
-static tuple FindClosestPointsHelper2(const GfRay &l1, const GfLineSeg &l2) {
+static tuple FindClosestPointsHelper2(const GfRay &l1, const GfLineSeg &l2)
+{
   GfVec3d p1(0), p2(0);
   double t1 = 0.0, t2 = 0.0;
   bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
   return make_tuple(result, p1, p2, t1, t2);
 }
 
-static tuple IntersectHelper1(const GfRay &self, const GfVec3d &p0,
-                              const GfVec3d &p1, const GfVec3d &p2) {
+static tuple IntersectHelper1(const GfRay &self,
+                              const GfVec3d &p0,
+                              const GfVec3d &p1,
+                              const GfVec3d &p2)
+{
   double dist = 0;
   GfVec3d barycentricCoords(0);
   bool frontFacing = false;
-  bool result =
-      self.Intersect(p0, p1, p2, &dist, &barycentricCoords, &frontFacing);
+  bool result = self.Intersect(p0, p1, p2, &dist, &barycentricCoords, &frontFacing);
   return make_tuple(result, dist, barycentricCoords, frontFacing);
 }
 
-static tuple IntersectHelper2(const GfRay &self, const GfPlane &plane) {
+static tuple IntersectHelper2(const GfRay &self, const GfPlane &plane)
+{
   double dist = 0;
   bool frontFacing = false;
   bool result = self.Intersect(plane, &dist, &frontFacing);
   return make_tuple(result, dist, frontFacing);
 }
 
-static tuple IntersectHelper3(const GfRay &self, const GfRange3d &box) {
+static tuple IntersectHelper3(const GfRay &self, const GfRange3d &box)
+{
   double enterDist = 0, exitDist = 0;
   bool result = self.Intersect(box, &enterDist, &exitDist);
   return make_tuple(result, enterDist, exitDist);
 }
 
-static tuple IntersectHelper4(const GfRay &self, const GfBBox3d &box) {
+static tuple IntersectHelper4(const GfRay &self, const GfBBox3d &box)
+{
   double enterDist = 0, exitDist = 0;
   bool result = self.Intersect(box, &enterDist, &exitDist);
   return make_tuple(result, enterDist, exitDist);
 }
 
-static tuple IntersectHelper5(const GfRay &self, const GfVec3d &center,
-                              double radius) {
+static tuple IntersectHelper5(const GfRay &self, const GfVec3d &center, double radius)
+{
   double enterDist = 0, exitDist = 0;
   bool result = self.Intersect(center, radius, &enterDist, &exitDist);
   return make_tuple(result, enterDist, exitDist);
 }
 
-static tuple IntersectHelper6(const GfRay &self, const GfVec3d &origin,
-                              const GfVec3d &axis, double radius) {
+static tuple IntersectHelper6(const GfRay &self,
+                              const GfVec3d &origin,
+                              const GfVec3d &axis,
+                              double radius)
+{
   double enter = 0, exit = 0;
   bool result = self.Intersect(origin, axis, radius, &enter, &exit);
   return make_tuple(result, enter, exit);
 }
 
-static tuple IntersectHelper7(const GfRay &self, const GfVec3d &origin,
-                              const GfVec3d &axis, double radius,
-                              double height) {
+static tuple IntersectHelper7(
+    const GfRay &self, const GfVec3d &origin, const GfVec3d &axis, double radius, double height)
+{
   double enter = 0, exit = 0;
   bool result = self.Intersect(origin, axis, radius, height, &enter, &exit);
   return make_tuple(result, enter, exit);
 }
 
-static string _Repr(GfRay const &self) {
+static string _Repr(GfRay const &self)
+{
   return TF_PY_REPR_PREFIX + "Ray(" + TfPyRepr(self.GetStartPoint()) + ", " +
          TfPyRepr(self.GetDirection()) + ")";
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRay() {
+void wrapRay()
+{
   typedef GfRay This;
 
-  def("FindClosestPoints", FindClosestPointsHelper1,
+  def("FindClosestPoints",
+      FindClosestPointsHelper1,
       "FindClosestPoints( r1, l2 ) -> tuple<intersects=bool, "
       "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>\n"
       "\n"
@@ -153,7 +169,8 @@ void wrapRay() {
       "The parametric distance of each point on the ray and line is\n"
       "returned in t1 and t2.\n"
       "----------------------------------------------------------------------");
-  def("FindClosestPoints", FindClosestPointsHelper2,
+  def("FindClosestPoints",
+      FindClosestPointsHelper2,
       "FindClosestPoints( r1, s2 ) -> tuple<intersects = bool, "
       "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>\n"
       "\n"
@@ -175,14 +192,14 @@ void wrapRay() {
       .def("SetPointAndDirection", &This::SetPointAndDirection, return_self<>())
       .def("SetEnds", &This::SetEnds, return_self<>())
 
-      .add_property("startPoint",
-                    make_function(&This::GetStartPoint,
-                                  return_value_policy<copy_const_reference>()),
-                    SetStartPointHelper)
-      .add_property("direction",
-                    make_function(&This::GetDirection,
-                                  return_value_policy<copy_const_reference>()),
-                    SetDirectionHelper)
+      .add_property(
+          "startPoint",
+          make_function(&This::GetStartPoint, return_value_policy<copy_const_reference>()),
+          SetStartPointHelper)
+      .add_property(
+          "direction",
+          make_function(&This::GetDirection, return_value_policy<copy_const_reference>()),
+          SetDirectionHelper)
 
       .def("GetPoint", &This::GetPoint)
 
@@ -190,7 +207,8 @@ void wrapRay() {
 
       .def("Transform", &This::Transform, return_self<>())
 
-      .def("Intersect", IntersectHelper1,
+      .def("Intersect",
+           IntersectHelper1,
            "Intersect( p0, p1, p2 ) -> tuple<intersects = bool, dist =\n"
            "float, barycentric = GfVec3d, frontFacing = bool>\n"
            "\n"
@@ -213,7 +231,8 @@ void wrapRay() {
            "                         barycentricCoords[2] * p2);\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper2,
+      .def("Intersect",
+           IntersectHelper2,
            "Intersect( plane ) -> tuple<intersects = bool, dist = float,\n"
            "frontFacing = bool>\n"
            "\n"
@@ -224,7 +243,8 @@ void wrapRay() {
            "of the plane toward which the plane's normal points.\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper3,
+      .def("Intersect",
+           IntersectHelper3,
            "Intersect( range3d ) -> tuple<intersects = bool, enterDist\n"
            "= float, exitDist = float>\n"
            //\n"
@@ -235,7 +255,8 @@ void wrapRay() {
            "intersection points.\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper4,
+      .def("Intersect",
+           IntersectHelper4,
            "Intersect( bbox3d ) -> tuple<intersects = bool, enterDist\n"
            "= float, exitDist = float>\n"
            //\n"
@@ -246,7 +267,8 @@ void wrapRay() {
            "intersection points.\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper5,
+      .def("Intersect",
+           IntersectHelper5,
            "Intersect( center, radius ) -> tuple<intersects = bool,\n"
            "enterDist = float, exitDist = float>\n"
            "\n"
@@ -256,7 +278,8 @@ void wrapRay() {
            "parametric distances to the two intersection points.\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper6,
+      .def("Intersect",
+           IntersectHelper6,
            "Intersect( origin, axis, radius ) -> tuple<intersects = bool,\n"
            "enterDist = float, exitDist = float>\n"
            "\n"
@@ -267,7 +290,8 @@ void wrapRay() {
            "intersection points.\n"
            "-------------------------------------------------------------------"
            "---")
-      .def("Intersect", IntersectHelper7,
+      .def("Intersect",
+           IntersectHelper7,
            "Intersect( origin, axis, radius, height ) -> \n"
            "tuple<intersects = bool, enterDist = float, exitDist = float>\n"
            "\n"

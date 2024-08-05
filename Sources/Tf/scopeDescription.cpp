@@ -56,14 +56,16 @@ char message[MaxMessageBytes];
 struct _MessageWriter {
   _MessageWriter() : cur(message), end(message + MaxMessageBytes - 1) {}
 
-  inline void Write(char const *txt) {
+  inline void Write(char const *txt)
+  {
     while (*txt && cur != end) {
       *cur++ = *txt++;
     }
     *cur = '\0';
   }
 
-  inline void Write(size_t num) {
+  inline void Write(size_t num)
+  {
     if (cur == end)
       return;
     char *start = cur;
@@ -89,31 +91,36 @@ struct _StackRegistry {
     friend struct _StackRegistry;
     StackLock(StackLock const &) = delete;
     StackLock &operator=(StackLock const &) = delete;
-    inline StackLock(_Stack *stack, _StackRegistry *reg)
-        : _stack(stack), _reg(reg) {}
+    inline StackLock(_Stack *stack, _StackRegistry *reg) : _stack(stack), _reg(reg) {}
     inline StackLock() : _stack(nullptr), _reg(nullptr) {}
 
-  public:
-    inline StackLock(StackLock &&o) : _stack(o._stack), _reg(o._reg) {
+   public:
+    inline StackLock(StackLock &&o) : _stack(o._stack), _reg(o._reg)
+    {
       o._stack = nullptr;
       o._reg = nullptr;
     }
-    inline StackLock &operator=(StackLock &&o) {
+    inline StackLock &operator=(StackLock &&o)
+    {
       _stack = o._stack;
       _reg = o._reg;
       o._stack = nullptr;
       o._reg = nullptr;
       return *this;
     }
-    inline ~StackLock() {
+    inline ~StackLock()
+    {
       if (_reg) {
         _reg->_UnlockThread();
       }
     }
     // Provide access to the requested stack.
-    inline _Stack *Get() const { return _stack; }
+    inline _Stack *Get() const
+    {
+      return _stack;
+    }
 
-  private:
+   private:
     _Stack *_stack;
     _StackRegistry *_reg;
   };
@@ -125,16 +132,18 @@ struct _StackRegistry {
   };
 
   // Register \p stack as the stack for \p id.
-  void Add(std::thread::id id, _Stack *stack) {
+  void Add(std::thread::id id, _Stack *stack)
+  {
     tbb::spin_mutex::scoped_lock lock(_stacksMutex);
     _stacks.push_back({id, TfStringify(id), stack});
   }
   // Remove \p stack from the registry.
-  void Remove(_Stack *stack) {
+  void Remove(_Stack *stack)
+  {
     tbb::spin_mutex::scoped_lock lock(_stacksMutex);
-    auto it = std::find_if(
-        _stacks.begin(), _stacks.end(),
-        [stack](_StackEntry const &e) { return e.stack == stack; });
+    auto it = std::find_if(_stacks.begin(), _stacks.end(), [stack](_StackEntry const &e) {
+      return e.stack == stack;
+    });
     TF_AXIOM(it != _stacks.end());
     std::swap(*it, _stacks.back());
     _stacks.pop_back();
@@ -142,25 +151,30 @@ struct _StackRegistry {
   // Acquire a lock on the registry and obtain a pointer to the stack
   // associated with \p id if one exists, otherwise return a StackLock with a
   // nullptr stack.
-  StackLock LockThread(std::thread::id id) {
+  StackLock LockThread(std::thread::id id)
+  {
     _stacksMutex.lock();
-    auto it = std::find_if(_stacks.begin(), _stacks.end(),
-                           [id](_StackEntry const &e) { return e.id == id; });
+    auto it = std::find_if(
+        _stacks.begin(), _stacks.end(), [id](_StackEntry const &e) { return e.id == id; });
     return StackLock(it == _stacks.end() ? nullptr : it->stack, this);
   }
 
-private:
+ private:
   // Give access to the crash reporter facility.
   friend char const *_ComputeAndLockScopeDescriptionStackMsg();
 
-  void _UnlockThread() { _stacksMutex.unlock(); }
+  void _UnlockThread()
+  {
+    _stacksMutex.unlock();
+  }
 
   tbb::spin_mutex _stacksMutex;
   std::vector<_StackEntry> _stacks;
 };
 
 // Obtain the registry singleton instance.
-static _StackRegistry &GetRegistry() {
+static _StackRegistry &GetRegistry()
+{
   // Avoid heap allocation (since this might be initialized in a signal
   // handler) and we don't want to run static destructors here at exit.
   alignas(_StackRegistry) static char registryBuf[sizeof(_StackRegistry)];
@@ -171,11 +185,15 @@ static _StackRegistry &GetRegistry() {
 // Per thread description stack representation.
 struct _Stack {
   // Add this stack to the registry.
-  _Stack() : head(nullptr) {
+  _Stack() : head(nullptr)
+  {
     GetRegistry().Add(std::this_thread::get_id(), this);
   }
   // Remove this stack from the registry.
-  ~_Stack() { GetRegistry().Remove(this); }
+  ~_Stack()
+  {
+    GetRegistry().Remove(this);
+  }
   // The head of the description stack (nullptr if empty);
   TfScopeDescription *head;
   // Thread-local lock for this stack.
@@ -185,8 +203,9 @@ struct _Stack {
 // A helper struct for thread_local that uses nullptr initialization as a
 // sentinel to prevent guard variable use from being invoked after first
 // initialization.
-template <class T> struct _FastThreadLocalBase {
-  static T &Get() {
+template<class T> struct _FastThreadLocalBase {
+  static T &Get()
+  {
     static thread_local T *theTPtr = nullptr;
     if (ARCH_LIKELY(theTPtr)) {
       return *theTPtr;
@@ -199,7 +218,9 @@ template <class T> struct _FastThreadLocalBase {
 struct _LocalStack : _FastThreadLocalBase<_Stack> {};
 
 static bool _TimedTryAcquire(tbb::spin_mutex::scoped_lock &lock,
-                             tbb::spin_mutex &mutex, int msecToTry = 10) {
+                             tbb::spin_mutex &mutex,
+                             int msecToTry = 10)
+{
   if (lock.try_acquire(mutex))
     return true;
 
@@ -210,13 +231,14 @@ static bool _TimedTryAcquire(tbb::spin_mutex::scoped_lock &lock,
     if (lock.try_acquire(mutex))
       return true;
     msec = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(
-                              std::chrono::high_resolution_clock::now() - start)
-                              .count());
+                                std::chrono::high_resolution_clock::now() - start)
+                                .count());
   } while (msec < msecToTry);
   return false;
 }
 
-char const *_ComputeAndLockScopeDescriptionStackMsg() {
+char const *_ComputeAndLockScopeDescriptionStackMsg()
+{
   // Lock the message mutex.
   messageMutex.lock();
 
@@ -226,8 +248,9 @@ char const *_ComputeAndLockScopeDescriptionStackMsg() {
   auto &reg = GetRegistry();
   tbb::spin_mutex::scoped_lock regLock;
   if (!_TimedTryAcquire(regLock, reg._stacksMutex)) {
-    writer.Write("Error: cannot generate TfScopeDescription stacks - "
-                 "failed to acquire lock on stack registry mutex.\n");
+    writer.Write(
+        "Error: cannot generate TfScopeDescription stacks - "
+        "failed to acquire lock on stack registry mutex.\n");
     return message;
   }
 
@@ -241,9 +264,9 @@ char const *_ComputeAndLockScopeDescriptionStackMsg() {
   }
   // Sort -- always sort "main thread" first.
   std::thread::id mainThreadId = ArchGetMainThreadId();
-  std::sort(entries, entries + numEntries,
-            [mainThreadId](_StackRegistry::_StackEntry *l,
-                           _StackRegistry::_StackEntry *r) {
+  std::sort(entries,
+            entries + numEntries,
+            [mainThreadId](_StackRegistry::_StackEntry *l, _StackRegistry::_StackEntry *r) {
               if (l->id == r->id)
                 return false;
               if (l->id == mainThreadId)
@@ -259,8 +282,9 @@ char const *_ComputeAndLockScopeDescriptionStackMsg() {
     // Try to lock this entry's mutex, if we fail or if empty stack, bail.
     tbb::spin_mutex::scoped_lock stackLock;
     if (!_TimedTryAcquire(stackLock, e->stack->mutex)) {
-      writer.Write("Error: cannot write TfScopeDescription stack "
-                   "for thread ");
+      writer.Write(
+          "Error: cannot write TfScopeDescription stack "
+          "for thread ");
       writer.Write(e->idStr.c_str());
       writer.Write(" - failed to acquire stack lock.\n\n");
     }
@@ -299,9 +323,10 @@ char const *_ComputeAndLockScopeDescriptionStackMsg() {
   return message;
 }
 
-} // namespace
+}  // namespace
 
-void TfScopeDescription::_Push() {
+void TfScopeDescription::_Push()
+{
   // No other thread can modify head, so we can read it without the lock
   // safely here.
   _Stack &stack = _LocalStack::Get();
@@ -311,7 +336,8 @@ void TfScopeDescription::_Push() {
   stack.head = this;
 }
 
-void TfScopeDescription::_Pop() const {
+void TfScopeDescription::_Pop() const
+{
   // No other thread can modify head, so we can read it without the lock
   // safely here.
   _Stack &stack = *static_cast<_Stack *>(_localStack);
@@ -320,28 +346,31 @@ void TfScopeDescription::_Pop() const {
   stack.head = _prev;
 }
 
-TfScopeDescription::TfScopeDescription(std::string const &msg,
-                                       TfCallContext const &ctx)
-    : _description(msg.c_str()), _context(ctx) {
+TfScopeDescription::TfScopeDescription(std::string const &msg, TfCallContext const &ctx)
+    : _description(msg.c_str()), _context(ctx)
+{
   _Push();
 }
 
-TfScopeDescription::TfScopeDescription(std::string &&msg,
-                                       TfCallContext const &ctx)
-    : _ownedString(std::move(msg)), _description(_ownedString->c_str()),
-      _context(ctx) {
+TfScopeDescription::TfScopeDescription(std::string &&msg, TfCallContext const &ctx)
+    : _ownedString(std::move(msg)), _description(_ownedString->c_str()), _context(ctx)
+{
   _Push();
 }
 
-TfScopeDescription::TfScopeDescription(char const *msg,
-                                       TfCallContext const &ctx)
-    : _description(msg), _context(ctx) {
+TfScopeDescription::TfScopeDescription(char const *msg, TfCallContext const &ctx)
+    : _description(msg), _context(ctx)
+{
   _Push();
 }
 
-TfScopeDescription::~TfScopeDescription() { _Pop(); }
+TfScopeDescription::~TfScopeDescription()
+{
+  _Pop();
+}
 
-void TfScopeDescription::SetDescription(std::string const &msg) {
+void TfScopeDescription::SetDescription(std::string const &msg)
+{
   _Stack &stack = *static_cast<_Stack *>(_localStack);
   {
     tbb::spin_mutex::scoped_lock lock(stack.mutex);
@@ -350,14 +379,16 @@ void TfScopeDescription::SetDescription(std::string const &msg) {
   _ownedString = boost::none;
 }
 
-void TfScopeDescription::SetDescription(std::string &&msg) {
+void TfScopeDescription::SetDescription(std::string &&msg)
+{
   _Stack &stack = *static_cast<_Stack *>(_localStack);
   tbb::spin_mutex::scoped_lock lock(stack.mutex);
   _ownedString = std::move(msg);
   _description = _ownedString->c_str();
 }
 
-void TfScopeDescription::SetDescription(char const *msg) {
+void TfScopeDescription::SetDescription(char const *msg)
+{
   _Stack &stack = *static_cast<_Stack *>(_localStack);
   {
     tbb::spin_mutex::scoped_lock lock(stack.mutex);
@@ -366,14 +397,14 @@ void TfScopeDescription::SetDescription(char const *msg) {
   _ownedString = boost::none;
 }
 
-static std::vector<std::string> _GetScopeDescriptionStack(std::thread::id id) {
+static std::vector<std::string> _GetScopeDescriptionStack(std::thread::id id)
+{
   std::vector<std::string> result;
   {
     auto lock = GetRegistry().LockThread(id);
     if (_Stack *stack = lock.Get()) {
       tbb::spin_mutex::scoped_lock lock(stack->mutex);
-      for (TfScopeDescription *cur = stack->head; cur;
-           cur = Tf_GetPreviousScopeDescription(cur)) {
+      for (TfScopeDescription *cur = stack->head; cur; cur = Tf_GetPreviousScopeDescription(cur)) {
         result.emplace_back(Tf_GetScopeDescriptionText(cur));
       }
     }
@@ -383,20 +414,25 @@ static std::vector<std::string> _GetScopeDescriptionStack(std::thread::id id) {
   return result;
 }
 
-std::vector<std::string> TfGetCurrentScopeDescriptionStack() {
+std::vector<std::string> TfGetCurrentScopeDescriptionStack()
+{
   return _GetScopeDescriptionStack(ArchGetMainThreadId());
 }
 
-vector<string> TfGetThisThreadScopeDescriptionStack() {
+vector<string> TfGetThisThreadScopeDescriptionStack()
+{
   return _GetScopeDescriptionStack(std::this_thread::get_id());
 }
 
 // From scopeDescriptionPrivate.h
 
 Tf_ScopeDescriptionStackReportLock::Tf_ScopeDescriptionStackReportLock()
-    : _msg(_ComputeAndLockScopeDescriptionStackMsg()) {}
+    : _msg(_ComputeAndLockScopeDescriptionStackMsg())
+{
+}
 
-Tf_ScopeDescriptionStackReportLock::~Tf_ScopeDescriptionStackReportLock() {
+Tf_ScopeDescriptionStackReportLock::~Tf_ScopeDescriptionStackReportLock()
+{
   messageMutex.unlock();
 }
 

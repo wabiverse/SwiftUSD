@@ -26,8 +26,8 @@
 
 /// \file glf/info.h
 
-#include <pxr/pxrns.h>
 #include "Glf/api.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE

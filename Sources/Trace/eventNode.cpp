@@ -32,18 +32,21 @@ TraceEventNodeRefPtr TraceEventNode::Append(const TfToken &key,
                                             TraceCategoryId category,
                                             TimeStamp beginTime,
                                             TimeStamp endTime,
-                                            bool separateEvents) {
-  TraceEventNodeRefPtr n = TraceEventNode::New(key, category, beginTime,
-                                               endTime, {}, separateEvents);
+                                            bool separateEvents)
+{
+  TraceEventNodeRefPtr n = TraceEventNode::New(
+      key, category, beginTime, endTime, {}, separateEvents);
   _children.push_back(n);
   return n;
 }
 
-void TraceEventNode::Append(TraceEventNodeRefPtr node) {
+void TraceEventNode::Append(TraceEventNodeRefPtr node)
+{
   _children.push_back(node);
 }
 
-void TraceEventNode::SetBeginAndEndTimesFromChildren() {
+void TraceEventNode::SetBeginAndEndTimesFromChildren()
+{
   if (_children.empty()) {
     _beginTime = 0;
     _endTime = 0;
@@ -59,8 +62,8 @@ void TraceEventNode::SetBeginAndEndTimesFromChildren() {
   }
 }
 
-void TraceEventNode::AddAttribute(const TfToken &key,
-                                  const AttributeData &attr) {
+void TraceEventNode::AddAttribute(const TfToken &key, const AttributeData &attr)
+{
   _attributes.emplace(key, attr);
 }
 

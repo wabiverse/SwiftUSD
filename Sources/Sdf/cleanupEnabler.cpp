@@ -30,11 +30,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_DEFINED_STACKED(SdfCleanupEnabler);
 
-SdfCleanupEnabler::SdfCleanupEnabler() {
+SdfCleanupEnabler::SdfCleanupEnabler()
+{
   // Do nothing
 }
 
-SdfCleanupEnabler::~SdfCleanupEnabler() {
+SdfCleanupEnabler::~SdfCleanupEnabler()
+{
   if (GetStack().size() == 1) {
     // The last CleanupEnabler is being removed from the stack, so notify
     // the CleanupTracker that it's time to clean up any specs it collected.
@@ -43,6 +45,9 @@ SdfCleanupEnabler::~SdfCleanupEnabler() {
 }
 
 // Static
-bool SdfCleanupEnabler::IsCleanupEnabled() { return !GetStack().empty(); }
+bool SdfCleanupEnabler::IsCleanupEnabled()
+{
+  return !GetStack().empty();
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

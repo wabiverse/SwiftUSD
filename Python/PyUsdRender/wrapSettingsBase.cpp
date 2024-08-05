@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdRender/settingsBase.h"
 #include "Usd/schemaBase.h"
+#include "UsdRender/settingsBase.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,84 +40,76 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateResolutionAttr(UsdRenderSettingsBase &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
 {
+  return self.CreateResolutionAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int2),
+                                   writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreatePixelAspectRatioAttr(UsdRenderSettingsBase &self,
+                                                object defaultVal,
+                                                bool writeSparsely)
+{
+  return self.CreatePixelAspectRatioAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                         writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateAspectRatioConformPolicyAttr(UsdRenderSettingsBase &self,
+                                                        object defaultVal,
+                                                        bool writeSparsely)
+{
+  return self.CreateAspectRatioConformPolicyAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateResolutionAttr(UsdRenderSettingsBase &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateResolutionAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int2), writeSparsely);
-  }
+static UsdAttribute _CreateDataWindowNDCAttr(UsdRenderSettingsBase &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
+{
+  return self.CreateDataWindowNDCAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float4),
+                                      writeSparsely);
+}
 
-  static UsdAttribute
-  _CreatePixelAspectRatioAttr(UsdRenderSettingsBase &self,
-                              object defaultVal, bool writeSparsely)
-  {
-    return self.CreatePixelAspectRatioAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
+static UsdAttribute _CreateInstantaneousShutterAttr(UsdRenderSettingsBase &self,
+                                                    object defaultVal,
+                                                    bool writeSparsely)
+{
+  return self.CreateInstantaneousShutterAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateAspectRatioConformPolicyAttr(UsdRenderSettingsBase &self,
-                                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateAspectRatioConformPolicyAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static UsdAttribute _CreateDisableMotionBlurAttr(UsdRenderSettingsBase &self,
+                                                 object defaultVal,
+                                                 bool writeSparsely)
+{
+  return self.CreateDisableMotionBlurAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool),
+                                          writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateDataWindowNDCAttr(UsdRenderSettingsBase &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDataWindowNDCAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float4), writeSparsely);
-  }
+static std::string _Repr(const UsdRenderSettingsBase &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdRender.SettingsBase(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateInstantaneousShutterAttr(UsdRenderSettingsBase &self,
-                                  object defaultVal, bool writeSparsely)
-  {
-    return self.CreateInstantaneousShutterAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateDisableMotionBlurAttr(UsdRenderSettingsBase &self,
-                               object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDisableMotionBlurAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdRenderSettingsBase &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdRender.SettingsBase(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdRenderSettingsBase()
 {
   typedef UsdRenderSettingsBase This;
 
-  class_<This, bases<UsdTyped>>
-      cls("SettingsBase");
+  class_<This, bases<UsdTyped>> cls("SettingsBase");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -130,58 +122,45 @@ void wrapUsdRenderSettingsBase()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetResolutionAttr",
-           &This::GetResolutionAttr)
+      .def("GetResolutionAttr", &This::GetResolutionAttr)
       .def("CreateResolutionAttr",
            &_CreateResolutionAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetPixelAspectRatioAttr",
-           &This::GetPixelAspectRatioAttr)
+      .def("GetPixelAspectRatioAttr", &This::GetPixelAspectRatioAttr)
       .def("CreatePixelAspectRatioAttr",
            &_CreatePixelAspectRatioAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetAspectRatioConformPolicyAttr",
-           &This::GetAspectRatioConformPolicyAttr)
+      .def("GetAspectRatioConformPolicyAttr", &This::GetAspectRatioConformPolicyAttr)
       .def("CreateAspectRatioConformPolicyAttr",
            &_CreateAspectRatioConformPolicyAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDataWindowNDCAttr",
-           &This::GetDataWindowNDCAttr)
+      .def("GetDataWindowNDCAttr", &This::GetDataWindowNDCAttr)
       .def("CreateDataWindowNDCAttr",
            &_CreateDataWindowNDCAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetInstantaneousShutterAttr",
-           &This::GetInstantaneousShutterAttr)
+      .def("GetInstantaneousShutterAttr", &This::GetInstantaneousShutterAttr)
       .def("CreateInstantaneousShutterAttr",
            &_CreateInstantaneousShutterAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDisableMotionBlurAttr",
-           &This::GetDisableMotionBlurAttr)
+      .def("GetDisableMotionBlurAttr", &This::GetDisableMotionBlurAttr)
       .def("CreateDisableMotionBlurAttr",
            &_CreateDisableMotionBlurAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetCameraRel",
-           &This::GetCameraRel)
-      .def("CreateCameraRel",
-           &This::CreateCameraRel)
+      .def("GetCameraRel", &This::GetCameraRel)
+      .def("CreateCameraRel", &This::CreateCameraRel)
       .def("__repr__", ::_Repr);
 
   _CustomWrapCode(cls);
@@ -206,11 +185,8 @@ void wrapUsdRenderSettingsBase()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

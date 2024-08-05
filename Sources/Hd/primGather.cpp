@@ -21,435 +21,397 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "Hd/primGather.h"
 #include "Hd/perfLog.h"
 #include "Tf/diagnostic.h"
 #include "Work/dispatcher.h"
 #include "Work/withScopedParallelism.h"
 #include <OneTBB/tbb/parallel_for.h>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Parallelism tunable values.
 // Only run ranges in parallel if there are enough to cover the
 // overhead.
-static const size_t MIN_RANGES_FOR_PARALLEL  = 10;
+static const size_t MIN_RANGES_FOR_PARALLEL = 10;
 static const size_t MIN_ENTRIES_FOR_PARALLEL = 10;
-static const size_t MIN_GRAIN_SIZE           = 10;
-
+static const size_t MIN_GRAIN_SIZE = 10;
 
 void HdPrimGather::Filter(const SdfPathVector &paths,
                           const SdfPathVector &includePaths,
                           const SdfPathVector &excludePaths,
-                          SdfPathVector       *results)
+                          SdfPathVector *results)
 {
-    HD_TRACE_FUNCTION();
+  HD_TRACE_FUNCTION();
 
-    _SetupFilter(includePaths, excludePaths);
-    _GatherPaths(paths);
+  _SetupFilter(includePaths, excludePaths);
+  _GatherPaths(paths);
 
-    _WriteResults(paths,
-                  _gatheredRanges.begin(),
-                  _gatheredRanges.end(),
-                  results);
+  _WriteResults(paths, _gatheredRanges.begin(), _gatheredRanges.end(), results);
 }
 
-void
-HdPrimGather::PredicatedFilter(const SdfPathVector &paths,
-                               const SdfPathVector &includePaths,
-                               const SdfPathVector &excludePaths,
-                               FilterPredicateFn    predicateFn,
-                               void                *predicateParam,
-                               SdfPathVector       *results)
+void HdPrimGather::PredicatedFilter(const SdfPathVector &paths,
+                                    const SdfPathVector &includePaths,
+                                    const SdfPathVector &excludePaths,
+                                    FilterPredicateFn predicateFn,
+                                    void *predicateParam,
+                                    SdfPathVector *results)
 {
-    HD_TRACE_FUNCTION();
+  HD_TRACE_FUNCTION();
 
-    _SetupFilter(includePaths, excludePaths);
-    _GatherPaths(paths);
+  _SetupFilter(includePaths, excludePaths);
+  _GatherPaths(paths);
 
-    {
-        HD_TRACE_SCOPE("HdPrimGather::Predicate Test");
+  {
+    HD_TRACE_SCOPE("HdPrimGather::Predicate Test");
 
-        size_t numRanges = _gatheredRanges.size();
-        if (numRanges > MIN_RANGES_FOR_PARALLEL) {
+    size_t numRanges = _gatheredRanges.size();
+    if (numRanges > MIN_RANGES_FOR_PARALLEL) {
 
-            WorkWithScopedParallelism([&]() {
-                WorkDispatcher rangeDispatcher;
+      WorkWithScopedParallelism([&]() {
+        WorkDispatcher rangeDispatcher;
 
-                for (size_t rangeNum = 0; rangeNum < numRanges; ++rangeNum) {
-                    const _Range &range = _gatheredRanges[rangeNum];
+        for (size_t rangeNum = 0; rangeNum < numRanges; ++rangeNum) {
+          const _Range &range = _gatheredRanges[rangeNum];
 
-                    rangeDispatcher.Run(&HdPrimGather::_DoPredicateTestOnRange,
-                                        this,
-                                        std::cref(paths),
-                                        range,
-                                        predicateFn,
-                                        predicateParam);
-                }
-            });
-        } else {
-            size_t numRanges = _gatheredRanges.size();
-            for (size_t rangeNum = 0; rangeNum < numRanges; ++rangeNum) {
-                const _Range &range = _gatheredRanges[rangeNum];
-
-                _DoPredicateTestOnRange(paths,
-                                        range,
-                                        predicateFn,
-                                        predicateParam);
-            }
+          rangeDispatcher.Run(&HdPrimGather::_DoPredicateTestOnRange,
+                              this,
+                              std::cref(paths),
+                              range,
+                              predicateFn,
+                              predicateParam);
         }
+      });
     }
+    else {
+      size_t numRanges = _gatheredRanges.size();
+      for (size_t rangeNum = 0; rangeNum < numRanges; ++rangeNum) {
+        const _Range &range = _gatheredRanges[rangeNum];
 
-    typedef tbb::flattened2d<_ConcurrentRangeArray> _FlattenRangeArray;
+        _DoPredicateTestOnRange(paths, range, predicateFn, predicateParam);
+      }
+    }
+  }
 
-    _FlattenRangeArray flattendResultRanges = tbb::flatten2d(_resultRanges);
+  typedef tbb::flattened2d<_ConcurrentRangeArray> _FlattenRangeArray;
 
-    _WriteResults(paths,
-                  flattendResultRanges.begin(),
-                  flattendResultRanges.end(),
-                  results);
+  _FlattenRangeArray flattendResultRanges = tbb::flatten2d(_resultRanges);
+
+  _WriteResults(paths, flattendResultRanges.begin(), flattendResultRanges.end(), results);
 }
 
-void
-HdPrimGather::Subtree(const SdfPathVector &paths,
-                       const SdfPath       &rootPath,
-                       SdfPathVector       *results)
+void HdPrimGather::Subtree(const SdfPathVector &paths,
+                           const SdfPath &rootPath,
+                           SdfPathVector *results)
 {
-    results->clear();
+  results->clear();
 
-    _FilterSubTree(paths, rootPath);
+  _FilterSubTree(paths, rootPath);
 
-    _WriteResults(paths,
-                  _gatheredRanges.begin(),
-                  _gatheredRanges.end(),
-                  results);
+  _WriteResults(paths, _gatheredRanges.begin(), _gatheredRanges.end(), results);
 }
 
-bool
-HdPrimGather::SubtreeAsRange(const SdfPathVector &paths,
-                             const SdfPath       &rootPath,
-                             size_t              *start,
-                             size_t              *end)
+bool HdPrimGather::SubtreeAsRange(const SdfPathVector &paths,
+                                  const SdfPath &rootPath,
+                                  size_t *start,
+                                  size_t *end)
 {
-    _FilterSubTree(paths, rootPath);
+  _FilterSubTree(paths, rootPath);
 
-    if (_gatheredRanges.empty()) {
-        return false;
-    }
+  if (_gatheredRanges.empty()) {
+    return false;
+  }
 
-    if (_gatheredRanges.size() > 1) {
-        TF_CODING_ERROR("Subtree produced more than 1 range.  List unsorted?");
-        return false;
-    }
+  if (_gatheredRanges.size() > 1) {
+    TF_CODING_ERROR("Subtree produced more than 1 range.  List unsorted?");
+    return false;
+  }
 
-    _Range &range = _gatheredRanges[0];
-    *start = range._start;
-    *end   = range._end;
+  _Range &range = _gatheredRanges[0];
+  *start = range._start;
+  *end = range._end;
 
-    return true;
+  return true;
 }
 
-size_t
-HdPrimGather::_FindLowerBound(const SdfPathVector &paths,
-                               size_t start,
-                               size_t end,
-                               const SdfPath &path) const
+size_t HdPrimGather::_FindLowerBound(const SdfPathVector &paths,
+                                     size_t start,
+                                     size_t end,
+                                     const SdfPath &path) const
 {
-    size_t rangeSize = end - start;
-    while (rangeSize > 0) {
-        size_t step = rangeSize / 2;
-        size_t mid = start + step;
+  size_t rangeSize = end - start;
+  while (rangeSize > 0) {
+    size_t step = rangeSize / 2;
+    size_t mid = start + step;
 
-        const SdfPath &testPath = paths[mid];
+    const SdfPath &testPath = paths[mid];
 
-        if ((testPath <  path)) {
-            start = mid + 1;
-            rangeSize -= step + 1;
-        } else {
-            rangeSize = step;
-        }
+    if ((testPath < path)) {
+      start = mid + 1;
+      rangeSize -= step + 1;
     }
+    else {
+      rangeSize = step;
+    }
+  }
 
-    return start;
+  return start;
 }
 
-size_t
-HdPrimGather::_FindUpperBound(const SdfPathVector &paths,
-                               size_t start,
-                               size_t end,
-                               const SdfPath &path) const
+size_t HdPrimGather::_FindUpperBound(const SdfPathVector &paths,
+                                     size_t start,
+                                     size_t end,
+                                     const SdfPath &path) const
 {
-    // This code looks for the first index that doesn't have
-    // the prefix, so special case if all paths have the prefix
-    if (paths[end].HasPrefix(path)) {
-        return end;
+  // This code looks for the first index that doesn't have
+  // the prefix, so special case if all paths have the prefix
+  if (paths[end].HasPrefix(path)) {
+    return end;
+  }
+
+  size_t rangeSize = end - start;
+  while (rangeSize > 0) {
+    size_t step = rangeSize / 2;
+    size_t mid = start + step;
+
+    const SdfPath &testPath = paths[mid];
+
+    if (testPath.HasPrefix(path)) {
+      start = mid + 1;
+      rangeSize -= step + 1;
     }
-
-    size_t rangeSize = end - start;
-    while (rangeSize > 0) {
-        size_t step = rangeSize / 2;
-        size_t mid = start + step;
-
-        const SdfPath &testPath = paths[mid];
-
-        if (testPath.HasPrefix(path)) {
-            start = mid + 1;
-            rangeSize -= step + 1;
-        } else {
-            rangeSize = step;
-        }
+    else {
+      rangeSize = step;
     }
+  }
 
-    // start represents the first path that doens't have the prefix
-    // but we want the inclusive range, so -1
-    return start - 1;
+  // start represents the first path that doens't have the prefix
+  // but we want the inclusive range, so -1
+  return start - 1;
 }
 
 // Apply the the top item on the filter stack to the range
 // of elements between (start, end) (inclusive).
 // isIncludeRange is the current state of the specified range.
-void
-HdPrimGather::_FilterRange(const SdfPathVector &paths,
-                            size_t start,
-                            size_t end,
-                            bool isIncludeRange)
+void HdPrimGather::_FilterRange(const SdfPathVector &paths,
+                                size_t start,
+                                size_t end,
+                                bool isIncludeRange)
 {
-    // If filter list is empty, we are done processing.
-    if (_filterList.empty()) {
-        if (isIncludeRange) {
-            _gatheredRanges.emplace_back(start, end);
-        }
-        return;
+  // If filter list is empty, we are done processing.
+  if (_filterList.empty()) {
+    if (isIncludeRange) {
+      _gatheredRanges.emplace_back(start, end);
+    }
+    return;
+  }
+
+  // Take copy as we are going to pop_back before we use the filter.
+  const _PathFilter currentFilter = _filterList.back();
+
+  // Check to see if the top of the filter stack is beyond the
+  // end of the range.  If it is, we are done processing this range.
+  if (currentFilter._path > paths[end]) {
+    if (isIncludeRange) {
+      _gatheredRanges.emplace_back(start, end);
+    }
+    return;
+  }
+
+  // Need to process the filter, so remove it.
+  _filterList.pop_back();
+
+  // If the type of filter matches the range, it's a no-op.
+  // Filter the same range again with the next filter.
+
+  bool skipFilter = currentFilter._includePath == isIncludeRange;
+
+  // Is filter before the start of the range?
+  skipFilter |= (paths[start] > currentFilter._path) &&
+                (!paths[start].HasPrefix(currentFilter._path));
+
+  if (skipFilter) {
+    _FilterRange(paths, start, end, isIncludeRange);
+  }
+  else {
+    // We need to split the range.
+
+    size_t lowerBound = _FindLowerBound(paths, start, end, currentFilter._path);
+
+    size_t upperBound = _FindUpperBound(paths, lowerBound, end, currentFilter._path);
+
+    // And filter the new ranges.
+    if (start < lowerBound) {
+      _FilterRange(paths, start, lowerBound - 1, isIncludeRange);
     }
 
-    // Take copy as we are going to pop_back before we use the filter.
-    const _PathFilter currentFilter = _filterList.back();
+    // Note: The type of range is inverted, because this is the
+    // area that hit the filter.
+    _FilterRange(paths, lowerBound, upperBound, !isIncludeRange);
 
-    // Check to see if the top of the filter stack is beyond the
-    // end of the range.  If it is, we are done processing this range.
-    if (currentFilter._path > paths[end]) {
-        if (isIncludeRange) {
-            _gatheredRanges.emplace_back(start, end);
-        }
-        return;
+    if (upperBound < end) {
+      _FilterRange(paths, upperBound + 1, end, isIncludeRange);
     }
-
-    // Need to process the filter, so remove it.
-    _filterList.pop_back();
-
-    // If the type of filter matches the range, it's a no-op.
-    // Filter the same range again with the next filter.
-
-    bool skipFilter = currentFilter._includePath == isIncludeRange;
-
-    // Is filter before the start of the range?
-    skipFilter |= (paths[start] > currentFilter._path) &&
-                  (!paths[start].HasPrefix(currentFilter._path));
-
-    if (skipFilter) {
-        _FilterRange(paths, start, end, isIncludeRange);
-    } else {
-        // We need to split the range.
-
-        size_t lowerBound = _FindLowerBound(paths,
-                                            start,
-                                            end,
-                                            currentFilter._path);
-
-        size_t upperBound = _FindUpperBound(paths,
-                                            lowerBound,
-                                            end,
-                                            currentFilter._path);
-
-        // And filter the new ranges.
-        if (start < lowerBound) {
-            _FilterRange(paths, start, lowerBound - 1, isIncludeRange);
-        }
-
-        // Note: The type of range is inverted, because this is the
-        // area that hit the filter.
-        _FilterRange(paths, lowerBound, upperBound, !isIncludeRange);
-
-        if (upperBound < end) {
-            _FilterRange(paths, upperBound + 1, end, isIncludeRange);
-        }
-    }
+  }
 }
 
-
-void
-HdPrimGather::_SetupFilter(const SdfPathVector &includePaths,
-                           const SdfPathVector &excludePaths)
+void HdPrimGather::_SetupFilter(const SdfPathVector &includePaths,
+                                const SdfPathVector &excludePaths)
 {
-    // Combine include and exclude paths in to the filter stack.
-    _filterList.clear();
-    _filterList.reserve(includePaths.size() + excludePaths.size());
-    for (SdfPathVector::const_iterator incIt  = includePaths.begin();
-                                       incIt != includePaths.end();
-                                     ++incIt) {
-        _filterList.emplace_back(*incIt, true);
-    }
+  // Combine include and exclude paths in to the filter stack.
+  _filterList.clear();
+  _filterList.reserve(includePaths.size() + excludePaths.size());
+  for (SdfPathVector::const_iterator incIt = includePaths.begin(); incIt != includePaths.end();
+       ++incIt)
+  {
+    _filterList.emplace_back(*incIt, true);
+  }
 
-    for (SdfPathVector::const_iterator excIt  = excludePaths.begin();
-                                       excIt != excludePaths.end();
-                                     ++excIt) {
-        _filterList.emplace_back(*excIt, false);
-    }
+  for (SdfPathVector::const_iterator excIt = excludePaths.begin(); excIt != excludePaths.end();
+       ++excIt)
+  {
+    _filterList.emplace_back(*excIt, false);
+  }
 
-    // Note: Inverted sort, so can pop back.
-    std::sort(_filterList.begin(),
-              _filterList.end(),
-              std::greater<_PathFilter>());
+  // Note: Inverted sort, so can pop back.
+  std::sort(_filterList.begin(), _filterList.end(), std::greater<_PathFilter>());
 }
 
-void
-HdPrimGather::_GatherPaths(const SdfPathVector &paths)
+void HdPrimGather::_GatherPaths(const SdfPathVector &paths)
 {
-    // There is an expectation that paths is pre-sorted, but it is an
-    // expensive check so only do it if safe mode is enabled.
-    if (TfDebug::IsEnabled(HD_SAFE_MODE)) {
-        TF_VERIFY(std::is_sorted(paths.begin(), paths.end()));
-        // The side effect of not sorting is incorrect results of the
-        // gather.  That should not lead to a crash, so just continue -
-        // thus producing the same results as when safe mode is off.
-    }
+  // There is an expectation that paths is pre-sorted, but it is an
+  // expensive check so only do it if safe mode is enabled.
+  if (TfDebug::IsEnabled(HD_SAFE_MODE)) {
+    TF_VERIFY(std::is_sorted(paths.begin(), paths.end()));
+    // The side effect of not sorting is incorrect results of the
+    // gather.  That should not lead to a crash, so just continue -
+    // thus producing the same results as when safe mode is off.
+  }
 
-    _gatheredRanges.clear();
+  _gatheredRanges.clear();
 
-    if (paths.empty()) {
-        return;
-    }
+  if (paths.empty()) {
+    return;
+  }
 
-    // Optimize the common case of including everything
-    if ((_filterList.size() == 1) &&
-        (_filterList[0]._includePath == true) &&
-        (_filterList[0]._path == SdfPath::AbsoluteRootPath())) {
-            // End of range is the inclusive.
-            _gatheredRanges.emplace_back(0, paths.size() - 1);
-            return;
-    }
-
-    // Enter recursive function
+  // Optimize the common case of including everything
+  if ((_filterList.size() == 1) && (_filterList[0]._includePath == true) &&
+      (_filterList[0]._path == SdfPath::AbsoluteRootPath()))
+  {
     // End of range is the inclusive.
-    // We start with everything excluded from the results
-    _FilterRange(paths, 0, paths.size() - 1, false);
+    _gatheredRanges.emplace_back(0, paths.size() - 1);
+    return;
+  }
+
+  // Enter recursive function
+  // End of range is the inclusive.
+  // We start with everything excluded from the results
+  _FilterRange(paths, 0, paths.size() - 1, false);
 }
 
 // Outer Loop called for each range in vector
-void
-HdPrimGather::_DoPredicateTestOnRange(const SdfPathVector &paths,
-                                      const _Range        &range,
-                                      FilterPredicateFn    predicateFn,
-                                      void                *predicateParam)
+void HdPrimGather::_DoPredicateTestOnRange(const SdfPathVector &paths,
+                                           const _Range &range,
+                                           FilterPredicateFn predicateFn,
+                                           void *predicateParam)
 {
-    TRACE_FUNCTION();
+  TRACE_FUNCTION();
 
-    // Range _end is inclusive, but blocked_range is exclusive.
-    _ConcurrentRange concurrentRange(range._start,
-                                     range._end + 1,
-                                     MIN_GRAIN_SIZE);
+  // Range _end is inclusive, but blocked_range is exclusive.
+  _ConcurrentRange concurrentRange(range._start, range._end + 1, MIN_GRAIN_SIZE);
 
+  if (concurrentRange.size() > MIN_ENTRIES_FOR_PARALLEL) {
 
-    if (concurrentRange.size() > MIN_ENTRIES_FOR_PARALLEL) {
-
-        tbb::parallel_for(concurrentRange,
-                          std::bind(&HdPrimGather::_DoPredicateTestOnPrims,
-                                    this,
-                                    std::cref(paths),
-                                    std::placeholders::_1,
-                                    predicateFn,
-                                    predicateParam));
-    } else {
-        _DoPredicateTestOnPrims(paths,
-                                concurrentRange,
+    tbb::parallel_for(concurrentRange,
+                      std::bind(&HdPrimGather::_DoPredicateTestOnPrims,
+                                this,
+                                std::cref(paths),
+                                std::placeholders::_1,
                                 predicateFn,
-                                predicateParam);
-    }
+                                predicateParam));
+  }
+  else {
+    _DoPredicateTestOnPrims(paths, concurrentRange, predicateFn, predicateParam);
+  }
 }
 
 // Inner Loop over each prim in a sub range of _Range.
-void
-HdPrimGather::_DoPredicateTestOnPrims(const SdfPathVector &paths,
-                               _ConcurrentRange    &range,
-                               FilterPredicateFn    predicateFn,
-                               void                *predicateParam)
+void HdPrimGather::_DoPredicateTestOnPrims(const SdfPathVector &paths,
+                                           _ConcurrentRange &range,
+                                           FilterPredicateFn predicateFn,
+                                           void *predicateParam)
 {
-    TRACE_FUNCTION();
+  TRACE_FUNCTION();
 
-    size_t begin = range.begin();
-    size_t end   = range.end() - 1;  // convert to inclusive.
+  size_t begin = range.begin();
+  size_t end = range.end() - 1;  // convert to inclusive.
 
-    _RangeArray &resultRanges = _resultRanges.local();
+  _RangeArray &resultRanges = _resultRanges.local();
 
+  size_t currentStart = begin;
+  for (size_t pathIdx = begin; pathIdx <= end; ++pathIdx) {
+    // Test to see if path at index needs to split
+    if (!predicateFn(paths[pathIdx], predicateParam)) {
 
-    size_t currentStart = begin;
-    for (size_t pathIdx = begin; pathIdx <= end; ++pathIdx) {
-        // Test to see if path at index needs to split
-        if (!predicateFn(paths[pathIdx], predicateParam)) {
+      // Add all paths up to the path before this one
+      if (currentStart < pathIdx) {
+        resultRanges.emplace_back(currentStart, pathIdx - 1);
+      }
 
-            // Add all paths up to the path before this one
-            if (currentStart < pathIdx) {
-                resultRanges.emplace_back(currentStart, pathIdx - 1);
-            }
-
-            currentStart = pathIdx + 1;
-        }
+      currentStart = pathIdx + 1;
     }
+  }
 
-    // Add final range
-    if (currentStart <= end) {
-        resultRanges.emplace_back(currentStart, end);
-    }
+  // Add final range
+  if (currentStart <= end) {
+    resultRanges.emplace_back(currentStart, end);
+  }
 }
 
-template <class Iterator>
-//static
-void
-HdPrimGather::_WriteResults(const SdfPathVector &paths,
-                            const Iterator &rangesBegin,
-                            const Iterator &rangesEnd,
-                            SdfPathVector *results)
+template<class Iterator>
+// static
+void HdPrimGather::_WriteResults(const SdfPathVector &paths,
+                                 const Iterator &rangesBegin,
+                                 const Iterator &rangesEnd,
+                                 SdfPathVector *results)
 {
-    results->clear();
+  results->clear();
 
-    size_t numPaths = 0;
-    for (Iterator it  = rangesBegin; it != rangesEnd; ++it) {
-        numPaths += (it->_end - it->_start) + 1; // +1 for inclusive range.
-    }
+  size_t numPaths = 0;
+  for (Iterator it = rangesBegin; it != rangesEnd; ++it) {
+    numPaths += (it->_end - it->_start) + 1;  // +1 for inclusive range.
+  }
 
-    results->reserve(numPaths);
+  results->reserve(numPaths);
 
-    for (Iterator it  = rangesBegin; it != rangesEnd; ++it) {
+  for (Iterator it = rangesBegin; it != rangesEnd; ++it) {
 
-        SdfPathVector::const_iterator rangeStartIt = paths.begin();
-        SdfPathVector::const_iterator rangeEndIt   = paths.begin();
+    SdfPathVector::const_iterator rangeStartIt = paths.begin();
+    SdfPathVector::const_iterator rangeEndIt = paths.begin();
 
-        rangeStartIt += it->_start;
-        rangeEndIt   += it->_end + 1; // End is exclusive, so +1
+    rangeStartIt += it->_start;
+    rangeEndIt += it->_end + 1;  // End is exclusive, so +1
 
-        results->insert(results->end(), rangeStartIt, rangeEndIt);
-    }
+    results->insert(results->end(), rangeStartIt, rangeEndIt);
+  }
 }
 
-
-void
-HdPrimGather::_FilterSubTree(const SdfPathVector &paths,
-                             const SdfPath       &rootPath)
+void HdPrimGather::_FilterSubTree(const SdfPathVector &paths, const SdfPath &rootPath)
 {
-    if (paths.empty()) {
-        return;
-    }
+  if (paths.empty()) {
+    return;
+  }
 
-    // Setup simple filter
-    _filterList.clear();
-    _filterList.reserve(1);
-    _filterList.emplace_back(rootPath, true);
+  // Setup simple filter
+  _filterList.clear();
+  _filterList.reserve(1);
+  _filterList.emplace_back(rootPath, true);
 
-    // Enter filter function
-    // End of range is the inclusive.
-    // We start with everything excluded from the results
-    _FilterRange(paths, 0, paths.size() - 1, false);
+  // Enter filter function
+  // End of range is the inclusive.
+  // We start with everything excluded from the results
+  _FilterRange(paths, 0, paths.size() - 1, false);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

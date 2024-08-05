@@ -20,10 +20,9 @@ extern "C" {
  * custom installs, and is a static string, do not free the returned
  * pointer.
  */
-EXR_EXPORT void
-exr_get_library_version (int* maj, int* min, int* patch, const char** extra);
+EXR_EXPORT void exr_get_library_version(int *maj, int *min, int *patch, const char **extra);
 
-/** 
+/**
  * @defgroup SafetyChecks Controls for internal safety checks
  * @{
  */
@@ -58,13 +57,13 @@ exr_get_library_version (int* maj, int* min, int* patch, const char** extra);
  *
  * This function does not fail.
  */
-EXR_EXPORT void exr_set_default_maximum_image_size (int w, int h);
+EXR_EXPORT void exr_set_default_maximum_image_size(int w, int h);
 
 /** @brief Retrieve the global default maximum image size.
  *
  * This function does not fail.
  */
-EXR_EXPORT void exr_get_default_maximum_image_size (int* w, int* h);
+EXR_EXPORT void exr_get_default_maximum_image_size(int *w, int *h);
 
 /** @brief Limit the size of an image tile allowed to be parsed or
  * created by the library.
@@ -99,13 +98,13 @@ EXR_EXPORT void exr_get_default_maximum_image_size (int* w, int* h);
  *
  * This function does not fail.
  */
-EXR_EXPORT void exr_set_default_maximum_tile_size (int w, int h);
+EXR_EXPORT void exr_set_default_maximum_tile_size(int w, int h);
 
 /** @brief Retrieve the global maximum tile size.
  *
  * This function does not fail.
  */
-EXR_EXPORT void exr_get_default_maximum_tile_size (int* w, int* h);
+EXR_EXPORT void exr_get_default_maximum_tile_size(int *w, int *h);
 
 /** @} */
 
@@ -119,22 +118,22 @@ EXR_EXPORT void exr_get_default_maximum_tile_size (int* w, int* h);
  * This value may be controlled separately on each part, but this
  * global control determines the initial value.
  */
-EXR_EXPORT void exr_set_default_zip_compression_level (int l);
+EXR_EXPORT void exr_set_default_zip_compression_level(int l);
 
 /** @brief Retrieve the global default zip compression value
  */
-EXR_EXPORT void exr_get_default_zip_compression_level (int* l);
+EXR_EXPORT void exr_get_default_zip_compression_level(int *l);
 
 /** @brief Assigns a default DWA compression quality level.
  *
  * This value may be controlled separately on each part, but this
  * global control determines the initial value.
  */
-EXR_EXPORT void exr_set_default_dwa_compression_quality (float q);
+EXR_EXPORT void exr_set_default_dwa_compression_quality(float q);
 
 /** @brief Retrieve the global default dwa compression quality
  */
-EXR_EXPORT void exr_get_default_dwa_compression_quality (float* q);
+EXR_EXPORT void exr_get_default_dwa_compression_quality(float *q);
 
 /** @} */
 
@@ -158,7 +157,7 @@ EXR_EXPORT void exr_get_default_dwa_compression_quality (float* q);
  * If one is provided, both should be provided.
  * @sa exr_memory_free_func_t
  */
-typedef void* (*exr_memory_allocation_func_t) (size_t bytes);
+typedef void *(*exr_memory_allocation_func_t)(size_t bytes);
 
 /** @brief Function pointer used to hold a free-like routine.
  *
@@ -174,7 +173,7 @@ typedef void* (*exr_memory_allocation_func_t) (size_t bytes);
  * If providing one, probably need to provide both routines.
  * @sa exr_memory_allocation_func_t
  */
-typedef void (*exr_memory_free_func_t) (void* ptr);
+typedef void (*exr_memory_free_func_t)(void *ptr);
 
 /** @brief Allow the user to override default allocator used internal
  * allocations necessary for files, attributes, and other temporary
@@ -189,8 +188,8 @@ typedef void (*exr_memory_free_func_t) (void* ptr);
  *
  * This function does not fail.
  */
-EXR_EXPORT void exr_set_default_memory_routines (
-    exr_memory_allocation_func_t alloc_func, exr_memory_free_func_t free_func);
+EXR_EXPORT void exr_set_default_memory_routines(exr_memory_allocation_func_t alloc_func,
+                                                exr_memory_free_func_t free_func);
 
 /** @} */
 

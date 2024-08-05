@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_METAL_INDIRECT_COMMAND_ENCODER_H
 #define PXR_IMAGING_HGI_METAL_INDIRECT_COMMAND_ENCODER_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/indirectCommandEncoder.h"
 #include "HgiMetal/api.h"
 #include "HgiMetal/stepFunctions.h"
+#include <pxr/pxrns.h>
 
 #include <Metal/Metal.hpp>
 
@@ -48,22 +48,20 @@ class HgiMetalVertexBufferBindings;
 ///
 /// Metal implementation of Indirect Command Buffers.
 ///
-class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder
-{
-public:
+class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
+ public:
   HGIMETAL_API
   HgiMetalIndirectCommandEncoder(Hgi *hgi);
 
   HGIMETAL_API
-  HgiIndirectCommandsUniquePtr EncodeDraw(
-      HgiComputeCmds *computeCmds,
-      HgiGraphicsPipelineHandle const &pipeline,
-      HgiResourceBindingsHandle const &resourceBindings,
-      HgiVertexBufferBindingVector const &vertexBindings,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride) override;
+  HgiIndirectCommandsUniquePtr EncodeDraw(HgiComputeCmds *computeCmds,
+                                          HgiGraphicsPipelineHandle const &pipeline,
+                                          HgiResourceBindingsHandle const &resourceBindings,
+                                          HgiVertexBufferBindingVector const &vertexBindings,
+                                          HgiBufferHandle const &drawParameterBuffer,
+                                          uint32_t drawBufferByteOffset,
+                                          uint32_t drawCount,
+                                          uint32_t stride) override;
 
   HGIMETAL_API
   HgiIndirectCommandsUniquePtr EncodeDrawIndexed(
@@ -79,36 +77,31 @@ public:
       uint32_t patchBaseVertexByteOffset) override;
 
   HGIMETAL_API
-  void ExecuteDraw(
-      HgiGraphicsCmds *gfxCmds,
-      HgiIndirectCommands const *commands) override;
+  void ExecuteDraw(HgiGraphicsCmds *gfxCmds, HgiIndirectCommands const *commands) override;
 
-private:
+ private:
   HgiMetalIndirectCommandEncoder &operator=(const HgiMetalIndirectCommandEncoder &) = delete;
   HgiMetalIndirectCommandEncoder(const HgiMetalIndirectCommandEncoder &) = delete;
 
-  struct FunctionState
-  {
+  struct FunctionState {
     MTL::Function *function;
     MTL::ComputePipelineState *pipelineState;
     MTL::ArgumentEncoder *argumentEncoder;
   };
 
   HGIMETAL_API
-  FunctionState _GetFunction(HgiGraphicsPipelineDesc const &pipelineDesc,
-                             bool isIndexed);
+  FunctionState _GetFunction(HgiGraphicsPipelineDesc const &pipelineDesc, bool isIndexed);
 
   HGIMETAL_API
-  HgiIndirectCommandsUniquePtr _EncodeDraw(
-      HgiComputeCmds *computeCmds,
-      HgiGraphicsPipelineHandle const &pipeline,
-      HgiResourceBindingsHandle const &resourceBindings,
-      HgiVertexBufferBindingVector const &bindings,
-      HgiBufferHandle const &indexBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride,
-      uint32_t patchBaseVertexByteOffset);
+  HgiIndirectCommandsUniquePtr _EncodeDraw(HgiComputeCmds *computeCmds,
+                                           HgiGraphicsPipelineHandle const &pipeline,
+                                           HgiResourceBindingsHandle const &resourceBindings,
+                                           HgiVertexBufferBindingVector const &bindings,
+                                           HgiBufferHandle const &indexBuffer,
+                                           uint32_t drawBufferByteOffset,
+                                           uint32_t drawCount,
+                                           uint32_t stride,
+                                           uint32_t patchBaseVertexByteOffset);
 
   HGIMETAL_API
   MTL::IndirectCommandBuffer *_AllocateCommandBuffer(uint32_t drawCount);

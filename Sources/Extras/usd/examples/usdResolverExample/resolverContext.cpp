@@ -57,8 +57,7 @@ size_t hash_value(const UsdResolverExampleResolverContext &ctx)
   return TfHash()(ctx._mappingFile);
 }
 
-const std::string &
-UsdResolverExampleResolverContext::GetMappingFile() const
+const std::string &UsdResolverExampleResolverContext::GetMappingFile() const
 {
   return _mappingFile;
 }

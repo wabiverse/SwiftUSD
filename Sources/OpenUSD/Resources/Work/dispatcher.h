@@ -26,9 +26,9 @@
 
 /// \file work/dispatcher.h
 
-#include <pxr/pxrns.h>
 #include "Work/api.h"
 #include "Work/threadLimits.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/errorMark.h"
 #include "Tf/errorTransport.h"
@@ -36,9 +36,9 @@
 #include <OneTBB/tbb/concurrent_vector.h>
 #include <OneTBB/tbb/task.h>
 #if !WITH_TBB_LEGACY
-#include <OneTBB/tbb/global_control.h>
-#include <OneTBB/tbb/task_group.h>
-#include <OneTBB/tbb/task_scheduler_observer.h>
+#  include <OneTBB/tbb/global_control.h>
+#  include <OneTBB/tbb/task_group.h>
+#  include <OneTBB/tbb/task_scheduler_observer.h>
 #endif /* WITH_TBB_LEGACY */
 
 #include <functional>
@@ -49,7 +49,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 #if !WITH_TBB_LEGACY
 class WorkDispatcher {
-public:
+ public:
   /// Construct a new dispatcher.
   WORK_API WorkDispatcher();
 
@@ -59,7 +59,7 @@ public:
   WorkDispatcher(WorkDispatcher const &) = delete;
   WorkDispatcher &operator=(WorkDispatcher const &) = delete;
 
-#ifdef doxygen
+#  ifdef doxygen
 
   /// Add work for the dispatcher to run.
   ///
@@ -71,23 +71,24 @@ public:
   /// is limited to 1.  The added work may be not yet started, may be started
   /// but not completed, or may be completed upon return.  No guarantee is
   /// made.
-  template <class Callable, class A1, class A2, ... class AN>
+  template<class Callable, class A1, class A2, ... class AN>
   void Run(Callable &&c, A1 &&a1, A2 &&a2, ... AN &&aN);
 
-#else // doxygen
+#  else  // doxygen
 
-  template <class Callable> inline void Run(Callable &&c) {
-    _tg.run(_InvokerTask<typename std::remove_reference<Callable>::type>(
-        std::forward<Callable>(c), &_errors));
+  template<class Callable> inline void Run(Callable &&c)
+  {
+    _tg.run(_InvokerTask<typename std::remove_reference<Callable>::type>(std::forward<Callable>(c),
+                                                                         &_errors));
   }
 
-  template <class Callable, class A0, class... Args>
-  inline void Run(Callable &&c, A0 &&a0, Args &&...args) {
-    Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0),
-                  std::forward<Args>(args)...));
+  template<class Callable, class A0, class... Args>
+  inline void Run(Callable &&c, A0 &&a0, Args &&...args)
+  {
+    Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0), std::forward<Args>(args)...));
   }
 
-#endif // doxygen
+#  endif  // doxygen
 
   /// Block until the work started by Run() completes.
   WORK_API void Wait();
@@ -104,35 +105,33 @@ public:
   /// pending tasks to complete.
   WORK_API void Cancel();
 
-private:
+ private:
   typedef tbb::concurrent_vector<TfErrorTransport> _ErrorTransports;
 
   // Function invoker helper that wraps the invocation with an ErrorMark so we
   // can transmit errors that occur back to the thread that Wait() s for tasks
   // to complete.
-  template <class Fn> struct _InvokerTask {
-    explicit _InvokerTask(Fn &&fn, _ErrorTransports *err)
-        : _fn(std::move(fn)), _errors(err) {}
+  template<class Fn> struct _InvokerTask {
+    explicit _InvokerTask(Fn &&fn, _ErrorTransports *err) : _fn(std::move(fn)), _errors(err) {}
 
-    explicit _InvokerTask(Fn const &fn, _ErrorTransports *err)
-        : _fn(fn), _errors(err) {}
+    explicit _InvokerTask(Fn const &fn, _ErrorTransports *err) : _fn(fn), _errors(err) {}
 
-    void operator()() const {
+    void operator()() const
+    {
       TfErrorMark m;
       _fn();
       if (!m.IsClean())
         WorkDispatcher::_TransportErrors(m, _errors);
     }
 
-  private:
+   private:
     Fn _fn;
     _ErrorTransports *_errors;
   };
 
   // Helper function that removes errors from \p m and stores them in a new
   // entry in \p errors.
-  WORK_API static void _TransportErrors(const TfErrorMark &m,
-                                        _ErrorTransports *errors);
+  WORK_API static void _TransportErrors(const TfErrorMark &m, _ErrorTransports *errors);
 
   // Task group.
   tbb::task_group _tg;
@@ -177,7 +176,7 @@ private:
 /// that task could never complete.
 ///
 class WorkDispatcher {
-public:
+ public:
   /// Construct a new dispatcher.
   WORK_API WorkDispatcher();
 
@@ -187,7 +186,7 @@ public:
   WorkDispatcher(WorkDispatcher const &) = delete;
   WorkDispatcher &operator=(WorkDispatcher const &) = delete;
 
-#ifdef doxygen
+#  ifdef doxygen
 
   /// Add work for the dispatcher to run.
   ///
@@ -199,22 +198,23 @@ public:
   /// is limited to 1.  The added work may be not yet started, may be started
   /// but not completed, or may be completed upon return.  No guarantee is
   /// made.
-  template <class Callable, class A1, class A2, ... class AN>
+  template<class Callable, class A1, class A2, ... class AN>
   void Run(Callable &&c, A1 &&a1, A2 &&a2, ... AN &&aN);
 
-#else // doxygen
+#  else  // doxygen
 
-  template <class Callable> inline void Run(Callable &&c) {
+  template<class Callable> inline void Run(Callable &&c)
+  {
     _rootTask->spawn(_MakeInvokerTask(std::forward<Callable>(c)));
   }
 
-  template <class Callable, class A0, class... Args>
-  inline void Run(Callable &&c, A0 &&a0, Args &&...args) {
-    Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0),
-                  std::forward<Args>(args)...));
+  template<class Callable, class A0, class... Args>
+  inline void Run(Callable &&c, A0 &&a0, Args &&...args)
+  {
+    Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0), std::forward<Args>(args)...));
   }
 
-#endif // doxygen
+#  endif  // doxygen
 
   /// Block until the work started by Run() completes.
   WORK_API void Wait();
@@ -231,20 +231,19 @@ public:
   /// pending tasks to complete.
   WORK_API void Cancel();
 
-private:
+ private:
   typedef tbb::concurrent_vector<TfErrorTransport> _ErrorTransports;
 
   // Function invoker helper that wraps the invocation with an ErrorMark so we
   // can transmit errors that occur back to the thread that Wait() s for tasks
   // to complete.
-  template <class Fn> struct _InvokerTask : public tbb::task {
-    explicit _InvokerTask(Fn &&fn, _ErrorTransports *err)
-        : _fn(std::move(fn)), _errors(err) {}
+  template<class Fn> struct _InvokerTask : public tbb::task {
+    explicit _InvokerTask(Fn &&fn, _ErrorTransports *err) : _fn(std::move(fn)), _errors(err) {}
 
-    explicit _InvokerTask(Fn const &fn, _ErrorTransports *err)
-        : _fn(fn), _errors(err) {}
+    explicit _InvokerTask(Fn const &fn, _ErrorTransports *err) : _fn(fn), _errors(err) {}
 
-    virtual tbb::task *execute() {
+    virtual tbb::task *execute()
+    {
       TfErrorMark m;
       _fn();
       if (!m.IsClean())
@@ -252,24 +251,22 @@ private:
       return NULL;
     }
 
-  private:
+   private:
     Fn _fn;
     _ErrorTransports *_errors;
   };
 
   // Make an _InvokerTask instance, letting the function template deduce Fn.
-  template <class Fn>
-  _InvokerTask<typename std::remove_reference<Fn>::type> &
-  _MakeInvokerTask(Fn &&fn) {
+  template<class Fn>
+  _InvokerTask<typename std::remove_reference<Fn>::type> &_MakeInvokerTask(Fn &&fn)
+  {
     return *new (_rootTask->allocate_additional_child_of(*_rootTask))
-        _InvokerTask<typename std::remove_reference<Fn>::type>(
-            std::forward<Fn>(fn), &_errors);
+        _InvokerTask<typename std::remove_reference<Fn>::type>(std::forward<Fn>(fn), &_errors);
   }
 
   // Helper function that removes errors from \p m and stores them in a new
   // entry in \p errors.
-  WORK_API static void _TransportErrors(const TfErrorMark &m,
-                                        _ErrorTransports *errors);
+  WORK_API static void _TransportErrors(const TfErrorMark &m, _ErrorTransports *errors);
 
   // Task group context and associated root task that allows us to cancel
   // tasks invoked directly by this dispatcher.
@@ -283,9 +280,9 @@ private:
   // Concurrent calls to Wait() have to serialize certain cleanup operations.
   std::atomic_flag _waitCleanupFlag;
 };
-#endif /* !WITH_TBB_LEGACY */
+#endif    /* !WITH_TBB_LEGACY */
 ///////////////////////////////////////////////////////////////////////////////
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_DISPATCHER_H
+#endif  // PXR_BASE_WORK_DISPATCHER_H

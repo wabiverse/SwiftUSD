@@ -33,280 +33,224 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdExtComputationSchemaTokens,
-    HDEXTCOMPUTATION_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdExtComputationSchemaTokens, HDEXTCOMPUTATION_SCHEMA_TOKENS);
 
-
-
-HdContainerDataSourceHandle
-HdExtComputationSchema::GetInputValues()
+HdContainerDataSourceHandle HdExtComputationSchema::GetInputValues()
 {
-    return _GetTypedDataSource<HdContainerDataSource>(
-        HdExtComputationSchemaTokens->inputValues);
+  return _GetTypedDataSource<HdContainerDataSource>(HdExtComputationSchemaTokens->inputValues);
 }
 
-HdVectorDataSourceHandle
-HdExtComputationSchema::GetInputComputations()
+HdVectorDataSourceHandle HdExtComputationSchema::GetInputComputations()
 {
-    return _GetTypedDataSource<HdVectorDataSource>(
-        HdExtComputationSchemaTokens->inputComputations);
+  return _GetTypedDataSource<HdVectorDataSource>(HdExtComputationSchemaTokens->inputComputations);
 }
 
-HdVectorDataSourceHandle
-HdExtComputationSchema::GetOutputs()
+HdVectorDataSourceHandle HdExtComputationSchema::GetOutputs()
 {
-    return _GetTypedDataSource<HdVectorDataSource>(
-        HdExtComputationSchemaTokens->outputs);
+  return _GetTypedDataSource<HdVectorDataSource>(HdExtComputationSchemaTokens->outputs);
 }
 
-HdStringDataSourceHandle
-HdExtComputationSchema::GetGlslKernel()
+HdStringDataSourceHandle HdExtComputationSchema::GetGlslKernel()
 {
-    return _GetTypedDataSource<HdStringDataSource>(
-        HdExtComputationSchemaTokens->glslKernel);
+  return _GetTypedDataSource<HdStringDataSource>(HdExtComputationSchemaTokens->glslKernel);
 }
 
-HdDataSourceBaseHandle
-HdExtComputationSchema::GetCpuCallback()
+HdDataSourceBaseHandle HdExtComputationSchema::GetCpuCallback()
 {
-    return _GetTypedDataSource<HdDataSourceBase>(
-        HdExtComputationSchemaTokens->cpuCallback);
+  return _GetTypedDataSource<HdDataSourceBase>(HdExtComputationSchemaTokens->cpuCallback);
 }
 
-HdSizetDataSourceHandle
-HdExtComputationSchema::GetDispatchCount()
+HdSizetDataSourceHandle HdExtComputationSchema::GetDispatchCount()
 {
-    return _GetTypedDataSource<HdSizetDataSource>(
-        HdExtComputationSchemaTokens->dispatchCount);
+  return _GetTypedDataSource<HdSizetDataSource>(HdExtComputationSchemaTokens->dispatchCount);
 }
 
-HdSizetDataSourceHandle
-HdExtComputationSchema::GetElementCount()
+HdSizetDataSourceHandle HdExtComputationSchema::GetElementCount()
 {
-    return _GetTypedDataSource<HdSizetDataSource>(
-        HdExtComputationSchemaTokens->elementCount);
+  return _GetTypedDataSource<HdSizetDataSource>(HdExtComputationSchemaTokens->elementCount);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdExtComputationSchema::BuildRetained(
-        const HdContainerDataSourceHandle &inputValues,
-        const HdVectorDataSourceHandle &inputComputations,
-        const HdVectorDataSourceHandle &outputs,
-        const HdStringDataSourceHandle &glslKernel,
-        const HdDataSourceBaseHandle &cpuCallback,
-        const HdSizetDataSourceHandle &dispatchCount,
-        const HdSizetDataSourceHandle &elementCount
-)
-{
-    TfToken names[7];
-    HdDataSourceBaseHandle values[7];
-
-    size_t count = 0;
-    if (inputValues) {
-        names[count] = HdExtComputationSchemaTokens->inputValues;
-        values[count++] = inputValues;
-    }
-
-    if (inputComputations) {
-        names[count] = HdExtComputationSchemaTokens->inputComputations;
-        values[count++] = inputComputations;
-    }
-
-    if (outputs) {
-        names[count] = HdExtComputationSchemaTokens->outputs;
-        values[count++] = outputs;
-    }
-
-    if (glslKernel) {
-        names[count] = HdExtComputationSchemaTokens->glslKernel;
-        values[count++] = glslKernel;
-    }
-
-    if (cpuCallback) {
-        names[count] = HdExtComputationSchemaTokens->cpuCallback;
-        values[count++] = cpuCallback;
-    }
-
-    if (dispatchCount) {
-        names[count] = HdExtComputationSchemaTokens->dispatchCount;
-        values[count++] = dispatchCount;
-    }
-
-    if (elementCount) {
-        names[count] = HdExtComputationSchemaTokens->elementCount;
-        values[count++] = elementCount;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdExtComputationSchema
-HdExtComputationSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdExtComputationSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdExtComputationSchemaTokens->extComputation))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdExtComputationSchema::GetSchemaToken()
-{
-    return HdExtComputationSchemaTokens->extComputation;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetInputValuesLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->inputValues
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetInputComputationsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->inputComputations
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetOutputsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->outputs
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetDispatchCountLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->dispatchCount
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetElementCountLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->elementCount
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdExtComputationSchema::GetGlslKernelLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdExtComputationSchemaTokens->extComputation,
-        HdExtComputationSchemaTokens->glslKernel
-    );
-    return locator;
-}
-
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetInputValues(
-    const HdContainerDataSourceHandle &inputValues)
-{
-    _inputValues = inputValues;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetInputComputations(
-    const HdVectorDataSourceHandle &inputComputations)
-{
-    _inputComputations = inputComputations;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetOutputs(
-    const HdVectorDataSourceHandle &outputs)
-{
-    _outputs = outputs;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetGlslKernel(
-    const HdStringDataSourceHandle &glslKernel)
-{
-    _glslKernel = glslKernel;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetCpuCallback(
-    const HdDataSourceBaseHandle &cpuCallback)
-{
-    _cpuCallback = cpuCallback;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetDispatchCount(
-    const HdSizetDataSourceHandle &dispatchCount)
-{
-    _dispatchCount = dispatchCount;
-    return *this;
-}
-
-HdExtComputationSchema::Builder &
-HdExtComputationSchema::Builder::SetElementCount(
+HdContainerDataSourceHandle HdExtComputationSchema::BuildRetained(
+    const HdContainerDataSourceHandle &inputValues,
+    const HdVectorDataSourceHandle &inputComputations,
+    const HdVectorDataSourceHandle &outputs,
+    const HdStringDataSourceHandle &glslKernel,
+    const HdDataSourceBaseHandle &cpuCallback,
+    const HdSizetDataSourceHandle &dispatchCount,
     const HdSizetDataSourceHandle &elementCount)
 {
-    _elementCount = elementCount;
-    return *this;
+  TfToken names[7];
+  HdDataSourceBaseHandle values[7];
+
+  size_t count = 0;
+  if (inputValues) {
+    names[count] = HdExtComputationSchemaTokens->inputValues;
+    values[count++] = inputValues;
+  }
+
+  if (inputComputations) {
+    names[count] = HdExtComputationSchemaTokens->inputComputations;
+    values[count++] = inputComputations;
+  }
+
+  if (outputs) {
+    names[count] = HdExtComputationSchemaTokens->outputs;
+    values[count++] = outputs;
+  }
+
+  if (glslKernel) {
+    names[count] = HdExtComputationSchemaTokens->glslKernel;
+    values[count++] = glslKernel;
+  }
+
+  if (cpuCallback) {
+    names[count] = HdExtComputationSchemaTokens->cpuCallback;
+    values[count++] = cpuCallback;
+  }
+
+  if (dispatchCount) {
+    names[count] = HdExtComputationSchemaTokens->dispatchCount;
+    values[count++] = dispatchCount;
+  }
+
+  if (elementCount) {
+    names[count] = HdExtComputationSchemaTokens->elementCount;
+    values[count++] = elementCount;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdExtComputationSchema::Builder::Build()
+/*static*/
+HdExtComputationSchema HdExtComputationSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdExtComputationSchema::BuildRetained(
-        _inputValues,
-        _inputComputations,
-        _outputs,
-        _glslKernel,
-        _cpuCallback,
-        _dispatchCount,
-        _elementCount
-    );
+  return HdExtComputationSchema(fromParentContainer ?
+                                    HdContainerDataSource::Cast(fromParentContainer->Get(
+                                        HdExtComputationSchemaTokens->extComputation)) :
+                                    nullptr);
 }
 
+/*static*/
+const TfToken &HdExtComputationSchema::GetSchemaToken()
+{
+  return HdExtComputationSchemaTokens->extComputation;
+}
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetInputValuesLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->inputValues);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetInputComputationsLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->inputComputations);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetOutputsLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->outputs);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetDispatchCountLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->dispatchCount);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetElementCountLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->elementCount);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdExtComputationSchema::GetGlslKernelLocator()
+{
+  static const HdDataSourceLocator locator(HdExtComputationSchemaTokens->extComputation,
+                                           HdExtComputationSchemaTokens->glslKernel);
+  return locator;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetInputValues(
+    const HdContainerDataSourceHandle &inputValues)
+{
+  _inputValues = inputValues;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetInputComputations(
+    const HdVectorDataSourceHandle &inputComputations)
+{
+  _inputComputations = inputComputations;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetOutputs(
+    const HdVectorDataSourceHandle &outputs)
+{
+  _outputs = outputs;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetGlslKernel(
+    const HdStringDataSourceHandle &glslKernel)
+{
+  _glslKernel = glslKernel;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetCpuCallback(
+    const HdDataSourceBaseHandle &cpuCallback)
+{
+  _cpuCallback = cpuCallback;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetDispatchCount(
+    const HdSizetDataSourceHandle &dispatchCount)
+{
+  _dispatchCount = dispatchCount;
+  return *this;
+}
+
+HdExtComputationSchema::Builder &HdExtComputationSchema::Builder::SetElementCount(
+    const HdSizetDataSourceHandle &elementCount)
+{
+  _elementCount = elementCount;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdExtComputationSchema::Builder::Build()
+{
+  return HdExtComputationSchema::BuildRetained(_inputValues,
+                                               _inputComputations,
+                                               _outputs,
+                                               _glslKernel,
+                                               _cpuCallback,
+                                               _dispatchCount,
+                                               _elementCount);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -42,14 +42,16 @@ using namespace boost::python;
 struct _PythonClass : def_visitor<_PythonClass> {
   friend class def_visitor_access;
 
-private:
-  template <class CLS, class T> void _Visit(CLS &c, T *) const {
+ private:
+  template<class CLS, class T> void _Visit(CLS &c, T *) const
+  {
     if (TfType t = TfType::Find<T>())
       t.DefinePythonClass(c);
   }
 
-public:
-  template <class CLS> void visit(CLS &c) const {
+ public:
+  template<class CLS> void visit(CLS &c) const
+  {
     // Use function template resolution to wrap the type
     // appropriately depending on whether it is a polymorphic
     // wrapper<> type.
@@ -58,7 +60,7 @@ public:
   }
 };
 
-} // namespace TfType_WrapHelpers
+}  // namespace TfType_WrapHelpers
 
 /// \struct TfTypePythonClass
 /// A boost.python visitor that associates the Python class object created by
@@ -75,9 +77,8 @@ struct TfTypePythonClass : public TfType_WrapHelpers::_PythonClass {};
 /// A helper for wrapping C++ types.
 /// This method defines a TfType for the given python class object, and also
 /// recursively defines TfTypes for all the Python bases if necessary.
-TF_API TfType
-TfType_DefinePythonTypeAndBases(const boost::python::object &classObj);
+TF_API TfType TfType_DefinePythonTypeAndBases(const boost::python::object &classObj);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_WRAP_TYPE_HELPERS_H
+#endif  // PXR_BASE_TF_WRAP_TYPE_HELPERS_H

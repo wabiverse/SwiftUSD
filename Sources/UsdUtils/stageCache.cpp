@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdUtils/stageCache.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/layer.h"
 #include "Sdf/primSpec.h"
@@ -33,26 +33,23 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
+namespace {
+
+// Cache of string keys (currently representing variant selections) to session
+// layers.
+typedef TfHashMap<std::string, SdfLayerRefPtr, TfHash> _SessionLayerMap;
+
+_SessionLayerMap &GetSessionLayerMap()
 {
-
-  // Cache of string keys (currently representing variant selections) to session
-  // layers.
-  typedef TfHashMap<std::string, SdfLayerRefPtr, TfHash> _SessionLayerMap;
-
-  _SessionLayerMap &
-  GetSessionLayerMap()
-  {
-    // Heap-allocate and deliberately leak this static cache to avoid
-    // problems with static destruction order.
-    static _SessionLayerMap *sessionLayerMap = new _SessionLayerMap();
-    return *sessionLayerMap;
-  }
-
+  // Heap-allocate and deliberately leak this static cache to avoid
+  // problems with static destruction order.
+  static _SessionLayerMap *sessionLayerMap = new _SessionLayerMap();
+  return *sessionLayerMap;
 }
 
-UsdStageCache &
-UsdUtilsStageCache::Get()
+}  // namespace
+
+UsdStageCache &UsdUtilsStageCache::Get()
 {
   // Heap-allocate and deliberately leak this static cache to avoid
   // problems with static destruction order.
@@ -60,8 +57,7 @@ UsdUtilsStageCache::Get()
   return *theCache;
 }
 
-SdfLayerRefPtr
-UsdUtilsStageCache::GetSessionLayerForVariantSelections(
+SdfLayerRefPtr UsdUtilsStageCache::GetSessionLayerForVariantSelections(
     const TfToken &modelName,
     const std::vector<std::pair<std::string, std::string>> &variantSelections)
 {
@@ -83,27 +79,20 @@ UsdUtilsStageCache::GetSessionLayerForVariantSelections(
 
     _SessionLayerMap &sessionLayerMap = GetSessionLayerMap();
     _SessionLayerMap::iterator itr = sessionLayerMap.find(sessionKey);
-    if (itr == sessionLayerMap.end())
-    {
+    if (itr == sessionLayerMap.end()) {
       SdfLayerRefPtr layer = SdfLayer::CreateAnonymous();
-      if (!variantSelections.empty())
-      {
-        SdfPrimSpecHandle over = SdfPrimSpec::New(
-            layer,
-            modelName,
-            SdfSpecifierOver);
+      if (!variantSelections.empty()) {
+        SdfPrimSpecHandle over = SdfPrimSpec::New(layer, modelName, SdfSpecifierOver);
         TF_FOR_ALL(varSelItr, variantSelections)
         {
           // Construct the variant opinion for the session layer.
-          over->GetVariantSelections()[varSelItr->first] =
-              varSelItr->second;
+          over->GetVariantSelections()[varSelItr->first] = varSelItr->second;
         }
       }
       sessionLayerMap[sessionKey] = layer;
       ret = layer;
     }
-    else
-    {
+    else {
       ret = itr->second;
     }
   }

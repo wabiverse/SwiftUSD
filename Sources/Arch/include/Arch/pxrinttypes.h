@@ -37,13 +37,13 @@
 // macros, as this was not adopted by the C++ committee and was dropped by the C
 // committee, but glibc erroneously "respects" them so we need to have them.
 #ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
+#  define __STDC_LIMIT_MACROS
 #endif
 #ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
+#  define __STDC_CONSTANT_MACROS
 #endif
 #ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
+#  define __STDC_FORMAT_MACROS
 #endif
 
 #include <cinttypes>
@@ -59,4 +59,4 @@ typedef unsigned char uchar;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_INTTYPES_H
+#endif  // PXR_BASE_ARCH_INTTYPES_H

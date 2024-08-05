@@ -23,21 +23,19 @@
 
 #include "hdPrman/coordSysPrimSceneIndexPlugin.h"
 
-#include "pxr/imaging/hdsi/coordSysPrimSceneIndex.h"
 #include "Hd/sceneIndexPluginRegistry.h"
+#include "pxr/imaging/hdsi/coordSysPrimSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((sceneIndexPluginName, "HdPrman_CoordSysPrimSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((sceneIndexPluginName, "HdPrman_CoordSysPrimSceneIndexPlugin")));
 
 static const char *const _pluginDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_CoordSysPrimSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_CoordSysPrimSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
@@ -52,13 +50,10 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
       HdSceneIndexPluginRegistry::InsertionOrderAtEnd);
 }
 
-HdPrman_CoordSysPrimSceneIndexPlugin::
-    HdPrman_CoordSysPrimSceneIndexPlugin() = default;
+HdPrman_CoordSysPrimSceneIndexPlugin::HdPrman_CoordSysPrimSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_CoordSysPrimSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_CoordSysPrimSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   //    return inputScene;
   return HdsiCoordSysPrimSceneIndex::New(inputScene);

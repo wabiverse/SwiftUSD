@@ -46,9 +46,7 @@ bool Sdf_BoolFromString(const std::string &, bool *parseOk);
 namespace Sdf_ParserHelpers {
 
 // Internal variant type.
-typedef boost::variant<uint64_t, int64_t, double, std::string, TfToken,
-                       SdfAssetPath>
-    _Variant;
+typedef boost::variant<uint64_t, int64_t, double, std::string, TfToken, SdfAssetPath> _Variant;
 
 ////////////////////////////////////////////////////////////////////////
 // Utilities that implement the Sdf_ParserHelpers::Value::Get<T>() method.  The
@@ -57,9 +55,10 @@ typedef boost::variant<uint64_t, int64_t, double, std::string, TfToken,
 // various types.
 
 // General Get case, requires exact match.
-template <class T, class Enable = void> struct _GetImpl {
+template<class T, class Enable = void> struct _GetImpl {
   typedef const T &ResultType;
-  static const T &Visit(_Variant const &variant) {
+  static const T &Visit(_Variant const &variant)
+  {
     return boost::get<T>(variant);
   }
 };
@@ -68,34 +67,47 @@ template <class T, class Enable = void> struct _GetImpl {
 // _GetImpl<T> for integral type T.  Convert finite doubles by static_cast,
 // throw bad_get for non-finite doubles.  Throw bad_get for out-of-range
 // integral values.
-template <class T>
+template<class T>
 struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>>
     : public boost::static_visitor<T> {
   typedef T ResultType;
 
-  T Visit(_Variant const &variant) {
+  T Visit(_Variant const &variant)
+  {
     return boost::apply_visitor(*this, variant);
   }
 
   // Fallback case: throw bad_get.
-  template <class Held> T operator()(Held held) { throw boost::bad_get(); }
+  template<class Held> T operator()(Held held)
+  {
+    throw boost::bad_get();
+  }
 
   // Attempt to cast unsigned and signed int64_t.
-  T operator()(uint64_t in) { return _Cast(in); }
-  T operator()(int64_t in) { return _Cast(in); }
+  T operator()(uint64_t in)
+  {
+    return _Cast(in);
+  }
+  T operator()(int64_t in)
+  {
+    return _Cast(in);
+  }
 
   // Attempt to cast finite doubles, throw otherwise.
-  T operator()(double in) {
+  T operator()(double in)
+  {
     if (std::isfinite(in))
       return _Cast(in);
     throw boost::bad_get();
   }
 
-private:
-  template <class In> T _Cast(In in) {
+ private:
+  template<class In> T _Cast(In in)
+  {
     try {
       return boost::numeric_cast<T>(in);
-    } catch (const boost::bad_numeric_cast &) {
+    }
+    catch (const boost::bad_numeric_cast &) {
       throw boost::bad_get();
     }
   }
@@ -106,29 +118,49 @@ private:
 // _GetImpl<T> for floating point type T.  Attempts to cast numeric values.
 // Also handles strings like "inf", "-inf", and "nan" to produce +/- infinity
 // and a quiet NaN.
-template <class T>
+template<class T>
 struct _GetImpl<T, std::enable_if_t<std::is_floating_point<T>::value>>
     : public boost::static_visitor<T> {
   typedef T ResultType;
 
-  T Visit(_Variant const &variant) {
+  T Visit(_Variant const &variant)
+  {
     return boost::apply_visitor(*this, variant);
   }
 
   // Fallback case: throw bad_get.
-  template <class Held> T operator()(Held held) { throw boost::bad_get(); }
+  template<class Held> T operator()(Held held)
+  {
+    throw boost::bad_get();
+  }
 
   // For numeric types, attempt to cast.
-  T operator()(uint64_t in) { return _Cast(in); }
-  T operator()(int64_t in) { return _Cast(in); }
-  T operator()(double in) { return static_cast<T>(in); }
+  T operator()(uint64_t in)
+  {
+    return _Cast(in);
+  }
+  T operator()(int64_t in)
+  {
+    return _Cast(in);
+  }
+  T operator()(double in)
+  {
+    return static_cast<T>(in);
+  }
 
   // Convert special strings if possible.
-  T operator()(const std::string &str) { return _FromString(str); }
-  T operator()(const TfToken &tok) { return _FromString(tok.GetString()); }
+  T operator()(const std::string &str)
+  {
+    return _FromString(str);
+  }
+  T operator()(const TfToken &tok)
+  {
+    return _FromString(tok.GetString());
+  }
 
-private:
-  T _FromString(const std::string &str) const {
+ private:
+  T _FromString(const std::string &str) const
+  {
     // Special case the strings 'inf', '-inf' and 'nan'.
     if (str == "inf")
       return std::numeric_limits<T>::infinity();
@@ -139,10 +171,12 @@ private:
     throw boost::bad_get();
   }
 
-  template <class In> T _Cast(In in) {
+  template<class In> T _Cast(In in)
+  {
     try {
       return boost::numeric_cast<T>(in);
-    } catch (const boost::bad_numeric_cast &) {
+    }
+    catch (const boost::bad_numeric_cast &) {
       throw boost::bad_get();
     }
   }
@@ -151,10 +185,11 @@ private:
 ////////////////////////////////////////////////////////////////////////
 
 // Get an asset path: converts string to asset path, otherwise throw bad_get.
-template <> struct _GetImpl<SdfAssetPath> {
+template<> struct _GetImpl<SdfAssetPath> {
   typedef SdfAssetPath ResultType;
 
-  SdfAssetPath Visit(_Variant const &variant) {
+  SdfAssetPath Visit(_Variant const &variant)
+  {
     if (std::string const *str = boost::get<std::string>(&variant))
       return SdfAssetPath(*str);
     return boost::get<SdfAssetPath>(variant);
@@ -164,15 +199,17 @@ template <> struct _GetImpl<SdfAssetPath> {
 // Get a bool.  Numbers are considered true if nonzero, false otherwise.
 // Strings and tokens get parsed via Sdf_BoolFromString.  Otherwise throw
 // bad_get.
-template <> struct _GetImpl<bool> : public boost::static_visitor<bool> {
+template<> struct _GetImpl<bool> : public boost::static_visitor<bool> {
   typedef bool ResultType;
 
-  bool Visit(_Variant const &variant) {
+  bool Visit(_Variant const &variant)
+  {
     return boost::apply_visitor(*this, variant);
   }
 
   // Parse string via Sdf_BoolFromString.
-  bool operator()(const std::string &str) {
+  bool operator()(const std::string &str)
+  {
     bool parseOK = false;
     bool result = Sdf_BoolFromString(str, &parseOK);
     if (!parseOK)
@@ -181,18 +218,21 @@ template <> struct _GetImpl<bool> : public boost::static_visitor<bool> {
   }
 
   // Treat tokens as strings.
-  bool operator()(const TfToken &tok) { return (*this)(tok.GetString()); }
+  bool operator()(const TfToken &tok)
+  {
+    return (*this)(tok.GetString());
+  }
 
   // For numbers, return true if not zero.
-  template <class Number>
-  std::enable_if_t<std::is_arithmetic<Number>::value, bool>
-  operator()(Number val) {
+  template<class Number>
+  std::enable_if_t<std::is_arithmetic<Number>::value, bool> operator()(Number val)
+  {
     return val != static_cast<Number>(0);
   }
 
   // For anything else, throw bad_get().
-  template <class T>
-  std::enable_if_t<!std::is_arithmetic<T>::value, bool> operator()(T) {
+  template<class T> std::enable_if_t<!std::is_arithmetic<T>::value, bool> operator()(T)
+  {
     throw boost::bad_get();
   }
 };
@@ -227,20 +267,23 @@ struct Value {
   // Construct and implicitly convert from an integral type \p Int.  If \p Int
   // is signed, the resulting value holds an 'int64_t' internally.  If \p Int
   // is unsigned, the result value holds an 'uint64_t'.
-  template <class Int>
-  Value(Int in, std::enable_if_t<std::is_integral<Int>::value> * = 0) {
+  template<class Int> Value(Int in, std::enable_if_t<std::is_integral<Int>::value> * = 0)
+  {
     if (std::is_signed<Int>::value) {
       _variant = static_cast<int64_t>(in);
-    } else {
+    }
+    else {
       _variant = static_cast<uint64_t>(in);
     }
   }
 
   // Construct and implicitly convert from a floating point type \p Flt.  The
   // resulting value holds a double internally.
-  template <class Flt>
+  template<class Flt>
   Value(Flt in, std::enable_if_t<std::is_floating_point<Flt>::value> * = 0)
-      : _variant(static_cast<double>(in)) {}
+      : _variant(static_cast<double>(in))
+  {
+  }
 
   // Construct and implicitly convert from std::string.
   Value(const std::string &in) : _variant(in) {}
@@ -254,48 +297,51 @@ struct Value {
   // Attempt to get a value of type T from this Value, applying appropriate
   // conversions.  If this value cannot be converted to T, throw
   // boost::bad_get.
-  template <class T> typename _GetImpl<T>::ResultType Get() const {
+  template<class T> typename _GetImpl<T>::ResultType Get() const
+  {
     return _GetImpl<T>().Visit(_variant);
   }
 
   // Hopefully short-lived API that applies an external visitor to the held
   // variant type.
-  template <class Visitor>
-  typename Visitor::result_type ApplyVisitor(const Visitor &visitor) {
+  template<class Visitor> typename Visitor::result_type ApplyVisitor(const Visitor &visitor)
+  {
     return boost::apply_visitor(visitor, _variant);
   }
 
-  template <class Visitor>
-  typename Visitor::result_type ApplyVisitor(Visitor &visitor) {
+  template<class Visitor> typename Visitor::result_type ApplyVisitor(Visitor &visitor)
+  {
     return boost::apply_visitor(visitor, _variant);
   }
 
-  template <class Visitor>
-  typename Visitor::result_type ApplyVisitor(const Visitor &visitor) const {
+  template<class Visitor> typename Visitor::result_type ApplyVisitor(const Visitor &visitor) const
+  {
     return _variant.apply_visitor(visitor);
   }
 
-  template <class Visitor>
-  typename Visitor::result_type ApplyVisitor(Visitor &visitor) const {
+  template<class Visitor> typename Visitor::result_type ApplyVisitor(Visitor &visitor) const
+  {
     return _variant.apply_visitor(visitor);
   }
 
-private:
+ private:
   _Variant _variant;
 };
 
-typedef std::function<VtValue(std::vector<unsigned int> const &,
-                              std::vector<Value> const &, size_t &,
-                              std::string *)>
+typedef std::function<VtValue(
+    std::vector<unsigned int> const &, std::vector<Value> const &, size_t &, std::string *)>
     ValueFactoryFunc;
 
 struct ValueFactory {
   ValueFactory() {}
 
-  ValueFactory(std::string typeName_, SdfTupleDimensions dimensions_,
-               bool isShaped_, ValueFactoryFunc func_)
-      : typeName(typeName_), dimensions(dimensions_), isShaped(isShaped_),
-        func(func_) {}
+  ValueFactory(std::string typeName_,
+               SdfTupleDimensions dimensions_,
+               bool isShaped_,
+               ValueFactoryFunc func_)
+      : typeName(typeName_), dimensions(dimensions_), isShaped(isShaped_), func(func_)
+  {
+  }
 
   std::string typeName;
   SdfTupleDimensions dimensions;
@@ -303,9 +349,8 @@ struct ValueFactory {
   ValueFactoryFunc func;
 };
 
-ValueFactory const &GetValueFactoryForMenvaName(std::string const &name,
-                                                bool *found);
-} // namespace Sdf_ParserHelpers
+ValueFactory const &GetValueFactoryForMenvaName(std::string const &name, bool *found);
+}  // namespace Sdf_ParserHelpers
 
 /// Converts a string to a bool.
 /// Accepts case insensitive "yes", "no", "false", true", "0", "1".
@@ -319,7 +364,9 @@ bool Sdf_BoolFromString(const std::string &s, bool *parseOk = NULL);
 // of chars from either side, and evaluating any embedded escaped characters.
 // If numLines is given, it will be populated with the number of newline
 // characters present in the original string.
-std::string Sdf_EvalQuotedString(const char *x, size_t n, size_t trimBothSides,
+std::string Sdf_EvalQuotedString(const char *x,
+                                 size_t n,
+                                 size_t trimBothSides,
                                  unsigned int *numLines = NULL);
 
 // Read the string representing an asset path at [x..x+n]. If tripleDelimited
@@ -329,4 +376,4 @@ std::string Sdf_EvalAssetPath(const char *x, size_t n, bool tripleDelimited);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PARSER_HELPERS_H
+#endif  // PXR_USD_SDF_PARSER_HELPERS_H

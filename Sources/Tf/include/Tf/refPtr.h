@@ -445,20 +445,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Tf_SupportsUniqueChanged is a metafunction that may be specialized to return
 // false for classes (and all derived classes) that *cannot* ever invoke unique
 // changed listeners.
-template <class T> struct Tf_SupportsUniqueChanged {
+template<class T> struct Tf_SupportsUniqueChanged {
   static const bool Value = true;
 };
 
 // Remnants are never able to support weak changed listeners.
 class Tf_Remnant;
-template <> struct Tf_SupportsUniqueChanged<Tf_Remnant> {
+template<> struct Tf_SupportsUniqueChanged<Tf_Remnant> {
   static const bool Value = false;
 };
 
 class TfWeakBase;
 
-template <class T> class TfWeakPtr;
-template <template <class> class X, class Y> class TfWeakPtrFacade;
+template<class T> class TfWeakPtr;
+template<template<class> class X, class Y> class TfWeakPtrFacade;
 
 // Functions used for tracking.  Do not implement these.
 inline void Tf_RefPtrTracker_FirstRef(const void *, const void *) {}
@@ -471,7 +471,8 @@ inline void Tf_RefPtrTracker_Assign(const void *, const void *, const void *) {}
 // It may lock and invoke the unique changed listener, if the reference count
 // becomes unique or non-unique.
 struct Tf_RefPtr_UniqueChangedCounter {
-  static inline int AddRef(TfRefBase const *refBase) {
+  static inline int AddRef(TfRefBase const *refBase)
+  {
     if (refBase) {
       // Check to see if we need to invoke the unique changed listener.
       if (refBase->_shouldInvokeUniqueChangedListener)
@@ -482,24 +483,27 @@ struct Tf_RefPtr_UniqueChangedCounter {
     return 0;
   }
 
-  static inline bool RemoveRef(TfRefBase const *refBase) {
+  static inline bool RemoveRef(TfRefBase const *refBase)
+  {
     if (refBase) {
       // Check to see if we need to invoke the unique changed listener.
-      return refBase->_shouldInvokeUniqueChangedListener
-                 ? _RemoveRef(refBase)
-                 : refBase->GetRefCount()._DecrementAndTestIfZero();
+      return refBase->_shouldInvokeUniqueChangedListener ?
+                 _RemoveRef(refBase) :
+                 refBase->GetRefCount()._DecrementAndTestIfZero();
     }
     return false;
   }
 
   // Increment ptr's count if it is not zero.  Return true if done so
   // successfully, false if its count is zero.
-  static inline bool AddRefIfNonzero(TfRefBase const *ptr) {
+  static inline bool AddRefIfNonzero(TfRefBase const *ptr)
+  {
     if (!ptr)
       return false;
     if (ptr->_shouldInvokeUniqueChangedListener) {
       return _AddRefIfNonzero(ptr);
-    } else {
+    }
+    else {
       auto &counter = ptr->GetRefCount()._counter;
       auto val = counter.load();
       do {
@@ -520,19 +524,22 @@ struct Tf_RefPtr_UniqueChangedCounter {
 // This code is used to increment and decrement ref counts in the case where
 // the object pointed to explicitly does not support unique changed listeners.
 struct Tf_RefPtr_Counter {
-  static inline int AddRef(TfRefBase const *refBase) {
+  static inline int AddRef(TfRefBase const *refBase)
+  {
     if (refBase)
       return refBase->GetRefCount()._FetchAndAdd(1);
     return 0;
   }
 
-  static inline bool RemoveRef(TfRefBase const *ptr) {
+  static inline bool RemoveRef(TfRefBase const *ptr)
+  {
     return (ptr && (ptr->GetRefCount()._DecrementAndTestIfZero()));
   }
 
   // Increment ptr's count if it is not zero.  Return true if done so
   // successfully, false if its count is zero.
-  static inline bool AddRefIfNonzero(TfRefBase const *ptr) {
+  static inline bool AddRefIfNonzero(TfRefBase const *ptr)
+  {
     if (!ptr)
       return false;
     auto &counter = ptr->GetRefCount()._counter;
@@ -546,8 +553,8 @@ struct Tf_RefPtr_Counter {
 };
 
 // Helper to post a fatal error when a NULL Tf pointer is dereferenced.
-[[noreturn]] TF_API void
-Tf_PostNullSmartPtrDereferenceFatalError(const TfCallContext &, const char *);
+[[noreturn]] TF_API void Tf_PostNullSmartPtrDereferenceFatalError(const TfCallContext &,
+                                                                  const char *);
 
 /// \class TfRefPtr
 /// \ingroup group_tf_Memory
@@ -560,18 +567,18 @@ Tf_PostNullSmartPtrDereferenceFatalError(const TfCallContext &, const char *);
 /// For more information, see either the \ref refPtr_QuickStart "Quick Start"
 /// example or read the \ref refPtr_DetailedDiscussion "detailed discussion".
 ///
-template <class T> class TfRefPtr {
+template<class T> class TfRefPtr {
   // Select the counter based on whether T supports unique changed listeners.
   using _Counter = typename std::conditional<
-      Tf_SupportsUniqueChanged<T>::Value &&
-          !std::is_convertible<T *, TfSimpleRefBase *>::value,
-      Tf_RefPtr_UniqueChangedCounter, Tf_RefPtr_Counter>::type;
+      Tf_SupportsUniqueChanged<T>::Value && !std::is_convertible<T *, TfSimpleRefBase *>::value,
+      Tf_RefPtr_UniqueChangedCounter,
+      Tf_RefPtr_Counter>::type;
 
-public:
+ public:
   /// Convenience type accessor to underlying type \c T for template code.
   using DataType = T;
 
-  template <class U> struct Rebind {
+  template<class U> struct Rebind {
     using Type = TfRefPtr<U>;
   };
 
@@ -580,7 +587,8 @@ public:
   /// The default constructor leaves the pointer initialized to point to the
   /// NULL object. Attempts to use the \c -> operator will cause an abort
   /// until the pointer is given a value.
-  TfRefPtr() : _refBase(nullptr) {
+  TfRefPtr() : _refBase(nullptr)
+  {
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
 
@@ -590,17 +598,18 @@ public:
   /// been pointing at and \p p will be pointing at the NULL object.
   /// The reference count of the object being pointed at does not
   /// change.
-  TfRefPtr(TfRefPtr<DataType> &&p) : _refBase(p._refBase) {
+  TfRefPtr(TfRefPtr<DataType> &&p) : _refBase(p._refBase)
+  {
     p._refBase = nullptr;
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
-    Tf_RefPtrTracker_Assign(&p, p._GetObjectForTracking(),
-                            _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(&p, p._GetObjectForTracking(), _GetObjectForTracking());
   }
 
   /// Initializes \c *this to point at \p p's object.
   ///
   /// Increments \p p's object's reference count.
-  TfRefPtr(const TfRefPtr<DataType> &p) : _refBase(p._refBase) {
+  TfRefPtr(const TfRefPtr<DataType> &p) : _refBase(p._refBase)
+  {
     _AddRef();
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
@@ -608,11 +617,10 @@ public:
   /// Initializes \c *this to point at \p gp's object.
   ///
   /// Increments \p gp's object's reference count.
-  template <template <class> class X, class U>
+  template<template<class> class X, class U>
   inline TfRefPtr(
       const TfWeakPtrFacade<X, U> &p,
-      typename std::enable_if<std::is_convertible<U *, DataType *>::value>::type * =
-          0);
+      typename std::enable_if<std::is_convertible<U *, DataType *>::value>::type * = 0);
 
   /// Transfer a raw pointer to a reference-counted pointer.
   ///
@@ -650,7 +658,7 @@ public:
 #if defined(doxygen)
   friend inline TfRefPtr TfCreateRefPtr(DataType *);
 #else
-  template <class U> friend inline TfRefPtr<U> TfCreateRefPtr(U *);
+  template<class U> friend inline TfRefPtr<U> TfCreateRefPtr(U *);
 #endif
 
   /// Initializes to point at \c *ptr.
@@ -659,22 +667,25 @@ public:
   /// objects start with a reference count of one.  Therefore, you should \e
   /// NOT use this constructor (either implicitly or explicitly) from within
   /// a \c New() function.  Use \c TfCreateRefPtr() instead.
-  template <class U>
-  explicit TfRefPtr(U *ptr,
-                    typename std::enable_if<std::is_convertible<U *, DataType *>::value>::type * = nullptr)
-    : _refBase(ptr)
+  template<class U>
+  explicit TfRefPtr(
+      U *ptr,
+      typename std::enable_if<std::is_convertible<U *, DataType *>::value>::type * = nullptr)
+      : _refBase(ptr)
   {
     _AddRef();
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
 
   /// Implicit conversion from \a TfNullPtr to TfRefPtr.
-  TfRefPtr(TfNullPtrType) : _refBase(nullptr) {
+  TfRefPtr(TfNullPtrType) : _refBase(nullptr)
+  {
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
 
   /// Implicit conversion from \a nullptr to TfRefPtr.
-  TfRefPtr(std::nullptr_t) : _refBase(nullptr) {
+  TfRefPtr(std::nullptr_t) : _refBase(nullptr)
+  {
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
   }
 
@@ -696,7 +707,8 @@ public:
   /// however that this has an important side effect, since it
   /// decrements the reference count of the object previously pointed
   /// to by \c ptr, possibly triggering destruction of that object.
-  TfRefPtr<DataType> &operator=(const TfRefPtr<DataType> &p) {
+  TfRefPtr<DataType> &operator=(const TfRefPtr<DataType> &p)
+  {
     //
     // It is quite possible for
     //   ptr = TfNullPtr;
@@ -707,14 +719,13 @@ public:
     // local variables to help us out.
     //
 
-    Tf_RefPtrTracker_Assign(this, p._GetObjectForTracking(),
-                            _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(this, p._GetObjectForTracking(), _GetObjectForTracking());
 
     const TfRefBase *tmp = _refBase;
     _refBase = p._refBase;
 
-    p._AddRef();     // first!
-    _RemoveRef(tmp); // second!
+    p._AddRef();      // first!
+    _RemoveRef(tmp);  // second!
     return *this;
   }
 
@@ -724,10 +735,10 @@ public:
   /// The object (if any) pointed at before the assignment has its
   /// reference count decremented, while the reference count of the
   /// object newly pointed at is not changed.
-  TfRefPtr<DataType> &operator=(TfRefPtr<DataType> &&p) {
+  TfRefPtr<DataType> &operator=(TfRefPtr<DataType> &&p)
+  {
     // See comment in assignment operator.
-    Tf_RefPtrTracker_Assign(this, p._GetObjectForTracking(),
-                            _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(this, p._GetObjectForTracking(), _GetObjectForTracking());
     Tf_RefPtrTracker_Assign(&p, nullptr, p._GetObjectForTracking());
 
     const TfRefBase *tmp = _refBase;
@@ -742,7 +753,8 @@ public:
   ///
   /// If the reference count of the object (if any) that was just pointed at
   /// reaches zero, the object will typically be destroyed at this point.
-  ~TfRefPtr() {
+  ~TfRefPtr()
+  {
     Tf_RefPtrTracker_Delete(this, _GetObjectForTracking());
     _RemoveRef(_refBase);
   }
@@ -756,9 +768,10 @@ public:
   /// \endcode
   /// is legal.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  TfRefPtr(const TfRefPtr<U> &p) : _refBase(p._refBase) {
+  TfRefPtr(const TfRefPtr<U> &p) : _refBase(p._refBase)
+  {
     static_assert(std::is_convertible<U *, DataType *>::value, "");
     _AddRef();
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
@@ -775,14 +788,14 @@ public:
   /// \endcode
   /// is legal.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  TfRefPtr(TfRefPtr<U> &&p) : _refBase(p._refBase) {
+  TfRefPtr(TfRefPtr<U> &&p) : _refBase(p._refBase)
+  {
     static_assert(std::is_convertible<U *, DataType *>::value, "");
     p._refBase = nullptr;
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
-    Tf_RefPtrTracker_Assign(&p, p._GetObjectForTracking(),
-                            _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(&p, p._GetObjectForTracking(), _GetObjectForTracking());
   }
 
   /// Assigns pointer to point at \c p's object, and increments reference
@@ -796,18 +809,18 @@ public:
   /// \endcode
   /// is legal.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  TfRefPtr<DataType> &operator=(const TfRefPtr<U> &p) {
+  TfRefPtr<DataType> &operator=(const TfRefPtr<U> &p)
+  {
     static_assert(std::is_convertible<U *, DataType *>::value, "");
 
-    Tf_RefPtrTracker_Assign(this,
-                            reinterpret_cast<DataType *>(p._GetObjectForTracking()),
-                            _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(
+        this, reinterpret_cast<DataType *>(p._GetObjectForTracking()), _GetObjectForTracking());
     const TfRefBase *tmp = _refBase;
     _refBase = p._GetData();
-    p._AddRef();     // first!
-    _RemoveRef(tmp); // second!
+    p._AddRef();      // first!
+    _RemoveRef(tmp);  // second!
     return *this;
   }
 
@@ -823,16 +836,15 @@ public:
   /// \endcode
   /// is legal.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  TfRefPtr<DataType> &operator=(TfRefPtr<U> &&p) {
+  TfRefPtr<DataType> &operator=(TfRefPtr<U> &&p)
+  {
     static_assert(std::is_convertible<U *, DataType *>::value, "");
 
-    Tf_RefPtrTracker_Assign(this,
-                            reinterpret_cast<DataType *>(p._GetObjectForTracking()),
-                            _GetObjectForTracking());
-    Tf_RefPtrTracker_Assign(&p, nullptr,
-                            reinterpret_cast<DataType *>(p._GetObjectForTracking()));
+    Tf_RefPtrTracker_Assign(
+        this, reinterpret_cast<DataType *>(p._GetObjectForTracking()), _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(&p, nullptr, reinterpret_cast<DataType *>(p._GetObjectForTracking()));
     const TfRefBase *tmp = _refBase;
     _refBase = p._GetData();
     p._refBase = nullptr;
@@ -845,10 +857,12 @@ public:
   ///
   /// The comparison is legal only if a \c T* and a \c U* are comparable.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator==(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() == std::declval<U *>(), bool()) {
+  auto operator==(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() ==
+                                                              std::declval<U *>(),
+                                                          bool())
+  {
     return _refBase == p._refBase;
   }
 
@@ -856,10 +870,12 @@ public:
   ///
   /// The comparison is legal only if a \c T* and a \c U* are comparable.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator!=(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() != std::declval<U *>(), bool()) {
+  auto operator!=(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() !=
+                                                              std::declval<U *>(),
+                                                          bool())
+  {
     return _refBase != p._refBase;
   }
 
@@ -868,85 +884,103 @@ public:
   ///
   /// The comparison is legal only if a \c T* and a \c U* are comparable.
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator<(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() < std::declval<U *>(), bool()) {
+  auto operator<(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() <
+                                                             std::declval<U *>(),
+                                                         bool())
+  {
     return _refBase < p._refBase;
   }
 
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator>(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() > std::declval<U *>(), bool()) {
+  auto operator>(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() >
+                                                             std::declval<U *>(),
+                                                         bool())
+  {
     return _refBase > p._refBase;
   }
 
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator<=(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() <= std::declval<U *>(), bool()) {
+  auto operator<=(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() <=
+                                                              std::declval<U *>(),
+                                                          bool())
+  {
     return _refBase <= p._refBase;
   }
 
 #if !defined(doxygen)
-  template <class U>
+  template<class U>
 #endif
-  auto operator>=(const TfRefPtr<U> &p) const
-      -> decltype(std::declval<DataType *>() >= std::declval<U *>(), bool()) {
+  auto operator>=(const TfRefPtr<U> &p) const -> decltype(std::declval<DataType *>() >=
+                                                              std::declval<U *>(),
+                                                          bool())
+  {
     return _refBase >= p._refBase;
   }
 
   /// Accessor to \c T's public members.
-  DataType *operator->() const {
+  DataType *operator->() const
+  {
     if (_refBase) {
       return static_cast<DataType *>(const_cast<TfRefBase *>(_refBase));
     }
-    Tf_PostNullSmartPtrDereferenceFatalError(TF_CALL_CONTEXT,
-                                             typeid(TfRefPtr).name());
+    Tf_PostNullSmartPtrDereferenceFatalError(TF_CALL_CONTEXT, typeid(TfRefPtr).name());
   }
 
   /// Dereferences the stored pointer.
-  DataType &operator*() const { return *operator->(); }
+  DataType &operator*() const
+  {
+    return *operator->();
+  }
 
 #if !defined(doxygen)
   using UnspecifiedBoolType = const TfRefBase *(TfRefPtr::*);
 #endif
 
   /// True if the pointer points to an object.
-  operator UnspecifiedBoolType() const {
+  operator UnspecifiedBoolType() const
+  {
     return _refBase ? &TfRefPtr::_refBase : nullptr;
   }
 
   /// True if the pointer points to \c NULL.
-  bool operator!() const { return _refBase == nullptr; }
+  bool operator!() const
+  {
+    return _refBase == nullptr;
+  }
 
   /// Swap this pointer with \a other.
   /// After this operation, this pointer will point to what \a other
   /// formerly pointed to, and \a other will point to what this pointer
   /// formerly pointed to.
-  void swap(TfRefPtr &other) {
-    Tf_RefPtrTracker_Assign(this, other._GetObjectForTracking(),
-                            _GetObjectForTracking());
-    Tf_RefPtrTracker_Assign(&other, _GetObjectForTracking(),
-                            other._GetObjectForTracking());
+  void swap(TfRefPtr &other)
+  {
+    Tf_RefPtrTracker_Assign(this, other._GetObjectForTracking(), _GetObjectForTracking());
+    Tf_RefPtrTracker_Assign(&other, _GetObjectForTracking(), other._GetObjectForTracking());
     std::swap(_refBase, other._refBase);
   }
 
   /// Set this pointer to point to no object.
   /// Equivalent to assignment with TfNullPtr.
-  void Reset() { *this = TfNullPtr; }
+  void Reset()
+  {
+    *this = TfNullPtr;
+  }
 
-private:
+ private:
   const TfRefBase *_refBase;
 
-  template <class HashState, class U>
+  template<class HashState, class U>
   friend inline void TfHashAppend(HashState &, const TfRefPtr<U> &);
-  template <class U> friend inline size_t hash_value(const TfRefPtr<U> &);
+  template<class U> friend inline size_t hash_value(const TfRefPtr<U> &);
 
-  friend DataType *get_pointer(TfRefPtr const &p) {
+  friend DataType *get_pointer(TfRefPtr const &p)
+  {
     return static_cast<DataType *>(const_cast<TfRefBase *>(p._refBase));
   }
 
@@ -954,7 +988,8 @@ private:
   class _CreateRefPtr {};
 
   // private constructor, used by TfCreateRefPtr()
-  TfRefPtr(DataType *ptr, _CreateRefPtr /* unused */) : _refBase(ptr) {
+  TfRefPtr(DataType *ptr, _CreateRefPtr /* unused */) : _refBase(ptr)
+  {
     /* reference count is NOT bumped */
     Tf_RefPtrTracker_FirstRef(this, _GetObjectForTracking());
     Tf_RefPtrTracker_New(this, _GetObjectForTracking());
@@ -980,13 +1015,12 @@ private:
   /// type, the result is a \c TfRefPtr pointing to NULL.
 #if defined(doxygen)
   // Sanitized for documentation:
-  template <class D>
-  friend inline TfRefPtr<D> TfDynamic_cast(const TfRefPtr<DataType> &);
+  template<class D> friend inline TfRefPtr<D> TfDynamic_cast(const TfRefPtr<DataType> &);
 #else
-  template <class D, class B>
+  template<class D, class B>
   friend TfRefPtr<typename D::DataType> TfDynamic_cast(const TfRefPtr<B> &);
 
-  template <class D, class B>
+  template<class D, class B>
   friend TfRefPtr<typename D::DataType> TfSafeDynamic_cast(const TfRefPtr<B> &);
 #endif
 
@@ -1008,10 +1042,9 @@ private:
   ///
 #if defined(doxygen)
   // Sanitized for documentation:
-  template <class D>
-  friend inline TfRefPtr<D> TfStatic_cast(const TfRefPtr<DataType> &);
+  template<class D> friend inline TfRefPtr<D> TfStatic_cast(const TfRefPtr<DataType> &);
 #else
-  template <class D, class B>
+  template<class D, class B>
   friend TfRefPtr<typename D::DataType> TfStatic_cast(const TfRefPtr<B> &);
 
 #endif
@@ -1029,15 +1062,14 @@ private:
   /// discouraged.
 #if defined(doxygen)
   // Sanitized for documentation:
-  template <class D>
-  friend inline TfRefPtr<D> TfConst_cast(const TfRefPtr<const D> &);
+  template<class D> friend inline TfRefPtr<D> TfConst_cast(const TfRefPtr<const D> &);
 #else
-  template <class D>
-  friend TfRefPtr<typename D::DataType>
-  TfConst_cast(const TfRefPtr<const typename D::DataType> &);
+  template<class D>
+  friend TfRefPtr<typename D::DataType> TfConst_cast(const TfRefPtr<const typename D::DataType> &);
 #endif
 
-  T *_GetData() const {
+  T *_GetData() const
+  {
     return static_cast<DataType *>(const_cast<TfRefBase *>(_refBase));
   }
 
@@ -1047,7 +1079,8 @@ private:
   // not the first base class of T then the resulting pointer may
   // not point to a T.  Nevertheless, it should be consistent to
   // all calls to the tracking functions.
-  T *_GetObjectForTracking() const {
+  T *_GetObjectForTracking() const
+  {
     return reinterpret_cast<DataType *>(const_cast<TfRefBase *>(_refBase));
   }
 
@@ -1058,15 +1091,17 @@ private:
   /// information about the object pointed to by a \c TfRefPtr,
   /// one can use \c TfTypeid.
 
-  template <class U>
-  friend const std::type_info &TfTypeid(const TfRefPtr<U> &ptr);
+  template<class U> friend const std::type_info &TfTypeid(const TfRefPtr<U> &ptr);
 
-  void _AddRef() const { _Counter::AddRef(_refBase); }
+  void _AddRef() const
+  {
+    _Counter::AddRef(_refBase);
+  }
 
-  void _RemoveRef(const TfRefBase *ptr) const {
+  void _RemoveRef(const TfRefBase *ptr) const
+  {
     if (_Counter::RemoveRef(ptr)) {
-      Tf_RefPtrTracker_LastRef(
-          this, reinterpret_cast<DataType *>(const_cast<TfRefBase *>(ptr)));
+      Tf_RefPtrTracker_LastRef(this, reinterpret_cast<DataType *>(const_cast<TfRefBase *>(ptr)));
       delete ptr;
     }
   }
@@ -1074,12 +1109,11 @@ private:
 #if !defined(doxygen)
   // doxygen is very confused by this. It declares all TfRefPtrs
   // to be friends.
-  template <class U> friend class TfRefPtr;
-  template <class U> friend class TfWeakPtr;
+  template<class U> friend class TfRefPtr;
+  template<class U> friend class TfWeakPtr;
   friend class Tf_Remnant;
 
-  template <class U>
-  friend TfRefPtr<U> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<U> const &);
+  template<class U> friend TfRefPtr<U> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<U> const &);
 #endif
   friend class TfWeakBase;
 };
@@ -1093,89 +1127,97 @@ private:
 // TfWeakPtrFacade::Derived comparisons with TfRefPtr.
 //
 
-template <class T>
-inline bool operator==(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator==(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return !p;
 }
-template <class T>
-inline bool operator==(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator==(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return !p;
 }
 
-template <class T>
-inline bool operator!=(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator!=(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return !(p == nullptr);
 }
-template <class T>
-inline bool operator!=(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator!=(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return !(nullptr == p);
 }
 
-template <class T> inline bool operator<(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator<(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return std::less<const TfRefBase *>()(get_pointer(p), nullptr);
 }
-template <class T> inline bool operator<(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator<(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return std::less<const TfRefBase *>()(nullptr, get_pointer(p));
 }
 
-template <class T>
-inline bool operator<=(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator<=(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return !(nullptr < p);
 }
-template <class T>
-inline bool operator<=(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator<=(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return !(p < nullptr);
 }
 
-template <class T> inline bool operator>(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator>(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return nullptr < p;
 }
-template <class T> inline bool operator>(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator>(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return p < nullptr;
 }
 
-template <class T>
-inline bool operator>=(const TfRefPtr<T> &p, std::nullptr_t) {
+template<class T> inline bool operator>=(const TfRefPtr<T> &p, std::nullptr_t)
+{
   return !(p < nullptr);
 }
-template <class T>
-inline bool operator>=(std::nullptr_t, const TfRefPtr<T> &p) {
+template<class T> inline bool operator>=(std::nullptr_t, const TfRefPtr<T> &p)
+{
   return !(nullptr < p);
 }
 
-template <typename T> inline TfRefPtr<T> TfCreateRefPtr(T *ptr) {
+template<typename T> inline TfRefPtr<T> TfCreateRefPtr(T *ptr)
+{
   return TfRefPtr<T>(ptr, typename TfRefPtr<T>::_CreateRefPtr());
 }
 
-template <class T> const std::type_info &TfTypeid(const TfRefPtr<T> &ptr) {
+template<class T> const std::type_info &TfTypeid(const TfRefPtr<T> &ptr)
+{
   if (ARCH_UNLIKELY(!ptr._refBase))
     TF_FATAL_ERROR("called TfTypeid on NULL TfRefPtr");
 
   return typeid(*ptr._GetData());
 }
 
-template <class D, class T>
-inline TfRefPtr<typename D::DataType> TfDynamic_cast(const TfRefPtr<T> &ptr) {
+template<class D, class T>
+inline TfRefPtr<typename D::DataType> TfDynamic_cast(const TfRefPtr<T> &ptr)
+{
   using RefPtr = TfRefPtr<typename D::DataType>;
   return RefPtr(dynamic_cast<typename D::DataType *>(ptr._GetData()));
 }
 
-template <class D, class T>
-inline TfRefPtr<typename D::DataType>
-TfSafeDynamic_cast(const TfRefPtr<T> &ptr) {
+template<class D, class T>
+inline TfRefPtr<typename D::DataType> TfSafeDynamic_cast(const TfRefPtr<T> &ptr)
+{
   using RefPtr = TfRefPtr<typename D::DataType>;
   return RefPtr(TfSafeDynamic_cast<typename D::DataType *>(ptr._GetData()));
 }
 
-template <class D, class T>
-inline TfRefPtr<typename D::DataType> TfStatic_cast(const TfRefPtr<T> &ptr) {
+template<class D, class T>
+inline TfRefPtr<typename D::DataType> TfStatic_cast(const TfRefPtr<T> &ptr)
+{
   using RefPtr = TfRefPtr<typename D::DataType>;
   return RefPtr(static_cast<typename D::DataType *>(ptr._GetData()));
 }
 
-template <class T>
-inline TfRefPtr<typename T::DataType>
-TfConst_cast(const TfRefPtr<const typename T::DataType> &ptr) {
+template<class T>
+inline TfRefPtr<typename T::DataType> TfConst_cast(const TfRefPtr<const typename T::DataType> &ptr)
+{
   // this ugly cast allows TfConst_cast to work without requiring
   // a definition for T.
   using NonConstRefPtr = TfRefPtr<typename T::DataType>;
@@ -1184,37 +1226,51 @@ TfConst_cast(const TfRefPtr<const typename T::DataType> &ptr) {
 
 // Specialization: prevent construction of a TfRefPtr<TfRefBase>.
 
-template <> class TfRefPtr<TfRefBase> {
-private:
+template<> class TfRefPtr<TfRefBase> {
+ private:
   TfRefPtr<TfRefBase>() {}
 };
 
-template <> class TfRefPtr<const TfRefBase> {
-private:
+template<> class TfRefPtr<const TfRefBase> {
+ private:
   TfRefPtr<const TfRefBase>() {}
 };
 
-template <class T> struct TfTypeFunctions<TfRefPtr<T>> {
-  static T *GetRawPtr(const TfRefPtr<T> &t) { return t.operator->(); }
+template<class T> struct TfTypeFunctions<TfRefPtr<T>> {
+  static T *GetRawPtr(const TfRefPtr<T> &t)
+  {
+    return t.operator->();
+  }
 
-  static TfRefPtr<T> ConstructFromRawPtr(T *ptr) { return TfRefPtr<T>(ptr); }
+  static TfRefPtr<T> ConstructFromRawPtr(T *ptr)
+  {
+    return TfRefPtr<T>(ptr);
+  }
 
-  static bool IsNull(const TfRefPtr<T> &t) { return !t; }
+  static bool IsNull(const TfRefPtr<T> &t)
+  {
+    return !t;
+  }
 
   static void Class_Object_MUST_Be_Passed_By_Address() {}
   static void Class_Object_MUST_Not_Be_Const() {}
 };
 
-template <class T> struct TfTypeFunctions<TfRefPtr<const T>> {
-  static const T *GetRawPtr(const TfRefPtr<const T> &t) {
+template<class T> struct TfTypeFunctions<TfRefPtr<const T>> {
+  static const T *GetRawPtr(const TfRefPtr<const T> &t)
+  {
     return t.operator->();
   }
 
-  static TfRefPtr<const T> ConstructFromRawPtr(T *ptr) {
+  static TfRefPtr<const T> ConstructFromRawPtr(T *ptr)
+  {
     return TfRefPtr<const T>(ptr);
   }
 
-  static bool IsNull(const TfRefPtr<const T> &t) { return !t; }
+  static bool IsNull(const TfRefPtr<const T> &t)
+  {
+    return !t;
+  }
 
   static void Class_Object_MUST_Be_Passed_By_Address() {}
 };
@@ -1223,7 +1279,8 @@ template <class T> struct TfTypeFunctions<TfRefPtr<const T>> {
 
 #if !defined(doxygen)
 
-template <class T> inline void swap(TfRefPtr<T> &lhs, TfRefPtr<T> &rhs) {
+template<class T> inline void swap(TfRefPtr<T> &lhs, TfRefPtr<T> &rhs)
+{
   lhs.swap(rhs);
 }
 
@@ -1231,31 +1288,30 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 namespace boost {
 
-template<typename T>
-T *
-get_pointer(PXR_NS::TfRefPtr<T> const& p)
+template<typename T> T *get_pointer(PXR_NS::TfRefPtr<T> const &p)
 {
-    return get_pointer(p);
+  return get_pointer(p);
 }
 
-} // end namespace boost
+}  // end namespace boost
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Extend boost::hash to support TfRefPtr.
-template <class T> inline size_t hash_value(const TfRefPtr<T> &ptr) {
+template<class T> inline size_t hash_value(const TfRefPtr<T> &ptr)
+{
   return TfHash()(ptr);
 }
 
-template <class HashState, class T>
-inline void TfHashAppend(HashState &h, const TfRefPtr<T> &ptr) {
+template<class HashState, class T> inline void TfHashAppend(HashState &h, const TfRefPtr<T> &ptr)
+{
   h.Append(get_pointer(ptr));
 }
 
-#endif // !doxygen
+#endif  // !doxygen
 
 #define TF_SUPPORTS_REFPTR(T) std::is_base_of<TfRefBase, T>::value
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_REF_PTR_H
+#endif  // PXR_BASE_TF_REF_PTR_H

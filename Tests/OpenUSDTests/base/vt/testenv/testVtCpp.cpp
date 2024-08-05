@@ -22,62 +22,62 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/base/vt/dictionary.h"
-#include "pxr/base/vt/value.h"
+#include "pxr/base/vt/functions.h"
 #include "pxr/base/vt/streamOut.h"
 #include "pxr/base/vt/types.h"
-#include "pxr/base/vt/functions.h"
+#include "pxr/base/vt/value.h"
 #include "pxr/base/vt/visitValue.h"
+#include "pxr/pxr.h"
 
-#include "pxr/base/gf/matrix2f.h"
 #include "pxr/base/gf/matrix2d.h"
-#include "pxr/base/gf/matrix3f.h"
+#include "pxr/base/gf/matrix2f.h"
 #include "pxr/base/gf/matrix3d.h"
-#include "pxr/base/gf/matrix4f.h"
+#include "pxr/base/gf/matrix3f.h"
 #include "pxr/base/gf/matrix4d.h"
+#include "pxr/base/gf/matrix4f.h"
 
-#include "pxr/base/gf/vec2i.h"
-#include "pxr/base/gf/vec2f.h"
 #include "pxr/base/gf/vec2d.h"
-#include "pxr/base/gf/vec3i.h"
-#include "pxr/base/gf/vec3f.h"
+#include "pxr/base/gf/vec2f.h"
+#include "pxr/base/gf/vec2i.h"
 #include "pxr/base/gf/vec3d.h"
-#include "pxr/base/gf/vec4i.h"
-#include "pxr/base/gf/vec4f.h"
+#include "pxr/base/gf/vec3f.h"
+#include "pxr/base/gf/vec3i.h"
 #include "pxr/base/gf/vec4d.h"
+#include "pxr/base/gf/vec4f.h"
+#include "pxr/base/gf/vec4i.h"
 
-#include "pxr/base/gf/dualQuath.h"
-#include "pxr/base/gf/dualQuatf.h"
 #include "pxr/base/gf/dualQuatd.h"
+#include "pxr/base/gf/dualQuatf.h"
+#include "pxr/base/gf/dualQuath.h"
 
-#include "pxr/base/gf/quaternion.h"
-#include "pxr/base/gf/quath.h"
-#include "pxr/base/gf/quatf.h"
 #include "pxr/base/gf/quatd.h"
+#include "pxr/base/gf/quaternion.h"
+#include "pxr/base/gf/quatf.h"
+#include "pxr/base/gf/quath.h"
 
 #include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/errorMark.h"
-#include "pxr/base/tf/iterator.h"
-#include "pxr/base/tf/stopwatch.h"
-#include "pxr/base/tf/token.h"
 #include "pxr/base/tf/enum.h"
-#include "pxr/base/tf/stringUtils.h"
-#include "pxr/base/tf/type.h"
+#include "pxr/base/tf/errorMark.h"
 #include "pxr/base/tf/fileUtils.h"
+#include "pxr/base/tf/iterator.h"
 #include "pxr/base/tf/span.h"
+#include "pxr/base/tf/stopwatch.h"
+#include "pxr/base/tf/stringUtils.h"
+#include "pxr/base/tf/token.h"
+#include "pxr/base/tf/type.h"
 
 #include "Arch/defines.h"
 #include "Arch/fileSystem.h"
 
-#include <cstdio>
 #include <cmath>
-#include <iterator>
+#include <cstdio>
 #include <iostream>
+#include <iterator>
 #include <limits>
-#include <new>
 #include <memory>
+#include <new>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -111,8 +111,7 @@ static void testArray()
   VtDoubleArray da2 = da;
   da2[0] = 333.333;
 
-  if (da2[0] != 333.333 ||
-      da[0] == 333.333)
+  if (da2[0] != 333.333 || da[0] == 333.333)
     die("copy-on-write");
 
   // Try swapping
@@ -161,8 +160,7 @@ static void testArray()
     TF_AXIOM(v2.size() == v.size());
     TF_AXIOM(v3.size() == v.size());
 
-    for (int i = 0; i < (int)v.size(); ++i)
-    {
+    for (int i = 0; i < (int)v.size(); ++i) {
       TF_AXIOM(v2[i] == i);
       TF_AXIOM(v3[i] == i);
     }
@@ -200,22 +198,18 @@ static void testArray()
 
     array.resize(1000);
     TF_AXIOM(array.size() == 1000);
-    for (size_t i = 0; i != 1000; ++i)
-    {
-      if (i < 100)
-      {
+    for (size_t i = 0; i != 1000; ++i) {
+      if (i < 100) {
         TF_AXIOM(array[i] == i);
       }
-      else
-      {
+      else {
         TF_AXIOM(array[i] == 0);
       }
     }
 
     array.resize(10);
     TF_AXIOM(array.size() == 10);
-    for (size_t i = 0; i != 10; ++i)
-    {
+    for (size_t i = 0; i != 10; ++i) {
       TF_AXIOM(array[i] == i);
     }
 
@@ -229,10 +223,7 @@ static void testArray()
 
     array.resize(10, 9.99);
     TF_AXIOM(array.size() == 10);
-    TF_AXIOM(array[5] == 9.99 &&
-             array[6] == 9.99 &&
-             array[7] == 9.99 &&
-             array[8] == 9.99 &&
+    TF_AXIOM(array[5] == 9.99 && array[6] == 9.99 && array[7] == 9.99 && array[8] == 9.99 &&
              array[9] == 9.99);
   }
 
@@ -245,10 +236,8 @@ static void testArray()
     VtArray<int> b = a;
     const auto &ca = a;
     const auto &cb = b;
-    TF_AXIOM(ca._GetShapeData()->otherDims[0] ==
-             cb._GetShapeData()->otherDims[0]);
-    TF_AXIOM(ca._GetShapeData()->otherDims[1] ==
-             cb._GetShapeData()->otherDims[1]);
+    TF_AXIOM(ca._GetShapeData()->otherDims[0] == cb._GetShapeData()->otherDims[0]);
+    TF_AXIOM(ca._GetShapeData()->otherDims[1] == cb._GetShapeData()->otherDims[1]);
 
     b._GetShapeData()->otherDims[0] = 2;
     b._GetShapeData()->otherDims[1] = 2;
@@ -289,8 +278,7 @@ static void testArray()
     VtArray<int> empty({});
     TF_AXIOM(empty.size() == 0);
 
-    auto testImplicit = [](const VtArray<int> &array, size_t size)
-    {
+    auto testImplicit = [](const VtArray<int> &array, size_t size) {
       TF_AXIOM(array.size() == size);
     };
     testImplicit({1, 2, 3}, 3);
@@ -323,8 +311,7 @@ static void testArray()
 
       TfSpan<int> span = copy;
       // Should have detached.
-      TF_AXIOM(span.data() == copy.cdata() &&
-               span.data() != constData.cdata());
+      TF_AXIOM(span.data() == copy.cdata() && span.data() != constData.cdata());
       TF_AXIOM(span.size() == copy.size());
     }
 
@@ -333,8 +320,7 @@ static void testArray()
 
       auto span = TfMakeSpan(copy);
       // Should have detached.
-      TF_AXIOM(span.data() == copy.cdata() &&
-               span.data() != constData.cdata());
+      TF_AXIOM(span.data() == copy.cdata() && span.data() != constData.cdata());
       TF_AXIOM(span.size() == copy.size());
     }
 
@@ -355,45 +341,40 @@ static void testArray()
   {
     // Test VtArray resize with filling function.
     VtDoubleArray da;
-    da.resize(1234, [](double *f, double *l)
-              {
-                int n = 0;
-                while (f != l) {
-                    new (f++) double(n++);
-                } });
+    da.resize(1234, [](double *f, double *l) {
+      int n = 0;
+      while (f != l) {
+        new (f++) double(n++);
+      }
+    });
     TF_AXIOM(da.size() == 1234);
-    for (int n = 0; n != 1234; ++n)
-    {
+    for (int n = 0; n != 1234; ++n) {
       TF_AXIOM(da.cdata()[n] == double(n));
     }
 
     // Make it bigger.
-    da.resize(2345, [](double *f, double *l)
-              {
-                int n = 0;
-                while (f != l) {
-                    new (f++) double(n++);
-                } });
+    da.resize(2345, [](double *f, double *l) {
+      int n = 0;
+      while (f != l) {
+        new (f++) double(n++);
+      }
+    });
     TF_AXIOM(da.size() == 2345);
-    for (int n = 1234; n != 2345; ++n)
-    {
+    for (int n = 1234; n != 2345; ++n) {
       TF_AXIOM(da.cdata()[n] == double(n - 1234));
     }
 
     // Make it smaller.
-    da.resize(123, [](double *f, double *l)
-              { TF_FATAL_ERROR("Expected no added elements"); });
+    da.resize(123, [](double *f, double *l) { TF_FATAL_ERROR("Expected no added elements"); });
     TF_AXIOM(da.size() == 123);
-    for (int n = 0; n != 123; ++n)
-    {
+    for (int n = 0; n != 123; ++n) {
       TF_AXIOM(da.cdata()[n] == double(n));
     }
   }
   {
     // Test VtArray erasing from the middle
     VtIntArray array({1, 2, 3, 4, 5, 6});
-    VtIntArray::iterator it = array.erase(
-        array.cbegin() + 2, array.cbegin() + 4);
+    VtIntArray::iterator it = array.erase(array.cbegin() + 2, array.cbegin() + 4);
     TF_AXIOM(array.size() == 4);
     TF_AXIOM(array == VtIntArray({1, 2, 5, 6}));
     TF_AXIOM(it == array.begin() + 2);
@@ -401,8 +382,7 @@ static void testArray()
   {
     // Test VtArray erasing from the beginning
     VtIntArray array({1, 2, 3, 4, 5, 6});
-    VtIntArray::iterator it = array.erase(
-        array.cbegin(), array.cbegin() + 4);
+    VtIntArray::iterator it = array.erase(array.cbegin(), array.cbegin() + 4);
     TF_AXIOM(array.size() == 2);
     TF_AXIOM(array == VtIntArray({5, 6}));
     TF_AXIOM(it == array.begin());
@@ -466,8 +446,7 @@ static void testArray()
   {
     // Test erasing an empty range from an empty vec
     VtStringArray array;
-    VtStringArray::iterator it =
-        array.erase(array.cbegin(), array.cbegin());
+    VtStringArray::iterator it = array.erase(array.cbegin(), array.cbegin());
     TF_AXIOM(array.empty());
     TF_AXIOM(it == array.cbegin());
     TF_AXIOM(it == array.cend());
@@ -478,28 +457,22 @@ static void testArray()
     VtIntArray array({1, 2, 3, 4, 5, 6});
     std::vector<int> vector({1, 2, 3, 4, 5, 6});
 
-    VtIntArray::iterator arrayIt = array.erase(
-        std::next(array.cbegin(), 1));
-    std::vector<int>::iterator vectorIt = vector.erase(
-        std::next(vector.cbegin(), 1));
+    VtIntArray::iterator arrayIt = array.erase(std::next(array.cbegin(), 1));
+    std::vector<int>::iterator vectorIt = vector.erase(std::next(vector.cbegin(), 1));
 
     TF_AXIOM(*vectorIt == 3);
     TF_AXIOM(*vectorIt == *arrayIt);
 
-    VtIntArray::iterator emptyArrayIt =
-        array.erase(array.cbegin(), array.cbegin());
-    std::vector<int>::iterator emptyVectorIt =
-        vector.erase(vector.cbegin(), vector.cbegin());
+    VtIntArray::iterator emptyArrayIt = array.erase(array.cbegin(), array.cbegin());
+    std::vector<int>::iterator emptyVectorIt = vector.erase(vector.cbegin(), vector.cbegin());
 
     TF_AXIOM(*emptyVectorIt == 1);
     TF_AXIOM(*emptyVectorIt == *emptyArrayIt);
 
     // When erasing the last element in an array, make sure we return
     // the new end()
-    VtIntArray::iterator lastArrayIt = array.erase(
-        std::next(array.cend(), -1));
-    std::vector<int>::iterator lastVectorIt =
-        vector.erase(std::next(vector.cend(), -1));
+    VtIntArray::iterator lastArrayIt = array.erase(std::next(array.cend(), -1));
+    std::vector<int>::iterator lastVectorIt = vector.erase(std::next(vector.cend(), -1));
     TF_AXIOM(lastVectorIt == vector.end());
     TF_AXIOM(lastArrayIt == array.end());
   }
@@ -534,34 +507,28 @@ static void testArray()
     // std::bad_alloc
 
     VtIntArray ia;
-    try
-    {
+    try {
       ia.resize(std::numeric_limits<size_t>::max());
       TF_FATAL_ERROR("Did not throw std::bad_alloc");
     }
-    catch (std::bad_alloc const &)
-    {
+    catch (std::bad_alloc const &) {
       // pass
     }
 
     VtDoubleArray da;
-    try
-    {
+    try {
       da.reserve(std::numeric_limits<size_t>::max() / 2);
       TF_FATAL_ERROR("Did not throw std::bad_alloc");
     }
-    catch (std::bad_alloc const &)
-    {
+    catch (std::bad_alloc const &) {
       // pass
     }
 
-    try
-    {
+    try {
       da.resize(ia.max_size() + 1);
       TF_FATAL_ERROR("Did not throw std::bad_alloc");
     }
-    catch (std::bad_alloc const &)
-    {
+    catch (std::bad_alloc const &) {
       // pass
     }
   }
@@ -698,24 +665,16 @@ static void testDictionary()
   dictionary2["key2"] = VtValue(s);
 
   // In-place creation and code coverage for equality operator.
-  if (VtDictionary{{"key1", VtValue(d)}, {"key2", VtValue(b)}} !=
-      dictionary)
-  {
+  if (VtDictionary{{"key1", VtValue(d)}, {"key2", VtValue(b)}} != dictionary) {
     die("VtDictionary");
   }
-  if (VtDictionary{{"key1", VtValue(d)}, {"key2X", VtValue(b)}} ==
-      dictionary)
-  {
+  if (VtDictionary{{"key1", VtValue(d)}, {"key2X", VtValue(b)}} == dictionary) {
     die("VtDictionary");
   }
-  if (VtDictionary{{"key1", VtValue(d)}, {"key2", VtValue(true)}} ==
-      dictionary)
-  {
+  if (VtDictionary{{"key1", VtValue(d)}, {"key2", VtValue(true)}} == dictionary) {
     die("VtDictionary");
   }
-  if (VtDictionary{{"key1", VtValue(d)}} ==
-      dictionary)
-  {
+  if (VtDictionary{{"key1", VtValue(d)}} == dictionary) {
     die("VtDictionary");
   }
 
@@ -723,8 +682,7 @@ static void testDictionary()
   VtDictionaryOver(dictionary2, &dictionary);
 
   // Make sure the result is the same if we create a new dictionary.
-  if (VtDictionaryOver(dictionary2, dictionary) != dictionary)
-  {
+  if (VtDictionaryOver(dictionary2, dictionary) != dictionary) {
     die("VtDictionaryOver");
   }
 
@@ -737,28 +695,23 @@ static void testDictionary()
   }
 
   // Look up a value that was there before the composite.
-  if (!VtDictionaryIsHolding<double>(dictionary, "key1"))
-  {
+  if (!VtDictionaryIsHolding<double>(dictionary, "key1")) {
     die("VtDictionaryIsHolding");
   }
-  if (VtDictionaryGet<double>(dictionary, "key1") != d)
-  {
+  if (VtDictionaryGet<double>(dictionary, "key1") != d) {
     die("VtDictionaryGet");
   }
 
   // Look up a value that resulted from the composite.
-  if (!VtDictionaryIsHolding<string>(dictionary, "key2"))
-  {
+  if (!VtDictionaryIsHolding<string>(dictionary, "key2")) {
     die("VtDictionaryIsHolding");
   }
-  if (VtDictionaryGet<string>(dictionary, "key2") != s)
-  {
+  if (VtDictionaryGet<string>(dictionary, "key2") != s) {
     die("VtDictionaryGet");
   }
 
   // Look up a key that's not there.
-  if (VtDictionaryIsHolding<double>(dictionary, "key3"))
-  {
+  if (VtDictionaryIsHolding<double>(dictionary, "key3")) {
     die("VtDictionaryIsHolding");
   }
 
@@ -769,8 +722,7 @@ static void testDictionary()
   VtDictionaryOver(&dictionary, dictionary2);
 
   // Make sure the result is the same if we create a new dictionary.
-  if (VtDictionaryOver(dictionary, dictionary2) != dictionary)
-  {
+  if (VtDictionaryOver(dictionary, dictionary2) != dictionary) {
     die("VtDictionaryOver");
   }
   // Call Over with a NULL pointer.
@@ -782,22 +734,18 @@ static void testDictionary()
   }
 
   // Look up a value that was there before the composite.
-  if (!VtDictionaryIsHolding<double>(dictionary, "key1"))
-  {
+  if (!VtDictionaryIsHolding<double>(dictionary, "key1")) {
     die("VtDictionaryIsHolding");
   }
-  if (VtDictionaryGet<double>(dictionary, "key1") != d)
-  {
+  if (VtDictionaryGet<double>(dictionary, "key1") != d) {
     die("VtDictionaryGet");
   }
 
   // Look up a value that resulted from the composite.
-  if (!VtDictionaryIsHolding<string>(dictionary, "key3"))
-  {
+  if (!VtDictionaryIsHolding<string>(dictionary, "key3")) {
     die("VtDictionaryIsHolding");
   }
-  if (VtDictionaryGet<string>(dictionary, "key3") != s)
-  {
+  if (VtDictionaryGet<string>(dictionary, "key3") != s) {
     die("VtDictionaryGet");
   }
 }
@@ -847,12 +795,10 @@ static void testDictionaryOverRecursive()
 
   // Check methods that take references for strong and weak.
   //
-  if (VtDictionaryOver(dictionaryA, dictionaryB) != aOverBResult)
-  {
+  if (VtDictionaryOver(dictionaryA, dictionaryB) != aOverBResult) {
     die("VtDictionaryOver - two ref version");
   }
-  if (VtDictionaryOverRecursive(dictionaryA, dictionaryB) != aOverBResultRecursive)
-  {
+  if (VtDictionaryOverRecursive(dictionaryA, dictionaryB) != aOverBResultRecursive) {
     die("VtDictionaryOverRecursive - two ref version recursive");
   }
 
@@ -867,14 +813,12 @@ static void testDictionaryOverRecursive()
 
   VtDictionary aCopy = dictionaryA;
   VtDictionaryOver(&aCopy, dictionaryB);
-  if (aCopy != aOverBResult)
-  {
+  if (aCopy != aOverBResult) {
     die("VtDictionaryOver - strong Ptr version");
   }
   aCopy = dictionaryA;
   VtDictionaryOverRecursive(&aCopy, dictionaryB);
-  if (aCopy != aOverBResultRecursive)
-  {
+  if (aCopy != aOverBResultRecursive) {
     die("VtDictionaryOverRecursive - strong Ptr version");
   }
 
@@ -889,20 +833,17 @@ static void testDictionaryOverRecursive()
 
   VtDictionary bCopy = dictionaryB;
   VtDictionaryOver(dictionaryA, &bCopy);
-  if (bCopy != aOverBResult)
-  {
+  if (bCopy != aOverBResult) {
     die("VtDictionaryOver - strong ref, weak Ptr version");
   }
   bCopy = dictionaryB;
   VtDictionaryOverRecursive(dictionaryA, &bCopy);
-  if (bCopy != aOverBResultRecursive)
-  {
+  if (bCopy != aOverBResultRecursive) {
     die("VtDictionaryOverRecursive - strong ref, weak Ptr version");
   }
 }
 
-static void
-testDictionaryIterators()
+static void testDictionaryIterators()
 {
   // Test iterator-related things that might break if one were to attempt a
   // copy-on-write implementation for VtDictionary.
@@ -924,8 +865,7 @@ testDictionaryIterators()
     a.erase(i);
 
     VtDictionary expected = {key1, key3};
-    if (a != expected)
-    {
+    if (a != expected) {
       die("VtDictionary::erase(Iterator) - failed after copy");
     }
   }
@@ -936,8 +876,7 @@ testDictionaryIterators()
     VtDictionary::const_iterator i = a.find(key2.first);
     a.insert(std::make_pair(key3.first, key3.second));
     VtDictionary::const_iterator j = a.find(key2.first);
-    if (i != j)
-    {
+    if (i != j) {
       die("VtDictionary - iterators to same element do not compare "
           "equal");
     }
@@ -958,8 +897,7 @@ testDictionaryIterators()
     }
     VtDictionary::const_iterator aEnd = a.end();
     VtDictionary::const_iterator expectedEnd = expected.end();
-    if (std::distance(i, aEnd) != std::distance(j, expectedEnd))
-    {
+    if (std::distance(i, aEnd) != std::distance(j, expectedEnd)) {
       die("VtDictionary - incorrect iterator distance after copy");
     }
   }
@@ -975,33 +913,27 @@ testDictionaryIterators()
     }
 
     VtDictionary::const_iterator j = a.find(key1.first);
-    if (i != j)
-    {
+    if (i != j) {
       die("VtDictionary - iterators to same item do not compare equal");
     }
 
-    if (*i != *j)
-    {
+    if (*i != *j) {
       die("VtDictionary - dereferenced iterators to same item do not "
           "have equal values.");
     }
   }
 }
 
-static void
-testDictionaryInitializerList()
+static void testDictionaryInitializerList()
 {
   const VtDictionary dict{};
   TF_AXIOM(dict.empty());
 
-  const VtDictionary dict2 = {
-      {"key_a", VtValue(1)},
-      {"key_b", VtValue(2)}};
+  const VtDictionary dict2 = {{"key_a", VtValue(1)}, {"key_b", VtValue(2)}};
   TF_AXIOM(!dict2.empty());
 
   int i = 0;
-  for (const string &k : {"key_a", "key_b"})
-  {
+  for (const string &k : {"key_a", "key_b"}) {
     auto it = dict2.find(k);
     TF_AXIOM(it != dict2.end());
     TF_AXIOM(it->first == k);
@@ -1012,52 +944,44 @@ testDictionaryInitializerList()
 
 // dest and source types are flipped so we can allow compiler to infer
 // source type
-template <class VB, class VA>
-static void _TestVecCast(VA const &vecA)
+template<class VB, class VA> static void _TestVecCast(VA const &vecA)
 {
   string typeNameA = ArchGetDemangled<VA>();
   string typeNameB = ArchGetDemangled<VB>();
   VtValue val(vecA);
 
-  if (!val.CanCast<VB>())
-  {
+  if (!val.CanCast<VB>()) {
     die("Could not cast type " + typeNameA + " to a " + typeNameB);
   }
 
   TF_AXIOM(!val.Cast<VB>().IsEmpty());
 
-  if (!(val.UncheckedGet<VB>() == VB(vecA)))
-  {
+  if (!(val.UncheckedGet<VB>() == VB(vecA))) {
     die("Unboxed " + typeNameA + " to " + typeNameB + "did no compare equal");
   }
 }
 
-template <class VB, class VA>
-static void _FailVecCast(VA const &vecA)
+template<class VB, class VA> static void _FailVecCast(VA const &vecA)
 {
   string typeNameA = ArchGetDemangled<VA>();
   string typeNameB = ArchGetDemangled<VB>();
   VtValue val(vecA);
 
-  if (val.CanCast<VB>())
-  {
+  if (val.CanCast<VB>()) {
     die("Should not have been able to cast " + typeNameA + " to a " + typeNameB);
   }
 
   TF_AXIOM(val.Cast<VB>().IsEmpty());
 }
 
-struct _NotStreamable
-{
-};
+struct _NotStreamable {};
 // Equality comparison requirement.
 bool operator==(const _NotStreamable &l, const _NotStreamable &r)
 {
   return true;
 }
 
-struct _NotDefaultConstructible
-{
+struct _NotDefaultConstructible {
   explicit _NotDefaultConstructible(int x) {}
   bool operator==(const _NotDefaultConstructible &other) const
   {
@@ -1065,11 +989,7 @@ struct _NotDefaultConstructible
   }
 };
 
-enum Vt_TestEnum
-{
-  Vt_TestEnumVal1,
-  Vt_TestEnumVal2
-};
+enum Vt_TestEnum { Vt_TestEnumVal1, Vt_TestEnumVal2 };
 TF_REGISTRY_FUNCTION(TfType)
 {
   TfType::Define<Vt_TestEnum>();
@@ -1111,19 +1031,15 @@ static void testValue()
     TF_AXIOM(TfStringify(VtValue(3.14159)) == "3.14159");
     TF_AXIOM(TfStringify(VtValue(0.1)) == "0.1");
     TF_AXIOM(TfStringify(VtValue(-0.000001)) == "-0.000001");
-    TF_AXIOM(TfStringify(
-                 VtValue(std::numeric_limits<double>::infinity())) == "inf");
-    TF_AXIOM(TfStringify(
-                 VtValue(-std::numeric_limits<double>::infinity())) == "-inf");
+    TF_AXIOM(TfStringify(VtValue(std::numeric_limits<double>::infinity())) == "inf");
+    TF_AXIOM(TfStringify(VtValue(-std::numeric_limits<double>::infinity())) == "-inf");
 
     TF_AXIOM(TfStringify(VtValue(0.0f)) == "0");
     TF_AXIOM(TfStringify(VtValue(3.14159f)) == "3.14159");
     TF_AXIOM(TfStringify(VtValue(0.1f)) == "0.1");
     TF_AXIOM(TfStringify(VtValue(-0.000001f)) == "-0.000001");
-    TF_AXIOM(TfStringify(
-                 VtValue(std::numeric_limits<float>::infinity())) == "inf");
-    TF_AXIOM(TfStringify(
-                 VtValue(-std::numeric_limits<float>::infinity())) == "-inf");
+    TF_AXIOM(TfStringify(VtValue(std::numeric_limits<float>::infinity())) == "inf");
+    TF_AXIOM(TfStringify(VtValue(-std::numeric_limits<float>::infinity())) == "-inf");
   }
 
   VtValue v(1.234);
@@ -1310,8 +1226,7 @@ static void testValue()
   // Range-checked casts.
   v = VtValue(std::numeric_limits<short>::max());
   v.Cast<short>();
-  TF_AXIOM(v.IsHolding<short>() &&
-           v.UncheckedGet<short>() == std::numeric_limits<short>::max());
+  TF_AXIOM(v.IsHolding<short>() && v.UncheckedGet<short>() == std::numeric_limits<short>::max());
   // Out-of-range should fail.
   v = VtValue(std::numeric_limits<int>::max());
   v.Cast<short>();
@@ -1532,16 +1447,14 @@ static void testValue()
     TF_AXIOM(s == "hello world!");
 
     v.Swap(s);
-    TF_AXIOM(v.IsHolding<string>() &&
-             v.UncheckedGet<string>() == "hello world!");
+    TF_AXIOM(v.IsHolding<string>() && v.UncheckedGet<string>() == "hello world!");
     string t = v.Remove<string>();
     TF_AXIOM(t == "hello world!");
     TF_AXIOM(v.IsEmpty());
 
     v.Swap(t);
     TF_AXIOM(t.empty());
-    TF_AXIOM(v.IsHolding<string>() &&
-             v.UncheckedGet<string>() == "hello world!");
+    TF_AXIOM(v.IsHolding<string>() && v.UncheckedGet<string>() == "hello world!");
 
     t = v.UncheckedRemove<string>();
     TF_AXIOM(t == "hello world!");
@@ -1559,21 +1472,19 @@ static void testValue()
     m.Clear();
   }
 
-#define _VT_TEST_ZERO_VALUE(r, unused, elem)                         \
-  {                                                                  \
-    VtValue empty;                                                   \
-    TfErrorMark m;                                                   \
+#define _VT_TEST_ZERO_VALUE(r, unused, elem) \
+  { \
+    VtValue empty; \
+    TfErrorMark m; \
     TF_AXIOM(empty.Get<VT_TYPE(elem)>() == VtZero<VT_TYPE(elem)>()); \
-    TF_AXIOM(!m.IsClean());                                          \
-    m.Clear();                                                       \
+    TF_AXIOM(!m.IsClean()); \
+    m.Clear(); \
   }
 
   BOOST_PP_SEQ_FOR_EACH(_VT_TEST_ZERO_VALUE,
                         unused,
-                        VT_VEC_VALUE_TYPES
-                            VT_MATRIX_VALUE_TYPES
-                                VT_QUATERNION_VALUE_TYPES
-                                    VT_DUALQUATERNION_VALUE_TYPES);
+                        VT_VEC_VALUE_TYPES VT_MATRIX_VALUE_TYPES VT_QUATERNION_VALUE_TYPES
+                            VT_DUALQUATERNION_VALUE_TYPES);
 
 #undef _VT_TEST_ZERO_VALUE
 
@@ -1594,13 +1505,13 @@ static void testValue()
   }
 }
 
-struct _Unhashable
+struct _Unhashable {};
+bool operator==(_Unhashable, _Unhashable)
 {
-};
-bool operator==(_Unhashable, _Unhashable) { return true; }
+  return true;
+}
 
-static void
-testValueHash()
+static void testValueHash()
 {
   static_assert(VtIsHashable<int>(), "");
   static_assert(VtIsHashable<double>(), "");
@@ -1631,30 +1542,24 @@ testValueHash()
   }
 }
 
-static void
-testArrayHash()
+static void testArrayHash()
 {
   VtArray<int> array = {1, 2, 3, 4, 5, 10, 100};
   TF_AXIOM(TfHash()(array) == TfHash()(array));
   TF_AXIOM(TfHash()(array) == TfHash()(VtArray<int>(array)));
 }
 
-template <class T>
-struct _TypedProxy : VtTypedValueProxyBase
-{
+template<class T> struct _TypedProxy : VtTypedValueProxyBase {
   explicit _TypedProxy(T const &val) : val(val) {}
   T val;
 };
 
-template <class T>
-T const &
-VtGetProxiedObject(_TypedProxy<T> const &tp)
+template<class T> T const &VtGetProxiedObject(_TypedProxy<T> const &tp)
 {
   return tp.val;
 }
 
-static void
-testTypedVtValueProxy()
+static void testTypedVtValueProxy()
 {
   // Make a value holding double, and a proxy also holding a double.
   VtValue vdouble(1.234), vproxy(_TypedProxy<double>(1.234));
@@ -1697,15 +1602,13 @@ testTypedVtValueProxy()
   TF_AXIOM(varrayProxy.Get<VtFloatArray>() == fa);
 }
 
-struct _ErasedDoubleProxy : VtErasedValueProxyBase
-{
+struct _ErasedDoubleProxy : VtErasedValueProxyBase {
   explicit _ErasedDoubleProxy(double val) : val(val) {}
   mutable std::shared_ptr<VtValue> vtValue;
   double val;
 };
 
-bool VtErasedProxyHoldsType(_ErasedDoubleProxy const &,
-                            std::type_info const &queryType)
+bool VtErasedProxyHoldsType(_ErasedDoubleProxy const &, std::type_info const &queryType)
 {
   return TfSafeTypeCompare(queryType, typeid(double));
 }
@@ -1719,8 +1622,7 @@ VtValue const *VtGetErasedProxiedVtValue(_ErasedDoubleProxy const &p)
 {
   // This would need synchronization for thread safety in general, leaving it
   // out of the test for clarity's sake.
-  if (!p.vtValue)
-  {
+  if (!p.vtValue) {
     p.vtValue.reset(new VtValue(p.val));
   }
   return p.vtValue.get();
@@ -1731,8 +1633,7 @@ std::ostream &operator<<(std::ostream &o, _ErasedDoubleProxy const &p)
   return VtStreamOut(p.val, o);
 }
 
-static void
-testErasedVtValueProxy()
+static void testErasedVtValueProxy()
 {
   // Make a value holding double, and a proxy also holding a double.
   VtValue vdouble(1.234), vproxy(_ErasedDoubleProxy(1.234));
@@ -1763,8 +1664,7 @@ testErasedVtValueProxy()
   TF_AXIOM(vproxy.Get<double>() == 3.456);
 }
 
-static void
-testCombinedVtValueProxies()
+static void testCombinedVtValueProxies()
 {
   VtValue tproxy(_TypedProxy<double>(1.234));
   VtValue eproxy(_ErasedDoubleProxy(1.234));
@@ -1786,8 +1686,7 @@ testCombinedVtValueProxies()
   TF_AXIOM(eproxy.IsHolding<_TypedProxy<double>>());
 }
 
-struct Stringify
-{
+struct Stringify {
   std::string operator()(int x) const
   {
     return TfStringPrintf("int: %d", x);
@@ -1803,8 +1702,7 @@ struct Stringify
     return TfStringPrintf("string: '%s'", str.c_str());
   };
 
-  template <class T>
-  std::string operator()(VtArray<T> const &arr) const
+  template<class T> std::string operator()(VtArray<T> const &arr) const
   {
     return TfStringPrintf("array: sz=%zu", arr.size());
   }
@@ -1815,19 +1713,25 @@ struct Stringify
   }
 };
 
-struct RoundOrMinusOne
-{
-  int operator()(int x) const { return x; }
+struct RoundOrMinusOne {
+  int operator()(int x) const
+  {
+    return x;
+  }
 
-  int operator()(double x) const { return static_cast<int>(rint(x)); }
+  int operator()(double x) const
+  {
+    return static_cast<int>(rint(x));
+  }
 
-  int operator()(VtValue const &val) const { return -1; }
+  int operator()(VtValue const &val) const
+  {
+    return -1;
+  }
 };
 
-struct GetArraySize
-{
-  template <class T>
-  size_t operator()(VtArray<T> const &array) const
+struct GetArraySize {
+  template<class T> size_t operator()(VtArray<T> const &array) const
   {
     return array.size();
   }
@@ -1838,8 +1742,7 @@ struct GetArraySize
   }
 };
 
-static void
-testVisitValue()
+static void testVisitValue()
 {
   VtValue iv(123);
   VtValue dv(1.23);
@@ -1867,32 +1770,25 @@ testVisitValue()
 
   TF_AXIOM(VtVisitValue(av, GetArraySize()) == 123);
   TF_AXIOM(VtVisitValue(iv, GetArraySize()) == size_t(~0));
-  TF_AXIOM(VtVisitValue(
-               VtValue(VtArray<GfVec3d>(234)), GetArraySize()) == 234);
+  TF_AXIOM(VtVisitValue(VtValue(VtArray<GfVec3d>(234)), GetArraySize()) == 234);
 }
 
-template <typename T>
-static void
-AssertIsHoldingKnownType(const VtValue &val)
+template<typename T> static void AssertIsHoldingKnownType(const VtValue &val)
 {
-  switch (val.GetKnownValueTypeIndex())
-  {
-  case VtGetKnownValueTypeIndex<T>():
-    break;
-  default:
-    TF_FATAL_ERROR("Expected %s (index=%d); got index %d",
-                   ArchGetDemangled<T>().c_str(),
-                   VtGetKnownValueTypeIndex<T>(),
-                   val.GetKnownValueTypeIndex());
+  switch (val.GetKnownValueTypeIndex()) {
+    case VtGetKnownValueTypeIndex<T>():
+      break;
+    default:
+      TF_FATAL_ERROR("Expected %s (index=%d); got index %d",
+                     ArchGetDemangled<T>().c_str(),
+                     VtGetKnownValueTypeIndex<T>(),
+                     val.GetKnownValueTypeIndex());
   }
 }
 
-struct TypeNotKnownToVt
-{
-};
+struct TypeNotKnownToVt {};
 
-static void
-testKnownValueTypeIndex()
+static void testKnownValueTypeIndex()
 {
   VtValue iv(123);
   VtValue dv(1.23);

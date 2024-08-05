@@ -48,23 +48,30 @@ class TfDiagnosticMgr;
 ///
 class TfError : public TfDiagnosticBase {
 
-public:
+ public:
   /// Return the error code posted.
-  TfEnum GetErrorCode() const { return GetDiagnosticCode(); }
+  TfEnum GetErrorCode() const
+  {
+    return GetDiagnosticCode();
+  }
 
   /// Return the diagnostic code posted as a string.
-  const std::string &GetErrorCodeAsString() const {
+  const std::string &GetErrorCodeAsString() const
+  {
     return GetDiagnosticCodeAsString();
   }
 
-private:
-  TfError(TfEnum errorCode, char const *errCodeString,
-          TfCallContext const &context, const std::string &commentary,
-          TfDiagnosticInfo info, bool quiet);
+ private:
+  TfError(TfEnum errorCode,
+          char const *errCodeString,
+          TfCallContext const &context,
+          const std::string &commentary,
+          TfDiagnosticInfo info,
+          bool quiet);
 
   friend class TfDiagnosticMgr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ERROR_H
+#endif  // PXR_BASE_TF_ERROR_H

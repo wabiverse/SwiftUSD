@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_GL_DIAGNOSTIC_H
 #define PXR_IMAGING_HGI_GL_DIAGNOSTIC_H
 
-#include <pxr/pxrns.h>
-#include "HgiGL/api.h"
 #include "Arch/functionLite.h"
+#include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -34,8 +34,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Posts diagnostic errors for all GL errors in the current context.
 /// This macro tags the diagnostic errors with the name of the calling
 /// function.
-#define HGIGL_POST_PENDING_GL_ERRORS() \
-  HgiGLPostPendingGLErrors(__ARCH_PRETTY_FUNCTION__)
+#define HGIGL_POST_PENDING_GL_ERRORS() HgiGLPostPendingGLErrors(__ARCH_PRETTY_FUNCTION__)
 
 /// Returns true if GL debug is enabled
 HGIGL_API
@@ -54,9 +53,7 @@ bool HgiGLMeetsMinimumRequirements();
 
 /// Calls glObjectLabel making sure the label is not too long.
 HGIGL_API
-void HgiGLObjectLabel(uint32_t identifier,
-                      uint32_t name,
-                      const std::string &label);
+void HgiGLObjectLabel(uint32_t identifier, uint32_t name, const std::string &label);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

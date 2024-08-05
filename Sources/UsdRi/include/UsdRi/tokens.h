@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdRi/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdRi/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdRiTokens->bspline);
 /// \endcode
-struct UsdRiTokensType
-{
+struct UsdRiTokensType {
   USDRI_API UsdRiTokensType();
   /// \brief "bspline"
   ///
@@ -68,7 +67,8 @@ struct UsdRiTokensType
   const TfToken bspline;
   /// \brief "cameraVisibility"
   ///
-  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI to set the camera visibility attribute on the prims in the collection for the RenderPass.
+  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI
+  ///  to set the camera visibility attribute on the prims in the collection for the RenderPass.
   const TfToken cameraVisibility;
   /// \brief "catmull-rom"
   ///
@@ -92,7 +92,8 @@ struct UsdRiTokensType
   const TfToken linear;
   /// \brief "matte"
   ///
-  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI to set the matte attribute on the prims in the collection for the RenderPass.
+  ///  UsdRenderPassAPI - This token represents the collection  name to use with UsdCollectionAPI
+  ///  to set the matte attribute on the prims in the collection for the RenderPass.
   const TfToken matte;
   /// \brief "outputs:ri:displacement"
   ///

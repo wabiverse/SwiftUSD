@@ -35,108 +35,82 @@
 
 #include "Hd/sceneIndex.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSceneGlobalsSchemaTokens,
-    HDSCENEGLOBALS_SCHEMA_TOKENS);
-
-
+TF_DEFINE_PUBLIC_TOKENS(HdSceneGlobalsSchemaTokens, HDSCENEGLOBALS_SCHEMA_TOKENS);
 
 /* static */
-HdSceneGlobalsSchema
-HdSceneGlobalsSchema::GetFromSceneIndex(
-    const HdSceneIndexBaseRefPtr &si)
+HdSceneGlobalsSchema HdSceneGlobalsSchema::GetFromSceneIndex(const HdSceneIndexBaseRefPtr &si)
 {
-    if (!si) {
-        TF_CODING_ERROR("Invalid input scene index provided.");
-        return HdSceneGlobalsSchema(nullptr);
-    }
+  if (!si) {
+    TF_CODING_ERROR("Invalid input scene index provided.");
+    return HdSceneGlobalsSchema(nullptr);
+  }
 
-    return GetFromParent(si->GetPrim(GetDefaultPrimPath()).dataSource);
+  return GetFromParent(si->GetPrim(GetDefaultPrimPath()).dataSource);
 }
 
-
-
-HdPathDataSourceHandle
-HdSceneGlobalsSchema::GetActiveRenderSettingsPrim()
+HdPathDataSourceHandle HdSceneGlobalsSchema::GetActiveRenderSettingsPrim()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim);
+  return _GetTypedDataSource<HdPathDataSource>(
+      HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdSceneGlobalsSchema::BuildRetained(
-        const HdPathDataSourceHandle &activeRenderSettingsPrim
-)
-{
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
-
-    size_t count = 0;
-    if (activeRenderSettingsPrim) {
-        names[count] = HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim;
-        values[count++] = activeRenderSettingsPrim;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdSceneGlobalsSchema
-HdSceneGlobalsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdSceneGlobalsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdSceneGlobalsSchemaTokens->sceneGlobals))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdSceneGlobalsSchema::GetSchemaToken()
-{
-    return HdSceneGlobalsSchemaTokens->sceneGlobals;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdSceneGlobalsSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdSceneGlobalsSchemaTokens->sceneGlobals
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdSceneGlobalsSchema::GetActiveRenderSettingsPrimLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdSceneGlobalsSchemaTokens->sceneGlobals,
-        HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim
-    );
-    return locator;
-}
-
-
-HdSceneGlobalsSchema::Builder &
-HdSceneGlobalsSchema::Builder::SetActiveRenderSettingsPrim(
+HdContainerDataSourceHandle HdSceneGlobalsSchema::BuildRetained(
     const HdPathDataSourceHandle &activeRenderSettingsPrim)
 {
-    _activeRenderSettingsPrim = activeRenderSettingsPrim;
-    return *this;
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
+
+  size_t count = 0;
+  if (activeRenderSettingsPrim) {
+    names[count] = HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim;
+    values[count++] = activeRenderSettingsPrim;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdSceneGlobalsSchema::Builder::Build()
+/*static*/
+HdSceneGlobalsSchema HdSceneGlobalsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdSceneGlobalsSchema::BuildRetained(
-        _activeRenderSettingsPrim
-    );
+  return HdSceneGlobalsSchema(fromParentContainer ?
+                                  HdContainerDataSource::Cast(fromParentContainer->Get(
+                                      HdSceneGlobalsSchemaTokens->sceneGlobals)) :
+                                  nullptr);
 }
 
+/*static*/
+const TfToken &HdSceneGlobalsSchema::GetSchemaToken()
+{
+  return HdSceneGlobalsSchemaTokens->sceneGlobals;
+}
+/*static*/
+const HdDataSourceLocator &HdSceneGlobalsSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdSceneGlobalsSchemaTokens->sceneGlobals);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdSceneGlobalsSchema::GetActiveRenderSettingsPrimLocator()
+{
+  static const HdDataSourceLocator locator(HdSceneGlobalsSchemaTokens->sceneGlobals,
+                                           HdSceneGlobalsSchemaTokens->activeRenderSettingsPrim);
+  return locator;
+}
+
+HdSceneGlobalsSchema::Builder &HdSceneGlobalsSchema::Builder::SetActiveRenderSettingsPrim(
+    const HdPathDataSourceHandle &activeRenderSettingsPrim)
+{
+  _activeRenderSettingsPrim = activeRenderSettingsPrim;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdSceneGlobalsSchema::Builder::Build()
+{
+  return HdSceneGlobalsSchema::BuildRetained(_activeRenderSettingsPrim);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

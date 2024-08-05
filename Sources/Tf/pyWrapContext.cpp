@@ -32,7 +32,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(Tf_PyWrapContextManager);
 
-Tf_PyWrapContextManager::Tf_PyWrapContextManager() {
+Tf_PyWrapContextManager::Tf_PyWrapContextManager()
+{
   // initialize the stack of context names
   _contextStack.clear();
 }

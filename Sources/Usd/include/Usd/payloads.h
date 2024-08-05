@@ -45,7 +45,7 @@ class UsdPayloads {
 
   explicit UsdPayloads(const UsdPrim &prim) : _prim(prim) {}
 
-public:
+ public:
   /// Adds a payload to the payload listOp at the current EditTarget, in the
   /// position specified by \p position.
   /// \sa \ref Usd_Failing_References "Why adding references may fail" for
@@ -58,7 +58,8 @@ public:
 
   /// \overload
   USD_API
-  bool AddPayload(const std::string &identifier, const SdfPath &primPath,
+  bool AddPayload(const std::string &identifier,
+                  const SdfPath &primPath,
                   const SdfLayerOffset &layerOffset = SdfLayerOffset(),
                   UsdListPosition position = UsdListPositionBackOfPrependList);
 
@@ -72,10 +73,9 @@ public:
   /// Add an internal payload to the specified prim.
   /// \sa \ref Usd_Internal_References "Internal Payloads"
   USD_API
-  bool AddInternalPayload(
-      const SdfPath &primPath,
-      const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-      UsdListPosition position = UsdListPositionBackOfPrependList);
+  bool AddInternalPayload(const SdfPath &primPath,
+                          const SdfLayerOffset &layerOffset = SdfLayerOffset(),
+                          UsdListPosition position = UsdListPositionBackOfPrependList);
 
   /// Removes the specified payload from the payloads listOp at the
   /// current EditTarget.  This does not necessarily eliminate the payload
@@ -103,17 +103,26 @@ public:
   bool SetPayloads(const SdfPayloadVector &items);
 
   /// Return the prim this object is bound to.
-  const UsdPrim &GetPrim() const { return _prim; }
+  const UsdPrim &GetPrim() const
+  {
+    return _prim;
+  }
 
   /// \overload
-  UsdPrim GetPrim() { return _prim; }
+  UsdPrim GetPrim()
+  {
+    return _prim;
+  }
 
-  explicit operator bool() { return bool(_prim); }
+  explicit operator bool()
+  {
+    return bool(_prim);
+  }
 
-private:
+ private:
   UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PAYLOADS_H
+#endif  // PXR_USD_USD_PAYLOADS_H

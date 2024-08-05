@@ -38,7 +38,9 @@ bool Tf_AtomicRenameFileOver(std::string const &srcFileName,
 // return the realpath of \p fileName in \p realFileName, the created temporary
 // file name in \p tempFileName, and its open file descriptor.  In case of an
 // error, set \p error and return -1.
-int Tf_CreateSiblingTempFile(std::string fileName, std::string *realFileName,
-                             std::string *tempFileName, std::string *error);
+int Tf_CreateSiblingTempFile(std::string fileName,
+                             std::string *realFileName,
+                             std::string *tempFileName,
+                             std::string *error);
 
 PXR_NAMESPACE_CLOSE_SCOPE

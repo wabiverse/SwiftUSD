@@ -52,11 +52,11 @@ namespace pxr_double_conversion {
 //
 // This method only works for some parameters. If it can't handle the input it
 // returns false. The output is null-terminated when the function succeeds.
-bool FastFixedDtoa(double v, int fractional_count, Vector<char> buffer,
-                   int *length, int *decimal_point);
+bool FastFixedDtoa(
+    double v, int fractional_count, Vector<char> buffer, int *length, int *decimal_point);
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // DOUBLE_CONVERSION_FIXED_DTOA_H_
+#endif  // DOUBLE_CONVERSION_FIXED_DTOA_H_

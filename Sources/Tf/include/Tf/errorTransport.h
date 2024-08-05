@@ -44,7 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// (e.g. the parent thread) invokes TfErrorTransport::Post() to post all
 /// contained errors to its own thread's error list.
 class TfErrorTransport {
-public:
+ public:
   typedef TfDiagnosticMgr::ErrorList ErrorList;
 
   /// Construct an empty TfErrorTransport.
@@ -52,25 +52,32 @@ public:
 
   /// Post all contained errors to the current thread's error list, leaving
   /// this TfErrorTransport empty.
-  void Post() {
+  void Post()
+  {
     if (ARCH_UNLIKELY(!IsEmpty()))
       _PostImpl();
   }
 
   /// Return true if this TfErrorTransport contains no errors, false
   /// otherwise.
-  bool IsEmpty() const { return _errorList.empty(); }
+  bool IsEmpty() const
+  {
+    return _errorList.empty();
+  }
 
   /// Swap this TfErrorTransport's content with \p other.  This provides a
   /// lightweight way to move the contents of one TfErrorTransport to
   /// another.
-  void swap(TfErrorTransport &other) { _errorList.swap(other._errorList); }
+  void swap(TfErrorTransport &other)
+  {
+    _errorList.swap(other._errorList);
+  }
 
-private:
+ private:
   friend class TfErrorMark;
 
-  TfErrorTransport(ErrorList &src, ErrorList::iterator first,
-                   ErrorList::iterator last) {
+  TfErrorTransport(ErrorList &src, ErrorList::iterator first, ErrorList::iterator last)
+  {
     _errorList.splice(_errorList.begin(), src, first, last);
   }
 
@@ -80,8 +87,11 @@ private:
   ErrorList _errorList;
 };
 
-inline void swap(TfErrorTransport &l, TfErrorTransport &r) { l.swap(r); }
+inline void swap(TfErrorTransport &l, TfErrorTransport &r)
+{
+  l.swap(r);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ERROR_TRANSPORT_H
+#endif  // PXR_BASE_TF_ERROR_TRANSPORT_H

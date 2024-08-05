@@ -33,226 +33,192 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static void
-TestGetDescendants()
+static void TestGetDescendants()
 {
-    std::string layerFile = "test.usda";
-    UsdStageRefPtr stage = UsdStage::Open(layerFile, UsdStage::InitialLoadSet::LoadNone);
-    if (!stage) {
-        TF_FATAL_ERROR("Failed to load stage for @%s@", layerFile.c_str());
-    }
+  std::string layerFile = "test.usda";
+  UsdStageRefPtr stage = UsdStage::Open(layerFile, UsdStage::InitialLoadSet::LoadNone);
+  if (!stage) {
+    TF_FATAL_ERROR("Failed to load stage for @%s@", layerFile.c_str());
+  }
 
-    UsdPrim 
-        root = stage->GetPrimAtPath(SdfPath("/")),
-        globalClass = stage->GetPrimAtPath(SdfPath("/GlobalClass")),
-        abstractSubscope =
-            stage->GetPrimAtPath(SdfPath("/GlobalClass/AbstractSubscope")),
-        abstractOver = 
-            stage->GetPrimAtPath(SdfPath("/GlobalClass/AbstractOver")),
-        pureOver = stage->GetPrimAtPath(SdfPath("/PureOver")),
-        undefSubscope = 
-            stage->GetPrimAtPath(SdfPath("/PureOver/UndefinedSubscope")),
-        group = stage->GetPrimAtPath(SdfPath("/Group")),
-        modelChild = stage->GetPrimAtPath(SdfPath("/Group/ModelChild")),
-        localChild = stage->GetPrimAtPath(SdfPath("/Group/LocalChild")),
-        undefModelChild = 
-            stage->GetPrimAtPath(SdfPath("/Group/UndefinedModelChild")),
-        deactivatedScope = 
-            stage->GetPrimAtPath(SdfPath("/Group/DeactivatedScope")),
-        deactivatedModel = 
-            stage->GetPrimAtPath(SdfPath("/Group/DeactivatedModel")),
-        deactivatedOver = 
-            stage->GetPrimAtPath(SdfPath("/Group/DeactivatedOver")),
-        propertyOrder = stage->GetPrimAtPath(SdfPath("/PropertyOrder"));
+  UsdPrim root = stage->GetPrimAtPath(SdfPath("/")),
+          globalClass = stage->GetPrimAtPath(SdfPath("/GlobalClass")),
+          abstractSubscope = stage->GetPrimAtPath(SdfPath("/GlobalClass/AbstractSubscope")),
+          abstractOver = stage->GetPrimAtPath(SdfPath("/GlobalClass/AbstractOver")),
+          pureOver = stage->GetPrimAtPath(SdfPath("/PureOver")),
+          undefSubscope = stage->GetPrimAtPath(SdfPath("/PureOver/UndefinedSubscope")),
+          group = stage->GetPrimAtPath(SdfPath("/Group")),
+          modelChild = stage->GetPrimAtPath(SdfPath("/Group/ModelChild")),
+          localChild = stage->GetPrimAtPath(SdfPath("/Group/LocalChild")),
+          undefModelChild = stage->GetPrimAtPath(SdfPath("/Group/UndefinedModelChild")),
+          deactivatedScope = stage->GetPrimAtPath(SdfPath("/Group/DeactivatedScope")),
+          deactivatedModel = stage->GetPrimAtPath(SdfPath("/Group/DeactivatedModel")),
+          deactivatedOver = stage->GetPrimAtPath(SdfPath("/Group/DeactivatedOver")),
+          propertyOrder = stage->GetPrimAtPath(SdfPath("/PropertyOrder"));
 
-    // Check filtered descendant access.
-    TF_AXIOM((
-        root.GetAllDescendants() ==
-        std::vector<UsdPrim>{
-            globalClass, abstractSubscope, abstractOver,
-            pureOver, undefSubscope,
-            group, modelChild, localChild, undefModelChild, 
-            deactivatedScope, deactivatedModel, deactivatedOver,
-            propertyOrder}));
+  // Check filtered descendant access.
+  TF_AXIOM((root.GetAllDescendants() == std::vector<UsdPrim>{globalClass,
+                                                             abstractSubscope,
+                                                             abstractOver,
+                                                             pureOver,
+                                                             undefSubscope,
+                                                             group,
+                                                             modelChild,
+                                                             localChild,
+                                                             undefModelChild,
+                                                             deactivatedScope,
+                                                             deactivatedModel,
+                                                             deactivatedOver,
+                                                             propertyOrder}));
 
-    // Manually construct the "normal" view.
-    TF_AXIOM((
-        root.GetFilteredDescendants(
-            UsdPrimIsActive && UsdPrimIsLoaded &&
-            UsdPrimIsDefined && !UsdPrimIsAbstract) ==
-        std::vector<UsdPrim>{propertyOrder}));
+  // Manually construct the "normal" view.
+  TF_AXIOM(
+      (root.GetFilteredDescendants(UsdPrimIsActive && UsdPrimIsLoaded && UsdPrimIsDefined &&
+                                   !UsdPrimIsAbstract) == std::vector<UsdPrim>{propertyOrder}));
 
-    // Only abstract prims.
-    TF_AXIOM((
-        root.GetFilteredDescendants(UsdPrimIsAbstract) ==
-        std::vector<UsdPrim>{globalClass, abstractSubscope, abstractOver}));
+  // Only abstract prims.
+  TF_AXIOM((root.GetFilteredDescendants(UsdPrimIsAbstract) ==
+            std::vector<UsdPrim>{globalClass, abstractSubscope, abstractOver}));
 
-    // Abstract & defined prims
-    TF_AXIOM((
-        root.GetFilteredDescendants(UsdPrimIsAbstract && UsdPrimIsDefined) ==
-        std::vector<UsdPrim>{globalClass, abstractSubscope}));
+  // Abstract & defined prims
+  TF_AXIOM((root.GetFilteredDescendants(UsdPrimIsAbstract && UsdPrimIsDefined) ==
+            std::vector<UsdPrim>{globalClass, abstractSubscope}));
 
-    // Abstract | unloaded prims
-    TF_AXIOM((
-        root.GetFilteredDescendants(UsdPrimIsAbstract || !UsdPrimIsLoaded) ==
-        std::vector<UsdPrim>{
-            globalClass, abstractSubscope, abstractOver, 
-            group, modelChild, localChild, undefModelChild, 
-            deactivatedScope, deactivatedModel, deactivatedOver}));
+  // Abstract | unloaded prims
+  TF_AXIOM((root.GetFilteredDescendants(UsdPrimIsAbstract || !UsdPrimIsLoaded) ==
+            std::vector<UsdPrim>{globalClass,
+                                 abstractSubscope,
+                                 abstractOver,
+                                 group,
+                                 modelChild,
+                                 localChild,
+                                 undefModelChild,
+                                 deactivatedScope,
+                                 deactivatedModel,
+                                 deactivatedOver}));
 
-    // Models only.
-    TF_AXIOM((
-        root.GetFilteredDescendants(UsdPrimIsModel) ==
-        std::vector<UsdPrim>{group, modelChild, deactivatedModel}));
+  // Models only.
+  TF_AXIOM((root.GetFilteredDescendants(UsdPrimIsModel) ==
+            std::vector<UsdPrim>{group, modelChild, deactivatedModel}));
 
-    // Non-models only.
-    TF_AXIOM((
-        root.GetFilteredDescendants(!UsdPrimIsModel) ==
-        std::vector<UsdPrim>{
-            globalClass, abstractSubscope, abstractOver, 
-            pureOver, undefSubscope, propertyOrder}));
+  // Non-models only.
+  TF_AXIOM(
+      (root.GetFilteredDescendants(!UsdPrimIsModel) ==
+       std::vector<UsdPrim>{
+           globalClass, abstractSubscope, abstractOver, pureOver, undefSubscope, propertyOrder}));
 
-    // Models or undefined.
-    TF_AXIOM((
-        root.GetFilteredDescendants(UsdPrimIsModel || !UsdPrimIsDefined) ==
-        std::vector<UsdPrim>{
-            pureOver, undefSubscope, group, modelChild, undefModelChild,
-            deactivatedModel, deactivatedOver}));
+  // Models or undefined.
+  TF_AXIOM((root.GetFilteredDescendants(UsdPrimIsModel || !UsdPrimIsDefined) ==
+            std::vector<UsdPrim>{pureOver,
+                                 undefSubscope,
+                                 group,
+                                 modelChild,
+                                 undefModelChild,
+                                 deactivatedModel,
+                                 deactivatedOver}));
 }
 
-static void
-TestGetDescendantsAsInstanceProxies()
+static void TestGetDescendantsAsInstanceProxies()
 {
-    std::string layerFile = "nested/root.usda";
-    UsdStageRefPtr stage = UsdStage::Open(layerFile);
-    if (!stage) {
-        TF_FATAL_ERROR("Failed to load stage for @%s@", layerFile.c_str());
-    }
+  std::string layerFile = "nested/root.usda";
+  UsdStageRefPtr stage = UsdStage::Open(layerFile);
+  if (!stage) {
+    TF_FATAL_ERROR("Failed to load stage for @%s@", layerFile.c_str());
+  }
 
-    auto Prim = [stage](const std::string& primPath) {
-        return stage->GetPrimAtPath(SdfPath(primPath));
-    };
+  auto Prim = [stage](const std::string &primPath) {
+    return stage->GetPrimAtPath(SdfPath(primPath));
+  };
 
-    UsdPrim root = stage->GetPseudoRoot();
+  UsdPrim root = stage->GetPseudoRoot();
 
-    TF_AXIOM((
-        Prim("/")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World"),
-            Prim("/World/sets"),
-            Prim("/World/sets/Set_1"),
-            Prim("/World/sets/Set_1/Prop_1"),
-            Prim("/World/sets/Set_1/Prop_1/geom"),
-            Prim("/World/sets/Set_1/Prop_1/anim"),
-            Prim("/World/sets/Set_1/Prop_2"),
-            Prim("/World/sets/Set_1/Prop_2/geom"),
-            Prim("/World/sets/Set_1/Prop_2/anim"),
-            Prim("/World/sets/Set_2"),
-            Prim("/World/sets/Set_2/Prop_1"),
-            Prim("/World/sets/Set_2/Prop_1/geom"),
-            Prim("/World/sets/Set_2/Prop_1/anim"),
-            Prim("/World/sets/Set_2/Prop_2"),
-            Prim("/World/sets/Set_2/Prop_2/geom"),
-            Prim("/World/sets/Set_2/Prop_2/anim")}));
+  TF_AXIOM((Prim("/").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+            std::vector<UsdPrim>{Prim("/World"),
+                                 Prim("/World/sets"),
+                                 Prim("/World/sets/Set_1"),
+                                 Prim("/World/sets/Set_1/Prop_1"),
+                                 Prim("/World/sets/Set_1/Prop_1/geom"),
+                                 Prim("/World/sets/Set_1/Prop_1/anim"),
+                                 Prim("/World/sets/Set_1/Prop_2"),
+                                 Prim("/World/sets/Set_1/Prop_2/geom"),
+                                 Prim("/World/sets/Set_1/Prop_2/anim"),
+                                 Prim("/World/sets/Set_2"),
+                                 Prim("/World/sets/Set_2/Prop_1"),
+                                 Prim("/World/sets/Set_2/Prop_1/geom"),
+                                 Prim("/World/sets/Set_2/Prop_1/anim"),
+                                 Prim("/World/sets/Set_2/Prop_2"),
+                                 Prim("/World/sets/Set_2/Prop_2/geom"),
+                                 Prim("/World/sets/Set_2/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_1"),
-            Prim("/World/sets/Set_1/Prop_1/geom"),
-            Prim("/World/sets/Set_1/Prop_1/anim"),
-            Prim("/World/sets/Set_1/Prop_2"),
-            Prim("/World/sets/Set_1/Prop_2/geom"),
-            Prim("/World/sets/Set_1/Prop_2/anim")}));
+  TF_AXIOM((Prim("/World/sets/Set_1").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_1"),
+                                 Prim("/World/sets/Set_1/Prop_1/geom"),
+                                 Prim("/World/sets/Set_1/Prop_1/anim"),
+                                 Prim("/World/sets/Set_1/Prop_2"),
+                                 Prim("/World/sets/Set_1/Prop_2/geom"),
+                                 Prim("/World/sets/Set_1/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_1")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_1/geom"),
-            Prim("/World/sets/Set_1/Prop_1/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_1/Prop_1").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_1/geom"),
+                            Prim("/World/sets/Set_1/Prop_1/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_2")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_2/geom"),
-            Prim("/World/sets/Set_1/Prop_2/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_1/Prop_2").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_2/geom"),
+                            Prim("/World/sets/Set_1/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_2")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_2/Prop_1"),
-            Prim("/World/sets/Set_2/Prop_1/geom"),
-            Prim("/World/sets/Set_2/Prop_1/anim"),
-            Prim("/World/sets/Set_2/Prop_2"),
-            Prim("/World/sets/Set_2/Prop_2/geom"),
-            Prim("/World/sets/Set_2/Prop_2/anim")}));
+  TF_AXIOM((Prim("/World/sets/Set_2").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_2/Prop_1"),
+                                 Prim("/World/sets/Set_2/Prop_1/geom"),
+                                 Prim("/World/sets/Set_2/Prop_1/anim"),
+                                 Prim("/World/sets/Set_2/Prop_2"),
+                                 Prim("/World/sets/Set_2/Prop_2/geom"),
+                                 Prim("/World/sets/Set_2/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_1")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_1/geom"),
-            Prim("/World/sets/Set_1/Prop_1/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_1/Prop_1").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_1/geom"),
+                            Prim("/World/sets/Set_1/Prop_1/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_2")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_2/geom"),
-            Prim("/World/sets/Set_1/Prop_2/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_1/Prop_2").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_2/geom"),
+                            Prim("/World/sets/Set_1/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_2/Prop_1")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_2/Prop_1/geom"),
-            Prim("/World/sets/Set_2/Prop_1/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_2/Prop_1").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_2/Prop_1/geom"),
+                            Prim("/World/sets/Set_2/Prop_1/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_2/Prop_2")
-            .GetFilteredDescendants(UsdTraverseInstanceProxies()) == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_2/Prop_2/geom"),
-            Prim("/World/sets/Set_2/Prop_2/anim")}));
+  TF_AXIOM(
+      (Prim("/World/sets/Set_2/Prop_2").GetFilteredDescendants(UsdTraverseInstanceProxies()) ==
+       std::vector<UsdPrim>{Prim("/World/sets/Set_2/Prop_2/geom"),
+                            Prim("/World/sets/Set_2/Prop_2/anim")}));
 
-    // On instance proxies, UsdTraverseInstanceProxies is not required.
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_1").GetDescendants() == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_1/geom"),
-            Prim("/World/sets/Set_1/Prop_1/anim")}));
+  // On instance proxies, UsdTraverseInstanceProxies is not required.
+  TF_AXIOM((Prim("/World/sets/Set_1/Prop_1").GetDescendants() ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_1/geom"),
+                                 Prim("/World/sets/Set_1/Prop_1/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_1/Prop_2").GetDescendants() == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_1/Prop_2/geom"),
-            Prim("/World/sets/Set_1/Prop_2/anim")}));
+  TF_AXIOM((Prim("/World/sets/Set_1/Prop_2").GetDescendants() ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_1/Prop_2/geom"),
+                                 Prim("/World/sets/Set_1/Prop_2/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_2/Prop_1").GetDescendants() == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_2/Prop_1/geom"),
-            Prim("/World/sets/Set_2/Prop_1/anim")}));
+  TF_AXIOM((Prim("/World/sets/Set_2/Prop_1").GetDescendants() ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_2/Prop_1/geom"),
+                                 Prim("/World/sets/Set_2/Prop_1/anim")}));
 
-    TF_AXIOM((
-        Prim("/World/sets/Set_2/Prop_2").GetDescendants() == 
-        std::vector<UsdPrim>{
-            Prim("/World/sets/Set_2/Prop_2/geom"),
-            Prim("/World/sets/Set_2/Prop_2/anim")}));
+  TF_AXIOM((Prim("/World/sets/Set_2/Prop_2").GetDescendants() ==
+            std::vector<UsdPrim>{Prim("/World/sets/Set_2/Prop_2/geom"),
+                                 Prim("/World/sets/Set_2/Prop_2/anim")}));
 }
 
-int 
-main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    TestGetDescendants();
-    TestGetDescendantsAsInstanceProxies();
+  TestGetDescendants();
+  TestGetDescendantsAsInstanceProxies();
 
-    std::cout << "OK\n";
-    return EXIT_SUCCESS;
+  std::cout << "OK\n";
+  return EXIT_SUCCESS;
 }
-

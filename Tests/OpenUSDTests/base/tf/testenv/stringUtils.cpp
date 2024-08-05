@@ -21,23 +21,22 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/diagnosticLite.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/stringUtils.h"
 #include "Arch/defines.h"
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
+#include <sstream>
 #include <stdarg.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <stdio.h>
 
 using namespace std;
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static bool
-TestNumbers()
+static bool TestNumbers()
 {
   /* compare as floats */
   TF_AXIOM(float(TfStringToDouble("")) == 0.0f);
@@ -86,23 +85,19 @@ TestNumbers()
 
   constexpr int bufferSize = 25;
   char buffer[bufferSize];
-  TF_AXIOM(
-      TfDoubleToString(-1.1111111111111113e-308, buffer, bufferSize, true));
+  TF_AXIOM(TfDoubleToString(-1.1111111111111113e-308, buffer, bufferSize, true));
   TF_AXIOM(strcmp(buffer, "-1.1111111111111113e-308") == 0);
-  TF_AXIOM(
-      !TfDoubleToString(-1.1111111111111113e-308, buffer, 24, true));
+  TF_AXIOM(!TfDoubleToString(-1.1111111111111113e-308, buffer, 24, true));
 
   return true;
 }
 
-static bool
-DictLessThan(const string &a, const string &b)
+static bool DictLessThan(const string &a, const string &b)
 {
   return TfDictionaryLessThan()(a, b);
 }
 
-static bool
-TestPreds()
+static bool TestPreds()
 {
   TF_AXIOM(TfStringStartsWith("  ", "  "));
   TF_AXIOM(TfStringStartsWith("abc", "ab"));
@@ -174,26 +169,16 @@ TestPreds()
   TF_AXIOM(!DictLessThan("_FooBar", "__FooBar"));
   TF_AXIOM(DictLessThan("abc012300", "abc000012300"));
   TF_AXIOM(!DictLessThan("abc0000123000", "abc0123000"));
-  TF_AXIOM(DictLessThan(
-      "0345678987654321234567", "03456789876543212345670"));
-  TF_AXIOM(!DictLessThan(
-      "03456789876543212345670", "0345678987654321234567"));
-  TF_AXIOM(DictLessThan(
-      "0345678987654321234567", "0345678987654322234567"));
-  TF_AXIOM(!DictLessThan(
-      "0345678987654322234567", "0345678987654321234567"));
-  TF_AXIOM(DictLessThan(
-      "XXX_0345678987654321234567", "XXX_03456789876543212345670"));
-  TF_AXIOM(!DictLessThan(
-      "XXX_03456789876543212345670", "XXX_0345678987654321234567"));
-  TF_AXIOM(DictLessThan(
-      "XXX_0345678987654321234567", "XXX_0345678987654322234567"));
-  TF_AXIOM(!DictLessThan(
-      "XXX_0345678987654322234567", "XXX_0345678987654321234567"));
-  TF_AXIOM(!DictLessThan("primvars:curveHierarchy__id",
-                         "primvars:curveHierarchy:id"));
-  TF_AXIOM(DictLessThan("primvars:curveHierarchy:id",
-                        "primvars:curveHierarchy__id"));
+  TF_AXIOM(DictLessThan("0345678987654321234567", "03456789876543212345670"));
+  TF_AXIOM(!DictLessThan("03456789876543212345670", "0345678987654321234567"));
+  TF_AXIOM(DictLessThan("0345678987654321234567", "0345678987654322234567"));
+  TF_AXIOM(!DictLessThan("0345678987654322234567", "0345678987654321234567"));
+  TF_AXIOM(DictLessThan("XXX_0345678987654321234567", "XXX_03456789876543212345670"));
+  TF_AXIOM(!DictLessThan("XXX_03456789876543212345670", "XXX_0345678987654321234567"));
+  TF_AXIOM(DictLessThan("XXX_0345678987654321234567", "XXX_0345678987654322234567"));
+  TF_AXIOM(!DictLessThan("XXX_0345678987654322234567", "XXX_0345678987654321234567"));
+  TF_AXIOM(!DictLessThan("primvars:curveHierarchy__id", "primvars:curveHierarchy:id"));
+  TF_AXIOM(DictLessThan("primvars:curveHierarchy:id", "primvars:curveHierarchy__id"));
 
   TF_AXIOM(TfIsValidIdentifier("f"));
   TF_AXIOM(TfIsValidIdentifier("foo"));
@@ -228,8 +213,7 @@ TestPreds()
   return true;
 }
 
-string
-DoPrintf(const char *fmt, ...)
+string DoPrintf(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
@@ -238,8 +222,7 @@ DoPrintf(const char *fmt, ...)
   return ret;
 }
 
-string
-DoPrintfStr(const char *fmt, ...)
+string DoPrintfStr(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
@@ -248,8 +231,7 @@ DoPrintfStr(const char *fmt, ...)
   return ret;
 }
 
-static bool
-TestStrings()
+static bool TestStrings()
 {
   TF_AXIOM(TfStringToLower("  ") == "  ");
   TF_AXIOM(TfStringToLower("lower") == "lower");
@@ -385,8 +367,9 @@ TestStrings()
   TF_AXIOM(TfEscapeString("\\c \\d") == "c d");
   TF_AXIOM(TfEscapeString("\\xB") == "\xB");
   TF_AXIOM(TfEscapeString("\\xab") == "\xab");
-  TF_AXIOM(TfEscapeString("\\x01f") == "\x1"
-                                       "f");
+  TF_AXIOM(TfEscapeString("\\x01f") ==
+           "\x1"
+           "f");
   TF_AXIOM(TfEscapeString("\\x008d") == string() + '\0' + "8d");
   TF_AXIOM(TfEscapeString("x\\x0x") == string() + 'x' + '\0' + 'x');
   TF_AXIOM(TfEscapeString("\\5") == "\5");
@@ -395,12 +378,15 @@ TestStrings()
   TF_AXIOM(TfEscapeString("\\007") == "\007");
   TF_AXIOM(TfEscapeString("\\008") == string() + '\0' + '8');
   TF_AXIOM(TfEscapeString("\\010") == "\010");
-  TF_AXIOM(TfEscapeString("\\0077") == "\07"
-                                       "7");
-  TF_AXIOM(TfEscapeString("\\00107") == "\01"
-                                        "07");
-  TF_AXIOM(TfEscapeString("\\005107") == "\05"
-                                         "107");
+  TF_AXIOM(TfEscapeString("\\0077") ==
+           "\07"
+           "7");
+  TF_AXIOM(TfEscapeString("\\00107") ==
+           "\01"
+           "07");
+  TF_AXIOM(TfEscapeString("\\005107") ==
+           "\05"
+           "107");
 
   TF_AXIOM(TfStringCatPaths("foo", "bar") == "foo/bar");
   TF_AXIOM(TfStringCatPaths("foo/crud", "../bar") == "foo/bar");
@@ -419,8 +405,7 @@ TestStrings()
   return true;
 }
 
-static bool
-TestTokens()
+static bool TestTokens()
 {
   vector<string> tokens;
   vector<string> empty;
@@ -569,8 +554,7 @@ TestTokens()
   return true;
 }
 
-static bool
-TestGetXmlEscapedString()
+static bool TestGetXmlEscapedString()
 {
   TF_AXIOM(TfGetXmlEscapedString("Amiga") == "Amiga");
   TF_AXIOM(TfGetXmlEscapedString("Amiga & Atari") == "Amiga &amp; Atari");
@@ -582,8 +566,7 @@ TestGetXmlEscapedString()
   return true;
 }
 
-static bool
-Test_TfStringUtils()
+static bool Test_TfStringUtils()
 {
   return TestNumbers() && TestPreds() && TestStrings() && TestTokens() &&
          TestGetXmlEscapedString();

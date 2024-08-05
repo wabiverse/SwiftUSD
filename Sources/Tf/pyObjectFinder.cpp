@@ -37,12 +37,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 static TfStaticData<TfTypeInfoMap<Tf_PyObjectFinderBase const *>> _finders;
 
-void Tf_RegisterPythonObjectFinderInternal(
-    std::type_info const &type, Tf_PyObjectFinderBase const *finder) {
+void Tf_RegisterPythonObjectFinderInternal(std::type_info const &type,
+                                           Tf_PyObjectFinderBase const *finder)
+{
   _finders->Set(type, finder);
 }
 
-object Tf_FindPythonObject(void const *objPtr, std::type_info const &type) {
+object Tf_FindPythonObject(void const *objPtr, std::type_info const &type)
+{
   Tf_PyObjectFinderBase const *finder = 0;
   if (Tf_PyObjectFinderBase const **x = _finders->Find(type))
     finder = *x;

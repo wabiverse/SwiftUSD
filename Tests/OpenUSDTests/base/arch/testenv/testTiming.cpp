@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/timing.h"
 #include "Arch/error.h"
+#include "Arch/timing.h"
+#include "pxr/pxr.h"
 #include <chrono>
 #include <thread>
 
@@ -33,8 +33,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 int main()
 {
   // Verify conversions for many tick counts.
-  for (size_t ticks = 0ul; ticks != 1ul << 24u; ++ticks)
-  {
+  for (size_t ticks = 0ul; ticks != 1ul << 24u; ++ticks) {
     ARCH_AXIOM((uint64_t)ArchTicksToNanoseconds(ticks) ==
                uint64_t(static_cast<double>(ticks) * ArchGetNanosecondsPerTick() + .5));
 

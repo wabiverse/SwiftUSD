@@ -35,8 +35,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 // Returns iterator in \p path pointing to outermost ']' delimiter.
-std::string::const_iterator
-_FindOutermostClosingDelimiter(const std::string &path) {
+std::string::const_iterator _FindOutermostClosingDelimiter(const std::string &path)
+{
   if (path.empty() || path.back() != ']') {
     return path.end();
   }
@@ -44,12 +44,11 @@ _FindOutermostClosingDelimiter(const std::string &path) {
 }
 
 // Delete rvalue overload to avoid returning an iterator to a temporary.
-std::string::const_iterator
-_FindOutermostClosingDelimiter(std::string &&path) = delete;
+std::string::const_iterator _FindOutermostClosingDelimiter(std::string &&path) = delete;
 
 // Returns iterator in \p path pointing to the innermost ']' delimiter.
-std::string::const_iterator
-_FindInnermostClosingDelimiter(const std::string &path) {
+std::string::const_iterator _FindInnermostClosingDelimiter(const std::string &path)
+{
   if (path.empty() || path.back() != ']') {
     return path.end();
   }
@@ -59,7 +58,8 @@ _FindInnermostClosingDelimiter(const std::string &path) {
       // The previous ']' character was escaped, so the innermost
       // delimiter is really the one before that character.
       return (it - 1).base();
-    } else if (*it != ']') {
+    }
+    else if (*it != ']') {
       return it.base();
     }
   }
@@ -68,15 +68,14 @@ _FindInnermostClosingDelimiter(const std::string &path) {
 }
 
 // Delete rvalue overload to avoid returning an iterator to a temporary.
-std::string::const_iterator
-_FindInnermostClosingDelimiter(std::string &&path) = delete;
+std::string::const_iterator _FindInnermostClosingDelimiter(std::string &&path) = delete;
 
 // Given iterator \p closingDelimIt in \p path pointing to a closing
 // ']' character, returns iterator to the corresponding opening '['
 // character, or path.end() if one can't be found.
-std::string::const_iterator
-_FindMatchingOpeningDelimiter(const std::string &path,
-                              std::string::const_iterator closingDelimIt) {
+std::string::const_iterator _FindMatchingOpeningDelimiter(
+    const std::string &path, std::string::const_iterator closingDelimIt)
+{
   size_t numOpenNeeded = 1;
   std::string::const_reverse_iterator revIt(closingDelimIt);
   for (; revIt != path.rend() && numOpenNeeded != 0; ++revIt) {
@@ -98,7 +97,8 @@ _FindMatchingOpeningDelimiter(const std::string &path,
 //
 // If path is a package-relative path, we assume the packaged portion of
 // that path has already been escaped and only process the package portion.
-std::string _EscapeDelimiters(const std::string &path) {
+std::string _EscapeDelimiters(const std::string &path)
+{
   if (path.empty()) {
     return path;
   }
@@ -122,7 +122,8 @@ std::string _EscapeDelimiters(const std::string &path) {
 //
 // If path is a package-relative path, we assume the packaged portion of
 // that path has already been escaped and only process the package portion.
-std::string _UnescapeDelimiters(const std::string &path) {
+std::string _UnescapeDelimiters(const std::string &path)
+{
   if (path.empty()) {
     return path;
   }
@@ -141,21 +142,28 @@ std::string _UnescapeDelimiters(const std::string &path) {
   return escapedString + std::string(escapeRangeEnd, path.end());
 }
 
-} // end anonymous namespace
+}  // end anonymous namespace
 
-bool ArIsPackageRelativePath(const std::string &path) {
+bool ArIsPackageRelativePath(const std::string &path)
+{
   return !path.empty() && path.back() == ']' &&
          _FindMatchingOpeningDelimiter(path, path.end() - 1) != path.end();
 }
 
 namespace {
 
-template <class Iter> const std::string &_Get(Iter it) { return *it; }
+template<class Iter> const std::string &_Get(Iter it)
+{
+  return *it;
+}
 
-const std::string &_Get(const std::string *const *it) { return **it; }
+const std::string &_Get(const std::string *const *it)
+{
+  return **it;
+}
 
-template <class Iter>
-std::string _JoinPackageRelativePath(Iter begin, Iter end) {
+template<class Iter> std::string _JoinPackageRelativePath(Iter begin, Iter end)
+{
   Iter pathIt = begin;
   for (; pathIt != end; ++pathIt) {
     if (!_Get(pathIt).empty()) {
@@ -174,11 +182,9 @@ std::string _JoinPackageRelativePath(Iter begin, Iter end) {
   std::string packageRelativePath = _Get(pathIt++);
   size_t insertIdx = packageRelativePath.length();
   if (packageRelativePath.back() == ']') {
-    auto innermostCloseRevIt =
-        std::find_if(packageRelativePath.rbegin(), packageRelativePath.rend(),
-                     [](char c) { return c != ']'; });
-    insertIdx =
-        std::distance(packageRelativePath.begin(), innermostCloseRevIt.base());
+    auto innermostCloseRevIt = std::find_if(
+        packageRelativePath.rbegin(), packageRelativePath.rend(), [](char c) { return c != ']'; });
+    insertIdx = std::distance(packageRelativePath.begin(), innermostCloseRevIt.base());
   }
 
   // Loop through and insert the rest of the paths.
@@ -189,8 +195,7 @@ std::string _JoinPackageRelativePath(Iter begin, Iter end) {
 
     // Since we're enclosing this path in delimiters, we need to escape
     // any existing delimiters.
-    const std::string pathToInsert =
-        '[' + _EscapeDelimiters(_Get(pathIt)) + ']';
+    const std::string pathToInsert = '[' + _EscapeDelimiters(_Get(pathIt)) + ']';
     packageRelativePath.insert(insertIdx, pathToInsert);
     insertIdx += pathToInsert.length() - 1;
   }
@@ -198,26 +203,28 @@ std::string _JoinPackageRelativePath(Iter begin, Iter end) {
   return packageRelativePath;
 }
 
-} // end anonymous namespace
+}  // end anonymous namespace
 
-std::string ArJoinPackageRelativePath(const std::vector<std::string> &paths) {
+std::string ArJoinPackageRelativePath(const std::vector<std::string> &paths)
+{
   return _JoinPackageRelativePath(paths.begin(), paths.end());
 }
 
-std::string
-ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths) {
+std::string ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths)
+{
   const std::string *const arr[2] = {&paths.first, &paths.second};
   return _JoinPackageRelativePath(arr, arr + 2);
 }
 
 std::string ArJoinPackageRelativePath(const std::string &packagePath,
-                                      const std::string &packagedPath) {
+                                      const std::string &packagedPath)
+{
   const std::string *const arr[2] = {&packagePath, &packagedPath};
   return _JoinPackageRelativePath(arr, arr + 2);
 }
 
-std::pair<std::string, std::string>
-ArSplitPackageRelativePathOuter(const std::string &path) {
+std::pair<std::string, std::string> ArSplitPackageRelativePathOuter(const std::string &path)
+{
   // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
   // find the range [outermostOpenIt, outermostCloseIt] containing
   // "[bar.package[baz.file]]"
@@ -241,8 +248,8 @@ ArSplitPackageRelativePathOuter(const std::string &path) {
   return std::make_pair(std::move(packagePath), std::move(packagedPath));
 }
 
-std::pair<std::string, std::string>
-ArSplitPackageRelativePathInner(const std::string &path) {
+std::pair<std::string, std::string> ArSplitPackageRelativePathInner(const std::string &path)
+{
   // For example, given a path like "/dir/foo.package[bar.package[baz.file]]",
   // find the range [innermostOpenIt, innermostCloseIt] containing
   // "[baz.file]"

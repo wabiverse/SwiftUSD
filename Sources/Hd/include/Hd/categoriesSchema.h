@@ -33,55 +33,47 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDCATEGORIES_SCHEMA_TOKENS \
-    (categories) \
+#define HDCATEGORIES_SCHEMA_TOKENS (categories)
 
-TF_DECLARE_PUBLIC_TOKENS(HdCategoriesSchemaTokens, HD_API,
-    HDCATEGORIES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCategoriesSchemaTokens, HD_API, HDCATEGORIES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdCategoriesSchema : public HdSchema
-{
-public:
-    HdCategoriesSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdCategoriesSchema : public HdSchema {
+ public:
+  HdCategoriesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    VtArray<TfToken> GetIncludedCategoryNames();
-    bool IsIncludedInCategory(const TfToken &categoryName);
+  VtArray<TfToken> GetIncludedCategoryNames();
+  bool IsIncludedInCategory(const TfToken &categoryName);
 
-    static HdContainerDataSourceHandle BuildRetained(
-        size_t includedNameCount,
-        TfToken *includedNames,
-        size_t excludedNameCount,
-        TfToken *excludedNames);
+  static HdContainerDataSourceHandle BuildRetained(size_t includedNameCount,
+                                                   TfToken *includedNames,
+                                                   size_t excludedNameCount,
+                                                   TfToken *excludedNames);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "categories" from the parent container and constructs a
+  /// HdCategoriesSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdCategoriesSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "categories" from the parent container and constructs a
-    /// HdCategoriesSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdCategoriesSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -69,18 +69,24 @@ typedef TfWeakPtr<class Tf_TestBase> Tf_TestBasePtr;
 typedef TfWeakPtr<const class Tf_TestBase> Tf_TestBaseConstPtr;
 typedef TfRefPtr<class Tf_TestBase> Tf_TestBaseRefPtr;
 class Tf_TestBase : public TfRefBase, public TfWeakBase {
-public:
+ public:
   virtual ~Tf_TestBase() {}
   virtual string Virtual() const = 0;
   virtual void Virtual2() const = 0;
   virtual void Virtual3(string const &arg) = 0;
 
-  virtual string Virtual4() const { return "cpp base"; }
+  virtual string Virtual4() const
+  {
+    return "cpp base";
+  }
 
-  string VirtualCaller() const { return UnwrappedVirtual(); }
+  string VirtualCaller() const
+  {
+    return UnwrappedVirtual();
+  }
   virtual string UnwrappedVirtual() const = 0;
 
-protected:
+ protected:
   Tf_TestBase() {}
 };
 
@@ -88,118 +94,167 @@ protected:
 typedef TfWeakPtr<class Tf_TestDerived> Tf_TestDerivedPtr;
 typedef TfRefPtr<class Tf_TestDerived> Tf_TestDerivedRefPtr;
 class Tf_TestDerived : public Tf_TestBase {
-public:
+ public:
   // CODE_COVERAGE_OFF_GCOV_BUG  woot
   virtual ~Tf_TestDerived() {}
   // CODE_COVERAGE_ON_GCOV_BUG
-  virtual string Virtual() const { return "cpp derived"; }
+  virtual string Virtual() const
+  {
+    return "cpp derived";
+  }
   virtual void Virtual2() const {}
-  virtual void Virtual3(string const &arg) {
+  virtual void Virtual3(string const &arg)
+  {
     printf("cpp derived v3! : %s\n", arg.c_str());
   }
-  virtual string UnwrappedVirtual() const { return "cpp derived"; }
+  virtual string UnwrappedVirtual() const
+  {
+    return "cpp derived";
+  }
 
-  static Tf_TestDerivedRefPtr Factory() {
+  static Tf_TestDerivedRefPtr Factory()
+  {
     return TfCreateRefPtr(new Tf_TestDerived());
   }
-  static Tf_TestDerivedRefPtr NullFactory() { return Tf_TestDerivedRefPtr(); }
+  static Tf_TestDerivedRefPtr NullFactory()
+  {
+    return Tf_TestDerivedRefPtr();
+  }
 
-protected:
+ protected:
   Tf_TestDerived() {}
 };
 
-static string TakesConstBase(Tf_TestBaseConstPtr base) {
+static string TakesConstBase(Tf_TestBaseConstPtr base)
+{
   return base->Virtual();
 }
 
-static Tf_TestBaseConstPtr ReturnsConstBase(Tf_TestBaseConstPtr base) {
+static Tf_TestBaseConstPtr ReturnsConstBase(Tf_TestBaseConstPtr base)
+{
   return base;
 }
 
-static Tf_TestBasePtr ReturnsBase(Tf_TestBasePtr base) { return base; }
+static Tf_TestBasePtr ReturnsBase(Tf_TestBasePtr base)
+{
+  return base;
+}
 
-static Tf_TestBaseRefPtr ReturnsBaseRefPtr(Tf_TestBasePtr base) { return base; }
+static Tf_TestBaseRefPtr ReturnsBaseRefPtr(Tf_TestBasePtr base)
+{
+  return base;
+}
 
-static boost::python::tuple TakesBase(Tf_TestBasePtr base) {
+static boost::python::tuple TakesBase(Tf_TestBasePtr base)
+{
   base->Virtual3("hello from TakesConstBase");
   base->Virtual2();
   bool isDerived = TfDynamic_cast<Tf_TestDerivedPtr>(base);
   return boost::python::make_tuple(isDerived, base->Virtual());
 }
 
-static string TakesDerived(Tf_TestDerivedPtr derived) {
+static string TakesDerived(Tf_TestDerivedPtr derived)
+{
   derived->Virtual3("A call to virtual 3!");
   return derived->Virtual();
 }
 
 static void TakesReference(Tf_TestDerivedRefPtr const &derived) {}
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<Tf_TestBase>();
   TfType::Define<Tf_TestDerived, TfType::Bases<Tf_TestBase>>();
 }
 
 ////////////////////////////////
 
-template <typename T = Tf_TestBase>
+template<typename T = Tf_TestBase>
 struct polymorphic_Tf_TestBase : public T, public TfPyPolymorphic<T> {
   typedef polymorphic_Tf_TestBase This;
-  virtual string Virtual() const {
+  virtual string Virtual() const
+  {
     return this->template CallPureVirtual<string>("Virtual")();
   }
-  virtual void Virtual2() const {
+  virtual void Virtual2() const
+  {
     return this->template CallPureVirtual<void>("Virtual2")();
   }
-  virtual void Virtual3(string const &arg) {
+  virtual void Virtual3(string const &arg)
+  {
     return this->template CallPureVirtual<void>("Virtual3")(arg);
   }
-  string default_Virtual4() const { return T::Virtual4(); }
-  virtual string Virtual4() const {
+  string default_Virtual4() const
+  {
+    return T::Virtual4();
+  }
+  virtual string Virtual4() const
+  {
     return this->CallVirtual("Virtual4", &This::default_Virtual4)();
   }
-  virtual string UnwrappedVirtual() const {
+  virtual string UnwrappedVirtual() const
+  {
     return this->template CallPureVirtual<string>("UnwrappedVirtual")();
   }
 };
 
-static string callVirtual(Tf_TestBase *base) { return base->VirtualCaller(); }
+static string callVirtual(Tf_TestBase *base)
+{
+  return base->VirtualCaller();
+}
 
-template <typename T = Tf_TestDerived>
+template<typename T = Tf_TestDerived>
 struct polymorphic_Tf_TestDerived : public polymorphic_Tf_TestBase<T> {
   typedef polymorphic_Tf_TestDerived This;
-  string default_Virtual() const { return T::Virtual(); }
-  virtual string Virtual() const {
+  string default_Virtual() const
+  {
+    return T::Virtual();
+  }
+  virtual string Virtual() const
+  {
     return this->CallVirtual("Virtual", &This::default_Virtual)();
   }
-  void default_Virtual2() const { return T::Virtual2(); }
-  virtual void Virtual2() const {
+  void default_Virtual2() const
+  {
+    return T::Virtual2();
+  }
+  virtual void Virtual2() const
+  {
     return this->CallVirtual("Virtual2", &This::default_Virtual2)();
   }
-  void default_Virtual3(string const &arg) { return T::Virtual3(arg); }
-  virtual void Virtual3(string const &arg) {
+  void default_Virtual3(string const &arg)
+  {
+    return T::Virtual3(arg);
+  }
+  virtual void Virtual3(string const &arg)
+  {
     return this->CallVirtual("Virtual3", &This::default_Virtual3)(arg);
   }
 };
 
-template <typename T> static TfRefPtr<T> __Ref_init__() {
+template<typename T> static TfRefPtr<T> __Ref_init__()
+{
   return TfCreateRefPtr(new T);
 }
 
 enum TfPyTestErrorCodes { TF_TEST_ERROR_1, TF_TEST_ERROR_2 };
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(TF_TEST_ERROR_1);
   TF_ADD_ENUM_NAME(TF_TEST_ERROR_2);
 }
 
-static void mightRaise(bool raise) {
+static void mightRaise(bool raise)
+{
   if (raise) {
     TF_ERROR(TF_TEST_ERROR_1, "Test error 1!");
     TF_ERROR(TF_TEST_ERROR_2, "Test error 2!");
   }
 }
 
-static void doErrors() {
+static void doErrors()
+{
   TF_ERROR(TF_TEST_ERROR_1, "TestError 1!");
   TF_ERROR(TF_TEST_ERROR_2, "TestError 2!");
   TF_CODING_ERROR("nonfatal coding error %d", 1);
@@ -209,7 +264,10 @@ static void doErrors() {
 };
 
 struct _TestStaticMethodError {
-  static void Error() { TF_ERROR(TF_TEST_ERROR_1, "Test error 1!"); }
+  static void Error()
+  {
+    TF_ERROR(TF_TEST_ERROR_1, "Test error 1!");
+  }
 };
 
 ////////////////////////////////
@@ -222,13 +280,7 @@ enum Tf_TestEnum {
   Tf_Delta,
 };
 
-enum class Tf_TestScopedEnum {
-  Hydrogen = 1,
-  Helium,
-  Lithium,
-  Beryllium,
-  Boron
-};
+enum class Tf_TestScopedEnum { Hydrogen = 1, Helium, Lithium, Beryllium, Boron };
 
 struct Tf_Enum {
   enum TestEnum2 {
@@ -256,39 +308,45 @@ struct Tf_Enum {
   };
 };
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_Alpha, "A");
   TF_ADD_ENUM_NAME(Tf_Bravo, "B");
   TF_ADD_ENUM_NAME(Tf_Charlie, "C");
   TF_ADD_ENUM_NAME(Tf_Delta, "D");
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_Enum::One);
   TF_ADD_ENUM_NAME(Tf_Enum::Two);
   TF_ADD_ENUM_NAME(Tf_Enum::Three);
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_Enum::_Alpha);
   TF_ADD_ENUM_NAME(Tf_Enum::_Beta);
   TF_ADD_ENUM_NAME(Tf_Enum::_Gamma);
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_Enum::TestScopedEnum::Alef);
   TF_ADD_ENUM_NAME(Tf_Enum::TestScopedEnum::Bet);
   TF_ADD_ENUM_NAME(Tf_Enum::TestScopedEnum::Gimel);
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_TestScopedEnum::Hydrogen, "H");
   TF_ADD_ENUM_NAME(Tf_TestScopedEnum::Lithium, "Li");
   TF_ADD_ENUM_NAME(Tf_TestScopedEnum::Beryllium, "Be");
   TF_ADD_ENUM_NAME(Tf_TestScopedEnum::Boron, "B");
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(Tf_Enum::TestKeywords::None);
   TF_ADD_ENUM_NAME(Tf_Enum::TestKeywords::False, "False");
   TF_ADD_ENUM_NAME(Tf_Enum::TestKeywords::True, "True");
@@ -297,26 +355,29 @@ TF_REGISTRY_FUNCTION(TfEnum) {
   TF_ADD_ENUM_NAME(Tf_Enum::TestKeywords::global, "global");
 }
 
-static void takesTfEnum(TfEnum const &e) {
-  printf("got enum '%s' with value '%d'\n", TfEnum::GetName(e).c_str(),
-         e.GetValueAsInt());
+static void takesTfEnum(TfEnum const &e)
+{
+  printf("got enum '%s' with value '%d'\n", TfEnum::GetName(e).c_str(), e.GetValueAsInt());
 }
 
-static TfEnum returnsTfEnum(TfEnum const &e) {
-  printf("returning enum '%s' with value '%d'\n", TfEnum::GetName(e).c_str(),
-         e.GetValueAsInt());
+static TfEnum returnsTfEnum(TfEnum const &e)
+{
+  printf("returning enum '%s' with value '%d'\n", TfEnum::GetName(e).c_str(), e.GetValueAsInt());
   return e;
 }
 
-static void takesTestEnum(Tf_TestEnum e) {
+static void takesTestEnum(Tf_TestEnum e)
+{
   printf("got enum %d with name '%s'\n", (int)e, TfEnum::GetName(e).c_str());
 }
 
-static void takesTestEnum2(Tf_Enum::TestEnum2 e) {
+static void takesTestEnum2(Tf_Enum::TestEnum2 e)
+{
   printf("got enum %d with name '%s'\n", (int)e, TfEnum::GetName(e).c_str());
 }
 
-static void registerInvalidEnum(object &obj) {
+static void registerInvalidEnum(object &obj)
+{
   scope s = obj;
 
   // This should be used to produce a coding error. The _Alpha value will
@@ -328,26 +389,35 @@ static void registerInvalidEnum(object &obj) {
 ////////////////////////////////
 // Function callback stuff.
 
-static void callback(std::function<void()> const &f) { f(); }
+static void callback(std::function<void()> const &f)
+{
+  f();
+}
 
-static string stringCallback(std::function<string()> const &f) { return f(); }
+static string stringCallback(std::function<string()> const &f)
+{
+  return f();
+}
 
-static string stringStringCallback(std::function<string(string)> const &f) {
+static string stringStringCallback(std::function<string(string)> const &f)
+{
   return f("c++ is calling...");
 }
 
-static string callUnboundInstance(std::function<string(string)> const &f,
-                                  string const &str) {
+static string callUnboundInstance(std::function<string(string)> const &f, string const &str)
+{
   return f(str);
 }
 
 static TfStaticData<std::function<string()>> _testCallback;
 
-static void setTestCallback(std::function<string()> const &func) {
+static void setTestCallback(std::function<string()> const &func)
+{
   *_testCallback = func;
 }
 
-static string invokeTestCallback() {
+static string invokeTestCallback()
+{
   if (*_testCallback)
     return (*_testCallback)();
   return string();
@@ -356,7 +426,8 @@ static string invokeTestCallback() {
 ////////////////////////////////
 // Sending notice from C++ sender
 
-static void sendTfNoticeWithSender(Tf_TestBasePtr const &base) {
+static void sendTfNoticeWithSender(Tf_TestBasePtr const &base)
+{
   TfNotice().Send(base);
 }
 
@@ -364,12 +435,13 @@ static void sendTfNoticeWithSender(Tf_TestBasePtr const &base) {
 // TfPyClassMethod()
 
 class Tf_ClassWithClassMethod {
-public:
+ public:
   Tf_ClassWithClassMethod() {}
   virtual ~Tf_ClassWithClassMethod() {}
 };
 
-static boost::python::tuple _TestClassMethod(object &pyClassObj, const object &callable) {
+static boost::python::tuple _TestClassMethod(object &pyClassObj, const object &callable)
+{
   return boost::python::make_tuple(pyClassObj, TfPyCall<object>(callable)());
 }
 
@@ -384,7 +456,8 @@ static boost::python::tuple _TestClassMethod(object &pyClassObj, const object &c
 //     printf("f2 with %s, %s, %d, %d\n", a1.c_str(), a2.c_str(), x, y);
 // }
 
-static std::string _ThrowCppException() {
+static std::string _ThrowCppException()
+{
   // Take the lock.
   TfPyLock lock;
   // Release the lock.
@@ -396,7 +469,8 @@ static std::string _ThrowCppException() {
   return std::string();
 }
 
-static size_t TakesVecVecString(std::vector<std::vector<std::string>> arg) {
+static size_t TakesVecVecString(std::vector<std::vector<std::string>> arg)
+{
   return arg.size();
 }
 
@@ -406,24 +480,24 @@ static size_t TakesVecVecString(std::vector<std::vector<std::string>> arg) {
 TF_DECLARE_WEAK_AND_REF_PTRS(Tf_ClassWithVarArgInit);
 
 class Tf_ClassWithVarArgInit : public TfRefBase, public TfWeakBase {
-public:
+ public:
   bool allowExtraArgs;
   tuple args;
   dict kwargs;
 };
 
-static Tf_ClassWithVarArgInitRefPtr
-_MakeClassWithVarArgInit(bool allowExtraArgs, const tuple &args,
-                         const dict &kwargs) {
+static Tf_ClassWithVarArgInitRefPtr _MakeClassWithVarArgInit(bool allowExtraArgs,
+                                                             const tuple &args,
+                                                             const dict &kwargs)
+{
   // To Python consumer, this class has 3 explicit optional arguments, named
   // 'a', 'b', and 'c'.
   TfPyArgs optionalArgs{{TfPyArg("a", ""), TfPyArg("b", ""), TfPyArg("c", "")}};
 
-  const std::pair<tuple, dict> params =
-      TfPyProcessOptionalArgs(args, kwargs, optionalArgs, allowExtraArgs);
+  const std::pair<tuple, dict> params = TfPyProcessOptionalArgs(
+      args, kwargs, optionalArgs, allowExtraArgs);
 
-  Tf_ClassWithVarArgInitRefPtr rval =
-      TfCreateRefPtr(new Tf_ClassWithVarArgInit);
+  Tf_ClassWithVarArgInitRefPtr rval = TfCreateRefPtr(new Tf_ClassWithVarArgInit);
   rval->allowExtraArgs = allowExtraArgs;
   rval->args = params.first;
   rval->kwargs = params.second;
@@ -434,7 +508,8 @@ _MakeClassWithVarArgInit(bool allowExtraArgs, const tuple &args,
 ////////////////////////////////
 // Bytearray conversion
 
-static object _ConvertByteListToByteArray(const list &byteList) {
+static object _ConvertByteListToByteArray(const list &byteList)
+{
   std::vector<char> inputList;
   for (int i = 0; i < len(byteList); ++i) {
     inputList.push_back(extract<char>(byteList[i]));
@@ -445,7 +520,8 @@ static object _ConvertByteListToByteArray(const list &byteList) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-void wrapTf_TestTfPython() {
+void wrapTf_TestTfPython()
+{
 
   //      def("f", f1, (arg("x")=3, arg("y")=4));
   //      def("f", f2, (arg("x")=5, arg("y")=6));
@@ -499,41 +575,37 @@ void wrapTf_TestTfPython() {
   def("_ReturnsBaseRefPtr", ReturnsBaseRefPtr);
   def("_TakesDerived", TakesDerived);
 
-  def("_DerivedFactory", Tf_TestDerived::Factory,
+  def("_DerivedFactory", Tf_TestDerived::Factory, return_value_policy<TfPyRefPtrFactory<>>());
+
+  def("_DerivedNullFactory",
+      Tf_TestDerived::NullFactory,
       return_value_policy<TfPyRefPtrFactory<>>());
 
-  def("_DerivedNullFactory", Tf_TestDerived::NullFactory,
-      return_value_policy<TfPyRefPtrFactory<>>());
-
-  class_<polymorphic_Tf_TestBase<>, TfWeakPtr<polymorphic_Tf_TestBase<>>,
-         boost::noncopyable>("_TestBase", no_init)
+  class_<polymorphic_Tf_TestBase<>, TfWeakPtr<polymorphic_Tf_TestBase<>>, boost::noncopyable>(
+      "_TestBase", no_init)
       .def(TfPyRefAndWeakPtr())
       .def(TfMakePyConstructor(__Ref_init__<polymorphic_Tf_TestBase<>>))
       .def("Virtual", pure_virtual(&Tf_TestBase::Virtual))
       .def("Virtual2", pure_virtual(&Tf_TestBase::Virtual2))
       .def("Virtual3", pure_virtual(&Tf_TestBase::Virtual3))
-      .def("Virtual4", &Tf_TestBase::Virtual4,
-           &polymorphic_Tf_TestBase<>::default_Virtual4)
+      .def("Virtual4", &Tf_TestBase::Virtual4, &polymorphic_Tf_TestBase<>::default_Virtual4)
       .def("TestCallVirtual", &callVirtual);
 
-  class_<polymorphic_Tf_TestDerived<>, TfWeakPtr<polymorphic_Tf_TestDerived<>>,
-         bases<Tf_TestBase>, boost::noncopyable>("_TestDerived", no_init)
+  class_<polymorphic_Tf_TestDerived<>,
+         TfWeakPtr<polymorphic_Tf_TestDerived<>>,
+         bases<Tf_TestBase>,
+         boost::noncopyable>("_TestDerived", no_init)
       .def(TfPyRefAndWeakPtr())
-      .def("__init__",
-           TfMakePyConstructor(__Ref_init__<polymorphic_Tf_TestDerived<>>))
-      .def("Virtual", &Tf_TestDerived::Virtual,
-           &polymorphic_Tf_TestDerived<>::default_Virtual)
-      .def("Virtual2", &Tf_TestDerived::Virtual2,
-           &polymorphic_Tf_TestDerived<>::default_Virtual2)
-      .def("Virtual3", &Tf_TestDerived::Virtual3,
-           &polymorphic_Tf_TestDerived<>::default_Virtual3);
+      .def("__init__", TfMakePyConstructor(__Ref_init__<polymorphic_Tf_TestDerived<>>))
+      .def("Virtual", &Tf_TestDerived::Virtual, &polymorphic_Tf_TestDerived<>::default_Virtual)
+      .def("Virtual2", &Tf_TestDerived::Virtual2, &polymorphic_Tf_TestDerived<>::default_Virtual2)
+      .def("Virtual3", &Tf_TestDerived::Virtual3, &polymorphic_Tf_TestDerived<>::default_Virtual3);
 
   class_<Tf_ClassWithClassMethod>("_ClassWithClassMethod", init<>())
       .def("Test", &_TestClassMethod)
       .def(TfPyClassMethod("Test"));
 
-  class_<Tf_ClassWithVarArgInit, Tf_ClassWithVarArgInitPtr>(
-      "_ClassWithVarArgInit", no_init)
+  class_<Tf_ClassWithVarArgInit, Tf_ClassWithVarArgInitPtr>("_ClassWithVarArgInit", no_init)
       .def(TfPyRefAndWeakPtr())
       .def(TfMakePyConstructorWithVarArgs(&_MakeClassWithVarArgInit))
       .add_property("allowExtraArgs", &Tf_ClassWithVarArgInit::allowExtraArgs)

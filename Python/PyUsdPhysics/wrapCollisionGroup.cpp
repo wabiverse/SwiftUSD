@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/collisionGroup.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/collisionGroup.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,52 +40,44 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateMergeGroupNameAttr(UsdPhysicsCollisionGroup &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
 {
+  return self.CreateMergeGroupNameAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String),
+                                       writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateInvertFilteredGroupsAttr(UsdPhysicsCollisionGroup &self,
+                                                    object defaultVal,
+                                                    bool writeSparsely)
+{
+  return self.CreateInvertFilteredGroupsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static std::string _Repr(const UsdPhysicsCollisionGroup &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.CollisionGroup(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateMergeGroupNameAttr(UsdPhysicsCollisionGroup &self,
-                            object defaultVal, bool writeSparsely)
-  {
-    return self.CreateMergeGroupNameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateInvertFilteredGroupsAttr(UsdPhysicsCollisionGroup &self,
-                                  object defaultVal, bool writeSparsely)
-  {
-    return self.CreateInvertFilteredGroupsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsCollisionGroup &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.CollisionGroup(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsCollisionGroup()
 {
   typedef UsdPhysicsCollisionGroup This;
 
-  class_<This, bases<UsdTyped>>
-      cls("CollisionGroup");
+  class_<This, bases<UsdTyped>> cls("CollisionGroup");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -101,30 +93,25 @@ void wrapUsdPhysicsCollisionGroup()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetMergeGroupNameAttr",
-           &This::GetMergeGroupNameAttr)
+      .def("GetMergeGroupNameAttr", &This::GetMergeGroupNameAttr)
       .def("CreateMergeGroupNameAttr",
            &_CreateMergeGroupNameAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetInvertFilteredGroupsAttr",
-           &This::GetInvertFilteredGroupsAttr)
+      .def("GetInvertFilteredGroupsAttr", &This::GetInvertFilteredGroupsAttr)
       .def("CreateInvertFilteredGroupsAttr",
            &_CreateInvertFilteredGroupsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetFilteredGroupsRel",
-           &This::GetFilteredGroupsRel)
-      .def("CreateFilteredGroupsRel",
-           &This::CreateFilteredGroupsRel)
+      .def("GetFilteredGroupsRel", &This::GetFilteredGroupsRel)
+      .def("CreateFilteredGroupsRel", &This::CreateFilteredGroupsRel)
       .def("__repr__", ::_Repr);
 
   _CustomWrapCode(cls);
@@ -151,67 +138,59 @@ void wrapUsdPhysicsCollisionGroup()
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-namespace
+namespace {
+
+static SdfPathVector _WrapGetGroups(const UsdPhysicsCollisionGroup::CollisionGroupTable &table)
 {
-
-  static SdfPathVector
-  _WrapGetGroups(const UsdPhysicsCollisionGroup::CollisionGroupTable &table)
-  {
-    return table.GetCollisionGroups();
-  }
-
-  static bool
-  _WrapIsCollisionEnabled(const UsdPhysicsCollisionGroup::CollisionGroupTable &table,
-                          boost::python::object a, boost::python::object b)
-  {
-    boost::python::extract<int> extractIntA(a);
-    boost::python::extract<int> extractIntB(b);
-    if (extractIntA.check() && extractIntB.check())
-    {
-      return table.IsCollisionEnabled(extractIntA(), extractIntB());
-    }
-
-    boost::python::extract<SdfPath> extractPathA(a);
-    boost::python::extract<SdfPath> extractPathB(b);
-    if (extractPathA.check() && extractPathB.check())
-    {
-      return table.IsCollisionEnabled(extractPathA(), extractPathB());
-    }
-
-    boost::python::extract<UsdPhysicsCollisionGroup> extractColGroupA(a);
-    boost::python::extract<UsdPhysicsCollisionGroup> extractColGroupB(b);
-    if (extractColGroupA.check() && extractColGroupB.check())
-    {
-      return table.IsCollisionEnabled(extractColGroupA().GetPrim().GetPrimPath(), extractColGroupB().GetPrim().GetPrimPath());
-    }
-
-    boost::python::extract<UsdPrim> extractPrimA(a);
-    boost::python::extract<UsdPrim> extractPrimB(b);
-    if (extractPrimA.check() && extractPrimB.check())
-    {
-      return table.IsCollisionEnabled(extractPrimA().GetPrimPath(), extractPrimB().GetPrimPath());
-    }
-
-    return true;
-  }
-
-  WRAP_CUSTOM
-  {
-    typedef UsdPhysicsCollisionGroup This;
-
-    _class
-        .def("GetCollidersCollectionAPI",
-             &This::GetCollidersCollectionAPI)
-        .def("ComputeCollisionGroupTable",
-             &This::ComputeCollisionGroupTable,
-             arg("stage"),
-             return_value_policy<return_by_value>())
-        .staticmethod("ComputeCollisionGroupTable");
-
-    class_<UsdPhysicsCollisionGroup::CollisionGroupTable>("CollisionGroupTable")
-        .def("GetGroups", &_WrapGetGroups,
-             return_value_policy<TfPySequenceToList>())
-        .def("IsCollisionEnabled", &_WrapIsCollisionEnabled);
-  }
-
+  return table.GetCollisionGroups();
 }
+
+static bool _WrapIsCollisionEnabled(const UsdPhysicsCollisionGroup::CollisionGroupTable &table,
+                                    boost::python::object a,
+                                    boost::python::object b)
+{
+  boost::python::extract<int> extractIntA(a);
+  boost::python::extract<int> extractIntB(b);
+  if (extractIntA.check() && extractIntB.check()) {
+    return table.IsCollisionEnabled(extractIntA(), extractIntB());
+  }
+
+  boost::python::extract<SdfPath> extractPathA(a);
+  boost::python::extract<SdfPath> extractPathB(b);
+  if (extractPathA.check() && extractPathB.check()) {
+    return table.IsCollisionEnabled(extractPathA(), extractPathB());
+  }
+
+  boost::python::extract<UsdPhysicsCollisionGroup> extractColGroupA(a);
+  boost::python::extract<UsdPhysicsCollisionGroup> extractColGroupB(b);
+  if (extractColGroupA.check() && extractColGroupB.check()) {
+    return table.IsCollisionEnabled(extractColGroupA().GetPrim().GetPrimPath(),
+                                    extractColGroupB().GetPrim().GetPrimPath());
+  }
+
+  boost::python::extract<UsdPrim> extractPrimA(a);
+  boost::python::extract<UsdPrim> extractPrimB(b);
+  if (extractPrimA.check() && extractPrimB.check()) {
+    return table.IsCollisionEnabled(extractPrimA().GetPrimPath(), extractPrimB().GetPrimPath());
+  }
+
+  return true;
+}
+
+WRAP_CUSTOM
+{
+  typedef UsdPhysicsCollisionGroup This;
+
+  _class.def("GetCollidersCollectionAPI", &This::GetCollidersCollectionAPI)
+      .def("ComputeCollisionGroupTable",
+           &This::ComputeCollisionGroupTable,
+           arg("stage"),
+           return_value_policy<return_by_value>())
+      .staticmethod("ComputeCollisionGroupTable");
+
+  class_<UsdPhysicsCollisionGroup::CollisionGroupTable>("CollisionGroupTable")
+      .def("GetGroups", &_WrapGetGroups, return_value_policy<TfPySequenceToList>())
+      .def("IsCollisionEnabled", &_WrapIsCollisionEnabled);
+}
+
+}  // namespace

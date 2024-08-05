@@ -12,4 +12,4 @@
 #include <UsdRender/tokens.h>
 #include <UsdRender/var.h>
 
-#endif // __PXR_USD_USDRENDER_H__
+#endif  // __PXR_USD_USDRENDER_H__

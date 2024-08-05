@@ -26,9 +26,9 @@
 
 #include <pxr/pxrns.h>
 
+#include "Sdf/childrenPolicies.h"
 #include "Sdf/childrenProxy.h"
 #include "Sdf/childrenView.h"
-#include "Sdf/childrenPolicies.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/listEditorProxy.h"
 #include "Sdf/listProxy.h"
@@ -46,14 +46,11 @@ typedef SdfListEditorProxy<SdfPathKeyPolicy> SdfPathEditorProxy;
 typedef SdfListEditorProxy<SdfPayloadTypePolicy> SdfPayloadEditorProxy;
 typedef SdfListEditorProxy<SdfReferenceTypePolicy> SdfReferenceEditorProxy;
 
-typedef SdfChildrenView<Sdf_AttributeChildPolicy, SdfAttributeViewPredicate>
-    SdfAttributeSpecView;
+typedef SdfChildrenView<Sdf_AttributeChildPolicy, SdfAttributeViewPredicate> SdfAttributeSpecView;
 typedef SdfChildrenView<Sdf_PrimChildPolicy> SdfPrimSpecView;
 typedef SdfChildrenView<Sdf_PropertyChildPolicy> SdfPropertySpecView;
-typedef SdfChildrenView<Sdf_AttributeChildPolicy>
-    SdfRelationalAttributeSpecView;
-typedef SdfChildrenView<Sdf_RelationshipChildPolicy,
-                        SdfRelationshipViewPredicate>
+typedef SdfChildrenView<Sdf_AttributeChildPolicy> SdfRelationalAttributeSpecView;
+typedef SdfChildrenView<Sdf_RelationshipChildPolicy, SdfRelationshipViewPredicate>
     SdfRelationshipSpecView;
 typedef SdfChildrenView<Sdf_VariantChildPolicy> SdfVariantView;
 typedef SdfChildrenView<Sdf_VariantSetChildPolicy> SdfVariantSetView;
@@ -71,21 +68,18 @@ typedef SdfNameEditorProxy SdfVariantSetNamesProxy;
 
 typedef SdfMapEditProxy<VtDictionary> SdfDictionaryProxy;
 typedef SdfMapEditProxy<SdfVariantSelectionMap> SdfVariantSelectionProxy;
-typedef SdfMapEditProxy<SdfRelocatesMap, SdfRelocatesMapProxyValuePolicy>
-    SdfRelocatesMapProxy;
+typedef SdfMapEditProxy<SdfRelocatesMap, SdfRelocatesMapProxyValuePolicy> SdfRelocatesMapProxy;
 
 /// Returns a path list editor proxy for the path list op in the given
 /// \p pathField on \p spec.  If the value doesn't exist or \p spec is
 /// invalid then this returns an invalid list editor.
-SdfPathEditorProxy SdfGetPathEditorProxy(const SdfSpecHandle &spec,
-                                         const TfToken &pathField);
+SdfPathEditorProxy SdfGetPathEditorProxy(const SdfSpecHandle &spec, const TfToken &pathField);
 
 /// Returns a reference list editor proxy for the references list op in the
 /// given \p referenceField on \p spec. If the value doesn't exist or the object
 /// is invalid then this returns an invalid list editor.
-SdfReferenceEditorProxy
-SdfGetReferenceEditorProxy(const SdfSpecHandle &spec,
-                           const TfToken &referenceField);
+SdfReferenceEditorProxy SdfGetReferenceEditorProxy(const SdfSpecHandle &spec,
+                                                   const TfToken &referenceField);
 
 /// Returns a payload list editor proxy for the payloads list op in the given
 /// \p payloadField on \p spec.  If the value doesn't exist or the object is
@@ -96,9 +90,8 @@ SdfPayloadEditorProxy SdfGetPayloadEditorProxy(const SdfSpecHandle &spec,
 /// Returns a name order list proxy for the ordering specified in the given
 /// \p orderField on \p spec.  If the value doesn't exist or the object is
 /// invalid then this returns an invalid list editor.
-SdfNameOrderProxy SdfGetNameOrderProxy(const SdfSpecHandle &spec,
-                                       const TfToken &orderField);
+SdfNameOrderProxy SdfGetNameOrderProxy(const SdfSpecHandle &spec, const TfToken &orderField);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PROXY_TYPES_H
+#endif  // PXR_USD_SDF_PROXY_TYPES_H

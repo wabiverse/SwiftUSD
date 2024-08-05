@@ -37,9 +37,8 @@ using HgiTextureHandle = HgiHandle<class HgiTexture>;
 ///
 /// OpenGL implementation of HgiSampler
 ///
-class HgiGLSampler final : public HgiSampler
-{
-public:
+class HgiGLSampler final : public HgiSampler {
+ public:
   HGIGL_API
   ~HgiGLSampler() override;
 
@@ -54,18 +53,18 @@ public:
   HGIGL_API
   uint64_t GetBindlessHandle(HgiTextureHandle const &textureHandle);
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
   HgiGLSampler(HgiSamplerDesc const &desc);
 
-private:
+ private:
   HgiGLSampler() = delete;
   HgiGLSampler &operator=(const HgiGLSampler &) = delete;
   HgiGLSampler(const HgiGLSampler &) = delete;
 
-private:
+ private:
   uint32_t _samplerId;
   uint32_t _bindlessTextureId;
   uint64_t _bindlessHandle;

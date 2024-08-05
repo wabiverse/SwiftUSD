@@ -30,46 +30,43 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_DEFINE_ENV_SETTING(HD_ENABLE_OPENSUBDIV3_ADAPTIVE, 0,
+TF_DEFINE_ENV_SETTING(HD_ENABLE_OPENSUBDIV3_ADAPTIVE,
+                      0,
                       "Enables OpenSubdiv 3 Adaptive Tessellation");
 
 HdMeshTopology::HdMeshTopology()
- : HdTopology()
- , _topology()
- , _invisiblePoints()
- , _invisibleFaces()
- , _refineLevel(0)
- , _numPoints()
+    : HdTopology(),
+      _topology(),
+      _invisiblePoints(),
+      _invisibleFaces(),
+      _refineLevel(0),
+      _numPoints()
 {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
+  HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
 }
 
-HdMeshTopology::HdMeshTopology(const HdMeshTopology &src,
-                               int refineLevel)
- : HdTopology(src)
- , _topology(src.GetPxOsdMeshTopology())
- , _geomSubsets(src._geomSubsets)
- , _invisiblePoints(src._invisiblePoints)
- , _invisibleFaces(src._invisibleFaces)
- , _refineLevel(refineLevel)
- , _numPoints(src._numPoints)
+HdMeshTopology::HdMeshTopology(const HdMeshTopology &src, int refineLevel)
+    : HdTopology(src),
+      _topology(src.GetPxOsdMeshTopology()),
+      _geomSubsets(src._geomSubsets),
+      _invisiblePoints(src._invisiblePoints),
+      _invisibleFaces(src._invisibleFaces),
+      _refineLevel(refineLevel),
+      _numPoints(src._numPoints)
 {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
+  HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
 }
 
-HdMeshTopology::HdMeshTopology(const PxOsdMeshTopology &topo,
-                               int refineLevel /* = 0 */)
- : HdTopology()
- , _topology(topo)
- , _invisiblePoints()
- , _invisibleFaces()
- , _refineLevel(refineLevel)
- , _numPoints()
+HdMeshTopology::HdMeshTopology(const PxOsdMeshTopology &topo, int refineLevel /* = 0 */)
+    : HdTopology(),
+      _topology(topo),
+      _invisiblePoints(),
+      _invisibleFaces(),
+      _refineLevel(refineLevel),
+      _numPoints()
 {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
-    _numPoints = HdMeshTopology::ComputeNumPoints(
-            _topology.GetFaceVertexIndices());
+  HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
+  _numPoints = HdMeshTopology::ComputeNumPoints(_topology.GetFaceVertexIndices());
 }
 
 HdMeshTopology::HdMeshTopology(const TfToken &scheme,
@@ -77,19 +74,15 @@ HdMeshTopology::HdMeshTopology(const TfToken &scheme,
                                const VtIntArray &faceVertexCounts,
                                const VtIntArray &faceVertexIndices,
                                int refineLevel /* = 0 */)
- : HdTopology()
- , _topology(scheme,
-             orientation,
-             faceVertexCounts,
-             faceVertexIndices)
- , _invisiblePoints()
- , _invisibleFaces()
- , _refineLevel(refineLevel)
- , _numPoints()
+    : HdTopology(),
+      _topology(scheme, orientation, faceVertexCounts, faceVertexIndices),
+      _invisiblePoints(),
+      _invisibleFaces(),
+      _refineLevel(refineLevel),
+      _numPoints()
 {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
-    _numPoints = HdMeshTopology::ComputeNumPoints(
-            _topology.GetFaceVertexIndices());
+  HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
+  _numPoints = HdMeshTopology::ComputeNumPoints(_topology.GetFaceVertexIndices());
 }
 
 HdMeshTopology::HdMeshTopology(const TfToken &scheme,
@@ -98,119 +91,101 @@ HdMeshTopology::HdMeshTopology(const TfToken &scheme,
                                const VtIntArray &faceVertexIndices,
                                const VtIntArray &holeIndices,
                                int refineLevel /* = 0 */)
- : HdTopology()
- , _topology(scheme,
-             orientation,
-             faceVertexCounts,
-             faceVertexIndices,
-             holeIndices)
- , _invisiblePoints()
- , _invisibleFaces()
- , _refineLevel(refineLevel)
- , _numPoints()
+    : HdTopology(),
+      _topology(scheme, orientation, faceVertexCounts, faceVertexIndices, holeIndices),
+      _invisiblePoints(),
+      _invisibleFaces(),
+      _refineLevel(refineLevel),
+      _numPoints()
 {
-    HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
-    _numPoints = HdMeshTopology::ComputeNumPoints(
-            _topology.GetFaceVertexIndices());
+  HD_PERF_COUNTER_INCR(HdPerfTokens->meshTopology);
+  _numPoints = HdMeshTopology::ComputeNumPoints(_topology.GetFaceVertexIndices());
 }
 
 HdMeshTopology::~HdMeshTopology()
 {
-    HD_PERF_COUNTER_DECR(HdPerfTokens->meshTopology);
+  HD_PERF_COUNTER_DECR(HdPerfTokens->meshTopology);
 }
 
-HdMeshTopology &
-HdMeshTopology::operator =(const HdMeshTopology &copy)
+HdMeshTopology &HdMeshTopology::operator=(const HdMeshTopology &copy)
 {
-    HdTopology::operator =(copy);
+  HdTopology::operator=(copy);
 
-    _topology        = copy.GetPxOsdMeshTopology();
-    _geomSubsets     = copy._geomSubsets;
-    _refineLevel     = copy._refineLevel;
-    _numPoints       = copy._numPoints;
-    _invisiblePoints = copy._invisiblePoints;
-    _invisibleFaces  = copy._invisibleFaces;
+  _topology = copy.GetPxOsdMeshTopology();
+  _geomSubsets = copy._geomSubsets;
+  _refineLevel = copy._refineLevel;
+  _numPoints = copy._numPoints;
+  _invisiblePoints = copy._invisiblePoints;
+  _invisibleFaces = copy._invisibleFaces;
 
-    return *this;
+  return *this;
 }
 
-bool
-HdMeshTopology::IsEnabledAdaptive()
+bool HdMeshTopology::IsEnabledAdaptive()
 {
-    return TfGetEnvSetting(HD_ENABLE_OPENSUBDIV3_ADAPTIVE) == 1;
+  return TfGetEnvSetting(HD_ENABLE_OPENSUBDIV3_ADAPTIVE) == 1;
 }
 
-bool
-HdMeshTopology::operator==(HdMeshTopology const &other) const {
-
-    HD_TRACE_FUNCTION();
-
-    return (_topology == other._topology)
-        && (_geomSubsets == other._geomSubsets)
-        && (_invisiblePoints == other._invisiblePoints)
-        && (_invisibleFaces == other._invisibleFaces)
-        && (_refineLevel == other._refineLevel);
-    // Don't compare _numPoints, since it is derived from _topology.
-}
-
-int
-HdMeshTopology::GetNumFaces() const
+bool HdMeshTopology::operator==(HdMeshTopology const &other) const
 {
-    return (int)_topology.GetFaceVertexCounts().size();
+
+  HD_TRACE_FUNCTION();
+
+  return (_topology == other._topology) && (_geomSubsets == other._geomSubsets) &&
+         (_invisiblePoints == other._invisiblePoints) &&
+         (_invisibleFaces == other._invisibleFaces) && (_refineLevel == other._refineLevel);
+  // Don't compare _numPoints, since it is derived from _topology.
 }
 
-int
-HdMeshTopology::GetNumFaceVaryings() const
+int HdMeshTopology::GetNumFaces() const
 {
-    return (int)_topology.GetFaceVertexIndices().size();
+  return (int)_topology.GetFaceVertexCounts().size();
 }
 
-int
-HdMeshTopology::GetNumPoints() const
+int HdMeshTopology::GetNumFaceVaryings() const
 {
-    return _numPoints;
+  return (int)_topology.GetFaceVertexIndices().size();
 }
 
-/*static*/ int
-HdMeshTopology::ComputeNumPoints(VtIntArray const &verts)
+int HdMeshTopology::GetNumPoints() const
 {
-    HD_TRACE_FUNCTION();
-
-    // compute numPoints from topology indices
-    int numIndices = verts.size();
-    int numPoints = -1;
-    int const * vertsPtr = verts.cdata();
-    for (int i= 0;i <numIndices; ++i) {
-        // find the max vertex index in face verts
-        numPoints = std::max(numPoints, vertsPtr[i]);
-    }
-    // numPoints = max vertex index + 1
-    return numPoints + 1;
+  return _numPoints;
 }
 
-HdTopology::ID
-HdMeshTopology::ComputeHash() const
+/*static*/ int HdMeshTopology::ComputeNumPoints(VtIntArray const &verts)
 {
-    HD_TRACE_FUNCTION();
+  HD_TRACE_FUNCTION();
 
-    HdTopology::ID hash =_topology.ComputeHash();
-    hash = ArchHash64((const char*)&_refineLevel, sizeof(_refineLevel), hash);
-    for (const HdGeomSubset &subset: _geomSubsets) {
-        hash = ArchHash64((const char*)&subset.type,
-                          sizeof(subset.type), hash);
-        hash = ArchHash64((const char*)&subset.id,
-                          sizeof(subset.id), hash);
-        hash = ArchHash64((const char*)&subset.materialId,
-                          sizeof(subset.materialId), hash);
-        hash = ArchHash64((const char*)subset.indices.cdata(),
-                          sizeof(int)*subset.indices.size(), hash);
-    }
-    // Note: We don't hash topological visibility, because it is treated as a
-    // per-mesh opinion, and hence, shouldn't break topology sharing.
+  // compute numPoints from topology indices
+  int numIndices = verts.size();
+  int numPoints = -1;
+  int const *vertsPtr = verts.cdata();
+  for (int i = 0; i < numIndices; ++i) {
+    // find the max vertex index in face verts
+    numPoints = std::max(numPoints, vertsPtr[i]);
+  }
+  // numPoints = max vertex index + 1
+  return numPoints + 1;
+}
 
-    // Do not hash _numPoints since it is derived from _topology.
-    return hash;
+HdTopology::ID HdMeshTopology::ComputeHash() const
+{
+  HD_TRACE_FUNCTION();
+
+  HdTopology::ID hash = _topology.ComputeHash();
+  hash = ArchHash64((const char *)&_refineLevel, sizeof(_refineLevel), hash);
+  for (const HdGeomSubset &subset : _geomSubsets) {
+    hash = ArchHash64((const char *)&subset.type, sizeof(subset.type), hash);
+    hash = ArchHash64((const char *)&subset.id, sizeof(subset.id), hash);
+    hash = ArchHash64((const char *)&subset.materialId, sizeof(subset.materialId), hash);
+    hash = ArchHash64(
+        (const char *)subset.indices.cdata(), sizeof(int) * subset.indices.size(), hash);
+  }
+  // Note: We don't hash topological visibility, because it is treated as a
+  // per-mesh opinion, and hence, shouldn't break topology sharing.
+
+  // Do not hash _numPoints since it is derived from _topology.
+  return hash;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

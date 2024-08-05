@@ -29,36 +29,40 @@ using namespace std;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfPatternMatcher::TfPatternMatcher()
-    : _caseSensitive(false), _isGlob(false), _recompile(true) {}
+TfPatternMatcher::TfPatternMatcher() : _caseSensitive(false), _isGlob(false), _recompile(true) {}
 
-TfPatternMatcher::TfPatternMatcher(const string &pattern, bool caseSensitive,
-                                   bool isGlob)
-    : _caseSensitive(caseSensitive), _isGlob(isGlob), _pattern(pattern),
-      _recompile(true) {}
+TfPatternMatcher::TfPatternMatcher(const string &pattern, bool caseSensitive, bool isGlob)
+    : _caseSensitive(caseSensitive), _isGlob(isGlob), _pattern(pattern), _recompile(true)
+{
+}
 
-TfPatternMatcher::~TfPatternMatcher() {
+TfPatternMatcher::~TfPatternMatcher()
+{
   // Do nothing.
 }
 
-string TfPatternMatcher::GetInvalidReason() const {
+string TfPatternMatcher::GetInvalidReason() const
+{
   _Compile();
   return _regex.GetError();
 }
 
-bool TfPatternMatcher::IsValid() const {
+bool TfPatternMatcher::IsValid() const
+{
   _Compile();
   return static_cast<bool>(_regex);
 }
 
-bool TfPatternMatcher::Match(const string &query, string *errorMsg) const {
+bool TfPatternMatcher::Match(const string &query, string *errorMsg) const
+{
   if (IsValid()) {
     if (errorMsg) {
       errorMsg->clear();
     }
 
     return _regex.Match(query);
-  } else {
+  }
+  else {
     if (errorMsg) {
       *errorMsg = _regex.GetError();
     }
@@ -66,21 +70,24 @@ bool TfPatternMatcher::Match(const string &query, string *errorMsg) const {
   }
 }
 
-void TfPatternMatcher::SetIsCaseSensitive(bool sensitive) {
+void TfPatternMatcher::SetIsCaseSensitive(bool sensitive)
+{
   if (sensitive != _caseSensitive) {
     _recompile = true;
     _caseSensitive = sensitive;
   }
 }
 
-void TfPatternMatcher::SetIsGlobPattern(bool isGlob) {
+void TfPatternMatcher::SetIsGlobPattern(bool isGlob)
+{
   if (isGlob != _isGlob) {
     _recompile = true;
     _isGlob = isGlob;
   }
 }
 
-void TfPatternMatcher::SetPattern(const string &pattern) {
+void TfPatternMatcher::SetPattern(const string &pattern)
+{
   if (pattern != _pattern) {
     _recompile = true;
     _pattern = pattern;
@@ -89,7 +96,8 @@ void TfPatternMatcher::SetPattern(const string &pattern) {
 
 ////////////////////////////////// Private ////////////////////////////////
 
-void TfPatternMatcher::_Compile() const {
+void TfPatternMatcher::_Compile() const
+{
   if (_recompile) {
 
     _recompile = false;

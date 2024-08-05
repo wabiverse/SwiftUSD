@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
-#include "data.h"
 #include "fileFormat.h"
+#include "data.h"
+#include <pxr/pxrns.h>
 
 #include "Pcp/dynamicFileFormatContext.h"
 #include "Usd/usdaFileFormat.h"
@@ -33,9 +33,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(
-    UsdDancingCubesExampleFileFormatTokens,
-    USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(UsdDancingCubesExampleFileFormatTokens,
+                        USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_TOKENS);
 
 TF_REGISTRY_FUNCTION(TfType)
 {
@@ -43,25 +42,21 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 UsdDancingCubesExampleFileFormat::UsdDancingCubesExampleFileFormat()
-    : SdfFileFormat(
-          UsdDancingCubesExampleFileFormatTokens->Id,
-          UsdDancingCubesExampleFileFormatTokens->Version,
-          UsdDancingCubesExampleFileFormatTokens->Target,
-          UsdDancingCubesExampleFileFormatTokens->Extension)
+    : SdfFileFormat(UsdDancingCubesExampleFileFormatTokens->Id,
+                    UsdDancingCubesExampleFileFormatTokens->Version,
+                    UsdDancingCubesExampleFileFormatTokens->Target,
+                    UsdDancingCubesExampleFileFormatTokens->Extension)
 {
 }
 
-UsdDancingCubesExampleFileFormat::~UsdDancingCubesExampleFileFormat()
-{
-}
+UsdDancingCubesExampleFileFormat::~UsdDancingCubesExampleFileFormat() {}
 
 bool UsdDancingCubesExampleFileFormat::CanRead(const std::string &filePath) const
 {
   return true;
 }
 
-SdfAbstractDataRefPtr
-UsdDancingCubesExampleFileFormat::InitData(
+SdfAbstractDataRefPtr UsdDancingCubesExampleFileFormat::InitData(
     const FileFormatArguments &args) const
 {
   // While we have the file format arguments used to generate the layer
@@ -71,13 +66,11 @@ UsdDancingCubesExampleFileFormat::InitData(
   return UsdDancingCubesExample_Data::New();
 }
 
-bool UsdDancingCubesExampleFileFormat::Read(
-    SdfLayer *layer,
-    const std::string &resolvedPath,
-    bool metadataOnly) const
+bool UsdDancingCubesExampleFileFormat::Read(SdfLayer *layer,
+                                            const std::string &resolvedPath,
+                                            bool metadataOnly) const
 {
-  if (!TF_VERIFY(layer))
-  {
+  if (!TF_VERIFY(layer)) {
     return false;
   }
 
@@ -85,8 +78,8 @@ bool UsdDancingCubesExampleFileFormat::Read(
   // from the file format arguments.
   const FileFormatArguments &args = layer->GetFileFormatArguments();
   SdfAbstractDataRefPtr data = InitData(args);
-  UsdDancingCubesExample_DataRefPtr cubesData =
-      TfStatic_cast<UsdDancingCubesExample_DataRefPtr>(data);
+  UsdDancingCubesExample_DataRefPtr cubesData = TfStatic_cast<UsdDancingCubesExample_DataRefPtr>(
+      data);
   cubesData->SetParams(UsdDancingCubesExample_DataParams::FromArgs(args));
   _SetLayerData(layer, data);
 
@@ -100,26 +93,20 @@ bool UsdDancingCubesExampleFileFormat::Read(
   return true;
 }
 
-bool UsdDancingCubesExampleFileFormat::WriteToString(
-    const SdfLayer &layer,
-    std::string *str,
-    const std::string &comment) const
+bool UsdDancingCubesExampleFileFormat::WriteToString(const SdfLayer &layer,
+                                                     std::string *str,
+                                                     const std::string &comment) const
 {
   // Write the generated contents in usda text format.
-  return SdfFileFormat::FindById(
-             UsdUsdaFileFormatTokens->Id)
-      ->WriteToString(layer, str, comment);
+  return SdfFileFormat::FindById(UsdUsdaFileFormatTokens->Id)->WriteToString(layer, str, comment);
 }
 
-bool UsdDancingCubesExampleFileFormat::WriteToStream(
-    const SdfSpecHandle &spec,
-    std::ostream &out,
-    size_t indent) const
+bool UsdDancingCubesExampleFileFormat::WriteToStream(const SdfSpecHandle &spec,
+                                                     std::ostream &out,
+                                                     size_t indent) const
 {
   // Write the generated contents in usda text format.
-  return SdfFileFormat::FindById(
-             UsdUsdaFileFormatTokens->Id)
-      ->WriteToStream(spec, out, indent);
+  return SdfFileFormat::FindById(UsdUsdaFileFormatTokens->Id)->WriteToStream(spec, out, indent);
 }
 
 void UsdDancingCubesExampleFileFormat::ComposeFieldsForFileFormatArguments(
@@ -137,19 +124,18 @@ void UsdDancingCubesExampleFileFormat::ComposeFieldsForFileFormatArguments(
   if (context.ComposeValue(UsdDancingCubesExampleFileFormatTokens->Params, &val) &&
       val.IsHolding<VtDictionary>())
   {
-    params = UsdDancingCubesExample_DataParams::FromDict(
-        val.UncheckedGet<VtDictionary>());
+    params = UsdDancingCubesExample_DataParams::FromDict(val.UncheckedGet<VtDictionary>());
   }
 
 // In addition, each parameter can optionally be specified via an attribute
 // on the prim with the same name and type as the parameter. If present, the
 // attributes default value will be used as the parameter value.
-#define xx(TYPE, NAME, DEFAULT)                                   \
-  if (context.ComposeAttributeDefaultValue(                       \
-          UsdDancingCubesExample_DataParamsTokens->NAME, &val) && \
-      val.IsHolding<TYPE>())                                      \
-  {                                                               \
-    params.NAME = val.UncheckedGet<TYPE>();                       \
+#define xx(TYPE, NAME, DEFAULT) \
+  if (context.ComposeAttributeDefaultValue(UsdDancingCubesExample_DataParamsTokens->NAME, \
+                                           &val) && \
+      val.IsHolding<TYPE>()) \
+  { \
+    params.NAME = val.UncheckedGet<TYPE>(); \
   }
   USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_X_FIELDS
 #undef xx
@@ -167,8 +153,12 @@ bool UsdDancingCubesExampleFileFormat::CanFieldChangeAffectFileFormatArguments(
     const VtValue &contextDependencyData) const
 {
   // Theres only one relevant field and its values should hold a dictionary.
-  const VtDictionary &oldDict = oldValue.IsHolding<VtDictionary>() ? oldValue.UncheckedGet<VtDictionary>() : VtGetEmptyDictionary();
-  const VtDictionary &newDict = newValue.IsHolding<VtDictionary>() ? newValue.UncheckedGet<VtDictionary>() : VtGetEmptyDictionary();
+  const VtDictionary &oldDict = oldValue.IsHolding<VtDictionary>() ?
+                                    oldValue.UncheckedGet<VtDictionary>() :
+                                    VtGetEmptyDictionary();
+  const VtDictionary &newDict = newValue.IsHolding<VtDictionary>() ?
+                                    newValue.UncheckedGet<VtDictionary>() :
+                                    VtGetEmptyDictionary();
 
   // The dictionary values for our metadata key are not restricted as to what
   // they may contain so it's possible they may have keys that are completely
@@ -182,28 +172,24 @@ bool UsdDancingCubesExampleFileFormat::CanFieldChangeAffectFileFormatArguments(
 
   // Compare relevant values in the old and new dictionaries.
   // If both the old and new dictionaries are empty, there's no change.
-  if (oldDict.empty() && newDict.empty())
-  {
+  if (oldDict.empty() && newDict.empty()) {
     return false;
   }
 
   // Otherwise we iterate through each possible parameter value looking for
   // any one that has a value change between the two dictionaries.
-  for (const TfToken &token : UsdDancingCubesExample_DataParamsTokens->allTokens)
-  {
+  for (const TfToken &token : UsdDancingCubesExample_DataParamsTokens->allTokens) {
     auto oldIt = oldDict.find(token);
     auto newIt = newDict.find(token);
     const bool oldValExists = oldIt != oldDict.end();
     const bool newValExists = newIt != newDict.end();
 
     // If param value exists in one or not the other, we have change.
-    if (oldValExists != newValExists)
-    {
+    if (oldValExists != newValExists) {
       return true;
     }
     // Otherwise if it's both and the value differs, we also have a change.
-    if (newValExists && oldIt->second != newIt->second)
-    {
+    if (newValExists && oldIt->second != newIt->second) {
       return true;
     }
   }

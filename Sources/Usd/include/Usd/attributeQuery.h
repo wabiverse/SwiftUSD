@@ -74,7 +74,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// dereferencing invalid objects.
 ///
 class UsdAttributeQuery {
-public:
+ public:
   /// Construct an invalid query object.
   USD_API
   UsdAttributeQuery();
@@ -102,15 +102,14 @@ public:
   /// Note that a UsdResolveTarget is associated with a particular prim so
   /// only resolve targets for the attribute's owning prim are allowed.
   USD_API
-  UsdAttributeQuery(const UsdAttribute &attr,
-                    const UsdResolveTarget &resolveTarget);
+  UsdAttributeQuery(const UsdAttribute &attr, const UsdResolveTarget &resolveTarget);
 
   /// Construct new queries for the attributes named in \p attrNames under
   /// the prim \p prim. The objects in the returned vector will line up
   /// 1-to-1 with \p attrNames.
   USD_API
-  static std::vector<UsdAttributeQuery>
-  CreateQueries(const UsdPrim &prim, const TfTokenVector &attrNames);
+  static std::vector<UsdAttributeQuery> CreateQueries(const UsdPrim &prim,
+                                                      const TfTokenVector &attrNames);
 
   // --------------------------------------------------------------------- //
   /// \name Query information
@@ -124,11 +123,17 @@ public:
 
   /// Return true if this query is valid (i.e. it is associated with a
   /// valid attribute), false otherwise.
-  bool IsValid() const { return GetAttribute().IsValid(); }
+  bool IsValid() const
+  {
+    return GetAttribute().IsValid();
+  }
 
-public:
+ public:
   /// Returns \c true if the query object is valid, \c false otherwise.
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
   /// Copy assignment.
   USD_API
@@ -150,10 +155,9 @@ public:
   /// with this query at the requested UsdTimeCode \p time.
   ///
   /// \sa UsdAttribute::Get
-  template <typename T>
-  bool Get(T *value, UsdTimeCode time = UsdTimeCode::Default()) const {
-    static_assert(SdfValueTypeTraits<T>::IsValueType,
-                  "T must be an SdfValueType.");
+  template<typename T> bool Get(T *value, UsdTimeCode time = UsdTimeCode::Default()) const
+  {
+    static_assert(SdfValueTypeTraits<T>::IsValueType, "T must be an SdfValueType.");
     return _Get(value, time);
   }
   /// \overload
@@ -175,8 +179,7 @@ public:
   ///
   /// Behaves identically to UsdAttribute::GetTimeSamplesInInterval()
   USD_API
-  bool GetTimeSamplesInInterval(const GfInterval &interval,
-                                std::vector<double> *times) const;
+  bool GetTimeSamplesInInterval(const GfInterval &interval, std::vector<double> *times) const;
 
   /// Populates the given vector, \p times with the union of all the
   /// authored sample times on all of the given attribute-query objects,
@@ -191,9 +194,8 @@ public:
   /// \sa UsdAttribute::GetUnionedTimeSamples
   /// \sa UsdAttributeQuery::GetUnionedTimeSamplesInInterval
   USD_API
-  static bool
-  GetUnionedTimeSamples(const std::vector<UsdAttributeQuery> &attrQueries,
-                        std::vector<double> *times);
+  static bool GetUnionedTimeSamples(const std::vector<UsdAttributeQuery> &attrQueries,
+                                    std::vector<double> *times);
 
   /// Populates the given vector, \p times with the union of all the
   /// authored sample times in the GfInterval, \p interval on all of the
@@ -207,9 +209,9 @@ public:
   ///
   /// \sa UsdAttribute::GetUnionedTimeSamplesInInterval
   USD_API
-  static bool GetUnionedTimeSamplesInInterval(
-      const std::vector<UsdAttributeQuery> &attrQueries,
-      const GfInterval &interval, std::vector<double> *times);
+  static bool GetUnionedTimeSamplesInInterval(const std::vector<UsdAttributeQuery> &attrQueries,
+                                              const GfInterval &interval,
+                                              std::vector<double> *times);
 
   /// Returns the number of time samples that have been authored.
   ///
@@ -222,8 +224,10 @@ public:
   ///
   /// \sa UsdAttribute::GetBracketingTimeSamples
   USD_API
-  bool GetBracketingTimeSamples(double desiredTime, double *lower,
-                                double *upper, bool *hasTimeSamples) const;
+  bool GetBracketingTimeSamples(double desiredTime,
+                                double *lower,
+                                double *upper,
+                                bool *hasTimeSamples) const;
 
   /// Return true if the attribute associated with this query has an
   /// authored default value, authored time samples or a fallback value
@@ -268,14 +272,14 @@ public:
 
   /// @}
 
-private:
+ private:
   void _Initialize();
 
   void _Initialize(const UsdResolveTarget &resolveTarget);
 
-  template <typename T> USD_API bool _Get(T *value, UsdTimeCode time) const;
+  template<typename T> USD_API bool _Get(T *value, UsdTimeCode time) const;
 
-private:
+ private:
   UsdAttribute _attr;
   UsdResolveInfo _resolveInfo;
   std::unique_ptr<UsdResolveTarget> _resolveTarget;
@@ -283,4 +287,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ATTRIBUTE_QUERY_H
+#endif  // PXR_USD_USD_ATTRIBUTE_QUERY_H

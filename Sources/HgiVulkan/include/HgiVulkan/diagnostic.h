@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HGIVULKAN_DIAGNOSTIC_H
 #define PXR_IMAGING_HGIVULKAN_DIAGNOSTIC_H
 
-#include <pxr/pxrns.h>
 #include "HgiVulkan/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,36 +47,26 @@ void HgiVulkanDestroyDebug(HgiVulkanInstance *instance);
 
 /// Setup vulkan device debug callbacks
 HGIVULKAN_API
-void HgiVulkanSetupDeviceDebug(
-    HgiVulkanInstance *instance,
-    HgiVulkanDevice *device);
+void HgiVulkanSetupDeviceDebug(HgiVulkanInstance *instance, HgiVulkanDevice *device);
 
 /// Add a debug name to a vulkan object
 HGIVULKAN_API
-void HgiVulkanSetDebugName(
-    HgiVulkanDevice *device,
-    uint64_t vulkanObject, /*Handle to vulkan object cast to uint64_t*/
-    VkObjectType objectType,
-    const char *name);
+void HgiVulkanSetDebugName(HgiVulkanDevice *device,
+                           uint64_t vulkanObject, /*Handle to vulkan object cast to uint64_t*/
+                           VkObjectType objectType,
+                           const char *name);
 
 /// Begin a label in a vulkan command buffer
 HGIVULKAN_API
-void HgiVulkanBeginLabel(
-    HgiVulkanDevice *device,
-    HgiVulkanCommandBuffer *cb,
-    const char *label);
+void HgiVulkanBeginLabel(HgiVulkanDevice *device, HgiVulkanCommandBuffer *cb, const char *label);
 
 /// End the last pushed label in a vulkan command buffer
 HGIVULKAN_API
-void HgiVulkanEndLabel(
-    HgiVulkanDevice *device,
-    HgiVulkanCommandBuffer *cb);
+void HgiVulkanEndLabel(HgiVulkanDevice *device, HgiVulkanCommandBuffer *cb);
 
 /// Begin a label in the vulkan device gfx queue
 HGIVULKAN_API
-void HgiVulkanBeginQueueLabel(
-    HgiVulkanDevice *device,
-    const char *label);
+void HgiVulkanBeginQueueLabel(HgiVulkanDevice *device, const char *label);
 
 /// End the last pushed label in the vulkan device gfx queue
 HGIVULKAN_API

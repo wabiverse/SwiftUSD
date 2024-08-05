@@ -31,7 +31,8 @@ ArAsset::ArAsset() {}
 
 ArAsset::~ArAsset() {}
 
-std::shared_ptr<ArAsset> ArAsset::GetDetachedAsset() const {
+std::shared_ptr<ArAsset> ArAsset::GetDetachedAsset() const
+{
   return ArInMemoryAsset::FromAsset(*this);
 }
 

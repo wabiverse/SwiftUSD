@@ -28,8 +28,8 @@
 #include <Sdf/declareSpec.h>
 #include <Sdf/fileFormat.h>
 #include <Sdf/fileFormatRegistry.h>
-#include <Sdf/fileIO_Common.h>
 #include <Sdf/fileIO.h>
+#include <Sdf/fileIO_Common.h>
 #include <Sdf/identity.h>
 #include <Sdf/instantiatePool.h>
 #include <Sdf/invoke.hpp>
@@ -45,8 +45,8 @@
 #include <Sdf/listOp.h>
 #include <Sdf/listOpListEditor.h>
 #include <Sdf/listProxy.h>
-#include <Sdf/mapEditor.h>
 #include <Sdf/mapEditProxy.h>
+#include <Sdf/mapEditor.h>
 #include <Sdf/namespaceEdit.h>
 #include <Sdf/notice.h>
 #include <Sdf/opaqueValue.h>
@@ -101,4 +101,4 @@
 #include <Sdf/variantSpec.h>
 #include <Sdf/vectorListEditor.h>
 
-#endif // __PXR_USD_SDF_H__
+#endif  // __PXR_USD_SDF_H__

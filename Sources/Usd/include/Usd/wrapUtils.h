@@ -48,30 +48,34 @@ struct Usd_ObjectSubclass : boost::python::def_visitor<Usd_ObjectSubclass> {
   // UsdObject types to their most derived type.  For example, when converting
   // a UsdProperty to python, we downcast it to either UsdAttribute or
   // UsdRelationship, as appropriate.
-  template <typename CLS> void visit(CLS &c) const {
+  template<typename CLS> void visit(CLS &c) const
+  {
     typedef typename CLS::wrapped_type Type;
     _ReplaceConverter(boost::python::type_id<Type>(),
-                      _Detail::GetObjType<Type>::Value, _Convert<Type>,
+                      _Detail::GetObjType<Type>::Value,
+                      _Convert<Type>,
                       _Downcast<Type>);
   }
 
-private:
+ private:
   // Converter implementation for UsdObject subclass T.
-  template <class T> static PyObject *_Convert(const void *in) {
+  template<class T> static PyObject *_Convert(const void *in)
+  {
     return _ConvertHelper(static_cast<const T *>(in));
   }
 
   // Downcast UsdObject to T.
-  template <class T> static const void *_Downcast(const UsdObject *in) {
+  template<class T> static const void *_Downcast(const UsdObject *in)
+  {
     return static_cast<const T *>(in);
   }
 
   // Internal method that replaces the boost.python to_python converter for
   // the type \p pti.
-  static void
-  _ReplaceConverter(boost::python::type_info pti, UsdObjType objType,
-                    boost::python::converter::to_python_function_t convert,
-                    DowncastFn downcast);
+  static void _ReplaceConverter(boost::python::type_info pti,
+                                UsdObjType objType,
+                                boost::python::converter::to_python_function_t convert,
+                                DowncastFn downcast);
 
   // Non-template helper function for _Convert.
   static PyObject *_ConvertHelper(const UsdObject *obj);
@@ -79,4 +83,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_WRAP_UTILS_H
+#endif  // PXR_USD_USD_WRAP_UTILS_H

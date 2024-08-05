@@ -27,22 +27,23 @@
 
 #include <errno.h>
 #if !defined(ARCH_OS_WINDOWS)
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/param.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
+#  include <signal.h>
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <sys/param.h>
+#  include <sys/resource.h>
+#  include <sys/stat.h>
+#  include <sys/time.h>
+#  include <sys/types.h>
+#  include <unistd.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Fork the current process and close all undesired file descriptors.
 //
-int ArchCloseAllFiles(int nExcept, const int *exceptFds) {
+int ArchCloseAllFiles(int nExcept, const int *exceptFds)
+{
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 
   int status, retStatus, retErrno;
@@ -55,7 +56,8 @@ int ArchCloseAllFiles(int nExcept, const int *exceptFds) {
 
   if (limits.rlim_cur == RLIM_INFINITY) {
     maxfd = NOFILE;
-  } else {
+  }
+  else {
     maxfd = (int)limits.rlim_cur;
   }
 

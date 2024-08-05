@@ -35,7 +35,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Sent when the list of available debug symbol names has changed.
 class TfDebugSymbolsChangedNotice : public TfNotice {
-public:
+ public:
   TfDebugSymbolsChangedNotice() {}
   virtual ~TfDebugSymbolsChangedNotice();
 };
@@ -44,7 +44,7 @@ public:
 ///
 /// Sent when a debug symbol has been enabled or disabled.
 class TfDebugSymbolEnableChangedNotice : public TfNotice {
-public:
+ public:
   TfDebugSymbolEnableChangedNotice() {}
   virtual ~TfDebugSymbolEnableChangedNotice();
 };

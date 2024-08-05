@@ -26,22 +26,22 @@
 
 /// \file usdRi/materialAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdRi/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdRi/api.h"
 #include "UsdRi/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "UsdShade/input.h"
-#include "UsdShade/output.h"
 #include "UsdShade/material.h"
+#include "UsdShade/output.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -68,9 +68,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRiTokens->rightHanded
 /// as the value.
 ///
-class UsdRiMaterialAPI : public UsdAPISchemaBase
-{
-public:
+class UsdRiMaterialAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -80,18 +79,12 @@ public:
   /// Equivalent to UsdRiMaterialAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRiMaterialAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
-  {
-  }
+  explicit UsdRiMaterialAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdRiMaterialAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdRiMaterialAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRiMaterialAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj)
-  {
-  }
+  explicit UsdRiMaterialAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
   /// Destructor.
   USDRI_API
@@ -101,8 +94,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRI_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRiMaterialAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -114,8 +106,7 @@ public:
   /// \endcode
   ///
   USDRI_API
-  static UsdRiMaterialAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRiMaterialAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -134,8 +125,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "RiMaterialAPI" to the
@@ -153,17 +143,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static UsdRiMaterialAPI
-  Apply(const UsdPrim &prim);
+  static UsdRiMaterialAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRI_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRI_API
@@ -175,7 +164,7 @@ private:
   USDRI_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SURFACE
   // --------------------------------------------------------------------- //
@@ -195,9 +184,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreateSurfaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateSurfaceAttr(VtValue const &defaultValue = VtValue(),
+                                 bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DISPLACEMENT
   // --------------------------------------------------------------------- //
@@ -217,9 +207,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreateDisplacementAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateDisplacementAttr(VtValue const &defaultValue = VtValue(),
+                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // VOLUME
   // --------------------------------------------------------------------- //
@@ -239,9 +230,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreateVolumeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateVolumeAttr(VtValue const &defaultValue = VtValue(),
+                                bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -333,13 +325,12 @@ public:
   /// vector of consumers of their values. The consumers can be inputs on
   /// shaders within the material or on node-graphs under it.
   USDRI_API
-  UsdShadeNodeGraph::InterfaceInputConsumersMap
-  ComputeInterfaceInputConsumersMap(
+  UsdShadeNodeGraph::InterfaceInputConsumersMap ComputeInterfaceInputConsumersMap(
       bool computeTransitiveConsumers = false) const;
 
   /// @}
 
-private:
+ private:
   UsdShadeShader _GetSourceShaderObject(const UsdShadeOutput &output,
                                         bool ignoreBaseMaterial) const;
 

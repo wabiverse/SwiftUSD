@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "Hgi/hgiImpl.h"
 #include "Arch/defines.h"
+#include "Hgi/hgiImpl.h"
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
 #include "Tf/envSetting.h"
@@ -30,18 +30,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HGI_ENABLE_VULKAN, 0,
-                      "Enable Vulkan as platform default Hgi backend (WIP)");
+TF_DEFINE_ENV_SETTING(HGI_ENABLE_VULKAN, 0, "Enable Vulkan as platform default Hgi backend (WIP)");
 
 TF_REGISTRY_FUNCTION(TfType)
 {
   TfType::Define<Hgi>();
 }
 
-Hgi::Hgi()
-    : _uniqueIdCounter(1)
-{
-}
+Hgi::Hgi() : _uniqueIdCounter(1) {}
 
 Hgi::~Hgi() = default;
 
@@ -49,15 +45,13 @@ void Hgi::SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
 {
   TRACE_FUNCTION();
 
-  if (cmds && TF_VERIFY(!cmds->IsSubmitted()))
-  {
+  if (cmds && TF_VERIFY(!cmds->IsSubmitted())) {
     _SubmitCmds(cmds, wait);
     cmds->_SetSubmitted();
   }
 }
 
-static Hgi *
-_MakeNewPlatformDefaultHgi()
+static Hgi *_MakeNewPlatformDefaultHgi()
 {
   // We use the plugin system to construct derived Hgi classes to avoid any
   // linker complications.
@@ -73,42 +67,36 @@ _MakeNewPlatformDefaultHgi()
       "HgiGL";
 #else
       "";
-#error Unknown Platform
+#  error Unknown Platform
   return nullptr;
 #endif
 
-  if (TfGetEnvSetting(HGI_ENABLE_VULKAN))
-  {
+  if (TfGetEnvSetting(HGI_ENABLE_VULKAN)) {
 #if defined(PXR_VULKAN_SUPPORT_ENABLED)
     hgiType = "HgiVulkan";
 #else
-    TF_CODING_ERROR(
-        "Build requires PXR_VULKAN_SUPPORT_ENABLED=true to use Vulkan");
+    TF_CODING_ERROR("Build requires PXR_VULKAN_SUPPORT_ENABLED=true to use Vulkan");
 #endif
   }
 
   const TfType plugType = plugReg.FindDerivedTypeByName<Hgi>(hgiType);
 
   PlugPluginPtr plugin = plugReg.GetPluginForType(plugType);
-  if (!plugin || !plugin->Load())
-  {
-    TF_CODING_ERROR(
-        "[PluginLoad] PlugPlugin could not be loaded for TfType '%s'\n",
-        plugType.GetTypeName().c_str());
+  if (!plugin || !plugin->Load()) {
+    TF_CODING_ERROR("[PluginLoad] PlugPlugin could not be loaded for TfType '%s'\n",
+                    plugType.GetTypeName().c_str());
     return nullptr;
   }
 
   HgiFactoryBase *factory = plugType.GetFactory<HgiFactoryBase>();
-  if (!factory)
-  {
+  if (!factory) {
     TF_CODING_ERROR("[PluginLoad] Cannot manufacture type '%s' \n",
                     plugType.GetTypeName().c_str());
     return nullptr;
   }
 
   Hgi *instance = factory->New();
-  if (!instance)
-  {
+  if (!instance) {
     TF_CODING_ERROR("[PluginLoad] Cannot construct instance of type '%s'\n",
                     plugType.GetTypeName().c_str());
     return nullptr;
@@ -120,31 +108,29 @@ _MakeNewPlatformDefaultHgi()
 Hgi *Hgi::GetPlatformDefaultHgi()
 {
 #if SWIFT_HAS_UNIQUE_PTR
-  TF_WARN("GetPlatformDefaultHgi is deprecated. "
-          "Please use CreatePlatformDefaultHgi");
+  TF_WARN(
+      "GetPlatformDefaultHgi is deprecated. "
+      "Please use CreatePlatformDefaultHgi");
 #endif /* SWIFT_HAS_UNIQUE_PTR */
-  
+
   return _MakeNewPlatformDefaultHgi();
 }
 
-HgiUniquePtr
-Hgi::CreatePlatformDefaultHgi()
+HgiUniquePtr Hgi::CreatePlatformDefaultHgi()
 {
   return HgiUniquePtr(_MakeNewPlatformDefaultHgi());
 }
 
 bool Hgi::IsSupported()
 {
-  if (HgiUniquePtr const instance = CreatePlatformDefaultHgi())
-  {
+  if (HgiUniquePtr const instance = CreatePlatformDefaultHgi()) {
     return instance->IsBackendSupported();
   }
 
   return false;
 }
 
-uint64_t
-Hgi::GetUniqueId()
+uint64_t Hgi::GetUniqueId()
 {
   return _uniqueIdCounter.fetch_add(1);
 }

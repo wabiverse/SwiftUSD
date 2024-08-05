@@ -31,21 +31,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLShaderFunction::HgiGLShaderFunction(
-    Hgi const *hgi,
-    HgiShaderFunctionDesc const &desc)
+HgiGLShaderFunction::HgiGLShaderFunction(Hgi const *hgi, HgiShaderFunctionDesc const &desc)
     : HgiShaderFunction(desc), _shaderId(0)
 {
-  std::vector<GLenum> stages =
-      HgiGLConversions::GetShaderStages(desc.shaderStage);
+  std::vector<GLenum> stages = HgiGLConversions::GetShaderStages(desc.shaderStage);
 
   if (!TF_VERIFY(stages.size() == 1))
     return;
 
   _shaderId = glCreateShader(stages[0]);
 
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     glObjectLabel(GL_SHADER, _shaderId, -1, _descriptor.debugName.c_str());
   }
 
@@ -59,8 +55,7 @@ HgiGLShaderFunction::HgiGLShaderFunction(
   // Grab compile errors
   GLint status;
   glGetShaderiv(_shaderId, GL_COMPILE_STATUS, &status);
-  if (status != GL_TRUE)
-  {
+  if (status != GL_TRUE) {
     int logSize = 0;
     glGetShaderiv(_shaderId, GL_INFO_LOG_LENGTH, &logSize);
     _errors.resize(logSize + 1);
@@ -91,26 +86,22 @@ bool HgiGLShaderFunction::IsValid() const
   return _shaderId > 0 && _errors.empty();
 }
 
-std::string const &
-HgiGLShaderFunction::GetCompileErrors()
+std::string const &HgiGLShaderFunction::GetCompileErrors()
 {
   return _errors;
 }
 
-size_t
-HgiGLShaderFunction::GetByteSizeOfResource() const
+size_t HgiGLShaderFunction::GetByteSizeOfResource() const
 {
-  return 0; // Can only query program binary size, not individual shaders.
+  return 0;  // Can only query program binary size, not individual shaders.
 }
 
-uint64_t
-HgiGLShaderFunction::GetRawResource() const
+uint64_t HgiGLShaderFunction::GetRawResource() const
 {
   return (uint64_t)_shaderId;
 }
 
-uint32_t
-HgiGLShaderFunction::GetShaderId() const
+uint32_t HgiGLShaderFunction::GetShaderId() const
 {
   return _shaderId;
 }

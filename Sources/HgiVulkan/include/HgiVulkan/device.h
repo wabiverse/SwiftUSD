@@ -42,9 +42,8 @@ class HgiVulkanPipelineCache;
 ///
 /// Vulkan implementation of GPU device.
 ///
-class HgiVulkanDevice final
-{
-public:
+class HgiVulkanDevice final {
+ public:
   HGIVULKAN_API
   HgiVulkanDevice(HgiVulkanInstance *instance);
 
@@ -97,7 +96,7 @@ public:
   PFN_vkQueueBeginDebugUtilsLabelEXT vkQueueBeginDebugUtilsLabelEXT = 0;
   PFN_vkQueueEndDebugUtilsLabelEXT vkQueueEndDebugUtilsLabelEXT = 0;
 
-private:
+ private:
   HgiVulkanDevice() = delete;
   HgiVulkanDevice &operator=(const HgiVulkanDevice &) = delete;
   HgiVulkanDevice(const HgiVulkanDevice &) = delete;

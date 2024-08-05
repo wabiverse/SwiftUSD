@@ -30,16 +30,18 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Vt_WrapArray {
-template <> std::string GetVtArrayName<VtArray<SdfTimeCode>>() {
+template<> std::string GetVtArrayName<VtArray<SdfTimeCode>>()
+{
   return "TimeCodeArray";
 }
-} // namespace Vt_WrapArray
+}  // namespace Vt_WrapArray
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayTimeCode() {
+void wrapArrayTimeCode()
+{
   VtWrapArray<VtArray<SdfTimeCode>>();
   VtValueFromPythonLValue<VtArray<SdfTimeCode>>();
 }

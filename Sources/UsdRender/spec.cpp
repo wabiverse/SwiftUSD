@@ -22,64 +22,51 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "UsdRender/spec.h"
-#include "UsdRender/settings.h"
-#include "UsdRender/product.h"
-#include "UsdRender/var.h"
 #include "UsdGeom/camera.h"
+#include "UsdRender/product.h"
+#include "UsdRender/settings.h"
+#include "UsdRender/var.h"
 #include "UsdShade/output.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static void
-_ReadNamespacedSettings(
-    UsdPrim const &prim,
-    TfTokenVector const &namespaces,
-    VtDictionary *namespacedSettings)
+static void _ReadNamespacedSettings(UsdPrim const &prim,
+                                    TfTokenVector const &namespaces,
+                                    VtDictionary *namespacedSettings)
 {
   const std::vector<UsdAttribute> attrs = prim.GetAuthoredAttributes();
-  const TfTokenVector &schemaProps =
-      prim.GetPrimDefinition().GetPropertyNames();
+  const TfTokenVector &schemaProps = prim.GetPrimDefinition().GetPropertyNames();
 
-  for (UsdAttribute attr : attrs)
-  {
-    if (namespaces.empty())
-    {
+  for (UsdAttribute attr : attrs) {
+    if (namespaces.empty()) {
       // Skip schema attributes from being aggregated.
-      if (std::find(schemaProps.begin(), schemaProps.end(),
-                    attr.GetBaseName()) != schemaProps.end())
+      if (std::find(schemaProps.begin(), schemaProps.end(), attr.GetBaseName()) !=
+          schemaProps.end())
       {
         continue;
       }
     }
-    else
-    {
+    else {
       bool attrIsInRequestedNS = false;
-      for (std::string const &ns : namespaces)
-      {
-        if (TfStringStartsWith(attr.GetName(), ns))
-        {
+      for (std::string const &ns : namespaces) {
+        if (TfStringStartsWith(attr.GetName(), ns)) {
           attrIsInRequestedNS = true;
           break;
         }
       }
-      if (!attrIsInRequestedNS)
-      {
+      if (!attrIsInRequestedNS) {
         continue;
       }
     }
     VtValue val;
-    if (attr.Get(&val))
-    {
+    if (attr.Get(&val)) {
       (*namespacedSettings)[attr.GetName()] = val;
     }
-    else if (UsdShadeOutput::IsOutput(attr))
-    {
-      UsdShadeAttributeVector targets =
-          UsdShadeUtils::GetValueProducingAttributes(
-              UsdShadeOutput(attr));
+    else if (UsdShadeOutput::IsOutput(attr)) {
+      UsdShadeAttributeVector targets = UsdShadeUtils::GetValueProducingAttributes(
+          UsdShadeOutput(attr));
       SdfPathVector outputs;
-      for (auto const &output : targets)
-      {
+      for (auto const &output : targets) {
         outputs.push_back(output.GetPrimPath());
       }
       (*namespacedSettings)[attr.GetName()] = VtValue(outputs);
@@ -87,41 +74,33 @@ _ReadNamespacedSettings(
   }
 }
 
-template <typename T>
-inline bool
-_Get(UsdAttribute const &attr, T *val, bool getDefaultValue)
+template<typename T> inline bool _Get(UsdAttribute const &attr, T *val, bool getDefaultValue)
 {
-  if (getDefaultValue || attr.HasAuthoredValue())
-  {
+  if (getDefaultValue || attr.HasAuthoredValue()) {
     return attr.Get(val);
   }
   return false;
 }
 
-static void
-_ReadSettingsBase(UsdRenderSettingsBase const &rsBase,
-                  UsdRenderSpec::Product *pd,
-                  bool getDefault = true)
+static void _ReadSettingsBase(UsdRenderSettingsBase const &rsBase,
+                              UsdRenderSpec::Product *pd,
+                              bool getDefault = true)
 {
   SdfPathVector targets;
   rsBase.GetCameraRel().GetForwardedTargets(&targets);
-  if (!targets.empty())
-  {
+  if (!targets.empty()) {
     pd->cameraPath = targets[0];
   }
   _Get(rsBase.GetResolutionAttr(), &pd->resolution, getDefault);
   _Get(rsBase.GetPixelAspectRatioAttr(), &pd->pixelAspectRatio, getDefault);
-  _Get(rsBase.GetAspectRatioConformPolicyAttr(),
-       &pd->aspectRatioConformPolicy, getDefault);
+  _Get(rsBase.GetAspectRatioConformPolicyAttr(), &pd->aspectRatioConformPolicy, getDefault);
 
   {
     // Convert dataWindowNDC from vec4 to range2.
     GfVec4f dataWindowNDCVec;
-    if (_Get(rsBase.GetDataWindowNDCAttr(), &dataWindowNDCVec, getDefault))
-    {
-      pd->dataWindowNDC = GfRange2f(
-          GfVec2f(dataWindowNDCVec[0], dataWindowNDCVec[1]),
-          GfVec2f(dataWindowNDCVec[2], dataWindowNDCVec[3]));
+    if (_Get(rsBase.GetDataWindowNDCAttr(), &dataWindowNDCVec, getDefault)) {
+      pd->dataWindowNDC = GfRange2f(GfVec2f(dataWindowNDCVec[0], dataWindowNDCVec[1]),
+                                    GfVec2f(dataWindowNDCVec[2], dataWindowNDCVec[3]));
     }
   }
 
@@ -131,10 +110,8 @@ _ReadSettingsBase(UsdRenderSettingsBase const &rsBase,
     // For backwards-compatibility:
     // instantaneousShutter disables motion blur
     bool instantaneousShutter = false;
-    _Get(rsBase.GetDisableMotionBlurAttr(),
-         &instantaneousShutter, getDefault);
-    if (instantaneousShutter)
-    {
+    _Get(rsBase.GetDisableMotionBlurAttr(), &instantaneousShutter, getDefault);
+    if (instantaneousShutter) {
       pd->disableMotionBlur = true;
     }
   }
@@ -148,69 +125,52 @@ static void _ApplyAspectRatioPolicy(UsdRenderSpec::Product *product)
   GfVec2i res = product->resolution;
   GfVec2f size = product->apertureSize;
   // Validate dimensions
-  if (res[0] <= 0.0 || res[1] <= 0.0 || size[0] <= 0.0 || size[1] <= 0.0)
-  {
+  if (res[0] <= 0.0 || res[1] <= 0.0 || size[0] <= 0.0 || size[1] <= 0.0) {
     return;
   }
   // Compute aspect ratios
   float resAspectRatio = float(res[0]) / float(res[1]);
   float imageAspectRatio = product->pixelAspectRatio * resAspectRatio;
-  if (imageAspectRatio <= 0.0)
-  {
+  if (imageAspectRatio <= 0.0) {
     return;
   }
   float apertureAspectRatio = size[0] / size[1];
   // Apply policy
   TfToken const &policy = product->aspectRatioConformPolicy;
-  enum
-  {
-    Width,
-    Height,
-    None
-  } adjust = None;
-  if (policy == UsdRenderTokens->adjustPixelAspectRatio)
-  {
+  enum { Width, Height, None } adjust = None;
+  if (policy == UsdRenderTokens->adjustPixelAspectRatio) {
     product->pixelAspectRatio = apertureAspectRatio / resAspectRatio;
   }
-  else if (policy == UsdRenderTokens->adjustApertureHeight)
-  {
+  else if (policy == UsdRenderTokens->adjustApertureHeight) {
     adjust = Height;
   }
-  else if (policy == UsdRenderTokens->adjustApertureWidth)
-  {
+  else if (policy == UsdRenderTokens->adjustApertureWidth) {
     adjust = Width;
   }
-  else if (policy == UsdRenderTokens->expandAperture)
-  {
+  else if (policy == UsdRenderTokens->expandAperture) {
     adjust = (apertureAspectRatio > imageAspectRatio) ? Height : Width;
   }
-  else if (policy == UsdRenderTokens->cropAperture)
-  {
+  else if (policy == UsdRenderTokens->cropAperture) {
     adjust = (apertureAspectRatio > imageAspectRatio) ? Width : Height;
   }
   // Adjust aperture so that size[0] / size[1] == imageAspectRatio.
-  if (adjust == Width)
-  {
+  if (adjust == Width) {
     product->apertureSize[0] = size[1] * imageAspectRatio;
   }
-  else if (adjust == Height)
-  {
+  else if (adjust == Height) {
     product->apertureSize[1] = size[0] / imageAspectRatio;
   }
 }
 
 // -------------------------------------------------------------------------- //
 
-UsdRenderSpec
-UsdRenderComputeSpec(
-    UsdRenderSettings const &settings,
-    TfTokenVector const &namespaces)
+UsdRenderSpec UsdRenderComputeSpec(UsdRenderSettings const &settings,
+                                   TfTokenVector const &namespaces)
 {
   UsdRenderSpec renderSpec;
   UsdPrim prim = settings.GetPrim();
   UsdStageWeakPtr stage = prim.GetStage();
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage\n");
     return renderSpec;
   }
@@ -223,33 +183,28 @@ UsdRenderComputeSpec(
   // Products
   SdfPathVector targets;
   settings.GetProductsRel().GetForwardedTargets(&targets);
-  for (SdfPath const &target : targets)
-  {
-    if (UsdRenderProduct rpPrim =
-            UsdRenderProduct(stage->GetPrimAtPath(target)))
-    {
+  for (SdfPath const &target : targets) {
+    if (UsdRenderProduct rpPrim = UsdRenderProduct(stage->GetPrimAtPath(target))) {
       // Initialize the render spec product with the base render product
       UsdRenderSpec::Product rpSpec = baseProduct;
       rpSpec.renderProductPath = target;
 
       // Read product-specific overrides to base render settings.
-      _ReadSettingsBase(UsdRenderSettingsBase(rpPrim), &rpSpec,
-                        false /* only get Authored values*/);
+      _ReadSettingsBase(
+          UsdRenderSettingsBase(rpPrim), &rpSpec, false /* only get Authored values*/);
 
       // Read camera aperture and apply aspectRatioConformPolicy.
-      if (UsdGeomCamera cam =
-              UsdGeomCamera(stage->GetPrimAtPath(baseProduct.cameraPath)))
-      {
+      if (UsdGeomCamera cam = UsdGeomCamera(stage->GetPrimAtPath(baseProduct.cameraPath))) {
         cam.GetHorizontalApertureAttr().Get(&baseProduct.apertureSize[0]);
         cam.GetVerticalApertureAttr().Get(&baseProduct.apertureSize[1]);
         _ApplyAspectRatioPolicy(&baseProduct);
       }
-      else
-      {
-        TF_RUNTIME_ERROR("UsdRenderSettings: Could not find camera "
-                         "<%s> for product <%s>\n",
-                         baseProduct.cameraPath.GetText(),
-                         target.GetText());
+      else {
+        TF_RUNTIME_ERROR(
+            "UsdRenderSettings: Could not find camera "
+            "<%s> for product <%s>\n",
+            baseProduct.cameraPath.GetText(),
+            target.GetText());
         continue;
       }
 
@@ -260,23 +215,18 @@ UsdRenderComputeSpec(
       // Read render vars.
       SdfPathVector renderVarPaths;
       rpPrim.GetOrderedVarsRel().GetForwardedTargets(&renderVarPaths);
-      for (SdfPath const &renderVarPath : renderVarPaths)
-      {
+      for (SdfPath const &renderVarPath : renderVarPaths) {
         bool foundExisting = false;
-        for (size_t i = 0; i < renderSpec.renderVars.size(); ++i)
-        {
-          if (renderSpec.renderVars[i].renderVarPath == renderVarPath)
-          {
+        for (size_t i = 0; i < renderSpec.renderVars.size(); ++i) {
+          if (renderSpec.renderVars[i].renderVarPath == renderVarPath) {
             rpSpec.renderVarIndices.push_back(i);
             foundExisting = true;
             break;
           }
         }
-        if (!foundExisting)
-        {
+        if (!foundExisting) {
           UsdPrim prim = stage->GetPrimAtPath(renderVarPath);
-          if (prim.IsA<UsdRenderVar>())
-          {
+          if (prim.IsA<UsdRenderVar>()) {
             UsdRenderVar rvPrim(prim);
             UsdRenderSpec::RenderVar rvSpec;
 
@@ -287,37 +237,33 @@ UsdRenderComputeSpec(
             rvPrim.GetSourceTypeAttr().Get(&rvSpec.sourceType);
             // Store any other custom render var attributes in
             // namespacedSettings.
-            _ReadNamespacedSettings(
-                prim, namespaces, &rvSpec.namespacedSettings);
+            _ReadNamespacedSettings(prim, namespaces, &rvSpec.namespacedSettings);
 
             // Record new render var.
-            rpSpec.renderVarIndices.push_back(
-                renderSpec.renderVars.size());
+            rpSpec.renderVarIndices.push_back(renderSpec.renderVars.size());
             renderSpec.renderVars.emplace_back(rvSpec);
           }
-          else
-          {
-            TF_RUNTIME_ERROR("Render product <%s> includes "
-                             "render var at path <%s>, but "
-                             "no suitable UsdRenderVar prim "
-                             "was found.  Skipping.",
-                             target.GetText(),
-                             renderVarPath.GetText());
+          else {
+            TF_RUNTIME_ERROR(
+                "Render product <%s> includes "
+                "render var at path <%s>, but "
+                "no suitable UsdRenderVar prim "
+                "was found.  Skipping.",
+                target.GetText(),
+                renderVarPath.GetText());
           }
         }
       }
       // Store any other custom render product attributes in
       // namespacedSettings.
-      _ReadNamespacedSettings(
-          rpPrim.GetPrim(), namespaces, &rpSpec.namespacedSettings);
+      _ReadNamespacedSettings(rpPrim.GetPrim(), namespaces, &rpSpec.namespacedSettings);
 
       renderSpec.products.emplace_back(rpSpec);
     }
   }
 
   // Scene configuration
-  settings.GetMaterialBindingPurposesAttr().Get(
-      &renderSpec.materialBindingPurposes);
+  settings.GetMaterialBindingPurposesAttr().Get(&renderSpec.materialBindingPurposes);
   settings.GetIncludedPurposesAttr().Get(&renderSpec.includedPurposes);
 
   // Store any other custom render settings attributes in namespacedSettings.
@@ -326,10 +272,8 @@ UsdRenderComputeSpec(
   return renderSpec;
 }
 
-VtDictionary
-UsdRenderComputeNamespacedSettings(
-    UsdPrim const &prim,
-    TfTokenVector const &namespaces)
+VtDictionary UsdRenderComputeNamespacedSettings(UsdPrim const &prim,
+                                                TfTokenVector const &namespaces)
 {
   VtDictionary dict;
   _ReadNamespacedSettings(prim, namespaces, &dict);

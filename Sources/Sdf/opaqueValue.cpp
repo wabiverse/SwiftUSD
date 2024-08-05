@@ -31,7 +31,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<SdfOpaqueValue>();
   // Even though we don't support an opaque[] type in scene description, there
   // is still code that assumes that any scene-description value type has a
@@ -39,7 +40,8 @@ TF_REGISTRY_FUNCTION(TfType) {
   TfType::Define<VtArray<SdfOpaqueValue>>();
 }
 
-std::ostream &operator<<(std::ostream &s, SdfOpaqueValue const &) {
+std::ostream &operator<<(std::ostream &s, SdfOpaqueValue const &)
+{
   return s << "OpaqueValue";
 }
 

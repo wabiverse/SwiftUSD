@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "HgiVulkan/diagnostic.h"
 #include "HgiVulkan/commandBuffer.h"
 #include "HgiVulkan/commandQueue.h"
 #include "HgiVulkan/device.h"
-#include "HgiVulkan/diagnostic.h"
 #include "HgiVulkan/instance.h"
 #include "HgiVulkan/vulkan.h"
 
@@ -36,8 +36,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_ENV_SETTING(HGIVULKAN_DEBUG, 0, "Enable debugging for HgiVulkan");
-TF_DEFINE_ENV_SETTING(HGIVULKAN_DEBUG_VERBOSE, 0,
-                      "Enable verbose debugging for HgiVulkan");
+TF_DEFINE_ENV_SETTING(HGIVULKAN_DEBUG_VERBOSE, 0, "Enable verbose debugging for HgiVulkan");
 
 bool HgiVulkanIsDebugEnabled()
 {
@@ -52,21 +51,18 @@ bool HgiVulkanIsVerboseDebugEnabled()
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL
-_VulkanDebugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT msgType,
-    const VkDebugUtilsMessengerCallbackDataEXT *callbackData,
-    void *userData)
+_VulkanDebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                     VkDebugUtilsMessageTypeFlagsEXT msgType,
+                     const VkDebugUtilsMessengerCallbackDataEXT *callbackData,
+                     void *userData)
 {
-  const char *type =
-      (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) ? "VULKAN_ERROR" : "VULKAN_MESSAGE";
+  const char *type = (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) ? "VULKAN_ERROR" :
+                                                                                  "VULKAN_MESSAGE";
 
-  if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
-  {
+  if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
     TF_CODING_ERROR("%s: %s\n", type, callbackData->pMessage);
   }
-  else
-  {
+  else {
     TF_WARN("%s: %s\n", type, callbackData->pMessage);
   }
 
@@ -75,76 +71,61 @@ _VulkanDebugCallback(
 
 void HgiVulkanCreateDebug(HgiVulkanInstance *instance)
 {
-  if (!HgiVulkanIsDebugEnabled())
-  {
+  if (!HgiVulkanIsDebugEnabled()) {
     return;
   }
 
   VkInstance vkInstance = instance->GetVulkanInstance();
 
-  instance->vkCreateDebugUtilsMessengerEXT =
-      (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkCreateDebugUtilsMessengerEXT");
+  instance->vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)
+      vkGetInstanceProcAddr(vkInstance, "vkCreateDebugUtilsMessengerEXT");
 
-  instance->vkDestroyDebugUtilsMessengerEXT =
-      (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkDestroyDebugUtilsMessengerEXT");
+  instance->vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT)
+      vkGetInstanceProcAddr(vkInstance, "vkDestroyDebugUtilsMessengerEXT");
 
-  if (!TF_VERIFY(instance->vkCreateDebugUtilsMessengerEXT))
-  {
+  if (!TF_VERIFY(instance->vkCreateDebugUtilsMessengerEXT)) {
     return;
   }
-  if (!TF_VERIFY(instance->vkDestroyDebugUtilsMessengerEXT))
-  {
+  if (!TF_VERIFY(instance->vkDestroyDebugUtilsMessengerEXT)) {
     return;
   }
 
-  VkDebugUtilsMessengerCreateInfoEXT dbgMsgCreateInfo =
-      {VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+  VkDebugUtilsMessengerCreateInfoEXT dbgMsgCreateInfo = {
+      VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
   dbgMsgCreateInfo.pNext = nullptr;
   dbgMsgCreateInfo.flags = 0;
-  dbgMsgCreateInfo.messageSeverity =
-      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+  dbgMsgCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                     VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 
   // Verbose debugging will cause many bits of information to be printed by
   // the vulkan validation layers. It is only useful for debugging.
-  if (HgiVulkanIsVerboseDebugEnabled())
-  {
-    dbgMsgCreateInfo.messageSeverity |=
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
+  if (HgiVulkanIsVerboseDebugEnabled()) {
+    dbgMsgCreateInfo.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
   }
 
-  dbgMsgCreateInfo.messageType =
-      VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  dbgMsgCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 
   dbgMsgCreateInfo.pfnUserCallback = _VulkanDebugCallback;
   dbgMsgCreateInfo.pUserData = nullptr;
 
-  TF_VERIFY(
-      instance->vkCreateDebugUtilsMessengerEXT(
-          vkInstance,
-          &dbgMsgCreateInfo,
-          HgiVulkanAllocator(),
-          &instance->vkDebugMessenger) == VK_SUCCESS);
+  TF_VERIFY(instance->vkCreateDebugUtilsMessengerEXT(vkInstance,
+                                                     &dbgMsgCreateInfo,
+                                                     HgiVulkanAllocator(),
+                                                     &instance->vkDebugMessenger) == VK_SUCCESS);
 }
 
 void HgiVulkanDestroyDebug(HgiVulkanInstance *instance)
 {
-  if (!HgiVulkanIsDebugEnabled())
-  {
+  if (!HgiVulkanIsDebugEnabled()) {
     return;
   }
 
   VkInstance vkInstance = instance->GetVulkanInstance();
 
-  if (!TF_VERIFY(instance->vkDestroyDebugUtilsMessengerEXT))
-  {
+  if (!TF_VERIFY(instance->vkDestroyDebugUtilsMessengerEXT)) {
     return;
   }
 
@@ -152,73 +133,51 @@ void HgiVulkanDestroyDebug(HgiVulkanInstance *instance)
       vkInstance, instance->vkDebugMessenger, HgiVulkanAllocator());
 }
 
-void HgiVulkanSetupDeviceDebug(
-    HgiVulkanInstance *instance,
-    HgiVulkanDevice *device)
+void HgiVulkanSetupDeviceDebug(HgiVulkanInstance *instance, HgiVulkanDevice *device)
 {
   VkInstance vkInstance = instance->GetVulkanInstance();
-  device->vkCmdBeginDebugUtilsLabelEXT =
-      (PFN_vkCmdBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkCmdBeginDebugUtilsLabelEXT");
+  device->vkCmdBeginDebugUtilsLabelEXT = (PFN_vkCmdBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(
+      vkInstance, "vkCmdBeginDebugUtilsLabelEXT");
 
-  device->vkCmdEndDebugUtilsLabelEXT =
-      (PFN_vkCmdEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkCmdEndDebugUtilsLabelEXT");
+  device->vkCmdEndDebugUtilsLabelEXT = (PFN_vkCmdEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(
+      vkInstance, "vkCmdEndDebugUtilsLabelEXT");
 
-  device->vkCmdInsertDebugUtilsLabelEXT =
-      (PFN_vkCmdInsertDebugUtilsLabelEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkCmdInsertDebugUtilsLabelEXT");
+  device->vkCmdInsertDebugUtilsLabelEXT = (PFN_vkCmdInsertDebugUtilsLabelEXT)vkGetInstanceProcAddr(
+      vkInstance, "vkCmdInsertDebugUtilsLabelEXT");
 
-  device->vkSetDebugUtilsObjectNameEXT =
-      (PFN_vkSetDebugUtilsObjectNameEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkSetDebugUtilsObjectNameEXT");
+  device->vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetInstanceProcAddr(
+      vkInstance, "vkSetDebugUtilsObjectNameEXT");
 
-  device->vkQueueBeginDebugUtilsLabelEXT =
-      (PFN_vkQueueBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkQueueBeginDebugUtilsLabelEXT");
+  device->vkQueueBeginDebugUtilsLabelEXT = (PFN_vkQueueBeginDebugUtilsLabelEXT)
+      vkGetInstanceProcAddr(vkInstance, "vkQueueBeginDebugUtilsLabelEXT");
 
-  device->vkQueueEndDebugUtilsLabelEXT =
-      (PFN_vkQueueEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(
-          vkInstance,
-          "vkQueueEndDebugUtilsLabelEXT");
+  device->vkQueueEndDebugUtilsLabelEXT = (PFN_vkQueueEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(
+      vkInstance, "vkQueueEndDebugUtilsLabelEXT");
 }
 
-void HgiVulkanSetDebugName(
-    HgiVulkanDevice *device,
-    uint64_t vulkanObject,
-    VkObjectType objectType,
-    const char *name)
+void HgiVulkanSetDebugName(HgiVulkanDevice *device,
+                           uint64_t vulkanObject,
+                           VkObjectType objectType,
+                           const char *name)
 {
-  if (!HgiVulkanIsDebugEnabled() || !name)
-  {
+  if (!HgiVulkanIsDebugEnabled() || !name) {
     return;
   }
 
-  if (!TF_VERIFY(device && device->vkSetDebugUtilsObjectNameEXT))
-  {
+  if (!TF_VERIFY(device && device->vkSetDebugUtilsObjectNameEXT)) {
     return;
   }
 
-  VkDebugUtilsObjectNameInfoEXT debugInfo =
-      {VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT};
+  VkDebugUtilsObjectNameInfoEXT debugInfo = {VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT};
   debugInfo.objectHandle = vulkanObject;
   debugInfo.objectType = objectType;
   debugInfo.pObjectName = name;
   device->vkSetDebugUtilsObjectNameEXT(device->GetVulkanDevice(), &debugInfo);
 }
 
-void HgiVulkanBeginLabel(
-    HgiVulkanDevice *device,
-    HgiVulkanCommandBuffer *cb,
-    const char *label)
+void HgiVulkanBeginLabel(HgiVulkanDevice *device, HgiVulkanCommandBuffer *cb, const char *label)
 {
-  if (!HgiVulkanIsDebugEnabled() || !label)
-  {
+  if (!HgiVulkanIsDebugEnabled() || !label) {
     return;
   }
 
@@ -228,12 +187,9 @@ void HgiVulkanBeginLabel(
   device->vkCmdBeginDebugUtilsLabelEXT(vkCmbuf, &labelInfo);
 }
 
-void HgiVulkanEndLabel(
-    HgiVulkanDevice *device,
-    HgiVulkanCommandBuffer *cb)
+void HgiVulkanEndLabel(HgiVulkanDevice *device, HgiVulkanCommandBuffer *cb)
 {
-  if (!HgiVulkanIsDebugEnabled())
-  {
+  if (!HgiVulkanIsDebugEnabled()) {
     return;
   }
 
@@ -241,12 +197,9 @@ void HgiVulkanEndLabel(
   device->vkCmdEndDebugUtilsLabelEXT(vkCmbuf);
 }
 
-void HgiVulkanBeginQueueLabel(
-    HgiVulkanDevice *device,
-    const char *label)
+void HgiVulkanBeginQueueLabel(HgiVulkanDevice *device, const char *label)
 {
-  if (!HgiVulkanIsDebugEnabled() || !label)
-  {
+  if (!HgiVulkanIsDebugEnabled() || !label) {
     return;
   }
 
@@ -258,8 +211,7 @@ void HgiVulkanBeginQueueLabel(
 
 void HgiVulkanEndQueueLabel(HgiVulkanDevice *device)
 {
-  if (!HgiVulkanIsDebugEnabled())
-  {
+  if (!HgiVulkanIsDebugEnabled()) {
     return;
   }
 

@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdHydra/generativeProceduralAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdHydra/generativeProceduralAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,68 +41,62 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateProceduralTypeAttr(UsdHydraGenerativeProceduralAPI &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
 {
+  return self.CreateProceduralTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                       writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateProceduralSystemAttr(UsdHydraGenerativeProceduralAPI &self,
+                                                object defaultVal,
+                                                bool writeSparsely)
+{
+  return self.CreateProceduralSystemAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                         writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static std::string _Repr(const UsdHydraGenerativeProceduralAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdHydra.GenerativeProceduralAPI(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateProceduralTypeAttr(UsdHydraGenerativeProceduralAPI &self,
-                            object defaultVal, bool writeSparsely)
+struct UsdHydraGenerativeProceduralAPI_CanApplyResult
+    : public TfPyAnnotatedBoolResult<std::string> {
+  UsdHydraGenerativeProceduralAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    return self.CreateProceduralTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
   }
+};
 
-  static UsdAttribute
-  _CreateProceduralSystemAttr(UsdHydraGenerativeProceduralAPI &self,
-                              object defaultVal, bool writeSparsely)
-  {
-    return self.CreateProceduralSystemAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static UsdHydraGenerativeProceduralAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdHydraGenerativeProceduralAPI::CanApply(prim, &whyNot);
+  return UsdHydraGenerativeProceduralAPI_CanApplyResult(result, whyNot);
+}
 
-  static std::string
-  _Repr(const UsdHydraGenerativeProceduralAPI &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdHydra.GenerativeProceduralAPI(%s)",
-        primRepr.c_str());
-  }
-
-  struct UsdHydraGenerativeProceduralAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdHydraGenerativeProceduralAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
-
-  static UsdHydraGenerativeProceduralAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdHydraGenerativeProceduralAPI::CanApply(prim, &whyNot);
-    return UsdHydraGenerativeProceduralAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdHydraGenerativeProceduralAPI()
 {
   typedef UsdHydraGenerativeProceduralAPI This;
 
-  UsdHydraGenerativeProceduralAPI_CanApplyResult::Wrap<UsdHydraGenerativeProceduralAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+  UsdHydraGenerativeProceduralAPI_CanApplyResult::Wrap<
+      UsdHydraGenerativeProceduralAPI_CanApplyResult>("_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("GenerativeProceduralAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("GenerativeProceduralAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -121,25 +115,22 @@ void wrapUsdHydraGenerativeProceduralAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetProceduralTypeAttr",
-           &This::GetProceduralTypeAttr)
+      .def("GetProceduralTypeAttr", &This::GetProceduralTypeAttr)
       .def("CreateProceduralTypeAttr",
            &_CreateProceduralTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetProceduralSystemAttr",
-           &This::GetProceduralSystemAttr)
+      .def("GetProceduralSystemAttr", &This::GetProceduralSystemAttr)
       .def("CreateProceduralSystemAttr",
            &_CreateProceduralSystemAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -165,11 +156,8 @@ void wrapUsdHydraGenerativeProceduralAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

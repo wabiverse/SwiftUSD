@@ -40,14 +40,11 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
 
   MTL::PixelFormat mtlFormat = HgiMetalConversions::GetPixelFormat(desc.format, desc.usage);
 
-  if (desc.usage &
-      (HgiTextureUsageBitsColorTarget | HgiTextureUsageBitsDepthTarget))
-  {
+  if (desc.usage & (HgiTextureUsageBitsColorTarget | HgiTextureUsageBitsDepthTarget)) {
     usage |= MTL::TextureUsageRenderTarget;
   }
 
-  if (desc.usage & HgiTextureUsageBitsShaderWrite)
-  {
+  if (desc.usage & HgiTextureUsageBitsShaderWrite) {
     usage |= MTL::TextureUsageShaderWrite;
   }
 
@@ -64,16 +61,15 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
   texDesc->setResourceOptions(resourceOptions);
   texDesc->setUsage(usage);
 
-#if (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+#if (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
   size_t numChannels = HgiGetComponentCount(desc.format);
 
-  if (usage == MTL::TextureUsageShaderRead && numChannels == 1)
-  {
+  if (usage == MTL::TextureUsageShaderRead && numChannels == 1) {
     MTL::TextureSwizzle s = HgiMetalConversions::GetComponentSwizzle(desc.componentMapping.r);
     texDesc->setSwizzle(MTL::TextureSwizzleChannels{s, s, s, s});
   }
-  else
-  {
+  else {
     texDesc->setSwizzle(MTL::TextureSwizzleChannels{
         HgiMetalConversions::GetComponentSwizzle(desc.componentMapping.r),
         HgiMetalConversions::GetComponentSwizzle(desc.componentMapping.g),
@@ -82,34 +78,28 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
   }
 #endif
 
-  if (desc.type == HgiTextureType3D)
-  {
+  if (desc.type == HgiTextureType3D) {
     texDesc->setDepth(depth);
     texDesc->setTextureType(MTL::TextureType::TextureType3D);
   }
-  else if (desc.type == HgiTextureType2DArray)
-  {
+  else if (desc.type == HgiTextureType2DArray) {
     texDesc->setTextureType(MTL::TextureType::TextureType2DArray);
   }
-  else if (desc.type == HgiTextureType1D)
-  {
+  else if (desc.type == HgiTextureType1D) {
     texDesc->setTextureType(MTL::TextureType::TextureType1D);
   }
-  else if (desc.type == HgiTextureType1DArray)
-  {
+  else if (desc.type == HgiTextureType1DArray) {
     texDesc->setTextureType(MTL::TextureType::TextureType1DArray);
   }
 
-  if (desc.sampleCount > 1)
-  {
+  if (desc.sampleCount > 1) {
     texDesc->setSampleCount(desc.sampleCount);
     texDesc->setTextureType(MTL::TextureType::TextureType2DMultisampleArray);
   }
 
   _textureId = hgi->GetPrimaryDevice()->newTexture(texDesc);
 
-  if (desc.initialData && desc.pixelsByteSize > 0)
-  {
+  if (desc.initialData && desc.pixelsByteSize > 0) {
     // Depth, stencil, depth-stencil, and multisample textures must be
     // allocated with MTLStorageModePrivate, which should not be used with
     // replaceRegion. We create a temporary, non-private texture to fill
@@ -119,24 +109,21 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
     // Modify texture descriptor to describe the temp texture.
     texDesc->setResourceOptions(MTL::ResourceStorageModeManaged);
     texDesc->setSampleCount(1);
-    if (desc.type == HgiTextureType3D)
-    {
+    if (desc.type == HgiTextureType3D) {
       texDesc->setTextureType(MTL::TextureType::TextureType3D);
     }
-    else if (desc.type == HgiTextureType2DArray)
-    {
+    else if (desc.type == HgiTextureType2DArray) {
       texDesc->setTextureType(MTL::TextureType::TextureType2DArray);
     }
-    else if (desc.type == HgiTextureType1D)
-    {
+    else if (desc.type == HgiTextureType1D) {
       texDesc->setTextureType(MTL::TextureType::TextureType1D);
     }
-    else if (desc.type == HgiTextureType1DArray)
-    {
+    else if (desc.type == HgiTextureType1DArray) {
       texDesc->setTextureType(MTL::TextureType::TextureType1DArray);
     }
     texDesc->setUsage(MTL::TextureUsageShaderRead);
-    texDesc->setPixelFormat(HgiMetalConversions::GetPixelFormat(desc.format, HgiTextureUsageBitsShaderRead));
+    texDesc->setPixelFormat(
+        HgiMetalConversions::GetPixelFormat(desc.format, HgiTextureUsageBitsShaderRead));
 
     // Create temp texture and fill with initial data.
     MTL::Texture *tempTextureId = hgi->GetPrimaryDevice()->newTexture(texDesc);
@@ -144,45 +131,32 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
     size_t perPixelSize = HgiGetDataSizeOfFormat(desc.format);
 
     // Upload each (available) mip
-    const std::vector<HgiMipInfo> mipInfos =
-        HgiGetMipInfos(
-            desc.format,
-            desc.dimensions,
-            desc.layerCount,
-            desc.pixelsByteSize);
-    const size_t mipLevels = std::min(
-        mipInfos.size(), size_t(desc.mipLevels));
-    const char *const initialData = reinterpret_cast<const char *>(
-        desc.initialData);
+    const std::vector<HgiMipInfo> mipInfos = HgiGetMipInfos(
+        desc.format, desc.dimensions, desc.layerCount, desc.pixelsByteSize);
+    const size_t mipLevels = std::min(mipInfos.size(), size_t(desc.mipLevels));
+    const char *const initialData = reinterpret_cast<const char *>(desc.initialData);
 
-    for (size_t mip = 0; mip < mipLevels; mip++)
-    {
+    for (size_t mip = 0; mip < mipLevels; mip++) {
       const HgiMipInfo &mipInfo = mipInfos[mip];
 
       const size_t width = mipInfo.dimensions[0];
       const size_t height = mipInfo.dimensions[1];
       const size_t bytesPerRow = perPixelSize * width;
 
-      if (desc.type == HgiTextureType1D)
-      {
-        tempTextureId->replaceRegion(MTL::Region::Make1D(0, width),
-                                     mip,
-                                     initialData + mipInfo.byteOffset,
-                                     bytesPerRow);
+      if (desc.type == HgiTextureType1D) {
+        tempTextureId->replaceRegion(
+            MTL::Region::Make1D(0, width), mip, initialData + mipInfo.byteOffset, bytesPerRow);
       }
-      else if (desc.type == HgiTextureType2D)
-      {
+      else if (desc.type == HgiTextureType2D) {
         tempTextureId->replaceRegion(MTL::Region::Make2D(0, 0, width, height),
                                      mip,
                                      initialData + mipInfo.byteOffset,
                                      bytesPerRow);
       }
-      else if (desc.type == HgiTextureType3D)
-      {
+      else if (desc.type == HgiTextureType3D) {
         const size_t depth = mipInfo.dimensions[2];
         const size_t imageBytes = bytesPerRow * height;
-        for (size_t d = 0; d < depth; d++)
-        {
+        for (size_t d = 0; d < depth; d++) {
           const size_t offset = d * imageBytes;
           tempTextureId->replaceRegion(MTL::Region::Make3D(0, 0, d, width, height, 1),
                                        mip,
@@ -192,36 +166,25 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
                                        0);
         }
       }
-      else if (desc.type == HgiTextureType2DArray)
-      {
+      else if (desc.type == HgiTextureType2DArray) {
         const size_t imageBytes = bytesPerRow * height;
-        for (int slice = 0; slice < desc.layerCount; slice++)
-        {
-          char const *sliceBase = static_cast<char const *>(initialData) + mipInfo.byteOffset + imageBytes * slice;
-          tempTextureId->replaceRegion(MTL::Region::Make2D(0, 0, width, height),
-                                       mip,
-                                       slice,
-                                       sliceBase,
-                                       bytesPerRow,
-                                       0);
+        for (int slice = 0; slice < desc.layerCount; slice++) {
+          char const *sliceBase = static_cast<char const *>(initialData) + mipInfo.byteOffset +
+                                  imageBytes * slice;
+          tempTextureId->replaceRegion(
+              MTL::Region::Make2D(0, 0, width, height), mip, slice, sliceBase, bytesPerRow, 0);
         }
       }
-      else if (desc.type == HgiTextureType1DArray)
-      {
+      else if (desc.type == HgiTextureType1DArray) {
         const size_t imageBytes = bytesPerRow;
-        for (int slice = 0; slice < desc.layerCount; slice++)
-        {
-          char const *sliceBase = static_cast<char const *>(initialData) + mipInfo.byteOffset + imageBytes * slice;
-          tempTextureId->replaceRegion(MTL::Region::Make1D(0, width),
-                                       mip,
-                                       slice,
-                                       sliceBase,
-                                       bytesPerRow,
-                                       0);
+        for (int slice = 0; slice < desc.layerCount; slice++) {
+          char const *sliceBase = static_cast<char const *>(initialData) + mipInfo.byteOffset +
+                                  imageBytes * slice;
+          tempTextureId->replaceRegion(
+              MTL::Region::Make1D(0, width), mip, slice, sliceBase, bytesPerRow, 0);
         }
       }
-      else
-      {
+      else {
         TF_CODING_ERROR("Missing Texture upload implementation");
       }
     }
@@ -230,26 +193,17 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc)
     MTL::CommandBuffer *commandBuffer = hgi->GetQueue()->commandBuffer();
     MTL::BlitCommandEncoder *blitCommandEncoder = commandBuffer->blitCommandEncoder();
     int sliceCount = 1;
-    if (desc.type == HgiTextureType1DArray ||
-        desc.type == HgiTextureType2DArray)
-    {
+    if (desc.type == HgiTextureType1DArray || desc.type == HgiTextureType2DArray) {
       sliceCount = desc.layerCount;
     }
-    blitCommandEncoder->copyFromTexture(tempTextureId,
-                                        0,
-                                        0,
-                                        _textureId,
-                                        0,
-                                        0,
-                                        sliceCount,
-                                        mipLevels);
+    blitCommandEncoder->copyFromTexture(
+        tempTextureId, 0, 0, _textureId, 0, 0, sliceCount, mipLevels);
     blitCommandEncoder->endEncoding();
     commandBuffer->commit();
     tempTextureId->release();
   }
 
-  if (!(usage & MTL::TextureUsageRenderTarget))
-  {
+  if (!(usage & MTL::TextureUsageRenderTarget)) {
     MTL::CommandBuffer *commandBuffer = hgi->GetQueue()->commandBuffer();
     MTL::BlitCommandEncoder *blitCommandEncoder = commandBuffer->blitCommandEncoder();
     blitCommandEncoder->optimizeContentsForGPUAccess(_textureId);
@@ -266,12 +220,11 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureViewDesc const &desc)
   HgiMetalTexture *srcTexture = static_cast<HgiMetalTexture *>(desc.sourceTexture.Get());
   NS::Range levels = NS::Range::Make(desc.sourceFirstMip, desc.mipLevels);
   NS::Range slices = NS::Range::Make(desc.sourceFirstLayer, desc.layerCount);
-  MTL::PixelFormat mtlFormat = HgiMetalConversions::GetPixelFormat(desc.format, HgiTextureUsageBitsColorTarget);
+  MTL::PixelFormat mtlFormat = HgiMetalConversions::GetPixelFormat(desc.format,
+                                                                   HgiTextureUsageBitsColorTarget);
 
-  _textureId = srcTexture->GetTextureId()->newTextureView(mtlFormat,
-                                                          srcTexture->GetTextureId()->textureType(),
-                                                          levels,
-                                                          slices);
+  _textureId = srcTexture->GetTextureId()->newTextureView(
+      mtlFormat, srcTexture->GetTextureId()->textureType(), levels, slices);
 
   // Update the texture descriptor to reflect the above
   _descriptor.debugName = desc.debugName;
@@ -282,27 +235,23 @@ HgiMetalTexture::HgiMetalTexture(HgiMetal *hgi, HgiTextureViewDesc const &desc)
 
 HgiMetalTexture::~HgiMetalTexture()
 {
-  if (_textureId != nil)
-  {
+  if (_textureId != nil) {
     _textureId->release();
     _textureId = nil;
   }
 }
 
-size_t
-HgiMetalTexture::GetByteSizeOfResource() const
+size_t HgiMetalTexture::GetByteSizeOfResource() const
 {
   return _GetByteSizeOfResource(_descriptor);
 }
 
-uint64_t
-HgiMetalTexture::GetRawResource() const
+uint64_t HgiMetalTexture::GetRawResource() const
 {
   return (uint64_t)_textureId;
 }
 
-MTL::Texture *
-HgiMetalTexture::GetTextureId() const
+MTL::Texture *HgiMetalTexture::GetTextureId() const
 {
   return _textureId;
 }

@@ -55,46 +55,42 @@ class PxOsdMeshTopology;
 ///
 /// \endcode
 ///
-class GeomUtilCuboidMeshGenerator final
-    : public GeomUtilMeshGeneratorBase
-{
-public:
+class GeomUtilCuboidMeshGenerator final : public GeomUtilMeshGeneratorBase {
+ public:
   GEOMUTIL_API
   static size_t ComputeNumPoints();
 
   GEOMUTIL_API
   static PxOsdMeshTopology GenerateTopology();
 
-  template <typename PointIterType,
-            typename ScalarType,
-            typename Enabled =
-                typename _EnableIfGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter,
-      const ScalarType xLength,
-      const ScalarType yLength,
-      const ScalarType zLength,
-      const GfMatrix4d *framePtr = nullptr)
+  template<typename PointIterType,
+           typename ScalarType,
+           typename Enabled = typename _EnableIfGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter,
+                             const ScalarType xLength,
+                             const ScalarType yLength,
+                             const ScalarType zLength,
+                             const GfMatrix4d *framePtr = nullptr)
   {
-    using PointType =
-        typename std::iterator_traits<PointIterType>::value_type;
+    using PointType = typename std::iterator_traits<PointIterType>::value_type;
 
-    _GeneratePointsImpl(xLength, yLength, zLength,
-                        framePtr ? _PointWriter<PointType>(iter, framePtr)
-                                 : _PointWriter<PointType>(iter));
+    _GeneratePointsImpl(xLength,
+                        yLength,
+                        zLength,
+                        framePtr ? _PointWriter<PointType>(iter, framePtr) :
+                                   _PointWriter<PointType>(iter));
   }
 
   using GeomUtilMeshGeneratorBase::GeneratePoints;
 
-private:
-  template <typename PointType>
-  static void _GeneratePointsImpl(
-      const typename PointType::ScalarType xLength,
-      const typename PointType::ScalarType yLength,
-      const typename PointType::ScalarType zLength,
-      const _PointWriter<PointType> &ptWriter);
+ private:
+  template<typename PointType>
+  static void _GeneratePointsImpl(const typename PointType::ScalarType xLength,
+                                  const typename PointType::ScalarType yLength,
+                                  const typename PointType::ScalarType zLength,
+                                  const _PointWriter<PointType> &ptWriter);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GEOM_UTIL_CUBOID_MESH_GENERATOR_H
+#endif  // PXR_IMAGING_GEOM_UTIL_CUBOID_MESH_GENERATOR_H

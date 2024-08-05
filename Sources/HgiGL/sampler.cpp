@@ -38,56 +38,40 @@ HgiGLSampler::HgiGLSampler(HgiSamplerDesc const &desc)
 {
   glCreateSamplers(1, &_samplerId);
 
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     HgiGLObjectLabel(GL_SAMPLER, _samplerId, _descriptor.debugName);
   }
 
   glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_WRAP_S,
-      HgiGLConversions::GetSamplerAddressMode(desc.addressModeU));
+      _samplerId, GL_TEXTURE_WRAP_S, HgiGLConversions::GetSamplerAddressMode(desc.addressModeU));
 
   glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_WRAP_T,
-      HgiGLConversions::GetSamplerAddressMode(desc.addressModeV));
+      _samplerId, GL_TEXTURE_WRAP_T, HgiGLConversions::GetSamplerAddressMode(desc.addressModeV));
 
   glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_WRAP_R,
-      HgiGLConversions::GetSamplerAddressMode(desc.addressModeW));
+      _samplerId, GL_TEXTURE_WRAP_R, HgiGLConversions::GetSamplerAddressMode(desc.addressModeW));
+
+  glSamplerParameteri(_samplerId,
+                      GL_TEXTURE_MIN_FILTER,
+                      HgiGLConversions::GetMinFilter(desc.minFilter, desc.mipFilter));
 
   glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_MIN_FILTER,
-      HgiGLConversions::GetMinFilter(desc.minFilter, desc.mipFilter));
+      _samplerId, GL_TEXTURE_MAG_FILTER, HgiGLConversions::GetMagFilter(desc.magFilter));
 
-  glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_MAG_FILTER,
-      HgiGLConversions::GetMagFilter(desc.magFilter));
-
-  glSamplerParameterfv(
-      _samplerId,
-      GL_TEXTURE_BORDER_COLOR,
-      HgiGLConversions::GetBorderColor(desc.borderColor).GetArray());
+  glSamplerParameterfv(_samplerId,
+                       GL_TEXTURE_BORDER_COLOR,
+                       HgiGLConversions::GetBorderColor(desc.borderColor).GetArray());
 
   static const float maxAnisotropy = 16.0;
-  glSamplerParameterf(
-      _samplerId,
-      GL_TEXTURE_MAX_ANISOTROPY_EXT,
-      maxAnisotropy);
+  glSamplerParameterf(_samplerId, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
-  glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_COMPARE_MODE,
-      desc.enableCompare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
+  glSamplerParameteri(_samplerId,
+                      GL_TEXTURE_COMPARE_MODE,
+                      desc.enableCompare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
 
-  glSamplerParameteri(
-      _samplerId,
-      GL_TEXTURE_COMPARE_FUNC,
-      HgiGLConversions::GetCompareFunction(desc.compareFunction));
+  glSamplerParameteri(_samplerId,
+                      GL_TEXTURE_COMPARE_FUNC,
+                      HgiGLConversions::GetCompareFunction(desc.compareFunction));
 
   HGIGL_POST_PENDING_GL_ERRORS();
 }
@@ -107,34 +91,27 @@ HgiGLSampler::~HgiGLSampler()
   HGIGL_POST_PENDING_GL_ERRORS();
 }
 
-uint64_t
-HgiGLSampler::GetRawResource() const
+uint64_t HgiGLSampler::GetRawResource() const
 {
   return (uint64_t)_samplerId;
 }
 
-uint32_t
-HgiGLSampler::GetSamplerId() const
+uint32_t HgiGLSampler::GetSamplerId() const
 {
   return _samplerId;
 }
 
-uint64_t
-HgiGLSampler::GetBindlessHandle(HgiTextureHandle const &textureHandle)
+uint64_t HgiGLSampler::GetBindlessHandle(HgiTextureHandle const &textureHandle)
 {
   GLuint textureId = textureHandle->GetRawResource();
-  if (textureId == 0)
-  {
+  if (textureId == 0) {
     return 0;
   }
 
-  if (!_bindlessHandle || _bindlessTextureId != textureId)
-  {
-    const GLuint64EXT result =
-        glGetTextureSamplerHandleARB(textureId, _samplerId);
+  if (!_bindlessHandle || _bindlessTextureId != textureId) {
+    const GLuint64EXT result = glGetTextureSamplerHandleARB(textureId, _samplerId);
 
-    if (!glIsTextureHandleResidentARB(result))
-    {
+    if (!glIsTextureHandleResidentARB(result)) {
       glMakeTextureHandleResidentARB(result);
     }
 

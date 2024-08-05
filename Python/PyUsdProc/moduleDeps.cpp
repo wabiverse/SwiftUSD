@@ -23,10 +23,10 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#include <pxr/pxrns.h>
 #include "Tf/registryManager.h"
 #include "Tf/scriptModuleLoader.h"
 #include "Tf/token.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -35,10 +35,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 TF_REGISTRY_FUNCTION(TfScriptModuleLoader)
 {
   // List of direct dependencies for this library.
-  const std::vector<TfToken> reqs = {
-      TfToken("usd"),
-      TfToken("usdGeom")};
-  TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("usdProc"), TfToken("pxr.UsdProc"), reqs);
+  const std::vector<TfToken> reqs = {TfToken("usd"), TfToken("usdGeom")};
+  TfScriptModuleLoader::GetInstance().RegisterLibrary(
+      TfToken("usdProc"), TfToken("pxr.UsdProc"), reqs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

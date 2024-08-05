@@ -33,46 +33,39 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDLIGHT_SCHEMA_TOKENS \
-    (light) \
+#define HDLIGHT_SCHEMA_TOKENS (light)
 
-TF_DECLARE_PUBLIC_TOKENS(HdLightSchemaTokens, HD_API,
-    HDLIGHT_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLightSchemaTokens, HD_API, HDLIGHT_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdLightSchema : public HdSchema
-{
-public:
-    HdLightSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdLightSchema : public HdSchema {
+ public:
+  HdLightSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "light" from the parent container and constructs a
+  /// HdLightSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdLightSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "light" from the parent container and constructs a
-    /// HdLightSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdLightSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

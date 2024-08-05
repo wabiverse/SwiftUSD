@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/driveAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/driveAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,120 +41,108 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateTypeAttr(UsdPhysicsDriveAPI &self,
+                                    object defaultVal,
+                                    bool writeSparsely)
 {
+  return self.CreateTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                             writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateMaxForceAttr(UsdPhysicsDriveAPI &self,
+                                        object defaultVal,
+                                        bool writeSparsely)
+{
+  return self.CreateMaxForceAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                 writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateTargetPositionAttr(UsdPhysicsDriveAPI &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
+{
+  return self.CreateTargetPositionAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                       writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateTypeAttr(UsdPhysicsDriveAPI &self,
-                  object defaultVal, bool writeSparsely)
+static UsdAttribute _CreateTargetVelocityAttr(UsdPhysicsDriveAPI &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
+{
+  return self.CreateTargetVelocityAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                       writeSparsely);
+}
+
+static UsdAttribute _CreateDampingAttr(UsdPhysicsDriveAPI &self,
+                                       object defaultVal,
+                                       bool writeSparsely)
+{
+  return self.CreateDampingAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                writeSparsely);
+}
+
+static UsdAttribute _CreateStiffnessAttr(UsdPhysicsDriveAPI &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateStiffnessAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                  writeSparsely);
+}
+
+static bool _WrapIsPhysicsDriveAPIPath(const SdfPath &path)
+{
+  TfToken collectionName;
+  return UsdPhysicsDriveAPI::IsPhysicsDriveAPIPath(path, &collectionName);
+}
+
+static std::string _Repr(const UsdPhysicsDriveAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  std::string instanceName = self.GetName();
+  return TfStringPrintf("UsdPhysics.DriveAPI(%s, '%s')", primRepr.c_str(), instanceName.c_str());
+}
+
+struct UsdPhysicsDriveAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdPhysicsDriveAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    return self.CreateTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
   }
+};
 
-  static UsdAttribute
-  _CreateMaxForceAttr(UsdPhysicsDriveAPI &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateMaxForceAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
+static UsdPhysicsDriveAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim, const TfToken &name)
+{
+  std::string whyNot;
+  bool result = UsdPhysicsDriveAPI::CanApply(prim, name, &whyNot);
+  return UsdPhysicsDriveAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdAttribute
-  _CreateTargetPositionAttr(UsdPhysicsDriveAPI &self,
-                            object defaultVal, bool writeSparsely)
-  {
-    return self.CreateTargetPositionAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateTargetVelocityAttr(UsdPhysicsDriveAPI &self,
-                            object defaultVal, bool writeSparsely)
-  {
-    return self.CreateTargetVelocityAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateDampingAttr(UsdPhysicsDriveAPI &self,
-                     object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDampingAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateStiffnessAttr(UsdPhysicsDriveAPI &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateStiffnessAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static bool _WrapIsPhysicsDriveAPIPath(const SdfPath &path)
-  {
-    TfToken collectionName;
-    return UsdPhysicsDriveAPI::IsPhysicsDriveAPIPath(
-        path, &collectionName);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsDriveAPI &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    std::string instanceName = self.GetName();
-    return TfStringPrintf(
-        "UsdPhysics.DriveAPI(%s, '%s')",
-        primRepr.c_str(), instanceName.c_str());
-  }
-
-  struct UsdPhysicsDriveAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdPhysicsDriveAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
-
-  static UsdPhysicsDriveAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim, const TfToken &name)
-  {
-    std::string whyNot;
-    bool result = UsdPhysicsDriveAPI::CanApply(prim, name, &whyNot);
-    return UsdPhysicsDriveAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsDriveAPI()
 {
   typedef UsdPhysicsDriveAPI This;
 
-  UsdPhysicsDriveAPI_CanApplyResult::Wrap<UsdPhysicsDriveAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+  UsdPhysicsDriveAPI_CanApplyResult::Wrap<UsdPhysicsDriveAPI_CanApplyResult>("_CanApplyResult",
+                                                                             "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("DriveAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("DriveAPI");
 
-  cls
-      .def(init<UsdPrim, TfToken>())
+  cls.def(init<UsdPrim, TfToken>())
       .def(init<UsdSchemaBase const &, TfToken>())
       .def(TfTypePythonClass())
 
       .def("Get",
-           (UsdPhysicsDriveAPI(*)(const UsdStagePtr &stage,
-                                  const SdfPath &path)) &
-               This::Get,
+           (UsdPhysicsDriveAPI(*)(const UsdStagePtr &stage, const SdfPath &path)) & This::Get,
            (arg("stage"), arg("path")))
       .def("Get",
-           (UsdPhysicsDriveAPI(*)(const UsdPrim &prim,
-                                  const TfToken &name)) &
-               This::Get,
+           (UsdPhysicsDriveAPI(*)(const UsdPrim &prim, const TfToken &name)) & This::Get,
            (arg("prim"), arg("name")))
       .staticmethod("Get")
 
@@ -181,53 +169,42 @@ void wrapUsdPhysicsDriveAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetTypeAttr",
-           &This::GetTypeAttr)
+      .def("GetTypeAttr", &This::GetTypeAttr)
       .def("CreateTypeAttr",
            &_CreateTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetMaxForceAttr",
-           &This::GetMaxForceAttr)
+      .def("GetMaxForceAttr", &This::GetMaxForceAttr)
       .def("CreateMaxForceAttr",
            &_CreateMaxForceAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetTargetPositionAttr",
-           &This::GetTargetPositionAttr)
+      .def("GetTargetPositionAttr", &This::GetTargetPositionAttr)
       .def("CreateTargetPositionAttr",
            &_CreateTargetPositionAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetTargetVelocityAttr",
-           &This::GetTargetVelocityAttr)
+      .def("GetTargetVelocityAttr", &This::GetTargetVelocityAttr)
       .def("CreateTargetVelocityAttr",
            &_CreateTargetVelocityAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDampingAttr",
-           &This::GetDampingAttr)
+      .def("GetDampingAttr", &This::GetDampingAttr)
       .def("CreateDampingAttr",
            &_CreateDampingAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetStiffnessAttr",
-           &This::GetStiffnessAttr)
+      .def("GetStiffnessAttr", &This::GetStiffnessAttr)
       .def("CreateStiffnessAttr",
            &_CreateStiffnessAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("IsPhysicsDriveAPIPath", _WrapIsPhysicsDriveAPIPath)
       .staticmethod("IsPhysicsDriveAPIPath")
@@ -255,11 +232,8 @@ void wrapUsdPhysicsDriveAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

@@ -35,8 +35,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <int M> class _TestPlugBase : public TfRefBase, public TfWeakBase {
-public:
+template<int M> class _TestPlugBase : public TfRefBase, public TfWeakBase {
+ public:
   typedef _TestPlugBase This;
   typedef TfRefPtr<This> RefPtr;
   typedef TfWeakPtr<This> Ptr;
@@ -44,26 +44,34 @@ public:
 
   virtual ~_TestPlugBase() {}
 
-  virtual std::string GetTypeName() { return TfType::Find(this).GetTypeName(); }
+  virtual std::string GetTypeName()
+  {
+    return TfType::Find(this).GetTypeName();
+  }
 
-  static RefPtr New() { return TfCreateRefPtr(new This()); }
+  static RefPtr New()
+  {
+    return TfCreateRefPtr(new This());
+  }
 
   PLUG_API
   static RefPtr Manufacture(const std::string &subclass);
 
-protected:
+ protected:
   _TestPlugBase() {}
 };
 
-template <int N> class _TestPlugFactoryBase : public TfType::FactoryBase {
-public:
+template<int N> class _TestPlugFactoryBase : public TfType::FactoryBase {
+ public:
   virtual TfRefPtr<_TestPlugBase<N>> New() const = 0;
 };
 
-template <typename T>
-class _TestPlugFactory : public _TestPlugFactoryBase<T::N> {
-public:
-  virtual TfRefPtr<_TestPlugBase<T::N>> New() const { return T::New(); }
+template<typename T> class _TestPlugFactory : public _TestPlugFactoryBase<T::N> {
+ public:
+  virtual TfRefPtr<_TestPlugBase<T::N>> New() const
+  {
+    return T::New();
+  }
 };
 
 typedef _TestPlugBase<1> _TestPlugBase1;
@@ -73,4 +81,4 @@ typedef _TestPlugBase<4> _TestPlugBase4;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_TEST_PLUG_BASE_H
+#endif  // PXR_BASE_PLUG_TEST_PLUG_BASE_H

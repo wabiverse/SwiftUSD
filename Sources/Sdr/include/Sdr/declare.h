@@ -26,8 +26,8 @@
 
 /// \file sdr/declare.h
 
-#include <pxr/pxrns.h>
 #include "Ndr/declare.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 #include <vector>
@@ -49,10 +49,9 @@ typedef std::vector<SdrShaderNodeConstPtr> SdrShaderNodePtrVec;
 typedef SdrShaderProperty *SdrShaderPropertyPtr;
 typedef SdrShaderProperty const *SdrShaderPropertyConstPtr;
 typedef std::unique_ptr<SdrShaderProperty> SdrShaderPropertyUniquePtr;
-typedef std::unordered_map<TfToken, SdrShaderPropertyConstPtr,
-                           TfToken::HashFunctor>
+typedef std::unordered_map<TfToken, SdrShaderPropertyConstPtr, TfToken::HashFunctor>
     SdrPropertyMap;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDR_DECLARE_H
+#endif  // PXR_USD_SDR_DECLARE_H

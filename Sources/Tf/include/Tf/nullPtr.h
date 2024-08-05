@@ -38,4 +38,4 @@ TF_API extern const TfNullPtrType TfNullPtr;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_NULL_PTR_H
+#endif  // PXR_BASE_TF_NULL_PTR_H

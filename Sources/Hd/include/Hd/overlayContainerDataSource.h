@@ -34,53 +34,43 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Earlier entries on the containers array have stronger opinion strength
 /// for overlapping child names. Overlapping children which are all containers
 /// themselves are returned as another instance of this class
-class HdOverlayContainerDataSource : public HdContainerDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE(HdOverlayContainerDataSource);
+class HdOverlayContainerDataSource : public HdContainerDataSource {
+ public:
+  HD_DECLARE_DATASOURCE(HdOverlayContainerDataSource);
 
-    HD_DECLARE_DATASOURCE_INITIALIZER_LIST_NEW(
-            HdOverlayContainerDataSource, 
-            HdContainerDataSourceHandle);
+  HD_DECLARE_DATASOURCE_INITIALIZER_LIST_NEW(HdOverlayContainerDataSource,
+                                             HdContainerDataSourceHandle);
 
-    HD_API
-    HdOverlayContainerDataSource(
-        std::initializer_list<HdContainerDataSourceHandle> sources);
+  HD_API
+  HdOverlayContainerDataSource(std::initializer_list<HdContainerDataSourceHandle> sources);
 
-    HD_API
-    HdOverlayContainerDataSource(
-        size_t count,
-        HdContainerDataSourceHandle *containers);
+  HD_API
+  HdOverlayContainerDataSource(size_t count, HdContainerDataSourceHandle *containers);
 
-    HD_API
-    HdOverlayContainerDataSource(
-        const HdContainerDataSourceHandle &src1,
-        const HdContainerDataSourceHandle &src2);
+  HD_API
+  HdOverlayContainerDataSource(const HdContainerDataSourceHandle &src1,
+                               const HdContainerDataSourceHandle &src2);
 
-    HD_API
-    HdOverlayContainerDataSource(
-        const HdContainerDataSourceHandle &src1,
-        const HdContainerDataSourceHandle &src2,
-        const HdContainerDataSourceHandle &src3);
-    
-    /// Creates HdOverlayContainerDataSource from sources, but only
-    /// if needed. If one of given handles is null, the other handle
-    /// is returned instead.
-    HD_API
-    static
-    HdContainerDataSourceHandle
-    OverlayedContainerDataSources(
-        const HdContainerDataSourceHandle &src1,
-        const HdContainerDataSourceHandle &src2);
+  HD_API
+  HdOverlayContainerDataSource(const HdContainerDataSourceHandle &src1,
+                               const HdContainerDataSourceHandle &src2,
+                               const HdContainerDataSourceHandle &src3);
 
-    HD_API
-    TfTokenVector GetNames() override;
-    HD_API
-    HdDataSourceBaseHandle Get(const TfToken &name) override;
+  /// Creates HdOverlayContainerDataSource from sources, but only
+  /// if needed. If one of given handles is null, the other handle
+  /// is returned instead.
+  HD_API
+  static HdContainerDataSourceHandle OverlayedContainerDataSources(
+      const HdContainerDataSourceHandle &src1, const HdContainerDataSourceHandle &src2);
 
-private:
-    using _ContainerVector = TfSmallVector<HdContainerDataSourceHandle, 8>;
-    _ContainerVector _containers;
+  HD_API
+  TfTokenVector GetNames() override;
+  HD_API
+  HdDataSourceBaseHandle Get(const TfToken &name) override;
+
+ private:
+  using _ContainerVector = TfSmallVector<HdContainerDataSourceHandle, 8>;
+  _ContainerVector _containers;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(HdOverlayContainerDataSource);

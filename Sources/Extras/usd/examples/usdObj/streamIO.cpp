@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "streamIO.h"
-#include "stream.h"
 #include "Tf/stringUtils.h"
+#include "stream.h"
+#include <pxr/pxrns.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/iterator.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <algorithm>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 using std::string;
@@ -39,17 +39,13 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool UsdObjReadDataFromFile(std::string const &fileName,
-                            UsdObjStream *stream, std::string *error)
+bool UsdObjReadDataFromFile(std::string const &fileName, UsdObjStream *stream, std::string *error)
 {
   // try and open the file
   std::ifstream fin(fileName.c_str());
-  if (!fin.is_open())
-  {
-    if (error)
-    {
-      *error = TfStringPrintf("Could not open file: (%s)\n",
-                              fileName.c_str());
+  if (!fin.is_open()) {
+    if (error) {
+      *error = TfStringPrintf("Could not open file: (%s)\n", fileName.c_str());
     }
     return false;
   }
@@ -57,8 +53,7 @@ bool UsdObjReadDataFromFile(std::string const &fileName,
   return UsdObjReadDataFromStream(fin, stream, error);
 }
 
-static UsdObjStream::Point
-_ParsePoint(string const &str)
+static UsdObjStream::Point _ParsePoint(string const &str)
 {
   using boost::iterator_range;
   using boost::lexical_cast;
@@ -69,10 +64,8 @@ _ParsePoint(string const &str)
   // Break the string up into up to 3 segments separated by slashes.
   iterator_range<char const *> ranges[3];
   int numRanges = 0;
-  char const *from = str.data(),
-             *pos = str.data(), *end = str.data() + strlen(str.data());
-  while (numRanges != 3)
-  {
+  char const *from = str.data(), *pos = str.data(), *end = str.data() + strlen(str.data());
+  while (numRanges != 3) {
     pos = std::find(from, end, '/');
     ranges[numRanges++] = make_iterator_range(from, pos);
     if (pos == end)
@@ -83,8 +76,7 @@ _ParsePoint(string const &str)
   // Now pull indexes out of the segments.  Subtract one since indexes are
   // 1-based in the file, but we store them 0-based in the data structure.
   int *indexes[] = {&result.vertIndex, &result.uvIndex, &result.normalIndex};
-  for (int i = 0; i != numRanges; ++i)
-  {
+  for (int i = 0; i != numRanges; ++i) {
     if (!ranges[i].empty())
       *indexes[i] = lexical_cast<int>(ranges[i]) - 1;
   }
@@ -92,16 +84,14 @@ _ParsePoint(string const &str)
   return result;
 }
 
-bool UsdObjReadDataFromStream(std::istream &input,
-                              UsdObjStream *stream, std::string *error)
+bool UsdObjReadDataFromStream(std::istream &input, UsdObjStream *stream, std::string *error)
 {
   string line;
   std::istringstream lineStream;
 
   UsdObjStream::Group curGroup;
 
-  while (getline(input, line))
-  {
+  while (getline(input, line)) {
     if (line.empty())
       continue;
 
@@ -112,26 +102,22 @@ bool UsdObjReadDataFromStream(std::istream &input,
     string type;
     lineStream >> type;
 
-    if (type == "v")
-    {
+    if (type == "v") {
       GfVec3f newVert;
       lineStream >> newVert[0] >> newVert[1] >> newVert[2];
       stream->AddVert(newVert);
     }
-    else if (type == "vt")
-    {
+    else if (type == "vt") {
       GfVec2f newUV;
       lineStream >> newUV[0] >> newUV[1];
       stream->AddUV(newUV);
     }
-    else if (type == "vn")
-    {
+    else if (type == "vn") {
       GfVec3f newNormal;
       lineStream >> newNormal[0] >> newNormal[1] >> newNormal[2];
       stream->AddNormal(newNormal);
     }
-    else if (type == "f")
-    {
+    else if (type == "f") {
       int pointsBegin = int(stream->GetPoints().size()), pointsEnd;
       std::string indexStr;
       while (lineStream >> indexStr)
@@ -140,15 +126,13 @@ bool UsdObjReadDataFromStream(std::istream &input,
       pointsEnd = int(stream->GetPoints().size());
       stream->AddFace(UsdObjStream::Face(pointsBegin, pointsEnd));
     }
-    else if (type == "g")
-    {
+    else if (type == "g") {
       // Create new group.
       string groupName;
       lineStream >> groupName;
       stream->AddGroup(groupName);
     }
-    else
-    {
+    else {
       // Add arbitrary text (or comment).
       stream->AppendArbitraryText(line);
     }

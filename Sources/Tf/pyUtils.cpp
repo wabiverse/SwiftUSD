@@ -51,45 +51,54 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void TfPyThrowIndexError(const char *msg) {
+void TfPyThrowIndexError(const char *msg)
+{
   PyErr_SetString(PyExc_IndexError, msg);
   boost::python::throw_error_already_set();
 }
 
-void TfPyThrowRuntimeError(const char *msg) {
+void TfPyThrowRuntimeError(const char *msg)
+{
   PyErr_SetString(PyExc_RuntimeError, msg);
   boost::python::throw_error_already_set();
 }
 
-void TfPyThrowStopIteration(const char *msg) {
+void TfPyThrowStopIteration(const char *msg)
+{
   PyErr_SetString(PyExc_StopIteration, msg);
   boost::python::throw_error_already_set();
 }
 
-void TfPyThrowKeyError(const char *msg) {
+void TfPyThrowKeyError(const char *msg)
+{
   PyErr_SetString(PyExc_KeyError, msg);
   boost::python::throw_error_already_set();
 }
 
-void TfPyThrowValueError(const char *msg) {
+void TfPyThrowValueError(const char *msg)
+{
   PyErr_SetString(PyExc_ValueError, msg);
   boost::python::throw_error_already_set();
 }
 
-void TfPyThrowTypeError(const char *msg) {
+void TfPyThrowTypeError(const char *msg)
+{
   PyErr_SetString(PyExc_TypeError, msg);
   boost::python::throw_error_already_set();
 }
 
-bool TfPyIsNone(boost::python::object const &obj) {
+bool TfPyIsNone(boost::python::object const &obj)
+{
   return obj.ptr() == Py_None;
 }
 
-bool TfPyIsNone(boost::python::handle<> const &obj) {
+bool TfPyIsNone(boost::python::handle<> const &obj)
+{
   return !obj.get() || obj.get() == Py_None;
 }
 
-void Tf_PyLoadScriptModule(std::string const &moduleName) {
+void Tf_PyLoadScriptModule(std::string const &moduleName)
+{
   if (TfPyIsInitialized()) {
     TfPyLock pyLock;
     string tmp(moduleName);
@@ -100,17 +109,21 @@ void Tf_PyLoadScriptModule(std::string const &moduleName) {
       TfPyPrintError();
       // CODE_COVERAGE_ON
     }
-  } else {
+  }
+  else {
     // CODE_COVERAGE_OFF
-    TF_WARN("Attempted to load module '%s' but Python is not initialized.",
-            moduleName.c_str());
+    TF_WARN("Attempted to load module '%s' but Python is not initialized.", moduleName.c_str());
     // CODE_COVERAGE_ON
   }
 }
 
-bool TfPyIsInitialized() { return Py_IsInitialized(); }
+bool TfPyIsInitialized()
+{
+  return Py_IsInitialized();
+}
 
-string TfPyObjectRepr(boost::python::object const &t) {
+string TfPyObjectRepr(boost::python::object const &t)
+{
   if (!TfPyIsInitialized()) {
     // CODE_COVERAGE_OFF
     TF_CODING_ERROR("Called TfPyRepr without python being initialized!");
@@ -138,15 +151,15 @@ string TfPyObjectRepr(boost::python::object const &t) {
       reprString = "float('inf')";
     if (reprString == "-inf")
       reprString = "-float('inf')";
-
-  } catch (error_already_set const &) {
+  }
+  catch (error_already_set const &) {
     PyErr_Clear();
   }
   return reprString;
 }
 
-boost::python::object TfPyEvaluate(std::string const &expr,
-                                   dict const &extraGlobals) {
+boost::python::object TfPyEvaluate(std::string const &expr, dict const &extraGlobals)
+{
   TfPyLock lock;
   try {
     // Get the modules dict for the loaded script modules.
@@ -159,14 +172,16 @@ boost::python::object TfPyEvaluate(std::string const &expr,
 
     // Eval the expression in that enviornment.
     return object(TfPyRunString(expr, Py_eval_input, modulesDict, modulesDict));
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
   }
   return boost::python::object();
 }
 
-int64_t TfPyNormalizeIndex(int64_t index, uint64_t size, bool throwError) {
+int64_t TfPyNormalizeIndex(int64_t index, uint64_t size, bool throwError)
+{
   if (index < 0)
     index += size;
 
@@ -174,14 +189,13 @@ int64_t TfPyNormalizeIndex(int64_t index, uint64_t size, bool throwError) {
     TfPyThrowIndexError("Index out of range.");
   }
 
-  return index < 0                              ? 0
-         : static_cast<uint64_t>(index) >= size ? size - 1
-                                                : index;
+  return index < 0 ? 0 : static_cast<uint64_t>(index) >= size ? size - 1 : index;
 }
 
 TF_API void Tf_PyWrapOnceImpl(boost::python::type_info const &type,
                               std::function<void()> const &wrapFunc,
-                              bool *isTypeWrapped) {
+                              bool *isTypeWrapped)
+{
   static std::mutex pyWrapOnceMutex;
 
   if (!wrapFunc) {
@@ -201,8 +215,7 @@ TF_API void Tf_PyWrapOnceImpl(boost::python::type_info const &type,
     return;
   }
 
-  boost::python::type_handle pyType =
-      boost::python::objects::registered_class_object(type);
+  boost::python::type_handle pyType = boost::python::objects::registered_class_object(type);
 
   if (!pyType) {
     wrapFunc();
@@ -211,13 +224,14 @@ TF_API void Tf_PyWrapOnceImpl(boost::python::type_info const &type,
   *isTypeWrapped = true;
 }
 
-boost::python::object TfPyGetClassObject(std::type_info const &type) {
+boost::python::object TfPyGetClassObject(std::type_info const &type)
+{
   TfPyLock pyLock;
-  return boost::python::object(
-      boost::python::objects::registered_class_object(type));
+  return boost::python::object(boost::python::objects::registered_class_object(type));
 }
 
-string TfPyGetClassName(object const &obj) {
+string TfPyGetClassName(object const &obj)
+{
   // Take the interpreter lock as we're about to call back to Python.
   TfPyLock pyLock;
 
@@ -230,14 +244,13 @@ string TfPyGetClassName(object const &obj) {
   }
 
   // CODE_COVERAGE_OFF This shouldn't really happen.
-  TF_WARN("Couldn't get class name for python object '%s'",
-          TfPyRepr(obj).c_str());
+  TF_WARN("Couldn't get class name for python object '%s'", TfPyRepr(obj).c_str());
   return "<unknown>";
   // CODE_COVERAGE_ON
 }
 
-boost::python::object TfPyCopyBufferToByteArray(const char *buffer,
-                                                size_t size) {
+boost::python::object TfPyCopyBufferToByteArray(const char *buffer, size_t size)
+{
   TfPyLock lock;
   boost::python::object result;
 
@@ -249,7 +262,8 @@ boost::python::object TfPyCopyBufferToByteArray(const char *buffer,
     PyObject *buf = PyByteArray_FromStringAndSize(buffer, size);
     boost::python::handle<> hbuf(buf);
     result = boost::python::object(hbuf);
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
   }
@@ -257,7 +271,8 @@ boost::python::object TfPyCopyBufferToByteArray(const char *buffer,
   return result;
 }
 
-vector<string> TfPyGetTraceback() {
+vector<string> TfPyGetTraceback()
+{
   vector<string> result;
 
   if (!TfPyIsInitialized())
@@ -276,13 +291,15 @@ vector<string> TfPyGetTraceback() {
       string s = extract<string>(stack[i]);
       result.push_back(s);
     }
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
   }
   return result;
 }
 
-void TfPyGetStackFrames(vector<uintptr_t> *frames) {
+void TfPyGetStackFrames(vector<uintptr_t> *frames)
+{
   if (!TfPyIsInitialized())
     return;
 
@@ -299,20 +316,23 @@ void TfPyGetStackFrames(vector<uintptr_t> *frames) {
       string *s = new string(extract<string>(stack[i]));
       frames->push_back((uintptr_t)s);
     }
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
   }
 }
 
-void TfPyDumpTraceback() {
+void TfPyDumpTraceback()
+{
   printf("Traceback (most recent call last):\n");
   vector<string> tb = TfPyGetTraceback();
   TF_FOR_ALL(i, tb)
   printf("%s", i->c_str());
 }
 
-static object _GetOsEnviron() {
+static object _GetOsEnviron()
+{
   // In theory, we could just check that the os module has been imported,
   // rather than forcing an import ourself.  However, it's possible that
   // os.environ is actually a re-export from another module (ie. posix,
@@ -320,13 +340,13 @@ static object _GetOsEnviron() {
   // without importing os.  Rather than check a hardcoded list of potential
   // modules, we always import os if Python is initialized.  If this turns
   // out to be problematic, we may want to consider the other approach.
-  boost::python::object module(
-      boost::python::handle<>(PyImport_ImportModule("os")));
+  boost::python::object module(boost::python::handle<>(PyImport_ImportModule("os")));
   boost::python::object environObj(module.attr("environ"));
   return environObj;
 }
 
-bool TfPySetenv(const std::string &name, const std::string &value) {
+bool TfPySetenv(const std::string &name, const std::string &value)
+{
   if (!TfPyIsInitialized()) {
     TF_CODING_ERROR("Python is uninitialized.");
     return false;
@@ -338,14 +358,16 @@ bool TfPySetenv(const std::string &name, const std::string &value) {
     object environObj(_GetOsEnviron());
     environObj[name] = value;
     return true;
-  } catch (boost::python::error_already_set &) {
+  }
+  catch (boost::python::error_already_set &) {
     PyErr_Clear();
   }
 
   return false;
 }
 
-bool TfPyUnsetenv(const std::string &name) {
+bool TfPyUnsetenv(const std::string &name)
+{
   if (!TfPyIsInitialized()) {
     TF_CODING_ERROR("Python is uninitialized.");
     return false;
@@ -360,37 +382,41 @@ bool TfPyUnsetenv(const std::string &name) {
       environObj[name].del();
     }
     return true;
-  } catch (boost::python::error_already_set &) {
+  }
+  catch (boost::python::error_already_set &) {
     PyErr_Clear();
   }
 
   return false;
 }
 
-bool Tf_PyEvaluateWithErrorCheck(const std::string &expr,
-                                 boost::python::object *obj) {
+bool Tf_PyEvaluateWithErrorCheck(const std::string &expr, boost::python::object *obj)
+{
   TfErrorMark m;
   *obj = TfPyEvaluate(expr);
   return m.IsClean();
 }
 
-void TfPyPrintError() {
+void TfPyPrintError()
+{
   if (!PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
     PyErr_Print();
   }
 }
 
-void Tf_PyObjectError(bool printError) {
+void Tf_PyObjectError(bool printError)
+{
   // Silently pass these exceptions through.
-  if (PyErr_ExceptionMatches(PyExc_SystemExit) ||
-      PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+  if (PyErr_ExceptionMatches(PyExc_SystemExit) || PyErr_ExceptionMatches(PyExc_KeyboardInterrupt))
+  {
     return;
   }
 
   // Report and clear.
   if (printError) {
     PyErr_Print();
-  } else {
+  }
+  else {
     PyErr_Clear();
   }
 }

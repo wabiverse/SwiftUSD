@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
 #define EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sprim.h"
 #include "Riley.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,9 +45,8 @@ class HdPrman_RenderParam;
 ///
 /// A representation for light filters.
 ///
-class HdPrmanLightFilter final : public HdSprim
-{
-public:
+class HdPrmanLightFilter final : public HdSprim {
+ public:
   HdPrmanLightFilter(SdfPath const &id, TfToken const &lightFilterType);
   ~HdPrmanLightFilter() override;
 
@@ -61,14 +60,17 @@ public:
   /// Typically this would be all dirty bits.
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-  riley::ShadingNode *GetLightFilter() const { return _lightFilter; }
+  riley::ShadingNode *GetLightFilter() const
+  {
+    return _lightFilter;
+  }
 
   /// Return true if this light filter is valid.
   bool IsValid() const;
 
   void Finalize(HdRenderParam *renderParam) override;
 
-private:
+ private:
   void _ResetLightFilter(HdPrman_RenderParam *renderParam);
 
   const TfToken _hdLightFilterType;
@@ -77,4 +79,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H
+#endif  // EXT_RMANPKG_22_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_FILTER_H

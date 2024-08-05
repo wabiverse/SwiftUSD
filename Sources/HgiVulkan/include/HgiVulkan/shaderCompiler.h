@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGIVULKAN_SHADERCOMPILER_H
 #define PXR_IMAGING_HGIVULKAN_SHADERCOMPILER_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/enums.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -38,15 +38,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiVulkanDevice;
 
-struct HgiVulkanDescriptorSetInfo
-{
+struct HgiVulkanDescriptorSetInfo {
   uint32_t setNumber;
   VkDescriptorSetLayoutCreateInfo createInfo;
   std::vector<VkDescriptorSetLayoutBinding> bindings;
 };
 
-using HgiVulkanDescriptorSetInfoVector =
-    std::vector<HgiVulkanDescriptorSetInfo>;
+using HgiVulkanDescriptorSetInfoVector = std::vector<HgiVulkanDescriptorSetInfo>;
 
 using VkDescriptorSetLayoutVector = std::vector<VkDescriptorSetLayout>;
 
@@ -55,13 +53,12 @@ using VkDescriptorSetLayoutVector = std::vector<VkDescriptorSetLayout>;
 /// numShaderCodes determines how many strings are provided via shaderCodes.
 /// 'name' is purely for debugging compile errors. It can be anything.
 HGIVULKAN_API
-bool HgiVulkanCompileGLSL(
-    const char *name,
-    const char *shaderCodes[],
-    uint8_t numShaderCodes,
-    HgiShaderStage stage,
-    std::vector<unsigned int> *spirvOUT,
-    std::string *errors = nullptr);
+bool HgiVulkanCompileGLSL(const char *name,
+                          const char *shaderCodes[],
+                          uint8_t numShaderCodes,
+                          HgiShaderStage stage,
+                          std::vector<unsigned int> *spirvOUT,
+                          std::string *errors = nullptr);
 
 /// Uses spirv-reflection to create new descriptor set layout information for
 /// the provided spirv.

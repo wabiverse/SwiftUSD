@@ -341,7 +341,7 @@ class PlugRegistry : public TfWeakBase {
   PlugRegistry(PlugRegistry const &) = delete;
   PlugRegistry &operator=(PlugRegistry const &) = delete;
 
-public:
+ public:
   typedef PlugRegistry This;
   typedef std::vector<TfType> TypeVector;
 
@@ -355,12 +355,11 @@ public:
   PlugPluginPtrVector RegisterPlugins(const std::string &pathToPlugInfo);
 
   using PlugPathsVector = std::vector<std::string>;
-  
+
   /// Registers all plug-ins discovered in any of \a pathsToPlugInfo.  Sends
   /// PlugNotice::DidRegisterPlugins with any newly registered plugins.
   PLUG_API
-  PlugPluginPtrVector
-  RegisterPlugins(const PlugPathsVector &pathsToPlugInfo);
+  PlugPluginPtrVector RegisterPlugins(const PlugPathsVector &pathsToPlugInfo);
 
   /// Retrieve the \c TfType corresponding to the given \c name.  See the
   /// documentation for \c TfType::FindByName for more information.  Use this
@@ -394,8 +393,8 @@ public:
   ///
   /// Note that additional plugins may be registered during program runtime.
   /// \sa \ref Plug_Discovery
-  template <class Base>
-  static TfType FindDerivedTypeByName(std::string const &typeName) {
+  template<class Base> static TfType FindDerivedTypeByName(std::string const &typeName)
+  {
     return FindDerivedTypeByName(TfType::Find<Base>(), typeName);
   }
 
@@ -421,8 +420,8 @@ public:
   ///
   /// Note that additional plugins may be registered during program runtime.
   /// \sa \ref Plug_Discovery
-  template <class Base>
-  static void GetAllDerivedTypes(std::set<TfType> *result) {
+  template<class Base> static void GetAllDerivedTypes(std::set<TfType> *result)
+  {
     return GetAllDerivedTypes(TfType::Find<Base>(), result);
   }
 
@@ -445,15 +444,14 @@ public:
   /// Looks for a string associated with \a type and \a key and returns it, or
   /// an empty string if \a type or \a key are not found.
   PLUG_API
-  std::string GetStringFromPluginMetaData(TfType type,
-                                          const std::string &key) const;
+  std::string GetStringFromPluginMetaData(TfType type, const std::string &key) const;
 
   /// Looks for a JsValue associated with \a type and \a key and returns it,
   /// or a null JsValue if \a type or \a key are not found.
   PLUG_API
   JsValue GetDataFromPluginMetaData(TfType type, const std::string &key) const;
 
-private:
+ private:
   // Private ctor and dtor since this is a constructed as a singleton.
   PLUG_LOCAL
   PlugRegistry();
@@ -462,20 +460,18 @@ private:
   // but does not send a notice.  The priority order of paths is honored if
   // pathsAreOrdered.
   PLUG_LOCAL
-  PlugPluginPtrVector
-  _RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
-                   bool pathsAreOrdered);
+  PlugPluginPtrVector _RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo,
+                                       bool pathsAreOrdered);
 
-  template <class ConcurrentVector>
-  PLUG_LOCAL void _RegisterPlugin(const Plug_RegistrationMetadata &,
-                                  ConcurrentVector *newPlugins);
+  template<class ConcurrentVector>
+  PLUG_LOCAL void _RegisterPlugin(const Plug_RegistrationMetadata &, ConcurrentVector *newPlugins);
   PLUG_LOCAL
   bool _InsertRegisteredPluginPath(const std::string &path);
 
   friend class TfSingleton<PlugRegistry>;
-  friend class PlugPlugin; // For _RegisterPlugins().
+  friend class PlugPlugin;  // For _RegisterPlugins().
 
-private:
+ private:
   TfHashSet<std::string, TfHash> _registeredPluginPaths;
 
   std::mutex _mutex;
@@ -485,4 +481,4 @@ PLUG_API_TEMPLATE_CLASS(TfSingleton<PlugRegistry>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_REGISTRY_H
+#endif  // PXR_BASE_PLUG_REGISTRY_H

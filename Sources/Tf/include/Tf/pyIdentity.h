@@ -49,18 +49,17 @@ namespace boost {
 namespace python {
 
 // TfWeakPtrFacade
-template <template <class> class X, class Y>
-struct pointee<PXR_NS::TfWeakPtrFacade<X, Y>> {
+template<template<class> class X, class Y> struct pointee<PXR_NS::TfWeakPtrFacade<X, Y>> {
   typedef Y type;
 };
 
 // TfRefPtr
-template <typename T> struct pointee<PXR_NS::TfRefPtr<T>> {
+template<typename T> struct pointee<PXR_NS::TfRefPtr<T>> {
   typedef T type;
 };
 
-} // namespace python
-} // namespace boost
+}  // namespace python
+}  // namespace boost
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -89,14 +88,13 @@ struct Tf_PyIdentityHelper {
   static void Release(void const *id);
 };
 
-template <class Ptr>
-void Tf_PyReleasePythonIdentity(Ptr const &ptr, PyObject *obj) {
+template<class Ptr> void Tf_PyReleasePythonIdentity(Ptr const &ptr, PyObject *obj)
+{
   Tf_PySetPythonIdentity(ptr, obj);
   Tf_PyIdentityHelper::Release(ptr.GetUniqueIdentifier());
 }
 
-void Tf_PyOwnershipRefBaseUniqueChanged(TfRefBase const *refBase,
-                                        bool isNowUnique);
+void Tf_PyOwnershipRefBaseUniqueChanged(TfRefBase const *refBase, bool isNowUnique);
 
 struct Tf_PyOwnershipPtrMap {
   typedef TfHashMap<TfRefBase const *, void const *, TfHash> _CacheType;
@@ -107,7 +105,7 @@ struct Tf_PyOwnershipPtrMap {
   TF_API
   static void Erase(TfRefBase *refBase);
 
-private:
+ private:
   static _CacheType _cache;
 };
 
@@ -118,48 +116,48 @@ private:
 // (6/06)
 #ifndef doxygen
 
-template <class Ptr, typename Enable = void> struct Tf_PyOwnershipHelper {
-  template <typename U> static void Add(U const &, const void *, PyObject *) {}
-  template <typename U> static void Remove(U const &, PyObject *) {}
+template<class Ptr, typename Enable = void> struct Tf_PyOwnershipHelper {
+  template<typename U> static void Add(U const &, const void *, PyObject *) {}
+  template<typename U> static void Remove(U const &, PyObject *) {}
 };
 
-template <typename Ptr>
+template<typename Ptr>
 struct Tf_PyOwnershipHelper<
-    Ptr, std::enable_if_t<
-             std::is_same<TfRefPtr<typename Ptr::DataType>, Ptr>::value &&
-             std::is_base_of<TfRefBase, typename Ptr::DataType>::value>> {
+    Ptr,
+    std::enable_if_t<std::is_same<TfRefPtr<typename Ptr::DataType>, Ptr>::value &&
+                     std::is_base_of<TfRefBase, typename Ptr::DataType>::value>> {
   struct _RefPtrHolder {
-    static boost::python::object Get(Ptr const &refptr) {
+    static boost::python::object Get(Ptr const &refptr)
+    {
       TfPyLock pyLock;
       _WrapIfNecessary();
       return boost::python::object(_RefPtrHolder(refptr));
     }
-    static void _WrapIfNecessary() {
+    static void _WrapIfNecessary()
+    {
       TfPyLock pyLock;
       if (TfPyIsNone(TfPyGetClassObject<_RefPtrHolder>())) {
-        std::string name = "__" +
-                           ArchGetDemangled(typeid(typename Ptr::DataType)) +
+        std::string name = "__" + ArchGetDemangled(typeid(typename Ptr::DataType)) +
                            "__RefPtrHolder";
         name = TfStringReplace(name, "<", "_");
         name = TfStringReplace(name, ">", "_");
         name = TfStringReplace(name, "::", "_");
-        boost::python::class_<_RefPtrHolder>(name.c_str(),
-                                             boost::python::no_init);
+        boost::python::class_<_RefPtrHolder>(name.c_str(), boost::python::no_init);
       }
     }
 
-  private:
+   private:
     explicit _RefPtrHolder(Ptr const &refptr) : _refptr(refptr) {}
     Ptr _refptr;
   };
 
-  static void Add(Ptr ptr, const void *uniqueId, PyObject *self) {
+  static void Add(Ptr ptr, const void *uniqueId, PyObject *self)
+  {
 
     TfPyLock pyLock;
 
     // Make the python object keep the c++ object alive.
-    int ret =
-        PyObject_SetAttrString(self, "__owner", _RefPtrHolder::Get(ptr).ptr());
+    int ret = PyObject_SetAttrString(self, "__owner", _RefPtrHolder::Get(ptr).ptr());
     if (ret == -1) {
       // CODE_COVERAGE_OFF
       TF_WARN("Could not set __owner attribute on python object!");
@@ -171,7 +169,8 @@ struct Tf_PyOwnershipHelper<
     Tf_PyOwnershipPtrMap::Insert(refBase, uniqueId);
   }
 
-  static void Remove(Ptr ptr, PyObject *obj) {
+  static void Remove(Ptr ptr, PyObject *obj)
+  {
     TfPyLock pyLock;
 
     if (!ptr) {
@@ -202,24 +201,24 @@ struct Tf_PyOwnershipHelper<
   }
 };
 
-#endif // doxygen -- see comment above.
+#endif  // doxygen -- see comment above.
 
-template <typename Ptr> struct Tf_PyIsRefPtr {
+template<typename Ptr> struct Tf_PyIsRefPtr {
   static const bool value = false;
 };
 
-template <typename T> struct Tf_PyIsRefPtr<TfRefPtr<T>> {
+template<typename T> struct Tf_PyIsRefPtr<TfRefPtr<T>> {
   static const bool value = true;
 };
 
-template <class Ptr>
-std::enable_if_t<Tf_PyIsRefPtr<Ptr>::value> Tf_PySetPythonIdentity(Ptr const &,
-                                                                   PyObject *) {
+template<class Ptr>
+std::enable_if_t<Tf_PyIsRefPtr<Ptr>::value> Tf_PySetPythonIdentity(Ptr const &, PyObject *)
+{
 }
 
-template <class Ptr>
-std::enable_if_t<!Tf_PyIsRefPtr<Ptr>::value>
-Tf_PySetPythonIdentity(Ptr const &ptr, PyObject *obj) {
+template<class Ptr>
+std::enable_if_t<!Tf_PyIsRefPtr<Ptr>::value> Tf_PySetPythonIdentity(Ptr const &ptr, PyObject *obj)
+{
   if (ptr.GetUniqueIdentifier()) {
     Tf_PyIdentityHelper::Set(ptr.GetUniqueIdentifier(), obj);
     // Make sure we hear about it when this weak base dies so we can remove
@@ -228,22 +227,22 @@ Tf_PySetPythonIdentity(Ptr const &ptr, PyObject *obj) {
   }
 }
 
-template <class Ptr> PyObject *Tf_PyGetPythonIdentity(Ptr const &ptr) {
+template<class Ptr> PyObject *Tf_PyGetPythonIdentity(Ptr const &ptr)
+{
   PyObject *ret = Tf_PyIdentityHelper::Get(ptr.GetUniqueIdentifier());
   return ret;
 }
 
-template <class Ptr>
-void Tf_PyRemovePythonOwnership(Ptr const &t, PyObject *obj) {
+template<class Ptr> void Tf_PyRemovePythonOwnership(Ptr const &t, PyObject *obj)
+{
   Tf_PyOwnershipHelper<Ptr>::Remove(t, obj);
 }
 
-template <class Ptr>
-void Tf_PyAddPythonOwnership(Ptr const &t, const void *uniqueId,
-                             PyObject *obj) {
+template<class Ptr> void Tf_PyAddPythonOwnership(Ptr const &t, const void *uniqueId, PyObject *obj)
+{
   Tf_PyOwnershipHelper<Ptr>::Add(t, uniqueId, obj);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_IDENTITY_H
+#endif  // PXR_BASE_TF_PY_IDENTITY_H

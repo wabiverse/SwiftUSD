@@ -34,10 +34,14 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfLine>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfLine>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfVec3d GfLine::FindClosestPoint(const GfVec3d &point, double *t) const {
+GfVec3d GfLine::FindClosestPoint(const GfVec3d &point, double *t) const
+{
   // Compute the vector from the start point to the given point.
   GfVec3d v = point - _p0;
 
@@ -50,8 +54,13 @@ GfVec3d GfLine::FindClosestPoint(const GfVec3d &point, double *t) const {
   return GetPoint(lt);
 }
 
-bool GfFindClosestPoints(const GfLine &l1, const GfLine &l2, GfVec3d *closest1,
-                         GfVec3d *closest2, double *t1, double *t2) {
+bool GfFindClosestPoints(const GfLine &l1,
+                         const GfLine &l2,
+                         GfVec3d *closest1,
+                         GfVec3d *closest2,
+                         double *t1,
+                         double *t2)
+{
   // Define terms:
   //   p1 = line 1's position
   //   d1 = line 1's direction
@@ -127,7 +136,8 @@ bool GfFindClosestPoints(const GfLine &l1, const GfLine &l2, GfVec3d *closest1,
   return true;
 }
 
-std::ostream &operator<<(std::ostream &out, const GfLine &line) {
+std::ostream &operator<<(std::ostream &out, const GfLine &line)
+{
   return out << '(' << "point:" << Gf_OstreamHelperP(line.GetPoint(0.0)) << ' '
              << "direction:" << Gf_OstreamHelperP(line.GetDirection()) << ')';
 }

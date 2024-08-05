@@ -52,23 +52,30 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class T>
-constexpr auto Tf_IsOstreamable_Impl(int)
-    -> decltype(std::declval<std::ostream &>() << std::declval<T>(), bool()) {
+template<class T>
+constexpr auto Tf_IsOstreamable_Impl(int) -> decltype(std::declval<std::ostream &>()
+                                                          << std::declval<T>(),
+                                                      bool())
+{
   return true;
 }
 
-template <class T> constexpr bool Tf_IsOstreamable_Impl(...) { return false; }
+template<class T> constexpr bool Tf_IsOstreamable_Impl(...)
+{
+  return false;
+}
 
-template <class T> constexpr bool Tf_IsOstreamable() {
+template<class T> constexpr bool Tf_IsOstreamable()
+{
   return Tf_IsOstreamable_Impl<T>(0);
 }
 
 /// Output a TfSmallVector using [ ] as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class T, uint32_t N>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type
-operator<<(std::ostream &out, const TfSmallVector<T, N> &v) {
+template<class T, uint32_t N>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type operator<<(
+    std::ostream &out, const TfSmallVector<T, N> &v)
+{
   out << "[ ";
   for (auto const &obj : v)
     out << obj << " ";
@@ -85,9 +92,10 @@ namespace std {
 
 /// Output an STL vector using [ ] as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class T>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type
-operator<<(std::ostream &out, const std::vector<T> &v) {
+template<class T>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type operator<<(
+    std::ostream &out, const std::vector<T> &v)
+{
   out << "[ ";
   for (auto const &obj : v)
     out << obj << " ";
@@ -98,9 +106,10 @@ operator<<(std::ostream &out, const std::vector<T> &v) {
 
 /// Output an STL set using ( ) as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class T>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type
-operator<<(std::ostream &out, const std::set<T> &v) {
+template<class T>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type operator<<(
+    std::ostream &out, const std::set<T> &v)
+{
   out << "( ";
   for (auto const &obj : v)
     out << obj << " ";
@@ -111,9 +120,10 @@ operator<<(std::ostream &out, const std::set<T> &v) {
 
 /// Output an STL list using { } as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class T>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type
-operator<<(std::ostream &out, const std::list<T> &l) {
+template<class T>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<T>(), std::ostream &>::type operator<<(
+    std::ostream &out, const std::list<T> &l)
+{
   out << "{ ";
   for (auto const &obj : l)
     out << obj << " ";
@@ -124,11 +134,11 @@ operator<<(std::ostream &out, const std::list<T> &l) {
 
 /// Output an TfHashMap using < > as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class K, class M, class H, class C, class A>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<K>() &&
-                            PXR_NS::Tf_IsOstreamable<M>(),
+template<class K, class M, class H, class C, class A>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<K>() && PXR_NS::Tf_IsOstreamable<M>(),
                         std::ostream &>::type
-operator<<(std::ostream &out, const PXR_NS::TfHashMap<K, M, H, C, A> &h) {
+operator<<(std::ostream &out, const PXR_NS::TfHashMap<K, M, H, C, A> &h)
+{
   out << "< ";
   for (auto const &p : h)
     out << "<" << p.first << ": " << p.second << "> ";
@@ -138,11 +148,11 @@ operator<<(std::ostream &out, const PXR_NS::TfHashMap<K, M, H, C, A> &h) {
 
 /// Output an STL map using < > as delimiters.
 /// \ingroup group_tf_DebuggingOutput
-template <class K, class M>
-typename std::enable_if<PXR_NS::Tf_IsOstreamable<K>() &&
-                            PXR_NS::Tf_IsOstreamable<M>(),
+template<class K, class M>
+typename std::enable_if<PXR_NS::Tf_IsOstreamable<K>() && PXR_NS::Tf_IsOstreamable<M>(),
                         std::ostream &>::type
-operator<<(std::ostream &out, const std::map<K, M> &h) {
+operator<<(std::ostream &out, const std::map<K, M> &h)
+{
   out << "< ";
   for (auto const &p : h)
     out << "<" << p.first << ": " << p.second << "> ";
@@ -150,6 +160,6 @@ operator<<(std::ostream &out, const std::map<K, M> &h) {
   return out;
 }
 
-} // namespace std
+}  // namespace std
 
-#endif // PXR_BASE_TF_OSTREAM_METHODS_H
+#endif  // PXR_BASE_TF_OSTREAM_METHODS_H

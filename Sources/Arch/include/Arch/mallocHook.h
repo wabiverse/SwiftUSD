@@ -73,7 +73,7 @@ ARCH_API bool ArchIsStlAllocatorOff();
 /// to use it properly, it should be declared at global scope, ensuring
 /// zero-initialization.
 class ArchMallocHook {
-public:
+ public:
   /// Initialize hooks.
   ///
   /// Calling \c Initialize() installs the supplied functions as call-back
@@ -107,7 +107,10 @@ public:
   /// are performed; in particular, calling this function without having
   /// successfully initialized \p *this will likely crash your program.
   ARCH_API
-  void *Malloc(size_t nBytes) { return (*_underlyingMallocFunc)(nBytes); }
+  void *Malloc(size_t nBytes)
+  {
+    return (*_underlyingMallocFunc)(nBytes);
+  }
 
   /// Call the original system \c realloc() function.
   ///
@@ -116,7 +119,8 @@ public:
   /// are performed; in particular, calling this function without having
   /// successfully initialized \p *this will likely crash your program.
   ARCH_API
-  void *Realloc(void *ptr, size_t nBytes) {
+  void *Realloc(void *ptr, size_t nBytes)
+  {
     return (*_underlyingReallocFunc)(ptr, nBytes);
   }
 
@@ -127,7 +131,8 @@ public:
   /// are performed; in particular, calling this function without having
   /// successfully initialized \p *this will likely crash your program.
   ARCH_API
-  void *Memalign(size_t alignment, size_t nBytes) {
+  void *Memalign(size_t alignment, size_t nBytes)
+  {
     return (*_underlyingMemalignFunc)(alignment, nBytes);
   }
 
@@ -138,9 +143,12 @@ public:
   /// are performed; in particular, calling this function without having
   /// successfully initialized \p *this will likely crash your program.
   ARCH_API
-  void Free(void *ptr) { (*_underlyingFreeFunc)(ptr); }
+  void Free(void *ptr)
+  {
+    (*_underlyingFreeFunc)(ptr);
+  }
 
-private:
+ private:
   // Note: this is a POD (plain 'ol data structure) so we depend on zero
   // initialization here to null these out.  Do not add a constructor or
   // destructor to this class.
@@ -153,4 +161,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_MALLOC_HOOK_H
+#endif  // PXR_BASE_ARCH_MALLOC_HOOK_H

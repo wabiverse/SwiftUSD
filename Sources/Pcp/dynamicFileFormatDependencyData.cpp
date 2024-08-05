@@ -31,7 +31,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 PcpDynamicFileFormatDependencyData::PcpDynamicFileFormatDependencyData(
-    const PcpDynamicFileFormatDependencyData &other) {
+    const PcpDynamicFileFormatDependencyData &other)
+{
   // Have to copy the contents of the unique pointer if it's non-null.
   if (other._data) {
     _data.reset(new _Data(*other._data));
@@ -40,8 +41,10 @@ PcpDynamicFileFormatDependencyData::PcpDynamicFileFormatDependencyData(
 
 void PcpDynamicFileFormatDependencyData::AddDependencyContext(
     const PcpDynamicFileFormatInterface *dynamicFileFormat,
-    VtValue &&dependencyContextData, TfToken::Set &&composedFieldNames,
-    TfToken::Set &&composedAttributeNames) {
+    VtValue &&dependencyContextData,
+    TfToken::Set &&composedFieldNames,
+    TfToken::Set &&composedAttributeNames)
+{
   // Create the data now if it was empty before this call..
   if (!_data) {
     _data.reset(new _Data());
@@ -49,14 +52,14 @@ void PcpDynamicFileFormatDependencyData::AddDependencyContext(
 
   // Add file format and context data to the list and update the list of
   // relevant fields.
-  _data->dependencyContexts.emplace_back(dynamicFileFormat,
-                                         std::move(dependencyContextData));
+  _data->dependencyContexts.emplace_back(dynamicFileFormat, std::move(dependencyContextData));
   _data->_AddRelevantFieldNames(std::move(composedFieldNames));
   _data->_AddRelevantAttributeNames(std::move(composedAttributeNames));
 }
 
 void PcpDynamicFileFormatDependencyData::AppendDependencyData(
-    PcpDynamicFileFormatDependencyData &&dependencyData) {
+    PcpDynamicFileFormatDependencyData &&dependencyData)
+{
   if (!dependencyData._data) {
     return;
   }
@@ -64,24 +67,21 @@ void PcpDynamicFileFormatDependencyData::AppendDependencyData(
   // the other dependency data wholesale.
   if (_data) {
     // Take each context from the other data and add it to ours.
-    for (_Data::_ContextData &contextData :
-         dependencyData._data->dependencyContexts) {
+    for (_Data::_ContextData &contextData : dependencyData._data->dependencyContexts) {
       _data->dependencyContexts.emplace_back(std::move(contextData));
     }
     // Add the other data's relevants fields to ours as well.
-    _data->_AddRelevantFieldNames(
-        std::move(dependencyData._data->relevantFieldNames));
-    _data->_AddRelevantAttributeNames(
-        std::move(dependencyData._data->relevantAttributeNames));
-  } else {
+    _data->_AddRelevantFieldNames(std::move(dependencyData._data->relevantFieldNames));
+    _data->_AddRelevantAttributeNames(std::move(dependencyData._data->relevantAttributeNames));
+  }
+  else {
     Swap(dependencyData);
   }
 }
 
-bool PcpDynamicFileFormatDependencyData::
-    CanFieldChangeAffectFileFormatArguments(const TfToken &fieldName,
-                                            const VtValue &oldValue,
-                                            const VtValue &newValue) const {
+bool PcpDynamicFileFormatDependencyData::CanFieldChangeAffectFileFormatArguments(
+    const TfToken &fieldName, const VtValue &oldValue, const VtValue &newValue) const
+{
   if (!_data) {
     return false;
   }
@@ -102,17 +102,17 @@ bool PcpDynamicFileFormatDependencyData::
     // Return true if any context's file format can be affect by this
     // field change.
     if (contextData.first->CanFieldChangeAffectFileFormatArguments(
-            fieldName, oldValue, newValue, contextData.second)) {
+            fieldName, oldValue, newValue, contextData.second))
+    {
       return true;
     }
   }
   return false;
 }
 
-bool PcpDynamicFileFormatDependencyData::
-    CanAttributeDefaultValueChangeAffectFileFormatArguments(
-        const TfToken &attributeName, const VtValue &oldValue,
-        const VtValue &newValue) const {
+bool PcpDynamicFileFormatDependencyData::CanAttributeDefaultValueChangeAffectFileFormatArguments(
+    const TfToken &attributeName, const VtValue &oldValue, const VtValue &newValue) const
+{
   if (!_data) {
     return false;
   }
@@ -132,47 +132,49 @@ bool PcpDynamicFileFormatDependencyData::
 
     // Return true if any context's file format can be affect by this
     // field change.
-    if (contextData.first
-            ->CanAttributeDefaultValueChangeAffectFileFormatArguments(
-                attributeName, oldValue, newValue, contextData.second)) {
+    if (contextData.first->CanAttributeDefaultValueChangeAffectFileFormatArguments(
+            attributeName, oldValue, newValue, contextData.second))
+    {
       return true;
     }
   }
   return false;
 }
 
-const TfToken::Set &
-PcpDynamicFileFormatDependencyData::GetRelevantFieldNames() const {
+const TfToken::Set &PcpDynamicFileFormatDependencyData::GetRelevantFieldNames() const
+{
   static const TfToken::Set empty;
   return _data ? _data->relevantFieldNames : empty;
 }
 
-const TfToken::Set &
-PcpDynamicFileFormatDependencyData::GetRelevantAttributeNames() const {
+const TfToken::Set &PcpDynamicFileFormatDependencyData::GetRelevantAttributeNames() const
+{
   static const TfToken::Set empty;
   return _data ? _data->relevantAttributeNames : empty;
 }
 
-void PcpDynamicFileFormatDependencyData::_Data::_AddRelevantFieldNames(
-    TfToken::Set &&fieldNames) {
+void PcpDynamicFileFormatDependencyData::_Data::_AddRelevantFieldNames(TfToken::Set &&fieldNames)
+{
   // Avoid copying if our current relevant fields list is empty.
   if (relevantFieldNames.empty()) {
     relevantFieldNames.swap(fieldNames);
-  } else {
+  }
+  else {
     relevantFieldNames.insert(std::make_move_iterator(fieldNames.begin()),
                               std::make_move_iterator(fieldNames.end()));
   }
 }
 
 void PcpDynamicFileFormatDependencyData::_Data::_AddRelevantAttributeNames(
-    TfToken::Set &&attributeNames) {
+    TfToken::Set &&attributeNames)
+{
   // Avoid copying if our current relevant fields list is empty.
   if (relevantAttributeNames.empty()) {
     relevantAttributeNames.swap(attributeNames);
-  } else {
-    relevantAttributeNames.insert(
-        std::make_move_iterator(attributeNames.begin()),
-        std::make_move_iterator(attributeNames.end()));
+  }
+  else {
+    relevantAttributeNames.insert(std::make_move_iterator(attributeNames.begin()),
+                                  std::make_move_iterator(attributeNames.end()));
   }
 }
 

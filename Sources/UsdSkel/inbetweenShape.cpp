@@ -21,33 +21,28 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdSkel/inbetweenShape.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((inbetweensPrefix, "inbetweens:"))((normalOffsetsSuffix, ":normalOffsets")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((inbetweensPrefix, "inbetweens:"))((normalOffsetsSuffix,
+                                                              ":normalOffsets")));
 
-UsdSkelInbetweenShape::UsdSkelInbetweenShape(const UsdAttribute &attr)
-    : _attr(attr)
-{
-}
+UsdSkelInbetweenShape::UsdSkelInbetweenShape(const UsdAttribute &attr) : _attr(attr) {}
 
 /* static */
-UsdSkelInbetweenShape
-UsdSkelInbetweenShape::_Create(const UsdPrim &prim, const TfToken &name)
+UsdSkelInbetweenShape UsdSkelInbetweenShape::_Create(const UsdPrim &prim, const TfToken &name)
 {
-  if (TF_VERIFY(prim))
-  {
+  if (TF_VERIFY(prim)) {
     TfToken attrName = _MakeNamespaced(name);
 
-    if (!attrName.IsEmpty())
-    {
-      return UsdSkelInbetweenShape(
-          prim.CreateAttribute(attrName, SdfValueTypeNames->Point3fArray,
-                               /*custom*/ false, SdfVariabilityUniform));
+    if (!attrName.IsEmpty()) {
+      return UsdSkelInbetweenShape(prim.CreateAttribute(attrName,
+                                                        SdfValueTypeNames->Point3fArray,
+                                                        /*custom*/ false,
+                                                        SdfVariabilityUniform));
     }
   }
   return UsdSkelInbetweenShape();
@@ -60,8 +55,7 @@ bool UsdSkelInbetweenShape::IsInbetween(const UsdAttribute &attr)
 }
 
 /* static */
-bool UsdSkelInbetweenShape::_IsValidInbetweenName(const std::string &name,
-                                                  bool quiet)
+bool UsdSkelInbetweenShape::_IsValidInbetweenName(const std::string &name, bool quiet)
 {
   // All properly namespaced attributes are legal inbetweens.
   // We do, however, need to exclude extra properties that apply
@@ -78,18 +72,14 @@ bool UsdSkelInbetweenShape::_IsNamespaced(const TfToken &name)
 }
 
 /* static */
-TfToken
-UsdSkelInbetweenShape::_MakeNamespaced(const TfToken &name, bool quiet)
+TfToken UsdSkelInbetweenShape::_MakeNamespaced(const TfToken &name, bool quiet)
 {
   TfToken result;
-  if (_IsNamespaced(name))
-  {
+  if (_IsNamespaced(name)) {
     result = name;
   }
-  else
-  {
-    result = TfToken(_tokens->inbetweensPrefix.GetString() +
-                     name.GetString());
+  else {
+    result = TfToken(_tokens->inbetweensPrefix.GetString() + name.GetString());
   }
 
   // XXX: All properly namespaced attributes are legal inbetweens.
@@ -97,51 +87,43 @@ UsdSkelInbetweenShape::_MakeNamespaced(const TfToken &name, bool quiet)
   // -- such as a namespaced pointIndices attr on each shape -- then
   // we must validate that the name does not conflict with those.
 
-  if (!_IsValidInbetweenName(result, quiet))
-  {
+  if (!_IsValidInbetweenName(result, quiet)) {
     result = TfToken();
   }
   return result;
 }
 
 /* static */
-const TfToken &
-UsdSkelInbetweenShape::_GetNamespacePrefix()
+const TfToken &UsdSkelInbetweenShape::_GetNamespacePrefix()
 {
   return _tokens->inbetweensPrefix;
 }
 
-UsdAttribute
-UsdSkelInbetweenShape::_GetNormalOffsetsAttr(bool create) const
+UsdAttribute UsdSkelInbetweenShape::_GetNormalOffsetsAttr(bool create) const
 {
   const TfToken normalOffsetsName(_attr.GetName().GetString() +
                                   _tokens->normalOffsetsSuffix.GetString());
 
-  if (!create)
-  {
+  if (!create) {
     return _attr.GetPrim().GetAttribute(normalOffsetsName);
   }
-  else
-  {
-    return _attr.GetPrim().CreateAttribute(
-        normalOffsetsName, SdfValueTypeNames->Vector3fArray,
-        /*custom*/ false, SdfVariabilityVarying);
+  else {
+    return _attr.GetPrim().CreateAttribute(normalOffsetsName,
+                                           SdfValueTypeNames->Vector3fArray,
+                                           /*custom*/ false,
+                                           SdfVariabilityVarying);
   }
 }
 
-UsdAttribute
-UsdSkelInbetweenShape::GetNormalOffsetsAttr() const
+UsdAttribute UsdSkelInbetweenShape::GetNormalOffsetsAttr() const
 {
   return _GetNormalOffsetsAttr(/*create*/ false);
 }
 
-UsdAttribute
-UsdSkelInbetweenShape::CreateNormalOffsetsAttr(
-    const VtValue &defaultValue) const
+UsdAttribute UsdSkelInbetweenShape::CreateNormalOffsetsAttr(const VtValue &defaultValue) const
 {
   const UsdAttribute attr = _GetNormalOffsetsAttr(/*create*/ true);
-  if (attr && !defaultValue.IsEmpty())
-  {
+  if (attr && !defaultValue.IsEmpty()) {
     attr.Set(defaultValue);
   }
   return attr;
@@ -174,8 +156,7 @@ bool UsdSkelInbetweenShape::SetOffsets(const VtVec3fArray &offsets) const
 
 bool UsdSkelInbetweenShape::GetNormalOffsets(VtVec3fArray *offsets) const
 {
-  if (const UsdAttribute attr = GetNormalOffsetsAttr())
-  {
+  if (const UsdAttribute attr = GetNormalOffsetsAttr()) {
     return attr.Get(offsets);
   }
   return false;
@@ -183,8 +164,7 @@ bool UsdSkelInbetweenShape::GetNormalOffsets(VtVec3fArray *offsets) const
 
 bool UsdSkelInbetweenShape::SetNormalOffsets(const VtVec3fArray &offsets) const
 {
-  if (const UsdAttribute attr = _GetNormalOffsetsAttr(/*create*/ true))
-  {
+  if (const UsdAttribute attr = _GetNormalOffsetsAttr(/*create*/ true)) {
     return attr.Set(offsets);
   }
   return false;

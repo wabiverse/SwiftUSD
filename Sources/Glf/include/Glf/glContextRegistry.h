@@ -26,9 +26,9 @@
 
 /// \file glf/glContextRegistry.h
 
-#include <pxr/pxrns.h>
 #include "Glf/glContext.h"
 #include "Tf/singleton.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 #include <vector>
@@ -43,9 +43,8 @@ typedef std::shared_ptr<class GlfGLContext> GlfGLContextSharedPtr;
 ///
 /// Registry of GlfGLContexts.
 ///
-class GlfGLContextRegistry
-{
-public:
+class GlfGLContextRegistry {
+ public:
   static GlfGLContextRegistry &GetInstance()
   {
     return TfSingleton<GlfGLContextRegistry>::GetInstance();
@@ -70,7 +69,7 @@ public:
   /// Removes the context.
   void Remove(const GlfGLContext *context);
 
-private:
+ private:
   GlfGLContextRegistry();
   ~GlfGLContextRegistry();
 
@@ -80,7 +79,7 @@ private:
 
   friend class TfSingleton<GlfGLContextRegistry>;
 
-private:
+ private:
   std::vector<std::unique_ptr<GlfGLContextRegistrationInterface>> _interfaces;
   bool _sharedContextInitialized;
   GlfGLContextSharedPtr _shared;
@@ -89,4 +88,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GLF_GL_CONTEXT_REGISTRY_H
+#endif  // PXR_IMAGING_GLF_GL_CONTEXT_REGISTRY_H

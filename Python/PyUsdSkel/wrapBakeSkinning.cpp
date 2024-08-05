@@ -35,9 +35,11 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapUsdSkelBakeSkinning()
 {
-  def("BakeSkinning", ((bool (*)(const UsdSkelRoot &, const GfInterval &)) & UsdSkelBakeSkinning),
+  def("BakeSkinning",
+      ((bool (*)(const UsdSkelRoot &, const GfInterval &)) & UsdSkelBakeSkinning),
       (arg("root"), arg("interval") = GfInterval::GetFullInterval()));
 
-  def("BakeSkinning", ((bool (*)(const UsdPrimRange &, const GfInterval &)) & UsdSkelBakeSkinning),
+  def("BakeSkinning",
+      ((bool (*)(const UsdPrimRange &, const GfInterval &)) & UsdSkelBakeSkinning),
       (arg("range"), arg("interval") = GfInterval::GetFullInterval()));
 }

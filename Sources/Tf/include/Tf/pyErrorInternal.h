@@ -43,7 +43,7 @@ TF_API void Tf_PySetErrorExceptionClass(boost::python::object const &cls);
 /// RAII class to save and restore the Python exception state.  The client
 /// must hold the GIL during all methods, including the c'tor and d'tor.
 class TfPyExceptionStateScope {
-public:
+ public:
   // Save the current exception state but don't unset it.
   TF_API TfPyExceptionStateScope();
   TfPyExceptionStateScope(const TfPyExceptionStateScope &) = delete;
@@ -53,15 +53,18 @@ public:
   TF_API ~TfPyExceptionStateScope();
 
   // Return a reference to the held TfPyExceptionState.
-  TfPyExceptionState const &Get() const { return _state; }
+  TfPyExceptionState const &Get() const
+  {
+    return _state;
+  }
 
   // Restore the exception state as it was in the c'tor.
   TF_API void Restore();
 
-private:
+ private:
   TfPyExceptionState _state;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_ERROR_INTERNAL_H
+#endif  // PXR_BASE_TF_PY_ERROR_INTERNAL_H

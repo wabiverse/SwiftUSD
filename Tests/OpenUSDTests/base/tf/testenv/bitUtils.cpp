@@ -22,17 +22,16 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/bitUtils.h"
 #include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 #include "Arch/defines.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-enum _TestEnum
-{
+enum _TestEnum {
   Test0,
   Test1,
   Test2,
@@ -57,8 +56,7 @@ enum _TestEnum
   Test65537 = 65537,
 };
 
-static bool
-TestTF_BITS_FOR_VALUES()
+static bool TestTF_BITS_FOR_VALUES()
 {
   TF_AXIOM(TF_BITS_FOR_VALUES(Test1) == 1);
   TF_AXIOM(TF_BITS_FOR_VALUES(Test2) == 1);
@@ -237,8 +235,7 @@ TestTF_BITS_FOR_VALUES()
   return true;
 }
 
-static bool
-Test_TfBitUtils()
+static bool Test_TfBitUtils()
 {
   return TestTF_BITS_FOR_VALUES();
 }

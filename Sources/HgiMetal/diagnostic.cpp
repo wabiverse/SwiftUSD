@@ -37,11 +37,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HGIMETAL_DEBUG, 0,
-                      "Enable Metal debugging for HgiMetal");
+TF_DEFINE_ENV_SETTING(HGIMETAL_DEBUG, 0, "Enable Metal debugging for HgiMetal");
 
-TF_DEBUG_CODES(
-    HGIMETAL_DEBUG_ERROR_STACKTRACE);
+TF_DEBUG_CODES(HGIMETAL_DEBUG_ERROR_STACKTRACE);
 
 TF_REGISTRY_FUNCTION(TfDebug)
 {
@@ -55,9 +53,7 @@ bool HgiMetalDebugEnabled()
   return _v;
 }
 
-void HgiMetalPostPendingMetalErrors(std::string const &where)
-{
-}
+void HgiMetalPostPendingMetalErrors(std::string const &where) {}
 
 void HgiMetalSetupMetalDebug()
 {

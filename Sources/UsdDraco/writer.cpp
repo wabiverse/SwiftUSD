@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include "UsdDraco/writer.h"
 #include "UsdDraco/exportTranslator.h"
 #include "UsdDraco/flag.h"
-#include "UsdDraco/writer.h"
 
 #include <pxr/pxrns.h>
 
@@ -50,12 +50,12 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
   // Translate USD mesh to Draco mesh.
   draco::Mesh dracoMesh;
   bool success = UsdDracoExportTranslator::Translate(
-      usdMesh, &dracoMesh,
+      usdMesh,
+      &dracoMesh,
       UsdDracoFlag<bool>::MakeBooleanFlag(preservePolygons),
       UsdDracoFlag<bool>::MakeBooleanFlag(preservePositionOrder),
       UsdDracoFlag<bool>::MakeBooleanFlag(preserveHoles));
-  if (!success)
-  {
+  if (!success) {
     std::cout << "Could not translate USD mesh to Draco mesh." << std::endl;
     return false;
   }
@@ -65,27 +65,22 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
   draco::Encoder encoder;
   encoder.SetEncodingMethod(draco::MESH_EDGEBREAKER_ENCODING);
   if (qp != 0)
-    encoder.SetAttributeQuantization(draco::GeometryAttribute::POSITION,
-                                     qp);
+    encoder.SetAttributeQuantization(draco::GeometryAttribute::POSITION, qp);
   if (qt != 0)
-    encoder.SetAttributeQuantization(draco::GeometryAttribute::TEX_COORD,
-                                     qt);
+    encoder.SetAttributeQuantization(draco::GeometryAttribute::TEX_COORD, qt);
   if (qn != 0)
-    encoder.SetAttributeQuantization(draco::GeometryAttribute::NORMAL,
-                                     qn);
+    encoder.SetAttributeQuantization(draco::GeometryAttribute::NORMAL, qn);
 
   const int speed = 10 - cl;
   encoder.SetSpeedOptions(speed, speed);
-  if (!encoder.EncodeMeshToBuffer(dracoMesh, &buffer).ok())
-  {
+  if (!encoder.EncodeMeshToBuffer(dracoMesh, &buffer).ok()) {
     std::cout << "Could not encode mesh." << std::endl;
     return false;
   }
 
   // Write encoded Draco mesh to file.
   std::ofstream fout(fileName.c_str(), std::ios::binary);
-  if (!fout.is_open())
-  {
+  if (!fout.is_open()) {
     std::cout << "Failed to open file " << fileName << std::endl;
     return false;
   }
@@ -96,8 +91,7 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
 
 bool UsdDraco_PrimvarSupported(const UsdGeomPrimvar &primvar)
 {
-  return UsdDracoExportTranslator::CreateAttributeFrom(
-             primvar) != nullptr;
+  return UsdDracoExportTranslator::CreateAttributeFrom(primvar) != nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

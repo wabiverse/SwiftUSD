@@ -33,141 +33,117 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDSPLITDIOPTER_SCHEMA_TOKENS \
-    (splitDiopter) \
-    (count) \
-    (angle) \
-    (offset1) \
-    (width1) \
-    (focusDistance1) \
-    (offset2) \
-    (width2) \
-    (focusDistance2) \
+  (splitDiopter)(count)(angle)(offset1)(width1)(focusDistance1)(offset2)(width2)(focusDistance2)
 
-TF_DECLARE_PUBLIC_TOKENS(HdSplitDiopterSchemaTokens, HD_API,
-    HDSPLITDIOPTER_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSplitDiopterSchemaTokens, HD_API, HDSPLITDIOPTER_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdSplitDiopterSchema : public HdSchema
-{
-public:
-    HdSplitDiopterSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdSplitDiopterSchema : public HdSchema {
+ public:
+  HdSplitDiopterSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
-    HD_API
-    HdIntDataSourceHandle GetCount();
-    HD_API
-    HdFloatDataSourceHandle GetAngle();
-    HD_API
-    HdFloatDataSourceHandle GetOffset1();
-    HD_API
-    HdFloatDataSourceHandle GetWidth1();
-    HD_API
-    HdFloatDataSourceHandle GetFocusDistance1();
-    HD_API
-    HdFloatDataSourceHandle GetOffset2();
-    HD_API
-    HdFloatDataSourceHandle GetWidth2();
-    HD_API
-    HdFloatDataSourceHandle GetFocusDistance2();
+  HD_API
+  HdIntDataSourceHandle GetCount();
+  HD_API
+  HdFloatDataSourceHandle GetAngle();
+  HD_API
+  HdFloatDataSourceHandle GetOffset1();
+  HD_API
+  HdFloatDataSourceHandle GetWidth1();
+  HD_API
+  HdFloatDataSourceHandle GetFocusDistance1();
+  HD_API
+  HdFloatDataSourceHandle GetOffset2();
+  HD_API
+  HdFloatDataSourceHandle GetWidth2();
+  HD_API
+  HdFloatDataSourceHandle GetFocusDistance2();
 
-    // RETRIEVING AND CONSTRUCTING
+  // RETRIEVING AND CONSTRUCTING
 
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdIntDataSourceHandle &count,
+                                                   const HdFloatDataSourceHandle &angle,
+                                                   const HdFloatDataSourceHandle &offset1,
+                                                   const HdFloatDataSourceHandle &width1,
+                                                   const HdFloatDataSourceHandle &focusDistance1,
+                                                   const HdFloatDataSourceHandle &offset2,
+                                                   const HdFloatDataSourceHandle &width2,
+                                                   const HdFloatDataSourceHandle &focusDistance2);
+
+  /// \class HdSplitDiopterSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdIntDataSourceHandle &count,
-        const HdFloatDataSourceHandle &angle,
-        const HdFloatDataSourceHandle &offset1,
-        const HdFloatDataSourceHandle &width1,
-        const HdFloatDataSourceHandle &focusDistance1,
-        const HdFloatDataSourceHandle &offset2,
-        const HdFloatDataSourceHandle &width2,
-        const HdFloatDataSourceHandle &focusDistance2
-    );
-
-    /// \class HdSplitDiopterSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetCount(
-            const HdIntDataSourceHandle &count);
-        HD_API
-        Builder &SetAngle(
-            const HdFloatDataSourceHandle &angle);
-        HD_API
-        Builder &SetOffset1(
-            const HdFloatDataSourceHandle &offset1);
-        HD_API
-        Builder &SetWidth1(
-            const HdFloatDataSourceHandle &width1);
-        HD_API
-        Builder &SetFocusDistance1(
-            const HdFloatDataSourceHandle &focusDistance1);
-        HD_API
-        Builder &SetOffset2(
-            const HdFloatDataSourceHandle &offset2);
-        HD_API
-        Builder &SetWidth2(
-            const HdFloatDataSourceHandle &width2);
-        HD_API
-        Builder &SetFocusDistance2(
-            const HdFloatDataSourceHandle &focusDistance2);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdIntDataSourceHandle _count;
-        HdFloatDataSourceHandle _angle;
-        HdFloatDataSourceHandle _offset1;
-        HdFloatDataSourceHandle _width1;
-        HdFloatDataSourceHandle _focusDistance1;
-        HdFloatDataSourceHandle _offset2;
-        HdFloatDataSourceHandle _width2;
-        HdFloatDataSourceHandle _focusDistance2;
-    };
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "splitDiopter" from the parent container and constructs a
-    /// HdSplitDiopterSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+    Builder &SetCount(const HdIntDataSourceHandle &count);
     HD_API
-    static HdSplitDiopterSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
+    Builder &SetAngle(const HdFloatDataSourceHandle &angle);
     HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
+    Builder &SetOffset1(const HdFloatDataSourceHandle &offset1);
     HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+    Builder &SetWidth1(const HdFloatDataSourceHandle &width1);
+    HD_API
+    Builder &SetFocusDistance1(const HdFloatDataSourceHandle &focusDistance1);
+    HD_API
+    Builder &SetOffset2(const HdFloatDataSourceHandle &offset2);
+    HD_API
+    Builder &SetWidth2(const HdFloatDataSourceHandle &width2);
+    HD_API
+    Builder &SetFocusDistance2(const HdFloatDataSourceHandle &focusDistance2);
 
+    /// Returns a container data source containing the members set thus far.
+    HD_API
+    HdContainerDataSourceHandle Build();
+
+   private:
+    HdIntDataSourceHandle _count;
+    HdFloatDataSourceHandle _angle;
+    HdFloatDataSourceHandle _offset1;
+    HdFloatDataSourceHandle _width1;
+    HdFloatDataSourceHandle _focusDistance1;
+    HdFloatDataSourceHandle _offset2;
+    HdFloatDataSourceHandle _width2;
+    HdFloatDataSourceHandle _focusDistance2;
+  };
+
+  /// Retrieves a container data source with the schema's default name token
+  /// "splitDiopter" from the parent container and constructs a
+  /// HdSplitDiopterSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdSplitDiopterSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
+
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

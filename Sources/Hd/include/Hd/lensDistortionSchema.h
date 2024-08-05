@@ -33,152 +33,125 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDLENSDISTORTION_SCHEMA_TOKENS \
-    (lensDistortion) \
-    (type) \
-    (k1) \
-    (k2) \
-    (center) \
-    (anaSq) \
-    (asym) \
-    (scale) \
-    (ior) \
-    (standard) \
-    (fisheye) \
+  (lensDistortion)(type)(k1)(k2)(center)(anaSq)(asym)(scale)(ior)(standard)(fisheye)
 
-TF_DECLARE_PUBLIC_TOKENS(HdLensDistortionSchemaTokens, HD_API,
-    HDLENSDISTORTION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLensDistortionSchemaTokens, HD_API, HDLENSDISTORTION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdLensDistortionSchema : public HdSchema
-{
-public:
-    HdLensDistortionSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdLensDistortionSchema : public HdSchema {
+ public:
+  HdLensDistortionSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
-    HD_API
-    HdTokenDataSourceHandle GetType();
-    HD_API
-    HdFloatDataSourceHandle GetK1();
-    HD_API
-    HdFloatDataSourceHandle GetK2();
-    HD_API
-    HdVec2fDataSourceHandle GetCenter();
-    HD_API
-    HdFloatDataSourceHandle GetAnaSq();
-    HD_API
-    HdVec2fDataSourceHandle GetAsym();
-    HD_API
-    HdFloatDataSourceHandle GetScale();
-    HD_API
-    HdFloatDataSourceHandle GetIor();
+  HD_API
+  HdTokenDataSourceHandle GetType();
+  HD_API
+  HdFloatDataSourceHandle GetK1();
+  HD_API
+  HdFloatDataSourceHandle GetK2();
+  HD_API
+  HdVec2fDataSourceHandle GetCenter();
+  HD_API
+  HdFloatDataSourceHandle GetAnaSq();
+  HD_API
+  HdVec2fDataSourceHandle GetAsym();
+  HD_API
+  HdFloatDataSourceHandle GetScale();
+  HD_API
+  HdFloatDataSourceHandle GetIor();
 
-    // RETRIEVING AND CONSTRUCTING
+  // RETRIEVING AND CONSTRUCTING
 
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &type,
+                                                   const HdFloatDataSourceHandle &k1,
+                                                   const HdFloatDataSourceHandle &k2,
+                                                   const HdVec2fDataSourceHandle &center,
+                                                   const HdFloatDataSourceHandle &anaSq,
+                                                   const HdVec2fDataSourceHandle &asym,
+                                                   const HdFloatDataSourceHandle &scale,
+                                                   const HdFloatDataSourceHandle &ior);
+
+  /// \class HdLensDistortionSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &type,
-        const HdFloatDataSourceHandle &k1,
-        const HdFloatDataSourceHandle &k2,
-        const HdVec2fDataSourceHandle &center,
-        const HdFloatDataSourceHandle &anaSq,
-        const HdVec2fDataSourceHandle &asym,
-        const HdFloatDataSourceHandle &scale,
-        const HdFloatDataSourceHandle &ior
-    );
-
-    /// \class HdLensDistortionSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetType(
-            const HdTokenDataSourceHandle &type);
-        HD_API
-        Builder &SetK1(
-            const HdFloatDataSourceHandle &k1);
-        HD_API
-        Builder &SetK2(
-            const HdFloatDataSourceHandle &k2);
-        HD_API
-        Builder &SetCenter(
-            const HdVec2fDataSourceHandle &center);
-        HD_API
-        Builder &SetAnaSq(
-            const HdFloatDataSourceHandle &anaSq);
-        HD_API
-        Builder &SetAsym(
-            const HdVec2fDataSourceHandle &asym);
-        HD_API
-        Builder &SetScale(
-            const HdFloatDataSourceHandle &scale);
-        HD_API
-        Builder &SetIor(
-            const HdFloatDataSourceHandle &ior);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _type;
-        HdFloatDataSourceHandle _k1;
-        HdFloatDataSourceHandle _k2;
-        HdVec2fDataSourceHandle _center;
-        HdFloatDataSourceHandle _anaSq;
-        HdVec2fDataSourceHandle _asym;
-        HdFloatDataSourceHandle _scale;
-        HdFloatDataSourceHandle _ior;
-    };
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "lensDistortion" from the parent container and constructs a
-    /// HdLensDistortionSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+    Builder &SetType(const HdTokenDataSourceHandle &type);
     HD_API
-    static HdLensDistortionSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
+    Builder &SetK1(const HdFloatDataSourceHandle &k1);
     HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
+    Builder &SetK2(const HdFloatDataSourceHandle &k2);
     HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-    /// Returns token data source for use as type value.
-    /// Values of...
-    /// - HdLensDistortionSchemaTokens->standard
-    /// - HdLensDistortionSchemaTokens->fisheye
-    ///     ...will be stored statically and reused for future calls.
+    Builder &SetCenter(const HdVec2fDataSourceHandle &center);
     HD_API
-    static HdTokenDataSourceHandle BuildTypeDataSource(
-        const TfToken &type);
+    Builder &SetAnaSq(const HdFloatDataSourceHandle &anaSq);
+    HD_API
+    Builder &SetAsym(const HdVec2fDataSourceHandle &asym);
+    HD_API
+    Builder &SetScale(const HdFloatDataSourceHandle &scale);
+    HD_API
+    Builder &SetIor(const HdFloatDataSourceHandle &ior);
 
+    /// Returns a container data source containing the members set thus far.
+    HD_API
+    HdContainerDataSourceHandle Build();
+
+   private:
+    HdTokenDataSourceHandle _type;
+    HdFloatDataSourceHandle _k1;
+    HdFloatDataSourceHandle _k2;
+    HdVec2fDataSourceHandle _center;
+    HdFloatDataSourceHandle _anaSq;
+    HdVec2fDataSourceHandle _asym;
+    HdFloatDataSourceHandle _scale;
+    HdFloatDataSourceHandle _ior;
+  };
+
+  /// Retrieves a container data source with the schema's default name token
+  /// "lensDistortion" from the parent container and constructs a
+  /// HdLensDistortionSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdLensDistortionSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
+
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
+
+  /// Returns token data source for use as type value.
+  /// Values of...
+  /// - HdLensDistortionSchemaTokens->standard
+  /// - HdLensDistortionSchemaTokens->fisheye
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildTypeDataSource(const TfToken &type);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

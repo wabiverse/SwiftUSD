@@ -26,17 +26,17 @@
 
 /// \file usdRender/denoisePass.h
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdRender/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -62,9 +62,8 @@ class SdfAssetPath;
 /// that inherit from RenderDenoisePass.
 ///
 ///
-class UsdRenderDenoisePass : public UsdTyped
-{
-public:
+class UsdRenderDenoisePass : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -74,18 +73,12 @@ public:
   /// Equivalent to UsdRenderDenoisePass::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRenderDenoisePass(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdRenderDenoisePass(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdRenderDenoisePass on the prim held by \p schemaObj .
   /// Should be preferred over UsdRenderDenoisePass(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRenderDenoisePass(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdRenderDenoisePass(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDRENDER_API
@@ -95,8 +88,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRENDER_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRenderDenoisePass holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -108,8 +100,7 @@ public:
   /// \endcode
   ///
   USDRENDER_API
-  static UsdRenderDenoisePass
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderDenoisePass Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -134,17 +125,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDRENDER_API
-  static UsdRenderDenoisePass
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderDenoisePass Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRENDER_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRENDER_API
@@ -156,7 +146,7 @@ private:
   USDRENDER_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

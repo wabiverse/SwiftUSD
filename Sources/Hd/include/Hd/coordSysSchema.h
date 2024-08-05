@@ -33,85 +33,73 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDCOORDSYS_SCHEMA_TOKENS \
-    (coordSys) \
-    (name) \
+#define HDCOORDSYS_SCHEMA_TOKENS (coordSys)(name)
 
-TF_DECLARE_PUBLIC_TOKENS(HdCoordSysSchemaTokens, HD_API,
-    HDCOORDSYS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCoordSysSchemaTokens, HD_API, HDCOORDSYS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdCoordSysSchema : public HdSchema
-{
-public:
-    HdCoordSysSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdCoordSysSchema : public HdSchema {
+ public:
+  HdCoordSysSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetName();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &name);
+
+  /// \class HdCoordSysSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetName();
+    Builder &SetName(const HdTokenDataSourceHandle &name);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &name
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdCoordSysSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetName(
-            const HdTokenDataSourceHandle &name);
+   private:
+    HdTokenDataSourceHandle _name;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "coordSys" from the parent container and constructs a
+  /// HdCoordSysSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdCoordSysSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdTokenDataSourceHandle _name;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "coordSys" from the parent container and constructs a
-    /// HdCoordSysSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdCoordSysSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -11,4 +11,4 @@
 #include <UsdRi/tokens.h>
 #include <UsdRi/typeUtils.h>
 
-#endif // __PXR_USD_USDRI_H__
+#endif  // __PXR_USD_USDRI_H__

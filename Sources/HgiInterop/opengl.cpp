@@ -23,15 +23,15 @@
 //
 #if !PXR_METAL_SUPPORT_ENABLED && !PXR_VULKAN_SUPPORT_ENABLED
 
-#include "Garch/glApi.h"
+#  include "Garch/glApi.h"
 
-#include <pxr/pxrns.h>
-#include "Hgi/hgiImpl.h"
-#include "Hgi/texture.h"
-#include "HgiInterop/opengl.h"
-#include "Vt/value.h"
+#  include "Hgi/hgiImpl.h"
+#  include "Hgi/texture.h"
+#  include "HgiInterop/opengl.h"
+#  include "Vt/value.h"
+#  include <pxr/pxrns.h>
 
-#include "Tf/diagnostic.h"
+#  include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -67,8 +67,7 @@ static const char *_fragmentDepthFullscreen =
     "    gl_FragDepth = depth;\n"
     "}\n";
 
-static uint32_t
-_CompileShader(const char *src, GLenum stage)
+static uint32_t _CompileShader(const char *src, GLenum stage)
 {
   uint32_t shaderId = glCreateShader(stage);
   glShaderSource(shaderId, 1, &src, nullptr);
@@ -79,8 +78,7 @@ _CompileShader(const char *src, GLenum stage)
   return shaderId;
 }
 
-static uint32_t
-_LinkProgram(uint32_t vs, uint32_t fs)
+static uint32_t _LinkProgram(uint32_t vs, uint32_t fs)
 {
   uint32_t programId = glCreateProgram();
   glAttachShader(programId, vs);
@@ -92,14 +90,27 @@ _LinkProgram(uint32_t vs, uint32_t fs)
   return programId;
 }
 
-static uint32_t
-_CreateVertexBuffer()
+static uint32_t _CreateVertexBuffer()
 {
-  static const float vertices[] = {
-      /* position        uv */
-      -1, 3, -1, 1, 0, 2,
-      -1, -1, -1, 1, 0, 0,
-      3, -1, -1, 1, 2, 0};
+  static const float vertices[] = {/* position        uv */
+                                   -1,
+                                   3,
+                                   -1,
+                                   1,
+                                   0,
+                                   2,
+                                   -1,
+                                   -1,
+                                   -1,
+                                   1,
+                                   0,
+                                   0,
+                                   3,
+                                   -1,
+                                   -1,
+                                   1,
+                                   2,
+                                   0};
   uint32_t vertexBuffer = 0;
   glGenBuffers(1, &vertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -131,14 +142,12 @@ HgiInteropOpenGL::~HgiInteropOpenGL()
   TF_VERIFY(glGetError() == GL_NO_ERROR);
 }
 
-void HgiInteropOpenGL::CompositeToInterop(
-    HgiTextureHandle const &color,
-    HgiTextureHandle const &depth,
-    VtValue const &framebuffer,
-    GfVec4i const &compRegion)
+void HgiInteropOpenGL::CompositeToInterop(HgiTextureHandle const &color,
+                                          HgiTextureHandle const &depth,
+                                          VtValue const &framebuffer,
+                                          GfVec4i const &compRegion)
 {
-  if (!ARCH_UNLIKELY(color))
-  {
+  if (!ARCH_UNLIKELY(color)) {
     TF_WARN("No valid color texture provided");
     return;
   }
@@ -146,41 +155,33 @@ void HgiInteropOpenGL::CompositeToInterop(
   // Verify there were no gl errors coming in.
   TF_VERIFY(glGetError() == GL_NO_ERROR);
 
-  if (!ARCH_UNLIKELY(color))
-  {
+  if (!ARCH_UNLIKELY(color)) {
     TF_CODING_ERROR("A valid color texture handle is required.\n");
     return;
   }
 
   const GLuint colorName = static_cast<GLuint>(color->GetRawResource());
-  if (!glIsTexture(colorName))
-  {
+  if (!glIsTexture(colorName)) {
     TF_CODING_ERROR(
         "Hgi color texture handle is not holding a valid OpenGL "
         "texture.");
     return;
   }
 
-#if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+#  if defined(GL_KHR_debug)
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, -1, "Interop");
   }
-#endif
+#  endif
 
   // When no destination framebuffer is specified, composite into
   // the currently bound framebuffer.
-  if (!framebuffer.IsEmpty())
-  {
-    if (framebuffer.IsHolding<uint32_t>())
-    {
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
-                        framebuffer.UncheckedGet<uint32_t>());
+  if (!framebuffer.IsEmpty()) {
+    if (framebuffer.IsHolding<uint32_t>()) {
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer.UncheckedGet<uint32_t>());
     }
-    else
-    {
-      TF_CODING_ERROR(
-          "dstFramebuffer must hold uint32_t when targeting OpenGL");
+    else {
+      TF_CODING_ERROR("dstFramebuffer must hold uint32_t when targeting OpenGL");
     }
   }
 
@@ -199,11 +200,9 @@ void HgiInteropOpenGL::CompositeToInterop(
   }
 
   // Depth is optional
-  if (depth)
-  {
+  if (depth) {
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,
-                  static_cast<GLuint>(depth->GetRawResource()));
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(depth->GetRawResource()));
     const GLint loc = glGetUniformLocation(prg, "depthIn");
     glUniform1i(loc, 1);
   }
@@ -215,13 +214,16 @@ void HgiInteropOpenGL::CompositeToInterop(
   // Vertex attributes
   const GLint locPosition = glGetAttribLocation(prg, "position");
   glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-  glVertexAttribPointer(locPosition, 4, GL_FLOAT, GL_FALSE,
-                        sizeof(float) * 6, 0);
+  glVertexAttribPointer(locPosition, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
   glEnableVertexAttribArray(locPosition);
 
   const GLint locUv = glGetAttribLocation(prg, "uvIn");
-  glVertexAttribPointer(locUv, 2, GL_FLOAT, GL_FALSE,
-                        sizeof(float) * 6, reinterpret_cast<void *>(sizeof(float) * 4));
+  glVertexAttribPointer(locUv,
+                        2,
+                        GL_FLOAT,
+                        GL_FALSE,
+                        sizeof(float) * 6,
+                        reinterpret_cast<void *>(sizeof(float) * 4));
   glEnableVertexAttribArray(locUv);
 
   // Since we want to composite over the application's framebuffer contents,
@@ -231,16 +233,14 @@ void HgiInteropOpenGL::CompositeToInterop(
   glGetBooleanv(GL_DEPTH_WRITEMASK, &restoreDepthMask);
   GLint restoreDepthFunc;
   glGetIntegerv(GL_DEPTH_FUNC, &restoreDepthFunc);
-  if (depth)
-  {
+  if (depth) {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     // Note: Use LEQUAL and not LESS to ensure that fragments with only
     // translucent contribution (that don't update depth) are composited.
     glDepthFunc(GL_LEQUAL);
   }
-  else
-  {
+  else {
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
   }
@@ -282,27 +282,23 @@ void HgiInteropOpenGL::CompositeToInterop(
   glDisableVertexAttribArray(locUv);
   glBindBuffer(GL_ARRAY_BUFFER, restoreArrayBuffer);
 
-  if (!blendEnabled)
-  {
+  if (!blendEnabled) {
     glDisable(GL_BLEND);
   }
-  glBlendFuncSeparate(restoreColorSrcFnOp, restoreColorDstFnOp,
-                      restoreAlphaSrcFnOp, restoreAlphaDstFnOp);
+  glBlendFuncSeparate(
+      restoreColorSrcFnOp, restoreColorDstFnOp, restoreAlphaSrcFnOp, restoreAlphaDstFnOp);
   glBlendEquationSeparate(restoreColorOp, restoreAlphaOp);
 
-  if (!restoreDepthEnabled)
-  {
+  if (!restoreDepthEnabled) {
     glDisable(GL_DEPTH_TEST);
   }
-  else
-  {
+  else {
     glEnable(GL_DEPTH_TEST);
   }
   glDepthMask(restoreDepthMask);
   glDepthFunc(restoreDepthFunc);
 
-  if (restoreAlphaToCoverage)
-  {
+  if (restoreAlphaToCoverage) {
     glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
   }
   glViewport(restoreVp[0], restoreVp[1], restoreVp[2], restoreVp[3]);
@@ -314,12 +310,11 @@ void HgiInteropOpenGL::CompositeToInterop(
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-#if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+#  if defined(GL_KHR_debug)
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPopDebugGroup();
   }
-#endif
+#  endif
 
   glActiveTexture(restoreActiveTexture);
 

@@ -35,40 +35,46 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 struct _PathFastLessThan {
   inline bool operator()(SdfChangeList::EntryList::value_type const &a,
-                         SdfChangeList::EntryList::value_type const &b) const {
+                         SdfChangeList::EntryList::value_type const &b) const
+  {
     return SdfPath::FastLessThan()(a.first, b.first);
   }
 };
-} // namespace
+}  // namespace
 
 TF_INSTANTIATE_SINGLETON(SdfChangeList);
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<SdfChangeList::SubLayerChangeType>();
 }
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(SdfChangeList::SubLayerAdded);
   TF_ADD_ENUM_NAME(SdfChangeList::SubLayerRemoved);
   TF_ADD_ENUM_NAME(SdfChangeList::SubLayerOffset);
 }
 
 // CODE_COVERAGE_OFF_debug output
-std::ostream &operator<<(std::ostream &os, const SdfChangeList &cl) {
-  TF_FOR_ALL(entryIter, cl.GetEntryList()) {
+std::ostream &operator<<(std::ostream &os, const SdfChangeList &cl)
+{
+  TF_FOR_ALL(entryIter, cl.GetEntryList())
+  {
     const SdfPath &path = entryIter->first;
     const SdfChangeList::Entry &entry = entryIter->second;
 
     os << "  <" << path << ">\n";
 
-    TF_FOR_ALL(it, entry.infoChanged) {
+    TF_FOR_ALL(it, entry.infoChanged)
+    {
       os << "   infoKey: " << it->first << "\n";
       os << "     oldValue: " << TfStringify(it->second.first) << "\n";
       os << "     newValue: " << TfStringify(it->second.second) << "\n";
     }
-    TF_FOR_ALL(i, entry.subLayerChanges) {
-      os << "    sublayer " << i->first << " " << TfEnum::GetName(i->second)
-         << "\n";
+    TF_FOR_ALL(i, entry.subLayerChanges)
+    {
+      os << "    sublayer " << i->first << " " << TfEnum::GetName(i->second) << "\n";
     }
     if (!entry.oldPath.IsEmpty()) {
       os << "   oldPath: <" << entry.oldPath << ">\n";
@@ -129,19 +135,21 @@ std::ostream &operator<<(std::ostream &os, const SdfChangeList &cl) {
 
 SdfChangeList::SdfChangeList(SdfChangeList const &o)
     : _entries(o._entries),
-      _entriesAccel(o._entriesAccel ? new _AccelTable(*o._entriesAccel)
-                                    : nullptr) {}
+      _entriesAccel(o._entriesAccel ? new _AccelTable(*o._entriesAccel) : nullptr)
+{
+}
 
-SdfChangeList &SdfChangeList::operator=(SdfChangeList const &o) {
+SdfChangeList &SdfChangeList::operator=(SdfChangeList const &o)
+{
   if (this != std::addressof(o)) {
     _entries = o._entries;
-    _entriesAccel.reset(o._entriesAccel ? new _AccelTable(*o._entriesAccel)
-                                        : nullptr);
+    _entriesAccel.reset(o._entriesAccel ? new _AccelTable(*o._entriesAccel) : nullptr);
   }
   return *this;
 }
 
-SdfChangeList::Entry const &SdfChangeList::GetEntry(const SdfPath &path) const {
+SdfChangeList::Entry const &SdfChangeList::GetEntry(const SdfPath &path) const
+{
   TF_AXIOM(!path.IsEmpty());
   auto iter = FindEntry(path);
   if (iter != _entries.end()) {
@@ -151,15 +159,15 @@ SdfChangeList::Entry const &SdfChangeList::GetEntry(const SdfPath &path) const {
   return defaultEntry;
 }
 
-SdfChangeList::Entry &SdfChangeList::_GetEntry(const SdfPath &path) {
+SdfChangeList::Entry &SdfChangeList::_GetEntry(const SdfPath &path)
+{
   TF_DEV_AXIOM(!path.IsEmpty());
   auto iter = FindEntry(path);
-  return iter != _entries.end() ? _MakeNonConstIterator(iter)->second
-                                : _AddNewEntry(path);
+  return iter != _entries.end() ? _MakeNonConstIterator(iter)->second : _AddNewEntry(path);
 }
 
-SdfChangeList::Entry &SdfChangeList::_MoveEntry(SdfPath const &oldPath,
-                                                SdfPath const &newPath) {
+SdfChangeList::Entry &SdfChangeList::_MoveEntry(SdfPath const &oldPath, SdfPath const &newPath)
+{
   TF_DEV_AXIOM(!oldPath.IsEmpty() && !newPath.IsEmpty());
   Entry tmp;
   auto constIter = FindEntry(oldPath);
@@ -180,13 +188,14 @@ SdfChangeList::Entry &SdfChangeList::_MoveEntry(SdfPath const &oldPath,
 }
 
 SdfChangeList::EntryList::iterator SdfChangeList::_MakeNonConstIterator(
-    SdfChangeList::EntryList::const_iterator i) {
+    SdfChangeList::EntryList::const_iterator i)
+{
   // Invoking erase(i, i) is a noop, but returns i as non-const iterator.
   return _entries.erase(i, i);
 }
 
-SdfChangeList::EntryList::const_iterator
-SdfChangeList::FindEntry(const SdfPath &path) const {
+SdfChangeList::EntryList::const_iterator SdfChangeList::FindEntry(const SdfPath &path) const
+{
   auto iter = _entries.end();
   if (_entries.empty()) {
     return iter;
@@ -204,40 +213,44 @@ SdfChangeList::FindEntry(const SdfPath &path) const {
     if (tableIter != _entriesAccel->end()) {
       return _entries.begin() + tableIter->second;
     }
-  } else {
+  }
+  else {
     // Linear search the unsorted range.
-    iter = std::find_if(
-        _entries.begin(), _entries.end(),
-        [&path](EntryList::value_type const &e) { return e.first == path; });
+    iter = std::find_if(_entries.begin(), _entries.end(), [&path](EntryList::value_type const &e) {
+      return e.first == path;
+    });
   }
   return iter;
 }
 
-SdfChangeList::Entry &SdfChangeList::_AddNewEntry(SdfPath const &path) {
-  _entries.emplace_back(std::piecewise_construct, std::tie(path),
-                        std::tuple<>());
+SdfChangeList::Entry &SdfChangeList::_AddNewEntry(SdfPath const &path)
+{
+  _entries.emplace_back(std::piecewise_construct, std::tie(path), std::tuple<>());
   if (_entriesAccel) {
     _entriesAccel->emplace(path, _entries.size() - 1);
-  } else if (ARCH_UNLIKELY(_entries.size() >= _AccelThreshold)) {
+  }
+  else if (ARCH_UNLIKELY(_entries.size() >= _AccelThreshold)) {
     _RebuildAccel();
   }
   return _entries.back().second;
 }
 
-void SdfChangeList::_RebuildAccel() {
+void SdfChangeList::_RebuildAccel()
+{
   if (_entries.size() >= _AccelThreshold) {
-    _entriesAccel.reset(new std::unordered_map<SdfPath, size_t, SdfPath::Hash>(
-        _entries.size()));
+    _entriesAccel.reset(new std::unordered_map<SdfPath, size_t, SdfPath::Hash>(_entries.size()));
     size_t idx = 0;
     for (auto const &p : _entries) {
       _entriesAccel->emplace(p.first, idx++);
     }
-  } else {
+  }
+  else {
     _entriesAccel.reset();
   }
 }
 
-void SdfChangeList::_EraseEntry(SdfPath const &path) {
+void SdfChangeList::_EraseEntry(SdfPath const &path)
+{
   if (_entries.empty()) {
     return;
   }
@@ -250,15 +263,18 @@ void SdfChangeList::_EraseEntry(SdfPath const &path) {
   }
 }
 
-void SdfChangeList::DidReplaceLayerContent() {
+void SdfChangeList::DidReplaceLayerContent()
+{
   _GetEntry(SdfPath::AbsoluteRootPath()).flags.didReplaceContent = true;
 }
 
-void SdfChangeList::DidReloadLayerContent() {
+void SdfChangeList::DidReloadLayerContent()
+{
   _GetEntry(SdfPath::AbsoluteRootPath()).flags.didReloadContent = true;
 }
 
-void SdfChangeList::DidChangeLayerIdentifier(const std::string &oldIdentifier) {
+void SdfChangeList::DidChangeLayerIdentifier(const std::string &oldIdentifier)
+{
   SdfChangeList::Entry &entry = _GetEntry(SdfPath::AbsoluteRootPath());
 
   if (!entry.flags.didChangeIdentifier) {
@@ -267,25 +283,30 @@ void SdfChangeList::DidChangeLayerIdentifier(const std::string &oldIdentifier) {
   }
 }
 
-void SdfChangeList::DidChangeLayerResolvedPath() {
+void SdfChangeList::DidChangeLayerResolvedPath()
+{
   _GetEntry(SdfPath::AbsoluteRootPath()).flags.didChangeResolvedPath = true;
 }
 
 void SdfChangeList::DidChangeSublayerPaths(const std::string &subLayerPath,
-                                           SubLayerChangeType changeType) {
+                                           SubLayerChangeType changeType)
+{
   _GetEntry(SdfPath::AbsoluteRootPath())
       .subLayerChanges.push_back(std::make_pair(subLayerPath, changeType));
 }
 
-void SdfChangeList::DidChangeInfo(const SdfPath &path, const TfToken &key,
-                                  VtValue &&oldVal, const VtValue &newVal) {
+void SdfChangeList::DidChangeInfo(const SdfPath &path,
+                                  const TfToken &key,
+                                  VtValue &&oldVal,
+                                  const VtValue &newVal)
+{
   Entry &entry = _GetEntry(path);
 
   auto iter = entry.FindInfoChange(key);
   if (iter == entry.infoChanged.end()) {
-    entry.infoChanged.emplace_back(key,
-                                   std::make_pair(std::move(oldVal), newVal));
-  } else {
+    entry.infoChanged.emplace_back(key, std::make_pair(std::move(oldVal), newVal));
+  }
+  else {
     // Update new val, but retain old val from previous change.
     // Produce a non-const iterator using the erase(i, i) trick.
     auto nonConstIter = entry.infoChanged.erase(iter, iter);
@@ -293,8 +314,8 @@ void SdfChangeList::DidChangeInfo(const SdfPath &path, const TfToken &key,
   }
 }
 
-void SdfChangeList::DidChangePrimName(const SdfPath &oldPath,
-                                      const SdfPath &newPath) {
+void SdfChangeList::DidChangePrimName(const SdfPath &oldPath, const SdfPath &newPath)
+{
   Entry &newEntry = _GetEntry(newPath);
 
   if (newEntry.flags.didRemoveNonInertPrim) {
@@ -313,7 +334,8 @@ void SdfChangeList::DidChangePrimName(const SdfPath &oldPath,
     // Clear out existing edits.
     oldEntry = Entry();
     oldEntry.flags.didRemoveNonInertPrim = true;
-  } else {
+  }
+  else {
     // Transfer accumulated changes about oldPath to apply to newPath.
     Entry &moved = _MoveEntry(oldPath, newPath);
 
@@ -327,42 +349,49 @@ void SdfChangeList::DidChangePrimName(const SdfPath &oldPath,
   }
 }
 
-void SdfChangeList::DidChangePrimVariantSets(const SdfPath &primPath) {
+void SdfChangeList::DidChangePrimVariantSets(const SdfPath &primPath)
+{
   _GetEntry(primPath).flags.didChangePrimVariantSets = true;
 }
 
-void SdfChangeList::DidChangePrimInheritPaths(const SdfPath &primPath) {
+void SdfChangeList::DidChangePrimInheritPaths(const SdfPath &primPath)
+{
   _GetEntry(primPath).flags.didChangePrimInheritPaths = true;
 }
 
-void SdfChangeList::DidChangePrimSpecializes(const SdfPath &primPath) {
+void SdfChangeList::DidChangePrimSpecializes(const SdfPath &primPath)
+{
   _GetEntry(primPath).flags.didChangePrimSpecializes = true;
 }
 
-void SdfChangeList::DidChangePrimReferences(const SdfPath &primPath) {
+void SdfChangeList::DidChangePrimReferences(const SdfPath &primPath)
+{
   _GetEntry(primPath).flags.didChangePrimReferences = true;
 }
 
-void SdfChangeList::DidReorderPrims(const SdfPath &parentPath) {
+void SdfChangeList::DidReorderPrims(const SdfPath &parentPath)
+{
   _GetEntry(parentPath).flags.didReorderChildren = true;
 }
 
-void SdfChangeList::DidAddPrim(const SdfPath &path, bool inert) {
+void SdfChangeList::DidAddPrim(const SdfPath &path, bool inert)
+{
   if (inert)
     _GetEntry(path).flags.didAddInertPrim = true;
   else
     _GetEntry(path).flags.didAddNonInertPrim = true;
 }
 
-void SdfChangeList::DidRemovePrim(const SdfPath &path, bool inert) {
+void SdfChangeList::DidRemovePrim(const SdfPath &path, bool inert)
+{
   if (inert)
     _GetEntry(path).flags.didRemoveInertPrim = true;
   else
     _GetEntry(path).flags.didRemoveNonInertPrim = true;
 }
 
-void SdfChangeList::DidChangePropertyName(const SdfPath &oldPath,
-                                          const SdfPath &newPath) {
+void SdfChangeList::DidChangePropertyName(const SdfPath &oldPath, const SdfPath &newPath)
+{
   Entry &newEntry = _GetEntry(newPath);
 
   if (newEntry.flags.didRemoveProperty) {
@@ -381,7 +410,8 @@ void SdfChangeList::DidChangePropertyName(const SdfPath &oldPath,
     Entry &oldEntry = _GetEntry(oldPath);
     oldEntry = Entry();
     _GetEntry(oldPath).flags.didRemoveProperty = true;
-  } else {
+  }
+  else {
     // Transfer accumulated changes about oldPath to apply to newPath.
     Entry &moved = _MoveEntry(oldPath, newPath);
 
@@ -395,43 +425,49 @@ void SdfChangeList::DidChangePropertyName(const SdfPath &oldPath,
   }
 }
 
-void SdfChangeList::DidReorderProperties(const SdfPath &parentPath) {
+void SdfChangeList::DidReorderProperties(const SdfPath &parentPath)
+{
   _GetEntry(parentPath).flags.didReorderProperties = true;
 }
 
-void SdfChangeList::DidAddProperty(const SdfPath &path,
-                                   bool hasOnlyRequiredFields) {
+void SdfChangeList::DidAddProperty(const SdfPath &path, bool hasOnlyRequiredFields)
+{
   if (hasOnlyRequiredFields)
     _GetEntry(path).flags.didAddPropertyWithOnlyRequiredFields = true;
   else
     _GetEntry(path).flags.didAddProperty = true;
 }
 
-void SdfChangeList::DidRemoveProperty(const SdfPath &path,
-                                      bool hasOnlyRequiredFields) {
+void SdfChangeList::DidRemoveProperty(const SdfPath &path, bool hasOnlyRequiredFields)
+{
   if (hasOnlyRequiredFields)
     _GetEntry(path).flags.didRemovePropertyWithOnlyRequiredFields = true;
   else
     _GetEntry(path).flags.didRemoveProperty = true;
 }
 
-void SdfChangeList::DidChangeAttributeTimeSamples(const SdfPath &attrPath) {
+void SdfChangeList::DidChangeAttributeTimeSamples(const SdfPath &attrPath)
+{
   _GetEntry(attrPath).flags.didChangeAttributeTimeSamples = true;
 }
 
-void SdfChangeList::DidChangeAttributeConnection(const SdfPath &attrPath) {
+void SdfChangeList::DidChangeAttributeConnection(const SdfPath &attrPath)
+{
   _GetEntry(attrPath).flags.didChangeAttributeConnection = true;
 }
 
-void SdfChangeList::DidChangeRelationshipTargets(const SdfPath &relPath) {
+void SdfChangeList::DidChangeRelationshipTargets(const SdfPath &relPath)
+{
   _GetEntry(relPath).flags.didChangeRelationshipTargets = true;
 }
 
-void SdfChangeList::DidAddTarget(const SdfPath &targetPath) {
+void SdfChangeList::DidAddTarget(const SdfPath &targetPath)
+{
   _GetEntry(targetPath).flags.didAddTarget = true;
 }
 
-void SdfChangeList::DidRemoveTarget(const SdfPath &targetPath) {
+void SdfChangeList::DidRemoveTarget(const SdfPath &targetPath)
+{
   _GetEntry(targetPath).flags.didRemoveTarget = true;
 }
 

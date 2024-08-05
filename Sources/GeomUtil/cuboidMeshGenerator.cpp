@@ -31,37 +31,30 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // static
-size_t
-GeomUtilCuboidMeshGenerator::ComputeNumPoints()
+size_t GeomUtilCuboidMeshGenerator::ComputeNumPoints()
 {
   return 8;
 }
 
 // static
-PxOsdMeshTopology
-GeomUtilCuboidMeshGenerator::GenerateTopology()
+PxOsdMeshTopology GeomUtilCuboidMeshGenerator::GenerateTopology()
 {
   // These never vary, we might as well share a single copy via VtArray.
   static const VtIntArray countsArray{4, 4, 4, 4, 4, 4};
-  static const VtIntArray indicesArray{0, 1, 2, 3,
-                                       4, 5, 6, 7,
-                                       0, 6, 5, 1,
-                                       4, 7, 3, 2,
-                                       0, 3, 7, 6,
-                                       4, 2, 1, 5};
-  return PxOsdMeshTopology(
-      PxOsdOpenSubdivTokens->bilinear,
-      PxOsdOpenSubdivTokens->rightHanded,
-      countsArray, indicesArray);
+  static const VtIntArray indicesArray{0, 1, 2, 3, 4, 5, 6, 7, 0, 6, 5, 1,
+                                       4, 7, 3, 2, 0, 3, 7, 6, 4, 2, 1, 5};
+  return PxOsdMeshTopology(PxOsdOpenSubdivTokens->bilinear,
+                           PxOsdOpenSubdivTokens->rightHanded,
+                           countsArray,
+                           indicesArray);
 }
 
 // static
-template <typename PointType>
-void GeomUtilCuboidMeshGenerator::_GeneratePointsImpl(
-    const typename PointType::ScalarType xLength,
-    const typename PointType::ScalarType yLength,
-    const typename PointType::ScalarType zLength,
-    const _PointWriter<PointType> &ptWriter)
+template<typename PointType>
+void GeomUtilCuboidMeshGenerator::_GeneratePointsImpl(const typename PointType::ScalarType xLength,
+                                                      const typename PointType::ScalarType yLength,
+                                                      const typename PointType::ScalarType zLength,
+                                                      const _PointWriter<PointType> &ptWriter)
 {
   using ScalarType = typename PointType::ScalarType;
 
@@ -83,11 +76,15 @@ void GeomUtilCuboidMeshGenerator::_GeneratePointsImpl(
 // these instantiations will ever be needed due to the SFINAE machinery on the
 // calling method template (the public GeneratePoints, in the header).
 template GEOMUTIL_API void GeomUtilCuboidMeshGenerator::_GeneratePointsImpl(
-    const float, const float, const float,
+    const float,
+    const float,
+    const float,
     const GeomUtilCuboidMeshGenerator::_PointWriter<GfVec3f> &);
 
 template GEOMUTIL_API void GeomUtilCuboidMeshGenerator::_GeneratePointsImpl(
-    const double, const double, const double,
+    const double,
+    const double,
+    const double,
     const GeomUtilCuboidMeshGenerator::_PointWriter<GfVec3d> &);
 
 PXR_NAMESPACE_CLOSE_SCOPE

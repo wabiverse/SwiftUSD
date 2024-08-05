@@ -24,9 +24,9 @@
 #ifndef PXR_USD_USD_PHYSICS_METRICS_H
 #define PXR_USD_USD_PHYSICS_METRICS_H
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
 #include "Usd/common.h"
+#include "UsdPhysics/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,8 +47,7 @@ bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage);
 /// \return true if kilogramsPerUnit was successfully set.  The stage's
 /// UsdEditTarget must be either its root layer or session layer.
 USDPHYSICS_API
-bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
-                                        double kilogramsPerUnit);
+bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage, double kilogramsPerUnit);
 
 /// Return *true* if the two given metrics are within the provided
 /// relative *epsilon* of each other, when you need to know an absolute
@@ -67,15 +66,13 @@ bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
 /// \return *false* if either input is zero or negative, otherwise relative
 /// floating-point comparison between the two inputs.
 USDPHYSICS_API
-bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits,
-                            double epsilon = 1e-5);
+bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits, double epsilon = 1e-5);
 
 /// \class UsdPhysicsMassUnits
 /// Container class for static double-precision symbols representing common
 /// mass units of measure expressed in kilograms.
-class UsdPhysicsMassUnits
-{
-public:
+class UsdPhysicsMassUnits {
+ public:
   static constexpr double grams = 0.001;
   static constexpr double kilograms = 1.0;
   static constexpr double slugs = 14.5939;
@@ -83,4 +80,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PHYSICS_METRICS_H
+#endif  // PXR_USD_USD_PHYSICS_METRICS_H

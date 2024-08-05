@@ -33,103 +33,76 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdExtentSchemaTokens,
-    HDEXTENT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdExtentSchemaTokens, HDEXTENT_SCHEMA_TOKENS);
 
-
-
-HdVec3dDataSourceHandle
-HdExtentSchema::GetMin()
+HdVec3dDataSourceHandle HdExtentSchema::GetMin()
 {
-    return _GetTypedDataSource<HdVec3dDataSource>(
-        HdExtentSchemaTokens->min);
+  return _GetTypedDataSource<HdVec3dDataSource>(HdExtentSchemaTokens->min);
 }
 
-HdVec3dDataSourceHandle
-HdExtentSchema::GetMax()
+HdVec3dDataSourceHandle HdExtentSchema::GetMax()
 {
-    return _GetTypedDataSource<HdVec3dDataSource>(
-        HdExtentSchemaTokens->max);
+  return _GetTypedDataSource<HdVec3dDataSource>(HdExtentSchemaTokens->max);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdExtentSchema::BuildRetained(
-        const HdVec3dDataSourceHandle &min,
-        const HdVec3dDataSourceHandle &max
-)
+HdContainerDataSourceHandle HdExtentSchema::BuildRetained(const HdVec3dDataSourceHandle &min,
+                                                          const HdVec3dDataSourceHandle &max)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (min) {
-        names[count] = HdExtentSchemaTokens->min;
-        values[count++] = min;
-    }
+  size_t count = 0;
+  if (min) {
+    names[count] = HdExtentSchemaTokens->min;
+    values[count++] = min;
+  }
 
-    if (max) {
-        names[count] = HdExtentSchemaTokens->max;
-        values[count++] = max;
-    }
+  if (max) {
+    names[count] = HdExtentSchemaTokens->max;
+    values[count++] = max;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdExtentSchema
-HdExtentSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdExtentSchema HdExtentSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdExtentSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdExtentSchemaTokens->extent))
-        : nullptr);
+  return HdExtentSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                  HdExtentSchemaTokens->extent)) :
+                                              nullptr);
 }
 
 /*static*/
-const TfToken &
-HdExtentSchema::GetSchemaToken()
+const TfToken &HdExtentSchema::GetSchemaToken()
 {
-    return HdExtentSchemaTokens->extent;
-} 
+  return HdExtentSchemaTokens->extent;
+}
 /*static*/
-const HdDataSourceLocator &
-HdExtentSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdExtentSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdExtentSchemaTokens->extent
-    );
-    return locator;
-} 
-HdExtentSchema::Builder &
-HdExtentSchema::Builder::SetMin(
-    const HdVec3dDataSourceHandle &min)
+  static const HdDataSourceLocator locator(HdExtentSchemaTokens->extent);
+  return locator;
+}
+HdExtentSchema::Builder &HdExtentSchema::Builder::SetMin(const HdVec3dDataSourceHandle &min)
 {
-    _min = min;
-    return *this;
+  _min = min;
+  return *this;
 }
 
-HdExtentSchema::Builder &
-HdExtentSchema::Builder::SetMax(
-    const HdVec3dDataSourceHandle &max)
+HdExtentSchema::Builder &HdExtentSchema::Builder::SetMax(const HdVec3dDataSourceHandle &max)
 {
-    _max = max;
-    return *this;
+  _max = max;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdExtentSchema::Builder::Build()
+HdContainerDataSourceHandle HdExtentSchema::Builder::Build()
 {
-    return HdExtentSchema::BuildRetained(
-        _min,
-        _max
-    );
+  return HdExtentSchema::BuildRetained(_min, _max);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

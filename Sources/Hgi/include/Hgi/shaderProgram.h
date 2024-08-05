@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_SHADERPROGRAM_H
 #define PXR_IMAGING_HGI_SHADERPROGRAM_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/shaderFunction.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -46,8 +46,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   Holds handles to shader functions for each shader stage.</li>
 /// </ul>
 ///
-struct HgiShaderProgramDesc
-{
+struct HgiShaderProgramDesc {
   HGI_API
   HgiShaderProgramDesc();
 
@@ -56,14 +55,10 @@ struct HgiShaderProgramDesc
 };
 
 HGI_API
-inline bool operator==(
-    const HgiShaderProgramDesc &lhs,
-    const HgiShaderProgramDesc &rhs);
+inline bool operator==(const HgiShaderProgramDesc &lhs, const HgiShaderProgramDesc &rhs);
 
 HGI_API
-inline bool operator!=(
-    const HgiShaderProgramDesc &lhs,
-    const HgiShaderProgramDesc &rhs);
+inline bool operator!=(const HgiShaderProgramDesc &lhs, const HgiShaderProgramDesc &rhs);
 
 ///
 /// \class HgiShaderProgram
@@ -74,9 +69,8 @@ inline bool operator!=(
 /// when the program is detroyed, because only the client knows if the shader
 /// functions are used by other shader programs.
 ///
-class HgiShaderProgram
-{
-public:
+class HgiShaderProgram {
+ public:
   HGI_API
   virtual ~HgiShaderProgram();
 
@@ -115,13 +109,13 @@ public:
   HGI_API
   virtual uint64_t GetRawResource() const = 0;
 
-protected:
+ protected:
   HGI_API
   HgiShaderProgram(HgiShaderProgramDesc const &desc);
 
   HgiShaderProgramDesc _descriptor;
 
-private:
+ private:
   HgiShaderProgram() = delete;
   HgiShaderProgram &operator=(const HgiShaderProgram &) = delete;
   HgiShaderProgram(const HgiShaderProgram &) = delete;

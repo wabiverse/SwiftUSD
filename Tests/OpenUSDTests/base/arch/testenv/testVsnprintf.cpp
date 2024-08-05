@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/vsnprintf.h"
 #include "Arch/error.h"
+#include "Arch/vsnprintf.h"
+#include "pxr/pxr.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -56,8 +56,7 @@ int main()
   // ensure that a string longer than 4096 works
   // create a long format string
   char long_fmt[8192];
-  for (int i = 0; i < 8191; ++i)
-  {
+  for (int i = 0; i < 8191; ++i) {
     long_fmt[i] = ' ';
   }
   long_fmt[8191] = '\0';

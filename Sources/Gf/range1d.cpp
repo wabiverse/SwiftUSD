@@ -37,23 +37,30 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfRange1d>(); }
-
-std::ostream &operator<<(std::ostream &out, GfRange1d const &r) {
-  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << "..."
-             << Gf_OstreamHelperP(r.GetMax()) << ']';
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfRange1d>();
 }
 
-GfRange1d::GfRange1d(class GfRange1f const &other)
-    : _min((other.GetMin())), _max((other.GetMax())) {}
+std::ostream &operator<<(std::ostream &out, GfRange1d const &r)
+{
+  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << "..." << Gf_OstreamHelperP(r.GetMax())
+             << ']';
+}
 
-double GfRange1d::GetDistanceSquared(double p) const {
+GfRange1d::GfRange1d(class GfRange1f const &other) : _min((other.GetMin())), _max((other.GetMax()))
+{
+}
+
+double GfRange1d::GetDistanceSquared(double p) const
+{
   double dist = 0.0;
 
   if (p < _min) {
     // p is left of box
     dist += GfSqr(_min - p);
-  } else if (p > _max) {
+  }
+  else if (p > _max) {
     // p is right of box
     dist += GfSqr(p - _max);
   }

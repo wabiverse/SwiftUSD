@@ -71,7 +71,7 @@ class PcpLayerStack : public TfRefBase, public TfWeakBase {
   PcpLayerStack(const PcpLayerStack &) = delete;
   PcpLayerStack &operator=(const PcpLayerStack &) = delete;
 
-public:
+ public:
   // See Pcp_LayerStackRegistry for creating layer stacks.
   PCP_API
   virtual ~PcpLayerStack();
@@ -117,7 +117,8 @@ public:
   const std::set<std::string> &GetMutedLayers() const;
 
   /// Return the list of errors local to this layer stack.
-  PcpErrorVector GetLocalErrors() const {
+  PcpErrorVector GetLocalErrors() const
+  {
     return _localErrors ? *_localErrors.get() : PcpErrorVector();
   }
 
@@ -129,22 +130,26 @@ public:
   bool HasLayer(const SdfLayerRefPtr &layer) const;
 
   /// Return the composed expression variables for this layer stack.
-  const PcpExpressionVariables &GetExpressionVariables() const {
+  const PcpExpressionVariables &GetExpressionVariables() const
+  {
     return *_expressionVariables;
   }
 
   /// Return the set of expression variables used during the computation
   /// of this layer stack. For example, this may include the variables
   /// used in expression variable expressions in sublayer asset paths.
-  const std::unordered_set<std::string> &
-  GetExpressionVariableDependencies() const {
+  const std::unordered_set<std::string> &GetExpressionVariableDependencies() const
+  {
     return _expressionVariableDependencies;
   }
 
   /// Return the time codes per second value of the layer stack. This is
   /// usually the same as the computed time codes per second of the root layer
   /// but may be computed from the session layer when its present.
-  double GetTimeCodesPerSecond() const { return _timeCodesPerSecond; }
+  double GetTimeCodesPerSecond() const
+  {
+    return _timeCodesPerSecond;
+  }
 
   /// Returns relocation source-to-target mapping for this layer stack.
   ///
@@ -216,7 +221,7 @@ public:
   PCP_API
   PcpMapExpression GetExpressionForRelocatesAtPath(const SdfPath &path);
 
-private:
+ private:
   // Only a registry can create a layer stack.
   friend class Pcp_LayerStackRegistry;
   // PcpCache needs access to check the _registry.
@@ -228,22 +233,23 @@ private:
   // installed into \p registry. This installation is managed by
   // \p registry and does not occur within the c'tor. See comments on
   // _registry for more details.
-  PcpLayerStack(const PcpLayerStackIdentifier &identifier,
-                const Pcp_LayerStackRegistry &registry);
+  PcpLayerStack(const PcpLayerStackIdentifier &identifier, const Pcp_LayerStackRegistry &registry);
 
   void _BlowLayers();
   void _BlowRelocations();
-  void _Compute(const std::string &fileFormatTarget,
-                const Pcp_MutedLayers &mutedLayers);
+  void _Compute(const std::string &fileFormatTarget, const Pcp_MutedLayers &mutedLayers);
 
-  SdfLayerTreeHandle _BuildLayerStack(
-      const SdfLayerHandle &layer, const SdfLayerOffset &offset,
-      double layerTcps, const ArResolverContext &pathResolverContext,
-      const SdfLayer::FileFormatArguments &layerArgs,
-      const std::string &sessionOwner, const Pcp_MutedLayers &mutedLayers,
-      SdfLayerHandleSet *seenLayers, PcpErrorVector *errors);
+  SdfLayerTreeHandle _BuildLayerStack(const SdfLayerHandle &layer,
+                                      const SdfLayerOffset &offset,
+                                      double layerTcps,
+                                      const ArResolverContext &pathResolverContext,
+                                      const SdfLayer::FileFormatArguments &layerArgs,
+                                      const std::string &sessionOwner,
+                                      const Pcp_MutedLayers &mutedLayers,
+                                      SdfLayerHandleSet *seenLayers,
+                                      PcpErrorVector *errors);
 
-private:
+ private:
   /// The identifier that uniquely identifies this layer stack.
   const PcpLayerStackIdentifier _identifier;
 
@@ -284,8 +290,11 @@ private:
     _SublayerSourceInfo(const SdfLayerHandle &layer_,
                         const std::string &authoredSublayerPath_,
                         const std::string &computedSublayerPath_)
-        : layer(layer_), authoredSublayerPath(authoredSublayerPath_),
-          computedSublayerPath(computedSublayerPath_) {}
+        : layer(layer_),
+          authoredSublayerPath(authoredSublayerPath_),
+          computedSublayerPath(computedSublayerPath_)
+    {
+    }
 
     SdfLayerHandle layer;
     std::string authoredSublayerPath;
@@ -312,8 +321,7 @@ private:
   /// the current value of relocations given out by
   /// GetExpressionForRelocatesAtPath().  This map is used to update
   /// those values when relocations change.
-  typedef std::map<SdfPath, PcpMapExpression::VariableUniquePtr,
-                   SdfPath::FastLessThan>
+  typedef std::map<SdfPath, PcpMapExpression::VariableUniquePtr, SdfPath::FastLessThan>
       _RelocatesVarMap;
   _RelocatesVarMap _relocatesVariables;
   tbb::spin_mutex _relocatesVariablesMutex;
@@ -338,27 +346,25 @@ std::ostream &operator<<(std::ostream &, const PcpLayerStackRefPtr &);
 /// Compose the relocation arcs in the given stack of layers,
 /// putting the results into the given sourceToTarget and targetToSource
 /// maps.
-void Pcp_ComputeRelocationsForLayerStack(
-    const SdfLayerRefPtrVector &layers,
-    SdfRelocatesMap *relocatesSourceToTarget,
-    SdfRelocatesMap *relocatesTargetToSource,
-    SdfRelocatesMap *incrementalRelocatesSourceToTarget,
-    SdfRelocatesMap *incrementalRelocatesTargetToSource,
-    SdfPathVector *relocatesPrimPaths);
+void Pcp_ComputeRelocationsForLayerStack(const SdfLayerRefPtrVector &layers,
+                                         SdfRelocatesMap *relocatesSourceToTarget,
+                                         SdfRelocatesMap *relocatesTargetToSource,
+                                         SdfRelocatesMap *incrementalRelocatesSourceToTarget,
+                                         SdfRelocatesMap *incrementalRelocatesTargetToSource,
+                                         SdfPathVector *relocatesPrimPaths);
 
 // Returns true if \p layerStack should be recomputed due to changes to
 // any computed asset paths that were used to find or open layers
 // when originally composing \p layerStack. This may be due to scene
 // description changes or external changes to asset resolution that
 // may affect the computation of those asset paths.
-bool Pcp_NeedToRecomputeDueToAssetPathChange(
-    const PcpLayerStackPtr &layerStack);
+bool Pcp_NeedToRecomputeDueToAssetPathChange(const PcpLayerStackPtr &layerStack);
 
 // Returns true if the \p layerStack should be recomputed because
 // \p changedLayer has had changes that would cause the layer stack to have
 // a different computed overall time codes per second value.
-bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(
-    const PcpLayerStackPtr &layerStack, const SdfLayerHandle &changedLayer);
+bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(const PcpLayerStackPtr &layerStack,
+                                                     const SdfLayerHandle &changedLayer);
 
 /// Returns true when the environment variable has been set to disable the
 /// behavior where differing time codes per second metadata in layers sublayered
@@ -369,4 +375,4 @@ bool PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_LAYER_STACK_H
+#endif  // PXR_USD_PCP_LAYER_STACK_H

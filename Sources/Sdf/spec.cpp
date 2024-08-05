@@ -46,24 +46,31 @@ SDF_DEFINE_BASE_SPEC(SdfSchema, SdfSpec);
 // SdfSpec
 //
 
-SdfSpec &SdfSpec::operator=(const SdfSpec &other) {
+SdfSpec &SdfSpec::operator=(const SdfSpec &other)
+{
   _id = other._id;
   return *this;
 }
 
 SdfSpec::~SdfSpec() {}
 
-const SdfSchemaBase &SdfSpec::GetSchema() const {
+const SdfSchemaBase &SdfSpec::GetSchema() const
+{
   return _id->GetLayer()->GetSchema();
 }
 
-SdfLayerHandle SdfSpec::GetLayer() const {
+SdfLayerHandle SdfSpec::GetLayer() const
+{
   return _id ? _id->GetLayer() : SdfLayerHandle();
 }
 
-SdfPath SdfSpec::GetPath() const { return _id ? _id->GetPath() : SdfPath(); }
+SdfPath SdfSpec::GetPath() const
+{
+  return _id ? _id->GetPath() : SdfPath();
+}
 
-SdfSpecType SdfSpec::GetSpecType() const {
+SdfSpecType SdfSpec::GetSpecType() const
+{
   // We can't retrieve an object type for a dormant spec.
   Sdf_Identity const *idPtr = _id.get();
   if (!idPtr) {
@@ -75,7 +82,8 @@ SdfSpecType SdfSpec::GetSpecType() const {
   return layerPtr ? layerPtr->GetSpecType(path) : SdfSpecTypeUnknown;
 }
 
-bool SdfSpec::IsDormant() const {
+bool SdfSpec::IsDormant() const
+{
   // If we have no id, we're dormant.
   if (!_id)
     return true;
@@ -91,11 +99,13 @@ bool SdfSpec::IsDormant() const {
   return ARCH_UNLIKELY(!layer) || !layer->HasSpec(path);
 }
 
-bool SdfSpec::PermissionToEdit() const {
+bool SdfSpec::PermissionToEdit() const
+{
   return _id ? GetLayer()->PermissionToEdit() : false;
 }
 
-std::vector<TfToken> SdfSpec::ListFields() const {
+std::vector<TfToken> SdfSpec::ListFields() const
+{
   if (!_id) {
     return std::vector<TfToken>();
   }
@@ -103,23 +113,26 @@ std::vector<TfToken> SdfSpec::ListFields() const {
   return GetLayer()->ListFields(path);
 }
 
-bool SdfSpec::_HasField(const TfToken &name,
-                        SdfAbstractDataValue *value) const {
+bool SdfSpec::_HasField(const TfToken &name, SdfAbstractDataValue *value) const
+{
   return _id ? _id->GetLayer()->HasField(_id->GetPath(), name, value) : false;
 }
 
-bool SdfSpec::HasField(const TfToken &name) const {
+bool SdfSpec::HasField(const TfToken &name) const
+{
   return _id ? _id->GetLayer()->HasField(_id->GetPath(), name) : false;
 }
 
-VtValue SdfSpec::GetField(const TfToken &name) const {
+VtValue SdfSpec::GetField(const TfToken &name) const
+{
   if (Sdf_Identity const *idPtr = _id.get()) {
     return idPtr->GetLayer()->GetField(idPtr->GetPath(), name);
   }
   return VtValue();
 }
 
-bool SdfSpec::SetField(const TfToken &name, const VtValue &value) {
+bool SdfSpec::SetField(const TfToken &name, const VtValue &value)
+{
   if (!_id) {
     return false;
   }
@@ -127,7 +140,8 @@ bool SdfSpec::SetField(const TfToken &name, const VtValue &value) {
   return true;
 }
 
-bool SdfSpec::ClearField(const TfToken &name) {
+bool SdfSpec::ClearField(const TfToken &name)
+{
   if (!_id) {
     return false;
   }
@@ -136,29 +150,30 @@ bool SdfSpec::ClearField(const TfToken &name) {
   return true;
 }
 
-std::vector<TfToken> SdfSpec::GetMetaDataInfoKeys() const {
+std::vector<TfToken> SdfSpec::GetMetaDataInfoKeys() const
+{
   return GetSchema().GetMetadataFields(GetSpecType());
 }
 
-TfToken SdfSpec::GetMetaDataDisplayGroup(TfToken const &key) const {
-  if (const SdfSchema::SpecDefinition *specDef =
-          GetSchema().GetSpecDefinition(GetSpecType())) {
+TfToken SdfSpec::GetMetaDataDisplayGroup(TfToken const &key) const
+{
+  if (const SdfSchema::SpecDefinition *specDef = GetSchema().GetSpecDefinition(GetSpecType())) {
     return specDef->GetMetadataFieldDisplayGroup(key);
   }
   return TfToken();
 }
 
-std::vector<TfToken> SdfSpec::ListInfoKeys() const {
+std::vector<TfToken> SdfSpec::ListInfoKeys() const
+{
   const SdfSchemaBase &schema = GetSchema();
-  if (const SdfSchema::SpecDefinition *specDef =
-          schema.GetSpecDefinition(GetSpecType())) {
+  if (const SdfSchema::SpecDefinition *specDef = schema.GetSpecDefinition(GetSpecType())) {
 
     std::vector<TfToken> result;
     const std::vector<TfToken> valueFields = specDef->GetFields();
-    TF_FOR_ALL(field, valueFields) {
+    TF_FOR_ALL(field, valueFields)
+    {
       // Skip fields holding children.
-      if (const SdfSchema::FieldDefinition *fieldDef =
-              schema.GetFieldDefinition(*field)) {
+      if (const SdfSchema::FieldDefinition *fieldDef = schema.GetFieldDefinition(*field)) {
         if (fieldDef->HoldsChildren())
           continue;
       }
@@ -176,32 +191,33 @@ std::vector<TfToken> SdfSpec::ListInfoKeys() const {
 
 // Helper function that performs some common checks to determine if a given
 // field is editable via the Info API.
-static bool _CanEditInfoOnSpec(const TfToken &key, SdfSpecType specType,
+static bool _CanEditInfoOnSpec(const TfToken &key,
+                               SdfSpecType specType,
                                const SdfSchemaBase &schema,
                                const SdfSchema::FieldDefinition *fieldDef,
-                               const char *editType) {
+                               const char *editType)
+{
   if (!fieldDef) {
-    TF_CODING_ERROR("Cannot %s value for unknown field '%s'", editType,
-                    key.GetText());
+    TF_CODING_ERROR("Cannot %s value for unknown field '%s'", editType, key.GetText());
     return false;
   }
 
   if (fieldDef->IsReadOnly()) {
-    TF_CODING_ERROR("Cannot %s value for read-only field '%s'", editType,
-                    key.GetText());
+    TF_CODING_ERROR("Cannot %s value for read-only field '%s'", editType, key.GetText());
     return false;
   }
 
   if (!schema.IsValidFieldForSpec(fieldDef->GetName(), specType)) {
-    TF_CODING_ERROR("Field '%s' is not valid for spec type %s", key.GetText(),
-                    TfStringify(specType).c_str());
+    TF_CODING_ERROR(
+        "Field '%s' is not valid for spec type %s", key.GetText(), TfStringify(specType).c_str());
     return false;
   }
 
   return true;
 }
 
-void SdfSpec::SetInfo(const TfToken &key, const VtValue &value) {
+void SdfSpec::SetInfo(const TfToken &key, const VtValue &value)
+{
   // Perform some validation on the field being modified to ensure we don't
   // author any invalid scene description. Note this function will issue
   // coding errors as needed.
@@ -214,15 +230,17 @@ void SdfSpec::SetInfo(const TfToken &key, const VtValue &value) {
   // Attempt to cast the given value to the type specified for the field
   // in the schema.
   const VtValue fallback = fieldDef->GetFallbackValue();
-  const VtValue castValue =
-      (fallback.IsEmpty() ? value : VtValue::CastToTypeOf(value, fallback));
+  const VtValue castValue = (fallback.IsEmpty() ? value : VtValue::CastToTypeOf(value, fallback));
   if (castValue.IsEmpty()) {
-    TF_CODING_ERROR("Cannot set field '%s' of type '%s' to provided value "
-                    "'%s' because the value is an incompatible type '%s', "
-                    "on spec <%s>",
-                    key.GetText(), fallback.GetTypeName().c_str(),
-                    TfStringify(value).c_str(), value.GetTypeName().c_str(),
-                    GetPath().GetString().c_str());
+    TF_CODING_ERROR(
+        "Cannot set field '%s' of type '%s' to provided value "
+        "'%s' because the value is an incompatible type '%s', "
+        "on spec <%s>",
+        key.GetText(),
+        fallback.GetTypeName().c_str(),
+        TfStringify(value).c_str(),
+        value.GetTypeName().c_str(),
+        GetPath().GetString().c_str());
     return;
   }
 
@@ -250,19 +268,22 @@ void SdfSpec::SetInfo(const TfToken &key, const VtValue &value) {
 
 void SdfSpec::SetInfoDictionaryValue(const TfToken &dictionaryKey,
                                      const TfToken &entryKey,
-                                     const VtValue &value) {
+                                     const VtValue &value)
+{
   // XXX: Instead of copying, modifying, then re-setting the dictionary,
   //      could this use the proxy to edit the dictionary directly?
   VtDictionary dict = SdfDictionaryProxy(SdfCreateHandle(this), dictionaryKey);
   if (value.IsEmpty()) {
     dict.erase(entryKey);
-  } else {
+  }
+  else {
     dict[entryKey] = value;
   }
   SetInfo(dictionaryKey, VtValue(dict));
 }
 
-bool SdfSpec::HasInfo(const TfToken &key) const {
+bool SdfSpec::HasInfo(const TfToken &key) const
+{
   // It's not an error to call this method with a key that isn't registered
   // with the schema. The file writer needs to be able to query for the
   // presence of metadata fields registered via plugins, such as wizardData.
@@ -273,14 +294,14 @@ bool SdfSpec::HasInfo(const TfToken &key) const {
   return HasField(key);
 }
 
-void SdfSpec::ClearInfo(const TfToken &key) {
+void SdfSpec::ClearInfo(const TfToken &key)
+{
   // Perform some validation to ensure we allow the clearing of this field
   // via the Info API. Note this function will issue coding errors as needed.
   const SdfSchemaBase &schema = GetSchema();
 
   // A field without a definition may still exist as an unknown field.
-  if (const SdfSchema::FieldDefinition *fieldDef =
-          schema.GetFieldDefinition(key)) {
+  if (const SdfSchema::FieldDefinition *fieldDef = schema.GetFieldDefinition(key)) {
     if (!_CanEditInfoOnSpec(key, GetSpecType(), schema, fieldDef, "clear")) {
       return;
     }
@@ -295,11 +316,13 @@ void SdfSpec::ClearInfo(const TfToken &key) {
   Sdf_CleanupTracker::GetInstance().AddSpecIfTracking(*this);
 }
 
-TfType SdfSpec::GetTypeForInfo(const TfToken &key) const {
+TfType SdfSpec::GetTypeForInfo(const TfToken &key) const
+{
   return GetSchema().GetFallback(key).GetType();
 }
 
-const VtValue &SdfSpec::GetFallbackForInfo(const TfToken &key) const {
+const VtValue &SdfSpec::GetFallbackForInfo(const TfToken &key) const
+{
   static VtValue empty;
 
   const SdfSchemaBase &schema = GetSchema();
@@ -312,23 +335,26 @@ const VtValue &SdfSpec::GetFallbackForInfo(const TfToken &key) const {
   const SdfSpecType objType = GetSpecType();
   const SdfSchema::SpecDefinition *specDef = schema.GetSpecDefinition(objType);
   if (!specDef || !specDef->IsMetadataField(key)) {
-    TF_CODING_ERROR("Non-metadata key '%s' for type %s", key.GetText(),
-                    TfStringify(objType).c_str());
+    TF_CODING_ERROR(
+        "Non-metadata key '%s' for type %s", key.GetText(), TfStringify(objType).c_str());
     return empty;
   }
 
   return def->GetFallbackValue();
 }
 
-bool SdfSpec::WriteToStream(std::ostream &out, size_t indent) const {
+bool SdfSpec::WriteToStream(std::ostream &out, size_t indent) const
+{
   return GetLayer()->GetFileFormat()->WriteToStream(*this, out, indent);
 }
 
-bool SdfSpec::IsInert(bool ignoreChildren) const {
+bool SdfSpec::IsInert(bool ignoreChildren) const
+{
   return _id ? GetLayer()->_IsInert(_id->GetPath(), ignoreChildren) : false;
 }
 
-VtValue SdfSpec::GetInfo(const TfToken &key) const {
+VtValue SdfSpec::GetInfo(const TfToken &key) const
+{
   const SdfSchema::FieldDefinition *def = GetSchema().GetFieldDefinition(key);
   if (!def) {
     TF_CODING_ERROR("Invalid info key: %s", key.GetText());
@@ -339,15 +365,23 @@ VtValue SdfSpec::GetInfo(const TfToken &key) const {
   return !value.IsEmpty() ? value : def->GetFallbackValue();
 }
 
-bool SdfSpec::operator==(const SdfSpec &rhs) const { return (_id == rhs._id); }
+bool SdfSpec::operator==(const SdfSpec &rhs) const
+{
+  return (_id == rhs._id);
+}
 
-bool SdfSpec::operator<(const SdfSpec &rhs) const { return (_id < rhs._id); }
+bool SdfSpec::operator<(const SdfSpec &rhs) const
+{
+  return (_id < rhs._id);
+}
 
-bool SdfSpec::_MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) const {
+bool SdfSpec::_MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) const
+{
   return GetLayer()->_MoveSpec(oldPath, newPath);
 }
 
-bool SdfSpec::_DeleteSpec(const SdfPath &path) {
+bool SdfSpec::_DeleteSpec(const SdfPath &path)
+{
   return GetLayer()->_DeleteSpec(path);
 }
 

@@ -39,16 +39,21 @@ class PcpPrimIndex;
 /// the prim indexing algorithm.
 ///
 class PcpPrimIndex_StackFrame {
-public:
+ public:
   PcpPrimIndex_StackFrame(PcpLayerStackSite const &requestedSite,
-                          PcpNodeRef const &parentNode, PcpArc *arcToParent,
+                          PcpNodeRef const &parentNode,
+                          PcpArc *arcToParent,
                           PcpPrimIndex_StackFrame *previousFrame,
                           PcpPrimIndex const *originatingIndex,
                           bool skipDuplicateNodes)
-      : previousFrame(previousFrame), requestedSite(requestedSite),
-        parentNode(parentNode), arcToParent(arcToParent),
+      : previousFrame(previousFrame),
+        requestedSite(requestedSite),
+        parentNode(parentNode),
+        arcToParent(arcToParent),
         originatingIndex(originatingIndex),
-        skipDuplicateNodes(skipDuplicateNodes) {}
+        skipDuplicateNodes(skipDuplicateNodes)
+  {
+  }
 
   /// Link to the previous recursive invocation.
   PcpPrimIndex_StackFrame *previousFrame;
@@ -80,51 +85,60 @@ public:
 /// stack frames.
 ///
 class PcpPrimIndex_StackFrameIterator {
-public:
+ public:
   PcpNodeRef node;
   PcpPrimIndex_StackFrame *previousFrame;
 
-  PcpPrimIndex_StackFrameIterator(const PcpNodeRef &n,
-                                  PcpPrimIndex_StackFrame *f)
-      : node(n), previousFrame(f) {}
+  PcpPrimIndex_StackFrameIterator(const PcpNodeRef &n, PcpPrimIndex_StackFrame *f)
+      : node(n), previousFrame(f)
+  {
+  }
 
   /// Step to the next parent node.
-  void Next() {
+  void Next()
+  {
     if (node.GetArcType() != PcpArcTypeRoot) {
       // Step to the next parent within this graph.
       node = node.GetParentNode();
-    } else if (previousFrame) {
+    }
+    else if (previousFrame) {
       // No more parents in this graph, but there is an outer
       // prim index that this node will become part of.
       // Step to the (eventual) parent in that graph.
       node = previousFrame->parentNode;
       previousFrame = previousFrame->previousFrame;
-    } else {
+    }
+    else {
       // No more parents.
       node = PcpNodeRef();
     }
   }
 
   /// Step to the first parent node in the next recursive call.
-  void NextFrame() {
+  void NextFrame()
+  {
     if (previousFrame) {
       node = previousFrame->parentNode;
       previousFrame = previousFrame->previousFrame;
-    } else {
+    }
+    else {
       node = PcpNodeRef();
     }
   }
 
   /// Get the type of arc connecting the current node with its parent.
-  PcpArcType GetArcType() {
+  PcpArcType GetArcType()
+  {
     if (node.GetArcType() != PcpArcTypeRoot) {
       // Use the current node's arc type.
       return node.GetArcType();
-    } else if (previousFrame) {
+    }
+    else if (previousFrame) {
       // No more parents in this graph, but there is an outer
       // prim index, so consult arcToParent.
       return previousFrame->arcToParent->type;
-    } else {
+    }
+    else {
       // No more parents; this must be the absolute final root.
       return PcpArcTypeRoot;
     }
@@ -133,4 +147,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PRIM_INDEX_STACK_FRAME_H
+#endif  // PXR_USD_PCP_PRIM_INDEX_STACK_FRAME_H

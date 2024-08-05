@@ -27,14 +27,18 @@
 #include <cstring>
 #include <pxr/pxrns.h>
 #if defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
+#  include <Windows.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-std::string ArchStrerror() { return ArchStrerror(errno); }
+std::string ArchStrerror()
+{
+  return ArchStrerror(errno);
+}
 
-std::string ArchStrerror(int errorCode) {
+std::string ArchStrerror(int errorCode)
+{
   char msg_buf[256];
 
 #if defined(_GNU_SOURCE)
@@ -53,21 +57,25 @@ std::string ArchStrerror(int errorCode) {
   strerror_r(errorCode, msg_buf, 256);
 #else
   strerror_s(msg_buf, 256, errorCode);
-#endif // _GNU_SOURCE
+#endif  // _GNU_SOURCE
   return msg_buf;
 }
 
 #if defined(ARCH_OS_WINDOWS)
-std::string ArchStrSysError(unsigned long errorCode) {
+std::string ArchStrSysError(unsigned long errorCode)
+{
   if (errorCode == 0)
     return std::string();
 
   LPSTR buffer = nullptr;
-  size_t len = FormatMessage(
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-          FORMAT_MESSAGE_IGNORE_INSERTS,
-      nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPSTR)&buffer, 0, nullptr);
+  size_t len = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                                 FORMAT_MESSAGE_IGNORE_INSERTS,
+                             nullptr,
+                             errorCode,
+                             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                             (LPSTR)&buffer,
+                             0,
+                             nullptr);
   std::string message(buffer, len);
   LocalFree(buffer);
 

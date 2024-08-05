@@ -67,8 +67,10 @@ void TfLogStackTrace(const std::string &reason, bool logtodb = false);
 /// \p logToDB controls whether the stack will be added to the stack_trace db
 /// table.
 TF_API
-void TfLogCrash(const std::string &reason, const std::string &message,
-                const std::string &additionalInfo, TfCallContext const &context,
+void TfLogCrash(const std::string &reason,
+                const std::string &message,
+                const std::string &additionalInfo,
+                TfCallContext const &context,
                 bool logToDB);
 
 /// Returns the application's launch time.

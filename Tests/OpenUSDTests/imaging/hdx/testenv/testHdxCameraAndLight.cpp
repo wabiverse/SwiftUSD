@@ -49,144 +49,136 @@
 #include <memory>
 
 #define VERIFY_PERF_COUNT(token, count) \
-            TF_VERIFY(perfLog.GetCounter(token) == count, \
-                    "expected %d found %.0f", \
-                    count,\
-                    perfLog.GetCounter(token));
+  TF_VERIFY(perfLog.GetCounter(token) == count, \
+            "expected %d found %.0f", \
+            count, \
+            perfLog.GetCounter(token));
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-class Hd_TestTask final : public HdTask
-{
-public:
-    Hd_TestTask(HdRenderPassSharedPtr const &renderPass,
-                HdRenderPassStateSharedPtr const &renderPassState)
-    : HdTask(SdfPath::EmptyPath())
-    , _renderPass(renderPass)
-    , _renderPassState(renderPassState)
-    {
-    }
+class Hd_TestTask final : public HdTask {
+ public:
+  Hd_TestTask(HdRenderPassSharedPtr const &renderPass,
+              HdRenderPassStateSharedPtr const &renderPassState)
+      : HdTask(SdfPath::EmptyPath()), _renderPass(renderPass), _renderPassState(renderPassState)
+  {
+  }
 
-    virtual void Sync(HdSceneDelegate*,
-                      HdTaskContext*,
-                      HdDirtyBits*) override
-    {
-        _renderPass->Sync();
-    }
+  virtual void Sync(HdSceneDelegate *, HdTaskContext *, HdDirtyBits *) override
+  {
+    _renderPass->Sync();
+  }
 
-    virtual void Prepare(HdTaskContext* ctx,
-                         HdRenderIndex* renderIndex) override
-    {
-        _renderPassState->Prepare(renderIndex->GetResourceRegistry());
-    }
+  virtual void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override
+  {
+    _renderPassState->Prepare(renderIndex->GetResourceRegistry());
+  }
 
-    virtual void Execute(HdTaskContext* ctx) override
-    {
-        _renderPass->Execute(_renderPassState, GetRenderTags());
-    }
+  virtual void Execute(HdTaskContext *ctx) override
+  {
+    _renderPass->Execute(_renderPassState, GetRenderTags());
+  }
 
-private:
-    HdRenderPassSharedPtr _renderPass;
-    HdRenderPassStateSharedPtr _renderPassState;
+ private:
+  HdRenderPassSharedPtr _renderPass;
+  HdRenderPassStateSharedPtr _renderPassState;
 };
 
 static void CameraAndLightTest()
 {
-    // Hgi and HdDriver should be constructed before HdEngine to ensure they
-    // are destructed last. Hgi may be used during engine/delegate destruction.
-    HgiUniquePtr hgi = Hgi::CreatePlatformDefaultHgi();
-    HdDriver driver{HgiTokens->renderDriver, VtValue(hgi.get())};
+  // Hgi and HdDriver should be constructed before HdEngine to ensure they
+  // are destructed last. Hgi may be used during engine/delegate destruction.
+  HgiUniquePtr hgi = Hgi::CreatePlatformDefaultHgi();
+  HdDriver driver{HgiTokens->renderDriver, VtValue(hgi.get())};
 
-    HdStRenderDelegate renderDelegate;
-    std::unique_ptr<HdRenderIndex> index(
-        HdRenderIndex::New(&renderDelegate, {&driver}));
-    TF_VERIFY(index);
-    std::unique_ptr<Hdx_UnitTestDelegate> delegate(
-                                         new Hdx_UnitTestDelegate(index.get()));
+  HdStRenderDelegate renderDelegate;
+  std::unique_ptr<HdRenderIndex> index(HdRenderIndex::New(&renderDelegate, {&driver}));
+  TF_VERIFY(index);
+  std::unique_ptr<Hdx_UnitTestDelegate> delegate(new Hdx_UnitTestDelegate(index.get()));
 
-    HdChangeTracker& tracker = index->GetChangeTracker();
-    HdPerfLog& perfLog = HdPerfLog::GetInstance();
-    perfLog.Enable();
-    HdRprimCollection collection(HdTokens->geometry, 
-        HdReprSelector(HdReprTokens->hull));
-    HdRenderPassStateSharedPtr renderPassState(new HdStRenderPassState());
-    HdRenderPassSharedPtr renderPass(
-        new HdSt_RenderPass(index.get(), collection));
-    HdEngine engine;
+  HdChangeTracker &tracker = index->GetChangeTracker();
+  HdPerfLog &perfLog = HdPerfLog::GetInstance();
+  perfLog.Enable();
+  HdRprimCollection collection(HdTokens->geometry, HdReprSelector(HdReprTokens->hull));
+  HdRenderPassStateSharedPtr renderPassState(new HdStRenderPassState());
+  HdRenderPassSharedPtr renderPass(new HdSt_RenderPass(index.get(), collection));
+  HdEngine engine;
 
-    HdTaskSharedPtr drawTask = std::make_shared<Hd_TestTask>(renderPass,
-                                                             renderPassState);
-    HdTaskSharedPtrVector tasks = { drawTask };
+  HdTaskSharedPtr drawTask = std::make_shared<Hd_TestTask>(renderPass, renderPassState);
+  HdTaskSharedPtrVector tasks = {drawTask};
 
-    GfMatrix4d tx(1.0f);
-    tx.SetRow(3, GfVec4f(5, 0, 5, 1.0));
-    SdfPath cube("/geometry");
-    delegate->AddCube(cube, tx);
+  GfMatrix4d tx(1.0f);
+  tx.SetRow(3, GfVec4f(5, 0, 5, 1.0));
+  SdfPath cube("/geometry");
+  delegate->AddCube(cube, tx);
 
-    SdfPath camera("/camera_test");
-    SdfPath light("/light");
+  SdfPath camera("/camera_test");
+  SdfPath light("/light");
 
-    delegate->AddCamera(camera);
-    delegate->AddLight(light, GlfSimpleLight());
-    delegate->SetLight(light, HdLightTokens->shadowCollection,
-                      VtValue(HdRprimCollection(HdTokens->geometry,
-                                        HdReprSelector(HdReprTokens->hull))));
+  delegate->AddCamera(camera);
+  delegate->AddLight(light, GlfSimpleLight());
+  delegate->SetLight(
+      light,
+      HdLightTokens->shadowCollection,
+      VtValue(HdRprimCollection(HdTokens->geometry, HdReprSelector(HdReprTokens->hull))));
 
-    engine.Execute(index.get(), &tasks);
+  engine.Execute(index.get(), &tasks);
 
-    VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 1);
+  VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 1);
 
-    // Update camera matrix
-    delegate->SetCamera(camera, GfMatrix4d(2), GfMatrix4d(2));
-    tracker.MarkSprimDirty(camera, HdCamera::DirtyTransform);
-    tracker.MarkSprimDirty(camera, HdCamera::DirtyParams);
+  // Update camera matrix
+  delegate->SetCamera(camera, GfMatrix4d(2), GfMatrix4d(2));
+  tracker.MarkSprimDirty(camera, HdCamera::DirtyTransform);
+  tracker.MarkSprimDirty(camera, HdCamera::DirtyParams);
 
-    engine.Execute(index.get(), &tasks);
+  engine.Execute(index.get(), &tasks);
 
-    // batch should not be rebuilt
-    VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 1);
+  // batch should not be rebuilt
+  VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 1);
 
-    // Update shadow collection
-    delegate->SetLight(light, HdLightTokens->shadowCollection,
-                      VtValue(HdRprimCollection(HdTokens->geometry,
-                        HdReprSelector(HdReprTokens->refined))));
-    tracker.MarkSprimDirty(light, HdLight::DirtyCollection);
+  // Update shadow collection
+  delegate->SetLight(
+      light,
+      HdLightTokens->shadowCollection,
+      VtValue(HdRprimCollection(HdTokens->geometry, HdReprSelector(HdReprTokens->refined))));
+  tracker.MarkSprimDirty(light, HdLight::DirtyCollection);
 
-    engine.Execute(index.get(), &tasks);
+  engine.Execute(index.get(), &tasks);
 
-    // batch rebuilt
-    VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 2);
+  // batch rebuilt
+  VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 2);
 
-    // Update shadow collection again with the same data
-    delegate->SetLight(light, HdLightTokens->shadowCollection,
-                      VtValue(HdRprimCollection(HdTokens->geometry,
-                                HdReprSelector(HdReprTokens->refined))));
-    tracker.MarkSprimDirty(light, HdLight::DirtyCollection);
+  // Update shadow collection again with the same data
+  delegate->SetLight(
+      light,
+      HdLightTokens->shadowCollection,
+      VtValue(HdRprimCollection(HdTokens->geometry, HdReprSelector(HdReprTokens->refined))));
+  tracker.MarkSprimDirty(light, HdLight::DirtyCollection);
 
-    engine.Execute(index.get(), &tasks);
+  engine.Execute(index.get(), &tasks);
 
-    // batch should not be rebuilt
-    VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 2);
+  // batch should not be rebuilt
+  VERIFY_PERF_COUNT(HdPerfTokens->rebuildBatches, 2);
 }
 
 int main()
 {
-    TfErrorMark mark;
+  TfErrorMark mark;
 
-    GlfTestGLContext::RegisterGLContextCallbacks();
-    GarchGLApiLoad();
-    GlfSharedGLContextScopeHolder sharedContext;
+  GlfTestGLContext::RegisterGLContextCallbacks();
+  GarchGLApiLoad();
+  GlfSharedGLContextScopeHolder sharedContext;
 
-    CameraAndLightTest();
+  CameraAndLightTest();
 
-    TF_VERIFY(mark.IsClean());
+  TF_VERIFY(mark.IsClean());
 
-    if (mark.IsClean()) {
-        std::cout << "OK" << std::endl;
-        return EXIT_SUCCESS;
-    } else {
-        std::cout << "FAILED" << std::endl;
-        return EXIT_FAILURE;
-    }
+  if (mark.IsClean()) {
+    std::cout << "OK" << std::endl;
+    return EXIT_SUCCESS;
+  }
+  else {
+    std::cout << "FAILED" << std::endl;
+    return EXIT_FAILURE;
+  }
 }
-

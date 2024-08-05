@@ -63,14 +63,16 @@ GfVec4d GfHomogeneousCross(const GfVec4d &a, const GfVec4d &b);
 
 /// Projects homogeneous \p v into Euclidean space and returns the result as a
 /// Vec3f.
-inline GfVec3f GfProject(const GfVec4f &v) {
+inline GfVec3f GfProject(const GfVec4f &v)
+{
   float inv = (v[3] != 0.0f) ? 1.0f / v[3] : 1.0f;
   return GfVec3f(inv * v[0], inv * v[1], inv * v[2]);
 }
 
 /// Projects homogeneous \p v into Euclidean space and returns the result as a
 /// Vec3d.
-inline GfVec3d GfProject(const GfVec4d &v) {
+inline GfVec3d GfProject(const GfVec4d &v)
+{
   double inv = (v[3] != 0.0) ? 1.0 / v[3] : 1.0;
   return GfVec3d(inv * v[0], inv * v[1], inv * v[2]);
 }

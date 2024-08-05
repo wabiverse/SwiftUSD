@@ -35,7 +35,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapExpressionVariables() {
+void wrapExpressionVariables()
+{
   using This = PcpExpressionVariables;
 
   class_<This>("ExpressionVariables")
@@ -47,8 +48,7 @@ void wrapExpressionVariables() {
 
       .def(
           "Compute",
-          +[](const PcpLayerStackIdentifier &sourceId,
-              const PcpLayerStackIdentifier &rootId) {
+          +[](const PcpLayerStackIdentifier &sourceId, const PcpLayerStackIdentifier &rootId) {
             return PcpExpressionVariables::Compute(sourceId, rootId);
           },
           (arg("sourceLayerStackId"), arg("rootLayerStackId")))
@@ -57,23 +57,18 @@ void wrapExpressionVariables() {
           +[](const PcpLayerStackIdentifier &sourceId,
               const PcpLayerStackIdentifier &rootId,
               const PcpExpressionVariables &overrides) {
-            return PcpExpressionVariables::Compute(sourceId, rootId,
-                                                   &overrides);
+            return PcpExpressionVariables::Compute(sourceId, rootId, &overrides);
           },
-          (arg("sourceLayerStackId"), arg("rootLayerStackId"),
-           arg("overrideExpressionVars")))
+          (arg("sourceLayerStackId"), arg("rootLayerStackId"), arg("overrideExpressionVars")))
       .staticmethod("Compute")
 
-      .def("GetSource", &This::GetSource,
-           return_value_policy<return_by_value>())
-      .def("GetVariables", &This::GetVariables,
-           return_value_policy<return_by_value>())
+      .def("GetSource", &This::GetSource, return_value_policy<return_by_value>())
+      .def("GetVariables", &This::GetVariables, return_value_policy<return_by_value>())
 
       .def(
           "__repr__", +[](const This &s) {
             if (s == PcpExpressionVariables()) {
-              return TfStringPrintf("%sExpressionVariables()",
-                                    TF_PY_REPR_PREFIX.c_str());
+              return TfStringPrintf("%sExpressionVariables()", TF_PY_REPR_PREFIX.c_str());
             }
             return TfStringPrintf("%sExpressionVariables(%s, %s)",
                                   TF_PY_REPR_PREFIX.c_str(),

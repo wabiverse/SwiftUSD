@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "HgiVulkan/device.h"
 #include "HgiVulkan/capabilities.h"
 #include "HgiVulkan/commandQueue.h"
-#include "HgiVulkan/device.h"
 #include "HgiVulkan/diagnostic.h"
 #include "HgiVulkan/hgi.h"
 #include "HgiVulkan/instance.h"
@@ -37,22 +37,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static uint32_t
-_GetGraphicsQueueFamilyIndex(VkPhysicalDevice physicalDevice)
+static uint32_t _GetGraphicsQueueFamilyIndex(VkPhysicalDevice physicalDevice)
 {
   uint32_t queueCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, 0);
 
   std::vector<VkQueueFamilyProperties> queues(queueCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(
-      physicalDevice,
-      &queueCount,
-      queues.data());
+  vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, queues.data());
 
-  for (uint32_t i = 0; i < queueCount; i++)
-  {
-    if (queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-    {
+  for (uint32_t i = 0; i < queueCount; i++) {
+    if (queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       return i;
     }
   }
@@ -60,31 +54,29 @@ _GetGraphicsQueueFamilyIndex(VkPhysicalDevice physicalDevice)
   return VK_QUEUE_FAMILY_IGNORED;
 }
 
-static bool
-_SupportsPresentation(
-    VkPhysicalDevice physicalDevice,
-    uint32_t familyIndex)
+static bool _SupportsPresentation(VkPhysicalDevice physicalDevice, uint32_t familyIndex)
 {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-  return vkGetPhysicalDeviceWin32PresentationSupportKHR(
-      physicalDevice, familyIndex);
+  return vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice, familyIndex);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
   Display *dsp = XOpenDisplay(nullptr);
-  VisualID visualID = XVisualIDFromVisual(
-      DefaultVisual(dsp, DefaultScreen(dsp)));
-  return vkGetPhysicalDeviceXlibPresentationSupportKHR(
-      physicalDevice, familyIndex, dsp, visualID);
+  VisualID visualID = XVisualIDFromVisual(DefaultVisual(dsp, DefaultScreen(dsp)));
+  return vkGetPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, familyIndex, dsp, visualID);
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
   // Presentation currently always supported on Metal / MoltenVk
   return true;
 #else
-#error Unsupported Platform
+#  error Unsupported Platform
   return true;
 #endif
 }
 
 HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
-    : _vkPhysicalDevice(nullptr), _vkDevice(nullptr), _vmaAllocator(nullptr), _commandQueue(nullptr), _capabilities(nullptr)
+    : _vkPhysicalDevice(nullptr),
+      _vkDevice(nullptr),
+      _vmaAllocator(nullptr),
+      _commandQueue(nullptr),
+      _capabilities(nullptr)
 {
   //
   // Determine physical device
@@ -93,26 +85,21 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
   const uint32_t maxDevices = 64;
   VkPhysicalDevice physicalDevices[maxDevices];
   uint32_t physicalDeviceCount = maxDevices;
-  TF_VERIFY(
-      vkEnumeratePhysicalDevices(
-          instance->GetVulkanInstance(),
-          &physicalDeviceCount,
-          physicalDevices) == VK_SUCCESS);
+  TF_VERIFY(vkEnumeratePhysicalDevices(instance->GetVulkanInstance(),
+                                       &physicalDeviceCount,
+                                       physicalDevices) == VK_SUCCESS);
 
-  for (uint32_t i = 0; i < physicalDeviceCount; i++)
-  {
+  for (uint32_t i = 0; i < physicalDeviceCount; i++) {
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(physicalDevices[i], &props);
 
-    uint32_t familyIndex =
-        _GetGraphicsQueueFamilyIndex(physicalDevices[i]);
+    uint32_t familyIndex = _GetGraphicsQueueFamilyIndex(physicalDevices[i]);
 
     if (familyIndex == VK_QUEUE_FAMILY_IGNORED)
       continue;
 
     // Assume we always want a presentation capable device for now.
-    if (!_SupportsPresentation(physicalDevices[i], familyIndex))
-    {
+    if (!_SupportsPresentation(physicalDevices[i], familyIndex)) {
       continue;
     }
 
@@ -122,21 +109,18 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
     // Try to find a discrete device. Until we find a discrete device,
     // store the first non-discrete device as fallback in case we never
     // find a discrete device at all.
-    if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-    {
+    if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
       _vkPhysicalDevice = physicalDevices[i];
       _vkGfxsQueueFamilyIndex = familyIndex;
       break;
     }
-    else if (!_vkPhysicalDevice)
-    {
+    else if (!_vkPhysicalDevice) {
       _vkPhysicalDevice = physicalDevices[i];
       _vkGfxsQueueFamilyIndex = familyIndex;
     }
   }
 
-  if (!_vkPhysicalDevice)
-  {
+  if (!_vkPhysicalDevice) {
     TF_CODING_ERROR("VULKAN_ERROR: Unable to determine physical device");
     return;
   }
@@ -146,41 +130,32 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
   //
 
   uint32_t extensionCount = 0;
-  TF_VERIFY(
-      vkEnumerateDeviceExtensionProperties(
-          _vkPhysicalDevice,
-          nullptr,
-          &extensionCount,
-          nullptr) == VK_SUCCESS);
+  TF_VERIFY(vkEnumerateDeviceExtensionProperties(
+                _vkPhysicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS);
 
   _vkExtensions.resize(extensionCount);
 
-  TF_VERIFY(
-      vkEnumerateDeviceExtensionProperties(
-          _vkPhysicalDevice,
-          nullptr,
-          &extensionCount,
-          _vkExtensions.data()) == VK_SUCCESS);
+  TF_VERIFY(vkEnumerateDeviceExtensionProperties(
+                _vkPhysicalDevice, nullptr, &extensionCount, _vkExtensions.data()) == VK_SUCCESS);
 
   //
   // Create Device
   //
   _capabilities = new HgiVulkanCapabilities(this);
 
-  VkDeviceQueueCreateInfo queueInfo =
-      {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
+  VkDeviceQueueCreateInfo queueInfo = {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
   float queuePriorities[] = {1.0f};
   queueInfo.queueFamilyIndex = _vkGfxsQueueFamilyIndex;
   queueInfo.queueCount = 1;
   queueInfo.pQueuePriorities = queuePriorities;
 
-  std::vector<const char *> extensions = {
-      VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  std::vector<const char *> extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
   // Allow certain buffers/images to have dedicated memory allocations to
   // improve performance on some GPUs.
   bool dedicatedAllocations = false;
-  if (IsSupportedExtension(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) && IsSupportedExtension(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME))
+  if (IsSupportedExtension(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) &&
+      IsSupportedExtension(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME))
   {
     dedicatedAllocations = true;
     extensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
@@ -197,15 +172,13 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
 
   // Memory budget query extension
   bool supportsMemExtension = false;
-  if (IsSupportedExtension(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME)) {
     supportsMemExtension = true;
     extensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
   }
 
   // Resolve depth during render pass resolve extension
-  if (IsSupportedExtension(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
     extensions.push_back(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME);
     extensions.push_back(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME);
     extensions.push_back(VK_KHR_MULTIVIEW_EXTENSION_NAME);
@@ -214,37 +187,32 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
 
   // Allows the same layout in structs between c++ and glsl (share structs).
   // This means instead of 'std430' you can now use 'scalar'.
-  if (IsSupportedExtension(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
     extensions.push_back(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
   }
-  else
-  {
-    TF_WARN("Unsupported VK_EXT_scalar_block_layout."
-            "Update gfx driver?");
+  else {
+    TF_WARN(
+        "Unsupported VK_EXT_scalar_block_layout."
+        "Update gfx driver?");
   }
 
   // Allow conservative rasterization.
-  if (IsSupportedExtension(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
     extensions.push_back(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME);
   }
 
   // Allow use of built-in shader barycentrics.
-  if (IsSupportedExtension(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
     extensions.push_back(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME);
   }
 
   // Allow use of shader draw parameters.
-  if (IsSupportedExtension(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME)) {
     extensions.push_back(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
   }
 
   // Allow use of vertex attribute divisors.
-  if (IsSupportedExtension(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME))
-  {
+  if (IsSupportedExtension(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
     extensions.push_back(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME);
   }
 
@@ -254,34 +222,25 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
 
   // Enabling certain features may incure a performance hit
   // (e.g. robustBufferAccess), so only enable the features we will use.
-  VkPhysicalDeviceVulkan11Features vulkan11Features =
-      {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES};
+  VkPhysicalDeviceVulkan11Features vulkan11Features = {
+      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES};
   vulkan11Features.pNext = _capabilities->vkVulkan11Features.pNext;
-  vulkan11Features.shaderDrawParameters =
-      _capabilities->vkVulkan11Features.shaderDrawParameters;
+  vulkan11Features.shaderDrawParameters = _capabilities->vkVulkan11Features.shaderDrawParameters;
 
-  VkPhysicalDeviceFeatures2 features =
-      {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+  VkPhysicalDeviceFeatures2 features = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
   features.pNext = &vulkan11Features;
 
-  features.features.multiDrawIndirect =
-      _capabilities->vkDeviceFeatures.multiDrawIndirect;
-  features.features.samplerAnisotropy =
-      _capabilities->vkDeviceFeatures.samplerAnisotropy;
+  features.features.multiDrawIndirect = _capabilities->vkDeviceFeatures.multiDrawIndirect;
+  features.features.samplerAnisotropy = _capabilities->vkDeviceFeatures.samplerAnisotropy;
   features.features.shaderSampledImageArrayDynamicIndexing =
       _capabilities->vkDeviceFeatures.shaderSampledImageArrayDynamicIndexing;
   features.features.shaderStorageImageArrayDynamicIndexing =
       _capabilities->vkDeviceFeatures.shaderStorageImageArrayDynamicIndexing;
-  features.features.sampleRateShading =
-      _capabilities->vkDeviceFeatures.sampleRateShading;
-  features.features.shaderClipDistance =
-      _capabilities->vkDeviceFeatures.shaderClipDistance;
-  features.features.tessellationShader =
-      _capabilities->vkDeviceFeatures.tessellationShader;
-  features.features.depthClamp =
-      _capabilities->vkDeviceFeatures.depthClamp;
-  features.features.shaderFloat64 =
-      _capabilities->vkDeviceFeatures.shaderFloat64;
+  features.features.sampleRateShading = _capabilities->vkDeviceFeatures.sampleRateShading;
+  features.features.shaderClipDistance = _capabilities->vkDeviceFeatures.shaderClipDistance;
+  features.features.tessellationShader = _capabilities->vkDeviceFeatures.tessellationShader;
+  features.features.depthClamp = _capabilities->vkDeviceFeatures.depthClamp;
+  features.features.shaderFloat64 = _capabilities->vkDeviceFeatures.shaderFloat64;
 
   // Needed to write to storage buffers from vertex shader (eg. GPU culling).
   features.features.vertexPipelineStoresAndAtomics =
@@ -292,11 +251,9 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
 
 #if !defined(VK_USE_PLATFORM_MACOS_MVK)
   // Needed for buffer address feature
-  features.features.shaderInt64 =
-      _capabilities->vkDeviceFeatures.shaderInt64;
+  features.features.shaderInt64 = _capabilities->vkDeviceFeatures.shaderInt64;
   // Needed for gl_primtiveID
-  features.features.geometryShader =
-      _capabilities->vkDeviceFeatures.geometryShader;
+  features.features.geometryShader = _capabilities->vkDeviceFeatures.geometryShader;
 #endif
 
   VkDeviceCreateInfo createInfo = {VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
@@ -306,12 +263,8 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
   createInfo.enabledExtensionCount = (uint32_t)extensions.size();
   createInfo.pNext = &features;
 
-  TF_VERIFY(
-      vkCreateDevice(
-          _vkPhysicalDevice,
-          &createInfo,
-          HgiVulkanAllocator(),
-          &_vkDevice) == VK_SUCCESS);
+  TF_VERIFY(vkCreateDevice(_vkPhysicalDevice, &createInfo, HgiVulkanAllocator(), &_vkDevice) ==
+            VK_SUCCESS);
 
   HgiVulkanSetupDeviceDebug(instance, this);
 
@@ -319,8 +272,8 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
   // Extension function pointers
   //
 
-  vkCreateRenderPass2KHR = (PFN_vkCreateRenderPass2KHR)
-      vkGetDeviceProcAddr(_vkDevice, "vkCreateRenderPass2KHR");
+  vkCreateRenderPass2KHR = (PFN_vkCreateRenderPass2KHR)vkGetDeviceProcAddr(
+      _vkDevice, "vkCreateRenderPass2KHR");
 
   //
   // Memory allocator
@@ -330,18 +283,15 @@ HgiVulkanDevice::HgiVulkanDevice(HgiVulkanInstance *instance)
   allocatorInfo.instance = instance->GetVulkanInstance();
   allocatorInfo.physicalDevice = _vkPhysicalDevice;
   allocatorInfo.device = _vkDevice;
-  if (dedicatedAllocations)
-  {
+  if (dedicatedAllocations) {
     allocatorInfo.flags |= VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT;
   }
 
-  if (supportsMemExtension)
-  {
+  if (supportsMemExtension) {
     allocatorInfo.flags |= VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
   }
 
-  TF_VERIFY(
-      vmaCreateAllocator(&allocatorInfo, &_vmaAllocator) == VK_SUCCESS);
+  TF_VERIFY(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator) == VK_SUCCESS);
 
   //
   // Command Queue
@@ -368,60 +318,50 @@ HgiVulkanDevice::~HgiVulkanDevice()
   vkDestroyDevice(_vkDevice, HgiVulkanAllocator());
 }
 
-VkDevice
-HgiVulkanDevice::GetVulkanDevice() const
+VkDevice HgiVulkanDevice::GetVulkanDevice() const
 {
   return _vkDevice;
 }
 
-VmaAllocator
-HgiVulkanDevice::GetVulkanMemoryAllocator() const
+VmaAllocator HgiVulkanDevice::GetVulkanMemoryAllocator() const
 {
   return _vmaAllocator;
 }
 
-HgiVulkanCommandQueue *
-HgiVulkanDevice::GetCommandQueue() const
+HgiVulkanCommandQueue *HgiVulkanDevice::GetCommandQueue() const
 {
   return _commandQueue;
 }
 
-HgiVulkanCapabilities const &
-HgiVulkanDevice::GetDeviceCapabilities() const
+HgiVulkanCapabilities const &HgiVulkanDevice::GetDeviceCapabilities() const
 {
   return *_capabilities;
 }
 
-uint32_t
-HgiVulkanDevice::GetGfxQueueFamilyIndex() const
+uint32_t HgiVulkanDevice::GetGfxQueueFamilyIndex() const
 {
   return _vkGfxsQueueFamilyIndex;
 }
 
-VkPhysicalDevice
-HgiVulkanDevice::GetVulkanPhysicalDevice() const
+VkPhysicalDevice HgiVulkanDevice::GetVulkanPhysicalDevice() const
 {
   return _vkPhysicalDevice;
 }
 
-HgiVulkanPipelineCache *
-HgiVulkanDevice::GetPipelineCache() const
+HgiVulkanPipelineCache *HgiVulkanDevice::GetPipelineCache() const
 {
   return _pipelineCache;
 }
 
 void HgiVulkanDevice::WaitForIdle()
 {
-  TF_VERIFY(
-      vkDeviceWaitIdle(_vkDevice) == VK_SUCCESS);
+  TF_VERIFY(vkDeviceWaitIdle(_vkDevice) == VK_SUCCESS);
 }
 
 bool HgiVulkanDevice::IsSupportedExtension(const char *extensionName) const
 {
-  for (VkExtensionProperties const &ext : _vkExtensions)
-  {
-    if (!strcmp(extensionName, ext.extensionName))
-    {
+  for (VkExtensionProperties const &ext : _vkExtensions) {
+    if (!strcmp(extensionName, ext.extensionName)) {
       return true;
     }
   }

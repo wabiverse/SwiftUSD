@@ -25,147 +25,130 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdGeomSphere,
-        TfType::Bases< UsdGeomGprim > >();
-    
-    // Register the usd prim typename as an alias under UsdSchemaBase. This
-    // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("Sphere")
-    // to find TfType<UsdGeomSphere>, which is how IsA queries are
-    // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdGeomSphere>("Sphere");
+  TfType::Define<UsdGeomSphere, TfType::Bases<UsdGeomGprim>>();
+
+  // Register the usd prim typename as an alias under UsdSchemaBase. This
+  // enables one to call
+  // TfType::Find<UsdSchemaBase>().FindDerivedByName("Sphere")
+  // to find TfType<UsdGeomSphere>, which is how IsA queries are
+  // answered.
+  TfType::AddAlias<UsdSchemaBase, UsdGeomSphere>("Sphere");
 }
 
 /* virtual */
-UsdGeomSphere::~UsdGeomSphere()
+UsdGeomSphere::~UsdGeomSphere() {}
+
+/* static */
+UsdGeomSphere UsdGeomSphere::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdGeomSphere();
+  }
+  return UsdGeomSphere(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdGeomSphere
-UsdGeomSphere::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdGeomSphere UsdGeomSphere::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdGeomSphere();
-    }
-    return UsdGeomSphere(stage->GetPrimAtPath(path));
-}
-
-/* static */
-UsdGeomSphere
-UsdGeomSphere::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
-    static TfToken usdPrimTypeName("Sphere");
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdGeomSphere();
-    }
-    return UsdGeomSphere(
-        stage->DefinePrim(path, usdPrimTypeName));
+  static TfToken usdPrimTypeName("Sphere");
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdGeomSphere();
+  }
+  return UsdGeomSphere(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdGeomSphere::_GetSchemaKind() const
 {
-    return UsdGeomSphere::schemaKind;
+  return UsdGeomSphere::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomSphere::_GetStaticTfType()
+const TfType &UsdGeomSphere::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdGeomSphere>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdGeomSphere>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdGeomSphere::_IsTypedSchema()
+bool UsdGeomSphere::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomSphere::_GetTfType() const
+const TfType &UsdGeomSphere::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomSphere::GetRadiusAttr() const
+UsdAttribute UsdGeomSphere::GetRadiusAttr() const
 {
-    return GetPrim().GetAttribute(UsdGeomTokens->radius);
+  return GetPrim().GetAttribute(UsdGeomTokens->radius);
 }
 
-UsdAttribute
-UsdGeomSphere::CreateRadiusAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdGeomSphere::CreateRadiusAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radius,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radius,
+                                    SdfValueTypeNames->Double,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdGeomSphere::GetExtentAttr() const
+UsdAttribute UsdGeomSphere::GetExtentAttr() const
 {
-    return GetPrim().GetAttribute(UsdGeomTokens->extent);
+  return GetPrim().GetAttribute(UsdGeomTokens->extent);
 }
 
-UsdAttribute
-UsdGeomSphere::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdGeomSphere::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
+                                    SdfValueTypeNames->Float3Array,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomSphere::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdGeomSphere::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-        UsdGeomTokens->radius,
-        UsdGeomTokens->extent,
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomGprim::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {
+      UsdGeomTokens->radius,
+      UsdGeomTokens->extent,
+  };
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdGeomGprim::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -179,67 +162,61 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-#include "UsdGeom/boundableComputeExtent.h"
 #include "Tf/registryManager.h"
+#include "UsdGeom/boundableComputeExtent.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-UsdGeomSphere::ComputeExtent(double radius, VtVec3fArray* extent)
+bool UsdGeomSphere::ComputeExtent(double radius, VtVec3fArray *extent)
 {
-    // Create Sized Extent
-    extent->resize(2);
+  // Create Sized Extent
+  extent->resize(2);
 
-    (*extent)[0] = GfVec3f(-radius);
-    (*extent)[1] = GfVec3f(radius);
+  (*extent)[0] = GfVec3f(-radius);
+  (*extent)[1] = GfVec3f(radius);
 
-    return true;
+  return true;
 }
 
-bool
-UsdGeomSphere::ComputeExtent(double radius, const GfMatrix4d& transform,
-    VtVec3fArray* extent)
+bool UsdGeomSphere::ComputeExtent(double radius, const GfMatrix4d &transform, VtVec3fArray *extent)
 {
-    // Create Sized Extent
-    extent->resize(2);
+  // Create Sized Extent
+  extent->resize(2);
 
-    GfBBox3d bbox = GfBBox3d(
-        GfRange3d(GfVec3d(-radius), GfVec3d(radius)), transform);
-    GfRange3d range = bbox.ComputeAlignedRange();
-    (*extent)[0] = GfVec3f(range.GetMin());
-    (*extent)[1] = GfVec3f(range.GetMax());
+  GfBBox3d bbox = GfBBox3d(GfRange3d(GfVec3d(-radius), GfVec3d(radius)), transform);
+  GfRange3d range = bbox.ComputeAlignedRange();
+  (*extent)[0] = GfVec3f(range.GetMin());
+  (*extent)[1] = GfVec3f(range.GetMax());
 
-    return true;
+  return true;
 }
 
-static bool
-_ComputeExtentForSphere(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    const GfMatrix4d* transform,
-    VtVec3fArray* extent)
+static bool _ComputeExtentForSphere(const UsdGeomBoundable &boundable,
+                                    const UsdTimeCode &time,
+                                    const GfMatrix4d *transform,
+                                    VtVec3fArray *extent)
 {
-    const UsdGeomSphere sphereSchema(boundable);
-    if (!TF_VERIFY(sphereSchema)) {
-        return false;
-    }
+  const UsdGeomSphere sphereSchema(boundable);
+  if (!TF_VERIFY(sphereSchema)) {
+    return false;
+  }
 
-    double radius;
-    if (!sphereSchema.GetRadiusAttr().Get(&radius, time)) {
-        return false;
-    }
+  double radius;
+  if (!sphereSchema.GetRadiusAttr().Get(&radius, time)) {
+    return false;
+  }
 
-    if (transform) {
-        return UsdGeomSphere::ComputeExtent(radius, *transform, extent);
-    } else {
-        return UsdGeomSphere::ComputeExtent(radius, extent);
-    }
+  if (transform) {
+    return UsdGeomSphere::ComputeExtent(radius, *transform, extent);
+  }
+  else {
+    return UsdGeomSphere::ComputeExtent(radius, extent);
+  }
 }
 
 TF_REGISTRY_FUNCTION(UsdGeomBoundable)
 {
-    UsdGeomRegisterComputeExtentFunction<UsdGeomSphere>(
-        _ComputeExtentForSphere);
+  UsdGeomRegisterComputeExtentFunction<UsdGeomSphere>(_ComputeExtentForSphere);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

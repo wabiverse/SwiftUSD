@@ -54,20 +54,20 @@ class TfType;
 /// }
 ///
 class SdfSpecTypeRegistration {
-public:
+ public:
   /// Registers the C++ type T as a concrete spec class.
-  template <class SchemaType, class SpecType>
-  static void RegisterSpecType(SdfSpecType specTypeEnum) {
+  template<class SchemaType, class SpecType> static void RegisterSpecType(SdfSpecType specTypeEnum)
+  {
     _RegisterSpecType(typeid(SpecType), specTypeEnum, typeid(SchemaType));
   }
 
   /// Registers the C++ type T as an abstract spec class.
-  template <class SchemaType, class SpecType>
-  static void RegisterAbstractSpecType() {
+  template<class SchemaType, class SpecType> static void RegisterAbstractSpecType()
+  {
     _RegisterSpecType(typeid(SpecType), SdfSpecTypeUnknown, typeid(SchemaType));
   }
 
-private:
+ private:
   SDF_API
   static void _RegisterSpecType(const std::type_info &specCPPType,
                                 SdfSpecType specEnumType,
@@ -77,7 +77,7 @@ private:
 // This class holds type information for specs.  It associates a
 // spec type with the corresponding TfType.
 class Sdf_SpecType {
-public:
+ public:
   // If \p spec can be represented by the C++ spec class \p to, returns
   // the TfType for \p to. This includes verifying that \p spec's schema
   // matches the schema associated with \p to.
@@ -95,4 +95,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SPEC_TYPE_H
+#endif  // PXR_USD_SDF_SPEC_TYPE_H

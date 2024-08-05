@@ -27,7 +27,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 UsdPrimTypeInfo::UsdPrimTypeInfo(_TypeId &&typeId)
-    : _typeId(std::move(typeId)), _primDefinition(nullptr) {
+    : _typeId(std::move(typeId)), _primDefinition(nullptr)
+{
   // Helper for initializing the schema type from either the mapped type
   // name or the prim type name.
   auto _SetSchemaType = [this](const TfToken &typeName) {
@@ -35,8 +36,7 @@ UsdPrimTypeInfo::UsdPrimTypeInfo(_TypeId &&typeId)
     if (typeName.IsEmpty()) {
       return false;
     }
-    _schemaType =
-        UsdSchemaRegistry::GetConcreteTypeFromSchemaTypeName(typeName);
+    _schemaType = UsdSchemaRegistry::GetConcreteTypeFromSchemaTypeName(typeName);
     if (_schemaType) {
       _schemaTypeName = typeName;
     }
@@ -47,11 +47,11 @@ UsdPrimTypeInfo::UsdPrimTypeInfo(_TypeId &&typeId)
 
   // Set the schema type using the mapped type name over the prim type
   // name if we have a mapped type name.
-  _SetSchemaType(_typeId.mappedTypeName) ||
-      _SetSchemaType(_typeId.primTypeName);
+  _SetSchemaType(_typeId.mappedTypeName) || _SetSchemaType(_typeId.primTypeName);
 }
 
-const UsdPrimDefinition *UsdPrimTypeInfo::_FindOrCreatePrimDefinition() const {
+const UsdPrimDefinition *UsdPrimTypeInfo::_FindOrCreatePrimDefinition() const
+{
   const UsdPrimDefinition *primDef = nullptr;
   const UsdSchemaRegistry &reg = UsdSchemaRegistry::GetInstance();
   if (_typeId.appliedAPISchemas.empty()) {
@@ -70,19 +70,20 @@ const UsdPrimDefinition *UsdPrimTypeInfo::_FindOrCreatePrimDefinition() const {
     // will be constant. Thus, we don't have to check if another thread
     // cached it first as all threads would store the same pointer.
     _primDefinition.store(primDef, std::memory_order_relaxed);
-  } else {
+  }
+  else {
     // If we have applied schemas, then we need ask the schema registry to
     // compose a prim definition for us from the list of types. The schema
     // registry does NOT take ownership of this new prim definition; this
     // type info will own it instead.
-    std::unique_ptr<UsdPrimDefinition> composedPrimDef =
-        reg.BuildComposedPrimDefinition(_schemaTypeName,
-                                        _typeId.appliedAPISchemas);
+    std::unique_ptr<UsdPrimDefinition> composedPrimDef = reg.BuildComposedPrimDefinition(
+        _schemaTypeName, _typeId.appliedAPISchemas);
     // Try to cache the new prim definition, but if another thread beat us
     // to it, we'll use its definition instead and just let ours get
     // deleted.
-    if (_primDefinition.compare_exchange_strong(primDef, composedPrimDef.get(),
-                                                std::memory_order_acq_rel)) {
+    if (_primDefinition.compare_exchange_strong(
+            primDef, composedPrimDef.get(), std::memory_order_acq_rel))
+    {
       // Since we succeeded, transfer ownership of the new prim definition
       // to this type info.
       _ownedPrimDefinition = std::move(composedPrimDef);
@@ -93,7 +94,8 @@ const UsdPrimDefinition *UsdPrimTypeInfo::_FindOrCreatePrimDefinition() const {
 }
 
 /*static*/
-const UsdPrimTypeInfo &UsdPrimTypeInfo::GetEmptyPrimType() {
+const UsdPrimTypeInfo &UsdPrimTypeInfo::GetEmptyPrimType()
+{
   static const UsdPrimTypeInfo empty;
   return empty;
 }

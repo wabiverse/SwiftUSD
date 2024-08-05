@@ -42,17 +42,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypeRelationship, SdfRelationshipSpec,
-                SdfPropertySpec);
+SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypeRelationship, SdfRelationshipSpec, SdfPropertySpec);
 
 //
 // Primary API
 //
 
-SdfRelationshipSpecHandle
-SdfRelationshipSpec::New(const SdfPrimSpecHandle &owner,
-                         const std::string &name, bool custom,
-                         SdfVariability variability) {
+SdfRelationshipSpecHandle SdfRelationshipSpec::New(const SdfPrimSpecHandle &owner,
+                                                   const std::string &name,
+                                                   bool custom,
+                                                   SdfVariability variability)
+{
   TRACE_FUNCTION();
 
   if (!owner) {
@@ -61,16 +61,19 @@ SdfRelationshipSpec::New(const SdfPrimSpecHandle &owner,
   }
 
   if (!Sdf_ChildrenUtils<Sdf_RelationshipChildPolicy>::IsValidName(name)) {
-    TF_CODING_ERROR("Cannot create a relationship on %s with "
-                    "invalid name: %s",
-                    owner->GetPath().GetText(), name.c_str());
+    TF_CODING_ERROR(
+        "Cannot create a relationship on %s with "
+        "invalid name: %s",
+        owner->GetPath().GetText(),
+        name.c_str());
     return TfNullPtr;
   }
 
   SdfPath relPath = owner->GetPath().AppendProperty(TfToken(name));
   if (!relPath.IsPropertyPath()) {
     TF_CODING_ERROR("Cannot create relationship at invalid path <%s.%s>",
-                    owner->GetPath().GetText(), name.c_str());
+                    owner->GetPath().GetText(),
+                    name.c_str());
     return TfNullPtr;
   }
 
@@ -81,13 +84,12 @@ SdfRelationshipSpec::New(const SdfPrimSpecHandle &owner,
   SdfChangeBlock block;
 
   if (!Sdf_ChildrenUtils<Sdf_RelationshipChildPolicy>::CreateSpec(
-          owner->GetLayer(), relPath, SdfSpecTypeRelationship,
-          hasOnlyRequiredFields)) {
+          owner->GetLayer(), relPath, SdfSpecTypeRelationship, hasOnlyRequiredFields))
+  {
     return TfNullPtr;
   }
 
-  SdfRelationshipSpecHandle spec =
-      owner->GetLayer()->GetRelationshipAtPath(relPath);
+  SdfRelationshipSpecHandle spec = owner->GetLayer()->GetRelationshipAtPath(relPath);
 
   spec->SetField(SdfFieldKeys->Custom, custom);
   spec->SetField(SdfFieldKeys->Variability, variability);
@@ -99,40 +101,44 @@ SdfRelationshipSpec::New(const SdfPrimSpecHandle &owner,
 // Relationship Targets
 //
 
-SdfPath
-SdfRelationshipSpec::_CanonicalizeTargetPath(const SdfPath &path) const {
+SdfPath SdfRelationshipSpec::_CanonicalizeTargetPath(const SdfPath &path) const
+{
   // Relationship target paths are always absolute. If a relative path
   // is passed in, it is considered to be relative to the relationship's
   // owning prim.
   return path.MakeAbsolutePath(GetPath().GetPrimPath());
 }
 
-SdfPath SdfRelationshipSpec::_MakeCompleteTargetSpecPath(
-    const SdfPath &targetPath) const {
+SdfPath SdfRelationshipSpec::_MakeCompleteTargetSpecPath(const SdfPath &targetPath) const
+{
   SdfPath absPath = _CanonicalizeTargetPath(targetPath);
   return GetPath().AppendTarget(absPath);
 }
 
-SdfSpecHandle SdfRelationshipSpec::_GetTargetSpec(const SdfPath &path) const {
+SdfSpecHandle SdfRelationshipSpec::_GetTargetSpec(const SdfPath &path) const
+{
   return GetLayer()->GetObjectAtPath(_MakeCompleteTargetSpecPath(path));
 }
 
-SdfTargetsProxy SdfRelationshipSpec::GetTargetPathList() const {
-  return SdfGetPathEditorProxy(SdfCreateHandle(this),
-                               SdfFieldKeys->TargetPaths);
+SdfTargetsProxy SdfRelationshipSpec::GetTargetPathList() const
+{
+  return SdfGetPathEditorProxy(SdfCreateHandle(this), SdfFieldKeys->TargetPaths);
 }
 
-bool SdfRelationshipSpec::HasTargetPathList() const {
+bool SdfRelationshipSpec::HasTargetPathList() const
+{
   return GetTargetPathList().HasKeys();
 }
 
-void SdfRelationshipSpec::ClearTargetPathList() const {
+void SdfRelationshipSpec::ClearTargetPathList() const
+{
   GetTargetPathList().ClearEdits();
 }
 
 static boost::optional<SdfPath> _ReplacePath(const SdfPath &oldPath,
                                              const SdfPath &newPath,
-                                             const SdfPath &path) {
+                                             const SdfPath &path)
+{
   // Replace oldPath with newPath, and also remove any existing
   // newPath entries in the list op.
   if (path == oldPath) {
@@ -144,8 +150,8 @@ static boost::optional<SdfPath> _ReplacePath(const SdfPath &oldPath,
   return path;
 }
 
-void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
-                                            const SdfPath &newPath) {
+void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath, const SdfPath &newPath)
+{
   // Check permissions; this is done here to catch the case where ChangePaths
   // is not called due to an erroneous oldPath being supplied, and ModifyEdits
   // won't check either if there are no changes made.
@@ -173,7 +179,8 @@ void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
   for (size_t i = 0, n = siblingPaths.size(); i != n; ++i) {
     if (siblingPaths[i] == oldTargetPath) {
       oldTargetSpecIndex = static_cast<int>(i);
-    } else if (siblingPaths[i] == newTargetPath) {
+    }
+    else if (siblingPaths[i] == newTargetPath) {
       newTargetSpecIndex = static_cast<int>(i);
     }
   }
@@ -190,10 +197,13 @@ void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
       const SdfSchemaBase &schema = GetSchema();
       for (const TfToken &field : layer->ListFields(newTargetSpecPath)) {
         if (schema.HoldsChildren(field)) {
-          TF_CODING_ERROR("Can't replace target %s with target %s in "
-                          "relationship %s: %s",
-                          oldPath.GetText(), newPath.GetText(),
-                          relPath.GetString().c_str(), "Target already exists");
+          TF_CODING_ERROR(
+              "Can't replace target %s with target %s in "
+              "relationship %s: %s",
+              oldPath.GetText(),
+              newPath.GetText(),
+              relPath.GetString().c_str(),
+              "Target already exists");
           return;
         }
       }
@@ -206,8 +216,7 @@ void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
 
     // Move the spec and all the fields under it.
     if (!_MoveSpec(oldTargetSpecPath, newTargetSpecPath)) {
-      TF_CODING_ERROR("Cannot move %s to %s", oldTargetPath.GetText(),
-                      newTargetPath.GetText());
+      TF_CODING_ERROR("Cannot move %s to %s", oldTargetPath.GetText(), newTargetPath.GetText());
       return;
     }
 
@@ -217,26 +226,24 @@ void SdfRelationshipSpec::ReplaceTargetPath(const SdfPath &oldPath,
       siblingPaths.erase(siblingPaths.begin() + newTargetSpecIndex);
     }
 
-    layer->SetField(relPath, SdfChildrenKeys->RelationshipTargetChildren,
-                    siblingPaths);
+    layer->SetField(relPath, SdfChildrenKeys->RelationshipTargetChildren, siblingPaths);
   }
 
   // Get the list op.
-  SdfPathListOp targetsListOp =
-      layer->GetFieldAs<SdfPathListOp>(relPath, SdfFieldKeys->TargetPaths);
+  SdfPathListOp targetsListOp = layer->GetFieldAs<SdfPathListOp>(relPath,
+                                                                 SdfFieldKeys->TargetPaths);
 
   // Update the list op.
   if (targetsListOp.HasItem(oldTargetPath)) {
-    targetsListOp.ModifyOperations(std::bind(
-        _ReplacePath, oldTargetPath, newTargetPath, std::placeholders::_1));
+    targetsListOp.ModifyOperations(
+        std::bind(_ReplacePath, oldTargetPath, newTargetPath, std::placeholders::_1));
     layer->SetField(relPath, SdfFieldKeys->TargetPaths, targetsListOp);
   }
 }
 
-void SdfRelationshipSpec::RemoveTargetPath(const SdfPath &path,
-                                           bool preserveTargetOrder) {
-  const SdfPath targetSpecPath =
-      GetPath().AppendTarget(_CanonicalizeTargetPath(path));
+void SdfRelationshipSpec::RemoveTargetPath(const SdfPath &path, bool preserveTargetOrder)
+{
+  const SdfPath targetSpecPath = GetPath().AppendTarget(_CanonicalizeTargetPath(path));
 
   SdfChangeBlock block;
   Sdf_ChildrenUtils<Sdf_AttributeChildPolicy>::SetChildren(
@@ -246,7 +253,8 @@ void SdfRelationshipSpec::RemoveTargetPath(const SdfPath &path,
   // both the list edits and actual object hierarchy underneath.
   if (preserveTargetOrder) {
     GetTargetPathList().Erase(path);
-  } else {
+  }
+  else {
     GetTargetPathList().RemoveItemEdits(path);
   }
 }

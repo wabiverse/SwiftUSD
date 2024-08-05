@@ -36,13 +36,13 @@
 
 #if PXR_USE_NAMESPACES
 
-#define PXR_NS pxr
-#define PXR_NS_GLOBAL ::PXR_NS
+#  define PXR_NS pxr
+#  define PXR_NS_GLOBAL ::PXR_NS
 
 /* ------ swift usd. ------ */
 
-#define SWIFTUSD_EVOLUTION 43
-#define PXR_INTERNAL_NS Pixar
+#  define SWIFTUSD_EVOLUTION 43
+#  define PXR_INTERNAL_NS Pixar
 
 /* ------------------------ */
 
@@ -61,7 +61,7 @@
   as **Pixar.Tf** and **Pixar.Gf**, as these inner Pixar modules contain the swift
   wrappers for the c++ classes and functions, providing a more **swifty** interface
   to the underlying c++ code, which is far safer and more convenient to use than the
-  c++ code directly. 
+  c++ code directly.
 
   - **Notice**: This is analogous to the **pxr** namespace in c++. In swift, an enum
   cannot "use" another enum to globally inject it into it's scope, so the longer form
@@ -71,33 +71,34 @@
   convenience, else users would have to use the longer form of the namespace in swift
   code.
  */
-namespace Pixar { }
+namespace Pixar {
+}
 
 // The root level namespace for all source in the USD distribution.
 namespace PXR_NS {
-    using namespace PXR_INTERNAL_NS;
+using namespace PXR_INTERNAL_NS;
 }
 
-#define PXR_NAMESPACE_OPEN_SCOPE   namespace PXR_INTERNAL_NS {
-#define PXR_NAMESPACE_CLOSE_SCOPE  }  
-#define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
+#  define PXR_NAMESPACE_OPEN_SCOPE namespace PXR_INTERNAL_NS {
+#  define PXR_NAMESPACE_CLOSE_SCOPE }
+#  define PXR_NAMESPACE_USING_DIRECTIVE using namespace PXR_NS;
 
 #else
 
-#define PXR_NS 
-#define PXR_NS_GLOBAL 
-#define PXR_NAMESPACE_OPEN_SCOPE   
-#define PXR_NAMESPACE_CLOSE_SCOPE 
-#define PXR_NAMESPACE_USING_DIRECTIVE
+#  define PXR_NS
+#  define PXR_NS_GLOBAL
+#  define PXR_NAMESPACE_OPEN_SCOPE
+#  define PXR_NAMESPACE_CLOSE_SCOPE
+#  define PXR_NAMESPACE_USING_DIRECTIVE
 
-#endif // PXR_USE_NAMESPACES
+#endif  // PXR_USE_NAMESPACES
 
 #if 1
-#define PXR_PYTHON_SUPPORT_ENABLED 1
+#  define PXR_PYTHON_SUPPORT_ENABLED 1
 #endif
 
 #if 1
-#define PXR_PREFER_SAFETY_OVER_SPEED 1
+#  define PXR_PREFER_SAFETY_OVER_SPEED 1
 #endif
 
-#endif // __PXRNS_H__
+#endif  // __PXRNS_H__

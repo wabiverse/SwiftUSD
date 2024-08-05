@@ -22,10 +22,10 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
+#include "pxr/base/tf/fastCompression.h"
 #include "pxr/base/tf/errorMark.h"
 #include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/fastCompression.h"
+#include "pxr/pxr.h"
 
 #include "Arch/defines.h"
 
@@ -41,20 +41,17 @@ static bool testRoundTrip(size_t sz)
 {
   // Create some data to compress.
   std::unique_ptr<char[]> src(new char[sz]);
-  for (size_t i = 0; i != sz; ++i)
-  {
+  for (size_t i = 0; i != sz; ++i) {
     src[i] = values[(i ^ (i >> 3)) & 3];
   }
 
   // Make a buffer to house compressed data.
-  std::unique_ptr<char[]> compressed(
-      new char[TfFastCompression::GetCompressedBufferSize(sz)]);
+  std::unique_ptr<char[]> compressed(new char[TfFastCompression::GetCompressedBufferSize(sz)]);
 
   TfErrorMark m;
 
   // Compress.
-  size_t compressedSize =
-      TfFastCompression::CompressToBuffer(src.get(), compressed.get(), sz);
+  size_t compressedSize = TfFastCompression::CompressToBuffer(src.get(), compressed.get(), sz);
   printf("Compressed %zu bytes to %zu\n", sz, compressedSize);
 
   // Decompress.
@@ -71,23 +68,24 @@ static bool testRoundTrip(size_t sz)
   return m.IsClean();
 }
 
-static bool
-Test_TfFastCompression()
+static bool Test_TfFastCompression()
 {
-  size_t sizes[] = {
-      3, 3 + 2,
-      3 * 1024, 3 * 1024 + 2267,
-      3 * 1024 * 1024, 3 * 1024 * 1024 + 514229,
-      7 * 1024 * 1024, 7 * 1024 * 1024 + 514229,
-      2008 * 1024 * 1024, 2008 * 1024 * 1024 + 514229,
-      3 * 1024 * 1024 * 1024ull, 3 * 1024 * 1024 * 1024ull + 178656871};
+  size_t sizes[] = {3,
+                    3 + 2,
+                    3 * 1024,
+                    3 * 1024 + 2267,
+                    3 * 1024 * 1024,
+                    3 * 1024 * 1024 + 514229,
+                    7 * 1024 * 1024,
+                    7 * 1024 * 1024 + 514229,
+                    2008 * 1024 * 1024,
+                    2008 * 1024 * 1024 + 514229,
+                    3 * 1024 * 1024 * 1024ull,
+                    3 * 1024 * 1024 * 1024ull + 178656871};
 
-  for (auto sz : sizes)
-  {
-    if (!testRoundTrip(sz))
-    {
-      TF_FATAL_ERROR("Failed to (de)compress size %s\n",
-                     TfStringify(sz).c_str());
+  for (auto sz : sizes) {
+    if (!testRoundTrip(sz)) {
+      TF_FATAL_ERROR("Failed to (de)compress size %s\n", TfStringify(sz).c_str());
     }
   }
   return true;

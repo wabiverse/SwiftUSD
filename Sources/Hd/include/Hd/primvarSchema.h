@@ -30,149 +30,115 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDPRIMVAR_SCHEMA_TOKENS \
-    (primvarValue) \
-    (indexedPrimvarValue) \
-    (indices) \
-    (interpolation) \
-    (role) \
-    (constant) \
-    (uniform) \
-    (varying) \
-    (vertex) \
-    (faceVarying) \
-    (instance) \
-    (point) \
-    (normal) \
-    (vector) \
-    (color) \
-    (pointIndex) \
-    (edgeIndex) \
-    (faceIndex) \
-    (textureCoordinate) \
-    (transform) \
+  (primvarValue)(indexedPrimvarValue)( \
+      indices)(interpolation)(role)(constant)(uniform)(varying)(vertex)(faceVarying)(instance)(point)(normal)(vector)(color)(pointIndex)(edgeIndex)(faceIndex)(textureCoordinate)(transform)
 
-TF_DECLARE_PUBLIC_TOKENS(HdPrimvarSchemaTokens, HD_API,
-    HDPRIMVAR_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdPrimvarSchemaTokens, HD_API, HDPRIMVAR_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdPrimvarSchema : public HdSchema
-{
-public:
-    HdPrimvarSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdPrimvarSchema : public HdSchema {
+ public:
+  HdPrimvarSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  // If the primvar does not have indices, GetPrimvarValue() and
+  // GetIndexedPrimvarValue() will return the same thing. If the primvar
+  // does has indices, GetPrimvarValue() will return the flattened value,
+  // while GetIndexedPrimvarValue() will return the unflattened value.
+  HD_API
+  HdSampledDataSourceHandle GetPrimvarValue();
+  HD_API
+  HdSampledDataSourceHandle GetIndexedPrimvarValue();
+  HD_API
+  HdIntArrayDataSourceHandle GetIndices();
+  HD_API
+  HdTokenDataSourceHandle GetInterpolation();
+  HD_API
+  HdTokenDataSourceHandle GetRole();
 
-    // If the primvar does not have indices, GetPrimvarValue() and
-    // GetIndexedPrimvarValue() will return the same thing. If the primvar
-    // does has indices, GetPrimvarValue() will return the flattened value,
-    // while GetIndexedPrimvarValue() will return the unflattened value.
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdSampledDataSourceHandle &primvarValue,
+      const HdSampledDataSourceHandle &indexedPrimvarValue,
+      const HdIntArrayDataSourceHandle &indices,
+      const HdTokenDataSourceHandle &interpolation,
+      const HdTokenDataSourceHandle &role);
+
+  /// \class HdPrimvarSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdSampledDataSourceHandle GetPrimvarValue();
+    Builder &SetPrimvarValue(const HdSampledDataSourceHandle &primvarValue);
     HD_API
-    HdSampledDataSourceHandle GetIndexedPrimvarValue();
+    Builder &SetIndexedPrimvarValue(const HdSampledDataSourceHandle &indexedPrimvarValue);
     HD_API
-    HdIntArrayDataSourceHandle GetIndices();
+    Builder &SetIndices(const HdIntArrayDataSourceHandle &indices);
     HD_API
-    HdTokenDataSourceHandle GetInterpolation();
+    Builder &SetInterpolation(const HdTokenDataSourceHandle &interpolation);
     HD_API
-    HdTokenDataSourceHandle GetRole();
+    Builder &SetRole(const HdTokenDataSourceHandle &role);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdSampledDataSourceHandle &primvarValue,
-        const HdSampledDataSourceHandle &indexedPrimvarValue,
-        const HdIntArrayDataSourceHandle &indices,
-        const HdTokenDataSourceHandle &interpolation,
-        const HdTokenDataSourceHandle &role
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdPrimvarSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetPrimvarValue(
-            const HdSampledDataSourceHandle &primvarValue);
-        HD_API
-        Builder &SetIndexedPrimvarValue(
-            const HdSampledDataSourceHandle &indexedPrimvarValue);
-        HD_API
-        Builder &SetIndices(
-            const HdIntArrayDataSourceHandle &indices);
-        HD_API
-        Builder &SetInterpolation(
-            const HdTokenDataSourceHandle &interpolation);
-        HD_API
-        Builder &SetRole(
-            const HdTokenDataSourceHandle &role);
+   private:
+    HdSampledDataSourceHandle _primvarValue;
+    HdSampledDataSourceHandle _indexedPrimvarValue;
+    HdIntArrayDataSourceHandle _indices;
+    HdTokenDataSourceHandle _interpolation;
+    HdTokenDataSourceHandle _role;
+  };
+  // Returns true if it contains data sources for an indexed primvar value
+  // and for indices.
+  HD_API
+  bool IsIndexed();
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdSampledDataSourceHandle _primvarValue;
-        HdSampledDataSourceHandle _indexedPrimvarValue;
-        HdIntArrayDataSourceHandle _indices;
-        HdTokenDataSourceHandle _interpolation;
-        HdTokenDataSourceHandle _role;
-    };
-    // Returns true if it contains data sources for an indexed primvar value
-    // and for indices.
-    HD_API
-    bool IsIndexed();
-
-
-    /// Returns token data source for use as interpolation value.
-    /// Values of...
-    /// - HdPrimvarSchemaTokens->constant
-    /// - HdPrimvarSchemaTokens->uniform
-    /// - HdPrimvarSchemaTokens->varying
-    /// - HdPrimvarSchemaTokens->vertex
-    /// - HdPrimvarSchemaTokens->faceVarying
-    /// - HdPrimvarSchemaTokens->instance
-    ///     ...will be stored statically and reused for future calls.
-    HD_API
-    static HdTokenDataSourceHandle BuildInterpolationDataSource(
-        const TfToken &interpolation);
-    /// Returns token data source for use as role value.
-    /// Values of...
-    /// - HdPrimvarSchemaTokens->point
-    /// - HdPrimvarSchemaTokens->normal
-    /// - HdPrimvarSchemaTokens->vector
-    /// - HdPrimvarSchemaTokens->color
-    /// - HdPrimvarSchemaTokens->pointIndex
-    /// - HdPrimvarSchemaTokens->edgeIndex
-    /// - HdPrimvarSchemaTokens->faceIndex
-    /// - HdPrimvarSchemaTokens->textureCoordinate
-    ///     ...will be stored statically and reused for future calls.
-    HD_API
-    static HdTokenDataSourceHandle BuildRoleDataSource(
-        const TfToken &role);
-
+  /// Returns token data source for use as interpolation value.
+  /// Values of...
+  /// - HdPrimvarSchemaTokens->constant
+  /// - HdPrimvarSchemaTokens->uniform
+  /// - HdPrimvarSchemaTokens->varying
+  /// - HdPrimvarSchemaTokens->vertex
+  /// - HdPrimvarSchemaTokens->faceVarying
+  /// - HdPrimvarSchemaTokens->instance
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildInterpolationDataSource(const TfToken &interpolation);
+  /// Returns token data source for use as role value.
+  /// Values of...
+  /// - HdPrimvarSchemaTokens->point
+  /// - HdPrimvarSchemaTokens->normal
+  /// - HdPrimvarSchemaTokens->vector
+  /// - HdPrimvarSchemaTokens->color
+  /// - HdPrimvarSchemaTokens->pointIndex
+  /// - HdPrimvarSchemaTokens->edgeIndex
+  /// - HdPrimvarSchemaTokens->faceIndex
+  /// - HdPrimvarSchemaTokens->textureCoordinate
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildRoleDataSource(const TfToken &role);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

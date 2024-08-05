@@ -22,15 +22,15 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/errorMark.h"
 #include "Arch/stackTrace.h"
+#include "pxr/base/tf/errorMark.h"
+#include "pxr/pxr.h"
 
 #include <unistd.h>
 
-#include <thread>
 #include <atomic>
 #include <iostream>
+#include <thread>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -44,15 +44,13 @@ static std::atomic_int synchronizer;
  * multiple threads.
  */
 
-static void
-_ThreadTask()
+static void _ThreadTask()
 {
   TfErrorMark m;
   TF_RUNTIME_ERROR("Pending secondary thread error for crash report!");
 
   // Wait for synchronizer to become 0
-  while (synchronizer)
-  {
+  while (synchronizer) {
     // spin!
   }
 

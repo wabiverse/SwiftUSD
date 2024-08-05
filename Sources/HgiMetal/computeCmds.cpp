@@ -39,10 +39,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiMetalComputeCmds::HgiMetalComputeCmds(
-    HgiMetal *hgi,
-    HgiComputeCmdsDesc const &desc)
-    : HgiComputeCmds(), _hgi(hgi), _pipelineState(nullptr), _commandBuffer(nil), _argumentBuffer(nil), _encoder(nil), _secondaryCommandBuffer(false), _hasWork(false), _dispatchMethod(desc.dispatchMethod)
+HgiMetalComputeCmds::HgiMetalComputeCmds(HgiMetal *hgi, HgiComputeCmdsDesc const &desc)
+    : HgiComputeCmds(),
+      _hgi(hgi),
+      _pipelineState(nullptr),
+      _commandBuffer(nil),
+      _argumentBuffer(nil),
+      _encoder(nil),
+      _secondaryCommandBuffer(false),
+      _hasWork(false),
+      _dispatchMethod(desc.dispatchMethod)
 {
   _CreateEncoder();
 }
@@ -54,17 +60,15 @@ HgiMetalComputeCmds::~HgiMetalComputeCmds()
 
 void HgiMetalComputeCmds::_CreateEncoder()
 {
-  if (!_encoder)
-  {
+  if (!_encoder) {
     _commandBuffer = _hgi->GetPrimaryCommandBuffer(this, false);
-    if (_commandBuffer == nil)
-    {
+    if (_commandBuffer == nil) {
       _commandBuffer = _hgi->GetSecondaryCommandBuffer();
       _secondaryCommandBuffer = true;
     }
-    MTL::DispatchType dispatchType = (_dispatchMethod == HgiComputeDispatchConcurrent)
-                                         ? MTL::DispatchTypeConcurrent
-                                         : MTL::DispatchTypeSerial;
+    MTL::DispatchType dispatchType = (_dispatchMethod == HgiComputeDispatchConcurrent) ?
+                                         MTL::DispatchTypeConcurrent :
+                                         MTL::DispatchTypeSerial;
 
     _encoder = _commandBuffer->computeCommandEncoder(dispatchType);
   }
@@ -72,8 +76,7 @@ void HgiMetalComputeCmds::_CreateEncoder()
 
 void HgiMetalComputeCmds::_CreateArgumentBuffer()
 {
-  if (!_argumentBuffer)
-  {
+  if (!_argumentBuffer) {
     _argumentBuffer = _hgi->GetArgBuffer();
   }
 }
@@ -87,8 +90,7 @@ void HgiMetalComputeCmds::BindPipeline(HgiComputePipelineHandle pipeline)
 
 void HgiMetalComputeCmds::BindResources(HgiResourceBindingsHandle r)
 {
-  if (HgiMetalResourceBindings *rb = static_cast<HgiMetalResourceBindings *>(r.Get()))
-  {
+  if (HgiMetalResourceBindings *rb = static_cast<HgiMetalResourceBindings *>(r.Get())) {
     _CreateEncoder();
     _CreateArgumentBuffer();
 
@@ -96,46 +98,39 @@ void HgiMetalComputeCmds::BindResources(HgiResourceBindingsHandle r)
   }
 }
 
-void HgiMetalComputeCmds::SetConstantValues(
-    HgiComputePipelineHandle pipeline,
-    uint32_t bindIndex,
-    uint32_t byteSize,
-    const void *data)
+void HgiMetalComputeCmds::SetConstantValues(HgiComputePipelineHandle pipeline,
+                                            uint32_t bindIndex,
+                                            uint32_t byteSize,
+                                            const void *data)
 {
   _CreateEncoder();
   _CreateArgumentBuffer();
 
-  HgiMetalResourceBindings::SetConstantValues(_argumentBuffer,
-                                              HgiShaderStageCompute,
-                                              bindIndex,
-                                              byteSize,
-                                              data);
+  HgiMetalResourceBindings::SetConstantValues(
+      _argumentBuffer, HgiShaderStageCompute, bindIndex, byteSize, data);
 }
 
 void HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
 {
-  if (dimX == 0 || dimY == 0)
-  {
+  if (dimX == 0 || dimY == 0) {
     return;
   }
 
-  uint32_t maxTotalThreads = _pipelineState->GetMetalPipelineState()->maxTotalThreadsPerThreadgroup();
+  uint32_t maxTotalThreads =
+      _pipelineState->GetMetalPipelineState()->maxTotalThreadsPerThreadgroup();
   uint32_t exeWidth = _pipelineState->GetMetalPipelineState()->threadExecutionWidth();
 
   uint32_t thread_width, thread_height;
   thread_width = maxTotalThreads < exeWidth ? maxTotalThreads : exeWidth;
-  if (dimY == 1)
-  {
+  if (dimY == 1) {
     thread_height = 1;
   }
-  else
-  {
+  else {
     thread_width = exeWidth;
     thread_height = maxTotalThreads / thread_width;
   }
 
-  if (_argumentBuffer->storageMode() != MTL::StorageModeShared)
-  {
+  if (_argumentBuffer->storageMode() != MTL::StorageModeShared) {
     NS::Range range = NS::Range::Make(0, _argumentBuffer->length());
     _argumentBuffer->didModifyRange(range);
   }
@@ -157,24 +152,21 @@ void HgiMetalComputeCmds::PushDebugGroup(const char *label)
 
 void HgiMetalComputeCmds::PopDebugGroup()
 {
-  if (_encoder)
-  {
+  if (_encoder) {
     HGIMETAL_DEBUG_POP_GROUP(_encoder)
   }
 }
 
 void HgiMetalComputeCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
-  if (TF_VERIFY(barrier == HgiMemoryBarrierAll))
-  {
+  if (TF_VERIFY(barrier == HgiMemoryBarrierAll)) {
     _CreateEncoder();
     MTL::BarrierScope scope = MTL::BarrierScopeBuffers | MTL::BarrierScopeTextures;
     _encoder->memoryBarrier(scope);
   }
 }
 
-HgiComputeDispatch
-HgiMetalComputeCmds::GetDispatchMethod() const
+HgiComputeDispatch HgiMetalComputeCmds::GetDispatchMethod() const
 {
   return _dispatchMethod;
 }
@@ -182,35 +174,30 @@ HgiMetalComputeCmds::GetDispatchMethod() const
 bool HgiMetalComputeCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
 {
   bool submittedWork = false;
-  if (_encoder)
-  {
+  if (_encoder) {
     _encoder->endEncoding();
     _encoder = nil;
     submittedWork = true;
 
     HgiMetal::CommitCommandBufferWaitType waitType;
-    switch (wait)
-    {
-    case HgiSubmitWaitTypeNoWait:
-      waitType = HgiMetal::CommitCommandBuffer_NoWait;
-      break;
-    case HgiSubmitWaitTypeWaitUntilCompleted:
-      waitType = HgiMetal::CommitCommandBuffer_WaitUntilCompleted;
-      break;
+    switch (wait) {
+      case HgiSubmitWaitTypeNoWait:
+        waitType = HgiMetal::CommitCommandBuffer_NoWait;
+        break;
+      case HgiSubmitWaitTypeWaitUntilCompleted:
+        waitType = HgiMetal::CommitCommandBuffer_WaitUntilCompleted;
+        break;
     }
 
-    if (_secondaryCommandBuffer)
-    {
+    if (_secondaryCommandBuffer) {
       _hgi->CommitSecondaryCommandBuffer(_commandBuffer, waitType);
     }
-    else
-    {
+    else {
       _hgi->CommitPrimaryCommandBuffer(waitType);
     }
   }
 
-  if (_secondaryCommandBuffer)
-  {
+  if (_secondaryCommandBuffer) {
     _hgi->ReleaseSecondaryCommandBuffer(_commandBuffer);
   }
   _commandBuffer = nil;

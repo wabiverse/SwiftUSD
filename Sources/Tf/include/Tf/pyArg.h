@@ -41,24 +41,36 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is similar to \c boost::python::arg, except it's not opaque and
 /// provides more fields for documentation purposes.
 class TfPyArg {
-public:
+ public:
   /// Create a TfPyArg representing an argument with the given \p name.
   /// \p typeDoc and \p defaultValueDoc are optional documentation strings
   /// describing the expected type and default value of this argument.
-  TfPyArg(const std::string &name, const std::string &typeDoc = std::string(),
+  TfPyArg(const std::string &name,
+          const std::string &typeDoc = std::string(),
           const std::string &defaultValueDoc = std::string())
-      : _name(name), _typeDoc(typeDoc), _defaultValueDoc(defaultValueDoc) {}
+      : _name(name), _typeDoc(typeDoc), _defaultValueDoc(defaultValueDoc)
+  {
+  }
 
   /// Returns argument name.
-  const std::string &GetName() const { return _name; }
+  const std::string &GetName() const
+  {
+    return _name;
+  }
 
   /// Returns documentation for default value (if any) for this argument.
-  const std::string &GetDefaultValueDoc() const { return _defaultValueDoc; }
+  const std::string &GetDefaultValueDoc() const
+  {
+    return _defaultValueDoc;
+  }
 
   /// Returns documentation of type of value required by this argument.
-  const std::string &GetTypeDoc() const { return _typeDoc; }
+  const std::string &GetTypeDoc() const
+  {
+    return _typeDoc;
+  }
 
-private:
+ private:
   std::string _name;
   std::string _typeDoc;
   std::string _defaultValueDoc;
@@ -79,19 +91,20 @@ typedef std::vector<TfPyArg> TfPyArgs;
 /// unmatched arguments will be added to the returned tuple or dict.
 TF_API
 std::pair<boost::python::tuple, boost::python::dict> TfPyProcessOptionalArgs(
-    const boost::python::tuple &args, const boost::python::dict &kwargs,
-    const TfPyArgs &expectedArgs, bool allowExtraArgs = false);
+    const boost::python::tuple &args,
+    const boost::python::dict &kwargs,
+    const TfPyArgs &expectedArgs,
+    bool allowExtraArgs = false);
 
 /// Create a doc string for a function with the given \p functionName,
 /// \p requiredArguments and \p optionalArguments. An extra \p description
 /// may also be supplied.
 TF_API
-std::string
-TfPyCreateFunctionDocString(const std::string &functionName,
-                            const TfPyArgs &requiredArguments = TfPyArgs(),
-                            const TfPyArgs &optionalArguments = TfPyArgs(),
-                            const std::string &description = std::string());
+std::string TfPyCreateFunctionDocString(const std::string &functionName,
+                                        const TfPyArgs &requiredArguments = TfPyArgs(),
+                                        const TfPyArgs &optionalArguments = TfPyArgs(),
+                                        const std::string &description = std::string());
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_ARG_H
+#endif  // PXR_BASE_TF_PY_ARG_H

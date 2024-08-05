@@ -41,23 +41,26 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This can potentially be sent from multiple threads. Listeners must be
 /// thread safe.
 class TraceCollectionAvailable : public TfNotice {
-public:
+ public:
   /// Constructor.
   TraceCollectionAvailable(const std::shared_ptr<TraceCollection> &collection)
-      : _collection(collection) {}
+      : _collection(collection)
+  {
+  }
 
   /// Destructor.
   TRACE_API virtual ~TraceCollectionAvailable();
 
   /// Returns the TraceCollection which was produced.
-  const std::shared_ptr<TraceCollection> &GetCollection() const {
+  const std::shared_ptr<TraceCollection> &GetCollection() const
+  {
     return _collection;
   }
 
-private:
+ private:
   std::shared_ptr<TraceCollection> _collection;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_COLLECTION_NOTICE_H
+#endif  // PXR_BASE_TRACE_COLLECTION_NOTICE_H

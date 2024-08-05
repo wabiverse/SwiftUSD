@@ -26,9 +26,9 @@
 
 #include <Metal/Metal.hpp>
 
-#include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
 #include "Hgi/texture.h"
+#include "HgiMetal/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,9 +38,8 @@ class HgiMetal;
 ///
 /// Represents a Metal GPU texture resource.
 ///
-class HgiMetalTexture final : public HgiTexture
-{
-public:
+class HgiMetalTexture final : public HgiTexture {
+ public:
   HGIMETAL_API
   ~HgiMetalTexture() override;
 
@@ -56,18 +55,16 @@ public:
   HGIMETAL_API
   MTL::Texture *GetTextureId() const;
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API
-  HgiMetalTexture(HgiMetal *hgi,
-                  HgiTextureDesc const &desc);
+  HgiMetalTexture(HgiMetal *hgi, HgiTextureDesc const &desc);
 
   HGIMETAL_API
-  HgiMetalTexture(HgiMetal *hgi,
-                  HgiTextureViewDesc const &desc);
+  HgiMetalTexture(HgiMetal *hgi, HgiTextureViewDesc const &desc);
 
-private:
+ private:
   HgiMetalTexture() = delete;
   HgiMetalTexture &operator=(const HgiMetalTexture &) = delete;
   HgiMetalTexture(const HgiMetalTexture &) = delete;

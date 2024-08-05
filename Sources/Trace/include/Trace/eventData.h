@@ -43,7 +43,7 @@ class JsWriter;
 /// This class holds data that can be stored in TraceEvents.
 ///
 class TraceEventData {
-public:
+ public:
   /// Ctor for Invalid type.
   TraceEventData() : _data(_NoData()) {}
 
@@ -83,15 +83,14 @@ public:
   /// Writes a json representation of the data.
   TRACE_API void WriteJson(JsWriter &) const;
 
-private:
+ private:
   // Type that represents no data was stored in an event.
   struct _NoData {};
 
-  using Variant =
-      boost::variant<_NoData, std::string, bool, int64_t, uint64_t, double>;
+  using Variant = boost::variant<_NoData, std::string, bool, int64_t, uint64_t, double>;
   Variant _data;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_EVENT_DATA_H
+#endif  // PXR_BASE_TRACE_EVENT_DATA_H

@@ -36,9 +36,9 @@
 #include "Tf/type.h"
 #include <pxr/pxrns.h>
 
-#include <atomic>
 #include <OneTBB/tbb/enumerable_thread_specific.h>
 #include <OneTBB/tbb/spin_mutex.h>
+#include <atomic>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -70,8 +70,9 @@ class Tf_NoticeRegistry {
   Tf_NoticeRegistry(const Tf_NoticeRegistry &) = delete;
   Tf_NoticeRegistry &operator=(const Tf_NoticeRegistry &) = delete;
 
-public:
-  void _BeginDelivery(const TfNotice &notice, const TfWeakBase *sender,
+ public:
+  void _BeginDelivery(const TfNotice &notice,
+                      const TfWeakBase *sender,
                       const std::type_info &senderType,
                       const TfWeakBase *listener,
                       const std::type_info &listenerType,
@@ -84,8 +85,11 @@ public:
   TfNotice::Key _Register(TfNotice::_DelivererBase *deliverer);
 
   // Send notice n to all interested listeners.
-  size_t _Send(const TfNotice &n, const TfType &noticeType, const TfWeakBase *s,
-               const void *senderUniqueId, const std::type_info &senderType);
+  size_t _Send(const TfNotice &n,
+               const TfType &noticeType,
+               const TfWeakBase *s,
+               const void *senderUniqueId,
+               const std::type_info &senderType);
 
   // Remove listener instance indicated by \p key.  This is pass by
   // reference so we can mark the key as having been revoked.
@@ -93,11 +97,13 @@ public:
 
   // Abort if casting of a notice failed; warn if it succeeded but
   // TfSafeDynamic_cast was required.
-  void _VerifyFailedCast(const std::type_info &toType, const TfNotice &notice,
+  void _VerifyFailedCast(const std::type_info &toType,
+                         const TfNotice &notice,
                          const TfNotice *castNotice);
 
   // Return reference to singleton object.
-  static Tf_NoticeRegistry &_GetInstance() {
+  static Tf_NoticeRegistry &_GetInstance()
+  {
     return TfSingleton<Tf_NoticeRegistry>::GetInstance();
   }
 
@@ -107,7 +113,7 @@ public:
   void _IncrementBlockCount();
   void _DecrementBlockCount();
 
-private:
+ private:
   Tf_NoticeRegistry();
   friend class TfSingleton<Tf_NoticeRegistry>;
 
@@ -115,13 +121,13 @@ private:
 
   typedef TfNotice::_DelivererList _DelivererList;
 
-  typedef std::pair<_DelivererList *, _DelivererList::iterator>
-      _DelivererListEntry;
+  typedef std::pair<_DelivererList *, _DelivererList::iterator> _DelivererListEntry;
 
   typedef tbb::spin_mutex _Mutex;
   typedef tbb::spin_mutex::scoped_lock _Lock;
 
-  void _BeginSend(const TfNotice &notice, const TfWeakBase *sender,
+  void _BeginSend(const TfNotice &notice,
+                  const TfWeakBase *sender,
                   const std::type_info &senderType,
                   const std::vector<TfNotice::WeakProbePtr> &probes);
   void _EndSend(const std::vector<TfNotice::WeakProbePtr> &probes);
@@ -135,9 +141,8 @@ private:
   // the item on the list as inactive.
 
   class _DelivererContainer {
-  public:
-    typedef TfHashMap<const TfWeakBase *, _DelivererList, TfHash>
-        _PerSenderTable;
+   public:
+    typedef TfHashMap<const TfWeakBase *, _DelivererList, TfHash> _PerSenderTable;
 
     _Mutex _mutex;
     _DelivererList _delivererList;
@@ -151,8 +156,8 @@ private:
 
   typedef TfHashSet<TfNotice::WeakProbePtr, TfHash> _ProbeTable;
 
-  void _Prepend(_DelivererContainer *c, const TfWeakBase *sender,
-                TfNotice::_DelivererBase *item) {
+  void _Prepend(_DelivererContainer *c, const TfWeakBase *sender, TfNotice::_DelivererBase *item)
+  {
     _Lock lock(c->_mutex);
 
     TF_DEV_AXIOM(!item->_list);
@@ -168,31 +173,33 @@ private:
     item->_listIter = dlist->begin();
   }
 
-  _DelivererListEntry _GetHead(_DelivererContainer *c) {
+  _DelivererListEntry _GetHead(_DelivererContainer *c)
+  {
     _Lock lock(c->_mutex);
     return _DelivererListEntry(&c->_delivererList, c->_delivererList.begin());
   }
 
-  _DelivererListEntry _GetHeadForSender(_DelivererContainer *c,
-                                        const TfWeakBase *s) {
+  _DelivererListEntry _GetHeadForSender(_DelivererContainer *c, const TfWeakBase *s)
+  {
     _Lock lock(c->_mutex);
-    _DelivererContainer::_PerSenderTable::iterator i =
-        c->_perSenderTable.find(s);
+    _DelivererContainer::_PerSenderTable::iterator i = c->_perSenderTable.find(s);
     if (i != c->_perSenderTable.end()) {
       return _DelivererListEntry(&(i->second), i->second.begin());
-    } else {
-      return _DelivererListEntry((_DelivererList *)0,
-                                 _DelivererList::iterator());
+    }
+    else {
+      return _DelivererListEntry((_DelivererList *)0, _DelivererList::iterator());
     }
   }
 
-  _DelivererContainer *_GetDelivererContainer(const TfType &t) {
+  _DelivererContainer *_GetDelivererContainer(const TfType &t)
+  {
     _Lock lock(_tableMutex);
     _DelivererTable::iterator i = _delivererTable.find(t);
     return (i == _delivererTable.end()) ? NULL : i->second;
   }
 
-  _DelivererContainer *_GetOrCreateDelivererContainer(const TfType &t) {
+  _DelivererContainer *_GetOrCreateDelivererContainer(const TfType &t)
+  {
     _Lock lock(_tableMutex);
     _DelivererTable::iterator i = _delivererTable.find(t);
 
@@ -202,13 +209,17 @@ private:
       return i->second;
   }
 
-  int _Deliver(const TfNotice &n, const TfType &type, const TfWeakBase *s,
-               const void *senderUniqueId, const std::type_info &senderType,
+  int _Deliver(const TfNotice &n,
+               const TfType &type,
+               const TfWeakBase *s,
+               const void *senderUniqueId,
+               const std::type_info &senderType,
                const std::vector<TfNotice::WeakProbePtr> &probes,
                const _DelivererListEntry &entry);
   void _FreeDeliverer(const TfNotice::_DelivererWeakPtr &d);
 
-  void _IncrementUserCount(int amount) {
+  void _IncrementUserCount(int amount)
+  {
     _Lock lock(_userCountMutex);
     _userCount += amount;
   }
@@ -239,4 +250,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_NOTICE_REGISTRY_H
+#endif  // PXR_BASE_TF_NOTICE_REGISTRY_H

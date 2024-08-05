@@ -28,17 +28,17 @@
  * thus we can prefer the ease of including all sources in the build
  * which is far more maintainable, especially for package consumers.
  * ----------------------------------------------------------------- */
-#include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
-#include "Garch/glDebugWindow.h"
-#include <pxr/pxrns.h>
+#  include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
+#  include "Garch/glDebugWindow.h"
+#  include <pxr/pxrns.h>
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <OpenGL/OpenGL.hpp>
+#  include <Foundation/Foundation.hpp>
+#  include <Metal/Metal.hpp>
+#  include <OpenGL/OpenGL.hpp>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#if 0
+#  if 0
 // XXX: FIXME: No-op. Probably just move this bit over to Swift.
 
 static int
@@ -47,12 +47,12 @@ Garch_GetModifierKeys(NS::UInteger flags)
     int keys = 0;
 
     // The 10.12 SDK has new symbols.
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 101200
-#define NSEventModifierFlagShift NSShiftKeyMask
-#define NSEventModifierFlagControl NSControlKeyMask
-#define NSEventModifierFlagOption NSAlternateKeyMask
-#define NSEventModifierFlagCommand NSCommandKeyMask
-#endif
+#    if MAC_OS_X_VERSION_MAX_ALLOWED < 101200
+#      define NSEventModifierFlagShift NSShiftKeyMask
+#      define NSEventModifierFlagControl NSControlKeyMask
+#      define NSEventModifierFlagOption NSAlternateKeyMask
+#      define NSEventModifierFlagCommand NSCommandKeyMask
+#    endif
     if (flags & NS::EventModifierFlagShift)   keys |= GarchGLDebugWindow::Shift;
     if (flags & NS::EventModifierFlagControl) keys |= GarchGLDebugWindow::Ctrl;
     if (flags & NS::EventModifierFlagOption)  keys |= GarchGLDebugWindow::Alt;
@@ -189,17 +189,15 @@ class Garch_GLPlatformView : NS::Object/*NSGL::OpenGLView <NSWindowDelegate>*/
 
 // ---------------------------------------------------------------------------
 
-#endif // 0
+#  endif  // 0
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w)
-    : _callback(w) {}
+Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w) : _callback(w) {}
 
-void Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height,
-                                       int nSamples)
+void Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height, int nSamples)
 {
-#if 0
+#  if 0
     // XXX: FIXME: No-op. Probably just move this bit over to Swift.
 
     NS::Application::sharedApplication();
@@ -226,25 +224,25 @@ void Garch_GLPlatformDebugWindow::Init(const char *title, int width, int height,
 
     window->setContentView(view);
     window->setDelegate(view);
-#endif // 0
+#  endif  // 0
 }
 
 void Garch_GLPlatformDebugWindow::Run()
 {
-#if 0
+#  if 0
     // XXX: FIXME: No-op. Probably just move this bit over to Swift.
 
     NS::App::run();
-#endif // 0
+#  endif  // 0
 }
 
 void Garch_GLPlatformDebugWindow::ExitApp()
 {
-#if 0
+#  if 0
     // XXX: FIXME: No-op. Probably just move this bit over to Swift.
 
     NS::App::stop(nil);
-#endif // 0
+#  endif  // 0
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -21,9 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "translator.h"
 #include "stream.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/layer.h"
 #include "Sdf/path.h"
@@ -35,8 +35,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SdfLayerRefPtr
-UsdObjTranslateObjToUsd(const UsdObjStream &objStream)
+SdfLayerRefPtr UsdObjTranslateObjToUsd(const UsdObjStream &objStream)
 {
   // To create an SdfLayer holding Usd data representing \p objStream, we
   // would like to use the Usd and UsdGeom APIs.  To do so, we first create an
@@ -66,8 +65,7 @@ UsdObjTranslateObjToUsd(const UsdObjStream &objStream)
 
   // Usd currently requires an extent, somewhat unfortunately.
   GfRange3f extent;
-  for (const auto &pt : usdPoints)
-  {
+  for (const auto &pt : usdPoints) {
     extent.UnionWith(pt);
   }
   VtVec3fArray extentArray(2);
@@ -75,25 +73,19 @@ UsdObjTranslateObjToUsd(const UsdObjStream &objStream)
   extentArray[1] = extent.GetMax();
 
   // Make a poly mesh for each group in the obj.
-  for (const auto &group : objStream.GetGroups())
-  {
-    if (!TfIsValidIdentifier(group.name))
-    {
-      TF_WARN("Omitting OBJ group with invalid name '%s'",
-              group.name.c_str());
+  for (const auto &group : objStream.GetGroups()) {
+    if (!TfIsValidIdentifier(group.name)) {
+      TF_WARN("Omitting OBJ group with invalid name '%s'", group.name.c_str());
       continue;
     }
 
-    if (group.faces.empty())
-    {
-      TF_WARN("Omitting OBJ group with no faces '%s'",
-              group.name.c_str());
+    if (group.faces.empty()) {
+      TF_WARN("Omitting OBJ group with no faces '%s'", group.name.c_str());
       continue;
     }
 
     // Create a mesh for the group.
-    UsdGeomMesh mesh =
-        UsdGeomMesh::Define(stage, SdfPath("/" + group.name));
+    UsdGeomMesh mesh = UsdGeomMesh::Define(stage, SdfPath("/" + group.name));
 
     // Populate the mesh data from the obj data.  This is not a very smart
     // importer.  We throw all the verts onto everything for simplicity.  If
@@ -101,11 +93,9 @@ UsdObjTranslateObjToUsd(const UsdObjStream &objStream)
     mesh.GetPointsAttr().Set(usdPoints);
 
     VtArray<int> faceVertexCounts, faceVertexIndices;
-    for (const auto &face : group.faces)
-    {
+    for (const auto &face : group.faces) {
       faceVertexCounts.push_back(face.size());
-      for (int p = face.pointsBegin; p != face.pointsEnd; ++p)
-      {
+      for (int p = face.pointsBegin; p != face.pointsEnd; ++p) {
         faceVertexIndices.push_back(objPoints[p].vertIndex);
       }
     }

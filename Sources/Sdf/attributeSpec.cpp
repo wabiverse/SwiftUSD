@@ -40,14 +40,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypeAttribute, SdfAttributeSpec,
-                SdfPropertySpec);
+SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypeAttribute, SdfAttributeSpec, SdfPropertySpec);
 
 SdfAttributeSpecHandle SdfAttributeSpec::New(const SdfPrimSpecHandle &owner,
                                              const std::string &name,
                                              const SdfValueTypeName &typeName,
                                              SdfVariability variability,
-                                             bool custom) {
+                                             bool custom)
+{
   TRACE_FUNCTION();
 
   SdfAttributeSpecHandle result;
@@ -65,34 +65,36 @@ SdfAttributeSpecHandle SdfAttributeSpec::New(const SdfPrimSpecHandle &owner,
     // name was not a valid property name.  Give specific error messages in
     // these cases.
     if (!Sdf_ChildrenUtils<Sdf_AttributeChildPolicy>::IsValidName(name)) {
-      TF_CODING_ERROR(
-          "Cannot create attribute spec on <%s> with invalid name '%s'",
-          ownerPtr->GetPath().GetText(), name.c_str());
-    } else if (ownerPtr->GetPath() == SdfPath::AbsoluteRootPath()) {
-      TF_CODING_ERROR(
-          "Cannot create attribute spec '%s' on the pseudo-root '/'",
-          name.c_str());
-    } else {
-      TF_CODING_ERROR("Cannot create attribute spec '%s' on <%s>", name.c_str(),
+      TF_CODING_ERROR("Cannot create attribute spec on <%s> with invalid name '%s'",
+                      ownerPtr->GetPath().GetText(),
+                      name.c_str());
+    }
+    else if (ownerPtr->GetPath() == SdfPath::AbsoluteRootPath()) {
+      TF_CODING_ERROR("Cannot create attribute spec '%s' on the pseudo-root '/'", name.c_str());
+    }
+    else {
+      TF_CODING_ERROR("Cannot create attribute spec '%s' on <%s>",
+                      name.c_str(),
                       ownerPtr->GetPath().GetText());
     }
     return result;
   }
 
   if (!typeName) {
-    TF_CODING_ERROR("Cannot create attribute spec <%s> with invalid type",
-                    attrPath.GetText());
+    TF_CODING_ERROR("Cannot create attribute spec <%s> with invalid type", attrPath.GetText());
     return result;
   }
 
   const SdfLayerHandle layer = ownerPtr->GetLayer();
   if (layer->_ValidateAuthoring()) {
-    const SdfValueTypeName typeInSchema =
-        layer->GetSchema().FindType(typeName.GetAsToken().GetString());
+    const SdfValueTypeName typeInSchema = layer->GetSchema().FindType(
+        typeName.GetAsToken().GetString());
     if (!typeInSchema) {
-      TF_CODING_ERROR("Cannot create attribute spec <%s> with type '%s' not "
-                      "supported by schema",
-                      attrPath.GetText(), typeName.GetAsToken().GetText());
+      TF_CODING_ERROR(
+          "Cannot create attribute spec <%s> with type '%s' not "
+          "supported by schema",
+          attrPath.GetText(),
+          typeName.GetAsToken().GetText());
       return result;
     }
   }
@@ -104,7 +106,8 @@ SdfAttributeSpecHandle SdfAttributeSpec::New(const SdfPrimSpecHandle &owner,
   const bool hasOnlyRequiredFields = (!custom);
 
   if (!Sdf_ChildrenUtils<Sdf_AttributeChildPolicy>::CreateSpec(
-          layer, attrPath, SdfSpecTypeAttribute, hasOnlyRequiredFields)) {
+          layer, attrPath, SdfSpecTypeAttribute, hasOnlyRequiredFields))
+  {
     return result;
   }
 
@@ -125,16 +128,18 @@ SdfAttributeSpecHandle SdfAttributeSpec::New(const SdfPrimSpecHandle &owner,
 // Connections
 //
 
-SdfConnectionsProxy SdfAttributeSpec::GetConnectionPathList() const {
-  return SdfGetPathEditorProxy(SdfCreateHandle(this),
-                               SdfFieldKeys->ConnectionPaths);
+SdfConnectionsProxy SdfAttributeSpec::GetConnectionPathList() const
+{
+  return SdfGetPathEditorProxy(SdfCreateHandle(this), SdfFieldKeys->ConnectionPaths);
 }
 
-bool SdfAttributeSpec::HasConnectionPaths() const {
+bool SdfAttributeSpec::HasConnectionPaths() const
+{
   return GetConnectionPathList().HasKeys();
 }
 
-void SdfAttributeSpec::ClearConnectionPaths() {
+void SdfAttributeSpec::ClearConnectionPaths()
+{
   GetConnectionPathList().ClearEdits();
 }
 
@@ -151,12 +156,12 @@ void SdfAttributeSpec::ClearConnectionPaths() {
 
 // Attribute Value API
 
-SDF_DEFINE_GET_SET_HAS_CLEAR(AllowedTokens, SdfFieldKeys->AllowedTokens,
-                             VtTokenArray)
+SDF_DEFINE_GET_SET_HAS_CLEAR(AllowedTokens, SdfFieldKeys->AllowedTokens, VtTokenArray)
 
 SDF_DEFINE_GET_SET_HAS_CLEAR(ColorSpace, SdfFieldKeys->ColorSpace, TfToken)
 
-TfEnum SdfAttributeSpec::GetDisplayUnit() const {
+TfEnum SdfAttributeSpec::GetDisplayUnit() const
+{
   // The difference between this and the macro version is that the
   // macro calls _GetValueWithDefault().  That checks if the value
   // is empty and, if so, returns the default value from the schema.
@@ -170,7 +175,8 @@ TfEnum SdfAttributeSpec::GetDisplayUnit() const {
   return GetTypeName().GetDefaultUnit();
 }
 
-TfToken SdfAttributeSpec::GetRoleName() const {
+TfToken SdfAttributeSpec::GetRoleName() const
+{
   return GetTypeName().GetRole();
 }
 
@@ -185,11 +191,13 @@ bool SdfJustCreatePrimAttributeInLayer(const SdfLayerHandle &layer,
                                        const SdfPath &attrPath,
                                        const SdfValueTypeName &typeName,
                                        SdfVariability variability,
-                                       bool isCustom) {
+                                       bool isCustom)
+{
   if (!attrPath.IsPrimPropertyPath()) {
-    TF_CODING_ERROR("Cannot create prim attribute at path '%s' because "
-                    "it is not a prim property path",
-                    attrPath.GetText());
+    TF_CODING_ERROR(
+        "Cannot create prim attribute at path '%s' because "
+        "it is not a prim property path",
+        attrPath.GetText());
     return false;
   }
 
@@ -202,11 +210,16 @@ bool SdfJustCreatePrimAttributeInLayer(const SdfLayerHandle &layer,
   }
 
   if (!Sdf_ChildrenUtils<Sdf_AttributeChildPolicy>::CreateSpec(
-          layer, attrPath, SdfSpecTypeAttribute,
-          /*hasOnlyRequiredFields=*/!isCustom)) {
-    TF_RUNTIME_ERROR("Failed to create attribute at path '%s' in "
-                     "layer @%s@",
-                     attrPath.GetText(), layerPtr->GetIdentifier().c_str());
+          layer,
+          attrPath,
+          SdfSpecTypeAttribute,
+          /*hasOnlyRequiredFields=*/!isCustom))
+  {
+    TF_RUNTIME_ERROR(
+        "Failed to create attribute at path '%s' in "
+        "layer @%s@",
+        attrPath.GetText(),
+        layerPtr->GetIdentifier().c_str());
     return false;
   }
 

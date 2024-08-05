@@ -31,10 +31,10 @@
 /// layer will be the first parameter to the function and will always have
 /// precedence in conflicts during the merge.
 
-#include <pxr/pxrns.h>
-#include "UsdUtils/api.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/spec.h"
+#include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include <functional>
 
@@ -67,29 +67,24 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// - The minimum startTimeCode value and maximum endTimeCode value will
 ///   be used.
 USDUTILS_API
-void UsdUtilsStitchLayers(
-    const SdfLayerHandle &strongLayer,
-    const SdfLayerHandle &weakLayer);
+void UsdUtilsStitchLayers(const SdfLayerHandle &strongLayer, const SdfLayerHandle &weakLayer);
 
 /// Merge the scene description for \p weakObj into \p strongObj.
 ///
 /// See documentation on UsdUtilsStitchLayers for a description of
 /// the merging behavior.
 USDUTILS_API
-void UsdUtilsStitchInfo(
-    const SdfSpecHandle &strongObj,
-    const SdfSpecHandle &weakObj);
+void UsdUtilsStitchInfo(const SdfSpecHandle &strongObj, const SdfSpecHandle &weakObj);
 
 /// \name Advanced Stitching API
 /// @{
 
 /// Status enum returned by UsdUtilsStitchValueFn describing the
 /// desired value stitching behavior.
-enum class UsdUtilsStitchValueStatus
-{
-  NoStitchedValue, ///< Don't stitch values for this field.
-  UseDefaultValue, ///< Use the default stitching behavior for this field.
-  UseSuppliedValue ///< Use the value supplied in stitchedValue.
+enum class UsdUtilsStitchValueStatus {
+  NoStitchedValue,  ///< Don't stitch values for this field.
+  UseDefaultValue,  ///< Use the default stitching behavior for this field.
+  UseSuppliedValue  ///< Use the value supplied in stitchedValue.
 };
 
 /// Callback for customizing how values are stitched together.
@@ -103,32 +98,32 @@ enum class UsdUtilsStitchValueStatus
 /// desired behavior. Note that if the callback returns UseSuppliedValue and
 /// supplies an empty VtValue in \p stitchedValue, the field will be removed
 /// from the destination spec.
-using UsdUtilsStitchValueFn = std::function<
-    UsdUtilsStitchValueStatus(
-        const TfToken &field, const SdfPath &path,
-        const SdfLayerHandle &strongLayer, bool fieldInStrongLayer,
-        const SdfLayerHandle &weakLayer, bool fieldInWeakLayer,
-        VtValue *stitchedValue)>;
+using UsdUtilsStitchValueFn =
+    std::function<UsdUtilsStitchValueStatus(const TfToken &field,
+                                            const SdfPath &path,
+                                            const SdfLayerHandle &strongLayer,
+                                            bool fieldInStrongLayer,
+                                            const SdfLayerHandle &weakLayer,
+                                            bool fieldInWeakLayer,
+                                            VtValue *stitchedValue)>;
 
 /// Advanced version of UsdUtilsStitchLayers that accepts a \p stitchValueFn
 /// callback to customize how fields in \p strongLayer and \p weakLayer are
 /// stitched together. See documentation on UsdUtilsStitchValueFn for more
 /// details.
 USDUTILS_API
-void UsdUtilsStitchLayers(
-    const SdfLayerHandle &strongLayer,
-    const SdfLayerHandle &weakLayer,
-    const UsdUtilsStitchValueFn &stitchValueFn);
+void UsdUtilsStitchLayers(const SdfLayerHandle &strongLayer,
+                          const SdfLayerHandle &weakLayer,
+                          const UsdUtilsStitchValueFn &stitchValueFn);
 
 /// Advanced version of UsdUtilsStitchInfo that accepts a \p stitchValueFn
 /// callback to customize how fields in \p strongObj and \p weakObj are
 /// stitched together. See documentation on UsdUtilsStitchValueFn for more
 /// details.
 USDUTILS_API
-void UsdUtilsStitchInfo(
-    const SdfSpecHandle &strongObj,
-    const SdfSpecHandle &weakObj,
-    const UsdUtilsStitchValueFn &stitchValueFn);
+void UsdUtilsStitchInfo(const SdfSpecHandle &strongObj,
+                        const SdfSpecHandle &weakObj,
+                        const UsdUtilsStitchValueFn &stitchValueFn);
 
 /// @}
 

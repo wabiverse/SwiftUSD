@@ -34,44 +34,35 @@
 #include "Hd/api.h"
 #include "Hd/geomSubsetSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDGEOMSUBSETS_SCHEMA_TOKENS \
-    (geomSubsets) \
+#define HDGEOMSUBSETS_SCHEMA_TOKENS (geomSubsets)
 
-TF_DECLARE_PUBLIC_TOKENS(HdGeomSubsetsSchemaTokens, HD_API,
-    HDGEOMSUBSETS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdGeomSubsetsSchemaTokens, HD_API, HDGEOMSUBSETS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdGeomSubsetsSchema : public HdSchema
-{
-public:
-    HdGeomSubsetsSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdGeomSubsetsSchema : public HdSchema {
+ public:
+  HdGeomSubsetsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    TfTokenVector GetIds();
-    HdGeomSubsetSchema GetGeomSubset(const TfToken & id);
+  TfTokenVector GetIds();
+  HdGeomSubsetSchema GetGeomSubset(const TfToken &id);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "geomSubsets" from the parent container and constructs a
+  /// HdGeomSubsetsSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdGeomSubsetsSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "geomSubsets" from the parent container and constructs a
-    /// HdGeomSubsetsSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdGeomSubsetsSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

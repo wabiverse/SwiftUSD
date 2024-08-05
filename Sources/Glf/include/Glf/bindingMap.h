@@ -26,27 +26,23 @@
 
 /// \file glf/bindingMap.h
 
-#include <pxr/pxrns.h>
-#include "Glf/api.h"
 #include "Garch/glApi.h"
+#include "Glf/api.h"
 #include "Tf/refBase.h"
 #include "Tf/stringUtils.h"
 #include "Tf/token.h"
 #include "Tf/weakBase.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/hashmap.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GlfBindingMap : public TfRefBase, public TfWeakBase
-{
-public:
+class GlfBindingMap : public TfRefBase, public TfWeakBase {
+ public:
   typedef TfHashMap<TfToken, int, TfToken::HashFunctor> BindingMap;
 
-  GlfBindingMap()
-      : _samplerBindingBaseIndex(0), _uniformBindingBaseIndex(0)
-  {
-  }
+  GlfBindingMap() : _samplerBindingBaseIndex(0), _uniformBindingBaseIndex(0) {}
 
   GLF_API
   int GetSamplerUnit(std::string const &name);
@@ -126,7 +122,7 @@ public:
   GLF_API
   void Debug() const;
 
-private:
+ private:
   void _AddActiveAttributeBindings(GLuint program);
   void _AddActiveUniformBindings(GLuint program);
   void _AddActiveUniformBlockBindings(GLuint program);
@@ -141,4 +137,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GLF_BINDING_MAP_H
+#endif  // PXR_IMAGING_GLF_BINDING_MAP_H

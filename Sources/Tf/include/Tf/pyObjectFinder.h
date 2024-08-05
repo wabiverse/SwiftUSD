@@ -41,10 +41,10 @@ struct Tf_PyObjectFinderBase {
   virtual boost::python::object Find(void const *objPtr) const = 0;
 };
 
-template <class T, class PtrType>
-struct Tf_PyObjectFinder : public Tf_PyObjectFinderBase {
+template<class T, class PtrType> struct Tf_PyObjectFinder : public Tf_PyObjectFinderBase {
   virtual ~Tf_PyObjectFinder() {}
-  virtual boost::python::object Find(void const *objPtr) const {
+  virtual boost::python::object Find(void const *objPtr) const
+  {
     using namespace boost::python;
     TfPyLock lock;
     void *p = const_cast<void *>(objPtr);
@@ -57,14 +57,13 @@ TF_API
 void Tf_RegisterPythonObjectFinderInternal(std::type_info const &type,
                                            Tf_PyObjectFinderBase const *finder);
 
-template <class T, class PtrType> void Tf_RegisterPythonObjectFinder() {
-  Tf_RegisterPythonObjectFinderInternal(typeid(T),
-                                        new Tf_PyObjectFinder<T, PtrType>());
+template<class T, class PtrType> void Tf_RegisterPythonObjectFinder()
+{
+  Tf_RegisterPythonObjectFinderInternal(typeid(T), new Tf_PyObjectFinder<T, PtrType>());
 }
 
-TF_API boost::python::object Tf_FindPythonObject(void const *objPtr,
-                                                 std::type_info const &type);
+TF_API boost::python::object Tf_FindPythonObject(void const *objPtr, std::type_info const &type);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_OBJECT_FINDER_H
+#endif  // PXR_BASE_TF_PY_OBJECT_FINDER_H

@@ -43,8 +43,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 // A helper struct for thread_local that uses nullptr initialization as a
 // sentinel to prevent guard variable use from being invoked after first
 // initialization.
-template <class T> struct Sdf_FastThreadLocalBase {
-  static T &Get() {
+template<class T> struct Sdf_FastThreadLocalBase {
+  static T &Get()
+  {
     static thread_local T *theTPtr = nullptr;
     if (ARCH_LIKELY(theTPtr)) {
       return *theTPtr;
@@ -70,13 +71,11 @@ template <class T> struct Sdf_FastThreadLocalBase {
 // individual allocations.  When freed, allocations are placed on a thread-local
 // free list, and eventually shared back for use by other threads when the free
 // list gets large.
-template <class Tag, unsigned ElemSize, unsigned RegionBits,
-          unsigned ElemsPerSpan = 16384>
+template<class Tag, unsigned ElemSize, unsigned RegionBits, unsigned ElemsPerSpan = 16384>
 class Sdf_Pool {
-  static_assert(ElemSize >= sizeof(uint32_t),
-                "ElemSize must be at least sizeof(uint32_t)");
+  static_assert(ElemSize >= sizeof(uint32_t), "ElemSize must be at least sizeof(uint32_t)");
 
-public:
+ public:
   // Number of pool elements per region.
   static constexpr uint64_t ElemsPerRegion = 1ull << (32 - RegionBits);
 
@@ -92,43 +91,58 @@ public:
   struct Handle {
     constexpr Handle() noexcept = default;
     constexpr Handle(std::nullptr_t) noexcept : value(0) {}
-    Handle(unsigned region, uint32_t index)
-        : value((index << RegionBits) | region) {}
+    Handle(unsigned region, uint32_t index) : value((index << RegionBits) | region) {}
     Handle &operator=(Handle const &) = default;
-    Handle &operator=(std::nullptr_t) { return *this = Handle(); }
-    inline char *GetPtr() const noexcept {
+    Handle &operator=(std::nullptr_t)
+    {
+      return *this = Handle();
+    }
+    inline char *GetPtr() const noexcept
+    {
       ARCH_PRAGMA_PUSH
       ARCH_PRAGMA_MAYBE_UNINITIALIZED
       return Sdf_Pool::_GetPtr(value & RegionMask, value >> RegionBits);
       ARCH_PRAGMA_POP
     }
-    static inline Handle GetHandle(char const *ptr) noexcept {
+    static inline Handle GetHandle(char const *ptr) noexcept
+    {
       return Sdf_Pool::_GetHandle(ptr);
     }
-    explicit operator bool() const { return value != 0; }
-    inline bool operator==(Handle const &r) const noexcept {
+    explicit operator bool() const
+    {
+      return value != 0;
+    }
+    inline bool operator==(Handle const &r) const noexcept
+    {
       return value == r.value;
     }
-    inline bool operator!=(Handle const &r) const noexcept {
+    inline bool operator!=(Handle const &r) const noexcept
+    {
       return value != r.value;
     }
-    inline bool operator<(Handle const &r) const noexcept {
+    inline bool operator<(Handle const &r) const noexcept
+    {
       return value < r.value;
     }
-    inline void swap(Handle &r) noexcept { std::swap(value, r.value); }
+    inline void swap(Handle &r) noexcept
+    {
+      std::swap(value, r.value);
+    }
     uint32_t value = 0;
   };
 
-private:
+ private:
   // We maintain per-thread free lists of pool items.
   struct _FreeList {
-    inline void Pop() {
+    inline void Pop()
+    {
       char *p = head.GetPtr();
       Handle *hp = reinterpret_cast<Handle *>(p);
       head = *hp;
       --size;
     }
-    inline void Push(Handle h) {
+    inline void Push(Handle h)
+    {
       ++size;
       char *p = h.GetPtr();
       Handle *hp = reinterpret_cast<Handle *>(p);
@@ -144,9 +158,18 @@ private:
   // pool span are exhausted, a thread will look for a shared free list, or
   // will obtain a new chunk of pool space to use.
   struct _PoolSpan {
-    size_t size() const { return endIndex - beginIndex; }
-    inline Handle Alloc() { return Handle(region, beginIndex++); }
-    inline bool empty() const { return beginIndex == endIndex; }
+    size_t size() const
+    {
+      return endIndex - beginIndex;
+    }
+    inline Handle Alloc()
+    {
+      return Handle(region, beginIndex++);
+    }
+    inline bool empty() const
+    {
+      return beginIndex == endIndex;
+    }
     unsigned region;
     uint32_t beginIndex;
     uint32_t endIndex;
@@ -168,39 +191,56 @@ private:
 
     _RegionState() = default;
     constexpr _RegionState(unsigned region, uint32_t index)
-        : _state((index << RegionBits) | region) {}
+        : _state((index << RegionBits) | region)
+    {
+    }
 
     // Make a new state that reserves up to \p num elements.  There must be
     // space left remaining.
     inline _RegionState Reserve(unsigned num) const;
 
-    static constexpr _RegionState GetInitState() { return _RegionState(0, 0); }
+    static constexpr _RegionState GetInitState()
+    {
+      return _RegionState(0, 0);
+    }
 
-    static constexpr _RegionState GetLockedState() {
+    static constexpr _RegionState GetLockedState()
+    {
       return _RegionState(LockedState, LockedState);
     }
 
-    constexpr bool operator==(_RegionState other) const {
+    constexpr bool operator==(_RegionState other) const
+    {
       return _state == other._state;
     }
 
-    uint32_t GetIndex() const { return _state >> RegionBits; }
+    uint32_t GetIndex() const
+    {
+      return _state >> RegionBits;
+    }
 
-    unsigned GetRegion() const { return _state & RegionMask; }
+    unsigned GetRegion() const
+    {
+      return _state & RegionMask;
+    }
 
-    bool IsLocked() const { return _state == LockedState; }
+    bool IsLocked() const
+    {
+      return _state == LockedState;
+    }
 
     // low RegionBits bits are region id, rest are index.
     uint32_t _state;
   };
 
-public:
+ public:
   static inline Handle Allocate();
   static inline void Free(Handle h);
 
-private:
+ private:
   // Given a region id and index, form the pointer into the pool.
-  static inline char *_GetPtr(unsigned region, uint32_t index) {
+  static inline char *_GetPtr(unsigned region, uint32_t index)
+  {
     // Suppress undefined-var-template warnings from clang; _regionStarts
     // is expected to be instantiated in another translation unit via
     // the SDF_INSTANTIATE_POOL macro.
@@ -212,7 +252,8 @@ private:
 
   // Given a pointer into the pool, produce its corresponding Handle.  Don't
   // do this unless you really have to, it has to do a bit of a search.
-  static inline Handle _GetHandle(char const *ptr) {
+  static inline Handle _GetHandle(char const *ptr)
+  {
     if (ptr) {
       for (unsigned region = 1; region != NumRegions + 1; ++region) {
         // Suppress undefined-var-template warnings from clang; _regionStarts
@@ -235,12 +276,14 @@ private:
   }
 
   // Try to take a shared free list.
-  static bool _TakeSharedFreeList(_FreeList &out) {
+  static bool _TakeSharedFreeList(_FreeList &out)
+  {
     return _sharedFreeLists->try_pop(out);
   }
 
   // Give a free list to be shared by other threads.
-  static void _ShareFreeList(_FreeList &in) {
+  static void _ShareFreeList(_FreeList &in)
+  {
     _sharedFreeLists->push(in);
     in = {};
   }
@@ -254,10 +297,9 @@ private:
   SDF_API static _ThreadData _threadData;
   SDF_API static char *_regionStarts[NumRegions + 1];
   SDF_API static std::atomic<_RegionState> _regionState;
-  SDF_API static TfStaticData<tbb::concurrent_queue<_FreeList>>
-      _sharedFreeLists;
+  SDF_API static TfStaticData<tbb::concurrent_queue<_FreeList>> _sharedFreeLists;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_POOL_H
+#endif  // PXR_USD_SDF_POOL_H

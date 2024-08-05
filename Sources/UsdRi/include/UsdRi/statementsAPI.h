@@ -26,19 +26,19 @@
 
 /// \file usdRi/statementsAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdRi/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdRi/api.h"
+#include <pxr/pxrns.h>
 
 #include "UsdGeom/primvarsAPI.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -65,9 +65,8 @@ class SdfAssetPath;
 /// namespace.
 ///
 ///
-class UsdRiStatementsAPI : public UsdAPISchemaBase
-{
-public:
+class UsdRiStatementsAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -77,18 +76,12 @@ public:
   /// Equivalent to UsdRiStatementsAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRiStatementsAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
-  {
-  }
+  explicit UsdRiStatementsAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdRiStatementsAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdRiStatementsAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRiStatementsAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj)
-  {
-  }
+  explicit UsdRiStatementsAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
   /// Destructor.
   USDRI_API
@@ -98,8 +91,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRI_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRiStatementsAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -111,8 +103,7 @@ public:
   /// \endcode
   ///
   USDRI_API
-  static UsdRiStatementsAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRiStatementsAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -131,8 +122,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "StatementsAPI" to the
@@ -150,17 +140,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static UsdRiStatementsAPI
-  Apply(const UsdPrim &prim);
+  static UsdRiStatementsAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRI_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRI_API
@@ -172,7 +161,7 @@ private:
   USDRI_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -201,30 +190,23 @@ public:
   /// can be array-valued.  For instance, both "color" and "float[3]"
   /// are valid values for \p riType.
   USDRI_API
-  UsdAttribute
-  CreateRiAttribute(
-      const TfToken &name,
-      const std::string &riType,
-      const std::string &nameSpace = "user");
+  UsdAttribute CreateRiAttribute(const TfToken &name,
+                                 const std::string &riType,
+                                 const std::string &nameSpace = "user");
 
   /// Creates an attribute of the given \p tfType.
   /// \overload
   USDRI_API
-  UsdAttribute
-  CreateRiAttribute(
-      const TfToken &name,
-      const TfType &tfType,
-      const std::string &nameSpace = "user");
+  UsdAttribute CreateRiAttribute(const TfToken &name,
+                                 const TfType &tfType,
+                                 const std::string &nameSpace = "user");
 
   /// Return a UsdAttribute representing the Ri attribute with the
   /// name \a name, in the namespace \a nameSpace.  The attribute
   /// returned may or may not \b actually exist so it must be
   /// checked for validity.
   USDRI_API
-  UsdAttribute
-  GetRiAttribute(
-      const TfToken &name,
-      const std::string &nameSpace = "user");
+  UsdAttribute GetRiAttribute(const TfToken &name, const std::string &nameSpace = "user");
 
   // --------------------------------------------------------------------- //
   // GetRiAttributes
@@ -236,8 +218,7 @@ public:
   /// UsdRelationship, and like all UsdProperties, need not have a defined
   /// value.
   USDRI_API
-  std::vector<UsdProperty>
-  GetRiAttributes(const std::string &nameSpace = "") const;
+  std::vector<UsdProperty> GetRiAttributes(const std::string &nameSpace = "") const;
   // --------------------------------------------------------------------- //
   // GetRiAttributeName
   // --------------------------------------------------------------------- //

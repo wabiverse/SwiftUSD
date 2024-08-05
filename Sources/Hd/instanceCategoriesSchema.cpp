@@ -33,81 +33,63 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstanceCategoriesSchemaTokens,
-    HDINSTANCECATEGORIES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstanceCategoriesSchemaTokens, HDINSTANCECATEGORIES_SCHEMA_TOKENS);
 
-
-
-HdVectorDataSourceHandle
-HdInstanceCategoriesSchema::GetCategoriesValues()
+HdVectorDataSourceHandle HdInstanceCategoriesSchema::GetCategoriesValues()
 {
-    return _GetTypedDataSource<HdVectorDataSource>(
-        HdInstanceCategoriesSchemaTokens->categoriesValues);
+  return _GetTypedDataSource<HdVectorDataSource>(
+      HdInstanceCategoriesSchemaTokens->categoriesValues);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdInstanceCategoriesSchema::BuildRetained(
-        const HdVectorDataSourceHandle &categoriesValues
-)
-{
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
-
-    size_t count = 0;
-    if (categoriesValues) {
-        names[count] = HdInstanceCategoriesSchemaTokens->categoriesValues;
-        values[count++] = categoriesValues;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdInstanceCategoriesSchema
-HdInstanceCategoriesSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdInstanceCategoriesSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdInstanceCategoriesSchemaTokens->instanceCategories))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdInstanceCategoriesSchema::GetSchemaToken()
-{
-    return HdInstanceCategoriesSchemaTokens->instanceCategories;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdInstanceCategoriesSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdInstanceCategoriesSchemaTokens->instanceCategories
-    );
-    return locator;
-} 
-HdInstanceCategoriesSchema::Builder &
-HdInstanceCategoriesSchema::Builder::SetCategoriesValues(
+HdContainerDataSourceHandle HdInstanceCategoriesSchema::BuildRetained(
     const HdVectorDataSourceHandle &categoriesValues)
 {
-    _categoriesValues = categoriesValues;
-    return *this;
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
+
+  size_t count = 0;
+  if (categoriesValues) {
+    names[count] = HdInstanceCategoriesSchemaTokens->categoriesValues;
+    values[count++] = categoriesValues;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdInstanceCategoriesSchema::Builder::Build()
+/*static*/
+HdInstanceCategoriesSchema HdInstanceCategoriesSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdInstanceCategoriesSchema::BuildRetained(
-        _categoriesValues
-    );
+  return HdInstanceCategoriesSchema(
+      fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                HdInstanceCategoriesSchemaTokens->instanceCategories)) :
+                            nullptr);
 }
 
+/*static*/
+const TfToken &HdInstanceCategoriesSchema::GetSchemaToken()
+{
+  return HdInstanceCategoriesSchemaTokens->instanceCategories;
+}
+/*static*/
+const HdDataSourceLocator &HdInstanceCategoriesSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdInstanceCategoriesSchemaTokens->instanceCategories);
+  return locator;
+}
+HdInstanceCategoriesSchema::Builder &HdInstanceCategoriesSchema::Builder::SetCategoriesValues(
+    const HdVectorDataSourceHandle &categoriesValues)
+{
+  _categoriesValues = categoriesValues;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdInstanceCategoriesSchema::Builder::Build()
+{
+  return HdInstanceCategoriesSchema::BuildRetained(_categoriesValues);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

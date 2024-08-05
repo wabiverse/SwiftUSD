@@ -26,18 +26,18 @@
 
 /// \file usdPhysics/limitAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdPhysics/api.h"
 #include "UsdPhysics/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -60,9 +60,8 @@ class SdfAssetPath;
 /// PhysicsLimitAPI is applied to. Note that if the low limit is higher than
 /// the high limit, motion along this axis is considered locked.
 ///
-class UsdPhysicsLimitAPI : public UsdAPISchemaBase
-{
-public:
+class UsdPhysicsLimitAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -77,8 +76,7 @@ public:
   ///
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdPhysicsLimitAPI(
-      const UsdPrim &prim = UsdPrim(), const TfToken &name = TfToken())
+  explicit UsdPhysicsLimitAPI(const UsdPrim &prim = UsdPrim(), const TfToken &name = TfToken())
       : UsdAPISchemaBase(prim, /*instanceName*/ name)
   {
   }
@@ -87,8 +85,7 @@ public:
   /// name \p name.  Should be preferred over
   /// UsdPhysicsLimitAPI(schemaObj.GetPrim(), name), as it preserves
   /// SchemaBase state.
-  explicit UsdPhysicsLimitAPI(
-      const UsdSchemaBase &schemaObj, const TfToken &name)
+  explicit UsdPhysicsLimitAPI(const UsdSchemaBase &schemaObj, const TfToken &name)
       : UsdAPISchemaBase(schemaObj, /*instanceName*/ name)
   {
   }
@@ -101,8 +98,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPHYSICS_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a vector of names of all pre-declared attributes for this schema
   /// class and all its ancestor classes for a given instance name.  Does not
@@ -110,8 +106,7 @@ public:
   /// the schemas involved. The names returned will have the proper namespace
   /// prefix.
   USDPHYSICS_API
-  static TfTokenVector
-  GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
+  static TfTokenVector GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
 
   /// Returns the name of this multiple-apply schema instance
   TfToken GetName() const
@@ -134,33 +129,28 @@ public:
   /// \endcode
   ///
   USDPHYSICS_API
-  static UsdPhysicsLimitAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsLimitAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Return a UsdPhysicsLimitAPI with name \p name holding the
   /// prim \p prim. Shorthand for UsdPhysicsLimitAPI(prim, name);
   USDPHYSICS_API
-  static UsdPhysicsLimitAPI
-  Get(const UsdPrim &prim, const TfToken &name);
+  static UsdPhysicsLimitAPI Get(const UsdPrim &prim, const TfToken &name);
 
   /// Return a vector of all named instances of UsdPhysicsLimitAPI on the
   /// given \p prim.
   USDPHYSICS_API
-  static std::vector<UsdPhysicsLimitAPI>
-  GetAll(const UsdPrim &prim);
+  static std::vector<UsdPhysicsLimitAPI> GetAll(const UsdPrim &prim);
 
   /// Checks if the given name \p baseName is the base name of a property
   /// of PhysicsLimitAPI.
   USDPHYSICS_API
-  static bool
-  IsSchemaPropertyBaseName(const TfToken &baseName);
+  static bool IsSchemaPropertyBaseName(const TfToken &baseName);
 
   /// Checks if the given path \p path is of an API schema of type
   /// PhysicsLimitAPI. If so, it stores the instance name of
   /// the schema in \p name and returns true. Otherwise, it returns false.
   USDPHYSICS_API
-  static bool
-  IsPhysicsLimitAPIPath(const SdfPath &path, TfToken *name);
+  static bool IsPhysicsLimitAPIPath(const SdfPath &path, TfToken *name);
 
   /// Returns true if this <b>multiple-apply</b> API schema can be applied,
   /// with the given instance name, \p name, to the given \p prim. If this
@@ -179,9 +169,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDPHYSICS_API
-  static bool
-  CanApply(const UsdPrim &prim, const TfToken &name,
-           std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, const TfToken &name, std::string *whyNot = nullptr);
 
   /// Applies this <b>multiple-apply</b> API schema to the given \p prim
   /// along with the given instance name, \p name.
@@ -203,17 +191,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDPHYSICS_API
-  static UsdPhysicsLimitAPI
-  Apply(const UsdPrim &prim, const TfToken &name);
+  static UsdPhysicsLimitAPI Apply(const UsdPrim &prim, const TfToken &name);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPHYSICS_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPHYSICS_API
@@ -225,7 +212,7 @@ private:
   USDPHYSICS_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // LOW
   // --------------------------------------------------------------------- //
@@ -246,9 +233,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateLowAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateLowAttr(VtValue const &defaultValue = VtValue(),
+                             bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // HIGH
   // --------------------------------------------------------------------- //
@@ -269,9 +257,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateHighAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateHighAttr(VtValue const &defaultValue = VtValue(),
+                              bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

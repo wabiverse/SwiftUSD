@@ -23,11 +23,11 @@
 //
 #include "UsdSkel/animQuery.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include "Usd/prim.h"
 
@@ -41,71 +41,63 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+VtMatrix4dArray _ComputeJointLocalTransforms(const UsdSkelAnimQuery &self, UsdTimeCode time)
 {
+  VtMatrix4dArray xforms;
+  self.ComputeJointLocalTransforms(&xforms, time);
+  return xforms;
+}
 
-  VtMatrix4dArray
-  _ComputeJointLocalTransforms(const UsdSkelAnimQuery &self, UsdTimeCode time)
-  {
-    VtMatrix4dArray xforms;
-    self.ComputeJointLocalTransforms(&xforms, time);
-    return xforms;
-  }
+boost::python::tuple _ComputeJointLocalTransformComponents(const UsdSkelAnimQuery &self,
+                                                           UsdTimeCode time)
+{
+  VtVec3fArray translations;
+  VtQuatfArray rotations;
+  VtVec3hArray scales;
+  self.ComputeJointLocalTransformComponents(&translations, &rotations, &scales, time);
+  return boost::python::make_tuple(translations, rotations, scales);
+}
 
-  boost::python::tuple
-  _ComputeJointLocalTransformComponents(const UsdSkelAnimQuery &self, UsdTimeCode time)
-  {
-    VtVec3fArray translations;
-    VtQuatfArray rotations;
-    VtVec3hArray scales;
-    self.ComputeJointLocalTransformComponents(&translations, &rotations,
-                                              &scales, time);
-    return boost::python::make_tuple(translations, rotations, scales);
-  }
+VtFloatArray _ComputeBlendShapeWeights(const UsdSkelAnimQuery &self, UsdTimeCode time)
+{
+  VtFloatArray weights;
+  self.ComputeBlendShapeWeights(&weights, time);
+  return weights;
+}
 
-  VtFloatArray
-  _ComputeBlendShapeWeights(const UsdSkelAnimQuery &self, UsdTimeCode time)
-  {
-    VtFloatArray weights;
-    self.ComputeBlendShapeWeights(&weights, time);
-    return weights;
-  }
+std::vector<double> _GetJointTransformTimeSamples(const UsdSkelAnimQuery &self)
+{
+  std::vector<double> times;
+  self.GetJointTransformTimeSamples(&times);
+  return times;
+}
 
-  std::vector<double>
-  _GetJointTransformTimeSamples(const UsdSkelAnimQuery &self)
-  {
-    std::vector<double> times;
-    self.GetJointTransformTimeSamples(&times);
-    return times;
-  }
+std::vector<double> _GetJointTransformTimeSamplesInInterval(const UsdSkelAnimQuery &self,
+                                                            const GfInterval &interval)
+{
+  std::vector<double> times;
+  self.GetJointTransformTimeSamplesInInterval(interval, &times);
+  return times;
+}
 
-  std::vector<double>
-  _GetJointTransformTimeSamplesInInterval(const UsdSkelAnimQuery &self,
-                                          const GfInterval &interval)
-  {
-    std::vector<double> times;
-    self.GetJointTransformTimeSamplesInInterval(interval, &times);
-    return times;
-  }
+std::vector<double> _GetBlendShapeWeightTimeSamples(const UsdSkelAnimQuery &self)
+{
+  std::vector<double> times;
+  self.GetBlendShapeWeightTimeSamples(&times);
+  return times;
+}
 
-  std::vector<double>
-  _GetBlendShapeWeightTimeSamples(const UsdSkelAnimQuery &self)
-  {
-    std::vector<double> times;
-    self.GetBlendShapeWeightTimeSamples(&times);
-    return times;
-  }
+std::vector<double> _GetBlendShapeWeightTimeSamplesInInterval(const UsdSkelAnimQuery &self,
+                                                              const GfInterval &interval)
+{
+  std::vector<double> times;
+  self.GetBlendShapeWeightTimeSamplesInInterval(interval, &times);
+  return times;
+}
 
-  std::vector<double>
-  _GetBlendShapeWeightTimeSamplesInInterval(const UsdSkelAnimQuery &self,
-                                            const GfInterval &interval)
-  {
-    std::vector<double> times;
-    self.GetBlendShapeWeightTimeSamplesInInterval(interval, &times);
-    return times;
-  }
-
-} // namespace
+}  // namespace
 
 void wrapUsdSkelAnimQuery()
 {
@@ -121,14 +113,16 @@ void wrapUsdSkelAnimQuery()
 
       .def("GetPrim", &This::GetPrim)
 
-      .def("ComputeJointLocalTransforms", &_ComputeJointLocalTransforms,
+      .def("ComputeJointLocalTransforms",
+           &_ComputeJointLocalTransforms,
            (arg("time") = UsdTimeCode::Default()))
 
       .def("ComputeJointLocalTransformComponents",
            &_ComputeJointLocalTransformComponents,
            (arg("time") = UsdTimeCode::Default()))
 
-      .def("ComputeBlendShapeWeights", &_ComputeBlendShapeWeights,
+      .def("ComputeBlendShapeWeights",
+           &_ComputeBlendShapeWeights,
            (arg("time") = UsdTimeCode::Default()))
 
       .def("GetJointTransformTimeSamples", &_GetJointTransformTimeSamples)
@@ -137,8 +131,7 @@ void wrapUsdSkelAnimQuery()
            &_GetJointTransformTimeSamplesInInterval,
            (arg("interval")))
 
-      .def("JointTransformsMightBeTimeVarying",
-           &This::JointTransformsMightBeTimeVarying)
+      .def("JointTransformsMightBeTimeVarying", &This::JointTransformsMightBeTimeVarying)
 
       .def("GetBlendShapeWeightTimeSamples", &_GetBlendShapeWeightTimeSamples)
 
@@ -146,8 +139,7 @@ void wrapUsdSkelAnimQuery()
            &_GetBlendShapeWeightTimeSamplesInInterval,
            (arg("interval")))
 
-      .def("BlendShapeWeightsMightBeTimeVarying",
-           &This::BlendShapeWeightsMightBeTimeVarying)
+      .def("BlendShapeWeightsMightBeTimeVarying", &This::BlendShapeWeightsMightBeTimeVarying)
 
       .def("GetJointOrder", &This::GetJointOrder)
 

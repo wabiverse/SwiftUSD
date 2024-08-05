@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGI_SAMPLER_H
 #define PXR_IMAGING_HGI_SAMPLER_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -60,10 +60,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///    The comparison function to apply if sampler compare is enabled.</li>
 /// </ul>
 ///
-struct HgiSamplerDesc
-{
+struct HgiSamplerDesc {
   HgiSamplerDesc()
-      : magFilter(HgiSamplerFilterNearest), minFilter(HgiSamplerFilterNearest), mipFilter(HgiMipFilterNotMipmapped), addressModeU(HgiSamplerAddressModeClampToEdge), addressModeV(HgiSamplerAddressModeClampToEdge), addressModeW(HgiSamplerAddressModeClampToEdge), borderColor(HgiBorderColorTransparentBlack), enableCompare(false), compareFunction(HgiCompareFunctionNever)
+      : magFilter(HgiSamplerFilterNearest),
+        minFilter(HgiSamplerFilterNearest),
+        mipFilter(HgiMipFilterNotMipmapped),
+        addressModeU(HgiSamplerAddressModeClampToEdge),
+        addressModeV(HgiSamplerAddressModeClampToEdge),
+        addressModeW(HgiSamplerAddressModeClampToEdge),
+        borderColor(HgiBorderColorTransparentBlack),
+        enableCompare(false),
+        compareFunction(HgiCompareFunctionNever)
   {
   }
 
@@ -80,14 +87,10 @@ struct HgiSamplerDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiSamplerDesc &lhs,
-    const HgiSamplerDesc &rhs);
+bool operator==(const HgiSamplerDesc &lhs, const HgiSamplerDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiSamplerDesc &lhs,
-    const HgiSamplerDesc &rhs);
+bool operator!=(const HgiSamplerDesc &lhs, const HgiSamplerDesc &rhs);
 
 ///
 /// \class HgiSampler
@@ -96,9 +99,8 @@ bool operator!=(
 /// perform texture sampling operations.
 /// Samplers should be created via Hgi::CreateSampler.
 ///
-class HgiSampler
-{
-public:
+class HgiSampler {
+ public:
   HGI_API
   virtual ~HgiSampler();
 
@@ -119,13 +121,13 @@ public:
   HGI_API
   virtual uint64_t GetRawResource() const = 0;
 
-protected:
+ protected:
   HGI_API
   HgiSampler(HgiSamplerDesc const &desc);
 
   HgiSamplerDesc _descriptor;
 
-private:
+ private:
   HgiSampler() = delete;
   HgiSampler &operator=(const HgiSampler &) = delete;
   HgiSampler(const HgiSampler &) = delete;

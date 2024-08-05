@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdLux/lightFilter.h"
 #include "Usd/schemaBase.h"
+#include "UsdLux/lightFilter.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -42,77 +42,68 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define WRAP_CUSTOM                                                     \
-    template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-        
-static UsdAttribute
-_CreateShaderIdAttr(UsdLuxLightFilter &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateShaderIdAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-}
-
-static std::string
-_Repr(const UsdLuxLightFilter &self)
+static UsdAttribute _CreateShaderIdAttr(UsdLuxLightFilter &self,
+                                        object defaultVal,
+                                        bool writeSparsely)
 {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdLux.LightFilter(%s)",
-        primRepr.c_str());
+  return self.CreateShaderIdAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                 writeSparsely);
 }
 
-} // anonymous namespace
+static std::string _Repr(const UsdLuxLightFilter &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdLux.LightFilter(%s)", primRepr.c_str());
+}
+
+}  // anonymous namespace
 
 void wrapUsdLuxLightFilter()
 {
-    typedef UsdLuxLightFilter This;
+  typedef UsdLuxLightFilter This;
 
-    class_<This, bases<UsdGeomXformable> >
-        cls("LightFilter");
+  class_<This, bases<UsdGeomXformable>> cls("LightFilter");
 
-    cls
-        .def(init<UsdPrim>(arg("prim")))
-        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
-        .def(TfTypePythonClass())
+  cls.def(init<UsdPrim>(arg("prim")))
+      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
+      .def(TfTypePythonClass())
 
-        .def("Get", &This::Get, (arg("stage"), arg("path")))
-        .staticmethod("Get")
+      .def("Get", &This::Get, (arg("stage"), arg("path")))
+      .staticmethod("Get")
 
-        .def("Define", &This::Define, (arg("stage"), arg("path")))
-        .staticmethod("Define")
+      .def("Define", &This::Define, (arg("stage"), arg("path")))
+      .staticmethod("Define")
 
-        .def("GetSchemaAttributeNames",
-             &This::GetSchemaAttributeNames,
-             arg("includeInherited")=true,
-             return_value_policy<TfPySequenceToList>())
-        .staticmethod("GetSchemaAttributeNames")
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
+           arg("includeInherited") = true,
+           return_value_policy<TfPySequenceToList>())
+      .staticmethod("GetSchemaAttributeNames")
 
-        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
-             return_value_policy<return_by_value>())
-        .staticmethod("_GetStaticTfType")
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
+           return_value_policy<return_by_value>())
+      .staticmethod("_GetStaticTfType")
 
-        .def(!self)
+      .def(!self)
 
-        
-        .def("GetShaderIdAttr",
-             &This::GetShaderIdAttr)
-        .def("CreateShaderIdAttr",
-             &_CreateShaderIdAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
+      .def("GetShaderIdAttr", &This::GetShaderIdAttr)
+      .def("CreateShaderIdAttr",
+           &_CreateShaderIdAttr,
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-        .def("__repr__", ::_Repr)
-    ;
+      .def("__repr__", ::_Repr);
 
-    _CustomWrapCode(cls);
+  _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by 
+// Feel free to add custom code below this line, it will be preserved by
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -123,7 +114,7 @@ void wrapUsdLuxLightFilter()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-// 
+//
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -132,54 +123,45 @@ void wrapUsdLuxLightFilter()
 
 #include "UsdShade/connectableAPI.h"
 
-static UsdAttribute
-_CreateShaderIdAttrForRenderContext(
-    UsdLuxLightFilter &self, 
-    const TfToken &renderContext,
-    object defaultVal, 
-    bool writeSparsely) 
+static UsdAttribute _CreateShaderIdAttrForRenderContext(UsdLuxLightFilter &self,
+                                                        const TfToken &renderContext,
+                                                        object defaultVal,
+                                                        bool writeSparsely)
 {
-    return self.CreateShaderIdAttrForRenderContext(
-        renderContext,
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), 
-        writeSparsely);
+  return self.CreateShaderIdAttrForRenderContext(
+      renderContext, UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
 }
 
 namespace {
 
-WRAP_CUSTOM {
-    _class
-        .def(init<UsdShadeConnectableAPI>(arg("connectable")))
-        .def("ConnectableAPI", &UsdLuxLightFilter::ConnectableAPI)
+WRAP_CUSTOM
+{
+  _class.def(init<UsdShadeConnectableAPI>(arg("connectable")))
+      .def("ConnectableAPI", &UsdLuxLightFilter::ConnectableAPI)
 
-        .def("CreateOutput", &UsdLuxLightFilter::CreateOutput,
-             (arg("name"), arg("type")))
-        .def("GetOutput", &UsdLuxLightFilter::GetOutput, arg("name"))
-        .def("GetOutputs", &UsdLuxLightFilter::GetOutputs,
-             (arg("onlyAuthored")=true),
-             return_value_policy<TfPySequenceToList>())
+      .def("CreateOutput", &UsdLuxLightFilter::CreateOutput, (arg("name"), arg("type")))
+      .def("GetOutput", &UsdLuxLightFilter::GetOutput, arg("name"))
+      .def("GetOutputs",
+           &UsdLuxLightFilter::GetOutputs,
+           (arg("onlyAuthored") = true),
+           return_value_policy<TfPySequenceToList>())
 
-        .def("CreateInput", &UsdLuxLightFilter::CreateInput,
-             (arg("name"), arg("type")))
-        .def("GetInput", &UsdLuxLightFilter::GetInput, arg("name"))
-        .def("GetInputs", &UsdLuxLightFilter::GetInputs,
-             (arg("onlyAuthored")=true),
-             return_value_policy<TfPySequenceToList>())
+      .def("CreateInput", &UsdLuxLightFilter::CreateInput, (arg("name"), arg("type")))
+      .def("GetInput", &UsdLuxLightFilter::GetInput, arg("name"))
+      .def("GetInputs",
+           &UsdLuxLightFilter::GetInputs,
+           (arg("onlyAuthored") = true),
+           return_value_policy<TfPySequenceToList>())
 
-        .def("GetFilterLinkCollectionAPI",
-             &UsdLuxLightFilter::GetFilterLinkCollectionAPI)
+      .def("GetFilterLinkCollectionAPI", &UsdLuxLightFilter::GetFilterLinkCollectionAPI)
 
-        .def("GetShaderIdAttrForRenderContext",
-             &UsdLuxLightFilter::GetShaderIdAttrForRenderContext, 
-             arg("renderContext"))
-        .def("CreateShaderIdAttrForRenderContext",
-             &_CreateShaderIdAttrForRenderContext,
-             (arg("renderContext"),
-              arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        .def("GetShaderId", 
-             &UsdLuxLightFilter::GetShaderId, arg("renderContexts"))
-        ;
+      .def("GetShaderIdAttrForRenderContext",
+           &UsdLuxLightFilter::GetShaderIdAttrForRenderContext,
+           arg("renderContext"))
+      .def("CreateShaderIdAttrForRenderContext",
+           &_CreateShaderIdAttrForRenderContext,
+           (arg("renderContext"), arg("defaultValue") = object(), arg("writeSparsely") = false))
+      .def("GetShaderId", &UsdLuxLightFilter::GetShaderId, arg("renderContexts"));
 }
 
-}
+}  // namespace

@@ -30,77 +30,61 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens,
-    HDMATERIALCONNECTION_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens, HDMATERIALCONNECTION_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdMaterialConnectionSchema::GetUpstreamNodePath()
+HdTokenDataSourceHandle HdMaterialConnectionSchema::GetUpstreamNodePath()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdMaterialConnectionSchemaTokens->upstreamNodePath);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdMaterialConnectionSchemaTokens->upstreamNodePath);
 }
 
-HdTokenDataSourceHandle
-HdMaterialConnectionSchema::GetUpstreamNodeOutputName()
+HdTokenDataSourceHandle HdMaterialConnectionSchema::GetUpstreamNodeOutputName()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdMaterialConnectionSchemaTokens->upstreamNodeOutputName);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdMaterialConnectionSchemaTokens->upstreamNodeOutputName);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdMaterialConnectionSchema::BuildRetained(
-        const HdTokenDataSourceHandle &upstreamNodePath,
-        const HdTokenDataSourceHandle &upstreamNodeOutputName
-)
-{
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
-
-    size_t count = 0;
-    if (upstreamNodePath) {
-        names[count] = HdMaterialConnectionSchemaTokens->upstreamNodePath;
-        values[count++] = upstreamNodePath;
-    }
-
-    if (upstreamNodeOutputName) {
-        names[count] = HdMaterialConnectionSchemaTokens->upstreamNodeOutputName;
-        values[count++] = upstreamNodeOutputName;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-
-HdMaterialConnectionSchema::Builder &
-HdMaterialConnectionSchema::Builder::SetUpstreamNodePath(
-    const HdTokenDataSourceHandle &upstreamNodePath)
-{
-    _upstreamNodePath = upstreamNodePath;
-    return *this;
-}
-
-HdMaterialConnectionSchema::Builder &
-HdMaterialConnectionSchema::Builder::SetUpstreamNodeOutputName(
+HdContainerDataSourceHandle HdMaterialConnectionSchema::BuildRetained(
+    const HdTokenDataSourceHandle &upstreamNodePath,
     const HdTokenDataSourceHandle &upstreamNodeOutputName)
 {
-    _upstreamNodeOutputName = upstreamNodeOutputName;
-    return *this;
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
+
+  size_t count = 0;
+  if (upstreamNodePath) {
+    names[count] = HdMaterialConnectionSchemaTokens->upstreamNodePath;
+    values[count++] = upstreamNodePath;
+  }
+
+  if (upstreamNodeOutputName) {
+    names[count] = HdMaterialConnectionSchemaTokens->upstreamNodeOutputName;
+    values[count++] = upstreamNodeOutputName;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdMaterialConnectionSchema::Builder::Build()
+HdMaterialConnectionSchema::Builder &HdMaterialConnectionSchema::Builder::SetUpstreamNodePath(
+    const HdTokenDataSourceHandle &upstreamNodePath)
 {
-    return HdMaterialConnectionSchema::BuildRetained(
-        _upstreamNodePath,
-        _upstreamNodeOutputName
-    );
+  _upstreamNodePath = upstreamNodePath;
+  return *this;
 }
 
+HdMaterialConnectionSchema::Builder &HdMaterialConnectionSchema::Builder::
+    SetUpstreamNodeOutputName(const HdTokenDataSourceHandle &upstreamNodeOutputName)
+{
+  _upstreamNodeOutputName = upstreamNodeOutputName;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdMaterialConnectionSchema::Builder::Build()
+{
+  return HdMaterialConnectionSchema::BuildRetained(_upstreamNodePath, _upstreamNodeOutputName);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

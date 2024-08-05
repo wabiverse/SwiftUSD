@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HDPRMAN_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HDPRMAN_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,17 +37,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Prman, and overload the transform (to account for different spine axes) for
 /// natively supported quadrics.
 ///
-class HdPrman_ImplicitSurfaceSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_ImplicitSurfaceSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_ImplicitSurfaceSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HDPRMAN_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H
+#endif  // PXR_IMAGING_HDPRMAN_IMPLICIT_SURFACE_SCENE_INDEX_PLUGIN_H

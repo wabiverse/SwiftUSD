@@ -29,8 +29,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static SdfLayerRefPtrVector::const_iterator
-_GetLayerIteratorInNode(const PcpNodeRef &node, const SdfLayerHandle &layer) {
+static SdfLayerRefPtrVector::const_iterator _GetLayerIteratorInNode(const PcpNodeRef &node,
+                                                                    const SdfLayerHandle &layer)
+{
   // Null layer means we want the root layer of the node's layer stack.
   const SdfLayerRefPtrVector &layers = node.GetLayerStack()->GetLayers();
   if (!layer) {
@@ -53,7 +54,8 @@ _GetLayerIteratorInNode(const PcpNodeRef &node, const SdfLayerHandle &layer) {
 UsdResolveTarget::UsdResolveTarget(const std::shared_ptr<PcpPrimIndex> &index,
                                    const PcpNodeRef &node,
                                    const SdfLayerHandle &layer)
-    : _expandedPrimIndex(index), _nodeRange(index->GetNodeRange()) {
+    : _expandedPrimIndex(index), _nodeRange(index->GetNodeRange())
+{
   // Always stop at the end of the prim index graph since no stop node is
   // provided.
   _stopNodeIt = _nodeRange.second;
@@ -69,9 +71,9 @@ UsdResolveTarget::UsdResolveTarget(const std::shared_ptr<PcpPrimIndex> &index,
                                    const SdfLayerHandle &layer,
                                    const PcpNodeRef &stopNode,
                                    const SdfLayerHandle &stopLayer)
-    : _expandedPrimIndex(index), _nodeRange(index->GetNodeRange()) {
-  _stopNodeIt =
-      stopNode ? index->GetNodeIteratorAtNode(stopNode) : _nodeRange.second;
+    : _expandedPrimIndex(index), _nodeRange(index->GetNodeRange())
+{
+  _stopNodeIt = stopNode ? index->GetNodeIteratorAtNode(stopNode) : _nodeRange.second;
   if (_stopNodeIt != _nodeRange.second) {
     _stopLayerIt = _GetLayerIteratorInNode(*_stopNodeIt, stopLayer);
   }
@@ -82,19 +84,23 @@ UsdResolveTarget::UsdResolveTarget(const std::shared_ptr<PcpPrimIndex> &index,
   }
 }
 
-PcpNodeRef UsdResolveTarget::GetStartNode() const {
+PcpNodeRef UsdResolveTarget::GetStartNode() const
+{
   return _startNodeIt != _nodeRange.second ? *_startNodeIt : PcpNodeRef();
 }
 
-PcpNodeRef UsdResolveTarget::GetStopNode() const {
+PcpNodeRef UsdResolveTarget::GetStopNode() const
+{
   return _stopNodeIt != _nodeRange.second ? *_stopNodeIt : PcpNodeRef();
 }
 
-SdfLayerHandle UsdResolveTarget::GetStartLayer() const {
+SdfLayerHandle UsdResolveTarget::GetStartLayer() const
+{
   return _startNodeIt != _nodeRange.second ? *_startLayerIt : nullptr;
 }
 
-SdfLayerHandle UsdResolveTarget::GetStopLayer() const {
+SdfLayerHandle UsdResolveTarget::GetStopLayer() const
+{
   return _stopNodeIt != _nodeRange.second ? *_stopLayerIt : nullptr;
 }
 

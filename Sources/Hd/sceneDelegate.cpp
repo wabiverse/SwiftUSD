@@ -27,57 +27,42 @@
 
 #include "PxOsd/subdivTags.h"
 
-#include "Gf/range3d.h"
 #include "Gf/matrix4d.h"
+#include "Gf/range3d.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdSceneDelegate::HdSceneDelegate(HdRenderIndex *parentIndex,
-                                 SdfPath const& delegateID)
-    : _index(parentIndex)
-    , _delegateID(delegateID)
+HdSceneDelegate::HdSceneDelegate(HdRenderIndex *parentIndex, SdfPath const &delegateID)
+    : _index(parentIndex), _delegateID(delegateID)
 {
-    if (!_delegateID.IsAbsolutePath()) {
-        TF_CODING_ERROR("Scene Delegate Id must be an absolute path: %s",
-                        delegateID.GetText());
+  if (!_delegateID.IsAbsolutePath()) {
+    TF_CODING_ERROR("Scene Delegate Id must be an absolute path: %s", delegateID.GetText());
 
-
-        _delegateID = _delegateID.MakeAbsolutePath(SdfPath::AbsoluteRootPath());
-    }
+    _delegateID = _delegateID.MakeAbsolutePath(SdfPath::AbsoluteRootPath());
+  }
 }
 
-HdSceneDelegate::~HdSceneDelegate()
+HdSceneDelegate::~HdSceneDelegate() {}
+
+/*virtual*/
+void HdSceneDelegate::Sync(HdSyncRequestVector *request) {}
+
+void HdSceneDelegate::PostSyncCleanup() {}
+
+/*virtual*/
+bool HdSceneDelegate::IsEnabled(TfToken const &option) const
 {
+  if (option == HdOptionTokens->parallelRprimSync) {
+    return true;
+  }
+
+  return false;
 }
 
 /*virtual*/
-void
-HdSceneDelegate::Sync(HdSyncRequestVector* request)
+TfToken HdSceneDelegate::GetRenderTag(SdfPath const &id)
 {
-
-}
-
-void
-HdSceneDelegate::PostSyncCleanup()
-{
-}
-
-/*virtual*/
-bool
-HdSceneDelegate::IsEnabled(TfToken const& option) const
-{
-    if (option == HdOptionTokens->parallelRprimSync) {
-        return true;
-    }
-
-    return false;
-}
-
-/*virtual*/
-TfToken
-HdSceneDelegate::GetRenderTag(SdfPath const& id)
-{
-    return HdRenderTagTokens->geometry;
+  return HdRenderTagTokens->geometry;
 }
 
 // -----------------------------------------------------------------------//
@@ -85,172 +70,153 @@ HdSceneDelegate::GetRenderTag(SdfPath const& id)
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-HdMeshTopology
-HdSceneDelegate::GetMeshTopology(SdfPath const& id)
+HdMeshTopology HdSceneDelegate::GetMeshTopology(SdfPath const &id)
 {
-    return HdMeshTopology();
+  return HdMeshTopology();
 }
 
 /*virtual*/
-HdBasisCurvesTopology
-HdSceneDelegate::GetBasisCurvesTopology(SdfPath const& id)
+HdBasisCurvesTopology HdSceneDelegate::GetBasisCurvesTopology(SdfPath const &id)
 {
-    return HdBasisCurvesTopology();
+  return HdBasisCurvesTopology();
 }
 
 /*virtual*/
-PxOsdSubdivTags
-HdSceneDelegate::GetSubdivTags(SdfPath const& id)
+PxOsdSubdivTags HdSceneDelegate::GetSubdivTags(SdfPath const &id)
 {
-    return PxOsdSubdivTags();
+  return PxOsdSubdivTags();
 }
 
 /*virtual*/
-GfRange3d
-HdSceneDelegate::GetExtent(SdfPath const & id)
+GfRange3d HdSceneDelegate::GetExtent(SdfPath const &id)
 {
-    return GfRange3d();
+  return GfRange3d();
 }
 
 /*virtual*/
-GfMatrix4d
-HdSceneDelegate::GetTransform(SdfPath const & id)
+GfMatrix4d HdSceneDelegate::GetTransform(SdfPath const &id)
 {
-    return GfMatrix4d(1);
+  return GfMatrix4d(1);
 }
 
 /*virtual*/
-size_t
-HdSceneDelegate::SampleTransform(SdfPath const & id,
-                                 size_t maxSampleCount,
-                                 float *sampleTimes,
-                                 GfMatrix4d *sampleValues)
+size_t HdSceneDelegate::SampleTransform(SdfPath const &id,
+                                        size_t maxSampleCount,
+                                        float *sampleTimes,
+                                        GfMatrix4d *sampleValues)
 {
-    if (maxSampleCount > 0) {
-        sampleTimes[0] = 0.0;
-        sampleValues[0] = GetTransform(id);
-        return 1;
-    }
-    return 0;
+  if (maxSampleCount > 0) {
+    sampleTimes[0] = 0.0;
+    sampleValues[0] = GetTransform(id);
+    return 1;
+  }
+  return 0;
 }
 
 /*virtual*/
-bool
-HdSceneDelegate::GetVisible(SdfPath const & id)
+bool HdSceneDelegate::GetVisible(SdfPath const &id)
 {
-    return true;
+  return true;
 }
 
 /*virtual*/
-bool
-HdSceneDelegate::GetDoubleSided(SdfPath const & id)
+bool HdSceneDelegate::GetDoubleSided(SdfPath const &id)
 {
-    return false;
+  return false;
 }
 
 /*virtual*/
-HdCullStyle
-HdSceneDelegate::GetCullStyle(SdfPath const &id)
+HdCullStyle HdSceneDelegate::GetCullStyle(SdfPath const &id)
 {
-    return HdCullStyleDontCare;
+  return HdCullStyleDontCare;
 }
 
 /*virtual*/
-VtValue
-HdSceneDelegate::GetShadingStyle(SdfPath const &id)
+VtValue HdSceneDelegate::GetShadingStyle(SdfPath const &id)
 {
-    return VtValue();
+  return VtValue();
 }
 
 /*virtual*/
-HdDisplayStyle
-HdSceneDelegate::GetDisplayStyle(SdfPath const& id)
+HdDisplayStyle HdSceneDelegate::GetDisplayStyle(SdfPath const &id)
 {
-    return HdDisplayStyle();
+  return HdDisplayStyle();
 }
 
 /*virtual*/
-VtValue
-HdSceneDelegate::Get(SdfPath const& id, TfToken const& key)
+VtValue HdSceneDelegate::Get(SdfPath const &id, TfToken const &key)
 {
-    return VtValue();
+  return VtValue();
 }
 
 /*virtual*/
-VtValue
-HdSceneDelegate::GetIndexedPrimvar(SdfPath const& id, TfToken const& key, 
-                                        VtIntArray *outIndices) 
+VtValue HdSceneDelegate::GetIndexedPrimvar(SdfPath const &id,
+                                           TfToken const &key,
+                                           VtIntArray *outIndices)
 {
-    // We return an empty value here rather than returning the result of 
-    // Get(id, key) since that would leave callers of this method with an 
-    // empty outIndices which is semantically different than a non-indexed 
-    // primvar.
-    return VtValue();
+  // We return an empty value here rather than returning the result of
+  // Get(id, key) since that would leave callers of this method with an
+  // empty outIndices which is semantically different than a non-indexed
+  // primvar.
+  return VtValue();
 }
 
 /*virtual*/
-size_t
-HdSceneDelegate::SamplePrimvar(SdfPath const& id, 
-                               TfToken const& key,
-                               size_t maxSampleCount,
-                               float *sampleTimes,
-                               VtValue *sampleValues)
+size_t HdSceneDelegate::SamplePrimvar(SdfPath const &id,
+                                      TfToken const &key,
+                                      size_t maxSampleCount,
+                                      float *sampleTimes,
+                                      VtValue *sampleValues)
 {
-    if (maxSampleCount > 0) {
-        sampleTimes[0] = 0.0;
-        sampleValues[0] = Get(id, key);
-        return 1;
-    }
-    return 0;
+  if (maxSampleCount > 0) {
+    sampleTimes[0] = 0.0;
+    sampleValues[0] = Get(id, key);
+    return 1;
+  }
+  return 0;
 }
 
 /*virtual*/
-size_t
-HdSceneDelegate::SampleIndexedPrimvar(SdfPath const& id, 
-                               TfToken const& key,
-                               size_t maxSampleCount,
-                               float *sampleTimes,
-                               VtValue *sampleValues,
-                               VtIntArray *sampleIndices)
+size_t HdSceneDelegate::SampleIndexedPrimvar(SdfPath const &id,
+                                             TfToken const &key,
+                                             size_t maxSampleCount,
+                                             float *sampleTimes,
+                                             VtValue *sampleValues,
+                                             VtIntArray *sampleIndices)
 {
-    if (maxSampleCount > 0) {
-        sampleTimes[0] = 0.0;
-        sampleValues[0] = GetIndexedPrimvar(id, key, &sampleIndices[0]);
-        return 1;
-    }
-    return 0;
+  if (maxSampleCount > 0) {
+    sampleTimes[0] = 0.0;
+    sampleValues[0] = GetIndexedPrimvar(id, key, &sampleIndices[0]);
+    return 1;
+  }
+  return 0;
 }
 
 /*virtual*/
-HdReprSelector
-HdSceneDelegate::GetReprSelector(SdfPath const &id)
+HdReprSelector HdSceneDelegate::GetReprSelector(SdfPath const &id)
 {
-    return HdReprSelector();
+  return HdReprSelector();
 }
 
 /*virtual*/
-VtArray<TfToken>
-HdSceneDelegate::GetCategories(SdfPath const& id)
+VtArray<TfToken> HdSceneDelegate::GetCategories(SdfPath const &id)
 {
-    return VtArray<TfToken>();
+  return VtArray<TfToken>();
 }
 
-std::vector<VtArray<TfToken>>
-HdSceneDelegate::GetInstanceCategories(SdfPath const &instancerId)
+std::vector<VtArray<TfToken>> HdSceneDelegate::GetInstanceCategories(SdfPath const &instancerId)
 {
-    return std::vector<VtArray<TfToken>>();
+  return std::vector<VtArray<TfToken>>();
 }
 
-HdIdVectorSharedPtr
-HdSceneDelegate::GetCoordSysBindings(SdfPath const& id)
+HdIdVectorSharedPtr HdSceneDelegate::GetCoordSysBindings(SdfPath const &id)
 {
-    return nullptr;
+  return nullptr;
 }
 
-HdModelDrawMode
-HdSceneDelegate::GetModelDrawMode(SdfPath const& id)
+HdModelDrawMode HdSceneDelegate::GetModelDrawMode(SdfPath const &id)
 {
-    return HdModelDrawMode();
+  return HdModelDrawMode();
 }
 
 // -----------------------------------------------------------------------//
@@ -258,85 +224,76 @@ HdSceneDelegate::GetModelDrawMode(SdfPath const& id)
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-VtIntArray
-HdSceneDelegate::GetInstanceIndices(SdfPath const &instancerId,
-                                      SdfPath const &prototypeId)
+VtIntArray HdSceneDelegate::GetInstanceIndices(SdfPath const &instancerId,
+                                               SdfPath const &prototypeId)
 {
-    return VtIntArray();
+  return VtIntArray();
 }
 
 /*virtual*/
-GfMatrix4d
-HdSceneDelegate::GetInstancerTransform(SdfPath const &instancerId)
+GfMatrix4d HdSceneDelegate::GetInstancerTransform(SdfPath const &instancerId)
 {
-    return GfMatrix4d(1);
+  return GfMatrix4d(1);
 }
 
 /*virtual*/
-SdfPath
-HdSceneDelegate::GetInstancerId(SdfPath const& primId)
+SdfPath HdSceneDelegate::GetInstancerId(SdfPath const &primId)
 {
-    return SdfPath();
+  return SdfPath();
 }
 
 /*virtual*/
-SdfPathVector
-HdSceneDelegate::GetInstancerPrototypes(SdfPath const& instancerId)
+SdfPathVector HdSceneDelegate::GetInstancerPrototypes(SdfPath const &instancerId)
 {
-    return SdfPathVector();
+  return SdfPathVector();
 }
 
 /*virtual*/
-size_t
-HdSceneDelegate::SampleInstancerTransform(SdfPath const &instancerId,
-                                          size_t maxSampleCount,
-                                          float *sampleTimes,
-                                          GfMatrix4d *sampleValues)
+size_t HdSceneDelegate::SampleInstancerTransform(SdfPath const &instancerId,
+                                                 size_t maxSampleCount,
+                                                 float *sampleTimes,
+                                                 GfMatrix4d *sampleValues)
 {
-    if (maxSampleCount > 0) {
-        sampleTimes[0] = 0.0;
-        sampleValues[0] = GetInstancerTransform(instancerId);
-        return 1;
-    }
-    return 0;
+  if (maxSampleCount > 0) {
+    sampleTimes[0] = 0.0;
+    sampleValues[0] = GetInstancerTransform(instancerId);
+    return 1;
+  }
+  return 0;
 }
 
 /*virtual*/
-SdfPath
-HdSceneDelegate::GetScenePrimPath(SdfPath const& rprimId,
-                                  int instanceIndex,
-                                  HdInstancerContext *instancerContext)
+SdfPath HdSceneDelegate::GetScenePrimPath(SdfPath const &rprimId,
+                                          int instanceIndex,
+                                          HdInstancerContext *instancerContext)
 {
-    return rprimId.ReplacePrefix(_delegateID, SdfPath::AbsoluteRootPath());
+  return rprimId.ReplacePrefix(_delegateID, SdfPath::AbsoluteRootPath());
 }
 
 /*virtual*/
-SdfPathVector
-HdSceneDelegate::GetScenePrimPaths(SdfPath const& rprimId,
-                                   std::vector<int> instanceIndices,
-                                   std::vector<HdInstancerContext> *instancerContexts)
+SdfPathVector HdSceneDelegate::GetScenePrimPaths(
+    SdfPath const &rprimId,
+    std::vector<int> instanceIndices,
+    std::vector<HdInstancerContext> *instancerContexts)
 {
-    return SdfPathVector(instanceIndices.size(),
-            rprimId.ReplacePrefix(_delegateID, SdfPath::AbsoluteRootPath()));
+  return SdfPathVector(instanceIndices.size(),
+                       rprimId.ReplacePrefix(_delegateID, SdfPath::AbsoluteRootPath()));
 }
-
 
 // -----------------------------------------------------------------------//
 /// \name Material Aspects
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-SdfPath 
-HdSceneDelegate::GetMaterialId(SdfPath const &rprimId)
+SdfPath HdSceneDelegate::GetMaterialId(SdfPath const &rprimId)
 {
-    return SdfPath();
+  return SdfPath();
 }
 
 /*virtual*/
-VtValue 
-HdSceneDelegate::GetMaterialResource(SdfPath const &materialId)
+VtValue HdSceneDelegate::GetMaterialResource(SdfPath const &materialId)
 {
-    return VtValue();
+  return VtValue();
 }
 
 // -----------------------------------------------------------------------//
@@ -344,10 +301,9 @@ HdSceneDelegate::GetMaterialResource(SdfPath const &materialId)
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-HdRenderBufferDescriptor
-HdSceneDelegate::GetRenderBufferDescriptor(SdfPath const& id)
+HdRenderBufferDescriptor HdSceneDelegate::GetRenderBufferDescriptor(SdfPath const &id)
 {
-    return HdRenderBufferDescriptor();
+  return HdRenderBufferDescriptor();
 }
 
 // -----------------------------------------------------------------------//
@@ -355,11 +311,9 @@ HdSceneDelegate::GetRenderBufferDescriptor(SdfPath const& id)
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-VtValue 
-HdSceneDelegate::GetLightParamValue(SdfPath const &id, 
-                                    TfToken const &paramName) 
+VtValue HdSceneDelegate::GetLightParamValue(SdfPath const &id, TfToken const &paramName)
 {
-    return VtValue();
+  return VtValue();
 }
 
 // -----------------------------------------------------------------------//
@@ -367,11 +321,9 @@ HdSceneDelegate::GetLightParamValue(SdfPath const &id,
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-VtValue 
-HdSceneDelegate::GetCameraParamValue(SdfPath const &cameraId, 
-                                     TfToken const &paramName) 
+VtValue HdSceneDelegate::GetCameraParamValue(SdfPath const &cameraId, TfToken const &paramName)
 {
-    return VtValue();
+  return VtValue();
 }
 
 // -----------------------------------------------------------------------//
@@ -379,10 +331,9 @@ HdSceneDelegate::GetCameraParamValue(SdfPath const &cameraId,
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-HdVolumeFieldDescriptorVector
-HdSceneDelegate::GetVolumeFieldDescriptors(SdfPath const &volumeId)
+HdVolumeFieldDescriptorVector HdSceneDelegate::GetVolumeFieldDescriptors(SdfPath const &volumeId)
 {
-    return HdVolumeFieldDescriptorVector();
+  return HdVolumeFieldDescriptorVector();
 }
 
 // -----------------------------------------------------------------------//
@@ -390,103 +341,88 @@ HdSceneDelegate::GetVolumeFieldDescriptors(SdfPath const &volumeId)
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-void
-HdSceneDelegate::InvokeExtComputation(SdfPath const& computationId,
-                                      HdExtComputationContext *context)
+void HdSceneDelegate::InvokeExtComputation(SdfPath const &computationId,
+                                           HdExtComputationContext *context)
 {
 }
 
 /*virtual*/
-TfTokenVector
-HdSceneDelegate::GetExtComputationSceneInputNames(SdfPath const& computationid)
+TfTokenVector HdSceneDelegate::GetExtComputationSceneInputNames(SdfPath const &computationid)
 {
-    return TfTokenVector();
+  return TfTokenVector();
 }
 
 /*virtual*/
-HdExtComputationInputDescriptorVector
-HdSceneDelegate::GetExtComputationInputDescriptors(
-                                        SdfPath const& computationid)
+HdExtComputationInputDescriptorVector HdSceneDelegate::GetExtComputationInputDescriptors(
+    SdfPath const &computationid)
 {
-    return HdExtComputationInputDescriptorVector();
+  return HdExtComputationInputDescriptorVector();
 }
 
 /*virtual*/
-HdExtComputationOutputDescriptorVector
-HdSceneDelegate::GetExtComputationOutputDescriptors(
-                                        SdfPath const& computationid)
+HdExtComputationOutputDescriptorVector HdSceneDelegate::GetExtComputationOutputDescriptors(
+    SdfPath const &computationid)
 {
-    return HdExtComputationOutputDescriptorVector();
+  return HdExtComputationOutputDescriptorVector();
 }
-
 
 // -----------------------------------------------------------------------//
 /// \name Primitive Variables
 // -----------------------------------------------------------------------//
 
 /*virtual*/
-HdPrimvarDescriptorVector
-HdSceneDelegate::GetPrimvarDescriptors(SdfPath const& id,
-                                       HdInterpolation interpolation)
+HdPrimvarDescriptorVector HdSceneDelegate::GetPrimvarDescriptors(SdfPath const &id,
+                                                                 HdInterpolation interpolation)
 {
-    return HdPrimvarDescriptorVector();
+  return HdPrimvarDescriptorVector();
 }
 
 /*virtual*/
-HdExtComputationPrimvarDescriptorVector
-HdSceneDelegate::GetExtComputationPrimvarDescriptors(
-                                        SdfPath const& rprimId,
-                                        HdInterpolation interpolationMode)
+HdExtComputationPrimvarDescriptorVector HdSceneDelegate::GetExtComputationPrimvarDescriptors(
+    SdfPath const &rprimId, HdInterpolation interpolationMode)
 {
-    return HdExtComputationPrimvarDescriptorVector();
+  return HdExtComputationPrimvarDescriptorVector();
 }
 
 /*virtual*/
-VtValue
-HdSceneDelegate::GetExtComputationInput(SdfPath const& computationId,
-                                        TfToken const& input)
+VtValue HdSceneDelegate::GetExtComputationInput(SdfPath const &computationId, TfToken const &input)
 {
-    return VtValue();
+  return VtValue();
 }
 
 /*virtual*/
-size_t
-HdSceneDelegate::SampleExtComputationInput(SdfPath const& computationId,
-                                           TfToken const& input,
-                                           size_t maxSampleCount,
-                                           float *sampleTimes,
-                                           VtValue *sampleValues)
+size_t HdSceneDelegate::SampleExtComputationInput(SdfPath const &computationId,
+                                                  TfToken const &input,
+                                                  size_t maxSampleCount,
+                                                  float *sampleTimes,
+                                                  VtValue *sampleValues)
 {
-    if (maxSampleCount > 0) {
-        sampleTimes[0] = 0.0;
-        sampleValues[0] = GetExtComputationInput(computationId, input);
-        return 1;
-    }
-    return 0;
+  if (maxSampleCount > 0) {
+    sampleTimes[0] = 0.0;
+    sampleValues[0] = GetExtComputationInput(computationId, input);
+    return 1;
+  }
+  return 0;
 }
 
 /*virtual*/
-std::string
-HdSceneDelegate::GetExtComputationKernel(SdfPath const& id)
+std::string HdSceneDelegate::GetExtComputationKernel(SdfPath const &id)
 {
-    return std::string();
+  return std::string();
 }
-
 
 // -----------------------------------------------------------------------//
 /// \name Task Aspects
 // -----------------------------------------------------------------------//
 /*virtual*/
-TfTokenVector HdSceneDelegate::GetTaskRenderTags(SdfPath const& taskId)
+TfTokenVector HdSceneDelegate::GetTaskRenderTags(SdfPath const &taskId)
 {
-    // While the empty vector can mean no filtering and let all tags
-    // pass.  If any task has a non-empty render tags, the empty tags
-    // means that the task isn't interested in any prims at all.
-    // So the empty set use for no filtering should be limited
-    // to tests.
-    return TfTokenVector();
+  // While the empty vector can mean no filtering and let all tags
+  // pass.  If any task has a non-empty render tags, the empty tags
+  // means that the task isn't interested in any prims at all.
+  // So the empty set use for no filtering should be limited
+  // to tests.
+  return TfTokenVector();
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
-

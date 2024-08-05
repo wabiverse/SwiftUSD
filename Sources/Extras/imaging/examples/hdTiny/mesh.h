@@ -24,8 +24,8 @@
 #ifndef EXTRAS_IMAGING_EXAMPLES_HD_TINY_MESH_H
 #define EXTRAS_IMAGING_EXAMPLES_HD_TINY_MESH_H
 
-#include <pxr/pxrns.h>
 #include "Hd/mesh.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -48,9 +48,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// can do the heavy work of releasing state (such as handles into the top-level
 /// scene), so that object population and existence aren't tied to each other.
 ///
-class HdTinyMesh final : public HdMesh
-{
-public:
+class HdTinyMesh final : public HdMesh {
+ public:
   HF_MALLOC_TAG_NEW("new HdTinyMesh");
 
   /// HdTinyMesh constructor.
@@ -90,13 +89,12 @@ public:
   ///   \param dirtyBits A specifier for which scene data has changed.
   ///   \param reprToken A specifier for which representation to draw with.
   ///
-  void Sync(
-      HdSceneDelegate *sceneDelegate,
-      HdRenderParam *renderParam,
-      HdDirtyBits *dirtyBits,
-      TfToken const &reprToken) override;
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits,
+            TfToken const &reprToken) override;
 
-protected:
+ protected:
   // Initialize the given representation of this Rprim.
   // This is called prior to syncing the prim, the first time the repr
   // is used.
@@ -109,9 +107,7 @@ protected:
   // repr is synced.  InitRepr occurs before dirty bit propagation.
   //
   // See HdRprim::InitRepr()
-  void _InitRepr(
-      TfToken const &reprToken,
-      HdDirtyBits *dirtyBits) override;
+  void _InitRepr(TfToken const &reprToken, HdDirtyBits *dirtyBits) override;
 
   // This callback from Rprim gives the prim an opportunity to set
   // additional dirty bits based on those already set.  This is done
@@ -132,4 +128,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXTRAS_IMAGING_EXAMPLES_HD_TINY_MESH_H
+#endif  // EXTRAS_IMAGING_EXAMPLES_HD_TINY_MESH_H

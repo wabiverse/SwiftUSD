@@ -59,7 +59,7 @@ class SdfTimeCode;
 /// property in Python) of the SdfPrimSpec class.
 ///
 class SdfLayerOffset : public boost::totally_ordered<SdfLayerOffset> {
-public:
+ public:
   /// \name Constructors
   /// @{
 
@@ -73,16 +73,28 @@ public:
   /// @{
 
   /// Returns the time offset.
-  double GetOffset() const { return _offset; }
+  double GetOffset() const
+  {
+    return _offset;
+  }
 
   /// Returns the time scale factor.
-  double GetScale() const { return _scale; }
+  double GetScale() const
+  {
+    return _scale;
+  }
 
   /// Sets the time offset.
-  void SetOffset(double newOffset) { _offset = newOffset; }
+  void SetOffset(double newOffset)
+  {
+    _offset = newOffset;
+  }
 
   /// Sets the time scale factor.
-  void SetScale(double newScale) { _scale = newScale; }
+  void SetScale(double newScale)
+  {
+    _scale = newScale;
+  }
 
   /// Returns \c true if this is an identity transformation, with
   /// an offset of 0.0 and a scale of 1.0.
@@ -108,12 +120,14 @@ public:
 
   /// Hash functor for hash maps and sets.
   struct Hash {
-    size_t operator()(const SdfLayerOffset &offset) const {
+    size_t operator()(const SdfLayerOffset &offset) const
+    {
       return offset.GetHash();
     }
   };
 
-  friend inline size_t hash_value(const SdfLayerOffset &offset) {
+  friend inline size_t hash_value(const SdfLayerOffset &offset)
+  {
     return offset.GetHash();
   }
 
@@ -146,7 +160,7 @@ public:
 
   /// @}
 
-private:
+ private:
   double _offset;
   double _scale;
 };
@@ -160,4 +174,4 @@ std::ostream &operator<<(std::ostream &out, const SdfLayerOffset &layerOffset);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LAYER_OFFSET_H
+#endif  // PXR_USD_SDF_LAYER_OFFSET_H

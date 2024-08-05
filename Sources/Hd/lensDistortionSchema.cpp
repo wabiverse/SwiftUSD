@@ -29,263 +29,215 @@
 /* ************************************************************************** */
 
 #include "Hd/lensDistortionSchema.h"
-#include "Hd/retainedDataSource.h"
 #include "Hd/cameraSchema.h"
+#include "Hd/retainedDataSource.h"
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdLensDistortionSchemaTokens,
-    HDLENSDISTORTION_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdLensDistortionSchemaTokens, HDLENSDISTORTION_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdLensDistortionSchema::GetType()
+HdTokenDataSourceHandle HdLensDistortionSchema::GetType()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdLensDistortionSchemaTokens->type);
+  return _GetTypedDataSource<HdTokenDataSource>(HdLensDistortionSchemaTokens->type);
 }
 
-HdFloatDataSourceHandle
-HdLensDistortionSchema::GetK1()
+HdFloatDataSourceHandle HdLensDistortionSchema::GetK1()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdLensDistortionSchemaTokens->k1);
+  return _GetTypedDataSource<HdFloatDataSource>(HdLensDistortionSchemaTokens->k1);
 }
 
-HdFloatDataSourceHandle
-HdLensDistortionSchema::GetK2()
+HdFloatDataSourceHandle HdLensDistortionSchema::GetK2()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdLensDistortionSchemaTokens->k2);
+  return _GetTypedDataSource<HdFloatDataSource>(HdLensDistortionSchemaTokens->k2);
 }
 
-HdVec2fDataSourceHandle
-HdLensDistortionSchema::GetCenter()
+HdVec2fDataSourceHandle HdLensDistortionSchema::GetCenter()
 {
-    return _GetTypedDataSource<HdVec2fDataSource>(
-        HdLensDistortionSchemaTokens->center);
+  return _GetTypedDataSource<HdVec2fDataSource>(HdLensDistortionSchemaTokens->center);
 }
 
-HdFloatDataSourceHandle
-HdLensDistortionSchema::GetAnaSq()
+HdFloatDataSourceHandle HdLensDistortionSchema::GetAnaSq()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdLensDistortionSchemaTokens->anaSq);
+  return _GetTypedDataSource<HdFloatDataSource>(HdLensDistortionSchemaTokens->anaSq);
 }
 
-HdVec2fDataSourceHandle
-HdLensDistortionSchema::GetAsym()
+HdVec2fDataSourceHandle HdLensDistortionSchema::GetAsym()
 {
-    return _GetTypedDataSource<HdVec2fDataSource>(
-        HdLensDistortionSchemaTokens->asym);
+  return _GetTypedDataSource<HdVec2fDataSource>(HdLensDistortionSchemaTokens->asym);
 }
 
-HdFloatDataSourceHandle
-HdLensDistortionSchema::GetScale()
+HdFloatDataSourceHandle HdLensDistortionSchema::GetScale()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdLensDistortionSchemaTokens->scale);
+  return _GetTypedDataSource<HdFloatDataSource>(HdLensDistortionSchemaTokens->scale);
 }
 
-HdFloatDataSourceHandle
-HdLensDistortionSchema::GetIor()
+HdFloatDataSourceHandle HdLensDistortionSchema::GetIor()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdLensDistortionSchemaTokens->ior);
+  return _GetTypedDataSource<HdFloatDataSource>(HdLensDistortionSchemaTokens->ior);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdLensDistortionSchema::BuildRetained(
-        const HdTokenDataSourceHandle &type,
-        const HdFloatDataSourceHandle &k1,
-        const HdFloatDataSourceHandle &k2,
-        const HdVec2fDataSourceHandle &center,
-        const HdFloatDataSourceHandle &anaSq,
-        const HdVec2fDataSourceHandle &asym,
-        const HdFloatDataSourceHandle &scale,
-        const HdFloatDataSourceHandle &ior
-)
-{
-    TfToken names[8];
-    HdDataSourceBaseHandle values[8];
-
-    size_t count = 0;
-    if (type) {
-        names[count] = HdLensDistortionSchemaTokens->type;
-        values[count++] = type;
-    }
-
-    if (k1) {
-        names[count] = HdLensDistortionSchemaTokens->k1;
-        values[count++] = k1;
-    }
-
-    if (k2) {
-        names[count] = HdLensDistortionSchemaTokens->k2;
-        values[count++] = k2;
-    }
-
-    if (center) {
-        names[count] = HdLensDistortionSchemaTokens->center;
-        values[count++] = center;
-    }
-
-    if (anaSq) {
-        names[count] = HdLensDistortionSchemaTokens->anaSq;
-        values[count++] = anaSq;
-    }
-
-    if (asym) {
-        names[count] = HdLensDistortionSchemaTokens->asym;
-        values[count++] = asym;
-    }
-
-    if (scale) {
-        names[count] = HdLensDistortionSchemaTokens->scale;
-        values[count++] = scale;
-    }
-
-    if (ior) {
-        names[count] = HdLensDistortionSchemaTokens->ior;
-        values[count++] = ior;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdLensDistortionSchema
-HdLensDistortionSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdLensDistortionSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdLensDistortionSchemaTokens->lensDistortion))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdLensDistortionSchema::GetSchemaToken()
-{
-    return HdLensDistortionSchemaTokens->lensDistortion;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdLensDistortionSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdCameraSchemaTokens->camera,
-        HdLensDistortionSchemaTokens->lensDistortion
-    );
-    return locator;
-} 
-
-/*static*/
-HdTokenDataSourceHandle
-HdLensDistortionSchema::BuildTypeDataSource(
-    const TfToken &type)
-{
-    if (type == HdLensDistortionSchemaTokens->standard) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(type);
-        return ds;
-    }
-    if (type == HdLensDistortionSchemaTokens->fisheye) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(type);
-        return ds;
-    }
-
-    // fallback for unknown token
-    return HdRetainedTypedSampledDataSource<TfToken>::New(type);
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetType(
-    const HdTokenDataSourceHandle &type)
-{
-    _type = type;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetK1(
-    const HdFloatDataSourceHandle &k1)
-{
-    _k1 = k1;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetK2(
-    const HdFloatDataSourceHandle &k2)
-{
-    _k2 = k2;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetCenter(
-    const HdVec2fDataSourceHandle &center)
-{
-    _center = center;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetAnaSq(
-    const HdFloatDataSourceHandle &anaSq)
-{
-    _anaSq = anaSq;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetAsym(
-    const HdVec2fDataSourceHandle &asym)
-{
-    _asym = asym;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetScale(
-    const HdFloatDataSourceHandle &scale)
-{
-    _scale = scale;
-    return *this;
-}
-
-HdLensDistortionSchema::Builder &
-HdLensDistortionSchema::Builder::SetIor(
+HdContainerDataSourceHandle HdLensDistortionSchema::BuildRetained(
+    const HdTokenDataSourceHandle &type,
+    const HdFloatDataSourceHandle &k1,
+    const HdFloatDataSourceHandle &k2,
+    const HdVec2fDataSourceHandle &center,
+    const HdFloatDataSourceHandle &anaSq,
+    const HdVec2fDataSourceHandle &asym,
+    const HdFloatDataSourceHandle &scale,
     const HdFloatDataSourceHandle &ior)
 {
-    _ior = ior;
-    return *this;
+  TfToken names[8];
+  HdDataSourceBaseHandle values[8];
+
+  size_t count = 0;
+  if (type) {
+    names[count] = HdLensDistortionSchemaTokens->type;
+    values[count++] = type;
+  }
+
+  if (k1) {
+    names[count] = HdLensDistortionSchemaTokens->k1;
+    values[count++] = k1;
+  }
+
+  if (k2) {
+    names[count] = HdLensDistortionSchemaTokens->k2;
+    values[count++] = k2;
+  }
+
+  if (center) {
+    names[count] = HdLensDistortionSchemaTokens->center;
+    values[count++] = center;
+  }
+
+  if (anaSq) {
+    names[count] = HdLensDistortionSchemaTokens->anaSq;
+    values[count++] = anaSq;
+  }
+
+  if (asym) {
+    names[count] = HdLensDistortionSchemaTokens->asym;
+    values[count++] = asym;
+  }
+
+  if (scale) {
+    names[count] = HdLensDistortionSchemaTokens->scale;
+    values[count++] = scale;
+  }
+
+  if (ior) {
+    names[count] = HdLensDistortionSchemaTokens->ior;
+    values[count++] = ior;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdLensDistortionSchema::Builder::Build()
+/*static*/
+HdLensDistortionSchema HdLensDistortionSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdLensDistortionSchema::BuildRetained(
-        _type,
-        _k1,
-        _k2,
-        _center,
-        _anaSq,
-        _asym,
-        _scale,
-        _ior
-    );
+  return HdLensDistortionSchema(fromParentContainer ?
+                                    HdContainerDataSource::Cast(fromParentContainer->Get(
+                                        HdLensDistortionSchemaTokens->lensDistortion)) :
+                                    nullptr);
 }
 
+/*static*/
+const TfToken &HdLensDistortionSchema::GetSchemaToken()
+{
+  return HdLensDistortionSchemaTokens->lensDistortion;
+}
+
+/*static*/
+const HdDataSourceLocator &HdLensDistortionSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdCameraSchemaTokens->camera,
+                                           HdLensDistortionSchemaTokens->lensDistortion);
+  return locator;
+}
+
+/*static*/
+HdTokenDataSourceHandle HdLensDistortionSchema::BuildTypeDataSource(const TfToken &type)
+{
+  if (type == HdLensDistortionSchemaTokens->standard) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(type);
+    return ds;
+  }
+  if (type == HdLensDistortionSchemaTokens->fisheye) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(type);
+    return ds;
+  }
+
+  // fallback for unknown token
+  return HdRetainedTypedSampledDataSource<TfToken>::New(type);
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetType(
+    const HdTokenDataSourceHandle &type)
+{
+  _type = type;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetK1(
+    const HdFloatDataSourceHandle &k1)
+{
+  _k1 = k1;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetK2(
+    const HdFloatDataSourceHandle &k2)
+{
+  _k2 = k2;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetCenter(
+    const HdVec2fDataSourceHandle &center)
+{
+  _center = center;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetAnaSq(
+    const HdFloatDataSourceHandle &anaSq)
+{
+  _anaSq = anaSq;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetAsym(
+    const HdVec2fDataSourceHandle &asym)
+{
+  _asym = asym;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetScale(
+    const HdFloatDataSourceHandle &scale)
+{
+  _scale = scale;
+  return *this;
+}
+
+HdLensDistortionSchema::Builder &HdLensDistortionSchema::Builder::SetIor(
+    const HdFloatDataSourceHandle &ior)
+{
+  _ior = ior;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdLensDistortionSchema::Builder::Build()
+{
+  return HdLensDistortionSchema::BuildRetained(
+      _type, _k1, _k2, _center, _anaSq, _asym, _scale, _ior);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

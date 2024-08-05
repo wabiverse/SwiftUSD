@@ -25,11 +25,11 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_DESCRIPTOR_H
 #define PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_DESCRIPTOR_H
 
-#include <pxr/pxrns.h>
-#include "Tf/token.h"
 #include "Sdf/valueTypeName.h"
+#include "Tf/token.h"
 #include "UsdGeom/mesh.h"
 #include "UsdGeom/primvarsAPI.h"
+#include <pxr/pxrns.h>
 
 #include <draco/attributes/geometry_attribute.h>
 #include <draco/attributes/point_attribute.h>
@@ -44,26 +44,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// attribute descriptions from/to USD mesh attributes, primvars, and Draco
 /// metadata.
 ///
-class UsdDracoAttributeDescriptor
-{
-public:
+class UsdDracoAttributeDescriptor {
+ public:
   // The status indicates whether the descriptor is valid or invalid, as well
   // as whether the corresponding attribute is absent from the mesh.
-  enum Status
-  {
-    VALID,
-    INVALID,
-    ABSENT
-  };
+  enum Status { VALID, INVALID, ABSENT };
 
   // Describes attribute data shape, such as vector, matrix, or quaternion.
   // Scalar data types are assumed to be a special case of a vector.
-  enum Shape
-  {
-    VECTOR,
-    MATRIX,
-    QUATERNION
-  };
+  enum Shape { VECTOR, MATRIX, QUATERNION };
 
   // Keys for storing of attribute description items in Draco metadata, for
   // description items that are not directly supported by Draco file format.
@@ -94,52 +83,111 @@ public:
   static UsdDracoAttributeDescriptor ForPosOrder();
 
   // Creates attribute descriptor from Draco attribute and its metadata.
-  static UsdDracoAttributeDescriptor FromDracoAttribute(
-      const draco::PointAttribute &attribute,
-      const draco::AttributeMetadata &metadata, bool isPrimvar);
+  static UsdDracoAttributeDescriptor FromDracoAttribute(const draco::PointAttribute &attribute,
+                                                        const draco::AttributeMetadata &metadata,
+                                                        bool isPrimvar);
 
   // Creates attribute descriptor from a given USD mesh primvar.
-  static UsdDracoAttributeDescriptor FromUsdPrimvar(
-      const UsdGeomPrimvar &primvar,
-      draco::GeometryAttribute::Type attributeType);
+  static UsdDracoAttributeDescriptor FromUsdPrimvar(const UsdGeomPrimvar &primvar,
+                                                    draco::GeometryAttribute::Type attributeType);
 
   // Craetes Draco metadata representation of attribute descriptor.
   std::unique_ptr<draco::AttributeMetadata> ToMetadata() const;
 
   // Getters for individual attribute description items.
-  Status GetStatus() const { return _status; }
-  draco::GeometryAttribute::Type GetAttributeType() const { return _attributeType; }
-  const TfToken &GetName() const { return _name; }
-  draco::DataType GetDataType() const { return _dataType; }
-  bool GetIsPrimvar() const { return _isPrimvar; }
-  size_t GetNumComponents() const { return _numComponents; }
-  Shape GetShape() const { return _shape; }
-  bool GetIsHalf() const { return _isHalf; }
-  UsdTimeCode GetValuesTime() const { return _valuesTime; }
-  UsdTimeCode GetIndicesTime() const { return _indicesTime; }
-  const TfToken &GetInterpolation() const { return _interpolation; }
+  Status GetStatus() const
+  {
+    return _status;
+  }
+  draco::GeometryAttribute::Type GetAttributeType() const
+  {
+    return _attributeType;
+  }
+  const TfToken &GetName() const
+  {
+    return _name;
+  }
+  draco::DataType GetDataType() const
+  {
+    return _dataType;
+  }
+  bool GetIsPrimvar() const
+  {
+    return _isPrimvar;
+  }
+  size_t GetNumComponents() const
+  {
+    return _numComponents;
+  }
+  Shape GetShape() const
+  {
+    return _shape;
+  }
+  bool GetIsHalf() const
+  {
+    return _isHalf;
+  }
+  UsdTimeCode GetValuesTime() const
+  {
+    return _valuesTime;
+  }
+  UsdTimeCode GetIndicesTime() const
+  {
+    return _indicesTime;
+  }
+  const TfToken &GetInterpolation() const
+  {
+    return _interpolation;
+  }
 
   // Default values for Draco metadata entries.
-  static Shape GetDefaultShape() { return VECTOR; }
-  static bool GetDefaultHalf() { return false; }
-  static UsdTimeCode GetDefaultTime() { return UsdTimeCode::Default(); }
+  static Shape GetDefaultShape()
+  {
+    return VECTOR;
+  }
+  static bool GetDefaultHalf()
+  {
+    return false;
+  }
+  static UsdTimeCode GetDefaultTime()
+  {
+    return UsdTimeCode::Default();
+  }
   static TfToken GetDefaultInterpolation()
   {
     return UsdGeomTokens->faceVarying;
   }
 
   // Names of non-generic attributes.
-  static TfToken GetPositionsName() { return UsdGeomTokens->points; }
-  static TfToken GetTexCoordsName() { return TfToken("primvars:Texture_uv"); }
-  static TfToken GetNormalsName() { return TfToken("primvars:normals"); }
-  static TfToken GetHoleFacesName() { return TfToken("hole_faces"); }
-  static TfToken GetAddedEdgesName() { return TfToken("added_edges"); }
-  static TfToken GetPointOrderName() { return TfToken("point_order"); }
+  static TfToken GetPositionsName()
+  {
+    return UsdGeomTokens->points;
+  }
+  static TfToken GetTexCoordsName()
+  {
+    return TfToken("primvars:Texture_uv");
+  }
+  static TfToken GetNormalsName()
+  {
+    return TfToken("primvars:normals");
+  }
+  static TfToken GetHoleFacesName()
+  {
+    return TfToken("hole_faces");
+  }
+  static TfToken GetAddedEdgesName()
+  {
+    return TfToken("added_edges");
+  }
+  static TfToken GetPointOrderName()
+  {
+    return TfToken("point_order");
+  }
 
   // Indicates whether the attribute is generic.
   bool IsGeneric() const;
 
-private:
+ private:
   // Creates an attribute description with an invalid status.
   UsdDracoAttributeDescriptor();
 
@@ -162,24 +210,31 @@ private:
   // Static helper methods for creating attribute desccriptor.
   static UsdDracoAttributeDescriptor Invalid();
   static UsdDracoAttributeDescriptor Absent();
-  static UsdDracoAttributeDescriptor Create(
-      draco::GeometryAttribute::Type attributeType, TfToken name,
-      draco::DataType dataType, bool isPrimvar, size_t numComponents,
-      Shape shape, bool isHalf, UsdTimeCode valuesTime,
-      UsdTimeCode indicesTime, TfToken interpolation);
+  static UsdDracoAttributeDescriptor Create(draco::GeometryAttribute::Type attributeType,
+                                            TfToken name,
+                                            draco::DataType dataType,
+                                            bool isPrimvar,
+                                            size_t numComponents,
+                                            Shape shape,
+                                            bool isHalf,
+                                            UsdTimeCode valuesTime,
+                                            UsdTimeCode indicesTime,
+                                            TfToken interpolation);
 
   // Methods for creating attribute descriptor from Draco and USD meshes.
-  static UsdDracoAttributeDescriptor FromDracoMesh(
-      const draco::Mesh &mesh, draco::GeometryAttribute::Type attributeType,
-      TfToken name, bool isPrimvar);
-  static UsdDracoAttributeDescriptor FromUsdMesh(
-      const UsdGeomMesh &mesh, draco::GeometryAttribute::Type attributeType,
-      TfToken name);
-  static UsdDracoAttributeDescriptor FromUsdAttribute(
-      const UsdAttribute &attribute,
-      draco::GeometryAttribute::Type attributeType, const TfToken &name,
-      bool isPrimvar, const UsdTimeCode &indicesTime,
-      const TfToken &interpolation);
+  static UsdDracoAttributeDescriptor FromDracoMesh(const draco::Mesh &mesh,
+                                                   draco::GeometryAttribute::Type attributeType,
+                                                   TfToken name,
+                                                   bool isPrimvar);
+  static UsdDracoAttributeDescriptor FromUsdMesh(const UsdGeomMesh &mesh,
+                                                 draco::GeometryAttribute::Type attributeType,
+                                                 TfToken name);
+  static UsdDracoAttributeDescriptor FromUsdAttribute(const UsdAttribute &attribute,
+                                                      draco::GeometryAttribute::Type attributeType,
+                                                      const TfToken &name,
+                                                      bool isPrimvar,
+                                                      const UsdTimeCode &indicesTime,
+                                                      const TfToken &interpolation);
 
   // Helper methods.
   static const std::set<TfToken> &GetSupportedInterpolations();
@@ -189,8 +244,7 @@ private:
   // Template method for extracting a single time sample for attribute values
   // or primvar indices. Supported types are UsdGeomPrimvar and UsdAttribute.
   // Returns true on success.
-  template <class T>
-  static bool GetTimeFrom(const T &item, double *time)
+  template<class T> static bool GetTimeFrom(const T &item, double *time)
   {
     // Try to get time samples and return in case of error.
     std::vector<double> times;
@@ -198,14 +252,12 @@ private:
       return false;
 
     // Multiple time samples are not supported.
-    if (times.size() > 1)
-    {
+    if (times.size() > 1) {
       return false;
     }
 
     // Use default time if there are no time samples.
-    if (times.empty())
-    {
+    if (times.empty()) {
       *time = GetDefaultTime().GetValue();
       return true;
     }
@@ -215,7 +267,7 @@ private:
     return true;
   }
 
-private:
+ private:
   const Status _status;
   const draco::GeometryAttribute::Type _attributeType;
   const TfToken _name;
@@ -238,4 +290,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_DESCRIPTOR_H
+#endif  // PXR_USD_PLUGIN_USD_DRACO_ATTRIBUTE_DESCRIPTOR_H

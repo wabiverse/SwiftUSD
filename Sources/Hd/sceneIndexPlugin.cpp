@@ -29,7 +29,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<HdSceneIndexPlugin>();
+  TfType::Define<HdSceneIndexPlugin>();
 }
 
 //
@@ -46,22 +46,16 @@ TF_REGISTRY_FUNCTION(TfType)
 HdSceneIndexPlugin::~HdSceneIndexPlugin() = default;
 
 // base implementation is a no-op which returns the input
-HdSceneIndexBaseRefPtr
-HdSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
-    return inputScene;
+  return inputScene;
 }
 
-
-HdSceneIndexBaseRefPtr
-HdSceneIndexPlugin::AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdSceneIndexPlugin::AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
-    return _AppendSceneIndex(inputScene, inputArgs);
+  return _AppendSceneIndex(inputScene, inputArgs);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -67,7 +67,7 @@ class UsdEditContext {
   UsdEditContext(UsdEditContext const &) = delete;
   UsdEditContext &operator=(UsdEditContext const &) = delete;
 
-public:
+ public:
   /// Construct without modifying \a stage's current EditTarget.  Save
   /// \a stage's current EditTarget to restore on destruction.
   USD_API
@@ -96,7 +96,7 @@ public:
   USD_API
   ~UsdEditContext();
 
-private:
+ private:
   // The stage this context is bound to.
   UsdStagePtr _stage;
 
@@ -106,4 +106,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_EDIT_CONTEXT_H
+#endif  // PXR_USD_USD_EDIT_CONTEXT_H

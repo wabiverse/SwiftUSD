@@ -27,7 +27,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE {
+TF_WRAP_MODULE
+{
   TF_WRAP(ArrayAssetPath);
   TF_WRAP(ArrayPath);
   TF_WRAP(ArrayTimeCode);
@@ -44,7 +45,7 @@ TF_WRAP_MODULE {
   TF_WRAP(OpaqueValue);
   TF_WRAP(Path);
   TF_WRAP(PredicateExpression);
-  TF_WRAP(PathExpression); // needs PredicateExpression for default args.
+  TF_WRAP(PathExpression);  // needs PredicateExpression for default args.
   TF_WRAP(Payload);
   TF_WRAP(Reference);
   TF_WRAP(TimeCode);

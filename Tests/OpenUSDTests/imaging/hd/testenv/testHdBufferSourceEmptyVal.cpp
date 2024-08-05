@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include "pxr/base/vt/value.h"
 #include "pxr/imaging/hd/tokens.h"
 #include "pxr/imaging/hd/vtBufferSource.h"
-#include "pxr/base/vt/value.h"
 
 #include "pxr/base/tf/errorMark.h"
 
@@ -34,27 +34,26 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 int main()
 {
-    TfErrorMark mark;
+  TfErrorMark mark;
 
-    VtValue v;
-    HdVtBufferSource b(HdTokens->points, v);
+  VtValue v;
+  HdVtBufferSource b(HdTokens->points, v);
 
-    // Above could throw errors.
-    mark.Clear();
+  // Above could throw errors.
+  mark.Clear();
 
-    bool valid = b.IsValid();
+  bool valid = b.IsValid();
 
-    std::cout << "Buffer is ";
-    std::cout << (valid ? "Valid" : "Invalid");
-    std::cout << "\n";
+  std::cout << "Buffer is ";
+  std::cout << (valid ? "Valid" : "Invalid");
+  std::cout << "\n";
 
-
-    if (mark.IsClean() && (!valid)) {
-        std::cout << "OK" << std::endl;
-        return EXIT_SUCCESS;
-    } else {
-        std::cout << "FAILED" << std::endl;
-        return EXIT_FAILURE;
-    }
+  if (mark.IsClean() && (!valid)) {
+    std::cout << "OK" << std::endl;
+    return EXIT_SUCCESS;
+  }
+  else {
+    std::cout << "FAILED" << std::endl;
+    return EXIT_FAILURE;
+  }
 }
-

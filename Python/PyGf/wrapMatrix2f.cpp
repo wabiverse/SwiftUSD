@@ -61,7 +61,8 @@ namespace {
 // Python buffer protocol support.
 
 // Python's getbuffer interface function.
-static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
+static int getbuffer(PyObject *self, Py_buffer *view, int flags)
+{
   if (view == NULL) {
     PyErr_SetString(PyExc_ValueError, "NULL view in getbuffer");
     return -1;
@@ -82,27 +83,30 @@ static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
   view->itemsize = sizeof(float);
   if ((flags & PyBUF_FORMAT) == PyBUF_FORMAT) {
     view->format = Gf_GetPyBufferFmtFor<float>();
-  } else {
+  }
+  else {
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
     view->ndim = 2;
     static Py_ssize_t shape[] = {2, 2};
     view->shape = shape;
-  } else {
+  }
+  else {
     view->ndim = 0;
     view->shape = NULL;
   }
   if ((flags & PyBUF_STRIDES) == PyBUF_STRIDES) {
     static Py_ssize_t strides[] = {2 * sizeof(float), sizeof(float)};
     view->strides = strides;
-  } else {
+  }
+  else {
     view->strides = NULL;
   }
   view->suboffsets = NULL;
   view->internal = NULL;
 
-  Py_INCREF(self); // need to retain a reference to self.
+  Py_INCREF(self);  // need to retain a reference to self.
   return 0;
 }
 
@@ -116,62 +120,75 @@ static PyBufferProcs bufferProcs = {
 // End python buffer protocol support.
 ////////////////////////////////////////////////////////////////////////
 
-static string _Repr(GfMatrix2f const &self) {
+static string _Repr(GfMatrix2f const &self)
+{
   static char newline[] = ",\n            ";
-  return TF_PY_REPR_PREFIX + "Matrix2f(" + TfPyRepr(self[0][0]) + ", " +
-         TfPyRepr(self[0][1]) + newline + TfPyRepr(self[1][0]) + ", " +
-         TfPyRepr(self[1][1]) + ")";
+  return TF_PY_REPR_PREFIX + "Matrix2f(" + TfPyRepr(self[0][0]) + ", " + TfPyRepr(self[0][1]) +
+         newline + TfPyRepr(self[1][0]) + ", " + TfPyRepr(self[1][1]) + ")";
 }
 
-static GfMatrix2f GetInverseWrapper(const GfMatrix2f &self) {
+static GfMatrix2f GetInverseWrapper(const GfMatrix2f &self)
+{
   return self.GetInverse();
 }
 
-static void throwIndexErr(const char *msg) {
+static void throwIndexErr(const char *msg)
+{
   PyErr_SetString(PyExc_IndexError, msg);
   boost::python::throw_error_already_set();
 }
 
-static int normalizeIndex(int index) {
+static int normalizeIndex(int index)
+{
   return TfPyNormalizeIndex(index, 2, true /*throw error*/);
 }
 
 // Return number of rows
-static int __len__(GfMatrix2f const &self) { return 2; }
+static int __len__(GfMatrix2f const &self)
+{
+  return 2;
+}
 
-static float __getitem__float(GfMatrix2f const &self, tuple index) {
+static float __getitem__float(GfMatrix2f const &self, tuple index)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   return self[i1][i2];
 }
 
-static GfVec2f __getitem__vector(GfMatrix2f const &self, int index) {
+static GfVec2f __getitem__vector(GfMatrix2f const &self, int index)
+{
   return GfVec2f(self[normalizeIndex(index)]);
 }
 
-static void __setitem__float(GfMatrix2f &self, tuple index, float value) {
+static void __setitem__float(GfMatrix2f &self, tuple index, float value)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   self[i1][i2] = value;
 }
 
-static void __setitem__vector(GfMatrix2f &self, int index, GfVec2f value) {
+static void __setitem__vector(GfMatrix2f &self, int index, GfVec2f value)
+{
   int ni = normalizeIndex(index);
   self[ni][0] = value[0];
   self[ni][1] = value[1];
 }
 
-static bool __contains__float(const GfMatrix2f &self, float value) {
+static bool __contains__float(const GfMatrix2f &self, float value)
+{
   for (int i = 0; i < 2; ++i)
     for (int j = 0; j < 2; ++j)
       if (self[i][j] == value)
@@ -180,18 +197,21 @@ static bool __contains__float(const GfMatrix2f &self, float value) {
 }
 
 // Check rows against GfVec
-static bool __contains__vector(const GfMatrix2f &self, GfVec2f value) {
+static bool __contains__vector(const GfMatrix2f &self, GfVec2f value)
+{
   for (int i = 0; i < 2; ++i)
     if (self.GetRow(i) == value)
       return true;
   return false;
 }
 
-static GfMatrix2f __truediv__(const GfMatrix2f &self, GfMatrix2f value) {
+static GfMatrix2f __truediv__(const GfMatrix2f &self, GfMatrix2f value)
+{
   return self / value;
 }
 
-static GfMatrix2f *__init__() {
+static GfMatrix2f *__init__()
+{
   // Default constructor produces identity from python.
   return new GfMatrix2f(1);
 }
@@ -200,14 +220,19 @@ static GfMatrix2f *__init__() {
 // This is used by our Shake plugins which need to pickle entire classes
 // (including code), which we don't support in pxml.
 struct GfMatrix2f_Pickle_Suite : boost::python::pickle_suite {
-  static boost::python::tuple getinitargs(const GfMatrix2f &m) {
+  static boost::python::tuple getinitargs(const GfMatrix2f &m)
+  {
     return boost::python::make_tuple(m[0][0], m[0][1], m[1][0], m[1][1]);
   }
 };
 
-static size_t __hash__(GfMatrix2f const &m) { return TfHash{}(m); }
+static size_t __hash__(GfMatrix2f const &m)
+{
+  return TfHash{}(m);
+}
 
-static boost::python::tuple get_dimension() {
+static boost::python::tuple get_dimension()
+{
   // At one time this was a constant static tuple we returned for
   // dimension. With boost building for python 3 that results in
   // a segfault at shutdown. Building for python 2 with a static
@@ -219,13 +244,13 @@ static boost::python::tuple get_dimension() {
   return make_tuple(2, 2);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapMatrix2f() {
+void wrapMatrix2f()
+{
   typedef GfMatrix2f This;
 
-  def("IsClose",
-      (bool (*)(const GfMatrix2f &m1, const GfMatrix2f &m2, double))GfIsClose);
+  def("IsClose", (bool (*)(const GfMatrix2f &m1, const GfMatrix2f &m2, double))GfIsClose);
 
   class_<This> cls("Matrix2f", no_init);
   cls.def_pickle(GfMatrix2f_Pickle_Suite())
@@ -251,17 +276,13 @@ void wrapMatrix2f() {
       .def("__contains__", __contains__float)
       .def("__contains__", __contains__vector, "Check rows against GfVec")
 
-      .def("Set", (This & (This::*)(float, float, float, float)) & This::Set,
-           return_self<>())
+      .def("Set", (This & (This::*)(float, float, float, float)) & This::Set, return_self<>())
 
       .def("SetIdentity", &This::SetIdentity, return_self<>())
       .def("SetZero", &This::SetZero, return_self<>())
 
-      .def("SetDiagonal", (This & (This::*)(float)) & This::SetDiagonal,
-           return_self<>())
-      .def("SetDiagonal",
-           (This & (This::*)(const GfVec2f &)) & This::SetDiagonal,
-           return_self<>())
+      .def("SetDiagonal", (This & (This::*)(float)) & This::SetDiagonal, return_self<>())
+      .def("SetDiagonal", (This & (This::*)(const GfVec2f &)) & This::SetDiagonal, return_self<>())
 
       .def("SetRow", &This::SetRow)
       .def("SetColumn", &This::SetColumn)
@@ -296,8 +317,7 @@ void wrapMatrix2f() {
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   // Install buffer protocol: set the tp_as_buffer slot to point to a
   // structure of function pointers that implement the buffer protocol for

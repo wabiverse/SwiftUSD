@@ -27,7 +27,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE {
+TF_WRAP_MODULE
+{
   TF_WRAP(AssetInfo);
   TF_WRAP(ResolvedPath);
   TF_WRAP(Timestamp);

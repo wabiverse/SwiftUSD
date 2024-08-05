@@ -42,8 +42,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(Tf_NoticeRegistry);
 
-Tf_NoticeRegistry::Tf_NoticeRegistry()
-    : _userCount(0), _doProbing(false), _globalBlockCount(0) {
+Tf_NoticeRegistry::Tf_NoticeRegistry() : _userCount(0), _doProbing(false), _globalBlockCount(0)
+{
   /*
    * lib/tf's diagnostic-reporting mechanisms are based on sending
    * a few TfNotice types.
@@ -66,7 +66,8 @@ Tf_NoticeRegistry::Tf_NoticeRegistry()
  */
 void Tf_NoticeRegistry::_VerifyFailedCast(const type_info &toType,
                                           const TfNotice &notice,
-                                          const TfNotice *castNotice) {
+                                          const TfNotice *castNotice)
+{
   string typeName = ArchGetDemangled(typeid(notice));
 
   if (castNotice) {
@@ -82,12 +83,14 @@ void Tf_NoticeRegistry::_VerifyFailedCast(const type_info &toType,
      * to avoid this in the future.  Warn so the author of the notice class
      * can fix.
      */
-    TF_WARN("Special handling of notice type '%s' invoked.\n"
-            "Most likely, this class is missing a non-inlined "
-            "virtual destructor.\n"
-            "Please request that someone modify class '%s' "
-            "accordingly.",
-            typeName.c_str(), typeName.c_str());
+    TF_WARN(
+        "Special handling of notice type '%s' invoked.\n"
+        "Most likely, this class is missing a non-inlined "
+        "virtual destructor.\n"
+        "Please request that someone modify class '%s' "
+        "accordingly.",
+        typeName.c_str(),
+        typeName.c_str());
     return;
   }
 
@@ -95,63 +98,71 @@ void Tf_NoticeRegistry::_VerifyFailedCast(const type_info &toType,
    * Death.
    */
 
-  TF_FATAL_ERROR("All attempts to cast notice of type '%s' to type "
-                 "'%s' failed.  One possibility is that '%s' has no "
-                 "non-inlined virtual functions and this system's C++ "
-                 "ABI is non-standard.  Verify that class '%s'"
-                 "has at least one non-inline virtual function.\n",
-                 typeName.c_str(), ArchGetDemangled(toType).c_str(),
-                 typeName.c_str(), typeName.c_str());
+  TF_FATAL_ERROR(
+      "All attempts to cast notice of type '%s' to type "
+      "'%s' failed.  One possibility is that '%s' has no "
+      "non-inlined virtual functions and this system's C++ "
+      "ABI is non-standard.  Verify that class '%s'"
+      "has at least one non-inline virtual function.\n",
+      typeName.c_str(),
+      ArchGetDemangled(toType).c_str(),
+      typeName.c_str(),
+      typeName.c_str());
 }
 
-void Tf_NoticeRegistry::_InsertProbe(const TfNotice::WeakProbePtr &probe) {
+void Tf_NoticeRegistry::_InsertProbe(const TfNotice::WeakProbePtr &probe)
+{
   _Lock lock(_probeMutex);
   if (probe)
     _probes.insert(probe);
   _doProbing = !_probes.empty();
 }
 
-void Tf_NoticeRegistry::_RemoveProbe(const TfNotice::WeakProbePtr &probe) {
+void Tf_NoticeRegistry::_RemoveProbe(const TfNotice::WeakProbePtr &probe)
+{
   _Lock lock(_probeMutex);
   _probes.erase(probe);
   _doProbing = !_probes.empty();
 }
 
-void Tf_NoticeRegistry::_BeginSend(
-    const TfNotice &notice, const TfWeakBase *sender,
-    const std::type_info &senderType,
-    const std::vector<TfNotice::WeakProbePtr> &probes) {
+void Tf_NoticeRegistry::_BeginSend(const TfNotice &notice,
+                                   const TfWeakBase *sender,
+                                   const std::type_info &senderType,
+                                   const std::vector<TfNotice::WeakProbePtr> &probes)
+{
   TF_FOR_ALL(i, probes)
   if (*i)
     (*i)->BeginSend(notice, sender, senderType);
 }
 
-void Tf_NoticeRegistry::_EndSend(
-    const std::vector<TfNotice::WeakProbePtr> &probes) {
+void Tf_NoticeRegistry::_EndSend(const std::vector<TfNotice::WeakProbePtr> &probes)
+{
   TF_FOR_ALL(i, probes)
   if (*i)
     (*i)->EndSend();
 }
 
-void Tf_NoticeRegistry::_BeginDelivery(
-    const TfNotice &notice, const TfWeakBase *sender,
-    const std::type_info &senderType, const TfWeakBase *listener,
-    const std::type_info &listenerType,
-    const std::vector<TfNotice::WeakProbePtr> &probes) {
+void Tf_NoticeRegistry::_BeginDelivery(const TfNotice &notice,
+                                       const TfWeakBase *sender,
+                                       const std::type_info &senderType,
+                                       const TfWeakBase *listener,
+                                       const std::type_info &listenerType,
+                                       const std::vector<TfNotice::WeakProbePtr> &probes)
+{
   TF_FOR_ALL(i, probes)
   if (*i)
     (*i)->BeginDelivery(notice, sender, senderType, listener, listenerType);
 }
 
-void Tf_NoticeRegistry::_EndDelivery(
-    const std::vector<TfNotice::WeakProbePtr> &probes) {
+void Tf_NoticeRegistry::_EndDelivery(const std::vector<TfNotice::WeakProbePtr> &probes)
+{
   TF_FOR_ALL(i, probes)
   if (*i)
     (*i)->EndDelivery();
 }
 
-TfNotice::Key
-Tf_NoticeRegistry::_Register(TfNotice::_DelivererBase *deliverer) {
+TfNotice::Key Tf_NoticeRegistry::_Register(TfNotice::_DelivererBase *deliverer)
+{
   TfAutoMallocTag2 tag("Tf", "Tf_NoticeRegistry::_Register");
 
   TfType noticeType = deliverer->GetNoticeType();
@@ -170,22 +181,27 @@ Tf_NoticeRegistry::_Register(TfNotice::_DelivererBase *deliverer) {
   return TfNotice::Key(TfCreateWeakPtr(deliverer));
 }
 
-void Tf_NoticeRegistry::_Revoke(TfNotice::Key &key) {
+void Tf_NoticeRegistry::_Revoke(TfNotice::Key &key)
+{
   _Lock lock(_userCountMutex);
 
   if (_userCount == 0) {
     // If no other execution context is traversing the registry, we
     // can remove the deliverer immediately.
     _FreeDeliverer(key._deliverer);
-  } else {
+  }
+  else {
     // Otherwise deactivate it.
     key._deliverer->_Deactivate();
   }
 }
 
-size_t Tf_NoticeRegistry::_Send(const TfNotice &n, const TfType &noticeType,
-                                const TfWeakBase *s, const void *senderUniqueId,
-                                const std::type_info &senderType) {
+size_t Tf_NoticeRegistry::_Send(const TfNotice &n,
+                                const TfType &noticeType,
+                                const TfWeakBase *s,
+                                const void *senderUniqueId,
+                                const std::type_info &senderType)
+{
   // Check the global block count to avoid the overhead of looking
   // up the thread-specific data in the 99.9% case where a block
   // is not present.
@@ -205,7 +221,8 @@ size_t Tf_NoticeRegistry::_Send(const TfNotice &n, const TfType &noticeType,
     // Copy off a list of the probes.
     _Lock lock(_probeMutex);
     probeList.reserve(_probes.size());
-    TF_FOR_ALL(i, _probes) {
+    TF_FOR_ALL(i, _probes)
+    {
       if (*i) {
         probeList.push_back(*i);
       }
@@ -222,12 +239,17 @@ size_t Tf_NoticeRegistry::_Send(const TfNotice &n, const TfType &noticeType,
     if (_DelivererContainer *container = _GetDelivererContainer(t)) {
       if (s) {
         // Do per-sender listeners
-        nSent += _Deliver(n, noticeType, s, senderUniqueId, senderType,
-                          probeList, _GetHeadForSender(container, s));
+        nSent += _Deliver(n,
+                          noticeType,
+                          s,
+                          senderUniqueId,
+                          senderType,
+                          probeList,
+                          _GetHeadForSender(container, s));
       }
       // Do "global" listeners
-      nSent += _Deliver(n, noticeType, s, senderUniqueId, senderType, probeList,
-                        _GetHead(container));
+      nSent += _Deliver(
+          n, noticeType, s, senderUniqueId, senderType, probeList, _GetHead(container));
     }
 
     // Chain up base types to find listeners interested in them
@@ -259,11 +281,14 @@ size_t Tf_NoticeRegistry::_Send(const TfNotice &n, const TfType &noticeType,
   return nSent;
 }
 
-int Tf_NoticeRegistry::_Deliver(
-    const TfNotice &n, const TfType &type, const TfWeakBase *s,
-    const void *senderUniqueId, const std::type_info &senderType,
-    const std::vector<TfNotice::WeakProbePtr> &probes,
-    const _DelivererListEntry &entry) {
+int Tf_NoticeRegistry::_Deliver(const TfNotice &n,
+                                const TfType &type,
+                                const TfWeakBase *s,
+                                const void *senderUniqueId,
+                                const std::type_info &senderType,
+                                const std::vector<TfNotice::WeakProbePtr> &probes,
+                                const _DelivererListEntry &entry)
+{
   _DelivererList *dlist = entry.first;
   if (!dlist)
     return 0;
@@ -273,10 +298,11 @@ int Tf_NoticeRegistry::_Deliver(
   while (i != dlist->end()) {
     _DelivererList::value_type deliverer = *i;
     if (deliverer->_IsActive() &&
-        deliverer->_SendToListener(n, type, s, senderUniqueId, senderType,
-                                   probes)) {
+        deliverer->_SendToListener(n, type, s, senderUniqueId, senderType, probes))
+    {
       ++nSent;
-    } else {
+    }
+    else {
       _Lock lock(_userCountMutex);
       if (!deliverer->_IsMarkedForRemoval()) {
         deliverer->_Deactivate();
@@ -289,7 +315,8 @@ int Tf_NoticeRegistry::_Deliver(
   return nSent;
 }
 
-void Tf_NoticeRegistry::_FreeDeliverer(const TfNotice::_DelivererWeakPtr &d) {
+void Tf_NoticeRegistry::_FreeDeliverer(const TfNotice::_DelivererWeakPtr &d)
+{
   if (d) {
     _DelivererList *list = d->_list;
     _DelivererList::iterator iter = d->_listIter;
@@ -298,34 +325,41 @@ void Tf_NoticeRegistry::_FreeDeliverer(const TfNotice::_DelivererWeakPtr &d) {
   }
 }
 
-void Tf_NoticeRegistry::_BadTypeFatalMsg(const TfType &t,
-                                         const std::type_info &ti) {
+void Tf_NoticeRegistry::_BadTypeFatalMsg(const TfType &t, const std::type_info &ti)
+{
   const vector<TfType> &baseTypes = t.GetBaseTypes();
   string msg;
 
   if (t.IsUnknown()) {
-    msg = TfStringPrintf("Class %s (derived from TfNotice) is "
-                         "undefined in the TfType system",
-                         ArchGetDemangled(ti).c_str());
-  } else if (!baseTypes.empty()) {
-    msg = TfStringPrintf("TfNotice type '%s' has multiple base types;\n"
-                         "it must have a unique parent in the TfType system",
-                         t.GetTypeName().c_str());
-  } else {
-    msg = TfStringPrintf("TfNotice type '%s' has NO base types;\n"
-                         "this should be impossible.",
-                         t.GetTypeName().c_str());
+    msg = TfStringPrintf(
+        "Class %s (derived from TfNotice) is "
+        "undefined in the TfType system",
+        ArchGetDemangled(ti).c_str());
+  }
+  else if (!baseTypes.empty()) {
+    msg = TfStringPrintf(
+        "TfNotice type '%s' has multiple base types;\n"
+        "it must have a unique parent in the TfType system",
+        t.GetTypeName().c_str());
+  }
+  else {
+    msg = TfStringPrintf(
+        "TfNotice type '%s' has NO base types;\n"
+        "this should be impossible.",
+        t.GetTypeName().c_str());
   }
 
   TF_FATAL_ERROR(msg);
 }
 
-void Tf_NoticeRegistry::_IncrementBlockCount() {
+void Tf_NoticeRegistry::_IncrementBlockCount()
+{
   ++_globalBlockCount;
   ++_perThreadBlockCount.local();
 }
 
-void Tf_NoticeRegistry::_DecrementBlockCount() {
+void Tf_NoticeRegistry::_DecrementBlockCount()
+{
   --_globalBlockCount;
   --_perThreadBlockCount.local();
 }

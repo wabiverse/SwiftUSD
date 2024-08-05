@@ -24,264 +24,237 @@
 #include "Hd/sceneIndex.h"
 #include "Hd/filteringSceneIndex.h"
 
-#include "Tf/instantiateSingleton.h"
 #include "Arch/demangle.h"
+#include "Tf/instantiateSingleton.h"
 
 #include <typeinfo>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-struct HdSceneIndexBase::_NotifyScope
-{
-    HdSceneIndexBase *_sceneIndex;
+struct HdSceneIndexBase::_NotifyScope {
+  HdSceneIndexBase *_sceneIndex;
 
-    _NotifyScope(HdSceneIndexBase *si)
-        : _sceneIndex(si)
-    {
-        ++_sceneIndex->_notifyDepth;
-    }
+  _NotifyScope(HdSceneIndexBase *si) : _sceneIndex(si)
+  {
+    ++_sceneIndex->_notifyDepth;
+  }
 
-    ~_NotifyScope()
-    {
-        --_sceneIndex->_notifyDepth;
-        if (_sceneIndex->_notifyDepth == 0
-            && _sceneIndex->_shouldRemoveExpiredObservers) {
-            _sceneIndex->_RemoveExpiredObservers();
-        }
+  ~_NotifyScope()
+  {
+    --_sceneIndex->_notifyDepth;
+    if (_sceneIndex->_notifyDepth == 0 && _sceneIndex->_shouldRemoveExpiredObservers) {
+      _sceneIndex->_RemoveExpiredObservers();
     }
+  }
 };
 
-HdSceneIndexBase::HdSceneIndexBase()
-    : _notifyDepth(0)
-    , _shouldRemoveExpiredObservers(false)
-{
-}
+HdSceneIndexBase::HdSceneIndexBase() : _notifyDepth(0), _shouldRemoveExpiredObservers(false) {}
 
 HdSceneIndexBase::~HdSceneIndexBase() = default;
 
-void
-HdSceneIndexBase::AddObserver(const HdSceneIndexObserverPtr &observer)
+void HdSceneIndexBase::AddObserver(const HdSceneIndexObserverPtr &observer)
 {
-    if (std::find(_observers.begin(), _observers.end(), observer)
-        != _observers.end()) {
-        TF_CODING_ERROR("Observer is already registered");
-        return;
-    }
+  if (std::find(_observers.begin(), _observers.end(), observer) != _observers.end()) {
+    TF_CODING_ERROR("Observer is already registered");
+    return;
+  }
 
-    _observers.push_back(observer);
+  _observers.push_back(observer);
 }
 
-void
-HdSceneIndexBase::RemoveObserver(const HdSceneIndexObserverPtr &observer)
+void HdSceneIndexBase::RemoveObserver(const HdSceneIndexObserverPtr &observer)
 {
-    _Observers::iterator i =
-        std::find(_observers.begin(), _observers.end(), observer);
-    if (i != _observers.end()) {
-        if (_notifyDepth == 0) {
-            _observers.erase(i);
-        } else {
-            // Observer notification is underway, so to avoid disrupting
-            // traversal, zero out the entry and flag it for removal.
-            *i = nullptr;
-            _shouldRemoveExpiredObservers = true;
-        }
-    }
-}
-
-void
-HdSceneIndexBase::_RemoveExpiredObservers()
-{
+  _Observers::iterator i = std::find(_observers.begin(), _observers.end(), observer);
+  if (i != _observers.end()) {
     if (_notifyDepth == 0) {
-        _observers.erase(
-            std::remove_if(
-                _observers.begin(), _observers.end(),
-                [](const HdSceneIndexObserverPtr &observer) {
-                    return !observer;
-                }),
-            _observers.end());
-        _shouldRemoveExpiredObservers = false;
+      _observers.erase(i);
     }
-}
-
-void
-HdSceneIndexBase::_SendPrimsAdded(
-    const HdSceneIndexObserver::AddedPrimEntries &entries)
-{
-    if (entries.empty()) {
-        return;
+    else {
+      // Observer notification is underway, so to avoid disrupting
+      // traversal, zero out the entry and flag it for removal.
+      *i = nullptr;
+      _shouldRemoveExpiredObservers = true;
     }
+  }
+}
 
-    _NotifyScope scope(this);
+void HdSceneIndexBase::_RemoveExpiredObservers()
+{
+  if (_notifyDepth == 0) {
+    _observers.erase(
+        std::remove_if(_observers.begin(),
+                       _observers.end(),
+                       [](const HdSceneIndexObserverPtr &observer) { return !observer; }),
+        _observers.end());
+    _shouldRemoveExpiredObservers = false;
+  }
+}
 
-    // Observers may be added during notification, so capture the
-    // initial count upfront, and use indexing rather than iterators
-    // (which might become invalidated).
-    const size_t num = _observers.size();
-    for (size_t i=0; i < num; ++i) {
-        if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
-            observer->PrimsAdded(*this, entries);
-        } else {
-            _shouldRemoveExpiredObservers = true;
-        }
+void HdSceneIndexBase::_SendPrimsAdded(const HdSceneIndexObserver::AddedPrimEntries &entries)
+{
+  if (entries.empty()) {
+    return;
+  }
+
+  _NotifyScope scope(this);
+
+  // Observers may be added during notification, so capture the
+  // initial count upfront, and use indexing rather than iterators
+  // (which might become invalidated).
+  const size_t num = _observers.size();
+  for (size_t i = 0; i < num; ++i) {
+    if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
+      observer->PrimsAdded(*this, entries);
     }
-}
-
-void
-HdSceneIndexBase::_SendPrimsRemoved(
-    const HdSceneIndexObserver::RemovedPrimEntries &entries)
-{
-    if (entries.empty()) {
-        return;
+    else {
+      _shouldRemoveExpiredObservers = true;
     }
+  }
+}
 
-    _NotifyScope scope(this);
+void HdSceneIndexBase::_SendPrimsRemoved(const HdSceneIndexObserver::RemovedPrimEntries &entries)
+{
+  if (entries.empty()) {
+    return;
+  }
 
-    // See note in _SendPrimsAdded.
-    const size_t num = _observers.size();
-    for (size_t i=0; i < num; ++i) {
-        if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
-            observer->PrimsRemoved(*this, entries);
-        } else {
-            _shouldRemoveExpiredObservers = true;
-        }
+  _NotifyScope scope(this);
+
+  // See note in _SendPrimsAdded.
+  const size_t num = _observers.size();
+  for (size_t i = 0; i < num; ++i) {
+    if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
+      observer->PrimsRemoved(*this, entries);
     }
-}
-
-void
-HdSceneIndexBase::_SendPrimsDirtied(
-    const HdSceneIndexObserver::DirtiedPrimEntries & entries)
-{
-    if (entries.empty()) {
-        return;
+    else {
+      _shouldRemoveExpiredObservers = true;
     }
+  }
+}
 
-    _NotifyScope scope(this);
+void HdSceneIndexBase::_SendPrimsDirtied(const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+{
+  if (entries.empty()) {
+    return;
+  }
 
-    // See note in _SendPrimsAdded.
-    const size_t num = _observers.size();
-    for (size_t i=0; i < num; ++i) {
-        if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
-            observer->PrimsDirtied(*this, entries);
-        } else {
-            _shouldRemoveExpiredObservers = true;
-        }
+  _NotifyScope scope(this);
+
+  // See note in _SendPrimsAdded.
+  const size_t num = _observers.size();
+  for (size_t i = 0; i < num; ++i) {
+    if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
+      observer->PrimsDirtied(*this, entries);
     }
-}
-
-void
-HdSceneIndexBase::_SendPrimsRenamed(
-    const HdSceneIndexObserver::RenamedPrimEntries & entries)
-{
-    if (entries.empty()) {
-        return;
+    else {
+      _shouldRemoveExpiredObservers = true;
     }
+  }
+}
 
-    _NotifyScope scope(this);
+void HdSceneIndexBase::_SendPrimsRenamed(const HdSceneIndexObserver::RenamedPrimEntries &entries)
+{
+  if (entries.empty()) {
+    return;
+  }
 
-    // See note in _SendPrimsAdded.
-    const size_t num = _observers.size();
-    for (size_t i=0; i < num; ++i) {
-        if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
-            observer->PrimsRenamed(*this, entries);
-        } else {
-            _shouldRemoveExpiredObservers = true;
-        }
+  _NotifyScope scope(this);
+
+  // See note in _SendPrimsAdded.
+  const size_t num = _observers.size();
+  for (size_t i = 0; i < num; ++i) {
+    if (const HdSceneIndexObserverPtr &observer = _observers[i]) {
+      observer->PrimsRenamed(*this, entries);
     }
-}
-
-bool
-HdSceneIndexBase::_IsObserved() const
-{
-    return !_observers.empty();
-}
-
-std::string
-HdSceneIndexBase::GetDisplayName() const
-{
-    if (!_displayName.empty()) {
-        return _displayName;
+    else {
+      _shouldRemoveExpiredObservers = true;
     }
-
-    return ArchGetDemangled(typeid(*this).name());
+  }
 }
 
-void
-HdSceneIndexBase::SetDisplayName(const std::string &n)
+bool HdSceneIndexBase::_IsObserved() const
 {
-    _displayName = n;
+  return !_observers.empty();
 }
 
-void
-HdSceneIndexBase::AddTag(const TfToken &tag)
+std::string HdSceneIndexBase::GetDisplayName() const
 {
-    _tags.insert(tag);
+  if (!_displayName.empty()) {
+    return _displayName;
+  }
+
+  return ArchGetDemangled(typeid(*this).name());
 }
 
-void
-HdSceneIndexBase::RemoveTag(const TfToken &tag)
+void HdSceneIndexBase::SetDisplayName(const std::string &n)
 {
-    _tags.erase(tag);
+  _displayName = n;
 }
 
-bool
-HdSceneIndexBase::HasTag(const TfToken &tag) const
+void HdSceneIndexBase::AddTag(const TfToken &tag)
 {
-    return _tags.find(tag) != _tags.end();
+  _tags.insert(tag);
 }
 
-TfTokenVector
-HdSceneIndexBase::GetTags() const
+void HdSceneIndexBase::RemoveTag(const TfToken &tag)
 {
-    return TfTokenVector(_tags.begin(), _tags.end());
+  _tags.erase(tag);
 }
 
+bool HdSceneIndexBase::HasTag(const TfToken &tag) const
+{
+  return _tags.find(tag) != _tags.end();
+}
+
+TfTokenVector HdSceneIndexBase::GetTags() const
+{
+  return TfTokenVector(_tags.begin(), _tags.end());
+}
 
 // ----------------------------------------------------------------------------
 
 TF_INSTANTIATE_SINGLETON(HdSceneIndexNameRegistry);
 
-void
-HdSceneIndexNameRegistry::RegisterNamedSceneIndex(
-    const std::string &name, HdSceneIndexBasePtr instance)
+void HdSceneIndexNameRegistry::RegisterNamedSceneIndex(const std::string &name,
+                                                       HdSceneIndexBasePtr instance)
 {
-    _namedInstances[name] = instance;
+  _namedInstances[name] = instance;
 }
 
-std::vector<std::string>
-HdSceneIndexNameRegistry::GetRegisteredNames()
+std::vector<std::string> HdSceneIndexNameRegistry::GetRegisteredNames()
 {
-    std::vector<std::string> result;
-    result.reserve(_namedInstances.size());
+  std::vector<std::string> result;
+  result.reserve(_namedInstances.size());
 
-    _NamedInstanceMap::const_iterator it = _namedInstances.begin();
-    while (it != _namedInstances.end()) {
-        if (it->second) {
-            result.push_back(it->first);
-            ++it;
-        } else {
-            it = _namedInstances.erase(it);
-        }
-    }
-
-    return result;
-}
-
-HdSceneIndexBaseRefPtr
-HdSceneIndexNameRegistry::GetNamedSceneIndex(const std::string &name)
-{
-    _NamedInstanceMap::const_iterator it = _namedInstances.find(name);
-    if (it == _namedInstances.end()) {
-        return nullptr;
-    }
-
+  _NamedInstanceMap::const_iterator it = _namedInstances.begin();
+  while (it != _namedInstances.end()) {
     if (it->second) {
-        return it->second;
-    } else {
-        _namedInstances.erase(it);
+      result.push_back(it->first);
+      ++it;
     }
+    else {
+      it = _namedInstances.erase(it);
+    }
+  }
 
+  return result;
+}
+
+HdSceneIndexBaseRefPtr HdSceneIndexNameRegistry::GetNamedSceneIndex(const std::string &name)
+{
+  _NamedInstanceMap::const_iterator it = _namedInstances.find(name);
+  if (it == _namedInstances.end()) {
     return nullptr;
+  }
+
+  if (it->second) {
+    return it->second;
+  }
+  else {
+    _namedInstances.erase(it);
+  }
+
+  return nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

@@ -77,13 +77,12 @@ TF_DECLARE_PUBLIC_TOKENS(UsdTimeCodeTokens, USD_API, USD_TIME_CODE_TOKENS);
 /// to retrieve the first authored timesample for any attribute.
 ///
 class UsdTimeCode {
-public:
+ public:
   /// Construct with optional time value.  Impilicitly convert from double.
   constexpr UsdTimeCode(double t = 0.0) noexcept : _value(t) {}
 
   /// Construct and implicitly cast from SdfTimeCode.
-  constexpr UsdTimeCode(const SdfTimeCode &timeCode) noexcept
-      : _value(timeCode.GetValue()) {}
+  constexpr UsdTimeCode(const SdfTimeCode &timeCode) noexcept : _value(timeCode.GetValue()) {}
 
   /// Produce a UsdTimeCode representing the lowest/earliest possible
   /// timeCode.  Thus, for any given timeSample \em s, its time ordinate
@@ -93,7 +92,8 @@ public:
   /// timeSample for an attribute, as they can use UsdTimeCode::EarliestTime()
   /// as the \em time argument to UsdAttribute::Get() and
   /// UsdAttribute::GetBracketingTimeSamples()
-  static constexpr UsdTimeCode EarliestTime() {
+  static constexpr UsdTimeCode EarliestTime()
+  {
     return UsdTimeCode(std::numeric_limits<double>::lowest());
   }
 
@@ -104,7 +104,8 @@ public:
   /// in UsdAttribute value resolution, the sample at Default() (if any) is
   /// always weaker than any numeric timeSample in the same layer.  For
   /// more information, see \ref Usd_ValueResolution
-  static constexpr UsdTimeCode Default() {
+  static constexpr UsdTimeCode Default()
+  {
     return UsdTimeCode(std::numeric_limits<double>::quiet_NaN());
   }
 
@@ -117,78 +118,90 @@ public:
   /// and value y at time t + SafeStep().  This ensures that as the sample
   /// times are shifted and scaled, t and t + SafeStep() remain distinct so
   /// long as they adhere to the \p maxValue and \p maxCompression limits.
-  static constexpr double SafeStep(double maxValue = 1e6,
-                                   double maxCompression = 10.0) {
-    return std::numeric_limits<double>::epsilon() * maxValue * maxCompression *
-           2.0;
+  static constexpr double SafeStep(double maxValue = 1e6, double maxCompression = 10.0)
+  {
+    return std::numeric_limits<double>::epsilon() * maxValue * maxCompression * 2.0;
   }
 
   /// Return true if this time represents the lowest/earliest possible
   /// timeCode, false otherwise.
-  bool IsEarliestTime() const {
+  bool IsEarliestTime() const
+  {
     return IsNumeric() && (_value == std::numeric_limits<double>::lowest());
   }
 
   /// Return true if this time represents the 'default' sentinel value, false
   /// otherwise.  This is equivalent to !IsNumeric().
-  bool IsDefault() const { return std::isnan(_value); }
+  bool IsDefault() const
+  {
+    return std::isnan(_value);
+  }
 
   /// Return true if this time represents a numeric value, false otherwise.
   /// This is equivalent to !IsDefault().
-  bool IsNumeric() const { return !IsDefault(); }
+  bool IsNumeric() const
+  {
+    return !IsDefault();
+  }
 
   /// Return the numeric value for this time.  If this time \a IsDefault(),
   /// return a quiet NaN value.
-  double GetValue() const {
+  double GetValue() const
+  {
     if (ARCH_UNLIKELY(IsDefault()))
       _IssueGetValueOnDefaultError();
     return _value;
   }
 
   /// Equality comparison.
-  friend bool operator==(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
+  friend bool operator==(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
     return lhs.IsDefault() == rhs.IsDefault() &&
            (lhs.IsDefault() || (lhs.GetValue() == rhs.GetValue()));
   }
 
   /// Inequality comparison.
-  friend bool operator!=(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
+  friend bool operator!=(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
     return !(lhs == rhs);
   }
 
   /// Less-than.  Default() times are less than all numeric times,
   /// \em including EarliestTime()
-  friend bool operator<(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
+  friend bool operator<(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
     return (lhs.IsDefault() && rhs.IsNumeric()) ||
-           (lhs.IsNumeric() && rhs.IsNumeric() &&
-            lhs.GetValue() < rhs.GetValue());
+           (lhs.IsNumeric() && rhs.IsNumeric() && lhs.GetValue() < rhs.GetValue());
   }
 
   /// Greater-equal.  Default() times are less than all numeric times,
   /// \em including EarliestTime().
-  friend bool operator>=(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
+  friend bool operator>=(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
     return !(lhs < rhs);
   }
 
   /// Less-equal.  Default() times are less than all numeric times,
   /// \em including EarliestTime().
-  friend bool operator<=(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
-    return lhs.IsDefault() ||
-           (rhs.IsNumeric() && lhs.GetValue() <= rhs.GetValue());
+  friend bool operator<=(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
+    return lhs.IsDefault() || (rhs.IsNumeric() && lhs.GetValue() <= rhs.GetValue());
   }
 
   /// Greater-than.  Default() times are less than all numeric times,
   /// \em including EarliestTime().
-  friend bool operator>(const UsdTimeCode &lhs, const UsdTimeCode &rhs) {
+  friend bool operator>(const UsdTimeCode &lhs, const UsdTimeCode &rhs)
+  {
     return !(lhs <= rhs);
   }
 
   /// Hash function.
-  friend size_t hash_value(const UsdTimeCode &time) {
+  friend size_t hash_value(const UsdTimeCode &time)
+  {
     return TfHash()(time._value);
   }
 
-private:
+ private:
   USD_API
   void _IssueGetValueOnDefaultError() const;
 
@@ -204,4 +217,4 @@ std::istream &operator>>(std::istream &is, UsdTimeCode &time);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_TIME_CODE_H
+#endif  // PXR_USD_USD_TIME_CODE_H

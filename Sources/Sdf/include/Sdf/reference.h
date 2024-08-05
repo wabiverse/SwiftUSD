@@ -73,7 +73,7 @@ typedef std::vector<SdfReference> SdfReferenceVector;
 /// that need to be able to store data associated with references.
 ///
 class SdfReference {
-public:
+ public:
   /// Creates a reference with all its meta data.  The default reference is an
   /// internal reference to the default prim.  See SdfAssetPath for what
   /// characters are valid in \p assetPath.  If \p assetPath contains invalid
@@ -88,14 +88,18 @@ public:
   /// Returns the asset path to the root layer of the referenced layer
   /// stack.  This will be empty in the case of an internal reference.
   ///
-  const std::string &GetAssetPath() const { return _assetPath; }
+  const std::string &GetAssetPath() const
+  {
+    return _assetPath;
+  }
 
   /// Sets the asset path for the root layer of the referenced layer stack.
   /// This may be set to an empty string to specify an internal reference.
   /// See SdfAssetPath for what characters are valid in \p assetPath.  If \p
   /// assetPath contains invalid characters, issue an error and set this
   /// reference's asset path to the empty asset path.
-  void SetAssetPath(const std::string &assetPath) {
+  void SetAssetPath(const std::string &assetPath)
+  {
     // Go through SdfAssetPath() to raise an error if \p assetPath contains
     // illegal characters (i.e. control characters).
     _assetPath = SdfAssetPath(assetPath).GetAssetPath();
@@ -105,31 +109,45 @@ public:
   /// This will be empty if the referenced prim is the default prim specified
   /// in the referenced layer stack.
   ///
-  const SdfPath &GetPrimPath() const { return _primPath; }
+  const SdfPath &GetPrimPath() const
+  {
+    return _primPath;
+  }
 
   /// Sets the path of the referenced prim.
   /// This may be set to an empty path to specify a reference to the default
   /// prim in the referenced layer stack.
   ///
-  void SetPrimPath(const SdfPath &primPath) { _primPath = primPath; }
+  void SetPrimPath(const SdfPath &primPath)
+  {
+    _primPath = primPath;
+  }
 
   /// Returns the layer offset associated with the reference.
   ///
-  const SdfLayerOffset &GetLayerOffset() const { return _layerOffset; }
+  const SdfLayerOffset &GetLayerOffset() const
+  {
+    return _layerOffset;
+  }
 
   /// Sets a new layer offset.
   ///
-  void SetLayerOffset(const SdfLayerOffset &layerOffset) {
+  void SetLayerOffset(const SdfLayerOffset &layerOffset)
+  {
     _layerOffset = layerOffset;
   }
 
   /// Returns the custom data associated with the reference.
   ///
-  const VtDictionary &GetCustomData() const { return _customData; }
+  const VtDictionary &GetCustomData() const
+  {
+    return _customData;
+  }
 
   /// Sets the custom data associated with the reference.
   ///
-  void SetCustomData(const VtDictionary &customData) {
+  void SetCustomData(const VtDictionary &customData)
+  {
     _customData = customData;
   }
 
@@ -140,7 +158,8 @@ public:
   SDF_API void SetCustomData(const std::string &name, const VtValue &value);
 
   /// Swaps the custom data dictionary for this reference.
-  void SwapCustomData(VtDictionary &customData) {
+  void SwapCustomData(VtDictionary &customData)
+  {
     _customData.swap(customData);
   }
 
@@ -150,35 +169,48 @@ public:
   ///
   SDF_API bool IsInternal() const;
 
-  friend inline size_t hash_value(const SdfReference &r) {
-    return TfHash::Combine(r._assetPath, r._primPath, r._layerOffset,
-                           r._customData);
+  friend inline size_t hash_value(const SdfReference &r)
+  {
+    return TfHash::Combine(r._assetPath, r._primPath, r._layerOffset, r._customData);
   }
 
   /// Returns whether this reference equals \a rhs.
   SDF_API bool operator==(const SdfReference &rhs) const;
 
   /// \sa SdfReference::operator==(const SdfReference&)
-  bool operator!=(const SdfReference &rhs) const { return !(*this == rhs); }
+  bool operator!=(const SdfReference &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// Returns whether this reference is less than \a rhs.  The meaning
   /// of less than is somewhat arbitrary.
   SDF_API bool operator<(const SdfReference &rhs) const;
 
   /// \sa SdfReference::operator<(const SdfReference&)
-  bool operator>(const SdfReference &rhs) const { return rhs < *this; }
+  bool operator>(const SdfReference &rhs) const
+  {
+    return rhs < *this;
+  }
 
   /// \sa SdfReference::operator<(const SdfReference&)
-  bool operator<=(const SdfReference &rhs) const { return !(rhs < *this); }
+  bool operator<=(const SdfReference &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
   /// \sa SdfReference::operator<(const SdfReference&)
-  bool operator>=(const SdfReference &rhs) const { return !(*this < rhs); }
+  bool operator>=(const SdfReference &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   /// Struct that defines equality of SdfReferences based on their
   /// identity (the asset path and prim path).
   ///
   struct IdentityEqual {
-    bool operator()(const SdfReference &lhs, const SdfReference &rhs) const {
+    bool operator()(const SdfReference &lhs, const SdfReference &rhs) const
+    {
       return lhs._assetPath == rhs._assetPath && lhs._primPath == rhs._primPath;
     }
   };
@@ -187,14 +219,14 @@ public:
   /// their identity (the asset path and prim path).
   ///
   struct IdentityLessThan {
-    bool operator()(const SdfReference &lhs, const SdfReference &rhs) const {
+    bool operator()(const SdfReference &lhs, const SdfReference &rhs) const
+    {
       return lhs._assetPath < rhs._assetPath ||
-             (lhs._assetPath == rhs._assetPath &&
-              lhs._primPath < rhs._primPath);
+             (lhs._assetPath == rhs._assetPath && lhs._primPath < rhs._primPath);
     }
   };
 
-private:
+ private:
   // The asset path to the external layer.
   std::string _assetPath;
 
@@ -222,9 +254,8 @@ SDF_API int SdfFindReferenceByIdentity(const SdfReferenceVector &references,
                                        const SdfReference &referenceId);
 
 /// Writes the string representation of \a SdfReference to \a out.
-SDF_API std::ostream &operator<<(std::ostream &out,
-                                 const SdfReference &reference);
+SDF_API std::ostream &operator<<(std::ostream &out, const SdfReference &reference);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_REFERENCE_H
+#endif  // PXR_USD_SDF_REFERENCE_H

@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_EXT_COMPUTATION_H
 #define PXR_IMAGING_HD_EXT_COMPUTATION_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
 #include "Hd/sceneDelegate.h"
 #include "Hd/sprim.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -53,107 +53,104 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ExtComputations use a pull model, so processing is only triggered if
 /// a downstream computation or prim pulls on one the computations outputs.
 ///
-class HdExtComputation : public HdSprim
-{
-public:
-    /// Construct a new ExtComputation identified by id.
-    HD_API
-    HdExtComputation(SdfPath const &id);
+class HdExtComputation : public HdSprim {
+ public:
+  /// Construct a new ExtComputation identified by id.
+  HD_API
+  HdExtComputation(SdfPath const &id);
 
-    HD_API
-    ~HdExtComputation() override;
+  HD_API
+  ~HdExtComputation() override;
 
-    ///
-    /// Change tracking
-    ///
-    enum DirtyBits : HdDirtyBits {
-        Clean                 = 0,
-        DirtyInputDesc        = 1 << 0,  ///< The list of inputs or input
-                                         ///  bindings changed
-        DirtyOutputDesc       = 1 << 1,  ///< The list of outputs changed
-        DirtyElementCount     = 1 << 2,  ///< The number of elements in the
-                                         ///  output arrays changed
-        DirtySceneInput       = 1 << 3,  ///< A scene input changed value
-        DirtyCompInput        = 1 << 4,  ///< A computation input changed value
-        DirtyKernel           = 1 << 5,  ///< The compute kernel binding changed
+  ///
+  /// Change tracking
+  ///
+  enum DirtyBits : HdDirtyBits {
+    Clean = 0,
+    DirtyInputDesc = 1 << 0,     ///< The list of inputs or input
+                                 ///  bindings changed
+    DirtyOutputDesc = 1 << 1,    ///< The list of outputs changed
+    DirtyElementCount = 1 << 2,  ///< The number of elements in the
+                                 ///  output arrays changed
+    DirtySceneInput = 1 << 3,    ///< A scene input changed value
+    DirtyCompInput = 1 << 4,     ///< A computation input changed value
+    DirtyKernel = 1 << 5,        ///< The compute kernel binding changed
 
-        DirtyDispatchCount    = 1 << 6,  ///< The number of kernel
-                                         ///  invocations to execute changed
+    DirtyDispatchCount = 1 << 6,  ///< The number of kernel
+                                  ///  invocations to execute changed
 
-        AllDirty              = (DirtyInputDesc
-                                |DirtyOutputDesc
-                                |DirtyElementCount
-                                |DirtySceneInput
-                                |DirtyCompInput
-                                |DirtyKernel
-                                |DirtyDispatchCount)
-    };
+    AllDirty = (DirtyInputDesc | DirtyOutputDesc | DirtyElementCount | DirtySceneInput |
+                DirtyCompInput | DirtyKernel | DirtyDispatchCount)
+  };
 
-    HD_API
-    void Sync(HdSceneDelegate *sceneDelegate,
-              HdRenderParam   *renderParam,
-              HdDirtyBits     *dirtyBits) override;
+  HD_API
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits) override;
 
-    HD_API
-    HdDirtyBits GetInitialDirtyBitsMask() const override;
+  HD_API
+  HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-    HD_API
-    size_t GetDispatchCount() const;
+  HD_API
+  size_t GetDispatchCount() const;
 
-    HD_API
-    size_t GetElementCount() const { return _elementCount; }
+  HD_API
+  size_t GetElementCount() const
+  {
+    return _elementCount;
+  }
 
-    HD_API
-    TfTokenVector const & GetSceneInputNames() const {
-        return _sceneInputNames;
-    }
+  HD_API
+  TfTokenVector const &GetSceneInputNames() const
+  {
+    return _sceneInputNames;
+  }
 
-    HD_API
-    TfTokenVector GetOutputNames() const;
+  HD_API
+  TfTokenVector GetOutputNames() const;
 
-    HD_API
-    HdExtComputationInputDescriptorVector const &
-    GetComputationInputs() const {
-        return _computationInputs;
-    }
+  HD_API
+  HdExtComputationInputDescriptorVector const &GetComputationInputs() const
+  {
+    return _computationInputs;
+  }
 
-    HD_API
-    HdExtComputationOutputDescriptorVector const &
-    GetComputationOutputs() const {
-        return _computationOutputs;
-    }
+  HD_API
+  HdExtComputationOutputDescriptorVector const &GetComputationOutputs() const
+  {
+    return _computationOutputs;
+  }
 
-    HD_API
-    const std::string& GetGpuKernelSource() const { return _gpuKernelSource; }
+  HD_API
+  const std::string &GetGpuKernelSource() const
+  {
+    return _gpuKernelSource;
+  }
 
-    HD_API
-    bool IsInputAggregation() const;
+  HD_API
+  bool IsInputAggregation() const;
 
-protected:
-    HD_API
-    void
-    _Sync(HdSceneDelegate *sceneDelegate,
-          HdRenderParam   *renderParam,
-          HdDirtyBits     *dirtyBits);
+ protected:
+  HD_API
+  void _Sync(HdSceneDelegate *sceneDelegate, HdRenderParam *renderParam, HdDirtyBits *dirtyBits);
 
-    HD_API
-    static bool _IsEnabledSharedExtComputationData();
+  HD_API
+  static bool _IsEnabledSharedExtComputationData();
 
-private:
-    size_t                                 _dispatchCount;
-    size_t                                 _elementCount;
-    TfTokenVector                          _sceneInputNames;
-    HdExtComputationInputDescriptorVector  _computationInputs;
-    HdExtComputationOutputDescriptorVector _computationOutputs;
-    std::string                            _gpuKernelSource;
+ private:
+  size_t _dispatchCount;
+  size_t _elementCount;
+  TfTokenVector _sceneInputNames;
+  HdExtComputationInputDescriptorVector _computationInputs;
+  HdExtComputationOutputDescriptorVector _computationOutputs;
+  std::string _gpuKernelSource;
 
-    // No default construction or copying
-    HdExtComputation() = delete;
-    HdExtComputation(const HdExtComputation &) = delete;
-    HdExtComputation &operator =(const HdExtComputation &) = delete;
-
+  // No default construction or copying
+  HdExtComputation() = delete;
+  HdExtComputation(const HdExtComputation &) = delete;
+  HdExtComputation &operator=(const HdExtComputation &) = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_EXT_COMPUTATION_H
+#endif  // PXR_IMAGING_HD_EXT_COMPUTATION_H

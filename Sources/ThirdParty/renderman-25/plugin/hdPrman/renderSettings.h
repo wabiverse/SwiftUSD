@@ -24,16 +24,15 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/renderSettings.h"
+#include <pxr/pxrns.h>
 
-#include "RiTypesHelper.h" // for RtParamList
+#include "RiTypesHelper.h"  // for RtParamList
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_RenderSettings final : public HdRenderSettings
-{
-public:
+class HdPrman_RenderSettings final : public HdRenderSettings {
+ public:
   HdPrman_RenderSettings(SdfPath const &id);
 
   ~HdPrman_RenderSettings() override;
@@ -49,10 +48,10 @@ public:
              HdRenderParam *renderParam,
              const HdDirtyBits *dirtyBits) override;
 
-private:
+ private:
   RtParamList _settingsOptions;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H

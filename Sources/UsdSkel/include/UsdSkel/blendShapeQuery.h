@@ -26,10 +26,10 @@
 
 /// \file usdSkel/blendShapeQuery.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
 #include "UsdSkel/blendShape.h"
 #include "UsdSkel/inbetweenShape.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/vec3f.h"
 #include "Tf/span.h"
@@ -43,21 +43,29 @@ class UsdSkelBindingAPI;
 ///
 /// Helper class used to resolve blend shape weights, including
 /// inbetweens.
-class UsdSkelBlendShapeQuery
-{
-public:
+class UsdSkelBlendShapeQuery {
+ public:
   UsdSkelBlendShapeQuery() = default;
 
   USDSKEL_API UsdSkelBlendShapeQuery(const UsdSkelBindingAPI &binding);
 
   /// Return true if this query is valid.
-  bool IsValid() const { return bool(_prim); }
+  bool IsValid() const
+  {
+    return bool(_prim);
+  }
 
   /// Boolean conversion operator. Equivalent to IsValid().
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
   /// Returns the prim the blend shapes apply to.
-  const UsdPrim &GetPrim() const { return _prim; }
+  const UsdPrim &GetPrim() const
+  {
+    return _prim;
+  }
 
   /// Returns the blend shape corresponding to \p blendShapeIndex.
   USDSKEL_API UsdSkelBlendShape GetBlendShape(size_t blendShapeIndex) const;
@@ -68,25 +76,29 @@ public:
   /// Returns the blend shape index corresponding to the \p i'th sub-shape.
   USDSKEL_API size_t GetBlendShapeIndex(size_t subShapeIndex) const;
 
-  size_t GetNumBlendShapes() const { return _blendShapes.size(); }
+  size_t GetNumBlendShapes() const
+  {
+    return _blendShapes.size();
+  }
 
-  size_t GetNumSubShapes() const { return _subShapes.size(); }
+  size_t GetNumSubShapes() const
+  {
+    return _subShapes.size();
+  }
 
   /// Compute an array holding the point indices of all shapes.
   /// This is indexed by the _blendShapeIndices_ returned by
   /// ComputeSubShapes().
   /// Since the _pointIndices_ property of blend shapes is optional,
   /// some of the arrays may be empty.
-  USDSKEL_API std::vector<VtIntArray>
-  ComputeBlendShapePointIndices() const;
+  USDSKEL_API std::vector<VtIntArray> ComputeBlendShapePointIndices() const;
 
   /// Compute an array holding the point offsets of all sub-shapes.
   /// This includes offsets of both primary shapes -- those stored directly
   /// on a BlendShape primitive -- as well as those of inbetween shapes.
   /// This is indexed by the _subShapeIndices_ returned by
   /// ComputeSubShapeWeights().
-  USDSKEL_API std::vector<VtVec3fArray>
-  ComputeSubShapePointOffsets() const;
+  USDSKEL_API std::vector<VtVec3fArray> ComputeSubShapePointOffsets() const;
 
   /// Compute an array holding the normal offsets of all sub-shapes.
   /// This includes offsets of both primary shapes -- those stored directly
@@ -95,8 +107,7 @@ public:
   /// ComputeSubShapeWeights().
   /// Normal offsets are optional. An empty array is stored for shapes that
   /// do not specify normal offsets.
-  USDSKEL_API std::vector<VtVec3fArray>
-  ComputeSubShapeNormalOffsets() const;
+  USDSKEL_API std::vector<VtVec3fArray> ComputeSubShapeNormalOffsets() const;
 
   /// Compute the resolved weights for all sub-shapes bound to this prim.
   /// The \p weights values are initial weight values, ordered according
@@ -107,16 +118,14 @@ public:
   /// All computed arrays shared the same size. Elements of the same index
   /// identify which sub-shape of which blend shape a given weight value
   /// is mapped to.
-  USDSKEL_API bool
-  ComputeSubShapeWeights(const TfSpan<const float> &weights,
-                         VtFloatArray *subShapeWeights,
-                         VtUIntArray *blendShapeIndices,
-                         VtUIntArray *subShapeIndices) const;
+  USDSKEL_API bool ComputeSubShapeWeights(const TfSpan<const float> &weights,
+                                          VtFloatArray *subShapeWeights,
+                                          VtUIntArray *blendShapeIndices,
+                                          VtUIntArray *subShapeIndices) const;
 
   /// Compute a flattened array of weights for all sub-shapes.
-  USDSKEL_API bool
-  ComputeFlattenedSubShapeWeights(const TfSpan<const float> &weights,
-                                  VtFloatArray *subShapeWeights) const;
+  USDSKEL_API bool ComputeFlattenedSubShapeWeights(const TfSpan<const float> &weights,
+                                                   VtFloatArray *subShapeWeights) const;
 
   /// Deform \p points using the resolved sub-shapes given by
   /// \p subShapeWeights, \p blendShapeIndices and \p subShapeIndices.
@@ -124,14 +133,12 @@ public:
   /// arrays both provide the pre-computed point offsets and indices
   /// of each sub-shape, as computed by ComputeBlendShapePointIndices()
   /// and ComputeSubShapePointOffsets().
-  USDSKEL_API bool
-  ComputeDeformedPoints(
-      const TfSpan<const float> subShapeWeights,
-      const TfSpan<const unsigned> blendShapeIndices,
-      const TfSpan<const unsigned> subShapeIndices,
-      const std::vector<VtIntArray> &blendShapePointIndices,
-      const std::vector<VtVec3fArray> &subShapePointOffsets,
-      TfSpan<GfVec3f> points) const;
+  USDSKEL_API bool ComputeDeformedPoints(const TfSpan<const float> subShapeWeights,
+                                         const TfSpan<const unsigned> blendShapeIndices,
+                                         const TfSpan<const unsigned> subShapeIndices,
+                                         const std::vector<VtIntArray> &blendShapePointIndices,
+                                         const std::vector<VtVec3fArray> &subShapePointOffsets,
+                                         TfSpan<GfVec3f> points) const;
 
   /// Deform \p normals using the resolved sub-shapes given by
   /// \p subShapeWeights, \p blendShapeIndices and \p subShapeIndices.
@@ -141,14 +148,12 @@ public:
   /// and ComputeSubShapeNormalOffsets().
   /// This is equivalent to ComputeDeformedPoints(), except that the
   /// resulting points are normalized after deformation.
-  USDSKEL_API bool
-  ComputeDeformedNormals(
-      const TfSpan<const float> subShapeWeights,
-      const TfSpan<const unsigned> blendShapeIndices,
-      const TfSpan<const unsigned> subShapeIndices,
-      const std::vector<VtIntArray> &blendShapePointIndices,
-      const std::vector<VtVec3fArray> &subShapeNormalOffsets,
-      TfSpan<GfVec3f> noramls) const;
+  USDSKEL_API bool ComputeDeformedNormals(const TfSpan<const float> subShapeWeights,
+                                          const TfSpan<const unsigned> blendShapeIndices,
+                                          const TfSpan<const unsigned> subShapeIndices,
+                                          const std::vector<VtIntArray> &blendShapePointIndices,
+                                          const std::vector<VtVec3fArray> &subShapeNormalOffsets,
+                                          TfSpan<GfVec3f> noramls) const;
 
   /// Compute a packed shape table combining all sub-shapes.
   /// This is intended to help encode blend shapes in a GPU-friendly form.
@@ -161,42 +166,56 @@ public:
   /// the sub-shape index, as a float. The sub-shape index can be used
   /// to lookup a corresponding weight value in the 'subShapeWeights'
   /// array returned by ComputeSubShapeWeights.
-  USDSKEL_API bool
-  ComputePackedShapeTable(VtVec4fArray *offsets,
-                          VtVec2iArray *ranges) const;
+  USDSKEL_API bool ComputePackedShapeTable(VtVec4fArray *offsets, VtVec2iArray *ranges) const;
 
   USDSKEL_API
   std::string GetDescription() const;
 
-private:
+ private:
   /// Object identifying a general subshape.
-  struct _SubShape
-  {
+  struct _SubShape {
     _SubShape() = default;
 
     _SubShape(unsigned blendShapeIndex, int inbetweenIndex, float weight)
-        : _blendShapeIndex(blendShapeIndex),
-          _inbetweenIndex(inbetweenIndex),
-          _weight(weight) {}
+        : _blendShapeIndex(blendShapeIndex), _inbetweenIndex(inbetweenIndex), _weight(weight)
+    {
+    }
 
-    unsigned GetBlendShapeIndex() const { return _blendShapeIndex; }
+    unsigned GetBlendShapeIndex() const
+    {
+      return _blendShapeIndex;
+    }
 
-    int GetInbetweenIndex() const { return _inbetweenIndex; }
+    int GetInbetweenIndex() const
+    {
+      return _inbetweenIndex;
+    }
 
-    bool IsInbetween() const { return _inbetweenIndex >= 0; }
-    bool IsNullShape() const { return _weight == 0.0f; }
-    bool IsPrimaryShape() const { return _weight == 1.0f; }
+    bool IsInbetween() const
+    {
+      return _inbetweenIndex >= 0;
+    }
+    bool IsNullShape() const
+    {
+      return _weight == 0.0f;
+    }
+    bool IsPrimaryShape() const
+    {
+      return _weight == 1.0f;
+    }
 
-    float GetWeight() const { return _weight; }
+    float GetWeight() const
+    {
+      return _weight;
+    }
 
-  private:
+   private:
     unsigned _blendShapeIndex = 0;
     int _inbetweenIndex = 0;
     float _weight = 0;
   };
 
-  struct _SubShapeCompareByWeight
-  {
+  struct _SubShapeCompareByWeight {
     bool operator()(const _SubShape &lhs, const _SubShape &rhs) const
     {
       return lhs.GetWeight() < rhs.GetWeight();
@@ -208,8 +227,7 @@ private:
     }
   };
 
-  struct _BlendShape
-  {
+  struct _BlendShape {
     UsdSkelBlendShape shape;
     size_t firstSubShape = 0;
     size_t numSubShapes = 0;
@@ -223,4 +241,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_BLEND_SHAPE_QUERY_H
+#endif  // PXR_USD_USD_SKEL_BLEND_SHAPE_QUERY_H

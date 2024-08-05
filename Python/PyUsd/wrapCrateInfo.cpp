@@ -34,21 +34,21 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdCrateInfo() {
-  scope thisClass =
-      class_<UsdCrateInfo>("CrateInfo")
-          .def("Open", &UsdCrateInfo::Open, arg("fileName"))
-          .staticmethod("Open")
-          .def("GetSummaryStats", &UsdCrateInfo::GetSummaryStats)
-          .def("GetSections", &UsdCrateInfo::GetSections,
-               return_value_policy<TfPySequenceToList>())
-          .def("GetFileVersion", &UsdCrateInfo::GetFileVersion)
-          .def("GetSoftwareVersion", &UsdCrateInfo::GetSoftwareVersion)
-          .def(!self);
+void wrapUsdCrateInfo()
+{
+  scope thisClass = class_<UsdCrateInfo>("CrateInfo")
+                        .def("Open", &UsdCrateInfo::Open, arg("fileName"))
+                        .staticmethod("Open")
+                        .def("GetSummaryStats", &UsdCrateInfo::GetSummaryStats)
+                        .def("GetSections",
+                             &UsdCrateInfo::GetSections,
+                             return_value_policy<TfPySequenceToList>())
+                        .def("GetFileVersion", &UsdCrateInfo::GetFileVersion)
+                        .def("GetSoftwareVersion", &UsdCrateInfo::GetSoftwareVersion)
+                        .def(!self);
 
   class_<UsdCrateInfo::Section>("Section")
-      .def(init<string, int64_t, int64_t>(
-          (arg("name"), arg("start"), arg("size"))))
+      .def(init<string, int64_t, int64_t>((arg("name"), arg("start"), arg("size"))))
       .def_readwrite("name", &UsdCrateInfo::Section::name)
       .def_readwrite("start", &UsdCrateInfo::Section::start)
       .def_readwrite("size", &UsdCrateInfo::Section::size);

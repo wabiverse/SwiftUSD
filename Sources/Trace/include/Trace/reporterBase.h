@@ -50,7 +50,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceReporterBase);
 ///
 ///
 class TraceReporterBase : public TfRefBase, public TfWeakBase {
-public:
+ public:
   using This = TraceReporterBase;
   using ThisPtr = TraceReporterBasePtr;
   using ThisRefPtr = TraceReporterBaseRefPtr;
@@ -66,7 +66,7 @@ public:
   /// Write all collections that were processed by this reporter to \p ostr.
   TRACE_API bool SerializeProcessedCollections(std::ostream &ostr) const;
 
-protected:
+ protected:
   /// Removes all references to TraceCollections.
   TRACE_API void _Clear();
 
@@ -77,11 +77,11 @@ protected:
   /// Called once per collection from _Update()
   virtual void _ProcessCollection(const CollectionPtr &) = 0;
 
-private:
+ private:
   DataSourcePtr _dataSource;
   tbb::concurrent_vector<CollectionPtr> _processedCollections;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_BASE_H
+#endif  // PXR_BASE_TRACE_REPORTER_BASE_H

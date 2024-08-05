@@ -49,4 +49,4 @@
 #include <Ar/timestamp.h>
 #include <Ar/writableAsset.h>
 
-#endif // __PXR_USD_AR_H__
+#endif  // __PXR_USD_AR_H__

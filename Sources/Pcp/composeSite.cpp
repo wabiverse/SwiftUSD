@@ -47,28 +47,37 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // SdfReference has custom data that is copied during composition, SdfPayload
 // does not.
-static void _CopyCustomData(SdfReference *lhs, const SdfReference &rhs) {
+static void _CopyCustomData(SdfReference *lhs, const SdfReference &rhs)
+{
   lhs->SetCustomData(rhs.GetCustomData());
 }
 
-static void _CopyCustomData(SdfPayload *, const SdfPayload &) {
+static void _CopyCustomData(SdfPayload *, const SdfPayload &)
+{
   // do nothing
 }
 
-static const char *_GetErrorContext(const SdfReference *) {
+static const char *_GetErrorContext(const SdfReference *)
+{
   return "reference";
 }
 
-static const char *_GetErrorContext(const SdfPayload *) { return "payload"; }
+static const char *_GetErrorContext(const SdfPayload *)
+{
+  return "payload";
+}
 
 // Payload and reference lists are composed in the same way.
-template <class RefOrPayloadType>
+template<class RefOrPayloadType>
 static void _PcpComposeSiteReferencesOrPayloads(
-    TfToken const &field, PcpLayerStackRefPtr const &layerStack,
-    SdfPath const &path, std::vector<RefOrPayloadType> *result,
+    TfToken const &field,
+    PcpLayerStackRefPtr const &layerStack,
+    SdfPath const &path,
+    std::vector<RefOrPayloadType> *result,
     PcpSourceArcInfoVector *info,
     std::unordered_set<std::string> *exprVarDependencies,
-    PcpErrorVector *errors) {
+    PcpErrorVector *errors)
+{
   // Sdf provides no convenient way to annotate each element of the result.
   // So we use a map from element value to its annotation, which in this
   // case is a PcpSourceArcInfo.
@@ -90,8 +99,8 @@ static void _PcpComposeSiteReferencesOrPayloads(
     // relative to the layer where they were expressed.
     curListOp.ApplyOperations(
         result,
-        [&](SdfListOpType opType, const RefOrPayloadType &refOrPayload)
-            -> boost::optional<RefOrPayloadType> {
+        [&](SdfListOpType opType,
+            const RefOrPayloadType &refOrPayload) -> boost::optional<RefOrPayloadType> {
           // Fill in the result reference or payload with the anchored
           // asset path instead of the authored asset path. This
           // ensures that references or payloads with the same
@@ -102,9 +111,13 @@ static void _PcpComposeSiteReferencesOrPayloads(
           std::string assetPath;
           if (Pcp_IsVariableExpression(authoredAssetPath)) {
             authoredAssetPath = Pcp_EvaluateVariableExpression(
-                authoredAssetPath, layerStack->GetExpressionVariables(),
-                _GetErrorContext((const RefOrPayloadType *)(nullptr)), layer,
-                path, exprVarDependencies, errors);
+                authoredAssetPath,
+                layerStack->GetExpressionVariables(),
+                _GetErrorContext((const RefOrPayloadType *)(nullptr)),
+                layer,
+                path,
+                exprVarDependencies,
+                errors);
 
             // Expressions that evaluate to an empty path are silently
             // ignored to allow users to conditionally reference a
@@ -114,20 +127,18 @@ static void _PcpComposeSiteReferencesOrPayloads(
               return boost::none;
             }
 
-            assetPath =
-                SdfComputeAssetPathRelativeToLayer(layer, authoredAssetPath);
-          } else if (!authoredAssetPath.empty()) {
-            assetPath =
-                SdfComputeAssetPathRelativeToLayer(layer, authoredAssetPath);
+            assetPath = SdfComputeAssetPathRelativeToLayer(layer, authoredAssetPath);
+          }
+          else if (!authoredAssetPath.empty()) {
+            assetPath = SdfComputeAssetPathRelativeToLayer(layer, authoredAssetPath);
           }
 
-          RefOrPayloadType result(assetPath, refOrPayload.GetPrimPath(),
-                                  refOrPayload.GetLayerOffset());
+          RefOrPayloadType result(
+              assetPath, refOrPayload.GetPrimPath(), refOrPayload.GetLayerOffset());
 
           _CopyCustomData(&result, refOrPayload);
-          infoMap[result] = {layer,
-                             layerOffset ? *layerOffset : SdfLayerOffset(),
-                             std::move(authoredAssetPath)};
+          infoMap[result] = {
+              layer, layerOffset ? *layerOffset : SdfLayerOffset(), std::move(authoredAssetPath)};
           return result;
         });
   }
@@ -140,28 +151,30 @@ static void _PcpComposeSiteReferencesOrPayloads(
   }
 }
 
-void PcpComposeSiteReferences(
-    PcpLayerStackRefPtr const &layerStack, SdfPath const &path,
-    SdfReferenceVector *result, PcpSourceArcInfoVector *info,
-    std::unordered_set<std::string> *stageVarDependencies,
-    PcpErrorVector *errors) {
-  _PcpComposeSiteReferencesOrPayloads(SdfFieldKeys->References, layerStack,
-                                      path, result, info, stageVarDependencies,
-                                      errors);
+void PcpComposeSiteReferences(PcpLayerStackRefPtr const &layerStack,
+                              SdfPath const &path,
+                              SdfReferenceVector *result,
+                              PcpSourceArcInfoVector *info,
+                              std::unordered_set<std::string> *stageVarDependencies,
+                              PcpErrorVector *errors)
+{
+  _PcpComposeSiteReferencesOrPayloads(
+      SdfFieldKeys->References, layerStack, path, result, info, stageVarDependencies, errors);
 }
 
-void PcpComposeSitePayloads(
-    PcpLayerStackRefPtr const &layerStack, SdfPath const &path,
-    SdfPayloadVector *result, PcpSourceArcInfoVector *info,
-    std::unordered_set<std::string> *stageVarDependencies,
-    PcpErrorVector *errors) {
-  _PcpComposeSiteReferencesOrPayloads(SdfFieldKeys->Payload, layerStack, path,
-                                      result, info, stageVarDependencies,
-                                      errors);
+void PcpComposeSitePayloads(PcpLayerStackRefPtr const &layerStack,
+                            SdfPath const &path,
+                            SdfPayloadVector *result,
+                            PcpSourceArcInfoVector *info,
+                            std::unordered_set<std::string> *stageVarDependencies,
+                            PcpErrorVector *errors)
+{
+  _PcpComposeSiteReferencesOrPayloads(
+      SdfFieldKeys->Payload, layerStack, path, result, info, stageVarDependencies, errors);
 }
 
-SdfPermission PcpComposeSitePermission(PcpLayerStackRefPtr const &layerStack,
-                                       SdfPath const &path) {
+SdfPermission PcpComposeSitePermission(PcpLayerStackRefPtr const &layerStack, SdfPath const &path)
+{
   SdfPermission perm = SdfPermissionPublic;
   for (auto const &layer : layerStack->GetLayers()) {
     if (layer->HasField(path, SdfFieldKeys->Permission, &perm))
@@ -170,8 +183,8 @@ SdfPermission PcpComposeSitePermission(PcpLayerStackRefPtr const &layerStack,
   return perm;
 }
 
-bool PcpComposeSiteHasPrimSpecs(PcpLayerStackRefPtr const &layerStack,
-                                SdfPath const &path) {
+bool PcpComposeSiteHasPrimSpecs(PcpLayerStackRefPtr const &layerStack, SdfPath const &path)
+{
   for (auto const &layer : layerStack->GetLayers()) {
     if (layer->HasSpec(path)) {
       return true;
@@ -180,11 +193,12 @@ bool PcpComposeSiteHasPrimSpecs(PcpLayerStackRefPtr const &layerStack,
   return false;
 }
 
-bool PcpComposeSiteHasSymmetry(PcpLayerStackRefPtr const &layerStack,
-                               SdfPath const &path) {
+bool PcpComposeSiteHasSymmetry(PcpLayerStackRefPtr const &layerStack, SdfPath const &path)
+{
   for (auto const &layer : layerStack->GetLayers()) {
     if (layer->HasField(path, SdfFieldKeys->SymmetryFunction) ||
-        layer->HasField(path, SdfFieldKeys->SymmetryArguments)) {
+        layer->HasField(path, SdfFieldKeys->SymmetryArguments))
+    {
       return true;
     }
   }
@@ -192,7 +206,9 @@ bool PcpComposeSiteHasSymmetry(PcpLayerStackRefPtr const &layerStack,
 }
 
 void PcpComposeSitePrimSites(PcpLayerStackRefPtr const &layerStack,
-                             SdfPath const &path, SdfSiteVector *result) {
+                             SdfPath const &path,
+                             SdfSiteVector *result)
+{
   for (auto const &layer : layerStack->GetLayers()) {
     if (layer->HasSpec(path))
       result->push_back(SdfSite(layer, path));
@@ -200,13 +216,17 @@ void PcpComposeSitePrimSites(PcpLayerStackRefPtr const &layerStack,
 }
 
 void PcpComposeSiteRelocates(PcpLayerStackRefPtr const &layerStack,
-                             SdfPath const &path, SdfRelocatesMap *result) {
+                             SdfPath const &path,
+                             SdfRelocatesMap *result)
+{
   static const TfToken field = SdfFieldKeys->Relocates;
 
   SdfRelocatesMap relocMap;
-  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers()) {
+  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
+  {
     if ((*layer)->HasField(path, field, &relocMap)) {
-      TF_FOR_ALL(reloc, relocMap) {
+      TF_FOR_ALL(reloc, relocMap)
+      {
         SdfPath source = reloc->first.MakeAbsolutePath(path);
         SdfPath target = reloc->second.MakeAbsolutePath(path);
         (*result)[source] = target;
@@ -217,28 +237,29 @@ void PcpComposeSiteRelocates(PcpLayerStackRefPtr const &layerStack,
 
 // Helper for PcpComposeSiteInherits/Specializes/ overloads
 // that want to provide source arc info with the layer that adds each result.
-template <typename ResultType>
-static void
-_ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerStack,
-                                 const SdfPath &path, const TfToken &field,
-                                 std::vector<ResultType> *result,
-                                 PcpSourceArcInfoVector *info) {
+template<typename ResultType>
+static void _ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerStack,
+                                             const SdfPath &path,
+                                             const TfToken &field,
+                                             std::vector<ResultType> *result,
+                                             PcpSourceArcInfoVector *info)
+{
   // Map of result value to source arc info. The same value may appear in
   // multiple layers' list ops. This lets us make sure we find the strongest
   // layer that added the value.
   std::map<ResultType, PcpSourceArcInfo> infoMap;
 
   SdfListOp<ResultType> listOp;
-  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers()) {
+  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
+  {
     if ((*layer)->HasField(path, field, &listOp)) {
-      listOp.ApplyOperations(
-          result,
-          [&layer, &infoMap](SdfListOpType opType, const ResultType &path) {
-            // Just store the layer in the source arc info for the
-            // result. We don't need the other data.
-            infoMap[path].layer = *layer;
-            return path;
-          });
+      listOp.ApplyOperations(result,
+                             [&layer, &infoMap](SdfListOpType opType, const ResultType &path) {
+                               // Just store the layer in the source arc info for the
+                               // result. We don't need the other data.
+                               infoMap[path].layer = *layer;
+                               return path;
+                             });
     }
   }
 
@@ -250,18 +271,23 @@ _ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerStack,
 }
 
 void PcpComposeSiteInherits(const PcpLayerStackRefPtr &layerStack,
-                            const SdfPath &path, SdfPathVector *result,
-                            PcpSourceArcInfoVector *info) {
+                            const SdfPath &path,
+                            SdfPathVector *result,
+                            PcpSourceArcInfoVector *info)
+{
   static const TfToken field = SdfFieldKeys->InheritPaths;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
 }
 
 void PcpComposeSiteInherits(const PcpLayerStackRefPtr &layerStack,
-                            const SdfPath &path, SdfPathVector *result) {
+                            const SdfPath &path,
+                            SdfPathVector *result)
+{
   static const TfToken field = SdfFieldKeys->InheritPaths;
 
   SdfPathListOp inheritListOp;
-  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers()) {
+  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
+  {
     if ((*layer)->HasField(path, field, &inheritListOp)) {
       inheritListOp.ApplyOperations(result);
     }
@@ -269,18 +295,23 @@ void PcpComposeSiteInherits(const PcpLayerStackRefPtr &layerStack,
 }
 
 void PcpComposeSiteSpecializes(const PcpLayerStackRefPtr &layerStack,
-                               const SdfPath &path, SdfPathVector *result,
-                               PcpSourceArcInfoVector *info) {
+                               const SdfPath &path,
+                               SdfPathVector *result,
+                               PcpSourceArcInfoVector *info)
+{
   static const TfToken field = SdfFieldKeys->Specializes;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
 }
 
 void PcpComposeSiteSpecializes(PcpLayerStackRefPtr const &layerStack,
-                               SdfPath const &path, SdfPathVector *result) {
+                               SdfPath const &path,
+                               SdfPathVector *result)
+{
   static const TfToken field = SdfFieldKeys->Specializes;
 
   SdfPathListOp specializesListOp;
-  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers()) {
+  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
+  {
     if ((*layer)->HasField(path, field, &specializesListOp)) {
       specializesListOp.ApplyOperations(result);
     }
@@ -291,18 +322,21 @@ PCP_API
 void PcpComposeSiteVariantSets(PcpLayerStackRefPtr const &layerStack,
                                SdfPath const &path,
                                std::vector<std::string> *result,
-                               PcpSourceArcInfoVector *info) {
+                               PcpSourceArcInfoVector *info)
+{
   static const TfToken field = SdfFieldKeys->VariantSetNames;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
 }
 
 void PcpComposeSiteVariantSets(PcpLayerStackRefPtr const &layerStack,
                                SdfPath const &path,
-                               std::vector<std::string> *result) {
+                               std::vector<std::string> *result)
+{
   static const TfToken field = SdfFieldKeys->VariantSetNames;
 
   SdfStringListOp vsetListOp;
-  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers()) {
+  TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
+  {
     if ((*layer)->HasField(path, field, &vsetListOp)) {
       vsetListOp.ApplyOperations(result);
     }
@@ -312,23 +346,29 @@ void PcpComposeSiteVariantSets(PcpLayerStackRefPtr const &layerStack,
 void PcpComposeSiteVariantSetOptions(PcpLayerStackRefPtr const &layerStack,
                                      SdfPath const &path,
                                      std::string const &vsetName,
-                                     std::set<std::string> *result) {
+                                     std::set<std::string> *result)
+{
   static const TfToken field = SdfChildrenKeys->VariantChildren;
 
   const SdfPath vsetPath = path.AppendVariantSelection(vsetName, "");
   TfTokenVector vsetNames;
   for (auto const &layer : layerStack->GetLayers()) {
     if (layer->HasField(vsetPath, field, &vsetNames)) {
-      TF_FOR_ALL(name, vsetNames) { result->insert(name->GetString()); }
+      TF_FOR_ALL(name, vsetNames)
+      {
+        result->insert(name->GetString());
+      }
     }
   }
 }
 
-bool PcpComposeSiteVariantSelection(
-    PcpLayerStackRefPtr const &layerStack, SdfPath const &path,
-    std::string const &vsetName, std::string *result,
-    std::unordered_set<std::string> *exprVarDependencies,
-    PcpErrorVector *errors) {
+bool PcpComposeSiteVariantSelection(PcpLayerStackRefPtr const &layerStack,
+                                    SdfPath const &path,
+                                    std::string const &vsetName,
+                                    std::string *result,
+                                    std::unordered_set<std::string> *exprVarDependencies,
+                                    PcpErrorVector *errors)
+{
   static const TfToken field = SdfFieldKeys->VariantSelection;
 
   SdfVariantSelectionMap vselMap;
@@ -345,9 +385,13 @@ bool PcpComposeSiteVariantSelection(
 
     if (Pcp_IsVariableExpression(*vsel)) {
       PcpErrorVector exprErrors;
-      *vsel = Pcp_EvaluateVariableExpression(
-          *vsel, layerStack->GetExpressionVariables(), "variant", layer, path,
-          exprVarDependencies, &exprErrors);
+      *vsel = Pcp_EvaluateVariableExpression(*vsel,
+                                             layerStack->GetExpressionVariables(),
+                                             "variant",
+                                             layer,
+                                             path,
+                                             exprVarDependencies,
+                                             &exprErrors);
 
       // If an error occurred evaluating this expression, we ignore
       // this variant selection and look for the next weakest opinion.
@@ -367,11 +411,12 @@ bool PcpComposeSiteVariantSelection(
   return false;
 }
 
-void PcpComposeSiteVariantSelections(
-    PcpLayerStackRefPtr const &layerStack, SdfPath const &path,
-    SdfVariantSelectionMap *result,
-    std::unordered_set<std::string> *exprVarDependencies,
-    PcpErrorVector *errors) {
+void PcpComposeSiteVariantSelections(PcpLayerStackRefPtr const &layerStack,
+                                     SdfPath const &path,
+                                     SdfVariantSelectionMap *result,
+                                     std::unordered_set<std::string> *exprVarDependencies,
+                                     PcpErrorVector *errors)
+{
   static const TfToken field = SdfFieldKeys->VariantSelection;
 
   SdfVariantSelectionMap vselMap;
@@ -386,9 +431,13 @@ void PcpComposeSiteVariantSelections(
 
       if (Pcp_IsVariableExpression(vsel)) {
         PcpErrorVector exprErrors;
-        vsel = Pcp_EvaluateVariableExpression(
-            vsel, layerStack->GetExpressionVariables(), "variant", layer, path,
-            exprVarDependencies, &exprErrors);
+        vsel = Pcp_EvaluateVariableExpression(vsel,
+                                              layerStack->GetExpressionVariables(),
+                                              "variant",
+                                              layer,
+                                              path,
+                                              exprVarDependencies,
+                                              &exprErrors);
 
         // If an error occurred evaluating this expression, we ignore
         // this variant selection and look for the next weakest opinion.
@@ -411,10 +460,14 @@ void PcpComposeSiteVariantSelections(
 }
 
 void PcpComposeSiteChildNames(SdfLayerRefPtrVector const &layers,
-                              SdfPath const &path, const TfToken &namesField,
-                              TfTokenVector *nameOrder, PcpTokenSet *nameSet,
-                              const TfToken *orderField) {
-  TF_REVERSE_FOR_ALL(layer, layers) {
+                              SdfPath const &path,
+                              const TfToken &namesField,
+                              TfTokenVector *nameOrder,
+                              PcpTokenSet *nameSet,
+                              const TfToken *orderField)
+{
+  TF_REVERSE_FOR_ALL(layer, layers)
+  {
     VtValue namesVal = (*layer)->GetField(path, namesField);
     if (namesVal.IsHolding<TfTokenVector>()) {
       TfTokenVector names = namesVal.UncheckedRemove<TfTokenVector>();
@@ -437,7 +490,8 @@ void PcpComposeSiteChildNames(SdfLayerRefPtrVector const &layers,
         nameSet->insert(names.begin(), names.end());
         if (nameSet->size() == names.size()) {
           *nameOrder = std::move(names);
-        } else {
+        }
+        else {
           // This case is really, really unlikely -- sdfdata semantics
           // should disallow duplicates within a single names field.
           // In this case we just pay the price and do them
@@ -445,7 +499,8 @@ void PcpComposeSiteChildNames(SdfLayerRefPtrVector const &layers,
           nameSet->clear();
           doOneByOne();
         }
-      } else {
+      }
+      else {
         doOneByOne();
       }
     }

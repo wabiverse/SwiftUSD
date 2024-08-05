@@ -35,9 +35,9 @@
 /// dependencies into a specified directory.
 ///
 
-#include <pxr/pxrns.h>
 #include "Sdf/layer.h"
 #include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -59,11 +59,10 @@ class SdfAssetPath;
 /// layer. For example, templated clip asset paths are resolved and expanded
 /// to include all available clip files that match the specified pattern.
 USDUTILS_API
-void UsdUtilsExtractExternalReferences(
-    const std::string &filePath,
-    std::vector<std::string> *subLayers,
-    std::vector<std::string> *references,
-    std::vector<std::string> *payloads);
+void UsdUtilsExtractExternalReferences(const std::string &filePath,
+                                       std::vector<std::string> *subLayers,
+                                       std::vector<std::string> *references,
+                                       std::vector<std::string> *payloads);
 
 /// Creates a USDZ package containing the specified asset, identified by its
 /// \p assetPath. The created package will include a localized version of the
@@ -99,10 +98,9 @@ void UsdUtilsExtractExternalReferences(
 ///
 /// \sa UsdUtilsCreateNewARKitUsdzPackage()
 USDUTILS_API
-bool UsdUtilsCreateNewUsdzPackage(
-    const SdfAssetPath &assetPath,
-    const std::string &usdzFilePath,
-    const std::string &firstLayerName = std::string());
+bool UsdUtilsCreateNewUsdzPackage(const SdfAssetPath &assetPath,
+                                  const std::string &usdzFilePath,
+                                  const std::string &firstLayerName = std::string());
 
 /// Similar to UsdUtilsCreateNewUsdzPackage, this function packages all of the
 /// dependencies of the given asset. Assets targeted at the initial usdz
@@ -139,10 +137,9 @@ bool UsdUtilsCreateNewUsdzPackage(
 ///
 /// \sa UsdUtilsCreateNewUsdzPackage()
 USDUTILS_API
-bool UsdUtilsCreateNewARKitUsdzPackage(
-    const SdfAssetPath &assetPath,
-    const std::string &usdzFilePath,
-    const std::string &firstLayerName = std::string());
+bool UsdUtilsCreateNewARKitUsdzPackage(const SdfAssetPath &assetPath,
+                                       const std::string &usdzFilePath,
+                                       const std::string &firstLayerName = std::string());
 
 /// Recursively computes all the dependencies of the given asset and populates
 /// \p layers with all the dependencies that can be opened as an SdfLayer.
@@ -164,8 +161,7 @@ bool UsdUtilsComputeAllDependencies(const SdfAssetPath &assetPath,
 /// will contain the string value that's authored.  The returned value is the
 /// new value that should be authored in the layer.  If the function returns
 /// an empty string, that value will be removed from the layer.
-using UsdUtilsModifyAssetPathFn = std::function<std::string(
-    const std::string &assetPath)>;
+using UsdUtilsModifyAssetPathFn = std::function<std::string(const std::string &assetPath)>;
 
 /// Helper function that visits every asset path in \c layer, calls \c modifyFn
 /// and replaces the value with the return value of \c modifyFn.  This modifies
@@ -176,10 +172,9 @@ using UsdUtilsModifyAssetPathFn = std::function<std::string(
 /// authored: we can replace all paths with their fully resolved equivalents,
 /// for example.
 USDUTILS_API
-void UsdUtilsModifyAssetPaths(
-    const SdfLayerHandle &layer,
-    const UsdUtilsModifyAssetPathFn &modifyFn);
+void UsdUtilsModifyAssetPaths(const SdfLayerHandle &layer,
+                              const UsdUtilsModifyAssetPathFn &modifyFn);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_UTILS_DEPENDENCIES_H
+#endif  // PXR_USD_USD_UTILS_DEPENDENCIES_H

@@ -25,44 +25,36 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdLazyContainerDataSource::HdLazyContainerDataSource(const Thunk &thunk)
- : _thunk(thunk)
-{
-}
+HdLazyContainerDataSource::HdLazyContainerDataSource(const Thunk &thunk) : _thunk(thunk) {}
 
 HdLazyContainerDataSource::~HdLazyContainerDataSource() = default;
 
-TfTokenVector
-HdLazyContainerDataSource::GetNames()
+TfTokenVector HdLazyContainerDataSource::GetNames()
 {
-    if (HdContainerDataSourceHandle src = _GetSrc()) {
-        return src->GetNames();
-    }
-    return {};
-}
-        
-HdDataSourceBaseHandle
-HdLazyContainerDataSource::Get(const TfToken &name)
-{
-    if (HdContainerDataSourceHandle src = _GetSrc()) {
-        return src->Get(name);
-    }
-    return nullptr;
+  if (HdContainerDataSourceHandle src = _GetSrc()) {
+    return src->GetNames();
+  }
+  return {};
 }
 
-HdContainerDataSourceHandle
-HdLazyContainerDataSource::_GetSrc()
+HdDataSourceBaseHandle HdLazyContainerDataSource::Get(const TfToken &name)
 {
-    if (HdContainerDataSourceHandle storedSrc =
-            HdContainerDataSource::AtomicLoad(_src)) {
-        return storedSrc;
-    }
+  if (HdContainerDataSourceHandle src = _GetSrc()) {
+    return src->Get(name);
+  }
+  return nullptr;
+}
 
-    HdContainerDataSourceHandle src = _thunk();
-    HdContainerDataSource::AtomicStore(_src, src);
+HdContainerDataSourceHandle HdLazyContainerDataSource::_GetSrc()
+{
+  if (HdContainerDataSourceHandle storedSrc = HdContainerDataSource::AtomicLoad(_src)) {
+    return storedSrc;
+  }
 
-    return src;
+  HdContainerDataSourceHandle src = _thunk();
+  HdContainerDataSource::AtomicStore(_src, src);
+
+  return src;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

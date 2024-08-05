@@ -44,4 +44,4 @@
 #include <Ndr/property.h>
 #include <Ndr/registry.h>
 
-#endif // __PXR_USD_NDR_H__
+#endif  // __PXR_USD_NDR_H__

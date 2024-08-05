@@ -30,12 +30,13 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static size_t __hash__(Tf_PyEnumWrapper const &self) {
+static size_t __hash__(Tf_PyEnumWrapper const &self)
+{
   return TfHash()(self.value);
 }
 
-static boost::python::object
-_GetValueFromFullName(const std::string &fullName) {
+static boost::python::object _GetValueFromFullName(const std::string &fullName)
+{
   bool found = false;
   const TfEnum value = TfEnum::GetValueFromFullName(fullName, &found);
   if (found) {
@@ -44,9 +45,10 @@ _GetValueFromFullName(const std::string &fullName) {
   return boost::python::object();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapEnum() {
+void wrapEnum()
+{
   class_<Tf_PyEnum>("Enum", no_init)
       .def("GetValueFromFullName", _GetValueFromFullName)
       .staticmethod("GetValueFromFullName");

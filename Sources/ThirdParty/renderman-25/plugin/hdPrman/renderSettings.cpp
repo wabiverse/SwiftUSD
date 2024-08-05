@@ -34,84 +34,72 @@
 #include "Hd/sceneIndex.h"
 #include "Hd/utils.h"
 
+#include <iostream>  // XXX
 #include <string>
-#include <iostream> // XXX
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _renderTerminalTokens, // properties in PxrRenderTerminalsAPI
-    ((outputsRiIntegrator, "outputs:ri:integrator"))((outputsRiSampleFilters, "outputs:ri:sampleFilters"))((outputsRiDisplayFilters, "outputs:ri:displayFilters")));
+TF_DEFINE_PRIVATE_TOKENS(_renderTerminalTokens,  // properties in PxrRenderTerminalsAPI
+                         ((outputsRiIntegrator, "outputs:ri:integrator"))(
+                             (outputsRiSampleFilters, "outputs:ri:sampleFilters"))(
+                             (outputsRiDisplayFilters, "outputs:ri:displayFilters")));
 
-namespace
+namespace {
+
+// Translate properties in PxrOptionsAPI to the Riley name.
+RtUString _GetRiName(std::string const &propertyName)
 {
-
-  // Translate properties in PxrOptionsAPI to the Riley name.
-  RtUString
-  _GetRiName(std::string const &propertyName)
-  {
-    // strip the "ri:" prefix if present, but don't strip the "Ri:" namespace.
-    // e.g. schema attribute "ri:hider:maxsamples" maps to "hider:maxsamples"
-    //      (or the pre-defined UString Rix::k_hider_maxsamples)
-    //      while "ri:Ri:CropWindow" maps to "Ri:CropWindow" (or
-    //      the UString k_riCropWindow)
-    //
-    if (TfStringStartsWith(propertyName, "ri:"))
-    {
-      return RtUString(propertyName.c_str() + 3);
-    }
-
-    // Unhandled property. This likely indicates an issue with namespace
-    // filtering upstream.
-    TF_WARN("Could not translate settings property %s to RtUString.",
-            propertyName.c_str());
-    return RtUString(propertyName.c_str());
+  // strip the "ri:" prefix if present, but don't strip the "Ri:" namespace.
+  // e.g. schema attribute "ri:hider:maxsamples" maps to "hider:maxsamples"
+  //      (or the pre-defined UString Rix::k_hider_maxsamples)
+  //      while "ri:Ri:CropWindow" maps to "Ri:CropWindow" (or
+  //      the UString k_riCropWindow)
+  //
+  if (TfStringStartsWith(propertyName, "ri:")) {
+    return RtUString(propertyName.c_str() + 3);
   }
 
-  RtParamList
-  _GenerateParamList(VtDictionary const &settings)
-  {
-    RtParamList options;
+  // Unhandled property. This likely indicates an issue with namespace
+  // filtering upstream.
+  TF_WARN("Could not translate settings property %s to RtUString.", propertyName.c_str());
+  return RtUString(propertyName.c_str());
+}
 
-    for (auto const &pair : settings)
+RtParamList _GenerateParamList(VtDictionary const &settings)
+{
+  RtParamList options;
+
+  for (auto const &pair : settings) {
+    // Skip render terminal connections.
+    const std::string &name = pair.first;
+    const TfToken tokenName(name);
+    if (tokenName == _renderTerminalTokens->outputsRiIntegrator ||
+        tokenName == _renderTerminalTokens->outputsRiSampleFilters ||
+        tokenName == _renderTerminalTokens->outputsRiDisplayFilters)
     {
-      // Skip render terminal connections.
-      const std::string &name = pair.first;
-      const TfToken tokenName(name);
-      if (tokenName == _renderTerminalTokens->outputsRiIntegrator ||
-          tokenName == _renderTerminalTokens->outputsRiSampleFilters ||
-          tokenName == _renderTerminalTokens->outputsRiDisplayFilters)
-      {
 
-        continue;
-      }
-
-      RtUString const riName = _GetRiName(name);
-      VtValue const &val = pair.second;
-      HdPrman_Utils::SetParamFromVtValue(
-          riName, val, /* role */ TfToken(), &options);
+      continue;
     }
 
-    return options;
+    RtUString const riName = _GetRiName(name);
+    VtValue const &val = pair.second;
+    HdPrman_Utils::SetParamFromVtValue(riName, val, /* role */ TfToken(), &options);
   }
 
+  return options;
 }
 
-HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const &id)
-    : HdRenderSettings(id)
-{
-}
+}  // namespace
+
+HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const &id) : HdRenderSettings(id) {}
 
 HdPrman_RenderSettings::~HdPrman_RenderSettings() = default;
 
-void HdPrman_RenderSettings::Finalize(HdRenderParam *renderParam)
-{
-}
+void HdPrman_RenderSettings::Finalize(HdRenderParam *renderParam) {}
 
-void HdPrman_RenderSettings::_Sync(
-    HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    const HdDirtyBits *dirtyBits)
+void HdPrman_RenderSettings::_Sync(HdSceneDelegate *sceneDelegate,
+                                   HdRenderParam *renderParam,
+                                   const HdDirtyBits *dirtyBits)
 {
   HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
@@ -128,10 +116,8 @@ void HdPrman_RenderSettings::_Sync(
   const bool hasActiveRsp = HdUtils::HasActiveRenderSettingsPrim(
       sceneDelegate->GetRenderIndex().GetTerminalSceneIndex());
 
-  if (IsActive() || !hasActiveRsp)
-  {
-    if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings)
-    {
+  if (IsActive() || !hasActiveRsp) {
+    if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings) {
       // NamespacedSettings contains all the Prman-specific render
       // settings opinions.
       const VtDictionary &namespacedSettings = GetNamespacedSettings();
@@ -141,9 +127,12 @@ void HdPrman_RenderSettings::_Sync(
       //       recompute all settings.
       _settingsOptions = _GenerateParamList(namespacedSettings);
 
-      TF_DEBUG(HDPRMAN_RENDER_SETTINGS).Msg("Processed dirty namespaced settings for %s and generated the "
-                                            "param list %s",
-                                            GetId().GetText(), HdPrmanDebugUtil::RtParamListToString(_settingsOptions).c_str());
+      TF_DEBUG(HDPRMAN_RENDER_SETTINGS)
+          .Msg(
+              "Processed dirty namespaced settings for %s and generated the "
+              "param list %s",
+              GetId().GetText(),
+              HdPrmanDebugUtil::RtParamListToString(_settingsOptions).c_str());
 
       // ... and connections.
       // Set the integrator connected to this Render Settings prim
@@ -154,8 +143,8 @@ void HdPrman_RenderSettings::_Sync(
             _renderTerminalTokens->outputsRiIntegrator.GetString(),
             VtDefault = SdfPathVector());
 
-        param->SetRenderSettingsIntegratorPath(sceneDelegate,
-                                               paths.empty() ? SdfPath::EmptyPath() : paths.front());
+        param->SetRenderSettingsIntegratorPath(
+            sceneDelegate, paths.empty() ? SdfPath::EmptyPath() : paths.front());
       }
 
       // Set the SampleFilters connected to this Render Settings prim

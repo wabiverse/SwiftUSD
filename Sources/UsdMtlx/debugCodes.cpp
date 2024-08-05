@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdMtlx/debugCodes.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/debug.h"
 #include "Tf/registryManager.h"
@@ -31,8 +31,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfDebug)
 {
-  TF_DEBUG_ENVIRONMENT_SYMBOL(USDMTLX_READER,
-                              "UsdMtlx reader details");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(USDMTLX_READER, "UsdMtlx reader details");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

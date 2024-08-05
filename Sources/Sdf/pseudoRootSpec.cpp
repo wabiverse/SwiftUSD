@@ -29,7 +29,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypePseudoRoot, SdfPseudoRootSpec,
-                SdfPrimSpec);
+SDF_DEFINE_SPEC(SdfSchema, SdfSpecTypePseudoRoot, SdfPseudoRootSpec, SdfPrimSpec);
 
 PXR_NAMESPACE_CLOSE_SCOPE

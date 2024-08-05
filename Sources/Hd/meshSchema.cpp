@@ -33,225 +33,175 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMeshSchemaTokens,
-    HDMESH_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMeshSchemaTokens, HDMESH_SCHEMA_TOKENS);
 
-
-
-HdMeshTopologySchema
-HdMeshSchema::GetTopology()
+HdMeshTopologySchema HdMeshSchema::GetTopology()
 {
-    return HdMeshTopologySchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdMeshSchemaTokens->topology));
+  return HdMeshTopologySchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdMeshSchemaTokens->topology));
 }
 
-HdTokenDataSourceHandle
-HdMeshSchema::GetSubdivisionScheme()
+HdTokenDataSourceHandle HdMeshSchema::GetSubdivisionScheme()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdMeshSchemaTokens->subdivisionScheme);
+  return _GetTypedDataSource<HdTokenDataSource>(HdMeshSchemaTokens->subdivisionScheme);
 }
 
-HdSubdivisionTagsSchema
-HdMeshSchema::GetSubdivisionTags()
+HdSubdivisionTagsSchema HdMeshSchema::GetSubdivisionTags()
 {
-    return HdSubdivisionTagsSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdMeshSchemaTokens->subdivisionTags));
+  return HdSubdivisionTagsSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdMeshSchemaTokens->subdivisionTags));
 }
 
-HdGeomSubsetsSchema
-HdMeshSchema::GetGeomSubsets()
+HdGeomSubsetsSchema HdMeshSchema::GetGeomSubsets()
 {
-    return HdGeomSubsetsSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdMeshSchemaTokens->geomSubsets));
+  return HdGeomSubsetsSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdMeshSchemaTokens->geomSubsets));
 }
 
-HdBoolDataSourceHandle
-HdMeshSchema::GetDoubleSided()
+HdBoolDataSourceHandle HdMeshSchema::GetDoubleSided()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdMeshSchemaTokens->doubleSided);
+  return _GetTypedDataSource<HdBoolDataSource>(HdMeshSchemaTokens->doubleSided);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdMeshSchema::BuildRetained(
-        const HdContainerDataSourceHandle &topology,
-        const HdTokenDataSourceHandle &subdivisionScheme,
-        const HdContainerDataSourceHandle &subdivisionTags,
-        const HdContainerDataSourceHandle &geomSubsets,
-        const HdBoolDataSourceHandle &doubleSided
-)
-{
-    TfToken names[5];
-    HdDataSourceBaseHandle values[5];
-
-    size_t count = 0;
-    if (topology) {
-        names[count] = HdMeshSchemaTokens->topology;
-        values[count++] = topology;
-    }
-
-    if (subdivisionScheme) {
-        names[count] = HdMeshSchemaTokens->subdivisionScheme;
-        values[count++] = subdivisionScheme;
-    }
-
-    if (subdivisionTags) {
-        names[count] = HdMeshSchemaTokens->subdivisionTags;
-        values[count++] = subdivisionTags;
-    }
-
-    if (geomSubsets) {
-        names[count] = HdMeshSchemaTokens->geomSubsets;
-        values[count++] = geomSubsets;
-    }
-
-    if (doubleSided) {
-        names[count] = HdMeshSchemaTokens->doubleSided;
-        values[count++] = doubleSided;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdMeshSchema
-HdMeshSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdMeshSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdMeshSchemaTokens->mesh))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdMeshSchema::GetSchemaToken()
-{
-    return HdMeshSchemaTokens->mesh;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetTopologyLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshSchemaTokens->topology
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetGeomSubsetsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshSchemaTokens->geomSubsets
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetDoubleSidedLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshSchemaTokens->doubleSided
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetSubdivisionTagsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshSchemaTokens->subdivisionTags
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdMeshSchema::GetSubdivisionSchemeLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshSchemaTokens->subdivisionScheme
-    );
-    return locator;
-}
-
-
-HdMeshSchema::Builder &
-HdMeshSchema::Builder::SetTopology(
-    const HdContainerDataSourceHandle &topology)
-{
-    _topology = topology;
-    return *this;
-}
-
-HdMeshSchema::Builder &
-HdMeshSchema::Builder::SetSubdivisionScheme(
-    const HdTokenDataSourceHandle &subdivisionScheme)
-{
-    _subdivisionScheme = subdivisionScheme;
-    return *this;
-}
-
-HdMeshSchema::Builder &
-HdMeshSchema::Builder::SetSubdivisionTags(
-    const HdContainerDataSourceHandle &subdivisionTags)
-{
-    _subdivisionTags = subdivisionTags;
-    return *this;
-}
-
-HdMeshSchema::Builder &
-HdMeshSchema::Builder::SetGeomSubsets(
-    const HdContainerDataSourceHandle &geomSubsets)
-{
-    _geomSubsets = geomSubsets;
-    return *this;
-}
-
-HdMeshSchema::Builder &
-HdMeshSchema::Builder::SetDoubleSided(
+HdContainerDataSourceHandle HdMeshSchema::BuildRetained(
+    const HdContainerDataSourceHandle &topology,
+    const HdTokenDataSourceHandle &subdivisionScheme,
+    const HdContainerDataSourceHandle &subdivisionTags,
+    const HdContainerDataSourceHandle &geomSubsets,
     const HdBoolDataSourceHandle &doubleSided)
 {
-    _doubleSided = doubleSided;
-    return *this;
+  TfToken names[5];
+  HdDataSourceBaseHandle values[5];
+
+  size_t count = 0;
+  if (topology) {
+    names[count] = HdMeshSchemaTokens->topology;
+    values[count++] = topology;
+  }
+
+  if (subdivisionScheme) {
+    names[count] = HdMeshSchemaTokens->subdivisionScheme;
+    values[count++] = subdivisionScheme;
+  }
+
+  if (subdivisionTags) {
+    names[count] = HdMeshSchemaTokens->subdivisionTags;
+    values[count++] = subdivisionTags;
+  }
+
+  if (geomSubsets) {
+    names[count] = HdMeshSchemaTokens->geomSubsets;
+    values[count++] = geomSubsets;
+  }
+
+  if (doubleSided) {
+    names[count] = HdMeshSchemaTokens->doubleSided;
+    values[count++] = doubleSided;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdMeshSchema::Builder::Build()
+/*static*/
+HdMeshSchema HdMeshSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdMeshSchema::BuildRetained(
-        _topology,
-        _subdivisionScheme,
-        _subdivisionTags,
-        _geomSubsets,
-        _doubleSided
-    );
+  return HdMeshSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                HdMeshSchemaTokens->mesh)) :
+                                            nullptr);
 }
 
+/*static*/
+const TfToken &HdMeshSchema::GetSchemaToken()
+{
+  return HdMeshSchemaTokens->mesh;
+}
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetTopologyLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh, HdMeshSchemaTokens->topology);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetGeomSubsetsLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdMeshSchemaTokens->geomSubsets);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetDoubleSidedLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdMeshSchemaTokens->doubleSided);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetSubdivisionTagsLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdMeshSchemaTokens->subdivisionTags);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdMeshSchema::GetSubdivisionSchemeLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdMeshSchemaTokens->subdivisionScheme);
+  return locator;
+}
+
+HdMeshSchema::Builder &HdMeshSchema::Builder::SetTopology(
+    const HdContainerDataSourceHandle &topology)
+{
+  _topology = topology;
+  return *this;
+}
+
+HdMeshSchema::Builder &HdMeshSchema::Builder::SetSubdivisionScheme(
+    const HdTokenDataSourceHandle &subdivisionScheme)
+{
+  _subdivisionScheme = subdivisionScheme;
+  return *this;
+}
+
+HdMeshSchema::Builder &HdMeshSchema::Builder::SetSubdivisionTags(
+    const HdContainerDataSourceHandle &subdivisionTags)
+{
+  _subdivisionTags = subdivisionTags;
+  return *this;
+}
+
+HdMeshSchema::Builder &HdMeshSchema::Builder::SetGeomSubsets(
+    const HdContainerDataSourceHandle &geomSubsets)
+{
+  _geomSubsets = geomSubsets;
+  return *this;
+}
+
+HdMeshSchema::Builder &HdMeshSchema::Builder::SetDoubleSided(
+    const HdBoolDataSourceHandle &doubleSided)
+{
+  _doubleSided = doubleSided;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdMeshSchema::Builder::Build()
+{
+  return HdMeshSchema::BuildRetained(
+      _topology, _subdivisionScheme, _subdivisionTags, _geomSubsets, _doubleSided);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

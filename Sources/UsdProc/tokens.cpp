@@ -25,10 +25,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdProcTokensType::UsdProcTokensType() : proceduralSystem("proceduralSystem", TfToken::Immortal),
-                                         GenerativeProcedural("GenerativeProcedural", TfToken::Immortal),
-                                         allTokens({proceduralSystem,
-                                                    GenerativeProcedural})
+UsdProcTokensType::UsdProcTokensType()
+    : proceduralSystem("proceduralSystem", TfToken::Immortal),
+      GenerativeProcedural("GenerativeProcedural", TfToken::Immortal),
+      allTokens({proceduralSystem, GenerativeProcedural})
 {
 }
 

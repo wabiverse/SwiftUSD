@@ -34,14 +34,12 @@ TF_REGISTRY_FUNCTION(TfType)
   HdRendererPluginRegistry::Define<HdTinyRendererPlugin>();
 }
 
-HdRenderDelegate *
-HdTinyRendererPlugin::CreateRenderDelegate()
+HdRenderDelegate *HdTinyRendererPlugin::CreateRenderDelegate()
 {
   return new HdTinyRenderDelegate();
 }
 
-HdRenderDelegate *
-HdTinyRendererPlugin::CreateRenderDelegate(
+HdRenderDelegate *HdTinyRendererPlugin::CreateRenderDelegate(
     HdRenderSettingsMap const &settingsMap)
 {
   return new HdTinyRenderDelegate(settingsMap);

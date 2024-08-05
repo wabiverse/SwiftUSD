@@ -25,8 +25,8 @@
 #ifndef PXR_IMAGING_HD_UTILS_H
 #define PXR_IMAGING_HD_UTILS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 
@@ -63,65 +63,60 @@ namespace HdUtils {
 ///
 /// The \em UnregisterInstance method is typically invoked prior to render
 /// index destruction.
-/// 
+///
 /// \note This facility isn't thread-safe.
 ///
 /// \sa HdSceneIndexPluginRegistry::SceneIndexAppendCallback
 /// \sa HdSceneIndexPluginRegistry::RegisterSceneIndexForRenderer
 ///
-template <typename T>
-class RenderInstanceTracker
-{
-public:
-    using TWeakPtr = std::weak_ptr<T>;
-    using TSharedPtr = std::shared_ptr<T>;
+template<typename T> class RenderInstanceTracker {
+ public:
+  using TWeakPtr = std::weak_ptr<T>;
+  using TSharedPtr = std::shared_ptr<T>;
 
-    void RegisterInstance(
-        std::string const &renderInstanceId,
-        TSharedPtr const &sp)
-    {
-        if (!sp) {
-            return;
-        }
-
-        auto res = idInstanceMap.insert({renderInstanceId, sp});
-        if (!res.second) { // wasn't inserted
-            TWeakPtr &wp = res.first->second;
-            if (auto handle = wp.lock()) {
-                // Found entry with valid handle. This can happen if the
-                // renderInstanceId isn't unique enough. Leave the existing
-                // entry as-is.
-                TF_WARN(
-                    "An instance with renderInstanceId %s was already "
-                    "registered previously.", renderInstanceId.c_str());
-                return;
-            }
-            res.first->second = sp;
-        }
+  void RegisterInstance(std::string const &renderInstanceId, TSharedPtr const &sp)
+  {
+    if (!sp) {
+      return;
     }
 
-    void UnregisterInstance(
-        std::string const &renderInstanceId)
-    {
-        idInstanceMap.erase(renderInstanceId);
+    auto res = idInstanceMap.insert({renderInstanceId, sp});
+    if (!res.second) {  // wasn't inserted
+      TWeakPtr &wp = res.first->second;
+      if (auto handle = wp.lock()) {
+        // Found entry with valid handle. This can happen if the
+        // renderInstanceId isn't unique enough. Leave the existing
+        // entry as-is.
+        TF_WARN(
+            "An instance with renderInstanceId %s was already "
+            "registered previously.",
+            renderInstanceId.c_str());
+        return;
+      }
+      res.first->second = sp;
     }
+  }
 
-    TSharedPtr GetInstance(
-        std::string const &id)
-    {
-        const auto it = idInstanceMap.find(id);
-        if (it != idInstanceMap.end()) {
-            if (TSharedPtr sp = it->second.lock()) {
-                return sp;
-            }
-        }
-        return nullptr;
+  void UnregisterInstance(std::string const &renderInstanceId)
+  {
+    idInstanceMap.erase(renderInstanceId);
+  }
+
+  TSharedPtr GetInstance(std::string const &id)
+  {
+    const auto it = idInstanceMap.find(id);
+    if (it != idInstanceMap.end()) {
+      if (TSharedPtr sp = it->second.lock()) {
+        return sp;
+      }
     }
-    
-private:
-    // Use a weak reference to the object.
-    using _IdToInstanceMap = std::unordered_map<std::string, TWeakPtr>;
-    _IdToInstanceMap idInstanceMap;
+    return nullptr;
+  }
+
+ private:
+  // Use a weak reference to the object.
+  using _IdToInstanceMap = std::unordered_map<std::string, TWeakPtr>;
+  _IdToInstanceMap idInstanceMap;
 };
 
 /// Retreives the active render settings prim path from the input scene index
@@ -129,13 +124,10 @@ private:
 /// with the result in \p primPath, and false otherwise.
 ///
 HD_API
-bool
-HasActiveRenderSettingsPrim(
-    const HdSceneIndexBaseRefPtr &si,
-    SdfPath *primPath = nullptr);
+bool HasActiveRenderSettingsPrim(const HdSceneIndexBaseRefPtr &si, SdfPath *primPath = nullptr);
 
-}
+}  // namespace HdUtils
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_UTILS_H
+#endif  // PXR_IMAGING_HD_UTILS_H

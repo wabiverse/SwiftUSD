@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/distanceJoint.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/distanceJoint.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,52 +40,44 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateMinDistanceAttr(UsdPhysicsDistanceJoint &self,
+                                           object defaultVal,
+                                           bool writeSparsely)
 {
+  return self.CreateMinDistanceAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                    writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateMaxDistanceAttr(UsdPhysicsDistanceJoint &self,
+                                           object defaultVal,
+                                           bool writeSparsely)
+{
+  return self.CreateMaxDistanceAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                    writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static std::string _Repr(const UsdPhysicsDistanceJoint &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.DistanceJoint(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateMinDistanceAttr(UsdPhysicsDistanceJoint &self,
-                         object defaultVal, bool writeSparsely)
-  {
-    return self.CreateMinDistanceAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateMaxDistanceAttr(UsdPhysicsDistanceJoint &self,
-                         object defaultVal, bool writeSparsely)
-  {
-    return self.CreateMaxDistanceAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsDistanceJoint &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.DistanceJoint(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsDistanceJoint()
 {
   typedef UsdPhysicsDistanceJoint This;
 
-  class_<This, bases<UsdPhysicsJoint>>
-      cls("DistanceJoint");
+  class_<This, bases<UsdPhysicsJoint>> cls("DistanceJoint");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -101,25 +93,22 @@ void wrapUsdPhysicsDistanceJoint()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetMinDistanceAttr",
-           &This::GetMinDistanceAttr)
+      .def("GetMinDistanceAttr", &This::GetMinDistanceAttr)
       .def("CreateMinDistanceAttr",
            &_CreateMinDistanceAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetMaxDistanceAttr",
-           &This::GetMaxDistanceAttr)
+      .def("GetMaxDistanceAttr", &This::GetMaxDistanceAttr)
       .def("CreateMaxDistanceAttr",
            &_CreateMaxDistanceAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -145,11 +134,8 @@ void wrapUsdPhysicsDistanceJoint()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

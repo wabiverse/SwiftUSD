@@ -42,16 +42,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// In the Python API, you can issue a warning with Tf.Warn().
 ///
 class TfWarning : public TfDiagnosticBase {
-private:
-  TfWarning(TfEnum warningCode, char const *warningCodeString,
-            TfCallContext const &context, const std::string &commentary,
-            TfDiagnosticInfo info, bool quiet)
-      : TfDiagnosticBase(warningCode, warningCodeString, context, commentary,
-                         info, quiet) {}
+ private:
+  TfWarning(TfEnum warningCode,
+            char const *warningCodeString,
+            TfCallContext const &context,
+            const std::string &commentary,
+            TfDiagnosticInfo info,
+            bool quiet)
+      : TfDiagnosticBase(warningCode, warningCodeString, context, commentary, info, quiet)
+  {
+  }
 
   friend class TfDiagnosticMgr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_WARNING_H
+#endif  // PXR_BASE_TF_WARNING_H

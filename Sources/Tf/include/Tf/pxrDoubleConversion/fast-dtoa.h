@@ -80,11 +80,15 @@ static const int kFastDtoaMaximalSingleLength = 9;
 //     If there are two values that are equally close, then FastDtoa returns
 //     false.
 // For both modes the buffer must be large enough to hold the result.
-bool FastDtoa(double d, FastDtoaMode mode, int requested_digits,
-              Vector<char> buffer, int *length, int *decimal_point);
+bool FastDtoa(double d,
+              FastDtoaMode mode,
+              int requested_digits,
+              Vector<char> buffer,
+              int *length,
+              int *decimal_point);
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // DOUBLE_CONVERSION_FAST_DTOA_H_
+#endif  // DOUBLE_CONVERSION_FAST_DTOA_H_

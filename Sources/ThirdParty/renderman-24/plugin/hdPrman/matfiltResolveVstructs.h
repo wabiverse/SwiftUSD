@@ -24,10 +24,10 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_RESOLVE_VSTRUCTS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_RESOLVE_VSTRUCTS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/material.h"
 #include "Hd/materialNetworkInterface.h"
 #include "Ndr/declare.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 
@@ -35,9 +35,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// Expands "virtual struct" connections for RenderMan.
 /// If requested, conditional actions are evaluated.
-void MatfiltResolveVstructs(
-    HdMaterialNetworkInterface *networkInterface,
-    bool enableConditions = true);
+void MatfiltResolveVstructs(HdMaterialNetworkInterface *networkInterface,
+                            bool enableConditions = true);
 
 class MatfiltVstructConditionalEvaluatorImpl;
 
@@ -46,9 +45,8 @@ class MatfiltVstructConditionalEvaluatorImpl;
 /// Parses and evaluates a single expression of "virtual struct conditional
 /// grammar". This is used internally by MatfiltResolveVstructs but is
 /// available to facilitate unit testing.
-class MatfiltVstructConditionalEvaluator
-{
-public:
+class MatfiltVstructConditionalEvaluator {
+ public:
   typedef std::shared_ptr<MatfiltVstructConditionalEvaluator> Ptr;
 
   ~MatfiltVstructConditionalEvaluator();
@@ -62,15 +60,14 @@ public:
   /// of the current connected nodes as well as the mutable network to
   /// directly change.
   ///
-  void Evaluate(
-      const TfToken &nodeId,
-      const TfToken &nodeInputId,
-      const TfToken &upstreamNodeId,
-      const TfToken &upstreamNodeOutput,
-      const NdrTokenVec &shaderTypePriority,
-      HdMaterialNetworkInterface *networkInterface) const;
+  void Evaluate(const TfToken &nodeId,
+                const TfToken &nodeInputId,
+                const TfToken &upstreamNodeId,
+                const TfToken &upstreamNodeOutput,
+                const NdrTokenVec &shaderTypePriority,
+                HdMaterialNetworkInterface *networkInterface) const;
 
-private:
+ private:
   MatfiltVstructConditionalEvaluator() = default;
 
   MatfiltVstructConditionalEvaluatorImpl *_impl = nullptr;

@@ -47,8 +47,8 @@
 #include "Trace/traceImpl.h"
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "Tf/pyInterpreter.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "Tf/pyInterpreter.h"
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <memory>
 #include <mutex>
@@ -62,8 +62,7 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-typedef pxr_tsl::robin_map<std::string, std::unique_ptr<PlugPlugin>, TfHash>
-    _PluginMap;
+typedef pxr_tsl::robin_map<std::string, std::unique_ptr<PlugPlugin>, TfHash> _PluginMap;
 typedef TfHashMap<std::string, PlugPluginPtr, TfHash> _WeakPluginMap;
 typedef TfHashMap<TfType, PlugPluginPtr, TfHash> _ClassMap;
 
@@ -76,21 +75,22 @@ static std::mutex _allPluginsMutex;
 static TfStaticData<_ClassMap> _classMap;
 static std::mutex _classMapMutex;
 
-constexpr char const *PlugPlugin::_GetPluginTypeDisplayName(_Type type) {
+constexpr char const *PlugPlugin::_GetPluginTypeDisplayName(_Type type)
+{
   return type == LibraryType ? "shared library" :
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-         type == PythonType ? "python module"
-         :
-#endif // PXR_PYTHON_SUPPORT_ENABLED
-         type == ResourceType ? "resource"
-                              : "<invalid enum value>";
+         type == PythonType ? "python module" :
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+         type == ResourceType ? "resource" :
+                                "<invalid enum value>";
 }
 
-template <class PluginMap>
-pair<PlugPluginPtr, bool>
-PlugPlugin::_NewPlugin(const Plug_RegistrationMetadata &metadata,
-                       _Type pluginType, const std::string &pluginCreationPath,
-                       PluginMap *allPluginsByNamePtr) {
+template<class PluginMap>
+pair<PlugPluginPtr, bool> PlugPlugin::_NewPlugin(const Plug_RegistrationMetadata &metadata,
+                                                 _Type pluginType,
+                                                 const std::string &pluginCreationPath,
+                                                 PluginMap *allPluginsByNamePtr)
+{
   PluginMap &allPluginsByName = *allPluginsByNamePtr;
 
   std::lock_guard<std::mutex> lock(_allPluginsMutex);
@@ -109,10 +109,13 @@ PlugPlugin::_NewPlugin(const Plug_RegistrationMetadata &metadata,
   if (it != allPluginsByName.end()) {
     TF_VERIFY(it->second);
     TF_DEBUG(PLUG_REGISTRATION)
-        .Msg("Already registered %s plugin '%s' at %s - not registering '%s'."
-             "\n\n",
-             _GetPluginTypeDisplayName(pluginType), metadata.pluginName.c_str(),
-             it->second->GetPath().c_str(), pluginCreationPath.c_str());
+        .Msg(
+            "Already registered %s plugin '%s' at %s - not registering '%s'."
+            "\n\n",
+            _GetPluginTypeDisplayName(pluginType),
+            metadata.pluginName.c_str(),
+            it->second->GetPath().c_str(),
+            pluginCreationPath.c_str());
     // Remove the null entry we added in _allPlugins for the alt path.
     _allPlugins->erase(iresult.first);
     return {it->second, false};
@@ -121,18 +124,23 @@ PlugPlugin::_NewPlugin(const Plug_RegistrationMetadata &metadata,
   // Go ahead and create a plugin.
   TF_DEBUG(PLUG_REGISTRATION)
       .Msg("Registering %s plugin '%s' at '%s'.\n\n",
-           _GetPluginTypeDisplayName(pluginType), metadata.pluginName.c_str(),
+           _GetPluginTypeDisplayName(pluginType),
+           metadata.pluginName.c_str(),
            pluginCreationPath.c_str());
 
-  std::unique_ptr<PlugPlugin> plugin(
-      new PlugPlugin(pluginCreationPath, metadata.pluginName,
-                     metadata.resourcePath, metadata.plugInfo, pluginType));
+  std::unique_ptr<PlugPlugin> plugin(new PlugPlugin(pluginCreationPath,
+                                                    metadata.pluginName,
+                                                    metadata.resourcePath,
+                                                    metadata.plugInfo,
+                                                    pluginType));
 
   if (TfDebug::IsEnabled(PLUG_REGISTRATION) && !metadata.pluginPath.empty() &&
-      !TfIsFile(pluginCreationPath, /* resolveSymlinks =*/true)) {
+      !TfIsFile(pluginCreationPath, /* resolveSymlinks =*/true))
+  {
     TF_DEBUG(PLUG_REGISTRATION)
         .Msg("Unable to read library plugin '%s' at '%s'.\n\n",
-             metadata.pluginName.c_str(), pluginCreationPath.c_str());
+             metadata.pluginName.c_str(),
+             pluginCreationPath.c_str());
   }
 
   PlugPluginPtr weakPlugin = TfCreateWeakPtr(plugin.get());
@@ -147,32 +155,41 @@ PlugPlugin::_NewPlugin(const Plug_RegistrationMetadata &metadata,
 }
 
 pair<PlugPluginPtr, bool> PlugPlugin::_NewDynamicLibraryPlugin(
-    const Plug_RegistrationMetadata &metadata) {
-  return _NewPlugin(metadata, LibraryType, metadata.libraryPath,
-                    _allPluginsByDynamicLibraryName.Get());
+    const Plug_RegistrationMetadata &metadata)
+{
+  return _NewPlugin(
+      metadata, LibraryType, metadata.libraryPath, _allPluginsByDynamicLibraryName.Get());
 }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-pair<PlugPluginPtr, bool>
-PlugPlugin::_NewPythonModulePlugin(const Plug_RegistrationMetadata &metadata) {
-  return _NewPlugin(metadata, PythonType, metadata.pluginPath,
-                    _allPluginsByModuleName.Get());
+pair<PlugPluginPtr, bool> PlugPlugin::_NewPythonModulePlugin(
+    const Plug_RegistrationMetadata &metadata)
+{
+  return _NewPlugin(metadata, PythonType, metadata.pluginPath, _allPluginsByModuleName.Get());
 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-std::pair<PlugPluginPtr, bool>
-PlugPlugin::_NewResourcePlugin(const Plug_RegistrationMetadata &metadata) {
-  return _NewPlugin(metadata, ResourceType, metadata.pluginPath,
-                    _allPluginsByResourceName.Get());
+std::pair<PlugPluginPtr, bool> PlugPlugin::_NewResourcePlugin(
+    const Plug_RegistrationMetadata &metadata)
+{
+  return _NewPlugin(metadata, ResourceType, metadata.pluginPath, _allPluginsByResourceName.Get());
 }
 
-PlugPlugin::PlugPlugin(const std::string &path, const std::string &name,
+PlugPlugin::PlugPlugin(const std::string &path,
+                       const std::string &name,
                        const std::string &resourcePath,
-                       const JsObject &plugInfo, _Type type)
+                       const JsObject &plugInfo,
+                       _Type type)
     :
 
-      _name(name), _path(path), _resourcePath(resourcePath), _dict(plugInfo),
-      _handle(0), _isLoaded(type == ResourceType), _type(type) {
+      _name(name),
+      _path(path),
+      _resourcePath(resourcePath),
+      _dict(plugInfo),
+      _handle(0),
+      _isLoaded(type == ResourceType),
+      _type(type)
+{
   // Do nothing
 }
 
@@ -180,9 +197,13 @@ PlugPlugin::PlugPlugin(const std::string &path, const std::string &name,
 PlugPlugin::~PlugPlugin() {}
 // CODE_COVERAGE_ON
 
-JsObject PlugPlugin::GetMetadata() { return _dict; }
+JsObject PlugPlugin::GetMetadata()
+{
+  return _dict;
+}
 
-JsObject PlugPlugin::GetDependencies() {
+JsObject PlugPlugin::GetDependencies()
+{
   JsObject::iterator depend = _dict.find("PluginDependencies");
   if (depend == _dict.end() || !depend->second.IsObject())
     return JsObject();
@@ -190,9 +211,9 @@ JsObject PlugPlugin::GetDependencies() {
   return depend->second.GetJsObject();
 }
 
-bool PlugPlugin::_Load() {
-  TfAutoMallocTag2 tag("PlugPlugin::_Load",
-                       TfStringPrintf("Load %s", _name.c_str()));
+bool PlugPlugin::_Load()
+{
+  TfAutoMallocTag2 tag("PlugPlugin::_Load", TfStringPrintf("Load %s", _name.c_str()));
 
   const std::string pluginBaseName = TfGetBaseName(_name);
 
@@ -212,22 +233,26 @@ bool PlugPlugin::_Load() {
     }
 #else
   if (false) {
-#endif // PXR_PYTHON_SUPPORT_ENABLED
-  } else if (!IsResource()) {
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+  }
+  else if (!IsResource()) {
     // This plugin's library path may be empty if the plugin isn't
     // separately loadable, e.g. it's part of a monolithic USD build
     // or it's a static library.
     if (_path.empty()) {
       TF_DEBUG(PLUG_LOAD).Msg("No path to library for '%s'.\n", _name.c_str());
-    } else {
+    }
+    else {
       string dsoError;
       {
         TRACE_FUNCTION_SCOPE("dlopen");
         _handle = TfDlopen(_path.c_str(), ARCH_LIBRARY_NOW, &dsoError);
       }
       if (!_handle) {
-        TF_CODING_ERROR("Failed to load plugin '%s': %s in '%s'", _name.c_str(),
-                        dsoError.c_str(), _path.c_str());
+        TF_CODING_ERROR("Failed to load plugin '%s': %s in '%s'",
+                        _name.c_str(),
+                        dsoError.c_str(),
+                        _path.c_str());
         isLoaded = false;
       }
     }
@@ -243,26 +268,26 @@ struct PlugPlugin::_SeenPlugins {
   TfHashSet<std::string, TfHash> plugins;
 };
 
-bool PlugPlugin::_LoadWithDependents(_SeenPlugins *seenPlugins) {
+bool PlugPlugin::_LoadWithDependents(_SeenPlugins *seenPlugins)
+{
   if (!_isLoaded) {
     // Take note of each plugin we've visited and bail if there is a cycle.
     if (seenPlugins->plugins.count(_name)) {
-      TF_CODING_ERROR("Load failed because of cyclic dependency for '%s'",
-                      _name.c_str());
+      TF_CODING_ERROR("Load failed because of cyclic dependency for '%s'", _name.c_str());
       return false;
     }
     seenPlugins->plugins.insert(_name);
 
     // Load any dependencies.
     JsObject dependencies = GetDependencies();
-    TF_FOR_ALL(i, dependencies) {
+    TF_FOR_ALL(i, dependencies)
+    {
       string baseTypeName = i->first;
       TfType baseType = TfType::FindByName(baseTypeName);
 
       // Check that each base class type is defined.
       if (baseType.IsUnknown()) {
-        TF_CODING_ERROR("Load failed: unknown base class '%s'",
-                        baseTypeName.c_str());
+        TF_CODING_ERROR("Load failed: unknown base class '%s'", baseTypeName.c_str());
         return false;
       }
 
@@ -275,27 +300,29 @@ bool PlugPlugin::_LoadWithDependents(_SeenPlugins *seenPlugins) {
       const TypeNames &dependents = i->second.GetArrayOf<string>();
 
       // Load the dependencies for each base class.
-      TF_FOR_ALL(j, dependents) {
+      TF_FOR_ALL(j, dependents)
+      {
         const string &dependName = *j;
         TfType dependType = TfType::FindByName(dependName);
 
         if (dependType.IsUnknown()) {
-          TF_CODING_ERROR("Load failed: unknown dependent class '%s'",
-                          dependName.c_str());
+          TF_CODING_ERROR("Load failed: unknown dependent class '%s'", dependName.c_str());
           return false;
         }
 
         PlugPluginPtr dependPlugin = _GetPluginForType(dependType);
         if (!dependPlugin) {
-          TF_CODING_ERROR("Load failed: unknown dependent "
-                          "plugin '%s'",
-                          dependName.c_str());
+          TF_CODING_ERROR(
+              "Load failed: unknown dependent "
+              "plugin '%s'",
+              dependName.c_str());
           return false;
         }
         if (!dependPlugin->_LoadWithDependents(seenPlugins)) {
-          TF_CODING_ERROR("Load failed: unable to load dependent "
-                          "plugin '%s'",
-                          dependName.c_str());
+          TF_CODING_ERROR(
+              "Load failed: unable to load dependent "
+              "plugin '%s'",
+              dependName.c_str());
           return false;
         }
       }
@@ -306,7 +333,8 @@ bool PlugPlugin::_LoadWithDependents(_SeenPlugins *seenPlugins) {
   return true;
 }
 
-bool PlugPlugin::Load() {
+bool PlugPlugin::Load()
+{
   static std::recursive_mutex loadMutex;
 
   bool result = false;
@@ -332,15 +360,25 @@ bool PlugPlugin::Load() {
   return result;
 }
 
-bool PlugPlugin::IsLoaded() const { return _isLoaded; }
+bool PlugPlugin::IsLoaded() const
+{
+  return _isLoaded;
+}
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-bool PlugPlugin::IsPythonModule() const { return _type == PythonType; }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+bool PlugPlugin::IsPythonModule() const
+{
+  return _type == PythonType;
+}
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-bool PlugPlugin::IsResource() const { return _type == ResourceType; }
+bool PlugPlugin::IsResource() const
+{
+  return _type == ResourceType;
+}
 
-std::string PlugPlugin::MakeResourcePath(const std::string &path) const {
+std::string PlugPlugin::MakeResourcePath(const std::string &path) const
+{
   std::string result = path;
   if (result.empty()) {
     return result;
@@ -351,8 +389,8 @@ std::string PlugPlugin::MakeResourcePath(const std::string &path) const {
   return result;
 }
 
-std::string PlugPlugin::FindPluginResource(const std::string &path,
-                                           bool verify) const {
+std::string PlugPlugin::FindPluginResource(const std::string &path, bool verify) const
+{
   std::string result = MakeResourcePath(path);
   if (verify && !TfPathExists(result)) {
     result.clear();
@@ -363,7 +401,8 @@ std::string PlugPlugin::FindPluginResource(const std::string &path,
 // Defined in registry.cpp.
 // void PlugPlugin::_RegisterAllPlugins();
 
-PlugPluginPtr PlugPlugin::_GetPluginWithName(const std::string &name) {
+PlugPluginPtr PlugPlugin::_GetPluginWithName(const std::string &name)
+{
   // Register all plugins first. We can't associate a plugin with a name
   // until it's registered.
   _RegisterAllPlugins();
@@ -388,19 +427,22 @@ PlugPluginPtr PlugPlugin::_GetPluginWithName(const std::string &name) {
   return nullptr;
 }
 
-PlugPluginPtrVector PlugPlugin::_GetAllPlugins() {
+PlugPluginPtrVector PlugPlugin::_GetAllPlugins()
+{
   _RegisterAllPlugins();
 
   std::lock_guard<std::mutex> lock(_allPluginsMutex);
   PlugPluginPtrVector plugins;
   plugins.reserve(_allPlugins->size());
-  TF_FOR_ALL(it, *_allPlugins) {
+  TF_FOR_ALL(it, *_allPlugins)
+  {
     plugins.push_back(TfCreateWeakPtr(it->second.get()));
   }
   return plugins;
 }
 
-PlugPluginPtr PlugPlugin::_GetPluginForType(const TfType &type) {
+PlugPluginPtr PlugPlugin::_GetPluginForType(const TfType &type)
+{
   // Ensure that plugins are registered, since even though the library that
   // defines \a type might be loaded, we might not have loaded its plugin
   // information, if it's loaded as a regular library dependency.
@@ -413,7 +455,8 @@ PlugPluginPtr PlugPlugin::_GetPluginForType(const TfType &type) {
   return TfNullPtr;
 }
 
-JsObject PlugPlugin::GetMetadataForType(const TfType &type) {
+JsObject PlugPlugin::GetMetadataForType(const TfType &type)
+{
   JsValue types;
   TfMapLookup(_dict, "Types", &types);
   if (!types.IsObject()) {
@@ -429,15 +472,16 @@ JsObject PlugPlugin::GetMetadataForType(const TfType &type) {
   return JsObject();
 }
 
-bool PlugPlugin::DeclaresType(const TfType &type,
-                              bool includeSubclasses) const {
+bool PlugPlugin::DeclaresType(const TfType &type, bool includeSubclasses) const
+{
   if (const JsValue *typesEntry = TfMapLookupPtr(_dict, "Types")) {
     if (typesEntry->IsObject()) {
       const JsObject &typesDict = typesEntry->GetJsObject();
-      TF_FOR_ALL(it, typesDict) {
+      TF_FOR_ALL(it, typesDict)
+      {
         const TfType typeFromPlugin = TfType::FindByName(it->first);
-        const bool match = (includeSubclasses ? typeFromPlugin.IsA(type)
-                                              : (typeFromPlugin == type));
+        const bool match = (includeSubclasses ? typeFromPlugin.IsA(type) :
+                                                (typeFromPlugin == type));
         if (match) {
           return true;
         }
@@ -448,7 +492,8 @@ bool PlugPlugin::DeclaresType(const TfType &type,
   return false;
 }
 
-void PlugPlugin::_DefineType(TfType t) {
+void PlugPlugin::_DefineType(TfType t)
+{
   PlugPluginPtr plug;
   {
     std::lock_guard<std::mutex> lock(_classMapMutex);
@@ -465,7 +510,8 @@ void PlugPlugin::_DefineType(TfType t) {
   plug->Load();
 }
 
-void PlugPlugin::_DeclareAliases(TfType t, const JsObject &metadata) {
+void PlugPlugin::_DeclareAliases(TfType t, const JsObject &metadata)
+{
   JsObject::const_iterator i = metadata.find("alias");
 
   if (i == metadata.end() || !i->second.IsObject())
@@ -473,7 +519,8 @@ void PlugPlugin::_DeclareAliases(TfType t, const JsObject &metadata) {
 
   const JsObject &aliasDict = i->second.GetJsObject();
 
-  TF_FOR_ALL(aliasIt, aliasDict) {
+  TF_FOR_ALL(aliasIt, aliasDict)
+  {
 
     if (!aliasIt->second.IsString()) {
       TF_WARN("Expected string for alias name, but found %s",
@@ -488,14 +535,16 @@ void PlugPlugin::_DeclareAliases(TfType t, const JsObject &metadata) {
   }
 }
 
-void PlugPlugin::_DeclareTypes() {
+void PlugPlugin::_DeclareTypes()
+{
   JsValue typesValue;
   TfMapLookup(_dict, "Types", &typesValue);
   if (typesValue.IsObject()) {
     const JsObject &types = typesValue.GetJsObject();
 
     // Declare TfTypes for all the types found in the plugin.
-    TF_FOR_ALL(i, types) {
+    TF_FOR_ALL(i, types)
+    {
       if (i->second.IsObject()) {
         _DeclareType(i->first, i->second.GetJsObject());
       }
@@ -503,8 +552,8 @@ void PlugPlugin::_DeclareTypes() {
   }
 }
 
-void PlugPlugin::_DeclareType(const std::string &typeName,
-                              const JsObject &typeDict) {
+void PlugPlugin::_DeclareType(const std::string &typeName, const JsObject &typeDict)
+{
   TfType::DefinitionCallback cb(&_DefineType);
 
   // Get the base types, declaring them if necessary.
@@ -515,10 +564,13 @@ void PlugPlugin::_DeclareType(const std::string &typeName,
     for (const auto &name : bases.GetArrayOf<string>()) {
       basesVec.push_back(TfType::Declare(name));
     }
-  } else if (!bases.IsNull()) {
-    TF_CODING_ERROR("Invalid bases for type %s specified by plugin %s. "
-                    "Expected list of strings.",
-                    typeName.c_str(), _name.c_str());
+  }
+  else if (!bases.IsNull()) {
+    TF_CODING_ERROR(
+        "Invalid bases for type %s specified by plugin %s. "
+        "Expected list of strings.",
+        typeName.c_str(),
+        _name.c_str());
   }
 
   // Declare the type.
@@ -537,25 +589,30 @@ void PlugPlugin::_DeclareType(const std::string &typeName,
     // If there were no bases previously declared, simply declare with known
     // bases.
     TfType::Declare(typeName, basesVec, cb);
-  } else {
+  }
+  else {
     // Make sure that the bases mentioned in the plugin
     // metadata are among them.
-    TF_FOR_ALL(i, basesVec) {
+    TF_FOR_ALL(i, basesVec)
+    {
       TfType base = *i;
       std::string const &baseName = base.GetTypeName();
-      if (std::find(existingBases.begin(), existingBases.end(), base) ==
-          existingBases.end()) {
+      if (std::find(existingBases.begin(), existingBases.end(), base) == existingBases.end()) {
         // Our expected base was not found.
         std::string basesStr;
         TF_FOR_ALL(j, existingBases)
         basesStr += j->GetTypeName() + " ";
-        TF_CODING_ERROR("The metadata for plugin '%s' defined in %s declares "
-                        "type '%s' with base type '%s', but the type has "
-                        "already been declared with a different set of bases "
-                        "that does not include that type.  The existing "
-                        "bases are: (%s).  Please fix the plugin.",
-                        _name.c_str(), GetPath().c_str(), typeName.c_str(),
-                        baseName.c_str(), basesStr.c_str());
+        TF_CODING_ERROR(
+            "The metadata for plugin '%s' defined in %s declares "
+            "type '%s' with base type '%s', but the type has "
+            "already been declared with a different set of bases "
+            "that does not include that type.  The existing "
+            "bases are: (%s).  Please fix the plugin.",
+            _name.c_str(),
+            GetPath().c_str(),
+            typeName.c_str(),
+            baseName.c_str(),
+            basesStr.c_str());
       }
     }
   }
@@ -567,12 +624,16 @@ void PlugPlugin::_DeclareType(const std::string &typeName,
     std::lock_guard<std::mutex> lock(_classMapMutex);
     if (_classMap->count(type)) {
       PlugPluginPtr other((*_classMap)[type]);
-      TF_CODING_ERROR("Plugin '%s' defined in %s has metadata "
-                      "claiming that it provides type %s, but this "
-                      "was previously provided by plugin '%s' "
-                      "defined in %s.",
-                      GetName().c_str(), GetPath().c_str(), typeName.c_str(),
-                      other->GetName().c_str(), other->GetPath().c_str());
+      TF_CODING_ERROR(
+          "Plugin '%s' defined in %s has metadata "
+          "claiming that it provides type %s, but this "
+          "was previously provided by plugin '%s' "
+          "defined in %s.",
+          GetName().c_str(),
+          GetPath().c_str(),
+          typeName.c_str(),
+          other->GetName().c_str(),
+          other->GetPath().c_str());
       return;
     }
 
@@ -583,10 +644,15 @@ void PlugPlugin::_DeclareType(const std::string &typeName,
   _DeclareAliases(type, typeDict);
 }
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<PlugPlugin>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<PlugPlugin>();
+}
 
 std::string PlugFindPluginResource(const PlugPluginPtr &plugin,
-                                   const std::string &path, bool verify) {
+                                   const std::string &path,
+                                   bool verify)
+{
   return plugin ? plugin->FindPluginResource(path, verify) : std::string();
 }
 

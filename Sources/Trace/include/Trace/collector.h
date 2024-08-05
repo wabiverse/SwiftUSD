@@ -69,7 +69,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceScope);
 ///
 /// All public methods of TraceCollector are safe to call from any thread.
 class TraceCollector : public TfWeakBase {
-public:
+ public:
   TF_MALLOC_TAG_NEW("Trace", "TraceCollector");
 
   using This = TraceCollector;
@@ -80,7 +80,8 @@ public:
   using Key = TraceDynamicKey;
 
   /// Returns the singleton instance.
-  TRACE_API static TraceCollector &GetInstance() {
+  TRACE_API static TraceCollector &GetInstance()
+  {
     return TfSingleton<TraceCollector>::GetInstance();
   }
 
@@ -90,7 +91,8 @@ public:
   TRACE_API void SetEnabled(bool isEnabled);
 
   ///  Returns whether collection of events is enabled for DefaultCategory.
-  static bool IsEnabled() {
+  static bool IsEnabled()
+  {
     return (_isEnabled.load(std::memory_order_acquire) == 1);
   }
 
@@ -98,20 +100,27 @@ public:
   /// macros.
   struct DefaultCategory {
     /// Returns TraceCategory::Default.
-    static constexpr TraceCategoryId GetId() { return TraceCategory::Default; }
+    static constexpr TraceCategoryId GetId()
+    {
+      return TraceCategory::Default;
+    }
     /// Returns the result of TraceCollector::IsEnabled.
-    static bool IsEnabled() { return TraceCollector::IsEnabled(); }
+    static bool IsEnabled()
+    {
+      return TraceCollector::IsEnabled();
+    }
   };
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   /// Returns whether automatic tracing of all python scopes is enabled.
-  bool IsPythonTracingEnabled() const {
+  bool IsPythonTracingEnabled() const
+  {
     return _isPythonTracingEnabled.load(std::memory_order_acquire) != 0;
   }
 
   /// Set whether automatic tracing of all python scopes is enabled.
   TRACE_API void SetPythonTracingEnabled(bool enabled);
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   /// Return the overhead cost to measure a scope.
   TRACE_API TimeStamp GetScopeOverhead() const;
@@ -131,8 +140,8 @@ public:
   /// \returns The TimeStamp of the TraceEvent or 0 if the collector is
   /// disabled.
   /// \sa BeginScope \sa Scope
-  template <typename Category = DefaultCategory>
-  TimeStamp BeginEvent(const Key &key) {
+  template<typename Category = DefaultCategory> TimeStamp BeginEvent(const Key &key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return 0;
     }
@@ -144,8 +153,8 @@ public:
   /// This version of the method allows the passing of a specific number of
   /// elapsed milliseconds, \a ms, to use for this event.
   /// This method is used for testing and debugging code.
-  template <typename Category = DefaultCategory>
-  void BeginEventAtTime(const Key &key, double ms) {
+  template<typename Category = DefaultCategory> void BeginEventAtTime(const Key &key, double ms)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return;
     }
@@ -160,8 +169,8 @@ public:
   /// \returns The TimeStamp of the TraceEvent or 0 if the collector is
   /// disabled.
   /// \sa EndScope \sa Scope
-  template <typename Category = DefaultCategory>
-  TimeStamp EndEvent(const Key &key) {
+  template<typename Category = DefaultCategory> TimeStamp EndEvent(const Key &key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return 0;
     }
@@ -173,8 +182,8 @@ public:
   /// This version of the method allows the passing of a specific number of
   /// elapsed milliseconds, \a ms, to use for this event.
   /// This method is used for testing and debugging code.
-  template <typename Category = DefaultCategory>
-  void EndEventAtTime(const Key &key, double ms) {
+  template<typename Category = DefaultCategory> void EndEventAtTime(const Key &key, double ms)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return;
     }
@@ -185,8 +194,8 @@ public:
   /// Unlike begin/end, there is no matching event for marker events
   ///
 
-  template <typename Category = DefaultCategory>
-  TimeStamp MarkerEvent(const Key &key) {
+  template<typename Category = DefaultCategory> TimeStamp MarkerEvent(const Key &key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return 0;
     }
@@ -198,8 +207,8 @@ public:
   /// This version of the method allows the passing of a specific number of
   /// elapsed milliseconds, \a ms, to use for this event.
   /// This method is used for testing and debugging code.
-  template <typename Category = DefaultCategory>
-  void MarkerEventAtTime(const Key &key, double ms) {
+  template<typename Category = DefaultCategory> void MarkerEventAtTime(const Key &key, double ms)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled())) {
       return;
     }
@@ -211,8 +220,8 @@ public:
   /// It is more efficient to use the \c Scope method than to call both
   /// \c BeginScope and \c EndScope.
   /// \sa EndScope \sa Scope
-  template <typename Category = DefaultCategory>
-  void BeginScope(const TraceKey &_key) {
+  template<typename Category = DefaultCategory> void BeginScope(const TraceKey &_key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
 
@@ -224,10 +233,10 @@ public:
   /// The variadic arguments \a args must be an even number of parameters in
   /// the form TraceKey, Value.
   /// \sa EndScope \sa Scope \sa StoreData
-  template <typename Category, typename... Args>
-  void BeginScope(const TraceKey &key, Args &&...args) {
-    static_assert(sizeof...(Args) % 2 == 0,
-                  "Data arguments must come in pairs");
+  template<typename Category, typename... Args>
+  void BeginScope(const TraceKey &key, Args &&...args)
+  {
+    static_assert(sizeof...(Args) % 2 == 0, "Data arguments must come in pairs");
 
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
@@ -241,10 +250,9 @@ public:
   /// arguments if \p Category is enabled. The variadic arguments \a args must
   /// be an even number of parameters in the form TraceKey, Value.
   /// \sa EndScope \sa Scope \sa StoreData
-  template <typename... Args>
-  void BeginScope(const TraceKey &key, Args &&...args) {
-    static_assert(sizeof...(Args) % 2 == 0,
-                  "Data arguments must come in pairs");
+  template<typename... Args> void BeginScope(const TraceKey &key, Args &&...args)
+  {
+    static_assert(sizeof...(Args) % 2 == 0, "Data arguments must come in pairs");
 
     // Explicitly cast to TraceCategoryId so overload resolution choose the
     // version with a category arguement.
@@ -255,8 +263,8 @@ public:
   /// It is more efficient to use the \c Scope method than to call both
   /// \c BeginScope and \c EndScope.
   /// \sa BeginScope \sa Scope
-  template <typename Category = DefaultCategory>
-  void EndScope(const TraceKey &key) {
+  template<typename Category = DefaultCategory> void EndScope(const TraceKey &key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
 
@@ -270,8 +278,7 @@ public:
   /// TRACE_FUNCTION_SCOPE macros.
   /// \sa BeginScope \sa EndScope
   TRACE_API
-  static void Scope(const TraceKey &key, TimeStamp start,
-                    TimeStamp stop) noexcept;
+  static void Scope(const TraceKey &key, TimeStamp start, TimeStamp stop) noexcept;
 
   /// Record a scope event described by \a key that started at \a start if
   /// \p Category is enabled.
@@ -279,22 +286,21 @@ public:
   /// This method is used by the TRACE_FUNCTION, TRACE_SCOPE and
   /// TRACE_FUNCTION_SCOPE macros.
   /// \sa BeginScope \sa EndScope
-  template <typename Category = DefaultCategory>
-  void Scope(const TraceKey &key, TimeStamp start, TimeStamp stop) {
+  template<typename Category = DefaultCategory>
+  void Scope(const TraceKey &key, TimeStamp start, TimeStamp stop)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
     _PerThreadData *threadData = _GetThreadData();
-    threadData->EmplaceEvent(TraceEvent::Timespan, key, start, stop,
-                             Category::GetId());
+    threadData->EmplaceEvent(TraceEvent::Timespan, key, start, stop, Category::GetId());
   }
 
   /// Record multiple data events with category \a cat if \p Category is
   /// enabled.
   /// \sa StoreData
-  template <typename Category, typename... Args>
-  void ScopeArgs(Args &&...args) {
-    static_assert(sizeof...(Args) % 2 == 0,
-                  "Data arguments must come in pairs");
+  template<typename Category, typename... Args> void ScopeArgs(Args &&...args)
+  {
+    static_assert(sizeof...(Args) % 2 == 0, "Data arguments must come in pairs");
 
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
@@ -309,9 +315,9 @@ public:
   /// the form TraceKey, Value. It is more efficient to use this method to
   /// store multiple data items than to use multiple calls to \c StoreData.
   /// \sa StoreData
-  template <typename... Args> void ScopeArgs(Args &&...args) {
-    static_assert(sizeof...(Args) % 2 == 0,
-                  "Data arguments must come in pairs");
+  template<typename... Args> void ScopeArgs(Args &&...args)
+  {
+    static_assert(sizeof...(Args) % 2 == 0, "Data arguments must come in pairs");
 
     ScopeArgs<DefaultCategory>(std::forward<Args>(args)...);
   }
@@ -322,8 +328,8 @@ public:
   /// This method is used by the TRACE_FUNCTION, TRACE_SCOPE and
   /// TRACE_FUNCTION_SCOPE macros.
   /// \sa BeginScope \sa EndScope
-  template <typename Category = DefaultCategory>
-  void MarkerEventStatic(const TraceKey &key) {
+  template<typename Category = DefaultCategory> void MarkerEventStatic(const TraceKey &key)
+  {
     if (ARCH_LIKELY(!Category::IsEnabled()))
       return;
 
@@ -335,27 +341,29 @@ public:
   /// enabled. \a value may be  of any type which a TraceEvent can
   /// be constructed from (bool, int, std::string, uint64, double).
   /// \sa ScopeArgs
-  template <typename Category = DefaultCategory, typename T>
-  void StoreData(const TraceKey &key, const T &value) {
+  template<typename Category = DefaultCategory, typename T>
+  void StoreData(const TraceKey &key, const T &value)
+  {
     if (ARCH_UNLIKELY(Category::IsEnabled())) {
       _StoreData(_GetThreadData(), key, Category::GetId(), value);
     }
   }
 
   /// Record a counter \a delta for a name \a key if \p Category is enabled.
-  template <typename Category = DefaultCategory>
-  void RecordCounterDelta(const TraceKey &key, double delta) {
+  template<typename Category = DefaultCategory>
+  void RecordCounterDelta(const TraceKey &key, double delta)
+  {
     // Only record counter values if the collector is enabled.
     if (ARCH_UNLIKELY(Category::IsEnabled())) {
       _PerThreadData *threadData = _GetThreadData();
-      threadData->EmplaceEvent(TraceEvent::CounterDelta, key, delta,
-                               Category::GetId());
+      threadData->EmplaceEvent(TraceEvent::CounterDelta, key, delta, Category::GetId());
     }
   }
 
   /// Record a counter \a delta for a name \a key if \p Category is enabled.
-  template <typename Category = DefaultCategory>
-  void RecordCounterDelta(const Key &key, double delta) {
+  template<typename Category = DefaultCategory>
+  void RecordCounterDelta(const Key &key, double delta)
+  {
     if (ARCH_UNLIKELY(Category::IsEnabled())) {
       _PerThreadData *threadData = _GetThreadData();
       threadData->CounterDelta(key, delta, Category::GetId());
@@ -363,20 +371,21 @@ public:
   }
 
   /// Record a counter \a value for a name \a key if \p Category is enabled.
-  template <typename Category = DefaultCategory>
-  void RecordCounterValue(const TraceKey &key, double value) {
+  template<typename Category = DefaultCategory>
+  void RecordCounterValue(const TraceKey &key, double value)
+  {
     // Only record counter values if the collector is enabled.
     if (ARCH_UNLIKELY(Category::IsEnabled())) {
       _PerThreadData *threadData = _GetThreadData();
-      threadData->EmplaceEvent(TraceEvent::CounterValue, key, value,
-                               Category::GetId());
+      threadData->EmplaceEvent(TraceEvent::CounterValue, key, value, Category::GetId());
     }
   }
 
   /// Record a counter \a value for a name \a key and delta \a value if
   /// \p Category is enabled.
-  template <typename Category = DefaultCategory>
-  void RecordCounterValue(const Key &key, double value) {
+  template<typename Category = DefaultCategory>
+  void RecordCounterValue(const Key &key, double value)
+  {
 
     if (ARCH_UNLIKELY(Category::IsEnabled())) {
       _PerThreadData *threadData = _GetThreadData();
@@ -387,7 +396,10 @@ public:
   /// @}
 
   ///  Return the label associated with this collector.
-  const std::string &GetLabel() { return _label; }
+  const std::string &GetLabel()
+  {
+    return _label;
+  }
 
   /// Produces a TraceCollection from all the events that recorded in the
   /// collector and issues a TraceCollectionAvailable notice. Note that
@@ -395,7 +407,7 @@ public:
   /// collection will not be present in subsequent collections.
   TRACE_API void CreateCollection();
 
-private:
+ private:
   TraceCollector();
 
   friend class TfSingleton<TraceCollector>;
@@ -408,22 +420,20 @@ private:
 
   TRACE_API TimeStamp _BeginEvent(const Key &key, TraceCategoryId cat);
 
-  TRACE_API void _BeginEventAtTime(const Key &key, double ms,
-                                   TraceCategoryId cat);
+  TRACE_API void _BeginEventAtTime(const Key &key, double ms, TraceCategoryId cat);
 
   TRACE_API TimeStamp _EndEvent(const Key &key, TraceCategoryId cat);
 
-  TRACE_API void _EndEventAtTime(const Key &key, double ms,
-                                 TraceCategoryId cat);
+  TRACE_API void _EndEventAtTime(const Key &key, double ms, TraceCategoryId cat);
 
   TRACE_API TimeStamp _MarkerEvent(const Key &key, TraceCategoryId cat);
 
-  TRACE_API void _MarkerEventAtTime(const Key &key, double ms,
-                                    TraceCategoryId cat);
+  TRACE_API void _MarkerEventAtTime(const Key &key, double ms, TraceCategoryId cat);
 
   // This is the fast execution path called from the TRACE_FUNCTION
   // and TRACE_SCOPE macros
-  void _BeginScope(const TraceKey &key, TraceCategoryId cat) {
+  void _BeginScope(const TraceKey &key, TraceCategoryId cat)
+  {
     // Note we're not calling _NewEvent, don't need to cache key
     _PerThreadData *threadData = _GetThreadData();
     threadData->BeginScope(key, cat);
@@ -438,44 +448,55 @@ private:
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   // Callback function registered as a python tracing function.
   void _PyTracingCallback(const TfPyTraceInfo &info);
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   // Implementation for small data that can stored inlined with the event.
-  template <typename T,
-            typename std::enable_if<sizeof(T) <= sizeof(uintptr_t) &&
-                                        !std::is_pointer<T>::value,
-                                    int>::type = 0>
-  void _StoreData(_PerThreadData *threadData, const TraceKey &key,
-                  TraceCategoryId cat, const T &value) {
+  template<typename T,
+           typename std::enable_if<sizeof(T) <= sizeof(uintptr_t) && !std::is_pointer<T>::value,
+                                   int>::type = 0>
+  void _StoreData(_PerThreadData *threadData,
+                  const TraceKey &key,
+                  TraceCategoryId cat,
+                  const T &value)
+  {
     threadData->StoreData(key, value, cat);
   }
 
   // Implementation for data that must be stored outside of the events.
-  template <typename T,
-            typename std::enable_if<(sizeof(T) > sizeof(uintptr_t)) &&
-                                        !std::is_pointer<T>::value,
-                                    int>::type = 0>
-  void _StoreData(_PerThreadData *threadData, const TraceKey &key,
-                  TraceCategoryId cat, const T &value) {
+  template<typename T,
+           typename std::enable_if<(sizeof(T) > sizeof(uintptr_t)) && !std::is_pointer<T>::value,
+                                   int>::type = 0>
+  void _StoreData(_PerThreadData *threadData,
+                  const TraceKey &key,
+                  TraceCategoryId cat,
+                  const T &value)
+  {
     threadData->StoreLargeData(key, value, cat);
   }
 
   // Specialization for c string
-  void _StoreData(_PerThreadData *threadData, const TraceKey &key,
-                  TraceCategoryId cat, const char *value) {
+  void _StoreData(_PerThreadData *threadData,
+                  const TraceKey &key,
+                  TraceCategoryId cat,
+                  const char *value)
+  {
     threadData->StoreLargeData(key, value, cat);
   }
 
   // Specialization for std::string
-  void _StoreData(_PerThreadData *threadData, const TraceKey &key,
-                  TraceCategoryId cat, const std::string &value) {
+  void _StoreData(_PerThreadData *threadData,
+                  const TraceKey &key,
+                  TraceCategoryId cat,
+                  const std::string &value)
+  {
     threadData->StoreLargeData(key, value.c_str(), cat);
   }
 
   // Variadic version to store multiple data events in one function call.
-  template <typename K, typename T, typename... Args>
-  void _StoreDataRec(_PerThreadData *threadData, TraceCategoryId cat, K &&key,
-                     const T &value, Args &&...args) {
+  template<typename K, typename T, typename... Args>
+  void _StoreDataRec(
+      _PerThreadData *threadData, TraceCategoryId cat, K &&key, const T &value, Args &&...args)
+  {
     _StoreData(threadData, std::forward<K>(key), cat, value);
     _StoreDataRec(threadData, cat, std::forward<Args>(args)...);
   }
@@ -486,13 +507,16 @@ private:
   // Thread-local storage, accessed via _GetThreadData()
   //
   class _PerThreadData {
-  public:
+   public:
     using EventList = TraceCollection::EventList;
 
     _PerThreadData();
     ~_PerThreadData();
 
-    const TraceThreadId &GetThreadId() const { return _threadIndex; }
+    const TraceThreadId &GetThreadId() const
+    {
+      return _threadIndex;
+    }
     TimeStamp BeginEvent(const Key &key, TraceCategoryId cat);
     TimeStamp EndEvent(const Key &key, TraceCategoryId cat);
     TimeStamp MarkerEvent(const Key &key, TraceCategoryId cat);
@@ -502,12 +526,14 @@ private:
     void EndEventAtTime(const Key &key, double ms, TraceCategoryId cat);
     void MarkerEventAtTime(const Key &key, double ms, TraceCategoryId cat);
 
-    void BeginScope(const TraceKey &key, TraceCategoryId cat) {
+    void BeginScope(const TraceKey &key, TraceCategoryId cat)
+    {
       AtomicRef lock(_writing);
       _BeginScope(key, cat);
     }
 
-    void EndScope(const TraceKey &key, TraceCategoryId cat) {
+    void EndScope(const TraceKey &key, TraceCategoryId cat)
+    {
       AtomicRef lock(_writing);
       _EndScope(key, cat);
     }
@@ -516,42 +542,41 @@ private:
 
     TRACE_API void CounterValue(const Key &, double value, TraceCategoryId cat);
 
-    template <typename T>
-    void StoreData(const TraceKey &key, const T &data, TraceCategoryId cat) {
+    template<typename T> void StoreData(const TraceKey &key, const T &data, TraceCategoryId cat)
+    {
       AtomicRef lock(_writing);
-      _events.load(std::memory_order_acquire)
-          ->EmplaceBack(TraceEvent::Data, key, data, cat);
+      _events.load(std::memory_order_acquire)->EmplaceBack(TraceEvent::Data, key, data, cat);
     }
 
-    template <typename T>
-    void StoreLargeData(const TraceKey &key, const T &data,
-                        TraceCategoryId cat) {
+    template<typename T>
+    void StoreLargeData(const TraceKey &key, const T &data, TraceCategoryId cat)
+    {
       AtomicRef lock(_writing);
       EventList *events = _events.load(std::memory_order_acquire);
       const auto *cached = events->StoreData(data);
       events->EmplaceBack(TraceEvent::Data, key, cached, cat);
     }
 
-    template <typename... Args> void EmplaceEvent(Args &&...args) {
+    template<typename... Args> void EmplaceEvent(Args &&...args)
+    {
       AtomicRef lock(_writing);
-      _events.load(std::memory_order_acquire)
-          ->EmplaceBack(std::forward<Args>(args)...);
+      _events.load(std::memory_order_acquire)->EmplaceBack(std::forward<Args>(args)...);
     }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
     void PushPyScope(const Key &key, bool enabled);
     void PopPyScope(bool enabled);
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
     // These methods can be called from threads at the same time as the
     // other methods.
     std::unique_ptr<EventList> GetCollectionData();
     void Clear();
 
-  private:
-    void _BeginScope(const TraceKey &key, TraceCategoryId cat) {
-      _events.load(std::memory_order_acquire)
-          ->EmplaceBack(TraceEvent::Begin, key, cat);
+   private:
+    void _BeginScope(const TraceKey &key, TraceCategoryId cat)
+    {
+      _events.load(std::memory_order_acquire)->EmplaceBack(TraceEvent::Begin, key, cat);
     }
 
     void _EndScope(const TraceKey &key, TraceCategoryId cat);
@@ -561,13 +586,17 @@ private:
     std::atomic<EventList *> _events;
 
     class AtomicRef {
-    public:
-      AtomicRef(std::atomic<bool> &b) : _bool(b) {
+     public:
+      AtomicRef(std::atomic<bool> &b) : _bool(b)
+      {
         _bool.store(true, std::memory_order_release);
       }
-      ~AtomicRef() { _bool.store(false, std::memory_order_release); }
+      ~AtomicRef()
+      {
+        _bool.store(false, std::memory_order_release);
+      }
 
-    private:
+     private:
       std::atomic<bool> &_bool;
     };
 
@@ -611,4 +640,4 @@ TRACE_API_TEMPLATE_CLASS(TfSingleton<TraceCollector>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_COLLECTOR_H
+#endif  // PXR_BASE_TRACE_COLLECTOR_H

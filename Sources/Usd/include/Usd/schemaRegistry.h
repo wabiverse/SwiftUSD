@@ -71,9 +71,8 @@ class UsdSchemaRegistry : public TfWeakBase {
   UsdSchemaRegistry(const UsdSchemaRegistry &) = delete;
   UsdSchemaRegistry &operator=(const UsdSchemaRegistry &) = delete;
 
-public:
-  using TokenToTokenVectorMap =
-      std::unordered_map<TfToken, TfTokenVector, TfHash>;
+ public:
+  using TokenToTokenVectorMap = std::unordered_map<TfToken, TfTokenVector, TfHash>;
 
   /// Structure that holds the information about a schema that is registered
   /// with the schema registry.
@@ -103,7 +102,8 @@ public:
   };
 
   USD_API
-  static UsdSchemaRegistry &GetInstance() {
+  static UsdSchemaRegistry &GetInstance()
+  {
     return TfSingleton<UsdSchemaRegistry>::GetInstance();
   }
 
@@ -120,9 +120,8 @@ public:
   /// append the appropriate version suffix, but the returned identifier will
   /// not be an \ref IsAllowedSchemaIdentifier "allowed schema identifier".
   USD_API
-  static TfToken
-  MakeSchemaIdentifierForFamilyAndVersion(const TfToken &schemaFamily,
-                                          UsdSchemaVersion schemaVersion);
+  static TfToken MakeSchemaIdentifierForFamilyAndVersion(const TfToken &schemaFamily,
+                                                         UsdSchemaVersion schemaVersion);
 
   /// Parses and returns the schema family and version values from the given
   /// \p schemaIdentifier.
@@ -142,8 +141,8 @@ public:
   /// \p schemaIdentifier be a registered schema itself or even an
   /// \ref IsAllowedSchemaIdentifier "allowed schema identifier".
   USD_API
-  static std::pair<TfToken, UsdSchemaVersion>
-  ParseSchemaFamilyAndVersionFromIdentifier(const TfToken &schemaIdentifier);
+  static std::pair<TfToken, UsdSchemaVersion> ParseSchemaFamilyAndVersionFromIdentifier(
+      const TfToken &schemaIdentifier);
 
   /// Returns whether the given \p schemaFamily is an allowed schema family
   /// name.
@@ -181,7 +180,8 @@ public:
   /// schema registry and as such, the return value from this function should
   /// never be null. A null return value is indication of a coding error even
   /// though this function itself will not report an error.
-  template <class SchemaType> static const SchemaInfo *FindSchemaInfo() {
+  template<class SchemaType> static const SchemaInfo *FindSchemaInfo()
+  {
     static_assert(std::is_base_of<UsdSchemaBase, SchemaType>::value,
                   "Provided type must derive UsdSchemaBase.");
     return FindSchemaInfo(SchemaType::_GetStaticTfType());
@@ -202,28 +202,21 @@ public:
 
   /// A policy for filtering by schema version when querying for schemas in a
   /// particular schema family.
-  enum class VersionPolicy {
-    All,
-    GreaterThan,
-    GreaterThanOrEqual,
-    LessThan,
-    LessThanOrEqual
-  };
+  enum class VersionPolicy { All, GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual };
 
   /// Finds all schemas in the given \p schemaFamily and returns their
   /// their schema info ordered from highest version to lowest version.
   USD_API
-  static const std::vector<const SchemaInfo *> &
-  FindSchemaInfosInFamily(const TfToken &schemaFamily);
+  static const std::vector<const SchemaInfo *> &FindSchemaInfosInFamily(
+      const TfToken &schemaFamily);
 
   /// Finds all schemas in the given \p schemaFamily, filtered according to
   /// the given \p schemaVersion and \p versionPolicy, and returns their
   /// their schema info ordered from highest version to lowest version.
   USD_API
-  static std::vector<const SchemaInfo *>
-  FindSchemaInfosInFamily(const TfToken &schemaFamily,
-                          UsdSchemaVersion schemaVersion,
-                          VersionPolicy versionPolicy);
+  static std::vector<const SchemaInfo *> FindSchemaInfosInFamily(const TfToken &schemaFamily,
+                                                                 UsdSchemaVersion schemaVersion,
+                                                                 VersionPolicy versionPolicy);
 
   /// Return the type name in the USD schema for prims or API schemas of the
   /// given registered \p schemaType.
@@ -232,7 +225,8 @@ public:
 
   /// Return the type name in the USD schema for prims or API schemas of the
   /// given registered \p SchemaType.
-  template <class SchemaType> static TfToken GetSchemaTypeName() {
+  template<class SchemaType> static TfToken GetSchemaTypeName()
+  {
     return GetSchemaTypeName(SchemaType::_GetStaticTfType());
   }
 
@@ -373,8 +367,7 @@ public:
   /// \sa UsdPrim::AddAppliedSchema(const TfToken&) const
   /// \sa UsdPrim::GetAppliedSchemas() const
   USD_API
-  static std::pair<TfToken, TfToken>
-  GetTypeNameAndInstance(const TfToken &apiSchemaName);
+  static std::pair<TfToken, TfToken> GetTypeNameAndInstance(const TfToken &apiSchemaName);
 
   /// Returns true if the given \p instanceName is an allowed instance name
   /// for the multiple apply API schema named \p apiSchemaName.
@@ -402,9 +395,8 @@ public:
   /// instance, it will fall back to looking for a "can only apply to" list
   /// for just the schema name itself.
   USD_API
-  static const TfTokenVector &
-  GetAPISchemaCanOnlyApplyToTypeNames(const TfToken &apiSchemaName,
-                                      const TfToken &instanceName = TfToken());
+  static const TfTokenVector &GetAPISchemaCanOnlyApplyToTypeNames(
+      const TfToken &apiSchemaName, const TfToken &instanceName = TfToken());
 
   /// Returns a map of the names of all registered auto apply API schemas
   /// to the list of type names each is registered to be auto applied to.
@@ -450,9 +442,8 @@ public:
   /// an instance name to create the name for a particular instance.
   ///
   USD_API
-  static TfToken
-  MakeMultipleApplyNameTemplate(const std::string &namespacePrefix,
-                                const std::string &baseName);
+  static TfToken MakeMultipleApplyNameTemplate(const std::string &namespacePrefix,
+                                               const std::string &baseName);
 
   /// Returns an instance of a multiple apply schema name from the given
   /// \p nameTemplate for the given \p instanceName.
@@ -482,8 +473,7 @@ public:
   /// as is.
   ///
   USD_API
-  static TfToken
-  GetMultipleApplyNameTemplateBaseName(const std::string &nameTemplate);
+  static TfToken GetMultipleApplyNameTemplateBaseName(const std::string &nameTemplate);
 
   /// Returns true if \p nameTemplate is a multiple apply schema name
   /// template.
@@ -499,25 +489,24 @@ public:
   /// Finds the prim definition for the given \p typeName token if
   /// \p typeName is a registered concrete typed schema type. Returns null if
   /// it is not.
-  const UsdPrimDefinition *
-  FindConcretePrimDefinition(const TfToken &typeName) const {
+  const UsdPrimDefinition *FindConcretePrimDefinition(const TfToken &typeName) const
+  {
     const auto it = _concreteTypedPrimDefinitions.find(typeName);
-    return it != _concreteTypedPrimDefinitions.end() ? it->second.get()
-                                                     : nullptr;
+    return it != _concreteTypedPrimDefinitions.end() ? it->second.get() : nullptr;
   }
 
   /// Finds the prim definition for the given \p typeName token if
   /// \p typeName is a registered applied API schema type. Returns null if
   /// it is not.
-  const UsdPrimDefinition *
-  FindAppliedAPIPrimDefinition(const TfToken &typeName) const {
+  const UsdPrimDefinition *FindAppliedAPIPrimDefinition(const TfToken &typeName) const
+  {
     const auto it = _appliedAPIPrimDefinitions.find(typeName);
-    return it != _appliedAPIPrimDefinitions.end() ? it->second.primDef.get()
-                                                  : nullptr;
+    return it != _appliedAPIPrimDefinitions.end() ? it->second.primDef.get() : nullptr;
   }
 
   /// Returns the empty prim definition.
-  const UsdPrimDefinition *GetEmptyPrimDefinition() const {
+  const UsdPrimDefinition *GetEmptyPrimDefinition() const
+  {
     return _emptyPrimDefinition;
   }
 
@@ -526,9 +515,8 @@ public:
   /// of properties from the registered prim definitions of each of the
   /// provided types.
   USD_API
-  std::unique_ptr<UsdPrimDefinition>
-  BuildComposedPrimDefinition(const TfToken &primType,
-                              const TfTokenVector &appliedAPISchemas) const;
+  std::unique_ptr<UsdPrimDefinition> BuildComposedPrimDefinition(
+      const TfToken &primType, const TfTokenVector &appliedAPISchemas) const;
 
   /// Returns a dictionary mapping concrete schema prim type names to a
   /// VtTokenArray of fallback prim type names if fallback types are defined
@@ -541,11 +529,12 @@ public:
   ///
   /// \sa UsdStage::WriteFallbackPrimTypes
   /// \sa \ref Usd_OM_FallbackPrimTypes
-  const VtDictionary &GetFallbackPrimTypes() const {
+  const VtDictionary &GetFallbackPrimTypes() const
+  {
     return _fallbackPrimTypes;
   }
 
-private:
+ private:
   friend class TfSingleton<UsdSchemaRegistry>;
 
   UsdSchemaRegistry();
@@ -554,7 +543,8 @@ private:
       std::unordered_map<std::pair<TfToken, TfToken>, UsdSchemaVersion, TfHash>;
 
   void _ComposeAPISchemasIntoPrimDefinition(
-      UsdPrimDefinition *primDef, const TfTokenVector &appliedAPISchemas,
+      UsdPrimDefinition *primDef,
+      const TfTokenVector &appliedAPISchemas,
       _FamilyAndInstanceToVersionMap *seenSchemaFamilyVersions) const;
 
   // Private class for helping initialize the schema registry. Defined
@@ -571,8 +561,7 @@ private:
     std::unique_ptr<UsdPrimDefinition> primDef;
     bool applyExpectsInstanceName;
   };
-  std::unordered_map<TfToken, const _APISchemaDefinitionInfo, TfHash>
-      _appliedAPIPrimDefinitions;
+  std::unordered_map<TfToken, const _APISchemaDefinitionInfo, TfHash> _appliedAPIPrimDefinitions;
 
   UsdPrimDefinition *_emptyPrimDefinition;
 
@@ -588,7 +577,8 @@ USD_API_TEMPLATE_CLASS(TfSingleton<UsdSchemaRegistry>);
 // to be able to access this plugin data in the same way that the
 // UsdSchemaRegistry does.
 void Usd_GetAPISchemaPluginApplyToInfoForType(
-    const TfType &apiSchemaType, const TfToken &apiSchemaName,
+    const TfType &apiSchemaType,
+    const TfToken &apiSchemaName,
     UsdSchemaRegistry::TokenToTokenVectorMap *autoApplyAPISchemasMap,
     UsdSchemaRegistry::TokenToTokenVectorMap *canOnlyApplyAPISchemasMap,
     TfHashMap<TfToken, TfToken::Set, TfHash> *allowedInstanceNamesMap);
@@ -600,4 +590,4 @@ void Usd_SortAutoAppliedAPISchemas(TfTokenVector *autoAppliedAPISchemas);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SCHEMA_REGISTRY_H
+#endif  // PXR_USD_USD_SCHEMA_REGISTRY_H

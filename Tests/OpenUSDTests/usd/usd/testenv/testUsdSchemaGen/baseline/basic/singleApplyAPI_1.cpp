@@ -25,95 +25,82 @@
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
 
-#include "pxr/usd/sdf/types.h"
 #include "pxr/usd/sdf/assetPath.h"
+#include "pxr/usd/sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdContrivedSingleApplyAPI_1,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+  TfType::Define<UsdContrivedSingleApplyAPI_1, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdContrivedSingleApplyAPI_1::~UsdContrivedSingleApplyAPI_1()
-{
-}
+UsdContrivedSingleApplyAPI_1::~UsdContrivedSingleApplyAPI_1() {}
 
 /* static */
-UsdContrivedSingleApplyAPI_1
-UsdContrivedSingleApplyAPI_1::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdContrivedSingleApplyAPI_1 UsdContrivedSingleApplyAPI_1::Get(const UsdStagePtr &stage,
+                                                               const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdContrivedSingleApplyAPI_1();
-    }
-    return UsdContrivedSingleApplyAPI_1(stage->GetPrimAtPath(path));
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdContrivedSingleApplyAPI_1();
+  }
+  return UsdContrivedSingleApplyAPI_1(stage->GetPrimAtPath(path));
 }
-
 
 /* virtual */
 UsdSchemaKind UsdContrivedSingleApplyAPI_1::_GetSchemaKind() const
 {
-    return UsdContrivedSingleApplyAPI_1::schemaKind;
+  return UsdContrivedSingleApplyAPI_1::schemaKind;
 }
 
 /* static */
-bool
-UsdContrivedSingleApplyAPI_1::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdContrivedSingleApplyAPI_1::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
-    return prim.CanApplyAPI<UsdContrivedSingleApplyAPI_1>(whyNot);
+  return prim.CanApplyAPI<UsdContrivedSingleApplyAPI_1>(whyNot);
 }
 
 /* static */
-UsdContrivedSingleApplyAPI_1
-UsdContrivedSingleApplyAPI_1::Apply(const UsdPrim &prim)
+UsdContrivedSingleApplyAPI_1 UsdContrivedSingleApplyAPI_1::Apply(const UsdPrim &prim)
 {
-    if (prim.ApplyAPI<UsdContrivedSingleApplyAPI_1>()) {
-        return UsdContrivedSingleApplyAPI_1(prim);
-    }
-    return UsdContrivedSingleApplyAPI_1();
+  if (prim.ApplyAPI<UsdContrivedSingleApplyAPI_1>()) {
+    return UsdContrivedSingleApplyAPI_1(prim);
+  }
+  return UsdContrivedSingleApplyAPI_1();
 }
 
 /* static */
-const TfType &
-UsdContrivedSingleApplyAPI_1::_GetStaticTfType()
+const TfType &UsdContrivedSingleApplyAPI_1::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdContrivedSingleApplyAPI_1>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdContrivedSingleApplyAPI_1>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdContrivedSingleApplyAPI_1::_IsTypedSchema()
+bool UsdContrivedSingleApplyAPI_1::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdContrivedSingleApplyAPI_1::_GetTfType() const
+const TfType &UsdContrivedSingleApplyAPI_1::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdContrivedSingleApplyAPI_1::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdContrivedSingleApplyAPI_1::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdAPISchemaBase::GetSchemaAttributeNames(true);
+  static TfTokenVector localNames;
+  static TfTokenVector allNames = UsdAPISchemaBase::GetSchemaAttributeNames(true);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -36,13 +36,13 @@
 #include <type_traits>
 
 #if defined(ARCH_OS_LINUX)
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cstring>
 #elif defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
-#include <chrono>
-#include <thread>
+#  include <Windows.h>
+#  include <chrono>
+#  include <thread>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -56,7 +56,8 @@ static uint64_t Arch_IntervalTimerTickOverhead = ~0;
 
 #if defined(ARCH_OS_DARWIN)
 
-static void Arch_ComputeNanosecondsPerTick() {
+static void Arch_ComputeNanosecondsPerTick()
+{
   mach_timebase_info_data_t info;
   mach_timebase_info(&info);
   Arch_NanosecondsPerTick = static_cast<double>(info.numer) / info.denom;
@@ -64,12 +65,13 @@ static void Arch_ComputeNanosecondsPerTick() {
 
 #elif defined(ARCH_OS_LINUX)
 
-static void Arch_ComputeNanosecondsPerTick() {
-#if defined(ARCH_CPU_ARM)
+static void Arch_ComputeNanosecondsPerTick()
+{
+#  if defined(ARCH_CPU_ARM)
   uint64_t counter_hz;
   __asm __volatile("mrs	%0, CNTFRQ_EL0" : "=&r"(counter_hz));
   Arch_NanosecondsPerTick = double(1e9) / double(counter_hz);
-#else
+#  else
   // NOTE: Normally ifstream would be cleaner, but it causes crashes when
   //       used in conjunction with DSOs and the Intel Compiler.
   FILE *in;
@@ -83,8 +85,7 @@ static void Arch_ComputeNanosecondsPerTick() {
     while (fgets(linebuffer, sizeof(linebuffer), in)) {
       char *colon;
 
-      if (strncmp(linebuffer, "bogomips", 8) == 0 &&
-          (colon = strchr(linebuffer, ':'))) {
+      if (strncmp(linebuffer, "bogomips", 8) == 0 && (colon = strchr(linebuffer, ':'))) {
 
         colon++;
 
@@ -126,8 +127,7 @@ static void Arch_ComputeNanosecondsPerTick() {
 
     while (fgets(linebuffer, sizeof(linebuffer), in)) {
       char *colon;
-      if (strncmp(linebuffer, "cpu MHz", 7) == 0 &&
-          (colon = strchr(linebuffer, ':'))) {
+      if (strncmp(linebuffer, "cpu MHz", 7) == 0 && (colon = strchr(linebuffer, ':'))) {
         colon++;
 
         // colon is pointing to a cpu speed in MHz.  Convert.
@@ -146,11 +146,12 @@ static void Arch_ComputeNanosecondsPerTick() {
 
   Arch_NanosecondsPerTick = double(1e9) / double(cpuHz);
 
-#endif
+#  endif
 }
 #elif defined(ARCH_OS_WINDOWS)
 
-static void Arch_ComputeNanosecondsPerTick() {
+static void Arch_ComputeNanosecondsPerTick()
+{
   // We want to use rdtsc so we need to find the frequency.  We run a
   // small sleep here to compute it using QueryPerformanceCounter()
   // which is independent of rdtsc.  So we wait for some duration using
@@ -159,7 +160,7 @@ static void Arch_ComputeNanosecondsPerTick() {
   // of ticks per nanosecond.
   LARGE_INTEGER qpcFreq, qpcStart, qpcEnd;
   QueryPerformanceFrequency(&qpcFreq);
-  const auto delay = (qpcFreq.QuadPart >> 4); // 1/16th of a second.
+  const auto delay = (qpcFreq.QuadPart >> 4);  // 1/16th of a second.
   QueryPerformanceCounter(&qpcStart);
   const auto t1 = ArchGetTickTime();
   do {
@@ -170,9 +171,8 @@ static void Arch_ComputeNanosecondsPerTick() {
   const auto t2 = ArchGetTickTime();
 
   // Total time take during the loop in seconds.
-  const auto durationInSeconds =
-      static_cast<double>(qpcEnd.QuadPart - qpcStart.QuadPart) /
-      qpcFreq.QuadPart;
+  const auto durationInSeconds = static_cast<double>(qpcEnd.QuadPart - qpcStart.QuadPart) /
+                                 qpcFreq.QuadPart;
 
   // Nanoseconds per tick.
   constexpr auto nanosPerSecond = 1.0e9;
@@ -180,7 +180,7 @@ static void Arch_ComputeNanosecondsPerTick() {
 }
 
 #else
-#error Unknown architecture.
+#  error Unknown architecture.
 #endif
 
 // A externally visible variable used only to ensure the compiler doesn't do
@@ -188,7 +188,8 @@ static void Arch_ComputeNanosecondsPerTick() {
 uint64_t testTimeAccum;
 
 ARCH_HIDDEN
-void Arch_InitTickTimer() {
+void Arch_InitTickTimer()
+{
   // Calculate Arch_NanosecondsPerTick.
   Arch_ComputeNanosecondsPerTick();
 
@@ -196,14 +197,16 @@ void Arch_InitTickTimer() {
 
   // Calculate the timer quantum.
   for (int trial = 0; trial != NumTrials; ++trial) {
-    uint64_t times[] = {ArchGetTickTime(), ArchGetTickTime(), ArchGetTickTime(),
-                        ArchGetTickTime(), ArchGetTickTime()};
+    uint64_t times[] = {ArchGetTickTime(),
+                        ArchGetTickTime(),
+                        ArchGetTickTime(),
+                        ArchGetTickTime(),
+                        ArchGetTickTime()};
     for (int i = 0; i != std::extent<decltype(times)>::value - 1; ++i) {
       times[i] = times[i + 1] - times[i];
     }
-    Arch_TickQuantum = std::min(
-        Arch_TickQuantum,
-        *std::min_element(std::begin(times), std::prev(std::end(times))));
+    Arch_TickQuantum = std::min(Arch_TickQuantum,
+                                *std::min_element(std::begin(times), std::prev(std::end(times))));
   }
 
   // Calculate the interval timer overhead (the time cost to take an interval
@@ -217,31 +220,41 @@ void Arch_InitTickTimer() {
   }
 }
 
-uint64_t ArchGetTickQuantum() { return Arch_TickQuantum; }
+uint64_t ArchGetTickQuantum()
+{
+  return Arch_TickQuantum;
+}
 
-uint64_t ArchGetIntervalTimerTickOverhead() {
+uint64_t ArchGetIntervalTimerTickOverhead()
+{
   return Arch_IntervalTimerTickOverhead;
 }
 
-int64_t ArchTicksToNanoseconds(uint64_t nTicks) {
-  return static_cast<int64_t>(
-      std::llround(static_cast<double>(nTicks) * Arch_NanosecondsPerTick));
+int64_t ArchTicksToNanoseconds(uint64_t nTicks)
+{
+  return static_cast<int64_t>(std::llround(static_cast<double>(nTicks) * Arch_NanosecondsPerTick));
 }
 
-double ArchTicksToSeconds(uint64_t nTicks) {
+double ArchTicksToSeconds(uint64_t nTicks)
+{
   return double(ArchTicksToNanoseconds(nTicks)) / 1e9;
 }
 
-uint64_t ArchSecondsToTicks(double seconds) {
-  return static_cast<uint64_t>(
-      std::llround(1.0e9 * seconds / ArchGetNanosecondsPerTick()));
+uint64_t ArchSecondsToTicks(double seconds)
+{
+  return static_cast<uint64_t>(std::llround(1.0e9 * seconds / ArchGetNanosecondsPerTick()));
 }
 
-double ArchGetNanosecondsPerTick() { return Arch_NanosecondsPerTick; }
+double ArchGetNanosecondsPerTick()
+{
+  return Arch_NanosecondsPerTick;
+}
 
 uint64_t Arch_MeasureExecutionTime(uint64_t maxMicroseconds,
-                                   bool *reachedConsensus, void const *m,
-                                   uint64_t (*callM)(void const *, int)) {
+                                   bool *reachedConsensus,
+                                   void const *m,
+                                   uint64_t (*callM)(void const *, int))
+{
   auto measureN = [m, callM](int nTimes) { return callM(m, nTimes); };
 
   // XXX pin to a certain cpu?  (not possible on macos)
@@ -256,10 +269,10 @@ uint64_t Arch_MeasureExecutionTime(uint64_t maxMicroseconds,
   // Since measured times are +/- 1 quantum, we multiply by 2000 to get the
   // desired runtime, and from there figure number of iterations for a sample.
   const uint64_t minTicksPerSample = 2000 * ArchGetTickQuantum();
-  const int sampleIters =
-      (estTicksPer < minTicksPerSample)
-          ? static_cast<int>((minTicksPerSample + estTicksPer / 2) / estTicksPer)
-          : 1;
+  const int sampleIters = (estTicksPer < minTicksPerSample) ?
+                              static_cast<int>((minTicksPerSample + estTicksPer / 2) /
+                                               estTicksPer) :
+                              1;
 
   auto measureSample = [&measureN, sampleIters]() {
     return (measureN(sampleIters) + sampleIters / 2) / sampleIters;

@@ -44,31 +44,38 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfVec3h>(); }
-
-std::ostream &operator<<(std::ostream &out, GfVec3h const &v) {
-  return out << '(' << Gf_OstreamHelperP(v[0]) << ", "
-             << Gf_OstreamHelperP(v[1]) << ", " << Gf_OstreamHelperP(v[2])
-             << ')';
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfVec3h>();
 }
 
-bool GfVec3h::operator==(GfVec3d const &other) const {
+std::ostream &operator<<(std::ostream &out, GfVec3h const &v)
+{
+  return out << '(' << Gf_OstreamHelperP(v[0]) << ", " << Gf_OstreamHelperP(v[1]) << ", "
+             << Gf_OstreamHelperP(v[2]) << ')';
+}
+
+bool GfVec3h::operator==(GfVec3d const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
-bool GfVec3h::operator==(GfVec3f const &other) const {
+bool GfVec3h::operator==(GfVec3f const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
-bool GfVec3h::operator==(GfVec3i const &other) const {
+bool GfVec3h::operator==(GfVec3i const &other) const
+{
   return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
 }
 
-bool GfVec3h::OrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz,
-                                 const bool normalize, double eps) {
+bool GfVec3h::OrthogonalizeBasis(
+    GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, const bool normalize, double eps)
+{
   return GfOrthogonalizeBasis(tx, ty, tz, normalize, eps);
 }
 
-void GfVec3h::BuildOrthonormalFrame(GfVec3h *v1, GfVec3h *v2,
-                                    GfHalf eps) const {
+void GfVec3h::BuildOrthonormalFrame(GfVec3h *v1, GfVec3h *v2, GfHalf eps) const
+{
   return GfBuildOrthonormalFrame(*this, v1, v2, eps);
 }
 
@@ -84,8 +91,8 @@ void GfVec3h::BuildOrthonormalFrame(GfVec3h *v1, GfVec3h *v2,
  * If the iteration fails to converge, returns false with vectors as close to
  * orthogonal as possible.
  */
-bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize,
-                          double eps) {
+bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize, double eps)
+{
   GfVec3h ax, bx, cx, ay, by, cy, az, bz, cz;
 
   if (normalize) {
@@ -95,7 +102,8 @@ bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize,
     ax = *tx;
     ay = *ty;
     az = *tz;
-  } else {
+  }
+  else {
     ax = *tx;
     ay = *ty;
     az = *tz;
@@ -111,8 +119,7 @@ bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize,
    * the colinear case beforehand, or we'll get fooled in the error
    * computation.
    */
-  if (GfIsClose(ax, ay, eps) || GfIsClose(ax, az, eps) ||
-      GfIsClose(ay, az, eps)) {
+  if (GfIsClose(ax, ay, eps) || GfIsClose(ax, az, eps) || GfIsClose(ay, az, eps)) {
     return false;
   }
 
@@ -146,8 +153,7 @@ bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize,
     GfVec3h yDiff = *ty - cy;
     GfVec3h zDiff = *tz - cz;
 
-    double error =
-        GfDot(xDiff, xDiff) + GfDot(yDiff, yDiff) + GfDot(zDiff, zDiff);
+    double error = GfDot(xDiff, xDiff) + GfDot(yDiff, yDiff) + GfDot(zDiff, zDiff);
 
     // error is squared, so compare to squared tolerance
     if (error < GfSqr(eps))
@@ -179,13 +185,14 @@ bool GfOrthogonalizeBasis(GfVec3h *tx, GfVec3h *ty, GfVec3h *tz, bool normalize,
  * If L = length(*this) < eps, we shrink v1 and v2 to be of
  * length L/eps.
  */
-void GfBuildOrthonormalFrame(GfVec3h const &v0, GfVec3h *v1, GfVec3h *v2,
-                             GfHalf eps) {
+void GfBuildOrthonormalFrame(GfVec3h const &v0, GfVec3h *v1, GfVec3h *v2, GfHalf eps)
+{
   GfHalf len = v0.GetLength();
 
   if (len == 0.) {
     *v1 = *v2 = GfVec3h(0);
-  } else {
+  }
+  else {
     GfVec3h unitDir = v0 / len;
     *v1 = GfVec3h::XAxis() ^ unitDir;
 
@@ -193,7 +200,7 @@ void GfBuildOrthonormalFrame(GfVec3h const &v0, GfVec3h *v1, GfVec3h *v2,
       *v1 = GfVec3h::YAxis() ^ unitDir;
 
     GfNormalize(v1);
-    *v2 = unitDir ^ *v1; // this is of unit length
+    *v2 = unitDir ^ *v1;  // this is of unit length
 
     if (len < eps) {
       double desiredLen = len / eps;
@@ -203,7 +210,8 @@ void GfBuildOrthonormalFrame(GfVec3h const &v0, GfVec3h *v1, GfVec3h *v2,
   }
 }
 
-GfVec3h GfSlerp(double alpha, const GfVec3h &v0, const GfVec3h &v1) {
+GfVec3h GfSlerp(double alpha, const GfVec3h &v0, const GfVec3h &v1)
+{
   // determine the angle between the two lines going from the center of
   // the sphere to v0 and v1.  the projection (dot prod) of one onto the
   // other gives us the arc cosine of the angle between them.

@@ -33,125 +33,98 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdInstanceSchemaTokens,
-    HDINSTANCE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdInstanceSchemaTokens, HDINSTANCE_SCHEMA_TOKENS);
 
-
-
-HdPathDataSourceHandle
-HdInstanceSchema::GetInstancer()
+HdPathDataSourceHandle HdInstanceSchema::GetInstancer()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdInstanceSchemaTokens->instancer);
+  return _GetTypedDataSource<HdPathDataSource>(HdInstanceSchemaTokens->instancer);
 }
 
-HdIntDataSourceHandle
-HdInstanceSchema::GetPrototypeIndex()
+HdIntDataSourceHandle HdInstanceSchema::GetPrototypeIndex()
 {
-    return _GetTypedDataSource<HdIntDataSource>(
-        HdInstanceSchemaTokens->prototypeIndex);
+  return _GetTypedDataSource<HdIntDataSource>(HdInstanceSchemaTokens->prototypeIndex);
 }
 
-HdIntDataSourceHandle
-HdInstanceSchema::GetInstanceIndex()
+HdIntDataSourceHandle HdInstanceSchema::GetInstanceIndex()
 {
-    return _GetTypedDataSource<HdIntDataSource>(
-        HdInstanceSchemaTokens->instanceIndex);
+  return _GetTypedDataSource<HdIntDataSource>(HdInstanceSchemaTokens->instanceIndex);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdInstanceSchema::BuildRetained(
-        const HdPathDataSourceHandle &instancer,
-        const HdIntDataSourceHandle &prototypeIndex,
-        const HdIntDataSourceHandle &instanceIndex
-)
-{
-    TfToken names[3];
-    HdDataSourceBaseHandle values[3];
-
-    size_t count = 0;
-    if (instancer) {
-        names[count] = HdInstanceSchemaTokens->instancer;
-        values[count++] = instancer;
-    }
-
-    if (prototypeIndex) {
-        names[count] = HdInstanceSchemaTokens->prototypeIndex;
-        values[count++] = prototypeIndex;
-    }
-
-    if (instanceIndex) {
-        names[count] = HdInstanceSchemaTokens->instanceIndex;
-        values[count++] = instanceIndex;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdInstanceSchema
-HdInstanceSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdInstanceSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdInstanceSchemaTokens->instance))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdInstanceSchema::GetSchemaToken()
-{
-    return HdInstanceSchemaTokens->instance;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdInstanceSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdInstanceSchemaTokens->instance
-    );
-    return locator;
-} 
-HdInstanceSchema::Builder &
-HdInstanceSchema::Builder::SetInstancer(
-    const HdPathDataSourceHandle &instancer)
-{
-    _instancer = instancer;
-    return *this;
-}
-
-HdInstanceSchema::Builder &
-HdInstanceSchema::Builder::SetPrototypeIndex(
-    const HdIntDataSourceHandle &prototypeIndex)
-{
-    _prototypeIndex = prototypeIndex;
-    return *this;
-}
-
-HdInstanceSchema::Builder &
-HdInstanceSchema::Builder::SetInstanceIndex(
+HdContainerDataSourceHandle HdInstanceSchema::BuildRetained(
+    const HdPathDataSourceHandle &instancer,
+    const HdIntDataSourceHandle &prototypeIndex,
     const HdIntDataSourceHandle &instanceIndex)
 {
-    _instanceIndex = instanceIndex;
-    return *this;
+  TfToken names[3];
+  HdDataSourceBaseHandle values[3];
+
+  size_t count = 0;
+  if (instancer) {
+    names[count] = HdInstanceSchemaTokens->instancer;
+    values[count++] = instancer;
+  }
+
+  if (prototypeIndex) {
+    names[count] = HdInstanceSchemaTokens->prototypeIndex;
+    values[count++] = prototypeIndex;
+  }
+
+  if (instanceIndex) {
+    names[count] = HdInstanceSchemaTokens->instanceIndex;
+    values[count++] = instanceIndex;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdInstanceSchema::Builder::Build()
+/*static*/
+HdInstanceSchema HdInstanceSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdInstanceSchema::BuildRetained(
-        _instancer,
-        _prototypeIndex,
-        _instanceIndex
-    );
+  return HdInstanceSchema(
+      fromParentContainer ?
+          HdContainerDataSource::Cast(fromParentContainer->Get(HdInstanceSchemaTokens->instance)) :
+          nullptr);
 }
 
+/*static*/
+const TfToken &HdInstanceSchema::GetSchemaToken()
+{
+  return HdInstanceSchemaTokens->instance;
+}
+/*static*/
+const HdDataSourceLocator &HdInstanceSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdInstanceSchemaTokens->instance);
+  return locator;
+}
+HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetInstancer(
+    const HdPathDataSourceHandle &instancer)
+{
+  _instancer = instancer;
+  return *this;
+}
+
+HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetPrototypeIndex(
+    const HdIntDataSourceHandle &prototypeIndex)
+{
+  _prototypeIndex = prototypeIndex;
+  return *this;
+}
+
+HdInstanceSchema::Builder &HdInstanceSchema::Builder::SetInstanceIndex(
+    const HdIntDataSourceHandle &instanceIndex)
+{
+  _instanceIndex = instanceIndex;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdInstanceSchema::Builder::Build()
+{
+  return HdInstanceSchema::BuildRetained(_instancer, _prototypeIndex, _instanceIndex);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

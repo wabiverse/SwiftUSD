@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_FILTERING_SCENE_INDEX_PLUGIN_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_FILTERING_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,17 +35,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Prman scene index plugin that configures the render settings filtering scene index to filter in
 /// Prman settings based on conventions used in UsdRiPxr-schemas applied to RenderSettings prims.
 ///
-class HdPrman_RenderSettingsFilteringSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_RenderSettingsFilteringSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_RenderSettingsFilteringSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_FILTERING_SCENE_INDEX_PLUGIN_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_FILTERING_SCENE_INDEX_PLUGIN_H

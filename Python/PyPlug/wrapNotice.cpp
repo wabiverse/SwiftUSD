@@ -39,15 +39,16 @@ namespace {
 TF_INSTANTIATE_NOTICE_WRAPPER(PlugNotice::Base, TfNotice);
 TF_INSTANTIATE_NOTICE_WRAPPER(PlugNotice::DidRegisterPlugins, PlugNotice::Base);
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPlugNotice() {
+void wrapPlugNotice()
+{
   scope noticeScope = class_<PlugNotice>("Notice", no_init);
 
   TfPyNoticeWrapper<PlugNotice::Base, TfNotice>::Wrap();
 
-  TfPyNoticeWrapper<PlugNotice::DidRegisterPlugins, PlugNotice::Base>::Wrap()
-      .def("GetNewPlugins",
-           make_function(&PlugNotice::DidRegisterPlugins::GetNewPlugins,
-                         return_value_policy<TfPySequenceToList>()));
+  TfPyNoticeWrapper<PlugNotice::DidRegisterPlugins, PlugNotice::Base>::Wrap().def(
+      "GetNewPlugins",
+      make_function(&PlugNotice::DidRegisterPlugins::GetNewPlugins,
+                    return_value_policy<TfPySequenceToList>()));
 }

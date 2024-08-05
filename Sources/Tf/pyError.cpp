@@ -44,7 +44,8 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool TfPyConvertTfErrorsToPythonException(TfErrorMark const &m) {
+bool TfPyConvertTfErrorsToPythonException(TfErrorMark const &m)
+{
   // If there is a python exception somewhere in here, restore that, otherwise
   // raise a normal error exception.
   if (!m.IsClean()) {
@@ -72,16 +73,17 @@ bool TfPyConvertTfErrorsToPythonException(TfErrorMark const &m) {
           //      Tf errors.
           m.Clear();
           return true;
-        } else {
+        }
+        else {
           // abort? should perhaps use polymorphic_downcast workalike
           // instead? throw a python error...
         }
-      } else
+      }
+      else
         args.append(*e);
     }
     // make and set a python exception
-    handle<> excObj(PyObject_CallObject(Tf_PyGetErrorExceptionClass().get(),
-                                        tuple(args).ptr()));
+    handle<> excObj(PyObject_CallObject(Tf_PyGetErrorExceptionClass().get(), tuple(args).ptr()));
     PyErr_SetObject(Tf_PyGetErrorExceptionClass().get(), excObj.get());
     m.Clear();
     return true;
@@ -89,14 +91,14 @@ bool TfPyConvertTfErrorsToPythonException(TfErrorMark const &m) {
   return false;
 }
 
-void TfPyConvertPythonExceptionToTfErrors() {
+void TfPyConvertPythonExceptionToTfErrors()
+{
   // Get the python exception info.
   TfPyExceptionState exc = Tf_PyFetchPythonExceptionState();
 
   // Replace the errors in m with errors parsed out of the exception.
   if (exc.GetType()) {
-    if (exc.GetType().get() == Tf_PyGetErrorExceptionClass().get() &&
-        exc.GetValue()) {
+    if (exc.GetType().get() == Tf_PyGetErrorExceptionClass().get() && exc.GetValue()) {
       // Replace the errors in m with errors pulled out of exc.
       object exception = object(exc.GetValue());
       object args = exception.attr("args");
@@ -106,10 +108,12 @@ void TfPyConvertPythonExceptionToTfErrors() {
         TF_FOR_ALL(e, errs)
         TfDiagnosticMgr::GetInstance().AppendError(*e);
       }
-    } else {
+    }
+    else {
       TF_ERROR(exc, TF_PYTHON_EXCEPTION, "Tf Python Exception");
     }
-  } else if (exc.GetValue()) {
+  }
+  else if (exc.GetValue()) {
     object exception(exc.GetValue());
     if (PyObject_HasAttrString(exception.ptr(), "_pxr_SavedTfException")) {
       extract<uintptr_t> extractor(exception.attr("_pxr_SavedTfException"));

@@ -30,16 +30,15 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HduiDataSourceValueTreeView : public QTreeView
-{
+class HduiDataSourceValueTreeView : public QTreeView {
   Q_OBJECT;
 
-public:
+ public:
   HduiDataSourceValueTreeView(QWidget *parent = Q_NULLPTR);
   void SetDataSource(const HdSampledDataSourceHandle &dataSource);
   void Refresh();
 
-private:
+ private:
   HdSampledDataSourceHandle _dataSource;
 };
 

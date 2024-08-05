@@ -48,11 +48,11 @@ class Pcp_MutedLayers;
 /// A registry of layer stacks.
 ///
 class Pcp_LayerStackRegistry : public TfRefBase, public TfWeakBase {
-public:
+ public:
   /// Create a new Pcp_LayerStackRegistry.
-  static Pcp_LayerStackRegistryRefPtr
-  New(const PcpLayerStackIdentifier &rootLayerStackIdentifier,
-      const std::string &fileFormatTarget = std::string(), bool isUsd = false);
+  static Pcp_LayerStackRegistryRefPtr New(const PcpLayerStackIdentifier &rootLayerStackIdentifier,
+                                          const std::string &fileFormatTarget = std::string(),
+                                          bool isUsd = false);
 
   /// Adds layers specified in \p layersToMute and removes layers
   /// specified in \p layersToUnmute from the registry's set of muted
@@ -91,34 +91,31 @@ public:
   bool Contains(const PcpLayerStackPtr &layerStack) const;
 
   /// Returns every layer stack that includes \p layer.
-  const PcpLayerStackPtrVector &
-  FindAllUsingLayer(const SdfLayerHandle &layer) const;
+  const PcpLayerStackPtrVector &FindAllUsingLayer(const SdfLayerHandle &layer) const;
 
   /// Returns every layer stack that uses the muted layer identified
   /// \p layerId, which is assumed to be a canonical muted layer
   /// identifier.
-  const PcpLayerStackPtrVector &
-  FindAllUsingMutedLayer(const std::string &layerId) const;
+  const PcpLayerStackPtrVector &FindAllUsingMutedLayer(const std::string &layerId) const;
 
   /// Returns every layer stack known to this registry.
   std::vector<PcpLayerStackPtr> GetAllLayerStacks() const;
 
   /// Runs \p fn on all layer stacks known to this registry.
-  void
-  ForEachLayerStack(const TfFunctionRef<void(const PcpLayerStackPtr &)> &fn);
+  void ForEachLayerStack(const TfFunctionRef<void(const PcpLayerStackPtr &)> &fn);
 
-private:
+ private:
   /// Private constructor -- see New().
   Pcp_LayerStackRegistry(const PcpLayerStackIdentifier &rootLayerStackId,
-                         const std::string &fileFormatTarget, bool isUsd);
+                         const std::string &fileFormatTarget,
+                         bool isUsd);
   ~Pcp_LayerStackRegistry();
 
   // Find that doesn't lock.
   PcpLayerStackPtr _Find(const PcpLayerStackIdentifier &) const;
 
   // Remove the layer stack with the given identifier from the registry.
-  void _SetLayersAndRemove(const PcpLayerStackIdentifier &,
-                           const PcpLayerStack *);
+  void _SetLayersAndRemove(const PcpLayerStackIdentifier &, const PcpLayerStack *);
 
   // Update the layer-stack-by-layer maps by setting the layers for the
   // given layer stack.
@@ -144,7 +141,7 @@ private:
   // _SetLayersAndRemove(), and _SetLayers().
   friend class PcpLayerStack;
 
-private:
+ private:
   std::unique_ptr<Pcp_LayerStackRegistryData> _data;
 };
 
@@ -153,7 +150,7 @@ private:
 /// Helper for maintaining and querying a collection of muted layers.
 ///
 class Pcp_MutedLayers {
-public:
+ public:
   const std::vector<std::string> &GetMutedLayers() const;
   void MuteAndUnmuteLayers(const SdfLayerHandle &anchorLayer,
                            std::vector<std::string> *layersToMute,
@@ -162,10 +159,10 @@ public:
                     const std::string &layerIdentifier,
                     std::string *canonicalLayerIdentifier = nullptr) const;
 
-private:
+ private:
   std::vector<std::string> _layers;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_LAYER_STACK_REGISTRY_H
+#endif  // PXR_USD_PCP_LAYER_STACK_REGISTRY_H

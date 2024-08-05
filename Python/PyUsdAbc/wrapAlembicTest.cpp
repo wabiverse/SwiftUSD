@@ -34,6 +34,5 @@ PXR_NAMESPACE_USING_DIRECTIVE
 void wrapUsdAbcAlembicTest()
 {
   def("_TestAlembic", UsdAbc_TestAlembic, arg("pathname"));
-  def("_WriteAlembic", UsdAbc_WriteAlembic,
-      (arg("srcPathname"), arg("dstPathname")));
+  def("_WriteAlembic", UsdAbc_WriteAlembic, (arg("srcPathname"), arg("dstPathname")));
 }

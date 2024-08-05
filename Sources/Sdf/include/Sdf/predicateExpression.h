@@ -85,37 +85,41 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li `isClose(100, tolerance=3.0) or negative`
 ///
 class SdfPredicateExpression {
-public:
+ public:
   /// \class FnArg
   ///
   /// Represents a function argument name and value.  Positional arguments
   /// have empty names.
-  struct FnArg 
-  {
-    static FnArg Positional(VtValue const &val) {
-        return { std::string(), val };
+  struct FnArg {
+    static FnArg Positional(VtValue const &val)
+    {
+      return {std::string(), val};
     }
-    static FnArg Keyword(std::string const &name, VtValue const &val) {
-        return { name, val };
+    static FnArg Keyword(std::string const &name, VtValue const &val)
+    {
+      return {name, val};
     }
     std::string argName;
     VtValue value;
 
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, FnArg const &arg) {
-        h.Append(arg.argName, arg.value);
+    template<class HashState> friend void TfHashAppend(HashState &h, FnArg const &arg)
+    {
+      h.Append(arg.argName, arg.value);
     }
 
-    friend bool operator==(FnArg const &l, FnArg const &r) {
-        return std::tie(l.argName, l.value) == std::tie(r.argName, r.value);
+    friend bool operator==(FnArg const &l, FnArg const &r)
+    {
+      return std::tie(l.argName, l.value) == std::tie(r.argName, r.value);
     }
-    friend bool operator!=(FnArg const &l, FnArg const &r) {
-        return !(l == r);
+    friend bool operator!=(FnArg const &l, FnArg const &r)
+    {
+      return !(l == r);
     }
 
-    friend void swap(FnArg &l, FnArg &r) {
-        swap(l.argName, r.argName);
-        swap(l.value, r.value);
+    friend void swap(FnArg &l, FnArg &r)
+    {
+      swap(l.argName, r.argName);
+      swap(l.value, r.value);
     }
   };
 
@@ -125,31 +129,29 @@ public:
   /// name, and arguments.
   struct FnCall {
     enum Kind {
-      BareCall,  ///< no-arg call like 'active'
-      ColonCall, ///< colon-separated pos args, like 'isa:Imageable'
-      ParenCall  ///< paren/comma & pos/kw args like 'foo(23, bar=baz)'
+      BareCall,   ///< no-arg call like 'active'
+      ColonCall,  ///< colon-separated pos args, like 'isa:Imageable'
+      ParenCall   ///< paren/comma & pos/kw args like 'foo(23, bar=baz)'
     };
 
     Kind kind;
     std::string funcName;
     std::vector<FnArg> args;
 
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, FnCall const &c) 
+    template<class HashState> friend void TfHashAppend(HashState &h, FnCall const &c)
     {
       h.Append(c.kind, c.funcName, c.args);
     }
 
-    friend bool operator==(FnCall const &l, FnCall const &r) 
+    friend bool operator==(FnCall const &l, FnCall const &r)
     {
-      return std::tie(l.kind, l.funcName, l.args) ==
-        std::tie(r.kind, r.funcName, r.args);
+      return std::tie(l.kind, l.funcName, l.args) == std::tie(r.kind, r.funcName, r.args);
     }
-    friend bool operator!=(FnCall const &l, FnCall const &r) 
+    friend bool operator!=(FnCall const &l, FnCall const &r)
     {
       return !(l == r);
     }
-    friend void swap(FnCall &l, FnCall &r) 
+    friend void swap(FnCall &l, FnCall &r)
     {
       auto lt = std::tie(l.kind, l.funcName, l.args);
       auto rt = std::tie(r.kind, r.funcName, r.args);
@@ -170,8 +172,7 @@ public:
   /// appears in a parse error, if one is generated.  See GetParseError().
   /// See the class documentation for details on expression syntax.
   SDF_API
-  explicit SdfPredicateExpression(std::string const &expr,
-                                  std::string const &context = {});
+  explicit SdfPredicateExpression(std::string const &expr, std::string const &context = {});
 
   /// Copy assign from another expression.
   SdfPredicateExpression &operator=(SdfPredicateExpression const &) = default;
@@ -189,7 +190,8 @@ public:
   /// Produce a new expression by combining \p left and \p right with the
   /// operator \p op.  The \p op must be one of ImpliedAnd, And, or Or.
   SDF_API
-  static SdfPredicateExpression MakeOp(Op op, SdfPredicateExpression &&left,
+  static SdfPredicateExpression MakeOp(Op op,
+                                       SdfPredicateExpression &&left,
                                        SdfPredicateExpression &&right);
 
   /// Produce a new expression containing just a the function call \p call.
@@ -226,8 +228,7 @@ public:
   ///     logic(And, 2)
   ///
   SDF_API
-  void Walk(TfFunctionRef<void(Op, int)> logic,
-            TfFunctionRef<void(FnCall const &)> call) const;
+  void Walk(TfFunctionRef<void(Op, int)> logic, TfFunctionRef<void(FnCall const &)> call) const;
 
   /// Equivalent to Walk(), except that the \p logic function is called with a
   /// const reference to the current Op stack instead of just the top of it.
@@ -235,9 +236,8 @@ public:
   /// the processing code needs to understand the context in which an Op
   /// appears.
   SDF_API
-  void WalkWithOpStack(
-      TfFunctionRef<void(std::vector<std::pair<Op, int>> const &)> logic,
-      TfFunctionRef<void(FnCall const &)> call) const;
+  void WalkWithOpStack(TfFunctionRef<void(std::vector<std::pair<Op, int>> const &)> logic,
+                       TfFunctionRef<void(FnCall const &)> call) const;
 
   /// Return a text representation of this expression that parses to the same
   /// expression.
@@ -246,60 +246,69 @@ public:
 
   /// Return true if this is the empty expression; i.e. default-constructed or
   /// constructed from a string with invalid syntax.
-  bool IsEmpty() const { return _ops.empty(); }
+  bool IsEmpty() const
+  {
+    return _ops.empty();
+  }
 
   /// Return true if this expression contains any operations, false otherwise.
-  explicit operator bool() const { return !IsEmpty(); }
+  explicit operator bool() const
+  {
+    return !IsEmpty();
+  }
 
   /// Return parsing errors as a string if this function was constructed from
   /// a string and parse errors were encountered.
-  std::string const &GetParseError() const & { return _parseError; }
+  std::string const &GetParseError() const &
+  {
+    return _parseError;
+  }
 
   /// Return parsing errors as a string if this function was constructed from
   /// a string and parse errors were encountered.
-  std::string GetParseError() const && { return _parseError; }
+  std::string GetParseError() const &&
+  {
+    return _parseError;
+  }
 
-private:
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, SdfPredicateExpression const &expr) {
-        h.Append(expr._ops, expr._calls, expr._parseError);
-    }
+ private:
+  template<class HashState>
+  friend void TfHashAppend(HashState &h, SdfPredicateExpression const &expr)
+  {
+    h.Append(expr._ops, expr._calls, expr._parseError);
+  }
 
-    friend bool
-    operator==(SdfPredicateExpression const &l,
-               SdfPredicateExpression const &r) {
-        return std::tie(l._ops, l._calls, l._parseError) ==
-               std::tie(r._ops, r._calls, r._parseError);
-    }
+  friend bool operator==(SdfPredicateExpression const &l, SdfPredicateExpression const &r)
+  {
+    return std::tie(l._ops, l._calls, l._parseError) == std::tie(r._ops, r._calls, r._parseError);
+  }
 
-    friend bool
-    operator!=(SdfPredicateExpression const &l,
-               SdfPredicateExpression const &r) {
-        return !(l == r);
-    }
+  friend bool operator!=(SdfPredicateExpression const &l, SdfPredicateExpression const &r)
+  {
+    return !(l == r);
+  }
 
-    SDF_API
-    friend std::ostream &
-    operator<<(std::ostream &, SdfPredicateExpression const &);
+  SDF_API
+  friend std::ostream &operator<<(std::ostream &, SdfPredicateExpression const &);
 
-    // The expression is represented in function-call style, but *in reverse* to
-    // facilitate efficient assembly.  For example, an expression like "a and b"
-    // would be represented as { Call(b), Call(a), And } rather than { And,
-    // Call(a), Call(b) }.  This way, joining two expressions like "a" 'and' "b"
-    // can be done by appending to a vector, avoiding having to shift all the
-    // elements down to insert the new operation at the head.  See the
-    // implementation of Walk() for guidance.
-    std::vector<Op> _ops;
+  // The expression is represented in function-call style, but *in reverse* to
+  // facilitate efficient assembly.  For example, an expression like "a and b"
+  // would be represented as { Call(b), Call(a), And } rather than { And,
+  // Call(a), Call(b) }.  This way, joining two expressions like "a" 'and' "b"
+  // can be done by appending to a vector, avoiding having to shift all the
+  // elements down to insert the new operation at the head.  See the
+  // implementation of Walk() for guidance.
+  std::vector<Op> _ops;
 
-    // On the contrary, the elements in _calls are in forward-order, so the last
-    // Call in _ops corresponds to the first element of _calls.
-    std::vector<FnCall> _calls;
+  // On the contrary, the elements in _calls are in forward-order, so the last
+  // Call in _ops corresponds to the first element of _calls.
+  std::vector<FnCall> _calls;
 
-    // This member holds a parsing error string if this expression was
-    // constructed by the parser and errors were encountered during the parsing.
-    std::string _parseError;
+  // This member holds a parsing error string if this expression was
+  // constructed by the parser and errors were encountered during the parsing.
+  std::string _parseError;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PREDICATE_EXPRESSION_H
+#endif  // PXR_USD_SDF_PREDICATE_EXPRESSION_H

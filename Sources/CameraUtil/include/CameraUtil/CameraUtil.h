@@ -7,4 +7,4 @@
 #include <CameraUtil/framing.h>
 #include <CameraUtil/screenWindowParameters.h>
 
-#endif // __PXR_USD_CAMERA_UTIL_H__
+#endif  // __PXR_USD_CAMERA_UTIL_H__

@@ -35,11 +35,15 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Str(const PcpMapExpression &e) { return e.GetString(); }
+static string _Str(const PcpMapExpression &e)
+{
+  return e.GetString();
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapMapExpression() {
+void wrapMapExpression()
+{
   typedef PcpMapExpression This;
 
   class_<This>("MapExpression")
@@ -52,15 +56,13 @@ void wrapMapExpression() {
       .staticmethod("Constant")
       .def("Inverse", &This::Inverse, return_value_policy<return_by_value>())
       .staticmethod("Inverse")
-      .def("AddRootIdentity", &This::AddRootIdentity,
-           return_value_policy<return_by_value>())
+      .def("AddRootIdentity", &This::AddRootIdentity, return_value_policy<return_by_value>())
       .def("Compose", &This::Compose, return_value_policy<return_by_value>())
       .def("MapSourceToTarget", &This::MapSourceToTarget, (arg("path")))
       .def("MapTargetToSource", &This::MapTargetToSource, (arg("path")))
 
       .add_property("timeOffset",
-                    make_function(&This::GetTimeOffset,
-                                  return_value_policy<return_by_value>()))
+                    make_function(&This::GetTimeOffset, return_value_policy<return_by_value>()))
       .add_property("isIdentity", &This::IsIdentity)
       .add_property("isNull", &This::IsNull);
 }

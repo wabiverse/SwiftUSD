@@ -33,22 +33,31 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 SdfLayerTreeHandle SdfLayerTree::New(const SdfLayerHandle &layer,
                                      const SdfLayerTreeHandleVector &childTrees,
-                                     const SdfLayerOffset &cumulativeOffset) {
+                                     const SdfLayerOffset &cumulativeOffset)
+{
   return TfCreateRefPtr(new SdfLayerTree(layer, childTrees, cumulativeOffset));
 }
 
 SdfLayerTree::SdfLayerTree(const SdfLayerHandle &layer,
                            const SdfLayerTreeHandleVector &childTrees,
                            const SdfLayerOffset &cumulativeOffset)
-    : _layer(layer), _offset(cumulativeOffset), _childTrees(childTrees) {
+    : _layer(layer), _offset(cumulativeOffset), _childTrees(childTrees)
+{
   // Do nothing
 }
 
-const SdfLayerHandle &SdfLayerTree::GetLayer() const { return _layer; }
+const SdfLayerHandle &SdfLayerTree::GetLayer() const
+{
+  return _layer;
+}
 
-const SdfLayerOffset &SdfLayerTree::GetOffset() const { return _offset; }
+const SdfLayerOffset &SdfLayerTree::GetOffset() const
+{
+  return _offset;
+}
 
-const SdfLayerTreeHandleVector &SdfLayerTree::GetChildTrees() const {
+const SdfLayerTreeHandleVector &SdfLayerTree::GetChildTrees() const
+{
   return _childTrees;
 }
 

@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_CMDS_H
 #define PXR_IMAGING_HGI_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include <memory>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ using HgiCmdsUniquePtr = std::unique_ptr<class HgiCmds>;
 /// Graphics commands are recorded in 'cmds' objects which are later submitted
 /// to hgi. HgiCmds is the base class for other cmds objects.
 ///
-class HgiCmds
-{
-public:
+class HgiCmds {
+ public:
   HGI_API
   virtual ~HgiCmds();
 
@@ -50,7 +49,7 @@ public:
   HGI_API
   bool IsSubmitted() const;
 
-protected:
+ protected:
   friend class Hgi;
 
   HGI_API
@@ -66,7 +65,7 @@ protected:
   HGI_API
   void _SetSubmitted();
 
-private:
+ private:
   HgiCmds &operator=(const HgiCmds &) = delete;
   HgiCmds(const HgiCmds &) = delete;
 

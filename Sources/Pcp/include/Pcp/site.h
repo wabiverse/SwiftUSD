@@ -43,7 +43,7 @@ class PcpLayerStackSite;
 /// A site specifies a path in a layer stack of scene description.
 ///
 class PcpSite {
-public:
+ public:
   PcpLayerStackIdentifier layerStackIdentifier;
   SdfPath path;
 
@@ -62,16 +62,28 @@ public:
   PCP_API
   bool operator==(const PcpSite &rhs) const;
 
-  bool operator!=(const PcpSite &rhs) const { return !(*this == rhs); }
+  bool operator!=(const PcpSite &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   PCP_API
   bool operator<(const PcpSite &rhs) const;
 
-  bool operator<=(const PcpSite &rhs) const { return !(rhs < *this); }
+  bool operator<=(const PcpSite &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
-  bool operator>(const PcpSite &rhs) const { return rhs < *this; }
+  bool operator>(const PcpSite &rhs) const
+  {
+    return rhs < *this;
+  }
 
-  bool operator>=(const PcpSite &rhs) const { return !(*this < rhs); }
+  bool operator>=(const PcpSite &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   struct Hash {
     PCP_API
@@ -84,7 +96,7 @@ public:
 /// A site specifies a path in a layer stack of scene description.
 ///
 class PcpLayerStackSite {
-public:
+ public:
   PcpLayerStackRefPtr layerStack;
   SdfPath path;
 
@@ -97,18 +109,28 @@ public:
   PCP_API
   bool operator==(const PcpLayerStackSite &rhs) const;
 
-  bool operator!=(const PcpLayerStackSite &rhs) const {
+  bool operator!=(const PcpLayerStackSite &rhs) const
+  {
     return !(*this == rhs);
   }
 
   PCP_API
   bool operator<(const PcpLayerStackSite &rhs) const;
 
-  bool operator<=(const PcpLayerStackSite &rhs) const { return !(rhs < *this); }
+  bool operator<=(const PcpLayerStackSite &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
-  bool operator>(const PcpLayerStackSite &rhs) const { return rhs < *this; }
+  bool operator>(const PcpLayerStackSite &rhs) const
+  {
+    return rhs < *this;
+  }
 
-  bool operator>=(const PcpLayerStackSite &rhs) const { return !(*this < rhs); }
+  bool operator>=(const PcpLayerStackSite &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   struct Hash {
     PCP_API
@@ -121,14 +143,16 @@ std::ostream &operator<<(std::ostream &, const PcpSite &);
 PCP_API
 std::ostream &operator<<(std::ostream &, const PcpLayerStackSite &);
 
-static inline size_t hash_value(const PcpSite &site) {
+static inline size_t hash_value(const PcpSite &site)
+{
   return PcpSite::Hash()(site);
 }
 
-static inline size_t hash_value(const PcpLayerStackSite &site) {
+static inline size_t hash_value(const PcpLayerStackSite &site)
+{
   return PcpLayerStackSite::Hash()(site);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_SITE_H
+#endif  // PXR_USD_PCP_SITE_H

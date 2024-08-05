@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_BPRIM_H
 #define PXR_IMAGING_HD_BPRIM_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/types.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/path.h"
 
@@ -53,45 +53,46 @@ class HdRenderParam;
 /// Dependent on the state of any other prim.
 ///
 /// The most typical use of a Bprim would be a Texture.
-class HdBprim
-{
-public:
-    HD_API
-    HdBprim(SdfPath const & id);
-    HD_API
-    virtual ~HdBprim();
+class HdBprim {
+ public:
+  HD_API
+  HdBprim(SdfPath const &id);
+  HD_API
+  virtual ~HdBprim();
 
-    /// Returns the identifier by which this buffer is known. This
-    /// identifier is a common associative key used by the SceneDelegate,
-    /// RenderIndex, and for binding to the buffer
-    SdfPath const& GetId() const { return _id; }
+  /// Returns the identifier by which this buffer is known. This
+  /// identifier is a common associative key used by the SceneDelegate,
+  /// RenderIndex, and for binding to the buffer
+  SdfPath const &GetId() const
+  {
+    return _id;
+  }
 
-    /// Synchronizes state from the delegate to this object.
-    /// @param[in, out]  dirtyBits: On input specifies which state is
-    ///                             is dirty and can be pulled from the scene
-    ///                             delegate.
-    ///                             On output specifies which bits are still
-    ///                             dirty and were not cleaned by the sync. 
-    ///                             
-    virtual void Sync(HdSceneDelegate *sceneDelegate,
-                      HdRenderParam   *renderParam,
-                      HdDirtyBits     *dirtyBits) = 0;
+  /// Synchronizes state from the delegate to this object.
+  /// @param[in, out]  dirtyBits: On input specifies which state is
+  ///                             is dirty and can be pulled from the scene
+  ///                             delegate.
+  ///                             On output specifies which bits are still
+  ///                             dirty and were not cleaned by the sync.
+  ///
+  virtual void Sync(HdSceneDelegate *sceneDelegate,
+                    HdRenderParam *renderParam,
+                    HdDirtyBits *dirtyBits) = 0;
 
-    /// Finalizes object resources. This function might not delete resources,
-    /// but it should deal with resource ownership so that the sprim is
-    /// deletable.
-    HD_API
-    virtual void Finalize(HdRenderParam *renderParam);
+  /// Finalizes object resources. This function might not delete resources,
+  /// but it should deal with resource ownership so that the sprim is
+  /// deletable.
+  HD_API
+  virtual void Finalize(HdRenderParam *renderParam);
 
-    /// Returns the minimal set of dirty bits to place in the
-    /// change tracker for use in the first sync of this prim.
-    /// Typically this would be all dirty bits.
-    virtual HdDirtyBits GetInitialDirtyBitsMask() const = 0;
+  /// Returns the minimal set of dirty bits to place in the
+  /// change tracker for use in the first sync of this prim.
+  /// Typically this would be all dirty bits.
+  virtual HdDirtyBits GetInitialDirtyBitsMask() const = 0;
 
-private:
-    SdfPath _id;
+ private:
+  SdfPath _id;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

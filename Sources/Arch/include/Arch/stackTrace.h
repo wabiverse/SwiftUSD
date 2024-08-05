@@ -65,7 +65,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// because we are trying to use only async-safe function from here on and
 /// malloc() is not async-safe.
 ARCH_API
-void ArchLogFatalProcessState(const char *reason, const char *message = nullptr,
+void ArchLogFatalProcessState(const char *reason,
+                              const char *message = nullptr,
                               const char *extraLogMsg = nullptr);
 
 /// Dumps call-stack info to a file, and prints an informative message.
@@ -150,7 +151,8 @@ void ArchLogSessionInfo(const char *crashStackTrace = NULL);
 ///
 /// \sa ArchLogSessionInfo
 ARCH_API
-void ArchSetLogSession(const char *command, const char *const argv[],
+void ArchSetLogSession(const char *command,
+                       const char *const argv[],
                        const char *const crashArgv[]);
 
 /// Register the callback to invoke logging at end of a successful session.
@@ -162,8 +164,7 @@ void ArchEnableSessionLogging();
 
 /// Print a stack trace to the given FILE pointer.
 ARCH_API
-void ArchPrintStackTrace(FILE *fout, const std::string &programName,
-                         const std::string &reason);
+void ArchPrintStackTrace(FILE *fout, const std::string &programName, const std::string &reason);
 
 /// Print a stack trace to the given FILE pointer.
 /// This function uses ArchGetProgramInfoForErrors as the \c programName.
@@ -174,7 +175,8 @@ void ArchPrintStackTrace(FILE *fout, const std::string &reason);
 /// Print a stack trace to the given ostream.
 /// \overload
 ARCH_API
-void ArchPrintStackTrace(std::ostream &out, const std::string &programName,
+void ArchPrintStackTrace(std::ostream &out,
+                         const std::string &programName,
                          const std::string &reason);
 
 /// Print a stack trace to the given ostream.
@@ -232,8 +234,7 @@ const char *ArchGetProgramNameForErrors();
 /// Sets additional program info to be reported to the terminal in case of a
 /// fatal error.
 ARCH_API
-void ArchSetProgramInfoForErrors(const std::string &key,
-                                 const std::string &value);
+void ArchSetProgramInfoForErrors(const std::string &key, const std::string &value);
 
 /// Returns currently set program info.
 /// \see ArchSetExtraLogInfoForErrors
@@ -248,8 +249,7 @@ std::string ArchGetProgramInfoForErrors(const std::string &key);
 /// and not mutated until replacing or removing it by invoking this function
 /// again with the same \p key and different \p lines.
 ARCH_API
-void ArchSetExtraLogInfoForErrors(const std::string &key,
-                                  std::vector<std::string> const *lines);
+void ArchSetExtraLogInfoForErrors(const std::string &key, std::vector<std::string> const *lines);
 
 /// Logs a stack trace to a file in /var/tmp.
 ///
@@ -262,8 +262,10 @@ void ArchSetExtraLogInfoForErrors(const std::string &key,
 /// written to.  And if \c fatal is true, then the stack trace will  be added
 /// to the stack_trace database table.
 ARCH_API
-void ArchLogStackTrace(const std::string &progName, const std::string &reason,
-                       bool fatal = false, const std::string &sessionLog = "");
+void ArchLogStackTrace(const std::string &progName,
+                       const std::string &reason,
+                       bool fatal = false,
+                       const std::string &sessionLog = "");
 
 /// Logs a stack trace to a file in /var/tmp.
 ///
@@ -276,7 +278,8 @@ void ArchLogStackTrace(const std::string &progName, const std::string &reason,
 /// written to.  And if \c fatal is true, then the stack trace will  be added
 /// to the stack_trace database table.
 ARCH_API
-void ArchLogStackTrace(const std::string &reason, bool fatal = false,
+void ArchLogStackTrace(const std::string &reason,
+                       bool fatal = false,
                        const std::string &sessionLog = "");
 
 /// Return stack trace.
@@ -305,15 +308,15 @@ size_t ArchGetStackFrames(size_t maxDepth, uintptr_t *frames);
 /// frames.  The first frame will be at depth \p numFramesToSkipAtTop and the
 /// last at depth \p numFramesToSkipAtTop + \p maxDepth - 1.
 ARCH_API
-void ArchGetStackFrames(size_t maxDepth, size_t numFramesToSkipAtTop,
+void ArchGetStackFrames(size_t maxDepth,
+                        size_t numFramesToSkipAtTop,
                         std::vector<uintptr_t> *frames);
 
 /// Store at most \p maxDepth frames of the current stack into \p frames,
 /// skipping the first \p numFramesToSkipAtTop frames.  Return the number of
 /// stack frames written to \p frames.
 ARCH_API
-size_t ArchGetStackFrames(size_t maxDepth, size_t numFramesToSkipAtTop,
-                          uintptr_t *frames);
+size_t ArchGetStackFrames(size_t maxDepth, size_t numFramesToSkipAtTop, uintptr_t *frames);
 
 /// Print stack frames to the given ostream.
 ARCH_API
@@ -339,21 +342,23 @@ typedef void (*ArchCrashHandlerSystemCB)(void *userData);
 /// and exec if available so should not generally be used except following a
 /// catastrophe.
 ARCH_API
-int ArchCrashHandlerSystemv(const char *pathname, char *const argv[],
-                            int timeout, ArchCrashHandlerSystemCB callback,
+int ArchCrashHandlerSystemv(const char *pathname,
+                            char *const argv[],
+                            int timeout,
+                            ArchCrashHandlerSystemCB callback,
                             void *userData);
 
 #if defined(ARCH_OS_DARWIN)
 // macOS has no ETIME. ECANCELED seems to have about the closest meaning to
 // the actual error here. The operation is timing out, not being explicitly
 // canceled, but it is canceled.
-#ifndef ETIME
-#define ETIME ECANCELED
-#endif // end ETIME
-#endif // end ARCH_OS_DARWIN
+#  ifndef ETIME
+#    define ETIME ECANCELED
+#  endif  // end ETIME
+#endif    // end ARCH_OS_DARWIN
 
 ///@}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_STACK_TRACE_H
+#endif  // PXR_BASE_ARCH_STACK_TRACE_H

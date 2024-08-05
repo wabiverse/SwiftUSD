@@ -56,24 +56,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 // thread-safety issues can be fixed, specifically plugin loading:
 // - FileFormat plugins
 // - value type plugins for parsing AnimSplines
-TF_DEFINE_ENV_SETTING(PCP_ENABLE_PARALLEL_LAYER_PREFETCH, true,
+TF_DEFINE_ENV_SETTING(PCP_ENABLE_PARALLEL_LAYER_PREFETCH,
+                      true,
                       "Enables parallel, threaded pre-fetch of sublayers.");
 
-TF_DEFINE_ENV_SETTING(
-    PCP_DISABLE_TIME_SCALING_BY_LAYER_TCPS, false,
-    "Disables automatic layer offset scaling from time codes per second "
-    "metadata in layers.");
+TF_DEFINE_ENV_SETTING(PCP_DISABLE_TIME_SCALING_BY_LAYER_TCPS,
+                      false,
+                      "Disables automatic layer offset scaling from time codes per second "
+                      "metadata in layers.");
 
-bool PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled() {
+bool PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled()
+{
   return TfGetEnvSetting(PCP_DISABLE_TIME_SCALING_BY_LAYER_TCPS);
 }
 
 struct Pcp_SublayerInfo {
   Pcp_SublayerInfo() = default;
-  Pcp_SublayerInfo(const SdfLayerRefPtr &layer_, const SdfLayerOffset &offset_,
+  Pcp_SublayerInfo(const SdfLayerRefPtr &layer_,
+                   const SdfLayerOffset &offset_,
                    double timeCodesPerSecond_)
-      : layer(layer_), offset(offset_),
-        timeCodesPerSecond(timeCodesPerSecond_) {}
+      : layer(layer_), offset(offset_), timeCodesPerSecond(timeCodesPerSecond_)
+  {
+  }
   SdfLayerRefPtr layer;
   SdfLayerOffset offset;
   double timeCodesPerSecond;
@@ -82,24 +86,26 @@ typedef std::vector<Pcp_SublayerInfo> Pcp_SublayerInfoVector;
 
 // Desired strict weak ordering.
 class Pcp_SublayerOrdering {
-public:
-  Pcp_SublayerOrdering(const std::string &sessionOwner)
-      : _sessionOwner(sessionOwner) {
+ public:
+  Pcp_SublayerOrdering(const std::string &sessionOwner) : _sessionOwner(sessionOwner)
+  {
     // Do nothing
   }
 
   // Returns true if a's layer has an owner equal to _sessionOwner.
-  bool IsOwned(const Pcp_SublayerInfo &a) const {
+  bool IsOwned(const Pcp_SublayerInfo &a) const
+  {
     return a.layer->HasOwner() && a.layer->GetOwner() == _sessionOwner;
   }
 
   // If one layer has the owner and the other does not then the one with
   // the owner is less than the other.  Otherwise the layers are equivalent.
-  bool operator()(const Pcp_SublayerInfo &a, const Pcp_SublayerInfo &b) const {
+  bool operator()(const Pcp_SublayerInfo &a, const Pcp_SublayerInfo &b) const
+  {
     return IsOwned(a) && !IsOwned(b);
   }
 
-private:
+ private:
   std::string _sessionOwner;
 };
 
@@ -107,7 +113,8 @@ static void _ApplyOwnedSublayerOrder(const PcpLayerStackIdentifier &identifier,
                                      const SdfLayerHandle &layer,
                                      const std::string &sessionOwner,
                                      Pcp_SublayerInfoVector *subtrees,
-                                     PcpErrorVector *errors) {
+                                     PcpErrorVector *errors)
+{
   // Reorder the given sublayers to give (opinion) priority to the sublayer
   // belonging to the session owner, if any.
   //
@@ -143,13 +150,12 @@ static void _ApplyOwnedSublayerOrder(const PcpLayerStackIdentifier &identifier,
       // The first layer is owned.  Get the range of layers that are
       // owned.
       Pcp_SublayerInfoVector::iterator first = subtrees->begin();
-      Pcp_SublayerInfoVector::iterator last =
-          std::upper_bound(first, subtrees->end(), *first, ordering);
+      Pcp_SublayerInfoVector::iterator last = std::upper_bound(
+          first, subtrees->end(), *first, ordering);
 
       // Report an error if more than one layer is owned.
       if (std::distance(first, last) > 1) {
-        PcpErrorInvalidSublayerOwnershipPtr error =
-            PcpErrorInvalidSublayerOwnership::New();
+        PcpErrorInvalidSublayerOwnershipPtr error = PcpErrorInvalidSublayerOwnership::New();
         error->rootSite = PcpSite(identifier, SdfPath::AbsoluteRootPath());
         error->owner = sessionOwner;
         error->layer = layer;
@@ -162,23 +168,25 @@ static void _ApplyOwnedSublayerOrder(const PcpLayerStackIdentifier &identifier,
   }
 }
 
-static bool _IsValidRelocatesPath(SdfPath const &path) {
+static bool _IsValidRelocatesPath(SdfPath const &path)
+{
   return path.IsPrimPath() && !path.ContainsPrimVariantSelection();
 }
 
-void Pcp_ComputeRelocationsForLayerStack(
-    const SdfLayerRefPtrVector &layers,
-    SdfRelocatesMap *relocatesSourceToTarget,
-    SdfRelocatesMap *relocatesTargetToSource,
-    SdfRelocatesMap *incrementalRelocatesSourceToTarget,
-    SdfRelocatesMap *incrementalRelocatesTargetToSource,
-    SdfPathVector *relocatesPrimPaths) {
+void Pcp_ComputeRelocationsForLayerStack(const SdfLayerRefPtrVector &layers,
+                                         SdfRelocatesMap *relocatesSourceToTarget,
+                                         SdfRelocatesMap *relocatesTargetToSource,
+                                         SdfRelocatesMap *incrementalRelocatesSourceToTarget,
+                                         SdfRelocatesMap *incrementalRelocatesTargetToSource,
+                                         SdfPathVector *relocatesPrimPaths)
+{
   TRACE_FUNCTION();
 
   // Compose authored relocation arcs per prim path.
   std::map<SdfPath, SdfRelocatesMap> relocatesPerPrim;
   static const TfToken field = SdfFieldKeys->Relocates;
-  TF_REVERSE_FOR_ALL(layer, layers) {
+  TF_REVERSE_FOR_ALL(layer, layers)
+  {
     if (!(*layer)->GetHints().mightHaveRelocates) {
       continue;
     }
@@ -190,7 +198,10 @@ void Pcp_ComputeRelocationsForLayerStack(
       SdfPrimSpecHandle prim = stack.back();
       stack.pop_back();
       // Push back any children.
-      TF_FOR_ALL(child, prim->GetNameChildren()) { stack.push_back(*child); }
+      TF_FOR_ALL(child, prim->GetNameChildren())
+      {
+        stack.push_back(*child);
+      }
       // Check for relocations.
       if (!prim->HasField(field)) {
         // No opinion in this layer.
@@ -198,16 +209,18 @@ void Pcp_ComputeRelocationsForLayerStack(
       }
       const VtValue &fieldValue = prim->GetField(field);
       if (!fieldValue.IsHolding<SdfRelocatesMap>()) {
-        TF_CODING_ERROR("Field '%s' in <%s> in layer @%s@"
-                        "does not contain an SdfRelocatesMap",
-                        field.GetText(), prim->GetPath().GetText(),
-                        (*layer)->GetIdentifier().c_str());
+        TF_CODING_ERROR(
+            "Field '%s' in <%s> in layer @%s@"
+            "does not contain an SdfRelocatesMap",
+            field.GetText(),
+            prim->GetPath().GetText(),
+            (*layer)->GetIdentifier().c_str());
         continue;
       }
       const SdfPath &primPath = prim->GetPath();
-      const SdfRelocatesMap &relocMap =
-          fieldValue.UncheckedGet<SdfRelocatesMap>();
-      TF_FOR_ALL(reloc, relocMap) {
+      const SdfRelocatesMap &relocMap = fieldValue.UncheckedGet<SdfRelocatesMap>();
+      TF_FOR_ALL(reloc, relocMap)
+      {
         // Absolutize source/target paths.
         SdfPath source = reloc->first.MakeAbsolutePath(primPath);
         SdfPath target = reloc->second.MakeAbsolutePath(primPath);
@@ -221,15 +234,19 @@ void Pcp_ComputeRelocationsForLayerStack(
         // warning in this case.  If we introduce a path to
         // emit PcpErrors in this code, we'd use it here too.
         if (!_IsValidRelocatesPath(source)) {
-          TF_WARN("Ignoring invalid relocate source "
-                  "path <%s> in layer @%s@",
-                  source.GetText(), (*layer)->GetIdentifier().c_str());
+          TF_WARN(
+              "Ignoring invalid relocate source "
+              "path <%s> in layer @%s@",
+              source.GetText(),
+              (*layer)->GetIdentifier().c_str());
           continue;
         }
         if (!_IsValidRelocatesPath(target)) {
-          TF_WARN("Ignoring invalid relocate target "
-                  "path <%s> in layer @%s@",
-                  target.GetText(), (*layer)->GetIdentifier().c_str());
+          TF_WARN(
+              "Ignoring invalid relocate target "
+              "path <%s> in layer @%s@",
+              target.GetText(),
+              (*layer)->GetIdentifier().c_str());
           continue;
         }
 
@@ -249,7 +266,8 @@ void Pcp_ComputeRelocationsForLayerStack(
           //      formal PcpError for this case.  Perhaps
           //      we can do this when removing the
           //      non-Pcp-mode composition code from Csd.
-        } else {
+        }
+        else {
           relocatesPerPrim[primPath][source] = target;
         }
       }
@@ -261,8 +279,10 @@ void Pcp_ComputeRelocationsForLayerStack(
   // Compose the final set of relocation arcs for this layer stack,
   // taking into account the cumulative effect of relocations down
   // namespace.
-  TF_FOR_ALL(relocatesForPath, relocatesPerPrim) {
-    TF_FOR_ALL(reloc, relocatesForPath->second) {
+  TF_FOR_ALL(relocatesForPath, relocatesPerPrim)
+  {
+    TF_FOR_ALL(reloc, relocatesForPath->second)
+    {
       SdfPath source = reloc->first;
       const SdfPath &target = reloc->second;
 
@@ -295,7 +315,8 @@ void Pcp_ComputeRelocationsForLayerStack(
 }
 
 static PcpMapFunction _FilterRelocationsForPath(const PcpLayerStack &layerStack,
-                                                const SdfPath &path) {
+                                                const SdfPath &path)
+{
   // Gather the relocations that affect this path.
   PcpMapFunction::PathMap siteRelocates;
 
@@ -307,19 +328,20 @@ static PcpMapFunction _FilterRelocationsForPath(const PcpLayerStack &layerStack,
   std::unordered_set<SdfPath, SdfPath::Hash> seenTargets;
 
   const SdfRelocatesMap &relocates = layerStack.GetRelocatesSourceToTarget();
-  for (SdfRelocatesMap::const_iterator i = relocates.lower_bound(path),
-                                       n = relocates.end();
-       (i != n) && (i->first.HasPrefix(path)); ++i) {
+  for (SdfRelocatesMap::const_iterator i = relocates.lower_bound(path), n = relocates.end();
+       (i != n) && (i->first.HasPrefix(path));
+       ++i)
+  {
     siteRelocates.insert(*i);
     seenTargets.insert(i->second);
   }
 
-  const SdfRelocatesMap &incrementalRelocates =
-      layerStack.GetIncrementalRelocatesSourceToTarget();
-  for (SdfRelocatesMap::const_iterator
-           i = incrementalRelocates.lower_bound(path),
-           n = incrementalRelocates.end();
-       (i != n) && (i->first.HasPrefix(path)); ++i) {
+  const SdfRelocatesMap &incrementalRelocates = layerStack.GetIncrementalRelocatesSourceToTarget();
+  for (SdfRelocatesMap::const_iterator i = incrementalRelocates.lower_bound(path),
+                                       n = incrementalRelocates.end();
+       (i != n) && (i->first.HasPrefix(path));
+       ++i)
+  {
 
     if (seenTargets.find(i->second) == seenTargets.end()) {
       siteRelocates.insert(*i);
@@ -335,10 +357,9 @@ static PcpMapFunction _FilterRelocationsForPath(const PcpLayerStack &layerStack,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool Pcp_NeedToRecomputeDueToAssetPathChange(
-    const PcpLayerStackPtr &layerStack) {
-  ArResolverContextBinder binder(
-      layerStack->GetIdentifier().pathResolverContext);
+bool Pcp_NeedToRecomputeDueToAssetPathChange(const PcpLayerStackPtr &layerStack)
+{
+  ArResolverContextBinder binder(layerStack->GetIdentifier().pathResolverContext);
 
   // Iterate through _sublayerSourceInfo to see if recomputing the
   // asset paths used to open sublayers would result in different
@@ -362,15 +383,15 @@ bool Pcp_NeedToRecomputeDueToAssetPathChange(
 // 3. Authored session framesPerSecond
 // 4. Authored root framesPerSecond
 // 5. SdfSchema fallback.
-static bool _ShouldUseSessionTcps(const SdfLayerHandle &sessionLyr,
-                                  const SdfLayerHandle &rootLyr) {
+static bool _ShouldUseSessionTcps(const SdfLayerHandle &sessionLyr, const SdfLayerHandle &rootLyr)
+{
   return sessionLyr && (sessionLyr->HasTimeCodesPerSecond() ||
-                        (!rootLyr->HasTimeCodesPerSecond() &&
-                         sessionLyr->HasFramesPerSecond()));
+                        (!rootLyr->HasTimeCodesPerSecond() && sessionLyr->HasFramesPerSecond()));
 }
 
-bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(
-    const PcpLayerStackPtr &layerStack, const SdfLayerHandle &changedLayer) {
+bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(const PcpLayerStackPtr &layerStack,
+                                                     const SdfLayerHandle &changedLayer)
+{
   const SdfLayerHandle &sessionLayer = layerStack->GetIdentifier().sessionLayer;
   const SdfLayerHandle &rootLayer = layerStack->GetIdentifier().rootLayer;
 
@@ -384,10 +405,9 @@ bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(
   // from either the session or root layer depending on what's
   // authored. We use the same logic here as we do in
   // PcpLayerStack::_Compute.
-  const double newLayerStackTcps =
-      _ShouldUseSessionTcps(sessionLayer, rootLayer)
-          ? sessionLayer->GetTimeCodesPerSecond()
-          : rootLayer->GetTimeCodesPerSecond();
+  const double newLayerStackTcps = _ShouldUseSessionTcps(sessionLayer, rootLayer) ?
+                                       sessionLayer->GetTimeCodesPerSecond() :
+                                       rootLayer->GetTimeCodesPerSecond();
 
   // The layer stack's overall TCPS is cached so if it doesn't match, we
   // need to recompute the layer stack.
@@ -399,10 +419,10 @@ bool Pcp_NeedToRecomputeLayerStackTimeCodesPerSecond(
 
 PcpLayerStack::PcpLayerStack(const PcpLayerStackIdentifier &identifier,
                              const Pcp_LayerStackRegistry &registry)
-    : _identifier(identifier), _expressionVariables([&identifier, &registry]() {
+    : _identifier(identifier),
+      _expressionVariables([&identifier, &registry]() {
         const PcpLayerStackIdentifier &selfId = identifier;
-        const PcpLayerStackIdentifier &rootLayerStackId =
-            registry._GetRootLayerStackIdentifier();
+        const PcpLayerStackIdentifier &rootLayerStackId = registry._GetRootLayerStackIdentifier();
 
         // Optimization: If the layer stack providing expression variable
         // overrides has already been computed, use its expression variables
@@ -412,34 +432,30 @@ PcpLayerStack::PcpLayerStack(const PcpLayerStackIdentifier &identifier,
         // Otherwise, we need to take a slower code path that computes
         // the full chain of overrides.
         const PcpLayerStackIdentifier &overrideLayerStackId =
-            selfId.expressionVariablesOverrideSource
-                .ResolveLayerStackIdentifier(rootLayerStackId);
+            selfId.expressionVariablesOverrideSource.ResolveLayerStackIdentifier(rootLayerStackId);
 
-        const PcpLayerStackPtr overrideLayerStack =
-            overrideLayerStackId != selfId ? registry.Find(overrideLayerStackId)
-                                           : TfNullPtr;
+        const PcpLayerStackPtr overrideLayerStack = overrideLayerStackId != selfId ?
+                                                        registry.Find(overrideLayerStackId) :
+                                                        TfNullPtr;
 
         PcpExpressionVariables composedExpressionVars;
 
         if (overrideLayerStack) {
           composedExpressionVars = PcpExpressionVariables::Compute(
-              selfId, rootLayerStackId,
-              &overrideLayerStack->GetExpressionVariables());
+              selfId, rootLayerStackId, &overrideLayerStack->GetExpressionVariables());
 
           // Optimization: If the composed expression variables for this
           // layer stack are the same as those in the overriding layer
           // stack, just share their PcpExpressionVariables object.
-          if (composedExpressionVars ==
-              overrideLayerStack->GetExpressionVariables()) {
+          if (composedExpressionVars == overrideLayerStack->GetExpressionVariables()) {
             return overrideLayerStack->_expressionVariables;
           }
-        } else {
-          composedExpressionVars =
-              PcpExpressionVariables::Compute(selfId, rootLayerStackId);
+        }
+        else {
+          composedExpressionVars = PcpExpressionVariables::Compute(selfId, rootLayerStackId);
         }
 
-        return std::make_shared<PcpExpressionVariables>(
-            std::move(composedExpressionVars));
+        return std::make_shared<PcpExpressionVariables>(std::move(composedExpressionVars));
       }()),
       _isUsd(registry._IsUsd())
 
@@ -458,14 +474,17 @@ PcpLayerStack::PcpLayerStack(const PcpLayerStackIdentifier &identifier,
   _Compute(registry._GetFileFormatTarget(), registry._GetMutedLayers());
 
   if (!_isUsd) {
-    Pcp_ComputeRelocationsForLayerStack(
-        _layers, &_relocatesSourceToTarget, &_relocatesTargetToSource,
-        &_incrementalRelocatesSourceToTarget,
-        &_incrementalRelocatesTargetToSource, &_relocatesPrimPaths);
+    Pcp_ComputeRelocationsForLayerStack(_layers,
+                                        &_relocatesSourceToTarget,
+                                        &_relocatesTargetToSource,
+                                        &_incrementalRelocatesSourceToTarget,
+                                        &_incrementalRelocatesTargetToSource,
+                                        &_relocatesPrimPaths);
   }
 }
 
-PcpLayerStack::~PcpLayerStack() {
+PcpLayerStack::~PcpLayerStack()
+{
   // Update layer-stack-to-layer maps in the registry.
   _BlowLayers();
   if (_registry) {
@@ -473,8 +492,8 @@ PcpLayerStack::~PcpLayerStack() {
   }
 }
 
-void PcpLayerStack::Apply(const PcpLayerStackChanges &changes,
-                          PcpLifeboat *lifeboat) {
+void PcpLayerStack::Apply(const PcpLayerStackChanges &changes, PcpLifeboat *lifeboat)
+{
   // Invalidate the layer stack as necessary, recomputing immediately.
   // Recomputing immediately assists optimal change processing --
   // e.g. it lets us examine the before/after change to relocations.
@@ -482,64 +501,61 @@ void PcpLayerStack::Apply(const PcpLayerStackChanges &changes,
   // Update expression variables if necessary. This needs to be done up front
   // since they may be needed when computing the full layer stack.
   if (changes.didChangeSignificantly || changes.didChangeExpressionVariables ||
-      changes._didChangeExpressionVariablesSource) {
+      changes._didChangeExpressionVariablesSource)
+  {
 
-    const auto updateExpressionVariables =
-        [&](const VtDictionary &newExprVars,
-            const PcpExpressionVariablesSource &newSource) {
-          const PcpLayerStackIdentifier &newSourceId =
-              newSource.ResolveLayerStackIdentifier(
-                  _registry->_GetRootLayerStackIdentifier());
+    const auto updateExpressionVariables = [&](const VtDictionary &newExprVars,
+                                               const PcpExpressionVariablesSource &newSource) {
+      const PcpLayerStackIdentifier &newSourceId = newSource.ResolveLayerStackIdentifier(
+          _registry->_GetRootLayerStackIdentifier());
 
-          if (newSourceId == GetIdentifier()) {
-            // If this layer stack is the new source for its expression
-            // vars, either update _expressionVariables or create a new
-            // one based on whether it's already sourced from this layer
-            // stack.
-            if (_expressionVariables->GetSource() == newSource) {
-              _expressionVariables->SetVariables(newExprVars);
-            } else {
-              _expressionVariables = std::make_shared<PcpExpressionVariables>(
-                  newSource, newExprVars);
-            }
-          } else {
-            // Optimization: If some other layer stack is the source for
-            // this layer stack's expression vars, grab that other layer
-            // stack's _expressionVariables. See matching optimization
-            // in c'tor.
-            const PcpLayerStackPtr overrideLayerStack =
-                _registry->Find(newSourceId);
-            if (overrideLayerStack) {
-              _expressionVariables = overrideLayerStack->_expressionVariables;
+      if (newSourceId == GetIdentifier()) {
+        // If this layer stack is the new source for its expression
+        // vars, either update _expressionVariables or create a new
+        // one based on whether it's already sourced from this layer
+        // stack.
+        if (_expressionVariables->GetSource() == newSource) {
+          _expressionVariables->SetVariables(newExprVars);
+        }
+        else {
+          _expressionVariables = std::make_shared<PcpExpressionVariables>(newSource, newExprVars);
+        }
+      }
+      else {
+        // Optimization: If some other layer stack is the source for
+        // this layer stack's expression vars, grab that other layer
+        // stack's _expressionVariables. See matching optimization
+        // in c'tor.
+        const PcpLayerStackPtr overrideLayerStack = _registry->Find(newSourceId);
+        if (overrideLayerStack) {
+          _expressionVariables = overrideLayerStack->_expressionVariables;
 
-              // Update _expressionVariables if it doesn't have the
-              // newly-computed expression variables. This is okay
-              // even if _expressionVariables is shared by other layer
-              // stacks, since we expect those layer stacks would have
-              // been updated in the same way.
-              if (newExprVars != _expressionVariables->GetVariables()) {
-                _expressionVariables->SetVariables(newExprVars);
-              }
-            } else {
-              _expressionVariables = std::make_shared<PcpExpressionVariables>(
-                  newSource, newExprVars);
-            }
+          // Update _expressionVariables if it doesn't have the
+          // newly-computed expression variables. This is okay
+          // even if _expressionVariables is shared by other layer
+          // stacks, since we expect those layer stacks would have
+          // been updated in the same way.
+          if (newExprVars != _expressionVariables->GetVariables()) {
+            _expressionVariables->SetVariables(newExprVars);
           }
-        };
+        }
+        else {
+          _expressionVariables = std::make_shared<PcpExpressionVariables>(newSource, newExprVars);
+        }
+      }
+    };
 
     if (changes.didChangeSignificantly) {
-      const PcpExpressionVariables newExprVars =
-          PcpExpressionVariables::Compute(
-              GetIdentifier(), _registry->_GetRootLayerStackIdentifier());
-      updateExpressionVariables(newExprVars.GetVariables(),
-                                newExprVars.GetSource());
-    } else {
-      updateExpressionVariables(changes.didChangeExpressionVariables
-                                    ? changes.newExpressionVariables
-                                    : _expressionVariables->GetVariables(),
-                                changes._didChangeExpressionVariablesSource
-                                    ? changes._newExpressionVariablesSource
-                                    : _expressionVariables->GetSource());
+      const PcpExpressionVariables newExprVars = PcpExpressionVariables::Compute(
+          GetIdentifier(), _registry->_GetRootLayerStackIdentifier());
+      updateExpressionVariables(newExprVars.GetVariables(), newExprVars.GetSource());
+    }
+    else {
+      updateExpressionVariables(
+          changes.didChangeExpressionVariables ? changes.newExpressionVariables :
+                                                 _expressionVariables->GetVariables(),
+          changes._didChangeExpressionVariablesSource ? changes._newExpressionVariablesSource :
+                                                        _expressionVariables->GetSource());
     }
   }
 
@@ -551,14 +567,16 @@ void PcpLayerStack::Apply(const PcpLayerStackChanges &changes,
     //      When we blow just the offsets we won't retain layers.
 
     // Retain prior set of layers.
-    TF_FOR_ALL(i, _layers) { lifeboat->Retain(*i); }
+    TF_FOR_ALL(i, _layers)
+    {
+      lifeboat->Retain(*i);
+    }
     _BlowLayers();
     _Compute(_registry->_GetFileFormatTarget(), _registry->_GetMutedLayers());
   }
 
   // Update relocations if necessary.
-  if (!_isUsd &&
-      (changes.didChangeSignificantly || changes.didChangeRelocates)) {
+  if (!_isUsd && (changes.didChangeSignificantly || changes.didChangeRelocates)) {
     // Blow the relocations if they changed specifically, or if there's been
     // a significant change.
     // A significant change means the composed opinions of the layer stack
@@ -567,43 +585,50 @@ void PcpLayerStack::Apply(const PcpLayerStackChanges &changes,
     _BlowRelocations();
     if (changes.didChangeSignificantly) {
       // Recompute relocations from scratch.
-      Pcp_ComputeRelocationsForLayerStack(
-          _layers, &_relocatesSourceToTarget, &_relocatesTargetToSource,
-          &_incrementalRelocatesSourceToTarget,
-          &_incrementalRelocatesTargetToSource, &_relocatesPrimPaths);
-    } else {
+      Pcp_ComputeRelocationsForLayerStack(_layers,
+                                          &_relocatesSourceToTarget,
+                                          &_relocatesTargetToSource,
+                                          &_incrementalRelocatesSourceToTarget,
+                                          &_incrementalRelocatesTargetToSource,
+                                          &_relocatesPrimPaths);
+    }
+    else {
       // Change processing has provided a specific new set of
       // relocations to use.
       _relocatesSourceToTarget = changes.newRelocatesSourceToTarget;
       _relocatesTargetToSource = changes.newRelocatesTargetToSource;
-      _incrementalRelocatesSourceToTarget =
-          changes.newIncrementalRelocatesSourceToTarget;
-      _incrementalRelocatesTargetToSource =
-          changes.newIncrementalRelocatesTargetToSource;
+      _incrementalRelocatesSourceToTarget = changes.newIncrementalRelocatesSourceToTarget;
+      _incrementalRelocatesTargetToSource = changes.newIncrementalRelocatesTargetToSource;
       _relocatesPrimPaths = changes.newRelocatesPrimPaths;
     }
 
     // Recompute the derived relocation variables.
-    TF_FOR_ALL(i, _relocatesVariables) {
+    TF_FOR_ALL(i, _relocatesVariables)
+    {
       i->second->SetValue(_FilterRelocationsForPath(*this, i->first));
     }
   }
 }
 
-const PcpLayerStackIdentifier &PcpLayerStack::GetIdentifier() const {
+const PcpLayerStackIdentifier &PcpLayerStack::GetIdentifier() const
+{
   return _identifier;
 }
 
-const SdfLayerRefPtrVector &PcpLayerStack::GetLayers() const { return _layers; }
+const SdfLayerRefPtrVector &PcpLayerStack::GetLayers() const
+{
+  return _layers;
+}
 
-SdfLayerHandleVector PcpLayerStack::GetSessionLayers() const {
+SdfLayerHandleVector PcpLayerStack::GetSessionLayers() const
+{
   SdfLayerHandleVector sessionLayers;
   if (_identifier.sessionLayer) {
     // Session layers will always be the strongest layers in the
     // layer stack. So, we can just take all of the layers stronger
     // than the root layer.
-    SdfLayerRefPtrVector::const_iterator rootLayerIt =
-        std::find(_layers.begin(), _layers.end(), _identifier.rootLayer);
+    SdfLayerRefPtrVector::const_iterator rootLayerIt = std::find(
+        _layers.begin(), _layers.end(), _identifier.rootLayer);
     if (TF_VERIFY(rootLayerIt != _layers.end())) {
       sessionLayers.insert(sessionLayers.begin(), _layers.begin(), rootLayerIt);
     }
@@ -612,17 +637,19 @@ SdfLayerHandleVector PcpLayerStack::GetSessionLayers() const {
   return sessionLayers;
 }
 
-const SdfLayerTreeHandle &PcpLayerStack::GetLayerTree() const {
+const SdfLayerTreeHandle &PcpLayerStack::GetLayerTree() const
+{
   return _layerTree;
 }
 
 // We have this version so that we can avoid weakptr/refptr conversions on the
 // \p layer arg.
-template <class LayerPtr>
-static inline const SdfLayerOffset *
-_GetLayerOffsetForLayer(LayerPtr const &layer,
-                        SdfLayerRefPtrVector const &layers,
-                        std::vector<PcpMapFunction> const &mapFunctions) {
+template<class LayerPtr>
+static inline const SdfLayerOffset *_GetLayerOffsetForLayer(
+    LayerPtr const &layer,
+    SdfLayerRefPtrVector const &layers,
+    std::vector<PcpMapFunction> const &mapFunctions)
+{
   // XXX: Optimization: store a flag if all offsets are identity
   //      and just return NULL if it's set.
   for (size_t i = 0, n = layers.size(); i != n; ++i) {
@@ -634,18 +661,18 @@ _GetLayerOffsetForLayer(LayerPtr const &layer,
   return NULL;
 }
 
-const SdfLayerOffset *
-PcpLayerStack::GetLayerOffsetForLayer(const SdfLayerHandle &layer) const {
+const SdfLayerOffset *PcpLayerStack::GetLayerOffsetForLayer(const SdfLayerHandle &layer) const
+{
   return _GetLayerOffsetForLayer(layer, _layers, _mapFunctions);
 }
 
-const SdfLayerOffset *
-PcpLayerStack::GetLayerOffsetForLayer(const SdfLayerRefPtr &layer) const {
+const SdfLayerOffset *PcpLayerStack::GetLayerOffsetForLayer(const SdfLayerRefPtr &layer) const
+{
   return _GetLayerOffsetForLayer(layer, _layers, _mapFunctions);
 }
 
-const SdfLayerOffset *
-PcpLayerStack::GetLayerOffsetForLayer(size_t layerIdx) const {
+const SdfLayerOffset *PcpLayerStack::GetLayerOffsetForLayer(size_t layerIdx) const
+{
   // XXX: Optimization: store a flag if all offsets are identity
   //      and just return NULL if it's set.
   if (!TF_VERIFY(layerIdx < _mapFunctions.size())) {
@@ -656,11 +683,13 @@ PcpLayerStack::GetLayerOffsetForLayer(size_t layerIdx) const {
   return layerOffset.IsIdentity() ? NULL : &layerOffset;
 }
 
-const std::set<std::string> &PcpLayerStack::GetMutedLayers() const {
+const std::set<std::string> &PcpLayerStack::GetMutedLayers() const
+{
   return _mutedAssetPaths;
 }
 
-bool PcpLayerStack::HasLayer(const SdfLayerHandle &layer) const {
+bool PcpLayerStack::HasLayer(const SdfLayerHandle &layer) const
+{
   // Avoid doing refcount operations here.
   SdfLayer const *layerPtr = get_pointer(layer);
   for (SdfLayerRefPtr const &layerRefPtr : _layers) {
@@ -671,34 +700,38 @@ bool PcpLayerStack::HasLayer(const SdfLayerHandle &layer) const {
   return false;
 }
 
-bool PcpLayerStack::HasLayer(const SdfLayerRefPtr &layer) const {
+bool PcpLayerStack::HasLayer(const SdfLayerRefPtr &layer) const
+{
   return std::find(_layers.begin(), _layers.end(), layer) != _layers.end();
 }
 
-const SdfRelocatesMap &PcpLayerStack::GetRelocatesSourceToTarget() const {
+const SdfRelocatesMap &PcpLayerStack::GetRelocatesSourceToTarget() const
+{
   return _relocatesSourceToTarget;
 }
 
-const SdfRelocatesMap &PcpLayerStack::GetRelocatesTargetToSource() const {
+const SdfRelocatesMap &PcpLayerStack::GetRelocatesTargetToSource() const
+{
   return _relocatesTargetToSource;
 }
 
-const SdfRelocatesMap &
-PcpLayerStack::GetIncrementalRelocatesSourceToTarget() const {
+const SdfRelocatesMap &PcpLayerStack::GetIncrementalRelocatesSourceToTarget() const
+{
   return _incrementalRelocatesSourceToTarget;
 }
 
-const SdfRelocatesMap &
-PcpLayerStack::GetIncrementalRelocatesTargetToSource() const {
+const SdfRelocatesMap &PcpLayerStack::GetIncrementalRelocatesTargetToSource() const
+{
   return _incrementalRelocatesTargetToSource;
 }
 
-const SdfPathVector &PcpLayerStack::GetPathsToPrimsWithRelocates() const {
+const SdfPathVector &PcpLayerStack::GetPathsToPrimsWithRelocates() const
+{
   return _relocatesPrimPaths;
 }
 
-PcpMapExpression
-PcpLayerStack::GetExpressionForRelocatesAtPath(const SdfPath &path) {
+PcpMapExpression PcpLayerStack::GetExpressionForRelocatesAtPath(const SdfPath &path)
+{
   const PcpMapExpression::Variable *var = nullptr;
   {
     tbb::spin_mutex::scoped_lock lock{_relocatesVariablesMutex};
@@ -713,8 +746,8 @@ PcpLayerStack::GetExpressionForRelocatesAtPath(const SdfPath &path) {
   }
 
   // Create a Variable representing the relocations that affect this path.
-  PcpMapExpression::VariableUniquePtr newVar =
-      PcpMapExpression::NewVariable(_FilterRelocationsForPath(*this, path));
+  PcpMapExpression::VariableUniquePtr newVar = PcpMapExpression::NewVariable(
+      _FilterRelocationsForPath(*this, path));
 
   {
     // Retain the variable so that we can update it if relocations change.
@@ -727,7 +760,8 @@ PcpLayerStack::GetExpressionForRelocatesAtPath(const SdfPath &path) {
   return var->GetExpression();
 }
 
-void PcpLayerStack::_BlowLayers() {
+void PcpLayerStack::_BlowLayers()
+{
   // Blow all of the members that get recomputed during _Compute.
   // Note this does not include relocations, which are maintained
   // separately for efficiency.
@@ -739,7 +773,8 @@ void PcpLayerStack::_BlowLayers() {
   _expressionVariableDependencies.clear();
 }
 
-void PcpLayerStack::_BlowRelocations() {
+void PcpLayerStack::_BlowRelocations()
+{
   _relocatesSourceToTarget.clear();
   _relocatesTargetToSource.clear();
   _incrementalRelocatesSourceToTarget.clear();
@@ -748,7 +783,8 @@ void PcpLayerStack::_BlowRelocations() {
 }
 
 void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
-                             const Pcp_MutedLayers &mutedLayers) {
+                             const Pcp_MutedLayers &mutedLayers)
+{
   // Builds the composed layer stack for \p result by recursively
   // resolving sublayer asset paths and reading in the sublayers.
   // In addition, this populates the result data with:
@@ -767,8 +803,8 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
 
   // Get any special file format arguments we need to use when finding
   // or opening sublayers.
-  const SdfLayer::FileFormatArguments layerArgs =
-      Pcp_GetArgumentsForFileFormatTarget(fileFormatTarget);
+  const SdfLayer::FileFormatArguments layerArgs = Pcp_GetArgumentsForFileFormatTarget(
+      fileFormatTarget);
 
   // The session owner.  This will be empty if there is no session owner
   // in the session layer.
@@ -780,8 +816,7 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
   std::set<SdfLayerHandle> seenLayers;
 
   // Env setting for disabling TCPS scaling.
-  const bool scaleLayerOffsetByTcps =
-      !PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled();
+  const bool scaleLayerOffsetByTcps = !PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled();
 
   const double rootTcps = _identifier.rootLayer->GetTimeCodesPerSecond();
   SdfLayerOffset rootLayerOffset;
@@ -798,12 +833,13 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
     std::string canonicalMutedPath;
     if (mutedLayers.IsLayerMuted(_identifier.sessionLayer,
                                  _identifier.sessionLayer->GetIdentifier(),
-                                 &canonicalMutedPath)) {
+                                 &canonicalMutedPath))
+    {
       _mutedAssetPaths.insert(canonicalMutedPath);
-    } else {
+    }
+    else {
       // The session layer has its own time codes per second.
-      const double sessionTcps =
-          _identifier.sessionLayer->GetTimeCodesPerSecond();
+      const double sessionTcps = _identifier.sessionLayer->GetTimeCodesPerSecond();
       SdfLayerOffset sessionLayerOffset;
 
       // The time codes per second of the entire layer stack may come
@@ -817,33 +853,39 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
       // computed TCPS for just the layer itself, so either layer may end
       // up with a layer offset scale in its map function to map from the
       // layer stack TCPS to the layer.
-      if (_ShouldUseSessionTcps(_identifier.sessionLayer,
-                                _identifier.rootLayer)) {
+      if (_ShouldUseSessionTcps(_identifier.sessionLayer, _identifier.rootLayer)) {
         _timeCodesPerSecond = sessionTcps;
         if (scaleLayerOffsetByTcps) {
           rootLayerOffset.SetScale(_timeCodesPerSecond / rootTcps);
         }
-      } else {
+      }
+      else {
         if (scaleLayerOffsetByTcps) {
           sessionLayerOffset.SetScale(_timeCodesPerSecond / sessionTcps);
         }
       }
 
-      SdfLayerTreeHandle sessionLayerTree = _BuildLayerStack(
-          _identifier.sessionLayer, sessionLayerOffset, sessionTcps,
-          _identifier.pathResolverContext, layerArgs, std::string(),
-          mutedLayers, &seenLayers, &errors);
+      SdfLayerTreeHandle sessionLayerTree = _BuildLayerStack(_identifier.sessionLayer,
+                                                             sessionLayerOffset,
+                                                             sessionTcps,
+                                                             _identifier.pathResolverContext,
+                                                             layerArgs,
+                                                             std::string(),
+                                                             mutedLayers,
+                                                             &seenLayers,
+                                                             &errors);
 
       // Get the session owner.
       struct _Helper {
-        static bool FindSessionOwner(const SdfLayerTreeHandle &tree,
-                                     std::string *sessionOwner) {
-          if (tree->GetLayer()->HasField(SdfPath::AbsoluteRootPath(),
-                                         SdfFieldKeys->SessionOwner,
-                                         sessionOwner)) {
+        static bool FindSessionOwner(const SdfLayerTreeHandle &tree, std::string *sessionOwner)
+        {
+          if (tree->GetLayer()->HasField(
+                  SdfPath::AbsoluteRootPath(), SdfFieldKeys->SessionOwner, sessionOwner))
+          {
             return true;
           }
-          TF_FOR_ALL(subtree, tree->GetChildTrees()) {
+          TF_FOR_ALL(subtree, tree->GetChildTrees())
+          {
             if (FindSessionOwner(*subtree, sessionOwner)) {
               return true;
             }
@@ -860,10 +902,15 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
   // sessionOwner, if any, to this stack.  Unlike session layers, we
   // don't allow muting a layer stack's root layer since that would
   // lead to empty layer stacks.
-  _layerTree =
-      _BuildLayerStack(_identifier.rootLayer, rootLayerOffset, rootTcps,
-                       _identifier.pathResolverContext, layerArgs, sessionOwner,
-                       mutedLayers, &seenLayers, &errors);
+  _layerTree = _BuildLayerStack(_identifier.rootLayer,
+                                rootLayerOffset,
+                                rootTcps,
+                                _identifier.pathResolverContext,
+                                layerArgs,
+                                sessionOwner,
+                                mutedLayers,
+                                &seenLayers,
+                                &errors);
 
   // Update layer-stack-to-layer maps in the registry, if we're installed in a
   // registry.
@@ -872,18 +919,24 @@ void PcpLayerStack::_Compute(const std::string &fileFormatTarget,
 
   if (errors.empty()) {
     _localErrors.reset();
-  } else {
+  }
+  else {
     _localErrors.reset(new PcpErrorVector);
     _localErrors->swap(errors);
   }
 }
 
 SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
-    const SdfLayerHandle &layer, const SdfLayerOffset &offset, double layerTcps,
+    const SdfLayerHandle &layer,
+    const SdfLayerOffset &offset,
+    double layerTcps,
     const ArResolverContext &pathResolverContext,
     const SdfLayer::FileFormatArguments &defaultLayerArgs,
-    const std::string &sessionOwner, const Pcp_MutedLayers &mutedLayers,
-    SdfLayerHandleSet *seenLayers, PcpErrorVector *errors) {
+    const std::string &sessionOwner,
+    const Pcp_MutedLayers &mutedLayers,
+    SdfLayerHandleSet *seenLayers,
+    PcpErrorVector *errors)
+{
   seenLayers->insert(layer);
 
   // Accumulate layer into results.
@@ -901,10 +954,13 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
   // Evaluate expressions and compute mutedness first.
   for (size_t i = 0; i != numSublayers; ++i) {
     if (Pcp_IsVariableExpression(sublayers[i])) {
-      sublayers[i] = Pcp_EvaluateVariableExpression(
-          sublayers[i], *_expressionVariables, "sublayer", layer,
-          SdfPath::AbsoluteRootPath(), &_expressionVariableDependencies,
-          errors);
+      sublayers[i] = Pcp_EvaluateVariableExpression(sublayers[i],
+                                                    *_expressionVariables,
+                                                    "sublayer",
+                                                    layer,
+                                                    SdfPath::AbsoluteRootPath(),
+                                                    &_expressionVariableDependencies,
+                                                    errors);
 
       if (sublayers[i].empty()) {
         continue;
@@ -927,15 +983,13 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
     TfErrorMark m;
 
     SdfLayer::FileFormatArguments localArgs;
-    const SdfLayer::FileFormatArguments &layerArgs =
-        Pcp_GetArgumentsForFileFormatTarget(sublayers[i], &defaultLayerArgs,
-                                            &localArgs);
+    const SdfLayer::FileFormatArguments &layerArgs = Pcp_GetArgumentsForFileFormatTarget(
+        sublayers[i], &defaultLayerArgs, &localArgs);
 
     // This is equivalent to SdfLayer::FindOrOpenRelativeToLayer,
     // but we want to keep track of the final sublayer path after
     // anchoring it to the layer.
-    string sublayerPath =
-        SdfComputeAssetPathRelativeToLayer(layer, sublayers[i]);
+    string sublayerPath = SdfComputeAssetPathRelativeToLayer(layer, sublayers[i]);
     sublayerRefPtrs[i] = SdfLayer::FindOrOpen(sublayerPath, layerArgs);
 
     localSourceInfo[i] = _SublayerSourceInfo(layer, sublayers[i], sublayerPath);
@@ -947,8 +1001,7 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
         commentary.push_back(err.GetCommentary());
       }
       m.Clear();
-      errCommentary[i] =
-          TfStringJoin(commentary.begin(), commentary.end(), "; ");
+      errCommentary[i] = TfStringJoin(commentary.begin(), commentary.end(), "; ");
     }
   };
 
@@ -971,7 +1024,8 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
           ArResolverContextBinder binder(pathResolverContext);
           loadSublayer(i);
         });
-      } else {
+      }
+      else {
         loadSublayer(i);
       }
     }
@@ -1006,8 +1060,7 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
     SdfLayerOffset sublayerOffset = sublayerOffsets[i];
     if (!sublayerOffset.IsValid() || !sublayerOffset.GetInverse().IsValid()) {
       // Report error, but continue with an identity layer offset.
-      PcpErrorInvalidSublayerOffsetPtr err =
-          PcpErrorInvalidSublayerOffset::New();
+      PcpErrorInvalidSublayerOffsetPtr err = PcpErrorInvalidSublayerOffset::New();
       err->rootSite = PcpSite(_identifier, SdfPath::AbsoluteRootPath());
       err->layer = layer;
       err->sublayer = sublayerRefPtrs[i];
@@ -1019,10 +1072,8 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
     // Apply the scale from computed layer TCPS to sublayer TCPS to sublayer
     // layer offset.
     const double sublayerTcps = sublayerRefPtrs[i]->GetTimeCodesPerSecond();
-    if (!PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled() &&
-        layerTcps != sublayerTcps) {
-      sublayerOffset.SetScale(sublayerOffset.GetScale() * layerTcps /
-                              sublayerTcps);
+    if (!PcpIsTimeScalingForLayerTimeCodesPerSecondDisabled() && layerTcps != sublayerTcps) {
+      sublayerOffset.SetScale(sublayerOffset.GetScale() * layerTcps / sublayerTcps);
     }
 
     // Combine the sublayerOffset with the cumulative offset
@@ -1036,8 +1087,7 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
   // Append localSourceInfo items into _sublayerSourceInfo, skipping any for
   // which don't have a layer (these entries correspond to layers that were
   // muted).
-  _sublayerSourceInfo.reserve(_sublayerSourceInfo.size() +
-                              localSourceInfo.size());
+  _sublayerSourceInfo.reserve(_sublayerSourceInfo.size() + localSourceInfo.size());
   for (_SublayerSourceInfo &localInfo : localSourceInfo) {
     if (localInfo.layer) {
       _sublayerSourceInfo.push_back(std::move(localInfo));
@@ -1046,8 +1096,7 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
   localSourceInfo.clear();
 
   // Reorder sublayers according to sessionOwner.
-  _ApplyOwnedSublayerOrder(_identifier, layer, sessionOwner, &sublayerInfo,
-                           errors);
+  _ApplyOwnedSublayerOrder(_identifier, layer, sessionOwner, &sublayerInfo, errors);
 
   // Recurse over sublayers to build subtrees.  We must do this after
   // applying the sublayer order, otherwise _layers and
@@ -1057,10 +1106,18 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
   //      and reorder them afterwards.  After building the tree we
   //      can preorder traverse it to collect the layers and offsets.
   SdfLayerTreeHandleVector subtrees;
-  TF_FOR_ALL(i, sublayerInfo) {
-    if (SdfLayerTreeHandle subtree = _BuildLayerStack(
-            i->layer, i->offset, i->timeCodesPerSecond, pathResolverContext,
-            defaultLayerArgs, sessionOwner, mutedLayers, seenLayers, errors)) {
+  TF_FOR_ALL(i, sublayerInfo)
+  {
+    if (SdfLayerTreeHandle subtree = _BuildLayerStack(i->layer,
+                                                      i->offset,
+                                                      i->timeCodesPerSecond,
+                                                      pathResolverContext,
+                                                      defaultLayerArgs,
+                                                      sessionOwner,
+                                                      mutedLayers,
+                                                      seenLayers,
+                                                      errors))
+    {
       subtrees.push_back(subtree);
     }
   }
@@ -1072,18 +1129,22 @@ SdfLayerTreeHandle PcpLayerStack::_BuildLayerStack(
   return SdfLayerTree::New(layer, subtrees, offset);
 }
 
-std::ostream &operator<<(std::ostream &s, const PcpLayerStackPtr &x) {
+std::ostream &operator<<(std::ostream &s, const PcpLayerStackPtr &x)
+{
   if (x) {
     return s << x->GetIdentifier();
-  } else {
+  }
+  else {
     return s << "@<expired>@";
   }
 }
 
-std::ostream &operator<<(std::ostream &s, const PcpLayerStackRefPtr &x) {
+std::ostream &operator<<(std::ostream &s, const PcpLayerStackRefPtr &x)
+{
   if (x) {
     return s << x->GetIdentifier();
-  } else {
+  }
+  else {
     return s << "@NULL@";
   }
 }

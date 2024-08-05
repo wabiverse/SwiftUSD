@@ -45,7 +45,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static std::string _Repr(GfFrustum const &self) {
+static std::string _Repr(GfFrustum const &self)
+{
   const std::string prefix = TF_PY_REPR_PREFIX + "Frustum(";
   const std::string indent(prefix.size(), ' ');
   const std::string seperator = ",\n" + indent;
@@ -64,61 +65,75 @@ static std::string _Repr(GfFrustum const &self) {
   return prefix + TfStringJoin(kwargs, seperator.c_str()) + ")";
 }
 
-static size_t __hash__(GfFrustum const &self) { return TfHash()(self); }
-
-static object GetPerspectiveHelper(const GfFrustum &self, bool isFovVertical) {
-  double fov, aspect, nearDist, farDist;
-  bool result =
-      self.GetPerspective(isFovVertical, &fov, &aspect, &nearDist, &farDist);
-  return result ? boost::python::make_tuple(fov, aspect, nearDist, farDist)
-                : object();
+static size_t __hash__(GfFrustum const &self)
+{
+  return TfHash()(self);
 }
 
-static tuple GetOrthographicHelper(const GfFrustum &self) {
+static object GetPerspectiveHelper(const GfFrustum &self, bool isFovVertical)
+{
+  double fov, aspect, nearDist, farDist;
+  bool result = self.GetPerspective(isFovVertical, &fov, &aspect, &nearDist, &farDist);
+  return result ? boost::python::make_tuple(fov, aspect, nearDist, farDist) : object();
+}
+
+static tuple GetOrthographicHelper(const GfFrustum &self)
+{
   double left, right, bottom, top, near, far;
   bool result = self.GetOrthographic(&left, &right, &bottom, &top, &near, &far);
-  return result ? boost::python::make_tuple(left, right, bottom, top, near, far)
-                : tuple();
+  return result ? boost::python::make_tuple(left, right, bottom, top, near, far) : tuple();
 }
 
-static tuple ComputeViewFrameHelper(const GfFrustum &self) {
+static tuple ComputeViewFrameHelper(const GfFrustum &self)
+{
   GfVec3d side, up, view;
   self.ComputeViewFrame(&side, &up, &view);
   return boost::python::make_tuple(side, up, view);
 }
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(FitToSphere_overloads, FitToSphere, 2,
-                                       3);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(FitToSphere_overloads, FitToSphere, 2, 3);
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapFrustum() {
+void wrapFrustum()
+{
   typedef GfFrustum This;
 
   // Create some objects that will be reused a few times.
   //
-  object getPositionFunc = make_function(
-      &This::GetPosition, return_value_policy<copy_const_reference>());
-  object getRotationFunc = make_function(
-      &This::GetRotation, return_value_policy<copy_const_reference>());
-  object getWindowFunc = make_function(
-      &This::GetWindow, return_value_policy<copy_const_reference>());
-  object getNearFarFunc = make_function(
-      &This::GetNearFar, return_value_policy<copy_const_reference>());
+  object getPositionFunc = make_function(&This::GetPosition,
+                                         return_value_policy<copy_const_reference>());
+  object getRotationFunc = make_function(&This::GetRotation,
+                                         return_value_policy<copy_const_reference>());
+  object getWindowFunc = make_function(&This::GetWindow,
+                                       return_value_policy<copy_const_reference>());
+  object getNearFarFunc = make_function(&This::GetNearFar,
+                                        return_value_policy<copy_const_reference>());
 
   scope thisScope =
       class_<This>("Frustum", "Basic view frustum", init<>())
           .def(init<const This &>())
-          .def(init<const GfVec3d &, const GfRotation &, const GfRange2d &,
-                    const GfRange1d &, GfFrustum::ProjectionType, double>(
-              (args("position"), args("rotation"), args("window"),
-               args("nearFar"), args("projectionType"),
-               args("viewDistance") = 5.0)))
+          .def(init<const GfVec3d &,
+                    const GfRotation &,
+                    const GfRange2d &,
+                    const GfRange1d &,
+                    GfFrustum::ProjectionType,
+                    double>((args("position"),
+                             args("rotation"),
+                             args("window"),
+                             args("nearFar"),
+                             args("projectionType"),
+                             args("viewDistance") = 5.0)))
 
-          .def(init<const GfMatrix4d &, const GfRange2d &, const GfRange1d &,
-                    GfFrustum::ProjectionType, double>(
-              (args("camToWorldXf"), args("window"), args("nearFar"),
-               args("projectionType"), args("viewDistance") = 5.0)))
+          .def(init<const GfMatrix4d &,
+                    const GfRange2d &,
+                    const GfRange1d &,
+                    GfFrustum::ProjectionType,
+                    double>((args("camToWorldXf"),
+                             args("window"),
+                             args("nearFar"),
+                             args("projectionType"),
+                             args("viewDistance") = 5.0)))
 
           .def(TfTypePythonClass())
 
@@ -126,22 +141,18 @@ void wrapFrustum() {
           .add_property("rotation", getRotationFunc, &This::SetRotation)
           .add_property("window", getWindowFunc, &This::SetWindow)
           .add_property("nearFar", getNearFarFunc, &This::SetNearFar)
-          .add_property("viewDistance", &This::GetViewDistance,
-                        &This::SetViewDistance)
-          .add_property("projectionType", &This::GetProjectionType,
-                        &This::SetProjectionType)
+          .add_property("viewDistance", &This::GetViewDistance, &This::SetViewDistance)
+          .add_property("projectionType", &This::GetProjectionType, &This::SetProjectionType)
 
           .def("SetPerspective",
-               (void(This::*)(double, double, double, double)) &
-                   This::SetPerspective,
+               (void(This::*)(double, double, double, double)) & This::SetPerspective,
                (args("fovHeight"), "aspectRatio", "nearDist", "farDist"))
           .def("SetPerspective",
-               (void(This::*)(double, bool, double, double, double)) &
-                   This::SetPerspective,
-               (args("fov"), "isFovVertical", "aspectRatio", "nearDist",
-                "farDist"))
+               (void(This::*)(double, bool, double, double, double)) & This::SetPerspective,
+               (args("fov"), "isFovVertical", "aspectRatio", "nearDist", "farDist"))
 
-          .def("GetPerspective", GetPerspectiveHelper,
+          .def("GetPerspective",
+               GetPerspectiveHelper,
                (args("isFovVertical") = true),
                "Returns the current perspective frustum values suitable\n"
                "for use by SetPerspective.  If the current frustum is a\n"
@@ -150,7 +161,9 @@ void wrapFrustum() {
                "If the current frustum is not perspective, the return\n"
                "value is None.")
 
-          .def("GetFOV", &This::GetFOV, (args("isFovVertical") = false),
+          .def("GetFOV",
+               &This::GetFOV,
+               (args("isFovVertical") = false),
                "Returns the horizontal fov of the frustum. The fov of the\n"
                "frustum is not necessarily the same value as displayed in\n"
                "the viewer. The displayed fov is a function of the focal\n"
@@ -170,7 +183,8 @@ void wrapFrustum() {
           .def("SetRotation", &This::SetRotation)
 
           .def("SetPositionAndRotationFromMatrix",
-               &This::SetPositionAndRotationFromMatrix, (args("camToWorldXf")))
+               &This::SetPositionAndRotationFromMatrix,
+               (args("camToWorldXf")))
 
           .def("GetWindow", getWindowFunc)
           .def("SetWindow", &This::SetWindow)
@@ -200,10 +214,10 @@ void wrapFrustum() {
 
           .def("ComputeAspectRatio", &This::ComputeAspectRatio)
 
-          .def("ComputeCorners", &This::ComputeCorners,
-               return_value_policy<TfPySequenceToTuple>())
+          .def("ComputeCorners", &This::ComputeCorners, return_value_policy<TfPySequenceToTuple>())
 
-          .def("ComputeCornersAtDistance", &This::ComputeCornersAtDistance,
+          .def("ComputeCornersAtDistance",
+               &This::ComputeCornersAtDistance,
                return_value_policy<TfPySequenceToTuple>())
 
           .def("ComputeNarrowedFrustum",
@@ -213,21 +227,16 @@ void wrapFrustum() {
                (GfFrustum(This::*)(const GfVec3d &, const GfVec2d &) const) &
                    This::ComputeNarrowedFrustum)
 
-          .def("ComputePickRay",
-               (GfRay(This::*)(const GfVec2d &) const) & This::ComputePickRay)
-          .def("ComputePickRay",
-               (GfRay(This::*)(const GfVec3d &) const) & This::ComputePickRay)
+          .def("ComputePickRay", (GfRay(This::*)(const GfVec2d &) const) & This::ComputePickRay)
+          .def("ComputePickRay", (GfRay(This::*)(const GfVec3d &) const) & This::ComputePickRay)
 
+          .def("Intersects", (bool(This::*)(const GfBBox3d &) const) & This::Intersects)
+          .def("Intersects", (bool(This::*)(const GfVec3d &) const) & This::Intersects)
           .def("Intersects",
-               (bool(This::*)(const GfBBox3d &) const) & This::Intersects)
+               (bool(This::*)(const GfVec3d &, const GfVec3d &) const) & This::Intersects)
           .def("Intersects",
-               (bool(This::*)(const GfVec3d &) const) & This::Intersects)
-          .def("Intersects",
-               (bool(This::*)(const GfVec3d &, const GfVec3d &) const) &
+               (bool(This::*)(const GfVec3d &, const GfVec3d &, const GfVec3d &) const) &
                    This::Intersects)
-          .def("Intersects", (bool(This::*)(const GfVec3d &, const GfVec3d &,
-                                            const GfVec3d &) const) &
-                                 This::Intersects)
 
           .def("SetProjectionType", &This::SetProjectionType)
           .def("GetProjectionType", &This::GetProjectionType)

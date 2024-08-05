@@ -35,16 +35,19 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static size_t __hash__(const ArTimestamp &self) { return TfHash()(self); }
-
-static std::string __repr__(const ArTimestamp &self) {
-  return TF_PY_REPR_PREFIX + "Timestamp" +
-         (self.IsValid()
-              ? TfStringPrintf("(%s)", TfPyRepr(self.GetTime()).c_str())
-              : "()");
+static size_t __hash__(const ArTimestamp &self)
+{
+  return TfHash()(self);
 }
 
-void wrapTimestamp() {
+static std::string __repr__(const ArTimestamp &self)
+{
+  return TF_PY_REPR_PREFIX + "Timestamp" +
+         (self.IsValid() ? TfStringPrintf("(%s)", TfPyRepr(self.GetTime()).c_str()) : "()");
+}
+
+void wrapTimestamp()
+{
   class_<ArTimestamp>("Timestamp")
       .def(init<double>())
       .def(init<ArTimestamp>())

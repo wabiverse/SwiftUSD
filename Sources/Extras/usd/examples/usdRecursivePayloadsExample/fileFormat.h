@@ -24,16 +24,19 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_H
 
-#include <pxr/pxrns.h>
-#include "Sdf/fileFormat.h"
 #include "Pcp/dynamicFileFormatInterface.h"
+#include "Sdf/fileFormat.h"
 #include "Tf/staticTokens.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 #define USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_TOKENS \
-  ((Id, "usdRecursivePayloadsExample"))((Version, "1.0"))((Target, "usd"))((Extension, "usdrecursivepayloadsexample"))((Depth, "UsdExample_depth"))((Num, "UsdExample_num"))((Radius, "UsdExample_radius"))((Height, "UsdExample_height"))((ArgDict, "UsdExample_argDict"))((PayloadId, "UsdExample_payloadId"))
+  ((Id, "usdRecursivePayloadsExample"))((Version, "1.0"))((Target, "usd"))( \
+      (Extension, "usdrecursivepayloadsexample"))((Depth, "UsdExample_depth"))( \
+      (Num, "UsdExample_num"))((Radius, "UsdExample_radius"))((Height, "UsdExample_height"))( \
+      (ArgDict, "UsdExample_argDict"))((PayloadId, "UsdExample_payloadId"))
 
 TF_DECLARE_PUBLIC_TOKENS(UsdRecursivePayloadsExampleFileFormatTokens,
                          USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_TOKENS);
@@ -127,31 +130,25 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfLayerBase);
 ///             specifically IDed payloads.
 ///
 class UsdRecursivePayloadsExampleFileFormat : public SdfFileFormat,
-                                              public PcpDynamicFileFormatInterface
-{
-public:
+                                              public PcpDynamicFileFormatInterface {
+ public:
   // SdfFileFormat overrides.
   bool CanRead(const std::string &file) const override;
-  bool Read(SdfLayer *layer,
-            const std::string &resolvedPath,
-            bool metadataOnly) const override;
+  bool Read(SdfLayer *layer, const std::string &resolvedPath, bool metadataOnly) const override;
 
   // We override Write methods so SdfLayer::ExportToString() etc, work.
   // Writing this layer will write out the generated layer contents.
   bool WriteToString(const SdfLayer &layer,
                      std::string *str,
                      const std::string &comment = std::string()) const override;
-  bool WriteToStream(const SdfSpecHandle &spec,
-                     std::ostream &out,
-                     size_t indent) const override;
+  bool WriteToStream(const SdfSpecHandle &spec, std::ostream &out, size_t indent) const override;
 
   // A required override for generating dynamic arguments that are
   // particular to this file format.
-  void ComposeFieldsForFileFormatArguments(
-      const std::string &assetPath,
-      const PcpDynamicFileFormatContext &context,
-      FileFormatArguments *args,
-      VtValue *dependencyContextData) const override;
+  void ComposeFieldsForFileFormatArguments(const std::string &assetPath,
+                                           const PcpDynamicFileFormatContext &context,
+                                           FileFormatArguments *args,
+                                           VtValue *dependencyContextData) const override;
 
   // Another required override for dynamic file arguments to help determine
   // which changes may cause prims using this file format to be invalidated.
@@ -161,7 +158,7 @@ public:
       const VtValue &newValue,
       const VtValue &dependencyContextData) const override;
 
-protected:
+ protected:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   virtual ~UsdRecursivePayloadsExampleFileFormat();
@@ -170,4 +167,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_RECURSIVE_PAYLOADS_EXAMPLE_FILE_FORMAT_H

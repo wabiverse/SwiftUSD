@@ -22,7 +22,6 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/imaging/hd/unitTestHelper.h"
 #include "pxr/imaging/hd/dirtyList.h"
 #include "pxr/imaging/hd/mesh.h"
 #include "pxr/imaging/hd/perfLog.h"
@@ -30,6 +29,7 @@
 #include "pxr/imaging/hd/renderPass.h"
 #include "pxr/imaging/hd/sceneDelegate.h"
 #include "pxr/imaging/hd/tokens.h"
+#include "pxr/imaging/hd/unitTestHelper.h"
 #include "pxr/imaging/hd/unitTestNullRenderPass.h"
 
 #include "pxr/base/tf/errorMark.h"
@@ -38,284 +38,279 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static void
-_VerifyDirtyListSize(HdDirtyList *dl, size_t count)
+static void _VerifyDirtyListSize(HdDirtyList *dl, size_t count)
 {
-    if (!TF_VERIFY(dl)) {
-        return;
-    }
-    SdfPathVector const &dirtyRprimIds = dl->GetDirtyRprims();
-    TF_VERIFY(dirtyRprimIds.size() == count, "expected %zu, found %zu",
-              count, dirtyRprimIds.size());
+  if (!TF_VERIFY(dl)) {
+    return;
+  }
+  SdfPathVector const &dirtyRprimIds = dl->GetDirtyRprims();
+  TF_VERIFY(dirtyRprimIds.size() == count, "expected %zu, found %zu", count, dirtyRprimIds.size());
 }
 
 #define _VERIFY_DIRTY_SIZE(delegate, count) \
-        { \
-            HdDirtyList dirtyList(delegate.GetRenderIndex()); \
-            _VerifyDirtyListSize(&dirtyList, count); \
-       }
+  { \
+    HdDirtyList dirtyList(delegate.GetRenderIndex()); \
+    _VerifyDirtyListSize(&dirtyList, count); \
+  }
 
-static
-bool
-BasicTest()
+static bool BasicTest()
 {
-    Hd_TestDriver driver;
-    HdUnitTestDelegate &delegate = driver.GetDelegate();
-    HdPerfLog& perfLog = HdPerfLog::GetInstance();
-    perfLog.Disable();
+  Hd_TestDriver driver;
+  HdUnitTestDelegate &delegate = driver.GetDelegate();
+  HdPerfLog &perfLog = HdPerfLog::GetInstance();
+  perfLog.Disable();
 
-    GfMatrix4f identity;
-    identity.SetIdentity();
+  GfMatrix4f identity;
+  identity.SetIdentity();
 
-    delegate.AddCube(SdfPath("/cube"), identity); 
+  delegate.AddCube(SdfPath("/cube"), identity);
 
-    driver.Draw();
+  driver.Draw();
 
-    // Performance logging is disabled, expect no tracking
-    TF_VERIFY(perfLog.GetCacheMisses(HdTokens->points) == 0);
-    TF_VERIFY(perfLog.GetCacheMisses(HdTokens->topology) == 0);
-    TF_VERIFY(perfLog.GetCounter(HdTokens->itemsDrawn) == 0);
-    return true;
+  // Performance logging is disabled, expect no tracking
+  TF_VERIFY(perfLog.GetCacheMisses(HdTokens->points) == 0);
+  TF_VERIFY(perfLog.GetCacheMisses(HdTokens->topology) == 0);
+  TF_VERIFY(perfLog.GetCounter(HdTokens->itemsDrawn) == 0);
+  return true;
 }
 
 // minimalistic scene delegate
 class Delegate : public HdSceneDelegate {
-public:
-    Delegate(HdRenderIndex *renderIndex)
-     : HdSceneDelegate(renderIndex, SdfPath("Delegate"))
-    {
+ public:
+  Delegate(HdRenderIndex *renderIndex) : HdSceneDelegate(renderIndex, SdfPath("Delegate")) {}
 
+  // ---------------------------------------------------------------------- //
+  // See HdSceneDelegate for documentation of virtual methods.
+  // ---------------------------------------------------------------------- //
+  virtual bool IsInCollection(SdfPath const &id, TfToken const &collectionName)
+  {
+    return true;
+  }
+  virtual HdMeshTopology GetMeshTopology(SdfPath const &id) override
+  {
+    return HdMeshTopology();
+  }
+  virtual HdBasisCurvesTopology GetBasisCurvesTopology(SdfPath const &id) override
+  {
+    return HdBasisCurvesTopology();
+  }
+  virtual PxOsdSubdivTags GetSubdivTags(SdfPath const &id) override
+  {
+    return PxOsdSubdivTags();
+  }
+  virtual GfRange3d GetExtent(SdfPath const &id) override
+  {
+    return GfRange3d();
+  }
+  virtual GfMatrix4d GetTransform(SdfPath const &id) override
+  {
+    return GfMatrix4d();
+  }
+  virtual bool GetVisible(SdfPath const &id) override
+  {
+    return true;
+  }
+  virtual bool GetDoubleSided(SdfPath const &id) override
+  {
+    return true;
+  }
+  virtual HdDisplayStyle GetDisplayStyle(SdfPath const &id) override
+  {
+    return HdDisplayStyle();
+  }
+  virtual VtValue Get(SdfPath const &id, TfToken const &key) override
+  {
+    if (key == HdTokens->points) {
+      return VtValue(0.0f);
     }
+    else {
+      return VtValue();
+    }
+  }
+  virtual HdPrimvarDescriptorVector GetPrimvarDescriptors(SdfPath const &id,
+                                                          HdInterpolation interpolation) override
+  {
+    HdPrimvarDescriptorVector result;
+    if (interpolation == HdInterpolationVertex) {
+      result.emplace_back(HdTokens->points, interpolation, HdPrimvarRoleTokens->point);
+    }
+    return result;
+  }
+  virtual VtIntArray GetInstanceIndices(SdfPath const &instancerId,
+                                        SdfPath const &prototypeId) override
+  {
+    return VtIntArray();
+  }
+  virtual GfMatrix4d GetInstancerTransform(SdfPath const &instancerId, SdfPath const &prototypeId)
+  {
+    return GfMatrix4d();
+  }
 
-    // ---------------------------------------------------------------------- //
-    // See HdSceneDelegate for documentation of virtual methods.
-    // ---------------------------------------------------------------------- //
-    virtual bool IsInCollection(SdfPath const& id,
-                                TfToken const& collectionName)
-        { return true; }
-    virtual HdMeshTopology GetMeshTopology(SdfPath const& id) override
-        { return HdMeshTopology(); }
-    virtual HdBasisCurvesTopology GetBasisCurvesTopology(SdfPath const& id) override
-        { return HdBasisCurvesTopology(); }
-    virtual PxOsdSubdivTags GetSubdivTags(SdfPath const& id) override
-        { return PxOsdSubdivTags(); }
-    virtual GfRange3d GetExtent(SdfPath const & id) override
-        { return GfRange3d(); }
-    virtual GfMatrix4d GetTransform(SdfPath const & id) override
-        { return GfMatrix4d(); }
-    virtual bool GetVisible(SdfPath const & id) override
-        { return true; }
-    virtual bool GetDoubleSided(SdfPath const & id) override
-        { return true; }
-    virtual HdDisplayStyle GetDisplayStyle(SdfPath const & id) override
-        { return HdDisplayStyle(); }
-    virtual VtValue Get(SdfPath const& id, TfToken const& key) override {
-        if (key == HdTokens->points) {
-            return VtValue(0.0f);
-        } else {
-            return VtValue();
-        }
-    }
-    virtual
-    HdPrimvarDescriptorVector
-    GetPrimvarDescriptors(SdfPath const& id,
-                          HdInterpolation interpolation) override
-    {
-        HdPrimvarDescriptorVector result;
-        if (interpolation == HdInterpolationVertex) {
-            result.emplace_back(HdTokens->points, interpolation,
-                                HdPrimvarRoleTokens->point);
-        }
-        return result;
-    }
-    virtual VtIntArray GetInstanceIndices(SdfPath const& instancerId,
-                                          SdfPath const& prototypeId) override
-        { return VtIntArray(); }
-    virtual GfMatrix4d GetInstancerTransform(SdfPath const& instancerId,
-                                             SdfPath const& prototypeId)
-        { return GfMatrix4d(); }
-
-private:
-    Delegate()                             = delete;
-    Delegate(const Delegate &)             = delete;
-    Delegate &operator =(const Delegate &) = delete;
+ private:
+  Delegate() = delete;
+  Delegate(const Delegate &) = delete;
+  Delegate &operator=(const Delegate &) = delete;
 };
 
 // Simple task focus only on sync.
-class TestTask final : public HdTask
-{
-public:
-    TestTask(HdRenderPassSharedPtr const &renderPass)
-    : HdTask(SdfPath::EmptyPath())
-    , _renderPass(renderPass)
-    {
-    }
+class TestTask final : public HdTask {
+ public:
+  TestTask(HdRenderPassSharedPtr const &renderPass)
+      : HdTask(SdfPath::EmptyPath()), _renderPass(renderPass)
+  {
+  }
 
-    virtual void Sync(HdSceneDelegate*,
-                      HdTaskContext*,
-                      HdDirtyBits*) override
-    {
-        _renderPass->Sync();
-    }
+  virtual void Sync(HdSceneDelegate *, HdTaskContext *, HdDirtyBits *) override
+  {
+    _renderPass->Sync();
+  }
 
-    virtual void Prepare(HdTaskContext* ctx,
-                         HdRenderIndex* renderIndex) override
-    {
-    }
+  virtual void Prepare(HdTaskContext *ctx, HdRenderIndex *renderIndex) override {}
 
-    virtual void Execute(HdTaskContext* ctx) override
-    {
-    }
+  virtual void Execute(HdTaskContext *ctx) override {}
 
-private:
-    HdRenderPassSharedPtr _renderPass;
+ private:
+  HdRenderPassSharedPtr _renderPass;
 };
 
-static bool
-SyncTest()
+static bool SyncTest()
 {
-    HdRprimCollection collection(HdTokens->geometry, 
-        HdReprSelector(HdReprTokens->hull));
+  HdRprimCollection collection(HdTokens->geometry, HdReprSelector(HdReprTokens->hull));
 
-    Hd_TestDriver driver;
-    HdUnitTestDelegate &delegate = driver.GetDelegate();
-    HdRenderIndex &renderIndex = delegate.GetRenderIndex();
-    HdChangeTracker& changeTracker = renderIndex.GetChangeTracker();
+  Hd_TestDriver driver;
+  HdUnitTestDelegate &delegate = driver.GetDelegate();
+  HdRenderIndex &renderIndex = delegate.GetRenderIndex();
+  HdChangeTracker &changeTracker = renderIndex.GetChangeTracker();
 
-    HdRenderPassSharedPtr renderPass(
-        new Hd_UnitTestNullRenderPass(&renderIndex, collection));
+  HdRenderPassSharedPtr renderPass(new Hd_UnitTestNullRenderPass(&renderIndex, collection));
 
-    HdTaskSharedPtrVector tasks;
-    HdTaskContext         taskContext;
-    tasks.push_back(std::make_shared<TestTask>(renderPass));
+  HdTaskSharedPtrVector tasks;
+  HdTaskContext taskContext;
+  tasks.push_back(std::make_shared<TestTask>(renderPass));
 
-    SdfPath id("/prim");
+  SdfPath id("/prim");
 
-    HdRprimCollection col(HdTokens->geometry, 
-        HdReprSelector(HdReprTokens->hull));
-    HdRenderPassSharedPtr renderPass0(
-        new Hd_UnitTestNullRenderPass(&renderIndex, col));
+  HdRprimCollection col(HdTokens->geometry, HdReprSelector(HdReprTokens->hull));
+  HdRenderPassSharedPtr renderPass0(new Hd_UnitTestNullRenderPass(&renderIndex, col));
 
+  SdfPathVector primList;
+  primList.push_back(SdfPath("/A/a0"));
+  primList.push_back(SdfPath("/A/a1"));
+  primList.push_back(SdfPath("/B/b0"));
+  primList.push_back(SdfPath("/B/b1"));
+  primList.push_back(SdfPath("/C/c0"));
+  primList.push_back(SdfPath("/C/c1"));
+  primList.push_back(SdfPath("/E/e0"));
+  primList.push_back(SdfPath("/E/e1"));
 
-    SdfPathVector primList;
-    primList.push_back(SdfPath("/A/a0"));
-    primList.push_back(SdfPath("/A/a1"));
-    primList.push_back(SdfPath("/B/b0"));
-    primList.push_back(SdfPath("/B/b1"));
-    primList.push_back(SdfPath("/C/c0"));
-    primList.push_back(SdfPath("/C/c1"));
-    primList.push_back(SdfPath("/E/e0"));
-    primList.push_back(SdfPath("/E/e1"));
+  // insert
+  _VERIFY_DIRTY_SIZE(delegate, 0);
+  TF_FOR_ALL(it, primList) delegate.AddMesh(*it);
+  _VERIFY_DIRTY_SIZE(delegate, 8);
 
-    // insert
-    _VERIFY_DIRTY_SIZE(delegate, 0);
-    TF_FOR_ALL(it, primList) delegate.AddMesh(*it);
-    _VERIFY_DIRTY_SIZE(delegate, 8);
+  // ------- sync /A --------
+  SdfPathVector rootA;
+  rootA.push_back(SdfPath("/A"));
+  collection.SetRootPaths(rootA);
+  renderPass->SetRprimCollection(collection);
 
-    // ------- sync /A --------
-    SdfPathVector rootA;
-    rootA.push_back(SdfPath("/A"));
-    collection.SetRootPaths(rootA);
-    renderPass->SetRprimCollection(collection);
+  renderIndex.SyncAll(&tasks, &taskContext);
 
-    renderIndex.SyncAll(&tasks, &taskContext);
+  // Render pass has been filtered to /A and we just cleaned it.
+  _VERIFY_DIRTY_SIZE(delegate, 0);
 
-    // Render pass has been filtered to /A and we just cleaned it.
-    _VERIFY_DIRTY_SIZE(delegate, 0);
+  // invalidate all
+  changeTracker.ResetVaryingState();
+  TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
 
-    // invalidate all
-    changeTracker.ResetVaryingState();
-    TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
+  // ------- sync /A and /B --------
+  SdfPathVector rootAB;
+  rootAB.push_back(SdfPath("/A"));
+  rootAB.push_back(SdfPath("/B"));
+  collection.SetRootPaths(rootAB);
+  renderPass->SetRprimCollection(collection);
+  renderIndex.SyncAll(&tasks, &taskContext);
 
-    // ------- sync /A and /B --------
-    SdfPathVector rootAB;
-    rootAB.push_back(SdfPath("/A"));
-    rootAB.push_back(SdfPath("/B"));
-    collection.SetRootPaths(rootAB);
-    renderPass->SetRprimCollection(collection);
-    renderIndex.SyncAll(&tasks, &taskContext);
+  // Ok, we expect the list to be clean now.
+  _VERIFY_DIRTY_SIZE(delegate, 0);
 
-    // Ok, we expect the list to be clean now.
-    _VERIFY_DIRTY_SIZE(delegate, 0);
+  // invalidate all
+  changeTracker.ResetVaryingState();
+  TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
 
-    // invalidate all
-    changeTracker.ResetVaryingState();
-    TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
+  // ------- sync /B, /D, /E and /F, random order --------
+  SdfPathVector rootBD;
+  rootBD.push_back(SdfPath("/D"));  // not exists in middle
+  rootBD.push_back(SdfPath("/B"));  // not first
+  rootBD.push_back(SdfPath("/F"));  // not exists at last
+  rootBD.push_back(SdfPath("/E"));
+  collection.SetRootPaths(rootBD);
+  renderPass->SetRprimCollection(collection);
+  renderIndex.SyncAll(&tasks, &taskContext);
 
-    // ------- sync /B, /D, /E and /F, random order --------
-    SdfPathVector rootBD;
-    rootBD.push_back(SdfPath("/D"));  // not exists in middle
-    rootBD.push_back(SdfPath("/B"));  // not first
-    rootBD.push_back(SdfPath("/F"));  // not exists at last
-    rootBD.push_back(SdfPath("/E"));
-    collection.SetRootPaths(rootBD);
-    renderPass->SetRprimCollection(collection);
-    renderIndex.SyncAll(&tasks, &taskContext);
+  // /A, /C remain
+  _VERIFY_DIRTY_SIZE(delegate, 0);
 
-    // /A, /C remain
-    _VERIFY_DIRTY_SIZE(delegate, 0);
+  // ---------------------------------------------------------------------- //
+  // ApplyEdit Transition tests
+  // ---------------------------------------------------------------------- //
 
-    // ---------------------------------------------------------------------- //
-    // ApplyEdit Transition tests
-    // ---------------------------------------------------------------------- //
+  // invalidate all
+  changeTracker.ResetVaryingState();
+  TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
 
-    // invalidate all
-    changeTracker.ResetVaryingState();
-    TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
+  SdfPathVector roots;
+  roots.push_back(SdfPath("/"));
+  collection.SetRootPaths(roots);
+  renderPass->SetRprimCollection(collection);
+  _VERIFY_DIRTY_SIZE(delegate, 8);
 
-    SdfPathVector roots;
-    roots.push_back(SdfPath("/"));
-    collection.SetRootPaths(roots);
-    renderPass->SetRprimCollection(collection);
-    _VERIFY_DIRTY_SIZE(delegate, 8);
+  // Transition from root </> to </A>, should still have 8 elements
+  // as it includes all prims
+  roots.clear();
+  roots.push_back(SdfPath("/A"));
+  collection.SetRootPaths(roots);
+  renderPass->SetRprimCollection(collection);
 
-    // Transition from root </> to </A>, should still have 8 elements
-    // as it includes all prims
-    roots.clear();
-    roots.push_back(SdfPath("/A"));
-    collection.SetRootPaths(roots);
-    renderPass->SetRprimCollection(collection);
+  // As this doesn't effect the scene state, we expect no change
+  _VERIFY_DIRTY_SIZE(delegate, 0);
 
-    // As this doesn't effect the scene state, we expect no change
-    _VERIFY_DIRTY_SIZE(delegate, 0);
+  // --
 
-    // --
+  // invalidate all
+  changeTracker.ResetVaryingState();
+  TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
 
-    // invalidate all
-    changeTracker.ResetVaryingState();
-    TF_FOR_ALL(it, primList) changeTracker.MarkRprimDirty(*it);
+  roots.clear();
+  roots.push_back(SdfPath("/A"));
+  collection.SetRootPaths(roots);
+  renderPass->SetRprimCollection(collection);
+  _VERIFY_DIRTY_SIZE(delegate, 8);
+  // Transition from root </A> to </>, should still have 8 elements
+  roots.clear();
+  roots.push_back(SdfPath("/"));
+  collection.SetRootPaths(roots);
+  renderPass->SetRprimCollection(collection);
 
-    roots.clear();
-    roots.push_back(SdfPath("/A"));
-    collection.SetRootPaths(roots);
-    renderPass->SetRprimCollection(collection);
-    _VERIFY_DIRTY_SIZE(delegate, 8);
-    // Transition from root </A> to </>, should still have 8 elements
-    roots.clear();
-    roots.push_back(SdfPath("/"));
-    collection.SetRootPaths(roots);
-    renderPass->SetRprimCollection(collection);
+  // As this doesn't effect the scene state, we expect no change
+  _VERIFY_DIRTY_SIZE(delegate, 0);
 
-    // As this doesn't effect the scene state, we expect no change
-    _VERIFY_DIRTY_SIZE(delegate, 0);
-
-    return true;
+  return true;
 }
 
 int main()
 {
-    TfErrorMark mark;
-    bool success = BasicTest()
-                   && SyncTest();
+  TfErrorMark mark;
+  bool success = BasicTest() && SyncTest();
 
-    TF_VERIFY(mark.IsClean());
+  TF_VERIFY(mark.IsClean());
 
-    if (success && mark.IsClean()) {
-        std::cout << "OK" << std::endl;
-        return EXIT_SUCCESS;
-    } else {
-        std::cout << "FAILED" << std::endl;
-        return EXIT_FAILURE;
-    }
+  if (success && mark.IsClean()) {
+    std::cout << "OK" << std::endl;
+    return EXIT_SUCCESS;
+  }
+  else {
+    std::cout << "FAILED" << std::endl;
+    return EXIT_FAILURE;
+  }
 }
-

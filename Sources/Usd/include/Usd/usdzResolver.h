@@ -38,15 +38,14 @@ class ArAsset;
 /// Package resolver responsible for resolving assets in
 /// .usdz files.
 class Usd_UsdzResolver : public ArPackageResolver {
-public:
+ public:
   Usd_UsdzResolver();
 
   virtual std::string Resolve(const std::string &packagePath,
                               const std::string &packagedPath) override;
 
-  virtual std::shared_ptr<ArAsset>
-  OpenAsset(const std::string &packagePath,
-            const std::string &packagedPath) override;
+  virtual std::shared_ptr<ArAsset> OpenAsset(const std::string &packagePath,
+                                             const std::string &packagedPath) override;
 
   virtual void BeginCacheScope(VtValue *cacheScopeData) override;
 
@@ -59,7 +58,7 @@ public:
 /// allows other clients besides Usd_UsdzResolver to take advantage of
 /// caching of zip files while a resolver scoped cache is active.
 class Usd_UsdzResolverCache {
-public:
+ public:
   static Usd_UsdzResolverCache &GetInstance();
 
   Usd_UsdzResolverCache(const Usd_UsdzResolverCache &) = delete;
@@ -83,7 +82,7 @@ public:
   /// dropped.
   void EndCacheScope(VtValue *cacheScopeData);
 
-private:
+ private:
   Usd_UsdzResolverCache();
 
   struct _Cache;
@@ -98,4 +97,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_USDZ_RESOLVER_H
+#endif  // PXR_USD_USD_USDZ_RESOLVER_H

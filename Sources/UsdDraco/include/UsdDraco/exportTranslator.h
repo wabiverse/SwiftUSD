@@ -29,8 +29,8 @@
 #include "exportAttribute.h"
 #include "flag.h"
 
-#include <pxr/pxrns.h>
 #include "UsdGeom/mesh.h"
+#include <pxr/pxrns.h>
 
 #include <draco/mesh/mesh.h>
 
@@ -40,9 +40,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Translates USD mesh to Draco mesh.
 ///
-class UsdDracoExportTranslator
-{
-public:
+class UsdDracoExportTranslator {
+ public:
   /// Translates USD mesh to Draco mesh and returns true on success.
   static bool Translate(const UsdGeomMesh &usdMesh,
                         draco::Mesh *dracoMesh,
@@ -54,12 +53,11 @@ public:
   /// primvar cannot be exported to Draco. This method is called by translator
   /// as well as by Python script to check whether a primvar should be kept or
   /// deleted from USD mesh.
-  static std::unique_ptr<UsdDracoExportAttributeInterface>
-  CreateAttributeFrom(const UsdGeomPrimvar &primvar);
+  static std::unique_ptr<UsdDracoExportAttributeInterface> CreateAttributeFrom(
+      const UsdGeomPrimvar &primvar);
 
-private:
-  UsdDracoExportTranslator(const UsdGeomMesh &usdMesh,
-                           draco::Mesh *dracoMesh);
+ private:
+  UsdDracoExportTranslator(const UsdGeomMesh &usdMesh, draco::Mesh *dracoMesh);
   bool _Translate(UsdDracoFlag<bool> preservePolygons,
                   UsdDracoFlag<bool> preservePositionOrder,
                   UsdDracoFlag<bool> preserveHoles);
@@ -68,8 +66,7 @@ private:
   void _GetConnectivityFromMesh();
   void _CheckUnsupportedPrimvar(const UsdGeomPrimvar &primvar);
   bool _CheckData() const;
-  bool _CheckPrimvarData(
-      const UsdDracoExportAttributeInterface &attribute) const;
+  bool _CheckPrimvarData(const UsdDracoExportAttributeInterface &attribute) const;
   void _ConfigureHelperAttributes(UsdDracoFlag<bool> preservePolygons,
                                   UsdDracoFlag<bool> preservePositionOrder,
                                   UsdDracoFlag<bool> preserveHoles);
@@ -83,7 +80,7 @@ private:
   static size_t _Triangulate(size_t triIndex, size_t triCorner);
   static bool _IsNewEdge(size_t triCount, size_t triIndex, size_t triCorner);
 
-private:
+ private:
   const UsdGeomMesh &_usdMesh;
   draco::Mesh *_dracoMesh;
 
@@ -99,8 +96,7 @@ private:
   UsdDracoExportAttribute<int> _posOrder;
 
   // Generic attributes.
-  std::vector<std::unique_ptr<UsdDracoExportAttributeInterface>>
-      _genericAttributes;
+  std::vector<std::unique_ptr<UsdDracoExportAttributeInterface>> _genericAttributes;
 
   VtIntArray _faceVertexCounts;
   VtIntArray _faceVertexIndices;
@@ -113,4 +109,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_DRACO_EXPORT_TRANSLATOR_H
+#endif  // PXR_USD_PLUGIN_USD_DRACO_EXPORT_TRANSLATOR_H

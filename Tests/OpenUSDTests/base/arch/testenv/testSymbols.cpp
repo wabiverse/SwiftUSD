@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/symbols.h"
 #include "Arch/error.h"
+#include "Arch/symbols.h"
+#include "pxr/pxr.h"
 
 #include <cstdlib>
 
@@ -43,19 +43,16 @@ static std::string GetBasename(const std::string &path)
 {
 #if defined(ARCH_OS_WINDOWS)
   std::string::size_type i = path.find_last_of("/\\");
-  if (i != std::string::npos)
-  {
+  if (i != std::string::npos) {
     std::string::size_type j = path.find(".exe");
-    if (j != std::string::npos)
-    {
+    if (j != std::string::npos) {
       return path.substr(i + 1, j - i - 1);
     }
     return path.substr(i + 1);
   }
 #else
   std::string::size_type i = path.rfind('/');
-  if (i != std::string::npos)
-  {
+  if (i != std::string::npos) {
     return path.substr(i + 1);
   }
 #endif

@@ -25,24 +25,22 @@
 #ifndef PXR_IMAGING_HGI_SHADERSECTION_H
 #define PXR_IMAGING_HGI_SHADERSECTION_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include <memory>
 #include <ostream>
+#include <pxr/pxrns.h>
 #include <string>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // struct to hold attribute definitions
-struct HgiShaderSectionAttribute
-{
+struct HgiShaderSectionAttribute {
   std::string identifier;
   std::string index;
 };
 
-using HgiShaderSectionAttributeVector =
-    std::vector<HgiShaderSectionAttribute>;
+using HgiShaderSectionAttributeVector = std::vector<HgiShaderSectionAttribute>;
 
 /// \class HgiShaderSection
 ///
@@ -52,9 +50,8 @@ using HgiShaderSectionAttributeVector =
 /// Can be subclassed to add more behaviour for complex cases
 /// and to hook into the visitor tree.
 ///
-class HgiShaderSection
-{
-public:
+class HgiShaderSection {
+ public:
   HGI_API
   virtual ~HgiShaderSection();
 
@@ -100,19 +97,18 @@ public:
     return !_blockInstanceIdentifier.empty();
   }
 
-protected:
+ protected:
   HGI_API
-  explicit HgiShaderSection(
-      const std::string &identifier,
-      const HgiShaderSectionAttributeVector &attributes = {},
-      const std::string &defaultValue = std::string(),
-      const std::string &arraySize = std::string(),
-      const std::string &blockInstanceIdentifier = std::string());
+  explicit HgiShaderSection(const std::string &identifier,
+                            const HgiShaderSectionAttributeVector &attributes = {},
+                            const std::string &defaultValue = std::string(),
+                            const std::string &arraySize = std::string(),
+                            const std::string &blockInstanceIdentifier = std::string());
 
   HGI_API
   const std::string &_GetDefaultValue() const;
 
-private:
+ private:
   const std::string _identifierVar;
   const HgiShaderSectionAttributeVector _attributes;
   const std::string _defaultValue;

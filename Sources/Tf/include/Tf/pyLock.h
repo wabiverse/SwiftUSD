@@ -28,9 +28,9 @@
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 
-#include "Tf/pySafePython.h"
+#  include "Tf/pySafePython.h"
 
-#include "Tf/api.h"
+#  include "Tf/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -120,7 +120,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// that could be shared across multiple threads.
 ///
 class TfPyLock {
-public:
+ public:
   /// Acquires the Python GIL and swaps in callers thread state.
   TF_API TfPyLock();
 
@@ -142,7 +142,7 @@ public:
   /// \a BeginAllowThreads must have been successfully called first.
   TF_API void EndAllowThreads();
 
-private:
+ private:
   // Non-acquiring constructor for TfPyEnsureGILUnlockedObj's use.
   friend struct TfPyEnsureGILUnlockedObj;
   enum _UnlockedTag { _ConstructUnlocked };
@@ -160,7 +160,7 @@ struct TfPyEnsureGILUnlockedObj {
   // the GIL, and relock upon destruction.
   TF_API TfPyEnsureGILUnlockedObj();
 
-private:
+ private:
   TfPyLock _lock;
 };
 
@@ -187,16 +187,15 @@ private:
 /// \endcode
 ///
 /// \hideinitializer
-#define TF_PY_ALLOW_THREADS_IN_SCOPE()                                         \
-  TfPyEnsureGILUnlockedObj __py_lock_allow_threads__
+#  define TF_PY_ALLOW_THREADS_IN_SCOPE() TfPyEnsureGILUnlockedObj __py_lock_allow_threads__
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #else
 
 // When python is disabled, we stub this macro out to nothing.
-#define TF_PY_ALLOW_THREADS_IN_SCOPE()
+#  define TF_PY_ALLOW_THREADS_IN_SCOPE()
 
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-#endif // PXR_BASE_TF_PY_LOCK_H
+#endif  // PXR_BASE_TF_PY_LOCK_H

@@ -47,35 +47,48 @@ SDF_DECLARE_HANDLES(SdfSpec);
 /// Base class for list editor implementations in which list editing operations
 /// are stored in data field(s) associated with an owning spec.
 ///
-template <class TypePolicy> class Sdf_ListEditor {
+template<class TypePolicy> class Sdf_ListEditor {
   Sdf_ListEditor(const Sdf_ListEditor &) = delete;
   Sdf_ListEditor &operator=(const Sdf_ListEditor &) = delete;
 
-private:
+ private:
   typedef Sdf_ListEditor<TypePolicy> This;
 
-public:
+ public:
   typedef typename TypePolicy::value_type value_type;
   typedef std::vector<value_type> value_vector_type;
 
   virtual ~Sdf_ListEditor() = default;
 
-  SdfLayerHandle GetLayer() const {
+  SdfLayerHandle GetLayer() const
+  {
     return _owner ? _owner->GetLayer() : SdfLayerHandle();
   }
 
-  SdfPath GetPath() const { return _owner ? _owner->GetPath() : SdfPath(); }
+  SdfPath GetPath() const
+  {
+    return _owner ? _owner->GetPath() : SdfPath();
+  }
 
-  bool IsValid() const { return !IsExpired(); }
+  bool IsValid() const
+  {
+    return !IsExpired();
+  }
 
-  bool IsExpired() const { return !_owner; }
+  bool IsExpired() const
+  {
+    return !_owner;
+  }
 
-  bool HasKeys() const {
+  bool HasKeys() const
+  {
     if (IsExplicit()) {
       return true;
-    } else if (IsOrderedOnly()) {
+    }
+    else if (IsOrderedOnly()) {
       return !_GetOperations(SdfListOpTypeOrdered).empty();
-    } else {
+    }
+    else {
       return (!_GetOperations(SdfListOpTypeAdded).empty() ||
               !_GetOperations(SdfListOpTypePrepended).empty() ||
               !_GetOperations(SdfListOpTypeAppended).empty() ||
@@ -87,7 +100,8 @@ public:
   virtual bool IsExplicit() const = 0;
   virtual bool IsOrderedOnly() const = 0;
 
-  virtual SdfAllowed PermissionToEdit(SdfListOpType op) const {
+  virtual SdfAllowed PermissionToEdit(SdfListOpType op) const
+  {
     if (!_owner) {
       return SdfAllowed("List editor is expired");
     }
@@ -103,8 +117,7 @@ public:
   virtual bool ClearEdits() = 0;
   virtual bool ClearEditsAndMakeExplicit() = 0;
 
-  typedef std::function<boost::optional<value_type>(const value_type &)>
-      ModifyCallback;
+  typedef std::function<boost::optional<value_type>(const value_type &)> ModifyCallback;
 
   /// Modifies the operations stored in all operation lists.
   /// \p callback is called for every key.  If the returned key is
@@ -114,8 +127,7 @@ public:
   /// removed.
   virtual void ModifyItemEdits(const ModifyCallback &cb) = 0;
 
-  typedef std::function<boost::optional<value_type>(SdfListOpType,
-                                                    const value_type &)>
+  typedef std::function<boost::optional<value_type>(SdfListOpType, const value_type &)>
       ApplyCallback;
 
   /// Apply the list operations represented by this interface to the given
@@ -129,31 +141,38 @@ public:
                                 const ApplyCallback &cb = ApplyCallback()) = 0;
 
   /// Returns the number of elements in the specified list of operations.
-  size_t GetSize(SdfListOpType op) const { return _GetOperations(op).size(); }
+  size_t GetSize(SdfListOpType op) const
+  {
+    return _GetOperations(op).size();
+  }
 
   /// Returns the \p i'th value in the specified list of operations.
-  value_type Get(SdfListOpType op, size_t i) const {
+  value_type Get(SdfListOpType op, size_t i) const
+  {
     return _GetOperations(op)[i];
   }
 
   /// Returns the specified list of operations.
-  value_vector_type GetVector(SdfListOpType op) const {
+  value_vector_type GetVector(SdfListOpType op) const
+  {
     return _GetOperations(op);
   }
 
   /// Returns the number of occurrences of \p val in the specified list of
   /// operations.
-  size_t Count(SdfListOpType op, const value_type &val) const {
+  size_t Count(SdfListOpType op, const value_type &val) const
+  {
     const value_vector_type &ops = _GetOperations(op);
     return std::count(ops.begin(), ops.end(), _typePolicy.Canonicalize(val));
   }
 
   /// Returns the index of \p val in the specified list of operations, -1
   /// if \p val is not found.
-  size_t Find(SdfListOpType op, const value_type &val) const {
+  size_t Find(SdfListOpType op, const value_type &val) const
+  {
     const value_vector_type &vec = _GetOperations(op);
-    typename value_vector_type::const_iterator findIt =
-        std::find(vec.begin(), vec.end(), _typePolicy.Canonicalize(val));
+    typename value_vector_type::const_iterator findIt = std::find(
+        vec.begin(), vec.end(), _typePolicy.Canonicalize(val));
     if (findIt != vec.end()) {
       return std::distance(vec.begin(), findIt);
     }
@@ -163,28 +182,41 @@ public:
 
   /// Replaces the operations in the specified list of operations in range
   /// [index, index + n) with the given \p elems.
-  virtual bool ReplaceEdits(SdfListOpType op, size_t index, size_t n,
+  virtual bool ReplaceEdits(SdfListOpType op,
+                            size_t index,
+                            size_t n,
                             const value_vector_type &elems) = 0;
 
   /// Applies a \p rhs opinions about a given operation list to this one.
   virtual void ApplyList(SdfListOpType op, const Sdf_ListEditor &rhs) = 0;
 
-protected:
+ protected:
   Sdf_ListEditor() {}
 
-  Sdf_ListEditor(const SdfSpecHandle &owner, const TfToken &field,
-                 const TypePolicy &typePolicy)
-      : _owner(owner), _field(field), _typePolicy(typePolicy) {}
+  Sdf_ListEditor(const SdfSpecHandle &owner, const TfToken &field, const TypePolicy &typePolicy)
+      : _owner(owner), _field(field), _typePolicy(typePolicy)
+  {
+  }
 
-  const SdfSpecHandle &_GetOwner() const { return _owner; }
+  const SdfSpecHandle &_GetOwner() const
+  {
+    return _owner;
+  }
 
-  const TfToken &_GetField() const { return _field; }
+  const TfToken &_GetField() const
+  {
+    return _field;
+  }
 
-  const TypePolicy &_GetTypePolicy() const { return _typePolicy; }
+  const TypePolicy &_GetTypePolicy() const
+  {
+    return _typePolicy;
+  }
 
   virtual bool _ValidateEdit(SdfListOpType op,
                              const value_vector_type &oldValues,
-                             const value_vector_type &newValues) const {
+                             const value_vector_type &newValues) const
+  {
     // Disallow duplicate items from being stored in the new list
     // editor values. This is O(n^2), but we expect the number of elements
     // stored to be small enough that this won't matter.
@@ -200,13 +232,11 @@ protected:
     // prefix of oldValues and newValues.  Then we can only check for dupes
     // in the tail of newValues.
 
-    typename value_vector_type::const_iterator oldValuesTail =
-                                                   oldValues.begin(),
-                                               newValuesTail =
-                                                   newValues.begin();
+    typename value_vector_type::const_iterator oldValuesTail = oldValues.begin(),
+                                               newValuesTail = newValues.begin();
     auto oldEnd = oldValues.end(), newEnd = newValues.end();
-    while (oldValuesTail != oldEnd && newValuesTail != newEnd &&
-           *oldValuesTail == *newValuesTail) {
+    while (oldValuesTail != oldEnd && newValuesTail != newEnd && *oldValuesTail == *newValuesTail)
+    {
       ++oldValuesTail, ++newValuesTail;
     }
 
@@ -214,24 +244,27 @@ protected:
       // Have to check unmatched new items for dupes.
       for (auto j = newValues.begin(); j != i; ++j) {
         if (*i == *j) {
-          TF_CODING_ERROR("Duplicate item '%s' not allowed for "
-                          "field '%s' on <%s>",
-                          TfStringify(*i).c_str(), _field.GetText(),
-                          this->GetPath().GetText());
+          TF_CODING_ERROR(
+              "Duplicate item '%s' not allowed for "
+              "field '%s' on <%s>",
+              TfStringify(*i).c_str(),
+              _field.GetText(),
+              this->GetPath().GetText());
           return false;
         }
       }
     }
 
     // Ensure that all new values are valid for this field.
-    const SdfSchema::FieldDefinition *fieldDef =
-        _owner->GetSchema().GetFieldDefinition(_field);
+    const SdfSchema::FieldDefinition *fieldDef = _owner->GetSchema().GetFieldDefinition(_field);
     if (!fieldDef) {
       TF_CODING_ERROR("No field definition for field '%s'", _field.GetText());
-    } else {
+    }
+    else {
       for (auto i = newValuesTail; i != newEnd; ++i) {
         if (SdfAllowed isValid = fieldDef->IsValidListValue(*i)) {
-        } else {
+        }
+        else {
           TF_CODING_ERROR("%s", isValid.GetWhyNot().c_str());
           return false;
         }
@@ -241,24 +274,28 @@ protected:
     return true;
   }
 
-  virtual void _OnEdit(SdfListOpType op, const value_vector_type &oldValues,
-                       const value_vector_type &newValues) const {}
+  virtual void _OnEdit(SdfListOpType op,
+                       const value_vector_type &oldValues,
+                       const value_vector_type &newValues) const
+  {
+  }
 
   virtual const value_vector_type &_GetOperations(SdfListOpType op) const = 0;
 
-private:
+ private:
   SdfSpecHandle _owner;
   TfToken _field;
   TypePolicy _typePolicy;
 };
 
-template <class TypePolicy>
-std::ostream &operator<<(std::ostream &s, const Sdf_ListEditor<TypePolicy> &x) {
+template<class TypePolicy>
+std::ostream &operator<<(std::ostream &s, const Sdf_ListEditor<TypePolicy> &x)
+{
   struct Util {
-    typedef typename Sdf_ListEditor<TypePolicy>::value_vector_type
-        value_vector_type;
+    typedef typename Sdf_ListEditor<TypePolicy>::value_vector_type value_vector_type;
 
-    static void _Write(std::ostream &s, const value_vector_type &v) {
+    static void _Write(std::ostream &s, const value_vector_type &v)
+    {
       s << '[';
       for (size_t i = 0, n = v.size(); i < n; ++i) {
         if (i != 0) {
@@ -272,10 +309,12 @@ std::ostream &operator<<(std::ostream &s, const Sdf_ListEditor<TypePolicy> &x) {
 
   if (!x.IsValid()) {
     return s;
-  } else if (x.IsExplicit()) {
+  }
+  else if (x.IsExplicit()) {
     Util::_Write(s, x.GetVector(SdfListOpTypeExplicit));
     return s;
-  } else {
+  }
+  else {
     s << "{ ";
     if (!x.IsOrderedOnly()) {
       s << "'added': ";
@@ -296,4 +335,4 @@ std::ostream &operator<<(std::ostream &s, const Sdf_ListEditor<TypePolicy> &x) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LIST_EDITOR_H
+#endif  // PXR_USD_SDF_LIST_EDITOR_H

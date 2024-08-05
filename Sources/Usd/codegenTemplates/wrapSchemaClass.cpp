@@ -27,9 +27,13 @@
 #include "Sdf/primSpec.h"
 
 #include "Usd/pyConversions.h"
-{ % if cls.isAppliedAPISchema % }
+{
+  % if cls.isAppliedAPISchema %
+}
 #include "Tf/pyAnnotatedBoolResult.h"
-{ % endif % }
+{
+  % endif %
+}
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
@@ -41,9 +45,13 @@
 
 using namespace boost::python;
 
-{ % if useExportAPI % }
 {
-  { namespaceUsing }
+  % if useExportAPI %
+}
+{
+  {
+    namespaceUsing
+  }
 }
 
 namespace {
@@ -51,64 +59,106 @@ namespace {
 {
   % endif %
 }
-#define WRAP_CUSTOM                                                            \
-  template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
 {% for attrName in cls.attrOrder -%
 }
-{ % set attr = cls.attrs[attrName] % }
+{
+  % set attr = cls.attrs[attrName] %
+}
 {
 #Only emit Create / Get API if apiName is not empty string.#
 }
-{ % if attr.apiName != '' % }
-
-static UsdAttribute _Create {
-  { Proper(attr.apiName) }
+{
+  % if attr.apiName != '' %
 }
-Attr({{cls.cppClassName}} & self, object defaultVal, bool writeSparsely) {
-  return self.Create {
-    { Proper(attr.apiName) }
+
+static UsdAttribute _Create
+{
+  {
+    Proper(attr.apiName)
+  }
+}
+Attr({{cls.cppClassName}} & self, object defaultVal, bool writeSparsely)
+{
+  return self.Create
+  {
+    {
+      Proper(attr.apiName)
+    }
   }
   Attr(UsdPythonToSdfType(defaultVal, {{attr.usdType}}), writeSparsely);
 }
-{ % endif % }
-{ % endfor % }
-{ % if cls.isMultipleApply and cls.propertyNamespacePrefix % }
-
-static bool _WrapIs {
-  { cls.usdPrimTypeName }
+{
+  % endif %
 }
-Path(const SdfPath &path) {
-  TfToken collectionName;
-  return {
-    { cls.cppClassName }
+{
+  % endfor %
+}
+{
+  % if cls.isMultipleApply and cls.propertyNamespacePrefix %
+}
+
+static bool _WrapIs
+{
+  {
+    cls.usdPrimTypeName
   }
-  ::Is {
-    { cls.usdPrimTypeName }
+}
+Path(const SdfPath &path)
+{
+  TfToken collectionName;
+  return
+  {
+    {
+      cls.cppClassName
+    }
+  }
+  ::Is
+  {
+    {
+      cls.usdPrimTypeName
+    }
   }
   Path(path, &collectionName);
 }
-{ % endif % }
-{ % if not cls.isAPISchemaBase % }
-
-static std::string _Repr(const {{cls.cppClassName}} & self) {
-  std::string primRepr = TfPyRepr(self.GetPrim());
-  { % if cls.isMultipleApply % }
-  std::string instanceName = self.GetName();
-  return TfStringPrintf("{{ libraryName[0]|upper }}{{ libraryName[1:] }}.{{ "
-                        "cls.className }}(%s, '%s')",
-                        primRepr.c_str(), instanceName.c_str());
-  { % else % }
-  return TfStringPrintf(
-      "{{ libraryName[0]|upper }}{{ libraryName[1:] }}.{{ cls.className }}(%s)",
-      primRepr.c_str());
-  { % endif % }
+{
+  % endif %
 }
-{ % endif % }
-{ % if cls.isAppliedAPISchema % }
+{
+  % if not cls.isAPISchemaBase %
+}
+
+static std::string _Repr(const {{cls.cppClassName}} & self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  {
+    % if cls.isMultipleApply %
+  }
+  std::string instanceName = self.GetName();
+  return TfStringPrintf(
+      "{{ libraryName[0]|upper }}{{ libraryName[1:] }}.{{ "
+      "cls.className }}(%s, '%s')",
+      primRepr.c_str(),
+      instanceName.c_str());
+  {
+    % else %
+  }
+  return TfStringPrintf("{{ libraryName[0]|upper }}{{ libraryName[1:] }}.{{ cls.className }}(%s)",
+                        primRepr.c_str());
+  {
+    % endif %
+  }
+}
+{
+  % endif %
+}
+{
+  % if cls.isAppliedAPISchema %
+}
 
 struct {
   {
@@ -119,68 +169,112 @@ struct {
       TfPyAnnotatedBoolResult<std::string>(val, msg){}
 };
 
-{ % if cls.isMultipleApply % }
-static {
-  { cls.cppClassName }
+{
+  % if cls.isMultipleApply %
 }
-_CanApplyResult _WrapCanApply(const UsdPrim &prim, const TfToken &name) {
+static
+{
+  {
+    cls.cppClassName
+  }
+}
+_CanApplyResult _WrapCanApply(const UsdPrim &prim, const TfToken &name)
+{
   std::string whyNot;
   bool result = { {cls.cppClassName} } ::CanApply(prim, name, &whyNot);
-  return {
-    { cls.cppClassName }
+  return
+  {
+    {
+      cls.cppClassName
+    }
   }
   _CanApplyResult(result, whyNot);
 }
-{ % else % }
-static {
-  { cls.cppClassName }
+{
+  % else %
 }
-_CanApplyResult _WrapCanApply(const UsdPrim &prim) {
+static
+{
+  {
+    cls.cppClassName
+  }
+}
+_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
   std::string whyNot;
   bool result = { {cls.cppClassName} } ::CanApply(prim, &whyNot);
-  return {
-    { cls.cppClassName }
+  return
+  {
+    {
+      cls.cppClassName
+    }
   }
   _CanApplyResult(result, whyNot);
 }
-{ % endif % }
-{ % endif % }
-{ % if useExportAPI % }
+{
+  % endif %
+}
+{
+  % endif %
+}
+{
+  % if useExportAPI %
+}
 
-} // anonymous namespace
-{ % endif % }
+}  // anonymous namespace
+{
+  % endif %
+}
 
-void wrap{{cls.cppClassName}}() {
-  typedef {
-    { cls.cppClassName }
+void wrap{{cls.cppClassName}}()
+{
+  typedef
+  {
+    {
+      cls.cppClassName
+    }
   }
   This;
 
-  { % if cls.isAppliedAPISchema % }
   {
-    { cls.cppClassName }
+    % if cls.isAppliedAPISchema %
   }
-  _CanApplyResult::Wrap < {
-    { cls.cppClassName }
+  {
+    {
+      cls.cppClassName
+    }
+  }
+  _CanApplyResult::Wrap <
+  {
+    {
+      cls.cppClassName
+    }
   }
   _CanApplyResult > ("_CanApplyResult", "whyNot");
 
-  { % endif % }
-  { % if cls.isAPISchemaBase % }
+  {
+    % endif %
+  }
+  {
+    % if cls.isAPISchemaBase %
+  }
   class_<This, bases<{{cls.parentCppClassName}}>, boost::noncopyable> cls(
       "APISchemaBase", "", no_init);
-  { % else % } class_<This, bases<{{cls.parentCppClassName}}>> cls(
-      "{{ cls.className }}");
+  { % else % } class_<This, bases<{{cls.parentCppClassName}}>> cls("{{ cls.className }}");
   { % endif % }
 
-  cls {
+  cls
+  {
     % if not cls.isAPISchemaBase %
   }
-  { % if cls.isMultipleApply % }
+  {
+    % if cls.isMultipleApply %
+  }
   .def(init<UsdPrim, TfToken>())
       .def(init<UsdSchemaBase const &, TfToken>()){ % else % }
       .def(init<UsdPrim>(arg("prim")))
-      .def(init<UsdSchemaBase const &>(arg("schemaObj"))) {
+      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
+  {
     % endif %
   }
   { % endif % }.def(TfTypePythonClass())
@@ -188,72 +282,93 @@ void wrap{{cls.cppClassName}}() {
   {
     % if not cls.isAPISchemaBase %
   }
-  { % if cls.isMultipleApply % }
-  .def(
-      "Get",
-      ({{cls.cppClassName}}(*)(const UsdStagePtr &stage, const SdfPath &path)) &
-          This::Get,
-      (arg("stage"), arg("path")))
+  {
+    % if cls.isMultipleApply %
+  }
+  .def("Get",
+       ({{cls.cppClassName}}(*)(const UsdStagePtr &stage, const SdfPath &path)) & This::Get,
+       (arg("stage"), arg("path")))
       .def("Get",
-           ({{cls.cppClassName}}(*)(const UsdPrim &prim, const TfToken &name)) &
-               This::Get,
+           ({{cls.cppClassName}}(*)(const UsdPrim &prim, const TfToken &name)) & This::Get,
            (arg("prim"), arg("name"))){ % else % }
       .def("Get", &This::Get, (arg("stage"), arg("path"))){ % endif % }
-      .staticmethod("Get") {
+      .staticmethod("Get")
+  {
     % endif %
   }
-  { % if cls.isMultipleApply % }
+  {
+    % if cls.isMultipleApply %
+  }
 
   .def("GetAll",
-       (std::vector<{{cls.cppClassName}}>(*)(const UsdPrim &prim)) &
-           This::GetAll,
-       arg("prim"), return_value_policy<TfPySequenceToList>())
-      .staticmethod("GetAll") {
+       (std::vector<{{cls.cppClassName}}>(*)(const UsdPrim &prim)) & This::GetAll,
+       arg("prim"),
+       return_value_policy<TfPySequenceToList>())
+      .staticmethod("GetAll")
+  {
     % endif %
   }
-  { % if cls.isConcrete % }
-
-  .def("Define", &This::Define, (arg("stage"), arg("path")))
-      .staticmethod("Define") {
-    % endif %
-  }
-  { % if cls.isAppliedAPISchema and not cls.isMultipleApply % }
-
-  .def("CanApply", &_WrapCanApply, (arg("prim"))).staticmethod("CanApply") {
-    % endif %
-  }
-  { % if cls.isAppliedAPISchema and cls.isMultipleApply % }
-
-  .def("CanApply", &_WrapCanApply, (arg("prim"), arg("name")))
-      .staticmethod("CanApply") {
-    % endif %
-  }
-  { % if cls.isAppliedAPISchema and not cls.isMultipleApply % }
-
-  .def("Apply", &This::Apply, (arg("prim"))).staticmethod("Apply") { % endif % }
-  { % if cls.isAppliedAPISchema and cls.isMultipleApply % }
-
-  .def("Apply", &This::Apply, (arg("prim"), arg("name")))
-      .staticmethod("Apply") {
-    % endif %
+  {
+    % if cls.isConcrete %
   }
 
-  { % if cls.isMultipleApply % }
+  .def("Define", &This::Define, (arg("stage"), arg("path"))).staticmethod("Define")
+  {
+    % endif %
+  }
+  {
+    % if cls.isAppliedAPISchema and not cls.isMultipleApply %
+  }
+
+  .def("CanApply", &_WrapCanApply, (arg("prim"))).staticmethod("CanApply")
+  {
+    % endif %
+  }
+  {
+    % if cls.isAppliedAPISchema and cls.isMultipleApply %
+  }
+
+  .def("CanApply", &_WrapCanApply, (arg("prim"), arg("name"))).staticmethod("CanApply")
+  {
+    % endif %
+  }
+  {
+    % if cls.isAppliedAPISchema and not cls.isMultipleApply %
+  }
+
+  .def("Apply", &This::Apply, (arg("prim"))).staticmethod("Apply")
+  {
+    % endif %
+  }
+  {
+    % if cls.isAppliedAPISchema and cls.isMultipleApply %
+  }
+
+  .def("Apply", &This::Apply, (arg("prim"), arg("name"))).staticmethod("Apply")
+  {
+    % endif %
+  }
+
+  {
+    % if cls.isMultipleApply %
+  }
   .def("GetSchemaAttributeNames",
        (const TfTokenVector &(*)(bool)) & This::GetSchemaAttributeNames,
        arg("includeInherited") = true,
        return_value_policy<TfPySequenceToList>())
       .def("GetSchemaAttributeNames",
-           (TfTokenVector(*)(bool, const TfToken &)) &
-               This::GetSchemaAttributeNames,
-           arg("includeInherited"), arg("instanceName"),
+           (TfTokenVector(*)(bool, const TfToken &)) & This::GetSchemaAttributeNames,
+           arg("includeInherited"),
+           arg("instanceName"),
            return_value_policy<TfPySequenceToList>()){ % else % }
-      .def("GetSchemaAttributeNames", &This::GetSchemaAttributeNames,
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
            arg("includeInherited") = true,
            return_value_policy<TfPySequenceToList>()){ % endif % }
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -261,57 +376,86 @@ void wrap{{cls.cppClassName}}() {
 
   {% for attrName in cls.attrOrder -%
   }
-  { % set attr = cls.attrs[attrName] % }
+  {
+    % set attr = cls.attrs[attrName] %
+  }
   {
 #Only emit Create / Get API if apiName is not empty string.#
   }
-  { % if attr.apiName != '' % }
+  {
+    % if attr.apiName != '' %
+  }
 
   .def(
       "Get{{ Proper(attr.apiName) }}Attr",
       &This::Get {
-        { Proper(attr.apiName) }
+        {
+          Proper(attr.apiName)
+        }
       } Attr)
       .def(
           "Create{{ Proper(attr.apiName) }}Attr",
           &_Create {
-            { Proper(attr.apiName) }
+            {
+              Proper(attr.apiName)
+            }
           } Attr,
-          (arg("defaultValue") = object(), arg("writeSparsely") = false)) {
+          (arg("defaultValue") = object(), arg("writeSparsely") = false))
+  {
     % endif %
   }
-  { % endfor % }
+  {
+    % endfor %
+  }
 
   {% for relName in cls.relOrder -%
   }
   {
 #Only emit Create / Get API and doxygen if apiName is not empty string.#
   }
-  { % set rel = cls.rels[relName] % }
-  { % if rel.apiName != '' % }
+  {
+    % set rel = cls.rels[relName] %
+  }
+  {
+    % if rel.apiName != '' %
+  }
 
   .def(
       "Get{{ Proper(rel.apiName) }}Rel",
       &This::Get {
-        { Proper(rel.apiName) }
+        {
+          Proper(rel.apiName)
+        }
       } Rel)
       .def(
           "Create{{ Proper(rel.apiName) }}Rel", &This::Create {
-            { Proper(rel.apiName) }
-          } Rel) {
+            {
+              Proper(rel.apiName)
+            }
+          } Rel)
+  {
     % endif %
   }
-  { % endfor % }
-  { % if cls.isMultipleApply and cls.propertyNamespacePrefix % }
+  {
+    % endfor %
+  }
+  {
+    % if cls.isMultipleApply and cls.propertyNamespacePrefix %
+  }
   .def(
       "Is{{ cls.usdPrimTypeName }}Path",
       _WrapIs {
-        { cls.usdPrimTypeName }
+        {
+          cls.usdPrimTypeName
+        }
       } Path)
-      .staticmethod("Is{{ cls.usdPrimTypeName }}Path") {
+      .staticmethod("Is{{ cls.usdPrimTypeName }}Path")
+  {
     % endif %
   }
-  { % if not cls.isAPISchemaBase % }
+  {
+    % if not cls.isAPISchemaBase %
+  }
   .def("__repr__", ::_Repr){ % endif % };
 
   _CustomWrapCode(cls);
@@ -329,11 +473,15 @@ void wrap{{cls.cppClassName}}() {
 // }
 //
 // Of course any other ancillary or support code may be provided.
-{ % if useExportAPI % }
+{
+  % if useExportAPI %
+}
 //
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
-{ % endif % }
+{
+  % endif %
+}
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--

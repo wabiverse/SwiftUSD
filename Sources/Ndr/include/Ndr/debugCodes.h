@@ -24,22 +24,15 @@
 #ifndef PXR_USD_NDR_DEBUG_CODES_H
 #define PXR_USD_NDR_DEBUG_CODES_H
 
-#include <pxr/pxrns.h>
 #include "Tf/debug.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DEBUG_CODES(
 
-    NDR_DISCOVERY,
-    NDR_PARSING,
-    NDR_INFO,
-    NDR_STATS,
-    NDR_DEBUG
-);
-
+    NDR_DISCOVERY, NDR_PARSING, NDR_INFO, NDR_STATS, NDR_DEBUG);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_DEBUG_CODES_H
+#endif  // PXR_USD_NDR_DEBUG_CODES_H

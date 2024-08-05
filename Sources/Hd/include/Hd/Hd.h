@@ -2,8 +2,8 @@
 #define __PXR_IMAGING_HD_HD_H__
 
 // hd
-#include <Hd/api.h>
 #include <Hd/aov.h>
+#include <Hd/api.h>
 #include <Hd/basisCurves.h>
 #include <Hd/basisCurvesSchema.h>
 #include <Hd/basisCurvesTopology.h>
@@ -38,8 +38,8 @@
 #include <Hd/dirtyBitsTranslator.h>
 #include <Hd/dirtyList.h>
 #include <Hd/displayFilterSchema.h>
-#include <Hd/drawingCoord.h>
 #include <Hd/drawItem.h>
+#include <Hd/drawingCoord.h>
 #include <Hd/driver.h>
 #include <Hd/engine.h>
 #include <Hd/enums.h>
@@ -69,12 +69,12 @@
 #include <Hd/geomSubsetSchema.h>
 #include <Hd/geomSubsetsSchema.h>
 #include <Hd/instanceCategoriesSchema.h>
-#include <Hd/instancedBySchema.h>
 #include <Hd/instanceIndicesSchema.h>
-#include <Hd/instancer.h>
 #include <Hd/instanceRegistry.h>
-#include <Hd/instancerTopologySchema.h>
 #include <Hd/instanceSchema.h>
+#include <Hd/instancedBySchema.h>
+#include <Hd/instancer.h>
+#include <Hd/instancerTopologySchema.h>
 #include <Hd/integratorSchema.h>
 #include <Hd/invalidatableContainerDataSource.h>
 #include <Hd/lazyContainerDataSource.h>
@@ -120,9 +120,6 @@
 #include <Hd/renderBuffer.h>
 #include <Hd/renderBufferSchema.h>
 #include <Hd/renderDelegate.h>
-#include <Hd/rendererPlugin.h>
-#include <Hd/rendererPluginHandle.h>
-#include <Hd/rendererPluginRegistry.h>
 #include <Hd/renderIndex.h>
 #include <Hd/renderPass.h>
 #include <Hd/renderPassState.h>
@@ -131,6 +128,9 @@
 #include <Hd/renderSettingsSchema.h>
 #include <Hd/renderThread.h>
 #include <Hd/renderVarSchema.h>
+#include <Hd/rendererPlugin.h>
+#include <Hd/rendererPluginHandle.h>
+#include <Hd/rendererPluginRegistry.h>
 #include <Hd/repr.h>
 #include <Hd/resourceRegistry.h>
 #include <Hd/retainedDataSource.h>
@@ -179,4 +179,4 @@
 #include <Hd/vtBufferSource.h>
 #include <Hd/xformSchema.h>
 
-#endif // __PXR_IMAGING_HD_HD_H__
+#endif  // __PXR_IMAGING_HD_HD_H__

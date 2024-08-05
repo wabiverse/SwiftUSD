@@ -33,93 +33,71 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSampleFilterSchemaTokens,
-    HDSAMPLEFILTER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSampleFilterSchemaTokens, HDSAMPLEFILTER_SCHEMA_TOKENS);
 
-
-
-HdMaterialNodeSchema
-HdSampleFilterSchema::GetResource()
+HdMaterialNodeSchema HdSampleFilterSchema::GetResource()
 {
-    return HdMaterialNodeSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdSampleFilterSchemaTokens->resource));
+  return HdMaterialNodeSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdSampleFilterSchemaTokens->resource));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdSampleFilterSchema::BuildRetained(
-        const HdContainerDataSourceHandle &resource
-)
-{
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
-
-    size_t count = 0;
-    if (resource) {
-        names[count] = HdSampleFilterSchemaTokens->resource;
-        values[count++] = resource;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdSampleFilterSchema
-HdSampleFilterSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdSampleFilterSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdSampleFilterSchemaTokens->sampleFilter))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdSampleFilterSchema::GetSchemaToken()
-{
-    return HdSampleFilterSchemaTokens->sampleFilter;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdSampleFilterSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdSampleFilterSchemaTokens->sampleFilter
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdSampleFilterSchema::GetResourceLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdSampleFilterSchemaTokens->sampleFilter,
-        HdSampleFilterSchemaTokens->resource
-    );
-    return locator;
-}
-
-
-HdSampleFilterSchema::Builder &
-HdSampleFilterSchema::Builder::SetResource(
+HdContainerDataSourceHandle HdSampleFilterSchema::BuildRetained(
     const HdContainerDataSourceHandle &resource)
 {
-    _resource = resource;
-    return *this;
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
+
+  size_t count = 0;
+  if (resource) {
+    names[count] = HdSampleFilterSchemaTokens->resource;
+    values[count++] = resource;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdSampleFilterSchema::Builder::Build()
+/*static*/
+HdSampleFilterSchema HdSampleFilterSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdSampleFilterSchema::BuildRetained(
-        _resource
-    );
+  return HdSampleFilterSchema(fromParentContainer ?
+                                  HdContainerDataSource::Cast(fromParentContainer->Get(
+                                      HdSampleFilterSchemaTokens->sampleFilter)) :
+                                  nullptr);
 }
 
+/*static*/
+const TfToken &HdSampleFilterSchema::GetSchemaToken()
+{
+  return HdSampleFilterSchemaTokens->sampleFilter;
+}
+/*static*/
+const HdDataSourceLocator &HdSampleFilterSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdSampleFilterSchemaTokens->sampleFilter);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdSampleFilterSchema::GetResourceLocator()
+{
+  static const HdDataSourceLocator locator(HdSampleFilterSchemaTokens->sampleFilter,
+                                           HdSampleFilterSchemaTokens->resource);
+  return locator;
+}
+
+HdSampleFilterSchema::Builder &HdSampleFilterSchema::Builder::SetResource(
+    const HdContainerDataSourceHandle &resource)
+{
+  _resource = resource;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdSampleFilterSchema::Builder::Build()
+{
+  return HdSampleFilterSchema::BuildRetained(_resource);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

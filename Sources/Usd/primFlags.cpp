@@ -27,14 +27,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const Usd_PrimFlagsConjunction UsdPrimDefaultPredicate =
-    UsdPrimIsActive && UsdPrimIsDefined && UsdPrimIsLoaded &&
-    !UsdPrimIsAbstract;
+const Usd_PrimFlagsConjunction UsdPrimDefaultPredicate = UsdPrimIsActive && UsdPrimIsDefined &&
+                                                         UsdPrimIsLoaded && !UsdPrimIsAbstract;
 
-const Usd_PrimFlagsPredicate UsdPrimAllPrimsPredicate =
-    Usd_PrimFlagsPredicate::Tautology();
+const Usd_PrimFlagsPredicate UsdPrimAllPrimsPredicate = Usd_PrimFlagsPredicate::Tautology();
 
-bool Usd_PrimFlagsPredicate::operator()(const UsdPrim &prim) const {
+bool Usd_PrimFlagsPredicate::operator()(const UsdPrim &prim) const
+{
   if (!prim) {
     TF_CODING_ERROR("Applying predicate to invalid prim.");
     return false;
@@ -42,11 +41,13 @@ bool Usd_PrimFlagsPredicate::operator()(const UsdPrim &prim) const {
   return _Eval(prim._Prim(), prim.IsInstanceProxy());
 }
 
-Usd_PrimFlagsConjunction Usd_PrimFlagsDisjunction::operator!() const {
+Usd_PrimFlagsConjunction Usd_PrimFlagsDisjunction::operator!() const
+{
   return Usd_PrimFlagsConjunction(_GetNegated());
 }
 
-Usd_PrimFlagsDisjunction Usd_PrimFlagsConjunction::operator!() const {
+Usd_PrimFlagsDisjunction Usd_PrimFlagsConjunction::operator!() const
+{
   return Usd_PrimFlagsDisjunction(_GetNegated());
 }
 

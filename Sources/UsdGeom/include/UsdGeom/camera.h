@@ -26,20 +26,20 @@
 
 /// \file usdGeom/camera.h
 
-#include <pxr/pxrns.h>
-#include "UsdGeom/api.h"
-#include "UsdGeom/xformable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/api.h"
 #include "UsdGeom/tokens.h"
+#include "UsdGeom/xformable.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/camera.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -74,10 +74,11 @@ class SdfAssetPath;
 /// \note
 /// <b>Cameras in USD are always "Y up", regardless of the stage's orientation
 /// (i.e. UsdGeomGetStageUpAxis()).</b>  This means that the inverse of
-/// 'camXform' (the VIEW half of the <A HREF="http://www.glprogramming.com/red/chapter03.html#name2">MODELVIEW transform in OpenGL parlance</A>)
-/// will transform the world such that the camera is at the origin, looking
-/// down the -Z axis, with +Y as the up axis, and +X pointing to the right.
-/// This describes a __right handed coordinate system__.
+/// 'camXform' (the VIEW half of the <A
+/// HREF="http://www.glprogramming.com/red/chapter03.html#name2">MODELVIEW transform in OpenGL
+/// parlance</A>) will transform the world such that the camera is at the origin, looking down the
+/// -Z axis, with +Y as the up axis, and +X pointing to the right. This describes a __right handed
+/// coordinate system__.
 ///
 /// \section UsdGeom_CameraUnits Units of Measure for Camera Properties
 ///
@@ -108,9 +109,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdGeomTokens->rightHanded
 /// as the value.
 ///
-class UsdGeomCamera : public UsdGeomXformable
-{
-public:
+class UsdGeomCamera : public UsdGeomXformable {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -120,18 +120,12 @@ public:
   /// Equivalent to UsdGeomCamera::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdGeomCamera(const UsdPrim &prim = UsdPrim())
-      : UsdGeomXformable(prim)
-  {
-  }
+  explicit UsdGeomCamera(const UsdPrim &prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
   /// Construct a UsdGeomCamera on the prim held by \p schemaObj .
   /// Should be preferred over UsdGeomCamera(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdGeomCamera(const UsdSchemaBase &schemaObj)
-      : UsdGeomXformable(schemaObj)
-  {
-  }
+  explicit UsdGeomCamera(const UsdSchemaBase &schemaObj) : UsdGeomXformable(schemaObj) {}
 
   /// Destructor.
   USDGEOM_API
@@ -141,8 +135,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDGEOM_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdGeomCamera holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -154,8 +147,7 @@ public:
   /// \endcode
   ///
   USDGEOM_API
-  static UsdGeomCamera
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdGeomCamera Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -180,17 +172,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDGEOM_API
-  static UsdGeomCamera
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdGeomCamera Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDGEOM_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDGEOM_API
@@ -202,7 +193,7 @@ private:
   USDGEOM_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PROJECTION
   // --------------------------------------------------------------------- //
@@ -223,9 +214,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateProjectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateProjectionAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // HORIZONTALAPERTURE
   // --------------------------------------------------------------------- //
@@ -247,9 +239,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateHorizontalApertureAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateHorizontalApertureAttr(VtValue const &defaultValue = VtValue(),
+                                            bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // VERTICALAPERTURE
   // --------------------------------------------------------------------- //
@@ -271,9 +264,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateVerticalApertureAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateVerticalApertureAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // HORIZONTALAPERTUREOFFSET
   // --------------------------------------------------------------------- //
@@ -294,9 +288,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateHorizontalApertureOffsetAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateHorizontalApertureOffsetAttr(VtValue const &defaultValue = VtValue(),
+                                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // VERTICALAPERTUREOFFSET
   // --------------------------------------------------------------------- //
@@ -317,9 +312,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateVerticalApertureOffsetAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateVerticalApertureOffsetAttr(VtValue const &defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FOCALLENGTH
   // --------------------------------------------------------------------- //
@@ -340,9 +336,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateFocalLengthAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFocalLengthAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // CLIPPINGRANGE
   // --------------------------------------------------------------------- //
@@ -363,9 +360,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateClippingRangeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateClippingRangeAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // CLIPPINGPLANES
   // --------------------------------------------------------------------- //
@@ -388,9 +386,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateClippingPlanesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateClippingPlanesAttr(VtValue const &defaultValue = VtValue(),
+                                        bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FSTOP
   // --------------------------------------------------------------------- //
@@ -410,9 +409,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateFStopAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFStopAttr(VtValue const &defaultValue = VtValue(),
+                               bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FOCUSDISTANCE
   // --------------------------------------------------------------------- //
@@ -433,9 +433,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateFocusDistanceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFocusDistanceAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // STEREOROLE
   // --------------------------------------------------------------------- //
@@ -458,9 +459,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateStereoRoleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateStereoRoleAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SHUTTEROPEN
   // --------------------------------------------------------------------- //
@@ -482,9 +484,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateShutterOpenAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateShutterOpenAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SHUTTERCLOSE
   // --------------------------------------------------------------------- //
@@ -507,9 +510,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateShutterCloseAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateShutterCloseAttr(VtValue const &defaultValue = VtValue(),
+                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // EXPOSURE
   // --------------------------------------------------------------------- //
@@ -532,9 +536,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDGEOM_API
-  UsdAttribute CreateExposureAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateExposureAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

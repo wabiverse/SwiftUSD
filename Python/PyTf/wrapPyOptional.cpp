@@ -32,7 +32,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapPyOptional() {
+void wrapPyOptional()
+{
   TfPyOptional::python_optional<std::string>();
   TfPyOptional::python_optional<std::vector<std::string>>();
   TfPyOptional::python_optional<double>();

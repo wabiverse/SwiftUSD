@@ -69,10 +69,9 @@ class Hf_PluginEntry;
 ///    }
 ///}
 ///
-class HfPluginRegistry
-{
+class HfPluginRegistry {
 
-public:
+ public:
   ///
   /// Returns an ordered list of all registered plugins.
   /// The plugins are ordered by priority then alphabetically
@@ -110,7 +109,7 @@ public:
   HF_API
   TfToken GetPluginId(const HfPluginBase *plugin) const;
 
-protected:
+ protected:
   // Must be derived.
 
   ///
@@ -139,16 +138,15 @@ protected:
   ///
   /// Bases optionally specifies other classes that T is derived from.
   ///
-  template <typename T, typename PluginBaseType, typename... Bases>
-  static void Define();
+  template<typename T, typename PluginBaseType, typename... Bases> static void Define();
 
   /// Gives subclasses an opportunity to inspect plugInfo-based metadata
   /// at the time of discovery.
   HF_API
-  virtual void _CollectAdditionalMetadata(
-      const PlugRegistry &plugRegistry, const TfType &pluginType);
+  virtual void _CollectAdditionalMetadata(const PlugRegistry &plugRegistry,
+                                          const TfType &pluginType);
 
-private:
+ private:
   typedef std::vector<Hf_PluginEntry> _PluginEntryVector;
   typedef std::map<TfToken, size_t> _TokenMap;
 
@@ -159,8 +157,7 @@ private:
   ///
   typedef std::function<HfPluginBase *()> _FactoryFn;
 
-  template <typename T>
-  static HfPluginBase *_CreatePlugin();
+  template<typename T> static HfPluginBase *_CreatePlugin();
 
   HF_API
   static void _SetFactory(TfType &type, _FactoryFn &func);
@@ -191,19 +188,15 @@ private:
   HfPluginRegistry &operator=(const HfPluginRegistry &) = delete;
 };
 
-template <typename T>
-HfPluginBase *
-HfPluginRegistry::_CreatePlugin()
+template<typename T> HfPluginBase *HfPluginRegistry::_CreatePlugin()
 {
   HF_MALLOC_TAG_FUNCTION();
   return new T;
 }
 
-template <typename T, typename PluginBaseType, typename... Bases>
-void HfPluginRegistry::Define()
+template<typename T, typename PluginBaseType, typename... Bases> void HfPluginRegistry::Define()
 {
-  TfType type = TfType::Define<T,
-                               TfType::Bases<PluginBaseType, Bases...>>();
+  TfType type = TfType::Define<T, TfType::Bases<PluginBaseType, Bases...>>();
 
   _FactoryFn func = &_CreatePlugin<T>;
   _SetFactory(type, func);
@@ -211,4 +204,4 @@ void HfPluginRegistry::Define()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PLUGIN_REGISTRY_H
+#endif  // PXR_IMAGING_HF_PLUGIN_REGISTRY_H

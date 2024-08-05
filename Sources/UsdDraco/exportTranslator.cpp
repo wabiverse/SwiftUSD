@@ -22,50 +22,47 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include "UsdDraco/exportTranslator.h"
 #include "UsdDraco/attributeDescriptor.h"
 #include "UsdDraco/attributeFactory.h"
 #include "UsdDraco/exportAttribute.h"
-#include "UsdDraco/exportTranslator.h"
 
-#include <pxr/pxrns.h>
 #include "UsdGeom/mesh.h"
 #include "Vt/types.h"
+#include <pxr/pxrns.h>
 
 #include <draco/core/macros.h>
 #include <draco/mesh/mesh.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool UsdDracoExportTranslator::Translate(
-    const UsdGeomMesh &usdMesh,
-    draco::Mesh *dracoMesh,
-    UsdDracoFlag<bool> preservePolygons,
-    UsdDracoFlag<bool> preservePositionOrder,
-    UsdDracoFlag<bool> preserveHoles)
+bool UsdDracoExportTranslator::Translate(const UsdGeomMesh &usdMesh,
+                                         draco::Mesh *dracoMesh,
+                                         UsdDracoFlag<bool> preservePolygons,
+                                         UsdDracoFlag<bool> preservePositionOrder,
+                                         UsdDracoFlag<bool> preserveHoles)
 {
   UsdDracoExportTranslator translator(usdMesh, dracoMesh);
-  return translator._Translate(
-      preservePolygons, preservePositionOrder, preserveHoles);
+  return translator._Translate(preservePolygons, preservePositionOrder, preserveHoles);
 }
 
-UsdDracoExportTranslator::UsdDracoExportTranslator(
-    const UsdGeomMesh &usdMesh,
-    draco::Mesh *dracoMesh) : _usdMesh(usdMesh),
-                              _dracoMesh(dracoMesh),
-                              _positions(UsdDracoAttributeDescriptor::ForPositions(usdMesh)),
-                              _texCoords(UsdDracoAttributeDescriptor::ForTexCoords(usdMesh)),
-                              _normals(UsdDracoAttributeDescriptor::ForNormals(usdMesh)),
-                              _holeFaces(UsdDracoAttributeDescriptor::ForHoleFaces()),
-                              _addedEdges(UsdDracoAttributeDescriptor::ForAddedEdges()),
-                              _posOrder(UsdDracoAttributeDescriptor::ForPosOrder()),
-                              _unsupportedPrimvarsReferToPositions(false)
+UsdDracoExportTranslator::UsdDracoExportTranslator(const UsdGeomMesh &usdMesh,
+                                                   draco::Mesh *dracoMesh)
+    : _usdMesh(usdMesh),
+      _dracoMesh(dracoMesh),
+      _positions(UsdDracoAttributeDescriptor::ForPositions(usdMesh)),
+      _texCoords(UsdDracoAttributeDescriptor::ForTexCoords(usdMesh)),
+      _normals(UsdDracoAttributeDescriptor::ForNormals(usdMesh)),
+      _holeFaces(UsdDracoAttributeDescriptor::ForHoleFaces()),
+      _addedEdges(UsdDracoAttributeDescriptor::ForAddedEdges()),
+      _posOrder(UsdDracoAttributeDescriptor::ForPosOrder()),
+      _unsupportedPrimvarsReferToPositions(false)
 {
 }
 
-bool UsdDracoExportTranslator::_Translate(
-    UsdDracoFlag<bool> preservePolygons,
-    UsdDracoFlag<bool> preservePositionOrder,
-    UsdDracoFlag<bool> preserveHoles)
+bool UsdDracoExportTranslator::_Translate(UsdDracoFlag<bool> preservePolygons,
+                                          UsdDracoFlag<bool> preservePositionOrder,
+                                          UsdDracoFlag<bool> preserveHoles)
 {
   // Check validity of descriptors obtained from USD mesh in constructor.
   if (!_CheckDescriptors())
@@ -80,8 +77,7 @@ bool UsdDracoExportTranslator::_Translate(
     return false;
 
   // Conditionally enable/disable helper attributes.
-  _ConfigureHelperAttributes(
-      preservePolygons, preservePositionOrder, preserveHoles);
+  _ConfigureHelperAttributes(preservePolygons, preservePositionOrder, preserveHoles);
 
   // Set data to Draco mesh.
   _SetNumPointsToMesh();
@@ -94,25 +90,19 @@ bool UsdDracoExportTranslator::_Translate(
 bool UsdDracoExportTranslator::_CheckDescriptors() const
 {
   // Valid positions must be present in the mesh.
-  if (_positions.GetDescriptor().GetStatus() !=
-      UsdDracoAttributeDescriptor::VALID)
-  {
+  if (_positions.GetDescriptor().GetStatus() != UsdDracoAttributeDescriptor::VALID) {
     TF_RUNTIME_ERROR("Mesh has no valid positions.");
     return false;
   }
 
   // Texture coordinates are optional and may be absent from USD mesh.
-  if (_texCoords.GetDescriptor().GetStatus() ==
-      UsdDracoAttributeDescriptor::INVALID)
-  {
+  if (_texCoords.GetDescriptor().GetStatus() == UsdDracoAttributeDescriptor::INVALID) {
     TF_RUNTIME_ERROR("Mesh has invalid texture coordinates.");
     return false;
   }
 
   // Normals are optional and may be absent from USD mesh.
-  if (_normals.GetDescriptor().GetStatus() ==
-      UsdDracoAttributeDescriptor::INVALID)
-  {
+  if (_normals.GetDescriptor().GetStatus() == UsdDracoAttributeDescriptor::INVALID) {
     TF_RUNTIME_ERROR("Mesh has invalid normals.");
     return false;
   }
@@ -132,14 +122,12 @@ void UsdDracoExportTranslator::_GetAttributesFromMesh()
 
   // Get generic attributes from USD mesh.
   const UsdGeomPrimvarsAPI api = UsdGeomPrimvarsAPI(_usdMesh.GetPrim());
-  for (const UsdGeomPrimvar &primvar : api.GetPrimvars())
-  {
+  for (const UsdGeomPrimvar &primvar : api.GetPrimvars()) {
     // Create export attribute from USD primvar.
     auto attribute = CreateAttributeFrom(primvar);
 
     // Unsupported primvars remain in USD mesh and not exported to Draco.
-    if (!attribute)
-    {
+    if (!attribute) {
       // When unsupported primvars have implicit or explicit indices,
       // position order must be preserved to avoid invalidation of these
       // indices due to Draco changing position order.
@@ -153,55 +141,48 @@ void UsdDracoExportTranslator::_GetAttributesFromMesh()
   }
 
   // Get generic attribute data from mesh.
-  for (size_t i = 0; i < _genericAttributes.size(); i++)
-  {
+  for (size_t i = 0; i < _genericAttributes.size(); i++) {
     _genericAttributes[i]->GetFromMesh(_usdMesh, np);
   }
 }
 
-void UsdDracoExportTranslator::_CheckUnsupportedPrimvar(
-    const UsdGeomPrimvar &primvar)
+void UsdDracoExportTranslator::_CheckUnsupportedPrimvar(const UsdGeomPrimvar &primvar)
 {
   if (_unsupportedPrimvarsReferToPositions)
     return;
 
-  if (primvar.IsIndexed())
-  {
+  if (primvar.IsIndexed()) {
     _unsupportedPrimvarsReferToPositions = true;
     return;
   }
 
   // Primvars with vertex interpolation and the number of values equal to the
   // number of mesh positions may have implicit indices to positions.
-  if (primvar.GetInterpolation() == UsdGeomTokens->vertex)
-  {
+  if (primvar.GetInterpolation() == UsdGeomTokens->vertex) {
     VtValue values;
     primvar.Get(&values);
-    if (values.IsArrayValued() &&
-        values.GetArraySize() == _positions.GetNumValues())
+    if (values.IsArrayValued() && values.GetArraySize() == _positions.GetNumValues())
       _unsupportedPrimvarsReferToPositions = true;
   }
 }
 
-class ExportAttributeCreator
-{
-public:
-  template <class ValueT>
-  static std::unique_ptr<UsdDracoExportAttributeInterface>
-  CreateAttribute(const UsdDracoAttributeDescriptor &descriptor)
+class ExportAttributeCreator {
+ public:
+  template<class ValueT>
+  static std::unique_ptr<UsdDracoExportAttributeInterface> CreateAttribute(
+      const UsdDracoAttributeDescriptor &descriptor)
   {
     return std::unique_ptr<UsdDracoExportAttributeInterface>(
         new UsdDracoExportAttribute<ValueT>(descriptor));
   }
 };
 
-std::unique_ptr<UsdDracoExportAttributeInterface>
-UsdDracoExportTranslator::CreateAttributeFrom(const UsdGeomPrimvar &primvar)
+std::unique_ptr<UsdDracoExportAttributeInterface> UsdDracoExportTranslator::CreateAttributeFrom(
+    const UsdGeomPrimvar &primvar)
 {
   // Create generic attribute descriptor from USD primvar.
-  const UsdDracoAttributeDescriptor descriptor =
-      UsdDracoAttributeDescriptor::FromUsdPrimvar(
-          primvar, draco::GeometryAttribute::GENERIC);
+  const UsdDracoAttributeDescriptor descriptor = UsdDracoAttributeDescriptor::FromUsdPrimvar(
+      primvar, draco::GeometryAttribute::GENERIC);
 
   // Skip unsupported primvars, e.g., with constant interpolation.
   if (descriptor.GetStatus() != UsdDracoAttributeDescriptor::VALID)
@@ -209,9 +190,8 @@ UsdDracoExportTranslator::CreateAttributeFrom(const UsdGeomPrimvar &primvar)
 
   // Create export attribute from attribute descriptor.
   const ExportAttributeCreator creator;
-  return UsdDracoAttributeFactory::CreateAttribute<
-      UsdDracoExportAttributeInterface, ExportAttributeCreator>(
-      descriptor, creator);
+  return UsdDracoAttributeFactory::CreateAttribute<UsdDracoExportAttributeInterface,
+                                                   ExportAttributeCreator>(descriptor, creator);
 }
 
 void UsdDracoExportTranslator::_GetConnectivityFromMesh()
@@ -223,38 +203,30 @@ void UsdDracoExportTranslator::_GetConnectivityFromMesh()
 
 bool UsdDracoExportTranslator::_CheckData() const
 {
-  if (_faceVertexCounts.empty())
-  {
+  if (_faceVertexCounts.empty()) {
     TF_RUNTIME_ERROR("Mesh has no face vertex counts.");
     return false;
   }
-  if (_faceVertexIndices.empty())
-  {
+  if (_faceVertexIndices.empty()) {
     TF_RUNTIME_ERROR("Mesh has no face vertex indices.");
     return false;
   }
-  if (_positions.GetNumValues() == 0)
-  {
+  if (_positions.GetNumValues() == 0) {
     TF_RUNTIME_ERROR("Mesh has no points.");
     return false;
   }
-  if (!_CheckPrimvarData(_texCoords))
-  {
+  if (!_CheckPrimvarData(_texCoords)) {
     TF_RUNTIME_ERROR("Mesh texture coordinates index is inconsistent.");
     return false;
   }
-  if (!_CheckPrimvarData(_normals))
-  {
+  if (!_CheckPrimvarData(_normals)) {
     TF_RUNTIME_ERROR("Mesh normal index is inconsistent.");
     return false;
   }
-  for (size_t i = 0; i < _genericAttributes.size(); i++)
-  {
-    if (!_CheckPrimvarData(*_genericAttributes[i]))
-    {
-      TF_RUNTIME_ERROR(
-          "Primvar %s index is inconsistent.",
-          _genericAttributes[i]->GetDescriptor().GetName().GetText());
+  for (size_t i = 0; i < _genericAttributes.size(); i++) {
+    if (!_CheckPrimvarData(*_genericAttributes[i])) {
+      TF_RUNTIME_ERROR("Primvar %s index is inconsistent.",
+                       _genericAttributes[i]->GetDescriptor().GetName().GetText());
       return false;
     }
   }
@@ -271,51 +243,39 @@ bool UsdDracoExportTranslator::_CheckPrimvarData(
   return attribute.GetNumIndices() == _faceVertexIndices.size();
 }
 
-void UsdDracoExportTranslator::_ConfigureHelperAttributes(
-    UsdDracoFlag<bool> preservePolygons,
-    UsdDracoFlag<bool> preservePositionOrder,
-    UsdDracoFlag<bool> preserveHoles)
+void UsdDracoExportTranslator::_ConfigureHelperAttributes(UsdDracoFlag<bool> preservePolygons,
+                                                          UsdDracoFlag<bool> preservePositionOrder,
+                                                          UsdDracoFlag<bool> preserveHoles)
 {
   // Conditionally clear position order preservation attribute.
-  if (!_unsupportedPrimvarsReferToPositions)
-  {
-    if (preservePositionOrder.HasValue())
-    {
-      if (preservePositionOrder.GetValue() == false)
-      {
+  if (!_unsupportedPrimvarsReferToPositions) {
+    if (preservePositionOrder.HasValue()) {
+      if (preservePositionOrder.GetValue() == false) {
         _posOrder.Clear();
       }
     }
-    else
-    {
-      if (!_SubdivisionRefersToPositions())
-      {
+    else {
+      if (!_SubdivisionRefersToPositions()) {
         _posOrder.Clear();
       }
     }
   }
 
   // Conditionally clear hole faces attribute.
-  if (preserveHoles.HasValue())
-  {
-    if (preserveHoles.GetValue() == false)
-    {
+  if (preserveHoles.HasValue()) {
+    if (preserveHoles.GetValue() == false) {
       _holeFaces.Clear();
     }
   }
-  else
-  {
-    if (!_SubdivisionRefersToFaces())
-    {
+  else {
+    if (!_SubdivisionRefersToFaces()) {
       _holeFaces.Clear();
     }
   }
 
   // Conditionally clear polygon preservation attribute.
-  if (preservePolygons.HasValue())
-  {
-    if (preservePolygons.GetValue() == false)
-    {
+  if (preservePolygons.HasValue()) {
+    if (preservePolygons.GetValue() == false) {
       _addedEdges.Clear();
     }
   }
@@ -350,8 +310,7 @@ bool UsdDracoExportTranslator::_SubdivisionRefersToFaces() const
 void UsdDracoExportTranslator::_SetNumPointsToMesh() const
 {
   size_t numPoints = 0;
-  for (size_t i = 0; i < _faceVertexCounts.size(); i++)
-  {
+  for (size_t i = 0; i < _faceVertexCounts.size(); i++) {
     const size_t numFaceVertices = _faceVertexCounts[i];
     const size_t numTriangles = numFaceVertices - 2;
     numPoints += 3 * numTriangles;
@@ -367,8 +326,7 @@ void UsdDracoExportTranslator::_SetAttributesToMesh()
   _holeFaces.SetToMesh(_dracoMesh);
   _addedEdges.SetToMesh(_dracoMesh);
   _posOrder.SetToMesh(_dracoMesh);
-  for (size_t i = 0; i < _genericAttributes.size(); i++)
-  {
+  for (size_t i = 0; i < _genericAttributes.size(); i++) {
     _genericAttributes[i]->SetToMesh(_dracoMesh);
   }
 }
@@ -382,15 +340,12 @@ void UsdDracoExportTranslator::_SetPointMapsToMesh()
   std::vector<bool> isHoleFace(numFaces, false);
   for (size_t i = 0; i < _holeIndices.size(); i++)
     isHoleFace[_holeIndices[i]] = true;
-  for (size_t i = 0; i < numFaces; i++)
-  {
+  for (size_t i = 0; i < numFaces; i++) {
     const size_t numFaceVertices = _faceVertexCounts[i];
     // Split quads and other n-gons into n - 2 triangles.
     const size_t nt = numFaceVertices - 2;
-    for (size_t t = 0; t < nt; t++)
-    {
-      for (size_t c = 0; c < 3; c++)
-      {
+    for (size_t t = 0; t < nt; t++) {
+      for (size_t c = 0; c < 3; c++) {
         face[c] = pointIdx;
         const size_t cornerIdx = firstVertexIdx + _Triangulate(t, c);
         const size_t positionIdx = _faceVertexIndices[cornerIdx];
@@ -402,10 +357,8 @@ void UsdDracoExportTranslator::_SetPointMapsToMesh()
         _holeFaces.SetPointMapEntry(pointIdx, isHoleFace[i]);
         _addedEdges.SetPointMapEntry(pointIdx, _IsNewEdge(nt, t, c));
         _posOrder.SetPointMapEntry(pointIdx, positionIdx);
-        for (size_t i = 0; i < _genericAttributes.size(); i++)
-        {
-          _genericAttributes[i]->SetPointMapEntry(
-              pointIdx, positionIdx, cornerIdx);
+        for (size_t i = 0; i < _genericAttributes.size(); i++) {
+          _genericAttributes[i]->SetPointMapEntry(pointIdx, positionIdx, cornerIdx);
         }
         pointIdx++;
       }
@@ -453,14 +406,14 @@ void UsdDracoExportTranslator::_Deduplicate() const
 //          *-----------*
 //          A           E
 //
-inline size_t UsdDracoExportTranslator::_Triangulate(
-    size_t triIndex, size_t triCorner)
+inline size_t UsdDracoExportTranslator::_Triangulate(size_t triIndex, size_t triCorner)
 {
   return triCorner == 0 ? 0 : triIndex + triCorner;
 }
 
-inline bool UsdDracoExportTranslator::_IsNewEdge(
-    size_t triCount, size_t triIndex, size_t triCorner)
+inline bool UsdDracoExportTranslator::_IsNewEdge(size_t triCount,
+                                                 size_t triIndex,
+                                                 size_t triCorner)
 {
   // All but the last triangle of the triangulated polygon have an added edge
   // opposite of corner 1.

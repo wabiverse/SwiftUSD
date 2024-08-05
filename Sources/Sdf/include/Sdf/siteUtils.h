@@ -39,37 +39,42 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-inline SdfSpecHandle SdfGetObjectAtPath(const SdfSite &site) {
+inline SdfSpecHandle SdfGetObjectAtPath(const SdfSite &site)
+{
   return site.layer->GetObjectAtPath(site.path);
 }
 
-inline SdfPrimSpecHandle SdfGetPrimAtPath(const SdfSite &site) {
+inline SdfPrimSpecHandle SdfGetPrimAtPath(const SdfSite &site)
+{
   return site.layer->GetPrimAtPath(site.path);
 }
 
-inline SdfPropertySpecHandle SdfGetPropertyAtPath(const SdfSite &site) {
+inline SdfPropertySpecHandle SdfGetPropertyAtPath(const SdfSite &site)
+{
   return site.layer->GetPropertyAtPath(site.path);
 }
 
-inline bool SdfHasField(const SdfSite &site, const TfToken &field) {
+inline bool SdfHasField(const SdfSite &site, const TfToken &field)
+{
   return site.layer->HasField(site.path, field);
 }
 
-template <class T>
-inline bool SdfHasField(const SdfSite &site, const TfToken &field, T *value) {
+template<class T> inline bool SdfHasField(const SdfSite &site, const TfToken &field, T *value)
+{
   return site.layer->HasField(site.path, field, value);
 }
 
-inline const VtValue SdfGetField(const SdfSite &site, const TfToken &field) {
+inline const VtValue SdfGetField(const SdfSite &site, const TfToken &field)
+{
   return site.layer->GetField(site.path, field);
 }
 
-template <class T>
-inline T SdfGetFieldAs(const SdfSite &site, const TfToken &field,
-                       const T &defaultValue = T()) {
+template<class T>
+inline T SdfGetFieldAs(const SdfSite &site, const TfToken &field, const T &defaultValue = T())
+{
   return site.layer->GetFieldAs<T>(site.path, field, defaultValue);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SITE_UTILS_H
+#endif  // PXR_USD_SDF_SITE_UTILS_H

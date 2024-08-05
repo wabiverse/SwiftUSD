@@ -24,43 +24,35 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_DEBUG_UTIL_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_DEBUG_UTIL_H
 
-#include <pxr/pxrns.h>
 #include "Arch/stackTrace.h"
 #include "hdPrman/renderParam.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace HdPrmanDebugUtil
+namespace HdPrmanDebugUtil {
+
+std::string RtParamListToString(const RtParamList &params, const std::string &name = "");
+
+std::string GetCallerAsString(const TfCallContext &ctx);
+
+template<typename T> std::string RileyIdVecToString(const std::vector<T> &vec)
 {
-
-  std::string
-  RtParamListToString(const RtParamList &params, const std::string &name = "");
-
-  std::string
-  GetCallerAsString(const TfCallContext &ctx);
-
-  template <typename T>
-  std::string
-  RileyIdVecToString(const std::vector<T> &vec)
-  {
-    std::string out;
-    for (const T &val : vec)
-    {
-      if (!out.empty())
-      {
-        out += ", ";
-      }
-      out += std::to_string(val.AsUInt32());
+  std::string out;
+  for (const T &val : vec) {
+    if (!out.empty()) {
+      out += ", ";
     }
-    return out;
+    out += std::to_string(val.AsUInt32());
   }
-
-  std::string
-  SdfPathVecToString(const std::vector<SdfPath> &vec);
-
+  return out;
 }
+
+std::string SdfPathVecToString(const std::vector<SdfPath> &vec);
+
+}  // namespace HdPrmanDebugUtil
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_DEBUG_UTIL_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_DEBUG_UTIL_H

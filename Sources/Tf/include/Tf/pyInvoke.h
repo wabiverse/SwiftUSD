@@ -54,14 +54,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 #ifndef doxygen
 
 // Convert any type to boost::python::object.
-template <typename T> boost::python::object Tf_ArgToPy(const T &value) {
+template<typename T> boost::python::object Tf_ArgToPy(const T &value)
+{
   return boost::python::object(value);
 }
 
 // Convert nullptr to None.
 TF_API boost::python::object Tf_ArgToPy(const std::nullptr_t &value);
 
-#endif // !doxygen
+#endif  // !doxygen
 
 ////////////////////////////////////////////////////////////////////////////////
 // Keyword arg specification
@@ -82,8 +83,8 @@ TF_API boost::python::object Tf_ArgToPy(const std::nullptr_t &value);
 /// \endcode
 ///
 struct TfPyKwArg {
-  template <typename T>
-  TfPyKwArg(const std::string &nameIn, const T &valueIn) : name(nameIn) {
+  template<typename T> TfPyKwArg(const std::string &nameIn, const T &valueIn) : name(nameIn)
+  {
     // Constructing boost::python::object requires the GIL.
     TfPyLock lock;
 
@@ -105,9 +106,9 @@ TF_API void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut);
 
 // Poisoned variadic template helper that provides an error message when
 // non-keyword args are used after keyword args.
-template <typename Arg, typename... RestArgs>
-void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut, const Arg &kwArg,
-                            RestArgs... rest) {
+template<typename Arg, typename... RestArgs>
+void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut, const Arg &kwArg, RestArgs... rest)
+{
   // This assertion will always be false, since TfPyKwArg will select the
   // overload below instead.
   static_assert(std::is_same<Arg, TfPyKwArg>::value,
@@ -115,9 +116,11 @@ void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut, const Arg &kwArg,
 }
 
 // Recursive variadic template helper for keyword args.
-template <typename... RestArgs>
+template<typename... RestArgs>
 void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut,
-                            const TfPyKwArg &kwArg, RestArgs... rest) {
+                            const TfPyKwArg &kwArg,
+                            RestArgs... rest)
+{
   // Store mapping in kwargs dict.
   (*kwArgsOut)[kwArg.name] = kwArg.value.Get();
 
@@ -126,14 +129,15 @@ void Tf_BuildPyInvokeKwArgs(boost::python::dict *kwArgsOut,
 }
 
 // Variadic helper: trivial base case.
-TF_API void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut,
-                                 boost::python::dict *kwArgsOut);
+TF_API void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut, boost::python::dict *kwArgsOut);
 
 // Recursive general-purpose variadic template helper.
-template <typename Arg, typename... RestArgs>
+template<typename Arg, typename... RestArgs>
 void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut,
-                          boost::python::dict *kwArgsOut, const Arg &arg,
-                          RestArgs... rest) {
+                          boost::python::dict *kwArgsOut,
+                          const Arg &arg,
+                          RestArgs... rest)
+{
   // Convert value to Python, and store in args list.
   // The object constructor throws if the type is not convertible.
   posArgsOut->append(Tf_ArgToPy(arg));
@@ -143,17 +147,19 @@ void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut,
 }
 
 // Recursive variadic template helper for keyword args.
-template <typename... RestArgs>
+template<typename... RestArgs>
 void Tf_BuildPyInvokeArgs(boost::python::list *posArgsOut,
                           boost::python::dict *kwArgsOut,
-                          const TfPyKwArg &kwArg, RestArgs... rest) {
+                          const TfPyKwArg &kwArg,
+                          RestArgs... rest)
+{
   // Switch to kwargs-only processing, enforcing (at compile time) the Python
   // rule that there may not be non-kwargs after kwargs.  If we relaxed this
   // rule, some strange argument ordering could occur.
   Tf_BuildPyInvokeKwArgs(kwArgsOut, kwArg, rest...);
 }
 
-#endif // !doxygen
+#endif  // !doxygen
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
@@ -168,12 +174,13 @@ TF_API bool Tf_PyInvokeImpl(const std::string &moduleName,
                             boost::python::object *resultObjOut);
 
 // Forward declaration.
-template <typename... Args>
+template<typename... Args>
 bool TfPyInvokeAndReturn(const std::string &moduleName,
                          const std::string &callableExpr,
-                         boost::python::object *resultOut, Args... args);
+                         boost::python::object *resultOut,
+                         Args... args);
 
-#endif // !doxygen
+#endif  // !doxygen
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main entry points
@@ -224,10 +231,12 @@ bool TfPyInvokeAndReturn(const std::string &moduleName,
 /// TfPyInvokeAndReturn instead.  This includes cases where the function's
 /// return value may be \c None.
 ///
-template <typename Result, typename... Args>
+template<typename Result, typename... Args>
 bool TfPyInvokeAndExtract(const std::string &moduleName,
-                          const std::string &callableExpr, Result *resultOut,
-                          Args... args) {
+                          const std::string &callableExpr,
+                          Result *resultOut,
+                          Args... args)
+{
   if (!resultOut) {
     TF_CODING_ERROR("Bad pointer to TfPyInvokeAndExtract");
     return false;
@@ -257,10 +266,12 @@ bool TfPyInvokeAndExtract(const std::string &moduleName,
 /// value as a \c boost::python::object, rather than extracting a particular C++
 /// type from it.
 ///
-template <typename... Args>
+template<typename... Args>
 bool TfPyInvokeAndReturn(const std::string &moduleName,
                          const std::string &callableExpr,
-                         boost::python::object *resultOut, Args... args) {
+                         boost::python::object *resultOut,
+                         Args... args)
+{
   if (!resultOut) {
     TF_CODING_ERROR("Bad pointer to TfPyInvokeAndExtract");
     return false;
@@ -277,11 +288,11 @@ bool TfPyInvokeAndReturn(const std::string &moduleName,
     Tf_BuildPyInvokeArgs(&posArgs, &kwArgs, args...);
 
     // Import, find callable, and call.
-    if (!Tf_PyInvokeImpl(moduleName, callableExpr, posArgs, kwArgs,
-                         resultOut)) {
+    if (!Tf_PyInvokeImpl(moduleName, callableExpr, posArgs, kwArgs, resultOut)) {
       return false;
     }
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     // Handle exceptions.
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
@@ -294,9 +305,9 @@ bool TfPyInvokeAndReturn(const std::string &moduleName,
 /// A version of TfPyInvokeAndExtract that ignores the Python function's return
 /// value.
 ///
-template <typename... Args>
-bool TfPyInvoke(const std::string &moduleName, const std::string &callableExpr,
-                Args... args) {
+template<typename... Args>
+bool TfPyInvoke(const std::string &moduleName, const std::string &callableExpr, Args... args)
+{
   // Init Python and grab the GIL.
   TfPyInitialize();
   TfPyLock lock;
@@ -307,4 +318,4 @@ bool TfPyInvoke(const std::string &moduleName, const std::string &callableExpr,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_INVOKE_H
+#endif  // PXR_BASE_TF_PY_INVOKE_H

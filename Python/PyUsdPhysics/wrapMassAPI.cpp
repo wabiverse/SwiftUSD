@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/massAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/massAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,92 +41,83 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateMassAttr(UsdPhysicsMassAPI &self, object defaultVal, bool writeSparsely)
 {
+  return self.CreateMassAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                             writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateDensityAttr(UsdPhysicsMassAPI &self,
+                                       object defaultVal,
+                                       bool writeSparsely)
+{
+  return self.CreateDensityAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateCenterOfMassAttr(UsdPhysicsMassAPI &self,
+                                            object defaultVal,
+                                            bool writeSparsely)
+{
+  return self.CreateCenterOfMassAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f),
+                                     writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateMassAttr(UsdPhysicsMassAPI &self,
-                  object defaultVal, bool writeSparsely)
+static UsdAttribute _CreateDiagonalInertiaAttr(UsdPhysicsMassAPI &self,
+                                               object defaultVal,
+                                               bool writeSparsely)
+{
+  return self.CreateDiagonalInertiaAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float3),
+                                        writeSparsely);
+}
+
+static UsdAttribute _CreatePrincipalAxesAttr(UsdPhysicsMassAPI &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
+{
+  return self.CreatePrincipalAxesAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf),
+                                      writeSparsely);
+}
+
+static std::string _Repr(const UsdPhysicsMassAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.MassAPI(%s)", primRepr.c_str());
+}
+
+struct UsdPhysicsMassAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdPhysicsMassAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    return self.CreateMassAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
   }
+};
 
-  static UsdAttribute
-  _CreateDensityAttr(UsdPhysicsMassAPI &self,
-                     object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDensityAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
+static UsdPhysicsMassAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdPhysicsMassAPI::CanApply(prim, &whyNot);
+  return UsdPhysicsMassAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdAttribute
-  _CreateCenterOfMassAttr(UsdPhysicsMassAPI &self,
-                          object defaultVal, bool writeSparsely)
-  {
-    return self.CreateCenterOfMassAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateDiagonalInertiaAttr(UsdPhysicsMassAPI &self,
-                             object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDiagonalInertiaAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float3), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreatePrincipalAxesAttr(UsdPhysicsMassAPI &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreatePrincipalAxesAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsMassAPI &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.MassAPI(%s)",
-        primRepr.c_str());
-  }
-
-  struct UsdPhysicsMassAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdPhysicsMassAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
-
-  static UsdPhysicsMassAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdPhysicsMassAPI::CanApply(prim, &whyNot);
-    return UsdPhysicsMassAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsMassAPI()
 {
   typedef UsdPhysicsMassAPI This;
 
-  UsdPhysicsMassAPI_CanApplyResult::Wrap<UsdPhysicsMassAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+  UsdPhysicsMassAPI_CanApplyResult::Wrap<UsdPhysicsMassAPI_CanApplyResult>("_CanApplyResult",
+                                                                           "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("MassAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("MassAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -145,46 +136,37 @@ void wrapUsdPhysicsMassAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetMassAttr",
-           &This::GetMassAttr)
+      .def("GetMassAttr", &This::GetMassAttr)
       .def("CreateMassAttr",
            &_CreateMassAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDensityAttr",
-           &This::GetDensityAttr)
+      .def("GetDensityAttr", &This::GetDensityAttr)
       .def("CreateDensityAttr",
            &_CreateDensityAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetCenterOfMassAttr",
-           &This::GetCenterOfMassAttr)
+      .def("GetCenterOfMassAttr", &This::GetCenterOfMassAttr)
       .def("CreateCenterOfMassAttr",
            &_CreateCenterOfMassAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDiagonalInertiaAttr",
-           &This::GetDiagonalInertiaAttr)
+      .def("GetDiagonalInertiaAttr", &This::GetDiagonalInertiaAttr)
       .def("CreateDiagonalInertiaAttr",
            &_CreateDiagonalInertiaAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetPrincipalAxesAttr",
-           &This::GetPrincipalAxesAttr)
+      .def("GetPrincipalAxesAttr", &This::GetPrincipalAxesAttr)
       .def("CreatePrincipalAxesAttr",
            &_CreatePrincipalAxesAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -210,11 +192,8 @@ void wrapUsdPhysicsMassAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

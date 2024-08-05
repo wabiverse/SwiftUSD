@@ -43,8 +43,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE;
 
-static void
-SetupPlugins()
+static void SetupPlugins()
 {
   // Set the preferred resolver to ArDefaultResolver before
   // running any test cases.
@@ -53,21 +52,18 @@ SetupPlugins()
   // Register TestArURIResolver plugin. We assume the build system will
   // install it to the ArPlugins subdirectory in the same location as
   // this test.
-  const std::string uriResolverPluginPath =
-      TfStringCatPaths(
-          TfGetPathName(ArchGetExecutablePath()),
-          "ArPlugins/lib/TestArURIResolver*/Resources/") +
-      "/";
+  const std::string uriResolverPluginPath = TfStringCatPaths(
+                                                TfGetPathName(ArchGetExecutablePath()),
+                                                "ArPlugins/lib/TestArURIResolver*/Resources/") +
+                                            "/";
 
-  PlugPluginPtrVector plugins =
-      PlugRegistry::GetInstance().RegisterPlugins(uriResolverPluginPath);
+  PlugPluginPtrVector plugins = PlugRegistry::GetInstance().RegisterPlugins(uriResolverPluginPath);
 
   TF_AXIOM(plugins.size() == 1);
   TF_AXIOM(plugins[0]->GetName() == "TestArURIResolver");
 }
 
-static void
-TestResolveWithContext()
+static void TestResolveWithContext()
 {
   ArResolver &resolver = ArGetResolver();
 
@@ -97,56 +93,44 @@ TestResolveWithContext()
   TF_AXIOM(resolver.Resolve("test://foo") == "test://foo?context");
 }
 
-static void
-TestCreateContextFromString()
+static void TestCreateContextFromString()
 {
   ArResolver &resolver = ArGetResolver();
 
   const std::vector<std::string> searchPaths = {"/a", "/b"};
-  const std::string searchPathStr =
-      TfStringJoin(searchPaths, ARCH_PATH_LIST_SEP);
+  const std::string searchPathStr = TfStringJoin(searchPaths, ARCH_PATH_LIST_SEP);
 
   // CreateContextFromString with an empty URI scheme should be
   // equivalent to CreateContextFromString without a URI scheme.
-  TF_AXIOM(
-      resolver.CreateContextFromString("", searchPathStr) ==
-      ArResolverContext(ArDefaultResolverContext(searchPaths)));
+  TF_AXIOM(resolver.CreateContextFromString("", searchPathStr) ==
+           ArResolverContext(ArDefaultResolverContext(searchPaths)));
 
-  TF_AXIOM(
-      resolver.CreateContextFromString("", searchPathStr) ==
-      resolver.CreateContextFromString(searchPathStr));
+  TF_AXIOM(resolver.CreateContextFromString("", searchPathStr) ==
+           resolver.CreateContextFromString(searchPathStr));
 
   // CreateContextFromString with a URI scheme that has no registered
   // resolver results in an empty ArResolverContext.
-  TF_AXIOM(
-      resolver.CreateContextFromString("bogus", "context string") ==
-      ArResolverContext());
+  TF_AXIOM(resolver.CreateContextFromString("bogus", "context string") == ArResolverContext());
 
   // CreateContextFromString with a URI scheme with a registered resolver
   // results in whatever context is returned from that resolver.
-  TF_AXIOM(
-      resolver.CreateContextFromString("test", "context string") ==
-      ArResolverContext(_TestURIResolverContext("context string")));
+  TF_AXIOM(resolver.CreateContextFromString("test", "context string") ==
+           ArResolverContext(_TestURIResolverContext("context string")));
 
   // CreateContextFromStrings should return a single ArResolverContext
   // containing context objects based on the given URI schemes and
   // context strings.
-  TF_AXIOM(
-      resolver.CreateContextFromStrings({{"test", "context string"}}) ==
-      ArResolverContext(
-          _TestURIResolverContext("context string")));
+  TF_AXIOM(resolver.CreateContextFromStrings({{"test", "context string"}}) ==
+           ArResolverContext(_TestURIResolverContext("context string")));
 
-  TF_AXIOM(
-      resolver.CreateContextFromStrings({{"", TfStringJoin(searchPaths, ARCH_PATH_LIST_SEP)},
-                                         {"test", "context string"},
-                                         {"bogus", "context string"}}) ==
-      ArResolverContext(
-          ArDefaultResolverContext(searchPaths),
-          _TestURIResolverContext("context string")));
+  TF_AXIOM(resolver.CreateContextFromStrings({{"", TfStringJoin(searchPaths, ARCH_PATH_LIST_SEP)},
+                                              {"test", "context string"},
+                                              {"bogus", "context string"}}) ==
+           ArResolverContext(ArDefaultResolverContext(searchPaths),
+                             _TestURIResolverContext("context string")));
 }
 
-static void
-TestCreateDefaultContext()
+static void TestCreateDefaultContext()
 {
   ArResolver &resolver = ArGetResolver();
 
@@ -157,47 +141,39 @@ TestCreateDefaultContext()
   // _TestURIResolverContext which we can check for here.
   const ArResolverContext defaultContext = resolver.CreateDefaultContext();
 
-  const _TestURIResolverContext *uriCtx =
-      defaultContext.Get<_TestURIResolverContext>();
+  const _TestURIResolverContext *uriCtx = defaultContext.Get<_TestURIResolverContext>();
   TF_AXIOM(uriCtx);
   TF_AXIOM(uriCtx->data == "CreateDefaultContext");
 }
 
-static void
-TestCreateDefaultContextForAsset()
+static void TestCreateDefaultContextForAsset()
 {
-  auto runTest = [](const std::string &assetPath)
-  {
+  auto runTest = [](const std::string &assetPath) {
     ArResolver &resolver = ArGetResolver();
 
     // CreateDefaultContextForAsset should return an ArResolverContext
     // containing the union of the default contexts returned by all
     // registered resolvers.
-    const ArResolverContext defaultContext =
-        resolver.CreateDefaultContextForAsset(assetPath);
+    const ArResolverContext defaultContext = resolver.CreateDefaultContextForAsset(assetPath);
 
     // ArDefaultResolver returns an ArDefaultResolverContext whose search
     // path is set to the directory of the asset.
     {
-      const ArDefaultResolverContext *defaultCtx =
-          defaultContext.Get<ArDefaultResolverContext>();
+      const ArDefaultResolverContext *defaultCtx = defaultContext.Get<ArDefaultResolverContext>();
       TF_AXIOM(defaultCtx);
 
       const ArDefaultResolverContext expectedCtx(
-          std::vector<std::string>{
-              TfGetPathName(TfAbsPath(assetPath))});
+          std::vector<std::string>{TfGetPathName(TfAbsPath(assetPath))});
       TF_AXIOM(*defaultCtx == expectedCtx);
     }
 
     // TestArURIResolver returns a _TestURIResolverContext whose data field
     // is set to the absolute path of the asset.
     {
-      const _TestURIResolverContext *uriCtx =
-          defaultContext.Get<_TestURIResolverContext>();
+      const _TestURIResolverContext *uriCtx = defaultContext.Get<_TestURIResolverContext>();
       TF_AXIOM(uriCtx);
 
-      const _TestURIResolverContext expectedCtx(
-          TfAbsPath("test/test.file"));
+      const _TestURIResolverContext expectedCtx(TfAbsPath("test/test.file"));
       TF_AXIOM(*uriCtx == expectedCtx);
     }
   };

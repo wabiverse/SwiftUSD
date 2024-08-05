@@ -22,12 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "Arch/testArchAbi.h"
 #include "Arch/error.h"
 #include "Arch/library.h"
 #include "Arch/systemInfo.h"
 #include "Arch/vsnprintf.h"
+#include "pxr/pxr.h"
 
 #include <iostream>
 #include <typeinfo>
@@ -52,17 +52,14 @@ int main(int /*argc*/, char ** /*argv*/)
   path += "/lib/libtestArchAbiPlugin.so";
 #endif
   auto plugin = ArchLibraryOpen(path, ARCH_LIBRARY_LAZY);
-  if (!plugin)
-  {
+  if (!plugin) {
     std::string error = ArchLibraryError();
     std::cerr << "Failed to load plugin: " << error << std::endl;
     ARCH_AXIOM(plugin);
   }
 
-  NewDerived newPluginDerived = (NewDerived)ArchLibraryGetSymbolAddress(
-      plugin, "newDerived");
-  if (!newPluginDerived)
-  {
+  NewDerived newPluginDerived = (NewDerived)ArchLibraryGetSymbolAddress(plugin, "newDerived");
+  if (!newPluginDerived) {
     std::cerr << "Failed to find factory symbol" << std::endl;
     ARCH_AXIOM(newPluginDerived);
   }
@@ -73,12 +70,10 @@ int main(int /*argc*/, char ** /*argv*/)
 
   // Compare.  The types should be equal and the dynamic cast should not
   // change the pointer.
-  std::cout
-      << "Derived types are equal: "
-      << ((typeid(*mainDerived) == typeid(*pluginDerived)) ? "yes" : "no")
-      << ", cast: " << pluginDerived
-      << "->" << dynamic_cast<ArchAbiDerived<int> *>(pluginDerived)
-      << std::endl;
+  std::cout << "Derived types are equal: "
+            << ((typeid(*mainDerived) == typeid(*pluginDerived)) ? "yes" : "no")
+            << ", cast: " << pluginDerived << "->"
+            << dynamic_cast<ArchAbiDerived<int> *>(pluginDerived) << std::endl;
   ARCH_AXIOM(typeid(*mainDerived) == typeid(*pluginDerived));
   ARCH_AXIOM(pluginDerived == dynamic_cast<ArchAbiDerived<int> *>(pluginDerived));
 

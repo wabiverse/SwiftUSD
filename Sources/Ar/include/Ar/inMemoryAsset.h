@@ -23,8 +23,8 @@
 #ifndef PXR_USD_AR_IN_MEMORY_ASSET_H
 #define PXR_USD_AR_IN_MEMORY_ASSET_H
 
-#include "ArTypes/api.h"
 #include "Ar/asset.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include <cstdio>
@@ -38,7 +38,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ArAsset implementation that stores asset content in a heap-allocated
 /// buffer managed by this object.
 class ArInMemoryAsset : public ArAsset {
-public:
+ public:
   /// Constructs a new instance containing the entire contents of \p srcAsset.
   ///
   /// Returns nullptr if a buffer large enough to hold \p srcAsset's contents
@@ -50,14 +50,14 @@ public:
   /// Constructs a new instance sharing ownership of the given \p buffer
   /// containing \p bufferSize bytes.
   AR_API
-  static std::shared_ptr<ArInMemoryAsset>
-  FromBuffer(const std::shared_ptr<const char> &buffer, size_t bufferSize);
+  static std::shared_ptr<ArInMemoryAsset> FromBuffer(const std::shared_ptr<const char> &buffer,
+                                                     size_t bufferSize);
 
   /// Constructs a new instance taking ownership of the given \p buffer
   /// containing \p bufferSize bytes.
   AR_API
-  static std::shared_ptr<ArInMemoryAsset>
-  FromBuffer(std::shared_ptr<const char> &&buffer, size_t bufferSize);
+  static std::shared_ptr<ArInMemoryAsset> FromBuffer(std::shared_ptr<const char> &&buffer,
+                                                     size_t bufferSize);
 
   /// Destructor. Note that this may not destroy the associated buffer if
   /// a client is holding on to the result of GetBuffer().
@@ -86,16 +86,16 @@ public:
   AR_API
   std::shared_ptr<ArAsset> GetDetachedAsset() const override;
 
-private:
+ private:
   struct PrivateCtorTag {};
 
-public:
+ public:
   // "Private" c'tor. Must actually be public for std::make_shared,
   // but the PrivateCtorTag prevents other code from using this.
-  template <class BufferSharedPtr>
+  template<class BufferSharedPtr>
   ArInMemoryAsset(BufferSharedPtr &&buffer, size_t bufferSize, PrivateCtorTag);
 
-private:
+ private:
   std::shared_ptr<const char> _buffer;
   size_t _bufferSize;
 };

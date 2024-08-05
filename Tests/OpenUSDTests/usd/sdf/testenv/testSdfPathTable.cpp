@@ -22,20 +22,20 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "pxr/pxr.h"
-#include "pxr/usd/sdf/pathTable.h"
 #include "pxr/usd/sdf/path.h"
+#include "pxr/usd/sdf/pathTable.h"
 
-#include "pxr/base/tf/stringUtils.h"
-#include "pxr/base/tf/stopwatch.h"
+#include "Arch/fileSystem.h"
 #include "pxr/base/tf/diagnostic.h"
 #include "pxr/base/tf/hashmap.h"
-#include "Arch/fileSystem.h"
+#include "pxr/base/tf/stopwatch.h"
+#include "pxr/base/tf/stringUtils.h"
 
 #include <algorithm>
-#include <cstdlib>
 #include <cstdio>
-#include <vector>
+#include <cstdlib>
 #include <utility>
+#include <vector>
 
 using std::make_pair;
 using std::pair;
@@ -44,12 +44,10 @@ using std::vector;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-template <class FwdIter>
-static size_t Count(FwdIter b, FwdIter e, SdfPath const &p)
+template<class FwdIter> static size_t Count(FwdIter b, FwdIter e, SdfPath const &p)
 {
   size_t n = 0;
-  while (b != e)
-  {
+  while (b != e) {
     if (b->first == p)
       ++n;
     ++b;
@@ -76,12 +74,8 @@ static void DoUnitTest()
     TF_AXIOM(table2.begin() == table2.end());
 
     // Inserting a path implicitly inserts all ancestors.
-    TF_AXIOM(table2.insert(Table::value_type(SdfPath("/a/b/c/d"),
-                                             string()))
-                 .second);
-    TF_AXIOM(table2.insert(Table::value_type(SdfPath("/a/b/x/y"),
-                                             string()))
-                 .second);
+    TF_AXIOM(table2.insert(Table::value_type(SdfPath("/a/b/c/d"), string())).second);
+    TF_AXIOM(table2.insert(Table::value_type(SdfPath("/a/b/x/y"), string())).second);
     TF_AXIOM(table2.size() == 7);
 
     // Make a copy via assignment.
@@ -116,8 +110,7 @@ static void DoUnitTest()
   }
 
   // Insertion implicitly inserts ancestors.
-  pair<Table::iterator, bool> result =
-      table.insert(make_pair(SdfPath("/foo/bar"), "/foo/bar"));
+  pair<Table::iterator, bool> result = table.insert(make_pair(SdfPath("/foo/bar"), "/foo/bar"));
   TF_AXIOM(result.second);
   TF_AXIOM(result.first->first == SdfPath("/foo/bar"));
   TF_AXIOM(result.first->second == "/foo/bar");
@@ -164,11 +157,9 @@ static void DoUnitTest()
   TF_AXIOM(table.size() == 4);
 
   // Test implicit ancestor insertion.
-  result = table.insert(make_pair(SdfPath("/foo/anim/chars/MeridaGroup/Merida"),
-                                  "Merida"));
+  result = table.insert(make_pair(SdfPath("/foo/anim/chars/MeridaGroup/Merida"), "Merida"));
   TF_AXIOM(result.second);
-  TF_AXIOM(result.first->first ==
-           SdfPath("/foo/anim/chars/MeridaGroup/Merida"));
+  TF_AXIOM(result.first->first == SdfPath("/foo/anim/chars/MeridaGroup/Merida"));
   TF_AXIOM(result.first->second == "Merida");
   TF_AXIOM(table.size() == 8);
   TF_AXIOM(!table.empty());
@@ -219,20 +210,15 @@ static void DoUnitTest()
     range = table.FindSubtreeRange(SdfPath("/foo/anim/chars"));
     using std::count;
     TF_AXIOM(std::distance(range.first, range.second) == 7);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/MeridaGroup")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/MeridaGroup/Merida")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/AngusGroup")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/AngusGroup/Angus")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/MeridaGroup/MeridaBow")) == 1);
-    TF_AXIOM(Count(range.first, range.second,
-                   SdfPath("/foo/anim/chars/MeridaGroup/MeridaSword")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars/MeridaGroup")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars/MeridaGroup/Merida")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars/AngusGroup")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars/AngusGroup/Angus")) == 1);
+    TF_AXIOM(Count(range.first, range.second, SdfPath("/foo/anim/chars/MeridaGroup/MeridaBow")) ==
+             1);
+    TF_AXIOM(
+        Count(range.first, range.second, SdfPath("/foo/anim/chars/MeridaGroup/MeridaSword")) == 1);
   }
 
   // build a table<SdfPath, std::string> from the table.
@@ -261,11 +247,9 @@ static void DoUnitTest()
   TF_AXIOM(table.size() == 0);
 
   // build a table and then clear it in parallel
-  for (char ch = 'a'; ch <= 'z'; ++ch)
-  {
+  for (char ch = 'a'; ch <= 'z'; ++ch) {
     std::string value(1, ch);
-    for (char n = '0'; n <= '9'; ++n)
-    {
+    for (char n = '0'; n <= '9'; ++n) {
       char p[] = {'/', ch, n, '/', ch, n, '/', ch, n, '/', ch, n, '\0'};
       table.insert({SdfPath(p), value});
     }
@@ -276,11 +260,9 @@ static void DoUnitTest()
   TF_AXIOM(table.size() == 0);
 
   // build a table and then parallel-iterate over it
-  for (char ch = 'a'; ch <= 'z'; ++ch)
-  {
+  for (char ch = 'a'; ch <= 'z'; ++ch) {
     std::string value(1, ch);
-    for (char n = '0'; n <= '9'; ++n)
-    {
+    for (char n = '0'; n <= '9'; ++n) {
       char p[] = {'/', ch, n, '/', ch, n, '/', ch, n, '/', ch, n, '\0'};
       table.insert({SdfPath(p), value});
     }
@@ -288,16 +270,18 @@ static void DoUnitTest()
   // const parallel for each...
   std::atomic_int z_count(0);
   const Table &ctable = table;
-  ctable.ParallelForEach([&z_count](const SdfPath &p, const string &v)
-                         {
-        if (v == "z") { ++z_count; } });
+  ctable.ParallelForEach([&z_count](const SdfPath &p, const string &v) {
+    if (v == "z") {
+      ++z_count;
+    }
+  });
   TF_AXIOM(z_count.load() == 10);
   // non-const parallel for each...
-  table.ParallelForEach([](const SdfPath &p, string &v)
-                        {
-        if (p.GetName() == "a2") {
-            v = "found";
-        } });
+  table.ParallelForEach([](const SdfPath &p, string &v) {
+    if (p.GetName() == "a2") {
+      v = "found";
+    }
+  });
   TF_AXIOM(table.find(SdfPath("/a2/a2/a2/a2"))->second == "found");
   TF_AXIOM(table.find(SdfPath("/a3/a3/a3/a3"))->second == "a");
 
@@ -333,8 +317,7 @@ static void ReadPaths(string const &fileName, vector<SdfPath> *out)
 
   sw.Reset();
   sw.Start();
-  for (const auto &line : lines)
-  {
+  for (const auto &line : lines) {
     out->push_back(SdfPath(line));
   }
   sw.Stop();
@@ -343,45 +326,37 @@ static void ReadPaths(string const &fileName, vector<SdfPath> *out)
   // printf("  done!  Read %zu paths.\n", out->size() - initialSize);
 }
 
-template <class Driver>
-static void Bench(size_t numIters,
-                  vector<SdfPath> const &paths,
-                  Driver *driver)
+template<class Driver>
+static void Bench(size_t numIters, vector<SdfPath> const &paths, Driver *driver)
 {
   TfStopwatch sw;
 
   sw.Start();
   // Insert all paths.
   size_t count = 0;
-  for (const auto &path : paths)
-  {
+  for (const auto &path : paths) {
     driver->Insert(path);
-    if (++count % 100000 == 0)
-    {
+    if (++count % 100000 == 0) {
       printf("...inserted %zu paths\n", count);
     }
   }
   sw.Stop();
-  printf("Inserted %zu paths in %f seconds\n",
-         paths.size(), sw.GetSeconds());
+  printf("Inserted %zu paths in %f seconds\n", paths.size(), sw.GetSeconds());
 
   sw.Reset();
   sw.Start();
 
   // Erase random subtrees.
   size_t n = numIters;
-  while (n--)
-  {
-    vector<SdfPath>::const_iterator
-        i = paths.begin() + (rand() % paths.size());
+  while (n--) {
+    vector<SdfPath>::const_iterator i = paths.begin() + (rand() % paths.size());
     driver->EraseSubtree(*i);
   }
   sw.Stop();
   printf("Erased %zu subtrees in %f seconds\n", numIters, sw.GetSeconds());
 }
 
-struct PathTableDriver
-{
+struct PathTableDriver {
   void Insert(SdfPath const &path)
   {
     map.insert(make_pair(path, 0));
@@ -395,8 +370,7 @@ struct PathTableDriver
   SdfPathTable<int> map;
 };
 
-struct HashAndSetDriver
-{
+struct HashAndSetDriver {
   void Insert(SdfPath const &path)
   {
     hash.insert(make_pair(path, 0));
@@ -406,8 +380,7 @@ struct HashAndSetDriver
   void EraseSubtree(SdfPath const &path)
   {
     SdfPathSet::iterator i = pathSet.lower_bound(path);
-    while (*i == path || i->HasPrefix(path))
-    {
+    while (*i == path || i->HasPrefix(path)) {
       hash.erase(*i);
       pathSet.erase(i++);
     }
@@ -419,10 +392,10 @@ struct HashAndSetDriver
 
 int main(int argc, char **argv)
 {
-  if (argc < 3)
-  {
-    fprintf(stderr, "usage: %s {HashAndSet, PathTable} "
-                    "pathsFile\n",
+  if (argc < 3) {
+    fprintf(stderr,
+            "usage: %s {HashAndSet, PathTable} "
+            "pathsFile\n",
             TfGetBaseName(argv[0]).c_str());
     fprintf(stderr, "running unit test.\n");
     DoUnitTest();
@@ -434,18 +407,15 @@ int main(int argc, char **argv)
 
   srand(100);
 
-  if (string(argv[1]) == "HashAndSet")
-  {
+  if (string(argv[1]) == "HashAndSet") {
     HashAndSetDriver driver;
     Bench(paths.size(), paths, &driver);
   }
-  else if (string(argv[1]) == "PathTable")
-  {
+  else if (string(argv[1]) == "PathTable") {
     PathTableDriver driver;
     Bench(paths.size(), paths, &driver);
   }
-  else
-  {
+  else {
     fprintf(stderr, "invalid driver name\n");
   }
 

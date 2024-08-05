@@ -44,10 +44,12 @@ const char *pluginBuildLocation = TF_PP_STRINGIZE(PXR_PLUGIN_BUILD_LOCATION);
 
 #ifdef PXR_INSTALL_LOCATION
 const char *installLocation = TF_PP_STRINGIZE(PXR_INSTALL_LOCATION);
-#endif // PXR_INSTALL_LOCATION
+#endif  // PXR_INSTALL_LOCATION
 
-void _AppendPathList(std::vector<std::string> *result, const std::string &paths,
-                     const std::string &sharedLibPath) {
+void _AppendPathList(std::vector<std::string> *result,
+                     const std::string &paths,
+                     const std::string &sharedLibPath)
+{
   for (const auto &path : TfStringSplit(paths, ARCH_PATH_LIST_SEP)) {
     if (path.empty()) {
       continue;
@@ -57,13 +59,15 @@ void _AppendPathList(std::vector<std::string> *result, const std::string &paths,
     const bool isLibraryRelativePath = TfIsRelativePath(path);
     if (isLibraryRelativePath) {
       result->push_back(TfStringCatPaths(sharedLibPath, path));
-    } else {
+    }
+    else {
       result->push_back(path);
     }
   }
 }
 
-ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void) {
+ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void)
+{
   std::vector<std::string> result;
 
   std::vector<std::string> debugMessages;
@@ -75,8 +79,9 @@ ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void) {
   // ArchGetExecutablePath().  Also provide some diagnostic output if the
   // PLUG_INFO_SEARCH debug flag is enabled.
   std::string binaryPath;
-  if (!ArchGetAddressInfo(reinterpret_cast<void *>(&Plug_InitConfig),
-                          &binaryPath, nullptr, nullptr, nullptr)) {
+  if (!ArchGetAddressInfo(
+          reinterpret_cast<void *>(&Plug_InitConfig), &binaryPath, nullptr, nullptr, nullptr))
+  {
     debugMessages.emplace_back(
         "Failed to determine absolute path for Plug search "
         "using using ArchGetAddressInfo().  This is expected "
@@ -92,8 +97,8 @@ ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void) {
 
   binaryPath = TfGetPathName(binaryPath);
 
-  debugMessages.emplace_back(TfStringPrintf(
-      "Plug will search for plug infos under '%s'\n", binaryPath.c_str()));
+  debugMessages.emplace_back(
+      TfStringPrintf("Plug will search for plug infos under '%s'\n", binaryPath.c_str()));
 
   // Environment locations.
   _AppendPathList(&result, TfGetenv(pathEnvVarName), binaryPath);
@@ -104,7 +109,7 @@ ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void) {
 
 #ifdef PXR_INSTALL_LOCATION
   _AppendPathList(&result, installLocation, binaryPath);
-#endif // PXR_INSTALL_LOCATION
+#endif  // PXR_INSTALL_LOCATION
 
   // Plugin registration must process these paths in order
   // to ensure deterministic behavior when the same plugin
@@ -114,6 +119,6 @@ ARCH_CONSTRUCTOR(Plug_InitConfig, 2, void) {
   Plug_SetPaths(result, debugMessages, pathsAreOrdered);
 }
 
-} // namespace
+}  // namespace
 
 PXR_NAMESPACE_CLOSE_SCOPE

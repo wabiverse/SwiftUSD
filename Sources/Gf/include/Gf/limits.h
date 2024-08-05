@@ -31,7 +31,7 @@
 /// This constant is used to determine whether the length of a vector is too
 /// small to handle accurately.
 /// \ingroup group_gf_BasicMath
-#define GF_MIN_VECTOR_LENGTH  1e-10
+#define GF_MIN_VECTOR_LENGTH 1e-10
 
 /// This constant is used to determine when a set of basis vectors is close to
 /// orthogonal.

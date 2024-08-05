@@ -38,36 +38,38 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static SdfLayerRefPtr
-_UsdFlattenLayerStack2(const PcpLayerStackRefPtr &layerStack,
-                       const std::string &tag) {
+static SdfLayerRefPtr _UsdFlattenLayerStack2(const PcpLayerStackRefPtr &layerStack,
+                                             const std::string &tag)
+{
   return UsdFlattenLayerStack(layerStack, tag);
 }
 
-using Py_UsdFlattenResolveAssetPathSig = std::string(const SdfLayerHandle &,
-                                                     const std::string &);
-using Py_UsdFlattenResolveAssetPathFn =
-    std::function<Py_UsdFlattenResolveAssetPathSig>;
+using Py_UsdFlattenResolveAssetPathSig = std::string(const SdfLayerHandle &, const std::string &);
+using Py_UsdFlattenResolveAssetPathFn = std::function<Py_UsdFlattenResolveAssetPathSig>;
 
 static SdfLayerRefPtr _UsdFlattenLayerStack3(
     const PcpLayerStackRefPtr &layerStack,
     const Py_UsdFlattenResolveAssetPathFn &resolveAssetPathFn,
-    const std::string &tag) {
+    const std::string &tag)
+{
   return UsdFlattenLayerStack(layerStack, resolveAssetPathFn, tag);
 }
 
-void wrapUsdFlattenUtils() {
-  def("FlattenLayerStack", &_UsdFlattenLayerStack2,
+void wrapUsdFlattenUtils()
+{
+  def("FlattenLayerStack",
+      &_UsdFlattenLayerStack2,
       (arg("layerStack"), arg("tag") = std::string()),
       boost::python::return_value_policy<TfPyRefPtrFactory<SdfLayerHandle>>());
 
   TfPyFunctionFromPython<Py_UsdFlattenResolveAssetPathSig>();
-  def("FlattenLayerStack", &_UsdFlattenLayerStack3,
-      (arg("layerStack"), arg("resolveAssetPathFn"),
-       arg("tag") = std::string()),
+  def("FlattenLayerStack",
+      &_UsdFlattenLayerStack3,
+      (arg("layerStack"), arg("resolveAssetPathFn"), arg("tag") = std::string()),
       boost::python::return_value_policy<TfPyRefPtrFactory<SdfLayerHandle>>());
 
-  def("FlattenLayerStackResolveAssetPath", UsdFlattenLayerStackResolveAssetPath,
+  def("FlattenLayerStackResolveAssetPath",
+      UsdFlattenLayerStackResolveAssetPath,
       (arg("sourceLayer"), arg("assetPath")));
 
   using Context = UsdFlattenResolveAssetPathContext;
@@ -77,11 +79,10 @@ void wrapUsdFlattenUtils() {
       .add_property(
           "assetPath", +[](const Context &c) { return c.assetPath; })
       .add_property(
-          "expressionVariables",
-          +[](const Context &c) { return c.expressionVariables; });
+          "expressionVariables", +[](const Context &c) { return c.expressionVariables; });
 
-  using Py_UsdFlattenResolveAssetPathAdvancedSig =
-      std::string(const UsdFlattenResolveAssetPathContext &);
+  using Py_UsdFlattenResolveAssetPathAdvancedSig = std::string(
+      const UsdFlattenResolveAssetPathContext &);
 
   TfPyFunctionFromPython<Py_UsdFlattenResolveAssetPathAdvancedSig>();
 
@@ -94,10 +95,10 @@ void wrapUsdFlattenUtils() {
                          const UsdFlattenResolveAssetPathAdvancedFn &,
                          const std::string &)) &
           UsdFlattenLayerStack,
-      (arg("layerStack"), arg("resolveAssetPathFn"),
-       arg("tag") = std::string()),
+      (arg("layerStack"), arg("resolveAssetPathFn"), arg("tag") = std::string()),
       return_value_policy<TfPyRefPtrFactory<SdfLayerHandle>>());
 
   def("FlattenLayerStackResolveAssetPathAdvanced",
-      &UsdFlattenLayerStackResolveAssetPathAdvanced, (arg("context")));
+      &UsdFlattenLayerStackResolveAssetPathAdvanced,
+      (arg("context")));
 }

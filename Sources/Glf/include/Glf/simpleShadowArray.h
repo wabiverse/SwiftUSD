@@ -26,24 +26,22 @@
 
 /// \file glf/simpleShadowArray.h
 
-#include <pxr/pxrns.h>
+#include "Garch/glApi.h"
+#include "Gf/matrix4d.h"
+#include "Gf/vec2i.h"
+#include "Gf/vec4d.h"
 #include "Glf/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/refPtr.h"
 #include "Tf/weakPtr.h"
-#include "Gf/matrix4d.h"
-#include "Gf/vec2i.h"
-#include "Gf/vec4d.h"
-#include "Garch/glApi.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GlfSimpleShadowArray : public TfRefBase,
-                             public TfWeakBase
-{
-public:
+class GlfSimpleShadowArray : public TfRefBase, public TfWeakBase {
+ public:
   GLF_API
   GlfSimpleShadowArray();
   GLF_API
@@ -116,7 +114,7 @@ public:
   GLF_API
   void AllocSamplers();
 
-private:
+ private:
   void _AllocResources();
   void _AllocTextures();
   void _FreeResources();
@@ -125,7 +123,7 @@ private:
   void _BindFramebuffer(size_t index);
   void _UnbindFramebuffer();
 
-private:
+ private:
   std::vector<GfVec2i> _resolutions;
   std::vector<GLuint> _textures;
 

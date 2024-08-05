@@ -48,15 +48,18 @@ class Sdf_Identity {
   Sdf_Identity(Sdf_Identity const &) = delete;
   Sdf_Identity &operator=(Sdf_Identity const &) = delete;
 
-public:
+ public:
   /// Returns the layer that this identity refers to.
   SDF_API
   const SdfLayerHandle &GetLayer() const;
 
   /// Returns the path that this identity refers to.
-  const SdfPath &GetPath() const { return _path; }
+  const SdfPath &GetPath() const
+  {
+    return _path;
+  }
 
-private:
+ private:
   // Ref-counting ops manage _refCount.
   friend void intrusive_ptr_add_ref(Sdf_Identity *);
   friend void intrusive_ptr_release(Sdf_Identity *);
@@ -65,7 +68,9 @@ private:
   friend class Sdf_IdRegistryImpl;
 
   Sdf_Identity(Sdf_IdRegistryImpl *regImpl, const SdfPath &path)
-      : _refCount(0), _path(path), _regImpl(regImpl) {}
+      : _refCount(0), _path(path), _regImpl(regImpl)
+  {
+  }
 
   SDF_API
   static void _UnregisterOrDelete(Sdf_IdRegistryImpl *reg, Sdf_Identity *id);
@@ -77,8 +82,12 @@ private:
 };
 
 // Specialize boost::intrusive_ptr operations.
-inline void intrusive_ptr_add_ref(PXR_NS::Sdf_Identity *p) { ++p->_refCount; }
-inline void intrusive_ptr_release(PXR_NS::Sdf_Identity *p) {
+inline void intrusive_ptr_add_ref(PXR_NS::Sdf_Identity *p)
+{
+  ++p->_refCount;
+}
+inline void intrusive_ptr_release(PXR_NS::Sdf_Identity *p)
+{
   // Once the count hits zero, p is liable to be destroyed at any point,
   // concurrently, by its owning registry if it happens to be doing a cleanup
   // pass.  Cache 'this' and the impl ptr in local variables so we have them
@@ -95,12 +104,15 @@ class Sdf_IdentityRegistry {
   Sdf_IdentityRegistry(const Sdf_IdentityRegistry &) = delete;
   Sdf_IdentityRegistry &operator=(const Sdf_IdentityRegistry &) = delete;
 
-public:
+ public:
   Sdf_IdentityRegistry(const SdfLayerHandle &layer);
   ~Sdf_IdentityRegistry();
 
   /// Returns the layer that owns this registry.
-  const SdfLayerHandle &GetLayer() const { return _layer; }
+  const SdfLayerHandle &GetLayer() const
+  {
+    return _layer;
+  }
 
   /// Return the identity associated with \a path, issuing a new
   /// one if necessary. The registry will track the identity
@@ -111,7 +123,7 @@ public:
   /// Update identity in response to a namespace edit.
   void MoveIdentity(const SdfPath &oldPath, const SdfPath &newPath);
 
-private:
+ private:
   friend class Sdf_Identity;
 
   friend class Sdf_IdRegistryImpl;
@@ -131,4 +143,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_IDENTITY_H
+#endif  // PXR_USD_SDF_IDENTITY_H

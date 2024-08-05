@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
+#include "pxr/base/tf/staticTokens.h"
 #include "Arch/export.h"
 #include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/staticTokens.h"
+#include "pxr/pxr.h"
 
 #include <map>
 #include <string>
@@ -33,8 +33,7 @@ using std::map;
 using std::string;
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#define TFTEST_TOKENS \
-  (foo)((bar, "bar_value"))((array, ((array_0)(array_1))))
+#define TFTEST_TOKENS (foo)((bar, "bar_value"))((array, ((array_0)(array_1))))
 
 // Public tokens.
 // Normally only in .h file:
@@ -46,20 +45,19 @@ TF_DEFINE_PUBLIC_TOKENS(TfTestPublicTokens, TFTEST_TOKENS);
 TF_DEFINE_PRIVATE_TOKENS(TfTestPrivateTokens, TFTEST_TOKENS);
 
 // Helper for testing public/private tokens the same way
-#define TEST(holder)                                \
-  TF_AXIOM(holder->foo == TfToken("foo"));          \
-  TF_AXIOM(holder->bar == TfToken("bar_value"));    \
+#define TEST(holder) \
+  TF_AXIOM(holder->foo == TfToken("foo")); \
+  TF_AXIOM(holder->bar == TfToken("bar_value")); \
   TF_AXIOM(holder->array[0] == TfToken("array_0")); \
   TF_AXIOM(holder->array[1] == TfToken("array_1")); \
-  TF_AXIOM(holder->array_0 == TfToken("array_0"));  \
-  TF_AXIOM(holder->array_1 == TfToken("array_1"));  \
+  TF_AXIOM(holder->array_0 == TfToken("array_0")); \
+  TF_AXIOM(holder->array_1 == TfToken("array_1")); \
   TF_AXIOM(holder->allTokens == expectedAllTokens); \
   ;
 
 static std::vector<TfToken> expectedAllTokens;
 
-static bool
-Test_TfStaticTokens()
+static bool Test_TfStaticTokens()
 {
   // Expected contents of allTokens
   expectedAllTokens.push_back(TfToken("foo"));

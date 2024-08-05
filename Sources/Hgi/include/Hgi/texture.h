@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_TEXTURE_H
 #define PXR_IMAGING_HGI_TEXTURE_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec3i.h"
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -51,8 +51,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   What component is used for alpha channel.
 /// </ul>
 ///
-struct HgiComponentMapping
-{
+struct HgiComponentMapping {
   HgiComponentSwizzle r;
   HgiComponentSwizzle g;
   HgiComponentSwizzle b;
@@ -60,14 +59,10 @@ struct HgiComponentMapping
 };
 
 HGI_API
-bool operator==(
-    const HgiComponentMapping &lhs,
-    const HgiComponentMapping &rhs);
+bool operator==(const HgiComponentMapping &lhs, const HgiComponentMapping &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiComponentMapping &lhs,
-    const HgiComponentMapping &rhs);
+bool operator!=(const HgiComponentMapping &lhs, const HgiComponentMapping &rhs);
 
 /// \struct HgiTextureDesc
 ///
@@ -104,15 +99,21 @@ bool operator!=(
 ///   in more detail how mip dimensions are rounded.</li>
 /// </ul>
 ///
-struct HgiTextureDesc
-{
+struct HgiTextureDesc {
   HgiTextureDesc()
-      : usage(0), format(HgiFormatInvalid), componentMapping{
-                                                HgiComponentSwizzleR,
-                                                HgiComponentSwizzleG,
-                                                HgiComponentSwizzleB,
-                                                HgiComponentSwizzleA},
-        type(HgiTextureType2D), dimensions(0), layerCount(1), mipLevels(1), sampleCount(HgiSampleCount1), pixelsByteSize(0), initialData(nullptr)
+      : usage(0),
+        format(HgiFormatInvalid),
+        componentMapping{HgiComponentSwizzleR,
+                         HgiComponentSwizzleG,
+                         HgiComponentSwizzleB,
+                         HgiComponentSwizzleA},
+        type(HgiTextureType2D),
+        dimensions(0),
+        layerCount(1),
+        mipLevels(1),
+        sampleCount(HgiSampleCount1),
+        pixelsByteSize(0),
+        initialData(nullptr)
   {
   }
 
@@ -130,14 +131,10 @@ struct HgiTextureDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiTextureDesc &lhs,
-    const HgiTextureDesc &rhs);
+bool operator==(const HgiTextureDesc &lhs, const HgiTextureDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiTextureDesc &lhs,
-    const HgiTextureDesc &rhs);
+bool operator!=(const HgiTextureDesc &lhs, const HgiTextureDesc &rhs);
 
 ///
 /// \class HgiTexture
@@ -149,9 +146,8 @@ bool operator!=(
 /// To the client (HdSt) texture resources are referred to via
 /// opaque, stateless handles (HgTextureHandle).
 ///
-class HgiTexture
-{
-public:
+class HgiTexture {
+ public:
   HGI_API
   virtual ~HgiTexture();
 
@@ -178,7 +174,7 @@ public:
   HGI_API
   virtual uint64_t GetRawResource() const = 0;
 
-protected:
+ protected:
   HGI_API
   static size_t _GetByteSizeOfResource(const HgiTextureDesc &descriptor);
 
@@ -187,7 +183,7 @@ protected:
 
   HgiTextureDesc _descriptor;
 
-private:
+ private:
   HgiTexture() = delete;
   HgiTexture &operator=(const HgiTexture &) = delete;
   HgiTexture(const HgiTexture &) = delete;
@@ -224,10 +220,14 @@ using HgiTextureHandleVector = std::vector<HgiTextureHandle>;
 ///   view.</li>
 ///   </ul>
 ///
-struct HgiTextureViewDesc
-{
+struct HgiTextureViewDesc {
   HgiTextureViewDesc()
-      : format(HgiFormatInvalid), layerCount(1), mipLevels(1), sourceTexture(), sourceFirstLayer(0), sourceFirstMip(0)
+      : format(HgiFormatInvalid),
+        layerCount(1),
+        mipLevels(1),
+        sourceTexture(),
+        sourceFirstLayer(0),
+        sourceFirstMip(0)
   {
   }
 
@@ -241,14 +241,10 @@ struct HgiTextureViewDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiTextureViewDesc &lhs,
-    const HgiTextureViewDesc &rhs);
+bool operator==(const HgiTextureViewDesc &lhs, const HgiTextureViewDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiTextureViewDesc &lhs,
-    const HgiTextureViewDesc &rhs);
+bool operator!=(const HgiTextureViewDesc &lhs, const HgiTextureViewDesc &rhs);
 
 ///
 /// \class HgiTextureView
@@ -268,9 +264,8 @@ bool operator!=(
 /// a RGBAI32 texture once the F32 texture is no longer needed
 /// (transient resources).
 ///
-class HgiTextureView
-{
-public:
+class HgiTextureView {
+ public:
   HGI_API
   HgiTextureView(HgiTextureViewDesc const &desc);
 
@@ -285,10 +280,10 @@ public:
   HGI_API
   HgiTextureHandle const &GetViewTexture() const;
 
-protected:
+ protected:
   HgiTextureHandle _viewTexture;
 
-private:
+ private:
   HgiTextureView() = delete;
   HgiTextureView &operator=(const HgiTextureView &) = delete;
   HgiTextureView(const HgiTextureView &) = delete;

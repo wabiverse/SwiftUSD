@@ -38,7 +38,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This class represents an identifier for a thread.
 ///
 class TraceThreadId {
-public:
+ public:
   /// Constructor which creates an identifier based on std::thread_id. .
   /// It is either"Main Thread" if this id is marked as the main thread or
   ///  "Thread XXX" where XXX is the string representation of the thread id.
@@ -48,7 +48,10 @@ public:
   TRACE_API explicit TraceThreadId(const std::string &id);
 
   /// Returns the string representation of the id.
-  const std::string &ToString() const { return _id; }
+  const std::string &ToString() const
+  {
+    return _id;
+  }
 
   /// Equality operator.
   TRACE_API bool operator==(const TraceThreadId &) const;
@@ -56,12 +59,15 @@ public:
   /// Less than operator.
   TRACE_API bool operator<(const TraceThreadId &) const;
 
-private:
+ private:
   std::string _id;
 };
 
-inline TraceThreadId TraceGetThreadId() { return TraceThreadId(); }
+inline TraceThreadId TraceGetThreadId()
+{
+  return TraceThreadId();
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_THREADS_H
+#endif  // PXR_BASE_TRACE_THREADS_H

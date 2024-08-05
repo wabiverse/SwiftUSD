@@ -10,4 +10,4 @@
 #include <UsdVol/tokens.h>
 #include <UsdVol/volume.h>
 
-#endif // __PXR_USD_USDVOL_H__
+#endif  // __PXR_USD_USDVOL_H__

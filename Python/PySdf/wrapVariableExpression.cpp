@@ -39,7 +39,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapVariableExpression() {
+void wrapVariableExpression()
+{
   using This = SdfVariableExpression;
 
   scope s = class_<This>("VariableExpression")
@@ -47,8 +48,7 @@ void wrapVariableExpression() {
                 .def(init<const std::string &>(arg("expression")))
 
                 .def("__bool__", &This::operator bool)
-                .def("__str__", &This::GetString,
-                     return_value_policy<return_by_value>())
+                .def("__str__", &This::GetString, return_value_policy<return_by_value>())
                 .def(
                     "__repr__",
                     +[](const This &expr) {
@@ -57,8 +57,7 @@ void wrapVariableExpression() {
                                             expr.GetString().c_str());
                     })
 
-                .def("GetErrors", &This::GetErrors,
-                     return_value_policy<TfPySequenceToList>())
+                .def("GetErrors", &This::GetErrors, return_value_policy<TfPySequenceToList>())
 
                 .def("Evaluate", &This::Evaluate, arg("vars"))
 
@@ -70,12 +69,10 @@ void wrapVariableExpression() {
 
   class_<This::Result>("Result", no_init)
       .add_property("value",
-                    make_getter(&This::Result::value,
-                                return_value_policy<return_by_value>()))
+                    make_getter(&This::Result::value, return_value_policy<return_by_value>()))
       .add_property("errors",
-                    make_getter(&This::Result::errors,
-                                return_value_policy<TfPySequenceToList>()))
-      .add_property("usedVariables",
-                    make_getter(&This::Result::usedVariables,
-                                return_value_policy<TfPySequenceToSet>()));
+                    make_getter(&This::Result::errors, return_value_policy<TfPySequenceToList>()))
+      .add_property(
+          "usedVariables",
+          make_getter(&This::Result::usedVariables, return_value_policy<TfPySequenceToSet>()));
 }

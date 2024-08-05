@@ -36,7 +36,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class Sdf_ValueTypeImpl;
 
 struct Sdf_ValueTypePrivate {
-public:
+ public:
   struct Empty {};
 
   // Represents a type/role pair.
@@ -65,7 +65,7 @@ public:
 
 /// Represents a registered type name.
 class Sdf_ValueTypeImpl {
-public:
+ public:
   Sdf_ValueTypeImpl();
 
   const Sdf_ValueTypePrivate::CoreType *type;
@@ -76,4 +76,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_VALUE_TYPE_PRIVATE_H
+#endif  // PXR_USD_SDF_VALUE_TYPE_PRIVATE_H

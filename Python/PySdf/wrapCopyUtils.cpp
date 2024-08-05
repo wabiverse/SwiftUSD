@@ -43,8 +43,10 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-VtValue _GetValueForField(const SdfLayerHandle &layer, const TfToken &field,
-                          const boost::python::object &obj) {
+VtValue _GetValueForField(const SdfLayerHandle &layer,
+                          const TfToken &field,
+                          const boost::python::object &obj)
+{
   // Need to disambiguate certain types from Python.
   //
   // XXX: See also wrapSpec.cpp. Perhaps this logic should live in
@@ -61,26 +63,40 @@ VtValue _GetValueForField(const SdfLayerHandle &layer, const TfToken &field,
   return v;
 }
 
-using Py_SdfShouldCopyValueSig = boost::python::object(
-    SdfSpecType, const TfToken &, const SdfLayerHandle &, const SdfPath &, bool,
-    const SdfLayerHandle &, const SdfPath &, bool);
+using Py_SdfShouldCopyValueSig = boost::python::object(SdfSpecType,
+                                                       const TfToken &,
+                                                       const SdfLayerHandle &,
+                                                       const SdfPath &,
+                                                       bool,
+                                                       const SdfLayerHandle &,
+                                                       const SdfPath &,
+                                                       bool);
 
 using Py_SdfShouldCopyValueFn = std::function<Py_SdfShouldCopyValueSig>;
 
-using Py_SdfShouldCopyChildrenSig = boost::python::object(
-    const TfToken &, const SdfLayerHandle &, const SdfPath &, bool,
-    const SdfLayerHandle &, const SdfPath &, bool);
+using Py_SdfShouldCopyChildrenSig = boost::python::object(const TfToken &,
+                                                          const SdfLayerHandle &,
+                                                          const SdfPath &,
+                                                          bool,
+                                                          const SdfLayerHandle &,
+                                                          const SdfPath &,
+                                                          bool);
 
 using Py_SdfShouldCopyChildrenFn = std::function<Py_SdfShouldCopyChildrenSig>;
 
 bool _ShouldCopyValue(const Py_SdfShouldCopyValueFn &pyFunc,
-                      SdfSpecType specType, const TfToken &field,
-                      const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
-                      bool fieldInSrc, const SdfLayerHandle &dstLayer,
-                      const SdfPath &dstPath, bool fieldInDst,
-                      boost::optional<VtValue> *value) {
-  object result = pyFunc(specType, field, srcLayer, srcPath, fieldInSrc,
-                         dstLayer, dstPath, fieldInDst);
+                      SdfSpecType specType,
+                      const TfToken &field,
+                      const SdfLayerHandle &srcLayer,
+                      const SdfPath &srcPath,
+                      bool fieldInSrc,
+                      const SdfLayerHandle &dstLayer,
+                      const SdfPath &dstPath,
+                      bool fieldInDst,
+                      boost::optional<VtValue> *value)
+{
+  object result = pyFunc(
+      specType, field, srcLayer, srcPath, fieldInSrc, dstLayer, dstPath, fieldInDst);
 
   if (PyBool_Check(result.ptr())) {
     return extract<bool>(result)();
@@ -95,19 +111,22 @@ bool _ShouldCopyValue(const Py_SdfShouldCopyValueFn &pyFunc,
     }
   }
 
-  TfPyThrowTypeError(
-      "Expected shouldCopyValueFn to return bool or (bool, value)");
+  TfPyThrowTypeError("Expected shouldCopyValueFn to return bool or (bool, value)");
   return true;
 }
 
 bool _ShouldCopyChildren(const Py_SdfShouldCopyChildrenFn &pyFunc,
-                         const TfToken &field, const SdfLayerHandle &srcLayer,
-                         const SdfPath &srcPath, bool fieldInSrc,
-                         const SdfLayerHandle &dstLayer, const SdfPath &dstPath,
-                         bool fieldInDst, boost::optional<VtValue> *srcChildren,
-                         boost::optional<VtValue> *dstChildren) {
-  object result = pyFunc(field, srcLayer, srcPath, fieldInSrc, dstLayer,
-                         dstPath, fieldInDst);
+                         const TfToken &field,
+                         const SdfLayerHandle &srcLayer,
+                         const SdfPath &srcPath,
+                         bool fieldInSrc,
+                         const SdfLayerHandle &dstLayer,
+                         const SdfPath &dstPath,
+                         bool fieldInDst,
+                         boost::optional<VtValue> *srcChildren,
+                         boost::optional<VtValue> *dstChildren)
+{
+  object result = pyFunc(field, srcLayer, srcPath, fieldInSrc, dstLayer, dstPath, fieldInDst);
 
   if (PyBool_Check(result.ptr())) {
     return extract<bool>(result)();
@@ -123,40 +142,67 @@ bool _ShouldCopyChildren(const Py_SdfShouldCopyChildrenFn &pyFunc,
     }
   }
 
-  TfPyThrowTypeError(
-      "Expected shouldCopyChildrenFn to return bool or (bool, value, value)");
+  TfPyThrowTypeError("Expected shouldCopyChildrenFn to return bool or (bool, value, value)");
   return true;
 }
 
-bool Py_SdfCopySpec(const SdfLayerHandle &srcLayer, const SdfPath &srcPath,
-                    const SdfLayerHandle &dstLayer, const SdfPath &dstPath,
+bool Py_SdfCopySpec(const SdfLayerHandle &srcLayer,
+                    const SdfPath &srcPath,
+                    const SdfLayerHandle &dstLayer,
+                    const SdfPath &dstPath,
                     const Py_SdfShouldCopyValueFn &shouldCopyValueFn,
-                    const Py_SdfShouldCopyChildrenFn &shouldCopyChildrenFn) {
+                    const Py_SdfShouldCopyChildrenFn &shouldCopyChildrenFn)
+{
   namespace ph = std::placeholders;
 
-  return SdfCopySpec(
-      srcLayer, srcPath, dstLayer, dstPath,
-      /* shouldCopyValueFn = */
-      std::bind(_ShouldCopyValue, std::cref(shouldCopyValueFn), ph::_1, ph::_2,
-                ph::_3, ph::_4, ph::_5, ph::_6, ph::_7, ph::_8, ph::_9),
-      /* shouldCopyChildrenFn = */
-      std::bind(_ShouldCopyChildren, std::cref(shouldCopyChildrenFn), ph::_1,
-                ph::_2, ph::_3, ph::_4, ph::_5, ph::_6, ph::_7, ph::_8,
-                ph::_9));
+  return SdfCopySpec(srcLayer,
+                     srcPath,
+                     dstLayer,
+                     dstPath,
+                     /* shouldCopyValueFn = */
+                     std::bind(_ShouldCopyValue,
+                               std::cref(shouldCopyValueFn),
+                               ph::_1,
+                               ph::_2,
+                               ph::_3,
+                               ph::_4,
+                               ph::_5,
+                               ph::_6,
+                               ph::_7,
+                               ph::_8,
+                               ph::_9),
+                     /* shouldCopyChildrenFn = */
+                     std::bind(_ShouldCopyChildren,
+                               std::cref(shouldCopyChildrenFn),
+                               ph::_1,
+                               ph::_2,
+                               ph::_3,
+                               ph::_4,
+                               ph::_5,
+                               ph::_6,
+                               ph::_7,
+                               ph::_8,
+                               ph::_9));
 }
 
-} // namespace
+}  // namespace
 
-void wrapCopyUtils() {
+void wrapCopyUtils()
+{
   def("CopySpec",
-      (bool (*)(const SdfLayerHandle &, const SdfPath &, const SdfLayerHandle &,
-                const SdfPath &)) &
+      (bool (*)(
+          const SdfLayerHandle &, const SdfPath &, const SdfLayerHandle &, const SdfPath &)) &
           SdfCopySpec,
       (arg("srcLayer"), arg("srcPath"), arg("dstLayer"), arg("dstPath")));
 
   TfPyFunctionFromPython<Py_SdfShouldCopyChildrenSig>();
   TfPyFunctionFromPython<Py_SdfShouldCopyValueSig>();
-  def("CopySpec", &Py_SdfCopySpec,
-      (arg("srcLayer"), arg("srcPath"), arg("dstLayer"), arg("dstPath"),
-       arg("shouldCopyValueFn"), arg("shouldCopyChildrenFn")));
+  def("CopySpec",
+      &Py_SdfCopySpec,
+      (arg("srcLayer"),
+       arg("srcPath"),
+       arg("dstLayer"),
+       arg("dstPath"),
+       arg("shouldCopyValueFn"),
+       arg("shouldCopyChildrenFn")));
 }

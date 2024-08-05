@@ -37,30 +37,33 @@ TF_DECLARE_WEAK_PTRS(PlugPlugin);
 /// \class PlugNotice
 /// Notifications sent by the Plug library.
 class PlugNotice {
-public:
+ public:
   /// Base class for all Plug notices.
   class Base : public TfNotice {
-  public:
+   public:
     PLUG_API virtual ~Base();
   };
 
   /// Notice sent after new plugins have been registered with the Plug
   /// registry.
   class DidRegisterPlugins : public Base {
-  public:
+   public:
     explicit DidRegisterPlugins(const PlugPluginPtrVector &newPlugins);
     PLUG_API virtual ~DidRegisterPlugins();
 
-    const PlugPluginPtrVector &GetNewPlugins() const { return _plugins; }
+    const PlugPluginPtrVector &GetNewPlugins() const
+    {
+      return _plugins;
+    }
 
-  private:
+   private:
     PlugPluginPtrVector _plugins;
   };
 
-private:
+ private:
   PlugNotice();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_NOTICE_H
+#endif  // PXR_BASE_PLUG_NOTICE_H

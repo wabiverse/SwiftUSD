@@ -37,8 +37,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _RealPath(string const &path, bool allowInaccessibleSuffix,
-                        bool raiseOnError) {
+static string _RealPath(string const &path, bool allowInaccessibleSuffix, bool raiseOnError)
+{
   string error;
   string realPath = TfRealPath(path, allowInaccessibleSuffix, &error);
   if (raiseOnError && !error.empty()) {
@@ -47,7 +47,8 @@ static string _RealPath(string const &path, bool allowInaccessibleSuffix,
   return realPath;
 }
 
-static string::size_type _FindLongestAccessiblePrefix(string const &path) {
+static string::size_type _FindLongestAccessiblePrefix(string const &path)
+{
   // For python, we convert npos into path's length, which makes the return
   // value correct to use in slices.
   string error;
@@ -61,12 +62,13 @@ static string::size_type _FindLongestAccessiblePrefix(string const &path) {
   return result;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPathUtils() {
-  def("RealPath", _RealPath,
-      (arg("path"), arg("allowInaccessibleSuffix") = false,
-       arg("raiseOnError") = false));
+void wrapPathUtils()
+{
+  def("RealPath",
+      _RealPath,
+      (arg("path"), arg("allowInaccessibleSuffix") = false, arg("raiseOnError") = false));
 
   def("FindLongestAccessiblePrefix", _FindLongestAccessiblePrefix);
 }

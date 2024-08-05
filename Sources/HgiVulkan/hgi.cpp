@@ -21,6 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "HgiVulkan/hgi.h"
 #include "HgiVulkan/blitCmds.h"
 #include "HgiVulkan/buffer.h"
 #include "HgiVulkan/capabilities.h"
@@ -32,7 +33,6 @@
 #include "HgiVulkan/garbageCollector.h"
 #include "HgiVulkan/graphicsCmds.h"
 #include "HgiVulkan/graphicsPipeline.h"
-#include "HgiVulkan/hgi.h"
 #include "HgiVulkan/instance.h"
 #include "HgiVulkan/resourceBindings.h"
 #include "HgiVulkan/sampler.h"
@@ -55,7 +55,11 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 HgiVulkan::HgiVulkan()
-    : _instance(new HgiVulkanInstance()), _device(new HgiVulkanDevice(_instance)), _garbageCollector(new HgiVulkanGarbageCollector(this)), _threadId(std::this_thread::get_id()), _frameDepth(0)
+    : _instance(new HgiVulkanInstance()),
+      _device(new HgiVulkanDevice(_instance)),
+      _garbageCollector(new HgiVulkanGarbageCollector(this)),
+      _threadId(std::this_thread::get_id()),
+      _frameDepth(0)
 {
 }
 
@@ -86,36 +90,28 @@ bool HgiVulkan::IsBackendSupported() const
 }
 
 /* Multi threaded */
-HgiGraphicsCmdsUniquePtr
-HgiVulkan::CreateGraphicsCmds(
-    HgiGraphicsCmdsDesc const &desc)
+HgiGraphicsCmdsUniquePtr HgiVulkan::CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc)
 {
   HgiVulkanGraphicsCmds *cmds(new HgiVulkanGraphicsCmds(this, desc));
   return HgiGraphicsCmdsUniquePtr(cmds);
 }
 
 /* Multi threaded */
-HgiBlitCmdsUniquePtr
-HgiVulkan::CreateBlitCmds()
+HgiBlitCmdsUniquePtr HgiVulkan::CreateBlitCmds()
 {
   return HgiBlitCmdsUniquePtr(new HgiVulkanBlitCmds(this));
 }
 
-HgiComputeCmdsUniquePtr
-HgiVulkan::CreateComputeCmds(
-    HgiComputeCmdsDesc const &desc)
+HgiComputeCmdsUniquePtr HgiVulkan::CreateComputeCmds(HgiComputeCmdsDesc const &desc)
 {
   HgiVulkanComputeCmds *cmds(new HgiVulkanComputeCmds(this, desc));
   return HgiComputeCmdsUniquePtr(cmds);
 }
 
 /* Multi threaded */
-HgiTextureHandle
-HgiVulkan::CreateTexture(HgiTextureDesc const &desc)
+HgiTextureHandle HgiVulkan::CreateTexture(HgiTextureDesc const &desc)
 {
-  return HgiTextureHandle(
-      new HgiVulkanTexture(this, GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiTextureHandle(new HgiVulkanTexture(this, GetPrimaryDevice(), desc), GetUniqueId());
 }
 
 /* Multi threaded */
@@ -125,16 +121,14 @@ void HgiVulkan::DestroyTexture(HgiTextureHandle *texHandle)
 }
 
 /* Multi threaded */
-HgiTextureViewHandle
-HgiVulkan::CreateTextureView(HgiTextureViewDesc const &desc)
+HgiTextureViewHandle HgiVulkan::CreateTextureView(HgiTextureViewDesc const &desc)
 {
-  if (!desc.sourceTexture)
-  {
+  if (!desc.sourceTexture) {
     TF_CODING_ERROR("Source texture is null");
   }
 
-  HgiTextureHandle src = HgiTextureHandle(
-      new HgiVulkanTexture(this, GetPrimaryDevice(), desc), GetUniqueId());
+  HgiTextureHandle src = HgiTextureHandle(new HgiVulkanTexture(this, GetPrimaryDevice(), desc),
+                                          GetUniqueId());
   HgiTextureView *view = new HgiTextureView(desc);
   view->SetViewTexture(src);
   return HgiTextureViewHandle(view, GetUniqueId());
@@ -151,12 +145,9 @@ void HgiVulkan::DestroyTextureView(HgiTextureViewHandle *viewHandle)
 }
 
 /* Multi threaded */
-HgiSamplerHandle
-HgiVulkan::CreateSampler(HgiSamplerDesc const &desc)
+HgiSamplerHandle HgiVulkan::CreateSampler(HgiSamplerDesc const &desc)
 {
-  return HgiSamplerHandle(
-      new HgiVulkanSampler(GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiSamplerHandle(new HgiVulkanSampler(GetPrimaryDevice(), desc), GetUniqueId());
 }
 
 /* Multi threaded */
@@ -166,12 +157,9 @@ void HgiVulkan::DestroySampler(HgiSamplerHandle *smpHandle)
 }
 
 /* Multi threaded */
-HgiBufferHandle
-HgiVulkan::CreateBuffer(HgiBufferDesc const &desc)
+HgiBufferHandle HgiVulkan::CreateBuffer(HgiBufferDesc const &desc)
 {
-  return HgiBufferHandle(
-      new HgiVulkanBuffer(this, GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiBufferHandle(new HgiVulkanBuffer(this, GetPrimaryDevice(), desc), GetUniqueId());
 }
 
 /* Multi threaded */
@@ -181,12 +169,11 @@ void HgiVulkan::DestroyBuffer(HgiBufferHandle *bufHandle)
 }
 
 /* Multi threaded */
-HgiShaderFunctionHandle
-HgiVulkan::CreateShaderFunction(HgiShaderFunctionDesc const &desc)
+HgiShaderFunctionHandle HgiVulkan::CreateShaderFunction(HgiShaderFunctionDesc const &desc)
 {
   return HgiShaderFunctionHandle(
-      new HgiVulkanShaderFunction(GetPrimaryDevice(), this, desc,
-                                  GetCapabilities()->GetShaderVersion()),
+      new HgiVulkanShaderFunction(
+          GetPrimaryDevice(), this, desc, GetCapabilities()->GetShaderVersion()),
       GetUniqueId());
 }
 
@@ -197,12 +184,10 @@ void HgiVulkan::DestroyShaderFunction(HgiShaderFunctionHandle *shaderFnHandle)
 }
 
 /* Multi threaded */
-HgiShaderProgramHandle
-HgiVulkan::CreateShaderProgram(HgiShaderProgramDesc const &desc)
+HgiShaderProgramHandle HgiVulkan::CreateShaderProgram(HgiShaderProgramDesc const &desc)
 {
-  return HgiShaderProgramHandle(
-      new HgiVulkanShaderProgram(GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiShaderProgramHandle(new HgiVulkanShaderProgram(GetPrimaryDevice(), desc),
+                                GetUniqueId());
 }
 
 /* Multi threaded */
@@ -212,12 +197,10 @@ void HgiVulkan::DestroyShaderProgram(HgiShaderProgramHandle *shaderPrgHandle)
 }
 
 /* Multi threaded */
-HgiResourceBindingsHandle
-HgiVulkan::CreateResourceBindings(HgiResourceBindingsDesc const &desc)
+HgiResourceBindingsHandle HgiVulkan::CreateResourceBindings(HgiResourceBindingsDesc const &desc)
 {
-  return HgiResourceBindingsHandle(
-      new HgiVulkanResourceBindings(GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiResourceBindingsHandle(new HgiVulkanResourceBindings(GetPrimaryDevice(), desc),
+                                   GetUniqueId());
 }
 
 /* Multi threaded */
@@ -226,12 +209,10 @@ void HgiVulkan::DestroyResourceBindings(HgiResourceBindingsHandle *resHandle)
   TrashObject(resHandle, GetGarbageCollector()->GetResourceBindingsList());
 }
 
-HgiGraphicsPipelineHandle
-HgiVulkan::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const &desc)
+HgiGraphicsPipelineHandle HgiVulkan::CreateGraphicsPipeline(HgiGraphicsPipelineDesc const &desc)
 {
-  return HgiGraphicsPipelineHandle(
-      new HgiVulkanGraphicsPipeline(GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiGraphicsPipelineHandle(new HgiVulkanGraphicsPipeline(GetPrimaryDevice(), desc),
+                                   GetUniqueId());
 }
 
 void HgiVulkan::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle)
@@ -239,12 +220,10 @@ void HgiVulkan::DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle)
   TrashObject(pipeHandle, GetGarbageCollector()->GetGraphicsPipelineList());
 }
 
-HgiComputePipelineHandle
-HgiVulkan::CreateComputePipeline(HgiComputePipelineDesc const &desc)
+HgiComputePipelineHandle HgiVulkan::CreateComputePipeline(HgiComputePipelineDesc const &desc)
 {
-  return HgiComputePipelineHandle(
-      new HgiVulkanComputePipeline(GetPrimaryDevice(), desc),
-      GetUniqueId());
+  return HgiComputePipelineHandle(new HgiVulkanComputePipeline(GetPrimaryDevice(), desc),
+                                  GetUniqueId());
 }
 
 void HgiVulkan::DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle)
@@ -253,21 +232,18 @@ void HgiVulkan::DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle)
 }
 
 /* Multi threaded */
-TfToken const &
-HgiVulkan::GetAPIName() const
+TfToken const &HgiVulkan::GetAPIName() const
 {
   return HgiTokens->Vulkan;
 }
 
 /* Multi threaded */
-HgiVulkanCapabilities const *
-HgiVulkan::GetCapabilities() const
+HgiVulkanCapabilities const *HgiVulkan::GetCapabilities() const
 {
   return &_device->GetDeviceCapabilities();
 }
 
-HgiIndirectCommandEncoder *
-HgiVulkan::GetIndirectCommandEncoder() const
+HgiIndirectCommandEncoder *HgiVulkan::GetIndirectCommandEncoder() const
 {
   return nullptr;
 }
@@ -277,8 +253,7 @@ void HgiVulkan::StartFrame()
 {
   // Please read important usage limitations for Hgi::StartFrame
 
-  if (_frameDepth++ == 0)
-  {
+  if (_frameDepth++ == 0) {
     HgiVulkanBeginQueueLabel(GetPrimaryDevice(), "Full Hydra Frame");
   }
 }
@@ -288,30 +263,26 @@ void HgiVulkan::EndFrame()
 {
   // Please read important usage limitations for Hgi::EndFrame
 
-  if (--_frameDepth == 0)
-  {
+  if (--_frameDepth == 0) {
     _EndFrameSync();
     HgiVulkanEndQueueLabel(GetPrimaryDevice());
   }
 }
 
 /* Multi threaded */
-HgiVulkanInstance *
-HgiVulkan::GetVulkanInstance() const
+HgiVulkanInstance *HgiVulkan::GetVulkanInstance() const
 {
   return _instance;
 }
 
 /* Multi threaded */
-HgiVulkanDevice *
-HgiVulkan::GetPrimaryDevice() const
+HgiVulkanDevice *HgiVulkan::GetPrimaryDevice() const
 {
   return _device;
 }
 
 /* Multi threaded */
-HgiVulkanGarbageCollector *
-HgiVulkan::GetGarbageCollector() const
+HgiVulkanGarbageCollector *HgiVulkan::GetGarbageCollector() const
 {
   return _garbageCollector;
 }
@@ -326,24 +297,21 @@ bool HgiVulkan::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
   // However, since we currently call garbage collection here and because
   // we only have one resource command buffer, we cannot support submitting
   // cmds from secondary threads until those issues are resolved.
-  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id()))
-  {
+  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
     TF_CODING_ERROR("Secondary threads should not submit cmds");
     return false;
   }
 
   // Submit Cmds work
   bool result = false;
-  if (cmds)
-  {
+  if (cmds) {
     result = Hgi::_SubmitCmds(cmds, wait);
   }
 
   // XXX If client does not call StartFrame / EndFrame we perform end of frame
   // cleanup after each SubmitCmds. This is more frequent than ideal and also
   // prevents us from making SubmitCmds thread-safe.
-  if (_frameDepth == 0)
-  {
+  if (_frameDepth == 0) {
     _EndFrameSync();
   }
 
@@ -355,8 +323,7 @@ void HgiVulkan::_EndFrameSync()
 {
   // The garbage collector and command buffer reset must happen on the
   // main-thread when no threads are recording.
-  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id()))
-  {
+  if (ARCH_UNLIKELY(_threadId != std::this_thread::get_id())) {
     TF_CODING_ERROR("Secondary thread violation");
     return;
   }

@@ -33,11 +33,12 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdEditTarget() {
+void wrapUsdEditTarget()
+{
   class_<UsdEditTarget>("EditTarget")
-      .def(init<SdfLayerHandle, optional<PcpNodeRef>>(
-          (arg("layer"), arg("node"))))
-      .def("ForLocalDirectVariant", &UsdEditTarget::ForLocalDirectVariant,
+      .def(init<SdfLayerHandle, optional<PcpNodeRef>>((arg("layer"), arg("node"))))
+      .def("ForLocalDirectVariant",
+           &UsdEditTarget::ForLocalDirectVariant,
            (arg("layer"), arg("varSelPath")))
       .staticmethod("ForLocalDirectVariant")
       .def(self == self)
@@ -47,15 +48,14 @@ void wrapUsdEditTarget() {
       .def("GetLayer",
            static_cast<SdfLayerHandle (*)(UsdEditTarget const &)>(
                [](UsdEditTarget const &et) { return et.GetLayer(); }))
-      .def("GetMapFunction", &UsdEditTarget::GetMapFunction,
-           return_value_policy<return_by_value>())
+      .def(
+          "GetMapFunction", &UsdEditTarget::GetMapFunction, return_value_policy<return_by_value>())
       .def("MapToSpecPath", &UsdEditTarget::MapToSpecPath, arg("scenePath"))
-      .def("GetPrimSpecForScenePath", &UsdEditTarget::GetPrimSpecForScenePath,
-           arg("scenePath"))
+      .def("GetPrimSpecForScenePath", &UsdEditTarget::GetPrimSpecForScenePath, arg("scenePath"))
       .def("GetPropertySpecForScenePath",
-           &UsdEditTarget::GetPropertySpecForScenePath, arg("scenePath"))
-      .def("GetSpecForScenePath", &UsdEditTarget::GetPrimSpecForScenePath,
+           &UsdEditTarget::GetPropertySpecForScenePath,
            arg("scenePath"))
+      .def("GetSpecForScenePath", &UsdEditTarget::GetPrimSpecForScenePath, arg("scenePath"))
       .def("ComposeOver", &UsdEditTarget::ComposeOver, arg("weaker"));
 
   // Allow passing SdLayerHandle to wrapped functions expecting UsdEditTarget.

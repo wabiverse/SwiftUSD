@@ -33,35 +33,24 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 // Test package resolver that handles packages of the form
 // "foo.package[...]"
-class _TestPackageResolver
-    : public ArPackageResolver
-{
-public:
-    virtual std::string Resolve(
-        const std::string& resolvedPackagePath,
-        const std::string& packagedPath) override
-    {
-        TF_AXIOM(TfStringEndsWith(resolvedPackagePath, ".package"));
-        return packagedPath;
-    }
+class _TestPackageResolver : public ArPackageResolver {
+ public:
+  virtual std::string Resolve(const std::string &resolvedPackagePath,
+                              const std::string &packagedPath) override
+  {
+    TF_AXIOM(TfStringEndsWith(resolvedPackagePath, ".package"));
+    return packagedPath;
+  }
 
-    virtual std::shared_ptr<ArAsset> OpenAsset(
-        const std::string& resolvedPackagePath,
-        const std::string& resolvedPackagedPath) override
-    {
-        return nullptr;
-    }
+  virtual std::shared_ptr<ArAsset> OpenAsset(const std::string &resolvedPackagePath,
+                                             const std::string &resolvedPackagedPath) override
+  {
+    return nullptr;
+  }
 
-    virtual void BeginCacheScope(
-        VtValue* cacheScopeData) override
-    {
-    }
+  virtual void BeginCacheScope(VtValue *cacheScopeData) override {}
 
-    virtual void EndCacheScope(
-        VtValue* cacheScopeData) override
-    {
-    }
-
+  virtual void EndCacheScope(VtValue *cacheScopeData) override {}
 };
 
 AR_DEFINE_PACKAGE_RESOLVER(_TestPackageResolver, ArPackageResolver);

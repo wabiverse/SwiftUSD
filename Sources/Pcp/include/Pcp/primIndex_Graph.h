@@ -54,16 +54,18 @@ TF_DECLARE_REF_PTRS(PcpPrimIndex_Graph);
 /// opinions in the prim index.
 ///
 class PcpPrimIndex_Graph : public TfSimpleRefBase {
-public:
+ public:
   /// Creates a new graph with a root node for site \p rootSite.
-  static PcpPrimIndex_GraphRefPtr New(const PcpLayerStackSite &rootSite,
-                                      bool usd);
+  static PcpPrimIndex_GraphRefPtr New(const PcpLayerStackSite &rootSite, bool usd);
 
   /// Creates a new graph that is a clone of \p rhs.
   static PcpPrimIndex_GraphRefPtr New(const PcpPrimIndex_GraphRefPtr &rhs);
 
   /// Returns true if this graph was created in USD mode.
-  bool IsUsd() const { return _usd; }
+  bool IsUsd() const
+  {
+    return _usd;
+  }
 
   /// Get/set whether this prim index has an authored payload.
   /// Note that it does not necessarily mean that the payload has been
@@ -84,8 +86,7 @@ public:
   /// strong-to-weak order.
   ///
   /// By default, this returns a range encompassing the entire graph.
-  std::pair<size_t, size_t>
-  GetNodeIndexesForRange(PcpRangeType rangeType = PcpRangeTypeAll) const;
+  std::pair<size_t, size_t> GetNodeIndexesForRange(PcpRangeType rangeType = PcpRangeTypeAll) const;
 
   /// Returns the node index of the given \p node in this graph.
   ///
@@ -111,7 +112,8 @@ public:
   /// If the new node would exceeed the graph capacity, an invalid
   /// PcpNodeRef is returned.
   PcpNodeRef InsertChildNode(const PcpNodeRef &parentNode,
-                             const PcpLayerStackSite &site, const PcpArc &arc,
+                             const PcpLayerStackSite &site,
+                             const PcpArc &arc,
                              PcpErrorBasePtr *error);
 
   /// Inserts \p subgraph as a child of \p parentNode. The root node of
@@ -122,36 +124,41 @@ public:
   /// PcpNodeRef is returned.
   PcpNodeRef InsertChildSubgraph(const PcpNodeRef &parentNode,
                                  const PcpPrimIndex_GraphRefPtr &subgraph,
-                                 const PcpArc &arc, PcpErrorBasePtr *error);
+                                 const PcpArc &arc,
+                                 PcpErrorBasePtr *error);
 
   /// Finalizes the graph. This optimizes internal data structures and
   /// should be called once the graph is fully generated.
   void Finalize();
 
   /// Return true if the graph is in a finalized state.
-  bool IsFinalized() const { return _finalized; }
+  bool IsFinalized() const
+  {
+    return _finalized;
+  }
 
   /// Get the SdSite from compressed site \p site.
-  SdfSite GetSdSite(const Pcp_CompressedSdSite &site) const {
-    return SdfSite(
-        _GetNode(site.nodeIndex).layerStack->GetLayers()[site.layerIndex],
-        _unshared[site.nodeIndex].sitePath);
+  SdfSite GetSdSite(const Pcp_CompressedSdSite &site) const
+  {
+    return SdfSite(_GetNode(site.nodeIndex).layerStack->GetLayers()[site.layerIndex],
+                   _unshared[site.nodeIndex].sitePath);
   }
 
   /// Make an uncompressed site reference from compressed site \p site.
-  Pcp_SdSiteRef GetSiteRef(const Pcp_CompressedSdSite &site) const {
-    return Pcp_SdSiteRef(
-        _GetNode(site.nodeIndex).layerStack->GetLayers()[site.layerIndex],
-        _unshared[site.nodeIndex].sitePath);
+  Pcp_SdSiteRef GetSiteRef(const Pcp_CompressedSdSite &site) const
+  {
+    return Pcp_SdSiteRef(_GetNode(site.nodeIndex).layerStack->GetLayers()[site.layerIndex],
+                         _unshared[site.nodeIndex].sitePath);
   }
 
   /// Get a node from compressed site \p site.
-  PcpNodeRef GetNode(const Pcp_CompressedSdSite &site) {
+  PcpNodeRef GetNode(const Pcp_CompressedSdSite &site)
+  {
     TF_DEV_AXIOM(site.nodeIndex < _GetNumNodes());
     return PcpNodeRef(this, site.nodeIndex);
   }
 
-private:
+ private:
   // Forward declarations for internal data structures.
   struct _Arc;
   struct _ArcStrengthOrder;
@@ -162,11 +169,9 @@ private:
   PcpPrimIndex_Graph(const PcpPrimIndex_Graph &rhs) = default;
 
   size_t _CreateNode(const PcpLayerStackSite &site, const PcpArc &arc);
-  size_t _CreateNodesForSubgraph(const PcpPrimIndex_Graph &subgraph,
-                                 const PcpArc &arc);
+  size_t _CreateNodesForSubgraph(const PcpPrimIndex_Graph &subgraph, const PcpArc &arc);
 
-  PcpNodeRef _InsertChildInStrengthOrder(size_t parentNodeIdx,
-                                         size_t childNodeIdx);
+  PcpNodeRef _InsertChildInStrengthOrder(size_t parentNodeIdx, size_t childNodeIdx);
 
   void _DetachSharedNodePool();
   void _DetachSharedNodePoolForNewNodes(size_t numAddedNodes = -1);
@@ -175,7 +180,7 @@ private:
   // for the first node for which p(node) is true and the first subsequent
   // node where p(node) is false. Returns the indexes of the resulting
   // nodes.
-  template <class Predicate>
+  template<class Predicate>
   std::pair<size_t, size_t> _FindRootChildRange(const Predicate &p) const;
 
   // Helper functions to compute a mapping between node indexes and
@@ -186,11 +191,9 @@ private:
   // ordering, false otherwise.
   //
   // nodeIndexToStrengthOrder[i] => strength order of node at index i.
-  bool _ComputeStrengthOrderIndexMapping(
-      std::vector<size_t> *nodeIndexToStrengthOrder) const;
+  bool _ComputeStrengthOrderIndexMapping(std::vector<size_t> *nodeIndexToStrengthOrder) const;
   bool _ComputeStrengthOrderIndexMappingRecursively(
-      size_t nodeIdx, size_t *strengthIdx,
-      std::vector<size_t> *nodeIndexToStrengthOrder) const;
+      size_t nodeIdx, size_t *strengthIdx, std::vector<size_t> *nodeIndexToStrengthOrder) const;
 
   // Helper function to compute a node index mapping that erases nodes
   // that have been marked for culling.
@@ -198,8 +201,7 @@ private:
   // Returns:
   // True if any nodes marked for culling can be erased, false otherwise.
   // culledNodeMapping[i] => index of node i after culled nodes are erased.
-  bool _ComputeEraseCulledNodeIndexMapping(
-      std::vector<size_t> *culledNodeMapping) const;
+  bool _ComputeEraseCulledNodeIndexMapping(std::vector<size_t> *culledNodeMapping) const;
 
   // Transforms the node pool by applying the given node index mapping.
   // References to to other nodes in the pool are fixed up appropriately.
@@ -209,7 +211,7 @@ private:
   // If \p nodeIndexMap[i] == _invalidNodeIndex, that node will be erased.
   void _ApplyNodeIndexMapping(const std::vector<size_t> &nodeIndexMap);
 
-private:
+ private:
   // PcpNodeRef is allowed to reach directly into the node pool to get/set
   // data.
   friend class PcpNodeRef;
@@ -223,17 +225,22 @@ private:
   _Node &_GetWriteableNode(size_t idx);
   _Node &_GetWriteableNode(const PcpNodeRef &node);
 
-  size_t _GetNumNodes() const { return _nodes->size(); }
+  size_t _GetNumNodes() const
+  {
+    return _nodes->size();
+  }
 
-  const _Node &_GetNode(size_t idx) const {
+  const _Node &_GetNode(size_t idx) const
+  {
     TF_DEV_AXIOM(idx < _GetNumNodes());
     return (*_nodes)[idx];
   }
-  const _Node &_GetNode(const PcpNodeRef &node) const {
+  const _Node &_GetNode(const PcpNodeRef &node) const
+  {
     return _GetNode(node._GetNodeIndex());
   }
 
-private:
+ private:
   // Allow Pcp_Statistics access to internal data for diagnostics.
   friend class Pcp_Statistics;
 
@@ -246,8 +253,7 @@ private:
     using _DepthSizeType = uint16_t;
 
     // Index used to represent an invalid node.
-    static const size_t _invalidNodeIndex =
-        static_cast<size_t>(_NodeIndexType(~0));
+    static const size_t _invalidNodeIndex = static_cast<size_t>(_NodeIndexType(~0));
 
     _Node() noexcept
     /* The equivalent initializations to the ctor body -- gcc emits much
@@ -271,7 +277,8 @@ private:
       memset(&indexes, ~0, sizeof(indexes));
     }
 
-    void Swap(_Node &rhs) noexcept {
+    void Swap(_Node &rhs) noexcept
+    {
       std::swap(layerStack, rhs.layerStack);
       mapToRoot.Swap(rhs.mapToRoot);
       mapToParent.Swap(rhs.mapToParent);
@@ -367,10 +374,13 @@ private:
   struct _UnsharedData {
     _UnsharedData() : hasSpecs(false), culled(false), isDueToAncestor(false) {}
     explicit _UnsharedData(SdfPath const &p)
-        : sitePath(p), hasSpecs(false), culled(false), isDueToAncestor(false) {}
+        : sitePath(p), hasSpecs(false), culled(false), isDueToAncestor(false)
+    {
+    }
     explicit _UnsharedData(SdfPath &&p)
-        : sitePath(std::move(p)), hasSpecs(false), culled(false),
-          isDueToAncestor(false) {}
+        : sitePath(std::move(p)), hasSpecs(false), culled(false), isDueToAncestor(false)
+    {
+    }
 
     // The site path for a particular node.
     SdfPath sitePath;
@@ -411,4 +421,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PRIM_INDEX_GRAPH_H
+#endif  // PXR_USD_PCP_PRIM_INDEX_GRAPH_H

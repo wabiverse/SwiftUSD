@@ -26,17 +26,17 @@
 
 /// \file glf/testGLContext.h
 
-#include <pxr/pxrns.h>
 #include "Glf/api.h"
 #include "Glf/glContext.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 
 #if (defined(__linux__) || defined(_WIN32)) && __has_include(<GL/glx.h>)
 #  define WITH_TEST_GL_CONTEXT 1
-# else // !defined(__linux__) && !defined(_WIN32) && !__has_include(<GL/glx.h>)
+#else  // !defined(__linux__) && !defined(_WIN32) && !__has_include(<GL/glx.h>)
 #  define WITH_TEST_GL_CONTEXT 0
-#endif // defined(__linux__) || defined(_WIN32) && __has_include(<GL/glx.h>)
+#endif  // defined(__linux__) || defined(_WIN32) && __has_include(<GL/glx.h>)
 
 #if WITH_TEST_GL_CONTEXT
 
@@ -50,9 +50,8 @@ typedef std::shared_ptr<class GlfTestGLContext> GlfTestGLContextSharedPtr;
 ///
 /// Testing support class for GlfGLContext.
 ///
-class GlfTestGLContext : public GlfGLContext
-{
-public:
+class GlfTestGLContext : public GlfGLContext {
+ public:
   GLF_API
   static void RegisterGLContextCallbacks();
 
@@ -63,7 +62,7 @@ public:
   GLF_API
   static GlfTestGLContextSharedPtr Create(GlfTestGLContextSharedPtr const &share);
 
-protected:
+ protected:
   // GlfGLContext overrides
   GLF_API
   virtual void _MakeCurrent();
@@ -72,17 +71,17 @@ protected:
   GLF_API
   virtual bool _IsEqual(const GlfGLContextSharedPtr &rhs) const;
 
-private:
+ private:
   GlfTestGLContext(Glf_TestGLContextPrivate const *context);
 
   friend class GlfTestGLContextRegistrationInterface;
 
-private:
+ private:
   Glf_TestGLContextPrivate *_context;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // WITH_TEST_GL_CONTEXT
+#endif  // WITH_TEST_GL_CONTEXT
 
-#endif // PXR_IMAGING_GLF_TEST_GLCONTEXT_H
+#endif  // PXR_IMAGING_GLF_TEST_GLCONTEXT_H

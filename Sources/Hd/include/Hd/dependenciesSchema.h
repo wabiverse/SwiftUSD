@@ -35,50 +35,43 @@
 
 #include "Hd/dependencySchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDDEPENDENCIES_SCHEMA_TOKENS \
-    (__dependencies) \
+#define HDDEPENDENCIES_SCHEMA_TOKENS (__dependencies)
 
-TF_DECLARE_PUBLIC_TOKENS(HdDependenciesSchemaTokens, HD_API,
-    HDDEPENDENCIES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdDependenciesSchemaTokens, HD_API, HDDEPENDENCIES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdDependenciesSchema : public HdSchema
-{
-public:
-    HdDependenciesSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdDependenciesSchema : public HdSchema {
+ public:
+  HdDependenciesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    using EntryPair = std::pair<TfToken, HdDependencySchema>;
-    using EntryVector = TfSmallVector<EntryPair, 8>;
+  using EntryPair = std::pair<TfToken, HdDependencySchema>;
+  using EntryVector = TfSmallVector<EntryPair, 8>;
 
-    EntryVector GetEntries();
+  EntryVector GetEntries();
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "__dependencies" from the parent container and constructs a
+  /// HdDependenciesSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdDependenciesSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "__dependencies" from the parent container and constructs a
-    /// HdDependenciesSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdDependenciesSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

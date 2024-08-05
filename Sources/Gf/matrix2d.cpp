@@ -39,20 +39,24 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfMatrix2d>(); }
-
-std::ostream &operator<<(std::ostream &out, const GfMatrix2d &m) {
-  return out << "( (" << Gf_OstreamHelperP(m[0][0]) << ", "
-             << Gf_OstreamHelperP(m[0][1]) << "), ("
-             << Gf_OstreamHelperP(m[1][0]) << ", " << Gf_OstreamHelperP(m[1][1])
-             << ") )";
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfMatrix2d>();
 }
 
-GfMatrix2d::GfMatrix2d(const GfMatrix2f &m) {
+std::ostream &operator<<(std::ostream &out, const GfMatrix2d &m)
+{
+  return out << "( (" << Gf_OstreamHelperP(m[0][0]) << ", " << Gf_OstreamHelperP(m[0][1]) << "), ("
+             << Gf_OstreamHelperP(m[1][0]) << ", " << Gf_OstreamHelperP(m[1][1]) << ") )";
+}
+
+GfMatrix2d::GfMatrix2d(const GfMatrix2f &m)
+{
   Set(m[0][0], m[0][1], m[1][0], m[1][1]);
 }
 
-GfMatrix2d::GfMatrix2d(const std::vector<std::vector<double>> &v) {
+GfMatrix2d::GfMatrix2d(const std::vector<std::vector<double>> &v)
+{
   double m[2][2] = {{1.0, 0.0}, {0.0, 1.0}};
   for (size_t row = 0; row < 2 && row < v.size(); ++row) {
     for (size_t col = 0; col < 2 && col < v[row].size(); ++col) {
@@ -62,7 +66,8 @@ GfMatrix2d::GfMatrix2d(const std::vector<std::vector<double>> &v) {
   Set(m);
 }
 
-GfMatrix2d::GfMatrix2d(const std::vector<std::vector<float>> &v) {
+GfMatrix2d::GfMatrix2d(const std::vector<std::vector<float>> &v)
+{
   double m[2][2] = {{1.0, 0.0}, {0.0, 1.0}};
   for (size_t row = 0; row < 2 && row < v.size(); ++row) {
     for (size_t col = 0; col < 2 && col < v[row].size(); ++col) {
@@ -72,7 +77,8 @@ GfMatrix2d::GfMatrix2d(const std::vector<std::vector<float>> &v) {
   Set(m);
 }
 
-GfMatrix2d &GfMatrix2d::SetDiagonal(double s) {
+GfMatrix2d &GfMatrix2d::SetDiagonal(double s)
+{
   _mtx[0][0] = s;
   _mtx[0][1] = 0.0;
   _mtx[1][0] = 0.0;
@@ -80,7 +86,8 @@ GfMatrix2d &GfMatrix2d::SetDiagonal(double s) {
   return *this;
 }
 
-GfMatrix2d &GfMatrix2d::SetDiagonal(const GfVec2d &v) {
+GfMatrix2d &GfMatrix2d::SetDiagonal(const GfVec2d &v)
+{
   _mtx[0][0] = v[0];
   _mtx[0][1] = 0.0;
   _mtx[1][0] = 0.0;
@@ -88,7 +95,8 @@ GfMatrix2d &GfMatrix2d::SetDiagonal(const GfVec2d &v) {
   return *this;
 }
 
-double *GfMatrix2d::Get(double m[2][2]) const {
+double *GfMatrix2d::Get(double m[2][2]) const
+{
   m[0][0] = _mtx[0][0];
   m[0][1] = _mtx[0][1];
   m[1][0] = _mtx[1][0];
@@ -96,17 +104,20 @@ double *GfMatrix2d::Get(double m[2][2]) const {
   return &m[0][0];
 }
 
-bool GfMatrix2d::operator==(const GfMatrix2d &m) const {
-  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] &&
-          _mtx[1][0] == m._mtx[1][0] && _mtx[1][1] == m._mtx[1][1]);
+bool GfMatrix2d::operator==(const GfMatrix2d &m) const
+{
+  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] && _mtx[1][0] == m._mtx[1][0] &&
+          _mtx[1][1] == m._mtx[1][1]);
 }
 
-bool GfMatrix2d::operator==(const GfMatrix2f &m) const {
-  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] &&
-          _mtx[1][0] == m._mtx[1][0] && _mtx[1][1] == m._mtx[1][1]);
+bool GfMatrix2d::operator==(const GfMatrix2f &m) const
+{
+  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] && _mtx[1][0] == m._mtx[1][0] &&
+          _mtx[1][1] == m._mtx[1][1]);
 }
 
-GfMatrix2d GfMatrix2d::GetTranspose() const {
+GfMatrix2d GfMatrix2d::GetTranspose() const
+{
   GfMatrix2d transpose;
   transpose._mtx[0][0] = _mtx[0][0];
   transpose._mtx[1][0] = _mtx[0][1];
@@ -116,7 +127,8 @@ GfMatrix2d GfMatrix2d::GetTranspose() const {
   return transpose;
 }
 
-GfMatrix2d GfMatrix2d::GetInverse(double *detPtr, double eps) const {
+GfMatrix2d GfMatrix2d::GetInverse(double *detPtr, double eps) const
+{
   double det = GetDeterminant();
 
   if (detPtr) {
@@ -135,21 +147,24 @@ GfMatrix2d GfMatrix2d::GetInverse(double *detPtr, double eps) const {
     inverse._mtx[0][1] = _mtx[0][1] * -rcp;
     inverse._mtx[1][0] = _mtx[1][0] * -rcp;
     inverse._mtx[1][1] = _mtx[0][0] * rcp;
-  } else {
+  }
+  else {
     inverse.SetDiagonal(FLT_MAX);
   }
 
   return inverse;
 }
 
-double GfMatrix2d::GetDeterminant() const {
+double GfMatrix2d::GetDeterminant() const
+{
   return (_mtx[0][0] * _mtx[1][1] - _mtx[0][1] * _mtx[1][0]);
 }
 
 /*
 ** Scaling
 */
-GfMatrix2d &GfMatrix2d::operator*=(double d) {
+GfMatrix2d &GfMatrix2d::operator*=(double d)
+{
   _mtx[0][0] *= d;
   _mtx[0][1] *= d;
   _mtx[1][0] *= d;
@@ -160,7 +175,8 @@ GfMatrix2d &GfMatrix2d::operator*=(double d) {
 /*
 ** Addition
 */
-GfMatrix2d &GfMatrix2d::operator+=(const GfMatrix2d &m) {
+GfMatrix2d &GfMatrix2d::operator+=(const GfMatrix2d &m)
+{
   _mtx[0][0] += m._mtx[0][0];
   _mtx[0][1] += m._mtx[0][1];
   _mtx[1][0] += m._mtx[1][0];
@@ -171,7 +187,8 @@ GfMatrix2d &GfMatrix2d::operator+=(const GfMatrix2d &m) {
 /*
 ** Subtraction
 */
-GfMatrix2d &GfMatrix2d::operator-=(const GfMatrix2d &m) {
+GfMatrix2d &GfMatrix2d::operator-=(const GfMatrix2d &m)
+{
   _mtx[0][0] -= m._mtx[0][0];
   _mtx[0][1] -= m._mtx[0][1];
   _mtx[1][0] -= m._mtx[1][0];
@@ -182,11 +199,13 @@ GfMatrix2d &GfMatrix2d::operator-=(const GfMatrix2d &m) {
 /*
 ** Negation
 */
-GfMatrix2d operator-(const GfMatrix2d &m) {
+GfMatrix2d operator-(const GfMatrix2d &m)
+{
   return GfMatrix2d(-m._mtx[0][0], -m._mtx[0][1], -m._mtx[1][0], -m._mtx[1][1]);
 }
 
-GfMatrix2d &GfMatrix2d::operator*=(const GfMatrix2d &m) {
+GfMatrix2d &GfMatrix2d::operator*=(const GfMatrix2d &m)
+{
   // Save current values before they are overwritten
   GfMatrix2d tmp = *this;
 
@@ -204,17 +223,20 @@ GfMatrix2d &GfMatrix2d::operator*=(const GfMatrix2d &m) {
 /*
  * Define multiplication between floating vector and double matrix.
  */
-GfVec2f operator*(const GfVec2f &vec, const GfMatrix2d &m) {
+GfVec2f operator*(const GfVec2f &vec, const GfMatrix2d &m)
+{
   return GfVec2f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[1][0]),
                  float(vec[0] * m._mtx[0][1] + vec[1] * m._mtx[1][1]));
 }
 
-GfVec2f operator*(const GfMatrix2d &m, const GfVec2f &vec) {
+GfVec2f operator*(const GfMatrix2d &m, const GfVec2f &vec)
+{
   return GfVec2f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[0][1]),
                  float(vec[0] * m._mtx[1][0] + vec[1] * m._mtx[1][1]));
 }
 
-bool GfIsClose(GfMatrix2d const &m1, GfMatrix2d const &m2, double tolerance) {
+bool GfIsClose(GfMatrix2d const &m1, GfMatrix2d const &m2, double tolerance)
+{
   for (size_t row = 0; row < 2; ++row) {
     for (size_t col = 0; col < 2; ++col) {
       if (!GfIsClose(m1[static_cast<int>(row)][col], m2[static_cast<int>(row)][col], tolerance))

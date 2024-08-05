@@ -118,8 +118,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ref TfSingleton_typicalUse "Typical Use" for a canonical example).
 ///
-template <class T> class TfSingleton {
-public:
+template<class T> class TfSingleton {
+ public:
   /// Return a reference to an object of type \c T, creating it if
   /// necessary.
   ///
@@ -133,7 +133,8 @@ public:
   /// object result in only one object being created; locking beyond this
   /// (for example, letting only one thread at a time call a member
   /// function) are the responsibility of the class author.
-  inline static T &GetInstance() {
+  inline static T &GetInstance()
+  {
     // Suppress undefined-var-template warnings from clang; _instance
     // is expected to be instantiated in another translation unit via
     // the TF_INSTANTIATE_SINGLETON macro.
@@ -151,7 +152,8 @@ public:
   /// existence.
   ///
   /// This call tests whether or not the singleton currently exists.
-  inline static bool CurrentlyExists() {
+  inline static bool CurrentlyExists()
+  {
     // Suppress undefined-var-template warnings from clang; _instance
     // is expected to be instantiated in another translation unit via
     // the TF_INSTANTIATE_SINGLETON macro.
@@ -191,7 +193,7 @@ public:
   /// call to \c GetInstance() will create a new instance.
   inline static void DeleteInstance();
 
-private:
+ private:
   static T *_CreateInstance(std::atomic<T *> &instance);
 
   static std::atomic<T *> _instance;

@@ -28,8 +28,8 @@
 /// Utilities for converting between USD encodings and Renderman encodings in
 /// cases where there is a difference.
 
-#include <pxr/pxrns.h>
 #include "UsdRi/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -67,4 +67,4 @@ const TfToken &UsdRiConvertFromRManTriangleSubdivisionRule(int i);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RI_RMAN_UTILITIES_H
+#endif  // PXR_USD_USD_RI_RMAN_UTILITIES_H

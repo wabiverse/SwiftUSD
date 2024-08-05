@@ -26,8 +26,8 @@
 #define PXR_IMAGING_HGIGL_SHADERGENERATOR_H
 
 #include "Hgi/shaderGenerator.h"
-#include "HgiGL/shaderSection.h"
 #include "HgiGL/api.h"
+#include "HgiGL/shaderSection.h"
 
 #include <map>
 
@@ -35,33 +35,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class Hgi;
 
-using HgiGLShaderSectionUniquePtrVector =
-    std::vector<std::unique_ptr<HgiGLShaderSection>>;
+using HgiGLShaderSectionUniquePtrVector = std::vector<std::unique_ptr<HgiGLShaderSection>>;
 
 /// \class HgiGLShaderGenerator
 ///
 /// Takes in a descriptor and spits out GLSL code through it's execute function.
 ///
-class HgiGLShaderGenerator final : public HgiShaderGenerator
-{
-public:
+class HgiGLShaderGenerator final : public HgiShaderGenerator {
+ public:
   HGIGL_API
-  explicit HgiGLShaderGenerator(
-      Hgi const *hgi,
-      const HgiShaderFunctionDesc &descriptor);
+  explicit HgiGLShaderGenerator(Hgi const *hgi, const HgiShaderFunctionDesc &descriptor);
 
   // This is not commonly consumed by the end user, but is available.
   HGIGL_API
   HgiGLShaderSectionUniquePtrVector *GetShaderSections();
 
-  template <typename SectionType, typename... T>
-  SectionType *CreateShaderSection(T &&...t);
+  template<typename SectionType, typename... T> SectionType *CreateShaderSection(T &&...t);
 
-protected:
+ protected:
   HGIGL_API
   void _Execute(std::ostream &ss) override;
 
-private:
+ private:
   HgiGLShaderGenerator() = delete;
   HgiGLShaderGenerator &operator=(const HgiGLShaderGenerator &) = delete;
   HgiGLShaderGenerator(const HgiGLShaderGenerator &) = delete;
@@ -74,16 +69,13 @@ private:
 
   void _WriteBuffers(const HgiShaderFunctionBufferDescVector &buffers);
 
-  void _WriteConstantParams(
-      const HgiShaderFunctionParamDescVector &parameters);
+  void _WriteConstantParams(const HgiShaderFunctionParamDescVector &parameters);
 
   // For writing shader inputs and outputs who are very similarly written
-  void _WriteInOuts(
-      const HgiShaderFunctionParamDescVector &parameters,
-      const std::string &qualifier);
-  void _WriteInOutBlocks(
-      const HgiShaderFunctionParamBlockDescVector &parameterBlocks,
-      const std::string &qualifier);
+  void _WriteInOuts(const HgiShaderFunctionParamDescVector &parameters,
+                    const std::string &qualifier);
+  void _WriteInOutBlocks(const HgiShaderFunctionParamBlockDescVector &parameterBlocks,
+                         const std::string &qualifier);
 
   Hgi const *_hgi;
   HgiGLShaderSectionUniquePtrVector _shaderSections;

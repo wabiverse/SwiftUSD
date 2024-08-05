@@ -33,56 +33,48 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDCOORDSYSBINDING_SCHEMA_TOKENS \
-    (coordSysBinding) \
+#define HDCOORDSYSBINDING_SCHEMA_TOKENS (coordSysBinding)
 
-TF_DECLARE_PUBLIC_TOKENS(HdCoordSysBindingSchemaTokens, HD_API,
-    HDCOORDSYSBINDING_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCoordSysBindingSchemaTokens, HD_API, HDCOORDSYSBINDING_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdCoordSysBindingSchema : public HdSchema
-{
-public:
-    HdCoordSysBindingSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdCoordSysBindingSchema : public HdSchema {
+ public:
+  HdCoordSysBindingSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        size_t count,
-        const TfToken *names,
-        const HdDataSourceBaseHandle *values);
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(size_t count,
+                                                   const TfToken *names,
+                                                   const HdDataSourceBaseHandle *values);
 
-    HD_API
-    HdPathDataSourceHandle GetCoordSysBinding(TfToken const &name);
+  HD_API
+  HdPathDataSourceHandle GetCoordSysBinding(TfToken const &name);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "coordSysBinding" from the parent container and constructs a
+  /// HdCoordSysBindingSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdCoordSysBindingSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "coordSysBinding" from the parent container and constructs a
-    /// HdCoordSysBindingSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdCoordSysBindingSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

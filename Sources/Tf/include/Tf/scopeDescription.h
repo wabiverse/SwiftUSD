@@ -53,26 +53,24 @@ class TfScopeDescription {
   TfScopeDescription(TfScopeDescription const &) = delete;
   TfScopeDescription &operator=(TfScopeDescription const &) = delete;
 
-public:
+ public:
   /// Construct with a description.  Push \a description on the stack of
   /// descriptions for this thread.  Caller guarantees that the string
   /// \p description lives at least as long as this TfScopeDescription object.
-  TF_API explicit TfScopeDescription(
-      std::string const &description,
-      TfCallContext const &context = TfCallContext());
+  TF_API explicit TfScopeDescription(std::string const &description,
+                                     TfCallContext const &context = TfCallContext());
 
   /// Construct with a description.  Push \a description on the stack of
   /// descriptions for this thread.  This object adopts ownership of the
   /// rvalue \p description.
-  TF_API explicit TfScopeDescription(
-      std::string &&description,
-      TfCallContext const &context = TfCallContext());
+  TF_API explicit TfScopeDescription(std::string &&description,
+                                     TfCallContext const &context = TfCallContext());
 
   /// Construct with a description.  Push \a description on the stack of
   /// descriptions for this thread.  Caller guarantees that the string
   /// \p description lives at least as long as this TfScopeDescription object.
-  TF_API explicit TfScopeDescription(
-      char const *description, TfCallContext const &context = TfCallContext());
+  TF_API explicit TfScopeDescription(char const *description,
+                                     TfCallContext const &context = TfCallContext());
 
   /// Destructor.
   /// Pop the description stack in this thread.
@@ -92,16 +90,17 @@ public:
   /// TfScopeDescription object.
   TF_API void SetDescription(char const *description);
 
-private:
-  friend inline TfScopeDescription *
-  Tf_GetPreviousScopeDescription(TfScopeDescription *d) {
+ private:
+  friend inline TfScopeDescription *Tf_GetPreviousScopeDescription(TfScopeDescription *d)
+  {
     return d->_prev;
   }
-  friend inline char const *Tf_GetScopeDescriptionText(TfScopeDescription *d) {
+  friend inline char const *Tf_GetScopeDescriptionText(TfScopeDescription *d)
+  {
     return d->_description;
   }
-  friend inline TfCallContext const &
-  Tf_GetScopeDescriptionContext(TfScopeDescription *d) {
+  friend inline TfCallContext const &Tf_GetScopeDescriptionContext(TfScopeDescription *d)
+  {
     return d->_context;
   }
 
@@ -112,7 +111,7 @@ private:
   char const *_description;
   TfCallContext _context;
   void *_localStack;
-  TfScopeDescription *_prev; // link to parent scope.
+  TfScopeDescription *_prev;  // link to parent scope.
 };
 
 /// Return a copy of the current description stack for the "main" thread as
@@ -128,28 +127,33 @@ TF_API std::vector<std::string> TfGetThisThreadScopeDescriptionStack();
 
 /// Macro that accepts either a single string, or printf-style arguments and
 /// creates a scope description local variable with the resulting string.
-#define TF_DESCRIBE_SCOPE(...)                                                 \
-  TfScopeDescription __scope_description__(                                    \
-      Tf_DescribeScopeFormat(__VA_ARGS__), TF_CALL_CONTEXT);
+#define TF_DESCRIBE_SCOPE(...) \
+  TfScopeDescription __scope_description__(Tf_DescribeScopeFormat(__VA_ARGS__), TF_CALL_CONTEXT);
 
-template <typename... Args>
-inline std::string Tf_DescribeScopeFormat(const char *fmt, Args &&...args) {
+template<typename... Args>
+inline std::string Tf_DescribeScopeFormat(const char *fmt, Args &&...args)
+{
   return TfStringPrintf(fmt, std::forward<Args>(args)...);
 }
 
 // If there are no formatting arguments, the string can be forwarded to the
 // scope description constructor. In C++17, consider if std::string_view could
 // reduce the need for as many of these overloads
-inline const char *Tf_DescribeScopeFormat(const char *fmt) { return fmt; }
+inline const char *Tf_DescribeScopeFormat(const char *fmt)
+{
+  return fmt;
+}
 
-inline std::string &&Tf_DescribeScopeFormat(std::string &&fmt) {
+inline std::string &&Tf_DescribeScopeFormat(std::string &&fmt)
+{
   return std::move(fmt);
 }
 
-inline const std::string &Tf_DescribeScopeFormat(const std::string &fmt) {
+inline const std::string &Tf_DescribeScopeFormat(const std::string &fmt)
+{
   return fmt;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SCOPE_DESCRIPTION_H
+#endif  // PXR_BASE_TF_SCOPE_DESCRIPTION_H

@@ -28,6 +28,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapTokens() {
+void wrapTokens()
+{
   TF_PY_WRAP_PUBLIC_TOKENS("Tokens", KindTokens, KIND_TOKENS);
 }

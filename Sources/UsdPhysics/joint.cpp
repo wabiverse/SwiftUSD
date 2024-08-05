@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsJoint,
-                 TfType::Bases<UsdGeomImageable>>();
+  TfType::Define<UsdPhysicsJoint, TfType::Bases<UsdGeomImageable>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdPhysicsJoint::~UsdPhysicsJoint()
-{
-}
+UsdPhysicsJoint::~UsdPhysicsJoint() {}
 
 /* static */
-UsdPhysicsJoint
-UsdPhysicsJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsJoint UsdPhysicsJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsJoint();
   }
@@ -62,18 +57,14 @@ UsdPhysicsJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdPhysicsJoint
-UsdPhysicsJoint::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsJoint UsdPhysicsJoint::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("PhysicsJoint");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsJoint();
   }
-  return UsdPhysicsJoint(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdPhysicsJoint(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdPhysicsJoint::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdPhysicsJoint::_GetStaticTfType()
+const TfType &UsdPhysicsJoint::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdPhysicsJoint>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdPhysicsJoint::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsJoint::_GetTfType() const
+const TfType &UsdPhysicsJoint::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetLocalPos0Attr() const
+UsdAttribute UsdPhysicsJoint::GetLocalPos0Attr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLocalPos0);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateLocalPos0Attr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateLocalPos0Attr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLocalPos0,
                                     SdfValueTypeNames->Point3f,
@@ -121,14 +109,13 @@ UsdPhysicsJoint::CreateLocalPos0Attr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetLocalRot0Attr() const
+UsdAttribute UsdPhysicsJoint::GetLocalRot0Attr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLocalRot0);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateLocalRot0Attr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateLocalRot0Attr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLocalRot0,
                                     SdfValueTypeNames->Quatf,
@@ -138,14 +125,13 @@ UsdPhysicsJoint::CreateLocalRot0Attr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetLocalPos1Attr() const
+UsdAttribute UsdPhysicsJoint::GetLocalPos1Attr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLocalPos1);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateLocalPos1Attr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateLocalPos1Attr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLocalPos1,
                                     SdfValueTypeNames->Point3f,
@@ -155,14 +141,13 @@ UsdPhysicsJoint::CreateLocalPos1Attr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetLocalRot1Attr() const
+UsdAttribute UsdPhysicsJoint::GetLocalRot1Attr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsLocalRot1);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateLocalRot1Attr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateLocalRot1Attr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsLocalRot1,
                                     SdfValueTypeNames->Quatf,
@@ -172,14 +157,13 @@ UsdPhysicsJoint::CreateLocalRot1Attr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetJointEnabledAttr() const
+UsdAttribute UsdPhysicsJoint::GetJointEnabledAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsJointEnabled);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateJointEnabledAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateJointEnabledAttr(VtValue const &defaultValue,
+                                                     bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsJointEnabled,
                                     SdfValueTypeNames->Bool,
@@ -189,14 +173,13 @@ UsdPhysicsJoint::CreateJointEnabledAttr(VtValue const &defaultValue, bool writeS
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetCollisionEnabledAttr() const
+UsdAttribute UsdPhysicsJoint::GetCollisionEnabledAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsCollisionEnabled);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateCollisionEnabledAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateCollisionEnabledAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsCollisionEnabled,
                                     SdfValueTypeNames->Bool,
@@ -206,14 +189,13 @@ UsdPhysicsJoint::CreateCollisionEnabledAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetExcludeFromArticulationAttr() const
+UsdAttribute UsdPhysicsJoint::GetExcludeFromArticulationAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsExcludeFromArticulation);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateExcludeFromArticulationAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateExcludeFromArticulationAttr(VtValue const &defaultValue,
+                                                                bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsExcludeFromArticulation,
                                     SdfValueTypeNames->Bool,
@@ -223,14 +205,13 @@ UsdPhysicsJoint::CreateExcludeFromArticulationAttr(VtValue const &defaultValue, 
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetBreakForceAttr() const
+UsdAttribute UsdPhysicsJoint::GetBreakForceAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsBreakForce);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateBreakForceAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateBreakForceAttr(VtValue const &defaultValue,
+                                                   bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsBreakForce,
                                     SdfValueTypeNames->Float,
@@ -240,14 +221,13 @@ UsdPhysicsJoint::CreateBreakForceAttr(VtValue const &defaultValue, bool writeSpa
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsJoint::GetBreakTorqueAttr() const
+UsdAttribute UsdPhysicsJoint::GetBreakTorqueAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsBreakTorque);
 }
 
-UsdAttribute
-UsdPhysicsJoint::CreateBreakTorqueAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsJoint::CreateBreakTorqueAttr(VtValue const &defaultValue,
+                                                    bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsBreakTorque,
                                     SdfValueTypeNames->Float,
@@ -257,48 +237,42 @@ UsdPhysicsJoint::CreateBreakTorqueAttr(VtValue const &defaultValue, bool writeSp
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdPhysicsJoint::GetBody0Rel() const
+UsdRelationship UsdPhysicsJoint::GetBody0Rel() const
 {
   return GetPrim().GetRelationship(UsdPhysicsTokens->physicsBody0);
 }
 
-UsdRelationship
-UsdPhysicsJoint::CreateBody0Rel() const
+UsdRelationship UsdPhysicsJoint::CreateBody0Rel() const
 {
   return GetPrim().CreateRelationship(UsdPhysicsTokens->physicsBody0,
                                       /* custom = */ false);
 }
 
-UsdRelationship
-UsdPhysicsJoint::GetBody1Rel() const
+UsdRelationship UsdPhysicsJoint::GetBody1Rel() const
 {
   return GetPrim().GetRelationship(UsdPhysicsTokens->physicsBody1);
 }
 
-UsdRelationship
-UsdPhysicsJoint::CreateBody1Rel() const
+UsdRelationship UsdPhysicsJoint::CreateBody1Rel() const
 {
   return GetPrim().CreateRelationship(UsdPhysicsTokens->physicsBody1,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdPhysicsJoint::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdPhysicsJoint::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdPhysicsTokens->physicsLocalPos0,
@@ -311,10 +285,8 @@ UsdPhysicsJoint::GetSchemaAttributeNames(bool includeInherited)
       UsdPhysicsTokens->physicsBreakForce,
       UsdPhysicsTokens->physicsBreakTorque,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdGeomImageable::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdGeomImageable::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

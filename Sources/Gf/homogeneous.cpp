@@ -32,7 +32,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-GfVec4f GfGetHomogenized(const GfVec4f &v) {
+GfVec4f GfGetHomogenized(const GfVec4f &v)
+{
   GfVec4f ret(v);
 
   if (ret[3] == 0)
@@ -41,17 +42,18 @@ GfVec4f GfGetHomogenized(const GfVec4f &v) {
   return ret;
 }
 
-GfVec4f GfHomogeneousCross(const GfVec4f &a, const GfVec4f &b) {
+GfVec4f GfHomogeneousCross(const GfVec4f &a, const GfVec4f &b)
+{
   GfVec4f ah(GfGetHomogenized(a));
   GfVec4f bh(GfGetHomogenized(b));
 
-  GfVec3f prod =
-      GfCross(GfVec3f(ah[0], ah[1], ah[2]), GfVec3f(bh[0], bh[1], bh[2]));
+  GfVec3f prod = GfCross(GfVec3f(ah[0], ah[1], ah[2]), GfVec3f(bh[0], bh[1], bh[2]));
 
   return GfVec4f(prod[0], prod[1], prod[2], 1);
 }
 
-GfVec4d GfGetHomogenized(const GfVec4d &v) {
+GfVec4d GfGetHomogenized(const GfVec4d &v)
+{
   GfVec4d ret(v);
 
   if (ret[3] == 0)
@@ -60,12 +62,12 @@ GfVec4d GfGetHomogenized(const GfVec4d &v) {
   return ret;
 }
 
-GfVec4d GfHomogeneousCross(const GfVec4d &a, const GfVec4d &b) {
+GfVec4d GfHomogeneousCross(const GfVec4d &a, const GfVec4d &b)
+{
   GfVec4d ah(GfGetHomogenized(a));
   GfVec4d bh(GfGetHomogenized(b));
 
-  GfVec3d prod =
-      GfCross(GfVec3d(ah[0], ah[1], ah[2]), GfVec3d(bh[0], bh[1], bh[2]));
+  GfVec3d prod = GfCross(GfVec3d(ah[0], ah[1], ah[2]), GfVec3d(bh[0], bh[1], bh[2]));
 
   return GfVec4d(prod[0], prod[1], prod[2], 1);
 }

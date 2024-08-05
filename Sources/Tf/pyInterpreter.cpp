@@ -50,7 +50,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void TfPyInitialize() {
+void TfPyInitialize()
+{
   static std::atomic<bool> initialized(false);
   if (initialized)
     return;
@@ -72,8 +73,9 @@ void TfPyInitialize() {
       // Python claims that PyEval_InitThreads "should be called in the
       // main thread before creating a second thread or engaging in any
       // other thread operations."  So we'll issue a warning here.
-      TF_WARN("Calling PyEval_InitThreads() for the first time outside "
-              "the 'main thread'.  Python doc says not to do this.");
+      TF_WARN(
+          "Calling PyEval_InitThreads() for the first time outside "
+          "the 'main thread'.  Python doc says not to do this.");
     }
 #endif
 
@@ -140,38 +142,43 @@ void TfPyInitialize() {
   }
 }
 
-int TfPyRunSimpleString(const std::string &cmd) {
+int TfPyRunSimpleString(const std::string &cmd)
+{
   TfPyInitialize();
   TfPyLock pyLock;
   return PyRun_SimpleString(cmd.c_str());
 }
 
-boost::python::handle<> TfPyRunString(const std::string &cmd, int start,
+boost::python::handle<> TfPyRunString(const std::string &cmd,
+                                      int start,
                                       object const &globals,
-                                      object const &locals) {
+                                      object const &locals)
+{
   TfPyInitialize();
   TfPyLock pyLock;
   try {
     handle<> mainModule(borrowed(PyImport_AddModule("__main__")));
     handle<> defaultGlobalsHandle(borrowed(PyModule_GetDict(mainModule.get())));
 
-    PyObject *pyGlobals =
-        TfPyIsNone(globals) ? defaultGlobalsHandle.get() : globals.ptr();
+    PyObject *pyGlobals = TfPyIsNone(globals) ? defaultGlobalsHandle.get() : globals.ptr();
     PyObject *pyLocals = TfPyIsNone(locals) ? pyGlobals : locals.ptr();
 
     // used passed-in objects for globals and locals, or default
     // to globals from main module if no locals/globals passed in.
     return handle<>(PyRun_String(cmd.c_str(), start, pyGlobals, pyLocals));
-  } catch (error_already_set const &) {
+  }
+  catch (error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
   }
   return handle<>();
 }
 
-boost::python::handle<> TfPyRunFile(const std::string &filename, int start,
+boost::python::handle<> TfPyRunFile(const std::string &filename,
+                                    int start,
                                     object const &globals,
-                                    object const &locals) {
+                                    object const &locals)
+{
   FILE *f = ArchOpenFile(filename.c_str(), "r");
   if (!f) {
     TF_CODING_ERROR("Could not open file '%s'!", filename.c_str());
@@ -186,13 +193,13 @@ boost::python::handle<> TfPyRunFile(const std::string &filename, int start,
 
     // used passed-in objects for globals and locals, or default
     // to globals from main module if no locals/globals passed in.
-    PyObject *pyGlobals =
-        TfPyIsNone(globals) ? defaultGlobalsHandle.get() : globals.ptr();
+    PyObject *pyGlobals = TfPyIsNone(globals) ? defaultGlobalsHandle.get() : globals.ptr();
     PyObject *pyLocals = TfPyIsNone(locals) ? pyGlobals : locals.ptr();
 
-    return handle<>(PyRun_FileEx(f, filename.c_str(), start, pyGlobals,
-                                 pyLocals, 1 /* close file */));
-  } catch (error_already_set const &) {
+    return handle<>(
+        PyRun_FileEx(f, filename.c_str(), start, pyGlobals, pyLocals, 1 /* close file */));
+  }
+  catch (error_already_set const &) {
     TfPyConvertPythonExceptionToTfErrors();
     PyErr_Clear();
   }

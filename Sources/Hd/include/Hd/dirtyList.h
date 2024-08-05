@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HD_DIRTY_LIST_H
 #define PXR_IMAGING_HD_DIRTY_LIST_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/repr.h"
 #include "Hd/rprimCollection.h"
 #include "Hd/types.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 
@@ -101,52 +101,53 @@ using HdReprSelectorVector = std::vector<HdReprSelector>;
 ///   using the Gather utility.
 ///
 class HdDirtyList {
-public:
-    HD_API
-    explicit HdDirtyList(HdRenderIndex &index);
+ public:
+  HD_API
+  explicit HdDirtyList(HdRenderIndex &index);
 
-    /// Returns a reference of dirty rprim ids.
-    /// If the change tracker hasn't changed any state since the last time
-    /// GetDirtyRprims gets called, and if the tracked filtering parameters
-    /// (set via UpdateRenderTagsAndReprSelectors) are the same, it simply
-    /// returns an empty list.
-    /// Otherwise depending on what changed, it will return a list of
-    /// Rprim ids to be synced.
-    /// Therefore, it is expected that GetDirtyRprims is called _only once_
-    /// per render index sync.
-    HD_API
-    SdfPathVector const& GetDirtyRprims();
+  /// Returns a reference of dirty rprim ids.
+  /// If the change tracker hasn't changed any state since the last time
+  /// GetDirtyRprims gets called, and if the tracked filtering parameters
+  /// (set via UpdateRenderTagsAndReprSelectors) are the same, it simply
+  /// returns an empty list.
+  /// Otherwise depending on what changed, it will return a list of
+  /// Rprim ids to be synced.
+  /// Therefore, it is expected that GetDirtyRprims is called _only once_
+  /// per render index sync.
+  HD_API
+  SdfPathVector const &GetDirtyRprims();
 
-    /// Updates the tracked filtering parameters.
-    /// This typically comes from the tasks submitted to HdEngine::Execute.
-    HD_API
-    void UpdateRenderTagsAndReprSelectors(
-        TfTokenVector const &tags, HdReprSelectorVector const &reprs);
+  /// Updates the tracked filtering parameters.
+  /// This typically comes from the tasks submitted to HdEngine::Execute.
+  HD_API
+  void UpdateRenderTagsAndReprSelectors(TfTokenVector const &tags,
+                                        HdReprSelectorVector const &reprs);
 
-    /// Sets the flag to prune to dirty list to just the varying Rprims on
-    /// the next call to GetDirtyRprims.
-    void PruneToVaryingRprims() {
-        _pruneDirtyList = true;
-    }
+  /// Sets the flag to prune to dirty list to just the varying Rprims on
+  /// the next call to GetDirtyRprims.
+  void PruneToVaryingRprims()
+  {
+    _pruneDirtyList = true;
+  }
 
-private:
-    HdChangeTracker & _GetChangeTracker() const;
-    void _UpdateDirtyIdsIfNeeded();
+ private:
+  HdChangeTracker &_GetChangeTracker() const;
+  void _UpdateDirtyIdsIfNeeded();
 
-    // Note: Can't use a const ref to the renderIndex because
-    // HdRenderIndex::GetRprimIds() isn't a const member fn.
-    HdRenderIndex &_renderIndex;
-    TfTokenVector _trackedRenderTags;
-    HdReprSelectorVector _trackedReprs;
-    SdfPathVector _dirtyIds;
+  // Note: Can't use a const ref to the renderIndex because
+  // HdRenderIndex::GetRprimIds() isn't a const member fn.
+  HdRenderIndex &_renderIndex;
+  TfTokenVector _trackedRenderTags;
+  HdReprSelectorVector _trackedReprs;
+  SdfPathVector _dirtyIds;
 
-    unsigned int _sceneStateVersion;
-    unsigned int _rprimIndexVersion;
-    unsigned int _rprimRenderTagVersion;
-    unsigned int _varyingStateVersion;
+  unsigned int _sceneStateVersion;
+  unsigned int _rprimIndexVersion;
+  unsigned int _rprimRenderTagVersion;
+  unsigned int _varyingStateVersion;
 
-    bool _rebuildDirtyList;
-    bool _pruneDirtyList;
+  bool _rebuildDirtyList;
+  bool _pruneDirtyList;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

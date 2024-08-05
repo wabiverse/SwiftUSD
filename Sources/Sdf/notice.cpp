@@ -29,31 +29,27 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<SdfNotice::Base, TfType::Bases<TfNotice>>();
   TfType::Define<SdfNotice::LayersDidChange, TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayersDidChangeSentPerLayer,
-                 TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayerInfoDidChange,
-                 TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayerIdentifierDidChange,
-                 TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayerDidReplaceContent,
-                 TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayersDidChangeSentPerLayer, TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerInfoDidChange, TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerIdentifierDidChange, TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerDidReplaceContent, TfType::Bases<SdfNotice::Base>>();
   TfType::Define<SdfNotice::LayerDidReloadContent,
                  TfType::Bases<SdfNotice::LayerDidReplaceContent>>();
-  TfType::Define<SdfNotice::LayerDidSaveLayerToFile,
-                 TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayerDirtinessChanged,
-                 TfType::Bases<SdfNotice::Base>>();
-  TfType::Define<SdfNotice::LayerMutenessChanged,
-                 TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerDidSaveLayerToFile, TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerDirtinessChanged, TfType::Bases<SdfNotice::Base>>();
+  TfType::Define<SdfNotice::LayerMutenessChanged, TfType::Bases<SdfNotice::Base>>();
 }
 
-SdfLayerHandleVector SdfNotice::BaseLayersDidChange::GetLayers() const {
+SdfLayerHandleVector SdfNotice::BaseLayersDidChange::GetLayers() const
+{
   SdfLayerHandleVector layers;
   layers.reserve(_vec->size());
-  TF_FOR_ALL(i, *_vec) {
+  TF_FOR_ALL(i, *_vec)
+  {
     // XXX:bug 20833 It should be ok to return expired layers here.
     if (i->first)
       layers.push_back(i->first);
@@ -61,9 +57,11 @@ SdfLayerHandleVector SdfNotice::BaseLayersDidChange::GetLayers() const {
   return layers;
 }
 
-SdfNotice::LayerIdentifierDidChange::LayerIdentifierDidChange(
-    const std::string &oldIdentifier, const std::string &newIdentifier)
-    : _oldId(oldIdentifier), _newId(newIdentifier) {}
+SdfNotice::LayerIdentifierDidChange::LayerIdentifierDidChange(const std::string &oldIdentifier,
+                                                              const std::string &newIdentifier)
+    : _oldId(oldIdentifier), _newId(newIdentifier)
+{
+}
 
 SdfNotice::Base::~Base() {}
 SdfNotice::LayersDidChange::~LayersDidChange() {}

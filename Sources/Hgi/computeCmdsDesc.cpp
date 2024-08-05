@@ -25,21 +25,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiComputeCmdsDesc::HgiComputeCmdsDesc()
-    : dispatchMethod(HgiComputeDispatchSerial)
-{
-}
+HgiComputeCmdsDesc::HgiComputeCmdsDesc() : dispatchMethod(HgiComputeDispatchSerial) {}
 
-bool operator==(
-    const HgiComputeCmdsDesc &lhs,
-    const HgiComputeCmdsDesc &rhs)
+bool operator==(const HgiComputeCmdsDesc &lhs, const HgiComputeCmdsDesc &rhs)
 {
   return lhs.dispatchMethod == rhs.dispatchMethod;
 }
 
-bool operator!=(
-    const HgiComputeCmdsDesc &lhs,
-    const HgiComputeCmdsDesc &rhs)
+bool operator!=(const HgiComputeCmdsDesc &lhs, const HgiComputeCmdsDesc &rhs)
 {
   return !(lhs == rhs);
 }

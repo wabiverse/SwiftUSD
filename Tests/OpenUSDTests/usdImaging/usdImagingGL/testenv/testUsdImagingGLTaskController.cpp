@@ -39,9 +39,9 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImagingGL/engine.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
 #include "pxr/usdImaging/usdImaging/unitTestHelper.h"
+#include "pxr/usdImaging/usdImagingGL/engine.h"
 
 #include <iostream>
 
@@ -54,15 +54,12 @@ int main(int argc, char *argv[])
   // Parse Arguments
   std::string stageFilePath;
   std::string domeLightTexturePath;
-  for (int i = 1; i < argc; ++i)
-  {
+  for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
-    if (arg == "--stage")
-    {
+    if (arg == "--stage") {
       stageFilePath = argv[++i];
     }
-    else if (arg == "--lightTexture")
-    {
+    else if (arg == "--lightTexture") {
       domeLightTexturePath = argv[++i];
     }
   }
@@ -80,8 +77,7 @@ int main(int argc, char *argv[])
   // Initialize UsdImagingGLEnging
   UsdImagingGLEngineSharedPtr engine;
   SdfPathVector excludedPaths;
-  engine.reset(new UsdImagingGLEngine(
-      stage->GetPseudoRoot().GetPath(), excludedPaths));
+  engine.reset(new UsdImagingGLEngine(stage->GetPseudoRoot().GetPath(), excludedPaths));
 
   engine->SetRendererAov(HdAovTokens->color);
 
@@ -102,15 +98,13 @@ int main(int argc, char *argv[])
   std::cerr << "worldCenter: " << worldCenter << "\n";
   std::cerr << "worldSize: " << worldSize << "\n";
   GfVec3d translate;
-  if (zUpStage)
-  {
+  if (zUpStage) {
     // transpose y and z centering translation
     translate[0] = -worldCenter[0];
     translate[1] = -worldCenter[2];
     translate[2] = -worldCenter[1] - worldSize;
   }
-  else
-  {
+  else {
     translate[0] = -worldCenter[0];
     translate[1] = -worldCenter[1];
     translate[2] = -worldCenter[2] - worldSize;
@@ -123,25 +117,20 @@ int main(int argc, char *argv[])
   GfMatrix4d viewMatrix = GfMatrix4d().SetTranslate(translate);
   GfMatrix4d projMatrix = frustum.ComputeProjectionMatrix();
   GfMatrix4d modelViewMatrix = viewMatrix;
-  if (zUpStage)
-  {
+  if (zUpStage) {
     // rotate from z-up to y-up
-    modelViewMatrix =
-        GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-        modelViewMatrix;
+    modelViewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
+                      modelViewMatrix;
   }
 
   // Ititialize the Lighting Context with a DomeLight
   GlfSimpleLightingContextRefPtr lightingContext(GlfSimpleLightingContext::New());
   GlfSimpleLight light;
   light.SetIsDomeLight(true);
-  light.SetDomeLightTextureFile(
-      SdfAssetPath(domeLightTexturePath, domeLightTexturePath));
+  light.SetDomeLightTextureFile(SdfAssetPath(domeLightTexturePath, domeLightTexturePath));
   // DomeLight is yup by default, rotate if the stage is z-up
-  if (zUpStage)
-  {
-    light.SetTransform(
-        GfMatrix4d().SetRotate(GfRotation(GfVec3d(1, 0, 0), 90.0)));
+  if (zUpStage) {
+    light.SetTransform(GfMatrix4d().SetRotate(GfRotation(GfVec3d(1, 0, 0), 90.0)));
   }
   light.SetDiffuse(GfVec4f(1, 1, 1, 1));
   light.SetAmbient(GfVec4f(0, 0, 0, 1));

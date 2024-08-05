@@ -24,11 +24,11 @@
 #ifndef PXR_USD_PLUGIN_USD_ABC_ALEMBIC_DATA_H
 #define PXR_USD_PLUGIN_USD_ABC_ALEMBIC_DATA_H
 
-#include <pxr/pxrns.h>
 #include "Sdf/data.h"
 #include "Sdf/fileFormat.h"
 #include "Tf/declarePtrs.h"
 #include <memory>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,14 +38,12 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdAbc_AlembicData);
 ///
 /// Provides an SdfAbstractData interface to Alembic data.
 ///
-class UsdAbc_AlembicData : public SdfAbstractData
-{
-public:
+class UsdAbc_AlembicData : public SdfAbstractData {
+ public:
   /// Returns a new \c UsdAbc_AlembicData object.  Outside a successful
   /// \c Open() and \c Close() pairing, the data acts as if it contains
   /// a pseudo-root prim spec at the absolute root path.
-  static UsdAbc_AlembicDataRefPtr New(
-      SdfFileFormat::FileFormatArguments = {});
+  static UsdAbc_AlembicDataRefPtr New(SdfFileFormat::FileFormatArguments = {});
 
   /// Opens the Alembic file at \p filePath read-only (closing any open
   /// file).  Alembic is not meant to be used as an in-memory store for
@@ -70,52 +68,40 @@ public:
   virtual void EraseSpec(const SdfPath &);
   virtual void MoveSpec(const SdfPath &oldPath, const SdfPath &newPath);
   virtual SdfSpecType GetSpecType(const SdfPath &) const;
-  virtual bool Has(const SdfPath &, const TfToken &fieldName,
-                   SdfAbstractDataValue *value) const;
-  virtual bool Has(const SdfPath &, const TfToken &fieldName,
-                   VtValue *value = NULL) const;
+  virtual bool Has(const SdfPath &, const TfToken &fieldName, SdfAbstractDataValue *value) const;
+  virtual bool Has(const SdfPath &, const TfToken &fieldName, VtValue *value = NULL) const;
   virtual VtValue Get(const SdfPath &, const TfToken &fieldName) const;
-  virtual void Set(const SdfPath &, const TfToken &fieldName,
-                   const VtValue &value);
-  virtual void Set(const SdfPath &, const TfToken &fieldName,
+  virtual void Set(const SdfPath &, const TfToken &fieldName, const VtValue &value);
+  virtual void Set(const SdfPath &,
+                   const TfToken &fieldName,
                    const SdfAbstractDataConstValue &value);
   virtual void Erase(const SdfPath &, const TfToken &fieldName);
   virtual std::vector<TfToken> List(const SdfPath &) const;
-  virtual std::set<double>
-  ListAllTimeSamples() const;
-  virtual std::set<double>
-  ListTimeSamplesForPath(const SdfPath &) const;
-  virtual bool
-  GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const;
-  virtual size_t
-  GetNumTimeSamplesForPath(const SdfPath &path) const;
-  virtual bool
-  GetBracketingTimeSamplesForPath(const SdfPath &,
-                                  double time,
-                                  double *tLower, double *tUpper) const;
-  virtual bool
-  QueryTimeSample(const SdfPath &, double time,
-                  SdfAbstractDataValue *value) const;
-  virtual bool
-  QueryTimeSample(const SdfPath &, double time,
-                  VtValue *value) const;
-  virtual void
-  SetTimeSample(const SdfPath &, double, const VtValue &);
-  virtual void
-  EraseTimeSample(const SdfPath &, double);
+  virtual std::set<double> ListAllTimeSamples() const;
+  virtual std::set<double> ListTimeSamplesForPath(const SdfPath &) const;
+  virtual bool GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const;
+  virtual size_t GetNumTimeSamplesForPath(const SdfPath &path) const;
+  virtual bool GetBracketingTimeSamplesForPath(const SdfPath &,
+                                               double time,
+                                               double *tLower,
+                                               double *tUpper) const;
+  virtual bool QueryTimeSample(const SdfPath &, double time, SdfAbstractDataValue *value) const;
+  virtual bool QueryTimeSample(const SdfPath &, double time, VtValue *value) const;
+  virtual void SetTimeSample(const SdfPath &, double, const VtValue &);
+  virtual void EraseTimeSample(const SdfPath &, double);
 
-protected:
+ protected:
   UsdAbc_AlembicData(SdfFileFormat::FileFormatArguments);
   virtual ~UsdAbc_AlembicData();
 
   // SdfAbstractData overrides
   virtual void _VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const;
 
-private:
+ private:
   std::shared_ptr<class UsdAbc_AlembicDataReader> _reader;
   const SdfFileFormat::FileFormatArguments _arguments;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_DATA_H
+#endif  // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_DATA_H

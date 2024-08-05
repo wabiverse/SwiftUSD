@@ -52,7 +52,7 @@ class Sdf_LayerRegistry {
   Sdf_LayerRegistry(const Sdf_LayerRegistry &) = delete;
   Sdf_LayerRegistry &operator=(const Sdf_LayerRegistry &) = delete;
 
-public:
+ public:
   /// Constructor.
   Sdf_LayerRegistry();
 
@@ -78,7 +78,7 @@ public:
   /// Returns all valid layers held in the registry as a set.
   SdfLayerHandleSet GetLayers() const;
 
-private:
+ private:
   // Returns a layer from the registry, consulting the by_repository_path
   // index with the \p layerPath as provided.
   SdfLayerHandle _FindByRepositoryPath(const std::string &layerPath) const;
@@ -87,9 +87,8 @@ private:
   // \p layerPath is an absolute file system path, the index is searched using
   // the input path. Otherwise, \p layerPath is resolved and the resulting
   // path is used to search the index.
-  SdfLayerHandle
-  _FindByRealPath(const std::string &layerPath,
-                  const std::string &resolvedPath = std::string()) const;
+  SdfLayerHandle _FindByRealPath(const std::string &layerPath,
+                                 const std::string &resolvedPath = std::string()) const;
 
   // Index tags.
   struct by_identity {};
@@ -119,26 +118,25 @@ private:
       boost::multi_index::indexed_by<
           // Layer<->Layer, one-to-one. Duplicate layer handles cannot be
           // inserted into the container.
-          boost::multi_index::hashed_unique<
-              boost::multi_index::tag<by_identity>,
-              boost::multi_index::identity<SdfLayerHandle>, TfHash>,
+          boost::multi_index::hashed_unique<boost::multi_index::tag<by_identity>,
+                                            boost::multi_index::identity<SdfLayerHandle>,
+                                            TfHash>,
 
           // Layer<->RealPath, one-to-one. The real path is the file from
           // which an existing layer asset was read, or the path to which a
           // newly created layer asset will be written.
-          boost::multi_index::hashed_unique<
-              boost::multi_index::tag<by_real_path>, layer_real_path>,
+          boost::multi_index::hashed_unique<boost::multi_index::tag<by_real_path>,
+                                            layer_real_path>,
 
           // Layer<->Identifier, one-to-many. The identifier is the path
           // passed in to CreateNew/FindOrOpen, and may be any path form
           // resolvable to a single real path.
-          boost::multi_index::hashed_non_unique<
-              boost::multi_index::tag<by_identifier>, layer_identifier>,
+          boost::multi_index::hashed_non_unique<boost::multi_index::tag<by_identifier>,
+                                                layer_identifier>,
 
           // Layer<->RepositoryPath
-          boost::multi_index::hashed_non_unique<
-              boost::multi_index::tag<by_repository_path>,
-              layer_repository_path>>>
+          boost::multi_index::hashed_non_unique<boost::multi_index::tag<by_repository_path>,
+                                                layer_repository_path>>>
       _Layers;
 
   // Identity index.
@@ -157,4 +155,4 @@ std::ostream &operator<<(std::ostream &ostr, const Sdf_LayerRegistry &registry);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LAYER_REGISTRY_H
+#endif  // PXR_USD_SDF_LAYER_REGISTRY_H

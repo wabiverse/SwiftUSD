@@ -9,4 +9,4 @@
 #include <GeomUtil/meshGeneratorBase.h>
 #include <GeomUtil/sphereMeshGenerator.h>
 
-#endif // __PXR_IMAGING_GEOM_UTIL_H__
+#endif  // __PXR_IMAGING_GEOM_UTIL_H__

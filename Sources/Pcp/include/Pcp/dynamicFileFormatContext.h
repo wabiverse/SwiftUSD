@@ -41,7 +41,7 @@ class PcpCache;
 /// allows us to iterate over all nodes that have already been composed looking
 /// for the strongest opinion for a relevant field.
 class PcpDynamicFileFormatContext {
-public:
+ public:
   using VtValueVector = std::vector<VtValue>;
 
   PCP_API
@@ -70,10 +70,9 @@ public:
   /// given \p attributeName and return its current strongest opinion.
   /// Returns true if a value for the field was found.
   PCP_API
-  bool ComposeAttributeDefaultValue(const TfToken &attributeName,
-                                    VtValue *value) const;
+  bool ComposeAttributeDefaultValue(const TfToken &attributeName, VtValue *value) const;
 
-private:
+ private:
   /// Constructs a context.
   /// \p parentNode and \p previousFrame are used to traverse the
   /// current state of the prim index graph when composing the opinions on
@@ -86,19 +85,18 @@ private:
                               TfToken::Set *composedAttributeNames);
 
   /// Access to private constructor. Should only be called by prim indexing.
-  friend PcpDynamicFileFormatContext
-  Pcp_CreateDynamicFileFormatContext(const PcpNodeRef &,
-                                     PcpPrimIndex_StackFrame *, TfToken::Set *,
-                                     TfToken::Set *);
+  friend PcpDynamicFileFormatContext Pcp_CreateDynamicFileFormatContext(const PcpNodeRef &,
+                                                                        PcpPrimIndex_StackFrame *,
+                                                                        TfToken::Set *,
+                                                                        TfToken::Set *);
 
   /// Returns whether the given \p field is allowed to be used to generate
   /// file format arguments. It can also return whether the value type of
   /// the field is a dictionary if needed.
-  bool
-  _IsAllowedFieldForArguments(const TfToken &field,
-                              bool *fieldValueIsDictionary = nullptr) const;
+  bool _IsAllowedFieldForArguments(const TfToken &field,
+                                   bool *fieldValueIsDictionary = nullptr) const;
 
-private:
+ private:
   PcpNodeRef _parentNode;
   PcpPrimIndex_StackFrame *_previousStackFrame;
 
@@ -115,4 +113,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_DYNAMIC_FILE_FORMAT_CONTEXT_H
+#endif  // PXR_USD_PCP_DYNAMIC_FILE_FORMAT_CONTEXT_H

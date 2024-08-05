@@ -22,12 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "hdPrman/lightFilter.h"
-#include "hdPrman/renderParam.h"
-#include "hdPrman/debugCodes.h"
-#include "hdPrman/rixStrings.h"
+#include "Hd/sceneDelegate.h"
 #include "Sdf/types.h"
 #include "Tf/staticTokens.h"
-#include "Hd/sceneDelegate.h"
+#include "hdPrman/debugCodes.h"
+#include "hdPrman/renderParam.h"
+#include "hdPrman/rixStrings.h"
 #include "pxr/imaging/hf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -40,8 +40,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Also, for now base the HdPrmanLightFilter class on HdSprim as there
 // currently is no HdLightFilter class.
 
-HdPrmanLightFilter::HdPrmanLightFilter(SdfPath const &id,
-                                       TfToken const &lightFilterType)
+HdPrmanLightFilter::HdPrmanLightFilter(SdfPath const &id, TfToken const &lightFilterType)
     : HdSprim(id), _hdLightFilterType(lightFilterType), _lightFilter(NULL)
 {
   /* NOTHING */
@@ -51,8 +50,7 @@ HdPrmanLightFilter::~HdPrmanLightFilter() = default;
 
 void HdPrmanLightFilter::Finalize(HdRenderParam *renderParam)
 {
-  HdPrman_RenderParam *param =
-      static_cast<HdPrman_RenderParam *>(renderParam);
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
   _ResetLightFilter(param);
 }
 
@@ -73,11 +71,9 @@ void HdPrmanLightFilter::Sync(HdSceneDelegate *sceneDelegate,
                               HdRenderParam *renderParam,
                               HdDirtyBits *dirtyBits)
 {
-  HdPrman_RenderParam *param =
-      static_cast<HdPrman_RenderParam *>(renderParam);
+  HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
-  if (*dirtyBits)
-  {
+  if (*dirtyBits) {
     _ResetLightFilter(param);
   }
 
@@ -85,8 +81,7 @@ void HdPrmanLightFilter::Sync(HdSceneDelegate *sceneDelegate,
 }
 
 /* virtual */
-HdDirtyBits
-HdPrmanLightFilter::GetInitialDirtyBitsMask() const
+HdDirtyBits HdPrmanLightFilter::GetInitialDirtyBitsMask() const
 {
   return HdChangeTracker::AllDirty;
 }

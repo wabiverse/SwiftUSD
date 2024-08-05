@@ -24,9 +24,9 @@
 #ifndef PXR_USD_USD_UTILS_CONDITIONAL_ABORT_DIAGNOSTIC_DELEGATE_H
 #define PXR_USD_USD_UTILS_CONDITIONAL_ABORT_DIAGNOSTIC_DELEGATE_H
 
-#include <pxr/pxrns.h>
-#include "UsdUtils/api.h"
 #include "Tf/diagnosticMgr.h"
+#include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -41,9 +41,8 @@ class TfPatternMatcher;
 /// of the error/warning
 /// codePathFilters: matching and filtering will be done on errors/warnings
 /// coming from a specific usd code path
-class UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters
-{
-public:
+class UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters {
+ public:
   UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters() {}
   USDUTILS_API
   UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters(
@@ -65,7 +64,7 @@ public:
   USDUTILS_API
   void SetCodePathFilters(const std::vector<std::string> &codePathFilters);
 
-private:
+ private:
   std::vector<std::string> _stringFilters;
   std::vector<std::string> _codePathFilters;
 };
@@ -96,19 +95,16 @@ private:
 ///         excludeFilters);
 /// \endcode
 ///
-class UsdUtilsConditionalAbortDiagnosticDelegate : public TfDiagnosticMgr::Delegate
-{
-public:
+class UsdUtilsConditionalAbortDiagnosticDelegate : public TfDiagnosticMgr::Delegate {
+ public:
   /// Constructor to initialize conditionalAbortDiagnosticDelegate.
   /// Responsible for adding this delegate instance to TfDiagnosticMgr and
   /// also sets the \p includeFilters and \p excludeFilters
   /// \note The _includeFilters and _excludeFilters are immutable
   USDUTILS_API
   UsdUtilsConditionalAbortDiagnosticDelegate(
-      const UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters &
-          includeFilters,
-      const UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters &
-          excludeFilters);
+      const UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters &includeFilters,
+      const UsdUtilsConditionalAbortDiagnosticDelegateErrorFilters &excludeFilters);
 
   /// Handles the removal of this delegate from TfDiagnosticMgr.
   USDUTILS_API
@@ -123,19 +119,18 @@ public:
   // Interface overrides
   void IssueError(const TfError &err) override;
   void IssueWarning(const TfWarning &warning) override;
-  void IssueFatalError(const TfCallContext &ctx,
-                       const std::string &msg) override;
+  void IssueFatalError(const TfCallContext &ctx, const std::string &msg) override;
   // Following will be no-ops for our purposes - prints same message as
   // DiagnosticMgr
   void IssueStatus(const TfStatus &status) override;
 
-private:
+ private:
   const std::vector<TfPatternMatcher> _includePatternStringFilters;
   const std::vector<TfPatternMatcher> _includePatternCodePathFilters;
   const std::vector<TfPatternMatcher> _excludePatternStringFilters;
   const std::vector<TfPatternMatcher> _excludePatternCodePathFilters;
 
-protected:
+ protected:
   /// Helper to match \p err against a given set of \p errorFilters
   /// A client can override this to affect the behavior of the rule matcher.
   virtual bool _RuleMatcher(const TfDiagnosticBase &err,

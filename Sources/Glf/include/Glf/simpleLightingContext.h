@@ -26,19 +26,19 @@
 
 /// \file glf/simpleLightingContext.h
 
-#include <pxr/pxrns.h>
 #include "Glf/api.h"
 #include "Glf/simpleLight.h"
 #include "Glf/simpleMaterial.h"
 #include "Glf/simpleShadowArray.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/matrix4d.h"
 #include "Gf/vec4f.h"
 
 #include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"
-#include "Tf/weakBase.h"
 #include "Tf/token.h"
+#include "Tf/weakBase.h"
 
 #include <memory>
 
@@ -49,9 +49,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(GlfUniformBlock);
 TF_DECLARE_WEAK_AND_REF_PTRS(GlfSimpleLightingContext);
 TF_DECLARE_WEAK_AND_REF_PTRS(GlfSimpleShadowArray);
 
-class GlfSimpleLightingContext : public TfRefBase, public TfWeakBase
-{
-public:
+class GlfSimpleLightingContext : public TfRefBase, public TfWeakBase {
+ public:
   typedef GlfSimpleLightingContext This;
 
   GLF_API
@@ -88,8 +87,7 @@ public:
   GfVec4f const &GetSceneAmbient() const;
 
   GLF_API
-  void SetCamera(GfMatrix4d const &worldToViewMatrix,
-                 GfMatrix4d const &projectionMatrix);
+  void SetCamera(GfMatrix4d const &worldToViewMatrix, GfMatrix4d const &projectionMatrix);
 
   GLF_API
   void SetUseLighting(bool val);
@@ -137,7 +135,7 @@ public:
 
   /// @}
 
-protected:
+ protected:
   GLF_API
   GlfSimpleLightingContext();
   GLF_API
@@ -146,7 +144,7 @@ protected:
   void _ComputePostSurfaceShaderState();
   void _BindPostSurfaceShaderParams(GlfBindingMapPtr const &bindingMap);
 
-private:
+ private:
   GlfSimpleLightVector _lights;
   GlfSimpleShadowArrayRefPtr _shadows;
 

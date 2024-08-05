@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
 #include "./api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdSchemaExamplesTokens->complexString);
 /// \endcode
-struct UsdSchemaExamplesTokensType
-{
+struct UsdSchemaExamplesTokensType {
   USDSCHEMAEXAMPLES_API UsdSchemaExamplesTokensType();
   /// \brief "complexString"
   ///

@@ -30,73 +30,63 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS \
-    (name) \
-    (valueType) \
+#define HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS (name)(valueType)
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens, HD_API,
-    HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens,
+                         HD_API,
+                         HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationOutputSchema : public HdSchema
-{
-public:
-    HdExtComputationOutputSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdExtComputationOutputSchema : public HdSchema {
+ public:
+  HdExtComputationOutputSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetName();
+  HD_API
+  HdTupleTypeDataSourceHandle GetValueType();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &name,
+                                                   const HdTupleTypeDataSourceHandle &valueType);
+
+  /// \class HdExtComputationOutputSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetName();
+    Builder &SetName(const HdTokenDataSourceHandle &name);
     HD_API
-    HdTupleTypeDataSourceHandle GetValueType();
+    Builder &SetValueType(const HdTupleTypeDataSourceHandle &valueType);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &name,
-        const HdTupleTypeDataSourceHandle &valueType
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdExtComputationOutputSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetName(
-            const HdTokenDataSourceHandle &name);
-        HD_API
-        Builder &SetValueType(
-            const HdTupleTypeDataSourceHandle &valueType);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _name;
-        HdTupleTypeDataSourceHandle _valueType;
-    };
-
+   private:
+    HdTokenDataSourceHandle _name;
+    HdTupleTypeDataSourceHandle _valueType;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

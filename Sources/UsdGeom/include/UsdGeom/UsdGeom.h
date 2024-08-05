@@ -37,9 +37,9 @@
 #include <UsdGeom/tokens.h>
 #include <UsdGeom/visibilityAPI.h>
 #include <UsdGeom/xform.h>
-#include <UsdGeom/xformable.h>
 #include <UsdGeom/xformCache.h>
 #include <UsdGeom/xformCommonAPI.h>
 #include <UsdGeom/xformOp.h>
+#include <UsdGeom/xformable.h>
 
-#endif // __PXR_USD_USDGEOM_H__
+#endif  // __PXR_USD_USDGEOM_H__

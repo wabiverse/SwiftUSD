@@ -45,23 +45,22 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
+#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
 #include "pxr/usdImaging/usdImagingGL/engine.h"
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
-class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing
-{
-public:
+class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing {
+ public:
   My_TestGLDrawing()
   {
     _mousePos[0] = _mousePos[1] = 0;
@@ -79,7 +78,7 @@ public:
   virtual void MouseRelease(int button, int x, int y, int modKeys);
   virtual void MouseMove(int x, int y, int modKeys);
 
-private:
+ private:
   UsdStageRefPtr _stage;
   UsdImagingGLEngineSharedPtr _engine;
   GlfSimpleLightingContextRefPtr _lightingContext;
@@ -96,7 +95,8 @@ void My_TestGLDrawing::InitTest()
 
   std::cout << "My_TestGLDrawing::InitTest()\n";
   _stage = UsdStage::Open(GetStageFilePath(),
-                          IsEnabledUnloadedAsBounds() ? UsdStage::InitialLoadSet::LoadNone : UsdStage::InitialLoadSet::LoadAll);
+                          IsEnabledUnloadedAsBounds() ? UsdStage::InitialLoadSet::LoadNone :
+                                                        UsdStage::InitialLoadSet::LoadAll);
 
   UsdImagingGLEngine::Parameters parameters;
   parameters.rootPath = _stage->GetPseudoRoot().GetPath();
@@ -104,40 +104,30 @@ void My_TestGLDrawing::InitTest()
 
   _engine = std::make_shared<UsdImagingGLEngine>(parameters);
 
-  if (!_GetRenderer().IsEmpty())
-  {
-    if (!_engine->SetRendererPlugin(_GetRenderer()))
-    {
+  if (!_GetRenderer().IsEmpty()) {
+    if (!_engine->SetRendererPlugin(_GetRenderer())) {
       std::cerr << "Couldn't set renderer plugin: " << _GetRenderer().GetText() << std::endl;
       exit(-1);
     }
-    else
-    {
-      std::cout << "Renderer plugin: " << _GetRenderer().GetText()
-                << std::endl;
+    else {
+      std::cout << "Renderer plugin: " << _GetRenderer().GetText() << std::endl;
     }
   }
 
-  for (const auto &renderSetting : GetRenderSettings())
-  {
-    _engine->SetRendererSetting(TfToken(renderSetting.first),
-                                renderSetting.second);
+  for (const auto &renderSetting : GetRenderSettings()) {
+    _engine->SetRendererSetting(TfToken(renderSetting.first), renderSetting.second);
   }
 
-  if (_ShouldFrameAll())
-  {
+  if (_ShouldFrameAll()) {
     TfTokenVector purposes;
     purposes.push_back(UsdGeomTokens->default_);
-    if (IsShowGuides())
-    {
+    if (IsShowGuides()) {
       purposes.push_back(UsdGeomTokens->guide);
     }
-    if (IsShowProxy())
-    {
+    if (IsShowProxy()) {
       purposes.push_back(UsdGeomTokens->proxy);
     }
-    if (IsShowRender())
-    {
+    if (IsShowRender()) {
       purposes.push_back(UsdGeomTokens->render);
     }
 
@@ -155,41 +145,34 @@ void My_TestGLDrawing::InitTest()
 
     std::cerr << "worldCenter: " << worldCenter << "\n";
     std::cerr << "worldSize: " << worldSize << "\n";
-    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-    {
+    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
       // transpose y and z centering translation
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[2];
       _translate[2] = -worldCenter[1] - worldSize;
     }
-    else
-    {
+    else {
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[1];
       _translate[2] = -worldCenter[2] - worldSize;
     }
   }
-  else
-  {
+  else {
     _translate[0] = GetTranslate()[0];
     _translate[1] = GetTranslate()[1];
     _translate[2] = GetTranslate()[2];
   }
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     _lightingContext = GlfSimpleLightingContext::New();
     // set same parameter as GlfSimpleLightingContext::SetStateFromOpenGL
     // OpenGL defaults
-    if (!IsEnabledSceneLights())
-    {
+    if (!IsEnabledSceneLights()) {
       GlfSimpleLight light;
-      if (IsEnabledCameraLight())
-      {
+      if (IsEnabledCameraLight()) {
         light.SetPosition(GfVec4f(_translate[0], _translate[2], _translate[1], 0));
       }
-      else
-      {
+      else {
         light.SetPosition(GfVec4f(0, -.5, .5, 0));
       }
       light.SetDiffuse(GfVec4f(1, 1, 1, 1));
@@ -235,20 +218,17 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   const int width = GetWidth();
   const int height = GetHeight();
 
-  if (GetCameraPath().empty())
-  {
+  if (GetCameraPath().empty()) {
     GfMatrix4d viewMatrix(1.0);
     viewMatrix *= GfMatrix4d().SetRotate(GfRotation(GfVec3d(0, 1, 0), _rotate[0]));
     viewMatrix *= GfMatrix4d().SetRotate(GfRotation(GfVec3d(1, 0, 0), _rotate[1]));
     viewMatrix *= GfMatrix4d().SetTranslate(GfVec3d(_translate[0], _translate[1], _translate[2]));
 
     GfMatrix4d modelViewMatrix = viewMatrix;
-    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-    {
+    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
       // rotate from z-up to y-up
-      modelViewMatrix =
-          GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-          modelViewMatrix;
+      modelViewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
+                        modelViewMatrix;
     }
 
     const double aspectRatio = double(width) / height;
@@ -258,22 +238,18 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
 
     _engine->SetCameraState(modelViewMatrix, projMatrix);
   }
-  else
-  {
+  else {
     _engine->SetCameraPath(SdfPath(GetCameraPath()));
   }
 
   _engine->SetOverrideWindowPolicy({true, GetWindowPolicy()});
 
-  const CameraUtilFraming framing(
-      GetDisplayWindow(), GetDataWindow(), GetPixelAspectRatio());
-  if (framing.IsValid())
-  {
+  const CameraUtilFraming framing(GetDisplayWindow(), GetDataWindow(), GetPixelAspectRatio());
+  if (framing.IsValid()) {
     _engine->SetRenderBufferSize(GfVec2i(width, height));
     _engine->SetFraming(framing);
   }
-  else
-  {
+  else {
     const GfVec4d viewport(0, 0, width, height);
     _engine->SetRenderViewport(viewport);
   }
@@ -292,23 +268,19 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
 
   _engine->SetRendererAov(GetRendererAov());
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     _engine->SetLightingState(_lightingContext);
   }
 
-  if (PresentDisabled())
-  {
+  if (PresentDisabled()) {
     _engine->SetEnablePresentation(false);
   }
 
   params.clipPlanes = GetClipPlanes();
 
-  for (double const &t : GetTimes())
-  {
+  for (double const &t : GetTimes()) {
     UsdTimeCode time = t;
-    if (t == -999)
-    {
+    if (t == -999) {
       time = UsdTimeCode::Default();
     }
 
@@ -323,8 +295,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
 
       renderTime.Start();
 
-      do
-      {
+      do {
         TRACE_FUNCTION_SCOPE("iteration render convergence");
 
         convergenceIterations++;
@@ -347,10 +318,8 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     std::cout << "totalItemCount " << perfLog.GetCounter(HdTokens->totalItemCount) << std::endl;
 
     std::string imageFilePath = GetOutputFilePath();
-    if (!imageFilePath.empty())
-    {
-      if (time != UsdTimeCode::Default())
-      {
+    if (!imageFilePath.empty()) {
+      if (time != UsdTimeCode::Default()) {
         std::stringstream suffix;
         suffix << "_" << std::setw(3) << std::setfill('0') << params.frame << ".png";
         imageFilePath = TfStringReplace(imageFilePath, ".png", suffix.str());
@@ -360,11 +329,9 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     }
   }
 
-  if (!GetPerfStatsFile().empty())
-  {
+  if (!GetPerfStatsFile().empty()) {
     std::ofstream perfstatsRaw(GetPerfStatsFile(), std::ofstream::out);
-    if (TF_VERIFY(perfstatsRaw))
-    {
+    if (TF_VERIFY(perfstatsRaw)) {
       perfstatsRaw << "{ 'profile'  : 'renderTime', "
                    << "   'metric'  : 'time', "
                    << "   'value'   : " << renderTime.GetSeconds() << ", "
@@ -395,18 +362,15 @@ void My_TestGLDrawing::MouseMove(int x, int y, int modKeys)
   int dx = x - _mousePos[0];
   int dy = y - _mousePos[1];
 
-  if (_mouseButton[0])
-  {
+  if (_mouseButton[0]) {
     _rotate[0] += dx;
     _rotate[1] += dy;
   }
-  else if (_mouseButton[1])
-  {
+  else if (_mouseButton[1]) {
     _translate[0] += dx;
     _translate[1] -= dy;
   }
-  else if (_mouseButton[2])
-  {
+  else if (_mouseButton[2]) {
     _translate[2] += dx;
   }
 

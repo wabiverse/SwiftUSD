@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGIGL_OPS_H
 #define PXR_IMAGING_HGIGL_OPS_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec4i.h"
+#include <pxr/pxrns.h>
 
-#include "Hgi/buffer.h"
 #include "Hgi/blitCmdsOps.h"
+#include "Hgi/buffer.h"
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
 #include "Hgi/resourceBindings.h"
@@ -67,9 +67,8 @@ using HgiGLOpsFn = std::function<void(void)>;
 /// 2. It lets us satisfy the Hgi requirement that Hgi***Cmds objects must be
 ///    able to do their recording on secondary threads.
 ///
-class HgiGLOps
-{
-public:
+class HgiGLOps {
+ public:
   HGIGL_API
   static HgiGLOpsFn PushDebugGroup(const char *label);
 
@@ -98,9 +97,8 @@ public:
   static HgiGLOpsFn CopyBufferToTexture(HgiBufferToTextureOp const &copyOp);
 
   HGIGL_API
-  static HgiGLOpsFn ResolveFramebuffer(
-      HgiGLDevice *device,
-      HgiGraphicsCmdsDesc const &graphicsCmds);
+  static HgiGLOpsFn ResolveFramebuffer(HgiGLDevice *device,
+                                       HgiGraphicsCmdsDesc const &graphicsCmds);
 
   HGIGL_API
   static HgiGLOpsFn SetViewport(GfVec4i const &vp);
@@ -118,67 +116,58 @@ public:
   static HgiGLOpsFn BindResources(HgiResourceBindingsHandle resources);
 
   HGIGL_API
-  static HgiGLOpsFn SetConstantValues(
-      HgiGraphicsPipelineHandle pipeline,
-      HgiShaderStage stages,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data);
+  static HgiGLOpsFn SetConstantValues(HgiGraphicsPipelineHandle pipeline,
+                                      HgiShaderStage stages,
+                                      uint32_t bindIndex,
+                                      uint32_t byteSize,
+                                      const void *data);
 
   HGIGL_API
-  static HgiGLOpsFn SetConstantValues(
-      HgiComputePipelineHandle pipeline,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data);
+  static HgiGLOpsFn SetConstantValues(HgiComputePipelineHandle pipeline,
+                                      uint32_t bindIndex,
+                                      uint32_t byteSize,
+                                      const void *data);
 
   HGIGL_API
-  static HgiGLOpsFn BindVertexBuffers(
-      HgiVertexBufferBindingVector const &bindings);
+  static HgiGLOpsFn BindVertexBuffers(HgiVertexBufferBindingVector const &bindings);
 
   HGIGL_API
-  static HgiGLOpsFn Draw(
-      HgiPrimitiveType primitiveType,
-      uint32_t primitiveIndexSize,
-      uint32_t vertexCount,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance);
+  static HgiGLOpsFn Draw(HgiPrimitiveType primitiveType,
+                         uint32_t primitiveIndexSize,
+                         uint32_t vertexCount,
+                         uint32_t baseVertex,
+                         uint32_t instanceCount,
+                         uint32_t baseInstance);
 
   HGIGL_API
-  static HgiGLOpsFn DrawIndirect(
-      HgiPrimitiveType primitiveType,
-      uint32_t primitiveIndexSize,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride);
+  static HgiGLOpsFn DrawIndirect(HgiPrimitiveType primitiveType,
+                                 uint32_t primitiveIndexSize,
+                                 HgiBufferHandle const &drawParameterBuffer,
+                                 uint32_t drawBufferByteOffset,
+                                 uint32_t drawCount,
+                                 uint32_t stride);
 
   HGIGL_API
-  static HgiGLOpsFn DrawIndexed(
-      HgiPrimitiveType primitiveType,
-      uint32_t primitiveIndexSize,
-      HgiBufferHandle const &indexBuffer,
-      uint32_t indexCount,
-      uint32_t indexBufferByteOffset,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance);
+  static HgiGLOpsFn DrawIndexed(HgiPrimitiveType primitiveType,
+                                uint32_t primitiveIndexSize,
+                                HgiBufferHandle const &indexBuffer,
+                                uint32_t indexCount,
+                                uint32_t indexBufferByteOffset,
+                                uint32_t baseVertex,
+                                uint32_t instanceCount,
+                                uint32_t baseInstance);
 
   HGIGL_API
-  static HgiGLOpsFn DrawIndexedIndirect(
-      HgiPrimitiveType primitiveType,
-      uint32_t primitiveIndexSize,
-      HgiBufferHandle const &indexBuffer,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride);
+  static HgiGLOpsFn DrawIndexedIndirect(HgiPrimitiveType primitiveType,
+                                        uint32_t primitiveIndexSize,
+                                        HgiBufferHandle const &indexBuffer,
+                                        HgiBufferHandle const &drawParameterBuffer,
+                                        uint32_t drawBufferByteOffset,
+                                        uint32_t drawCount,
+                                        uint32_t stride);
 
   HGIGL_API
-  static HgiGLOpsFn BindFramebufferOp(
-      HgiGLDevice *device,
-      HgiGraphicsCmdsDesc const &desc);
+  static HgiGLOpsFn BindFramebufferOp(HgiGLDevice *device, HgiGraphicsCmdsDesc const &desc);
 
   HGIGL_API
   static HgiGLOpsFn Dispatch(int dimX, int dimY);

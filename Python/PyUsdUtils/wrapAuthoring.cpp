@@ -21,24 +21,23 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include <boost/python/def.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <boost/python/tuple.hpp>
+#include <pxr/pxrns.h>
 
 #include "UsdUtils/authoring.h"
 
 #include "Sdf/layer.h"
 
-#include "Tf/pyResultConversions.h"
 #include "Tf/pyContainerConversions.h"
+#include "Tf/pyResultConversions.h"
 
 using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static std::vector<UsdCollectionAPI>
-_WrapUsdUtilsCreateCollections(
+static std::vector<UsdCollectionAPI> _WrapUsdUtilsCreateCollections(
     const boost::python::list &assignments,
     const UsdPrim &usdPrim,
     const double minInclusionRatio,
@@ -50,29 +49,28 @@ _WrapUsdUtilsCreateCollections(
   size_t nPairs = len(assignments);
   assignmentsVec.resize(nPairs);
 
-  for (size_t i = 0; i < nPairs; ++i)
-  {
+  for (size_t i = 0; i < nPairs; ++i) {
     tuple pair = extract<tuple>(assignments[i]);
     TfToken collName = extract<TfToken>(pair[0]);
     list pathList = extract<list>(pair[1]);
 
     SdfPathSet includedPaths;
     size_t numPaths = len(pathList);
-    for (size_t pathIdx = 0; pathIdx < numPaths; ++pathIdx)
-    {
+    for (size_t pathIdx = 0; pathIdx < numPaths; ++pathIdx) {
       SdfPath includedPath = extract<SdfPath>(pathList[pathIdx]);
       includedPaths.insert(includedPath);
     }
     assignmentsVec[i] = std::make_pair(collName, includedPaths);
   }
 
-  return UsdUtilsCreateCollections(assignmentsVec, usdPrim,
-                                   minInclusionRatio, maxNumExcludesBelowInclude,
+  return UsdUtilsCreateCollections(assignmentsVec,
+                                   usdPrim,
+                                   minInclusionRatio,
+                                   maxNumExcludesBelowInclude,
                                    minIncludeExcludeCollectionSize);
 }
 
-static object
-_WrapUsdUtilsComputeCollectionIncludesAndExcludes(
+static object _WrapUsdUtilsComputeCollectionIncludesAndExcludes(
     const SdfPathSet &includedRootPaths,
     const UsdStageWeakPtr &usdStage,
     double minInclusionRatio,
@@ -91,8 +89,12 @@ _WrapUsdUtilsComputeCollectionIncludesAndExcludes(
   SdfPathVector pathsToExclude;
 
   UsdUtilsComputeCollectionIncludesAndExcludes(includedRootPaths,
-                                               usdStage, &pathsToInclude, &pathsToExclude, minInclusionRatio,
-                                               maxNumExcludesBelowInclude, minIncludeExcludeCollectionSize,
+                                               usdStage,
+                                               &pathsToInclude,
+                                               &pathsToExclude,
+                                               minInclusionRatio,
+                                               maxNumExcludesBelowInclude,
+                                               minIncludeExcludeCollectionSize,
                                                pathsToIgnoreSet);
 
   return boost::python::make_tuple(pathsToInclude, pathsToExclude);
@@ -100,30 +102,40 @@ _WrapUsdUtilsComputeCollectionIncludesAndExcludes(
 
 void wrapAuthoring()
 {
-  def("CopyLayerMetadata", UsdUtilsCopyLayerMetadata,
-      (arg("source"), arg("destination"), arg("skipSublayers") = false,
+  def("CopyLayerMetadata",
+      UsdUtilsCopyLayerMetadata,
+      (arg("source"),
+       arg("destination"),
+       arg("skipSublayers") = false,
        arg("bakeUnauthoredFallbacks") = false));
 
   def("ComputeCollectionIncludesAndExcludes",
       &_WrapUsdUtilsComputeCollectionIncludesAndExcludes,
-      (arg("includedRootPaths"), arg("usdStage"),
+      (arg("includedRootPaths"),
+       arg("usdStage"),
        arg("minInclusionRatio") = 0.75,
        arg("maxNumExcludesBelowInclude") = 5u,
        arg("minIncludeExcludeCollectionSize") = 3u,
        arg("pathsToIgnore") = SdfPathVector()));
 
-  def("AuthorCollection", UsdUtilsAuthorCollection,
-      (arg("collectionName"), arg("usdPrim"), arg("pathsToInclude"),
+  def("AuthorCollection",
+      UsdUtilsAuthorCollection,
+      (arg("collectionName"),
+       arg("usdPrim"),
+       arg("pathsToInclude"),
        arg("pathsToExclude") = SdfPathSet()));
 
-  def("CreateCollections", _WrapUsdUtilsCreateCollections,
+  def("CreateCollections",
+      _WrapUsdUtilsCreateCollections,
       boost::python::return_value_policy<TfPySequenceToList>(),
-      (arg("assignments"), arg("usdPrim"),
+      (arg("assignments"),
+       arg("usdPrim"),
        arg("minInclusionRatio") = 0.75,
        arg("maxNumExcludesBelowInclude") = 5u,
        arg("minIncludeExcludeCollectionSize") = 3u));
 
-  def("GetDirtyLayers", UsdUtilsGetDirtyLayers,
+  def("GetDirtyLayers",
+      UsdUtilsGetDirtyLayers,
       (arg("stage"), arg("includeClipLayers") = true),
       return_value_policy<TfPySequenceToList>());
 }

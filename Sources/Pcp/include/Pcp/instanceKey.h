@@ -51,7 +51,7 @@ class PcpPrimIndex;
 /// the same opinions for direct properties of the prim indexes themselves.
 ///
 class PcpInstanceKey {
-public:
+ public:
   PCP_API
   PcpInstanceKey();
 
@@ -66,19 +66,23 @@ public:
   bool operator!=(const PcpInstanceKey &rhs) const;
 
   /// Appends hash value for this instance key.
-  template <typename HashState>
-  friend void TfHashAppend(HashState &h, const PcpInstanceKey &key) {
+  template<typename HashState> friend void TfHashAppend(HashState &h, const PcpInstanceKey &key)
+  {
     h.Append(key._hash);
   }
   /// Returns hash value for this instance key.
-  friend size_t hash_value(const PcpInstanceKey &key) { return key._hash; }
+  friend size_t hash_value(const PcpInstanceKey &key)
+  {
+    return key._hash;
+  }
 
   /// \struct Hash
   ///
   /// Hash functor.
   ///
   struct Hash {
-    inline size_t operator()(const PcpInstanceKey &key) const {
+    inline size_t operator()(const PcpInstanceKey &key) const
+    {
       return key._hash;
     }
   };
@@ -88,21 +92,25 @@ public:
   PCP_API
   std::string GetString() const;
 
-private:
+ private:
   struct _Collector;
 
   struct _Arc {
     explicit _Arc(const PcpNodeRef &node)
-        : _arcType(node.GetArcType()), _sourceSite(node.GetSite()),
-          _timeOffset(node.GetMapToRoot().GetTimeOffset()) {}
+        : _arcType(node.GetArcType()),
+          _sourceSite(node.GetSite()),
+          _timeOffset(node.GetMapToRoot().GetTimeOffset())
+    {
+    }
 
-    bool operator==(const _Arc &rhs) const {
+    bool operator==(const _Arc &rhs) const
+    {
       return _arcType == rhs._arcType && _sourceSite == rhs._sourceSite &&
              _timeOffset == rhs._timeOffset;
     }
 
-    template <typename HashState>
-    friend void TfHashAppend(HashState &h, const _Arc &arc) {
+    template<typename HashState> friend void TfHashAppend(HashState &h, const _Arc &arc)
+    {
       h.Append(arc._arcType);
       h.Append(arc._sourceSite);
       h.Append(arc._timeOffset);
@@ -122,4 +130,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_INSTANCE_KEY_H
+#endif  // PXR_USD_PCP_INSTANCE_KEY_H

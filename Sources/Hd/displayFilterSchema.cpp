@@ -33,93 +33,71 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdDisplayFilterSchemaTokens,
-    HDDISPLAYFILTER_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdDisplayFilterSchemaTokens, HDDISPLAYFILTER_SCHEMA_TOKENS);
 
-
-
-HdMaterialNodeSchema
-HdDisplayFilterSchema::GetResource()
+HdMaterialNodeSchema HdDisplayFilterSchema::GetResource()
 {
-    return HdMaterialNodeSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdDisplayFilterSchemaTokens->resource));
+  return HdMaterialNodeSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdDisplayFilterSchemaTokens->resource));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdDisplayFilterSchema::BuildRetained(
-        const HdContainerDataSourceHandle &resource
-)
-{
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
-
-    size_t count = 0;
-    if (resource) {
-        names[count] = HdDisplayFilterSchemaTokens->resource;
-        values[count++] = resource;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdDisplayFilterSchema
-HdDisplayFilterSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdDisplayFilterSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdDisplayFilterSchemaTokens->displayFilter))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdDisplayFilterSchema::GetSchemaToken()
-{
-    return HdDisplayFilterSchemaTokens->displayFilter;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdDisplayFilterSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdDisplayFilterSchemaTokens->displayFilter
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdDisplayFilterSchema::GetResourceLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdDisplayFilterSchemaTokens->displayFilter,
-        HdDisplayFilterSchemaTokens->resource
-    );
-    return locator;
-}
-
-
-HdDisplayFilterSchema::Builder &
-HdDisplayFilterSchema::Builder::SetResource(
+HdContainerDataSourceHandle HdDisplayFilterSchema::BuildRetained(
     const HdContainerDataSourceHandle &resource)
 {
-    _resource = resource;
-    return *this;
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
+
+  size_t count = 0;
+  if (resource) {
+    names[count] = HdDisplayFilterSchemaTokens->resource;
+    values[count++] = resource;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdDisplayFilterSchema::Builder::Build()
+/*static*/
+HdDisplayFilterSchema HdDisplayFilterSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdDisplayFilterSchema::BuildRetained(
-        _resource
-    );
+  return HdDisplayFilterSchema(fromParentContainer ?
+                                   HdContainerDataSource::Cast(fromParentContainer->Get(
+                                       HdDisplayFilterSchemaTokens->displayFilter)) :
+                                   nullptr);
 }
 
+/*static*/
+const TfToken &HdDisplayFilterSchema::GetSchemaToken()
+{
+  return HdDisplayFilterSchemaTokens->displayFilter;
+}
+/*static*/
+const HdDataSourceLocator &HdDisplayFilterSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdDisplayFilterSchemaTokens->displayFilter);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdDisplayFilterSchema::GetResourceLocator()
+{
+  static const HdDataSourceLocator locator(HdDisplayFilterSchemaTokens->displayFilter,
+                                           HdDisplayFilterSchemaTokens->resource);
+  return locator;
+}
+
+HdDisplayFilterSchema::Builder &HdDisplayFilterSchema::Builder::SetResource(
+    const HdContainerDataSourceHandle &resource)
+{
+  _resource = resource;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdDisplayFilterSchema::Builder::Build()
+{
+  return HdDisplayFilterSchema::BuildRetained(_resource);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

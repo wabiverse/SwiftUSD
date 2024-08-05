@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 #define PXR_IMAGING_HGI_METAL_CAPABILITIES_H
 
+#include "Hgi/capabilities.h"
+#include "HgiMetal/api.h"
 #include <Metal/Metal.hpp>
 #include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
-#include "Hgi/capabilities.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,9 +36,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Reports the capabilities of the Metal device.
 ///
-class HgiMetalCapabilities final : public HgiCapabilities
-{
-public:
+class HgiMetalCapabilities final : public HgiCapabilities {
+ public:
   HGIMETAL_API
   ~HgiMetalCapabilities() override;
 
@@ -53,7 +52,7 @@ public:
   bool useParallelEncoder;
   bool requiresIndirectDrawFix;
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API

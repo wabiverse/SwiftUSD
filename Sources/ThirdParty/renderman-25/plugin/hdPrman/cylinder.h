@@ -24,17 +24,16 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CYLINDER_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CYLINDER_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/gprim.h"
 #include "Hd/rprim.h"
+#include "hdPrman/gprim.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_Cylinder final : public HdPrman_Gprim<HdRprim>
-{
-public:
+class HdPrman_Cylinder final : public HdPrman_Gprim<HdRprim> {
+ public:
   using BASE = HdPrman_Gprim<HdRprim>;
 
   HF_MALLOC_TAG_NEW("new HdPrman_Cylinder");
@@ -45,15 +44,14 @@ public:
 
   TfTokenVector const &GetBuiltinPrimvarNames() const;
 
-protected:
-  RtPrimVarList
-  _ConvertGeometry(HdPrman_RenderParam *renderParam,
-                   HdSceneDelegate *sceneDelegate,
-                   const SdfPath &id,
-                   RtUString *primType,
-                   std::vector<HdGeomSubset> *geomSubsets) override;
+ protected:
+  RtPrimVarList _ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                 HdSceneDelegate *sceneDelegate,
+                                 const SdfPath &id,
+                                 RtUString *primType,
+                                 std::vector<HdGeomSubset> *geomSubsets) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CYLINDER_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CYLINDER_H

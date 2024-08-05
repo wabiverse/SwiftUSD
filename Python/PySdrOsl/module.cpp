@@ -22,8 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "Tf/pyModule.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

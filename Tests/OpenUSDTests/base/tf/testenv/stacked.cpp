@@ -22,24 +22,23 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/stacked.h"
-#include "pxr/base/tf/instantiateStacked.h"
 #include "pxr/base/tf/diagnostic.h"
+#include "pxr/base/tf/instantiateStacked.h"
 #include "pxr/base/tf/iterator.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 #include "Arch/demangle.h"
 
+#include <cstdio>
 #include <iostream>
 #include <thread>
-#include <cstdio>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class Tf_SafeStacked : public TfStacked<Tf_SafeStacked, true>
-{
-public:
+class Tf_SafeStacked : public TfStacked<Tf_SafeStacked, true> {
+ public:
   explicit Tf_SafeStacked(int v) : value(v) {}
   int value;
 };
@@ -47,7 +46,7 @@ TF_INSTANTIATE_STACKED(Tf_SafeStacked);
 
 TF_DEFINE_STACKED(Tf_UnsafeStacked, false, )
 {
-public:
+ public:
   explicit Tf_UnsafeStacked(int v) : value(v) {}
   int value;
 };
@@ -55,11 +54,11 @@ TF_INSTANTIATE_DEFINED_STACKED(Tf_UnsafeStacked);
 
 TF_DEFINE_STACKED(Tf_FallbackStacked, true, )
 {
-public:
+ public:
   explicit Tf_FallbackStacked(int v) : value(v) {}
   int value;
 
-private:
+ private:
   friend class TfStackedAccess;
   static void _InitializeStack()
   {
@@ -69,8 +68,7 @@ private:
 };
 TF_INSTANTIATE_DEFINED_STACKED(Tf_FallbackStacked);
 
-template <class T>
-static void PrintStack()
+template<class T> static void PrintStack()
 {
   printf("%s : ", ArchGetDemangled<T>().c_str());
   TF_FOR_ALL(i, T::GetStack())
@@ -78,8 +76,7 @@ static void PrintStack()
   printf("\n");
 }
 
-template <class Stacked>
-static void Test()
+template<class Stacked> static void Test()
 {
   typedef typename Stacked::Stack Stack;
 
@@ -103,8 +100,7 @@ static void Test()
 
       Stack const &stack = Stacked::GetStack();
       TF_AXIOM(stack.size() == 2);
-      TF_AXIOM(stack[0]->value == 1 &&
-               stack[1]->value == 2);
+      TF_AXIOM(stack[0]->value == 1 && stack[1]->value == 2);
     }
 
     {
@@ -118,11 +114,8 @@ static void Test()
 
       Stack const &stack = Stacked::GetStack();
       TF_AXIOM(stack.size() == 5);
-      TF_AXIOM(stack[0]->value == 1 &&
-               stack[1]->value == 2 &&
-               stack[2]->value == 3 &&
-               stack[3]->value == 4 &&
-               stack[4]->value == 5);
+      TF_AXIOM(stack[0]->value == 1 && stack[1]->value == 2 && stack[2]->value == 3 &&
+               stack[3]->value == 4 && stack[4]->value == 5);
     }
 
     {
@@ -133,8 +126,7 @@ static void Test()
 
       Stack const &stack = Stacked::GetStack();
       TF_AXIOM(stack.size() == 2);
-      TF_AXIOM(stack[0]->value == 1 &&
-               stack[1]->value == 2);
+      TF_AXIOM(stack[0]->value == 1 && stack[1]->value == 2);
     }
   }
 
@@ -148,8 +140,7 @@ static void Test()
   }
 }
 
-struct TestFallbackStackedInAThread
-{
+struct TestFallbackStackedInAThread {
   void operator()()
   {
     // This will run in multiple threads to make sure that the
@@ -159,8 +150,7 @@ struct TestFallbackStackedInAThread
   }
 };
 
-static bool
-Test_TfStacked()
+static bool Test_TfStacked()
 {
 
   Test<Tf_SafeStacked>();
@@ -169,12 +159,10 @@ Test_TfStacked()
   // Test SafeStacked in multiple threads
   TF_AXIOM(std::thread::hardware_concurrency() > 1);
   std::vector<std::thread> threads;
-  for (size_t i = 0, n = std::thread::hardware_concurrency(); i != n; ++i)
-  {
+  for (size_t i = 0, n = std::thread::hardware_concurrency(); i != n; ++i) {
     threads.emplace_back(TestFallbackStackedInAThread());
   }
-  for (size_t i = 0, n = std::thread::hardware_concurrency(); i != n; ++i)
-  {
+  for (size_t i = 0, n = std::thread::hardware_concurrency(); i != n; ++i) {
     threads[i].join();
   }
 

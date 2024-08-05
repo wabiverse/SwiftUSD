@@ -24,17 +24,16 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_POINTS_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_POINTS_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/gprim.h"
 #include "Hd/points.h"
+#include "hdPrman/gprim.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_Points final : public HdPrman_Gprim<HdPoints>
-{
-public:
+class HdPrman_Points final : public HdPrman_Gprim<HdPoints> {
+ public:
   using BASE = HdPrman_Gprim<HdPoints>;
 
   HF_MALLOC_TAG_NEW("new HdPrman_Points");
@@ -43,15 +42,14 @@ public:
 
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-protected:
-  RtPrimVarList
-  _ConvertGeometry(HdPrman_RenderParam *renderParam,
-                   HdSceneDelegate *sceneDelegate,
-                   const SdfPath &id,
-                   RtUString *primType,
-                   std::vector<HdGeomSubset> *geomSubsets) override;
+ protected:
+  RtPrimVarList _ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                 HdSceneDelegate *sceneDelegate,
+                                 const SdfPath &id,
+                                 RtUString *primType,
+                                 std::vector<HdGeomSubset> *geomSubsets) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_POINTS_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_POINTS_H

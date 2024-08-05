@@ -25,60 +25,52 @@
 //
 #include "hdPrman/cone.h"
 
-#include "hdPrman/renderParam.h"
+#include "Gf/matrix4d.h"
+#include "Gf/matrix4f.h"
+#include "Hd/coneSchema.h"
 #include "hdPrman/instancer.h"
 #include "hdPrman/material.h"
+#include "hdPrman/renderParam.h"
 #include "hdPrman/rixStrings.h"
-#include "Hd/coneSchema.h"
-#include "Gf/matrix4f.h"
-#include "Gf/matrix4d.h"
 
-#include "Riley.h"
 #include "RiTypesHelper.h"
-#include "RixShadingUtils.h"
+#include "Riley.h"
 #include "RixPredefinedStrings.hpp"
+#include "RixShadingUtils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdPrman_Cone::HdPrman_Cone(SdfPath const &id)
-    : BASE(id)
-{
-}
+HdPrman_Cone::HdPrman_Cone(SdfPath const &id) : BASE(id) {}
 
-HdDirtyBits
-HdPrman_Cone::GetInitialDirtyBitsMask() const
+HdDirtyBits HdPrman_Cone::GetInitialDirtyBitsMask() const
 {
-  constexpr int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyVisibility | HdChangeTracker::DirtyPrimvar | HdChangeTracker::DirtyMaterialId | HdChangeTracker::DirtyInstancer;
+  constexpr int mask = HdChangeTracker::Clean | HdChangeTracker::DirtyTransform |
+                       HdChangeTracker::DirtyVisibility | HdChangeTracker::DirtyPrimvar |
+                       HdChangeTracker::DirtyMaterialId | HdChangeTracker::DirtyInstancer;
 
   return (HdDirtyBits)mask;
 }
 
-TfTokenVector const &
-HdPrman_Cone::GetBuiltinPrimvarNames() const
+TfTokenVector const &HdPrman_Cone::GetBuiltinPrimvarNames() const
 {
-  static TfTokenVector result{
-      HdConeSchemaTokens->height,
-      HdConeSchemaTokens->radius};
+  static TfTokenVector result{HdConeSchemaTokens->height, HdConeSchemaTokens->radius};
   return result;
 }
 
-RtPrimVarList
-HdPrman_Cone::_ConvertGeometry(HdPrman_RenderParam *renderParam,
-                               HdSceneDelegate *sceneDelegate,
-                               const SdfPath &id,
-                               RtUString *primType,
-                               std::vector<HdGeomSubset> *geomSubsets)
+RtPrimVarList HdPrman_Cone::_ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                             HdSceneDelegate *sceneDelegate,
+                                             const SdfPath &id,
+                                             RtUString *primType,
+                                             std::vector<HdGeomSubset> *geomSubsets)
 {
   RtPrimVarList primvars;
 
   *primType = RixStr.k_Ri_Cone;
 
   const float radius =
-      sceneDelegate->Get(id, HdConeSchemaTokens->radius)
-          .GetWithDefault<double>(0.0);
+      sceneDelegate->Get(id, HdConeSchemaTokens->radius).GetWithDefault<double>(0.0);
   const float height =
-      sceneDelegate->Get(id, HdConeSchemaTokens->height)
-          .GetWithDefault<double>(0.0);
+      sceneDelegate->Get(id, HdConeSchemaTokens->height).GetWithDefault<double>(0.0);
 
   primvars.SetFloat(RixStr.k_Ri_radius, radius);
   primvars.SetFloat(RixStr.k_Ri_height, height);

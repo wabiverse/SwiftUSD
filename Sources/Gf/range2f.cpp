@@ -39,30 +39,39 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfRange2f>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfRange2f>();
+}
 
-std::ostream &operator<<(std::ostream &out, GfRange2f const &r) {
-  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << "..."
-             << Gf_OstreamHelperP(r.GetMax()) << ']';
+std::ostream &operator<<(std::ostream &out, GfRange2f const &r)
+{
+  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << "..." << Gf_OstreamHelperP(r.GetMax())
+             << ']';
 }
 
 GfRange2f::GfRange2f(class GfRange2d const &other)
-    : _min(GfVec2f(other.GetMin())), _max(GfVec2f(other.GetMax())) {}
+    : _min(GfVec2f(other.GetMin())), _max(GfVec2f(other.GetMax()))
+{
+}
 
-double GfRange2f::GetDistanceSquared(const GfVec2f &p) const {
+double GfRange2f::GetDistanceSquared(const GfVec2f &p) const
+{
   double dist = 0.0;
 
   if (p[0] < _min[0]) {
     // p is left of box
     dist += GfSqr(_min[0] - p[0]);
-  } else if (p[0] > _max[0]) {
+  }
+  else if (p[0] > _max[0]) {
     // p is right of box
     dist += GfSqr(p[0] - _max[0]);
   }
   if (p[1] < _min[1]) {
     // p is front of box
     dist += GfSqr(_min[1] - p[1]);
-  } else if (p[1] > _max[1]) {
+  }
+  else if (p[1] > _max[1]) {
     // p is back of box
     dist += GfSqr(p[1] - _max[1]);
   }
@@ -70,7 +79,8 @@ double GfRange2f::GetDistanceSquared(const GfVec2f &p) const {
   return dist;
 }
 
-GfVec2f GfRange2f::GetCorner(size_t i) const {
+GfVec2f GfRange2f::GetCorner(size_t i) const
+{
   if (i > 3) {
     TF_CODING_ERROR("Invalid corner %zu > 3.", i);
     return _min;
@@ -79,7 +89,8 @@ GfVec2f GfRange2f::GetCorner(size_t i) const {
   return GfVec2f((i & 1 ? _max : _min)[0], (i & 2 ? _max : _min)[1]);
 }
 
-GfRange2f GfRange2f::GetQuadrant(size_t i) const {
+GfRange2f GfRange2f::GetQuadrant(size_t i) const
+{
   if (i > 3) {
     TF_CODING_ERROR("Invalid quadrant %zu > 3.", i);
     return GfRange2f();

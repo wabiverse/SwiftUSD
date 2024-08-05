@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdUI/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdUI/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdUITokens->closed);
 /// \endcode
-struct UsdUITokensType
-{
+struct UsdUITokensType {
   USDUI_API UsdUITokensType();
   /// \brief "closed"
   ///

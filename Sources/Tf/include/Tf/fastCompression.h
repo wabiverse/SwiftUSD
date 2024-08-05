@@ -36,7 +36,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class TfFastCompression {
-public:
+ public:
   /// Return the largest input buffer size that can be compressed with these
   /// functions.  Guaranteed to be at least 200 GB.
   TF_API static size_t GetMaxInputSize();
@@ -51,17 +51,17 @@ public:
   /// GetCompressedBufferSize(uncompressedSize) bytes.  Return the number of
   /// bytes written to the \p compressed buffer.  Issue a runtime error and
   /// return ~0 in case of an error.
-  TF_API static size_t CompressToBuffer(char const *input, char *compressed,
-                                        size_t inputSize);
+  TF_API static size_t CompressToBuffer(char const *input, char *compressed, size_t inputSize);
 
   /// Decompress \p compressedSize bytes in \p compressed and store the
   /// result in \p output.  No more than \p maxOutputSize bytes will be
   /// written to \p output.
   TF_API static size_t DecompressFromBuffer(char const *compressed,
-                                            char *output, size_t compressedSize,
+                                            char *output,
+                                            size_t compressedSize,
                                             size_t maxOutputSize);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_FAST_COMPRESSION_H
+#endif  // PXR_BASE_TF_FAST_COMPRESSION_H

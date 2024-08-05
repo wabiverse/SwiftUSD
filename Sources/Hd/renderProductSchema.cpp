@@ -33,357 +33,298 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdRenderProductSchemaTokens,
-    HDRENDERPRODUCT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdRenderProductSchemaTokens, HDRENDERPRODUCT_SCHEMA_TOKENS);
 
-
-
-HdPathDataSourceHandle
-HdRenderProductSchema::GetPath()
+HdPathDataSourceHandle HdRenderProductSchema::GetPath()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdRenderProductSchemaTokens->path);
+  return _GetTypedDataSource<HdPathDataSource>(HdRenderProductSchemaTokens->path);
 }
 
-HdTokenDataSourceHandle
-HdRenderProductSchema::GetType()
+HdTokenDataSourceHandle HdRenderProductSchema::GetType()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdRenderProductSchemaTokens->type);
+  return _GetTypedDataSource<HdTokenDataSource>(HdRenderProductSchemaTokens->type);
 }
 
-HdTokenDataSourceHandle
-HdRenderProductSchema::GetName()
+HdTokenDataSourceHandle HdRenderProductSchema::GetName()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdRenderProductSchemaTokens->name);
+  return _GetTypedDataSource<HdTokenDataSource>(HdRenderProductSchemaTokens->name);
 }
 
-HdVec2iDataSourceHandle
-HdRenderProductSchema::GetResolution()
+HdVec2iDataSourceHandle HdRenderProductSchema::GetResolution()
 {
-    return _GetTypedDataSource<HdVec2iDataSource>(
-        HdRenderProductSchemaTokens->resolution);
+  return _GetTypedDataSource<HdVec2iDataSource>(HdRenderProductSchemaTokens->resolution);
 }
 
-HdRenderVarVectorSchema
-HdRenderProductSchema::GetRenderVars()
+HdRenderVarVectorSchema HdRenderProductSchema::GetRenderVars()
 {
-    return HdRenderVarVectorSchema(_GetTypedDataSource<HdVectorDataSource>(
-        HdRenderProductSchemaTokens->renderVars));
+  return HdRenderVarVectorSchema(
+      _GetTypedDataSource<HdVectorDataSource>(HdRenderProductSchemaTokens->renderVars));
 }
 
-HdPathDataSourceHandle
-HdRenderProductSchema::GetCameraPrim()
+HdPathDataSourceHandle HdRenderProductSchema::GetCameraPrim()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdRenderProductSchemaTokens->cameraPrim);
+  return _GetTypedDataSource<HdPathDataSource>(HdRenderProductSchemaTokens->cameraPrim);
 }
 
-HdFloatDataSourceHandle
-HdRenderProductSchema::GetPixelAspectRatio()
+HdFloatDataSourceHandle HdRenderProductSchema::GetPixelAspectRatio()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdRenderProductSchemaTokens->pixelAspectRatio);
+  return _GetTypedDataSource<HdFloatDataSource>(HdRenderProductSchemaTokens->pixelAspectRatio);
 }
 
-HdTokenDataSourceHandle
-HdRenderProductSchema::GetAspectRatioConformPolicy()
+HdTokenDataSourceHandle HdRenderProductSchema::GetAspectRatioConformPolicy()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdRenderProductSchemaTokens->aspectRatioConformPolicy);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdRenderProductSchemaTokens->aspectRatioConformPolicy);
 }
 
-HdVec2fDataSourceHandle
-HdRenderProductSchema::GetApertureSize()
+HdVec2fDataSourceHandle HdRenderProductSchema::GetApertureSize()
 {
-    return _GetTypedDataSource<HdVec2fDataSource>(
-        HdRenderProductSchemaTokens->apertureSize);
+  return _GetTypedDataSource<HdVec2fDataSource>(HdRenderProductSchemaTokens->apertureSize);
 }
 
-HdVec4fDataSourceHandle
-HdRenderProductSchema::GetDataWindowNDC()
+HdVec4fDataSourceHandle HdRenderProductSchema::GetDataWindowNDC()
 {
-    return _GetTypedDataSource<HdVec4fDataSource>(
-        HdRenderProductSchemaTokens->dataWindowNDC);
+  return _GetTypedDataSource<HdVec4fDataSource>(HdRenderProductSchemaTokens->dataWindowNDC);
 }
 
-HdBoolDataSourceHandle
-HdRenderProductSchema::GetDisableMotionBlur()
+HdBoolDataSourceHandle HdRenderProductSchema::GetDisableMotionBlur()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdRenderProductSchemaTokens->disableMotionBlur);
+  return _GetTypedDataSource<HdBoolDataSource>(HdRenderProductSchemaTokens->disableMotionBlur);
 }
 
-HdContainerDataSourceHandle
-HdRenderProductSchema::GetNamespacedSettings()
+HdContainerDataSourceHandle HdRenderProductSchema::GetNamespacedSettings()
 {
-    return _GetTypedDataSource<HdContainerDataSource>(
-        HdRenderProductSchemaTokens->namespacedSettings);
+  return _GetTypedDataSource<HdContainerDataSource>(
+      HdRenderProductSchemaTokens->namespacedSettings);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdRenderProductSchema::BuildRetained(
-        const HdPathDataSourceHandle &path,
-        const HdTokenDataSourceHandle &type,
-        const HdTokenDataSourceHandle &name,
-        const HdVec2iDataSourceHandle &resolution,
-        const HdVectorDataSourceHandle &renderVars,
-        const HdPathDataSourceHandle &cameraPrim,
-        const HdFloatDataSourceHandle &pixelAspectRatio,
-        const HdTokenDataSourceHandle &aspectRatioConformPolicy,
-        const HdVec2fDataSourceHandle &apertureSize,
-        const HdVec4fDataSourceHandle &dataWindowNDC,
-        const HdBoolDataSourceHandle &disableMotionBlur,
-        const HdContainerDataSourceHandle &namespacedSettings
-)
-{
-    TfToken names[12];
-    HdDataSourceBaseHandle values[12];
-
-    size_t count = 0;
-    if (path) {
-        names[count] = HdRenderProductSchemaTokens->path;
-        values[count++] = path;
-    }
-
-    if (type) {
-        names[count] = HdRenderProductSchemaTokens->type;
-        values[count++] = type;
-    }
-
-    if (name) {
-        names[count] = HdRenderProductSchemaTokens->name;
-        values[count++] = name;
-    }
-
-    if (resolution) {
-        names[count] = HdRenderProductSchemaTokens->resolution;
-        values[count++] = resolution;
-    }
-
-    if (renderVars) {
-        names[count] = HdRenderProductSchemaTokens->renderVars;
-        values[count++] = renderVars;
-    }
-
-    if (cameraPrim) {
-        names[count] = HdRenderProductSchemaTokens->cameraPrim;
-        values[count++] = cameraPrim;
-    }
-
-    if (pixelAspectRatio) {
-        names[count] = HdRenderProductSchemaTokens->pixelAspectRatio;
-        values[count++] = pixelAspectRatio;
-    }
-
-    if (aspectRatioConformPolicy) {
-        names[count] = HdRenderProductSchemaTokens->aspectRatioConformPolicy;
-        values[count++] = aspectRatioConformPolicy;
-    }
-
-    if (apertureSize) {
-        names[count] = HdRenderProductSchemaTokens->apertureSize;
-        values[count++] = apertureSize;
-    }
-
-    if (dataWindowNDC) {
-        names[count] = HdRenderProductSchemaTokens->dataWindowNDC;
-        values[count++] = dataWindowNDC;
-    }
-
-    if (disableMotionBlur) {
-        names[count] = HdRenderProductSchemaTokens->disableMotionBlur;
-        values[count++] = disableMotionBlur;
-    }
-
-    if (namespacedSettings) {
-        names[count] = HdRenderProductSchemaTokens->namespacedSettings;
-        values[count++] = namespacedSettings;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdRenderProductSchema
-HdRenderProductSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdRenderProductSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdRenderProductSchemaTokens->renderProduct))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdRenderProductSchema::GetSchemaToken()
-{
-    return HdRenderProductSchemaTokens->renderProduct;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdRenderProductSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdRenderProductSchemaTokens->renderProduct
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdRenderProductSchema::GetResolutionLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdRenderProductSchemaTokens->renderProduct,
-        HdRenderProductSchemaTokens->resolution
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdRenderProductSchema::GetRenderVarsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdRenderProductSchemaTokens->renderProduct,
-        HdRenderProductSchemaTokens->renderVars
-    );
-    return locator;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdRenderProductSchema::GetNamespacedSettingsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdRenderProductSchemaTokens->renderProduct,
-        HdRenderProductSchemaTokens->namespacedSettings
-    );
-    return locator;
-}
-
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetPath(
-    const HdPathDataSourceHandle &path)
-{
-    _path = path;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetType(
-    const HdTokenDataSourceHandle &type)
-{
-    _type = type;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetName(
-    const HdTokenDataSourceHandle &name)
-{
-    _name = name;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetResolution(
-    const HdVec2iDataSourceHandle &resolution)
-{
-    _resolution = resolution;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetRenderVars(
-    const HdVectorDataSourceHandle &renderVars)
-{
-    _renderVars = renderVars;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetCameraPrim(
-    const HdPathDataSourceHandle &cameraPrim)
-{
-    _cameraPrim = cameraPrim;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetPixelAspectRatio(
-    const HdFloatDataSourceHandle &pixelAspectRatio)
-{
-    _pixelAspectRatio = pixelAspectRatio;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetAspectRatioConformPolicy(
-    const HdTokenDataSourceHandle &aspectRatioConformPolicy)
-{
-    _aspectRatioConformPolicy = aspectRatioConformPolicy;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetApertureSize(
-    const HdVec2fDataSourceHandle &apertureSize)
-{
-    _apertureSize = apertureSize;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetDataWindowNDC(
-    const HdVec4fDataSourceHandle &dataWindowNDC)
-{
-    _dataWindowNDC = dataWindowNDC;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetDisableMotionBlur(
-    const HdBoolDataSourceHandle &disableMotionBlur)
-{
-    _disableMotionBlur = disableMotionBlur;
-    return *this;
-}
-
-HdRenderProductSchema::Builder &
-HdRenderProductSchema::Builder::SetNamespacedSettings(
+HdContainerDataSourceHandle HdRenderProductSchema::BuildRetained(
+    const HdPathDataSourceHandle &path,
+    const HdTokenDataSourceHandle &type,
+    const HdTokenDataSourceHandle &name,
+    const HdVec2iDataSourceHandle &resolution,
+    const HdVectorDataSourceHandle &renderVars,
+    const HdPathDataSourceHandle &cameraPrim,
+    const HdFloatDataSourceHandle &pixelAspectRatio,
+    const HdTokenDataSourceHandle &aspectRatioConformPolicy,
+    const HdVec2fDataSourceHandle &apertureSize,
+    const HdVec4fDataSourceHandle &dataWindowNDC,
+    const HdBoolDataSourceHandle &disableMotionBlur,
     const HdContainerDataSourceHandle &namespacedSettings)
 {
-    _namespacedSettings = namespacedSettings;
-    return *this;
+  TfToken names[12];
+  HdDataSourceBaseHandle values[12];
+
+  size_t count = 0;
+  if (path) {
+    names[count] = HdRenderProductSchemaTokens->path;
+    values[count++] = path;
+  }
+
+  if (type) {
+    names[count] = HdRenderProductSchemaTokens->type;
+    values[count++] = type;
+  }
+
+  if (name) {
+    names[count] = HdRenderProductSchemaTokens->name;
+    values[count++] = name;
+  }
+
+  if (resolution) {
+    names[count] = HdRenderProductSchemaTokens->resolution;
+    values[count++] = resolution;
+  }
+
+  if (renderVars) {
+    names[count] = HdRenderProductSchemaTokens->renderVars;
+    values[count++] = renderVars;
+  }
+
+  if (cameraPrim) {
+    names[count] = HdRenderProductSchemaTokens->cameraPrim;
+    values[count++] = cameraPrim;
+  }
+
+  if (pixelAspectRatio) {
+    names[count] = HdRenderProductSchemaTokens->pixelAspectRatio;
+    values[count++] = pixelAspectRatio;
+  }
+
+  if (aspectRatioConformPolicy) {
+    names[count] = HdRenderProductSchemaTokens->aspectRatioConformPolicy;
+    values[count++] = aspectRatioConformPolicy;
+  }
+
+  if (apertureSize) {
+    names[count] = HdRenderProductSchemaTokens->apertureSize;
+    values[count++] = apertureSize;
+  }
+
+  if (dataWindowNDC) {
+    names[count] = HdRenderProductSchemaTokens->dataWindowNDC;
+    values[count++] = dataWindowNDC;
+  }
+
+  if (disableMotionBlur) {
+    names[count] = HdRenderProductSchemaTokens->disableMotionBlur;
+    values[count++] = disableMotionBlur;
+  }
+
+  if (namespacedSettings) {
+    names[count] = HdRenderProductSchemaTokens->namespacedSettings;
+    values[count++] = namespacedSettings;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdRenderProductSchema::Builder::Build()
+/*static*/
+HdRenderProductSchema HdRenderProductSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdRenderProductSchema::BuildRetained(
-        _path,
-        _type,
-        _name,
-        _resolution,
-        _renderVars,
-        _cameraPrim,
-        _pixelAspectRatio,
-        _aspectRatioConformPolicy,
-        _apertureSize,
-        _dataWindowNDC,
-        _disableMotionBlur,
-        _namespacedSettings
-    );
+  return HdRenderProductSchema(fromParentContainer ?
+                                   HdContainerDataSource::Cast(fromParentContainer->Get(
+                                       HdRenderProductSchemaTokens->renderProduct)) :
+                                   nullptr);
 }
 
+/*static*/
+const TfToken &HdRenderProductSchema::GetSchemaToken()
+{
+  return HdRenderProductSchemaTokens->renderProduct;
+}
+/*static*/
+const HdDataSourceLocator &HdRenderProductSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdRenderProductSchemaTokens->renderProduct);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdRenderProductSchema::GetResolutionLocator()
+{
+  static const HdDataSourceLocator locator(HdRenderProductSchemaTokens->renderProduct,
+                                           HdRenderProductSchemaTokens->resolution);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdRenderProductSchema::GetRenderVarsLocator()
+{
+  static const HdDataSourceLocator locator(HdRenderProductSchemaTokens->renderProduct,
+                                           HdRenderProductSchemaTokens->renderVars);
+  return locator;
+}
+
+/*static*/
+const HdDataSourceLocator &HdRenderProductSchema::GetNamespacedSettingsLocator()
+{
+  static const HdDataSourceLocator locator(HdRenderProductSchemaTokens->renderProduct,
+                                           HdRenderProductSchemaTokens->namespacedSettings);
+  return locator;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetPath(
+    const HdPathDataSourceHandle &path)
+{
+  _path = path;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetType(
+    const HdTokenDataSourceHandle &type)
+{
+  _type = type;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetName(
+    const HdTokenDataSourceHandle &name)
+{
+  _name = name;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetResolution(
+    const HdVec2iDataSourceHandle &resolution)
+{
+  _resolution = resolution;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetRenderVars(
+    const HdVectorDataSourceHandle &renderVars)
+{
+  _renderVars = renderVars;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetCameraPrim(
+    const HdPathDataSourceHandle &cameraPrim)
+{
+  _cameraPrim = cameraPrim;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetPixelAspectRatio(
+    const HdFloatDataSourceHandle &pixelAspectRatio)
+{
+  _pixelAspectRatio = pixelAspectRatio;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetAspectRatioConformPolicy(
+    const HdTokenDataSourceHandle &aspectRatioConformPolicy)
+{
+  _aspectRatioConformPolicy = aspectRatioConformPolicy;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetApertureSize(
+    const HdVec2fDataSourceHandle &apertureSize)
+{
+  _apertureSize = apertureSize;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetDataWindowNDC(
+    const HdVec4fDataSourceHandle &dataWindowNDC)
+{
+  _dataWindowNDC = dataWindowNDC;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetDisableMotionBlur(
+    const HdBoolDataSourceHandle &disableMotionBlur)
+{
+  _disableMotionBlur = disableMotionBlur;
+  return *this;
+}
+
+HdRenderProductSchema::Builder &HdRenderProductSchema::Builder::SetNamespacedSettings(
+    const HdContainerDataSourceHandle &namespacedSettings)
+{
+  _namespacedSettings = namespacedSettings;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdRenderProductSchema::Builder::Build()
+{
+  return HdRenderProductSchema::BuildRetained(_path,
+                                              _type,
+                                              _name,
+                                              _resolution,
+                                              _renderVars,
+                                              _cameraPrim,
+                                              _pixelAspectRatio,
+                                              _aspectRatioConformPolicy,
+                                              _apertureSize,
+                                              _dataWindowNDC,
+                                              _disableMotionBlur,
+                                              _namespacedSettings);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

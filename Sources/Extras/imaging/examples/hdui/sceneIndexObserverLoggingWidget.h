@@ -26,25 +26,24 @@
 
 #include <pxr/pxrns.h>
 
-#include <QPushButton>
 #include <QLabel>
+#include <QPushButton>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HduiSceneIndexObserverLoggingTreeView;
 
-class HduiSceneIndexObserverLoggingWidget : public QWidget
-{
+class HduiSceneIndexObserverLoggingWidget : public QWidget {
   Q_OBJECT;
 
-public:
+ public:
   HduiSceneIndexObserverLoggingWidget(QWidget *parent = Q_NULLPTR);
 
   HduiSceneIndexObserverLoggingTreeView *GetTreeView();
 
   void SetLabel(const std::string &labelText);
 
-private:
+ private:
   QPushButton *_startStopButton;
   QPushButton *_clearButton;
   HduiSceneIndexObserverLoggingTreeView *_treeView;
@@ -54,4 +53,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H
+#endif  // PXR_IMAGING_HDUI_SCENE_INDEX_OBSERVER_LOGGING_WIDGET_H

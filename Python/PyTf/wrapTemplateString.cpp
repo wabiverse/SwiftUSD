@@ -44,14 +44,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string __repr__(TfTemplateString const &self) {
+static string __repr__(TfTemplateString const &self)
+{
   return TF_PY_REPR_PREFIX + "TemplateString(" +
-         (self.GetTemplate().empty() ? string()
-                                     : TfPyRepr(self.GetTemplate())) +
-         ")";
+         (self.GetTemplate().empty() ? string() : TfPyRepr(self.GetTemplate())) + ")";
 }
 
-static string _Substitute(TfTemplateString const &self, dict const &d) {
+static string _Substitute(TfTemplateString const &self, dict const &d)
+{
   TfTemplateString::Mapping m;
   list items = d.items();
   for (int i = 0; i < len(items); ++i)
@@ -59,7 +59,8 @@ static string _Substitute(TfTemplateString const &self, dict const &d) {
   return self.Substitute(m);
 }
 
-static string _SafeSubstitute(TfTemplateString const &self, dict const &d) {
+static string _SafeSubstitute(TfTemplateString const &self, dict const &d)
+{
   TfTemplateString::Mapping m;
   list items = d.items();
   for (int i = 0; i < len(items); ++i)
@@ -67,22 +68,20 @@ static string _SafeSubstitute(TfTemplateString const &self, dict const &d) {
   return self.SafeSubstitute(m);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapTemplateString() {
+void wrapTemplateString()
+{
   typedef TfTemplateString This;
 
   class_<This>("TemplateString")
       .def(init<string>())
       .def("__repr__", __repr__)
       .add_property("template",
-                    make_function(&This::GetTemplate,
-                                  return_value_policy<return_by_value>()))
+                    make_function(&This::GetTemplate, return_value_policy<return_by_value>()))
       .def("Substitute", _Substitute)
       .def("SafeSubstitute", _SafeSubstitute)
-      .def("GetEmptyMapping", &This::GetEmptyMapping,
-           return_value_policy<TfPyMapToDictionary>())
-      .def("GetParseErrors", &This::GetParseErrors,
-           return_value_policy<TfPySequenceToList>())
+      .def("GetEmptyMapping", &This::GetEmptyMapping, return_value_policy<TfPyMapToDictionary>())
+      .def("GetParseErrors", &This::GetParseErrors, return_value_policy<TfPySequenceToList>())
       .add_property("valid", &This::IsValid);
 }

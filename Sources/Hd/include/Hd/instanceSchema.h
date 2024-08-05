@@ -33,20 +33,15 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDINSTANCE_SCHEMA_TOKENS \
-    (instance) \
-    (instancer) \
-    (prototypeIndex) \
-    (instanceIndex) \
+#define HDINSTANCE_SCHEMA_TOKENS (instance)(instancer)(prototypeIndex)(instanceIndex)
 
-TF_DECLARE_PUBLIC_TOKENS(HdInstanceSchemaTokens, HD_API,
-    HDINSTANCE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdInstanceSchemaTokens, HD_API, HDINSTANCE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
@@ -59,100 +54,87 @@ TF_DECLARE_PUBLIC_TOKENS(HdInstanceSchemaTokens, HD_API,
 // The instance prims aren't directly useful for rendering but can be useful
 // for scene processing and data aggregation.
 
+class HdInstanceSchema : public HdSchema {
+ public:
+  HdInstanceSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-class HdInstanceSchema : public HdSchema
-{
-public:
-    HdInstanceSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+  // ACCESSORS
 
-    //ACCESSORS
+  // Path to instancer for which a (sub-)entry was added to its
+  // instancerTopology's instanceIndices during instance aggregation to
+  // account for this instance. Note that instanceIndices is nested, that
+  // is a vector data source containing integer arrays, one for each
+  // prototype the instancer is instancing. Thus, we need two indices to
+  // identify the entry: prototypeIndex is the outer index and
+  // instanceIndex the inner index.
+  HD_API
+  HdPathDataSourceHandle GetInstancer();
 
+  // Index into vector data source at instancer's instancerTopology's
+  // instanceIndices to find entry corresponding to this instance.
+  HD_API
+  HdIntDataSourceHandle GetPrototypeIndex();
 
-    // Path to instancer for which a (sub-)entry was added to its
-    // instancerTopology's instanceIndices during instance aggregation to
-    // account for this instance. Note that instanceIndices is nested, that
-    // is a vector data source containing integer arrays, one for each
-    // prototype the instancer is instancing. Thus, we need two indices to
-    // identify the entry: prototypeIndex is the outer index and
-    // instanceIndex the inner index.
+  // Index into int array within the vector data source at instancer's
+  // instancerTopology's instanceIndices to find entry corresponding to
+  // this instance.
+  HD_API
+  HdIntDataSourceHandle GetInstanceIndex();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdPathDataSourceHandle &instancer,
+                                                   const HdIntDataSourceHandle &prototypeIndex,
+                                                   const HdIntDataSourceHandle &instanceIndex);
+
+  /// \class HdInstanceSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetInstancer();
-
-    // Index into vector data source at instancer's instancerTopology's
-    // instanceIndices to find entry corresponding to this instance.
+    Builder &SetInstancer(const HdPathDataSourceHandle &instancer);
     HD_API
-    HdIntDataSourceHandle GetPrototypeIndex();
-
-    // Index into int array within the vector data source at instancer's
-    // instancerTopology's instanceIndices to find entry corresponding to
-    // this instance.
+    Builder &SetPrototypeIndex(const HdIntDataSourceHandle &prototypeIndex);
     HD_API
-    HdIntDataSourceHandle GetInstanceIndex();
+    Builder &SetInstanceIndex(const HdIntDataSourceHandle &instanceIndex);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &instancer,
-        const HdIntDataSourceHandle &prototypeIndex,
-        const HdIntDataSourceHandle &instanceIndex
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdInstanceSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetInstancer(
-            const HdPathDataSourceHandle &instancer);
-        HD_API
-        Builder &SetPrototypeIndex(
-            const HdIntDataSourceHandle &prototypeIndex);
-        HD_API
-        Builder &SetInstanceIndex(
-            const HdIntDataSourceHandle &instanceIndex);
+   private:
+    HdPathDataSourceHandle _instancer;
+    HdIntDataSourceHandle _prototypeIndex;
+    HdIntDataSourceHandle _instanceIndex;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "instance" from the parent container and constructs a
+  /// HdInstanceSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdInstanceSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdPathDataSourceHandle _instancer;
-        HdIntDataSourceHandle _prototypeIndex;
-        HdIntDataSourceHandle _instanceIndex;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "instance" from the parent container and constructs a
-    /// HdInstanceSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdInstanceSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

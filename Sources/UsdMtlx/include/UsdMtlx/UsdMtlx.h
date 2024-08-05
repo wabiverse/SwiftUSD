@@ -9,4 +9,4 @@
 #include <UsdMtlx/reader.h>
 #include <UsdMtlx/utils.h>
 
-#endif // __PXR_USD_USDMTLX_H__
+#endif  // __PXR_USD_USDMTLX_H__

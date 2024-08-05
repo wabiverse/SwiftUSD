@@ -31,7 +31,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HGIMETAL_ENABLE_INDIRECT_COMMAND_BUFFER, true,
+TF_DEFINE_ENV_SETTING(HGIMETAL_ENABLE_INDIRECT_COMMAND_BUFFER,
+                      true,
                       "Enable indirect command buffers");
 
 HgiMetalCapabilities::HgiMetalCapabilities(MTL::Device *device)
@@ -47,8 +48,10 @@ HgiMetalCapabilities::HgiMetalCapabilities(MTL::Device *device)
   bool icbSupported = false;
 #if defined(ARCH_OS_IOS) && (__IPHONE_OS_VERSION_MAX_ALLOWED <= 120000)
   unifiedMemory = true;
-#elif defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
-    defined(ARCH_OS_IOS) && (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
+#elif defined(ARCH_OS_OSX) && \
+        (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
+    defined(ARCH_OS_IOS) && \
+        (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
   unifiedMemory = device->hasUnifiedMemory();
 #else
   unifiedMemory = device->lowPower();
@@ -56,26 +59,26 @@ HgiMetalCapabilities::HgiMetalCapabilities(MTL::Device *device)
   // On macOS 10.15 and 11.0 the AMD drivers reported the wrong value for
   // supportsShaderBarycentricCoordinates so check both flags.
   // Also, Intel GPU drivers do not correctly support barycentrics.
-  barycentrics = (device->supportsShaderBarycentricCoordinates() || device->barycentricCoordsSupported()) && !hasIntelGPU;
+  barycentrics = (device->supportsShaderBarycentricCoordinates() ||
+                  device->barycentricCoordsSupported()) &&
+                 !hasIntelGPU;
   hasAppleSilicon = device->hasUnifiedMemory() && !device->lowPower();
 
-  if (hasAppleSilicon)
-  {
+  if (hasAppleSilicon) {
     // Indirect command buffers supported only on
     // Apple Silicon GPUs with macOS 12.3 or later.
     icbSupported = false;
 #if defined(ARCH_OS_OSX) && (defined(__MAC_12_3) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_12_3)
     icbSupported = true;
-#endif /* defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) */
+#endif /* defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= \
+          __MAC_10_15) */
   }
-  else if (hasIntelGPU)
-  {
+  else if (hasIntelGPU) {
     // Indirect command buffers not currently supported on Intel GPUs.
     icbSupported = false;
   }
 
-  if (!TfGetEnvSetting(HGIMETAL_ENABLE_INDIRECT_COMMAND_BUFFER))
-  {
+  if (!TfGetEnvSetting(HGIMETAL_ENABLE_INDIRECT_COMMAND_BUFFER)) {
     icbSupported = false;
   }
 
@@ -104,17 +107,14 @@ HgiMetalCapabilities::HgiMetalCapabilities(MTL::Device *device)
   // bool isMacOs13OrLess = NSProcessInfo.processInfo.operatingSystemVersion.majorVersion <= 13
   // bool requireBasePrimitiveOffset = hasAppleSilicon && isMacOs13OrLess;
   bool requiresBasePrimitiveOffset = hasAppleSilicon || hasIntelGPU;
-  _SetFlag(HgiDeviceCapabilitiesBitsBasePrimitiveOffset,
-           requiresBasePrimitiveOffset);
+  _SetFlag(HgiDeviceCapabilitiesBitsBasePrimitiveOffset, requiresBasePrimitiveOffset);
 
   // Intel GPU drivers do not correctly support primitive_id.
-  if (hasIntelGPU)
-  {
+  if (hasIntelGPU) {
     _SetFlag(HgiDeviceCapabilitiesBitsPrimitiveIdEmulation, true);
   }
 
-  if (!unifiedMemory)
-  {
+  if (!unifiedMemory) {
     defaultStorageMode = MTL::ResourceStorageModeManaged;
   }
 
@@ -129,13 +129,15 @@ HgiMetalCapabilities::HgiMetalCapabilities(MTL::Device *device)
   hasVertexMemoryBarrier = !hasAppleSilicon;
 #if defined(ARCH_OS_OSX) && (defined(__MAC_12_3) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_12_3)
   hasVertexMemoryBarrier = true;
-#endif /* defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) */
+#endif /* defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= \
+          __MAC_10_15) */
 
   // Vega GPUs require a fix to the indirect draw before macOS 12.2
   requiresIndirectDrawFix = false;
 #if defined(ARCH_OS_OSX) && (__MAC_OS_X_VERSION_MAX_ALLOWED <= 120200)
-  if (device->name()->rangeOfString(NS::String::string("Vega", NS::UTF8StringEncoding),
-                                    NS::CaseInsensitiveSearch)
+  if (device->name()
+          ->rangeOfString(NS::String::string("Vega", NS::UTF8StringEncoding),
+                          NS::CaseInsensitiveSearch)
           .location != NS::NotFound)
   {
     requiresIndirectDrawFix = true;
@@ -149,8 +151,10 @@ HgiMetalCapabilities::~HgiMetalCapabilities() = default;
 
 int HgiMetalCapabilities::GetAPIVersion() const
 {
-#if defined(ARCH_OS_OSX) && (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
-    defined(ARCH_OS_IOS) && (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
+#if defined(ARCH_OS_OSX) && \
+        (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
+    defined(ARCH_OS_IOS) && \
+        (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
   return APIVersion_Metal3_0;
 #elif defined(ARCH_OS_OSX) && (__MAC_OS_X_VERSION_MAX_ALLOWED >= 101300) || \
     defined(ARCH_OS_IOS) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= 110000)

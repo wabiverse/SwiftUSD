@@ -30,7 +30,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(PcpArcTypeRoot, "root");
   TF_ADD_ENUM_NAME(PcpArcTypeInherit, "inherit");
   TF_ADD_ENUM_NAME(PcpArcTypeRelocate, "relocate");

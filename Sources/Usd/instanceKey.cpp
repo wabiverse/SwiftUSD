@@ -33,52 +33,56 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 Usd_InstanceKey::Usd_InstanceKey() : _hash(_ComputeHash()) {}
 
-static UsdStagePopulationMask
-_MakeMaskRelativeTo(SdfPath const &path, UsdStagePopulationMask const &mask) {
+static UsdStagePopulationMask _MakeMaskRelativeTo(SdfPath const &path,
+                                                  UsdStagePopulationMask const &mask)
+{
   SdfPath const &absRoot = SdfPath::AbsoluteRootPath();
   std::vector<SdfPath> maskPaths = mask.GetPaths();
   for (SdfPath &maskPath : maskPaths) {
     if (maskPath.HasPrefix(path)) {
       maskPath = maskPath.ReplacePrefix(path, absRoot);
-    } else {
+    }
+    else {
       maskPath = SdfPath();
     }
   }
   // Remove the empty paths to the end, and construct a mask with the
   // translated paths.
-  return UsdStagePopulationMask(
-      maskPaths.begin(),
-      std::remove(maskPaths.begin(), maskPaths.end(), SdfPath()));
+  return UsdStagePopulationMask(maskPaths.begin(),
+                                std::remove(maskPaths.begin(), maskPaths.end(), SdfPath()));
 }
 
-static UsdStageLoadRules
-_MakeLoadRulesRelativeTo(SdfPath const &path, UsdStageLoadRules const &rules) {
+static UsdStageLoadRules _MakeLoadRulesRelativeTo(SdfPath const &path,
+                                                  UsdStageLoadRules const &rules)
+{
   UsdStageLoadRules::Rule rootRule = rules.GetEffectiveRuleForPath(path);
-  std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>> elems =
-      rules.GetRules();
+  std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>> elems = rules.GetRules();
 
   SdfPath const &absRoot = SdfPath::AbsoluteRootPath();
   for (auto &p : elems) {
     if (p.first == path) {
       p.first = absRoot;
       p.second = rootRule;
-    } else if (p.first.HasPrefix(path)) {
+    }
+    else if (p.first.HasPrefix(path)) {
       p.first = p.first.ReplacePrefix(path, absRoot);
-    } else {
+    }
+    else {
       p.first = SdfPath();
     }
   }
-  elems.erase(std::remove_if(
-                  elems.begin(), elems.end(),
-                  [](std::pair<SdfPath, UsdStageLoadRules::Rule> const &rule) {
-                    return rule.first.IsEmpty();
-                  }),
+  elems.erase(std::remove_if(elems.begin(),
+                             elems.end(),
+                             [](std::pair<SdfPath, UsdStageLoadRules::Rule> const &rule) {
+                               return rule.first.IsEmpty();
+                             }),
               elems.end());
 
   // Ensure the first element is the root rule.
   if (elems.empty() || elems.front().first != absRoot) {
     elems.emplace(elems.begin(), absRoot, rootRule);
-  } else {
+  }
+  else {
     elems.front().second = rootRule;
   }
 
@@ -91,7 +95,8 @@ _MakeLoadRulesRelativeTo(SdfPath const &path, UsdStageLoadRules const &rules) {
 Usd_InstanceKey::Usd_InstanceKey(const PcpPrimIndex &instance,
                                  const UsdStagePopulationMask *mask,
                                  const UsdStageLoadRules &loadRules)
-    : _pcpInstanceKey(instance) {
+    : _pcpInstanceKey(instance)
+{
   Usd_ComputeClipSetDefinitionsForPrimIndex(instance, &_clipDefs);
 
   // Make the population mask "relative" to this prim index by removing the
@@ -103,7 +108,8 @@ Usd_InstanceKey::Usd_InstanceKey(const PcpPrimIndex &instance,
   // with.
   if (!mask) {
     _mask = UsdStagePopulationMask::All();
-  } else {
+  }
+  else {
     _mask = _MakeMaskRelativeTo(instance.GetPath(), *mask);
   }
 
@@ -114,17 +120,19 @@ Usd_InstanceKey::Usd_InstanceKey(const PcpPrimIndex &instance,
   _hash = _ComputeHash();
 }
 
-bool Usd_InstanceKey::operator==(const Usd_InstanceKey &rhs) const {
+bool Usd_InstanceKey::operator==(const Usd_InstanceKey &rhs) const
+{
   return _hash == rhs._hash && _pcpInstanceKey == rhs._pcpInstanceKey &&
-         _clipDefs == rhs._clipDefs && _mask == rhs._mask &&
-         _loadRules == rhs._loadRules;
+         _clipDefs == rhs._clipDefs && _mask == rhs._mask && _loadRules == rhs._loadRules;
 }
 
-size_t Usd_InstanceKey::_ComputeHash() const {
+size_t Usd_InstanceKey::_ComputeHash() const
+{
   return TfHash::Combine(_pcpInstanceKey, _clipDefs, _mask, _loadRules);
 }
 
-std::ostream &operator<<(std::ostream &os, const Usd_InstanceKey &key) {
+std::ostream &operator<<(std::ostream &os, const Usd_InstanceKey &key)
+{
   os << "_pcpInstanceKey:\n"
      << key._pcpInstanceKey.GetString() << '\n'
      << "_mask: " << key._mask << '\n'

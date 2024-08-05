@@ -26,12 +26,12 @@
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,63 +41,58 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateMassAttr(UsdSchemaExamplesParamsAPI &self,
+                                    object defaultVal,
+                                    bool writeSparsely)
 {
+  return self.CreateMassAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double),
+                             writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateVelocityAttr(UsdSchemaExamplesParamsAPI &self,
+                                        object defaultVal,
+                                        bool writeSparsely)
+{
+  return self.CreateVelocityAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double),
+                                 writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateVolumeAttr(UsdSchemaExamplesParamsAPI &self,
+                                      object defaultVal,
+                                      bool writeSparsely)
+{
+  return self.CreateVolumeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double),
+                               writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateMassAttr(UsdSchemaExamplesParamsAPI &self,
-                  object defaultVal, bool writeSparsely)
+static std::string _Repr(const UsdSchemaExamplesParamsAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSchemaExamples.ParamsAPI(%s)", primRepr.c_str());
+}
+
+struct UsdSchemaExamplesParamsAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdSchemaExamplesParamsAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    return self.CreateMassAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double), writeSparsely);
   }
+};
 
-  static UsdAttribute
-  _CreateVelocityAttr(UsdSchemaExamplesParamsAPI &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateVelocityAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double), writeSparsely);
-  }
+static UsdSchemaExamplesParamsAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdSchemaExamplesParamsAPI::CanApply(prim, &whyNot);
+  return UsdSchemaExamplesParamsAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdAttribute
-  _CreateVolumeAttr(UsdSchemaExamplesParamsAPI &self,
-                    object defaultVal, bool writeSparsely)
-  {
-    return self.CreateVolumeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Double), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdSchemaExamplesParamsAPI &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSchemaExamples.ParamsAPI(%s)",
-        primRepr.c_str());
-  }
-
-  struct UsdSchemaExamplesParamsAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdSchemaExamplesParamsAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
-
-  static UsdSchemaExamplesParamsAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdSchemaExamplesParamsAPI::CanApply(prim, &whyNot);
-    return UsdSchemaExamplesParamsAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSchemaExamplesParamsAPI()
 {
@@ -106,11 +101,9 @@ void wrapUsdSchemaExamplesParamsAPI()
   UsdSchemaExamplesParamsAPI_CanApplyResult::Wrap<UsdSchemaExamplesParamsAPI_CanApplyResult>(
       "_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("ParamsAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("ParamsAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -129,32 +122,27 @@ void wrapUsdSchemaExamplesParamsAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetMassAttr",
-           &This::GetMassAttr)
+      .def("GetMassAttr", &This::GetMassAttr)
       .def("CreateMassAttr",
            &_CreateMassAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetVelocityAttr",
-           &This::GetVelocityAttr)
+      .def("GetVelocityAttr", &This::GetVelocityAttr)
       .def("CreateVelocityAttr",
            &_CreateVelocityAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetVolumeAttr",
-           &This::GetVolumeAttr)
+      .def("GetVolumeAttr", &This::GetVolumeAttr)
       .def("CreateVolumeAttr",
            &_CreateVolumeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -180,11 +168,8 @@ void wrapUsdSchemaExamplesParamsAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-} // anonymous namespace
+}  // anonymous namespace

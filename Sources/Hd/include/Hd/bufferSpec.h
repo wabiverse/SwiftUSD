@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_BUFFER_SPEC_H
 #define PXR_IMAGING_HD_BUFFER_SPEC_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/types.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/stl.h"
 #include "Tf/token.h"
@@ -35,7 +35,6 @@
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 typedef std::vector<struct HdBufferSpec> HdBufferSpecVector;
 
@@ -53,81 +52,80 @@ typedef std::vector<struct HdBufferSpec> HdBufferSpecVector;
 ///    2: name = colors,  tupleType = {HdTypeFloatVec3, 1}
 ///
 struct HdBufferSpec final {
-    /// Constructor.
-    HdBufferSpec(TfToken const &name, HdTupleType tupleType) :
-        name(name), tupleType(tupleType) {}
+  /// Constructor.
+  HdBufferSpec(TfToken const &name, HdTupleType tupleType) : name(name), tupleType(tupleType) {}
 
-    /// Util function for adding buffer specs of sources into bufferspecs.
-    template<typename T>
-    static void GetBufferSpecs(T const &sources,
-                               HdBufferSpecVector *bufferSpecs) {
-        for (auto const &src : sources) {
-            if (src->IsValid()) {
-                src->GetBufferSpecs(bufferSpecs);
-            }
-        }
+  /// Util function for adding buffer specs of sources into bufferspecs.
+  template<typename T>
+  static void GetBufferSpecs(T const &sources, HdBufferSpecVector *bufferSpecs)
+  {
+    for (auto const &src : sources) {
+      if (src->IsValid()) {
+        src->GetBufferSpecs(bufferSpecs);
+      }
     }
+  }
 
-    /// Returns true if \p subset is a subset of \p superset.
-    /// An empty set is considered a valid subset of the superset.
-    HD_API
-    static bool IsSubset(HdBufferSpecVector const &subset,
-                         HdBufferSpecVector const &superset);
+  /// Returns true if \p subset is a subset of \p superset.
+  /// An empty set is considered a valid subset of the superset.
+  HD_API
+  static bool IsSubset(HdBufferSpecVector const &subset, HdBufferSpecVector const &superset);
 
-    /// Returns union set of \p spec1 and \p spec2. Duplicated entries are
-    /// uniquified. The order of items in spec1 and spec2 are preserved relative
-    /// to themselves respectively in the result, with items in spec1 appearing
-    /// first.
-    HD_API
-    static HdBufferSpecVector ComputeUnion(HdBufferSpecVector const &spec1,
-                                           HdBufferSpecVector const &spec2);
-    
-    /// Returns difference set of \p spec1 and \p spec2, i.e., entries in spec1
-    /// that are not in spec2.  Duplicated entries are uniquified. The order of
-    /// items in spec1 is preserved.  
-    HD_API
-    static HdBufferSpecVector ComputeDifference(HdBufferSpecVector const &spec1,
-                                           HdBufferSpecVector const &spec2);
+  /// Returns union set of \p spec1 and \p spec2. Duplicated entries are
+  /// uniquified. The order of items in spec1 and spec2 are preserved relative
+  /// to themselves respectively in the result, with items in spec1 appearing
+  /// first.
+  HD_API
+  static HdBufferSpecVector ComputeUnion(HdBufferSpecVector const &spec1,
+                                         HdBufferSpecVector const &spec2);
 
-    /// Debug output.
-    HD_API
-    static void Dump(HdBufferSpecVector const &specs);
+  /// Returns difference set of \p spec1 and \p spec2, i.e., entries in spec1
+  /// that are not in spec2.  Duplicated entries are uniquified. The order of
+  /// items in spec1 is preserved.
+  HD_API
+  static HdBufferSpecVector ComputeDifference(HdBufferSpecVector const &spec1,
+                                              HdBufferSpecVector const &spec2);
 
-    /// Return a size_t hash for this spec.
-    HD_API
-    size_t Hash() const;
+  /// Debug output.
+  HD_API
+  static void Dump(HdBufferSpecVector const &specs);
 
-    /// Functor to use for unordered sets, maps.
-    struct HashFunctor {
-        size_t operator()(HdBufferSpec const& spec) const {
-            return spec.Hash();
-        }
-    };
+  /// Return a size_t hash for this spec.
+  HD_API
+  size_t Hash() const;
 
-    /// Equality checks.
-    bool operator == (HdBufferSpec const &other) const {
-        return name == other.name && tupleType == other.tupleType;
+  /// Functor to use for unordered sets, maps.
+  struct HashFunctor {
+    size_t operator()(HdBufferSpec const &spec) const
+    {
+      return spec.Hash();
     }
-    bool operator != (HdBufferSpec const &other) const {
-        return !(*this == other);
-    }
+  };
 
-    /// Ordering.
-    bool operator < (HdBufferSpec const &other) const {
-        return name < other.name || (name == other.name &&
-            tupleType < other.tupleType);
-    }
+  /// Equality checks.
+  bool operator==(HdBufferSpec const &other) const
+  {
+    return name == other.name && tupleType == other.tupleType;
+  }
+  bool operator!=(HdBufferSpec const &other) const
+  {
+    return !(*this == other);
+  }
 
-    TfToken name;
-    HdTupleType tupleType;
+  /// Ordering.
+  bool operator<(HdBufferSpec const &other) const
+  {
+    return name < other.name || (name == other.name && tupleType < other.tupleType);
+  }
+
+  TfToken name;
+  HdTupleType tupleType;
 };
 
 // Support TfHash.
-template <class HashState>
-void
-TfHashAppend(HashState &h, HdBufferSpec const &bs)
+template<class HashState> void TfHashAppend(HashState &h, HdBufferSpec const &bs)
 {
-    h.Append(bs.name, bs.tupleType);
+  h.Append(bs.name, bs.tupleType);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

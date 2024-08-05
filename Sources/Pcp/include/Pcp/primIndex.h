@@ -78,7 +78,7 @@ class SdfPath;
 /// ordering the results.
 ///
 class PcpPrimIndex {
-public:
+ public:
   /// Default construct an empty, invalid prim index.
   PCP_API
   PcpPrimIndex();
@@ -91,7 +91,8 @@ public:
   PcpPrimIndex(PcpPrimIndex &&rhs) noexcept = default;
 
   /// Assignment.
-  PcpPrimIndex &operator=(const PcpPrimIndex &rhs) {
+  PcpPrimIndex &operator=(const PcpPrimIndex &rhs)
+  {
     PcpPrimIndex(rhs).Swap(*this);
     return *this;
   }
@@ -104,15 +105,27 @@ public:
   void Swap(PcpPrimIndex &rhs);
 
   /// Same as Swap(), but standard name.
-  inline void swap(PcpPrimIndex &rhs) { Swap(rhs); }
+  inline void swap(PcpPrimIndex &rhs)
+  {
+    Swap(rhs);
+  }
 
   /// Return true if this index is valid.
   /// A default-constructed index is invalid.
-  bool IsValid() const { return bool(_graph); }
+  bool IsValid() const
+  {
+    return bool(_graph);
+  }
 
-  void SetGraph(const PcpPrimIndex_GraphRefPtr &graph) { _graph = graph; }
+  void SetGraph(const PcpPrimIndex_GraphRefPtr &graph)
+  {
+    _graph = graph;
+  }
 
-  const PcpPrimIndex_GraphRefPtr &GetGraph() const { return _graph; }
+  const PcpPrimIndex_GraphRefPtr &GetGraph() const
+  {
+    return _graph;
+  }
 
   /// Returns the root node of the prim index graph.
   PCP_API
@@ -190,8 +203,7 @@ public:
   /// and \p path into this prim index. If no such node exists, returns an
   /// invalid PcpNodeRef.
   PCP_API
-  PcpNodeRef GetNodeProvidingSpec(const SdfLayerHandle &layer,
-                                  const SdfPath &path) const;
+  PcpNodeRef GetNodeProvidingSpec(const SdfLayerHandle &layer, const SdfPath &path) const;
 
   /// @}
 
@@ -199,7 +211,8 @@ public:
   /// @{
 
   /// Return the list of errors local to this prim.
-  PcpErrorVector GetLocalErrors() const {
+  PcpErrorVector GetLocalErrors() const
+  {
     return _localErrors ? *_localErrors.get() : PcpErrorVector();
   }
 
@@ -214,8 +227,7 @@ public:
   /// If \p includeMaps is \c true, output for each node will include the
   /// mappings to the parent and root node.
   PCP_API
-  std::string DumpToString(bool includeInheritOriginInfo = true,
-                           bool includeMaps = true) const;
+  std::string DumpToString(bool includeInheritOriginInfo = true, bool includeMaps = true) const;
 
   /// Dump the prim index in dot format to the file named \p filename.
   /// See Dump(...) for information regarding arguments.
@@ -232,8 +244,7 @@ public:
   /// Compute the prim child names for the given path. \p errors will
   /// contain any errors encountered while performing this operation.
   PCP_API
-  void ComputePrimChildNames(TfTokenVector *nameOrder,
-                             PcpTokenSet *prohibitedNameSet) const;
+  void ComputePrimChildNames(TfTokenVector *nameOrder, PcpTokenSet *prohibitedNameSet) const;
 
   /// Compute the prim property names for the given path. \p errors will
   /// contain any errors encountered while performing this operation.  The
@@ -256,12 +267,11 @@ public:
   /// This can be different from the authored variant selection;
   /// for example, if the authored selection is invalid.
   PCP_API
-  std::string
-  GetSelectionAppliedForVariantSet(const std::string &variantSet) const;
+  std::string GetSelectionAppliedForVariantSet(const std::string &variantSet) const;
 
   /// @}
 
-private:
+ private:
   friend class PcpPrimIterator;
   friend struct Pcp_PrimIndexer;
   friend void Pcp_RescanForSpecs(PcpPrimIndex *, bool usd, bool updateHasSpecs);
@@ -279,14 +289,17 @@ private:
 };
 
 /// Free function version for generic code and ADL.
-inline void swap(PcpPrimIndex &l, PcpPrimIndex &r) { l.swap(r); }
+inline void swap(PcpPrimIndex &l, PcpPrimIndex &r)
+{
+  l.swap(r);
+}
 
 /// \class PcpPrimIndexOutputs
 ///
 /// Outputs of the prim indexing procedure.
 ///
 class PcpPrimIndexOutputs {
-public:
+ public:
   /// Enumerator whose enumerants describe the payload state of this prim
   /// index.  NoPayload if the index has no payload arcs, otherwise whether
   /// payloads were included or excluded, and if done so by consulting either
@@ -330,7 +343,8 @@ public:
   /// Returns the node in this object's prim index corresponding to the root
   /// node of \p childOutputs' prim index.
   PcpNodeRef Append(PcpPrimIndexOutputs &&childOutputs,
-                    const PcpArc &arcToParent, PcpErrorBasePtr *error);
+                    const PcpArc &arcToParent,
+                    PcpErrorBasePtr *error);
 };
 
 /// \class PcpPrimIndexInputs
@@ -338,11 +352,17 @@ public:
 /// Inputs for the prim indexing procedure.
 ///
 class PcpPrimIndexInputs {
-public:
+ public:
   PcpPrimIndexInputs()
-      : cache(nullptr), variantFallbacks(nullptr), includedPayloads(nullptr),
-        includedPayloadsMutex(nullptr), parentIndex(nullptr), cull(true),
-        usd(false) {}
+      : cache(nullptr),
+        variantFallbacks(nullptr),
+        includedPayloads(nullptr),
+        includedPayloadsMutex(nullptr),
+        parentIndex(nullptr),
+        cull(true),
+        usd(false)
+  {
+  }
 
   /// Returns true if prim index computations using this parameters object
   /// would be equivalent to computations using \p params.
@@ -350,14 +370,16 @@ public:
 
   /// If supplied, the given PcpCache will be used where possible to compute
   /// needed intermediate results.
-  PcpPrimIndexInputs &Cache(PcpCache *cache_) {
+  PcpPrimIndexInputs &Cache(PcpCache *cache_)
+  {
     cache = cache_;
     return *this;
   }
 
   /// Ordered list of variant names to use for the "standin" variant set
   /// if there is no authored opinion in scene description.
-  PcpPrimIndexInputs &VariantFallbacks(const PcpVariantFallbackMap *map) {
+  PcpPrimIndexInputs &VariantFallbacks(const PcpVariantFallbackMap *map)
+  {
     variantFallbacks = map;
     return *this;
   }
@@ -365,13 +387,15 @@ public:
   /// Set of paths to prims that should have their payloads included
   /// during composition.
   using PayloadSet = std::unordered_set<SdfPath, SdfPath::Hash>;
-  PcpPrimIndexInputs &IncludedPayloads(const PayloadSet *payloadSet) {
+  PcpPrimIndexInputs &IncludedPayloads(const PayloadSet *payloadSet)
+  {
     includedPayloads = payloadSet;
     return *this;
   }
 
   /// Optional mutex for accessing includedPayloads.
-  PcpPrimIndexInputs &IncludedPayloadsMutex(tbb::spin_rw_mutex *mutex) {
+  PcpPrimIndexInputs &IncludedPayloadsMutex(tbb::spin_rw_mutex *mutex)
+  {
     includedPayloadsMutex = mutex;
     return *this;
   }
@@ -380,15 +404,16 @@ public:
   /// discovered while indexing.  If the predicate returns true, indexing
   /// includes the payload and sets the includedDiscoveredPayload bit in the
   /// outputs.
-  PcpPrimIndexInputs &
-  IncludePayloadPredicate(std::function<bool(const SdfPath &)> predicate) {
+  PcpPrimIndexInputs &IncludePayloadPredicate(std::function<bool(const SdfPath &)> predicate)
+  {
     includePayloadPredicate = predicate;
     return *this;
   }
 
   /// Whether subtrees that contribute no opinions should be culled
   /// from the index.
-  PcpPrimIndexInputs &Cull(bool doCulling = true) {
+  PcpPrimIndexInputs &Cull(bool doCulling = true)
+  {
     cull = doCulling;
     return *this;
   }
@@ -396,14 +421,16 @@ public:
   /// Whether the prim stack should be computed, and
   /// whether relocates, inherits, permissions, symmetry, or payloads should
   /// be considered during prim index computation,
-  PcpPrimIndexInputs &USD(bool doUSD = true) {
+  PcpPrimIndexInputs &USD(bool doUSD = true)
+  {
     usd = doUSD;
     return *this;
   }
 
   /// The file format target for scene description layers encountered during
   /// prim index computation.
-  PcpPrimIndexInputs &FileFormatTarget(const std::string &target) {
+  PcpPrimIndexInputs &FileFormatTarget(const std::string &target)
+  {
     fileFormatTarget = target;
     return *this;
   }
@@ -445,4 +472,4 @@ bool Pcp_NeedToRecomputeDueToAssetPathChange(const PcpPrimIndex &index);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PRIM_INDEX_H
+#endif  // PXR_USD_PCP_PRIM_INDEX_H

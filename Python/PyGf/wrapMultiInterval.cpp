@@ -43,12 +43,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfMultiInterval const &self) {
+static string _Repr(GfMultiInterval const &self)
+{
   string r = TF_PY_REPR_PREFIX + "MultiInterval(";
   if (!self.IsEmpty()) {
     r += "[";
     int count = 0;
-    TF_FOR_ALL(i, self) {
+    TF_FOR_ALL(i, self)
+    {
       if (count)
         r += ", ";
       r += TfPyRepr(*i);
@@ -60,9 +62,10 @@ static string _Repr(GfMultiInterval const &self) {
   return r;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapMultiInterval() {
+void wrapMultiInterval()
+{
   typedef GfMultiInterval This;
 
   class_<This>("MultiInterval", init<>())
@@ -81,7 +84,8 @@ void wrapMultiInterval() {
       .def("Contains",
            (bool(This::*)(const GfMultiInterval &) const) & This::Contains,
            "Returns true if x is inside the multi-interval.")
-      .def("Contains", (bool(This::*)(double) const) & This::Contains,
+      .def("Contains",
+           (bool(This::*)(double) const) & This::Contains,
            "Returns true if x is inside the multi-interval.")
 
       .def("Clear", &This::Clear)
@@ -90,15 +94,13 @@ void wrapMultiInterval() {
       .def("Add", (void(This::*)(const GfInterval &)) & This::Add)
       .def("Add", (void(This::*)(const GfMultiInterval &)) & This::Add)
 
-      .def("ArithmeticAdd",
-           (void(This::*)(const GfInterval &)) & This::ArithmeticAdd)
+      .def("ArithmeticAdd", (void(This::*)(const GfInterval &)) & This::ArithmeticAdd)
 
       .def("Remove", (void(This::*)(const GfInterval &)) & This::Remove)
       .def("Remove", (void(This::*)(const GfMultiInterval &)) & This::Remove)
 
       .def("Intersect", (void(This::*)(const GfInterval &)) & This::Intersect)
-      .def("Intersect",
-           (void(This::*)(const GfMultiInterval &)) & This::Intersect)
+      .def("Intersect", (void(This::*)(const GfMultiInterval &)) & This::Intersect)
 
       .def("IsEmpty", &This::IsEmpty)
       .def("GetSize", &This::GetSize)

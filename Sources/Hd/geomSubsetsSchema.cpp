@@ -33,47 +33,38 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdGeomSubsetsSchemaTokens,
-    HDGEOMSUBSETS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdGeomSubsetsSchemaTokens, HDGEOMSUBSETS_SCHEMA_TOKENS);
 
-
-TfTokenVector
-HdGeomSubsetsSchema::GetIds()
+TfTokenVector HdGeomSubsetsSchema::GetIds()
 {
-    if (_container) {
-        return _container->GetNames();
-    } else {
-        return {};
-    }
+  if (_container) {
+    return _container->GetNames();
+  }
+  else {
+    return {};
+  }
 }
 
-HdGeomSubsetSchema 
-HdGeomSubsetsSchema::GetGeomSubset(const TfToken & id) 
+HdGeomSubsetSchema HdGeomSubsetsSchema::GetGeomSubset(const TfToken &id)
 {
-    return HdGeomSubsetSchema(
-            _GetTypedDataSource<HdContainerDataSource>(id));
-}
-
-
-/*static*/
-HdGeomSubsetsSchema
-HdGeomSubsetsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdGeomSubsetsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdGeomSubsetsSchemaTokens->geomSubsets))
-        : nullptr);
+  return HdGeomSubsetSchema(_GetTypedDataSource<HdContainerDataSource>(id));
 }
 
 /*static*/
-const TfToken &
-HdGeomSubsetsSchema::GetSchemaToken()
+HdGeomSubsetsSchema HdGeomSubsetsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdGeomSubsetsSchemaTokens->geomSubsets;
-} 
+  return HdGeomSubsetsSchema(fromParentContainer ?
+                                 HdContainerDataSource::Cast(fromParentContainer->Get(
+                                     HdGeomSubsetsSchemaTokens->geomSubsets)) :
+                                 nullptr);
+}
+
+/*static*/
+const TfToken &HdGeomSubsetsSchema::GetSchemaToken()
+{
+  return HdGeomSubsetsSchemaTokens->geomSubsets;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

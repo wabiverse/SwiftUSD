@@ -26,8 +26,8 @@
 
 /// \file usdSkel/definition.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/matrix4d.h"
 #include "Gf/matrix4f.h"
@@ -53,9 +53,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdSkel_SkelDefinition);
 /// A definition is a simple cache of the *validated* structure
 /// of a skeleton, including its topology, bind pose and rest pose.
 /// Skeleton definitions are meant to shared across instances.
-class UsdSkel_SkelDefinition : public TfRefBase, public TfWeakBase
-{
-public:
+class UsdSkel_SkelDefinition : public TfRefBase, public TfWeakBase {
+ public:
   virtual ~UsdSkel_SkelDefinition() {}
 
   /// Create a definition from a skeleton.
@@ -67,31 +66,35 @@ public:
     return static_cast<bool>(_skel);
   }
 
-  const UsdSkelSkeleton &GetSkeleton() const { return _skel; }
+  const UsdSkelSkeleton &GetSkeleton() const
+  {
+    return _skel;
+  }
 
-  const VtTokenArray &GetJointOrder() const { return _jointOrder; }
+  const VtTokenArray &GetJointOrder() const
+  {
+    return _jointOrder;
+  }
 
-  const UsdSkelTopology &GetTopology() const { return _topology; }
+  const UsdSkelTopology &GetTopology() const
+  {
+    return _topology;
+  }
 
   /// Returns rest pose joint transforms in joint-local space.
-  template <typename Matrix4>
-  bool GetJointLocalRestTransforms(VtArray<Matrix4> *xforms);
+  template<typename Matrix4> bool GetJointLocalRestTransforms(VtArray<Matrix4> *xforms);
 
   /// Returns rest pose joint transforms in skel space.
-  template <typename Matrix4>
-  bool GetJointSkelRestTransforms(VtArray<Matrix4> *xforms);
+  template<typename Matrix4> bool GetJointSkelRestTransforms(VtArray<Matrix4> *xforms);
 
   /// Returns bind pose joint transforms in world space.
-  template <typename Matrix4>
-  bool GetJointWorldBindTransforms(VtArray<Matrix4> *xforms);
+  template<typename Matrix4> bool GetJointWorldBindTransforms(VtArray<Matrix4> *xforms);
 
   /// Returns the inverse of the world-space joint bind transforms.
-  template <typename Matrix4>
-  bool GetJointWorldInverseBindTransforms(VtArray<Matrix4> *xforms);
+  template<typename Matrix4> bool GetJointWorldInverseBindTransforms(VtArray<Matrix4> *xforms);
 
   /// Returns the inverse of the local-space rest transforms.
-  template <typename Matrix4>
-  bool GetJointLocalInverseRestTransforms(VtArray<Matrix4> *xforms);
+  template<typename Matrix4> bool GetJointLocalInverseRestTransforms(VtArray<Matrix4> *xforms);
 
   /// See UsdSkel_SkeletonQuery::HasBindPose()
   bool HasBindPose();
@@ -99,44 +102,38 @@ public:
   /// See UsdSkel_SkeletonQuery::HasRestPose()
   bool HasRestPose();
 
-private:
+ private:
   UsdSkel_SkelDefinition();
 
   bool _Init(const UsdSkelSkeleton &skel);
 
-  template <int ComputeFlag, typename Matrix4>
+  template<int ComputeFlag, typename Matrix4>
   bool _GetJointSkelRestTransforms(VtArray<Matrix4> *xforms);
 
-  template <int ComputeFlag, typename Matrix4>
+  template<int ComputeFlag, typename Matrix4>
   bool _GetJointWorldInverseBindTransforms(VtArray<Matrix4> *xforms);
 
-  template <int ComputeFlag, typename Matrix4>
+  template<int ComputeFlag, typename Matrix4>
   bool _GetJointLocalInverseRestTransforms(VtArray<Matrix4> *xforms);
 
-  template <int ComputeFlag, typename Matrix4>
-  bool _ComputeJointSkelRestTransforms();
+  template<int ComputeFlag, typename Matrix4> bool _ComputeJointSkelRestTransforms();
 
-  template <int ComputeFlag, typename Matrix4>
-  bool _ComputeJointWorldInverseBindTransforms();
+  template<int ComputeFlag, typename Matrix4> bool _ComputeJointWorldInverseBindTransforms();
 
-  template <int ComputeFlag, typename Matrix4>
-  bool _ComputeJointLocalInverseRestTransforms();
+  template<int ComputeFlag, typename Matrix4> bool _ComputeJointLocalInverseRestTransforms();
 
   /// Helper for managing a set of cached transforms
   /// with both float and double precision.
-  struct _XformHolder
-  {
-    template <typename Matrix4>
-    VtArray<Matrix4> &Get();
+  struct _XformHolder {
+    template<typename Matrix4> VtArray<Matrix4> &Get();
 
-    template <typename Matrix4>
-    const VtArray<Matrix4> &Get() const;
+    template<typename Matrix4> const VtArray<Matrix4> &Get() const;
 
     VtMatrix4dArray xforms4d;
     VtMatrix4fArray xforms4f;
   };
 
-private:
+ private:
   UsdSkelSkeleton _skel;
   VtTokenArray _jointOrder;
   UsdSkelTopology _topology;
@@ -157,4 +154,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_SKEL_DEFINITION_H
+#endif  // PXR_USD_USD_SKEL_SKEL_DEFINITION_H

@@ -28,28 +28,28 @@
 
 #include "Arch/defines.h"
 #include "Garch/api.h"
-#include <pxr/pxrns.h>
 #include <cstddef>
 #include <functional>
+#include <pxr/pxrns.h>
 
 // Note: there may be cases in which you wish to build for GLX when you are
 // not on Linux, so we have left this optional define, `WITH_GLX` which will
 // override the platform detection and force the inclusion of GLX code.
 #if defined(ARCH_OS_LINUX) || defined(WITH_GLX)
 
-#include "Garch/GarchGLX/glPlatformContextGLX.h"
+#  include "Garch/GarchGLX/glPlatformContextGLX.h"
 
 #elif defined(ARCH_OS_DARWIN)
 
-#include "Garch/GarchDarwin/glPlatformContextDarwin.h"
+#  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#include "Garch/GarchWindows/glPlatformContextWindows.h"
+#  include "Garch/GarchWindows/glPlatformContextWindows.h"
 
 #else
 
-#error "Unknown platform"
+#  error "Unknown platform"
 
 #endif
 
@@ -59,16 +59,13 @@ GARCH_API GarchGLPlatformContextState GarchGetNullGLPlatformContextState();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-namespace std
-{
-  template <>
-  struct hash<PXR_NS::GarchGLPlatformContextState>
+namespace std {
+template<> struct hash<PXR_NS::GarchGLPlatformContextState> {
+  inline size_t operator()(const PXR_NS::GarchGLPlatformContextState &x) const
   {
-    inline size_t operator()(const PXR_NS::GarchGLPlatformContextState &x) const
-    {
-      return x.GetHash();
-    }
-  };
-} // namespace std
+    return x.GetHash();
+  }
+};
+}  // namespace std
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_H

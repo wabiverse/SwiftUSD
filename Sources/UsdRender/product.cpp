@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdRenderProduct,
-                 TfType::Bases<UsdRenderSettingsBase>>();
+  TfType::Define<UsdRenderProduct, TfType::Bases<UsdRenderSettingsBase>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdRenderProduct::~UsdRenderProduct()
-{
-}
+UsdRenderProduct::~UsdRenderProduct() {}
 
 /* static */
-UsdRenderProduct
-UsdRenderProduct::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderProduct UsdRenderProduct::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderProduct();
   }
@@ -62,18 +57,14 @@ UsdRenderProduct::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdRenderProduct
-UsdRenderProduct::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderProduct UsdRenderProduct::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("RenderProduct");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderProduct();
   }
-  return UsdRenderProduct(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdRenderProduct(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdRenderProduct::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdRenderProduct::_GetStaticTfType()
+const TfType &UsdRenderProduct::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdRenderProduct>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdRenderProduct::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdRenderProduct::_GetTfType() const
+const TfType &UsdRenderProduct::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdRenderProduct::GetProductTypeAttr() const
+UsdAttribute UsdRenderProduct::GetProductTypeAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->productType);
 }
 
-UsdAttribute
-UsdRenderProduct::CreateProductTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderProduct::CreateProductTypeAttr(VtValue const &defaultValue,
+                                                     bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->productType,
                                     SdfValueTypeNames->Token,
@@ -121,14 +109,13 @@ UsdRenderProduct::CreateProductTypeAttr(VtValue const &defaultValue, bool writeS
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderProduct::GetProductNameAttr() const
+UsdAttribute UsdRenderProduct::GetProductNameAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->productName);
 }
 
-UsdAttribute
-UsdRenderProduct::CreateProductNameAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderProduct::CreateProductNameAttr(VtValue const &defaultValue,
+                                                     bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->productName,
                                     SdfValueTypeNames->Token,
@@ -138,44 +125,38 @@ UsdRenderProduct::CreateProductNameAttr(VtValue const &defaultValue, bool writeS
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdRenderProduct::GetOrderedVarsRel() const
+UsdRelationship UsdRenderProduct::GetOrderedVarsRel() const
 {
   return GetPrim().GetRelationship(UsdRenderTokens->orderedVars);
 }
 
-UsdRelationship
-UsdRenderProduct::CreateOrderedVarsRel() const
+UsdRelationship UsdRenderProduct::CreateOrderedVarsRel() const
 {
   return GetPrim().CreateRelationship(UsdRenderTokens->orderedVars,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdRenderProduct::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdRenderProduct::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdRenderTokens->productType,
       UsdRenderTokens->productName,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdRenderSettingsBase::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdRenderSettingsBase::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

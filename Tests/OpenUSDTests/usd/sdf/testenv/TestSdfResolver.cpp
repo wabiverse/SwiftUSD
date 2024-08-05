@@ -38,84 +38,69 @@ PXR_NAMESPACE_USING_DIRECTIVE
 //   that resolver plugins should not have to reason about.
 //
 
-static bool
-_AssetPathHasArguments(const std::string& assetPath)
+static bool _AssetPathHasArguments(const std::string &assetPath)
 {
-    std::string layerPath;
-    SdfLayer::FileFormatArguments args;
-    return SdfLayer::SplitIdentifier(assetPath, &layerPath, &args)
-        && !args.empty();
+  std::string layerPath;
+  SdfLayer::FileFormatArguments args;
+  return SdfLayer::SplitIdentifier(assetPath, &layerPath, &args) && !args.empty();
 }
 
-class Sdf_TestResolver
-    : public ArDefaultResolver
-{
-public:
+class Sdf_TestResolver : public ArDefaultResolver {
+ public:
+ protected:
+  using _Parent = ArDefaultResolver;
 
-protected:
-    using _Parent = ArDefaultResolver;
+  std::string _CreateIdentifier(const std::string &assetPath,
+                                const ArResolvedPath &anchorAssetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_CreateIdentifier(assetPath, anchorAssetPath);
+  }
 
-    std::string _CreateIdentifier(
-        const std::string& assetPath,
-        const ArResolvedPath& anchorAssetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_CreateIdentifier(assetPath, anchorAssetPath);
-    }
+  std::string _CreateIdentifierForNewAsset(const std::string &assetPath,
+                                           const ArResolvedPath &anchorAssetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_CreateIdentifierForNewAsset(assetPath, anchorAssetPath);
+  }
 
-    std::string _CreateIdentifierForNewAsset(
-        const std::string& assetPath,
-        const ArResolvedPath& anchorAssetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_CreateIdentifierForNewAsset(
-            assetPath, anchorAssetPath);
-    }
+  ArResolvedPath _Resolve(const std::string &assetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_Resolve(assetPath);
+  }
 
-    ArResolvedPath _Resolve(
-        const std::string& assetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_Resolve(assetPath);
-    }
+  ArResolvedPath _ResolveForNewAsset(const std::string &assetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_ResolveForNewAsset(assetPath);
+  }
 
-    ArResolvedPath _ResolveForNewAsset(
-        const std::string& assetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_ResolveForNewAsset(assetPath);
-    }
+  bool _IsContextDependentPath(const std::string &assetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_IsContextDependentPath(assetPath);
+  }
 
-    bool _IsContextDependentPath(
-        const std::string& assetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_IsContextDependentPath(assetPath);
-    }
+  std::string _GetExtension(const std::string &assetPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_GetExtension(assetPath);
+  }
 
-    std::string _GetExtension(
-        const std::string& assetPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_GetExtension(assetPath);
-    }
+  ArAssetInfo _GetAssetInfo(const std::string &assetPath,
+                            const ArResolvedPath &resolvedPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_GetAssetInfo(assetPath, resolvedPath);
+  }
 
-    ArAssetInfo _GetAssetInfo(
-        const std::string& assetPath,
-        const ArResolvedPath& resolvedPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_GetAssetInfo(assetPath, resolvedPath);
-    }
-
-    ArTimestamp _GetModificationTimestamp(
-        const std::string& assetPath,
-        const ArResolvedPath& resolvedPath) const override
-    {
-        TF_AXIOM(!_AssetPathHasArguments(assetPath));
-        return _Parent::_GetModificationTimestamp(assetPath, resolvedPath);
-    }
-
+  ArTimestamp _GetModificationTimestamp(const std::string &assetPath,
+                                        const ArResolvedPath &resolvedPath) const override
+  {
+    TF_AXIOM(!_AssetPathHasArguments(assetPath));
+    return _Parent::_GetModificationTimestamp(assetPath, resolvedPath);
+  }
 };
 
 PXR_NAMESPACE_OPEN_SCOPE

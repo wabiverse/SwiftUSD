@@ -42,11 +42,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// for diagnostic purposes.
 ///
 class UsdCrateInfo {
-public:
+ public:
   struct Section {
     Section() = default;
     Section(std::string const &name, int64_t start, int64_t size)
-        : name(name), start(start), size(size) {}
+        : name(name), start(start), size(size)
+    {
+    }
     std::string name;
     int64_t start = -1, size = -1;
   };
@@ -81,13 +83,16 @@ public:
   TfToken GetSoftwareVersion() const;
 
   /// Return true if this object refers to a valid file.
-  explicit operator bool() const { return (bool)_impl; }
+  explicit operator bool() const
+  {
+    return (bool)_impl;
+  }
 
-private:
+ private:
   struct _Impl;
   std::shared_ptr<_Impl> _impl;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_CRATE_INFO_H
+#endif  // PXR_USD_USD_CRATE_INFO_H

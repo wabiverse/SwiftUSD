@@ -73,12 +73,13 @@ GF_API const half::uif half::_toFloat[1 << 16] =
         // which may be trapped by the operating system.
         //-----------------------------------------------
 
-    GF_API float half::overflow() {
+    GF_API float half::overflow()
+{
   volatile float f = 1e10;
 
   for (int i = 0; i < 10; i++)
-    f *= f; // this will overflow before
-            // the for�loop terminates
+    f *= f;  // this will overflow before
+             // the for�loop terminates
   return f;
 }
 
@@ -87,7 +88,8 @@ GF_API const half::uif half::_toFloat[1 << 16] =
 // zeroes, denormalized numbers and exponent overflows.
 //-----------------------------------------------------
 
-GF_API short half::convert(int i) {
+GF_API short half::convert(int i)
+{
   //
   // Our floating point number, f, is represented by the bit
   // pattern in integer i.  Disassemble that bit pattern into
@@ -153,7 +155,8 @@ GF_API short half::convert(int i) {
     //
 
     return s | m;
-  } else if (e == 0xff - (127 - 15)) {
+  }
+  else if (e == 0xff - (127 - 15)) {
     if (m == 0) {
       //
       // F is an infinity; convert f to a half
@@ -161,7 +164,8 @@ GF_API short half::convert(int i) {
       //
 
       return s | 0x7c00;
-    } else {
+    }
+    else {
       //
       // F is a NAN; we produce a half NAN that preserves
       // the sign bit and the 10 leftmost bits of the
@@ -174,7 +178,8 @@ GF_API short half::convert(int i) {
       m >>= 13;
       return s | 0x7c00 | m | (m == 0);
     }
-  } else {
+  }
+  else {
     //
     // E is greater than zero.  F is a normalized float.
     // We try to convert f to a normalized half.
@@ -188,8 +193,8 @@ GF_API short half::convert(int i) {
     m = m + 0x00000fff + ((m >> 13) & 1);
 
     if (m & 0x00800000) {
-      m = 0;  // overflow in significand,
-      e += 1; // adjust exponent
+      m = 0;   // overflow in significand,
+      e += 1;  // adjust exponent
     }
 
     //
@@ -197,9 +202,9 @@ GF_API short half::convert(int i) {
     //
 
     if (e > 30) {
-      overflow();        // Cause a hardware floating point overflow;
-      return s | 0x7c00; // if this returns, the half becomes an
-    }                    // infinity with the same sign as f.
+      overflow();         // Cause a hardware floating point overflow;
+      return s | 0x7c00;  // if this returns, the half becomes an
+    }  // infinity with the same sign as f.
 
     //
     // Assemble the half from s, e and m.
@@ -213,12 +218,14 @@ GF_API short half::convert(int i) {
 // Stream I/O operators
 //---------------------
 
-GF_API ostream &operator<<(ostream &os, half h) {
+GF_API ostream &operator<<(ostream &os, half h)
+{
   os << float(h);
   return os;
 }
 
-GF_API istream &operator>>(istream &is, half &h) {
+GF_API istream &operator>>(istream &is, half &h)
+{
   float f;
   is >> f;
   h = half(f);
@@ -230,7 +237,8 @@ GF_API istream &operator>>(istream &is, half &h) {
 // floats and halfs, mostly for debugging
 //---------------------------------------
 
-GF_API void printBits(ostream &os, half h) {
+GF_API void printBits(ostream &os, half h)
+{
   unsigned short b = h.bits();
 
   for (int i = 15; i >= 0; i--) {
@@ -241,7 +249,8 @@ GF_API void printBits(ostream &os, half h) {
   }
 }
 
-GF_API void printBits(ostream &os, float f) {
+GF_API void printBits(ostream &os, float f)
+{
   half::uif x;
   x.f = f;
 
@@ -253,7 +262,8 @@ GF_API void printBits(ostream &os, float f) {
   }
 }
 
-GF_API void printBits(char c[19], half h) {
+GF_API void printBits(char c[19], half h)
+{
   unsigned short b = h.bits();
 
   for (int i = 15, j = 0; i >= 0; i--, j++) {
@@ -266,7 +276,8 @@ GF_API void printBits(char c[19], half h) {
   c[18] = 0;
 }
 
-GF_API void printBits(char c[35], float f) {
+GF_API void printBits(char c[35], float f)
+{
   half::uif x;
   x.f = f;
 
@@ -280,6 +291,6 @@ GF_API void printBits(char c[35], float f) {
   c[34] = 0;
 }
 
-} // namespace pxr_half
+}  // namespace pxr_half
 
 PXR_NAMESPACE_CLOSE_SCOPE

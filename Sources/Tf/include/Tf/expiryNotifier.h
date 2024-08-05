@@ -54,14 +54,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \p func is non-NULL and a previous non-NULL notifier function has been
 /// set, a fatal error is issued.
 class Tf_ExpiryNotifier {
-public:
+ public:
   TF_API static void Invoke(void const *p);
   TF_API static void SetNotifier(void (*func)(void const *));
 
   TF_API static void Invoke2(void const *p);
   TF_API static void SetNotifier2(void (*func)(void const *));
 
-private:
+ private:
   static void (*_func)(void const *);
   static void (*_func2)(void const *);
 };

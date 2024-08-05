@@ -35,8 +35,8 @@
 #include <pxr/pxrns.h>
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "Tf/pyUtils.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "Tf/pyUtils.h"
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/pyObjWrapper.h"
 
@@ -55,20 +55,23 @@ class TfAnyWeakPtr {
     void *space[4];
   };
 
-public:
+ public:
   using This = TfAnyWeakPtr;
 
   /// Construct an AnyWeakPtr watching \a ptr.
-  template <class Ptr, class = typename std::enable_if<Tf_SupportsWeakPtr<
-                           typename Ptr::DataType>::value>::type>
-  TfAnyWeakPtr(Ptr const &ptr) {
+  template<
+      class Ptr,
+      class = typename std::enable_if<Tf_SupportsWeakPtr<typename Ptr::DataType>::value>::type>
+  TfAnyWeakPtr(Ptr const &ptr)
+  {
     static_assert(sizeof(_PointerHolder<Ptr>) <= sizeof(_Data),
                   "Ptr is too big to fit in a TfAnyWeakPtr");
     new (&_ptrStorage) _PointerHolder<Ptr>(ptr);
   }
 
   /// Construct an AnyWeakPtr not watching any \a ptr.
-  TfAnyWeakPtr() {
+  TfAnyWeakPtr()
+  {
     static_assert(sizeof(_EmptyHolder) <= sizeof(_Data),
                   "Ptr is too big to fit in a TfAnyWeakPtr");
     new (&_ptrStorage) _EmptyHolder;
@@ -80,9 +83,13 @@ public:
   /// Construct and implicitly convert from std::nullptr_t.
   TfAnyWeakPtr(std::nullptr_t) : TfAnyWeakPtr() {}
 
-  TfAnyWeakPtr(TfAnyWeakPtr const &other) { other._Get()->Clone(&_ptrStorage); }
+  TfAnyWeakPtr(TfAnyWeakPtr const &other)
+  {
+    other._Get()->Clone(&_ptrStorage);
+  }
 
-  TfAnyWeakPtr &operator=(TfAnyWeakPtr const &other) {
+  TfAnyWeakPtr &operator=(TfAnyWeakPtr const &other)
+  {
     if (this != &other) {
       _Get()->~_PointerHolderBase();
       other._Get()->Clone(&_ptrStorage);
@@ -90,7 +97,10 @@ public:
     return *this;
   }
 
-  ~TfAnyWeakPtr() { _Get()->~_PointerHolderBase(); }
+  ~TfAnyWeakPtr()
+  {
+    _Get()->~_PointerHolderBase();
+  }
 
   /// Return true *only* if this expiry checker is watching a weak pointer
   /// which has expired.
@@ -112,19 +122,31 @@ public:
   TF_API bool operator==(const TfAnyWeakPtr &rhs) const;
 
   /// inequality operator
-  bool operator!=(const TfAnyWeakPtr &rhs) const { return !(*this == rhs); }
+  bool operator!=(const TfAnyWeakPtr &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// comparison operator
   TF_API bool operator<(const TfAnyWeakPtr &rhs) const;
 
   /// less than or equal operator
-  bool operator<=(const TfAnyWeakPtr &rhs) const { return !(rhs < *this); }
+  bool operator<=(const TfAnyWeakPtr &rhs) const
+  {
+    return !(rhs < *this);
+  }
 
   /// greater than operator
-  bool operator>(const TfAnyWeakPtr &rhs) const { return rhs < *this; }
+  bool operator>(const TfAnyWeakPtr &rhs) const
+  {
+    return rhs < *this;
+  }
 
   /// greater than or equal operator
-  bool operator>=(const TfAnyWeakPtr &rhs) const { return !(*this < rhs); }
+  bool operator>=(const TfAnyWeakPtr &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   /// returns the type_info of the underlying WeakPtr
   TF_API const std::type_info &GetTypeInfo() const;
@@ -133,26 +155,25 @@ public:
   TF_API TfType const &GetType() const;
 
   /// Return a hash value for this instance.
-  size_t GetHash() const {
+  size_t GetHash() const
+  {
     return reinterpret_cast<uintptr_t>(GetUniqueIdentifier()) >> 3;
   }
 
-private:
+ private:
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   // This grants friend access to a function in the wrapper file for this
   // class.  This lets the wrapper reach down into an AnyWeakPtr to get a
   // boost::python wrapped object corresponding to the held type.  This
   // facility is necessary to get the python API we want.
-  friend boost::python::api::object
-  Tf_GetPythonObjectFromAnyWeakPtr(This const &self);
+  friend boost::python::api::object Tf_GetPythonObjectFromAnyWeakPtr(This const &self);
 
   TF_API
   boost::python::api::object _GetPythonObject() const;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-  template <class WeakPtr>
-  friend WeakPtr TfAnyWeakPtrDynamicCast(const TfAnyWeakPtr &anyWeak,
-                                         WeakPtr *);
+  template<class WeakPtr>
+  friend WeakPtr TfAnyWeakPtrDynamicCast(const TfAnyWeakPtr &anyWeak, WeakPtr *);
 
   // This is using the standard type-erasure pattern.
   struct _PointerHolderBase {
@@ -185,7 +206,7 @@ private:
     TF_API virtual bool _IsPolymorphic() const;
   };
 
-  template <typename Ptr> struct _PointerHolder : _PointerHolderBase {
+  template<typename Ptr> struct _PointerHolder : _PointerHolderBase {
     _PointerHolder(Ptr const &ptr) : _ptr(ptr) {}
 
     virtual ~_PointerHolder();
@@ -201,11 +222,12 @@ private:
     virtual const void *_GetMostDerivedPtr() const;
     virtual bool _IsPolymorphic() const;
 
-  private:
+   private:
     Ptr _ptr;
   };
 
-  _PointerHolderBase *_Get() const {
+  _PointerHolderBase *_Get() const
+  {
     return (_PointerHolderBase *)(&_ptrStorage);
   }
 
@@ -216,58 +238,61 @@ private:
 // passed argument is exactly TfAnyWeakPtr.  By making this a function template
 // that's only enabled for TfAnyWeakPtr, C++ will not perform implicit
 // conversions since T is deduced.
-template <
-    class HashState, class T,
-    class = typename std::enable_if<std::is_same<T, TfAnyWeakPtr>::value>::type>
-inline void TfHashAppend(HashState &h, const T &ptr) {
+template<class HashState,
+         class T,
+         class = typename std::enable_if<std::is_same<T, TfAnyWeakPtr>::value>::type>
+inline void TfHashAppend(HashState &h, const T &ptr)
+{
   h.Append(ptr.GetUniqueIdentifier());
 }
 
-template <class Ptr> TfAnyWeakPtr::_PointerHolder<Ptr>::~_PointerHolder() {}
+template<class Ptr> TfAnyWeakPtr::_PointerHolder<Ptr>::~_PointerHolder() {}
 
-template <class Ptr>
-void TfAnyWeakPtr::_PointerHolder<Ptr>::Clone(_Data *target) const {
+template<class Ptr> void TfAnyWeakPtr::_PointerHolder<Ptr>::Clone(_Data *target) const
+{
   new (target) _PointerHolder<Ptr>(_ptr);
 }
 
-template <class Ptr> bool TfAnyWeakPtr::_PointerHolder<Ptr>::IsInvalid() const {
+template<class Ptr> bool TfAnyWeakPtr::_PointerHolder<Ptr>::IsInvalid() const
+{
   return _ptr.IsInvalid();
 }
 
-template <class Ptr>
-void const *TfAnyWeakPtr::_PointerHolder<Ptr>::GetUniqueIdentifier() const {
+template<class Ptr> void const *TfAnyWeakPtr::_PointerHolder<Ptr>::GetUniqueIdentifier() const
+{
   return _ptr.GetUniqueIdentifier();
 }
 
-template <class Ptr>
-TfWeakBase const *TfAnyWeakPtr::_PointerHolder<Ptr>::GetWeakBase() const {
+template<class Ptr> TfWeakBase const *TfAnyWeakPtr::_PointerHolder<Ptr>::GetWeakBase() const
+{
   return &(_ptr->__GetTfWeakBase__());
 }
 
-template <class Ptr> TfAnyWeakPtr::_PointerHolder<Ptr>::operator bool() const {
+template<class Ptr> TfAnyWeakPtr::_PointerHolder<Ptr>::operator bool() const
+{
   return bool(_ptr);
 }
 
-template <class Ptr>
-TfPyObjWrapper TfAnyWeakPtr::_PointerHolder<Ptr>::GetPythonObject() const {
+template<class Ptr> TfPyObjWrapper TfAnyWeakPtr::_PointerHolder<Ptr>::GetPythonObject() const
+{
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   return TfPyObject(_ptr);
 #else
   return {};
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 }
-template <class Ptr>
-const std::type_info &TfAnyWeakPtr::_PointerHolder<Ptr>::GetTypeInfo() const {
+template<class Ptr> const std::type_info &TfAnyWeakPtr::_PointerHolder<Ptr>::GetTypeInfo() const
+{
   return TfTypeid(_ptr);
 }
 
-template <class Ptr>
-TfType const &TfAnyWeakPtr::_PointerHolder<Ptr>::GetType() const {
+template<class Ptr> TfType const &TfAnyWeakPtr::_PointerHolder<Ptr>::GetType() const
+{
   return TfType::Find(_ptr);
 }
 
-template <class Ptr>
-const void *TfAnyWeakPtr::_PointerHolder<Ptr>::_GetMostDerivedPtr() const {
+template<class Ptr> const void *TfAnyWeakPtr::_PointerHolder<Ptr>::_GetMostDerivedPtr() const
+{
   if (!_ptr) {
     return 0;
   }
@@ -276,12 +301,13 @@ const void *TfAnyWeakPtr::_PointerHolder<Ptr>::_GetMostDerivedPtr() const {
   return TfCastToMostDerivedType(rawPtr);
 }
 
-template <class Ptr>
-bool TfAnyWeakPtr::_PointerHolder<Ptr>::_IsPolymorphic() const {
+template<class Ptr> bool TfAnyWeakPtr::_PointerHolder<Ptr>::_IsPolymorphic() const
+{
   return std::is_polymorphic<typename Ptr::DataType>::value;
 }
 
-template <class Ptr> bool TfAnyWeakPtr::_PointerHolder<Ptr>::_IsConst() const {
+template<class Ptr> bool TfAnyWeakPtr::_PointerHolder<Ptr>::_IsConst() const
+{
   return std::is_const<typename Ptr::DataType>::value;
 }
 

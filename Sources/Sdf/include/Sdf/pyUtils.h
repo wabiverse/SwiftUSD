@@ -39,11 +39,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// If a non-string key or value is encountered, \p errMsg will be filled in
 /// (if given) and this function will return false. Otherwise, this function
 /// will return true.
-SDF_API bool
-SdfFileFormatArgumentsFromPython(const boost::python::dict &dict,
-                                 SdfLayer::FileFormatArguments *args,
-                                 std::string *errMsg = NULL);
+SDF_API bool SdfFileFormatArgumentsFromPython(const boost::python::dict &dict,
+                                              SdfLayer::FileFormatArguments *args,
+                                              std::string *errMsg = NULL);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PY_UTILS_H
+#endif  // PXR_USD_SDF_PY_UTILS_H

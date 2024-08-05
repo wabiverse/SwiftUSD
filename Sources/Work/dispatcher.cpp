@@ -28,11 +28,18 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 #if !WITH_TBB_LEGACY
-WorkDispatcher::WorkDispatcher() { _waitCleanupFlag.clear(); }
+WorkDispatcher::WorkDispatcher()
+{
+  _waitCleanupFlag.clear();
+}
 
-WorkDispatcher::~WorkDispatcher() { Wait(); }
+WorkDispatcher::~WorkDispatcher()
+{
+  Wait();
+}
 
-void WorkDispatcher::Wait() {
+void WorkDispatcher::Wait()
+{
   _tg.wait();
 
   // If we take the flag from false -> true, we do the cleanup.
@@ -46,12 +53,15 @@ void WorkDispatcher::Wait() {
   }
 }
 
-void WorkDispatcher::Cancel() { _tg.cancel(); }
+void WorkDispatcher::Cancel()
+{
+  _tg.cancel();
+}
 #else  /* WITH_TBB_LEGACY */
 WorkDispatcher::WorkDispatcher()
     : _context(tbb::task_group_context::isolated,
-               tbb::task_group_context::concurrent_wait |
-                   tbb::task_group_context::default_traits) {
+               tbb::task_group_context::concurrent_wait | tbb::task_group_context::default_traits)
+{
   _waitCleanupFlag.clear();
 
   // The concurrent_wait flag used with the task_group_context ensures
@@ -61,12 +71,14 @@ WorkDispatcher::WorkDispatcher()
   _rootTask->set_ref_count(1);
 }
 
-WorkDispatcher::~WorkDispatcher() {
+WorkDispatcher::~WorkDispatcher()
+{
   Wait();
   tbb::task::destroy(*_rootTask);
 }
 
-void WorkDispatcher::Wait() {
+void WorkDispatcher::Wait()
+{
   // Wait for tasks to complete.
   _rootTask->wait_for_all();
 
@@ -86,12 +98,15 @@ void WorkDispatcher::Wait() {
   }
 }
 
-void WorkDispatcher::Cancel() { _context.cancel_group_execution(); }
+void WorkDispatcher::Cancel()
+{
+  _context.cancel_group_execution();
+}
 #endif /* WITH_TBB_LEGACY */
 
 /* static */
-void WorkDispatcher::_TransportErrors(const TfErrorMark &mark,
-                                      _ErrorTransports *errors) {
+void WorkDispatcher::_TransportErrors(const TfErrorMark &mark, _ErrorTransports *errors)
+{
   TfErrorTransport transport = mark.Transport();
   errors->grow_by(1)->swap(transport);
 }

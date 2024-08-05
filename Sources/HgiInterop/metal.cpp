@@ -24,39 +24,36 @@
 
 #if PXR_METAL_SUPPORT_ENABLED
 
-#include "Garch/glApi.h"
+#  include "Garch/glApi.h"
 
-#include "HgiInterop/metal.h"
+#  include "HgiInterop/metal.h"
 
-#include "HgiMetal/capabilities.h"
-#include "HgiMetal/diagnostic.h"
-#include "HgiMetal/hgi.h"
+#  include "HgiMetal/capabilities.h"
+#  include "HgiMetal/diagnostic.h"
+#  include "HgiMetal/hgi.h"
 
-#include "Tf/diagnostic.h"
-#include "Vt/value.h"
+#  include "Tf/diagnostic.h"
+#  include "Vt/value.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <MetalFX/MetalFX.hpp>
-#include <QuartzCore/QuartzCore.hpp>
-#include <OpenGL/OpenGL.hpp>
+#  include <Foundation/Foundation.hpp>
+#  include <Metal/Metal.hpp>
+#  include <MetalFX/MetalFX.hpp>
+#  include <OpenGL/OpenGL.hpp>
+#  include <QuartzCore/QuartzCore.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
-{
-  struct Vertex
-  {
-    float position[2];
-    float uv[2];
-  };
-}
+namespace {
+struct Vertex {
+  float position[2];
+  float uv[2];
+};
+}  // namespace
 
-static bool
-_ProcessGLErrors(bool silent = false)
+static bool _ProcessGLErrors(bool silent = false)
 {
   bool foundError = false;
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     GLenum error;
@@ -80,17 +77,15 @@ _ProcessGLErrors(bool silent = false)
             TF_WARN("%s", errorMessage.str().c_str());
         }
     }
-#endif // 0
+#  endif  // 0
 
   return foundError;
 }
 
-static GLuint
-_compileShader(
-    GLchar const *const shaderSource, GLenum shaderType)
+static GLuint _compileShader(GLchar const *const shaderSource, GLenum shaderType)
 {
   GLint status;
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     // Determine if GLSL version 140 is supported by this context.
@@ -136,14 +131,13 @@ _compileShader(
     }
     
     return s;
-#endif // 0
+#  endif  // 0
   return status;
 }
 
-static void
-_OutputShaderLog(GLuint program)
+static void _OutputShaderLog(GLuint program)
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     GLint maxLength = 2048;
@@ -159,15 +153,14 @@ _OutputShaderLog(GLuint program)
         free(errorLog);
     }
 
-#endif // 0
+#  endif  // 0
 }
 
-void HgiInteropMetal::_CreateShaderContext(
-    int32_t vertexSource,
-    int32_t fragmentSource,
-    ShaderContext &shader)
+void HgiInteropMetal::_CreateShaderContext(int32_t vertexSource,
+                                           int32_t fragmentSource,
+                                           ShaderContext &shader)
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     GLuint program;
@@ -231,16 +224,15 @@ void HgiInteropMetal::_CreateShaderContext(
     glBindVertexArray(0);
     glUseProgram(0);
 
-#endif // 0
+#  endif  // 0
 }
 
-HgiInteropMetal::HgiInteropMetal(Hgi *hgi)
-    : _hgiMetal(nullptr)
+HgiInteropMetal::HgiInteropMetal(Hgi *hgi) : _hgiMetal(nullptr)
 {
   _hgiMetal = static_cast<HgiMetal *>(hgi);
   _device = _hgiMetal->GetPrimaryDevice();
 
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     NS::Error *error = nil;
@@ -468,14 +460,14 @@ HgiInteropMetal::HgiInteropMetal(Hgi *hgi)
 
     _SetAttachmentSize(256, 256);
 
-#endif // 0
+#  endif  // 0
 }
 
 HgiInteropMetal::~HgiInteropMetal()
 {
   _FreeTransientTextureCacheRefs();
 
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
     if (_cvglTextureCache) {
         CFRelease(_cvglTextureCache);
@@ -485,12 +477,12 @@ HgiInteropMetal::~HgiInteropMetal()
         CFRelease(_cvmtlTextureCache);
         _cvmtlTextureCache = nil;
     }
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_FreeTransientTextureCacheRefs()
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     if (_glColorTexture) {
@@ -526,12 +518,12 @@ void HgiInteropMetal::_FreeTransientTextureCacheRefs()
         _depthBuffer = nil;
     }
 
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_ValidateGLContext()
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     if (_currentOpenGLContext != NSGL::OpenGLContext::currentContext()) {
@@ -541,12 +533,12 @@ void HgiInteropMetal::_ValidateGLContext()
         );
     }
 
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_SetAttachmentSize(int width, int height)
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     if (_mtlAliasedColorTexture != nil) {
@@ -661,12 +653,12 @@ void HgiInteropMetal::_SetAttachmentSize(int width, int height)
     CVOpenGLTextureCacheFlush(_cvglTextureCache, 0);
     CVMetalTextureCacheFlush(_cvmtlTextureCache, 0);
 
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_CaptureOpenGlState()
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &_restoreDrawFbo);
@@ -720,12 +712,12 @@ void HgiInteropMetal::_CaptureOpenGlState()
     
     glGetIntegerv(GL_CURRENT_PROGRAM, &_restoreProgram);
 
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_RestoreOpenGlState()
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     if (_restoreAlphaToCoverage) {
@@ -795,14 +787,14 @@ void HgiInteropMetal::_RestoreOpenGlState()
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _restoreDrawFbo);
 
-#endif // 0
+#  endif  // 0
 }
 
 void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
                                     GfVec4i const &compRegion,
                                     int shaderIndex)
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     // Clear GL error state
@@ -880,16 +872,15 @@ void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
     _RestoreOpenGlState();
     glFlush();
 
-#endif // 0
+#  endif  // 0
 }
 
-void HgiInteropMetal::CompositeToInterop(
-    HgiTextureHandle const &color,
-    HgiTextureHandle const &depth,
-    VtValue const &framebuffer,
-    GfVec4i const &compRegion)
+void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
+                                         HgiTextureHandle const &depth,
+                                         VtValue const &framebuffer,
+                                         GfVec4i const &compRegion)
 {
-#if 0
+#  if 0
     // XXX: Add these into the CXX Apple headers.
 
     if (!ARCH_UNLIKELY(color)) {
@@ -987,7 +978,7 @@ void HgiInteropMetal::CompositeToInterop(
         _ProcessGLErrors();
     }
 
-#endif // 0
+#  endif  // 0
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

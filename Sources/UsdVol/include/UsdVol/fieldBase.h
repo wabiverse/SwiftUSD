@@ -26,17 +26,17 @@
 
 /// \file usdVol/fieldBase.h
 
-#include <pxr/pxrns.h>
-#include "UsdVol/api.h"
-#include "UsdGeom/xformable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/xformable.h"
+#include "UsdVol/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -53,9 +53,8 @@ class SdfAssetPath;
 ///
 /// Base class for field primitives.
 ///
-class UsdVolFieldBase : public UsdGeomXformable
-{
-public:
+class UsdVolFieldBase : public UsdGeomXformable {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -65,18 +64,12 @@ public:
   /// Equivalent to UsdVolFieldBase::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdVolFieldBase(const UsdPrim &prim = UsdPrim())
-      : UsdGeomXformable(prim)
-  {
-  }
+  explicit UsdVolFieldBase(const UsdPrim &prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
   /// Construct a UsdVolFieldBase on the prim held by \p schemaObj .
   /// Should be preferred over UsdVolFieldBase(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdVolFieldBase(const UsdSchemaBase &schemaObj)
-      : UsdGeomXformable(schemaObj)
-  {
-  }
+  explicit UsdVolFieldBase(const UsdSchemaBase &schemaObj) : UsdGeomXformable(schemaObj) {}
 
   /// Destructor.
   USDVOL_API
@@ -86,8 +79,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDVOL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdVolFieldBase holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -99,17 +91,16 @@ public:
   /// \endcode
   ///
   USDVOL_API
-  static UsdVolFieldBase
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdVolFieldBase Get(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDVOL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDVOL_API
@@ -121,7 +112,7 @@ private:
   USDVOL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

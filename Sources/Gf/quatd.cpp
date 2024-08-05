@@ -27,8 +27,8 @@
 
 #include <pxr/pxrns.h>
 
-#include "Gf/quatd.h"
 #include "Gf/ostreamHelpers.h"
+#include "Gf/quatd.h"
 #include "Gf/vec4d.h"
 #include "Tf/type.h"
 
@@ -37,20 +37,27 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfQuatd>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfQuatd>();
+}
 
-GfQuatd::GfQuatd(GfQuatf const &other)
-    : _imaginary(other.GetImaginary()), _real(other.GetReal()) {}
-GfQuatd::GfQuatd(GfQuath const &other)
-    : _imaginary(other.GetImaginary()), _real(other.GetReal()) {}
+GfQuatd::GfQuatd(GfQuatf const &other) : _imaginary(other.GetImaginary()), _real(other.GetReal())
+{
+}
+GfQuatd::GfQuatd(GfQuath const &other) : _imaginary(other.GetImaginary()), _real(other.GetReal())
+{
+}
 
-std::ostream &operator<<(std::ostream &out, GfQuatd const &q) {
+std::ostream &operator<<(std::ostream &out, GfQuatd const &q)
+{
   GfVec3d i = q.GetImaginary();
   double real = q.GetReal();
   return out << GfVec4d(real, i[0], i[1], i[2]);
 }
 
-double GfQuatd::Normalize(double eps) {
+double GfQuatd::Normalize(double eps)
+{
   double length = GetLength();
 
   if (length < eps)
@@ -127,15 +134,17 @@ double GfQuatd::Normalize(double eps) {
 //
 // which takes 22 multiplications, 11 additions, and 1 division
 //
-GfVec3d GfQuatd::Transform(const GfVec3d &point) const {
+GfVec3d GfQuatd::Transform(const GfVec3d &point) const
+{
   double tmpDot = GfDot(_imaginary, _imaginary);
   double tmpSqr = _real * _real;
-  return (2 * GfDot(_imaginary, point) * _imaginary +
-          (tmpSqr - tmpDot) * point + 2 * _real * GfCross(_imaginary, point)) /
+  return (2 * GfDot(_imaginary, point) * _imaginary + (tmpSqr - tmpDot) * point +
+          2 * _real * GfCross(_imaginary, point)) /
          (tmpSqr + tmpDot);
 }
 
-GfQuatd &GfQuatd::operator*=(const GfQuatd &q) {
+GfQuatd &GfQuatd::operator*=(const GfQuatd &q)
+{
   double r1 = GetReal();
   double r2 = q.GetReal();
   const GfVec3d &i1 = GetImaginary();
@@ -153,13 +162,14 @@ GfQuatd &GfQuatd::operator*=(const GfQuatd &q) {
   return *this;
 }
 
-GfQuatd GfSlerp(const GfQuatd &q0, const GfQuatd &q1, double alpha) {
+GfQuatd GfSlerp(const GfQuatd &q0, const GfQuatd &q1, double alpha)
+{
   return GfSlerp(alpha, q0, q1);
 }
 
-GfQuatd GfSlerp(double alpha, const GfQuatd &q0, const GfQuatd &q1) {
-  double cosTheta =
-      q0.GetImaginary() * q1.GetImaginary() + q0.GetReal() * q1.GetReal();
+GfQuatd GfSlerp(double alpha, const GfQuatd &q0, const GfQuatd &q1)
+{
+  double cosTheta = q0.GetImaginary() * q1.GetImaginary() + q0.GetReal() * q1.GetReal();
   bool flip1 = false;
 
   if (cosTheta < 0.0) {
@@ -175,7 +185,8 @@ GfQuatd GfSlerp(double alpha, const GfQuatd &q0, const GfQuatd &q1) {
 
     scale0 = sin((1.0 - alpha) * theta) / sinTheta;
     scale1 = sin(alpha * theta) / sinTheta;
-  } else {
+  }
+  else {
     // rot0 and rot1 very close - just do linear interp and renormalize.
     scale0 = 1.0 - alpha;
     scale1 = alpha;

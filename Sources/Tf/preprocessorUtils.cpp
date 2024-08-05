@@ -25,19 +25,19 @@
 
 #if !defined(ARCH_OS_WINDOWS)
 
-#include <boost/preprocessor/arithmetic/sub.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/config/limits.hpp>
-#include <boost/preprocessor/control/expr_iif.hpp>
-#include <boost/preprocessor/comparison/equal.hpp>
-#include <boost/preprocessor/comparison/greater_equal.hpp>
-#include <boost/preprocessor/facilities/expand.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/punctuation/comma.hpp>
-#include <boost/preprocessor/punctuation/paren.hpp>
-#include <boost/preprocessor/tuple/eat.hpp>
+#  include <boost/preprocessor/arithmetic/sub.hpp>
+#  include <boost/preprocessor/cat.hpp>
+#  include <boost/preprocessor/comparison/equal.hpp>
+#  include <boost/preprocessor/comparison/greater_equal.hpp>
+#  include <boost/preprocessor/config/limits.hpp>
+#  include <boost/preprocessor/control/expr_iif.hpp>
+#  include <boost/preprocessor/facilities/expand.hpp>
+#  include <boost/preprocessor/punctuation/comma.hpp>
+#  include <boost/preprocessor/punctuation/paren.hpp>
+#  include <boost/preprocessor/repetition/repeat.hpp>
+#  include <boost/preprocessor/tuple/eat.hpp>
 
-#define _MAX_ARGS 64
+#  define _MAX_ARGS 64
 
 /* Python code for generating The TF_ARG_N() macros:
 for i in range(1, 32+1):
@@ -50,19 +50,21 @@ for i in range(1, 32+1):
 
 // Make sure TF_ARG_N() supports at least BOOST_PP_LIMIT_TUPLE arguments.
 
-#define _TF_ARG_ERROR(a, b, c)
-#define _TF_ARG_TUPLE_OVERFLOW(a, b, c)
+#  define _TF_ARG_ERROR(a, b, c)
+#  define _TF_ARG_TUPLE_OVERFLOW(a, b, c)
 
-BOOST_PP_IIF(
-    BOOST_PP_EQUAL(
-        1, BOOST_PP_EXPAND(BOOST_PP_CAT(TF_ARG_, _MAX_ARGS) BOOST_PP_LPAREN()
-                               _TF BOOST_PP_REPEAT(BOOST_PP_SUB(_MAX_ARGS, 2),
-                                                   _TF_NUM_ARGS_REP, _TF)
-                                   BOOST_PP_COMMA() 1 BOOST_PP_RPAREN())),
-    BOOST_PP_TUPLE_EAT(1), _TF_ARG_ERROR)
+BOOST_PP_IIF(BOOST_PP_EQUAL(1,
+                            BOOST_PP_EXPAND(BOOST_PP_CAT(TF_ARG_, _MAX_ARGS) BOOST_PP_LPAREN()
+                                                _TF BOOST_PP_REPEAT(BOOST_PP_SUB(_MAX_ARGS, 2),
+                                                                    _TF_NUM_ARGS_REP,
+                                                                    _TF)
+                                                    BOOST_PP_COMMA() 1 BOOST_PP_RPAREN())),
+             BOOST_PP_TUPLE_EAT(1),
+             _TF_ARG_ERROR)
 (...)
 
     BOOST_PP_IIF(BOOST_PP_GREATER_EQUAL(_MAX_ARGS, BOOST_PP_LIMIT_TUPLE),
-                 BOOST_PP_TUPLE_EAT(1), _TF_ARG_TUPLE_OVERFLOW)(...)
+                 BOOST_PP_TUPLE_EAT(1),
+                 _TF_ARG_TUPLE_OVERFLOW)(...)
 
 #endif

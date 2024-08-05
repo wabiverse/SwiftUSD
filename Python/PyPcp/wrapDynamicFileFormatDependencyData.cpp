@@ -33,12 +33,12 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapDynamicFileFormatDependencyData() {
+void wrapDynamicFileFormatDependencyData()
+{
   using This = PcpDynamicFileFormatDependencyData;
   class_<This>("DynamicFileFormatDependencyData", no_init)
       .def("GetRelevantFieldNames",
-           make_function(&This::GetRelevantFieldNames,
-                         return_value_policy<TfPySequenceToList>()))
+           make_function(&This::GetRelevantFieldNames, return_value_policy<TfPySequenceToList>()))
       .def("GetRelevantAttributeNames",
            make_function(&This::GetRelevantAttributeNames,
                          return_value_policy<TfPySequenceToList>()))

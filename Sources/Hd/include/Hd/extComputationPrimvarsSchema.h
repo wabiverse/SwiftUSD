@@ -35,51 +35,46 @@
 
 #include "Hd/extComputationPrimvarSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS \
-    (extComputationPrimvars) \
+#define HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS (extComputationPrimvars)
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationPrimvarsSchemaTokens, HD_API,
-    HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationPrimvarsSchemaTokens,
+                         HD_API,
+                         HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationPrimvarsSchema : public HdSchema
-{
-public:
-    HdExtComputationPrimvarsSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdExtComputationPrimvarsSchema : public HdSchema {
+ public:
+  HdExtComputationPrimvarsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    HD_API
-    TfTokenVector GetExtComputationPrimvarNames();
+  HD_API
+  TfTokenVector GetExtComputationPrimvarNames();
 
-    HD_API
-    HdExtComputationPrimvarSchema GetPrimvar(const TfToken &name);
+  HD_API
+  HdExtComputationPrimvarSchema GetPrimvar(const TfToken &name);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "extComputationPrimvars" from the parent container and constructs a
+  /// HdExtComputationPrimvarsSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdExtComputationPrimvarsSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "extComputationPrimvars" from the parent container and constructs a
-    /// HdExtComputationPrimvarsSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdExtComputationPrimvarsSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

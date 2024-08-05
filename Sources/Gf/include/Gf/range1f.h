@@ -46,7 +46,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class GfRange1d;
 class GfRange1f;
 
-template <> struct GfIsGfRange<class GfRange1f> {
+template<> struct GfIsGfRange<class GfRange1f> {
   static const bool value = true;
 };
 
@@ -60,7 +60,7 @@ template <> struct GfIsGfRange<class GfRange1f> {
 /// empty range is one where max < min.
 /// The default empty is [FLT_MAX,-FLT_MAX]
 class GfRange1f {
-public:
+ public:
   /// Helper typedef.
   typedef float MinMaxType;
 
@@ -69,13 +69,17 @@ public:
 
   /// Sets the range to an empty interval
   // TODO check whether this can be deprecated.
-  void inline SetEmpty() {
+  void inline SetEmpty()
+  {
     _min = FLT_MAX;
     _max = -FLT_MAX;
   }
 
   /// The default constructor creates an empty range.
-  GfRange1f() { SetEmpty(); }
+  GfRange1f()
+  {
+    SetEmpty();
+  }
 
   /// This constructor initializes the minimum and maximum points.
   GfRange1f(float min, float max) : _min(min), _max(max) {}
@@ -85,70 +89,106 @@ public:
   explicit GfRange1f(class GfRange1d const &other);
 
   /// Returns the minimum value of the range.
-  float GetMin() const { return _min; }
+  float GetMin() const
+  {
+    return _min;
+  }
 
   /// Returns the maximum value of the range.
-  float GetMax() const { return _max; }
+  float GetMax() const
+  {
+    return _max;
+  }
 
   /// Returns the size of the range.
-  float GetSize() const { return _max - _min; }
+  float GetSize() const
+  {
+    return _max - _min;
+  }
 
   /// Returns the midpoint of the range, that is, 0.5*(min+max).
   /// Note: this returns zero in the case of default-constructed ranges,
   /// or ranges set via SetEmpty().
-  float GetMidpoint() const {
-    return static_cast<ScalarType>(0.5) * _min +
-           static_cast<ScalarType>(0.5) * _max;
+  float GetMidpoint() const
+  {
+    return static_cast<ScalarType>(0.5) * _min + static_cast<ScalarType>(0.5) * _max;
   }
 
   /// Sets the minimum value of the range.
-  void SetMin(float min) { _min = min; }
+  void SetMin(float min)
+  {
+    _min = min;
+  }
 
   /// Sets the maximum value of the range.
-  void SetMax(float max) { _max = max; }
+  void SetMax(float max)
+  {
+    _max = max;
+  }
 
   /// Returns whether the range is empty (max < min).
-  bool IsEmpty() const { return _min > _max; }
+  bool IsEmpty() const
+  {
+    return _min > _max;
+  }
 
   /// Modifies the range if necessary to surround the given value.
   /// \deprecated Use UnionWith() instead.
-  void ExtendBy(float point) { UnionWith(point); }
+  void ExtendBy(float point)
+  {
+    UnionWith(point);
+  }
 
   /// Modifies the range if necessary to surround the given range.
   /// \deprecated Use UnionWith() instead.
-  void ExtendBy(const GfRange1f &range) { UnionWith(range); }
+  void ExtendBy(const GfRange1f &range)
+  {
+    UnionWith(range);
+  }
 
   /// Returns true if the \p point is located inside the range. As with all
   /// operations of this type, the range is assumed to include its extrema.
-  bool Contains(float point) const { return (point >= _min && point <= _max); }
+  bool Contains(float point) const
+  {
+    return (point >= _min && point <= _max);
+  }
 
   /// Returns true if the \p range is located entirely inside the range. As
   /// with all operations of this type, the ranges are assumed to include
   /// their extrema.
-  bool Contains(const GfRange1f &range) const {
+  bool Contains(const GfRange1f &range) const
+  {
     return Contains(range._min) && Contains(range._max);
   }
 
   /// Returns true if the \p point is located inside the range. As with all
   /// operations of this type, the range is assumed to include its extrema.
   /// \deprecated Use Contains() instead.
-  bool IsInside(float point) const { return Contains(point); }
+  bool IsInside(float point) const
+  {
+    return Contains(point);
+  }
 
   /// Returns true if the \p range is located entirely inside the range. As
   /// with all operations of this type, the ranges are assumed to include
   /// their extrema.
   /// \deprecated Use Contains() instead.
-  bool IsInside(const GfRange1f &range) const { return Contains(range); }
+  bool IsInside(const GfRange1f &range) const
+  {
+    return Contains(range);
+  }
 
   /// Returns true if the \p range is located entirely outside the range. As
   /// with all operations of this type, the ranges are assumed to include
   /// their extrema.
-  bool IsOutside(const GfRange1f &range) const {
+  bool IsOutside(const GfRange1f &range) const
+  {
     return (range._max < _min || range._min > _max);
   }
 
   /// Returns the smallest \c GfRange1f which contains both \p a and \p b.
-  static GfRange1f GetUnion(const GfRange1f &a, const GfRange1f &b) {
+  static GfRange1f GetUnion(const GfRange1f &a, const GfRange1f &b)
+  {
     GfRange1f res = a;
     _FindMin(res._min, b._min);
     _FindMax(res._max, b._max);
@@ -156,14 +196,16 @@ public:
   }
 
   /// Extend \p this to include \p b.
-  const GfRange1f &UnionWith(const GfRange1f &b) {
+  const GfRange1f &UnionWith(const GfRange1f &b)
+  {
     _FindMin(_min, b._min);
     _FindMax(_max, b._max);
     return *this;
   }
 
   /// Extend \p this to include \p b.
-  const GfRange1f &UnionWith(float b) {
+  const GfRange1f &UnionWith(float b)
+  {
     _FindMin(_min, b);
     _FindMax(_max, b);
     return *this;
@@ -171,20 +213,28 @@ public:
 
   /// Returns the smallest \c GfRange1f which contains both \p a and \p b
   /// \deprecated Use GetUnion() instead.
-  static GfRange1f Union(const GfRange1f &a, const GfRange1f &b) {
+  static GfRange1f Union(const GfRange1f &a, const GfRange1f &b)
+  {
     return GetUnion(a, b);
   }
 
   /// Extend \p this to include \p b.
   /// \deprecated Use UnionWith() instead.
-  const GfRange1f &Union(const GfRange1f &b) { return UnionWith(b); }
+  const GfRange1f &Union(const GfRange1f &b)
+  {
+    return UnionWith(b);
+  }
 
   /// Extend \p this to include \p b.
   /// \deprecated Use UnionWith() instead.
-  const GfRange1f &Union(float b) { return UnionWith(b); }
+  const GfRange1f &Union(float b)
+  {
+    return UnionWith(b);
+  }
 
   /// Returns a \c GfRange1f that describes the intersection of \p a and \p b.
-  static GfRange1f GetIntersection(const GfRange1f &a, const GfRange1f &b) {
+  static GfRange1f GetIntersection(const GfRange1f &a, const GfRange1f &b)
+  {
     GfRange1f res = a;
     _FindMax(res._min, b._min);
     _FindMin(res._max, b._max);
@@ -193,13 +243,15 @@ public:
 
   /// Returns a \c GfRange1f that describes the intersection of \p a and \p b.
   /// \deprecated Use GetIntersection() instead.
-  static GfRange1f Intersection(const GfRange1f &a, const GfRange1f &b) {
+  static GfRange1f Intersection(const GfRange1f &a, const GfRange1f &b)
+  {
     return GetIntersection(a, b);
   }
 
   /// Modifies this range to hold its intersection with \p b and returns the
   /// result
-  const GfRange1f &IntersectWith(const GfRange1f &b) {
+  const GfRange1f &IntersectWith(const GfRange1f &b)
+  {
     _FindMax(_min, b._min);
     _FindMin(_max, b._max);
     return *this;
@@ -208,28 +260,35 @@ public:
   /// Modifies this range to hold its intersection with \p b and returns the
   /// result.
   /// \deprecated Use IntersectWith() instead.
-  const GfRange1f &Intersection(const GfRange1f &b) { return IntersectWith(b); }
+  const GfRange1f &Intersection(const GfRange1f &b)
+  {
+    return IntersectWith(b);
+  }
 
   /// unary sum.
-  GfRange1f &operator+=(const GfRange1f &b) {
+  GfRange1f &operator+=(const GfRange1f &b)
+  {
     _min += b._min;
     _max += b._max;
     return *this;
   }
 
   /// unary difference.
-  GfRange1f &operator-=(const GfRange1f &b) {
+  GfRange1f &operator-=(const GfRange1f &b)
+  {
     _min -= b._max;
     _max -= b._min;
     return *this;
   }
 
   /// unary multiply.
-  GfRange1f &operator*=(double m) {
+  GfRange1f &operator*=(double m)
+  {
     if (m > 0) {
       _min *= m;
       _max *= m;
-    } else {
+    }
+    else {
       float tmp = _min;
       _min = _max * m;
       _max = tmp * m;
@@ -238,46 +297,57 @@ public:
   }
 
   /// unary division.
-  GfRange1f &operator/=(double m) { return *this *= (1.0 / m); }
+  GfRange1f &operator/=(double m)
+  {
+    return *this *= (1.0 / m);
+  }
 
   /// binary sum.
-  GfRange1f operator+(const GfRange1f &b) const {
+  GfRange1f operator+(const GfRange1f &b) const
+  {
     return GfRange1f(_min + b._min, _max + b._max);
   }
 
   /// binary difference.
-  GfRange1f operator-(const GfRange1f &b) const {
+  GfRange1f operator-(const GfRange1f &b) const
+  {
     return GfRange1f(_min - b._max, _max - b._min);
   }
 
   /// scalar multiply.
-  friend GfRange1f operator*(double m, const GfRange1f &r) {
-    return (m > 0 ? GfRange1f(r._min * m, r._max * m)
-                  : GfRange1f(r._max * m, r._min * m));
+  friend GfRange1f operator*(double m, const GfRange1f &r)
+  {
+    return (m > 0 ? GfRange1f(r._min * m, r._max * m) : GfRange1f(r._max * m, r._min * m));
   }
 
   /// scalar multiply.
-  friend GfRange1f operator*(const GfRange1f &r, double m) {
-    return (m > 0 ? GfRange1f(r._min * m, r._max * m)
-                  : GfRange1f(r._max * m, r._min * m));
+  friend GfRange1f operator*(const GfRange1f &r, double m)
+  {
+    return (m > 0 ? GfRange1f(r._min * m, r._max * m) : GfRange1f(r._max * m, r._min * m));
   }
 
   /// scalar divide.
-  friend GfRange1f operator/(const GfRange1f &r, double m) {
+  friend GfRange1f operator/(const GfRange1f &r, double m)
+  {
     return r * (1.0 / m);
   }
 
   /// hash.
-  friend inline size_t hash_value(const GfRange1f &r) {
+  friend inline size_t hash_value(const GfRange1f &r)
+  {
     return TfHash::Combine(r._min, r._max);
   }
 
   /// The min and max points must match exactly for equality.
-  bool operator==(const GfRange1f &b) const {
+  bool operator==(const GfRange1f &b) const
+  {
     return (_min == b._min && _max == b._max);
   }
 
-  bool operator!=(const GfRange1f &b) const { return !(*this == b); }
+  bool operator!=(const GfRange1f &b) const
+  {
+    return !(*this == b);
+  }
 
   /// Compare this range to a GfRange1d.
   ///
@@ -290,18 +360,20 @@ public:
   GF_API
   double GetDistanceSquared(float p) const;
 
-private:
+ private:
   /// Minimum and maximum points.
   float _min, _max;
 
   /// Extends minimum point if necessary to contain given point.
-  static void _FindMin(float &dest, float point) {
+  static void _FindMin(float &dest, float point)
+  {
     if (point < dest)
       dest = point;
   }
 
   /// Extends maximum point if necessary to contain given point.
-  static void _FindMax(float &dest, float point) {
+  static void _FindMax(float &dest, float point)
+  {
     if (point > dest)
       dest = point;
   }
@@ -315,14 +387,16 @@ PXR_NAMESPACE_CLOSE_SCOPE
 #include "Gf/range1d.h"
 PXR_NAMESPACE_OPEN_SCOPE
 
-inline bool GfRange1f::operator==(const GfRange1d &other) const {
+inline bool GfRange1f::operator==(const GfRange1d &other) const
+{
   return _min == float(other.GetMin()) && _max == float(other.GetMax());
 }
 
-inline bool GfRange1f::operator!=(const GfRange1d &other) const {
+inline bool GfRange1f::operator!=(const GfRange1d &other) const
+{
   return !(*this == other);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_RANGE1F_H
+#endif  // PXR_BASE_GF_RANGE1F_H

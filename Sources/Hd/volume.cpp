@@ -25,19 +25,15 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdVolume::HdVolume(SdfPath const& id)
- : HdRprim(id)
-{
-}
+HdVolume::HdVolume(SdfPath const &id) : HdRprim(id) {}
 
 HdVolume::~HdVolume() = default;
 
 /* virtual */
-TfTokenVector const &
-HdVolume::GetBuiltinPrimvarNames() const
+TfTokenVector const &HdVolume::GetBuiltinPrimvarNames() const
 {
-    static const TfTokenVector primvarNames;
-    return primvarNames;
+  static const TfTokenVector primvarNames;
+  return primvarNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

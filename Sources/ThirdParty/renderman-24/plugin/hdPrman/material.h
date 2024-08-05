@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_H
 
-#include <pxr/pxrns.h>
 #include "Hd/material.h"
 #include "Riley.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ class HdPrman_RenderParam;
 ///
 /// A representation for materials (including displacement) in prman.
 ///
-class HdPrmanMaterial final : public HdMaterial
-{
-public:
+class HdPrmanMaterial final : public HdMaterial {
+ public:
   HdPrmanMaterial(SdfPath const &id);
   ~HdPrmanMaterial() override;
 
@@ -53,8 +52,14 @@ public:
   /// Typically this would be all dirty bits.
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-  riley::MaterialId GetMaterialId() const { return _materialId; }
-  riley::DisplacementId GetDisplacementId() const { return _displacementId; }
+  riley::MaterialId GetMaterialId() const
+  {
+    return _materialId;
+  }
+  riley::DisplacementId GetDisplacementId() const
+  {
+    return _displacementId;
+  }
 
   /// Return true if this material is valid.
   bool IsValid() const;
@@ -67,7 +72,7 @@ public:
   /// Return the material network after filtering.
   HdMaterialNetwork2 const &GetMaterialNetwork() const;
 
-private:
+ private:
   void _ResetMaterial(HdPrman_RenderParam *renderParam);
 
   riley::MaterialId _materialId;
@@ -79,17 +84,15 @@ private:
 /// Helper function for converting an HdMaterialNetwork into Riley shading
 /// nodes. Lights and light filters, in addition to materials, need to be able
 /// to perform this conversion.
-bool HdPrman_ConvertHdMaterialNetwork2ToRmanNodes(
-    HdMaterialNetwork2 const &network,
-    SdfPath const &nodePath,
-    std::vector<riley::ShadingNode> *result);
+bool HdPrman_ConvertHdMaterialNetwork2ToRmanNodes(HdMaterialNetwork2 const &network,
+                                                  SdfPath const &nodePath,
+                                                  std::vector<riley::ShadingNode> *result);
 
 /// Return the fallback surface material network description.  This network
 /// is meant to resemble Storm's fallback material.  It uses displayColor,
 /// displayRoughness, displayOpacity, and displayMetallic.
-HdMaterialNetwork2
-HdPrmanMaterial_GetFallbackSurfaceMaterialNetwork();
+HdMaterialNetwork2 HdPrmanMaterial_GetFallbackSurfaceMaterialNetwork();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATERIAL_H

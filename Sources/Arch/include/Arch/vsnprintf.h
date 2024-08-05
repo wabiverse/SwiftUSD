@@ -102,4 +102,4 @@ std::string ArchVStringPrintf(const char *fmt, va_list ap)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_VSNPRINTF_H
+#endif  // PXR_BASE_ARCH_VSNPRINTF_H

@@ -49,7 +49,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// destructible.
 ///
 class TraceDataBuffer {
-public:
+ public:
   constexpr static size_t DefaultAllocSize = 1024;
 
   /// Constructor. The buffer will make allocations of \p allocSize.
@@ -58,17 +58,17 @@ public:
 
   /// Makes a copy of \p value and returns a pointer to it.
   ///
-  template <typename T> const T *StoreData(const T &value) {
-    static_assert(std::is_copy_constructible<T>::value,
-                  "Must by copy constructible");
-    static_assert(std::is_trivially_destructible<T>::value,
-                  "No destructors will be called");
+  template<typename T> const T *StoreData(const T &value)
+  {
+    static_assert(std::is_copy_constructible<T>::value, "Must by copy constructible");
+    static_assert(std::is_trivially_destructible<T>::value, "No destructors will be called");
     return new (_alloc.Allocate(alignof(T), sizeof(T))) T(value);
   }
 
   /// Makes a copy of \p str and returns a pointer to it.
   /// Specialization for c strings.
-  const char *StoreData(const char *str) {
+  const char *StoreData(const char *str)
+  {
     const size_t strLen = std::strlen(str) + 1;
     void *mem = _alloc.Allocate(alignof(char), strLen);
     char *cstr = reinterpret_cast<char *>(mem);
@@ -76,11 +76,11 @@ public:
     return cstr;
   }
 
-private:
+ private:
   // Simple Allocator that only supports allocations, but not frees.
   // Allocated memory is tied to the lifetime of the allocator object.
   class Allocator {
-  public:
+   public:
     Allocator(size_t blockSize) : _desiredBlockSize(blockSize) {}
     Allocator(Allocator &&) = default;
     Allocator &operator=(Allocator &&) = default;
@@ -88,7 +88,8 @@ private:
     Allocator(const Allocator &) = delete;
     Allocator &operator=(const Allocator &) = delete;
 
-    void *Allocate(const size_t align, const size_t size) {
+    void *Allocate(const size_t align, const size_t size)
+    {
       Byte *alignedNext = AlignPointer(_next, align);
       Byte *end = alignedNext + size;
       if (ARCH_UNLIKELY(end > _blockEnd)) {
@@ -100,13 +101,13 @@ private:
       return alignedNext;
     }
 
-  private:
+   private:
     using Byte = std::uint8_t;
 
-    static Byte *AlignPointer(Byte *ptr, const size_t align) {
+    static Byte *AlignPointer(Byte *ptr, const size_t align)
+    {
       const size_t alignMask = align - 1;
-      return reinterpret_cast<Byte *>(
-          reinterpret_cast<uintptr_t>(ptr + alignMask) & ~alignMask);
+      return reinterpret_cast<Byte *>(reinterpret_cast<uintptr_t>(ptr + alignMask) & ~alignMask);
     }
 
     TRACE_API void AllocateBlock(const size_t align, const size_t desiredSize);
@@ -123,4 +124,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_DATA_BUFFER_H
+#endif  // PXR_BASE_TRACE_DATA_BUFFER_H

@@ -53,10 +53,12 @@ namespace {
 
 // Converter from std::vector<VtValue> to python list
 struct VtValueArrayToPython {
-  static PyObject *convert(const std::vector<VtValue> &v) {
+  static PyObject *convert(const std::vector<VtValue> &v)
+  {
     // TODO Use result converter. TfPySequenceToList.
     list result;
-    TF_FOR_ALL(i, v) {
+    TF_FOR_ALL(i, v)
+    {
       object o = TfPyObject(*i);
       result.append(o);
     }
@@ -66,12 +68,14 @@ struct VtValueArrayToPython {
 
 // Converter from VtDictionary to python dict.
 struct VtDictionaryToPython {
-  static PyObject *convert(const VtDictionary &v) {
+  static PyObject *convert(const VtDictionary &v)
+  {
     TRACE_FUNCTION();
 
     // TODO Use result converter TfPyMapToDictionary??
     dict result;
-    TF_FOR_ALL(i, v) {
+    TF_FOR_ALL(i, v)
+    {
       object o = TfPyObject(i->second);
       result.setdefault(i->first, o);
     }
@@ -88,7 +92,8 @@ static bool _CanVtValueFromPython(object pVal);
 // VtValue knows about, does that.  In each of these cases, returns true.
 //
 // Otherwise, returns false.
-static bool _VtValueFromPython(object pVal, VtValue *result) {
+static bool _VtValueFromPython(object pVal, VtValue *result)
+{
   // Try to convert a nested dictionary into a VtDictionary.
   extract<VtDictionary> valDictProxy(pVal);
   if (valDictProxy.check()) {
@@ -126,14 +131,15 @@ static bool _VtValueFromPython(object pVal, VtValue *result) {
 
 // Converter from python dict to VtValueArray.
 struct _VtValueArrayFromPython {
-  _VtValueArrayFromPython() {
-    converter::registry::insert(&convertible, &construct,
-                                type_id<std::vector<VtValue>>());
+  _VtValueArrayFromPython()
+  {
+    converter::registry::insert(&convertible, &construct, type_id<std::vector<VtValue>>());
   }
 
   // Returns p if p can convert to an array, NULL otherwise.
   // If result is non-NULL, does the conversion into *result.
-  static PyObject *convert(PyObject *p, std::vector<VtValue> *result) {
+  static PyObject *convert(PyObject *p, std::vector<VtValue> *result)
+  {
     extract<list> dProxy(p);
     if (!dProxy.check()) {
       return NULL;
@@ -150,20 +156,23 @@ struct _VtValueArrayFromPython {
         if (!_VtValueFromPython(pVal, &result->back()))
           return NULL;
         // Fall through to return p.
-      } else {
+      }
+      else {
         // Test for convertibility.
       }
     }
     return p;
   }
-  static void *convertible(PyObject *p) { return convert(p, NULL); }
+  static void *convertible(PyObject *p)
+  {
+    return convert(p, NULL);
+  }
 
-  static void construct(PyObject *source,
-                        converter::rvalue_from_python_stage1_data *data) {
+  static void construct(PyObject *source, converter::rvalue_from_python_stage1_data *data)
+  {
     TfAutoMallocTag2 tag("Vt", "_VtValueArrayFromPython::construct");
     void *storage =
-        ((converter::rvalue_from_python_storage<std::vector<VtValue>> *)data)
-            ->storage.bytes;
+        ((converter::rvalue_from_python_storage<std::vector<VtValue>> *)data)->storage.bytes;
     new (storage) std::vector<VtValue>();
     data->convertible = storage;
     convert(source, (std::vector<VtValue> *)storage);
@@ -172,14 +181,15 @@ struct _VtValueArrayFromPython {
 
 // Converter from python dict to VtDictionary.
 struct _VtDictionaryFromPython {
-  _VtDictionaryFromPython() {
-    converter::registry::insert(&convertible, &construct,
-                                type_id<VtDictionary>());
+  _VtDictionaryFromPython()
+  {
+    converter::registry::insert(&convertible, &construct, type_id<VtDictionary>());
   }
 
   // Returns p if p can convert to a dictionary, NULL otherwise.
   // If result is non-NULL, does the conversion into *result.
-  static PyObject *convert(PyObject *p, VtDictionary *result) {
+  static PyObject *convert(PyObject *p, VtDictionary *result)
+  {
     if (!PyDict_Check(p)) {
       return NULL;
     }
@@ -195,25 +205,25 @@ struct _VtDictionaryFromPython {
         VtValue &val = (*result)[keyProxy()];
         if (!_VtValueFromPython(pVal, &val))
           return NULL;
-      } else {
+      }
+      else {
         if (!_CanVtValueFromPython(pVal))
           return NULL;
       }
     }
     return p;
   }
-  static void *convertible(PyObject *p) {
+  static void *convertible(PyObject *p)
+  {
     TRACE_FUNCTION();
     return convert(p, NULL);
   }
 
-  static void construct(PyObject *source,
-                        converter::rvalue_from_python_stage1_data *data) {
+  static void construct(PyObject *source, converter::rvalue_from_python_stage1_data *data)
+  {
     TRACE_FUNCTION();
     TfAutoMallocTag2 tag("Vt", "_VtDictionaryFromPython::construct");
-    void *storage =
-        ((converter::rvalue_from_python_storage<VtDictionary> *)data)
-            ->storage.bytes;
+    void *storage = ((converter::rvalue_from_python_storage<VtDictionary> *)data)->storage.bytes;
     new (storage) VtDictionary(0);
     data->convertible = storage;
     convert(source, (VtDictionary *)storage);
@@ -222,19 +232,18 @@ struct _VtDictionaryFromPython {
 
 // Converter from python list to VtValue holding VtValueArray.
 struct _VtValueHoldingVtValueArrayFromPython {
-  _VtValueHoldingVtValueArrayFromPython() {
-    converter::registry::insert(&_VtValueArrayFromPython::convertible,
-                                &construct, type_id<VtValue>());
+  _VtValueHoldingVtValueArrayFromPython()
+  {
+    converter::registry::insert(
+        &_VtValueArrayFromPython::convertible, &construct, type_id<VtValue>());
   }
 
-  static void construct(PyObject *source,
-                        converter::rvalue_from_python_stage1_data *data) {
-    TfAutoMallocTag2 tag("Vt",
-                         "_VtValueHoldingVtValueArrayFromPython::construct");
+  static void construct(PyObject *source, converter::rvalue_from_python_stage1_data *data)
+  {
+    TfAutoMallocTag2 tag("Vt", "_VtValueHoldingVtValueArrayFromPython::construct");
     std::vector<VtValue> arr;
     _VtValueArrayFromPython::convert(source, &arr);
-    void *storage =
-        ((converter::rvalue_from_python_storage<VtValue> *)data)->storage.bytes;
+    void *storage = ((converter::rvalue_from_python_storage<VtValue> *)data)->storage.bytes;
     new (storage) VtValue();
     ((VtValue *)storage)->Swap(arr);
     data->convertible = storage;
@@ -243,26 +252,26 @@ struct _VtValueHoldingVtValueArrayFromPython {
 
 // Converter from python dict to VtValue holding VtDictionary.
 struct _VtValueHoldingVtDictionaryFromPython {
-  _VtValueHoldingVtDictionaryFromPython() {
-    converter::registry::insert(&_VtDictionaryFromPython::convertible,
-                                &construct, type_id<VtValue>());
+  _VtValueHoldingVtDictionaryFromPython()
+  {
+    converter::registry::insert(
+        &_VtDictionaryFromPython::convertible, &construct, type_id<VtValue>());
   }
 
-  static void construct(PyObject *source,
-                        converter::rvalue_from_python_stage1_data *data) {
-    TfAutoMallocTag2 tag("Vt",
-                         "_VtValueHoldingVtDictionaryFromPython::construct");
+  static void construct(PyObject *source, converter::rvalue_from_python_stage1_data *data)
+  {
+    TfAutoMallocTag2 tag("Vt", "_VtValueHoldingVtDictionaryFromPython::construct");
     VtDictionary dictionary;
     _VtDictionaryFromPython::convert(source, &dictionary);
-    void *storage =
-        ((converter::rvalue_from_python_storage<VtValue> *)data)->storage.bytes;
+    void *storage = ((converter::rvalue_from_python_storage<VtValue> *)data)->storage.bytes;
     new (storage) VtValue();
     ((VtValue *)storage)->Swap(dictionary);
     data->convertible = storage;
   }
 };
 
-static bool _CanVtValueFromPython(object pVal) {
+static bool _CanVtValueFromPython(object pVal)
+{
   if (_VtDictionaryFromPython::convertible(pVal.ptr()))
     return true;
 
@@ -273,11 +282,15 @@ static bool _CanVtValueFromPython(object pVal) {
   return e.check() && !e().IsHolding<TfPyObjWrapper>();
 }
 
-static VtDictionary _ReturnDictionary(VtDictionary const &x) { return x; }
+static VtDictionary _ReturnDictionary(VtDictionary const &x)
+{
+  return x;
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapDictionary() {
+void wrapDictionary()
+{
   def("_ReturnDictionary", _ReturnDictionary);
 
   to_python_converter<VtDictionary, VtDictionaryToPython>();

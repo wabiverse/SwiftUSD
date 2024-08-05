@@ -33,10 +33,10 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdFileFormat() {
+void wrapUsdFileFormat()
+{
   using This = UsdUsdFileFormat;
-  class_<This, bases<SdfFileFormat>, boost::noncopyable>("UsdFileFormat",
-                                                         no_init)
+  class_<This, bases<SdfFileFormat>, boost::noncopyable>("UsdFileFormat", no_init)
 
       .def("GetUnderlyingFormatForLayer", &This::GetUnderlyingFormatForLayer)
       .staticmethod("GetUnderlyingFormatForLayer");

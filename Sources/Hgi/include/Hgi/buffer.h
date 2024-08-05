@@ -27,12 +27,12 @@
 #include <string>
 #include <vector>
 
-#include <pxr/pxrns.h>
 #include "Gf/vec3i.h"
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -57,8 +57,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   of the HgiBuffer has returned.</li>
 /// </ul>
 ///
-struct HgiBufferDesc
-{
+struct HgiBufferDesc {
   HGI_API
   HgiBufferDesc()
       : usage(HgiBufferUsageUniform), byteSize(0), vertexStride(0), initialData(nullptr)
@@ -73,14 +72,10 @@ struct HgiBufferDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiBufferDesc &lhs,
-    const HgiBufferDesc &rhs);
+bool operator==(const HgiBufferDesc &lhs, const HgiBufferDesc &rhs);
 
 HGI_API
-inline bool operator!=(
-    const HgiBufferDesc &lhs,
-    const HgiBufferDesc &rhs);
+inline bool operator!=(const HgiBufferDesc &lhs, const HgiBufferDesc &rhs);
 
 ///
 /// \class HgiBuffer
@@ -90,9 +85,8 @@ inline bool operator!=(
 /// The fill the buffer with data you supply `initialData` in the descriptor.
 /// To update the data inside the buffer later on, use blitCmds.
 ///
-class HgiBuffer
-{
-public:
+class HgiBuffer {
+ public:
   HGI_API
   virtual ~HgiBuffer();
 
@@ -131,13 +125,13 @@ public:
   HGI_API
   virtual void *GetCPUStagingAddress() = 0;
 
-protected:
+ protected:
   HGI_API
   HgiBuffer(HgiBufferDesc const &desc);
 
   HgiBufferDesc _descriptor;
 
-private:
+ private:
   HgiBuffer() = delete;
   HgiBuffer &operator=(const HgiBuffer &) = delete;
   HgiBuffer(const HgiBuffer &) = delete;

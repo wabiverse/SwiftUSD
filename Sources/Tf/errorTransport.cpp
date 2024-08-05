@@ -27,7 +27,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void TfErrorTransport::_PostImpl() {
+void TfErrorTransport::_PostImpl()
+{
   TfDiagnosticMgr::GetInstance()._SpliceErrors(_errorList);
 }
 

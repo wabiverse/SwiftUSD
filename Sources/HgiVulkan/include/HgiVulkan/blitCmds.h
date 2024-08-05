@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGIVULKAN_BLIT_CMDS_H
 #define PXR_IMAGING_HGIVULKAN_BLIT_CMDS_H
 
-#include <pxr/pxrns.h>
-#include "HgiVulkan/api.h"
 #include "Hgi/blitCmds.h"
+#include "HgiVulkan/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ class HgiVulkanCommandBuffer;
 ///
 /// Vulkan implementation of HgiBlitCmds.
 ///
-class HgiVulkanBlitCmds final : public HgiBlitCmds
-{
-public:
+class HgiVulkanBlitCmds final : public HgiBlitCmds {
+ public:
   HGIVULKAN_API
   ~HgiVulkanBlitCmds() override;
 
@@ -83,7 +82,7 @@ public:
   HGIVULKAN_API
   HgiVulkanCommandBuffer *GetCommandBuffer();
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
@@ -92,7 +91,7 @@ protected:
   HGIVULKAN_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiVulkanBlitCmds &operator=(const HgiVulkanBlitCmds &) = delete;
   HgiVulkanBlitCmds(const HgiVulkanBlitCmds &) = delete;
 

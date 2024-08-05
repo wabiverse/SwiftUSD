@@ -31,13 +31,12 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapDefaultResolver() {
+void wrapDefaultResolver()
+{
   using This = ArDefaultResolver;
 
-  class_<This, bases<ArResolver>, boost::noncopyable>("DefaultResolver",
-                                                      no_init)
+  class_<This, bases<ArResolver>, boost::noncopyable>("DefaultResolver", no_init)
 
-      .def("SetDefaultSearchPath", &This::SetDefaultSearchPath,
-           args("searchPath"))
+      .def("SetDefaultSearchPath", &This::SetDefaultSearchPath, args("searchPath"))
       .staticmethod("SetDefaultSearchPath");
 }

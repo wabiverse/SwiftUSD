@@ -30,7 +30,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 static inline int _GetNonVariantPathElementCount(const SdfPath &path);
 
-bool PcpNodeRef::operator<(const PcpNodeRef &rhs) const {
+bool PcpNodeRef::operator<(const PcpNodeRef &rhs) const
+{
   if (_nodeIdx < rhs._nodeIdx)
     return true;
   if (_nodeIdx > rhs._nodeIdx)
@@ -39,22 +40,32 @@ bool PcpNodeRef::operator<(const PcpNodeRef &rhs) const {
   return _graph < rhs._graph;
 }
 
-void *PcpNodeRef::GetUniqueIdentifier() const { return _graph + _nodeIdx; }
+void *PcpNodeRef::GetUniqueIdentifier() const
+{
+  return _graph + _nodeIdx;
+}
 
-PcpNodeRef
-PcpNodeRef::InsertChildSubgraph(const PcpPrimIndex_GraphRefPtr &subgraph,
-                                const PcpArc &arc, PcpErrorBasePtr *error) {
+PcpNodeRef PcpNodeRef::InsertChildSubgraph(const PcpPrimIndex_GraphRefPtr &subgraph,
+                                           const PcpArc &arc,
+                                           PcpErrorBasePtr *error)
+{
   return _graph->InsertChildSubgraph(*this, subgraph, arc, error);
 }
 
 PcpNodeRef PcpNodeRef::InsertChild(const PcpLayerStackSite &site,
-                                   const PcpArc &arc, PcpErrorBasePtr *error) {
+                                   const PcpArc &arc,
+                                   PcpErrorBasePtr *error)
+{
   return _graph->InsertChildNode(*this, site, arc, error);
 }
 
-PcpNodeRef PcpNodeRef::GetRootNode() const { return _graph->GetRootNode(); }
+PcpNodeRef PcpNodeRef::GetRootNode() const
+{
+  return _graph->GetRootNode();
+}
 
-PcpNodeRef PcpNodeRef::GetOriginRootNode() const {
+PcpNodeRef PcpNodeRef::GetOriginRootNode() const
+{
   PcpNodeRef root(*this);
   while (root.GetOriginNode() && root.GetOriginNode() != root.GetParentNode())
     root = root.GetOriginNode();
@@ -62,36 +73,38 @@ PcpNodeRef PcpNodeRef::GetOriginRootNode() const {
   return root;
 }
 
-#define PCP_DEFINE_GET_API(typeName, getter, varName)                          \
-  typeName PcpNodeRef::getter() const {                                        \
-    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx);   \
-    return graphNode.varName;                                                  \
+#define PCP_DEFINE_GET_API(typeName, getter, varName) \
+  typeName PcpNodeRef::getter() const \
+  { \
+    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx); \
+    return graphNode.varName; \
   }
 
 // Same as PCP_DEFINE_GET_API() except specifically for retrieving
 // node indices. Consumers expect this to return -1 for an invalid
 // node, so we need to specifically check for the _invalidNodeIndex
 // value.
-#define PCP_DEFINE_GET_NODE_API(typeName, getter, varName)                     \
-  typeName PcpNodeRef::getter() const {                                        \
-    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx);   \
-    if (graphNode.varName == PcpPrimIndex_Graph::_Node::_invalidNodeIndex)     \
-      return (typeName)-1;                                                     \
-    return graphNode.varName;                                                  \
+#define PCP_DEFINE_GET_NODE_API(typeName, getter, varName) \
+  typeName PcpNodeRef::getter() const \
+  { \
+    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx); \
+    if (graphNode.varName == PcpPrimIndex_Graph::_Node::_invalidNodeIndex) \
+      return (typeName) - 1; \
+    return graphNode.varName; \
   }
 
-#define PCP_DEFINE_SET_API(typeName, setter, varName)                          \
-  void PcpNodeRef::setter(typeName val) {                                      \
-    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx);   \
-    if (graphNode.varName != val) {                                            \
-      PcpPrimIndex_Graph::_Node &writeableGraphNode =                          \
-          _graph->_GetWriteableNode(_nodeIdx);                                 \
-      writeableGraphNode.varName = val;                                        \
-    }                                                                          \
+#define PCP_DEFINE_SET_API(typeName, setter, varName) \
+  void PcpNodeRef::setter(typeName val) \
+  { \
+    const PcpPrimIndex_Graph::_Node &graphNode = _graph->_GetNode(_nodeIdx); \
+    if (graphNode.varName != val) { \
+      PcpPrimIndex_Graph::_Node &writeableGraphNode = _graph->_GetWriteableNode(_nodeIdx); \
+      writeableGraphNode.varName = val; \
+    } \
   }
 
-#define PCP_DEFINE_API(typeName, getter, setter, varName)                      \
-  PCP_DEFINE_GET_API(typeName, getter, varName)                                \
+#define PCP_DEFINE_API(typeName, getter, setter, varName) \
+  PCP_DEFINE_GET_API(typeName, getter, varName) \
   PCP_DEFINE_SET_API(typeName, setter, varName)
 
 PCP_DEFINE_GET_API(PcpArcType, GetArcType, smallInts.arcType);
@@ -101,8 +114,7 @@ PCP_DEFINE_GET_API(const PcpMapExpression &, GetMapToParent, mapToParent);
 PCP_DEFINE_GET_API(const PcpMapExpression &, GetMapToRoot, mapToRoot);
 
 PCP_DEFINE_API(bool, HasSymmetry, SetHasSymmetry, smallInts.hasSymmetry);
-PCP_DEFINE_API(SdfPermission, GetPermission, SetPermission,
-               smallInts.permission);
+PCP_DEFINE_API(SdfPermission, GetPermission, SetPermission, smallInts.permission);
 PCP_DEFINE_API(bool, IsRestricted, SetRestricted, smallInts.permissionDenied);
 
 PCP_DEFINE_SET_API(bool, SetInert, smallInts.inert);
@@ -111,12 +123,14 @@ PCP_DEFINE_GET_NODE_API(size_t, _GetParentIndex, indexes.arcParentIndex);
 PCP_DEFINE_GET_NODE_API(size_t, _GetOriginIndex, indexes.arcOriginIndex);
 PCP_DEFINE_GET_API(const PcpLayerStackRefPtr &, GetLayerStack, layerStack);
 
-bool PcpNodeRef::IsCulled() const {
+bool PcpNodeRef::IsCulled() const
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   return _graph->_unshared[_nodeIdx].culled;
 }
 
-void PcpNodeRef::SetCulled(bool culled) {
+void PcpNodeRef::SetCulled(bool culled)
+{
   // Have to set finalized to false if we cull anything.
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   if (culled && !_graph->_unshared[_nodeIdx].culled) {
@@ -125,43 +139,54 @@ void PcpNodeRef::SetCulled(bool culled) {
   _graph->_unshared[_nodeIdx].culled = culled;
 }
 
-bool PcpNodeRef::IsDueToAncestor() const {
+bool PcpNodeRef::IsDueToAncestor() const
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   return _graph->_unshared[_nodeIdx].isDueToAncestor;
 }
 
-void PcpNodeRef::SetIsDueToAncestor(bool isDueToAncestor) {
+void PcpNodeRef::SetIsDueToAncestor(bool isDueToAncestor)
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   _graph->_unshared[_nodeIdx].isDueToAncestor = isDueToAncestor;
 }
 
-bool PcpNodeRef::HasSpecs() const {
+bool PcpNodeRef::HasSpecs() const
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   return _graph->_unshared[_nodeIdx].hasSpecs;
 }
 
-void PcpNodeRef::SetHasSpecs(bool hasSpecs) {
+void PcpNodeRef::SetHasSpecs(bool hasSpecs)
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   _graph->_unshared[_nodeIdx].hasSpecs = hasSpecs;
 }
 
-const SdfPath &PcpNodeRef::GetPath() const {
+const SdfPath &PcpNodeRef::GetPath() const
+{
   TF_DEV_AXIOM(_nodeIdx < _graph->_unshared.size());
   return _graph->_unshared[_nodeIdx].sitePath;
 }
 
-PcpLayerStackSite PcpNodeRef::GetSite() const {
+PcpLayerStackSite PcpNodeRef::GetSite() const
+{
   return PcpLayerStackSite(GetLayerStack(), GetPath());
 }
 
-bool PcpNodeRef::IsRootNode() const { return GetArcType() == PcpArcTypeRoot; }
+bool PcpNodeRef::IsRootNode() const
+{
+  return GetArcType() == PcpArcTypeRoot;
+}
 
-bool PcpNodeRef::IsInert() const {
+bool PcpNodeRef::IsInert() const
+{
   const PcpPrimIndex_Graph::_Node &node = _graph->_GetNode(_nodeIdx);
   return node.smallInts.inert || _graph->_unshared[_nodeIdx].culled;
 }
 
-bool PcpNodeRef::CanContributeSpecs() const {
+bool PcpNodeRef::CanContributeSpecs() const
+{
   // No permissions in Usd mode, so skip restriction check.
   //
   // The logic here is equivalent to:
@@ -176,7 +201,8 @@ bool PcpNodeRef::CanContributeSpecs() const {
          (!node.smallInts.permissionDenied || _graph->IsUsd());
 }
 
-int PcpNodeRef::GetDepthBelowIntroduction() const {
+int PcpNodeRef::GetDepthBelowIntroduction() const
+{
   const PcpNodeRef parent = GetParentNode();
   if (!parent)
     return 0;
@@ -184,7 +210,8 @@ int PcpNodeRef::GetDepthBelowIntroduction() const {
   return _GetNonVariantPathElementCount(parent.GetPath()) - GetNamespaceDepth();
 }
 
-SdfPath PcpNodeRef::GetPathAtIntroduction() const {
+SdfPath PcpNodeRef::GetPathAtIntroduction() const
+{
   SdfPath pathAtIntroduction = GetPath();
   for (int depth = GetDepthBelowIntroduction(); depth; --depth) {
     while (pathAtIntroduction.IsPrimVariantSelectionPath()) {
@@ -201,7 +228,8 @@ SdfPath PcpNodeRef::GetPathAtIntroduction() const {
   return pathAtIntroduction;
 }
 
-SdfPath PcpNodeRef::GetIntroPath() const {
+SdfPath PcpNodeRef::GetIntroPath() const
+{
   // Start with the parent node's current path.
   const PcpNodeRef parent = GetParentNode();
   if (!parent)
@@ -224,75 +252,85 @@ SdfPath PcpNodeRef::GetIntroPath() const {
   return introPath;
 }
 
-PcpNodeRef::child_const_range PcpNodeRef::GetChildrenRange() const {
+PcpNodeRef::child_const_range PcpNodeRef::GetChildrenRange() const
+{
   PcpNodeRef node(_graph, _nodeIdx);
   return child_const_range(child_const_iterator(node, /* end = */ false),
                            child_const_iterator(node, /* end = */ true));
 }
 
-PcpNodeRef PcpNodeRef::GetParentNode() const {
+PcpNodeRef PcpNodeRef::GetParentNode() const
+{
   const size_t parentIndex = _GetParentIndex();
-  return (parentIndex == PCP_INVALID_INDEX ? PcpNodeRef()
-                                           : PcpNodeRef(_graph, parentIndex));
+  return (parentIndex == PCP_INVALID_INDEX ? PcpNodeRef() : PcpNodeRef(_graph, parentIndex));
 }
 
-PcpNodeRef PcpNodeRef::GetOriginNode() const {
+PcpNodeRef PcpNodeRef::GetOriginNode() const
+{
   const size_t originIndex = _GetOriginIndex();
-  return (originIndex == PCP_INVALID_INDEX ? PcpNodeRef()
-                                           : PcpNodeRef(_graph, originIndex));
+  return (originIndex == PCP_INVALID_INDEX ? PcpNodeRef() : PcpNodeRef(_graph, originIndex));
 }
 
 ////////////////////////////////////////////////////////////
 
 PcpNodeRef_ChildrenIterator::PcpNodeRef_ChildrenIterator()
-    : _index(PcpPrimIndex_Graph::_Node::_invalidNodeIndex) {
+    : _index(PcpPrimIndex_Graph::_Node::_invalidNodeIndex)
+{
   // Do nothing
 }
 
-PcpNodeRef_ChildrenIterator::PcpNodeRef_ChildrenIterator(const PcpNodeRef &node,
-                                                         bool end)
+PcpNodeRef_ChildrenIterator::PcpNodeRef_ChildrenIterator(const PcpNodeRef &node, bool end)
     : _node(node),
-      _index(!end ? _node._graph->_GetNode(_node).indexes.firstChildIndex
-                  : PcpPrimIndex_Graph::_Node::_invalidNodeIndex) {
+      _index(!end ? _node._graph->_GetNode(_node).indexes.firstChildIndex :
+                    PcpPrimIndex_Graph::_Node::_invalidNodeIndex)
+{
   // Do nothing
 }
 
-void PcpNodeRef_ChildrenIterator::increment() {
+void PcpNodeRef_ChildrenIterator::increment()
+{
   _index = _node._graph->_GetNode(_index).indexes.nextSiblingIndex;
 }
 
 PcpNodeRef_ChildrenReverseIterator::PcpNodeRef_ChildrenReverseIterator()
-    : _index(PcpPrimIndex_Graph::_Node::_invalidNodeIndex) {
+    : _index(PcpPrimIndex_Graph::_Node::_invalidNodeIndex)
+{
   // Do nothing
 }
 
 PcpNodeRef_ChildrenReverseIterator::PcpNodeRef_ChildrenReverseIterator(
     const PcpNodeRef_ChildrenIterator &i)
-    : _node(i._node), _index(i._index) {
+    : _node(i._node), _index(i._index)
+{
   if (_index == PcpPrimIndex_Graph::_Node::_invalidNodeIndex) {
     _index = _node._graph->_GetNode(_node).indexes.lastChildIndex;
-  } else {
+  }
+  else {
     increment();
   }
 }
 
-PcpNodeRef_ChildrenReverseIterator::PcpNodeRef_ChildrenReverseIterator(
-    const PcpNodeRef &node, bool end)
+PcpNodeRef_ChildrenReverseIterator::PcpNodeRef_ChildrenReverseIterator(const PcpNodeRef &node,
+                                                                       bool end)
     : _node(node),
-      _index(!end ? _node._graph->_GetNode(_node).indexes.lastChildIndex
-                  : PcpPrimIndex_Graph::_Node::_invalidNodeIndex) {
+      _index(!end ? _node._graph->_GetNode(_node).indexes.lastChildIndex :
+                    PcpPrimIndex_Graph::_Node::_invalidNodeIndex)
+{
   // Do nothing
 }
 
-void PcpNodeRef_ChildrenReverseIterator::increment() {
+void PcpNodeRef_ChildrenReverseIterator::increment()
+{
   _index = _node._graph->_GetNode(_index).indexes.prevSiblingIndex;
 }
 
-int PcpNode_GetNonVariantPathElementCount(const SdfPath &path) {
+int PcpNode_GetNonVariantPathElementCount(const SdfPath &path)
+{
   return _GetNonVariantPathElementCount(path);
 }
 
-static inline int _GetNonVariantPathElementCount(const SdfPath &path) {
+static inline int _GetNonVariantPathElementCount(const SdfPath &path)
+{
   // The following code is equivalent to but more performant than:
   //
   // return path.StripAllVariantSelections().GetPathElementCount();

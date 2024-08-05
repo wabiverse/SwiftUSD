@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_TEXTURE_H
 #define PXR_IMAGING_HGI_VULKAN_TEXTURE_H
 
-#include <pxr/pxrns.h>
-#include "HgiVulkan/api.h"
 #include "Hgi/texture.h"
+#include "HgiVulkan/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,9 +39,8 @@ class HgiVulkanDevice;
 ///
 /// Represents a Vulkan GPU texture resource.
 ///
-class HgiVulkanTexture final : public HgiTexture
-{
-public:
+class HgiVulkanTexture final : public HgiTexture {
+ public:
   static const uint32_t NO_PENDING_WRITES = 0;
 
   HGIVULKAN_API
@@ -92,11 +91,10 @@ public:
   /// Schedule a copy of texels from the provided buffer into the texture.
   /// If mipLevel is less than one, all mip levels will be copied from buffer.
   HGIVULKAN_API
-  void CopyBufferToTexture(
-      HgiVulkanCommandBuffer *cb,
-      HgiVulkanBuffer *srcBuffer,
-      GfVec3i const &dstTexelOffset = GfVec3i(0),
-      int mipLevel = -1);
+  void CopyBufferToTexture(HgiVulkanCommandBuffer *cb,
+                           HgiVulkanBuffer *srcBuffer,
+                           GfVec3i const &dstTexelOffset = GfVec3i(0),
+                           int mipLevel = -1);
 
   /// Transition image from oldLayout to newLayout.
   /// `producerAccess` of 0 means:
@@ -105,16 +103,15 @@ public:
   ///    Multiple passes can go back to back which all read the resource.
   /// If mipLevel is > -1 only that mips level will be transitioned.
   HGIVULKAN_API
-  static void TransitionImageBarrier(
-      HgiVulkanCommandBuffer *cb,
-      HgiVulkanTexture *tex,
-      VkImageLayout oldLayout,
-      VkImageLayout newLayout,
-      VkAccessFlags producerAccess,
-      VkAccessFlags consumerAccess,
-      VkPipelineStageFlags producerStage,
-      VkPipelineStageFlags consumerStage,
-      int32_t mipLevel = -1);
+  static void TransitionImageBarrier(HgiVulkanCommandBuffer *cb,
+                                     HgiVulkanTexture *tex,
+                                     VkImageLayout oldLayout,
+                                     VkImageLayout newLayout,
+                                     VkAccessFlags producerAccess,
+                                     VkAccessFlags consumerAccess,
+                                     VkPipelineStageFlags producerStage,
+                                     VkPipelineStageFlags consumerStage,
+                                     int32_t mipLevel = -1);
 
   /// Returns the layout for a texture based on its usage flags.
   HGIVULKAN_API
@@ -124,23 +121,17 @@ public:
   HGIVULKAN_API
   static VkAccessFlags GetDefaultAccessFlags(HgiTextureUsage usage);
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
-  HgiVulkanTexture(
-      HgiVulkan *hgi,
-      HgiVulkanDevice *device,
-      HgiTextureDesc const &desc);
+  HgiVulkanTexture(HgiVulkan *hgi, HgiVulkanDevice *device, HgiTextureDesc const &desc);
 
   // Texture view constructor to alias another texture's data.
   HGIVULKAN_API
-  HgiVulkanTexture(
-      HgiVulkan *hgi,
-      HgiVulkanDevice *device,
-      HgiTextureViewDesc const &desc);
+  HgiVulkanTexture(HgiVulkan *hgi, HgiVulkanDevice *device, HgiTextureViewDesc const &desc);
 
-private:
+ private:
   HgiVulkanTexture() = delete;
   HgiVulkanTexture &operator=(const HgiVulkanTexture &) = delete;
   HgiVulkanTexture(const HgiVulkanTexture &) = delete;

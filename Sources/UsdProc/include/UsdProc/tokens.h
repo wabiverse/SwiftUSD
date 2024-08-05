@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdProc/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdProc/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdProcTokens->proceduralSystem);
 /// \endcode
-struct UsdProcTokensType
-{
+struct UsdProcTokensType {
   USDPROC_API UsdProcTokensType();
   /// \brief "proceduralSystem"
   ///

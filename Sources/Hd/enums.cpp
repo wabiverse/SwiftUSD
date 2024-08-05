@@ -22,42 +22,41 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "Hd/enums.h"
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-    TF_ADD_ENUM_NAME(HdInterpolationConstant, "constant");
-    TF_ADD_ENUM_NAME(HdInterpolationUniform, "uniform");
-    TF_ADD_ENUM_NAME(HdInterpolationVarying, "varying");
-    TF_ADD_ENUM_NAME(HdInterpolationVertex, "vertex");
-    TF_ADD_ENUM_NAME(HdInterpolationFaceVarying, "faceVarying");
-    TF_ADD_ENUM_NAME(HdInterpolationInstance, "instance");
+  TF_ADD_ENUM_NAME(HdInterpolationConstant, "constant");
+  TF_ADD_ENUM_NAME(HdInterpolationUniform, "uniform");
+  TF_ADD_ENUM_NAME(HdInterpolationVarying, "varying");
+  TF_ADD_ENUM_NAME(HdInterpolationVertex, "vertex");
+  TF_ADD_ENUM_NAME(HdInterpolationFaceVarying, "faceVarying");
+  TF_ADD_ENUM_NAME(HdInterpolationInstance, "instance");
 }
 
-HdCullStyle
-HdInvertCullStyle(HdCullStyle cs)
+HdCullStyle HdInvertCullStyle(HdCullStyle cs)
 {
-    switch(cs) {
+  switch (cs) {
     case HdCullStyleDontCare:
-        return HdCullStyleDontCare;
+      return HdCullStyleDontCare;
     case HdCullStyleNothing:
-        return HdCullStyleNothing;
+      return HdCullStyleNothing;
     case HdCullStyleBack:
-        return HdCullStyleFront;
+      return HdCullStyleFront;
     case HdCullStyleFront:
-        return HdCullStyleBack;
+      return HdCullStyleBack;
     case HdCullStyleBackUnlessDoubleSided:
-        return HdCullStyleFrontUnlessDoubleSided;
+      return HdCullStyleFrontUnlessDoubleSided;
     case HdCullStyleFrontUnlessDoubleSided:
-        return HdCullStyleBackUnlessDoubleSided;
+      return HdCullStyleBackUnlessDoubleSided;
     default:
-        return cs;
-    }
+      return cs;
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

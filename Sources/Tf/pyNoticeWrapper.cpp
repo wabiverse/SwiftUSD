@@ -35,8 +35,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TfPyNoticeWrapperBase::~TfPyNoticeWrapperBase() {}
 
-Tf_PyNoticeObjectGenerator::MakeObjectFunc
-Tf_PyNoticeObjectGenerator::_Lookup(TfNotice const &n) {
+Tf_PyNoticeObjectGenerator::MakeObjectFunc Tf_PyNoticeObjectGenerator::_Lookup(TfNotice const &n)
+{
   if (!_generators.IsInitialized())
     return 0;
   string typeName = typeid(n).name();
@@ -44,8 +44,9 @@ Tf_PyNoticeObjectGenerator::_Lookup(TfNotice const &n) {
   return i == _generators->end() ? 0 : i->second;
 }
 
-object Tf_PyNoticeObjectGenerator::Invoke(TfNotice const &n) {
-  TfPyLock lock; // Take python lock since generators call to python.
+object Tf_PyNoticeObjectGenerator::Invoke(TfNotice const &n)
+{
+  TfPyLock lock;  // Take python lock since generators call to python.
   MakeObjectFunc func = _Lookup(n);
   return func ? func(n) : object();
 }

@@ -24,9 +24,9 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec2f.h"
 #include "Gf/vec3f.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -50,15 +50,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Deserialization is also supported.  See \relates UsdObjReadDataFromFile
 /// \relates UsdObjReadDataFromStream.
 ///
-class UsdObjStream
-{
-public:
+class UsdObjStream {
+ public:
   /// A "Point" identifies a vertex, a uv, and a normal by indexes into
   /// arrays.  NOTE!  These indexes are 0-based, unlike in the OBJ file format
   /// where indexes are 1-based.  A point can have -1 for its normal and uv.
   /// This indicates that the point has no normal or uv.
-  struct Point
-  {
+  struct Point {
     int vertIndex;
     int uvIndex;
     int normalIndex;
@@ -67,15 +65,13 @@ public:
     Point() : vertIndex(-1), uvIndex(-1), normalIndex(-1) {}
 
     /// Construct with indexes \a v, \a uv, and \a n.
-    Point(int v, int uv, int n)
-        : vertIndex(v), uvIndex(uv), normalIndex(n) {}
+    Point(int v, int uv, int n) : vertIndex(v), uvIndex(uv), normalIndex(n) {}
   };
 
   /// A face is a pair of indices denoting a range in a vector of Points.  The
   /// first element indexes the first Point in the face, the second element is
   /// one past the last Point in the face.
-  struct Face
-  {
+  struct Face {
     int pointsBegin;
     int pointsEnd;
 
@@ -86,7 +82,10 @@ public:
     Face(int begin, int end) : pointsBegin(begin), pointsEnd(end) {}
 
     /// Return the number of points in this face.
-    inline int size() const { return pointsEnd - pointsBegin; }
+    inline int size() const
+    {
+      return pointsEnd - pointsBegin;
+    }
 
     /// Return true if \a lhs has the same range as \a rhs.
     friend bool operator==(Face const &lhs, Face const &rhs);
@@ -96,19 +95,16 @@ public:
   };
 
   /// A group is a sequence of faces wtih a name.
-  struct Group
-  {
+  struct Group {
     std::string name;
     std::vector<Face> faces;
   };
 
   /// A sequence element, indicating a series of one or more data elements in
   /// order.
-  struct SequenceElem
-  {
+  struct SequenceElem {
     /// Data element type.
-    enum ElemType
-    {
+    enum ElemType {
       Verts,
       UVs,
       Normals,
@@ -153,8 +149,7 @@ public:
   int AddVert(GfVec3f const &vert);
 
   /// Add a range of vertices.
-  template <class Iter>
-  void AddVerts(Iter begin, Iter end)
+  template<class Iter> void AddVerts(Iter begin, Iter end)
   {
     size_t oldSize = _verts.size();
     _verts.insert(_verts.end(), begin, end);
@@ -171,8 +166,7 @@ public:
   int AddUV(GfVec2f const &uv);
 
   /// Add a range of UVs.
-  template <class Iter>
-  void AddUVs(Iter begin, Iter end)
+  template<class Iter> void AddUVs(Iter begin, Iter end)
   {
     size_t oldSize = _uvs.size();
     _uvs.insert(_uvs.end(), begin, end);
@@ -189,8 +183,7 @@ public:
   int AddNormal(GfVec3f const &normal);
 
   /// Add a range of normals.
-  template <class Iter>
-  void AddNormals(Iter begin, Iter end)
+  template<class Iter> void AddNormals(Iter begin, Iter end)
   {
     size_t oldSize = _normals.size();
     _normals.insert(_normals.end(), begin, end);
@@ -207,8 +200,7 @@ public:
   void AddPoint(Point const &point);
 
   /// Add a range of points.
-  template <class Iter>
-  void AddPoints(Iter begin, Iter end)
+  template<class Iter> void AddPoints(Iter begin, Iter end)
   {
     _points.insert(_points.end(), begin, end);
   }
@@ -267,7 +259,7 @@ public:
   // Sequence elements.
   std::vector<SequenceElem> const &GetSequence() const;
 
-private:
+ private:
   // Helper functions that add ranges of newly inserted elements.
   void _AddVertsInternal(std::vector<GfVec3f>::iterator begin);
   void _AddUVsInternal(std::vector<GfVec2f>::iterator begin);
@@ -295,4 +287,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_H

@@ -58,38 +58,45 @@ class Tf_PyScopeDescription {
   // This is used to avoid new/delete on TfScopeDescription directly, which is
   // disallowed.
   struct _Holder {
-    explicit _Holder(string const &description)
-        : _scopeDescription(description) {}
+    explicit _Holder(string const &description) : _scopeDescription(description) {}
     TfScopeDescription _scopeDescription;
   };
 
-public:
+ public:
   // Construct with a description string.
-  Tf_PyScopeDescription(string const &description)
-      : _description(description) {}
+  Tf_PyScopeDescription(string const &description) : _description(description) {}
 
   // Enter creates a description object, pushing onto the stack.
-  void __enter__() { _descriptionHolder.reset(new _Holder(_description)); }
+  void __enter__()
+  {
+    _descriptionHolder.reset(new _Holder(_description));
+  }
 
   // Exit destroys the scope description, popping from the stack.
-  void __exit__(object, object, object) { _descriptionHolder.reset(); }
+  void __exit__(object, object, object)
+  {
+    _descriptionHolder.reset();
+  }
 
-  void SetDescription(const string &description) {
+  void SetDescription(const string &description)
+  {
     _description = description;
     if (_descriptionHolder) {
       _descriptionHolder->_scopeDescription.SetDescription(_description);
     }
   }
 
-private:
+ private:
   std::unique_ptr<_Holder> _descriptionHolder;
   string _description;
 };
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapScopeDescription() {
-  def("GetCurrentScopeDescriptionStack", TfGetCurrentScopeDescriptionStack,
+void wrapScopeDescription()
+{
+  def("GetCurrentScopeDescriptionStack",
+      TfGetCurrentScopeDescriptionStack,
       return_value_policy<TfPySequenceToList>());
 
   typedef Tf_PyScopeDescription This;

@@ -21,6 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "HgiVulkan/graphicsCmds.h"
 #include "Hgi/graphicsCmdsDesc.h"
 #include "HgiVulkan/buffer.h"
 #include "HgiVulkan/commandBuffer.h"
@@ -28,18 +29,20 @@
 #include "HgiVulkan/conversions.h"
 #include "HgiVulkan/device.h"
 #include "HgiVulkan/diagnostic.h"
-#include "HgiVulkan/graphicsCmds.h"
-#include "HgiVulkan/hgi.h"
 #include "HgiVulkan/graphicsPipeline.h"
+#include "HgiVulkan/hgi.h"
 #include "HgiVulkan/resourceBindings.h"
 #include "HgiVulkan/texture.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanGraphicsCmds::HgiVulkanGraphicsCmds(
-    HgiVulkan *hgi,
-    HgiGraphicsCmdsDesc const &desc)
-    : _hgi(hgi), _descriptor(desc), _commandBuffer(nullptr), _renderPassStarted(false), _viewportSet(false), _scissorSet(false)
+HgiVulkanGraphicsCmds::HgiVulkanGraphicsCmds(HgiVulkan *hgi, HgiGraphicsCmdsDesc const &desc)
+    : _hgi(hgi),
+      _descriptor(desc),
+      _commandBuffer(nullptr),
+      _renderPassStarted(false),
+      _viewportSet(false),
+      _scissorSet(false)
 {
   // We do not acquire the command buffer here, because the Cmds object may
   // have been created on the main thread, but used on a secondary thread.
@@ -47,9 +50,7 @@ HgiVulkanGraphicsCmds::HgiVulkanGraphicsCmds(
   // recording so we postpone acquiring cmd buffer until first use of Cmds.
 }
 
-HgiVulkanGraphicsCmds::~HgiVulkanGraphicsCmds()
-{
-}
+HgiVulkanGraphicsCmds::~HgiVulkanGraphicsCmds() {}
 
 void HgiVulkanGraphicsCmds::PushDebugGroup(const char *label)
 {
@@ -68,44 +69,38 @@ void HgiVulkanGraphicsCmds::SetViewport(GfVec4i const &vp)
   _viewportSet = true;
 
   // Delay until the pipeline is set and the render pass has begun.
-  _pendingUpdates.push_back(
-      [this, vp]
-      {
-        float offsetX = (float)vp[0];
-        float offsetY = (float)vp[1];
-        float width = (float)vp[2];
-        float height = (float)vp[3];
+  _pendingUpdates.push_back([this, vp] {
+    float offsetX = (float)vp[0];
+    float offsetY = (float)vp[1];
+    float width = (float)vp[2];
+    float height = (float)vp[3];
 
-        // Flip viewport in Y-axis, because the vertex.y position is flipped
-        // between opengl and vulkan. This also moves origin to bottom-left.
-        // Requires VK_KHR_maintenance1 extension.
+    // Flip viewport in Y-axis, because the vertex.y position is flipped
+    // between opengl and vulkan. This also moves origin to bottom-left.
+    // Requires VK_KHR_maintenance1 extension.
 
-        // Alternatives are:
-        // 1. Multiply projection by 'inverted Y and half Z' matrix:
-        //    const GfMatrix4d clip(
-        //        1.0,  0.0, 0.0, 0.0,
-        //        0.0, -1.0, 0.0, 0.0,
-        //        0.0,  0.0, 0.5, 0.0,
-        //        0.0,  0.0, 0.5, 1.0);
-        //    projection = clip * projection;
-        //
-        // 2. Adjust vertex position:
-        //    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
+    // Alternatives are:
+    // 1. Multiply projection by 'inverted Y and half Z' matrix:
+    //    const GfMatrix4d clip(
+    //        1.0,  0.0, 0.0, 0.0,
+    //        0.0, -1.0, 0.0, 0.0,
+    //        0.0,  0.0, 0.5, 0.0,
+    //        0.0,  0.0, 0.5, 1.0);
+    //    projection = clip * projection;
+    //
+    // 2. Adjust vertex position:
+    //    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
-        VkViewport viewport;
-        viewport.x = offsetX;
-        viewport.y = offsetY + height;
-        viewport.width = width;
-        viewport.height = -height;
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+    VkViewport viewport;
+    viewport.x = offsetX;
+    viewport.y = offsetY + height;
+    viewport.width = width;
+    viewport.height = -height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
 
-        vkCmdSetViewport(
-            _commandBuffer->GetVulkanCommandBuffer(),
-            0,
-            1,
-            &viewport);
-      });
+    vkCmdSetViewport(_commandBuffer->GetVulkanCommandBuffer(), 0, 1, &viewport);
+  });
 }
 
 void HgiVulkanGraphicsCmds::SetScissor(GfVec4i const &sc)
@@ -113,18 +108,12 @@ void HgiVulkanGraphicsCmds::SetScissor(GfVec4i const &sc)
   _scissorSet = true;
 
   // Delay until the pipeline is set and the render pass has begun.
-  _pendingUpdates.push_back(
-      [this, sc]
-      {
-        uint32_t w(sc[2]);
-        uint32_t h(sc[3]);
-        VkRect2D scissor = {{sc[0], sc[1]}, {w, h}};
-        vkCmdSetScissor(
-            _commandBuffer->GetVulkanCommandBuffer(),
-            0,
-            1,
-            &scissor);
-      });
+  _pendingUpdates.push_back([this, sc] {
+    uint32_t w(sc[2]);
+    uint32_t h(sc[3]);
+    VkRect2D scissor = {{sc[0], sc[1]}, {w, h}};
+    vkCmdSetScissor(_commandBuffer->GetVulkanCommandBuffer(), 0, 1, &scissor);
+  });
 }
 
 void HgiVulkanGraphicsCmds::BindPipeline(HgiGraphicsPipelineHandle pipeline)
@@ -136,11 +125,9 @@ void HgiVulkanGraphicsCmds::BindPipeline(HgiGraphicsPipelineHandle pipeline)
   _EndRenderPass();
 
   _pipeline = pipeline;
-  HgiVulkanGraphicsPipeline *pso =
-      static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
+  HgiVulkanGraphicsPipeline *pso = static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
 
-  if (TF_VERIFY(pso))
-  {
+  if (TF_VERIFY(pso)) {
     pso->BindPipeline(_commandBuffer->GetVulkanCommandBuffer());
   }
 }
@@ -148,31 +135,24 @@ void HgiVulkanGraphicsCmds::BindPipeline(HgiGraphicsPipelineHandle pipeline)
 void HgiVulkanGraphicsCmds::BindResources(HgiResourceBindingsHandle res)
 {
   // Delay until the pipeline is set and the render pass has begun.
-  _pendingUpdates.push_back(
-      [this, res]
-      {
-        HgiVulkanGraphicsPipeline *pso =
-            static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
+  _pendingUpdates.push_back([this, res] {
+    HgiVulkanGraphicsPipeline *pso = static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
 
-        HgiVulkanResourceBindings *rb =
-            static_cast<HgiVulkanResourceBindings *>(res.Get());
+    HgiVulkanResourceBindings *rb = static_cast<HgiVulkanResourceBindings *>(res.Get());
 
-        if (pso && rb)
-        {
-          rb->BindResources(
-              _commandBuffer->GetVulkanCommandBuffer(),
-              VK_PIPELINE_BIND_POINT_GRAPHICS,
-              pso->GetVulkanPipelineLayout());
-        }
-      });
+    if (pso && rb) {
+      rb->BindResources(_commandBuffer->GetVulkanCommandBuffer(),
+                        VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        pso->GetVulkanPipelineLayout());
+    }
+  });
 }
 
-void HgiVulkanGraphicsCmds::SetConstantValues(
-    HgiGraphicsPipelineHandle pipeline,
-    HgiShaderStage stages,
-    uint32_t bindIndex,
-    uint32_t byteSize,
-    const void *data)
+void HgiVulkanGraphicsCmds::SetConstantValues(HgiGraphicsPipelineHandle pipeline,
+                                              HgiShaderStage stages,
+                                              uint32_t bindIndex,
+                                              uint32_t byteSize,
+                                              const void *data)
 {
   // The data provided could be local stack memory that goes out of scope
   // before we execute this pending fn. Make a copy to prevent that.
@@ -180,121 +160,101 @@ void HgiVulkanGraphicsCmds::SetConstantValues(
   memcpy(dataCopy, data, byteSize);
 
   // Delay until the pipeline is set and the render pass has begun.
-  _pendingUpdates.push_back(
-      [this, byteSize, dataCopy, stages]
-      {
-        HgiVulkanGraphicsPipeline *pso =
-            static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
+  _pendingUpdates.push_back([this, byteSize, dataCopy, stages] {
+    HgiVulkanGraphicsPipeline *pso = static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
 
-        if (pso)
-        {
-          vkCmdPushConstants(
-              _commandBuffer->GetVulkanCommandBuffer(),
-              pso->GetVulkanPipelineLayout(),
-              HgiVulkanConversions::GetShaderStages(stages),
-              0, // offset
-              byteSize,
-              dataCopy);
-        }
+    if (pso) {
+      vkCmdPushConstants(_commandBuffer->GetVulkanCommandBuffer(),
+                         pso->GetVulkanPipelineLayout(),
+                         HgiVulkanConversions::GetShaderStages(stages),
+                         0,  // offset
+                         byteSize,
+                         dataCopy);
+    }
 
-        delete[] dataCopy;
-      });
+    delete[] dataCopy;
+  });
 }
 
-void HgiVulkanGraphicsCmds::BindVertexBuffers(
-    HgiVertexBufferBindingVector const &bindings)
+void HgiVulkanGraphicsCmds::BindVertexBuffers(HgiVertexBufferBindingVector const &bindings)
 {
   // Delay until the pipeline is set and the render pass has begun.
-  _pendingUpdates.push_back(
-      [this, bindings]
-      {
-        std::vector<VkBuffer> buffers;
-        std::vector<VkDeviceSize> bufferOffsets;
+  _pendingUpdates.push_back([this, bindings] {
+    std::vector<VkBuffer> buffers;
+    std::vector<VkDeviceSize> bufferOffsets;
 
-        for (HgiVertexBufferBinding const &binding : bindings)
-        {
-          HgiVulkanBuffer *buf =
-              static_cast<HgiVulkanBuffer *>(binding.buffer.Get());
-          VkBuffer vkBuf = buf->GetVulkanBuffer();
-          if (vkBuf)
-          {
-            buffers.push_back(vkBuf);
-            bufferOffsets.push_back(binding.byteOffset);
-          }
-        }
+    for (HgiVertexBufferBinding const &binding : bindings) {
+      HgiVulkanBuffer *buf = static_cast<HgiVulkanBuffer *>(binding.buffer.Get());
+      VkBuffer vkBuf = buf->GetVulkanBuffer();
+      if (vkBuf) {
+        buffers.push_back(vkBuf);
+        bufferOffsets.push_back(binding.byteOffset);
+      }
+    }
 
-        vkCmdBindVertexBuffers(
-            _commandBuffer->GetVulkanCommandBuffer(),
-            bindings[0].index, // first binding
-            buffers.size(),
-            buffers.data(),
-            bufferOffsets.data());
-      });
+    vkCmdBindVertexBuffers(_commandBuffer->GetVulkanCommandBuffer(),
+                           bindings[0].index,  // first binding
+                           buffers.size(),
+                           buffers.data(),
+                           bufferOffsets.data());
+  });
 }
 
-void HgiVulkanGraphicsCmds::Draw(
-    uint32_t vertexCount,
-    uint32_t baseVertex,
-    uint32_t instanceCount,
-    uint32_t baseInstance)
+void HgiVulkanGraphicsCmds::Draw(uint32_t vertexCount,
+                                 uint32_t baseVertex,
+                                 uint32_t instanceCount,
+                                 uint32_t baseInstance)
 {
   // Make sure the render pass has begun and resource are bound
   _ApplyPendingUpdates();
 
-  vkCmdDraw(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      vertexCount,
-      instanceCount,
-      baseVertex,
-      baseInstance);
+  vkCmdDraw(_commandBuffer->GetVulkanCommandBuffer(),
+            vertexCount,
+            instanceCount,
+            baseVertex,
+            baseInstance);
 }
 
-void HgiVulkanGraphicsCmds::DrawIndirect(
-    HgiBufferHandle const &drawParameterBuffer,
-    uint32_t drawBufferByteOffset,
-    uint32_t drawCount,
-    uint32_t stride)
+void HgiVulkanGraphicsCmds::DrawIndirect(HgiBufferHandle const &drawParameterBuffer,
+                                         uint32_t drawBufferByteOffset,
+                                         uint32_t drawCount,
+                                         uint32_t stride)
 {
   // Make sure the render pass has begun and resource are bound
   _ApplyPendingUpdates();
 
-  HgiVulkanBuffer *drawBuf =
-      static_cast<HgiVulkanBuffer *>(drawParameterBuffer.Get());
+  HgiVulkanBuffer *drawBuf = static_cast<HgiVulkanBuffer *>(drawParameterBuffer.Get());
 
-  vkCmdDrawIndirect(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      drawBuf->GetVulkanBuffer(),
-      drawBufferByteOffset,
-      drawCount,
-      stride);
+  vkCmdDrawIndirect(_commandBuffer->GetVulkanCommandBuffer(),
+                    drawBuf->GetVulkanBuffer(),
+                    drawBufferByteOffset,
+                    drawCount,
+                    stride);
 }
 
-void HgiVulkanGraphicsCmds::DrawIndexed(
-    HgiBufferHandle const &indexBuffer,
-    uint32_t indexCount,
-    uint32_t indexBufferByteOffset,
-    uint32_t baseVertex,
-    uint32_t instanceCount,
-    uint32_t baseInstance)
+void HgiVulkanGraphicsCmds::DrawIndexed(HgiBufferHandle const &indexBuffer,
+                                        uint32_t indexCount,
+                                        uint32_t indexBufferByteOffset,
+                                        uint32_t baseVertex,
+                                        uint32_t instanceCount,
+                                        uint32_t baseInstance)
 {
   // Make sure the render pass has begun and resource are bound
   _ApplyPendingUpdates();
 
   HgiVulkanBuffer *ibo = static_cast<HgiVulkanBuffer *>(indexBuffer.Get());
 
-  vkCmdBindIndexBuffer(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      ibo->GetVulkanBuffer(),
-      indexBufferByteOffset,
-      VK_INDEX_TYPE_UINT32);
+  vkCmdBindIndexBuffer(_commandBuffer->GetVulkanCommandBuffer(),
+                       ibo->GetVulkanBuffer(),
+                       indexBufferByteOffset,
+                       VK_INDEX_TYPE_UINT32);
 
-  vkCmdDrawIndexed(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      indexCount,
-      instanceCount,
-      static_cast<uint32_t>(indexBufferByteOffset / sizeof(uint32_t)),
-      baseVertex,
-      baseInstance);
+  vkCmdDrawIndexed(_commandBuffer->GetVulkanCommandBuffer(),
+                   indexCount,
+                   instanceCount,
+                   static_cast<uint32_t>(indexBufferByteOffset / sizeof(uint32_t)),
+                   baseVertex,
+                   baseInstance);
 }
 
 void HgiVulkanGraphicsCmds::DrawIndexedIndirect(
@@ -311,21 +271,18 @@ void HgiVulkanGraphicsCmds::DrawIndexedIndirect(
 
   HgiVulkanBuffer *ibo = static_cast<HgiVulkanBuffer *>(indexBuffer.Get());
 
-  vkCmdBindIndexBuffer(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      ibo->GetVulkanBuffer(),
-      0, // indexBufferByteOffset
-      VK_INDEX_TYPE_UINT32);
+  vkCmdBindIndexBuffer(_commandBuffer->GetVulkanCommandBuffer(),
+                       ibo->GetVulkanBuffer(),
+                       0,  // indexBufferByteOffset
+                       VK_INDEX_TYPE_UINT32);
 
-  HgiVulkanBuffer *drawBuf =
-      static_cast<HgiVulkanBuffer *>(drawParameterBuffer.Get());
+  HgiVulkanBuffer *drawBuf = static_cast<HgiVulkanBuffer *>(drawParameterBuffer.Get());
 
-  vkCmdDrawIndexedIndirect(
-      _commandBuffer->GetVulkanCommandBuffer(),
-      drawBuf->GetVulkanBuffer(),
-      drawBufferByteOffset,
-      drawCount,
-      stride);
+  vkCmdDrawIndexedIndirect(_commandBuffer->GetVulkanCommandBuffer(),
+                           drawBuf->GetVulkanBuffer(),
+                           drawBufferByteOffset,
+                           drawCount,
+                           stride);
 }
 
 void HgiVulkanGraphicsCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
@@ -334,16 +291,14 @@ void HgiVulkanGraphicsCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
   _commandBuffer->InsertMemoryBarrier(barrier);
 }
 
-HgiVulkanCommandBuffer *
-HgiVulkanGraphicsCmds::GetCommandBuffer()
+HgiVulkanCommandBuffer *HgiVulkanGraphicsCmds::GetCommandBuffer()
 {
   return _commandBuffer;
 }
 
 bool HgiVulkanGraphicsCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
 {
-  if (!_commandBuffer)
-  {
+  if (!_commandBuffer) {
     return false;
   }
 
@@ -361,8 +316,7 @@ bool HgiVulkanGraphicsCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
 
 void HgiVulkanGraphicsCmds::_ApplyPendingUpdates()
 {
-  if (!_pipeline)
-  {
+  if (!_pipeline) {
     TF_CODING_ERROR("No pipeline bound");
     return;
   }
@@ -371,18 +325,15 @@ void HgiVulkanGraphicsCmds::_ApplyPendingUpdates()
   _CreateCommandBuffer();
 
   // Begin render pass
-  if (!_renderPassStarted && !_pendingUpdates.empty())
-  {
+  if (!_renderPassStarted && !_pendingUpdates.empty()) {
     _renderPassStarted = true;
 
-    HgiVulkanGraphicsPipeline *pso =
-        static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
+    HgiVulkanGraphicsPipeline *pso = static_cast<HgiVulkanGraphicsPipeline *>(_pipeline.Get());
 
     GfVec2i size(0);
     VkClearValueVector const &clearValues = pso->GetClearValues();
 
-    VkRenderPassBeginInfo beginInfo =
-        {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+    VkRenderPassBeginInfo beginInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
     beginInfo.renderPass = pso->GetVulkanRenderPass();
     beginInfo.framebuffer = pso->AcquireVulkanFramebuffer(_descriptor, &size);
     beginInfo.renderArea.extent.width = size[0];
@@ -392,27 +343,21 @@ void HgiVulkanGraphicsCmds::_ApplyPendingUpdates()
 
     VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE;
 
-    vkCmdBeginRenderPass(
-        _commandBuffer->GetVulkanCommandBuffer(),
-        &beginInfo,
-        contents);
+    vkCmdBeginRenderPass(_commandBuffer->GetVulkanCommandBuffer(), &beginInfo, contents);
 
     // Make sure viewport and scissor are set since our HgiVulkanPipeline
     // hardcodes one dynamic viewport and scissor.
-    if (!_viewportSet)
-    {
+    if (!_viewportSet) {
       SetViewport(GfVec4i(0, 0, size[0], size[1]));
     }
-    if (!_scissorSet)
-    {
+    if (!_scissorSet) {
       SetScissor(GfVec4i(0, 0, size[0], size[1]));
     }
   }
 
   // Now that the render pass has begun we can execute any cmds that
   // require a render pass to be active.
-  for (HgiVulkanGfxFunction const &fn : _pendingUpdates)
-  {
+  for (HgiVulkanGfxFunction const &fn : _pendingUpdates) {
     fn();
   }
   _pendingUpdates.clear();
@@ -420,8 +365,7 @@ void HgiVulkanGraphicsCmds::_ApplyPendingUpdates()
 
 void HgiVulkanGraphicsCmds::_EndRenderPass()
 {
-  if (_renderPassStarted)
-  {
+  if (_renderPassStarted) {
     vkCmdEndRenderPass(_commandBuffer->GetVulkanCommandBuffer());
     _renderPassStarted = false;
     _viewportSet = false;
@@ -431,8 +375,7 @@ void HgiVulkanGraphicsCmds::_EndRenderPass()
 
 void HgiVulkanGraphicsCmds::_CreateCommandBuffer()
 {
-  if (!_commandBuffer)
-  {
+  if (!_commandBuffer) {
     HgiVulkanDevice *device = _hgi->GetPrimaryDevice();
     HgiVulkanCommandQueue *queue = device->GetCommandQueue();
     _commandBuffer = queue->AcquireCommandBuffer();

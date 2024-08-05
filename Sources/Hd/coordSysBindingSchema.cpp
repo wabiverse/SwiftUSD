@@ -33,56 +33,42 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCoordSysBindingSchemaTokens,
-    HDCOORDSYSBINDING_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCoordSysBindingSchemaTokens, HDCOORDSYSBINDING_SCHEMA_TOKENS);
 
-
-HdPathDataSourceHandle
-HdCoordSysBindingSchema::GetCoordSysBinding(TfToken const &name)
+HdPathDataSourceHandle HdCoordSysBindingSchema::GetCoordSysBinding(TfToken const &name)
 {
-    return _GetTypedDataSource<HdPathDataSource>(name);
-}
-
-
-/*static*/
-HdContainerDataSourceHandle
-HdCoordSysBindingSchema::BuildRetained(
-    const size_t count,
-    const TfToken * const names,
-    const HdDataSourceBaseHandle * const values)
-{
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return _GetTypedDataSource<HdPathDataSource>(name);
 }
 
 /*static*/
-HdCoordSysBindingSchema
-HdCoordSysBindingSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle HdCoordSysBindingSchema::BuildRetained(
+    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
 {
-    return HdCoordSysBindingSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdCoordSysBindingSchemaTokens->coordSysBinding))
-        : nullptr);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const TfToken &
-HdCoordSysBindingSchema::GetSchemaToken()
+HdCoordSysBindingSchema HdCoordSysBindingSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdCoordSysBindingSchemaTokens->coordSysBinding;
+  return HdCoordSysBindingSchema(fromParentContainer ?
+                                     HdContainerDataSource::Cast(fromParentContainer->Get(
+                                         HdCoordSysBindingSchemaTokens->coordSysBinding)) :
+                                     nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdCoordSysBindingSchema::GetDefaultLocator()
+const TfToken &HdCoordSysBindingSchema::GetSchemaToken()
 {
-    static const HdDataSourceLocator locator(
-        HdCoordSysBindingSchemaTokens->coordSysBinding
-    );
-    return locator;
-} 
+  return HdCoordSysBindingSchemaTokens->coordSysBinding;
+}
+
+/*static*/
+const HdDataSourceLocator &HdCoordSysBindingSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdCoordSysBindingSchemaTokens->coordSysBinding);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

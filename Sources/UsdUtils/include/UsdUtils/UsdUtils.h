@@ -18,4 +18,4 @@
 #include <UsdUtils/stitchClips.h>
 #include <UsdUtils/timeCodeRange.h>
 
-#endif // __PXR_USD_USDUTILS_H__
+#endif  // __PXR_USD_USDUTILS_H__

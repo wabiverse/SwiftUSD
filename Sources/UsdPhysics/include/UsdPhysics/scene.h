@@ -26,18 +26,18 @@
 
 /// \file usdPhysics/scene.h
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdPhysics/api.h"
 #include "UsdPhysics/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -54,9 +54,8 @@ class SdfAssetPath;
 ///
 /// General physics simulation properties, required for simulation.
 ///
-class UsdPhysicsScene : public UsdTyped
-{
-public:
+class UsdPhysicsScene : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -66,18 +65,12 @@ public:
   /// Equivalent to UsdPhysicsScene::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdPhysicsScene(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdPhysicsScene(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdPhysicsScene on the prim held by \p schemaObj .
   /// Should be preferred over UsdPhysicsScene(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdPhysicsScene(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdPhysicsScene(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDPHYSICS_API
@@ -87,8 +80,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPHYSICS_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdPhysicsScene holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -100,8 +92,7 @@ public:
   /// \endcode
   ///
   USDPHYSICS_API
-  static UsdPhysicsScene
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsScene Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -126,17 +117,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDPHYSICS_API
-  static UsdPhysicsScene
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsScene Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPHYSICS_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPHYSICS_API
@@ -148,7 +138,7 @@ private:
   USDPHYSICS_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // GRAVITYDIRECTION
   // --------------------------------------------------------------------- //
@@ -170,9 +160,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateGravityDirectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateGravityDirectionAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // GRAVITYMAGNITUDE
   // --------------------------------------------------------------------- //
@@ -195,9 +186,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateGravityMagnitudeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateGravityMagnitudeAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

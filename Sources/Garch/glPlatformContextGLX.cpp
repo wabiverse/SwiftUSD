@@ -33,8 +33,8 @@
  * thus we can prefer the ease of including all sources in the build
  * which is far more maintainable, especially for package consumers.
  * ----------------------------------------------------------------- */
-#include "Garch/glPlatformContext.h"
-#include <boost/functional/hash.hpp>
+#  include "Garch/glPlatformContext.h"
+#  include <boost/functional/hash.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -42,30 +42,29 @@ PXR_NAMESPACE_OPEN_SCOPE
 // GarchGLXContextState
 //
 
-GarchGLXContextState::GarchGLXContextState() : display(glXGetCurrentDisplay()),
-                                               drawable(glXGetCurrentDrawable()),
-                                               context(glXGetCurrentContext()),
-                                               _defaultCtor(true)
+GarchGLXContextState::GarchGLXContextState()
+    : display(glXGetCurrentDisplay()),
+      drawable(glXGetCurrentDrawable()),
+      context(glXGetCurrentContext()),
+      _defaultCtor(true)
 {
   // Do nothing
 }
 
-GarchGLXContextState::GarchGLXContextState(
-    Display *display_, GLXDrawable drawable_, GLXContext context_) : display(display_), drawable(drawable_), context(context_),
-                                                                     _defaultCtor(false)
+GarchGLXContextState::GarchGLXContextState(Display *display_,
+                                           GLXDrawable drawable_,
+                                           GLXContext context_)
+    : display(display_), drawable(drawable_), context(context_), _defaultCtor(false)
 {
   // Do nothing
 }
 
 bool GarchGLXContextState::operator==(const GarchGLXContextState &rhs) const
 {
-  return display == rhs.display &&
-         drawable == rhs.drawable &&
-         context == rhs.context;
+  return display == rhs.display && drawable == rhs.drawable && context == rhs.context;
 }
 
-size_t
-GarchGLXContextState::GetHash() const
+size_t GarchGLXContextState::GetHash() const
 {
   size_t result = 0;
   boost::hash_combine(result, display);
@@ -81,26 +80,22 @@ bool GarchGLXContextState::IsValid() const
 
 void GarchGLXContextState::MakeCurrent()
 {
-  if (IsValid())
-  {
+  if (IsValid()) {
     glXMakeCurrent(display, drawable, context);
   }
-  else if (_defaultCtor)
-  {
+  else if (_defaultCtor) {
     DoneCurrent();
   }
 }
 
 void GarchGLXContextState::DoneCurrent()
 {
-  if (Display *display = glXGetCurrentDisplay())
-  {
+  if (Display *display = glXGetCurrentDisplay()) {
     glXMakeCurrent(display, None, NULL);
   }
 }
 
-GarchGLPlatformContextState
-GarchGetNullGLPlatformContextState()
+GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 {
   return GarchGLXContextState(NULL, None, NULL);
 }

@@ -59,7 +59,7 @@ class SdfAssetPath;
 /// UsdSchemaBase::_IsCompatible().  It provides no other behavior.
 ///
 class UsdTyped : public UsdSchemaBase {
-public:
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -74,8 +74,7 @@ public:
   /// Construct a UsdTyped on the prim held by \p schemaObj .
   /// Should be preferred over UsdTyped(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdTyped(const UsdSchemaBase &schemaObj)
-      : UsdSchemaBase(schemaObj) {}
+  explicit UsdTyped(const UsdSchemaBase &schemaObj) : UsdSchemaBase(schemaObj) {}
 
   /// Destructor.
   USD_API
@@ -85,8 +84,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USD_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdTyped holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -100,14 +98,14 @@ public:
   USD_API
   static UsdTyped Get(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USD_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USD_API
@@ -119,7 +117,7 @@ private:
   USD_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -131,7 +129,7 @@ public:
   // ===================================================================== //
   // --(BEGIN CUSTOM CODE)--
 
-protected:
+ protected:
   USD_API
   bool _IsCompatible() const override;
 };

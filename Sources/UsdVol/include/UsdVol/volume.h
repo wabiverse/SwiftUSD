@@ -26,17 +26,17 @@
 
 /// \file usdVol/volume.h
 
-#include <pxr/pxrns.h>
-#include "UsdVol/api.h"
-#include "UsdGeom/gprim.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/gprim.h"
+#include "UsdVol/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -70,9 +70,8 @@ class SdfAssetPath;
 /// by multiple Volumes, a Volume's Field prims should be located
 /// under the Volume in namespace, for enhanced organization.
 ///
-class UsdVolVolume : public UsdGeomGprim
-{
-public:
+class UsdVolVolume : public UsdGeomGprim {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -82,18 +81,12 @@ public:
   /// Equivalent to UsdVolVolume::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdVolVolume(const UsdPrim &prim = UsdPrim())
-      : UsdGeomGprim(prim)
-  {
-  }
+  explicit UsdVolVolume(const UsdPrim &prim = UsdPrim()) : UsdGeomGprim(prim) {}
 
   /// Construct a UsdVolVolume on the prim held by \p schemaObj .
   /// Should be preferred over UsdVolVolume(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdVolVolume(const UsdSchemaBase &schemaObj)
-      : UsdGeomGprim(schemaObj)
-  {
-  }
+  explicit UsdVolVolume(const UsdSchemaBase &schemaObj) : UsdGeomGprim(schemaObj) {}
 
   /// Destructor.
   USDVOL_API
@@ -103,8 +96,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDVOL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdVolVolume holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -116,8 +108,7 @@ public:
   /// \endcode
   ///
   USDVOL_API
-  static UsdVolVolume
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdVolVolume Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -142,17 +133,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDVOL_API
-  static UsdVolVolume
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdVolVolume Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDVOL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDVOL_API
@@ -164,7 +154,7 @@ private:
   USDVOL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -228,8 +218,7 @@ public:
   /// The name lookup automatically applies the field relationship
   /// namespacing, if it isn't specified in the name token.
   USDVOL_API
-  bool CreateFieldRelationship(const TfToken &name,
-                               const SdfPath &fieldPath) const;
+  bool CreateFieldRelationship(const TfToken &name, const SdfPath &fieldPath) const;
 
   /// Blocks an existing field relationship on this volume, ensuring it
   /// will not be enumerated by GetFieldPaths().
@@ -242,7 +231,7 @@ public:
   USDVOL_API
   bool BlockFieldRelationship(const TfToken &name) const;
 
-private:
+ private:
   /// Return \p name prepended with the field namespace, if it isn't
   /// already prefixed.
   ///

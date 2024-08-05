@@ -65,12 +65,8 @@ struct HgiGraphicsPipelineDesc;
 ///
 /// For passing in vertex buffer step function parameters.
 ///
-struct HgiMetalStepFunctionDesc
-{
-  HgiMetalStepFunctionDesc(
-      uint32_t bindingIndex,
-      uint32_t byteOffset,
-      uint32_t vertexStride)
+struct HgiMetalStepFunctionDesc {
+  HgiMetalStepFunctionDesc(uint32_t bindingIndex, uint32_t byteOffset, uint32_t vertexStride)
       : bindingIndex(bindingIndex), byteOffset(byteOffset), vertexStride(vertexStride)
   {
   }
@@ -81,16 +77,14 @@ struct HgiMetalStepFunctionDesc
 
 using HgiMetalStepFunctionDescVector = std::vector<HgiMetalStepFunctionDesc>;
 
-class HgiMetalStepFunctions
-{
-public:
+class HgiMetalStepFunctions {
+ public:
   HGIMETAL_API
   HgiMetalStepFunctions();
 
   HGIMETAL_API
-  HgiMetalStepFunctions(
-      HgiGraphicsPipelineDesc const &graphicsDesc,
-      HgiVertexBufferBindingVector const &bindings);
+  HgiMetalStepFunctions(HgiGraphicsPipelineDesc const &graphicsDesc,
+                        HgiVertexBufferBindingVector const &bindings);
 
   HGIMETAL_API
   void Init(HgiGraphicsPipelineDesc const &graphicsDesc);
@@ -116,7 +110,7 @@ public:
     return _drawBufferIndex;
   }
 
-private:
+ private:
   HgiMetalStepFunctionDescVector _vertexBufferDescs;
   HgiMetalStepFunctionDescVector _patchBaseDescs;
   uint32_t _drawBufferIndex;

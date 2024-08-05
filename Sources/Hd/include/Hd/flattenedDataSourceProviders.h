@@ -40,4 +40,3 @@ HdContainerDataSourceHandle HdFlattenedDataSourceProviders();
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif
-

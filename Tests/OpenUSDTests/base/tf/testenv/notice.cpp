@@ -21,15 +21,15 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/notice.h"
+#include "Arch/systemInfo.h"
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/stringUtils.h"
 #include "pxr/base/tf/type.h"
-#include "pxr/base/tf/diagnosticLite.h"
 #include "pxr/base/tf/weakBase.h"
 #include "pxr/base/tf/weakPtr.h"
-#include "Arch/systemInfo.h"
+#include "pxr/pxr.h"
 
 #include <chrono>
 #include <cstdio>
@@ -49,13 +49,9 @@ using std::vector;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-class TestNotice : public TfNotice
-{
-public:
-  TestNotice(const string &what)
-      : _what(what)
-  {
-  }
+class TestNotice : public TfNotice {
+ public:
+  TestNotice(const string &what) : _what(what) {}
   ~TestNotice();
 
   const string &GetWhat() const
@@ -63,19 +59,15 @@ public:
     return _what;
   }
 
-private:
+ private:
   const string _what;
 };
 
 TestNotice::~TestNotice() {}
 
-class TestListener : public TfWeakBase
-{
-public:
-  explicit TestListener(int identity)
-      : _identity(identity)
-  {
-  }
+class TestListener : public TfWeakBase {
+ public:
+  explicit TestListener(int identity) : _identity(identity) {}
 
   //! Called when a notice of any type is sent
   void ProcessNotice(const TfNotice &)
@@ -85,26 +77,25 @@ public:
 
   void ProcessTestNotice(const TestNotice &n)
   {
-    printf("Listener #%d: ProcessTestNotice got %s\n", _identity,
-           n.GetWhat().c_str());
+    printf("Listener #%d: ProcessTestNotice got %s\n", _identity, n.GetWhat().c_str());
   }
 
-  void ProcessMyTestNotice(const TestNotice &n,
-                           TfWeakPtr<TestListener> const &sender)
+  void ProcessMyTestNotice(const TestNotice &n, TfWeakPtr<TestListener> const &sender)
   {
-    if (!sender)
-    {
-      printf("Listener #%d: ProcessMyTestNotice got %s from unknown sender\n", _identity,
+    if (!sender) {
+      printf("Listener #%d: ProcessMyTestNotice got %s from unknown sender\n",
+             _identity,
              n.GetWhat().c_str());
     }
-    else
-    {
-      printf("Listener #%d: ProcessMyTestNotice got %s from Sender #%d\n", _identity,
-             n.GetWhat().c_str(), sender->_identity);
+    else {
+      printf("Listener #%d: ProcessMyTestNotice got %s from Sender #%d\n",
+             _identity,
+             n.GetWhat().c_str(),
+             sender->_identity);
     }
   }
 
-private:
+ private:
   int _identity;
 };
 
@@ -118,22 +109,18 @@ vector<string> mainThreadList;
 std::mutex workerThreadLock;
 std::mutex mainThreadLock;
 
-static void
-_DumpLog(ostream *log, vector<string> *li, std::mutex *mutex)
+static void _DumpLog(ostream *log, vector<string> *li, std::mutex *mutex)
 {
   std::lock_guard<std::mutex> lock(*mutex);
   sort(li->begin(), li->end());
-  for (vector<string>::const_iterator n = li->begin();
-       n != li->end(); ++n)
-  {
+  for (vector<string>::const_iterator n = li->begin(); n != li->end(); ++n) {
     *log << *n << endl;
   }
   li->clear();
 }
 
-class BaseNotice : public TfNotice
-{
-public:
+class BaseNotice : public TfNotice {
+ public:
   BaseNotice(const string &what) : _what(what) {}
   ~BaseNotice();
 
@@ -142,34 +129,30 @@ public:
     return _what;
   }
 
-protected:
+ protected:
   const string _what;
 };
 
 BaseNotice::~BaseNotice() {}
 
-class MainNotice : public BaseNotice
-{
-public:
+class MainNotice : public BaseNotice {
+ public:
   MainNotice(const string &what) : BaseNotice(what) {}
 };
 
-class WorkerNotice : public BaseNotice
-{
-public:
+class WorkerNotice : public BaseNotice {
+ public:
   WorkerNotice(const string &what) : BaseNotice(what) {}
 };
 
-class MainListener : public TfWeakBase
-{
-public:
+class MainListener : public TfWeakBase {
+ public:
   MainListener()
   {
     // Register for invokation in any thread
     TfWeakPtr<MainListener> me(this);
     TfNotice::Register(me, &MainListener::ProcessNotice);
-    _processMainKey =
-        TfNotice::Register(me, &MainListener::ProcessMainNotice);
+    _processMainKey = TfNotice::Register(me, &MainListener::ProcessMainNotice);
   }
 
   void Revoke()
@@ -180,25 +163,24 @@ public:
   void ProcessNotice(const TfNotice &n)
   {
     std::lock_guard<std::mutex> lock(mainThreadLock);
-    mainThreadList.push_back("MainListener::ProcessNotice got notice of"
-                             " type " +
-                             TfType::Find(n).GetTypeName());
+    mainThreadList.push_back(
+        "MainListener::ProcessNotice got notice of"
+        " type " +
+        TfType::Find(n).GetTypeName());
   }
 
   void ProcessMainNotice(const MainNotice &n)
   {
     std::lock_guard<std::mutex> lock(mainThreadLock);
-    mainThreadList.push_back("MainListener::ProcessMainNotice got " +
-                             n.GetWhat());
+    mainThreadList.push_back("MainListener::ProcessMainNotice got " + n.GetWhat());
   }
 
-private:
+ private:
   TfNotice::Key _processMainKey;
 };
 
-class WorkListener : public TfWeakBase
-{
-public:
+class WorkListener : public TfWeakBase {
+ public:
   WorkListener()
   {
     // Register for exclusive invokation in the worker (current) thread
@@ -214,11 +196,10 @@ public:
   void ProcessWorkerNotice(const WorkerNotice &n)
   {
     std::lock_guard<std::mutex> lock(workerThreadLock);
-    workerThreadList.push_back("WorkListener::ProcessWorkerNotice got " +
-                               n.GetWhat());
+    workerThreadList.push_back("WorkListener::ProcessWorkerNotice got " + n.GetWhat());
   }
 
-private:
+ private:
   TfNotice::Key _key;
 };
 
@@ -245,8 +226,7 @@ void WorkTask()
   delete workListener;
 }
 
-static bool
-_TestThreadedNotices()
+static bool _TestThreadedNotices()
 {
   // Create and register the main listener
   MainListener *mainListener = new MainListener();
@@ -285,12 +265,9 @@ _TestThreadedNotices()
   return true;
 }
 
-struct SpoofSender : public TfWeakBase
-{
-};
+struct SpoofSender : public TfWeakBase {};
 
-struct SpoofCheckListener : public TfWeakBase
-{
+struct SpoofCheckListener : public TfWeakBase {
   void ListenA(const TfNotice &, TfWeakPtr<SpoofSender> const &)
   {
     printf("SpoofCheckListener: A\n");
@@ -303,8 +280,8 @@ struct SpoofCheckListener : public TfWeakBase
     hits++;
   }
 
-  void ListenC(const TfNotice &, TfType const &,
-               TfWeakBase *, const void *, const std::type_info &)
+  void ListenC(
+      const TfNotice &, TfType const &, TfWeakBase *, const void *, const std::type_info &)
   {
     printf("SpoofCheckListener: C\n");
     hits++;
@@ -318,8 +295,7 @@ struct SpoofCheckListener : public TfWeakBase
   int hits;
 };
 
-static void
-_TestSpoofedNotices()
+static void _TestSpoofedNotices()
 {
   SpoofCheckListener listener;
   char rawSpace[1024];
@@ -327,11 +303,9 @@ _TestSpoofedNotices()
   SpoofSender *rawSender = new (rawSpace) SpoofSender;
   TfWeakPtr<SpoofSender> sender = TfCreateWeakPtr(rawSender);
 
-  TfNotice::Register(TfCreateWeakPtr(&listener),
-                     &SpoofCheckListener::ListenA, sender);
+  TfNotice::Register(TfCreateWeakPtr(&listener), &SpoofCheckListener::ListenA, sender);
 
-  TfNotice::Register(TfCreateWeakPtr(&listener),
-                     &SpoofCheckListener::ListenB, sender);
+  TfNotice::Register(TfCreateWeakPtr(&listener), &SpoofCheckListener::ListenB, sender);
 
   TfNotice::Register(TfCreateWeakPtr(&listener),
                      &SpoofCheckListener::ListenC,
@@ -359,11 +333,10 @@ _TestSpoofedNotices()
   TfNotice().Send(sender2);
   TF_AXIOM(listener.hits == 0);
 
-  TfNotice::Register(TfCreateWeakPtr(&listener),
-                     &SpoofCheckListener::ListenA, TfWeakPtr<SpoofSender>(NULL));
+  TfNotice::Register(
+      TfCreateWeakPtr(&listener), &SpoofCheckListener::ListenA, TfWeakPtr<SpoofSender>(NULL));
 
-  TfNotice::Register(TfCreateWeakPtr(&listener),
-                     &SpoofCheckListener::ListenB);
+  TfNotice::Register(TfCreateWeakPtr(&listener), &SpoofCheckListener::ListenB);
 
   TfNotice::Register(TfCreateWeakPtr(&listener),
                      &SpoofCheckListener::ListenC,
@@ -381,8 +354,7 @@ _TestSpoofedNotices()
   TF_AXIOM(listener.hits == 3);
 }
 
-struct BlockListener : public TfWeakBase
-{
+struct BlockListener : public TfWeakBase {
   BlockListener() : mainId(std::this_thread::get_id())
   {
     hits[0] = 0;
@@ -399,33 +371,27 @@ struct BlockListener : public TfWeakBase
   size_t hits[2];
 };
 
-static void
-_TestNoticeBlockWorker(std::thread::id mainId)
+static void _TestNoticeBlockWorker(std::thread::id mainId)
 {
-  struct _Work
-  {
+  struct _Work {
     static void Go()
     {
-      for (int i = 0; i < 20; ++i)
-      {
+      for (int i = 0; i < 20; ++i) {
         TestNotice(TfStringPrintf("Notice %d", i)).Send();
       }
     }
   };
 
-  if (std::this_thread::get_id() == mainId)
-  {
+  if (std::this_thread::get_id() == mainId) {
     TfNotice::Block block;
     _Work::Go();
   }
-  else
-  {
+  else {
     _Work::Go();
   }
 }
 
-static void
-_TestNoticeBlock()
+static void _TestNoticeBlock()
 {
   BlockListener l;
   TestNotice("should not be blocked").Send();
@@ -455,14 +421,12 @@ _TestNoticeBlock()
   TF_AXIOM(l.hits[1] == 20);
 }
 
-static bool
-Test_TfNotice()
+static bool Test_TfNotice()
 {
 
   TestListener *l1 = new TestListener(1);
   TestListener *l2 = new TestListener(2);
-  TfWeakPtr<TestListener> wl1(l1),
-      wl2(l2);
+  TfWeakPtr<TestListener> wl1(l1), wl2(l2);
   TfNotice::Key l1Key1 = TfNotice::Register(wl1, &TestListener::ProcessNotice);
   /*TfNotice::Key l1Key2 =*/TfNotice::Register(wl1, &TestListener::ProcessTestNotice);
   /*TfNotice::Key l2Key1 =*/TfNotice::Register(wl2, &TestListener::ProcessNotice);
@@ -508,9 +472,8 @@ Test_TfNotice()
   printf("// Expect: #1 ProcessTestNotice\n");
   printf("// Expect: #2 ProcessNotice\n");
   printf("// Expect: #2 ProcessMyTestNotice from #2\n");
-  TestNotice("sixth").SendWithWeakBase(&wl2->__GetTfWeakBase__(),
-                                       wl2.GetUniqueIdentifier(),
-                                       typeid(TestListener));
+  TestNotice("sixth").SendWithWeakBase(
+      &wl2->__GetTfWeakBase__(), wl2.GetUniqueIdentifier(), typeid(TestListener));
 
   delete l2;
 

@@ -46,17 +46,25 @@ static const RtUString _us_main_cam_projection("main_cam_projection");
 // need to be ported to PxrProjection and then back-ported to the PxrCamera
 // in RenderMan 24.
 //
-TF_DEFINE_ENV_SETTING(HD_PRMAN_SUPPORT_LENS_DISTORTION, true,
+TF_DEFINE_ENV_SETTING(HD_PRMAN_SUPPORT_LENS_DISTORTION,
+                      true,
                       "Switches camera shader from PxrPerspective to "
                       "PxrProjection/PxrCamera so that lens distortion "
                       "parametrers are supported.");
 
 HdPrman_CameraContext::HdPrman_CameraContext()
-    : _policy(CameraUtilFit), _shutterOpenTime(0.0f), _shutterCloseTime(1.0f), _shutteropeningPoints{            // matches RenderMan default
-                                                                                                     0.0f, 0.0f, // points before open time
-                                                                                                     0.0f, 0.0f,
-                                                                                                     1.0f, 0.0f, // points after close time
-                                                                                                     1.0f, 0.0f},
+    : _policy(CameraUtilFit),
+      _shutterOpenTime(0.0f),
+      _shutterCloseTime(1.0f),
+      _shutteropeningPoints{// matches RenderMan default
+                            0.0f,
+                            0.0f,  // points before open time
+                            0.0f,
+                            0.0f,
+                            1.0f,
+                            0.0f,  // points after close time
+                            1.0f,
+                            0.0f},
       _invalid(false)
 {
 }
@@ -65,16 +73,14 @@ void HdPrman_CameraContext::MarkCameraInvalid(const SdfPath &path)
 {
   // No need to invalidate if camera that is not the active camera
   // changed.
-  if (path == _cameraPath)
-  {
+  if (path == _cameraPath) {
     _invalid = true;
   }
 }
 
 void HdPrman_CameraContext::SetCameraPath(const SdfPath &path)
 {
-  if (_cameraPath != path)
-  {
+  if (_cameraPath != path) {
     _invalid = true;
     _cameraPath = path;
   }
@@ -82,18 +88,15 @@ void HdPrman_CameraContext::SetCameraPath(const SdfPath &path)
 
 void HdPrman_CameraContext::SetFraming(const CameraUtilFraming &framing)
 {
-  if (_framing != framing)
-  {
+  if (_framing != framing) {
     _framing = framing;
     _invalid = true;
   }
 }
 
-void HdPrman_CameraContext::SetWindowPolicy(
-    const CameraUtilConformWindowPolicy policy)
+void HdPrman_CameraContext::SetWindowPolicy(const CameraUtilConformWindowPolicy policy)
 {
-  if (_policy != policy)
-  {
+  if (_policy != policy) {
     _policy = policy;
     _invalid = true;
   }
@@ -103,27 +106,22 @@ void HdPrman_CameraContext::SetShutterCurve(const float shutterOpenTime,
                                             const float shutterCloseTime,
                                             const float shutteropeningPoints[8])
 {
-  if (_shutterOpenTime != shutterOpenTime)
-  {
+  if (_shutterOpenTime != shutterOpenTime) {
     _shutterOpenTime = shutterOpenTime;
     _invalid = true;
   }
-  if (_shutterCloseTime != shutterCloseTime)
-  {
+  if (_shutterCloseTime != shutterCloseTime) {
     _shutterCloseTime = shutterCloseTime;
     _invalid = true;
   }
   size_t i = 0;
-  for (; i < TfArraySize(_shutteropeningPoints); i++)
-  {
-    if (_shutteropeningPoints[i] != shutteropeningPoints[i])
-    {
+  for (; i < TfArraySize(_shutteropeningPoints); i++) {
+    if (_shutteropeningPoints[i] != shutteropeningPoints[i]) {
       _invalid = true;
       break;
     }
   }
-  for (; i < TfArraySize(_shutteropeningPoints); i++)
-  {
+  for (; i < TfArraySize(_shutteropeningPoints); i++) {
     _shutteropeningPoints[i] = shutteropeningPoints[i];
   }
 }
@@ -151,23 +149,18 @@ bool HdPrman_CameraContext::IsInvalid() const
 //
 // Compute screen window for given camera.
 //
-static GfRange2d
-_GetScreenWindow(const HdCamera *const cam)
+static GfRange2d _GetScreenWindow(const HdCamera *const cam)
 {
-  const GfVec2d size(
-      cam->GetHorizontalAperture(), cam->GetVerticalAperture());
-  const GfVec2d offset(
-      cam->GetHorizontalApertureOffset(), cam->GetVerticalApertureOffset());
+  const GfVec2d size(cam->GetHorizontalAperture(), cam->GetVerticalAperture());
+  const GfVec2d offset(cam->GetHorizontalApertureOffset(), cam->GetVerticalApertureOffset());
 
   const GfRange2d filmbackPlane(-0.5 * size + offset, +0.5 * size + offset);
 
-  if (cam->GetProjection() == HdCamera::Orthographic)
-  {
+  if (cam->GetProjection() == HdCamera::Orthographic) {
     return filmbackPlane;
   }
 
-  if (cam->GetFocalLength() == 0.0f || cam->GetHorizontalAperture() == 0.0f)
-  {
+  if (cam->GetFocalLength() == 0.0f || cam->GetHorizontalAperture() == 0.0f) {
     return filmbackPlane;
   }
 
@@ -190,44 +183,39 @@ _GetScreenWindow(const HdCamera *const cam)
 // render buffer rect in image space and convert it to screen window
 // space.
 //
-static GfRange2d
-_ConvertScreenWindowForDisplayWindowToRenderBuffer(
+static GfRange2d _ConvertScreenWindowForDisplayWindowToRenderBuffer(
     const GfRange2d &screenWindowForDisplayWindow,
     const GfRange2f &displayWindow,
     const GfVec2i &renderBufferSize)
 {
   // Scaling factors to go from image space to screen window space.
-  const double screenWindowWidthPerPixel =
-      screenWindowForDisplayWindow.GetSize()[0] /
-      displayWindow.GetSize()[0];
+  const double screenWindowWidthPerPixel = screenWindowForDisplayWindow.GetSize()[0] /
+                                           displayWindow.GetSize()[0];
 
-  const double screenWindowHeightPerPixel =
-      screenWindowForDisplayWindow.GetSize()[1] /
-      displayWindow.GetSize()[1];
+  const double screenWindowHeightPerPixel = screenWindowForDisplayWindow.GetSize()[1] /
+                                            displayWindow.GetSize()[1];
 
   // Assuming an affine mapping between screen window space
   // and image space, compute what (0,0) corresponds to in
   // screen window space.
-  const GfVec2d screenWindowMin(
-      screenWindowForDisplayWindow.GetMin()[0] - screenWindowWidthPerPixel * displayWindow.GetMin()[0],
-      // Note that image space is y-Down and screen window
-      // space is y-Up, so this is a bit tricky...
-      screenWindowForDisplayWindow.GetMax()[1] + screenWindowHeightPerPixel * (displayWindow.GetMin()[1] - renderBufferSize[1]));
+  const GfVec2d screenWindowMin(screenWindowForDisplayWindow.GetMin()[0] -
+                                    screenWindowWidthPerPixel * displayWindow.GetMin()[0],
+                                // Note that image space is y-Down and screen window
+                                // space is y-Up, so this is a bit tricky...
+                                screenWindowForDisplayWindow.GetMax()[1] +
+                                    screenWindowHeightPerPixel *
+                                        (displayWindow.GetMin()[1] - renderBufferSize[1]));
 
-  const GfVec2d screenWindowSize(
-      screenWindowWidthPerPixel * renderBufferSize[0],
-      screenWindowHeightPerPixel * renderBufferSize[1]);
+  const GfVec2d screenWindowSize(screenWindowWidthPerPixel * renderBufferSize[0],
+                                 screenWindowHeightPerPixel * renderBufferSize[1]);
 
   return GfRange2d(screenWindowMin, screenWindowMin + screenWindowSize);
 }
 
-static double
-_SafeDiv(const double a, const double b)
+static double _SafeDiv(const double a, const double b)
 {
-  if (b == 0)
-  {
-    TF_CODING_ERROR(
-        "Invalid display window in render pass state for hdPrman");
+  if (b == 0) {
+    TF_CODING_ERROR("Invalid display window in render pass state for hdPrman");
     return 1.0;
   }
   return a / b;
@@ -235,8 +223,7 @@ _SafeDiv(const double a, const double b)
 
 // Compute the aspect ratio of the display window taking the
 // pixel aspect ratio into account.
-static double
-_GetDisplayWindowAspect(const CameraUtilFraming &framing)
+static double _GetDisplayWindowAspect(const CameraUtilFraming &framing)
 {
   const GfVec2f &size = framing.displayWindow.GetSize();
   return framing.pixelAspectRatio * _SafeDiv(size[0], size[1]);
@@ -244,34 +231,35 @@ _GetDisplayWindowAspect(const CameraUtilFraming &framing)
 
 // Convert a window into the format expected by RenderMan
 // (xmin, xmax, ymin, ymax).
-static GfVec4f
-_ToVec4f(const GfRange2d &window)
+static GfVec4f _ToVec4f(const GfRange2d &window)
 {
-  return {float(window.GetMin()[0]), float(window.GetMax()[0]),
-          float(window.GetMin()[1]), float(window.GetMax()[1])};
+  return {float(window.GetMin()[0]),
+          float(window.GetMax()[0]),
+          float(window.GetMin()[1]),
+          float(window.GetMax()[1])};
 }
 
 // Get respective projection shader name for projection.
-static const RtUString &
-_ComputeProjectionShader(const HdCamera::Projection projection)
+static const RtUString &_ComputeProjectionShader(const HdCamera::Projection projection)
 {
   // Switch this to PxrCamera once it is ready in RenderMan.
-  static const RtUString us_PxrCamera(
-      TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION)
+  static const RtUString us_PxrCamera(TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION)
 #if _PRMANAPI_VERSION_ < 25
-          ? "PxrProjection"
+                                          ?
+                                          "PxrProjection"
 #else
-          ? "PxrCamera"
+                                          ?
+                                          "PxrCamera"
 #endif
-          : "PxrPerspective");
+                                          :
+                                          "PxrPerspective");
   static const RtUString us_PxrOrthographic("PxrOrthographic");
 
-  switch (projection)
-  {
-  case HdCamera::Perspective:
-    return us_PxrCamera;
-  case HdCamera::Orthographic:
-    return us_PxrOrthographic;
+  switch (projection) {
+    case HdCamera::Perspective:
+      return us_PxrCamera;
+    case HdCamera::Orthographic:
+      return us_PxrOrthographic;
   }
 
   // Make compiler happy.
@@ -279,8 +267,7 @@ _ComputeProjectionShader(const HdCamera::Projection projection)
 }
 
 // Compute parameters for the camera riley::ShadingNode for perspective camera
-RtParamList
-_ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
+RtParamList _ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
 {
   RtParamList result;
 
@@ -288,8 +275,7 @@ _ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
   // lensType values in PxrProjection.
   constexpr int lensTypeLensWarp = 2;
 
-  if (TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION))
-  {
+  if (TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION)) {
     // Pick a PxrProjection lens type that supports depth of field
     // and lens distortion.
     result.SetInteger(us_lensType, lensTypeLensWarp);
@@ -297,15 +283,13 @@ _ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
 
   // FOV settings.
   const float focalLength = camera->GetFocalLength();
-  if (focalLength > 0)
-  {
+  if (focalLength > 0) {
     result.SetFloat(RixStr.k_focalLength, focalLength);
     const float r = camera->GetHorizontalAperture() / focalLength;
     const float fov = 2.0f * GfRadiansToDegrees(std::atan(0.5f * r));
     result.SetFloat(RixStr.k_fov, fov);
   }
-  else
-  {
+  else {
     // If focal length is bogus, don't set it.
     // Fallback to sane FOV.
     result.SetFloat(RixStr.k_fov, 90.0f);
@@ -313,23 +297,19 @@ _ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
 
   // Depth of field settings.
   const float focusDistance = camera->GetFocusDistance();
-  if (focusDistance > 0.0f)
-  {
+  if (focusDistance > 0.0f) {
     result.SetFloat(RixStr.k_focalDistance, focusDistance);
   }
-  else
-  {
+  else {
     // If value is bogus, set to sane value.
     result.SetFloat(RixStr.k_focalDistance, 1000.0f);
   }
 
   const float fStop = camera->GetFStop();
-  if (fStop > 0.0f && focusDistance > 0.0f)
-  {
+  if (fStop > 0.0f && focusDistance > 0.0f) {
     result.SetFloat(RixStr.k_fStop, fStop);
   }
-  else
-  {
+  else {
     // If values are bogus, disable depth of field by setting
     // ininie f-Stop and a sane value for focalDistance.
     result.SetFloat(RixStr.k_fStop, RI_INFINITY);
@@ -346,50 +326,32 @@ _ComputePerspectiveNodeParams(const HdPrmanCamera *const camera)
   static const RtUString us_lensAsymmetry("lensAsymmetry");
   static const RtUString us_lensScale("lensScale");
 
-  if (TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION))
-  {
-    result.SetFloat(
-        us_lensK1,
-        camera->GetLensDistortionK1());
-    result.SetFloat(
-        us_lensK2,
-        camera->GetLensDistortionK2());
-    result.SetFloatArray(
-        us_distortionCtr,
-        camera->GetLensDistortionCenter().data(),
-        2);
-    result.SetFloat(
-        us_lensSqueeze,
-        camera->GetLensDistortionAnaSq());
-    result.SetFloatArray(
-        us_lensAsymmetry,
-        camera->GetLensDistortionAsym().data(),
-        2);
-    result.SetFloat(
-        us_lensScale,
-        camera->GetLensDistortionScale());
+  if (TfGetEnvSetting(HD_PRMAN_SUPPORT_LENS_DISTORTION)) {
+    result.SetFloat(us_lensK1, camera->GetLensDistortionK1());
+    result.SetFloat(us_lensK2, camera->GetLensDistortionK2());
+    result.SetFloatArray(us_distortionCtr, camera->GetLensDistortionCenter().data(), 2);
+    result.SetFloat(us_lensSqueeze, camera->GetLensDistortionAnaSq());
+    result.SetFloatArray(us_lensAsymmetry, camera->GetLensDistortionAsym().data(), 2);
+    result.SetFloat(us_lensScale, camera->GetLensDistortionScale());
   }
 
   return result;
 }
 
 // Compute parameters for the camera riley::ShadingNode for orthographic camera
-RtParamList
-_ComputeOrthographicNodeParams(const HdPrmanCamera *const camera)
+RtParamList _ComputeOrthographicNodeParams(const HdPrmanCamera *const camera)
 {
   return {};
 }
 
 // Compute parameters for the camera riley::ShadingNode
-static RtParamList
-_ComputeNodeParams(const HdPrmanCamera *const camera)
+static RtParamList _ComputeNodeParams(const HdPrmanCamera *const camera)
 {
-  switch (camera->GetProjection())
-  {
-  case HdCamera::Perspective:
-    return _ComputePerspectiveNodeParams(camera);
-  case HdCamera::Orthographic:
-    return _ComputeOrthographicNodeParams(camera);
+  switch (camera->GetProjection()) {
+    case HdCamera::Perspective:
+      return _ComputePerspectiveNodeParams(camera);
+    case HdCamera::Orthographic:
+      return _ComputeOrthographicNodeParams(camera);
   }
 
   // Make compiler happy
@@ -397,10 +359,8 @@ _ComputeNodeParams(const HdPrmanCamera *const camera)
 }
 
 // Compute params given to Riley::ModifyCamera
-RtParamList
-HdPrman_CameraContext::_ComputeCameraParams(
-    const GfRange2d &screenWindow,
-    const HdCamera *const camera) const
+RtParamList HdPrman_CameraContext::_ComputeCameraParams(const GfRange2d &screenWindow,
+                                                        const HdCamera *const camera) const
 {
   RtParamList result;
 
@@ -427,8 +387,7 @@ HdPrman_CameraContext::_ComputeCameraParams(
   // GfRange1f::IsEmpty() in that we do not allow the range to contain
   // only exactly one point.
   const GfRange1f &clippingRange = camera->GetClippingRange();
-  if (clippingRange.GetMin() < clippingRange.GetMax())
-  {
+  if (clippingRange.GetMin() < clippingRange.GetMax()) {
     result.SetFloat(RixStr.k_nearClip, clippingRange.GetMin());
     result.SetFloat(RixStr.k_farClip, clippingRange.GetMax());
   }
@@ -436,8 +395,7 @@ HdPrman_CameraContext::_ComputeCameraParams(
   result.SetFloat(RixStr.k_shutterOpenTime, _shutterOpenTime);
   result.SetFloat(RixStr.k_shutterCloseTime, _shutterCloseTime);
   result.SetFloatArray(
-      RixStr.k_shutteropening,
-      _shutteropeningPoints, TfArraySize(_shutteropeningPoints));
+      RixStr.k_shutteropening, _shutteropeningPoints, TfArraySize(_shutteropeningPoints));
 
   // XXX : Ideally we would want to set the proper shutter open and close,
   // however we can not fully change the shutter without restarting
@@ -464,8 +422,7 @@ HdPrman_CameraContext::_ComputeCameraParams(
 
 // Convert Hydra time sampled matrices to renderman matrices.
 // Optionally flip z-direction.
-static TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>
-_ToRtMatrices(
+static TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES> _ToRtMatrices(
     const HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> &samples,
     const bool flipZ = false)
 {
@@ -474,49 +431,33 @@ _ToRtMatrices(
 
   static const GfMatrix4d flipZMatrix(GfVec4d(1.0, 1.0, -1.0, 1.0));
 
-  for (size_t i = 0; i < samples.count; ++i)
-  {
-    matrices[i] = HdPrman_Utils::GfMatrixToRtMatrix(
-        flipZ
-            ? flipZMatrix * samples.values[i]
-            : samples.values[i]);
+  for (size_t i = 0; i < samples.count; ++i) {
+    matrices[i] = HdPrman_Utils::GfMatrixToRtMatrix(flipZ ? flipZMatrix * samples.values[i] :
+                                                            samples.values[i]);
   }
 
   return matrices;
 }
 
-GfRange2d
-HdPrman_CameraContext::_ComputeConformedScreenWindow(
-    const HdCamera *const camera) const
+GfRange2d HdPrman_CameraContext::_ComputeConformedScreenWindow(const HdCamera *const camera) const
 {
   return CameraUtilConformedWindow(
-      _GetScreenWindow(camera),
-      _policy,
-      _GetDisplayWindowAspect(_framing));
+      _GetScreenWindow(camera), _policy, _GetDisplayWindowAspect(_framing));
 }
 
-void HdPrman_CameraContext::UpdateRileyCameraAndClipPlanes(
-    riley::Riley *const riley,
-    const HdRenderIndex *const renderIndex)
+void HdPrman_CameraContext::UpdateRileyCameraAndClipPlanes(riley::Riley *const riley,
+                                                           const HdRenderIndex *const renderIndex)
 {
-  const HdPrmanCamera *const camera =
-      GetCamera(renderIndex);
-  if (!camera)
-  {
+  const HdPrmanCamera *const camera = GetCamera(renderIndex);
+  if (!camera) {
     // Bail if no camera.
     return;
   }
 
-  const GfRange2d conformedScreenWindow =
-      _ComputeConformedScreenWindow(camera);
+  const GfRange2d conformedScreenWindow = _ComputeConformedScreenWindow(camera);
 
-  _UpdateRileyCamera(
-      riley,
-      conformedScreenWindow,
-      camera);
-  _UpdateClipPlanes(
-      riley,
-      camera);
+  _UpdateRileyCamera(riley, conformedScreenWindow, camera);
+  _UpdateClipPlanes(riley, camera);
 }
 
 void HdPrman_CameraContext::UpdateRileyCameraAndClipPlanesInteractive(
@@ -524,38 +465,29 @@ void HdPrman_CameraContext::UpdateRileyCameraAndClipPlanesInteractive(
     const HdRenderIndex *const renderIndex,
     const GfVec2i &renderBufferSize)
 {
-  const HdPrmanCamera *const camera =
-      GetCamera(renderIndex);
-  if (!camera)
-  {
+  const HdPrmanCamera *const camera = GetCamera(renderIndex);
+  if (!camera) {
     // Bail if no camera.
     return;
   }
 
   // The screen window we would need to use if we were targeting
   // the display window.
-  const GfRange2d conformedScreenWindow =
-      _ComputeConformedScreenWindow(camera);
+  const GfRange2d conformedScreenWindow = _ComputeConformedScreenWindow(camera);
 
   // But instead, we target the rect of pixels in the render
   // buffer baking the AOVs, so we need to convert the
   // screen window.
-  _UpdateRileyCamera(
-      riley,
-      _ConvertScreenWindowForDisplayWindowToRenderBuffer(
-          conformedScreenWindow,
-          _framing.displayWindow,
-          renderBufferSize),
-      camera);
-  _UpdateClipPlanes(
-      riley,
-      camera);
+  _UpdateRileyCamera(riley,
+                     _ConvertScreenWindowForDisplayWindowToRenderBuffer(
+                         conformedScreenWindow, _framing.displayWindow, renderBufferSize),
+                     camera);
+  _UpdateClipPlanes(riley, camera);
 }
 
-void HdPrman_CameraContext::_UpdateRileyCamera(
-    riley::Riley *const riley,
-    const GfRange2d &screenWindow,
-    const HdPrmanCamera *const camera)
+void HdPrman_CameraContext::_UpdateRileyCamera(riley::Riley *const riley,
+                                               const GfRange2d &screenWindow,
+                                               const HdPrmanCamera *const camera)
 {
   const riley::ShadingNode node = riley::ShadingNode{
       riley::ShadingNode::Type::k_Projection,
@@ -578,10 +510,8 @@ void HdPrman_CameraContext::_UpdateRileyCamera(
   // - World is Y-up
   // - Camera looks along +Z.
 
-  using _HdTimeSamples =
-      HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES>;
-  using _RtMatrices =
-      TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>;
+  using _HdTimeSamples = HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES>;
+  using _RtMatrices = TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>;
 
   // Use time sampled transforms authored on the scene camera.
   const _HdTimeSamples &sampleXforms = camera->GetTimeSampleXforms();
@@ -590,93 +520,71 @@ void HdPrman_CameraContext::_UpdateRileyCamera(
   // Convert right-handed Y-up camera space (USD, Hydra) to
   // left-handed Y-up (Prman) coordinates.  This just amounts to
   // flipping the Z axis.
-  const _RtMatrices rtMatrices =
-      _ToRtMatrices(sampleXforms, /* flipZ = */ true);
+  const _RtMatrices rtMatrices = _ToRtMatrices(sampleXforms, /* flipZ = */ true);
 
   const riley::Transform transform{
-      unsigned(sampleXforms.count),
-      rtMatrices.data(),
-      sampleXforms.times.data()};
+      unsigned(sampleXforms.count), rtMatrices.data(), sampleXforms.times.data()};
 
   // Commit camera.
-  riley->ModifyCamera(
-      _cameraId,
-      &node,
-      &transform,
-      &params);
+  riley->ModifyCamera(_cameraId, &node, &transform, &params);
 }
 
 // Hydra expresses clipping planes as a plane equation
 // in the camera object space.
 // Riley API expresses clipping planes in terms of a
 // time-sampled transform, a normal, and a point.
-static bool
-_ToClipPlaneParams(const GfVec4d &plane, RtParamList *const params)
+static bool _ToClipPlaneParams(const GfVec4d &plane, RtParamList *const params)
 {
   static const RtUString us_planeNormal("planeNormal");
   static const RtUString us_planeOrigin("planeOrigin");
 
   const GfVec3f direction(plane[0], plane[1], plane[2]);
   const float directionLength = direction.GetLength();
-  if (directionLength == 0.0f)
-  {
+  if (directionLength == 0.0f) {
     return false;
   }
   // Riley API expects a unit-length normal.
   const GfVec3f norm = direction / directionLength;
-  params->SetNormal(us_planeNormal,
-                    RtNormal3(norm[0], norm[1], norm[2]));
+  params->SetNormal(us_planeNormal, RtNormal3(norm[0], norm[1], norm[2]));
   // Determine the distance along the normal
   // to the plane.
   const float distance = -plane[3] / directionLength;
   // The origin can be any point on the plane.
-  const RtPoint3 origin(norm[0] * distance,
-                        norm[1] * distance,
-                        norm[2] * distance);
+  const RtPoint3 origin(norm[0] * distance, norm[1] * distance, norm[2] * distance);
   params->SetPoint(us_planeOrigin, origin);
 
   return true;
 }
 
-void HdPrman_CameraContext::_UpdateClipPlanes(
-    riley::Riley *const riley,
-    const HdPrmanCamera *const camera)
+void HdPrman_CameraContext::_UpdateClipPlanes(riley::Riley *const riley,
+                                              const HdPrmanCamera *const camera)
 {
   // Delete clipping planes
-  for (riley::ClippingPlaneId const &id : _clipPlaneIds)
-  {
+  for (riley::ClippingPlaneId const &id : _clipPlaneIds) {
     riley->DeleteClippingPlane(id);
   }
   _clipPlaneIds.clear();
 
   // Create clipping planes
   const std::vector<GfVec4d> &clipPlanes = camera->GetClipPlanes();
-  if (clipPlanes.empty())
-  {
+  if (clipPlanes.empty()) {
     return;
   }
 
-  using _HdTimeSamples =
-      HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES>;
-  using _RtMatrices =
-      TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>;
+  using _HdTimeSamples = HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES>;
+  using _RtMatrices = TfSmallVector<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>;
 
   // Use time sampled transforms authored on the scene camera.
   const _HdTimeSamples &sampleXforms = camera->GetTimeSampleXforms();
   const _RtMatrices rtMatrices = _ToRtMatrices(sampleXforms);
 
   const riley::Transform transform{
-      unsigned(sampleXforms.count),
-      rtMatrices.data(),
-      sampleXforms.times.data()};
+      unsigned(sampleXforms.count), rtMatrices.data(), sampleXforms.times.data()};
 
-  for (const GfVec4d &plane : clipPlanes)
-  {
+  for (const GfVec4d &plane : clipPlanes) {
     RtParamList params;
-    if (_ToClipPlaneParams(plane, &params))
-    {
-      _clipPlaneIds.push_back(
-          riley->CreateClippingPlane(transform, params));
+    if (_ToClipPlaneParams(plane, &params)) {
+      _clipPlaneIds.push_back(riley->CreateClippingPlane(transform, params));
     }
   }
 }
@@ -700,8 +608,7 @@ void HdPrman_CameraContext::_UpdateClipPlanes(
 //   rxmax = clamp(ceil( renderbufferwidth*xmax - 1), 0, renderbufferwidth - 1)
 //   similar for y
 //
-static float
-_DivRoundDown(const float a, const int b)
+static float _DivRoundDown(const float a, const int b)
 {
   // Note that if the division (performed here)
   //    float(a) / b
@@ -718,76 +625,50 @@ _DivRoundDown(const float a, const int b)
 
 // Compute how the dataWindow sets in a window with upper left corner
 // at camWindowMin and size camWindowSize.
-static GfVec4f
-_ComputeCropWindow(
-    const GfRect2i &dataWindow,
-    const GfVec2f &camWindowMin,
-    const GfVec2i &camWindowSize)
+static GfVec4f _ComputeCropWindow(const GfRect2i &dataWindow,
+                                  const GfVec2f &camWindowMin,
+                                  const GfVec2i &camWindowSize)
 {
-  return GfVec4f(
-      _DivRoundDown(dataWindow.GetMinX() - camWindowMin[0],
-                    camWindowSize[0]),
-      _DivRoundDown(dataWindow.GetMaxX() - camWindowMin[0] + 1.0f,
-                    camWindowSize[0]),
-      _DivRoundDown(dataWindow.GetMinY() - camWindowMin[1],
-                    camWindowSize[1]),
-      _DivRoundDown(dataWindow.GetMaxY() - camWindowMin[1] + 1.0f,
-                    camWindowSize[1]));
+  return GfVec4f(_DivRoundDown(dataWindow.GetMinX() - camWindowMin[0], camWindowSize[0]),
+                 _DivRoundDown(dataWindow.GetMaxX() - camWindowMin[0] + 1.0f, camWindowSize[0]),
+                 _DivRoundDown(dataWindow.GetMinY() - camWindowMin[1], camWindowSize[1]),
+                 _DivRoundDown(dataWindow.GetMaxY() - camWindowMin[1] + 1.0f, camWindowSize[1]));
 }
 
-GfVec2i
-HdPrman_CameraContext::GetResolutionFromDisplayWindow() const
+GfVec2i HdPrman_CameraContext::GetResolutionFromDisplayWindow() const
 {
   const GfVec2f size = _framing.displayWindow.GetSize();
 
   return GfVec2i(std::ceil(size[0]), std::ceil(size[1]));
 }
 
-void HdPrman_CameraContext::SetRileyOptions(
-    RtParamList *const options) const
+void HdPrman_CameraContext::SetRileyOptions(RtParamList *const options) const
 {
   const GfVec2i res = GetResolutionFromDisplayWindow();
 
   // Compute how the data window sits in the display window.
-  const GfVec4f cropWindow =
-      _ComputeCropWindow(
-          _framing.dataWindow,
-          _framing.displayWindow.GetMin(),
-          res);
+  const GfVec4f cropWindow = _ComputeCropWindow(
+      _framing.dataWindow, _framing.displayWindow.GetMin(), res);
 
-  options->SetFloatArray(
-      RixStr.k_Ri_CropWindow,
-      cropWindow.data(), 4);
+  options->SetFloatArray(RixStr.k_Ri_CropWindow, cropWindow.data(), 4);
 
-  options->SetIntegerArray(
-      RixStr.k_Ri_FormatResolution,
-      res.data(), 2);
+  options->SetIntegerArray(RixStr.k_Ri_FormatResolution, res.data(), 2);
 
-  options->SetFloat(
-      RixStr.k_Ri_FormatPixelAspectRatio,
-      _framing.pixelAspectRatio);
+  options->SetFloat(RixStr.k_Ri_FormatPixelAspectRatio, _framing.pixelAspectRatio);
 }
 
-void HdPrman_CameraContext::SetRileyOptionsInteractive(
-    RtParamList *const options,
-    const GfVec2i &renderBufferSize) const
+void HdPrman_CameraContext::SetRileyOptionsInteractive(RtParamList *const options,
+                                                       const GfVec2i &renderBufferSize) const
 {
   // Compute how the data window sits in the rect of the render
   // buffer baking the AOVs.
 
-  const GfVec4f cropWindow =
-      _ComputeCropWindow(
-          _framing.dataWindow,
-          GfVec2f(0.0f),
-          renderBufferSize);
+  const GfVec4f cropWindow = _ComputeCropWindow(
+      _framing.dataWindow, GfVec2f(0.0f), renderBufferSize);
 
-  options->SetFloatArray(
-      RixStr.k_Ri_CropWindow,
-      cropWindow.data(), 4);
+  options->SetFloatArray(RixStr.k_Ri_CropWindow, cropWindow.data(), 4);
 
-  options->SetFloat(
-      RixStr.k_Ri_FormatPixelAspectRatio,
-      _framing.pixelAspectRatio);
+  options->SetFloat(RixStr.k_Ri_FormatPixelAspectRatio, _framing.pixelAspectRatio);
 }
 
 void HdPrman_CameraContext::MarkValid()
@@ -823,30 +704,23 @@ void HdPrman_CameraContext::Begin(riley::Riley *const riley)
   matrix[0].Translate(0.f, 0.f, -10.0f);
   const riley::Transform transform = {1, matrix, zerotime};
 
-  _cameraId = riley->CreateCamera(
-      riley::UserId(
-          stats::AddDataLocation(name.CStr()).GetValue()),
-      name,
-      node,
-      transform,
-      params);
+  _cameraId = riley->CreateCamera(riley::UserId(stats::AddDataLocation(name.CStr()).GetValue()),
+                                  name,
+                                  node,
+                                  transform,
+                                  params);
 
   // Dicing Camera
   riley->SetDefaultDicingCamera(_cameraId);
 }
 
-const HdPrmanCamera *
-HdPrman_CameraContext::GetCamera(
-    const HdRenderIndex *const renderIndex) const
+const HdPrmanCamera *HdPrman_CameraContext::GetCamera(const HdRenderIndex *const renderIndex) const
 {
   return static_cast<const HdPrmanCamera *>(
-      renderIndex->GetSprim(
-          HdPrimTypeTokens->camera,
-          _cameraPath));
+      renderIndex->GetSprim(HdPrimTypeTokens->camera, _cameraPath));
 }
 
-const CameraUtilFraming &
-HdPrman_CameraContext::GetFraming() const
+const CameraUtilFraming &HdPrman_CameraContext::GetFraming() const
 {
   return _framing;
 }

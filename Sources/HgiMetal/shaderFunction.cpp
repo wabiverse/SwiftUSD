@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "HgiMetal/hgi.h"
+#include "HgiMetal/shaderFunction.h"
 #include "HgiMetal/conversions.h"
 #include "HgiMetal/diagnostic.h"
-#include "HgiMetal/shaderFunction.h"
+#include "HgiMetal/hgi.h"
 #include "HgiMetal/shaderGenerator.h"
 
 #include "Arch/defines.h"
@@ -34,13 +34,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiMetalShaderFunction::HgiMetalShaderFunction(
-    HgiMetal *hgi,
-    HgiShaderFunctionDesc const &desc)
+HgiMetalShaderFunction::HgiMetalShaderFunction(HgiMetal *hgi, HgiShaderFunctionDesc const &desc)
     : HgiShaderFunction(desc), _shaderId(nil)
 {
-  if (desc.shaderCode)
-  {
+  if (desc.shaderCode) {
     MTL::Device *device = hgi->GetPrimaryDevice();
 
     HgiMetalShaderGenerator shaderGenerator{desc, device};
@@ -56,11 +53,9 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
 
     // Compile the shader code into a library
     NS::Error *error = nil;
-    MTL::Library *library = hgi->GetPrimaryDevice()->newLibrary(NS::String::string(shaderCode, NS::UTF8StringEncoding),
-                                                                options,
-                                                                &error);
-    if (error)
-    {
+    MTL::Library *library = hgi->GetPrimaryDevice()->newLibrary(
+        NS::String::string(shaderCode, NS::UTF8StringEncoding), options, &error);
+    if (error) {
       NS::String *err = error->localizedDescription();
       TF_CODING_ERROR("Error compiling shader: %s", err->utf8String());
     }
@@ -69,39 +64,36 @@ HgiMetalShaderFunction::HgiMetalShaderFunction(
     options = nil;
 
     NS::String *entryPoint = nullptr;
-    switch (_descriptor.shaderStage)
-    {
-    case HgiShaderStageVertex:
-      entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-      break;
-    case HgiShaderStageFragment:
-      entryPoint = NS::String::string("fragmentEntryPoint", NS::UTF8StringEncoding);
-      break;
-    case HgiShaderStageCompute:
-      entryPoint = NS::String::string("computeEntryPoint", NS::UTF8StringEncoding);
-      break;
-    case HgiShaderStagePostTessellationControl:
-      entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-      break;
-    case HgiShaderStagePostTessellationVertex:
-      entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
-      break;
-    case HgiShaderStageTessellationControl:
-    case HgiShaderStageTessellationEval:
-    case HgiShaderStageGeometry:
-      TF_CODING_ERROR("Todo: Unsupported shader stage");
-      break;
+    switch (_descriptor.shaderStage) {
+      case HgiShaderStageVertex:
+        entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+        break;
+      case HgiShaderStageFragment:
+        entryPoint = NS::String::string("fragmentEntryPoint", NS::UTF8StringEncoding);
+        break;
+      case HgiShaderStageCompute:
+        entryPoint = NS::String::string("computeEntryPoint", NS::UTF8StringEncoding);
+        break;
+      case HgiShaderStagePostTessellationControl:
+        entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+        break;
+      case HgiShaderStagePostTessellationVertex:
+        entryPoint = NS::String::string("vertexEntryPoint", NS::UTF8StringEncoding);
+        break;
+      case HgiShaderStageTessellationControl:
+      case HgiShaderStageTessellationEval:
+      case HgiShaderStageGeometry:
+        TF_CODING_ERROR("Todo: Unsupported shader stage");
+        break;
     }
 
     _shaderId = library->newFunction(entryPoint);
-    if (!_shaderId)
-    {
+    if (!_shaderId) {
       NS::String *err = error->localizedDescription();
       TF_CODING_ERROR("Error loading shader function: %s", err->utf8String());
       _errors = err->utf8String();
     }
-    else
-    {
+    else {
       HGIMETAL_DEBUG_LABEL(_shaderId, _descriptor.debugName.c_str());
     }
 
@@ -126,26 +118,22 @@ bool HgiMetalShaderFunction::IsValid() const
   return _errors.empty();
 }
 
-std::string const &
-HgiMetalShaderFunction::GetCompileErrors()
+std::string const &HgiMetalShaderFunction::GetCompileErrors()
 {
   return _errors;
 }
 
-size_t
-HgiMetalShaderFunction::GetByteSizeOfResource() const
+size_t HgiMetalShaderFunction::GetByteSizeOfResource() const
 {
   return 0;
 }
 
-uint64_t
-HgiMetalShaderFunction::GetRawResource() const
+uint64_t HgiMetalShaderFunction::GetRawResource() const
 {
   return (uint64_t)_shaderId;
 }
 
-MTL::Function *
-HgiMetalShaderFunction::GetShaderId() const
+MTL::Function *HgiMetalShaderFunction::GetShaderId() const
 {
   return _shaderId;
 }

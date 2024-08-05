@@ -22,17 +22,16 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "Arch/attributes.h"
 #include "Arch/error.h"
+#include "pxr/pxr.h"
 
 #include <cstdio>
 #include <cstdlib>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-enum Operation
-{
+enum Operation {
   Ctor20Op,
   Ctor30Op,
   CtorTestOp,
@@ -72,15 +71,28 @@ static const Bits dependencies[NumOperations] = {
 
 static void TestAndSet(Operation operation)
 {
-  static const char binary[][5] = {
-      "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
-      "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"};
+  static const char binary[][5] = {"0000",
+                                   "0001",
+                                   "0010",
+                                   "0011",
+                                   "0100",
+                                   "0101",
+                                   "0110",
+                                   "0111",
+                                   "1000",
+                                   "1001",
+                                   "1010",
+                                   "1011",
+                                   "1100",
+                                   "1101",
+                                   "1110",
+                                   "1111"};
 
   // Check dependencies.
   const Bits deps = dependencies[operation];
-  if ((done & deps) != deps)
-  {
-    fprintf(stderr, "Failed on operation %d: %s%s%s%s expected %s%s%s%s\n",
+  if ((done & deps) != deps) {
+    fprintf(stderr,
+            "Failed on operation %d: %s%s%s%s expected %s%s%s%s\n",
             operation,
             binary[(done >> 12) & 15],
             binary[(done >> 8) & 15],
@@ -132,8 +144,7 @@ ARCH_DESTRUCTOR(Dtor30, 30, void)
   TestAndSet(Dtor30Op);
 }
 
-struct Test
-{
+struct Test {
   Test() : _dtor(DtorTestOp)
   {
     TestAndSet(CtorTestOp);

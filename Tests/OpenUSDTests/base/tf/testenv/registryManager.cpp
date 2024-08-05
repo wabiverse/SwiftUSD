@@ -22,16 +22,16 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/registryManager.h"
 #include "pxr/base/tf/instantiateSingleton.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
-#include <string>
 #include <map>
+#include <string>
 
-using std::string;
 using std::map;
+using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -44,105 +44,107 @@ PXR_NAMESPACE_USING_DIRECTIVE
  * and use them.
  */
 
-
-
 /*
  * Interface class
  */
 class RegBase {
-public:
-    virtual int Get() = 0;
-    virtual ~RegBase() {};
+ public:
+  virtual int Get() = 0;
+  virtual ~RegBase() {};
 };
-
-
 
 /*
  * Registry, allows registering of pointers to RegBase and lookup by name.
  */
 class RegRegistry {
-public:
-    static RegRegistry& GetInstance() {
-        return TfSingleton<RegRegistry>::GetInstance();
-    }
+ public:
+  static RegRegistry &GetInstance()
+  {
+    return TfSingleton<RegRegistry>::GetInstance();
+  }
 
-    void Register(const std::string &name, RegBase *i) {
-        _registered[name] = i;
-    }
+  void Register(const std::string &name, RegBase *i)
+  {
+    _registered[name] = i;
+  }
 
-    RegBase *Get(const std::string &name) {
-        map<string, RegBase *>::iterator i = _registered.find(name);
-        if(i == _registered.end())
-            return NULL;
-        return i->second;
-    }
+  RegBase *Get(const std::string &name)
+  {
+    map<string, RegBase *>::iterator i = _registered.find(name);
+    if (i == _registered.end())
+      return NULL;
+    return i->second;
+  }
 
-private:
-    RegRegistry() {
-        TfSingleton<RegRegistry>::SetInstanceConstructed(*this);  
-        TfRegistryManager::GetInstance().SubscribeTo<RegRegistry>();
-    }
+ private:
+  RegRegistry()
+  {
+    TfSingleton<RegRegistry>::SetInstanceConstructed(*this);
+    TfRegistryManager::GetInstance().SubscribeTo<RegRegistry>();
+  }
 
-    RegRegistry(const RegRegistry &);
-    const RegRegistry &operator=(const RegRegistry &);
+  RegRegistry(const RegRegistry &);
+  const RegRegistry &operator=(const RegRegistry &);
 
-    friend class TfSingleton<RegRegistry>;
+  friend class TfSingleton<RegRegistry>;
 
-    std::map<std::string, RegBase *> _registered;
+  std::map<std::string, RegBase *> _registered;
 };
 
 TF_INSTANTIATE_SINGLETON(RegRegistry);
-
-
 
 /*
  * Derived classes, implement RegBase and register themselves
  * with the RegRegistry.
  */
 class RegDerived1 : public RegBase {
-public:
-    virtual int Get() { return 1; }
-    virtual ~RegDerived1() {};
+ public:
+  virtual int Get()
+  {
+    return 1;
+  }
+  virtual ~RegDerived1() {};
 };
 
-TF_REGISTRY_FUNCTION(RegRegistry) {
-    RegRegistry::GetInstance().Register("one", new RegDerived1());
+TF_REGISTRY_FUNCTION(RegRegistry)
+{
+  RegRegistry::GetInstance().Register("one", new RegDerived1());
 }
-
 
 class RegDerived2 : public RegBase {
-public:
-    virtual int Get() { return 2; }
-    virtual ~RegDerived2() {};
+ public:
+  virtual int Get()
+  {
+    return 2;
+  }
+  virtual ~RegDerived2() {};
 };
 
-TF_REGISTRY_FUNCTION(RegRegistry) {
-    RegRegistry::GetInstance().Register("two", new RegDerived2());
+TF_REGISTRY_FUNCTION(RegRegistry)
+{
+  RegRegistry::GetInstance().Register("two", new RegDerived2());
 }
-
-
 
 /*
  * Try to get the derived classes out of the registry by name.
  */
-static bool
-Test_TfRegistryManager()
+static bool Test_TfRegistryManager()
 {
-    RegBase *x;
+  RegBase *x;
 
-    x = RegRegistry::GetInstance().Get("one");
-    TF_AXIOM(x);
-    TF_AXIOM(x->Get() == 1);
+  x = RegRegistry::GetInstance().Get("one");
+  TF_AXIOM(x);
+  TF_AXIOM(x->Get() == 1);
 
-    x = RegRegistry::GetInstance().Get("two");
-    TF_AXIOM(x);
-    TF_AXIOM(x->Get() == 2);
+  x = RegRegistry::GetInstance().Get("two");
+  TF_AXIOM(x);
+  TF_AXIOM(x->Get() == 2);
 
-    x = RegRegistry::GetInstance().Get("three");
-    TF_AXIOM(!x);
+  x = RegRegistry::GetInstance().Get("three");
+  TF_AXIOM(!x);
 
-    TfSingleton<RegRegistry>::DeleteInstance();
-    return true;
+  TfSingleton<RegRegistry>::DeleteInstance();
+  return true;
 }
 
 TF_ADD_REGTEST(TfRegistryManager);

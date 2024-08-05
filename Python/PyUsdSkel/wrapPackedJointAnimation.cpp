@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdSkel/packedJointAnimation.h"
 #include "Usd/schemaBase.h"
+#include "UsdSkel/packedJointAnimation.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,36 +40,28 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static std::string _Repr(const UsdSkelPackedJointAnimation &self)
 {
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSkel.PackedJointAnimation(%s)", primRepr.c_str());
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
-
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static std::string
-  _Repr(const UsdSkelPackedJointAnimation &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSkel.PackedJointAnimation(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSkelPackedJointAnimation()
 {
   typedef UsdSkelPackedJointAnimation This;
 
-  class_<This, bases<UsdSkelAnimation>>
-      cls("PackedJointAnimation");
+  class_<This, bases<UsdSkelAnimation>> cls("PackedJointAnimation");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -85,7 +77,8 @@ void wrapUsdSkelPackedJointAnimation()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -115,11 +108,8 @@ void wrapUsdSkelPackedJointAnimation()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-} // anonymous namespace
+}  // anonymous namespace

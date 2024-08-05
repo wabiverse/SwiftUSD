@@ -52,8 +52,8 @@ using std::vector;
 // UsdVariantSet: Public Methods
 // ---------------------------------------------------------------------- //
 
-bool UsdVariantSet::AddVariant(const std::string &variantName,
-                               UsdListPosition position) {
+bool UsdVariantSet::AddVariant(const std::string &variantName, UsdListPosition position)
+{
   if (SdfVariantSetSpecHandle varSet = _AddVariantSet(position)) {
     // If the variant spec already exists, we don't need to create it
     for (const auto &variant : varSet->GetVariants()) {
@@ -66,9 +66,11 @@ bool UsdVariantSet::AddVariant(const std::string &variantName,
   return false;
 }
 
-vector<string> UsdVariantSet::GetVariantNames() const {
+vector<string> UsdVariantSet::GetVariantNames() const
+{
   std::set<std::string> namesSet;
-  TF_REVERSE_FOR_ALL(i, _prim.GetPrimIndex().GetNodeRange()) {
+  TF_REVERSE_FOR_ALL(i, _prim.GetPrimIndex().GetNodeRange())
+  {
     if (i->GetPath().IsPrimOrPrimVariantSelectionPath()) {
       PcpComposeSiteVariantSetOptions(*i, _variantSetName, &namesSet);
     }
@@ -77,22 +79,24 @@ vector<string> UsdVariantSet::GetVariantNames() const {
   return vector<string>(namesSet.begin(), namesSet.end());
 }
 
-bool UsdVariantSet::HasAuthoredVariant(const std::string &variantName) const {
+bool UsdVariantSet::HasAuthoredVariant(const std::string &variantName) const
+{
   std::vector<std::string> variants = GetVariantNames();
 
-  return std::find(variants.begin(), variants.end(), variantName) !=
-         variants.end();
+  return std::find(variants.begin(), variants.end(), variantName) != variants.end();
 }
 
-string UsdVariantSet::GetVariantSelection() const {
+string UsdVariantSet::GetVariantSelection() const
+{
   // Scan the composed prim for variant arcs for this variant set and
   // return the first selection found.  This ensures that we reflect
   // whatever composition process selected the variant, such as fallbacks.
   for (auto nodeIter = _prim.GetPrimIndex().GetNodeRange().first;
-       nodeIter != _prim.GetPrimIndex().GetNodeRange().second; ++nodeIter) {
+       nodeIter != _prim.GetPrimIndex().GetNodeRange().second;
+       ++nodeIter)
+  {
     if (nodeIter->GetArcType() == PcpArcTypeVariant) {
-      std::pair<std::string, std::string> vsel =
-          nodeIter->GetSite().path.GetVariantSelection();
+      std::pair<std::string, std::string> vsel = nodeIter->GetSite().path.GetVariantSelection();
       if (vsel.first == _variantSetName) {
         return vsel.second;
       }
@@ -101,13 +105,16 @@ string UsdVariantSet::GetVariantSelection() const {
   return std::string();
 }
 
-bool UsdVariantSet::HasAuthoredVariantSelection(std::string *value) const {
+bool UsdVariantSet::HasAuthoredVariantSelection(std::string *value) const
+{
   string sel;
   if (!value) {
     value = &sel;
   }
   for (auto nodeIter = _prim.GetPrimIndex().GetNodeRange().first;
-       nodeIter != _prim.GetPrimIndex().GetNodeRange().second; ++nodeIter) {
+       nodeIter != _prim.GetPrimIndex().GetNodeRange().second;
+       ++nodeIter)
+  {
     if (PcpComposeSiteVariantSelection(*nodeIter, _variantSetName, value)) {
       return true;
     }
@@ -115,7 +122,8 @@ bool UsdVariantSet::HasAuthoredVariantSelection(std::string *value) const {
   return false;
 }
 
-bool UsdVariantSet::SetVariantSelection(const std::string &variantName) {
+bool UsdVariantSet::SetVariantSelection(const std::string &variantName)
+{
   if (SdfPrimSpecHandle spec = _CreatePrimSpecForEditing()) {
     spec->SetVariantSelection(_variantSetName, variantName);
     return true;
@@ -124,13 +132,15 @@ bool UsdVariantSet::SetVariantSelection(const std::string &variantName) {
   return false;
 }
 
-bool UsdVariantSet::ClearVariantSelection() {
+bool UsdVariantSet::ClearVariantSelection()
+{
   // empty selection is how you clear in SdfPrimSpec... don't want to
   // adopt that pattern in our API.  Let's be "clear" about it!
   return SetVariantSelection(string());
 }
 
-bool UsdVariantSet::BlockVariantSelection() {
+bool UsdVariantSet::BlockVariantSelection()
+{
   if (SdfPrimSpecHandle spec = _CreatePrimSpecForEditing()) {
     spec->BlockVariantSelection(_variantSetName);
     return true;
@@ -139,8 +149,8 @@ bool UsdVariantSet::BlockVariantSelection() {
   return false;
 }
 
-UsdEditTarget
-UsdVariantSet::GetVariantEditTarget(const SdfLayerHandle &layer) const {
+UsdEditTarget UsdVariantSet::GetVariantEditTarget(const SdfLayerHandle &layer) const
+{
   using std::pair;
   UsdEditTarget target;
 
@@ -151,54 +161,54 @@ UsdVariantSet::GetVariantEditTarget(const SdfLayerHandle &layer) const {
     return target;
 
   UsdStagePtr stage = _prim.GetStage();
-  const SdfLayerHandle &lyr =
-      layer ? layer : _prim.GetStage()->GetEditTarget().GetLayer();
+  const SdfLayerHandle &lyr = layer ? layer : _prim.GetStage()->GetEditTarget().GetLayer();
 
   if (!stage->HasLocalLayer(lyr)) {
-    TF_CODING_ERROR("Layer %s is not a local layer of stage rooted at "
-                    "layer %s",
-                    lyr->GetIdentifier().c_str(),
-                    stage->GetRootLayer()->GetIdentifier().c_str());
+    TF_CODING_ERROR(
+        "Layer %s is not a local layer of stage rooted at "
+        "layer %s",
+        lyr->GetIdentifier().c_str(),
+        stage->GetRootLayer()->GetIdentifier().c_str());
     return target;
   }
 
-  SdfPath varSpecPath =
-      stage->GetEditTarget()
-          .MapToSpecPath(_prim.GetPath())
-          .AppendVariantSelection(curVarSel.first, curVarSel.second);
+  SdfPath varSpecPath = stage->GetEditTarget()
+                            .MapToSpecPath(_prim.GetPath())
+                            .AppendVariantSelection(curVarSel.first, curVarSel.second);
 
   return UsdEditTarget::ForLocalDirectVariant(lyr, varSpecPath);
 }
 
-std::pair<UsdStagePtr, UsdEditTarget>
-UsdVariantSet::GetVariantEditContext(const SdfLayerHandle &layer) const {
+std::pair<UsdStagePtr, UsdEditTarget> UsdVariantSet::GetVariantEditContext(
+    const SdfLayerHandle &layer) const
+{
   UsdEditTarget target = GetVariantEditTarget(layer);
 
   return std::make_pair(_prim.GetStage(), target);
 }
 
-SdfPrimSpecHandle UsdVariantSet::_CreatePrimSpecForEditing() {
+SdfPrimSpecHandle UsdVariantSet::_CreatePrimSpecForEditing()
+{
   return _prim.GetStage()->_CreatePrimSpecForEditing(_prim);
 }
 
-SdfVariantSetSpecHandle
-UsdVariantSet::_AddVariantSet(UsdListPosition position) {
+SdfVariantSetSpecHandle UsdVariantSet::_AddVariantSet(UsdListPosition position)
+{
   SdfVariantSetSpecHandle result;
   SdfPrimSpecHandle primSpec = _CreatePrimSpecForEditing();
   if (primSpec) {
-    SdfPath varSetPath =
-        primSpec->GetPath().AppendVariantSelection(_variantSetName, string());
+    SdfPath varSetPath = primSpec->GetPath().AppendVariantSelection(_variantSetName, string());
     if (varSetPath.IsEmpty()) {
       return result;
     }
     SdfLayerHandle layer = primSpec->GetLayer();
     if (SdfSpecHandle spec = layer->GetObjectAtPath(varSetPath)) {
       result = TfDynamic_cast<SdfVariantSetSpecHandle>(spec);
-    } else {
+    }
+    else {
       result = SdfVariantSetSpec::New(primSpec, _variantSetName);
     }
-    Usd_InsertListItem(primSpec->GetVariantSetNameList(), _variantSetName,
-                       position);
+    Usd_InsertListItem(primSpec->GetVariantSetNameList(), _variantSetName, position);
   }
   return result;
 }
@@ -207,8 +217,8 @@ UsdVariantSet::_AddVariantSet(UsdListPosition position) {
 // UsdVariantSets: Public Methods
 // ---------------------------------------------------------------------- //
 
-UsdVariantSet
-UsdVariantSets::GetVariantSet(const std::string &variantSetName) const {
+UsdVariantSet UsdVariantSets::GetVariantSet(const std::string &variantSetName) const
+{
   if (!_prim) {
     TF_CODING_ERROR("Invalid prim");
 
@@ -220,7 +230,8 @@ UsdVariantSets::GetVariantSet(const std::string &variantSetName) const {
 }
 
 UsdVariantSet UsdVariantSets::AddVariantSet(const std::string &variantSetName,
-                                            UsdListPosition position) {
+                                            UsdListPosition position)
+{
   UsdVariantSet varSet = GetVariantSet(variantSetName);
 
   varSet._AddVariantSet(position);
@@ -230,12 +241,14 @@ UsdVariantSet UsdVariantSets::AddVariantSet(const std::string &variantSetName,
   return varSet;
 }
 
-bool UsdVariantSets::HasVariantSet(const std::string &variantSetName) const {
+bool UsdVariantSets::HasVariantSet(const std::string &variantSetName) const
+{
   std::vector<std::string> sets = GetNames();
   return std::find(sets.begin(), sets.end(), variantSetName) != sets.end();
 }
 
-bool UsdVariantSets::GetNames(std::vector<std::string> *names) const {
+bool UsdVariantSets::GetNames(std::vector<std::string> *names) const
+{
   names->clear();
   std::set<std::string> seenNames;
   std::vector<std::string> fromNode;
@@ -254,25 +267,28 @@ bool UsdVariantSets::GetNames(std::vector<std::string> *names) const {
   return true;
 }
 
-std::vector<std::string> UsdVariantSets::GetNames() const {
+std::vector<std::string> UsdVariantSets::GetNames() const
+{
   std::vector<std::string> names;
   GetNames(&names);
   return names;
 }
 
-string
-UsdVariantSets::GetVariantSelection(const std::string &variantSetName) const {
+string UsdVariantSets::GetVariantSelection(const std::string &variantSetName) const
+{
   return GetVariantSet(variantSetName).GetVariantSelection();
 }
 
 bool UsdVariantSets::SetSelection(const std::string &variantSetName,
-                                  const std::string &variantName) {
+                                  const std::string &variantName)
+{
   UsdVariantSet vset(_prim, variantSetName);
 
   return vset.SetVariantSelection(variantName);
 }
 
-SdfVariantSelectionMap UsdVariantSets::GetAllVariantSelections() const {
+SdfVariantSelectionMap UsdVariantSets::GetAllVariantSelections() const
+{
   SdfVariantSelectionMap variantSelections;
   for (const auto &i : _prim.GetPrimIndex().GetNodeRange()) {
     PcpComposeSiteVariantSelections(i, &variantSelections);

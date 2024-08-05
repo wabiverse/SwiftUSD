@@ -37,7 +37,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace pxr_double_conversion {
 
 class PowersOfTenCache {
-public:
+ public:
   // Not all powers of ten are cached. The decimal exponent of two neighboring
   // cached numbers will differ by kDecimalExponentDistance.
   static const int kDecimalExponentDistance;
@@ -62,8 +62,8 @@ public:
                                                int *found_exponent);
 };
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // DOUBLE_CONVERSION_CACHED_POWERS_H_
+#endif  // DOUBLE_CONVERSION_CACHED_POWERS_H_

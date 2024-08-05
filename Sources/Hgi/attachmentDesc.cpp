@@ -27,36 +27,25 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool operator==(
-    const HgiAttachmentDesc &lhs,
-    const HgiAttachmentDesc &rhs)
+bool operator==(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs)
 {
-  return lhs.format == rhs.format &&
-         lhs.usage == rhs.usage &&
-         lhs.clearValue == rhs.clearValue &&
-         lhs.colorMask == rhs.colorMask &&
-         lhs.loadOp == rhs.loadOp &&
-         lhs.storeOp == rhs.storeOp &&
-         lhs.blendEnabled == rhs.blendEnabled &&
+  return lhs.format == rhs.format && lhs.usage == rhs.usage && lhs.clearValue == rhs.clearValue &&
+         lhs.colorMask == rhs.colorMask && lhs.loadOp == rhs.loadOp &&
+         lhs.storeOp == rhs.storeOp && lhs.blendEnabled == rhs.blendEnabled &&
          lhs.srcColorBlendFactor == rhs.srcColorBlendFactor &&
          lhs.dstColorBlendFactor == rhs.dstColorBlendFactor &&
          lhs.colorBlendOp == rhs.colorBlendOp &&
          lhs.srcAlphaBlendFactor == rhs.srcAlphaBlendFactor &&
          lhs.dstAlphaBlendFactor == rhs.dstAlphaBlendFactor &&
-         lhs.alphaBlendOp == rhs.alphaBlendOp &&
-         lhs.blendConstantColor == rhs.blendConstantColor;
+         lhs.alphaBlendOp == rhs.alphaBlendOp && lhs.blendConstantColor == rhs.blendConstantColor;
 }
 
-bool operator!=(
-    const HgiAttachmentDesc &lhs,
-    const HgiAttachmentDesc &rhs)
+bool operator!=(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-std::ostream &operator<<(
-    std::ostream &out,
-    const HgiAttachmentDesc &attachment)
+std::ostream &operator<<(std::ostream &out, const HgiAttachmentDesc &attachment)
 {
   out << "HgiAttachmentDesc: {"
       << "format: " << attachment.format << ", "

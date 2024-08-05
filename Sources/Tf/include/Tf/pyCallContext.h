@@ -35,4 +35,4 @@ TF_API TfCallContext Tf_PythonCallContext(char const *fileName,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_CALL_CONTEXT_H
+#endif  // PXR_BASE_TF_PY_CALL_CONTEXT_H

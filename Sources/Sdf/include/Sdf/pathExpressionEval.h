@@ -43,13 +43,12 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // fwd decl
-template <class DomainType> class SdfPathExpressionEval;
+template<class DomainType> class SdfPathExpressionEval;
 
 // fwd decl
-template <class DomainType>
-SdfPathExpressionEval<DomainType>
-SdfMakePathExpressionEval(SdfPathExpression const &expr,
-                          SdfPredicateLibrary<DomainType> const &lib);
+template<class DomainType>
+SdfPathExpressionEval<DomainType> SdfMakePathExpressionEval(
+    SdfPathExpression const &expr, SdfPredicateLibrary<DomainType> const &lib);
 
 // fwd decl
 class Sdf_PathExpressionEvalBase;
@@ -58,29 +57,35 @@ class Sdf_PathExpressionEvalBase;
 // template-parameter independent code as possible to reduce bloat & compile
 // times.
 class Sdf_PathExpressionEvalBase {
-public:
+ public:
   friend SDF_API bool Sdf_MakePathExpressionEvalImpl(
-      Sdf_PathExpressionEvalBase &eval, SdfPathExpression const &expr,
-      TfFunctionRef<void(SdfPathExpression::PathPattern const &)>
-          translatePattern);
+      Sdf_PathExpressionEvalBase &eval,
+      SdfPathExpression const &expr,
+      TfFunctionRef<void(SdfPathExpression::PathPattern const &)> translatePattern);
 
   /// Return true if this is the empty evalutator.  The empty evaluator always
   /// returns false from operator().
-  bool IsEmpty() const { return _ops.empty(); }
+  bool IsEmpty() const
+  {
+    return _ops.empty();
+  }
 
   /// Return true if this is not the empty evaluator, false otherwise.
-  explicit operator bool() const { return !IsEmpty(); }
+  explicit operator bool() const
+  {
+    return !IsEmpty();
+  }
 
-protected:
+ protected:
   class _PatternImplBase;
 
   class _PatternIncrSearchState {
     friend class _PatternImplBase;
 
-  public:
-    void Pop(int newDepth) {
-      while (!_segmentMatchDepths.empty() &&
-             _segmentMatchDepths.back() >= newDepth) {
+   public:
+    void Pop(int newDepth)
+    {
+      while (!_segmentMatchDepths.empty() && _segmentMatchDepths.back() >= newDepth) {
         _segmentMatchDepths.pop_back();
       }
       if (newDepth <= _constantDepth) {
@@ -88,51 +93,61 @@ protected:
       }
     }
 
-  private:
+   private:
     std::vector<int> _segmentMatchDepths;
-    int _constantDepth = -1; // 0 means constant at the _prefix level.
+    int _constantDepth = -1;  // 0 means constant at the _prefix level.
     bool _constantValue = false;
   };
 
   class _PatternImplBase {
-  protected:
+   protected:
     // This is not a constructor because the subclass wants to invoke this
     // from its ctor, TfFunctionRef currently requires an lvalue, which is
     // hard to conjure in a ctor initializer list.
     SDF_API
-    void
-    _Init(SdfPathExpression::PathPattern const &pattern,
-          TfFunctionRef<int(SdfPredicateExpression const &)> linkPredicate);
+    void _Init(SdfPathExpression::PathPattern const &pattern,
+               TfFunctionRef<int(SdfPredicateExpression const &)> linkPredicate);
 
     SDF_API
-    SdfPredicateFunctionResult
-    _Match(SdfPath const &path,
-           TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)>
-               runNthPredicate) const;
+    SdfPredicateFunctionResult _Match(
+        SdfPath const &path,
+        TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)> runNthPredicate) const;
 
     SDF_API
-    SdfPredicateFunctionResult
-    _Next(_PatternIncrSearchState &searchState, SdfPath const &path,
-          TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)>
-              runNthPredicate) const;
+    SdfPredicateFunctionResult _Next(
+        _PatternIncrSearchState &searchState,
+        SdfPath const &path,
+        TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)> runNthPredicate) const;
 
     enum _ComponentType {
-      ExplicitName, // an explicit name (not a glob pattern).
-      Regex         // a glob pattern (handled via regex).
+      ExplicitName,  // an explicit name (not a glob pattern).
+      Regex          // a glob pattern (handled via regex).
     };
 
     struct _Component {
       _ComponentType type;
-      int patternIndex;   // into either _explicitNames or _regexes
-      int predicateIndex; // into _predicates or -1 if no predicate.
+      int patternIndex;    // into either _explicitNames or _regexes
+      int predicateIndex;  // into _predicates or -1 if no predicate.
     };
 
     struct _Segment {
       // A _Segment is a half-open interval [begin, end) in _components.
-      bool IsEmpty() const { return begin == end; }
-      bool StartsAt(size_t idx) const { return begin == idx; }
-      bool EndsAt(size_t idx) const { return end == idx; }
-      size_t GetSize() const { return end - begin; }
+      bool IsEmpty() const
+      {
+        return begin == end;
+      }
+      bool StartsAt(size_t idx) const
+      {
+        return begin == idx;
+      }
+      bool EndsAt(size_t idx) const
+      {
+        return end == idx;
+      }
+      size_t GetSize() const
+      {
+        return end - begin;
+      }
       size_t begin, end;
     };
 
@@ -144,7 +159,7 @@ protected:
 
     bool _stretchBegin;
     bool _stretchEnd;
-    bool _isProperty; // true if this pattern matches only properties.
+    bool _isProperty;  // true if this pattern matches only properties.
   };
 
   // The passed \p invokePattern function must do two things: 1, if \p skip is
@@ -153,8 +168,7 @@ protected:
   // to \p invokePattern.
   SDF_API
   SdfPredicateFunctionResult _EvalExpr(
-      TfFunctionRef<SdfPredicateFunctionResult(bool /*skip*/)> invokePattern)
-      const;
+      TfFunctionRef<SdfPredicateFunctionResult(bool /*skip*/)> invokePattern) const;
 
   enum _Op { EvalPattern, Not, Open, Close, Or, And };
 
@@ -169,17 +183,16 @@ protected:
 /// predicates.
 ///
 ///
-template <class DomainType>
-class SdfPathExpressionEval : public Sdf_PathExpressionEvalBase {
+template<class DomainType> class SdfPathExpressionEval : public Sdf_PathExpressionEvalBase {
   // This object implements matching against a single path pattern.
   class _PatternImpl : public _PatternImplBase {
-  public:
+   public:
     _PatternImpl() = default;
 
     _PatternImpl(SdfPathExpression::PathPattern const &pattern,
-                 SdfPredicateLibrary<DomainType> const &predLib) {
-      auto linkPredicate = [this,
-                            &predLib](SdfPredicateExpression const &predExpr) {
+                 SdfPredicateLibrary<DomainType> const &predLib)
+    {
+      auto linkPredicate = [this, &predLib](SdfPredicateExpression const &predExpr) {
         _predicates.push_back(SdfLinkPredicateExpression(predExpr, predLib));
         return _predicates.size() - 1;
       };
@@ -187,10 +200,11 @@ class SdfPathExpressionEval : public Sdf_PathExpressionEvalBase {
     }
 
     // Check obj for a match against this pattern.
-    template <class ObjectToPath, class PathToObject>
+    template<class ObjectToPath, class PathToObject>
     SdfPredicateFunctionResult Match(DomainType const &obj,
                                      ObjectToPath const &objToPath,
-                                     PathToObject const &pathToObj) const {
+                                     PathToObject const &pathToObj) const
+    {
       auto runNthPredicate = [this, &pathToObj](int i, SdfPath const &path) {
         return _predicates[i](pathToObj(path));
       };
@@ -198,41 +212,46 @@ class SdfPathExpressionEval : public Sdf_PathExpressionEvalBase {
     }
 
     // Perform the next incremental search step against this pattern.
-    template <class ObjectToPath, class PathToObject>
-    SdfPredicateFunctionResult
-    Next(DomainType const &obj, _PatternIncrSearchState &search,
-         ObjectToPath const &objToPath, PathToObject const &pathToObj) const {
+    template<class ObjectToPath, class PathToObject>
+    SdfPredicateFunctionResult Next(DomainType const &obj,
+                                    _PatternIncrSearchState &search,
+                                    ObjectToPath const &objToPath,
+                                    PathToObject const &pathToObj) const
+    {
       auto runNthPredicate = [this, &pathToObj](int i, SdfPath const &path) {
         return _predicates[i](pathToObj(path));
       };
       return _Next(search, objToPath(obj), runNthPredicate);
     }
 
-  private:
+   private:
     std::vector<SdfPredicateProgram<DomainType>> _predicates;
   };
 
-public:
+ public:
   /// Make an SdfPathExpressionEval object to evaluate \p expr using \p lib to
   /// link any embedded predicate expressions.
   friend SdfPathExpressionEval SdfMakePathExpressionEval<DomainType>(
-      SdfPathExpression const &expr,
-      SdfPredicateLibrary<DomainType> const &lib);
+      SdfPathExpression const &expr, SdfPredicateLibrary<DomainType> const &lib);
 
-  bool IsEmpty() const { return _patternImpls.empty(); }
+  bool IsEmpty() const
+  {
+    return _patternImpls.empty();
+  }
 
   /// Test \p obj for a match with this expression.
-  template <class ObjectToPath, class PathToObject>
+  template<class ObjectToPath, class PathToObject>
   SdfPredicateFunctionResult Match(DomainType const &obj,
                                    ObjectToPath const &objToPath,
-                                   PathToObject const &pathToObj) const {
+                                   PathToObject const &pathToObj) const
+  {
     if (IsEmpty()) {
       return SdfPredicateFunctionResult::MakeConstant(false);
     }
     auto patternImplIter = _patternImpls.cbegin();
     auto evalPattern = [&](bool skip) {
-      return skip ? (++patternImplIter, SdfPredicateFunctionResult())
-                  : (*patternImplIter++).Match(obj, objToPath, pathToObj);
+      return skip ? (++patternImplIter, SdfPredicateFunctionResult()) :
+                    (*patternImplIter++).Match(obj, objToPath, pathToObj);
     };
     return _EvalExpr(evalPattern);
   }
@@ -244,20 +263,29 @@ public:
   /// copyable, and may be copied to parallelize searches over domain
   /// subtrees, where one copy is invoked with a child, and the other with the
   /// next sibling.
-  template <class ObjectToPath, class PathToObject> class IncrementalSearcher {
-  public:
+  template<class ObjectToPath, class PathToObject> class IncrementalSearcher {
+   public:
     IncrementalSearcher() : _eval(nullptr), _lastPathDepth(0) {}
 
     IncrementalSearcher(SdfPathExpressionEval const *eval,
-                        ObjectToPath const &o2p, PathToObject const &p2o)
-        : _eval(eval), _incrSearchStates(_eval->_patternImpls.size()),
-          _objToPath(o2p), _pathToObj(p2o), _lastPathDepth(0) {}
+                        ObjectToPath const &o2p,
+                        PathToObject const &p2o)
+        : _eval(eval),
+          _incrSearchStates(_eval->_patternImpls.size()),
+          _objToPath(o2p),
+          _pathToObj(p2o),
+          _lastPathDepth(0)
+    {
+    }
 
-    IncrementalSearcher(SdfPathExpressionEval const *eval, ObjectToPath &&o2p,
-                        PathToObject &&p2o)
-        : _eval(eval), _incrSearchStates(_eval->_patternImpls.size()),
-          _objToPath(std::move(o2p)), _pathToObj(std::move(p2o)),
-          _lastPathDepth(0) {}
+    IncrementalSearcher(SdfPathExpressionEval const *eval, ObjectToPath &&o2p, PathToObject &&p2o)
+        : _eval(eval),
+          _incrSearchStates(_eval->_patternImpls.size()),
+          _objToPath(std::move(o2p)),
+          _pathToObj(std::move(p2o)),
+          _lastPathDepth(0)
+    {
+    }
 
     /// Advance the search to the next \p object, and return the result of
     /// evaluating the expression on it.
@@ -269,7 +297,8 @@ public:
     ///
     /// /foo, /foo/bar, /foo/bar/baz, /foo/bar/qux, /oof, /oof/zab /oof/xuq
     ///
-    SdfPredicateFunctionResult Next(DomainType const &obj) {
+    SdfPredicateFunctionResult Next(DomainType const &obj)
+    {
       auto patternImplIter = _eval->_patternImpls.begin();
       auto stateIter = _incrSearchStates.begin();
       int newDepth = _objToPath(obj).GetPathElementCount();
@@ -278,9 +307,8 @@ public:
         if (popLevel) {
           stateIter->Pop(popLevel);
         }
-        return skip ? (++patternImplIter, SdfPredicateFunctionResult())
-                    : (*patternImplIter++)
-                          .Next(obj, *stateIter++, _objToPath, _pathToObj);
+        return skip ? (++patternImplIter, SdfPredicateFunctionResult()) :
+                      (*patternImplIter++).Next(obj, *stateIter++, _objToPath, _pathToObj);
       };
       _lastPathDepth = newDepth;
       return _eval->_EvalExpr(patternStateNext);
@@ -288,12 +316,12 @@ public:
 
     /// Reset this object's incremental search state so that a new round of
     /// searching may begin.
-    void Reset() {
-      *this = IncrementalSearcher{_eval, std::move(_objToPath),
-                                  std::move(_pathToObj)};
+    void Reset()
+    {
+      *this = IncrementalSearcher{_eval, std::move(_objToPath), std::move(_pathToObj)};
     }
 
-  private:
+   private:
     SdfPathExpressionEval const *_eval;
     std::vector<_PatternIncrSearchState> _incrSearchStates;
 
@@ -305,17 +333,15 @@ public:
 
   /// Create an IncrementalSearcher object, using \p objToPath and \p
   /// pathToObject to map DomainType instances to their paths and vice-versa.
-  template <class ObjectToPath, class PathToObject>
+  template<class ObjectToPath, class PathToObject>
   IncrementalSearcher<std::decay_t<ObjectToPath>, std::decay_t<PathToObject>>
-  MakeIncrementalSearcher(ObjectToPath &&objToPath,
-                          PathToObject &&pathToObj) const {
-    return IncrementalSearcher<std::decay_t<ObjectToPath>,
-                               std::decay_t<PathToObject>>(
-        this, std::forward<ObjectToPath>(objToPath),
-        std::forward<PathToObject>(pathToObj));
+  MakeIncrementalSearcher(ObjectToPath &&objToPath, PathToObject &&pathToObj) const
+  {
+    return IncrementalSearcher<std::decay_t<ObjectToPath>, std::decay_t<PathToObject>>(
+        this, std::forward<ObjectToPath>(objToPath), std::forward<PathToObject>(pathToObj));
   }
 
-private:
+ private:
   std::vector<_PatternImpl> _patternImpls;
 };
 
@@ -330,10 +356,10 @@ private:
 /// \p lib, or another reason, issue an error and return the empty
 /// SdfPathExpressionEval object.  See SdfPathExpressionEval::IsEmpty().
 ///
-template <class DomainType>
-SdfPathExpressionEval<DomainType>
-SdfMakePathExpressionEval(SdfPathExpression const &expr,
-                          SdfPredicateLibrary<DomainType> const &lib) {
+template<class DomainType>
+SdfPathExpressionEval<DomainType> SdfMakePathExpressionEval(
+    SdfPathExpression const &expr, SdfPredicateLibrary<DomainType> const &lib)
+{
   using Expr = SdfPathExpression;
   using Eval = SdfPathExpressionEval<DomainType>;
 
@@ -355,4 +381,4 @@ SdfMakePathExpressionEval(SdfPathExpression const &expr,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PATH_EXPRESSION_EVAL_H
+#endif  // PXR_USD_SDF_PATH_EXPRESSION_EVAL_H

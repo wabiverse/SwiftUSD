@@ -53,7 +53,7 @@ class SdfPath;
 /// (More detailed description of variants to follow)
 ///
 class UsdVariantSet {
-public:
+ public:
   /// Author a variant spec for \a variantName in this VariantSet at the
   /// stage's current EditTarget, in the position specified by
   /// \p position.  Return true if the spec was successfully authored,
@@ -133,8 +133,7 @@ public:
   /// restriction in the future, if need arises, but it introduces several
   /// complications in specification and behavior.
   USD_API
-  UsdEditTarget
-  GetVariantEditTarget(const SdfLayerHandle &layer = SdfLayerHandle()) const;
+  UsdEditTarget GetVariantEditTarget(const SdfLayerHandle &layer = SdfLayerHandle()) const;
 
   /// Helper function for configuring a UsdStage's EditTarget to author
   /// into the currently selected variant.  Returns configuration for a
@@ -161,25 +160,39 @@ public:
   ///
   /// See GetVariantEditTarget() for discussion of \p layer parameter
   USD_API
-  std::pair<UsdStagePtr, UsdEditTarget>
-  GetVariantEditContext(const SdfLayerHandle &layer = SdfLayerHandle()) const;
+  std::pair<UsdStagePtr, UsdEditTarget> GetVariantEditContext(
+      const SdfLayerHandle &layer = SdfLayerHandle()) const;
 
   /// Return this VariantSet's held prim.
-  UsdPrim const &GetPrim() const { return _prim; }
+  UsdPrim const &GetPrim() const
+  {
+    return _prim;
+  }
 
   /// Return this VariantSet's name
-  std::string const &GetName() const { return _variantSetName; }
+  std::string const &GetName() const
+  {
+    return _variantSetName;
+  }
 
   /// Is this UsdVariantSet object usable?  If not, calling any of
   /// its other methods is likely to crash.
-  bool IsValid() const { return static_cast<bool>(_prim); }
+  bool IsValid() const
+  {
+    return static_cast<bool>(_prim);
+  }
 
   /// Equivalent to IsValid().
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
-private:
+ private:
   UsdVariantSet(const UsdPrim &prim, const std::string &variantSetName)
-      : _prim(prim), _variantSetName(variantSetName) {}
+      : _prim(prim), _variantSetName(variantSetName)
+  {
+  }
 
   SdfPrimSpecHandle _CreatePrimSpecForEditing();
   SdfVariantSetSpecHandle _AddVariantSet(UsdListPosition position);
@@ -207,7 +220,7 @@ private:
 /// VariantSets.
 ///
 class UsdVariantSets {
-public:
+ public:
   /// Find an existing, or create a new VariantSet on the originating UsdPrim,
   /// named \p variantSetName.
   ///
@@ -220,9 +233,8 @@ public:
   /// method exists for situations in which you want to create a VariantSet
   /// without necessarily populating it with variants.
   USD_API
-  UsdVariantSet
-  AddVariantSet(const std::string &variantSetName,
-                UsdListPosition position = UsdListPositionBackOfPrependList);
+  UsdVariantSet AddVariantSet(const std::string &variantSetName,
+                              UsdListPosition position = UsdListPositionBackOfPrependList);
 
   // TODO: don't we want remove and reorder, clear, etc. also?
 
@@ -236,7 +248,8 @@ public:
   USD_API
   std::vector<std::string> GetNames() const;
 
-  UsdVariantSet operator[](const std::string &variantSetName) const {
+  UsdVariantSet operator[](const std::string &variantSetName) const
+  {
     return GetVariantSet(variantSetName);
   }
 
@@ -258,8 +271,7 @@ public:
   std::string GetVariantSelection(const std::string &variantSetName) const;
 
   USD_API
-  bool SetSelection(const std::string &variantSetName,
-                    const std::string &variantName);
+  bool SetSelection(const std::string &variantSetName, const std::string &variantName);
 
   /// Returns the composed map of all variant selections authored on the
   /// the originating UsdPrim, regardless of whether a corresponding
@@ -267,8 +279,9 @@ public:
   USD_API
   SdfVariantSelectionMap GetAllVariantSelections() const;
 
-private:
-  explicit UsdVariantSets(const UsdPrim &prim) : _prim(prim) { /* NOTHING */
+ private:
+  explicit UsdVariantSets(const UsdPrim &prim) : _prim(prim)
+  { /* NOTHING */
   }
 
   UsdPrim _prim;
@@ -278,4 +291,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_VARIANT_SETS_H
+#endif  // PXR_USD_USD_VARIANT_SETS_H

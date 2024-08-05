@@ -26,8 +26,8 @@
 
 #if defined(_WIN32)
 
-#include <pxr/pxrns.h>
-#include <Windows.h>
+#  include <Windows.h>
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,19 +35,17 @@ class GarchGLDebugWindow;
 
 /// \class Garch_GLPlatformDebugWindow
 ///
-class Garch_GLPlatformDebugWindow
-{
-public:
+class Garch_GLPlatformDebugWindow {
+ public:
   Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w);
 
   void Init(const char *title, int width, int height, int nSamples = 1);
   void Run();
   void ExitApp();
 
-private:
+ private:
   static Garch_GLPlatformDebugWindow *_GetWindowByHandle(HWND);
-  static LRESULT WINAPI _MsgProc(HWND hWnd, UINT msg,
-                                 WPARAM wParam, LPARAM lParam);
+  static LRESULT WINAPI _MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
   bool _running;
   GarchGLDebugWindow *_callback;
@@ -59,6 +57,6 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(_WIN32)
+#endif  // defined(_WIN32)
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_WINDOWS_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_WINDOWS_H

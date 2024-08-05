@@ -33,59 +33,53 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDVOLUMEFIELDBINDING_SCHEMA_TOKENS \
-    (volumeFieldBinding) \
+#define HDVOLUMEFIELDBINDING_SCHEMA_TOKENS (volumeFieldBinding)
 
-TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens, HD_API,
-    HDVOLUMEFIELDBINDING_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens,
+                         HD_API,
+                         HDVOLUMEFIELDBINDING_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdVolumeFieldBindingSchema : public HdSchema
-{
-public:
-    HdVolumeFieldBindingSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdVolumeFieldBindingSchema : public HdSchema {
+ public:
+  HdVolumeFieldBindingSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        size_t count,
-        TfToken *names,
-        HdDataSourceBaseHandle *values);
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(size_t count,
+                                                   TfToken *names,
+                                                   HdDataSourceBaseHandle *values);
 
-    HD_API
-    TfTokenVector GetVolumeFieldBindingNames();
+  HD_API
+  TfTokenVector GetVolumeFieldBindingNames();
 
-    HD_API
-    HdPathDataSourceHandle GetVolumeFieldBinding(TfToken const &name);
+  HD_API
+  HdPathDataSourceHandle GetVolumeFieldBinding(TfToken const &name);
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "volumeFieldBinding" from the parent container and constructs a
+  /// HdVolumeFieldBindingSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdVolumeFieldBindingSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "volumeFieldBinding" from the parent container and constructs a
-    /// HdVolumeFieldBindingSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdVolumeFieldBindingSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

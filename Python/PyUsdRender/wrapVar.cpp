@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdRender/var.h"
 #include "Usd/schemaBase.h"
+#include "UsdRender/var.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,60 +40,50 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateDataTypeAttr(UsdRenderVar &self, object defaultVal, bool writeSparsely)
 {
+  return self.CreateDataTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                 writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateSourceNameAttr(UsdRenderVar &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
+{
+  return self.CreateSourceNameAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String),
+                                   writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateSourceTypeAttr(UsdRenderVar &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
+{
+  return self.CreateSourceTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                   writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateDataTypeAttr(UsdRenderVar &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDataTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static std::string _Repr(const UsdRenderVar &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdRender.Var(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateSourceNameAttr(UsdRenderVar &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateSourceNameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateSourceTypeAttr(UsdRenderVar &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateSourceTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdRenderVar &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdRender.Var(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdRenderVar()
 {
   typedef UsdRenderVar This;
 
-  class_<This, bases<UsdTyped>>
-      cls("Var");
+  class_<This, bases<UsdTyped>> cls("Var");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -109,32 +99,27 @@ void wrapUsdRenderVar()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetDataTypeAttr",
-           &This::GetDataTypeAttr)
+      .def("GetDataTypeAttr", &This::GetDataTypeAttr)
       .def("CreateDataTypeAttr",
            &_CreateDataTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetSourceNameAttr",
-           &This::GetSourceNameAttr)
+      .def("GetSourceNameAttr", &This::GetSourceNameAttr)
       .def("CreateSourceNameAttr",
            &_CreateSourceNameAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetSourceTypeAttr",
-           &This::GetSourceTypeAttr)
+      .def("GetSourceTypeAttr", &This::GetSourceTypeAttr)
       .def("CreateSourceTypeAttr",
            &_CreateSourceTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -160,11 +145,8 @@ void wrapUsdRenderVar()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

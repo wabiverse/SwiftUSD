@@ -24,8 +24,8 @@
 #ifndef PXR_USD_USD_RI_TYPE_UTILS_H
 #define PXR_USD_USD_RI_TYPE_UTILS_H
 
-#include <pxr/pxrns.h>
 #include "Sdf/valueTypeName.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -35,4 +35,4 @@ SdfValueTypeName UsdRi_GetUsdType(const std::string &riType);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RI_TYPE_UTILS_H
+#endif  // PXR_USD_USD_RI_TYPE_UTILS_H

@@ -29,15 +29,14 @@
 /// Collection of utility methods.
 ///
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
-#include "Gf/quatf.h"
 #include "Gf/matrix3d.h"
 #include "Gf/matrix3f.h"
 #include "Gf/matrix4d.h"
 #include "Gf/matrix4f.h"
-#include "Gf/vec3h.h"
+#include "Gf/quatf.h"
 #include "Gf/vec3h.h"
 #include "Tf/span.h"
 #include "Vt/array.h"
@@ -188,12 +187,11 @@ bool UsdSkelConcatJointTransforms(const UsdSkelTopology &topology,
 /// The \p rootXform may also be set to provide an additional root
 /// transformation on top of all joints, which is useful for computing
 /// extent relative to a different space.
-template <typename Matrix4>
-USDSKEL_API bool
-UsdSkelComputeJointsExtent(TfSpan<const Matrix4> joints,
-                           GfRange3f *extent,
-                           float pad = 0.0f,
-                           const Matrix4 *rootXform = nullptr);
+template<typename Matrix4>
+USDSKEL_API bool UsdSkelComputeJointsExtent(TfSpan<const Matrix4> joints,
+                                            GfRange3f *extent,
+                                            float pad = 0.0f,
+                                            const Matrix4 *rootXform = nullptr);
 
 /// \overload
 /// \deprecated Use form that takes a TfSpan.
@@ -221,20 +219,18 @@ bool UsdSkelComputeJointsExtent(const GfMatrix4d *xforms,
 
 /// Decompose a transform into translate/rotate/scale components.
 /// The transform order for decomposition is scale, rotate, translate.
-template <typename Matrix4>
-USDSKEL_API bool
-UsdSkelDecomposeTransform(const Matrix4 &xform,
-                          GfVec3f *translate,
-                          GfRotation *rotate,
-                          GfVec3h *scale);
+template<typename Matrix4>
+USDSKEL_API bool UsdSkelDecomposeTransform(const Matrix4 &xform,
+                                           GfVec3f *translate,
+                                           GfRotation *rotate,
+                                           GfVec3h *scale);
 
 /// \overload
-template <typename Matrix4>
-USDSKEL_API bool
-UsdSkelDecomposeTransform(const Matrix4 &xform,
-                          GfVec3f *translate,
-                          GfQuatf *rotate,
-                          GfVec3h *scale);
+template<typename Matrix4>
+USDSKEL_API bool UsdSkelDecomposeTransform(const Matrix4 &xform,
+                                           GfVec3f *translate,
+                                           GfQuatf *rotate,
+                                           GfVec3h *scale);
 
 /// Decompose an array of transforms into translate/rotate/scale components.
 /// All spans must be the same size.
@@ -270,20 +266,18 @@ bool UsdSkelDecomposeTransforms(const GfMatrix4d *xforms,
 
 /// Create a transform from translate/rotate/scale components.
 /// This performs the inverse of UsdSkelDecomposeTransform.
-template <typename Matrix4>
-USDSKEL_API void
-UsdSkelMakeTransform(const GfVec3f &translate,
-                     const GfMatrix3f &rotate,
-                     const GfVec3h &scale,
-                     Matrix4 *xform);
+template<typename Matrix4>
+USDSKEL_API void UsdSkelMakeTransform(const GfVec3f &translate,
+                                      const GfMatrix3f &rotate,
+                                      const GfVec3h &scale,
+                                      Matrix4 *xform);
 
 /// \overload
-template <typename Matrix4>
-USDSKEL_API void
-UsdSkelMakeTransform(const GfVec3f &translate,
-                     const GfQuatf &rotate,
-                     const GfVec3h &scale,
-                     Matrix4 *xform);
+template<typename Matrix4>
+USDSKEL_API void UsdSkelMakeTransform(const GfVec3f &translate,
+                                      const GfQuatf &rotate,
+                                      const GfVec3h &scale,
+                                      Matrix4 *xform);
 
 /// Create transforms from arrays of components.
 /// All spans must be the same size.
@@ -329,7 +323,8 @@ bool UsdSkelMakeTransforms(const GfVec3f *translations,
 /// If the total weight for a run of elements is smaller than \p eps, the
 /// elements' weights are set to zero.
 USDSKEL_API
-bool UsdSkelNormalizeWeights(TfSpan<float> weights, int numInfluencesPerComponent,
+bool UsdSkelNormalizeWeights(TfSpan<float> weights,
+                             int numInfluencesPerComponent,
                              float eps = std::numeric_limits<float>::epsilon());
 
 /// \overload
@@ -339,13 +334,15 @@ bool UsdSkelNormalizeWeights(VtFloatArray *weights, int numInfluencesPerComponen
 
 /// Sort joint influences such that highest weight values come first.
 USDSKEL_API
-bool UsdSkelSortInfluences(TfSpan<int> indices, TfSpan<float> weights,
+bool UsdSkelSortInfluences(TfSpan<int> indices,
+                           TfSpan<float> weights,
                            int numInfluencesPerComponent);
 
 /// \overload
 /// \deprecated Use form that takes TfSpan arguments.
 USDSKEL_API
-bool UsdSkelSortInfluences(VtIntArray *indices, VtFloatArray *weights,
+bool UsdSkelSortInfluences(VtIntArray *indices,
+                           VtFloatArray *weights,
                            int numInfluencesPerComponent);
 
 /// Convert an array of constant influences (joint weights or indices)
@@ -764,4 +761,4 @@ bool UsdSkelApplyBlendShape(const float weight,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_UTILS_H
+#endif  // PXR_USD_USD_SKEL_UTILS_H

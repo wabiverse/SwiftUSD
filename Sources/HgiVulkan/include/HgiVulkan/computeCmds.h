@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGIVULKAN_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGIVULKAN_COMPUTE_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ class HgiVulkanCommandBuffer;
 ///
 /// OpenGL implementation of HgiComputeCmds.
 ///
-class HgiVulkanComputeCmds final : public HgiComputeCmds
-{
-public:
+class HgiVulkanComputeCmds final : public HgiComputeCmds {
+ public:
   HGIVULKAN_API
   ~HgiVulkanComputeCmds() override;
 
@@ -59,11 +58,10 @@ public:
   void BindResources(HgiResourceBindingsHandle resources) override;
 
   HGIVULKAN_API
-  void SetConstantValues(
-      HgiComputePipelineHandle pipeline,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) override;
+  void SetConstantValues(HgiComputePipelineHandle pipeline,
+                         uint32_t bindIndex,
+                         uint32_t byteSize,
+                         const void *data) override;
 
   HGIVULKAN_API
   void Dispatch(int dimX, int dimY) override;
@@ -74,7 +72,7 @@ public:
   HGIVULKAN_API
   HgiComputeDispatch GetDispatchMethod() const override;
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
@@ -83,7 +81,7 @@ protected:
   HGIVULKAN_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiVulkanComputeCmds() = delete;
   HgiVulkanComputeCmds &operator=(const HgiVulkanComputeCmds &) = delete;
   HgiVulkanComputeCmds(const HgiVulkanComputeCmds &) = delete;

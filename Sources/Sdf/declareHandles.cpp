@@ -29,16 +29,18 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool Sdf_CanCastToType(const SdfSpec &spec, const std::type_info &destType) {
+bool Sdf_CanCastToType(const SdfSpec &spec, const std::type_info &destType)
+{
   return Sdf_SpecType::CanCast(spec.GetSpecType(), destType);
 }
 
-bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &spec,
-                                  const std::type_info &destType) {
+bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &spec, const std::type_info &destType)
+{
   return Sdf_SpecType::CanCast(spec, destType);
 }
 
-template <> SdfHandleTo<SdfLayer>::Handle SdfCreateHandle(SdfLayer *p) {
+template<> SdfHandleTo<SdfLayer>::Handle SdfCreateHandle(SdfLayer *p)
+{
   return SdfHandleTo<SdfLayer>::Handle(p);
 }
 

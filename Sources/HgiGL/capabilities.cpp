@@ -35,18 +35,18 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BINDLESS_BUFFER, false,
-                      "Use GL bindless buffer extension");
-TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_MULTI_DRAW_INDIRECT, true,
+TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BINDLESS_BUFFER, false, "Use GL bindless buffer extension");
+TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_MULTI_DRAW_INDIRECT,
+                      true,
                       "Use GL multi draw indirect extension");
-TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BUILTIN_BARYCENTRICS, false,
+TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BUILTIN_BARYCENTRICS,
+                      false,
                       "Use built in barycentric coordinates");
-TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_SHADER_DRAW_PARAMETERS, true,
+TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_SHADER_DRAW_PARAMETERS,
+                      true,
                       "Use GL shader draw params if available (OpenGL 4.5+)");
-TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BINDLESS_TEXTURE, false,
-                      "Use GL bindless texture extension");
-TF_DEFINE_ENV_SETTING(HGIGL_GLSL_VERSION, 0,
-                      "GLSL version");
+TF_DEFINE_ENV_SETTING(HGIGL_ENABLE_BINDLESS_TEXTURE, false, "Use GL bindless texture extension");
+TF_DEFINE_ENV_SETTING(HGIGL_GLSL_VERSION, 0, "GLSL version");
 
 // Set defaults based on GL spec minimums
 static const int _DefaultMaxUniformBlockSize = 16 * 1024;
@@ -54,8 +54,7 @@ static const int _DefaultMaxShaderStorageBlockSize = 16 * 1024 * 1024;
 static const int _DefaultGLSLVersion = 400;
 static const int _DefaultMaxClipDistances = 8;
 
-HgiGLCapabilities::HgiGLCapabilities()
-    : _glVersion(0), _glslVersion(_DefaultGLSLVersion)
+HgiGLCapabilities::HgiGLCapabilities() : _glVersion(0), _glslVersion(_DefaultGLSLVersion)
 {
   _LoadCapabilities();
 }
@@ -87,9 +86,7 @@ void HgiGLCapabilities::_LoadCapabilities()
     return;
 
   const char *dot = strchr(glVersionStr, '.');
-  if (TF_VERIFY((dot && dot != glVersionStr),
-                "Can't parse GL_VERSION %s", glVersionStr))
-  {
+  if (TF_VERIFY((dot && dot != glVersionStr), "Can't parse GL_VERSION %s", glVersionStr)) {
     // GL_VERSION = "4.5.0 <vendor> <version>"
     //              "4.1 <vendor-os-ver> <version>"
     //              "4.1 <vendor-os-ver>"
@@ -98,10 +95,8 @@ void HgiGLCapabilities::_LoadCapabilities()
     _glVersion = major * 100 + minor * 10;
   }
 
-  if (_glVersion >= 200)
-  {
-    const char *glslVersionStr =
-        (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
+  if (_glVersion >= 200) {
+    const char *glslVersionStr = (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
     dot = strchr(glslVersionStr, '.');
     if (TF_VERIFY((dot && dot != glslVersionStr),
                   "Can't parse GL_SHADING_LANGUAGE_VERSION %s",
@@ -114,8 +109,7 @@ void HgiGLCapabilities::_LoadCapabilities()
       _glslVersion = major * 100 + minor * 10;
     }
   }
-  else
-  {
+  else {
     _glslVersion = 0;
   }
 
@@ -124,146 +118,101 @@ void HgiGLCapabilities::_LoadCapabilities()
   _maxClipDistances = maxClipDistances;
 
   // initialize by Core versions
-  if (_glVersion >= 310)
-  {
+  if (_glVersion >= 310) {
     GLint maxUniformBlockSize = 0;
-    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE,
-                  &maxUniformBlockSize);
+    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
     _maxUniformBlockSize = maxUniformBlockSize;
 
     GLint uniformBufferOffsetAlignment = 0;
-    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-                  &uniformBufferOffsetAlignment);
+    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformBufferOffsetAlignment);
     _uniformBufferOffsetAlignment = uniformBufferOffsetAlignment;
   }
-  if (_glVersion >= 430)
-  {
+  if (_glVersion >= 430) {
     GLint maxShaderStorageBlockSize = 0;
-    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE,
-                  &maxShaderStorageBlockSize);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxShaderStorageBlockSize);
     _maxShaderStorageBlockSize = maxShaderStorageBlockSize;
   }
-  if (_glVersion >= 450)
-  {
+  if (_glVersion >= 450) {
     multiDrawIndirectEnabled = true;
   }
-  if (_glVersion >= 460)
-  {
+  if (_glVersion >= 460) {
     shaderDrawParametersEnabled = true;
   }
 
   // initialize by individual extension.
-  if (GARCH_GLAPI_HAS(ARB_bindless_texture))
-  {
+  if (GARCH_GLAPI_HAS(ARB_bindless_texture)) {
     bindlessTextureEnabled = true;
   }
-  if (GARCH_GLAPI_HAS(NV_shader_buffer_load))
-  {
+  if (GARCH_GLAPI_HAS(NV_shader_buffer_load)) {
     bindlessBufferEnabled = true;
   }
-  if (GARCH_GLAPI_HAS(NV_fragment_shader_barycentric))
-  {
+  if (GARCH_GLAPI_HAS(NV_fragment_shader_barycentric)) {
     builtinBarycentricsEnabled = true;
   }
-  if (GARCH_GLAPI_HAS(ARB_multi_draw_indirect))
-  {
+  if (GARCH_GLAPI_HAS(ARB_multi_draw_indirect)) {
     multiDrawIndirectEnabled = true;
   }
-  if (GARCH_GLAPI_HAS(ARB_shader_draw_parameters))
-  {
+  if (GARCH_GLAPI_HAS(ARB_shader_draw_parameters)) {
     shaderDrawParametersEnabled = true;
   }
-  if (GARCH_GLAPI_HAS(NV_conservative_raster))
-  {
+  if (GARCH_GLAPI_HAS(NV_conservative_raster)) {
     conservativeRasterEnabled = true;
   }
 
   // Environment variable overrides (only downgrading is possible)
-  if (!TfGetEnvSetting(HGIGL_ENABLE_BINDLESS_TEXTURE))
-  {
+  if (!TfGetEnvSetting(HGIGL_ENABLE_BINDLESS_TEXTURE)) {
     bindlessTextureEnabled = false;
   }
-  if (!TfGetEnvSetting(HGIGL_ENABLE_BINDLESS_BUFFER))
-  {
+  if (!TfGetEnvSetting(HGIGL_ENABLE_BINDLESS_BUFFER)) {
     bindlessBufferEnabled = false;
   }
-  if (!TfGetEnvSetting(HGIGL_ENABLE_BUILTIN_BARYCENTRICS))
-  {
+  if (!TfGetEnvSetting(HGIGL_ENABLE_BUILTIN_BARYCENTRICS)) {
     builtinBarycentricsEnabled = false;
   }
-  if (!TfGetEnvSetting(HGIGL_ENABLE_MULTI_DRAW_INDIRECT))
-  {
+  if (!TfGetEnvSetting(HGIGL_ENABLE_MULTI_DRAW_INDIRECT)) {
     multiDrawIndirectEnabled = false;
   }
-  if (!TfGetEnvSetting(HGIGL_ENABLE_SHADER_DRAW_PARAMETERS))
-  {
+  if (!TfGetEnvSetting(HGIGL_ENABLE_SHADER_DRAW_PARAMETERS)) {
     shaderDrawParametersEnabled = false;
   }
 
   // For debugging and unit testing
-  if (TfGetEnvSetting(HGIGL_GLSL_VERSION) > 0)
-  {
+  if (TfGetEnvSetting(HGIGL_GLSL_VERSION) > 0) {
     // GLSL version override
-    _glslVersion = std::min(_glslVersion,
-                            TfGetEnvSetting(HGIGL_GLSL_VERSION));
+    _glslVersion = std::min(_glslVersion, TfGetEnvSetting(HGIGL_GLSL_VERSION));
   }
 
-  _SetFlag(HgiDeviceCapabilitiesBitsMultiDrawIndirect,
-           multiDrawIndirectEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsBindlessTextures,
-           bindlessTextureEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsBindlessBuffers,
-           bindlessBufferEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsBuiltinBarycentrics,
-           builtinBarycentricsEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsShaderDrawParameters,
-           shaderDrawParametersEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsShaderDoublePrecision,
-           true);
-  _SetFlag(HgiDeviceCapabilitiesBitsDepthRangeMinusOnetoOne,
-           true);
-  _SetFlag(HgiDeviceCapabilitiesBitsConservativeRaster,
-           conservativeRasterEnabled);
-  _SetFlag(HgiDeviceCapabilitiesBitsStencilReadback,
-           true);
-  _SetFlag(HgiDeviceCapabilitiesBitsCustomDepthRange,
-           true);
+  _SetFlag(HgiDeviceCapabilitiesBitsMultiDrawIndirect, multiDrawIndirectEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsBindlessTextures, bindlessTextureEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsBindlessBuffers, bindlessBufferEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsBuiltinBarycentrics, builtinBarycentricsEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsShaderDrawParameters, shaderDrawParametersEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsShaderDoublePrecision, true);
+  _SetFlag(HgiDeviceCapabilitiesBitsDepthRangeMinusOnetoOne, true);
+  _SetFlag(HgiDeviceCapabilitiesBitsConservativeRaster, conservativeRasterEnabled);
+  _SetFlag(HgiDeviceCapabilitiesBitsStencilReadback, true);
+  _SetFlag(HgiDeviceCapabilitiesBitsCustomDepthRange, true);
 
-  if (TfDebug::IsEnabled(HGI_DEBUG_DEVICE_CAPABILITIES))
-  {
-    std::cout
-        << "HgiGLCapabilities: \n"
-        << "  GL_VENDOR                          = "
-        << glVendorStr << "\n"
-        << "  GL_RENDERER                        = "
-        << glRendererStr << "\n"
-        << "  GL_VERSION                         = "
-        << glVersionStr << "\n"
-        << "  GL version                         = "
-        << _glVersion << "\n"
-        << "  GLSL version                       = "
-        << _glslVersion << "\n"
+  if (TfDebug::IsEnabled(HGI_DEBUG_DEVICE_CAPABILITIES)) {
+    std::cout << "HgiGLCapabilities: \n"
+              << "  GL_VENDOR                          = " << glVendorStr << "\n"
+              << "  GL_RENDERER                        = " << glRendererStr << "\n"
+              << "  GL_VERSION                         = " << glVersionStr << "\n"
+              << "  GL version                         = " << _glVersion << "\n"
+              << "  GLSL version                       = " << _glslVersion << "\n"
 
-        << "  GL_MAX_UNIFORM_BLOCK_SIZE          = "
-        << _maxUniformBlockSize << "\n"
-        << "  GL_MAX_SHADER_STORAGE_BLOCK_SIZE   = "
-        << _maxShaderStorageBlockSize << "\n"
-        << "  GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT = "
-        << _uniformBufferOffsetAlignment << "\n"
+              << "  GL_MAX_UNIFORM_BLOCK_SIZE          = " << _maxUniformBlockSize << "\n"
+              << "  GL_MAX_SHADER_STORAGE_BLOCK_SIZE   = " << _maxShaderStorageBlockSize << "\n"
+              << "  GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT = " << _uniformBufferOffsetAlignment
+              << "\n"
 
-        // order alphabetically
-        << "  ARB_bindless_texture               = "
-        << bindlessTextureEnabled << "\n"
-        << "  ARB_multi_draw_indirect            = "
-        << multiDrawIndirectEnabled << "\n"
-        << "  ARB_shader_draw_parameters         = "
-        << shaderDrawParametersEnabled << "\n"
-        << "  NV_fragment_shader_barycentric     = "
-        << builtinBarycentricsEnabled << "\n"
-        << "  NV_shader_buffer_load              = "
-        << bindlessBufferEnabled << "\n"
-        << "  NV_conservative_raster             = "
-        << conservativeRasterEnabled << "\n";
+              // order alphabetically
+              << "  ARB_bindless_texture               = " << bindlessTextureEnabled << "\n"
+              << "  ARB_multi_draw_indirect            = " << multiDrawIndirectEnabled << "\n"
+              << "  ARB_shader_draw_parameters         = " << shaderDrawParametersEnabled << "\n"
+              << "  NV_fragment_shader_barycentric     = " << builtinBarycentricsEnabled << "\n"
+              << "  NV_shader_buffer_load              = " << bindlessBufferEnabled << "\n"
+              << "  NV_conservative_raster             = " << conservativeRasterEnabled << "\n";
   }
 }
 

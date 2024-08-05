@@ -30,73 +30,64 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDMATERIALCONNECTION_SCHEMA_TOKENS \
-    (upstreamNodePath) \
-    (upstreamNodeOutputName) \
+#define HDMATERIALCONNECTION_SCHEMA_TOKENS (upstreamNodePath)(upstreamNodeOutputName)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens, HD_API,
-    HDMATERIALCONNECTION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialConnectionSchemaTokens,
+                         HD_API,
+                         HDMATERIALCONNECTION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialConnectionSchema : public HdSchema
-{
-public:
-    HdMaterialConnectionSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMaterialConnectionSchema : public HdSchema {
+ public:
+  HdMaterialConnectionSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetUpstreamNodePath();
+  HD_API
+  HdTokenDataSourceHandle GetUpstreamNodeOutputName();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdTokenDataSourceHandle &upstreamNodePath,
+      const HdTokenDataSourceHandle &upstreamNodeOutputName);
+
+  /// \class HdMaterialConnectionSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetUpstreamNodePath();
+    Builder &SetUpstreamNodePath(const HdTokenDataSourceHandle &upstreamNodePath);
     HD_API
-    HdTokenDataSourceHandle GetUpstreamNodeOutputName();
+    Builder &SetUpstreamNodeOutputName(const HdTokenDataSourceHandle &upstreamNodeOutputName);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &upstreamNodePath,
-        const HdTokenDataSourceHandle &upstreamNodeOutputName
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMaterialConnectionSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetUpstreamNodePath(
-            const HdTokenDataSourceHandle &upstreamNodePath);
-        HD_API
-        Builder &SetUpstreamNodeOutputName(
-            const HdTokenDataSourceHandle &upstreamNodeOutputName);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _upstreamNodePath;
-        HdTokenDataSourceHandle _upstreamNodeOutputName;
-    };
-
+   private:
+    HdTokenDataSourceHandle _upstreamNodePath;
+    HdTokenDataSourceHandle _upstreamNodeOutputName;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

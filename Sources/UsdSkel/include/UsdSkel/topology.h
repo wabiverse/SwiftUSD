@@ -26,12 +26,12 @@
 
 /// \file usdSkel/topology.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
-#include "Tf/span.h"
 #include "Sdf/path.h"
 #include "Sdf/types.h"
+#include "Tf/span.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Object holding information describing skeleton topology.
 /// This provides the hierarchical information needed to reason about joint
 /// relationships in a manner suitable to computations.
-class UsdSkelTopology
-{
-public:
+class UsdSkelTopology {
+ public:
   /// Construct an empty topology.
   UsdSkelTopology() = default;
 
@@ -70,18 +69,30 @@ public:
   USDSKEL_API
   bool Validate(std::string *reason = nullptr) const;
 
-  const VtIntArray &GetParentIndices() const { return _parentIndices; }
+  const VtIntArray &GetParentIndices() const
+  {
+    return _parentIndices;
+  }
 
-  size_t GetNumJoints() const { return size(); }
+  size_t GetNumJoints() const
+  {
+    return size();
+  }
 
-  size_t size() const { return _parentIndices.size(); }
+  size_t size() const
+  {
+    return _parentIndices.size();
+  }
 
   /// Returns the parent joint of the \p index'th joint,
   /// Returns -1 for joints with no parent (roots).
   inline int GetParent(size_t index) const;
 
   /// Returns true if the \p index'th joint is a root joint.
-  bool IsRoot(size_t index) const { return GetParent(index) < 0; }
+  bool IsRoot(size_t index) const
+  {
+    return GetParent(index) < 0;
+  }
 
   bool operator==(const UsdSkelTopology &o) const;
 
@@ -90,7 +101,7 @@ public:
     return !(*this == o);
   }
 
-private:
+ private:
   VtIntArray _parentIndices;
 };
 
@@ -102,4 +113,4 @@ int UsdSkelTopology::GetParent(size_t index) const
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_TOPOLOGY_H
+#endif  // PXR_USD_USD_SKEL_TOPOLOGY_H

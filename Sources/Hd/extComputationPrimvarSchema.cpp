@@ -30,143 +30,119 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdExtComputationPrimvarSchemaTokens,
-    HDEXTCOMPUTATIONPRIMVAR_SCHEMA_TOKENS);
+                        HDEXTCOMPUTATIONPRIMVAR_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdExtComputationPrimvarSchema::GetInterpolation()
+HdTokenDataSourceHandle HdExtComputationPrimvarSchema::GetInterpolation()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdExtComputationPrimvarSchemaTokens->interpolation);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdExtComputationPrimvarSchemaTokens->interpolation);
 }
 
-HdTokenDataSourceHandle
-HdExtComputationPrimvarSchema::GetRole()
+HdTokenDataSourceHandle HdExtComputationPrimvarSchema::GetRole()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdExtComputationPrimvarSchemaTokens->role);
+  return _GetTypedDataSource<HdTokenDataSource>(HdExtComputationPrimvarSchemaTokens->role);
 }
 
-HdPathDataSourceHandle
-HdExtComputationPrimvarSchema::GetSourceComputation()
+HdPathDataSourceHandle HdExtComputationPrimvarSchema::GetSourceComputation()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdExtComputationPrimvarSchemaTokens->sourceComputation);
+  return _GetTypedDataSource<HdPathDataSource>(
+      HdExtComputationPrimvarSchemaTokens->sourceComputation);
 }
 
-HdTokenDataSourceHandle
-HdExtComputationPrimvarSchema::GetSourceComputationOutputName()
+HdTokenDataSourceHandle HdExtComputationPrimvarSchema::GetSourceComputationOutputName()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdExtComputationPrimvarSchemaTokens->sourceComputationOutputName);
+  return _GetTypedDataSource<HdTokenDataSource>(
+      HdExtComputationPrimvarSchemaTokens->sourceComputationOutputName);
 }
 
-HdTupleTypeDataSourceHandle
-HdExtComputationPrimvarSchema::GetValueType()
+HdTupleTypeDataSourceHandle HdExtComputationPrimvarSchema::GetValueType()
 {
-    return _GetTypedDataSource<HdTupleTypeDataSource>(
-        HdExtComputationPrimvarSchemaTokens->valueType);
+  return _GetTypedDataSource<HdTupleTypeDataSource>(
+      HdExtComputationPrimvarSchemaTokens->valueType);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdExtComputationPrimvarSchema::BuildRetained(
-        const HdTokenDataSourceHandle &interpolation,
-        const HdTokenDataSourceHandle &role,
-        const HdPathDataSourceHandle &sourceComputation,
-        const HdTokenDataSourceHandle &sourceComputationOutputName,
-        const HdTupleTypeDataSourceHandle &valueType
-)
-{
-    TfToken names[5];
-    HdDataSourceBaseHandle values[5];
-
-    size_t count = 0;
-    if (interpolation) {
-        names[count] = HdExtComputationPrimvarSchemaTokens->interpolation;
-        values[count++] = interpolation;
-    }
-
-    if (role) {
-        names[count] = HdExtComputationPrimvarSchemaTokens->role;
-        values[count++] = role;
-    }
-
-    if (sourceComputation) {
-        names[count] = HdExtComputationPrimvarSchemaTokens->sourceComputation;
-        values[count++] = sourceComputation;
-    }
-
-    if (sourceComputationOutputName) {
-        names[count] = HdExtComputationPrimvarSchemaTokens->sourceComputationOutputName;
-        values[count++] = sourceComputationOutputName;
-    }
-
-    if (valueType) {
-        names[count] = HdExtComputationPrimvarSchemaTokens->valueType;
-        values[count++] = valueType;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-
-HdExtComputationPrimvarSchema::Builder &
-HdExtComputationPrimvarSchema::Builder::SetInterpolation(
-    const HdTokenDataSourceHandle &interpolation)
-{
-    _interpolation = interpolation;
-    return *this;
-}
-
-HdExtComputationPrimvarSchema::Builder &
-HdExtComputationPrimvarSchema::Builder::SetRole(
-    const HdTokenDataSourceHandle &role)
-{
-    _role = role;
-    return *this;
-}
-
-HdExtComputationPrimvarSchema::Builder &
-HdExtComputationPrimvarSchema::Builder::SetSourceComputation(
-    const HdPathDataSourceHandle &sourceComputation)
-{
-    _sourceComputation = sourceComputation;
-    return *this;
-}
-
-HdExtComputationPrimvarSchema::Builder &
-HdExtComputationPrimvarSchema::Builder::SetSourceComputationOutputName(
-    const HdTokenDataSourceHandle &sourceComputationOutputName)
-{
-    _sourceComputationOutputName = sourceComputationOutputName;
-    return *this;
-}
-
-HdExtComputationPrimvarSchema::Builder &
-HdExtComputationPrimvarSchema::Builder::SetValueType(
+HdContainerDataSourceHandle HdExtComputationPrimvarSchema::BuildRetained(
+    const HdTokenDataSourceHandle &interpolation,
+    const HdTokenDataSourceHandle &role,
+    const HdPathDataSourceHandle &sourceComputation,
+    const HdTokenDataSourceHandle &sourceComputationOutputName,
     const HdTupleTypeDataSourceHandle &valueType)
 {
-    _valueType = valueType;
-    return *this;
+  TfToken names[5];
+  HdDataSourceBaseHandle values[5];
+
+  size_t count = 0;
+  if (interpolation) {
+    names[count] = HdExtComputationPrimvarSchemaTokens->interpolation;
+    values[count++] = interpolation;
+  }
+
+  if (role) {
+    names[count] = HdExtComputationPrimvarSchemaTokens->role;
+    values[count++] = role;
+  }
+
+  if (sourceComputation) {
+    names[count] = HdExtComputationPrimvarSchemaTokens->sourceComputation;
+    values[count++] = sourceComputation;
+  }
+
+  if (sourceComputationOutputName) {
+    names[count] = HdExtComputationPrimvarSchemaTokens->sourceComputationOutputName;
+    values[count++] = sourceComputationOutputName;
+  }
+
+  if (valueType) {
+    names[count] = HdExtComputationPrimvarSchemaTokens->valueType;
+    values[count++] = valueType;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdExtComputationPrimvarSchema::Builder::Build()
+HdExtComputationPrimvarSchema::Builder &HdExtComputationPrimvarSchema::Builder::SetInterpolation(
+    const HdTokenDataSourceHandle &interpolation)
 {
-    return HdExtComputationPrimvarSchema::BuildRetained(
-        _interpolation,
-        _role,
-        _sourceComputation,
-        _sourceComputationOutputName,
-        _valueType
-    );
+  _interpolation = interpolation;
+  return *this;
 }
 
+HdExtComputationPrimvarSchema::Builder &HdExtComputationPrimvarSchema::Builder::SetRole(
+    const HdTokenDataSourceHandle &role)
+{
+  _role = role;
+  return *this;
+}
+
+HdExtComputationPrimvarSchema::Builder &HdExtComputationPrimvarSchema::Builder::
+    SetSourceComputation(const HdPathDataSourceHandle &sourceComputation)
+{
+  _sourceComputation = sourceComputation;
+  return *this;
+}
+
+HdExtComputationPrimvarSchema::Builder &HdExtComputationPrimvarSchema::Builder::
+    SetSourceComputationOutputName(const HdTokenDataSourceHandle &sourceComputationOutputName)
+{
+  _sourceComputationOutputName = sourceComputationOutputName;
+  return *this;
+}
+
+HdExtComputationPrimvarSchema::Builder &HdExtComputationPrimvarSchema::Builder::SetValueType(
+    const HdTupleTypeDataSourceHandle &valueType)
+{
+  _valueType = valueType;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdExtComputationPrimvarSchema::Builder::Build()
+{
+  return HdExtComputationPrimvarSchema::BuildRetained(
+      _interpolation, _role, _sourceComputation, _sourceComputationOutputName, _valueType);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

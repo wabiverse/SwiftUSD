@@ -35,29 +35,41 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfMultiInterval>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfMultiInterval>();
+}
 
-GfMultiInterval::GfMultiInterval(const GfInterval &i) { Add(i); }
+GfMultiInterval::GfMultiInterval(const GfInterval &i)
+{
+  Add(i);
+}
 
-GfMultiInterval::GfMultiInterval(const std::vector<GfInterval> &intervals) {
+GfMultiInterval::GfMultiInterval(const std::vector<GfInterval> &intervals)
+{
   TF_FOR_ALL(i, intervals)
   Add(*i);
 }
 
-size_t GfMultiInterval::Hash() const { return TfHash()(_set); }
+size_t GfMultiInterval::Hash() const
+{
+  return TfHash()(_set);
+}
 
-GfInterval GfMultiInterval::GetBounds() const {
+GfInterval GfMultiInterval::GetBounds() const
+{
   if (!_set.empty()) {
     const GfInterval &first = *_set.begin();
     const GfInterval &last = *_set.rbegin();
-    return GfInterval(first.GetMin(), last.GetMax(), first.IsMinClosed(),
-                      last.IsMaxClosed());
-  } else {
+    return GfInterval(first.GetMin(), last.GetMax(), first.IsMinClosed(), last.IsMaxClosed());
+  }
+  else {
     return GfInterval();
   }
 }
 
-bool GfMultiInterval::Contains(double d) const {
+bool GfMultiInterval::Contains(double d) const
+{
   // Find position of first interval >= [d,d].
   const_iterator i = lower_bound(d);
 
@@ -72,7 +84,8 @@ bool GfMultiInterval::Contains(double d) const {
   return false;
 }
 
-bool GfMultiInterval::Contains(const GfInterval &a) const {
+bool GfMultiInterval::Contains(const GfInterval &a) const
+{
   if (a.IsEmpty())
     return false;
 
@@ -90,11 +103,13 @@ bool GfMultiInterval::Contains(const GfInterval &a) const {
   return false;
 }
 
-bool GfMultiInterval::Contains(const GfMultiInterval &s) const {
+bool GfMultiInterval::Contains(const GfMultiInterval &s) const
+{
   if (s.IsEmpty()) {
     return false;
   }
-  TF_FOR_ALL(i, s) {
+  TF_FOR_ALL(i, s)
+  {
     if (!Contains(*i)) {
       return false;
     }
@@ -102,16 +117,18 @@ bool GfMultiInterval::Contains(const GfMultiInterval &s) const {
   return true;
 }
 
-GfMultiInterval::const_iterator GfMultiInterval::lower_bound(double x) const {
+GfMultiInterval::const_iterator GfMultiInterval::lower_bound(double x) const
+{
   return _set.lower_bound(GfInterval(x));
 }
 
-GfMultiInterval::const_iterator GfMultiInterval::upper_bound(double x) const {
+GfMultiInterval::const_iterator GfMultiInterval::upper_bound(double x) const
+{
   return _set.upper_bound(GfInterval(x));
 }
 
-GfMultiInterval::const_iterator
-GfMultiInterval::GetNextNonContainingInterval(double x) const {
+GfMultiInterval::const_iterator GfMultiInterval::GetNextNonContainingInterval(double x) const
+{
   // We pass the partially open interval (x,x] to the upper_bound
   // function instead of the closed interval [x,x] because of how the
   // less than operator behaves on intervals with the same minimum
@@ -123,8 +140,8 @@ GfMultiInterval::GetNextNonContainingInterval(double x) const {
   return _set.upper_bound(GfInterval(x, x, false, true));
 }
 
-GfMultiInterval::const_iterator
-GfMultiInterval::GetPriorNonContainingInterval(double x) const {
+GfMultiInterval::const_iterator GfMultiInterval::GetPriorNonContainingInterval(double x) const
+{
   const_iterator i = _set.lower_bound(x);
 
   if (i == _set.begin()) {
@@ -142,14 +159,15 @@ GfMultiInterval::GetPriorNonContainingInterval(double x) const {
     --i;
     TF_AXIOM(!i->Contains(x));
     return i;
-  } else {
+  }
+  else {
     // No prior intervals left.
     return _set.end();
   }
 }
 
-GfMultiInterval::const_iterator
-GfMultiInterval::GetContainingInterval(double x) const {
+GfMultiInterval::const_iterator GfMultiInterval::GetContainingInterval(double x) const
+{
   // Get the next interval that doesn't contain x
   const_iterator i = GetNextNonContainingInterval(x);
 
@@ -168,12 +186,14 @@ GfMultiInterval::GetContainingInterval(double x) const {
   return _set.end();
 }
 
-void GfMultiInterval::Add(const GfMultiInterval &intervals) {
+void GfMultiInterval::Add(const GfMultiInterval &intervals)
+{
   TF_FOR_ALL(i, intervals)
   Add(*i);
 }
 
-void GfMultiInterval::Add(const GfInterval &interval) {
+void GfMultiInterval::Add(const GfInterval &interval)
+{
   if (interval.IsEmpty())
     return;
 
@@ -191,7 +211,8 @@ void GfMultiInterval::Add(const GfInterval &interval) {
   // has that boundary open.  So we need to merge in the next interval if our
   // end points match up and either of the these end points is closed
   if (i != _set.end() && merged.GetMax() == (*i).GetMin() &&
-      !(merged.IsMaxOpen() && (*i).IsMinOpen())) {
+      !(merged.IsMaxOpen() && (*i).IsMinOpen()))
+  {
     merged |= *i;
     _set.erase(i++);
   }
@@ -201,8 +222,9 @@ void GfMultiInterval::Add(const GfInterval &interval) {
     // If our merged interval intersects the previous interval or it's min
     // matches the previous interval's max with either one of the ends being
     // close, then merged the previous interval in
-    if (merged.Intersects(*i) || (merged.GetMin() == (*i).GetMax() &&
-                                  !(merged.IsMinOpen() && (*i).IsMaxOpen()))) {
+    if (merged.Intersects(*i) ||
+        (merged.GetMin() == (*i).GetMax() && !(merged.IsMinOpen() && (*i).IsMaxOpen())))
+    {
       merged |= *i;
       _set.erase(i);
     }
@@ -215,7 +237,8 @@ void GfMultiInterval::Add(const GfInterval &interval) {
     _AssertInvariants();
 }
 
-void GfMultiInterval::Remove(const GfMultiInterval &intervals) {
+void GfMultiInterval::Remove(const GfMultiInterval &intervals)
+{
   TF_FOR_ALL(i, intervals)
   Remove(*i);
 }
@@ -223,7 +246,9 @@ void GfMultiInterval::Remove(const GfMultiInterval &intervals) {
 // Remove interval j from interval at iterator i, inserting new intervals
 // as necessary.
 static void _RemoveInterval(const GfMultiInterval::Set::iterator i,
-                            const GfInterval &j, GfMultiInterval::Set *set) {
+                            const GfInterval &j,
+                            GfMultiInterval::Set *set)
+{
   if (!i->Intersects(j))
     return;
 
@@ -238,7 +263,8 @@ static void _RemoveInterval(const GfMultiInterval::Set::iterator i,
   set->erase(i);
 }
 
-void GfMultiInterval::Remove(const GfInterval &intervalToRemove) {
+void GfMultiInterval::Remove(const GfInterval &intervalToRemove)
+{
   if (intervalToRemove.IsEmpty())
     return;
 
@@ -258,10 +284,12 @@ void GfMultiInterval::Remove(const GfInterval &intervalToRemove) {
     _AssertInvariants();
 }
 
-GfMultiInterval GfMultiInterval::GetComplement() const {
+GfMultiInterval GfMultiInterval::GetComplement() const
+{
   GfMultiInterval r;
   GfInterval workingInterval = GfInterval::GetFullInterval();
-  TF_FOR_ALL(i, _set) {
+  TF_FOR_ALL(i, _set)
+  {
     // Insert interval prior to *i.
     workingInterval.SetMax(i->GetMin(), !i->IsMinClosed());
     if (!workingInterval.IsEmpty()) {
@@ -278,15 +306,18 @@ GfMultiInterval GfMultiInterval::GetComplement() const {
   return r;
 }
 
-void GfMultiInterval::Intersect(const GfMultiInterval &intervals) {
+void GfMultiInterval::Intersect(const GfMultiInterval &intervals)
+{
   Remove(intervals.GetComplement());
 }
 
-void GfMultiInterval::Intersect(const GfInterval &i) {
+void GfMultiInterval::Intersect(const GfInterval &i)
+{
   Intersect(GfMultiInterval(i));
 }
 
-void GfMultiInterval::_AssertInvariants() const {
+void GfMultiInterval::_AssertInvariants() const
+{
   const GfInterval *last = 0;
 
   for (const_iterator i = _set.begin(), iEnd = _set.end(); i != iEnd; ++i) {
@@ -303,17 +334,23 @@ void GfMultiInterval::_AssertInvariants() const {
   }
 }
 
-void GfMultiInterval::ArithmeticAdd(const GfInterval &i) {
+void GfMultiInterval::ArithmeticAdd(const GfInterval &i)
+{
   GfMultiInterval result;
-  TF_FOR_ALL(it, *this) { result.Add(*it + i); }
+  TF_FOR_ALL(it, *this)
+  {
+    result.Add(*it + i);
+  }
 
   swap(result);
 }
 
-std::ostream &operator<<(std::ostream &out, const GfMultiInterval &s) {
+std::ostream &operator<<(std::ostream &out, const GfMultiInterval &s)
+{
   out << "[";
   bool first = true;
-  TF_FOR_ALL(interval, s) {
+  TF_FOR_ALL(interval, s)
+  {
     if (!first)
       out << ", ";
     out << Gf_OstreamHelperP(*interval);

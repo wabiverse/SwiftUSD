@@ -22,36 +22,38 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "pxr/base/plug/testPlugBase.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // This plugin is coded correctly, but will have an empty plugInfo.json
 class TestPlugEmpty : public _TestPlugBase3 {
-  public:
-    typedef TestPlugEmpty This;
-    typedef TfRefPtr<This> RefPtr;
-    typedef TfWeakPtr<This> Ptr;
+ public:
+  typedef TestPlugEmpty This;
+  typedef TfRefPtr<This> RefPtr;
+  typedef TfWeakPtr<This> Ptr;
 
-    virtual ~TestPlugEmpty() {}
+  virtual ~TestPlugEmpty() {}
 
-    virtual std::string GetTypeName() { return "TestPlugEmpty"; }
+  virtual std::string GetTypeName()
+  {
+    return "TestPlugEmpty";
+  }
 
-    static RefPtr New() {
-        return TfCreateRefPtr(new This());
-    }
+  static RefPtr New()
+  {
+    return TfCreateRefPtr(new This());
+  }
 
-  protected:
-    TestPlugEmpty() {}
+ protected:
+  TestPlugEmpty() {}
 };
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<TestPlugEmpty,
-                   TfType::Bases<_TestPlugBase3> >()
-        .SetFactory<_TestPlugFactory<TestPlugEmpty> >()
-        ;
+  TfType::Define<TestPlugEmpty, TfType::Bases<_TestPlugBase3>>()
+      .SetFactory<_TestPlugFactory<TestPlugEmpty>>();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

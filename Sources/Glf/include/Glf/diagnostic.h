@@ -26,21 +26,20 @@
 
 /// \file glf/diagnostic.h
 
-#include <pxr/pxrns.h>
-#include "Glf/api.h"
 #include "Garch/glApi.h"
+#include "Glf/api.h"
 #include "Tf/diagnostic.h"
+#include <pxr/pxrns.h>
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Posts diagnostic errors for all GL errors in the current context.
 /// This macro tags the diagnostic errors with the name of the calling
 /// function.
-#define GLF_POST_PENDING_GL_ERRORS() \
-  GlfPostPendingGLErrors(__ARCH_PRETTY_FUNCTION__)
+#define GLF_POST_PENDING_GL_ERRORS() GlfPostPendingGLErrors(__ARCH_PRETTY_FUNCTION__)
 
 /// Posts diagnostic errors for all GL errors in the current context.
 GLF_API
@@ -55,21 +54,23 @@ void GlfRegisterDefaultDebugOutputMessageCallback();
 /// errors for messages of type DEBUG_TYPE_ERROR and diagnostic warnings
 /// for other message types.
 GLF_API
-void GlfDefaultDebugOutputMessageCallback(
-    GLenum source, GLenum type, GLuint id, GLenum severity,
-    GLsizei length, char const *message, GLvoid const *userParam);
+void GlfDefaultDebugOutputMessageCallback(GLenum source,
+                                          GLenum type,
+                                          GLuint id,
+                                          GLenum severity,
+                                          GLsizei length,
+                                          char const *message,
+                                          GLvoid const *userParam);
 
 /// Returns a string representation of debug output enum values.
 GLF_API
 char const *GlfDebugEnumToString(GLenum debugEnum);
 
 /// Emit a GlfDebugGroup tracing the current function.
-#define GLF_GROUP_FUNCTION() \
-  GlfDebugGroup __glf_group_function(__ARCH_PRETTY_FUNCTION__)
+#define GLF_GROUP_FUNCTION() GlfDebugGroup __glf_group_function(__ARCH_PRETTY_FUNCTION__)
 
 /// Emit a GlfDebugGroup tracing the current scope with the given string.
-#define GLF_GROUP_SCOPE(str) \
-  GlfDebugGroup __glf_group_scope(str)
+#define GLF_GROUP_SCOPE(str) GlfDebugGroup __glf_group_scope(str)
 
 /// \class GlfDebugGroup
 ///
@@ -80,9 +81,8 @@ char const *GlfDebugEnumToString(GLenum debugEnum);
 /// If set to 1 (true) the debug objects will be pushed and popped in
 /// the command stream as long as the GL implementation and version supports it.
 ///
-class GlfDebugGroup
-{
-public:
+class GlfDebugGroup {
+ public:
   /// Pushes a new debug group onto the GL api debug trace stack
   GLF_API
   GlfDebugGroup(char const *message);
@@ -112,9 +112,8 @@ void GlfDebugLabelProgram(GLuint id, char const *label);
 ///
 /// Represents a GL query object in Glf
 ///
-class GlfGLQueryObject
-{
-public:
+class GlfGLQueryObject {
+ public:
   GLF_API
   GlfGLQueryObject();
   GLF_API
@@ -164,7 +163,7 @@ public:
   GlfGLQueryObject(GlfGLQueryObject const &) = delete;
   GlfGLQueryObject &operator=(GlfGLQueryObject const &) = delete;
 
-private:
+ private:
   GLuint _id;
   GLenum _target;
 };

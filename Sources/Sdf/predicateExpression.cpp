@@ -39,7 +39,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   // SdfPredicateExpression::FnCall::Kind
   TF_ADD_ENUM_NAME(SdfPredicateExpression::FnCall::BareCall);
   TF_ADD_ENUM_NAME(SdfPredicateExpression::FnCall::ColonCall);
@@ -53,8 +54,8 @@ TF_REGISTRY_FUNCTION(TfEnum) {
   TF_ADD_ENUM_NAME(SdfPredicateExpression::Or);
 }
 
-SdfPredicateExpression
-SdfPredicateExpression::MakeNot(SdfPredicateExpression &&right) {
+SdfPredicateExpression SdfPredicateExpression::MakeNot(SdfPredicateExpression &&right)
+{
   // Move over the ops and calls, then push back 'Not'.
   SdfPredicateExpression ret;
   ret._ops = std::move(right._ops);
@@ -63,9 +64,10 @@ SdfPredicateExpression::MakeNot(SdfPredicateExpression &&right) {
   return ret;
 }
 
-SdfPredicateExpression
-SdfPredicateExpression::MakeOp(Op op, SdfPredicateExpression &&left,
-                               SdfPredicateExpression &&right) {
+SdfPredicateExpression SdfPredicateExpression::MakeOp(Op op,
+                                                      SdfPredicateExpression &&left,
+                                                      SdfPredicateExpression &&right)
+{
   SdfPredicateExpression ret;
   // Move the right ops, ensure we have enough space, then insert left.
   // Finally push back this new op.
@@ -76,12 +78,14 @@ SdfPredicateExpression::MakeOp(Op op, SdfPredicateExpression &&left,
 
   // Move the left calls, then move-insert the right calls.
   ret._calls = std::move(left._calls);
-  ret._calls.insert(ret._calls.end(), make_move_iterator(right._calls.begin()),
+  ret._calls.insert(ret._calls.end(),
+                    make_move_iterator(right._calls.begin()),
                     make_move_iterator(right._calls.end()));
   return ret;
 }
 
-SdfPredicateExpression SdfPredicateExpression::MakeCall(FnCall &&call) {
+SdfPredicateExpression SdfPredicateExpression::MakeCall(FnCall &&call)
+{
   /// Just push back a 'Call' op and the call itself.
   SdfPredicateExpression ret;
   ret._ops.push_back(Call);
@@ -91,7 +95,8 @@ SdfPredicateExpression SdfPredicateExpression::MakeCall(FnCall &&call) {
 
 void SdfPredicateExpression::WalkWithOpStack(
     TfFunctionRef<void(std::vector<std::pair<Op, int>> const &)> logic,
-    TfFunctionRef<void(FnCall const &)> call) const {
+    TfFunctionRef<void(FnCall const &)> call) const
+{
   // Do nothing if this is the empty expression.
   if (IsEmpty()) {
     return;
@@ -120,32 +125,35 @@ void SdfPredicateExpression::WalkWithOpStack(
     // Invoke 'call' for Call operations, otherwise 'logic'.
     if (stackOp == Call) {
       call(*curCall++);
-    } else {
+    }
+    else {
       logic(stack);
       ++operandIndex;
-      operandIndexEnd = stackOp == Not ? 2 : 3; // only 'not' is unary.
+      operandIndexEnd = stackOp == Not ? 2 : 3;  // only 'not' is unary.
     }
 
     // If we've reached the end of an operation, pop it from the stack,
     // otherwise push the next operation on.
     if (operandIndex == operandIndexEnd) {
       stack.pop_back();
-    } else {
+    }
+    else {
       stack.emplace_back(*(++curOp), 0);
     }
   }
 }
 
-void SdfPredicateExpression::Walk(
-    TfFunctionRef<void(Op, int)> logic,
-    TfFunctionRef<void(FnCall const &)> call) const {
+void SdfPredicateExpression::Walk(TfFunctionRef<void(Op, int)> logic,
+                                  TfFunctionRef<void(FnCall const &)> call) const
+{
   auto adaptLogic = [&logic](std::vector<std::pair<Op, int>> const &stack) {
     return logic(stack.back().first, stack.back().second);
   };
   return WalkWithOpStack(adaptLogic, call);
 }
 
-std::string SdfPredicateExpression::GetText() const {
+std::string SdfPredicateExpression::GetText() const
+{
   std::string result;
   if (IsEmpty()) {
     return result;
@@ -153,24 +161,23 @@ std::string SdfPredicateExpression::GetText() const {
 
   auto opName = [](Op k) {
     switch (k) {
-    case Not:
-      return "not";
-    case ImpliedAnd:
-      return " ";
-    case And:
-      return "and";
-    case Or:
-      return "or";
-    default:
-      break;
+      case Not:
+        return "not";
+      case ImpliedAnd:
+        return " ";
+      case And:
+        return "and";
+      case Or:
+        return "or";
+      default:
+        break;
     };
     return "<unknown>";
   };
 
   std::vector<Op> opStack;
 
-  auto printLogic = [&opName, &opStack,
-                     &result](std::vector<std::pair<Op, int>> const &stack) {
+  auto printLogic = [&opName, &opStack, &result](std::vector<std::pair<Op, int>> const &stack) {
     const Op op = stack.back().first;
     const int argIndex = stack.back().second;
 
@@ -200,29 +207,30 @@ std::string SdfPredicateExpression::GetText() const {
   auto printCall = [&result](FnCall const &call) {
     result += call.funcName;
     switch (call.kind) {
-    case FnCall::BareCall:
-      break;
-    case FnCall::ColonCall: {
-      std::vector<std::string> argStrs;
-      for (auto const &arg : call.args) {
-        argStrs.push_back(Sdf_FileIOUtility::StringFromVtValue(arg.value));
-      }
-      if (!argStrs.empty()) {
-        result += ":" + TfStringJoin(argStrs, ",");
-      }
-    } break;
-    case FnCall::ParenCall: {
-      std::vector<std::string> argStrs;
-      for (auto const &arg : call.args) {
-        argStrs.push_back(TfStringPrintf(
-            "%s%s%s", arg.argName.empty() ? "" : arg.argName.c_str(),
-            arg.argName.empty() ? "" : "=",
-            Sdf_FileIOUtility ::StringFromVtValue(arg.value).c_str()));
-      }
-      if (!argStrs.empty()) {
-        result += "(" + TfStringJoin(argStrs, ", ") + ")";
-      }
-    } break;
+      case FnCall::BareCall:
+        break;
+      case FnCall::ColonCall: {
+        std::vector<std::string> argStrs;
+        for (auto const &arg : call.args) {
+          argStrs.push_back(Sdf_FileIOUtility::StringFromVtValue(arg.value));
+        }
+        if (!argStrs.empty()) {
+          result += ":" + TfStringJoin(argStrs, ",");
+        }
+      } break;
+      case FnCall::ParenCall: {
+        std::vector<std::string> argStrs;
+        for (auto const &arg : call.args) {
+          argStrs.push_back(
+              TfStringPrintf("%s%s%s",
+                             arg.argName.empty() ? "" : arg.argName.c_str(),
+                             arg.argName.empty() ? "" : "=",
+                             Sdf_FileIOUtility ::StringFromVtValue(arg.value).c_str()));
+        }
+        if (!argStrs.empty()) {
+          result += "(" + TfStringJoin(argStrs, ", ") + ")";
+        }
+      } break;
     };
   };
 
@@ -237,7 +245,8 @@ std::ostream &operator<<(std::ostream &out, SdfPredicateExpression const &expr)
 }
 
 SdfPredicateExpression::SdfPredicateExpression(std::string const &input,
-                                               std::string const &context) {
+                                               std::string const &context)
+{
   using namespace tao::TAO_PEGTL_NAMESPACE;
 
   Analyze<PredExpr>();
@@ -245,10 +254,10 @@ SdfPredicateExpression::SdfPredicateExpression(std::string const &input,
     SdfPredicateExprBuilder builder;
     // Uncomment the 'tracer' bit below for debugging.
     parse<must<seq<PredExpr, eolf>>, PredAction /*, tracer*/>(
-        string_input<>{input, context.empty() ? "<input>" : context.c_str()},
-        builder);
+        string_input<>{input, context.empty() ? "<input>" : context.c_str()}, builder);
     *this = builder.Finish();
-  } catch (parse_error const &err) {
+  }
+  catch (parse_error const &err) {
     // Failed to parse -- make an err msg.
     std::string errMsg = err.what();
     errMsg += " -- ";

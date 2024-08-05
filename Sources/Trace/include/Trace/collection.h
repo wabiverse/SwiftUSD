@@ -47,7 +47,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// read access to them.
 ///
 class TraceCollection {
-public:
+ public:
   TF_MALLOC_TAG_NEW("Trace", "TraceCollection");
 
   using This = TraceCollection;
@@ -71,8 +71,7 @@ public:
 
   /// Appends \p events to the collection. The collection will
   /// take ownership of the data.
-  TRACE_API void AddToCollection(const TraceThreadId &id,
-                                 EventListPtr &&events);
+  TRACE_API void AddToCollection(const TraceThreadId &id, EventListPtr &&events);
 
   ////////////////////////////////////////////////////////////////////////
   ///
@@ -81,7 +80,7 @@ public:
   /// This interface provides a way to access data a TraceCollection.
   ///
   class Visitor {
-  public:
+   public:
     /// Destructor
     TRACE_API virtual ~Visitor();
 
@@ -105,7 +104,8 @@ public:
 
     /// Called for every event \p event with \p key on thread
     /// \p threadId if AcceptsCategory returns true.
-    virtual void OnEvent(const TraceThreadId &threadId, const TfToken &key,
+    virtual void OnEvent(const TraceThreadId &threadId,
+                         const TfToken &key,
                          const TraceEvent &event) = 0;
   };
 
@@ -117,9 +117,8 @@ public:
   /// \p visitor callbacks.
   TRACE_API void ReverseIterate(Visitor &visitor) const;
 
-private:
-  using KeyTokenCache =
-      std::unordered_map<TraceKey, TfToken, TraceKey::HashFunctor>;
+ private:
+  using KeyTokenCache = std::unordered_map<TraceKey, TfToken, TraceKey::HashFunctor>;
 
   /// Iterate through threads, then choose either forward or reverse
   /// iteration for the events in the threads
@@ -127,9 +126,8 @@ private:
 
   // Iterate through events in either forward or reverse order, depending on
   // the templated arguments
-  template <class I>
-  void _IterateEvents(Visitor &, KeyTokenCache &, const TraceThreadId &, I,
-                      I) const;
+  template<class I>
+  void _IterateEvents(Visitor &, KeyTokenCache &, const TraceThreadId &, I, I) const;
 
   using EventTable = std::map<TraceThreadId, EventListPtr>;
 
@@ -138,4 +136,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_COLLECTION_H
+#endif  // PXR_BASE_TRACE_COLLECTION_H

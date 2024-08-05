@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_GL_CONVERSIONS_H
 #define PXR_IMAGING_HGI_GL_CONVERSIONS_H
 
-#include <pxr/pxrns.h>
-#include "HgiGL/api.h"
 #include "Garch/glApi.h"
+#include "Gf/vec4f.h"
 #include "Hgi/enums.h"
 #include "Hgi/types.h"
-#include "Gf/vec4f.h"
+#include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -40,16 +40,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Converts from Hgi types to GL types.
 ///
-class HgiGLConversions final
-{
-public:
+class HgiGLConversions final {
+ public:
   HGIGL_API
-  static void GetFormat(
-      HgiFormat inFormat,
-      HgiTextureUsage inUsage,
-      GLenum *outFormat,
-      GLenum *outType,
-      GLenum *outInternalFormat = nullptr);
+  static void GetFormat(HgiFormat inFormat,
+                        HgiTextureUsage inUsage,
+                        GLenum *outFormat,
+                        GLenum *outType,
+                        GLenum *outInternalFormat = nullptr);
 
   HGIGL_API
   static GLenum GetFormatType(HgiFormat inFormat);
@@ -88,9 +86,7 @@ public:
   static GLenum GetMagFilter(HgiSamplerFilter mf);
 
   HGIGL_API
-  static GLenum GetMinFilter(
-      HgiSamplerFilter minFilter,
-      HgiMipFilter mipFilter);
+  static GLenum GetMinFilter(HgiSamplerFilter minFilter, HgiMipFilter mipFilter);
 
   HGIGL_API
   static GfVec4f GetBorderColor(HgiBorderColor borderColor);

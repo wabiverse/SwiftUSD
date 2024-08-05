@@ -49,7 +49,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// begin.
 ///
 /// \hideinitializer
-#define ARCH_PRINTF_FUNCTION(_fmt, _firstArg)
+#  define ARCH_PRINTF_FUNCTION(_fmt, _firstArg)
 
 /// Macro used to indicate a function takes a scanf-like specification.
 ///
@@ -63,7 +63,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// format string begin.
 ///
 /// \hideinitializer
-#define ARCH_SCANF_FUNCTION(_fmt, _firstArg)
+#  define ARCH_SCANF_FUNCTION(_fmt, _firstArg)
 
 /// Macro used to indicate that a function should never be inlined.
 ///
@@ -73,7 +73,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// \hideinitializer
-#define ARCH_NOINLINE
+#  define ARCH_NOINLINE
 
 /// Macro used to indicate a function parameter may be unused.
 ///
@@ -88,7 +88,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// \hideinitializer
-#define ARCH_UNUSED_ARG
+#  define ARCH_UNUSED_ARG
 
 /// Macro used to indicate a function may be unused.
 ///
@@ -103,7 +103,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// \hideinitializer
-#define ARCH_UNUSED_FUNCTION
+#  define ARCH_UNUSED_FUNCTION
 
 /// Macro used to indicate that a function's code must always be emitted even
 /// if not required.
@@ -123,7 +123,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// \hideinitializer
-#define ARCH_USED_FUNCTION
+#  define ARCH_USED_FUNCTION
 
 /// Macro to begin the definition of a function that should be executed by
 /// the dynamic loader when the dynamic object (library or program) is
@@ -142,7 +142,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// not be used.  If you don't need any arguments you must use void.
 ///
 /// \hideinitializer
-#define ARCH_CONSTRUCTOR(_name, _priority, ...)
+#  define ARCH_CONSTRUCTOR(_name, _priority, ...)
 
 /// Macro to begin the definition of a function that should be executed by
 /// the dynamic loader when the dynamic object (library or program) is
@@ -161,7 +161,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// not be used.  If you don't need any arguments you must use void.
 ///
 /// \hideinitializer
-#define ARCH_DESTRUCTOR(_name, _priority, ...)
+#  define ARCH_DESTRUCTOR(_name, _priority, ...)
 
 /// Macro to begin the definition of a class that is using private inheritance
 /// to take advantage of the empty base optimization. Some compilers require
@@ -169,29 +169,27 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// In C++20, usage of private inheritance may be able to be retired with the
 /// [[no_unique_address]] tag.
-#define ARCH_EMPTY_BASES
+#  define ARCH_EMPTY_BASES
 
 #elif defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG)
 
-#define ARCH_PRINTF_FUNCTION(_fmt, _firstArg)                                  \
-  __attribute__((format(printf, _fmt, _firstArg)))
-#define ARCH_SCANF_FUNCTION(_fmt, _firstArg)                                   \
-  __attribute__((format(scanf, _fmt, _firstArg)))
-#define ARCH_NOINLINE __attribute__((noinline))
-#define ARCH_UNUSED_ARG __attribute__((unused))
-#define ARCH_UNUSED_FUNCTION __attribute__((unused))
-#define ARCH_USED_FUNCTION __attribute__((used))
-#define ARCH_EMPTY_BASES
+#  define ARCH_PRINTF_FUNCTION(_fmt, _firstArg) __attribute__((format(printf, _fmt, _firstArg)))
+#  define ARCH_SCANF_FUNCTION(_fmt, _firstArg) __attribute__((format(scanf, _fmt, _firstArg)))
+#  define ARCH_NOINLINE __attribute__((noinline))
+#  define ARCH_UNUSED_ARG __attribute__((unused))
+#  define ARCH_UNUSED_FUNCTION __attribute__((unused))
+#  define ARCH_USED_FUNCTION __attribute__((used))
+#  define ARCH_EMPTY_BASES
 
 #elif defined(ARCH_COMPILER_MSVC)
 
-#define ARCH_PRINTF_FUNCTION(_fmt, _firstArg)
-#define ARCH_SCANF_FUNCTION(_fmt, _firstArg)
-#define ARCH_NOINLINE // __declspec(noinline)
-#define ARCH_UNUSED_ARG
-#define ARCH_UNUSED_FUNCTION
-#define ARCH_USED_FUNCTION
-#define ARCH_EMPTY_BASES __declspec(empty_bases)
+#  define ARCH_PRINTF_FUNCTION(_fmt, _firstArg)
+#  define ARCH_SCANF_FUNCTION(_fmt, _firstArg)
+#  define ARCH_NOINLINE  // __declspec(noinline)
+#  define ARCH_UNUSED_ARG
+#  define ARCH_UNUSED_FUNCTION
+#  define ARCH_USED_FUNCTION
+#  define ARCH_EMPTY_BASES __declspec(empty_bases)
 
 #else
 
@@ -215,19 +213,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 // ensure that each library gets its own initialization.  Without it, on Linux,
 // there would be exactly *one* initialization no matter how many libraries are
 // loaded.
-template <class StaticInit> struct ARCH_HIDDEN Arch_PerLibInit {
-  Arch_PerLibInit() { /* "use" of init here forces instantiation */
+template<class StaticInit> struct ARCH_HIDDEN Arch_PerLibInit {
+  Arch_PerLibInit()
+  { /* "use" of init here forces instantiation */
     (void)init;
   }
 
-private:
+ private:
   static StaticInit init;
 };
-template <class StaticInit> StaticInit Arch_PerLibInit<StaticInit>::init;
+template<class StaticInit> StaticInit Arch_PerLibInit<StaticInit>::init;
 
 #define _ARCH_CAT_NOEXPAND(a, b) a##b
 #define _ARCH_CAT(a, b) _ARCH_CAT_NOEXPAND(a, b)
-#define _ARCH_ENSURE_PER_LIB_INIT(T, prefix)                                   \
+#define _ARCH_ENSURE_PER_LIB_INIT(T, prefix) \
   static Arch_PerLibInit<T> _ARCH_CAT(prefix, __COUNTER__)
 
 #if defined(doxygen)
@@ -240,54 +239,52 @@ template <class StaticInit> StaticInit Arch_PerLibInit<StaticInit>::init;
 struct Arch_ConstructorEntry {
   typedef void (*Type)(void);
   Type function;
-  unsigned int version : 24; // USD version
-  unsigned int priority : 8; // Priority of function
+  unsigned int version : 24;  // USD version
+  unsigned int priority : 8;  // Priority of function
 };
 
 // Emit a Arch_ConstructorEntry in the __Data,pxrctor section.
-#define ARCH_CONSTRUCTOR(_name, _priority, ...)                                \
-  static void _name(__VA_ARGS__);                                              \
-  static const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND(                       \
-      arch_ctor_, _name) __attribute__((used, section("__DATA,pxrctor"))) = {  \
-      reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority};   \
-  static void _name(__VA_ARGS__)
+#  define ARCH_CONSTRUCTOR(_name, _priority, ...) \
+    static void _name(__VA_ARGS__); \
+    static const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND(arch_ctor_, _name) \
+        __attribute__((used, section("__DATA,pxrctor"))) = { \
+            reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority}; \
+    static void _name(__VA_ARGS__)
 
 // Emit a Arch_ConstructorEntry in the __Data,pxrdtor section.
-#define ARCH_DESTRUCTOR(_name, _priority, ...)                                 \
-  static void _name(__VA_ARGS__);                                              \
-  static const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND(                       \
-      arch_dtor_, _name) __attribute__((used, section("__DATA,pxrdtor"))) = {  \
-      reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority};   \
-  static void _name(__VA_ARGS__)
+#  define ARCH_DESTRUCTOR(_name, _priority, ...) \
+    static void _name(__VA_ARGS__); \
+    static const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND(arch_dtor_, _name) \
+        __attribute__((used, section("__DATA,pxrdtor"))) = { \
+            reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority}; \
+    static void _name(__VA_ARGS__)
 
 #elif defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG)
 
 // The used attribute is required to prevent these apparently unused functions
 // from being removed by the linker.
-#define ARCH_CONSTRUCTOR(_name, _priority, ...)                                \
-  __attribute__((used, section(".pxrctor"),                                    \
-                 constructor((_priority) + 100))) static void                  \
-  _name(__VA_ARGS__)
-#define ARCH_DESTRUCTOR(_name, _priority, ...)                                 \
-  __attribute__((used, section(".pxrdtor"),                                    \
-                 destructor((_priority) + 100))) static void                   \
-  _name(__VA_ARGS__)
+#  define ARCH_CONSTRUCTOR(_name, _priority, ...) \
+    __attribute__((used, section(".pxrctor"), constructor((_priority) + 100))) static void _name( \
+        __VA_ARGS__)
+#  define ARCH_DESTRUCTOR(_name, _priority, ...) \
+    __attribute__((used, section(".pxrdtor"), destructor((_priority) + 100))) static void _name( \
+        __VA_ARGS__)
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#include "Arch/api.h"
+#  include "Arch/api.h"
 
 // Entry for a constructor/destructor in the custom section.
 __declspec(align(16)) struct Arch_ConstructorEntry {
   typedef void(__cdecl *Type)(void);
   Type function;
-  unsigned int version : 24; // USD version
-  unsigned int priority : 8; // Priority of function
+  unsigned int version : 24;  // USD version
+  unsigned int priority : 8;  // Priority of function
 };
 
 // Declare the special sections.
-#pragma section(".pxrctor", read)
-#pragma section(".pxrdtor", read)
+#  pragma section(".pxrctor", read)
+#  pragma section(".pxrdtor", read)
 
 // Objects of this type run the ARCH_CONSTRUCTOR and ARCH_DESTRUCTOR functions
 // for the library containing the object in the c'tor and d'tor, respectively.
@@ -301,28 +298,26 @@ struct Arch_ConstructorInit {
 // extern are to convince the compiler and linker to leave the object in the
 // final library/executable instead of stripping it out.  In clang/gcc we use
 // __attribute__((used)) to do that.
-#define ARCH_CONSTRUCTOR(_name, _priority, ...)                                \
-  static void _name(__VA_ARGS__);                                              \
-  namespace {                                                                  \
-  __declspec(allocate(".pxrctor")) extern const Arch_ConstructorEntry          \
-      _ARCH_CAT_NOEXPAND(arch_ctor_, _name) = {                                \
-          reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u,           \
-          _priority};                                                          \
-  }                                                                            \
-  _ARCH_ENSURE_PER_LIB_INIT(Arch_ConstructorInit, _archCtorInit);              \
-  static void _name(__VA_ARGS__)
+#  define ARCH_CONSTRUCTOR(_name, _priority, ...) \
+    static void _name(__VA_ARGS__); \
+    namespace { \
+    __declspec(allocate(".pxrctor")) extern const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND( \
+        arch_ctor_, \
+        _name) = {reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority}; \
+    } \
+    _ARCH_ENSURE_PER_LIB_INIT(Arch_ConstructorInit, _archCtorInit); \
+    static void _name(__VA_ARGS__)
 
 // Emit a Arch_ConstructorEntry in the .pxrdtor section.
-#define ARCH_DESTRUCTOR(_name, _priority, ...)                                 \
-  static void _name(__VA_ARGS__);                                              \
-  namespace {                                                                  \
-  __declspec(allocate(".pxrdtor")) extern const Arch_ConstructorEntry          \
-      _ARCH_CAT_NOEXPAND(arch_dtor_, _name) = {                                \
-          reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u,           \
-          _priority};                                                          \
-  }                                                                            \
-  _ARCH_ENSURE_PER_LIB_INIT(Arch_ConstructorInit, _archCtorInit);              \
-  static void _name(__VA_ARGS__)
+#  define ARCH_DESTRUCTOR(_name, _priority, ...) \
+    static void _name(__VA_ARGS__); \
+    namespace { \
+    __declspec(allocate(".pxrdtor")) extern const Arch_ConstructorEntry _ARCH_CAT_NOEXPAND( \
+        arch_dtor_, \
+        _name) = {reinterpret_cast<Arch_ConstructorEntry::Type>(&_name), 0u, _priority}; \
+    } \
+    _ARCH_ENSURE_PER_LIB_INIT(Arch_ConstructorInit, _archCtorInit); \
+    static void _name(__VA_ARGS__)
 
 #else
 
@@ -333,4 +328,4 @@ struct Arch_ConstructorInit {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_ATTRIBUTES_H
+#endif  // PXR_BASE_ARCH_ATTRIBUTES_H

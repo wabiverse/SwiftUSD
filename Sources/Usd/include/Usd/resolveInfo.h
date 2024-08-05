@@ -48,12 +48,12 @@ TF_DECLARE_WEAK_PTRS(PcpLayerStack);
 /// For more details, see \ref Usd_ValueResolution.
 ///
 enum UsdResolveInfoSource {
-  UsdResolveInfoSourceNone, ///< No value
+  UsdResolveInfoSourceNone,  ///< No value
 
-  UsdResolveInfoSourceFallback,    ///< Built-in fallback value
-  UsdResolveInfoSourceDefault,     ///< Attribute default value
-  UsdResolveInfoSourceTimeSamples, ///< Attribute time samples
-  UsdResolveInfoSourceValueClips,  ///< Value clips
+  UsdResolveInfoSourceFallback,     ///< Built-in fallback value
+  UsdResolveInfoSourceDefault,      ///< Attribute default value
+  UsdResolveInfoSourceTimeSamples,  ///< Attribute time samples
+  UsdResolveInfoSourceValueClips,   ///< Value clips
 };
 
 /// \class UsdResolveInfo
@@ -64,43 +64,51 @@ enum UsdResolveInfoSource {
 /// For more details, see \ref Usd_ValueResolution.
 ///
 class UsdResolveInfo {
-public:
-  UsdResolveInfo()
-      : _source(UsdResolveInfoSourceNone), _valueIsBlocked(false) {}
+ public:
+  UsdResolveInfo() : _source(UsdResolveInfoSourceNone), _valueIsBlocked(false) {}
 
   /// Return the source of the associated attribute's value.
-  UsdResolveInfoSource GetSource() const { return _source; }
+  UsdResolveInfoSource GetSource() const
+  {
+    return _source;
+  }
 
   /// Return true if this UsdResolveInfo represents an attribute that has an
   /// authored value opinion.  This will return `true` if there is *any*
   /// authored value opinion, including a \ref Usd_AttributeBlocking "block"
   ///
   /// This is equivalent to `HasAuthoredValue() || ValueIsBlocked()`
-  bool HasAuthoredValueOpinion() const {
-    return _source == UsdResolveInfoSourceDefault ||
-           _source == UsdResolveInfoSourceTimeSamples ||
+  bool HasAuthoredValueOpinion() const
+  {
+    return _source == UsdResolveInfoSourceDefault || _source == UsdResolveInfoSourceTimeSamples ||
            _source == UsdResolveInfoSourceValueClips || _valueIsBlocked;
   }
 
   /// Return true if this UsdResolveInfo represents an attribute that has an
   /// authored value that is not \ref Usd_AttributeBlocking "blocked"
-  bool HasAuthoredValue() const {
-    return _source == UsdResolveInfoSourceDefault ||
-           _source == UsdResolveInfoSourceTimeSamples ||
+  bool HasAuthoredValue() const
+  {
+    return _source == UsdResolveInfoSourceDefault || _source == UsdResolveInfoSourceTimeSamples ||
            _source == UsdResolveInfoSourceValueClips;
   }
 
   /// Return the node within the containing PcpPrimIndex that provided
   /// the resolved value opinion.
-  PcpNodeRef GetNode() const { return _node; }
+  PcpNodeRef GetNode() const
+  {
+    return _node;
+  }
 
   /// Return true if this UsdResolveInfo represents an attribute whose
   /// value is blocked.
   ///
   /// \see UsdAttribute::Block()
-  bool ValueIsBlocked() const { return _valueIsBlocked; }
+  bool ValueIsBlocked() const
+  {
+    return _valueIsBlocked;
+  }
 
-private:
+ private:
   /// The LayerStack that provides the strongest value opinion.
   ///
   /// If \p source is either \p UsdResolveInfoSourceDefault
@@ -159,4 +167,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RESOLVE_INFO_H
+#endif  // PXR_USD_USD_RESOLVE_INFO_H

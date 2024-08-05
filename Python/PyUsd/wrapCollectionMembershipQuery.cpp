@@ -34,20 +34,22 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static bool _WrapIsPathIncluded_1(const UsdCollectionMembershipQuery &query,
-                                  const SdfPath &path) {
+static bool _WrapIsPathIncluded_1(const UsdCollectionMembershipQuery &query, const SdfPath &path)
+{
   return query.IsPathIncluded(path);
 }
 
 static bool _WrapIsPathIncluded_2(const UsdCollectionMembershipQuery &query,
                                   const SdfPath &path,
-                                  const TfToken &parentExpansionRule) {
+                                  const TfToken &parentExpansionRule)
+{
   return query.IsPathIncluded(path, parentExpansionRule);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapUsdCollectionMembershipQuery() {
+void wrapUsdCollectionMembershipQuery()
+{
   def("ComputeIncludedObjectsFromCollection",
       &UsdComputeIncludedObjectsFromCollection,
       (arg("query"), arg("stage"), arg("predicate") = UsdPrimDefaultPredicate),
@@ -61,8 +63,7 @@ void wrapUsdCollectionMembershipQuery() {
   class_<UsdCollectionMembershipQuery>("UsdCollectionMembershipQuery")
       .def(init<>())
       .def("IsPathIncluded", _WrapIsPathIncluded_1, arg("path"))
-      .def("IsPathIncluded", _WrapIsPathIncluded_2,
-           (arg("path"), arg("parentExpansionRule")))
+      .def("IsPathIncluded", _WrapIsPathIncluded_2, (arg("path"), arg("parentExpansionRule")))
       .def("HasExcludes", &UsdCollectionMembershipQuery::HasExcludes)
       .def("GetAsPathExpansionRuleMap",
            &UsdCollectionMembershipQuery::GetAsPathExpansionRuleMap,

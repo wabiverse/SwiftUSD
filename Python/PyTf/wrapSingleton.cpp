@@ -40,7 +40,8 @@ namespace {
 // python.
 struct Tf_PySingleton {};
 
-static object _GetSingletonInstance(object const &classObj) {
+static object _GetSingletonInstance(object const &classObj)
+{
 
   // Try to get existing instance from this class.
   object instance = classObj.attr("__dict__").attr("get")("__instance");
@@ -48,8 +49,7 @@ static object _GetSingletonInstance(object const &classObj) {
   if (TfPyIsNone(instance)) {
     // Create instance.  Use our first base class in the method resolution
     // order (mro) to create it.
-    instance = TfPyGetClassObject<Tf_PySingleton>().attr("__mro__")[1].attr(
-        "__new__")(classObj);
+    instance = TfPyGetClassObject<Tf_PySingleton>().attr("__mro__")[1].attr("__new__")(classObj);
 
     // Store singleton instance in class.
     setattr(classObj, "__instance", instance);
@@ -64,15 +64,15 @@ static object _GetSingletonInstance(object const &classObj) {
 }
 
 // Need an init method that accepts any arguments and does nothing.
-static object _DummyInit(boost::python::tuple const &, 
-                         boost::python::dict const &)
-{ 
+static object _DummyInit(boost::python::tuple const &, boost::python::dict const &)
+{
   return object();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapSingleton() {
+void wrapSingleton()
+{
   class_<Tf_PySingleton>("Singleton", no_init)
       .def("__new__", _GetSingletonInstance)
       .staticmethod("__new__")

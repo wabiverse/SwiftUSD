@@ -24,10 +24,10 @@
 #ifndef EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDER_DELEGATE_H
 #define EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDER_DELEGATE_H
 
-#include <pxr/pxrns.h>
 #include "Hd/renderDelegate.h"
 #include "Hd/resourceRegistry.h"
 #include "Tf/staticTokens.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -41,9 +41,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// responsible for creating renderpasses, which know how to draw this
 /// renderer's scene primitives.
 ///
-class HdTinyRenderDelegate final : public HdRenderDelegate
-{
-public:
+class HdTinyRenderDelegate final : public HdRenderDelegate {
+ public:
   /// Render delegate constructor.
   HdTinyRenderDelegate();
   /// Render delegate constructor.
@@ -60,25 +59,20 @@ public:
   HdResourceRegistrySharedPtr GetResourceRegistry() const override;
 
   // Prims
-  HdRenderPassSharedPtr CreateRenderPass(
-      HdRenderIndex *index,
-      HdRprimCollection const &collection) override;
+  HdRenderPassSharedPtr CreateRenderPass(HdRenderIndex *index,
+                                         HdRprimCollection const &collection) override;
 
-  HdInstancer *CreateInstancer(HdSceneDelegate *delegate,
-                               SdfPath const &id) override;
+  HdInstancer *CreateInstancer(HdSceneDelegate *delegate, SdfPath const &id) override;
   void DestroyInstancer(HdInstancer *instancer) override;
 
-  HdRprim *CreateRprim(TfToken const &typeId,
-                       SdfPath const &rprimId) override;
+  HdRprim *CreateRprim(TfToken const &typeId, SdfPath const &rprimId) override;
   void DestroyRprim(HdRprim *rPrim) override;
 
-  HdSprim *CreateSprim(TfToken const &typeId,
-                       SdfPath const &sprimId) override;
+  HdSprim *CreateSprim(TfToken const &typeId, SdfPath const &sprimId) override;
   HdSprim *CreateFallbackSprim(TfToken const &typeId) override;
   void DestroySprim(HdSprim *sprim) override;
 
-  HdBprim *CreateBprim(TfToken const &typeId,
-                       SdfPath const &bprimId) override;
+  HdBprim *CreateBprim(TfToken const &typeId, SdfPath const &bprimId) override;
   HdBprim *CreateFallbackBprim(TfToken const &typeId) override;
   void DestroyBprim(HdBprim *bprim) override;
 
@@ -86,7 +80,7 @@ public:
 
   HdRenderParam *GetRenderParam() const override;
 
-private:
+ private:
   static const TfTokenVector SUPPORTED_RPRIM_TYPES;
   static const TfTokenVector SUPPORTED_SPRIM_TYPES;
   static const TfTokenVector SUPPORTED_BPRIM_TYPES;
@@ -102,4 +96,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDER_DELEGATE_H
+#endif  // EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDER_DELEGATE_H

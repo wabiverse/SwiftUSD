@@ -22,81 +22,70 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "pxr/base/work/loops.h"
+#include "pxr/pxr.h"
 
 #include "pxr/base/work/threadLimits.h"
 
-#include "pxr/base/tf/stopwatch.h"
+#include "Arch/fileSystem.h"
 #include "pxr/base/tf/iterator.h"
 #include "pxr/base/tf/staticData.h"
-#include "Arch/fileSystem.h"
+#include "pxr/base/tf/stopwatch.h"
 
 #include <functional>
 
 #include <cstdio>
-#include <numeric>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 using namespace std::placeholders;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static void
-_Double(size_t begin, size_t end, std::vector<int> *v)
+static void _Double(size_t begin, size_t end, std::vector<int> *v)
 {
   for (size_t i = begin; i < end; ++i)
     (*v)[i] *= 2;
 }
 
-static void
-_DoubleAll(std::vector<int> &v)
+static void _DoubleAll(std::vector<int> &v)
 {
-  for (int &i : v)
-  {
+  for (int &i : v) {
     i *= 2;
   }
 }
 
-static void
-_VerifyDoubled(const std::vector<int> &v)
+static void _VerifyDoubled(const std::vector<int> &v)
 {
-  for (size_t i = 0; i < v.size(); ++i)
-  {
-    if (static_cast<size_t>(v[i]) != (2 * i))
-    {
-      std::cout << "found error at index " << i << " is "
-                << v[i] << std::endl;
+  for (size_t i = 0; i < v.size(); ++i) {
+    if (static_cast<size_t>(v[i]) != (2 * i)) {
+      std::cout << "found error at index " << i << " is " << v[i] << std::endl;
       TF_AXIOM(static_cast<size_t>(v[i]) == (2 * i));
     }
   }
 }
 
-static void
-_PopulateVector(size_t arraySize, std::vector<int> *v)
+static void _PopulateVector(size_t arraySize, std::vector<int> *v)
 {
   v->resize(arraySize);
   std::iota(v->begin(), v->end(), 0);
 }
 
 // Returns the number of seconds it took to complete this operation.
-double
-_DoTBBTest(bool verify, const size_t arraySize, const size_t numIterations)
+double _DoTBBTest(bool verify, const size_t arraySize, const size_t numIterations)
 {
   std::vector<int> v;
   _PopulateVector(arraySize, &v);
 
   TfStopwatch sw;
   sw.Start();
-  for (size_t i = 0; i < numIterations; i++)
-  {
+  for (size_t i = 0; i < numIterations; i++) {
 
     WorkParallelForN(arraySize, std::bind(&_Double, _1, _2, &v));
   }
 
-  if (verify)
-  {
+  if (verify) {
     TF_AXIOM(numIterations == 1);
     _VerifyDoubled(v);
   }
@@ -106,30 +95,24 @@ _DoTBBTest(bool verify, const size_t arraySize, const size_t numIterations)
 }
 
 // Returns the number of seconds it took to complete this operation.
-double
-_DoTBBTestForEach(
-    bool verify, const size_t arraySize, const size_t numIterations)
+double _DoTBBTestForEach(bool verify, const size_t arraySize, const size_t numIterations)
 {
   static const size_t partitionSize = 20;
   std::vector<std::vector<int>> vs(partitionSize);
-  for (std::vector<int> &v : vs)
-  {
+  for (std::vector<int> &v : vs) {
     _PopulateVector(arraySize / partitionSize, &v);
   }
 
   TfStopwatch sw;
   sw.Start();
-  for (size_t i = 0; i < numIterations; i++)
-  {
+  for (size_t i = 0; i < numIterations; i++) {
 
     WorkParallelForEach(vs.begin(), vs.end(), _DoubleAll);
   }
 
-  if (verify)
-  {
+  if (verify) {
     TF_AXIOM(numIterations == 1);
-    for (const auto &v : vs)
-    {
+    for (const auto &v : vs) {
       _VerifyDoubled(v);
     }
   }
@@ -151,12 +134,9 @@ void _DoSerialTest()
 // interchanged.
 void _DoSignatureTest()
 {
-  struct F
-  {
+  struct F {
     // Test that this can be non-const
-    void operator()(size_t start, size_t end)
-    {
-    }
+    void operator()(size_t start, size_t end) {}
   };
 
   F f;
@@ -176,25 +156,22 @@ int main(int argc, char **argv)
 
   WorkSetMaximumConcurrencyLimit();
 
-  std::cout << "Initialized with " << WorkGetPhysicalConcurrencyLimit() << " cores..." << std::endl;
+  std::cout << "Initialized with " << WorkGetPhysicalConcurrencyLimit() << " cores..."
+            << std::endl;
 
   double tbbSeconds = _DoTBBTest(!perfMode, arraySize, numIterations);
 
-  std::cout << "TBB parallel_for took: " << tbbSeconds << " seconds"
-            << std::endl;
+  std::cout << "TBB parallel_for took: " << tbbSeconds << " seconds" << std::endl;
 
-  double tbbForEachSeconds = _DoTBBTestForEach(
-      !perfMode, arraySize, numIterations);
+  double tbbForEachSeconds = _DoTBBTestForEach(!perfMode, arraySize, numIterations);
 
-  std::cout << "TBB parallel_for_each took: " << tbbForEachSeconds
-            << " seconds" << std::endl;
+  std::cout << "TBB parallel_for_each took: " << tbbForEachSeconds << " seconds" << std::endl;
 
   _DoSerialTest();
 
   _DoSignatureTest();
 
-  if (perfMode)
-  {
+  if (perfMode) {
 
     // XXX:perfgen only accepts metric names ending in _time.  See bug 97317
     FILE *outputFile = ArchOpenFile("perfstats.raw", "w");

@@ -28,9 +28,9 @@
 #if (defined(__linux__) || defined(_WIN32)) && __has_include(<GL/glx.h>)
 #  define WITH_TEST_GL_CONTEXT 1
 #  include <GL/glx.h>
-# else // !defined(__linux__) && !defined(_WIN32) && !__has_include(<GL/glx.h>)
+#else  // !defined(__linux__) && !defined(_WIN32) && !__has_include(<GL/glx.h>)
 #  define WITH_TEST_GL_CONTEXT 0
-#endif // defined(__linux__) || defined(_WIN32) && __has_include(<GL/glx.h>)
+#endif  // defined(__linux__) || defined(_WIN32) && __has_include(<GL/glx.h>)
 
 #include <stdio.h>
 
@@ -38,9 +38,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class Glf_TestGLContextPrivate
-{
-public:
+class Glf_TestGLContextPrivate {
+ public:
   Glf_TestGLContextPrivate(Glf_TestGLContextPrivate const *other = NULL);
 
   void makeCurrent() const;
@@ -57,7 +56,7 @@ public:
   static bool areSharing(const Glf_TestGLContextPrivate *context1,
                          const Glf_TestGLContextPrivate *context2);
 
-private:
+ private:
   Display *_dpy;
 
   GLXContext _context;
@@ -75,36 +74,51 @@ GLXWindow Glf_TestGLContextPrivate::_win = 0;
 Glf_TestGLContextPrivate::Glf_TestGLContextPrivate(Glf_TestGLContextPrivate const *other)
     : _dpy(NULL), _context(NULL)
 {
-  static int attribs[] = {GLX_DOUBLEBUFFER, GLX_RGBA_BIT,
-                          GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
-                          GLX_SAMPLE_BUFFERS, 1, GLX_SAMPLES, 4, None};
+  static int attribs[] = {GLX_DOUBLEBUFFER,
+                          GLX_RGBA_BIT,
+                          GLX_RED_SIZE,
+                          8,
+                          GLX_GREEN_SIZE,
+                          8,
+                          GLX_BLUE_SIZE,
+                          8,
+                          GLX_SAMPLE_BUFFERS,
+                          1,
+                          GLX_SAMPLES,
+                          4,
+                          None};
 
   _dpy = XOpenDisplay(0);
 
   int n;
-  GLXFBConfig *fbConfigs = glXChooseFBConfig(_dpy,
-                                             DefaultScreen(_dpy), attribs, &n);
+  GLXFBConfig *fbConfigs = glXChooseFBConfig(_dpy, DefaultScreen(_dpy), attribs, &n);
 
   GLXContext share = other ? other->_context : 0;
 
-  _context = glXCreateNewContext(_dpy,
-                                 fbConfigs[0], GLX_RGBA_TYPE, share, true);
+  _context = glXCreateNewContext(_dpy, fbConfigs[0], GLX_RGBA_TYPE, share, true);
 
   _sharedContext = other ? other : this;
 
-  if (!_win)
-  {
+  if (!_win) {
     XVisualInfo *vi = glXGetVisualFromFBConfig(_dpy, fbConfigs[0]);
 
     XSetWindowAttributes swa;
-    swa.colormap = XCreateColormap(_dpy, RootWindow(_dpy, vi->screen),
-                                   vi->visual, AllocNone);
+    swa.colormap = XCreateColormap(_dpy, RootWindow(_dpy, vi->screen), vi->visual, AllocNone);
     swa.border_pixel = 0;
     swa.event_mask = StructureNotifyMask;
 
-    Window xwin = XCreateWindow(_dpy, RootWindow(_dpy, vi->screen),
-                                0, 0, 256, 256, 0, vi->depth, InputOutput, vi->visual,
-                                CWBorderPixel | CWColormap | CWEventMask, &swa);
+    Window xwin = XCreateWindow(_dpy,
+                                RootWindow(_dpy, vi->screen),
+                                0,
+                                0,
+                                256,
+                                256,
+                                0,
+                                vi->depth,
+                                InputOutput,
+                                vi->visual,
+                                CWBorderPixel | CWColormap | CWEventMask,
+                                &swa);
 
     _win = glXCreateWindow(_dpy, fbConfigs[0], xwin, NULL);
   }
@@ -122,13 +136,13 @@ bool Glf_TestGLContextPrivate::isValid()
   return _context != NULL;
 }
 
-const Glf_TestGLContextPrivate *
-Glf_TestGLContextPrivate::currentContext()
+const Glf_TestGLContextPrivate *Glf_TestGLContextPrivate::currentContext()
 {
   return _currenGLContext;
 }
 
-bool Glf_TestGLContextPrivate::areSharing(const Glf_TestGLContextPrivate *context1, const Glf_TestGLContextPrivate *context2)
+bool Glf_TestGLContextPrivate::areSharing(const Glf_TestGLContextPrivate *context1,
+                                          const Glf_TestGLContextPrivate *context2)
 {
   if (!context1 || !context2)
     return false;
@@ -136,8 +150,7 @@ bool Glf_TestGLContextPrivate::areSharing(const Glf_TestGLContextPrivate *contex
   return context1->_sharedContext == context2->_sharedContext;
 }
 
-Glf_TestGLContextPrivate *
-_GetSharedContext()
+Glf_TestGLContextPrivate *_GetSharedContext()
 {
   static Glf_TestGLContextPrivate *sharedCtx = new Glf_TestGLContextPrivate();
   return sharedCtx;
@@ -147,9 +160,8 @@ _GetSharedContext()
 // GlfTestGLContextRegistrationInterface
 //
 
-class GlfTestGLContextRegistrationInterface : public GlfGLContextRegistrationInterface
-{
-public:
+class GlfTestGLContextRegistrationInterface : public GlfGLContextRegistrationInterface {
+ public:
   GlfTestGLContextRegistrationInterface();
   virtual ~GlfTestGLContextRegistrationInterface();
 
@@ -168,18 +180,14 @@ GlfTestGLContextRegistrationInterface::~GlfTestGLContextRegistrationInterface()
   // Do nothing
 }
 
-GlfGLContextSharedPtr
-GlfTestGLContextRegistrationInterface::GetShared()
+GlfGLContextSharedPtr GlfTestGLContextRegistrationInterface::GetShared()
 {
   return GlfGLContextSharedPtr(new GlfTestGLContext(_GetSharedContext()));
 }
 
-GlfGLContextSharedPtr
-GlfTestGLContextRegistrationInterface::GetCurrent()
+GlfGLContextSharedPtr GlfTestGLContextRegistrationInterface::GetCurrent()
 {
-  if (const Glf_TestGLContextPrivate *context =
-          Glf_TestGLContextPrivate::currentContext())
-  {
+  if (const Glf_TestGLContextPrivate *context = Glf_TestGLContextPrivate::currentContext()) {
     return GlfGLContextSharedPtr(new GlfTestGLContext(context));
   }
   return GlfGLContextSharedPtr();
@@ -189,8 +197,7 @@ GlfTestGLContextRegistrationInterface::GetCurrent()
 // GlfTestGLContext
 //
 
-GlfTestGLContextSharedPtr
-GlfTestGLContext::Create(GlfTestGLContextSharedPtr const &share)
+GlfTestGLContextSharedPtr GlfTestGLContext::Create(GlfTestGLContextSharedPtr const &share)
 {
   Glf_TestGLContextPrivate *ctx = new Glf_TestGLContextPrivate(
       share && share->_context ? share->_context : NULL);
@@ -202,7 +209,8 @@ void GlfTestGLContext::RegisterGLContextCallbacks()
   new GlfTestGLContextRegistrationInterface;
 }
 
-GlfTestGLContext::GlfTestGLContext(Glf_TestGLContextPrivate const *context) : _context(const_cast<Glf_TestGLContextPrivate *>(context))
+GlfTestGLContext::GlfTestGLContext(Glf_TestGLContextPrivate const *context)
+    : _context(const_cast<Glf_TestGLContextPrivate *>(context))
 {
 }
 
@@ -218,22 +226,20 @@ void GlfTestGLContext::_MakeCurrent()
 
 bool GlfTestGLContext::_IsSharing(GlfGLContextSharedPtr const &otherContext) const
 {
-#ifdef MENV30
-  GlfTestGLContextSharedPtr otherGlfTestGLContext =
-      std::dynamic_pointer_cast<GlfTestGLContext>(otherContext);
+#  ifdef MENV30
+  GlfTestGLContextSharedPtr otherGlfTestGLContext = std::dynamic_pointer_cast<GlfTestGLContext>(
+      otherContext);
   return (otherGlfTestGLContext &&
           Glf_TestGLContextPrivate::areSharing(_context, otherGlfTestGLContext->_context));
-#else
+#  else
   TF_CODING_ERROR("Glf_TestGLContextPrivate::areSharing() is not supported outside of Presto.");
   return false;
-#endif
+#  endif
 }
 
 bool GlfTestGLContext::_IsEqual(GlfGLContextSharedPtr const &rhs) const
 {
-  if (const GlfTestGLContext *rhsRaw =
-          dynamic_cast<const GlfTestGLContext *>(rhs.get()))
-  {
+  if (const GlfTestGLContext *rhsRaw = dynamic_cast<const GlfTestGLContext *>(rhs.get())) {
     return *_context == *rhsRaw->_context;
   }
   return false;
@@ -241,4 +247,4 @@ bool GlfTestGLContext::_IsEqual(GlfGLContextSharedPtr const &rhs) const
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // WITH_TEST_GL_CONTEXT
+#endif  // WITH_TEST_GL_CONTEXT

@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_COMPUTE_CMDS_DESC_H
 #define PXR_IMAGING_HGI_COMPUTE_CMDS_DESC_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,8 +39,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   The dispatch method for compute encoders.</li>
 /// </ul>
 ///
-struct HgiComputeCmdsDesc
-{
+struct HgiComputeCmdsDesc {
   HGI_API
   HgiComputeCmdsDesc();
 
@@ -48,14 +47,10 @@ struct HgiComputeCmdsDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiComputeCmdsDesc &lhs,
-    const HgiComputeCmdsDesc &rhs);
+bool operator==(const HgiComputeCmdsDesc &lhs, const HgiComputeCmdsDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiComputeCmdsDesc &lhs,
-    const HgiComputeCmdsDesc &rhs);
+bool operator!=(const HgiComputeCmdsDesc &lhs, const HgiComputeCmdsDesc &rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -34,7 +34,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapUsdDraco()
 {
-  def("_WriteDraco", UsdDraco_WriteDraco,
+  def("_WriteDraco",
+      UsdDraco_WriteDraco,
       (arg("mesh"),
        arg("fileName"),
        arg("qp"),
@@ -44,6 +45,5 @@ void wrapUsdDraco()
        arg("preservePolygons"),
        arg("preservePositionOrder"),
        arg("preserveHoles")));
-  def("_PrimvarSupported", UsdDraco_PrimvarSupported,
-      (arg("primvar")));
+  def("_PrimvarSupported", UsdDraco_PrimvarSupported, (arg("primvar")));
 }

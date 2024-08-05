@@ -22,21 +22,17 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "hdPrman/virtualStructResolvingSceneIndex.h"
-#include "hdPrman/matfiltResolveVstructs.h"
 #include "Hd/materialNetworkInterface.h"
+#include "hdPrman/matfiltResolveVstructs.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static void
-_ResolveVirtualStructsWithConditionals(
-    HdMaterialNetworkInterface *networkInterface)
+static void _ResolveVirtualStructsWithConditionals(HdMaterialNetworkInterface *networkInterface)
 {
   MatfiltResolveVstructs(networkInterface, true);
 }
 
-static void
-_ResolveVirtualStructsWithoutConditionals(
-    HdMaterialNetworkInterface *networkInterface)
+static void _ResolveVirtualStructsWithoutConditionals(HdMaterialNetworkInterface *networkInterface)
 {
   MatfiltResolveVstructs(networkInterface, false);
 }
@@ -47,16 +43,14 @@ HdPrman_VirtualStructResolvingSceneIndex::HdPrman_VirtualStructResolvingSceneInd
 {
 }
 
-HdMaterialFilteringSceneIndexBase::FilteringFnc
-HdPrman_VirtualStructResolvingSceneIndex::_GetFilteringFunction() const
+HdMaterialFilteringSceneIndexBase::FilteringFnc HdPrman_VirtualStructResolvingSceneIndex::
+    _GetFilteringFunction() const
 {
   // could capture _applyCondition but instead use wrapper function
-  if (_applyConditionals)
-  {
+  if (_applyConditionals) {
     return _ResolveVirtualStructsWithConditionals;
   }
-  else
-  {
+  else {
     return _ResolveVirtualStructsWithoutConditionals;
   }
 }

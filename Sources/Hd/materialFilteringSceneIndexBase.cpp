@@ -29,163 +29,136 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
-{
+namespace {
 
-class _MaterialDataSource final : public HdContainerDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE(_MaterialDataSource);
+class _MaterialDataSource final : public HdContainerDataSource {
+ public:
+  HD_DECLARE_DATASOURCE(_MaterialDataSource);
 
-    _MaterialDataSource(
-        const HdContainerDataSourceHandle &input,
-        const SdfPath &primPath,
-        const HdMaterialFilteringSceneIndexBase::FilteringFnc &fnc)
-    : _input(input)
-    , _primPath(primPath)
-    , _fnc(fnc)
-    {}
+  _MaterialDataSource(const HdContainerDataSourceHandle &input,
+                      const SdfPath &primPath,
+                      const HdMaterialFilteringSceneIndexBase::FilteringFnc &fnc)
+      : _input(input), _primPath(primPath), _fnc(fnc)
+  {
+  }
 
-    TfTokenVector
-    GetNames() override
-    {
-        if (_input) {
-            return _input->GetNames();
-        }
-        return {};
+  TfTokenVector GetNames() override
+  {
+    if (_input) {
+      return _input->GetNames();
+    }
+    return {};
+  }
+
+  HdDataSourceBaseHandle Get(const TfToken &name) override
+  {
+    if (_input) {
+      HdDataSourceBaseHandle result = _input->Get(name);
+      if (HdContainerDataSourceHandle networkContainer = HdContainerDataSource::Cast(result)) {
+
+        HdDataSourceMaterialNetworkInterface networkInterface(_primPath, networkContainer);
+        _fnc(&networkInterface);
+        return networkInterface.Finish();
+      }
     }
 
-    HdDataSourceBaseHandle
-    Get(const TfToken &name) override
-    {
-        if (_input) {
-            HdDataSourceBaseHandle result = _input->Get(name);
-            if (HdContainerDataSourceHandle networkContainer =
-                    HdContainerDataSource::Cast(result)) {
+    return nullptr;
+  }
 
-                HdDataSourceMaterialNetworkInterface networkInterface(
-                    _primPath, networkContainer);
-                _fnc(&networkInterface);
-                return networkInterface.Finish();
-            }
-        }
-
-        return nullptr;
-    }
-
-
-private:
-    HdContainerDataSourceHandle _input;
-    SdfPath _primPath;
-    HdMaterialFilteringSceneIndexBase::FilteringFnc _fnc;
+ private:
+  HdContainerDataSourceHandle _input;
+  SdfPath _primPath;
+  HdMaterialFilteringSceneIndexBase::FilteringFnc _fnc;
 };
 
+class _PrimDataSource final : public HdContainerDataSource {
+ public:
+  HD_DECLARE_DATASOURCE(_PrimDataSource);
 
-class _PrimDataSource final : public HdContainerDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE(_PrimDataSource);
+  _PrimDataSource(const HdMaterialFilteringSceneIndexBase *base,
+                  const HdContainerDataSourceHandle &input,
+                  const SdfPath &primPath)
+      : _base(base), _input(input), _primPath(primPath)
+  {
+  }
 
-    _PrimDataSource(
-        const HdMaterialFilteringSceneIndexBase* base,
-        const HdContainerDataSourceHandle &input,
-        const SdfPath &primPath)
-    : _base(base)
-    , _input(input)
-    , _primPath(primPath)
-    {}
+  TfTokenVector GetNames() override
+  {
+    if (_input) {
+      return _input->GetNames();
+    }
+    return {};
+  }
 
-    TfTokenVector
-    GetNames() override
-    {
-        if (_input) {
-            return _input->GetNames();
+  HdDataSourceBaseHandle Get(const TfToken &name) override
+  {
+    if (_input) {
+      HdDataSourceBaseHandle result = _input->Get(name);
+      if (result && name == HdMaterialSchemaTokens->material) {
+        if (HdContainerDataSourceHandle materialContainer = HdContainerDataSource::Cast(result)) {
+          return _MaterialDataSource::New(
+              materialContainer, _primPath, _base->GetFilteringFunction());
         }
-        return {};
+      }
+      return result;
     }
 
-    HdDataSourceBaseHandle
-    Get(const TfToken &name) override
-    {
-        if (_input) {
-            HdDataSourceBaseHandle result = _input->Get(name);
-            if (result && name == HdMaterialSchemaTokens->material) {
-                if (HdContainerDataSourceHandle materialContainer =
-                        HdContainerDataSource::Cast(result)) {
-                    return _MaterialDataSource::New(
-                        materialContainer, _primPath, _base->GetFilteringFunction());
-                }
-            }
-            return result;
-        }
+    return nullptr;
+  }
 
-        return nullptr;
-    }
-
-private:
-    // pointer to HdMaterialFilteringSceneIndexBase so that we can query for the
-    // filtering function.
-    const HdMaterialFilteringSceneIndexBase* _base;
-    HdContainerDataSourceHandle _input;
-    SdfPath _primPath;
+ private:
+  // pointer to HdMaterialFilteringSceneIndexBase so that we can query for the
+  // filtering function.
+  const HdMaterialFilteringSceneIndexBase *_base;
+  HdContainerDataSourceHandle _input;
+  SdfPath _primPath;
 };
 
-
-
-} // namespace anonymous
+}  // namespace
 
 HdMaterialFilteringSceneIndexBase::HdMaterialFilteringSceneIndexBase(
     const HdSceneIndexBaseRefPtr &inputSceneIndex)
-: HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
+    : HdSingleInputFilteringSceneIndexBase(inputSceneIndex)
 {
 }
 
-HdSceneIndexPrim
-HdMaterialFilteringSceneIndexBase::GetPrim(const SdfPath &primPath) const
+HdSceneIndexPrim HdMaterialFilteringSceneIndexBase::GetPrim(const SdfPath &primPath) const
 {
-    HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
-    if (prim.primType == HdPrimTypeTokens->material && prim.dataSource) {
-        prim.dataSource = _PrimDataSource::New(this, prim.dataSource, primPath);
-    }
+  HdSceneIndexPrim prim = _GetInputSceneIndex()->GetPrim(primPath);
+  if (prim.primType == HdPrimTypeTokens->material && prim.dataSource) {
+    prim.dataSource = _PrimDataSource::New(this, prim.dataSource, primPath);
+  }
 
-    return prim;
+  return prim;
 }
 
-SdfPathVector
-HdMaterialFilteringSceneIndexBase::GetChildPrimPaths(
-    const SdfPath &primPath) const
+SdfPathVector HdMaterialFilteringSceneIndexBase::GetChildPrimPaths(const SdfPath &primPath) const
 {
-    return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
+  return _GetInputSceneIndex()->GetChildPrimPaths(primPath);
 }
 
-HdMaterialFilteringSceneIndexBase::FilteringFnc
-HdMaterialFilteringSceneIndexBase::GetFilteringFunction() const
+HdMaterialFilteringSceneIndexBase::FilteringFnc HdMaterialFilteringSceneIndexBase::
+    GetFilteringFunction() const
 {
-    return _GetFilteringFunction();
+  return _GetFilteringFunction();
 }
 
-void
-HdMaterialFilteringSceneIndexBase::_PrimsAdded(
-    const HdSceneIndexBase &sender,
-    const HdSceneIndexObserver::AddedPrimEntries &entries)
+void HdMaterialFilteringSceneIndexBase::_PrimsAdded(
+    const HdSceneIndexBase &sender, const HdSceneIndexObserver::AddedPrimEntries &entries)
 {
-    _SendPrimsAdded(entries);
+  _SendPrimsAdded(entries);
 }
 
-void
-HdMaterialFilteringSceneIndexBase::_PrimsRemoved(
-    const HdSceneIndexBase &sender,
-    const HdSceneIndexObserver::RemovedPrimEntries &entries)
+void HdMaterialFilteringSceneIndexBase::_PrimsRemoved(
+    const HdSceneIndexBase &sender, const HdSceneIndexObserver::RemovedPrimEntries &entries)
 {
-    _SendPrimsRemoved(entries);
+  _SendPrimsRemoved(entries);
 }
 
-void
-HdMaterialFilteringSceneIndexBase::_PrimsDirtied(
-    const HdSceneIndexBase &sender,
-    const HdSceneIndexObserver::DirtiedPrimEntries &entries)
+void HdMaterialFilteringSceneIndexBase::_PrimsDirtied(
+    const HdSceneIndexBase &sender, const HdSceneIndexObserver::DirtiedPrimEntries &entries)
 {
-    _SendPrimsDirtied(entries);
+  _SendPrimsDirtied(entries);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

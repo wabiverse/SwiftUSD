@@ -29,175 +29,143 @@
 /* ************************************************************************** */
 
 #include "Hd/basisCurvesTopologySchema.h"
-#include "Hd/retainedDataSource.h"
 #include "Hd/basisCurvesSchema.h"
+#include "Hd/retainedDataSource.h"
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdBasisCurvesTopologySchemaTokens,
-    HDBASISCURVESTOPOLOGY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdBasisCurvesTopologySchemaTokens, HDBASISCURVESTOPOLOGY_SCHEMA_TOKENS);
 
-
-
-HdIntArrayDataSourceHandle
-HdBasisCurvesTopologySchema::GetCurveVertexCounts()
+HdIntArrayDataSourceHandle HdBasisCurvesTopologySchema::GetCurveVertexCounts()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdBasisCurvesTopologySchemaTokens->curveVertexCounts);
+  return _GetTypedDataSource<HdIntArrayDataSource>(
+      HdBasisCurvesTopologySchemaTokens->curveVertexCounts);
 }
 
-HdIntArrayDataSourceHandle
-HdBasisCurvesTopologySchema::GetCurveIndices()
+HdIntArrayDataSourceHandle HdBasisCurvesTopologySchema::GetCurveIndices()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdBasisCurvesTopologySchemaTokens->curveIndices);
+  return _GetTypedDataSource<HdIntArrayDataSource>(
+      HdBasisCurvesTopologySchemaTokens->curveIndices);
 }
 
-HdTokenDataSourceHandle
-HdBasisCurvesTopologySchema::GetBasis()
+HdTokenDataSourceHandle HdBasisCurvesTopologySchema::GetBasis()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdBasisCurvesTopologySchemaTokens->basis);
+  return _GetTypedDataSource<HdTokenDataSource>(HdBasisCurvesTopologySchemaTokens->basis);
 }
 
-HdTokenDataSourceHandle
-HdBasisCurvesTopologySchema::GetType()
+HdTokenDataSourceHandle HdBasisCurvesTopologySchema::GetType()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdBasisCurvesTopologySchemaTokens->type);
+  return _GetTypedDataSource<HdTokenDataSource>(HdBasisCurvesTopologySchemaTokens->type);
 }
 
-HdTokenDataSourceHandle
-HdBasisCurvesTopologySchema::GetWrap()
+HdTokenDataSourceHandle HdBasisCurvesTopologySchema::GetWrap()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdBasisCurvesTopologySchemaTokens->wrap);
+  return _GetTypedDataSource<HdTokenDataSource>(HdBasisCurvesTopologySchemaTokens->wrap);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdBasisCurvesTopologySchema::BuildRetained(
-        const HdIntArrayDataSourceHandle &curveVertexCounts,
-        const HdIntArrayDataSourceHandle &curveIndices,
-        const HdTokenDataSourceHandle &basis,
-        const HdTokenDataSourceHandle &type,
-        const HdTokenDataSourceHandle &wrap
-)
-{
-    TfToken names[5];
-    HdDataSourceBaseHandle values[5];
-
-    size_t count = 0;
-    if (curveVertexCounts) {
-        names[count] = HdBasisCurvesTopologySchemaTokens->curveVertexCounts;
-        values[count++] = curveVertexCounts;
-    }
-
-    if (curveIndices) {
-        names[count] = HdBasisCurvesTopologySchemaTokens->curveIndices;
-        values[count++] = curveIndices;
-    }
-
-    if (basis) {
-        names[count] = HdBasisCurvesTopologySchemaTokens->basis;
-        values[count++] = basis;
-    }
-
-    if (type) {
-        names[count] = HdBasisCurvesTopologySchemaTokens->type;
-        values[count++] = type;
-    }
-
-    if (wrap) {
-        names[count] = HdBasisCurvesTopologySchemaTokens->wrap;
-        values[count++] = wrap;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdBasisCurvesTopologySchema
-HdBasisCurvesTopologySchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdBasisCurvesTopologySchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdBasisCurvesTopologySchemaTokens->topology))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdBasisCurvesTopologySchema::GetSchemaToken()
-{
-    return HdBasisCurvesTopologySchemaTokens->topology;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdBasisCurvesTopologySchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdBasisCurvesSchemaTokens->basisCurves,
-        HdBasisCurvesTopologySchemaTokens->topology
-    );
-    return locator;
-} 
-HdBasisCurvesTopologySchema::Builder &
-HdBasisCurvesTopologySchema::Builder::SetCurveVertexCounts(
-    const HdIntArrayDataSourceHandle &curveVertexCounts)
-{
-    _curveVertexCounts = curveVertexCounts;
-    return *this;
-}
-
-HdBasisCurvesTopologySchema::Builder &
-HdBasisCurvesTopologySchema::Builder::SetCurveIndices(
-    const HdIntArrayDataSourceHandle &curveIndices)
-{
-    _curveIndices = curveIndices;
-    return *this;
-}
-
-HdBasisCurvesTopologySchema::Builder &
-HdBasisCurvesTopologySchema::Builder::SetBasis(
-    const HdTokenDataSourceHandle &basis)
-{
-    _basis = basis;
-    return *this;
-}
-
-HdBasisCurvesTopologySchema::Builder &
-HdBasisCurvesTopologySchema::Builder::SetType(
-    const HdTokenDataSourceHandle &type)
-{
-    _type = type;
-    return *this;
-}
-
-HdBasisCurvesTopologySchema::Builder &
-HdBasisCurvesTopologySchema::Builder::SetWrap(
+HdContainerDataSourceHandle HdBasisCurvesTopologySchema::BuildRetained(
+    const HdIntArrayDataSourceHandle &curveVertexCounts,
+    const HdIntArrayDataSourceHandle &curveIndices,
+    const HdTokenDataSourceHandle &basis,
+    const HdTokenDataSourceHandle &type,
     const HdTokenDataSourceHandle &wrap)
 {
-    _wrap = wrap;
-    return *this;
+  TfToken names[5];
+  HdDataSourceBaseHandle values[5];
+
+  size_t count = 0;
+  if (curveVertexCounts) {
+    names[count] = HdBasisCurvesTopologySchemaTokens->curveVertexCounts;
+    values[count++] = curveVertexCounts;
+  }
+
+  if (curveIndices) {
+    names[count] = HdBasisCurvesTopologySchemaTokens->curveIndices;
+    values[count++] = curveIndices;
+  }
+
+  if (basis) {
+    names[count] = HdBasisCurvesTopologySchemaTokens->basis;
+    values[count++] = basis;
+  }
+
+  if (type) {
+    names[count] = HdBasisCurvesTopologySchemaTokens->type;
+    values[count++] = type;
+  }
+
+  if (wrap) {
+    names[count] = HdBasisCurvesTopologySchemaTokens->wrap;
+    values[count++] = wrap;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdBasisCurvesTopologySchema::Builder::Build()
+/*static*/
+HdBasisCurvesTopologySchema HdBasisCurvesTopologySchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdBasisCurvesTopologySchema::BuildRetained(
-        _curveVertexCounts,
-        _curveIndices,
-        _basis,
-        _type,
-        _wrap
-    );
+  return HdBasisCurvesTopologySchema(fromParentContainer ?
+                                         HdContainerDataSource::Cast(fromParentContainer->Get(
+                                             HdBasisCurvesTopologySchemaTokens->topology)) :
+                                         nullptr);
 }
 
+/*static*/
+const TfToken &HdBasisCurvesTopologySchema::GetSchemaToken()
+{
+  return HdBasisCurvesTopologySchemaTokens->topology;
+}
+/*static*/
+const HdDataSourceLocator &HdBasisCurvesTopologySchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdBasisCurvesSchemaTokens->basisCurves,
+                                           HdBasisCurvesTopologySchemaTokens->topology);
+  return locator;
+}
+HdBasisCurvesTopologySchema::Builder &HdBasisCurvesTopologySchema::Builder::SetCurveVertexCounts(
+    const HdIntArrayDataSourceHandle &curveVertexCounts)
+{
+  _curveVertexCounts = curveVertexCounts;
+  return *this;
+}
+
+HdBasisCurvesTopologySchema::Builder &HdBasisCurvesTopologySchema::Builder::SetCurveIndices(
+    const HdIntArrayDataSourceHandle &curveIndices)
+{
+  _curveIndices = curveIndices;
+  return *this;
+}
+
+HdBasisCurvesTopologySchema::Builder &HdBasisCurvesTopologySchema::Builder::SetBasis(
+    const HdTokenDataSourceHandle &basis)
+{
+  _basis = basis;
+  return *this;
+}
+
+HdBasisCurvesTopologySchema::Builder &HdBasisCurvesTopologySchema::Builder::SetType(
+    const HdTokenDataSourceHandle &type)
+{
+  _type = type;
+  return *this;
+}
+
+HdBasisCurvesTopologySchema::Builder &HdBasisCurvesTopologySchema::Builder::SetWrap(
+    const HdTokenDataSourceHandle &wrap)
+{
+  _wrap = wrap;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdBasisCurvesTopologySchema::Builder::Build()
+{
+  return HdBasisCurvesTopologySchema::BuildRetained(
+      _curveVertexCounts, _curveIndices, _basis, _type, _wrap);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

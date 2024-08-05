@@ -22,56 +22,53 @@
 // language governing permissions and limitations under the Apache License.
 //
 // GENERATED FILE.  DO NOT EDIT.
-#include <boost/python/class.hpp>
 #include "UsdRender/tokens.h"
+#include <boost/python/class.hpp>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
-{
+namespace {
 
-  // Helper to return a static token as a string.  We wrap tokens as Python
-  // strings and for some reason simply wrapping the token using def_readonly
-  // bypasses to-Python conversion, leading to the error that there's no
-  // Python type for the C++ TfToken type.  So we wrap this functor instead.
-  class _WrapStaticToken
+// Helper to return a static token as a string.  We wrap tokens as Python
+// strings and for some reason simply wrapping the token using def_readonly
+// bypasses to-Python conversion, leading to the error that there's no
+// Python type for the C++ TfToken type.  So we wrap this functor instead.
+class _WrapStaticToken {
+ public:
+  _WrapStaticToken(const TfToken *token) : _token(token) {}
+
+  std::string operator()() const
   {
-  public:
-    _WrapStaticToken(const TfToken *token) : _token(token) {}
-
-    std::string operator()() const
-    {
-      return _token->GetString();
-    }
-
-  private:
-    const TfToken *_token;
-  };
-
-  template <typename T>
-  void
-  _AddToken(T &cls, const char *name, const TfToken &token)
-  {
-    cls.add_static_property(name,
-                            boost::python::make_function(
-                                _WrapStaticToken(&token),
-                                boost::python::return_value_policy<
-                                    boost::python::return_by_value>(),
-                                boost::mpl::vector1<std::string>()));
+    return _token->GetString();
   }
 
-} // anonymous
+ private:
+  const TfToken *_token;
+};
+
+template<typename T> void _AddToken(T &cls, const char *name, const TfToken &token)
+{
+  cls.add_static_property(name,
+                          boost::python::make_function(
+                              _WrapStaticToken(&token),
+                              boost::python::return_value_policy<boost::python::return_by_value>(),
+                              boost::mpl::vector1<std::string>()));
+}
+
+}  // namespace
 
 void wrapUsdRenderTokens()
 {
-  boost::python::class_<UsdRenderTokensType, boost::noncopyable>
-      cls("Tokens", boost::python::no_init);
+  boost::python::class_<UsdRenderTokensType, boost::noncopyable> cls("Tokens",
+                                                                     boost::python::no_init);
   _AddToken(cls, "adjustApertureHeight", UsdRenderTokens->adjustApertureHeight);
   _AddToken(cls, "adjustApertureWidth", UsdRenderTokens->adjustApertureWidth);
   _AddToken(cls, "adjustPixelAspectRatio", UsdRenderTokens->adjustPixelAspectRatio);
   _AddToken(cls, "aspectRatioConformPolicy", UsdRenderTokens->aspectRatioConformPolicy);
   _AddToken(cls, "camera", UsdRenderTokens->camera);
-  _AddToken(cls, "collectionRenderVisibilityIncludeRoot", UsdRenderTokens->collectionRenderVisibilityIncludeRoot);
+  _AddToken(cls,
+            "collectionRenderVisibilityIncludeRoot",
+            UsdRenderTokens->collectionRenderVisibilityIncludeRoot);
   _AddToken(cls, "color3f", UsdRenderTokens->color3f);
   _AddToken(cls, "command", UsdRenderTokens->command);
   _AddToken(cls, "cropAperture", UsdRenderTokens->cropAperture);

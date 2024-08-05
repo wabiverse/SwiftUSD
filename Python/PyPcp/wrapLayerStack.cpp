@@ -39,13 +39,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static SdfLayerHandleVector
-_GetLayerStackLayers(const PcpLayerStack &layerStack) {
+static SdfLayerHandleVector _GetLayerStackLayers(const PcpLayerStack &layerStack)
+{
   const SdfLayerRefPtrVector &layers = layerStack.GetLayers();
   return SdfLayerHandleVector(layers.begin(), layers.end());
 }
 
-static SdfLayerOffsetVector _GetLayerOffsets(const PcpLayerStack &layerStack) {
+static SdfLayerOffsetVector _GetLayerOffsets(const PcpLayerStack &layerStack)
+{
   const size_t numLayers = layerStack.GetLayers().size();
 
   SdfLayerOffsetVector rval(numLayers);
@@ -57,51 +58,47 @@ static SdfLayerOffsetVector _GetLayerOffsets(const PcpLayerStack &layerStack) {
   return rval;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapLayerStack() {
-  class_<PcpLayerStack, PcpLayerStackPtr, boost::noncopyable>("LayerStack",
-                                                              no_init)
+void wrapLayerStack()
+{
+  class_<PcpLayerStack, PcpLayerStackPtr, boost::noncopyable>("LayerStack", no_init)
       .def(TfPyRefAndWeakPtr())
-      .add_property("identifier",
-                    make_function(&PcpLayerStack::GetIdentifier,
-                                  return_value_policy<return_by_value>()))
-      .add_property("layers",
-                    make_function(&_GetLayerStackLayers,
-                                  return_value_policy<TfPySequenceToList>()))
+      .add_property(
+          "identifier",
+          make_function(&PcpLayerStack::GetIdentifier, return_value_policy<return_by_value>()))
+      .add_property(
+          "layers",
+          make_function(&_GetLayerStackLayers, return_value_policy<TfPySequenceToList>()))
       .add_property("layerOffsets",
-                    make_function(&_GetLayerOffsets,
-                                  return_value_policy<TfPySequenceToList>()))
-      .add_property("layerTree",
-                    make_function(&PcpLayerStack::GetLayerTree,
-                                  return_value_policy<return_by_value>()))
-      .add_property("mutedLayers",
-                    make_function(&PcpLayerStack::GetMutedLayers,
-                                  return_value_policy<TfPySequenceToList>()))
+                    make_function(&_GetLayerOffsets, return_value_policy<TfPySequenceToList>()))
+      .add_property(
+          "layerTree",
+          make_function(&PcpLayerStack::GetLayerTree, return_value_policy<return_by_value>()))
+      .add_property(
+          "mutedLayers",
+          make_function(&PcpLayerStack::GetMutedLayers, return_value_policy<TfPySequenceToList>()))
       .add_property("expressionVariables",
                     make_function(&PcpLayerStack::GetExpressionVariables,
                                   return_value_policy<return_by_value>()))
-      .add_property(
-          "expressionVariableDependencies",
-          make_function(&PcpLayerStack::GetExpressionVariableDependencies,
-                        return_value_policy<TfPySequenceToList>()))
+      .add_property("expressionVariableDependencies",
+                    make_function(&PcpLayerStack::GetExpressionVariableDependencies,
+                                  return_value_policy<TfPySequenceToList>()))
       .add_property("relocatesSourceToTarget",
                     make_function(&PcpLayerStack::GetRelocatesSourceToTarget,
                                   return_value_policy<return_by_value>()))
       .add_property("relocatesTargetToSource",
                     make_function(&PcpLayerStack::GetRelocatesTargetToSource,
                                   return_value_policy<return_by_value>()))
+      .add_property("incrementalRelocatesSourceToTarget",
+                    make_function(&PcpLayerStack::GetIncrementalRelocatesSourceToTarget,
+                                  return_value_policy<return_by_value>()))
+      .add_property("incrementalRelocatesTargetToSource",
+                    make_function(&PcpLayerStack::GetIncrementalRelocatesTargetToSource,
+                                  return_value_policy<return_by_value>()))
       .add_property(
-          "incrementalRelocatesSourceToTarget",
-          make_function(&PcpLayerStack::GetIncrementalRelocatesSourceToTarget,
-                        return_value_policy<return_by_value>()))
-      .add_property(
-          "incrementalRelocatesTargetToSource",
-          make_function(&PcpLayerStack::GetIncrementalRelocatesTargetToSource,
-                        return_value_policy<return_by_value>()))
-      .add_property("localErrors",
-                    make_function(&PcpLayerStack::GetLocalErrors,
-                                  return_value_policy<TfPySequenceToList>()))
+          "localErrors",
+          make_function(&PcpLayerStack::GetLocalErrors, return_value_policy<TfPySequenceToList>()))
       .add_property("pathsToPrimsWithRelocates",
                     make_function(&PcpLayerStack::GetPathsToPrimsWithRelocates,
                                   return_value_policy<TfPySequenceToList>()))

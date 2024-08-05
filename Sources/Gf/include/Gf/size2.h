@@ -50,112 +50,150 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// mathematical operations are componentwise (including multiplication).
 ///
 class GfSize2 {
-public:
+ public:
   /// Default constructor initializes components to zero.
-  GfSize2() { Set(0, 0); }
+  GfSize2()
+  {
+    Set(0, 0);
+  }
 
   /// Copy constructor.
-  GfSize2(const GfSize2 &o) { *this = o; }
+  GfSize2(const GfSize2 &o)
+  {
+    *this = o;
+  }
 
   /// Conversion from GfVec2i.
-  explicit GfSize2(const GfVec2i &o) { Set(o[0], o[1]); }
+  explicit GfSize2(const GfVec2i &o)
+  {
+    Set(o[0], o[1]);
+  }
 
   /// Construct from an array.
-  GfSize2(const size_t v[2]) { Set(v); }
+  GfSize2(const size_t v[2])
+  {
+    Set(v);
+  }
 
   /// Construct from two values.
-  GfSize2(size_t v0, size_t v1) { Set(v0, v1); }
+  GfSize2(size_t v0, size_t v1)
+  {
+    Set(v0, v1);
+  }
 
   /// Set to the values in a given array.
-  GfSize2 &Set(const size_t v[2]) {
+  GfSize2 &Set(const size_t v[2])
+  {
     _vec[0] = v[0];
     _vec[1] = v[1];
     return *this;
   }
 
   /// Set to values passed directly.
-  GfSize2 &Set(size_t v0, size_t v1) {
+  GfSize2 &Set(size_t v0, size_t v1)
+  {
     _vec[0] = v0;
     _vec[1] = v1;
     return *this;
   }
 
   /// Array operator.
-  size_t &operator[](size_t i) { return _vec[i]; }
+  size_t &operator[](size_t i)
+  {
+    return _vec[i];
+  }
 
   /// Const array operator.
-  const size_t &operator[](size_t i) const { return _vec[i]; }
+  const size_t &operator[](size_t i) const
+  {
+    return _vec[i];
+  }
 
   /// Component-wise equality.
-  bool operator==(const GfSize2 &v) const {
+  bool operator==(const GfSize2 &v) const
+  {
     return _vec[0] == v._vec[0] && _vec[1] == v._vec[1];
   }
 
   /// Component-wise inequality.
-  bool operator!=(const GfSize2 &v) const { return !(*this == v); }
+  bool operator!=(const GfSize2 &v) const
+  {
+    return !(*this == v);
+  }
 
   /// Component-wise in-place addition.
-  GfSize2 &operator+=(const GfSize2 &v) {
+  GfSize2 &operator+=(const GfSize2 &v)
+  {
     _vec[0] += v._vec[0];
     _vec[1] += v._vec[1];
     return *this;
   }
 
   /// Component-wise in-place subtraction.
-  GfSize2 &operator-=(const GfSize2 &v) {
+  GfSize2 &operator-=(const GfSize2 &v)
+  {
     _vec[0] -= v._vec[0];
     _vec[1] -= v._vec[1];
     return *this;
   }
 
   /// Component-wise in-place multiplication.
-  GfSize2 &operator*=(GfSize2 const &v) {
+  GfSize2 &operator*=(GfSize2 const &v)
+  {
     _vec[0] *= v._vec[0];
     _vec[1] *= v._vec[1];
     return *this;
   }
 
   /// Component-wise in-place multiplication by a scalar.
-  GfSize2 &operator*=(int d) {
+  GfSize2 &operator*=(int d)
+  {
     _vec[0] = _vec[0] * d;
     _vec[1] = _vec[1] * d;
     return *this;
   }
 
   /// Component-wise in-place division by a scalar.
-  GfSize2 &operator/=(int d) {
+  GfSize2 &operator/=(int d)
+  {
     _vec[0] = _vec[0] / d;
     _vec[1] = _vec[1] / d;
     return *this;
   }
 
   /// Component-wise addition.
-  friend GfSize2 operator+(const GfSize2 &v1, const GfSize2 &v2) {
+  friend GfSize2 operator+(const GfSize2 &v1, const GfSize2 &v2)
+  {
     return GfSize2(v1._vec[0] + v2._vec[0], v1._vec[1] + v2._vec[1]);
   }
 
   /// Component-wise subtraction.
-  friend GfSize2 operator-(const GfSize2 &v1, const GfSize2 &v2) {
+  friend GfSize2 operator-(const GfSize2 &v1, const GfSize2 &v2)
+  {
     return GfSize2(v1._vec[0] - v2._vec[0], v1._vec[1] - v2._vec[1]);
   }
 
   /// Component-wise multiplication.
-  friend GfSize2 operator*(const GfSize2 &v1, const GfSize2 &v2) {
+  friend GfSize2 operator*(const GfSize2 &v1, const GfSize2 &v2)
+  {
     return GfSize2(v1._vec[0] * v2._vec[0], v1._vec[1] * v2._vec[1]);
   }
 
   /// Component-wise multiplication by a scalar.
-  friend GfSize2 operator*(const GfSize2 &v1, int s) {
+  friend GfSize2 operator*(const GfSize2 &v1, int s)
+  {
     return GfSize2(v1._vec[0] * s, v1._vec[1] * s);
   }
 
   /// Component-wise multiplication by a scalar.
-  friend GfSize2 operator*(int s, const GfSize2 &v1) {
+  friend GfSize2 operator*(int s, const GfSize2 &v1)
+  {
     return GfSize2(v1._vec[0] * s, v1._vec[1] * s);
   }
 
   /// Component-wise division by a scalar.
-  friend GfSize2 operator/(const GfSize2 &v1, int s) {
+  friend GfSize2 operator/(const GfSize2 &v1, int s)
+  {
     return GfSize2(v1._vec[0] / s, v1._vec[1] / s);
   }
 
@@ -164,9 +202,12 @@ public:
   friend std::ostream &operator<<(std::ostream &o, GfSize2 const &v);
 
   /// Conversion to GfVec2i.
-  operator GfVec2i() const { return GfVec2i(static_cast<int>(_vec[0]), static_cast<int>(_vec[1])); }
+  operator GfVec2i() const
+  {
+    return GfVec2i(static_cast<int>(_vec[0]), static_cast<int>(_vec[1]));
+  }
 
-private:
+ private:
   size_t _vec[2];
 };
 
@@ -175,4 +216,4 @@ GF_API std::ostream &operator<<(std::ostream &o, GfSize2 const &v);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_SIZE2_H
+#endif  // PXR_BASE_GF_SIZE2_H

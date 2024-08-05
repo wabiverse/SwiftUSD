@@ -30,99 +30,80 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdDependencySchemaTokens,
-    HDDEPENDENCY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdDependencySchemaTokens, HDDEPENDENCY_SCHEMA_TOKENS);
 
-
-
-HdPathDataSourceHandle
-HdDependencySchema::GetDependedOnPrimPath()
+HdPathDataSourceHandle HdDependencySchema::GetDependedOnPrimPath()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdDependencySchemaTokens->dependedOnPrimPath);
+  return _GetTypedDataSource<HdPathDataSource>(HdDependencySchemaTokens->dependedOnPrimPath);
 }
 
-HdLocatorDataSourceHandle
-HdDependencySchema::GetDependedOnDataSourceLocator()
+HdLocatorDataSourceHandle HdDependencySchema::GetDependedOnDataSourceLocator()
 {
-    return _GetTypedDataSource<HdLocatorDataSource>(
-        HdDependencySchemaTokens->dependedOnDataSourceLocator);
+  return _GetTypedDataSource<HdLocatorDataSource>(
+      HdDependencySchemaTokens->dependedOnDataSourceLocator);
 }
 
-HdLocatorDataSourceHandle
-HdDependencySchema::GetAffectedDataSourceLocator()
+HdLocatorDataSourceHandle HdDependencySchema::GetAffectedDataSourceLocator()
 {
-    return _GetTypedDataSource<HdLocatorDataSource>(
-        HdDependencySchemaTokens->affectedDataSourceLocator);
+  return _GetTypedDataSource<HdLocatorDataSource>(
+      HdDependencySchemaTokens->affectedDataSourceLocator);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdDependencySchema::BuildRetained(
-        const HdPathDataSourceHandle &dependedOnPrimPath,
-        const HdLocatorDataSourceHandle &dependedOnDataSourceLocator,
-        const HdLocatorDataSourceHandle &affectedDataSourceLocator
-)
-{
-    TfToken names[3];
-    HdDataSourceBaseHandle values[3];
-
-    size_t count = 0;
-    if (dependedOnPrimPath) {
-        names[count] = HdDependencySchemaTokens->dependedOnPrimPath;
-        values[count++] = dependedOnPrimPath;
-    }
-
-    if (dependedOnDataSourceLocator) {
-        names[count] = HdDependencySchemaTokens->dependedOnDataSourceLocator;
-        values[count++] = dependedOnDataSourceLocator;
-    }
-
-    if (affectedDataSourceLocator) {
-        names[count] = HdDependencySchemaTokens->affectedDataSourceLocator;
-        values[count++] = affectedDataSourceLocator;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-
-HdDependencySchema::Builder &
-HdDependencySchema::Builder::SetDependedOnPrimPath(
-    const HdPathDataSourceHandle &dependedOnPrimPath)
-{
-    _dependedOnPrimPath = dependedOnPrimPath;
-    return *this;
-}
-
-HdDependencySchema::Builder &
-HdDependencySchema::Builder::SetDependedOnDataSourceLocator(
-    const HdLocatorDataSourceHandle &dependedOnDataSourceLocator)
-{
-    _dependedOnDataSourceLocator = dependedOnDataSourceLocator;
-    return *this;
-}
-
-HdDependencySchema::Builder &
-HdDependencySchema::Builder::SetAffectedDataSourceLocator(
+HdContainerDataSourceHandle HdDependencySchema::BuildRetained(
+    const HdPathDataSourceHandle &dependedOnPrimPath,
+    const HdLocatorDataSourceHandle &dependedOnDataSourceLocator,
     const HdLocatorDataSourceHandle &affectedDataSourceLocator)
 {
-    _affectedDataSourceLocator = affectedDataSourceLocator;
-    return *this;
+  TfToken names[3];
+  HdDataSourceBaseHandle values[3];
+
+  size_t count = 0;
+  if (dependedOnPrimPath) {
+    names[count] = HdDependencySchemaTokens->dependedOnPrimPath;
+    values[count++] = dependedOnPrimPath;
+  }
+
+  if (dependedOnDataSourceLocator) {
+    names[count] = HdDependencySchemaTokens->dependedOnDataSourceLocator;
+    values[count++] = dependedOnDataSourceLocator;
+  }
+
+  if (affectedDataSourceLocator) {
+    names[count] = HdDependencySchemaTokens->affectedDataSourceLocator;
+    values[count++] = affectedDataSourceLocator;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdDependencySchema::Builder::Build()
+HdDependencySchema::Builder &HdDependencySchema::Builder::SetDependedOnPrimPath(
+    const HdPathDataSourceHandle &dependedOnPrimPath)
 {
-    return HdDependencySchema::BuildRetained(
-        _dependedOnPrimPath,
-        _dependedOnDataSourceLocator,
-        _affectedDataSourceLocator
-    );
+  _dependedOnPrimPath = dependedOnPrimPath;
+  return *this;
 }
 
+HdDependencySchema::Builder &HdDependencySchema::Builder::SetDependedOnDataSourceLocator(
+    const HdLocatorDataSourceHandle &dependedOnDataSourceLocator)
+{
+  _dependedOnDataSourceLocator = dependedOnDataSourceLocator;
+  return *this;
+}
+
+HdDependencySchema::Builder &HdDependencySchema::Builder::SetAffectedDataSourceLocator(
+    const HdLocatorDataSourceHandle &affectedDataSourceLocator)
+{
+  _affectedDataSourceLocator = affectedDataSourceLocator;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdDependencySchema::Builder::Build()
+{
+  return HdDependencySchema::BuildRetained(
+      _dependedOnPrimPath, _dependedOnDataSourceLocator, _affectedDataSourceLocator);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

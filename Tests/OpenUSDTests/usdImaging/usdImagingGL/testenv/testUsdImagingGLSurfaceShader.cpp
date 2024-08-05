@@ -42,8 +42,8 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
+#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
 #include "pxr/usdImaging/usdImagingGL/engine.h"
 
@@ -55,9 +55,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
-class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing
-{
-public:
+class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing {
+ public:
   My_TestGLDrawing()
   {
     _mousePos[0] = _mousePos[1] = 0;
@@ -75,7 +74,7 @@ public:
   virtual void MouseRelease(int button, int x, int y, int modKeys);
   virtual void MouseMove(int x, int y, int modKeys);
 
-private:
+ private:
   UsdStageRefPtr _stage;
   UsdImagingGLEngineSharedPtr _engine;
   GlfSimpleLightingContextRefPtr _lightingContext;
@@ -92,12 +91,9 @@ void My_TestGLDrawing::InitTest()
   _stage = UsdStage::Open(GetStageFilePath());
   SdfPathVector excludedPaths;
 
-  _engine.reset(
-      new UsdImagingGLEngine(_stage->GetPseudoRoot().GetPath(),
-                             excludedPaths));
+  _engine.reset(new UsdImagingGLEngine(_stage->GetPseudoRoot().GetPath(), excludedPaths));
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     // set same parameter as
     // GlfSimpleLightingContext::SetStateFromOpenGL OpenGL defaults
     _lightingContext = GlfSimpleLightingContext::New();
@@ -119,8 +115,7 @@ void My_TestGLDrawing::InitTest()
     _lightingContext->SetSceneAmbient(GfVec4f(0.2, 0.2, 0.2, 1.0));
   }
 
-  if (_ShouldFrameAll())
-  {
+  if (_ShouldFrameAll()) {
     TfTokenVector purposes;
     purposes.push_back(UsdGeomTokens->default_);
     purposes.push_back(UsdGeomTokens->proxy);
@@ -139,22 +134,19 @@ void My_TestGLDrawing::InitTest()
 
     std::cerr << "worldCenter: " << worldCenter << "\n";
     std::cerr << "worldSize: " << worldSize << "\n";
-    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-    {
+    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
       // transpose y and z centering translation
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[2];
       _translate[2] = -worldCenter[1] - worldSize;
     }
-    else
-    {
+    else {
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[1];
       _translate[2] = -worldCenter[2] - worldSize;
     }
   }
-  else
-  {
+  else {
     _translate[0] = 0.0;
     _translate[1] = -1000.0;
     _translate[2] = -2500.0;
@@ -184,12 +176,10 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   GfMatrix4d projMatrix = frustum.ComputeProjectionMatrix();
 
   GfMatrix4d modelViewMatrix = viewMatrix;
-  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-  {
+  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
     // rotate from z-up to y-up
-    modelViewMatrix =
-        GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-        modelViewMatrix;
+    modelViewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
+                      modelViewMatrix;
   }
 
   GfVec4d viewport(0, 0, width, height);
@@ -262,18 +252,15 @@ void My_TestGLDrawing::MouseMove(int x, int y, int modKeys)
   int dx = x - _mousePos[0];
   int dy = y - _mousePos[1];
 
-  if (_mouseButton[0])
-  {
+  if (_mouseButton[0]) {
     _rotate[0] += dx;
     _rotate[1] += dy;
   }
-  else if (_mouseButton[1])
-  {
+  else if (_mouseButton[1]) {
     _translate[0] += dx;
     _translate[1] -= dy;
   }
-  else if (_mouseButton[2])
-  {
+  else if (_mouseButton[2]) {
     _translate[2] += dx;
   }
 

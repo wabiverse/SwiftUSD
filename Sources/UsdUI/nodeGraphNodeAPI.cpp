@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdUINodeGraphNodeAPI,
-                 TfType::Bases<UsdAPISchemaBase>>();
+  TfType::Define<UsdUINodeGraphNodeAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdUINodeGraphNodeAPI::~UsdUINodeGraphNodeAPI()
-{
-}
+UsdUINodeGraphNodeAPI::~UsdUINodeGraphNodeAPI() {}
 
 /* static */
-UsdUINodeGraphNodeAPI
-UsdUINodeGraphNodeAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdUINodeGraphNodeAPI UsdUINodeGraphNodeAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdUINodeGraphNodeAPI();
   }
@@ -61,26 +56,22 @@ UsdSchemaKind UsdUINodeGraphNodeAPI::_GetSchemaKind() const
 }
 
 /* static */
-bool UsdUINodeGraphNodeAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdUINodeGraphNodeAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
   return prim.CanApplyAPI<UsdUINodeGraphNodeAPI>(whyNot);
 }
 
 /* static */
-UsdUINodeGraphNodeAPI
-UsdUINodeGraphNodeAPI::Apply(const UsdPrim &prim)
+UsdUINodeGraphNodeAPI UsdUINodeGraphNodeAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdUINodeGraphNodeAPI>())
-  {
+  if (prim.ApplyAPI<UsdUINodeGraphNodeAPI>()) {
     return UsdUINodeGraphNodeAPI(prim);
   }
   return UsdUINodeGraphNodeAPI();
 }
 
 /* static */
-const TfType &
-UsdUINodeGraphNodeAPI::_GetStaticTfType()
+const TfType &UsdUINodeGraphNodeAPI::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdUINodeGraphNodeAPI>();
   return tfType;
@@ -94,20 +85,18 @@ bool UsdUINodeGraphNodeAPI::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdUINodeGraphNodeAPI::_GetTfType() const
+const TfType &UsdUINodeGraphNodeAPI::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetPosAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetPosAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodePos);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreatePosAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreatePosAttr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodePos,
                                     SdfValueTypeNames->Float2,
@@ -117,14 +106,13 @@ UsdUINodeGraphNodeAPI::CreatePosAttr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetStackingOrderAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetStackingOrderAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodeStackingOrder);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreateStackingOrderAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreateStackingOrderAttr(VtValue const &defaultValue,
+                                                            bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodeStackingOrder,
                                     SdfValueTypeNames->Int,
@@ -134,14 +122,13 @@ UsdUINodeGraphNodeAPI::CreateStackingOrderAttr(VtValue const &defaultValue, bool
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetDisplayColorAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetDisplayColorAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodeDisplayColor);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreateDisplayColorAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreateDisplayColorAttr(VtValue const &defaultValue,
+                                                           bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodeDisplayColor,
                                     SdfValueTypeNames->Color3f,
@@ -151,14 +138,13 @@ UsdUINodeGraphNodeAPI::CreateDisplayColorAttr(VtValue const &defaultValue, bool 
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetIconAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetIconAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodeIcon);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreateIconAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreateIconAttr(VtValue const &defaultValue,
+                                                   bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodeIcon,
                                     SdfValueTypeNames->Asset,
@@ -168,14 +154,13 @@ UsdUINodeGraphNodeAPI::CreateIconAttr(VtValue const &defaultValue, bool writeSpa
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetExpansionStateAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetExpansionStateAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodeExpansionState);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreateExpansionStateAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreateExpansionStateAttr(VtValue const &defaultValue,
+                                                             bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodeExpansionState,
                                     SdfValueTypeNames->Token,
@@ -185,14 +170,13 @@ UsdUINodeGraphNodeAPI::CreateExpansionStateAttr(VtValue const &defaultValue, boo
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::GetSizeAttr() const
+UsdAttribute UsdUINodeGraphNodeAPI::GetSizeAttr() const
 {
   return GetPrim().GetAttribute(UsdUITokens->uiNodegraphNodeSize);
 }
 
-UsdAttribute
-UsdUINodeGraphNodeAPI::CreateSizeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdUINodeGraphNodeAPI::CreateSizeAttr(VtValue const &defaultValue,
+                                                   bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdUITokens->uiNodegraphNodeSize,
                                     SdfValueTypeNames->Float2,
@@ -202,22 +186,20 @@ UsdUINodeGraphNodeAPI::CreateSizeAttr(VtValue const &defaultValue, bool writeSpa
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdUINodeGraphNodeAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdUINodeGraphNodeAPI::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdUITokens->uiNodegraphNodePos,
@@ -227,10 +209,8 @@ UsdUINodeGraphNodeAPI::GetSchemaAttributeNames(bool includeInherited)
       UsdUITokens->uiNodegraphNodeExpansionState,
       UsdUITokens->uiNodegraphNodeSize,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdAPISchemaBase::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

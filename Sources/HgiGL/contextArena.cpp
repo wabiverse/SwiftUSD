@@ -23,244 +23,206 @@
 //
 #include "Garch/glApi.h"
 
+#include "Hgi/graphicsCmdsDesc.h"
 #include "HgiGL/contextArena.h"
 #include "HgiGL/debugCodes.h"
 #include "HgiGL/diagnostic.h"
 #include "HgiGL/texture.h"
-#include "Hgi/graphicsCmdsDesc.h"
 
 #include "Tf/diagnostic.h"
-#include "Tf/weakPtr.h"
 #include "Tf/envSetting.h"
+#include "Tf/weakPtr.h"
 #include "Trace/traceImpl.h"
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(HGIGL_CONTEXT_ARENA_REPORT_ERRORS, true,
+TF_DEFINE_ENV_SETTING(HGIGL_CONTEXT_ARENA_REPORT_ERRORS,
+                      true,
                       "Report errors when FBOs managed by the cache aren't deleted successfully");
 
-namespace
+namespace {
+
+bool _IsErrorReportingEnabled()
 {
+  static bool reportErrors = TfGetEnvSetting(HGIGL_CONTEXT_ARENA_REPORT_ERRORS);
+  return reportErrors;
+}
 
-  bool
-  _IsErrorReportingEnabled()
+struct _FramebufferDesc {
+  _FramebufferDesc() = default;
+
+  _FramebufferDesc(HgiGraphicsCmdsDesc const &desc, bool resolved)
+      : depthFormat(desc.depthAttachmentDesc.format),
+        colorTextures(resolved && !desc.colorResolveTextures.empty() ? desc.colorResolveTextures :
+                                                                       desc.colorTextures),
+        depthTexture(resolved && desc.depthResolveTexture ? desc.depthResolveTexture :
+                                                            desc.depthTexture)
   {
-    static bool reportErrors =
-        TfGetEnvSetting(HGIGL_CONTEXT_ARENA_REPORT_ERRORS);
-    return reportErrors;
+    TF_VERIFY(colorTextures.size() == desc.colorAttachmentDescs.size(),
+              "Number of attachment descriptors and textures don't match");
   }
 
-  struct _FramebufferDesc
-  {
-    _FramebufferDesc() = default;
+  HgiFormat depthFormat;
+  HgiTextureHandleVector colorTextures;
+  HgiTextureHandle depthTexture;
+};
 
-    _FramebufferDesc(HgiGraphicsCmdsDesc const &desc, bool resolved)
-        : depthFormat(desc.depthAttachmentDesc.format), colorTextures(
-                                                            resolved && !desc.colorResolveTextures.empty()
-                                                                ? desc.colorResolveTextures
-                                                                : desc.colorTextures),
-          depthTexture(
-              resolved && desc.depthResolveTexture
-                  ? desc.depthResolveTexture
-                  : desc.depthTexture)
-    {
-      TF_VERIFY(
-          colorTextures.size() == desc.colorAttachmentDescs.size(),
-          "Number of attachment descriptors and textures don't match");
-    }
+bool operator==(const _FramebufferDesc &lhs, const _FramebufferDesc &rhs)
+{
+  return lhs.depthFormat == rhs.depthFormat && lhs.colorTextures == rhs.colorTextures &&
+         lhs.depthTexture == rhs.depthTexture;
+}
 
-    HgiFormat depthFormat;
-    HgiTextureHandleVector colorTextures;
-    HgiTextureHandle depthTexture;
-  };
+std::ostream &operator<<(std::ostream &out, const _FramebufferDesc &desc)
+{
+  out << "_FramebufferDesc: {";
 
-  bool operator==(
-      const _FramebufferDesc &lhs,
-      const _FramebufferDesc &rhs)
-  {
-    return lhs.depthFormat == rhs.depthFormat &&
-           lhs.colorTextures == rhs.colorTextures &&
-           lhs.depthTexture == rhs.depthTexture;
+  for (size_t i = 0; i < desc.colorTextures.size(); i++) {
+    out << "colorTexture" << i << " ";
+    out << "dimensions:" << desc.colorTextures[i]->GetDescriptor().dimensions << ", ";
   }
 
-  std::ostream &operator<<(
-      std::ostream &out,
-      const _FramebufferDesc &desc)
-  {
-    out << "_FramebufferDesc: {";
-
-    for (size_t i = 0; i < desc.colorTextures.size(); i++)
-    {
-      out << "colorTexture" << i << " ";
-      out << "dimensions:" << desc.colorTextures[i]->GetDescriptor().dimensions << ", ";
-    }
-
-    if (desc.depthTexture)
-    {
-      out << "depthFormat " << desc.depthFormat;
-      out << "depthTexture ";
-      out << "dimensions:" << desc.depthTexture->GetDescriptor().dimensions;
-    }
-
-    out << "}";
-    return out;
+  if (desc.depthTexture) {
+    out << "depthFormat " << desc.depthFormat;
+    out << "depthTexture ";
+    out << "dimensions:" << desc.depthTexture->GetDescriptor().dimensions;
   }
 
-  // -----------------------------------------------------------------------------
+  out << "}";
+  return out;
+}
 
-  // Simple struct that tracks a framebuffer object and its texture attachments
-  // for a descriptor.
-  struct _DescriptorCacheItem
-  {
-    _FramebufferDesc descriptor;
-    uint32_t framebuffer = 0;
-    HgiGLTextureConstPtrVector attachments;
-  };
+// -----------------------------------------------------------------------------
 
-  void
-  _CreateFramebuffer(
-      const _FramebufferDesc &desc,
-      uint32_t *const framebuffer,
-      HgiGLTextureConstPtrVector *const attachments)
-  {
-    // Create framebuffer
-    glCreateFramebuffers(1, framebuffer);
+// Simple struct that tracks a framebuffer object and its texture attachments
+// for a descriptor.
+struct _DescriptorCacheItem {
+  _FramebufferDesc descriptor;
+  uint32_t framebuffer = 0;
+  HgiGLTextureConstPtrVector attachments;
+};
 
-    // Bind color attachments
-    const size_t numColorAttachments = desc.colorTextures.size();
-    std::vector<GLenum> drawBuffers(numColorAttachments);
+void _CreateFramebuffer(const _FramebufferDesc &desc,
+                        uint32_t *const framebuffer,
+                        HgiGLTextureConstPtrVector *const attachments)
+{
+  // Create framebuffer
+  glCreateFramebuffers(1, framebuffer);
 
-    //
-    // Color attachments
-    //
-    for (size_t i = 0; i < numColorAttachments; i++)
-    {
-      HgiGLTexture *const glTexture = static_cast<HgiGLTexture *>(
-          desc.colorTextures[i].Get());
+  // Bind color attachments
+  const size_t numColorAttachments = desc.colorTextures.size();
+  std::vector<GLenum> drawBuffers(numColorAttachments);
 
-      if (!TF_VERIFY(glTexture, "Invalid attachment texture"))
-      {
-        continue;
-      }
+  //
+  // Color attachments
+  //
+  for (size_t i = 0; i < numColorAttachments; i++) {
+    HgiGLTexture *const glTexture = static_cast<HgiGLTexture *>(desc.colorTextures[i].Get());
 
-      attachments->emplace_back(glTexture);
-
-      const uint32_t textureName = glTexture->GetTextureId();
-      if (!TF_VERIFY(glIsTexture(textureName), "Attachment not a texture"))
-      {
-        continue;
-      }
-
-      glNamedFramebufferTexture(
-          *framebuffer,
-          GL_COLOR_ATTACHMENT0 + i,
-          textureName,
-          /*level*/ 0);
-
-      drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+    if (!TF_VERIFY(glTexture, "Invalid attachment texture")) {
+      continue;
     }
 
-    glNamedFramebufferDrawBuffers(
-        *framebuffer,
-        numColorAttachments,
-        drawBuffers.data());
+    attachments->emplace_back(glTexture);
 
-    //
-    // Depth attachment
-    //
-    if (desc.depthTexture)
-    {
-      HgiGLTexture *const glTexture =
-          static_cast<HgiGLTexture *>(desc.depthTexture.Get());
-
-      const uint32_t textureName = glTexture->GetTextureId();
-
-      attachments->emplace_back(glTexture);
-
-      if (TF_VERIFY(glIsTexture(textureName), "Attachment not a texture"))
-      {
-
-        const GLenum attachment =
-            (desc.depthFormat == HgiFormatFloat32UInt8) ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT;
-
-        glNamedFramebufferTexture(
-            *framebuffer,
-            attachment,
-            textureName,
-            0); // level
-      }
+    const uint32_t textureName = glTexture->GetTextureId();
+    if (!TF_VERIFY(glIsTexture(textureName), "Attachment not a texture")) {
+      continue;
     }
 
-    // Note that if color or depth is multi-sample, they both have to be for GL.
-    const GLenum status = glCheckNamedFramebufferStatus(
-        *framebuffer,
-        GL_FRAMEBUFFER);
-    TF_VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    glNamedFramebufferTexture(*framebuffer,
+                              GL_COLOR_ATTACHMENT0 + i,
+                              textureName,
+                              /*level*/ 0);
 
-    HGIGL_POST_PENDING_GL_ERRORS();
+    drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
   }
 
-  _DescriptorCacheItem *
-  _CreateDescriptorCacheItem(const _FramebufferDesc &desc)
-  {
-    TRACE_FUNCTION();
+  glNamedFramebufferDrawBuffers(*framebuffer, numColorAttachments, drawBuffers.data());
 
-    _DescriptorCacheItem *const dci = new _DescriptorCacheItem();
-    dci->descriptor = desc;
-    _CreateFramebuffer(desc, &dci->framebuffer, &dci->attachments);
+  //
+  // Depth attachment
+  //
+  if (desc.depthTexture) {
+    HgiGLTexture *const glTexture = static_cast<HgiGLTexture *>(desc.depthTexture.Get());
 
-    return dci;
-  }
+    const uint32_t textureName = glTexture->GetTextureId();
 
-  // Deletes the cache item and returns whether the associated framebuffer object
-  // was deleted successfully.
-  bool
-  _DestroyDescriptorCacheItem(_DescriptorCacheItem *dci, void *cache)
-  {
-    TRACE_FUNCTION();
+    attachments->emplace_back(glTexture);
 
-    bool fboDeleted = false;
-    if (dci->framebuffer)
-    {
-      if (glIsFramebuffer(dci->framebuffer))
-      {
-        TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE).Msg("Deleting FBO %u from cache cache %p\n", dci->framebuffer, cache);
+    if (TF_VERIFY(glIsTexture(textureName), "Attachment not a texture")) {
 
-        glDeleteFramebuffers(1, &dci->framebuffer);
-        dci->framebuffer = 0;
-        fboDeleted = true;
-      }
-      else if (_IsErrorReportingEnabled())
-      {
-        TF_CODING_ERROR("_DestroyDescriptorCacheItem: Found invalid "
-                        "framebuffer %d in cache.\n",
-                        dci->framebuffer);
-      }
+      const GLenum attachment = (desc.depthFormat == HgiFormatFloat32UInt8) ?
+                                    GL_DEPTH_STENCIL_ATTACHMENT :
+                                    GL_DEPTH_ATTACHMENT;
+
+      glNamedFramebufferTexture(*framebuffer, attachment, textureName,
+                                0);  // level
     }
-
-    HGIGL_POST_PENDING_GL_ERRORS();
-    delete dci;
-    return fboDeleted;
   }
 
-  // If any of the texture attachments of a framebuffer object were deleted,
-  // the cache item is deemed invalid.
-  bool
-  _IsValid(_DescriptorCacheItem *dci)
-  {
-    for (const HgiGLTextureConstPtr &texture : dci->attachments)
-    {
-      if (!texture)
-      { // TfWeakPtr validity check
-        return false;
-      }
+  // Note that if color or depth is multi-sample, they both have to be for GL.
+  const GLenum status = glCheckNamedFramebufferStatus(*framebuffer, GL_FRAMEBUFFER);
+  TF_VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+
+  HGIGL_POST_PENDING_GL_ERRORS();
+}
+
+_DescriptorCacheItem *_CreateDescriptorCacheItem(const _FramebufferDesc &desc)
+{
+  TRACE_FUNCTION();
+
+  _DescriptorCacheItem *const dci = new _DescriptorCacheItem();
+  dci->descriptor = desc;
+  _CreateFramebuffer(desc, &dci->framebuffer, &dci->attachments);
+
+  return dci;
+}
+
+// Deletes the cache item and returns whether the associated framebuffer object
+// was deleted successfully.
+bool _DestroyDescriptorCacheItem(_DescriptorCacheItem *dci, void *cache)
+{
+  TRACE_FUNCTION();
+
+  bool fboDeleted = false;
+  if (dci->framebuffer) {
+    if (glIsFramebuffer(dci->framebuffer)) {
+      TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE)
+          .Msg("Deleting FBO %u from cache cache %p\n", dci->framebuffer, cache);
+
+      glDeleteFramebuffers(1, &dci->framebuffer);
+      dci->framebuffer = 0;
+      fboDeleted = true;
     }
-    return true;
+    else if (_IsErrorReportingEnabled()) {
+      TF_CODING_ERROR(
+          "_DestroyDescriptorCacheItem: Found invalid "
+          "framebuffer %d in cache.\n",
+          dci->framebuffer);
+    }
   }
 
-} // end anonymous namespace
+  HGIGL_POST_PENDING_GL_ERRORS();
+  delete dci;
+  return fboDeleted;
+}
+
+// If any of the texture attachments of a framebuffer object were deleted,
+// the cache item is deemed invalid.
+bool _IsValid(_DescriptorCacheItem *dci)
+{
+  for (const HgiGLTextureConstPtr &texture : dci->attachments) {
+    if (!texture) {  // TfWeakPtr validity check
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // end anonymous namespace
 
 // -----------------------------------------------------------------------------
 // HgiGLContextArena::_FramebufferCache
@@ -275,9 +237,8 @@ using _DescriptorCacheVec = std::vector<_DescriptorCacheItem *>;
 // Although unbounded, we expect it be small with the expectation that
 // GarbageCollect() is called frequently (typically per frame).
 //
-class HgiGLContextArena::_FramebufferCache
-{
-public:
+class HgiGLContextArena::_FramebufferCache {
+ public:
   _FramebufferCache() = default;
 
   ~_FramebufferCache();
@@ -290,25 +251,21 @@ public:
   /// When the cmds descriptor has resolved textures, two framebuffers are
   /// created for the MSAA and for the resolved textures. The bool flag can
   /// be used to access the respective ones.
-  uint32_t AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc,
-                              bool resolved = false);
+  uint32_t AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc, bool resolved = false);
 
   /// Removes framebuffer entries that reference invalid texture handles from
   /// the cache.
   void GarbageCollect();
 
-private:
+ private:
   /// Clears all framebuffers from cache.
   /// This should generally only be called when the arena is being destroyed.
   void _Clear();
 
-  friend std::ostream &operator<<(
-      std::ostream &out,
-      const _FramebufferCache &fbc)
+  friend std::ostream &operator<<(std::ostream &out, const _FramebufferCache &fbc)
   {
     out << "_FramebufferCache: {" << std::endl;
-    for (_DescriptorCacheItem const *d : fbc._descriptorCache)
-    {
+    for (_DescriptorCacheItem const *d : fbc._descriptorCache) {
       out << "    " << d->descriptor << std::endl;
     }
     out << "}" << std::endl;
@@ -323,10 +280,8 @@ HgiGLContextArena::_FramebufferCache::~_FramebufferCache()
   _Clear();
 }
 
-uint32_t
-HgiGLContextArena::_FramebufferCache::AcquireFramebuffer(
-    HgiGraphicsCmdsDesc const &graphicsCmdsDesc,
-    const bool resolved)
+uint32_t HgiGLContextArena::_FramebufferCache::AcquireFramebuffer(
+    HgiGraphicsCmdsDesc const &graphicsCmdsDesc, const bool resolved)
 {
   TRACE_FUNCTION();
 
@@ -335,32 +290,30 @@ HgiGLContextArena::_FramebufferCache::AcquireFramebuffer(
   _FramebufferDesc desc(graphicsCmdsDesc, resolved);
 
   // Look for our framebuffer in cache based on the descriptor.
-  for (size_t i = 0; i < _descriptorCache.size(); i++)
-  {
+  for (size_t i = 0; i < _descriptorCache.size(); i++) {
     _DescriptorCacheItem *const item = _descriptorCache[i];
-    if (desc == item->descriptor)
-    {
-      if (glIsFramebuffer(item->framebuffer))
-      {
-        TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE).Msg("Cache Hit: Using FBO %u in cache %p.\n", item->framebuffer, &_descriptorCache);
+    if (desc == item->descriptor) {
+      if (glIsFramebuffer(item->framebuffer)) {
+        TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE)
+            .Msg("Cache Hit: Using FBO %u in cache %p.\n", item->framebuffer, &_descriptorCache);
 
         return item->framebuffer;
       }
-      else if (_IsErrorReportingEnabled())
-      {
-        TF_CODING_ERROR("AcquireFramebuffer: Found invalid framebuffer "
-                        "%d in cache.\n",
-                        item->framebuffer);
+      else if (_IsErrorReportingEnabled()) {
+        TF_CODING_ERROR(
+            "AcquireFramebuffer: Found invalid framebuffer "
+            "%d in cache.\n",
+            item->framebuffer);
       }
     }
   }
 
   // Create a new descriptor cache item if it was not found
-  if (!dci)
-  {
+  if (!dci) {
     dci = _CreateDescriptorCacheItem(desc);
     _descriptorCache.push_back(dci);
-    TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE).Msg("Cache Miss: Creating FBO %u in cache %p\n", dci->framebuffer, (void *)this);
+    TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE)
+        .Msg("Cache Miss: Creating FBO %u in cache %p\n", dci->framebuffer, (void *)this);
   }
 
   return dci->framebuffer;
@@ -373,25 +326,22 @@ void HgiGLContextArena::_FramebufferCache::GarbageCollect()
   const size_t numTotalEntries = _descriptorCache.size();
   size_t numStaleEntries = 0;
   // Remove FBO entries refering to texture attachments that were deleted.
-  for (auto it = _descriptorCache.begin(); it != _descriptorCache.end();)
-  {
+  for (auto it = _descriptorCache.begin(); it != _descriptorCache.end();) {
     _DescriptorCacheItem *const dci = *it;
 
-    if (!_IsValid(dci))
-    {
-      if (_DestroyDescriptorCacheItem(dci, (void *)this))
-      {
+    if (!_IsValid(dci)) {
+      if (_DestroyDescriptorCacheItem(dci, (void *)this)) {
         numStaleEntries++;
       }
       it = _descriptorCache.erase(it);
     }
-    else
-    {
+    else {
       it++;
     }
   }
 
-  TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE).Msg("Garbage collected %zu (of %zu) stale entries.\n", numStaleEntries, numTotalEntries);
+  TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE)
+      .Msg("Garbage collected %zu (of %zu) stale entries.\n", numStaleEntries, numTotalEntries);
 }
 
 void HgiGLContextArena::_FramebufferCache::_Clear()
@@ -400,16 +350,15 @@ void HgiGLContextArena::_FramebufferCache::_Clear()
 
   const size_t numTotalEntries = _descriptorCache.size();
   size_t numClearedEntries = 0;
-  for (_DescriptorCacheItem *dci : _descriptorCache)
-  {
-    if (_DestroyDescriptorCacheItem(dci, (void *)this))
-    {
+  for (_DescriptorCacheItem *dci : _descriptorCache) {
+    if (_DestroyDescriptorCacheItem(dci, (void *)this)) {
       numClearedEntries++;
     }
   }
   _descriptorCache.clear();
 
-  TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE).Msg("Cleared %zu (of %zu) entries.\n", numClearedEntries, numTotalEntries);
+  TF_DEBUG(HGIGL_DEBUG_FRAMEBUFFER_CACHE)
+      .Msg("Cleared %zu (of %zu) entries.\n", numClearedEntries, numTotalEntries);
 }
 
 // -----------------------------------------------------------------------------
@@ -417,17 +366,13 @@ void HgiGLContextArena::_FramebufferCache::_Clear()
 // -----------------------------------------------------------------------------
 
 HgiGLContextArena::HgiGLContextArena()
-    : _framebufferCache(
-          std::make_unique<HgiGLContextArena::_FramebufferCache>())
+    : _framebufferCache(std::make_unique<HgiGLContextArena::_FramebufferCache>())
 {
 }
 
 HgiGLContextArena::~HgiGLContextArena() = default;
 
-uint32_t
-HgiGLContextArena::_AcquireFramebuffer(
-    HgiGraphicsCmdsDesc const &desc,
-    bool resolved)
+uint32_t HgiGLContextArena::_AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc, bool resolved)
 {
   return _framebufferCache.get()->AcquireFramebuffer(desc, resolved);
 }
@@ -437,9 +382,7 @@ void HgiGLContextArena::_GarbageCollect()
   _framebufferCache.get()->GarbageCollect();
 }
 
-std::ostream &operator<<(
-    std::ostream &out,
-    const HgiGLContextArena &arena)
+std::ostream &operator<<(std::ostream &out, const HgiGLContextArena &arena)
 {
   out << *arena._framebufferCache.get();
   return out;

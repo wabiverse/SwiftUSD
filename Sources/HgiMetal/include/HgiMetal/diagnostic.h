@@ -26,9 +26,9 @@
 
 #include <Foundation/Foundation.hpp>
 
-#include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
 #include "Arch/functionLite.h"
+#include "HgiMetal/api.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -42,22 +42,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 HGIMETAL_API
 bool HgiMetalDebugEnabled();
 
-#define HGIMETAL_DEBUG_LABEL(_obj, label)                                              \
-  if (HgiMetalDebugEnabled())                                                          \
-  {                                                                                    \
+#define HGIMETAL_DEBUG_LABEL(_obj, label) \
+  if (HgiMetalDebugEnabled()) { \
     _obj->setLabel(NS::String::string(label, NS::StringEncoding::UTF8StringEncoding)); \
   }
 
-#define HGIMETAL_DEBUG_PUSH_GROUP(_obj, label)                                               \
-  if (HgiMetalDebugEnabled())                                                                \
-  {                                                                                          \
+#define HGIMETAL_DEBUG_PUSH_GROUP(_obj, label) \
+  if (HgiMetalDebugEnabled()) { \
     _obj->pushDebugGroup(NS::String::string(label, NS::StringEncoding::UTF8StringEncoding)); \
   }
 
 #define HGIMETAL_DEBUG_POP_GROUP(_obj) \
-  if (HgiMetalDebugEnabled())          \
-  {                                    \
-    _obj->popDebugGroup();             \
+  if (HgiMetalDebugEnabled()) { \
+    _obj->popDebugGroup(); \
   }
 
 /// Posts diagnostic errors for all Metal errors in the current context.

@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdUtils/flattenLayerStack.h"
 #include "Usd/flattenUtils.h"
 #include "Usd/prim.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -42,30 +42,21 @@ PXR_NAMESPACE_OPEN_SCOPE
 //   particular value types and fields.  It uses _ApplyLayerOffset()
 //   to handle time-remapping needed, depending on the field.
 
-SdfLayerRefPtr
-UsdUtilsFlattenLayerStack(const UsdStagePtr &stage, const std::string &tag)
+SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage, const std::string &tag)
 {
-  return UsdUtilsFlattenLayerStack(
-      stage, UsdUtilsFlattenLayerStackResolveAssetPath, tag);
+  return UsdUtilsFlattenLayerStack(stage, UsdUtilsFlattenLayerStackResolveAssetPath, tag);
 }
 
-SdfLayerRefPtr
-UsdUtilsFlattenLayerStack(
-    const UsdStagePtr &stage,
-    const UsdUtilsResolveAssetPathFn &resolveAssetPathFn,
-    const std::string &tag)
+SdfLayerRefPtr UsdUtilsFlattenLayerStack(const UsdStagePtr &stage,
+                                         const UsdUtilsResolveAssetPathFn &resolveAssetPathFn,
+                                         const std::string &tag)
 {
   PcpPrimIndex index = stage->GetPseudoRoot().GetPrimIndex();
-  return UsdFlattenLayerStack(
-      index.GetRootNode().GetLayerStack(),
-      resolveAssetPathFn,
-      tag);
+  return UsdFlattenLayerStack(index.GetRootNode().GetLayerStack(), resolveAssetPathFn, tag);
 }
 
-std::string
-UsdUtilsFlattenLayerStackResolveAssetPath(
-    const SdfLayerHandle &sourceLayer,
-    const std::string &assetPath)
+std::string UsdUtilsFlattenLayerStackResolveAssetPath(const SdfLayerHandle &sourceLayer,
+                                                      const std::string &assetPath)
 {
   return UsdFlattenLayerStackResolveAssetPath(sourceLayer, assetPath);
 }

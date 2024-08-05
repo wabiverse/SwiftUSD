@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HDPRMAN_COORD_SYS_PRIM_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HDPRMAN_COORD_SYS_PRIM_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,17 +34,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Plugin adds a scene index that adds coord system prims.
 ///
-class HdPrman_CoordSysPrimSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_CoordSysPrimSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_CoordSysPrimSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HDPRMAN_COORD_SYS_PRIM_SCENE_INDEX_PLUGIN_H
+#endif  // PXR_IMAGING_HDPRMAN_COORD_SYS_PRIM_SCENE_INDEX_PLUGIN_H

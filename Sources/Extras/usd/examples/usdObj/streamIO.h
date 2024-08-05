@@ -24,8 +24,8 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_IO_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_IO_H
 
-#include <pxr/pxrns.h>
 #include <iosfwd>
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -42,10 +42,8 @@ bool UsdObjReadDataFromFile(std::string const &fileName,
 /// Read obj data from \a stream into \a data.  Return true if successful, false
 /// otherwise.  If unsuccessful, return an error message in \a error if it is
 /// not null.
-bool UsdObjReadDataFromStream(std::istream &input,
-                              UsdObjStream *stream,
-                              std::string *error = 0);
+bool UsdObjReadDataFromStream(std::istream &input, UsdObjStream *stream, std::string *error = 0);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_IO_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_STREAM_IO_H

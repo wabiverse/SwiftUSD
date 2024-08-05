@@ -33,156 +33,136 @@
 
 #include "Hd/api.h"
 
+#include "Hd/geomSubsetsSchema.h"
 #include "Hd/meshTopologySchema.h"
 #include "Hd/subdivisionTagsSchema.h"
-#include "Hd/geomSubsetsSchema.h"
-
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDMESH_SCHEMA_TOKENS \
-    (mesh) \
-    (topology) \
-    (subdivisionScheme) \
-    (subdivisionTags) \
-    (geomSubsets) \
-    (doubleSided) \
+  (mesh)(topology)(subdivisionScheme)(subdivisionTags)(geomSubsets)(doubleSided)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMeshSchemaTokens, HD_API,
-    HDMESH_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMeshSchemaTokens, HD_API, HDMESH_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMeshSchema : public HdSchema
-{
-public:
-    HdMeshSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMeshSchema : public HdSchema {
+ public:
+  HdMeshSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdMeshTopologySchema GetTopology();
+  HD_API
+  HdTokenDataSourceHandle GetSubdivisionScheme();
+  HD_API
+  HdSubdivisionTagsSchema GetSubdivisionTags();
+  HD_API
+  HdGeomSubsetsSchema GetGeomSubsets();
+  HD_API
+  HdBoolDataSourceHandle GetDoubleSided();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdContainerDataSourceHandle &topology,
+      const HdTokenDataSourceHandle &subdivisionScheme,
+      const HdContainerDataSourceHandle &subdivisionTags,
+      const HdContainerDataSourceHandle &geomSubsets,
+      const HdBoolDataSourceHandle &doubleSided);
+
+  /// \class HdMeshSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdMeshTopologySchema GetTopology();
+    Builder &SetTopology(const HdContainerDataSourceHandle &topology);
     HD_API
-    HdTokenDataSourceHandle GetSubdivisionScheme();
+    Builder &SetSubdivisionScheme(const HdTokenDataSourceHandle &subdivisionScheme);
     HD_API
-    HdSubdivisionTagsSchema GetSubdivisionTags();
+    Builder &SetSubdivisionTags(const HdContainerDataSourceHandle &subdivisionTags);
     HD_API
-    HdGeomSubsetsSchema GetGeomSubsets();
+    Builder &SetGeomSubsets(const HdContainerDataSourceHandle &geomSubsets);
     HD_API
-    HdBoolDataSourceHandle GetDoubleSided();
+    Builder &SetDoubleSided(const HdBoolDataSourceHandle &doubleSided);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdContainerDataSourceHandle &topology,
-        const HdTokenDataSourceHandle &subdivisionScheme,
-        const HdContainerDataSourceHandle &subdivisionTags,
-        const HdContainerDataSourceHandle &geomSubsets,
-        const HdBoolDataSourceHandle &doubleSided
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMeshSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetTopology(
-            const HdContainerDataSourceHandle &topology);
-        HD_API
-        Builder &SetSubdivisionScheme(
-            const HdTokenDataSourceHandle &subdivisionScheme);
-        HD_API
-        Builder &SetSubdivisionTags(
-            const HdContainerDataSourceHandle &subdivisionTags);
-        HD_API
-        Builder &SetGeomSubsets(
-            const HdContainerDataSourceHandle &geomSubsets);
-        HD_API
-        Builder &SetDoubleSided(
-            const HdBoolDataSourceHandle &doubleSided);
+   private:
+    HdContainerDataSourceHandle _topology;
+    HdTokenDataSourceHandle _subdivisionScheme;
+    HdContainerDataSourceHandle _subdivisionTags;
+    HdContainerDataSourceHandle _geomSubsets;
+    HdBoolDataSourceHandle _doubleSided;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "mesh" from the parent container and constructs a
+  /// HdMeshSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdMeshSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdContainerDataSourceHandle _topology;
-        HdTokenDataSourceHandle _subdivisionScheme;
-        HdContainerDataSourceHandle _subdivisionTags;
-        HdContainerDataSourceHandle _geomSubsets;
-        HdBoolDataSourceHandle _doubleSided;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "mesh" from the parent container and constructs a
-    /// HdMeshSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdMeshSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the topology data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetTopologyLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the geomsubsets data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetGeomSubsetsLocator();
 
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the doublesided data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetDoubleSidedLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the topology data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetTopologyLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the subdivisiontags data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetSubdivisionTagsLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the geomsubsets data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetGeomSubsetsLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the doublesided data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetDoubleSidedLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the subdivisiontags data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetSubdivisionTagsLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the subdivisionscheme data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetSubdivisionSchemeLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the subdivisionscheme data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetSubdivisionSchemeLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

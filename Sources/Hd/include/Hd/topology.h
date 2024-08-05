@@ -34,11 +34,11 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdTopology {
-public:
+ public:
   typedef uint64_t ID;
 
-  HdTopology(){};
-  virtual ~HdTopology(){};
+  HdTopology() {};
+  virtual ~HdTopology() {};
 
   /// Returns the hash value of this topology to be used for instancing.
   virtual ID ComputeHash() const = 0;
@@ -49,4 +49,4 @@ std::ostream &operator<<(std::ostream &out, HdTopology const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_TOPOLOGY_H
+#endif  // PXR_IMAGING_HD_TOPOLOGY_H

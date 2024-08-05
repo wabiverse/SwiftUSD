@@ -27,33 +27,24 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdPrman_GprimBase::~HdPrman_GprimBase() = default; 
+HdPrman_GprimBase::~HdPrman_GprimBase() = default;
 
-void
-HdPrman_GprimBase::UpdateInstanceVisibility(bool vis,
-                                            riley::Riley *riley ) const
+void HdPrman_GprimBase::UpdateInstanceVisibility(bool vis, riley::Riley *riley) const
 {
-    for(auto instid : _instanceIds) {
-        RtParamList attrs;
-        attrs.SetInteger(RixStr.k_visibility_camera,
-                         static_cast<int>(vis));
-        attrs.SetInteger(RixStr.k_visibility_indirect,
-                         static_cast<int>(vis));
-        attrs.SetInteger(RixStr.k_visibility_transmission,
-                         static_cast<int>(vis));
-        riley->ModifyGeometryInstance(
-            riley::GeometryPrototypeId::InvalidId(),
-            instid, nullptr, nullptr,
-            nullptr, &attrs);
-    }
+  for (auto instid : _instanceIds) {
+    RtParamList attrs;
+    attrs.SetInteger(RixStr.k_visibility_camera, static_cast<int>(vis));
+    attrs.SetInteger(RixStr.k_visibility_indirect, static_cast<int>(vis));
+    attrs.SetInteger(RixStr.k_visibility_transmission, static_cast<int>(vis));
+    riley->ModifyGeometryInstance(
+        riley::GeometryPrototypeId::InvalidId(), instid, nullptr, nullptr, nullptr, &attrs);
+  }
 }
 
-std::vector<riley::GeometryPrototypeId> 
-HdPrman_GprimBase::GetPrototypeIds() const
+std::vector<riley::GeometryPrototypeId> HdPrman_GprimBase::GetPrototypeIds() const
 {
-    const std::vector<riley::GeometryPrototypeId> ret(_prototypeIds);
-    return ret;
+  const std::vector<riley::GeometryPrototypeId> ret(_prototypeIds);
+  return ret;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

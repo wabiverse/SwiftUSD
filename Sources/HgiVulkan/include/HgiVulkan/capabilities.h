@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGIVULKAN_CAPABILITIES_H
 #define PXR_IMAGING_HGIVULKAN_CAPABILITIES_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/capabilities.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ class HgiVulkanDevice;
 ///
 /// Reports the capabilities of the Vulkan device.
 ///
-class HgiVulkanCapabilities final : public HgiCapabilities
-{
-public:
+class HgiVulkanCapabilities final : public HgiCapabilities {
+ public:
   HGIVULKAN_API
   HgiVulkanCapabilities(HgiVulkanDevice *device);
 
@@ -55,14 +54,12 @@ public:
   bool supportsTimeStamps;
   VkPhysicalDeviceProperties vkDeviceProperties;
   VkPhysicalDeviceProperties2 vkDeviceProperties2;
-  VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT
-      vkVertexAttributeDivisorProperties;
+  VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT vkVertexAttributeDivisorProperties;
   VkPhysicalDeviceFeatures vkDeviceFeatures;
   VkPhysicalDeviceFeatures2 vkDeviceFeatures2;
   VkPhysicalDeviceVulkan11Features vkVulkan11Features;
   VkPhysicalDeviceDescriptorIndexingFeaturesEXT vkIndexingFeatures;
-  VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT
-      vkVertexAttributeDivisorFeatures;
+  VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT vkVertexAttributeDivisorFeatures;
   VkPhysicalDeviceMemoryProperties vkMemoryProperties;
 };
 

@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_CAPABILITIES_H
 #define PXR_IMAGING_HGI_CAPABILITIES_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
+#include <pxr/pxrns.h>
 
 #include <cstddef>
 
@@ -36,9 +36,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Reports the capabilities of the Hgi device.
 ///
-class HgiCapabilities
-{
-public:
+class HgiCapabilities {
+ public:
   HGI_API
   virtual ~HgiCapabilities() = 0;
 
@@ -83,20 +82,23 @@ public:
     return _pageSizeAlignment;
   }
 
-protected:
+ protected:
   HgiCapabilities()
-      : _maxUniformBlockSize(0), _maxShaderStorageBlockSize(0), _uniformBufferOffsetAlignment(0), _maxClipDistances(0), _pageSizeAlignment(1), _flags(0)
+      : _maxUniformBlockSize(0),
+        _maxShaderStorageBlockSize(0),
+        _uniformBufferOffsetAlignment(0),
+        _maxClipDistances(0),
+        _pageSizeAlignment(1),
+        _flags(0)
   {
   }
 
   void _SetFlag(HgiDeviceCapabilities mask, bool value)
   {
-    if (value)
-    {
+    if (value) {
       _flags |= mask;
     }
-    else
-    {
+    else {
       _flags &= ~mask;
     }
   }
@@ -107,7 +109,7 @@ protected:
   size_t _maxClipDistances;
   size_t _pageSizeAlignment;
 
-private:
+ private:
   HgiCapabilities &operator=(const HgiCapabilities &) = delete;
   HgiCapabilities(const HgiCapabilities &) = delete;
 

@@ -26,7 +26,7 @@
 #include "hdPrman/matfiltConvertPreviewMaterial.h"
 
 #if PXR_MATERIALX_SUPPORT_ENABLED
-#include "hdPrman/matfiltMaterialX.h"
+#  include "hdPrman/matfiltMaterialX.h"
 #endif
 
 #include "hdPrman/virtualStructResolvingSceneIndex.h"
@@ -44,22 +44,22 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (applyConditionals)((previewMatPluginName, "HdPrman_PreviewMaterialFilteringSceneIndexPlugin"))((materialXPluginName, "HdPrman_MaterialXFilteringSceneIndexPlugin"))((vstructPluginName, "HdPrman_VirtualStructResolvingSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         (applyConditionals)((previewMatPluginName,
+                                              "HdPrman_PreviewMaterialFilteringSceneIndexPlugin"))(
+                             (materialXPluginName, "HdPrman_MaterialXFilteringSceneIndexPlugin"))(
+                             (vstructPluginName,
+                              "HdPrman_VirtualStructResolvingSceneIndexPlugin")));
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _materialContextTokens,
-    (ri)(mtlx));
+TF_DEFINE_PRIVATE_TOKENS(_materialContextTokens, (ri)(mtlx));
 
 /// Ordering of the matfilt operations. This is necessary when using scene
 /// index plugins instead of a filter chain which is populated in the required
 /// order.
-enum _MatfiltOrder
-{
+enum _MatfiltOrder {
   Start = 0,
-  ConnectionResolve = 100, // vstruct
-  NodeTranslation = 110,   // matx, preview surface
+  ConnectionResolve = 100,  // vstruct
+  NodeTranslation = 110,    // matx, preview surface
   End = 200,
 };
 
@@ -73,14 +73,11 @@ static const bool _resolveVstructsWithConditionals = true;
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_PreviewMaterialFilteringSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_PreviewMaterialFilteringSceneIndexPlugin>();
 
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_MaterialXFilteringSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_MaterialXFilteringSceneIndexPlugin>();
 
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_VirtualStructResolvingSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_VirtualStructResolvingSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
@@ -88,22 +85,20 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _rendererDisplayName,
       _tokens->previewMatPluginName,
-      nullptr, // no argument data necessary
+      nullptr,  // no argument data necessary
       _MatfiltOrder::NodeTranslation,
       HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _rendererDisplayName,
       _tokens->materialXPluginName,
-      nullptr, // no argument data necessary
+      nullptr,  // no argument data necessary
       _MatfiltOrder::NodeTranslation,
       HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 
-  HdContainerDataSourceHandle const inputArgs =
-      HdRetainedContainerDataSource::New(
-          _tokens->applyConditionals,
-          HdRetainedTypedSampledDataSource<bool>::New(
-              _resolveVstructsWithConditionals));
+  HdContainerDataSourceHandle const inputArgs = HdRetainedContainerDataSource::New(
+      _tokens->applyConditionals,
+      HdRetainedTypedSampledDataSource<bool>::New(_resolveVstructsWithConditionals));
 
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _rendererDisplayName,
@@ -117,102 +112,85 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 // Scene Index Implementations
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace
-{
+namespace {
 
-  void
-  _TransformPreviewMaterialNetwork(
-      HdMaterialNetworkInterface *networkInterface)
+void _TransformPreviewMaterialNetwork(HdMaterialNetworkInterface *networkInterface)
+{
+  std::vector<std::string> errors;
+  MatfiltConvertPreviewMaterial(networkInterface, &errors);
+  if (!errors.empty()) {
+    TF_RUNTIME_ERROR("Error filtering preview material network for prim %s: %s\n",
+                     networkInterface->GetMaterialPrimPath().GetText(),
+                     TfStringJoin(errors).c_str());
+  }
+}
+
+TF_DECLARE_REF_PTRS(_PreviewMaterialFilteringSceneIndex);
+
+class _PreviewMaterialFilteringSceneIndex : public HdMaterialFilteringSceneIndexBase {
+ public:
+  static _PreviewMaterialFilteringSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputScene)
   {
-    std::vector<std::string> errors;
-    MatfiltConvertPreviewMaterial(networkInterface, &errors);
-    if (!errors.empty())
-    {
-      TF_RUNTIME_ERROR(
-          "Error filtering preview material network for prim %s: %s\n",
-          networkInterface->GetMaterialPrimPath().GetText(),
-          TfStringJoin(errors).c_str());
-    }
+    return TfCreateRefPtr(new _PreviewMaterialFilteringSceneIndex(inputScene));
   }
 
-  TF_DECLARE_REF_PTRS(_PreviewMaterialFilteringSceneIndex);
-
-  class _PreviewMaterialFilteringSceneIndex : public HdMaterialFilteringSceneIndexBase
+ protected:
+  _PreviewMaterialFilteringSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex)
+      : HdMaterialFilteringSceneIndexBase(inputSceneIndex)
   {
-  public:
-    static _PreviewMaterialFilteringSceneIndexRefPtr New(
-        const HdSceneIndexBaseRefPtr &inputScene)
-    {
-      return TfCreateRefPtr(
-          new _PreviewMaterialFilteringSceneIndex(inputScene));
-    }
+  }
 
-  protected:
-    _PreviewMaterialFilteringSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputSceneIndex)
-        : HdMaterialFilteringSceneIndexBase(inputSceneIndex)
-    {
-    }
+  FilteringFnc _GetFilteringFunction() const override
+  {
+    return _TransformPreviewMaterialNetwork;
+  }
+};
 
-    FilteringFnc _GetFilteringFunction() const override
-    {
-      return _TransformPreviewMaterialNetwork;
-    }
-  };
-
-  /// ----------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------
 
 #if PXR_MATERIALX_SUPPORT_ENABLED
 
-  void
-  _TransformMaterialXNetwork(
-      HdMaterialNetworkInterface *networkInterface)
+void _TransformMaterialXNetwork(HdMaterialNetworkInterface *networkInterface)
+{
+  std::vector<std::string> errors;
+  MatfiltMaterialX(networkInterface, &errors);
+  if (!errors.empty()) {
+    TF_RUNTIME_ERROR("Error filtering preview material network for prim %s: %s\n",
+                     networkInterface->GetMaterialPrimPath().GetText(),
+                     TfStringJoin(errors).c_str());
+  }
+}
+
+TF_DECLARE_REF_PTRS(_MaterialXFilteringSceneIndex);
+
+class _MaterialXFilteringSceneIndex : public HdMaterialFilteringSceneIndexBase {
+ public:
+  static _MaterialXFilteringSceneIndexRefPtr New(const HdSceneIndexBaseRefPtr &inputScene)
   {
-    std::vector<std::string> errors;
-    MatfiltMaterialX(networkInterface, &errors);
-    if (!errors.empty())
-    {
-      TF_RUNTIME_ERROR(
-          "Error filtering preview material network for prim %s: %s\n",
-          networkInterface->GetMaterialPrimPath().GetText(),
-          TfStringJoin(errors).c_str());
-    }
+    return TfCreateRefPtr(new _MaterialXFilteringSceneIndex(inputScene));
   }
 
-  TF_DECLARE_REF_PTRS(_MaterialXFilteringSceneIndex);
-
-  class _MaterialXFilteringSceneIndex : public HdMaterialFilteringSceneIndexBase
+ protected:
+  _MaterialXFilteringSceneIndex(const HdSceneIndexBaseRefPtr &inputSceneIndex)
+      : HdMaterialFilteringSceneIndexBase(inputSceneIndex)
   {
-  public:
-    static _MaterialXFilteringSceneIndexRefPtr New(
-        const HdSceneIndexBaseRefPtr &inputScene)
-    {
-      return TfCreateRefPtr(
-          new _MaterialXFilteringSceneIndex(inputScene));
-    }
+  }
 
-  protected:
-    _MaterialXFilteringSceneIndex(
-        const HdSceneIndexBaseRefPtr &inputSceneIndex)
-        : HdMaterialFilteringSceneIndexBase(inputSceneIndex)
-    {
-    }
-
-    FilteringFnc _GetFilteringFunction() const override
-    {
-      return _TransformMaterialXNetwork;
-    }
-  };
+  FilteringFnc _GetFilteringFunction() const override
+  {
+    return _TransformMaterialXNetwork;
+  }
+};
 
 #endif
 
-  /// ----------------------------------------------------------------------------
+/// ----------------------------------------------------------------------------
 
-  // Note: HdPrman_VirtualStructResolvingSceneIndex is defined in its own
-  // translation unit for unit testing purposes.
-  //
+// Note: HdPrman_VirtualStructResolvingSceneIndex is defined in its own
+// translation unit for unit testing purposes.
+//
 
-} // anonymous namespace
+}  // anonymous namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // Scene Index Plugin Implementations
@@ -221,10 +199,8 @@ namespace
 HdPrman_PreviewMaterialFilteringSceneIndexPlugin::
     HdPrman_PreviewMaterialFilteringSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_PreviewMaterialFilteringSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_PreviewMaterialFilteringSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   TF_UNUSED(inputArgs);
   return _PreviewMaterialFilteringSceneIndex::New(inputScene);
@@ -232,13 +208,10 @@ HdPrman_PreviewMaterialFilteringSceneIndexPlugin::_AppendSceneIndex(
 
 /// ----------------------------------------------------------------------------
 
-HdPrman_MaterialXFilteringSceneIndexPlugin::
-    HdPrman_MaterialXFilteringSceneIndexPlugin() = default;
+HdPrman_MaterialXFilteringSceneIndexPlugin::HdPrman_MaterialXFilteringSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_MaterialXFilteringSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_MaterialXFilteringSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   TF_UNUSED(inputArgs);
 #if PXR_MATERIALX_SUPPORT_ENABLED
@@ -250,13 +223,11 @@ HdPrman_MaterialXFilteringSceneIndexPlugin::_AppendSceneIndex(
 
 /// ----------------------------------------------------------------------------
 
-HdPrman_VirtualStructResolvingSceneIndexPlugin::
-    HdPrman_VirtualStructResolvingSceneIndexPlugin() = default;
+HdPrman_VirtualStructResolvingSceneIndexPlugin::HdPrman_VirtualStructResolvingSceneIndexPlugin() =
+    default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_VirtualStructResolvingSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_VirtualStructResolvingSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   bool applyConditionals = false;
   if (HdBoolDataSourceHandle val = HdBoolDataSource::Cast(
@@ -264,13 +235,10 @@ HdPrman_VirtualStructResolvingSceneIndexPlugin::_AppendSceneIndex(
   {
     applyConditionals = val->GetTypedValue(0.0f);
   }
-  else
-  {
-    TF_CODING_ERROR("Missing argument to plugin %s",
-                    _tokens->vstructPluginName.GetText());
+  else {
+    TF_CODING_ERROR("Missing argument to plugin %s", _tokens->vstructPluginName.GetText());
   }
-  return HdPrman_VirtualStructResolvingSceneIndex::New(
-      inputScene, applyConditionals);
+  return HdPrman_VirtualStructResolvingSceneIndex::New(inputScene, applyConditionals);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

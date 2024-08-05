@@ -28,48 +28,39 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((outputsRiSampleFilters, "outputs:ri:sampleFilters"))((outputsRiDisplayFilters, "outputs:ri:displayFilters")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((outputsRiSampleFilters, "outputs:ri:sampleFilters"))(
+                             (outputsRiDisplayFilters, "outputs:ri:displayFilters")));
 
-HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const &id)
-    : HdRenderSettings(id)
-{
-}
+HdPrman_RenderSettings::HdPrman_RenderSettings(SdfPath const &id) : HdRenderSettings(id) {}
 
 HdPrman_RenderSettings::~HdPrman_RenderSettings() = default;
 
-void HdPrman_RenderSettings::Finalize(HdRenderParam *renderParam)
-{
-}
+void HdPrman_RenderSettings::Finalize(HdRenderParam *renderParam) {}
 
-void HdPrman_RenderSettings::_Sync(
-    HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    const HdDirtyBits *dirtyBits)
+void HdPrman_RenderSettings::_Sync(HdSceneDelegate *sceneDelegate,
+                                   HdRenderParam *renderParam,
+                                   const HdDirtyBits *dirtyBits)
 {
   HdPrman_RenderParam *param = static_cast<HdPrman_RenderParam *>(renderParam);
 
-  if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings)
-  {
+  if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings) {
     // NamespacedSettings contains all the Prman-specific Render Settings
     const VtDictionary &namespacedSettings = GetNamespacedSettings();
 
     // Set the SampleFilters connected to this Render Settings prim
     const auto sampleFilterIt = namespacedSettings.find(
         _tokens->outputsRiSampleFilters.GetString());
-    if (sampleFilterIt != namespacedSettings.end())
-    {
+    if (sampleFilterIt != namespacedSettings.end()) {
       param->SetConnectedSampleFilterPaths(sceneDelegate,
                                            sampleFilterIt->second.GetWithDefault<SdfPathVector>());
     }
     // Set the DisplayFilters connected to this Render Settings prim
     const auto displayFilterIt = namespacedSettings.find(
         _tokens->outputsRiDisplayFilters.GetString());
-    if (displayFilterIt != namespacedSettings.end())
-    {
-      param->SetConnectedDisplayFilterPaths(sceneDelegate,
-                                            displayFilterIt->second.GetWithDefault<SdfPathVector>());
+    if (displayFilterIt != namespacedSettings.end()) {
+      param->SetConnectedDisplayFilterPaths(
+          sceneDelegate, displayFilterIt->second.GetWithDefault<SdfPathVector>());
     }
   }
 }

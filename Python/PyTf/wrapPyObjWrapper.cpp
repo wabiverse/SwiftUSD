@@ -35,22 +35,22 @@ PXR_NAMESPACE_USING_DIRECTIVE
 namespace {
 
 struct Tf_PyObjWrapperFromPython {
-  Tf_PyObjWrapperFromPython() {
-    converter::registry::push_back(&_convertible, &_construct,
-                                   boost::python::type_id<TfPyObjWrapper>());
+  Tf_PyObjWrapperFromPython()
+  {
+    converter::registry::push_back(
+        &_convertible, &_construct, boost::python::type_id<TfPyObjWrapper>());
   }
 
-private:
-  static void *_convertible(PyObject *o) {
+ private:
+  static void *_convertible(PyObject *o)
+  {
     // Can always put a python object in a TfPyObjWrapper.
     return o;
   }
 
-  static void _construct(PyObject *obj_ptr,
-                         converter::rvalue_from_python_stage1_data *data) {
-    void *storage =
-        ((converter::rvalue_from_python_storage<TfPyObjWrapper> *)data)
-            ->storage.bytes;
+  static void _construct(PyObject *obj_ptr, converter::rvalue_from_python_stage1_data *data)
+  {
+    void *storage = ((converter::rvalue_from_python_storage<TfPyObjWrapper> *)data)->storage.bytes;
     // Make a TfPyObjWrapper holding the Python object.
     new (storage) TfPyObjWrapper(object(borrowed(obj_ptr)));
     data->convertible = storage;
@@ -58,27 +58,31 @@ private:
 };
 
 struct Tf_PyObjWrapperToPython {
-  static PyObject *convert(TfPyObjWrapper const &val) {
+  static PyObject *convert(TfPyObjWrapper const &val)
+  {
     return incref(val.Get().ptr());
   }
 };
 
-static TfPyObjWrapper _RoundTripWrapperTest(TfPyObjWrapper const &wrapper) {
+static TfPyObjWrapper _RoundTripWrapperTest(TfPyObjWrapper const &wrapper)
+{
   return wrapper;
 }
 
-static TfPyObjWrapper _RoundTripWrapperCallTest(TfPyObjWrapper const &wrapper) {
+static TfPyObjWrapper _RoundTripWrapperCallTest(TfPyObjWrapper const &wrapper)
+{
   return wrapper();
 }
 
-static TfPyObjWrapper _RoundTripWrapperIndexTest(TfPyObjWrapper const &wrapper,
-                                                 int index) {
+static TfPyObjWrapper _RoundTripWrapperIndexTest(TfPyObjWrapper const &wrapper, int index)
+{
   return boost::python::object(wrapper[index]);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPyObjWrapper() {
+void wrapPyObjWrapper()
+{
   to_python_converter<TfPyObjWrapper, Tf_PyObjWrapperToPython>();
   Tf_PyObjWrapperFromPython();
 

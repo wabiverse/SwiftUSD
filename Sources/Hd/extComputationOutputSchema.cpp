@@ -30,77 +30,58 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens,
-    HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdExtComputationOutputSchemaTokens, HDEXTCOMPUTATIONOUTPUT_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdExtComputationOutputSchema::GetName()
+HdTokenDataSourceHandle HdExtComputationOutputSchema::GetName()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdExtComputationOutputSchemaTokens->name);
+  return _GetTypedDataSource<HdTokenDataSource>(HdExtComputationOutputSchemaTokens->name);
 }
 
-HdTupleTypeDataSourceHandle
-HdExtComputationOutputSchema::GetValueType()
+HdTupleTypeDataSourceHandle HdExtComputationOutputSchema::GetValueType()
 {
-    return _GetTypedDataSource<HdTupleTypeDataSource>(
-        HdExtComputationOutputSchemaTokens->valueType);
+  return _GetTypedDataSource<HdTupleTypeDataSource>(HdExtComputationOutputSchemaTokens->valueType);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdExtComputationOutputSchema::BuildRetained(
-        const HdTokenDataSourceHandle &name,
-        const HdTupleTypeDataSourceHandle &valueType
-)
+HdContainerDataSourceHandle HdExtComputationOutputSchema::BuildRetained(
+    const HdTokenDataSourceHandle &name, const HdTupleTypeDataSourceHandle &valueType)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (name) {
-        names[count] = HdExtComputationOutputSchemaTokens->name;
-        values[count++] = name;
-    }
+  size_t count = 0;
+  if (name) {
+    names[count] = HdExtComputationOutputSchemaTokens->name;
+    values[count++] = name;
+  }
 
-    if (valueType) {
-        names[count] = HdExtComputationOutputSchemaTokens->valueType;
-        values[count++] = valueType;
-    }
+  if (valueType) {
+    names[count] = HdExtComputationOutputSchemaTokens->valueType;
+    values[count++] = valueType;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-
-HdExtComputationOutputSchema::Builder &
-HdExtComputationOutputSchema::Builder::SetName(
+HdExtComputationOutputSchema::Builder &HdExtComputationOutputSchema::Builder::SetName(
     const HdTokenDataSourceHandle &name)
 {
-    _name = name;
-    return *this;
+  _name = name;
+  return *this;
 }
 
-HdExtComputationOutputSchema::Builder &
-HdExtComputationOutputSchema::Builder::SetValueType(
+HdExtComputationOutputSchema::Builder &HdExtComputationOutputSchema::Builder::SetValueType(
     const HdTupleTypeDataSourceHandle &valueType)
 {
-    _valueType = valueType;
-    return *this;
+  _valueType = valueType;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdExtComputationOutputSchema::Builder::Build()
+HdContainerDataSourceHandle HdExtComputationOutputSchema::Builder::Build()
 {
-    return HdExtComputationOutputSchema::BuildRetained(
-        _name,
-        _valueType
-    );
+  return HdExtComputationOutputSchema::BuildRetained(_name, _valueType);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

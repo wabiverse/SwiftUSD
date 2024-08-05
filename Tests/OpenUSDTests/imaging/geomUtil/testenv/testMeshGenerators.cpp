@@ -31,55 +31,44 @@
 #include "GeomUtil/sphereMeshGenerator.h"
 #include "PxOsd/meshTopology.h"
 
-#include "pxr/base/tf/errorMark.h"
 #include "pxr/base/gf/vec3d.h"
 #include "pxr/base/gf/vec3f.h"
+#include "pxr/base/tf/errorMark.h"
 #include "pxr/base/vt/array.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 PXR_NAMESPACE_USING_DIRECTIVE;
 
-namespace
+namespace {
+
+static void _LogHeader(std::string const &msg, std::ofstream &out)
 {
-
-  static void
-  _LogHeader(std::string const &msg, std::ofstream &out)
-  {
-    out << msg << std::endl;
-    out << std::string(msg.length(), '-') << std::endl;
-  }
-
-  static void
-  _LogFooter(std::ofstream &out)
-  {
-    out << std::endl
-        << std::endl;
-  }
-
-  template <typename T>
-  static void
-  _Log(PxOsdMeshTopology const &topology,
-       VtArray<T> const &points,
-       std::ofstream &out)
-  {
-    out << "Topology:\n";
-    out << "  " << topology << std::endl
-        << std::endl;
-
-    out << "Points:\n";
-    out << "  " << points << std::endl
-        << std::endl;
-  }
-
+  out << msg << std::endl;
+  out << std::string(msg.length(), '-') << std::endl;
 }
 
-static bool TestTopologyAndPointGeneration(
-    const float sweep, std::ofstream &out)
+static void _LogFooter(std::ofstream &out)
 {
-  const bool closedSweep =
-      GfIsClose(cos(GfDegreesToRadians(sweep)), 1.0, 1e-4);
+  out << std::endl << std::endl;
+}
+
+template<typename T>
+static void _Log(PxOsdMeshTopology const &topology, VtArray<T> const &points, std::ofstream &out)
+{
+  out << "Topology:\n";
+  out << "  " << topology << std::endl << std::endl;
+
+  out << "Points:\n";
+  out << "  " << points << std::endl << std::endl;
+}
+
+}  // namespace
+
+static bool TestTopologyAndPointGeneration(const float sweep, std::ofstream &out)
+{
+  const bool closedSweep = GfIsClose(cos(GfDegreesToRadians(sweep)), 1.0, 1e-4);
   {
     _LogHeader("1. Capsule", out);
 
@@ -88,33 +77,27 @@ static bool TestTopologyAndPointGeneration(
     const size_t numRadial = 10, numCapAxial = 4;
     const float radius = 0.5, height = 2;
 
-    out << "radius = " << radius
-        << ", height = " << height
-        << ", sweep = " << sweep
-        << std::endl
+    out << "radius = " << radius << ", height = " << height << ", sweep = " << sweep << std::endl
         << std::endl;
 
-    const PxOsdMeshTopology topology =
-        MeshGen::GenerateTopology(numRadial, numCapAxial, closedSweep);
+    const PxOsdMeshTopology topology = MeshGen::GenerateTopology(
+        numRadial, numCapAxial, closedSweep);
 
-    const size_t numPoints =
-        MeshGen::ComputeNumPoints(numRadial, numCapAxial, closedSweep);
+    const size_t numPoints = MeshGen::ComputeNumPoints(numRadial, numCapAxial, closedSweep);
     VtVec3fArray points(numPoints);
-    if (closedSweep)
-    {
-      MeshGen::GeneratePoints(
-          points.begin(), numRadial, numCapAxial, radius, height);
+    if (closedSweep) {
+      MeshGen::GeneratePoints(points.begin(), numRadial, numCapAxial, radius, height);
     }
-    else
-    {
-      MeshGen::GeneratePoints(
-          points.begin(), numRadial, numCapAxial,
-          /* bottomRadius =    */ radius,
-          /* topRadius    =    */ radius,
-          height,
-          /* bottomCapHeight = */ radius,
-          /* topCapHeight =    */ radius,
-          sweep);
+    else {
+      MeshGen::GeneratePoints(points.begin(),
+                              numRadial,
+                              numCapAxial,
+                              /* bottomRadius =    */ radius,
+                              /* topRadius    =    */ radius,
+                              height,
+                              /* bottomCapHeight = */ radius,
+                              /* topCapHeight =    */ radius,
+                              sweep);
     }
 
     _Log(topology, points, out);
@@ -130,20 +113,14 @@ static bool TestTopologyAndPointGeneration(
     const size_t numRadial = 10;
     const float radius = 0.5, height = 2;
 
-    out << "radius = " << radius
-        << ", height = " << height
-        << ", sweep = " << sweep
-        << std::endl
+    out << "radius = " << radius << ", height = " << height << ", sweep = " << sweep << std::endl
         << std::endl;
 
-    const PxOsdMeshTopology topology =
-        MeshGen::GenerateTopology(numRadial, closedSweep);
+    const PxOsdMeshTopology topology = MeshGen::GenerateTopology(numRadial, closedSweep);
 
-    const size_t numPoints =
-        MeshGen::ComputeNumPoints(numRadial, closedSweep);
+    const size_t numPoints = MeshGen::ComputeNumPoints(numRadial, closedSweep);
     VtVec3fArray points(numPoints);
-    MeshGen::GeneratePoints(
-        points.begin(), numRadial, radius, height, sweep);
+    MeshGen::GeneratePoints(points.begin(), numRadial, radius, height, sweep);
 
     _Log(topology, points, out);
 
@@ -157,8 +134,7 @@ static bool TestTopologyAndPointGeneration(
 
     const float side = 1.0;
 
-    out << "side = " << side << std::endl
-        << std::endl;
+    out << "side = " << side << std::endl << std::endl;
 
     const PxOsdMeshTopology topology = MeshGen::GenerateTopology();
 
@@ -179,30 +155,23 @@ static bool TestTopologyAndPointGeneration(
     const size_t numRadial = 10;
     const float radius = 0.5, height = 2;
 
-    out << "radius = " << radius
-        << ", height = " << height
-        << ", sweep = " << sweep
-        << std::endl
+    out << "radius = " << radius << ", height = " << height << ", sweep = " << sweep << std::endl
         << std::endl;
 
-    const PxOsdMeshTopology topology =
-        MeshGen::GenerateTopology(numRadial, closedSweep);
+    const PxOsdMeshTopology topology = MeshGen::GenerateTopology(numRadial, closedSweep);
 
-    const size_t numPoints =
-        MeshGen::ComputeNumPoints(numRadial, closedSweep);
+    const size_t numPoints = MeshGen::ComputeNumPoints(numRadial, closedSweep);
     VtVec3fArray points(numPoints);
-    if (closedSweep)
-    {
-      MeshGen::GeneratePoints(
-          points.begin(), numRadial, radius, height);
+    if (closedSweep) {
+      MeshGen::GeneratePoints(points.begin(), numRadial, radius, height);
     }
-    else
-    {
-      MeshGen::GeneratePoints(
-          points.begin(), numRadial,
-          /* bottomRadius = */ radius,
-          /* topRadius =    */ radius,
-          height, sweep);
+    else {
+      MeshGen::GeneratePoints(points.begin(),
+                              numRadial,
+                              /* bottomRadius = */ radius,
+                              /* topRadius =    */ radius,
+                              height,
+                              sweep);
     }
 
     _Log(topology, points, out);
@@ -218,19 +187,13 @@ static bool TestTopologyAndPointGeneration(
     const size_t numRadial = 10, numAxial = 10;
     const float radius = 0.5;
 
-    out << "radius = " << radius
-        << ", sweep = " << sweep
-        << std::endl
-        << std::endl;
+    out << "radius = " << radius << ", sweep = " << sweep << std::endl << std::endl;
 
-    const PxOsdMeshTopology topology =
-        MeshGen::GenerateTopology(numRadial, numAxial, closedSweep);
+    const PxOsdMeshTopology topology = MeshGen::GenerateTopology(numRadial, numAxial, closedSweep);
 
-    const size_t numPoints =
-        MeshGen::ComputeNumPoints(numRadial, numAxial, closedSweep);
+    const size_t numPoints = MeshGen::ComputeNumPoints(numRadial, numAxial, closedSweep);
     VtVec3fArray points(numPoints);
-    MeshGen::GeneratePoints(
-        points.begin(), numRadial, numAxial, radius, sweep);
+    MeshGen::GeneratePoints(points.begin(), numRadial, numAxial, radius, sweep);
 
     _Log(topology, points, out);
 
@@ -247,17 +210,16 @@ int main()
   std::ofstream out1("generatedMeshes_closed.txt");
   std::ofstream out2("generatedMeshes_open.txt");
 
-  bool success = TestTopologyAndPointGeneration(/*sweep = */ 360, out1) && TestTopologyAndPointGeneration(/*sweep = */ 120, out2);
+  bool success = TestTopologyAndPointGeneration(/*sweep = */ 360, out1) &&
+                 TestTopologyAndPointGeneration(/*sweep = */ 120, out2);
 
   TF_VERIFY(mark.IsClean());
 
-  if (success && mark.IsClean())
-  {
+  if (success && mark.IsClean()) {
     std::cout << "OK" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
+  else {
     std::cout << "FAILED" << std::endl;
     return EXIT_FAILURE;
   }

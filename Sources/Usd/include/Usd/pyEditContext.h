@@ -40,13 +40,12 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 // code.
 struct UsdPyEditContext {
   USD_API
-  explicit UsdPyEditContext(
-      const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget);
+  explicit UsdPyEditContext(const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget);
   USD_API
   explicit UsdPyEditContext(const UsdStagePtr &stage,
                             const UsdEditTarget &editTarget = UsdEditTarget());
 
-private:
+ private:
   friend struct Usd_PyEditContextAccess;
 
   UsdStagePtr _stage;
@@ -56,4 +55,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PY_EDIT_CONTEXT_H
+#endif  // PXR_USD_USD_PY_EDIT_CONTEXT_H

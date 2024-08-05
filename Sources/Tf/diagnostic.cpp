@@ -39,15 +39,16 @@
 
 #include "Arch/stackTrace.h"
 
+#include <csignal>
 #include <cstdio>
 #include <stdexcept>
-#include <csignal>
 
 using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(TF_DIAGNOSTIC_CODING_ERROR_TYPE, "Coding Error");
   TF_ADD_ENUM_NAME(TF_DIAGNOSTIC_FATAL_CODING_ERROR_TYPE, "Fatal Coding Error");
   TF_ADD_ENUM_NAME(TF_DIAGNOSTIC_RUNTIME_ERROR_TYPE, "Runtime Error");
@@ -58,7 +59,8 @@ TF_REGISTRY_FUNCTION(TfEnum) {
   TF_ADD_ENUM_NAME(TF_APPLICATION_EXIT_TYPE, "Application Exit");
 };
 
-char const *Tf_VerifyStringFormat(const char *format, ...) {
+char const *Tf_VerifyStringFormat(const char *format, ...)
+{
   va_list ap;
   va_start(ap, format);
   string s = TfVStringPrintf(format, ap);
@@ -66,10 +68,9 @@ char const *Tf_VerifyStringFormat(const char *format, ...) {
   return strdup(s.c_str());
 }
 
-bool Tf_FailedVerifyHelper(const TfCallContext &context, char const *condition,
-                           char const *msg) {
-  std::string errorMsg =
-      std::string("Failed verification: ' ") + condition + " '";
+bool Tf_FailedVerifyHelper(const TfCallContext &context, char const *condition, char const *msg)
+{
+  std::string errorMsg = std::string("Failed verification: ' ") + condition + " '";
 
   if (msg) {
     errorMsg += " -- ";
@@ -78,9 +79,9 @@ bool Tf_FailedVerifyHelper(const TfCallContext &context, char const *condition,
   }
 
   if (TfGetenvBool("TF_FATAL_VERIFY", false)) {
-    Tf_DiagnosticHelper(context, TF_DIAGNOSTIC_FATAL_ERROR_TYPE)
-        .IssueFatalError(errorMsg);
-  } else {
+    Tf_DiagnosticHelper(context, TF_DIAGNOSTIC_FATAL_ERROR_TYPE).IssueFatalError(errorMsg);
+  }
+  else {
     Tf_PostErrorHelper(context, TF_DIAGNOSTIC_CODING_ERROR_TYPE, errorMsg);
   }
 
@@ -108,11 +109,13 @@ bool Tf_FailedVerifyHelper(const TfCallContext &context, char const *condition,
  *
  * Finally, a program may also call std::terminate directly.
  */
-static void _BadThrowHandler() {
+static void _BadThrowHandler()
+{
   TF_FATAL_ERROR("std::terminate() called without a current exception");
 }
 
-void Tf_TerminateHandler() {
+void Tf_TerminateHandler()
+{
   string reason("<unknown reason>");
   string type("<unknown type>");
 
@@ -125,11 +128,13 @@ void Tf_TerminateHandler() {
      */
     std::set_terminate(_BadThrowHandler);
     throw;
-  } catch (std::bad_alloc const &exc) {
+  }
+  catch (std::bad_alloc const &exc) {
     std::set_terminate(Tf_TerminateHandler);
     reason = "allocation failed (you've run out of memory)";
     type = ArchGetDemangled(typeid(exc));
-  } catch (TfBaseException &exc) {
+  }
+  catch (TfBaseException &exc) {
     std::set_terminate(Tf_TerminateHandler);
     reason = exc.what();
     type = ArchGetDemangled(typeid(exc));
@@ -138,11 +143,13 @@ void Tf_TerminateHandler() {
     }
     throwContext = exc.GetThrowContext();
     exc.MoveThrowStackTo(throwStack);
-  } catch (std::exception const &exc) {
+  }
+  catch (std::exception const &exc) {
     std::set_terminate(Tf_TerminateHandler);
     reason = exc.what();
     type = ArchGetDemangled(typeid(exc));
-  } catch (...) {
+  }
+  catch (...) {
     std::set_terminate(Tf_TerminateHandler);
     /*
      * Unknown exception type.
@@ -159,31 +166,34 @@ void Tf_TerminateHandler() {
     std::stringstream throwStackText;
     ArchPrintStackFrames(throwStackText, throwStack);
     throwStackMsg = TfStringSplit(throwStackText.str(), "\n");
-    std::string throwContextMsg =
-        throwContext
-            ? TfStringPrintf("at %s (%s:%zu) ", throwContext.GetFunction(),
-                             throwContext.GetFile(), throwContext.GetLine())
-            : std::string();
+    std::string throwContextMsg = throwContext ? TfStringPrintf("at %s (%s:%zu) ",
+                                                                throwContext.GetFunction(),
+                                                                throwContext.GetFile(),
+                                                                throwContext.GetLine()) :
+                                                 std::string();
     ArchSetExtraLogInfoForErrors(
         TfStringPrintf("Unhandled %s exception: %s; "
                        "thrown %sfrom ",
-                       type.c_str(), reason.c_str(),
+                       type.c_str(),
+                       reason.c_str(),
                        throwContextMsg.empty() ? "" : throwContextMsg.c_str()),
         &throwStackMsg);
   }
 
-  TF_FATAL_ERROR(
-      throwStack.empty()
-          ? "Unhandled exception %s - '%s'"
-          : "Unhandled exception %s - '%s' (throw stack in crash report)",
-      reason.c_str(), type.c_str());
+  TF_FATAL_ERROR(throwStack.empty() ?
+                     "Unhandled exception %s - '%s'" :
+                     "Unhandled exception %s - '%s' (throw stack in crash report)",
+                 reason.c_str(),
+                 type.c_str());
 }
 
-void TfSetProgramNameForErrors(string const &programName) {
+void TfSetProgramNameForErrors(string const &programName)
+{
   ArchSetProgramNameForErrors(programName.c_str());
 }
 
-std::string TfGetProgramNameForErrors() {
+std::string TfGetProgramNameForErrors()
+{
   return ArchGetProgramNameForErrors();
 }
 
@@ -197,39 +207,38 @@ _fatalSignalHandler(int signo)
 {
   const char *msg = "unknown signal";
   switch (signo) {
-  case SIGSEGV:
-    msg = "received SIGSEGV";
-    break;
+    case SIGSEGV:
+      msg = "received SIGSEGV";
+      break;
 
 #if !defined(ARCH_OS_WINDOWS)
-  case SIGBUS:
-    msg = "received SIGBUS";
-    break;
+    case SIGBUS:
+      msg = "received SIGBUS";
+      break;
 #endif
 
-  case SIGFPE:
-    msg = "received SIGFPE";
-    break;
+    case SIGFPE:
+      msg = "received SIGFPE";
+      break;
 
-  case SIGABRT:
-    msg = "received SIGABRT";
-    break;
+    case SIGABRT:
+      msg = "received SIGABRT";
+      break;
 
-  case SIGILL:
-    msg = "received SIGILL";
-    break;
+    case SIGILL:
+      msg = "received SIGILL";
+      break;
 
 #if defined(_GNU_SOURCE)
-  default:
-    msg = strsignal(signo);
-    break;
+    default:
+      msg = strsignal(signo);
+      break;
 #endif
   }
 
   {
     Tf_ScopeDescriptionStackReportLock descStackReport;
-    ArchLogFatalProcessState(msg, /*message=*/nullptr,
-                             descStackReport.GetMessage());
+    ArchLogFatalProcessState(msg, /*message=*/nullptr, descStackReport.GetMessage());
   }
 
   // Fatal signal handlers should not return. If they do and the
@@ -246,7 +255,8 @@ _fatalSignalHandler(int signo)
   _exit(128 + signo);
 }
 
-void TfInstallTerminateAndCrashHandlers() {
+void TfInstallTerminateAndCrashHandlers()
+{
   std::set_terminate(Tf_TerminateHandler);
 #if defined(ARCH_OS_WINDOWS)
   signal(SIGSEGV, &_fatalSignalHandler);

@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdSkel/skeleton.h"
 #include "Usd/schemaBase.h"
+#include "UsdSkel/skeleton.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,68 +40,58 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateJointsAttr(UsdSkelSkeleton &self, object defaultVal, bool writeSparsely)
 {
+  return self.CreateJointsAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray),
+                               writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateJointNamesAttr(UsdSkelSkeleton &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
+{
+  return self.CreateJointNamesAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray),
+                                   writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateBindTransformsAttr(UsdSkelSkeleton &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
+{
+  return self.CreateBindTransformsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Matrix4dArray), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateJointsAttr(UsdSkelSkeleton &self,
-                    object defaultVal, bool writeSparsely)
-  {
-    return self.CreateJointsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray), writeSparsely);
-  }
+static UsdAttribute _CreateRestTransformsAttr(UsdSkelSkeleton &self,
+                                              object defaultVal,
+                                              bool writeSparsely)
+{
+  return self.CreateRestTransformsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Matrix4dArray), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateJointNamesAttr(UsdSkelSkeleton &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateJointNamesAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray), writeSparsely);
-  }
+static std::string _Repr(const UsdSkelSkeleton &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSkel.Skeleton(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateBindTransformsAttr(UsdSkelSkeleton &self,
-                            object defaultVal, bool writeSparsely)
-  {
-    return self.CreateBindTransformsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Matrix4dArray), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateRestTransformsAttr(UsdSkelSkeleton &self,
-                            object defaultVal, bool writeSparsely)
-  {
-    return self.CreateRestTransformsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Matrix4dArray), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdSkelSkeleton &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSkel.Skeleton(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSkelSkeleton()
 {
   typedef UsdSkelSkeleton This;
 
-  class_<This, bases<UsdGeomBoundable>>
-      cls("Skeleton");
+  class_<This, bases<UsdGeomBoundable>> cls("Skeleton");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -117,39 +107,32 @@ void wrapUsdSkelSkeleton()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetJointsAttr",
-           &This::GetJointsAttr)
+      .def("GetJointsAttr", &This::GetJointsAttr)
       .def("CreateJointsAttr",
            &_CreateJointsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetJointNamesAttr",
-           &This::GetJointNamesAttr)
+      .def("GetJointNamesAttr", &This::GetJointNamesAttr)
       .def("CreateJointNamesAttr",
            &_CreateJointNamesAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBindTransformsAttr",
-           &This::GetBindTransformsAttr)
+      .def("GetBindTransformsAttr", &This::GetBindTransformsAttr)
       .def("CreateBindTransformsAttr",
            &_CreateBindTransformsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetRestTransformsAttr",
-           &This::GetRestTransformsAttr)
+      .def("GetRestTransformsAttr", &This::GetRestTransformsAttr)
       .def("CreateRestTransformsAttr",
            &_CreateRestTransformsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -175,11 +158,8 @@ void wrapUsdSkelSkeleton()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-} // anonymous namespace
+}  // anonymous namespace

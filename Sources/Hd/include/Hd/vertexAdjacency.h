@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HD_VERTEX_ADJACENCY_H
 #define PXR_IMAGING_HD_VERTEX_ADJACENCY_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/array.h"
 
@@ -33,9 +33,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-using Hd_VertexAdjacencySharedPtr = 
-    std::shared_ptr<class Hd_VertexAdjacency>;
+using Hd_VertexAdjacencySharedPtr = std::shared_ptr<class Hd_VertexAdjacency>;
 
 class HdMeshTopology;
 
@@ -72,36 +70,36 @@ class HdMeshTopology;
 ///   Offset / Count pairs        ||            Prev / Next Pairs
 ///      per vertex               ||           Per Vertex, Per Face.
 ///
-class Hd_VertexAdjacency final
-{
-public:
-    HD_API
-    Hd_VertexAdjacency();
+class Hd_VertexAdjacency final {
+ public:
+  HD_API
+  Hd_VertexAdjacency();
 
-    HD_API
-    ~Hd_VertexAdjacency();
+  HD_API
+  ~Hd_VertexAdjacency();
 
-    /// Updates the internal adjacency table using the supplied topology.
-    /// Important! The adjacency table needs to be computed before smooth
-    /// normals.
-    HD_API
-    void BuildAdjacencyTable(HdMeshTopology const *topology);
+  /// Updates the internal adjacency table using the supplied topology.
+  /// Important! The adjacency table needs to be computed before smooth
+  /// normals.
+  HD_API
+  void BuildAdjacencyTable(HdMeshTopology const *topology);
 
-    /// Returns the number of points in the adjacency table.
-    int GetNumPoints() const {
-        return _numPoints;
-    }
+  /// Returns the number of points in the adjacency table.
+  int GetNumPoints() const
+  {
+    return _numPoints;
+  }
 
-    /// Returns the adjacency table.
-    VtIntArray const &GetAdjacencyTable() const {
-        return _adjacencyTable;
-    }
+  /// Returns the adjacency table.
+  VtIntArray const &GetAdjacencyTable() const
+  {
+    return _adjacencyTable;
+  }
 
-private:
-    int _numPoints;
-    VtIntArray _adjacencyTable;
+ private:
+  int _numPoints;
+  VtIntArray _adjacencyTable;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -29,7 +29,7 @@
 /// Provide architecture-specific memory-alignment information.
 
 #if !defined(__cplusplus)
-#error This include file can only be included in C++ programs.
+#  error This include file can only be included in C++ programs.
 #endif
 
 #include "Arch/api.h"
@@ -50,7 +50,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// returns the amount that would actually be consumed by the system to
 /// satisfy it. This is needed for efficient user-defined memory management.
 ///
-inline size_t ArchAlignMemorySize(size_t nBytes) {
+inline size_t ArchAlignMemorySize(size_t nBytes)
+{
   return (nBytes + 7) & (~0x7);
 }
 
@@ -67,18 +68,18 @@ inline size_t ArchAlignMemorySize(size_t nBytes) {
 /// This will take a pointer and bump it to the next ideal alignment boundary
 /// that will work for all data types.
 ///
-inline void *ArchAlignMemory(void *base) {
-  return reinterpret_cast<void *>((reinterpret_cast<uintptr_t>(base) + 7) &
-                                  ~0x7);
+inline void *ArchAlignMemory(void *base)
+{
+  return reinterpret_cast<void *>((reinterpret_cast<uintptr_t>(base) + 7) & ~0x7);
 }
 
 /// The size of a CPU cache line on the current processor architecture in bytes.
 ///
 /// \hideinitializer
 #if defined(ARCH_OS_DARWIN) && defined(ARCH_CPU_ARM)
-#define ARCH_CACHE_LINE_SIZE 128
+#  define ARCH_CACHE_LINE_SIZE 128
 #else
-#define ARCH_CACHE_LINE_SIZE 64
+#  define ARCH_CACHE_LINE_SIZE 64
 #endif
 
 /// Aligned memory allocation.
@@ -93,4 +94,4 @@ void ArchAlignedFree(void *ptr);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_ALIGN_H
+#endif  // PXR_BASE_ARCH_ALIGN_H

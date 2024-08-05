@@ -23,8 +23,8 @@
 //
 /// \file wrapStitch.cpp
 
-#include <pxr/pxrns.h>
 #include <boost/python/def.hpp>
+#include <pxr/pxrns.h>
 
 #include "UsdUtils/stitch.h"
 

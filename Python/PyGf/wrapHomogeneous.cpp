@@ -31,14 +31,13 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapHomogeneous() {
+void wrapHomogeneous()
+{
   def("GetHomogenized", (GfVec4d(*)(const GfVec4d &))GfGetHomogenized);
   def("GetHomogenized", (GfVec4f(*)(const GfVec4f &))GfGetHomogenized);
 
-  def("HomogeneousCross",
-      (GfVec4d(*)(const GfVec4d &, const GfVec4d &))GfHomogeneousCross);
-  def("HomogeneousCross",
-      (GfVec4f(*)(const GfVec4f &, const GfVec4f &))GfHomogeneousCross);
+  def("HomogeneousCross", (GfVec4d(*)(const GfVec4d &, const GfVec4d &))GfHomogeneousCross);
+  def("HomogeneousCross", (GfVec4f(*)(const GfVec4f &, const GfVec4f &))GfHomogeneousCross);
 
   def("Project", (GfVec3d(*)(const GfVec4d &))GfProject);
   def("Project", (GfVec3f(*)(const GfVec4f &))GfProject);

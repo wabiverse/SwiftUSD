@@ -59,12 +59,12 @@ class SdfLayerTree : public TfRefBase, public TfWeakBase {
   SdfLayerTree(const SdfLayerTree &) = delete;
   SdfLayerTree &operator=(const SdfLayerTree &) = delete;
 
-public:
+ public:
   /// Create a new layer tree node.
   SDF_API
-  static SdfLayerTreeHandle
-  New(const SdfLayerHandle &layer, const SdfLayerTreeHandleVector &childTrees,
-      const SdfLayerOffset &cumulativeOffset = SdfLayerOffset());
+  static SdfLayerTreeHandle New(const SdfLayerHandle &layer,
+                                const SdfLayerTreeHandleVector &childTrees,
+                                const SdfLayerOffset &cumulativeOffset = SdfLayerOffset());
 
   /// Returns the layer handle this tree node represents.
   SDF_API const SdfLayerHandle &GetLayer() const;
@@ -75,12 +75,12 @@ public:
   /// Returns the children of this tree node.
   SDF_API const SdfLayerTreeHandleVector &GetChildTrees() const;
 
-private:
+ private:
   SdfLayerTree(const SdfLayerHandle &layer,
                const SdfLayerTreeHandleVector &childTrees,
                const SdfLayerOffset &cumulativeOffset);
 
-private:
+ private:
   const SdfLayerHandle _layer;
   const SdfLayerOffset _offset;
   const SdfLayerTreeHandleVector _childTrees;
@@ -88,4 +88,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LAYER_TREE_H
+#endif  // PXR_USD_SDF_LAYER_TREE_H

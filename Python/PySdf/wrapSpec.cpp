@@ -40,14 +40,18 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static VtValue _WrapGetInfo(SdfSpec &self, const TfToken &name) {
+static VtValue _WrapGetInfo(SdfSpec &self, const TfToken &name)
+{
   return self.GetInfo(name);
 }
 
-static bool _WrapIsInertProperty(SdfSpec &self) { return self.IsInert(); }
+static bool _WrapIsInertProperty(SdfSpec &self)
+{
+  return self.IsInert();
+}
 
-static void _WrapSetInfo(SdfSpec &self, const TfToken &name,
-                         const object &pyObj) {
+static void _WrapSetInfo(SdfSpec &self, const TfToken &name, const object &pyObj)
+{
   VtValue fallback;
   if (!self.GetSchema().IsRegistered(name, &fallback)) {
     TF_CODING_ERROR("Invalid info key: %s", name.GetText());
@@ -57,16 +61,20 @@ static void _WrapSetInfo(SdfSpec &self, const TfToken &name,
   VtValue value;
   if (fallback.IsEmpty()) {
     value = extract<VtValue>(pyObj)();
-  } else {
+  }
+  else {
     // We have to handle a few things as special cases to disambiguate
     // types from Python.
     if (fallback.IsHolding<SdfPath>()) {
       value = extract<SdfPath>(pyObj)();
-    } else if (fallback.IsHolding<TfTokenVector>()) {
+    }
+    else if (fallback.IsHolding<TfTokenVector>()) {
       value = extract<TfTokenVector>(pyObj)();
-    } else if (fallback.IsHolding<SdfVariantSelectionMap>()) {
+    }
+    else if (fallback.IsHolding<SdfVariantSelectionMap>()) {
       value = extract<SdfVariantSelectionMap>(pyObj)();
-    } else {
+    }
+    else {
       value = extract<VtValue>(pyObj)();
       value.CastToTypeOf(fallback);
     }
@@ -80,7 +88,8 @@ static void _WrapSetInfo(SdfSpec &self, const TfToken &name,
   self.SetInfo(name, value);
 }
 
-static std::string _GetAsText(const SdfSpecHandle &self) {
+static std::string _GetAsText(const SdfSpecHandle &self)
+{
   if (!self) {
     return TfPyRepr(self);
   }
@@ -89,9 +98,10 @@ static std::string _GetAsText(const SdfSpecHandle &self) {
   return stream.str();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapSpec() {
+void wrapSpec()
+{
   typedef SdfSpec This;
 
   class_<This, SdfHandle<This>, boost::noncopyable>("Spec", no_init)
@@ -102,9 +112,9 @@ void wrapSpec() {
 
       .def("GetAsText", &_GetAsText)
 
-      .def("ListInfoKeys", &This::ListInfoKeys,
-           return_value_policy<TfPySequenceToList>())
-      .def("GetMetaDataInfoKeys", &This::GetMetaDataInfoKeys,
+      .def("ListInfoKeys", &This::ListInfoKeys, return_value_policy<TfPySequenceToList>())
+      .def("GetMetaDataInfoKeys",
+           &This::GetMetaDataInfoKeys,
            return_value_policy<TfPySequenceToList>())
 
       .def("GetMetaDataDisplayGroup", &This::GetMetaDataDisplayGroup)
@@ -112,7 +122,8 @@ void wrapSpec() {
       .def("GetInfo", &_WrapGetInfo)
       .def("SetInfo", &_WrapSetInfo)
       .def("SetInfoDictionaryValue", &This::SetInfoDictionaryValue)
-      .def("HasInfo", &This::HasInfo,
+      .def("HasInfo",
+           &This::HasInfo,
            "HasInfo(key) -> bool\n\n"
 
            "key : string\n\n"
@@ -135,7 +146,8 @@ void wrapSpec() {
            "A spec may or may not have an expressed value for "
            "some of its scene spec info.")
 
-      .def("ClearInfo", &This::ClearInfo,
+      .def("ClearInfo",
+           &This::ClearInfo,
            "ClearInfo(key)\n\n"
 
            "key : string\nn"
@@ -146,7 +158,8 @@ void wrapSpec() {
            "spec info.",
            (arg("key")))
 
-      .def("GetTypeForInfo", &This::GetTypeForInfo,
+      .def("GetTypeForInfo",
+           &This::GetTypeForInfo,
            "GetTypeForInfo(key)\n\n"
 
            "key : string\n\n"
@@ -154,25 +167,26 @@ void wrapSpec() {
            "Returns the type of value for the given key. ")
 
       .def("GetFallbackForInfo",
-           make_function(&This::GetFallbackForInfo,
-                         return_value_policy<return_by_value>()),
+           make_function(&This::GetFallbackForInfo, return_value_policy<return_by_value>()),
            "GetFallbackForInfo(key)\n\n"
 
            "key : string\n\n"
 
            "Returns the fallback value for the given key. ")
 
-      .add_property(
-          "isInert", &_WrapIsInertProperty,
-          "Indicates whether this spec has any significant data. This is "
-          "for backwards compatibility, use IsInert instead.\n\n"
+      .add_property("isInert",
+                    &_WrapIsInertProperty,
+                    "Indicates whether this spec has any significant data. This is "
+                    "for backwards compatibility, use IsInert instead.\n\n"
 
-          "Compatibility note: prior to presto 1.9, isInert (then isEmpty) "
-          "was true for otherwise inert PrimSpecs with inert inherits, "
-          "references, or variant sets. isInert is now false in such "
-          "conditions.")
+                    "Compatibility note: prior to presto 1.9, isInert (then isEmpty) "
+                    "was true for otherwise inert PrimSpecs with inert inherits, "
+                    "references, or variant sets. isInert is now false in such "
+                    "conditions.")
 
-      .def("IsInert", &This::IsInert, (arg("ignoreChildren") = false),
+      .def("IsInert",
+           &This::IsInert,
+           (arg("ignoreChildren") = false),
 
            "Indicates whether this spec has any significant data. "
            "If ignoreChildren is true, child scenegraph objects will be "

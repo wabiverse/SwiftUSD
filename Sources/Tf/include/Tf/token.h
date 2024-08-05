@@ -85,22 +85,27 @@ struct TfTokenFastArbitraryLessThan;
 /// \c char* is provided.
 ///
 class TfToken {
-public:
+ public:
   enum _ImmortalTag { Immortal };
 
   /// Create the empty token, containing the empty string.
   constexpr TfToken() noexcept {}
 
   /// Copy constructor.
-  TfToken(TfToken const &rhs) noexcept : _rep(rhs._rep) { _AddRef(); }
+  TfToken(TfToken const &rhs) noexcept : _rep(rhs._rep)
+  {
+    _AddRef();
+  }
 
   /// Move constructor.
-  TfToken(TfToken &&rhs) noexcept : _rep(rhs._rep) {
+  TfToken(TfToken &&rhs) noexcept : _rep(rhs._rep)
+  {
     rhs._rep = TfPointerAndBits<const _Rep>();
   }
 
   /// Copy assignment.
-  TfToken &operator=(TfToken const &rhs) noexcept {
+  TfToken &operator=(TfToken const &rhs) noexcept
+  {
     if (&rhs != this) {
       rhs._AddRef();
       _RemoveRef();
@@ -110,7 +115,8 @@ public:
   }
 
   /// Move assignment.
-  TfToken &operator=(TfToken &&rhs) noexcept {
+  TfToken &operator=(TfToken &&rhs) noexcept
+  {
     if (&rhs != this) {
       _RemoveRef();
       _rep = rhs._rep;
@@ -120,7 +126,10 @@ public:
   }
 
   /// Destructor.
-  ~TfToken() { _RemoveRef(); }
+  ~TfToken()
+  {
+    _RemoveRef();
+  }
 
   /// Acquire a token for the given string.
   //
@@ -163,7 +172,10 @@ public:
 
   /// Functor to use for hash maps from tokens to other things.
   struct HashFunctor {
-    size_t operator()(TfToken const &token) const { return token.Hash(); }
+    size_t operator()(TfToken const &token) const
+    {
+      return token.Hash();
+    }
   };
 
   /// \typedef TfHashSet<TfToken, TfToken::HashFunctor> HashSet;
@@ -182,7 +194,8 @@ public:
   typedef std::set<TfToken, TfTokenFastArbitraryLessThan> Set;
 
   /// Return the size of the string that this token represents.
-  size_t size() const {
+  size_t size() const
+  {
     _Rep const *rep = _rep.Get();
     return rep ? rep->_str.size() : 0;
   }
@@ -192,31 +205,43 @@ public:
   /// \note The returned pointer value is not valid after this TfToken
   /// object has been destroyed.
   ///
-  char const *GetText() const {
+  char const *GetText() const
+  {
     _Rep const *rep = _rep.Get();
     return rep ? rep->_str.c_str() : "";
   }
 
   /// Synonym for GetText().
-  char const *data() const { return GetText(); }
+  char const *data() const
+  {
+    return GetText();
+  }
 
   /// Return the string that this token represents.
-  std::string const &GetString() const {
+  std::string const &GetString() const
+  {
     _Rep const *rep = _rep.Get();
     return rep ? rep->_str : _GetEmptyString();
   }
 
   /// Swap this token with another.
-  inline void Swap(TfToken &other) { std::swap(_rep, other._rep); }
+  inline void Swap(TfToken &other)
+  {
+    std::swap(_rep, other._rep);
+  }
 
   /// Equality operator
-  bool operator==(TfToken const &o) const {
+  bool operator==(TfToken const &o) const
+  {
     // Equal if pointers & bits are equal, or if just pointers are.
     return _rep.Get() == o._rep.Get();
   }
 
   /// Equality operator
-  bool operator!=(TfToken const &o) const { return !(*this == o); }
+  bool operator!=(TfToken const &o) const
+  {
+    return !(*this == o);
+  }
 
   /// Equality operator for \c char strings.  Not as fast as direct
   /// token to token equality testing
@@ -227,32 +252,47 @@ public:
   TF_API bool operator==(const char *) const;
 
   /// \overload
-  friend bool operator==(std::string const &o, TfToken const &t) {
+  friend bool operator==(std::string const &o, TfToken const &t)
+  {
     return t == o;
   }
 
   /// \overload
-  friend bool operator==(const char *o, TfToken const &t) { return t == o; }
+  friend bool operator==(const char *o, TfToken const &t)
+  {
+    return t == o;
+  }
 
   /// Inequality operator for \c string's.  Not as fast as direct
   /// token to token equality testing
-  bool operator!=(std::string const &o) const { return !(*this == o); }
+  bool operator!=(std::string const &o) const
+  {
+    return !(*this == o);
+  }
 
   /// \overload
-  friend bool operator!=(std::string const &o, TfToken const &t) {
+  friend bool operator!=(std::string const &o, TfToken const &t)
+  {
     return !(t == o);
   }
 
   /// Inequality operator for \c char strings.  Not as fast as direct
   /// token to token equality testing
-  bool operator!=(char const *o) const { return !(*this == o); }
+  bool operator!=(char const *o) const
+  {
+    return !(*this == o);
+  }
 
   /// \overload
-  friend bool operator!=(char const *o, TfToken const &t) { return !(t == o); }
+  friend bool operator!=(char const *o, TfToken const &t)
+  {
+    return !(t == o);
+  }
 
   /// Less-than operator that compares tokenized strings lexicographically.
   /// Allows \c TfToken to be used in \c std::set
-  inline bool operator<(TfToken const &r) const {
+  inline bool operator<(TfToken const &r) const
+  {
     auto ll = _rep.GetLiteral(), rl = r._rep.GetLiteral();
     if (ll && rl) {
       auto lrep = _rep.Get(), rrep = r._rep.Get();
@@ -264,39 +304,61 @@ public:
   }
 
   /// Greater-than operator that compares tokenized strings lexicographically.
-  inline bool operator>(TfToken const &o) const { return o < *this; }
+  inline bool operator>(TfToken const &o) const
+  {
+    return o < *this;
+  }
 
   /// Greater-than-or-equal operator that compares tokenized strings
   /// lexicographically.
-  inline bool operator>=(TfToken const &o) const { return !(*this < o); }
+  inline bool operator>=(TfToken const &o) const
+  {
+    return !(*this < o);
+  }
 
   /// Less-than-or-equal operator that compares tokenized strings
   /// lexicographically.
-  inline bool operator<=(TfToken const &o) const { return !(*this > o); }
+  inline bool operator<=(TfToken const &o) const
+  {
+    return !(*this > o);
+  }
 
   /// Allow \c TfToken to be auto-converted to \c string
-  operator std::string const &() const { return GetString(); }
+  operator std::string const &() const
+  {
+    return GetString();
+  }
 
   /// Returns \c true iff this token contains the empty string \c ""
-  bool IsEmpty() const { return _rep.GetLiteral() == 0; }
+  bool IsEmpty() const
+  {
+    return _rep.GetLiteral() == 0;
+  }
 
   /// Returns \c true iff this is an immortal token.
-  bool IsImmortal() const { return !_rep->_isCounted; }
+  bool IsImmortal() const
+  {
+    return !_rep->_isCounted;
+  }
 
   /// Stream insertion.
   friend TF_API std::ostream &operator<<(std::ostream &stream, TfToken const &);
 
   /// TfHash support.
-  template <class HashState>
-  friend void TfHashAppend(HashState &h, TfToken const &token) {
+  template<class HashState> friend void TfHashAppend(HashState &h, TfToken const &token)
+  {
     h.Append(token._rep.Get());
   }
 
-private:
+ private:
   // Add global swap overload.
-  friend void swap(TfToken &lhs, TfToken &rhs) { lhs.Swap(rhs); }
+  friend void swap(TfToken &lhs, TfToken &rhs)
+  {
+    lhs.Swap(rhs);
+  }
 
-  void _AddRef() const {
+  void _AddRef() const
+  {
     if (_rep.BitsAs<bool>()) {
       // We believe this rep is refCounted.
       if (!_rep->IncrementIfCounted()) {
@@ -306,13 +368,15 @@ private:
     }
   }
 
-  void _RemoveRef() const {
+  void _RemoveRef() const
+  {
     if (_rep.BitsAs<bool>()) {
       // We believe this rep is refCounted.
       if (_rep->_isCounted) {
         if (_rep->_refCount.load(std::memory_order_relaxed) == 1) {
           _PossiblyDestroyRep();
-        } else {
+        }
+        else {
           /*
            * This is deliberately racy.  It's possible the statement
            * below drops our count to zero, and we leak the rep
@@ -328,7 +392,8 @@ private:
            */
           _rep->_refCount.fetch_sub(1, std::memory_order_relaxed);
         }
-      } else {
+      }
+      else {
         // Our belief is wrong, update our cache of countedness.
         _rep.SetBits(false);
       }
@@ -350,9 +415,14 @@ private:
     _Rep(_Rep const &rhs)
         : _str(rhs._str),
           _cstr(rhs._str.c_str() != rhs._cstr ? rhs._cstr : _str.c_str()),
-          _compareCode(rhs._compareCode), _refCount(rhs._refCount.load()),
-          _isCounted(rhs._isCounted), _setNum(rhs._setNum) {}
-    _Rep &operator=(_Rep const &rhs) {
+          _compareCode(rhs._compareCode),
+          _refCount(rhs._refCount.load()),
+          _isCounted(rhs._isCounted),
+          _setNum(rhs._setNum)
+    {
+    }
+    _Rep &operator=(_Rep const &rhs)
+    {
       _str = rhs._str;
       _cstr = (rhs._str.c_str() != rhs._cstr ? rhs._cstr : _str.c_str());
       _compareCode = rhs._compareCode;
@@ -362,7 +432,8 @@ private:
       return *this;
     }
 
-    inline bool IncrementIfCounted() const {
+    inline bool IncrementIfCounted() const
+    {
       const bool isCounted = _isCounted;
       if (isCounted) {
         _refCount.fetch_add(1, std::memory_order_relaxed);
@@ -386,12 +457,16 @@ private:
   mutable TfPointerAndBits<const _Rep> _rep;
 };
 
-inline size_t TfToken::Hash() const { return TfHash()(*this); }
+inline size_t TfToken::Hash() const
+{
+  return TfHash()(*this);
+}
 
 /// Fast but non-lexicographical (in fact, arbitrary) less-than comparison for
 /// TfTokens.  Should only be used in performance-critical cases.
 struct TfTokenFastArbitraryLessThan {
-  inline bool operator()(TfToken const &lhs, TfToken const &rhs) const {
+  inline bool operator()(TfToken const &lhs, TfToken const &rhs) const
+  {
     return lhs._rep.Get() < rhs._rep.Get();
   }
 };
@@ -400,15 +475,17 @@ struct TfTokenFastArbitraryLessThan {
 TF_API std::vector<TfToken> TfToTokenVector(const std::vector<std::string> &sv);
 
 /// Convert the vector of \c TfToken \p tv into a vector of strings
-TF_API std::vector<std::string>
-TfToStringVector(const std::vector<TfToken> &tv);
+TF_API std::vector<std::string> TfToStringVector(const std::vector<TfToken> &tv);
 
 /// Overload hash_value for TfToken.
-inline size_t hash_value(const TfToken &x) { return x.Hash(); }
+inline size_t hash_value(const TfToken &x)
+{
+  return x.Hash();
+}
 
 /// Convenience types.
 typedef std::vector<TfToken> TfTokenVector;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TOKEN_H
+#endif  // PXR_BASE_TF_TOKEN_H

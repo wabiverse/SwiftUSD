@@ -3,4 +3,4 @@
 
 /* no includes. */
 
-#endif // __PXR_BASE_PY_TRACE_H__
+#endif  // __PXR_BASE_PY_TRACE_H__

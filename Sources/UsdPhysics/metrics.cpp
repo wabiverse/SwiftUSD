@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "UsdPhysics/metrics.h"
 #include "UsdPhysics/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/stage.h"
 
@@ -39,12 +39,10 @@ constexpr double UsdPhysicsMassUnits::grams;
 constexpr double UsdPhysicsMassUnits::kilograms;
 constexpr double UsdPhysicsMassUnits::slugs;
 
-double
-UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
+double UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
 {
   double units = UsdPhysicsMassUnits::kilograms;
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid UsdStage");
     return units;
   }
@@ -55,8 +53,7 @@ UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
 
 bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid UsdStage");
     return false;
   }
@@ -64,24 +61,19 @@ bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
   return stage->HasAuthoredMetadata(UsdPhysicsTokens->kilogramsPerUnit);
 }
 
-bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
-                                        double kilogramsPerUnit)
+bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage, double kilogramsPerUnit)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid UsdStage");
     return false;
   }
 
-  return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit,
-                            kilogramsPerUnit);
+  return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit, kilogramsPerUnit);
 }
 
-bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits,
-                            double epsilon)
+bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits, double epsilon)
 {
-  if (authoredUnits <= 0 || standardUnits <= 0)
-  {
+  if (authoredUnits <= 0 || standardUnits <= 0) {
     return false;
   }
 

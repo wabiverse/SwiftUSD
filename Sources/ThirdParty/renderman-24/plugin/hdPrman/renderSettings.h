@@ -24,16 +24,15 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_SETTINGS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/renderSettings.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_RenderSettings final : public HdRenderSettings
-{
-public:
+class HdPrman_RenderSettings final : public HdRenderSettings {
+ public:
   HdPrman_RenderSettings(SdfPath const &id);
 
   ~HdPrman_RenderSettings() override;
@@ -47,4 +46,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VOLUME_H

@@ -43,8 +43,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \hideinitializer
 #define TF_BITS_FOR_VALUES(n) Tf_NumBits<n - 1>::type::value
 
-template <size_t N, size_t SUM = 0, size_t BIT = sizeof(N) * 8 / 2>
-struct Tf_NumBits {
+template<size_t N, size_t SUM = 0, size_t BIT = sizeof(N) * 8 / 2> struct Tf_NumBits {
   // The result is computed by divide and conquer; for a given word N the
   // bit at position BIT divides the word in an upper and a lower half.
   // If the upper half contain any ones, then the result is SUM plus BIT
@@ -56,7 +55,7 @@ struct Tf_NumBits {
   typedef typename _func::type type;
 };
 
-template <size_t N, size_t SUM> struct Tf_NumBits<N, SUM, 0> {
+template<size_t N, size_t SUM> struct Tf_NumBits<N, SUM, 0> {
   typedef std::integral_constant<size_t, SUM + 1> type;
 };
 

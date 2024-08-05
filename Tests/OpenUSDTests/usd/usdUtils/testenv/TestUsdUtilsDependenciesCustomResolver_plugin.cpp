@@ -35,62 +35,49 @@ PXR_NAMESPACE_USING_DIRECTIVE
 /// for identifier creation and asset resolution.
 /// Identifiers are in form of test:path
 /// Resolved paths are in form testresolved:path
-class CustomResolver
-    : public ArResolver
-{
-public:
-    CustomResolver()
-    {
-    }
+class CustomResolver : public ArResolver {
+ public:
+  CustomResolver() {}
 
-protected:
-    std::string _CreateIdentifier(
-        const std::string& assetPath,
-        const ArResolvedPath& anchorAssetPath) const final
-    {
-        return assetPath;
-    }
+ protected:
+  std::string _CreateIdentifier(const std::string &assetPath,
+                                const ArResolvedPath &anchorAssetPath) const final
+  {
+    return assetPath;
+  }
 
-    std::string _CreateIdentifierForNewAsset(
-        const std::string& assetPath,
-        const ArResolvedPath& anchorAssetPath) const final
-    {
-        return assetPath;
-    }
+  std::string _CreateIdentifierForNewAsset(const std::string &assetPath,
+                                           const ArResolvedPath &anchorAssetPath) const final
+  {
+    return assetPath;
+  }
 
-    ArResolvedPath _Resolve(
-        const std::string& assetPath) const final
-    {
-        const std::string resolved = "testresolved:" + 
-            assetPath.substr(assetPath.find_first_of(":") + 1);
+  ArResolvedPath _Resolve(const std::string &assetPath) const final
+  {
+    const std::string resolved = "testresolved:" +
+                                 assetPath.substr(assetPath.find_first_of(":") + 1);
 
-        return ArResolvedPath(resolved);
-    }
+    return ArResolvedPath(resolved);
+  }
 
-    ArResolvedPath _ResolveForNewAsset(
-        const std::string& assetPath) const final
-    {
-        return _Resolve(assetPath);
-    }
+  ArResolvedPath _ResolveForNewAsset(const std::string &assetPath) const final
+  {
+    return _Resolve(assetPath);
+  }
 
-    std::shared_ptr<ArAsset> _OpenAsset(
-        const ArResolvedPath& resolvedPath) const final
-    {
-        const std::string pathStr = resolvedPath.GetPathString();
-        const std::string filesystemPath = 
-            pathStr.substr(pathStr.find_first_of(":") + 1);
+  std::shared_ptr<ArAsset> _OpenAsset(const ArResolvedPath &resolvedPath) const final
+  {
+    const std::string pathStr = resolvedPath.GetPathString();
+    const std::string filesystemPath = pathStr.substr(pathStr.find_first_of(":") + 1);
 
-        return ArFilesystemAsset::Open(ArResolvedPath(filesystemPath));
-    }
+    return ArFilesystemAsset::Open(ArResolvedPath(filesystemPath));
+  }
 
-    std::shared_ptr<ArWritableAsset>
-    _OpenAssetForWrite(
-        const ArResolvedPath& resolvedPath,
-        WriteMode writeMode) const final
-    {
-        return nullptr;
-    }
-
+  std::shared_ptr<ArWritableAsset> _OpenAssetForWrite(const ArResolvedPath &resolvedPath,
+                                                      WriteMode writeMode) const final
+  {
+    return nullptr;
+  }
 };
 
 AR_DEFINE_RESOLVER(CustomResolver, ArResolver);

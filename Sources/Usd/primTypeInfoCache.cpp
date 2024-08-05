@@ -28,7 +28,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 void Usd_PrimTypeInfoCache::ComputeInvalidPrimTypeToFallbackMap(
     const VtDictionary &fallbackPrimTypesDict,
-    TfHashMap<TfToken, TfToken, TfHash> *typeToFallbackTypeMap) {
+    TfHashMap<TfToken, TfToken, TfHash> *typeToFallbackTypeMap)
+{
   // The dictionary is expected to map prim type name strings each to a
   // VtTokenArray containing the ordered list of fallback types to use if
   // the given type name is not valid.
@@ -40,13 +41,13 @@ void Usd_PrimTypeInfoCache::ComputeInvalidPrimTypeToFallbackMap(
       continue;
     }
     if (!valuePair.second.IsHolding<VtTokenArray>()) {
-      TF_WARN("Value for key '%s' in fallbackPrimTypes metadata "
-              "dictionary is not a VtTokenArray.",
-              typeName.GetText());
+      TF_WARN(
+          "Value for key '%s' in fallbackPrimTypes metadata "
+          "dictionary is not a VtTokenArray.",
+          typeName.GetText());
       continue;
     }
-    const VtTokenArray &fallbackNames =
-        valuePair.second.UncheckedGet<VtTokenArray>();
+    const VtTokenArray &fallbackNames = valuePair.second.UncheckedGet<VtTokenArray>();
 
     // Go through the list of fallbacks for the invalid type and choose
     // the first one that produces a valid schema type.

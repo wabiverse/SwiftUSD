@@ -24,15 +24,16 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_H
 
-#include <pxr/pxrns.h>
-#include "Sdf/fileFormat.h"
 #include "Pcp/dynamicFileFormatInterface.h"
+#include "Sdf/fileFormat.h"
 #include "Tf/staticTokens.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 #define USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_TOKENS \
-  ((Id, "usdDancingCubesExample"))((Version, "1.0"))((Target, "usd"))((Extension, "usddancingcubesexample"))((Params, "Usd_DCE_Params"))
+  ((Id, "usdDancingCubesExample"))((Version, "1.0"))((Target, "usd"))( \
+      (Extension, "usddancingcubesexample"))((Params, "Usd_DCE_Params"))
 
 TF_DECLARE_PUBLIC_TOKENS(UsdDancingCubesExampleFileFormatTokens,
                          USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_TOKENS);
@@ -63,13 +64,11 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdDancingCubesExampleFileFormat);
 /// value arguments defined in UsdDancingCubesExample_Data.
 ///
 class UsdDancingCubesExampleFileFormat : public SdfFileFormat,
-                                         public PcpDynamicFileFormatInterface
-{
-public:
+                                         public PcpDynamicFileFormatInterface {
+ public:
   /// Override this function from SdfFileFormat to provide our own procedural
   /// SdfAbstractData class.
-  SdfAbstractDataRefPtr InitData(
-      const FileFormatArguments &args) const override;
+  SdfAbstractDataRefPtr InitData(const FileFormatArguments &args) const override;
 
   /// Must implement SdfFileFormat's CanRead function. Returns true for all
   /// files as the contents of the file aren't used.
@@ -79,9 +78,7 @@ public:
   /// doesn't do anything. There is nothing from the file that needs to be
   /// read as data will have already been initialized from file format
   /// arguments.
-  bool Read(SdfLayer *layer,
-            const std::string &resolvedPath,
-            bool metadataOnly) const override;
+  bool Read(SdfLayer *layer, const std::string &resolvedPath, bool metadataOnly) const override;
 
   /// We override WriteToString and WriteToStream methods so
   /// SdfLayer::ExportToString() etc, work. Writing this layer will write out
@@ -92,17 +89,14 @@ public:
   bool WriteToString(const SdfLayer &layer,
                      std::string *str,
                      const std::string &comment = std::string()) const override;
-  bool WriteToStream(const SdfSpecHandle &spec,
-                     std::ostream &out,
-                     size_t indent) const override;
+  bool WriteToStream(const SdfSpecHandle &spec, std::ostream &out, size_t indent) const override;
 
   /// A required PcpDynamicFileFormatInterface override for generating
   /// the file format arguments in context.
-  void ComposeFieldsForFileFormatArguments(
-      const std::string &assetPath,
-      const PcpDynamicFileFormatContext &context,
-      FileFormatArguments *args,
-      VtValue *contextDependencyData) const override;
+  void ComposeFieldsForFileFormatArguments(const std::string &assetPath,
+                                           const PcpDynamicFileFormatContext &context,
+                                           FileFormatArguments *args,
+                                           VtValue *contextDependencyData) const override;
 
   /// A PcpDynamicFileFormatInterface override for more finely processing
   /// whether a field change may affect the file format arguments within a
@@ -123,7 +117,7 @@ public:
   //     const VtValue &newValue,
   //     const VtValue &contextDependencyData) const override;
 
-protected:
+ protected:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   bool _ShouldSkipAnonymousReload() const override;
@@ -135,4 +129,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_FILE_FORMAT_H

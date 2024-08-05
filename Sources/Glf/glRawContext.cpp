@@ -31,15 +31,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 // GlfGLRawContext
 //
 
-GlfGLRawContextSharedPtr
-GlfGLRawContext::New()
+GlfGLRawContextSharedPtr GlfGLRawContext::New()
 {
-  return GlfGLRawContextSharedPtr(
-      new GlfGLRawContext(GarchGLPlatformContextState()));
+  return GlfGLRawContextSharedPtr(new GlfGLRawContext(GarchGLPlatformContextState()));
 }
 
-GlfGLRawContextSharedPtr
-GlfGLRawContext::New(const GarchGLPlatformContextState &state)
+GlfGLRawContextSharedPtr GlfGLRawContext::New(const GarchGLPlatformContextState &state)
 {
   return GlfGLRawContextSharedPtr(new GlfGLRawContext(state));
 }
@@ -71,9 +68,7 @@ bool GlfGLRawContext::_IsSharing(const GlfGLContextSharedPtr &rhs) const
 
 bool GlfGLRawContext::_IsEqual(const GlfGLContextSharedPtr &rhs) const
 {
-  if (const GlfGLRawContext *rhsRaw =
-          dynamic_cast<const GlfGLRawContext *>(rhs.get()))
-  {
+  if (const GlfGLRawContext *rhsRaw = dynamic_cast<const GlfGLRawContext *>(rhs.get())) {
     return _state == rhsRaw->_state;
   }
   return false;

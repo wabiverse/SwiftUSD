@@ -26,18 +26,18 @@
 
 /// \file hio/glslfx.h
 
-#include <pxr/pxrns.h>
 #include "Hio/api.h"
 #include "Hio/glslfxConfig.h"
+#include <pxr/pxrns.h>
 
-#include "Tf/token.h"
 #include "Tf/staticTokens.h"
+#include "Tf/token.h"
 
-#include <string>
-#include <vector>
-#include <set>
 #include <map>
 #include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,11 +45,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 //
 #define HIO_GLSLFX_API_VERSION 1
 
-#define HIO_GLSLFX_TOKENS                                                                                                                                                                      \
-  (glslfx)                                                                                                                                                                                     \
-                                                                                                                                                                                               \
-      (fragmentShader)(geometryShader)(geometryShaderInjection)(preamble)(tessControlShader)(tessEvalShader)(postTessControlShader)(postTessVertexShader)(vertexShader)(vertexShaderInjection) \
-                                                                                                                                                                                               \
+#define HIO_GLSLFX_TOKENS \
+  (glslfx) \
+\
+      (fragmentShader)( \
+          geometryShader)(geometryShaderInjection)(preamble)(tessControlShader)(tessEvalShader)(postTessControlShader)(postTessVertexShader)(vertexShader)(vertexShaderInjection) \
+\
           (surfaceShader)(displacementShader)(volumeShader)((defVal, "default"))
 
 TF_DECLARE_PUBLIC_TOKENS(HioGlslfxTokens, HIO_API, HIO_GLSLFX_TOKENS);
@@ -134,24 +135,19 @@ TF_DECLARE_PUBLIC_TOKENS(HioGlslfxTokens, HIO_API, HIO_GLSLFX_TOKENS);
 /// }
 /// \endcode
 ///
-class HioGlslfx
-{
-public:
+class HioGlslfx {
+ public:
   /// Create an invalid glslfx object
   HIO_API
   HioGlslfx();
 
   /// Create a glslfx object from a file
   HIO_API
-  HioGlslfx(
-      std::string const &filePath,
-      TfToken const &technique = HioGlslfxTokens->defVal);
+  HioGlslfx(std::string const &filePath, TfToken const &technique = HioGlslfxTokens->defVal);
 
   /// Create a glslfx object from a stream
   HIO_API
-  HioGlslfx(
-      std::istream &is,
-      TfToken const &technique = HioGlslfxTokens->defVal);
+  HioGlslfx(std::istream &is, TfToken const &technique = HioGlslfxTokens->defVal);
 
   /// Return the parameters specified in the configuration
   HIO_API
@@ -202,16 +198,25 @@ public:
   std::string GetSource(const TfToken &shaderStageKey) const;
 
   /// Get the original file name passed to the constructor
-  const std::string &GetFilePath() const { return _globalContext.filename; }
+  const std::string &GetFilePath() const
+  {
+    return _globalContext.filename;
+  }
 
   /// Return set of all files processed for this glslfx object.
   /// This includes the original file given to the constructor
   /// as well as any other files that were imported. This set
   /// will only contain files that exist.
-  const std::set<std::string> &GetFiles() const { return _seenFiles; }
+  const std::set<std::string> &GetFiles() const
+  {
+    return _seenFiles;
+  }
 
   /// Return the computed hash value based on the string
-  size_t GetHash() const { return _hash; }
+  size_t GetHash() const
+  {
+    return _hash;
+  }
 
   /// Extract imported files from the specified glslfx file. The returned
   /// paths are as-authored, in the order of declaration, with possible
@@ -220,10 +225,9 @@ public:
   HIO_API
   static std::vector<std::string> ExtractImports(const std::string &filename);
 
-private:
-  class _ParseContext
-  {
-  public:
+ private:
+  class _ParseContext {
+   public:
     _ParseContext() {}
 
     _ParseContext(std::string const &filePath) : filename(filePath), lineNo(0), version(-1.0) {}
@@ -237,19 +241,14 @@ private:
     std::vector<std::string> imports;
   };
 
-private:
-  bool _ProcessFile(std::string const &filePath,
-                    _ParseContext &context);
-  bool _ProcessInput(std::istream *input,
-                     _ParseContext &context);
+ private:
+  bool _ProcessFile(std::string const &filePath, _ParseContext &context);
+  bool _ProcessInput(std::istream *input, _ParseContext &context);
   bool _ProcessImport(_ParseContext &context);
   bool _ParseSectionLine(_ParseContext &context);
-  bool _ParseGLSLSectionLine(std::vector<std::string> const &tokens,
-                             _ParseContext &context);
-  bool _ParseLayoutSectionLine(std::vector<std::string> const &tokens,
-                               _ParseContext &context);
-  bool _ParseVersionLine(std::vector<std::string> const &tokens,
-                         _ParseContext &context);
+  bool _ParseGLSLSectionLine(std::vector<std::string> const &tokens, _ParseContext &context);
+  bool _ParseLayoutSectionLine(std::vector<std::string> const &tokens, _ParseContext &context);
+  bool _ParseVersionLine(std::vector<std::string> const &tokens, _ParseContext &context);
   bool _ParseConfigurationLine(_ParseContext &context);
   bool _ComposeConfiguration(std::string *reason);
 
@@ -260,7 +259,7 @@ private:
   /// to the shader source associated with the given keys.
   std::string _GetLayoutAsString(const TfTokenVector &shaderStageKeys) const;
 
-private:
+ private:
   _ParseContext _globalContext;
 
   typedef std::map<std::string, std::string> _SourceMap;
@@ -276,7 +275,7 @@ private:
   TfToken _technique;
 
   bool _valid;
-  std::string _invalidReason; // if _valid is false, reason why
+  std::string _invalidReason;  // if _valid is false, reason why
   size_t _hash;
 };
 

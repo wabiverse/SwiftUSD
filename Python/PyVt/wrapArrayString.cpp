@@ -32,7 +32,8 @@ using std::string;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayString() {
+void wrapArrayString()
+{
   VtWrapArray<VtArray<string>>();
   VtWrapComparisonFunctions<VtArray<string>>();
 }

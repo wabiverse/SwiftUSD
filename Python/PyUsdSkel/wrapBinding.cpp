@@ -40,23 +40,19 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+UsdSkelBinding *_New(const UsdSkelSkeleton &skel, const boost::python::list &skinningQueries)
 {
-
-  UsdSkelBinding *
-  _New(const UsdSkelSkeleton &skel, const boost::python::list &skinningQueries)
-  {
-    const size_t numQueries = len(skinningQueries);
-    VtArray<UsdSkelSkinningQuery> skinningQueriesArray(numQueries);
-    for (size_t i = 0; i < numQueries; ++i)
-    {
-      skinningQueriesArray[i] =
-          extract<const UsdSkelSkinningQuery &>(skinningQueries[i]);
-    }
-    return new UsdSkelBinding(skel, skinningQueriesArray);
+  const size_t numQueries = len(skinningQueries);
+  VtArray<UsdSkelSkinningQuery> skinningQueriesArray(numQueries);
+  for (size_t i = 0; i < numQueries; ++i) {
+    skinningQueriesArray[i] = extract<const UsdSkelSkinningQuery &>(skinningQueries[i]);
   }
+  return new UsdSkelBinding(skel, skinningQueriesArray);
+}
 
-} // namespace
+}  // namespace
 
 void wrapUsdSkelBinding()
 {
@@ -66,9 +62,9 @@ void wrapUsdSkelBinding()
 
       .def("__init__", make_constructor(&_New))
 
-      .def("GetSkeleton", &This::GetSkeleton,
-           return_value_policy<return_by_value>())
+      .def("GetSkeleton", &This::GetSkeleton, return_value_policy<return_by_value>())
 
-      .def("GetSkinningTargets", &This::GetSkinningTargets,
+      .def("GetSkinningTargets",
+           &This::GetSkinningTargets,
            return_value_policy<TfPySequenceToList>());
 }

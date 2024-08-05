@@ -54,7 +54,7 @@ using HdReprSharedPtr = std::shared_ptr<HdRepr>;
 /// access (aside from local caches) is delegated to the HdSceneDelegate.
 ///
 class HdRprim {
-public:
+ public:
   HD_API
   HdRprim(SdfPath const &id);
 
@@ -96,8 +96,7 @@ public:
   /// if additional data is required from the scene delegate when this
   /// repr is synced.
   HD_API
-  void InitRepr(HdSceneDelegate *delegate, TfToken const &reprToken,
-                HdDirtyBits *dirtyBits);
+  void InitRepr(HdSceneDelegate *delegate, TfToken const &reprToken, HdDirtyBits *dirtyBits);
 
   /// Pull invalidated scene data and prepare/update the renderable
   /// representation.
@@ -128,8 +127,10 @@ public:
   ///                    pulled from the scene delegate.
   ///                    On output specifies which bits are still dirty and
   ///                    were not cleaned by the sync.
-  virtual void Sync(HdSceneDelegate *delegate, HdRenderParam *renderParam,
-                    HdDirtyBits *dirtyBits, TfToken const &reprToken) = 0;
+  virtual void Sync(HdSceneDelegate *delegate,
+                    HdRenderParam *renderParam,
+                    HdDirtyBits *dirtyBits,
+                    TfToken const &reprToken) = 0;
   // ---------------------------------------------------------------------- //
   /// \name Rprim Hydra Engine API : Execute Phase
   // ---------------------------------------------------------------------- //
@@ -139,8 +140,7 @@ public:
   /// If no draw items exist, or reprToken cannot be found, nullptr will be
   /// returned.
   HD_API
-  const HdRepr::DrawItemUniquePtrVector &
-  GetDrawItems(TfToken const &reprToken) const;
+  const HdRepr::DrawItemUniquePtrVector &GetDrawItems(TfToken const &reprToken) const;
 
   // ---------------------------------------------------------------------- //
   /// \name Rprim Hydra Engine API : Cleanup
@@ -158,10 +158,16 @@ public:
   /// Returns the identifier of this Rprim. This is both used in the
   /// RenderIndex and the SceneDelegate and acts as the associative key for
   /// the Rprim in both contexts.
-  SdfPath const &GetId() const { return _sharedData.rprimID; }
+  SdfPath const &GetId() const
+  {
+    return _sharedData.rprimID;
+  }
 
   /// Return the unique instance id
-  int32_t GetPrimId() const { return _primId; };
+  int32_t GetPrimId() const
+  {
+    return _primId;
+  };
 
   /// Set the unique instance id
   HD_API
@@ -169,22 +175,32 @@ public:
 
   /// Returns the identifier of the instancer (if any) for this Rprim. If this
   /// Rprim is not instanced, an empty SdfPath will be returned.
-  SdfPath const &GetInstancerId() const { return _instancerId; }
+  SdfPath const &GetInstancerId() const
+  {
+    return _instancerId;
+  }
 
   /// Returns the path of the material to which this Rprim is bound. The
   /// material object itself can be fetched from the RenderIndex using
   /// this identifier.
-  SdfPath const &GetMaterialId() const { return _materialId; }
+  SdfPath const &GetMaterialId() const
+  {
+    return _materialId;
+  }
 
   /// Sets a new material binding to be used by this rprim
   HD_API
   void SetMaterialId(SdfPath const &materialId);
 
-  HdReprSelector const &GetReprSelector() const {
+  HdReprSelector const &GetReprSelector() const
+  {
     return _authoredReprSelector;
   }
 
-  TfToken const &GetRenderTag() const { return _renderTag; }
+  TfToken const &GetRenderTag() const
+  {
+    return _renderTag;
+  }
 
   /// Returns the render tag associated to this rprim
   inline TfToken GetRenderTag(HdSceneDelegate *delegate) const;
@@ -193,17 +209,15 @@ public:
   inline GfRange3d GetExtent(HdSceneDelegate *delegate) const;
 
   /// Primvar Query
-  inline HdPrimvarDescriptorVector
-  GetPrimvarDescriptors(HdSceneDelegate *delegate,
-                        HdInterpolation interpolation) const;
+  inline HdPrimvarDescriptorVector GetPrimvarDescriptors(HdSceneDelegate *delegate,
+                                                         HdInterpolation interpolation) const;
 
   /// Returns the names of built-in primvars, i.e. primvars that
   /// are part of the core geometric schema for this prim.
   HD_API
   virtual TfTokenVector const &GetBuiltinPrimvarNames() const = 0;
 
-  inline VtValue GetPrimvar(HdSceneDelegate *delegate,
-                            const TfToken &name) const;
+  inline VtValue GetPrimvar(HdSceneDelegate *delegate, const TfToken &name) const;
 
   inline VtValue GetIndexedPrimvar(HdSceneDelegate *delegate,
                                    const TfToken &name,
@@ -217,16 +231,18 @@ public:
   bool IsDirty(HdChangeTracker &changeTracker) const;
 
   /// Is the prim itself visible
-  bool IsVisible() const { return _sharedData.visible; }
+  bool IsVisible() const
+  {
+    return _sharedData.visible;
+  }
 
   HD_API
   void UpdateReprSelector(HdSceneDelegate *delegate, HdDirtyBits *dirtyBits);
 
   HD_API
-  virtual void UpdateRenderTag(HdSceneDelegate *delegate,
-                               HdRenderParam *renderParam);
+  virtual void UpdateRenderTag(HdSceneDelegate *delegate, HdRenderParam *renderParam);
 
-protected:
+ protected:
   // ---------------------------------------------------------------------- //
   /// \name Rprim Hydra Engine API : Pre-Sync & Sync-Phase
   // ---------------------------------------------------------------------- //
@@ -264,20 +280,19 @@ protected:
   HdReprSharedPtr const &_GetRepr(TfToken const &reprToken) const;
 
   HD_API
-  void _UpdateVisibility(HdSceneDelegate *sceneDelegate,
-                         HdDirtyBits *dirtyBits);
+  void _UpdateVisibility(HdSceneDelegate *sceneDelegate, HdDirtyBits *dirtyBits);
 
   HD_API
   void _UpdateInstancer(HdSceneDelegate *sceneDelegate, HdDirtyBits *dirtyBits);
 
-private:
+ private:
   SdfPath _instancerId;
   SdfPath _materialId;
 
   // Used for id renders.
   int32_t _primId;
 
-protected:
+ protected:
   // shared data across reprs: bufferArrayRanges, bounds, visibility
   HdRprimSharedData _sharedData;
 
@@ -294,11 +309,12 @@ protected:
 
   struct _ReprComparator {
     _ReprComparator(TfToken const &name) : _name(name) {}
-    bool operator()(const std::pair<TfToken, HdReprSharedPtr> &e) const {
+    bool operator()(const std::pair<TfToken, HdReprSharedPtr> &e) const
+    {
       return _name == e.first;
     }
 
-  private:
+   private:
     TfToken _name;
   };
 
@@ -307,20 +323,23 @@ protected:
   //
   // N : # of descriptors for the repr.
   //
-  template <typename DESC_TYPE, int N = 1> struct _ReprDescConfigs {
+  template<typename DESC_TYPE, int N = 1> struct _ReprDescConfigs {
     using DescArray = std::array<DESC_TYPE, N>;
     static const int MAX_DESCS = N;
 
-    DescArray Find(TfToken const &reprToken) const {
+    DescArray Find(TfToken const &reprToken) const
+    {
       // linear search, we expect only a handful reprs configured.
-      TF_FOR_ALL(it, _configs) {
+      TF_FOR_ALL(it, _configs)
+      {
         if (it->first == reprToken)
           return it->second;
       }
       TF_CODING_ERROR("Repr %s not found", reprToken.GetText());
       return DescArray();
     }
-    void AddOrUpdate(TfToken const &reprToken, DescArray descs) {
+    void AddOrUpdate(TfToken const &reprToken, DescArray descs)
+    {
       for (auto &config : _configs) {
         if (config.first == reprToken) {
           // Overrwrite the existing entry.
@@ -338,31 +357,34 @@ protected:
 //
 // Delegate API Wrappers
 //
-TfToken HdRprim::GetRenderTag(HdSceneDelegate *delegate) const {
+TfToken HdRprim::GetRenderTag(HdSceneDelegate *delegate) const
+{
   return delegate->GetRenderTag(GetId());
 }
 
-GfRange3d HdRprim::GetExtent(HdSceneDelegate *delegate) const {
+GfRange3d HdRprim::GetExtent(HdSceneDelegate *delegate) const
+{
   return delegate->GetExtent(GetId());
 }
 
-inline HdPrimvarDescriptorVector
-HdRprim::GetPrimvarDescriptors(HdSceneDelegate *delegate,
-                               HdInterpolation interpolation) const {
+inline HdPrimvarDescriptorVector HdRprim::GetPrimvarDescriptors(
+    HdSceneDelegate *delegate, HdInterpolation interpolation) const
+{
   return delegate->GetPrimvarDescriptors(GetId(), interpolation);
 }
 
-inline VtValue HdRprim::GetPrimvar(HdSceneDelegate *delegate,
-                                   const TfToken &name) const {
+inline VtValue HdRprim::GetPrimvar(HdSceneDelegate *delegate, const TfToken &name) const
+{
   return delegate->Get(GetId(), name);
 }
 
 inline VtValue HdRprim::GetIndexedPrimvar(HdSceneDelegate *delegate,
                                           const TfToken &name,
-                                          VtIntArray *indices) const {
+                                          VtIntArray *indices) const
+{
   return delegate->GetIndexedPrimvar(GetId(), name, indices);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_RPRIM_H
+#endif  // PXR_IMAGING_HD_RPRIM_H

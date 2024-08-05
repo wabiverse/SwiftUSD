@@ -26,18 +26,18 @@
 
 /// \file usdRender/var.h
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdRender/api.h"
 #include "UsdRender/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -71,9 +71,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRenderTokens->rightHanded
 /// as the value.
 ///
-class UsdRenderVar : public UsdTyped
-{
-public:
+class UsdRenderVar : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -83,18 +82,12 @@ public:
   /// Equivalent to UsdRenderVar::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRenderVar(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdRenderVar(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdRenderVar on the prim held by \p schemaObj .
   /// Should be preferred over UsdRenderVar(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRenderVar(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdRenderVar(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDRENDER_API
@@ -104,8 +97,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRENDER_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRenderVar holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -117,8 +109,7 @@ public:
   /// \endcode
   ///
   USDRENDER_API
-  static UsdRenderVar
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderVar Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -143,17 +134,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDRENDER_API
-  static UsdRenderVar
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderVar Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRENDER_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRENDER_API
@@ -165,7 +155,7 @@ private:
   USDRENDER_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DATATYPE
   // --------------------------------------------------------------------- //
@@ -186,9 +176,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateDataTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateDataTypeAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SOURCENAME
   // --------------------------------------------------------------------- //
@@ -210,9 +201,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateSourceNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateSourceNameAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SOURCETYPE
   // --------------------------------------------------------------------- //
@@ -226,9 +218,10 @@ public:
   /// material network be provided, in which case this is simply
   /// an advisory setting.
   /// - "lpe":  Specifies a Light Path Expression in the
-  /// [OSL Light Path Expressions language](https://github.com/imageworks/OpenShadingLanguage/wiki/OSL-Light-Path-Expressions) as the source for
-  /// this RenderVar.  Some renderers may use extensions to
-  /// that syntax, which will necessarily be non-portable.
+  /// [OSL Light Path Expressions
+  /// language](https://github.com/imageworks/OpenShadingLanguage/wiki/OSL-Light-Path-Expressions)
+  /// as the source for this RenderVar.  Some renderers may use extensions to that syntax, which
+  /// will necessarily be non-portable.
   /// - "intrinsic":  This setting is currently unimplemented,
   /// but represents a future namespace for UsdRender to provide
   /// portable baseline RenderVars, such as camera depth, that
@@ -251,9 +244,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateSourceTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateSourceTypeAttr(VtValue const &defaultValue = VtValue(),
+                                    bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

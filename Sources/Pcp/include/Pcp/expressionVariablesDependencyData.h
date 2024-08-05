@@ -42,7 +42,7 @@ TF_DECLARE_WEAK_PTRS(PcpLayerStack);
 /// Captures the expression variables used by an associated prim index
 /// during composition.
 class PcpExpressionVariablesDependencyData {
-public:
+ public:
   PCP_API
   PcpExpressionVariablesDependencyData();
 
@@ -53,8 +53,7 @@ public:
   ~PcpExpressionVariablesDependencyData();
 
   PCP_API
-  PcpExpressionVariablesDependencyData &
-  operator=(PcpExpressionVariablesDependencyData &&);
+  PcpExpressionVariablesDependencyData &operator=(PcpExpressionVariablesDependencyData &&);
 
   /// Returns true if any dependencies have been recorded, false otherwise.
   PCP_API
@@ -78,8 +77,8 @@ public:
   ///
   /// The first argument is the layer stack associated with the expression
   /// variables in the second argument.
-  template <class Callback>
-  void ForEachDependency(const Callback &callback) const {
+  template<class Callback> void ForEachDependency(const Callback &callback) const
+  {
     _ForEachFunctionRef fn(callback);
     _ForEachDependency(fn);
   }
@@ -88,12 +87,12 @@ public:
   /// \p layerStack. If no such dependencies have been added, returns
   /// nullptr.
   PCP_API
-  const std::unordered_set<std::string> *
-  GetDependenciesForLayerStack(const PcpLayerStackPtr &layerStack) const;
+  const std::unordered_set<std::string> *GetDependenciesForLayerStack(
+      const PcpLayerStackPtr &layerStack) const;
 
-private:
-  using _ForEachFunctionRef = TfFunctionRef<void(
-      const PcpLayerStackPtr &, const std::unordered_set<std::string> &)>;
+ private:
+  using _ForEachFunctionRef =
+      TfFunctionRef<void(const PcpLayerStackPtr &, const std::unordered_set<std::string> &)>;
 
   PCP_API
   void _ForEachDependency(const _ForEachFunctionRef &fn) const;

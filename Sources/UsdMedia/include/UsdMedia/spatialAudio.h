@@ -26,18 +26,18 @@
 
 /// \file usdMedia/spatialAudio.h
 
-#include <pxr/pxrns.h>
-#include "UsdMedia/api.h"
-#include "UsdGeom/xformable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/xformable.h"
+#include "UsdMedia/api.h"
 #include "UsdMedia/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -105,9 +105,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdMediaTokens->rightHanded
 /// as the value.
 ///
-class UsdMediaSpatialAudio : public UsdGeomXformable
-{
-public:
+class UsdMediaSpatialAudio : public UsdGeomXformable {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -117,18 +116,12 @@ public:
   /// Equivalent to UsdMediaSpatialAudio::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdMediaSpatialAudio(const UsdPrim &prim = UsdPrim())
-      : UsdGeomXformable(prim)
-  {
-  }
+  explicit UsdMediaSpatialAudio(const UsdPrim &prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
   /// Construct a UsdMediaSpatialAudio on the prim held by \p schemaObj .
   /// Should be preferred over UsdMediaSpatialAudio(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdMediaSpatialAudio(const UsdSchemaBase &schemaObj)
-      : UsdGeomXformable(schemaObj)
-  {
-  }
+  explicit UsdMediaSpatialAudio(const UsdSchemaBase &schemaObj) : UsdGeomXformable(schemaObj) {}
 
   /// Destructor.
   USDMEDIA_API
@@ -138,8 +131,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDMEDIA_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdMediaSpatialAudio holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -151,8 +143,7 @@ public:
   /// \endcode
   ///
   USDMEDIA_API
-  static UsdMediaSpatialAudio
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdMediaSpatialAudio Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -177,17 +168,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDMEDIA_API
-  static UsdMediaSpatialAudio
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdMediaSpatialAudio Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDMEDIA_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDMEDIA_API
@@ -199,7 +189,7 @@ private:
   USDMEDIA_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FILEPATH
   // --------------------------------------------------------------------- //
@@ -227,9 +217,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateFilePathAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFilePathAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // AURALMODE
   // --------------------------------------------------------------------- //
@@ -261,9 +252,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateAuralModeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateAuralModeAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PLAYBACKMODE
   // --------------------------------------------------------------------- //
@@ -292,7 +284,8 @@ public:
   /// | C++ Type | TfToken |
   /// | \ref Usd_Datatypes "Usd Type" | SdfValueTypeNames->Token |
   /// | \ref SdfVariability "Variability" | SdfVariabilityUniform |
-  /// | \ref UsdMediaTokens "Allowed Values" | onceFromStart, onceFromStartToEnd, loopFromStart, loopFromStartToEnd, loopFromStage |
+  /// | \ref UsdMediaTokens "Allowed Values" | onceFromStart, onceFromStartToEnd, loopFromStart,
+  /// loopFromStartToEnd, loopFromStage |
   USDMEDIA_API
   UsdAttribute GetPlaybackModeAttr() const;
 
@@ -302,9 +295,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreatePlaybackModeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreatePlaybackModeAttr(VtValue const &defaultValue = VtValue(),
+                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // STARTTIME
   // --------------------------------------------------------------------- //
@@ -333,9 +327,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateStartTimeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateStartTimeAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // ENDTIME
   // --------------------------------------------------------------------- //
@@ -367,9 +362,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateEndTimeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateEndTimeAttr(VtValue const &defaultValue = VtValue(),
+                                 bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // MEDIAOFFSET
   // --------------------------------------------------------------------- //
@@ -396,9 +392,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateMediaOffsetAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateMediaOffsetAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // GAIN
   // --------------------------------------------------------------------- //
@@ -420,9 +417,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDMEDIA_API
-  UsdAttribute CreateGainAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateGainAttr(VtValue const &defaultValue = VtValue(),
+                              bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

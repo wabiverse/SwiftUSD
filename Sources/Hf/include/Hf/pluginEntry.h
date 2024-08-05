@@ -26,12 +26,12 @@
 
 #include <pxr/pxrns.h>
 
+#include "Hf/perfLog.h"
 #include "Tf/token.h"
 #include "Tf/type.h"
-#include "Hf/perfLog.h"
 
-#include <string>
 #include <functional>
+#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -41,9 +41,8 @@ struct HfPluginDesc;
 ///
 /// Internal class that manages a single plugin.
 ///
-class Hf_PluginEntry final
-{
-public:
+class Hf_PluginEntry final {
+ public:
   HF_MALLOC_TAG_NEW("new Hf_PluginEntry");
 
   ///
@@ -59,9 +58,7 @@ public:
   /// Constructors a new plugin entry from information in the
   /// plugins metadata file.  See HfPluginRegistry.
   ///
-  Hf_PluginEntry(const TfType &type,
-                 const std::string &displayName,
-                 int priority);
+  Hf_PluginEntry(const TfType &type, const std::string &displayName, int priority);
   ~Hf_PluginEntry();
 
   ///
@@ -73,10 +70,22 @@ public:
   ///
   /// Simple Accessors
   ///
-  const TfType &GetType() const { return _type; }
-  const std::string &GetDisplayName() const { return _displayName; }
-  int GetPriority() const { return _priority; }
-  HfPluginBase *GetInstance() const { return _instance; }
+  const TfType &GetType() const
+  {
+    return _type;
+  }
+  const std::string &GetDisplayName() const
+  {
+    return _displayName;
+  }
+  int GetPriority() const
+  {
+    return _priority;
+  }
+  HfPluginBase *GetInstance() const
+  {
+    return _instance;
+  }
 
   ///
   /// Returns the internal name of the plugin that is used by the API's.
@@ -107,7 +116,7 @@ public:
   ///
   static void SetFactory(TfType &type, _PluginFactoryFn &func);
 
-private:
+ private:
   ///
   /// Factory class used for plugin registration.
   /// Even though this class adds another level of indirection
@@ -115,14 +124,16 @@ private:
   /// from TfType::FactoryBase, which because of templating was exposing
   /// this class rather than keeping it private.
   ///
-  class _Factory final : public TfType::FactoryBase
-  {
-  public:
+  class _Factory final : public TfType::FactoryBase {
+   public:
     _Factory(_PluginFactoryFn &func) : _func(func) {}
 
-    HfPluginBase *New() const { return _func(); }
+    HfPluginBase *New() const
+    {
+      return _func();
+    }
 
-  private:
+   private:
     _PluginFactoryFn _func;
   };
 
@@ -142,4 +153,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PLUGIN_ENTRY_H
+#endif  // PXR_IMAGING_HF_PLUGIN_ENTRY_H

@@ -39,34 +39,31 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+TfPyObjWrapper _Remap(const UsdSkelAnimMapper &self,
+                      const VtValue &source,
+                      const VtValue &target,
+                      int elementSize,
+                      const VtValue &defaultValue)
 {
+  VtValue output(target);
+  self.Remap(source, &output, elementSize, defaultValue);
+  return UsdVtValueToPython(output);
+}
 
-  TfPyObjWrapper
-  _Remap(const UsdSkelAnimMapper &self,
-         const VtValue &source,
-         const VtValue &target,
-         int elementSize,
-         const VtValue &defaultValue)
-  {
-    VtValue output(target);
-    self.Remap(source, &output, elementSize, defaultValue);
-    return UsdVtValueToPython(output);
-  }
+template<typename Matrix4>
+VtArray<Matrix4> _RemapTransforms(const UsdSkelAnimMapper &self,
+                                  const VtArray<Matrix4> &source,
+                                  const VtArray<Matrix4> &target,
+                                  int elementSize)
+{
+  VtArray<Matrix4> output(target);
+  self.RemapTransforms(source, &output, elementSize);
+  return output;
+}
 
-  template <typename Matrix4>
-  VtArray<Matrix4>
-  _RemapTransforms(const UsdSkelAnimMapper &self,
-                   const VtArray<Matrix4> &source,
-                   const VtArray<Matrix4> &target,
-                   int elementSize)
-  {
-    VtArray<Matrix4> output(target);
-    self.RemapTransforms(source, &output, elementSize);
-    return output;
-  }
-
-} // namespace
+}  // namespace
 
 void wrapUsdSkelAnimMapper()
 {
@@ -78,23 +75,21 @@ void wrapUsdSkelAnimMapper()
 
       .def(init<size_t>())
 
-      .def(init<VtTokenArray, VtTokenArray>(
-          (arg("sourceOrder"), arg("targetOrder"))))
-      .def("Remap", &_Remap,
+      .def(init<VtTokenArray, VtTokenArray>((arg("sourceOrder"), arg("targetOrder"))))
+      .def("Remap",
+           &_Remap,
            (arg("source"),
             arg("target") = VtValue(),
             arg("elementSize") = 1,
             arg("defaultValue") = VtValue()))
 
-      .def("RemapTransforms", &_RemapTransforms<GfMatrix4d>,
-           (arg("source"),
-            arg("target"),
-            arg("elementSize") = 1))
+      .def("RemapTransforms",
+           &_RemapTransforms<GfMatrix4d>,
+           (arg("source"), arg("target"), arg("elementSize") = 1))
 
-      .def("RemapTransforms", &_RemapTransforms<GfMatrix4f>,
-           (arg("source"),
-            arg("target"),
-            arg("elementSize") = 1))
+      .def("RemapTransforms",
+           &_RemapTransforms<GfMatrix4f>,
+           (arg("source"), arg("target"), arg("elementSize") = 1))
 
       .def("IsIdentity", &This::IsIdentity)
 

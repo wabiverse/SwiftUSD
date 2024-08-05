@@ -53,7 +53,7 @@ class Sdf_FileFormatRegistry {
   Sdf_FileFormatRegistry(const Sdf_FileFormatRegistry &) = delete;
   Sdf_FileFormatRegistry &operator=(const Sdf_FileFormatRegistry &) = delete;
 
-public:
+ public:
   /// Constructor.
   Sdf_FileFormatRegistry();
 
@@ -64,9 +64,8 @@ public:
   /// \p s and target \p target. Extension \p s may be a full file path name,
   /// or an extension with or without a leading dot (e.g. 'foo/bar.usd', 'usd'
   /// or '.usd' are acceptable).
-  SdfFileFormatConstPtr
-  FindByExtension(const std::string &s,
-                  const std::string &target = std::string());
+  SdfFileFormatConstPtr FindByExtension(const std::string &s,
+                                        const std::string &target = std::string());
 
   /// Returns a set containing the extension(s) corresponding to
   /// all registered file formats.
@@ -76,8 +75,7 @@ public:
   /// all registered file formats that derive from \p baseType.
   ///
   /// \p baseType must derive from SdfFileFormat.
-  std::set<std::string>
-  FindAllDerivedFileFormatExtensions(const TfType &baseType);
+  std::set<std::string> FindAllDerivedFileFormatExtensions(const TfType &baseType);
 
   /// Returns the id of the file format plugin that is registered as
   /// the primary format for the given file extension.
@@ -98,7 +96,7 @@ public:
   bool FormatSupportsEditing(const std::string &extension,
                              const std::string &target = std::string());
 
-private:
+ private:
   /// \struct _Info
   ///
   /// Information about a file format plugin. This structure initially holds
@@ -107,7 +105,7 @@ private:
   /// loaded, and the file format is instantiated.
   ///
   class _Info {
-  public:
+   public:
     /// Enumerates specific Capabilities that can be authored in the
     /// format's plugInfo.json file.
     enum class Capabilities : uint32_t {
@@ -117,10 +115,19 @@ private:
       Editing = 1 << 2
     };
 
-    _Info(const TfToken &formatId, const TfType &type, const TfToken &target,
-          const PlugPluginPtr &plugin, Capabilities capabilities)
-        : formatId(formatId), type(type), target(target),
-          capabilities(capabilities), _plugin(plugin), _hasFormat(false) {}
+    _Info(const TfToken &formatId,
+          const TfType &type,
+          const TfToken &target,
+          const PlugPluginPtr &plugin,
+          Capabilities capabilities)
+        : formatId(formatId),
+          type(type),
+          target(target),
+          capabilities(capabilities),
+          _plugin(plugin),
+          _hasFormat(false)
+    {
+    }
 
     // Return this _Info's file format
     SdfFileFormatRefPtr GetFileFormat() const;
@@ -130,7 +137,7 @@ private:
     const TfToken target;
     const Capabilities capabilities;
 
-  private:
+   private:
     const PlugPluginPtr _plugin;
     mutable std::mutex _formatMutex;
     mutable std::atomic<bool> _hasFormat;
@@ -151,8 +158,7 @@ private:
   // many-to-many mapping from file extensions -> file format info
   // A file with a given extension may be supported by any number of file
   // formats plugins.
-  typedef TfHashMap<std::string, _InfoSharedPtrVector, TfHash>
-      _FullExtensionIndex;
+  typedef TfHashMap<std::string, _InfoSharedPtrVector, TfHash> _FullExtensionIndex;
 
   // Populates the _formatInfo structure if it is empty. This causes plugin
   // discovery to run, but does not load any plugins.
@@ -164,8 +170,7 @@ private:
   SdfFileFormatConstPtr _GetFileFormat(const _InfoSharedPtr &format);
 
   // Gets the format info for the supplied path, target pair
-  _InfoSharedPtr _GetFormatInfo(const std::string &path,
-                                const std::string &target);
+  _InfoSharedPtr _GetFormatInfo(const std::string &path, const std::string &target);
 
   // Given a path and target: returns true if the file format supports the
   // given capability.
@@ -173,8 +178,7 @@ private:
                                  const std::string &target,
                                  _Info::Capabilities capability);
 
-  static _Info::Capabilities
-  _ParseFormatCapabilities(const TfType &fileFormatType);
+  static _Info::Capabilities _ParseFormatCapabilities(const TfType &fileFormatType);
 
   _FormatInfo _formatInfo;
   _ExtensionIndex _extensionIndex;
@@ -186,4 +190,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_FILE_FORMAT_REGISTRY_H
+#endif  // PXR_USD_SDF_FILE_FORMAT_REGISTRY_H

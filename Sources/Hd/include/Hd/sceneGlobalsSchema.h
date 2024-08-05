@@ -33,22 +33,18 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
-
-#include "Sdf/path.h"
 #include "Hd/sceneIndex.h"
+#include "Sdf/path.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDSCENEGLOBALS_SCHEMA_TOKENS \
-    (sceneGlobals) \
-    (activeRenderSettingsPrim) \
+#define HDSCENEGLOBALS_SCHEMA_TOKENS (sceneGlobals)(activeRenderSettingsPrim)
 
-TF_DECLARE_PUBLIC_TOKENS(HdSceneGlobalsSchemaTokens, HD_API,
-    HDSCENEGLOBALS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSceneGlobalsSchemaTokens, HD_API, HDSCENEGLOBALS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
@@ -63,97 +59,86 @@ TF_DECLARE_PUBLIC_TOKENS(HdSceneGlobalsSchemaTokens, HD_API,
 /// behavior as necessary.
 ///
 
-class HdSceneGlobalsSchema : public HdSchema
-{
-public:
-    HdSceneGlobalsSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdSceneGlobalsSchema : public HdSchema {
+ public:
+  HdSceneGlobalsSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdPathDataSourceHandle GetActiveRenderSettingsPrim();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdPathDataSourceHandle &activeRenderSettingsPrim);
+
+  /// \class HdSceneGlobalsSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetActiveRenderSettingsPrim();
+    Builder &SetActiveRenderSettingsPrim(const HdPathDataSourceHandle &activeRenderSettingsPrim);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &activeRenderSettingsPrim
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdSceneGlobalsSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetActiveRenderSettingsPrim(
-            const HdPathDataSourceHandle &activeRenderSettingsPrim);
+   private:
+    HdPathDataSourceHandle _activeRenderSettingsPrim;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Constructs and returns a HdSceneGlobalsSchema from the root prim in the
+  /// scene index. Since the root prim might not have a data source for this
+  /// schema, the result should be checked with IsDefined() or a bool
+  /// conversion before use.
+  ///
+  /// \note This API is preferable to GetFromParent(container).
+  HD_API
+  static HdSceneGlobalsSchema GetFromSceneIndex(const HdSceneIndexBaseRefPtr &si);
 
-    private:
-        HdPathDataSourceHandle _activeRenderSettingsPrim;
-    };
-    
-    /// Constructs and returns a HdSceneGlobalsSchema from the root prim in the
-    /// scene index. Since the root prim might not have a data source for this
-    /// schema, the result should be checked with IsDefined() or a bool 
-    /// conversion before use.
-    ///
-    /// \note This API is preferable to GetFromParent(container).
-    HD_API
-    static HdSceneGlobalsSchema
-    GetFromSceneIndex(
-        const HdSceneIndexBaseRefPtr &si);
-    
-    /// Utility method to concretize the convention of parking the 
-    /// "sceneGlobals" container at the root prim of the scene index.
-    static const SdfPath&
-    GetDefaultPrimPath() {
-        return SdfPath::AbsoluteRootPath();
-    }
+  /// Utility method to concretize the convention of parking the
+  /// "sceneGlobals" container at the root prim of the scene index.
+  static const SdfPath &GetDefaultPrimPath()
+  {
+    return SdfPath::AbsoluteRootPath();
+  }
 
+  /// Retrieves a container data source with the schema's default name token
+  /// "sceneGlobals" from the parent container and constructs a
+  /// HdSceneGlobalsSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdSceneGlobalsSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "sceneGlobals" from the parent container and constructs a
-    /// HdSceneGlobalsSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdSceneGlobalsSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the activerendersettingsprim data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetActiveRenderSettingsPrimLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the activerendersettingsprim data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetActiveRenderSettingsPrimLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -27,24 +27,24 @@
 
 /// \file ndr/registry.h
 
-#include <pxr/pxrns.h>
 #include "Ndr/api.h"
+#include "Ndr/declare.h"
+#include "Ndr/nodeDiscoveryResult.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/type.h"
 #include "Tf/weakBase.h"
-#include "Ndr/declare.h"
-#include "Ndr/nodeDiscoveryResult.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Register a discovery plugin (`DiscoveryPluginClass`) with the plugin system.
 /// If registered, the discovery plugin will execute its discovery process when
 /// the registry is instantiated.
-#define NDR_REGISTER_DISCOVERY_PLUGIN(DiscoveryPluginClass)                   \
-  TF_REGISTRY_FUNCTION(TfType)                                                \
-  {                                                                           \
+#define NDR_REGISTER_DISCOVERY_PLUGIN(DiscoveryPluginClass) \
+  TF_REGISTRY_FUNCTION(TfType) \
+  { \
     TfType::Define<DiscoveryPluginClass, TfType::Bases<NdrDiscoveryPlugin>>() \
-        .SetFactory<NdrDiscoveryPluginFactory<DiscoveryPluginClass>>();       \
+        .SetFactory<NdrDiscoveryPluginFactory<DiscoveryPluginClass>>(); \
   }
 
 TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPluginContext);
@@ -52,9 +52,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPluginContext);
 /// A context for discovery.  Discovery plugins can use this to get
 /// a limited set of non-local information without direct coupling
 /// between plugins.
-class NdrDiscoveryPluginContext : public TfRefBase, public TfWeakBase
-{
-public:
+class NdrDiscoveryPluginContext : public TfRefBase, public TfWeakBase {
+ public:
   NDR_API
   virtual ~NdrDiscoveryPluginContext() = default;
 
@@ -140,9 +139,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPlugin);
 ///     </li>
 /// </ul>
 ///
-class NdrDiscoveryPlugin : public TfRefBase, public TfWeakBase
-{
-public:
+class NdrDiscoveryPlugin : public TfRefBase, public TfWeakBase {
+ public:
   using Context = NdrDiscoveryPluginContext;
 
   NDR_API
@@ -163,17 +161,14 @@ public:
 /// \cond
 /// Factory classes should be hidden from the documentation.
 
-class NdrDiscoveryPluginFactoryBase : public TfType::FactoryBase
-{
-public:
+class NdrDiscoveryPluginFactoryBase : public TfType::FactoryBase {
+ public:
   NDR_API
   virtual NdrDiscoveryPluginRefPtr New() const = 0;
 };
 
-template <class T>
-class NdrDiscoveryPluginFactory : public NdrDiscoveryPluginFactoryBase
-{
-public:
+template<class T> class NdrDiscoveryPluginFactory : public NdrDiscoveryPluginFactoryBase {
+ public:
   NdrDiscoveryPluginRefPtr New() const override
   {
     return TfCreateRefPtr(new T);
@@ -184,4 +179,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_DISCOVERY_PLUGIN_H
+#endif  // PXR_USD_NDR_DISCOVERY_PLUGIN_H

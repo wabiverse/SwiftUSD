@@ -30,81 +30,71 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDDEPENDENCY_SCHEMA_TOKENS \
-    (dependedOnPrimPath) \
-    (dependedOnDataSourceLocator) \
-    (affectedDataSourceLocator) \
+  (dependedOnPrimPath)(dependedOnDataSourceLocator)(affectedDataSourceLocator)
 
-TF_DECLARE_PUBLIC_TOKENS(HdDependencySchemaTokens, HD_API,
-    HDDEPENDENCY_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdDependencySchemaTokens, HD_API, HDDEPENDENCY_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdDependencySchema : public HdSchema
-{
-public:
-    HdDependencySchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdDependencySchema : public HdSchema {
+ public:
+  HdDependencySchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdPathDataSourceHandle GetDependedOnPrimPath();
+  HD_API
+  HdLocatorDataSourceHandle GetDependedOnDataSourceLocator();
+  HD_API
+  HdLocatorDataSourceHandle GetAffectedDataSourceLocator();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdPathDataSourceHandle &dependedOnPrimPath,
+      const HdLocatorDataSourceHandle &dependedOnDataSourceLocator,
+      const HdLocatorDataSourceHandle &affectedDataSourceLocator);
+
+  /// \class HdDependencySchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetDependedOnPrimPath();
+    Builder &SetDependedOnPrimPath(const HdPathDataSourceHandle &dependedOnPrimPath);
     HD_API
-    HdLocatorDataSourceHandle GetDependedOnDataSourceLocator();
+    Builder &SetDependedOnDataSourceLocator(
+        const HdLocatorDataSourceHandle &dependedOnDataSourceLocator);
     HD_API
-    HdLocatorDataSourceHandle GetAffectedDataSourceLocator();
+    Builder &SetAffectedDataSourceLocator(
+        const HdLocatorDataSourceHandle &affectedDataSourceLocator);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &dependedOnPrimPath,
-        const HdLocatorDataSourceHandle &dependedOnDataSourceLocator,
-        const HdLocatorDataSourceHandle &affectedDataSourceLocator
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdDependencySchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetDependedOnPrimPath(
-            const HdPathDataSourceHandle &dependedOnPrimPath);
-        HD_API
-        Builder &SetDependedOnDataSourceLocator(
-            const HdLocatorDataSourceHandle &dependedOnDataSourceLocator);
-        HD_API
-        Builder &SetAffectedDataSourceLocator(
-            const HdLocatorDataSourceHandle &affectedDataSourceLocator);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdPathDataSourceHandle _dependedOnPrimPath;
-        HdLocatorDataSourceHandle _dependedOnDataSourceLocator;
-        HdLocatorDataSourceHandle _affectedDataSourceLocator;
-    };
-
+   private:
+    HdPathDataSourceHandle _dependedOnPrimPath;
+    HdLocatorDataSourceHandle _dependedOnDataSourceLocator;
+    HdLocatorDataSourceHandle _affectedDataSourceLocator;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

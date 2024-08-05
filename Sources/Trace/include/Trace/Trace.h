@@ -35,10 +35,10 @@
 
 #include <Trace/concurrentList.h>
 
-#include <Trace/stringHash.h>
 #include <Trace/category.h>
-#include <Trace/staticKeyData.h>
 #include <Trace/key.h>
+#include <Trace/staticKeyData.h>
+#include <Trace/stringHash.h>
 
 // #include <Trace/dataBuffer.h>
 #include <Trace/dynamicKey.h>
@@ -57,9 +57,9 @@
 // #include <Trace/eventTree.h>
 
 #include <Trace/collection.h>
-#include <Trace/serialization.h>
 #include <Trace/collectionNotice.h>
 #include <Trace/reporterDataSourceBase.h>
+#include <Trace/serialization.h>
 
 // #include <Trace/reporterBase.h>
 
@@ -76,4 +76,4 @@
 #include <Trace/reporterDataSourceCollection.h>
 // #include <Trace/reporterDataSourceCollector.h>
 
-#endif // __PXR_BASE_TRACE_H__
+#endif  // __PXR_BASE_TRACE_H__

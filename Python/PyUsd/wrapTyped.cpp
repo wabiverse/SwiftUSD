@@ -42,20 +42,21 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define WRAP_CUSTOM                                                            \
-  template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-static std::string _Repr(const UsdTyped &self) {
+static std::string _Repr(const UsdTyped &self)
+{
   std::string primRepr = TfPyRepr(self.GetPrim());
   return TfStringPrintf("Usd.Typed(%s)", primRepr.c_str());
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapUsdTyped() {
+void wrapUsdTyped()
+{
   typedef UsdTyped This;
 
   class_<This, bases<UsdSchemaBase>> cls("Typed");
@@ -67,12 +68,14 @@ void wrapUsdTyped() {
       .def("Get", &This::Get, (arg("stage"), arg("path")))
       .staticmethod("Get")
 
-      .def("GetSchemaAttributeNames", &This::GetSchemaAttributeNames,
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
            arg("includeInherited") = true,
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -106,4 +109,4 @@ namespace {
 
 WRAP_CUSTOM {}
 
-} // namespace
+}  // namespace

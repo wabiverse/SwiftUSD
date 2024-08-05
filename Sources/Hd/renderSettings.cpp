@@ -28,257 +28,212 @@
 
 #include "Arch/hash.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-    
-template <class HashState>
-void TfHashAppend(
-        HashState &h,
-        HdRenderSettings::RenderProduct::RenderVar const &rv)
+
+template<class HashState>
+void TfHashAppend(HashState &h, HdRenderSettings::RenderProduct::RenderVar const &rv)
 {
-    h.Append(
-            rv.varPath,
-            rv.dataType,
-            rv.sourceName,
-            rv.sourceType,
-            rv.namespacedSettings);
+  h.Append(rv.varPath, rv.dataType, rv.sourceName, rv.sourceType, rv.namespacedSettings);
 }
 
-template <class HashState>
-void TfHashAppend(
-    HashState &h,
-    HdRenderSettings::RenderProduct const &rp)
+template<class HashState>
+void TfHashAppend(HashState &h, HdRenderSettings::RenderProduct const &rp)
 {
-    h.Append(
-            rp.productPath,
-            rp.type,
-            rp.name,
-            rp.resolution,
-            rp.renderVars,
-            rp.cameraPath,
-            rp.pixelAspectRatio,
-            rp.aspectRatioConformPolicy,
-            rp.apertureSize,
-            rp.dataWindowNDC,
-            rp.disableMotionBlur,
-            rp.namespacedSettings);
+  h.Append(rp.productPath,
+           rp.type,
+           rp.name,
+           rp.resolution,
+           rp.renderVars,
+           rp.cameraPath,
+           rp.pixelAspectRatio,
+           rp.aspectRatioConformPolicy,
+           rp.apertureSize,
+           rp.dataWindowNDC,
+           rp.disableMotionBlur,
+           rp.namespacedSettings);
 }
 
-}
+}  // namespace
 // -------------------------------------------------------------------------- //
 
-HdRenderSettings::HdRenderSettings(
-    SdfPath const& id)
-    : HdBprim(id)
-    , _active(false)
-    , _settingsVersion(1)
+HdRenderSettings::HdRenderSettings(SdfPath const &id)
+    : HdBprim(id), _active(false), _settingsVersion(1)
 {
 }
 
 HdRenderSettings::~HdRenderSettings() = default;
 
-bool
-HdRenderSettings::IsActive() const
+bool HdRenderSettings::IsActive() const
 {
-    return _active;
+  return _active;
 }
 
-const HdRenderSettings::NamespacedSettings&
-HdRenderSettings::GetNamespacedSettings() const
+const HdRenderSettings::NamespacedSettings &HdRenderSettings::GetNamespacedSettings() const
 {
-    return _namespacedSettings;
+  return _namespacedSettings;
 }
 
-unsigned int
-HdRenderSettings::GetSettingsVersion() const
- {
-    return _settingsVersion;
+unsigned int HdRenderSettings::GetSettingsVersion() const
+{
+  return _settingsVersion;
 }
 
-const HdRenderSettings::RenderProducts&
-HdRenderSettings::GetRenderProducts() const
+const HdRenderSettings::RenderProducts &HdRenderSettings::GetRenderProducts() const
 {
-    return _products;
+  return _products;
 }
 
-const VtArray<TfToken>&
-HdRenderSettings::GetIncludedPurposes() const
+const VtArray<TfToken> &HdRenderSettings::GetIncludedPurposes() const
 {
-    return _includedPurposes;
+  return _includedPurposes;
 }
 
-const VtArray<TfToken>&
-HdRenderSettings::GetMaterialBindingPurposes() const
+const VtArray<TfToken> &HdRenderSettings::GetMaterialBindingPurposes() const
 {
-    return _materialBindingPurposes;
+  return _materialBindingPurposes;
 }
 
-const TfToken&
-HdRenderSettings::GetRenderingColorSpace() const
+const TfToken &HdRenderSettings::GetRenderingColorSpace() const
 {
-    return _renderingColorSpace;
+  return _renderingColorSpace;
 }
 
-void
-HdRenderSettings::Sync(
-    HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    HdDirtyBits *dirtyBits)
+void HdRenderSettings::Sync(HdSceneDelegate *sceneDelegate,
+                            HdRenderParam *renderParam,
+                            HdDirtyBits *dirtyBits)
 {
-    if (*dirtyBits & HdRenderSettings::DirtyActive) {
+  if (*dirtyBits & HdRenderSettings::DirtyActive) {
 
-        const VtValue val = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->active);
-        if (val.IsHolding<bool>()) {
-            _active = val.UncheckedGet<bool>();
-        }
+    const VtValue val = sceneDelegate->Get(GetId(), HdRenderSettingsPrimTokens->active);
+    if (val.IsHolding<bool>()) {
+      _active = val.UncheckedGet<bool>();
     }
+  }
 
-    if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings) {
+  if (*dirtyBits & HdRenderSettings::DirtyNamespacedSettings) {
 
-        const VtValue vSettings = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->namespacedSettings);
-        if (vSettings.IsHolding<VtDictionary>()) {
-            _namespacedSettings = vSettings.UncheckedGet<VtDictionary>();
-            _settingsVersion++;
-        }
+    const VtValue vSettings = sceneDelegate->Get(GetId(),
+                                                 HdRenderSettingsPrimTokens->namespacedSettings);
+    if (vSettings.IsHolding<VtDictionary>()) {
+      _namespacedSettings = vSettings.UncheckedGet<VtDictionary>();
+      _settingsVersion++;
     }
+  }
 
-    if (*dirtyBits & HdRenderSettings::DirtyRenderProducts) {
+  if (*dirtyBits & HdRenderSettings::DirtyRenderProducts) {
 
-        const VtValue vProducts = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->renderProducts);
-        if (vProducts.IsHolding<RenderProducts>()) {
-            _products = vProducts.UncheckedGet<RenderProducts>();
-        }
+    const VtValue vProducts = sceneDelegate->Get(GetId(),
+                                                 HdRenderSettingsPrimTokens->renderProducts);
+    if (vProducts.IsHolding<RenderProducts>()) {
+      _products = vProducts.UncheckedGet<RenderProducts>();
     }
+  }
 
-    if (*dirtyBits & HdRenderSettings::DirtyIncludedPurposes) {
+  if (*dirtyBits & HdRenderSettings::DirtyIncludedPurposes) {
 
-        const VtValue vPurposes = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->includedPurposes);
-        if (vPurposes.IsHolding<VtArray<TfToken>>()) {
-            _includedPurposes = vPurposes.UncheckedGet<VtArray<TfToken>>();
-        }
+    const VtValue vPurposes = sceneDelegate->Get(GetId(),
+                                                 HdRenderSettingsPrimTokens->includedPurposes);
+    if (vPurposes.IsHolding<VtArray<TfToken>>()) {
+      _includedPurposes = vPurposes.UncheckedGet<VtArray<TfToken>>();
     }
+  }
 
-    if (*dirtyBits & HdRenderSettings::DirtyMaterialBindingPurposes) {
+  if (*dirtyBits & HdRenderSettings::DirtyMaterialBindingPurposes) {
 
-        const VtValue vPurposes = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->materialBindingPurposes);
-        if (vPurposes.IsHolding<VtArray<TfToken>>()) {
-            _materialBindingPurposes =
-                vPurposes.UncheckedGet<VtArray<TfToken>>();
-        }
+    const VtValue vPurposes = sceneDelegate->Get(
+        GetId(), HdRenderSettingsPrimTokens->materialBindingPurposes);
+    if (vPurposes.IsHolding<VtArray<TfToken>>()) {
+      _materialBindingPurposes = vPurposes.UncheckedGet<VtArray<TfToken>>();
     }
+  }
 
-    if (*dirtyBits & HdRenderSettings::DirtyRenderingColorSpace) {
+  if (*dirtyBits & HdRenderSettings::DirtyRenderingColorSpace) {
 
-        const VtValue vColorSpace = sceneDelegate->Get(
-            GetId(), HdRenderSettingsPrimTokens->renderingColorSpace);
-        if (vColorSpace.IsHolding<TfToken>()) {
-            _renderingColorSpace = vColorSpace.UncheckedGet<TfToken>();
-        }
+    const VtValue vColorSpace = sceneDelegate->Get(
+        GetId(), HdRenderSettingsPrimTokens->renderingColorSpace);
+    if (vColorSpace.IsHolding<TfToken>()) {
+      _renderingColorSpace = vColorSpace.UncheckedGet<TfToken>();
     }
+  }
 
-    // Allow subclasses to do any additional processing if necessary.
-    _Sync(sceneDelegate, renderParam, dirtyBits);
+  // Allow subclasses to do any additional processing if necessary.
+  _Sync(sceneDelegate, renderParam, dirtyBits);
 
-    *dirtyBits = HdChangeTracker::Clean;
+  *dirtyBits = HdChangeTracker::Clean;
 }
 
 HdDirtyBits HdRenderSettings::GetInitialDirtyBitsMask() const
 {
-    int mask = HdRenderSettings::AllDirty;
-    return HdDirtyBits(mask);
+  int mask = HdRenderSettings::AllDirty;
+  return HdDirtyBits(mask);
 }
 
-void
-HdRenderSettings::_Sync(
-    HdSceneDelegate *sceneDelegate,
-    HdRenderParam *renderParam,
-    const HdDirtyBits *dirtyBits)
+void HdRenderSettings::_Sync(HdSceneDelegate *sceneDelegate,
+                             HdRenderParam *renderParam,
+                             const HdDirtyBits *dirtyBits)
 {
-    // no-op
+  // no-op
 }
 
 // -------------------------------------------------------------------------- //
 // VtValue Requirements
 // -------------------------------------------------------------------------- //
-size_t
-hash_value(HdRenderSettings::RenderProduct const &rp)
+size_t hash_value(HdRenderSettings::RenderProduct const &rp)
 {
-    return TfHash()(rp);
+  return TfHash()(rp);
 }
 
-std::ostream& operator<<(
-    std::ostream& out,
-    const HdRenderSettings::RenderProduct& rp)
+std::ostream &operator<<(std::ostream &out, const HdRenderSettings::RenderProduct &rp)
 {
-    out << "RenderProduct: \n"
-        << "    productPath : " << rp.productPath
-        << "    resolution : " << rp.resolution
-        << "    namespacedSettings: " << rp.namespacedSettings
-        << "    renderVars: \n";
-    for (size_t rvId = 0; rvId < rp.renderVars.size(); rvId++) {
-        out << "        [" << rvId << "] "  << rp.renderVars[rvId];
-    }
-    // XXX Fill other state as need be.
-    return out;
+  out << "RenderProduct: \n"
+      << "    productPath : " << rp.productPath << "    resolution : " << rp.resolution
+      << "    namespacedSettings: " << rp.namespacedSettings << "    renderVars: \n";
+  for (size_t rvId = 0; rvId < rp.renderVars.size(); rvId++) {
+    out << "        [" << rvId << "] " << rp.renderVars[rvId];
+  }
+  // XXX Fill other state as need be.
+  return out;
 }
 
-bool operator==(const HdRenderSettings::RenderProduct& lhs, 
-                const HdRenderSettings::RenderProduct& rhs) 
+bool operator==(const HdRenderSettings::RenderProduct &lhs,
+                const HdRenderSettings::RenderProduct &rhs)
 {
-    return
-           lhs.productPath == rhs.productPath
-        && lhs.type == rhs.type
-        && lhs.name == rhs.name
-        && lhs.resolution == rhs.resolution
-        && lhs.renderVars == rhs.renderVars
-        && lhs.cameraPath == rhs.cameraPath
-        && lhs.pixelAspectRatio == rhs.pixelAspectRatio
-        && lhs.aspectRatioConformPolicy == rhs.aspectRatioConformPolicy
-        && lhs.apertureSize == rhs.apertureSize
-        && lhs.dataWindowNDC == rhs.dataWindowNDC
-        && lhs.disableMotionBlur == rhs.disableMotionBlur
-        && lhs.namespacedSettings == rhs.namespacedSettings;
+  return lhs.productPath == rhs.productPath && lhs.type == rhs.type && lhs.name == rhs.name &&
+         lhs.resolution == rhs.resolution && lhs.renderVars == rhs.renderVars &&
+         lhs.cameraPath == rhs.cameraPath && lhs.pixelAspectRatio == rhs.pixelAspectRatio &&
+         lhs.aspectRatioConformPolicy == rhs.aspectRatioConformPolicy &&
+         lhs.apertureSize == rhs.apertureSize && lhs.dataWindowNDC == rhs.dataWindowNDC &&
+         lhs.disableMotionBlur == rhs.disableMotionBlur &&
+         lhs.namespacedSettings == rhs.namespacedSettings;
 }
 
-bool operator!=(const HdRenderSettings::RenderProduct& lhs, 
-                const HdRenderSettings::RenderProduct& rhs) 
+bool operator!=(const HdRenderSettings::RenderProduct &lhs,
+                const HdRenderSettings::RenderProduct &rhs)
 {
-    return !(lhs == rhs);
+  return !(lhs == rhs);
 }
 
-std::ostream& operator<<(
-    std::ostream& out,
-    const HdRenderSettings::RenderProduct::RenderVar& rv)
+std::ostream &operator<<(std::ostream &out, const HdRenderSettings::RenderProduct::RenderVar &rv)
 {
-    out << "RenderVar \n"
-        << "    varPath : " << rv.varPath
-        << "    namespacedSettings" << rv.namespacedSettings;
-    return out;
+  out << "RenderVar \n"
+      << "    varPath : " << rv.varPath << "    namespacedSettings" << rv.namespacedSettings;
+  return out;
 }
 
-bool operator==(const HdRenderSettings::RenderProduct::RenderVar& lhs, 
-                const HdRenderSettings::RenderProduct::RenderVar& rhs) 
+bool operator==(const HdRenderSettings::RenderProduct::RenderVar &lhs,
+                const HdRenderSettings::RenderProduct::RenderVar &rhs)
 {
-    return
-           lhs.varPath == rhs.varPath
-        && lhs.dataType == rhs.dataType
-        && lhs.sourceName == rhs.sourceName
-        && lhs.sourceType == rhs.sourceType
-        && lhs.namespacedSettings == rhs.namespacedSettings;
+  return lhs.varPath == rhs.varPath && lhs.dataType == rhs.dataType &&
+         lhs.sourceName == rhs.sourceName && lhs.sourceType == rhs.sourceType &&
+         lhs.namespacedSettings == rhs.namespacedSettings;
 }
 
-bool operator!=(const HdRenderSettings::RenderProduct::RenderVar& lhs, 
-                const HdRenderSettings::RenderProduct::RenderVar& rhs) 
+bool operator!=(const HdRenderSettings::RenderProduct::RenderVar &lhs,
+                const HdRenderSettings::RenderProduct::RenderVar &rhs)
 {
-    return !(lhs == rhs);
+  return !(lhs == rhs);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -33,173 +33,138 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDMODEL_SCHEMA_TOKENS \
-    (model) \
-    (drawMode) \
-    (applyDrawMode) \
-    (drawModeColor) \
-    (cardGeometry) \
-    (cardTextureXPos) \
-    (cardTextureYPos) \
-    (cardTextureZPos) \
-    (cardTextureXNeg) \
-    (cardTextureYNeg) \
-    (cardTextureZNeg) \
-    (inherited) \
-    (origin) \
-    (bounds) \
-    (cards) \
-    ((default_, "default")) \
-    (cross) \
-    (box) \
-    (fromTexture) \
+  (model)(drawMode)( \
+      applyDrawMode)(drawModeColor)(cardGeometry)(cardTextureXPos)(cardTextureYPos)(cardTextureZPos)(cardTextureXNeg)(cardTextureYNeg)(cardTextureZNeg)(inherited)(origin)(bounds)(cards)(( \
+      default_, "default"))(cross)(box)(fromTexture)
 
-TF_DECLARE_PUBLIC_TOKENS(HdModelSchemaTokens, HD_API,
-    HDMODEL_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdModelSchemaTokens, HD_API, HDMODEL_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdModelSchema : public HdSchema
-{
-public:
-    HdModelSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdModelSchema : public HdSchema {
+ public:
+  HdModelSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
-    HD_API
-    HdTokenDataSourceHandle GetDrawMode();
-    HD_API
-    HdBoolDataSourceHandle GetApplyDrawMode();
-    HD_API
-    HdVec3fDataSourceHandle GetDrawModeColor();
-    HD_API
-    HdTokenDataSourceHandle GetCardGeometry();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureXPos();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureYPos();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureZPos();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureXNeg();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureYNeg();
-    HD_API
-    HdAssetPathDataSourceHandle GetCardTextureZNeg();
+  HD_API
+  HdTokenDataSourceHandle GetDrawMode();
+  HD_API
+  HdBoolDataSourceHandle GetApplyDrawMode();
+  HD_API
+  HdVec3fDataSourceHandle GetDrawModeColor();
+  HD_API
+  HdTokenDataSourceHandle GetCardGeometry();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureXPos();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureYPos();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureZPos();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureXNeg();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureYNeg();
+  HD_API
+  HdAssetPathDataSourceHandle GetCardTextureZNeg();
 
-    // RETRIEVING AND CONSTRUCTING
+  // RETRIEVING AND CONSTRUCTING
 
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdTokenDataSourceHandle &drawMode,
+      const HdBoolDataSourceHandle &applyDrawMode,
+      const HdVec3fDataSourceHandle &drawModeColor,
+      const HdTokenDataSourceHandle &cardGeometry,
+      const HdAssetPathDataSourceHandle &cardTextureXPos,
+      const HdAssetPathDataSourceHandle &cardTextureYPos,
+      const HdAssetPathDataSourceHandle &cardTextureZPos,
+      const HdAssetPathDataSourceHandle &cardTextureXNeg,
+      const HdAssetPathDataSourceHandle &cardTextureYNeg,
+      const HdAssetPathDataSourceHandle &cardTextureZNeg);
+
+  /// \class HdModelSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &drawMode,
-        const HdBoolDataSourceHandle &applyDrawMode,
-        const HdVec3fDataSourceHandle &drawModeColor,
-        const HdTokenDataSourceHandle &cardGeometry,
-        const HdAssetPathDataSourceHandle &cardTextureXPos,
-        const HdAssetPathDataSourceHandle &cardTextureYPos,
-        const HdAssetPathDataSourceHandle &cardTextureZPos,
-        const HdAssetPathDataSourceHandle &cardTextureXNeg,
-        const HdAssetPathDataSourceHandle &cardTextureYNeg,
-        const HdAssetPathDataSourceHandle &cardTextureZNeg
-    );
-
-    /// \class HdModelSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetDrawMode(
-            const HdTokenDataSourceHandle &drawMode);
-        HD_API
-        Builder &SetApplyDrawMode(
-            const HdBoolDataSourceHandle &applyDrawMode);
-        HD_API
-        Builder &SetDrawModeColor(
-            const HdVec3fDataSourceHandle &drawModeColor);
-        HD_API
-        Builder &SetCardGeometry(
-            const HdTokenDataSourceHandle &cardGeometry);
-        HD_API
-        Builder &SetCardTextureXPos(
-            const HdAssetPathDataSourceHandle &cardTextureXPos);
-        HD_API
-        Builder &SetCardTextureYPos(
-            const HdAssetPathDataSourceHandle &cardTextureYPos);
-        HD_API
-        Builder &SetCardTextureZPos(
-            const HdAssetPathDataSourceHandle &cardTextureZPos);
-        HD_API
-        Builder &SetCardTextureXNeg(
-            const HdAssetPathDataSourceHandle &cardTextureXNeg);
-        HD_API
-        Builder &SetCardTextureYNeg(
-            const HdAssetPathDataSourceHandle &cardTextureYNeg);
-        HD_API
-        Builder &SetCardTextureZNeg(
-            const HdAssetPathDataSourceHandle &cardTextureZNeg);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _drawMode;
-        HdBoolDataSourceHandle _applyDrawMode;
-        HdVec3fDataSourceHandle _drawModeColor;
-        HdTokenDataSourceHandle _cardGeometry;
-        HdAssetPathDataSourceHandle _cardTextureXPos;
-        HdAssetPathDataSourceHandle _cardTextureYPos;
-        HdAssetPathDataSourceHandle _cardTextureZPos;
-        HdAssetPathDataSourceHandle _cardTextureXNeg;
-        HdAssetPathDataSourceHandle _cardTextureYNeg;
-        HdAssetPathDataSourceHandle _cardTextureZNeg;
-    };
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "model" from the parent container and constructs a
-    /// HdModelSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+    Builder &SetDrawMode(const HdTokenDataSourceHandle &drawMode);
     HD_API
-    static HdModelSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
+    Builder &SetApplyDrawMode(const HdBoolDataSourceHandle &applyDrawMode);
     HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
+    Builder &SetDrawModeColor(const HdVec3fDataSourceHandle &drawModeColor);
     HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the drawmode data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+    Builder &SetCardGeometry(const HdTokenDataSourceHandle &cardGeometry);
     HD_API
-    static const HdDataSourceLocator &GetDrawModeLocator();
+    Builder &SetCardTextureXPos(const HdAssetPathDataSourceHandle &cardTextureXPos);
+    HD_API
+    Builder &SetCardTextureYPos(const HdAssetPathDataSourceHandle &cardTextureYPos);
+    HD_API
+    Builder &SetCardTextureZPos(const HdAssetPathDataSourceHandle &cardTextureZPos);
+    HD_API
+    Builder &SetCardTextureXNeg(const HdAssetPathDataSourceHandle &cardTextureXNeg);
+    HD_API
+    Builder &SetCardTextureYNeg(const HdAssetPathDataSourceHandle &cardTextureYNeg);
+    HD_API
+    Builder &SetCardTextureZNeg(const HdAssetPathDataSourceHandle &cardTextureZNeg);
 
+    /// Returns a container data source containing the members set thus far.
+    HD_API
+    HdContainerDataSourceHandle Build();
+
+   private:
+    HdTokenDataSourceHandle _drawMode;
+    HdBoolDataSourceHandle _applyDrawMode;
+    HdVec3fDataSourceHandle _drawModeColor;
+    HdTokenDataSourceHandle _cardGeometry;
+    HdAssetPathDataSourceHandle _cardTextureXPos;
+    HdAssetPathDataSourceHandle _cardTextureYPos;
+    HdAssetPathDataSourceHandle _cardTextureZPos;
+    HdAssetPathDataSourceHandle _cardTextureXNeg;
+    HdAssetPathDataSourceHandle _cardTextureYNeg;
+    HdAssetPathDataSourceHandle _cardTextureZNeg;
+  };
+
+  /// Retrieves a container data source with the schema's default name token
+  /// "model" from the parent container and constructs a
+  /// HdModelSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdModelSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
+
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the drawmode data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetDrawModeLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

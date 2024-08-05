@@ -96,12 +96,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace pxr_half {
 
 class half {
-public:
+ public:
   //-------------
   // Constructors
   //-------------
 
-  half() = default; // no initialization
+  half() = default;  // no initialization
   half(float f);
   // rule of 5
   ~half() = default;
@@ -203,13 +203,13 @@ public:
   GF_API unsigned short bits() const;
   GF_API void setBits(unsigned short bits);
 
-public:
+ public:
   union uif {
     unsigned int i;
     float f;
   };
 
-private:
+ private:
   GF_API static short convert(int i);
   GF_API static float overflow();
 
@@ -245,66 +245,66 @@ GF_API void printBits(char c[35], float f);
 
 #if (defined _WIN32 || defined _WIN64) && defined _MSC_VER
 
-#define PXR_HALF_MIN 5.96046448e-08f // Smallest positive half
+#  define PXR_HALF_MIN 5.96046448e-08f  // Smallest positive half
 
-#define PXR_HALF_NRM_MIN 6.10351562e-05f // Smallest positive normalized half
+#  define PXR_HALF_NRM_MIN 6.10351562e-05f  // Smallest positive normalized half
 
-#define PXR_HALF_MAX 65504.0f // Largest positive half
+#  define PXR_HALF_MAX 65504.0f  // Largest positive half
 
-#define PXR_HALF_EPSILON                                                       \
-  0.00097656f // Smallest positive e for which
-              // half (1.0 + e) != half (1.0)
+#  define PXR_HALF_EPSILON \
+    0.00097656f  // Smallest positive e for which
+                 // half (1.0 + e) != half (1.0)
 #else
 
-#define PXR_HALF_MIN 5.96046448e-08 // Smallest positive half
+#  define PXR_HALF_MIN 5.96046448e-08  // Smallest positive half
 
-#define PXR_HALF_NRM_MIN 6.10351562e-05 // Smallest positive normalized half
+#  define PXR_HALF_NRM_MIN 6.10351562e-05  // Smallest positive normalized half
 
-#define PXR_HALF_MAX 65504.0 // Largest positive half
+#  define PXR_HALF_MAX 65504.0  // Largest positive half
 
-#define PXR_HALF_EPSILON 0.00097656 // Smallest positive e for which
+#  define PXR_HALF_EPSILON 0.00097656  // Smallest positive e for which
 // half (1.0 + e) != half (1.0)
 #endif
 
-#define PXR_HALF_MANT_DIG                                                      \
-  11 // Number of digits in mantissa
-     // (significand + hidden leading 1)
+#define PXR_HALF_MANT_DIG \
+  11  // Number of digits in mantissa
+      // (significand + hidden leading 1)
 
 //
 // floor( (PXR_HALF_MANT_DIG - 1) * log10(2) ) => 3.01... -> 3
-#define PXR_HALF_DIG                                                           \
-  3 // Number of base 10 digits that
-    // can be represented without change
+#define PXR_HALF_DIG \
+  3  // Number of base 10 digits that
+     // can be represented without change
 
 // ceil(PXR_HALF_MANT_DIG * log10(2) + 1) => 4.31... -> 5
-#define PXR_HALF_DECIMAL_DIG                                                   \
-  5 // Number of base-10 digits that are
-    // necessary to uniquely represent all
-    // distinct values
+#define PXR_HALF_DECIMAL_DIG \
+  5  // Number of base-10 digits that are
+     // necessary to uniquely represent all
+     // distinct values
 
-#define PXR_HALF_RADIX 2 // Base of the exponent
+#define PXR_HALF_RADIX 2  // Base of the exponent
 
-#define PXR_HALF_MIN_EXP                                                       \
-  -13 // Minimum negative integer such that
+#define PXR_HALF_MIN_EXP \
+  -13  // Minimum negative integer such that
+       // PXR_HALF_RADIX raised to the power of
+       // one less than that integer is a
+       // normalized half
+
+#define PXR_HALF_MAX_EXP \
+  16  // Maximum positive integer such that
       // PXR_HALF_RADIX raised to the power of
       // one less than that integer is a
       // normalized half
 
-#define PXR_HALF_MAX_EXP                                                       \
-  16 // Maximum positive integer such that
-     // PXR_HALF_RADIX raised to the power of
-     // one less than that integer is a
-     // normalized half
+#define PXR_HALF_MIN_10_EXP \
+  -4  // Minimum positive integer such
+      // that 10 raised to that power is
+      // a normalized half
 
-#define PXR_HALF_MIN_10_EXP                                                    \
-  -4 // Minimum positive integer such
+#define PXR_HALF_MAX_10_EXP \
+  4  // Maximum positive integer such
      // that 10 raised to that power is
      // a normalized half
-
-#define PXR_HALF_MAX_10_EXP                                                    \
-  4 // Maximum positive integer such
-    // that 10 raised to that power is
-    // a normalized half
 
 //---------------------------------------------------------------------------
 //
@@ -421,7 +421,8 @@ GF_API void printBits(char c[35], float f);
 // Half-from-float constructor
 //----------------------------
 
-inline half::half(float f) {
+inline half::half(float f)
+{
   uif x;
 
   x.f = f;
@@ -433,7 +434,8 @@ inline half::half(float f) {
     //
 
     _h = (x.i >> 16);
-  } else {
+  }
+  else {
     //
     // We extract the combined sign and exponent, e, from our
     // floating-point number, f.  Then we convert e to the sign
@@ -462,7 +464,8 @@ inline half::half(float f) {
 
       int m = x.i & 0x007fffff;
       _h = e + ((m + 0x00000fff + ((m >> 13) & 1)) >> 13);
-    } else {
+    }
+    else {
       //
       // Difficult case - call a function.
       //
@@ -476,13 +479,17 @@ inline half::half(float f) {
 // Half-to-float conversion via table lookup
 //------------------------------------------
 
-inline half::operator float() const { return _toFloat[_h].f; }
+inline half::operator float() const
+{
+  return _toFloat[_h].f;
+}
 
 //-------------------------
 // Round to n-bit precision
 //-------------------------
 
-inline half half::round(unsigned int n) const {
+inline half half::round(unsigned int n) const
+{
   //
   // Parameter check.
   //
@@ -537,118 +544,149 @@ inline half half::round(unsigned int n) const {
 // Other inline functions
 //-----------------------
 
-inline half half::operator-() const {
+inline half half::operator-() const
+{
   half h;
   h._h = _h ^ 0x8000;
   return h;
 }
 
-inline half &half::operator=(float f) {
+inline half &half::operator=(float f)
+{
   *this = half(f);
   return *this;
 }
 
-inline half &half::operator+=(half h) {
+inline half &half::operator+=(half h)
+{
   *this = half(float(*this) + float(h));
   return *this;
 }
 
-inline half &half::operator+=(float f) {
+inline half &half::operator+=(float f)
+{
   *this = half(float(*this) + f);
   return *this;
 }
 
-inline half &half::operator-=(half h) {
+inline half &half::operator-=(half h)
+{
   *this = half(float(*this) - float(h));
   return *this;
 }
 
-inline half &half::operator-=(float f) {
+inline half &half::operator-=(float f)
+{
   *this = half(float(*this) - f);
   return *this;
 }
 
-inline half &half::operator*=(half h) {
+inline half &half::operator*=(half h)
+{
   *this = half(float(*this) * float(h));
   return *this;
 }
 
-inline half &half::operator*=(float f) {
+inline half &half::operator*=(float f)
+{
   *this = half(float(*this) * f);
   return *this;
 }
 
-inline half &half::operator/=(half h) {
+inline half &half::operator/=(half h)
+{
   *this = half(float(*this) / float(h));
   return *this;
 }
 
-inline half &half::operator/=(float f) {
+inline half &half::operator/=(float f)
+{
   *this = half(float(*this) / f);
   return *this;
 }
 
-inline bool half::isFinite() const {
+inline bool half::isFinite() const
+{
   unsigned short e = (_h >> 10) & 0x001f;
   return e < 31;
 }
 
-inline bool half::isNormalized() const {
+inline bool half::isNormalized() const
+{
   unsigned short e = (_h >> 10) & 0x001f;
   return e > 0 && e < 31;
 }
 
-inline bool half::isDenormalized() const {
+inline bool half::isDenormalized() const
+{
   unsigned short e = (_h >> 10) & 0x001f;
   unsigned short m = _h & 0x3ff;
   return e == 0 && m != 0;
 }
 
-inline bool half::isZero() const { return (_h & 0x7fff) == 0; }
+inline bool half::isZero() const
+{
+  return (_h & 0x7fff) == 0;
+}
 
-inline bool half::isNan() const {
+inline bool half::isNan() const
+{
   unsigned short e = (_h >> 10) & 0x001f;
   unsigned short m = _h & 0x3ff;
   return e == 31 && m != 0;
 }
 
-inline bool half::isInfinity() const {
+inline bool half::isInfinity() const
+{
   unsigned short e = (_h >> 10) & 0x001f;
   unsigned short m = _h & 0x3ff;
   return e == 31 && m == 0;
 }
 
-inline bool half::isNegative() const { return (_h & 0x8000) != 0; }
+inline bool half::isNegative() const
+{
+  return (_h & 0x8000) != 0;
+}
 
-inline half half::posInf() {
+inline half half::posInf()
+{
   half h;
   h._h = 0x7c00;
   return h;
 }
 
-inline half half::negInf() {
+inline half half::negInf()
+{
   half h;
   h._h = 0xfc00;
   return h;
 }
 
-inline half half::qNan() {
+inline half half::qNan()
+{
   half h;
   h._h = 0x7fff;
   return h;
 }
 
-inline half half::sNan() {
+inline half half::sNan()
+{
   half h;
   h._h = 0x7dff;
   return h;
 }
 
-inline unsigned short half::bits() const { return _h; }
+inline unsigned short half::bits() const
+{
+  return _h;
+}
 
-inline void half::setBits(unsigned short bits) { _h = bits; }
+inline void half::setBits(unsigned short bits)
+{
+  _h = bits;
+}
 
-} // namespace pxr_half
+}  // namespace pxr_half
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -24,14 +24,13 @@
 #ifndef PXR_USD_USDMTLX_FILE_FORMAT_H
 #define PXR_USD_USDMTLX_FILE_FORMAT_H
 
-#include <pxr/pxrns.h>
 #include "Sdf/fileFormat.h"
 #include "Tf/staticTokens.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define USDMTLX_FILE_FORMAT_TOKENS \
-  ((Id, "mtlx"))((Version, "1.0"))((Target, "usd"))
+#define USDMTLX_FILE_FORMAT_TOKENS ((Id, "mtlx"))((Version, "1.0"))((Target, "usd"))
 
 TF_DECLARE_PUBLIC_TOKENS(UsdMtlxFileFormatTokens, USDMTLX_FILE_FORMAT_TOKENS);
 
@@ -39,30 +38,23 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdMtlxFileFormat);
 
 /// \class UsdMtlxFileFormat
 ///
-class UsdMtlxFileFormat : public SdfFileFormat
-{
-public:
+class UsdMtlxFileFormat : public SdfFileFormat {
+ public:
   // SdfFileFormat overrides
   SdfAbstractDataRefPtr InitData(const FileFormatArguments &) const override;
   bool CanRead(const std::string &file) const override;
-  bool Read(SdfLayer *layer,
-            const std::string &resolvedPath,
-            bool metadataOnly) const override;
+  bool Read(SdfLayer *layer, const std::string &resolvedPath, bool metadataOnly) const override;
   bool WriteToFile(const SdfLayer &layer,
                    const std::string &filePath,
                    const std::string &comment = std::string(),
-                   const FileFormatArguments &args =
-                       FileFormatArguments()) const override;
-  bool ReadFromString(SdfLayer *layer,
-                      const std::string &str) const override;
+                   const FileFormatArguments &args = FileFormatArguments()) const override;
+  bool ReadFromString(SdfLayer *layer, const std::string &str) const override;
   bool WriteToString(const SdfLayer &layer,
                      std::string *str,
                      const std::string &comment = std::string()) const override;
-  bool WriteToStream(const SdfSpecHandle &spec,
-                     std::ostream &out,
-                     size_t indent) const override;
+  bool WriteToStream(const SdfSpecHandle &spec, std::ostream &out, size_t indent) const override;
 
-protected:
+ protected:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   UsdMtlxFileFormat();
@@ -71,4 +63,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USDMTLX_FILE_FORMAT_H
+#endif  // PXR_USD_USDMTLX_FILE_FORMAT_H

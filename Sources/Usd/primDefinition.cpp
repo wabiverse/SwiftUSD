@@ -30,9 +30,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void UsdPrimDefinition::_IntializeForTypedSchema(
-    const SdfLayerHandle &schematicsLayer, const SdfPath &schematicsPrimPath,
-    const VtTokenArray &propertiesToIgnore) {
+void UsdPrimDefinition::_IntializeForTypedSchema(const SdfLayerHandle &schematicsLayer,
+                                                 const SdfPath &schematicsPrimPath,
+                                                 const VtTokenArray &propertiesToIgnore)
+{
   _primLayerAndPath = {get_pointer(schematicsLayer), schematicsPrimPath};
 
   if (_MapSchematicsPropertyPaths(propertiesToIgnore)) {
@@ -48,9 +49,11 @@ void UsdPrimDefinition::_IntializeForTypedSchema(
   }
 }
 
-void UsdPrimDefinition::_IntializeForAPISchema(
-    const TfToken &apiSchemaName, const SdfLayerHandle &schematicsLayer,
-    const SdfPath &schematicsPrimPath, const VtTokenArray &propertiesToIgnore) {
+void UsdPrimDefinition::_IntializeForAPISchema(const TfToken &apiSchemaName,
+                                               const SdfLayerHandle &schematicsLayer,
+                                               const SdfPath &schematicsPrimPath,
+                                               const VtTokenArray &propertiesToIgnore)
+{
   // We always include the API schema itself as the first applied API
   // schema in its prim definition.
   _appliedAPISchemas = {apiSchemaName};
@@ -60,47 +63,45 @@ void UsdPrimDefinition::_IntializeForAPISchema(
   _MapSchematicsPropertyPaths(propertiesToIgnore);
 }
 
-SdfPropertySpecHandle
-UsdPrimDefinition::GetSchemaPropertySpec(const TfToken &propName) const {
+SdfPropertySpecHandle UsdPrimDefinition::GetSchemaPropertySpec(const TfToken &propName) const
+{
   if (const _LayerAndPath *layerAndPath = _GetPropertyLayerAndPath(propName)) {
     // XXX: We have to const cast because the schematics layers really
     // shouldn't be editable via the prim definitions. But these methods
     // already exist and return an editable property spec. These methods
     // should one day be deprecated and replaced.
-    return const_cast<SdfLayer *>(layerAndPath->layer)
-        ->GetPropertyAtPath(layerAndPath->path);
+    return const_cast<SdfLayer *>(layerAndPath->layer)->GetPropertyAtPath(layerAndPath->path);
   }
   return TfNullPtr;
 }
 
-SdfAttributeSpecHandle
-UsdPrimDefinition::GetSchemaAttributeSpec(const TfToken &attrName) const {
+SdfAttributeSpecHandle UsdPrimDefinition::GetSchemaAttributeSpec(const TfToken &attrName) const
+{
   if (const _LayerAndPath *layerAndPath = _GetPropertyLayerAndPath(attrName)) {
     // XXX: We have to const cast because the schematics layers really
     // shouldn't be editable via the prim definitions. But these methods
     // already exist and return an editable property spec. These methods
     // should one day be deprecated and replaced.
-    return const_cast<SdfLayer *>(layerAndPath->layer)
-        ->GetAttributeAtPath(layerAndPath->path);
+    return const_cast<SdfLayer *>(layerAndPath->layer)->GetAttributeAtPath(layerAndPath->path);
   }
   return TfNullPtr;
 }
 
-SdfRelationshipSpecHandle
-UsdPrimDefinition::GetSchemaRelationshipSpec(const TfToken &relName) const {
+SdfRelationshipSpecHandle UsdPrimDefinition::GetSchemaRelationshipSpec(
+    const TfToken &relName) const
+{
   if (const _LayerAndPath *layerAndPath = _GetPropertyLayerAndPath(relName)) {
     // XXX: We have to const cast because the schematics layers really
     // shouldn't be editable via the prim definitions. But these methods
     // already exist and return an editable property spec. These methods
     // should one day be deprecated and replaced.
-    return const_cast<SdfLayer *>(layerAndPath->layer)
-        ->GetRelationshipAtPath(layerAndPath->path);
+    return const_cast<SdfLayer *>(layerAndPath->layer)->GetRelationshipAtPath(layerAndPath->path);
   }
   return TfNullPtr;
 }
 
-UsdPrimDefinition::Property
-UsdPrimDefinition::GetPropertyDefinition(const TfToken &propName) const {
+UsdPrimDefinition::Property UsdPrimDefinition::GetPropertyDefinition(const TfToken &propName) const
+{
   // For Typed schemas, the empty property is mapped to the prim path to
   // access prim metadata for the schema. We make sure that this can't be
   // accessed via the public GetPropertyDefinition since we only want this
@@ -111,24 +112,28 @@ UsdPrimDefinition::GetPropertyDefinition(const TfToken &propName) const {
   return Property(propName, _GetPropertyLayerAndPath(propName));
 }
 
-UsdPrimDefinition::Attribute
-UsdPrimDefinition::GetAttributeDefinition(const TfToken &attrName) const {
+UsdPrimDefinition::Attribute UsdPrimDefinition::GetAttributeDefinition(
+    const TfToken &attrName) const
+{
   return GetPropertyDefinition(attrName);
 }
 
-UsdPrimDefinition::Relationship
-UsdPrimDefinition::GetRelationshipDefinition(const TfToken &relName) const {
+UsdPrimDefinition::Relationship UsdPrimDefinition::GetRelationshipDefinition(
+    const TfToken &relName) const
+{
   return GetPropertyDefinition(relName);
 }
 
-SdfSpecType UsdPrimDefinition::GetSpecType(const TfToken &propName) const {
+SdfSpecType UsdPrimDefinition::GetSpecType(const TfToken &propName) const
+{
   if (const Property prop = GetPropertyDefinition(propName)) {
     return prop.GetSpecType();
   }
   return SdfSpecTypeUnknown;
 }
 
-std::string UsdPrimDefinition::GetDocumentation() const {
+std::string UsdPrimDefinition::GetDocumentation() const
+{
   // Special case for prim documentation. Pure API schemas don't map their
   // prim spec paths to the empty token as they aren't meant to provide
   // metadata fallbacks so _HasField will always return false. To get
@@ -138,23 +143,24 @@ std::string UsdPrimDefinition::GetDocumentation() const {
   return Property(&_primLayerAndPath).GetDocumentation();
 }
 
-TfTokenVector
-UsdPrimDefinition::ListPropertyMetadataFields(const TfToken &propName) const {
+TfTokenVector UsdPrimDefinition::ListPropertyMetadataFields(const TfToken &propName) const
+{
   if (const Property prop = GetPropertyDefinition(propName)) {
     return prop.ListMetadataFields();
   }
   return TfTokenVector();
 }
 
-std::string
-UsdPrimDefinition::GetPropertyDocumentation(const TfToken &propName) const {
+std::string UsdPrimDefinition::GetPropertyDocumentation(const TfToken &propName) const
+{
   if (const Property prop = GetPropertyDefinition(propName)) {
     return prop.GetDocumentation();
   }
   return std::string();
 }
 
-TfTokenVector UsdPrimDefinition::ListMetadataFields() const {
+TfTokenVector UsdPrimDefinition::ListMetadataFields() const
+{
   // Prim metadata for Typed schema definitions is stored specially as an
   // empty named property which will not be returned by GetPropertyDefinition.
   // But we can still access it
@@ -164,12 +170,11 @@ TfTokenVector UsdPrimDefinition::ListMetadataFields() const {
   return TfTokenVector();
 }
 
-bool UsdPrimDefinition::_MapSchematicsPropertyPaths(
-    const VtTokenArray &propertiesToIgnore) {
+bool UsdPrimDefinition::_MapSchematicsPropertyPaths(const VtTokenArray &propertiesToIgnore)
+{
   // Get the names of all the properties defined in the prim spec.
   TfTokenVector specPropertyNames;
-  if (!_primLayerAndPath.HasField(SdfChildrenKeys->PropertyChildren,
-                                  &specPropertyNames)) {
+  if (!_primLayerAndPath.HasField(SdfChildrenKeys->PropertyChildren, &specPropertyNames)) {
     if (!_primLayerAndPath.layer->HasSpec(_primLayerAndPath.path)) {
       // While its possible for the spec to have no properties, we expect
       // the prim spec itself to exist.
@@ -182,11 +187,9 @@ bool UsdPrimDefinition::_MapSchematicsPropertyPaths(
   }
 
   auto addPropFn = [&](TfToken &propName) {
-    _LayerAndPath propLayerAndPath{
-        _primLayerAndPath.layer,
-        _primLayerAndPath.path.AppendProperty(propName)};
-    auto insertIt = _propLayerAndPathMap.emplace(std::move(propName),
-                                                 std::move(propLayerAndPath));
+    _LayerAndPath propLayerAndPath{_primLayerAndPath.layer,
+                                   _primLayerAndPath.path.AppendProperty(propName)};
+    auto insertIt = _propLayerAndPathMap.emplace(std::move(propName), std::move(propLayerAndPath));
     if (insertIt.second) {
       _properties.push_back(insertIt.first->first);
     }
@@ -200,13 +203,15 @@ bool UsdPrimDefinition::_MapSchematicsPropertyPaths(
     for (TfToken &propName : specPropertyNames) {
       addPropFn(propName);
     }
-  } else {
+  }
+  else {
     for (TfToken &propName : specPropertyNames) {
       // Note the propertiesToIgnore list is expected to be extremely
       // small (like a few entries at most) so linear search should be
       // efficient enough.
-      if (std::find(propertiesToIgnore.begin(), propertiesToIgnore.end(),
-                    propName) == propertiesToIgnore.end()) {
+      if (std::find(propertiesToIgnore.begin(), propertiesToIgnore.end(), propName) ==
+          propertiesToIgnore.end())
+      {
         addPropFn(propName);
       }
     }
@@ -220,8 +225,8 @@ bool UsdPrimDefinition::_MapSchematicsPropertyPaths(
 // the same kind of property (attribute or relationship) and if they are
 // attributes, that their attributes type names are the same.
 /*static*/
-bool UsdPrimDefinition::_PropertyTypesMatch(const Property &strongProp,
-                                            const Property &weakProp) {
+bool UsdPrimDefinition::_PropertyTypesMatch(const Property &strongProp, const Property &weakProp)
+{
   if (!TF_VERIFY(strongProp && weakProp)) {
     return false;
   }
@@ -229,13 +234,14 @@ bool UsdPrimDefinition::_PropertyTypesMatch(const Property &strongProp,
   if (strongProp.IsRelationship()) {
     // Compare spec types (relationship vs attribute)
     if (!weakProp.IsRelationship()) {
-      TF_WARN("Cannot compose schema specs: Schema relationship spec at "
-              "path '%s' in layer '%s' is a different spec type than "
-              "schema attribute spec at path '%s' in layer '%s'.",
-              strongProp._layerAndPath->path.GetText(),
-              strongProp._layerAndPath->layer->GetIdentifier().c_str(),
-              weakProp._layerAndPath->path.GetText(),
-              weakProp._layerAndPath->layer->GetIdentifier().c_str());
+      TF_WARN(
+          "Cannot compose schema specs: Schema relationship spec at "
+          "path '%s' in layer '%s' is a different spec type than "
+          "schema attribute spec at path '%s' in layer '%s'.",
+          strongProp._layerAndPath->path.GetText(),
+          strongProp._layerAndPath->layer->GetIdentifier().c_str(),
+          weakProp._layerAndPath->path.GetText(),
+          weakProp._layerAndPath->layer->GetIdentifier().c_str());
       return false;
     }
     return true;
@@ -248,13 +254,14 @@ bool UsdPrimDefinition::_PropertyTypesMatch(const Property &strongProp,
 
   Attribute weakAttr(weakProp);
   if (!weakAttr) {
-    TF_WARN("Cannot compose schema specs: Schema attribute spec at "
-            "path '%s' in layer '%s' is a different spec type than "
-            "schema relationship spec at path '%s' in layer '%s'.",
-            strongProp._layerAndPath->path.GetText(),
-            strongProp._layerAndPath->layer->GetIdentifier().c_str(),
-            weakProp._layerAndPath->path.GetText(),
-            weakProp._layerAndPath->layer->GetIdentifier().c_str());
+    TF_WARN(
+        "Cannot compose schema specs: Schema attribute spec at "
+        "path '%s' in layer '%s' is a different spec type than "
+        "schema relationship spec at path '%s' in layer '%s'.",
+        strongProp._layerAndPath->path.GetText(),
+        strongProp._layerAndPath->layer->GetIdentifier().c_str(),
+        weakProp._layerAndPath->path.GetText(),
+        weakProp._layerAndPath->layer->GetIdentifier().c_str());
     return false;
   }
 
@@ -262,22 +269,24 @@ bool UsdPrimDefinition::_PropertyTypesMatch(const Property &strongProp,
   const TfToken strongTypeName = strongAttr.GetTypeNameToken();
   const TfToken weakTypeName = weakAttr.GetTypeNameToken();
   if (weakTypeName != strongTypeName) {
-    TF_WARN("Cannot compose schema attribute specs: Mismatched type names."
-            "Schema attribute spec at path '%s' in layer '%s' has type "
-            "name '%s' while schema attribute spec at path '%s' in layer "
-            "'%s' has type name '%s'.",
-            strongProp._layerAndPath->path.GetText(),
-            strongProp._layerAndPath->layer->GetIdentifier().c_str(),
-            strongTypeName.GetText(), weakProp._layerAndPath->path.GetText(),
-            weakProp._layerAndPath->layer->GetIdentifier().c_str(),
-            weakTypeName.GetText());
+    TF_WARN(
+        "Cannot compose schema attribute specs: Mismatched type names."
+        "Schema attribute spec at path '%s' in layer '%s' has type "
+        "name '%s' while schema attribute spec at path '%s' in layer "
+        "'%s' has type name '%s'.",
+        strongProp._layerAndPath->path.GetText(),
+        strongProp._layerAndPath->layer->GetIdentifier().c_str(),
+        strongTypeName.GetText(),
+        weakProp._layerAndPath->path.GetText(),
+        weakProp._layerAndPath->layer->GetIdentifier().c_str(),
+        weakTypeName.GetText());
     return false;
   }
   return true;
 }
 
-void UsdPrimDefinition::_ComposePropertiesFromPrimDef(
-    const UsdPrimDefinition &weakerPrimDef) {
+void UsdPrimDefinition::_ComposePropertiesFromPrimDef(const UsdPrimDefinition &weakerPrimDef)
+{
   _properties.reserve(_properties.size() + weakerPrimDef._properties.size());
 
   // Copy over property to path mappings from the weaker prim definition,
@@ -288,22 +297,23 @@ void UsdPrimDefinition::_ComposePropertiesFromPrimDef(
 }
 
 void UsdPrimDefinition::_ComposePropertiesFromPrimDefInstance(
-    const UsdPrimDefinition &weakerPrimDef, const std::string &instanceName) {
+    const UsdPrimDefinition &weakerPrimDef, const std::string &instanceName)
+{
   _properties.reserve(_properties.size() + weakerPrimDef._properties.size());
 
   // Copy over property to path mappings from the weaker prim definition,
   // possibly creating composed definitions for properties that already exist.
   for (const auto &it : weakerPrimDef._propLayerAndPathMap) {
     // Apply the prefix to each property name before adding it.
-    const TfToken instancedPropName =
-        UsdSchemaRegistry::MakeMultipleApplyNameInstance(it.first,
-                                                         instanceName);
+    const TfToken instancedPropName = UsdSchemaRegistry::MakeMultipleApplyNameInstance(
+        it.first, instanceName);
     _AddOrComposeProperty(instancedPropName, it.second);
   }
 }
 
-void UsdPrimDefinition::_AddOrComposeProperty(
-    const TfToken &propName, const _LayerAndPath &layerAndPath) {
+void UsdPrimDefinition::_AddOrComposeProperty(const TfToken &propName,
+                                              const _LayerAndPath &layerAndPath)
+{
   // Note that the prop name may be empty as we use the empty path to
   // map to the spec containing the prim level metadata. We need to
   // make sure we don't add the empty name to properties list if
@@ -313,19 +323,19 @@ void UsdPrimDefinition::_AddOrComposeProperty(
     if (!propName.IsEmpty()) {
       _properties.push_back(propName);
     }
-  } else {
+  }
+  else {
     // The property exists already. Some fields may be able to be
     // composed in from the new weaker property definition so we try to
     // do that here.
     _LayerAndPath &existingProp = insertResult.first->second;
-    if (SdfPropertySpecHandle composedPropSpec =
-            _CreateComposedPropertyIfNeeded(propName, existingProp,
-                                            layerAndPath)) {
+    if (SdfPropertySpecHandle composedPropSpec = _CreateComposedPropertyIfNeeded(
+            propName, existingProp, layerAndPath))
+    {
       // If a composed property was created, replace the existing
       // property definition. Otherwise, we just leave the existing
       // property as is.
-      existingProp = {get_pointer(composedPropSpec->GetLayer()),
-                      composedPropSpec->GetPath()};
+      existingProp = {get_pointer(composedPropSpec->GetLayer()), composedPropSpec->GetPath()};
     }
   }
 }
@@ -333,18 +343,18 @@ void UsdPrimDefinition::_AddOrComposeProperty(
 // We limit which fields are allowed to be composed in from a property defined
 // in a weaker prim definition when a prim definition already has a property
 // with the same name.
-static const TfTokenVector &_GetAllowedComposeFromWeakerPropertyFields() {
+static const TfTokenVector &_GetAllowedComposeFromWeakerPropertyFields()
+{
   // Right now we only allow the "default" value (of attributes) and the
   // "hidden" field to be composed from a weaker property. We may selectively
   // expand this set of fields if it becomes necessary.
-  static const TfTokenVector fields = {SdfFieldKeys->Default,
-                                       SdfFieldKeys->Hidden};
+  static const TfTokenVector fields = {SdfFieldKeys->Default, SdfFieldKeys->Hidden};
   return fields;
 }
 
-SdfPropertySpecHandle
-UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
-    const TfToken &propName, const _LayerAndPath &srcLayerAndPath) {
+SdfPropertySpecHandle UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
+    const TfToken &propName, const _LayerAndPath &srcLayerAndPath)
+{
   // Arbitrary prim path for this definition's composed property specs. Only
   // this prim definition will use the layer we find or create here so we
   // don't need unique prim spec names/paths.
@@ -357,13 +367,13 @@ UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
   // we create a new layer for this prim definition to write its composed
   // properties.
   if (_composedPropertyLayer) {
-    if ((destProp = _composedPropertyLayer->GetPropertyAtPath(
-            primPath.AppendProperty(propName)))) {
+    if ((destProp = _composedPropertyLayer->GetPropertyAtPath(primPath.AppendProperty(propName))))
+    {
       return destProp;
     }
-  } else {
-    _composedPropertyLayer =
-        SdfLayer::CreateAnonymous("schema-composed-properties");
+  }
+  else {
+    _composedPropertyLayer = SdfLayer::CreateAnonymous("schema-composed-properties");
   }
 
   SdfChangeBlock block;
@@ -371,8 +381,7 @@ UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
   // Find or create the prim spec that will hold the composed property specs.
   SdfPrimSpecHandle destPrim = _composedPropertyLayer->GetPrimAtPath(primPath);
   if (!destPrim) {
-    destPrim = SdfPrimSpec::New(_composedPropertyLayer, primPath.GetName(),
-                                SdfSpecifierDef);
+    destPrim = SdfPrimSpec::New(_composedPropertyLayer, primPath.GetName(), SdfSpecifierDef);
   }
 
   // Create a copy of the source attribute or relationship spec. We do this
@@ -381,17 +390,19 @@ UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
   const Property srcProp(&srcLayerAndPath);
   if (srcProp.IsAttribute()) {
     const Attribute srcAttr(srcProp);
-    destProp = SdfAttributeSpec::New(destPrim, propName, srcAttr.GetTypeName(),
-                                     srcAttr.GetVariability());
-  } else if (srcProp.IsRelationship()) {
-    destProp =
-        SdfRelationshipSpec::New(destPrim, propName, srcProp.GetVariability());
-  } else {
-    TF_CODING_ERROR("Cannot create a property spec from spec at layer "
-                    "'%s' and path '%s'. The spec type is not an attribute or "
-                    "relationship.",
-                    srcLayerAndPath.layer->GetIdentifier().c_str(),
-                    srcLayerAndPath.path.GetText());
+    destProp = SdfAttributeSpec::New(
+        destPrim, propName, srcAttr.GetTypeName(), srcAttr.GetVariability());
+  }
+  else if (srcProp.IsRelationship()) {
+    destProp = SdfRelationshipSpec::New(destPrim, propName, srcProp.GetVariability());
+  }
+  else {
+    TF_CODING_ERROR(
+        "Cannot create a property spec from spec at layer "
+        "'%s' and path '%s'. The spec type is not an attribute or "
+        "relationship.",
+        srcLayerAndPath.layer->GetIdentifier().c_str(),
+        srcLayerAndPath.path.GetText());
     return destProp;
   }
 
@@ -406,8 +417,8 @@ UsdPrimDefinition::_FindOrCreatePropertySpecForComposition(
 }
 
 SdfPropertySpecHandle UsdPrimDefinition::_CreateComposedPropertyIfNeeded(
-    const TfToken &propName, const _LayerAndPath &strongProp,
-    const _LayerAndPath &weakProp) {
+    const TfToken &propName, const _LayerAndPath &strongProp, const _LayerAndPath &weakProp)
+{
   SdfPropertySpecHandle destProp;
 
   // If the property types don't match, then we can't compose the properties
@@ -441,22 +452,21 @@ SdfPropertySpecHandle UsdPrimDefinition::_CreateComposedPropertyIfNeeded(
   return destProp;
 }
 
-void UsdPrimDefinition::_ComposeOverAndReplaceExistingProperty(
-    const TfToken &propName, const SdfLayerRefPtr &overLayer,
-    const SdfPath &overPrimPath) {
+void UsdPrimDefinition::_ComposeOverAndReplaceExistingProperty(const TfToken &propName,
+                                                               const SdfLayerRefPtr &overLayer,
+                                                               const SdfPath &overPrimPath)
+{
   // Get the path to the property in the prim definition that the
   // override property applies to. If no such property exists, we ignore
   // the override.
-  UsdPrimDefinition::_LayerAndPath *defLayerAndPath =
-      _GetPropertyLayerAndPath(propName);
+  UsdPrimDefinition::_LayerAndPath *defLayerAndPath = _GetPropertyLayerAndPath(propName);
   if (!defLayerAndPath) {
     return;
   }
 
   // Property overrides are not allowed to change the type of a property
   // from its defining spec.
-  _LayerAndPath overLayerAndPath{get_pointer(overLayer),
-                                 overPrimPath.AppendProperty(propName)};
+  _LayerAndPath overLayerAndPath{get_pointer(overLayer), overPrimPath.AppendProperty(propName)};
 
   const Property overProp(&overLayerAndPath);
   const Property defProp(defLayerAndPath);
@@ -482,8 +492,7 @@ void UsdPrimDefinition::_ComposeOverAndReplaceExistingProperty(
   // set the variability to match the defined property.
   SdfVariability variability = defProp.GetVariability();
   if (overProp.GetVariability() != variability) {
-    overLayer->SetField(overLayerAndPath.path, SdfFieldKeys->Variability,
-                        variability);
+    overLayer->SetField(overLayerAndPath.path, SdfFieldKeys->Variability, variability);
   }
 
   // With the override spec composed, set the definition's path for the
@@ -492,8 +501,10 @@ void UsdPrimDefinition::_ComposeOverAndReplaceExistingProperty(
 }
 
 bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
-    const UsdPrimDefinition &apiPrimDef, const TfToken &instanceName,
-    _FamilyAndInstanceToVersionMap *alreadyAppliedSchemaFamilyVersions) {
+    const UsdPrimDefinition &apiPrimDef,
+    const TfToken &instanceName,
+    _FamilyAndInstanceToVersionMap *alreadyAppliedSchemaFamilyVersions)
+{
   // Helper for appending the given schemas to our applied schemas list while
   // checking for version conflicts. Returns true if the schemas are appended
   // which only happens if there are no conflicts.
@@ -503,8 +514,7 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
     const size_t startingNumAppliedSchemas = _appliedAPISchemas.size();
     std::vector<std::pair<TfToken, TfToken>> newlyAddedFamilies;
 
-    _appliedAPISchemas.reserve(startingNumAppliedSchemas +
-                               apiSchemaNamesToAppend.size());
+    _appliedAPISchemas.reserve(startingNumAppliedSchemas + apiSchemaNamesToAppend.size());
     // Append each API schema name to this definition's applied API schemas
     // list checking each for vesion conflicts with the already applied
     // schemas. If any conflicts are found, NONE of these schemas will be
@@ -519,15 +529,15 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
       // Use the identifier to get the schema family. The family and
       // instance name are the key into the already applied family
       // versions.
-      const UsdSchemaRegistry::SchemaInfo *schemaInfo =
-          UsdSchemaRegistry::FindSchemaInfo(identifierAndInstance.first);
-      std::pair<TfToken, TfToken> familyAndInstance(
-          schemaInfo->family, identifierAndInstance.second);
+      const UsdSchemaRegistry::SchemaInfo *schemaInfo = UsdSchemaRegistry::FindSchemaInfo(
+          identifierAndInstance.first);
+      std::pair<TfToken, TfToken> familyAndInstance(schemaInfo->family,
+                                                    identifierAndInstance.second);
 
       // Try to add the family and instance's version to the applied map
       // to check if we have a version conflict.
-      const auto result = alreadyAppliedSchemaFamilyVersions->emplace(
-          familyAndInstance, schemaInfo->version);
+      const auto result = alreadyAppliedSchemaFamilyVersions->emplace(familyAndInstance,
+                                                                      schemaInfo->version);
       if (result.second) {
         // The family and instance were not already in the map so we
         // can add the schema name to the applied list. We also store
@@ -535,7 +545,8 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
         // can undo the addition if we have to.
         _appliedAPISchemas.push_back(std::move(apiSchemaName));
         newlyAddedFamilies.push_back(std::move(familyAndInstance));
-      } else if (result.first->second != schemaInfo->version) {
+      }
+      else if (result.first->second != schemaInfo->version) {
         // If we get here, the family and instance name were already
         // added with a different version of the schema. This is a
         // conflict and we will not add ANY of the schemas that are
@@ -548,23 +559,28 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
         }
 
         if (apiSchemaNamesToAppend.front() == apiSchemaName) {
-          TF_WARN("Failure composing the API schema definition for "
-                  "'%s' into another prim definition. Adding this schema "
-                  "would cause a version conflict with an already "
-                  "composed in API schema definition with family '%s' "
-                  "and version %u.",
-                  apiSchemaName.GetText(), result.first->first.first.GetText(),
-                  result.first->second);
-        } else {
-          TF_WARN("Failure composing the API schema definition for "
-                  "'%s' into another prim definition. Adding API schema "
-                  "'%s', which is built in to this schema definition "
-                  "would cause a version conflict with an already "
-                  "composed in API schema definition with family '%s' "
-                  "and version %u.",
-                  apiSchemaNamesToAppend.front().GetText(),
-                  apiSchemaName.GetText(), result.first->first.first.GetText(),
-                  result.first->second);
+          TF_WARN(
+              "Failure composing the API schema definition for "
+              "'%s' into another prim definition. Adding this schema "
+              "would cause a version conflict with an already "
+              "composed in API schema definition with family '%s' "
+              "and version %u.",
+              apiSchemaName.GetText(),
+              result.first->first.first.GetText(),
+              result.first->second);
+        }
+        else {
+          TF_WARN(
+              "Failure composing the API schema definition for "
+              "'%s' into another prim definition. Adding API schema "
+              "'%s', which is built in to this schema definition "
+              "would cause a version conflict with an already "
+              "composed in API schema definition with family '%s' "
+              "and version %u.",
+              apiSchemaNamesToAppend.front().GetText(),
+              apiSchemaName.GetText(),
+              result.first->first.first.GetText(),
+              result.first->second);
         }
         return false;
       }
@@ -578,15 +594,15 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
   // prim def's API schemas list. This list will always include the
   // schema itself followed by all other API schemas that were
   // composed into its definition.
-  const TfTokenVector &apiSchemaNamesToAppend =
-      apiPrimDef.GetAppliedAPISchemas();
+  const TfTokenVector &apiSchemaNamesToAppend = apiPrimDef.GetAppliedAPISchemas();
 
   if (instanceName.IsEmpty()) {
     if (!appendSchemasFn(apiSchemaNamesToAppend)) {
       return false;
     }
     _ComposePropertiesFromPrimDef(apiPrimDef);
-  } else {
+  }
+  else {
     // If an instance name is provided, the API schema definition is a
     // multiple apply template that needs the instance name applied to it
     // and all the other multiple apply schema templates it may include.
@@ -594,8 +610,7 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
     instancedAPISchemaNames.reserve(apiSchemaNamesToAppend.size());
     for (const TfToken &apiSchemaName : apiSchemaNamesToAppend) {
       instancedAPISchemaNames.push_back(
-          UsdSchemaRegistry::MakeMultipleApplyNameInstance(apiSchemaName,
-                                                           instanceName));
+          UsdSchemaRegistry::MakeMultipleApplyNameInstance(apiSchemaName, instanceName));
     }
     if (!appendSchemasFn(instancedAPISchemaNames)) {
       return false;
@@ -608,7 +623,8 @@ bool UsdPrimDefinition::_ComposeWeakerAPIPrimDefinition(
 
 bool UsdPrimDefinition::FlattenTo(const SdfLayerHandle &layer,
                                   const SdfPath &path,
-                                  SdfSpecifier newSpecSpecifier) const {
+                                  SdfSpecifier newSpecSpecifier) const
+{
   SdfChangeBlock block;
 
   // Find or create the target prim spec at the target layer.
@@ -623,12 +639,14 @@ bool UsdPrimDefinition::FlattenTo(const SdfLayerHandle &layer,
         targetSpec->ClearInfo(fieldName);
       }
     }
-  } else {
+  }
+  else {
     // Otherwise create a new target spec and set its specifier.
     targetSpec = SdfCreatePrimInLayer(layer, path);
     if (!targetSpec) {
       TF_WARN("Failed to create prim spec at path '%s' in layer '%s'",
-              path.GetText(), layer->GetIdentifier().c_str());
+              path.GetText(),
+              layer->GetIdentifier().c_str());
       return false;
     }
     targetSpec->SetSpecifier(newSpecSpecifier);
@@ -642,14 +660,14 @@ bool UsdPrimDefinition::FlattenTo(const SdfLayerHandle &layer,
       // SdfCopySpec requires the source layer to be a non-const handle
       // even though it shouldn't be editing the source layer. Thus we
       // have to const cast here.
-      const SdfLayerHandle srcLayer(
-          const_cast<SdfLayer *>(layerAndPath->layer));
-      if (!SdfCopySpec(srcLayer, layerAndPath->path, layer,
-                       path.AppendProperty(propName))) {
-        TF_WARN("Failed to copy prim definition property '%s' to prim "
-                "spec at path '%s' in layer '%s'.",
-                propName.GetText(), path.GetText(),
-                layer->GetIdentifier().c_str());
+      const SdfLayerHandle srcLayer(const_cast<SdfLayer *>(layerAndPath->layer));
+      if (!SdfCopySpec(srcLayer, layerAndPath->path, layer, path.AppendProperty(propName))) {
+        TF_WARN(
+            "Failed to copy prim definition property '%s' to prim "
+            "spec at path '%s' in layer '%s'.",
+            propName.GetText(),
+            path.GetText(),
+            layer->GetIdentifier().c_str());
       }
     }
   }
@@ -666,8 +684,8 @@ bool UsdPrimDefinition::FlattenTo(const SdfLayerHandle &layer,
   // the apiSchemas field copied from prim metadata will only contain the
   // built-in API schemas of the underlying typed schemas but not any
   // additional API schemas that may have been applied to this definition.
-  layer->SetField(path, UsdTokens->apiSchemas,
-                  VtValue(SdfTokenListOp::CreateExplicit(_appliedAPISchemas)));
+  layer->SetField(
+      path, UsdTokens->apiSchemas, VtValue(SdfTokenListOp::CreateExplicit(_appliedAPISchemas)));
 
   // Also explicitly set the documentation string. This is necessary when
   // flattening an API schema prim definition as GetMetadata doesn't return
@@ -677,8 +695,10 @@ bool UsdPrimDefinition::FlattenTo(const SdfLayerHandle &layer,
   return true;
 }
 
-UsdPrim UsdPrimDefinition::FlattenTo(const UsdPrim &parent, const TfToken &name,
-                                     SdfSpecifier newSpecSpecifier) const {
+UsdPrim UsdPrimDefinition::FlattenTo(const UsdPrim &parent,
+                                     const TfToken &name,
+                                     SdfSpecifier newSpecSpecifier) const
+{
   // Create the path of the prim we're flattening to.
   const SdfPath primPath = parent.GetPath().AppendChild(name);
 
@@ -695,67 +715,75 @@ UsdPrim UsdPrimDefinition::FlattenTo(const UsdPrim &parent, const TfToken &name,
   return parent.GetStage()->GetPrimAtPath(primPath);
 }
 
-UsdPrim UsdPrimDefinition::FlattenTo(const UsdPrim &prim,
-                                     SdfSpecifier newSpecSpecifier) const {
+UsdPrim UsdPrimDefinition::FlattenTo(const UsdPrim &prim, SdfSpecifier newSpecSpecifier) const
+{
   return FlattenTo(prim.GetParent(), prim.GetName(), newSpecSpecifier);
 }
 
-const TfToken &UsdPrimDefinition::Property::GetName() const { return _name; }
+const TfToken &UsdPrimDefinition::Property::GetName() const
+{
+  return _name;
+}
 
-bool UsdPrimDefinition::Property::IsAttribute() const {
+bool UsdPrimDefinition::Property::IsAttribute() const
+{
   return _layerAndPath && GetSpecType() == SdfSpecTypeAttribute;
 }
 
-bool UsdPrimDefinition::Property::IsRelationship() const {
+bool UsdPrimDefinition::Property::IsRelationship() const
+{
   return _layerAndPath && GetSpecType() == SdfSpecTypeRelationship;
 }
 
-SdfSpecType UsdPrimDefinition::Property::GetSpecType() const {
+SdfSpecType UsdPrimDefinition::Property::GetSpecType() const
+{
   return _layerAndPath->layer->GetSpecType(_layerAndPath->path);
 }
 
-TfTokenVector UsdPrimDefinition::Property::ListMetadataFields() const {
+TfTokenVector UsdPrimDefinition::Property::ListMetadataFields() const
+{
   // Get the list of fields from the schematics for the property (or prim)
   // path and remove the fields that we don't allow fallbacks for.
   TfTokenVector fields = _layerAndPath->layer->ListFields(_layerAndPath->path);
-  fields.erase(std::remove_if(fields.begin(), fields.end(),
-                              &UsdSchemaRegistry::IsDisallowedField),
+  fields.erase(std::remove_if(fields.begin(), fields.end(), &UsdSchemaRegistry::IsDisallowedField),
                fields.end());
   return fields;
 }
 
-SdfVariability UsdPrimDefinition::Property::GetVariability() const {
+SdfVariability UsdPrimDefinition::Property::GetVariability() const
+{
   SdfVariability variability;
   _layerAndPath->HasField(SdfFieldKeys->Variability, &variability);
   return variability;
 }
 
-std::string UsdPrimDefinition::Property::GetDocumentation() const {
+std::string UsdPrimDefinition::Property::GetDocumentation() const
+{
   std::string docString;
   _layerAndPath->HasField(SdfFieldKeys->Documentation, &docString);
   return docString;
 }
 
-UsdPrimDefinition::Attribute::Attribute(const Property &property)
-    : Property(property) {}
+UsdPrimDefinition::Attribute::Attribute(const Property &property) : Property(property) {}
 
-UsdPrimDefinition::Attribute::Attribute(Property &&property)
-    : Property(std::move(property)) {}
+UsdPrimDefinition::Attribute::Attribute(Property &&property) : Property(std::move(property)) {}
 
-SdfValueTypeName UsdPrimDefinition::Attribute::GetTypeName() const {
+SdfValueTypeName UsdPrimDefinition::Attribute::GetTypeName() const
+{
   return SdfSchema::GetInstance().FindType(GetTypeNameToken());
 }
 
-TfToken UsdPrimDefinition::Attribute::GetTypeNameToken() const {
+TfToken UsdPrimDefinition::Attribute::GetTypeNameToken() const
+{
   TfToken typeName;
   _layerAndPath->HasField(SdfFieldKeys->TypeName, &typeName);
   return typeName;
 }
 
-UsdPrimDefinition::Relationship::Relationship(const Property &property)
-    : Property(property) {}
+UsdPrimDefinition::Relationship::Relationship(const Property &property) : Property(property) {}
 
-UsdPrimDefinition::Relationship::Relationship(Property &&property)
-    : Property(std::move(property)) {}
+UsdPrimDefinition::Relationship::Relationship(Property &&property) : Property(std::move(property))
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

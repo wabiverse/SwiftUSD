@@ -22,22 +22,21 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/debugCodes.h"
-#include "pxr/base/tf/debug.h"
-#include "pxr/base/tf/diagnosticLite.h"
-#include "pxr/base/tf/stringUtils.h"
 #include "pxr/base/tf/dl.h"
 #include "Arch/fileSystem.h"
 #include "Arch/library.h"
 #include "Arch/symbols.h"
+#include "pxr/base/tf/debug.h"
+#include "pxr/base/tf/debugCodes.h"
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/base/tf/stringUtils.h"
+#include "pxr/pxr.h"
 
 using std::string;
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static bool
-Test_TfDl()
+static bool Test_TfDl()
 {
   // We should not be in the process of opening/closing a DL right now
   TF_AXIOM(!Tf_DlOpenIsActive());
@@ -58,20 +57,18 @@ Test_TfDl()
   // Compute path to test library.
   string dlname;
   TF_AXIOM(ArchGetAddressInfo((void *)Test_TfDl, &dlname, NULL, NULL, NULL));
-  dlname = TfGetPathName(dlname) +
-           "lib" ARCH_PATH_SEP
+  dlname = TfGetPathName(dlname) + "lib" ARCH_PATH_SEP
 #if !defined(ARCH_OS_WINDOWS)
-           "lib"
+                                   "lib"
 #endif
-           "TestTfDl" ARCH_LIBRARY_SUFFIX;
+                                   "TestTfDl" ARCH_LIBRARY_SUFFIX;
 
   // Make sure that this .so does indeed exist first
   printf("Checking test shared lib: %s\n", dlname.c_str());
   TF_AXIOM(!ArchFileAccess(dlname.c_str(), R_OK));
 
   // Check that we can open the existing library.
-  void *handle =
-      TfDlopen(dlname, ARCH_LIBRARY_LAZY | ARCH_LIBRARY_LOCAL, &dlerror);
+  void *handle = TfDlopen(dlname, ARCH_LIBRARY_LAZY | ARCH_LIBRARY_LOCAL, &dlerror);
   TF_AXIOM(handle);
   TF_AXIOM(dlerror.empty());
   TF_AXIOM(!TfDlclose(handle));

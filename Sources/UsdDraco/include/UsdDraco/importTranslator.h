@@ -28,8 +28,8 @@
 #include "UsdDraco/attributeDescriptor.h"
 #include "UsdDraco/importAttribute.h"
 
-#include <pxr/pxrns.h>
 #include "UsdGeom/mesh.h"
+#include <pxr/pxrns.h>
 
 #include <draco/mesh/corner_table.h>
 #include <draco/mesh/mesh.h>
@@ -40,13 +40,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Translates Draco mesh to USD mesh.
 ///
-class UsdDracoImportTranslator
-{
-public:
+class UsdDracoImportTranslator {
+ public:
   /// Translates Draco mesh to USD mesh and returns USD layer with mesh.
   static SdfLayerRefPtr Translate(const draco::Mesh &dracoMesh);
 
-private:
+ private:
   typedef draco::AttributeValueIndex PositionIndex;
   typedef std::map<PositionIndex, draco::PointIndex> PolygonEdges;
 
@@ -66,11 +65,10 @@ private:
                               const draco::CornerTable *cornerTable,
                               std::vector<bool> &triangleVisited,
                               PolygonEdges &polygonEdges);
-  std::unique_ptr<UsdDracoImportAttributeInterface>
-  CreateAttributeFrom(const draco::PointAttribute &attribute,
-                      const draco::AttributeMetadata &metadata);
+  std::unique_ptr<UsdDracoImportAttributeInterface> CreateAttributeFrom(
+      const draco::PointAttribute &attribute, const draco::AttributeMetadata &metadata);
 
-private:
+ private:
   const draco::Mesh &_dracoMesh;
 
   // Named attributes.
@@ -82,8 +80,7 @@ private:
   UsdDracoImportAttribute<int> _posOrder;
 
   // Generic attributes.
-  std::vector<std::unique_ptr<UsdDracoImportAttributeInterface>>
-      _genericAttributes;
+  std::vector<std::unique_ptr<UsdDracoImportAttributeInterface>> _genericAttributes;
 
   VtIntArray _faceVertexCounts;
   VtIntArray _faceVertexIndices;
@@ -92,4 +89,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_DRACO_IMPORT_TRANSLATOR_H
+#endif  // PXR_USD_PLUGIN_USD_DRACO_IMPORT_TRANSLATOR_H

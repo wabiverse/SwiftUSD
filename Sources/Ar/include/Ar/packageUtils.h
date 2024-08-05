@@ -84,8 +84,7 @@ std::string ArJoinPackageRelativePath(const std::vector<std::string> &paths);
 
 /// \overload
 AR_API
-std::string
-ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths);
+std::string ArJoinPackageRelativePath(const std::pair<std::string, std::string> &paths);
 
 /// \overload
 AR_API
@@ -105,8 +104,7 @@ std::string ArJoinPackageRelativePath(const std::string &packagePath,
 ///    => ("a.pack", "b.pack[c.pack]")
 /// \endcode
 AR_API
-std::pair<std::string, std::string>
-ArSplitPackageRelativePathOuter(const std::string &path);
+std::pair<std::string, std::string> ArSplitPackageRelativePathOuter(const std::string &path);
 
 /// Split package-relative path \p path into a (package path, packaged path)
 /// pair. If \p packageRelativePath contains nested package-relative paths
@@ -121,11 +119,10 @@ ArSplitPackageRelativePathOuter(const std::string &path);
 ///    => ("a.pack[b.pack]", "c.pack")
 /// \endcode
 AR_API
-std::pair<std::string, std::string>
-ArSplitPackageRelativePathInner(const std::string &path);
+std::pair<std::string, std::string> ArSplitPackageRelativePathInner(const std::string &path);
 
 /// @}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_PACKAGE_UTILS_H
+#endif  // PXR_USD_AR_PACKAGE_UTILS_H

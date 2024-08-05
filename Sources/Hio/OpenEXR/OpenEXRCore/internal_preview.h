@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-/** 
+/**
  * @addtogroup InternalAttributeFunctions
  * @{
  */
@@ -26,8 +26,10 @@ extern "C" {
  *
  * @return 0 on success, error code otherwise
  */
-EXR_INTERNAL exr_result_t exr_attr_preview_init (
-    exr_context_t ctxt, exr_attr_preview_t* p, uint32_t w, uint32_t h);
+EXR_INTERNAL exr_result_t exr_attr_preview_init(exr_context_t ctxt,
+                                                exr_attr_preview_t *p,
+                                                uint32_t w,
+                                                uint32_t h);
 
 /** @brief Allocates memory for a w * h * 4 entry in the preview and fills with provided data
  *
@@ -41,16 +43,11 @@ EXR_INTERNAL exr_result_t exr_attr_preview_init (
  *
  * @return 0 on success, error code otherwise
  */
-EXR_INTERNAL exr_result_t exr_attr_preview_create (
-    exr_context_t       ctxt,
-    exr_attr_preview_t* p,
-    uint32_t            w,
-    uint32_t            h,
-    const uint8_t*      d);
+EXR_INTERNAL exr_result_t exr_attr_preview_create(
+    exr_context_t ctxt, exr_attr_preview_t *p, uint32_t w, uint32_t h, const uint8_t *d);
 
 /** @brief Frees memory for the preview attribute if memory is owned by the preview attr */
-EXR_INTERNAL exr_result_t
-exr_attr_preview_destroy (exr_context_t ctxt, exr_attr_preview_t* p);
+EXR_INTERNAL exr_result_t exr_attr_preview_destroy(exr_context_t ctxt, exr_attr_preview_t *p);
 
 /** @} */
 

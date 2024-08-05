@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_METAL_PIPELINE_H
 #define PXR_IMAGING_HGI_METAL_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
+#include <pxr/pxrns.h>
 
 #include "HgiMetal/api.h"
 
@@ -38,9 +38,8 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiGraphicsPipeline.
 ///
-class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline
-{
-public:
+class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline {
+ public:
   HGIMETAL_API
   HgiMetalGraphicsPipeline(HgiMetal *hgi, HgiGraphicsPipelineDesc const &desc);
 
@@ -51,7 +50,7 @@ public:
   HGIMETAL_API
   void BindPipeline(MTL::RenderCommandEncoder *renderEncoder);
 
-private:
+ private:
   HgiMetalGraphicsPipeline() = delete;
   HgiMetalGraphicsPipeline &operator=(const HgiMetalGraphicsPipeline &) = delete;
   HgiMetalGraphicsPipeline(const HgiMetalGraphicsPipeline &) = delete;

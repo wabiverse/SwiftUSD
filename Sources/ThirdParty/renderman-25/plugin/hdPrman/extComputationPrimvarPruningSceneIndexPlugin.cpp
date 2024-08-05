@@ -28,9 +28,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((sceneIndexPluginName, "HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((sceneIndexPluginName,
+                           "HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plugin registrations
@@ -40,8 +40,7 @@ static const char *const _rendererDisplayName = "Prman";
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-  HdSceneIndexPluginRegistry::Define<
-      HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin>();
+  HdSceneIndexPluginRegistry::Define<HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin>();
 }
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
@@ -55,7 +54,7 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _rendererDisplayName,
       _tokens->sceneIndexPluginName,
-      nullptr, // no argument data necessary
+      nullptr,  // no argument data necessary
       insertionPhase,
       HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
@@ -67,10 +66,8 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin::
     HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   TF_UNUSED(inputArgs);
   return HdSiExtComputationPrimvarPruningSceneIndex::New(inputScene);

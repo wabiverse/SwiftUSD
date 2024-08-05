@@ -44,8 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// as a string.  If the variable is unset, or is the empty string,
 /// then \c defaultValue is returned.
 TF_API
-std::string TfGetenv(const std::string &envName,
-                     const std::string &defaultValue = "");
+std::string TfGetenv(const std::string &envName, const std::string &defaultValue = "");
 
 /// Return an environment variable as an integer.
 ///

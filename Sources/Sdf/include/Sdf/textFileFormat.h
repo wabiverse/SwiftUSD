@@ -37,11 +37,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define SDF_TEXT_FILE_FORMAT_TOKENS                                            \
-  ((Id, "sdf"))((Version, "1.4.32"))((Target, "sdf"))
+#define SDF_TEXT_FILE_FORMAT_TOKENS ((Id, "sdf"))((Version, "1.4.32"))((Target, "sdf"))
 
-TF_DECLARE_PUBLIC_TOKENS(SdfTextFileFormatTokens, SDF_API,
-                         SDF_TEXT_FILE_FORMAT_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(SdfTextFileFormatTokens, SDF_API, SDF_TEXT_FILE_FORMAT_TOKENS);
 
 TF_DECLARE_WEAK_AND_REF_PTRS(SdfTextFileFormat);
 
@@ -54,35 +52,36 @@ class ArAsset;
 /// Sdf text file format
 ///
 class SdfTextFileFormat : public SdfFileFormat {
-public:
+ public:
   // SdfFileFormat overrides.
   SDF_API
   virtual bool CanRead(const std::string &file) const override;
 
   SDF_API
-  virtual bool Read(SdfLayer *layer, const std::string &resolvedPath,
+  virtual bool Read(SdfLayer *layer,
+                    const std::string &resolvedPath,
                     bool metadataOnly) const override;
 
   SDF_API
-  virtual bool WriteToFile(
-      const SdfLayer &layer, const std::string &filePath,
-      const std::string &comment = std::string(),
-      const FileFormatArguments &args = FileFormatArguments()) const override;
+  virtual bool WriteToFile(const SdfLayer &layer,
+                           const std::string &filePath,
+                           const std::string &comment = std::string(),
+                           const FileFormatArguments &args = FileFormatArguments()) const override;
 
   SDF_API
-  virtual bool ReadFromString(SdfLayer *layer,
-                              const std::string &str) const override;
+  virtual bool ReadFromString(SdfLayer *layer, const std::string &str) const override;
 
   SDF_API
-  virtual bool
-  WriteToString(const SdfLayer &layer, std::string *str,
-                const std::string &comment = std::string()) const override;
+  virtual bool WriteToString(const SdfLayer &layer,
+                             std::string *str,
+                             const std::string &comment = std::string()) const override;
 
   SDF_API
-  virtual bool WriteToStream(const SdfSpecHandle &spec, std::ostream &out,
+  virtual bool WriteToStream(const SdfSpecHandle &spec,
+                             std::ostream &out,
                              size_t indent) const override;
 
-protected:
+ protected:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   /// Destructor.
@@ -110,11 +109,12 @@ protected:
 
   /// Read layer from \p asset at \p resolvedPath into \p layer.
   SDF_API
-  bool _ReadFromAsset(SdfLayer *layer, const std::string &resolvedPath,
+  bool _ReadFromAsset(SdfLayer *layer,
+                      const std::string &resolvedPath,
                       const std::shared_ptr<ArAsset> &asset,
                       bool metadataOnly) const;
 
-private:
+ private:
   // Override to return false.  Reloading anonymous text layers clears their
   // content.
   SDF_API virtual bool _ShouldSkipAnonymousReload() const override;
@@ -122,4 +122,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // SDF_TEXT_FILE_FORMAT_H
+#endif  // SDF_TEXT_FILE_FORMAT_H

@@ -29,20 +29,21 @@
 #include <regex>
 
 #if defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
+#  include <Windows.h>
 #else
-#include <stdlib.h>
+#  include <stdlib.h>
 #endif
 
 #if defined(ARCH_OS_DARWIN)
-#include <crt_externs.h>
+#  include <crt_externs.h>
 #else
 extern "C" char **environ;
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool ArchHasEnv(const std::string &name) {
+bool ArchHasEnv(const std::string &name)
+{
 #if defined(ARCH_OS_WINDOWS)
   const DWORD size = GetEnvironmentVariable(name.c_str(), nullptr, 0);
   return size != 0 && size != ERROR_ENVVAR_NOT_FOUND;
@@ -51,7 +52,8 @@ bool ArchHasEnv(const std::string &name) {
 #endif
 }
 
-std::string ArchGetEnv(const std::string &name) {
+std::string ArchGetEnv(const std::string &name)
+{
 #if defined(ARCH_OS_WINDOWS)
   const DWORD size = GetEnvironmentVariable(name.c_str(), nullptr, 0);
   if (size != 0) {
@@ -69,8 +71,8 @@ std::string ArchGetEnv(const std::string &name) {
   return std::string();
 }
 
-bool ArchSetEnv(const std::string &name, const std::string &value,
-                bool overwrite) {
+bool ArchSetEnv(const std::string &name, const std::string &value, bool overwrite)
+{
   // NOTE: Setting environment variables must be externally synchronized
   //       with other sets and gets to avoid race conditions.
 
@@ -88,7 +90,8 @@ bool ArchSetEnv(const std::string &name, const std::string &value,
 #endif
 }
 
-bool ArchRemoveEnv(const std::string &name) {
+bool ArchRemoveEnv(const std::string &name)
+{
 #if defined(ARCH_OS_WINDOWS)
   return SetEnvironmentVariable(name.c_str(), nullptr) != 0;
 #else
@@ -96,7 +99,8 @@ bool ArchRemoveEnv(const std::string &name) {
 #endif
 }
 
-std::string ArchExpandEnvironmentVariables(const std::string &value) {
+std::string ArchExpandEnvironmentVariables(const std::string &value)
+{
 #if defined(ARCH_OS_WINDOWS)
   static std::regex regex("\\%([^\\%]+)\\%");
 #else
@@ -118,7 +122,8 @@ std::string ArchExpandEnvironmentVariables(const std::string &value) {
   return result;
 }
 
-char **ArchEnviron() {
+char **ArchEnviron()
+{
 #if defined(ARCH_OS_DARWIN)
   return *_NSGetEnviron();
 #else

@@ -42,4 +42,4 @@ bool PcpVariantFallbackMapFromPython(const boost::python::dict &dict,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PY_UTILS_H
+#endif  // PXR_USD_PCP_PY_UTILS_H

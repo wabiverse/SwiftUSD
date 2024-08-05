@@ -40,9 +40,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Metal implementation of HgiShaderProgram
 ///
-class HgiMetalShaderProgram final : public HgiShaderProgram
-{
-public:
+class HgiMetalShaderProgram final : public HgiShaderProgram {
+ public:
   HGIMETAL_API
   ~HgiMetalShaderProgram() noexcept override;
 
@@ -91,18 +90,18 @@ public:
     return _postTessControlFunction;
   }
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API
   HgiMetalShaderProgram(HgiShaderProgramDesc const &desc);
 
-private:
+ private:
   HgiMetalShaderProgram() = delete;
   HgiMetalShaderProgram &operator=(const HgiMetalShaderProgram &) = delete;
   HgiMetalShaderProgram(const HgiMetalShaderProgram &) = delete;
 
-private:
+ private:
   std::string _errors;
 
   MTL::Function *_vertexFunction;

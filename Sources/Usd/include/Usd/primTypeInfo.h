@@ -45,15 +45,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// definition that defines all the built-in properties and metadata of a prim
 /// of this type.
 class UsdPrimTypeInfo {
-public:
+ public:
   /// Returns the concrete prim type name.
-  const TfToken &GetTypeName() const { return _typeId.primTypeName; }
+  const TfToken &GetTypeName() const
+  {
+    return _typeId.primTypeName;
+  }
 
   /// Returns the list of applied API schemas, directly authored on the prim,
   /// that impart additional properties on its prim definition. This does NOT
   /// include the applied API schemas that may be defined in the conrete prim
   /// type's prim definition..
-  const TfTokenVector &GetAppliedAPISchemas() const {
+  const TfTokenVector &GetAppliedAPISchemas() const
+  {
     return _typeId.appliedAPISchemas;
   }
 
@@ -65,7 +69,10 @@ public:
   /// this will return the provided fallback schema type instead.
   ///
   /// \sa \ref Usd_OM_FallbackPrimTypes
-  const TfType &GetSchemaType() const { return _schemaType; }
+  const TfType &GetSchemaType() const
+  {
+    return _schemaType;
+  }
 
   /// Returns the type name associated with the schema type returned from
   /// GetSchemaType. This will always be equivalent to calling
@@ -74,29 +81,34 @@ public:
   /// the prim type name is a recognized prim type.
   ///
   /// \sa \ref Usd_OM_FallbackPrimTypes
-  const TfToken &GetSchemaTypeName() const { return _schemaTypeName; }
+  const TfToken &GetSchemaTypeName() const
+  {
+    return _schemaTypeName;
+  }
 
   /// Returns the prim definition associated with this prim type's schema
   /// type and applied API schemas.
-  const UsdPrimDefinition &GetPrimDefinition() const {
+  const UsdPrimDefinition &GetPrimDefinition() const
+  {
     // First check if we've already cached the prim definition pointer;
     // we can just return it. Note that we use memory_order_acquire for
     // the case wher _FindOrCreatePrimDefinition needs to build its own
     // prim definition.
-    if (const UsdPrimDefinition *primDef =
-            _primDefinition.load(std::memory_order_acquire)) {
+    if (const UsdPrimDefinition *primDef = _primDefinition.load(std::memory_order_acquire)) {
       return *primDef;
     }
     return *_FindOrCreatePrimDefinition();
   }
 
-  bool operator==(const UsdPrimTypeInfo &other) const {
+  bool operator==(const UsdPrimTypeInfo &other) const
+  {
     // Only need to compare typeId as a typeId is expected to always produce
     // the same schema type and prim definition.
     return _typeId == other._typeId;
   }
 
-  bool operator!=(const UsdPrimTypeInfo &other) const {
+  bool operator!=(const UsdPrimTypeInfo &other) const
+  {
     return !(*this == other);
   }
 
@@ -104,7 +116,7 @@ public:
   USD_API
   static const UsdPrimTypeInfo &GetEmptyPrimType();
 
-private:
+ private:
   // Only the PrimTypeInfoCache can create the PrimTypeInfo prims.
   // These are cached, one for each unique, prim type/applied schema list
   // encountered. This provides the PrimData with lazy access to the unique
@@ -134,30 +146,35 @@ private:
     _TypeId(_TypeId &&typeId) = default;
 
     // Explicit constructor from just a prim type name.
-    explicit _TypeId(const TfToken &primTypeName_)
-        : primTypeName(primTypeName_) {}
+    explicit _TypeId(const TfToken &primTypeName_) : primTypeName(primTypeName_) {}
 
     // Is empty type
-    bool IsEmpty() const {
-      return primTypeName.IsEmpty() && mappedTypeName.IsEmpty() &&
-             appliedAPISchemas.empty();
+    bool IsEmpty() const
+    {
+      return primTypeName.IsEmpty() && mappedTypeName.IsEmpty() && appliedAPISchemas.empty();
     }
 
     // Hash function for hash map keying.
-    template <class HashState>
-    friend void TfHashAppend(HashState &h, const _TypeId &id) {
+    template<class HashState> friend void TfHashAppend(HashState &h, const _TypeId &id)
+    {
       h.Append(id.primTypeName, id.mappedTypeName, id.appliedAPISchemas);
     }
 
-    size_t Hash() const { return TfHash()(*this); }
+    size_t Hash() const
+    {
+      return TfHash()(*this);
+    }
 
-    bool operator==(const _TypeId &other) const {
-      return primTypeName == other.primTypeName &&
-             mappedTypeName == other.mappedTypeName &&
+    bool operator==(const _TypeId &other) const
+    {
+      return primTypeName == other.primTypeName && mappedTypeName == other.mappedTypeName &&
              appliedAPISchemas == other.appliedAPISchemas;
     }
 
-    bool operator!=(const _TypeId &other) const { return !(*this == other); }
+    bool operator!=(const _TypeId &other) const
+    {
+      return !(*this == other);
+    }
   };
 
   // Default constructor. Empty type.
@@ -167,7 +184,10 @@ private:
   UsdPrimTypeInfo(_TypeId &&typeId);
 
   // Returns the full type ID.
-  const _TypeId &_GetTypeId() const { return _typeId; }
+  const _TypeId &_GetTypeId() const
+  {
+    return _typeId;
+  }
 
   // Finds the prim definition, creating it if it doesn't already exist. This
   // cache access must be thread safe.
@@ -193,4 +213,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_TYPE_INFO_H
+#endif  // PXR_USD_USD_PRIM_TYPE_INFO_H

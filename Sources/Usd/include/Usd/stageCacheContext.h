@@ -36,8 +36,7 @@ class UsdStageCache;
 
 // Private helper wrapper class, holds a const reference to a stage cache.
 struct Usd_NonPopulatingStageCacheWrapper {
-  explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache &cache)
-      : cache(cache) {}
+  explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache &cache) : cache(cache) {}
   const UsdStageCache &cache;
 };
 
@@ -49,9 +48,9 @@ struct Usd_NonPopulatingStageCacheWrapper {
 /// Calls to UsdStage::Open() will attempt to find stages in \p cache when a
 /// UsdStageCacheContext is present on the stack.  See UsdStageCacheContext for
 /// more details and example use.
-template <class StageCache>
-Usd_NonPopulatingStageCacheWrapper
-UsdUseButDoNotPopulateCache(StageCache &cache) {
+template<class StageCache>
+Usd_NonPopulatingStageCacheWrapper UsdUseButDoNotPopulateCache(StageCache &cache)
+{
   return Usd_NonPopulatingStageCacheWrapper(cache);
 }
 
@@ -116,22 +115,25 @@ enum UsdStageCacheContextBlockType {
 /// UsdStageCacheContext objects that exist in one thread's stack do not
 /// influence calls to UsdStage::Open() from a different thread.
 ///
-TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API) {
-public:
+TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
+{
+ public:
   /// Bind a cache for calls to UsdStage::Open() to read from and write to.
   explicit UsdStageCacheContext(UsdStageCache & cache)
-      : _rwCache(&cache), _isReadOnlyCache(false), _blockType(Usd_NoBlock) {}
+      : _rwCache(&cache), _isReadOnlyCache(false), _blockType(Usd_NoBlock)
+  {
+  }
 
   /// Bind a cache for calls to UsdStage::Open() to read from.
   /// \see UsdUseButDoNotPopulateCache()
   explicit UsdStageCacheContext(Usd_NonPopulatingStageCacheWrapper holder)
-      : _roCache(&holder.cache), _isReadOnlyCache(true),
-        _blockType(Usd_NoBlock) {}
+      : _roCache(&holder.cache), _isReadOnlyCache(true), _blockType(Usd_NoBlock)
+  {
+  }
 
   /// Disable cache use completely (with UsdBlockStageCaches) or only
   /// for writing (with UsdBlockStageCacheWrites).
-  explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType)
-      : _blockType(blockType) {}
+  explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType) : _blockType(blockType) {}
 
   /// Bind a cache for calls to UsdStage::Open() to read from and write to.
   /// For constructing UsdStageCacheContext in Swift. Swift programmers, if
@@ -143,11 +145,11 @@ public:
   /// let context = UsdStageCacheContext.bind(cache: &stageCache)
   /// ```
   ///
-  static UsdStageCacheContext* CreateCache(UsdStageCache &cache)
+  static UsdStageCacheContext *CreateCache(UsdStageCache & cache)
   {
     return new UsdStageCacheContext(cache);
   }
-  
+
  private:
   friend class UsdStage;
 
@@ -162,8 +164,9 @@ public:
   };
   bool _isReadOnlyCache;
   UsdStageCacheContextBlockType _blockType;
-} SWIFT_IMMORTAL_REFERENCE;
+}
+SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_STAGE_CACHE_CONTEXT_H
+#endif  // PXR_USD_USD_STAGE_CACHE_CONTEXT_H

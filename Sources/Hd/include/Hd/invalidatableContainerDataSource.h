@@ -36,12 +36,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Base class for container data sources that cache data but provide
 /// a locator to invalidate the cached data.
 ///
-class HdInvalidatableContainerDataSource : public HdContainerDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE_ABSTRACT(HdInvalidatableContainerDataSource)
+class HdInvalidatableContainerDataSource : public HdContainerDataSource {
+ public:
+  HD_DECLARE_DATASOURCE_ABSTRACT(HdInvalidatableContainerDataSource)
 
-    virtual bool Invalidate(const HdDataSourceLocatorSet &dirtyLocators) = 0;
+  virtual bool Invalidate(const HdDataSourceLocatorSet &dirtyLocators) = 0;
 };
 
 HD_DECLARE_DATASOURCE_HANDLES(HdInvalidatableContainerDataSource);

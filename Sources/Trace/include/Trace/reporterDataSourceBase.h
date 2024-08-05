@@ -42,7 +42,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// class to access TraceCollections.
 ///
 class TraceReporterDataSourceBase {
-public:
+ public:
   using CollectionPtr = std::shared_ptr<TraceCollection>;
 
   /// Destructor
@@ -57,4 +57,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H
+#endif  // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H

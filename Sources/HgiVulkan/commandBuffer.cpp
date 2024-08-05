@@ -30,65 +30,47 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanCommandBuffer::HgiVulkanCommandBuffer(
-    HgiVulkanDevice *device,
-    VkCommandPool pool)
-    : _device(device), _vkCommandPool(pool), _vkCommandBuffer(nullptr), _vkFence(nullptr), _vkSemaphore(nullptr), _isInFlight(false), _isSubmitted(false), _inflightId(0)
+HgiVulkanCommandBuffer::HgiVulkanCommandBuffer(HgiVulkanDevice *device, VkCommandPool pool)
+    : _device(device),
+      _vkCommandPool(pool),
+      _vkCommandBuffer(nullptr),
+      _vkFence(nullptr),
+      _vkSemaphore(nullptr),
+      _isInFlight(false),
+      _isSubmitted(false),
+      _inflightId(0)
 {
   VkDevice vkDevice = _device->GetVulkanDevice();
 
   // Create vulkan command buffer
-  VkCommandBufferAllocateInfo allocInfo =
-      {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
+  VkCommandBufferAllocateInfo allocInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
   allocInfo.commandBufferCount = 1;
   allocInfo.commandPool = pool;
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-  TF_VERIFY(
-      vkAllocateCommandBuffers(
-          vkDevice,
-          &allocInfo,
-          &_vkCommandBuffer) == VK_SUCCESS);
+  TF_VERIFY(vkAllocateCommandBuffers(vkDevice, &allocInfo, &_vkCommandBuffer) == VK_SUCCESS);
 
   // Assign a debug label to command buffer
   uint64_t cmdBufHandle = (uint64_t)_vkCommandBuffer;
   std::string handleStr = std::to_string(cmdBufHandle);
   std::string cmdBufLbl = "HgiVulkan Command Buffer " + handleStr;
 
-  HgiVulkanSetDebugName(
-      _device,
-      cmdBufHandle,
-      VK_OBJECT_TYPE_COMMAND_BUFFER,
-      cmdBufLbl.c_str());
+  HgiVulkanSetDebugName(_device, cmdBufHandle, VK_OBJECT_TYPE_COMMAND_BUFFER, cmdBufLbl.c_str());
 
   // CPU synchronization fence. So we known when the cmd buffer can be reused.
   VkFenceCreateInfo fenceInfo = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
-  fenceInfo.flags = 0; // Unsignaled starting state
+  fenceInfo.flags = 0;  // Unsignaled starting state
 
-  TF_VERIFY(
-      vkCreateFence(
-          vkDevice,
-          &fenceInfo,
-          HgiVulkanAllocator(),
-          &_vkFence) == VK_SUCCESS);
+  TF_VERIFY(vkCreateFence(vkDevice, &fenceInfo, HgiVulkanAllocator(), &_vkFence) == VK_SUCCESS);
 
   // Create semaphore for GPU-GPU synchronization
-  VkSemaphoreCreateInfo semaCreateInfo =
-      {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
-  TF_VERIFY(
-      vkCreateSemaphore(
-          vkDevice,
-          &semaCreateInfo,
-          HgiVulkanAllocator(),
-          &_vkSemaphore) == VK_SUCCESS);
+  VkSemaphoreCreateInfo semaCreateInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+  TF_VERIFY(vkCreateSemaphore(vkDevice, &semaCreateInfo, HgiVulkanAllocator(), &_vkSemaphore) ==
+            VK_SUCCESS);
 
   // Assign a debug label to fence.
   std::string fenceLbl = "HgiVulkan Fence for Command Buffer: " + handleStr;
-  HgiVulkanSetDebugName(
-      _device,
-      (uint64_t)_vkFence,
-      VK_OBJECT_TYPE_FENCE,
-      fenceLbl.c_str());
+  HgiVulkanSetDebugName(_device, (uint64_t)_vkFence, VK_OBJECT_TYPE_FENCE, fenceLbl.c_str());
 }
 
 HgiVulkanCommandBuffer::~HgiVulkanCommandBuffer()
@@ -101,15 +83,12 @@ HgiVulkanCommandBuffer::~HgiVulkanCommandBuffer()
 
 void HgiVulkanCommandBuffer::BeginCommandBuffer(uint8_t inflightId)
 {
-  if (!_isInFlight)
-  {
+  if (!_isInFlight) {
 
-    VkCommandBufferBeginInfo beginInfo =
-        {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+    VkCommandBufferBeginInfo beginInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
     beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    TF_VERIFY(
-        vkBeginCommandBuffer(_vkCommandBuffer, &beginInfo) == VK_SUCCESS);
+    TF_VERIFY(vkBeginCommandBuffer(_vkCommandBuffer, &beginInfo) == VK_SUCCESS);
 
     _inflightId = inflightId;
     _isInFlight = true;
@@ -123,10 +102,8 @@ bool HgiVulkanCommandBuffer::IsInFlight() const
 
 void HgiVulkanCommandBuffer::EndCommandBuffer()
 {
-  if (_isInFlight)
-  {
-    TF_VERIFY(
-        vkEndCommandBuffer(_vkCommandBuffer) == VK_SUCCESS);
+  if (_isInFlight) {
+    TF_VERIFY(vkEndCommandBuffer(_vkCommandBuffer) == VK_SUCCESS);
 
     _isSubmitted = true;
   }
@@ -136,15 +113,13 @@ bool HgiVulkanCommandBuffer::ResetIfConsumedByGPU(HgiSubmitWaitType wait)
 {
   // Command buffer is already available (previously reset).
   // We do not have to test the fence or reset the cmd buffer.
-  if (!_isInFlight)
-  {
+  if (!_isInFlight) {
     return false;
   }
 
   // The command buffer is still recording. We should not test its fence until
   // we have submitted the command buffer to the queue (vulkan requirement).
-  if (!_isSubmitted)
-  {
+  if (!_isSubmitted) {
     return false;
   }
 
@@ -152,16 +127,12 @@ bool HgiVulkanCommandBuffer::ResetIfConsumedByGPU(HgiSubmitWaitType wait)
 
   // Check the fence to see if the GPU has consumed the command buffer.
   // We cannnot reuse a command buffer until the GPU is finished with it.
-  if (vkGetFenceStatus(vkDevice, _vkFence) == VK_NOT_READY)
-  {
-    if (wait == HgiSubmitWaitTypeWaitUntilCompleted)
-    {
+  if (vkGetFenceStatus(vkDevice, _vkFence) == VK_NOT_READY) {
+    if (wait == HgiSubmitWaitTypeWaitUntilCompleted) {
       static const uint64_t timeOut = 100000000000;
-      TF_VERIFY(vkWaitForFences(
-                    vkDevice, 1, &_vkFence, VK_TRUE, timeOut) == VK_SUCCESS);
+      TF_VERIFY(vkWaitForFences(vkDevice, 1, &_vkFence, VK_TRUE, timeOut) == VK_SUCCESS);
     }
-    else
-    {
+    else {
       return false;
     }
   }
@@ -171,8 +142,7 @@ bool HgiVulkanCommandBuffer::ResetIfConsumedByGPU(HgiSubmitWaitType wait)
   RunAndClearCompletedHandlers();
 
   // GPU is done with command buffer, reset fence and command buffer.
-  TF_VERIFY(
-      vkResetFences(vkDevice, 1, &_vkFence) == VK_SUCCESS);
+  TF_VERIFY(vkResetFences(vkDevice, 1, &_vkFence) == VK_SUCCESS);
 
   // It might be more efficient to reset the cmd pool instead of individual
   // command buffers. But we may not have a clear 'StartFrame' / 'EndFrame'
@@ -181,8 +151,7 @@ bool HgiVulkanCommandBuffer::ResetIfConsumedByGPU(HgiSubmitWaitType wait)
   // been consumed by the GPU.
 
   VkCommandBufferResetFlags flags = _GetCommandBufferResetFlags();
-  TF_VERIFY(
-      vkResetCommandBuffer(_vkCommandBuffer, flags) == VK_SUCCESS);
+  TF_VERIFY(vkResetCommandBuffer(_vkCommandBuffer, flags) == VK_SUCCESS);
 
   // Command buffer may now be reused for new recordings / resource creation.
   _isInFlight = false;
@@ -190,46 +159,39 @@ bool HgiVulkanCommandBuffer::ResetIfConsumedByGPU(HgiSubmitWaitType wait)
   return true;
 }
 
-VkCommandBuffer
-HgiVulkanCommandBuffer::GetVulkanCommandBuffer() const
+VkCommandBuffer HgiVulkanCommandBuffer::GetVulkanCommandBuffer() const
 {
   return _vkCommandBuffer;
 }
 
-VkCommandPool
-HgiVulkanCommandBuffer::GetVulkanCommandPool() const
+VkCommandPool HgiVulkanCommandBuffer::GetVulkanCommandPool() const
 {
   return _vkCommandPool;
 }
 
-VkFence
-HgiVulkanCommandBuffer::GetVulkanFence() const
+VkFence HgiVulkanCommandBuffer::GetVulkanFence() const
 {
   return _vkFence;
 }
 
-VkSemaphore
-HgiVulkanCommandBuffer::GetVulkanSemaphore() const
+VkSemaphore HgiVulkanCommandBuffer::GetVulkanSemaphore() const
 {
   return _vkSemaphore;
 }
 
-uint8_t
-HgiVulkanCommandBuffer::GetInflightId() const
+uint8_t HgiVulkanCommandBuffer::GetInflightId() const
 {
   return _inflightId;
 }
 
-HgiVulkanDevice *
-HgiVulkanCommandBuffer::GetDevice() const
+HgiVulkanDevice *HgiVulkanCommandBuffer::GetDevice() const
 {
   return _device;
 }
 
 void HgiVulkanCommandBuffer::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 {
-  if (!_vkCommandBuffer)
-  {
+  if (!_vkCommandBuffer) {
     return;
   }
 
@@ -243,22 +205,21 @@ void HgiVulkanCommandBuffer::InsertMemoryBarrier(HgiMemoryBarrier barrier)
   TF_VERIFY(barrier == HgiMemoryBarrierAll, "Unsupported barrier");
 
   // Who might be generating the data we are interested in reading.
-  memoryBarrier.srcAccessMask =
-      VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+  memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 
   // Who might be consuming the data that was writen.
-  memoryBarrier.dstAccessMask =
-      VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+  memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 
-  vkCmdPipelineBarrier(
-      _vkCommandBuffer,
-      VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, // producer (what we wait for)
-      VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, // consumer (what must wait)
-      0,                                  // flags
-      1,                                  // memoryBarrierCount
-      &memoryBarrier,                     // memory barriers
-      0, nullptr,                         // buffer barriers
-      0, nullptr);                        // image barriers
+  vkCmdPipelineBarrier(_vkCommandBuffer,
+                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // producer (what we wait for)
+                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // consumer (what must wait)
+                       0,                                   // flags
+                       1,                                   // memoryBarrierCount
+                       &memoryBarrier,                      // memory barriers
+                       0,
+                       nullptr,  // buffer barriers
+                       0,
+                       nullptr);  // image barriers
 }
 
 void HgiVulkanCommandBuffer::AddCompletedHandler(HgiVulkanCompletedHandler const &fn)
@@ -268,15 +229,13 @@ void HgiVulkanCommandBuffer::AddCompletedHandler(HgiVulkanCompletedHandler const
 
 void HgiVulkanCommandBuffer::RunAndClearCompletedHandlers()
 {
-  for (HgiVulkanCompletedHandler &fn : _completedHandlers)
-  {
+  for (HgiVulkanCompletedHandler &fn : _completedHandlers) {
     fn();
   }
   _completedHandlers.clear();
 }
 
-VkCommandBufferResetFlags
-HgiVulkanCommandBuffer::_GetCommandBufferResetFlags()
+VkCommandBufferResetFlags HgiVulkanCommandBuffer::_GetCommandBufferResetFlags()
 {
   // For now we do not use VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT,
   // assuming similar memory requirements will be needed each frame.

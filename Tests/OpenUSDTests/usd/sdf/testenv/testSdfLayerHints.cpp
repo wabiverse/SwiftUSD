@@ -33,8 +33,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static void
-TestSdfLayerHintsMaybeHasRelocates()
+static void TestSdfLayerHintsMaybeHasRelocates()
 {
   // Test empty layer hints
   {
@@ -45,22 +44,19 @@ TestSdfLayerHintsMaybeHasRelocates()
 
   // Open layer without relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/without_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/without_relocates.sdf");
     TF_AXIOM(!layer->GetHints().mightHaveRelocates);
   }
 
   // Open layer with relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/with_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/with_relocates.sdf");
     TF_AXIOM(layer->GetHints().mightHaveRelocates);
   }
 
   // Author relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/without_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/without_relocates.sdf");
     TF_AXIOM(!layer->GetHints().mightHaveRelocates);
 
     SdfPrimSpecHandle prim = layer->GetPrimAtPath(SdfPath("/Prim"));
@@ -90,8 +86,7 @@ TestSdfLayerHintsMaybeHasRelocates()
 
   // Transfer content with relocates
   {
-    SdfLayerRefPtr srcLayer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/with_relocates.sdf");
+    SdfLayerRefPtr srcLayer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/with_relocates.sdf");
     SdfLayerRefPtr dstLayer = SdfLayer::CreateAnonymous();
     dstLayer->TransferContent(srcLayer);
     TF_AXIOM(dstLayer->GetHints().mightHaveRelocates);
@@ -115,8 +110,7 @@ TestSdfLayerHintsMaybeHasRelocates()
 
   // Save layer without relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::CreateNew(
-        ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
+    SdfLayerRefPtr layer = SdfLayer::CreateNew(ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
     SdfPrimSpecHandle prim = SdfCreatePrimInLayer(layer, SdfPath("Prim"));
     TF_AXIOM(prim);
     layer->Save();
@@ -125,8 +119,7 @@ TestSdfLayerHintsMaybeHasRelocates()
 
   // Save layer with relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::CreateNew(
-        ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
+    SdfLayerRefPtr layer = SdfLayer::CreateNew(ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
     TF_AXIOM(!layer->GetHints().mightHaveRelocates);
     SdfPrimSpecHandle prim = SdfCreatePrimInLayer(layer, SdfPath("Prim"));
     TF_AXIOM(prim);
@@ -156,32 +149,28 @@ TestSdfLayerHintsMaybeHasRelocates()
 
   // Export without relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/without_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/without_relocates.sdf");
     layer->Export(ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
     TF_AXIOM(!layer->GetHints().mightHaveRelocates);
   }
 
   // Export with relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/with_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/with_relocates.sdf");
     layer->Export(ArchMakeTmpFileName("testSdfLayerHints_", ".sdf"));
     TF_AXIOM(layer->GetHints().mightHaveRelocates);
   }
 
   // Clear without relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/without_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/without_relocates.sdf");
     layer->Clear();
     TF_AXIOM(layer->GetHints().mightHaveRelocates);
   }
 
   // Clear with relocates
   {
-    SdfLayerRefPtr layer = SdfLayer::FindOrOpen(
-        "testSdfLayerHints.testenv/with_relocates.sdf");
+    SdfLayerRefPtr layer = SdfLayer::FindOrOpen("testSdfLayerHints.testenv/with_relocates.sdf");
     layer->Clear();
     TF_AXIOM(layer->GetHints().mightHaveRelocates);
   }

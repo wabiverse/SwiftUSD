@@ -26,13 +26,13 @@
 
 /// \file glf/simpleLight.h
 
-#include <pxr/pxrns.h>
-#include "Glf/api.h"
 #include "Gf/matrix4d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4f.h"
-#include "Sdf/path.h"
+#include "Glf/api.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/path.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/token.h"
 #include "Vt/array.h"
@@ -42,9 +42,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GlfSimpleLight final
-{
-public:
+class GlfSimpleLight final {
+ public:
   GLF_API
   GlfSimpleLight(GfVec4f const &position = GfVec4f(0.0, 0.0, 0.0, 1.0));
   GLF_API
@@ -186,10 +185,9 @@ public:
   GLF_API
   bool operator!=(GlfSimpleLight const &other) const;
 
-private:
+ private:
   GLF_API
-  friend std::ostream &operator<<(std::ostream &out,
-                                  const GlfSimpleLight &v);
+  friend std::ostream &operator<<(std::ostream &out, const GlfSimpleLight &v);
   GfVec4f _ambient;
   GfVec4f _diffuse;
   GfVec4f _specular;

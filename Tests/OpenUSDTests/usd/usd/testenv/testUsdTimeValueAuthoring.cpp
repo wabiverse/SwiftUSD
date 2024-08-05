@@ -22,18 +22,18 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "pxr/usd/usd/stage.h"
-#include "pxr/usd/usd/object.h"
-#include "pxr/usd/usd/attribute.h"
-#include "pxr/usd/usd/attributeQuery.h"
-#include "pxr/usd/sdf/path.h"
 #include "Arch/systemInfo.h"
 #include "pxr/base/plug/registry.h"
-#include "pxr/base/vt/array.h"
-#include "pxr/base/vt/dictionary.h"
 #include "pxr/base/tf/diagnostic.h"
 #include "pxr/base/tf/token.h"
+#include "pxr/base/vt/array.h"
+#include "pxr/base/vt/dictionary.h"
+#include "pxr/pxr.h"
+#include "pxr/usd/sdf/path.h"
+#include "pxr/usd/usd/attribute.h"
+#include "pxr/usd/usd/attributeQuery.h"
+#include "pxr/usd/usd/object.h"
+#include "pxr/usd/usd/stage.h"
 
 #include <string>
 
@@ -55,28 +55,29 @@ PXR_NAMESPACE_USING_DIRECTIVE
 using SdfTimeCodeArray = VtArray<SdfTimeCode>;
 using _EditTargets = std::array<UsdEditTarget, 4>;
 
-template <class T>
-static void
-_GetAndVerifyMetadata(const UsdObject &obj, const TfToken &field, const T &expected)
+template<class T>
+static void _GetAndVerifyMetadata(const UsdObject &obj, const TfToken &field, const T &expected)
 {
   T value;
   TF_AXIOM(obj.GetMetadata(field, &value));
   TF_AXIOM(value == expected);
 }
 
-template <class T>
-static void
-_GetAndVerifyMetadata(const UsdStagePtr &stage, const TfToken &field, const T &expected)
+template<class T>
+static void _GetAndVerifyMetadata(const UsdStagePtr &stage,
+                                  const TfToken &field,
+                                  const T &expected)
 {
   T value;
   TF_AXIOM(stage->GetMetadata(field, &value));
   TF_AXIOM(value == expected);
 }
 
-template <class T>
-static void
-_GetAndVerifyMetadataByDictKey(const UsdObject &obj, const TfToken &field,
-                               const TfToken &key, const T &expected)
+template<class T>
+static void _GetAndVerifyMetadataByDictKey(const UsdObject &obj,
+                                           const TfToken &field,
+                                           const TfToken &key,
+                                           const T &expected)
 {
   T value;
   TF_AXIOM(obj.GetMetadataByDictKey(field, key, &value));
@@ -85,23 +86,17 @@ _GetAndVerifyMetadataByDictKey(const UsdObject &obj, const TfToken &field,
 
 // Creates the edit target for each layer composed into the root stage with
 // its correct composition map function.
-static _EditTargets
-_GetEditTargets(const UsdPrim &prim)
+static _EditTargets _GetEditTargets(const UsdPrim &prim)
 {
   _EditTargets editTargets;
   const PcpPrimIndex &primIndex = prim.GetPrimIndex();
   const PcpNodeRef rootNode = primIndex.GetRootNode();
-  const PcpNodeRef refNode =
-      *(primIndex.GetNodeRange(PcpRangeTypeReference).first);
+  const PcpNodeRef refNode = *(primIndex.GetNodeRange(PcpRangeTypeReference).first);
 
-  SdfLayerHandle rootLayer =
-      SdfLayer::Find("timeCodes/root.usda");
-  SdfLayerHandle rootSubLayer =
-      SdfLayer::Find("timeCodes/root_sub.usda");
-  SdfLayerHandle refLayer =
-      SdfLayer::Find("timeCodes/ref.usda");
-  SdfLayerHandle refSubLayer =
-      SdfLayer::Find("timeCodes/ref_sub.usda");
+  SdfLayerHandle rootLayer = SdfLayer::Find("timeCodes/root.usda");
+  SdfLayerHandle rootSubLayer = SdfLayer::Find("timeCodes/root_sub.usda");
+  SdfLayerHandle refLayer = SdfLayer::Find("timeCodes/ref.usda");
+  SdfLayerHandle refSubLayer = SdfLayer::Find("timeCodes/ref_sub.usda");
   TF_AXIOM(rootLayer);
   TF_AXIOM(rootSubLayer);
   TF_AXIOM(refLayer);
@@ -128,7 +123,7 @@ _GetEditTargets(const UsdPrim &prim)
 
 // Verify that a value authored to the edit target exists on the correct
 // spec on the target's layer and matches the expected value.
-template <class T>
+template<class T>
 static void _VerifyAuthoredValue(const UsdEditTarget &editTarget,
                                  const SdfPath &objPath,
                                  const TfToken &fieldName,
@@ -143,7 +138,7 @@ static void _VerifyAuthoredValue(const UsdEditTarget &editTarget,
 
 // Sets the value for a metadata field of a prim or attribute using the
 // given edit target and verifies the resolved and authored values.
-template <class T>
+template<class T>
 static void _SetMetadataWithEditTarget(const UsdStagePtr &stage,
                                        const UsdEditTarget &editTarget,
                                        const UsdObject &obj,
@@ -159,22 +154,20 @@ static void _SetMetadataWithEditTarget(const UsdStagePtr &stage,
   _GetAndVerifyMetadata(obj, fieldName, resolvedValue);
   // Verify that the value authored on the edit target's layer matches
   // the expected authored value.
-  _VerifyAuthoredValue(editTarget, obj.GetPath(), fieldName,
-                       expectedAuthoredValue);
+  _VerifyAuthoredValue(editTarget, obj.GetPath(), fieldName, expectedAuthoredValue);
 }
 
 // Sets the value for a particular key in a dictionary metadata field of
 // a prim or attribute using the given edit target and verifies the
 // resolved and authored values.
-template <class T>
-static void _SetMetadataByKeyWithEditTarget(
-    const UsdStagePtr &stage,
-    const UsdEditTarget &editTarget,
-    const UsdObject &obj,
-    const TfToken &fieldName,
-    const TfToken &key,
-    const T &resolvedValue,
-    const VtDictionary &expectedAuthoredValue)
+template<class T>
+static void _SetMetadataByKeyWithEditTarget(const UsdStagePtr &stage,
+                                            const UsdEditTarget &editTarget,
+                                            const UsdObject &obj,
+                                            const TfToken &fieldName,
+                                            const TfToken &key,
+                                            const T &resolvedValue,
+                                            const VtDictionary &expectedAuthoredValue)
 {
   // Set the edit target on the stage.
   stage->SetEditTarget(editTarget);
@@ -184,14 +177,13 @@ static void _SetMetadataByKeyWithEditTarget(
   _GetAndVerifyMetadataByDictKey(obj, fieldName, key, resolvedValue);
   // Verify that the value authored on the edit target's layer matches
   // the expected authored value.
-  _VerifyAuthoredValue(editTarget, obj.GetPath(), fieldName,
-                       expectedAuthoredValue);
+  _VerifyAuthoredValue(editTarget, obj.GetPath(), fieldName, expectedAuthoredValue);
 }
 
-template <class T>
-static void
-_GetAndVerifyAttributeValue(const UsdAttribute &attr, const UsdTimeCode &time,
-                            const T &expected)
+template<class T>
+static void _GetAndVerifyAttributeValue(const UsdAttribute &attr,
+                                        const UsdTimeCode &time,
+                                        const T &expected)
 {
   T value, queryValue;
   TF_AXIOM(attr.Get(&value, time));
@@ -207,14 +199,13 @@ _GetAndVerifyAttributeValue(const UsdAttribute &attr, const UsdTimeCode &time,
 
 // Sets the value at time for an attribute using the given edit target
 // and verifies the resolved and authored values.
-template <class T>
-static void _SetTimeSampleWithEditTarget(
-    const UsdStagePtr &stage,
-    const UsdEditTarget &editTarget,
-    const UsdAttribute &attr,
-    double time,
-    const T &resolvedValue,
-    const SdfTimeSampleMap &expectedAuthoredValue)
+template<class T>
+static void _SetTimeSampleWithEditTarget(const UsdStagePtr &stage,
+                                         const UsdEditTarget &editTarget,
+                                         const UsdAttribute &attr,
+                                         double time,
+                                         const T &resolvedValue,
+                                         const SdfTimeSampleMap &expectedAuthoredValue)
 {
   // Set the edit target on the stage.
   stage->SetEditTarget(editTarget);
@@ -225,19 +216,18 @@ static void _SetTimeSampleWithEditTarget(
   _GetAndVerifyAttributeValue(attr, time, resolvedValue);
   // Verify that timeSamples authored on the edit target's layer
   // matches the expected authored value.
-  _VerifyAuthoredValue(editTarget, attr.GetPath(), SdfFieldKeys->TimeSamples,
-                       expectedAuthoredValue);
+  _VerifyAuthoredValue(
+      editTarget, attr.GetPath(), SdfFieldKeys->TimeSamples, expectedAuthoredValue);
 }
 
 // Sets the default value for an attribute using the given edit target
 // and verifies the resolved and authored values.
-template <class T>
-static void _SetDefaultWithEditTarget(
-    const UsdStagePtr &stage,
-    const UsdEditTarget &editTarget,
-    const UsdAttribute &attr,
-    const T &resolvedValue,
-    const T &expectedAuthoredValue)
+template<class T>
+static void _SetDefaultWithEditTarget(const UsdStagePtr &stage,
+                                      const UsdEditTarget &editTarget,
+                                      const UsdAttribute &attr,
+                                      const T &resolvedValue,
+                                      const T &expectedAuthoredValue)
 {
   // Set the edit target on the stage.
   stage->SetEditTarget(editTarget);
@@ -245,41 +235,36 @@ static void _SetDefaultWithEditTarget(
   // same resolved value back from both the attr and a
   // UsdAttributeQuery
   attr.Set(resolvedValue);
-  _GetAndVerifyAttributeValue(attr, UsdTimeCode::Default(),
-                              resolvedValue);
+  _GetAndVerifyAttributeValue(attr, UsdTimeCode::Default(), resolvedValue);
   // Verify that the default value authored on the edit target's layer
   // matches the expected authored value.
-  _VerifyAuthoredValue(editTarget, attr.GetPath(), SdfFieldKeys->Default,
-                       expectedAuthoredValue);
+  _VerifyAuthoredValue(editTarget, attr.GetPath(), SdfFieldKeys->Default, expectedAuthoredValue);
 }
 
 // Sets the value for a metadata field of a prim or attribute using to
 // the same resolved value using each of the available edit targets
 // in turn and verifies the resolved and authored values.
-template <class T>
-static void _SetMetadataWithEachEditTarget(
-    const UsdStagePtr &stage,
-    const _EditTargets &editTargets,
-    const UsdObject &obj,
-    const TfToken &fieldName,
-    const T &resolvedValue,
-    const std::vector<T> &expectedAuthoredValues)
+template<class T>
+static void _SetMetadataWithEachEditTarget(const UsdStagePtr &stage,
+                                           const _EditTargets &editTargets,
+                                           const UsdObject &obj,
+                                           const TfToken &fieldName,
+                                           const T &resolvedValue,
+                                           const std::vector<T> &expectedAuthoredValues)
 {
   // We set the value using each edit target in order from weakest
   // layer to strongest layer.
   TF_AXIOM(expectedAuthoredValues.size() == editTargets.size());
-  for (size_t i = 0; i < editTargets.size(); ++i)
-  {
+  for (size_t i = 0; i < editTargets.size(); ++i) {
     _SetMetadataWithEditTarget(
-        stage, editTargets[i], obj, fieldName, resolvedValue,
-        expectedAuthoredValues[i]);
+        stage, editTargets[i], obj, fieldName, resolvedValue, expectedAuthoredValues[i]);
   }
 }
 
 // Sets the value for a particular key in a dictionary metadata field of
 // a prim or attribute using each of the available edit targets in turn
 // and verifies the resolved and authored values.
-template <class T>
+template<class T>
 static void _SetMetadataByKeyWithEachEditTarget(
     const UsdStagePtr &stage,
     const _EditTargets &editTargets,
@@ -292,18 +277,16 @@ static void _SetMetadataByKeyWithEachEditTarget(
   // We set the value using each edit target in order from weakest
   // layer to strongest layer.
   TF_AXIOM(expectedAuthoredValues.size() == editTargets.size());
-  for (size_t i = 0; i < editTargets.size(); ++i)
-  {
+  for (size_t i = 0; i < editTargets.size(); ++i) {
     _SetMetadataByKeyWithEditTarget(
-        stage, editTargets[i], obj, fieldName, key, resolvedValue,
-        expectedAuthoredValues[i]);
+        stage, editTargets[i], obj, fieldName, key, resolvedValue, expectedAuthoredValues[i]);
   }
 }
 
 // Sets the value at time for an attribute using the same resolved value
 // using each of the available edit targets in turn and verifies the
 // resolved and authored values.
-template <class T>
+template<class T>
 static void _SetTimeSampleWithEachEditTarget(
     const UsdStagePtr &stage,
     const _EditTargets &editTargets,
@@ -315,33 +298,28 @@ static void _SetTimeSampleWithEachEditTarget(
   // We set the value using each edit target in order from weakest
   // layer to strongest layer.
   TF_AXIOM(expectedAuthoredValues.size() == editTargets.size());
-  for (size_t i = 0; i < editTargets.size(); ++i)
-  {
+  for (size_t i = 0; i < editTargets.size(); ++i) {
     _SetTimeSampleWithEditTarget(
-        stage, editTargets[i], attr, time, resolvedValue,
-        expectedAuthoredValues[i]);
+        stage, editTargets[i], attr, time, resolvedValue, expectedAuthoredValues[i]);
   }
 }
 
 // Sets the default value for an attribute using the same resolved value
 // using each of the available edit targets in turn and verifies the
 // resolved and authored values.
-template <class T>
-static void _SetDefaultWithEachEditTarget(
-    const UsdStagePtr &stage,
-    const _EditTargets &editTargets,
-    const UsdAttribute &attr,
-    const T &resolvedValue,
-    const std::vector<T> &expectedAuthoredValues)
+template<class T>
+static void _SetDefaultWithEachEditTarget(const UsdStagePtr &stage,
+                                          const _EditTargets &editTargets,
+                                          const UsdAttribute &attr,
+                                          const T &resolvedValue,
+                                          const std::vector<T> &expectedAuthoredValues)
 {
   // We set the value using each edit target in order from weakest
   // layer to strongest layer.
   TF_AXIOM(expectedAuthoredValues.size() == editTargets.size());
-  for (size_t i = 0; i < editTargets.size(); ++i)
-  {
+  for (size_t i = 0; i < editTargets.size(); ++i) {
     _SetDefaultWithEditTarget(
-        stage, editTargets[i], attr, resolvedValue,
-        expectedAuthoredValues[i]);
+        stage, editTargets[i], attr, resolvedValue, expectedAuthoredValues[i]);
   }
 }
 
@@ -367,52 +345,55 @@ static void _TestGetMetadataNoOffsets()
   const TfToken doubleTest("doubleTest");
 
   // Attribute timeSamples metadata.
-  _GetAndVerifyMetadata(timeAttr, SdfFieldKeys->TimeSamples,
-                        SdfTimeSampleMap({{0.0, VtValue(SdfTimeCode(10.0))},
-                                          {1.0, VtValue(SdfTimeCode(20.0))}}));
-  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->TimeSamples,
+  _GetAndVerifyMetadata(
+      timeAttr,
+      SdfFieldKeys->TimeSamples,
+      SdfTimeSampleMap({{0.0, VtValue(SdfTimeCode(10.0))}, {1.0, VtValue(SdfTimeCode(20.0))}}));
+  _GetAndVerifyMetadata(arrayAttr,
+                        SdfFieldKeys->TimeSamples,
                         SdfTimeSampleMap({{0.0, VtValue(SdfTimeCodeArray({10.0, 30.0}))},
                                           {1.0, VtValue(SdfTimeCodeArray({20.0, 40.0}))}}));
-  _GetAndVerifyMetadata(doubleAttr, SdfFieldKeys->TimeSamples,
-                        SdfTimeSampleMap({{0.0, VtValue(10.0)},
-                                          {1.0, VtValue(20.0)}}));
+  _GetAndVerifyMetadata(doubleAttr,
+                        SdfFieldKeys->TimeSamples,
+                        SdfTimeSampleMap({{0.0, VtValue(10.0)}, {1.0, VtValue(20.0)}}));
 
   // Attribute default metadata.
   _GetAndVerifyMetadata(timeAttr, SdfFieldKeys->Default, SdfTimeCode(10.0));
-  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->Default,
-                        SdfTimeCodeArray({10.0, 20.0}));
+  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->Default, SdfTimeCodeArray({10.0, 20.0}));
   _GetAndVerifyMetadata(doubleAttr, SdfFieldKeys->Default, 10.0);
 
   // Test prim metadata resolution
   _GetAndVerifyMetadata(prim, timeCodeTest, SdfTimeCode(10.0));
-  _GetAndVerifyMetadata(prim, timeCodeArrayTest,
-                        SdfTimeCodeArray({10.0, 20.0}));
+  _GetAndVerifyMetadata(prim, timeCodeArrayTest, SdfTimeCodeArray({10.0, 20.0}));
   _GetAndVerifyMetadata(prim, doubleTest, 10.0);
 
   // Prim customData retrieved as the full dictionary
-  VtDictionary expectedCustomData({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                   {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
-                                   {"doubleVal", VtValue(10.0)},
-                                   {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                                                     {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
-                                                                     {"doubleVal", VtValue(10.0)}}))}});
+  VtDictionary expectedCustomData(
+      {{"timeCode", VtValue(SdfTimeCode(10.0))},
+       {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
+       {"doubleVal", VtValue(10.0)},
+       {"subDict",
+        VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
+                              {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
+                              {"doubleVal", VtValue(10.0)}}))}});
 
   _GetAndVerifyMetadata(prim, SdfFieldKeys->CustomData, expectedCustomData);
 
   // Also test getting customData values by dict key.
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("timeCode"), SdfTimeCode(10.0));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("timeCodeArray"), SdfTimeCodeArray({10.0, 20.0}));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("doubleVal"), 10.0);
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("timeCode"), SdfTimeCode(10.0));
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("timeCodeArray"), SdfTimeCodeArray({10.0, 20.0}));
+  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData, TfToken("doubleVal"), 10.0);
 
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:timeCode"), SdfTimeCode(10.0));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:timeCodeArray"), SdfTimeCodeArray({10.0, 20.0}));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:doubleVal"), 10.0);
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("subDict:timeCode"), SdfTimeCode(10.0));
+  _GetAndVerifyMetadataByDictKey(prim,
+                                 SdfFieldKeys->CustomData,
+                                 TfToken("subDict:timeCodeArray"),
+                                 SdfTimeCodeArray({10.0, 20.0}));
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("subDict:doubleVal"), 10.0);
 }
 
 // Tests GetMetadata functions on time code valued fields resolved
@@ -442,66 +423,70 @@ static void _TestGetMetaDataWithLayerOffsets()
   // has offsets applied to both the time sample keys and the value itself.
   // The double value attribute is only offset by the time sample keys, the
   // values remains as authored.
-  _GetAndVerifyMetadata(timeAttr, SdfFieldKeys->TimeSamples,
-                        SdfTimeSampleMap({{3.0, VtValue(SdfTimeCode(23.0))},
-                                          {5.0, VtValue(SdfTimeCode(43.0))}}));
-  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->TimeSamples,
+  _GetAndVerifyMetadata(
+      timeAttr,
+      SdfFieldKeys->TimeSamples,
+      SdfTimeSampleMap({{3.0, VtValue(SdfTimeCode(23.0))}, {5.0, VtValue(SdfTimeCode(43.0))}}));
+  _GetAndVerifyMetadata(arrayAttr,
+                        SdfFieldKeys->TimeSamples,
                         SdfTimeSampleMap({{3.0, VtValue(SdfTimeCodeArray({23.0, 63.0}))},
                                           {5.0, VtValue(SdfTimeCodeArray({43.0, 83.0}))}}));
-  _GetAndVerifyMetadata(doubleAttr, SdfFieldKeys->TimeSamples,
-                        SdfTimeSampleMap({{3.0, VtValue(10.0)},
-                                          {5.0, VtValue(20.0)}}));
+  _GetAndVerifyMetadata(doubleAttr,
+                        SdfFieldKeys->TimeSamples,
+                        SdfTimeSampleMap({{3.0, VtValue(10.0)}, {5.0, VtValue(20.0)}}));
 
   // Attribute default metadata. Time code values are resolved by layer
   // offsets, double values are not.
   _GetAndVerifyMetadata(timeAttr, SdfFieldKeys->Default, SdfTimeCode(23.0));
-  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->Default,
-                        SdfTimeCodeArray({23.0, 43.0}));
+  _GetAndVerifyMetadata(arrayAttr, SdfFieldKeys->Default, SdfTimeCodeArray({23.0, 43.0}));
   _GetAndVerifyMetadata(doubleAttr, SdfFieldKeys->Default, 10.0);
 
   // Test prim metadata resolution. All time code values are offset,
   // doubles are not. This applies even when the values are contained
   // within dictionaries.
   _GetAndVerifyMetadata(prim, timeCodeTest, SdfTimeCode(23.0));
-  _GetAndVerifyMetadata(prim, timeCodeArrayTest,
-                        SdfTimeCodeArray({23.0, 43.0}));
+  _GetAndVerifyMetadata(prim, timeCodeArrayTest, SdfTimeCodeArray({23.0, 43.0}));
   _GetAndVerifyMetadata(prim, doubleTest, 10.0);
 
   // Prim customData retrieved as the full dictionary
-  VtDictionary expectedCustomData({{"timeCode", VtValue(SdfTimeCode(23.0))},
-                                   {"timeCodeArray", VtValue(SdfTimeCodeArray({23.0, 43.0}))},
-                                   {"doubleVal", VtValue(10.0)},
-                                   {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(23.0))},
-                                                                     {"timeCodeArray", VtValue(SdfTimeCodeArray({23.0, 43.0}))},
-                                                                     {"doubleVal", VtValue(10.0)}}))}});
+  VtDictionary expectedCustomData(
+      {{"timeCode", VtValue(SdfTimeCode(23.0))},
+       {"timeCodeArray", VtValue(SdfTimeCodeArray({23.0, 43.0}))},
+       {"doubleVal", VtValue(10.0)},
+       {"subDict",
+        VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(23.0))},
+                              {"timeCodeArray", VtValue(SdfTimeCodeArray({23.0, 43.0}))},
+                              {"doubleVal", VtValue(10.0)}}))}});
 
   _GetAndVerifyMetadata(prim, SdfFieldKeys->CustomData, expectedCustomData);
 
   // Also test getting customData values by dict key.
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("timeCode"), SdfTimeCode(23.0));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("timeCodeArray"), SdfTimeCodeArray({23.0, 43.0}));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("doubleVal"), 10.0);
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("timeCode"), SdfTimeCode(23.0));
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("timeCodeArray"), SdfTimeCodeArray({23.0, 43.0}));
+  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData, TfToken("doubleVal"), 10.0);
 
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:timeCode"), SdfTimeCode(23.0));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:timeCodeArray"), SdfTimeCodeArray({23.0, 43.0}));
-  _GetAndVerifyMetadataByDictKey(prim, SdfFieldKeys->CustomData,
-                                 TfToken("subDict:doubleVal"), 10.0);
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("subDict:timeCode"), SdfTimeCode(23.0));
+  _GetAndVerifyMetadataByDictKey(prim,
+                                 SdfFieldKeys->CustomData,
+                                 TfToken("subDict:timeCodeArray"),
+                                 SdfTimeCodeArray({23.0, 43.0}));
+  _GetAndVerifyMetadataByDictKey(
+      prim, SdfFieldKeys->CustomData, TfToken("subDict:doubleVal"), 10.0);
 
   // Test stage level metadata resolution. Stage metadata is always defined
   // on the root layer so there are never any layer offsets to apply to
   // this metadata.
-  VtDictionary expectedCustomLayerData({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                        {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
-                                        {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                                                          {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))}}))}});
+  VtDictionary expectedCustomLayerData(
+      {{"timeCode", VtValue(SdfTimeCode(10.0))},
+       {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
+       {"subDict",
+        VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
+                              {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))}}))}});
 
-  _GetAndVerifyMetadata(s, SdfFieldKeys->CustomLayerData,
-                        expectedCustomLayerData);
+  _GetAndVerifyMetadata(s, SdfFieldKeys->CustomLayerData, expectedCustomLayerData);
 }
 
 // Test the SetMetadata API on UsdObjects for time code valued metadata
@@ -532,13 +517,17 @@ static void _TestSetMetaDataWithEditTarget()
 
   // Set SdfTimeCode and SdfTimeCodeArray metadata on prim. Each edit
   // target resolves against a different composed layer offset.
-  _SetMetadataWithEachEditTarget(stage, editTargets, prim, timeCodeTest,
-                                 SdfTimeCode(25.0),
-                                 {SdfTimeCode(11.0),
-                                  SdfTimeCode(14.0),
-                                  SdfTimeCode(50.0),
-                                  SdfTimeCode(25.0)});
-  _SetMetadataWithEachEditTarget(stage, editTargets, prim, timeCodeArrayTest,
+  _SetMetadataWithEachEditTarget(
+      stage,
+      editTargets,
+      prim,
+      timeCodeTest,
+      SdfTimeCode(25.0),
+      {SdfTimeCode(11.0), SdfTimeCode(14.0), SdfTimeCode(50.0), SdfTimeCode(25.0)});
+  _SetMetadataWithEachEditTarget(stage,
+                                 editTargets,
+                                 prim,
+                                 timeCodeArrayTest,
                                  SdfTimeCodeArray({25.0, 45.0}),
                                  {SdfTimeCodeArray({11.0, 21.0}),
                                   SdfTimeCodeArray({14.0, 24.0}),
@@ -547,36 +536,45 @@ static void _TestSetMetaDataWithEditTarget()
 
   // Set double value metadata on prim. Values are not resolved over
   // edit target offsets.
-  _SetMetadataWithEachEditTarget(stage, editTargets, prim, doubleTest, 25.0,
-                                 {25.0, 25.0, 25.0, 25.0});
+  _SetMetadataWithEachEditTarget(
+      stage, editTargets, prim, doubleTest, 25.0, {25.0, 25.0, 25.0, 25.0});
 
   // For the customData dictionary tests, the weakest layer has the
   // original authored value dictionary. We'll need to compare the
   // expected authored value for that layer against the whole dictionary
   // for that edit target.
-  VtDictionary authoredCustomData({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                   {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
-                                   {"doubleVal", VtValue(10.0)},
-                                   {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
-                                                                     {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
-                                                                     {"doubleVal", VtValue(10.0)}}))}});
+  VtDictionary authoredCustomData(
+      {{"timeCode", VtValue(SdfTimeCode(10.0))},
+       {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
+       {"doubleVal", VtValue(10.0)},
+       {"subDict",
+        VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(10.0))},
+                              {"timeCodeArray", VtValue(SdfTimeCodeArray({10.0, 20.0}))},
+                              {"doubleVal", VtValue(10.0)}}))}});
 
   // Set SdfTimeCode and SdfTimeCodeArray metadata by key in the prim's
   // customData metadata. Each edit target resolves against a different
   // composed layer offset.
   authoredCustomData["timeCode"] = VtValue(SdfTimeCode(1.5));
-  _SetMetadataByKeyWithEachEditTarget(
-      stage, editTargets, prim, SdfFieldKeys->CustomData,
-      TfToken("timeCode"), SdfTimeCode(6.0),
-      {authoredCustomData,
-       {{"timeCode", VtValue(SdfTimeCode(4.5))}},
-       {{"timeCode", VtValue(SdfTimeCode(12.0))}},
-       {{"timeCode", VtValue(SdfTimeCode(6.0))}}});
+  _SetMetadataByKeyWithEachEditTarget(stage,
+                                      editTargets,
+                                      prim,
+                                      SdfFieldKeys->CustomData,
+                                      TfToken("timeCode"),
+                                      SdfTimeCode(6.0),
+                                      {authoredCustomData,
+                                       {{"timeCode", VtValue(SdfTimeCode(4.5))}},
+                                       {{"timeCode", VtValue(SdfTimeCode(12.0))}},
+                                       {{"timeCode", VtValue(SdfTimeCode(6.0))}}});
 
   authoredCustomData.SetValueAtPath("subDict:timeCode", VtValue(SdfTimeCode(4)));
   _SetMetadataByKeyWithEachEditTarget(
-      stage, editTargets, prim, SdfFieldKeys->CustomData,
-      TfToken("subDict:timeCode"), SdfTimeCode(11.0),
+      stage,
+      editTargets,
+      prim,
+      SdfFieldKeys->CustomData,
+      TfToken("subDict:timeCode"),
+      SdfTimeCode(11.0),
       {authoredCustomData,
        {{"timeCode", VtValue(SdfTimeCode(4.5))},
         {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(7))}}))}},
@@ -589,18 +587,25 @@ static void _TestSetMetaDataWithEditTarget()
   // The double values are not resolved over edit target offsets.
   authoredCustomData.SetValueAtPath("subDict:doubleVal", VtValue(11.0));
   _SetMetadataByKeyWithEachEditTarget(
-      stage, editTargets, prim, SdfFieldKeys->CustomData,
-      TfToken("subDict:doubleVal"), 11.0,
+      stage,
+      editTargets,
+      prim,
+      SdfFieldKeys->CustomData,
+      TfToken("subDict:doubleVal"),
+      11.0,
       {authoredCustomData,
        {{"timeCode", VtValue(SdfTimeCode(4.5))},
-        {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(7))},
-                                          {"doubleVal", VtValue(11.0)}}))}},
+        {"subDict",
+         VtValue(VtDictionary(
+             {{"timeCode", VtValue(SdfTimeCode(7))}, {"doubleVal", VtValue(11.0)}}))}},
        {{"timeCode", VtValue(SdfTimeCode(12.0))},
-        {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(22))},
-                                          {"doubleVal", VtValue(11.0)}}))}},
+        {"subDict",
+         VtValue(VtDictionary(
+             {{"timeCode", VtValue(SdfTimeCode(22))}, {"doubleVal", VtValue(11.0)}}))}},
        {{"timeCode", VtValue(SdfTimeCode(6.0))},
-        {"subDict", VtValue(VtDictionary({{"timeCode", VtValue(SdfTimeCode(11))},
-                                          {"doubleVal", VtValue(11.0)}}))}}});
+        {"subDict",
+         VtValue(VtDictionary(
+             {{"timeCode", VtValue(SdfTimeCode(11))}, {"doubleVal", VtValue(11.0)}}))}}});
 
   // Note that with this testing setup, we MUST set and test the "timeSamples"
   // metadata before setting the "default" metadata. This because of special
@@ -612,19 +617,21 @@ static void _TestSetMetaDataWithEditTarget()
   // timeSample metadata of the timeCode attributes. Both the time keys and
   // values are resolved for each edit target's composed layer offset.
   _SetMetadataWithEachEditTarget(
-      stage, editTargets, timeAttr, SdfFieldKeys->TimeSamples,
-      SdfTimeSampleMap({{11.0, VtValue(SdfTimeCode(30.0))},
-                        {21.0, VtValue(SdfTimeCode(40.0))}}),
-      {SdfTimeSampleMap({{4.0, VtValue(SdfTimeCode(13.5))},
-                         {9.0, VtValue(SdfTimeCode(18.5))}}),
-       SdfTimeSampleMap({{7.0, VtValue(SdfTimeCode(16.5))},
-                         {12.0, VtValue(SdfTimeCode(21.5))}}),
-       SdfTimeSampleMap({{22.0, VtValue(SdfTimeCode(60.0))},
-                         {42.0, VtValue(SdfTimeCode(80.0))}}),
-       SdfTimeSampleMap({{11.0, VtValue(SdfTimeCode(30.0))},
-                         {21.0, VtValue(SdfTimeCode(40.0))}})});
+      stage,
+      editTargets,
+      timeAttr,
+      SdfFieldKeys->TimeSamples,
+      SdfTimeSampleMap({{11.0, VtValue(SdfTimeCode(30.0))}, {21.0, VtValue(SdfTimeCode(40.0))}}),
+      {SdfTimeSampleMap({{4.0, VtValue(SdfTimeCode(13.5))}, {9.0, VtValue(SdfTimeCode(18.5))}}),
+       SdfTimeSampleMap({{7.0, VtValue(SdfTimeCode(16.5))}, {12.0, VtValue(SdfTimeCode(21.5))}}),
+       SdfTimeSampleMap({{22.0, VtValue(SdfTimeCode(60.0))}, {42.0, VtValue(SdfTimeCode(80.0))}}),
+       SdfTimeSampleMap(
+           {{11.0, VtValue(SdfTimeCode(30.0))}, {21.0, VtValue(SdfTimeCode(40.0))}})});
   _SetMetadataWithEachEditTarget(
-      stage, editTargets, arrayAttr, SdfFieldKeys->TimeSamples,
+      stage,
+      editTargets,
+      arrayAttr,
+      SdfFieldKeys->TimeSamples,
       SdfTimeSampleMap({{11.0, VtValue(SdfTimeCodeArray({30.0, 50.0}))},
                         {21.0, VtValue(SdfTimeCodeArray({40.0, 60.0}))}}),
       {SdfTimeSampleMap({{4.0, VtValue(SdfTimeCodeArray({13.5, 23.5}))},
@@ -641,41 +648,40 @@ static void _TestSetMetaDataWithEditTarget()
   // The time keys are still resolved for each edit target's composed layer
   // offset.
   _SetMetadataWithEachEditTarget(
-      stage, editTargets, doubleAttr, SdfFieldKeys->TimeSamples,
-      SdfTimeSampleMap({{11.0, VtValue(30.0)},
-                        {21.0, VtValue(40.0)}}),
-      {SdfTimeSampleMap({{4.0, VtValue(30.0)},
-                         {9.0, VtValue(40.0)}}),
-       SdfTimeSampleMap({{7.0, VtValue(30.0)},
-                         {12.0, VtValue(40.0)}}),
-       SdfTimeSampleMap({{22.0, VtValue(30.0)},
-                         {42.0, VtValue(40.0)}}),
-       SdfTimeSampleMap({{11.0, VtValue(30.0)},
-                         {21.0, VtValue(40.0)}})});
+      stage,
+      editTargets,
+      doubleAttr,
+      SdfFieldKeys->TimeSamples,
+      SdfTimeSampleMap({{11.0, VtValue(30.0)}, {21.0, VtValue(40.0)}}),
+      {SdfTimeSampleMap({{4.0, VtValue(30.0)}, {9.0, VtValue(40.0)}}),
+       SdfTimeSampleMap({{7.0, VtValue(30.0)}, {12.0, VtValue(40.0)}}),
+       SdfTimeSampleMap({{22.0, VtValue(30.0)}, {42.0, VtValue(40.0)}}),
+       SdfTimeSampleMap({{11.0, VtValue(30.0)}, {21.0, VtValue(40.0)}})});
 
   // Set SdfTimeCode and SdfTimeCodeArray default value metadata on the
   // time valued attributes. Each edit target resolves against a different
   // composed layer offset.
   _SetMetadataWithEachEditTarget(
-      stage, editTargets, timeAttr, SdfFieldKeys->Default,
+      stage,
+      editTargets,
+      timeAttr,
+      SdfFieldKeys->Default,
       SdfTimeCode(19.0),
-      {SdfTimeCode(8.0),
-       SdfTimeCode(11.0),
-       SdfTimeCode(38.0),
-       SdfTimeCode(19.0)});
-  _SetMetadataWithEachEditTarget(
-      stage, editTargets, arrayAttr, SdfFieldKeys->Default,
-      SdfTimeCodeArray({19.0, -11.0}),
-      {SdfTimeCodeArray({8.0, -7.0}),
-       SdfTimeCodeArray({11.0, -4.0}),
-       SdfTimeCodeArray({38.0, -22.0}),
-       SdfTimeCodeArray({19.0, -11.0})});
+      {SdfTimeCode(8.0), SdfTimeCode(11.0), SdfTimeCode(38.0), SdfTimeCode(19.0)});
+  _SetMetadataWithEachEditTarget(stage,
+                                 editTargets,
+                                 arrayAttr,
+                                 SdfFieldKeys->Default,
+                                 SdfTimeCodeArray({19.0, -11.0}),
+                                 {SdfTimeCodeArray({8.0, -7.0}),
+                                  SdfTimeCodeArray({11.0, -4.0}),
+                                  SdfTimeCodeArray({38.0, -22.0}),
+                                  SdfTimeCodeArray({19.0, -11.0})});
 
   // Set double value default metadata on the double valued attribute.
   // Values are not resolved over edit target offsets.
   _SetMetadataWithEachEditTarget(
-      stage, editTargets, doubleAttr, SdfFieldKeys->Default, 19.0,
-      {19.0, 19.0, 19.0, 19.0});
+      stage, editTargets, doubleAttr, SdfFieldKeys->Default, 19.0, {19.0, 19.0, 19.0, 19.0});
 }
 
 static void _TestSetAttrValueWithEditTarget()
@@ -702,7 +708,10 @@ static void _TestSetAttrValueWithEditTarget()
   // Each edit target resolves against a different composed layer offset.
   // Both the time sample keys and the time sample values are resolved
   // against offsets
-  _SetTimeSampleWithEachEditTarget(stage, editTargets, timeAttr, 12.0,
+  _SetTimeSampleWithEachEditTarget(stage,
+                                   editTargets,
+                                   timeAttr,
+                                   12.0,
                                    SdfTimeCode(19.0),
                                    {SdfTimeSampleMap({{0.0, VtValue(SdfTimeCode(10.0))},
                                                       {1.0, VtValue(SdfTimeCode(20.0))},
@@ -711,23 +720,29 @@ static void _TestSetAttrValueWithEditTarget()
                                     SdfTimeSampleMap({{24.0, VtValue(SdfTimeCode(38.0))}}),
                                     SdfTimeSampleMap({{12.0, VtValue(SdfTimeCode(19.0))}})});
 
-  _SetDefaultWithEachEditTarget(stage, editTargets, timeAttr,
-                                SdfTimeCode(19.0),
-                                {SdfTimeCode(8.0),
-                                 SdfTimeCode(11.0),
-                                 SdfTimeCode(38.0),
-                                 SdfTimeCode(19.0)});
+  _SetDefaultWithEachEditTarget(
+      stage,
+      editTargets,
+      timeAttr,
+      SdfTimeCode(19.0),
+      {SdfTimeCode(8.0), SdfTimeCode(11.0), SdfTimeCode(38.0), SdfTimeCode(19.0)});
 
-  _SetTimeSampleWithEachEditTarget(stage, editTargets, arrayAttr, 12.0,
-                                   SdfTimeCodeArray({19.0, 12.0}),
-                                   {SdfTimeSampleMap({{0.0, VtValue(SdfTimeCodeArray({10.0, 30.0}))},
-                                                      {1.0, VtValue(SdfTimeCodeArray({20.0, 40.0}))},
-                                                      {4.5, VtValue(SdfTimeCodeArray({8.0, 4.5}))}}),
-                                    SdfTimeSampleMap({{7.5, VtValue(SdfTimeCodeArray({11.0, 7.5}))}}),
-                                    SdfTimeSampleMap({{24.0, VtValue(SdfTimeCodeArray({38.0, 24.0}))}}),
-                                    SdfTimeSampleMap({{12.0, VtValue(SdfTimeCodeArray({19.0, 12.0}))}})});
+  _SetTimeSampleWithEachEditTarget(
+      stage,
+      editTargets,
+      arrayAttr,
+      12.0,
+      SdfTimeCodeArray({19.0, 12.0}),
+      {SdfTimeSampleMap({{0.0, VtValue(SdfTimeCodeArray({10.0, 30.0}))},
+                         {1.0, VtValue(SdfTimeCodeArray({20.0, 40.0}))},
+                         {4.5, VtValue(SdfTimeCodeArray({8.0, 4.5}))}}),
+       SdfTimeSampleMap({{7.5, VtValue(SdfTimeCodeArray({11.0, 7.5}))}}),
+       SdfTimeSampleMap({{24.0, VtValue(SdfTimeCodeArray({38.0, 24.0}))}}),
+       SdfTimeSampleMap({{12.0, VtValue(SdfTimeCodeArray({19.0, 12.0}))}})});
 
-  _SetDefaultWithEachEditTarget(stage, editTargets, arrayAttr,
+  _SetDefaultWithEachEditTarget(stage,
+                                editTargets,
+                                arrayAttr,
                                 SdfTimeCodeArray({19.0, 12.0}),
                                 {SdfTimeCodeArray({8.0, 4.5}),
                                  SdfTimeCodeArray({11.0, 7.5}),
@@ -737,17 +752,18 @@ static void _TestSetAttrValueWithEditTarget()
   // Set double values at times and at default. Time sample keys are
   // resolved against each edit target's offset, but none of the values
   // themselves are.
-  _SetTimeSampleWithEachEditTarget(stage, editTargets, doubleAttr, 12.0,
-                                   19.0,
-                                   {SdfTimeSampleMap({{0.0, VtValue(10.0)},
-                                                      {1.0, VtValue(20.0)},
-                                                      {4.5, VtValue(19.0)}}),
-                                    SdfTimeSampleMap({{7.5, VtValue(19.0)}}),
-                                    SdfTimeSampleMap({{24.0, VtValue(19.0)}}),
-                                    SdfTimeSampleMap({{12.0, VtValue(19.0)}})});
+  _SetTimeSampleWithEachEditTarget(
+      stage,
+      editTargets,
+      doubleAttr,
+      12.0,
+      19.0,
+      {SdfTimeSampleMap({{0.0, VtValue(10.0)}, {1.0, VtValue(20.0)}, {4.5, VtValue(19.0)}}),
+       SdfTimeSampleMap({{7.5, VtValue(19.0)}}),
+       SdfTimeSampleMap({{24.0, VtValue(19.0)}}),
+       SdfTimeSampleMap({{12.0, VtValue(19.0)}})});
 
-  _SetDefaultWithEachEditTarget(stage, editTargets, doubleAttr, 19.0,
-                                {19.0, 19.0, 19.0, 19.0});
+  _SetDefaultWithEachEditTarget(stage, editTargets, doubleAttr, 19.0, {19.0, 19.0, 19.0, 19.0});
 }
 
 int main()

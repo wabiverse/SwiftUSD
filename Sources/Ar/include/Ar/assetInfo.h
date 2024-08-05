@@ -39,7 +39,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Contains information about a resolved asset.
 ///
 class ArAssetInfo {
-public:
+ public:
   /// Version of the resolved asset, if any.
   std::string version;
 
@@ -56,15 +56,19 @@ public:
   VtValue resolverInfo;
 };
 
-template <class HashState>
-void TfHashAppend(HashState &h, const ArAssetInfo &info) {
+template<class HashState> void TfHashAppend(HashState &h, const ArAssetInfo &info)
+{
   h.Append(info.version, info.assetName, info.repoPath, info.resolverInfo);
 }
 
-inline size_t hash_value(const ArAssetInfo &info) { return TfHash()(info); }
+inline size_t hash_value(const ArAssetInfo &info)
+{
+  return TfHash()(info);
+}
 
 /// \relates ArAssetInfo
-inline void swap(ArAssetInfo &lhs, ArAssetInfo &rhs) {
+inline void swap(ArAssetInfo &lhs, ArAssetInfo &rhs)
+{
   lhs.version.swap(rhs.version);
   lhs.assetName.swap(rhs.assetName);
   lhs.repoPath.swap(rhs.repoPath);
@@ -81,4 +85,4 @@ bool operator!=(const ArAssetInfo &lhs, const ArAssetInfo &rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_ASSET_INFO_H
+#endif  // PXR_USD_AR_ASSET_INFO_H

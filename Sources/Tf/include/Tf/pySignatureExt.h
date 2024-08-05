@@ -44,19 +44,25 @@
 // To use this utility, #include this file before any other file in your
 // wrapXXX.cpp file; the order matters.
 
-namespace boost { namespace python { namespace detail {
+namespace boost {
+namespace python {
+namespace detail {
 
-template <class Ret, class TheCls, class ... Args>
-auto get_signature(Ret (TheCls::*)(Args...) &, void* =nullptr) {
-    return boost::mpl::vector<Ret, TheCls &, Args...>();
+template<class Ret, class TheCls, class... Args>
+auto get_signature(Ret (TheCls::*)(Args...) &, void * = nullptr)
+{
+  return boost::mpl::vector<Ret, TheCls &, Args...>();
 }
-template <class Ret, class TheCls, class ... Args>
-auto get_signature(Ret (TheCls::*)(Args...) const &, void* =nullptr) {
-    return boost::mpl::vector<Ret, TheCls &, Args...>();
+template<class Ret, class TheCls, class... Args>
+auto get_signature(Ret (TheCls::*)(Args...) const &, void * = nullptr)
+{
+  return boost::mpl::vector<Ret, TheCls &, Args...>();
 }
 
-}}}
+}  // namespace detail
+}  // namespace python
+}  // namespace boost
 
 #include <boost/python/signature.hpp>
 
-#endif // PXR_BASE_TF_PY_SIGNATURE_EXT_H
+#endif  // PXR_BASE_TF_PY_SIGNATURE_EXT_H

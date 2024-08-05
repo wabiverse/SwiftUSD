@@ -21,11 +21,11 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/regTest.h"
-#include "pxr/base/tf/diagnostic.h"
 #include "pxr/base/tf/error.h"
+#include "pxr/base/tf/diagnostic.h"
 #include "pxr/base/tf/errorMark.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 #include "Arch/functionLite.h"
 
@@ -37,12 +37,7 @@
 using std::string;
 PXR_NAMESPACE_USING_DIRECTIVE
 
-enum TfTestErrorCodes
-{
-  SMALL,
-  MEDIUM,
-  LARGE
-};
+enum TfTestErrorCodes { SMALL, MEDIUM, LARGE };
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
@@ -51,13 +46,9 @@ TF_REGISTRY_FUNCTION(TfEnum)
   TF_ADD_ENUM_NAME(LARGE);
 }
 
-enum UnRegisteredErrorCode
-{
-  UNREGISTERED
-};
+enum UnRegisteredErrorCode { UNREGISTERED };
 
-static bool
-Test_TfError()
+static bool Test_TfError()
 {
 
   TfErrorMark m;
@@ -185,8 +176,7 @@ Test_TfError()
 
 TF_ADD_REGTEST(TfError);
 
-static void
-_ThreadTask(TfErrorTransport *transport)
+static void _ThreadTask(TfErrorTransport *transport)
 {
   TfErrorMark m;
   printf("Thread issuing error\n");
@@ -196,15 +186,13 @@ _ThreadTask(TfErrorTransport *transport)
   TF_AXIOM(m.IsClean());
 }
 
-static bool
-Test_TfErrorThreadTransport()
+static bool Test_TfErrorThreadTransport()
 {
   TfErrorTransport transport;
   printf("Creating TfErrorMark\n");
   TfErrorMark m;
   printf("Launching thread\n");
-  std::thread t([&transport]()
-                { _ThreadTask(&transport); });
+  std::thread t([&transport]() { _ThreadTask(&transport); });
   TF_AXIOM(m.IsClean());
   t.join();
   printf("Thread completed, posting error.\n");

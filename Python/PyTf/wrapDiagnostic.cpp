@@ -30,7 +30,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapDiagnostic() {
+void wrapDiagnostic()
+{
   TfPyWrapEnum<TfDiagnosticType>();
 
   def("InstallTerminateAndCrashHandlers", TfInstallTerminateAndCrashHandlers);

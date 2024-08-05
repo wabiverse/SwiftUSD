@@ -26,11 +26,11 @@
 #define PXR_IMAGING_HGIMETAL_SHADERGENERATOR_H
 
 #include "Arch/defines.h"
-#include "Tf/diagnostic.h"
-#include "HgiMetal/hgi.h"
-#include "HgiMetal/conversions.h"
-#include "HgiMetal/shaderSection.h"
 #include "Hgi/shaderGenerator.h"
+#include "HgiMetal/conversions.h"
+#include "HgiMetal/hgi.h"
+#include "HgiMetal/shaderSection.h"
+#include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -56,13 +56,10 @@ using HgiMetalShaderStageEntryPointUniquePtr =
 /// Takes in a descriptor and spits out metal code through it's Execute function
 ///
 
-class HgiMetalShaderGenerator final : public HgiShaderGenerator
-{
-public:
+class HgiMetalShaderGenerator final : public HgiShaderGenerator {
+ public:
   HGIMETAL_API
-  HgiMetalShaderGenerator(
-      const HgiShaderFunctionDesc &descriptor,
-      MTL::Device *device);
+  HgiMetalShaderGenerator(const HgiShaderFunctionDesc &descriptor, MTL::Device *device);
 
   HGIMETAL_API
   ~HgiMetalShaderGenerator() override;
@@ -70,16 +67,14 @@ public:
   HGIMETAL_API
   HgiMetalShaderSectionUniquePtrVector *GetShaderSections();
 
-  template <typename SectionType, typename... T>
-  SectionType *CreateShaderSection(T &&...t);
+  template<typename SectionType, typename... T> SectionType *CreateShaderSection(T &&...t);
 
-protected:
+ protected:
   HGIMETAL_API
   void _Execute(std::ostream &ss) override;
 
-private:
-  HgiMetalShaderStageEntryPointUniquePtr
-  _BuildShaderStageEntryPoints(
+ private:
+  HgiMetalShaderStageEntryPointUniquePtr _BuildShaderStageEntryPoints(
       const HgiShaderFunctionDesc &descriptor);
 
   void _BuildKeywordInputShaderSections(const HgiShaderFunctionDesc &descriptor);

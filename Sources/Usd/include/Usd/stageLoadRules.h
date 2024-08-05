@@ -54,7 +54,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Remove redundant rules that do not change the effective load state with
 /// UsdStageLoadRules::Minimize().
 class UsdStageLoadRules {
-public:
+ public:
   /// \enum Rule
   ///
   /// These values are paired with paths to govern payload inclusion on
@@ -73,7 +73,10 @@ public:
 
   /// Return rules that load all payloads.  This is equivalent to
   /// default-constructed UsdStageLoadRules.
-  static inline UsdStageLoadRules LoadAll() { return UsdStageLoadRules(); }
+  static inline UsdStageLoadRules LoadAll()
+  {
+    return UsdStageLoadRules();
+  }
 
   /// Return rules that load no payloads.
   USD_API
@@ -126,8 +129,7 @@ public:
   /// \p policy is UsdLoadPolicy::LoadWithoutDescendants) for each element of
   /// \p loadSet.
   USD_API
-  void LoadAndUnload(const SdfPathSet &loadSet, const SdfPathSet &unloadSet,
-                     UsdLoadPolicy policy);
+  void LoadAndUnload(const SdfPathSet &loadSet, const SdfPathSet &unloadSet, UsdLoadPolicy policy);
 
   /// Add a literal rule.  If there's already a rule for \p path, replace it.
   USD_API
@@ -138,7 +140,8 @@ public:
   void SetRules(std::vector<std::pair<SdfPath, Rule>> const &rules);
 
   /// Set literal rules, must be sorted by SdfPath::operator<.
-  inline void SetRules(std::vector<std::pair<SdfPath, Rule>> &&rules) {
+  inline void SetRules(std::vector<std::pair<SdfPath, Rule>> &&rules)
+  {
     _rules = std::move(rules);
   }
 
@@ -173,7 +176,8 @@ public:
   Rule GetEffectiveRuleForPath(SdfPath const &path) const;
 
   /// Return all the rules as a vector.
-  inline std::vector<std::pair<SdfPath, Rule>> const &GetRules() const {
+  inline std::vector<std::pair<SdfPath, Rule>> const &GetRules() const
+  {
     return _rules;
   }
 
@@ -186,35 +190,38 @@ public:
 
   /// Return false if \p other has exactly the same set of rules as this.  See
   /// operator==().
-  inline bool operator!=(UsdStageLoadRules const &other) const {
+  inline bool operator!=(UsdStageLoadRules const &other) const
+  {
     return !(*this == other);
   }
 
   /// Swap the contents of these rules with \p other.
-  inline void swap(UsdStageLoadRules &other) { _rules.swap(other._rules); }
+  inline void swap(UsdStageLoadRules &other)
+  {
+    _rules.swap(other._rules);
+  }
 
-private:
-  friend USD_API std::ostream &operator<<(std::ostream &,
-                                          std::pair<SdfPath, Rule> const &);
+ private:
+  friend USD_API std::ostream &operator<<(std::ostream &, std::pair<SdfPath, Rule> const &);
 
-  friend USD_API std::ostream &operator<<(std::ostream &,
-                                          UsdStageLoadRules const &);
+  friend USD_API std::ostream &operator<<(std::ostream &, UsdStageLoadRules const &);
 
   friend USD_API size_t hash_value(UsdStageLoadRules const &);
 
   USD_API
-  std::vector<std::pair<SdfPath, Rule>>::const_iterator
-  _LowerBound(SdfPath const &path) const;
+  std::vector<std::pair<SdfPath, Rule>>::const_iterator _LowerBound(SdfPath const &path) const;
 
   USD_API
-  std::vector<std::pair<SdfPath, Rule>>::iterator
-  _LowerBound(SdfPath const &path);
+  std::vector<std::pair<SdfPath, Rule>>::iterator _LowerBound(SdfPath const &path);
 
   std::vector<std::pair<SdfPath, Rule>> _rules;
 };
 
 /// Swap the contents of rules \p l and \p r.
-inline void swap(UsdStageLoadRules &l, UsdStageLoadRules &r) { l.swap(r); }
+inline void swap(UsdStageLoadRules &l, UsdStageLoadRules &r)
+{
+  l.swap(r);
+}
 
 /// Stream a text representation of a UsdStageLoadRules object.
 USD_API
@@ -223,8 +230,7 @@ std::ostream &operator<<(std::ostream &, UsdStageLoadRules const &);
 /// Stream a text representation of a pair of SdfPath and
 /// UsdStageLoadRules::Rule.
 USD_API
-std::ostream &operator<<(std::ostream &,
-                         std::pair<SdfPath, UsdStageLoadRules::Rule> const &);
+std::ostream &operator<<(std::ostream &, std::pair<SdfPath, UsdStageLoadRules::Rule> const &);
 
 /// Return the hash code for a UsdStageLoadRules object.
 USD_API
@@ -232,4 +238,4 @@ size_t hash_value(UsdStageLoadRules const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_STAGE_LOAD_RULES_H
+#endif  // PXR_USD_USD_STAGE_LOAD_RULES_H

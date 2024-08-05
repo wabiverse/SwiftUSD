@@ -39,14 +39,13 @@ SDF_DECLARE_HANDLES(SdfLayer);
 ///
 /// List editor implementation for sublayer path lists.
 ///
-class Sdf_SubLayerListEditor
-    : public Sdf_VectorListEditor<SdfSubLayerTypePolicy> {
-public:
+class Sdf_SubLayerListEditor : public Sdf_VectorListEditor<SdfSubLayerTypePolicy> {
+ public:
   Sdf_SubLayerListEditor(const SdfLayerHandle &owner);
 
   virtual ~Sdf_SubLayerListEditor();
 
-private:
+ private:
   typedef Sdf_VectorListEditor<SdfSubLayerTypePolicy> Parent;
 
   virtual void _OnEdit(SdfListOpType op,
@@ -56,4 +55,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SUB_LAYER_LIST_EDITOR_H
+#endif  // PXR_USD_SDF_SUB_LAYER_LIST_EDITOR_H

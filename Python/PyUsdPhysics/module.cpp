@@ -27,9 +27,9 @@ Copyright (c) 2018, NVIDIA CORPORATION
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "Tf/pyModule.h"
 #include "boost/python.hpp"
 #include <pxr/pxrns.h>
-#include "Tf/pyModule.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

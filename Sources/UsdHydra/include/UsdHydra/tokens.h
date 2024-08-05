@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdHydra/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdHydra/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,20 +59,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdHydraTokens->black);
 /// \endcode
-struct UsdHydraTokensType
-{
+struct UsdHydraTokensType {
   USDHYDRA_API UsdHydraTokensType();
   /// \brief "black"
   ///
-  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes black to be returned when sampling outside the bounds of the texture.
+  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes black to
+  /// be returned when sampling outside the bounds of the texture.
   const TfToken black;
   /// \brief "clamp"
   ///
-  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the the texture coordinate to be clamped to [0,1].
+  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the the
+  /// texture coordinate to be clamped to [0,1].
   const TfToken clamp;
   /// \brief "displayLook:bxdf"
   ///
-  /// deprecated This has been deprecated in favor of the glslfx:surface output.  Relationship on a material that targets the "bxdf" or the surface shader prim.
+  /// deprecated This has been deprecated in favor of the glslfx:surface output.  Relationship on a
+  /// material that targets the "bxdf" or the surface shader prim.
   const TfToken displayLookBxdf;
   /// \brief "faceIndex"
   ///
@@ -104,7 +106,8 @@ struct UsdHydraTokensType
   const TfToken hydraGenerativeProcedural;
   /// \brief "inputs:file"
   ///
-  /// The special "info:filename" property of a hydra Texture shader, which points to a resolvable texture asset.
+  /// The special "info:filename" property of a hydra Texture shader, which points to a resolvable
+  /// texture asset.
   const TfToken infoFilename;
   /// \brief "inputs:varname"
   ///
@@ -112,15 +115,18 @@ struct UsdHydraTokensType
   const TfToken infoVarname;
   /// \brief "linear"
   ///
-  /// A weighted linear blend of nearest adjacent samples. Possible value for "minFilter" and "magFilter" inputs on a UvTextureshader.
+  /// A weighted linear blend of nearest adjacent samples. Possible value for "minFilter" and
+  /// "magFilter" inputs on a UvTextureshader.
   const TfToken linear;
   /// \brief "linearMipmapLinear"
   ///
-  /// See https://www.opengl.org/wiki/Sampler_Object , Possible value for the "minFilter" input on a UvTexture shader.
+  /// See https://www.opengl.org/wiki/Sampler_Object , Possible value for the "minFilter" input on
+  /// a UvTexture shader.
   const TfToken linearMipmapLinear;
   /// \brief "linearMipmapNearest"
   ///
-  /// See https://www.opengl.org/wiki/Sampler_Object  Possible value for the "minFilter" input on a UvTexture shader.
+  /// See https://www.opengl.org/wiki/Sampler_Object  Possible value for the "minFilter" input on a
+  /// UvTexture shader.
   const TfToken linearMipmapNearest;
   /// \brief "magFilter"
   ///
@@ -132,19 +138,23 @@ struct UsdHydraTokensType
   const TfToken minFilter;
   /// \brief "mirror"
   ///
-  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the texture coordinate to wrap around like a mirror. -0.2 becomes 0.2, -1.2 becomes 0.8, etc. ,
+  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the
+  /// texture coordinate to wrap around like a mirror. -0.2 becomes 0.2, -1.2 becomes 0.8, etc. ,
   const TfToken mirror;
   /// \brief "nearest"
   ///
-  /// Selects the nearest sample for the given coordinate  Possible value for "minFilter" and "magFilter" inputs on a UvTexture shader.
+  /// Selects the nearest sample for the given coordinate  Possible value for "minFilter" and
+  /// "magFilter" inputs on a UvTexture shader.
   const TfToken nearest;
   /// \brief "nearestMipmapLinear"
   ///
-  /// See https://www.opengl.org/wiki/Sampler_Object Possible value for "minFilter" and "magFilter" inputs on a UvTexture shader.
+  /// See https://www.opengl.org/wiki/Sampler_Object Possible value for "minFilter" and "magFilter"
+  /// inputs on a UvTexture shader.
   const TfToken nearestMipmapLinear;
   /// \brief "nearestMipmapNearest"
   ///
-  /// See https://www.opengl.org/wiki/Sampler_Object Possible value for the "minFilter" input on a UvTexture shader.
+  /// See https://www.opengl.org/wiki/Sampler_Object Possible value for the "minFilter" input on a
+  /// UvTexture shader.
   const TfToken nearestMipmapNearest;
   /// \brief "primvars:hdGp:proceduralType"
   ///
@@ -156,7 +166,9 @@ struct UsdHydraTokensType
   const TfToken proceduralSystem;
   /// \brief "repeat"
   ///
-  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim.  Causes the texture coordinate to wrap around the texture. So a texture coordinate of -0.2 becomes the equivalent of 0.8.
+  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim.  Causes the
+  /// texture coordinate to wrap around the texture. So a texture coordinate of -0.2 becomes the
+  /// equivalent of 0.8.
   const TfToken repeat;
   /// \brief "textureMemory"
   ///
@@ -164,7 +176,10 @@ struct UsdHydraTokensType
   const TfToken textureMemory;
   /// \brief "useMetadata"
   ///
-  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the wrap value to be loaded from the texture file instead of being specified in the prim.  If the texture file doesn't support metadata or the metadata doesn't contain a wrap mode,  the "black" wrap mode is used.
+  /// Possible value for "wrapT" and "wrapS" inputs on a "UvTexture" shader prim. Causes the wrap
+  /// value to be loaded from the texture file instead of being specified in the prim.  If the
+  /// texture file doesn't support metadata or the metadata doesn't contain a wrap mode,  the
+  /// "black" wrap mode is used.
   const TfToken useMetadata;
   /// \brief "uv"
   ///
@@ -172,11 +187,13 @@ struct UsdHydraTokensType
   const TfToken uv;
   /// \brief "wrapS"
   ///
-  /// A shader input on a hydra UvTexture shader which defines the behavior of texture coordinates that are outside the bounds of the texture.
+  /// A shader input on a hydra UvTexture shader which defines the behavior of texture coordinates
+  /// that are outside the bounds of the texture.
   const TfToken wrapS;
   /// \brief "wrapT"
   ///
-  /// A shader input on a hydra UvTexture shader which defines the behavior of texture coordinates that are outside the bounds of the texture.
+  /// A shader input on a hydra UvTexture shader which defines the behavior of texture coordinates
+  /// that are outside the bounds of the texture.
   const TfToken wrapT;
   /// \brief "HydraGenerativeProceduralAPI"
   ///

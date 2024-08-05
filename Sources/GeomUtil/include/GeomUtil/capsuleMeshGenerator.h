@@ -66,89 +66,88 @@ class PxOsdMeshTopology;
 ///
 /// \endcode
 ///
-class GeomUtilCapsuleMeshGenerator final
-    : public GeomUtilMeshGeneratorBase
-{
-public:
+class GeomUtilCapsuleMeshGenerator final : public GeomUtilMeshGeneratorBase {
+ public:
   static constexpr size_t minNumRadial = 3;
   static constexpr size_t minNumCapAxial = 1;
 
   GEOMUTIL_API
-  static size_t ComputeNumPoints(
-      const size_t numRadial,
-      const size_t numCapAxial,
-      const bool closedSweep = true);
+  static size_t ComputeNumPoints(const size_t numRadial,
+                                 const size_t numCapAxial,
+                                 const bool closedSweep = true);
 
   GEOMUTIL_API
-  static PxOsdMeshTopology GenerateTopology(
-      const size_t numRadial,
-      const size_t numCapAxial,
-      const bool closedSweep = true);
+  static PxOsdMeshTopology GenerateTopology(const size_t numRadial,
+                                            const size_t numCapAxial,
+                                            const bool closedSweep = true);
 
-  template <typename PointIterType,
-            typename ScalarType,
-            typename Enabled =
-                typename _EnableIfGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter,
-      const size_t numRadial,
-      const size_t numCapAxial,
-      const ScalarType radius,
-      const ScalarType height,
-      const GfMatrix4d *framePtr = nullptr)
+  template<typename PointIterType,
+           typename ScalarType,
+           typename Enabled = typename _EnableIfGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter,
+                             const size_t numRadial,
+                             const size_t numCapAxial,
+                             const ScalarType radius,
+                             const ScalarType height,
+                             const GfMatrix4d *framePtr = nullptr)
   {
     constexpr ScalarType sweep = 360;
 
-    GeneratePoints(iter, numRadial, numCapAxial,
+    GeneratePoints(iter,
+                   numRadial,
+                   numCapAxial,
                    /* bottomRadius =    */ radius,
                    /* topRadius    =    */ radius,
                    height,
                    /* bottomCapHeight = */ radius,
                    /* topCapHeight =    */ radius,
-                   sweep, framePtr);
+                   sweep,
+                   framePtr);
   }
 
-  template <typename PointIterType,
-            typename ScalarType,
-            typename Enabled =
-                typename _EnableIfGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter,
-      const size_t numRadial,
-      const size_t numCapAxial,
-      const ScalarType bottomRadius,
-      const ScalarType topRadius,
-      const ScalarType height,
-      const ScalarType bottomCapHeight,
-      const ScalarType topCapHeight,
-      const ScalarType sweepDegrees,
-      const GfMatrix4d *framePtr = nullptr)
+  template<typename PointIterType,
+           typename ScalarType,
+           typename Enabled = typename _EnableIfGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter,
+                             const size_t numRadial,
+                             const size_t numCapAxial,
+                             const ScalarType bottomRadius,
+                             const ScalarType topRadius,
+                             const ScalarType height,
+                             const ScalarType bottomCapHeight,
+                             const ScalarType topCapHeight,
+                             const ScalarType sweepDegrees,
+                             const GfMatrix4d *framePtr = nullptr)
   {
-    using PointType =
-        typename std::iterator_traits<PointIterType>::value_type;
+    using PointType = typename std::iterator_traits<PointIterType>::value_type;
 
-    _GeneratePointsImpl(numRadial, numCapAxial, bottomRadius, topRadius,
-                        height, bottomCapHeight, topCapHeight, sweepDegrees,
-                        framePtr ? _PointWriter<PointType>(iter, framePtr)
-                                 : _PointWriter<PointType>(iter));
+    _GeneratePointsImpl(numRadial,
+                        numCapAxial,
+                        bottomRadius,
+                        topRadius,
+                        height,
+                        bottomCapHeight,
+                        topCapHeight,
+                        sweepDegrees,
+                        framePtr ? _PointWriter<PointType>(iter, framePtr) :
+                                   _PointWriter<PointType>(iter));
   }
 
   using GeomUtilMeshGeneratorBase::GeneratePoints;
 
-private:
-  template <typename PointType>
-  static void _GeneratePointsImpl(
-      const size_t numRadial,
-      const size_t numCapAxial,
-      const typename PointType::ScalarType bottomRadius,
-      const typename PointType::ScalarType topRadius,
-      const typename PointType::ScalarType height,
-      const typename PointType::ScalarType bottomCapHeight,
-      const typename PointType::ScalarType topCapHeight,
-      const typename PointType::ScalarType sweep,
-      const _PointWriter<PointType> &ptWriter);
+ private:
+  template<typename PointType>
+  static void _GeneratePointsImpl(const size_t numRadial,
+                                  const size_t numCapAxial,
+                                  const typename PointType::ScalarType bottomRadius,
+                                  const typename PointType::ScalarType topRadius,
+                                  const typename PointType::ScalarType height,
+                                  const typename PointType::ScalarType bottomCapHeight,
+                                  const typename PointType::ScalarType topCapHeight,
+                                  const typename PointType::ScalarType sweep,
+                                  const _PointWriter<PointType> &ptWriter);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GEOM_UTIL_CAPSULE_MESH_GENERATOR_H
+#endif  // PXR_IMAGING_GEOM_UTIL_CAPSULE_MESH_GENERATOR_H

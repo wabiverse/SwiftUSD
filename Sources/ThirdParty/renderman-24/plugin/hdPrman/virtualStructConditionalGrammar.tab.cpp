@@ -104,403 +104,360 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <math.h>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 #include <vector>
 
 #include "hdPrman/debugCodes.h"
 #include "hdPrman/matfiltResolveVstructs.h"
 
-#include <pxr/pxrns.h>
 #include "Hd/material.h"
+#include "Sdr/registry.h"
 #include "Sdr/shaderNode.h"
 #include "Sdr/shaderProperty.h"
-#include "Sdr/registry.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 // ---------------------------------------------------------------------------
 
-struct _VSCGConditionalBase
-{
+struct _VSCGConditionalBase {
   virtual ~_VSCGConditionalBase() = default;
 
   typedef std::shared_ptr<_VSCGConditionalBase> Ptr;
 
-  virtual bool Eval(
-      const HdMaterialNetworkInterface *interface,
-      const TfToken &nodeName,
-      const NdrTokenVec &shaderTypePriority) = 0;
+  virtual bool Eval(const HdMaterialNetworkInterface *interface,
+                    const TfToken &nodeName,
+                    const NdrTokenVec &shaderTypePriority) = 0;
 };
 
 // ---------------------------------------------------------------------------
 
-namespace // anonymous
+namespace  // anonymous
 {
 
-  struct ConditionalParamBase : public _VSCGConditionalBase
+struct ConditionalParamBase : public _VSCGConditionalBase {
+  ConditionalParamBase(const TfToken &name) : paramName(name) {}
+
+  TfToken paramName;
+};
+
+struct ConditionalParamIsConnected : public ConditionalParamBase {
+  ConditionalParamIsConnected(const TfToken &name) : ConditionalParamBase(name) {}
+
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
   {
-    ConditionalParamBase(const TfToken &name)
-        : paramName(name)
-    {
+    return !interface->GetNodeInputConnection(nodeName, paramName).empty();
+  }
+};
+
+struct ConditionalParamIsNotConnected : public ConditionalParamBase {
+  ConditionalParamIsNotConnected(const TfToken &name) : ConditionalParamBase(name) {}
+
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    return interface->GetNodeInputConnection(nodeName, paramName).empty();
+  }
+};
+
+struct ConditionalParamIsSet : public ConditionalParamBase {
+  ConditionalParamIsSet(const TfToken &name) : ConditionalParamBase(name) {}
+
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    return !interface->GetNodeParameterValue(nodeName, paramName).IsEmpty();
+  }
+};
+
+struct ConditionalParamIsNotSet : public ConditionalParamBase {
+  ConditionalParamIsNotSet(const TfToken &name) : ConditionalParamBase(name) {}
+
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    return interface->GetNodeParameterValue(nodeName, paramName).IsEmpty();
+  }
+};
+
+struct ConditionalParamCmpBase : public ConditionalParamBase {
+  ConditionalParamCmpBase(const TfToken &name, const VtValue &v)
+      : ConditionalParamBase(name), value(v)
+  {
+  }
+
+  VtValue value;
+
+  static bool ValueAsNumber(const VtValue v, double *result)
+  {
+    if (v.IsHolding<float>()) {
+      *result = v.UncheckedGet<float>();
+      return true;
     }
 
-    TfToken paramName;
-  };
-
-  struct ConditionalParamIsConnected : public ConditionalParamBase
-  {
-    ConditionalParamIsConnected(const TfToken &name)
-        : ConditionalParamBase(name) {}
-
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return !interface->GetNodeInputConnection(nodeName, paramName).empty();
+    if (v.IsHolding<int>()) {
+      *result = v.UncheckedGet<int>();
+      return true;
     }
-  };
 
-  struct ConditionalParamIsNotConnected : public ConditionalParamBase
-  {
-    ConditionalParamIsNotConnected(const TfToken &name)
-        : ConditionalParamBase(name) {}
-
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return interface->GetNodeInputConnection(nodeName, paramName).empty();
+    if (v.IsHolding<double>()) {
+      *result = v.UncheckedGet<double>();
+      return true;
     }
-  };
 
-  struct ConditionalParamIsSet : public ConditionalParamBase
-  {
-    ConditionalParamIsSet(const TfToken &name)
-        : ConditionalParamBase(name) {}
-
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return !interface->GetNodeParameterValue(nodeName, paramName).IsEmpty();
+    if (v.IsHolding<bool>()) {
+      *result = v.UncheckedGet<bool>();
+      return true;
     }
-  };
 
-  struct ConditionalParamIsNotSet : public ConditionalParamBase
+    // TODO check color?
+
+    return false;
+  }
+
+  static bool GetParameterValue(const HdMaterialNetworkInterface *interface,
+                                const TfToken &nodeName,
+                                const TfToken &paramName,
+                                const NdrTokenVec &shaderTypePriority,
+                                VtValue *result)
   {
-    ConditionalParamIsNotSet(const TfToken &name)
-        : ConditionalParamBase(name) {}
 
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return interface->GetNodeParameterValue(nodeName, paramName).IsEmpty();
+    *result = interface->GetNodeParameterValue(nodeName, paramName);
+
+    if (!result->IsEmpty()) {
+      return true;
     }
-  };
 
-  struct ConditionalParamCmpBase : public ConditionalParamBase
-  {
-    ConditionalParamCmpBase(const TfToken &name, const VtValue &v)
-        : ConditionalParamBase(name), value(v) {}
+    // check for a default
+    auto &reg = SdrRegistry::GetInstance();
 
-    VtValue value;
-
-    static bool ValueAsNumber(const VtValue v, double *result)
+    if (SdrShaderNodeConstPtr sdrNode = reg.GetShaderNodeByIdentifier(
+            interface->GetNodeType(nodeName), shaderTypePriority))
     {
-      if (v.IsHolding<float>())
-      {
-        *result = v.UncheckedGet<float>();
+      if (NdrPropertyConstPtr ndrProp = sdrNode->GetInput(paramName)) {
+        *result = ndrProp->GetDefaultValue();
         return true;
       }
+    }
 
-      if (v.IsHolding<int>())
-      {
-        *result = v.UncheckedGet<int>();
-        return true;
-      }
+    return false;
+  }
 
-      if (v.IsHolding<double>())
-      {
-        *result = v.UncheckedGet<double>();
-        return true;
-      }
+  virtual bool CompareNumber(double v1, double v2) = 0;
+  virtual bool CompareString(const std::string &v1, const std::string &v2) = 0;
 
-      if (v.IsHolding<bool>())
-      {
-        *result = v.UncheckedGet<bool>();
-        return true;
-      }
-
-      // TODO check color?
-
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    VtValue paramValue;
+    if (!GetParameterValue(interface, nodeName, paramName, shaderTypePriority, &paramValue)) {
       return false;
     }
 
-    static bool GetParameterValue(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const TfToken &paramName,
-        const NdrTokenVec &shaderTypePriority,
-        VtValue *result)
-    {
-
-      *result = interface->GetNodeParameterValue(nodeName, paramName);
-
-      if (!result->IsEmpty())
-      {
-        return true;
+    if (value.IsHolding<std::string>()) {
+      if (paramValue.IsHolding<std::string>()) {
+        return CompareString(value.UncheckedGet<std::string>(),
+                             paramValue.UncheckedGet<std::string>());
       }
-
-      // check for a default
-      auto &reg = SdrRegistry::GetInstance();
-
-      if (SdrShaderNodeConstPtr sdrNode = reg.GetShaderNodeByIdentifier(
-              interface->GetNodeType(nodeName), shaderTypePriority))
-      {
-        if (NdrPropertyConstPtr ndrProp = sdrNode->GetInput(paramName))
-        {
-          *result = ndrProp->GetDefaultValue();
-          return true;
-        }
-      }
-
       return false;
     }
 
-    virtual bool CompareNumber(double v1, double v2) = 0;
-    virtual bool CompareString(
-        const std::string &v1, const std::string &v2) = 0;
+    double d1 = 0, d2 = 0;
 
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      VtValue paramValue;
-      if (!GetParameterValue(interface,
-                             nodeName, paramName, shaderTypePriority, &paramValue))
-      {
-        return false;
-      }
+    if (ValueAsNumber(paramValue, &d1) && ValueAsNumber(value, &d2)) {
 
-      if (value.IsHolding<std::string>())
-      {
-        if (paramValue.IsHolding<std::string>())
-        {
-          return CompareString(value.UncheckedGet<std::string>(),
-                               paramValue.UncheckedGet<std::string>());
-        }
-        return false;
-      }
-
-      double d1 = 0, d2 = 0;
-
-      if (ValueAsNumber(paramValue, &d1) && ValueAsNumber(value, &d2))
-      {
-
-        // std::cerr << d1 << " " << d2 << std::endl;
-        return CompareNumber(d1, d2);
-      }
-
-      return false;
+      // std::cerr << d1 << " " << d2 << std::endl;
+      return CompareNumber(d1, d2);
     }
-  };
 
-  struct ConditionalParamCmpEqualTo : public ConditionalParamCmpBase
+    return false;
+  }
+};
+
+struct ConditionalParamCmpEqualTo : public ConditionalParamCmpBase {
+  ConditionalParamCmpEqualTo(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
   {
-    ConditionalParamCmpEqualTo(const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v) {}
+  }
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 == v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return v1 == v2;
-    }
-  };
-
-  struct ConditionalParamCmpNotEqualTo : public ConditionalParamCmpBase
+  bool CompareNumber(double v1, double v2) override
   {
-    ConditionalParamCmpNotEqualTo(const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v) {}
+    return v1 == v2;
+  }
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 != v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return v1 != v2;
-    }
-  };
-
-  struct ConditionalParamCmpGreaterThan : public ConditionalParamCmpBase
+  bool CompareString(const std::string &v1, const std::string &v2) override
   {
-    ConditionalParamCmpGreaterThan(const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v)
-    {
-    }
+    return v1 == v2;
+  }
+};
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 > v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return false;
-    }
-  };
-
-  struct ConditionalParamCmpLessThan : public ConditionalParamCmpBase
+struct ConditionalParamCmpNotEqualTo : public ConditionalParamCmpBase {
+  ConditionalParamCmpNotEqualTo(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
   {
-    ConditionalParamCmpLessThan(const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v) {}
+  }
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 < v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return false;
-    }
-  };
-
-  struct ConditionalParamCmpGreaterThanOrEqualTo
-      : public ConditionalParamCmpBase
+  bool CompareNumber(double v1, double v2) override
   {
-    ConditionalParamCmpGreaterThanOrEqualTo(
-        const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v) {}
+    return v1 != v2;
+  }
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 >= v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return false;
-    }
-  };
-
-  struct ConditionalParamCmpLessThanOrEqualTo : public ConditionalParamCmpBase
+  bool CompareString(const std::string &v1, const std::string &v2) override
   {
-    ConditionalParamCmpLessThanOrEqualTo(
-        const TfToken &name, const VtValue &v)
-        : ConditionalParamCmpBase(name, v) {}
+    return v1 != v2;
+  }
+};
 
-    bool CompareNumber(double v1, double v2) override
-    {
-      return v1 <= v2;
-    }
-
-    bool CompareString(const std::string &v1, const std::string &v2)
-        override
-    {
-      return false;
-    }
-  };
-
-  struct ConditionalAnd : _VSCGConditionalBase
+struct ConditionalParamCmpGreaterThan : public ConditionalParamCmpBase {
+  ConditionalParamCmpGreaterThan(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
   {
-    ConditionalAnd(_VSCGConditionalBase *left, _VSCGConditionalBase *right)
-        : _VSCGConditionalBase(), left(left), right(right) {}
+  }
 
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return (left && left->Eval(interface, nodeName, shaderTypePriority)) && (right && right->Eval(
-                                                                                            interface, nodeName, shaderTypePriority));
-    }
-
-    ~ConditionalAnd()
-    {
-      delete left;
-      delete right;
-    }
-
-    _VSCGConditionalBase *left;
-    _VSCGConditionalBase *right;
-  };
-
-  struct ConditionalOr : _VSCGConditionalBase
+  bool CompareNumber(double v1, double v2) override
   {
-    ConditionalOr(_VSCGConditionalBase *left, _VSCGConditionalBase *right)
-        : _VSCGConditionalBase(), left(left), right(right) {}
+    return v1 > v2;
+  }
 
-    ~ConditionalOr()
-    {
-      delete left;
-      delete right;
-    }
-    bool Eval(
-        const HdMaterialNetworkInterface *interface,
-        const TfToken &nodeName,
-        const NdrTokenVec &shaderTypePriority) override
-    {
-      return (left && left->Eval(interface, nodeName, shaderTypePriority)) || (right && right->Eval(
-                                                                                            interface, nodeName, shaderTypePriority));
-    }
+  bool CompareString(const std::string &v1, const std::string &v2) override
+  {
+    return false;
+  }
+};
 
-    _VSCGConditionalBase *left;
-    _VSCGConditionalBase *right;
-  };
+struct ConditionalParamCmpLessThan : public ConditionalParamCmpBase {
+  ConditionalParamCmpLessThan(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
+  {
+  }
 
-  //----------------------------------------------------------------------------
+  bool CompareNumber(double v1, double v2) override
+  {
+    return v1 < v2;
+  }
 
-} // namespace anonymous
+  bool CompareString(const std::string &v1, const std::string &v2) override
+  {
+    return false;
+  }
+};
 
-struct _VSCGValueContainer
-{
-  _VSCGValueContainer(const VtValue &v)
-      : value(v) {}
+struct ConditionalParamCmpGreaterThanOrEqualTo : public ConditionalParamCmpBase {
+  ConditionalParamCmpGreaterThanOrEqualTo(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
+  {
+  }
+
+  bool CompareNumber(double v1, double v2) override
+  {
+    return v1 >= v2;
+  }
+
+  bool CompareString(const std::string &v1, const std::string &v2) override
+  {
+    return false;
+  }
+};
+
+struct ConditionalParamCmpLessThanOrEqualTo : public ConditionalParamCmpBase {
+  ConditionalParamCmpLessThanOrEqualTo(const TfToken &name, const VtValue &v)
+      : ConditionalParamCmpBase(name, v)
+  {
+  }
+
+  bool CompareNumber(double v1, double v2) override
+  {
+    return v1 <= v2;
+  }
+
+  bool CompareString(const std::string &v1, const std::string &v2) override
+  {
+    return false;
+  }
+};
+
+struct ConditionalAnd : _VSCGConditionalBase {
+  ConditionalAnd(_VSCGConditionalBase *left, _VSCGConditionalBase *right)
+      : _VSCGConditionalBase(), left(left), right(right)
+  {
+  }
+
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    return (left && left->Eval(interface, nodeName, shaderTypePriority)) &&
+           (right && right->Eval(interface, nodeName, shaderTypePriority));
+  }
+
+  ~ConditionalAnd()
+  {
+    delete left;
+    delete right;
+  }
+
+  _VSCGConditionalBase *left;
+  _VSCGConditionalBase *right;
+};
+
+struct ConditionalOr : _VSCGConditionalBase {
+  ConditionalOr(_VSCGConditionalBase *left, _VSCGConditionalBase *right)
+      : _VSCGConditionalBase(), left(left), right(right)
+  {
+  }
+
+  ~ConditionalOr()
+  {
+    delete left;
+    delete right;
+  }
+  bool Eval(const HdMaterialNetworkInterface *interface,
+            const TfToken &nodeName,
+            const NdrTokenVec &shaderTypePriority) override
+  {
+    return (left && left->Eval(interface, nodeName, shaderTypePriority)) ||
+           (right && right->Eval(interface, nodeName, shaderTypePriority));
+  }
+
+  _VSCGConditionalBase *left;
+  _VSCGConditionalBase *right;
+};
+
+//----------------------------------------------------------------------------
+
+}  // namespace
+
+struct _VSCGValueContainer {
+  _VSCGValueContainer(const VtValue &v) : value(v) {}
 
   VtValue value;
 };
 
-struct _VSCGAction
-{
+struct _VSCGAction {
 
-  enum Action
-  {
+  enum Action {
     Connect,
     Ignore,
     SetConstant,
     CopyParam,
   };
 
-  _VSCGAction(Action action)
-      : action(action) {}
-  _VSCGAction(Action action, const VtValue &value)
-      : action(action), value(value) {}
+  _VSCGAction(Action action) : action(action) {}
+  _VSCGAction(Action action, const VtValue &value) : action(action), value(value) {}
 
   Action action;
   VtValue value;
 };
 
-struct _VSCGParserData
-{
+struct _VSCGParserData {
 
   // flex scanner
   void *yyscanner;
@@ -530,8 +487,7 @@ struct _VSCGParserData
     delete action;
     delete fallbackAction;
 
-    for (auto c : _intermediateConditions)
-    {
+    for (auto c : _intermediateConditions) {
       delete c;
     }
     _intermediateConditions.clear();
@@ -540,9 +496,8 @@ struct _VSCGParserData
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class MatfiltVstructConditionalEvaluatorImpl
-{
-public:
+class MatfiltVstructConditionalEvaluatorImpl {
+ public:
   ~MatfiltVstructConditionalEvaluatorImpl()
   {
     delete condition;
@@ -564,29 +519,28 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
-#define YYDEBUG 0
+#  define YYDEBUG 0
 #endif
 
 /* Enabling verbose error messages.  */
 #ifdef YYERROR_VERBOSE
-#undef YYERROR_VERBOSE
-#define YYERROR_VERBOSE 1
+#  undef YYERROR_VERBOSE
+#  define YYERROR_VERBOSE 1
 #else
-#define YYERROR_VERBOSE 1
+#  define YYERROR_VERBOSE 1
 #endif
 
 /* Enabling the token table.  */
 #ifndef YYTOKEN_TABLE
-#define YYTOKEN_TABLE 0
+#  define YYTOKEN_TABLE 0
 #endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
-#define YYTOKENTYPE
+#  define YYTOKENTYPE
 /* Put the tokens into the symbol table, so that GDB and other debuggers
    know about them.  */
-enum yytokentype
-{
+enum yytokentype {
   NUMBER = 258,
   STRING = 259,
   PARAM = 260,
@@ -614,11 +568,10 @@ enum yytokentype
 #endif
 
 #if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-{
+typedef union YYSTYPE {
 
 /* Line 214 of yacc.c  */
-#line 469 "hdPrman/virtualStructConditionalGrammar.yy"
+#  line 469 "hdPrman/virtualStructConditionalGrammar.yy"
 
   double number;
   char *string;
@@ -627,24 +580,23 @@ typedef union YYSTYPE
   struct _VSCGValueContainer *value;
 
 /* Line 214 of yacc.c  */
-#line 592 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
+#  line 592 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
 } YYSTYPE;
-#define YYSTYPE_IS_TRIVIAL 1
-#define yystype YYSTYPE /* obsolescent; will be withdrawn */
-#define YYSTYPE_IS_DECLARED 1
+#  define YYSTYPE_IS_TRIVIAL 1
+#  define yystype YYSTYPE /* obsolescent; will be withdrawn */
+#  define YYSTYPE_IS_DECLARED 1
 #endif
 
 #if !defined YYLTYPE && !defined YYLTYPE_IS_DECLARED
-typedef struct YYLTYPE
-{
+typedef struct YYLTYPE {
   int first_line;
   int first_column;
   int last_line;
   int last_column;
 } YYLTYPE;
-#define yyltype YYLTYPE /* obsolescent; will be withdrawn */
-#define YYLTYPE_IS_DECLARED 1
-#define YYLTYPE_IS_TRIVIAL 1
+#  define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+#  define YYLTYPE_IS_DECLARED 1
+#  define YYLTYPE_IS_TRIVIAL 1
 #endif
 
 /* Copy the second part of user declarations.  */
@@ -652,10 +604,8 @@ typedef struct YYLTYPE
 /* Line 264 of yacc.c  */
 #line 502 "hdPrman/virtualStructConditionalGrammar.yy"
 
-int virtualStructConditionalGrammarYylex(
-    YYSTYPE *lvalp, YYLTYPE *llocp, void *yyscanner);
-void virtualStructConditionalGrammarYyerror(
-    YYLTYPE *llocp, _VSCGParserData *data, const char *s);
+int virtualStructConditionalGrammarYylex(YYSTYPE *lvalp, YYLTYPE *llocp, void *yyscanner);
+void virtualStructConditionalGrammarYyerror(YYLTYPE *llocp, _VSCGParserData *data, const char *s);
 
 /*This macro is to hack around the fact that
 %lex-param ends up getting cut off, for example:
@@ -668,7 +618,7 @@ Really ends up passing in yyscanner in the YYLEX macro
 #line 632 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
 
 #ifdef short
-#undef short
+#  undef short
 #endif
 
 #ifdef YYTYPE_UINT8
@@ -698,51 +648,50 @@ typedef short int yytype_int16;
 #endif
 
 #ifndef YYSIZE_T
-#ifdef __SIZE_TYPE__
-#define YYSIZE_T __SIZE_TYPE__
-#elif defined size_t
-#define YYSIZE_T size_t
-#elif !defined YYSIZE_T && (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-#include <stddef.h> /* INFRINGES ON USER NAME SPACE */
-#define YYSIZE_T size_t
-#else
-#define YYSIZE_T unsigned int
-#endif
+#  ifdef __SIZE_TYPE__
+#    define YYSIZE_T __SIZE_TYPE__
+#  elif defined size_t
+#    define YYSIZE_T size_t
+#  elif !defined YYSIZE_T && \
+      (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+#    include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#    define YYSIZE_T size_t
+#  else
+#    define YYSIZE_T unsigned int
+#  endif
 #endif
 
-#define YYSIZE_MAXIMUM ((YYSIZE_T)-1)
+#define YYSIZE_MAXIMUM ((YYSIZE_T) - 1)
 
 #ifndef YY_
-#if YYENABLE_NLS
-#if ENABLE_NLS
-#include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#define YY_(msgid) dgettext("bison-runtime", msgid)
-#endif
-#endif
-#ifndef YY_
-#define YY_(msgid) msgid
-#endif
+#  if YYENABLE_NLS
+#    if ENABLE_NLS
+#      include <libintl.h> /* INFRINGES ON USER NAME SPACE */
+#      define YY_(msgid) dgettext("bison-runtime", msgid)
+#    endif
+#  endif
+#  ifndef YY_
+#    define YY_(msgid) msgid
+#  endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if !defined lint || defined __GNUC__
-#define YYUSE(e) ((void)(e))
+#  define YYUSE(e) ((void)(e))
 #else
-#define YYUSE(e) /* empty */
+#  define YYUSE(e) /* empty */
 #endif
 
 /* Identity function, used to suppress warnings about constant conditions.  */
 #ifndef lint
-#define YYID(n) (n)
+#  define YYID(n) (n)
 #else
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static int
-YYID(int yyi)
-#else
-static int
-YYID(yyi)
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static int YYID(int yyi)
+#  else
+static int YYID(yyi)
 int yyi;
-#endif
+#  endif
 {
   return yyi;
 }
@@ -752,119 +701,121 @@ int yyi;
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
-#ifdef YYSTACK_USE_ALLOCA
-#if YYSTACK_USE_ALLOCA
-#ifdef __GNUC__
-#define YYSTACK_ALLOC __builtin_alloca
-#elif defined __BUILTIN_VA_ARG_INCR
-#include <alloca.h> /* INFRINGES ON USER NAME SPACE */
-#elif defined _AIX
-#define YYSTACK_ALLOC __alloca
-#elif defined _MSC_VER
-#include <malloc.h> /* INFRINGES ON USER NAME SPACE */
-#define alloca _alloca
-#else
-#define YYSTACK_ALLOC alloca
-#if !defined _ALLOCA_H && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-#include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#ifndef _STDLIB_H
-#define _STDLIB_H 1
-#endif
-#endif
-#endif
-#endif
-#endif
+#  ifdef YYSTACK_USE_ALLOCA
+#    if YYSTACK_USE_ALLOCA
+#      ifdef __GNUC__
+#        define YYSTACK_ALLOC __builtin_alloca
+#      elif defined __BUILTIN_VA_ARG_INCR
+#        include <alloca.h> /* INFRINGES ON USER NAME SPACE */
+#      elif defined _AIX
+#        define YYSTACK_ALLOC __alloca
+#      elif defined _MSC_VER
+#        include <malloc.h> /* INFRINGES ON USER NAME SPACE */
+#        define alloca _alloca
+#      else
+#        define YYSTACK_ALLOC alloca
+#        if !defined _ALLOCA_H && !defined _STDLIB_H && \
+            (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || \
+             defined _MSC_VER)
+#          include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
+#          ifndef _STDLIB_H
+#            define _STDLIB_H 1
+#          endif
+#        endif
+#      endif
+#    endif
+#  endif
 
-#ifdef YYSTACK_ALLOC
+#  ifdef YYSTACK_ALLOC
 /* Pacify GCC's `empty if-body' warning.  */
-#define YYSTACK_FREE(Ptr) \
-  do                      \
-  { /* empty */           \
-    ;                     \
-  } while (YYID(0))
-#ifndef YYSTACK_ALLOC_MAXIMUM
+#    define YYSTACK_FREE(Ptr) \
+      do { /* empty */ \
+        ; \
+      } while (YYID(0))
+#    ifndef YYSTACK_ALLOC_MAXIMUM
 /* The OS might guarantee only one guard page at the bottom of the stack,
    and a page size can be as small as 4096 bytes.  So we cannot safely
    invoke alloca (N) if N exceeds 4096.  Use a slightly smaller number
    to allow for a few compiler-allocated temporary stack slots.  */
-#define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
-#endif
-#else
-#define YYSTACK_ALLOC YYMALLOC
-#define YYSTACK_FREE YYFREE
-#ifndef YYSTACK_ALLOC_MAXIMUM
-#define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
-#endif
-#if (defined __cplusplus && !defined _STDLIB_H && !((defined YYMALLOC || defined malloc) && (defined YYFREE || defined free)))
-#include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#ifndef _STDLIB_H
-#define _STDLIB_H 1
-#endif
-#endif
-#ifndef YYMALLOC
-#define YYMALLOC malloc
-#if !defined malloc && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+#      define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
+#    endif
+#  else
+#    define YYSTACK_ALLOC YYMALLOC
+#    define YYSTACK_FREE YYFREE
+#    ifndef YYSTACK_ALLOC_MAXIMUM
+#      define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
+#    endif
+#    if (defined __cplusplus && !defined _STDLIB_H && \
+         !((defined YYMALLOC || defined malloc) && (defined YYFREE || defined free)))
+#      include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
+#      ifndef _STDLIB_H
+#        define _STDLIB_H 1
+#      endif
+#    endif
+#    ifndef YYMALLOC
+#      define YYMALLOC malloc
+#      if !defined malloc && !defined _STDLIB_H && \
+          (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
 void *malloc(YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
-#endif
-#endif
-#ifndef YYFREE
-#define YYFREE free
-#if !defined free && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+#      endif
+#    endif
+#    ifndef YYFREE
+#      define YYFREE free
+#      if !defined free && !defined _STDLIB_H && \
+          (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
 void free(void *); /* INFRINGES ON USER NAME SPACE */
-#endif
-#endif
-#endif
+#      endif
+#    endif
+#  endif
 #endif /* ! defined yyoverflow || YYERROR_VERBOSE */
 
-#if (!defined yyoverflow && (!defined __cplusplus || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL && defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+#if (!defined yyoverflow && \
+     (!defined __cplusplus || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL && \
+                               defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
-union yyalloc
-{
+union yyalloc {
   yytype_int16 yyss_alloc;
   YYSTYPE yyvs_alloc;
   YYLTYPE yyls_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
-#define YYSTACK_GAP_MAXIMUM (sizeof(union yyalloc) - 1)
+#  define YYSTACK_GAP_MAXIMUM (sizeof(union yyalloc) - 1)
 
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
-#define YYSTACK_BYTES(N) \
-  ((N) * (sizeof(yytype_int16) + sizeof(YYSTYPE) + sizeof(YYLTYPE)) + 2 * YYSTACK_GAP_MAXIMUM)
+#  define YYSTACK_BYTES(N) \
+    ((N) * (sizeof(yytype_int16) + sizeof(YYSTYPE) + sizeof(YYLTYPE)) + 2 * YYSTACK_GAP_MAXIMUM)
 
 /* Copy COUNT objects from FROM to TO.  The source and destination do
    not overlap.  */
-#ifndef YYCOPY
-#if defined __GNUC__ && 1 < __GNUC__
-#define YYCOPY(To, From, Count) \
-  __builtin_memcpy(To, From, (Count) * sizeof(*(From)))
-#else
-#define YYCOPY(To, From, Count)         \
-  do                                    \
-  {                                     \
-    YYSIZE_T yyi;                       \
-    for (yyi = 0; yyi < (Count); yyi++) \
-      (To)[yyi] = (From)[yyi];          \
-  } while (YYID(0))
-#endif
-#endif
+#  ifndef YYCOPY
+#    if defined __GNUC__ && 1 < __GNUC__
+#      define YYCOPY(To, From, Count) __builtin_memcpy(To, From, (Count) * sizeof(*(From)))
+#    else
+#      define YYCOPY(To, From, Count) \
+        do { \
+          YYSIZE_T yyi; \
+          for (yyi = 0; yyi < (Count); yyi++) \
+            (To)[yyi] = (From)[yyi]; \
+        } while (YYID(0))
+#    endif
+#  endif
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-#define YYSTACK_RELOCATE(Stack_alloc, Stack)                         \
-  do                                                                 \
-  {                                                                  \
-    YYSIZE_T yynewbytes;                                             \
-    YYCOPY(&yyptr->Stack_alloc, Stack, yysize);                      \
-    Stack = &yyptr->Stack_alloc;                                     \
-    yynewbytes = yystacksize * sizeof(*Stack) + YYSTACK_GAP_MAXIMUM; \
-    yyptr += yynewbytes / sizeof(*yyptr);                            \
-  } while (YYID(0))
+#  define YYSTACK_RELOCATE(Stack_alloc, Stack) \
+    do { \
+      YYSIZE_T yynewbytes; \
+      YYCOPY(&yyptr->Stack_alloc, Stack, yysize); \
+      Stack = &yyptr->Stack_alloc; \
+      yynewbytes = yystacksize * sizeof(*Stack) + YYSTACK_GAP_MAXIMUM; \
+      yyptr += yynewbytes / sizeof(*yyptr); \
+    } while (YYID(0))
 
 #endif
 
@@ -886,367 +837,217 @@ union yyalloc
 #define YYUNDEFTOK 2
 #define YYMAXUTOK 280
 
-#define YYTRANSLATE(YYX) \
-  ((unsigned int)(YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+#define YYTRANSLATE(YYX) ((unsigned int)(YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
-static const yytype_uint8 yytranslate[] =
-    {
-        0, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 1, 2, 3, 4,
-        5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-        25};
+static const yytype_uint8 yytranslate[] = {
+    0, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 1, 2, 3, 4,
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
 
 #if YYDEBUG
 /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
    YYRHS.  */
-static const yytype_uint16 yyprhs[] =
-    {
-        0, 0, 3, 5, 7, 11, 15, 19, 23, 27,
-        31, 35, 39, 43, 47, 51, 55, 59, 63, 67,
-        71, 75, 79, 83, 87, 91, 95, 99, 103, 107,
-        111, 115, 119, 123, 127, 131, 135, 139, 143, 147,
-        151, 155, 159, 163, 167, 171, 175, 179, 183, 187,
-        191, 195, 199, 203, 207, 211, 215, 219, 223, 227,
-        231, 235, 239, 243, 247, 251, 255, 259, 263, 267,
-        271, 275, 279, 283, 287, 291, 295, 299, 303, 307,
-        311, 315, 319, 323, 327, 331, 335, 339, 343, 347,
-        351, 355, 359, 363, 367, 371, 375, 379, 383, 387,
-        391, 395, 399, 403, 407, 411, 415, 419, 423, 427,
-        431, 435, 439, 443, 447, 451, 455, 459, 462, 464,
-        466, 469, 472, 478, 482, 487, 489};
+static const yytype_uint16 yyprhs[] = {
+    0,   0,   3,   5,   7,   11,  15,  19,  23,  27,  31,  35,  39,  43,  47,  51,  55,  59,  63,
+    67,  71,  75,  79,  83,  87,  91,  95,  99,  103, 107, 111, 115, 119, 123, 127, 131, 135, 139,
+    143, 147, 151, 155, 159, 163, 167, 171, 175, 179, 183, 187, 191, 195, 199, 203, 207, 211, 215,
+    219, 223, 227, 231, 235, 239, 243, 247, 251, 255, 259, 263, 267, 271, 275, 279, 283, 287, 291,
+    295, 299, 303, 307, 311, 315, 319, 323, 327, 331, 335, 339, 343, 347, 351, 355, 359, 363, 367,
+    371, 375, 379, 383, 387, 391, 395, 399, 403, 407, 411, 415, 419, 423, 427, 431, 435, 439, 443,
+    447, 451, 455, 459, 462, 464, 466, 469, 472, 478, 482, 487, 489};
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-static const yytype_int8 yyrhs[] =
-    {
-        30, 0, -1, 4, -1, 3, -1, 5, 8, 27,
-        -1, 16, 8, 27, -1, 17, 8, 27, -1, 14,
-        8, 27, -1, 18, 8, 27, -1, 19, 8, 27,
-        -1, 20, 8, 27, -1, 21, 8, 27, -1, 22,
-        8, 27, -1, 23, 8, 27, -1, 24, 8, 27,
-        -1, 5, 9, 27, -1, 16, 9, 27, -1, 17,
-        9, 27, -1, 14, 9, 27, -1, 18, 9, 27,
-        -1, 19, 9, 27, -1, 20, 9, 27, -1, 21,
-        9, 27, -1, 22, 9, 27, -1, 23, 9, 27,
-        -1, 24, 9, 27, -1, 5, 10, 27, -1, 16,
-        10, 27, -1, 17, 10, 27, -1, 14, 10, 27,
-        -1, 18, 10, 27, -1, 19, 10, 27, -1, 20,
-        10, 27, -1, 21, 10, 27, -1, 22, 10, 27,
-        -1, 23, 10, 27, -1, 24, 10, 27, -1, 5,
-        11, 27, -1, 16, 11, 27, -1, 17, 11, 27,
-        -1, 14, 11, 27, -1, 18, 11, 27, -1, 19,
-        11, 27, -1, 20, 11, 27, -1, 21, 11, 27,
-        -1, 22, 11, 27, -1, 23, 11, 27, -1, 24,
-        11, 27, -1, 5, 12, 27, -1, 16, 12, 27,
-        -1, 17, 12, 27, -1, 14, 12, 27, -1, 18,
-        12, 27, -1, 19, 12, 27, -1, 20, 12, 27,
-        -1, 21, 12, 27, -1, 22, 12, 27, -1, 23,
-        12, 27, -1, 24, 12, 27, -1, 5, 13, 27,
-        -1, 16, 13, 27, -1, 17, 13, 27, -1, 14,
-        13, 27, -1, 18, 13, 27, -1, 19, 13, 27,
-        -1, 20, 13, 27, -1, 21, 13, 27, -1, 22,
-        13, 27, -1, 23, 13, 27, -1, 24, 13, 27,
-        -1, 5, 14, 20, -1, 16, 14, 20, -1, 17,
-        14, 20, -1, 14, 14, 20, -1, 18, 14, 20,
-        -1, 19, 14, 20, -1, 20, 14, 20, -1, 21,
-        14, 20, -1, 22, 14, 20, -1, 23, 14, 20,
-        -1, 24, 14, 20, -1, 5, 15, 20, -1, 16,
-        15, 20, -1, 17, 15, 20, -1, 14, 15, 20,
-        -1, 18, 15, 20, -1, 19, 15, 20, -1, 20,
-        15, 20, -1, 21, 15, 20, -1, 22, 15, 20,
-        -1, 23, 15, 20, -1, 24, 15, 20, -1, 5,
-        14, 24, -1, 16, 14, 24, -1, 17, 14, 24,
-        -1, 14, 14, 24, -1, 18, 14, 24, -1, 19,
-        14, 24, -1, 20, 14, 24, -1, 21, 14, 24,
-        -1, 22, 14, 24, -1, 23, 14, 24, -1, 24,
-        14, 24, -1, 5, 15, 24, -1, 16, 15, 24,
-        -1, 17, 15, 24, -1, 14, 15, 24, -1, 18,
-        15, 24, -1, 19, 15, 24, -1, 20, 15, 24,
-        -1, 21, 15, 24, -1, 22, 15, 24, -1, 23,
-        15, 24, -1, 24, 15, 24, -1, 6, 28, 7,
-        -1, 28, 16, 28, -1, 28, 17, 28, -1, 23,
-        5, -1, 21, -1, 22, -1, 24, 4, -1, 24,
-        3, -1, 29, 18, 28, 19, 29, -1, 29, 18,
-        28, -1, 18, 28, 19, 29, -1, 29, -1, 28,
-        -1};
+static const yytype_int8 yyrhs[] = {
+    30, 0,  -1, 4,  -1, 3,  -1, 5,  8,  27, -1, 16, 8,  27, -1, 17, 8,  27, -1, 14, 8,  27, -1, 18,
+    8,  27, -1, 19, 8,  27, -1, 20, 8,  27, -1, 21, 8,  27, -1, 22, 8,  27, -1, 23, 8,  27, -1, 24,
+    8,  27, -1, 5,  9,  27, -1, 16, 9,  27, -1, 17, 9,  27, -1, 14, 9,  27, -1, 18, 9,  27, -1, 19,
+    9,  27, -1, 20, 9,  27, -1, 21, 9,  27, -1, 22, 9,  27, -1, 23, 9,  27, -1, 24, 9,  27, -1, 5,
+    10, 27, -1, 16, 10, 27, -1, 17, 10, 27, -1, 14, 10, 27, -1, 18, 10, 27, -1, 19, 10, 27, -1, 20,
+    10, 27, -1, 21, 10, 27, -1, 22, 10, 27, -1, 23, 10, 27, -1, 24, 10, 27, -1, 5,  11, 27, -1, 16,
+    11, 27, -1, 17, 11, 27, -1, 14, 11, 27, -1, 18, 11, 27, -1, 19, 11, 27, -1, 20, 11, 27, -1, 21,
+    11, 27, -1, 22, 11, 27, -1, 23, 11, 27, -1, 24, 11, 27, -1, 5,  12, 27, -1, 16, 12, 27, -1, 17,
+    12, 27, -1, 14, 12, 27, -1, 18, 12, 27, -1, 19, 12, 27, -1, 20, 12, 27, -1, 21, 12, 27, -1, 22,
+    12, 27, -1, 23, 12, 27, -1, 24, 12, 27, -1, 5,  13, 27, -1, 16, 13, 27, -1, 17, 13, 27, -1, 14,
+    13, 27, -1, 18, 13, 27, -1, 19, 13, 27, -1, 20, 13, 27, -1, 21, 13, 27, -1, 22, 13, 27, -1, 23,
+    13, 27, -1, 24, 13, 27, -1, 5,  14, 20, -1, 16, 14, 20, -1, 17, 14, 20, -1, 14, 14, 20, -1, 18,
+    14, 20, -1, 19, 14, 20, -1, 20, 14, 20, -1, 21, 14, 20, -1, 22, 14, 20, -1, 23, 14, 20, -1, 24,
+    14, 20, -1, 5,  15, 20, -1, 16, 15, 20, -1, 17, 15, 20, -1, 14, 15, 20, -1, 18, 15, 20, -1, 19,
+    15, 20, -1, 20, 15, 20, -1, 21, 15, 20, -1, 22, 15, 20, -1, 23, 15, 20, -1, 24, 15, 20, -1, 5,
+    14, 24, -1, 16, 14, 24, -1, 17, 14, 24, -1, 14, 14, 24, -1, 18, 14, 24, -1, 19, 14, 24, -1, 20,
+    14, 24, -1, 21, 14, 24, -1, 22, 14, 24, -1, 23, 14, 24, -1, 24, 14, 24, -1, 5,  15, 24, -1, 16,
+    15, 24, -1, 17, 15, 24, -1, 14, 15, 24, -1, 18, 15, 24, -1, 19, 15, 24, -1, 20, 15, 24, -1, 21,
+    15, 24, -1, 22, 15, 24, -1, 23, 15, 24, -1, 24, 15, 24, -1, 6,  28, 7,  -1, 28, 16, 28, -1, 28,
+    17, 28, -1, 23, 5,  -1, 21, -1, 22, -1, 24, 4,  -1, 24, 3,  -1, 29, 18, 28, 19, 29, -1, 29, 18,
+    28, -1, 18, 28, 19, 29, -1, 29, -1, 28, -1};
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
-    {
-        0, 538, 538, 542, 555, 563, 569, 575, 582, 588,
-        594, 600, 606, 612, 618, 626, 634, 640, 646, 653,
-        659, 665, 672, 678, 684, 690, 699, 707, 713, 719,
-        726, 732, 738, 745, 751, 757, 763, 772, 780, 786,
-        792, 799, 805, 811, 817, 823, 829, 835, 843, 852,
-        859, 866, 874, 881, 888, 895, 902, 909, 916, 926,
-        935, 942, 949, 957, 964, 971, 978, 985, 992, 999,
-        1010, 1015, 1019, 1023, 1028, 1032, 1036, 1041, 1046, 1051,
-        1055, 1062, 1067, 1072, 1077, 1083, 1088, 1093, 1098, 1103,
-        1108, 1113, 1122, 1127, 1131, 1135, 1140, 1144, 1148, 1152,
-        1156, 1160, 1164, 1171, 1176, 1180, 1184, 1189, 1193, 1197,
-        1202, 1206, 1210, 1214, 1221, 1224, 1229, 1235, 1243, 1247,
-        1250, 1256, 1266, 1271, 1282, 1292, 1295};
+static const yytype_uint16 yyrline[] = {
+    0,    538,  538,  542,  555,  563,  569,  575,  582,  588,  594,  600,  606,  612,  618,  626,
+    634,  640,  646,  653,  659,  665,  672,  678,  684,  690,  699,  707,  713,  719,  726,  732,
+    738,  745,  751,  757,  763,  772,  780,  786,  792,  799,  805,  811,  817,  823,  829,  835,
+    843,  852,  859,  866,  874,  881,  888,  895,  902,  909,  916,  926,  935,  942,  949,  957,
+    964,  971,  978,  985,  992,  999,  1010, 1015, 1019, 1023, 1028, 1032, 1036, 1041, 1046, 1051,
+    1055, 1062, 1067, 1072, 1077, 1083, 1088, 1093, 1098, 1103, 1108, 1113, 1122, 1127, 1131, 1135,
+    1140, 1144, 1148, 1152, 1156, 1160, 1164, 1171, 1176, 1180, 1184, 1189, 1193, 1197, 1202, 1206,
+    1210, 1214, 1221, 1224, 1229, 1235, 1243, 1247, 1250, 1256, 1266, 1271, 1282, 1292, 1295};
 #endif
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
-static const char *const yytname[] =
-    {
-        "$end", "error", "$undefined", "NUMBER", "STRING", "PARAM", "LPAR",
-        "RPAR", "OP_EQ", "OP_NOTEQ", "OP_GT", "OP_LT", "OP_GTEQ", "OP_LTEQ",
-        "OP_IS", "OP_ISNOT", "OP_AND", "OP_OR", "KW_IF", "KW_ELSE",
-        "KW_CONNECTED", "KW_CONNECT", "KW_IGNORE", "KW_COPY", "KW_SET",
-        "UNRECOGNIZED_TOKEN", "$accept", "value", "expr", "action", "statement", 0};
+static const char *const yytname[] = {"$end",         "error",
+                                      "$undefined",   "NUMBER",
+                                      "STRING",       "PARAM",
+                                      "LPAR",         "RPAR",
+                                      "OP_EQ",        "OP_NOTEQ",
+                                      "OP_GT",        "OP_LT",
+                                      "OP_GTEQ",      "OP_LTEQ",
+                                      "OP_IS",        "OP_ISNOT",
+                                      "OP_AND",       "OP_OR",
+                                      "KW_IF",        "KW_ELSE",
+                                      "KW_CONNECTED", "KW_CONNECT",
+                                      "KW_IGNORE",    "KW_COPY",
+                                      "KW_SET",       "UNRECOGNIZED_TOKEN",
+                                      "$accept",      "value",
+                                      "expr",         "action",
+                                      "statement",    0};
 #endif
 
 #ifdef YYPRINT
 /* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
    token YYLEX-NUM.  */
-static const yytype_uint16 yytoknum[] =
-    {
-        0, 256, 257, 258, 259, 260, 261, 262, 263, 264,
-        265, 266, 267, 268, 269, 270, 271, 272, 273, 274,
-        275, 276, 277, 278, 279, 280};
+static const yytype_uint16 yytoknum[] = {0,   256, 257, 258, 259, 260, 261, 262, 263,
+                                         264, 265, 266, 267, 268, 269, 270, 271, 272,
+                                         273, 274, 275, 276, 277, 278, 279, 280};
 #endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
-static const yytype_uint8 yyr1[] =
-    {
-        0, 26, 27, 27, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-        28, 28, 28, 28, 28, 28, 28, 29, 29, 29,
-        29, 29, 30, 30, 30, 30, 30};
+static const yytype_uint8 yyr1[] = {
+    0,  26, 27, 27, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    28, 28, 28, 28, 28, 28, 28, 29, 29, 29, 29, 29, 30, 30, 30, 30, 30};
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
-static const yytype_uint8 yyr2[] =
-    {
-        0, 2, 1, 1, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 2, 1, 1,
-        2, 2, 5, 3, 4, 1, 1};
+static const yytype_uint8 yyr2[] = {
+    0, 2, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1, 1, 2, 2, 5, 3, 4, 1, 1};
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
    STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
    means the default is an error.  */
-static const yytype_uint8 yydefact[] =
-    {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 118,
-        119, 0, 0, 126, 125, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 117, 0, 0, 0, 0,
-        0, 0, 0, 0, 121, 120, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 3, 2,
-        4, 15, 26, 37, 48, 59, 70, 92, 81, 103,
-        0, 114, 7, 18, 29, 40, 51, 62, 73, 95,
-        84, 106, 5, 16, 27, 38, 49, 60, 71, 93,
-        82, 104, 6, 17, 28, 39, 50, 61, 72, 94,
-        83, 105, 8, 19, 30, 41, 52, 63, 74, 96,
-        85, 107, 0, 9, 20, 31, 42, 53, 64, 75,
-        97, 86, 108, 10, 21, 32, 43, 54, 65, 76,
-        98, 87, 109, 11, 22, 33, 44, 55, 66, 77,
-        99, 88, 110, 12, 23, 34, 45, 56, 67, 78,
-        100, 89, 111, 13, 24, 35, 46, 57, 68, 79,
-        101, 90, 112, 14, 25, 36, 47, 58, 69, 80,
-        102, 91, 113, 115, 116, 123, 118, 119, 0, 0,
-        124, 0, 122};
+static const yytype_uint8 yydefact[] = {
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   118, 119, 0,   0,   126, 125, 0,   0,  0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  0,   0,
+    117, 0,   0,   0,   0,   0,   0,   0,   0,   121, 120, 0,   0,   0,   0,   0,   0,  0,   0,
+    0,   0,   0,   1,   3,   2,   4,   15,  26,  37,  48,  59,  70,  92,  81,  103, 0,  114, 7,
+    18,  29,  40,  51,  62,  73,  95,  84,  106, 5,   16,  27,  38,  49,  60,  71,  93, 82,  104,
+    6,   17,  28,  39,  50,  61,  72,  94,  83,  105, 8,   19,  30,  41,  52,  63,  74, 96,  85,
+    107, 0,   9,   20,  31,  42,  53,  64,  75,  97,  86,  108, 10,  21,  32,  43,  54, 65,  76,
+    98,  87,  109, 11,  22,  33,  44,  55,  66,  77,  99,  88,  110, 12,  23,  34,  45, 56,  67,
+    78,  100, 89,  111, 13,  24,  35,  46,  57,  68,  79,  101, 90,  112, 14,  25,  36, 47,  58,
+    69,  80,  102, 91,  113, 115, 116, 123, 118, 119, 0,   0,   124, 0,   122};
 
 /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
-    {
-        -1, 120, 13, 14, 15};
+static const yytype_int8 yydefgoto[] = {-1, 120, 13, 14, 15};
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
 #define YYPACT_NINF -161
-static const yytype_int16 yypact[] =
-    {
-        86, 184, 130, 192, 200, 208, 110, 216, 224, 232,
-        240, 176, 165, -14, 14, 16, 11, 11, 11, 11,
-        11, 11, -7, 117, 248, 232, 240, 256, 264, -6,
-        11, 11, 11, 11, 11, 11, 118, 119, 11, 11,
-        11, 11, 11, 11, 146, 260, 11, 11, 11, 11,
-        11, 11, 261, 262, 11, 11, 11, 11, 11, 11,
-        147, 263, 305, 11, 11, 11, 11, 11, 11, 268,
-        269, 11, 11, 11, 11, 11, 11, 270, 271, 11,
-        11, 11, 11, 11, 11, 276, 277, 11, 11, 11,
-        11, 11, 11, 278, 279, -161, 11, 11, 11, 11,
-        11, 11, 284, 285, -161, -161, 11, 11, 11, 11,
-        11, 11, 286, 287, 130, 130, 130, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        292, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, 296, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
-        -161, -161, -161, -161, 17, 309, -161, -161, 35, 21,
-        -161, 296, -161};
+static const yytype_int16 yypact[] = {
+    86,   184,  130,  192,  200,  208,  110,  216,  224,  232,  240,  176,  165,  -14,  14,   16,
+    11,   11,   11,   11,   11,   11,   -7,   117,  248,  232,  240,  256,  264,  -6,   11,   11,
+    11,   11,   11,   11,   118,  119,  11,   11,   11,   11,   11,   11,   146,  260,  11,   11,
+    11,   11,   11,   11,   261,  262,  11,   11,   11,   11,   11,   11,   147,  263,  305,  11,
+    11,   11,   11,   11,   11,   268,  269,  11,   11,   11,   11,   11,   11,   270,  271,  11,
+    11,   11,   11,   11,   11,   276,  277,  11,   11,   11,   11,   11,   11,   278,  279,  -161,
+    11,   11,   11,   11,   11,   11,   284,  285,  -161, -161, 11,   11,   11,   11,   11,   11,
+    286,  287,  130,  130,  130,  -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, 292,  -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, 296,  -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, -161,
+    -161, -161, -161, -161, -161, -161, -161, -161, -161, -161, 17,   309,  -161, -161, 35,   21,
+    -161, 296,  -161};
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
-    {
-        -161, -12, -2, -160, -161};
+static const yytype_int16 yypgoto[] = {-161, -12, -2, -160, -161};
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
 #define YYTABLE_NINF -1
-static const yytype_uint8 yytable[] =
-    {
-        29, 131, 114, 115, 62, 121, 122, 123, 124, 125,
-        114, 115, 240, 126, 118, 119, 117, 127, 132, 133,
-        134, 135, 136, 137, 104, 105, 142, 143, 144, 145,
-        146, 147, 116, 114, 152, 153, 154, 155, 156, 157,
-        95, 0, 162, 163, 164, 165, 166, 167, 0, 0,
-        0, 173, 174, 175, 176, 177, 178, 0, 0, 183,
-        184, 185, 186, 187, 188, 0, 0, 193, 194, 195,
-        196, 197, 198, 0, 0, 203, 204, 205, 206, 207,
-        208, 242, 0, 0, 213, 214, 215, 216, 217, 218,
-        0, 1, 2, 0, 223, 224, 225, 226, 227, 228,
-        3, 0, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 0, 233, 234, 235, 1, 2, 0, 54, 55,
-        56, 57, 58, 59, 60, 61, 4, 5, 24, 7,
-        8, 25, 26, 27, 28, 1, 2, 128, 138, 140,
-        0, 129, 139, 141, 3, 0, 4, 5, 24, 7,
-        8, 25, 26, 27, 28, 30, 31, 32, 33, 34,
-        35, 36, 37, 0, 0, 0, 148, 168, 104, 105,
-        149, 169, 0, 106, 107, 108, 109, 110, 111, 112,
-        113, 95, 0, 0, 96, 97, 98, 99, 100, 101,
-        102, 103, 16, 17, 18, 19, 20, 21, 22, 23,
-        30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-        40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-        50, 51, 52, 53, 63, 64, 65, 66, 67, 68,
-        69, 70, 71, 72, 73, 74, 75, 76, 77, 78,
-        79, 80, 81, 82, 83, 84, 85, 86, 87, 88,
-        89, 90, 91, 92, 93, 94, 54, 55, 56, 57,
-        58, 59, 130, 61, 96, 97, 98, 99, 100, 101,
-        102, 103, 106, 107, 108, 109, 110, 111, 112, 113,
-        150, 158, 160, 170, 151, 159, 161, 171, 179, 181,
-        189, 191, 180, 182, 190, 192, 199, 201, 209, 211,
-        200, 202, 210, 212, 219, 221, 229, 231, 220, 222,
-        230, 232, 168, 0, 0, 0, 169, 236, 237, 238,
-        239, 114, 115, 0, 172, 114, 115, 0, 241};
+static const yytype_uint8 yytable[] = {
+    29,  131, 114, 115, 62,  121, 122, 123, 124, 125, 114, 115, 240, 126, 118, 119, 117, 127, 132,
+    133, 134, 135, 136, 137, 104, 105, 142, 143, 144, 145, 146, 147, 116, 114, 152, 153, 154, 155,
+    156, 157, 95,  0,   162, 163, 164, 165, 166, 167, 0,   0,   0,   173, 174, 175, 176, 177, 178,
+    0,   0,   183, 184, 185, 186, 187, 188, 0,   0,   193, 194, 195, 196, 197, 198, 0,   0,   203,
+    204, 205, 206, 207, 208, 242, 0,   0,   213, 214, 215, 216, 217, 218, 0,   1,   2,   0,   223,
+    224, 225, 226, 227, 228, 3,   0,   4,   5,   6,   7,   8,   9,   10,  11,  12,  0,   233, 234,
+    235, 1,   2,   0,   54,  55,  56,  57,  58,  59,  60,  61,  4,   5,   24,  7,   8,   25,  26,
+    27,  28,  1,   2,   128, 138, 140, 0,   129, 139, 141, 3,   0,   4,   5,   24,  7,   8,   25,
+    26,  27,  28,  30,  31,  32,  33,  34,  35,  36,  37,  0,   0,   0,   148, 168, 104, 105, 149,
+    169, 0,   106, 107, 108, 109, 110, 111, 112, 113, 95,  0,   0,   96,  97,  98,  99,  100, 101,
+    102, 103, 16,  17,  18,  19,  20,  21,  22,  23,  30,  31,  32,  33,  34,  35,  36,  37,  38,
+    39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  52,  53,  63,  64,  65,  66,
+    67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,
+    86,  87,  88,  89,  90,  91,  92,  93,  94,  54,  55,  56,  57,  58,  59,  130, 61,  96,  97,
+    98,  99,  100, 101, 102, 103, 106, 107, 108, 109, 110, 111, 112, 113, 150, 158, 160, 170, 151,
+    159, 161, 171, 179, 181, 189, 191, 180, 182, 190, 192, 199, 201, 209, 211, 200, 202, 210, 212,
+    219, 221, 229, 231, 220, 222, 230, 232, 168, 0,   0,   0,   169, 236, 237, 238, 239, 114, 115,
+    0,   172, 114, 115, 0,   241};
 
-static const yytype_int16 yycheck[] =
-    {
-        2, 7, 16, 17, 6, 17, 18, 19, 20, 21,
-        16, 17, 172, 20, 3, 4, 0, 24, 30, 31,
-        32, 33, 34, 35, 3, 4, 38, 39, 40, 41,
-        42, 43, 18, 16, 46, 47, 48, 49, 50, 51,
-        5, -1, 54, 55, 56, 57, 58, 59, -1, -1,
-        -1, 63, 64, 65, 66, 67, 68, -1, -1, 71,
-        72, 73, 74, 75, 76, -1, -1, 79, 80, 81,
-        82, 83, 84, -1, -1, 87, 88, 89, 90, 91,
-        92, 241, -1, -1, 96, 97, 98, 99, 100, 101,
-        -1, 5, 6, -1, 106, 107, 108, 109, 110, 111,
-        14, -1, 16, 17, 18, 19, 20, 21, 22, 23,
-        24, -1, 114, 115, 116, 5, 6, -1, 8, 9,
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        20, 21, 22, 23, 24, 5, 6, 20, 20, 20,
-        -1, 24, 24, 24, 14, -1, 16, 17, 18, 19,
-        20, 21, 22, 23, 24, 8, 9, 10, 11, 12,
-        13, 14, 15, -1, -1, -1, 20, 20, 3, 4,
-        24, 24, -1, 8, 9, 10, 11, 12, 13, 14,
-        15, 5, -1, -1, 8, 9, 10, 11, 12, 13,
-        14, 15, 8, 9, 10, 11, 12, 13, 14, 15,
-        8, 9, 10, 11, 12, 13, 14, 15, 8, 9,
-        10, 11, 12, 13, 14, 15, 8, 9, 10, 11,
-        12, 13, 14, 15, 8, 9, 10, 11, 12, 13,
-        14, 15, 8, 9, 10, 11, 12, 13, 14, 15,
-        8, 9, 10, 11, 12, 13, 14, 15, 8, 9,
-        10, 11, 12, 13, 14, 15, 8, 9, 10, 11,
-        12, 13, 14, 15, 8, 9, 10, 11, 12, 13,
-        14, 15, 8, 9, 10, 11, 12, 13, 14, 15,
-        20, 20, 20, 20, 24, 24, 24, 24, 20, 20,
-        20, 20, 24, 24, 24, 24, 20, 20, 20, 20,
-        24, 24, 24, 24, 20, 20, 20, 20, 24, 24,
-        24, 24, 20, -1, -1, -1, 24, 21, 22, 23,
-        24, 16, 17, -1, 19, 16, 17, -1, 19};
+static const yytype_int16 yycheck[] = {
+    2,  7,  16, 17, 6,   17,  18, 19,  20,  21,  16,  17,  172, 20,  3,   4,   0,  24, 30,  31, 32,
+    33, 34, 35, 3,  4,   38,  39, 40,  41,  42,  43,  18,  16,  46,  47,  48,  49, 50, 51,  5,  -1,
+    54, 55, 56, 57, 58,  59,  -1, -1,  -1,  63,  64,  65,  66,  67,  68,  -1,  -1, 71, 72,  73, 74,
+    75, 76, -1, -1, 79,  80,  81, 82,  83,  84,  -1,  -1,  87,  88,  89,  90,  91, 92, 241, -1, -1,
+    96, 97, 98, 99, 100, 101, -1, 5,   6,   -1,  106, 107, 108, 109, 110, 111, 14, -1, 16,  17, 18,
+    19, 20, 21, 22, 23,  24,  -1, 114, 115, 116, 5,   6,   -1,  8,   9,   10,  11, 12, 13,  14, 15,
+    16, 17, 18, 19, 20,  21,  22, 23,  24,  5,   6,   20,  20,  20,  -1,  24,  24, 24, 14,  -1, 16,
+    17, 18, 19, 20, 21,  22,  23, 24,  8,   9,   10,  11,  12,  13,  14,  15,  -1, -1, -1,  20, 20,
+    3,  4,  24, 24, -1,  8,   9,  10,  11,  12,  13,  14,  15,  5,   -1,  -1,  8,  9,  10,  11, 12,
+    13, 14, 15, 8,  9,   10,  11, 12,  13,  14,  15,  8,   9,   10,  11,  12,  13, 14, 15,  8,  9,
+    10, 11, 12, 13, 14,  15,  8,  9,   10,  11,  12,  13,  14,  15,  8,   9,   10, 11, 12,  13, 14,
+    15, 8,  9,  10, 11,  12,  13, 14,  15,  8,   9,   10,  11,  12,  13,  14,  15, 8,  9,   10, 11,
+    12, 13, 14, 15, 8,   9,   10, 11,  12,  13,  14,  15,  8,   9,   10,  11,  12, 13, 14,  15, 8,
+    9,  10, 11, 12, 13,  14,  15, 20,  20,  20,  20,  24,  24,  24,  24,  20,  20, 20, 20,  24, 24,
+    24, 24, 20, 20, 20,  20,  24, 24,  24,  24,  20,  20,  20,  20,  24,  24,  24, 24, 20,  -1, -1,
+    -1, 24, 21, 22, 23,  24,  16, 17,  -1,  19,  16,  17,  -1,  19};
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
-static const yytype_uint8 yystos[] =
-    {
-        0, 5, 6, 14, 16, 17, 18, 19, 20, 21,
-        22, 23, 24, 28, 29, 30, 8, 9, 10, 11,
-        12, 13, 14, 15, 18, 21, 22, 23, 24, 28,
-        8, 9, 10, 11, 12, 13, 14, 15, 8, 9,
-        10, 11, 12, 13, 14, 15, 8, 9, 10, 11,
-        12, 13, 14, 15, 8, 9, 10, 11, 12, 13,
-        14, 15, 28, 8, 9, 10, 11, 12, 13, 14,
-        15, 8, 9, 10, 11, 12, 13, 14, 15, 8,
-        9, 10, 11, 12, 13, 14, 15, 8, 9, 10,
-        11, 12, 13, 14, 15, 5, 8, 9, 10, 11,
-        12, 13, 14, 15, 3, 4, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17, 18, 0, 3, 4,
-        27, 27, 27, 27, 27, 27, 20, 24, 20, 24,
-        14, 7, 27, 27, 27, 27, 27, 27, 20, 24,
-        20, 24, 27, 27, 27, 27, 27, 27, 20, 24,
-        20, 24, 27, 27, 27, 27, 27, 27, 20, 24,
-        20, 24, 27, 27, 27, 27, 27, 27, 20, 24,
-        20, 24, 19, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
-        24, 20, 24, 28, 28, 28, 21, 22, 23, 24,
-        29, 19, 29};
+static const yytype_uint8 yystos[] = {
+    0,  5,  6,  14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 28, 29, 30, 8,  9,  10, 11, 12, 13, 14,
+    15, 18, 21, 22, 23, 24, 28, 8,  9,  10, 11, 12, 13, 14, 15, 8,  9,  10, 11, 12, 13, 14, 15,
+    8,  9,  10, 11, 12, 13, 14, 15, 8,  9,  10, 11, 12, 13, 14, 15, 28, 8,  9,  10, 11, 12, 13,
+    14, 15, 8,  9,  10, 11, 12, 13, 14, 15, 8,  9,  10, 11, 12, 13, 14, 15, 8,  9,  10, 11, 12,
+    13, 14, 15, 5,  8,  9,  10, 11, 12, 13, 14, 15, 3,  4,  8,  9,  10, 11, 12, 13, 14, 15, 16,
+    17, 18, 0,  3,  4,  27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 14, 7,  27, 27, 27, 27, 27, 27,
+    20, 24, 20, 24, 27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 27, 27, 27, 27, 27, 27, 20, 24, 20,
+    24, 27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 19, 27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 27,
+    27, 27, 27, 27, 27, 20, 24, 20, 24, 27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 27, 27, 27, 27,
+    27, 27, 20, 24, 20, 24, 27, 27, 27, 27, 27, 27, 20, 24, 20, 24, 27, 27, 27, 27, 27, 27, 20,
+    24, 20, 24, 28, 28, 28, 21, 22, 23, 24, 29, 19, 29};
 
 #define yyerrok (yyerrstatus = 0)
 #define yyclearin (yychar = YYEMPTY)
@@ -1265,21 +1066,19 @@ static const yytype_uint8 yystos[] =
 
 #define YYRECOVERING() (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                     \
-  do                                                               \
-    if (yychar == YYEMPTY && yylen == 1)                           \
-    {                                                              \
-      yychar = (Token);                                            \
-      yylval = (Value);                                            \
-      yytoken = YYTRANSLATE(yychar);                               \
-      YYPOPSTACK(1);                                               \
-      goto yybackup;                                               \
-    }                                                              \
-    else                                                           \
-    {                                                              \
+#define YYBACKUP(Token, Value) \
+  do \
+    if (yychar == YYEMPTY && yylen == 1) { \
+      yychar = (Token); \
+      yylval = (Value); \
+      yytoken = YYTRANSLATE(yychar); \
+      YYPOPSTACK(1); \
+      goto yybackup; \
+    } \
+    else { \
       yyerror(&yylloc, data, YY_("syntax error: cannot back up")); \
-      YYERROR;                                                     \
-    }                                                              \
+      YYERROR; \
+    } \
   while (YYID(0))
 
 #define YYTERROR 1
@@ -1291,23 +1090,19 @@ static const yytype_uint8 yystos[] =
 
 #define YYRHSLOC(Rhs, K) ((Rhs)[K])
 #ifndef YYLLOC_DEFAULT
-#define YYLLOC_DEFAULT(Current, Rhs, N)                       \
-  do                                                          \
-    if (YYID(N))                                              \
-    {                                                         \
-      (Current).first_line = YYRHSLOC(Rhs, 1).first_line;     \
-      (Current).first_column = YYRHSLOC(Rhs, 1).first_column; \
-      (Current).last_line = YYRHSLOC(Rhs, N).last_line;       \
-      (Current).last_column = YYRHSLOC(Rhs, N).last_column;   \
-    }                                                         \
-    else                                                      \
-    {                                                         \
-      (Current).first_line = (Current).last_line =            \
-          YYRHSLOC(Rhs, 0).last_line;                         \
-      (Current).first_column = (Current).last_column =        \
-          YYRHSLOC(Rhs, 0).last_column;                       \
-    }                                                         \
-  while (YYID(0))
+#  define YYLLOC_DEFAULT(Current, Rhs, N) \
+    do \
+      if (YYID(N)) { \
+        (Current).first_line = YYRHSLOC(Rhs, 1).first_line; \
+        (Current).first_column = YYRHSLOC(Rhs, 1).first_column; \
+        (Current).last_line = YYRHSLOC(Rhs, N).last_line; \
+        (Current).last_column = YYRHSLOC(Rhs, N).last_column; \
+      } \
+      else { \
+        (Current).first_line = (Current).last_line = YYRHSLOC(Rhs, 0).last_line; \
+        (Current).first_column = (Current).last_column = YYRHSLOC(Rhs, 0).last_column; \
+      } \
+    while (YYID(0))
 #endif
 
 /* YY_LOCATION_PRINT -- Print the location on the stream.
@@ -1315,83 +1110,82 @@ static const yytype_uint8 yystos[] =
    we won't break user code: when these are the locations we know.  */
 
 #ifndef YY_LOCATION_PRINT
-#if YYLTYPE_IS_TRIVIAL
-#define YY_LOCATION_PRINT(File, Loc)            \
-  fprintf(File, "%d.%d-%d.%d",                  \
-          (Loc).first_line, (Loc).first_column, \
-          (Loc).last_line, (Loc).last_column)
-#else
-#define YY_LOCATION_PRINT(File, Loc) ((void)0)
-#endif
+#  if YYLTYPE_IS_TRIVIAL
+#    define YY_LOCATION_PRINT(File, Loc) \
+      fprintf(File, \
+              "%d.%d-%d.%d", \
+              (Loc).first_line, \
+              (Loc).first_column, \
+              (Loc).last_line, \
+              (Loc).last_column)
+#  else
+#    define YY_LOCATION_PRINT(File, Loc) ((void)0)
+#  endif
 #endif
 
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
 #ifdef YYLEX_PARAM
-#define YYLEX yylex(&yylval, &yylloc, YYLEX_PARAM)
+#  define YYLEX yylex(&yylval, &yylloc, YYLEX_PARAM)
 #else
-#define YYLEX yylex(&yylval, &yylloc, MACRO_YYSCANNER)
+#  define YYLEX yylex(&yylval, &yylloc, MACRO_YYSCANNER)
 #endif
 
 /* Enable debugging if requested.  */
 #if YYDEBUG
 
-#ifndef YYFPRINTF
-#include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#define YYFPRINTF fprintf
-#endif
+#  ifndef YYFPRINTF
+#    include <stdio.h> /* INFRINGES ON USER NAME SPACE */
+#    define YYFPRINTF fprintf
+#  endif
 
-#define YYDPRINTF(Args) \
-  do                    \
-  {                     \
-    if (yydebug)        \
-      YYFPRINTF Args;   \
-  } while (YYID(0))
+#  define YYDPRINTF(Args) \
+    do { \
+      if (yydebug) \
+        YYFPRINTF Args; \
+    } while (YYID(0))
 
-#define YY_SYMBOL_PRINT(Title, Type, Value, Location) \
-  do                                                  \
-  {                                                   \
-    if (yydebug)                                      \
-    {                                                 \
-      YYFPRINTF(stderr, "%s ", Title);                \
-      yy_symbol_print(stderr,                         \
-                      Type, Value, Location, data);   \
-      YYFPRINTF(stderr, "\n");                        \
-    }                                                 \
-  } while (YYID(0))
+#  define YY_SYMBOL_PRINT(Title, Type, Value, Location) \
+    do { \
+      if (yydebug) { \
+        YYFPRINTF(stderr, "%s ", Title); \
+        yy_symbol_print(stderr, Type, Value, Location, data); \
+        YYFPRINTF(stderr, "\n"); \
+      } \
+    } while (YYID(0))
 
 /*--------------------------------.
 | Print this symbol on YYOUTPUT.  |
 `--------------------------------*/
 
 /*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static void
-yy_symbol_value_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp, _VSCGParserData *data)
-#else
-static void
-    yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp, data)
-        FILE *yyoutput;
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static void yy_symbol_value_print(FILE *yyoutput,
+                                  int yytype,
+                                  YYSTYPE const *const yyvaluep,
+                                  YYLTYPE const *const yylocationp,
+                                  _VSCGParserData *data)
+#  else
+static void yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp, data) FILE *yyoutput;
 int yytype;
 YYSTYPE const *const yyvaluep;
 YYLTYPE const *const yylocationp;
 _VSCGParserData *data;
-#endif
+#  endif
 {
   if (!yyvaluep)
     return;
   YYUSE(yylocationp);
   YYUSE(data);
-#ifdef YYPRINT
+#  ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT(yyoutput, yytoknum[yytype], *yyvaluep);
-#else
+#  else
   YYUSE(yyoutput);
-#endif
-  switch (yytype)
-  {
-  default:
-    break;
+#  endif
+  switch (yytype) {
+    default:
+      break;
   }
 }
 
@@ -1399,18 +1193,19 @@ _VSCGParserData *data;
 | Print this symbol on YYOUTPUT.  |
 `--------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static void
-yy_symbol_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp, _VSCGParserData *data)
-#else
-static void
-    yy_symbol_print(yyoutput, yytype, yyvaluep, yylocationp, data)
-        FILE *yyoutput;
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static void yy_symbol_print(FILE *yyoutput,
+                            int yytype,
+                            YYSTYPE const *const yyvaluep,
+                            YYLTYPE const *const yylocationp,
+                            _VSCGParserData *data)
+#  else
+static void yy_symbol_print(yyoutput, yytype, yyvaluep, yylocationp, data) FILE *yyoutput;
 int yytype;
 YYSTYPE const *const yyvaluep;
 YYLTYPE const *const yylocationp;
 _VSCGParserData *data;
-#endif
+#  endif
 {
   if (yytype < YYNTOKENS)
     YYFPRINTF(yyoutput, "token %s (", yytname[yytype]);
@@ -1428,83 +1223,75 @@ _VSCGParserData *data;
 | TOP (included).                                                   |
 `------------------------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static void
-yy_stack_print(yytype_int16 *yybottom, yytype_int16 *yytop)
-#else
-static void
-    yy_stack_print(yybottom, yytop)
-        yytype_int16 *yybottom;
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static void yy_stack_print(yytype_int16 *yybottom, yytype_int16 *yytop)
+#  else
+static void yy_stack_print(yybottom, yytop) yytype_int16 *yybottom;
 yytype_int16 *yytop;
-#endif
+#  endif
 {
   YYFPRINTF(stderr, "Stack now");
-  for (; yybottom <= yytop; yybottom++)
-  {
+  for (; yybottom <= yytop; yybottom++) {
     int yybot = *yybottom;
     YYFPRINTF(stderr, " %d", yybot);
   }
   YYFPRINTF(stderr, "\n");
 }
 
-#define YY_STACK_PRINT(Bottom, Top)    \
-  do                                   \
-  {                                    \
-    if (yydebug)                       \
-      yy_stack_print((Bottom), (Top)); \
-  } while (YYID(0))
+#  define YY_STACK_PRINT(Bottom, Top) \
+    do { \
+      if (yydebug) \
+        yy_stack_print((Bottom), (Top)); \
+    } while (YYID(0))
 
 /*------------------------------------------------.
 | Report that the YYRULE is going to be reduced.  |
 `------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static void
-yy_reduce_print(YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, _VSCGParserData *data)
-#else
-static void
-    yy_reduce_print(yyvsp, yylsp, yyrule, data)
-        YYSTYPE *yyvsp;
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static void yy_reduce_print(YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, _VSCGParserData *data)
+#  else
+static void yy_reduce_print(yyvsp, yylsp, yyrule, data) YYSTYPE *yyvsp;
 YYLTYPE *yylsp;
 int yyrule;
 _VSCGParserData *data;
-#endif
+#  endif
 {
   int yynrhs = yyr2[yyrule];
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
-  YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n",
-            yyrule - 1, yylno);
+  YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n", yyrule - 1, yylno);
   /* The symbols being reduced.  */
-  for (yyi = 0; yyi < yynrhs; yyi++)
-  {
+  for (yyi = 0; yyi < yynrhs; yyi++) {
     YYFPRINTF(stderr, "   $%d = ", yyi + 1);
-    yy_symbol_print(stderr, yyrhs[yyprhs[yyrule] + yyi],
-                    &(yyvsp[(yyi + 1) - (yynrhs)]), &(yylsp[(yyi + 1) - (yynrhs)]), data);
+    yy_symbol_print(stderr,
+                    yyrhs[yyprhs[yyrule] + yyi],
+                    &(yyvsp[(yyi + 1) - (yynrhs)]),
+                    &(yylsp[(yyi + 1) - (yynrhs)]),
+                    data);
     YYFPRINTF(stderr, "\n");
   }
 }
 
-#define YY_REDUCE_PRINT(Rule)                    \
-  do                                             \
-  {                                              \
-    if (yydebug)                                 \
-      yy_reduce_print(yyvsp, yylsp, Rule, data); \
-  } while (YYID(0))
+#  define YY_REDUCE_PRINT(Rule) \
+    do { \
+      if (yydebug) \
+        yy_reduce_print(yyvsp, yylsp, Rule, data); \
+    } while (YYID(0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
 int yydebug;
 #else /* !YYDEBUG */
-#define YYDPRINTF(Args)
-#define YY_SYMBOL_PRINT(Title, Type, Value, Location)
-#define YY_STACK_PRINT(Bottom, Top)
-#define YY_REDUCE_PRINT(Rule)
+#  define YYDPRINTF(Args)
+#  define YY_SYMBOL_PRINT(Title, Type, Value, Location)
+#  define YY_STACK_PRINT(Bottom, Top)
+#  define YY_REDUCE_PRINT(Rule)
 #endif /* !YYDEBUG */
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
 #ifndef YYINITDEPTH
-#define YYINITDEPTH 200
+#  define YYINITDEPTH 200
 #endif
 
 /* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
@@ -1515,48 +1302,43 @@ int yydebug;
    evaluated with infinite-precision integer arithmetic.  */
 
 #ifndef YYMAXDEPTH
-#define YYMAXDEPTH 10000
+#  define YYMAXDEPTH 10000
 #endif
 
 #if YYERROR_VERBOSE
 
-#ifndef yystrlen
-#if defined __GLIBC__ && defined _STRING_H
-#define yystrlen strlen
-#else
+#  ifndef yystrlen
+#    if defined __GLIBC__ && defined _STRING_H
+#      define yystrlen strlen
+#    else
 /* Return the length of YYSTR.  */
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static YYSIZE_T
-yystrlen(const char *yystr)
-#else
-static YYSIZE_T
-    yystrlen(yystr)
-        const char *yystr;
-#endif
+#      if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static YYSIZE_T yystrlen(const char *yystr)
+#      else
+static YYSIZE_T yystrlen(yystr) const char *yystr;
+#      endif
 {
   YYSIZE_T yylen;
   for (yylen = 0; yystr[yylen]; yylen++)
     continue;
   return yylen;
 }
-#endif
-#endif
+#    endif
+#  endif
 
-#ifndef yystpcpy
-#if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
-#define yystpcpy stpcpy
-#else
+#  ifndef yystpcpy
+#    if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
+#      define yystpcpy stpcpy
+#    else
 /* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
    YYDEST.  */
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static char *
-yystpcpy(char *yydest, const char *yysrc)
-#else
-static char *
-yystpcpy(yydest, yysrc)
+#      if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+static char *yystpcpy(char *yydest, const char *yysrc)
+#      else
+static char *yystpcpy(yydest, yysrc)
 char *yydest;
 const char *yysrc;
-#endif
+#      endif
 {
   char *yyd = yydest;
   const char *yys = yysrc;
@@ -1566,10 +1348,10 @@ const char *yysrc;
 
   return yyd - 1;
 }
-#endif
-#endif
+#    endif
+#  endif
 
-#ifndef yytnamerr
+#  ifndef yytnamerr
 /* Copy to YYRES the contents of YYSTR after stripping away unnecessary
    quotes and backslashes, so that it's suitable for yyerror.  The
    heuristic is that double-quoting is unnecessary unless the string
@@ -1577,35 +1359,32 @@ const char *yysrc;
    backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
    null, do not copy; instead, return the length of what the result
    would have been.  */
-static YYSIZE_T
-yytnamerr(char *yyres, const char *yystr)
+static YYSIZE_T yytnamerr(char *yyres, const char *yystr)
 {
-  if (*yystr == '"')
-  {
+  if (*yystr == '"') {
     YYSIZE_T yyn = 0;
     char const *yyp = yystr;
 
     for (;;)
-      switch (*++yyp)
-      {
-      case '\'':
-      case ',':
-        goto do_not_strip_quotes;
-
-      case '\\':
-        if (*++yyp != '\\')
+      switch (*++yyp) {
+        case '\'':
+        case ',':
           goto do_not_strip_quotes;
-        /* Fall through.  */
-      default:
-        if (yyres)
-          yyres[yyn] = *yyp;
-        yyn++;
-        break;
 
-      case '"':
-        if (yyres)
-          yyres[yyn] = '\0';
-        return yyn;
+        case '\\':
+          if (*++yyp != '\\')
+            goto do_not_strip_quotes;
+          /* Fall through.  */
+        default:
+          if (yyres)
+            yyres[yyn] = *yyp;
+          yyn++;
+          break;
+
+        case '"':
+          if (yyres)
+            yyres[yyn] = '\0';
+          return yyn;
       }
   do_not_strip_quotes:;
   }
@@ -1615,7 +1394,7 @@ yytnamerr(char *yyres, const char *yystr)
 
   return yystpcpy(yyres, yystr) - yyres;
 }
-#endif
+#  endif
 
 /* Copy into YYRESULT an error message about the unexpected token
    YYCHAR while in state YYSTATE.  Return the number of bytes copied,
@@ -1624,28 +1403,23 @@ yytnamerr(char *yyres, const char *yystr)
    copied.  As a special case, return 0 if an ordinary "syntax error"
    message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
    size calculation.  */
-static YYSIZE_T
-yysyntax_error(char *yyresult, int yystate, int yychar)
+static YYSIZE_T yysyntax_error(char *yyresult, int yystate, int yychar)
 {
   int yyn = yypact[yystate];
 
   if (!(YYPACT_NINF < yyn && yyn <= YYLAST))
     return 0;
-  else
-  {
+  else {
     int yytype = YYTRANSLATE(yychar);
     YYSIZE_T yysize0 = yytnamerr(0, yytname[yytype]);
     YYSIZE_T yysize = yysize0;
     YYSIZE_T yysize1;
     int yysize_overflow = 0;
-    enum
-    {
-      YYERROR_VERBOSE_ARGS_MAXIMUM = 5
-    };
+    enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
     char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
     int yyx;
 
-#if 0
+#  if 0
       /* This is so xgettext sees the translatable formats that are
 	 constructed on the fly.  */
       YY_("syntax error, unexpected %s");
@@ -1653,13 +1427,14 @@ yysyntax_error(char *yyresult, int yystate, int yychar)
       YY_("syntax error, unexpected %s, expecting %s or %s");
       YY_("syntax error, unexpected %s, expecting %s or %s or %s");
       YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
-#endif
+#  endif
     char *yyfmt;
     char const *yyf;
     static char const yyunexpected[] = "syntax error, unexpected %s";
     static char const yyexpecting[] = ", expecting %s";
     static char const yyor[] = " or %s";
-    char yyformat[sizeof yyunexpected + sizeof yyexpecting - 1 + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2) * (sizeof yyor - 1))];
+    char yyformat[sizeof yyunexpected + sizeof yyexpecting - 1 +
+                  ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2) * (sizeof yyor - 1))];
     char const *yyprefix = yyexpecting;
 
     /* Start YYX at -YYN if negative to avoid negative indexes in
@@ -1675,10 +1450,8 @@ yysyntax_error(char *yyresult, int yystate, int yychar)
     yyfmt = yystpcpy(yyformat, yyunexpected);
 
     for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-      if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-      {
-        if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-        {
+      if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR) {
+        if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM) {
           yycount = 1;
           yysize = yysize0;
           yyformat[sizeof yyunexpected - 1] = '\0';
@@ -1700,22 +1473,18 @@ yysyntax_error(char *yyresult, int yystate, int yychar)
     if (yysize_overflow)
       return YYSIZE_MAXIMUM;
 
-    if (yyresult)
-    {
+    if (yyresult) {
       /* Avoid sprintf, as that infringes on the user's name space.
          Don't have undefined behavior even if the translation
          produced a string with the wrong number of "%s"s.  */
       char *yyp = yyresult;
       int yyi = 0;
-      while ((*yyp = *yyf) != '\0')
-      {
-        if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
-        {
+      while ((*yyp = *yyf) != '\0') {
+        if (*yyp == '%' && yyf[1] == 's' && yyi < yycount) {
           yyp += yytnamerr(yyp, yyarg[yyi++]);
           yyf += 2;
         }
-        else
-        {
+        else {
           yyp++;
           yyf++;
         }
@@ -1732,12 +1501,10 @@ yysyntax_error(char *yyresult, int yystate, int yychar)
 
 /*ARGSUSED*/
 #if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
-static void
-yydestruct(const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, _VSCGParserData *data)
+static void yydestruct(
+    const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, _VSCGParserData *data)
 #else
-static void
-    yydestruct(yymsg, yytype, yyvaluep, yylocationp, data)
-        const char *yymsg;
+static void yydestruct(yymsg, yytype, yyvaluep, yylocationp, data) const char *yymsg;
 int yytype;
 YYSTYPE *yyvaluep;
 YYLTYPE *yylocationp;
@@ -1752,102 +1519,96 @@ _VSCGParserData *data;
     yymsg = "Deleting";
   YY_SYMBOL_PRINT(yymsg, yytype, yyvaluep, yylocationp);
 
-  switch (yytype)
-  {
-  case 3: /* "NUMBER" */
+  switch (yytype) {
+    case 3: /* "NUMBER" */
 
 /* Line 1000 of yacc.c  */
 #line 477 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    if ((yyvaluep->string))
     {
-      free((yyvaluep->string));
-    }
-    (yyvaluep->string) = 0;
-  };
+      if ((yyvaluep->string)) {
+        free((yyvaluep->string));
+      }
+      (yyvaluep->string) = 0;
+    };
 
 /* Line 1000 of yacc.c  */
 #line 1776 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  break;
-  case 4: /* "STRING" */
+        break;
+    case 4: /* "STRING" */
 
 /* Line 1000 of yacc.c  */
 #line 477 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    if ((yyvaluep->string))
     {
-      free((yyvaluep->string));
-    }
-    (yyvaluep->string) = 0;
-  };
+      if ((yyvaluep->string)) {
+        free((yyvaluep->string));
+      }
+      (yyvaluep->string) = 0;
+    };
 
 /* Line 1000 of yacc.c  */
 #line 1791 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  break;
-  case 5: /* "PARAM" */
+        break;
+    case 5: /* "PARAM" */
 
 /* Line 1000 of yacc.c  */
 #line 477 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    if ((yyvaluep->string))
     {
-      free((yyvaluep->string));
-    }
-    (yyvaluep->string) = 0;
-  };
+      if ((yyvaluep->string)) {
+        free((yyvaluep->string));
+      }
+      (yyvaluep->string) = 0;
+    };
 
 /* Line 1000 of yacc.c  */
 #line 1806 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  break;
-  case 27: /* "value" */
+        break;
+    case 27: /* "value" */
 
 /* Line 1000 of yacc.c  */
 #line 493 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    if ((yyvaluep->value))
     {
-      delete (yyvaluep->value);
-    }
-    (yyvaluep->value) = 0;
-  };
+      if ((yyvaluep->value)) {
+        delete (yyvaluep->value);
+      }
+      (yyvaluep->value) = 0;
+    };
 
 /* Line 1000 of yacc.c  */
 #line 1821 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  break;
-  case 29: /* "action" */
+        break;
+    case 29: /* "action" */
 
 /* Line 1000 of yacc.c  */
 #line 485 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    if ((yyvaluep->action))
     {
-      delete (yyvaluep->action);
-    }
-    (yyvaluep->action) = 0;
-  };
+      if ((yyvaluep->action)) {
+        delete (yyvaluep->action);
+      }
+      (yyvaluep->action) = 0;
+    };
 
 /* Line 1000 of yacc.c  */
 #line 1836 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  break;
+        break;
 
-  default:
-    break;
+    default:
+      break;
   }
 }
 
 /* Prevent warnings from -Wmissing-prototypes.  */
 #ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
+#  if defined __STDC__ || defined __cplusplus
 int yyparse(void *YYPARSE_PARAM);
-#else
+#  else
 int yyparse();
-#endif
+#  endif
 #else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
+#  if defined __STDC__ || defined __cplusplus
 int yyparse(_VSCGParserData *data);
-#else
+#  else
 int yyparse();
-#endif
+#  endif
 #endif /* ! YYPARSE_PARAM */
 
 /*-------------------------.
@@ -1855,19 +1616,18 @@ int yyparse();
 `-------------------------*/
 
 #ifdef YYPARSE_PARAM
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
 int yyparse(void *YYPARSE_PARAM)
-#else
-int
-    yyparse(YYPARSE_PARAM) void *YYPARSE_PARAM;
-#endif
+#  else
+int yyparse(YYPARSE_PARAM) void *YYPARSE_PARAM;
+#  endif
 #else /* ! YYPARSE_PARAM */
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
+#  if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus || defined _MSC_VER)
 int yyparse(_VSCGParserData *data)
-#else
+#  else
 int yyparse(data)
 _VSCGParserData *data;
-#endif
+#  endif
 #endif
 {
   /* The lookahead symbol.  */
@@ -1976,8 +1736,7 @@ yynewstate:
 yysetstate:
   *yyssp = yystate;
 
-  if (yyss + yystacksize - 1 <= yyssp)
-  {
+  if (yyss + yystacksize - 1 <= yyssp) {
     /* Get the current used size of the three stacks, in elements.  */
     YYSIZE_T yysize = yyssp - yyss + 1;
 
@@ -1995,9 +1754,12 @@ yysetstate:
          conditional around just the two extra args, but that might
          be undefined if yyoverflow is a macro.  */
       yyoverflow(YY_("memory exhausted"),
-                 &yyss1, yysize * sizeof(*yyssp),
-                 &yyvs1, yysize * sizeof(*yyvsp),
-                 &yyls1, yysize * sizeof(*yylsp),
+                 &yyss1,
+                 yysize * sizeof(*yyssp),
+                 &yyvs1,
+                 yysize * sizeof(*yyvsp),
+                 &yyls1,
+                 yysize * sizeof(*yylsp),
                  &yystacksize);
 
       yyls = yyls1;
@@ -2005,9 +1767,9 @@ yysetstate:
       yyvs = yyvs1;
     }
 #else /* no yyoverflow */
-#ifndef YYSTACK_RELOCATE
+#  ifndef YYSTACK_RELOCATE
     goto yyexhaustedlab;
-#else
+#  else
     /* Extend the stack our own way.  */
     if (YYMAXDEPTH <= yystacksize)
       goto yyexhaustedlab;
@@ -2017,26 +1779,24 @@ yysetstate:
 
     {
       yytype_int16 *yyss1 = yyss;
-      union yyalloc *yyptr =
-          (union yyalloc *)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
+      union yyalloc *yyptr = (union yyalloc *)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
       if (!yyptr)
         goto yyexhaustedlab;
       YYSTACK_RELOCATE(yyss_alloc, yyss);
       YYSTACK_RELOCATE(yyvs_alloc, yyvs);
       YYSTACK_RELOCATE(yyls_alloc, yyls);
-#undef YYSTACK_RELOCATE
+#    undef YYSTACK_RELOCATE
       if (yyss1 != yyssa)
         YYSTACK_FREE(yyss1);
     }
-#endif
+#  endif
 #endif /* no yyoverflow */
 
     yyssp = yyss + yysize - 1;
     yyvsp = yyvs + yysize - 1;
     yylsp = yyls + yysize - 1;
 
-    YYDPRINTF((stderr, "Stack size increased to %lu\n",
-               (unsigned long int)yystacksize));
+    YYDPRINTF((stderr, "Stack size increased to %lu\n", (unsigned long int)yystacksize));
 
     if (yyss + yystacksize - 1 <= yyssp)
       YYABORT;
@@ -2065,19 +1825,16 @@ yybackup:
   /* Not known => get a lookahead token if don't already have one.  */
 
   /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
-  if (yychar == YYEMPTY)
-  {
+  if (yychar == YYEMPTY) {
     YYDPRINTF((stderr, "Reading a token: "));
     yychar = YYLEX;
   }
 
-  if (yychar <= YYEOF)
-  {
+  if (yychar <= YYEOF) {
     yychar = yytoken = YYEOF;
     YYDPRINTF((stderr, "Now at end of input.\n"));
   }
-  else
-  {
+  else {
     yytoken = YYTRANSLATE(yychar);
     YY_SYMBOL_PRINT("Next token is", yytoken, &yylval, &yylloc);
   }
@@ -2088,8 +1845,7 @@ yybackup:
   if (yyn < 0 || YYLAST < yyn || yycheck[yyn] != yytoken)
     goto yydefault;
   yyn = yytable[yyn];
-  if (yyn <= 0)
-  {
+  if (yyn <= 0) {
     if (yyn == 0 || yyn == YYTABLE_NINF)
       goto yyerrlab;
     yyn = -yyn;
@@ -2141,1596 +1897,1439 @@ yyreduce:
   /* Default location.  */
   YYLLOC_DEFAULT(yyloc, (yylsp - yylen), yylen);
   YY_REDUCE_PRINT(yyn);
-  switch (yyn)
-  {
-  case 2:
+  switch (yyn) {
+    case 2:
 
 /* Line 1455 of yacc.c  */
 #line 538 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.value) = new _VSCGValueContainer(VtValue((yyvsp[(1) - (1)].string)));
-    free((yyvsp[(1) - (1)].string));
-    ;
-  }
-  break;
+    {
+      (yyval.value) = new _VSCGValueContainer(VtValue((yyvsp[(1) - (1)].string)));
+      free((yyvsp[(1) - (1)].string));
+      ;
+    } break;
 
-  case 3:
+    case 3:
 
 /* Line 1455 of yacc.c  */
 #line 542 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.value) = new _VSCGValueContainer(VtValue(atof((yyvsp[(1) - (1)].string))));
-    free((yyvsp[(1) - (1)].string));
-    ;
-  }
-  break;
+    {
+      (yyval.value) = new _VSCGValueContainer(VtValue(atof((yyvsp[(1) - (1)].string))));
+      free((yyvsp[(1) - (1)].string));
+      ;
+    } break;
 
-  case 4:
+    case 4:
 
 /* Line 1455 of yacc.c  */
 #line 555 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpEqualTo(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 5:
+    case 5:
 
 /* Line 1455 of yacc.c  */
 #line 563 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 6:
+    case 6:
 
 /* Line 1455 of yacc.c  */
 #line 569 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 7:
+    case 7:
 
 /* Line 1455 of yacc.c  */
 #line 575 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 8:
+    case 8:
 
 /* Line 1455 of yacc.c  */
 #line 582 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 9:
+    case 9:
 
 /* Line 1455 of yacc.c  */
 #line 588 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 10:
+    case 10:
 
 /* Line 1455 of yacc.c  */
 #line 594 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 11:
+    case 11:
 
 /* Line 1455 of yacc.c  */
 #line 600 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 12:
+    case 12:
 
 /* Line 1455 of yacc.c  */
 #line 606 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 13:
+    case 13:
 
 /* Line 1455 of yacc.c  */
 #line 612 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 14:
+    case 14:
 
 /* Line 1455 of yacc.c  */
 #line 618 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpEqualTo(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpEqualTo(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 15:
+    case 15:
 
 /* Line 1455 of yacc.c  */
 #line 626 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpNotEqualTo(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 16:
+    case 16:
 
 /* Line 1455 of yacc.c  */
 #line 634 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 17:
+    case 17:
 
 /* Line 1455 of yacc.c  */
 #line 640 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 18:
+    case 18:
 
 /* Line 1455 of yacc.c  */
 #line 646 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 19:
+    case 19:
 
 /* Line 1455 of yacc.c  */
 #line 653 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 20:
+    case 20:
 
 /* Line 1455 of yacc.c  */
 #line 659 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 21:
+    case 21:
 
 /* Line 1455 of yacc.c  */
 #line 665 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(
-            TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpNotEqualTo(
+          TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 22:
+    case 22:
 
 /* Line 1455 of yacc.c  */
 #line 672 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 23:
+    case 23:
 
 /* Line 1455 of yacc.c  */
 #line 678 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 24:
+    case 24:
 
 /* Line 1455 of yacc.c  */
 #line 684 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 25:
+    case 25:
 
 /* Line 1455 of yacc.c  */
 #line 690 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpNotEqualTo(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpNotEqualTo(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 26:
+    case 26:
 
 /* Line 1455 of yacc.c  */
 #line 699 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThan(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 27:
+    case 27:
 
 /* Line 1455 of yacc.c  */
 #line 707 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 28:
+    case 28:
 
 /* Line 1455 of yacc.c  */
 #line 713 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 29:
+    case 29:
 
 /* Line 1455 of yacc.c  */
 #line 719 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 30:
+    case 30:
 
 /* Line 1455 of yacc.c  */
 #line 726 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 31:
+    case 31:
 
 /* Line 1455 of yacc.c  */
 #line 732 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 32:
+    case 32:
 
 /* Line 1455 of yacc.c  */
 #line 738 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(
-            TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThan(
+          TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 33:
+    case 33:
 
 /* Line 1455 of yacc.c  */
 #line 745 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 34:
+    case 34:
 
 /* Line 1455 of yacc.c  */
 #line 751 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 35:
+    case 35:
 
 /* Line 1455 of yacc.c  */
 #line 757 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 36:
+    case 36:
 
 /* Line 1455 of yacc.c  */
 #line 763 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThan(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpGreaterThan(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 37:
+    case 37:
 
 /* Line 1455 of yacc.c  */
 #line 772 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThan(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 38:
+    case 38:
 
 /* Line 1455 of yacc.c  */
 #line 780 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 39:
+    case 39:
 
 /* Line 1455 of yacc.c  */
 #line 786 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 40:
+    case 40:
 
 /* Line 1455 of yacc.c  */
 #line 792 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 41:
+    case 41:
 
 /* Line 1455 of yacc.c  */
 #line 799 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 42:
+    case 42:
 
 /* Line 1455 of yacc.c  */
 #line 805 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 43:
+    case 43:
 
 /* Line 1455 of yacc.c  */
 #line 811 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 44:
+    case 44:
 
 /* Line 1455 of yacc.c  */
 #line 817 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 45:
+    case 45:
 
 /* Line 1455 of yacc.c  */
 #line 823 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 46:
+    case 46:
 
 /* Line 1455 of yacc.c  */
 #line 829 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 47:
+    case 47:
 
 /* Line 1455 of yacc.c  */
 #line 835 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThan(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamCmpLessThan(TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 48:
+    case 48:
 
 /* Line 1455 of yacc.c  */
 #line 843 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken((yyvsp[(1) - (3)].string)),
-                                                    (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 49:
+    case 49:
 
 /* Line 1455 of yacc.c  */
 #line 852 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("and"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 50:
+    case 50:
 
 /* Line 1455 of yacc.c  */
 #line 859 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("or"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 51:
+    case 51:
 
 /* Line 1455 of yacc.c  */
 #line 866 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("is"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 52:
+    case 52:
 
 /* Line 1455 of yacc.c  */
 #line 874 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("if"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 53:
+    case 53:
 
 /* Line 1455 of yacc.c  */
 #line 881 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("else"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 54:
+    case 54:
 
 /* Line 1455 of yacc.c  */
 #line 888 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("connected"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 55:
+    case 55:
 
 /* Line 1455 of yacc.c  */
 #line 895 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("connect"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 56:
+    case 56:
 
 /* Line 1455 of yacc.c  */
 #line 902 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("ignore"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 57:
+    case 57:
 
 /* Line 1455 of yacc.c  */
 #line 909 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("copy"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 58:
+    case 58:
 
 /* Line 1455 of yacc.c  */
 #line 916 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpGreaterThanOrEqualTo(TfToken("set"),
-                                                    (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpGreaterThanOrEqualTo(
+          TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 59:
+    case 59:
 
 /* Line 1455 of yacc.c  */
 #line 926 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken((yyvsp[(1) - (3)].string)),
-                                                 (yyvsp[(3) - (3)].value)->value));
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken((yyvsp[(1) - (3)].string)), (yyvsp[(3) - (3)].value)->value));
 
-    free((yyvsp[(1) - (3)].string));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+      free((yyvsp[(1) - (3)].string));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 60:
+    case 60:
 
 /* Line 1455 of yacc.c  */
 #line 935 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("and"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("and"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 61:
+    case 61:
 
 /* Line 1455 of yacc.c  */
 #line 942 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("or"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("or"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 62:
+    case 62:
 
 /* Line 1455 of yacc.c  */
 #line 949 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("is"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("is"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 63:
+    case 63:
 
 /* Line 1455 of yacc.c  */
 #line 957 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("if"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("if"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 64:
+    case 64:
 
 /* Line 1455 of yacc.c  */
 #line 964 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("else"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("else"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 65:
+    case 65:
 
 /* Line 1455 of yacc.c  */
 #line 971 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("connected"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("connected"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 66:
+    case 66:
 
 /* Line 1455 of yacc.c  */
 #line 978 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("connect"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("connect"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 67:
+    case 67:
 
 /* Line 1455 of yacc.c  */
 #line 985 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("ignore"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("ignore"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 68:
+    case 68:
 
 /* Line 1455 of yacc.c  */
 #line 992 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("copy"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("copy"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 69:
+    case 69:
 
 /* Line 1455 of yacc.c  */
 #line 999 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(
-        new ConditionalParamCmpLessThanOrEqualTo(TfToken("set"),
-                                                 (yyvsp[(3) - (3)].value)->value));
-    delete (yyvsp[(3) - (3)].value);
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamCmpLessThanOrEqualTo(
+          TfToken("set"), (yyvsp[(3) - (3)].value)->value));
+      delete (yyvsp[(3) - (3)].value);
+      ;
+    } break;
 
-  case 70:
+    case 70:
 
 /* Line 1455 of yacc.c  */
 #line 1010 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken((yyvsp[(1) - (3)].string))));
-    free((yyvsp[(1) - (3)].string));
-    ;
-  }
-  break;
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsConnected(TfToken((yyvsp[(1) - (3)].string))));
+      free((yyvsp[(1) - (3)].string));
+      ;
+    } break;
 
-  case 71:
+    case 71:
 
 /* Line 1455 of yacc.c  */
 #line 1015 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("and")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("and")));
+      ;
+    } break;
 
-  case 72:
+    case 72:
 
 /* Line 1455 of yacc.c  */
 #line 1019 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("or")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("or")));
+      ;
+    } break;
 
-  case 73:
+    case 73:
 
 /* Line 1455 of yacc.c  */
 #line 1023 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("is")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("is")));
+      ;
+    } break;
 
-  case 74:
+    case 74:
 
 /* Line 1455 of yacc.c  */
 #line 1028 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("if")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("if")));
+      ;
+    } break;
 
-  case 75:
+    case 75:
 
 /* Line 1455 of yacc.c  */
 #line 1032 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("else")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("else")));
+      ;
+    } break;
 
-  case 76:
+    case 76:
 
 /* Line 1455 of yacc.c  */
 #line 1036 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(
-        TfToken("connected")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsConnected(TfToken("connected")));
+      ;
+    } break;
 
-  case 77:
+    case 77:
 
 /* Line 1455 of yacc.c  */
 #line 1041 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(
-        TfToken("connect")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("connect")));
+      ;
+    } break;
 
-  case 78:
+    case 78:
 
 /* Line 1455 of yacc.c  */
 #line 1046 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(
-        TfToken("ignore")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("ignore")));
+      ;
+    } break;
 
-  case 79:
+    case 79:
 
 /* Line 1455 of yacc.c  */
 #line 1051 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("copy")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("copy")));
+      ;
+    } break;
 
-  case 80:
+    case 80:
 
 /* Line 1455 of yacc.c  */
 #line 1055 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("set")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsConnected(TfToken("set")));
+      ;
+    } break;
 
-  case 81:
+    case 81:
 
 /* Line 1455 of yacc.c  */
 #line 1062 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken((yyvsp[(1) - (3)].string))));
-    free((yyvsp[(1) - (3)].string));
-    ;
-  }
-  break;
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsNotConnected(TfToken((yyvsp[(1) - (3)].string))));
+      free((yyvsp[(1) - (3)].string));
+      ;
+    } break;
 
-  case 82:
+    case 82:
 
 /* Line 1455 of yacc.c  */
 #line 1067 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("and")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("and")));
+      ;
+    } break;
 
-  case 83:
+    case 83:
 
 /* Line 1455 of yacc.c  */
 #line 1072 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("or")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("or")));
+      ;
+    } break;
 
-  case 84:
+    case 84:
 
 /* Line 1455 of yacc.c  */
 #line 1077 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("is")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("is")));
+      ;
+    } break;
 
-  case 85:
+    case 85:
 
 /* Line 1455 of yacc.c  */
 #line 1083 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("if")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("if")));
+      ;
+    } break;
 
-  case 86:
+    case 86:
 
 /* Line 1455 of yacc.c  */
 #line 1088 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("else")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("else")));
+      ;
+    } break;
 
-  case 87:
+    case 87:
 
 /* Line 1455 of yacc.c  */
 #line 1093 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("connected")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsNotConnected(TfToken("connected")));
+      ;
+    } break;
 
-  case 88:
+    case 88:
 
 /* Line 1455 of yacc.c  */
 #line 1098 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("connect")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsNotConnected(TfToken("connect")));
+      ;
+    } break;
 
-  case 89:
+    case 89:
 
 /* Line 1455 of yacc.c  */
 #line 1103 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("ignore")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsNotConnected(TfToken("ignore")));
+      ;
+    } break;
 
-  case 90:
+    case 90:
 
 /* Line 1455 of yacc.c  */
 #line 1108 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("copy")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("copy")));
+      ;
+    } break;
 
-  case 91:
+    case 91:
 
 /* Line 1455 of yacc.c  */
 #line 1113 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(
-        TfToken("set")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotConnected(TfToken("set")));
+      ;
+    } break;
 
-  case 92:
+    case 92:
 
 /* Line 1455 of yacc.c  */
 #line 1122 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken((yyvsp[(1) - (3)].string))));
-    free((yyvsp[(1) - (3)].string));
-    ;
-  }
-  break;
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsSet(TfToken((yyvsp[(1) - (3)].string))));
+      free((yyvsp[(1) - (3)].string));
+      ;
+    } break;
 
-  case 93:
+    case 93:
 
 /* Line 1455 of yacc.c  */
 #line 1127 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("and")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("and")));
+      ;
+    } break;
 
-  case 94:
+    case 94:
 
 /* Line 1455 of yacc.c  */
 #line 1131 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("or")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("or")));
+      ;
+    } break;
 
-  case 95:
+    case 95:
 
 /* Line 1455 of yacc.c  */
 #line 1135 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("is")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("is")));
+      ;
+    } break;
 
-  case 96:
+    case 96:
 
 /* Line 1455 of yacc.c  */
 #line 1140 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("if")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("if")));
+      ;
+    } break;
 
-  case 97:
+    case 97:
 
 /* Line 1455 of yacc.c  */
 #line 1144 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("else")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("else")));
+      ;
+    } break;
 
-  case 98:
+    case 98:
 
 /* Line 1455 of yacc.c  */
 #line 1148 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("connected")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("connected")));
+      ;
+    } break;
 
-  case 99:
+    case 99:
 
 /* Line 1455 of yacc.c  */
 #line 1152 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("connect")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("connect")));
+      ;
+    } break;
 
-  case 100:
+    case 100:
 
 /* Line 1455 of yacc.c  */
 #line 1156 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("ignore")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("ignore")));
+      ;
+    } break;
 
-  case 101:
+    case 101:
 
 /* Line 1455 of yacc.c  */
 #line 1160 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("copy")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("copy")));
+      ;
+    } break;
 
-  case 102:
+    case 102:
 
 /* Line 1455 of yacc.c  */
 #line 1164 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("set")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsSet(TfToken("set")));
+      ;
+    } break;
 
-  case 103:
+    case 103:
 
 /* Line 1455 of yacc.c  */
 #line 1171 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken((yyvsp[(1) - (3)].string))));
-    free((yyvsp[(1) - (3)].string));
-    ;
-  }
-  break;
+      (yyval.condition) = data->NewCondition(
+          new ConditionalParamIsNotSet(TfToken((yyvsp[(1) - (3)].string))));
+      free((yyvsp[(1) - (3)].string));
+      ;
+    } break;
 
-  case 104:
+    case 104:
 
 /* Line 1455 of yacc.c  */
 #line 1176 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'and', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("and")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'and', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("and")));
+      ;
+    } break;
 
-  case 105:
+    case 105:
 
 /* Line 1455 of yacc.c  */
 #line 1180 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'or', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("or")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'or', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("or")));
+      ;
+    } break;
 
-  case 106:
+    case 106:
 
 /* Line 1455 of yacc.c  */
 #line 1184 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'is', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("is")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'is', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("is")));
+      ;
+    } break;
 
-  case 107:
+    case 107:
 
 /* Line 1455 of yacc.c  */
 #line 1189 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'if', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("if")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'if', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("if")));
+      ;
+    } break;
 
-  case 108:
+    case 108:
 
 /* Line 1455 of yacc.c  */
 #line 1193 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'else', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("else")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'else', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("else")));
+      ;
+    } break;
 
-  case 109:
+    case 109:
 
 /* Line 1455 of yacc.c  */
 #line 1197 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connected', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(
-        TfToken("connected")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connected', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("connected")));
+      ;
+    } break;
 
-  case 110:
+    case 110:
 
 /* Line 1455 of yacc.c  */
 #line 1202 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'connect', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("connect")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'connect', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("connect")));
+      ;
+    } break;
 
-  case 111:
+    case 111:
 
 /* Line 1455 of yacc.c  */
 #line 1206 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'ignore', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("ignore")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'ignore', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("ignore")));
+      ;
+    } break;
 
-  case 112:
+    case 112:
 
 /* Line 1455 of yacc.c  */
 #line 1210 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'copy', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("copy")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'copy', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("copy")));
+      ;
+    } break;
 
-  case 113:
+    case 113:
 
 /* Line 1455 of yacc.c  */
 #line 1214 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    /* PARAM named 'set', special case */
-    (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("set")));
-    ;
-  }
-  break;
+    {
+      /* PARAM named 'set', special case */
+      (yyval.condition) = data->NewCondition(new ConditionalParamIsNotSet(TfToken("set")));
+      ;
+    } break;
 
-  case 114:
+    case 114:
 
 /* Line 1455 of yacc.c  */
 #line 1221 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.condition) = (yyvsp[(2) - (3)].condition);
-    ;
-  }
-  break;
+    {
+      (yyval.condition) = (yyvsp[(2) - (3)].condition);
+      ;
+    } break;
 
-  case 115:
+    case 115:
 
 /* Line 1455 of yacc.c  */
 #line 1224 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.condition) = data->NewCondition(new ConditionalAnd(
-        data->ClaimCondition((yyvsp[(1) - (3)].condition)),
-        data->ClaimCondition((yyvsp[(3) - (3)].condition))));
-    ;
-  }
-  break;
+    {
+      (yyval.condition) = data->NewCondition(
+          new ConditionalAnd(data->ClaimCondition((yyvsp[(1) - (3)].condition)),
+                             data->ClaimCondition((yyvsp[(3) - (3)].condition))));
+      ;
+    } break;
 
-  case 116:
+    case 116:
 
 /* Line 1455 of yacc.c  */
 #line 1229 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    (yyval.condition) = data->NewCondition(new ConditionalOr(
-        data->ClaimCondition((yyvsp[(1) - (3)].condition)),
-        data->ClaimCondition((yyvsp[(3) - (3)].condition))));
-    ;
-  }
-  break;
+      (yyval.condition) = data->NewCondition(
+          new ConditionalOr(data->ClaimCondition((yyvsp[(1) - (3)].condition)),
+                            data->ClaimCondition((yyvsp[(3) - (3)].condition))));
+      ;
+    } break;
 
-  case 117:
+    case 117:
 
 /* Line 1455 of yacc.c  */
 #line 1235 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    TfToken paramName((yyvsp[(2) - (2)].string));
-    free((yyvsp[(2) - (2)].string));
+      TfToken paramName((yyvsp[(2) - (2)].string));
+      free((yyvsp[(2) - (2)].string));
 
-    (yyval.action) = new _VSCGAction(_VSCGAction::CopyParam, VtValue(paramName));
+      (yyval.action) = new _VSCGAction(_VSCGAction::CopyParam, VtValue(paramName));
 
-    ;
-  }
-  break;
+      ;
+    } break;
 
-  case 118:
+    case 118:
 
 /* Line 1455 of yacc.c  */
 #line 1243 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.action) = new _VSCGAction(_VSCGAction::Connect);
+    {
+      (yyval.action) = new _VSCGAction(_VSCGAction::Connect);
 
-    ;
-  }
-  break;
+      ;
+    } break;
 
-  case 119:
+    case 119:
 
 /* Line 1455 of yacc.c  */
 #line 1247 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.action) = new _VSCGAction(_VSCGAction::Ignore);
-    ;
-  }
-  break;
+    {
+      (yyval.action) = new _VSCGAction(_VSCGAction::Ignore);
+      ;
+    } break;
 
-  case 120:
+    case 120:
 
 /* Line 1455 of yacc.c  */
 #line 1250 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    std::string value((yyvsp[(2) - (2)].string));
-    free((yyvsp[(2) - (2)].string));
-    (yyval.action) = new _VSCGAction(_VSCGAction::SetConstant, VtValue(value));
-    ;
-  }
-  break;
+      std::string value((yyvsp[(2) - (2)].string));
+      free((yyvsp[(2) - (2)].string));
+      (yyval.action) = new _VSCGAction(_VSCGAction::SetConstant, VtValue(value));
+      ;
+    } break;
 
-  case 121:
+    case 121:
 
 /* Line 1455 of yacc.c  */
 #line 1256 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    (yyval.action) = new _VSCGAction(_VSCGAction::SetConstant, VtValue(atof((yyvsp[(2) - (2)].string))));
-    free((yyvsp[(2) - (2)].string));
-    ;
-  }
-  break;
+    {
+      (yyval.action) = new _VSCGAction(_VSCGAction::SetConstant,
+                                       VtValue(atof((yyvsp[(2) - (2)].string))));
+      free((yyvsp[(2) - (2)].string));
+      ;
+    } break;
 
-  case 122:
+    case 122:
 
 /* Line 1455 of yacc.c  */
 #line 1266 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    data->action = (yyvsp[(1) - (5)].action);
-    data->rootCondition = data->ClaimCondition((yyvsp[(3) - (5)].condition));
-    data->fallbackAction = (yyvsp[(5) - (5)].action);
-    ;
-  }
-  break;
+    {
+      data->action = (yyvsp[(1) - (5)].action);
+      data->rootCondition = data->ClaimCondition((yyvsp[(3) - (5)].condition));
+      data->fallbackAction = (yyvsp[(5) - (5)].action);
+      ;
+    } break;
 
-  case 123:
+    case 123:
 
 /* Line 1455 of yacc.c  */
 #line 1271 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    data->action = (yyvsp[(1) - (3)].action);
-    data->rootCondition = data->ClaimCondition((yyvsp[(3) - (3)].condition));
-
-    if ((yyvsp[(1) - (3)].action)->action == _VSCGAction::Ignore)
     {
-      data->fallbackAction = new _VSCGAction(_VSCGAction::Connect);
-    }
-    else
-    {
-      data->fallbackAction = new _VSCGAction(_VSCGAction::Ignore);
-    }
+      data->action = (yyvsp[(1) - (3)].action);
+      data->rootCondition = data->ClaimCondition((yyvsp[(3) - (3)].condition));
 
-    ;
-  }
-  break;
+      if ((yyvsp[(1) - (3)].action)->action == _VSCGAction::Ignore) {
+        data->fallbackAction = new _VSCGAction(_VSCGAction::Connect);
+      }
+      else {
+        data->fallbackAction = new _VSCGAction(_VSCGAction::Ignore);
+      }
 
-  case 124:
+      ;
+    } break;
+
+    case 124:
 
 /* Line 1455 of yacc.c  */
 #line 1282 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
+    {
 
-    data->action = new _VSCGAction(_VSCGAction::Connect);
+      data->action = new _VSCGAction(_VSCGAction::Connect);
 
-    data->rootCondition = data->ClaimCondition((yyvsp[(2) - (4)].condition));
+      data->rootCondition = data->ClaimCondition((yyvsp[(2) - (4)].condition));
 
-    data->fallbackAction = (yyvsp[(4) - (4)].action);
+      data->fallbackAction = (yyvsp[(4) - (4)].action);
 
-    ;
-  }
-  break;
+      ;
+    } break;
 
-  case 125:
+    case 125:
 
 /* Line 1455 of yacc.c  */
 #line 1292 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    data->action = (yyvsp[(1) - (1)].action);
-    ;
-  }
-  break;
+    {
+      data->action = (yyvsp[(1) - (1)].action);
+      ;
+    } break;
 
-  case 126:
+    case 126:
 
 /* Line 1455 of yacc.c  */
 #line 1295 "hdPrman/virtualStructConditionalGrammar.yy"
-  {
-    data->action = new _VSCGAction(_VSCGAction::Connect);
-    data->rootCondition = data->ClaimCondition((yyvsp[(1) - (1)].condition));
-    data->fallbackAction = new _VSCGAction(_VSCGAction::Ignore);
-    ;
-  }
-  break;
+    {
+      data->action = new _VSCGAction(_VSCGAction::Connect);
+      data->rootCondition = data->ClaimCondition((yyvsp[(1) - (1)].condition));
+      data->fallbackAction = new _VSCGAction(_VSCGAction::Ignore);
+      ;
+    } break;
 
 /* Line 1455 of yacc.c  */
 #line 3624 "hdPrman/virtualStructConditionalGrammar.tab.cpp"
-  default:
-    break;
+    default:
+      break;
   }
   YY_SYMBOL_PRINT("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
@@ -3760,16 +3359,14 @@ yyreduce:
 `------------------------------------*/
 yyerrlab:
   /* If not already recovering from an error, report this error.  */
-  if (!yyerrstatus)
-  {
+  if (!yyerrstatus) {
     ++yynerrs;
 #if !YYERROR_VERBOSE
     yyerror(&yylloc, data, YY_("syntax error"));
 #else
     {
       YYSIZE_T yysize = yysyntax_error(0, yystate, yychar);
-      if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM)
-      {
+      if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM) {
         YYSIZE_T yyalloc = 2 * yysize;
         if (!(yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
           yyalloc = YYSTACK_ALLOC_MAXIMUM;
@@ -3778,20 +3375,17 @@ yyerrlab:
         yymsg = (char *)YYSTACK_ALLOC(yyalloc);
         if (yymsg)
           yymsg_alloc = yyalloc;
-        else
-        {
+        else {
           yymsg = yymsgbuf;
           yymsg_alloc = sizeof yymsgbuf;
         }
       }
 
-      if (0 < yysize && yysize <= yymsg_alloc)
-      {
+      if (0 < yysize && yysize <= yymsg_alloc) {
         (void)yysyntax_error(yymsg, yystate, yychar);
         yyerror(&yylloc, data, yymsg);
       }
-      else
-      {
+      else {
         yyerror(&yylloc, data, YY_("syntax error"));
         if (yysize != 0)
           goto yyexhaustedlab;
@@ -3802,21 +3396,17 @@ yyerrlab:
 
   yyerror_range[0] = yylloc;
 
-  if (yyerrstatus == 3)
-  {
+  if (yyerrstatus == 3) {
     /* If just tried and failed to reuse lookahead token after an
  error, discard it.  */
 
-    if (yychar <= YYEOF)
-    {
+    if (yychar <= YYEOF) {
       /* Return failure if at end of input.  */
       if (yychar == YYEOF)
         YYABORT;
     }
-    else
-    {
-      yydestruct("Error: discarding",
-                 yytoken, &yylval, &yylloc, data);
+    else {
+      yydestruct("Error: discarding", yytoken, &yylval, &yylloc, data);
       yychar = YYEMPTY;
     }
   }
@@ -3851,14 +3441,11 @@ yyerrorlab:
 yyerrlab1:
   yyerrstatus = 3; /* Each real token shifted decrements this.  */
 
-  for (;;)
-  {
+  for (;;) {
     yyn = yypact[yystate];
-    if (yyn != YYPACT_NINF)
-    {
+    if (yyn != YYPACT_NINF) {
       yyn += YYTERROR;
-      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-      {
+      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR) {
         yyn = yytable[yyn];
         if (0 < yyn)
           break;
@@ -3870,8 +3457,7 @@ yyerrlab1:
       YYABORT;
 
     yyerror_range[0] = *yylsp;
-    yydestruct("Error: popping",
-               yystos[yystate], yyvsp, yylsp, data);
+    yydestruct("Error: popping", yystos[yystate], yyvsp, yylsp, data);
     YYPOPSTACK(1);
     yystate = *yyssp;
     YY_STACK_PRINT(yyss, yyssp);
@@ -3917,16 +3503,13 @@ yyexhaustedlab:
 
 yyreturn:
   if (yychar != YYEMPTY)
-    yydestruct("Cleanup: discarding lookahead",
-               yytoken, &yylval, &yylloc, data);
+    yydestruct("Cleanup: discarding lookahead", yytoken, &yylval, &yylloc, data);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK(yylen);
   YY_STACK_PRINT(yyss, yyssp);
-  while (yyssp != yyss)
-  {
-    yydestruct("Cleanup: popping",
-               yystos[*yyssp], yyvsp, yylsp, data);
+  while (yyssp != yyss) {
+    yydestruct("Cleanup: popping", yystos[*yyssp], yyvsp, yylsp, data);
     YYPOPSTACK(1);
   }
 #ifndef yyoverflow
@@ -3945,38 +3528,31 @@ yyreturn:
 #line 1302 "hdPrman/virtualStructConditionalGrammar.yy"
 
 /* Called by yyparse on error */
-void virtualStructConditionalGrammarYyerror(
-    YYLTYPE *llocp, _VSCGParserData *data, const char *s)
+void virtualStructConditionalGrammarYyerror(YYLTYPE *llocp, _VSCGParserData *data, const char *s)
 {
   data->parseError = s;
 }
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
-YY_BUFFER_STATE virtualStructConditionalGrammarYy_scan_string(
-    const char *, void *);
-void virtualStructConditionalGrammarYy_delete_buffer(
-    YY_BUFFER_STATE, void *);
+YY_BUFFER_STATE virtualStructConditionalGrammarYy_scan_string(const char *, void *);
+void virtualStructConditionalGrammarYy_delete_buffer(YY_BUFFER_STATE, void *);
 int virtualStructConditionalGrammarYylex_init(void **yyscanner);
 int virtualStructConditionalGrammarYylex_destroy(void *yyscanner);
 
 //----------------------------------------------------------------------------
 
-MatfiltVstructConditionalEvaluator::Ptr
-MatfiltVstructConditionalEvaluator::Parse(const std::string &inputExpr)
+MatfiltVstructConditionalEvaluator::Ptr MatfiltVstructConditionalEvaluator::Parse(
+    const std::string &inputExpr)
 {
   _VSCGParserData data;
-  if (virtualStructConditionalGrammarYylex_init(&data.yyscanner))
-  {
+  if (virtualStructConditionalGrammarYylex_init(&data.yyscanner)) {
     TF_CODING_ERROR("_VSCGParser: error initializing scanner");
     return nullptr;
   }
-  YY_BUFFER_STATE bufferstate =
-      virtualStructConditionalGrammarYy_scan_string(
-          inputExpr.c_str(), data.yyscanner);
-  MatfiltVstructConditionalEvaluator::Ptr result(
-      new MatfiltVstructConditionalEvaluator);
-  if (virtualStructConditionalGrammarYyparse(&data) == 0)
-  {
+  YY_BUFFER_STATE bufferstate = virtualStructConditionalGrammarYy_scan_string(inputExpr.c_str(),
+                                                                              data.yyscanner);
+  MatfiltVstructConditionalEvaluator::Ptr result(new MatfiltVstructConditionalEvaluator);
+  if (virtualStructConditionalGrammarYyparse(&data) == 0) {
     // hintsAttr = data.getHints(prefix, secondaryPrefix);
 
     result->_impl = new MatfiltVstructConditionalEvaluatorImpl;
@@ -3989,214 +3565,172 @@ MatfiltVstructConditionalEvaluator::Parse(const std::string &inputExpr)
     data.action = nullptr;
     data.fallbackAction = nullptr;
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("_VSCGParser: Error parsing '%s'", inputExpr.c_str());
   }
-  if (!data.parseError.empty())
-  {
-    TF_CODING_ERROR("_VSCGParser: Error parsing '%s': %s",
-                    inputExpr.c_str(),
-                    data.parseError.c_str());
+  if (!data.parseError.empty()) {
+    TF_CODING_ERROR(
+        "_VSCGParser: Error parsing '%s': %s", inputExpr.c_str(), data.parseError.c_str());
   }
 
-  virtualStructConditionalGrammarYy_delete_buffer(
-      bufferstate, data.yyscanner);
+  virtualStructConditionalGrammarYy_delete_buffer(bufferstate, data.yyscanner);
   virtualStructConditionalGrammarYylex_destroy(data.yyscanner);
 
   // TODO
   return result;
 }
 
-void MatfiltVstructConditionalEvaluator::Evaluate(
-    const TfToken &nodeId,
-    const TfToken &nodeInputId,
-    const TfToken &upstreamNodeId,
-    const TfToken &upstreamNodeOutput,
-    const NdrTokenVec &shaderTypePriority,
-    HdMaterialNetworkInterface *interface) const
+void MatfiltVstructConditionalEvaluator::Evaluate(const TfToken &nodeId,
+                                                  const TfToken &nodeInputId,
+                                                  const TfToken &upstreamNodeId,
+                                                  const TfToken &upstreamNodeOutput,
+                                                  const NdrTokenVec &shaderTypePriority,
+                                                  HdMaterialNetworkInterface *interface) const
 {
-  if (!_impl)
-  {
+  if (!_impl) {
     TF_CODING_ERROR("MatfiltVstructConditionalEvaluator: No impl");
     return;
   }
 
   // if it's already connected explicitly, don't do anything
-  if (!interface->GetNodeInputConnection(nodeId, nodeInputId).empty())
-  {
+  if (!interface->GetNodeInputConnection(nodeId, nodeInputId).empty()) {
     return;
   }
 
   _VSCGAction *chosenAction = nullptr;
 
   // confirm upstream node
-  if (interface->GetNodeType(upstreamNodeId).IsEmpty())
-  {
+  if (interface->GetNodeType(upstreamNodeId).IsEmpty()) {
     // No upstream node; silently ignore
     return;
   }
 
   // Decide action to perform.
-  if (_impl->condition)
-  {
-    if (_impl->condition->Eval(interface, upstreamNodeId,
-                               shaderTypePriority))
-    {
+  if (_impl->condition) {
+    if (_impl->condition->Eval(interface, upstreamNodeId, shaderTypePriority)) {
       chosenAction = _impl->action;
     }
-    else
-    {
+    else {
       chosenAction = _impl->fallbackAction;
     }
   }
-  else
-  {
+  else {
     chosenAction = _impl->action;
   }
-  if (!chosenAction)
-  {
+  if (!chosenAction) {
     TF_CODING_ERROR("MatfiltVstructConditionalEvaluator: NULL action");
     return;
   }
 
   // Execute action.
-  switch (chosenAction->action)
-  {
-  case _VSCGAction::Ignore:
-    break;
-  case _VSCGAction::Connect:
-    interface->SetNodeInputConnection(nodeId, nodeInputId, {{upstreamNodeId, upstreamNodeOutput}});
-    break;
-  case _VSCGAction::SetConstant:
-  {
-    // convert the constant to the expected type
-    auto &reg = SdrRegistry::GetInstance();
-    SdrShaderNodeConstPtr sdrNode =
-        reg.GetShaderNodeByIdentifier(
-            interface->GetNodeType(nodeId), shaderTypePriority);
-    if (!sdrNode)
-    {
-      // TODO, warn
+  switch (chosenAction->action) {
+    case _VSCGAction::Ignore:
       break;
-    }
-    NdrPropertyConstPtr ndrProp = sdrNode->GetInput(nodeInputId);
-    if (!ndrProp)
-    {
-      // TODO, warn
+    case _VSCGAction::Connect:
+      interface->SetNodeInputConnection(
+          nodeId, nodeInputId, {{upstreamNodeId, upstreamNodeOutput}});
       break;
-    }
-    VtValue value = chosenAction->value;
-    TfToken inputType = ndrProp->GetType();
-    if (value.IsHolding<std::string>())
-    {
-      if (inputType == SdrPropertyTypes->String)
-      {
-        interface->SetNodeParameterValue(nodeId, nodeInputId, value);
-        // node.parameters[nodeInput] = value;
-      }
-      else
-      {
-        TF_CODING_ERROR("MatfiltVstructConditionalEvaluator: "
-                        "Expected string but found %s\n",
-                        inputType.GetText());
-        break;
-      }
-    }
-    else if (value.IsHolding<double>())
-    {
-      // parser always stores numbers as double.
-      double doubleValue = value.UncheckedGet<double>();
-      VtValue resultValue;
-      if (inputType == SdrPropertyTypes->Int)
-      {
-        resultValue = VtValue(static_cast<int>(doubleValue));
-      }
-      else if (inputType == SdrPropertyTypes->Float)
-      {
-        resultValue = VtValue(static_cast<float>(doubleValue));
-      }
-      if (!resultValue.IsEmpty())
-      {
-        interface->SetNodeParameterValue(
-            nodeId, nodeInputId, resultValue);
-      }
-      else
-      {
-        TF_CODING_ERROR("MatfiltVstructConditionalEvaluator: "
-                        "Empty result");
-      }
-      break;
-    }
-    else
-    {
-      TF_CODING_ERROR("MatfiltVstructConditionalEvaluator: "
-                      "Unhandled type %s\n",
-                      value.GetTypeName().c_str());
-      break;
-    }
-    break;
-  }
-  case _VSCGAction::CopyParam:
-  {
-    if (chosenAction->value.IsHolding<TfToken>())
-    {
-      const TfToken &copyParamName =
-          chosenAction->value.UncheckedGet<TfToken>();
-      // confirm that parameter types are equivalent
-      // via Sdr
+    case _VSCGAction::SetConstant: {
+      // convert the constant to the expected type
       auto &reg = SdrRegistry::GetInstance();
-      SdrShaderNodeConstPtr sdrNode =
-          reg.GetShaderNodeByIdentifier(
-              interface->GetNodeType(nodeId), shaderTypePriority);
-      SdrShaderNodeConstPtr sdrUpstreamNode =
-          reg.GetShaderNodeByIdentifier(
-              interface->GetNodeType(upstreamNodeId),
-              shaderTypePriority);
-      if (!sdrNode || !sdrUpstreamNode)
-      {
-        // TODO warn?
+      SdrShaderNodeConstPtr sdrNode = reg.GetShaderNodeByIdentifier(interface->GetNodeType(nodeId),
+                                                                    shaderTypePriority);
+      if (!sdrNode) {
+        // TODO, warn
         break;
       }
-      NdrPropertyConstPtr ndrProp =
-          sdrNode->GetInput(nodeInputId);
-
-      NdrPropertyConstPtr ndrUpstreamProp =
-          sdrUpstreamNode->GetInput(copyParamName);
-
-      if (!ndrProp || !ndrUpstreamProp)
-      {
-        // TODO warn?
+      NdrPropertyConstPtr ndrProp = sdrNode->GetInput(nodeInputId);
+      if (!ndrProp) {
+        // TODO, warn
         break;
       }
-
-      // TODO, convert between int and float
-      if (ndrProp->GetType() == ndrUpstreamProp->GetType())
-      {
-
-        VtValue value =
-            interface->GetNodeParameterValue(
-                upstreamNodeId, copyParamName);
-
-        if (!value.IsEmpty())
-        {
-          interface->SetNodeParameterValue(
-              nodeId, nodeInputId, value);
+      VtValue value = chosenAction->value;
+      TfToken inputType = ndrProp->GetType();
+      if (value.IsHolding<std::string>()) {
+        if (inputType == SdrPropertyTypes->String) {
+          interface->SetNodeParameterValue(nodeId, nodeInputId, value);
+          // node.parameters[nodeInput] = value;
         }
-        else
-        {
-          // use default
-          interface->SetNodeParameterValue(
-              nodeId, nodeInputId, ndrUpstreamProp->GetDefaultValue());
+        else {
+          TF_CODING_ERROR(
+              "MatfiltVstructConditionalEvaluator: "
+              "Expected string but found %s\n",
+              inputType.GetText());
+          break;
         }
       }
-      else
-      {
-        // TODO warn?
+      else if (value.IsHolding<double>()) {
+        // parser always stores numbers as double.
+        double doubleValue = value.UncheckedGet<double>();
+        VtValue resultValue;
+        if (inputType == SdrPropertyTypes->Int) {
+          resultValue = VtValue(static_cast<int>(doubleValue));
+        }
+        else if (inputType == SdrPropertyTypes->Float) {
+          resultValue = VtValue(static_cast<float>(doubleValue));
+        }
+        if (!resultValue.IsEmpty()) {
+          interface->SetNodeParameterValue(nodeId, nodeInputId, resultValue);
+        }
+        else {
+          TF_CODING_ERROR(
+              "MatfiltVstructConditionalEvaluator: "
+              "Empty result");
+        }
+        break;
       }
+      else {
+        TF_CODING_ERROR(
+            "MatfiltVstructConditionalEvaluator: "
+            "Unhandled type %s\n",
+            value.GetTypeName().c_str());
+        break;
+      }
+      break;
     }
-    break;
-  }
+    case _VSCGAction::CopyParam: {
+      if (chosenAction->value.IsHolding<TfToken>()) {
+        const TfToken &copyParamName = chosenAction->value.UncheckedGet<TfToken>();
+        // confirm that parameter types are equivalent
+        // via Sdr
+        auto &reg = SdrRegistry::GetInstance();
+        SdrShaderNodeConstPtr sdrNode = reg.GetShaderNodeByIdentifier(
+            interface->GetNodeType(nodeId), shaderTypePriority);
+        SdrShaderNodeConstPtr sdrUpstreamNode = reg.GetShaderNodeByIdentifier(
+            interface->GetNodeType(upstreamNodeId), shaderTypePriority);
+        if (!sdrNode || !sdrUpstreamNode) {
+          // TODO warn?
+          break;
+        }
+        NdrPropertyConstPtr ndrProp = sdrNode->GetInput(nodeInputId);
+
+        NdrPropertyConstPtr ndrUpstreamProp = sdrUpstreamNode->GetInput(copyParamName);
+
+        if (!ndrProp || !ndrUpstreamProp) {
+          // TODO warn?
+          break;
+        }
+
+        // TODO, convert between int and float
+        if (ndrProp->GetType() == ndrUpstreamProp->GetType()) {
+
+          VtValue value = interface->GetNodeParameterValue(upstreamNodeId, copyParamName);
+
+          if (!value.IsEmpty()) {
+            interface->SetNodeParameterValue(nodeId, nodeInputId, value);
+          }
+          else {
+            // use default
+            interface->SetNodeParameterValue(
+                nodeId, nodeInputId, ndrUpstreamProp->GetDefaultValue());
+          }
+        }
+        else {
+          // TODO warn?
+        }
+      }
+      break;
+    }
   }
   // TODO
 }

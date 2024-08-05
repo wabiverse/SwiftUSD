@@ -34,9 +34,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceEventTreeRefPtr
-TraceEventTree::New(const TraceCollection &collection,
-                    const CounterMap *initialCounterValues) {
+TraceEventTreeRefPtr TraceEventTree::New(const TraceCollection &collection,
+                                         const CounterMap *initialCounterValues)
+{
   Trace_EventTreeBuilder graphBuilder;
   if (initialCounterValues) {
     graphBuilder.SetCounterValues(*initialCounterValues);
@@ -45,24 +45,26 @@ TraceEventTree::New(const TraceCollection &collection,
   return graphBuilder.GetTree();
 }
 
-TraceEventTreeRefPtr TraceEventTree::Add(const TraceCollection &collection) {
+TraceEventTreeRefPtr TraceEventTree::Add(const TraceCollection &collection)
+{
   CounterMap currentCounters = GetFinalCounterValues();
   TraceEventTreeRefPtr newGraph = New(collection, &currentCounters);
   Merge(newGraph);
   return newGraph;
 }
 
-void TraceEventTree::Merge(const TraceEventTreeRefPtr &tree) {
+void TraceEventTree::Merge(const TraceEventTreeRefPtr &tree)
+{
   // Add the node to the tree.
   for (TraceEventNodeRefPtr newThreadNode : tree->GetRoot()->GetChildrenRef()) {
 
     const TraceEventNodeRefPtrVector &threadNodes = _root->GetChildrenRef();
 
     // Find if the tree already has a node for child thread.
-    auto it = std::find_if(threadNodes.begin(), threadNodes.end(),
-                           [&](const TraceEventNodeRefPtr &node) {
-                             return node->GetKey() == newThreadNode->GetKey();
-                           });
+    auto it = std::find_if(
+        threadNodes.begin(), threadNodes.end(), [&](const TraceEventNodeRefPtr &node) {
+          return node->GetKey() == newThreadNode->GetKey();
+        });
 
     if (it != threadNodes.end()) {
       // Add the nodes thread children from child into the current tree.
@@ -71,7 +73,8 @@ void TraceEventTree::Merge(const TraceEventTreeRefPtr &tree) {
       }
       // Update the thread times from the newly added children.
       (*it)->SetBeginAndEndTimesFromChildren();
-    } else {
+    }
+    else {
       // Add the thread if it wasn't already in the tree.
       _root->Append(newThreadNode);
     }
@@ -83,12 +86,12 @@ void TraceEventTree::Merge(const TraceEventTreeRefPtr &tree) {
     if (it == _counters.end()) {
       // Add new counter values;
       _counters.insert(p);
-    } else {
+    }
+    else {
       // Merge new counter values to existing counter values.
       const size_t originalSize = it->second.size();
       it->second.insert(it->second.end(), p.second.begin(), p.second.end());
-      std::inplace_merge(it->second.begin(), it->second.begin() + originalSize,
-                         it->second.end());
+      std::inplace_merge(it->second.begin(), it->second.begin() + originalSize, it->second.end());
     }
   }
 
@@ -98,17 +101,18 @@ void TraceEventTree::Merge(const TraceEventTreeRefPtr &tree) {
     if (it == _markers.end()) {
       // Add new markers values;
       _markers.insert(p);
-    } else {
+    }
+    else {
       // Merge new marker values to existing marker values.
       const size_t originalSize = it->second.size();
       it->second.insert(it->second.end(), p.second.begin(), p.second.end());
-      std::inplace_merge(it->second.begin(), it->second.begin() + originalSize,
-                         it->second.end());
+      std::inplace_merge(it->second.begin(), it->second.begin() + originalSize, it->second.end());
     }
   }
 }
 
-static double _TimeStampToChromeTraceValue(TraceEvent::TimeStamp t) {
+static double _TimeStampToChromeTraceValue(TraceEvent::TimeStamp t)
+{
   // Chrome trace format uses timestamps in microseconds.
   return ArchTicksToNanoseconds(t) / 1000.0;
 }
@@ -117,12 +121,13 @@ static double _TimeStampToChromeTraceValue(TraceEvent::TimeStamp t) {
 static void TraceEventTree_WriteToJsonArray(const TraceEventNodeRefPtr &node,
                                             const int pid,
                                             const TraceThreadId &threadId,
-                                            JsWriter &js) {
+                                            JsWriter &js)
+{
   std::string categoryList("");
 
   // Add begin time
-  std::vector<std::string> catList =
-      TraceCategory::GetInstance().GetCategories(node->GetCategory());
+  std::vector<std::string> catList = TraceCategory::GetInstance().GetCategories(
+      node->GetCategory());
   for (const std::string &catName : catList) {
     if (categoryList.length() > 0) {
       categoryList.append(",");
@@ -132,8 +137,7 @@ static void TraceEventTree_WriteToJsonArray(const TraceEventNodeRefPtr &node,
   auto writeCommonEventData = [&]() {
     js.BeginObject();
     js.WriteKeyValue("cat", categoryList);
-    js.WriteKeyValue("libTraceCatId",
-                     static_cast<uint64_t>(node->GetCategory()));
+    js.WriteKeyValue("libTraceCatId", static_cast<uint64_t>(node->GetCategory()));
     js.WriteKeyValue("pid", pid);
     js.WriteKeyValue("tid", threadId.ToString());
     js.WriteKeyValue("name", node->GetKey().GetString());
@@ -156,11 +160,11 @@ static void TraceEventTree_WriteToJsonArray(const TraceEventNodeRefPtr &node,
         if (std::distance(range.first, range.second) == 1) {
           js.WriteKey(range.first->first.GetString());
           range.first->second.WriteJson(js);
-        } else {
+        }
+        else {
           js.WriteKey(it.first.GetString());
-          js.WriteArray(range.first, range.second, [](JsWriter &js, AttrItr i) {
-            i->second.WriteJson(js);
-          });
+          js.WriteArray(
+              range.first, range.second, [](JsWriter &js, AttrItr i) { i->second.WriteJson(js); });
         }
       }
     }
@@ -168,16 +172,17 @@ static void TraceEventTree_WriteToJsonArray(const TraceEventNodeRefPtr &node,
   }
 
   if (!node->IsFromSeparateEvents()) {
-    js.WriteKeyValue("ph", "X"); // Complete event
-    js.WriteKeyValue("dur", _TimeStampToChromeTraceValue(node->GetEndTime() -
-                                                         node->GetBeginTime()));
+    js.WriteKeyValue("ph", "X");  // Complete event
+    js.WriteKeyValue("dur",
+                     _TimeStampToChromeTraceValue(node->GetEndTime() - node->GetBeginTime()));
     js.EndObject();
-  } else {
-    js.WriteKeyValue("ph", "B"); // begin event
+  }
+  else {
+    js.WriteKeyValue("ph", "B");  // begin event
     js.EndObject();
 
     writeCommonEventData();
-    js.WriteKeyValue("ph", "E"); // end event
+    js.WriteKeyValue("ph", "E");  // end event
     js.WriteKeyValue("ts", _TimeStampToChromeTraceValue(node->GetEndTime()));
     js.EndObject();
   }
@@ -189,41 +194,61 @@ static void TraceEventTree_WriteToJsonArray(const TraceEventNodeRefPtr &node,
 }
 
 // Writes Chrome counter events to the events array.
-static void
-TraceEventTree_WriteCounters(const int pid,
-                             const TraceEventTree::CounterValuesMap &counters,
-                             JsWriter &js) {
+static void TraceEventTree_WriteCounters(const int pid,
+                                         const TraceEventTree::CounterValuesMap &counters,
+                                         JsWriter &js)
+{
   for (const TraceEventTree::CounterValuesMap::value_type &c : counters) {
     for (const TraceEventTree::CounterValues::value_type &v : c.second) {
 
-      js.WriteObject("cat", "",
+      js.WriteObject("cat",
+                     "",
                      // Chrome counters are process scoped so the thread id does
                      // not seem to have an impact.
-                     "tid", 0, "pid", pid, "name", c.first.GetString(), "ph",
-                     "C", "ts", _TimeStampToChromeTraceValue(v.first), "args",
+                     "tid",
+                     0,
+                     "pid",
+                     pid,
+                     "name",
+                     c.first.GetString(),
+                     "ph",
+                     "C",
+                     "ts",
+                     _TimeStampToChromeTraceValue(v.first),
+                     "args",
                      [&v](JsWriter &js) { js.WriteObject("value", v.second); });
     }
   }
 }
 
 // Writes Chrome instant events to the events array.
-static void
-TraceEventTree_WriteMarkers(const int pid,
-                            const TraceEventTree::MarkerValuesMap &markers,
-                            JsWriter &js) {
+static void TraceEventTree_WriteMarkers(const int pid,
+                                        const TraceEventTree::MarkerValuesMap &markers,
+                                        JsWriter &js)
+{
   for (const TraceEventTree::MarkerValuesMap::value_type &m : markers) {
     for (const TraceEventTree::MarkerValues::value_type &v : m.second) {
 
-      js.WriteObject("cat", "", "tid", v.second.ToString(), "pid", pid, "name",
-                     m.first.GetString(), "ph", "I", // Mark
-                     "s", "t",                       // Scope
-                     "ts", _TimeStampToChromeTraceValue(v.first));
+      js.WriteObject("cat",
+                     "",
+                     "tid",
+                     v.second.ToString(),
+                     "pid",
+                     pid,
+                     "name",
+                     m.first.GetString(),
+                     "ph",
+                     "I",  // Mark
+                     "s",
+                     "t",  // Scope
+                     "ts",
+                     _TimeStampToChromeTraceValue(v.first));
     }
   }
 }
 
-void TraceEventTree::WriteChromeTraceObject(JsWriter &writer,
-                                            ExtraFieldFn extraFields) const {
+void TraceEventTree::WriteChromeTraceObject(JsWriter &writer, ExtraFieldFn extraFields) const
+{
   writer.BeginObject();
   writer.WriteKey("traceEvents");
   writer.BeginArray();
@@ -252,7 +277,8 @@ void TraceEventTree::WriteChromeTraceObject(JsWriter &writer,
   writer.EndObject();
 }
 
-TraceEventTree::CounterMap TraceEventTree::GetFinalCounterValues() const {
+TraceEventTree::CounterMap TraceEventTree::GetFinalCounterValues() const
+{
   CounterMap finalValues;
 
   for (const CounterValuesMap::value_type &p : _counters) {

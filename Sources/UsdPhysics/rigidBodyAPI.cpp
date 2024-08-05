@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsRigidBodyAPI,
-                 TfType::Bases<UsdAPISchemaBase>>();
+  TfType::Define<UsdPhysicsRigidBodyAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdPhysicsRigidBodyAPI::~UsdPhysicsRigidBodyAPI()
-{
-}
+UsdPhysicsRigidBodyAPI::~UsdPhysicsRigidBodyAPI() {}
 
 /* static */
-UsdPhysicsRigidBodyAPI
-UsdPhysicsRigidBodyAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsRigidBodyAPI UsdPhysicsRigidBodyAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsRigidBodyAPI();
   }
@@ -61,26 +56,22 @@ UsdSchemaKind UsdPhysicsRigidBodyAPI::_GetSchemaKind() const
 }
 
 /* static */
-bool UsdPhysicsRigidBodyAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdPhysicsRigidBodyAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
   return prim.CanApplyAPI<UsdPhysicsRigidBodyAPI>(whyNot);
 }
 
 /* static */
-UsdPhysicsRigidBodyAPI
-UsdPhysicsRigidBodyAPI::Apply(const UsdPrim &prim)
+UsdPhysicsRigidBodyAPI UsdPhysicsRigidBodyAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdPhysicsRigidBodyAPI>())
-  {
+  if (prim.ApplyAPI<UsdPhysicsRigidBodyAPI>()) {
     return UsdPhysicsRigidBodyAPI(prim);
   }
   return UsdPhysicsRigidBodyAPI();
 }
 
 /* static */
-const TfType &
-UsdPhysicsRigidBodyAPI::_GetStaticTfType()
+const TfType &UsdPhysicsRigidBodyAPI::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdPhysicsRigidBodyAPI>();
   return tfType;
@@ -94,20 +85,18 @@ bool UsdPhysicsRigidBodyAPI::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsRigidBodyAPI::_GetTfType() const
+const TfType &UsdPhysicsRigidBodyAPI::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::GetRigidBodyEnabledAttr() const
+UsdAttribute UsdPhysicsRigidBodyAPI::GetRigidBodyEnabledAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsRigidBodyEnabled);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::CreateRigidBodyEnabledAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsRigidBodyAPI::CreateRigidBodyEnabledAttr(VtValue const &defaultValue,
+                                                                bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsRigidBodyEnabled,
                                     SdfValueTypeNames->Bool,
@@ -117,14 +106,13 @@ UsdPhysicsRigidBodyAPI::CreateRigidBodyEnabledAttr(VtValue const &defaultValue, 
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::GetKinematicEnabledAttr() const
+UsdAttribute UsdPhysicsRigidBodyAPI::GetKinematicEnabledAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsKinematicEnabled);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::CreateKinematicEnabledAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsRigidBodyAPI::CreateKinematicEnabledAttr(VtValue const &defaultValue,
+                                                                bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsKinematicEnabled,
                                     SdfValueTypeNames->Bool,
@@ -134,14 +122,13 @@ UsdPhysicsRigidBodyAPI::CreateKinematicEnabledAttr(VtValue const &defaultValue, 
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::GetStartsAsleepAttr() const
+UsdAttribute UsdPhysicsRigidBodyAPI::GetStartsAsleepAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsStartsAsleep);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::CreateStartsAsleepAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsRigidBodyAPI::CreateStartsAsleepAttr(VtValue const &defaultValue,
+                                                            bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsStartsAsleep,
                                     SdfValueTypeNames->Bool,
@@ -151,14 +138,13 @@ UsdPhysicsRigidBodyAPI::CreateStartsAsleepAttr(VtValue const &defaultValue, bool
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::GetVelocityAttr() const
+UsdAttribute UsdPhysicsRigidBodyAPI::GetVelocityAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsVelocity);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::CreateVelocityAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsRigidBodyAPI::CreateVelocityAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsVelocity,
                                     SdfValueTypeNames->Vector3f,
@@ -168,14 +154,13 @@ UsdPhysicsRigidBodyAPI::CreateVelocityAttr(VtValue const &defaultValue, bool wri
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::GetAngularVelocityAttr() const
+UsdAttribute UsdPhysicsRigidBodyAPI::GetAngularVelocityAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsAngularVelocity);
 }
 
-UsdAttribute
-UsdPhysicsRigidBodyAPI::CreateAngularVelocityAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsRigidBodyAPI::CreateAngularVelocityAttr(VtValue const &defaultValue,
+                                                               bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsAngularVelocity,
                                     SdfValueTypeNames->Vector3f,
@@ -185,35 +170,31 @@ UsdPhysicsRigidBodyAPI::CreateAngularVelocityAttr(VtValue const &defaultValue, b
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdPhysicsRigidBodyAPI::GetSimulationOwnerRel() const
+UsdRelationship UsdPhysicsRigidBodyAPI::GetSimulationOwnerRel() const
 {
   return GetPrim().GetRelationship(UsdPhysicsTokens->physicsSimulationOwner);
 }
 
-UsdRelationship
-UsdPhysicsRigidBodyAPI::CreateSimulationOwnerRel() const
+UsdRelationship UsdPhysicsRigidBodyAPI::CreateSimulationOwnerRel() const
 {
   return GetPrim().CreateRelationship(UsdPhysicsTokens->physicsSimulationOwner,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdPhysicsRigidBodyAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdPhysicsRigidBodyAPI::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdPhysicsTokens->physicsRigidBodyEnabled,
@@ -222,10 +203,8 @@ UsdPhysicsRigidBodyAPI::GetSchemaAttributeNames(bool includeInherited)
       UsdPhysicsTokens->physicsVelocity,
       UsdPhysicsTokens->physicsAngularVelocity,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdAPISchemaBase::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;
@@ -244,28 +223,25 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-#include "UsdPhysics/massProperties.h"
-#include "UsdPhysics/massAPI.h"
+#include "Gf/transform.h"
+#include "Usd/primRange.h"
+#include "UsdGeom/metrics.h"
+#include "UsdGeom/xformCache.h"
 #include "UsdPhysics/collisionAPI.h"
+#include "UsdPhysics/massAPI.h"
+#include "UsdPhysics/massProperties.h"
 #include "UsdPhysics/materialAPI.h"
 #include "UsdPhysics/metrics.h"
-#include "UsdGeom/xformCache.h"
-#include "UsdGeom/metrics.h"
-#include "Usd/primRange.h"
-#include "Gf/transform.h"
-#include "UsdShade/materialBindingAPI.h"
 #include "UsdShade/material.h"
+#include "UsdShade/materialBindingAPI.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _physicsPurposeTokens,
-    ((materialPurposePhysics, "physics")));
+TF_DEFINE_PRIVATE_TOKENS(_physicsPurposeTokens, ((materialPurposePhysics, "physics")));
 
 const float COMPARE_TOLERANCE = 1e-05f;
 
-struct _MassApiData
-{
+struct _MassApiData {
   float mass = -1.0f;
   float density = -1.0f;
   bool hasInertia = false;
@@ -279,8 +255,7 @@ _MassApiData _ParseMassApi(const UsdPrim &usdPrim)
 {
   _MassApiData result;
 
-  if (usdPrim.HasAPI<UsdPhysicsMassAPI>())
-  {
+  if (usdPrim.HasAPI<UsdPhysicsMassAPI>()) {
     // density
     const UsdPhysicsMassAPI massAPI(usdPrim);
     const UsdAttribute densityAttribute = massAPI.GetDensityAttr();
@@ -292,15 +267,13 @@ _MassApiData _ParseMassApi(const UsdPrim &usdPrim)
 
     float m;
     massAttribute.Get(&m);
-    if (m > 0.0f)
-    {
+    if (m > 0.0f) {
       result.mass = m;
     }
 
     GfVec3f dg;
     diagonalInertia.Get(&dg);
-    if (!GfIsClose(dg, GfVec3f(0.0f), COMPARE_TOLERANCE))
-    {
+    if (!GfIsClose(dg, GfVec3f(0.0f), COMPARE_TOLERANCE)) {
       result.hasInertia = true;
       result.diagonalInertia = dg;
     }
@@ -308,7 +281,8 @@ _MassApiData _ParseMassApi(const UsdPrim &usdPrim)
     // 0 0 0 0 is the sentinel value
     GfQuatf pa;
     principalAxes.Get(&pa);
-    if (!GfIsClose(pa.GetImaginary(), GfVec3f(0.0f), COMPARE_TOLERANCE) || fabsf(pa.GetReal()) > COMPARE_TOLERANCE)
+    if (!GfIsClose(pa.GetImaginary(), GfVec3f(0.0f), COMPARE_TOLERANCE) ||
+        fabsf(pa.GetReal()) > COMPARE_TOLERANCE)
     {
       result.hasPa = true;
       result.principalAxes = pa;
@@ -321,8 +295,7 @@ _MassApiData _ParseMassApi(const UsdPrim &usdPrim)
 bool _GetCoM(const UsdPrim &usdPrim, GfVec3f *com, UsdGeomXformCache *xfCache)
 {
   bool comSet = false;
-  if (usdPrim.HasAPI<UsdPhysicsMassAPI>())
-  {
+  if (usdPrim.HasAPI<UsdPhysicsMassAPI>()) {
     // com
     const UsdPhysicsMassAPI massAPI(usdPrim);
     const UsdAttribute comAttribute = massAPI.GetCenterOfMassAttr();
@@ -331,8 +304,7 @@ bool _GetCoM(const UsdPrim &usdPrim, GfVec3f *com, UsdGeomXformCache *xfCache)
     comAttribute.Get(&v);
 
     // -inf -inf -inf is the sentinel value, though any inf works
-    if (isfinite(v[0]) && isfinite(v[1]) && isfinite(v[2]))
-    {
+    if (isfinite(v[0]) && isfinite(v[1]) && isfinite(v[2])) {
       // need to extract scale as physics in general does not support scale,
       // we need to scale the com
       GfMatrix4d mat = xfCache->GetLocalToWorldTransform(usdPrim);
@@ -349,26 +321,25 @@ bool _GetCoM(const UsdPrim &usdPrim, GfVec3f *com, UsdGeomXformCache *xfCache)
 
 // get density form a collision prim, it will also check its materials eventually
 _MassApiData _GetCollisionShapeMassAPIData(const UsdPhysicsCollisionAPI &collisionAPI,
-                                           float bodyDensity, float *density, const UsdShadeMaterial &materialPrim)
+                                           float bodyDensity,
+                                           float *density,
+                                           const UsdShadeMaterial &materialPrim)
 {
 
   _MassApiData shapeMassInfo = _ParseMassApi(collisionAPI.GetPrim());
-  if (shapeMassInfo.density <= 0.0)
-  {
+  if (shapeMassInfo.density <= 0.0) {
     // use parent density if shape doesn't have one specified
     shapeMassInfo.density = bodyDensity;
   }
 
   // handle material
   *density = shapeMassInfo.density;
-  if (shapeMassInfo.density <= 0.0f) // density not set, so we take it from the materials
+  if (shapeMassInfo.density <= 0.0f)  // density not set, so we take it from the materials
   {
-    if (materialPrim)
-    {
+    if (materialPrim) {
       const UsdPhysicsMaterialAPI materialAPI = UsdPhysicsMaterialAPI(materialPrim.GetPrim());
 
-      if (materialAPI)
-      {
+      if (materialAPI) {
         UsdAttribute densityAttr = materialAPI.GetDensityAttr();
         densityAttr.Get(density);
       }
@@ -379,19 +350,21 @@ _MassApiData _GetCollisionShapeMassAPIData(const UsdPhysicsCollisionAPI &collisi
 }
 
 // gather mass information for given collision shape
-UsdPhysicsMassProperties _ParseCollisionShapeForMass(const UsdPrim &prim,
-                                                     const _MassApiData &inShapeMassInfo, float density, GfMatrix4f *transform,
-                                                     UsdGeomXformCache *xformCache, const UsdPhysicsRigidBodyAPI::MassInformationFn &massInfoFn)
+UsdPhysicsMassProperties _ParseCollisionShapeForMass(
+    const UsdPrim &prim,
+    const _MassApiData &inShapeMassInfo,
+    float density,
+    GfMatrix4f *transform,
+    UsdGeomXformCache *xformCache,
+    const UsdPhysicsRigidBodyAPI::MassInformationFn &massInfoFn)
 {
   _MassApiData shapeMassInfo = inShapeMassInfo;
 
   // Get the actuall mass information for the prim
   UsdPhysicsRigidBodyAPI::MassInformation massInfo = massInfoFn(prim);
-  if (massInfo.volume < 0.0f)
-  {
-    TF_DIAGNOSTIC_WARNING(
-        "Provided mass information not valid for a prim %s.",
-        prim.GetPrimPath().GetString().c_str());
+  if (massInfo.volume < 0.0f) {
+    TF_DIAGNOSTIC_WARNING("Provided mass information not valid for a prim %s.",
+                          prim.GetPrimPath().GetString().c_str());
 
     return UsdPhysicsMassProperties();
   }
@@ -399,8 +372,7 @@ UsdPhysicsMassProperties _ParseCollisionShapeForMass(const UsdPrim &prim,
   GfMatrix3f inertia = massInfo.inertia;
 
   // if no density was set, use default based on units
-  if (density <= 0.0f)
-  {
+  if (density <= 0.0f) {
     // default density 1000.0 kg / meters * meters * meters
     float metersPerUnit = float(UsdGeomGetStageMetersPerUnit(prim.GetStage()));
     float kgPerUnit = float(UsdPhysicsGetStageKilogramsPerUnit(prim.GetStage()));
@@ -412,20 +384,17 @@ UsdPhysicsMassProperties _ParseCollisionShapeForMass(const UsdPrim &prim,
   const bool hasCoM = _GetCoM(prim, &centerOfMass, xformCache);
 
   // we have a collider mass override
-  if (shapeMassInfo.mass > 0.0f)
-  {
+  if (shapeMassInfo.mass > 0.0f) {
     inertia = inertia * (shapeMassInfo.mass / massInfo.volume);
   }
-  else if (massInfo.volume >= 0.0f)
-  {
+  else if (massInfo.volume >= 0.0f) {
     // we dont have mass compute it based on the collision volume
     shapeMassInfo.mass = massInfo.volume * density;
     inertia = inertia * density;
   }
 
   // inertia was provided, update the inertia data
-  if (shapeMassInfo.hasInertia)
-  {
+  if (shapeMassInfo.hasInertia) {
     const GfMatrix3f rotMatr(principalAxes);
     GfMatrix3f inMatr(0.0f);
     inMatr[0][0] = shapeMassInfo.diagonalInertia[0];
@@ -435,16 +404,13 @@ UsdPhysicsMassProperties _ParseCollisionShapeForMass(const UsdPrim &prim,
     inertia = inMatr * rotMatr;
   }
 
-  if (shapeMassInfo.hasPa)
-  {
+  if (shapeMassInfo.hasPa) {
     inertia = UsdPhysicsMassProperties::RotateInertia(inertia, shapeMassInfo.principalAxes);
   }
 
   // center of mass provided, update the inertia
-  if (hasCoM)
-  {
-    if (!shapeMassInfo.hasInertia)
-    {
+  if (hasCoM) {
+    if (!shapeMassInfo.hasInertia) {
       // update inertia if we override the CoM but use the computed inertia
       UsdPhysicsMassProperties massProps(shapeMassInfo.mass, inertia, massInfo.centerOfMass);
       massProps.Translate(centerOfMass - massProps.GetCenterOfMass());
@@ -463,7 +429,9 @@ UsdPhysicsMassProperties _ParseCollisionShapeForMass(const UsdPrim &prim,
 
 // compute mass properties for given rigid body
 float UsdPhysicsRigidBodyAPI::ComputeMassProperties(GfVec3f *_diagonalInertia,
-                                                    GfVec3f *_com, GfQuatf *_principalAxes, const MassInformationFn &massInfoFn) const
+                                                    GfVec3f *_com,
+                                                    GfQuatf *_principalAxes,
+                                                    const MassInformationFn &massInfoFn) const
 {
   UsdPhysicsMassProperties massProps;
 
@@ -488,8 +456,7 @@ float UsdPhysicsRigidBodyAPI::ComputeMassProperties(GfVec3f *_diagonalInertia,
 
   // if we dont have enough mass information, we need to traverse collisions
   // to gather final mass information
-  if (accumulateMass || !rigidBodyMassInfo.hasInertia || !hasCoM)
-  {
+  if (accumulateMass || !rigidBodyMassInfo.hasInertia || !hasCoM) {
     std::vector<UsdPhysicsMassProperties> massProps;
     std::vector<GfMatrix4f> massTransf;
     std::vector<UsdPrim> collisionPrims;
@@ -497,98 +464,86 @@ float UsdPhysicsRigidBodyAPI::ComputeMassProperties(GfVec3f *_diagonalInertia,
     // traverse all collisions below this body and get their collision information
     // first gather all collisions
     UsdPrimRange range(usdPrim);
-    for (auto it = range.begin(); it != range.end(); ++it)
-    {
+    for (auto it = range.begin(); it != range.end(); ++it) {
       UsdPrim collisionPrim = *it;
-      if (collisionPrim && collisionPrim.HasAPI<UsdPhysicsCollisionAPI>())
-      {
+      if (collisionPrim && collisionPrim.HasAPI<UsdPhysicsCollisionAPI>()) {
         collisionPrims.push_back(std::move(collisionPrim));
       }
     }
 
     // get materials for all prims
     std::vector<UsdShadeMaterial> physicsMaterials =
-        UsdShadeMaterialBindingAPI::ComputeBoundMaterials(collisionPrims, _physicsPurposeTokens->materialPurposePhysics);
-    for (UsdShadeMaterial &material : physicsMaterials)
-    {
-      if (material && !material.GetPrim().HasAPI<UsdPhysicsMaterialAPI>())
-      {
+        UsdShadeMaterialBindingAPI::ComputeBoundMaterials(
+            collisionPrims, _physicsPurposeTokens->materialPurposePhysics);
+    for (UsdShadeMaterial &material : physicsMaterials) {
+      if (material && !material.GetPrim().HasAPI<UsdPhysicsMaterialAPI>()) {
         material = UsdShadeMaterial();
       }
     }
 
-    for (size_t i = 0; i < collisionPrims.size(); i++)
-    {
+    for (size_t i = 0; i < collisionPrims.size(); i++) {
       const UsdPrim &collisionPrim = collisionPrims[i];
       const UsdPhysicsCollisionAPI collisionAPI(collisionPrim);
       float shapeDensity = 0.0f;
 
-      _MassApiData _MassApiData =
-          _GetCollisionShapeMassAPIData(collisionAPI, rigidBodyMassInfo.density, &shapeDensity, physicsMaterials[i]);
+      _MassApiData _MassApiData = _GetCollisionShapeMassAPIData(
+          collisionAPI, rigidBodyMassInfo.density, &shapeDensity, physicsMaterials[i]);
 
       GfMatrix4f matrix;
-      massProps.push_back(_ParseCollisionShapeForMass(collisionPrim, _MassApiData, shapeDensity, &matrix, &xfCache, massInfoFn));
+      massProps.push_back(_ParseCollisionShapeForMass(
+          collisionPrim, _MassApiData, shapeDensity, &matrix, &xfCache, massInfoFn));
       massTransf.push_back(matrix);
     }
 
-    if (!massProps.empty())
-    {
+    if (!massProps.empty()) {
       // compute accumulated mass properties from all gathered collisions
-      UsdPhysicsMassProperties accumulatedMassProps =
-          UsdPhysicsMassProperties::Sum(massProps.data(), massTransf.data(), uint32_t(massProps.size()));
+      UsdPhysicsMassProperties accumulatedMassProps = UsdPhysicsMassProperties::Sum(
+          massProps.data(), massTransf.data(), uint32_t(massProps.size()));
 
       // if we had to compute mass, set the new mass
-      if (accumulateMass)
-      {
+      if (accumulateMass) {
         outMass = accumulatedMassProps.GetMass();
       }
-      else
-      {
+      else {
         // otherwise scale inertia based on the given body mass
         const float massDiff = outMass / accumulatedMassProps.GetMass();
         accumulatedMassProps.SetMass(outMass);
         accumulatedMassProps.SetInertiaTensor(accumulatedMassProps.GetInertiaTensor() * massDiff);
       }
 
-      if (!hasCoM)
-      {
+      if (!hasCoM) {
         // get CoM from the accumulated props
         outCenterOfMass = accumulatedMassProps.GetCenterOfMass();
       }
-      else
-      {
+      else {
         // otherwise translae the mass props by given body CoM
         accumulatedMassProps.Translate(outCenterOfMass - accumulatedMassProps.GetCenterOfMass());
       }
 
       GfQuatf accPa;
-      const GfVec3f accInertia = UsdPhysicsMassProperties::GetMassSpaceInertia(accumulatedMassProps.GetInertiaTensor(), accPa);
+      const GfVec3f accInertia = UsdPhysicsMassProperties::GetMassSpaceInertia(
+          accumulatedMassProps.GetInertiaTensor(), accPa);
 
       // check for inertia override
-      if (!rigidBodyMassInfo.hasInertia)
-      {
+      if (!rigidBodyMassInfo.hasInertia) {
         // if no inertia was given to the rigid body get the accumulated inertia
         outDiagonalizedInertiaTensor = accInertia;
       }
 
-      if (!hasPa)
-      {
+      if (!hasPa) {
         // if no prinicipal axes were given to the rigid body get the accumulated one
         outPrincipalAxes = accPa;
       }
     }
-    else
-    {
+    else {
       // no shape provided check inertia
-      if (!rigidBodyMassInfo.hasInertia)
-      {
+      if (!rigidBodyMassInfo.hasInertia) {
         // In the absence of collision shapes and a specified inertia tensor, approximate
         // the tensor using a sphere. If the mass is not specified
         // throw a warning instead. Equation for spherical intertial tensor is (2/5 or
         // 0.4)*mass*radius^2, where we use 0.1 radius to imitate point.
 
-        if (outMass > 0.0f)
-        {
+        if (outMass > 0.0f) {
           const float metersPerUnit = float(UsdGeomGetStageMetersPerUnit(stage));
           const float radius = 0.1f / metersPerUnit;
           const float inertiaVal = 0.4f * outMass * radius * radius;
@@ -596,35 +551,38 @@ float UsdPhysicsRigidBodyAPI::ComputeMassProperties(GfVec3f *_diagonalInertia,
           outDiagonalizedInertiaTensor[1] = inertiaVal;
           outDiagonalizedInertiaTensor[2] = inertiaVal;
           TF_DIAGNOSTIC_WARNING(
-              "The rigid body at %s has a possibly invalid inertia tensor of {1.0, 1.0, 1.0}, small sphere approximated inertia was used. %s %s",
+              "The rigid body at %s has a possibly invalid inertia tensor of {1.0, 1.0, 1.0}, "
+              "small sphere approximated inertia was used. %s %s",
               usdPrim.GetPrimPath().GetString().c_str(),
-              "Either specify correct values in the mass properties, or add collider(s) to any shape(s) that you wish to automatically compute mass properties for.",
-              "If you do not want the objects to collide, add colliders regardless then disable the 'enable collision' property.");
+              "Either specify correct values in the mass properties, or add collider(s) to any "
+              "shape(s) that you wish to automatically compute mass properties for.",
+              "If you do not want the objects to collide, add colliders regardless then disable "
+              "the 'enable collision' property.");
         }
-        else
-        {
+        else {
           TF_DIAGNOSTIC_WARNING(
-              "The rigid body at %s has a possibly invalid inertia tensor of {1.0, 1.0, 1.0}%s. %s %s",
-              usdPrim.GetPrimPath().GetString().c_str(), (outMass < 0.0f) ? " and a negative mass" : "",
-              "Either specify correct values in the mass properties, or add collider(s) to any shape(s) that you wish to automatically compute mass properties for.",
-              "If you do not want the objects to collide, add colliders regardless then disable the 'enable collision' property.");
+              "The rigid body at %s has a possibly invalid inertia tensor of {1.0, 1.0, 1.0}%s. "
+              "%s %s",
+              usdPrim.GetPrimPath().GetString().c_str(),
+              (outMass < 0.0f) ? " and a negative mass" : "",
+              "Either specify correct values in the mass properties, or add collider(s) to any "
+              "shape(s) that you wish to automatically compute mass properties for.",
+              "If you do not want the objects to collide, add colliders regardless then disable "
+              "the 'enable collision' property.");
         }
       }
     }
   }
 
-  if (_com)
-  {
+  if (_com) {
     *_com = outCenterOfMass;
   }
 
-  if (_diagonalInertia)
-  {
+  if (_diagonalInertia) {
     *_diagonalInertia = outDiagonalizedInertiaTensor;
   }
 
-  if (_principalAxes)
-  {
+  if (_principalAxes) {
     *_principalAxes = outPrincipalAxes;
   }
   return outMass;

@@ -45,7 +45,7 @@ class UsdResolveTarget;
 /// a mechanism for walking the composition structure in strong-to-weak order.
 ///
 class Usd_Resolver {
-public:
+ public:
   /// Constructs a resolver with the given \p index. The index is
   /// held for the duration of the resolver's lifetime. If \p skipEmptyNodes
   /// is \c true, the resolver will skip over nodes that provide no opinions
@@ -61,15 +61,17 @@ public:
   /// represented by \p index. Otherwise, the resolver will visit all
   /// non-inert nodes in the index.
   USD_API
-  explicit Usd_Resolver(const UsdResolveTarget *resolveTarget,
-                        bool skipEmptyNodes = true);
+  explicit Usd_Resolver(const UsdResolveTarget *resolveTarget, bool skipEmptyNodes = true);
 
   /// Returns true when there is a current Node and Layer.
   ///
   /// The resolver must be known to be valid before calling any of the
   /// accessor or iteration functions, otherwise the behavior will be
   /// undefined.
-  bool IsValid() const { return _curNode != _endNode; }
+  bool IsValid() const
+  {
+    return _curNode != _endNode;
+  }
 
   /// Advances the resolver to the next weaker Layer in the layer
   /// stack, if the current LayerStack has no more layers, the resolver will
@@ -97,7 +99,10 @@ public:
   /// individual layers must be inspected in the common case.
   ///
   /// The behavior is undefined if the resolver is not valid.
-  PcpNodeRef GetNode() const { return *_curNode; }
+  PcpNodeRef GetNode() const
+  {
+    return *_curNode;
+  }
 
   /// Returns the current layer for the current PcpNode for a valid resolver.
   ///
@@ -106,30 +111,39 @@ public:
   /// PERFORMANCE: This returns a const-ref to avoid ref-count bumps during
   /// resolution. This is safe under the assumption that no changes will occur
   /// during resolution and that the lifetime of this object will be short.
-  const SdfLayerRefPtr &GetLayer() const { return *_curLayer; }
+  const SdfLayerRefPtr &GetLayer() const
+  {
+    return *_curLayer;
+  }
 
   /// Returns a translated path for the current PcpNode and Layer for a valid
   /// resolver.
   ///
   /// The behavior is undefined if the resolver is not valid.
-  const SdfPath &GetLocalPath() const { return _curNode->GetPath(); }
+  const SdfPath &GetLocalPath() const
+  {
+    return _curNode->GetPath();
+  }
 
   /// Returns a translated path of the property with the given \p propName for
   /// the current PcpNode and Layer for a valid resolver.
   ///
   /// The behavior is undefined if the resolver is not valid.
-  SdfPath GetLocalPath(TfToken const &propName) const {
-    return propName.IsEmpty() ? GetLocalPath()
-                              : GetLocalPath().AppendProperty(propName);
+  SdfPath GetLocalPath(TfToken const &propName) const
+  {
+    return propName.IsEmpty() ? GetLocalPath() : GetLocalPath().AppendProperty(propName);
   }
 
   /// Returns the PcpPrimIndex.
   ///
   /// This value is initialized when the resolver is constructed and does not
   /// change as a result of calling NextLayer() or NextNode().
-  const PcpPrimIndex *GetPrimIndex() const { return _index; }
+  const PcpPrimIndex *GetPrimIndex() const
+  {
+    return _index;
+  }
 
-private:
+ private:
   void _SkipEmptyNodes();
 
   const PcpPrimIndex *_index;
@@ -144,4 +158,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RESOLVER_H
+#endif  // PXR_USD_USD_RESOLVER_H

@@ -98,12 +98,12 @@ per integer (6.25% the original size), in the worst possible case it is
 
 namespace {
 
-template <class Int>
-inline typename std::enable_if<std::is_integral<Int>::value &&
-                                   std::is_unsigned<Int>::value &&
+template<class Int>
+inline typename std::enable_if<std::is_integral<Int>::value && std::is_unsigned<Int>::value &&
                                    sizeof(Int) == 4,
                                int32_t>::type
-_Signed(Int x) {
+_Signed(Int x)
+{
   if (x <= static_cast<uint32_t>(INT32_MAX))
     return static_cast<int32_t>(x);
 
@@ -114,21 +114,21 @@ _Signed(Int x) {
   return 0;
 }
 
-template <class Int>
-inline
-    typename std::enable_if<std::is_integral<Int>::value &&
-                                std::is_signed<Int>::value && sizeof(Int) == 4,
-                            int32_t>::type
-    _Signed(Int x) {
+template<class Int>
+inline typename std::enable_if<std::is_integral<Int>::value && std::is_signed<Int>::value &&
+                                   sizeof(Int) == 4,
+                               int32_t>::type
+_Signed(Int x)
+{
   return x;
 }
 
-template <class Int>
-inline typename std::enable_if<std::is_integral<Int>::value &&
-                                   std::is_unsigned<Int>::value &&
+template<class Int>
+inline typename std::enable_if<std::is_integral<Int>::value && std::is_unsigned<Int>::value &&
                                    sizeof(Int) == 8,
                                int64_t>::type
-_Signed(Int x) {
+_Signed(Int x)
+{
   if (x <= static_cast<uint64_t>(INT64_MAX))
     return static_cast<int64_t>(x);
 
@@ -139,50 +139,52 @@ _Signed(Int x) {
   return 0;
 }
 
-template <class Int>
-inline
-    typename std::enable_if<std::is_integral<Int>::value &&
-                                std::is_signed<Int>::value && sizeof(Int) == 8,
-                            int64_t>::type
-    _Signed(Int x) {
+template<class Int>
+inline typename std::enable_if<std::is_integral<Int>::value && std::is_signed<Int>::value &&
+                                   sizeof(Int) == 8,
+                               int64_t>::type
+_Signed(Int x)
+{
   return x;
 }
 
-template <class T> inline char *_WriteBits(char *p, T val) {
+template<class T> inline char *_WriteBits(char *p, T val)
+{
   memcpy(p, &val, sizeof(val));
   return p + sizeof(val);
 }
 
-template <class T> inline T _ReadBits(char const *&p) {
+template<class T> inline T _ReadBits(char const *&p)
+{
   T ret;
   memcpy(&ret, p, sizeof(ret));
   p += sizeof(ret);
   return ret;
 }
 
-template <class Int> constexpr size_t _GetEncodedBufferSize(size_t numInts) {
+template<class Int> constexpr size_t _GetEncodedBufferSize(size_t numInts)
+{
   // Calculate encoded integer size.
   return numInts ?
-                 /* commonValue */ (sizeof(Int)) +
-                     /* numCodesBytes */ ((numInts * 2 + 7) / 8) +
-                     /* maxIntBytes */ (numInts * sizeof(Int))
-                 : 0;
+             /* commonValue */ (sizeof(Int)) +
+                 /* numCodesBytes */ ((numInts * 2 + 7) / 8) +
+                 /* maxIntBytes */ (numInts * sizeof(Int)) :
+             0;
 }
 
-template <class Int> struct _SmallTypes {
-  typedef typename std::conditional<sizeof(Int) == 4, int8_t, int16_t>::type
-      SmallInt;
-  typedef typename std::conditional<sizeof(Int) == 4, int16_t, int32_t>::type
-      MediumInt;
+template<class Int> struct _SmallTypes {
+  typedef typename std::conditional<sizeof(Int) == 4, int8_t, int16_t>::type SmallInt;
+  typedef typename std::conditional<sizeof(Int) == 4, int16_t, int32_t>::type MediumInt;
 };
 
-template <int N, class Iterator>
+template<int N, class Iterator>
 void _EncodeNHelper(
     Iterator &cur,
     typename std::iterator_traits<Iterator>::value_type commonValue,
-    typename std::make_signed<
-        typename std::iterator_traits<Iterator>::value_type>::type &prevVal,
-    char *&codesOut, char *&vintsOut) {
+    typename std::make_signed<typename std::iterator_traits<Iterator>::value_type>::type &prevVal,
+    char *&codesOut,
+    char *&vintsOut)
+{
 
   using Int = typename std::iterator_traits<Iterator>::value_type;
   using SInt = typename std::make_signed<Int>::type;
@@ -215,30 +217,31 @@ void _EncodeNHelper(
     Code code = getCode(val);
     codeByte |= (code << (2 * i));
     switch (code) {
-    default:
-    case Common:
-      break;
-    case Small:
-      vintsOut = _WriteBits(vintsOut, static_cast<SmallInt>(val));
-      break;
-    case Medium:
-      vintsOut = _WriteBits(vintsOut, static_cast<MediumInt>(val));
-      break;
-    case Large:
-      vintsOut = _WriteBits(vintsOut, _Signed(val));
-      break;
+      default:
+      case Common:
+        break;
+      case Small:
+        vintsOut = _WriteBits(vintsOut, static_cast<SmallInt>(val));
+        break;
+      case Medium:
+        vintsOut = _WriteBits(vintsOut, static_cast<MediumInt>(val));
+        break;
+      case Large:
+        vintsOut = _WriteBits(vintsOut, _Signed(val));
+        break;
     };
   }
   codesOut = _WriteBits(codesOut, codeByte);
 }
 
-template <int N, class Iterator>
+template<int N, class Iterator>
 void _DecodeNHelper(
-    char const *&codesIn, char const *&vintsIn,
+    char const *&codesIn,
+    char const *&vintsIn,
     typename std::iterator_traits<Iterator>::value_type commonValue,
-    typename std::make_signed<
-        typename std::iterator_traits<Iterator>::value_type>::type &prevVal,
-    Iterator &output) {
+    typename std::make_signed<typename std::iterator_traits<Iterator>::value_type>::type &prevVal,
+    Iterator &output)
+{
   using Int = typename std::iterator_traits<Iterator>::value_type;
   using SInt = typename std::make_signed<Int>::type;
   using SmallInt = typename _SmallTypes<Int>::SmallInt;
@@ -249,26 +252,26 @@ void _DecodeNHelper(
   uint8_t codeByte = *codesIn++;
   for (int i = 0; i != N; ++i) {
     switch ((codeByte >> (2 * i)) & 3) {
-    default:
-    case Common:
-      prevVal += commonValue;
-      break;
-    case Small:
-      prevVal += _ReadBits<SmallInt>(vintsIn);
-      break;
-    case Medium:
-      prevVal += _ReadBits<MediumInt>(vintsIn);
-      break;
-    case Large:
-      prevVal += _ReadBits<SInt>(vintsIn);
-      break;
+      default:
+      case Common:
+        prevVal += commonValue;
+        break;
+      case Small:
+        prevVal += _ReadBits<SmallInt>(vintsIn);
+        break;
+      case Medium:
+        prevVal += _ReadBits<MediumInt>(vintsIn);
+        break;
+      case Large:
+        prevVal += _ReadBits<SInt>(vintsIn);
+        break;
     }
     *output++ = static_cast<Int>(prevVal);
   }
 }
 
-template <class Int>
-size_t _EncodeIntegers(Int const *begin, size_t numInts, char *output) {
+template<class Int> size_t _EncodeIntegers(Int const *begin, size_t numInts, char *output)
+{
   using SInt = typename std::make_signed<Int>::type;
 
   if (numInts == 0)
@@ -286,7 +289,8 @@ size_t _EncodeIntegers(Int const *begin, size_t numInts, char *output) {
       if (count > commonCount) {
         commonValue = val;
         commonCount = count;
-      } else if (count == commonCount && val > commonValue) {
+      }
+      else if (count == commonCount && val > commonValue) {
         // Take the largest common value in case of a tie -- this gives
         // the biggest potential savings in the encoded stream.
         commonValue = val;
@@ -309,25 +313,25 @@ size_t _EncodeIntegers(Int const *begin, size_t numInts, char *output) {
     numInts -= 4;
   }
   switch (numInts) {
-  case 0:
-  default:
-    break;
-  case 1:
-    _EncodeNHelper<1>(cur, commonValue, prevVal, codesOut, vintsOut);
-    break;
-  case 2:
-    _EncodeNHelper<2>(cur, commonValue, prevVal, codesOut, vintsOut);
-    break;
-  case 3:
-    _EncodeNHelper<3>(cur, commonValue, prevVal, codesOut, vintsOut);
-    break;
+    case 0:
+    default:
+      break;
+    case 1:
+      _EncodeNHelper<1>(cur, commonValue, prevVal, codesOut, vintsOut);
+      break;
+    case 2:
+      _EncodeNHelper<2>(cur, commonValue, prevVal, codesOut, vintsOut);
+      break;
+    case 3:
+      _EncodeNHelper<3>(cur, commonValue, prevVal, codesOut, vintsOut);
+      break;
   };
 
   return vintsOut - output;
 }
 
-template <class Int>
-size_t _DecodeIntegers(char const *data, size_t numInts, Int *result) {
+template<class Int> size_t _DecodeIntegers(char const *data, size_t numInts, Int *result)
+{
   using SInt = typename std::make_signed<Int>::type;
 
   auto commonValue = _ReadBits<SInt>(data);
@@ -343,43 +347,41 @@ size_t _DecodeIntegers(char const *data, size_t numInts, Int *result) {
     intsLeft -= 4;
   }
   switch (intsLeft) {
-  case 0:
-  default:
-    break;
-  case 1:
-    _DecodeNHelper<1>(codesIn, vintsIn, commonValue, prevVal, result);
-    break;
-  case 2:
-    _DecodeNHelper<2>(codesIn, vintsIn, commonValue, prevVal, result);
-    break;
-  case 3:
-    _DecodeNHelper<3>(codesIn, vintsIn, commonValue, prevVal, result);
-    break;
+    case 0:
+    default:
+      break;
+    case 1:
+      _DecodeNHelper<1>(codesIn, vintsIn, commonValue, prevVal, result);
+      break;
+    case 2:
+      _DecodeNHelper<2>(codesIn, vintsIn, commonValue, prevVal, result);
+      break;
+    case 3:
+      _DecodeNHelper<3>(codesIn, vintsIn, commonValue, prevVal, result);
+      break;
   };
 
   return numInts;
 }
 
-template <class Int>
-size_t _CompressIntegers(Int const *begin, size_t numInts, char *output) {
+template<class Int> size_t _CompressIntegers(Int const *begin, size_t numInts, char *output)
+{
   // Working space.
-  std::unique_ptr<char[]> encodeBuffer(
-      new char[_GetEncodedBufferSize<Int>(numInts)]);
+  std::unique_ptr<char[]> encodeBuffer(new char[_GetEncodedBufferSize<Int>(numInts)]);
 
   // Encode first.
   size_t encodedSize = _EncodeIntegers(begin, numInts, encodeBuffer.get());
 
   // Then compress.
-  return TfFastCompression::CompressToBuffer(encodeBuffer.get(), output,
-                                             encodedSize);
+  return TfFastCompression::CompressToBuffer(encodeBuffer.get(), output, encodedSize);
 }
 
-template <class Int>
-size_t _DecompressIntegers(char const *compressed, size_t compressedSize,
-                           Int *ints, size_t numInts, char *workingSpace) {
+template<class Int>
+size_t _DecompressIntegers(
+    char const *compressed, size_t compressedSize, Int *ints, size_t numInts, char *workingSpace)
+{
   // Working space.
-  size_t workingSpaceSize =
-      Usd_IntegerCompression::GetDecompressionWorkingSpaceSize(numInts);
+  size_t workingSpaceSize = Usd_IntegerCompression::GetDecompressionWorkingSpaceSize(numInts);
   std::unique_ptr<char[]> tmpSpace;
   if (!workingSpace) {
     tmpSpace.reset(new char[workingSpaceSize]);
@@ -395,30 +397,32 @@ size_t _DecompressIntegers(char const *compressed, size_t compressedSize,
   return _DecodeIntegers(workingSpace, numInts, ints);
 }
 
-} // namespace
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////
 // 32 bit.
 
-size_t Usd_IntegerCompression::GetCompressedBufferSize(size_t numInts) {
-  return TfFastCompression::GetCompressedBufferSize(
-      _GetEncodedBufferSize<int32_t>(numInts));
+size_t Usd_IntegerCompression::GetCompressedBufferSize(size_t numInts)
+{
+  return TfFastCompression::GetCompressedBufferSize(_GetEncodedBufferSize<int32_t>(numInts));
 }
 
-size_t
-Usd_IntegerCompression::GetDecompressionWorkingSpaceSize(size_t numInts) {
+size_t Usd_IntegerCompression::GetDecompressionWorkingSpaceSize(size_t numInts)
+{
   return _GetEncodedBufferSize<int32_t>(numInts);
 }
 
 size_t Usd_IntegerCompression::CompressToBuffer(int32_t const *ints,
                                                 size_t numInts,
-                                                char *compressed) {
+                                                char *compressed)
+{
   return _CompressIntegers(ints, numInts, compressed);
 }
 
 size_t Usd_IntegerCompression::CompressToBuffer(uint32_t const *ints,
                                                 size_t numInts,
-                                                char *compressed) {
+                                                char *compressed)
+{
   return _CompressIntegers(ints, numInts, compressed);
 }
 
@@ -426,42 +430,44 @@ size_t Usd_IntegerCompression::DecompressFromBuffer(char const *compressed,
                                                     size_t compressedSize,
                                                     int32_t *ints,
                                                     size_t numInts,
-                                                    char *workingSpace) {
-  return _DecompressIntegers(compressed, compressedSize, ints, numInts,
-                             workingSpace);
+                                                    char *workingSpace)
+{
+  return _DecompressIntegers(compressed, compressedSize, ints, numInts, workingSpace);
 }
 
 size_t Usd_IntegerCompression::DecompressFromBuffer(char const *compressed,
                                                     size_t compressedSize,
                                                     uint32_t *ints,
                                                     size_t numInts,
-                                                    char *workingSpace) {
-  return _DecompressIntegers(compressed, compressedSize, ints, numInts,
-                             workingSpace);
+                                                    char *workingSpace)
+{
+  return _DecompressIntegers(compressed, compressedSize, ints, numInts, workingSpace);
 }
 
 ////////////////////////////////////////////////////////////////////////
 // 64 bit.
 
-size_t Usd_IntegerCompression64::GetCompressedBufferSize(size_t numInts) {
-  return TfFastCompression::GetCompressedBufferSize(
-      _GetEncodedBufferSize<int64_t>(numInts));
+size_t Usd_IntegerCompression64::GetCompressedBufferSize(size_t numInts)
+{
+  return TfFastCompression::GetCompressedBufferSize(_GetEncodedBufferSize<int64_t>(numInts));
 }
 
-size_t
-Usd_IntegerCompression64::GetDecompressionWorkingSpaceSize(size_t numInts) {
+size_t Usd_IntegerCompression64::GetDecompressionWorkingSpaceSize(size_t numInts)
+{
   return _GetEncodedBufferSize<int64_t>(numInts);
 }
 
 size_t Usd_IntegerCompression64::CompressToBuffer(int64_t const *ints,
                                                   size_t numInts,
-                                                  char *compressed) {
+                                                  char *compressed)
+{
   return _CompressIntegers(ints, numInts, compressed);
 }
 
 size_t Usd_IntegerCompression64::CompressToBuffer(uint64_t const *ints,
                                                   size_t numInts,
-                                                  char *compressed) {
+                                                  char *compressed)
+{
   return _CompressIntegers(ints, numInts, compressed);
 }
 
@@ -469,18 +475,18 @@ size_t Usd_IntegerCompression64::DecompressFromBuffer(char const *compressed,
                                                       size_t compressedSize,
                                                       int64_t *ints,
                                                       size_t numInts,
-                                                      char *workingSpace) {
-  return _DecompressIntegers(compressed, compressedSize, ints, numInts,
-                             workingSpace);
+                                                      char *workingSpace)
+{
+  return _DecompressIntegers(compressed, compressedSize, ints, numInts, workingSpace);
 }
 
 size_t Usd_IntegerCompression64::DecompressFromBuffer(char const *compressed,
                                                       size_t compressedSize,
                                                       uint64_t *ints,
                                                       size_t numInts,
-                                                      char *workingSpace) {
-  return _DecompressIntegers(compressed, compressedSize, ints, numInts,
-                             workingSpace);
+                                                      char *workingSpace)
+{
+  return _DecompressIntegers(compressed, compressedSize, ints, numInts, workingSpace);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

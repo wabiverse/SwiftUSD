@@ -33,10 +33,10 @@
 
 #include "Tf/hashset.h"
 
+#include "Sdf/declareHandles.h"
 #include "Usd/collectionAPI.h"
 #include "Usd/stage.h"
 #include "UsdUtils/api.h"
-#include "Sdf/declareHandles.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -134,11 +134,10 @@ bool UsdUtilsComputeCollectionIncludesAndExcludes(
 /// its data is appended to. The resulting collection will contain
 /// both the old paths and the newly included paths.
 USDUTILS_API
-UsdCollectionAPI UsdUtilsAuthorCollection(
-    const TfToken &collectionName,
-    const UsdPrim &usdPrim,
-    const SdfPathVector &pathsToInclude,
-    const SdfPathVector &pathsToExclude = SdfPathVector());
+UsdCollectionAPI UsdUtilsAuthorCollection(const TfToken &collectionName,
+                                          const UsdPrim &usdPrim,
+                                          const SdfPathVector &pathsToInclude,
+                                          const SdfPathVector &pathsToExclude = SdfPathVector());
 
 /// Given a vector of (collection-name, path-set) pairs, \p assignments,
 /// creates and returns a vector of collections that include subtrees of prims
@@ -193,8 +192,7 @@ std::vector<UsdCollectionAPI> UsdUtilsCreateCollections(
 
 /// Retrieve a list of all dirty layers from the stage's UsedLayers.
 USDUTILS_API
-SdfLayerHandleVector UsdUtilsGetDirtyLayers(UsdStagePtr stage,
-                                            bool includeClipLayers = true);
+SdfLayerHandleVector UsdUtilsGetDirtyLayers(UsdStagePtr stage, bool includeClipLayers = true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

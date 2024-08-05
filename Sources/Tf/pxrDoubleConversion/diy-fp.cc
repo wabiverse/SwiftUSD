@@ -34,7 +34,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace pxr_double_conversion {
 
-void DiyFp::Multiply(const DiyFp &other) {
+void DiyFp::Multiply(const DiyFp &other)
+{
   // Simply "emulates" a 128 bit multiplication.
   // However: the resulting number only contains 64 bits. The least
   // significant 64 bits are only used for rounding the most significant 64
@@ -57,6 +58,6 @@ void DiyFp::Multiply(const DiyFp &other) {
   f_ = result_f;
 }
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE

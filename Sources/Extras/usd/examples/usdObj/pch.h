@@ -25,67 +25,27 @@
 //
 
 #define TF_MAX_ARITY 7
-#include <pxr/pxrns.h>
 #include "Arch/defines.h"
+#include <pxr/pxrns.h>
 #if defined(ARCH_OS_DARWIN)
-#include <mach/mach_time.h>
+#  include <mach/mach_time.h>
 #endif
 #if defined(ARCH_OS_LINUX)
-#include <x86intrin.h>
+#  include <x86intrin.h>
 #endif
 #if defined(ARCH_OS_WINDOWS)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
 
-#include <intrin.h>
-#include <boost/preprocessor/variadic/size.hpp>
-#include <boost/vmd/is_empty.hpp>
-#include <boost/vmd/is_tuple.hpp>
+#  include <boost/preprocessor/variadic/size.hpp>
+#  include <boost/vmd/is_empty.hpp>
+#  include <boost/vmd/is_tuple.hpp>
+#  include <intrin.h>
 #endif
 #include <algorithm>
 #include <atomic>
 #include <bitset>
-#include <cfloat>
-#include <cinttypes>
-#include <cmath>
-#include <cstdarg>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <deque>
-#include <float.h>
-#include <fstream>
-#include <functional>
-#include <initializer_list>
-#include <iosfwd>
-#include <iostream>
-#include <iterator>
-#include <limits>
-#include <list>
-#include <locale>
-#include <map>
-#include <math.h>
-#include <memory>
-#include <mutex>
-#include <new>
-#include <set>
-#include <sstream>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string>
-#include <sys/types.h>
-#include <thread>
-#include <type_traits>
-#include <typeindex>
-#include <typeinfo>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <vector>
 #include <boost/aligned_storage.hpp>
 #include <boost/any.hpp>
 #include <boost/call_traits.hpp>
@@ -135,19 +95,68 @@
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/tuple/to_list.hpp>
 #include <boost/preprocessor/tuple/to_seq.hpp>
+#include <cfloat>
+#include <cinttypes>
+#include <cmath>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <deque>
+#include <float.h>
+#include <fstream>
+#include <functional>
+#include <initializer_list>
+#include <iosfwd>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <list>
+#include <locale>
+#include <map>
+#include <math.h>
+#include <memory>
+#include <mutex>
+#include <new>
+#include <set>
+#include <sstream>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string>
+#include <sys/types.h>
+#include <thread>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include <boost/python/dict.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/handle.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/object_fwd.hpp>
-#include <boost/python/object_operators.hpp>
-#include <boost/python/type_id.hpp>
-#if defined(__APPLE__) // Fix breakage caused by Python's pyport.h.
-#undef tolower
-#undef toupper
-#endif
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include <boost/python/dict.hpp>
+#  include <boost/python/extract.hpp>
+#  include <boost/python/handle.hpp>
+#  include <boost/python/object.hpp>
+#  include <boost/python/object_fwd.hpp>
+#  include <boost/python/object_operators.hpp>
+#  include <boost/python/type_id.hpp>
+#  if defined(__APPLE__)  // Fix breakage caused by Python's pyport.h.
+#    undef tolower
+#    undef toupper
+#  endif
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#include <OneTBB/tbb/cache_aligned_allocator.h>
+#include <OneTBB/tbb/concurrent_queue.h>
+#include <OneTBB/tbb/concurrent_unordered_set.h>
+#include <OneTBB/tbb/concurrent_vector.h>
+#include <OneTBB/tbb/enumerable_thread_specific.h>
+#include <OneTBB/tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_rw_mutex.h>
+#include <OneTBB/tbb/task.h>
+#include <OneTBB/tbb/task_arena.h>
 #include <boost/range/iterator_range.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/decay.hpp>
@@ -166,15 +175,6 @@
 #include <boost/utility.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/variant.hpp>
-#include <OneTBB/tbb/cache_aligned_allocator.h>
-#include <OneTBB/tbb/concurrent_queue.h>
-#include <OneTBB/tbb/concurrent_unordered_set.h>
-#include <OneTBB/tbb/concurrent_vector.h>
-#include <OneTBB/tbb/enumerable_thread_specific.h>
-#include <OneTBB/tbb/spin_mutex.h>
-#include <OneTBB/tbb/spin_rw_mutex.h>
-#include <OneTBB/tbb/task.h>
-#include <OneTBB/tbb/task_arena.h>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "Tf/pySafePython.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "Tf/pySafePython.h"
+#endif  // PXR_PYTHON_SUPPORT_ENABLED

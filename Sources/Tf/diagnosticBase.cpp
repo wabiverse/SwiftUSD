@@ -35,11 +35,14 @@ using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfDiagnosticBase::TfDiagnosticBase(TfEnum code, const char *codeString,
+TfDiagnosticBase::TfDiagnosticBase(TfEnum code,
+                                   const char *codeString,
                                    TfCallContext const &context,
                                    const string &commentary,
-                                   TfDiagnosticInfo info, bool quiet)
-    : _context(context) {
+                                   TfDiagnosticInfo info,
+                                   bool quiet)
+    : _context(context)
+{
   _commentary = commentary;
   _code = code;
   _codeString = TfEnum::GetName(code);
@@ -50,14 +53,15 @@ TfDiagnosticBase::TfDiagnosticBase(TfEnum code, const char *codeString,
     _codeString = TfSafeString(codeString);
 }
 
-bool TfDiagnosticBase::IsFatal() const {
+bool TfDiagnosticBase::IsFatal() const
+{
   TfEnum code = _code;
   return (code == TF_DIAGNOSTIC_FATAL_CODING_ERROR_TYPE) ||
-         (code == TF_DIAGNOSTIC_FATAL_ERROR_TYPE) ||
-         (code == TF_APPLICATION_EXIT_TYPE);
+         (code == TF_DIAGNOSTIC_FATAL_ERROR_TYPE) || (code == TF_APPLICATION_EXIT_TYPE);
 }
 
-bool TfDiagnosticBase::IsCodingError() const {
+bool TfDiagnosticBase::IsCodingError() const
+{
   TfEnum code = _code;
   return (code == TF_DIAGNOSTIC_CODING_ERROR_TYPE) ||
          (code == TF_DIAGNOSTIC_FATAL_CODING_ERROR_TYPE);

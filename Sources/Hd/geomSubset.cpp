@@ -25,13 +25,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool operator==(const HdGeomSubset& lhs, const HdGeomSubset& rhs)
+bool operator==(const HdGeomSubset &lhs, const HdGeomSubset &rhs)
 {
-    return lhs.type == rhs.type
-        && lhs.id == rhs.id
-        && lhs.materialId == rhs.materialId
-        && lhs.indices == rhs.indices;
+  return lhs.type == rhs.type && lhs.id == rhs.id && lhs.materialId == rhs.materialId &&
+         lhs.indices == rhs.indices;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

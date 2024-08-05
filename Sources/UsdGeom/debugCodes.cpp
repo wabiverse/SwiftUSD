@@ -21,22 +21,21 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdGeom/debugCodes.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/debug.h"
 #include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_REGISTRY_FUNCTION(TfDebug)
 {
-    TF_DEBUG_ENVIRONMENT_SYMBOL(USDGEOM_EXTENT, "Reports when Boundable "
-            "extents are computed dynamically because no cached authored "
-            "attribute is present in the scene.");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(USDGEOM_BBOX, "UsdGeom bounding box computation");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(USDGEOM_EXTENT,
+                              "Reports when Boundable "
+                              "extents are computed dynamically because no cached authored "
+                              "attribute is present in the scene.");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(USDGEOM_BBOX, "UsdGeom bounding box computation");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

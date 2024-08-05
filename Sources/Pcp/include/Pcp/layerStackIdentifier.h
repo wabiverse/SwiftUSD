@@ -47,7 +47,7 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// Objects of this type are immutable.
 ///
 class PcpLayerStackIdentifier {
-public:
+ public:
   typedef PcpLayerStackIdentifier This;
 
   /// Construct with all empty pointers.
@@ -57,12 +57,11 @@ public:
   /// Construct with given pointers.  If all arguments are \c TfNullPtr
   /// then the result is identical to the default constructed object.
   PCP_API
-  PcpLayerStackIdentifier(
-      const SdfLayerHandle &rootLayer,
-      const SdfLayerHandle &sessionLayer = TfNullPtr,
-      const ArResolverContext &pathResolverContext = ArResolverContext(),
-      const PcpExpressionVariablesSource &expressionVariablesOverrideSource =
-          PcpExpressionVariablesSource());
+  PcpLayerStackIdentifier(const SdfLayerHandle &rootLayer,
+                          const SdfLayerHandle &sessionLayer = TfNullPtr,
+                          const ArResolverContext &pathResolverContext = ArResolverContext(),
+                          const PcpExpressionVariablesSource &expressionVariablesOverrideSource =
+                              PcpExpressionVariablesSource());
 
   // XXX: Allow assignment because there are clients using this
   //      as a member that themselves want to be assignable.
@@ -76,21 +75,39 @@ public:
   // Comparison.
   PCP_API
   bool operator==(const This &rhs) const;
-  bool operator!=(const This &rhs) const { return !(rhs == *this); }
+  bool operator!=(const This &rhs) const
+  {
+    return !(rhs == *this);
+  }
 
   PCP_API
   bool operator<(const This &rhs) const;
-  bool operator<=(const This &rhs) const { return !(rhs < *this); }
-  bool operator>(const This &rhs) const { return rhs < *this; }
-  bool operator>=(const This &rhs) const { return !(*this < rhs); }
+  bool operator<=(const This &rhs) const
+  {
+    return !(rhs < *this);
+  }
+  bool operator>(const This &rhs) const
+  {
+    return rhs < *this;
+  }
+  bool operator>=(const This &rhs) const
+  {
+    return !(*this < rhs);
+  }
 
   // Hashing.
   struct Hash {
-    size_t operator()(const This &x) const { return x.GetHash(); }
+    size_t operator()(const This &x) const
+    {
+      return x.GetHash();
+    }
   };
-  size_t GetHash() const { return _hash; }
+  size_t GetHash() const
+  {
+    return _hash;
+  }
 
-public:
+ public:
   /// The root layer.
   const SdfLayerHandle rootLayer;
 
@@ -104,19 +121,21 @@ public:
   /// variables in this layer stack. (optional)
   const PcpExpressionVariablesSource expressionVariablesOverrideSource;
 
-private:
+ private:
   size_t _ComputeHash() const;
 
-private:
+ private:
   const size_t _hash;
 };
 
-template <typename HashState>
-inline void TfHashAppend(HashState &h, const PcpLayerStackIdentifier &x) {
+template<typename HashState>
+inline void TfHashAppend(HashState &h, const PcpLayerStackIdentifier &x)
+{
   h.Append(x.GetHash());
 }
 
-inline size_t hash_value(const PcpLayerStackIdentifier &x) {
+inline size_t hash_value(const PcpLayerStackIdentifier &x)
+{
   return TfHash{}(x);
 }
 
@@ -144,4 +163,4 @@ std::ostream &PcpIdentifierFormatIdentifier(std::ostream &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_LAYER_STACK_IDENTIFIER_H
+#endif  // PXR_USD_PCP_LAYER_STACK_IDENTIFIER_H

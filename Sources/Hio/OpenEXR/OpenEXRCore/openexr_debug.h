@@ -17,8 +17,7 @@ extern "C" {
 /** Debug function: print to stdout the parts and attributes of the
  * context @p c
  */
-EXR_EXPORT exr_result_t
-exr_print_context_info (exr_const_context_t c, int verbose);
+EXR_EXPORT exr_result_t exr_print_context_info(exr_const_context_t c, int verbose);
 
 #ifdef __cplusplus
 } /* extern "C" */

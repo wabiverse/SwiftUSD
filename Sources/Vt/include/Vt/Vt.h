@@ -17,4 +17,4 @@
 #include <Vt/valueFromPython.h>
 #include <Vt/visitValue.h>
 
-#endif // __PXR_BASE_VT_H__
+#endif  // __PXR_BASE_VT_H__

@@ -57,4 +57,4 @@ ARCH_API uint64_t ArchHash64(const char *data, size_t len, uint64_t seed);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_HASH_H
+#endif  // PXR_BASE_ARCH_HASH_H

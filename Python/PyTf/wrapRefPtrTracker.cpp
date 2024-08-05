@@ -39,28 +39,31 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static std::string _ReportAllWatchedCounts(TfRefPtrTracker &tracker) {
+static std::string _ReportAllWatchedCounts(TfRefPtrTracker &tracker)
+{
   std::ostringstream s;
   tracker.ReportAllWatchedCounts(s);
   return s.str();
 }
 
-static std::string _ReportAllTraces(TfRefPtrTracker &tracker) {
+static std::string _ReportAllTraces(TfRefPtrTracker &tracker)
+{
   std::ostringstream s;
   tracker.ReportAllTraces(s);
   return s.str();
 }
 
-static std::string _ReportTracesForWatched(TfRefPtrTracker &tracker,
-                                           uintptr_t ptr) {
+static std::string _ReportTracesForWatched(TfRefPtrTracker &tracker, uintptr_t ptr)
+{
   std::ostringstream s;
   tracker.ReportTracesForWatched(s, (TfRefBase *)ptr);
   return s.str();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRefPtrTracker() {
+void wrapRefPtrTracker()
+{
   typedef TfRefPtrTracker This;
   typedef TfWeakPtr<TfRefPtrTracker> ThisPtr;
 

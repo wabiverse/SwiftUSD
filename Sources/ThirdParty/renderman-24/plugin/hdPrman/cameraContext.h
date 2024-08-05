@@ -24,11 +24,11 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_CONTEXT_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_CONTEXT_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/api.h"
 #include "Sdf/path.h"
+#include "hdPrman/api.h"
 #include "pxr/imaging/cameraUtil/conformWindow.h"
 #include "pxr/imaging/cameraUtil/framing.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
@@ -45,9 +45,8 @@ class HdPrmanCamera;
 /// track whether the camera or camera-related settings such as the
 /// framing have changed so that updating riley is necessary.
 ///
-class HdPrman_CameraContext final
-{
-public:
+class HdPrman_CameraContext final {
+ public:
   HdPrman_CameraContext();
 
   /// Call when hydra changed the transform or parameters of a camera.
@@ -72,35 +71,32 @@ public:
   void Begin(riley::Riley *riley);
 
   /// Get id of riley camera - valid only after Begin.
-  const riley::CameraId &GetCameraId() const { return _cameraId; }
+  const riley::CameraId &GetCameraId() const
+  {
+    return _cameraId;
+  }
 
   /// Update the given riley options for offline rendering
   /// to an image file.
   ///
   /// Sets the crop window, format resolution and pixel aspect ratio.
-  void SetRileyOptions(
-      RtParamList *options) const;
+  void SetRileyOptions(RtParamList *options) const;
 
   /// Update the given riley options for rendering to AOVs baked by
   /// render buffers of the given size.
   ///
   /// Sets the crop window and pixel aspect ratio.
-  void SetRileyOptionsInteractive(
-      RtParamList *options,
-      const GfVec2i &renderBufferSize) const;
+  void SetRileyOptionsInteractive(RtParamList *options, const GfVec2i &renderBufferSize) const;
 
   /// Update riley camera and clipping planes for offline rendering
   /// to an image file.
-  void UpdateRileyCameraAndClipPlanes(
-      riley::Riley *riley,
-      const HdRenderIndex *renderIndex);
+  void UpdateRileyCameraAndClipPlanes(riley::Riley *riley, const HdRenderIndex *renderIndex);
 
   /// Update riley camera and clipping planes for rendering to AOVs
   /// baked by render buffers of the given size.
-  void UpdateRileyCameraAndClipPlanesInteractive(
-      riley::Riley *riley,
-      const HdRenderIndex *renderIndex,
-      const GfVec2i &renderBufferSize);
+  void UpdateRileyCameraAndClipPlanesInteractive(riley::Riley *riley,
+                                                 const HdRenderIndex *renderIndex,
+                                                 const GfVec2i &renderBufferSize);
 
   /// Mark that riley camera and options are up to date.
   void MarkValid();
@@ -138,29 +134,27 @@ public:
                        const float shutteropeningPoints[8]);
 
   /// Path of current camera in render index.
-  const SdfPath &GetCameraPath() const { return _cameraPath; }
+  const SdfPath &GetCameraPath() const
+  {
+    return _cameraPath;
+  }
 
   /// For convenience, get camera at camera path from render index.
   const HdPrmanCamera *GetCamera(const HdRenderIndex *renderIndex) const;
 
-private:
+ private:
   /// Computes the screen window for the camera and conforms
   /// it to have the display window's aspect ratio using the
   /// current conform policy.
   GfRange2d _ComputeConformedScreenWindow(const HdCamera *camera) const;
 
   // Compute parameters for Riley::ModifyCamera
-  RtParamList _ComputeCameraParams(
-      const GfRange2d &screenWindow,
-      const HdCamera *camera) const;
+  RtParamList _ComputeCameraParams(const GfRange2d &screenWindow, const HdCamera *camera) const;
 
-  void _UpdateRileyCamera(
-      riley::Riley *const riley,
-      const GfRange2d &screenWindow,
-      const HdPrmanCamera *camera);
-  void _UpdateClipPlanes(
-      riley::Riley *riley,
-      const HdPrmanCamera *camera);
+  void _UpdateRileyCamera(riley::Riley *const riley,
+                          const GfRange2d &screenWindow,
+                          const HdPrmanCamera *camera);
+  void _UpdateClipPlanes(riley::Riley *riley, const HdPrmanCamera *camera);
 
   SdfPath _cameraPath;
   CameraUtilFraming _framing;
@@ -180,4 +174,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_CONTEXT_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_CONTEXT_H

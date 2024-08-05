@@ -59,60 +59,57 @@
  * eventually summed together.
  */
 
-static u32 ATTRIBUTES MAYBE_UNUSED
-FUNCNAME(u32 adler, const u8 *p, size_t len)
+static u32 ATTRIBUTES MAYBE_UNUSED FUNCNAME(u32 adler, const u8 *p, size_t len)
 {
-	const size_t max_chunk_len =
-		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
-		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
-	u32 s1 = adler & 0xFFFF;
-	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
-	const u8 *vend;
+  const size_t max_chunk_len = MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
+                               (MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
+  u32 s1 = adler & 0xFFFF;
+  u32 s2 = adler >> 16;
+  const u8 *const end = p + len;
+  const u8 *vend;
 
-	/* Process a byte at a time until the needed alignment is reached. */
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+  /* Process a byte at a time until the needed alignment is reached. */
+  if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+    do {
+      s1 += *p++;
+      s2 += s1;
+    } while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+    s1 %= DIVISOR;
+    s2 %= DIVISOR;
+  }
 
-	/*
-	 * Process "chunks" of bytes using vector instructions.  Chunk lengths
-	 * are limited to MAX_CHUNK_LEN, which guarantees that s1 and s2 never
-	 * overflow before being reduced modulo DIVISOR.  For vector processing,
-	 * chunk lengths are also made evenly divisible by IMPL_SEGMENT_LEN and
-	 * may be further limited to IMPL_MAX_CHUNK_LEN.
-	 */
-	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
-	while (p != vend) {
-		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+  /*
+   * Process "chunks" of bytes using vector instructions.  Chunk lengths
+   * are limited to MAX_CHUNK_LEN, which guarantees that s1 and s2 never
+   * overflow before being reduced modulo DIVISOR.  For vector processing,
+   * chunk lengths are also made evenly divisible by IMPL_SEGMENT_LEN and
+   * may be further limited to IMPL_MAX_CHUNK_LEN.
+   */
+  STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
+  vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
+  while (p != vend) {
+    size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
 
-		s2 += s1 * chunk_len;
+    s2 += s1 * chunk_len;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
-			       &s1, &s2);
+    FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len), &s1, &s2);
 
-		p += chunk_len;
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+    p += chunk_len;
+    s1 %= DIVISOR;
+    s2 %= DIVISOR;
+  }
 
-	/* Process any remaining bytes. */
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+  /* Process any remaining bytes. */
+  if (p != end) {
+    do {
+      s1 += *p++;
+      s2 += s1;
+    } while (p != end);
+    s1 %= DIVISOR;
+    s2 %= DIVISOR;
+  }
 
-	return (s2 << 16) | s1;
+  return (s2 << 16) | s1;
 }
 
 #undef FUNCNAME

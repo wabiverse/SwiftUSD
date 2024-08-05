@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_GL_CAPABILITIES_H
 #define PXR_IMAGING_HGI_GL_CAPABILITIES_H
 
-#include <pxr/pxrns.h>
-#include "HgiGL/api.h"
 #include "Hgi/capabilities.h"
+#include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,13 +34,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Reports the capabilities of the HgiGL device.
 ///
-class HgiGLCapabilities final : public HgiCapabilities
-{
-public:
+class HgiGLCapabilities final : public HgiCapabilities {
+ public:
   HGIGL_API
   ~HgiGLCapabilities() override;
 
-public:
+ public:
   friend class HgiGL;
 
   HGIGL_API
@@ -52,14 +51,14 @@ public:
   HGIGL_API
   int GetShaderVersion() const override;
 
-private:
+ private:
   void _LoadCapabilities();
 
   // GL version
-  int _glVersion; // 400 (4.0), 410 (4.1), ...
+  int _glVersion;  // 400 (4.0), 410 (4.1), ...
 
   // GLSL version
-  int _glslVersion; // 400, 410, ...
+  int _glslVersion;  // 400, 410, ...
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -24,7 +24,6 @@
 #ifndef PXR_IMAGING_HGI_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGI_COMPUTE_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/attachmentDesc.h"
 #include "Hgi/enums.h"
@@ -32,6 +31,7 @@
 #include "Hgi/resourceBindings.h"
 #include "Hgi/shaderProgram.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 #include <vector>
@@ -47,8 +47,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///    Size of the constants in bytes. (max 256 bytes)</li>
 /// </ul>
 ///
-struct HgiComputeShaderConstantsDesc
-{
+struct HgiComputeShaderConstantsDesc {
   HGI_API
   HgiComputeShaderConstantsDesc();
 
@@ -56,14 +55,12 @@ struct HgiComputeShaderConstantsDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiComputeShaderConstantsDesc &lhs,
-    const HgiComputeShaderConstantsDesc &rhs);
+bool operator==(const HgiComputeShaderConstantsDesc &lhs,
+                const HgiComputeShaderConstantsDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiComputeShaderConstantsDesc &lhs,
-    const HgiComputeShaderConstantsDesc &rhs);
+bool operator!=(const HgiComputeShaderConstantsDesc &lhs,
+                const HgiComputeShaderConstantsDesc &rhs);
 
 /// \struct HgiComputePipelineDesc
 ///
@@ -76,8 +73,7 @@ bool operator!=(
 ///   Describes the shader uniforms.</li>
 /// </ul>
 ///
-struct HgiComputePipelineDesc
-{
+struct HgiComputePipelineDesc {
   HGI_API
   HgiComputePipelineDesc();
 
@@ -87,14 +83,10 @@ struct HgiComputePipelineDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiComputePipelineDesc &lhs,
-    const HgiComputePipelineDesc &rhs);
+bool operator==(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiComputePipelineDesc &lhs,
-    const HgiComputePipelineDesc &rhs);
+bool operator!=(const HgiComputePipelineDesc &lhs, const HgiComputePipelineDesc &rhs);
 
 ///
 /// \class HgiComputePipeline
@@ -105,9 +97,8 @@ bool operator!=(
 /// To the client (HdSt) compute pipeline resources are referred to via
 /// opaque, stateless handles (HgiComputePipelineHandle).
 ///
-class HgiComputePipeline
-{
-public:
+class HgiComputePipeline {
+ public:
   HGI_API
   virtual ~HgiComputePipeline();
 
@@ -115,13 +106,13 @@ public:
   HGI_API
   HgiComputePipelineDesc const &GetDescriptor() const;
 
-protected:
+ protected:
   HGI_API
   HgiComputePipeline(HgiComputePipelineDesc const &desc);
 
   HgiComputePipelineDesc _descriptor;
 
-private:
+ private:
   HgiComputePipeline() = delete;
   HgiComputePipeline &operator=(const HgiComputePipeline &) = delete;
   HgiComputePipeline(const HgiComputePipeline &) = delete;

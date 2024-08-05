@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGI_METAL_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGI_METAL_COMPUTE_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec4i.h"
-#include "HgiMetal/api.h"
 #include "Hgi/computeCmds.h"
+#include "HgiMetal/api.h"
 #include <cstdint>
+#include <pxr/pxrns.h>
 
 #include <Metal/Metal.hpp>
 
@@ -41,9 +41,8 @@ class HgiMetalComputePipeline;
 ///
 /// Metal implementation of HgiGraphicsEncoder.
 ///
-class HgiMetalComputeCmds final : public HgiComputeCmds
-{
-public:
+class HgiMetalComputeCmds final : public HgiComputeCmds {
+ public:
   HGIMETAL_API
   ~HgiMetalComputeCmds() override;
 
@@ -54,11 +53,10 @@ public:
   void BindResources(HgiResourceBindingsHandle resources) override;
 
   HGIMETAL_API
-  void SetConstantValues(
-      HgiComputePipelineHandle pipeline,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) override;
+  void SetConstantValues(HgiComputePipelineHandle pipeline,
+                         uint32_t bindIndex,
+                         uint32_t byteSize,
+                         const void *data) override;
 
   HGIMETAL_API
   void Dispatch(int dimX, int dimY) override;
@@ -78,7 +76,7 @@ public:
   HGIMETAL_API
   MTL::ComputeCommandEncoder *GetEncoder();
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API
@@ -87,7 +85,7 @@ protected:
   HGIMETAL_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiMetalComputeCmds() = delete;
   HgiMetalComputeCmds &operator=(const HgiMetalComputeCmds &) = delete;
   HgiMetalComputeCmds(const HgiMetalComputeCmds &) = delete;

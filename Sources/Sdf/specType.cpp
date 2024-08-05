@@ -51,14 +51,16 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static constexpr size_t _GetBitmaskForSpecType(SdfSpecType specType) {
+static constexpr size_t _GetBitmaskForSpecType(SdfSpecType specType)
+{
   return (size_t(1) << specType);
 }
 
 struct Sdf_SpecTypeInfo {
   // GetInstance() waits until initial registration has completed to support
   // query operations.  Call GetInstanceForRegistration() to do registrations.
-  static Sdf_SpecTypeInfo &GetInstance() {
+  static Sdf_SpecTypeInfo &GetInstance()
+  {
     Sdf_SpecTypeInfo &instance = TfSingleton<Sdf_SpecTypeInfo>::GetInstance();
     while (!instance.initialRegistrationCompleted) {
       std::this_thread::yield();
@@ -68,7 +70,8 @@ struct Sdf_SpecTypeInfo {
 
   // Return the instance directly, without waiting for initial registrations.
   // Use this form for doing registrations, and GetInstance() for queries.
-  static Sdf_SpecTypeInfo &GetInstanceForRegistration() {
+  static Sdf_SpecTypeInfo &GetInstanceForRegistration()
+  {
     return TfSingleton<Sdf_SpecTypeInfo>::GetInstance();
   }
 
@@ -97,11 +100,11 @@ struct Sdf_SpecTypeInfo {
   std::atomic<bool> initialRegistrationCompleted;
   mutable TfBigRWMutex mutex;
 
-private:
+ private:
   friend class TfSingleton<Sdf_SpecTypeInfo>;
 
-  Sdf_SpecTypeInfo()
-      : specTypeToBitmask(0), initialRegistrationCompleted(false) {
+  Sdf_SpecTypeInfo() : specTypeToBitmask(0), initialRegistrationCompleted(false)
+  {
     TfSingleton<Sdf_SpecTypeInfo>::SetInstanceConstructed(*this);
 
     TfRegistryManager::GetInstance().SubscribeTo<SdfSpecTypeRegistration>();
@@ -115,12 +118,12 @@ private:
 TF_INSTANTIATE_SINGLETON(Sdf_SpecTypeInfo);
 
 // In abstract registrations, specEnumType is SdfSpecTypeUnknown.
-void SdfSpecTypeRegistration::_RegisterSpecType(
-    const std::type_info &specCPPType, SdfSpecType specEnumType,
-    const std::type_info &schemaType) {
+void SdfSpecTypeRegistration::_RegisterSpecType(const std::type_info &specCPPType,
+                                                SdfSpecType specEnumType,
+                                                const std::type_info &schemaType)
+{
   const bool isConcrete = specEnumType != SdfSpecTypeUnknown;
-  Sdf_SpecTypeInfo &specTypeInfo =
-      Sdf_SpecTypeInfo::GetInstanceForRegistration();
+  Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstanceForRegistration();
 
   const TfType &schemaTfType = TfType::Find(schemaType);
   if (schemaTfType.IsUnknown()) {
@@ -146,10 +149,12 @@ void SdfSpecTypeRegistration::_RegisterSpecType(
   // Check every entry currently in the specTypeToBitmask (including the
   // one that was just added above) and indicate whether each spec type
   // can be created from the spec type we're registering.
-  TF_FOR_ALL(it, specTypeInfo.specTypeToBitmask) {
+  TF_FOR_ALL(it, specTypeInfo.specTypeToBitmask)
+  {
     if (isConcrete && specTfType.IsA(it->first)) {
       it->second |= _GetBitmaskForSpecType(specEnumType);
-    } else if (it->first.IsA(specTfType)) {
+    }
+    else if (it->first.IsA(specTfType)) {
       specAllowedBitmask |= it->second;
     }
   }
@@ -170,32 +175,37 @@ void SdfSpecTypeRegistration::_RegisterSpecType(
 
   Sdf_SpecTypeInfo::SchemaTypes &schemaTypesForSpecType =
       specTypeInfo.specTypeToSchemaTypes[specTfType];
-  if (std::find(schemaTypesForSpecType.begin(), schemaTypesForSpecType.end(),
-                schemaTfType) == schemaTypesForSpecType.end()) {
+  if (std::find(schemaTypesForSpecType.begin(), schemaTypesForSpecType.end(), schemaTfType) ==
+      schemaTypesForSpecType.end())
+  {
     schemaTypesForSpecType.push_back(schemaTfType);
-  } else {
+  }
+  else {
     TF_CODING_ERROR("Spec type %s already registered for schema type %s",
                     specTfType.GetTypeName().c_str(),
                     schemaTfType.GetTypeName().c_str());
   }
 }
 
-static bool _CanCast(const Sdf_SpecTypeInfo &specTypeInfo, SdfSpecType fromType,
-                     const TfType &toType) {
+static bool _CanCast(const Sdf_SpecTypeInfo &specTypeInfo,
+                     SdfSpecType fromType,
+                     const TfType &toType)
+{
   if (toType.IsUnknown()) {
     return TfType();
   }
-  const size_t allowedBitmask =
-      TfMapLookupByValue(specTypeInfo.specTypeToBitmask, toType, size_t(0));
+  const size_t allowedBitmask = TfMapLookupByValue(
+      specTypeInfo.specTypeToBitmask, toType, size_t(0));
   return allowedBitmask & _GetBitmaskForSpecType(fromType);
 }
 
-TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to) {
+TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to)
+{
   const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
 
   const SdfSpecType fromType = from.GetSpecType();
   const SdfSchemaBase &schema = from.GetSchema();
-  
+
   const TfType &schemaType = TfType::Find(typeid(schema));
   if (!TF_VERIFY(!schemaType.IsUnknown())) {
     return TfType();
@@ -209,8 +219,8 @@ TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to) {
     return TfType();
   }
 
-  const Sdf_SpecTypeInfo::SpecTypeToTfType &specTypeToTfType =
-      *TfMapLookupPtr(specTypeInfo.schemaTypeToSpecTypes, schemaType);
+  const Sdf_SpecTypeInfo::SpecTypeToTfType &specTypeToTfType = *TfMapLookupPtr(
+      specTypeInfo.schemaTypeToSpecTypes, schemaType);
 
   // Allow casting to go through if we're trying to cast from a
   // variant spec to a prim spec.
@@ -228,20 +238,22 @@ TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to) {
   return specTypeToTfType[fromType];
 }
 
-bool Sdf_SpecType::CanCast(SdfSpecType fromType, const std::type_info &to) {
+bool Sdf_SpecType::CanCast(SdfSpecType fromType, const std::type_info &to)
+{
   const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
   TfType toType = TfType::Find(to);
   TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
   return _CanCast(specTypeInfo, fromType, toType);
 }
 
-bool Sdf_SpecType::CanCast(const SdfSpec &from, const std::type_info &to) {
+bool Sdf_SpecType::CanCast(const SdfSpec &from, const std::type_info &to)
+{
   const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
 
   const SdfSpecType fromType = from.GetSpecType();
   const TfType &toType = TfType::Find(to);
 
-  const auto& schema = from.GetSchema();
+  const auto &schema = from.GetSchema();
   const TfType &fromSchemaType = TfType::Find(typeid(schema));
 
   TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
@@ -250,8 +262,8 @@ bool Sdf_SpecType::CanCast(const SdfSpec &from, const std::type_info &to) {
     return false;
   }
 
-  const Sdf_SpecTypeInfo::SchemaTypes *toSchemaTypes =
-      TfMapLookupPtr(specTypeInfo.specTypeToSchemaTypes, toType);
+  const Sdf_SpecTypeInfo::SchemaTypes *toSchemaTypes = TfMapLookupPtr(
+      specTypeInfo.specTypeToSchemaTypes, toType);
   if (!toSchemaTypes) {
     return false;
   }

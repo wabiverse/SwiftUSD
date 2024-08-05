@@ -27,87 +27,69 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdExtComputationContextInternal::HdExtComputationContextInternal()
- : HdExtComputationContext()
- , m_inputs()
- , m_outputs()
- , m_compuationError(false){
-}
-
-HdExtComputationContextInternal::~HdExtComputationContextInternal()
+    : HdExtComputationContext(), m_inputs(), m_outputs(), m_compuationError(false)
 {
 }
 
+HdExtComputationContextInternal::~HdExtComputationContextInternal() {}
 
-void
-HdExtComputationContextInternal::SetInputValue(const TfToken &name,
-                                                 const VtValue &input)
+void HdExtComputationContextInternal::SetInputValue(const TfToken &name, const VtValue &input)
 {
-    m_inputs.emplace(name, input);
+  m_inputs.emplace(name, input);
 }
 
-bool
-HdExtComputationContextInternal::GetOutputValue(const TfToken &name,
-                                                 VtValue *output) const
+bool HdExtComputationContextInternal::GetOutputValue(const TfToken &name, VtValue *output) const
 {
-    ValueMap::const_iterator it = m_outputs.find(name);
+  ValueMap::const_iterator it = m_outputs.find(name);
 
-    if (it == m_outputs.end()) {
-       TF_WARN("output not specified: %s", name.GetText());
+  if (it == m_outputs.end()) {
+    TF_WARN("output not specified: %s", name.GetText());
 
-       return false;
-    }
+    return false;
+  }
 
-    *output = it->second;
-    return true;
+  *output = it->second;
+  return true;
 }
 
-bool
-HdExtComputationContextInternal::HasComputationError()
+bool HdExtComputationContextInternal::HasComputationError()
 {
-    return m_compuationError;
+  return m_compuationError;
 }
 
-
-void
-HdExtComputationContextInternal::RaiseComputationError()
+void HdExtComputationContextInternal::RaiseComputationError()
 {
-    m_compuationError = true;
+  m_compuationError = true;
 }
 
-
-const VtValue &
-HdExtComputationContextInternal::GetInputValue(const TfToken &name) const
+const VtValue &HdExtComputationContextInternal::GetInputValue(const TfToken &name) const
 {
-    ValueMap::const_iterator it = m_inputs.find(name);
+  ValueMap::const_iterator it = m_inputs.find(name);
 
-    if (it == m_inputs.end()) {
-       TF_CODING_ERROR("Asking for invalid input %s", name.GetText());
-       static VtValue ERROR_VT_VALUE;
+  if (it == m_inputs.end()) {
+    TF_CODING_ERROR("Asking for invalid input %s", name.GetText());
+    static VtValue ERROR_VT_VALUE;
 
-       return ERROR_VT_VALUE;
-    }
+    return ERROR_VT_VALUE;
+  }
 
-    return it->second;
+  return it->second;
 }
 
-const VtValue *
-HdExtComputationContextInternal::GetOptionalInputValuePtr(
-                                                      const TfToken &name) const
+const VtValue *HdExtComputationContextInternal::GetOptionalInputValuePtr(const TfToken &name) const
 {
-    ValueMap::const_iterator it = m_inputs.find(name);
+  ValueMap::const_iterator it = m_inputs.find(name);
 
-    if (it == m_inputs.end()) {
-        return nullptr;
-    }
+  if (it == m_inputs.end()) {
+    return nullptr;
+  }
 
-    return &(it->second);
+  return &(it->second);
 }
 
-void
-HdExtComputationContextInternal::SetOutputValue(const TfToken &name,
-                                        const VtValue &input)
+void HdExtComputationContextInternal::SetOutputValue(const TfToken &name, const VtValue &input)
 {
-    m_outputs.emplace(name, input);
+  m_outputs.emplace(name, input);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

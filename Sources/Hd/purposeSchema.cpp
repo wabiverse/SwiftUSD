@@ -33,81 +33,61 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdPurposeSchemaTokens,
-    HDPURPOSE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPurposeSchemaTokens, HDPURPOSE_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdPurposeSchema::GetPurpose()
+HdTokenDataSourceHandle HdPurposeSchema::GetPurpose()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdPurposeSchemaTokens->purpose);
+  return _GetTypedDataSource<HdTokenDataSource>(HdPurposeSchemaTokens->purpose);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdPurposeSchema::BuildRetained(
-        const HdTokenDataSourceHandle &purpose
-)
+HdContainerDataSourceHandle HdPurposeSchema::BuildRetained(const HdTokenDataSourceHandle &purpose)
 {
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
 
-    size_t count = 0;
-    if (purpose) {
-        names[count] = HdPurposeSchemaTokens->purpose;
-        values[count++] = purpose;
-    }
+  size_t count = 0;
+  if (purpose) {
+    names[count] = HdPurposeSchemaTokens->purpose;
+    values[count++] = purpose;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdPurposeSchema
-HdPurposeSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdPurposeSchema HdPurposeSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdPurposeSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdPurposeSchemaTokens->purpose))
-        : nullptr);
+  return HdPurposeSchema(
+      fromParentContainer ?
+          HdContainerDataSource::Cast(fromParentContainer->Get(HdPurposeSchemaTokens->purpose)) :
+          nullptr);
 }
 
 /*static*/
-const TfToken &
-HdPurposeSchema::GetSchemaToken()
+const TfToken &HdPurposeSchema::GetSchemaToken()
 {
-    return HdPurposeSchemaTokens->purpose;
-} 
+  return HdPurposeSchemaTokens->purpose;
+}
 /*static*/
-const HdDataSourceLocator &
-HdPurposeSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdPurposeSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdPurposeSchemaTokens->purpose
-    );
-    return locator;
-} 
-HdPurposeSchema::Builder &
-HdPurposeSchema::Builder::SetPurpose(
+  static const HdDataSourceLocator locator(HdPurposeSchemaTokens->purpose);
+  return locator;
+}
+HdPurposeSchema::Builder &HdPurposeSchema::Builder::SetPurpose(
     const HdTokenDataSourceHandle &purpose)
 {
-    _purpose = purpose;
-    return *this;
+  _purpose = purpose;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdPurposeSchema::Builder::Build()
+HdContainerDataSourceHandle HdPurposeSchema::Builder::Build()
 {
-    return HdPurposeSchema::BuildRetained(
-        _purpose
-    );
+  return HdPurposeSchema::BuildRetained(_purpose);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

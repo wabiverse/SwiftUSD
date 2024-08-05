@@ -33,125 +33,106 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDRENDERVAR_SCHEMA_TOKENS \
-    (renderVar) \
-    (path) \
-    (dataType) \
-    (sourceName) \
-    (sourceType) \
-    (namespacedSettings) \
+  (renderVar)(path)(dataType)(sourceName)(sourceType)(namespacedSettings)
 
-TF_DECLARE_PUBLIC_TOKENS(HdRenderVarSchemaTokens, HD_API,
-    HDRENDERVAR_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdRenderVarSchemaTokens, HD_API, HDRENDERVAR_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdRenderVarSchema : public HdSchema
-{
-public:
-    HdRenderVarSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdRenderVarSchema : public HdSchema {
+ public:
+  HdRenderVarSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdPathDataSourceHandle GetPath();
+  HD_API
+  HdTokenDataSourceHandle GetDataType();
+  HD_API
+  HdTokenDataSourceHandle GetSourceName();
+  HD_API
+  HdTokenDataSourceHandle GetSourceType();
+  HD_API
+  HdContainerDataSourceHandle GetNamespacedSettings();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdPathDataSourceHandle &path,
+      const HdTokenDataSourceHandle &dataType,
+      const HdTokenDataSourceHandle &sourceName,
+      const HdTokenDataSourceHandle &sourceType,
+      const HdContainerDataSourceHandle &namespacedSettings);
+
+  /// \class HdRenderVarSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetPath();
+    Builder &SetPath(const HdPathDataSourceHandle &path);
     HD_API
-    HdTokenDataSourceHandle GetDataType();
+    Builder &SetDataType(const HdTokenDataSourceHandle &dataType);
     HD_API
-    HdTokenDataSourceHandle GetSourceName();
+    Builder &SetSourceName(const HdTokenDataSourceHandle &sourceName);
     HD_API
-    HdTokenDataSourceHandle GetSourceType();
+    Builder &SetSourceType(const HdTokenDataSourceHandle &sourceType);
     HD_API
-    HdContainerDataSourceHandle GetNamespacedSettings();
+    Builder &SetNamespacedSettings(const HdContainerDataSourceHandle &namespacedSettings);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &path,
-        const HdTokenDataSourceHandle &dataType,
-        const HdTokenDataSourceHandle &sourceName,
-        const HdTokenDataSourceHandle &sourceType,
-        const HdContainerDataSourceHandle &namespacedSettings
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdRenderVarSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetPath(
-            const HdPathDataSourceHandle &path);
-        HD_API
-        Builder &SetDataType(
-            const HdTokenDataSourceHandle &dataType);
-        HD_API
-        Builder &SetSourceName(
-            const HdTokenDataSourceHandle &sourceName);
-        HD_API
-        Builder &SetSourceType(
-            const HdTokenDataSourceHandle &sourceType);
-        HD_API
-        Builder &SetNamespacedSettings(
-            const HdContainerDataSourceHandle &namespacedSettings);
+   private:
+    HdPathDataSourceHandle _path;
+    HdTokenDataSourceHandle _dataType;
+    HdTokenDataSourceHandle _sourceName;
+    HdTokenDataSourceHandle _sourceType;
+    HdContainerDataSourceHandle _namespacedSettings;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "renderVar" from the parent container and constructs a
+  /// HdRenderVarSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdRenderVarSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdPathDataSourceHandle _path;
-        HdTokenDataSourceHandle _dataType;
-        HdTokenDataSourceHandle _sourceName;
-        HdTokenDataSourceHandle _sourceType;
-        HdContainerDataSourceHandle _namespacedSettings;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "renderVar" from the parent container and constructs a
-    /// HdRenderVarSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdRenderVarSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the namespacedsettings data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetNamespacedSettingsLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the namespacedsettings data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetNamespacedSettingsLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

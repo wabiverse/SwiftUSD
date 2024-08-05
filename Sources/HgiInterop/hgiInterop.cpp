@@ -21,18 +21,18 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "HgiInterop/hgiInteropImpl.h"
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
+#include "HgiInterop/hgiInteropImpl.h"
 
 #if PXR_METAL_SUPPORT_ENABLED
-#include "HgiMetal/hgi.h"
-#include "HgiInterop/metal.h"
+#  include "HgiInterop/metal.h"
+#  include "HgiMetal/hgi.h"
 #elif PXR_VULKAN_SUPPORT_ENABLED
-#include "HgiVulkan/hgi.h"
-#include "HgiInterop/vulkan.h"
+#  include "HgiInterop/vulkan.h"
+#  include "HgiVulkan/hgi.h"
 #else
-#include "HgiInterop/opengl.h"
+#  include "HgiInterop/opengl.h"
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -41,59 +41,46 @@ HgiInterop::HgiInterop() = default;
 
 HgiInterop::~HgiInterop() = default;
 
-void HgiInterop::TransferToApp(
-    Hgi *srcHgi,
-    HgiTextureHandle const &srcColor,
-    HgiTextureHandle const &srcDepth,
-    TfToken const &dstApi,
-    VtValue const &dstFramebuffer,
-    GfVec4i const &dstRegion)
+void HgiInterop::TransferToApp(Hgi *srcHgi,
+                               HgiTextureHandle const &srcColor,
+                               HgiTextureHandle const &srcDepth,
+                               TfToken const &dstApi,
+                               VtValue const &dstFramebuffer,
+                               GfVec4i const &dstRegion)
 {
   TfToken const &srcApi = srcHgi->GetAPIName();
 
 #if PXR_METAL_SUPPORT_ENABLED
-  if (srcApi == HgiTokens->Metal && dstApi == HgiTokens->OpenGL)
-  {
+  if (srcApi == HgiTokens->Metal && dstApi == HgiTokens->OpenGL) {
     // Transfer Metal textures to OpenGL application
-    if (!_metalToOpenGL)
-    {
+    if (!_metalToOpenGL) {
       _metalToOpenGL = std::make_unique<HgiInteropMetal>(srcHgi);
     }
-    _metalToOpenGL->CompositeToInterop(
-        srcColor, srcDepth, dstFramebuffer, dstRegion);
+    _metalToOpenGL->CompositeToInterop(srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unsupported Hgi backend: %s", srcApi.GetText());
   }
 #elif PXR_VULKAN_SUPPORT_ENABLED
-  if (srcApi == HgiTokens->Vulkan && dstApi == HgiTokens->OpenGL)
-  {
+  if (srcApi == HgiTokens->Vulkan && dstApi == HgiTokens->OpenGL) {
     // Transfer Vulkan textures to OpenGL application
-    if (!_vulkanToOpenGL)
-    {
+    if (!_vulkanToOpenGL) {
       _vulkanToOpenGL = std::make_unique<HgiInteropVulkan>(srcHgi);
     }
-    _vulkanToOpenGL->CompositeToInterop(
-        srcColor, srcDepth, dstFramebuffer, dstRegion);
+    _vulkanToOpenGL->CompositeToInterop(srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unsupported Hgi backend: %s", srcApi.GetText());
   }
 #else
-  if (srcApi == HgiTokens->OpenGL && dstApi == HgiTokens->OpenGL)
-  {
+  if (srcApi == HgiTokens->OpenGL && dstApi == HgiTokens->OpenGL) {
     // Transfer OpenGL textures to OpenGL application
-    if (!_openGLToOpenGL)
-    {
+    if (!_openGLToOpenGL) {
       _openGLToOpenGL = std::make_unique<HgiInteropOpenGL>();
     }
-    _openGLToOpenGL->CompositeToInterop(
-        srcColor, srcDepth, dstFramebuffer, dstRegion);
+    _openGLToOpenGL->CompositeToInterop(srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-  else
-  {
+  else {
     TF_CODING_ERROR("Unsupported Hgi backend: %s", srcApi.GetText());
   }
 #endif

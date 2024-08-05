@@ -29,38 +29,34 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle
-HdFlattenedVisibilityDataSourceProvider::GetFlattenedDataSource(
+HdContainerDataSourceHandle HdFlattenedVisibilityDataSourceProvider::GetFlattenedDataSource(
     const Context &ctx) const
 {
-    // Note: this resolves the visibility not according to USD spec.
-    // That is, if a parent is invis'd, we should never be vis'd.
+  // Note: this resolves the visibility not according to USD spec.
+  // That is, if a parent is invis'd, we should never be vis'd.
 
-    HdVisibilitySchema inputVisibility(ctx.GetInputDataSource());
-    if (inputVisibility.GetVisibility()) {
-        return inputVisibility.GetContainer();
-    }
+  HdVisibilitySchema inputVisibility(ctx.GetInputDataSource());
+  if (inputVisibility.GetVisibility()) {
+    return inputVisibility.GetContainer();
+  }
 
-    HdVisibilitySchema parentVisibility(
-        ctx.GetFlattenedDataSourceFromParentPrim());
-    if (parentVisibility.GetVisibility()) {
-        return parentVisibility.GetContainer();
-    }
+  HdVisibilitySchema parentVisibility(ctx.GetFlattenedDataSourceFromParentPrim());
+  if (parentVisibility.GetVisibility()) {
+    return parentVisibility.GetContainer();
+  }
 
-    static const HdContainerDataSourceHandle identityVisibility =
-        HdVisibilitySchema::Builder()
-            .SetVisibility(
-                HdRetainedTypedSampledDataSource<bool>::New(true))
-            .Build();
+  static const HdContainerDataSourceHandle identityVisibility =
+      HdVisibilitySchema::Builder()
+          .SetVisibility(HdRetainedTypedSampledDataSource<bool>::New(true))
+          .Build();
 
-    return identityVisibility;
+  return identityVisibility;
 }
 
-void
-HdFlattenedVisibilityDataSourceProvider::ComputeDirtyLocatorsForDescendants(
-    HdDataSourceLocatorSet * const locators) const
+void HdFlattenedVisibilityDataSourceProvider::ComputeDirtyLocatorsForDescendants(
+    HdDataSourceLocatorSet *const locators) const
 {
-    *locators = HdDataSourceLocatorSet::UniversalSet();
+  *locators = HdDataSourceLocatorSet::UniversalSet();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

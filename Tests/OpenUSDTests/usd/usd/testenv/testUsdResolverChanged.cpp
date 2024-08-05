@@ -30,8 +30,8 @@
 #include "pxr/usd/ar/resolverContextBinder.h"
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/usd/attribute.h"
-#include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/notice.h"
+#include "pxr/usd/usd/stage.h"
 
 #include "Arch/systemInfo.h"
 #include "pxr/base/plug/plugin.h"
@@ -47,30 +47,27 @@ PXR_NAMESPACE_USING_DIRECTIVE
 // to call.
 static PlugStaticInterface<_TestResolverPluginInterface> _ResolverInterface;
 
-static void
-SetupPlugins()
+static void SetupPlugins()
 {
   ArSetPreferredResolver("_TestResolver");
 
   // Register _TestResolver plugin. We assume the build system will
   // install it to the UsdPlugins subdirectory in the same location as
   // this test.
-  const std::string pluginPath =
-      TfStringCatPaths(
-          TfGetPathName(ArchGetExecutablePath()),
-          "UsdPlugins/lib/TestUsdResolverChangedResolver*/Resources/") +
-      "/";
+  const std::string pluginPath = TfStringCatPaths(
+                                     TfGetPathName(ArchGetExecutablePath()),
+                                     "UsdPlugins/lib/TestUsdResolverChangedResolver*/Resources/") +
+                                 "/";
 
-  PlugPluginPtrVector plugins =
-      PlugRegistry::GetInstance().RegisterPlugins(pluginPath);
+  PlugPluginPtrVector plugins = PlugRegistry::GetInstance().RegisterPlugins(pluginPath);
 
   TF_AXIOM(plugins.size() == 1);
   TF_AXIOM(plugins[0]->GetName() == "TestUsdResolverChangedResolver");
 }
 
-void ValidateValue(
-    const UsdStageRefPtr &stage, const std::string &attrPath,
-    const std::string &expectedValue)
+void ValidateValue(const UsdStageRefPtr &stage,
+                   const std::string &attrPath,
+                   const std::string &expectedValue)
 {
   std::string value;
   UsdAttribute attr = stage->GetAttributeAtPath(SdfPath(attrPath));
@@ -79,21 +76,17 @@ void ValidateValue(
   TF_AXIOM(value == expectedValue);
 }
 
-class NoticeTester
-    : public TfWeakBase
-{
-public:
-  NoticeTester(const UsdStageRefPtr &stage)
-      : noticeCount(0)
+class NoticeTester : public TfWeakBase {
+ public:
+  NoticeTester(const UsdStageRefPtr &stage) : noticeCount(0)
   {
-    TfNotice::Register(TfCreateWeakPtr(this),
-                       &NoticeTester::_HandleNotice, UsdStagePtr(stage));
+    TfNotice::Register(TfCreateWeakPtr(this), &NoticeTester::_HandleNotice, UsdStagePtr(stage));
   }
 
   size_t noticeCount;
   std::function<void(const UsdNotice::ObjectsChanged &)> test;
 
-private:
+ private:
   void _HandleNotice(const UsdNotice::ObjectsChanged &n)
   {
     ++noticeCount;
@@ -116,58 +109,44 @@ int main(int argc, char **argv)
   //    The model name is looked up in the asset paths table set with
   //    SetAssetPathsForConfig during _TestResolver::Resolve.
   //
-  std::unordered_map<std::string, std::string> assetPaths = {
-      {"Woody", "ts1/Woody.usda"},
-      {"Buzz", "ts1/Buzz.usda"}};
+  std::unordered_map<std::string, std::string> assetPaths = {{"Woody", "ts1/Woody.usda"},
+                                                             {"Buzz", "ts1/Buzz.usda"}};
 
   _ResolverInterface->SetAssetPathsForConfig("toy_story", assetPaths);
   _ResolverInterface->SetVersionForConfig("toy_story", "ts1");
 
-  UsdStageRefPtr shotA = UsdStage::Open(
-      "shotA.usda", _TestResolverContext("toy_story"));
+  UsdStageRefPtr shotA = UsdStage::Open("shotA.usda", _TestResolverContext("toy_story"));
   TF_AXIOM(shotA);
 
-  UsdStageRefPtr shotB = UsdStage::Open(
-      "shotB.usda", _TestResolverContext("toy_story"));
+  UsdStageRefPtr shotB = UsdStage::Open("shotB.usda", _TestResolverContext("toy_story"));
   TF_AXIOM(shotB);
 
-  UsdStageRefPtr shotC = UsdStage::Open(
-      "shotC.usda", _TestResolverContext("toy_story"));
+  UsdStageRefPtr shotC = UsdStage::Open("shotC.usda", _TestResolverContext("toy_story"));
   TF_AXIOM(shotC);
 
-  UsdStageRefPtr woody = UsdStage::Open(
-      "Woody.usda", _TestResolverContext("toy_story"));
+  UsdStageRefPtr woody = UsdStage::Open("Woody.usda", _TestResolverContext("toy_story"));
   TF_AXIOM(woody);
 
-  UsdStageRefPtr unrelatedShot = UsdStage::CreateInMemory(
-      "unrelated", _TestResolverContext("unrelated"));
+  UsdStageRefPtr unrelatedShot = UsdStage::CreateInMemory("unrelated",
+                                                          _TestResolverContext("unrelated"));
   TF_AXIOM(unrelatedShot);
 
-  NoticeTester shotAListener(shotA), shotBListener(shotB),
-      shotCListener(shotC), woodyListener(woody),
-      unrelatedListener(unrelatedShot);
+  NoticeTester shotAListener(shotA), shotBListener(shotB), shotCListener(shotC),
+      woodyListener(woody), unrelatedListener(unrelatedShot);
 
   // We always expect to see resyncs for the pseudo-root for the
   // following test cases. Resolver changes currently invalidate
   // the whole stage because there may be asset path-valued attributes
   // that clients need to re-resolve.
-  shotAListener.test = shotBListener.test = shotCListener.test =
-      woodyListener.test =
-          [](const UsdNotice::ObjectsChanged &n)
-  {
-    TF_AXIOM(
-        SdfPathVector(n.GetResyncedPaths()) ==
-        SdfPathVector{SdfPath::AbsoluteRootPath()});
-    TF_AXIOM(
-        SdfPathVector(n.GetChangedInfoOnlyPaths()).empty());
-  };
+  shotAListener.test = shotBListener.test = shotCListener.test = woodyListener.test =
+      [](const UsdNotice::ObjectsChanged &n) {
+        TF_AXIOM(SdfPathVector(n.GetResyncedPaths()) ==
+                 SdfPathVector{SdfPath::AbsoluteRootPath()});
+        TF_AXIOM(SdfPathVector(n.GetChangedInfoOnlyPaths()).empty());
+      };
 
   // Change notifications should never come from unrelatedShot.
-  unrelatedListener.test =
-      [](const UsdNotice::ObjectsChanged &n)
-  {
-    TF_AXIOM(false);
-  };
+  unrelatedListener.test = [](const UsdNotice::ObjectsChanged &n) { TF_AXIOM(false); };
 
   ValidateValue(shotA, "/AndysRoom/Woody.movie", "toy_story_1");
   ValidateValue(shotA, "/AndysRoom/Buzz.movie", "toy_story_1");

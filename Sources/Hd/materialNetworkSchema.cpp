@@ -33,77 +33,58 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens,
-    HDMATERIALNETWORK_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens, HDMATERIALNETWORK_SCHEMA_TOKENS);
 
-
-
-HdContainerDataSourceHandle
-HdMaterialNetworkSchema::GetNodes()
+HdContainerDataSourceHandle HdMaterialNetworkSchema::GetNodes()
 {
-    return _GetTypedDataSource<HdContainerDataSource>(
-        HdMaterialNetworkSchemaTokens->nodes);
+  return _GetTypedDataSource<HdContainerDataSource>(HdMaterialNetworkSchemaTokens->nodes);
 }
 
-HdContainerDataSourceHandle
-HdMaterialNetworkSchema::GetTerminals()
+HdContainerDataSourceHandle HdMaterialNetworkSchema::GetTerminals()
 {
-    return _GetTypedDataSource<HdContainerDataSource>(
-        HdMaterialNetworkSchemaTokens->terminals);
+  return _GetTypedDataSource<HdContainerDataSource>(HdMaterialNetworkSchemaTokens->terminals);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdMaterialNetworkSchema::BuildRetained(
-        const HdContainerDataSourceHandle &nodes,
-        const HdContainerDataSourceHandle &terminals
-)
+HdContainerDataSourceHandle HdMaterialNetworkSchema::BuildRetained(
+    const HdContainerDataSourceHandle &nodes, const HdContainerDataSourceHandle &terminals)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (nodes) {
-        names[count] = HdMaterialNetworkSchemaTokens->nodes;
-        values[count++] = nodes;
-    }
+  size_t count = 0;
+  if (nodes) {
+    names[count] = HdMaterialNetworkSchemaTokens->nodes;
+    values[count++] = nodes;
+  }
 
-    if (terminals) {
-        names[count] = HdMaterialNetworkSchemaTokens->terminals;
-        values[count++] = terminals;
-    }
+  if (terminals) {
+    names[count] = HdMaterialNetworkSchemaTokens->terminals;
+    values[count++] = terminals;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-
-HdMaterialNetworkSchema::Builder &
-HdMaterialNetworkSchema::Builder::SetNodes(
+HdMaterialNetworkSchema::Builder &HdMaterialNetworkSchema::Builder::SetNodes(
     const HdContainerDataSourceHandle &nodes)
 {
-    _nodes = nodes;
-    return *this;
+  _nodes = nodes;
+  return *this;
 }
 
-HdMaterialNetworkSchema::Builder &
-HdMaterialNetworkSchema::Builder::SetTerminals(
+HdMaterialNetworkSchema::Builder &HdMaterialNetworkSchema::Builder::SetTerminals(
     const HdContainerDataSourceHandle &terminals)
 {
-    _terminals = terminals;
-    return *this;
+  _terminals = terminals;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdMaterialNetworkSchema::Builder::Build()
+HdContainerDataSourceHandle HdMaterialNetworkSchema::Builder::Build()
 {
-    return HdMaterialNetworkSchema::BuildRetained(
-        _nodes,
-        _terminals
-    );
+  return HdMaterialNetworkSchema::BuildRetained(_nodes, _terminals);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

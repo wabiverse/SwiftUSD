@@ -53,7 +53,7 @@ TF_DECLARE_WEAK_PTRS(PcpLayerStack);
 /// This is an internal class only meant for use by PcpCache.
 ///
 class Pcp_Dependencies {
-public:
+ public:
   /// Construct with no dependencies.
   Pcp_Dependencies();
   ~Pcp_Dependencies();
@@ -90,7 +90,10 @@ public:
 
   /// Inform this dependencies object that layer stacks it observes may have
   /// changed.
-  void LayerStacksChanged() { ++_layerStacksRevision; }
+  void LayerStacksChanged()
+  {
+    ++_layerStacksRevision;
+  }
 
   /// \struct ConcurrentPopulationContext
   ///
@@ -122,10 +125,13 @@ public:
   ///
   /// If \p recurseBelowSite is \c false, depSitePath is always
   /// the sitePath supplied and can be ignored.
-  template <typename FN>
+  template<typename FN>
   void ForEachDependencyOnSite(const PcpLayerStackPtr &siteLayerStack,
-                               const SdfPath &sitePath, bool includeAncestral,
-                               bool recurseBelowSite, const FN &fn) const {
+                               const SdfPath &sitePath,
+                               bool includeAncestral,
+                               bool recurseBelowSite,
+                               const FN &fn) const
+  {
     _LayerStackDepMap::const_iterator i = _deps.find(siteLayerStack);
     if (i == _deps.end()) {
       return;
@@ -138,7 +144,8 @@ public:
           fn(primIndexPath, iter->first);
         }
       }
-    } else {
+    }
+    else {
       _SiteDepMap::const_iterator j = siteDepMap.find(sitePath);
       if (j != siteDepMap.end()) {
         for (const SdfPath &primIndexPath : j->second) {
@@ -147,9 +154,9 @@ public:
       }
     }
     if (includeAncestral) {
-      for (SdfPath ancestorSitePath = sitePath.GetParentPath();
-           !ancestorSitePath.IsEmpty();
-           ancestorSitePath = ancestorSitePath.GetParentPath()) {
+      for (SdfPath ancestorSitePath = sitePath.GetParentPath(); !ancestorSitePath.IsEmpty();
+           ancestorSitePath = ancestorSitePath.GetParentPath())
+      {
         _SiteDepMap::const_iterator j = siteDepMap.find(ancestorSitePath);
         if (j != siteDepMap.end()) {
           for (const SdfPath &ancestorPrimIndexPath : j->second) {
@@ -170,7 +177,10 @@ public:
   /// GetLayerStacksRevision(), and then later calls GetLayerStacksRevision()
   /// again, if the number is unchanged, then GetUsedLayers() is guaranteed to
   /// be unchanged as well.
-  size_t GetLayerStacksRevision() const { return _layerStacksRevision; }
+  size_t GetLayerStacksRevision() const
+  {
+    return _layerStacksRevision;
+  }
 
   /// Returns the root layers of all layer stacks with dependencies
   /// recorded against them.
@@ -182,13 +192,12 @@ public:
 
   /// Returns list of culled dependencies for the prim index with the given
   /// \p primIndexPath.
-  const PcpCulledDependencyVector &
-  GetCulledDependencies(const SdfPath &primIndexPath) const;
+  const PcpCulledDependencyVector &GetCulledDependencies(const SdfPath &primIndexPath) const;
 
   /// Returns list of culled dependencies for the prim index in \p cache
   /// with the given \p primIndexPath.
-  static const PcpCulledDependencyVector &
-  GetCulledDependencies(const PcpCache &cache, const SdfPath &primIndexPath);
+  static const PcpCulledDependencyVector &GetCulledDependencies(const PcpCache &cache,
+                                                                const SdfPath &primIndexPath);
 
   /// Returns true if there are any dynamic file format argument field
   /// dependencies in this dependencies object.
@@ -206,15 +215,13 @@ public:
   /// Returns true if the given \p attribute name is an attribute whose
   /// default field was composed while generating dynamic file format
   /// arguments for any prim index that was added to this dependencies object.
-  bool IsPossibleDynamicFileFormatArgumentAttribute(
-      const TfToken &attributeName) const;
+  bool IsPossibleDynamicFileFormatArgumentAttribute(const TfToken &attributeName) const;
 
   /// Returns the dynamic file format dependency data object for the prim
   /// index with the given \p primIndexPath. This will return an empty
   /// dependency data if either there is no cache prim index for the path or
   /// if the prim index has no dynamic file formats that it depends on.
-  const PcpDynamicFileFormatDependencyData &
-  GetDynamicFileFormatArgumentDependencyData(
+  const PcpDynamicFileFormatDependencyData &GetDynamicFileFormatArgumentDependencyData(
       const SdfPath &primIndexPath) const;
 
   /// Returns the list of prim index paths that depend on one or more
@@ -224,13 +231,12 @@ public:
 
   /// Returns the set of expression variables in \p layerStack that are
   /// used by the prim index at \p primIndexPath.
-  const std::unordered_set<std::string> &
-  GetExpressionVariablesFromLayerStackUsedByPrim(
+  const std::unordered_set<std::string> &GetExpressionVariablesFromLayerStackUsedByPrim(
       const SdfPath &primIndexPath, const PcpLayerStackPtr &layerStack) const;
 
   /// @}
 
-private:
+ private:
   // Map of site paths to dependencies, as cache paths.  Stores cache
   // paths as an unordered vector: for our datasets this is both more
   // compact and faster than std::set.
@@ -239,8 +245,7 @@ private:
   // Map of layer stacks to dependencies on that layerStack.
   // Retains references to those layer stacks, which in turn
   // retain references to their constituent layers.
-  using _LayerStackDepMap =
-      std::unordered_map<PcpLayerStackRefPtr, _SiteDepMap, TfHash>;
+  using _LayerStackDepMap = std::unordered_map<PcpLayerStackRefPtr, _SiteDepMap, TfHash>;
   _LayerStackDepMap _deps;
 
   // A revision number that's incremented when the set of layer stacks that
@@ -259,52 +264,53 @@ private:
   // Map of prim index paths to the dynamic file format dependency info for
   // the prim index.
   using _FileFormatArgumentDependencyMap =
-      std::unordered_map<SdfPath, PcpDynamicFileFormatDependencyData,
-                         SdfPath::Hash>;
+      std::unordered_map<SdfPath, PcpDynamicFileFormatDependencyData, SdfPath::Hash>;
   _FileFormatArgumentDependencyMap _fileFormatArgumentDependencyMap;
 
   // Map of field name to the number of cached prim indices that depend on
   // the field for dynamic file format arguments. This for quick lookup of
   // possible file format argument relevant field changes.
-  using _FileFormatArgumentFieldDepMap =
-      std::unordered_map<TfToken, int, TfToken::HashFunctor>;
+  using _FileFormatArgumentFieldDepMap = std::unordered_map<TfToken, int, TfToken::HashFunctor>;
   _FileFormatArgumentFieldDepMap _possibleDynamicFileFormatArgumentFields;
   _FileFormatArgumentFieldDepMap _possibleDynamicFileFormatArgumentAttributes;
 
   using _ExprVariablesDependencyMap =
-      std::unordered_map<SdfPath, PcpExpressionVariablesDependencyData,
-                         SdfPath::Hash>;
+      std::unordered_map<SdfPath, PcpExpressionVariablesDependencyData, SdfPath::Hash>;
   _ExprVariablesDependencyMap _exprVarsDependencyMap;
 
-  using _LayerStackToExprVarDepMap =
-      std::unordered_map<PcpLayerStackPtr, SdfPathVector, TfHash>;
+  using _LayerStackToExprVarDepMap = std::unordered_map<PcpLayerStackPtr, SdfPathVector, TfHash>;
   _LayerStackToExprVarDepMap _layerStackExprVarsMap;
 
   ConcurrentPopulationContext *_concurrentPopulationContext;
 };
 
 static inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
-                                                 const SdfLayerHandle &layer) {
+                                                 const SdfLayerHandle &layer)
+{
   return node.GetLayerStack()->HasLayer(layer);
 }
 
-static inline bool
-Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
-                              const PcpLayerStackRefPtr &layerStack) {
+static inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
+                                                 const PcpLayerStackRefPtr &layerStack)
+{
   return node.GetLayerStack() == layerStack;
 }
 
-template <class FN, class LayerOrLayerStack>
-static bool Pcp_ForEachDependentNodeImpl(
-    const SdfPath &sitePath, const LayerOrLayerStack &layerOrLayerStack,
-    const SdfPath &depIndexPath, const PcpCache &cache, const FN &fn) {
+template<class FN, class LayerOrLayerStack>
+static bool Pcp_ForEachDependentNodeImpl(const SdfPath &sitePath,
+                                         const LayerOrLayerStack &layerOrLayerStack,
+                                         const SdfPath &depIndexPath,
+                                         const PcpCache &cache,
+                                         const FN &fn)
+{
   bool foundDep = false;
 
   // Walk up as needed to find a containing prim index.
   SdfPath indexPath;
   const PcpPrimIndex *primIndex = nullptr;
-  for (indexPath = depIndexPath.GetAbsoluteRootOrPrimPath();
-       indexPath != SdfPath(); indexPath = indexPath.GetParentPath()) {
+  for (indexPath = depIndexPath.GetAbsoluteRootOrPrimPath(); indexPath != SdfPath();
+       indexPath = indexPath.GetParentPath())
+  {
     primIndex = cache.FindPrimIndex(indexPath);
     if (primIndex) {
       break;
@@ -315,7 +321,8 @@ static bool Pcp_ForEachDependentNodeImpl(
     for (const PcpNodeRef &node : primIndex->GetNodeRange()) {
       if (PcpNodeIntroducesDependency(node) &&
           Pcp_NodeUsesLayerOrLayerStack(node, layerOrLayerStack) &&
-          sitePath.HasPrefix(node.GetPath())) {
+          sitePath.HasPrefix(node.GetPath()))
+      {
         foundDep = true;
         fn(depIndexPath, node);
       }
@@ -331,11 +338,13 @@ static bool Pcp_ForEachDependentNodeImpl(
 ///
 /// The \p nodeFn callback will be called with \p depIndexPath and the
 /// PcpNodeRef for each dependent node in the prim index.
-template <class FN, class LayerOrLayerStack>
+template<class FN, class LayerOrLayerStack>
 static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
                                      const LayerOrLayerStack &layerOrLayerStack,
                                      const SdfPath &depIndexPath,
-                                     const PcpCache &cache, const FN &nodeFn) {
+                                     const PcpCache &cache,
+                                     const FN &nodeFn)
+{
   const bool foundDep = Pcp_ForEachDependentNodeImpl(
       sitePath, layerOrLayerStack, depIndexPath, cache, nodeFn);
 
@@ -357,17 +366,18 @@ static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
 ///
 /// The \p culledDepFn will be called with \p depIndexPath and the
 /// PcpCulledDependency for each culled dependent node in the prim index.
-template <class NodeFn, class CulledDepFn>
-static void
-Pcp_ForEachDependentNode(const SdfPath &sitePath,
-                         const PcpLayerStackRefPtr &layerStack,
-                         const SdfPath &depIndexPath, const PcpCache &cache,
-                         const NodeFn &nodeFn, const CulledDepFn &culledDepFn) {
-  bool foundDep = Pcp_ForEachDependentNodeImpl(sitePath, layerStack,
-                                               depIndexPath, cache, nodeFn);
+template<class NodeFn, class CulledDepFn>
+static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
+                                     const PcpLayerStackRefPtr &layerStack,
+                                     const SdfPath &depIndexPath,
+                                     const PcpCache &cache,
+                                     const NodeFn &nodeFn,
+                                     const CulledDepFn &culledDepFn)
+{
+  bool foundDep = Pcp_ForEachDependentNodeImpl(sitePath, layerStack, depIndexPath, cache, nodeFn);
 
-  const PcpCulledDependencyVector &culledDeps =
-      Pcp_Dependencies::GetCulledDependencies(cache, depIndexPath);
+  const PcpCulledDependencyVector &culledDeps = Pcp_Dependencies::GetCulledDependencies(
+      cache, depIndexPath);
   for (const PcpCulledDependency &dep : culledDeps) {
     if (layerStack == dep.layerStack && sitePath.HasPrefix(dep.sitePath)) {
       foundDep = true;
@@ -387,9 +397,8 @@ Pcp_ForEachDependentNode(const SdfPath &sitePath,
 /// Record a PcpCulledDependency for \p node in \p culledDeps if that
 /// node would be recorded by Pcp_Dependencies if it remained in the
 /// prim index.
-void Pcp_AddCulledDependency(const PcpNodeRef &node,
-                             PcpCulledDependencyVector *culledDeps);
+void Pcp_AddCulledDependency(const PcpNodeRef &node, PcpCulledDependencyVector *culledDeps);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_DEPENDENCIES_H
+#endif  // PXR_USD_PCP_DEPENDENCIES_H

@@ -27,8 +27,8 @@
 
 #include <pxr/pxrns.h>
 
-#include "Trace/api.h"
 #include "Trace/aggregateNode.h"
+#include "Trace/api.h"
 #include "Trace/event.h"
 #include "Trace/reporterBase.h"
 
@@ -60,7 +60,7 @@ class TraceCollectionAvailable;
 /// can then be used as a data source to a GUI or written out to a file.
 ///
 class TraceReporter : public TraceReporterBase {
-public:
+ public:
   TF_MALLOC_TAG_NEW("Trace", "TraceReporter");
 
   using This = TraceReporter;
@@ -72,12 +72,14 @@ public:
   using CounterMap = TfHashMap<TfToken, double, TfToken::HashFunctor>;
 
   /// Create a new reporter with \a label and \a dataSource.
-  static ThisRefPtr New(const std::string &label, DataSourcePtr dataSource) {
+  static ThisRefPtr New(const std::string &label, DataSourcePtr dataSource)
+  {
     return TfCreateRefPtr(new This(label, std::move(dataSource)));
   }
 
   /// Create a new reporter with \a label and no data source.
-  static ThisRefPtr New(const std::string &label) {
+  static ThisRefPtr New(const std::string &label)
+  {
     return TfCreateRefPtr(new This(label, nullptr));
   }
 
@@ -88,7 +90,10 @@ public:
   TRACE_API virtual ~TraceReporter();
 
   /// Return the label associated with this reporter.
-  const std::string &GetLabel() { return _label; }
+  const std::string &GetLabel()
+  {
+    return _label;
+  }
 
   /// \name Report Generation.
   /// @{
@@ -183,15 +188,15 @@ public:
   /// populated internally within the Reporter object itself.
   TRACE_API static TraceAggregateNode::Id CreateValidEventId();
 
-protected:
+ protected:
   TRACE_API TraceReporter(const std::string &label, DataSourcePtr dataSource);
 
-private:
+ private:
   void _ProcessCollection(const TraceReporterBase::CollectionPtr &) override;
   void _RebuildEventAndAggregateTrees();
   void _PrintTimes(std::ostream &s);
 
-private:
+ private:
   std::string _label;
 
   bool _groupByFunction;
@@ -204,4 +209,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_H
+#endif  // PXR_BASE_TRACE_REPORTER_H

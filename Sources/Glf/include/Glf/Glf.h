@@ -21,4 +21,4 @@
 #include <Glf/uniformBlock.h>
 #include <Glf/utils.h>
 
-#endif // __PXR_IMAGING_GLF_H__
+#endif  // __PXR_IMAGING_GLF_H__

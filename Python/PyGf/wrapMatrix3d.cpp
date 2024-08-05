@@ -65,7 +65,8 @@ namespace {
 // Python buffer protocol support.
 
 // Python's getbuffer interface function.
-static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
+static int getbuffer(PyObject *self, Py_buffer *view, int flags)
+{
   if (view == NULL) {
     PyErr_SetString(PyExc_ValueError, "NULL view in getbuffer");
     return -1;
@@ -86,27 +87,30 @@ static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
   view->itemsize = sizeof(double);
   if ((flags & PyBUF_FORMAT) == PyBUF_FORMAT) {
     view->format = Gf_GetPyBufferFmtFor<double>();
-  } else {
+  }
+  else {
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
     view->ndim = 2;
     static Py_ssize_t shape[] = {3, 3};
     view->shape = shape;
-  } else {
+  }
+  else {
     view->ndim = 0;
     view->shape = NULL;
   }
   if ((flags & PyBUF_STRIDES) == PyBUF_STRIDES) {
     static Py_ssize_t strides[] = {3 * sizeof(double), sizeof(double)};
     view->strides = strides;
-  } else {
+  }
+  else {
     view->strides = NULL;
   }
   view->suboffsets = NULL;
   view->internal = NULL;
 
-  Py_INCREF(self); // need to retain a reference to self.
+  Py_INCREF(self);  // need to retain a reference to self.
   return 0;
 }
 
@@ -120,65 +124,78 @@ static PyBufferProcs bufferProcs = {
 // End python buffer protocol support.
 ////////////////////////////////////////////////////////////////////////
 
-static string _Repr(GfMatrix3d const &self) {
+static string _Repr(GfMatrix3d const &self)
+{
   static char newline[] = ",\n            ";
-  return TF_PY_REPR_PREFIX + "Matrix3d(" + TfPyRepr(self[0][0]) + ", " +
-         TfPyRepr(self[0][1]) + ", " + TfPyRepr(self[0][2]) + newline +
-         TfPyRepr(self[1][0]) + ", " + TfPyRepr(self[1][1]) + ", " +
-         TfPyRepr(self[1][2]) + newline + TfPyRepr(self[2][0]) + ", " +
-         TfPyRepr(self[2][1]) + ", " + TfPyRepr(self[2][2]) + ")";
+  return TF_PY_REPR_PREFIX + "Matrix3d(" + TfPyRepr(self[0][0]) + ", " + TfPyRepr(self[0][1]) +
+         ", " + TfPyRepr(self[0][2]) + newline + TfPyRepr(self[1][0]) + ", " +
+         TfPyRepr(self[1][1]) + ", " + TfPyRepr(self[1][2]) + newline + TfPyRepr(self[2][0]) +
+         ", " + TfPyRepr(self[2][1]) + ", " + TfPyRepr(self[2][2]) + ")";
 }
 
-static GfMatrix3d GetInverseWrapper(const GfMatrix3d &self) {
+static GfMatrix3d GetInverseWrapper(const GfMatrix3d &self)
+{
   return self.GetInverse();
 }
 
-static void throwIndexErr(const char *msg) {
+static void throwIndexErr(const char *msg)
+{
   PyErr_SetString(PyExc_IndexError, msg);
   boost::python::throw_error_already_set();
 }
 
-static int normalizeIndex(int index) {
+static int normalizeIndex(int index)
+{
   return TfPyNormalizeIndex(index, 3, true /*throw error*/);
 }
 
 // Return number of rows
-static int __len__(GfMatrix3d const &self) { return 3; }
+static int __len__(GfMatrix3d const &self)
+{
+  return 3;
+}
 
-static double __getitem__double(GfMatrix3d const &self, tuple index) {
+static double __getitem__double(GfMatrix3d const &self, tuple index)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   return self[i1][i2];
 }
 
-static GfVec3d __getitem__vector(GfMatrix3d const &self, int index) {
+static GfVec3d __getitem__vector(GfMatrix3d const &self, int index)
+{
   return GfVec3d(self[normalizeIndex(index)]);
 }
 
-static void __setitem__double(GfMatrix3d &self, tuple index, double value) {
+static void __setitem__double(GfMatrix3d &self, tuple index, double value)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   self[i1][i2] = value;
 }
 
-static void __setitem__vector(GfMatrix3d &self, int index, GfVec3d value) {
+static void __setitem__vector(GfMatrix3d &self, int index, GfVec3d value)
+{
   int ni = normalizeIndex(index);
   self[ni][0] = value[0];
   self[ni][1] = value[1];
   self[ni][2] = value[2];
 }
 
-static bool __contains__double(const GfMatrix3d &self, double value) {
+static bool __contains__double(const GfMatrix3d &self, double value)
+{
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)
       if (self[i][j] == value)
@@ -187,18 +204,21 @@ static bool __contains__double(const GfMatrix3d &self, double value) {
 }
 
 // Check rows against GfVec
-static bool __contains__vector(const GfMatrix3d &self, GfVec3d value) {
+static bool __contains__vector(const GfMatrix3d &self, GfVec3d value)
+{
   for (int i = 0; i < 3; ++i)
     if (self.GetRow(i) == value)
       return true;
   return false;
 }
 
-static GfMatrix3d __truediv__(const GfMatrix3d &self, GfMatrix3d value) {
+static GfMatrix3d __truediv__(const GfMatrix3d &self, GfMatrix3d value)
+{
   return self / value;
 }
 
-static GfMatrix3d *__init__() {
+static GfMatrix3d *__init__()
+{
   // Default constructor produces identity from python.
   return new GfMatrix3d(1);
 }
@@ -207,16 +227,20 @@ static GfMatrix3d *__init__() {
 // This is used by our Shake plugins which need to pickle entire classes
 // (including code), which we don't support in pxml.
 struct GfMatrix3d_Pickle_Suite : boost::python::pickle_suite {
-  static boost::python::tuple getinitargs(const GfMatrix3d &m) {
-    return boost::python::make_tuple(m[0][0], m[0][1], m[0][2], m[1][0],
-                                     m[1][1], m[1][2], m[2][0], m[2][1],
-                                     m[2][2]);
+  static boost::python::tuple getinitargs(const GfMatrix3d &m)
+  {
+    return boost::python::make_tuple(
+        m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
   }
 };
 
-static size_t __hash__(GfMatrix3d const &m) { return TfHash{}(m); }
+static size_t __hash__(GfMatrix3d const &m)
+{
+  return TfHash{}(m);
+}
 
-static boost::python::tuple get_dimension() {
+static boost::python::tuple get_dimension()
+{
   // At one time this was a constant static tuple we returned for
   // dimension. With boost building for python 3 that results in
   // a segfault at shutdown. Building for python 2 with a static
@@ -228,13 +252,13 @@ static boost::python::tuple get_dimension() {
   return make_tuple(3, 3);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapMatrix3d() {
+void wrapMatrix3d()
+{
   typedef GfMatrix3d This;
 
-  def("IsClose",
-      (bool (*)(const GfMatrix3d &m1, const GfMatrix3d &m2, double))GfIsClose);
+  def("IsClose", (bool (*)(const GfMatrix3d &m1, const GfMatrix3d &m2, double))GfIsClose);
 
   class_<This> cls("Matrix3d", no_init);
   cls.def_pickle(GfMatrix3d_Pickle_Suite())
@@ -243,8 +267,7 @@ void wrapMatrix3d() {
       .def(init<const GfMatrix3f &>())
       .def(init<int>())
       .def(init<double>())
-      .def(init<double, double, double, double, double, double, double, double,
-                double>())
+      .def(init<double, double, double, double, double, double, double, double, double>())
       .def(init<const GfVec3d &>())
       .def(init<const vector<vector<float>> &>())
       .def(init<const vector<vector<double>> &>())
@@ -264,19 +287,16 @@ void wrapMatrix3d() {
       .def("__contains__", __contains__vector, "Check rows against GfVec")
 
       .def("Set",
-           (This & (This::*)(double, double, double, double, double, double,
-                             double, double, double)) &
+           (This &
+            (This::*)(double, double, double, double, double, double, double, double, double)) &
                This::Set,
            return_self<>())
 
       .def("SetIdentity", &This::SetIdentity, return_self<>())
       .def("SetZero", &This::SetZero, return_self<>())
 
-      .def("SetDiagonal", (This & (This::*)(double)) & This::SetDiagonal,
-           return_self<>())
-      .def("SetDiagonal",
-           (This & (This::*)(const GfVec3d &)) & This::SetDiagonal,
-           return_self<>())
+      .def("SetDiagonal", (This & (This::*)(double)) & This::SetDiagonal, return_self<>())
+      .def("SetDiagonal", (This & (This::*)(const GfVec3d &)) & This::SetDiagonal, return_self<>())
 
       .def("SetRow", &This::SetRow)
       .def("SetColumn", &This::SetColumn)
@@ -291,10 +311,8 @@ void wrapMatrix3d() {
       .def("IsLeftHanded", &This::IsLeftHanded)
       .def("IsRightHanded", &This::IsRightHanded)
 
-      .def("Orthonormalize", &This::Orthonormalize,
-           (arg("issueWarning") = true))
-      .def("GetOrthonormalized", &This::GetOrthonormalized,
-           (arg("issueWarning") = true))
+      .def("Orthonormalize", &This::Orthonormalize, (arg("issueWarning") = true))
+      .def("GetOrthonormalized", &This::GetOrthonormalized, (arg("issueWarning") = true))
 
       .def(str(self))
       .def(self == self)
@@ -317,23 +335,17 @@ void wrapMatrix3d() {
       .def(self * GfVec3f())
       .def(GfVec3f() * self)
 
-      .def("SetScale", (This & (This::*)(const GfVec3d &)) & This::SetScale,
-           return_self<>())
-      .def("SetRotate", (This & (This::*)(const GfQuatd &)) & This::SetRotate,
-           return_self<>())
-      .def("SetRotate",
-           (This & (This::*)(const GfRotation &)) & This::SetRotate,
-           return_self<>())
+      .def("SetScale", (This & (This::*)(const GfVec3d &)) & This::SetScale, return_self<>())
+      .def("SetRotate", (This & (This::*)(const GfQuatd &)) & This::SetRotate, return_self<>())
+      .def("SetRotate", (This & (This::*)(const GfRotation &)) & This::SetRotate, return_self<>())
       .def("ExtractRotation", &This::ExtractRotation)
-      .def("SetScale", (This & (This::*)(double)) & This::SetScale,
-           return_self<>())
+      .def("SetScale", (This & (This::*)(double)) & This::SetScale, return_self<>())
 
       .def("__repr__", _Repr)
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   // Install buffer protocol: set the tp_as_buffer slot to point to a
   // structure of function pointers that implement the buffer protocol for

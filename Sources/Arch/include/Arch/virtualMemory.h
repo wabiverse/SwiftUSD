@@ -69,9 +69,10 @@ enum ArchMemoryProtection {
 /// ArchProtectReadWrite and ArchProtectReadWriteCopy are the same, on Windows
 /// they differ but the Windows API documentation does not make it clear what
 /// using ReadWrite means for a private file-backed mapping.
-ARCH_API bool ArchSetMemoryProtection(void const *start, size_t numBytes,
+ARCH_API bool ArchSetMemoryProtection(void const *start,
+                                      size_t numBytes,
                                       ArchMemoryProtection protection);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_VIRTUAL_MEMORY_H
+#endif  // PXR_BASE_ARCH_VIRTUAL_MEMORY_H

@@ -33,27 +33,26 @@
 #include "pxr/base/gf/vec3d.h"
 #include "pxr/base/tf/getenv.h"
 
+#include "pxr/base/work/threadLimits.h"
 #include "pxr/imaging/hd/mesh.h"
 #include "pxr/imaging/hd/renderIndex.h"
-#include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/primRange.h"
-#include "pxr/base/work/threadLimits.h"
+#include "pxr/usd/usd/stage.h"
 
 #include "pxr/usdImaging/usdImaging/delegate.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
 #include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
-#include "pxr/usdImaging/usdImagingGL/engine.h"
 #include "pxr/imaging/glf/simpleLightingContext.h"
+#include "pxr/usdImaging/usdImagingGL/engine.h"
 
 #include <iostream>
 #include <sstream>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing
-{
-public:
+class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing {
+ public:
   My_TestGLDrawing()
   {
     _mousePos[0] = _mousePos[1] = 0;
@@ -72,7 +71,7 @@ public:
   virtual void MouseRelease(int button, int x, int y, int modKeys);
   virtual void MouseMove(int x, int y, int modKeys);
 
-private:
+ private:
   std::unique_ptr<UsdImagingGLEngine> _engine;
   HdRenderIndex *_batchIndex;
 
@@ -95,8 +94,7 @@ private:
   double _time;
 };
 
-static UsdStageRefPtr
-_CreateStage(std::string const &primName)
+static UsdStageRefPtr _CreateStage(std::string const &primName)
 {
   static int offset = -2;
   UsdStageRefPtr stage = UsdStage::CreateInMemory();
@@ -125,8 +123,7 @@ void My_TestGLDrawing::InitTest()
   _stage4 = _CreateStage("Bar");
 
   SdfPathVector excludedPaths;
-  _engine.reset(new UsdImagingGLEngine(
-      _stage1->GetPseudoRoot().GetPath(), excludedPaths));
+  _engine.reset(new UsdImagingGLEngine(_stage1->GetPseudoRoot().GetPath(), excludedPaths));
 
   // Setup the batch index to be drawn.
   _batchIndex = _GetRenderIndex(_engine.get());
@@ -156,19 +153,15 @@ void My_TestGLDrawing::InitTest()
 
   // Make sure everything is in the index as we expect.
   SdfPath delegateRoot = _stage1->GetPseudoRoot().GetChildren().begin()->GetPath();
-  for (UsdPrim prim : _stage1->Traverse())
-  {
+  for (UsdPrim prim : _stage1->Traverse()) {
     if (prim.GetPath() == SdfPath::AbsoluteRootPath())
       continue;
     // We expect to find prim </Foo/Foo> for _stage1, but in _stage1 that
     // prim is stored as </Foo>, so we have to replace the prefix </> with
     // </Foo>, yielding </Foo/Foo>.
-    SdfPath path = prim.GetPath().ReplacePrefix(SdfPath::AbsoluteRootPath(),
-                                                delegateRoot);
+    SdfPath path = prim.GetPath().ReplacePrefix(SdfPath::AbsoluteRootPath(), delegateRoot);
     TF_VERIFY(
-        _batchIndex->HasRprim(path),
-        "Failed to find <%s> in the render index.",
-        path.GetText());
+        _batchIndex->HasRprim(path), "Failed to find <%s> in the render index.", path.GetText());
   }
 
   _translate[0] = 0.0;
@@ -182,8 +175,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   perfLog.Enable();
 
   _time += 1.0;
-  if (_time > 20)
-  {
+  if (_time > 20) {
     // delete _delegate2;
     //_delegate2 = NULL;
     _time = 0.0;
@@ -221,8 +213,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
 
   GfMatrix4d modelViewMatrix =
       // rotate from z-up to y-up
-      GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-      viewMatrix;
+      GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) * viewMatrix;
 
   GfVec4d viewport(0, 0, width, height);
   _engine->SetCameraState(modelViewMatrix, projMatrix);
@@ -233,8 +224,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   params.cullStyle = GetCullStyle();
   params.clearColor = GetClearColor();
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     GlfSimpleLightingContextRefPtr lightingContext = GlfSimpleLightingContext::New();
     lightingContext->SetStateFromOpenGL();
     _engine->SetLightingState(lightingContext);
@@ -343,13 +333,13 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   std::cout << "Recreateing re-vising 4\n";
   _delegate4->SetRootVisibility(true);
   // Used to measure delta in the next test, get the initial value here.
-  double bufferSourceDelta1 =
-      perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved);
+  double bufferSourceDelta1 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved);
 
   _Render(_engine.get(), params);
 
   // Save the delta.
-  bufferSourceDelta1 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved) - bufferSourceDelta1;
+  bufferSourceDelta1 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved) -
+                       bufferSourceDelta1;
   std::cout << "--------------------------------------------------------\n";
   counterNames = perfLog.GetCounterNames();
   TF_FOR_ALL(nameIt, counterNames)
@@ -369,8 +359,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   GfMatrix4d xf(1);
   xf[2][0] = -42;
   _delegate3->SetRootTransform(xf);
-  double bufferSourceDelta2 =
-      perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved);
+  double bufferSourceDelta2 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved);
   _Render(_engine.get(), params);
 
   std::cout << "--------------------------------------------------------\n";
@@ -385,12 +374,14 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
 
   // Now, if we did everything correctly, we only updated one extra buffer
   // for the transform, so verify bufferSourceDelta2 - buferSourceDelta1 == 1.
-  bufferSourceDelta2 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved) - bufferSourceDelta2;
+  bufferSourceDelta2 = perfLog.GetCounter(HdPerfTokens->bufferSourcesResolved) -
+                       bufferSourceDelta2;
   TF_VERIFY(bufferSourceDelta2 - bufferSourceDelta1 == 2.0,
             "Expected two buffer source updates, one for the transform and "
             "one for the normal, but got %f (%f - %f)",
             bufferSourceDelta2 - bufferSourceDelta1,
-            bufferSourceDelta2, bufferSourceDelta1);
+            bufferSourceDelta2,
+            bufferSourceDelta1);
 }
 
 void My_TestGLDrawing::MousePress(int button, int x, int y, int modKeys)
@@ -410,18 +401,15 @@ void My_TestGLDrawing::MouseMove(int x, int y, int modKeys)
   int dx = x - _mousePos[0];
   int dy = y - _mousePos[1];
 
-  if (_mouseButton[0])
-  {
+  if (_mouseButton[0]) {
     _rotate[0] += dx;
     _rotate[1] += dy;
   }
-  else if (_mouseButton[1])
-  {
+  else if (_mouseButton[1]) {
     _translate[0] += dx;
     _translate[1] -= dy;
   }
-  else if (_mouseButton[2])
-  {
+  else if (_mouseButton[2]) {
     _translate[2] += dx;
   }
 

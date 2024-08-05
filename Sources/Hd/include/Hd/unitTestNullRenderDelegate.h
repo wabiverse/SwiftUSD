@@ -24,103 +24,90 @@
 #ifndef PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_DELEGATE_H
 #define PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_DELEGATE_H
 
-#include <pxr/pxrns.h>
-#include "Hd/renderDelegate.h"
 #include "Hd/instancer.h"
+#include "Hd/renderDelegate.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class Hd_UnitTestNullRenderDelegate final : public HdRenderDelegate
-{
-public:
-    Hd_UnitTestNullRenderDelegate() = default;
-    ~Hd_UnitTestNullRenderDelegate() override = default;
+class Hd_UnitTestNullRenderDelegate final : public HdRenderDelegate {
+ public:
+  Hd_UnitTestNullRenderDelegate() = default;
+  ~Hd_UnitTestNullRenderDelegate() override = default;
 
-    const TfTokenVector &GetSupportedRprimTypes() const override;
-    const TfTokenVector &GetSupportedSprimTypes() const override;
-    const TfTokenVector &GetSupportedBprimTypes() const override;
-    HdRenderParam *GetRenderParam() const override;
-    HdResourceRegistrySharedPtr GetResourceRegistry() const override;
+  const TfTokenVector &GetSupportedRprimTypes() const override;
+  const TfTokenVector &GetSupportedSprimTypes() const override;
+  const TfTokenVector &GetSupportedBprimTypes() const override;
+  HdRenderParam *GetRenderParam() const override;
+  HdResourceRegistrySharedPtr GetResourceRegistry() const override;
 
-    ////////////////////////////////////////////////////////////////////////////
-    ///
-    /// Renderpass factory
-    ///
-    ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Renderpass factory
+  ///
+  ////////////////////////////////////////////////////////////////////////////
 
-    HdRenderPassSharedPtr CreateRenderPass(HdRenderIndex *index,
-                HdRprimCollection const& collection) override;
+  HdRenderPassSharedPtr CreateRenderPass(HdRenderIndex *index,
+                                         HdRprimCollection const &collection) override;
 
-    ////////////////////////////////////////////////////////////////////////////
-    ///
-    /// Instancer Factory
-    ///
-    ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Instancer Factory
+  ///
+  ////////////////////////////////////////////////////////////////////////////
 
-    HdInstancer *CreateInstancer(HdSceneDelegate *delegate,
-                                 SdfPath const& id) override;
+  HdInstancer *CreateInstancer(HdSceneDelegate *delegate, SdfPath const &id) override;
 
-    void DestroyInstancer(HdInstancer *instancer) override;
+  void DestroyInstancer(HdInstancer *instancer) override;
 
-    ////////////////////////////////////////////////////////////////////////////
-    ///
-    /// Prim Factories
-    ///
-    ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Prim Factories
+  ///
+  ////////////////////////////////////////////////////////////////////////////
 
-    HdRprim *CreateRprim(TfToken const& typeId,
-                                 SdfPath const& rprimId) override;
+  HdRprim *CreateRprim(TfToken const &typeId, SdfPath const &rprimId) override;
 
-    void DestroyRprim(HdRprim *rPrim) override;
+  void DestroyRprim(HdRprim *rPrim) override;
 
-    HdSprim *CreateSprim(TfToken const& typeId,
-                         SdfPath const& sprimId) override;
+  HdSprim *CreateSprim(TfToken const &typeId, SdfPath const &sprimId) override;
 
-    HdSprim *CreateFallbackSprim(TfToken const& typeId) override;
-    void DestroySprim(HdSprim *sprim) override;
+  HdSprim *CreateFallbackSprim(TfToken const &typeId) override;
+  void DestroySprim(HdSprim *sprim) override;
 
-    HdBprim *CreateBprim(TfToken const& typeId,
-                         SdfPath const& bprimId) override;
+  HdBprim *CreateBprim(TfToken const &typeId, SdfPath const &bprimId) override;
 
-    HdBprim *CreateFallbackBprim(TfToken const& typeId) override;
+  HdBprim *CreateFallbackBprim(TfToken const &typeId) override;
 
-    void DestroyBprim(HdBprim *bprim) override;
+  void DestroyBprim(HdBprim *bprim) override;
 
-    ////////////////////////////////////////////////////////////////////////////
-    ///
-    /// Sync, Execute & Dispatch Hooks
-    ///
-    ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Sync, Execute & Dispatch Hooks
+  ///
+  ////////////////////////////////////////////////////////////////////////////
 
-    void CommitResources(HdChangeTracker *tracker) override;
+  void CommitResources(HdChangeTracker *tracker) override;
 
+  ////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Commands API
+  ///
+  ////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////
-    ///
-    /// Commands API
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    
-    HdCommandDescriptors GetCommandDescriptors() const override;
+  HdCommandDescriptors GetCommandDescriptors() const override;
 
-    bool InvokeCommand(
-        const TfToken &command,
-        const HdCommandArgs &args = HdCommandArgs()) override;
+  bool InvokeCommand(const TfToken &command, const HdCommandArgs &args = HdCommandArgs()) override;
 
+ private:
+  static const TfTokenVector SUPPORTED_RPRIM_TYPES;
+  static const TfTokenVector SUPPORTED_SPRIM_TYPES;
+  static const TfTokenVector SUPPORTED_BPRIM_TYPES;
 
-
-private:
-    static const TfTokenVector SUPPORTED_RPRIM_TYPES;
-    static const TfTokenVector SUPPORTED_SPRIM_TYPES;
-    static const TfTokenVector SUPPORTED_BPRIM_TYPES;
-
-    Hd_UnitTestNullRenderDelegate(
-                                const Hd_UnitTestNullRenderDelegate &) = delete;
-    Hd_UnitTestNullRenderDelegate &operator =(
-                                const Hd_UnitTestNullRenderDelegate &) = delete;
-
+  Hd_UnitTestNullRenderDelegate(const Hd_UnitTestNullRenderDelegate &) = delete;
+  Hd_UnitTestNullRenderDelegate &operator=(const Hd_UnitTestNullRenderDelegate &) = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_DELEGATE_H
+#endif  // PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_DELEGATE_H

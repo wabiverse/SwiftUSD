@@ -24,28 +24,40 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_BUFFER_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_BUFFER_H
 
-#include <pxr/pxrns.h>
 #include "Hd/renderBuffer.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrmanRenderBuffer : public HdRenderBuffer
-{
-public:
+class HdPrmanRenderBuffer : public HdRenderBuffer {
+ public:
   HdPrmanRenderBuffer(SdfPath const &id);
   ~HdPrmanRenderBuffer() override;
 
-  bool Allocate(GfVec3i const &dimensions,
-                HdFormat format,
-                bool multiSampled) override;
+  bool Allocate(GfVec3i const &dimensions, HdFormat format, bool multiSampled) override;
 
-  unsigned int GetWidth() const override { return _width; }
-  unsigned int GetHeight() const override { return _height; }
-  unsigned int GetDepth() const override { return 1; }
-  HdFormat GetFormat() const override { return _format; }
+  unsigned int GetWidth() const override
+  {
+    return _width;
+  }
+  unsigned int GetHeight() const override
+  {
+    return _height;
+  }
+  unsigned int GetDepth() const override
+  {
+    return 1;
+  }
+  HdFormat GetFormat() const override
+  {
+    return _format;
+  }
 
   // HdPrman doesn't handle sampling decisions at the hydra level.
-  bool IsMultiSampled() const override { return false; }
+  bool IsMultiSampled() const override
+  {
+    return false;
+  }
 
   void *Map() override
   {
@@ -79,7 +91,7 @@ public:
   // format is the input format.
   void Blit(HdFormat format, int width, int height, uint8_t const *data);
 
-private:
+ private:
   static size_t _GetBufferSize(GfVec2i const &dims, HdFormat format);
 
   void _Deallocate() override;
@@ -95,4 +107,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_BUFFER_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_BUFFER_H

@@ -26,21 +26,22 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiShaderSection::HgiShaderSection(
-    const std::string &identifier,
-    const HgiShaderSectionAttributeVector &attributes,
-    const std::string &defaultValue,
-    const std::string &arraySize,
-    const std::string &blockInstanceIdentifier)
-    : _identifierVar(identifier), _attributes(attributes), _defaultValue(defaultValue), _arraySize(arraySize), _blockInstanceIdentifier(blockInstanceIdentifier)
+HgiShaderSection::HgiShaderSection(const std::string &identifier,
+                                   const HgiShaderSectionAttributeVector &attributes,
+                                   const std::string &defaultValue,
+                                   const std::string &arraySize,
+                                   const std::string &blockInstanceIdentifier)
+    : _identifierVar(identifier),
+      _attributes(attributes),
+      _defaultValue(defaultValue),
+      _arraySize(arraySize),
+      _blockInstanceIdentifier(blockInstanceIdentifier)
 {
 }
 
 HgiShaderSection::~HgiShaderSection() = default;
 
-void HgiShaderSection::WriteType(std::ostream &ss) const
-{
-}
+void HgiShaderSection::WriteType(std::ostream &ss) const {}
 
 void HgiShaderSection::WriteIdentifier(std::ostream &ss) const
 {
@@ -70,20 +71,17 @@ void HgiShaderSection::WriteParameter(std::ostream &ss) const
 
 void HgiShaderSection::WriteArraySize(std::ostream &ss) const
 {
-  if (!_arraySize.empty())
-  {
+  if (!_arraySize.empty()) {
     ss << "[" << _arraySize << "]";
   }
 }
 
-const HgiShaderSectionAttributeVector &
-HgiShaderSection::GetAttributes() const
+const HgiShaderSectionAttributeVector &HgiShaderSection::GetAttributes() const
 {
   return _attributes;
 }
 
-const std::string &
-HgiShaderSection::_GetDefaultValue() const
+const std::string &HgiShaderSection::_GetDefaultValue() const
 {
   return _defaultValue;
 }

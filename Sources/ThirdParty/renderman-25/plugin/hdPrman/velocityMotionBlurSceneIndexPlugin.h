@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VELOCITY_MOTION_BLUR_SCENE_INDEX_PLUGIN_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VELOCITY_MOTION_BLUR_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -48,17 +48,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// The plugin is registered with the scene index plugin registry for Prman.
 ///
-class HdPrman_VelocityMotionBlurSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_VelocityMotionBlurSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_VelocityMotionBlurSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VELOCITY_MOTION_BLUR_SCENE_INDEX_PLUGIN_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_VELOCITY_MOTION_BLUR_SCENE_INDEX_PLUGIN_H

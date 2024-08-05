@@ -58,18 +58,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class TfScriptModuleLoader : public TfWeakBase {
 
-public:
+ public:
   typedef TfScriptModuleLoader This;
 
   /// Return the singleton instance.
-  TF_API static This &GetInstance() { return TfSingleton<This>::GetInstance(); }
+  TF_API static This &GetInstance()
+  {
+    return TfSingleton<This>::GetInstance();
+  }
 
   /// Register a library named \a name and with script module \a moduleName
   /// and libraries which must be loaded first \a predecessors. The script
   /// module will be loaded when necessary. This should generally not be
   /// called by user code.
   TF_API
-  void RegisterLibrary(TfToken const &name, TfToken const &moduleName,
+  void RegisterLibrary(TfToken const &name,
+                       TfToken const &moduleName,
                        std::vector<TfToken> const &predecessors);
 
   /// Load all the script modules for any libraries registered using \a
@@ -98,7 +102,7 @@ public:
   TF_API
   void WriteDotFile(std::string const &file) const;
 
-private:
+ private:
   struct _LibInfo {
     _LibInfo() {}
     std::vector<TfToken> predecessors, successors;
@@ -124,8 +128,7 @@ private:
                                std::vector<TfToken> *result) const;
   void _TopologicalSort(std::vector<TfToken> *result) const;
 
-  bool _HasTransitiveSuccessor(TfToken const &predecessor,
-                               TfToken const &successor) const;
+  bool _HasTransitiveSuccessor(TfToken const &predecessor, TfToken const &successor) const;
 
   _TokenToInfoMap _libInfo;
   _TokenToTokenMap _libsToModules;
@@ -139,4 +142,4 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfScriptModuleLoader>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SCRIPT_MODULE_LOADER_H
+#endif  // PXR_BASE_TF_SCRIPT_MODULE_LOADER_H

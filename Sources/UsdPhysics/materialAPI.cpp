@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsMaterialAPI,
-                 TfType::Bases<UsdAPISchemaBase>>();
+  TfType::Define<UsdPhysicsMaterialAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdPhysicsMaterialAPI::~UsdPhysicsMaterialAPI()
-{
-}
+UsdPhysicsMaterialAPI::~UsdPhysicsMaterialAPI() {}
 
 /* static */
-UsdPhysicsMaterialAPI
-UsdPhysicsMaterialAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsMaterialAPI UsdPhysicsMaterialAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsMaterialAPI();
   }
@@ -61,26 +56,22 @@ UsdSchemaKind UsdPhysicsMaterialAPI::_GetSchemaKind() const
 }
 
 /* static */
-bool UsdPhysicsMaterialAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdPhysicsMaterialAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
   return prim.CanApplyAPI<UsdPhysicsMaterialAPI>(whyNot);
 }
 
 /* static */
-UsdPhysicsMaterialAPI
-UsdPhysicsMaterialAPI::Apply(const UsdPrim &prim)
+UsdPhysicsMaterialAPI UsdPhysicsMaterialAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdPhysicsMaterialAPI>())
-  {
+  if (prim.ApplyAPI<UsdPhysicsMaterialAPI>()) {
     return UsdPhysicsMaterialAPI(prim);
   }
   return UsdPhysicsMaterialAPI();
 }
 
 /* static */
-const TfType &
-UsdPhysicsMaterialAPI::_GetStaticTfType()
+const TfType &UsdPhysicsMaterialAPI::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdPhysicsMaterialAPI>();
   return tfType;
@@ -94,20 +85,18 @@ bool UsdPhysicsMaterialAPI::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsMaterialAPI::_GetTfType() const
+const TfType &UsdPhysicsMaterialAPI::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::GetDynamicFrictionAttr() const
+UsdAttribute UsdPhysicsMaterialAPI::GetDynamicFrictionAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsDynamicFriction);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::CreateDynamicFrictionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsMaterialAPI::CreateDynamicFrictionAttr(VtValue const &defaultValue,
+                                                              bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsDynamicFriction,
                                     SdfValueTypeNames->Float,
@@ -117,14 +106,13 @@ UsdPhysicsMaterialAPI::CreateDynamicFrictionAttr(VtValue const &defaultValue, bo
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::GetStaticFrictionAttr() const
+UsdAttribute UsdPhysicsMaterialAPI::GetStaticFrictionAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsStaticFriction);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::CreateStaticFrictionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsMaterialAPI::CreateStaticFrictionAttr(VtValue const &defaultValue,
+                                                             bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsStaticFriction,
                                     SdfValueTypeNames->Float,
@@ -134,14 +122,13 @@ UsdPhysicsMaterialAPI::CreateStaticFrictionAttr(VtValue const &defaultValue, boo
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::GetRestitutionAttr() const
+UsdAttribute UsdPhysicsMaterialAPI::GetRestitutionAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsRestitution);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::CreateRestitutionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsMaterialAPI::CreateRestitutionAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsRestitution,
                                     SdfValueTypeNames->Float,
@@ -151,14 +138,13 @@ UsdPhysicsMaterialAPI::CreateRestitutionAttr(VtValue const &defaultValue, bool w
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::GetDensityAttr() const
+UsdAttribute UsdPhysicsMaterialAPI::GetDensityAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsDensity);
 }
 
-UsdAttribute
-UsdPhysicsMaterialAPI::CreateDensityAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsMaterialAPI::CreateDensityAttr(VtValue const &defaultValue,
+                                                      bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsDensity,
                                     SdfValueTypeNames->Float,
@@ -168,22 +154,20 @@ UsdPhysicsMaterialAPI::CreateDensityAttr(VtValue const &defaultValue, bool write
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdPhysicsMaterialAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdPhysicsMaterialAPI::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdPhysicsTokens->physicsDynamicFriction,
@@ -191,10 +175,8 @@ UsdPhysicsMaterialAPI::GetSchemaAttributeNames(bool includeInherited)
       UsdPhysicsTokens->physicsRestitution,
       UsdPhysicsTokens->physicsDensity,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdAPISchemaBase::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

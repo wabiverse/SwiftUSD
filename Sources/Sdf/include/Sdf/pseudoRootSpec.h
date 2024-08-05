@@ -40,4 +40,4 @@ class SdfPseudoRootSpec : public SdfPrimSpec {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PSEUDO_ROOT_SPEC_H
+#endif  // PXR_USD_SDF_PSEUDO_ROOT_SPEC_H

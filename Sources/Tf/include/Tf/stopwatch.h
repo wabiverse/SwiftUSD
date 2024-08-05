@@ -53,14 +53,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// function.
 ///
 class TfStopwatch {
-public:
+ public:
   /// Record the current time for use by the next \c Stop() call.
   ///
   /// The \c Start() function records the current time.  A subsequent call
   /// to \c Start() before a call to \c Stop() simply records a later
   /// current time, but does not change the accumulated time of the \c
   /// TfStopwatch.
-  inline void Start() { _startTick = ArchGetStartTickTime(); }
+  inline void Start()
+  {
+    _startTick = ArchGetStartTickTime();
+  }
 
   /// Increases the accumulated time stored in the \c TfStopwatch.
   ///
@@ -72,13 +75,15 @@ public:
   /// A \c TfStopwatch also counts the number of samples it has taken. The
   /// "sample count" is simply the number of times that \c Stop() has been
   /// called.
-  inline void Stop() {
+  inline void Stop()
+  {
     _nTicks += ArchGetStopTickTime() - _startTick;
     _sampleCount++;
   }
 
   ///  Resets the accumulated time and the sample count to zero.
-  void Reset() {
+  void Reset()
+  {
     _nTicks = 0;
     _sampleCount = 0;
   }
@@ -90,7 +95,8 @@ public:
   /// combine them together, you can add one timer's results into another;
   /// for example, \c t2.AddFrom(t1) will add \c t1 's time and sample count
   /// into \c t2.
-  void AddFrom(const TfStopwatch &t) {
+  void AddFrom(const TfStopwatch &t)
+  {
     _nTicks += t._nTicks;
     _sampleCount += t._sampleCount;
   }
@@ -100,28 +106,43 @@ public:
   /// Note that this number can easily overflow a 32-bit counter, so take
   /// care to save the result in an \c int64_t, and not a regular \c int or
   /// \c long.
-  int64_t GetNanoseconds() const { return ArchTicksToNanoseconds(_nTicks); }
+  int64_t GetNanoseconds() const
+  {
+    return ArchTicksToNanoseconds(_nTicks);
+  }
 
   /// Return the accumulated time in microseconds
   ///
   /// Note that 45 minutes will overflow a 32-bit counter, so take care to
   /// save the result in an \c int64_t, and not a regular \c int or \c long.
-  int64_t GetMicroseconds() const { return GetNanoseconds() / 1000; }
+  int64_t GetMicroseconds() const
+  {
+    return GetNanoseconds() / 1000;
+  }
 
   /// Return the accumulated time in milliseconds.
-  int64_t GetMilliseconds() const { return GetMicroseconds() / 1000; }
+  int64_t GetMilliseconds() const
+  {
+    return GetMicroseconds() / 1000;
+  }
 
   /// Return the current sample count.
   ///
   /// The sample count, which is simply the number of calls to \c Stop()
   /// since creation or a call to \c Reset(), is useful for computing
   /// average running times of a repeated task.
-  size_t GetSampleCount() const { return _sampleCount; }
+  size_t GetSampleCount() const
+  {
+    return _sampleCount;
+  }
 
   /// Return the accumulated time in seconds as a \c double.
-  double GetSeconds() const { return ArchTicksToSeconds(_nTicks); }
+  double GetSeconds() const
+  {
+    return ArchTicksToSeconds(_nTicks);
+  }
 
-private:
+ private:
   uint64_t _nTicks = 0;
   uint64_t _startTick = 0;
   size_t _sampleCount = 0;
@@ -137,4 +158,4 @@ TF_API std::ostream &operator<<(std::ostream &out, const TfStopwatch &s);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_STOPWATCH_H
+#endif  // PXR_BASE_TF_STOPWATCH_H

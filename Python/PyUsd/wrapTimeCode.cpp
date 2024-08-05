@@ -42,29 +42,35 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static size_t __hash__(const UsdTimeCode &self) { return hash_value(self); }
+static size_t __hash__(const UsdTimeCode &self)
+{
+  return hash_value(self);
+}
 
-static std::string _Str(const UsdTimeCode &self) {
+static std::string _Str(const UsdTimeCode &self)
+{
   return boost::lexical_cast<std::string>(self);
 }
 
-static string __repr__(const UsdTimeCode &self) {
+static string __repr__(const UsdTimeCode &self)
+{
   string tail = ".Default()";
   if (self.IsNumeric()) {
     if (self.IsEarliestTime()) {
       tail = ".EarliestTime()";
-    } else {
-      tail = self.GetValue() == 0.0
-                 ? string("()")
-                 : TfStringPrintf("(%s)", TfPyRepr(self.GetValue()).c_str());
+    }
+    else {
+      tail = self.GetValue() == 0.0 ? string("()") :
+                                      TfStringPrintf("(%s)", TfPyRepr(self.GetValue()).c_str());
     }
   }
   return TF_PY_REPR_PREFIX + "TimeCode" + tail;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapUsdTimeCode() {
+void wrapUsdTimeCode()
+{
   scope s = class_<UsdTimeCode>("TimeCode")
                 .def(init<double>())
                 .def(init<SdfTimeCode>())
@@ -76,7 +82,8 @@ void wrapUsdTimeCode() {
                 .def("Default", &UsdTimeCode::Default)
                 .staticmethod("Default")
 
-                .def("SafeStep", &UsdTimeCode::SafeStep,
+                .def("SafeStep",
+                     &UsdTimeCode::SafeStep,
                      (arg("maxValue") = 1e6, arg("maxCompression") = 10.0))
                 .staticmethod("SafeStep")
 

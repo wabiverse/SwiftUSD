@@ -27,9 +27,9 @@
 
 /// \file rmanDiscovery/rmanDiscovery.h
 
-#include <pxr/pxrns.h>
 #include "Ndr/discoveryPlugin.h"
 #include <functional>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Discovers nodes supported by the HdPrman render delegate.
 ///
-class RmanDiscoveryPlugin final : public NdrDiscoveryPlugin
-{
-public:
+class RmanDiscoveryPlugin final : public NdrDiscoveryPlugin {
+ public:
   /// A filter for discovered nodes.  If the function returns false
   /// then the discovered node is discarded.  Otherwise the function
   /// can modify the discovery result.
@@ -63,7 +62,7 @@ public:
   /// Gets the paths that this plugin is searching for nodes in.
   const NdrStringVec &GetSearchURIs() const override;
 
-private:
+ private:
   /// The paths (abs) indicating where the plugin should search for nodes.
   NdrStringVec _searchPaths;
 
@@ -85,4 +84,4 @@ void RmanDiscoveryPlugin_SetDefaultFollowSymlinks(bool followSymlinks);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_DISCOVERY_RMAN_DISCOVERY_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_DISCOVERY_RMAN_DISCOVERY_H

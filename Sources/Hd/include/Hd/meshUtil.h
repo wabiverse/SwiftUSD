@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HD_MESH_UTIL_H
 #define PXR_IMAGING_HD_MESH_UTIL_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
-#include "Hd/types.h"
 #include "Hd/meshTopology.h"
+#include "Hd/types.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/path.h"
 
@@ -63,204 +63,207 @@ PXR_NAMESPACE_OPEN_SCOPE
 //                       <----- numAdditionalPoints  ---->
 
 struct HdQuadInfo {
-    HdQuadInfo() : pointsOffset(0), numAdditionalPoints(0), maxNumVert(0) { }
+  HdQuadInfo() : pointsOffset(0), numAdditionalPoints(0), maxNumVert(0) {}
 
-    /// Returns true if the mesh is all-quads.
-    bool IsAllQuads() const { return numAdditionalPoints == 0; }
+  /// Returns true if the mesh is all-quads.
+  bool IsAllQuads() const
+  {
+    return numAdditionalPoints == 0;
+  }
 
-    int pointsOffset;
-    int numAdditionalPoints;
-    int maxNumVert;
-    std::vector<int> numVerts;  // num vertices of non-quads
-    std::vector<int> verts;     // vertex indices of non-quads
+  int pointsOffset;
+  int numAdditionalPoints;
+  int maxNumVert;
+  std::vector<int> numVerts;  // num vertices of non-quads
+  std::vector<int> verts;     // vertex indices of non-quads
 };
 
 /// \class HdMeshUtil
 /// A collection of utility algorithms for generating triangulation
 /// and quadrangulation of an input topology.
 
-class HdMeshUtil
-{
-public:
-    HdMeshUtil(HdMeshTopology const* topology, SdfPath const& id)
-        : _topology(topology), _id(id) {}
-    virtual ~HdMeshUtil() {}
+class HdMeshUtil {
+ public:
+  HdMeshUtil(HdMeshTopology const *topology, SdfPath const &id) : _topology(topology), _id(id) {}
+  virtual ~HdMeshUtil() {}
 
-    // --------------------------------------------------------------------
-    /// \name Triangulation
-    ///
-    /// Produces a mesh where each non-triangle face in the base mesh topology
-    /// is fan-triangulated such that the resulting mesh consists entirely
-    /// of triangles.
-    ///
-    /// In order to access per-face signals (face color, face selection etc)
-    /// we need a mapping from primitiveID to authored face index domain.
-    /// This is encoded in primitiveParams, and computed along with indices.
-    /// See \ref PrimitiveParamEncoding.
-    /// @{
-    /*
-                 +--------+-------+
-                /| \      |\      |\
-               / |  \  1  | \  2  | \
-              /  |   \    |  \    |  \
-             /   |    \   |   \   | 2 +
-            / 0  |  1  \  | 2  \  |  /
-           /     |      \ |     \ | /
-          /      |       \|      \|/
-         +-------+--------+-------+
-    */
+  // --------------------------------------------------------------------
+  /// \name Triangulation
+  ///
+  /// Produces a mesh where each non-triangle face in the base mesh topology
+  /// is fan-triangulated such that the resulting mesh consists entirely
+  /// of triangles.
+  ///
+  /// In order to access per-face signals (face color, face selection etc)
+  /// we need a mapping from primitiveID to authored face index domain.
+  /// This is encoded in primitiveParams, and computed along with indices.
+  /// See \ref PrimitiveParamEncoding.
+  /// @{
+  /*
+               +--------+-------+
+              /| \      |\      |\
+             / |  \  1  | \  2  | \
+            /  |   \    |  \    |  \
+           /   |    \   |   \   | 2 +
+          / 0  |  1  \  | 2  \  |  /
+         /     |      \ |     \ | /
+        /      |       \|      \|/
+       +-------+--------+-------+
+  */
 
-    /// Return a triangulation of the input topology.  indices and
-    /// primitiveParams are output parameters.
-    HD_API
-    void ComputeTriangleIndices(VtVec3iArray *indices,
-                                VtIntArray *primitiveParams,
-                                VtIntArray *edgeIndices = nullptr) const;
+  /// Return a triangulation of the input topology.  indices and
+  /// primitiveParams are output parameters.
+  HD_API
+  void ComputeTriangleIndices(VtVec3iArray *indices,
+                              VtIntArray *primitiveParams,
+                              VtIntArray *edgeIndices = nullptr) const;
 
-    /// Return a triangulation of a face-varying primvar. source is
-    /// a buffer of size numElements and type corresponding to dataType
-    /// (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
-    /// correct type written to the variable "triangulated".
-    /// This function returns false if it can't resolve dataType.
-    HD_API
-    bool ComputeTriangulatedFaceVaryingPrimvar(void const* source,
+  /// Return a triangulation of a face-varying primvar. source is
+  /// a buffer of size numElements and type corresponding to dataType
+  /// (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
+  /// correct type written to the variable "triangulated".
+  /// This function returns false if it can't resolve dataType.
+  HD_API
+  bool ComputeTriangulatedFaceVaryingPrimvar(void const *source,
+                                             int numElements,
+                                             HdType dataType,
+                                             VtValue *triangulated) const;
+
+  /// @}
+
+  // --------------------------------------------------------------------
+  /// \name Quadrangulation
+  ///
+  /// Produces a mesh where each non-quad face in the base mesh topology
+  /// is quadrangulated such that the resulting mesh consists entirely
+  /// of quads. Additionally, supports splitting each resulting quad
+  /// face into a pair of triangles. This is different than simply
+  /// triangulating the base mesh topology and can be useful for
+  /// maintaining consistency with quad-based subdivision schemes.
+  ///
+  /// In order to access per-face signals (face color, face selection etc)
+  /// we need a mapping from primitiveID to authored face index domain.
+  /// This is encoded in primitiveParams, and computed along with indices.
+  /// See \ref PrimitiveParamEncoding.
+  /// @{
+
+  /*
+             +--------+-------+
+            /|        |    |   \
+           / |        |  2 | 2 /\
+          /  |        |     \ /  \
+         / 0 |    1   |------+  2 +
+        /\  /|        |     / \  /
+       /  \/ |        |  2 | 2 \/
+      / 0 | 0|        |    |   /
+     +-------+--------+-------+
+  */
+
+  /// Generate a quadInfo struct for the input topology.
+  HD_API
+  void ComputeQuadInfo(HdQuadInfo *quadInfo) const;
+
+  /// Return quadrangulated indices of the input topology. indices and
+  /// primitiveParams are output parameters.
+  HD_API
+  void ComputeQuadIndices(VtIntArray *indices,
+                          VtIntArray *primitiveParams,
+                          VtVec2iArray *edgeIndices = nullptr) const;
+
+  /// Return triquad indices (triangulated after quadrangulation) of the
+  /// input topology. indices and primitiveParams are output parameters.
+  HD_API
+  void ComputeTriQuadIndices(VtIntArray *indices,
+                             VtIntArray *primitiveParams,
+                             VtVec2iArray *edgeIndices = nullptr) const;
+
+  /// Return a quadrangulation of a per-vertex primvar. source is
+  /// a buffer of size numElements and type corresponding to dataType
+  /// (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
+  /// correct type written to the variable "quadrangulated".
+  /// This function returns false if it can't resolve dataType.
+  HD_API
+  bool ComputeQuadrangulatedPrimvar(HdQuadInfo const *qi,
+                                    void const *source,
+                                    int numElements,
+                                    HdType dataType,
+                                    VtValue *quadrangulated) const;
+
+  /// Return a quadrangulation of a face-varying primvar.
+  /// source is a buffer of size numElements and type corresponding
+  /// to dataType (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
+  /// correct type written to the variable "quadrangulated".
+  /// This function returns false if it can't resolve dataType.
+  HD_API
+  bool ComputeQuadrangulatedFaceVaryingPrimvar(void const *source,
                                                int numElements,
                                                HdType dataType,
-                                               VtValue *triangulated) const;
+                                               VtValue *quadrangulated) const;
 
-    /// @}
+  /// @}
 
-    // --------------------------------------------------------------------
-    /// \name Quadrangulation
-    ///
-    /// Produces a mesh where each non-quad face in the base mesh topology
-    /// is quadrangulated such that the resulting mesh consists entirely
-    /// of quads. Additionally, supports splitting each resulting quad
-    /// face into a pair of triangles. This is different than simply
-    /// triangulating the base mesh topology and can be useful for
-    /// maintaining consistency with quad-based subdivision schemes.
-    ///
-    /// In order to access per-face signals (face color, face selection etc)
-    /// we need a mapping from primitiveID to authored face index domain.
-    /// This is encoded in primitiveParams, and computed along with indices.
-    /// See \ref PrimitiveParamEncoding.
-    /// @{
+  /// Return a buffer filled with face vertex index pairs corresponding
+  /// to the sequence in which edges are visited when iterating through
+  /// the mesh topology. The edges of degenerate and hole faces are
+  /// included so that this sequence will correspond with either base
+  /// face triangulation or quadrangulation (which typically skips
+  /// over hole faces) as well as for refined surfaces which take into
+  /// account faces tagged as holes as well as other non-manifold faces.
+  HD_API
+  void EnumerateEdges(std::vector<GfVec2i> *edgeVerticesOut) const;
 
-    /*
-               +--------+-------+
-              /|        |    |   \
-             / |        |  2 | 2 /\
-            /  |        |     \ /  \
-           / 0 |    1   |------+  2 +
-          /\  /|        |     / \  /
-         /  \/ |        |  2 | 2 \/
-        / 0 | 0|        |    |   /
-       +-------+--------+-------+
-    */
+  // --------------------------------------------------------------------
+  /// \anchor PrimitiveParamEncoding
+  /// \name Primitive Param bit encoding
+  ///
+  /// This encoding provides information about each sub-face resulting
+  /// from the triangulation or quadrangulation of a base topology face.
+  ///
+  /// The encoded faceIndex is the index of the base topology face
+  /// corresponding to a triangulated or quadrangulated sub-face.
+  ///
+  /// The encoded edge flag identifies where a sub-face occurs in the
+  /// sequence of sub-faces produced for each base topology face.
+  /// This edge flag can be used to determine which edges of a sub-face
+  /// correspond to edges of a base topology face and which are internal
+  /// edges that were introduced by triangulation or quadrangulation:
+  /// - 0 unaffected triangle or quad base topology face
+  /// - 1 first sub-face produced by triangulation or quadrangulation
+  /// - 2 last sub-face produced by triangulation or quadrangulation
+  /// - 3 intermediate sub-face produced by triangulation or quadrangulation
+  /// @{
 
-    /// Generate a quadInfo struct for the input topology.
-    HD_API
-    void ComputeQuadInfo(HdQuadInfo* quadInfo) const;
+  // Per-primitive coarse-face-param encoding/decoding functions
+  static int EncodeCoarseFaceParam(int faceIndex, int edgeFlag)
+  {
+    return ((faceIndex << 2) | (edgeFlag & 3));
+  }
+  static int DecodeFaceIndexFromCoarseFaceParam(int coarseFaceParam)
+  {
+    return (coarseFaceParam >> 2);
+  }
+  static int DecodeEdgeFlagFromCoarseFaceParam(int coarseFaceParam)
+  {
+    return (coarseFaceParam & 3);
+  }
 
-    /// Return quadrangulated indices of the input topology. indices and
-    /// primitiveParams are output parameters.
-    HD_API
-    void ComputeQuadIndices(VtIntArray *indices,
-                            VtIntArray *primitiveParams,
-                            VtVec2iArray *edgeIndices = nullptr) const;
+  /// }@
 
-    /// Return triquad indices (triangulated after quadrangulation) of the
-    /// input topology. indices and primitiveParams are output parameters.
-    HD_API
-    void ComputeTriQuadIndices(VtIntArray *indices,
-                               VtIntArray *primitiveParams,
-                               VtVec2iArray *edgeIndices = nullptr) const;
+ private:
+  /// Return the number of quadrangulated quads.
+  /// If degenerate face is found, sets invalidFaceFound as true.
+  int _ComputeNumQuads(VtIntArray const &numVerts,
+                       VtIntArray const &holeIndices,
+                       bool *invalidFaceFound = nullptr) const;
 
-    /// Return a quadrangulation of a per-vertex primvar. source is
-    /// a buffer of size numElements and type corresponding to dataType
-    /// (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
-    /// correct type written to the variable "quadrangulated".
-    /// This function returns false if it can't resolve dataType.
-    HD_API
-    bool ComputeQuadrangulatedPrimvar(HdQuadInfo const* qi,
-                                      void const* source,
-                                      int numElements,
-                                      HdType dataType,
-                                      VtValue *quadrangulated) const;
+  /// Return quad indices (optionally triangulated after quadrangulation).
+  void _ComputeQuadIndices(VtIntArray *indices,
+                           VtIntArray *primitiveParams,
+                           VtVec2iArray *edgeIndices,
+                           bool triangulate = false) const;
 
-    /// Return a quadrangulation of a face-varying primvar.
-    /// source is a buffer of size numElements and type corresponding
-    /// to dataType (e.g. HdTypeFloatVec3); the result is a VtArray<T> of the
-    /// correct type written to the variable "quadrangulated".
-    /// This function returns false if it can't resolve dataType.
-    HD_API
-    bool ComputeQuadrangulatedFaceVaryingPrimvar(void const* source,
-                                                 int numElements,
-                                                 HdType dataType,
-                                                 VtValue *quadrangulated) const;
-
-    /// @}
-
-    /// Return a buffer filled with face vertex index pairs corresponding
-    /// to the sequence in which edges are visited when iterating through
-    /// the mesh topology. The edges of degenerate and hole faces are
-    /// included so that this sequence will correspond with either base
-    /// face triangulation or quadrangulation (which typically skips
-    /// over hole faces) as well as for refined surfaces which take into
-    /// account faces tagged as holes as well as other non-manifold faces.
-    HD_API
-    void EnumerateEdges(std::vector<GfVec2i> * edgeVerticesOut) const;
-
-    // --------------------------------------------------------------------
-    /// \anchor PrimitiveParamEncoding
-    /// \name Primitive Param bit encoding
-    ///
-    /// This encoding provides information about each sub-face resulting
-    /// from the triangulation or quadrangulation of a base topology face.
-    ///
-    /// The encoded faceIndex is the index of the base topology face
-    /// corresponding to a triangulated or quadrangulated sub-face.
-    ///
-    /// The encoded edge flag identifies where a sub-face occurs in the
-    /// sequence of sub-faces produced for each base topology face.
-    /// This edge flag can be used to determine which edges of a sub-face
-    /// correspond to edges of a base topology face and which are internal
-    /// edges that were introduced by triangulation or quadrangulation:
-    /// - 0 unaffected triangle or quad base topology face
-    /// - 1 first sub-face produced by triangulation or quadrangulation
-    /// - 2 last sub-face produced by triangulation or quadrangulation
-    /// - 3 intermediate sub-face produced by triangulation or quadrangulation
-    /// @{
-
-    // Per-primitive coarse-face-param encoding/decoding functions
-    static int EncodeCoarseFaceParam(int faceIndex, int edgeFlag) {
-        return ((faceIndex << 2) | (edgeFlag & 3));
-    }
-    static int DecodeFaceIndexFromCoarseFaceParam(int coarseFaceParam) {
-        return (coarseFaceParam >> 2);
-    }
-    static int DecodeEdgeFlagFromCoarseFaceParam(int coarseFaceParam) {
-        return (coarseFaceParam & 3);
-    }
-
-    /// }@
-
-private:
-    /// Return the number of quadrangulated quads.
-    /// If degenerate face is found, sets invalidFaceFound as true.
-    int _ComputeNumQuads(VtIntArray const &numVerts,
-                         VtIntArray const &holeIndices,
-                         bool *invalidFaceFound = nullptr) const;
-
-    /// Return quad indices (optionally triangulated after quadrangulation).
-    void _ComputeQuadIndices(
-                            VtIntArray *indices,
-                            VtIntArray *primitiveParams,
-                            VtVec2iArray *edgeIndices,
-                            bool triangulate = false) const;
-
-    HdMeshTopology const* _topology;
-    SdfPath const _id;
+  HdMeshTopology const *_topology;
+  SdfPath const _id;
 };
 
 /// \class HdMeshEdgeIndexTable
@@ -309,61 +312,56 @@ private:
 /// drawing order and requires minimal additional GPU data.
 ///
 ///
-class HdMeshEdgeIndexTable
-{
-public:
-    explicit HdMeshEdgeIndexTable(HdMeshTopology const * topology);
-    ~HdMeshEdgeIndexTable();
+class HdMeshEdgeIndexTable {
+ public:
+  explicit HdMeshEdgeIndexTable(HdMeshTopology const *topology);
+  ~HdMeshEdgeIndexTable();
 
-    bool GetVerticesForEdgeIndex(int edgeId, GfVec2i * edgeVerticesOut) const;
+  bool GetVerticesForEdgeIndex(int edgeId, GfVec2i *edgeVerticesOut) const;
 
-    bool GetVerticesForEdgeIndices(
-        std::vector<int> const & edgeIndices,
-        std::vector<GfVec2i> * edgeVerticesOut) const;
+  bool GetVerticesForEdgeIndices(std::vector<int> const &edgeIndices,
+                                 std::vector<GfVec2i> *edgeVerticesOut) const;
 
-    bool GetEdgeIndices(GfVec2i const & edgeVertices,
-                        std::vector<int> * edgeIndicesOut) const;
+  bool GetEdgeIndices(GfVec2i const &edgeVertices, std::vector<int> *edgeIndicesOut) const;
 
-private:
-    struct _Edge{
-        _Edge(GfVec2i const & verts_ = GfVec2i(-1), int index_ = -1)
-            : verts(verts_)
-            , index(index_)
-        {
-            // Simplify sorting and searching by keeping the vertices ordered.
-            if (verts[0] > verts[1]) {
-                std::swap(verts[0], verts[1]);
-            }
-        }
-        GfVec2i verts;
-        int index;
+ private:
+  struct _Edge {
+    _Edge(GfVec2i const &verts_ = GfVec2i(-1), int index_ = -1) : verts(verts_), index(index_)
+    {
+      // Simplify sorting and searching by keeping the vertices ordered.
+      if (verts[0] > verts[1]) {
+        std::swap(verts[0], verts[1]);
+      }
+    }
+    GfVec2i verts;
+    int index;
+  };
 
-    };
+  struct _CompareEdgeVertices {
+    bool operator()(_Edge const &lhs, _Edge const &rhs) const
+    {
+      return (lhs.verts[0] < rhs.verts[0] ||
+              (lhs.verts[0] == rhs.verts[0] && lhs.verts[1] < rhs.verts[1]));
+    }
+  };
 
-    struct _CompareEdgeVertices {
-        bool operator() (_Edge const &lhs, _Edge const & rhs) const {
-            return (lhs.verts[0] < rhs.verts[0] ||
-                    (lhs.verts[0] == rhs.verts[0] &&
-                     lhs.verts[1] < rhs.verts[1]));
-        }
-    };
+  struct _EdgeVerticesHash {
+    // Use a custom hash so that edges (a,b) and (b,a) are equivalent
+    inline size_t operator()(GfVec2i const &v) const
+    {
+      // Triangular numbers for 2-d hash.
+      int theMin = v[0], theMax = v[1];
+      if (theMin > theMax) {
+        std::swap(theMin, theMax);
+      }
+      size_t x = theMin;
+      size_t y = x + theMax;
+      return x + (y * (y + 1)) / 2;
+    }
+  };
 
-    struct _EdgeVerticesHash {
-        // Use a custom hash so that edges (a,b) and (b,a) are equivalent
-        inline size_t operator()(GfVec2i const& v) const {
-            // Triangular numbers for 2-d hash.
-            int theMin = v[0], theMax = v[1];
-            if (theMin > theMax) {
-                std::swap(theMin, theMax);
-            }
-            size_t x = theMin;
-            size_t y = x + theMax;
-            return x + (y * (y + 1)) / 2;
-        }
-    };
-
-    std::vector<GfVec2i> _edgeVertices;
-    std::vector<_Edge> _edgesByIndex;
+  std::vector<GfVec2i> _edgeVertices;
+  std::vector<_Edge> _edgesByIndex;
 };
 
 /// \class HdMeshTriQuadBuilder
@@ -371,39 +369,39 @@ private:
 /// Helper class for emitting a buffer of quad indices, optionally
 /// splitting each quad into two triangles.
 ///
-class HdMeshTriQuadBuilder
-{
-public:
-    static int const NumIndicesPerQuad = 4;
-    static int const NumIndicesPerTriQuad = 6;
+class HdMeshTriQuadBuilder {
+ public:
+  static int const NumIndicesPerQuad = 4;
+  static int const NumIndicesPerTriQuad = 6;
 
-    HdMeshTriQuadBuilder(int * indicesBuffer, bool triangulate)
-        : _outputPtr(indicesBuffer)
-        , _triangulate(triangulate)
-        { }
+  HdMeshTriQuadBuilder(int *indicesBuffer, bool triangulate)
+      : _outputPtr(indicesBuffer), _triangulate(triangulate)
+  {
+  }
 
-    void EmitQuadFace(GfVec4i const & quadIndices) {
-        if (_triangulate) {
-            *_outputPtr++ = quadIndices[0];
-            *_outputPtr++ = quadIndices[1];
-            *_outputPtr++ = quadIndices[2];
-            *_outputPtr++ = quadIndices[2];
-            *_outputPtr++ = quadIndices[3];
-            *_outputPtr++ = quadIndices[0];
-        } else {
-            *_outputPtr++ = quadIndices[0];
-            *_outputPtr++ = quadIndices[1];
-            *_outputPtr++ = quadIndices[2];
-            *_outputPtr++ = quadIndices[3];
-        }
+  void EmitQuadFace(GfVec4i const &quadIndices)
+  {
+    if (_triangulate) {
+      *_outputPtr++ = quadIndices[0];
+      *_outputPtr++ = quadIndices[1];
+      *_outputPtr++ = quadIndices[2];
+      *_outputPtr++ = quadIndices[2];
+      *_outputPtr++ = quadIndices[3];
+      *_outputPtr++ = quadIndices[0];
     }
+    else {
+      *_outputPtr++ = quadIndices[0];
+      *_outputPtr++ = quadIndices[1];
+      *_outputPtr++ = quadIndices[2];
+      *_outputPtr++ = quadIndices[3];
+    }
+  }
 
-private:
-    int * _outputPtr;
-    bool const _triangulate;
+ private:
+  int *_outputPtr;
+  bool const _triangulate;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_MESH_UTIL_H
+#endif  // PXR_IMAGING_HD_MESH_UTIL_H

@@ -10,9 +10,9 @@
 #include <Hio/image.h>
 #include <Hio/imageRegistry.h>
 #include <Hio/rankedTypeMap.h>
-#include <Hio/types.h>
+#include <Hio/stb/stb_image.h>
 #include <Hio/stb/stb_image_resize.h>
 #include <Hio/stb/stb_image_write.h>
-#include <Hio/stb/stb_image.h>
+#include <Hio/types.h>
 
-#endif // __PXR_IMAGING_HIO_H__
+#endif  // __PXR_IMAGING_HIO_H__

@@ -67,21 +67,21 @@ typedef uint8_t uint8;
 namespace {
 
 class SpookyHash {
-public:
+ public:
   //
   // SpookyHash: hash a single message in one call, produce 128-bit output
   //
-  static void Hash128(const void *message, // message to hash
-                      size_t length,       // length of message in bytes
-                      uint64 *hash1,  // in/out: in seed 1, out hash value 1
-                      uint64 *hash2); // in/out: in seed 2, out hash value 2
+  static void Hash128(const void *message,  // message to hash
+                      size_t length,        // length of message in bytes
+                      uint64 *hash1,        // in/out: in seed 1, out hash value 1
+                      uint64 *hash2);       // in/out: in seed 2, out hash value 2
 
   //
   // Hash64: hash a single message in one call, return 64-bit output
   //
-  static uint64 Hash64(const void *message, // message to hash
-                       size_t length,       // length of message in bytes
-                       uint64 seed)         // seed
+  static uint64 Hash64(const void *message,  // message to hash
+                       size_t length,        // length of message in bytes
+                       uint64 seed)          // seed
   {
     uint64 hash1 = seed;
     Hash128(message, length, &hash1, &seed);
@@ -91,9 +91,9 @@ public:
   //
   // Hash32: hash a single message in one call, produce 32-bit output
   //
-  static uint32 Hash32(const void *message, // message to hash
-                       size_t length,       // length of message in bytes
-                       uint32 seed)         // seed
+  static uint32 Hash32(const void *message,  // message to hash
+                       size_t length,        // length of message in bytes
+                       uint32 seed)          // seed
   {
     uint64 hash1 = seed, hash2 = seed;
     Hash128(message, length, &hash1, &hash2);
@@ -104,15 +104,15 @@ public:
   // Init: initialize the context of a SpookyHash
   //
   ARCH_UNUSED_FUNCTION
-  void Init(uint64 seed1,  // any 64-bit value will do, including 0
-            uint64 seed2); // different seeds produce independent hashes
+  void Init(uint64 seed1,   // any 64-bit value will do, including 0
+            uint64 seed2);  // different seeds produce independent hashes
 
   //
   // Update: add a piece of a message to a SpookyHash state
   //
   ARCH_UNUSED_FUNCTION
-  void Update(const void *message, // message fragment
-              size_t length);      // length of message fragment in bytes
+  void Update(const void *message,  // message fragment
+              size_t length);       // length of message fragment in bytes
 
   //
   // Final: compute the hash for the current SpookyHash state
@@ -123,13 +123,14 @@ public:
   // all the pieces concatenated into one message.
   //
   ARCH_UNUSED_FUNCTION
-  void Final(uint64 *hash1,  // out only: first 64 bits of hash value.
-             uint64 *hash2); // out only: second 64 bits of hash value.
+  void Final(uint64 *hash1,   // out only: first 64 bits of hash value.
+             uint64 *hash2);  // out only: second 64 bits of hash value.
 
   //
   // left rotate a 64-bit value by k bytes
   //
-  static inline uint64 Rot64(uint64 x, int k) {
+  static inline uint64 Rot64(uint64 x, int k)
+  {
     return (x << k) | (x >> (64 - k));
   }
 
@@ -146,10 +147,20 @@ public:
   //   When run forward or backwards one Mix
   // I tried 3 pairs of each; they all differed by at least 212 bits.
   //
-  static inline void Mix(const uint64 *data, uint64 &s0, uint64 &s1, uint64 &s2,
-                         uint64 &s3, uint64 &s4, uint64 &s5, uint64 &s6,
-                         uint64 &s7, uint64 &s8, uint64 &s9, uint64 &s10,
-                         uint64 &s11) {
+  static inline void Mix(const uint64 *data,
+                         uint64 &s0,
+                         uint64 &s1,
+                         uint64 &s2,
+                         uint64 &s3,
+                         uint64 &s4,
+                         uint64 &s5,
+                         uint64 &s6,
+                         uint64 &s7,
+                         uint64 &s8,
+                         uint64 &s9,
+                         uint64 &s10,
+                         uint64 &s11)
+  {
     s0 += data[0];
     s2 ^= s10;
     s11 ^= s0;
@@ -228,10 +239,19 @@ public:
   // Two iterations was almost good enough for a 64-bit result, but a
   // 128-bit result is reported, so End() does three iterations.
   //
-  static inline void EndPartial(uint64 &h0, uint64 &h1, uint64 &h2, uint64 &h3,
-                                uint64 &h4, uint64 &h5, uint64 &h6, uint64 &h7,
-                                uint64 &h8, uint64 &h9, uint64 &h10,
-                                uint64 &h11) {
+  static inline void EndPartial(uint64 &h0,
+                                uint64 &h1,
+                                uint64 &h2,
+                                uint64 &h3,
+                                uint64 &h4,
+                                uint64 &h5,
+                                uint64 &h6,
+                                uint64 &h7,
+                                uint64 &h8,
+                                uint64 &h9,
+                                uint64 &h10,
+                                uint64 &h11)
+  {
     h11 += h1;
     h2 ^= h11;
     h1 = Rot64(h1, 44);
@@ -270,10 +290,20 @@ public:
     h0 = Rot64(h0, 54);
   }
 
-  static inline void End(const uint64 *data, uint64 &h0, uint64 &h1, uint64 &h2,
-                         uint64 &h3, uint64 &h4, uint64 &h5, uint64 &h6,
-                         uint64 &h7, uint64 &h8, uint64 &h9, uint64 &h10,
-                         uint64 &h11) {
+  static inline void End(const uint64 *data,
+                         uint64 &h0,
+                         uint64 &h1,
+                         uint64 &h2,
+                         uint64 &h3,
+                         uint64 &h4,
+                         uint64 &h5,
+                         uint64 &h6,
+                         uint64 &h7,
+                         uint64 &h8,
+                         uint64 &h9,
+                         uint64 &h10,
+                         uint64 &h11)
+  {
     h0 += data[0];
     h1 += data[1];
     h2 += data[2];
@@ -306,7 +336,8 @@ public:
   // with diffs defined by either xor or subtraction
   // with a base of all zeros plus a counter, or plus another bit, or random
   //
-  static inline void ShortMix(uint64 &h0, uint64 &h1, uint64 &h2, uint64 &h3) {
+  static inline void ShortMix(uint64 &h0, uint64 &h1, uint64 &h2, uint64 &h3)
+  {
     h2 = Rot64(h2, 50);
     h2 += h3;
     h0 ^= h2;
@@ -357,7 +388,8 @@ public:
   // For every pair of input bits,
   // with probability 50 +- .75% (the worst case is approximately that)
   //
-  static inline void ShortEnd(uint64 &h0, uint64 &h1, uint64 &h2, uint64 &h3) {
+  static inline void ShortEnd(uint64 &h0, uint64 &h1, uint64 &h2, uint64 &h3)
+  {
     h3 ^= h2;
     h2 = Rot64(h2, 15);
     h3 += h2;
@@ -393,18 +425,18 @@ public:
     h1 += h0;
   }
 
-private:
+ private:
   //
   // Short is used for messages under 192 bytes in length
   // Short has a low startup cost, the normal mode is good for long
   // keys, the cost crossover is at about 192 bytes.  The two modes were
   // held to the same quality bar.
   //
-  static void Short(const void *message, // message (array of bytes, not
-                                         // necessarily aligned)
-                    size_t length,       // length of message (in bytes)
-                    uint64 *hash1,  // in/out: in the seed, out the hash value
-                    uint64 *hash2); // in/out: in the seed, out the hash value
+  static void Short(const void *message,  // message (array of bytes, not
+                                          // necessarily aligned)
+                    size_t length,        // length of message (in bytes)
+                    uint64 *hash1,        // in/out: in the seed, out the hash value
+                    uint64 *hash2);       // in/out: in the seed, out the hash value
 
   // number of uint64's in internal state
   static const size_t sc_numVars = 12;
@@ -424,10 +456,10 @@ private:
   //
   static const uint64 sc_const = 0xdeadbeefdeadbeefLL;
 
-  uint64 m_data[2 * sc_numVars]; // unhashed data, for partial messages
-  uint64 m_state[sc_numVars];    // internal state of the hash
-  size_t m_length;               // total length of the input so far
-  uint8 m_remainder;             // length of unhashed data stashed in m_data
+  uint64 m_data[2 * sc_numVars];  // unhashed data, for partial messages
+  uint64 m_state[sc_numVars];     // internal state of the hash
+  size_t m_length;                // total length of the input so far
+  uint8 m_remainder;              // length of unhashed data stashed in m_data
 };
 
 #define ALLOW_UNALIGNED_READS 1
@@ -436,8 +468,8 @@ private:
 // short hash ... it could be used on any message,
 // but it's used by Spooky just for short messages.
 //
-void SpookyHash::Short(const void *message, size_t length, uint64 *hash1,
-                       uint64 *hash2) {
+void SpookyHash::Short(const void *message, size_t length, uint64 *hash1, uint64 *hash2)
+{
   uint64 buf[2 * sc_numVars];
   union {
     const uint8 *p8;
@@ -484,44 +516,44 @@ void SpookyHash::Short(const void *message, size_t length, uint64 *hash1,
   // Handle the last 0..15 bytes, and its length
   d += ((uint64)length) << 56;
   switch (remainder) {
-  case 15:
-    d += ((uint64)u.p8[14]) << 48;
-  case 14:
-    d += ((uint64)u.p8[13]) << 40;
-  case 13:
-    d += ((uint64)u.p8[12]) << 32;
-  case 12:
-    d += u.p32[2];
-    c += u.p64[0];
-    break;
-  case 11:
-    d += ((uint64)u.p8[10]) << 16;
-  case 10:
-    d += ((uint64)u.p8[9]) << 8;
-  case 9:
-    d += (uint64)u.p8[8];
-  case 8:
-    c += u.p64[0];
-    break;
-  case 7:
-    c += ((uint64)u.p8[6]) << 48;
-  case 6:
-    c += ((uint64)u.p8[5]) << 40;
-  case 5:
-    c += ((uint64)u.p8[4]) << 32;
-  case 4:
-    c += u.p32[0];
-    break;
-  case 3:
-    c += ((uint64)u.p8[2]) << 16;
-  case 2:
-    c += ((uint64)u.p8[1]) << 8;
-  case 1:
-    c += (uint64)u.p8[0];
-    break;
-  case 0:
-    c += sc_const;
-    d += sc_const;
+    case 15:
+      d += ((uint64)u.p8[14]) << 48;
+    case 14:
+      d += ((uint64)u.p8[13]) << 40;
+    case 13:
+      d += ((uint64)u.p8[12]) << 32;
+    case 12:
+      d += u.p32[2];
+      c += u.p64[0];
+      break;
+    case 11:
+      d += ((uint64)u.p8[10]) << 16;
+    case 10:
+      d += ((uint64)u.p8[9]) << 8;
+    case 9:
+      d += (uint64)u.p8[8];
+    case 8:
+      c += u.p64[0];
+      break;
+    case 7:
+      c += ((uint64)u.p8[6]) << 48;
+    case 6:
+      c += ((uint64)u.p8[5]) << 40;
+    case 5:
+      c += ((uint64)u.p8[4]) << 32;
+    case 4:
+      c += u.p32[0];
+      break;
+    case 3:
+      c += ((uint64)u.p8[2]) << 16;
+    case 2:
+      c += ((uint64)u.p8[1]) << 8;
+    case 1:
+      c += (uint64)u.p8[0];
+      break;
+    case 0:
+      c += sc_const;
+      d += sc_const;
   }
   ShortEnd(a, b, c, d);
   *hash1 = a;
@@ -529,8 +561,8 @@ void SpookyHash::Short(const void *message, size_t length, uint64 *hash1,
 }
 
 // do the whole hash in one call
-void SpookyHash::Hash128(const void *message, size_t length, uint64 *hash1,
-                         uint64 *hash2) {
+void SpookyHash::Hash128(const void *message, size_t length, uint64 *hash1, uint64 *hash2)
+{
   if (length < sc_bufSize) {
     Short(message, length, hash1, hash2);
     return;
@@ -559,7 +591,8 @@ void SpookyHash::Hash128(const void *message, size_t length, uint64 *hash1,
       Mix(u.p64, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11);
       u.p64 += sc_numVars;
     }
-  } else {
+  }
+  else {
     while (u.p64 < end) {
       memcpy(buf, u.p64, sc_blockSize);
       Mix(buf, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11);
@@ -580,7 +613,8 @@ void SpookyHash::Hash128(const void *message, size_t length, uint64 *hash1,
 }
 
 // init spooky state
-void SpookyHash::Init(uint64 seed1, uint64 seed2) {
+void SpookyHash::Init(uint64 seed1, uint64 seed2)
+{
   m_length = 0;
   m_remainder = 0;
   m_state[0] = seed1;
@@ -588,7 +622,8 @@ void SpookyHash::Init(uint64 seed1, uint64 seed2) {
 }
 
 // add a message fragment to the state
-void SpookyHash::Update(const void *message, size_t length) {
+void SpookyHash::Update(const void *message, size_t length)
+{
   uint64 h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11;
   size_t newLength = length + m_remainder;
   uint8 remainder;
@@ -612,7 +647,8 @@ void SpookyHash::Update(const void *message, size_t length) {
     h0 = h3 = h6 = h9 = m_state[0];
     h1 = h4 = h7 = h10 = m_state[1];
     h2 = h5 = h8 = h11 = sc_const;
-  } else {
+  }
+  else {
     h0 = m_state[0];
     h1 = m_state[1];
     h2 = m_state[2];
@@ -637,7 +673,8 @@ void SpookyHash::Update(const void *message, size_t length) {
     Mix(&u.p64[sc_numVars], h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11);
     u.p8 = ((const uint8 *)message) + prefix;
     length -= prefix;
-  } else {
+  }
+  else {
     u.p8 = (const uint8 *)message;
   }
 
@@ -649,7 +686,8 @@ void SpookyHash::Update(const void *message, size_t length) {
       Mix(u.p64, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11);
       u.p64 += sc_numVars;
     }
-  } else {
+  }
+  else {
     while (u.p64 < end) {
       memcpy(m_data, u.p8, sc_blockSize);
       Mix(m_data, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11);
@@ -677,7 +715,8 @@ void SpookyHash::Update(const void *message, size_t length) {
 }
 
 // report the hash for the concatenation of all message fragments so far
-void SpookyHash::Final(uint64 *hash1, uint64 *hash2) {
+void SpookyHash::Final(uint64 *hash1, uint64 *hash2)
+{
   // init the variables
   if (m_length < sc_bufSize) {
     *hash1 = m_state[0];
@@ -721,21 +760,25 @@ void SpookyHash::Final(uint64 *hash1, uint64 *hash2) {
   *hash2 = h1;
 }
 
-} // namespace
+}  // namespace
 
-uint32_t ArchHash(const char *data, size_t len) {
+uint32_t ArchHash(const char *data, size_t len)
+{
   return SpookyHash::Hash32(data, len, /*seed=*/0);
 }
 
-uint32_t ArchHash(const char *data, size_t len, uint32_t seed) {
+uint32_t ArchHash(const char *data, size_t len, uint32_t seed)
+{
   return SpookyHash::Hash32(data, len, seed);
 }
 
-uint64_t ArchHash64(const char *data, size_t len) {
+uint64_t ArchHash64(const char *data, size_t len)
+{
   return SpookyHash::Hash64(data, len, /*seed=*/0);
 }
 
-uint64_t ArchHash64(const char *data, size_t len, uint64_t seed) {
+uint64_t ArchHash64(const char *data, size_t len, uint64_t seed)
+{
   return SpookyHash::Hash64(data, len, seed);
 }
 

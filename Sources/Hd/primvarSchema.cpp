@@ -33,375 +33,332 @@
 #include "Vt/typeHeaders.h"
 #include "Vt/visitValue.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrimvarSchemaTokens,
-    HDPRIMVAR_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrimvarSchemaTokens, HDPRIMVAR_SCHEMA_TOKENS);
 
-
-
-bool
-HdPrimvarSchema::IsIndexed()
+bool HdPrimvarSchema::IsIndexed()
 {
-    if (_container) {
-        return (_container->Get(HdPrimvarSchemaTokens->
-                    indexedPrimvarValue) && 
-                _container->Get(HdPrimvarSchemaTokens->indices));
-    }
-    return false;
+  if (_container) {
+    return (_container->Get(HdPrimvarSchemaTokens->indexedPrimvarValue) &&
+            _container->Get(HdPrimvarSchemaTokens->indices));
+  }
+  return false;
 }
 
 namespace {
 
-template<typename T>
-VtValue 
-_ComputeFlattened(VtArray<T> const &array, VtIntArray const &indices) {
-    if (indices.empty()) {
-        return VtValue(array);
-    }
+template<typename T> VtValue _ComputeFlattened(VtArray<T> const &array, VtIntArray const &indices)
+{
+  if (indices.empty()) {
+    return VtValue(array);
+  }
 
-    VtArray<T> result = VtArray<T>(indices.size());
+  VtArray<T> result = VtArray<T>(indices.size());
 
-    bool invalidIndices = false;
-    for (size_t i = 0; i < indices.size(); ++i) {
-        int index = indices[i];
-        if (index >= 0 && (size_t)index < array.size()) {
-            result[i] = array[index];
-        } else {
-            result[i] = T();
-            invalidIndices = true;
-        }
+  bool invalidIndices = false;
+  for (size_t i = 0; i < indices.size(); ++i) {
+    int index = indices[i];
+    if (index >= 0 && (size_t)index < array.size()) {
+      result[i] = array[index];
     }
-    if (invalidIndices) {
-        TF_WARN("Invalid primvar indices");
+    else {
+      result[i] = T();
+      invalidIndices = true;
     }
+  }
+  if (invalidIndices) {
+    TF_WARN("Invalid primvar indices");
+  }
 
-    return VtValue(result);
+  return VtValue(result);
 }
 
+struct _ComputeFlattenedValue {
+  _ComputeFlattenedValue(VtIntArray const &indices) : _indices(indices) {}
 
-struct _ComputeFlattenedValue
-{
-    _ComputeFlattenedValue(VtIntArray const &indices)
-    : _indices(indices) {}
+  template<typename T> VtValue operator()(VtArray<T> const &array)
+  {
+    return _ComputeFlattened<T>(array, _indices);
+  }
 
-    template <typename T>
-    VtValue operator()(VtArray<T> const &array) {
-        return _ComputeFlattened<T>(array, _indices);
-    }
+  VtValue operator()(VtValue const &value)
+  {
+    TF_WARN("Unsupported indexed primvar type");
+    return value;
+  }
 
-    VtValue operator()(VtValue const &value) {
-        TF_WARN("Unsupported indexed primvar type");
-        return value;
-    }
-
-    VtIntArray _indices;
+  VtIntArray _indices;
 };
 
-class _HdDataSourceFlattenedPrimvarValue : public HdSampledDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE(_HdDataSourceFlattenedPrimvarValue);
+class _HdDataSourceFlattenedPrimvarValue : public HdSampledDataSource {
+ public:
+  HD_DECLARE_DATASOURCE(_HdDataSourceFlattenedPrimvarValue);
 
-    _HdDataSourceFlattenedPrimvarValue(
-        HdSampledDataSourceHandle indexedValue,
-        HdIntArrayDataSourceHandle indices)
-    : _indexedValue(indexedValue)
-    , _indices(indices)
-    {
+  _HdDataSourceFlattenedPrimvarValue(HdSampledDataSourceHandle indexedValue,
+                                     HdIntArrayDataSourceHandle indices)
+      : _indexedValue(indexedValue), _indices(indices)
+  {
+  }
+
+  VtValue GetValue(Time shutterOffset) override
+  {
+    VtValue indexedValue = _indexedValue->GetValue(shutterOffset);
+    VtIntArray indices = _indices->GetTypedValue(shutterOffset);
+    return VtVisitValue(indexedValue, _ComputeFlattenedValue(indices));
+  }
+
+  bool GetContributingSampleTimesForInterval(Time startTime,
+                                             Time endTime,
+                                             std::vector<Time> *outSampleTimes) override
+  {
+    std::vector<Time> valueSampleTimes;
+    const bool valueVarying = _indexedValue->GetContributingSampleTimesForInterval(
+        startTime, endTime, &valueSampleTimes);
+    std::vector<Time> indexSampleTimes;
+    const bool indexVarying = _indices->GetContributingSampleTimesForInterval(
+        startTime, endTime, &indexSampleTimes);
+
+    if (outSampleTimes) {
+      if (valueVarying && indexVarying) {
+        std::set_union(valueSampleTimes.begin(),
+                       valueSampleTimes.end(),
+                       indexSampleTimes.begin(),
+                       indexSampleTimes.end(),
+                       std::back_inserter(*outSampleTimes));
+      }
+      else if (valueVarying) {
+        *outSampleTimes = std::move(valueSampleTimes);
+      }
+      else if (indexVarying) {
+        *outSampleTimes = std::move(indexSampleTimes);
+      }
     }
+    return valueVarying || indexVarying;
+  }
 
-    VtValue GetValue(Time shutterOffset) override
-    {
-        VtValue indexedValue = _indexedValue->GetValue(shutterOffset);
-        VtIntArray indices = _indices->GetTypedValue(shutterOffset);
-        return VtVisitValue(indexedValue, _ComputeFlattenedValue(indices));
-    }
-
-    bool GetContributingSampleTimesForInterval(
-            Time startTime, Time endTime,
-            std::vector<Time> * outSampleTimes) override
-    {
-        std::vector<Time> valueSampleTimes;
-        const bool valueVarying =
-            _indexedValue->GetContributingSampleTimesForInterval(
-                startTime, endTime, &valueSampleTimes);
-        std::vector<Time> indexSampleTimes;
-        const bool indexVarying =
-            _indices->GetContributingSampleTimesForInterval(
-                startTime, endTime, &indexSampleTimes);
-
-        if (outSampleTimes) {
-            if (valueVarying && indexVarying) {
-                std::set_union(
-                    valueSampleTimes.begin(), valueSampleTimes.end(),
-                    indexSampleTimes.begin(), indexSampleTimes.end(),
-                    std::back_inserter(*outSampleTimes));
-            } else if (valueVarying) {
-                *outSampleTimes = std::move(valueSampleTimes);
-            } else if (indexVarying) {
-                *outSampleTimes = std::move(indexSampleTimes);
-            }
-        }
-        return valueVarying || indexVarying;
-    }
-
-private:
-    HdSampledDataSourceHandle _indexedValue;
-    HdIntArrayDataSourceHandle _indices;
+ private:
+  HdSampledDataSourceHandle _indexedValue;
+  HdIntArrayDataSourceHandle _indices;
 };
 
-}
+}  // namespace
 
-
-
-HdSampledDataSourceHandle
-HdPrimvarSchema::GetPrimvarValue()
+HdSampledDataSourceHandle HdPrimvarSchema::GetPrimvarValue()
 {
-    // overriden definition from primvarSchemaGetValue.template.cpp
-    if (_container) {
-        if (HdSampledDataSourceHandle sds =
-                _GetTypedDataSource<HdSampledDataSource>(
-                    HdPrimvarSchemaTokens->primvarValue)) {
-            return sds;
-        } else {
-            HdSampledDataSourceHandle ivds =
-                _GetTypedDataSource<HdSampledDataSource>(
-                    HdPrimvarSchemaTokens->indexedPrimvarValue);
-
-            HdTypedSampledDataSource<VtIntArray>::Handle ids = 
-                _GetTypedDataSource<HdTypedSampledDataSource<VtIntArray>>(
-                    HdPrimvarSchemaTokens->indices);
-
-            if (ivds && ids) {
-                return _HdDataSourceFlattenedPrimvarValue::New(ivds, ids);
-            }
-        }
+  // overriden definition from primvarSchemaGetValue.template.cpp
+  if (_container) {
+    if (HdSampledDataSourceHandle sds = _GetTypedDataSource<HdSampledDataSource>(
+            HdPrimvarSchemaTokens->primvarValue))
+    {
+      return sds;
     }
-    return nullptr;
-}
+    else {
+      HdSampledDataSourceHandle ivds = _GetTypedDataSource<HdSampledDataSource>(
+          HdPrimvarSchemaTokens->indexedPrimvarValue);
 
-HdSampledDataSourceHandle
-HdPrimvarSchema::GetIndexedPrimvarValue()
-{
-    // overriden definition from primvarSchemaGetIndexedValue.template.cpp
-    if (IsIndexed()) {
-        return _GetTypedDataSource<HdSampledDataSource>(
-                HdPrimvarSchemaTokens->indexedPrimvarValue);
-    } else {
-        return _GetTypedDataSource<HdSampledDataSource>(
-                HdPrimvarSchemaTokens->primvarValue);
+      HdTypedSampledDataSource<VtIntArray>::Handle ids =
+          _GetTypedDataSource<HdTypedSampledDataSource<VtIntArray>>(
+              HdPrimvarSchemaTokens->indices);
+
+      if (ivds && ids) {
+        return _HdDataSourceFlattenedPrimvarValue::New(ivds, ids);
+      }
     }
+  }
+  return nullptr;
 }
 
-HdIntArrayDataSourceHandle
-HdPrimvarSchema::GetIndices()
+HdSampledDataSourceHandle HdPrimvarSchema::GetIndexedPrimvarValue()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdPrimvarSchemaTokens->indices);
+  // overriden definition from primvarSchemaGetIndexedValue.template.cpp
+  if (IsIndexed()) {
+    return _GetTypedDataSource<HdSampledDataSource>(HdPrimvarSchemaTokens->indexedPrimvarValue);
+  }
+  else {
+    return _GetTypedDataSource<HdSampledDataSource>(HdPrimvarSchemaTokens->primvarValue);
+  }
 }
 
-HdTokenDataSourceHandle
-HdPrimvarSchema::GetInterpolation()
+HdIntArrayDataSourceHandle HdPrimvarSchema::GetIndices()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdPrimvarSchemaTokens->interpolation);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdPrimvarSchemaTokens->indices);
 }
 
-HdTokenDataSourceHandle
-HdPrimvarSchema::GetRole()
+HdTokenDataSourceHandle HdPrimvarSchema::GetInterpolation()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdPrimvarSchemaTokens->role);
+  return _GetTypedDataSource<HdTokenDataSource>(HdPrimvarSchemaTokens->interpolation);
+}
+
+HdTokenDataSourceHandle HdPrimvarSchema::GetRole()
+{
+  return _GetTypedDataSource<HdTokenDataSource>(HdPrimvarSchemaTokens->role);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdPrimvarSchema::BuildRetained(
-        const HdSampledDataSourceHandle &primvarValue,
-        const HdSampledDataSourceHandle &indexedPrimvarValue,
-        const HdIntArrayDataSourceHandle &indices,
-        const HdTokenDataSourceHandle &interpolation,
-        const HdTokenDataSourceHandle &role
-)
-{
-    TfToken names[5];
-    HdDataSourceBaseHandle values[5];
-
-    size_t count = 0;
-    if (primvarValue) {
-        names[count] = HdPrimvarSchemaTokens->primvarValue;
-        values[count++] = primvarValue;
-    }
-
-    if (indexedPrimvarValue) {
-        names[count] = HdPrimvarSchemaTokens->indexedPrimvarValue;
-        values[count++] = indexedPrimvarValue;
-    }
-
-    if (indices) {
-        names[count] = HdPrimvarSchemaTokens->indices;
-        values[count++] = indices;
-    }
-
-    if (interpolation) {
-        names[count] = HdPrimvarSchemaTokens->interpolation;
-        values[count++] = interpolation;
-    }
-
-    if (role) {
-        names[count] = HdPrimvarSchemaTokens->role;
-        values[count++] = role;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-
-
-/*static*/
-HdTokenDataSourceHandle
-HdPrimvarSchema::BuildInterpolationDataSource(
-    const TfToken &interpolation)
-{
-    if (interpolation == HdPrimvarSchemaTokens->constant) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-    if (interpolation == HdPrimvarSchemaTokens->uniform) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-    if (interpolation == HdPrimvarSchemaTokens->varying) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-    if (interpolation == HdPrimvarSchemaTokens->vertex) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-    if (interpolation == HdPrimvarSchemaTokens->faceVarying) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-    if (interpolation == HdPrimvarSchemaTokens->instance) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-        return ds;
-    }
-
-    // fallback for unknown token
-    return HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
-}
-
-
-/*static*/
-HdTokenDataSourceHandle
-HdPrimvarSchema::BuildRoleDataSource(
-    const TfToken &role)
-{
-    if (role == HdPrimvarSchemaTokens->point) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->normal) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->vector) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->color) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->pointIndex) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->edgeIndex) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->faceIndex) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-    if (role == HdPrimvarSchemaTokens->textureCoordinate) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(role);
-        return ds;
-    }
-
-    // fallback for unknown token
-    return HdRetainedTypedSampledDataSource<TfToken>::New(role);
-}
-
-HdPrimvarSchema::Builder &
-HdPrimvarSchema::Builder::SetPrimvarValue(
-    const HdSampledDataSourceHandle &primvarValue)
-{
-    _primvarValue = primvarValue;
-    return *this;
-}
-
-HdPrimvarSchema::Builder &
-HdPrimvarSchema::Builder::SetIndexedPrimvarValue(
-    const HdSampledDataSourceHandle &indexedPrimvarValue)
-{
-    _indexedPrimvarValue = indexedPrimvarValue;
-    return *this;
-}
-
-HdPrimvarSchema::Builder &
-HdPrimvarSchema::Builder::SetIndices(
-    const HdIntArrayDataSourceHandle &indices)
-{
-    _indices = indices;
-    return *this;
-}
-
-HdPrimvarSchema::Builder &
-HdPrimvarSchema::Builder::SetInterpolation(
-    const HdTokenDataSourceHandle &interpolation)
-{
-    _interpolation = interpolation;
-    return *this;
-}
-
-HdPrimvarSchema::Builder &
-HdPrimvarSchema::Builder::SetRole(
+HdContainerDataSourceHandle HdPrimvarSchema::BuildRetained(
+    const HdSampledDataSourceHandle &primvarValue,
+    const HdSampledDataSourceHandle &indexedPrimvarValue,
+    const HdIntArrayDataSourceHandle &indices,
+    const HdTokenDataSourceHandle &interpolation,
     const HdTokenDataSourceHandle &role)
 {
-    _role = role;
-    return *this;
+  TfToken names[5];
+  HdDataSourceBaseHandle values[5];
+
+  size_t count = 0;
+  if (primvarValue) {
+    names[count] = HdPrimvarSchemaTokens->primvarValue;
+    values[count++] = primvarValue;
+  }
+
+  if (indexedPrimvarValue) {
+    names[count] = HdPrimvarSchemaTokens->indexedPrimvarValue;
+    values[count++] = indexedPrimvarValue;
+  }
+
+  if (indices) {
+    names[count] = HdPrimvarSchemaTokens->indices;
+    values[count++] = indices;
+  }
+
+  if (interpolation) {
+    names[count] = HdPrimvarSchemaTokens->interpolation;
+    values[count++] = interpolation;
+  }
+
+  if (role) {
+    names[count] = HdPrimvarSchemaTokens->role;
+    values[count++] = role;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdPrimvarSchema::Builder::Build()
+/*static*/
+HdTokenDataSourceHandle HdPrimvarSchema::BuildInterpolationDataSource(const TfToken &interpolation)
 {
-    return HdPrimvarSchema::BuildRetained(
-        _primvarValue,
-        _indexedPrimvarValue,
-        _indices,
-        _interpolation,
-        _role
-    );
+  if (interpolation == HdPrimvarSchemaTokens->constant) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+  if (interpolation == HdPrimvarSchemaTokens->uniform) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+  if (interpolation == HdPrimvarSchemaTokens->varying) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+  if (interpolation == HdPrimvarSchemaTokens->vertex) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+  if (interpolation == HdPrimvarSchemaTokens->faceVarying) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+  if (interpolation == HdPrimvarSchemaTokens->instance) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
+    return ds;
+  }
+
+  // fallback for unknown token
+  return HdRetainedTypedSampledDataSource<TfToken>::New(interpolation);
 }
 
+/*static*/
+HdTokenDataSourceHandle HdPrimvarSchema::BuildRoleDataSource(const TfToken &role)
+{
+  if (role == HdPrimvarSchemaTokens->point) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->normal) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->vector) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->color) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->pointIndex) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->edgeIndex) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->faceIndex) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+  if (role == HdPrimvarSchemaTokens->textureCoordinate) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(role);
+    return ds;
+  }
+
+  // fallback for unknown token
+  return HdRetainedTypedSampledDataSource<TfToken>::New(role);
+}
+
+HdPrimvarSchema::Builder &HdPrimvarSchema::Builder::SetPrimvarValue(
+    const HdSampledDataSourceHandle &primvarValue)
+{
+  _primvarValue = primvarValue;
+  return *this;
+}
+
+HdPrimvarSchema::Builder &HdPrimvarSchema::Builder::SetIndexedPrimvarValue(
+    const HdSampledDataSourceHandle &indexedPrimvarValue)
+{
+  _indexedPrimvarValue = indexedPrimvarValue;
+  return *this;
+}
+
+HdPrimvarSchema::Builder &HdPrimvarSchema::Builder::SetIndices(
+    const HdIntArrayDataSourceHandle &indices)
+{
+  _indices = indices;
+  return *this;
+}
+
+HdPrimvarSchema::Builder &HdPrimvarSchema::Builder::SetInterpolation(
+    const HdTokenDataSourceHandle &interpolation)
+{
+  _interpolation = interpolation;
+  return *this;
+}
+
+HdPrimvarSchema::Builder &HdPrimvarSchema::Builder::SetRole(const HdTokenDataSourceHandle &role)
+{
+  _role = role;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdPrimvarSchema::Builder::Build()
+{
+  return HdPrimvarSchema::BuildRetained(
+      _primvarValue, _indexedPrimvarValue, _indices, _interpolation, _role);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

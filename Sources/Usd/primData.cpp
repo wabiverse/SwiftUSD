@@ -45,60 +45,70 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Static assertion on PrimData size.  We want to be warned when its size
 // changes.
-static_assert(sizeof(Usd_PrimData) == 64,
-              "Expected sizeof(Usd_PrimData) == 64");
+static_assert(sizeof(Usd_PrimData) == 64, "Expected sizeof(Usd_PrimData) == 64");
 
 // Usd_PrimData need to be always initialized with a valid type info pointer
-static const UsdPrimTypeInfo *_GetEmptyPrimTypeInfo() {
+static const UsdPrimTypeInfo *_GetEmptyPrimTypeInfo()
+{
   static const UsdPrimTypeInfo *empty = &UsdPrimTypeInfo::GetEmptyPrimType();
   return empty;
 }
 
 Usd_PrimData::Usd_PrimData(UsdStage *stage, const SdfPath &path)
-    : _stage(stage), _primIndex(nullptr), _path(path),
-      _primTypeInfo(_GetEmptyPrimTypeInfo()), _firstChild(nullptr),
-      _refCount(0) {
+    : _stage(stage),
+      _primIndex(nullptr),
+      _path(path),
+      _primTypeInfo(_GetEmptyPrimTypeInfo()),
+      _firstChild(nullptr),
+      _refCount(0)
+{
   if (!stage)
     TF_FATAL_ERROR("Attempted to construct with null stage");
 
   TF_DEBUG(USD_PRIM_LIFETIMES)
-      .Msg("Usd_PrimData::ctor<%s,%s,%s>\n", GetTypeName().GetText(),
-           path.GetText(), _stage->GetRootLayer()->GetIdentifier().c_str());
+      .Msg("Usd_PrimData::ctor<%s,%s,%s>\n",
+           GetTypeName().GetText(),
+           path.GetText(),
+           _stage->GetRootLayer()->GetIdentifier().c_str());
 }
 
-Usd_PrimData::~Usd_PrimData() {
+Usd_PrimData::~Usd_PrimData()
+{
   TF_DEBUG(USD_PRIM_LIFETIMES)
-      .Msg("~Usd_PrimData::dtor<%s,%s,%s>\n", GetTypeName().GetText(),
+      .Msg("~Usd_PrimData::dtor<%s,%s,%s>\n",
+           GetTypeName().GetText(),
            _path.GetText(),
-           _stage ? _stage->GetRootLayer()->GetIdentifier().c_str()
-                  : "prim is invalid/expired");
+           _stage ? _stage->GetRootLayer()->GetIdentifier().c_str() : "prim is invalid/expired");
 }
 
-Usd_PrimDataConstPtr Usd_PrimData::GetParent() const {
+Usd_PrimDataConstPtr Usd_PrimData::GetParent() const
+{
   if (Usd_PrimDataPtr parentLink = GetParentLink())
     return parentLink;
 
   SdfPath parent = _path.GetParentPath();
-  return parent == SdfPath::EmptyPath() ? nullptr
-                                        : _stage->_GetPrimDataAtPath(parent);
+  return parent == SdfPath::EmptyPath() ? nullptr : _stage->_GetPrimDataAtPath(parent);
 }
 
-const PcpPrimIndex &Usd_PrimData::GetPrimIndex() const {
+const PcpPrimIndex &Usd_PrimData::GetPrimIndex() const
+{
   static const PcpPrimIndex dummyPrimIndex;
   return ARCH_UNLIKELY(IsPrototype()) ? dummyPrimIndex : *_primIndex;
 }
 
-const PcpPrimIndex &Usd_PrimData::GetSourcePrimIndex() const {
+const PcpPrimIndex &Usd_PrimData::GetSourcePrimIndex() const
+{
   TF_AXIOM(_primIndex);
   return *_primIndex;
 }
 
-SdfSpecifier Usd_PrimData::GetSpecifier() const {
+SdfSpecifier Usd_PrimData::GetSpecifier() const
+{
   return UsdStage::_GetSpecifier(this);
 }
 
-void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent,
-                                         bool isPrototypePrim) {
+void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent, bool isPrototypePrim)
+{
   // We do not have to clear _flags here since in the pseudo root or instance
   // prototype case the values never change, and in the ordinary prim case we
   // set every flag (with the exception of the pseudo root flag which is only
@@ -116,7 +126,8 @@ void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent,
     _flags[Usd_PrimHasDefiningSpecifierFlag] = true;
     _flags[Usd_PrimPrototypeFlag] = isPrototypePrim;
     _flags[Usd_PrimPseudoRootFlag] = !parent;
-  } else {
+  }
+  else {
     // Compose and cache 'active'.
     const bool active = UsdStage::_IsActive(this);
     _flags[Usd_PrimActiveFlag] = active;
@@ -127,11 +138,9 @@ void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent,
 
     // An active prim is loaded if it's loadable and in the load set, or
     // it's not loadable and its parent is loaded.
-    _flags[Usd_PrimLoadedFlag] =
-        active &&
-        (hasPayload
-             ? _stage->_GetPcpCache()->IsPayloadIncluded(_primIndex->GetPath())
-             : parent->IsLoaded());
+    _flags[Usd_PrimLoadedFlag] = active && (hasPayload ? _stage->_GetPcpCache()->IsPayloadIncluded(
+                                                             _primIndex->GetPath()) :
+                                                         parent->IsLoaded());
 
     // According to Model hierarchy rules, only Model Groups may have Model
     // children (groups or otherwise).  So if our parent is not a Model
@@ -153,8 +162,7 @@ void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent,
     const SdfSpecifier specifier = GetSpecifier();
 
     // This prim is abstract if its parent is or if it's a class.
-    _flags[Usd_PrimAbstractFlag] =
-        parent->IsAbstract() || specifier == SdfSpecifierClass;
+    _flags[Usd_PrimAbstractFlag] = parent->IsAbstract() || specifier == SdfSpecifierClass;
 
     // Cache whether or not this prim has an authored defining specifier.
     const bool isDefiningSpec = SdfIsDefiningSpecifier(specifier);
@@ -174,16 +182,18 @@ void Usd_PrimData::_ComposeAndCacheFlags(Usd_PrimDataConstPtr parent,
   }
 }
 
-Usd_PrimDataConstPtr
-Usd_PrimData::GetPrimDataAtPathOrInPrototype(const SdfPath &path) const {
+Usd_PrimDataConstPtr Usd_PrimData::GetPrimDataAtPathOrInPrototype(const SdfPath &path) const
+{
   return _stage->_GetPrimDataAtPathOrInPrototype(path);
 }
 
-Usd_PrimDataConstPtr Usd_PrimData::GetPrototype() const {
+Usd_PrimDataConstPtr Usd_PrimData::GetPrototype() const
+{
   return _stage->_GetPrototypeForInstance(this);
 }
 
-bool Usd_PrimData::_ComposePrimChildNames(TfTokenVector *nameOrder) {
+bool Usd_PrimData::_ComposePrimChildNames(TfTokenVector *nameOrder)
+{
   // TODO: would be nice to not compute the name order until it is needed
   // TODO: What do we do with prohibitedNames?
   PcpTokenSet prohibitedNames;
@@ -191,54 +201,47 @@ bool Usd_PrimData::_ComposePrimChildNames(TfTokenVector *nameOrder) {
   return true;
 }
 
-std::string Usd_DescribePrimData(const Usd_PrimData *p,
-                                 SdfPath const &proxyPrimPath) {
+std::string Usd_DescribePrimData(const Usd_PrimData *p, SdfPath const &proxyPrimPath)
+{
   if (!p)
     return "null prim";
 
   bool isInstance = p->IsInstance();
   bool isInstanceProxy = Usd_IsInstanceProxy(p, proxyPrimPath);
-  bool isInPrototype = isInstanceProxy
-                           ? Usd_InstanceCache::IsPathInPrototype(proxyPrimPath)
-                           : p->IsInPrototype();
+  bool isInPrototype = isInstanceProxy ? Usd_InstanceCache::IsPathInPrototype(proxyPrimPath) :
+                                         p->IsInPrototype();
   bool isPrototype = p->IsPrototype();
-  Usd_PrimDataConstPtr prototypeForInstance =
-      isInstance && p->_stage ? p->GetPrototype() : nullptr;
+  Usd_PrimDataConstPtr prototypeForInstance = isInstance && p->_stage ? p->GetPrototype() :
+                                                                        nullptr;
 
   return TfStringPrintf(
       "%s%s%sprim %s<%s> %s%s%s",
-      Usd_IsDead(p) ? "expired "
-                    : (p->_flags[Usd_PrimActiveFlag] ? "" : "inactive "),
-      p->GetTypeName().IsEmpty()
-          ? ""
-          : TfStringPrintf("'%s' ", p->GetTypeName().GetText()).c_str(),
+      Usd_IsDead(p) ? "expired " : (p->_flags[Usd_PrimActiveFlag] ? "" : "inactive "),
+      p->GetTypeName().IsEmpty() ? "" :
+                                   TfStringPrintf("'%s' ", p->GetTypeName().GetText()).c_str(),
       // XXX: Add applied schemas to this descriptor
-      isInstance        ? "instance "
-      : isInstanceProxy ? "instance proxy "
-                        : "",
+      isInstance      ? "instance " :
+      isInstanceProxy ? "instance proxy " :
+                        "",
       isInPrototype ? "in prototype " : "",
       isInstanceProxy ? proxyPrimPath.GetText() : p->_path.GetText(),
-      (isInstanceProxy || isInstance)
-          ? TfStringPrintf("with prototype <%s> ",
-                           isInstance
-                               ? prototypeForInstance->GetPath().GetText()
-                               : p->_path.GetText())
-                .c_str()
-          : "",
-      (isInstanceProxy || isPrototype || isInPrototype)
-          ? TfStringPrintf("using prim index <%s> ",
-                           p->GetSourcePrimIndex().GetPath().GetText())
-                .c_str()
-          : "",
-      p->_stage
-          ? TfStringPrintf("on %s", UsdDescribe(p->_stage).c_str()).c_str()
-          : "");
+      (isInstanceProxy || isInstance) ?
+          TfStringPrintf("with prototype <%s> ",
+                         isInstance ? prototypeForInstance->GetPath().GetText() :
+                                      p->_path.GetText())
+              .c_str() :
+          "",
+      (isInstanceProxy || isPrototype || isInPrototype) ?
+          TfStringPrintf("using prim index <%s> ", p->GetSourcePrimIndex().GetPath().GetText())
+              .c_str() :
+          "",
+      p->_stage ? TfStringPrintf("on %s", UsdDescribe(p->_stage).c_str()).c_str() : "");
 }
 
-void Usd_ThrowExpiredPrimAccessError(const Usd_PrimData *p) {
-  TF_THROW(
-      UsdExpiredPrimAccessError,
-      TfStringPrintf("Used %s", Usd_DescribePrimData(p, SdfPath()).c_str()));
+void Usd_ThrowExpiredPrimAccessError(const Usd_PrimData *p)
+{
+  TF_THROW(UsdExpiredPrimAccessError,
+           TfStringPrintf("Used %s", Usd_DescribePrimData(p, SdfPath()).c_str()));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

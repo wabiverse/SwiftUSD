@@ -42,11 +42,11 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
+#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
-#include "pxr/usdImaging/usdImagingGL/engine.h"
 #include "pxr/imaging/glf/simpleLightingContext.h"
+#include "pxr/usdImaging/usdImagingGL/engine.h"
 
 #include <iomanip>
 #include <iostream>
@@ -56,9 +56,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
-class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing
-{
-public:
+class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing {
+ public:
   My_TestGLDrawing()
   {
     _mousePos[0] = _mousePos[1] = 0;
@@ -79,7 +78,7 @@ public:
   void Draw();
   void Pick(GfVec2i const &startPos, GfVec2i const &endPos);
 
-private:
+ private:
   UsdStageRefPtr _stage;
   UsdImagingGLEngineSharedPtr _engine;
 
@@ -102,13 +101,12 @@ void My_TestGLDrawing::InitTest()
   _sharedId = SdfPath("/Shared");
   _engine.reset(new UsdImagingGLEngine(_stage->GetPseudoRoot().GetPath(),
                                        excludedPaths,
-                                       SdfPathVector(), // invisedPrimPaths
+                                       SdfPathVector(),  // invisedPrimPaths
                                        _sharedId));
 
   _engine->SetSelectionColor(GfVec4f(1, 1, 0, 1));
 
-  if (_ShouldFrameAll())
-  {
+  if (_ShouldFrameAll()) {
     TfTokenVector purposes;
     purposes.push_back(UsdGeomTokens->default_);
     purposes.push_back(UsdGeomTokens->proxy);
@@ -127,22 +125,19 @@ void My_TestGLDrawing::InitTest()
 
     std::cerr << "worldCenter: " << worldCenter << "\n";
     std::cerr << "worldSize: " << worldSize << "\n";
-    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-    {
+    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
       // transpose y and z centering translation
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[2];
       _translate[2] = -worldCenter[1] - worldSize;
     }
-    else
-    {
+    else {
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[1];
       _translate[2] = -worldCenter[2] - worldSize;
     }
   }
-  else
-  {
+  else {
     _translate[0] = 0.0;
     _translate[1] = -1000.0;
     _translate[2] = -2500.0;
@@ -156,8 +151,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   Draw();
   _engine->SetSelectionColor(GfVec4f(1, 1, 0, 1));
 
-  if (GetStageFilePath() == "instance.usda")
-  {
+  if (GetStageFilePath() == "instance.usda") {
     SdfPathVector paths;
     paths.push_back(SdfPath("/Group_Multiple_Instances"));
     paths.push_back(SdfPath("/DormRoomDouble/Geom/cube1"));
@@ -167,8 +161,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     _engine->AddSelected(SdfPath("/Invis_Instance"), -1);
     Draw();
   }
-  else if (GetStageFilePath() == "pi.usda")
-  {
+  else if (GetStageFilePath() == "pi.usda") {
     // Test highlighting PI instances.
     _engine->AddSelected(SdfPath("/World/Instancer"), -1);
     Draw();
@@ -186,8 +179,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     Draw();
     _engine->ClearSelected();
   }
-  else if (GetStageFilePath() == "pi_ni.usda")
-  {
+  else if (GetStageFilePath() == "pi_ni.usda") {
     // Test PI highlighting.
     _engine->SetSelected({SdfPath("/Bar/C")});
     Draw();
@@ -221,9 +213,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     Draw();
 
     // Test highlighting in prototype.
-    SdfPath prototype1 = _stage->GetPrimAtPath(SdfPath("/Foo/X3/C3"))
-                             .GetPrototype()
-                             .GetPath();
+    SdfPath prototype1 = _stage->GetPrimAtPath(SdfPath("/Foo/X3/C3")).GetPrototype().GetPath();
     _engine->SetSelected({prototype1});
     Draw();
     _engine->SetSelected({prototype1.AppendPath(SdfPath("Instancer"))});
@@ -235,12 +225,14 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     _engine->SetSelected({prototype1.AppendPath(SdfPath("Instancer/Protos/Proto2/cube"))});
     Draw();
 
-    SdfPath prototype2 = _stage->GetPrimAtPath(prototype1.AppendPath(SdfPath("Instancer/Protos/Proto1")))
+    SdfPath prototype2 = _stage
+                             ->GetPrimAtPath(
+                                 prototype1.AppendPath(SdfPath("Instancer/Protos/Proto1")))
                              .GetPrototype()
                              .GetPath();
     _engine->SetSelected({prototype2.AppendPath(SdfPath("cube"))});
     Draw();
-  } // else nothing.
+  }  // else nothing.
 }
 
 void My_TestGLDrawing::Draw()
@@ -257,12 +249,9 @@ void My_TestGLDrawing::Draw()
 
   GfMatrix4d projMatrix = _frustum.ComputeProjectionMatrix();
 
-  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-  {
+  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
     // rotate from z-up to y-up
-    _viewMatrix =
-        GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-        _viewMatrix;
+    _viewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) * _viewMatrix;
   }
 
   GfVec4d viewport(0, 0, width, height);
@@ -279,8 +268,7 @@ void My_TestGLDrawing::Draw()
   params.highlight = true;
   params.clearColor = GetClearColor();
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     GlfSimpleLightingContextRefPtr lightingContext = GlfSimpleLightingContext::New();
     lightingContext->SetStateFromOpenGL();
     _engine->SetLightingState(lightingContext);
@@ -291,8 +279,7 @@ void My_TestGLDrawing::Draw()
   _engine->Render(_stage->GetPseudoRoot(), params);
 
   std::string imageFilePath = GetOutputFilePath();
-  if (!imageFilePath.empty())
-  {
+  if (!imageFilePath.empty()) {
     static size_t i = 0;
 
     std::stringstream suffix;
@@ -322,8 +309,7 @@ void My_TestGLDrawing::MouseRelease(int button, int x, int y, int modKeys)
 {
   _mouseButton[button] = 0;
 
-  if (!(modKeys & GarchGLDebugWindow::Alt))
-  {
+  if (!(modKeys & GarchGLDebugWindow::Alt)) {
     std::cerr << "Pick " << x << ", " << y << "\n";
     GfVec2i startPos = GfVec2i(_mousePos[0] - 1, _mousePos[1] - 1);
     GfVec2i endPos = GfVec2i(_mousePos[0] + 1, _mousePos[1] + 1);
@@ -336,18 +322,15 @@ void My_TestGLDrawing::MouseMove(int x, int y, int modKeys)
   int dx = x - _mousePos[0];
   int dy = y - _mousePos[1];
 
-  if (_mouseButton[0])
-  {
+  if (_mouseButton[0]) {
     _rotate[0] += dx;
     _rotate[1] += dy;
   }
-  else if (_mouseButton[1])
-  {
+  else if (_mouseButton[1]) {
     _translate[0] += dx;
     _translate[1] -= dy;
   }
-  else if (_mouseButton[2])
-  {
+  else if (_mouseButton[2]) {
     _translate[2] += dx;
   }
 
@@ -381,24 +364,19 @@ void My_TestGLDrawing::Pick(GfVec2i const &startPos, GfVec2i const &endPos)
 
   SdfPathVector selection;
 
-  if (_engine->TestIntersection(
-          _viewMatrix,
-          frustum.ComputeProjectionMatrix(),
-          _stage->GetPseudoRoot(),
-          params,
-          &outHitPoint,
-          &outHitNormal,
-          &outHitPrimPath,
-          &outHitInstancerPath,
-          &outHitInstanceIndex))
+  if (_engine->TestIntersection(_viewMatrix,
+                                frustum.ComputeProjectionMatrix(),
+                                _stage->GetPseudoRoot(),
+                                params,
+                                &outHitPoint,
+                                &outHitNormal,
+                                &outHitPrimPath,
+                                &outHitInstancerPath,
+                                &outHitInstanceIndex))
   {
 
-    std::cout << "Hit "
-              << outHitPoint << ", "
-              << outHitNormal << ", "
-              << outHitPrimPath << ", "
-              << outHitInstancerPath << ", "
-              << outHitInstanceIndex << "\n";
+    std::cout << "Hit " << outHitPoint << ", " << outHitNormal << ", " << outHitPrimPath << ", "
+              << outHitInstancerPath << ", " << outHitInstanceIndex << "\n";
 
     _engine->SetSelectionColor(GfVec4f(1, 1, 0, 1));
     selection.push_back(outHitPrimPath);

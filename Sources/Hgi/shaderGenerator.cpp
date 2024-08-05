@@ -45,50 +45,38 @@ void HgiShaderGenerator::Execute()
   _Execute(ss);
 
   // Capture the result as specified by the descriptor or locally.
-  if (_descriptor.generatedShaderCodeOut)
-  {
+  if (_descriptor.generatedShaderCodeOut) {
     *_descriptor.generatedShaderCodeOut = ss.str();
   }
-  else
-  {
+  else {
     _localGeneratedShaderCode = ss.str();
   }
 }
 
-const char *
-HgiShaderGenerator::_GetShaderCodeDeclarations() const
+const char *HgiShaderGenerator::_GetShaderCodeDeclarations() const
 {
   static const char *emptyString = "";
-  return _descriptor.shaderCodeDeclarations
-             ? _descriptor.shaderCodeDeclarations
-             : emptyString;
+  return _descriptor.shaderCodeDeclarations ? _descriptor.shaderCodeDeclarations : emptyString;
 }
 
-const char *
-HgiShaderGenerator::_GetShaderCode() const
+const char *HgiShaderGenerator::_GetShaderCode() const
 {
   static const char *emptyString = "";
-  return _descriptor.shaderCode
-             ? _descriptor.shaderCode
-             : emptyString;
+  return _descriptor.shaderCode ? _descriptor.shaderCode : emptyString;
 }
 
-HgiShaderStage
-HgiShaderGenerator::_GetShaderStage() const
+HgiShaderStage HgiShaderGenerator::_GetShaderStage() const
 {
   return _descriptor.shaderStage;
 }
 
-const char *
-HgiShaderGenerator::GetGeneratedShaderCode() const
+const char *HgiShaderGenerator::GetGeneratedShaderCode() const
 {
   // Return the result as specified by the descriptor or locally.
-  if (_descriptor.generatedShaderCodeOut)
-  {
+  if (_descriptor.generatedShaderCodeOut) {
     return _descriptor.generatedShaderCodeOut->c_str();
   }
-  else
-  {
+  else {
     return _localGeneratedShaderCode.c_str();
   }
 }

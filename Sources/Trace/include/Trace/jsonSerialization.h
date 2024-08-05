@@ -40,11 +40,10 @@ class JsWriter;
 /// format.  This JSON format for a TraceCollection is an extension of the
 /// Chrome Tracing format.
 class Trace_JSONSerialization {
-public:
+ public:
   /// Write a JSON representation of \p collections.
   static bool WriteCollectionsToJSON(
-      JsWriter &js,
-      const std::vector<std::shared_ptr<TraceCollection>> &collections);
+      JsWriter &js, const std::vector<std::shared_ptr<TraceCollection>> &collections);
 
   /// Creates a TraceCollection from a JSON value if possible.
   static std::unique_ptr<TraceCollection> CollectionFromJSON(const JsValue &);
@@ -52,4 +51,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_JSON_SERIALIZATION_H
+#endif  // PXR_BASE_TRACE_JSON_SERIALIZATION_H

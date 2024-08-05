@@ -24,11 +24,11 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/api.h"
-#include "hdPrman/renderParam.h"
 #include "Hd/camera.h"
 #include "Hd/timeSampleArray.h"
+#include "hdPrman/api.h"
+#include "hdPrman/renderParam.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -42,9 +42,8 @@ class HdSceneDelegate;
 /// it'd require a render target to be created and bound (per camera), which
 /// would be prohibitively expensive in Prman 22.
 ///
-class HdPrmanCamera final : public HdCamera
-{
-public:
+class HdPrmanCamera final : public HdCamera {
+ public:
   HDPRMAN_API
   HdPrmanCamera(SdfPath const &id);
 
@@ -59,8 +58,7 @@ public:
 
   /// Returns the time sampled xforms that were queried during Sync.
   HDPRMAN_API
-  HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> const &
-  GetTimeSampleXforms() const
+  HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> const &GetTimeSampleXforms() const
   {
     return _sampleXforms;
   }
@@ -97,7 +95,7 @@ public:
   }
 #endif
 
-private:
+ private:
   HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES> _sampleXforms;
 
 #if HD_API_VERSION < 52
@@ -112,4 +110,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_CAMERA_H

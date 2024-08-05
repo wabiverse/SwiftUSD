@@ -35,11 +35,15 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static size_t __hash__(const PcpInstanceKey &key) { return TfHash{}(key); }
+static size_t __hash__(const PcpInstanceKey &key)
+{
+  return TfHash{}(key);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapInstanceKey() {
+void wrapInstanceKey()
+{
   class_<PcpInstanceKey>("InstanceKey")
       .def(init<const PcpPrimIndex &>(args("primIndex")))
 

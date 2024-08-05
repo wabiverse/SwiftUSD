@@ -42,7 +42,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 class TfPyObjWrapper;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 /// \class TfType
 ///
@@ -64,38 +64,38 @@ class TfPyObjWrapper;
 class TfType {
   struct _TypeInfo;
 
-public:
+ public:
   /// Callback invoked when a declared type needs to be defined.
   using DefinitionCallback = void (*)(TfType);
 
   /// Base class of all factory types.
   class FactoryBase {
-  public:
+   public:
     TF_API virtual ~FactoryBase();
   };
 
-public:
+ public:
   enum LegacyFlags {
-    ABSTRACT = 0x01,       ///< Abstract (unmanufacturable and unclonable)
-    CONCRETE = 0x02,       ///< Not abstract
-    MANUFACTURABLE = 0x08, ///< Manufacturable type (implies concrete)
+    ABSTRACT = 0x01,        ///< Abstract (unmanufacturable and unclonable)
+    CONCRETE = 0x02,        ///< Not abstract
+    MANUFACTURABLE = 0x08,  ///< Manufacturable type (implies concrete)
   };
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   // This is a non-templated base class for the templated
   // polymorphic-to-Python infrastructure.
   struct PyPolymorphicBase {
-  protected:
+   protected:
     TF_API virtual ~PyPolymorphicBase();
   };
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-public:
+ public:
   /// A type-list of C++ base types.
   /// \see TfType::Define()
-  template <class... Args> struct Bases {};
+  template<class... Args> struct Bases {};
 
-public:
+ public:
   /// Construct an TfType representing an unknown type.
   ///
   /// To actually register a new type with the TfType system, see
@@ -125,14 +125,32 @@ public:
   /// \note All unknown types (see IsUnknown()) are considered equal.
   /// This is so all unknown types will only occupy one key when used in
   /// an associative map.
-  inline bool operator==(const TfType &t) const { return _info == t._info; }
-  inline bool operator!=(const TfType &t) const { return _info != t._info; }
+  inline bool operator==(const TfType &t) const
+  {
+    return _info == t._info;
+  }
+  inline bool operator!=(const TfType &t) const
+  {
+    return _info != t._info;
+  }
 
   /// Comparison operator.
-  inline bool operator<(const TfType &t) const { return _info < t._info; }
-  inline bool operator>(const TfType &t) const { return _info > t._info; }
-  inline bool operator<=(const TfType &t) const { return _info <= t._info; }
-  inline bool operator>=(const TfType &t) const { return _info >= t._info; }
+  inline bool operator<(const TfType &t) const
+  {
+    return _info < t._info;
+  }
+  inline bool operator>(const TfType &t) const
+  {
+    return _info > t._info;
+  }
+  inline bool operator<=(const TfType &t) const
+  {
+    return _info <= t._info;
+  }
+  inline bool operator>=(const TfType &t) const
+  {
+    return _info >= t._info;
+  }
 
   /// \name Finding types
   /// @{
@@ -144,7 +162,10 @@ public:
   ///
   /// \see IsUnknown()
   ///
-  template <typename T> static TfType const &Find() { return Find(typeid(T)); }
+  template<typename T> static TfType const &Find()
+  {
+    return Find(typeid(T));
+  }
 
   /// Retrieve the \c TfType corresponding to \c obj.
   ///
@@ -161,7 +182,8 @@ public:
   ///
   /// \see IsUnknown()
   ///
-  template <typename T> static TfType const &Find(const T &obj) {
+  template<typename T> static TfType const &Find(const T &obj)
+  {
     // If T is polymorphic to python, we may have to bridge into python.  We
     // could also optimize for Ts that are not polymorphic at all and avoid
     // doing rtti typeid lookups, but we trust the compiler to do this for
@@ -174,14 +196,16 @@ public:
   /// Retrieve the \c TfType corresponding to an obj with the
   /// given \c type_info.
   ///
-  static TfType const &Find(const std::type_info &t) {
+  static TfType const &Find(const std::type_info &t)
+  {
     return _FindByTypeid(t);
   }
 
   /// Retrieve the \c TfType corresponding to an obj with the
   /// given \c type_info.
   ///
-  static TfType const &FindByTypeid(const std::type_info &t) {
+  static TfType const &FindByTypeid(const std::type_info &t)
+  {
     return _FindByTypeid(t);
   }
 
@@ -222,8 +246,8 @@ public:
   ///    TfType::Find<BASE>().FindDerivedByName(name)
   /// \endcode
   ///
-  template <typename BASE>
-  static TfType const &FindDerivedByName(const std::string &name) {
+  template<typename BASE> static TfType const &FindDerivedByName(const std::string &name)
+  {
     return TfType::Find<BASE>().FindDerivedByName(name);
   }
 
@@ -233,7 +257,7 @@ public:
   ///
   TF_API
   static TfType const &FindByPythonClass(const TfPyObjWrapper &classObj);
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   /// @}
 
@@ -294,7 +318,7 @@ public:
   ///
   TF_API
   TfPyObjWrapper GetPythonClass() const;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   /// Return a vector of types from which this type was derived.
   ///
@@ -365,7 +389,10 @@ public:
   ///     IsA(Find<T>())
   /// \endcode
   ///
-  template <typename T> bool IsA() const { return IsA(Find<T>()); }
+  template<typename T> bool IsA() const
+  {
+    return IsA(Find<T>());
+  }
 
   /// Return true if this is the unknown type, representing a type
   /// unknown to the TfType system.
@@ -373,23 +400,33 @@ public:
   /// The unknown type does not derive from the root type, or any
   /// other type.
   ///
-  bool IsUnknown() const { return *this == TfType(); }
+  bool IsUnknown() const
+  {
+    return *this == TfType();
+  }
 
   typedef TfType::_TypeInfo *(TfType::*UnspecifiedBoolType);
 
   /// Convert to bool -- return true if this type is not unknown, false
   /// otherwise.
-  operator UnspecifiedBoolType() const {
+  operator UnspecifiedBoolType() const
+  {
     return IsUnknown() ? NULL : &TfType::_info;
   }
 
   /// Boolean not operator -- return true if this type is unknown, false
   /// otherwise.
-  bool operator!() const { return !bool(*this); }
+  bool operator!() const
+  {
+    return !bool(*this);
+  }
 
   /// Return true if this is the root type.
   ///
-  bool IsRoot() const { return *this == GetRoot(); }
+  bool IsRoot() const
+  {
+    return *this == GetRoot();
+  }
 
   /// Return true if this is an enum type.
   ///
@@ -448,8 +485,7 @@ public:
   /// they have not already been.  See the other Declare() methods for more
   /// details.
   ///
-  template <typename T, typename BaseTypes = TfType::Bases<>>
-  static TfType const &Declare();
+  template<typename T, typename BaseTypes = TfType::Bases<>> static TfType const &Declare();
 
   /// Define a TfType with the given C++ type T and C++ base types
   /// B.  Each of the base types will be declared (but not defined)
@@ -461,7 +497,7 @@ public:
   /// It is an error to attempt to define a type that has already
   /// been defined.
   ///
-  template <typename T, typename B> static TfType const &Define();
+  template<typename T, typename B> static TfType const &Define();
 
   /// Define a TfType with the given C++ type T and no bases.
   /// See the other Define() template for more details.
@@ -470,22 +506,22 @@ public:
   /// templates, so we provide this separate definition for the case of
   /// no bases.
   ///
-  template <typename T> static TfType const &Define();
+  template<typename T> static TfType const &Define();
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   /// Define the Python class object corresponding to this TfType.
   /// \see TfTypePythonClass
   TF_API
   void DefinePythonClass(const TfPyObjWrapper &classObj) const;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   /// Add an alias for DERIVED beneath BASE.
   ///
   /// This is a convenience method, that declares both DERIVED and BASE
   /// as TfTypes before adding the alias.
   ///
-  template <typename Base, typename Derived>
-  static void AddAlias(const std::string &name) {
+  template<typename Base, typename Derived> static void AddAlias(const std::string &name)
+  {
     TfType b = Declare(GetCanonicalTypeName(typeid(Base)));
     TfType d = Declare(GetCanonicalTypeName(typeid(Derived)));
     d.AddAlias(b, name);
@@ -504,7 +540,8 @@ public:
 
   /// Convenience method to add an alias and return *this.
   /// \see AddAlias()
-  const TfType &Alias(TfType base, const std::string &name) const {
+  const TfType &Alias(TfType base, const std::string &name) const
+  {
     AddAlias(base, name);
     return *this;
   }
@@ -534,7 +571,8 @@ public:
   TF_API
   void *CastToAncestor(TfType ancestor, void *addr) const;
 
-  const void *CastToAncestor(TfType ancestor, const void *addr) const {
+  const void *CastToAncestor(TfType ancestor, const void *addr) const
+  {
     return CastToAncestor(ancestor, const_cast<void *>(addr));
   }
 
@@ -555,7 +593,8 @@ public:
   TF_API
   void *CastFromAncestor(TfType ancestor, void *addr) const;
 
-  const void *CastFromAncestor(TfType ancestor, const void *addr) const {
+  const void *CastFromAncestor(TfType ancestor, const void *addr) const
+  {
     return CastFromAncestor(ancestor, const_cast<void *>(addr));
   }
 
@@ -573,20 +612,23 @@ public:
   /// Sets the factory object for this type.  A type's factory typically
   /// has methods to instantiate the type given various arguments and must
   /// inherit from \c FactoryBase.  The factory cannot be changed once set.
-  template <class T> void SetFactory(std::unique_ptr<T> &factory) const {
+  template<class T> void SetFactory(std::unique_ptr<T> &factory) const
+  {
     SetFactory(std::unique_ptr<FactoryBase>(std::move(factory)));
   }
 
   /// Sets the factory object for this type to be a \c T.  The factory
   /// cannot be changed once set.
-  template <class T> void SetFactory() const {
+  template<class T> void SetFactory() const
+  {
     SetFactory(std::unique_ptr<FactoryBase>(new T));
   }
 
   /// Sets the factory object for this type.  A type's factory typically
   /// has methods to instantiate the type given various arguments and must
   /// inherit from \c FactoryBase.  The factory cannot be changed once set.
-  const TfType &Factory(std::unique_ptr<FactoryBase> factory) const {
+  const TfType &Factory(std::unique_ptr<FactoryBase> factory) const
+  {
     SetFactory(std::move(factory));
     return *this;
   }
@@ -594,14 +636,16 @@ public:
   /// Sets the factory object for this type.  A type's factory typically
   /// has methods to instantiate the type given various arguments and must
   /// inherit from \c FactoryBase.  The factory cannot be changed once set.
-  template <class T> const TfType &Factory(std::unique_ptr<T> &factory) const {
+  template<class T> const TfType &Factory(std::unique_ptr<T> &factory) const
+  {
     SetFactory(std::unique_ptr<FactoryBase>(std::move(factory)));
     return *this;
   }
 
   /// Sets the factory object for this type to be a \c T.  The factory
   /// cannot be changed once set.
-  template <class T> const TfType &Factory() const {
+  template<class T> const TfType &Factory() const
+  {
     SetFactory(std::unique_ptr<FactoryBase>(new T));
     return *this;
   }
@@ -610,13 +654,14 @@ public:
   /// there is no factory or the factory is not or is not derived from \c T.
   /// Clients can check if a factory is set using
   /// \c GetFactory<TfType::FactoryBase>().
-  template <class T> T *GetFactory() const {
+  template<class T> T *GetFactory() const
+  {
     return dynamic_cast<T *>(_GetFactory());
   }
 
   /// @}
 
-private:
+ private:
   TF_API
   FactoryBase *_GetFactory() const;
 
@@ -625,62 +670,62 @@ private:
   static TfType const &_FindImplPyPolymorphic(PyPolymorphicBase const *ptr);
 
   // PyPolymorphic case.
-  template <class T>
-  static typename std::enable_if<std::is_base_of<PyPolymorphicBase, T>::value,
-                                 TfType const &>::type
-  _FindImpl(T const *rawPtr) {
-    return _FindImplPyPolymorphic(
-        static_cast<PyPolymorphicBase const *>(rawPtr));
+  template<class T>
+  static
+      typename std::enable_if<std::is_base_of<PyPolymorphicBase, T>::value, TfType const &>::type
+      _FindImpl(T const *rawPtr)
+  {
+    return _FindImplPyPolymorphic(static_cast<PyPolymorphicBase const *>(rawPtr));
   }
 
   // Polymorphic.
-  template <class T>
-  static
-      typename std::enable_if<std::is_polymorphic<T>::value &&
-                                  !std::is_base_of<PyPolymorphicBase, T>::value,
-                              TfType const &>::type
-      _FindImpl(T const *rawPtr) {
+  template<class T>
+  static typename std::enable_if<std::is_polymorphic<T>::value &&
+                                     !std::is_base_of<PyPolymorphicBase, T>::value,
+                                 TfType const &>::type
+  _FindImpl(T const *rawPtr)
+  {
     if (auto ptr = dynamic_cast<PyPolymorphicBase const *>(rawPtr))
       return _FindImplPyPolymorphic(ptr);
     return Find(typeid(*rawPtr));
   }
 
-  template <class T>
-  static typename std::enable_if<!std::is_polymorphic<T>::value,
-                                 TfType const &>::type
-  _FindImpl(T const *rawPtr) {
+  template<class T>
+  static typename std::enable_if<!std::is_polymorphic<T>::value, TfType const &>::type _FindImpl(
+      T const *rawPtr)
+  {
     return Find(typeid(T));
   }
 
 #else
-  template <class T>
-  static typename std::enable_if<std::is_polymorphic<T>::value,
-                                 TfType const &>::type
-  _FindImpl(T const *rawPtr) {
+  template<class T>
+  static typename std::enable_if<std::is_polymorphic<T>::value, TfType const &>::type _FindImpl(
+      T const *rawPtr)
+  {
     return Find(typeid(*rawPtr));
   }
 
-  template <class T>
-  static typename std::enable_if<!std::is_polymorphic<T>::value,
-                                 TfType const &>::type
-  _FindImpl(T const *rawPtr) {
+  template<class T>
+  static typename std::enable_if<!std::is_polymorphic<T>::value, TfType const &>::type _FindImpl(
+      T const *rawPtr)
+  {
     return Find(typeid(T));
   }
 
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   // Callers must hold at least a read lock on the type registry's mutex.
   bool _IsAImplNoLock(TfType queryType) const;
 
   typedef void *(*_CastFunction)(void *, bool derivedToBase);
 
-  template <typename TypeVector> friend struct Tf_AddBases;
+  template<typename TypeVector> friend struct Tf_AddBases;
   friend struct _TypeInfo;
   friend class Tf_TypeRegistry;
 
   // TfHash support.
-  template <class HashState>
-  friend void TfHashAppend(HashState &h, TfType const &type) {
+  template<class HashState> friend void TfHashAppend(HashState &h, TfType const &type)
+  {
     h.Append(type._info);
   }
 
@@ -698,7 +743,9 @@ private:
 
   // Define this TfType to have the given type_info.
   TF_API
-  void _DefineCppType(const std::type_info &, size_t sizeofType, bool isPodType,
+  void _DefineCppType(const std::type_info &,
+                      size_t sizeofType,
+                      bool isPodType,
                       bool isEnumType) const;
 
   // Execute the definition callback if one exists.
@@ -719,19 +766,19 @@ private:
 TF_API std::ostream &operator<<(std::ostream &out, const TfType &t);
 
 /// Metafunction returning sizeof(T) for a type T (or 0 if T is a void type).
-template <typename T> struct TfSizeofType {
+template<typename T> struct TfSizeofType {
   static const size_t value = sizeof(T);
 };
-template <> struct TfSizeofType<void> {
+template<> struct TfSizeofType<void> {
   static const size_t value = 0;
 };
-template <> struct TfSizeofType<const void> {
+template<> struct TfSizeofType<const void> {
   static const size_t value = 0;
 };
-template <> struct TfSizeofType<volatile void> {
+template<> struct TfSizeofType<volatile void> {
   static const size_t value = 0;
 };
-template <> struct TfSizeofType<const volatile void> {
+template<> struct TfSizeofType<const volatile void> {
   static const size_t value = 0;
 };
 
@@ -740,4 +787,4 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // Implementation details are put in this header.
 #include "Tf/type_Impl.h"
 
-#endif // PXR_BASE_TF_TYPE_H
+#endif  // PXR_BASE_TF_TYPE_H

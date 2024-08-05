@@ -26,14 +26,13 @@
 
 #if defined(__linux__)
 
-#include <pxr/pxrns.h>
-#include <GL/glx.h>
+#  include <GL/glx.h>
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchGLXContextState
-{
-public:
+class GarchGLXContextState {
+ public:
   /// Construct with the current state.
   GarchGLXContextState();
 
@@ -55,12 +54,12 @@ public:
   /// Make no context current.
   static void DoneCurrent();
 
-public:
+ public:
   Display *display;
   GLXDrawable drawable;
   GLXContext context;
 
-private:
+ private:
   bool _defaultCtor;
 };
 
@@ -69,6 +68,6 @@ typedef GarchGLXContextState GarchGLPlatformContextState;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__linux__)
+#endif  // defined(__linux__)
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H

@@ -32,7 +32,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapStopwatch() {
+void wrapStopwatch()
+{
 
   typedef TfStopwatch This;
 

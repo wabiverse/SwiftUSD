@@ -33,164 +33,142 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDLEGACYDISPLAYSTYLE_SCHEMA_TOKENS \
-    (displayStyle) \
-    (refineLevel) \
-    (flatShadingEnabled) \
-    (displacementEnabled) \
-    (occludedSelectionShowsThrough) \
-    (pointsShadingEnabled) \
-    (materialIsFinal) \
-    (shadingStyle) \
-    (reprSelector) \
-    (cullStyle) \
+  (displayStyle)(refineLevel)( \
+      flatShadingEnabled)(displacementEnabled)(occludedSelectionShowsThrough)(pointsShadingEnabled)(materialIsFinal)(shadingStyle)(reprSelector)(cullStyle)
 
-TF_DECLARE_PUBLIC_TOKENS(HdLegacyDisplayStyleSchemaTokens, HD_API,
-    HDLEGACYDISPLAYSTYLE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLegacyDisplayStyleSchemaTokens,
+                         HD_API,
+                         HDLEGACYDISPLAYSTYLE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdLegacyDisplayStyleSchema : public HdSchema
-{
-public:
-    HdLegacyDisplayStyleSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdLegacyDisplayStyleSchema : public HdSchema {
+ public:
+  HdLegacyDisplayStyleSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
-    HD_API
-    HdIntDataSourceHandle GetRefineLevel();
-    HD_API
-    HdBoolDataSourceHandle GetFlatShadingEnabled();
-    HD_API
-    HdBoolDataSourceHandle GetDisplacementEnabled();
-    HD_API
-    HdBoolDataSourceHandle GetOccludedSelectionShowsThrough();
-    HD_API
-    HdBoolDataSourceHandle GetPointsShadingEnabled();
-    HD_API
-    HdBoolDataSourceHandle GetMaterialIsFinal();
-    HD_API
-    HdTokenDataSourceHandle GetShadingStyle();
-    HD_API
-    HdTokenArrayDataSourceHandle GetReprSelector();
-    HD_API
-    HdTokenDataSourceHandle GetCullStyle();
+  HD_API
+  HdIntDataSourceHandle GetRefineLevel();
+  HD_API
+  HdBoolDataSourceHandle GetFlatShadingEnabled();
+  HD_API
+  HdBoolDataSourceHandle GetDisplacementEnabled();
+  HD_API
+  HdBoolDataSourceHandle GetOccludedSelectionShowsThrough();
+  HD_API
+  HdBoolDataSourceHandle GetPointsShadingEnabled();
+  HD_API
+  HdBoolDataSourceHandle GetMaterialIsFinal();
+  HD_API
+  HdTokenDataSourceHandle GetShadingStyle();
+  HD_API
+  HdTokenArrayDataSourceHandle GetReprSelector();
+  HD_API
+  HdTokenDataSourceHandle GetCullStyle();
 
-    // RETRIEVING AND CONSTRUCTING
+  // RETRIEVING AND CONSTRUCTING
 
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdIntDataSourceHandle &refineLevel,
+      const HdBoolDataSourceHandle &flatShadingEnabled,
+      const HdBoolDataSourceHandle &displacementEnabled,
+      const HdBoolDataSourceHandle &occludedSelectionShowsThrough,
+      const HdBoolDataSourceHandle &pointsShadingEnabled,
+      const HdBoolDataSourceHandle &materialIsFinal,
+      const HdTokenDataSourceHandle &shadingStyle,
+      const HdTokenArrayDataSourceHandle &reprSelector,
+      const HdTokenDataSourceHandle &cullStyle);
+
+  /// \class HdLegacyDisplayStyleSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdIntDataSourceHandle &refineLevel,
-        const HdBoolDataSourceHandle &flatShadingEnabled,
-        const HdBoolDataSourceHandle &displacementEnabled,
-        const HdBoolDataSourceHandle &occludedSelectionShowsThrough,
-        const HdBoolDataSourceHandle &pointsShadingEnabled,
-        const HdBoolDataSourceHandle &materialIsFinal,
-        const HdTokenDataSourceHandle &shadingStyle,
-        const HdTokenArrayDataSourceHandle &reprSelector,
-        const HdTokenDataSourceHandle &cullStyle
-    );
-
-    /// \class HdLegacyDisplayStyleSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetRefineLevel(
-            const HdIntDataSourceHandle &refineLevel);
-        HD_API
-        Builder &SetFlatShadingEnabled(
-            const HdBoolDataSourceHandle &flatShadingEnabled);
-        HD_API
-        Builder &SetDisplacementEnabled(
-            const HdBoolDataSourceHandle &displacementEnabled);
-        HD_API
-        Builder &SetOccludedSelectionShowsThrough(
-            const HdBoolDataSourceHandle &occludedSelectionShowsThrough);
-        HD_API
-        Builder &SetPointsShadingEnabled(
-            const HdBoolDataSourceHandle &pointsShadingEnabled);
-        HD_API
-        Builder &SetMaterialIsFinal(
-            const HdBoolDataSourceHandle &materialIsFinal);
-        HD_API
-        Builder &SetShadingStyle(
-            const HdTokenDataSourceHandle &shadingStyle);
-        HD_API
-        Builder &SetReprSelector(
-            const HdTokenArrayDataSourceHandle &reprSelector);
-        HD_API
-        Builder &SetCullStyle(
-            const HdTokenDataSourceHandle &cullStyle);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdIntDataSourceHandle _refineLevel;
-        HdBoolDataSourceHandle _flatShadingEnabled;
-        HdBoolDataSourceHandle _displacementEnabled;
-        HdBoolDataSourceHandle _occludedSelectionShowsThrough;
-        HdBoolDataSourceHandle _pointsShadingEnabled;
-        HdBoolDataSourceHandle _materialIsFinal;
-        HdTokenDataSourceHandle _shadingStyle;
-        HdTokenArrayDataSourceHandle _reprSelector;
-        HdTokenDataSourceHandle _cullStyle;
-    };
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "displayStyle" from the parent container and constructs a
-    /// HdLegacyDisplayStyleSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+    Builder &SetRefineLevel(const HdIntDataSourceHandle &refineLevel);
     HD_API
-    static HdLegacyDisplayStyleSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
+    Builder &SetFlatShadingEnabled(const HdBoolDataSourceHandle &flatShadingEnabled);
     HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
+    Builder &SetDisplacementEnabled(const HdBoolDataSourceHandle &displacementEnabled);
     HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the reprselector data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+    Builder &SetOccludedSelectionShowsThrough(
+        const HdBoolDataSourceHandle &occludedSelectionShowsThrough);
     HD_API
-    static const HdDataSourceLocator &GetReprSelectorLocator();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the cullstyle data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+    Builder &SetPointsShadingEnabled(const HdBoolDataSourceHandle &pointsShadingEnabled);
     HD_API
-    static const HdDataSourceLocator &GetCullStyleLocator();
+    Builder &SetMaterialIsFinal(const HdBoolDataSourceHandle &materialIsFinal);
+    HD_API
+    Builder &SetShadingStyle(const HdTokenDataSourceHandle &shadingStyle);
+    HD_API
+    Builder &SetReprSelector(const HdTokenArrayDataSourceHandle &reprSelector);
+    HD_API
+    Builder &SetCullStyle(const HdTokenDataSourceHandle &cullStyle);
 
+    /// Returns a container data source containing the members set thus far.
+    HD_API
+    HdContainerDataSourceHandle Build();
+
+   private:
+    HdIntDataSourceHandle _refineLevel;
+    HdBoolDataSourceHandle _flatShadingEnabled;
+    HdBoolDataSourceHandle _displacementEnabled;
+    HdBoolDataSourceHandle _occludedSelectionShowsThrough;
+    HdBoolDataSourceHandle _pointsShadingEnabled;
+    HdBoolDataSourceHandle _materialIsFinal;
+    HdTokenDataSourceHandle _shadingStyle;
+    HdTokenArrayDataSourceHandle _reprSelector;
+    HdTokenDataSourceHandle _cullStyle;
+  };
+
+  /// Retrieves a container data source with the schema's default name token
+  /// "displayStyle" from the parent container and constructs a
+  /// HdLegacyDisplayStyleSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdLegacyDisplayStyleSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
+
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the reprselector data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetReprSelectorLocator();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the cullstyle data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetCullStyleLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

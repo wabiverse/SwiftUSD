@@ -36,9 +36,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Non templated base class to namespace the overloading of _TranslatePath on
 // the list item type.
 class Usd_ListEditImplBase {
-protected:
+ protected:
   // Generic path translation for the list edit types.
-  static bool _TranslatePath(SdfPath *path, const UsdEditTarget &editTarget) {
+  static bool _TranslatePath(SdfPath *path, const UsdEditTarget &editTarget)
+  {
     if (path->IsEmpty()) {
       TF_CODING_ERROR("Invalid empty path");
       return false;
@@ -53,8 +54,7 @@ protected:
 
     const SdfPath mappedPath = editTarget.MapToSpecPath(*path);
     if (mappedPath.IsEmpty()) {
-      TF_CODING_ERROR("Cannot map <%s> to current edit target.",
-                      path->GetText());
+      TF_CODING_ERROR("Cannot map <%s> to current edit target.", path->GetText());
       return false;
     }
 
@@ -66,9 +66,9 @@ protected:
   }
 
   // Special path translation for references and payloads
-  template <typename RefOrPayloadType>
-  static bool _TranslatePath(RefOrPayloadType *refOrPayload,
-                             const UsdEditTarget &editTarget) {
+  template<typename RefOrPayloadType>
+  static bool _TranslatePath(RefOrPayloadType *refOrPayload, const UsdEditTarget &editTarget)
+  {
     // We do not map prim paths across the edit target for non-internal
     // references or payloads, as these paths are supposed to be in the
     // namespace of the layer stack.
@@ -96,13 +96,15 @@ protected:
 // Templated implementation of the edit operations provided by UsdRefereneces
 // and UsdPayloads. Editing payloads and references is identical outside of
 // their type.
-template <class UsdListEditorType, class ListOpProxyType>
+template<class UsdListEditorType, class ListOpProxyType>
 struct Usd_ListEditImpl : public Usd_ListEditImplBase {
   using ListOpValueType = typename ListOpProxyType::value_type;
   using ListOpValueVector = typename ListOpProxyType::value_vector_type;
 
   static bool Add(const UsdListEditorType &editor,
-                  const ListOpValueType &itemIn, UsdListPosition position) {
+                  const ListOpValueType &itemIn,
+                  UsdListPosition position)
+  {
     const UsdPrim &prim = editor.GetPrim();
 
     if (!prim) {
@@ -131,8 +133,8 @@ struct Usd_ListEditImpl : public Usd_ListEditImplBase {
     return success;
   }
 
-  static bool Remove(const UsdListEditorType &editor,
-                     const ListOpValueType &itemIn) {
+  static bool Remove(const UsdListEditorType &editor, const ListOpValueType &itemIn)
+  {
     const UsdPrim &prim = editor.GetPrim();
 
     if (!prim) {
@@ -157,7 +159,8 @@ struct Usd_ListEditImpl : public Usd_ListEditImplBase {
     return success;
   }
 
-  static bool Clear(const UsdListEditorType &editor) {
+  static bool Clear(const UsdListEditorType &editor)
+  {
     const UsdPrim &prim = editor.GetPrim();
 
     if (!prim) {
@@ -176,8 +179,8 @@ struct Usd_ListEditImpl : public Usd_ListEditImplBase {
     return success;
   }
 
-  static bool Set(const UsdListEditorType &editor,
-                  const ListOpValueVector &itemsIn) {
+  static bool Set(const UsdListEditorType &editor, const ListOpValueVector &itemsIn)
+  {
     const UsdPrim &prim = editor.GetPrim();
 
     if (!prim) {
@@ -210,7 +213,8 @@ struct Usd_ListEditImpl : public Usd_ListEditImplBase {
       // no-op when the list op is not currently explicit.
       if (items.empty()) {
         listEditor.ClearEditsAndMakeExplicit();
-      } else {
+      }
+      else {
         listEditor.GetExplicitItems() = items;
       }
     }
@@ -220,8 +224,9 @@ struct Usd_ListEditImpl : public Usd_ListEditImplBase {
     return success;
   }
 
-private:
-  static ListOpProxyType _GetListEditor(const UsdPrim &prim) {
+ private:
+  static ListOpProxyType _GetListEditor(const UsdPrim &prim)
+  {
     if (!TF_VERIFY(prim)) {
       return ListOpProxyType();
     }
@@ -243,4 +248,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_LIST_EDIT_IMPL_H
+#endif  // PXR_USD_USD_LIST_EDIT_IMPL_H

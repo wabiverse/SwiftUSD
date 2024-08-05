@@ -23,12 +23,32 @@
 //
 #include "{{ libraryPath }}/tokens.h"
 
-{% if useExportAPI %}
-{{ namespaceOpen }}
+{
+  % if useExportAPI %
+}
+{
+  {
+    namespaceOpen
+  }
+}
 
-{% endif %}
-{{ tokensPrefix }}TokensType::{{ tokensPrefix }}TokensType() :
-{% for token in tokens %}
+{
+  % endif %
+}
+{
+  {
+    tokensPrefix
+  }
+}
+TokensType::
+{
+  {
+    tokensPrefix
+  }
+}
+TokensType() :
+{% for token in tokens %
+}
     {{ token.id }}("{{ token.value }}", TfToken::Immortal),
 {% endfor %}
     allTokens({
@@ -37,11 +57,31 @@
 
 {% endfor %}
     })
-{
-}
+    {
+    }
 
-TfStaticData<{{ tokensPrefix }}TokensType> {{ tokensPrefix }}Tokens;
-{% if useExportAPI %}
+    TfStaticData <
+    {
+      {
+        tokensPrefix
+      }
+    }
+    TokensType >
+    {
+      {
+        tokensPrefix
+      }
+    }
+    Tokens;
+    {
+      % if useExportAPI %
+    }
 
-{{ namespaceClose }}
-{% endif %}
+    {
+      {
+        namespaceClose
+      }
+    }
+    {
+      % endif %
+    }

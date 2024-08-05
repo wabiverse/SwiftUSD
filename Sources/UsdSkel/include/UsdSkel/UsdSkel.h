@@ -2,10 +2,10 @@
 #define __PXR_USD_USDSKEL_H__
 
 // usdSkel.
-#include <UsdSkel/animation.h>
 #include <UsdSkel/animMapper.h>
 #include <UsdSkel/animQuery.h>
 #include <UsdSkel/animQueryImpl.h>
+#include <UsdSkel/animation.h>
 #include <UsdSkel/api.h>
 #include <UsdSkel/bakeSkinning.h>
 #include <UsdSkel/binding.h>
@@ -26,4 +26,4 @@
 #include <UsdSkel/topology.h>
 #include <UsdSkel/utils.h>
 
-#endif // __PXR_USD_USDSKEL_H__
+#endif  // __PXR_USD_USDSKEL_H__

@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HF_PLUGIN_BASE_H
 #define PXR_IMAGING_HF_PLUGIN_BASE_H
 
-#include <pxr/pxrns.h>
 #include "Hf/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,18 +36,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// functionality other than to serve as a polymorphic type for the
 /// plugin registry.
 ///
-class HfPluginBase
-{
-public:
+class HfPluginBase {
+ public:
   HF_API
-  virtual ~HfPluginBase(); // = default: See workaround in cpp file
+  virtual ~HfPluginBase();  // = default: See workaround in cpp file
 
-protected:
+ protected:
   // Pure virtual class, must be derived
   HF_API
   HfPluginBase() = default;
 
-private:
+ private:
   ///
   /// This class is not intended to be copied.
   ///
@@ -57,4 +56,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PLUGIN_BASE_H
+#endif  // PXR_IMAGING_HF_PLUGIN_BASE_H

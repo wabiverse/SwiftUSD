@@ -25,7 +25,7 @@
 // wrapMatrix4.template.cpp file to make changes.
 
 #ifndef BOOST_PYTHON_MAX_ARITY
-#define BOOST_PYTHON_MAX_ARITY 20
+#  define BOOST_PYTHON_MAX_ARITY 20
 #endif
 
 #include <pxr/pxrns.h>
@@ -69,7 +69,8 @@ namespace {
 // Python buffer protocol support.
 
 // Python's getbuffer interface function.
-static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
+static int getbuffer(PyObject *self, Py_buffer *view, int flags)
+{
   if (view == NULL) {
     PyErr_SetString(PyExc_ValueError, "NULL view in getbuffer");
     return -1;
@@ -90,27 +91,30 @@ static int getbuffer(PyObject *self, Py_buffer *view, int flags) {
   view->itemsize = sizeof(float);
   if ((flags & PyBUF_FORMAT) == PyBUF_FORMAT) {
     view->format = Gf_GetPyBufferFmtFor<float>();
-  } else {
+  }
+  else {
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
     view->ndim = 2;
     static Py_ssize_t shape[] = {4, 4};
     view->shape = shape;
-  } else {
+  }
+  else {
     view->ndim = 0;
     view->shape = NULL;
   }
   if ((flags & PyBUF_STRIDES) == PyBUF_STRIDES) {
     static Py_ssize_t strides[] = {4 * sizeof(float), sizeof(float)};
     view->strides = strides;
-  } else {
+  }
+  else {
     view->strides = NULL;
   }
   view->suboffsets = NULL;
   view->internal = NULL;
 
-  Py_INCREF(self); // need to retain a reference to self.
+  Py_INCREF(self);  // need to retain a reference to self.
   return 0;
 }
 
@@ -124,62 +128,73 @@ static PyBufferProcs bufferProcs = {
 // End python buffer protocol support.
 ////////////////////////////////////////////////////////////////////////
 
-static string _Repr(GfMatrix4f const &self) {
+static string _Repr(GfMatrix4f const &self)
+{
   static char newline[] = ",\n            ";
-  return TF_PY_REPR_PREFIX + "Matrix4f(" + TfPyRepr(self[0][0]) + ", " +
-         TfPyRepr(self[0][1]) + ", " + TfPyRepr(self[0][2]) + ", " +
-         TfPyRepr(self[0][3]) + newline + TfPyRepr(self[1][0]) + ", " +
-         TfPyRepr(self[1][1]) + ", " + TfPyRepr(self[1][2]) + ", " +
-         TfPyRepr(self[1][3]) + newline + TfPyRepr(self[2][0]) + ", " +
-         TfPyRepr(self[2][1]) + ", " + TfPyRepr(self[2][2]) + ", " +
-         TfPyRepr(self[2][3]) + newline + TfPyRepr(self[3][0]) + ", " +
-         TfPyRepr(self[3][1]) + ", " + TfPyRepr(self[3][2]) + ", " +
+  return TF_PY_REPR_PREFIX + "Matrix4f(" + TfPyRepr(self[0][0]) + ", " + TfPyRepr(self[0][1]) +
+         ", " + TfPyRepr(self[0][2]) + ", " + TfPyRepr(self[0][3]) + newline +
+         TfPyRepr(self[1][0]) + ", " + TfPyRepr(self[1][1]) + ", " + TfPyRepr(self[1][2]) + ", " +
+         TfPyRepr(self[1][3]) + newline + TfPyRepr(self[2][0]) + ", " + TfPyRepr(self[2][1]) +
+         ", " + TfPyRepr(self[2][2]) + ", " + TfPyRepr(self[2][3]) + newline +
+         TfPyRepr(self[3][0]) + ", " + TfPyRepr(self[3][1]) + ", " + TfPyRepr(self[3][2]) + ", " +
          TfPyRepr(self[3][3]) + ")";
 }
 
-static GfMatrix4f GetInverseWrapper(const GfMatrix4f &self) {
+static GfMatrix4f GetInverseWrapper(const GfMatrix4f &self)
+{
   return self.GetInverse();
 }
 
-static void throwIndexErr(const char *msg) {
+static void throwIndexErr(const char *msg)
+{
   PyErr_SetString(PyExc_IndexError, msg);
   boost::python::throw_error_already_set();
 }
 
-static int normalizeIndex(int index) {
+static int normalizeIndex(int index)
+{
   return TfPyNormalizeIndex(index, 4, true /*throw error*/);
 }
 
 // Return number of rows
-static int __len__(GfMatrix4f const &self) { return 4; }
+static int __len__(GfMatrix4f const &self)
+{
+  return 4;
+}
 
-static float __getitem__float(GfMatrix4f const &self, tuple index) {
+static float __getitem__float(GfMatrix4f const &self, tuple index)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   return self[i1][i2];
 }
 
-static GfVec4f __getitem__vector(GfMatrix4f const &self, int index) {
+static GfVec4f __getitem__vector(GfMatrix4f const &self, int index)
+{
   return GfVec4f(self[normalizeIndex(index)]);
 }
 
-static void __setitem__float(GfMatrix4f &self, tuple index, float value) {
+static void __setitem__float(GfMatrix4f &self, tuple index, float value)
+{
   int i1 = 0, i2 = 0;
   if (len(index) == 2) {
     i1 = normalizeIndex(extract<int>(index[0]));
     i2 = normalizeIndex(extract<int>(index[1]));
-  } else
+  }
+  else
     throwIndexErr("Index has incorrect size.");
 
   self[i1][i2] = value;
 }
 
-static void __setitem__vector(GfMatrix4f &self, int index, GfVec4f value) {
+static void __setitem__vector(GfMatrix4f &self, int index, GfVec4f value)
+{
   int ni = normalizeIndex(index);
   self[ni][0] = value[0];
   self[ni][1] = value[1];
@@ -187,7 +202,8 @@ static void __setitem__vector(GfMatrix4f &self, int index, GfVec4f value) {
   self[ni][3] = value[3];
 }
 
-static bool __contains__float(const GfMatrix4f &self, float value) {
+static bool __contains__float(const GfMatrix4f &self, float value)
+{
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 4; ++j)
       if (self[i][j] == value)
@@ -196,37 +212,43 @@ static bool __contains__float(const GfMatrix4f &self, float value) {
 }
 
 // Check rows against GfVec
-static bool __contains__vector(const GfMatrix4f &self, GfVec4f value) {
+static bool __contains__vector(const GfMatrix4f &self, GfVec4f value)
+{
   for (int i = 0; i < 4; ++i)
     if (self.GetRow(i) == value)
       return true;
   return false;
 }
 
-static GfMatrix4f __truediv__(const GfMatrix4f &self, GfMatrix4f value) {
+static GfMatrix4f __truediv__(const GfMatrix4f &self, GfMatrix4f value)
+{
   return self / value;
 }
 
-static GfMatrix4f *__init__() {
+static GfMatrix4f *__init__()
+{
   // Default constructor produces identity from python.
   return new GfMatrix4f(1);
 }
 
-static tuple FactorWithEpsilon(GfMatrix4f &self, double eps) {
+static tuple FactorWithEpsilon(GfMatrix4f &self, double eps)
+{
   GfMatrix4f r, u, p;
   GfVec3f s, t;
   bool result = self.Factor(&r, &s, &u, &t, &p, eps);
   return boost::python::make_tuple(result, r, s, u, t, p);
 }
 
-static tuple Factor(GfMatrix4f &self) {
+static tuple Factor(GfMatrix4f &self)
+{
   GfMatrix4f r, u, p;
   GfVec3f s, t;
   bool result = self.Factor(&r, &s, &u, &t, &p);
   return boost::python::make_tuple(result, r, s, u, t, p);
 }
 
-static GfMatrix4f RemoveScaleShearWrapper(const GfMatrix4f &self) {
+static GfMatrix4f RemoveScaleShearWrapper(const GfMatrix4f &self)
+{
   return self.RemoveScaleShear();
 }
 
@@ -234,16 +256,34 @@ static GfMatrix4f RemoveScaleShearWrapper(const GfMatrix4f &self) {
 // This is used by our Shake plugins which need to pickle entire classes
 // (including code), which we don't support in pxml.
 struct GfMatrix4f_Pickle_Suite : boost::python::pickle_suite {
-  static boost::python::tuple getinitargs(const GfMatrix4f &m) {
-    return boost::python::make_tuple(
-        m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3],
-        m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]);
+  static boost::python::tuple getinitargs(const GfMatrix4f &m)
+  {
+    return boost::python::make_tuple(m[0][0],
+                                     m[0][1],
+                                     m[0][2],
+                                     m[0][3],
+                                     m[1][0],
+                                     m[1][1],
+                                     m[1][2],
+                                     m[1][3],
+                                     m[2][0],
+                                     m[2][1],
+                                     m[2][2],
+                                     m[2][3],
+                                     m[3][0],
+                                     m[3][1],
+                                     m[3][2],
+                                     m[3][3]);
   }
 };
 
-static size_t __hash__(GfMatrix4f const &m) { return TfHash{}(m); }
+static size_t __hash__(GfMatrix4f const &m)
+{
+  return TfHash{}(m);
+}
 
-static boost::python::tuple get_dimension() {
+static boost::python::tuple get_dimension()
+{
   // At one time this was a constant static tuple we returned for
   // dimension. With boost building for python 3 that results in
   // a segfault at shutdown. Building for python 2 with a static
@@ -255,13 +295,13 @@ static boost::python::tuple get_dimension() {
   return make_tuple(4, 4);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapMatrix4f() {
+void wrapMatrix4f()
+{
   typedef GfMatrix4f This;
 
-  def("IsClose",
-      (bool (*)(const GfMatrix4f &m1, const GfMatrix4f &m2, double))GfIsClose);
+  def("IsClose", (bool (*)(const GfMatrix4f &m1, const GfMatrix4f &m2, double))GfIsClose);
 
   class_<This> cls("Matrix4f", no_init);
   cls.def_pickle(GfMatrix4f_Pickle_Suite())
@@ -270,15 +310,33 @@ void wrapMatrix4f() {
       .def(init<const GfMatrix4f &>())
       .def(init<int>())
       .def(init<float>())
-      .def(init<float, float, float, float, float, float, float, float, float,
-                float, float, float, float, float, float, float>())
+      .def(init<float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float>())
       .def(init<const GfVec4f &>())
       .def(init<const vector<vector<float>> &>())
       .def(init<const vector<vector<double>> &>())
-      .def(init<const vector<float> &, const vector<float> &,
-                const vector<float> &, const vector<float> &>())
-      .def(init<const vector<double> &, const vector<double> &,
-                const vector<double> &, const vector<double> &>())
+      .def(init<const vector<float> &,
+                const vector<float> &,
+                const vector<float> &,
+                const vector<float> &>())
+      .def(init<const vector<double> &,
+                const vector<double> &,
+                const vector<double> &,
+                const vector<double> &>())
       .def(init<const GfMatrix3f &, const GfVec3f>())
       .def(init<const GfRotation &, const GfVec3f>())
 
@@ -295,20 +353,30 @@ void wrapMatrix4f() {
       .def("__contains__", __contains__vector, "Check rows against GfVec")
 
       .def("Set",
-           (This & (This::*)(float, float, float, float, float, float, float,
-                             float, float, float, float, float, float, float,
-                             float, float)) &
+           (This & (This::*)(float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float,
+                             float)) &
                This::Set,
            return_self<>())
 
       .def("SetIdentity", &This::SetIdentity, return_self<>())
       .def("SetZero", &This::SetZero, return_self<>())
 
-      .def("SetDiagonal", (This & (This::*)(float)) & This::SetDiagonal,
-           return_self<>())
-      .def("SetDiagonal",
-           (This & (This::*)(const GfVec4f &)) & This::SetDiagonal,
-           return_self<>())
+      .def("SetDiagonal", (This & (This::*)(float)) & This::SetDiagonal, return_self<>())
+      .def("SetDiagonal", (This & (This::*)(const GfVec4f &)) & This::SetDiagonal, return_self<>())
 
       .def("SetRow", &This::SetRow)
       .def("SetColumn", &This::SetColumn)
@@ -328,10 +396,8 @@ void wrapMatrix4f() {
       .def("IsLeftHanded", &This::IsLeftHanded)
       .def("IsRightHanded", &This::IsRightHanded)
 
-      .def("Orthonormalize", &This::Orthonormalize,
-           (arg("issueWarning") = true))
-      .def("GetOrthonormalized", &This::GetOrthonormalized,
-           (arg("issueWarning") = true))
+      .def("Orthonormalize", &This::Orthonormalize, (arg("issueWarning") = true))
+      .def("GetOrthonormalized", &This::GetOrthonormalized, (arg("issueWarning") = true))
 
       .def(str(self))
       .def(self == self)
@@ -353,49 +419,38 @@ void wrapMatrix4f() {
       .def(GfVec4f() * self)
 
       .def("SetTransform",
-           (This & (This::*)(const GfRotation &, const GfVec3f &)) &
-               This::SetTransform,
+           (This & (This::*)(const GfRotation &, const GfVec3f &)) & This::SetTransform,
            return_self<>())
       .def("SetTransform",
-           (This & (This::*)(const GfMatrix3f &, const GfVec3f &)) &
-               This::SetTransform,
+           (This & (This::*)(const GfMatrix3f &, const GfVec3f &)) & This::SetTransform,
            return_self<>())
 
-      .def("SetScale", (This & (This::*)(const GfVec3f &)) & This::SetScale,
-           return_self<>())
+      .def("SetScale", (This & (This::*)(const GfVec3f &)) & This::SetScale, return_self<>())
 
       .def("SetTranslate", &This::SetTranslate, return_self<>())
       .def("SetTranslateOnly", &This::SetTranslateOnly, return_self<>())
 
-      .def("SetRotate", (This & (This::*)(const GfQuatf &)) & This::SetRotate,
-           return_self<>())
+      .def("SetRotate", (This & (This::*)(const GfQuatf &)) & This::SetRotate, return_self<>())
       .def("SetRotateOnly",
            (This & (This::*)(const GfQuatf &)) & This::SetRotateOnly,
            return_self<>())
 
-      .def("SetRotate",
-           (This & (This::*)(const GfRotation &)) & This::SetRotate,
-           return_self<>())
+      .def("SetRotate", (This & (This::*)(const GfRotation &)) & This::SetRotate, return_self<>())
       .def("SetRotateOnly",
            (This & (This::*)(const GfRotation &)) & This::SetRotateOnly,
            return_self<>())
 
-      .def("SetRotate",
-           (This & (This::*)(const GfMatrix3f &)) & This::SetRotate,
-           return_self<>())
+      .def("SetRotate", (This & (This::*)(const GfMatrix3f &)) & This::SetRotate, return_self<>())
       .def("SetRotateOnly",
            (This & (This::*)(const GfMatrix3f &)) & This::SetRotateOnly,
            return_self<>())
 
       .def("SetLookAt",
-           (This &
-            (This::*)(const GfVec3f &, const GfVec3f &, const GfVec3f &)) &
-               This::SetLookAt,
+           (This & (This::*)(const GfVec3f &, const GfVec3f &, const GfVec3f &)) & This::SetLookAt,
            return_self<>())
 
       .def("SetLookAt",
-           (This & (This::*)(const GfVec3f &, const GfRotation &)) &
-               This::SetLookAt,
+           (This & (This::*)(const GfVec3f &, const GfRotation &)) & This::SetLookAt,
            return_self<>())
 
       .def("ExtractTranslation", &This::ExtractTranslation)
@@ -407,29 +462,21 @@ void wrapMatrix4f() {
       .def("Factor", Factor)
       .def("RemoveScaleShear", RemoveScaleShearWrapper)
 
-      .def("Transform",
-           (GfVec3f(This::*)(const GfVec3f &) const) & This::Transform)
-      .def("Transform",
-           (GfVec3d(This::*)(const GfVec3d &) const) & This::Transform)
+      .def("Transform", (GfVec3f(This::*)(const GfVec3f &) const) & This::Transform)
+      .def("Transform", (GfVec3d(This::*)(const GfVec3d &) const) & This::Transform)
 
-      .def("TransformDir",
-           (GfVec3f(This::*)(const GfVec3f &) const) & This::TransformDir)
-      .def("TransformDir",
-           (GfVec3d(This::*)(const GfVec3d &) const) & This::TransformDir)
+      .def("TransformDir", (GfVec3f(This::*)(const GfVec3f &) const) & This::TransformDir)
+      .def("TransformDir", (GfVec3d(This::*)(const GfVec3d &) const) & This::TransformDir)
 
-      .def("TransformAffine",
-           (GfVec3f(This::*)(const GfVec3f &) const) & This::TransformAffine)
-      .def("TransformAffine",
-           (GfVec3d(This::*)(const GfVec3d &) const) & This::TransformAffine)
-      .def("SetScale", (This & (This::*)(float)) & This::SetScale,
-           return_self<>())
+      .def("TransformAffine", (GfVec3f(This::*)(const GfVec3f &) const) & This::TransformAffine)
+      .def("TransformAffine", (GfVec3d(This::*)(const GfVec3d &) const) & This::TransformAffine)
+      .def("SetScale", (This & (This::*)(float)) & This::SetScale, return_self<>())
 
       .def("__repr__", _Repr)
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   // Install buffer protocol: set the tp_as_buffer slot to point to a
   // structure of function pointers that implement the buffer protocol for

@@ -21,59 +21,46 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/cxxCast.h"
 #include "Arch/functionLite.h"
+#include "pxr/base/tf/cxxCast.h"
+#include "pxr/pxr.h"
 #include <stdio.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-#define CHECK(cond)                                             \
-  if (!(cond))                                                  \
-  {                                                             \
-    status = false;                                             \
-    fprintf(stderr, "testTfCxxCast: %s failed (line %d, %s)\n", \
-            #cond, __LINE__, __ARCH_FILE__);                    \
+#define CHECK(cond) \
+  if (!(cond)) { \
+    status = false; \
+    fprintf(stderr, "testTfCxxCast: %s failed (line %d, %s)\n", #cond, __LINE__, __ARCH_FILE__); \
   }
 
-struct PolyBase0
-{
+struct PolyBase0 {
   virtual ~PolyBase0() {}
   char data0[1024];
 };
 
-struct PolyBase1
-{
+struct PolyBase1 {
   virtual ~PolyBase1() {}
   char data1[128];
 };
 
-struct PolyBase2
-{
+struct PolyBase2 {
   virtual ~PolyBase2() {}
   char data1[12];
 };
 
-struct PolyDerived1 : public PolyBase0, public PolyBase1
-{
-};
-struct PolyDerived2 : public PolyDerived1, public PolyBase2
-{
-};
+struct PolyDerived1 : public PolyBase0, public PolyBase1 {};
+struct PolyDerived2 : public PolyDerived1, public PolyBase2 {};
 
-struct NonPolyBase0
-{
+struct NonPolyBase0 {
   char data[128];
 };
 
-struct NonPolyBase1
-{
+struct NonPolyBase1 {
   char data[12];
 };
 
-struct NonPolyDerived : public NonPolyBase0, public NonPolyBase1
-{
-};
+struct NonPolyDerived : public NonPolyBase0, public NonPolyBase1 {};
 
 int main()
 {

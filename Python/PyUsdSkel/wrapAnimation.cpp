@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdSkel/animation.h"
 #include "Usd/schemaBase.h"
+#include "UsdSkel/animation.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,84 +40,76 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateJointsAttr(UsdSkelAnimation &self,
+                                      object defaultVal,
+                                      bool writeSparsely)
 {
+  return self.CreateJointsAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray),
+                               writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateTranslationsAttr(UsdSkelAnimation &self,
+                                            object defaultVal,
+                                            bool writeSparsely)
+{
+  return self.CreateTranslationsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float3Array), writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateRotationsAttr(UsdSkelAnimation &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateRotationsAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->QuatfArray),
+                                  writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateJointsAttr(UsdSkelAnimation &self,
-                    object defaultVal, bool writeSparsely)
-  {
-    return self.CreateJointsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray), writeSparsely);
-  }
+static UsdAttribute _CreateScalesAttr(UsdSkelAnimation &self,
+                                      object defaultVal,
+                                      bool writeSparsely)
+{
+  return self.CreateScalesAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Half3Array),
+                               writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateTranslationsAttr(UsdSkelAnimation &self,
-                          object defaultVal, bool writeSparsely)
-  {
-    return self.CreateTranslationsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float3Array), writeSparsely);
-  }
+static UsdAttribute _CreateBlendShapesAttr(UsdSkelAnimation &self,
+                                           object defaultVal,
+                                           bool writeSparsely)
+{
+  return self.CreateBlendShapesAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray),
+                                    writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateRotationsAttr(UsdSkelAnimation &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateRotationsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->QuatfArray), writeSparsely);
-  }
+static UsdAttribute _CreateBlendShapeWeightsAttr(UsdSkelAnimation &self,
+                                                 object defaultVal,
+                                                 bool writeSparsely)
+{
+  return self.CreateBlendShapeWeightsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->FloatArray), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateScalesAttr(UsdSkelAnimation &self,
-                    object defaultVal, bool writeSparsely)
-  {
-    return self.CreateScalesAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Half3Array), writeSparsely);
-  }
+static std::string _Repr(const UsdSkelAnimation &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSkel.Animation(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateBlendShapesAttr(UsdSkelAnimation &self,
-                         object defaultVal, bool writeSparsely)
-  {
-    return self.CreateBlendShapesAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->TokenArray), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateBlendShapeWeightsAttr(UsdSkelAnimation &self,
-                               object defaultVal, bool writeSparsely)
-  {
-    return self.CreateBlendShapeWeightsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->FloatArray), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdSkelAnimation &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSkel.Animation(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSkelAnimation()
 {
   typedef UsdSkelAnimation This;
 
-  class_<This, bases<UsdTyped>>
-      cls("Animation");
+  class_<This, bases<UsdTyped>> cls("Animation");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -133,53 +125,42 @@ void wrapUsdSkelAnimation()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetJointsAttr",
-           &This::GetJointsAttr)
+      .def("GetJointsAttr", &This::GetJointsAttr)
       .def("CreateJointsAttr",
            &_CreateJointsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetTranslationsAttr",
-           &This::GetTranslationsAttr)
+      .def("GetTranslationsAttr", &This::GetTranslationsAttr)
       .def("CreateTranslationsAttr",
            &_CreateTranslationsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetRotationsAttr",
-           &This::GetRotationsAttr)
+      .def("GetRotationsAttr", &This::GetRotationsAttr)
       .def("CreateRotationsAttr",
            &_CreateRotationsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetScalesAttr",
-           &This::GetScalesAttr)
+      .def("GetScalesAttr", &This::GetScalesAttr)
       .def("CreateScalesAttr",
            &_CreateScalesAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBlendShapesAttr",
-           &This::GetBlendShapesAttr)
+      .def("GetBlendShapesAttr", &This::GetBlendShapesAttr)
       .def("CreateBlendShapesAttr",
            &_CreateBlendShapesAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBlendShapeWeightsAttr",
-           &This::GetBlendShapeWeightsAttr)
+      .def("GetBlendShapeWeightsAttr", &This::GetBlendShapeWeightsAttr)
       .def("CreateBlendShapeWeightsAttr",
            &_CreateBlendShapeWeightsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -205,26 +186,23 @@ void wrapUsdSkelAnimation()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
+namespace {
+
+VtMatrix4dArray _GetTransforms(const UsdSkelAnimation &self, UsdTimeCode time)
 {
-
-  VtMatrix4dArray
-  _GetTransforms(const UsdSkelAnimation &self, UsdTimeCode time)
-  {
-    VtMatrix4dArray xforms;
-    self.GetTransforms(&xforms, time);
-    return xforms;
-  }
-
-  WRAP_CUSTOM
-  {
-    using This = UsdSkelAnimation;
-
-    _class
-        .def("GetTransforms", &_GetTransforms,
-             (arg("time") = UsdTimeCode::Default()))
-        .def("SetTransforms", &This::SetTransforms,
-             (arg("xforms"), arg("time") = UsdTimeCode::Default()));
-  }
-
+  VtMatrix4dArray xforms;
+  self.GetTransforms(&xforms, time);
+  return xforms;
 }
+
+WRAP_CUSTOM
+{
+  using This = UsdSkelAnimation;
+
+  _class.def("GetTransforms", &_GetTransforms, (arg("time") = UsdTimeCode::Default()))
+      .def("SetTransforms",
+           &This::SetTransforms,
+           (arg("xforms"), arg("time") = UsdTimeCode::Default()));
+}
+
+}  // namespace

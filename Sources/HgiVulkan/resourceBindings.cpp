@@ -34,57 +34,51 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
-{
-  static const uint8_t _descriptorSetCnt = 1;
+namespace {
+static const uint8_t _descriptorSetCnt = 1;
 }
 
-static VkDescriptorSetLayout
-_CreateDescriptorSetLayout(
+static VkDescriptorSetLayout _CreateDescriptorSetLayout(
     HgiVulkanDevice *device,
     std::vector<VkDescriptorSetLayoutBinding> const &bindings,
     std::string const &debugName)
 {
   // Create descriptor
-  VkDescriptorSetLayoutCreateInfo setCreateInfo =
-      {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+  VkDescriptorSetLayoutCreateInfo setCreateInfo = {
+      VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
   setCreateInfo.bindingCount = (uint32_t)bindings.size();
   setCreateInfo.pBindings = bindings.data();
   setCreateInfo.pNext = nullptr;
 
   VkDescriptorSetLayout layout = nullptr;
-  TF_VERIFY(
-      vkCreateDescriptorSetLayout(
-          device->GetVulkanDevice(),
-          &setCreateInfo,
-          HgiVulkanAllocator(),
-          &layout) == VK_SUCCESS);
+  TF_VERIFY(vkCreateDescriptorSetLayout(
+                device->GetVulkanDevice(), &setCreateInfo, HgiVulkanAllocator(), &layout) ==
+            VK_SUCCESS);
 
   // Debug label
-  if (!debugName.empty())
-  {
+  if (!debugName.empty()) {
     std::string debugLabel = "DescriptorSetLayout " + debugName;
     HgiVulkanSetDebugName(
-        device,
-        (uint64_t)layout,
-        VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT,
-        debugLabel.c_str());
+        device, (uint64_t)layout, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, debugLabel.c_str());
   }
 
   return layout;
 }
 
-HgiVulkanResourceBindings::HgiVulkanResourceBindings(
-    HgiVulkanDevice *device,
-    HgiResourceBindingsDesc const &desc)
-    : HgiResourceBindings(desc), _device(device), _inflightBits(0), _vkDescriptorPool(nullptr), _vkDescriptorSetLayout(nullptr), _vkDescriptorSet(nullptr)
+HgiVulkanResourceBindings::HgiVulkanResourceBindings(HgiVulkanDevice *device,
+                                                     HgiResourceBindingsDesc const &desc)
+    : HgiResourceBindings(desc),
+      _device(device),
+      _inflightBits(0),
+      _vkDescriptorPool(nullptr),
+      _vkDescriptorSetLayout(nullptr),
+      _vkDescriptorSet(nullptr)
 {
   // Initialize the pool sizes for each descriptor type we support
   std::vector<VkDescriptorPoolSize> poolSizes;
   poolSizes.resize(HgiBindResourceTypeCount);
 
-  for (size_t i = 0; i < HgiBindResourceTypeCount; i++)
-  {
+  for (size_t i = 0; i < HgiBindResourceTypeCount; i++) {
     HgiBindResourceType bt = HgiBindResourceType(i);
     VkDescriptorPoolSize p;
     p.descriptorCount = 0;
@@ -114,61 +108,55 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   // XXX We need to overspecify the stage usage here so we can match the
   // VkDescriptorSetLayout that is created with spirv-reflect for the
   // graphics and compute pipelines.
-  VkShaderStageFlags const bufferShaderStageFlags =
-      HgiVulkanConversions::GetShaderStages(
-          HgiShaderStageVertex | HgiShaderStageTessellationControl |
-          HgiShaderStageTessellationEval | HgiShaderStageGeometry |
-          HgiShaderStageFragment);
-  VkShaderStageFlags const textureShaderStageFlags =
-      HgiVulkanConversions::GetShaderStages(
-          HgiShaderStageGeometry | HgiShaderStageFragment);
+  VkShaderStageFlags const bufferShaderStageFlags = HgiVulkanConversions::GetShaderStages(
+      HgiShaderStageVertex | HgiShaderStageTessellationControl | HgiShaderStageTessellationEval |
+      HgiShaderStageGeometry | HgiShaderStageFragment);
+  VkShaderStageFlags const textureShaderStageFlags = HgiVulkanConversions::GetShaderStages(
+      HgiShaderStageGeometry | HgiShaderStageFragment);
 
   // Create DescriptorSetLayout to describe resource bindings.
   //
   // Buffers
   std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-  for (HgiBufferBindDesc const &b : desc.buffers)
-  {
+  for (HgiBufferBindDesc const &b : desc.buffers) {
     VkDescriptorSetLayoutBinding d = {};
     d.binding = b.bindingIndex;
-    d.descriptorType =
-        HgiVulkanConversions::GetDescriptorType(b.resourceType);
+    d.descriptorType = HgiVulkanConversions::GetDescriptorType(b.resourceType);
     poolSizes[b.resourceType].descriptorCount++;
     d.descriptorCount = (uint32_t)b.buffers.size();
-    d.stageFlags = (b.stageUsage == HgiShaderStageCompute) ? HgiVulkanConversions::GetShaderStages(b.stageUsage) : bufferShaderStageFlags;
+    d.stageFlags = (b.stageUsage == HgiShaderStageCompute) ?
+                       HgiVulkanConversions::GetShaderStages(b.stageUsage) :
+                       bufferShaderStageFlags;
     d.pImmutableSamplers = nullptr;
     bindings.push_back(std::move(d));
 
-    textureBindIndexStart =
-        std::max(textureBindIndexStart, b.bindingIndex + 1);
+    textureBindIndexStart = std::max(textureBindIndexStart, b.bindingIndex + 1);
   }
 
   // Textures
-  for (HgiTextureBindDesc const &t : desc.textures)
-  {
+  for (HgiTextureBindDesc const &t : desc.textures) {
     VkDescriptorSetLayoutBinding d = {};
     d.binding = textureBindIndexStart + t.bindingIndex;
-    d.descriptorType =
-        HgiVulkanConversions::GetDescriptorType(t.resourceType);
+    d.descriptorType = HgiVulkanConversions::GetDescriptorType(t.resourceType);
     poolSizes[t.resourceType].descriptorCount++;
     d.descriptorCount = (uint32_t)t.textures.size();
-    d.stageFlags = (t.stageUsage == HgiShaderStageCompute) ? HgiVulkanConversions::GetShaderStages(t.stageUsage) : textureShaderStageFlags;
+    d.stageFlags = (t.stageUsage == HgiShaderStageCompute) ?
+                       HgiVulkanConversions::GetShaderStages(t.stageUsage) :
+                       textureShaderStageFlags;
     d.pImmutableSamplers = nullptr;
     bindings.push_back(std::move(d));
   }
 
   // Create descriptor set layout
-  _vkDescriptorSetLayout =
-      _CreateDescriptorSetLayout(_device, bindings, _descriptor.debugName);
+  _vkDescriptorSetLayout = _CreateDescriptorSetLayout(_device, bindings, _descriptor.debugName);
 
   //
   // Create the descriptor pool.
   //
   // XXX For now each resource bindings gets its own pool to allocate its
   // descriptor sets from to simplify multi-threading support.
-  for (size_t i = poolSizes.size(); i-- > 0;)
-  {
+  for (size_t i = poolSizes.size(); i-- > 0;) {
     // Vulkan validation will complain if any descriptorCount is 0.
     // Instead of removing them we set a minimum of 1. An empty poolSize
     // will not let us create the pool, which prevents us from creating
@@ -183,73 +171,51 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   pool_info.poolSizeCount = (uint32_t)poolSizes.size();
   pool_info.pPoolSizes = poolSizes.data();
 
-  TF_VERIFY(
-      vkCreateDescriptorPool(
-          _device->GetVulkanDevice(),
-          &pool_info,
-          HgiVulkanAllocator(),
-          &_vkDescriptorPool) == VK_SUCCESS);
+  TF_VERIFY(vkCreateDescriptorPool(_device->GetVulkanDevice(),
+                                   &pool_info,
+                                   HgiVulkanAllocator(),
+                                   &_vkDescriptorPool) == VK_SUCCESS);
 
   // Debug label
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     std::string debugLabel = "Descriptor Pool " + _descriptor.debugName;
     HgiVulkanSetDebugName(
-        device,
-        (uint64_t)_vkDescriptorPool,
-        VK_OBJECT_TYPE_DESCRIPTOR_POOL,
-        debugLabel.c_str());
+        device, (uint64_t)_vkDescriptorPool, VK_OBJECT_TYPE_DESCRIPTOR_POOL, debugLabel.c_str());
   }
 
   //
   // Create Descriptor Set
   //
-  VkDescriptorSetAllocateInfo allocateInfo =
-      {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+  VkDescriptorSetAllocateInfo allocateInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
 
   allocateInfo.descriptorPool = _vkDescriptorPool;
   allocateInfo.descriptorSetCount = _descriptorSetCnt;
   allocateInfo.pSetLayouts = &_vkDescriptorSetLayout;
 
-  TF_VERIFY(
-      vkAllocateDescriptorSets(
-          _device->GetVulkanDevice(),
-          &allocateInfo,
-          &_vkDescriptorSet) == VK_SUCCESS);
+  TF_VERIFY(vkAllocateDescriptorSets(
+                _device->GetVulkanDevice(), &allocateInfo, &_vkDescriptorSet) == VK_SUCCESS);
 
   // Debug label
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     std::string dbgLbl = "Descriptor Set Buffers " + _descriptor.debugName;
     HgiVulkanSetDebugName(
-        _device,
-        (uint64_t)_vkDescriptorSet,
-        VK_OBJECT_TYPE_DESCRIPTOR_SET,
-        dbgLbl.c_str());
+        _device, (uint64_t)_vkDescriptorSet, VK_OBJECT_TYPE_DESCRIPTOR_SET, dbgLbl.c_str());
   }
 
   //
   // Setup limits for each resource type
   //
-  VkPhysicalDeviceProperties const &devProps =
-      _device->GetDeviceCapabilities().vkDeviceProperties;
+  VkPhysicalDeviceProperties const &devProps = _device->GetDeviceCapabilities().vkDeviceProperties;
   VkPhysicalDeviceLimits const &limits = devProps.limits;
 
   uint32_t bindLimits[HgiBindResourceTypeCount][2] = {
-      {HgiBindResourceTypeSampler,
-       limits.maxPerStageDescriptorSamplers},
-      {HgiBindResourceTypeSampledImage,
-       limits.maxPerStageDescriptorSampledImages},
-      {HgiBindResourceTypeCombinedSamplerImage,
-       limits.maxPerStageDescriptorSampledImages},
-      {HgiBindResourceTypeStorageImage,
-       limits.maxPerStageDescriptorStorageImages},
-      {HgiBindResourceTypeUniformBuffer,
-       limits.maxPerStageDescriptorUniformBuffers},
-      {HgiBindResourceTypeStorageBuffer,
-       limits.maxPerStageDescriptorStorageBuffers},
-      {HgiBindResourceTypeTessFactors,
-       0} // unsupported
+      {HgiBindResourceTypeSampler, limits.maxPerStageDescriptorSamplers},
+      {HgiBindResourceTypeSampledImage, limits.maxPerStageDescriptorSampledImages},
+      {HgiBindResourceTypeCombinedSamplerImage, limits.maxPerStageDescriptorSampledImages},
+      {HgiBindResourceTypeStorageImage, limits.maxPerStageDescriptorStorageImages},
+      {HgiBindResourceTypeUniformBuffer, limits.maxPerStageDescriptorUniformBuffers},
+      {HgiBindResourceTypeStorageBuffer, limits.maxPerStageDescriptorStorageBuffers},
+      {HgiBindResourceTypeTessFactors, 0}  // unsupported
   };
   static_assert(HgiBindResourceTypeCount == 7, "");
 
@@ -262,11 +228,9 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   std::vector<VkDescriptorBufferInfo> bufferInfos;
   bufferInfos.reserve(desc.buffers.size());
 
-  for (HgiBufferBindDesc const &bufDesc : desc.buffers)
-  {
+  for (HgiBufferBindDesc const &bufDesc : desc.buffers) {
     uint32_t &limit = bindLimits[bufDesc.resourceType][1];
-    if (!TF_VERIFY(limit > 0, "Maximum size array-of-buffers exceeded"))
-    {
+    if (!TF_VERIFY(limit > 0, "Maximum size array-of-buffers exceeded")) {
       break;
     }
     limit -= 1;
@@ -274,11 +238,9 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
     TF_VERIFY(bufDesc.buffers.size() == bufDesc.offsets.size());
 
     // Each buffer can be an array of buffers (usually one)
-    for (size_t i = 0; i < bufDesc.buffers.size(); i++)
-    {
+    for (size_t i = 0; i < bufDesc.buffers.size(); i++) {
       HgiBufferHandle const &bufHandle = bufDesc.buffers[i];
-      HgiVulkanBuffer *buf =
-          static_cast<HgiVulkanBuffer *>(bufHandle.Get());
+      HgiVulkanBuffer *buf = static_cast<HgiVulkanBuffer *>(bufHandle.Get());
       if (!TF_VERIFY(buf))
         continue;
       VkDescriptorBufferInfo bufferInfo;
@@ -290,18 +252,16 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   }
 
   size_t bufInfoOffset = 0;
-  for (HgiBufferBindDesc const &bufDesc : desc.buffers)
-  {
+  for (HgiBufferBindDesc const &bufDesc : desc.buffers) {
     VkWriteDescriptorSet writeSet = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
     writeSet.dstBinding = bufDesc.bindingIndex;
     writeSet.dstArrayElement = 0;
-    writeSet.descriptorCount = (uint32_t)bufDesc.buffers.size(); // 0 ok
+    writeSet.descriptorCount = (uint32_t)bufDesc.buffers.size();  // 0 ok
     writeSet.dstSet = _vkDescriptorSet;
     writeSet.pBufferInfo = bufferInfos.data() + bufInfoOffset;
     writeSet.pImageInfo = nullptr;
     writeSet.pTexelBufferView = nullptr;
-    writeSet.descriptorType =
-        HgiVulkanConversions::GetDescriptorType(bufDesc.resourceType);
+    writeSet.descriptorType = HgiVulkanConversions::GetDescriptorType(bufDesc.resourceType);
     writeSets.push_back(std::move(writeSet));
     bufInfoOffset += bufDesc.buffers.size();
   }
@@ -313,29 +273,24 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   std::vector<VkDescriptorImageInfo> imageInfos;
   imageInfos.reserve(desc.textures.size());
 
-  for (HgiTextureBindDesc const &texDesc : desc.textures)
-  {
+  for (HgiTextureBindDesc const &texDesc : desc.textures) {
 
     uint32_t &limit = bindLimits[texDesc.resourceType][1];
-    if (!TF_VERIFY(limit > 0, "Maximum array-of-texture/samplers exceeded"))
-    {
+    if (!TF_VERIFY(limit > 0, "Maximum array-of-texture/samplers exceeded")) {
       break;
     }
     limit -= 1;
 
     // Each texture can be an array of textures
-    for (size_t i = 0; i < texDesc.textures.size(); i++)
-    {
+    for (size_t i = 0; i < texDesc.textures.size(); i++) {
       HgiTextureHandle const &texHandle = texDesc.textures[i];
-      HgiVulkanTexture *tex =
-          static_cast<HgiVulkanTexture *>(texHandle.Get());
+      HgiVulkanTexture *tex = static_cast<HgiVulkanTexture *>(texHandle.Get());
       if (!TF_VERIFY(tex))
         continue;
 
       // Not having a sampler is ok only for StorageImage.
       HgiVulkanSampler *smp = nullptr;
-      if (i < texDesc.samplers.size())
-      {
+      if (i < texDesc.samplers.size()) {
         HgiSamplerHandle const &smpHandle = texDesc.samplers[i];
         smp = static_cast<HgiVulkanSampler *>(smpHandle.Get());
       }
@@ -349,20 +304,18 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   }
 
   size_t texInfoOffset = 0;
-  for (HgiTextureBindDesc const &texDesc : desc.textures)
-  {
+  for (HgiTextureBindDesc const &texDesc : desc.textures) {
     // For dstBinding we must provided an index in descriptor set.
     // Must be one of the bindings specified in VkDescriptorSetLayoutBinding
     VkWriteDescriptorSet writeSet = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
     writeSet.dstBinding = textureBindIndexStart + texDesc.bindingIndex;
     writeSet.dstArrayElement = 0;
-    writeSet.descriptorCount = (uint32_t)texDesc.textures.size(); // 0 ok
+    writeSet.descriptorCount = (uint32_t)texDesc.textures.size();  // 0 ok
     writeSet.dstSet = _vkDescriptorSet;
     writeSet.pBufferInfo = nullptr;
     writeSet.pImageInfo = imageInfos.data() + texInfoOffset;
     writeSet.pTexelBufferView = nullptr;
-    writeSet.descriptorType =
-        HgiVulkanConversions::GetDescriptorType(texDesc.resourceType);
+    writeSet.descriptorType = HgiVulkanConversions::GetDescriptorType(texDesc.resourceType);
     writeSets.push_back(std::move(writeSet));
     texInfoOffset += texDesc.textures.size();
   }
@@ -373,58 +326,48 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(
   // little and we are allowed to use vkUpdateDescriptorSets before
   // vkBeginCommandBuffer and after vkEndCommandBuffer, just not during the
   // command buffer recording.
-  vkUpdateDescriptorSets(
-      _device->GetVulkanDevice(),
-      (uint32_t)writeSets.size(),
-      writeSets.data(),
-      0,        // copy count
-      nullptr); // copy_desc
+  vkUpdateDescriptorSets(_device->GetVulkanDevice(),
+                         (uint32_t)writeSets.size(),
+                         writeSets.data(),
+                         0,         // copy count
+                         nullptr);  // copy_desc
 }
 
 HgiVulkanResourceBindings::~HgiVulkanResourceBindings()
 {
   vkDestroyDescriptorSetLayout(
-      _device->GetVulkanDevice(),
-      _vkDescriptorSetLayout,
-      HgiVulkanAllocator());
+      _device->GetVulkanDevice(), _vkDescriptorSetLayout, HgiVulkanAllocator());
 
   // Since we have one pool for this resourceBindings we can reset the pool
   // instead of freeing the descriptorSets (vkFreeDescriptorSets).
-  vkDestroyDescriptorPool(
-      _device->GetVulkanDevice(),
-      _vkDescriptorPool,
-      HgiVulkanAllocator());
+  vkDestroyDescriptorPool(_device->GetVulkanDevice(), _vkDescriptorPool, HgiVulkanAllocator());
 }
 
-void HgiVulkanResourceBindings::BindResources(
-    VkCommandBuffer cb,
-    VkPipelineBindPoint bindPoint,
-    VkPipelineLayout layout)
+void HgiVulkanResourceBindings::BindResources(VkCommandBuffer cb,
+                                              VkPipelineBindPoint bindPoint,
+                                              VkPipelineLayout layout)
 {
   // When binding new resources for the currently bound pipeline it may
   // 'disturb' previously bound resources (for a previous pipeline) that
   // are no longer compatible with the layout for the new pipeline.
   // This essentially unbinds the old resources.
 
-  vkCmdBindDescriptorSets(
-      cb,
-      bindPoint,
-      layout,
-      0, // firstSet/slot - Hgi does not provide slot index, assume 0.
-      _descriptorSetCnt,
-      &_vkDescriptorSet,
-      0, // dynamicOffset
-      nullptr);
+  vkCmdBindDescriptorSets(cb,
+                          bindPoint,
+                          layout,
+                          0,  // firstSet/slot - Hgi does not provide slot index, assume 0.
+                          _descriptorSetCnt,
+                          &_vkDescriptorSet,
+                          0,  // dynamicOffset
+                          nullptr);
 }
 
-HgiVulkanDevice *
-HgiVulkanResourceBindings::GetDevice() const
+HgiVulkanDevice *HgiVulkanResourceBindings::GetDevice() const
 {
   return _device;
 }
 
-uint64_t &
-HgiVulkanResourceBindings::GetInflightBits()
+uint64_t &HgiVulkanResourceBindings::GetInflightBits()
 {
   return _inflightBits;
 }

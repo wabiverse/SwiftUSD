@@ -74,36 +74,28 @@ class PxOsdMeshTopology;
 /// all subclasses.  However, it's important that subclasses explicitly include
 /// a "using" statement for the fallback to be included in overload resolution.
 ///
-class GeomUtilMeshGeneratorBase
-{
-private:
+class GeomUtilMeshGeneratorBase {
+ private:
   // Delete the implicit default c'tor.  This class and its subclasses are
   // only for grouping; there's never any need to make instances.
   GeomUtilMeshGeneratorBase() = delete;
 
-protected:
+ protected:
   // SFINAE helper types, for more compact and readable template shenanigans
   // in the subclasses.
-  template <typename IterType>
-  struct _IsGfVec3Iterator
-  {
+  template<typename IterType> struct _IsGfVec3Iterator {
     using PointType = typename std::iterator_traits<IterType>::value_type;
-    static constexpr bool value =
-        std::is_same<PointType, GfVec3f>::value ||
-        std::is_same<PointType, GfVec3d>::value;
+    static constexpr bool value = std::is_same<PointType, GfVec3f>::value ||
+                                  std::is_same<PointType, GfVec3d>::value;
   };
 
-  template <typename IterType>
+  template<typename IterType>
   struct _EnableIfGfVec3Iterator
-      : public std::enable_if<_IsGfVec3Iterator<IterType>::value, void>
-  {
-  };
+      : public std::enable_if<_IsGfVec3Iterator<IterType>::value, void> {};
 
-  template <typename IterType>
+  template<typename IterType>
   struct _EnableIfNotGfVec3Iterator
-      : public std::enable_if<!_IsGfVec3Iterator<IterType>::value, void>
-  {
-  };
+      : public std::enable_if<!_IsGfVec3Iterator<IterType>::value, void> {};
 
   // Helper struct to provide iterator type erasure, allowing subclasses to
   // implement their GeneratePoints methods privately.  Usage doesn't require
@@ -118,53 +110,43 @@ protected:
   // guaranteed by the client deriving PointType from IterType; see subclass
   // use for examples and how they guarantee IterType dereferences to a
   // supportable point type.
-  template <typename PointType>
-  struct _PointWriter
-  {
-    template <class IterType>
-    _PointWriter(
-        IterType &iter)
-        : _writeFnPtr(&_PointWriter<PointType>::_WritePoint<IterType>), _untypedIterPtr(static_cast<void *>(&iter))
+  template<typename PointType> struct _PointWriter {
+    template<class IterType>
+    _PointWriter(IterType &iter)
+        : _writeFnPtr(&_PointWriter<PointType>::_WritePoint<IterType>),
+          _untypedIterPtr(static_cast<void *>(&iter))
     {
     }
 
-    template <class IterType>
-    _PointWriter(
-        IterType &iter,
-        const GfMatrix4d *const framePtr)
-        : _writeFnPtr(
-              &_PointWriter<PointType>::_TransformAndWritePoint<IterType>),
-          _untypedIterPtr(static_cast<void *>(&iter)), _framePtr(framePtr)
+    template<class IterType>
+    _PointWriter(IterType &iter, const GfMatrix4d *const framePtr)
+        : _writeFnPtr(&_PointWriter<PointType>::_TransformAndWritePoint<IterType>),
+          _untypedIterPtr(static_cast<void *>(&iter)),
+          _framePtr(framePtr)
     {
     }
 
-    void Write(
-        const PointType &pt) const
+    void Write(const PointType &pt) const
     {
       (this->*_writeFnPtr)(pt);
     }
 
-  private:
-    template <class IterType>
-    void _WritePoint(
-        const PointType &pt) const
+   private:
+    template<class IterType> void _WritePoint(const PointType &pt) const
     {
       IterType &iter = *static_cast<IterType *>(_untypedIterPtr);
       *iter = pt;
       ++iter;
     }
 
-    template <class IterType>
-    void _TransformAndWritePoint(
-        const PointType &pt) const
+    template<class IterType> void _TransformAndWritePoint(const PointType &pt) const
     {
       IterType &iter = *static_cast<IterType *>(_untypedIterPtr);
       *iter = _framePtr->Transform(pt);
       ++iter;
     }
 
-    using _WriteFnPtr =
-        void (_PointWriter<PointType>::*)(const PointType &) const;
+    using _WriteFnPtr = void (_PointWriter<PointType>::*)(const PointType &) const;
     _WriteFnPtr _writeFnPtr;
     void *_untypedIterPtr;
     const GfMatrix4d *_framePtr;
@@ -197,29 +179,21 @@ protected:
   // extension, the generated topology, differs for "open" and "closed"
   // surfaces.
   //
-  enum _CapStyle
-  {
-    CapStyleNone,
-    CapStyleSharedEdge,
-    CapStyleSeparateEdge
-  };
+  enum _CapStyle { CapStyleNone, CapStyleSharedEdge, CapStyleSeparateEdge };
 
-  static PxOsdMeshTopology _GenerateCappedQuadTopology(
-      const size_t numRadial,
-      const size_t numQuadStrips,
-      const _CapStyle bottomCapStyle,
-      const _CapStyle topCapStyle,
-      const bool closedSweep);
+  static PxOsdMeshTopology _GenerateCappedQuadTopology(const size_t numRadial,
+                                                       const size_t numQuadStrips,
+                                                       const _CapStyle bottomCapStyle,
+                                                       const _CapStyle topCapStyle,
+                                                       const bool closedSweep);
 
   // Subclasses that use the topology helper method above generate one or more
   // circular arcs during point generation.  The number of radial points on
   // each arc depends on the number of radial segments and whether the arc
   // is fully swept (i.e., a ring).
-  static size_t _ComputeNumRadialPoints(
-      const size_t numRadial,
-      const bool closedSweep);
+  static size_t _ComputeNumRadialPoints(const size_t numRadial, const bool closedSweep);
 
-public:
+ public:
   // This template provides a "fallback" for GeneratePoints(...) calls that
   // do not meet the SFINAE requirement that the given point-container-
   // iterator must dereference to a GfVec3f or GfVec3d.  This version
@@ -227,11 +201,9 @@ public:
   // earlier, subclasses should explicitly add a "using" statement with
   // this method to include it in overload resolution.
   //
-  template <typename PointIterType,
-            typename Enabled =
-                typename _EnableIfNotGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter, ...)
+  template<typename PointIterType,
+           typename Enabled = typename _EnableIfNotGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter, ...)
   {
     static_assert(_IsGfVec3Iterator<PointIterType>::value,
                   "This function only supports iterators to GfVec3f or GfVec3d "
@@ -241,4 +213,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GEOM_UTIL_MESH_GENERATOR_BASE_H
+#endif  // PXR_IMAGING_GEOM_UTIL_MESH_GENERATOR_BASE_H

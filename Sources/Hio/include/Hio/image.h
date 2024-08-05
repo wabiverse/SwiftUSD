@@ -26,9 +26,9 @@
 
 /// \file hio/image.h
 
-#include <pxr/pxrns.h>
 #include "Hio/api.h"
 #include "Hio/types.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -48,37 +48,28 @@ using HioImageSharedPtr = std::shared_ptr<class HioImage>;
 ///
 /// The class allows basic access to texture image file data.
 ///
-class HioImage
-{
-public:
+class HioImage {
+ public:
   /// Specifies whether to treat the image origin as the upper-left corner
   /// or the lower left
-  enum ImageOriginLocation
-  {
-    OriginUpperLeft,
-    OriginLowerLeft
-  };
+  enum ImageOriginLocation { OriginUpperLeft, OriginLowerLeft };
 
   /// Specifies the source color space in which the texture is encoded, with
   /// "Auto" indicating the texture reader should determine color space based
   /// on hints from the image (e.g. file type, number of channels, image
   /// metadata)
-  enum SourceColorSpace
-  {
-    Raw,
-    SRGB,
-    Auto
-  };
+  enum SourceColorSpace { Raw, SRGB, Auto };
 
   /// \class StorageSpec
   ///
   /// Describes the memory layout and storage of a texture image
   ///
-  class StorageSpec
-  {
-  public:
+  class StorageSpec {
+   public:
     StorageSpec()
-        : width(0), height(0), depth(0), format(HioFormatInvalid), flipped(false), data(0) {}
+        : width(0), height(0), depth(0), format(HioFormatInvalid), flipped(false), data(0)
+    {
+    }
 
     int width, height, depth;
     HioFormat format;
@@ -86,7 +77,7 @@ public:
     void *data;
   };
 
-public:
+ public:
   HioImage() = default;
 
   HIO_API
@@ -107,12 +98,12 @@ public:
   /// \a mip, using \a sourceColorSpace to help determine the color space
   /// with which to interpret the texture
   HIO_API
-  static HioImageSharedPtr OpenForReading(std::string const &filename,
-                                          int subimage = 0,
-                                          int mip = 0,
-                                          SourceColorSpace sourceColorSpace =
-                                              SourceColorSpace::Auto,
-                                          bool suppressErrors = false);
+  static HioImageSharedPtr OpenForReading(
+      std::string const &filename,
+      int subimage = 0,
+      int mip = 0,
+      SourceColorSpace sourceColorSpace = SourceColorSpace::Auto,
+      bool suppressErrors = false);
 
   /// Reads the image file into \a storage.
   virtual bool Read(StorageSpec const &storage) = 0;
@@ -162,17 +153,15 @@ public:
 
   /// \name Metadata
   /// {@
-  template <typename T>
-  bool GetMetadata(TfToken const &key, T *value) const;
+  template<typename T> bool GetMetadata(TfToken const &key, T *value) const;
 
   virtual bool GetMetadata(TfToken const &key, VtValue *value) const = 0;
 
-  virtual bool GetSamplerMetadata(HioAddressDimension dim,
-                                  HioAddressMode *param) const = 0;
+  virtual bool GetSamplerMetadata(HioAddressDimension dim, HioAddressMode *param) const = 0;
 
   /// }@
 
-protected:
+ protected:
   virtual bool _OpenForReading(std::string const &filename,
                                int subimage,
                                int mip,
@@ -182,28 +171,23 @@ protected:
   virtual bool _OpenForWriting(std::string const &filename) = 0;
 };
 
-template <typename T>
-bool HioImage::GetMetadata(TfToken const &key, T *value) const
+template<typename T> bool HioImage::GetMetadata(TfToken const &key, T *value) const
 {
   VtValue any;
-  if (!GetMetadata(key, &any) || !any.IsHolding<T>())
-  {
+  if (!GetMetadata(key, &any) || !any.IsHolding<T>()) {
     return false;
   }
   *value = any.UncheckedGet<T>();
   return true;
 }
 
-class HIO_API HioImageFactoryBase : public TfType::FactoryBase
-{
-public:
+class HIO_API HioImageFactoryBase : public TfType::FactoryBase {
+ public:
   virtual HioImageSharedPtr New() const = 0;
 };
 
-template <class T>
-class HioImageFactory : public HioImageFactoryBase
-{
-public:
+template<class T> class HioImageFactory : public HioImageFactoryBase {
+ public:
   virtual HioImageSharedPtr New() const
   {
     return HioImageSharedPtr(new T);
@@ -212,4 +196,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HIO_IMAGE_H
+#endif  // PXR_IMAGING_HIO_IMAGE_H

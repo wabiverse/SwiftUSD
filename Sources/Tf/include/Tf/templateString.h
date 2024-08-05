@@ -61,7 +61,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// read freely by multiple threads concurrently.
 ///
 class TfTemplateString {
-public:
+ public:
   typedef std::map<std::string, std::string> Mapping;
 
   /// Constructs a new template string.
@@ -73,7 +73,10 @@ public:
   TfTemplateString(const std::string &template_);
 
   /// Returns the template source string supplied to the constructor.
-  const std::string &GetTemplate() const { return _data->template_; }
+  const std::string &GetTemplate() const
+  {
+    return _data->template_;
+  }
 
   /// Performs the template substitution, returning a new string. The mapping
   /// contains keys which match the placeholders in the template. If a
@@ -102,10 +105,9 @@ public:
   TF_API
   std::vector<std::string> GetParseErrors() const;
 
-private:
+ private:
   struct _PlaceHolder {
-    _PlaceHolder(const std::string &n, size_t p, size_t l)
-        : name(n), pos(p), len(l) {}
+    _PlaceHolder(const std::string &n, size_t p, size_t l) : name(n), pos(p), len(l) {}
     std::string name;
     size_t pos;
     size_t len;
@@ -146,4 +148,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TEMPLATE_STRING_H
+#endif  // PXR_BASE_TF_TEMPLATE_STRING_H

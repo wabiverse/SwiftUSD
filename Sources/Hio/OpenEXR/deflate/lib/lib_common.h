@@ -6,10 +6,10 @@
 #define LIB_LIB_COMMON_H
 
 #ifdef LIBDEFLATE_H
- /*
-  * When building the library, LIBDEFLATEAPI needs to be defined properly before
-  * including libdeflate.h.
-  */
+/*
+ * When building the library, LIBDEFLATEAPI needs to be defined properly before
+ * including libdeflate.h.
+ */
 #  error "lib_common.h must always be included before libdeflate.h"
 #endif
 
@@ -24,12 +24,12 @@
  * This prevents crashes in SSE/AVX code.
  */
 #if defined(__GNUC__) && defined(__i386__)
-#  define LIBDEFLATE_ALIGN_STACK  __attribute__((force_align_arg_pointer))
+#  define LIBDEFLATE_ALIGN_STACK __attribute__((force_align_arg_pointer))
 #else
 #  define LIBDEFLATE_ALIGN_STACK
 #endif
 
-#define LIBDEFLATEAPI	LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
+#define LIBDEFLATEAPI LIBDEFLATE_EXPORT_SYM LIBDEFLATE_ALIGN_STACK
 
 #include "../common_defs.h"
 
@@ -53,20 +53,20 @@ static void libdeflate_aligned_free(void *ptr);
  * We still need the actual function definitions in case gcc calls them.
  */
 void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+#  define memset(s, c, n) __builtin_memset((s), (c), (n))
 
 void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+#  define memcpy(dest, src, n) __builtin_memcpy((dest), (src), (n))
 
 void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+#  define memmove(dest, src, n) __builtin_memmove((dest), (src), (n))
 
 int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define memcmp(s1, s2, n) __builtin_memcmp((s1), (s2), (n))
 
-#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#  undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
 #endif
 
 /*
@@ -75,14 +75,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
  */
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
 void libdeflate_assertion_failed(const char *expr, const char *file, int line);
-#define ASSERT(expr) { if (unlikely(!(expr))) \
-	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#  define ASSERT(expr) \
+    { \
+      if (unlikely(!(expr))) \
+        libdeflate_assertion_failed(#expr, __FILE__, __LINE__); \
+    }
 #else
-#define ASSERT(expr) (void)(expr)
+#  define ASSERT(expr) (void)(expr)
 #endif
 
-#define CONCAT_IMPL(a, b)	a##b
-#define CONCAT(a, b)		CONCAT_IMPL(a, b)
-#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+#define CONCAT_IMPL(a, b) a##b
+#define CONCAT(a, b) CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name) CONCAT(name, SUFFIX)
 
 #endif /* LIB_LIB_COMMON_H */

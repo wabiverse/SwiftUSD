@@ -87,7 +87,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// (Most library test functions shouldn't need any arguments.)
 ///
 class TfRegTest {
-public:
+ public:
   /// Run a single regression test function, returning 0 if the function
   /// succeeded and 1 otherwise.
   ///
@@ -103,7 +103,8 @@ public:
   /// other than the test name should be supplied.  Otherwise, the \c Main()
   /// passes \c argc-1 and \c argv+1 to the test function, and the test
   /// function is responsible for argument checking.
-  static int Main(int argc, char *argv[]) {
+  static int Main(int argc, char *argv[])
+  {
     return GetInstance()._Main(argc, argv);
   }
 
@@ -125,7 +126,7 @@ public:
   TF_API
   bool Register(const char *name, RegFuncWithArgs);
 
-private:
+ private:
   friend class TfSingleton<TfRegTest>;
   TF_API
   int _Main(int argc, char *argv[]);
@@ -146,7 +147,7 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfRegTest>);
 ///
 /// \ingroup group_tf_Internal
 /// \hideinitializer
-#define TF_ADD_REGTEST(name)                                                   \
+#define TF_ADD_REGTEST(name) \
   bool Tf_RegTst##name = TfRegTest::GetInstance().Register(#name, Test_##name)
 
 PXR_NAMESPACE_CLOSE_SCOPE

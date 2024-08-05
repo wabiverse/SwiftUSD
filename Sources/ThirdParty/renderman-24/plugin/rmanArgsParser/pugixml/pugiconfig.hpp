@@ -12,7 +12,7 @@
  */
 
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_ARGS_PARSER_PUGIXML_PUGICONFIG_HPP
-#define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_ARGS_PARSER_PUGIXML_PUGICONFIG_HPP
+#  define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_RMAN_ARGS_PARSER_PUGIXML_PUGICONFIG_HPP
 
 // Uncomment this to enable wchar_t mode
 // #define PUGIXML_WCHAR_MODE
@@ -32,8 +32,8 @@
 // Set this to control attributes for public classes/functions, i.e.:
 // #define PUGIXML_API __declspec(dllexport) // to export all public symbols from DLL
 // #define PUGIXML_CLASS __declspec(dllimport) // to import all classes from DLL
-// #define PUGIXML_FUNCTION __fastcall // to set calling conventions to all public functions to fastcall
-// In absence of PUGIXML_CLASS/PUGIXML_FUNCTION definitions PUGIXML_API is used instead
+// #define PUGIXML_FUNCTION __fastcall // to set calling conventions to all public functions to
+// fastcall In absence of PUGIXML_CLASS/PUGIXML_FUNCTION definitions PUGIXML_API is used instead
 
 // Tune these constants to adjust memory-related behavior
 // #define PUGIXML_MEMORY_PAGE_SIZE 32768

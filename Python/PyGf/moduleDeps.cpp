@@ -32,11 +32,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
+TF_REGISTRY_FUNCTION(TfScriptModuleLoader)
+{
   // List of direct dependencies for this library.
   const std::vector<TfToken> reqs = {TfToken("arch"), TfToken("tf")};
-  TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("gf"),
-                                                      TfToken("pxr.Gf"), reqs);
+  TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("gf"), TfToken("pxr.Gf"), reqs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

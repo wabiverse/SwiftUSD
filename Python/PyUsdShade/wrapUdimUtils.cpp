@@ -31,33 +31,26 @@
 
 #include "UsdShade/udimUtils.h"
 
-
 using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapUsdShadeUdimUtils()
 {
-    class_<UsdShadeUdimUtils>("UdimUtils", no_init)
-        .def("IsUdimIdentifier", 
-            UsdShadeUdimUtils::IsUdimIdentifier,
-            (arg("identifier")))
-        .staticmethod("IsUdimIdentifier")
+  class_<UsdShadeUdimUtils>("UdimUtils", no_init)
+      .def("IsUdimIdentifier", UsdShadeUdimUtils::IsUdimIdentifier, (arg("identifier")))
+      .staticmethod("IsUdimIdentifier")
 
-        .def("ResolveUdimTilePaths", 
-            UsdShadeUdimUtils::ResolveUdimTilePaths,
-            (arg("udimPath"), arg("layer")))
-        .staticmethod("ResolveUdimTilePaths")
+      .def("ResolveUdimTilePaths",
+           UsdShadeUdimUtils::ResolveUdimTilePaths,
+           (arg("udimPath"), arg("layer")))
+      .staticmethod("ResolveUdimTilePaths")
 
-        .def("ReplaceUdimPattern",
-            UsdShadeUdimUtils::ReplaceUdimPattern,
-            (arg("identifierWithPattern"), arg("replacement")))
-        .staticmethod("ReplaceUdimPattern")
+      .def("ReplaceUdimPattern",
+           UsdShadeUdimUtils::ReplaceUdimPattern,
+           (arg("identifierWithPattern"), arg("replacement")))
+      .staticmethod("ReplaceUdimPattern")
 
-        .def("ResolveUdimPath",
-            UsdShadeUdimUtils::ResolveUdimPath,
-            (arg("udimPath"), arg("layer")))
-        .staticmethod("ResolveUdimPath")
-        ;
-
+      .def("ResolveUdimPath", UsdShadeUdimUtils::ResolveUdimPath, (arg("udimPath"), arg("layer")))
+      .staticmethod("ResolveUdimPath");
 }

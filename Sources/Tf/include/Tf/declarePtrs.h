@@ -31,8 +31,8 @@
 
 #include <pxr/pxrns.h>
 
-#include "Tf/weakPtr.h"
 #include "Tf/refPtr.h"
+#include "Tf/weakPtr.h"
 
 #include <vector>
 
@@ -40,9 +40,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \struct TfDeclarePtrs
 /// Templated struct used for type definition macros.
-template <typename T> struct TfDeclarePtrs {
+template<typename T> struct TfDeclarePtrs {
   using ClsType = T;
-  
+
   using Ptr = TfWeakPtr<ClsType>;
   using ConstPtr = TfWeakPtr<const ClsType>;
   using PtrVector = std::vector<Ptr>;
@@ -62,10 +62,10 @@ template <typename T> struct TfDeclarePtrs {
 /// ClassPtrVector and ClassConstPtrVector.
 ///
 /// \hideinitializer
-#define TF_DECLARE_WEAK_PTRS(type)                                          \
-  using type##Ptr = TfDeclarePtrs<class type>::Ptr;                         \
-  using type##ConstPtr = TfDeclarePtrs<class type>::ConstPtr;               \
-  using type##PtrVector = TfDeclarePtrs<class type>::PtrVector;             \
+#define TF_DECLARE_WEAK_PTRS(type) \
+  using type##Ptr = TfDeclarePtrs<class type>::Ptr; \
+  using type##ConstPtr = TfDeclarePtrs<class type>::ConstPtr; \
+  using type##PtrVector = TfDeclarePtrs<class type>::PtrVector; \
   using type##ConstPtrVector = TfDeclarePtrs<class type>::ConstPtrVector
 
 /// Define standard ref pointer types.
@@ -75,10 +75,10 @@ template <typename T> struct TfDeclarePtrs {
 /// \c TF_DECLARE_REF_PTRS(Class) declares ClassRefPtr and ClassConstRefPtr.
 ///
 /// \hideinitializer
-#define TF_DECLARE_REF_PTRS(type)                                              \
-  using type##RefPtr = TfDeclarePtrs<class type>::RefPtr;                      \
-  using type##ConstRefPtr = TfDeclarePtrs<class type>::ConstRefPtr;            \
-  using type##RefPtrVector = TfDeclarePtrs<class type>::RefPtrVector;          \
+#define TF_DECLARE_REF_PTRS(type) \
+  using type##RefPtr = TfDeclarePtrs<class type>::RefPtr; \
+  using type##ConstRefPtr = TfDeclarePtrs<class type>::ConstRefPtr; \
+  using type##RefPtrVector = TfDeclarePtrs<class type>::RefPtrVector; \
   using type##ConstRefPtrVector = TfDeclarePtrs<class type>::ConstRefPtrVector
 
 /// Define standard weak, ref, and vector pointer types.
@@ -89,8 +89,8 @@ template <typename T> struct TfDeclarePtrs {
 /// ClassPtrVector, ClassConstPtrVector, ClassRefPtr and ClassConstRefPtr.
 ///
 /// \hideinitializer
-#define TF_DECLARE_WEAK_AND_REF_PTRS(type)                                     \
-  TF_DECLARE_WEAK_PTRS(type);                                                  \
+#define TF_DECLARE_WEAK_AND_REF_PTRS(type) \
+  TF_DECLARE_WEAK_PTRS(type); \
   TF_DECLARE_REF_PTRS(type)
 
 PXR_NAMESPACE_CLOSE_SCOPE

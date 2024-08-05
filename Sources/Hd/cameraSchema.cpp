@@ -33,455 +33,385 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCameraSchemaTokens,
-    HDCAMERA_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCameraSchemaTokens, HDCAMERA_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdCameraSchema::GetProjection()
+HdTokenDataSourceHandle HdCameraSchema::GetProjection()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdCameraSchemaTokens->projection);
+  return _GetTypedDataSource<HdTokenDataSource>(HdCameraSchemaTokens->projection);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetHorizontalAperture()
+HdFloatDataSourceHandle HdCameraSchema::GetHorizontalAperture()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->horizontalAperture);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->horizontalAperture);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetVerticalAperture()
+HdFloatDataSourceHandle HdCameraSchema::GetVerticalAperture()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->verticalAperture);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->verticalAperture);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetHorizontalApertureOffset()
+HdFloatDataSourceHandle HdCameraSchema::GetHorizontalApertureOffset()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->horizontalApertureOffset);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->horizontalApertureOffset);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetVerticalApertureOffset()
+HdFloatDataSourceHandle HdCameraSchema::GetVerticalApertureOffset()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->verticalApertureOffset);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->verticalApertureOffset);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetFocalLength()
+HdFloatDataSourceHandle HdCameraSchema::GetFocalLength()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->focalLength);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->focalLength);
 }
 
-HdVec2fDataSourceHandle
-HdCameraSchema::GetClippingRange()
+HdVec2fDataSourceHandle HdCameraSchema::GetClippingRange()
 {
-    return _GetTypedDataSource<HdVec2fDataSource>(
-        HdCameraSchemaTokens->clippingRange);
+  return _GetTypedDataSource<HdVec2fDataSource>(HdCameraSchemaTokens->clippingRange);
 }
 
-HdVec4dArrayDataSourceHandle
-HdCameraSchema::GetClippingPlanes()
+HdVec4dArrayDataSourceHandle HdCameraSchema::GetClippingPlanes()
 {
-    return _GetTypedDataSource<HdVec4dArrayDataSource>(
-        HdCameraSchemaTokens->clippingPlanes);
+  return _GetTypedDataSource<HdVec4dArrayDataSource>(HdCameraSchemaTokens->clippingPlanes);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetFStop()
+HdFloatDataSourceHandle HdCameraSchema::GetFStop()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->fStop);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->fStop);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetFocusDistance()
+HdFloatDataSourceHandle HdCameraSchema::GetFocusDistance()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->focusDistance);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->focusDistance);
 }
 
-HdDoubleDataSourceHandle
-HdCameraSchema::GetShutterOpen()
+HdDoubleDataSourceHandle HdCameraSchema::GetShutterOpen()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdCameraSchemaTokens->shutterOpen);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdCameraSchemaTokens->shutterOpen);
 }
 
-HdDoubleDataSourceHandle
-HdCameraSchema::GetShutterClose()
+HdDoubleDataSourceHandle HdCameraSchema::GetShutterClose()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdCameraSchemaTokens->shutterClose);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdCameraSchemaTokens->shutterClose);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetExposure()
+HdFloatDataSourceHandle HdCameraSchema::GetExposure()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->exposure);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->exposure);
 }
 
-HdBoolDataSourceHandle
-HdCameraSchema::GetFocusOn()
+HdBoolDataSourceHandle HdCameraSchema::GetFocusOn()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdCameraSchemaTokens->focusOn);
+  return _GetTypedDataSource<HdBoolDataSource>(HdCameraSchemaTokens->focusOn);
 }
 
-HdFloatDataSourceHandle
-HdCameraSchema::GetDofAspect()
+HdFloatDataSourceHandle HdCameraSchema::GetDofAspect()
 {
-    return _GetTypedDataSource<HdFloatDataSource>(
-        HdCameraSchemaTokens->dofAspect);
+  return _GetTypedDataSource<HdFloatDataSource>(HdCameraSchemaTokens->dofAspect);
 }
 
-HdSplitDiopterSchema
-HdCameraSchema::GetSplitDiopter()
+HdSplitDiopterSchema HdCameraSchema::GetSplitDiopter()
 {
-    return HdSplitDiopterSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdCameraSchemaTokens->splitDiopter));
+  return HdSplitDiopterSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdCameraSchemaTokens->splitDiopter));
 }
 
-HdLensDistortionSchema
-HdCameraSchema::GetLensDistortion()
+HdLensDistortionSchema HdCameraSchema::GetLensDistortion()
 {
-    return HdLensDistortionSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdCameraSchemaTokens->lensDistortion));
+  return HdLensDistortionSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdCameraSchemaTokens->lensDistortion));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdCameraSchema::BuildRetained(
-        const HdTokenDataSourceHandle &projection,
-        const HdFloatDataSourceHandle &horizontalAperture,
-        const HdFloatDataSourceHandle &verticalAperture,
-        const HdFloatDataSourceHandle &horizontalApertureOffset,
-        const HdFloatDataSourceHandle &verticalApertureOffset,
-        const HdFloatDataSourceHandle &focalLength,
-        const HdVec2fDataSourceHandle &clippingRange,
-        const HdVec4dArrayDataSourceHandle &clippingPlanes,
-        const HdFloatDataSourceHandle &fStop,
-        const HdFloatDataSourceHandle &focusDistance,
-        const HdDoubleDataSourceHandle &shutterOpen,
-        const HdDoubleDataSourceHandle &shutterClose,
-        const HdFloatDataSourceHandle &exposure,
-        const HdBoolDataSourceHandle &focusOn,
-        const HdFloatDataSourceHandle &dofAspect,
-        const HdContainerDataSourceHandle &splitDiopter,
-        const HdContainerDataSourceHandle &lensDistortion
-)
-{
-    TfToken names[17];
-    HdDataSourceBaseHandle values[17];
-
-    size_t count = 0;
-    if (projection) {
-        names[count] = HdCameraSchemaTokens->projection;
-        values[count++] = projection;
-    }
-
-    if (horizontalAperture) {
-        names[count] = HdCameraSchemaTokens->horizontalAperture;
-        values[count++] = horizontalAperture;
-    }
-
-    if (verticalAperture) {
-        names[count] = HdCameraSchemaTokens->verticalAperture;
-        values[count++] = verticalAperture;
-    }
-
-    if (horizontalApertureOffset) {
-        names[count] = HdCameraSchemaTokens->horizontalApertureOffset;
-        values[count++] = horizontalApertureOffset;
-    }
-
-    if (verticalApertureOffset) {
-        names[count] = HdCameraSchemaTokens->verticalApertureOffset;
-        values[count++] = verticalApertureOffset;
-    }
-
-    if (focalLength) {
-        names[count] = HdCameraSchemaTokens->focalLength;
-        values[count++] = focalLength;
-    }
-
-    if (clippingRange) {
-        names[count] = HdCameraSchemaTokens->clippingRange;
-        values[count++] = clippingRange;
-    }
-
-    if (clippingPlanes) {
-        names[count] = HdCameraSchemaTokens->clippingPlanes;
-        values[count++] = clippingPlanes;
-    }
-
-    if (fStop) {
-        names[count] = HdCameraSchemaTokens->fStop;
-        values[count++] = fStop;
-    }
-
-    if (focusDistance) {
-        names[count] = HdCameraSchemaTokens->focusDistance;
-        values[count++] = focusDistance;
-    }
-
-    if (shutterOpen) {
-        names[count] = HdCameraSchemaTokens->shutterOpen;
-        values[count++] = shutterOpen;
-    }
-
-    if (shutterClose) {
-        names[count] = HdCameraSchemaTokens->shutterClose;
-        values[count++] = shutterClose;
-    }
-
-    if (exposure) {
-        names[count] = HdCameraSchemaTokens->exposure;
-        values[count++] = exposure;
-    }
-
-    if (focusOn) {
-        names[count] = HdCameraSchemaTokens->focusOn;
-        values[count++] = focusOn;
-    }
-
-    if (dofAspect) {
-        names[count] = HdCameraSchemaTokens->dofAspect;
-        values[count++] = dofAspect;
-    }
-
-    if (splitDiopter) {
-        names[count] = HdCameraSchemaTokens->splitDiopter;
-        values[count++] = splitDiopter;
-    }
-
-    if (lensDistortion) {
-        names[count] = HdCameraSchemaTokens->lensDistortion;
-        values[count++] = lensDistortion;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdCameraSchema
-HdCameraSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdCameraSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdCameraSchemaTokens->camera))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdCameraSchema::GetSchemaToken()
-{
-    return HdCameraSchemaTokens->camera;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdCameraSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdCameraSchemaTokens->camera
-    );
-    return locator;
-} 
-
-/*static*/
-HdTokenDataSourceHandle
-HdCameraSchema::BuildProjectionDataSource(
-    const TfToken &projection)
-{
-    if (projection == HdCameraSchemaTokens->perspective) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(projection);
-        return ds;
-    }
-    if (projection == HdCameraSchemaTokens->orthographic) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(projection);
-        return ds;
-    }
-
-    // fallback for unknown token
-    return HdRetainedTypedSampledDataSource<TfToken>::New(projection);
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetProjection(
-    const HdTokenDataSourceHandle &projection)
-{
-    _projection = projection;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetHorizontalAperture(
-    const HdFloatDataSourceHandle &horizontalAperture)
-{
-    _horizontalAperture = horizontalAperture;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetVerticalAperture(
-    const HdFloatDataSourceHandle &verticalAperture)
-{
-    _verticalAperture = verticalAperture;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetHorizontalApertureOffset(
-    const HdFloatDataSourceHandle &horizontalApertureOffset)
-{
-    _horizontalApertureOffset = horizontalApertureOffset;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetVerticalApertureOffset(
-    const HdFloatDataSourceHandle &verticalApertureOffset)
-{
-    _verticalApertureOffset = verticalApertureOffset;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetFocalLength(
-    const HdFloatDataSourceHandle &focalLength)
-{
-    _focalLength = focalLength;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetClippingRange(
-    const HdVec2fDataSourceHandle &clippingRange)
-{
-    _clippingRange = clippingRange;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetClippingPlanes(
-    const HdVec4dArrayDataSourceHandle &clippingPlanes)
-{
-    _clippingPlanes = clippingPlanes;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetFStop(
-    const HdFloatDataSourceHandle &fStop)
-{
-    _fStop = fStop;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetFocusDistance(
-    const HdFloatDataSourceHandle &focusDistance)
-{
-    _focusDistance = focusDistance;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetShutterOpen(
-    const HdDoubleDataSourceHandle &shutterOpen)
-{
-    _shutterOpen = shutterOpen;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetShutterClose(
-    const HdDoubleDataSourceHandle &shutterClose)
-{
-    _shutterClose = shutterClose;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetExposure(
-    const HdFloatDataSourceHandle &exposure)
-{
-    _exposure = exposure;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetFocusOn(
-    const HdBoolDataSourceHandle &focusOn)
-{
-    _focusOn = focusOn;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetDofAspect(
-    const HdFloatDataSourceHandle &dofAspect)
-{
-    _dofAspect = dofAspect;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetSplitDiopter(
-    const HdContainerDataSourceHandle &splitDiopter)
-{
-    _splitDiopter = splitDiopter;
-    return *this;
-}
-
-HdCameraSchema::Builder &
-HdCameraSchema::Builder::SetLensDistortion(
+HdContainerDataSourceHandle HdCameraSchema::BuildRetained(
+    const HdTokenDataSourceHandle &projection,
+    const HdFloatDataSourceHandle &horizontalAperture,
+    const HdFloatDataSourceHandle &verticalAperture,
+    const HdFloatDataSourceHandle &horizontalApertureOffset,
+    const HdFloatDataSourceHandle &verticalApertureOffset,
+    const HdFloatDataSourceHandle &focalLength,
+    const HdVec2fDataSourceHandle &clippingRange,
+    const HdVec4dArrayDataSourceHandle &clippingPlanes,
+    const HdFloatDataSourceHandle &fStop,
+    const HdFloatDataSourceHandle &focusDistance,
+    const HdDoubleDataSourceHandle &shutterOpen,
+    const HdDoubleDataSourceHandle &shutterClose,
+    const HdFloatDataSourceHandle &exposure,
+    const HdBoolDataSourceHandle &focusOn,
+    const HdFloatDataSourceHandle &dofAspect,
+    const HdContainerDataSourceHandle &splitDiopter,
     const HdContainerDataSourceHandle &lensDistortion)
 {
-    _lensDistortion = lensDistortion;
-    return *this;
+  TfToken names[17];
+  HdDataSourceBaseHandle values[17];
+
+  size_t count = 0;
+  if (projection) {
+    names[count] = HdCameraSchemaTokens->projection;
+    values[count++] = projection;
+  }
+
+  if (horizontalAperture) {
+    names[count] = HdCameraSchemaTokens->horizontalAperture;
+    values[count++] = horizontalAperture;
+  }
+
+  if (verticalAperture) {
+    names[count] = HdCameraSchemaTokens->verticalAperture;
+    values[count++] = verticalAperture;
+  }
+
+  if (horizontalApertureOffset) {
+    names[count] = HdCameraSchemaTokens->horizontalApertureOffset;
+    values[count++] = horizontalApertureOffset;
+  }
+
+  if (verticalApertureOffset) {
+    names[count] = HdCameraSchemaTokens->verticalApertureOffset;
+    values[count++] = verticalApertureOffset;
+  }
+
+  if (focalLength) {
+    names[count] = HdCameraSchemaTokens->focalLength;
+    values[count++] = focalLength;
+  }
+
+  if (clippingRange) {
+    names[count] = HdCameraSchemaTokens->clippingRange;
+    values[count++] = clippingRange;
+  }
+
+  if (clippingPlanes) {
+    names[count] = HdCameraSchemaTokens->clippingPlanes;
+    values[count++] = clippingPlanes;
+  }
+
+  if (fStop) {
+    names[count] = HdCameraSchemaTokens->fStop;
+    values[count++] = fStop;
+  }
+
+  if (focusDistance) {
+    names[count] = HdCameraSchemaTokens->focusDistance;
+    values[count++] = focusDistance;
+  }
+
+  if (shutterOpen) {
+    names[count] = HdCameraSchemaTokens->shutterOpen;
+    values[count++] = shutterOpen;
+  }
+
+  if (shutterClose) {
+    names[count] = HdCameraSchemaTokens->shutterClose;
+    values[count++] = shutterClose;
+  }
+
+  if (exposure) {
+    names[count] = HdCameraSchemaTokens->exposure;
+    values[count++] = exposure;
+  }
+
+  if (focusOn) {
+    names[count] = HdCameraSchemaTokens->focusOn;
+    values[count++] = focusOn;
+  }
+
+  if (dofAspect) {
+    names[count] = HdCameraSchemaTokens->dofAspect;
+    values[count++] = dofAspect;
+  }
+
+  if (splitDiopter) {
+    names[count] = HdCameraSchemaTokens->splitDiopter;
+    values[count++] = splitDiopter;
+  }
+
+  if (lensDistortion) {
+    names[count] = HdCameraSchemaTokens->lensDistortion;
+    values[count++] = lensDistortion;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdCameraSchema::Builder::Build()
+/*static*/
+HdCameraSchema HdCameraSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdCameraSchema::BuildRetained(
-        _projection,
-        _horizontalAperture,
-        _verticalAperture,
-        _horizontalApertureOffset,
-        _verticalApertureOffset,
-        _focalLength,
-        _clippingRange,
-        _clippingPlanes,
-        _fStop,
-        _focusDistance,
-        _shutterOpen,
-        _shutterClose,
-        _exposure,
-        _focusOn,
-        _dofAspect,
-        _splitDiopter,
-        _lensDistortion
-    );
+  return HdCameraSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                  HdCameraSchemaTokens->camera)) :
+                                              nullptr);
 }
 
+/*static*/
+const TfToken &HdCameraSchema::GetSchemaToken()
+{
+  return HdCameraSchemaTokens->camera;
+}
+
+/*static*/
+const HdDataSourceLocator &HdCameraSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdCameraSchemaTokens->camera);
+  return locator;
+}
+
+/*static*/
+HdTokenDataSourceHandle HdCameraSchema::BuildProjectionDataSource(const TfToken &projection)
+{
+  if (projection == HdCameraSchemaTokens->perspective) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(projection);
+    return ds;
+  }
+  if (projection == HdCameraSchemaTokens->orthographic) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(projection);
+    return ds;
+  }
+
+  // fallback for unknown token
+  return HdRetainedTypedSampledDataSource<TfToken>::New(projection);
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetProjection(
+    const HdTokenDataSourceHandle &projection)
+{
+  _projection = projection;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetHorizontalAperture(
+    const HdFloatDataSourceHandle &horizontalAperture)
+{
+  _horizontalAperture = horizontalAperture;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetVerticalAperture(
+    const HdFloatDataSourceHandle &verticalAperture)
+{
+  _verticalAperture = verticalAperture;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetHorizontalApertureOffset(
+    const HdFloatDataSourceHandle &horizontalApertureOffset)
+{
+  _horizontalApertureOffset = horizontalApertureOffset;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetVerticalApertureOffset(
+    const HdFloatDataSourceHandle &verticalApertureOffset)
+{
+  _verticalApertureOffset = verticalApertureOffset;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetFocalLength(
+    const HdFloatDataSourceHandle &focalLength)
+{
+  _focalLength = focalLength;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetClippingRange(
+    const HdVec2fDataSourceHandle &clippingRange)
+{
+  _clippingRange = clippingRange;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetClippingPlanes(
+    const HdVec4dArrayDataSourceHandle &clippingPlanes)
+{
+  _clippingPlanes = clippingPlanes;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetFStop(const HdFloatDataSourceHandle &fStop)
+{
+  _fStop = fStop;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetFocusDistance(
+    const HdFloatDataSourceHandle &focusDistance)
+{
+  _focusDistance = focusDistance;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetShutterOpen(
+    const HdDoubleDataSourceHandle &shutterOpen)
+{
+  _shutterOpen = shutterOpen;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetShutterClose(
+    const HdDoubleDataSourceHandle &shutterClose)
+{
+  _shutterClose = shutterClose;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetExposure(
+    const HdFloatDataSourceHandle &exposure)
+{
+  _exposure = exposure;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetFocusOn(const HdBoolDataSourceHandle &focusOn)
+{
+  _focusOn = focusOn;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetDofAspect(
+    const HdFloatDataSourceHandle &dofAspect)
+{
+  _dofAspect = dofAspect;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetSplitDiopter(
+    const HdContainerDataSourceHandle &splitDiopter)
+{
+  _splitDiopter = splitDiopter;
+  return *this;
+}
+
+HdCameraSchema::Builder &HdCameraSchema::Builder::SetLensDistortion(
+    const HdContainerDataSourceHandle &lensDistortion)
+{
+  _lensDistortion = lensDistortion;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdCameraSchema::Builder::Build()
+{
+  return HdCameraSchema::BuildRetained(_projection,
+                                       _horizontalAperture,
+                                       _verticalAperture,
+                                       _horizontalApertureOffset,
+                                       _verticalApertureOffset,
+                                       _focalLength,
+                                       _clippingRange,
+                                       _clippingPlanes,
+                                       _fStop,
+                                       _focusDistance,
+                                       _shutterOpen,
+                                       _shutterClose,
+                                       _exposure,
+                                       _focusOn,
+                                       _dofAspect,
+                                       _splitDiopter,
+                                       _lensDistortion);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -26,8 +26,8 @@
 
 #include <pxr/pxrns.h>
 
-#include "ArTypes/api.h"
 #include "Ar/resolverContext.h"
+#include "ArTypes/api.h"
 
 #include "Tf/notice.h"
 
@@ -35,9 +35,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class ContextObj>
-bool Ar_ContextIsHolding(const ContextObj &contextObj,
-                         const ArResolverContext &ctx) {
+template<class ContextObj>
+bool Ar_ContextIsHolding(const ContextObj &contextObj, const ArResolverContext &ctx)
+{
   const ContextObj *testObj = ctx.Get<ContextObj>();
   return testObj && *testObj == contextObj;
 }
@@ -45,14 +45,14 @@ bool Ar_ContextIsHolding(const ContextObj &contextObj,
 /// \class ArNotice
 ///
 class ArNotice {
-public:
+ public:
   /// \class ResolverNotice
   /// Base class for all ArResolver-related notices.
   class ResolverNotice : public TfNotice {
-  public:
+   public:
     AR_API virtual ~ResolverNotice();
 
-  protected:
+   protected:
     AR_API ResolverNotice();
   };
 
@@ -60,7 +60,7 @@ public:
   /// Notice sent when asset paths may resolve to a different path than
   /// before due to a change in the resolver.
   class ResolverChanged : public ResolverNotice {
-  public:
+   public:
     /// Create a notice indicating that the results of asset resolution
     /// might have changed, regardless of what ArResolverContext object
     /// is bound.
@@ -73,21 +73,21 @@ public:
     /// resolution when the given ArResolverContext is bound might have
     /// changed.
     AR_API
-    ResolverChanged(
-        const std::function<bool(const ArResolverContext &)> &affectsFn);
+    ResolverChanged(const std::function<bool(const ArResolverContext &)> &affectsFn);
 
     /// Create a notice indicating that the results of asset resolution when
     /// any ArResolverContext containing \p contextObj is bound might have
     /// changed.
-    template <class ContextObj, typename std::enable_if<ArIsContextObject<
-                                    ContextObj>::value>::type * = nullptr>
+    template<class ContextObj,
+             typename std::enable_if<ArIsContextObject<ContextObj>::value>::type * = nullptr>
     ResolverChanged(const ContextObj &contextObj)
         // XXX: Ideally this would just use a lambda and forward it to
         // the other c'tor. Both of those cause issues in MSVC 2015; the
         // first causes an unspecified type error and the second causes
         // odd linker errors.
-        : _affects(std::bind(&Ar_ContextIsHolding<ContextObj>, contextObj,
-                             std::placeholders::_1)) {}
+        : _affects(std::bind(&Ar_ContextIsHolding<ContextObj>, contextObj, std::placeholders::_1))
+    {
+    }
 
     AR_API
     virtual ~ResolverChanged();
@@ -97,7 +97,7 @@ public:
     AR_API
     bool AffectsContext(const ArResolverContext &ctx) const;
 
-  private:
+   private:
     std::function<bool(const ArResolverContext &)> _affects;
   };
 };

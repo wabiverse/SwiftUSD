@@ -33,92 +33,68 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens,
-    HDPRIMVARS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdPrimvarsSchemaTokens, HDPRIMVARS_SCHEMA_TOKENS);
 
-
-
-TfTokenVector
-HdPrimvarsSchema::GetPrimvarNames()
+TfTokenVector HdPrimvarsSchema::GetPrimvarNames()
 {
-    if (_container) {
-        return _container->GetNames();
-    } else {
-        return {};
-    }
+  if (_container) {
+    return _container->GetNames();
+  }
+  else {
+    return {};
+  }
 }
 
-HdPrimvarSchema
-HdPrimvarsSchema::GetPrimvar(TfToken name)
+HdPrimvarSchema HdPrimvarsSchema::GetPrimvar(TfToken name)
 {
-    return HdPrimvarSchema(
-        _GetTypedDataSource<HdContainerDataSource>(name));
-}
-
-
-
-/*static*/
-HdPrimvarsSchema
-HdPrimvarsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdPrimvarsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdPrimvarsSchemaTokens->primvars))
-        : nullptr);
+  return HdPrimvarSchema(_GetTypedDataSource<HdContainerDataSource>(name));
 }
 
 /*static*/
-const TfToken &
-HdPrimvarsSchema::GetSchemaToken()
+HdPrimvarsSchema HdPrimvarsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdPrimvarsSchemaTokens->primvars;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdPrimvarsSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdPrimvarsSchemaTokens->primvars
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdPrimvarsSchema::GetPointsLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdPrimvarsSchemaTokens->primvars,
-        HdPrimvarsSchemaTokens->points
-    );
-    return locator;
+  return HdPrimvarsSchema(
+      fromParentContainer ?
+          HdContainerDataSource::Cast(fromParentContainer->Get(HdPrimvarsSchemaTokens->primvars)) :
+          nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdPrimvarsSchema::GetNormalsLocator()
+const TfToken &HdPrimvarsSchema::GetSchemaToken()
 {
-    static const HdDataSourceLocator locator(
-        HdPrimvarsSchemaTokens->primvars,
-        HdPrimvarsSchemaTokens->normals
-    );
-    return locator;
+  return HdPrimvarsSchemaTokens->primvars;
+}
+/*static*/
+const HdDataSourceLocator &HdPrimvarsSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdPrimvarsSchemaTokens->primvars);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdPrimvarsSchema::GetPointsLocator()
+{
+  static const HdDataSourceLocator locator(HdPrimvarsSchemaTokens->primvars,
+                                           HdPrimvarsSchemaTokens->points);
+  return locator;
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdPrimvarsSchema::GetWidthsLocator()
+const HdDataSourceLocator &HdPrimvarsSchema::GetNormalsLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdPrimvarsSchemaTokens->primvars,
-        HdPrimvarsSchemaTokens->widths
-    );
-    return locator;
+  static const HdDataSourceLocator locator(HdPrimvarsSchemaTokens->primvars,
+                                           HdPrimvarsSchemaTokens->normals);
+  return locator;
 }
 
+/*static*/
+const HdDataSourceLocator &HdPrimvarsSchema::GetWidthsLocator()
+{
+  static const HdDataSourceLocator locator(HdPrimvarsSchemaTokens->primvars,
+                                           HdPrimvarsSchemaTokens->widths);
+  return locator;
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

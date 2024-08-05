@@ -33,56 +33,46 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdExtComputationPrimvarsSchemaTokens,
-    HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS);
+                        HDEXTCOMPUTATIONPRIMVARS_SCHEMA_TOKENS);
 
-
-
-TfTokenVector
-HdExtComputationPrimvarsSchema::GetExtComputationPrimvarNames()
+TfTokenVector HdExtComputationPrimvarsSchema::GetExtComputationPrimvarNames()
 {
-    if (_container) {
-        return _container->GetNames();
-    } else {
-        return {};
-    }
+  if (_container) {
+    return _container->GetNames();
+  }
+  else {
+    return {};
+  }
 }
 
-HdExtComputationPrimvarSchema
-HdExtComputationPrimvarsSchema::GetPrimvar(const TfToken &name)
+HdExtComputationPrimvarSchema HdExtComputationPrimvarsSchema::GetPrimvar(const TfToken &name)
 {
-    return HdExtComputationPrimvarSchema(
-        _GetTypedDataSource<HdContainerDataSource>(name));
+  return HdExtComputationPrimvarSchema(_GetTypedDataSource<HdContainerDataSource>(name));
 }
 
 /*static*/
-HdExtComputationPrimvarsSchema
-HdExtComputationPrimvarsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdExtComputationPrimvarsSchema HdExtComputationPrimvarsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdExtComputationPrimvarsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars))
-        : nullptr);
+  return HdExtComputationPrimvarsSchema(
+      fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars)) :
+                            nullptr);
 }
 
 /*static*/
-const TfToken &
-HdExtComputationPrimvarsSchema::GetSchemaToken()
+const TfToken &HdExtComputationPrimvarsSchema::GetSchemaToken()
 {
-    return HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars;
-} 
+  return HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars;
+}
 /*static*/
-const HdDataSourceLocator &
-HdExtComputationPrimvarsSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdExtComputationPrimvarsSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars
-    );
-    return locator;
-} 
+  static const HdDataSourceLocator locator(
+      HdExtComputationPrimvarsSchemaTokens->extComputationPrimvars);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

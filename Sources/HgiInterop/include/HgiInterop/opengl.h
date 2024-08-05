@@ -26,10 +26,10 @@
 
 #if !PXR_METAL_SUPPORT_ENABLED && !PXR_VULKAN_SUPPORT_ENABLED
 
-#include <pxr/pxrns.h>
-#include "Gf/vec4i.h"
-#include "Hgi/texture.h"
-#include "HgiInterop/api.h"
+#  include "Gf/vec4i.h"
+#  include "Hgi/texture.h"
+#  include "HgiInterop/api.h"
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,9 +39,8 @@ class VtValue;
 ///
 /// Provides GL/GL interop.
 ///
-class HgiInteropOpenGL final
-{
-public:
+class HgiInteropOpenGL final {
+ public:
   HGIINTEROP_API
   HgiInteropOpenGL();
 
@@ -51,13 +50,12 @@ public:
   /// Composite provided color (and optional depth) textures over app's
   /// framebuffer contents.
   HGIINTEROP_API
-  void CompositeToInterop(
-      HgiTextureHandle const &color,
-      HgiTextureHandle const &depth,
-      VtValue const &framebuffer,
-      GfVec4i const &viewport);
+  void CompositeToInterop(HgiTextureHandle const &color,
+                          HgiTextureHandle const &depth,
+                          VtValue const &framebuffer,
+                          GfVec4i const &viewport);
 
-private:
+ private:
   uint32_t _vs;
   uint32_t _fsNoDepth;
   uint32_t _fsDepth;

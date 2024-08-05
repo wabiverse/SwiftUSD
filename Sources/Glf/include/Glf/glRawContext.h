@@ -26,10 +26,10 @@
 
 /// \file glf/glRawContext.h
 
-#include <pxr/pxrns.h>
+#include "Garch/glPlatformContext.h"
 #include "Glf/api.h"
 #include "Glf/glContext.h"
-#include "Garch/glPlatformContext.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 
@@ -37,9 +37,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 typedef std::shared_ptr<class GlfGLRawContext> GlfGLRawContextSharedPtr;
 
-class GlfGLRawContext : public GlfGLContext
-{
-public:
+class GlfGLRawContext : public GlfGLContext {
+ public:
   /// Returns a new object with the current context.
   GLF_API
   static GlfGLRawContextSharedPtr New();
@@ -52,13 +51,16 @@ public:
   virtual ~GlfGLRawContext();
 
   /// Returns the held state.
-  const GarchGLPlatformContextState &GetState() const { return _state; }
+  const GarchGLPlatformContextState &GetState() const
+  {
+    return _state;
+  }
 
   // GlfGLContext overrides
   GLF_API
   virtual bool IsValid() const;
 
-protected:
+ protected:
   // GlfGLContext overrides
   GLF_API
   virtual void _MakeCurrent();
@@ -67,13 +69,13 @@ protected:
   GLF_API
   virtual bool _IsEqual(const GlfGLContextSharedPtr &rhs) const;
 
-private:
+ private:
   GlfGLRawContext(const GarchGLPlatformContextState &);
 
-private:
+ private:
   GarchGLPlatformContextState _state;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GLF_GL_RAW_CONTEXT_H
+#endif  // PXR_IMAGING_GLF_GL_RAW_CONTEXT_H

@@ -25,9 +25,9 @@
 
 /// \file ar/filesystemAsset.h
 
-#include "ArTypes/api.h"
 #include "Ar/asset.h"
 #include "Ar/timestamp.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include <cstdio>
@@ -42,18 +42,16 @@ class ArResolvedPath;
 ///
 /// ArAsset implementation for asset represented by a file on a filesystem.
 class ArFilesystemAsset : public ArAsset {
-public:
+ public:
   /// Constructs a new ArFilesystemAsset for the file at \p resolvedPath.
   /// Returns a null pointer if the file could not be opened.
   AR_API
-  static std::shared_ptr<ArFilesystemAsset>
-  Open(const ArResolvedPath &resolvedPath);
+  static std::shared_ptr<ArFilesystemAsset> Open(const ArResolvedPath &resolvedPath);
 
   /// Returns an ArTimestamp holding the mtime of the file at \p resolvedPath.
   /// Returns an invalid ArTimestamp if the mtime could not be retrieved.
   AR_API
-  static ArTimestamp
-  GetModificationTimestamp(const ArResolvedPath &resolvedPath);
+  static ArTimestamp GetModificationTimestamp(const ArResolvedPath &resolvedPath);
 
   /// Constructs an ArFilesystemAsset for the given \p file.
   /// The ArFilesystemAsset object takes ownership of \p file and will
@@ -85,10 +83,10 @@ public:
   AR_API
   virtual std::pair<FILE *, size_t> GetFileUnsafe() const override;
 
-private:
+ private:
   FILE *_file;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_FILESYSTEM_ASSET_H
+#endif  // PXR_USD_AR_FILESYSTEM_ASSET_H

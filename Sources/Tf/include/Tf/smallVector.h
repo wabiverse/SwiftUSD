@@ -45,7 +45,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Contains parts of the small vector implementation that do not depend on
 // *all* of TfSmallVector's template parameters.
 class TfSmallVectorBase {
-public:
+ public:
   using size_type = std::uint32_t;
   using difference_type = std::int32_t;
 
@@ -53,47 +53,59 @@ public:
   // of the TfSmallVector.  TfSmallVector<T, N> will never use more local
   // capacity than is specified by N but clients that wish to maximize local
   // occupancy in a generic way can compute N using this function.
-  template <typename U>
-  static constexpr size_type ComputeSerendipitousLocalCapacity() {
-    return (alignof(U) <= alignof(_Data<U, 0>))
-               ? sizeof(_Data<U, 0>) / sizeof(U)
-               : 0;
+  template<typename U> static constexpr size_type ComputeSerendipitousLocalCapacity()
+  {
+    return (alignof(U) <= alignof(_Data<U, 0>)) ? sizeof(_Data<U, 0>) / sizeof(U) : 0;
   }
 
-protected:
+ protected:
   // Invoke std::uninitialized_copy that either moves or copies entries,
   // depending on whether the type is move constructible or not.
-  template <typename Iterator>
-  static Iterator _UninitializedMove(Iterator first, Iterator last,
-                                     Iterator dest) {
-    return std::uninitialized_copy(std::make_move_iterator(first),
-                                   std::make_move_iterator(last), dest);
+  template<typename Iterator>
+  static Iterator _UninitializedMove(Iterator first, Iterator last, Iterator dest)
+  {
+    return std::uninitialized_copy(
+        std::make_move_iterator(first), std::make_move_iterator(last), dest);
   }
 
   // Invokes either the move or copy constructor (via placement new),
   // depending on whether U is move constructible or not.
-  template <typename U> static void _MoveConstruct(U *p, U *src) {
+  template<typename U> static void _MoveConstruct(U *p, U *src)
+  {
     new (p) U(std::move(*src));
   }
 
   // The data storage, which is a union of both the local storage, as well
   // as a pointer, holding the address to the remote storage on the heap, if
   // used.
-  template <typename U, size_type M> union _Data {
-  public:
-    U *GetLocalStorage() { return reinterpret_cast<U *>(_local); }
+  template<typename U, size_type M> union _Data {
+   public:
+    U *GetLocalStorage()
+    {
+      return reinterpret_cast<U *>(_local);
+    }
 
-    const U *GetLocalStorage() const {
+    const U *GetLocalStorage() const
+    {
       return reinterpret_cast<const U *>(_local);
     }
 
-    U *GetRemoteStorage() { return _remote; }
+    U *GetRemoteStorage()
+    {
+      return _remote;
+    }
 
-    const U *GetRemoteStorage() const { return _remote; }
+    const U *GetRemoteStorage() const
+    {
+      return _remote;
+    }
 
-    void SetRemoteStorage(U *p) { _remote = p; }
+    void SetRemoteStorage(U *p)
+    {
+      _remote = p;
+    }
 
-  private:
+   private:
     alignas(U) char _local[sizeof(U) * M];
     U *_remote;
   };
@@ -101,25 +113,36 @@ protected:
   // For N == 0 the _Data class has been specialized to elide the local
   // storage completely. This way we don't have to rely on compiler-specific
   // support for 0-sized arrays.
-  template <typename U> union _Data<U, 0> {
-  public:
-    U *GetLocalStorage() {
+  template<typename U> union _Data<U, 0> {
+   public:
+    U *GetLocalStorage()
+    {
       // XXX: Could assert here. Introduce dependency on Tf/diagnostic.h?
       return nullptr;
     }
 
-    const U *GetLocalStorage() const {
+    const U *GetLocalStorage() const
+    {
       // XXX: Could assert here. Introduce dependency on Tf/diagnostic.h?
       return nullptr;
     }
 
-    U *GetRemoteStorage() { return _remote; }
+    U *GetRemoteStorage()
+    {
+      return _remote;
+    }
 
-    const U *GetRemoteStorage() const { return _remote; }
+    const U *GetRemoteStorage() const
+    {
+      return _remote;
+    }
 
-    void SetRemoteStorage(U *p) { _remote = p; }
+    void SetRemoteStorage(U *p)
+    {
+      _remote = p;
+    }
 
-  private:
+   private:
     U *_remote;
   };
 };
@@ -146,9 +169,8 @@ protected:
 /// Note that a TfSmallVector that has grown beyond its local storage, will
 /// NOT move its entries back into the local storage once it shrinks back to N.
 ///
-template <typename T, uint32_t N>
-class TfSmallVector : public TfSmallVectorBase {
-public:
+template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase {
+ public:
   /// XXX: Functionality currently missing, and which we would like to add as
   ///  needed:
   ///     - emplace
@@ -181,7 +203,8 @@ public:
 
   /// Construct a vector holding \p n value-initialized elements.
   ///
-  explicit TfSmallVector(size_type n) : _capacity(N) {
+  explicit TfSmallVector(size_type n) : _capacity(N)
+  {
     _InitStorage(n);
     value_type *d = data();
     for (size_type i = 0; i < n; ++i) {
@@ -191,7 +214,8 @@ public:
 
   /// Construct a vector holding \p n copies of \p v.
   ///
-  TfSmallVector(size_type n, const value_type &v) : _capacity(N) {
+  TfSmallVector(size_type n, const value_type &v) : _capacity(N)
+  {
     _InitStorage(n);
     std::uninitialized_fill_n(data(), n, v);
   }
@@ -199,7 +223,8 @@ public:
   /// Construct a vector holding \p n default-initialized elements.
   ///
   enum DefaultInitTag { DefaultInit };
-  TfSmallVector(size_type n, DefaultInitTag) : _capacity(N) {
+  TfSmallVector(size_type n, DefaultInitTag) : _capacity(N)
+  {
     _InitStorage(n);
     value_type *d = data();
     for (size_type i = 0; i < n; ++i) {
@@ -209,14 +234,16 @@ public:
 
   /// Copy constructor.
   ///
-  TfSmallVector(const TfSmallVector &rhs) : _capacity(N) {
+  TfSmallVector(const TfSmallVector &rhs) : _capacity(N)
+  {
     _InitStorage(rhs.size());
     std::uninitialized_copy(rhs.begin(), rhs.end(), begin());
   }
 
   /// Move constructor.
   ///
-  TfSmallVector(TfSmallVector &&rhs) : _size(0), _capacity(N) {
+  TfSmallVector(TfSmallVector &&rhs) : _size(0), _capacity(N)
+  {
     // If rhs can not be stored locally, take rhs's remote storage and
     // reset rhs to empty.
     if (rhs.size() > N) {
@@ -236,33 +263,34 @@ public:
   }
 
   /// Construct a new vector from initializer list
-  TfSmallVector(std::initializer_list<T> values)
-      : TfSmallVector(values.begin(), values.end()) {}
+  TfSmallVector(std::initializer_list<T> values) : TfSmallVector(values.begin(), values.end()) {}
 
-  template <typename _ForwardIterator>
-  using _EnableIfForwardIterator = typename std::enable_if<std::is_convertible<
-      typename std::iterator_traits<_ForwardIterator>::iterator_category,
-      std::forward_iterator_tag>::value>::type;
+  template<typename _ForwardIterator>
+  using _EnableIfForwardIterator = typename std::enable_if<
+      std::is_convertible<typename std::iterator_traits<_ForwardIterator>::iterator_category,
+                          std::forward_iterator_tag>::value>::type;
 
   /// Creates a new vector containing copies of the data between
   /// \p first and \p last.
-  template <typename ForwardIterator,
-            typename = _EnableIfForwardIterator<ForwardIterator>>
-  TfSmallVector(ForwardIterator first, ForwardIterator last) : _capacity(N) {
+  template<typename ForwardIterator, typename = _EnableIfForwardIterator<ForwardIterator>>
+  TfSmallVector(ForwardIterator first, ForwardIterator last) : _capacity(N)
+  {
     _InitStorage(std::distance(first, last));
     std::uninitialized_copy(first, last, begin());
   }
 
   /// Destructor.
   ///
-  ~TfSmallVector() {
+  ~TfSmallVector()
+  {
     _Destruct();
     _FreeStorage();
   }
 
   /// Assignment operator.
   ///
-  TfSmallVector &operator=(const TfSmallVector &rhs) {
+  TfSmallVector &operator=(const TfSmallVector &rhs)
+  {
     if (this != &rhs) {
       assign(rhs.begin(), rhs.end());
     }
@@ -271,7 +299,8 @@ public:
 
   /// Move assignment operator.
   ///
-  TfSmallVector &operator=(TfSmallVector &&rhs) {
+  TfSmallVector &operator=(TfSmallVector &&rhs)
+  {
     if (this != &rhs) {
       swap(rhs);
     }
@@ -280,14 +309,16 @@ public:
 
   /// Replace existing contents with the contents of \p ilist.
   ///
-  TfSmallVector &operator=(std::initializer_list<T> ilist) {
+  TfSmallVector &operator=(std::initializer_list<T> ilist)
+  {
     assign(ilist.begin(), ilist.end());
     return *this;
   }
 
   /// Swap two vector instances.
   ///
-  void swap(TfSmallVector &rhs) {
+  void swap(TfSmallVector &rhs)
+  {
     // Both this vector and rhs are stored locally.
     if (_IsLocal() && rhs._IsLocal()) {
       TfSmallVector *smaller = size() < rhs.size() ? this : &rhs;
@@ -351,23 +382,29 @@ public:
 
   /// Insert an rvalue-reference entry at the given iterator position.
   ///
-  iterator insert(const_iterator it, value_type &&v) {
+  iterator insert(const_iterator it, value_type &&v)
+  {
     return _Insert(it, std::move(v));
   }
 
   /// Insert an entry at the given iterator.
   ///
-  iterator insert(const_iterator it, const value_type &v) {
+  iterator insert(const_iterator it, const value_type &v)
+  {
     return _Insert(it, v);
   }
 
   /// Erase an entry at the given iterator.
   ///
-  iterator erase(const_iterator it) { return erase(it, it + 1); }
+  iterator erase(const_iterator it)
+  {
+    return erase(it, it + 1);
+  }
 
   /// Erase entries between [ \p first, \p last ) from the vector.
   ///
-  iterator erase(const_iterator it, const_iterator last) {
+  iterator erase(const_iterator it, const_iterator last)
+  {
     value_type *p = const_cast<value_type *>(&*it);
     value_type *q = const_cast<value_type *>(&*last);
 
@@ -396,7 +433,8 @@ public:
 
   /// Reserve storage for \p newCapacity entries.
   ///
-  void reserve(size_type newCapacity) {
+  void reserve(size_type newCapacity)
+  {
     // Only reserve storage if the new capacity would grow past the local
     // storage, or the currently allocated storage. We'll grow to
     // accommodate exactly newCapacity entries.
@@ -407,7 +445,8 @@ public:
 
   /// Resize the vector to \p newSize and insert copies of \v.
   ///
-  void resize(size_type newSize, const value_type &v = value_type()) {
+  void resize(size_type newSize, const value_type &v = value_type())
+  {
     // If the new size is smaller than the current size, let go of some
     // entries at the tail.
     if (newSize < size()) {
@@ -426,7 +465,8 @@ public:
   /// Clear the entries in the vector. Does not let go of the underpinning
   /// storage.
   ///
-  void clear() {
+  void clear()
+  {
     _Destruct();
     _size = 0;
   }
@@ -434,9 +474,9 @@ public:
   /// Clears any previously held entries, and copies entries between
   /// [ \p first, \p last ) to this vector.
   ///
-  template <typename ForwardIterator,
-            typename = _EnableIfForwardIterator<ForwardIterator>>
-  void assign(ForwardIterator first, ForwardIterator last) {
+  template<typename ForwardIterator, typename = _EnableIfForwardIterator<ForwardIterator>>
+  void assign(ForwardIterator first, ForwardIterator last)
+  {
     clear();
     const size_type newSize = static_cast<unsigned int>(std::distance(first, last));
     reserve(newSize);
@@ -446,13 +486,15 @@ public:
 
   /// Replace existing contents with the contents of \p ilist.
   ///
-  void assign(std::initializer_list<T> ilist) {
+  void assign(std::initializer_list<T> ilist)
+  {
     assign(ilist.begin(), ilist.end());
   }
 
   /// Emplace an entry at the back of the vector.
   ///
-  template <typename... Args> void emplace_back(Args &&...args) {
+  template<typename... Args> void emplace_back(Args &&...args)
+  {
     if (size() == capacity()) {
       _GrowStorage(_NextCapacity());
     }
@@ -462,21 +504,27 @@ public:
 
   /// Copy an entry to the back of the vector,
   ///
-  void push_back(const value_type &v) { emplace_back(v); }
+  void push_back(const value_type &v)
+  {
+    emplace_back(v);
+  }
 
   /// Move an entry to the back of the vector.
   ///
-  void push_back(value_type &&v) { emplace_back(std::move(v)); }
+  void push_back(value_type &&v)
+  {
+    emplace_back(std::move(v));
+  }
 
   /// Copy the range denoted by [\p first, \p last) into this vector
   /// before \p pos.
   ///
-  template <typename ForwardIterator>
-  void insert(iterator pos, ForwardIterator first, ForwardIterator last) {
+  template<typename ForwardIterator>
+  void insert(iterator pos, ForwardIterator first, ForwardIterator last)
+  {
     static_assert(
-        std::is_convertible<
-            typename std::iterator_traits<ForwardIterator>::iterator_category,
-            std::forward_iterator_tag>::value,
+        std::is_convertible<typename std::iterator_traits<ForwardIterator>::iterator_category,
+                            std::forward_iterator_tag>::value,
         "Input Iterators not supported.");
 
     // Check for the insert-at-end special case as the very first thing so
@@ -525,7 +573,8 @@ public:
       _FreeStorage();
       _data.SetRemoteStorage(newStorage);
       _capacity = nextCapacity;
-    } else {
+    }
+    else {
       // Insert in-place requires handling four ranges.
       //
       // For both the range-to-move [pos, end()) and the range-to-insert
@@ -560,159 +609,241 @@ public:
 
   /// Insert elements from \p ilist starting at position \p pos.
   ///
-  void insert(iterator pos, std::initializer_list<T> ilist) {
+  void insert(iterator pos, std::initializer_list<T> ilist)
+  {
     insert(pos, ilist.begin(), ilist.end());
   }
 
   /// Remove the entry at the back of the vector.
   ///
-  void pop_back() {
+  void pop_back()
+  {
     back().~value_type();
     _size -= 1;
   }
 
   /// Returns the current size of the vector.
   ///
-  size_type size() const { return _size; }
+  size_type size() const
+  {
+    return _size;
+  }
 
   /// Returns the maximum size of this vector.
   ///
-  static constexpr size_type max_size() {
+  static constexpr size_type max_size()
+  {
     return std::numeric_limits<size_type>::max();
   }
 
   /// Returns \c true if this vector is empty.
   ///
-  bool empty() const { return size() == 0; }
+  bool empty() const
+  {
+    return size() == 0;
+  }
 
   /// Returns the current capacity of this vector. Note that if the returned
   /// value is <= N, it does NOT mean the storage is local. A vector that has
   /// previously grown beyond its local storage, will not move entries back to
   /// the local storage once it shrinks to N.
   ///
-  size_type capacity() const { return _capacity; }
+  size_type capacity() const
+  {
+    return _capacity;
+  }
 
   /// Returns the local storage capacity. The vector uses its local storage
   /// if capacity() <= internal_capacity().
   /// This method mimics the boost::container::small_vector interface.
   ///
-  static constexpr size_type internal_capacity() { return N; }
+  static constexpr size_type internal_capacity()
+  {
+    return N;
+  }
 
   /// \name Returns an iterator to the beginning of the vector.
   /// @{
 
-  iterator begin() { return iterator(_GetStorage()); }
+  iterator begin()
+  {
+    return iterator(_GetStorage());
+  }
 
-  const_iterator begin() const { return const_iterator(_GetStorage()); }
+  const_iterator begin() const
+  {
+    return const_iterator(_GetStorage());
+  }
 
-  const_iterator cbegin() const { return begin(); }
+  const_iterator cbegin() const
+  {
+    return begin();
+  }
 
   /// @}
 
   /// \name Returns an iterator to the end of the vector.
   /// @{
 
-  iterator end() { return iterator(_GetStorage() + size()); }
+  iterator end()
+  {
+    return iterator(_GetStorage() + size());
+  }
 
-  const_iterator end() const { return const_iterator(_GetStorage() + size()); }
+  const_iterator end() const
+  {
+    return const_iterator(_GetStorage() + size());
+  }
 
-  const_iterator cend() const { return end(); }
+  const_iterator cend() const
+  {
+    return end();
+  }
 
   /// @}
 
   /// \name Returns a reverse iterator to the beginning of the vector.
   /// @{
 
-  reverse_iterator rbegin() { return reverse_iterator(end()); }
+  reverse_iterator rbegin()
+  {
+    return reverse_iterator(end());
+  }
 
-  const_reverse_iterator rbegin() const {
+  const_reverse_iterator rbegin() const
+  {
     return const_reverse_iterator(end());
   }
 
-  const_reverse_iterator crbegin() const { return rbegin(); }
+  const_reverse_iterator crbegin() const
+  {
+    return rbegin();
+  }
 
   /// @}
 
   /// \name Returns a reverse iterator to the end of the vector.
   /// @{
 
-  reverse_iterator rend() { return reverse_iterator(begin()); }
+  reverse_iterator rend()
+  {
+    return reverse_iterator(begin());
+  }
 
-  const_reverse_iterator rend() const {
+  const_reverse_iterator rend() const
+  {
     return const_reverse_iterator(begin());
   }
 
-  const_reverse_iterator crend() const { return rend(); }
+  const_reverse_iterator crend() const
+  {
+    return rend();
+  }
 
   /// @}
 
   /// Returns the first element in the vector.
   ///
-  reference front() { return *begin(); }
+  reference front()
+  {
+    return *begin();
+  }
 
   /// Returns the first element in the vector.
   ///
-  const_reference front() const { return *begin(); }
+  const_reference front() const
+  {
+    return *begin();
+  }
 
   /// Returns the last element in the vector.
   ///
-  reference back() { return *(data() + size() - 1); }
+  reference back()
+  {
+    return *(data() + size() - 1);
+  }
 
   /// Returns the last elements in the vector.
   ///
-  const_reference back() const { return *(data() + size() - 1); }
+  const_reference back() const
+  {
+    return *(data() + size() - 1);
+  }
 
   /// Access the specified element.
   ///
-  reference operator[](size_type i) { return *(data() + i); }
+  reference operator[](size_type i)
+  {
+    return *(data() + i);
+  }
 
   /// Access the specified element.
   ///
-  const_reference operator[](size_type i) const { return *(data() + i); }
+  const_reference operator[](size_type i) const
+  {
+    return *(data() + i);
+  }
 
   /// Direct access to the underlying array.
   ///
-  value_type *data() { return _GetStorage(); }
+  value_type *data()
+  {
+    return _GetStorage();
+  }
 
   /// Direct access to the underlying array.
   ///
-  const value_type *data() const { return _GetStorage(); }
+  const value_type *data() const
+  {
+    return _GetStorage();
+  }
 
   /// Lexicographically compares the elements in the vectors for equality.
   ///
-  bool operator==(const TfSmallVector &rhs) const {
+  bool operator==(const TfSmallVector &rhs) const
+  {
     return size() == rhs.size() && std::equal(begin(), end(), rhs.begin());
   }
 
   /// Lexicographically compares the elements in the vectors for inequality.
   ///
-  bool operator!=(const TfSmallVector &rhs) const { return !operator==(rhs); }
+  bool operator!=(const TfSmallVector &rhs) const
+  {
+    return !operator==(rhs);
+  }
 
-private:
+ private:
   // Returns true if the local storage is used.
-  bool _IsLocal() const { return _capacity <= N; }
+  bool _IsLocal() const
+  {
+    return _capacity <= N;
+  }
 
   // Return a pointer to the storage, which is either local or remote
   // depending on the current capacity.
-  value_type *_GetStorage() {
+  value_type *_GetStorage()
+  {
     return _IsLocal() ? _data.GetLocalStorage() : _data.GetRemoteStorage();
   }
 
   // Return a const pointer to the storage, which is either local or remote
   // depending on the current capacity.
-  const value_type *_GetStorage() const {
+  const value_type *_GetStorage() const
+  {
     return _IsLocal() ? _data.GetLocalStorage() : _data.GetRemoteStorage();
   }
 
   // Free the remotely allocated storage.
-  void _FreeStorage() {
+  void _FreeStorage()
+  {
     if (!_IsLocal()) {
       free(_data.GetRemoteStorage());
     }
   }
 
   // Destructs all the elements stored in this vector.
-  void _Destruct() {
+  void _Destruct()
+  {
     value_type *b = data();
     value_type *e = b + size();
     for (value_type *p = b; p != e; ++p) {
@@ -721,12 +852,14 @@ private:
   }
 
   // Allocate a buffer on the heap.
-  static value_type *_Allocate(size_type size) {
+  static value_type *_Allocate(size_type size)
+  {
     return static_cast<value_type *>(malloc(sizeof(value_type) * size));
   }
 
   // Initialize the vector with new storage, updating the capacity and size.
-  void _InitStorage(size_type size) {
+  void _InitStorage(size_type size)
+  {
     if (size > capacity()) {
       _data.SetRemoteStorage(_Allocate(size));
       _capacity = size;
@@ -736,7 +869,8 @@ private:
 
   // Grow the storage to be able to accommodate newCapacity entries. This
   // always allocates remotes storage.
-  void _GrowStorage(const size_type newCapacity) {
+  void _GrowStorage(const size_type newCapacity)
+  {
     value_type *newStorage = _Allocate(newCapacity);
     _UninitializedMove(begin(), end(), iterator(newStorage));
     _Destruct();
@@ -748,7 +882,8 @@ private:
   // Returns the next capacity to use for vector growth. The growth factor
   // here is 1.5. A constant 1 is added so that we do not have to special
   // case initial capacities of 0 and 1.
-  size_type _NextCapacity() const {
+  size_type _NextCapacity() const
+  {
     const size_type cap = capacity();
     return cap + (cap / 2) + 1;
   }
@@ -759,7 +894,8 @@ private:
   // const reference. This way, we can take the most optimal code path (
   // move, or copy without making redundant copies) based on whether v is
   // a rvalue reference or const reference.
-  template <typename U> iterator _Insert(const_iterator it, U &&v) {
+  template<typename U> iterator _Insert(const_iterator it, U &&v)
+  {
     value_type *newEntry;
 
     // If the iterator points to the end, simply push back.
@@ -823,8 +959,8 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, uint32_t N>
-void swap(TfSmallVector<T, N> &a, TfSmallVector<T, N> &b) {
+template<typename T, uint32_t N> void swap(TfSmallVector<T, N> &a, TfSmallVector<T, N> &b)
+{
   a.swap(b);
 }
 

@@ -26,10 +26,10 @@
 
 /// \file pxOsd/meshTopology.h
 
-#include <pxr/pxrns.h>
 #include "PxOsd/api.h"
-#include "PxOsd/subdivTags.h"
 #include "PxOsd/meshTopologyValidation.h"
+#include "PxOsd/subdivTags.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/array.h"
 #include "Vt/value.h"
@@ -68,202 +68,213 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// TfToken.
 class PxOsdMeshTopology {
 
-public:
+ public:
+  typedef uint64_t ID;
 
-    typedef uint64_t ID;
+  PXOSD_API
+  PxOsdMeshTopology();
 
-    PXOSD_API
-    PxOsdMeshTopology();
+  PxOsdMeshTopology &operator=(const PxOsdMeshTopology &) = default;
+  PxOsdMeshTopology(const PxOsdMeshTopology &) = default;
+  PxOsdMeshTopology(PxOsdMeshTopology &&) = default;
+  PxOsdMeshTopology &operator=(PxOsdMeshTopology &&) = default;
+  ~PxOsdMeshTopology() = default;
 
-    PxOsdMeshTopology& operator=(const PxOsdMeshTopology &) = default;
-    PxOsdMeshTopology(const PxOsdMeshTopology &) = default;
-    PxOsdMeshTopology(PxOsdMeshTopology&&) = default;
-    PxOsdMeshTopology& operator=(PxOsdMeshTopology&&) = default;
-    ~PxOsdMeshTopology() = default;
+  /// Construct a topology without holes or subdiv tags
+  PXOSD_API
+  PxOsdMeshTopology(TfToken const &scheme,
+                    TfToken const &orientation,
+                    VtIntArray const &faceVertexCounts,
+                    VtIntArray const &faceVertexIndices);
 
-    /// Construct a topology without holes or subdiv tags
-    PXOSD_API
-    PxOsdMeshTopology(
-        TfToken const& scheme,
-        TfToken const& orientation,
-        VtIntArray const& faceVertexCounts,
-        VtIntArray const& faceVertexIndices);
+  /// Construct a topology with holes
+  PXOSD_API
+  PxOsdMeshTopology(TfToken const &scheme,
+                    TfToken const &orientation,
+                    VtIntArray const &faceVertexCounts,
+                    VtIntArray const &faceVertexIndices,
+                    VtIntArray const &holeIndices);
 
-    /// Construct a topology with holes
-    PXOSD_API
-    PxOsdMeshTopology(
-        TfToken const& scheme,
-        TfToken const& orientation,
-        VtIntArray const& faceVertexCounts,
-        VtIntArray const& faceVertexIndices,
-        VtIntArray const& holeIndices);
+  /// Construct a topology with holes and subdiv tags
+  PXOSD_API
+  PxOsdMeshTopology(TfToken const &scheme,
+                    TfToken const &orientation,
+                    VtIntArray const &faceVertexCounts,
+                    VtIntArray const &faceVertexIndices,
+                    VtIntArray const &holeIndices,
+                    PxOsdSubdivTags const &subdivTags);
 
-    /// Construct a topology with holes and subdiv tags
-    PXOSD_API
-    PxOsdMeshTopology(
-        TfToken const& scheme,
-        TfToken const& orientation,
-        VtIntArray const& faceVertexCounts,
-        VtIntArray const& faceVertexIndices,
-        VtIntArray const& holeIndices,
-        PxOsdSubdivTags const& subdivTags);
+  /// Construct a topology with subdiv tags
+  PXOSD_API
+  PxOsdMeshTopology(TfToken const &scheme,
+                    TfToken const &orientation,
+                    VtIntArray const &faceVertexCounts,
+                    VtIntArray const &faceVertexIndices,
+                    PxOsdSubdivTags const &subdivTags);
 
-    /// Construct a topology with subdiv tags
-    PXOSD_API
-    PxOsdMeshTopology(
-        TfToken const& scheme,
-        TfToken const& orientation,
-        VtIntArray const& faceVertexCounts,
-        VtIntArray const& faceVertexIndices,
-        PxOsdSubdivTags const& subdivTags);
+ public:
+  /// Returns the subdivision scheme
+  TfToken const GetScheme() const
+  {
+    return _scheme;
+  }
 
-public:
+  /// Returns face vertex counts.
+  VtIntArray const &GetFaceVertexCounts() const
+  {
+    return _faceVertexCounts;
+  }
 
-    /// Returns the subdivision scheme
-    TfToken const GetScheme() const {
-        return _scheme;
+  /// Returns face vertex indices.
+  VtIntArray const &GetFaceVertexIndices() const
+  {
+    return _faceVertexIndices;
+  }
+
+  /// Returns orientation.
+  TfToken const &GetOrientation() const
+  {
+    return _orientation;
+  }
+
+  ///
+  /// \name Holes
+  /// @{
+  /// Returns the hole face indices.
+  VtIntArray const &GetHoleIndices() const
+  {
+    return _holeIndices;
+  }
+
+  /// @}
+
+  ///
+  /// \name Tags
+  /// @{
+
+  /// Returns subdivision tags
+  PxOsdSubdivTags const &GetSubdivTags() const
+  {
+    return _subdivTags;
+  }
+
+  /// @}
+
+  /// Return a copy of the topology, changing only the scheme.
+  /// Valid values include: catmullClark, loop, bilinear.
+  ///
+  /// Note that the token "catmark" is also supported for backward
+  /// compatibility, but has been deprecated.
+  PXOSD_API PxOsdMeshTopology WithScheme(TfToken const &scheme) const
+  {
+    return PxOsdMeshTopology(scheme,
+                             GetOrientation(),
+                             GetFaceVertexCounts(),
+                             GetFaceVertexIndices(),
+                             GetHoleIndices(),
+                             GetSubdivTags());
+  }
+
+  /// Return a copy of the topology, changing only the subdiv tags.
+  PXOSD_API PxOsdMeshTopology WithSubdivTags(PxOsdSubdivTags const &tags) const
+  {
+    return PxOsdMeshTopology(GetScheme(),
+                             GetOrientation(),
+                             GetFaceVertexCounts(),
+                             GetFaceVertexIndices(),
+                             GetHoleIndices(),
+                             tags);
+  }
+
+  /// Return a copy of the topology, changing only the hole indices.
+  PXOSD_API PxOsdMeshTopology WithHoleIndices(VtIntArray const &holeIndices) const
+  {
+    return PxOsdMeshTopology(GetScheme(),
+                             GetOrientation(),
+                             GetFaceVertexCounts(),
+                             GetFaceVertexIndices(),
+                             holeIndices,
+                             GetSubdivTags());
+  }
+
+ public:
+  /// Returns the hash value of this topology to be used for instancing.
+  PXOSD_API
+  ID ComputeHash() const;
+
+  /// Equality check between two mesh topologies.
+  PXOSD_API
+  bool operator==(PxOsdMeshTopology const &other) const;
+
+  /// Returns a validation object which is empty if the topology is valid
+  ///
+  /// \code{.cpp}
+  /// // Validation with minimal reporting
+  /// if (!topology.Validate()) TF_CODING_ERROR("Invalid topology.");
+  /// \endcode
+  ///
+  /// \code{.cpp}
+  /// {
+  ///    PxOsdMeshTopologyValidation validation = topology.Validate();
+  ///    if (!validation){
+  ///        for (auto const& elem: validation){
+  ///             TF_WARN(elem.message);
+  ///        }
+  ///    }
+  /// }
+  /// \endcode
+  ///
+  /// \note Internally caches the result of the validation if the topology is
+  /// valid
+  PXOSD_API
+  PxOsdMeshTopologyValidation Validate() const;
+
+ private:
+  // note: if you're going to add more members, make sure
+  // ComputeHash will be updated too.
+
+  TfToken _scheme, _orientation;
+
+  VtIntArray _faceVertexCounts;
+  VtIntArray _faceVertexIndices;
+  VtIntArray _holeIndices;
+
+  PxOsdSubdivTags _subdivTags;
+
+  struct _Validated {
+    std::atomic<bool> value;
+
+    _Validated() : value(false) {}
+    _Validated(const _Validated &other) : value(other.value.load()) {}
+    _Validated(_Validated &&other) : value(other.value.load())
+    {
+      other.value = false;
     }
-
-    /// Returns face vertex counts.
-    VtIntArray const &GetFaceVertexCounts() const {
-        return _faceVertexCounts;
+    _Validated &operator=(const _Validated &other)
+    {
+      value.store(other.value.load());
+      return *this;
     }
-
-    /// Returns face vertex indices.
-    VtIntArray const &GetFaceVertexIndices() const {
-        return _faceVertexIndices;
+    _Validated &operator=(_Validated &&other)
+    {
+      value.store(other.value.load());
+      other.value = false;
+      return *this;
     }
+  };
 
-    /// Returns orientation.
-    TfToken const &GetOrientation() const {
-        return _orientation;
-    }
-
-
-    ///
-    /// \name Holes
-    /// @{
-    /// Returns the hole face indices.
-    VtIntArray const &GetHoleIndices() const {
-        return _holeIndices;
-    }
-
-    /// @}
-
-    ///
-    /// \name Tags
-    /// @{
-
-    /// Returns subdivision tags
-    PxOsdSubdivTags const & GetSubdivTags() const {
-        return _subdivTags;
-    }
-
-    /// @}
-
-    /// Return a copy of the topology, changing only the scheme.
-    /// Valid values include: catmullClark, loop, bilinear.
-    ///
-    /// Note that the token "catmark" is also supported for backward
-    /// compatibility, but has been deprecated.
-    PXOSD_API PxOsdMeshTopology WithScheme(TfToken const& scheme) const {
-        return PxOsdMeshTopology(scheme, GetOrientation(),
-                                 GetFaceVertexCounts(), GetFaceVertexIndices(),
-                                 GetHoleIndices(), GetSubdivTags());
-    }
-
-    /// Return a copy of the topology, changing only the subdiv tags.
-    PXOSD_API PxOsdMeshTopology WithSubdivTags(PxOsdSubdivTags const& tags) const {
-        return PxOsdMeshTopology(GetScheme(), GetOrientation(),
-                                 GetFaceVertexCounts(), GetFaceVertexIndices(),
-                                 GetHoleIndices(), tags);
-    }
-
-    /// Return a copy of the topology, changing only the hole indices.
-    PXOSD_API PxOsdMeshTopology WithHoleIndices(VtIntArray const& holeIndices) const {
-        return PxOsdMeshTopology(GetScheme(), GetOrientation(),
-                                 GetFaceVertexCounts(), GetFaceVertexIndices(),
-                                 holeIndices, GetSubdivTags());
-    }
-public:
-
-    /// Returns the hash value of this topology to be used for instancing.
-    PXOSD_API
-    ID ComputeHash() const;
-
-    /// Equality check between two mesh topologies.
-    PXOSD_API
-    bool operator==(PxOsdMeshTopology const &other) const;
-
-    /// Returns a validation object which is empty if the topology is valid
-    ///
-    /// \code{.cpp}
-    /// // Validation with minimal reporting
-    /// if (!topology.Validate()) TF_CODING_ERROR("Invalid topology.");
-    /// \endcode
-    ///
-    /// \code{.cpp}
-    /// {
-    ///    PxOsdMeshTopologyValidation validation = topology.Validate();
-    ///    if (!validation){
-    ///        for (auto const& elem: validation){
-    ///             TF_WARN(elem.message);
-    ///        }
-    ///    }
-    /// }
-    /// \endcode
-    ///
-    /// \note Internally caches the result of the validation if the topology is
-    /// valid
-    PXOSD_API
-    PxOsdMeshTopologyValidation Validate() const;
-
-private:
-
-    // note: if you're going to add more members, make sure
-    // ComputeHash will be updated too.
-
-    TfToken _scheme,
-            _orientation;
-
-    VtIntArray _faceVertexCounts;
-    VtIntArray _faceVertexIndices;
-    VtIntArray _holeIndices;
-
-    PxOsdSubdivTags _subdivTags;
-
-    struct _Validated {
-        std::atomic<bool> value;
-
-        _Validated() : value(false) {}
-        _Validated(const _Validated& other) : value(other.value.load()) {}
-        _Validated(_Validated&& other) : value(other.value.load()) {
-            other.value = false;
-        }
-        _Validated& operator=(const _Validated& other) {
-            value.store(other.value.load());
-            return *this;
-        }
-        _Validated& operator=(_Validated&& other) {
-            value.store(other.value.load());
-            other.value = false;
-            return *this;
-        }
-    };
-
-    // This should NOT be included in the hash
-    // This evaluates to true if the topology has been successfully
-    // pre-validated. If this is false, the topology is either invalid
-    // or it hasn't been validated yet.
-    mutable _Validated _validated;
+  // This should NOT be included in the hash
+  // This evaluates to true if the topology has been successfully
+  // pre-validated. If this is false, the topology is either invalid
+  // or it hasn't been validated yet.
+  mutable _Validated _validated;
 };
 
 PXOSD_API
-std::ostream& operator << (std::ostream &out, PxOsdMeshTopology const &);
+std::ostream &operator<<(std::ostream &out, PxOsdMeshTopology const &);
 PXOSD_API
-bool operator!=(const PxOsdMeshTopology& lhs, const PxOsdMeshTopology& rhs);
-
+bool operator!=(const PxOsdMeshTopology &lhs, const PxOsdMeshTopology &rhs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_PX_OSD_MESH_TOPOLOGY_H
+#endif  // PXR_IMAGING_PX_OSD_MESH_TOPOLOGY_H

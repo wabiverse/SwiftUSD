@@ -30,17 +30,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdFlattenedMaterialBindingsDataSourceProvider : public HdFlattenedDataSourceProvider
-{
-    HD_API
-    HdContainerDataSourceHandle GetFlattenedDataSource(
-        const Context&) const override;
+class HdFlattenedMaterialBindingsDataSourceProvider : public HdFlattenedDataSourceProvider {
+  HD_API
+  HdContainerDataSourceHandle GetFlattenedDataSource(const Context &) const override;
 
-    HD_API
-    void ComputeDirtyLocatorsForDescendants(
-        HdDataSourceLocatorSet * locators) const override;
+  HD_API
+  void ComputeDirtyLocatorsForDescendants(HdDataSourceLocatorSet *locators) const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_FLATTENED_MATERIAL_BINDINGS_DATA_SOURCE_PROVIDER_H
+#endif  // PXR_IMAGING_HD_FLATTENED_MATERIAL_BINDINGS_DATA_SOURCE_PROVIDER_H

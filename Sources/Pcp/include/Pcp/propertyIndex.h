@@ -49,7 +49,9 @@ class PcpCache;
 struct Pcp_PropertyInfo {
   Pcp_PropertyInfo() {}
   Pcp_PropertyInfo(const SdfPropertySpecHandle &prop, const PcpNodeRef &node)
-      : propertySpec(prop), originatingNode(node) {}
+      : propertySpec(prop), originatingNode(node)
+  {
+  }
 
   SdfPropertySpecHandle propertySpec;
   PcpNodeRef originatingNode;
@@ -62,7 +64,7 @@ struct Pcp_PropertyInfo {
 /// semantics.
 ///
 class PcpPropertyIndex {
-public:
+ public:
   /// Construct an empty property index.
   PCP_API
   PcpPropertyIndex();
@@ -90,7 +92,8 @@ public:
   PcpPropertyRange GetPropertyRange(bool localOnly = false) const;
 
   /// Return the list of errors local to this property.
-  PcpErrorVector GetLocalErrors() const {
+  PcpErrorVector GetLocalErrors() const
+  {
     return _localErrors ? *_localErrors.get() : PcpErrorVector();
   }
 
@@ -98,7 +101,7 @@ public:
   PCP_API
   size_t GetNumLocalSpecs() const;
 
-private:
+ private:
   friend class PcpPropertyIterator;
   friend class Pcp_PropertyIndexer;
 
@@ -115,7 +118,8 @@ private:
 /// internally computing and caching an owning prim index as necessary.
 /// \p allErrors will contain any errors encountered.
 PCP_API
-void PcpBuildPropertyIndex(const SdfPath &propertyPath, PcpCache *cache,
+void PcpBuildPropertyIndex(const SdfPath &propertyPath,
+                           PcpCache *cache,
                            PcpPropertyIndex *propertyIndex,
                            PcpErrorVector *allErrors);
 
@@ -130,4 +134,4 @@ void PcpBuildPrimPropertyIndex(const SdfPath &propertyPath,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PROPERTY_INDEX_H
+#endif  // PXR_USD_PCP_PROPERTY_INDEX_H

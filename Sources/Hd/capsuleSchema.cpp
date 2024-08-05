@@ -33,125 +33,96 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCapsuleSchemaTokens,
-    HDCAPSULE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCapsuleSchemaTokens, HDCAPSULE_SCHEMA_TOKENS);
 
-
-
-HdDoubleDataSourceHandle
-HdCapsuleSchema::GetHeight()
+HdDoubleDataSourceHandle HdCapsuleSchema::GetHeight()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdCapsuleSchemaTokens->height);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->height);
 }
 
-HdDoubleDataSourceHandle
-HdCapsuleSchema::GetRadius()
+HdDoubleDataSourceHandle HdCapsuleSchema::GetRadius()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdCapsuleSchemaTokens->radius);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdCapsuleSchemaTokens->radius);
 }
 
-HdTokenDataSourceHandle
-HdCapsuleSchema::GetAxis()
+HdTokenDataSourceHandle HdCapsuleSchema::GetAxis()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdCapsuleSchemaTokens->axis);
+  return _GetTypedDataSource<HdTokenDataSource>(HdCapsuleSchemaTokens->axis);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdCapsuleSchema::BuildRetained(
-        const HdDoubleDataSourceHandle &height,
-        const HdDoubleDataSourceHandle &radius,
-        const HdTokenDataSourceHandle &axis
-)
+HdContainerDataSourceHandle HdCapsuleSchema::BuildRetained(const HdDoubleDataSourceHandle &height,
+                                                           const HdDoubleDataSourceHandle &radius,
+                                                           const HdTokenDataSourceHandle &axis)
 {
-    TfToken names[3];
-    HdDataSourceBaseHandle values[3];
+  TfToken names[3];
+  HdDataSourceBaseHandle values[3];
 
-    size_t count = 0;
-    if (height) {
-        names[count] = HdCapsuleSchemaTokens->height;
-        values[count++] = height;
-    }
+  size_t count = 0;
+  if (height) {
+    names[count] = HdCapsuleSchemaTokens->height;
+    values[count++] = height;
+  }
 
-    if (radius) {
-        names[count] = HdCapsuleSchemaTokens->radius;
-        values[count++] = radius;
-    }
+  if (radius) {
+    names[count] = HdCapsuleSchemaTokens->radius;
+    values[count++] = radius;
+  }
 
-    if (axis) {
-        names[count] = HdCapsuleSchemaTokens->axis;
-        values[count++] = axis;
-    }
+  if (axis) {
+    names[count] = HdCapsuleSchemaTokens->axis;
+    values[count++] = axis;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdCapsuleSchema
-HdCapsuleSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdCapsuleSchema HdCapsuleSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdCapsuleSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdCapsuleSchemaTokens->capsule))
-        : nullptr);
+  return HdCapsuleSchema(
+      fromParentContainer ?
+          HdContainerDataSource::Cast(fromParentContainer->Get(HdCapsuleSchemaTokens->capsule)) :
+          nullptr);
 }
 
 /*static*/
-const TfToken &
-HdCapsuleSchema::GetSchemaToken()
+const TfToken &HdCapsuleSchema::GetSchemaToken()
 {
-    return HdCapsuleSchemaTokens->capsule;
-} 
+  return HdCapsuleSchemaTokens->capsule;
+}
 /*static*/
-const HdDataSourceLocator &
-HdCapsuleSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdCapsuleSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdCapsuleSchemaTokens->capsule
-    );
-    return locator;
-} 
-HdCapsuleSchema::Builder &
-HdCapsuleSchema::Builder::SetHeight(
+  static const HdDataSourceLocator locator(HdCapsuleSchemaTokens->capsule);
+  return locator;
+}
+HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetHeight(
     const HdDoubleDataSourceHandle &height)
 {
-    _height = height;
-    return *this;
+  _height = height;
+  return *this;
 }
 
-HdCapsuleSchema::Builder &
-HdCapsuleSchema::Builder::SetRadius(
+HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetRadius(
     const HdDoubleDataSourceHandle &radius)
 {
-    _radius = radius;
-    return *this;
+  _radius = radius;
+  return *this;
 }
 
-HdCapsuleSchema::Builder &
-HdCapsuleSchema::Builder::SetAxis(
-    const HdTokenDataSourceHandle &axis)
+HdCapsuleSchema::Builder &HdCapsuleSchema::Builder::SetAxis(const HdTokenDataSourceHandle &axis)
 {
-    _axis = axis;
-    return *this;
+  _axis = axis;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdCapsuleSchema::Builder::Build()
+HdContainerDataSourceHandle HdCapsuleSchema::Builder::Build()
 {
-    return HdCapsuleSchema::BuildRetained(
-        _height,
-        _radius,
-        _axis
-    );
+  return HdCapsuleSchema::BuildRetained(_height, _radius, _axis);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -39,30 +39,28 @@ namespace {
 
 typedef SdfPyChildrenProxy<SdfVariantSetView> VariantSetProxy;
 
-static VariantSetProxy _WrapGetVariantSetsProxy(const SdfVariantSpec &owner) {
+static VariantSetProxy _WrapGetVariantSetsProxy(const SdfVariantSpec &owner)
+{
   return VariantSetProxy(owner.GetVariantSets());
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapVariantSpec() {
+void wrapVariantSpec()
+{
   def("CreateVariantInLayer", SdfCreateVariantInLayer);
 
   typedef SdfVariantSpec This;
 
-  class_<This, SdfHandle<This>, bases<SdfSpec>, boost::noncopyable>(
-      "VariantSpec", no_init)
+  class_<This, SdfHandle<This>, bases<SdfSpec>, boost::noncopyable>("VariantSpec", no_init)
       .def(SdfPySpec())
       .def(SdfMakePySpecConstructor(&This::New))
 
-      .add_property("primSpec", &This::GetPrimSpec,
-                    "The root prim of this variant.")
-      .add_property("owner", &This::GetOwner,
-                    "The variant set that this variant belongs to.")
-      .add_property(
-          "name",
-          make_function(&This::GetName, return_value_policy<return_by_value>()),
-          "The variant's name.")
+      .add_property("primSpec", &This::GetPrimSpec, "The root prim of this variant.")
+      .add_property("owner", &This::GetOwner, "The variant set that this variant belongs to.")
+      .add_property("name",
+                    make_function(&This::GetName, return_value_policy<return_by_value>()),
+                    "The variant's name.")
       .add_property("variantSets", &_WrapGetVariantSetsProxy)
       .def("GetVariantNames", &This::GetVariantNames);
 }

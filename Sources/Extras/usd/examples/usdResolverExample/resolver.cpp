@@ -55,17 +55,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 AR_DEFINE_RESOLVER(UsdResolverExampleResolver, ArResolver);
 
-TF_DEBUG_CODES(
-    USD_RESOLVER_EXAMPLE);
+TF_DEBUG_CODES(USD_RESOLVER_EXAMPLE);
 
-TF_DEFINE_ENV_SETTING(
-    USD_RESOLVER_EXAMPLE_ASSET_DIR, ".",
-    "Root of asset directory used by UsdResolverExampleResolver.")
+TF_DEFINE_ENV_SETTING(USD_RESOLVER_EXAMPLE_ASSET_DIR,
+                      ".",
+                      "Root of asset directory used by UsdResolverExampleResolver.")
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
 
-    (asset)(latest)((version, "{$VERSION}")));
+                         (asset)(latest)((version, "{$VERSION}")));
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
@@ -82,11 +80,9 @@ PXR_NAMESPACE_CLOSE_SCOPE
 //    "Buzz" : "2"
 // }
 //
-class _VersionTable
-{
-public:
-  static std::unique_ptr<_VersionTable>
-  ReadFromFile(const std::string &mappingFile);
+class _VersionTable {
+ public:
+  static std::unique_ptr<_VersionTable> ReadFromFile(const std::string &mappingFile);
 
   bool operator==(const _VersionTable &rhs) const;
   bool operator!=(const _VersionTable &rhs) const;
@@ -94,57 +90,49 @@ public:
   std::string GetVersionForAsset(const std::string &modelName) const;
   std::string GetDebugString(size_t indent = 0) const;
 
-private:
-  using _AssetNameToVersionMap =
-      std::unordered_map<std::string, std::string>;
+ private:
+  using _AssetNameToVersionMap = std::unordered_map<std::string, std::string>;
 
   _AssetNameToVersionMap _versionMap;
 };
 
-std::unique_ptr<_VersionTable>
-_VersionTable::ReadFromFile(const std::string &mappingFile)
+std::unique_ptr<_VersionTable> _VersionTable::ReadFromFile(const std::string &mappingFile)
 {
   std::unique_ptr<_VersionTable> result;
 
   std::ifstream fs(mappingFile);
-  if (!fs)
-  {
-    TF_RUNTIME_ERROR(
-        "Unable to open mapping file %s", mappingFile.c_str());
+  if (!fs) {
+    TF_RUNTIME_ERROR("Unable to open mapping file %s", mappingFile.c_str());
     return result;
   }
 
   JsParseError err;
   const JsValue value = JsParseStream(fs, &err);
-  if (value.IsNull())
-  {
-    TF_RUNTIME_ERROR(
-        "Syntax error in %s:%d:%d: %s\n",
-        mappingFile.c_str(), err.line, err.column, err.reason.c_str());
+  if (value.IsNull()) {
+    TF_RUNTIME_ERROR("Syntax error in %s:%d:%d: %s\n",
+                     mappingFile.c_str(),
+                     err.line,
+                     err.column,
+                     err.reason.c_str());
     return result;
   }
 
-  if (!value.IsObject())
-  {
-    TF_RUNTIME_ERROR(
-        "Syntax error in %s: must be dictionary",
-        mappingFile.c_str());
+  if (!value.IsObject()) {
+    TF_RUNTIME_ERROR("Syntax error in %s: must be dictionary", mappingFile.c_str());
     return result;
   }
 
   _AssetNameToVersionMap versionMap;
 
   const JsObject &obj = value.GetJsObject();
-  for (const auto &entry : obj)
-  {
+  for (const auto &entry : obj) {
     const std::string &assetName = entry.first;
     const JsValue &assetVersion = entry.second;
 
-    if (!assetVersion.IsString())
-    {
-      TF_RUNTIME_ERROR(
-          "Syntax error in %s: version for '%s' must be a string",
-          mappingFile.c_str(), entry.first.c_str());
+    if (!assetVersion.IsString()) {
+      TF_RUNTIME_ERROR("Syntax error in %s: version for '%s' must be a string",
+                       mappingFile.c_str(),
+                       entry.first.c_str());
       continue;
     }
 
@@ -166,18 +154,15 @@ bool _VersionTable::operator!=(const _VersionTable &rhs) const
   return !(*this == rhs);
 }
 
-std::string
-_VersionTable::GetVersionForAsset(const std::string &modelName) const
+std::string _VersionTable::GetVersionForAsset(const std::string &modelName) const
 {
   return TfMapLookupByValue(_versionMap, modelName, std::string());
 }
 
-std::string
-_VersionTable::GetDebugString(size_t indent) const
+std::string _VersionTable::GetDebugString(size_t indent) const
 {
   std::string rval;
-  for (const auto &entry : _versionMap)
-  {
+  for (const auto &entry : _versionMap) {
     rval.append(indent, ' ')
         .append(entry.first)
         .append(" -> ")
@@ -191,9 +176,8 @@ _VersionTable::GetDebugString(size_t indent) const
 
 // Registry of version tables that manages reading and caching
 // data from mapping files.
-class _VersionTableRegistry
-{
-public:
+class _VersionTableRegistry {
+ public:
   _VersionTableRegistry() = default;
 
   _VersionTableRegistry(const _VersionTableRegistry &) = delete;
@@ -201,36 +185,28 @@ public:
   _VersionTableRegistry &operator==(const _VersionTableRegistry &) = delete;
   _VersionTableRegistry &operator==(_VersionTableRegistry &&) = delete;
 
-  std::string GetVersionForAsset(
-      const std::string &mappingFile,
-      const std::string &modelName) const;
+  std::string GetVersionForAsset(const std::string &mappingFile,
+                                 const std::string &modelName) const;
 
   bool Refresh(const std::string &mappingFile);
 
-private:
+ private:
   mutable std::shared_timed_mutex _mutex;
-  mutable std::unordered_map<
-      std::string, std::unique_ptr<_VersionTable>>
-      _maps;
+  mutable std::unordered_map<std::string, std::unique_ptr<_VersionTable>> _maps;
 };
 
-std::string
-_VersionTableRegistry::GetVersionForAsset(
-    const std::string &mappingFile,
-    const std::string &modelName) const
+std::string _VersionTableRegistry::GetVersionForAsset(const std::string &mappingFile,
+                                                      const std::string &modelName) const
 {
   {
     std::shared_lock<std::shared_timed_mutex> readLock(_mutex);
-    const std::unique_ptr<_VersionTable> *mappings =
-        TfMapLookupPtr(_maps, mappingFile);
-    if (mappings)
-    {
+    const std::unique_ptr<_VersionTable> *mappings = TfMapLookupPtr(_maps, mappingFile);
+    if (mappings) {
       return (*mappings)->GetVersionForAsset(modelName);
     }
   }
 
-  std::unique_ptr<_VersionTable> mapping =
-      _VersionTable::ReadFromFile(mappingFile);
+  std::unique_ptr<_VersionTable> mapping = _VersionTable::ReadFromFile(mappingFile);
 
   std::shared_lock<std::shared_timed_mutex> writeLock(_mutex, std::defer_lock);
   writeLock.lock();
@@ -243,23 +219,19 @@ bool _VersionTableRegistry::Refresh(const std::string &mappingFile)
 {
   {
     std::shared_lock<std::shared_timed_mutex> readLock(_mutex);
-    const std::unique_ptr<_VersionTable> *mappings =
-        TfMapLookupPtr(_maps, mappingFile);
-    if (!mappings)
-    {
+    const std::unique_ptr<_VersionTable> *mappings = TfMapLookupPtr(_maps, mappingFile);
+    if (!mappings) {
       return false;
     }
   }
 
-  std::unique_ptr<_VersionTable> mapping =
-      _VersionTable::ReadFromFile(mappingFile);
+  std::unique_ptr<_VersionTable> mapping = _VersionTable::ReadFromFile(mappingFile);
 
   std::shared_lock<std::shared_timed_mutex> writeLock(_mutex, std::defer_lock);
   writeLock.lock();
 
   auto entry = _maps.find(mappingFile);
-  if (entry == _maps.end() || *entry->second == *mapping)
-  {
+  if (entry == _maps.end() || *entry->second == *mapping) {
     return false;
   }
 
@@ -267,8 +239,7 @@ bool _VersionTableRegistry::Refresh(const std::string &mappingFile)
   return true;
 }
 
-static _VersionTableRegistry &
-_GetVersionTableRegistry()
+static _VersionTableRegistry &_GetVersionTableRegistry()
 {
   static _VersionTableRegistry reg;
   return reg;
@@ -279,24 +250,19 @@ _GetVersionTableRegistry()
 // Simple class to represent a URI. This is just a helper for this example
 // and should not be considered an RFC-compliant implementation. A real
 // resolver implementation might want to use an external URI library instead.
-class _URI
-{
-public:
+class _URI {
+ public:
   _URI(const std::string &uri)
   {
     const size_t index = uri.find(":");
-    if (index == std::string::npos)
-    {
+    if (index == std::string::npos) {
       _path.push_back(uri);
     }
-    else
-    {
+    else {
       _scheme = uri.substr(0, index);
 
-      std::vector<std::string> path =
-          TfStringSplit(uri.substr(index + 1), "/");
-      if (!path.empty())
-      {
+      std::vector<std::string> path = TfStringSplit(uri.substr(index + 1), "/");
+      if (!path.empty()) {
         _assetName = std::move(path.front());
 
         _path.resize(path.size() - 1);
@@ -305,18 +271,20 @@ public:
     }
   }
 
-  _URI(const ArResolvedPath &resolvedPath)
-      : _URI(resolvedPath.GetPathString())
-  {
-  }
+  _URI(const ArResolvedPath &resolvedPath) : _URI(resolvedPath.GetPathString()) {}
 
-  const std::string &GetScheme() const { return _scheme; }
-  const std::string &GetAssetName() const { return _assetName; }
+  const std::string &GetScheme() const
+  {
+    return _scheme;
+  }
+  const std::string &GetAssetName() const
+  {
+    return _assetName;
+  }
 
   std::string GetPath() const
   {
-    if (_scheme.empty())
-    {
+    if (_scheme.empty()) {
       return TfNormPath(_path.back());
     }
 
@@ -325,22 +293,18 @@ public:
 
   std::string GetNormalized() const
   {
-    if (_scheme.empty())
-    {
+    if (_scheme.empty()) {
       return TfNormPath(_path.back());
     }
 
-    return _scheme + ":" +
-           TfNormPath(_assetName + "/" + TfStringJoin(_path, "/"));
+    return _scheme + ":" + TfNormPath(_assetName + "/" + TfStringJoin(_path, "/"));
   }
 
   _URI &Anchor(const std::string &relativePath)
   {
-    std::vector<std::string> relativeParts =
-        TfStringSplit(relativePath, "/");
+    std::vector<std::string> relativeParts = TfStringSplit(relativePath, "/");
 
-    if (!_path.empty())
-    {
+    if (!_path.empty()) {
       _path.pop_back();
     }
 
@@ -350,15 +314,14 @@ public:
 
   _URI &Replace(const std::string &replaceStr, const std::string &replaceWith)
   {
-    for (std::string &elem : _path)
-    {
+    for (std::string &elem : _path) {
       elem = TfStringReplace(elem, replaceStr, replaceWith);
     }
 
     return *this;
   }
 
-private:
+ private:
   std::string _scheme;
   std::string _assetName;
   std::vector<std::string> _path;
@@ -366,31 +329,24 @@ private:
 
 // ------------------------------------------------------------
 
-static std::string
-_GetFilesystemPath(const _URI &assetURI)
+static std::string _GetFilesystemPath(const _URI &assetURI)
 {
-  return TfAbsPath(TfStringCatPaths(
-      TfGetEnvSetting(USD_RESOLVER_EXAMPLE_ASSET_DIR),
-      assetURI.GetPath()));
+  return TfAbsPath(
+      TfStringCatPaths(TfGetEnvSetting(USD_RESOLVER_EXAMPLE_ASSET_DIR), assetURI.GetPath()));
 }
 
-static std::string
-_GetFilesystemPath(const ArResolvedPath &resolvedPath)
+static std::string _GetFilesystemPath(const ArResolvedPath &resolvedPath)
 {
   const _URI assetURI(resolvedPath.GetPathString());
   return _GetFilesystemPath(assetURI);
 }
 
-UsdResolverExampleResolver::UsdResolverExampleResolver()
-{
-}
+UsdResolverExampleResolver::UsdResolverExampleResolver() {}
 
 UsdResolverExampleResolver::~UsdResolverExampleResolver() = default;
 
-static std::string
-_CreateIdentifierHelper(
-    const std::string &assetPath,
-    const ArResolvedPath &anchorAssetPath)
+static std::string _CreateIdentifierHelper(const std::string &assetPath,
+                                           const ArResolvedPath &anchorAssetPath)
 {
   // Ar will call this function if either assetPath or anchorAssetPath
   // have a URI scheme that is associated with this resolver.
@@ -398,8 +354,7 @@ _CreateIdentifierHelper(
   // If assetPath has a URI scheme it must be an absolute URI so we
   // just return the normalized URI as the asset's identifier.
   const _URI assetURI(assetPath);
-  if (!assetURI.GetScheme().empty())
-  {
+  if (!assetURI.GetScheme().empty()) {
     TF_AXIOM(assetURI.GetScheme() == _tokens->asset);
     return assetURI.GetNormalized();
   }
@@ -409,32 +364,32 @@ _CreateIdentifierHelper(
   return _URI(anchorAssetPath).Anchor(assetPath).GetNormalized();
 }
 
-std::string
-UsdResolverExampleResolver::_CreateIdentifier(
-    const std::string &assetPath,
-    const ArResolvedPath &anchorAssetPath) const
+std::string UsdResolverExampleResolver::_CreateIdentifier(
+    const std::string &assetPath, const ArResolvedPath &anchorAssetPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_CreateIdentifier('%s', '%s')\n", assetPath.c_str(), anchorAssetPath.GetPathString().c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::_CreateIdentifier('%s', '%s')\n",
+           assetPath.c_str(),
+           anchorAssetPath.GetPathString().c_str());
 
   return _CreateIdentifierHelper(assetPath, anchorAssetPath);
 }
 
-std::string
-UsdResolverExampleResolver::_CreateIdentifierForNewAsset(
-    const std::string &assetPath,
-    const ArResolvedPath &anchorAssetPath) const
+std::string UsdResolverExampleResolver::_CreateIdentifierForNewAsset(
+    const std::string &assetPath, const ArResolvedPath &anchorAssetPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_CreateIdentifierForNewAsset"
-                                     "('%s', '%s')\n",
-                                     assetPath.c_str(), anchorAssetPath.GetPathString().c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg(
+          "UsdResolverExampleResolver::_CreateIdentifierForNewAsset"
+          "('%s', '%s')\n",
+          assetPath.c_str(),
+          anchorAssetPath.GetPathString().c_str());
 
   return _CreateIdentifierHelper(assetPath, anchorAssetPath);
 }
 
-ArResolvedPath
-UsdResolverExampleResolver::_ResolveHelper(
-    const std::string &assetPath,
-    bool forNewAsset) const
+ArResolvedPath UsdResolverExampleResolver::_ResolveHelper(const std::string &assetPath,
+                                                          bool forNewAsset) const
 {
   _URI assetURI(assetPath);
   TF_AXIOM(assetURI.GetScheme() == _tokens->asset);
@@ -442,18 +397,16 @@ UsdResolverExampleResolver::_ResolveHelper(
   // Substitute "{$VERSION}" variables in the asset path with
   // the version specified for the asset in the currently-bound
   // context object.
-  if (TfStringContains(assetPath, _tokens->version))
-  {
+  if (TfStringContains(assetPath, _tokens->version)) {
     std::string version;
     if (const UsdResolverExampleResolverContext *ctx =
             _GetCurrentContextObject<UsdResolverExampleResolverContext>())
     {
-      version = _GetVersionTableRegistry().GetVersionForAsset(
-          ctx->GetMappingFile(), assetURI.GetAssetName());
+      version = _GetVersionTableRegistry().GetVersionForAsset(ctx->GetMappingFile(),
+                                                              assetURI.GetAssetName());
     }
 
-    assetURI.Replace(
-        _tokens->version, version.empty() ? _tokens->latest : version);
+    assetURI.Replace(_tokens->version, version.empty() ? _tokens->latest : version);
   }
 
   // If we're resolving for a new asset, a file may not yet exist at the
@@ -463,17 +416,16 @@ UsdResolverExampleResolver::_ResolveHelper(
   // If this is not for a new asset, we need to check if a file exists at the
   // corresponding filesystem path for this URI. If so, we just return an
   // ArResolvedPath with the original URI to indicate that the asset exists.
-  if (!forNewAsset)
-  {
+  if (!forNewAsset) {
     const std::string filesystemPath = _GetFilesystemPath(assetURI);
-    if (!TfIsFile(filesystemPath))
-    {
-      TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Asset does not exist at filesystem path %s\n", filesystemPath.c_str());
+    if (!TfIsFile(filesystemPath)) {
+      TF_DEBUG(USD_RESOLVER_EXAMPLE)
+          .Msg("  - Asset does not exist at filesystem path %s\n", filesystemPath.c_str());
       return ArResolvedPath();
     }
-    else
-    {
-      TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Asset found at filesystem path %s\n", filesystemPath.c_str());
+    else {
+      TF_DEBUG(USD_RESOLVER_EXAMPLE)
+          .Msg("  - Asset found at filesystem path %s\n", filesystemPath.c_str());
     }
   }
 
@@ -487,68 +439,60 @@ UsdResolverExampleResolver::_ResolveHelper(
   return ArResolvedPath(assetURI.GetNormalized());
 }
 
-ArResolvedPath
-UsdResolverExampleResolver::_Resolve(
-    const std::string &assetPath) const
+ArResolvedPath UsdResolverExampleResolver::_Resolve(const std::string &assetPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_Resolve('%s')\n", assetPath.c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::_Resolve('%s')\n", assetPath.c_str());
 
   return _ResolveHelper(assetPath, /* forNewAsset = */ false);
 }
 
-ArResolvedPath
-UsdResolverExampleResolver::_ResolveForNewAsset(
-    const std::string &assetPath) const
+ArResolvedPath UsdResolverExampleResolver::_ResolveForNewAsset(const std::string &assetPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_ResolveForNewAsset('%s')\n", assetPath.c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::_ResolveForNewAsset('%s')\n", assetPath.c_str());
 
   return _ResolveHelper(assetPath, /* forNewAsset = */ true);
 }
 
-ArResolverContext
-UsdResolverExampleResolver::_CreateDefaultContext() const
+ArResolverContext UsdResolverExampleResolver::_CreateDefaultContext() const
 {
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_CreateDefaultContext()\n");
 
   const std::string defaultMappingFile = TfAbsPath("versions.json");
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Looking for default mapping at %s...", defaultMappingFile.c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("  - Looking for default mapping at %s...", defaultMappingFile.c_str());
 
-  if (TfIsFile(defaultMappingFile))
-  {
+  if (TfIsFile(defaultMappingFile)) {
     TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg(" found\n");
-    return ArResolverContext(
-        UsdResolverExampleResolverContext(defaultMappingFile));
+    return ArResolverContext(UsdResolverExampleResolverContext(defaultMappingFile));
   }
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg(" not found\n");
   return ArResolverContext();
 }
 
-ArResolverContext
-UsdResolverExampleResolver::_CreateDefaultContextForAsset(
+ArResolverContext UsdResolverExampleResolver::_CreateDefaultContextForAsset(
     const std::string &assetPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_CreateDefaultContextForAsset('%s')\n", assetPath.c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::_CreateDefaultContextForAsset('%s')\n", assetPath.c_str());
 
   const std::string assetDir = TfGetPathName(assetPath);
-  const std::string mappingFile =
-      TfAbsPath(TfStringCatPaths(assetDir, "versions.json"));
+  const std::string mappingFile = TfAbsPath(TfStringCatPaths(assetDir, "versions.json"));
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Looking for mapping at %s...", mappingFile.c_str());
 
-  if (TfIsFile(mappingFile))
-  {
+  if (TfIsFile(mappingFile)) {
     TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg(" found\n");
-    return ArResolverContext(
-        UsdResolverExampleResolverContext(mappingFile));
+    return ArResolverContext(UsdResolverExampleResolverContext(mappingFile));
   }
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg(" not found\n");
   return ArResolverContext();
 }
 
-ArResolverContext
-UsdResolverExampleResolver::_CreateContextFromString(
+ArResolverContext UsdResolverExampleResolver::_CreateContextFromString(
     const std::string &contextStr) const
 {
   // This resolver assumes the given context string will be a path to a
@@ -556,17 +500,14 @@ UsdResolverExampleResolver::_CreateContextFromString(
   // ArGetResolver()->CreateContextFromString("asset", <filepath>) to create a
   // UsdResolverExampleResolverContext without having to link against this
   // library directly.
-  if (TfIsFile(contextStr))
-  {
-    return ArResolverContext(
-        UsdResolverExampleResolverContext(contextStr));
+  if (TfIsFile(contextStr)) {
+    return ArResolverContext(UsdResolverExampleResolverContext(contextStr));
   }
 
   return ArResolverContext();
 }
 
-bool UsdResolverExampleResolver::_IsContextDependentPath(
-    const std::string &assetPath) const
+bool UsdResolverExampleResolver::_IsContextDependentPath(const std::string &assetPath) const
 {
   // URIs that contain the "{$VERSION}" subtitution token are
   // context-dependent since they may resolve to different paths depending on
@@ -577,24 +518,20 @@ bool UsdResolverExampleResolver::_IsContextDependentPath(
   return TfStringContains(assetPath, _tokens->version);
 }
 
-void UsdResolverExampleResolver::_RefreshContext(
-    const ArResolverContext &context)
+void UsdResolverExampleResolver::_RefreshContext(const ArResolverContext &context)
 {
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExample::_RefreshContext()\n");
 
   // If the given ArResolverContext isn't holding a context object
   // used by this resolver, there's nothing to do so we can exit.
-  const UsdResolverExampleResolverContext *ctx =
-      context.Get<UsdResolverExampleResolverContext>();
-  if (!ctx)
-  {
+  const UsdResolverExampleResolverContext *ctx = context.Get<UsdResolverExampleResolverContext>();
+  if (!ctx) {
     return;
   }
 
   // Attempt to re-read the mapping file on disk. If nothing
   // has changed, we can exit.
-  if (!_GetVersionTableRegistry().Refresh(ctx->GetMappingFile()))
-  {
+  if (!_GetVersionTableRegistry().Refresh(ctx->GetMappingFile())) {
     return;
   }
 
@@ -604,46 +541,43 @@ void UsdResolverExampleResolver::_RefreshContext(
   ArNotice::ResolverChanged(*ctx).Send();
 }
 
-ArTimestamp
-UsdResolverExampleResolver::_GetModificationTimestamp(
-    const std::string &assetPath,
-    const ArResolvedPath &resolvedPath) const
+ArTimestamp UsdResolverExampleResolver::_GetModificationTimestamp(
+    const std::string &assetPath, const ArResolvedPath &resolvedPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::GetModificationTimestamp('%s', '%s')\n", assetPath.c_str(), resolvedPath.GetPathString().c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::GetModificationTimestamp('%s', '%s')\n",
+           assetPath.c_str(),
+           resolvedPath.GetPathString().c_str());
 
   std::string filesystemPath = _GetFilesystemPath(resolvedPath);
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Getting timestamp for %s\n", filesystemPath.c_str());
-  return ArFilesystemAsset::GetModificationTimestamp(
-      ArResolvedPath(std::move(filesystemPath)));
+  return ArFilesystemAsset::GetModificationTimestamp(ArResolvedPath(std::move(filesystemPath)));
 }
 
-static std::string
-_GetVersionFromResolvedPath(
-    const std::string &assetPath,
-    const ArResolvedPath &resolvedPath)
+static std::string _GetVersionFromResolvedPath(const std::string &assetPath,
+                                               const ArResolvedPath &resolvedPath)
 {
   const size_t versionStart = assetPath.find(_tokens->version);
-  if (versionStart == std::string::npos)
-  {
+  if (versionStart == std::string::npos) {
     return std::string();
   }
 
   std::string resolvedPathString = resolvedPath.GetPathString();
-  const size_t versionEnd = resolvedPathString.find(
-      assetPath.substr(versionStart + 10), versionStart);
+  const size_t versionEnd = resolvedPathString.find(assetPath.substr(versionStart + 10),
+                                                    versionStart);
 
-  return std::string(
-      resolvedPathString.begin() + versionStart,
-      resolvedPathString.begin() + versionEnd);
+  return std::string(resolvedPathString.begin() + versionStart,
+                     resolvedPathString.begin() + versionEnd);
 }
 
-ArAssetInfo
-UsdResolverExampleResolver::_GetAssetInfo(
-    const std::string &assetPath,
-    const ArResolvedPath &resolvedPath) const
+ArAssetInfo UsdResolverExampleResolver::_GetAssetInfo(const std::string &assetPath,
+                                                      const ArResolvedPath &resolvedPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::GetAssetInfo('%s', '%s')\n", assetPath.c_str(), resolvedPath.GetPathString().c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::GetAssetInfo('%s', '%s')\n",
+           assetPath.c_str(),
+           resolvedPath.GetPathString().c_str());
 
   ArAssetInfo assetInfo;
 
@@ -656,29 +590,28 @@ UsdResolverExampleResolver::_GetAssetInfo(
   return assetInfo;
 }
 
-std::shared_ptr<ArAsset>
-UsdResolverExampleResolver::_OpenAsset(
+std::shared_ptr<ArAsset> UsdResolverExampleResolver::_OpenAsset(
     const ArResolvedPath &resolvedPath) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::OpenAsset('%s')\n", resolvedPath.GetPathString().c_str());
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::OpenAsset('%s')\n", resolvedPath.GetPathString().c_str());
 
   std::string filesystemPath = _GetFilesystemPath(resolvedPath);
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Opening file at %s\n", filesystemPath.c_str());
-  return ArFilesystemAsset::Open(
-      ArResolvedPath(std::move(filesystemPath)));
+  return ArFilesystemAsset::Open(ArResolvedPath(std::move(filesystemPath)));
 }
 
-std::shared_ptr<ArWritableAsset>
-UsdResolverExampleResolver::_OpenAssetForWrite(
-    const ArResolvedPath &resolvedPath,
-    WriteMode writeMode) const
+std::shared_ptr<ArWritableAsset> UsdResolverExampleResolver::_OpenAssetForWrite(
+    const ArResolvedPath &resolvedPath, WriteMode writeMode) const
 {
-  TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("UsdResolverExampleResolver::_OpenAssetForWrite('%s', %d)\n", resolvedPath.GetPathString().c_str(), static_cast<int>(writeMode));
+  TF_DEBUG(USD_RESOLVER_EXAMPLE)
+      .Msg("UsdResolverExampleResolver::_OpenAssetForWrite('%s', %d)\n",
+           resolvedPath.GetPathString().c_str(),
+           static_cast<int>(writeMode));
 
   std::string filesystemPath = _GetFilesystemPath(resolvedPath);
 
   TF_DEBUG(USD_RESOLVER_EXAMPLE).Msg("  - Opening file for write at %s\n", filesystemPath.c_str());
-  return ArFilesystemWritableAsset::Create(
-      ArResolvedPath(std::move(filesystemPath)), writeMode);
+  return ArFilesystemWritableAsset::Create(ArResolvedPath(std::move(filesystemPath)), writeMode);
 }

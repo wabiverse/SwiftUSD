@@ -40,31 +40,39 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_REGISTRY_FUNCTION(VtValue) {
+TF_REGISTRY_FUNCTION(VtValue)
+{
   VtRegisterValueCastsFromPythonSequencesToArray<SdfTimeCode>();
 }
 
 namespace {
 
-static std::string _Str(SdfTimeCode const &self) {
+static std::string _Str(SdfTimeCode const &self)
+{
   return boost::lexical_cast<std::string>(self);
 }
 
-static std::string _Repr(SdfTimeCode const &self) {
+static std::string _Repr(SdfTimeCode const &self)
+{
   std::ostringstream repr;
   repr << TF_PY_REPR_PREFIX << "TimeCode(" << self << ")";
   return repr.str();
 }
 
-static bool _HasNonZeroTimeCode(SdfTimeCode const &self) {
+static bool _HasNonZeroTimeCode(SdfTimeCode const &self)
+{
   return self != SdfTimeCode(0.0);
 }
 
-static double _Float(SdfTimeCode const &self) { return double(self); }
+static double _Float(SdfTimeCode const &self)
+{
+  return double(self);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapTimeCode() {
+void wrapTimeCode()
+{
   typedef SdfTimeCode This;
 
   auto selfCls = class_<This>("TimeCode", init<>())

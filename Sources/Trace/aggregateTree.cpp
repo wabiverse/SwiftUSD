@@ -34,9 +34,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceAggregateTree::TraceAggregateTree() { Clear(); }
+TraceAggregateTree::TraceAggregateTree()
+{
+  Clear();
+}
 
-void TraceAggregateTree::Clear() {
+void TraceAggregateTree::Clear()
+{
   _root = TraceAggregateNode::New();
   _eventTimes.clear();
   _counters.clear();
@@ -44,13 +48,14 @@ void TraceAggregateTree::Clear() {
   _counterIndex = 0;
 }
 
-int TraceAggregateTree::GetCounterIndex(const TfToken &key) const {
+int TraceAggregateTree::GetCounterIndex(const TfToken &key) const
+{
   _CounterIndexMap::const_iterator it = _counterIndexMap.find(key);
   return it != _counterIndexMap.end() ? it->second : -1;
 }
 
-bool TraceAggregateTree::AddCounter(const TfToken &key, int index,
-                                    double totalValue) {
+bool TraceAggregateTree::AddCounter(const TfToken &key, int index, double totalValue)
+{
   // Don't add counters with invalid indices
   if (!TF_VERIFY(index >= 0)) {
     return false;
@@ -76,9 +81,9 @@ bool TraceAggregateTree::AddCounter(const TfToken &key, int index,
 }
 
 void TraceAggregateTree::Append(const TraceEventTreeRefPtr &eventTree,
-                                const TraceCollection &collection) {
-  Trace_AggregateTreeBuilder::AddEventTreeToAggregate(this, eventTree,
-                                                      collection);
+                                const TraceCollection &collection)
+{
+  Trace_AggregateTreeBuilder::AddEventTreeToAggregate(this, eventTree, collection);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

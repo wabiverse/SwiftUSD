@@ -3,4 +3,4 @@
 
 #include <pxr/pxrns.h>
 
-#endif // __PXR_H__
+#endif  // __PXR_H__

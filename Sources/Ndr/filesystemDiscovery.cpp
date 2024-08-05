@@ -22,12 +22,12 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "Arch/fileSystem.h"
 #include "Ndr/filesystemDiscovery.h"
+#include "Arch/fileSystem.h"
 #include "Ndr/filesystemDiscoveryHelpers.h"
 
-#include "Tf/stringUtils.h"
 #include "Tf/envSetting.h"
+#include "Tf/stringUtils.h"
 
 #include <string>
 
@@ -35,65 +35,61 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 NDR_REGISTER_DISCOVERY_PLUGIN(_NdrFilesystemDiscoveryPlugin)
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_FS_PLUGIN_SEARCH_PATHS, "",
-    "The paths that should be searched, recursively, for files that represent "
-    "nodes. Paths should be separated by either a ':' or a ';' depending on "
-    "your platform (it should mimic the PATH attribute).  See "
-    "ARCH_PATH_LIST_SEP");
+TF_DEFINE_ENV_SETTING(PXR_NDR_FS_PLUGIN_SEARCH_PATHS,
+                      "",
+                      "The paths that should be searched, recursively, for files that represent "
+                      "nodes. Paths should be separated by either a ':' or a ';' depending on "
+                      "your platform (it should mimic the PATH attribute).  See "
+                      "ARCH_PATH_LIST_SEP");
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_FS_PLUGIN_ALLOWED_EXTS, "",
-    "The extensions on files that define nodes.  Do not include the leading "
-    "'.'. Extensions should be separated by a colon.");
+TF_DEFINE_ENV_SETTING(PXR_NDR_FS_PLUGIN_ALLOWED_EXTS,
+                      "",
+                      "The extensions on files that define nodes.  Do not include the leading "
+                      "'.'. Extensions should be separated by a colon.");
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_FS_PLUGIN_FOLLOW_SYMLINKS, false,
-    "Whether symlinks should be followed while walking the search paths. Set "
-    "to 'true' (case sensitive) if they should be followed.");
+TF_DEFINE_ENV_SETTING(PXR_NDR_FS_PLUGIN_FOLLOW_SYMLINKS,
+                      false,
+                      "Whether symlinks should be followed while walking the search paths. Set "
+                      "to 'true' (case sensitive) if they should be followed.");
 
 _NdrFilesystemDiscoveryPlugin::_NdrFilesystemDiscoveryPlugin()
 {
-    //
-    // TODO: This needs to somehow be set up to find the nodes that USD
-    //       ships with
-    //
-    _searchPaths = TfStringSplit(
-            TfGetEnvSetting(PXR_NDR_FS_PLUGIN_SEARCH_PATHS),
-            ARCH_PATH_LIST_SEP);
-    _allowedExtensions = TfStringSplit(
-            TfGetEnvSetting(PXR_NDR_FS_PLUGIN_ALLOWED_EXTS), ":");
-    _followSymlinks = TfGetEnvSetting(PXR_NDR_FS_PLUGIN_FOLLOW_SYMLINKS);
+  //
+  // TODO: This needs to somehow be set up to find the nodes that USD
+  //       ships with
+  //
+  _searchPaths = TfStringSplit(TfGetEnvSetting(PXR_NDR_FS_PLUGIN_SEARCH_PATHS),
+                               ARCH_PATH_LIST_SEP);
+  _allowedExtensions = TfStringSplit(TfGetEnvSetting(PXR_NDR_FS_PLUGIN_ALLOWED_EXTS), ":");
+  _followSymlinks = TfGetEnvSetting(PXR_NDR_FS_PLUGIN_FOLLOW_SYMLINKS);
 }
 
 _NdrFilesystemDiscoveryPlugin::_NdrFilesystemDiscoveryPlugin(Filter filter)
     : _NdrFilesystemDiscoveryPlugin()
 {
-    _filter = std::move(filter);
+  _filter = std::move(filter);
 }
 
-NdrNodeDiscoveryResultVec
-_NdrFilesystemDiscoveryPlugin::DiscoverNodes(const Context& context)
+NdrNodeDiscoveryResultVec _NdrFilesystemDiscoveryPlugin::DiscoverNodes(const Context &context)
 {
-    auto result = NdrFsHelpersDiscoverNodes(
-        _searchPaths, _allowedExtensions, _followSymlinks, &context
-    );
+  auto result = NdrFsHelpersDiscoverNodes(
+      _searchPaths, _allowedExtensions, _followSymlinks, &context);
 
-    if (_filter) {
-        auto j = result.begin();
-        for (auto i = j; i != result.end(); ++i) {
-            // If we pass the filter and any previous haven't then move.
-            if (_filter(*i)) {
-                if (j != i) {
-                    *j = std::move(*i);
-                }
-                ++j;
-            }
+  if (_filter) {
+    auto j = result.begin();
+    for (auto i = j; i != result.end(); ++i) {
+      // If we pass the filter and any previous haven't then move.
+      if (_filter(*i)) {
+        if (j != i) {
+          *j = std::move(*i);
         }
-        result.erase(j, result.end());
+        ++j;
+      }
     }
+    result.erase(j, result.end());
+  }
 
-    return result;
+  return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

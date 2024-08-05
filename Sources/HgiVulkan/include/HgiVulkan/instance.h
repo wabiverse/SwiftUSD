@@ -35,9 +35,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Initializes the Vulkan library and contains the apps Vulkan state.
 ///
-class HgiVulkanInstance final
-{
-public:
+class HgiVulkanInstance final {
+ public:
   HGIVULKAN_API
   HgiVulkanInstance();
 
@@ -53,7 +52,7 @@ public:
   PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = 0;
   PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = 0;
 
-private:
+ private:
   VkInstance _vkInstance;
 };
 

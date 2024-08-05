@@ -40,7 +40,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Represents a timestamp for an asset. Timestamps are represented by
 /// Unix time, the number of seconds elapsed since 00:00:00 UTC 1/1/1970.
 class ArTimestamp {
-public:
+ public:
   /// Create an invalid timestamp.
   ArTimestamp() : _time(std::numeric_limits<double>::quiet_NaN()) {}
 
@@ -48,12 +48,16 @@ public:
   explicit ArTimestamp(double time) : _time(time) {}
 
   /// Return true if this timestamp is valid, false otherwise.
-  bool IsValid() const { return !std::isnan(_time); }
+  bool IsValid() const
+  {
+    return !std::isnan(_time);
+  }
 
   /// Return the time represented by this timestamp as a double.
   /// If this timestamp is invalid, issue a coding error and
   /// return a quiet NaN value.
-  double GetTime() const {
+  double GetTime() const
+  {
     if (ARCH_UNLIKELY(!IsValid())) {
       _IssueInvalidGetTimeError();
     }
@@ -65,41 +69,47 @@ public:
   /// other timestamps.
   /// @{
 
-  friend bool operator==(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator==(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return (!lhs.IsValid() && !rhs.IsValid()) ||
            (lhs.IsValid() && rhs.IsValid() && lhs._time == rhs._time);
   }
 
-  friend bool operator!=(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator!=(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return !(lhs == rhs);
   }
 
-  friend bool operator<(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator<(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return (!lhs.IsValid() && rhs.IsValid()) ||
            (lhs.IsValid() && rhs.IsValid() && lhs._time < rhs._time);
   }
 
-  friend bool operator>=(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator>=(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return !(lhs < rhs);
   }
 
-  friend bool operator<=(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator<=(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return !lhs.IsValid() || (rhs.IsValid() && lhs._time <= rhs._time);
   }
 
-  friend bool operator>(const ArTimestamp &lhs, const ArTimestamp &rhs) {
+  friend bool operator>(const ArTimestamp &lhs, const ArTimestamp &rhs)
+  {
     return !(lhs <= rhs);
   }
 
   /// @}
 
-private:
+ private:
   AR_API
   void _IssueInvalidGetTimeError() const;
 
   // TfHash support.
-  template <class HashState>
-  friend void TfHashAppend(HashState &h, const ArTimestamp &t) {
+  template<class HashState> friend void TfHashAppend(HashState &h, const ArTimestamp &t)
+  {
     h.Append(t._time);
   }
 

@@ -32,10 +32,14 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfLine2d>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfLine2d>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfVec2d GfLine2d::FindClosestPoint(const GfVec2d &point, double *t) const {
+GfVec2d GfLine2d::FindClosestPoint(const GfVec2d &point, double *t) const
+{
   // Compute the vector from the start point to the given point.
   GfVec2d v = point - _p0;
 
@@ -48,9 +52,13 @@ GfVec2d GfLine2d::FindClosestPoint(const GfVec2d &point, double *t) const {
   return GetPoint(lt);
 }
 
-bool GfFindClosestPoints(const GfLine2d &l1, const GfLine2d &l2,
-                         GfVec2d *closest1, GfVec2d *closest2, double *t1,
-                         double *t2) {
+bool GfFindClosestPoints(const GfLine2d &l1,
+                         const GfLine2d &l2,
+                         GfVec2d *closest1,
+                         GfVec2d *closest2,
+                         double *t1,
+                         double *t2)
+{
   // Define terms:
   //   p1 = line 1's position
   //   d1 = line 1's direction

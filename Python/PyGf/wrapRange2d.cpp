@@ -52,29 +52,34 @@ namespace {
 
 static const int _dimension = 2;
 
-static string _Repr(GfRange2d const &self) {
+static string _Repr(GfRange2d const &self)
+{
   return TF_PY_REPR_PREFIX + "Range2d(" + TfPyRepr(self.GetMin()) + ", " +
          TfPyRepr(self.GetMax()) + ")";
 }
 
-static GfRange2d __truediv__(const GfRange2d &self, double value) {
+static GfRange2d __truediv__(const GfRange2d &self, double value)
+{
   return self / value;
 }
 
-static GfRange2d &__itruediv__(GfRange2d &self, double value) {
+static GfRange2d &__itruediv__(GfRange2d &self, double value)
+{
   return self /= value;
 }
 
-static size_t __hash__(GfRange2d const &r) { return TfHash{}(r); }
+static size_t __hash__(GfRange2d const &r)
+{
+  return TfHash{}(r);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRange2d() {
-  object getMin =
-      make_function(&GfRange2d::GetMin, return_value_policy<return_by_value>());
+void wrapRange2d()
+{
+  object getMin = make_function(&GfRange2d::GetMin, return_value_policy<return_by_value>());
 
-  object getMax =
-      make_function(&GfRange2d::GetMax, return_value_policy<return_by_value>());
+  object getMax = make_function(&GfRange2d::GetMax, return_value_policy<return_by_value>());
 
   class_<GfRange2d> cls("Range2d", init<>());
   cls.def(init<GfRange2d>())
@@ -102,29 +107,24 @@ void wrapRange2d() {
 
       .def("SetEmpty", &GfRange2d::SetEmpty)
 
-      .def("Contains",
-           (bool(GfRange2d::*)(const GfVec2d &) const) & GfRange2d::Contains)
-      .def("Contains",
-           (bool(GfRange2d::*)(const GfRange2d &) const) & GfRange2d::Contains)
+      .def("Contains", (bool(GfRange2d::*)(const GfVec2d &) const) & GfRange2d::Contains)
+      .def("Contains", (bool(GfRange2d::*)(const GfRange2d &) const) & GfRange2d::Contains)
 
       .def("GetUnion", &GfRange2d::GetUnion)
       .staticmethod("GetUnion")
 
       .def("UnionWith",
-           (const GfRange2d &(GfRange2d::*)(const GfVec2d &)) &
-               GfRange2d::UnionWith,
+           (const GfRange2d &(GfRange2d::*)(const GfVec2d &)) & GfRange2d::UnionWith,
            return_self<>())
       .def("UnionWith",
-           (const GfRange2d &(GfRange2d::*)(const GfRange2d &)) &
-               GfRange2d::UnionWith,
+           (const GfRange2d &(GfRange2d::*)(const GfRange2d &)) & GfRange2d::UnionWith,
            return_self<>())
 
       .def("GetIntersection", &GfRange2d::GetIntersection)
       .staticmethod("GetIntersection")
 
       .def("IntersectWith",
-           (const GfRange2d &(GfRange2d::*)(const GfRange2d &)) &
-               GfRange2d::IntersectWith,
+           (const GfRange2d &(GfRange2d::*)(const GfRange2d &)) & GfRange2d::IntersectWith,
            return_self<>())
 
       .def("GetDistanceSquared", &GfRange2d::GetDistanceSquared)
@@ -151,8 +151,7 @@ void wrapRange2d() {
       .def_readonly("unitSquare", &GfRange2d::UnitSquare)
 
       ;
-  to_python_converter<std::vector<GfRange2d>,
-                      TfPySequenceToPython<std::vector<GfRange2d>>>();
+  to_python_converter<std::vector<GfRange2d>, TfPySequenceToPython<std::vector<GfRange2d>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / double() ) above, which

@@ -39,38 +39,59 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // fwd decl, from parserHelpers.cpp.
-std::string Sdf_EvalQuotedString(const char *x, size_t n, size_t trimBothSides,
+std::string Sdf_EvalQuotedString(const char *x,
+                                 size_t n,
+                                 size_t trimBothSides,
                                  unsigned int *numLines);
 
 struct SdfPredicateExprBuilder {
-  SdfPredicateExprBuilder() { OpenGroup(); }
+  SdfPredicateExprBuilder()
+  {
+    OpenGroup();
+  }
 
-  void PushOp(SdfPredicateExpression::Op op) { _stacks.back().PushOp(op); }
+  void PushOp(SdfPredicateExpression::Op op)
+  {
+    _stacks.back().PushOp(op);
+  }
 
-  void PushCall(SdfPredicateExpression::FnCall::Kind kind) {
+  void PushCall(SdfPredicateExpression::FnCall::Kind kind)
+  {
     _stacks.back().PushCall(kind, std::move(_funcName), std::move(_funcArgs));
     _funcName.clear();
     _funcArgs.clear();
   }
 
-  void SetFuncName(std::string const &name) { _funcName = name; }
+  void SetFuncName(std::string const &name)
+  {
+    _funcName = name;
+  }
 
-  void AddFuncArg(VtValue const &val) {
+  void AddFuncArg(VtValue const &val)
+  {
     _funcArgs.push_back({std::move(_funcKwArgName), val});
     _funcKwArgName.clear();
   }
 
-  void SetFuncArgKWName(std::string const &kw) { _funcKwArgName = kw; }
+  void SetFuncArgKWName(std::string const &kw)
+  {
+    _funcKwArgName = kw;
+  }
 
-  void OpenGroup() { _stacks.emplace_back(); }
+  void OpenGroup()
+  {
+    _stacks.emplace_back();
+  }
 
-  void CloseGroup() {
+  void CloseGroup()
+  {
     SdfPredicateExpression innerExpr = _stacks.back().Finish();
     _stacks.pop_back();
     _stacks.back().PushExpr(std::move(innerExpr));
   }
 
-  SdfPredicateExpression Finish() {
+  SdfPredicateExpression Finish()
+  {
     SdfPredicateExpression result = _stacks.back().Finish();
     _stacks.clear();
     _funcArgs.clear();
@@ -78,10 +99,11 @@ struct SdfPredicateExprBuilder {
     return result;
   }
 
-private:
+ private:
   struct _Stack {
 
-    void PushOp(SdfPredicateExpression::Op op) {
+    void PushOp(SdfPredicateExpression::Op op)
+    {
       using Op = SdfPredicateExpression::Op;
       auto higherPrec = [](Op left, Op right) {
         return (left < right) || (left == right && left != Op::Not);
@@ -93,17 +115,21 @@ private:
       opStack.push_back(op);
     }
 
-    void PushCall(SdfPredicateExpression::FnCall::Kind kind, std::string &&name,
-                  std::vector<SdfPredicateExpression::FnArg> &&args) {
-      exprStack.push_back(SdfPredicateExpression::MakeCall(
-          {kind, std::move(name), std::move(args)}));
+    void PushCall(SdfPredicateExpression::FnCall::Kind kind,
+                  std::string &&name,
+                  std::vector<SdfPredicateExpression::FnArg> &&args)
+    {
+      exprStack.push_back(
+          SdfPredicateExpression::MakeCall({kind, std::move(name), std::move(args)}));
     }
 
-    void PushExpr(SdfPredicateExpression &&expr) {
+    void PushExpr(SdfPredicateExpression &&expr)
+    {
       exprStack.push_back(std::move(expr));
     }
 
-    SdfPredicateExpression Finish() {
+    SdfPredicateExpression Finish()
+    {
       while (!opStack.empty()) {
         _Reduce();
       }
@@ -112,8 +138,9 @@ private:
       return ret;
     }
 
-  private:
-    void _Reduce() {
+   private:
+    void _Reduce()
+    {
       SdfPredicateExpression::Op op = opStack.back();
       opStack.pop_back();
       SdfPredicateExpression right = std::move(exprStack.back());
@@ -122,12 +149,12 @@ private:
       if (op == SdfPredicateExpression::Not) {
         // Not is the only unary op.
         exprStack.push_back(SdfPredicateExpression::MakeNot(std::move(right)));
-      } else {
+      }
+      else {
         // All other ops are all binary.
         SdfPredicateExpression left = std::move(exprStack.back());
         exprStack.pop_back();
-        exprStack.push_back(SdfPredicateExpression::MakeOp(op, std::move(left),
-                                                           std::move(right)));
+        exprStack.push_back(SdfPredicateExpression::MakeOp(op, std::move(left), std::move(right)));
       }
     }
 
@@ -150,10 +177,9 @@ namespace {
 
 using namespace tao::TAO_PEGTL_NAMESPACE;
 
-template <class Rule, class Sep>
-using LookaheadList = seq<Rule, star<at<Sep, Rule>, Sep, Rule>>;
+template<class Rule, class Sep> using LookaheadList = seq<Rule, star<at<Sep, Rule>, Sep, Rule>>;
 
-template <class Rule> using OptSpaced = pad<Rule, blank>;
+template<class Rule> using OptSpaced = pad<Rule, blank>;
 
 using OptSpacedComma = OptSpaced<one<','>>;
 
@@ -175,33 +201,27 @@ struct Digits : plus<range<'0', '9'>> {};
 struct Exp : seq<one<'e', 'E'>, opt<one<'-', '+'>>, must<Digits>> {};
 struct Frac : if_must<one<'.'>, Digits> {};
 struct PredArgFloat
-    : seq<opt<one<'-'>>,
-          sor<Inf, seq<Digits, if_then_else<Frac, opt<Exp>, Exp>>>> {};
+    : seq<opt<one<'-'>>, sor<Inf, seq<Digits, if_then_else<Frac, opt<Exp>, Exp>>>> {};
 struct PredArgInt : seq<opt<one<'-'>>, Digits> {};
 
 struct PredArgBool : sor<True, False> {};
 
-template <class Quote>
-struct Escaped : sor<Quote, one<'\\', 'b', 'f', 'n', 'r', 't'>> {};
-template <class Quote>
-struct Unescaped : minus<utf8::range<0x20, 0x10FFFF>, Quote> {};
+template<class Quote> struct Escaped : sor<Quote, one<'\\', 'b', 'f', 'n', 'r', 't'>> {};
+template<class Quote> struct Unescaped : minus<utf8::range<0x20, 0x10FFFF>, Quote> {};
 
-template <class Quote>
-struct StringChar
-    : if_then_else<one<'\\'>, must<Escaped<Quote>>, Unescaped<Quote>> {};
+template<class Quote>
+struct StringChar : if_then_else<one<'\\'>, must<Escaped<Quote>>, Unescaped<Quote>> {};
 
-struct QuotedString
-    : sor<if_must<one<'"'>, until<one<'"'>, StringChar<one<'"'>>>>,
-          if_must<one<'\''>, until<one<'\''>, StringChar<one<'\''>>>>> {};
+struct QuotedString : sor<if_must<one<'"'>, until<one<'"'>, StringChar<one<'"'>>>>,
+                          if_must<one<'\''>, until<one<'\''>, StringChar<one<'\''>>>>> {};
 
 struct UnquotedStringDelimiter : sor<blank, one<',', ')', '"', '\''>> {};
-struct UnquotedString : until<at<sor<UnquotedStringDelimiter, eolf>>,
-                              StringChar<UnquotedStringDelimiter>> {};
+struct UnquotedString
+    : until<at<sor<UnquotedStringDelimiter, eolf>>, StringChar<UnquotedStringDelimiter>> {};
 
 struct PredArgString : sor<QuotedString, UnquotedString> {};
 
-struct PredArgVal : sor<PredArgFloat, PredArgInt, PredArgBool, PredArgString> {
-};
+struct PredArgVal : sor<PredArgFloat, PredArgInt, PredArgBool, PredArgString> {};
 
 struct PredKWArgName : minus<identifier, ReservedWord> {};
 
@@ -212,15 +232,14 @@ struct PredParenPosArg : seq<not_at<PredKWArgPrefix>, PredArgVal> {};
 
 struct PredFuncName : minus<identifier, ReservedWord> {};
 
-struct PredParenArgs
-    : if_then_else<list<PredParenPosArg, OptSpacedComma>,
-                   opt<OptSpacedComma, list<PredKWArg, OptSpacedComma>>,
-                   opt<list<PredKWArg, OptSpacedComma>>> {};
+struct PredParenArgs : if_then_else<list<PredParenPosArg, OptSpacedComma>,
+                                    opt<OptSpacedComma, list<PredKWArg, OptSpacedComma>>,
+                                    opt<list<PredKWArg, OptSpacedComma>>> {};
 
 struct PredColonArgs : list<PredArgVal, one<','>> {};
 struct PredColonCall : if_must<seq<PredFuncName, one<':'>>, PredColonArgs> {};
-struct PredParenCall : seq<PredFuncName, OptSpaced<one<'('>>,
-                           must<PredParenArgs, star<blank>, one<')'>>> {};
+struct PredParenCall
+    : seq<PredFuncName, OptSpaced<one<'('>>, must<PredParenArgs, star<blank>, one<')'>>> {};
 
 struct PredBareCall : PredFuncName {};
 
@@ -229,9 +248,10 @@ struct PredExpr;
 struct PredOpenGroup : one<'('> {};
 struct PredCloseGroup : one<')'> {};
 
-struct PredAtom
-    : sor<PredColonCall, PredParenCall, PredBareCall,
-          if_must<PredOpenGroup, OptSpaced<PredExpr>, PredCloseGroup>> {};
+struct PredAtom : sor<PredColonCall,
+                      PredParenCall,
+                      PredBareCall,
+                      if_must<PredOpenGroup, OptSpaced<PredExpr>, PredCloseGroup>> {};
 
 struct PredFactor : seq<opt<OptSpaced<list<NotKW, plus<blank>>>>, PredAtom> {};
 struct PredOperator : sor<OptSpaced<AndKW>, OptSpaced<OrKW>, ImpliedAnd> {};
@@ -239,49 +259,44 @@ struct PredExpr : LookaheadList<PredFactor, PredOperator> {};
 
 // Actions ///////////////////////////////////////////////////////////////
 
-template <class Rule> struct PredAction : nothing<Rule> {};
+template<class Rule> struct PredAction : nothing<Rule> {};
 
-template <SdfPredicateExpression::Op op> struct PredOpAction {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<SdfPredicateExpression::Op op> struct PredOpAction {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.PushOp(op);
   }
 };
 
-template <>
-struct PredAction<NotKW> : PredOpAction<SdfPredicateExpression::Not> {};
-template <>
-struct PredAction<AndKW> : PredOpAction<SdfPredicateExpression::And> {};
-template <>
-struct PredAction<OrKW> : PredOpAction<SdfPredicateExpression::Or> {};
-template <>
-struct PredAction<ImpliedAnd>
-    : PredOpAction<SdfPredicateExpression::ImpliedAnd> {};
+template<> struct PredAction<NotKW> : PredOpAction<SdfPredicateExpression::Not> {};
+template<> struct PredAction<AndKW> : PredOpAction<SdfPredicateExpression::And> {};
+template<> struct PredAction<OrKW> : PredOpAction<SdfPredicateExpression::Or> {};
+template<> struct PredAction<ImpliedAnd> : PredOpAction<SdfPredicateExpression::ImpliedAnd> {};
 
-template <> struct PredAction<PredOpenGroup> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredOpenGroup> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.OpenGroup();
   }
 };
 
-template <> struct PredAction<PredCloseGroup> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredCloseGroup> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.CloseGroup();
   }
 };
 
-template <> struct PredAction<PredFuncName> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredFuncName> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.SetFuncName(in.string());
   }
 };
 
-template <> struct PredAction<PredArgInt> {
-  template <class Input>
-  static bool apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredArgInt> {
+  template<class Input> static bool apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     bool outOfRange = false;
     int64_t ival = TfStringToInt64(in.string(), &outOfRange);
     if (outOfRange) {
@@ -292,37 +307,39 @@ template <> struct PredAction<PredArgInt> {
   }
 };
 
-template <> struct PredAction<PredArgBool> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredArgBool> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.AddFuncArg(VtValue(in.string()[0] == 't'));
   }
 };
 
-template <> struct PredAction<PredArgFloat> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredArgFloat> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     std::string const &instr = in.string();
     double fval;
     if (instr == "inf") {
       fval = std::numeric_limits<double>::infinity();
-    } else if (instr == "-inf") {
+    }
+    else if (instr == "-inf") {
       fval = -std::numeric_limits<double>::infinity();
-    } else {
+    }
+    else {
       fval = TfStringToDouble(instr);
     }
     builder.AddFuncArg(VtValue(fval));
   }
 };
 
-template <> struct PredAction<PredArgString> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredArgString> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     std::string const &instr = in.string();
     size_t trimAmount = 0;
-    if (instr.size() >= 2 &&
-        ((instr.front() == '"' && instr.back() == '"') ||
-         (instr.front() == '\'' && instr.back() == '\''))) {
+    if (instr.size() >= 2 && ((instr.front() == '"' && instr.back() == '"') ||
+                              (instr.front() == '\'' && instr.back() == '\'')))
+    {
       trimAmount = 1;
     }
     builder.AddFuncArg(
@@ -330,39 +347,36 @@ template <> struct PredAction<PredArgString> {
   }
 };
 
-template <> struct PredAction<PredKWArgName> {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<> struct PredAction<PredKWArgName> {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.SetFuncArgKWName(in.string());
   }
 };
 
-template <SdfPredicateExpression::FnCall::Kind callKind> struct PredCallAction {
-  template <class Input>
-  static void apply(Input const &in, SdfPredicateExprBuilder &builder) {
+template<SdfPredicateExpression::FnCall::Kind callKind> struct PredCallAction {
+  template<class Input> static void apply(Input const &in, SdfPredicateExprBuilder &builder)
+  {
     builder.PushCall(callKind);
   }
 };
-template <>
-struct PredAction<PredBareCall>
-    : PredCallAction<SdfPredicateExpression::FnCall::BareCall> {};
-template <>
-struct PredAction<PredParenCall>
-    : PredCallAction<SdfPredicateExpression::FnCall::ParenCall> {};
-template <>
-struct PredAction<PredColonCall>
-    : PredCallAction<SdfPredicateExpression::FnCall::ColonCall> {};
+template<>
+struct PredAction<PredBareCall> : PredCallAction<SdfPredicateExpression::FnCall::BareCall> {};
+template<>
+struct PredAction<PredParenCall> : PredCallAction<SdfPredicateExpression::FnCall::ParenCall> {};
+template<>
+struct PredAction<PredColonCall> : PredCallAction<SdfPredicateExpression::FnCall::ColonCall> {};
 
-template <class Grammar> static void Analyze() {
+template<class Grammar> static void Analyze()
+{
   static const size_t numIssues = analyze<Grammar>();
   if (numIssues) {
-    TF_FATAL_ERROR("%zu issues found in '%s'", numIssues,
-                   TF_FUNC_NAME().c_str());
+    TF_FATAL_ERROR("%zu issues found in '%s'", numIssues, TF_FUNC_NAME().c_str());
   }
 }
 
-} // namespace
+}  // namespace
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PREDICATE_EXPRESSION_PARSER_H
+#endif  // PXR_USD_SDF_PREDICATE_EXPRESSION_PARSER_H

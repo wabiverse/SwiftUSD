@@ -33,7 +33,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct PcpInstanceKey::_Collector {
-  bool Visit(const PcpNodeRef &node, bool nodeIsInstanceable) {
+  bool Visit(const PcpNodeRef &node, bool nodeIsInstanceable)
+  {
     if (nodeIsInstanceable) {
       instancingArcs.push_back(_Arc(node));
       // We can stop immediately if we know there is no payload
@@ -53,7 +54,8 @@ struct PcpInstanceKey::_Collector {
 
 PcpInstanceKey::PcpInstanceKey() : _hash(0) {}
 
-PcpInstanceKey::PcpInstanceKey(const PcpPrimIndex &primIndex) : _hash(0) {
+PcpInstanceKey::PcpInstanceKey(const PcpPrimIndex &primIndex) : _hash(0)
+{
   TRACE_FUNCTION();
 
   // Instance keys only apply to instanceable prim indexes.
@@ -78,29 +80,33 @@ PcpInstanceKey::PcpInstanceKey(const PcpPrimIndex &primIndex) : _hash(0) {
   _hash = TfHash::Combine(_hash, _arcs, _variantSelection);
 }
 
-bool PcpInstanceKey::operator==(const PcpInstanceKey &rhs) const {
+bool PcpInstanceKey::operator==(const PcpInstanceKey &rhs) const
+{
   return _variantSelection == rhs._variantSelection && _arcs == rhs._arcs;
 }
 
-bool PcpInstanceKey::operator!=(const PcpInstanceKey &rhs) const {
+bool PcpInstanceKey::operator!=(const PcpInstanceKey &rhs) const
+{
   return !(*this == rhs);
 }
 
-std::string PcpInstanceKey::GetString() const {
+std::string PcpInstanceKey::GetString() const
+{
   std::string s;
   s += "Arcs:\n";
   if (_arcs.empty()) {
     s += "  (none)\n";
-  } else {
+  }
+  else {
     for (const auto &arc : _arcs) {
       s += TfStringPrintf("  %s%s : %s\n",
                           TfEnum::GetDisplayName(arc._arcType).c_str(),
-                          (arc._timeOffset.IsIdentity()
-                               ? ""
-                               : TfStringPrintf(" (offset: %f scale: %f)",
-                                                arc._timeOffset.GetOffset(),
-                                                arc._timeOffset.GetScale())
-                                     .c_str()),
+                          (arc._timeOffset.IsIdentity() ?
+                               "" :
+                               TfStringPrintf(" (offset: %f scale: %f)",
+                                              arc._timeOffset.GetOffset(),
+                                              arc._timeOffset.GetScale())
+                                   .c_str()),
                           Pcp_FormatSite(arc._sourceSite).c_str());
     }
   }
@@ -108,10 +114,10 @@ std::string PcpInstanceKey::GetString() const {
   s += "Variant selections:\n";
   if (_variantSelection.empty()) {
     s += "  (none)";
-  } else {
+  }
+  else {
     for (const auto &vsel : _variantSelection) {
-      s += TfStringPrintf("  %s = %s\n", vsel.first.c_str(),
-                          vsel.second.c_str());
+      s += TfStringPrintf("  %s = %s\n", vsel.first.c_str(), vsel.second.c_str());
     }
     // Kill the last newline.
     s.erase(s.length() - 1);

@@ -37,19 +37,21 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 using HgiAttachmentDescConstPtrVector = std::vector<HgiAttachmentDesc const *>;
 
-HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
-    HgiVulkanDevice *device,
-    HgiGraphicsPipelineDesc const &desc)
-    : HgiGraphicsPipeline(desc), _device(device), _inflightBits(0), _vkPipeline(nullptr), _vkRenderPass(nullptr), _vkPipelineLayout(nullptr)
+HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(HgiVulkanDevice *device,
+                                                     HgiGraphicsPipelineDesc const &desc)
+    : HgiGraphicsPipeline(desc),
+      _device(device),
+      _inflightBits(0),
+      _vkPipeline(nullptr),
+      _vkRenderPass(nullptr),
+      _vkPipelineLayout(nullptr)
 {
-  VkGraphicsPipelineCreateInfo pipeCreateInfo =
-      {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO};
+  VkGraphicsPipelineCreateInfo pipeCreateInfo = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO};
 
   //
   // Shaders
   //
-  HgiShaderFunctionHandleVector const &sfv =
-      desc.shaderProgram->GetShaderFunctions();
+  HgiShaderFunctionHandleVector const &sfv = desc.shaderProgram->GetShaderFunctions();
 
   // Shader reflection produced descriptor set information that we need
   // to create the pipeline layout.
@@ -60,15 +62,12 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
 
   bool useTessellation = false;
 
-  for (HgiShaderFunctionHandle const &sf : sfv)
-  {
-    HgiVulkanShaderFunction const *s =
-        static_cast<HgiVulkanShaderFunction const *>(sf.Get());
+  for (HgiShaderFunctionHandle const &sf : sfv) {
+    HgiVulkanShaderFunction const *s = static_cast<HgiVulkanShaderFunction const *>(sf.Get());
 
     descriptorSetInfos.push_back(s->GetDescriptorSetInfo());
 
-    VkPipelineShaderStageCreateInfo stage =
-        {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};
+    VkPipelineShaderStageCreateInfo stage = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};
     stage.stage = s->GetShaderStage();
     if (stage.stage == VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT ||
         stage.stage == VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
@@ -78,7 +77,7 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
     stage.module = s->GetShaderModule();
     stage.pName = s->GetShaderFunctionName();
     stage.pNext = nullptr;
-    stage.pSpecializationInfo = nullptr; // XXX allows shader optimizations
+    stage.pSpecializationInfo = nullptr;  // XXX allows shader optimizations
     stage.flags = 0;
     stages.push_back(std::move(stage));
   }
@@ -95,10 +94,8 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   std::vector<VkVertexInputAttributeDescription> vertAttrs;
   std::vector<VkVertexInputBindingDivisorDescriptionEXT> vertBindingDivisors;
 
-  for (HgiVertexBufferDesc const &vbo : desc.vertexBuffers)
-  {
-    for (HgiVertexAttributeDesc const &va : vbo.vertexAttributes)
-    {
+  for (HgiVertexBufferDesc const &vbo : desc.vertexBuffers) {
+    for (HgiVertexAttributeDesc const &va : vbo.vertexAttributes) {
       VkVertexInputAttributeDescription ad;
       ad.binding = vbo.bindingIndex;
       ad.location = va.shaderBindLocation;
@@ -111,9 +108,7 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
     vib.binding = vbo.bindingIndex;
     vib.stride = vbo.vertexStride;
 
-    if (vbo.vertexStepFunction ==
-        HgiVertexBufferStepFunctionPerDrawCommand)
-    {
+    if (vbo.vertexStepFunction == HgiVertexBufferStepFunctionPerDrawCommand) {
       // Set the divisor such that the attribute index will advance only
       // according to the base instance at the start of each draw in a
       // multi-draw command.
@@ -121,24 +116,23 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
 
       VkVertexInputBindingDivisorDescriptionEXT vibDivisor;
       vibDivisor.binding = vbo.bindingIndex;
-      vibDivisor.divisor = _device->GetDeviceCapabilities().vkVertexAttributeDivisorProperties.maxVertexAttribDivisor;
+      vibDivisor.divisor = _device->GetDeviceCapabilities()
+                               .vkVertexAttributeDivisorProperties.maxVertexAttribDivisor;
       vertBindingDivisors.push_back(std::move(vibDivisor));
     }
-    else
-    {
+    else {
       vib.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
     }
     vertBufs.push_back(std::move(vib));
   }
 
-  VkPipelineVertexInputDivisorStateCreateInfoEXT vertexInputDivisor =
-      {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_DIVISOR_STATE_CREATE_INFO_EXT};
+  VkPipelineVertexInputDivisorStateCreateInfoEXT vertexInputDivisor = {
+      VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_DIVISOR_STATE_CREATE_INFO_EXT};
   vertexInputDivisor.pVertexBindingDivisors = vertBindingDivisors.data();
-  vertexInputDivisor.vertexBindingDivisorCount =
-      (uint32_t)vertBindingDivisors.size();
+  vertexInputDivisor.vertexBindingDivisorCount = (uint32_t)vertBindingDivisors.size();
 
-  VkPipelineVertexInputStateCreateInfo vertexInput =
-      {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
+  VkPipelineVertexInputStateCreateInfo vertexInput = {
+      VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
   vertexInput.pVertexAttributeDescriptions = vertAttrs.data();
   vertexInput.vertexAttributeDescriptionCount = (uint32_t)vertAttrs.size();
   vertexInput.pVertexBindingDescriptions = vertBufs.data();
@@ -151,22 +145,19 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   // Input assembly state
   // Declare how your vertices form the geometry you want to draw.
   //
-  VkPipelineInputAssemblyStateCreateInfo inputAssembly =
-      {VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
+  VkPipelineInputAssemblyStateCreateInfo inputAssembly = {
+      VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
 
-  inputAssembly.topology =
-      HgiVulkanConversions::GetPrimitiveType(desc.primitiveType);
+  inputAssembly.topology = HgiVulkanConversions::GetPrimitiveType(desc.primitiveType);
   pipeCreateInfo.pInputAssemblyState = &inputAssembly;
 
   //
   // Tessellation State
   //
-  VkPipelineTessellationStateCreateInfo tessellationState =
-      {VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO};
-  if (useTessellation)
-  {
-    tessellationState.patchControlPoints =
-        desc.tessellationState.primitiveIndexSize;
+  VkPipelineTessellationStateCreateInfo tessellationState = {
+      VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO};
+  if (useTessellation) {
+    tessellationState.patchControlPoints = desc.tessellationState.primitiveIndexSize;
     pipeCreateInfo.pTessellationState = &tessellationState;
   }
 
@@ -174,8 +165,8 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   // Viewport and Scissor state
   // If these are set via a command, state this in Dynamic states below.
   //
-  VkPipelineViewportStateCreateInfo viewportState =
-      {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
+  VkPipelineViewportStateCreateInfo viewportState = {
+      VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
   viewportState.viewportCount = 1;
   viewportState.scissorCount = 1;
   viewportState.pScissors = nullptr;
@@ -188,20 +179,17 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   //
   HgiRasterizationState const &ras = desc.rasterizationState;
 
-  VkPipelineRasterizationStateCreateInfo rasterState =
-      {VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO};
+  VkPipelineRasterizationStateCreateInfo rasterState = {
+      VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO};
   rasterState.lineWidth = ras.lineWidth;
   rasterState.cullMode = HgiVulkanConversions::GetCullMode(ras.cullMode);
-  rasterState.polygonMode =
-      HgiVulkanConversions::GetPolygonMode(ras.polygonMode);
+  rasterState.polygonMode = HgiVulkanConversions::GetPolygonMode(ras.polygonMode);
   rasterState.frontFace = HgiVulkanConversions::GetWinding(ras.winding);
   rasterState.rasterizerDiscardEnable = !ras.rasterizerEnabled;
   rasterState.depthClampEnable = ras.depthClampEnabled;
 
-  VkPipelineRasterizationConservativeStateCreateInfoEXT
-      conservativeRasterState = {};
-  if (device->GetDeviceCapabilities().IsSet(
-          HgiDeviceCapabilitiesBitsConservativeRaster) &&
+  VkPipelineRasterizationConservativeStateCreateInfoEXT conservativeRasterState = {};
+  if (device->GetDeviceCapabilities().IsSet(HgiDeviceCapabilitiesBitsConservativeRaster) &&
       ras.conservativeRaster)
   {
     conservativeRasterState.sType =
@@ -219,11 +207,10 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   //
   HgiMultiSampleState const &ms = desc.multiSampleState;
 
-  VkPipelineMultisampleStateCreateInfo multisampleState =
-      {VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
+  VkPipelineMultisampleStateCreateInfo multisampleState = {
+      VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
   multisampleState.pSampleMask = nullptr;
-  multisampleState.rasterizationSamples =
-      HgiVulkanConversions::GetSampleCount(ms.sampleCount);
+  multisampleState.rasterizationSamples = HgiVulkanConversions::GetSampleCount(ms.sampleCount);
   multisampleState.sampleShadingEnable = VK_FALSE;
   multisampleState.minSampleShading = 0.5f;
   multisampleState.alphaToCoverageEnable = ms.alphaToCoverageEnable;
@@ -233,29 +220,25 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   //
   // Depth Stencil state
   //
-  VkPipelineDepthStencilStateCreateInfo depthStencilState =
-      {VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
+  VkPipelineDepthStencilStateCreateInfo depthStencilState = {
+      VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
 
   depthStencilState.depthTestEnable = desc.depthState.depthTestEnabled;
   depthStencilState.depthWriteEnable = desc.depthState.depthWriteEnabled;
 
-  depthStencilState.depthCompareOp =
-      HgiVulkanConversions::GetDepthCompareFunction(
-          desc.depthState.depthCompareFn);
+  depthStencilState.depthCompareOp = HgiVulkanConversions::GetDepthCompareFunction(
+      desc.depthState.depthCompareFn);
 
   depthStencilState.depthBoundsTestEnable = VK_FALSE;
   depthStencilState.minDepthBounds = 0;
   depthStencilState.maxDepthBounds = 0;
 
-  depthStencilState.stencilTestEnable =
-      desc.depthState.stencilTestEnabled;
+  depthStencilState.stencilTestEnable = desc.depthState.stencilTestEnabled;
 
-  if (desc.depthState.stencilTestEnabled)
-  {
+  if (desc.depthState.stencilTestEnabled) {
     TF_CODING_ERROR("Missing implementation stencil mask enabled");
   }
-  else
-  {
+  else {
     depthStencilState.back.failOp = VK_STENCIL_OP_KEEP;
     depthStencilState.back.passOp = VK_STENCIL_OP_KEEP;
     depthStencilState.back.compareOp = VK_COMPARE_OP_ALWAYS;
@@ -273,35 +256,26 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   // Per attachment configuration of how output color blends with destination.
   //
   std::vector<VkPipelineColorBlendAttachmentState> colorAttachState;
-  for (HgiAttachmentDesc const &attach : desc.colorAttachmentDescs)
-  {
-    VkPipelineColorBlendAttachmentState ca =
-        {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
+  for (HgiAttachmentDesc const &attach : desc.colorAttachmentDescs) {
+    VkPipelineColorBlendAttachmentState ca = {
+        VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
 
-    ca.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
-                        VK_COLOR_COMPONENT_G_BIT |
-                        VK_COLOR_COMPONENT_B_BIT |
-                        VK_COLOR_COMPONENT_A_BIT;
+    ca.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                        VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
     ca.blendEnable = attach.blendEnabled;
-    ca.alphaBlendOp =
-        HgiVulkanConversions::GetBlendEquation(attach.alphaBlendOp);
-    ca.colorBlendOp =
-        HgiVulkanConversions::GetBlendEquation(attach.colorBlendOp);
-    ca.srcColorBlendFactor =
-        HgiVulkanConversions::GetBlendFactor(attach.srcColorBlendFactor);
-    ca.dstColorBlendFactor =
-        HgiVulkanConversions::GetBlendFactor(attach.dstColorBlendFactor);
-    ca.srcAlphaBlendFactor =
-        HgiVulkanConversions::GetBlendFactor(attach.srcAlphaBlendFactor);
-    ca.dstAlphaBlendFactor =
-        HgiVulkanConversions::GetBlendFactor(attach.dstAlphaBlendFactor);
+    ca.alphaBlendOp = HgiVulkanConversions::GetBlendEquation(attach.alphaBlendOp);
+    ca.colorBlendOp = HgiVulkanConversions::GetBlendEquation(attach.colorBlendOp);
+    ca.srcColorBlendFactor = HgiVulkanConversions::GetBlendFactor(attach.srcColorBlendFactor);
+    ca.dstColorBlendFactor = HgiVulkanConversions::GetBlendFactor(attach.dstColorBlendFactor);
+    ca.srcAlphaBlendFactor = HgiVulkanConversions::GetBlendFactor(attach.srcAlphaBlendFactor);
+    ca.dstAlphaBlendFactor = HgiVulkanConversions::GetBlendFactor(attach.dstAlphaBlendFactor);
 
     colorAttachState.push_back(std::move(ca));
   }
 
-  VkPipelineColorBlendStateCreateInfo colorBlendState =
-      {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
+  VkPipelineColorBlendStateCreateInfo colorBlendState = {
+      VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
   colorBlendState.attachmentCount = (uint32_t)colorAttachState.size();
   colorBlendState.pAttachments = colorAttachState.data();
   colorBlendState.logicOpEnable = VK_FALSE;
@@ -316,11 +290,10 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   // Dynamic States
   // States that change during command buffer execution via a command
   //
-  VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT,
-                                    VK_DYNAMIC_STATE_SCISSOR};
+  VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-  VkPipelineDynamicStateCreateInfo dynamicState =
-      {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+  VkPipelineDynamicStateCreateInfo dynamicState = {
+      VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
   dynamicState.dynamicStateCount = (uint32_t)TfArraySize(dynamicStates);
   dynamicState.pDynamicStates = dynamicStates;
   pipeCreateInfo.pDynamicState = &dynamicState;
@@ -330,18 +303,15 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   //
   bool usePushConstants = desc.shaderConstantsDesc.byteSize > 0;
   VkPushConstantRange pcRanges;
-  if (usePushConstants)
-  {
-    TF_VERIFY(desc.shaderConstantsDesc.byteSize % 4 == 0,
-              "Push constants not multipes of 4");
+  if (usePushConstants) {
+    TF_VERIFY(desc.shaderConstantsDesc.byteSize % 4 == 0, "Push constants not multipes of 4");
     pcRanges.offset = 0;
     pcRanges.size = desc.shaderConstantsDesc.byteSize;
     pcRanges.stageFlags = HgiVulkanConversions::GetShaderStages(
         desc.shaderConstantsDesc.stageUsage);
   }
 
-  VkPipelineLayoutCreateInfo pipeLayCreateInfo =
-      {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+  VkPipelineLayoutCreateInfo pipeLayCreateInfo = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
   pipeLayCreateInfo.pushConstantRangeCount = usePushConstants ? 1 : 0;
   pipeLayCreateInfo.pPushConstantRanges = &pcRanges;
 
@@ -350,22 +320,16 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   pipeLayCreateInfo.setLayoutCount = (uint32_t)_vkDescriptorSetLayouts.size();
   pipeLayCreateInfo.pSetLayouts = _vkDescriptorSetLayouts.data();
 
-  TF_VERIFY(
-      vkCreatePipelineLayout(
-          _device->GetVulkanDevice(),
-          &pipeLayCreateInfo,
-          HgiVulkanAllocator(),
-          &_vkPipelineLayout) == VK_SUCCESS);
+  TF_VERIFY(vkCreatePipelineLayout(_device->GetVulkanDevice(),
+                                   &pipeLayCreateInfo,
+                                   HgiVulkanAllocator(),
+                                   &_vkPipelineLayout) == VK_SUCCESS);
 
   // Debug label
-  if (!desc.debugName.empty())
-  {
+  if (!desc.debugName.empty()) {
     std::string debugLabel = "PipelineLayout " + desc.debugName;
     HgiVulkanSetDebugName(
-        device,
-        (uint64_t)_vkPipelineLayout,
-        VK_OBJECT_TYPE_PIPELINE_LAYOUT,
-        debugLabel.c_str());
+        device, (uint64_t)_vkPipelineLayout, VK_OBJECT_TYPE_PIPELINE_LAYOUT, debugLabel.c_str());
   }
 
   pipeCreateInfo.layout = _vkPipelineLayout;
@@ -382,58 +346,35 @@ HgiVulkanGraphicsPipeline::HgiVulkanGraphicsPipeline(
   //
   HgiVulkanPipelineCache *pCache = device->GetPipelineCache();
 
-  TF_VERIFY(
-      vkCreateGraphicsPipelines(
-          _device->GetVulkanDevice(),
-          pCache->GetVulkanPipelineCache(),
-          1,
-          &pipeCreateInfo,
-          HgiVulkanAllocator(),
-          &_vkPipeline) == VK_SUCCESS);
+  TF_VERIFY(vkCreateGraphicsPipelines(_device->GetVulkanDevice(),
+                                      pCache->GetVulkanPipelineCache(),
+                                      1,
+                                      &pipeCreateInfo,
+                                      HgiVulkanAllocator(),
+                                      &_vkPipeline) == VK_SUCCESS);
 
   // Debug label
-  if (!desc.debugName.empty())
-  {
+  if (!desc.debugName.empty()) {
     std::string debugLabel = "Pipeline " + desc.debugName;
     HgiVulkanSetDebugName(
-        device,
-        (uint64_t)_vkPipeline,
-        VK_OBJECT_TYPE_PIPELINE,
-        debugLabel.c_str());
+        device, (uint64_t)_vkPipeline, VK_OBJECT_TYPE_PIPELINE, debugLabel.c_str());
   }
 }
 
 HgiVulkanGraphicsPipeline::~HgiVulkanGraphicsPipeline()
 {
-  for (HgiVulkan_Framebuffer const &fb : _framebuffers)
-  {
-    vkDestroyFramebuffer(
-        _device->GetVulkanDevice(),
-        fb.vkFramebuffer,
-        HgiVulkanAllocator());
+  for (HgiVulkan_Framebuffer const &fb : _framebuffers) {
+    vkDestroyFramebuffer(_device->GetVulkanDevice(), fb.vkFramebuffer, HgiVulkanAllocator());
   }
 
-  vkDestroyRenderPass(
-      _device->GetVulkanDevice(),
-      _vkRenderPass,
-      HgiVulkanAllocator());
+  vkDestroyRenderPass(_device->GetVulkanDevice(), _vkRenderPass, HgiVulkanAllocator());
 
-  vkDestroyPipelineLayout(
-      _device->GetVulkanDevice(),
-      _vkPipelineLayout,
-      HgiVulkanAllocator());
+  vkDestroyPipelineLayout(_device->GetVulkanDevice(), _vkPipelineLayout, HgiVulkanAllocator());
 
-  vkDestroyPipeline(
-      _device->GetVulkanDevice(),
-      _vkPipeline,
-      HgiVulkanAllocator());
+  vkDestroyPipeline(_device->GetVulkanDevice(), _vkPipeline, HgiVulkanAllocator());
 
-  for (VkDescriptorSetLayout layout : _vkDescriptorSetLayouts)
-  {
-    vkDestroyDescriptorSetLayout(
-        _device->GetVulkanDevice(),
-        layout,
-        HgiVulkanAllocator());
+  for (VkDescriptorSetLayout layout : _vkDescriptorSetLayouts) {
+    vkDestroyDescriptorSetLayout(_device->GetVulkanDevice(), layout, HgiVulkanAllocator());
   }
 }
 
@@ -442,29 +383,22 @@ void HgiVulkanGraphicsPipeline::BindPipeline(VkCommandBuffer cb)
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipeline);
 }
 
-VkPipelineLayout
-HgiVulkanGraphicsPipeline::GetVulkanPipelineLayout() const
+VkPipelineLayout HgiVulkanGraphicsPipeline::GetVulkanPipelineLayout() const
 {
   return _vkPipelineLayout;
 }
 
-VkRenderPass
-HgiVulkanGraphicsPipeline::GetVulkanRenderPass() const
+VkRenderPass HgiVulkanGraphicsPipeline::GetVulkanRenderPass() const
 {
   return _vkRenderPass;
 }
 
-VkFramebuffer
-HgiVulkanGraphicsPipeline::AcquireVulkanFramebuffer(
-    HgiGraphicsCmdsDesc const &gfxDesc,
-    GfVec2i *dimensions)
+VkFramebuffer HgiVulkanGraphicsPipeline::AcquireVulkanFramebuffer(
+    HgiGraphicsCmdsDesc const &gfxDesc, GfVec2i *dimensions)
 {
-  for (HgiVulkan_Framebuffer const &fb : _framebuffers)
-  {
-    if (fb.desc == gfxDesc)
-    {
-      if (dimensions)
-      {
+  for (HgiVulkan_Framebuffer const &fb : _framebuffers) {
+    if (fb.desc == gfxDesc) {
+      if (dimensions) {
         *dimensions = fb.dimensions;
       }
       return fb.vkFramebuffer;
@@ -478,13 +412,9 @@ HgiVulkanGraphicsPipeline::AcquireVulkanFramebuffer(
   // for multiple differently sized attachments that are compatible with
   // the pipeline. E.g. a blur pyramid where attachment config is the same,
   // but the sizes shrink.
-  if (_framebuffers.size() > 32)
-  {
+  if (_framebuffers.size() > 32) {
     auto fbIt = _framebuffers.begin();
-    vkDestroyFramebuffer(
-        _device->GetVulkanDevice(),
-        fbIt->vkFramebuffer,
-        HgiVulkanAllocator());
+    vkDestroyFramebuffer(_device->GetVulkanDevice(), fbIt->vkFramebuffer, HgiVulkanAllocator());
     _framebuffers.erase(fbIt);
   }
 
@@ -493,37 +423,28 @@ HgiVulkanGraphicsPipeline::AcquireVulkanFramebuffer(
 
   // Make a list of all attachments (color, depth, resolve).
   std::vector<HgiTextureHandle> textures;
-  textures.insert(
-      textures.end(),
-      gfxDesc.colorTextures.begin(),
-      gfxDesc.colorTextures.end());
+  textures.insert(textures.end(), gfxDesc.colorTextures.begin(), gfxDesc.colorTextures.end());
 
-  if (gfxDesc.depthTexture)
-  {
+  if (gfxDesc.depthTexture) {
     textures.push_back(gfxDesc.depthTexture);
   }
 
   textures.insert(
-      textures.end(),
-      gfxDesc.colorResolveTextures.begin(),
-      gfxDesc.colorResolveTextures.end());
+      textures.end(), gfxDesc.colorResolveTextures.begin(), gfxDesc.colorResolveTextures.end());
 
-  if (gfxDesc.depthResolveTexture)
-  {
+  if (gfxDesc.depthResolveTexture) {
     textures.push_back(gfxDesc.depthResolveTexture);
   }
 
   std::vector<VkImageView> views;
-  for (HgiTextureHandle const &texHandle : textures)
-  {
+  for (HgiTextureHandle const &texHandle : textures) {
     HgiVulkanTexture *tex = static_cast<HgiVulkanTexture *>(texHandle.Get());
     views.push_back(tex->GetImageView());
     framebuffer.dimensions[0] = tex->GetDescriptor().dimensions[0];
     framebuffer.dimensions[1] = tex->GetDescriptor().dimensions[1];
   }
 
-  VkFramebufferCreateInfo fbCreateInfo =
-      {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
+  VkFramebufferCreateInfo fbCreateInfo = {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
   fbCreateInfo.renderPass = _vkRenderPass;
   fbCreateInfo.attachmentCount = (uint32_t)views.size();
   fbCreateInfo.pAttachments = views.data();
@@ -531,73 +452,64 @@ HgiVulkanGraphicsPipeline::AcquireVulkanFramebuffer(
   fbCreateInfo.height = framebuffer.dimensions[1];
   fbCreateInfo.layers = 1;
 
-  TF_VERIFY(
-      vkCreateFramebuffer(
-          _device->GetVulkanDevice(),
-          &fbCreateInfo,
-          HgiVulkanAllocator(),
-          &framebuffer.vkFramebuffer) == VK_SUCCESS);
+  TF_VERIFY(vkCreateFramebuffer(_device->GetVulkanDevice(),
+                                &fbCreateInfo,
+                                HgiVulkanAllocator(),
+                                &framebuffer.vkFramebuffer) == VK_SUCCESS);
 
   // Debug label
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     std::string debugLabel = "Framebuffer " + _descriptor.debugName;
-    HgiVulkanSetDebugName(
-        _device,
-        (uint64_t)framebuffer.vkFramebuffer,
-        VK_OBJECT_TYPE_FRAMEBUFFER,
-        debugLabel.c_str());
+    HgiVulkanSetDebugName(_device,
+                          (uint64_t)framebuffer.vkFramebuffer,
+                          VK_OBJECT_TYPE_FRAMEBUFFER,
+                          debugLabel.c_str());
   }
 
   TF_VERIFY(framebuffer.dimensions[0] > 0 && framebuffer.dimensions[1] > 0);
 
   _framebuffers.push_back(std::move(framebuffer));
 
-  if (dimensions)
-  {
+  if (dimensions) {
     *dimensions = framebuffer.dimensions;
   }
   return framebuffer.vkFramebuffer;
 }
 
-HgiVulkanDevice *
-HgiVulkanGraphicsPipeline::GetDevice() const
+HgiVulkanDevice *HgiVulkanGraphicsPipeline::GetDevice() const
 {
   return _device;
 }
 
-VkClearValueVector const &
-HgiVulkanGraphicsPipeline::GetClearValues() const
+VkClearValueVector const &HgiVulkanGraphicsPipeline::GetClearValues() const
 {
   return _vkClearValues;
 }
 
-uint64_t &
-HgiVulkanGraphicsPipeline::GetInflightBits()
+uint64_t &HgiVulkanGraphicsPipeline::GetInflightBits()
 {
   return _inflightBits;
 }
 
-static void
-_ProcessAttachment(
-    HgiAttachmentDesc const &attachment,
-    uint32_t attachmentIndex,
-    HgiSampleCount sampleCount,
-    VkClearValue *vkClearValue,
-    VkAttachmentDescription2 *vkAttachDesc,
-    VkAttachmentReference2 *vkRef)
+static void _ProcessAttachment(HgiAttachmentDesc const &attachment,
+                               uint32_t attachmentIndex,
+                               HgiSampleCount sampleCount,
+                               VkClearValue *vkClearValue,
+                               VkAttachmentDescription2 *vkAttachDesc,
+                               VkAttachmentReference2 *vkRef)
 {
-  bool const isDepthAttachment =
-      attachment.usage & HgiTextureUsageBitsDepthTarget;
+  bool const isDepthAttachment = attachment.usage & HgiTextureUsageBitsDepthTarget;
   //
   // Reference
   //
   vkRef->sType = {VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2};
   vkRef->pNext = nullptr;
   vkRef->attachment = attachmentIndex;
-  vkRef->aspectMask = isDepthAttachment ? VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+  vkRef->aspectMask = isDepthAttachment ? VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT :
+                                          VK_IMAGE_ASPECT_COLOR_BIT;
   // The desired layout of the image during the sub pass
-  vkRef->layout = isDepthAttachment ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  vkRef->layout = isDepthAttachment ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
+                                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
   //
   // Description
@@ -605,15 +517,13 @@ _ProcessAttachment(
   // The layout at the end of the render pass.
   // XXX We don't know previous or next passes so for now we transition back
   // to our default. This may cause non-ideal image transitions.
-  VkImageLayout layout =
-      HgiVulkanTexture::GetDefaultImageLayout(attachment.usage);
+  VkImageLayout layout = HgiVulkanTexture::GetDefaultImageLayout(attachment.usage);
 
   vkAttachDesc->sType = {VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2};
   vkAttachDesc->pNext = nullptr;
   vkAttachDesc->finalLayout = layout;
   vkAttachDesc->flags = 0;
-  vkAttachDesc->format = HgiVulkanConversions::GetFormat(
-      attachment.format, isDepthAttachment);
+  vkAttachDesc->format = HgiVulkanConversions::GetFormat(attachment.format, isDepthAttachment);
   vkAttachDesc->initialLayout = layout;
   vkAttachDesc->loadOp = HgiVulkanConversions::GetLoadOp(attachment.loadOp);
   vkAttachDesc->samples = HgiVulkanConversions::GetSampleCount(sampleCount);
@@ -637,30 +547,24 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
 {
   HgiSampleCount samples = _descriptor.multiSampleState.sampleCount;
 
-  if (!_descriptor.colorResolveAttachmentDescs.empty())
-  {
-    TF_VERIFY(
-        _descriptor.colorAttachmentDescs.size() ==
-            _descriptor.colorResolveAttachmentDescs.size(),
-        "Count mismatch between color and resolve attachments");
-    TF_VERIFY(
-        samples > HgiSampleCount1,
-        "Pipeline sample count must be greater than one to use resolve");
+  if (!_descriptor.colorResolveAttachmentDescs.empty()) {
+    TF_VERIFY(_descriptor.colorAttachmentDescs.size() ==
+                  _descriptor.colorResolveAttachmentDescs.size(),
+              "Count mismatch between color and resolve attachments");
+    TF_VERIFY(samples > HgiSampleCount1,
+              "Pipeline sample count must be greater than one to use resolve");
   }
 
   // Determine description and reference for each attachment
   _vkClearValues.clear();
   std::vector<VkAttachmentDescription2> vkDescriptions;
   std::vector<VkAttachmentReference2> vkColorReferences;
-  VkAttachmentReference2 vkDepthReference =
-      {VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2};
+  VkAttachmentReference2 vkDepthReference = {VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2};
   std::vector<VkAttachmentReference2> vkColorResolveReferences;
-  VkAttachmentReference2 vkDepthResolveReference =
-      {VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2};
+  VkAttachmentReference2 vkDepthResolveReference = {VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2};
 
   // Process color attachments
-  for (HgiAttachmentDesc const &desc : _descriptor.colorAttachmentDescs)
-  {
+  for (HgiAttachmentDesc const &desc : _descriptor.colorAttachmentDescs) {
     uint32_t slot = (uint32_t)vkDescriptions.size();
     VkClearValue vkClear;
     VkAttachmentDescription2 vkDesc;
@@ -673,8 +577,7 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
 
   // Process depth attachment
   bool hasDepth = _descriptor.depthAttachmentDesc.format != HgiFormatInvalid;
-  if (hasDepth)
-  {
+  if (hasDepth) {
     HgiAttachmentDesc const &desc = _descriptor.depthAttachmentDesc;
     uint32_t slot = (uint32_t)vkDescriptions.size();
     VkClearValue vkClear;
@@ -686,8 +589,7 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   }
 
   // Process color resolve attachments
-  for (HgiAttachmentDesc const &desc : _descriptor.colorResolveAttachmentDescs)
-  {
+  for (HgiAttachmentDesc const &desc : _descriptor.colorResolveAttachmentDescs) {
     uint32_t slot = (uint32_t)vkDescriptions.size();
     VkClearValue vkClear;
     VkAttachmentDescription2 vkDesc;
@@ -699,10 +601,8 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   }
 
   // Process depth resolve attachment
-  bool hasDepthResolve =
-      _descriptor.depthResolveAttachmentDesc.format != HgiFormatInvalid;
-  if (hasDepthResolve)
-  {
+  bool hasDepthResolve = _descriptor.depthResolveAttachmentDesc.format != HgiFormatInvalid;
+  if (hasDepthResolve) {
     HgiAttachmentDesc const &desc = _descriptor.depthResolveAttachmentDesc;
     uint32_t slot = (uint32_t)vkDescriptions.size();
     VkClearValue vkClear;
@@ -716,8 +616,7 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   //
   // Attachments
   //
-  VkSubpassDescription2KHR subpassDesc =
-      {VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2_KHR};
+  VkSubpassDescription2KHR subpassDesc = {VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2_KHR};
   subpassDesc.flags = 0;
   subpassDesc.viewMask = 0;
   subpassDesc.inputAttachmentCount = 0;
@@ -730,10 +629,9 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   subpassDesc.pResolveAttachments = vkColorResolveReferences.data();
   subpassDesc.pDepthStencilAttachment = hasDepth ? &vkDepthReference : nullptr;
 
-  VkSubpassDescriptionDepthStencilResolveKHR depthResolve =
-      {VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_DEPTH_STENCIL_RESOLVE_KHR};
-  if (hasDepthResolve)
-  {
+  VkSubpassDescriptionDepthStencilResolveKHR depthResolve = {
+      VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_DEPTH_STENCIL_RESOLVE_KHR};
+  if (hasDepthResolve) {
     depthResolve.pDepthStencilResolveAttachment = &vkDepthResolveReference;
     depthResolve.depthResolveMode = VK_RESOLVE_MODE_SAMPLE_ZERO_BIT;
     depthResolve.stencilResolveMode = VK_RESOLVE_MODE_NONE;
@@ -746,9 +644,8 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   // Use subpass dependencies to transition image layouts and act as barrier
   // to ensure the read and write operations happen when it is allowed.
   //
-  VkSubpassDependency2KHR dependencies[2] =
-      {{VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2_KHR},
-       {VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2_KHR}};
+  VkSubpassDependency2KHR dependencies[2] = {{VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2_KHR},
+                                             {VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2_KHR}};
 
   // Start of subpass -- ensure shader reading is completed before FB write.
   dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -759,9 +656,7 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
   dependencies[0].dstStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
   dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-  dependencies[0].dstAccessMask =
-      VK_ACCESS_MEMORY_READ_BIT |
-      VK_ACCESS_MEMORY_WRITE_BIT;
+  dependencies[0].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 
   dependencies[0].viewOffset = 0;
 
@@ -774,17 +669,14 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
   dependencies[1].srcStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
   dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-  dependencies[1].srcAccessMask =
-      VK_ACCESS_MEMORY_READ_BIT |
-      VK_ACCESS_MEMORY_WRITE_BIT;
+  dependencies[1].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
 
   dependencies[1].viewOffset = 0;
 
   //
   // Create the renderpass
   //
-  VkRenderPassCreateInfo2KHR renderPassInfo =
-      {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2_KHR};
+  VkRenderPassCreateInfo2KHR renderPassInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2_KHR};
   renderPassInfo.attachmentCount = (uint32_t)vkDescriptions.size();
   renderPassInfo.pAttachments = vkDescriptions.data();
   renderPassInfo.subpassCount = 1;
@@ -800,22 +692,16 @@ void HgiVulkanGraphicsPipeline::_CreateRenderPass()
   vkCreateRenderPass2KHR = (PFN_vkCreateRenderPass2KHR)vkGetDeviceProcAddr(
       _device->GetVulkanDevice(), "vkCreateRenderPass2KHR");
 
-  TF_VERIFY(
-      vkCreateRenderPass2KHR(
-          _device->GetVulkanDevice(),
-          &renderPassInfo,
-          HgiVulkanAllocator(),
-          &_vkRenderPass) == VK_SUCCESS);
+  TF_VERIFY(vkCreateRenderPass2KHR(_device->GetVulkanDevice(),
+                                   &renderPassInfo,
+                                   HgiVulkanAllocator(),
+                                   &_vkRenderPass) == VK_SUCCESS);
 
   // Debug label
-  if (!_descriptor.debugName.empty())
-  {
+  if (!_descriptor.debugName.empty()) {
     std::string debugLabel = "RenderPass " + _descriptor.debugName;
     HgiVulkanSetDebugName(
-        _device,
-        (uint64_t)_vkRenderPass,
-        VK_OBJECT_TYPE_RENDER_PASS,
-        debugLabel.c_str());
+        _device, (uint64_t)_vkRenderPass, VK_OBJECT_TYPE_RENDER_PASS, debugLabel.c_str());
   }
 }
 

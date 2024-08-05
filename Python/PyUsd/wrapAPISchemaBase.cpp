@@ -42,28 +42,29 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define WRAP_CUSTOM                                                            \
-  template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapUsdAPISchemaBase() {
+void wrapUsdAPISchemaBase()
+{
   typedef UsdAPISchemaBase This;
 
-  class_<This, bases<UsdSchemaBase>, boost::noncopyable> cls("APISchemaBase",
-                                                             "", no_init);
+  class_<This, bases<UsdSchemaBase>, boost::noncopyable> cls("APISchemaBase", "", no_init);
 
   cls.def(TfTypePythonClass())
 
-      .def("GetSchemaAttributeNames", &This::GetSchemaAttributeNames,
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
            arg("includeInherited") = true,
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
@@ -97,4 +98,4 @@ namespace {
 
 WRAP_CUSTOM {}
 
-} // namespace
+}  // namespace

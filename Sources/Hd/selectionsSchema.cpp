@@ -23,40 +23,33 @@
 //
 
 #include "Hd/selectionsSchema.h"
-#include "Hd/selectionSchema.h"
 #include "Hd/retainedDataSource.h"
+#include "Hd/selectionSchema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSelectionsSchemaTokens,
-    HDSELECTIONS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSelectionsSchemaTokens, HDSELECTIONS_SCHEMA_TOKENS);
 
 /*static*/
-HdSelectionsSchema
-HdSelectionsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdSelectionsSchema HdSelectionsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdSelectionsSchema(
-        fromParentContainer
-        ? HdVectorDataSource::Cast(fromParentContainer->Get(
-                HdSelectionsSchemaTokens->selections))
-        : nullptr);
+  return HdSelectionsSchema(fromParentContainer ?
+                                HdVectorDataSource::Cast(fromParentContainer->Get(
+                                    HdSelectionsSchemaTokens->selections)) :
+                                nullptr);
 }
 
 /*static*/
-const TfToken &
-HdSelectionsSchema::GetSchemaToken()
+const TfToken &HdSelectionsSchema::GetSchemaToken()
 {
-    return HdSelectionsSchemaTokens->selections;
+  return HdSelectionsSchemaTokens->selections;
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdSelectionsSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdSelectionsSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdSelectionsSchemaTokens->selections
-    );
-    return locator;
-} 
+  static const HdDataSourceLocator locator(HdSelectionsSchemaTokens->selections);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

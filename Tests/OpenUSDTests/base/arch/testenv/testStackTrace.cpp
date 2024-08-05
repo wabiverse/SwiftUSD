@@ -22,15 +22,15 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/stackTrace.h"
 #include "Arch/defines.h"
 #include "Arch/error.h"
 #include "Arch/fileSystem.h"
+#include "Arch/stackTrace.h"
 #include "Arch/testArchUtil.h"
+#include "pxr/pxr.h"
 
-#include <string>
 #include <cstdlib>
+#include <string>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -72,8 +72,7 @@ int main(int argc, char **argv)
   // test GetStackTrace
   std::vector<std::string> stackTrace = ArchGetStackTrace(20);
   bool found = false;
-  for (unsigned int i = 0; i < stackTrace.size(); i++)
-  {
+  for (unsigned int i = 0; i < stackTrace.size(); i++) {
     found |= (stackTrace[i].find("main", 0) != std::string::npos);
   }
 #if defined(ARCH_OS_WINDOWS) && !defined(_DEBUG)

@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_SAMPLE_FILTER_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_SAMPLE_FILTER_H
 
-#include <pxr/pxrns.h>
-#include "Hd/sprim.h"
 #include "Hd/material.h"
+#include "Hd/sprim.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
@@ -34,9 +34,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdPrman_RenderParam;
 
-class HdPrman_SampleFilter : public HdSprim
-{
-public:
+class HdPrman_SampleFilter : public HdSprim {
+ public:
   HdPrman_SampleFilter(SdfPath const &id);
 
   void Sync(HdSceneDelegate *sceneDelegate,
@@ -47,7 +46,7 @@ public:
 
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-private:
+ private:
   void _CreateRmanSampleFilter(HdSceneDelegate *sceneDelegate,
                                HdPrman_RenderParam *renderParam,
                                SdfPath const &filterPrimPath,
@@ -56,4 +55,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_SAMPLE_FILTER_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_SAMPLE_FILTER_H

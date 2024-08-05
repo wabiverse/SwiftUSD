@@ -34,16 +34,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Flattens a data source by using HdOverlayContainerDataSource.
 ///
-class HdFlattenedOverlayDataSourceProvider : public HdFlattenedDataSourceProvider
-{
-public:
-    HD_API
-    HdContainerDataSourceHandle GetFlattenedDataSource(
-        const Context&) const override;
+class HdFlattenedOverlayDataSourceProvider : public HdFlattenedDataSourceProvider {
+ public:
+  HD_API
+  HdContainerDataSourceHandle GetFlattenedDataSource(const Context &) const override;
 
-    HD_API
-    void ComputeDirtyLocatorsForDescendants(
-        HdDataSourceLocatorSet * locators) const override;
+  HD_API
+  void ComputeDirtyLocatorsForDescendants(HdDataSourceLocatorSet *locators) const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

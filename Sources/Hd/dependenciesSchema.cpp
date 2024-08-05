@@ -33,61 +33,48 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdDependenciesSchemaTokens,
-    HDDEPENDENCIES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdDependenciesSchemaTokens, HDDEPENDENCIES_SCHEMA_TOKENS);
 
-
-
-HdDependenciesSchema::EntryVector
-HdDependenciesSchema::GetEntries()
+HdDependenciesSchema::EntryVector HdDependenciesSchema::GetEntries()
 {
-    EntryVector result;
-    if (!_container) {
-        return result;
-    }
-
-    TfTokenVector childNames = _container->GetNames();
-    for (const TfToken & childName : childNames) {
-        if (HdContainerDataSourceHandle child =
-                HdContainerDataSource::Cast(_container->Get(childName))) {
-            result.push_back(EntryPair(
-                    childName, HdDependencySchema(child)));
-        }
-    }
-
+  EntryVector result;
+  if (!_container) {
     return result;
+  }
+
+  TfTokenVector childNames = _container->GetNames();
+  for (const TfToken &childName : childNames) {
+    if (HdContainerDataSourceHandle child = HdContainerDataSource::Cast(
+            _container->Get(childName)))
+    {
+      result.push_back(EntryPair(childName, HdDependencySchema(child)));
+    }
+  }
+
+  return result;
 }
 
-
-
 /*static*/
-HdDependenciesSchema
-HdDependenciesSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdDependenciesSchema HdDependenciesSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdDependenciesSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdDependenciesSchemaTokens->__dependencies))
-        : nullptr);
+  return HdDependenciesSchema(fromParentContainer ?
+                                  HdContainerDataSource::Cast(fromParentContainer->Get(
+                                      HdDependenciesSchemaTokens->__dependencies)) :
+                                  nullptr);
 }
 
 /*static*/
-const TfToken &
-HdDependenciesSchema::GetSchemaToken()
+const TfToken &HdDependenciesSchema::GetSchemaToken()
 {
-    return HdDependenciesSchemaTokens->__dependencies;
-} 
+  return HdDependenciesSchemaTokens->__dependencies;
+}
 /*static*/
-const HdDataSourceLocator &
-HdDependenciesSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdDependenciesSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdDependenciesSchemaTokens->__dependencies
-    );
-    return locator;
-} 
+  static const HdDataSourceLocator locator(HdDependenciesSchemaTokens->__dependencies);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

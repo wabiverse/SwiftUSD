@@ -26,20 +26,20 @@
 
 /// \file usdMedia/assetPreviewsAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdMedia/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdMedia/api.h"
 #include "UsdMedia/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/types.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -90,9 +90,8 @@ class SdfAssetPath;
 ///
 ///
 ///
-class UsdMediaAssetPreviewsAPI : public UsdAPISchemaBase
-{
-public:
+class UsdMediaAssetPreviewsAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -102,16 +101,12 @@ public:
   /// Equivalent to UsdMediaAssetPreviewsAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdMediaAssetPreviewsAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
-  {
-  }
+  explicit UsdMediaAssetPreviewsAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdMediaAssetPreviewsAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdMediaAssetPreviewsAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdMediaAssetPreviewsAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj)
+  explicit UsdMediaAssetPreviewsAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj)
   {
   }
 
@@ -123,8 +118,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDMEDIA_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdMediaAssetPreviewsAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -136,8 +130,7 @@ public:
   /// \endcode
   ///
   USDMEDIA_API
-  static UsdMediaAssetPreviewsAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdMediaAssetPreviewsAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -156,8 +149,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDMEDIA_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "AssetPreviewsAPI" to the
@@ -175,17 +167,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDMEDIA_API
-  static UsdMediaAssetPreviewsAPI
-  Apply(const UsdPrim &prim);
+  static UsdMediaAssetPreviewsAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDMEDIA_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDMEDIA_API
@@ -197,7 +188,7 @@ private:
   USDMEDIA_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -214,8 +205,7 @@ public:
   /// Thumbnails is a value type that serves as schema to aid in serialization
   /// and deserialization of thumbnail images in the assetInfo["thumbnails"]
   /// dictionary
-  struct Thumbnails
-  {
+  struct Thumbnails {
     USDMEDIA_API
     explicit Thumbnails(const SdfAssetPath &defaultImage = SdfAssetPath());
 
@@ -244,15 +234,13 @@ public:
   /// interrogation.  This is equivalent to:
   /// `GetAssetDefaultPreviews(SdfLayer::FindOrOpen(layerPath))`
   USDMEDIA_API
-  static UsdMediaAssetPreviewsAPI
-  GetAssetDefaultPreviews(const std::string &layerPath);
+  static UsdMediaAssetPreviewsAPI GetAssetDefaultPreviews(const std::string &layerPath);
 
   /// \overload
   USDMEDIA_API
-  static UsdMediaAssetPreviewsAPI
-  GetAssetDefaultPreviews(const SdfLayerHandle &layer);
+  static UsdMediaAssetPreviewsAPI GetAssetDefaultPreviews(const SdfLayerHandle &layer);
 
-private:
+ private:
   UsdStageRefPtr _defaultMaskedStage;
 };
 

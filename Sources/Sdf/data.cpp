@@ -31,32 +31,40 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SdfData::~SdfData() {
+SdfData::~SdfData()
+{
   // Clear out _data in parallel, since it can get big.
   WorkSwapDestroyAsync(_data);
 }
 
-bool SdfData::StreamsData() const { return false; }
+bool SdfData::StreamsData() const
+{
+  return false;
+}
 
-bool SdfData::IsDetached() const { return true; }
+bool SdfData::IsDetached() const
+{
+  return true;
+}
 
-bool SdfData::HasSpec(const SdfPath &path) const {
+bool SdfData::HasSpec(const SdfPath &path) const
+{
   return _data.find(path) != _data.end();
 }
 
-void SdfData::EraseSpec(const SdfPath &path) {
+void SdfData::EraseSpec(const SdfPath &path)
+{
   _HashTable::iterator i = _data.find(path);
-  if (!TF_VERIFY(i != _data.end(), "No spec to erase at <%s>",
-                 path.GetText())) {
+  if (!TF_VERIFY(i != _data.end(), "No spec to erase at <%s>", path.GetText())) {
     return;
   }
   _data.erase(i);
 }
 
-void SdfData::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) {
+void SdfData::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath)
+{
   _HashTable::iterator old = _data.find(oldPath);
-  if (!TF_VERIFY(old != _data.end(), "No spec to move at <%s>",
-                 oldPath.GetString().c_str())) {
+  if (!TF_VERIFY(old != _data.end(), "No spec to move at <%s>", oldPath.GetString().c_str())) {
     return;
   }
   bool inserted = _data.insert(std::make_pair(newPath, old->second)).second;
@@ -66,7 +74,8 @@ void SdfData::MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) {
   _data.erase(old);
 }
 
-SdfSpecType SdfData::GetSpecType(const SdfPath &path) const {
+SdfSpecType SdfData::GetSpecType(const SdfPath &path) const
+{
   _HashTable::const_iterator i = _data.find(path);
   if (i == _data.end()) {
     return SdfSpecTypeUnknown;
@@ -74,23 +83,26 @@ SdfSpecType SdfData::GetSpecType(const SdfPath &path) const {
   return i->second.specType;
 }
 
-void SdfData::CreateSpec(const SdfPath &path, SdfSpecType specType) {
+void SdfData::CreateSpec(const SdfPath &path, SdfSpecType specType)
+{
   if (!TF_VERIFY(specType != SdfSpecTypeUnknown)) {
     return;
   }
   _data[path].specType = specType;
 }
 
-void SdfData::_VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const {
-  TF_FOR_ALL(it, _data) {
+void SdfData::_VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const
+{
+  TF_FOR_ALL(it, _data)
+  {
     if (!visitor->VisitSpec(*this, it->first)) {
       break;
     }
   }
 }
 
-bool SdfData::Has(const SdfPath &path, const TfToken &field,
-                  SdfAbstractDataValue *value) const {
+bool SdfData::Has(const SdfPath &path, const TfToken &field, SdfAbstractDataValue *value) const
+{
   if (const VtValue *fieldValue = _GetFieldValue(path, field)) {
     if (value) {
       return value->StoreValue(*fieldValue);
@@ -100,8 +112,8 @@ bool SdfData::Has(const SdfPath &path, const TfToken &field,
   return false;
 }
 
-bool SdfData::Has(const SdfPath &path, const TfToken &field,
-                  VtValue *value) const {
+bool SdfData::Has(const SdfPath &path, const TfToken &field, VtValue *value) const
+{
   if (const VtValue *fieldValue = _GetFieldValue(path, field)) {
     if (value) {
       *value = *fieldValue;
@@ -111,17 +123,22 @@ bool SdfData::Has(const SdfPath &path, const TfToken &field,
   return false;
 }
 
-bool SdfData::HasSpecAndField(const SdfPath &path, const TfToken &fieldName,
+bool SdfData::HasSpecAndField(const SdfPath &path,
+                              const TfToken &fieldName,
                               SdfAbstractDataValue *value,
-                              SdfSpecType *specType) const {
+                              SdfSpecType *specType) const
+{
   if (VtValue const *v = _GetSpecTypeAndFieldValue(path, fieldName, specType)) {
     return !value || value->StoreValue(*v);
   }
   return false;
 }
 
-bool SdfData::HasSpecAndField(const SdfPath &path, const TfToken &fieldName,
-                              VtValue *value, SdfSpecType *specType) const {
+bool SdfData::HasSpecAndField(const SdfPath &path,
+                              const TfToken &fieldName,
+                              VtValue *value,
+                              SdfSpecType *specType) const
+{
   if (VtValue const *v = _GetSpecTypeAndFieldValue(path, fieldName, specType)) {
     if (value) {
       *value = *v;
@@ -133,11 +150,13 @@ bool SdfData::HasSpecAndField(const SdfPath &path, const TfToken &fieldName,
 
 const VtValue *SdfData::_GetSpecTypeAndFieldValue(const SdfPath &path,
                                                   const TfToken &field,
-                                                  SdfSpecType *specType) const {
+                                                  SdfSpecType *specType) const
+{
   _HashTable::const_iterator i = _data.find(path);
   if (i == _data.end()) {
     *specType = SdfSpecTypeUnknown;
-  } else {
+  }
+  else {
     const _SpecData &spec = i->second;
     *specType = spec.specType;
     for (auto const &f : spec.fields) {
@@ -149,8 +168,8 @@ const VtValue *SdfData::_GetSpecTypeAndFieldValue(const SdfPath &path,
   return nullptr;
 }
 
-const VtValue *SdfData::_GetFieldValue(const SdfPath &path,
-                                       const TfToken &field) const {
+const VtValue *SdfData::_GetFieldValue(const SdfPath &path, const TfToken &field) const
+{
   _HashTable::const_iterator i = _data.find(path);
   if (i != _data.end()) {
     const _SpecData &spec = i->second;
@@ -163,8 +182,8 @@ const VtValue *SdfData::_GetFieldValue(const SdfPath &path,
   return nullptr;
 }
 
-VtValue *SdfData::_GetMutableFieldValue(const SdfPath &path,
-                                        const TfToken &field) {
+VtValue *SdfData::_GetMutableFieldValue(const SdfPath &path, const TfToken &field)
+{
   _HashTable::iterator i = _data.find(path);
   if (i != _data.end()) {
     _SpecData &spec = i->second;
@@ -177,15 +196,16 @@ VtValue *SdfData::_GetMutableFieldValue(const SdfPath &path,
   return NULL;
 }
 
-VtValue SdfData::Get(const SdfPath &path, const TfToken &field) const {
+VtValue SdfData::Get(const SdfPath &path, const TfToken &field) const
+{
   if (const VtValue *value = _GetFieldValue(path, field)) {
     return *value;
   }
   return VtValue();
 }
 
-void SdfData::Set(const SdfPath &path, const TfToken &field,
-                  const VtValue &value) {
+void SdfData::Set(const SdfPath &path, const TfToken &field, const VtValue &value)
+{
   TfAutoMallocTag2 tag("Sdf", "SdfData::Set");
 
   if (value.IsEmpty()) {
@@ -199,8 +219,10 @@ void SdfData::Set(const SdfPath &path, const TfToken &field,
   }
 }
 
-void SdfData::Set(const SdfPath &path, const TfToken &field,
-                  const SdfAbstractDataConstValue &value) {
+void SdfData::Set(const SdfPath &path,
+                  const TfToken &field,
+                  const SdfAbstractDataConstValue &value)
+{
   TfAutoMallocTag2 tag("Sdf", "SdfData::Set");
 
   VtValue *newValue = _GetOrCreateFieldValue(path, field);
@@ -209,12 +231,14 @@ void SdfData::Set(const SdfPath &path, const TfToken &field,
   }
 }
 
-VtValue *SdfData::_GetOrCreateFieldValue(const SdfPath &path,
-                                         const TfToken &field) {
+VtValue *SdfData::_GetOrCreateFieldValue(const SdfPath &path, const TfToken &field)
+{
   _HashTable::iterator i = _data.find(path);
   if (!TF_VERIFY(i != _data.end(),
                  "No spec at <%s> when trying to set field '%s'",
-                 path.GetText(), field.GetText())) {
+                 path.GetText(),
+                 field.GetText()))
+  {
     return nullptr;
   }
 
@@ -225,14 +249,14 @@ VtValue *SdfData::_GetOrCreateFieldValue(const SdfPath &path,
     }
   }
 
-  spec.fields.emplace_back(std::piecewise_construct,
-                           std::forward_as_tuple(field),
-                           std::forward_as_tuple());
+  spec.fields.emplace_back(
+      std::piecewise_construct, std::forward_as_tuple(field), std::forward_as_tuple());
 
   return &spec.fields.back().second;
 }
 
-void SdfData::Erase(const SdfPath &path, const TfToken &field) {
+void SdfData::Erase(const SdfPath &path, const TfToken &field)
+{
   _HashTable::iterator i = _data.find(path);
   if (i == _data.end()) {
     return;
@@ -247,7 +271,8 @@ void SdfData::Erase(const SdfPath &path, const TfToken &field) {
   }
 }
 
-std::vector<TfToken> SdfData::List(const SdfPath &path) const {
+std::vector<TfToken> SdfData::List(const SdfPath &path) const
+{
   std::vector<TfToken> names;
   _HashTable::const_iterator i = _data.find(path);
   if (i != _data.end()) {
@@ -266,11 +291,13 @@ std::vector<TfToken> SdfData::List(const SdfPath &path) const {
 // This is a basic prototype implementation of the time-sampling API
 // for in-memory, non cached presto layers.
 
-std::set<double> SdfData::ListAllTimeSamples() const {
+std::set<double> SdfData::ListAllTimeSamples() const
+{
   // Use a set to determine unique times.
   std::set<double> times;
 
-  TF_FOR_ALL(i, _data) {
+  TF_FOR_ALL(i, _data)
+  {
     std::set<double> timesForPath = ListTimeSamplesForPath(i->first);
     times.insert(timesForPath.begin(), timesForPath.end());
   }
@@ -278,39 +305,48 @@ std::set<double> SdfData::ListAllTimeSamples() const {
   return times;
 }
 
-std::set<double> SdfData::ListTimeSamplesForPath(const SdfPath &path) const {
+std::set<double> SdfData::ListTimeSamplesForPath(const SdfPath &path) const
+{
   std::set<double> times;
 
   VtValue value = Get(path, SdfDataTokens->TimeSamples);
   if (value.IsHolding<SdfTimeSampleMap>()) {
-    const SdfTimeSampleMap &timeSampleMap =
-        value.UncheckedGet<SdfTimeSampleMap>();
-    TF_FOR_ALL(j, timeSampleMap) { times.insert(j->first); }
+    const SdfTimeSampleMap &timeSampleMap = value.UncheckedGet<SdfTimeSampleMap>();
+    TF_FOR_ALL(j, timeSampleMap)
+    {
+      times.insert(j->first);
+    }
   }
 
   return times;
 }
 
-template <class Container, class GetTime>
+template<class Container, class GetTime>
 static bool _GetBracketingTimeSamplesImpl(const Container &samples,
                                           const GetTime &getTime,
-                                          const double time, double *tLower,
-                                          double *tUpper) {
+                                          const double time,
+                                          double *tLower,
+                                          double *tUpper)
+{
   if (samples.empty()) {
     // No samples.
     return false;
-  } else if (time <= getTime(*samples.begin())) {
+  }
+  else if (time <= getTime(*samples.begin())) {
     // Time is at-or-before the first sample.
     *tLower = *tUpper = getTime(*samples.begin());
-  } else if (time >= getTime(*samples.rbegin())) {
+  }
+  else if (time >= getTime(*samples.rbegin())) {
     // Time is at-or-after the last sample.
     *tLower = *tUpper = getTime(*samples.rbegin());
-  } else {
+  }
+  else {
     auto iter = samples.lower_bound(time);
     if (getTime(*iter) == time) {
       // Time is exactly on a sample.
       *tLower = *tUpper = getTime(*iter);
-    } else {
+    }
+    else {
       // Time is in-between samples; return the bracketing times.
       *tUpper = getTime(*iter);
       --iter;
@@ -321,26 +357,33 @@ static bool _GetBracketingTimeSamplesImpl(const Container &samples,
 }
 
 static bool _GetBracketingTimeSamples(const std::set<double> &samples,
-                                      double time, double *tLower,
-                                      double *tUpper) {
-  return _GetBracketingTimeSamplesImpl(
-      samples, [](double t) { return t; }, time, tLower, tUpper);
+                                      double time,
+                                      double *tLower,
+                                      double *tUpper)
+{
+  return _GetBracketingTimeSamplesImpl(samples, [](double t) { return t; }, time, tLower, tUpper);
 }
 
 static bool _GetBracketingTimeSamples(const SdfTimeSampleMap &samples,
-                                      double time, double *tLower,
-                                      double *tUpper) {
+                                      double time,
+                                      double *tLower,
+                                      double *tUpper)
+{
   return _GetBracketingTimeSamplesImpl(
-      samples, [](SdfTimeSampleMap::value_type const &p) { return p.first; },
-      time, tLower, tUpper);
+      samples,
+      [](SdfTimeSampleMap::value_type const &p) { return p.first; },
+      time,
+      tLower,
+      tUpper);
 }
 
-bool SdfData::GetBracketingTimeSamples(double time, double *tLower,
-                                       double *tUpper) const {
+bool SdfData::GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const
+{
   return _GetBracketingTimeSamples(ListAllTimeSamples(), time, tLower, tUpper);
 }
 
-size_t SdfData::GetNumTimeSamplesForPath(const SdfPath &path) const {
+size_t SdfData::GetNumTimeSamplesForPath(const SdfPath &path) const
+{
   if (const VtValue *fval = _GetFieldValue(path, SdfDataTokens->TimeSamples)) {
     if (fval->IsHolding<SdfTimeSampleMap>()) {
       return fval->UncheckedGet<SdfTimeSampleMap>().size();
@@ -349,9 +392,11 @@ size_t SdfData::GetNumTimeSamplesForPath(const SdfPath &path) const {
   return 0;
 }
 
-bool SdfData::GetBracketingTimeSamplesForPath(const SdfPath &path, double time,
+bool SdfData::GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                              double time,
                                               double *tLower,
-                                              double *tUpper) const {
+                                              double *tUpper) const
+{
   const VtValue *fval = _GetFieldValue(path, SdfDataTokens->TimeSamples);
   if (fval && fval->IsHolding<SdfTimeSampleMap>()) {
     auto const &tsmap = fval->UncheckedGet<SdfTimeSampleMap>();
@@ -360,8 +405,8 @@ bool SdfData::GetBracketingTimeSamplesForPath(const SdfPath &path, double time,
   return false;
 }
 
-bool SdfData::QueryTimeSample(const SdfPath &path, double time,
-                              VtValue *value) const {
+bool SdfData::QueryTimeSample(const SdfPath &path, double time, VtValue *value) const
+{
   const VtValue *fval = _GetFieldValue(path, SdfDataTokens->TimeSamples);
   if (fval && fval->IsHolding<SdfTimeSampleMap>()) {
     auto const &tsmap = fval->UncheckedGet<SdfTimeSampleMap>();
@@ -375,8 +420,8 @@ bool SdfData::QueryTimeSample(const SdfPath &path, double time,
   return false;
 }
 
-bool SdfData::QueryTimeSample(const SdfPath &path, double time,
-                              SdfAbstractDataValue *value) const {
+bool SdfData::QueryTimeSample(const SdfPath &path, double time, SdfAbstractDataValue *value) const
+{
   const VtValue *fval = _GetFieldValue(path, SdfDataTokens->TimeSamples);
   if (fval && fval->IsHolding<SdfTimeSampleMap>()) {
     auto const &tsmap = fval->UncheckedGet<SdfTimeSampleMap>();
@@ -388,8 +433,8 @@ bool SdfData::QueryTimeSample(const SdfPath &path, double time,
   return false;
 }
 
-void SdfData::SetTimeSample(const SdfPath &path, double time,
-                            const VtValue &value) {
+void SdfData::SetTimeSample(const SdfPath &path, double time, const VtValue &value)
+{
   if (value.IsEmpty()) {
     EraseTimeSample(path, time);
     return;
@@ -411,12 +456,14 @@ void SdfData::SetTimeSample(const SdfPath &path, double time,
   // Set back into the field.
   if (fieldValue) {
     fieldValue->Swap(newSamples);
-  } else {
+  }
+  else {
     Set(path, SdfDataTokens->TimeSamples, VtValue::Take(newSamples));
   }
 }
 
-void SdfData::EraseTimeSample(const SdfPath &path, double time) {
+void SdfData::EraseTimeSample(const SdfPath &path, double time)
+{
   SdfTimeSampleMap newSamples;
 
   // Attempt to get a pointer to an existing timeSamples field.
@@ -426,7 +473,8 @@ void SdfData::EraseTimeSample(const SdfPath &path, double time) {
   // there's nothing to erase so we're done.
   if (fieldValue && fieldValue->IsHolding<SdfTimeSampleMap>()) {
     fieldValue->UncheckedSwap(newSamples);
-  } else {
+  }
+  else {
     return;
   }
 
@@ -436,7 +484,8 @@ void SdfData::EraseTimeSample(const SdfPath &path, double time) {
   // Check to see if the result is empty.  In that case we remove the field.
   if (newSamples.empty()) {
     Erase(path, SdfDataTokens->TimeSamples);
-  } else {
+  }
+  else {
     fieldValue->UncheckedSwap(newSamples);
   }
 }

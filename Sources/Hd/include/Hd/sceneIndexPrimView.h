@@ -61,88 +61,77 @@ TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 ///
 /// \endcode
 ///
-class HdSceneIndexPrimView
-{
-public:
-    class const_iterator
-    {
-    public:
-        inline const SdfPath &operator*() const;
-
-        HD_API
-        const_iterator& operator++();
-
-        inline void SkipDescendants();
-        inline bool operator==(const const_iterator &other) const;
-        inline bool operator!=(const const_iterator &other) const;
-
-    private:
-        friend class HdSceneIndexPrimView;
-        struct _StackFrame;
-
-        const_iterator(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                       const SdfPath &root);
-        const_iterator(HdSceneIndexBaseRefPtr const &inputSceneIndex);
-
-        HdSceneIndexBaseRefPtr const _inputSceneIndex;
-        std::vector<_StackFrame> _stack;
-        bool _skipDescendants;
-    };
+class HdSceneIndexPrimView {
+ public:
+  class const_iterator {
+   public:
+    inline const SdfPath &operator*() const;
 
     HD_API
-    HdSceneIndexPrimView(HdSceneIndexBaseRefPtr const &inputSceneIndex);
+    const_iterator &operator++();
 
-    HD_API
-    HdSceneIndexPrimView(HdSceneIndexBaseRefPtr const &inputSceneIndex,
-                         const SdfPath &root);
+    inline void SkipDescendants();
+    inline bool operator==(const const_iterator &other) const;
+    inline bool operator!=(const const_iterator &other) const;
 
-    HD_API
-    const const_iterator &begin() const;
+   private:
+    friend class HdSceneIndexPrimView;
+    struct _StackFrame;
 
-    HD_API
-    const const_iterator &end() const;
+    const_iterator(HdSceneIndexBaseRefPtr const &inputSceneIndex, const SdfPath &root);
+    const_iterator(HdSceneIndexBaseRefPtr const &inputSceneIndex);
 
-private:
-    const const_iterator _begin;
-    const const_iterator _end;
+    HdSceneIndexBaseRefPtr const _inputSceneIndex;
+    std::vector<_StackFrame> _stack;
+    bool _skipDescendants;
+  };
+
+  HD_API
+  HdSceneIndexPrimView(HdSceneIndexBaseRefPtr const &inputSceneIndex);
+
+  HD_API
+  HdSceneIndexPrimView(HdSceneIndexBaseRefPtr const &inputSceneIndex, const SdfPath &root);
+
+  HD_API
+  const const_iterator &begin() const;
+
+  HD_API
+  const const_iterator &end() const;
+
+ private:
+  const const_iterator _begin;
+  const const_iterator _end;
 };
 
-struct
-HdSceneIndexPrimView::const_iterator::_StackFrame
-{
-    std::vector<SdfPath> paths;
-    size_t index;
-    
-    bool operator==(const _StackFrame &other) const {
-        return paths == other.paths && index == other.index;
-    }
+struct HdSceneIndexPrimView::const_iterator::_StackFrame {
+  std::vector<SdfPath> paths;
+  size_t index;
+
+  bool operator==(const _StackFrame &other) const
+  {
+    return paths == other.paths && index == other.index;
+  }
 };
 
-const SdfPath &
-HdSceneIndexPrimView::const_iterator::operator*() const
+const SdfPath &HdSceneIndexPrimView::const_iterator::operator*() const
 {
-    const _StackFrame &frame = _stack.back();
-    return frame.paths[frame.index];
+  const _StackFrame &frame = _stack.back();
+  return frame.paths[frame.index];
 }
 
-void
-HdSceneIndexPrimView::const_iterator::SkipDescendants()
+void HdSceneIndexPrimView::const_iterator::SkipDescendants()
 {
-    _skipDescendants = true;
+  _skipDescendants = true;
 }
 
-bool
-HdSceneIndexPrimView::const_iterator::operator==(
-    const const_iterator &other) const
+bool HdSceneIndexPrimView::const_iterator::operator==(const const_iterator &other) const
 {
-    return _stack == other._stack;
+  return _stack == other._stack;
 }
 
-bool
-HdSceneIndexPrimView::const_iterator::operator!=(
-    const const_iterator &other) const
+bool HdSceneIndexPrimView::const_iterator::operator!=(const const_iterator &other) const
 {
-    return !(*this == other);
+  return !(*this == other);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

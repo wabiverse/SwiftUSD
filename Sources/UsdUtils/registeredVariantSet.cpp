@@ -28,36 +28,29 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    // lowerCamelCase of enums
-    (never)(ifAuthored)(always));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         // lowerCamelCase of enums
+                         (never)(ifAuthored)(always));
 
 // static
 bool UsdUtilsRegisteredVariantSet::GetSelectionExportPolicyFromString(
-    const std::string &selectionExportPolicyStr,
-    SelectionExportPolicy *outSelectionExportPolicy)
+    const std::string &selectionExportPolicyStr, SelectionExportPolicy *outSelectionExportPolicy)
 {
   SelectionExportPolicy selectionExportPolicy;
-  if (selectionExportPolicyStr == _tokens->never)
-  {
+  if (selectionExportPolicyStr == _tokens->never) {
     selectionExportPolicy = UsdUtilsRegisteredVariantSet::SelectionExportPolicy::Never;
   }
-  else if (selectionExportPolicyStr == _tokens->ifAuthored)
-  {
+  else if (selectionExportPolicyStr == _tokens->ifAuthored) {
     selectionExportPolicy = UsdUtilsRegisteredVariantSet::SelectionExportPolicy::IfAuthored;
   }
-  else if (selectionExportPolicyStr == _tokens->always)
-  {
+  else if (selectionExportPolicyStr == _tokens->always) {
     selectionExportPolicy = UsdUtilsRegisteredVariantSet::SelectionExportPolicy::Always;
   }
-  else
-  {
+  else {
     return false;
   }
 
-  if (outSelectionExportPolicy)
-  {
+  if (outSelectionExportPolicy) {
     *outSelectionExportPolicy = selectionExportPolicy;
   }
   return true;

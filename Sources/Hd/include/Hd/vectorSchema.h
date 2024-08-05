@@ -35,74 +35,63 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Vector schema classes represent a view of a vector data source
 /// which is returning untyped data sources.
 ///
-class HdVectorSchema
-{
-public:
-    HdVectorSchema(HdVectorDataSourceHandle const &vector)
-      : _vector(vector) {}
+class HdVectorSchema {
+ public:
+  HdVectorSchema(HdVectorDataSourceHandle const &vector) : _vector(vector) {}
 
-    HD_API
-    static HdVectorDataSourceHandle
-    BuildRetained(
-        size_t count,
-        const HdDataSourceBaseHandle *values);
+  HD_API
+  static HdVectorDataSourceHandle BuildRetained(size_t count,
+                                                const HdDataSourceBaseHandle *values);
 
-    /// Returns the vector data source that this schema is interpreting.
-    HD_API
-    HdVectorDataSourceHandle GetVector();
-    HD_API
-    bool IsDefined() const;
+  /// Returns the vector data source that this schema is interpreting.
+  HD_API
+  HdVectorDataSourceHandle GetVector();
+  HD_API
+  bool IsDefined() const;
 
-    /// Returns \c true if this schema is applied on top of a non-null
-    /// vector.
-    explicit operator bool() const { return IsDefined(); }
+  /// Returns \c true if this schema is applied on top of a non-null
+  /// vector.
+  explicit operator bool() const
+  {
+    return IsDefined();
+  }
 
-    /// Number of elements in the vector.
-    HD_API
-    size_t GetNumElements() const;
+  /// Number of elements in the vector.
+  HD_API
+  size_t GetNumElements() const;
 
-protected:
-    HdVectorDataSourceHandle _vector;
+ protected:
+  HdVectorDataSourceHandle _vector;
 };
 
 /// Base class for vector schema classes that represent a view of
 /// a vector data source containing data source of a given type.
 ///
-template<typename T>
-class HdTypedVectorSchema : public HdVectorSchema
-{
-public:
-    using DataSource = HdTypedSampledDataSource<T>;
-    using DataSourceHandle = typename DataSource::Handle;
+template<typename T> class HdTypedVectorSchema : public HdVectorSchema {
+ public:
+  using DataSource = HdTypedSampledDataSource<T>;
+  using DataSourceHandle = typename DataSource::Handle;
 
-    HdTypedVectorSchema(HdVectorDataSourceHandle const &vector)
-      : HdVectorSchema(vector) {}
+  HdTypedVectorSchema(HdVectorDataSourceHandle const &vector) : HdVectorSchema(vector) {}
 
-    DataSourceHandle GetElement(const size_t element) const {
-        return
-            _vector
-            ? DataSource::Cast(_vector->GetElement(element))
-            : nullptr;
-    }
+  DataSourceHandle GetElement(const size_t element) const
+  {
+    return _vector ? DataSource::Cast(_vector->GetElement(element)) : nullptr;
+  }
 };
 
 /// Base class for vector schema classes that represent a view of
 /// a vector data source containing container data sources conforming
 /// to a given HdSchema.
 ///
-template<typename Schema>
-class HdSchemaBasedVectorSchema : public HdVectorSchema
-{
-public:
-    HdSchemaBasedVectorSchema(HdVectorDataSourceHandle const &vector)
-      : HdVectorSchema(vector) {}
-    
-    Schema GetElement(const size_t element) const {
-        return Schema(
-            _vector
-            ? HdContainerDataSource::Cast(_vector->GetElement(element))
-            : nullptr);
-    }
+template<typename Schema> class HdSchemaBasedVectorSchema : public HdVectorSchema {
+ public:
+  HdSchemaBasedVectorSchema(HdVectorDataSourceHandle const &vector) : HdVectorSchema(vector) {}
+
+  Schema GetElement(const size_t element) const
+  {
+    return Schema(_vector ? HdContainerDataSource::Cast(_vector->GetElement(element)) : nullptr);
+  }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

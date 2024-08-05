@@ -52,7 +52,7 @@ class UsdProperty;
 /// checking.
 ///
 class UsdProperty : public UsdObject {
-public:
+ public:
   /// Construct an invalid property.
   UsdProperty() : UsdObject(_Null<UsdProperty>()) {}
 
@@ -82,8 +82,7 @@ public:
   ///
   /// \sa UsdClipsAPI
   USD_API
-  SdfPropertySpecHandleVector
-  GetPropertyStack(UsdTimeCode time = UsdTimeCode::Default()) const;
+  SdfPropertySpecHandleVector GetPropertyStack(UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Returns a strength-ordered list of property specs that provide
   /// opinions for this property paired with the cumulative layer offset from
@@ -99,8 +98,7 @@ public:
   /// itself be time-varying.  To expedite repeated value resolution of
   /// attributes, you should instead retain a \c UsdAttributeQuery .
   USD_API
-  std::vector<std::pair<SdfPropertySpecHandle, SdfLayerOffset>>
-  GetPropertyStackWithLayerOffsets(
+  std::vector<std::pair<SdfPropertySpecHandle, SdfLayerOffset>> GetPropertyStackWithLayerOffsets(
       UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Return this property's name with all namespace prefixes removed,
@@ -169,8 +167,7 @@ public:
   /// If \p nestedGroups is empty, we author an empty string for displayGroup.
   /// \sa SetDisplayGroup()
   USD_API
-  bool
-  SetNestedDisplayGroups(const std::vector<std::string> &nestedGroups) const;
+  bool SetNestedDisplayGroups(const std::vector<std::string> &nestedGroups) const;
 
   /// Return true if this is a custom property (i.e., not part of a
   /// prim schema).
@@ -269,28 +266,30 @@ public:
   USD_API
   UsdProperty FlattenTo(const UsdProperty &property) const;
 
-protected:
-  template <class Derived>
-  UsdProperty(_Null<Derived>) : UsdObject(_Null<Derived>()) {}
+ protected:
+  template<class Derived> UsdProperty(_Null<Derived>) : UsdObject(_Null<Derived>()) {}
 
   // Gets the targets of the given spec type. Returns true if an authored
   // opinion is found and no composition errors occured. If foundErrors is
   // provided, it will be set to true only if errors are encountered.
-  bool _GetTargets(SdfSpecType specType, SdfPathVector *out,
-                   bool *foundErrors = nullptr) const;
+  bool _GetTargets(SdfSpecType specType, SdfPathVector *out, bool *foundErrors = nullptr) const;
 
-private:
+ private:
   friend class UsdAttribute;
   friend class UsdObject;
   friend class UsdPrim;
   friend class UsdRelationship;
   friend class Usd_PrimData;
 
-  UsdProperty(UsdObjType objType, const Usd_PrimDataHandle &prim,
-              const SdfPath &proxyPrimPath, const TfToken &propName)
-      : UsdObject(objType, prim, proxyPrimPath, propName) {}
+  UsdProperty(UsdObjType objType,
+              const Usd_PrimDataHandle &prim,
+              const SdfPath &proxyPrimPath,
+              const TfToken &propName)
+      : UsdObject(objType, prim, proxyPrimPath, propName)
+  {
+  }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PROPERTY_H
+#endif  // PXR_USD_USD_PROPERTY_H

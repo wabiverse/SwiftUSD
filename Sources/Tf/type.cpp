@@ -43,13 +43,13 @@
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
-#include "Tf/cxxCast.h"
-#include "Tf/pyLock.h"
-#include "Tf/pyObjWrapper.h"
-#include "Tf/pyObjectFinder.h"
-#include "Tf/pyUtils.h"
-#include <locale>
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "Tf/cxxCast.h"
+#  include "Tf/pyLock.h"
+#  include "Tf/pyObjWrapper.h"
+#  include "Tf/pyObjectFinder.h"
+#  include "Tf/pyUtils.h"
+#  include <locale>
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <boost/optional.hpp>
 
@@ -78,7 +78,7 @@ TfType::FactoryBase::~FactoryBase() {}
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 TfType::PyPolymorphicBase::~PyPolymorphicBase() {}
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 // Stored data for a TfType.
 // A unique instance of _TypeInfo is allocated for every type declared.
@@ -111,7 +111,7 @@ struct TfType::_TypeInfo {
   // We use handle<> rather than boost::python::object in case Python
   // has not yet been initialized.
   boost::python::handle<> pyClass;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   // Direct base types.
   TypeVector baseTypes;
@@ -147,17 +147,18 @@ struct TfType::_TypeInfo {
 
   // A type is "defined" as soon as it has either type_info or a
   // Python class object.
-  inline bool IsDefined() {
+  inline bool IsDefined()
+  {
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
     return typeInfo.load() != nullptr || pyClass.get();
 #else
     return typeInfo.load() != nullptr;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
   }
 
   // Caller must hold a write lock on mutex.
-  void SetCastFunc(std::type_info const &baseType,
-                   TfType::_CastFunction const &func) {
+  void SetCastFunc(std::type_info const &baseType, TfType::_CastFunction const &func)
+  {
     // check for existing func.
     for (size_t i = 0; i < castFuncs.size(); ++i) {
       if (baseType == *castFuncs[i].first) {
@@ -170,7 +171,8 @@ struct TfType::_TypeInfo {
   }
 
   // Caller must hold at least a read lock on mutex.
-  TfType::_CastFunction *GetCastFunc(std::type_info const &baseType) {
+  TfType::_CastFunction *GetCastFunc(std::type_info const &baseType)
+  {
     for (size_t i = 0; i < castFuncs.size(); ++i)
       if (TfSafeTypeCompare(baseType, *castFuncs[i].first))
         return &castFuncs[i].second;
@@ -178,7 +180,8 @@ struct TfType::_TypeInfo {
   }
 
   // Caller must hold at least a read lock on mutex.
-  _TypeInfo *FindByAlias(std::string const &alias) const {
+  _TypeInfo *FindByAlias(std::string const &alias) const
+  {
     if (aliasToDerivedTypeMap) {
       auto it = aliasToDerivedTypeMap->find(alias);
       return it != aliasToDerivedTypeMap->end() ? it->second : nullptr;
@@ -188,20 +191,27 @@ struct TfType::_TypeInfo {
 
   // Allocate an empty (undefined) _TypeInfo with the given typeName.
   _TypeInfo(const string &newTypeName)
-      : canonicalTfType(this), typeName(newTypeName),
-        definitionCallback(nullptr), typeInfo(nullptr), sizeofType(0),
-        isPodType(false), isEnumType(false), hasSentNotice(false) {}
+      : canonicalTfType(this),
+        typeName(newTypeName),
+        definitionCallback(nullptr),
+        typeInfo(nullptr),
+        sizeofType(0),
+        isPodType(false),
+        isEnumType(false),
+        hasSentNotice(false)
+  {
+  }
 };
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 // Comparison for boost::python::handle.
 struct Tf_PyHandleLess {
-  bool operator()(const boost::python::handle<> &lhs,
-                  const boost::python::handle<> &rhs) const {
+  bool operator()(const boost::python::handle<> &lhs, const boost::python::handle<> &rhs) const
+  {
     return lhs.get() < rhs.get();
   }
 };
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 // Registry for _TypeInfos.
 //
@@ -209,14 +219,19 @@ class Tf_TypeRegistry {
   Tf_TypeRegistry(const Tf_TypeRegistry &) = delete;
   Tf_TypeRegistry &operator=(const Tf_TypeRegistry &) = delete;
 
-public:
-  static Tf_TypeRegistry &GetInstance() {
+ public:
+  static Tf_TypeRegistry &GetInstance()
+  {
     return TfSingleton<Tf_TypeRegistry>::GetInstance();
   }
 
-  RWMutex &GetMutex() const { return _mutex; }
+  RWMutex &GetMutex() const
+  {
+    return _mutex;
+  }
 
-  inline void WaitForInitializingThread() const {
+  inline void WaitForInitializingThread() const
+  {
     // If we are the initializing thread or if the registry is initialized,
     // we don't have to wait.
     std::thread::id initId = _initializingThread;
@@ -232,22 +247,28 @@ public:
 
   // Note, callers must hold the registry lock for writing, and base's lock
   // for writing, but need not hold derived's lock.
-  void AddTypeAlias(TfType::_TypeInfo *base, TfType::_TypeInfo *derived,
-                    const string &alias, string *errMsg) {
+  void AddTypeAlias(TfType::_TypeInfo *base,
+                    TfType::_TypeInfo *derived,
+                    const string &alias,
+                    string *errMsg)
+  {
     // Aliases cannot conflict with other aliases under the same base.
     if (base->aliasToDerivedTypeMap) {
-      TfType::_TypeInfo::NameToTypeMap::const_iterator it =
-          base->aliasToDerivedTypeMap->find(alias);
+      TfType::_TypeInfo::NameToTypeMap::const_iterator it = base->aliasToDerivedTypeMap->find(
+          alias);
       if (it != base->aliasToDerivedTypeMap->end()) {
         if (it->second == derived) {
           // Alias already exists; no change.
           return;
-        } else {
-          *errMsg = TfStringPrintf("Cannot set alias '%s' under '%s', because "
-                                   "it is already set to '%s', not '%s'.",
-                                   alias.c_str(), base->typeName.c_str(),
-                                   it->second->typeName.c_str(),
-                                   derived->typeName.c_str());
+        }
+        else {
+          *errMsg = TfStringPrintf(
+              "Cannot set alias '%s' under '%s', because "
+              "it is already set to '%s', not '%s'.",
+              alias.c_str(),
+              base->typeName.c_str(),
+              it->second->typeName.c_str(),
+              derived->typeName.c_str());
           return;
         }
       }
@@ -256,11 +277,13 @@ public:
     // same base, either.
     const auto it = _typeNameToTypeMap.find(alias);
     if (it != _typeNameToTypeMap.end() &&
-        it->second->canonicalTfType._IsAImplNoLock(base->canonicalTfType)) {
-      *errMsg =
-          TfStringPrintf("There already is a type named '%s' derived from base "
-                         "type '%s'; cannot create an alias of the same name.",
-                         alias.c_str(), base->typeName.c_str());
+        it->second->canonicalTfType._IsAImplNoLock(base->canonicalTfType))
+    {
+      *errMsg = TfStringPrintf(
+          "There already is a type named '%s' derived from base "
+          "type '%s'; cannot create an alias of the same name.",
+          alias.c_str(),
+          base->typeName.c_str());
       return;
     }
 
@@ -273,14 +296,19 @@ public:
     (*base->derivedTypeToAliasesMap)[derived].push_back(alias);
   }
 
-  TfType::_TypeInfo *NewTypeInfo(const string &typeName) {
+  TfType::_TypeInfo *NewTypeInfo(const string &typeName)
+  {
     TfType::_TypeInfo *info = new TfType::_TypeInfo(typeName);
     _typeNameToTypeMap[typeName] = info;
     return info;
   }
 
-  void SetTypeInfo(TfType::_TypeInfo *info, const std::type_info &typeInfo,
-                   size_t sizeofType, bool isPodType, bool isEnumType) {
+  void SetTypeInfo(TfType::_TypeInfo *info,
+                   const std::type_info &typeInfo,
+                   size_t sizeofType,
+                   bool isPodType,
+                   bool isEnumType)
+  {
     info->typeInfo = &typeInfo;
     info->sizeofType = sizeofType;
     info->isPodType = isPodType;
@@ -289,8 +317,8 @@ public:
   }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-  void SetPythonClass(TfType::_TypeInfo *info,
-                      const boost::python::object &classObj) {
+  void SetPythonClass(TfType::_TypeInfo *info, const boost::python::object &classObj)
+  {
     // Hold a reference to this PyObject in our map.
     boost::python::handle<> handle(boost::python::borrowed(classObj.ptr()));
 
@@ -302,34 +330,41 @@ public:
       info->sizeofType = TfSizeofType<boost::python::object>::value;
     }
   }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-  TfType::_TypeInfo *GetUnknownType() const { return _unknownTypeInfo; }
+  TfType::_TypeInfo *GetUnknownType() const
+  {
+    return _unknownTypeInfo;
+  }
 
-  TfType::_TypeInfo *GetRoot() const { return _rootTypeInfo; }
+  TfType::_TypeInfo *GetRoot() const
+  {
+    return _rootTypeInfo;
+  }
 
-  TfType::_TypeInfo *FindByName(const string &name) const {
+  TfType::_TypeInfo *FindByName(const string &name) const
+  {
     auto it = _typeNameToTypeMap.find(name);
     return it != _typeNameToTypeMap.end() ? it->second : nullptr;
   }
 
-  template <class Upgrader>
-  TfType::_TypeInfo *FindByTypeid(const std::type_info &typeInfo,
-                                  Upgrader upgrader) {
+  template<class Upgrader>
+  TfType::_TypeInfo *FindByTypeid(const std::type_info &typeInfo, Upgrader upgrader)
+  {
     TfType::_TypeInfo **info = _typeInfoMap.Find(typeInfo, upgrader);
     return info ? *info : nullptr;
   }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-  TfType::_TypeInfo *
-  FindByPythonClass(const boost::python::object &classObj) const {
+  TfType::_TypeInfo *FindByPythonClass(const boost::python::object &classObj) const
+  {
     boost::python::handle<> handle(boost::python::borrowed(classObj.ptr()));
     auto it = _pyClassMap.find(handle);
     return it != _pyClassMap.end() ? it->second : nullptr;
   }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-private:
+ private:
   Tf_TypeRegistry();
 
   mutable RWMutex _mutex;
@@ -349,10 +384,9 @@ private:
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   // Map of python class handles to _TypeInfo*.
-  typedef map<boost::python::handle<>, TfType::_TypeInfo *, Tf_PyHandleLess>
-      PyClassMap;
+  typedef map<boost::python::handle<>, TfType::_TypeInfo *, Tf_PyHandleLess> PyClassMap;
   PyClassMap _pyClassMap;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   // _TypeInfo for Unknown type
   TfType::_TypeInfo *_unknownTypeInfo;
@@ -370,7 +404,8 @@ TF_INSTANTIATE_SINGLETON(Tf_TypeRegistry);
 
 // Helper for getting the registry mutex.  Call Tf_TypeRegistry::GetMutex() if
 // you already have the registry to avoid the additional GetInstance() call.
-static inline RWMutex &GetRegistryMutex() {
+static inline RWMutex &GetRegistryMutex()
+{
   return Tf_TypeRegistry::GetInstance().GetMutex();
 }
 
@@ -379,14 +414,18 @@ static inline RWMutex &GetRegistryMutex() {
 struct _TfUnknownType {};
 
 Tf_TypeRegistry::Tf_TypeRegistry()
-    : _unknownTypeInfo(0), _rootTypeInfo(0), _sendDeclaredNotification(false) {
+    : _unknownTypeInfo(0), _rootTypeInfo(0), _sendDeclaredNotification(false)
+{
   // Register root type
   _rootTypeInfo = NewTypeInfo("TfType::_Root");
 
   // Register unknown type
   _unknownTypeInfo = NewTypeInfo("TfType::_Unknown");
-  SetTypeInfo(_unknownTypeInfo, typeid(_TfUnknownType),
-              /*sizeofType=*/0, /*isPodType=*/false, /*isEnumType=*/false);
+  SetTypeInfo(_unknownTypeInfo,
+              typeid(_TfUnknownType),
+              /*sizeofType=*/0,
+              /*isPodType=*/false,
+              /*isEnumType=*/false);
 
   // Put the registry into an "initializing" state so that racing to get the
   // singleton instance (which will start happening immediately after calling
@@ -410,7 +449,8 @@ Tf_TypeRegistry::Tf_TypeRegistry()
   try {
     TfRegistryManager::GetInstance().SubscribeTo<TfType>();
     _initializingThread = std::thread::id();
-  } catch (...) {
+  }
+  catch (...) {
     // Ensure we mark initialization completed in the face of an exception.
     _initializingThread = std::thread::id();
     throw;
@@ -421,19 +461,23 @@ Tf_TypeRegistry::Tf_TypeRegistry()
 
 TfType::TfType() : _info(Tf_TypeRegistry::GetInstance().GetUnknownType()) {}
 
-TfType const &TfType::GetRoot() {
+TfType const &TfType::GetRoot()
+{
   return Tf_TypeRegistry::GetInstance().GetRoot()->canonicalTfType;
 }
 
-TfType const &TfType::GetCanonicalType() const {
+TfType const &TfType::GetCanonicalType() const
+{
   return _info->canonicalTfType;
 }
 
-TfType const &TfType::FindByName(const string &name) {
+TfType const &TfType::FindByName(const string &name)
+{
   return GetRoot().FindDerivedByName(name);
 }
 
-TfType const &TfType::FindDerivedByName(const string &name) const {
+TfType const &TfType::FindDerivedByName(const string &name) const
+{
   if (IsUnknown())
     return GetUnknownType();
 
@@ -447,7 +491,8 @@ TfType const &TfType::FindDerivedByName(const string &name) const {
   {
     ScopedLock regLock(r.GetMutex(), /*write=*/false);
     if (ARCH_LIKELY(_info->derivedByNameCache &&
-                    TfMapLookup(*(_info->derivedByNameCache), name, &result))) {
+                    TfMapLookup(*(_info->derivedByNameCache), name, &result)))
+    {
       // Cache hit.  We're done.
       return result._info->canonicalTfType;
     }
@@ -486,17 +531,18 @@ TfType const &TfType::FindDerivedByName(const string &name) const {
   return result._info->canonicalTfType;
 }
 
-TfType const &TfType::GetUnknownType() {
+TfType const &TfType::GetUnknownType()
+{
   return Tf_TypeRegistry::GetInstance().GetUnknownType()->canonicalTfType;
 }
 
-TfType const &TfType::_FindByTypeid(const std::type_info &typeInfo) {
+TfType const &TfType::_FindByTypeid(const std::type_info &typeInfo)
+{
   auto &r = Tf_TypeRegistry::GetInstance();
   r.WaitForInitializingThread();
 
   ScopedLock lock(r.GetMutex(), /*write=*/false);
-  TfType::_TypeInfo *info =
-      r.FindByTypeid(typeInfo, [&lock]() { lock.UpgradeToWriter(); });
+  TfType::_TypeInfo *info = r.FindByTypeid(typeInfo, [&lock]() { lock.UpgradeToWriter(); });
 
   if (ARCH_LIKELY(info)) {
     return info->canonicalTfType;
@@ -513,7 +559,8 @@ TfType const &TfType::_FindByTypeid(const std::type_info &typeInfo) {
 }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-TfType const &TfType::FindByPythonClass(const TfPyObjWrapper &classObj) {
+TfType const &TfType::FindByPythonClass(const TfPyObjWrapper &classObj)
+{
   const auto &r = Tf_TypeRegistry::GetInstance();
   r.WaitForInitializingThread();
 
@@ -522,17 +569,22 @@ TfType const &TfType::FindByPythonClass(const TfPyObjWrapper &classObj) {
 
   return info ? info->canonicalTfType : GetUnknownType();
 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-const string &TfType::GetTypeName() const { return _info->typeName; }
+const string &TfType::GetTypeName() const
+{
+  return _info->typeName;
+}
 
-const std::type_info &TfType::GetTypeid() const {
+const std::type_info &TfType::GetTypeid() const
+{
   std::type_info const *typeInfo = _info->typeInfo;
   return typeInfo ? *typeInfo : typeid(void);
 }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-TfPyObjWrapper TfType::GetPythonClass() const {
+TfPyObjWrapper TfType::GetPythonClass() const
+{
   if (!TfPyIsInitialized())
     TF_CODING_ERROR("Python has not been initialized");
 
@@ -543,9 +595,10 @@ TfPyObjWrapper TfType::GetPythonClass() const {
   }
   return TfPyObjWrapper();
 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-vector<string> TfType::GetAliases(TfType derivedType) const {
+vector<string> TfType::GetAliases(TfType derivedType) const
+{
   ScopedLock lock(GetRegistryMutex(), /*write=*/false);
   if (_info->derivedTypeToAliasesMap) {
     auto i = _info->derivedTypeToAliasesMap->find(derivedType._info);
@@ -555,12 +608,14 @@ vector<string> TfType::GetAliases(TfType derivedType) const {
   return vector<string>();
 }
 
-vector<TfType> TfType::GetBaseTypes() const {
+vector<TfType> TfType::GetBaseTypes() const
+{
   ScopedLock lock(GetRegistryMutex(), /*write=*/false);
   return _info->baseTypes;
 }
 
-size_t TfType::GetNBaseTypes(TfType *out, size_t maxBases) const {
+size_t TfType::GetNBaseTypes(TfType *out, size_t maxBases) const
+{
   ScopedLock lock(GetRegistryMutex(), /*write=*/false);
   size_t numBases = _info->baseTypes.size();
   auto b = _info->baseTypes.begin();
@@ -569,32 +624,37 @@ size_t TfType::GetNBaseTypes(TfType *out, size_t maxBases) const {
   return numBases;
 }
 
-vector<TfType> TfType::GetDirectlyDerivedTypes() const {
+vector<TfType> TfType::GetDirectlyDerivedTypes() const
+{
   ScopedLock lock(GetRegistryMutex(), /*write=*/false);
   return _info->derivedTypes;
 }
 
-void TfType::GetAllDerivedTypes(std::set<TfType> *result) const {
+void TfType::GetAllDerivedTypes(std::set<TfType> *result) const
+{
   ScopedLock lock(GetRegistryMutex(), /*write=*/false);
   TypeVector stack{_info->derivedTypes};
   while (!stack.empty()) {
     TfType derivedType = std::move(stack.back());
     stack.pop_back();
-    stack.insert(stack.end(), derivedType._info->derivedTypes.begin(),
+    stack.insert(stack.end(),
+                 derivedType._info->derivedTypes.begin(),
                  derivedType._info->derivedTypes.end());
     result->insert(std::move(derivedType));
   }
 }
 
 // Helper for resolving ancestor order in the case of multiple inheritance.
-static bool _MergeAncestors(vector<TypeVector> *seqs, TypeVector *result) {
+static bool _MergeAncestors(vector<TypeVector> *seqs, TypeVector *result)
+{
   while (true) {
     // Find a candidate for the next type.
     TfType cand;
 
     // Try the first element of each non-empty sequence, in order.
     bool anyLeft = false;
-    TF_FOR_ALL(candSeq, *seqs) {
+    TF_FOR_ALL(candSeq, *seqs)
+    {
       if (candSeq->empty())
         continue;
 
@@ -603,12 +663,12 @@ static bool _MergeAncestors(vector<TypeVector> *seqs, TypeVector *result) {
 
       // Check that the candidate does not occur in the tail
       // ("cdr", in lisp terms) of any of the sequences.
-      TF_FOR_ALL(checkSeq, *seqs) {
+      TF_FOR_ALL(checkSeq, *seqs)
+      {
         if (checkSeq->size() <= 1)
           continue;
 
-        if (std::find(++(checkSeq->begin()), checkSeq->end(), cand) !=
-            checkSeq->end()) {
+        if (std::find(++(checkSeq->begin()), checkSeq->end(), cand) != checkSeq->end()) {
           // Reject this candidate.
           cand = TfType();
           break;
@@ -631,14 +691,16 @@ static bool _MergeAncestors(vector<TypeVector> *seqs, TypeVector *result) {
     result->push_back(cand);
 
     // Remove candidate from input sequences.
-    TF_FOR_ALL(seqIt, *seqs) {
+    TF_FOR_ALL(seqIt, *seqs)
+    {
       if (!seqIt->empty() && seqIt->front() == cand)
         seqIt->erase(seqIt->begin());
     }
   }
 }
 
-void TfType::GetAllAncestorTypes(vector<TfType> *result) const {
+void TfType::GetAllAncestorTypes(vector<TfType> *result) const
+{
   if (IsUnknown()) {
     TF_CODING_ERROR("Cannot ask for ancestor types of Unknown type");
     return;
@@ -670,7 +732,8 @@ void TfType::GetAllAncestorTypes(vector<TfType> *result) const {
   seqs.push_back(baseTypes);
 
   // Remaining sequences: Inherited types for each direct base.
-  TF_FOR_ALL(it, baseTypes) {
+  TF_FOR_ALL(it, baseTypes)
+  {
     // Populate the base's ancestor types directly into a new vector on
     // the back of seqs.
     seqs.push_back(TypeVector());
@@ -682,33 +745,35 @@ void TfType::GetAllAncestorTypes(vector<TfType> *result) const {
   bool ok = _MergeAncestors(&seqs, result);
 
   if (!ok) {
-    TF_CODING_ERROR("Cannot resolve ancestor classes for '%s' "
-                    "because the inheritance hierarchy is "
-                    "inconsistent.  Please check that multiply-"
-                    "inherited types are inherited in the same order "
-                    "throughout the inherited hierarchy.",
-                    GetTypeName().c_str());
+    TF_CODING_ERROR(
+        "Cannot resolve ancestor classes for '%s' "
+        "because the inheritance hierarchy is "
+        "inconsistent.  Please check that multiply-"
+        "inherited types are inherited in the same order "
+        "throughout the inherited hierarchy.",
+        GetTypeName().c_str());
   }
 }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-TfType const &TfType::_FindImplPyPolymorphic(PyPolymorphicBase const *ptr) {
+TfType const &TfType::_FindImplPyPolymorphic(PyPolymorphicBase const *ptr)
+{
   using namespace boost::python;
   TfType ret;
   if (TfPyIsInitialized()) {
     TfPyLock lock;
     // See if we can find a polymorphic python object...
-    object pyObj =
-        Tf_FindPythonObject(TfCastToMostDerivedType(ptr), typeid(*ptr));
+    object pyObj = Tf_FindPythonObject(TfCastToMostDerivedType(ptr), typeid(*ptr));
     if (!TfPyIsNone(pyObj))
       ret = FindByPythonClass(TfPyObjWrapper(pyObj.attr("__class__")));
   }
   return !ret.IsUnknown() ? ret.GetCanonicalType() : Find(typeid(*ptr));
 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 // Callers must hold at least a read lock on the registry mutex.
-bool TfType::_IsAImplNoLock(TfType queryType) const {
+bool TfType::_IsAImplNoLock(TfType queryType) const
+{
   // Iterate until we reach more than one parent.
   for (TfType t = *this;;) {
     if (t == queryType)
@@ -725,14 +790,16 @@ bool TfType::_IsAImplNoLock(TfType queryType) const {
   }
 }
 
-bool TfType::IsA(TfType queryType) const {
+bool TfType::IsA(TfType queryType) const
+{
   if (queryType.IsUnknown()) {
     // If queryType is unknown, it almost always means a previous
     // type lookup failed, and went unchecked.
-    TF_RUNTIME_ERROR("IsA() was given an Unknown base type.  "
-                     "This probably means the attempt to look up the "
-                     "base type failed.  (Note: to explicitly check if a "
-                     "type is unknown, use IsUnknown() instead.)");
+    TF_RUNTIME_ERROR(
+        "IsA() was given an Unknown base type.  "
+        "This probably means the attempt to look up the "
+        "base type failed.  (Note: to explicitly check if a "
+        "type is unknown, use IsUnknown() instead.)");
     return false;
   }
   if (IsUnknown()) {
@@ -753,7 +820,8 @@ bool TfType::IsA(TfType queryType) const {
   return _IsAImplNoLock(queryType);
 }
 
-TfType const &TfType::Declare(const string &typeName) {
+TfType const &TfType::Declare(const string &typeName)
+{
   TfAutoMallocTag2 tag("Tf", "TfType::Declare");
 
   TfType t = FindByName(typeName);
@@ -768,7 +836,8 @@ TfType const &TfType::Declare(const string &typeName) {
 
 TfType const &TfType::Declare(const string &typeName,
                               const vector<TfType> &newBases,
-                              DefinitionCallback definitionCallback) {
+                              DefinitionCallback definitionCallback)
+{
   TfAutoMallocTag2 tag("Tf", "TfType::Declare");
   TF_DESCRIBE_SCOPE(typeName);
 
@@ -792,8 +861,8 @@ TfType const &TfType::Declare(const string &typeName,
     ScopedLock regLock(r.GetMutex(), /*write=*/true);
 
     if (t.IsUnknown() || t.IsRoot()) {
-      errorsToEmit.push_back(TfStringPrintf("Cannot declare the type '%s'",
-                                            t.GetTypeName().c_str()));
+      errorsToEmit.push_back(
+          TfStringPrintf("Cannot declare the type '%s'", t.GetTypeName().c_str()));
       goto errorOut;
     }
 
@@ -802,8 +871,7 @@ TfType const &TfType::Declare(const string &typeName,
 
     // If this type already directly inherits from root, then
     // prohibit adding any new bases.
-    if (!newBases.empty() && haveBases.size() == 1 &&
-        haveBases.front() == GetRoot()) {
+    if (!newBases.empty() && haveBases.size() == 1 && haveBases.front() == GetRoot()) {
       errorsToEmit.push_back(
           TfStringPrintf("Type '%s' has been declared to have 0 bases, "
                          "and therefore inherits directly from the root "
@@ -817,7 +885,8 @@ TfType const &TfType::Declare(const string &typeName,
         // If we don't have any bases yet, add the root type.
         t._AddBasesNoLock(TypeVector(1, GetRoot()), &errorsToEmit);
       }
-    } else {
+    }
+    else {
       // Otherwise, add the new bases.
       t._AddBasesNoLock(newBases, &errorsToEmit);
     }
@@ -854,7 +923,8 @@ errorOut:
 }
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-void TfType::DefinePythonClass(const TfPyObjWrapper &classObj) const {
+void TfType::DefinePythonClass(const TfPyObjWrapper &classObj) const
+{
   if (IsUnknown() || IsRoot()) {
     TF_CODING_ERROR("cannot define Python class because type is unknown");
     return;
@@ -863,32 +933,37 @@ void TfType::DefinePythonClass(const TfPyObjWrapper &classObj) const {
   ScopedLock regLock(r.GetMutex(), /*write=*/true);
   if (!TfPyIsNone(_info->pyClass)) {
     regLock.Release();
-    TF_CODING_ERROR("TfType '%s' already has a defined Python type; "
-                    "cannot redefine",
-                    GetTypeName().c_str());
+    TF_CODING_ERROR(
+        "TfType '%s' already has a defined Python type; "
+        "cannot redefine",
+        GetTypeName().c_str());
     return;
   }
   r.SetPythonClass(_info, classObj.Get());
 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-void TfType::_DefineCppType(const std::type_info &typeInfo, size_t sizeofType,
-                            bool isPodType, bool isEnumType) const {
+void TfType::_DefineCppType(const std::type_info &typeInfo,
+                            size_t sizeofType,
+                            bool isPodType,
+                            bool isEnumType) const
+{
   auto &r = Tf_TypeRegistry::GetInstance();
   ScopedLock regLock(r.GetMutex(), /*write=*/true);
   if (_info->typeInfo.load() != nullptr) {
     regLock.Release();
-    TF_CODING_ERROR("TfType '%s' already has a defined C++ type; "
-                    "cannot redefine",
-                    GetTypeName().c_str());
+    TF_CODING_ERROR(
+        "TfType '%s' already has a defined C++ type; "
+        "cannot redefine",
+        GetTypeName().c_str());
     return;
   }
   r.SetTypeInfo(_info, typeInfo, sizeofType, isPodType, isEnumType);
 }
 
 // Callers must hold registry write lock.
-void TfType::_AddBasesNoLock(const TypeVector &newBases,
-                             vector<string> *errorsToEmit) const {
+void TfType::_AddBasesNoLock(const TypeVector &newBases, vector<string> *errorsToEmit) const
+{
   TypeVector &haveBases = _info->baseTypes;
 
   // Also we check that all previously-declared bases are included and make
@@ -898,8 +973,8 @@ void TfType::_AddBasesNoLock(const TypeVector &newBases,
 
   for (const TfType &haveBase : haveBases) {
 
-    const TypeVector::const_iterator newIter =
-        std::find(newBases.begin(), newBases.end(), haveBase);
+    const TypeVector::const_iterator newIter = std::find(
+        newBases.begin(), newBases.end(), haveBase);
 
     // Repeated base declaration must include all previous bases.
     if (newIter == newBases.end()) {
@@ -910,15 +985,16 @@ void TfType::_AddBasesNoLock(const TypeVector &newBases,
         newBasesStr += newBase.GetTypeName();
       }
 
-      errorsToEmit->push_back(TfStringPrintf(
-          "TfType '%s' was previously declared to have '%s' as a base, "
-          "but a subsequent declaration does not include this as a base.  "
-          "The newly given bases were: (%s).  If this is a type declared "
-          "in a plugin, check that the plugin metadata is correct.",
-          GetTypeName().c_str(), haveBase.GetTypeName().c_str(),
-          newBasesStr.c_str()));
-
-    } else {
+      errorsToEmit->push_back(
+          TfStringPrintf("TfType '%s' was previously declared to have '%s' as a base, "
+                         "but a subsequent declaration does not include this as a base.  "
+                         "The newly given bases were: (%s).  If this is a type declared "
+                         "in a plugin, check that the plugin metadata is correct.",
+                         GetTypeName().c_str(),
+                         haveBase.GetTypeName().c_str(),
+                         newBasesStr.c_str()));
+    }
+    else {
 
       // Make sure the new bases are also ordered strictly monotonically
       // increasing so that it matches the old order.
@@ -934,11 +1010,13 @@ void TfType::_AddBasesNoLock(const TypeVector &newBases,
           newStr += newStr.empty() ? "" : ", ";
           newStr += t.GetTypeName();
         }
-        errorsToEmit->push_back(TfStringPrintf(
-            "Specified base type order differs for %s: had (%s), now "
-            "(%s).  If this is a type declared in a plugin, check that "
-            "the plugin metadata is correct.",
-            GetTypeName().c_str(), haveStr.c_str(), newStr.c_str()));
+        errorsToEmit->push_back(
+            TfStringPrintf("Specified base type order differs for %s: had (%s), now "
+                           "(%s).  If this is a type declared in a plugin, check that "
+                           "the plugin metadata is correct.",
+                           GetTypeName().c_str(),
+                           haveStr.c_str(),
+                           newStr.c_str()));
       }
 
       lastNewBaseIter = newIter;
@@ -957,8 +1035,7 @@ void TfType::_AddBasesNoLock(const TypeVector &newBases,
         errorsToEmit->push_back("Specified base type is unknown, skipping.");
         continue;
       }
-      if (std::find(haveBases.begin(), haveBases.end(), newBase) ==
-          haveBases.end()) {
+      if (std::find(haveBases.begin(), haveBases.end(), newBase) == haveBases.end()) {
 
         // Tell the new base that it has a new derived type.
         newBase._info->derivedTypes.push_back(*this);
@@ -972,13 +1049,14 @@ void TfType::_AddBasesNoLock(const TypeVector &newBases,
   }
 }
 
-void TfType::_AddCppCastFunc(const std::type_info &baseTypeInfo,
-                             _CastFunction func) const {
+void TfType::_AddCppCastFunc(const std::type_info &baseTypeInfo, _CastFunction func) const
+{
   ScopedLock regLock(GetRegistryMutex(), /*write=*/true);
   _info->SetCastFunc(baseTypeInfo, func);
 }
 
-void *TfType::CastToAncestor(TfType ancestor, void *addr) const {
+void *TfType::CastToAncestor(TfType ancestor, void *addr) const
+{
   if (IsUnknown() || ancestor.IsUnknown())
     return 0;
 
@@ -989,19 +1067,18 @@ void *TfType::CastToAncestor(TfType ancestor, void *addr) const {
     if (t == ancestor)
       return addr;
     if (t._info->baseTypes.size() == 1) {
-      _CastFunction *castFunc =
-          t._info->GetCastFunc(t._info->baseTypes[0].GetTypeid());
+      _CastFunction *castFunc = t._info->GetCastFunc(t._info->baseTypes[0].GetTypeid());
       if (castFunc) {
         addr = (*castFunc)(addr, true);
         t = t._info->baseTypes[0];
         continue;
-      } else {
+      }
+      else {
         return nullptr;
       }
     }
     for (size_t i = 0; i < t._info->baseTypes.size(); i++) {
-      _CastFunction *castFunc =
-          t._info->GetCastFunc(t._info->baseTypes[i].GetTypeid());
+      _CastFunction *castFunc = t._info->GetCastFunc(t._info->baseTypes[i].GetTypeid());
       if (castFunc) {
         void *pAddr = (*castFunc)(addr, true);
         if (void *final = t._info->baseTypes[i].CastToAncestor(ancestor, pAddr))
@@ -1012,7 +1089,8 @@ void *TfType::CastToAncestor(TfType ancestor, void *addr) const {
   }
 }
 
-void *TfType::CastFromAncestor(TfType ancestor, void *addr) const {
+void *TfType::CastFromAncestor(TfType ancestor, void *addr) const
+{
   if (IsUnknown() || ancestor.IsUnknown())
     return 0;
 
@@ -1022,7 +1100,8 @@ void *TfType::CastFromAncestor(TfType ancestor, void *addr) const {
     return addr;
 
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
-  TF_FOR_ALL(it, _info->baseTypes) {
+  TF_FOR_ALL(it, _info->baseTypes)
+  {
     if (void *tmp = it->CastFromAncestor(ancestor, addr)) {
       if (_CastFunction *castFunc = _info->GetCastFunc(it->GetTypeid()))
         return (*castFunc)(tmp, false);
@@ -1032,7 +1111,8 @@ void *TfType::CastFromAncestor(TfType ancestor, void *addr) const {
   return nullptr;
 }
 
-void TfType::SetFactory(std::unique_ptr<FactoryBase> factory) const {
+void TfType::SetFactory(std::unique_ptr<FactoryBase> factory) const
+{
   if (IsUnknown() || IsRoot()) {
     TF_CODING_ERROR("Cannot set factory of %s\n", GetTypeName().c_str());
     return;
@@ -1048,7 +1128,8 @@ void TfType::SetFactory(std::unique_ptr<FactoryBase> factory) const {
   _info->factory = std::move(factory);
 }
 
-TfType::FactoryBase *TfType::_GetFactory() const {
+TfType::FactoryBase *TfType::_GetFactory() const
+{
   if (IsUnknown() || IsRoot()) {
     TF_CODING_ERROR("Cannot manufacture type %s", GetTypeName().c_str());
     return NULL;
@@ -1060,7 +1141,8 @@ TfType::FactoryBase *TfType::_GetFactory() const {
   return _info->factory.get();
 }
 
-void TfType::_ExecuteDefinitionCallback() const {
+void TfType::_ExecuteDefinitionCallback() const
+{
   // We don't want to call the definition callback while holding the
   // registry's lock, so first copy it with the lock held then
   // execute it.
@@ -1071,11 +1153,11 @@ void TfType::_ExecuteDefinitionCallback() const {
   }
 }
 
-string TfType::GetCanonicalTypeName(const std::type_info &t) {
+string TfType::GetCanonicalTypeName(const std::type_info &t)
+{
   TfAutoMallocTag2 tag("Tf", "TfType::GetCanonicalTypeName");
 
-  using LookupMap =
-      TfHashMap<std::type_index, std::string, std::hash<std::type_index>>;
+  using LookupMap = TfHashMap<std::type_index, std::string, std::hash<std::type_index>>;
   static LookupMap lookupMap;
 
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
@@ -1091,7 +1173,8 @@ string TfType::GetCanonicalTypeName(const std::type_info &t) {
   return lookupMap.insert({typeIndex, ArchGetDemangled(t)}).first->second;
 }
 
-void TfType::AddAlias(TfType base, const string &name) const {
+void TfType::AddAlias(TfType base, const string &name) const
+{
   std::string errMsg;
   {
     auto &r = Tf_TypeRegistry::GetInstance();
@@ -1103,22 +1186,26 @@ void TfType::AddAlias(TfType base, const string &name) const {
     TF_CODING_ERROR(errMsg);
 }
 
-bool TfType::IsEnumType() const {
+bool TfType::IsEnumType() const
+{
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
   return _info->isEnumType;
 }
 
-bool TfType::IsPlainOldDataType() const {
+bool TfType::IsPlainOldDataType() const
+{
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
   return _info->isPodType;
 }
 
-size_t TfType::GetSizeof() const {
+size_t TfType::GetSizeof() const
+{
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
   return _info->sizeofType;
 }
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<void>();
   TfType::Define<bool>();
   TfType::Define<char>();
@@ -1138,36 +1225,31 @@ TF_REGISTRY_FUNCTION(TfType) {
 
   TfType::Define<vector<bool>>().AddAlias(TfType::GetRoot(), "vector<bool>");
   TfType::Define<vector<char>>().AddAlias(TfType::GetRoot(), "vector<char>");
-  TfType::Define<vector<unsigned char>>().AddAlias(TfType::GetRoot(),
-                                                   "vector<unsigned char>");
+  TfType::Define<vector<unsigned char>>().AddAlias(TfType::GetRoot(), "vector<unsigned char>");
   TfType::Define<vector<short>>().AddAlias(TfType::GetRoot(), "vector<short>");
-  TfType::Define<vector<unsigned short>>().AddAlias(TfType::GetRoot(),
-                                                    "vector<unsigned short>");
+  TfType::Define<vector<unsigned short>>().AddAlias(TfType::GetRoot(), "vector<unsigned short>");
   TfType::Define<vector<int>>().AddAlias(TfType::GetRoot(), "vector<int>");
-  TfType::Define<vector<unsigned int>>().AddAlias(TfType::GetRoot(),
-                                                  "vector<unsigned int>");
+  TfType::Define<vector<unsigned int>>().AddAlias(TfType::GetRoot(), "vector<unsigned int>");
   TfType::Define<vector<long>>().AddAlias(TfType::GetRoot(), "vector<long>");
 
   TfType ulvec = TfType::Define<vector<unsigned long>>();
   ulvec.AddAlias(TfType::GetRoot(), "vector<unsigned long>");
   ulvec.AddAlias(TfType::GetRoot(), "vector<size_t>");
 
-  TfType::Define<vector<long long>>().AddAlias(TfType::GetRoot(),
-                                               "vector<long long>");
-  TfType::Define<vector<unsigned long long>>().AddAlias(
-      TfType::GetRoot(), "vector<unsigned long long>");
+  TfType::Define<vector<long long>>().AddAlias(TfType::GetRoot(), "vector<long long>");
+  TfType::Define<vector<unsigned long long>>().AddAlias(TfType::GetRoot(),
+                                                        "vector<unsigned long long>");
 
   TfType::Define<vector<float>>().AddAlias(TfType::GetRoot(), "vector<float>");
-  TfType::Define<vector<double>>().AddAlias(TfType::GetRoot(),
-                                            "vector<double>");
-  TfType::Define<vector<string>>().AddAlias(TfType::GetRoot(),
-                                            "vector<string>");
+  TfType::Define<vector<double>>().AddAlias(TfType::GetRoot(), "vector<double>");
+  TfType::Define<vector<string>>().AddAlias(TfType::GetRoot(), "vector<string>");
 
   // Register TfType itself.
   TfType::Define<TfType>();
 }
 
-std::ostream &operator<<(std::ostream &out, const TfType &t) {
+std::ostream &operator<<(std::ostream &out, const TfType &t)
+{
   return out << t.GetTypeName();
 }
 

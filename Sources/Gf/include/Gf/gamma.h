@@ -104,4 +104,4 @@ GF_API unsigned char GfConvertDisplayToLinear(const unsigned char &v);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_GAMMA_H
+#endif  // PXR_BASE_GF_GAMMA_H

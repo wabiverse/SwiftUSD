@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HGIGL_STATE_H
 #define PXR_IMAGING_HGIGL_STATE_H
 
-#include <pxr/pxrns.h>
 #include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 
 #include <cstdint>
 #include <vector>
@@ -45,16 +45,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// The end goal is to not need this object at all and make sure all opengl
 /// state is only changed via HgiPipeline objects.
 ///
-class HgiGL_ScopedStateHolder final
-{
-public:
+class HgiGL_ScopedStateHolder final {
+ public:
   HGIGL_API
   HgiGL_ScopedStateHolder();
 
   HGIGL_API
   ~HgiGL_ScopedStateHolder();
 
-private:
+ private:
   HgiGL_ScopedStateHolder &operator=(const HgiGL_ScopedStateHolder &) = delete;
   HgiGL_ScopedStateHolder(const HgiGL_ScopedStateHolder &) = delete;
 

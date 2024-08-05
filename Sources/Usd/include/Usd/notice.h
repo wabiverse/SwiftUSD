@@ -40,19 +40,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Container class for Usd notices
 ///
 class UsdNotice {
-public:
+ public:
   /// Base class for UsdStage notices.
   class StageNotice : public TfNotice {
-  public:
+   public:
     USD_API
     StageNotice(const UsdStageWeakPtr &stage);
     USD_API
     virtual ~StageNotice();
 
     /// Return the stage associated with this notice.
-    const UsdStageWeakPtr &GetStage() const { return _stage; }
+    const UsdStageWeakPtr &GetStage() const
+    {
+      return _stage;
+    }
 
-  private:
+   private:
     UsdStageWeakPtr _stage;
   };
 
@@ -69,9 +72,8 @@ public:
   /// invalidation of UsdPrim s.
   ///
   class StageContentsChanged : public StageNotice {
-  public:
-    explicit StageContentsChanged(const UsdStageWeakPtr &stage)
-        : StageNotice(stage) {}
+   public:
+    explicit StageContentsChanged(const UsdStageWeakPtr &stage) : StageNotice(stage) {}
     USD_API virtual ~StageContentsChanged();
   };
 
@@ -105,17 +107,17 @@ public:
   /// GetChangedInfoOnlyPaths() methods.
   ///
   class ObjectsChanged : public StageNotice {
-    using _PathsToChangesMap =
-        std::map<SdfPath, std::vector<const SdfChangeList::Entry *>>;
+    using _PathsToChangesMap = std::map<SdfPath, std::vector<const SdfChangeList::Entry *>>;
 
     friend class UsdStage;
     ObjectsChanged(const UsdStageWeakPtr &stage,
                    const _PathsToChangesMap *resyncChanges,
                    const _PathsToChangesMap *infoChanges)
-        : StageNotice(stage), _resyncChanges(resyncChanges),
-          _infoChanges(infoChanges) {}
+        : StageNotice(stage), _resyncChanges(resyncChanges), _infoChanges(infoChanges)
+    {
+    }
 
-  public:
+   public:
     USD_API virtual ~ObjectsChanged();
 
     /// Return true if \p obj was possibly affected by the layer changes
@@ -124,7 +126,8 @@ public:
     /// \code
     /// ResyncedObject(obj) or ChangedInfoOnly(obj)
     /// \endcode
-    bool AffectedObject(const UsdObject &obj) const {
+    bool AffectedObject(const UsdObject &obj) const
+    {
       return ResyncedObject(obj) || ChangedInfoOnly(obj);
     }
 
@@ -144,14 +147,14 @@ public:
     /// iterators to access additional information about each changed
     /// object.
     class PathRange {
-    public:
+     public:
       /// \class iterator
-      class iterator : public boost::iterator_adaptor<
-                           iterator,                           // crtp base,
-                           _PathsToChangesMap::const_iterator, // base iterator
-                           const SdfPath &                     // value type
-                           > {
-      public:
+      class iterator
+          : public boost::iterator_adaptor<iterator,                            // crtp base,
+                                           _PathsToChangesMap::const_iterator,  // base iterator
+                                           const SdfPath &                      // value type
+                                           > {
+       public:
         iterator() : iterator_adaptor_(base_type()) {}
 
         /// Return the set of changed fields in layers that affected
@@ -166,12 +169,15 @@ public:
         /// details.
         USD_API bool HasChangedFields() const;
 
-      private:
+       private:
         friend class PathRange;
         friend class boost::iterator_core_access;
 
         iterator(base_type baseIter) : iterator_adaptor_(baseIter) {}
-        inline reference dereference() const { return base()->first; }
+        inline reference dereference() const
+        {
+          return base()->first;
+        }
       };
 
       using const_iterator = iterator;
@@ -179,39 +185,58 @@ public:
       PathRange() : _changes(nullptr) {}
 
       /// Explicit conversion to SdfPathVector for convenience
-      explicit operator SdfPathVector() const {
+      explicit operator SdfPathVector() const
+      {
         return SdfPathVector(begin(), end());
       }
 
       /// Return true if this range contains any paths, false otherwise.
-      bool empty() const { return !_changes || _changes->empty(); }
+      bool empty() const
+      {
+        return !_changes || _changes->empty();
+      }
 
       /// Return the number of paths in this range.
-      size_t size() const { return _changes ? _changes->size() : 0; }
+      size_t size() const
+      {
+        return _changes ? _changes->size() : 0;
+      }
 
       /// Return iterator to the start of this range.
-      iterator begin() const { return iterator(_changes->cbegin()); }
+      iterator begin() const
+      {
+        return iterator(_changes->cbegin());
+      }
 
       /// Return iterator to the start of this range.
-      const_iterator cbegin() const { return iterator(_changes->cbegin()); }
+      const_iterator cbegin() const
+      {
+        return iterator(_changes->cbegin());
+      }
 
       /// Return the end iterator for this range.
-      iterator end() const { return iterator(_changes->cend()); }
+      iterator end() const
+      {
+        return iterator(_changes->cend());
+      }
 
       /// Return the end iterator for this range.
-      const_iterator cend() const { return iterator(_changes->cend()); }
+      const_iterator cend() const
+      {
+        return iterator(_changes->cend());
+      }
 
       /// Return an iterator to the specified \p path in this range if
       /// it exists, or end() if it does not.  This is potentially more
       /// efficient than std::find(begin(), end()).
-      const_iterator find(const SdfPath &path) const {
+      const_iterator find(const SdfPath &path) const
+      {
         return const_iterator(_changes->find(path));
       }
 
-    private:
+     private:
       friend class ObjectsChanged;
-      explicit PathRange(const _PathsToChangesMap *changes)
-          : _changes(changes) {}
+      explicit PathRange(const _PathsToChangesMap *changes) : _changes(changes) {}
 
       const _PathsToChangesMap *_changes;
     };
@@ -255,7 +280,7 @@ public:
     /// \overload
     USD_API bool HasChangedFields(const SdfPath &path) const;
 
-  private:
+   private:
     const _PathsToChangesMap *_resyncChanges;
     const _PathsToChangesMap *_infoChanges;
   };
@@ -266,9 +291,8 @@ public:
   /// thread that changed the target.
   ///
   class StageEditTargetChanged : public StageNotice {
-  public:
-    explicit StageEditTargetChanged(const UsdStageWeakPtr &stage)
-        : StageNotice(stage) {}
+   public:
+    explicit StageEditTargetChanged(const UsdStageWeakPtr &stage) : StageNotice(stage) {}
     USD_API virtual ~StageEditTargetChanged();
   };
 
@@ -287,12 +311,13 @@ public:
   /// layer that does belong to the current stage but is not yet loaded
   /// because it is behind an unloaded payload or unselected variant.
   class LayerMutingChanged : public StageNotice {
-  public:
+   public:
     explicit LayerMutingChanged(const UsdStageWeakPtr &stage,
                                 const std::vector<std::string> &mutedLayers,
                                 const std::vector<std::string> &unmutedLayers)
-        : StageNotice(stage), _mutedLayers(mutedLayers),
-          _unMutedLayers(unmutedLayers) {}
+        : StageNotice(stage), _mutedLayers(mutedLayers), _unMutedLayers(unmutedLayers)
+    {
+    }
 
     USD_API virtual ~LayerMutingChanged();
 
@@ -301,7 +326,8 @@ public:
     /// The stage's resolver context must be bound when looking up
     /// layers using the returned identifiers to ensure the same layers
     /// that would be used by the stage are found.
-    const std::vector<std::string> &GetMutedLayers() const {
+    const std::vector<std::string> &GetMutedLayers() const
+    {
       return _mutedLayers;
     }
 
@@ -310,11 +336,12 @@ public:
     /// The stage's resolver context must be bound when looking up
     /// layers using the returned identifiers to ensure the same layers
     /// that would be used by the stage are found.
-    const std::vector<std::string> &GetUnmutedLayers() const {
+    const std::vector<std::string> &GetUnmutedLayers() const
+    {
       return _unMutedLayers;
     }
 
-  private:
+   private:
     const std::vector<std::string> &_mutedLayers;
     const std::vector<std::string> &_unMutedLayers;
   };
@@ -322,4 +349,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_NOTICE_H
+#endif  // PXR_USD_USD_NOTICE_H

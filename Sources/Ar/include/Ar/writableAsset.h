@@ -41,7 +41,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \see ArResolver::OpenAssetForWrite for how to retrieve instances of
 /// this object.
 class ArWritableAsset {
-public:
+ public:
   AR_API
   virtual ~ArWritableAsset();
 
@@ -61,7 +61,7 @@ public:
   /// of the asset. Returns number of bytes written, or 0 on error.
   virtual size_t Write(const void *buffer, size_t count, size_t offset) = 0;
 
-protected:
+ protected:
   AR_API
   ArWritableAsset();
 };

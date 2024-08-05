@@ -37,7 +37,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Array concept. By default, types are not arrays.
-template <typename T> struct VtIsArray : public std::false_type {};
+template<typename T> struct VtIsArray : public std::false_type {};
 
 // We attempt to use local storage if a given type will fit and if it has a
 // cheap copy operation.  By default we only treat types with trivial
@@ -45,12 +45,10 @@ template <typename T> struct VtIsArray : public std::false_type {};
 // space but do not have a trivial assignment are not cheap to copy.  E.g. std::
 // containers.  Clients can specialize this template for their own types that
 // aren't trivially assignable but are cheap to copy to enable local storage.
-template <class T>
-struct VtValueTypeHasCheapCopy : boost::has_trivial_assign<T> {};
+template<class T> struct VtValueTypeHasCheapCopy : boost::has_trivial_assign<T> {};
 
-#define VT_TYPE_IS_CHEAP_TO_COPY(T)                                            \
-  template <>                                                                  \
-  struct VtValueTypeHasCheapCopy<TF_PP_EAT_PARENS(T)> : std::true_type {}
+#define VT_TYPE_IS_CHEAP_TO_COPY(T) \
+  template<> struct VtValueTypeHasCheapCopy<TF_PP_EAT_PARENS(T)> : std::true_type {}
 
 // VtValue supports two kinds of "value proxy":
 //
@@ -105,42 +103,37 @@ struct VtValueTypeHasCheapCopy : boost::has_trivial_assign<T> {};
 // or use the VT_TYPE_IS_TYPED_VALUE_PROXY macro to indicate their type is a
 // VtValue proxy type.
 struct VtTypedValueProxyBase {};
-template <class T>
-struct VtIsTypedValueProxy : std::is_base_of<VtTypedValueProxyBase, T> {};
-#define VT_TYPE_IS_TYPED_VALUE_PROXY(T)                                        \
-  template <>                                                                  \
-  struct VtIsTypedValueProxy<TF_PP_EAT_PARENS(T)> : std::true_type {}
+template<class T> struct VtIsTypedValueProxy : std::is_base_of<VtTypedValueProxyBase, T> {};
+#define VT_TYPE_IS_TYPED_VALUE_PROXY(T) \
+  template<> struct VtIsTypedValueProxy<TF_PP_EAT_PARENS(T)> : std::true_type {}
 
 // Base implementation for VtGetProxiedObject (for non-proxy types).
-template <class T, typename std::enable_if<!VtIsTypedValueProxy<T>::value,
-                                           int>::type = 0>
-T const &VtGetProxiedObject(T const &nonProxy) {
+template<class T, typename std::enable_if<!VtIsTypedValueProxy<T>::value, int>::type = 0>
+T const &VtGetProxiedObject(T const &nonProxy)
+{
   return nonProxy;
 }
 
 // Metafunction to determine the proxied type for a typed proxy.
-template <class T> struct VtGetProxiedType {
-  using type = typename std::decay<decltype(VtGetProxiedObject(
-      std::declval<T>()))>::type;
+template<class T> struct VtGetProxiedType {
+  using type = typename std::decay<decltype(VtGetProxiedObject(std::declval<T>()))>::type;
 };
 
 // Clients may derive VtErasedValueProxyBase, specialize VtIsErasedValueProxy,
 // or use the VT_TYPE_IS_ERASED_VALUE_PROXY macro to indicate their type is a
 // VtValue proxy type.
 struct VtErasedValueProxyBase {};
-template <class T>
-struct VtIsErasedValueProxy : std::is_base_of<VtErasedValueProxyBase, T> {};
-#define VT_TYPE_IS_ERASED_VALUE_PROXY(T)                                       \
-  template <>                                                                  \
-  struct VtIsErasedValueProxy<TF_PP_EAT_PARENS(T)> : std::true_type {}
+template<class T> struct VtIsErasedValueProxy : std::is_base_of<VtErasedValueProxyBase, T> {};
+#define VT_TYPE_IS_ERASED_VALUE_PROXY(T) \
+  template<> struct VtIsErasedValueProxy<TF_PP_EAT_PARENS(T)> : std::true_type {}
 
 // Metafunction to determine whether or not a given type T is a value proxy
 // (either typed or type-erased).
-template <class T>
+template<class T>
 struct VtIsValueProxy
-    : std::integral_constant<bool, VtIsTypedValueProxy<T>::value ||
-                                       VtIsErasedValueProxy<T>::value> {};
+    : std::integral_constant<bool,
+                             VtIsTypedValueProxy<T>::value || VtIsErasedValueProxy<T>::value> {};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_VT_TRAITS_H
+#endif  // PXR_BASE_VT_TRAITS_H

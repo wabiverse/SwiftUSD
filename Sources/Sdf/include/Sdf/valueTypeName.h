@@ -44,25 +44,31 @@ class Sdf_ValueTypeImpl;
 /// Represents the shape of a value type (or that of an element in an array).
 ///
 struct SdfTupleDimensions {
-public:
+ public:
   SdfTupleDimensions() : size(0) {}
-  SdfTupleDimensions(size_t m) : size(1) { d[0] = m; }
-  SdfTupleDimensions(size_t m, size_t n) : size(2) {
+  SdfTupleDimensions(size_t m) : size(1)
+  {
+    d[0] = m;
+  }
+  SdfTupleDimensions(size_t m, size_t n) : size(2)
+  {
     d[0] = m;
     d[1] = n;
   }
-  SdfTupleDimensions(const size_t (&s)[2]) : size(2) {
+  SdfTupleDimensions(const size_t (&s)[2]) : size(2)
+  {
     d[0] = s[0];
     d[1] = s[1];
   }
 
   SDF_API
   bool operator==(const SdfTupleDimensions &rhs) const;
-  bool operator!=(const SdfTupleDimensions &rhs) const {
+  bool operator!=(const SdfTupleDimensions &rhs) const
+  {
     return !(*this == rhs);
   }
 
-public:
+ public:
   size_t d[2];
   size_t size;
 };
@@ -89,7 +95,7 @@ public:
 /// Aliases compare equal, even if registered by different schemas.
 ///
 class SdfValueTypeName {
-public:
+ public:
   /// Constructs an invalid type name.
   SDF_API
   SdfValueTypeName();
@@ -152,35 +158,44 @@ public:
   /// compare equal.
   SDF_API
   bool operator==(const SdfValueTypeName &rhs) const;
-  bool operator!=(const SdfValueTypeName &rhs) const { return !(*this == rhs); }
+  bool operator!=(const SdfValueTypeName &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// Returns \c true if this type name is equal to \p rhs.  Aliases
   /// compare equal.  Avoid relying on this overload.
   SDF_API
   bool operator==(const std::string &rhs) const;
-  bool operator!=(const std::string &rhs) const { return !(*this == rhs); }
+  bool operator!=(const std::string &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// Returns \c true if this type name is equal to \p rhs.  Aliases
   /// compare equal.  Avoid relying on this overload.
   SDF_API
   bool operator==(const TfToken &rhs) const;
-  bool operator!=(const TfToken &rhs) const { return !(*this == rhs); }
+  bool operator!=(const TfToken &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
-  friend inline bool operator==(const std::string &lhs,
-                                const SdfValueTypeName &rhs) {
+  friend inline bool operator==(const std::string &lhs, const SdfValueTypeName &rhs)
+  {
     return rhs == lhs;
   }
-  friend inline bool operator!=(const std::string &lhs,
-                                const SdfValueTypeName &rhs) {
+  friend inline bool operator!=(const std::string &lhs, const SdfValueTypeName &rhs)
+  {
     return !(rhs == lhs);
   }
 
-  friend inline bool operator==(const TfToken &lhs,
-                                const SdfValueTypeName &rhs) {
+  friend inline bool operator==(const TfToken &lhs, const SdfValueTypeName &rhs)
+  {
     return rhs == lhs;
   }
-  friend inline bool operator!=(const TfToken &lhs,
-                                const SdfValueTypeName &rhs) {
+  friend inline bool operator!=(const TfToken &lhs, const SdfValueTypeName &rhs)
+  {
     return !(rhs == lhs);
   }
 
@@ -190,14 +205,17 @@ public:
 
   /// Explicit bool conversion operator. Converts to \c true if this is a
   /// valid, non-empty type, \c false otherwise.
-  explicit operator bool() const { return !_IsEmpty(); }
+  explicit operator bool() const
+  {
+    return !_IsEmpty();
+  }
 
   /// Returns all aliases of the type name as tokens.  These should not
   /// be used for comparison purposes.
   SDF_API
   std::vector<TfToken> GetAliasesAsTokens() const;
 
-private:
+ private:
   friend class Sdf_ValueTypeRegistry;
   friend struct Sdf_ValueTypePrivate;
 
@@ -207,22 +225,25 @@ private:
   SDF_API
   bool _IsEmpty() const;
 
-private:
+ private:
   const Sdf_ValueTypeImpl *_impl;
 };
 
 /// Functor for hashing a \c SdfValueTypeName.
 struct SdfValueTypeNameHash {
-  size_t operator()(const SdfValueTypeName &x) const { return x.GetHash(); }
+  size_t operator()(const SdfValueTypeName &x) const
+  {
+    return x.GetHash();
+  }
 };
 
-inline size_t hash_value(const SdfValueTypeName &typeName) {
+inline size_t hash_value(const SdfValueTypeName &typeName)
+{
   return typeName.GetHash();
 }
 
-SDF_API std::ostream &operator<<(std::ostream &,
-                                 const SdfValueTypeName &typeName);
+SDF_API std::ostream &operator<<(std::ostream &, const SdfValueTypeName &typeName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_VALUE_TYPE_NAME_H
+#endif  // PXR_USD_SDF_VALUE_TYPE_NAME_H

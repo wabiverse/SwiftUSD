@@ -55,62 +55,71 @@ namespace {
 static SdfPrimSpecHandle _NewFromLayer(const SdfLayerHandle &parent,
                                        const std::string &name,
                                        SdfSpecifier spec,
-                                       const std::string &typeName) {
+                                       const std::string &typeName)
+{
   return SdfPrimSpec::New(parent, name, spec, typeName);
 }
 
 static SdfPrimSpecHandle _NewTypelessFromLayer(const SdfLayerHandle &parent,
                                                const std::string &name,
-                                               SdfSpecifier spec) {
+                                               SdfSpecifier spec)
+{
   return SdfPrimSpec::New(parent, name, spec);
 }
 
 static SdfPrimSpecHandle _NewPrim(const SdfPrimSpecHandle &parent,
-                                  const std::string &name, SdfSpecifier spec,
-                                  const std::string &typeName) {
+                                  const std::string &name,
+                                  SdfSpecifier spec,
+                                  const std::string &typeName)
+{
   return SdfPrimSpec::New(parent, name, spec, typeName);
 }
 
 static SdfPrimSpecHandle _NewTypelessPrim(const SdfPrimSpecHandle &parent,
                                           const std::string &name,
-                                          SdfSpecifier spec) {
+                                          SdfSpecifier spec)
+{
   return SdfPrimSpec::New(parent, name, spec);
 }
 
 typedef SdfPyChildrenProxy<SdfPrimSpec::NameChildrenView> NameChildrenProxy;
 
-static NameChildrenProxy _WrapGetNameChildrenProxy(const SdfPrimSpec &prim) {
+static NameChildrenProxy _WrapGetNameChildrenProxy(const SdfPrimSpec &prim)
+{
   return NameChildrenProxy(prim.GetNameChildren(), "prim");
 }
 
 typedef SdfPyChildrenProxy<SdfPrimSpec::PropertySpecView> PropertiesProxy;
 
-static PropertiesProxy _WrapGetPropertiesProxy(const SdfPrimSpec &prim) {
+static PropertiesProxy _WrapGetPropertiesProxy(const SdfPrimSpec &prim)
+{
   return PropertiesProxy(prim.GetProperties(), "property");
 }
 
 typedef SdfPyChildrenProxy<SdfVariantSetView> VariantSetProxy;
 
-static VariantSetProxy _WrapGetVariantSetsProxy(const SdfPrimSpec &prim) {
+static VariantSetProxy _WrapGetVariantSetsProxy(const SdfPrimSpec &prim)
+{
   return VariantSetProxy(prim.GetVariantSets());
 }
 
-static void _SetSymmetryArguments(const SdfPrimSpec &self,
-                                  VtDictionary const &dictionary) {
+static void _SetSymmetryArguments(const SdfPrimSpec &self, VtDictionary const &dictionary)
+{
   self.GetSymmetryArguments() = dictionary;
 }
 
-static void _SetCustomData(const SdfPrimSpec &self,
-                           VtDictionary const &dictionary) {
+static void _SetCustomData(const SdfPrimSpec &self, VtDictionary const &dictionary)
+{
   self.GetCustomData() = dictionary;
 }
 
-static void _SetAssetInfo(const SdfPrimSpec &self,
-                          VtDictionary const &dictionary) {
+static void _SetAssetInfo(const SdfPrimSpec &self, VtDictionary const &dictionary)
+{
   self.GetAssetInfo() = dictionary;
 }
 
-static void _SetRelocates(SdfPrimSpec &self, const dict &d) {
+static void _SetRelocates(SdfPrimSpec &self, const dict &d)
+{
   SdfRelocatesMap reloMap;
 
   auto items = d.attr("items")();
@@ -128,43 +137,45 @@ static void _SetRelocates(SdfPrimSpec &self, const dict &d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void _WrapSetName(SdfPrimSpec &self, const std::string &newName) {
+static void _WrapSetName(SdfPrimSpec &self, const std::string &newName)
+{
   // Always validate the new name from python.
   self.SetName(newName, true);
 }
 
-static bool _WrapCanSetName(SdfPrimSpec &self, const std::string &newName) {
+static bool _WrapCanSetName(SdfPrimSpec &self, const std::string &newName)
+{
   std::string errStr;
   return self.CanSetName(newName, &errStr);
 }
 
-static std::vector<TfToken>
-_ApplyNameChildrenOrder(const SdfPrimSpec &self,
-                        const std::vector<TfToken> &names) {
+static std::vector<TfToken> _ApplyNameChildrenOrder(const SdfPrimSpec &self,
+                                                    const std::vector<TfToken> &names)
+{
   std::vector<TfToken> result = names;
   self.ApplyNameChildrenOrder(&result);
   return result;
 }
 
-static std::vector<TfToken>
-_ApplyPropertyOrder(const SdfPrimSpec &self,
-                    const std::vector<TfToken> &names) {
+static std::vector<TfToken> _ApplyPropertyOrder(const SdfPrimSpec &self,
+                                                const std::vector<TfToken> &names)
+{
   std::vector<TfToken> result = names;
   self.ApplyPropertyOrder(&result);
   return result;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPrimSpec() {
+void wrapPrimSpec()
+{
   def("CreatePrimInLayer", SdfCreatePrimInLayer);
   def("JustCreatePrimInLayer", SdfJustCreatePrimInLayer);
 
   typedef SdfPrimSpec This;
 
   // Register python conversions for vector<SdfPrimSpecHandle>
-  to_python_converter<SdfPrimSpecHandleVector,
-                      TfPySequenceToPython<SdfPrimSpecHandleVector>>();
+  to_python_converter<SdfPrimSpecHandleVector, TfPySequenceToPython<SdfPrimSpecHandleVector>>();
   TfPyContainerConversions::from_python_sequence<
       SdfPrimSpecHandleVector,
       TfPyContainerConversions::variable_capacity_policy>();
@@ -182,8 +193,7 @@ void wrapPrimSpec() {
   to_python_converter<SdfVariantSetSpecHandleMap,
                       TfPySequenceToPython<SdfVariantSetSpecHandleMap>>();
 
-  class_<This, SdfHandle<This>, bases<SdfSpec>, boost::noncopyable>("PrimSpec",
-                                                                    no_init)
+  class_<This, SdfHandle<This>, bases<SdfSpec>, boost::noncopyable>("PrimSpec", no_init)
       .def(SdfPySpec())
 
       .def(SdfMakePySpecConstructor(&_NewFromLayer))
@@ -191,36 +201,44 @@ void wrapPrimSpec() {
       .def(SdfMakePySpecConstructor(&_NewPrim))
       .def(SdfMakePySpecConstructor(&_NewTypelessPrim))
 
-      .add_property(
-          "name",
-          make_function(&This::GetName, return_value_policy<return_by_value>()),
-          &_WrapSetName, "The prim's name.")
+      .add_property("name",
+                    make_function(&This::GetName, return_value_policy<return_by_value>()),
+                    &_WrapSetName,
+                    "The prim's name.")
 
-      .add_property("comment", &This::GetComment, &This::SetComment,
-                    "The prim's comment string.")
+      .add_property("comment", &This::GetComment, &This::SetComment, "The prim's comment string.")
 
-      .add_property("documentation", &This::GetDocumentation,
-                    &This::SetDocumentation, "The prim's documentation string.")
+      .add_property("documentation",
+                    &This::GetDocumentation,
+                    &This::SetDocumentation,
+                    "The prim's documentation string.")
 
-      .add_property("active", &This::GetActive, &This::SetActive,
+      .add_property("active",
+                    &This::GetActive,
+                    &This::SetActive,
                     "Whether this prim spec is active.\n"
                     "The default value is true.")
 
       .def("HasActive", &This::HasActive)
       .def("ClearActive", &This::ClearActive)
 
-      .add_property("hidden", &This::GetHidden, &This::SetHidden,
+      .add_property("hidden",
+                    &This::GetHidden,
+                    &This::SetHidden,
                     "Whether this prim spec will be hidden in browsers.\n"
                     "The default value is false.")
 
-      .add_property("kind", &This::GetKind, &This::SetKind,
+      .add_property("kind",
+                    &This::GetKind,
+                    &This::SetKind,
                     "What kind of model this prim spec represents, if any.\n"
                     "The default is an empty string")
 
       .def("HasKind", &This::HasKind)
       .def("ClearKind", &This::ClearKind)
 
-      .add_property("instanceable", &This::GetInstanceable,
+      .add_property("instanceable",
+                    &This::GetInstanceable,
                     &This::SetInstanceable,
                     "Whether this prim spec is flagged as instanceable.\n"
                     "The default value is false.")
@@ -228,61 +246,70 @@ void wrapPrimSpec() {
       .def("HasInstanceable", &This::HasInstanceable)
       .def("ClearInstanceable", &This::ClearInstanceable)
 
-      .add_property("permission", &This::GetPermission, &This::SetPermission,
+      .add_property("permission",
+                    &This::GetPermission,
+                    &This::SetPermission,
                     "The prim's permission restriction.\n"
                     "The default value is SdfPermissionPublic.")
 
-      .add_property("symmetryFunction", &This::GetSymmetryFunction,
-                    &This::SetSymmetryFunction, "The prim's symmetry function.")
+      .add_property("symmetryFunction",
+                    &This::GetSymmetryFunction,
+                    &This::SetSymmetryFunction,
+                    "The prim's symmetry function.")
 
-      .add_property("symmetryArguments", &This::GetSymmetryArguments,
+      .add_property("symmetryArguments",
+                    &This::GetSymmetryArguments,
                     &_SetSymmetryArguments,
                     "Dictionary with prim symmetry arguments.\n\n"
                     "Although this property is marked read-only, you can "
                     "modify the contents to add, change, and clear symmetry "
                     "arguments.")
 
-      .add_property("symmetricPeer", &This::GetSymmetricPeer,
-                    &This::SetSymmetricPeer, "The prims's symmetric peer.")
+      .add_property("symmetricPeer",
+                    &This::GetSymmetricPeer,
+                    &This::SetSymmetricPeer,
+                    "The prims's symmetric peer.")
 
-      .add_property(
-          "customData", &This::GetCustomData, &_SetCustomData,
-          "The custom data for this prim.\n\n"
-          "The default value for custom data is an empty dictionary.\n\n"
-          "Custom data is for use by plugins or other non-tools supplied \n"
-          "extensions that need to be able to store data attached to "
-          "arbitrary\n"
-          "scene objects.  Note that if the only objects you want to store "
-          "data\n"
-          "on are prims, using custom attributes is probably a better choice.\n"
-          "But if you need to possibly store this data on attributes or \n"
-          "relationships or as annotations on reference arcs, then custom "
-          "data\n"
-          "is an appropriate choice.")
+      .add_property("customData",
+                    &This::GetCustomData,
+                    &_SetCustomData,
+                    "The custom data for this prim.\n\n"
+                    "The default value for custom data is an empty dictionary.\n\n"
+                    "Custom data is for use by plugins or other non-tools supplied \n"
+                    "extensions that need to be able to store data attached to "
+                    "arbitrary\n"
+                    "scene objects.  Note that if the only objects you want to store "
+                    "data\n"
+                    "on are prims, using custom attributes is probably a better choice.\n"
+                    "But if you need to possibly store this data on attributes or \n"
+                    "relationships or as annotations on reference arcs, then custom "
+                    "data\n"
+                    "is an appropriate choice.")
 
-      .add_property(
-          "assetInfo", &This::GetAssetInfo, &_SetAssetInfo,
-          "Returns the asset info dictionary for this prim.\n\n"
-          "The default value is an empty dictionary.\n\n"
-          "The asset info dictionary is used to annotate prims representing "
-          "the root-prims of assets (generally organized as models) with "
-          "various data related to asset management. For example, asset "
-          "name, root layer identifier, asset version etc.")
+      .add_property("assetInfo",
+                    &This::GetAssetInfo,
+                    &_SetAssetInfo,
+                    "Returns the asset info dictionary for this prim.\n\n"
+                    "The default value is an empty dictionary.\n\n"
+                    "The asset info dictionary is used to annotate prims representing "
+                    "the root-prims of assets (generally organized as models) with "
+                    "various data related to asset management. For example, asset "
+                    "name, root layer identifier, asset version etc.")
 
-      .add_property("specifier", &This::GetSpecifier, &This::SetSpecifier,
+      .add_property("specifier",
+                    &This::GetSpecifier,
+                    &This::SetSpecifier,
                     "The prim's specifier (SpecifierDef or SpecifierOver).\n"
                     "The default value is SpecifierOver.")
 
-      .add_property("nameRoot", &This::GetNameRoot,
-                    "The name pseudo-root of this prim.")
+      .add_property("nameRoot", &This::GetNameRoot, "The name pseudo-root of this prim.")
 
-      .add_property("nameParent", &This::GetNameParent,
-                    "The name parent of this prim.")
+      .add_property("nameParent", &This::GetNameParent, "The name parent of this prim.")
 
-      .add_property("realNameParent", &This::GetRealNameParent,
-                    "The name parent of this prim.")
+      .add_property("realNameParent", &This::GetRealNameParent, "The name parent of this prim.")
 
-      .def("GetObjectAtPath", &This::GetObjectAtPath,
+      .def("GetObjectAtPath",
+           &This::GetObjectAtPath,
            "GetObjectAtPath(path) -> object\n\n"
            "path: Path\n\n"
            "Returns a prim or property given its namespace path.\n\n"
@@ -299,141 +326,145 @@ void wrapPrimSpec() {
       .def("GetVariantNames", &This::GetVariantNames)
       .def("BlockVariantSelection", &This::BlockVariantSelection)
 
-      .add_property(
-          "variantSelections", &This::GetVariantSelections,
-          "Dictionary whose keys are variant set names and whose values are "
-          "the variants chosen for each set.\n\n"
-          "Although this property is marked read-only, you can "
-          "modify the contents to add, change, and clear variants.")
+      .add_property("variantSelections",
+                    &This::GetVariantSelections,
+                    "Dictionary whose keys are variant set names and whose values are "
+                    "the variants chosen for each set.\n\n"
+                    "Although this property is marked read-only, you can "
+                    "modify the contents to add, change, and clear variants.")
 
-      .add_property("prefix", &This::GetPrefix, &This::SetPrefix,
-                    "The prim's prefix.")
+      .add_property("prefix", &This::GetPrefix, &This::SetPrefix, "The prim's prefix.")
 
-      .add_property("prefixSubstitutions", &This::GetPrefixSubstitutions,
+      .add_property("prefixSubstitutions",
+                    &This::GetPrefixSubstitutions,
                     &This::SetPrefixSubstitutions,
                     "Dictionary of prefix substitutions.")
 
-      .add_property("suffix", &This::GetSuffix, &This::SetSuffix,
-                    "The prim's suffix.")
+      .add_property("suffix", &This::GetSuffix, &This::SetSuffix, "The prim's suffix.")
 
-      .add_property("suffixSubstitutions", &This::GetSuffixSubstitutions,
+      .add_property("suffixSubstitutions",
+                    &This::GetSuffixSubstitutions,
                     &This::SetSuffixSubstitutions,
                     "Dictionary of prefix substitutions.")
 
-      .add_property(
-          "variantSetNameList", &This::GetVariantSetNameList,
-          "A StringListEditor for the names of the variant \n"
-          "sets for this prim.\n\n"
-          "The list of the names of the variants sets of this prim may be\n"
-          "modified with this StringListEditor.\n\n"
-          "A StringListEditor may express a list either as an explicit "
-          "value or as a set of list editing operations.  See StringListEditor "
-          "for more information.\n\n"
-          "Although this property is marked as read-only, the returned object "
-          "is modifiable.")
+      .add_property("variantSetNameList",
+                    &This::GetVariantSetNameList,
+                    "A StringListEditor for the names of the variant \n"
+                    "sets for this prim.\n\n"
+                    "The list of the names of the variants sets of this prim may be\n"
+                    "modified with this StringListEditor.\n\n"
+                    "A StringListEditor may express a list either as an explicit "
+                    "value or as a set of list editing operations.  See StringListEditor "
+                    "for more information.\n\n"
+                    "Although this property is marked as read-only, the returned object "
+                    "is modifiable.")
 
-      .add_property(
-          "variantSets", &_WrapGetVariantSetsProxy,
-          "The VariantSetSpecs for this prim indexed by name.\n\n"
-          "Although this property is marked as read-only, you can \n"
-          "modify the contents to remove variant sets.  New variant sets \n"
-          "are created by creating them with the prim as the owner.\n\n"
-          "Although this property is marked as read-only, the returned object\n"
-          "is modifiable.")
+      .add_property("variantSets",
+                    &_WrapGetVariantSetsProxy,
+                    "The VariantSetSpecs for this prim indexed by name.\n\n"
+                    "Although this property is marked as read-only, you can \n"
+                    "modify the contents to remove variant sets.  New variant sets \n"
+                    "are created by creating them with the prim as the owner.\n\n"
+                    "Although this property is marked as read-only, the returned object\n"
+                    "is modifiable.")
 
-      .add_property("typeName", &This::GetTypeName, &This::SetTypeName,
-                    "The type of this prim.")
+      .add_property("typeName", &This::GetTypeName, &This::SetTypeName, "The type of this prim.")
 
-      .add_property("nameChildren", &_WrapGetNameChildrenProxy,
+      .add_property("nameChildren",
+                    &_WrapGetNameChildrenProxy,
                     "The prim name children of this prim, as an ordered "
                     "dictionary.\n\n"
                     "Note that although this property is described as being "
                     "read-only, you can modify the contents to add, "
                     "remove, or reorder children.")
 
-      .add_property("nameChildrenOrder", &This::GetNameChildrenOrder,
+      .add_property("nameChildrenOrder",
+                    &This::GetNameChildrenOrder,
                     &This::SetNameChildrenOrder,
                     "Get/set the list of child names for this prim's 'reorder "
                     "nameChildren' statement.")
 
-      .add_property("properties", &_WrapGetPropertiesProxy,
+      .add_property("properties",
+                    &_WrapGetPropertiesProxy,
                     "The properties of this prim, as an ordered dictionary.\n\n"
                     "Note that although this property is described as being "
                     "read-only, you can modify the contents to add, "
                     "remove, or reorder properties.")
 
-      .add_property("attributes", &This::GetAttributes,
+      .add_property("attributes",
+                    &This::GetAttributes,
                     "The attributes of this prim, as an ordered dictionary.")
 
-      .add_property("relationships", &This::GetRelationships,
+      .add_property("relationships",
+                    &This::GetRelationships,
                     "The relationships of this prim, as an ordered dictionary.")
 
-      .add_property(
-          "propertyOrder", &This::GetPropertyOrder, &This::SetPropertyOrder,
-          "Get/set the list of property names for this prim's 'reorder "
-          "properties' statement.")
+      .add_property("propertyOrder",
+                    &This::GetPropertyOrder,
+                    &This::SetPropertyOrder,
+                    "Get/set the list of property names for this prim's 'reorder "
+                    "properties' statement.")
+
+      .add_property("inheritPathList",
+                    &This::GetInheritPathList,
+                    "A PathListEditor for the prim's inherit paths.\n\n"
+                    "The list of the inherit paths for this prim may be "
+                    "modified with this PathListEditor.\n\n"
+                    "A PathListEditor may express a list either as an explicit "
+                    "value or as a set of list editing operations.  See PathListEditor "
+                    "for more information.")
+
+      .add_property("specializesList",
+                    &This::GetSpecializesList,
+                    "A PathListEditor for the prim's specializes.\n\n"
+                    "The list of the specializes for this prim may be "
+                    "modified with this PathListEditor.\n\n"
+                    "A PathListEditor may express a list either as an explicit "
+                    "value or as a set of list editing operations.  See PathListEditor "
+                    "for more information.")
+
+      .add_property("referenceList",
+                    &This::GetReferenceList,
+                    "A ReferenceListEditor for the prim's references.\n\n"
+                    "The list of the references for this prim may be "
+                    "modified with this ReferenceListEditor.\n\n"
+                    "A ReferenceListEditor may express a list either as an explicit "
+                    "value or as a set of list editing operations.  See "
+                    "ReferenceListEditor for more information.")
+
+      .add_property("payloadList",
+                    &This::GetPayloadList,
+                    "A PayloadListEditor for the prim's payloads.\n\n"
+                    "The list of the payloads for this prim may be "
+                    "modified with this PayloadListEditor.\n\n"
+                    "A PayloadListEditor may express a list either as an explicit "
+                    "value or as a set of list editing operations.  See "
+                    "PayloadListEditor for more information.")
 
       .add_property(
-          "inheritPathList", &This::GetInheritPathList,
-          "A PathListEditor for the prim's inherit paths.\n\n"
-          "The list of the inherit paths for this prim may be "
-          "modified with this PathListEditor.\n\n"
-          "A PathListEditor may express a list either as an explicit "
-          "value or as a set of list editing operations.  See PathListEditor "
-          "for more information.")
+          "hasReferences", &This::HasReferences, "Returns true if this prim has references set.")
 
       .add_property(
-          "specializesList", &This::GetSpecializesList,
-          "A PathListEditor for the prim's specializes.\n\n"
-          "The list of the specializes for this prim may be "
-          "modified with this PathListEditor.\n\n"
-          "A PathListEditor may express a list either as an explicit "
-          "value or as a set of list editing operations.  See PathListEditor "
-          "for more information.")
+          "hasPayloads", &This::HasPayloads, "Returns true if this prim has payloads set.")
 
-      .add_property(
-          "referenceList", &This::GetReferenceList,
-          "A ReferenceListEditor for the prim's references.\n\n"
-          "The list of the references for this prim may be "
-          "modified with this ReferenceListEditor.\n\n"
-          "A ReferenceListEditor may express a list either as an explicit "
-          "value or as a set of list editing operations.  See "
-          "ReferenceListEditor for more information.")
+      .add_property("relocates",
+                    &This::GetRelocates,
+                    &_SetRelocates,
+                    "An editing proxy for the prim's map of relocation paths.\n\n"
+                    "The map of source-to-target paths specifying namespace "
+                    "relocation may be set or cleared whole, or individual map "
+                    "entries may be added, removed, or edited.")
 
-      .add_property(
-          "payloadList", &This::GetPayloadList,
-          "A PayloadListEditor for the prim's payloads.\n\n"
-          "The list of the payloads for this prim may be "
-          "modified with this PayloadListEditor.\n\n"
-          "A PayloadListEditor may express a list either as an explicit "
-          "value or as a set of list editing operations.  See "
-          "PayloadListEditor for more information.")
+      .def("ClearReferenceList", &This::ClearReferenceList, "Clears the references for this prim.")
 
-      .add_property("hasReferences", &This::HasReferences,
-                    "Returns true if this prim has references set.")
-
-      .add_property("hasPayloads", &This::HasPayloads,
-                    "Returns true if this prim has payloads set.")
-
-      .add_property(
-          "relocates", &This::GetRelocates, &_SetRelocates,
-          "An editing proxy for the prim's map of relocation paths.\n\n"
-          "The map of source-to-target paths specifying namespace "
-          "relocation may be set or cleared whole, or individual map "
-          "entries may be added, removed, or edited.")
-
-      .def("ClearReferenceList", &This::ClearReferenceList,
-           "Clears the references for this prim.")
-
-      .def("ClearPayloadList", &This::ClearPayloadList,
-           "Clears the payloads for this prim.")
+      .def("ClearPayloadList", &This::ClearPayloadList, "Clears the payloads for this prim.")
 
       .def("CanSetName", &_WrapCanSetName)
 
-      .def("ApplyNameChildrenOrder", &_ApplyNameChildrenOrder,
+      .def("ApplyNameChildrenOrder",
+           &_ApplyNameChildrenOrder,
            return_value_policy<TfPySequenceToList>())
-      .def("ApplyPropertyOrder", &_ApplyPropertyOrder,
-           return_value_policy<TfPySequenceToList>())
+      .def("ApplyPropertyOrder", &_ApplyPropertyOrder, return_value_policy<TfPySequenceToList>())
 
       .setattr("ActiveKey", SdfFieldKeys->Active)
       .setattr("AnyTypeToken", SdfTokens->AnyTypeToken)

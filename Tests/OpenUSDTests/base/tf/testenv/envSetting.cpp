@@ -21,11 +21,11 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/diagnosticLite.h"
 #include "pxr/base/tf/envSetting.h"
-#include "pxr/base/tf/regTest.h"
 #include "Arch/attributes.h"
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 using std::string;
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -36,13 +36,15 @@ TF_DEFINE_ENV_SETTING(TF_TEST_BOOL_ENV_SETTING, false, "bool env setting");
 TF_DEFINE_ENV_SETTING(TF_TEST_INT_ENV_SETTING_X, 1, "int env setting (not set by test)");
 TF_DEFINE_ENV_SETTING(TF_TEST_INT_ENV_SETTING, 1, "int env setting");
 
-TF_DEFINE_ENV_SETTING(TF_TEST_STRING_ENV_SETTING_X, "default",
+TF_DEFINE_ENV_SETTING(TF_TEST_STRING_ENV_SETTING_X,
+                      "default",
                       "string env setting (not set by test)");
 
-TF_DEFINE_ENV_SETTING(TF_TEST_STRING_ENV_SETTING, "default",
-                      "string env setting");
+TF_DEFINE_ENV_SETTING(TF_TEST_STRING_ENV_SETTING, "default", "string env setting");
 
-TF_DEFINE_ENV_SETTING(TF_TEST_POST_ENV_SETTING_X, false, "post-registry-manager setting (not set by test)");
+TF_DEFINE_ENV_SETTING(TF_TEST_POST_ENV_SETTING_X,
+                      false,
+                      "post-registry-manager setting (not set by test)");
 
 // This tests that there are no issues with getting an env setting related
 // to global dynamic initialization order.  In particular, getting an env
@@ -53,8 +55,7 @@ ARCH_CONSTRUCTOR(_PostRegistryManager, 150, void)
   TF_AXIOM(TfGetEnvSetting(TF_TEST_POST_ENV_SETTING_X) == false);
 }
 
-static bool
-Test_TfEnvSetting()
+static bool Test_TfEnvSetting()
 {
   TF_AXIOM(TfGetEnvSetting(TF_TEST_BOOL_ENV_SETTING_X) == false);
   TF_AXIOM(TfGetEnvSetting(TF_TEST_BOOL_ENV_SETTING) == true);

@@ -24,8 +24,8 @@
 #ifndef EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDERER_PLUGIN_H
 #define EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDERER_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/rendererPlugin.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// prims (which translate scene data into drawable representations) and Hydra
 /// renderpasses (which draw the scene to the framebuffer).
 ///
-class HdTinyRendererPlugin final : public HdRendererPlugin
-{
-public:
+class HdTinyRendererPlugin final : public HdRendererPlugin {
+ public:
   HdTinyRendererPlugin() = default;
   virtual ~HdTinyRendererPlugin() = default;
 
@@ -50,18 +49,16 @@ public:
   virtual HdRenderDelegate *CreateRenderDelegate() override;
 
   /// Construct a new render delegate of type HdTinyRenderDelegate.
-  virtual HdRenderDelegate *CreateRenderDelegate(
-      HdRenderSettingsMap const &settingsMap) override;
+  virtual HdRenderDelegate *CreateRenderDelegate(HdRenderSettingsMap const &settingsMap) override;
 
   /// Destroy a render delegate created by this class's CreateRenderDelegate.
   ///   \param renderDelegate The render delegate to delete.
-  virtual void DeleteRenderDelegate(
-      HdRenderDelegate *renderDelegate) override;
+  virtual void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) override;
 
   /// Checks to see if the plugin is supported on the running system.
   virtual bool IsSupported(bool gpuEnabled = true) const override;
 
-private:
+ private:
   // This class does not support copying.
   HdTinyRendererPlugin(const HdTinyRendererPlugin &) = delete;
   HdTinyRendererPlugin &operator=(const HdTinyRendererPlugin &) = delete;
@@ -69,4 +66,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDERER_PLUGIN_H
+#endif  // EXTRAS_IMAGING_EXAMPLES_HD_TINY_RENDERER_PLUGIN_H

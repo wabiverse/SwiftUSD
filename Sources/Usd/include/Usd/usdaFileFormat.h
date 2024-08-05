@@ -34,8 +34,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 #define USD_USDA_FILE_FORMAT_TOKENS ((Id, "usda"))((Version, "1.0"))
 
-TF_DECLARE_PUBLIC_TOKENS(UsdUsdaFileFormatTokens, USD_API,
-                         USD_USDA_FILE_FORMAT_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(UsdUsdaFileFormatTokens, USD_API, USD_USDA_FILE_FORMAT_TOKENS);
 
 TF_DECLARE_WEAK_AND_REF_PTRS(UsdUsdaFileFormat);
 
@@ -44,7 +43,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdUsdaFileFormat);
 /// File format used by textual USD files.
 ///
 class UsdUsdaFileFormat : public SdfTextFileFormat {
-private:
+ private:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   UsdUsdaFileFormat();
@@ -55,4 +54,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // USDA_FILE_FORMAT_H
+#endif  // USDA_FILE_FORMAT_H

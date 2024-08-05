@@ -24,11 +24,11 @@
 #ifndef PXR_USD_USDMTLX_READER_H
 #define PXR_USD_USDMTLX_READER_H
 
-#include <pxr/pxrns.h>
-#include "UsdMtlx/api.h"
 #include "Sdf/path.h"
 #include "Tf/declarePtrs.h"
+#include "UsdMtlx/api.h"
 #include <MaterialX/MXCoreDocument.h>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -61,4 +61,4 @@ void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr &mtlx,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USDMTLX_READER_H
+#endif  // PXR_USD_USDMTLX_READER_H

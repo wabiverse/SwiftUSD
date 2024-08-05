@@ -24,10 +24,10 @@
 
 #include <pxr/pxrns.h>
 
-#include "UsdUtils/coalescingDiagnosticDelegate.h"
+#include "Arch/debugger.h"
 #include "Tf/hash.h"
 #include "Tf/stackTrace.h"
-#include "Arch/debugger.h"
+#include "UsdUtils/coalescingDiagnosticDelegate.h"
 
 #include <memory>
 #include <tuple>
@@ -38,28 +38,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Hash implementation which allows us to coalesce warnings
 // and statuses based on their file name, line number and
 // function name.
-namespace
-{
-  using _CoalescedItem = UsdUtilsCoalescingDiagnosticDelegateSharedItem;
+namespace {
+using _CoalescedItem = UsdUtilsCoalescingDiagnosticDelegateSharedItem;
 
-  struct _CoalescedItemHash
+struct _CoalescedItemHash {
+  std::size_t operator()(const _CoalescedItem &i) const
   {
-    std::size_t operator()(const _CoalescedItem &i) const
-    {
-      return TfHash::Combine(
-          i.sourceLineNumber, i.sourceFunction, i.sourceFileName);
-    }
-  };
+    return TfHash::Combine(i.sourceLineNumber, i.sourceFunction, i.sourceFileName);
+  }
+};
 
-  struct _CoalescedItemEqualTo
+struct _CoalescedItemEqualTo {
+  bool operator()(const _CoalescedItem &i1, const _CoalescedItem &i2) const
   {
-    bool operator()(const _CoalescedItem &i1,
-                    const _CoalescedItem &i2) const
-    {
-      return i1.sourceLineNumber == i2.sourceLineNumber && i1.sourceFunction == i2.sourceFunction && i1.sourceFileName == i2.sourceFileName;
-    }
-  };
-}
+    return i1.sourceLineNumber == i2.sourceLineNumber && i1.sourceFunction == i2.sourceFunction &&
+           i1.sourceFileName == i2.sourceFileName;
+  }
+};
+}  // namespace
 
 UsdUtilsCoalescingDiagnosticDelegate::UsdUtilsCoalescingDiagnosticDelegate()
 {
@@ -87,8 +83,7 @@ void UsdUtilsCoalescingDiagnosticDelegate::IssueError(const TfError &err)
 void UsdUtilsCoalescingDiagnosticDelegate::IssueFatalError(const TfCallContext &ctx,
                                                            const std::string &msg)
 {
-  TfLogCrash("FATAL ERROR", msg, std::string() /*additionalInfo*/,
-             ctx, true /*logToDB*/);
+  TfLogCrash("FATAL ERROR", msg, std::string() /*additionalInfo*/, ctx, true /*logToDB*/);
   ArchAbort(/*logging=*/false);
 }
 
@@ -102,11 +97,13 @@ void UsdUtilsCoalescingDiagnosticDelegate::IssueWarning(const TfWarning &warning
   _diagnostics.push(new TfWarning(warning));
 }
 
-UsdUtilsCoalescingDiagnosticDelegateVector
-UsdUtilsCoalescingDiagnosticDelegate::TakeCoalescedDiagnostics()
+UsdUtilsCoalescingDiagnosticDelegateVector UsdUtilsCoalescingDiagnosticDelegate::
+    TakeCoalescedDiagnostics()
 {
-  std::unordered_map<UsdUtilsCoalescingDiagnosticDelegateSharedItem, size_t,
-                     _CoalescedItemHash, _CoalescedItemEqualTo>
+  std::unordered_map<UsdUtilsCoalescingDiagnosticDelegateSharedItem,
+                     size_t,
+                     _CoalescedItemHash,
+                     _CoalescedItemEqualTo>
       existence;
 
   UsdUtilsCoalescingDiagnosticDelegateVector result;
@@ -117,10 +114,8 @@ UsdUtilsCoalescingDiagnosticDelegate::TakeCoalescedDiagnostics()
   size_t vectorIndex = 0;
 
   TfDiagnosticBase *p = nullptr;
-  while (!_diagnostics.empty())
-  {
-    if (_diagnostics.try_pop(p))
-    {
+  while (!_diagnostics.empty()) {
+    if (_diagnostics.try_pop(p)) {
       std::unique_ptr<TfDiagnosticBase> handle(p);
 
       UsdUtilsCoalescingDiagnosticDelegateSharedItem sharedItem{
@@ -129,23 +124,18 @@ UsdUtilsCoalescingDiagnosticDelegate::TakeCoalescedDiagnostics()
           handle->GetSourceFileName(),
       };
 
-      UsdUtilsCoalescingDiagnosticDelegateUnsharedItem unsharedItem{
-          handle->GetContext(),
-          handle->GetCommentary()};
+      UsdUtilsCoalescingDiagnosticDelegateUnsharedItem unsharedItem{handle->GetContext(),
+                                                                    handle->GetCommentary()};
 
       auto lookup = existence.find(sharedItem);
-      if (lookup == existence.end())
-      {
+      if (lookup == existence.end()) {
         existence.insert(std::make_pair(sharedItem, vectorIndex));
-        UsdUtilsCoalescingDiagnosticDelegateItem vItem{
-            sharedItem,
-            {unsharedItem}};
+        UsdUtilsCoalescingDiagnosticDelegateItem vItem{sharedItem, {unsharedItem}};
 
         result.push_back(vItem);
         vectorIndex += 1;
       }
-      else
-      {
+      else {
         result[lookup->second].unsharedItems.push_back(unsharedItem);
       }
     }
@@ -154,16 +144,14 @@ UsdUtilsCoalescingDiagnosticDelegate::TakeCoalescedDiagnostics()
   return result;
 }
 
-std::vector<std::unique_ptr<TfDiagnosticBase>>
-UsdUtilsCoalescingDiagnosticDelegate::TakeUncoalescedDiagnostics()
+std::vector<std::unique_ptr<TfDiagnosticBase>> UsdUtilsCoalescingDiagnosticDelegate::
+    TakeUncoalescedDiagnostics()
 {
   std::vector<std::unique_ptr<TfDiagnosticBase>> items;
 
   TfDiagnosticBase *p = nullptr;
-  while (!_diagnostics.empty())
-  {
-    if (_diagnostics.try_pop(p))
-    {
+  while (!_diagnostics.empty()) {
+    if (_diagnostics.try_pop(p)) {
       items.push_back(std::unique_ptr<TfDiagnosticBase>(p));
     }
   }
@@ -173,8 +161,7 @@ UsdUtilsCoalescingDiagnosticDelegate::TakeUncoalescedDiagnostics()
 
 void UsdUtilsCoalescingDiagnosticDelegate::DumpCoalescedDiagnostics(std::ostream &o)
 {
-  for (auto const &item : TakeCoalescedDiagnostics())
-  {
+  for (auto const &item : TakeCoalescedDiagnostics()) {
     o << item.unsharedItems.size() << " ";
     o << "Diagnostic Notification(s) in ";
     o << item.sharedItem.sourceFunction;
@@ -186,8 +173,7 @@ void UsdUtilsCoalescingDiagnosticDelegate::DumpCoalescedDiagnostics(std::ostream
 
 void UsdUtilsCoalescingDiagnosticDelegate::DumpUncoalescedDiagnostics(std::ostream &o)
 {
-  for (auto const &item : TakeUncoalescedDiagnostics())
-  {
+  for (auto const &item : TakeUncoalescedDiagnostics()) {
     o << "Diagnostic Notification in ";
     o << item->GetSourceFunction();
     o << " at line " << item->GetSourceLineNumber();

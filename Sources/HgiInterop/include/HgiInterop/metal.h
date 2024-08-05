@@ -26,16 +26,16 @@
 
 #if PXR_METAL_SUPPORT_ENABLED
 
-#include "Garch/glApi.h"
+#  include "Garch/glApi.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <OpenGL/OpenGL.hpp>
+#  include <Foundation/Foundation.hpp>
+#  include <Metal/Metal.hpp>
+#  include <OpenGL/OpenGL.hpp>
 
-#include <pxr/pxrns.h>
-#include "Gf/vec4i.h"
-#include "Hgi/texture.h"
-#include "HgiInterop/api.h"
+#  include "Gf/vec4i.h"
+#  include "Hgi/texture.h"
+#  include "HgiInterop/api.h"
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,9 +47,8 @@ class VtValue;
 ///
 /// Provides Metal/GL interop
 ///
-class HgiInteropMetal final
-{
-public:
+class HgiInteropMetal final {
+ public:
   HGIINTEROP_API
   HgiInteropMetal(Hgi *hgi);
 
@@ -58,25 +57,22 @@ public:
 
   /// Copy/Present provided color (and optional depth) textures to app.
   HGIINTEROP_API
-  void CompositeToInterop(
-      HgiTextureHandle const &color,
-      HgiTextureHandle const &depth,
-      VtValue const &framebuffer,
-      GfVec4i const &compRegion);
+  void CompositeToInterop(HgiTextureHandle const &color,
+                          HgiTextureHandle const &depth,
+                          VtValue const &framebuffer,
+                          GfVec4i const &compRegion);
 
-private:
+ private:
   HgiInteropMetal() = delete;
 
-  enum
-  {
+  enum {
     ShaderContextColor,
     ShaderContextColorDepth,
 
     ShaderContextCount
   };
 
-  struct ShaderContext
-  {
+  struct ShaderContext {
     uint32_t program;
     uint32_t vao;
     uint32_t vbo;
@@ -87,8 +83,7 @@ private:
     uint32_t blitTexSizeUniform;
   };
 
-  struct VertexAttribState
-  {
+  struct VertexAttribState {
     int32_t enabled;
     int32_t size;
     int32_t type;
@@ -98,15 +93,11 @@ private:
     void *pointer;
   };
 
-  void _BlitToOpenGL(VtValue const &framebuffer, GfVec4i const &compRegion,
-                     int shaderIndex);
+  void _BlitToOpenGL(VtValue const &framebuffer, GfVec4i const &compRegion, int shaderIndex);
   void _FreeTransientTextureCacheRefs();
   void _CaptureOpenGlState();
   void _RestoreOpenGlState();
-  void _CreateShaderContext(
-      int32_t vertexSource,
-      int32_t fragmentSource,
-      ShaderContext &shader);
+  void _CreateShaderContext(int32_t vertexSource, int32_t fragmentSource, ShaderContext &shader);
   void _SetAttachmentSize(int width, int height);
   void _ValidateGLContext();
 
@@ -123,7 +114,7 @@ private:
   MTL::ComputePipelineState *_computePipelineStateColor;
   MTL::ComputePipelineState *_computePipelineStateDepth;
 
-#if 0
+#  if 0
   // XXX: Add these into the CXX Apple headers.
     CVPixelBufferRef _pixelBuffer;
     CVPixelBufferRef _depthBuffer;
@@ -134,17 +125,17 @@ private:
     CVOpenGLTextureCacheRef _cvglTextureCache;
     CVOpenGLTextureRef _cvglColorTexture;
     CVOpenGLTextureRef _cvglDepthTexture;
-#endif // 0
+#  endif  // 0
 
   uint32_t _glColorTexture;
   uint32_t _glDepthTexture;
 
   ShaderContext _shaderProgramContext[ShaderContextCount];
 
-#if 0
+#  if 0
   // XXX: OpenGLContext just need the inlined impl in the header left.
     NSGL::OpenGLContext* _currentOpenGLContext;
-#endif // 0
+#  endif  // 0
 
   int32_t _restoreDrawFbo;
   int32_t _restoreVao;

@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGI_ATTACHMENT_DESC_H
 #define PXR_IMAGING_HGI_ATTACHMENT_DESC_H
 
-#include <pxr/pxrns.h>
+#include "Gf/vec4f.h"
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/types.h"
-#include "Gf/vec4f.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -61,12 +61,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// <li> blendConstantColor:
 ///   The constant color for blend operations.</li>
 ///
-struct HgiAttachmentDesc
-{
+struct HgiAttachmentDesc {
   HgiAttachmentDesc()
-      : format(HgiFormatInvalid), usage(0), loadOp(HgiAttachmentLoadOpLoad), storeOp(HgiAttachmentStoreOpStore), clearValue(0), colorMask(HgiColorMaskRed | HgiColorMaskGreen |
-                                                                                                                                          HgiColorMaskBlue | HgiColorMaskAlpha),
-        blendEnabled(false), srcColorBlendFactor(HgiBlendFactorZero), dstColorBlendFactor(HgiBlendFactorZero), colorBlendOp(HgiBlendOpAdd), srcAlphaBlendFactor(HgiBlendFactorZero), dstAlphaBlendFactor(HgiBlendFactorZero), alphaBlendOp(HgiBlendOpAdd), blendConstantColor(0.0f, 0.0f, 0.0f, 0.0f)
+      : format(HgiFormatInvalid),
+        usage(0),
+        loadOp(HgiAttachmentLoadOpLoad),
+        storeOp(HgiAttachmentStoreOpStore),
+        clearValue(0),
+        colorMask(HgiColorMaskRed | HgiColorMaskGreen | HgiColorMaskBlue | HgiColorMaskAlpha),
+        blendEnabled(false),
+        srcColorBlendFactor(HgiBlendFactorZero),
+        dstColorBlendFactor(HgiBlendFactorZero),
+        colorBlendOp(HgiBlendOpAdd),
+        srcAlphaBlendFactor(HgiBlendFactorZero),
+        dstAlphaBlendFactor(HgiBlendFactorZero),
+        alphaBlendOp(HgiBlendOpAdd),
+        blendConstantColor(0.0f, 0.0f, 0.0f, 0.0f)
   {
   }
 
@@ -89,19 +99,13 @@ struct HgiAttachmentDesc
 using HgiAttachmentDescVector = std::vector<HgiAttachmentDesc>;
 
 HGI_API
-bool operator==(
-    const HgiAttachmentDesc &lhs,
-    const HgiAttachmentDesc &rhs);
+bool operator==(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiAttachmentDesc &lhs,
-    const HgiAttachmentDesc &rhs);
+bool operator!=(const HgiAttachmentDesc &lhs, const HgiAttachmentDesc &rhs);
 
 HGI_API
-std::ostream &operator<<(
-    std::ostream &out,
-    const HgiAttachmentDesc &attachment);
+std::ostream &operator<<(std::ostream &out, const HgiAttachmentDesc &attachment);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

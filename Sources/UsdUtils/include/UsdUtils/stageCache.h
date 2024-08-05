@@ -27,9 +27,9 @@
 /// \file usdUtils/stageCache.h
 /// A simple interface for handling a singleton usd stage cache.
 
-#include <pxr/pxrns.h>
-#include "UsdUtils/api.h"
 #include "Usd/stageCache.h"
+#include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 #include "Tf/token.h"
@@ -47,9 +47,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfLayer);
 /// singleton usd stage cache for use by all USD clients. This way code from
 /// any location can make use of the same cache to maximize stage reuse.
 ///
-class UsdUtilsStageCache
-{
-public:
+class UsdUtilsStageCache {
+ public:
   /// Returns the singleton stage cache.
   USDUTILS_API
   static UsdStageCache &Get();

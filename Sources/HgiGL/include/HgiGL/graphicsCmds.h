@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_GL_GRAPHICS_CMDS_H
 #define PXR_IMAGING_HGI_GL_GRAPHICS_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec4i.h"
 #include "Hgi/graphicsCmds.h"
 #include "HgiGL/api.h"
 #include "HgiGL/hgi.h"
 #include <cstdint>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ class HgiGLDevice;
 ///
 /// OpenGL implementation of HgiGraphicsCmds.
 ///
-class HgiGLGraphicsCmds final : public HgiGraphicsCmds
-{
-public:
+class HgiGLGraphicsCmds final : public HgiGraphicsCmds {
+ public:
   HGIGL_API
   ~HgiGLGraphicsCmds() override;
 
@@ -73,65 +72,57 @@ public:
   void BindResources(HgiResourceBindingsHandle resources) override;
 
   HGIGL_API
-  void SetConstantValues(
-      HgiGraphicsPipelineHandle pipeline,
-      HgiShaderStage stages,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) override;
+  void SetConstantValues(HgiGraphicsPipelineHandle pipeline,
+                         HgiShaderStage stages,
+                         uint32_t bindIndex,
+                         uint32_t byteSize,
+                         const void *data) override;
 
   HGIGL_API
-  void BindVertexBuffers(
-      HgiVertexBufferBindingVector const &bindings) override;
+  void BindVertexBuffers(HgiVertexBufferBindingVector const &bindings) override;
 
   HGIGL_API
-  void Draw(
-      uint32_t vertexCount,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance) override;
+  void Draw(uint32_t vertexCount,
+            uint32_t baseVertex,
+            uint32_t instanceCount,
+            uint32_t baseInstance) override;
 
   HGIGL_API
-  void DrawIndirect(
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride) override;
+  void DrawIndirect(HgiBufferHandle const &drawParameterBuffer,
+                    uint32_t drawBufferByteOffset,
+                    uint32_t drawCount,
+                    uint32_t stride) override;
 
   HGIGL_API
-  void DrawIndexed(
-      HgiBufferHandle const &indexBuffer,
-      uint32_t indexCount,
-      uint32_t indexBufferByteOffset,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance) override;
+  void DrawIndexed(HgiBufferHandle const &indexBuffer,
+                   uint32_t indexCount,
+                   uint32_t indexBufferByteOffset,
+                   uint32_t baseVertex,
+                   uint32_t instanceCount,
+                   uint32_t baseInstance) override;
 
   HGIGL_API
-  void DrawIndexedIndirect(
-      HgiBufferHandle const &indexBuffer,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride,
-      std::vector<uint32_t> const &drawParameterBufferUInt32,
-      uint32_t patchBaseVertexByteOffset) override;
+  void DrawIndexedIndirect(HgiBufferHandle const &indexBuffer,
+                           HgiBufferHandle const &drawParameterBuffer,
+                           uint32_t drawBufferByteOffset,
+                           uint32_t drawCount,
+                           uint32_t stride,
+                           std::vector<uint32_t> const &drawParameterBufferUInt32,
+                           uint32_t patchBaseVertexByteOffset) override;
 
   HGIGL_API
   void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
-  HgiGLGraphicsCmds(
-      HgiGLDevice *device,
-      HgiGraphicsCmdsDesc const &desc);
+  HgiGLGraphicsCmds(HgiGLDevice *device, HgiGraphicsCmdsDesc const &desc);
 
   HGIGL_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiGLGraphicsCmds() = delete;
   HgiGLGraphicsCmds &operator=(const HgiGLGraphicsCmds &) = delete;
   HgiGLGraphicsCmds(const HgiGLGraphicsCmds &) = delete;

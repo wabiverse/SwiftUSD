@@ -59,19 +59,21 @@ static boost::python::tuple _TakesOptional(const boost::optional<string> &optStr
   return boost::python::make_tuple(strObj, vecObj);
 }
 
-template <typename T>
-static boost::optional<T> _TestOptional(const boost::optional<T> &opt) {
+template<typename T> static boost::optional<T> _TestOptional(const boost::optional<T> &opt)
+{
   fprintf(stderr, "TestOptional<%s>\n", ArchGetDemangled<T>().c_str());
   return opt;
 }
 
 struct Tf_TestPyOptional {};
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapTf_TestTfPyOptional() {
+void wrapTf_TestTfPyOptional()
+{
   class_<Tf_TestPyOptional, boost::noncopyable>("Tf_TestPyOptional")
-      .def("TakesOptional", _TakesOptional,
+      .def("TakesOptional",
+           _TakesOptional,
            (arg("optString") = boost::optional<string>(),
             arg("optStrvec") = boost::optional<vector<string>>()))
       .staticmethod("TakesOptional")

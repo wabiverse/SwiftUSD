@@ -55,42 +55,47 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Helper class for clients that create VtArrays referring to foreign-owned
 // data.
 class Vt_ArrayForeignDataSource {
-public:
-  explicit Vt_ArrayForeignDataSource(
-      void (*detachedFn)(Vt_ArrayForeignDataSource *self) = nullptr,
-      size_t initRefCount = 0)
-      : _refCount(initRefCount), _detachedFn(detachedFn) {}
+ public:
+  explicit Vt_ArrayForeignDataSource(void (*detachedFn)(Vt_ArrayForeignDataSource *self) = nullptr,
+                                     size_t initRefCount = 0)
+      : _refCount(initRefCount), _detachedFn(detachedFn)
+  {
+  }
 
-private:
-  template <class T> friend class VtArray;
+ private:
+  template<class T> friend class VtArray;
   // Invoked when no more arrays share this data source.
-  void _ArraysDetached() {
+  void _ArraysDetached()
+  {
     if (_detachedFn) {
       _detachedFn(this);
     }
   }
 
-protected:
+ protected:
   std::atomic<size_t> _refCount;
   void (*_detachedFn)(Vt_ArrayForeignDataSource *self);
 };
 
 // Private base class helper for VtArray implementation.
 class Vt_ArrayBase {
-public:
+ public:
   Vt_ArrayBase() : _shapeData{0}, _foreignSource(nullptr) {}
 
-  Vt_ArrayBase(Vt_ArrayForeignDataSource *foreignSrc)
-      : _shapeData{0}, _foreignSource(foreignSrc) {}
+  Vt_ArrayBase(Vt_ArrayForeignDataSource *foreignSrc) : _shapeData{0}, _foreignSource(foreignSrc)
+  {
+  }
 
   Vt_ArrayBase(Vt_ArrayBase const &other) = default;
-  Vt_ArrayBase(Vt_ArrayBase &&other) : Vt_ArrayBase(other) {
+  Vt_ArrayBase(Vt_ArrayBase &&other) : Vt_ArrayBase(other)
+  {
     other._shapeData.clear();
     other._foreignSource = nullptr;
   }
 
   Vt_ArrayBase &operator=(Vt_ArrayBase const &other) = default;
-  Vt_ArrayBase &operator=(Vt_ArrayBase &&other) {
+  Vt_ArrayBase &operator=(Vt_ArrayBase &&other)
+  {
     if (this == &other)
       return *this;
     *this = other;
@@ -99,38 +104,44 @@ public:
     return *this;
   }
 
-protected:
+ protected:
   // Control block header for native data representation.  Houses refcount and
   // capacity.  For arrays with native data, this structure always lives
   // immediately preceding the start of the array's _data in memory.  See
   // _GetControlBlock() for details.
   struct _ControlBlock {
     _ControlBlock() : nativeRefCount(0), capacity(0) {}
-    _ControlBlock(size_t initCount, size_t initCap)
-        : nativeRefCount(initCount), capacity(initCap) {}
+    _ControlBlock(size_t initCount, size_t initCap) : nativeRefCount(initCount), capacity(initCap)
+    {
+    }
     mutable std::atomic<size_t> nativeRefCount;
     size_t capacity;
   };
 
-  _ControlBlock &_GetControlBlock(void *nativeData) {
+  _ControlBlock &_GetControlBlock(void *nativeData)
+  {
     TF_DEV_AXIOM(!_foreignSource);
     return *(reinterpret_cast<_ControlBlock *>(nativeData) - 1);
   }
 
-  _ControlBlock const &_GetControlBlock(void *nativeData) const {
+  _ControlBlock const &_GetControlBlock(void *nativeData) const
+  {
     TF_DEV_AXIOM(!_foreignSource);
     return *(reinterpret_cast<_ControlBlock *>(nativeData) - 1);
   }
 
   // Mutable ref count, as is standard.
-  std::atomic<size_t> &_GetNativeRefCount(void *nativeData) const {
+  std::atomic<size_t> &_GetNativeRefCount(void *nativeData) const
+  {
     return _GetControlBlock(nativeData).nativeRefCount;
   }
 
-  size_t &_GetCapacity(void *nativeData) {
+  size_t &_GetCapacity(void *nativeData)
+  {
     return _GetControlBlock(nativeData).capacity;
   }
-  size_t const &_GetCapacity(void *nativeData) const {
+  size_t const &_GetCapacity(void *nativeData) const
+  {
     return _GetControlBlock(nativeData).capacity;
   }
 
@@ -228,8 +239,8 @@ protected:
 /// determine where unintended copy-on-write detaches come from.  When set,
 /// VtArray will log a stack trace for every copy-on-write detach that occurs.
 ///
-template <typename ELEM> class VtArray : public Vt_ArrayBase {
-public:
+template<typename ELEM> class VtArray : public Vt_ArrayBase {
+ public:
   /// Type this array holds.
   typedef ELEM ElementType;
   typedef ELEM value_type;
@@ -273,18 +284,23 @@ public:
   /// with our other constructor with the following signature:
   ///
   /// VtArray(size_t n, value_type const &value = value_type())
-  template <typename LegacyInputIterator>
-  VtArray(LegacyInputIterator first, LegacyInputIterator last,
-          typename std::enable_if<!std::is_integral<LegacyInputIterator>::value,
-                                  void>::type * = nullptr)
-      : VtArray() {
+  template<typename LegacyInputIterator>
+  VtArray(LegacyInputIterator first,
+          LegacyInputIterator last,
+          typename std::enable_if<!std::is_integral<LegacyInputIterator>::value, void>::type * =
+              nullptr)
+      : VtArray()
+  {
     assign(first, last);
   }
 
   /// Create an array with foreign source.
-  VtArray(Vt_ArrayForeignDataSource *foreignSrc, ElementType *data, size_t size,
+  VtArray(Vt_ArrayForeignDataSource *foreignSrc,
+          ElementType *data,
+          size_t size,
           bool addRef = true)
-      : Vt_ArrayBase(foreignSrc), _data(data) {
+      : Vt_ArrayBase(foreignSrc), _data(data)
+  {
     if (addRef) {
       foreignSrc->_refCount.fetch_add(1, std::memory_order_relaxed);
     }
@@ -292,40 +308,48 @@ public:
   }
 
   /// Copy \p other.  The new array shares underlying data with \p other.
-  VtArray(VtArray const &other) : Vt_ArrayBase(other), _data(other._data) {
+  VtArray(VtArray const &other) : Vt_ArrayBase(other), _data(other._data)
+  {
     if (!_data)
       return;
 
     if (ARCH_LIKELY(!_foreignSource)) {
       _GetNativeRefCount(_data).fetch_add(1, std::memory_order_relaxed);
-    } else {
+    }
+    else {
       _foreignSource->_refCount.fetch_add(1, std::memory_order_relaxed);
     }
   }
 
   /// Move from \p other.  The new array takes ownership of \p other's
   /// underlying data.
-  VtArray(VtArray &&other)
-      : Vt_ArrayBase(std::move(other)), _data(other._data) {
+  VtArray(VtArray &&other) : Vt_ArrayBase(std::move(other)), _data(other._data)
+  {
     other._data = nullptr;
   }
 
   /// Initialize array from the contents of a \p initializerList.
-  VtArray(std::initializer_list<ELEM> initializerList) : VtArray() {
+  VtArray(std::initializer_list<ELEM> initializerList) : VtArray()
+  {
     assign(initializerList);
   }
 
   /// Create an array filled with \p n value-initialized elements.
-  explicit VtArray(size_t n) : VtArray() { assign(n, value_type()); }
+  explicit VtArray(size_t n) : VtArray()
+  {
+    assign(n, value_type());
+  }
 
   /// Create an array filled with \p n copies of \p value.
-  explicit VtArray(size_t n, value_type const &value) : VtArray() {
+  explicit VtArray(size_t n, value_type const &value) : VtArray()
+  {
     assign(n, value);
   }
 
   /// Copy assign from \p other.  This array shares underlying data with
   /// \p other.
-  VtArray &operator=(VtArray const &other) {
+  VtArray &operator=(VtArray const &other)
+  {
     // This might look recursive but it's really invoking move-assign, since
     // we create a temporary copy (an rvalue).
     if (this != &other)
@@ -335,7 +359,8 @@ public:
 
   /// Move assign from \p other.  This array takes ownership of \p other's
   /// underlying data.
-  VtArray &operator=(VtArray &&other) {
+  VtArray &operator=(VtArray &&other)
+  {
     if (this == &other)
       return *this;
     _DecRef();
@@ -346,12 +371,16 @@ public:
   }
 
   /// Replace current array contents with those in \p initializerList
-  VtArray &operator=(std::initializer_list<ELEM> initializerList) {
+  VtArray &operator=(std::initializer_list<ELEM> initializerList)
+  {
     this->assign(initializerList.begin(), initializerList.end());
     return *this;
   }
 
-  ~VtArray() { _DecRef(); }
+  ~VtArray()
+  {
+    _DecRef();
+  }
 
   /// Return *this as a const reference.  This ensures that all operations on
   /// the result do not mutate and thus are safe to invoke concurrently with
@@ -361,66 +390,109 @@ public:
   /// Note that the return is a const reference to this object, so it is only
   /// valid within the lifetime of this array object.  Take special care
   /// invoking AsConst() on VtArray temporaries/rvalues.
-  VtArray const &AsConst() const noexcept { return *this; }
+  VtArray const &AsConst() const noexcept
+  {
+    return *this;
+  }
 
   /// \addtogroup STL_API
   /// @{
 
   /// Return a non-const iterator to the start of the array.  The underlying
   /// data is copied if it is not uniquely owned.
-  iterator begin() { return iterator(data()); }
+  iterator begin()
+  {
+    return iterator(data());
+  }
   /// Returns a non-const iterator to the end of the array.  The underlying
   /// data is copied if it is not uniquely owned.
-  iterator end() { return iterator(data() + size()); }
+  iterator end()
+  {
+    return iterator(data() + size());
+  }
 
   /// Return a const iterator to the start of the array.
-  const_iterator begin() const { return const_iterator(data()); }
+  const_iterator begin() const
+  {
+    return const_iterator(data());
+  }
   /// Return a const iterator to the end of the array.
-  const_iterator end() const { return const_iterator(data() + size()); }
+  const_iterator end() const
+  {
+    return const_iterator(data() + size());
+  }
 
   /// Return a const iterator to the start of the array.
-  const_iterator cbegin() const { return begin(); }
+  const_iterator cbegin() const
+  {
+    return begin();
+  }
   /// Return a const iterator to the end of the array.
-  const_iterator cend() const { return end(); }
+  const_iterator cend() const
+  {
+    return end();
+  }
 
   /// Return a non-const reverse iterator to the end of the array.  The
   /// underlying data is copied if it is not uniquely owned.
-  reverse_iterator rbegin() { return reverse_iterator(end()); }
+  reverse_iterator rbegin()
+  {
+    return reverse_iterator(end());
+  }
   /// Return a reverse iterator to the start of the array.  The underlying
   /// data is copied if it is not uniquely owned.
-  reverse_iterator rend() { return reverse_iterator(begin()); }
+  reverse_iterator rend()
+  {
+    return reverse_iterator(begin());
+  }
 
   /// Return a const reverse iterator to the end of the array.
-  const_reverse_iterator rbegin() const {
+  const_reverse_iterator rbegin() const
+  {
     return const_reverse_iterator(end());
   }
   /// Return a const reverse iterator to the start of the array.
-  const_reverse_iterator rend() const {
+  const_reverse_iterator rend() const
+  {
     return const_reverse_iterator(begin());
   }
 
   /// Return a const reverse iterator to the end of the array.
-  const_reverse_iterator crbegin() const { return rbegin(); }
+  const_reverse_iterator crbegin() const
+  {
+    return rbegin();
+  }
   /// Return a const reverse iterator to the start of the array.
-  const_reverse_iterator crend() const { return rend(); }
+  const_reverse_iterator crend() const
+  {
+    return rend();
+  }
 
   /// Return a non-const pointer to this array's data.  The underlying data is
   /// copied if it is not uniquely owned.
-  pointer data() {
+  pointer data()
+  {
     _DetachIfNotUnique();
     return _data;
   }
   /// Return a const pointer to this array's data.
-  const_pointer data() const { return _data; }
+  const_pointer data() const
+  {
+    return _data;
+  }
   /// Return a const pointer to the data held by this array.
-  const_pointer cdata() const { return _data; }
+  const_pointer cdata() const
+  {
+    return _data;
+  }
 
   /// Initializes a new element at the end of the array. The underlying data
   /// is first copied if it is not uniquely owned.
   ///
   /// \sa push_back(ElementType const&)
   /// \sa push_back(ElementType&&)
-  template <typename... Args> void emplace_back(Args &&...args) {
+  template<typename... Args> void emplace_back(Args &&...args)
+  {
     // If this is a non-pxr array with rank > 1, disallow push_back.
     if (ARCH_UNLIKELY(_shapeData.otherDims[0])) {
       TF_CODING_ERROR("Array rank %u != 1", _shapeData.GetRank());
@@ -428,17 +500,14 @@ public:
     }
     // If we don't own the data, or if we need more space, realloc.
     size_t curSize = size();
-    if (ARCH_UNLIKELY(_foreignSource || !_IsUnique() ||
-                      curSize == capacity())) {
-      value_type *newData =
-          _AllocateCopy(_data, _CapacityForSize(curSize + 1), curSize);
-      ::new (static_cast<void *>(newData + curSize))
-          value_type(std::forward<Args>(args)...);
+    if (ARCH_UNLIKELY(_foreignSource || !_IsUnique() || curSize == capacity())) {
+      value_type *newData = _AllocateCopy(_data, _CapacityForSize(curSize + 1), curSize);
+      ::new (static_cast<void *>(newData + curSize)) value_type(std::forward<Args>(args)...);
       _DecRef();
       _data = newData;
-    } else {
-      ::new (static_cast<void *>(_data + curSize))
-          value_type(std::forward<Args>(args)...);
+    }
+    else {
+      ::new (static_cast<void *>(_data + curSize)) value_type(std::forward<Args>(args)...);
     }
     // Adjust size.
     ++_shapeData.totalSize;
@@ -449,18 +518,25 @@ public:
   ///
   /// \sa emplace_back
   /// \sa push_back(ElementType&&)
-  void push_back(ElementType const &element) { emplace_back(element); }
+  void push_back(ElementType const &element)
+  {
+    emplace_back(element);
+  }
 
   /// Appends an element at the end of the array. The underlying data
   /// is first copied if it is not uniquely owned.
   ///
   /// \sa emplace_back
   /// \sa push_back(ElementType const&)
-  void push_back(ElementType &&element) { emplace_back(std::move(element)); }
+  void push_back(ElementType &&element)
+  {
+    emplace_back(std::move(element));
+  }
 
   /// Remove the last element of an array.  The underlying data is first
   /// copied if it is not uniquely owned.
-  void pop_back() {
+  void pop_back()
+  {
     // If this is a presto array with rank > 1, disallow push_back.
     if (ARCH_UNLIKELY(_shapeData.otherDims[0])) {
       TF_CODING_ERROR("Array rank %u != 1", _shapeData.GetRank());
@@ -474,13 +550,17 @@ public:
   }
 
   /// Return the total number of elements in this array.
-  size_t size() const { return _shapeData.totalSize; }
+  size_t size() const
+  {
+    return _shapeData.totalSize;
+  }
 
   /// Return the number of items this container can grow to hold without
   /// triggering a (re)allocation.  Note that if the underlying data is not
   /// uniquely owned, a reallocation can occur upon object insertion even if
   /// there is remaining capacity.
-  size_t capacity() const {
+  size_t capacity() const
+  {
     if (!_data) {
       return 0;
     }
@@ -492,25 +572,28 @@ public:
   /// Return a theoretical maximum size limit for the container.  In practice
   /// this size is unachievable due to the amount of available memory or other
   /// system limitations.
-  constexpr size_t max_size() const {
+  constexpr size_t max_size() const
+  {
     // The number of value_type elements that can be fit into maximum size_t
     // bytes minus the size of _ControlBlock.
-    return (std::numeric_limits<size_t>::max() - sizeof(_ControlBlock)) /
-           sizeof(value_type);
+    return (std::numeric_limits<size_t>::max() - sizeof(_ControlBlock)) / sizeof(value_type);
   }
 
   /// Return true if this array contains no elements, false otherwise.
-  bool empty() const { return size() == 0; }
+  bool empty() const
+  {
+    return size() == 0;
+  }
 
   /// Ensure enough memory is allocated to hold \p num elements.  Note that
   /// this currently does not ensure that the underlying data is uniquely
   /// owned.  If that is desired, invoke a method like data() first.
-  void reserve(size_t num) {
+  void reserve(size_t num)
+  {
     if (num <= capacity())
       return;
 
-    value_type *newData =
-        _data ? _AllocateCopy(_data, num, size()) : _AllocateNew(num);
+    value_type *newData = _data ? _AllocateCopy(_data, num, size()) : _AllocateNew(num);
 
     _DecRef();
     _data = newData;
@@ -519,49 +602,72 @@ public:
   /// Return a non-const reference to the first element in this array.  The
   /// underlying data is copied if it is not uniquely owned.  Invokes
   /// undefined behavior if the array is empty.
-  reference front() { return *begin(); }
+  reference front()
+  {
+    return *begin();
+  }
   /// Return a const reference to the first element in this array.  Invokes
   /// undefined behavior if the array is empty.
-  const_reference front() const { return *begin(); }
+  const_reference front() const
+  {
+    return *begin();
+  }
   /// Return a const reference to the first element in this array.  Invokes
   /// undefined behavior if the array is empty.
-  const_reference cfront() const { return *begin(); }
+  const_reference cfront() const
+  {
+    return *begin();
+  }
 
   /// Return a reference to the last element in this array.  The underlying
   /// data is copied if it is not uniquely owned.  Invokes undefined behavior
   /// if the array is empty.
-  reference back() { return *rbegin(); }
+  reference back()
+  {
+    return *rbegin();
+  }
   /// Return a const reference to the last element in this array.  Invokes
   /// undefined behavior if the array is empty.
-  const_reference back() const { return *rbegin(); }
+  const_reference back() const
+  {
+    return *rbegin();
+  }
   /// Return a const reference to the last element in this array.  Invokes
   /// undefined behavior if the array is empty.
-  const_reference cback() const { return *rbegin(); }
+  const_reference cback() const
+  {
+    return *rbegin();
+  }
 
   /// Resize this array.  Preserve existing elements that remain,
   /// value-initialize any newly added elements.  For example, calling
   /// resize(10) on an array of size 5 would change the size to 10, the first
   /// 5 elements would be left unchanged and the last 5 elements would be
   /// value-initialized.
-  void resize(size_t newSize) { return resize(newSize, value_type()); }
-
-  /// Resize this array.  Preserve existing elements that remain, initialize
-  /// any newly added elements by copying \p value.
-  void resize(size_t newSize, value_type const &value) {
-    return resize(newSize, [&value](pointer b, pointer e) {
-      std::uninitialized_fill(b, e, value);
-    });
+  void resize(size_t newSize)
+  {
+    return resize(newSize, value_type());
   }
 
   /// Resize this array.  Preserve existing elements that remain, initialize
   /// any newly added elements by copying \p value.
-  void resize(size_t newSize, value_type &value) {
+  void resize(size_t newSize, value_type const &value)
+  {
+    return resize(newSize,
+                  [&value](pointer b, pointer e) { std::uninitialized_fill(b, e, value); });
+  }
+
+  /// Resize this array.  Preserve existing elements that remain, initialize
+  /// any newly added elements by copying \p value.
+  void resize(size_t newSize, value_type &value)
+  {
     return resize(newSize, const_cast<value_type const &>(value));
   }
 
   /// Resize this array.  Preserve existing elements that remain, initialize
   /// any newly added elements by copying \p value.
-  void resize(size_t newSize, value_type &&value) {
+  void resize(size_t newSize, value_type &&value)
+  {
     return resize(newSize, const_cast<value_type const &>(value));
   }
 
@@ -569,8 +675,8 @@ public:
   /// any newly added elements by calling \p fillElems(first, last).  Note
   /// that this function is passed pointers to uninitialized memory, so the
   /// elements must be filled with something like placement-new.
-  template <class FillElemsFn>
-  void resize(size_t newSize, FillElemsFn &&fillElems) {
+  template<class FillElemsFn> void resize(size_t newSize, FillElemsFn &&fillElems)
+  {
     const size_t oldSize = size();
     if (oldSize == newSize) {
       return;
@@ -587,27 +693,27 @@ public:
       // Allocate newSize elements and initialize.
       newData = _AllocateNew(newSize);
       std::forward<FillElemsFn>(fillElems)(newData, newData + newSize);
-    } else if (_IsUnique()) {
+    }
+    else if (_IsUnique()) {
       if (growing) {
         if (newSize > _GetCapacity(_data)) {
           newData = _AllocateCopy(_data, newSize, oldSize);
         }
         // fill with newly added elements from oldSize to newSize.
-        std::forward<FillElemsFn>(fillElems)(newData + oldSize,
-                                             newData + newSize);
-      } else {
+        std::forward<FillElemsFn>(fillElems)(newData + oldSize, newData + newSize);
+      }
+      else {
         // destroy removed elements
-        for (auto *cur = newData + newSize, *end = newData + oldSize;
-             cur != end; ++cur) {
+        for (auto *cur = newData + newSize, *end = newData + oldSize; cur != end; ++cur) {
           cur->~value_type();
         }
       }
-    } else {
+    }
+    else {
       newData = _AllocateCopy(_data, newSize, growing ? oldSize : newSize);
       if (growing) {
         // fill with newly added elements from oldSize to newSize.
-        std::forward<FillElemsFn>(fillElems)(newData + oldSize,
-                                             newData + newSize);
+        std::forward<FillElemsFn>(fillElems)(newData + oldSize, newData + newSize);
       }
     }
 
@@ -621,7 +727,8 @@ public:
   }
 
   /// Equivalent to resize(0).
-  void clear() {
+  void clear()
+  {
     if (!_data)
       return;
     if (_IsUnique()) {
@@ -629,7 +736,8 @@ public:
       for (value_type *p = _data, *e = _data + size(); p != e; ++p) {
         p->~value_type();
       }
-    } else {
+    }
+    else {
       // Detach to empty.
       _DecRef();
     }
@@ -648,7 +756,8 @@ public:
   /// where iterators prior to \p pos remain valid).
   ///
   /// \sa erase(const_iterator, const_iterator)
-  iterator erase(const_iterator pos) {
+  iterator erase(const_iterator pos)
+  {
     TF_DEV_AXIOM(pos != cend());
     return erase(pos, pos + 1);
   }
@@ -668,7 +777,8 @@ public:
   /// where iterators prior to \p first remain valid).
   ///
   /// \sa erase(const_iterator)
-  iterator erase(const_iterator first, const_iterator last) {
+  iterator erase(const_iterator first, const_iterator last)
+  {
     if (first == last) {
       return std::next(begin(), std::distance(cbegin(), last));
     }
@@ -692,18 +802,17 @@ public:
       }
       _shapeData.totalSize = newSize;
       return iterator(removeStart);
-    } else {
+    }
+    else {
       // If the array is not unique, we want to avoid copying the
       // elements in the range we are erasing. We allocate a
       // new buffer and copy the head and tail ranges, omitting
       // [first, last)
       value_type *newData = _AllocateNew(newSize);
-      value_type *newMiddle =
-          std::uninitialized_copy(_data, removeStart, newData);
+      value_type *newMiddle = std::uninitialized_copy(_data, removeStart, newData);
       value_type *newEnd = std::uninitialized_copy(removeEnd, endIt, newMiddle);
       TF_DEV_AXIOM(newEnd == std::next(newData, newSize));
-      TF_DEV_AXIOM(std::distance(newData, newMiddle) ==
-                   std::distance(_data, removeStart));
+      TF_DEV_AXIOM(std::distance(newData, newMiddle) == std::distance(_data, removeStart));
       _DecRef();
       _data = newData;
       _shapeData.totalSize = newSize;
@@ -717,11 +826,13 @@ public:
   /// array.resize(std::distance(first, last));
   /// std::copy(first, last, array.begin());
   /// \endcode
-  template <class ForwardIter>
-  typename std::enable_if<!std::is_integral<ForwardIter>::value>::type
-  assign(ForwardIter first, ForwardIter last) {
+  template<class ForwardIter>
+  typename std::enable_if<!std::is_integral<ForwardIter>::value>::type assign(ForwardIter first,
+                                                                              ForwardIter last)
+  {
     struct _Copier {
-      void operator()(pointer b, pointer e) const {
+      void operator()(pointer b, pointer e) const
+      {
         std::uninitialized_copy(first, last, b);
       }
       ForwardIter const &first, &last;
@@ -736,9 +847,11 @@ public:
   /// array.resize(n);
   /// std::fill(array.begin(), array.end(), fill);
   /// \endcode
-  void assign(size_t n, const value_type &fill) {
+  void assign(size_t n, const value_type &fill)
+  {
     struct _Filler {
-      void operator()(pointer b, pointer e) const {
+      void operator()(pointer b, pointer e) const
+      {
         std::uninitialized_fill(b, e, fill);
       }
       const value_type &fill;
@@ -752,12 +865,14 @@ public:
   /// \code
   /// array.assign(list.begin(), list.end());
   /// \endcode
-  void assign(std::initializer_list<ELEM> initializerList) {
+  void assign(std::initializer_list<ELEM> initializerList)
+  {
     assign(initializerList.begin(), initializerList.end());
   }
 
   /// Swap the contents of this array with \p other.
-  void swap(VtArray &other) {
+  void swap(VtArray &other)
+  {
     std::swap(_data, other._data);
     std::swap(_shapeData, other._shapeData);
     std::swap(_foreignSource, other._foreignSource);
@@ -766,53 +881,78 @@ public:
   /// @}
 
   /// Allows usage of [i].
-  ElementType &operator[](size_t index) { return data()[index]; }
+  ElementType &operator[](size_t index)
+  {
+    return data()[index];
+  }
 
   /// Allows usage of [i].
-  ElementType const &operator[](size_t index) const { return data()[index]; }
+  ElementType const &operator[](size_t index) const
+  {
+    return data()[index];
+  }
 
   /// Tests if two arrays are identical, i.e. that they share
   /// the same underlying copy-on-write data.  See also operator==().
-  bool IsIdentical(VtArray const &other) const {
+  bool IsIdentical(VtArray const &other) const
+  {
     return _data == other._data && _shapeData == other._shapeData &&
            _foreignSource == other._foreignSource;
   }
 
   /// Tests two arrays for equality.  See also IsIdentical().
-  bool operator==(VtArray const &other) const {
+  bool operator==(VtArray const &other) const
+  {
     return IsIdentical(other) || (*_GetShapeData() == *other._GetShapeData() &&
                                   std::equal(cbegin(), cend(), other.cbegin()));
   }
 
   /// Tests two arrays for inequality.
-  bool operator!=(VtArray const &other) const { return !(*this == other); }
+  bool operator!=(VtArray const &other) const
+  {
+    return !(*this == other);
+  }
 
-public:
+ public:
   // XXX -- Public so VtValue::_ArrayHelper<T,U>::GetShapeData() has access.
-  Vt_ShapeData const *_GetShapeData() const { return &_shapeData; }
-  Vt_ShapeData *_GetShapeData() { return &_shapeData; }
+  Vt_ShapeData const *_GetShapeData() const
+  {
+    return &_shapeData;
+  }
+  Vt_ShapeData *_GetShapeData()
+  {
+    return &_shapeData;
+  }
 
-private:
+ private:
   class _Streamer {
-  public:
+   public:
     explicit _Streamer(const_pointer data) : _p(data) {}
-    void operator()(std::ostream &out) const { VtStreamOut(*_p++, out); }
+    void operator()(std::ostream &out) const
+    {
+      VtStreamOut(*_p++, out);
+    }
 
-  private:
+   private:
     mutable const_pointer _p;
   };
 
   /// Outputs a comma-separated list of the values in the array.
-  friend std::ostream &operator<<(std::ostream &out, const VtArray &self) {
+  friend std::ostream &operator<<(std::ostream &out, const VtArray &self)
+  {
     VtArray::_Streamer streamer(self.cdata());
     VtStreamOutArray(out, self._GetShapeData(), streamer);
     return out;
   }
 
   /// Swap array contents.
-  friend void swap(VtArray &lhs, VtArray &rhs) { lhs.swap(rhs); }
+  friend void swap(VtArray &lhs, VtArray &rhs)
+  {
+    lhs.swap(rhs);
+  }
 
-  void _DetachIfNotUnique() {
+  void _DetachIfNotUnique()
+  {
     if (_IsUnique())
       return;
     // Copy to local.
@@ -822,12 +962,13 @@ private:
     _data = newData;
   }
 
-  inline bool _IsUnique() const {
-    return !_data ||
-           (ARCH_LIKELY(!_foreignSource) && _GetNativeRefCount(_data) == 1);
+  inline bool _IsUnique() const
+  {
+    return !_data || (ARCH_LIKELY(!_foreignSource) && _GetNativeRefCount(_data) == 1);
   }
 
-  inline size_t _CapacityForSize(size_t sz) const {
+  inline size_t _CapacityForSize(size_t sz) const
+  {
     // Currently just successive powers of two.
     size_t cap = 1;
     while (cap < sz) {
@@ -836,52 +977,49 @@ private:
     return cap;
   }
 
-  value_type *_AllocateNew(size_t capacity) {
+  value_type *_AllocateNew(size_t capacity)
+  {
     TfAutoMallocTag2 tag("VtArray::_AllocateNew", __ARCH_PRETTY_FUNCTION__);
     // Need space for the control block and capacity elements.
     // Exceptionally large capacity requests can overflow the arithmetic
     // here.  If that happens we'll just attempt to allocate the max size_t
     // value and let new() throw.
-    size_t numBytes =
-        (capacity <= max_size())
-            ? sizeof(_ControlBlock) + capacity * sizeof(value_type)
-            : std::numeric_limits<size_t>::max();
+    size_t numBytes = (capacity <= max_size()) ?
+                          sizeof(_ControlBlock) + capacity * sizeof(value_type) :
+                          std::numeric_limits<size_t>::max();
     void *data = ::operator new(numBytes);
     // Placement-new a control block.
     ::new (data) _ControlBlock(/*count=*/1, capacity);
     // Data starts after the block.
-    return reinterpret_cast<value_type *>(static_cast<_ControlBlock *>(data) +
-                                          1);
+    return reinterpret_cast<value_type *>(static_cast<_ControlBlock *>(data) + 1);
   }
 
-  value_type *_AllocateCopy(value_type *src, size_t newCapacity,
-                            size_t numToCopy) {
+  value_type *_AllocateCopy(value_type *src, size_t newCapacity, size_t numToCopy)
+  {
     // Allocate and copy elements.
     value_type *newData = _AllocateNew(newCapacity);
     std::uninitialized_copy(src, src + numToCopy, newData);
     return newData;
   }
 
-  void _DecRef() {
+  void _DecRef()
+  {
     if (!_data)
       return;
     if (ARCH_LIKELY(!_foreignSource)) {
       // Drop the refcount.  If we take it to zero, destroy the data.
-      if (_GetNativeRefCount(_data).fetch_sub(1, std::memory_order_release) ==
-          1) {
+      if (_GetNativeRefCount(_data).fetch_sub(1, std::memory_order_release) == 1) {
         std::atomic_thread_fence(std::memory_order_acquire);
-        for (value_type *p = _data, *e = _data + _shapeData.totalSize; p != e;
-             ++p) {
+        for (value_type *p = _data, *e = _data + _shapeData.totalSize; p != e; ++p) {
           p->~value_type();
         }
-        ::operator delete(
-            static_cast<void *>(std::addressof(_GetControlBlock(_data))));
+        ::operator delete(static_cast<void *>(std::addressof(_GetControlBlock(_data))));
       }
-    } else {
+    }
+    else {
       // Drop the refcount in the foreign source.  If we take it to zero,
       // invoke the function pointer to alert the foreign source.
-      if (_foreignSource->_refCount.fetch_sub(1, std::memory_order_release) ==
-          1) {
+      if (_foreignSource->_refCount.fetch_sub(1, std::memory_order_release) == 1) {
         std::atomic_thread_fence(std::memory_order_acquire);
         _foreignSource->_ArraysDetached();
       }
@@ -895,82 +1033,142 @@ private:
 
 // Declare basic array instantiations as extern templates.  They are explicitly
 // instantiated in array.cpp.
-#define VT_ARRAY_EXTERN_TMPL(r, unused, elem)                                  \
-  extern template class VtArray<VT_TYPE(elem)>;
+#define VT_ARRAY_EXTERN_TMPL(r, unused, elem) extern template class VtArray<VT_TYPE(elem)>;
 BOOST_PP_SEQ_FOR_EACH(VT_ARRAY_EXTERN_TMPL, ~, VT_SCALAR_VALUE_TYPES)
 
-template <class HashState, class ELEM>
-inline std::enable_if_t<VtIsHashable<ELEM>()>
-TfHashAppend(HashState &h, VtArray<ELEM> const &array) {
+template<class HashState, class ELEM>
+inline std::enable_if_t<VtIsHashable<ELEM>()> TfHashAppend(HashState &h,
+                                                           VtArray<ELEM> const &array)
+{
   h.Append(array.size());
   h.AppendContiguous(array.cdata(), array.size());
 }
 
-template <class ELEM>
-typename std::enable_if<VtIsHashable<ELEM>(), size_t>::type
-hash_value(VtArray<ELEM> const &array) {
+template<class ELEM>
+typename std::enable_if<VtIsHashable<ELEM>(), size_t>::type hash_value(VtArray<ELEM> const &array)
+{
   return TfHash()(array);
 }
 
 // Specialize traits so others can figure out that VtArray is an array.
-template <typename T> struct VtIsArray<VtArray<T>> : public std::true_type {};
+template<typename T> struct VtIsArray<VtArray<T>> : public std::true_type {};
 
-template <class T> struct Vt_ArrayOpHelp {
-  static T Add(T l, T r) { return l + r; }
-  static T Sub(T l, T r) { return l - r; }
-  static T Mul(T l, T r) { return l * r; }
-  static T Div(T l, T r) { return l / r; }
-  static T Mod(T l, T r) { return l % r; }
+template<class T> struct Vt_ArrayOpHelp {
+  static T Add(T l, T r)
+  {
+    return l + r;
+  }
+  static T Sub(T l, T r)
+  {
+    return l - r;
+  }
+  static T Mul(T l, T r)
+  {
+    return l * r;
+  }
+  static T Div(T l, T r)
+  {
+    return l / r;
+  }
+  static T Mod(T l, T r)
+  {
+    return l % r;
+  }
 };
 
-template <class T> struct Vt_ArrayOpHelpScalar {
-  static T Mul(T l, double r) { return l * r; }
-  static T Mul(double l, T r) { return l * r; }
-  static T Div(T l, double r) { return l / r; }
-  static T Div(double l, T r) { return l / r; }
+template<class T> struct Vt_ArrayOpHelpScalar {
+  static T Mul(T l, double r)
+  {
+    return l * r;
+  }
+  static T Mul(double l, T r)
+  {
+    return l * r;
+  }
+  static T Div(T l, double r)
+  {
+    return l / r;
+  }
+  static T Div(double l, T r)
+  {
+    return l / r;
+  }
 };
 
 // These operations on bool-arrays are highly questionable, but this preserves
 // existing behavior in the name of Hyrum's Law.
-template <> struct Vt_ArrayOpHelp<bool> {
-  static bool Add(bool l, bool r) { return l | r; }
-  static bool Sub(bool l, bool r) { return l ^ r; }
-  static bool Mul(bool l, bool r) { return l & r; }
-  static bool Div(bool l, bool r) { return l; }
-  static bool Mod(bool l, bool r) { return false; }
+template<> struct Vt_ArrayOpHelp<bool> {
+  static bool Add(bool l, bool r)
+  {
+    return l | r;
+  }
+  static bool Sub(bool l, bool r)
+  {
+    return l ^ r;
+  }
+  static bool Mul(bool l, bool r)
+  {
+    return l & r;
+  }
+  static bool Div(bool l, bool r)
+  {
+    return l;
+  }
+  static bool Mod(bool l, bool r)
+  {
+    return false;
+  }
 };
 
-template <> struct Vt_ArrayOpHelpScalar<bool> {
-  static bool Mul(bool l, double r) { return l && (r != 0.0); }
-  static bool Mul(double l, bool r) { return (l != 0.0) && r; }
-  static bool Div(bool l, double r) { return (r == 0.0) || l; }
-  static bool Div(double l, bool r) { return !r || (l != 0.0); }
+template<> struct Vt_ArrayOpHelpScalar<bool> {
+  static bool Mul(bool l, double r)
+  {
+    return l && (r != 0.0);
+  }
+  static bool Mul(double l, bool r)
+  {
+    return (l != 0.0) && r;
+  }
+  static bool Div(bool l, double r)
+  {
+    return (r == 0.0) || l;
+  }
+  static bool Div(double l, bool r)
+  {
+    return !r || (l != 0.0);
+  }
 };
 
-#define VTOPERATOR_CPPARRAY(op, opName)                                        \
-  template <class T>                                                           \
-  VtArray<T> operator op(VtArray<T> const &lhs, VtArray<T> const &rhs) {       \
-    using Op = Vt_ArrayOpHelp<T>;                                              \
-    /* accept empty vecs */                                                    \
-    if (!lhs.empty() && !rhs.empty() && lhs.size() != rhs.size()) {            \
-      TF_CODING_ERROR("Non-conforming inputs for operator %s", #op);           \
-      return VtArray<T>();                                                     \
-    }                                                                          \
-    /* promote empty vecs to vecs of zeros */                                  \
-    const bool leftEmpty = lhs.size() == 0, rightEmpty = rhs.size() == 0;      \
-    VtArray<T> ret(leftEmpty ? rhs.size() : lhs.size());                       \
-    T zero = VtZero<T>();                                                      \
-    if (leftEmpty) {                                                           \
-      std::transform(rhs.begin(), rhs.end(), ret.begin(),                      \
-                     [zero](T const &r) { return Op::opName(zero, r); });      \
-    } else if (rightEmpty) {                                                   \
-      std::transform(lhs.begin(), lhs.end(), ret.begin(),                      \
-                     [zero](T const &l) { return Op::opName(l, zero); });      \
-    } else {                                                                   \
-      std::transform(lhs.begin(), lhs.end(), rhs.begin(), ret.begin(),         \
-                     [](T const &l, T const &r) { return Op::opName(l, r); }); \
-    }                                                                          \
-    return ret;                                                                \
+#define VTOPERATOR_CPPARRAY(op, opName) \
+  template<class T> VtArray<T> operator op(VtArray<T> const &lhs, VtArray<T> const &rhs) \
+  { \
+    using Op = Vt_ArrayOpHelp<T>; \
+    /* accept empty vecs */ \
+    if (!lhs.empty() && !rhs.empty() && lhs.size() != rhs.size()) { \
+      TF_CODING_ERROR("Non-conforming inputs for operator %s", #op); \
+      return VtArray<T>(); \
+    } \
+    /* promote empty vecs to vecs of zeros */ \
+    const bool leftEmpty = lhs.size() == 0, rightEmpty = rhs.size() == 0; \
+    VtArray<T> ret(leftEmpty ? rhs.size() : lhs.size()); \
+    T zero = VtZero<T>(); \
+    if (leftEmpty) { \
+      std::transform(rhs.begin(), rhs.end(), ret.begin(), [zero](T const &r) { \
+        return Op::opName(zero, r); \
+      }); \
+    } \
+    else if (rightEmpty) { \
+      std::transform(lhs.begin(), lhs.end(), ret.begin(), [zero](T const &l) { \
+        return Op::opName(l, zero); \
+      }); \
+    } \
+    else { \
+      std::transform( \
+          lhs.begin(), lhs.end(), rhs.begin(), ret.begin(), [](T const &l, T const &r) { \
+            return Op::opName(l, r); \
+          }); \
+    } \
+    return ret; \
   }
 
 ARCH_PRAGMA_PUSH
@@ -984,10 +1182,10 @@ VTOPERATOR_CPPARRAY(*, Mul);
 VTOPERATOR_CPPARRAY(/, Div);
 VTOPERATOR_CPPARRAY(%, Mod);
 
-template <class T> VtArray<T> operator-(VtArray<T> const &a) {
+template<class T> VtArray<T> operator-(VtArray<T> const &a)
+{
   VtArray<T> ret(a.size());
-  std::transform(a.begin(), a.end(), ret.begin(),
-                 [](T const &x) { return -x; });
+  std::transform(a.begin(), a.end(), ret.begin(), [](T const &x) { return -x; });
   return ret;
 }
 
@@ -995,49 +1193,51 @@ ARCH_PRAGMA_POP
 
 // Operations on scalars and arrays
 // These are free functions defined in Array.h
-#define VTOPERATOR_CPPSCALAR(op, opName)                                       \
-  template <typename T>                                                        \
-  VtArray<T> operator op(T const &scalar, VtArray<T> const &arr) {             \
-    using Op = Vt_ArrayOpHelp<T>;                                              \
-    VtArray<T> ret(arr.size());                                                \
-    std::transform(                                                            \
-        arr.begin(), arr.end(), ret.begin(),                                   \
-        [&scalar](T const &aObj) { return Op::opName(scalar, aObj); });        \
-    return ret;                                                                \
-  }                                                                            \
-  template <typename T>                                                        \
-  VtArray<T> operator op(VtArray<T> const &arr, T const &scalar) {             \
-    using Op = Vt_ArrayOpHelp<T>;                                              \
-    VtArray<T> ret(arr.size());                                                \
-    std::transform(                                                            \
-        arr.begin(), arr.end(), ret.begin(),                                   \
-        [&scalar](T const &aObj) { return Op::opName(aObj, scalar); });        \
-    return ret;                                                                \
+#define VTOPERATOR_CPPSCALAR(op, opName) \
+  template<typename T> VtArray<T> operator op(T const &scalar, VtArray<T> const &arr) \
+  { \
+    using Op = Vt_ArrayOpHelp<T>; \
+    VtArray<T> ret(arr.size()); \
+    std::transform(arr.begin(), arr.end(), ret.begin(), [&scalar](T const &aObj) { \
+      return Op::opName(scalar, aObj); \
+    }); \
+    return ret; \
+  } \
+  template<typename T> VtArray<T> operator op(VtArray<T> const &arr, T const &scalar) \
+  { \
+    using Op = Vt_ArrayOpHelp<T>; \
+    VtArray<T> ret(arr.size()); \
+    std::transform(arr.begin(), arr.end(), ret.begin(), [&scalar](T const &aObj) { \
+      return Op::opName(aObj, scalar); \
+    }); \
+    return ret; \
   }
 
 // define special-case operators on arrays and doubles - except if the array
 // holds doubles, in which case we already defined the operator (with
 // VTOPERATOR_CPPSCALAR above) so we can't do it again!
-#define VTOPERATOR_CPPSCALAR_DOUBLE(op, opName)                                \
-  template <typename T>                                                        \
-  std::enable_if_t<!std::is_same<T, double>::value, VtArray<T>> operator op(   \
-      double const &scalar, VtArray<T> const &arr) {                           \
-    using Op = Vt_ArrayOpHelpScalar<T>;                                        \
-    VtArray<T> ret(arr.size());                                                \
-    std::transform(                                                            \
-        arr.begin(), arr.end(), ret.begin(),                                   \
-        [&scalar](T const &aObj) { return Op::opName(scalar, aObj); });        \
-    return ret;                                                                \
-  }                                                                            \
-  template <typename T>                                                        \
-  std::enable_if_t<!std::is_same<T, double>::value, VtArray<T>> operator op(   \
-      VtArray<T> const &arr, double const &scalar) {                           \
-    using Op = Vt_ArrayOpHelpScalar<T>;                                        \
-    VtArray<T> ret(arr.size());                                                \
-    std::transform(                                                            \
-        arr.begin(), arr.end(), ret.begin(),                                   \
-        [&scalar](T const &aObj) { return Op::opName(aObj, scalar); });        \
-    return ret;                                                                \
+#define VTOPERATOR_CPPSCALAR_DOUBLE(op, opName) \
+  template<typename T> \
+  std::enable_if_t<!std::is_same<T, double>::value, VtArray<T>> operator op( \
+      double const &scalar, VtArray<T> const &arr) \
+  { \
+    using Op = Vt_ArrayOpHelpScalar<T>; \
+    VtArray<T> ret(arr.size()); \
+    std::transform(arr.begin(), arr.end(), ret.begin(), [&scalar](T const &aObj) { \
+      return Op::opName(scalar, aObj); \
+    }); \
+    return ret; \
+  } \
+  template<typename T> \
+  std::enable_if_t<!std::is_same<T, double>::value, VtArray<T>> operator op( \
+      VtArray<T> const &arr, double const &scalar) \
+  { \
+    using Op = Vt_ArrayOpHelpScalar<T>; \
+    VtArray<T> ret(arr.size()); \
+    std::transform(arr.begin(), arr.end(), ret.begin(), [&scalar](T const &aObj) { \
+      return Op::opName(aObj, scalar); \
+    }); \
+    return ret; \
   }
 
 // free functions for operators combining scalar and array types
@@ -1056,4 +1256,4 @@ ARCH_PRAGMA_POP
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_VT_ARRAY_H
+#endif  // PXR_BASE_VT_ARRAY_H

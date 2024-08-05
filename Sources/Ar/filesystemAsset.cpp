@@ -31,8 +31,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-std::shared_ptr<ArFilesystemAsset>
-ArFilesystemAsset::Open(const ArResolvedPath &resolvedPath) {
+std::shared_ptr<ArFilesystemAsset> ArFilesystemAsset::Open(const ArResolvedPath &resolvedPath)
+{
   FILE *f = ArchOpenFile(resolvedPath.GetPathString().c_str(), "rb");
   if (!f) {
     return nullptr;
@@ -41,8 +41,8 @@ ArFilesystemAsset::Open(const ArResolvedPath &resolvedPath) {
   return std::make_shared<ArFilesystemAsset>(f);
 }
 
-ArTimestamp ArFilesystemAsset::GetModificationTimestamp(
-    const ArResolvedPath &resolvedPath) {
+ArTimestamp ArFilesystemAsset::GetModificationTimestamp(const ArResolvedPath &resolvedPath)
+{
   double time;
   if (ArchGetModificationTime(resolvedPath.GetPathString().c_str(), &time)) {
     return ArTimestamp(time);
@@ -50,17 +50,25 @@ ArTimestamp ArFilesystemAsset::GetModificationTimestamp(
   return ArTimestamp();
 }
 
-ArFilesystemAsset::ArFilesystemAsset(FILE *file) : _file(file) {
+ArFilesystemAsset::ArFilesystemAsset(FILE *file) : _file(file)
+{
   if (!_file) {
     TF_CODING_ERROR("Invalid file handle");
   }
 }
 
-ArFilesystemAsset::~ArFilesystemAsset() { fclose(_file); }
+ArFilesystemAsset::~ArFilesystemAsset()
+{
+  fclose(_file);
+}
 
-size_t ArFilesystemAsset::GetSize() const { return ArchGetFileLength(_file); }
+size_t ArFilesystemAsset::GetSize() const
+{
+  return ArchGetFileLength(_file);
+}
 
-std::shared_ptr<const char> ArFilesystemAsset::GetBuffer() const {
+std::shared_ptr<const char> ArFilesystemAsset::GetBuffer() const
+{
   ArchConstFileMapping mapping = ArchMapFileReadOnly(_file);
   if (!mapping) {
     return nullptr;
@@ -68,9 +76,14 @@ std::shared_ptr<const char> ArFilesystemAsset::GetBuffer() const {
 
   struct _Deleter {
     explicit _Deleter(ArchConstFileMapping &&mapping)
-        : _mapping(new ArchConstFileMapping(std::move(mapping))) {}
+        : _mapping(new ArchConstFileMapping(std::move(mapping)))
+    {
+    }
 
-    void operator()(const char *b) { _mapping.reset(); }
+    void operator()(const char *b)
+    {
+      _mapping.reset();
+    }
 
     std::shared_ptr<ArchConstFileMapping> _mapping;
   };
@@ -79,8 +92,8 @@ std::shared_ptr<const char> ArFilesystemAsset::GetBuffer() const {
   return std::shared_ptr<const char>(buffer, _Deleter(std::move(mapping)));
 }
 
-size_t ArFilesystemAsset::Read(void *buffer, size_t count,
-                               size_t offset) const {
+size_t ArFilesystemAsset::Read(void *buffer, size_t count, size_t offset) const
+{
   int64_t numRead = ArchPRead(_file, buffer, count, offset);
   if (numRead == -1) {
     TF_RUNTIME_ERROR("Error occurred reading file: %s", ArchStrerror().c_str());
@@ -89,7 +102,8 @@ size_t ArFilesystemAsset::Read(void *buffer, size_t count,
   return numRead;
 }
 
-std::pair<FILE *, size_t> ArFilesystemAsset::GetFileUnsafe() const {
+std::pair<FILE *, size_t> ArFilesystemAsset::GetFileUnsafe() const
+{
   return std::make_pair(_file, 0);
 }
 

@@ -26,18 +26,18 @@
 
 /// \file usdSkel/animation.h
 
-#include <pxr/pxrns.h>
-#include "UsdSkel/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdSkel/api.h"
 #include "UsdSkel/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -59,9 +59,8 @@ class SdfAssetPath;
 /// documentation for more information.
 ///
 ///
-class UsdSkelAnimation : public UsdTyped
-{
-public:
+class UsdSkelAnimation : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -71,18 +70,12 @@ public:
   /// Equivalent to UsdSkelAnimation::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdSkelAnimation(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdSkelAnimation(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdSkelAnimation on the prim held by \p schemaObj .
   /// Should be preferred over UsdSkelAnimation(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdSkelAnimation(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdSkelAnimation(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDSKEL_API
@@ -92,8 +85,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSKEL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSkelAnimation holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -105,8 +97,7 @@ public:
   /// \endcode
   ///
   USDSKEL_API
-  static UsdSkelAnimation
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelAnimation Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -131,17 +122,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDSKEL_API
-  static UsdSkelAnimation
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelAnimation Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSKEL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSKEL_API
@@ -153,7 +143,7 @@ private:
   USDSKEL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // JOINTS
   // --------------------------------------------------------------------- //
@@ -177,9 +167,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateJointsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateJointsAttr(VtValue const &defaultValue = VtValue(),
+                                bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // TRANSLATIONS
   // --------------------------------------------------------------------- //
@@ -200,9 +191,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateTranslationsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateTranslationsAttr(VtValue const &defaultValue = VtValue(),
+                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // ROTATIONS
   // --------------------------------------------------------------------- //
@@ -224,9 +216,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateRotationsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateRotationsAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // SCALES
   // --------------------------------------------------------------------- //
@@ -248,9 +241,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateScalesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateScalesAttr(VtValue const &defaultValue = VtValue(),
+                                bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // BLENDSHAPES
   // --------------------------------------------------------------------- //
@@ -274,9 +268,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateBlendShapesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateBlendShapesAttr(VtValue const &defaultValue = VtValue(),
+                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // BLENDSHAPEWEIGHTS
   // --------------------------------------------------------------------- //
@@ -299,9 +294,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSKEL_API
-  UsdAttribute CreateBlendShapeWeightsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateBlendShapeWeightsAttr(VtValue const &defaultValue = VtValue(),
+                                           bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -317,8 +313,7 @@ public:
   /// Note that it is more efficient to query transforms through
   /// UsdSkelAnimQuery or UsdSkelSkeletonQuery.
   USDSKEL_API
-  bool GetTransforms(VtMatrix4dArray *xforms,
-                     UsdTimeCode time = UsdTimeCode::Default()) const;
+  bool GetTransforms(VtMatrix4dArray *xforms, UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Convenience method for setting an array of transforms.
   /// The given transforms must be _orthogonal_.

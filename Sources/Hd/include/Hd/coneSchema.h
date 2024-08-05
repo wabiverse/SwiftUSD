@@ -33,104 +33,85 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDCONE_SCHEMA_TOKENS \
-    (cone) \
-    (height) \
-    (radius) \
-    (axis) \
-    (X) \
-    (Y) \
-    (Z) \
+#define HDCONE_SCHEMA_TOKENS (cone)(height)(radius)(axis)(X)(Y)(Z)
 
-TF_DECLARE_PUBLIC_TOKENS(HdConeSchemaTokens, HD_API,
-    HDCONE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdConeSchemaTokens, HD_API, HDCONE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdConeSchema : public HdSchema
-{
-public:
-    HdConeSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdConeSchema : public HdSchema {
+ public:
+  HdConeSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdDoubleDataSourceHandle GetHeight();
+  HD_API
+  HdDoubleDataSourceHandle GetRadius();
+  HD_API
+  HdTokenDataSourceHandle GetAxis();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdDoubleDataSourceHandle &height,
+                                                   const HdDoubleDataSourceHandle &radius,
+                                                   const HdTokenDataSourceHandle &axis);
+
+  /// \class HdConeSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdDoubleDataSourceHandle GetHeight();
+    Builder &SetHeight(const HdDoubleDataSourceHandle &height);
     HD_API
-    HdDoubleDataSourceHandle GetRadius();
+    Builder &SetRadius(const HdDoubleDataSourceHandle &radius);
     HD_API
-    HdTokenDataSourceHandle GetAxis();
+    Builder &SetAxis(const HdTokenDataSourceHandle &axis);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdDoubleDataSourceHandle &height,
-        const HdDoubleDataSourceHandle &radius,
-        const HdTokenDataSourceHandle &axis
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdConeSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetHeight(
-            const HdDoubleDataSourceHandle &height);
-        HD_API
-        Builder &SetRadius(
-            const HdDoubleDataSourceHandle &radius);
-        HD_API
-        Builder &SetAxis(
-            const HdTokenDataSourceHandle &axis);
+   private:
+    HdDoubleDataSourceHandle _height;
+    HdDoubleDataSourceHandle _radius;
+    HdTokenDataSourceHandle _axis;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "cone" from the parent container and constructs a
+  /// HdConeSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdConeSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdDoubleDataSourceHandle _height;
-        HdDoubleDataSourceHandle _radius;
-        HdTokenDataSourceHandle _axis;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "cone" from the parent container and constructs a
-    /// HdConeSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdConeSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

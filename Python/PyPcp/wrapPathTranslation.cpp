@@ -37,21 +37,28 @@ PXR_NAMESPACE_USING_DIRECTIVE
 namespace {
 
 static SdfPath TranslatePathFromNodeToRoot(const PcpNodeRef &sourceNode,
-                                           const SdfPath &pathInNodeNamespace) {
+                                           const SdfPath &pathInNodeNamespace)
+{
   return PcpTranslatePathFromNodeToRoot(sourceNode, pathInNodeNamespace);
 }
 
 static SdfPath TranslatePathFromRootToNode(const PcpNodeRef &destNode,
-                                           const SdfPath &pathInRootNamespace) {
+                                           const SdfPath &pathInRootNamespace)
+{
   return PcpTranslatePathFromRootToNode(destNode, pathInRootNamespace);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPathTranslation() {
-  def("TranslatePathFromNodeToRoot", TranslatePathFromNodeToRoot,
-      arg("sourceNode"), arg("pathInNodeNamespace"));
+void wrapPathTranslation()
+{
+  def("TranslatePathFromNodeToRoot",
+      TranslatePathFromNodeToRoot,
+      arg("sourceNode"),
+      arg("pathInNodeNamespace"));
 
-  def("TranslatePathFromRootToNode", TranslatePathFromRootToNode,
-      arg("destNode"), arg("pathInRootNamespace"));
+  def("TranslatePathFromRootToNode",
+      TranslatePathFromRootToNode,
+      arg("destNode"),
+      arg("pathInRootNamespace"));
 }

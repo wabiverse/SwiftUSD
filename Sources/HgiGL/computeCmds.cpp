@@ -28,17 +28,15 @@
 #include "HgiGL/conversions.h"
 #include "HgiGL/device.h"
 #include "HgiGL/diagnostic.h"
-#include "HgiGL/ops.h"
 #include "HgiGL/graphicsPipeline.h"
+#include "HgiGL/ops.h"
 #include "HgiGL/resourceBindings.h"
 
 #include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLComputeCmds::HgiGLComputeCmds(
-    HgiGLDevice *device,
-    HgiComputeCmdsDesc const &)
+HgiGLComputeCmds::HgiGLComputeCmds(HgiGLDevice *device, HgiComputeCmdsDesc const &)
     : HgiComputeCmds(), _pushStack(0), _localWorkGroupSize(GfVec3i(1, 1, 1))
 {
 }
@@ -53,11 +51,9 @@ void HgiGLComputeCmds::BindPipeline(HgiComputePipelineHandle pipeline)
   const HgiShaderFunctionHandleVector shaderFunctionsHandles =
       pipeline.Get()->GetDescriptor().shaderProgram.Get()->GetDescriptor().shaderFunctions;
 
-  for (const auto &handle : shaderFunctionsHandles)
-  {
+  for (const auto &handle : shaderFunctionsHandles) {
     const HgiShaderFunctionDesc &shaderDesc = handle.Get()->GetDescriptor();
-    if (shaderDesc.shaderStage == HgiShaderStageCompute)
-    {
+    if (shaderDesc.shaderStage == HgiShaderStageCompute) {
       if (shaderDesc.computeDescriptor.localSize[0] > 0 &&
           shaderDesc.computeDescriptor.localSize[1] > 0 &&
           shaderDesc.computeDescriptor.localSize[2] > 0)
@@ -73,18 +69,12 @@ void HgiGLComputeCmds::BindResources(HgiResourceBindingsHandle res)
   _ops.push_back(HgiGLOps::BindResources(res));
 }
 
-void HgiGLComputeCmds::SetConstantValues(
-    HgiComputePipelineHandle pipeline,
-    uint32_t bindIndex,
-    uint32_t byteSize,
-    const void *data)
+void HgiGLComputeCmds::SetConstantValues(HgiComputePipelineHandle pipeline,
+                                         uint32_t bindIndex,
+                                         uint32_t byteSize,
+                                         const void *data)
 {
-  _ops.push_back(
-      HgiGLOps::SetConstantValues(
-          pipeline,
-          bindIndex,
-          byteSize,
-          data));
+  _ops.push_back(HgiGLOps::SetConstantValues(pipeline, bindIndex, byteSize, data));
 }
 
 void HgiGLComputeCmds::Dispatch(int dimX, int dimY)
@@ -99,29 +89,29 @@ void HgiGLComputeCmds::Dispatch(int dimX, int dimY)
   glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &maxNumWorkGroups[0]);
   glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &maxNumWorkGroups[1]);
 
-  if (numWorkGroupsX > maxNumWorkGroups[0])
-  {
-    TF_WARN("Max number of work group available from device is %i, larger "
-            "than %i",
-            maxNumWorkGroups[0], numWorkGroupsX);
+  if (numWorkGroupsX > maxNumWorkGroups[0]) {
+    TF_WARN(
+        "Max number of work group available from device is %i, larger "
+        "than %i",
+        maxNumWorkGroups[0],
+        numWorkGroupsX);
     numWorkGroupsX = maxNumWorkGroups[0];
   }
-  if (numWorkGroupsY > maxNumWorkGroups[1])
-  {
-    TF_WARN("Max number of work group available from device is %i, larger "
-            "than %i",
-            maxNumWorkGroups[1], numWorkGroupsY);
+  if (numWorkGroupsY > maxNumWorkGroups[1]) {
+    TF_WARN(
+        "Max number of work group available from device is %i, larger "
+        "than %i",
+        maxNumWorkGroups[1],
+        numWorkGroupsY);
     numWorkGroupsY = maxNumWorkGroups[1];
   }
 
-  _ops.push_back(
-      HgiGLOps::Dispatch(numWorkGroupsX, numWorkGroupsY));
+  _ops.push_back(HgiGLOps::Dispatch(numWorkGroupsX, numWorkGroupsY));
 }
 
 void HgiGLComputeCmds::PushDebugGroup(const char *label)
 {
-  if (HgiGLDebugEnabled())
-  {
+  if (HgiGLDebugEnabled()) {
     _pushStack++;
     _ops.push_back(HgiGLOps::PushDebugGroup(label));
   }
@@ -129,8 +119,7 @@ void HgiGLComputeCmds::PushDebugGroup(const char *label)
 
 void HgiGLComputeCmds::PopDebugGroup()
 {
-  if (HgiGLDebugEnabled())
-  {
+  if (HgiGLDebugEnabled()) {
     _pushStack--;
     _ops.push_back(HgiGLOps::PopDebugGroup());
   }
@@ -141,16 +130,14 @@ void HgiGLComputeCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
   _ops.push_back(HgiGLOps::InsertMemoryBarrier(barrier));
 }
 
-HgiComputeDispatch
-HgiGLComputeCmds::GetDispatchMethod() const
+HgiComputeDispatch HgiGLComputeCmds::GetDispatchMethod() const
 {
   return HgiComputeDispatchSerial;
 }
 
 bool HgiGLComputeCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
 {
-  if (_ops.empty())
-  {
+  if (_ops.empty()) {
     return false;
   }
 

@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HGIVULKAN_GARBAGE_COLLECTOR_H
 #define PXR_IMAGING_HGIVULKAN_GARBAGE_COLLECTOR_H
 
-#include <pxr/pxrns.h>
 #include "Tf/diagnostic.h"
+#include <pxr/pxrns.h>
 
 #include "Hgi/hgiImpl.h"
 #include "HgiVulkan/api.h"
@@ -38,31 +38,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HgiVulkan;
 class HgiVulkanDevice;
 
-using HgiVulkanBufferVector =
-    std::vector<class HgiVulkanBuffer *>;
-using HgiVulkanTextureVector =
-    std::vector<class HgiVulkanTexture *>;
-using HgiVulkanSamplerVector =
-    std::vector<class HgiVulkanSampler *>;
-using HgiVulkanShaderFunctionVector =
-    std::vector<class HgiVulkanShaderFunction *>;
-using HgiVulkanShaderProgramVector =
-    std::vector<class HgiVulkanShaderProgram *>;
-using HgiVulkanResourceBindingsVector =
-    std::vector<class HgiVulkanResourceBindings *>;
-using HgiVulkanGraphicsPipelineVector =
-    std::vector<class HgiVulkanGraphicsPipeline *>;
-using HgiVulkanComputePipelineVector =
-    std::vector<class HgiVulkanComputePipeline *>;
+using HgiVulkanBufferVector = std::vector<class HgiVulkanBuffer *>;
+using HgiVulkanTextureVector = std::vector<class HgiVulkanTexture *>;
+using HgiVulkanSamplerVector = std::vector<class HgiVulkanSampler *>;
+using HgiVulkanShaderFunctionVector = std::vector<class HgiVulkanShaderFunction *>;
+using HgiVulkanShaderProgramVector = std::vector<class HgiVulkanShaderProgram *>;
+using HgiVulkanResourceBindingsVector = std::vector<class HgiVulkanResourceBindings *>;
+using HgiVulkanGraphicsPipelineVector = std::vector<class HgiVulkanGraphicsPipeline *>;
+using HgiVulkanComputePipelineVector = std::vector<class HgiVulkanComputePipeline *>;
 
 /// \class HgiVulkanGarbageCollector
 ///
 /// Handles garbage collection of vulkan objects by delaying their destruction
 /// until those objects are no longer used.
 ///
-class HgiVulkanGarbageCollector final
-{
-public:
+class HgiVulkanGarbageCollector final {
+ public:
   HGIVULKAN_API
   HgiVulkanGarbageCollector(HgiVulkan *hgi);
 
@@ -87,15 +78,14 @@ public:
   HgiVulkanGraphicsPipelineVector *GetGraphicsPipelineList();
   HgiVulkanComputePipelineVector *GetComputePipelineList();
 
-private:
+ private:
   HgiVulkanGarbageCollector &operator=(const HgiVulkanGarbageCollector &) = delete;
   HgiVulkanGarbageCollector(const HgiVulkanGarbageCollector &) = delete;
 
   /// Returns a thread_local vector in which to store a object handle.
   /// Thread safety: The returned vector is a thread_local vector so this call
   /// is thread safe as long as the vector is only used by the calling thread.
-  template <class T>
-  T *_GetThreadLocalStorageList(std::vector<T *> *collector);
+  template<class T> T *_GetThreadLocalStorageList(std::vector<T *> *collector);
 
   HgiVulkan *_hgi;
 

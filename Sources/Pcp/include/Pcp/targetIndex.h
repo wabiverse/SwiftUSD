@@ -88,13 +88,17 @@ void PcpBuildTargetIndex(const PcpSite &propSite,
 /// \p allErrors will contain any errors encountered while
 /// performing this operation.
 PCP_API
-void PcpBuildFilteredTargetIndex(
-    const PcpSite &propSite, const PcpPropertyIndex &propIndex,
-    const SdfSpecType relOrAttrType, const bool localOnly,
-    const SdfSpecHandle &stopProperty, const bool includeStopProperty,
-    PcpCache *cacheForValidation, PcpTargetIndex *targetIndex,
-    SdfPathVector *deletedPaths, PcpErrorVector *allErrors);
+void PcpBuildFilteredTargetIndex(const PcpSite &propSite,
+                                 const PcpPropertyIndex &propIndex,
+                                 const SdfSpecType relOrAttrType,
+                                 const bool localOnly,
+                                 const SdfSpecHandle &stopProperty,
+                                 const bool includeStopProperty,
+                                 PcpCache *cacheForValidation,
+                                 PcpTargetIndex *targetIndex,
+                                 SdfPathVector *deletedPaths,
+                                 PcpErrorVector *allErrors);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_TARGET_INDEX_H
+#endif  // PXR_USD_PCP_TARGET_INDEX_H

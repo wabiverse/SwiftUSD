@@ -55,8 +55,7 @@ std::string ArchGetEnv(const std::string &name);
 /// \ingroup group_arch_SystemFunctions
 ///
 ARCH_API
-bool ArchSetEnv(const std::string &name, const std::string &value,
-                bool overwrite);
+bool ArchSetEnv(const std::string &name, const std::string &value, bool overwrite);
 
 ///
 /// Removes an environment variable.
@@ -81,4 +80,4 @@ char **ArchEnviron();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_ENV_H
+#endif  // PXR_BASE_ARCH_ENV_H

@@ -26,18 +26,18 @@
 
 /// \file usdSchemaExamples/paramsAPI.h
 
-#include <pxr/pxrns.h>
 #include "./api.h"
+#include "./tokens.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
-#include "./tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -53,9 +53,8 @@ class SdfAssetPath;
 /// \class UsdSchemaExamplesParamsAPI
 ///
 ///
-class UsdSchemaExamplesParamsAPI : public UsdAPISchemaBase
-{
-public:
+class UsdSchemaExamplesParamsAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -65,16 +64,12 @@ public:
   /// Equivalent to UsdSchemaExamplesParamsAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdSchemaExamplesParamsAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
-  {
-  }
+  explicit UsdSchemaExamplesParamsAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdSchemaExamplesParamsAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdSchemaExamplesParamsAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdSchemaExamplesParamsAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj)
+  explicit UsdSchemaExamplesParamsAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj)
   {
   }
 
@@ -86,8 +81,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSCHEMAEXAMPLES_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSchemaExamplesParamsAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -99,8 +93,7 @@ public:
   /// \endcode
   ///
   USDSCHEMAEXAMPLES_API
-  static UsdSchemaExamplesParamsAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSchemaExamplesParamsAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -119,8 +112,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDSCHEMAEXAMPLES_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "ParamsAPI" to the
@@ -138,17 +130,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDSCHEMAEXAMPLES_API
-  static UsdSchemaExamplesParamsAPI
-  Apply(const UsdPrim &prim);
+  static UsdSchemaExamplesParamsAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSCHEMAEXAMPLES_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSCHEMAEXAMPLES_API
@@ -160,7 +151,7 @@ private:
   USDSCHEMAEXAMPLES_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // MASS
   // --------------------------------------------------------------------- //
@@ -180,9 +171,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSCHEMAEXAMPLES_API
-  UsdAttribute CreateMassAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateMassAttr(VtValue const &defaultValue = VtValue(),
+                              bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // VELOCITY
   // --------------------------------------------------------------------- //
@@ -202,9 +194,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSCHEMAEXAMPLES_API
-  UsdAttribute CreateVelocityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateVelocityAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // VOLUME
   // --------------------------------------------------------------------- //
@@ -224,9 +217,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSCHEMAEXAMPLES_API
-  UsdAttribute CreateVolumeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateVolumeAttr(VtValue const &defaultValue = VtValue(),
+                                bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

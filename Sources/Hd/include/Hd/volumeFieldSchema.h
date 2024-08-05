@@ -33,117 +33,99 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDVOLUMEFIELD_SCHEMA_TOKENS \
-    (volumeField) \
-    (filePath) \
-    (fieldName) \
-    (fieldIndex) \
-    (fieldDataType) \
-    (vectorDataRoleHint) \
+  (volumeField)(filePath)(fieldName)(fieldIndex)(fieldDataType)(vectorDataRoleHint)
 
-TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldSchemaTokens, HD_API,
-    HDVOLUMEFIELD_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdVolumeFieldSchemaTokens, HD_API, HDVOLUMEFIELD_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdVolumeFieldSchema : public HdSchema
-{
-public:
-    HdVolumeFieldSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdVolumeFieldSchema : public HdSchema {
+ public:
+  HdVolumeFieldSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdAssetPathDataSourceHandle GetFilePath();
+  HD_API
+  HdTokenDataSourceHandle GetFieldName();
+  HD_API
+  HdIntDataSourceHandle GetFieldIndex();
+  HD_API
+  HdTokenDataSourceHandle GetFieldDataType();
+  HD_API
+  HdTokenDataSourceHandle GetVectorDataRoleHint();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdAssetPathDataSourceHandle &filePath,
+      const HdTokenDataSourceHandle &fieldName,
+      const HdIntDataSourceHandle &fieldIndex,
+      const HdTokenDataSourceHandle &fieldDataType,
+      const HdTokenDataSourceHandle &vectorDataRoleHint);
+
+  /// \class HdVolumeFieldSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdAssetPathDataSourceHandle GetFilePath();
+    Builder &SetFilePath(const HdAssetPathDataSourceHandle &filePath);
     HD_API
-    HdTokenDataSourceHandle GetFieldName();
+    Builder &SetFieldName(const HdTokenDataSourceHandle &fieldName);
     HD_API
-    HdIntDataSourceHandle GetFieldIndex();
+    Builder &SetFieldIndex(const HdIntDataSourceHandle &fieldIndex);
     HD_API
-    HdTokenDataSourceHandle GetFieldDataType();
+    Builder &SetFieldDataType(const HdTokenDataSourceHandle &fieldDataType);
     HD_API
-    HdTokenDataSourceHandle GetVectorDataRoleHint();
+    Builder &SetVectorDataRoleHint(const HdTokenDataSourceHandle &vectorDataRoleHint);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdAssetPathDataSourceHandle &filePath,
-        const HdTokenDataSourceHandle &fieldName,
-        const HdIntDataSourceHandle &fieldIndex,
-        const HdTokenDataSourceHandle &fieldDataType,
-        const HdTokenDataSourceHandle &vectorDataRoleHint
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdVolumeFieldSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetFilePath(
-            const HdAssetPathDataSourceHandle &filePath);
-        HD_API
-        Builder &SetFieldName(
-            const HdTokenDataSourceHandle &fieldName);
-        HD_API
-        Builder &SetFieldIndex(
-            const HdIntDataSourceHandle &fieldIndex);
-        HD_API
-        Builder &SetFieldDataType(
-            const HdTokenDataSourceHandle &fieldDataType);
-        HD_API
-        Builder &SetVectorDataRoleHint(
-            const HdTokenDataSourceHandle &vectorDataRoleHint);
+   private:
+    HdAssetPathDataSourceHandle _filePath;
+    HdTokenDataSourceHandle _fieldName;
+    HdIntDataSourceHandle _fieldIndex;
+    HdTokenDataSourceHandle _fieldDataType;
+    HdTokenDataSourceHandle _vectorDataRoleHint;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "volumeField" from the parent container and constructs a
+  /// HdVolumeFieldSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdVolumeFieldSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdAssetPathDataSourceHandle _filePath;
-        HdTokenDataSourceHandle _fieldName;
-        HdIntDataSourceHandle _fieldIndex;
-        HdTokenDataSourceHandle _fieldDataType;
-        HdTokenDataSourceHandle _vectorDataRoleHint;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "volumeField" from the parent container and constructs a
-    /// HdVolumeFieldSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdVolumeFieldSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

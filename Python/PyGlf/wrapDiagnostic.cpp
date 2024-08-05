@@ -23,8 +23,8 @@
 //
 #include "Glf/diagnostic.h"
 
-#include <boost/python/def.hpp>
 #include <boost/python/class.hpp>
+#include <boost/python/def.hpp>
 
 using namespace boost::python;
 
@@ -32,8 +32,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapGlfDiagnostic()
 {
-  def("RegisterDefaultDebugOutputMessageCallback",
-      &GlfRegisterDefaultDebugOutputMessageCallback);
+  def("RegisterDefaultDebugOutputMessageCallback", &GlfRegisterDefaultDebugOutputMessageCallback);
 
   class_<GlfGLQueryObject, boost::noncopyable>("GLQueryObject")
       .def("Begin", &GlfGLQueryObject::Begin)

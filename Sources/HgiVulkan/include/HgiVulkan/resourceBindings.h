@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_RESOURCEBINDINGS_H
 #define PXR_IMAGING_HGI_VULKAN_RESOURCEBINDINGS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/resourceBindings.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,18 +39,14 @@ class HgiVulkanDevice;
 /// Vulkan implementation of HgiResourceBindings.
 ///
 ///
-class HgiVulkanResourceBindings final : public HgiResourceBindings
-{
-public:
+class HgiVulkanResourceBindings final : public HgiResourceBindings {
+ public:
   HGIVULKAN_API
   ~HgiVulkanResourceBindings() override;
 
   /// Binds the resources to GPU.
   HGIVULKAN_API
-  void BindResources(
-      VkCommandBuffer cb,
-      VkPipelineBindPoint bindPoint,
-      VkPipelineLayout layout);
+  void BindResources(VkCommandBuffer cb, VkPipelineBindPoint bindPoint, VkPipelineLayout layout);
 
   /// Returns the device used to create this object.
   HGIVULKAN_API
@@ -60,15 +56,13 @@ public:
   HGIVULKAN_API
   uint64_t &GetInflightBits();
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
-  HgiVulkanResourceBindings(
-      HgiVulkanDevice *device,
-      HgiResourceBindingsDesc const &desc);
+  HgiVulkanResourceBindings(HgiVulkanDevice *device, HgiResourceBindingsDesc const &desc);
 
-private:
+ private:
   HgiVulkanResourceBindings() = delete;
   HgiVulkanResourceBindings &operator=(const HgiVulkanResourceBindings &) = delete;
   HgiVulkanResourceBindings(const HgiVulkanResourceBindings &) = delete;

@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdShade/input.h"
+#include <pxr/pxrns.h>
 
 #include "UsdShade/connectableAPI.h"
 #include "UsdShade/output.h"
@@ -35,404 +35,341 @@
 
 #include "Tf/smallVector.h"
 
-#include <stdlib.h>
 #include <algorithm>
+#include <stdlib.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-using std::vector;
 using std::string;
+using std::vector;
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (connectability)
-    (renderType)
-);
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (connectability)(renderType));
 
-UsdShadeInput::UsdShadeInput(const UsdAttribute &attr)
-    : _attr(attr)
+UsdShadeInput::UsdShadeInput(const UsdAttribute &attr) : _attr(attr) {}
+
+TfToken UsdShadeInput::GetBaseName() const
 {
+  string name = GetFullName();
+  if (TfStringStartsWith(name, UsdShadeTokens->inputs)) {
+    return TfToken(name.substr(UsdShadeTokens->inputs.GetString().size()));
+  }
+
+  return GetFullName();
 }
 
-TfToken 
-UsdShadeInput::GetBaseName() const
+SdfValueTypeName UsdShadeInput::GetTypeName() const
 {
-    string name = GetFullName();
-    if (TfStringStartsWith(name, UsdShadeTokens->inputs)) {
-        return TfToken(name.substr(UsdShadeTokens->inputs.GetString().size()));
-    }
-    
-    return GetFullName();
+  return _attr.GetTypeName();
 }
 
-SdfValueTypeName 
-UsdShadeInput::GetTypeName() const
-{ 
-    return _attr.GetTypeName();
+static TfToken _GetInputAttrName(const TfToken inputName)
+{
+  return TfToken(UsdShadeTokens->inputs.GetString() + inputName.GetString());
 }
 
-static TfToken
-_GetInputAttrName(const TfToken inputName) 
+UsdShadeInput::UsdShadeInput(UsdPrim prim, TfToken const &name, SdfValueTypeName const &typeName)
 {
-    return TfToken(UsdShadeTokens->inputs.GetString() + inputName.GetString());
+  // XXX what do we do if the type name doesn't match and it exists already?
+  TfToken inputAttrName = _GetInputAttrName(name);
+  if (prim.HasAttribute(inputAttrName)) {
+    _attr = prim.GetAttribute(inputAttrName);
+  }
+
+  if (!_attr) {
+    _attr = prim.CreateAttribute(inputAttrName,
+                                 typeName,
+                                 /* custom = */ false);
+  }
 }
 
-UsdShadeInput::UsdShadeInput(
-    UsdPrim prim,
-    TfToken const &name,
-    SdfValueTypeName const &typeName)
+bool UsdShadeInput::Get(VtValue *value, UsdTimeCode time) const
 {
-    // XXX what do we do if the type name doesn't match and it exists already?
-    TfToken inputAttrName = _GetInputAttrName(name);
-    if (prim.HasAttribute(inputAttrName)) {
-        _attr = prim.GetAttribute(inputAttrName);
-    }
-
-    if (!_attr) {
-        _attr = prim.CreateAttribute(inputAttrName, typeName, 
-            /* custom = */ false);
-    }
-}
-
-bool
-UsdShadeInput::Get(VtValue* value, UsdTimeCode time) const
-{
-    if (!_attr) {
-        return false;
-    }
-
-    return _attr.Get(value, time);
-}
-
-bool
-UsdShadeInput::Set(const VtValue& value, UsdTimeCode time) const
-{
-    return _attr.Set(value, time);
-}
-
-bool 
-UsdShadeInput::SetRenderType(TfToken const& renderType) const
-{
-    return _attr.SetMetadata(_tokens->renderType, renderType);
-}
-
-TfToken 
-UsdShadeInput::GetRenderType() const
-{
-    TfToken renderType;
-    _attr.GetMetadata(_tokens->renderType, &renderType);
-    return renderType;
-}
-
-bool 
-UsdShadeInput::HasRenderType() const
-{
-    return _attr.HasMetadata(_tokens->renderType);
-}
-
-
-NdrTokenMap
-UsdShadeInput::GetSdrMetadata() const
-{
-    NdrTokenMap result;
-
-    VtDictionary sdrMetadata;
-    if (GetAttr().GetMetadata(UsdShadeTokens->sdrMetadata, &sdrMetadata)){
-        for (const auto &it : sdrMetadata) {
-            result[TfToken(it.first)] = TfStringify(it.second);
-        }
-    }
-
-    return result;
-}
-
-std::string 
-UsdShadeInput::GetSdrMetadataByKey(const TfToken &key) const
-{
-    VtValue val;
-    GetAttr().GetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, &val);
-    return TfStringify(val);
-}
-    
-void 
-UsdShadeInput::SetSdrMetadata(const NdrTokenMap &sdrMetadata) const
-{
-    for (auto &i: sdrMetadata) {
-        SetSdrMetadataByKey(i.first, i.second);
-    }
-}
-
-void 
-UsdShadeInput::SetSdrMetadataByKey(
-    const TfToken &key, 
-    const std::string &value) const
-{
-    GetAttr().SetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, value);
-}
-
-bool 
-UsdShadeInput::HasSdrMetadata() const
-{
-    return GetAttr().HasMetadata(UsdShadeTokens->sdrMetadata);
-}
-
-bool 
-UsdShadeInput::HasSdrMetadataByKey(const TfToken &key) const
-{
-    return GetAttr().HasMetadataDictKey(UsdShadeTokens->sdrMetadata, key);
-}
-
-void 
-UsdShadeInput::ClearSdrMetadata() const
-{
-    GetAttr().ClearMetadata(UsdShadeTokens->sdrMetadata);
-}
-
-void
-UsdShadeInput::ClearSdrMetadataByKey(const TfToken &key) const
-{
-    GetAttr().ClearMetadataByDictKey(UsdShadeTokens->sdrMetadata, key);
-}
-
-/* static */
-bool 
-UsdShadeInput::IsInput(const UsdAttribute &attr)
-{
-    return attr && attr.IsDefined() && 
-             TfStringStartsWith(attr.GetName().GetString(), 
-                                UsdShadeTokens->inputs);
-}
-
-/* static */
-bool
-UsdShadeInput::IsInterfaceInputName(const std::string & name)
-{
-    if (TfStringStartsWith(name, UsdShadeTokens->inputs)) {
-        return true;
-    }
-
+  if (!_attr) {
     return false;
+  }
+
+  return _attr.Get(value, time);
 }
 
-bool 
-UsdShadeInput::SetDocumentation(const std::string& docs) const
+bool UsdShadeInput::Set(const VtValue &value, UsdTimeCode time) const
 {
-    if (!_attr) {
-        return false;
+  return _attr.Set(value, time);
+}
+
+bool UsdShadeInput::SetRenderType(TfToken const &renderType) const
+{
+  return _attr.SetMetadata(_tokens->renderType, renderType);
+}
+
+TfToken UsdShadeInput::GetRenderType() const
+{
+  TfToken renderType;
+  _attr.GetMetadata(_tokens->renderType, &renderType);
+  return renderType;
+}
+
+bool UsdShadeInput::HasRenderType() const
+{
+  return _attr.HasMetadata(_tokens->renderType);
+}
+
+NdrTokenMap UsdShadeInput::GetSdrMetadata() const
+{
+  NdrTokenMap result;
+
+  VtDictionary sdrMetadata;
+  if (GetAttr().GetMetadata(UsdShadeTokens->sdrMetadata, &sdrMetadata)) {
+    for (const auto &it : sdrMetadata) {
+      result[TfToken(it.first)] = TfStringify(it.second);
     }
+  }
 
-    return _attr.SetDocumentation(docs);
+  return result;
 }
 
-std::string 
-UsdShadeInput::GetDocumentation() const
+std::string UsdShadeInput::GetSdrMetadataByKey(const TfToken &key) const
 {
-    if (!_attr) {
-        return "";
-    }
-
-    return _attr.GetDocumentation();
+  VtValue val;
+  GetAttr().GetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, &val);
+  return TfStringify(val);
 }
 
-bool 
-UsdShadeInput::SetDisplayGroup(const std::string& docs) const
+void UsdShadeInput::SetSdrMetadata(const NdrTokenMap &sdrMetadata) const
 {
-    if (!_attr) {
-        return false;
-    }
-
-    return _attr.SetDisplayGroup(docs);
+  for (auto &i : sdrMetadata) {
+    SetSdrMetadataByKey(i.first, i.second);
+  }
 }
 
-std::string 
-UsdShadeInput::GetDisplayGroup() const
+void UsdShadeInput::SetSdrMetadataByKey(const TfToken &key, const std::string &value) const
 {
-    if (!_attr) {
-        return "";
-    }
-
-    return _attr.GetDisplayGroup();
+  GetAttr().SetMetadataByDictKey(UsdShadeTokens->sdrMetadata, key, value);
 }
 
-bool 
-UsdShadeInput::CanConnect(const UsdAttribute &source) const 
+bool UsdShadeInput::HasSdrMetadata() const
 {
-    return UsdShadeConnectableAPI::CanConnect(*this, source);
+  return GetAttr().HasMetadata(UsdShadeTokens->sdrMetadata);
 }
 
-bool 
-UsdShadeInput::CanConnect(const UsdShadeInput &sourceInput) const 
+bool UsdShadeInput::HasSdrMetadataByKey(const TfToken &key) const
 {
-    return CanConnect(sourceInput.GetAttr());
+  return GetAttr().HasMetadataDictKey(UsdShadeTokens->sdrMetadata, key);
 }
 
-bool 
-UsdShadeInput::CanConnect(const UsdShadeOutput &sourceOutput) const
+void UsdShadeInput::ClearSdrMetadata() const
 {
-    return CanConnect(sourceOutput.GetAttr());
+  GetAttr().ClearMetadata(UsdShadeTokens->sdrMetadata);
 }
 
-bool
-UsdShadeInput::ConnectToSource(
-    UsdShadeConnectionSourceInfo const &source,
-    ConnectionModification const mod) const
+void UsdShadeInput::ClearSdrMetadataByKey(const TfToken &key) const
 {
-    return UsdShadeConnectableAPI::ConnectToSource(*this, source, mod);
+  GetAttr().ClearMetadataByDictKey(UsdShadeTokens->sdrMetadata, key);
 }
 
-bool 
-UsdShadeInput::ConnectToSource(
-    UsdShadeConnectableAPI const &source, 
-    TfToken const &sourceName, 
-    UsdShadeAttributeType const sourceType,
-    SdfValueTypeName typeName) const 
+/* static */
+bool UsdShadeInput::IsInput(const UsdAttribute &attr)
 {
-    return UsdShadeConnectableAPI::ConnectToSource(*this, source,
-        sourceName, sourceType, typeName);
+  return attr && attr.IsDefined() &&
+         TfStringStartsWith(attr.GetName().GetString(), UsdShadeTokens->inputs);
 }
 
-bool 
-UsdShadeInput::ConnectToSource(SdfPath const &sourcePath) const 
+/* static */
+bool UsdShadeInput::IsInterfaceInputName(const std::string &name)
 {
-    return UsdShadeConnectableAPI::ConnectToSource(*this, sourcePath);
+  if (TfStringStartsWith(name, UsdShadeTokens->inputs)) {
+    return true;
+  }
+
+  return false;
 }
 
-bool 
-UsdShadeInput::ConnectToSource(UsdShadeInput const &sourceInput) const 
+bool UsdShadeInput::SetDocumentation(const std::string &docs) const
 {
-    return UsdShadeConnectableAPI::ConnectToSource(*this, sourceInput);
+  if (!_attr) {
+    return false;
+  }
+
+  return _attr.SetDocumentation(docs);
 }
 
-bool 
-UsdShadeInput::ConnectToSource(UsdShadeOutput const &sourceOutput) const 
+std::string UsdShadeInput::GetDocumentation() const
 {
-    return UsdShadeConnectableAPI::ConnectToSource(*this, sourceOutput);
+  if (!_attr) {
+    return "";
+  }
+
+  return _attr.GetDocumentation();
 }
 
-bool
-UsdShadeInput::SetConnectedSources(
+bool UsdShadeInput::SetDisplayGroup(const std::string &docs) const
+{
+  if (!_attr) {
+    return false;
+  }
+
+  return _attr.SetDisplayGroup(docs);
+}
+
+std::string UsdShadeInput::GetDisplayGroup() const
+{
+  if (!_attr) {
+    return "";
+  }
+
+  return _attr.GetDisplayGroup();
+}
+
+bool UsdShadeInput::CanConnect(const UsdAttribute &source) const
+{
+  return UsdShadeConnectableAPI::CanConnect(*this, source);
+}
+
+bool UsdShadeInput::CanConnect(const UsdShadeInput &sourceInput) const
+{
+  return CanConnect(sourceInput.GetAttr());
+}
+
+bool UsdShadeInput::CanConnect(const UsdShadeOutput &sourceOutput) const
+{
+  return CanConnect(sourceOutput.GetAttr());
+}
+
+bool UsdShadeInput::ConnectToSource(UsdShadeConnectionSourceInfo const &source,
+                                    ConnectionModification const mod) const
+{
+  return UsdShadeConnectableAPI::ConnectToSource(*this, source, mod);
+}
+
+bool UsdShadeInput::ConnectToSource(UsdShadeConnectableAPI const &source,
+                                    TfToken const &sourceName,
+                                    UsdShadeAttributeType const sourceType,
+                                    SdfValueTypeName typeName) const
+{
+  return UsdShadeConnectableAPI::ConnectToSource(*this, source, sourceName, sourceType, typeName);
+}
+
+bool UsdShadeInput::ConnectToSource(SdfPath const &sourcePath) const
+{
+  return UsdShadeConnectableAPI::ConnectToSource(*this, sourcePath);
+}
+
+bool UsdShadeInput::ConnectToSource(UsdShadeInput const &sourceInput) const
+{
+  return UsdShadeConnectableAPI::ConnectToSource(*this, sourceInput);
+}
+
+bool UsdShadeInput::ConnectToSource(UsdShadeOutput const &sourceOutput) const
+{
+  return UsdShadeConnectableAPI::ConnectToSource(*this, sourceOutput);
+}
+
+bool UsdShadeInput::SetConnectedSources(
     std::vector<UsdShadeConnectionSourceInfo> const &sourceInfos) const
 {
-    return UsdShadeConnectableAPI::SetConnectedSources(*this, sourceInfos);
+  return UsdShadeConnectableAPI::SetConnectedSources(*this, sourceInfos);
 }
 
-UsdShadeInput::SourceInfoVector
-UsdShadeInput::GetConnectedSources(SdfPathVector *invalidSourcePaths) const
+UsdShadeInput::SourceInfoVector UsdShadeInput::GetConnectedSources(
+    SdfPathVector *invalidSourcePaths) const
 {
-    return UsdShadeConnectableAPI::GetConnectedSources(*this,
-                                                       invalidSourcePaths);
+  return UsdShadeConnectableAPI::GetConnectedSources(*this, invalidSourcePaths);
 }
 
-bool 
-UsdShadeInput::GetConnectedSource(UsdShadeConnectableAPI *source, 
-                                  TfToken *sourceName,
-                                  UsdShadeAttributeType *sourceType) const 
+bool UsdShadeInput::GetConnectedSource(UsdShadeConnectableAPI *source,
+                                       TfToken *sourceName,
+                                       UsdShadeAttributeType *sourceType) const
 {
-    return UsdShadeConnectableAPI::GetConnectedSource(*this, source, 
-        sourceName, sourceType);
+  return UsdShadeConnectableAPI::GetConnectedSource(*this, source, sourceName, sourceType);
 }
 
-bool 
-UsdShadeInput::GetRawConnectedSourcePaths(SdfPathVector *sourcePaths) const 
+bool UsdShadeInput::GetRawConnectedSourcePaths(SdfPathVector *sourcePaths) const
 {
-    return UsdShadeConnectableAPI::GetRawConnectedSourcePaths(*this, 
-        sourcePaths);
+  return UsdShadeConnectableAPI::GetRawConnectedSourcePaths(*this, sourcePaths);
 }
 
-bool 
-UsdShadeInput::HasConnectedSource() const 
+bool UsdShadeInput::HasConnectedSource() const
 {
-    return UsdShadeConnectableAPI::HasConnectedSource(*this);
+  return UsdShadeConnectableAPI::HasConnectedSource(*this);
 }
 
-bool 
-UsdShadeInput::IsSourceConnectionFromBaseMaterial() const 
+bool UsdShadeInput::IsSourceConnectionFromBaseMaterial() const
 {
-    return UsdShadeConnectableAPI::IsSourceConnectionFromBaseMaterial(*this);
+  return UsdShadeConnectableAPI::IsSourceConnectionFromBaseMaterial(*this);
 }
 
-bool 
-UsdShadeInput::DisconnectSource(UsdAttribute const &sourceAttr) const
+bool UsdShadeInput::DisconnectSource(UsdAttribute const &sourceAttr) const
 {
-    return UsdShadeConnectableAPI::DisconnectSource(*this, sourceAttr);
+  return UsdShadeConnectableAPI::DisconnectSource(*this, sourceAttr);
 }
 
-bool
-UsdShadeInput::ClearSources() const
+bool UsdShadeInput::ClearSources() const
 {
-    return UsdShadeConnectableAPI::ClearSources(*this);
+  return UsdShadeConnectableAPI::ClearSources(*this);
 }
 
-bool 
-UsdShadeInput::ClearSource() const 
+bool UsdShadeInput::ClearSource() const
 {
-    return UsdShadeConnectableAPI::ClearSources(*this);
+  return UsdShadeConnectableAPI::ClearSources(*this);
 }
 
-bool 
-UsdShadeInput::SetConnectability(const TfToken &connectability) const
+bool UsdShadeInput::SetConnectability(const TfToken &connectability) const
 {
-    return _attr.SetMetadata(_tokens->connectability, connectability);
+  return _attr.SetMetadata(_tokens->connectability, connectability);
 }
 
-TfToken 
-UsdShadeInput::GetConnectability() const
+TfToken UsdShadeInput::GetConnectability() const
 {
-    TfToken connectability; 
-    _attr.GetMetadata(_tokens->connectability, &connectability);
+  TfToken connectability;
+  _attr.GetMetadata(_tokens->connectability, &connectability);
 
-    // If there's an authored non-empty connectability value, then return it. 
-    // If not, return "full".
-    if (!connectability.IsEmpty()) {
-        return connectability;
+  // If there's an authored non-empty connectability value, then return it.
+  // If not, return "full".
+  if (!connectability.IsEmpty()) {
+    return connectability;
+  }
+
+  return UsdShadeTokens->full;
+}
+
+bool UsdShadeInput::ClearConnectability() const
+{
+  return _attr.ClearMetadata(_tokens->connectability);
+}
+
+UsdShadeAttributeVector UsdShadeInput::GetValueProducingAttributes(bool shaderOutputsOnly) const
+{
+  return UsdShadeUtils::GetValueProducingAttributes(*this, shaderOutputsOnly);
+}
+
+UsdAttribute UsdShadeInput::GetValueProducingAttribute(UsdShadeAttributeType *attrType) const
+{
+  // Call the multi-connection aware version
+  UsdShadeAttributeVector valueAttrs = UsdShadeUtils::GetValueProducingAttributes(*this);
+
+  if (valueAttrs.empty()) {
+    if (attrType) {
+      *attrType = UsdShadeAttributeType::Invalid;
+    }
+    return UsdAttribute();
+  }
+  else {
+    // If we have valid connections extract the first one
+    if (valueAttrs.size() > 1) {
+      TF_WARN(
+          "More than one value producing attribute for shading input "
+          "%s. GetValueProducingAttribute will only report the first "
+          "one. Please use GetValueProducingAttributes to retrieve "
+          "all.",
+          GetAttr().GetPath().GetText());
     }
 
-    return UsdShadeTokens->full;
-}
-
-bool 
-UsdShadeInput::ClearConnectability() const
-{
-    return _attr.ClearMetadata(_tokens->connectability);
-}
-
-UsdShadeAttributeVector
-UsdShadeInput::GetValueProducingAttributes(
-    bool shaderOutputsOnly) const
-{
-    return UsdShadeUtils::GetValueProducingAttributes(*this,
-                                                      shaderOutputsOnly);
-}
-
-UsdAttribute
-UsdShadeInput::GetValueProducingAttribute(UsdShadeAttributeType* attrType) const
-{
-    // Call the multi-connection aware version
-    UsdShadeAttributeVector valueAttrs =
-        UsdShadeUtils::GetValueProducingAttributes(*this);
-
-    if (valueAttrs.empty()) {
-        if (attrType) {
-            *attrType = UsdShadeAttributeType::Invalid;
-        }
-        return UsdAttribute();
-    } else {
-        // If we have valid connections extract the first one
-        if (valueAttrs.size() > 1) {
-            TF_WARN("More than one value producing attribute for shading input "
-                    "%s. GetValueProducingAttribute will only report the first "
-                    "one. Please use GetValueProducingAttributes to retrieve "
-                    "all.", GetAttr().GetPath().GetText());
-        }
-
-        UsdAttribute attr = valueAttrs[0];
-        if (attrType) {
-            *attrType = UsdShadeUtils::GetType(attr.GetName());
-        }
-
-        return attr;
+    UsdAttribute attr = valueAttrs[0];
+    if (attrType) {
+      *attrType = UsdShadeUtils::GetType(attr.GetName());
     }
+
+    return attr;
+  }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

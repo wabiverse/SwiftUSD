@@ -133,7 +133,7 @@ typedef boost::iterator_range<UsdPrimSubtreeIterator> UsdPrimSubtreeRange;
 /// Please refer to \ref UsdNotice for a listing of
 /// the events that could cause UsdNotice::ObjectsChanged to be emitted.
 class UsdPrim : public UsdObject {
-public:
+ public:
   /// Convenience typedefs.
   typedef UsdPrimSiblingIterator SiblingIterator;
   typedef UsdPrimSiblingRange SiblingRange;
@@ -155,19 +155,24 @@ public:
   /// \sa GetTypeName
   /// \sa GetAppliedSchemas
   /// \sa \ref Usd_OM_FallbackPrimTypes
-  const UsdPrimTypeInfo &GetPrimTypeInfo() const {
+  const UsdPrimTypeInfo &GetPrimTypeInfo() const
+  {
     return _Prim()->GetPrimTypeInfo();
   }
 
   /// Return this prim's definition based on the prim's type if the type
   /// is a registered prim type. Returns an empty prim definition if it is
   /// not.
-  const UsdPrimDefinition &GetPrimDefinition() const {
+  const UsdPrimDefinition &GetPrimDefinition() const
+  {
     return _Prim()->GetPrimDefinition();
   }
 
   /// Return this prim's composed specifier.
-  SdfSpecifier GetSpecifier() const { return _Prim()->GetSpecifier(); };
+  SdfSpecifier GetSpecifier() const
+  {
+    return _Prim()->GetSpecifier();
+  };
 
   /// Return all the authored SdfPrimSpecs that may contain opinions for this
   /// prim in order from strong to weak.
@@ -198,12 +203,12 @@ public:
   /// resolution, since not all metadata resolves with simple "strongest
   /// opinion wins" semantics.
   USD_API
-  std::vector<std::pair<SdfPrimSpecHandle, SdfLayerOffset>>
-  GetPrimStackWithLayerOffsets() const;
+  std::vector<std::pair<SdfPrimSpecHandle, SdfLayerOffset>> GetPrimStackWithLayerOffsets() const;
 
   /// Author an opinion for this Prim's specifier at the current edit
   /// target.
-  bool SetSpecifier(SdfSpecifier specifier) const {
+  bool SetSpecifier(SdfSpecifier specifier) const
+  {
     return SetMetadata(SdfFieldKeys->Specifier, specifier);
   }
 
@@ -214,19 +219,27 @@ public:
   /// need to reason about the actual type of the prim, use GetPrimTypeInfo
   /// instead as it accounts for recognized schemas, applied API schemas,
   /// fallback types, etc.
-  const TfToken &GetTypeName() const { return _Prim()->GetTypeName(); };
+  const TfToken &GetTypeName() const
+  {
+    return _Prim()->GetTypeName();
+  };
 
   /// Author this Prim's typeName at the current EditTarget.
-  bool SetTypeName(const TfToken &typeName) const {
+  bool SetTypeName(const TfToken &typeName) const
+  {
     return SetMetadata(SdfFieldKeys->TypeName, typeName);
   }
 
   /// Clear the opinion for this Prim's typeName at the current edit
   /// target.
-  bool ClearTypeName() const { return ClearMetadata(SdfFieldKeys->TypeName); }
+  bool ClearTypeName() const
+  {
+    return ClearMetadata(SdfFieldKeys->TypeName);
+  }
 
   /// Return true if a typeName has been authored.
-  bool HasAuthoredTypeName() const {
+  bool HasAuthoredTypeName() const
+  {
     return HasAuthoredMetadata(SdfFieldKeys->TypeName);
   }
 
@@ -234,13 +247,17 @@ public:
   /// ancestors have active=false.  Return false otherwise.
   ///
   /// See \ref Usd_ActiveInactive for what it means for a prim to be active.
-  bool IsActive() const { return _Prim()->IsActive(); }
+  bool IsActive() const
+  {
+    return _Prim()->IsActive();
+  }
 
   /// Author 'active' metadata for this prim at the current EditTarget.
   ///
   /// See \ref Usd_ActiveInactive for the effects of activating or deactivating
   /// a prim.
-  bool SetActive(bool active) const {
+  bool SetActive(bool active) const
+  {
     return SetMetadata(SdfFieldKeys->Active, active);
   }
 
@@ -249,40 +266,62 @@ public:
   ///
   /// See \ref Usd_ActiveInactive for the effects of activating or deactivating
   /// a prim.
-  bool ClearActive() const { return ClearMetadata(SdfFieldKeys->Active); }
+  bool ClearActive() const
+  {
+    return ClearMetadata(SdfFieldKeys->Active);
+  }
 
   /// Return true if this prim has an authored opinion for 'active', false
   /// otherwise.
   ///
   /// See \ref Usd_ActiveInactive for what it means for a prim to be active.
-  bool HasAuthoredActive() const {
+  bool HasAuthoredActive() const
+  {
     return HasAuthoredMetadata(SdfFieldKeys->Active);
   }
 
   /// Return true if this prim is active, and \em either it is loadable and
   /// it is loaded, \em or its nearest loadable ancestor is loaded, \em or it
   /// has no loadable ancestor; false otherwise.
-  bool IsLoaded() const { return _Prim()->IsLoaded(); }
+  bool IsLoaded() const
+  {
+    return _Prim()->IsLoaded();
+  }
 
   /// Return true if this prim is a model based on its kind metadata, false
   /// otherwise.
-  bool IsModel() const { return _Prim()->IsModel(); }
+  bool IsModel() const
+  {
+    return _Prim()->IsModel();
+  }
 
   /// Return true if this prim is a model group based on its kind metadata,
   /// false otherwise.  If this prim is a group, it is also necessarily a
   /// model.
-  bool IsGroup() const { return _Prim()->IsGroup(); }
+  bool IsGroup() const
+  {
+    return _Prim()->IsGroup();
+  }
 
   /// Return true if this prim or any of its ancestors is a class.
-  bool IsAbstract() const { return _Prim()->IsAbstract(); }
+  bool IsAbstract() const
+  {
+    return _Prim()->IsAbstract();
+  }
 
   /// Return true if this prim and all its ancestors have defining specifiers,
   /// false otherwise. \sa SdfIsDefiningSpecifier.
-  bool IsDefined() const { return _Prim()->IsDefined(); }
+  bool IsDefined() const
+  {
+    return _Prim()->IsDefined();
+  }
 
   /// Return true if this prim has a specifier of type SdfSpecifierDef
   /// or SdfSpecifierClass. \sa SdfIsDefiningSpecifier
-  bool HasDefiningSpecifier() const { return _Prim()->HasDefiningSpecifier(); }
+  bool HasDefiningSpecifier() const
+  {
+    return _Prim()->HasDefiningSpecifier();
+  }
 
   /// Return a vector containing the names of API schemas which have
   /// been applied to this prim. This includes both the authored API schemas
@@ -295,8 +334,7 @@ public:
 
   /// Alias for the "predicate" function parameter passed into the various
   /// Get{Authored}{PropertyNames,Properties} methods.
-  using PropertyPredicateFunc =
-      std::function<bool(const TfToken &propertyName)>;
+  using PropertyPredicateFunc = std::function<bool(const TfToken &propertyName)>;
 
   /// Return all of this prim's property names (attributes and relationships),
   /// including all builtin properties.
@@ -310,8 +348,7 @@ public:
   /// \sa GetAuthoredPropertyNames()
   /// \sa UsdProperty::IsAuthored()
   USD_API
-  TfTokenVector
-  GetPropertyNames(const PropertyPredicateFunc &predicate = {}) const;
+  TfTokenVector GetPropertyNames(const PropertyPredicateFunc &predicate = {}) const;
 
   /// Return this prim's property names (attributes and relationships) that
   /// have authored scene description, ordered according to the strongest
@@ -327,8 +364,7 @@ public:
   /// \sa GetPropertyNames()
   /// \sa UsdProperty::IsAuthored()
   USD_API
-  TfTokenVector
-  GetAuthoredPropertyNames(const PropertyPredicateFunc &predicate = {}) const;
+  TfTokenVector GetAuthoredPropertyNames(const PropertyPredicateFunc &predicate = {}) const;
 
   /// Return all of this prim's properties (attributes and relationships),
   /// including all builtin properties, ordered by name according to the
@@ -374,8 +410,7 @@ public:
   /// \sa GetAuthoredProperties()
   /// \sa UsdProperty::IsAuthored()
   USD_API
-  std::vector<UsdProperty>
-  GetProperties(const PropertyPredicateFunc &predicate = {}) const;
+  std::vector<UsdProperty> GetProperties(const PropertyPredicateFunc &predicate = {}) const;
 
   /// Return this prim's properties (attributes and relationships) that have
   /// authored scene description, ordered by name according to the strongest
@@ -391,8 +426,8 @@ public:
   /// \sa GetProperties()
   /// \sa UsdProperty::IsAuthored()
   USD_API
-  std::vector<UsdProperty>
-  GetAuthoredProperties(const PropertyPredicateFunc &predicate = {}) const;
+  std::vector<UsdProperty> GetAuthoredProperties(
+      const PropertyPredicateFunc &predicate = {}) const;
 
   /// Return this prim's properties that are inside the given property
   /// namespace ordered according to the strongest propertyOrder statement in
@@ -406,16 +441,15 @@ public:
   ///
   /// For details of namespaced properties, see \ref Usd_Ordering
   USD_API
-  std::vector<UsdProperty>
-  GetPropertiesInNamespace(const std::vector<std::string> &namespaces) const;
+  std::vector<UsdProperty> GetPropertiesInNamespace(
+      const std::vector<std::string> &namespaces) const;
 
   /// \overload
   /// \p namespaces must be an already-concatenated ordered set of namespaces,
   /// and may or may not terminate with the namespace-separator character. If
   /// \p namespaces is empty, this method is equivalent to GetProperties().
   USD_API
-  std::vector<UsdProperty>
-  GetPropertiesInNamespace(const std::string &namespaces) const;
+  std::vector<UsdProperty> GetPropertiesInNamespace(const std::string &namespaces) const;
 
   /// Like GetPropertiesInNamespace(), but exclude properties that do not have
   /// authored scene description from the result.  See
@@ -432,8 +466,7 @@ public:
   /// \p namespaces is empty, this method is equivalent to
   /// GetAuthoredProperties().
   USD_API
-  std::vector<UsdProperty>
-  GetAuthoredPropertiesInNamespace(const std::string &namespaces) const;
+  std::vector<UsdProperty> GetAuthoredPropertiesInNamespace(const std::string &namespaces) const;
 
   /// Return the strongest propertyOrder metadata value authored on this prim.
   USD_API
@@ -441,13 +474,15 @@ public:
 
   /// Author an opinion for propertyOrder metadata on this prim at the current
   /// EditTarget.
-  void SetPropertyOrder(const TfTokenVector &order) const {
+  void SetPropertyOrder(const TfTokenVector &order) const
+  {
     SetMetadata(SdfFieldKeys->PropertyOrder, order);
   }
 
   /// Remove the opinion for propertyOrder metadata on this prim at the current
   /// EditTarget.
-  void ClearPropertyOrder() const {
+  void ClearPropertyOrder() const
+  {
     ClearMetadata(SdfFieldKeys->PropertyOrder);
   }
 
@@ -482,7 +517,7 @@ public:
   USD_API
   bool HasProperty(const TfToken &propName) const;
 
-private:
+ private:
   // Helper functions for the public schema query and API schema
   // authoring functions. The public functions have overloads that take
   // a type, an identifier, or a family which all are used to find the
@@ -502,28 +537,25 @@ private:
                                std::string *whyNot) const;
 
   USD_API
-  bool
-  _CanApplyMultipleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo,
-                            const TfToken &instanceName,
-                            std::string *whyNot) const;
+  bool _CanApplyMultipleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo,
+                                 const TfToken &instanceName,
+                                 std::string *whyNot) const;
 
   USD_API
-  bool
-  _ApplySingleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo) const;
+  bool _ApplySingleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo) const;
 
   USD_API
   bool _ApplyMultipleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo,
                               const TfToken &instanceName) const;
 
   USD_API
-  bool
-  _RemoveSingleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo) const;
+  bool _RemoveSingleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo) const;
 
   USD_API
   bool _RemoveMultipleApplyAPI(const UsdSchemaRegistry::SchemaInfo &schemaInfo,
                                const TfToken &instanceName) const;
 
-public:
+ public:
   /// \name IsA
   ///
   /// @{
@@ -534,7 +566,8 @@ public:
   /// \sa GetPrimTypeInfo
   /// \sa UsdPrimTypeInfo::GetSchemaType
   /// \sa \ref Usd_OM_FallbackPrimTypes
-  template <typename SchemaType> bool IsA() const {
+  template<typename SchemaType> bool IsA() const
+  {
     static_assert(std::is_base_of<UsdSchemaBase, SchemaType>::value,
                   "Provided type must derive UsdSchemaBase.");
     return _IsA(UsdSchemaRegistry::FindSchemaInfo<SchemaType>());
@@ -569,7 +602,8 @@ public:
   /// type of any schema in the given \p schemaFamily that matches the version
   /// filter provided by \p schemaVersion and \p versionPolicy.
   USD_API
-  bool IsInFamily(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool IsInFamily(const TfToken &schemaFamily,
+                  UsdSchemaVersion schemaVersion,
                   UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
@@ -577,8 +611,9 @@ public:
   /// UsdSchemaRegistry::VersionPolicy) const "IsInFamily" that finds a
   /// registered schema for the C++ schema class \p SchemaType and uses that
   /// schema's family and version.
-  template <typename SchemaType>
-  bool IsInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const {
+  template<typename SchemaType>
+  bool IsInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const
+  {
     static_assert(std::is_base_of<UsdSchemaBase, SchemaType>::value,
                   "Provided type must derive UsdSchemaBase.");
     const UsdSchemaRegistry::SchemaInfo *schemaInfo =
@@ -600,8 +635,7 @@ public:
   /// registered schema for the given \p schemaType and uses that schema's
   /// family and version.
   USD_API
-  bool IsInFamily(const TfType &schemaType,
-                  UsdSchemaRegistry::VersionPolicy versionPolicy) const;
+  bool IsInFamily(const TfType &schemaType, UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
   /// \ref IsInFamily(const TfToken&, UsdSchemaVersion,
@@ -620,8 +654,7 @@ public:
   /// populates \p schemaVersion with the version of the schema that this
   /// prim \ref IsA.
   USD_API
-  bool GetVersionIfIsInFamily(const TfToken &schemaFamily,
-                              UsdSchemaVersion *schemaVersion) const;
+  bool GetVersionIfIsInFamily(const TfToken &schemaFamily, UsdSchemaVersion *schemaVersion) const;
 
   /// @}
 
@@ -677,7 +710,8 @@ public:
   /// This function works for both single-apply and multiple-apply API schema
   /// types. If the schema is a multiple-apply API schema this will return
   /// true if any instance of the multiple-apply API has been applied.
-  template <typename SchemaType> bool HasAPI() const {
+  template<typename SchemaType> bool HasAPI() const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -694,8 +728,8 @@ public:
   /// \p SchemaType applied to it.
   ///
   /// \p instanceName must be non-empty, otherwise it is a coding error.
-  template <typename SchemaType>
-  bool HasAPI(const TfToken &instanceName) const {
+  template<typename SchemaType> bool HasAPI(const TfToken &instanceName) const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -703,8 +737,7 @@ public:
     static_assert(SchemaType::schemaKind == UsdSchemaKind::MultipleApplyAPI,
                   "Provided schema type must be a multi apply API schema.");
 
-    return _HasAPIInstance(UsdSchemaRegistry::FindSchemaInfo<SchemaType>(),
-                           instanceName);
+    return _HasAPIInstance(UsdSchemaRegistry::FindSchemaInfo<SchemaType>(), instanceName);
   }
 
   /// This is an overload of \ref HasAPI that takes a TfType \p schemaType .
@@ -725,20 +758,19 @@ public:
   /// \p instanceName that takes a \p schemaIdentifier to determine the schema
   /// type.
   USD_API
-  bool HasAPI(const TfToken &schemaIdentifier,
-              const TfToken &instanceName) const;
+  bool HasAPI(const TfToken &schemaIdentifier, const TfToken &instanceName) const;
 
   /// This is an overload of \ref HasAPI that takes a \p schemaFamily and
   /// \p schemaVersion to determine the schema type.
   USD_API
-  bool HasAPI(const TfToken &schemaFamily,
-              UsdSchemaVersion schemaVersion) const;
+  bool HasAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion) const;
 
   /// This is an overload of \ref HasAPI(const TfToken &) const "HasAPI" with
   /// \p instanceName that takes a \p schemaFamily and \p schemaVersion to
   /// determine the schema type.
   USD_API
-  bool HasAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool HasAPI(const TfToken &schemaFamily,
+              UsdSchemaVersion schemaVersion,
               const TfToken &instanceName) const;
 
   /// @}
@@ -762,8 +794,7 @@ public:
   ///
   /// \p instanceName must be non-empty, otherwise it is a coding error.
   USD_API
-  bool HasAPIInFamily(const TfToken &schemaFamily,
-                      const TfToken &instanceName) const;
+  bool HasAPIInFamily(const TfToken &schemaFamily, const TfToken &instanceName) const;
 
   /// Return true if the prim has an applied API schema that is a schema in
   /// the given \p schemaFamily that matches the version filter provided by
@@ -795,8 +826,9 @@ public:
   /// UsdSchemaRegistry::VersionPolicy) const "HasAPIInFamily" that finds a
   /// registered schema for the C++ schema class \p SchemaType and uses that
   /// schema's family and version.
-  template <typename SchemaType>
-  bool HasAPIInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const {
+  template<typename SchemaType>
+  bool HasAPIInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const
+  {
     static_assert(std::is_base_of<UsdSchemaBase, SchemaType>::value,
                   "Provided type must derive UsdSchemaBase.");
     const UsdSchemaRegistry::SchemaInfo *schemaInfo =
@@ -809,8 +841,7 @@ public:
           TfType::Find<SchemaType>().GetTypeName().c_str());
       return false;
     }
-    return HasAPIInFamily(schemaInfo->family, schemaInfo->version,
-                          versionPolicy);
+    return HasAPIInFamily(schemaInfo->family, schemaInfo->version, versionPolicy);
   };
 
   /// Overload for convenience of
@@ -818,9 +849,10 @@ public:
   /// UsdSchemaRegistry::VersionPolicy, const TfToken &) const "HasAPIInFamily"
   /// that finds a registered schema for the C++ schema class \p SchemaType
   /// and uses that schema's family and version.
-  template <typename SchemaType>
+  template<typename SchemaType>
   bool HasAPIInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy,
-                      const TfToken &instanceName) const {
+                      const TfToken &instanceName) const
+  {
     static_assert(std::is_base_of<UsdSchemaBase, SchemaType>::value,
                   "Provided type must derive UsdSchemaBase.");
     const UsdSchemaRegistry::SchemaInfo *schemaInfo =
@@ -833,8 +865,7 @@ public:
           TfType::Find<SchemaType>().GetTypeName().c_str());
       return false;
     }
-    return HasAPIInFamily(schemaInfo->family, schemaInfo->version,
-                          versionPolicy, instanceName);
+    return HasAPIInFamily(schemaInfo->family, schemaInfo->version, versionPolicy, instanceName);
   };
 
   /// Overload for convenience of
@@ -934,8 +965,8 @@ public:
   /// The return value of this function only indicates whether it would be
   /// valid to apply this schema to the prim. It has no bearing on whether
   /// calling ApplyAPI will be successful or not.
-  template <typename SchemaType>
-  bool CanApplyAPI(std::string *whyNot = nullptr) const {
+  template<typename SchemaType> bool CanApplyAPI(std::string *whyNot = nullptr) const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -969,9 +1000,9 @@ public:
   /// The return value of this function only indicates whether it would be
   /// valid to apply this schema to the prim. It has no bearing on whether
   /// calling ApplyAPI will be successful or not.
-  template <typename SchemaType>
-  bool CanApplyAPI(const TfToken &instanceName,
-                   std::string *whyNot = nullptr) const {
+  template<typename SchemaType>
+  bool CanApplyAPI(const TfToken &instanceName, std::string *whyNot = nullptr) const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -995,34 +1026,35 @@ public:
   /// This is an overload of \ref CanApplyAPI that takes a TfType
   /// \p schemaType .
   USD_API
-  bool CanApplyAPI(const TfType &schemaType,
-                   std::string *whyNot = nullptr) const;
+  bool CanApplyAPI(const TfType &schemaType, std::string *whyNot = nullptr) const;
 
   /// This is an overload of
   /// \ref CanApplyAPI(const TfToken &, std::string *) const "CanApplyAPI"
   /// with \p instanceName that takes a TfType \p schemaType .
   USD_API
-  bool CanApplyAPI(const TfType &schemaType, const TfToken &instanceName,
+  bool CanApplyAPI(const TfType &schemaType,
+                   const TfToken &instanceName,
                    std::string *whyNot = nullptr) const;
 
   /// This is an overload of \ref CanApplyAPI that takes a \p schemaIdentifier
   /// to determine the schema type.
   USD_API
-  bool CanApplyAPI(const TfToken &schemaIdentifier,
-                   std::string *whyNot = nullptr) const;
+  bool CanApplyAPI(const TfToken &schemaIdentifier, std::string *whyNot = nullptr) const;
 
   /// This is an overload of
   /// \ref CanApplyAPI(const TfToken &, std::string *) const "CanApplyAPI"
   /// with \p instanceName that takes a \p schemaIdentifier to determine the
   /// schema type.
   USD_API
-  bool CanApplyAPI(const TfToken &schemaIdentifier, const TfToken &instanceName,
+  bool CanApplyAPI(const TfToken &schemaIdentifier,
+                   const TfToken &instanceName,
                    std::string *whyNot = nullptr) const;
 
   /// This is an overload of \ref CanApplyAPI that takes a \p schemaFamily and
   /// \p schemaVersion to determine the schema type.
   USD_API
-  bool CanApplyAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool CanApplyAPI(const TfToken &schemaFamily,
+                   UsdSchemaVersion schemaVersion,
                    std::string *whyNot = nullptr) const;
 
   /// This is an overload of
@@ -1030,7 +1062,8 @@ public:
   /// with \p instanceName that takes a \p schemaFamily and \p schemaVersion
   /// to determine the schema type.
   USD_API
-  bool CanApplyAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool CanApplyAPI(const TfToken &schemaFamily,
+                   UsdSchemaVersion schemaVersion,
                    const TfToken &instanceName,
                    std::string *whyNot = nullptr) const;
 
@@ -1055,7 +1088,8 @@ public:
   /// \li this prim is valid, but cannot be reached or overridden in the
   /// current edit target
   /// \li the schema name cannot be added to the apiSchemas listOp metadata
-  template <typename SchemaType> bool ApplyAPI() const {
+  template<typename SchemaType> bool ApplyAPI() const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -1096,8 +1130,8 @@ public:
   /// \li this prim is valid, but cannot be reached or overridden in the
   /// current edit target
   /// \li the schema name cannot be added to the apiSchemas listOp metadata
-  template <typename SchemaType>
-  bool ApplyAPI(const TfToken &instanceName) const {
+  template<typename SchemaType> bool ApplyAPI(const TfToken &instanceName) const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -1136,20 +1170,19 @@ public:
   /// with \p instanceName that takes a \p schemaIdentifier to determine the
   /// schema type.
   USD_API
-  bool ApplyAPI(const TfToken &schemaIdentifier,
-                const TfToken &instanceName) const;
+  bool ApplyAPI(const TfToken &schemaIdentifier, const TfToken &instanceName) const;
 
   /// This is an overload of \ref ApplyAPI that takes a \p schemaFamily and
   /// \p schemaVersion to determine the schema type.
   USD_API
-  bool ApplyAPI(const TfToken &schemaFamily,
-                UsdSchemaVersion schemaVersion) const;
+  bool ApplyAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion) const;
 
   /// This is an overload of \ref ApplyAPI(const TfToken &) const "ApplyAPI"
   /// with \p instanceName that takes a \p schemaFamily and \p schemaVersion
   /// to determine the schema type.
   USD_API
-  bool ApplyAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool ApplyAPI(const TfToken &schemaFamily,
+                UsdSchemaVersion schemaVersion,
                 const TfToken &instanceName) const;
 
   /// @}
@@ -1174,7 +1207,8 @@ public:
   /// \li this prim is valid, but cannot be reached or overridden in the
   /// current edit target
   /// \li the schema name cannot be deleted in the apiSchemas listOp metadata
-  template <typename SchemaType> bool RemoveAPI() const {
+  template<typename SchemaType> bool RemoveAPI() const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -1216,8 +1250,8 @@ public:
   /// \li this prim is valid, but cannot be reached or overridden in the
   /// current edit target
   /// \li the schema name cannot be deleted in the apiSchemas listOp metadata
-  template <typename SchemaType>
-  bool RemoveAPI(const TfToken &instanceName) const {
+  template<typename SchemaType> bool RemoveAPI(const TfToken &instanceName) const
+  {
     static_assert(std::is_base_of<UsdAPISchemaBase, SchemaType>::value,
                   "Provided type must derive UsdAPISchemaBase.");
     static_assert(!std::is_same<UsdAPISchemaBase, SchemaType>::value,
@@ -1256,20 +1290,19 @@ public:
   /// with \p instanceName that takes a \p schemaIdentifier to determine the
   /// schema type.
   USD_API
-  bool RemoveAPI(const TfToken &schemaIdentifier,
-                 const TfToken &instanceName) const;
+  bool RemoveAPI(const TfToken &schemaIdentifier, const TfToken &instanceName) const;
 
   /// This is an overload of \ref RemoveAPI that takes a \p schemaFamily and
   /// \p schemaVersion to determine the schema type.
   USD_API
-  bool RemoveAPI(const TfToken &schemaFamily,
-                 UsdSchemaVersion schemaVersion) const;
+  bool RemoveAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion) const;
 
   /// This is an overload of \ref RemoveAPI(const TfToken &) const "RemoveAPI"
   /// with \p instanceName that takes a \p schemaFamily and \p schemaVersion
   /// to determine the schema type.
   USD_API
-  bool RemoveAPI(const TfToken &schemaFamily, UsdSchemaVersion schemaVersion,
+  bool RemoveAPI(const TfToken &schemaFamily,
+                 UsdSchemaVersion schemaVersion,
                  const TfToken &instanceName) const;
 
   /// @}
@@ -1371,8 +1404,7 @@ public:
   ///
   /// See \ref Usd_PrimFlags "Prim predicate flags"
   /// and #UsdPrimDefaultPredicate for more information.
-  inline SiblingRange
-  GetFilteredChildren(const Usd_PrimFlagsPredicate &predicate) const;
+  inline SiblingRange GetFilteredChildren(const Usd_PrimFlagsPredicate &predicate) const;
 
   /// Return the names of the child prims in the order they appear when
   /// iterating over GetChildren.
@@ -1387,8 +1419,7 @@ public:
   /// Return the names of the child prims in the order they appear when
   /// iterating over GetFilteredChildren(\p predicate).
   USD_API
-  TfTokenVector
-  GetFilteredChildrenNames(const Usd_PrimFlagsPredicate &predicate) const;
+  TfTokenVector GetFilteredChildrenNames(const Usd_PrimFlagsPredicate &predicate) const;
 
   /// Return this prim's active, loaded, defined, non-abstract descendants as
   /// an iterable range.  Equivalent to:
@@ -1437,8 +1468,7 @@ public:
   /// See \ref Usd_PrimFlags "Prim predicate flags" and
   /// #UsdPrimDefaultPredicate for more information, UsdStage::Traverse(),
   /// and \c UsdPrimRange for more general Stage traversal behaviors.
-  inline SubtreeRange
-  GetFilteredDescendants(const Usd_PrimFlagsPredicate &predicate) const;
+  inline SubtreeRange GetFilteredDescendants(const Usd_PrimFlagsPredicate &predicate) const;
 
   /// Return the strongest opinion for the metadata used to reorder children
   /// of this prim. Due to how reordering of prim children is composed,
@@ -1450,22 +1480,27 @@ public:
 
   /// Author an opinion for the metadata used to reorder children of this
   /// prim at the current EditTarget.
-  void SetChildrenReorder(const TfTokenVector &order) const {
+  void SetChildrenReorder(const TfTokenVector &order) const
+  {
     SetMetadata(SdfFieldKeys->PrimOrder, order);
   }
 
   /// Remove the opinion for the metadata used to reorder children of this
   /// prim at the current EditTarget.
-  void ClearChildrenReorder() const { ClearMetadata(SdfFieldKeys->PrimOrder); }
+  void ClearChildrenReorder() const
+  {
+    ClearMetadata(SdfFieldKeys->PrimOrder);
+  }
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   /// \name Parent & Stage
   // --------------------------------------------------------------------- //
 
   /// Return this prim's parent prim.  Return an invalid UsdPrim if this is a
   /// root prim.
-  UsdPrim GetParent() const {
+  UsdPrim GetParent() const
+  {
     Usd_PrimDataConstPtr prim = get_pointer(_Prim());
     SdfPath proxyPrimPath = _ProxyPrimPath();
     Usd_MoveToParent(prim, proxyPrimPath);
@@ -1614,34 +1649,33 @@ public:
   /// Note that these supplied arguments are only ever used in this particular
   /// circumstance, in all other cases they are ignored.
   USD_API
-  UsdAttribute
-  CreateAttribute(const TfToken &name, const SdfValueTypeName &typeName,
-                  bool custom,
-                  SdfVariability variability = SdfVariabilityVarying) const;
+  UsdAttribute CreateAttribute(const TfToken &name,
+                               const SdfValueTypeName &typeName,
+                               bool custom,
+                               SdfVariability variability = SdfVariabilityVarying) const;
   /// \overload
   /// Create a custom attribute with \p name, \p typeName and \p variability.
   USD_API
-  UsdAttribute
-  CreateAttribute(const TfToken &name, const SdfValueTypeName &typeName,
-                  SdfVariability variability = SdfVariabilityVarying) const;
+  UsdAttribute CreateAttribute(const TfToken &name,
+                               const SdfValueTypeName &typeName,
+                               SdfVariability variability = SdfVariabilityVarying) const;
 
   /// \overload
   /// This overload of CreateAttribute() accepts a vector of name components
   /// used to construct a \em namespaced property name.  For details, see
   /// \ref Usd_Ordering
   USD_API
-  UsdAttribute
-  CreateAttribute(const std::vector<std::string> &nameElts,
-                  const SdfValueTypeName &typeName, bool custom,
-                  SdfVariability variability = SdfVariabilityVarying) const;
+  UsdAttribute CreateAttribute(const std::vector<std::string> &nameElts,
+                               const SdfValueTypeName &typeName,
+                               bool custom,
+                               SdfVariability variability = SdfVariabilityVarying) const;
   /// \overload
   /// Create a custom attribute with \p nameElts, \p typeName, and
   /// \p variability.
   USD_API
-  UsdAttribute
-  CreateAttribute(const std::vector<std::string> &nameElts,
-                  const SdfValueTypeName &typeName,
-                  SdfVariability variability = SdfVariabilityVarying) const;
+  UsdAttribute CreateAttribute(const std::vector<std::string> &nameElts,
+                               const SdfValueTypeName &typeName,
+                               SdfVariability variability = SdfVariabilityVarying) const;
 
   /// Like GetProperties(), but exclude all relationships from the result.
   USD_API
@@ -1723,8 +1757,7 @@ public:
   /// EditTarget, honoring \p custom .
   ///
   USD_API
-  UsdRelationship CreateRelationship(const TfToken &relName,
-                                     bool custom = true) const;
+  UsdRelationship CreateRelationship(const TfToken &relName, bool custom = true) const;
 
   /// \overload
   /// This overload of CreateRelationship() accepts a vector of
@@ -1919,27 +1952,30 @@ public:
   /// true for IsInstanceable() and false for IsInstance() if this prim
   /// is not active or if it is marked as instanceable but contains no
   /// instanceable data.
-  bool IsInstanceable() const {
+  bool IsInstanceable() const
+  {
     bool instanceable = false;
-    return GetMetadata(SdfFieldKeys->Instanceable, &instanceable) &&
-           instanceable;
+    return GetMetadata(SdfFieldKeys->Instanceable, &instanceable) && instanceable;
   }
 
   /// Author 'instanceable' metadata for this prim at the current
   /// EditTarget.
-  bool SetInstanceable(bool instanceable) const {
+  bool SetInstanceable(bool instanceable) const
+  {
     return SetMetadata(SdfFieldKeys->Instanceable, instanceable);
   }
 
   /// Remove the authored 'instanceable' opinion at the current EditTarget.
   /// Do nothing if there is no authored opinion.
-  bool ClearInstanceable() const {
+  bool ClearInstanceable() const
+  {
     return ClearMetadata(SdfFieldKeys->Instanceable);
   }
 
   /// Return true if this prim has an authored opinion for 'instanceable',
   /// false otherwise.
-  bool HasAuthoredInstanceable() const {
+  bool HasAuthoredInstanceable() const
+  {
     return HasAuthoredMetadata(SdfFieldKeys->Instanceable);
   }
 
@@ -1948,12 +1984,16 @@ public:
   ///
   /// If this prim is an instance, calling GetPrototype() will return
   /// the UsdPrim for the corresponding prototype prim.
-  bool IsInstance() const { return _Prim()->IsInstance(); }
+  bool IsInstance() const
+  {
+    return _Prim()->IsInstance();
+  }
 
   /// Return true if this prim is an instance proxy, false otherwise.
   /// An instance proxy prim represents a descendent of an instance
   /// prim.
-  bool IsInstanceProxy() const {
+  bool IsInstanceProxy() const
+  {
     return Usd_IsInstanceProxy(_Prim(), _ProxyPrimPath());
   }
 
@@ -1978,15 +2018,18 @@ public:
   /// false otherwise.
   ///
   /// \sa IsInPrototype
-  bool IsPrototype() const { return _Prim()->IsPrototype(); }
+  bool IsPrototype() const
+  {
+    return _Prim()->IsPrototype();
+  }
 
   /// Return true if this prim is a prototype prim or a descendant
   /// of a prototype prim, false otherwise.
   ///
   /// \sa IsPrototype
-  bool IsInPrototype() const {
-    return (IsInstanceProxy() ? IsPathInPrototype(GetPrimPath())
-                              : _Prim()->IsInPrototype());
+  bool IsInPrototype() const
+  {
+    return (IsInstanceProxy() ? IsPathInPrototype(GetPrimPath()) : _Prim()->IsInPrototype());
   }
 
   /// If this prim is an instance, return the UsdPrim for the corresponding
@@ -1997,7 +2040,8 @@ public:
   /// If this prim is an instance proxy, return the UsdPrim for the
   /// corresponding prim in the instance's prototype. Otherwise, return an
   /// invalid UsdPrim.
-  UsdPrim GetPrimInPrototype() const {
+  UsdPrim GetPrimInPrototype() const
+  {
     if (IsInstanceProxy()) {
       return UsdPrim(_Prim(), SdfPath());
     }
@@ -2040,7 +2084,10 @@ public:
   /// detect if they are expired. Clients should avoid keeping copies of the
   /// prim index across such changes, which include scene description
   /// changes or changes to load state.
-  const PcpPrimIndex &GetPrimIndex() const { return _Prim()->GetPrimIndex(); }
+  const PcpPrimIndex &GetPrimIndex() const
+  {
+    return _Prim()->GetPrimIndex();
+  }
 
   /// Compute the prim index containing all sites that could contribute
   /// opinions to this prim.
@@ -2073,8 +2120,7 @@ public:
   /// If the edit target would not affect any specs that could contribute to
   /// this prim, a null resolve target is returned.
   USD_API
-  UsdResolveTarget
-  MakeResolveTargetUpToEditTarget(const UsdEditTarget &editTarget) const;
+  UsdResolveTarget MakeResolveTargetUpToEditTarget(const UsdEditTarget &editTarget) const;
 
   /// Creates and returns a resolve target that, when passed to a
   /// UsdAttributeQuery for one of this prim's attributes, causes value
@@ -2084,12 +2130,11 @@ public:
   /// If the edit target would not affect any specs that could contribute to
   /// this prim, a null resolve target is returned.
   USD_API
-  UsdResolveTarget MakeResolveTargetStrongerThanEditTarget(
-      const UsdEditTarget &editTarget) const;
+  UsdResolveTarget MakeResolveTargetStrongerThanEditTarget(const UsdEditTarget &editTarget) const;
 
   /// @}
 
-private:
+ private:
   friend class UsdObject;
   friend class UsdPrimSiblingIterator;
   friend class UsdPrimSubtreeIterator;
@@ -2105,41 +2150,42 @@ private:
 
   // Prim constructor.
   UsdPrim(const Usd_PrimDataHandle &primData, const SdfPath &proxyPrimPath)
-      : UsdObject(primData, proxyPrimPath) {}
+      : UsdObject(primData, proxyPrimPath)
+  {
+  }
 
   // General constructor.
-  UsdPrim(UsdObjType objType, const Usd_PrimDataHandle &prim,
-          const SdfPath &proxyPrimPath, const TfToken &propName)
-      : UsdObject(objType, prim, proxyPrimPath, propName) {}
+  UsdPrim(UsdObjType objType,
+          const Usd_PrimDataHandle &prim,
+          const SdfPath &proxyPrimPath,
+          const TfToken &propName)
+      : UsdObject(objType, prim, proxyPrimPath, propName)
+  {
+  }
 
   // Helper to make a sibling range.
-  inline SiblingRange
-  _MakeSiblingRange(const Usd_PrimFlagsPredicate &pred) const;
+  inline SiblingRange _MakeSiblingRange(const Usd_PrimFlagsPredicate &pred) const;
 
   // Helper to make a range of descendants.
-  inline SubtreeRange
-  _MakeDescendantsRange(const Usd_PrimFlagsPredicate &pred) const;
+  inline SubtreeRange _MakeDescendantsRange(const Usd_PrimFlagsPredicate &pred) const;
 
   // Helper to make a vector of properties from names.
   std::vector<UsdProperty> _MakeProperties(const TfTokenVector &names) const;
 
   // Helper for Get{Authored}{PropertyNames,Properties}
-  TfTokenVector
-  _GetPropertyNames(bool onlyAuthored, bool applyOrder = true,
-                    const PropertyPredicateFunc &predicate = {}) const;
+  TfTokenVector _GetPropertyNames(bool onlyAuthored,
+                                  bool applyOrder = true,
+                                  const PropertyPredicateFunc &predicate = {}) const;
 
   // Helper for Get(Authored)PropertiesInNamespace.
-  std::vector<UsdProperty>
-  _GetPropertiesInNamespace(const std::string &namespaces,
-                            bool onlyAuthored) const;
+  std::vector<UsdProperty> _GetPropertiesInNamespace(const std::string &namespaces,
+                                                     bool onlyAuthored) const;
 
   // Helper for Get(Authored)Attributes.
-  std::vector<UsdAttribute> _GetAttributes(bool onlyAuthored,
-                                           bool applyOrder = false) const;
+  std::vector<UsdAttribute> _GetAttributes(bool onlyAuthored, bool applyOrder = false) const;
 
   // Helper for Get(Authored)Relationships.
-  std::vector<UsdRelationship> _GetRelationships(bool onlyAuthored,
-                                                 bool applyOrder = false) const;
+  std::vector<UsdRelationship> _GetRelationships(bool onlyAuthored, bool applyOrder = false) const;
 
   friend const PcpPrimIndex &Usd_PrimGetSourcePrimIndex(const UsdPrim &);
   // Return a const reference to the source PcpPrimIndex for this prim.
@@ -2151,15 +2197,15 @@ private:
   //
   // This is a private helper but is also wrapped out to Python
   // for testing and debugging purposes.
-  const PcpPrimIndex &_GetSourcePrimIndex() const {
+  const PcpPrimIndex &_GetSourcePrimIndex() const
+  {
     return _Prim()->GetSourcePrimIndex();
   }
 
   // Helper function for MakeResolveTargetUpToEditTarget and
   // MakeResolveTargetStrongerThanEditTarget.
-  UsdResolveTarget
-  _MakeResolveTargetFromEditTarget(const UsdEditTarget &editTarget,
-                                   bool makeAsStrongerThan) const;
+  UsdResolveTarget _MakeResolveTargetFromEditTarget(const UsdEditTarget &editTarget,
+                                                    bool makeAsStrongerThan) const;
 };
 
 #ifdef doxygen
@@ -2167,7 +2213,7 @@ private:
 /// Forward traversal iterator of sibling ::UsdPrim s.  This is a
 /// standard-compliant iterator that may be used with STL algorithms, etc.
 class UsdPrimSiblingIterator {
-public:
+ public:
   /// Iterator value type.
   typedef UsdPrim value_type;
   /// Iterator reference type, in this case the same as \a value_type.
@@ -2183,13 +2229,11 @@ public:
   /// Preincrement.
   UsdPrimSiblingIterator operator++(int);
 
-private:
+ private:
   /// Equality.
-  friend bool operator==(const UsdPrimSiblingIterator &lhs,
-                         const UsdPrimSiblingIterator &rhs);
+  friend bool operator==(const UsdPrimSiblingIterator &lhs, const UsdPrimSiblingIterator &rhs);
   /// Inequality.
-  friend bool operator!=(const UsdPrimSiblingIterator &lhs,
-                         const UsdPrimSiblingIterator &rhs);
+  friend bool operator!=(const UsdPrimSiblingIterator &lhs, const UsdPrimSiblingIterator &rhs);
 };
 
 /// Forward iterator range of sibling ::UsdPrim s.  This range type contains a
@@ -2197,7 +2241,7 @@ private:
 /// siblings.  It provides a subset of container-like API, such as begin(),
 /// end(), front(), empty(), etc.
 class UsdPrimSiblingRange {
-public:
+ public:
   /// Iterator type.
   typedef UsdPrimSiblingIterator iterator;
   /// Const iterator type.
@@ -2213,11 +2257,10 @@ public:
   UsdPrimSiblingRange(UsdPrimSiblingIterator begin, UsdPrimSiblingIterator end);
 
   /// Construct/convert from another compatible range type.
-  template <class ForwardRange> UsdPrimSiblingRange(const ForwardRange &r);
+  template<class ForwardRange> UsdPrimSiblingRange(const ForwardRange &r);
 
   /// Assign from another compatible range type.
-  template <class ForwardRange>
-  UsdPrimSiblingRange &operator=(const ForwardRange &r);
+  template<class ForwardRange> UsdPrimSiblingRange &operator=(const ForwardRange &r);
 
   /// First iterator.
   iterator begin() const;
@@ -2240,16 +2283,14 @@ public:
   /// Advance this range's end iterator.
   iterator_range &advance_end(difference_type n);
 
-  ; /// Return begin() == end().
+  ;  /// Return begin() == end().
   bool empty() const;
 
-private:
+ private:
   /// Equality comparison.
-  friend bool operator==(const UsdPrimSiblingRange &lhs,
-                         const UsdPrimSiblingRange &rhs);
+  friend bool operator==(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs);
   /// Inequality comparison.
-  friend bool operator!=(const UsdPrimSiblingRange &lhs,
-                         const UsdPrimSiblingRange &rhs);
+  friend bool operator!=(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs);
 };
 
 #else
@@ -2257,24 +2298,25 @@ private:
 // Sibling iterator class.  Converts ref to weak and filters according to a
 // supplied predicate.
 class UsdPrimSiblingIterator
-    : public boost::iterator_adaptor<UsdPrimSiblingIterator, // crtp base.
-                                     const Usd_PrimData *,   // base iterator.
-                                     UsdPrim,                // value type.
-                                     boost::forward_traversal_tag, // traversal
-                                     UsdPrim> // reference type.
+    : public boost::iterator_adaptor<UsdPrimSiblingIterator,        // crtp base.
+                                     const Usd_PrimData *,          // base iterator.
+                                     UsdPrim,                       // value type.
+                                     boost::forward_traversal_tag,  // traversal
+                                     UsdPrim>                       // reference type.
 {
-public:
+ public:
   // Default ctor.
   UsdPrimSiblingIterator() {}
 
-private:
+ private:
   friend class UsdPrim;
 
   // Constructor used by Prim.
-  UsdPrimSiblingIterator(const base_type &i, const SdfPath &proxyPrimPath,
+  UsdPrimSiblingIterator(const base_type &i,
+                         const SdfPath &proxyPrimPath,
                          const Usd_PrimFlagsPredicate &predicate)
-      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath),
-        _predicate(predicate) {
+      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
+  {
     // Need to advance iterator to first matching element.
     if (base() && !Usd_EvalPredicate(_predicate, base(), _proxyPrimPath))
       increment();
@@ -2282,12 +2324,14 @@ private:
 
   // Core implementation invoked by iterator_adaptor.
   friend class boost::iterator_core_access;
-  bool equal(const UsdPrimSiblingIterator &other) const {
+  bool equal(const UsdPrimSiblingIterator &other) const
+  {
     return base() == other.base() && _proxyPrimPath == other._proxyPrimPath &&
            _predicate == other._predicate;
   }
 
-  void increment() {
+  void increment()
+  {
     base_type &base = base_reference();
     if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, _predicate)) {
       base = nullptr;
@@ -2295,7 +2339,10 @@ private:
     }
   }
 
-  reference dereference() const { return UsdPrim(base(), _proxyPrimPath); }
+  reference dereference() const
+  {
+    return UsdPrim(base(), _proxyPrimPath);
+  }
 
   SdfPath _proxyPrimPath;
   Usd_PrimFlagsPredicate _predicate;
@@ -2305,30 +2352,29 @@ private:
 typedef boost::iterator_range<UsdPrimSiblingIterator> UsdPrimSiblingRange;
 
 // Inform TfIterator it should feel free to make copies of the range type.
-template <>
-struct Tf_ShouldIterateOverCopy<UsdPrimSiblingRange> : std::true_type {};
-template <>
-struct Tf_ShouldIterateOverCopy<const UsdPrimSiblingRange> : std::true_type {};
+template<> struct Tf_ShouldIterateOverCopy<UsdPrimSiblingRange> : std::true_type {};
+template<> struct Tf_ShouldIterateOverCopy<const UsdPrimSiblingRange> : std::true_type {};
 
-#endif // doxygen
+#endif  // doxygen
 
-UsdPrimSiblingRange
-UsdPrim::GetFilteredChildren(const Usd_PrimFlagsPredicate &pred) const {
-  return _MakeSiblingRange(
-      Usd_CreatePredicateForTraversal(_Prim(), _ProxyPrimPath(), pred));
+UsdPrimSiblingRange UsdPrim::GetFilteredChildren(const Usd_PrimFlagsPredicate &pred) const
+{
+  return _MakeSiblingRange(Usd_CreatePredicateForTraversal(_Prim(), _ProxyPrimPath(), pred));
 }
 
-UsdPrimSiblingRange UsdPrim::GetAllChildren() const {
+UsdPrimSiblingRange UsdPrim::GetAllChildren() const
+{
   return GetFilteredChildren(UsdPrimAllPrimsPredicate);
 }
 
-UsdPrimSiblingRange UsdPrim::GetChildren() const {
+UsdPrimSiblingRange UsdPrim::GetChildren() const
+{
   return GetFilteredChildren(UsdPrimDefaultPredicate);
 }
 
 // Helper to make a sibling range.
-UsdPrim::SiblingRange
-UsdPrim::_MakeSiblingRange(const Usd_PrimFlagsPredicate &pred) const {
+UsdPrim::SiblingRange UsdPrim::_MakeSiblingRange(const Usd_PrimFlagsPredicate &pred) const
+{
   Usd_PrimDataConstPtr firstChild = get_pointer(_Prim());
   SdfPath firstChildPath = _ProxyPrimPath();
   if (!Usd_MoveToChild(firstChild, firstChildPath, pred)) {
@@ -2345,7 +2391,7 @@ UsdPrim::_MakeSiblingRange(const Usd_PrimFlagsPredicate &pred) const {
 /// Forward traversal iterator of sibling ::UsdPrim s.  This is a
 /// standard-compliant iterator that may be used with STL algorithms, etc.
 class UsdPrimSubtreeIterator {
-public:
+ public:
   /// Iterator value type.
   typedef UsdPrim value_type;
   /// Iterator reference type, in this case the same as \a value_type.
@@ -2361,13 +2407,11 @@ public:
   /// Preincrement.
   UsdPrimSubtreeIterator operator++(int);
 
-private:
+ private:
   /// Equality.
-  friend bool operator==(const UsdPrimSubtreeIterator &lhs,
-                         const UsdPrimSubtreeIterator &rhs);
+  friend bool operator==(const UsdPrimSubtreeIterator &lhs, const UsdPrimSubtreeIterator &rhs);
   /// Inequality.
-  friend bool operator!=(const UsdPrimSubtreeIterator &lhs,
-                         const UsdPrimSubtreeIterator &rhs);
+  friend bool operator!=(const UsdPrimSubtreeIterator &lhs, const UsdPrimSubtreeIterator &rhs);
 };
 
 /// Forward iterator range of sibling ::UsdPrim s.  This range type contains a
@@ -2375,7 +2419,7 @@ private:
 /// siblings.  It provides a subset of container-like API, such as begin(),
 /// end(), front(), empty(), etc.
 class UsdPrimSubtreeRange {
-public:
+ public:
   /// Iterator type.
   typedef UsdPrimSubtreeIterator iterator;
   /// Const iterator type.
@@ -2391,11 +2435,10 @@ public:
   UsdPrimSubtreeRange(UsdPrimSubtreeIterator begin, UsdPrimSubtreeIterator end);
 
   /// Construct/convert from another compatible range type.
-  template <class ForwardRange> UsdPrimSubtreeRange(const ForwardRange &r);
+  template<class ForwardRange> UsdPrimSubtreeRange(const ForwardRange &r);
 
   /// Assign from another compatible range type.
-  template <class ForwardRange>
-  UsdPrimSubtreeRange &operator=(const ForwardRange &r);
+  template<class ForwardRange> UsdPrimSubtreeRange &operator=(const ForwardRange &r);
 
   /// First iterator.
   iterator begin() const;
@@ -2421,13 +2464,11 @@ public:
   /// Return begin() == end().
   bool empty() const;
 
-private:
+ private:
   /// Equality comparison.
-  friend bool operator==(const UsdPrimSubtreeRange &lhs,
-                         const UsdPrimSubtreeRange &rhs);
+  friend bool operator==(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs);
   /// Inequality comparison.
-  friend bool operator!=(const UsdPrimSubtreeRange &lhs,
-                         const UsdPrimSubtreeRange &rhs);
+  friend bool operator!=(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs);
 };
 
 #else
@@ -2435,24 +2476,25 @@ private:
 // Subtree iterator class.  Converts ref to weak and filters according to a
 // supplied predicate.
 class UsdPrimSubtreeIterator
-    : public boost::iterator_adaptor<UsdPrimSubtreeIterator, // crtp base.
-                                     const Usd_PrimData *,   // base iterator.
-                                     UsdPrim,                // value type.
-                                     boost::forward_traversal_tag, // traversal
-                                     UsdPrim> // reference type.
+    : public boost::iterator_adaptor<UsdPrimSubtreeIterator,        // crtp base.
+                                     const Usd_PrimData *,          // base iterator.
+                                     UsdPrim,                       // value type.
+                                     boost::forward_traversal_tag,  // traversal
+                                     UsdPrim>                       // reference type.
 {
-public:
+ public:
   // Default ctor.
   UsdPrimSubtreeIterator() {}
 
-private:
+ private:
   friend class UsdPrim;
 
   // Constructor used by Prim.
-  UsdPrimSubtreeIterator(const base_type &i, const SdfPath &proxyPrimPath,
+  UsdPrimSubtreeIterator(const base_type &i,
+                         const SdfPath &proxyPrimPath,
                          const Usd_PrimFlagsPredicate &predicate)
-      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath),
-        _predicate(predicate) {
+      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
+  {
     // Need to advance iterator to first matching element.
     base_type &base = base_reference();
     if (base && !Usd_EvalPredicate(_predicate, base, _proxyPrimPath)) {
@@ -2465,12 +2507,14 @@ private:
 
   // Core implementation invoked by iterator_adaptor.
   friend class boost::iterator_core_access;
-  bool equal(const UsdPrimSubtreeIterator &other) const {
+  bool equal(const UsdPrimSubtreeIterator &other) const
+  {
     return base() == other.base() && _proxyPrimPath == other._proxyPrimPath &&
            _predicate == other._predicate;
   }
 
-  void increment() {
+  void increment()
+  {
     base_type &base = base_reference();
     if (!Usd_MoveToChild(base, _proxyPrimPath, _predicate)) {
       while (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, _predicate)) {
@@ -2478,7 +2522,10 @@ private:
     }
   }
 
-  reference dereference() const { return UsdPrim(base(), _proxyPrimPath); }
+  reference dereference() const
+  {
+    return UsdPrim(base(), _proxyPrimPath);
+  }
 
   SdfPath _proxyPrimPath;
   Usd_PrimFlagsPredicate _predicate;
@@ -2488,30 +2535,29 @@ private:
 typedef boost::iterator_range<UsdPrimSubtreeIterator> UsdPrimSubtreeRange;
 
 // Inform TfIterator it should feel free to make copies of the range type.
-template <>
-struct Tf_ShouldIterateOverCopy<UsdPrimSubtreeRange> : std::true_type {};
-template <>
-struct Tf_ShouldIterateOverCopy<const UsdPrimSubtreeRange> : std::true_type {};
+template<> struct Tf_ShouldIterateOverCopy<UsdPrimSubtreeRange> : std::true_type {};
+template<> struct Tf_ShouldIterateOverCopy<const UsdPrimSubtreeRange> : std::true_type {};
 
-#endif // doxygen
+#endif  // doxygen
 
-UsdPrimSubtreeRange
-UsdPrim::GetFilteredDescendants(const Usd_PrimFlagsPredicate &pred) const {
-  return _MakeDescendantsRange(
-      Usd_CreatePredicateForTraversal(_Prim(), _ProxyPrimPath(), pred));
+UsdPrimSubtreeRange UsdPrim::GetFilteredDescendants(const Usd_PrimFlagsPredicate &pred) const
+{
+  return _MakeDescendantsRange(Usd_CreatePredicateForTraversal(_Prim(), _ProxyPrimPath(), pred));
 }
 
-UsdPrimSubtreeRange UsdPrim::GetAllDescendants() const {
+UsdPrimSubtreeRange UsdPrim::GetAllDescendants() const
+{
   return GetFilteredDescendants(UsdPrimAllPrimsPredicate);
 }
 
-UsdPrimSubtreeRange UsdPrim::GetDescendants() const {
+UsdPrimSubtreeRange UsdPrim::GetDescendants() const
+{
   return GetFilteredDescendants(UsdPrimDefaultPredicate);
 }
 
 // Helper to make a sibling range.
-UsdPrim::SubtreeRange
-UsdPrim::_MakeDescendantsRange(const Usd_PrimFlagsPredicate &pred) const {
+UsdPrim::SubtreeRange UsdPrim::_MakeDescendantsRange(const Usd_PrimFlagsPredicate &pred) const
+{
   Usd_PrimDataConstPtr firstChild = get_pointer(_Prim());
   SdfPath firstChildPath = _ProxyPrimPath();
   Usd_PrimDataConstPtr endChild = firstChild;
@@ -2528,10 +2574,11 @@ UsdPrim::_MakeDescendantsRange(const Usd_PrimFlagsPredicate &pred) const {
 ////////////////////////////////////////////////////////////////////////
 // UsdObject methods that require UsdPrim be a complete type.
 
-inline UsdPrim UsdObject::GetPrim() const {
+inline UsdPrim UsdObject::GetPrim() const
+{
   return UsdPrim(_prim, _proxyPrimPath);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_H
+#endif  // PXR_USD_USD_PRIM_H

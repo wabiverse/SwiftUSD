@@ -30,86 +30,70 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDGEOMSUBSET_SCHEMA_TOKENS \
-    (type) \
-    (indices) \
-    (typeFaceSet) \
-    (typePointSet) \
-    (typeCurveSet) \
+#define HDGEOMSUBSET_SCHEMA_TOKENS (type)(indices)(typeFaceSet)(typePointSet)(typeCurveSet)
 
-TF_DECLARE_PUBLIC_TOKENS(HdGeomSubsetSchemaTokens, HD_API,
-    HDGEOMSUBSET_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdGeomSubsetSchemaTokens, HD_API, HDGEOMSUBSET_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdGeomSubsetSchema : public HdSchema
-{
-public:
-    HdGeomSubsetSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdGeomSubsetSchema : public HdSchema {
+ public:
+  HdGeomSubsetSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetType();
+  HD_API
+  HdIntArrayDataSourceHandle GetIndices();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdTokenDataSourceHandle &type,
+                                                   const HdIntArrayDataSourceHandle &indices);
+
+  /// \class HdGeomSubsetSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetType();
+    Builder &SetType(const HdTokenDataSourceHandle &type);
     HD_API
-    HdIntArrayDataSourceHandle GetIndices();
+    Builder &SetIndices(const HdIntArrayDataSourceHandle &indices);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &type,
-        const HdIntArrayDataSourceHandle &indices
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdGeomSubsetSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetType(
-            const HdTokenDataSourceHandle &type);
-        HD_API
-        Builder &SetIndices(
-            const HdIntArrayDataSourceHandle &indices);
+   private:
+    HdTokenDataSourceHandle _type;
+    HdIntArrayDataSourceHandle _indices;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _type;
-        HdIntArrayDataSourceHandle _indices;
-    };
-
-    /// Returns token data source for use as type value.
-    /// Values of...
-    /// - HdGeomSubsetSchemaTokens->typeFaceSet
-    /// - HdGeomSubsetSchemaTokens->typePointSet
-    /// - HdGeomSubsetSchemaTokens->typeCurveSet
-    ///     ...will be stored statically and reused for future calls.
-    HD_API
-    static HdTokenDataSourceHandle BuildTypeDataSource(
-        const TfToken &type);
-
+  /// Returns token data source for use as type value.
+  /// Values of...
+  /// - HdGeomSubsetSchemaTokens->typeFaceSet
+  /// - HdGeomSubsetSchemaTokens->typePointSet
+  /// - HdGeomSubsetSchemaTokens->typeCurveSet
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildTypeDataSource(const TfToken &type);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

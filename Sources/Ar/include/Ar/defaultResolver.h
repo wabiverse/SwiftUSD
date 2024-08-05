@@ -26,10 +26,10 @@
 
 /// \file ar/defaultResolver.h
 
-#include "ArTypes/api.h"
 #include "Ar/defaultResolverContext.h"
-#include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
+#include "ArTypes/api.h"
+#include "ArTypes/resolvedPath.h"
 #include <pxr/pxrns.h>
 
 #include <Arch/swiftInterop.h>
@@ -64,7 +64,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ArResolver::CreateContextFromString by passing a list of directories
 /// delimited by the platform's standard path separator.
 class ArDefaultResolver : public ArResolver {
-public:
+ public:
   AR_API
   ArDefaultResolver();
 
@@ -80,34 +80,30 @@ public:
   /// paths specified via the environment variable PXR_AR_DEFAULT_SEARCH_PATH
   AR_API
   static void SetDefaultSearchPath(const ArSearchPathVec &searchPath);
-  
+
   AR_API
-  static ArResolvedPath _ResolveAnchored(const std::string &anchorPath,
-                                         const std::string &path);
+  static ArResolvedPath _ResolveAnchored(const std::string &anchorPath, const std::string &path);
 
   AR_API
   const ArDefaultResolverContext GetFallbackContext() const;
-  
-  AR_API
-  const ArDefaultResolverContext *GetCurrentContextPtr() const;
-  
-protected:
-  AR_API
-  std::string
-  _CreateIdentifier(const std::string &assetPath,
-                    const ArResolvedPath &anchorAssetPath) const override;
 
   AR_API
-  std::string _CreateIdentifierForNewAsset(
-      const std::string &assetPath,
-      const ArResolvedPath &anchorAssetPath) const override;
+  const ArDefaultResolverContext *GetCurrentContextPtr() const;
+
+ protected:
+  AR_API
+  std::string _CreateIdentifier(const std::string &assetPath,
+                                const ArResolvedPath &anchorAssetPath) const override;
+
+  AR_API
+  std::string _CreateIdentifierForNewAsset(const std::string &assetPath,
+                                           const ArResolvedPath &anchorAssetPath) const override;
 
   AR_API
   ArResolvedPath _Resolve(const std::string &assetPath) const override;
 
   AR_API
-  ArResolvedPath
-  _ResolveForNewAsset(const std::string &assetPath) const override;
+  ArResolvedPath _ResolveForNewAsset(const std::string &assetPath) const override;
 
   AR_API
   ArResolverContext _CreateDefaultContext() const override;
@@ -120,36 +116,31 @@ protected:
   /// \p assetPath is not an absolute filesystem path, it will first be
   /// anchored to the process's current working directory.
   AR_API
-  ArResolverContext
-  _CreateDefaultContextForAsset(const std::string &assetPath) const override;
+  ArResolverContext _CreateDefaultContextForAsset(const std::string &assetPath) const override;
 
   /// Creates an ArDefaultResolverContext from \p contextStr. This
   /// string is expected to be a list of directories delimited by
   /// the platform's standard path separator.
   AR_API
-  ArResolverContext
-  _CreateContextFromString(const std::string &contextStr) const override;
+  ArResolverContext _CreateContextFromString(const std::string &contextStr) const override;
 
   AR_API
   bool _IsContextDependentPath(const std::string &assetPath) const override;
 
   AR_API
-  ArTimestamp
-  _GetModificationTimestamp(const std::string &path,
-                            const ArResolvedPath &resolvedPath) const override;
+  ArTimestamp _GetModificationTimestamp(const std::string &path,
+                                        const ArResolvedPath &resolvedPath) const override;
 
   AR_API
-  std::shared_ptr<ArAsset>
-  _OpenAsset(const ArResolvedPath &resolvedPath) const override;
+  std::shared_ptr<ArAsset> _OpenAsset(const ArResolvedPath &resolvedPath) const override;
 
   /// Creates an ArFilesystemWriteableAsset for the asset at the
   /// given \p resolvedPath.
   AR_API
-  std::shared_ptr<ArWritableAsset>
-  _OpenAssetForWrite(const ArResolvedPath &resolvedPath,
-                     WriteMode writeMode) const override;
+  std::shared_ptr<ArWritableAsset> _OpenAssetForWrite(const ArResolvedPath &resolvedPath,
+                                                      WriteMode writeMode) const override;
 
-private:
+ private:
   const ArDefaultResolverContext *_GetCurrentContextPtr() const;
 
   ArDefaultResolverContext _fallbackContext;
@@ -158,4 +149,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_DEFAULT_RESOLVER_H
+#endif  // PXR_USD_AR_DEFAULT_RESOLVER_H

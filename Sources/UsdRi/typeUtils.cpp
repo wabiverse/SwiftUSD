@@ -21,40 +21,35 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdRi/typeUtils.h"
 #include "Sdf/schema.h"
 #include "Sdf/types.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 using std::string;
 
-string
-UsdRi_GetRiType(const SdfValueTypeName &usdType)
+string UsdRi_GetRiType(const SdfValueTypeName &usdType)
 {
   // TODO
   return "";
 }
 
-SdfValueTypeName
-UsdRi_GetUsdType(const string &riType)
+SdfValueTypeName UsdRi_GetUsdType(const string &riType)
 {
-  struct Entry
-  {
+  struct Entry {
     const char *riName;
     SdfValueTypeName usdType;
   };
-  static Entry map[] = {
-      {"color", SdfValueTypeNames->Color3f},
-      {"vector", SdfValueTypeNames->Vector3d},
-      {"normal", SdfValueTypeNames->Normal3d},
-      {"point", SdfValueTypeNames->Point3d},
-      {"matrix", SdfValueTypeNames->Matrix4d}};
+  static Entry map[] = {{"color", SdfValueTypeNames->Color3f},
+                        {"vector", SdfValueTypeNames->Vector3d},
+                        {"normal", SdfValueTypeNames->Normal3d},
+                        {"point", SdfValueTypeNames->Point3d},
+                        {"matrix", SdfValueTypeNames->Matrix4d}};
   static const size_t mapLen = sizeof(map) / sizeof(map[0]);
 
-  for (size_t i = 0; i != mapLen; ++i)
-  {
+  for (size_t i = 0; i != mapLen; ++i) {
     if (riType.find(map[i].riName) != string::npos)
       return map[i].usdType;
   }

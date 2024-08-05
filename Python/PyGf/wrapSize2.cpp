@@ -44,42 +44,54 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static int normalizeIndex(int index) {
+static int normalizeIndex(int index)
+{
   return TfPyNormalizeIndex(index, 2, true /*throw error*/);
 }
 
-static int __len__(const GfSize2 &self) { return 2; }
+static int __len__(const GfSize2 &self)
+{
+  return 2;
+}
 
-static size_t __getitem__(const GfSize2 &self, int index) {
+static size_t __getitem__(const GfSize2 &self, int index)
+{
   index = normalizeIndex(index);
   return self[index];
 }
 
-static void __setitem__(GfSize2 &self, int index, size_t value) {
+static void __setitem__(GfSize2 &self, int index, size_t value)
+{
   index = normalizeIndex(index);
   self[index] = value;
 }
 
-static bool __contains__(const GfSize2 &self, size_t value) {
+static bool __contains__(const GfSize2 &self, size_t value)
+{
   if (self[0] == value || self[1] == value)
     return true;
   return false;
 }
 
-static GfSize2 __truediv__(const GfSize2 &self, int value) {
+static GfSize2 __truediv__(const GfSize2 &self, int value)
+{
   return self / value;
 }
 
-static GfSize2 &__itruediv__(GfSize2 &self, int value) { return self /= value; }
-
-static string _Repr(GfSize2 const &self) {
-  return TF_PY_REPR_PREFIX + "Size2(" + TfPyRepr(self[0]) + ", " +
-         TfPyRepr(self[1]) + ")";
+static GfSize2 &__itruediv__(GfSize2 &self, int value)
+{
+  return self /= value;
 }
 
-} // anonymous namespace
+static string _Repr(GfSize2 const &self)
+{
+  return TF_PY_REPR_PREFIX + "Size2(" + TfPyRepr(self[0]) + ", " + TfPyRepr(self[1]) + ")";
+}
 
-void wrapSize2() {
+}  // anonymous namespace
+
+void wrapSize2()
+{
   typedef GfSize2 This;
 
   static const int dimension = 2;
@@ -91,8 +103,7 @@ void wrapSize2() {
 
       .def(TfTypePythonClass())
 
-      .def("Set", (GfSize2 & (This::*)(size_t, size_t)) & This::Set,
-           return_self<>())
+      .def("Set", (GfSize2 & (This::*)(size_t, size_t)) & This::Set, return_self<>())
 
       .def_readonly("dimension", dimension)
 
@@ -117,8 +128,7 @@ void wrapSize2() {
       .def("__repr__", _Repr)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   // conversion operator
   implicitly_convertible<This, GfVec2i>();

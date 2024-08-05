@@ -27,10 +27,10 @@
 
 /// \file ndr/filesystemDiscoveryHelpers.h
 
-#include <pxr/pxrns.h>
 #include "Ndr/api.h"
 #include "Ndr/declare.h"
 #include "Ndr/nodeDiscoveryResult.h"
+#include <pxr/pxrns.h>
 
 #include <functional>
 
@@ -47,11 +47,8 @@ class NdrDiscoveryPluginContext;
 
 /// Type of a function that can be used to parse a discovery result's identifier
 /// into its family, name, and version.
-using NdrParseIdentifierFn = std::function<
-    bool(const TfToken &identifier,
-         TfToken *family,
-         TfToken *name,
-         NdrVersion *version)>;
+using NdrParseIdentifierFn = std::function<bool(
+    const TfToken &identifier, TfToken *family, TfToken *name, NdrVersion *version)>;
 
 /// Given a shader's \p identifier token, computes the corresponding
 /// NdrNode's family name, implementation name and shader version
@@ -71,11 +68,10 @@ using NdrParseIdentifierFn = std::function<
 /// \note The python version of this function returns a tuple containing
 /// (famiyName, implementationName, version).
 NDR_API
-bool NdrFsHelpersSplitShaderIdentifier(
-    const TfToken &identifier,
-    TfToken *family,
-    TfToken *name,
-    NdrVersion *version);
+bool NdrFsHelpersSplitShaderIdentifier(const TfToken &identifier,
+                                       TfToken *family,
+                                       TfToken *name,
+                                       NdrVersion *version);
 
 /// Returns a vector of discovery results that have been found while walking
 /// the given search paths.
@@ -96,19 +92,16 @@ bool NdrFsHelpersSplitShaderIdentifier(
 /// every discovery result returned by this function will be naively marked as
 /// being default even if multiple versions with the same name are found.
 NDR_API
-NdrNodeDiscoveryResultVec
-NdrFsHelpersDiscoverNodes(
+NdrNodeDiscoveryResultVec NdrFsHelpersDiscoverNodes(
     const NdrStringVec &searchPaths,
     const NdrStringVec &allowedExtensions,
     bool followSymlinks = true,
     const NdrDiscoveryPluginContext *context = nullptr,
-    const NdrParseIdentifierFn &parseIdentifierFn =
-        NdrFsHelpersSplitShaderIdentifier);
+    const NdrParseIdentifierFn &parseIdentifierFn = NdrFsHelpersSplitShaderIdentifier);
 
 /// Struct for holding a URI and its resolved URI for a file discovered
 /// by NdrFsHelpersDiscoverFiles
-struct NdrDiscoveryUri
-{
+struct NdrDiscoveryUri {
   std::string uri;
   std::string resolvedUri;
 };
@@ -128,12 +121,10 @@ using NdrDiscoveryUriVec = std::vector<NdrDiscoveryUri>;
 /// that want to search for files that are not meant to be returned by discovery
 /// themselves, but can be parsed to generate the discovery results.
 NDR_API
-NdrDiscoveryUriVec
-NdrFsHelpersDiscoverFiles(
-    const NdrStringVec &searchPaths,
-    const NdrStringVec &allowedExtensions,
-    bool followSymlinks = true);
+NdrDiscoveryUriVec NdrFsHelpersDiscoverFiles(const NdrStringVec &searchPaths,
+                                             const NdrStringVec &allowedExtensions,
+                                             bool followSymlinks = true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_FILESYSTEM_DISCOVERY_HELPERS_H
+#endif  // PXR_USD_NDR_FILESYSTEM_DISCOVERY_HELPERS_H

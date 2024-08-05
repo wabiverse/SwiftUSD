@@ -69,7 +69,7 @@ class Node;
 /// or more information on the expression language and areas of the system
 /// where expressions may be used.
 class SdfVariableExpression {
-public:
+ public:
   /// Construct using the expression \p expr. If the expression cannot be
   /// parsed, this object represents an invalid expression. Parsing errors
   /// will be accessible via GetErrors.
@@ -123,7 +123,7 @@ public:
 
   /// \class Result
   class Result {
-  public:
+   public:
     /// The result of evaluating the expression. This value may be
     /// empty if the expression yielded no value. It may also be empty
     /// if errors occurred during evaluation. In this case, the errors
@@ -172,21 +172,19 @@ public:
   /// Result value will be set to an empty VtValue an error message
   /// indicating the unexpected type will be added to the Result's error
   /// list. Otherwise, the Result will be returned as-is.
-  template <class ResultType>
-  Result EvaluateTyped(const VtDictionary &variables) const {
+  template<class ResultType> Result EvaluateTyped(const VtDictionary &variables) const
+  {
     Result r = Evaluate(variables);
     if (!r.value.IsEmpty() && !r.value.IsHolding<ResultType>()) {
-      r.errors.push_back(
-          _FormatUnexpectedTypeError(r.value, VtValue(ResultType())));
+      r.errors.push_back(_FormatUnexpectedTypeError(r.value, VtValue(ResultType())));
       r.value = VtValue();
     }
     return r;
   }
 
-private:
+ private:
   SDF_API
-  static std::string _FormatUnexpectedTypeError(const VtValue &got,
-                                                const VtValue &expected);
+  static std::string _FormatUnexpectedTypeError(const VtValue &got, const VtValue &expected);
 
   std::vector<std::string> _errors;
   std::shared_ptr<Sdf_VariableExpressionImpl::Node> _expression;

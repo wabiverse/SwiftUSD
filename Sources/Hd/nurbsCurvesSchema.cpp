@@ -33,147 +33,116 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdNurbsCurvesSchemaTokens,
-    HDNURBSCURVES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdNurbsCurvesSchemaTokens, HDNURBSCURVES_SCHEMA_TOKENS);
 
-
-
-HdIntArrayDataSourceHandle
-HdNurbsCurvesSchema::GetCurveVertexCounts()
+HdIntArrayDataSourceHandle HdNurbsCurvesSchema::GetCurveVertexCounts()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdNurbsCurvesSchemaTokens->curveVertexCounts);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdNurbsCurvesSchemaTokens->curveVertexCounts);
 }
 
-HdIntArrayDataSourceHandle
-HdNurbsCurvesSchema::GetOrder()
+HdIntArrayDataSourceHandle HdNurbsCurvesSchema::GetOrder()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdNurbsCurvesSchemaTokens->order);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdNurbsCurvesSchemaTokens->order);
 }
 
-HdDoubleArrayDataSourceHandle
-HdNurbsCurvesSchema::GetKnots()
+HdDoubleArrayDataSourceHandle HdNurbsCurvesSchema::GetKnots()
 {
-    return _GetTypedDataSource<HdDoubleArrayDataSource>(
-        HdNurbsCurvesSchemaTokens->knots);
+  return _GetTypedDataSource<HdDoubleArrayDataSource>(HdNurbsCurvesSchemaTokens->knots);
 }
 
-HdVec2dArrayDataSourceHandle
-HdNurbsCurvesSchema::GetRanges()
+HdVec2dArrayDataSourceHandle HdNurbsCurvesSchema::GetRanges()
 {
-    return _GetTypedDataSource<HdVec2dArrayDataSource>(
-        HdNurbsCurvesSchemaTokens->ranges);
+  return _GetTypedDataSource<HdVec2dArrayDataSource>(HdNurbsCurvesSchemaTokens->ranges);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdNurbsCurvesSchema::BuildRetained(
-        const HdIntArrayDataSourceHandle &curveVertexCounts,
-        const HdIntArrayDataSourceHandle &order,
-        const HdDoubleArrayDataSourceHandle &knots,
-        const HdVec2dArrayDataSourceHandle &ranges
-)
-{
-    TfToken names[4];
-    HdDataSourceBaseHandle values[4];
-
-    size_t count = 0;
-    if (curveVertexCounts) {
-        names[count] = HdNurbsCurvesSchemaTokens->curveVertexCounts;
-        values[count++] = curveVertexCounts;
-    }
-
-    if (order) {
-        names[count] = HdNurbsCurvesSchemaTokens->order;
-        values[count++] = order;
-    }
-
-    if (knots) {
-        names[count] = HdNurbsCurvesSchemaTokens->knots;
-        values[count++] = knots;
-    }
-
-    if (ranges) {
-        names[count] = HdNurbsCurvesSchemaTokens->ranges;
-        values[count++] = ranges;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdNurbsCurvesSchema
-HdNurbsCurvesSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdNurbsCurvesSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdNurbsCurvesSchemaTokens->nurbsCurves))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdNurbsCurvesSchema::GetSchemaToken()
-{
-    return HdNurbsCurvesSchemaTokens->nurbsCurves;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdNurbsCurvesSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdNurbsCurvesSchemaTokens->nurbsCurves
-    );
-    return locator;
-} 
-HdNurbsCurvesSchema::Builder &
-HdNurbsCurvesSchema::Builder::SetCurveVertexCounts(
-    const HdIntArrayDataSourceHandle &curveVertexCounts)
-{
-    _curveVertexCounts = curveVertexCounts;
-    return *this;
-}
-
-HdNurbsCurvesSchema::Builder &
-HdNurbsCurvesSchema::Builder::SetOrder(
-    const HdIntArrayDataSourceHandle &order)
-{
-    _order = order;
-    return *this;
-}
-
-HdNurbsCurvesSchema::Builder &
-HdNurbsCurvesSchema::Builder::SetKnots(
-    const HdDoubleArrayDataSourceHandle &knots)
-{
-    _knots = knots;
-    return *this;
-}
-
-HdNurbsCurvesSchema::Builder &
-HdNurbsCurvesSchema::Builder::SetRanges(
+HdContainerDataSourceHandle HdNurbsCurvesSchema::BuildRetained(
+    const HdIntArrayDataSourceHandle &curveVertexCounts,
+    const HdIntArrayDataSourceHandle &order,
+    const HdDoubleArrayDataSourceHandle &knots,
     const HdVec2dArrayDataSourceHandle &ranges)
 {
-    _ranges = ranges;
-    return *this;
+  TfToken names[4];
+  HdDataSourceBaseHandle values[4];
+
+  size_t count = 0;
+  if (curveVertexCounts) {
+    names[count] = HdNurbsCurvesSchemaTokens->curveVertexCounts;
+    values[count++] = curveVertexCounts;
+  }
+
+  if (order) {
+    names[count] = HdNurbsCurvesSchemaTokens->order;
+    values[count++] = order;
+  }
+
+  if (knots) {
+    names[count] = HdNurbsCurvesSchemaTokens->knots;
+    values[count++] = knots;
+  }
+
+  if (ranges) {
+    names[count] = HdNurbsCurvesSchemaTokens->ranges;
+    values[count++] = ranges;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdNurbsCurvesSchema::Builder::Build()
+/*static*/
+HdNurbsCurvesSchema HdNurbsCurvesSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdNurbsCurvesSchema::BuildRetained(
-        _curveVertexCounts,
-        _order,
-        _knots,
-        _ranges
-    );
+  return HdNurbsCurvesSchema(fromParentContainer ?
+                                 HdContainerDataSource::Cast(fromParentContainer->Get(
+                                     HdNurbsCurvesSchemaTokens->nurbsCurves)) :
+                                 nullptr);
 }
 
+/*static*/
+const TfToken &HdNurbsCurvesSchema::GetSchemaToken()
+{
+  return HdNurbsCurvesSchemaTokens->nurbsCurves;
+}
+/*static*/
+const HdDataSourceLocator &HdNurbsCurvesSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdNurbsCurvesSchemaTokens->nurbsCurves);
+  return locator;
+}
+HdNurbsCurvesSchema::Builder &HdNurbsCurvesSchema::Builder::SetCurveVertexCounts(
+    const HdIntArrayDataSourceHandle &curveVertexCounts)
+{
+  _curveVertexCounts = curveVertexCounts;
+  return *this;
+}
+
+HdNurbsCurvesSchema::Builder &HdNurbsCurvesSchema::Builder::SetOrder(
+    const HdIntArrayDataSourceHandle &order)
+{
+  _order = order;
+  return *this;
+}
+
+HdNurbsCurvesSchema::Builder &HdNurbsCurvesSchema::Builder::SetKnots(
+    const HdDoubleArrayDataSourceHandle &knots)
+{
+  _knots = knots;
+  return *this;
+}
+
+HdNurbsCurvesSchema::Builder &HdNurbsCurvesSchema::Builder::SetRanges(
+    const HdVec2dArrayDataSourceHandle &ranges)
+{
+  _ranges = ranges;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdNurbsCurvesSchema::Builder::Build()
+{
+  return HdNurbsCurvesSchema::BuildRetained(_curveVertexCounts, _order, _knots, _ranges);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

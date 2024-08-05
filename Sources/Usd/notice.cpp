@@ -29,24 +29,20 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the notice class
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<UsdNotice::StageNotice, TfType::Bases<TfNotice>>();
 
-  TfType::Define<UsdNotice::StageContentsChanged,
-                 TfType::Bases<UsdNotice::StageNotice>>();
+  TfType::Define<UsdNotice::StageContentsChanged, TfType::Bases<UsdNotice::StageNotice>>();
 
-  TfType::Define<UsdNotice::StageEditTargetChanged,
-                 TfType::Bases<UsdNotice::StageNotice>>();
+  TfType::Define<UsdNotice::StageEditTargetChanged, TfType::Bases<UsdNotice::StageNotice>>();
 
-  TfType::Define<UsdNotice::ObjectsChanged,
-                 TfType::Bases<UsdNotice::StageNotice>>();
+  TfType::Define<UsdNotice::ObjectsChanged, TfType::Bases<UsdNotice::StageNotice>>();
 
-  TfType::Define<UsdNotice::LayerMutingChanged,
-                 TfType::Bases<UsdNotice::StageNotice>>();
+  TfType::Define<UsdNotice::LayerMutingChanged, TfType::Bases<UsdNotice::StageNotice>>();
 }
 
-UsdNotice::StageNotice::StageNotice(const UsdStageWeakPtr &stage)
-    : _stage(stage) {}
+UsdNotice::StageNotice::StageNotice(const UsdStageWeakPtr &stage) : _stage(stage) {}
 
 UsdNotice::StageNotice::~StageNotice() {}
 
@@ -56,13 +52,15 @@ UsdNotice::StageEditTargetChanged::~StageEditTargetChanged() {}
 
 UsdNotice::LayerMutingChanged::~LayerMutingChanged() {}
 
-TfTokenVector
-UsdNotice::ObjectsChanged::PathRange::const_iterator::GetChangedFields() const {
+TfTokenVector UsdNotice::ObjectsChanged::PathRange::const_iterator::GetChangedFields() const
+{
   TfTokenVector fields;
   for (const SdfChangeList::Entry *entry : base()->second) {
     fields.reserve(fields.size() + entry->infoChanged.size());
-    std::transform(entry->infoChanged.begin(), entry->infoChanged.end(),
-                   std::back_inserter(fields), TfGet<0>());
+    std::transform(entry->infoChanged.begin(),
+                   entry->infoChanged.end(),
+                   std::back_inserter(fields),
+                   TfGet<0>());
   }
 
   std::sort(fields.begin(), fields.end());
@@ -70,8 +68,8 @@ UsdNotice::ObjectsChanged::PathRange::const_iterator::GetChangedFields() const {
   return fields;
 }
 
-bool UsdNotice::ObjectsChanged::PathRange::const_iterator::HasChangedFields()
-    const {
+bool UsdNotice::ObjectsChanged::PathRange::const_iterator::HasChangedFields() const
+{
   for (const SdfChangeList::Entry *entry : base()->second) {
     if (!entry->infoChanged.empty()) {
       return true;
@@ -82,37 +80,37 @@ bool UsdNotice::ObjectsChanged::PathRange::const_iterator::HasChangedFields()
 
 UsdNotice::ObjectsChanged::~ObjectsChanged() {}
 
-bool UsdNotice::ObjectsChanged::ResyncedObject(const UsdObject &obj) const {
+bool UsdNotice::ObjectsChanged::ResyncedObject(const UsdObject &obj) const
+{
   // XXX: We don't need the longest prefix here, we just need to know if
   // a prefix exists in the map.
-  return SdfPathFindLongestPrefix(*_resyncChanges, obj.GetPath()) !=
-         _resyncChanges->end();
+  return SdfPathFindLongestPrefix(*_resyncChanges, obj.GetPath()) != _resyncChanges->end();
 }
 
-bool UsdNotice::ObjectsChanged::ChangedInfoOnly(const UsdObject &obj) const {
+bool UsdNotice::ObjectsChanged::ChangedInfoOnly(const UsdObject &obj) const
+{
   // XXX: We don't need the longest prefix here, we just need to know if
   // a prefix exists in the map.
-  return SdfPathFindLongestPrefix(*_infoChanges, obj.GetPath()) !=
-         _infoChanges->end();
+  return SdfPathFindLongestPrefix(*_infoChanges, obj.GetPath()) != _infoChanges->end();
 }
 
-UsdNotice::ObjectsChanged::PathRange
-UsdNotice::ObjectsChanged::GetResyncedPaths() const {
+UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::GetResyncedPaths() const
+{
   return PathRange(_resyncChanges);
 }
 
-UsdNotice::ObjectsChanged::PathRange
-UsdNotice::ObjectsChanged::GetChangedInfoOnlyPaths() const {
+UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::GetChangedInfoOnlyPaths() const
+{
   return PathRange(_infoChanges);
 }
 
-TfTokenVector
-UsdNotice::ObjectsChanged::GetChangedFields(const UsdObject &obj) const {
+TfTokenVector UsdNotice::ObjectsChanged::GetChangedFields(const UsdObject &obj) const
+{
   return GetChangedFields(obj.GetPath());
 }
 
-TfTokenVector
-UsdNotice::ObjectsChanged::GetChangedFields(const SdfPath &path) const {
+TfTokenVector UsdNotice::ObjectsChanged::GetChangedFields(const SdfPath &path) const
+{
   PathRange range = GetResyncedPaths();
   PathRange::const_iterator it = range.find(path);
   if (it != range.end()) {
@@ -128,11 +126,13 @@ UsdNotice::ObjectsChanged::GetChangedFields(const SdfPath &path) const {
   return TfTokenVector();
 }
 
-bool UsdNotice::ObjectsChanged::HasChangedFields(const UsdObject &obj) const {
+bool UsdNotice::ObjectsChanged::HasChangedFields(const UsdObject &obj) const
+{
   return HasChangedFields(obj.GetPath());
 }
 
-bool UsdNotice::ObjectsChanged::HasChangedFields(const SdfPath &path) const {
+bool UsdNotice::ObjectsChanged::HasChangedFields(const SdfPath &path) const
+{
   PathRange range = GetResyncedPaths();
   PathRange::const_iterator it = range.find(path);
   if (it != range.end()) {

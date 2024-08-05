@@ -26,8 +26,8 @@
 
 /// \file usdLux/blackbody.h
 
-#include "UsdLux/api.h"
 #include "Gf/vec3f.h"
+#include "UsdLux/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

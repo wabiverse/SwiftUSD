@@ -57,10 +57,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// (IsEmpty()) and include no paths.  A population mask containing
 /// SdfPath::AbsoluteRootPath() includes all paths.
 class UsdStagePopulationMask {
-public:
+ public:
   /// Return a mask that includes all paths.  This is the mask that contains
   /// the absolute root path.
-  static UsdStagePopulationMask All() {
+  static UsdStagePopulationMask All()
+  {
     return UsdStagePopulationMask().Add(SdfPath::AbsoluteRootPath());
   }
 
@@ -75,8 +76,8 @@ public:
   /// Construct a mask from the range of paths [f, l).  All paths in the range
   /// must be absolute prim paths or the absolute root path. (See
   /// SdfPath::IsAbsolutePath, SdfPath::IsAbsoluteRootOrPrimPath).
-  template <class Iter>
-  explicit UsdStagePopulationMask(Iter f, Iter l) : _paths(f, l) {
+  template<class Iter> explicit UsdStagePopulationMask(Iter f, Iter l) : _paths(f, l)
+  {
     _ValidateAndNormalize();
   }
 
@@ -84,7 +85,7 @@ public:
   /// or the absolute root path.  (See SdfPath::IsAbsolutePath,
   /// SdfPath::IsAbsoluteRootOrPrimPath).
   explicit UsdStagePopulationMask(std::vector<SdfPath> const &paths)
-      : UsdStagePopulationMask(std::vector<SdfPath>(paths)){};
+      : UsdStagePopulationMask(std::vector<SdfPath>(paths)) {};
 
   /// Construct a mask from \p paths.  All paths must be absolute prim paths
   /// or the absolute root path.  (See SdfPath::IsAbsolutePath,
@@ -113,8 +114,7 @@ public:
 
   /// Return a mask that is the intersection of this and \p other.
   USD_API
-  UsdStagePopulationMask
-  GetIntersection(UsdStagePopulationMask const &other) const;
+  UsdStagePopulationMask GetIntersection(UsdStagePopulationMask const &other) const;
 
   /// Return true if this mask is a superset of \p other.  That is, if this
   /// mask includes at least every path that \p other includes.
@@ -142,7 +142,10 @@ public:
 
   /// Return true if this mask contains no paths.  Empty masks include no
   /// paths.
-  bool IsEmpty() const { return _paths.empty(); }
+  bool IsEmpty() const
+  {
+    return _paths.empty();
+  }
 
   /// Return true if this mask includes any child prims beneath \p path,
   /// false otherwise.  If only specific child prims beneath \p path are
@@ -150,8 +153,7 @@ public:
   /// If all child prims beneath \p path are included, \p childNames will
   /// be empty.
   USD_API
-  bool GetIncludedChildNames(SdfPath const &path,
-                             std::vector<TfToken> *childNames) const;
+  bool GetIncludedChildNames(SdfPath const &path, std::vector<TfToken> *childNames) const;
 
   /// Return the set of paths that define this mask.
   USD_API
@@ -159,32 +161,39 @@ public:
 
   /// Assign this mask to be its union with \p other and return a reference to
   /// this mask.
-  UsdStagePopulationMask &Add(UsdStagePopulationMask const &other) {
+  UsdStagePopulationMask &Add(UsdStagePopulationMask const &other)
+  {
     *this = GetUnion(other);
     return *this;
   }
 
   /// Assign this mask to be its union with \p path and return a reference to
   /// this mask.
-  UsdStagePopulationMask &Add(SdfPath const &path) {
+  UsdStagePopulationMask &Add(SdfPath const &path)
+  {
     *this = GetUnion(path);
     return *this;
   }
 
   /// Return true if this mask is equivalent to \p other.
-  bool operator==(UsdStagePopulationMask const &other) const {
+  bool operator==(UsdStagePopulationMask const &other) const
+  {
     return _paths == other._paths;
   }
 
   /// Return true if this mask is not equivalent to \p other.
-  bool operator!=(UsdStagePopulationMask const &other) const {
+  bool operator!=(UsdStagePopulationMask const &other) const
+  {
     return !(*this == other);
   }
 
   /// Swap the content of this mask with \p other.
-  void swap(UsdStagePopulationMask &other) { _paths.swap(other._paths); }
+  void swap(UsdStagePopulationMask &other)
+  {
+    _paths.swap(other._paths);
+  }
 
-private:
+ private:
   friend USD_API size_t hash_value(UsdStagePopulationMask const &);
 
   USD_API void _ValidateAndNormalize();
@@ -197,7 +206,8 @@ USD_API
 std::ostream &operator<<(std::ostream &, UsdStagePopulationMask const &);
 
 /// Swap the contents of masks \p l and \p r.
-inline void swap(UsdStagePopulationMask &l, UsdStagePopulationMask &r) {
+inline void swap(UsdStagePopulationMask &l, UsdStagePopulationMask &r)
+{
   l.swap(r);
 }
 
@@ -206,4 +216,4 @@ size_t hash_value(UsdStagePopulationMask const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_STAGE_POPULATION_MASK_H
+#endif  // PXR_USD_USD_STAGE_POPULATION_MASK_H

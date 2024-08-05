@@ -24,9 +24,9 @@
 // Written by dhl (10 Jul 2006)
 //
 
-#include "pxr/pxr.h"
 #include "Arch/error.h"
 #include "Arch/testArchUtil.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

@@ -40,19 +40,20 @@ using namespace boost::python;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static bool _ArgumentIsNamed(const std::string &name, const TfPyArg &arg) {
+static bool _ArgumentIsNamed(const std::string &name, const TfPyArg &arg)
+{
   return arg.GetName() == name;
 }
 
 std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
                                                const dict &kwargs,
                                                const TfPyArgs &expectedArgs,
-                                               bool allowExtraArgs) {
+                                               bool allowExtraArgs)
+{
   std::pair<tuple, dict> rval;
 
   const unsigned int numArgs = static_cast<unsigned int>(len(args));
-  const unsigned int numExpectedArgs =
-      static_cast<unsigned int>(expectedArgs.size());
+  const unsigned int numExpectedArgs = static_cast<unsigned int>(expectedArgs.size());
 
   if (!allowExtraArgs) {
     if (numArgs > numExpectedArgs) {
@@ -63,10 +64,11 @@ std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
 
     typedef stl_input_iterator<string> KeyIterator;
     for (KeyIterator it(keys), it_end; it != it_end; ++it) {
-      if (std::find_if(
-              expectedArgs.begin(), expectedArgs.end(),
-              std::bind(_ArgumentIsNamed, *it, std::placeholders::_1)) ==
-          expectedArgs.end()) {
+      if (std::find_if(expectedArgs.begin(),
+                       expectedArgs.end(),
+                       std::bind(_ArgumentIsNamed, *it, std::placeholders::_1)) ==
+          expectedArgs.end())
+      {
 
         TfPyThrowTypeError("Unexpected keyword argument '%s'");
       }
@@ -78,8 +80,8 @@ std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
   for (unsigned int i = 0; i < std::min(numArgs, numExpectedArgs); ++i) {
     const string &argName = expectedArgs[i].GetName();
     if (rval.second.has_key(argName)) {
-      TfPyThrowTypeError(TfStringPrintf(
-          "Multiple values for keyword argument '%s'", argName.c_str()));
+      TfPyThrowTypeError(
+          TfStringPrintf("Multiple values for keyword argument '%s'", argName.c_str()));
     }
 
     rval.second[argName] = args[i];
@@ -94,21 +96,21 @@ std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
 
 static void _AddArgAndTypeDocStrings(const TfPyArg &arg,
                                      vector<string> *argStrs,
-                                     vector<string> *typeStrs) {
+                                     vector<string> *typeStrs)
+{
   argStrs->push_back(arg.GetName());
   if (!arg.GetDefaultValueDoc().empty()) {
-    argStrs->back() +=
-        TfStringPrintf(" = %s", arg.GetDefaultValueDoc().c_str());
+    argStrs->back() += TfStringPrintf(" = %s", arg.GetDefaultValueDoc().c_str());
   }
 
-  typeStrs->push_back(TfStringPrintf("%s : %s", arg.GetName().c_str(),
-                                     arg.GetTypeDoc().c_str()));
+  typeStrs->push_back(TfStringPrintf("%s : %s", arg.GetName().c_str(), arg.GetTypeDoc().c_str()));
 }
 
 string TfPyCreateFunctionDocString(const string &functionName,
                                    const TfPyArgs &requiredArgs,
                                    const TfPyArgs &optionalArgs,
-                                   const string &description) {
+                                   const string &description)
+{
   string rval = functionName + "(";
 
   vector<string> argStrs;

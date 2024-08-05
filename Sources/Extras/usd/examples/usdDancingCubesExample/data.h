@@ -24,13 +24,13 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_H
 
-#include <pxr/pxrns.h>
-#include "Sdf/api.h"
 #include "Sdf/abstractData.h"
+#include "Sdf/api.h"
 #include "Sdf/fileFormat.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/token.h"
 #include "Vt/value.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -46,12 +46,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdDancingCubesExample_Data);
 // functions for converting between file format arguments and dictionary values.
 // xx(TYPE, NAME, DEFAULT_VALUE)
 #define USD_DANCING_CUBES_EXAMPLE_DATA_PARAMS_X_FIELDS \
-  xx(int, perSide, 1)                                  \
-      xx(int, numFrames, 100)                          \
-          xx(int, framesPerCycle, 24)                  \
-              xx(double, distance, 10.0)               \
-                  xx(double, moveScale, 1.0)           \
-                      xx(TfToken, geomType, "Cube")
+  xx(int, perSide, 1) xx(int, numFrames, 100) xx(int, framesPerCycle, 24) \
+      xx(double, distance, 10.0) xx(double, moveScale, 1.0) xx(TfToken, geomType, "Cube")
 
 // A token of the same name must be defined for each parameter in the macro
 // above so we can access these parameter values in file format arguments and
@@ -65,8 +61,7 @@ TF_DECLARE_PUBLIC_TOKENS(UsdDancingCubesExample_DataParamsTokens,
 // The parameter structure used as the input values to generate the data's
 // specs and fields procedurally. This is converted to and from file format
 // arguments.
-struct UsdDancingCubesExample_DataParams
-{
+struct UsdDancingCubesExample_DataParams {
 
 // Define each parameter declared in the param field macro.
 #define xx(TYPE, NAME, DEFAULT) TYPE NAME{DEFAULT};
@@ -78,8 +73,7 @@ struct UsdDancingCubesExample_DataParams
       const SdfFileFormat::FileFormatArguments &args);
 
   // Creates a new params structure from a VtDictionary
-  static UsdDancingCubesExample_DataParams FromDict(
-      const VtDictionary &dict);
+  static UsdDancingCubesExample_DataParams FromDict(const VtDictionary &dict);
 
   // Converts this params structure into the file format arguments that could
   // be used to recreate these parameters.
@@ -119,9 +113,8 @@ struct UsdDancingCubesExample_DataParams
 ///   geomType - A token of the name the geometry type. Valid names are of other
 ///              UsdGeom types such as "Cone", "Cylinder", or "Capsule"
 ///
-class UsdDancingCubesExample_Data : public SdfAbstractData
-{
-public:
+class UsdDancingCubesExample_Data : public SdfAbstractData {
+ public:
   /// Factory New. We always create this data with an explicit params object.
   static UsdDancingCubesExample_DataRefPtr New();
 
@@ -132,58 +125,51 @@ public:
   /// SdfAbstractData overrides
   bool StreamsData() const override;
 
-  void CreateSpec(const SdfPath &path,
-                  SdfSpecType specType) override;
+  void CreateSpec(const SdfPath &path, SdfSpecType specType) override;
   bool HasSpec(const SdfPath &path) const override;
   void EraseSpec(const SdfPath &path) override;
-  void MoveSpec(const SdfPath &oldPath,
-                const SdfPath &newPath) override;
+  void MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) override;
   SdfSpecType GetSpecType(const SdfPath &path) const override;
 
-  bool Has(const SdfPath &path, const TfToken &fieldName,
+  bool Has(const SdfPath &path,
+           const TfToken &fieldName,
            SdfAbstractDataValue *value) const override;
-  bool Has(const SdfPath &path, const TfToken &fieldName,
-           VtValue *value = NULL) const override;
-  VtValue Get(const SdfPath &path,
-              const TfToken &fieldName) const override;
-  void Set(const SdfPath &path, const TfToken &fieldName,
-           const VtValue &value) override;
-  void Set(const SdfPath &path, const TfToken &fieldName,
+  bool Has(const SdfPath &path, const TfToken &fieldName, VtValue *value = NULL) const override;
+  VtValue Get(const SdfPath &path, const TfToken &fieldName) const override;
+  void Set(const SdfPath &path, const TfToken &fieldName, const VtValue &value) override;
+  void Set(const SdfPath &path,
+           const TfToken &fieldName,
            const SdfAbstractDataConstValue &value) override;
-  void Erase(const SdfPath &path,
-             const TfToken &fieldName) override;
+  void Erase(const SdfPath &path, const TfToken &fieldName) override;
   std::vector<TfToken> List(const SdfPath &path) const override;
 
   std::set<double> ListAllTimeSamples() const override;
 
-  std::set<double> ListTimeSamplesForPath(
-      const SdfPath &path) const override;
+  std::set<double> ListTimeSamplesForPath(const SdfPath &path) const override;
 
-  bool GetBracketingTimeSamples(
-      double time, double *tLower, double *tUpper) const override;
+  bool GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const override;
 
-  size_t GetNumTimeSamplesForPath(
-      const SdfPath &path) const override;
+  size_t GetNumTimeSamplesForPath(const SdfPath &path) const override;
 
-  bool GetBracketingTimeSamplesForPath(
-      const SdfPath &path, double time,
-      double *tLower, double *tUpper) const override;
+  bool GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                       double time,
+                                       double *tLower,
+                                       double *tUpper) const override;
 
-  bool QueryTimeSample(const SdfPath &path, double time,
+  bool QueryTimeSample(const SdfPath &path,
+                       double time,
                        SdfAbstractDataValue *optionalValue) const override;
-  bool QueryTimeSample(const SdfPath &path, double time,
-                       VtValue *value) const override;
+  bool QueryTimeSample(const SdfPath &path, double time, VtValue *value) const override;
 
-  void SetTimeSample(const SdfPath &path, double time,
-                     const VtValue &value) override;
+  void SetTimeSample(const SdfPath &path, double time, const VtValue &value) override;
 
   void EraseTimeSample(const SdfPath &path, double time) override;
 
-protected:
+ protected:
   // SdfAbstractData overrides
   void _VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const override;
 
-private:
+ private:
   // Private constructor for factory New
   UsdDancingCubesExample_Data();
 
@@ -193,4 +179,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_H

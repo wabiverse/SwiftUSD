@@ -26,7 +26,12 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiShaderFunctionTextureDesc::HgiShaderFunctionTextureDesc()
-    : dimensions(2), format(HgiFormatInvalid), textureType(HgiShaderTextureTypeTexture), bindIndex(0), arraySize(0), writable(false)
+    : dimensions(2),
+      format(HgiFormatInvalid),
+      textureType(HgiShaderTextureTypeTexture),
+      bindIndex(0),
+      arraySize(0),
+      writable(false)
 {
 }
 
@@ -35,219 +40,177 @@ HgiShaderFunctionBufferDesc::HgiShaderFunctionBufferDesc()
 {
 }
 
-HgiShaderFunctionComputeDesc::HgiShaderFunctionComputeDesc()
-    : localSize(GfVec3i(0, 0, 0))
-{
-}
+HgiShaderFunctionComputeDesc::HgiShaderFunctionComputeDesc() : localSize(GfVec3i(0, 0, 0)) {}
 
 HgiShaderFunctionParamDesc::HgiShaderFunctionParamDesc()
-    : location(-1), interstageSlot(-1), interpolation(HgiInterpolationDefault), sampling(HgiSamplingDefault), storage(HgiStorageDefault)
+    : location(-1),
+      interstageSlot(-1),
+      interpolation(HgiInterpolationDefault),
+      sampling(HgiSamplingDefault),
+      storage(HgiStorageDefault)
 {
 }
 
-HgiShaderFunctionParamBlockDesc::HgiShaderFunctionParamBlockDesc()
-    : interstageSlot(-1)
-{
-}
+HgiShaderFunctionParamBlockDesc::HgiShaderFunctionParamBlockDesc() : interstageSlot(-1) {}
 
 HgiShaderFunctionTessellationDesc::HgiShaderFunctionTessellationDesc()
-    : patchType(PatchType::Triangles), spacing(Spacing::Equal), ordering(Ordering::CCW), numVertsPerPatchIn("3"), numVertsPerPatchOut("3")
+    : patchType(PatchType::Triangles),
+      spacing(Spacing::Equal),
+      ordering(Ordering::CCW),
+      numVertsPerPatchIn("3"),
+      numVertsPerPatchOut("3")
 {
 }
 
 HgiShaderFunctionDesc::HgiShaderFunctionDesc()
-    : shaderStage(0), shaderCodeDeclarations(nullptr), shaderCode(nullptr), generatedShaderCodeOut(nullptr), textures(), constantParams(), stageInputs(), stageOutputs(), computeDescriptor(), tessellationDescriptor(), geometryDescriptor(), fragmentDescriptor()
+    : shaderStage(0),
+      shaderCodeDeclarations(nullptr),
+      shaderCode(nullptr),
+      generatedShaderCodeOut(nullptr),
+      textures(),
+      constantParams(),
+      stageInputs(),
+      stageOutputs(),
+      computeDescriptor(),
+      tessellationDescriptor(),
+      geometryDescriptor(),
+      fragmentDescriptor()
 {
 }
 
-bool operator==(
-    const HgiShaderFunctionTextureDesc &lhs,
-    const HgiShaderFunctionTextureDesc &rhs)
+bool operator==(const HgiShaderFunctionTextureDesc &lhs, const HgiShaderFunctionTextureDesc &rhs)
 {
-  return lhs.nameInShader == rhs.nameInShader &&
-         lhs.dimensions == rhs.dimensions &&
-         lhs.format == rhs.format &&
-         lhs.textureType == rhs.textureType &&
-         lhs.arraySize == rhs.arraySize &&
-         lhs.writable == rhs.writable;
+  return lhs.nameInShader == rhs.nameInShader && lhs.dimensions == rhs.dimensions &&
+         lhs.format == rhs.format && lhs.textureType == rhs.textureType &&
+         lhs.arraySize == rhs.arraySize && lhs.writable == rhs.writable;
 }
 
-bool operator!=(
-    const HgiShaderFunctionTextureDesc &lhs,
-    const HgiShaderFunctionTextureDesc &rhs)
+bool operator!=(const HgiShaderFunctionTextureDesc &lhs, const HgiShaderFunctionTextureDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
 HgiShaderFunctionGeometryDesc::HgiShaderFunctionGeometryDesc()
-    : inPrimitiveType(InPrimitiveType::Triangles), outPrimitiveType(OutPrimitiveType::TriangleStrip), outMaxVertices("3")
+    : inPrimitiveType(InPrimitiveType::Triangles),
+      outPrimitiveType(OutPrimitiveType::TriangleStrip),
+      outMaxVertices("3")
 {
 }
 
-bool operator==(
-    const HgiShaderFunctionGeometryDesc &lhs,
-    const HgiShaderFunctionGeometryDesc &rhs)
+bool operator==(const HgiShaderFunctionGeometryDesc &lhs, const HgiShaderFunctionGeometryDesc &rhs)
 {
   return lhs.inPrimitiveType == rhs.inPrimitiveType &&
-         lhs.outPrimitiveType == rhs.outPrimitiveType &&
-         lhs.outMaxVertices == rhs.outMaxVertices;
+         lhs.outPrimitiveType == rhs.outPrimitiveType && lhs.outMaxVertices == rhs.outMaxVertices;
 }
 
-bool operator!=(
-    const HgiShaderFunctionGeometryDesc &lhs,
-    const HgiShaderFunctionGeometryDesc &rhs)
+bool operator!=(const HgiShaderFunctionGeometryDesc &lhs, const HgiShaderFunctionGeometryDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-HgiShaderFunctionFragmentDesc::HgiShaderFunctionFragmentDesc()
-    : earlyFragmentTests(false)
-{
-}
+HgiShaderFunctionFragmentDesc::HgiShaderFunctionFragmentDesc() : earlyFragmentTests(false) {}
 
-bool operator==(
-    const HgiShaderFunctionFragmentDesc &lhs,
-    const HgiShaderFunctionFragmentDesc &rhs)
+bool operator==(const HgiShaderFunctionFragmentDesc &lhs, const HgiShaderFunctionFragmentDesc &rhs)
 {
   return lhs.earlyFragmentTests == rhs.earlyFragmentTests;
 }
 
-bool operator!=(
-    const HgiShaderFunctionFragmentDesc &lhs,
-    const HgiShaderFunctionFragmentDesc &rhs)
+bool operator!=(const HgiShaderFunctionFragmentDesc &lhs, const HgiShaderFunctionFragmentDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionBufferDesc &lhs,
-    const HgiShaderFunctionBufferDesc &rhs)
+bool operator==(const HgiShaderFunctionBufferDesc &lhs, const HgiShaderFunctionBufferDesc &rhs)
 {
-  return lhs.nameInShader == rhs.nameInShader &&
-         lhs.type == rhs.type &&
-         lhs.bindIndex == rhs.bindIndex &&
-         lhs.arraySize == rhs.arraySize &&
-         lhs.binding == rhs.binding &&
-         lhs.writable == rhs.writable;
+  return lhs.nameInShader == rhs.nameInShader && lhs.type == rhs.type &&
+         lhs.bindIndex == rhs.bindIndex && lhs.arraySize == rhs.arraySize &&
+         lhs.binding == rhs.binding && lhs.writable == rhs.writable;
 }
 
-bool operator!=(
-    const HgiShaderFunctionBufferDesc &lhs,
-    const HgiShaderFunctionBufferDesc &rhs)
+bool operator!=(const HgiShaderFunctionBufferDesc &lhs, const HgiShaderFunctionBufferDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionParamDesc &lhs,
-    const HgiShaderFunctionParamDesc &rhs)
+bool operator==(const HgiShaderFunctionParamDesc &lhs, const HgiShaderFunctionParamDesc &rhs)
 {
-  return lhs.nameInShader == rhs.nameInShader &&
-         lhs.type == rhs.type &&
-         lhs.location == rhs.location &&
-         lhs.interstageSlot == rhs.interstageSlot &&
-         lhs.interpolation == rhs.interpolation &&
-         lhs.sampling == rhs.sampling &&
-         lhs.storage == rhs.storage &&
-         lhs.role == rhs.role &&
-         lhs.arraySize == rhs.arraySize;
+  return lhs.nameInShader == rhs.nameInShader && lhs.type == rhs.type &&
+         lhs.location == rhs.location && lhs.interstageSlot == rhs.interstageSlot &&
+         lhs.interpolation == rhs.interpolation && lhs.sampling == rhs.sampling &&
+         lhs.storage == rhs.storage && lhs.role == rhs.role && lhs.arraySize == rhs.arraySize;
 }
 
-bool operator!=(
-    const HgiShaderFunctionParamDesc &lhs,
-    const HgiShaderFunctionParamDesc &rhs)
+bool operator!=(const HgiShaderFunctionParamDesc &lhs, const HgiShaderFunctionParamDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionParamBlockDesc &lhs,
-    const HgiShaderFunctionParamBlockDesc &rhs)
+bool operator==(const HgiShaderFunctionParamBlockDesc &lhs,
+                const HgiShaderFunctionParamBlockDesc &rhs)
 {
-  return lhs.blockName == rhs.blockName &&
-         lhs.instanceName == rhs.instanceName &&
-         lhs.members == rhs.members &&
-         lhs.arraySize == rhs.arraySize &&
+  return lhs.blockName == rhs.blockName && lhs.instanceName == rhs.instanceName &&
+         lhs.members == rhs.members && lhs.arraySize == rhs.arraySize &&
          lhs.interstageSlot == rhs.interstageSlot;
 }
 
-bool operator!=(
-    const HgiShaderFunctionParamBlockDesc &lhs,
-    const HgiShaderFunctionParamBlockDesc &rhs)
+bool operator!=(const HgiShaderFunctionParamBlockDesc &lhs,
+                const HgiShaderFunctionParamBlockDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionParamBlockDesc::Member &lhs,
-    const HgiShaderFunctionParamBlockDesc::Member &rhs)
+bool operator==(const HgiShaderFunctionParamBlockDesc::Member &lhs,
+                const HgiShaderFunctionParamBlockDesc::Member &rhs)
 {
-  return lhs.name == rhs.name &&
-         lhs.type == rhs.type;
+  return lhs.name == rhs.name && lhs.type == rhs.type;
 }
 
-bool operator!=(
-    const HgiShaderFunctionParamBlockDesc::Member &lhs,
-    const HgiShaderFunctionParamBlockDesc::Member &rhs)
+bool operator!=(const HgiShaderFunctionParamBlockDesc::Member &lhs,
+                const HgiShaderFunctionParamBlockDesc::Member &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionComputeDesc &lhs,
-    const HgiShaderFunctionComputeDesc &rhs)
+bool operator==(const HgiShaderFunctionComputeDesc &lhs, const HgiShaderFunctionComputeDesc &rhs)
 {
   return lhs.localSize == rhs.localSize;
 }
 
-bool operator!=(
-    const HgiShaderFunctionComputeDesc &lhs,
-    const HgiShaderFunctionComputeDesc &rhs)
+bool operator!=(const HgiShaderFunctionComputeDesc &lhs, const HgiShaderFunctionComputeDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionTessellationDesc &lhs,
-    const HgiShaderFunctionTessellationDesc &rhs)
+bool operator==(const HgiShaderFunctionTessellationDesc &lhs,
+                const HgiShaderFunctionTessellationDesc &rhs)
 {
-  return lhs.patchType == rhs.patchType &&
-         lhs.spacing == rhs.spacing &&
-         lhs.ordering == rhs.ordering &&
-         lhs.numVertsPerPatchIn == rhs.numVertsPerPatchIn &&
+  return lhs.patchType == rhs.patchType && lhs.spacing == rhs.spacing &&
+         lhs.ordering == rhs.ordering && lhs.numVertsPerPatchIn == rhs.numVertsPerPatchIn &&
          lhs.numVertsPerPatchOut == rhs.numVertsPerPatchOut;
 }
 
-bool operator!=(
-    const HgiShaderFunctionTessellationDesc &lhs,
-    const HgiShaderFunctionTessellationDesc &rhs)
+bool operator!=(const HgiShaderFunctionTessellationDesc &lhs,
+                const HgiShaderFunctionTessellationDesc &rhs)
 {
   return !(lhs == rhs);
 }
 
-bool operator==(
-    const HgiShaderFunctionDesc &lhs,
-    const HgiShaderFunctionDesc &rhs)
+bool operator==(const HgiShaderFunctionDesc &lhs, const HgiShaderFunctionDesc &rhs)
 {
-  return lhs.debugName == rhs.debugName &&
-         lhs.shaderStage == rhs.shaderStage &&
+  return lhs.debugName == rhs.debugName && lhs.shaderStage == rhs.shaderStage &&
          // Omitted. Only used tmp during shader compile
          // lhs.shaderCodeDeclarations == rhs.shaderCodeDeclarations
          // lhs.shaderCode == rhs.shaderCode
          // lhs.generatedShaderCodeOut == rhs.generatedShaderCodeOut
-         lhs.textures == rhs.textures &&
-         lhs.constantParams == rhs.constantParams &&
-         lhs.stageInputs == rhs.stageInputs &&
-         lhs.stageOutputs == rhs.stageOutputs &&
+         lhs.textures == rhs.textures && lhs.constantParams == rhs.constantParams &&
+         lhs.stageInputs == rhs.stageInputs && lhs.stageOutputs == rhs.stageOutputs &&
          lhs.computeDescriptor == rhs.computeDescriptor &&
          lhs.tessellationDescriptor == rhs.tessellationDescriptor &&
          lhs.geometryDescriptor == rhs.geometryDescriptor &&
          lhs.fragmentDescriptor == rhs.fragmentDescriptor;
 }
 
-bool operator!=(
-    const HgiShaderFunctionDesc &lhs,
-    const HgiShaderFunctionDesc &rhs)
+bool operator!=(const HgiShaderFunctionDesc &lhs, const HgiShaderFunctionDesc &rhs)
 {
   return !(lhs == rhs);
 }
@@ -313,13 +276,12 @@ void HgiShaderFunctionAddWritableTexture(
   desc->textures.push_back(std::move(texDesc));
 }
 
-void HgiShaderFunctionAddBuffer(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const uint32_t bindIndex,
-    const HgiBindingType binding,
-    const uint32_t arraySize)
+void HgiShaderFunctionAddBuffer(HgiShaderFunctionDesc *desc,
+                                const std::string &nameInShader,
+                                const std::string &type,
+                                const uint32_t bindIndex,
+                                const HgiBindingType binding,
+                                const uint32_t arraySize)
 {
   HgiShaderFunctionBufferDesc bufDesc;
   bufDesc.nameInShader = nameInShader;
@@ -332,11 +294,10 @@ void HgiShaderFunctionAddBuffer(
   desc->buffers.push_back(std::move(bufDesc));
 }
 
-void HgiShaderFunctionAddWritableBuffer(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const uint32_t bindIndex)
+void HgiShaderFunctionAddWritableBuffer(HgiShaderFunctionDesc *desc,
+                                        const std::string &nameInShader,
+                                        const std::string &type,
+                                        const uint32_t bindIndex)
 {
   HgiShaderFunctionBufferDesc bufDesc;
   bufDesc.nameInShader = nameInShader;
@@ -348,11 +309,10 @@ void HgiShaderFunctionAddWritableBuffer(
   desc->buffers.push_back(std::move(bufDesc));
 }
 
-void HgiShaderFunctionAddConstantParam(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const std::string &role)
+void HgiShaderFunctionAddConstantParam(HgiShaderFunctionDesc *desc,
+                                       const std::string &nameInShader,
+                                       const std::string &type,
+                                       const std::string &role)
 {
   HgiShaderFunctionParamDesc paramDesc;
   paramDesc.nameInShader = nameInShader;
@@ -362,11 +322,10 @@ void HgiShaderFunctionAddConstantParam(
   desc->constantParams.push_back(std::move(paramDesc));
 }
 
-void HgiShaderFunctionAddStageInput(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const std::string &role)
+void HgiShaderFunctionAddStageInput(HgiShaderFunctionDesc *desc,
+                                    const std::string &nameInShader,
+                                    const std::string &type,
+                                    const std::string &role)
 {
   HgiShaderFunctionParamDesc paramDesc;
   paramDesc.nameInShader = nameInShader;
@@ -376,18 +335,16 @@ void HgiShaderFunctionAddStageInput(
   desc->stageInputs.push_back(std::move(paramDesc));
 }
 
-void HgiShaderFunctionAddStageInput(
-    HgiShaderFunctionDesc *functionDesc,
-    HgiShaderFunctionParamDesc const &paramDesc)
+void HgiShaderFunctionAddStageInput(HgiShaderFunctionDesc *functionDesc,
+                                    HgiShaderFunctionParamDesc const &paramDesc)
 {
   functionDesc->stageInputs.push_back(paramDesc);
 }
 
-void HgiShaderFunctionAddGlobalVariable(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const std::string &arraySize)
+void HgiShaderFunctionAddGlobalVariable(HgiShaderFunctionDesc *desc,
+                                        const std::string &nameInShader,
+                                        const std::string &type,
+                                        const std::string &arraySize)
 {
   HgiShaderFunctionParamDesc paramDesc;
   paramDesc.nameInShader = nameInShader;
@@ -396,11 +353,10 @@ void HgiShaderFunctionAddGlobalVariable(
   desc->stageGlobalMembers.push_back(std::move(paramDesc));
 }
 
-void HgiShaderFunctionAddStageOutput(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const std::string &role)
+void HgiShaderFunctionAddStageOutput(HgiShaderFunctionDesc *desc,
+                                     const std::string &nameInShader,
+                                     const std::string &type,
+                                     const std::string &role)
 {
   HgiShaderFunctionParamDesc paramDesc;
   paramDesc.nameInShader = nameInShader;
@@ -410,11 +366,10 @@ void HgiShaderFunctionAddStageOutput(
   desc->stageOutputs.push_back(std::move(paramDesc));
 }
 
-void HgiShaderFunctionAddStageOutput(
-    HgiShaderFunctionDesc *desc,
-    const std::string &nameInShader,
-    const std::string &type,
-    const uint32_t location)
+void HgiShaderFunctionAddStageOutput(HgiShaderFunctionDesc *desc,
+                                     const std::string &nameInShader,
+                                     const std::string &type,
+                                     const uint32_t location)
 {
   HgiShaderFunctionParamDesc paramDesc;
   paramDesc.nameInShader = nameInShader;
@@ -424,9 +379,8 @@ void HgiShaderFunctionAddStageOutput(
   desc->stageOutputs.push_back(std::move(paramDesc));
 }
 
-void HgiShaderFunctionAddStageOutput(
-    HgiShaderFunctionDesc *functionDesc,
-    HgiShaderFunctionParamDesc const &paramDesc)
+void HgiShaderFunctionAddStageOutput(HgiShaderFunctionDesc *functionDesc,
+                                     HgiShaderFunctionParamDesc const &paramDesc)
 {
   functionDesc->stageOutputs.push_back(paramDesc);
 }

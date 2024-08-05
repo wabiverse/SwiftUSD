@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_LIGHT_H
 #define PXR_IMAGING_HD_LIGHT_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/sprim.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/staticTokens.h"
 
@@ -35,40 +35,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HD_LIGHT_TOKENS                                     \
-    (angle)                                                 \
-    (color)                                                 \
-    (colorTemperature)                                      \
-    (enableColorTemperature)                                \
-    (exposure)                                              \
-    (height)                                                \
-    (intensity)                                             \
-    (radius)                                                \
-    (length)                                                \
-    ((textureFile, "texture:file"))                         \
-    ((textureFormat, "texture:format"))                     \
-    (width)                                                 \
-    (ambient)                                               \
-    (diffuse)                                               \
-    (specular)                                              \
-    (normalize)                                             \
-    (hasShadow)                                             \
-    ((shapingFocus, "shaping:focus"))                       \
-    ((shapingFocusTint, "shaping:focusTint"))               \
-    ((shapingConeAngle, "shaping:cone:angle"))              \
-    ((shapingConeSoftness, "shaping:cone:softness"))        \
-    ((shapingIesFile, "shaping:ies:file"))                  \
-    ((shapingIesAngleScale, "shaping:ies:angleScale"))      \
-    ((shapingIesNormalize, "shaping:ies:normalize"))        \
-    ((shadowEnable, "shadow:enable"))                       \
-    ((shadowColor, "shadow:color"))                         \
-    ((shadowDistance, "shadow:distance"))                   \
-    ((shadowFalloff, "shadow:falloff"))                     \
-    ((shadowFalloffGamma, "shadow:falloffGamma"))           \
-                                                            \
-    (params)                                                \
-    (shadowCollection)                                      \
-    (shadowParams)
+#define HD_LIGHT_TOKENS \
+  (angle)(color)( \
+      colorTemperature)(enableColorTemperature)(exposure)(height)(intensity)(radius)(length)(( \
+      textureFile, "texture:file"))((textureFormat, "texture:format"))( \
+      width)(ambient)(diffuse)(specular)(normalize)(hasShadow)((shapingFocus, "shaping:focus"))( \
+      (shapingFocusTint, "shaping:focusTint"))((shapingConeAngle, "shaping:cone:angle"))( \
+      (shapingConeSoftness, "shaping:cone:softness"))((shapingIesFile, "shaping:ies:file"))( \
+      (shapingIesAngleScale, "shaping:ies:angleScale"))( \
+      (shapingIesNormalize, "shaping:ies:normalize"))((shadowEnable, "shadow:enable"))( \
+      (shadowColor, "shadow:color"))((shadowDistance, "shadow:distance"))( \
+      (shadowFalloff, "shadow:falloff"))((shadowFalloffGamma, "shadow:falloffGamma")) \
+\
+      (params)(shadowCollection)(shadowParams)
 
 TF_DECLARE_PUBLIC_TOKENS(HdLightTokens, HD_API, HD_LIGHT_TOKENS);
 
@@ -79,48 +58,44 @@ using HdLightPtrConstVector = std::vector<class HdLight const *>;
 ///
 /// A light model, used in conjunction with HdRenderPass.
 ///
-class HdLight : public HdSprim
-{
-public:
-    HD_API
-    HdLight(SdfPath const & id);
-    HD_API
-    ~HdLight() override;
+class HdLight : public HdSprim {
+ public:
+  HD_API
+  HdLight(SdfPath const &id);
+  HD_API
+  ~HdLight() override;
 
-    // Change tracking for HdLight
-    enum DirtyBits : HdDirtyBits {
-        Clean                 = 0,
-        DirtyTransform        = 1 << 0,
-        DirtyParams           = 1 << 1,
-        DirtyShadowParams     = 1 << 2,
-        DirtyCollection       = 1 << 3,
-        DirtyResource         = 1 << 4,
+  // Change tracking for HdLight
+  enum DirtyBits : HdDirtyBits {
+    Clean = 0,
+    DirtyTransform = 1 << 0,
+    DirtyParams = 1 << 1,
+    DirtyShadowParams = 1 << 2,
+    DirtyCollection = 1 << 3,
+    DirtyResource = 1 << 4,
 
-        // XXX: This flag is important for instanced lights, and must have
-        // the same value as it does for Rprims
-        DirtyInstancer        = 1 << 16,
-        AllDirty              = (DirtyTransform
-                                 |DirtyParams
-                                 |DirtyShadowParams
-                                 |DirtyCollection
-                                 |DirtyResource
-                                 |DirtyInstancer)
-    };
+    // XXX: This flag is important for instanced lights, and must have
+    // the same value as it does for Rprims
+    DirtyInstancer = 1 << 16,
+    AllDirty = (DirtyTransform | DirtyParams | DirtyShadowParams | DirtyCollection |
+                DirtyResource | DirtyInstancer)
+  };
 
-    HD_API
-    static std::string StringifyDirtyBits(HdDirtyBits dirtyBits);
+  HD_API
+  static std::string StringifyDirtyBits(HdDirtyBits dirtyBits);
 
-    /// Returns the identifier of the instancer (if any) for this Sprim. If this
-    /// Sprim is not instanced, an empty SdfPath will be returned.
-    const SdfPath& GetInstancerId() const { return _instancerId; }
+  /// Returns the identifier of the instancer (if any) for this Sprim. If this
+  /// Sprim is not instanced, an empty SdfPath will be returned.
+  const SdfPath &GetInstancerId() const
+  {
+    return _instancerId;
+  }
 
-    HD_API
-    void _UpdateInstancer(
-        HdSceneDelegate* sceneDelegate,
-        HdDirtyBits* dirtyBits);
+  HD_API
+  void _UpdateInstancer(HdSceneDelegate *sceneDelegate, HdDirtyBits *dirtyBits);
 
-private:
-    SdfPath _instancerId;
+ private:
+  SdfPath _instancerId;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

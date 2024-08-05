@@ -36,16 +36,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEBUG_CODES(
 
-    TF_DISCOVERY_TERSE,    // these are special in that they don't have a
-    TF_DISCOVERY_DETAILED, // corresponding entry in debugCodes.cpp; see
-    TF_DEBUG_REGISTRY,     // registryManager.cpp and debug.cpp for the reason.
-    TF_DLOPEN, TF_DLCLOSE,
+    TF_DISCOVERY_TERSE,     // these are special in that they don't have a
+    TF_DISCOVERY_DETAILED,  // corresponding entry in debugCodes.cpp; see
+    TF_DEBUG_REGISTRY,      // registryManager.cpp and debug.cpp for the reason.
+    TF_DLOPEN,
+    TF_DLCLOSE,
 
     TF_SCRIPT_MODULE_LOADER,
 
     TF_TYPE_REGISTRY,
 
-    TF_ATTACH_DEBUGGER_ON_ERROR, TF_ATTACH_DEBUGGER_ON_FATAL_ERROR,
+    TF_ATTACH_DEBUGGER_ON_ERROR,
+    TF_ATTACH_DEBUGGER_ON_FATAL_ERROR,
     TF_ATTACH_DEBUGGER_ON_WARNING
 
 );

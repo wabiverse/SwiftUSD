@@ -47,12 +47,11 @@ constexpr double _DefaultClipOffsetValue = std::numeric_limits<double>::max();
 // ------------------------------------------------------------
 
 // XXX: Duplicate of function in usd/stage.cpp. Refactor?
-static SdfLayerOffset _GetLayerOffsetToRoot(const PcpNodeRef &pcpNode,
-                                            const SdfLayerHandle &layer) {
+static SdfLayerOffset _GetLayerOffsetToRoot(const PcpNodeRef &pcpNode, const SdfLayerHandle &layer)
+{
   // PERFORMANCE: This is cached in the PcpNode and should be cheap.
   // Get the node-local path and layer offset.
-  const SdfLayerOffset &nodeToRootNodeOffset =
-      pcpNode.GetMapToRoot().GetTimeOffset();
+  const SdfLayerOffset &nodeToRootNodeOffset = pcpNode.GetMapToRoot().GetTimeOffset();
 
   //
   // Each sublayer may have a layer offset, so we must adjust the
@@ -68,7 +67,8 @@ static SdfLayerOffset _GetLayerOffsetToRoot(const PcpNodeRef &pcpNode,
   // offsets are cached), however it requires iterating over every layer in
   // the stack calling SdfLayerOffset::IsIdentity.
   if (const SdfLayerOffset *layerToRootLayerOffset =
-          pcpNode.GetLayerStack()->GetLayerOffsetForLayer(layer)) {
+          pcpNode.GetLayerStack()->GetLayerOffsetForLayer(layer))
+  {
     localOffset = localOffset * (*layerToRootLayerOffset);
   }
 
@@ -81,7 +81,8 @@ static SdfLayerOffset _GetLayerOffsetToRoot(const PcpNodeRef &pcpNode,
 }
 
 static void _ApplyLayerOffsetToExternalTimes(const SdfLayerOffset &layerOffset,
-                                             VtVec2dArray *array) {
+                                             VtVec2dArray *array)
+{
   if (layerOffset.IsIdentity()) {
     return;
   }
@@ -91,11 +92,12 @@ static void _ApplyLayerOffsetToExternalTimes(const SdfLayerOffset &layerOffset,
   }
 }
 
-template <typename V>
-static void _ClipDerivationMsg(const TfToken &metadataName, const V &v,
-                               const SdfPath &usdPrimPath) {
+template<typename V>
+static void _ClipDerivationMsg(const TfToken &metadataName, const V &v, const SdfPath &usdPrimPath)
+{
   TF_DEBUG(USD_CLIPS).Msg("%s for prim <%s> derived: %s\n",
-                          metadataName.GetText(), usdPrimPath.GetText(),
+                          metadataName.GetText(),
+                          usdPrimPath.GetText(),
                           TfStringify(v).c_str());
 }
 
@@ -104,11 +106,12 @@ struct _ClipTimeString {
   std::string integerPortion;
   std::string decimalPortion;
 };
-} // namespace
+}  // namespace
 
 static _ClipTimeString _DeriveClipTimeString(const double currentClipTime,
                                              const size_t numIntegerHashes,
-                                             const size_t numDecimalHashes) {
+                                             const size_t numDecimalHashes)
+{
   std::string integerPortion = "";
   std::string decimalPortion = "";
 
@@ -119,8 +122,7 @@ static _ClipTimeString _DeriveClipTimeString(const double currentClipTime,
   // specification, such as foo.###.###.usd
   if (numDecimalHashes != 0) {
     auto decimalSpec = "%.0" + TfStringify(numDecimalHashes) + "f";
-    std::string stringRep =
-        TfStringPrintf(decimalSpec.c_str(), currentClipTime);
+    std::string stringRep = TfStringPrintf(decimalSpec.c_str(), currentClipTime);
     auto splitAt = stringRep.find('.');
 
     // We trim anything larger that the specified number of values
@@ -130,17 +132,22 @@ static _ClipTimeString _DeriveClipTimeString(const double currentClipTime,
   return {integerPortion, decimalPortion};
 }
 
-static void _DeriveClipInfo(
-    const std::string &templateAssetPath, const double stride,
-    const double activeOffset, const double startTimeCode,
-    const double endTimeCode, boost::optional<VtVec2dArray> *clipTimes,
-    boost::optional<VtVec2dArray> *clipActive,
-    boost::optional<VtArray<SdfAssetPath>> *clipAssetPaths,
-    const SdfPath &usdPrimPath, const PcpLayerStackPtr &sourceLayerStack,
-    const size_t indexOfSourceLayer) {
+static void _DeriveClipInfo(const std::string &templateAssetPath,
+                            const double stride,
+                            const double activeOffset,
+                            const double startTimeCode,
+                            const double endTimeCode,
+                            boost::optional<VtVec2dArray> *clipTimes,
+                            boost::optional<VtVec2dArray> *clipActive,
+                            boost::optional<VtArray<SdfAssetPath>> *clipAssetPaths,
+                            const SdfPath &usdPrimPath,
+                            const PcpLayerStackPtr &sourceLayerStack,
+                            const size_t indexOfSourceLayer)
+{
   if (stride <= 0) {
     TF_WARN("Invalid %s %f for prim <%s>. %s must be greater than 0.",
-            UsdClipsAPIInfoKeys->templateStride.GetText(), stride,
+            UsdClipsAPIInfoKeys->templateStride.GetText(),
+            stride,
             usdPrimPath.GetText(),
             UsdClipsAPIInfoKeys->templateStride.GetText());
     return;
@@ -148,12 +155,15 @@ static void _DeriveClipInfo(
 
   bool activeOffsetProvided = activeOffset != _DefaultClipOffsetValue;
   if (activeOffsetProvided && (std::abs(activeOffset) > stride)) {
-    TF_WARN("Invalid %s %f for prim <%s>. "
-            "Absolute value of %s must not exceed %s %f.",
-            UsdClipsAPIInfoKeys->templateActiveOffset.GetText(), activeOffset,
-            usdPrimPath.GetText(),
-            UsdClipsAPIInfoKeys->templateActiveOffset.GetText(),
-            UsdClipsAPIInfoKeys->templateStride.GetText(), stride);
+    TF_WARN(
+        "Invalid %s %f for prim <%s>. "
+        "Absolute value of %s must not exceed %s %f.",
+        UsdClipsAPIInfoKeys->templateActiveOffset.GetText(),
+        activeOffset,
+        usdPrimPath.GetText(),
+        UsdClipsAPIInfoKeys->templateActiveOffset.GetText(),
+        UsdClipsAPIInfoKeys->templateStride.GetText(),
+        stride);
     return;
   }
 
@@ -177,12 +187,12 @@ static void _DeriveClipInfo(
   // obtain our 'groups', meaning the hash sequences denoting
   // how much padding the user is requesting in their template string
   for (const auto &token : tokenizedBasename) {
-    if (std::all_of(token.begin(), token.end(),
-                    [](const char &c) { return c == '#'; })) {
+    if (std::all_of(token.begin(), token.end(), [](const char &c) { return c == '#'; })) {
       if (integerHashSectionIndex == std::numeric_limits<size_t>::max()) {
         numIntegerHashes = token.size();
         integerHashSectionIndex = tokenIndex;
-      } else {
+      }
+      else {
         numDecimalHashes = token.size();
         decimalHashSectionIndex = tokenIndex;
       }
@@ -192,23 +202,28 @@ static void _DeriveClipInfo(
   }
 
   if ((matchingGroups != 1 && matchingGroups != 2) ||
-      (matchingGroups == 2 &&
-       (integerHashSectionIndex != decimalHashSectionIndex - 1))) {
-    TF_WARN("Invalid %s '%s' for prim <%s>. It must be "
-            "of the form path/basename.###.usd or "
-            "path/basename.###.###.usd. Note that the number "
-            "of hash marks is variable in each group.",
-            UsdClipsAPIInfoKeys->templateAssetPath.GetText(),
-            templateAssetPath.c_str(), usdPrimPath.GetText());
+      (matchingGroups == 2 && (integerHashSectionIndex != decimalHashSectionIndex - 1)))
+  {
+    TF_WARN(
+        "Invalid %s '%s' for prim <%s>. It must be "
+        "of the form path/basename.###.usd or "
+        "path/basename.###.###.usd. Note that the number "
+        "of hash marks is variable in each group.",
+        UsdClipsAPIInfoKeys->templateAssetPath.GetText(),
+        templateAssetPath.c_str(),
+        usdPrimPath.GetText());
     return;
   }
 
   if (startTimeCode > endTimeCode) {
-    TF_WARN("Invalid time range specified for prim <%s>. "
-            "%s (%f) cannot be greater than %s (%f).",
-            usdPrimPath.GetText(),
-            UsdClipsAPIInfoKeys->templateEndTime.GetText(), endTimeCode,
-            UsdClipsAPIInfoKeys->templateStartTime.GetText(), startTimeCode);
+    TF_WARN(
+        "Invalid time range specified for prim <%s>. "
+        "%s (%f) cannot be greater than %s (%f).",
+        usdPrimPath.GetText(),
+        UsdClipsAPIInfoKeys->templateEndTime.GetText(),
+        endTimeCode,
+        UsdClipsAPIInfoKeys->templateStartTime.GetText(),
+        startTimeCode);
     return;
   }
 
@@ -216,10 +231,8 @@ static void _DeriveClipInfo(
   *clipActive = VtVec2dArray();
   *clipAssetPaths = VtArray<SdfAssetPath>();
 
-  const SdfLayerRefPtr &sourceLayer =
-      sourceLayerStack->GetLayers()[indexOfSourceLayer];
-  const ArResolverContextBinder binder(
-      sourceLayerStack->GetIdentifier().pathResolverContext);
+  const SdfLayerRefPtr &sourceLayer = sourceLayerStack->GetLayers()[indexOfSourceLayer];
+  const ArResolverContextBinder binder(sourceLayerStack->GetIdentifier().pathResolverContext);
   ArResolverScopedCache resolverScopedCache;
   auto &resolver = ArGetResolver();
 
@@ -235,17 +248,15 @@ static void _DeriveClipInfo(
   if (activeOffsetProvided) {
     const double promotedStart = startTimeCode * promotion;
     const double promotedOffset = std::abs(activeOffset) * promotion;
-    const double clipTime =
-        (promotedStart - promotedOffset) / (double)promotion;
+    const double clipTime = (promotedStart - promotedOffset) / (double)promotion;
     (*clipTimes)->push_back(GfVec2d(clipTime, clipTime));
   }
 
-  for (double t = startTimeCode * promotion; t <= endTimeCode * promotion;
-       t += stride * promotion) {
+  for (double t = startTimeCode * promotion; t <= endTimeCode * promotion; t += stride * promotion)
+  {
 
     const double clipTime = t / (double)promotion;
-    auto timeString =
-        _DeriveClipTimeString(clipTime, numIntegerHashes, numDecimalHashes);
+    auto timeString = _DeriveClipTimeString(clipTime, numIntegerHashes, numDecimalHashes);
     tokenizedBasename[integerHashSectionIndex] = timeString.integerPortion;
 
     if (!timeString.decimalPortion.empty()) {
@@ -256,15 +267,14 @@ static void _DeriveClipInfo(
         sourceLayer, path + TfStringJoin(tokenizedBasename, "."));
 
     if (!resolver.Resolve(filePath).empty()) {
-      (*clipAssetPaths)
-          ->push_back(SdfAssetPath(SdfLayer::CreateIdentifier(filePath, args)));
+      (*clipAssetPaths)->push_back(SdfAssetPath(SdfLayer::CreateIdentifier(filePath, args)));
 
       (*clipTimes)->push_back(GfVec2d(clipTime, clipTime));
       if (activeOffsetProvided) {
-        const double offsetTime =
-            (t + (activeOffset * (double)promotion)) / (double)promotion;
+        const double offsetTime = (t + (activeOffset * (double)promotion)) / (double)promotion;
         (*clipActive)->push_back(GfVec2d(offsetTime, clipActiveIndex));
-      } else {
+      }
+      else {
         (*clipActive)->push_back(GfVec2d(clipTime, clipActiveIndex));
       }
       clipActiveIndex++;
@@ -280,8 +290,7 @@ static void _DeriveClipInfo(
     (*clipTimes)->push_back(GfVec2d(clipTime, clipTime));
   }
 
-  _ClipDerivationMsg(UsdClipsAPIInfoKeys->assetPaths, **clipAssetPaths,
-                     usdPrimPath);
+  _ClipDerivationMsg(UsdClipsAPIInfoKeys->assetPaths, **clipAssetPaths, usdPrimPath);
   _ClipDerivationMsg(UsdClipsAPIInfoKeys->times, **clipTimes, usdPrimPath);
   _ClipDerivationMsg(UsdClipsAPIInfoKeys->active, **clipActive, usdPrimPath);
 }
@@ -301,11 +310,11 @@ struct _ClipSet {
   VtDictionary clipInfo;
   std::string name;
 };
-} // namespace
+}  // namespace
 
-template <class T>
-static bool _SetInfo(const VtDictionary &dict, const TfToken &key,
-                     boost::optional<T> *out) {
+template<class T>
+static bool _SetInfo(const VtDictionary &dict, const TfToken &key, boost::optional<T> *out)
+{
   const VtValue *v = TfMapLookupPtr(dict, key.GetString());
   if (v && v->IsHolding<T>()) {
     *out = v->UncheckedGet<T>();
@@ -314,45 +323,50 @@ static bool _SetInfo(const VtDictionary &dict, const TfToken &key,
   return false;
 }
 
-template <class T>
-static const T *_GetInfo(const VtDictionary &dict, const TfToken &key) {
+template<class T> static const T *_GetInfo(const VtDictionary &dict, const TfToken &key)
+{
   const VtValue *v = TfMapLookupPtr(dict, key.GetString());
   return v && v->IsHolding<T>() ? &v->UncheckedGet<T>() : nullptr;
 }
 
-static void _RecordAnchorInfo(const PcpNodeRef &node, size_t layerIdx,
-                              const VtDictionary &clipInfo, _ClipSet *clipSet) {
+static void _RecordAnchorInfo(const PcpNodeRef &node,
+                              size_t layerIdx,
+                              const VtDictionary &clipInfo,
+                              _ClipSet *clipSet)
+{
   // A clip set is anchored to the strongest site containing opinions
   // about asset paths.
-  if (_GetInfo<VtArray<SdfAssetPath>>(clipInfo,
-                                      UsdClipsAPIInfoKeys->assetPaths) ||
-      _GetInfo<std::string>(clipInfo, UsdClipsAPIInfoKeys->templateAssetPath)) {
+  if (_GetInfo<VtArray<SdfAssetPath>>(clipInfo, UsdClipsAPIInfoKeys->assetPaths) ||
+      _GetInfo<std::string>(clipInfo, UsdClipsAPIInfoKeys->templateAssetPath))
+  {
 
     const SdfPath &path = node.GetPath();
     const PcpLayerStackRefPtr &layerStack = node.GetLayerStack();
     const SdfLayerRefPtr &layer = layerStack->GetLayers()[layerIdx];
-    clipSet->anchorInfo = _ClipSet::_AnchorInfo{
-        layerStack, path, layerIdx, 0, // This will get filled in later
-        _GetLayerOffsetToRoot(node, layer)};
+    clipSet->anchorInfo = _ClipSet::_AnchorInfo{layerStack,
+                                                path,
+                                                layerIdx,
+                                                0,  // This will get filled in later
+                                                _GetLayerOffsetToRoot(node, layer)};
   }
 }
 
 static void _ApplyLayerOffsetToClipInfo(const PcpNodeRef &node,
                                         const SdfLayerRefPtr &layer,
                                         const TfToken &infoKey,
-                                        VtDictionary *clipInfo) {
+                                        VtDictionary *clipInfo)
+{
   VtValue *v = TfMapLookupPtr(*clipInfo, infoKey);
   if (v && v->IsHolding<VtVec2dArray>()) {
     VtVec2dArray value;
     v->Swap(value);
-    _ApplyLayerOffsetToExternalTimes(_GetLayerOffsetToRoot(node, layer),
-                                     &value);
+    _ApplyLayerOffsetToExternalTimes(_GetLayerOffsetToRoot(node, layer), &value);
     v->Swap(value);
   }
 }
 
-static void _ResolveClipSetsInNode(const PcpNodeRef &node,
-                                   std::map<std::string, _ClipSet> *result) {
+static void _ResolveClipSetsInNode(const PcpNodeRef &node, std::map<std::string, _ClipSet> *result)
+{
   const SdfPath &primPath = node.GetPath();
   const SdfLayerRefPtrVector &layers = node.GetLayerStack()->GetLayers();
 
@@ -390,33 +404,35 @@ static void _ResolveClipSetsInNode(const PcpNodeRef &node,
         VtValue &clipInfoValue = entry.second;
 
         if (clipSetName.empty()) {
-          TF_WARN("Invalid unnamed clip set for prim <%s> "
-                  "in 'clips' dictionary on spec @%s@<%s>",
-                  node.GetRootNode().GetPath().GetText(),
-                  layer->GetIdentifier().c_str(), primPath.GetText());
+          TF_WARN(
+              "Invalid unnamed clip set for prim <%s> "
+              "in 'clips' dictionary on spec @%s@<%s>",
+              node.GetRootNode().GetPath().GetText(),
+              layer->GetIdentifier().c_str(),
+              primPath.GetText());
           continue;
         }
 
         if (!clipInfoValue.IsHolding<VtDictionary>()) {
-          TF_WARN("Expected dictionary for entry '%s' for prim "
-                  "<%s> in 'clips' dictionary on spec @%s@<%s>",
-                  clipSetName.c_str(), node.GetRootNode().GetPath().GetText(),
-                  layer->GetIdentifier().c_str(), primPath.GetText());
+          TF_WARN(
+              "Expected dictionary for entry '%s' for prim "
+              "<%s> in 'clips' dictionary on spec @%s@<%s>",
+              clipSetName.c_str(),
+              node.GetRootNode().GetPath().GetText(),
+              layer->GetIdentifier().c_str(),
+              primPath.GetText());
           continue;
         }
 
-        _ClipSet &clipSet =
-            clipSetsInNode.emplace(clipSetName, clipSetName).first->second;
+        _ClipSet &clipSet = clipSetsInNode.emplace(clipSetName, clipSetName).first->second;
 
         VtDictionary clipInfoForLayer;
         clipInfoValue.Swap(clipInfoForLayer);
 
         _RecordAnchorInfo(node, i, clipInfoForLayer, &clipSet);
 
-        _ApplyLayerOffsetToClipInfo(node, layer, UsdClipsAPIInfoKeys->active,
-                                    &clipInfoForLayer);
-        _ApplyLayerOffsetToClipInfo(node, layer, UsdClipsAPIInfoKeys->times,
-                                    &clipInfoForLayer);
+        _ApplyLayerOffsetToClipInfo(node, layer, UsdClipsAPIInfoKeys->active, &clipInfoForLayer);
+        _ApplyLayerOffsetToClipInfo(node, layer, UsdClipsAPIInfoKeys->times, &clipInfoForLayer);
 
         VtDictionaryOverRecursive(&clipInfoForLayer, clipSet.clipInfo);
         clipSet.clipInfo.swap(clipInfoForLayer);
@@ -446,16 +462,15 @@ static void _ResolveClipSetsInNode(const PcpNodeRef &node,
   // Filter out composed clip sets that aren't in the addedClipSets list.
   // This could be because they were deleted via the clipSets list op.
   for (auto it = clipSetsInNode.begin(); it != clipSetsInNode.end();) {
-    auto addedIt =
-        std::find(addedClipSets.begin(), addedClipSets.end(), it->first);
+    auto addedIt = std::find(addedClipSets.begin(), addedClipSets.end(), it->first);
     if (addedIt == addedClipSets.end()) {
       it = clipSetsInNode.erase(it);
-    } else {
+    }
+    else {
       // If no anchor info is found, this clip set will be removed
       // later on.
       if (it->second.anchorInfo.layerStack) {
-        it->second.anchorInfo.layerStackOrder =
-            std::distance(addedClipSets.begin(), addedIt);
+        it->second.anchorInfo.layerStackOrder = std::distance(addedClipSets.begin(), addedIt);
       }
       ++it;
     }
@@ -469,7 +484,8 @@ static void _ResolveClipSetsInNode(const PcpNodeRef &node,
 void Usd_ComputeClipSetDefinitionsForPrimIndex(
     const PcpPrimIndex &primIndex,
     std::vector<Usd_ClipSetDefinition> *clipSetDefinitions,
-    std::vector<std::string> *clipSetNames) {
+    std::vector<std::string> *clipSetNames)
+{
   std::map<std::string, _ClipSet> composedClipSets;
 
   // Iterate over all nodes from strong to weak to compose all clip sets
@@ -481,13 +497,11 @@ void Usd_ComputeClipSetDefinitionsForPrimIndex(
       const std::string &clipSetName = entry.first;
       const _ClipSet &nodeClipSet = entry.second;
 
-      _ClipSet &composedClipSet =
-          composedClipSets.emplace(clipSetName, clipSetName).first->second;
+      _ClipSet &composedClipSet = composedClipSets.emplace(clipSetName, clipSetName).first->second;
       if (!composedClipSet.anchorInfo.layerStack) {
         composedClipSet.anchorInfo = nodeClipSet.anchorInfo;
       }
-      VtDictionaryOverRecursive(&composedClipSet.clipInfo,
-                                nodeClipSet.clipInfo);
+      VtDictionaryOverRecursive(&composedClipSet.clipInfo, nodeClipSet.clipInfo);
     }
   }
 
@@ -496,7 +510,8 @@ void Usd_ComputeClipSetDefinitionsForPrimIndex(
   for (auto it = composedClipSets.begin(); it != composedClipSets.end();) {
     if (!it->second.anchorInfo.layerStack) {
       it = composedClipSets.erase(it);
-    } else {
+    }
+    else {
       ++it;
     }
   }
@@ -513,13 +528,13 @@ void Usd_ComputeClipSetDefinitionsForPrimIndex(
   for (auto &entry : composedClipSets) {
     sortedClipSets.emplace_back(std::move(entry.second));
   }
-  std::sort(sortedClipSets.begin(), sortedClipSets.end(),
-            [](const _ClipSet &x, const _ClipSet &y) {
-              return std::tie(x.anchorInfo.layerStack, x.anchorInfo.primPath,
-                              x.anchorInfo.layerStackOrder) <
-                     std::tie(y.anchorInfo.layerStack, y.anchorInfo.primPath,
-                              y.anchorInfo.layerStackOrder);
-            });
+  std::sort(
+      sortedClipSets.begin(), sortedClipSets.end(), [](const _ClipSet &x, const _ClipSet &y) {
+        return std::tie(
+                   x.anchorInfo.layerStack, x.anchorInfo.primPath, x.anchorInfo.layerStackOrder) <
+               std::tie(
+                   y.anchorInfo.layerStack, y.anchorInfo.primPath, y.anchorInfo.layerStackOrder);
+      });
 
   // Unpack the information in the composed clip sets into individual
   // Usd_ResolvedClipInfo objects.
@@ -542,39 +557,42 @@ void Usd_ComputeClipSetDefinitionsForPrimIndex(
 
     const VtDictionary &clipInfo = clipSet.clipInfo;
     _SetInfo(clipInfo, UsdClipsAPIInfoKeys->primPath, &out.clipPrimPath);
-    _SetInfo(clipInfo, UsdClipsAPIInfoKeys->manifestAssetPath,
-             &out.clipManifestAssetPath);
-    _SetInfo(clipInfo, UsdClipsAPIInfoKeys->interpolateMissingClipValues,
+    _SetInfo(clipInfo, UsdClipsAPIInfoKeys->manifestAssetPath, &out.clipManifestAssetPath);
+    _SetInfo(clipInfo,
+             UsdClipsAPIInfoKeys->interpolateMissingClipValues,
              &out.interpolateMissingClipValues);
 
-    if (_SetInfo(clipInfo, UsdClipsAPIInfoKeys->assetPaths,
-                 &out.clipAssetPaths)) {
+    if (_SetInfo(clipInfo, UsdClipsAPIInfoKeys->assetPaths, &out.clipAssetPaths)) {
       _SetInfo(clipInfo, UsdClipsAPIInfoKeys->active, &out.clipActive);
       _SetInfo(clipInfo, UsdClipsAPIInfoKeys->times, &out.clipTimes);
-    } else if (const std::string *templateAssetPath = _GetInfo<std::string>(
-                   clipInfo, UsdClipsAPIInfoKeys->templateAssetPath)) {
+    }
+    else if (const std::string *templateAssetPath = _GetInfo<std::string>(
+                 clipInfo, UsdClipsAPIInfoKeys->templateAssetPath))
+    {
 
-      const double *templateActiveOffset =
-          _GetInfo<double>(clipInfo, UsdClipsAPIInfoKeys->templateActiveOffset);
-      const double *templateStride =
-          _GetInfo<double>(clipInfo, UsdClipsAPIInfoKeys->templateStride);
-      const double *templateStartTime =
-          _GetInfo<double>(clipInfo, UsdClipsAPIInfoKeys->templateStartTime);
-      const double *templateEndTime =
-          _GetInfo<double>(clipInfo, UsdClipsAPIInfoKeys->templateEndTime);
+      const double *templateActiveOffset = _GetInfo<double>(
+          clipInfo, UsdClipsAPIInfoKeys->templateActiveOffset);
+      const double *templateStride = _GetInfo<double>(clipInfo,
+                                                      UsdClipsAPIInfoKeys->templateStride);
+      const double *templateStartTime = _GetInfo<double>(clipInfo,
+                                                         UsdClipsAPIInfoKeys->templateStartTime);
+      const double *templateEndTime = _GetInfo<double>(clipInfo,
+                                                       UsdClipsAPIInfoKeys->templateEndTime);
 
       if (templateStride && templateStartTime && templateEndTime) {
-        _DeriveClipInfo(*templateAssetPath, *templateStride,
-                        (templateActiveOffset ? *templateActiveOffset
-                                              : _DefaultClipOffsetValue),
-                        *templateStartTime, *templateEndTime, &out.clipTimes,
-                        &out.clipActive, &out.clipAssetPaths,
-                        primIndex.GetPath(), out.sourceLayerStack,
+        _DeriveClipInfo(*templateAssetPath,
+                        *templateStride,
+                        (templateActiveOffset ? *templateActiveOffset : _DefaultClipOffsetValue),
+                        *templateStartTime,
+                        *templateEndTime,
+                        &out.clipTimes,
+                        &out.clipActive,
+                        &out.clipAssetPaths,
+                        primIndex.GetPath(),
+                        out.sourceLayerStack,
                         out.indexOfLayerWhereAssetPathsFound);
 
-        auto sourceLayer =
-            out.sourceLayerStack
-                ->GetLayers()[out.indexOfLayerWhereAssetPathsFound];
+        auto sourceLayer = out.sourceLayerStack->GetLayers()[out.indexOfLayerWhereAssetPathsFound];
 
         // Apply layer offsets to clipActive and clipTimes afterwards
         // so that they don't affect the derived asset paths. Consumers
@@ -587,10 +605,8 @@ void Usd_ComputeClipSetDefinitionsForPrimIndex(
         // offsets, this is an uncommon situation -- consumers usually
         // author all clip metadata in the same layer -- and it's not
         // clear what the desired result in that case would be anyway.
-        _ApplyLayerOffsetToExternalTimes(clipSet.anchorInfo.offset,
-                                         &*out.clipTimes);
-        _ApplyLayerOffsetToExternalTimes(clipSet.anchorInfo.offset,
-                                         &*out.clipActive);
+        _ApplyLayerOffsetToExternalTimes(clipSet.anchorInfo.offset, &*out.clipTimes);
+        _ApplyLayerOffsetToExternalTimes(clipSet.anchorInfo.offset, &*out.clipActive);
       }
     }
   }

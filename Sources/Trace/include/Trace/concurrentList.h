@@ -42,7 +42,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This class supports thread safe insertion and iteration over a list of
 /// items.
 ///
-template <typename T> class TraceConcurrentList {
+template<typename T> class TraceConcurrentList {
 
   // Linked list node that is cache line aligned to prevent false sharing.
   struct alignas(ARCH_CACHE_LINE_SIZE * 2) Node {
@@ -50,7 +50,7 @@ template <typename T> class TraceConcurrentList {
     Node *next;
   };
 
-public:
+ public:
   ////////////////////////////////////////////////////////////////////////////
   /// \class iterator
   ///
@@ -58,7 +58,7 @@ public:
   /// items.
   ///
   class iterator {
-  public:
+   public:
     // iterator types
     using iterator_category = std::forward_iterator_tag;
     using value = T;
@@ -68,30 +68,40 @@ public:
 
     iterator() : _node(nullptr) {}
 
-    pointer operator->() { return _node ? &_node->value : nullptr; }
+    pointer operator->()
+    {
+      return _node ? &_node->value : nullptr;
+    }
 
-    reference operator*() { return _node->value; }
+    reference operator*()
+    {
+      return _node->value;
+    }
 
-    iterator &operator++() {
+    iterator &operator++()
+    {
       _node = _node->next;
       return *this;
     }
 
-    iterator operator++(int) {
+    iterator operator++(int)
+    {
       iterator result(*this);
       _node = _node->next;
       return result;
     }
 
-    bool operator!=(const iterator &other) const {
+    bool operator!=(const iterator &other) const
+    {
       return _node != other._node;
     }
 
-    bool operator==(const iterator &other) const {
+    bool operator==(const iterator &other) const
+    {
       return _node == other._node;
     }
 
-  private:
+   private:
     explicit iterator(Node *node) : _node(node) {}
     Node *_node;
     friend class TraceConcurrentList;
@@ -101,7 +111,8 @@ public:
   TraceConcurrentList() : _head(nullptr) {}
 
   /// Destructor.
-  ~TraceConcurrentList() {
+  ~TraceConcurrentList()
+  {
     // Delete all nodes in the list.
     Node *curNode = _head.load(std::memory_order_acquire);
     while (curNode) {
@@ -118,15 +129,22 @@ public:
 
   /// \name Iterator support.
   /// @{
-  iterator begin() { return iterator(_head.load(std::memory_order_acquire)); }
-  iterator end() { return iterator(); }
+  iterator begin()
+  {
+    return iterator(_head.load(std::memory_order_acquire));
+  }
+  iterator end()
+  {
+    return iterator();
+  }
   /// @}
 
   /// Inserts an item at the beginning of the list and returns an iterator to
   /// the newly created item.
-  iterator Insert() {
+  iterator Insert()
+  {
     Node *newNode = _alloc.allocate(1);
-    new(newNode) Node();
+    new (newNode) Node();
 
     // Add the node to the linked list in an atomic manner.
     do {
@@ -135,11 +153,11 @@ public:
     return iterator(newNode);
   }
 
-private:
+ private:
   std::atomic<Node *> _head;
   tbb::cache_aligned_allocator<Node> _alloc;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_CONCURRENT_LIST_H
+#endif  // PXR_BASE_TRACE_CONCURRENT_LIST_H

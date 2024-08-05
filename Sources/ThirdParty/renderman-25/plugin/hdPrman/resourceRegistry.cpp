@@ -22,8 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "hdPrman/resourceRegistry.h"
-#include "hdPrman/renderParam.h"
 #include "Hd/tokens.h"
+#include "hdPrman/renderParam.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,12 +35,9 @@ HdPrman_ResourceRegistry::HdPrman_ResourceRegistry(
 
 HdPrman_ResourceRegistry::~HdPrman_ResourceRegistry() = default;
 
-void HdPrman_ResourceRegistry::ReloadResource(
-    TfToken const &resourceType,
-    std::string const &path)
+void HdPrman_ResourceRegistry::ReloadResource(TfToken const &resourceType, std::string const &path)
 {
-  if (resourceType == HdResourceTypeTokens->texture)
-  {
+  if (resourceType == HdResourceTypeTokens->texture) {
     _renderParam->InvalidateTexture(path);
   }
 }

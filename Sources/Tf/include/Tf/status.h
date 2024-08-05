@@ -42,16 +42,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// In the Python API, you can issue a status message with Tf.Status().
 ///
 class TfStatus : public TfDiagnosticBase {
-private:
-  TfStatus(TfEnum statusCode, char const *statusCodeString,
-           TfCallContext const &context, const std::string &commentary,
-           TfDiagnosticInfo info, bool quiet)
-      : TfDiagnosticBase(statusCode, statusCodeString, context, commentary,
-                         info, quiet) {}
+ private:
+  TfStatus(TfEnum statusCode,
+           char const *statusCodeString,
+           TfCallContext const &context,
+           const std::string &commentary,
+           TfDiagnosticInfo info,
+           bool quiet)
+      : TfDiagnosticBase(statusCode, statusCodeString, context, commentary, info, quiet)
+  {
+  }
 
   friend class TfDiagnosticMgr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_STATUS_H
+#endif  // PXR_BASE_TF_STATUS_H

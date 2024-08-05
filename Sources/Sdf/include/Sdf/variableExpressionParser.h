@@ -39,14 +39,13 @@ class Node;
 /// \class Sdf_VariableExpressionParserResult
 /// Object containing results of parsing an expression.
 class Sdf_VariableExpressionParserResult {
-public:
+ public:
   std::unique_ptr<Sdf_VariableExpressionImpl::Node> expression;
   std::vector<std::string> errors;
 };
 
 /// Parse the given expression.
-Sdf_VariableExpressionParserResult
-Sdf_ParseVariableExpression(const std::string &expr);
+Sdf_VariableExpressionParserResult Sdf_ParseVariableExpression(const std::string &expr);
 
 /// Returns true if \p s is recognized as a variable expression.
 /// This does not check the syntax of the expression.

@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdVol/fieldAsset.h"
 #include "Usd/schemaBase.h"
+#include "UsdVol/fieldAsset.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,76 +40,68 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateFilePathAttr(UsdVolFieldAsset &self,
+                                        object defaultVal,
+                                        bool writeSparsely)
 {
+  return self.CreateFilePathAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset),
+                                 writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateFieldNameAttr(UsdVolFieldAsset &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateFieldNameAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                  writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateFieldIndexAttr(UsdVolFieldAsset &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
+{
+  return self.CreateFieldIndexAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int),
+                                   writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateFilePathAttr(UsdVolFieldAsset &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateFilePathAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset), writeSparsely);
-  }
+static UsdAttribute _CreateFieldDataTypeAttr(UsdVolFieldAsset &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
+{
+  return self.CreateFieldDataTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                      writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateFieldNameAttr(UsdVolFieldAsset &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateFieldNameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static UsdAttribute _CreateVectorDataRoleHintAttr(UsdVolFieldAsset &self,
+                                                  object defaultVal,
+                                                  bool writeSparsely)
+{
+  return self.CreateVectorDataRoleHintAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateFieldIndexAttr(UsdVolFieldAsset &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateFieldIndexAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int), writeSparsely);
-  }
+static std::string _Repr(const UsdVolFieldAsset &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdVol.FieldAsset(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateFieldDataTypeAttr(UsdVolFieldAsset &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreateFieldDataTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateVectorDataRoleHintAttr(UsdVolFieldAsset &self,
-                                object defaultVal, bool writeSparsely)
-  {
-    return self.CreateVectorDataRoleHintAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdVolFieldAsset &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdVol.FieldAsset(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdVolFieldAsset()
 {
   typedef UsdVolFieldAsset This;
 
-  class_<This, bases<UsdVolFieldBase>>
-      cls("FieldAsset");
+  class_<This, bases<UsdVolFieldBase>> cls("FieldAsset");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -122,46 +114,37 @@ void wrapUsdVolFieldAsset()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetFilePathAttr",
-           &This::GetFilePathAttr)
+      .def("GetFilePathAttr", &This::GetFilePathAttr)
       .def("CreateFilePathAttr",
            &_CreateFilePathAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetFieldNameAttr",
-           &This::GetFieldNameAttr)
+      .def("GetFieldNameAttr", &This::GetFieldNameAttr)
       .def("CreateFieldNameAttr",
            &_CreateFieldNameAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetFieldIndexAttr",
-           &This::GetFieldIndexAttr)
+      .def("GetFieldIndexAttr", &This::GetFieldIndexAttr)
       .def("CreateFieldIndexAttr",
            &_CreateFieldIndexAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetFieldDataTypeAttr",
-           &This::GetFieldDataTypeAttr)
+      .def("GetFieldDataTypeAttr", &This::GetFieldDataTypeAttr)
       .def("CreateFieldDataTypeAttr",
            &_CreateFieldDataTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetVectorDataRoleHintAttr",
-           &This::GetVectorDataRoleHintAttr)
+      .def("GetVectorDataRoleHintAttr", &This::GetVectorDataRoleHintAttr)
       .def("CreateVectorDataRoleHintAttr",
            &_CreateVectorDataRoleHintAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -187,11 +170,8 @@ void wrapUsdVolFieldAsset()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

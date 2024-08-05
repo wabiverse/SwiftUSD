@@ -43,13 +43,12 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // fwd decl
-template <class DomainType> class SdfPredicateProgram;
+template<class DomainType> class SdfPredicateProgram;
 
 // fwd decl
-template <class DomainType>
-SdfPredicateProgram<DomainType>
-SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
-                           SdfPredicateLibrary<DomainType> const &lib);
+template<class DomainType>
+SdfPredicateProgram<DomainType> SdfLinkPredicateExpression(
+    SdfPredicateExpression const &expr, SdfPredicateLibrary<DomainType> const &lib);
 
 /// \class SdfPredicateProgram
 ///
@@ -63,17 +62,20 @@ SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
 /// `DomainType` for both SdfPredicateProgram and SdfPredicateLibrary if it's
 /// important that domain type instances aren't passed by-value.
 ///
-template <class DomainType> class SdfPredicateProgram {
-public:
+template<class DomainType> class SdfPredicateProgram {
+ public:
   friend SdfPredicateProgram SdfLinkPredicateExpression<DomainType>(
-      SdfPredicateExpression const &expr,
-      SdfPredicateLibrary<DomainType> const &lib);
+      SdfPredicateExpression const &expr, SdfPredicateLibrary<DomainType> const &lib);
 
   /// Return true if this program has any ops, false otherwise.
-  explicit operator bool() const { return !_ops.empty(); }
+  explicit operator bool() const
+  {
+    return !_ops.empty();
+  }
 
   /// Run the predicate program on \p obj, and return the result.
-  bool operator()(DomainType obj) const {
+  bool operator()(DomainType obj) const
+  {
     bool result = false;
     int nest = 0;
     auto funcIter = _funcs.cbegin();
@@ -86,21 +88,21 @@ public:
       const int origNest = nest;
       for (; opIter != opEnd; ++opIter) {
         switch (*opIter) {
-        case Call:
-          ++funcIter;
-          break; // Skip calls.
-        case Not:
-        case And:
-        case Or:
-          break; // Skip operations.
-        case Open:
-          ++nest;
-          break;
-        case Close:
-          if (--nest == origNest) {
-            return;
-          }
-          break;
+          case Call:
+            ++funcIter;
+            break;  // Skip calls.
+          case Not:
+          case And:
+          case Or:
+            break;  // Skip operations.
+          case Open:
+            ++nest;
+            break;
+          case Close:
+            if (--nest == origNest) {
+              return;
+            }
+            break;
         };
       }
     };
@@ -109,33 +111,33 @@ public:
     // invoking predicate functions.
     for (; opIter != opEnd; ++opIter) {
       switch (*opIter) {
-      case Call:
-        result = static_cast<bool>((*funcIter++)(obj));
-        break;
-      case Not:
-        result = !result;
-        break;
-      case And:
-      case Or: {
-        const bool decidingValue = *opIter != And;
-        // If the and/or result is already the deciding value,
-        // short-circuit.  Otherwise the result is the rhs, so continue.
-        if (result == decidingValue) {
-          shortCircuit();
-        }
-      } break;
-      case Open:
-        ++nest;
-        break;
-      case Close:
-        --nest;
-        break;
+        case Call:
+          result = static_cast<bool>((*funcIter++)(obj));
+          break;
+        case Not:
+          result = !result;
+          break;
+        case And:
+        case Or: {
+          const bool decidingValue = *opIter != And;
+          // If the and/or result is already the deciding value,
+          // short-circuit.  Otherwise the result is the rhs, so continue.
+          if (result == decidingValue) {
+            shortCircuit();
+          }
+        } break;
+        case Open:
+          ++nest;
+          break;
+        case Close:
+          --nest;
+          break;
       };
     }
     return result;
   }
 
-private:
+ private:
   enum _Op { Call, Not, Open, Close, And, Or };
   std::vector<_Op> _ops;
   std::vector<std::function<SdfPredicateFunctionResult(DomainType)>> _funcs;
@@ -144,10 +146,10 @@ private:
 /// Link \p expr with \p lib and return a callable program that evaluates \p
 /// expr on given objects of the \p DomainType.  If linking \p expr and \p lib
 /// fails, issue a TF_RUNTIME_ERROR with a message, and return an empty program.
-template <class DomainType>
-SdfPredicateProgram<DomainType>
-SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
-                           SdfPredicateLibrary<DomainType> const &lib) {
+template<class DomainType>
+SdfPredicateProgram<DomainType> SdfLinkPredicateExpression(
+    SdfPredicateExpression const &expr, SdfPredicateLibrary<DomainType> const &lib)
+{
   using Expr = SdfPredicateExpression;
   using Program = SdfPredicateProgram<DomainType>;
 
@@ -158,38 +160,39 @@ SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
 
   auto exprToProgramOp = [](Expr::Op op) {
     switch (op) {
-    case Expr::Call:
-      return Program::Call;
-    case Expr::Not:
-      return Program::Not;
-    case Expr::ImpliedAnd:
-    case Expr::And:
-      return Program::And;
-    case Expr::Or:
-      return Program::Or;
+      case Expr::Call:
+        return Program::Call;
+      case Expr::Not:
+        return Program::Not;
+      case Expr::ImpliedAnd:
+      case Expr::And:
+        return Program::And;
+      case Expr::Or:
+        return Program::Or;
     };
     return static_cast<typename Program::_Op>(-1);
   };
 
   auto translateLogic = [&](Expr::Op op, int argIndex) {
     switch (op) {
-    case Expr::Not: // Not is postfix, RPN-style.
-      if (argIndex == 1) {
-        prog._ops.push_back(Program::Not);
-      }
-      break;
-    case Expr::ImpliedAnd: // Binary logic ops are infix to facilitate
-    case Expr::And:        // short-circuiting.
-    case Expr::Or:
-      if (argIndex == 1) {
-        prog._ops.push_back(exprToProgramOp(op));
-        prog._ops.push_back(Program::Open);
-      } else if (argIndex == 2) {
-        prog._ops.push_back(Program::Close);
-      }
-      break;
-    case Expr::Call:
-      break; // do nothing, handled in translateCall.
+      case Expr::Not:  // Not is postfix, RPN-style.
+        if (argIndex == 1) {
+          prog._ops.push_back(Program::Not);
+        }
+        break;
+      case Expr::ImpliedAnd:  // Binary logic ops are infix to facilitate
+      case Expr::And:         // short-circuiting.
+      case Expr::Or:
+        if (argIndex == 1) {
+          prog._ops.push_back(exprToProgramOp(op));
+          prog._ops.push_back(Program::Open);
+        }
+        else if (argIndex == 2) {
+          prog._ops.push_back(Program::Close);
+        }
+        break;
+      case Expr::Call:
+        break;  // do nothing, handled in translateCall.
     };
   };
 
@@ -199,7 +202,8 @@ SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
     if (auto fn = lib._BindCall(call.funcName, call.args)) {
       prog._funcs.push_back(std::move(fn));
       prog._ops.push_back(Program::Call);
-    } else {
+    }
+    else {
       if (!errs.empty()) {
         errs += ", ";
       }
@@ -219,4 +223,4 @@ SdfLinkPredicateExpression(SdfPredicateExpression const &expr,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PREDICATE_PROGRAM_H
+#endif  // PXR_USD_SDF_PREDICATE_PROGRAM_H

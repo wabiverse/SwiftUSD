@@ -24,19 +24,18 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERT_PREVIEW_MATERIAL_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERT_PREVIEW_MATERIAL_H
 
-#include <pxr/pxrns.h>
 #include "Hd/material.h"
 #include "Hd/materialNetworkInterface.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdMaterialNetworkInterface;
 
 /// Converts USD preview shading nodes to Renderman equivalents.
-void MatfiltConvertPreviewMaterial(
-    HdMaterialNetworkInterface *networkInterface,
-    std::vector<std::string> *outputErrorMessages);
+void MatfiltConvertPreviewMaterial(HdMaterialNetworkInterface *networkInterface,
+                                   std::vector<std::string> *outputErrorMessages);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERT_PREVIEW_MATERIAL_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MATFILT_CONVERT_PREVIEW_MATERIAL_H

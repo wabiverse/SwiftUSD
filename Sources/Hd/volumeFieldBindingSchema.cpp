@@ -33,65 +33,50 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens,
-    HDVOLUMEFIELDBINDING_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdVolumeFieldBindingSchemaTokens, HDVOLUMEFIELDBINDING_SCHEMA_TOKENS);
 
-
-TfTokenVector
-HdVolumeFieldBindingSchema::GetVolumeFieldBindingNames()
+TfTokenVector HdVolumeFieldBindingSchema::GetVolumeFieldBindingNames()
 {
-    HdContainerDataSourceHandle container = GetContainer();
-    if (!container) {
-        return {};
-    }
-    return container->GetNames();
+  HdContainerDataSourceHandle container = GetContainer();
+  if (!container) {
+    return {};
+  }
+  return container->GetNames();
 }
 
-HdPathDataSourceHandle
-HdVolumeFieldBindingSchema::GetVolumeFieldBinding(TfToken const &name)
+HdPathDataSourceHandle HdVolumeFieldBindingSchema::GetVolumeFieldBinding(TfToken const &name)
 {
-    return _GetTypedDataSource<HdPathDataSource>(name);
-}
-
-
-/*static*/
-HdContainerDataSourceHandle
-HdVolumeFieldBindingSchema::BuildRetained(
-    size_t count,
-    TfToken *names,
-    HdDataSourceBaseHandle *values)
-{
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return _GetTypedDataSource<HdPathDataSource>(name);
 }
 
 /*static*/
-HdVolumeFieldBindingSchema
-HdVolumeFieldBindingSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle HdVolumeFieldBindingSchema::BuildRetained(
+    size_t count, TfToken *names, HdDataSourceBaseHandle *values)
 {
-    return HdVolumeFieldBindingSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdVolumeFieldBindingSchemaTokens->volumeFieldBinding))
-        : nullptr);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const TfToken &
-HdVolumeFieldBindingSchema::GetSchemaToken()
+HdVolumeFieldBindingSchema HdVolumeFieldBindingSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdVolumeFieldBindingSchemaTokens->volumeFieldBinding;
-} 
+  return HdVolumeFieldBindingSchema(
+      fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                HdVolumeFieldBindingSchemaTokens->volumeFieldBinding)) :
+                            nullptr);
+}
+
 /*static*/
-const HdDataSourceLocator &
-HdVolumeFieldBindingSchema::GetDefaultLocator()
+const TfToken &HdVolumeFieldBindingSchema::GetSchemaToken()
 {
-    static const HdDataSourceLocator locator(
-        HdVolumeFieldBindingSchemaTokens->volumeFieldBinding
-    );
-    return locator;
-} 
+  return HdVolumeFieldBindingSchemaTokens->volumeFieldBinding;
+}
+/*static*/
+const HdDataSourceLocator &HdVolumeFieldBindingSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdVolumeFieldBindingSchemaTokens->volumeFieldBinding);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -91,100 +91,112 @@ class Tf_NoticeRegistry;
 /// For more on using notices in Python, see the Editor With Notices tutorial.
 ///
 class TfNotice {
-private:
+ private:
   class _DelivererBase;
   typedef TfWeakPtr<_DelivererBase> _DelivererWeakPtr;
   typedef std::list<_DelivererBase *> _DelivererList;
 
   ////////////////////////////////////////////////////////////////////////
   // Per-sender delivery, listener gets sender.
-  template <class LPtr, class L, class Notice, class SPtr, class DeliveredSPtr>
-  static _DelivererBase *
-  _MakeDeliverer(LPtr const &listener,
-                 void (L::*method)(const Notice &, DeliveredSPtr const &),
-                 SPtr const &sender) {
+  template<class LPtr, class L, class Notice, class SPtr, class DeliveredSPtr>
+  static _DelivererBase *_MakeDeliverer(LPtr const &listener,
+                                        void (L::*method)(const Notice &, DeliveredSPtr const &),
+                                        SPtr const &sender)
+  {
     DeliveredSPtr weakSender(sender);
-    return new _DelivererWithSender<
-        LPtr, DeliveredSPtr, void (L::*)(const Notice &, DeliveredSPtr const &),
-        Notice>(listener, method, weakSender);
+    return new _DelivererWithSender<LPtr,
+                                    DeliveredSPtr,
+                                    void (L::*)(const Notice &, DeliveredSPtr const &),
+                                    Notice>(listener, method, weakSender);
   }
 
-  template <class LPtr, class L, class Notice, class SPtr, class DeliveredSPtr>
-  static _DelivererBase *
-  _MakeDeliverer(LPtr const &listener,
-                 void (L::*method)(const Notice &, DeliveredSPtr const &) const,
-                 SPtr const &sender) {
+  template<class LPtr, class L, class Notice, class SPtr, class DeliveredSPtr>
+  static _DelivererBase *_MakeDeliverer(LPtr const &listener,
+                                        void (L::*method)(const Notice &, DeliveredSPtr const &)
+                                            const,
+                                        SPtr const &sender)
+  {
     DeliveredSPtr weakSender(sender);
-    return new _DelivererWithSender<
-        LPtr, DeliveredSPtr,
-        void (L::*)(const Notice &, DeliveredSPtr const &) const, Notice>(
-        listener, method, weakSender);
+    return new _DelivererWithSender<LPtr,
+                                    DeliveredSPtr,
+                                    void (L::*)(const Notice &, DeliveredSPtr const &) const,
+                                    Notice>(listener, method, weakSender);
   }
 
   ////////////////////////////////////////////////////////////////////////
   // Per-sender delivery, listener does not get sender.
-  template <class LPtr, class L, class SPtr, class Notice>
+  template<class LPtr, class L, class SPtr, class Notice>
   static _DelivererBase *_MakeDeliverer(LPtr const &listener,
                                         void (L::*method)(const Notice &),
-                                        SPtr const &sender) {
+                                        SPtr const &sender)
+  {
     return new _Deliverer<LPtr, SPtr, void (L::*)(const Notice &), Notice>(
         listener, method, sender);
   }
 
-  template <class LPtr, class L, class SPtr, class Notice>
+  template<class LPtr, class L, class SPtr, class Notice>
   static _DelivererBase *_MakeDeliverer(LPtr const &listener,
                                         void (L::*method)(const Notice &) const,
-                                        SPtr const &sender) {
-    return new _Deliverer<LPtr, SPtr, void (L::*)(const Notice &) const,
-                          Notice>(listener, method, sender);
+                                        SPtr const &sender)
+  {
+    return new _Deliverer<LPtr, SPtr, void (L::*)(const Notice &) const, Notice>(
+        listener, method, sender);
   }
 
   ////////////////////////////////////////////////////////////////////////
   // Global delivery.
-  template <class LPtr, class L, class Notice>
-  static _DelivererBase *_MakeDeliverer(LPtr const &listener,
-                                        void (L::*method)(const Notice &)) {
-    return new _Deliverer<LPtr, TfAnyWeakPtr, void (L::*)(const Notice &),
-                          Notice>(listener, method);
+  template<class LPtr, class L, class Notice>
+  static _DelivererBase *_MakeDeliverer(LPtr const &listener, void (L::*method)(const Notice &))
+  {
+    return new _Deliverer<LPtr, TfAnyWeakPtr, void (L::*)(const Notice &), Notice>(listener,
+                                                                                   method);
   }
 
-  template <class LPtr, class L, class Notice>
+  template<class LPtr, class L, class Notice>
   static _DelivererBase *_MakeDeliverer(LPtr const &listener,
-                                        void (L::*method)(const Notice &)
-                                            const) {
-    return new _Deliverer<LPtr, TfAnyWeakPtr, void (L::*)(const Notice &) const,
-                          Notice>(listener, method);
+                                        void (L::*method)(const Notice &) const)
+  {
+    return new _Deliverer<LPtr, TfAnyWeakPtr, void (L::*)(const Notice &) const, Notice>(listener,
+                                                                                         method);
   }
 
   ////////////////////////////////////////////////////////////////////////
   // Generic (raw) delivery.
-  template <class LPtr, class L>
-  static _DelivererBase *
-  _MakeDeliverer(TfType const &noticeType, LPtr const &listener,
-                 void (L::*method)(const TfNotice &, const TfType &,
-                                   TfWeakBase *, const void *,
-                                   const std::type_info &),
-                 TfAnyWeakPtr const &sender) {
-    return new _RawDeliverer<LPtr, void (L::*)(const TfNotice &, const TfType &,
-                                               TfWeakBase *, const void *,
-                                               const std::type_info &)>(
+  template<class LPtr, class L>
+  static _DelivererBase *_MakeDeliverer(TfType const &noticeType,
+                                        LPtr const &listener,
+                                        void (L::*method)(const TfNotice &,
+                                                          const TfType &,
+                                                          TfWeakBase *,
+                                                          const void *,
+                                                          const std::type_info &),
+                                        TfAnyWeakPtr const &sender)
+  {
+    return new _RawDeliverer<
+        LPtr,
+        void (L::*)(
+            const TfNotice &, const TfType &, TfWeakBase *, const void *, const std::type_info &)>(
         listener, method, sender, noticeType);
   }
 
-  template <class LPtr, class L>
-  static _DelivererBase *
-  _MakeDeliverer(TfType const &noticeType, LPtr const &listener,
-                 void (L::*method)(const TfNotice &, const TfType &,
-                                   TfWeakBase *, const void *,
-                                   const std::type_info &) const,
-                 TfAnyWeakPtr const &sender) {
-    return new _RawDeliverer<LPtr, void (L::*)(const TfNotice &, const TfType &,
-                                               TfWeakBase *, const void *,
-                                               const std::type_info &) const>(
-        listener, method, sender, noticeType);
+  template<class LPtr, class L>
+  static _DelivererBase *_MakeDeliverer(TfType const &noticeType,
+                                        LPtr const &listener,
+                                        void (L::*method)(const TfNotice &,
+                                                          const TfType &,
+                                                          TfWeakBase *,
+                                                          const void *,
+                                                          const std::type_info &) const,
+                                        TfAnyWeakPtr const &sender)
+  {
+    return new _RawDeliverer<
+        LPtr,
+        void (L::*)(
+            const TfNotice &, const TfType &, TfWeakBase *, const void *, const std::type_info &)
+            const>(listener, method, sender, noticeType);
   }
 
-public:
+ public:
   class Probe;
   typedef TfWeakPtr<Probe> WeakProbePtr;
 
@@ -192,14 +204,15 @@ public:
   /// \c InsertProbe to introspect about notices as they are sent and
   /// delivered.
   class Probe : public TfWeakBase {
-  public:
+   public:
     TF_API
     virtual ~Probe() = 0;
 
     /// This method is called just before \p notice is sent to any
     /// listeners.  \p sender is NULL if \p notice is sent globally.  In
     /// this case, \p senderType will be typeid(void).
-    virtual void BeginSend(const TfNotice &notice, const TfWeakBase *sender,
+    virtual void BeginSend(const TfNotice &notice,
+                           const TfWeakBase *sender,
                            const std::type_info &senderType) = 0;
 
     /// This method is called after the notice in the corresponding \c
@@ -210,7 +223,8 @@ public:
     /// delivered to a listener.  \p sender is NULL if \p notice is
     /// sent globally or the listener is global.  In this case, \p
     /// senderType will be typeid(void).
-    virtual void BeginDelivery(const TfNotice &notice, const TfWeakBase *sender,
+    virtual void BeginDelivery(const TfNotice &notice,
+                               const TfWeakBase *sender,
                                const std::type_info &senderType,
                                const TfWeakBase *listener,
                                const std::type_info &listenerType) = 0;
@@ -228,21 +242,27 @@ public:
   /// Revoke() to subsequently unregister the listener with respect to that
   /// particular notice type and callback method.
   class Key {
-  public:
+   public:
     Key() {}
 
     /// Does this key refer to a valid notification?
     ///
     /// \c IsValid will return true if this key refers to a currently
     /// active notification.  Revoking the key will make it invalid again.
-    bool IsValid() const { return _deliverer && _deliverer->_IsActive(); }
+    bool IsValid() const
+    {
+      return _deliverer && _deliverer->_IsActive();
+    }
 
     /// Does this key refer to a valid notification?
     ///
     /// The boolean operator is identical to \c IsValid() above.
-    operator bool() const { return IsValid(); }
+    operator bool() const
+    {
+      return IsValid();
+    }
 
-  private:
+   private:
     Key(const _DelivererWeakPtr &d) : _deliverer(d) {}
 
     _DelivererWeakPtr _deliverer;
@@ -326,21 +346,24 @@ public:
   ///
   /// To reverse the registration, call \c Key::Revoke() on the \c Key
   /// object returned by this call.
-  template <class LPtr, class MethodPtr>
-  static TfNotice::Key Register(LPtr const &listener, MethodPtr method) {
+  template<class LPtr, class MethodPtr>
+  static TfNotice::Key Register(LPtr const &listener, MethodPtr method)
+  {
     return _Register(_MakeDeliverer(listener, method));
   }
 
-  template <class LPtr, class MethodPtr, class SenderPtr>
-  static TfNotice::Key Register(LPtr const &listener, MethodPtr method,
-                                SenderPtr const &sender) {
+  template<class LPtr, class MethodPtr, class SenderPtr>
+  static TfNotice::Key Register(LPtr const &listener, MethodPtr method, SenderPtr const &sender)
+  {
     return _Register(_MakeDeliverer(listener, method, sender));
   }
 
-  template <class LPtr, class MethodPtr>
-  static TfNotice::Key Register(LPtr const &listener, MethodPtr method,
+  template<class LPtr, class MethodPtr>
+  static TfNotice::Key Register(LPtr const &listener,
+                                MethodPtr method,
                                 const TfType &noticeType,
-                                const TfAnyWeakPtr &sender) {
+                                const TfAnyWeakPtr &sender)
+  {
     return _Register(_MakeDeliverer(noticeType, listener, method, sender));
   }
 
@@ -394,7 +417,7 @@ public:
   /// listeners. Note that a listener is called in the thread in which \c
   /// Send() is called and \e not necessarily in the thread that \c
   /// Register() was called in.
-  template <typename SenderPtr> size_t Send(SenderPtr const &s) const;
+  template<typename SenderPtr> size_t Send(SenderPtr const &s) const;
 
   /// Variant of Send() that takes a specific sender in the form of a
   /// TfWeakBase pointer and a typeid.
@@ -419,23 +442,24 @@ public:
   /// will continue until all \c TfNotice::Block objects are destroyed.
   /// Notices that are sent when blocking is active will *not* be resent.
   class Block {
-  public:
+   public:
     TF_API Block();
     TF_API ~Block();
   };
 
-private:
+ private:
   // Abstract base class for calling listeners.
   // A typed-version derives (via templating) off this class.
   class _DelivererBase : public TfWeakBase {
-  public:
+   public:
     _DelivererBase() : _list(0), _active(true), _markedForRemoval(false) {}
 
     TF_API
     virtual ~_DelivererBase();
 
     TF_API
-    void _BeginDelivery(const TfNotice &notice, const TfWeakBase *sender,
+    void _BeginDelivery(const TfNotice &notice,
+                        const TfWeakBase *sender,
                         const std::type_info &senderType,
                         const TfWeakBase *listener,
                         const std::type_info &listenerType,
@@ -449,40 +473,52 @@ private:
     // unless the listener has expired or been marked in active (i.e. by
     // TfNotice::Revoke()), in which case the method call is skipped and
     // \c false is returned.
-    virtual bool
-    _SendToListener(const TfNotice &n, const TfType &type, const TfWeakBase *s,
-                    const void *senderUniqueId,
-                    const std::type_info &senderType,
-                    const std::vector<TfNotice::WeakProbePtr> &probes) = 0;
+    virtual bool _SendToListener(const TfNotice &n,
+                                 const TfType &type,
+                                 const TfWeakBase *s,
+                                 const void *senderUniqueId,
+                                 const std::type_info &senderType,
+                                 const std::vector<TfNotice::WeakProbePtr> &probes) = 0;
 
-    void _Deactivate() { _active = false; }
+    void _Deactivate()
+    {
+      _active = false;
+    }
 
-    bool _IsActive() const { return _active; }
+    bool _IsActive() const
+    {
+      return _active;
+    }
 
-    void _MarkForRemoval() { _markedForRemoval = true; }
+    void _MarkForRemoval()
+    {
+      _markedForRemoval = true;
+    }
 
     // True if the entry has been added to the _deadEntries list for
     // removal.  Used to avoid adding it more than once to the list.
-    bool _IsMarkedForRemoval() const { return _markedForRemoval; }
+    bool _IsMarkedForRemoval() const
+    {
+      return _markedForRemoval;
+    }
 
     virtual TfType GetNoticeType() const = 0;
 
-    virtual bool Delivers(TfType const &noticeType,
-                          const TfWeakBase *sender) const = 0;
+    virtual bool Delivers(TfType const &noticeType, const TfWeakBase *sender) const = 0;
 
     virtual TfWeakBase const *GetSenderWeakBase() const = 0;
 
     virtual _DelivererBase *Clone() const = 0;
 
-  protected:
-    template <class ToNoticeType, class FromNoticeType>
-    static inline ToNoticeType const *_CastNotice(FromNoticeType const *from) {
+   protected:
+    template<class ToNoticeType, class FromNoticeType>
+    static inline ToNoticeType const *_CastNotice(FromNoticeType const *from)
+    {
       // Dynamic casting in deliverers is significant overhead, so only
       // do error checking in debug builds.
       if (TF_DEV_BUILD) {
         if (!dynamic_cast<ToNoticeType const *>(from)) {
-          ToNoticeType const *castNotice =
-              TfSafeDynamic_cast<ToNoticeType const *>(from);
+          ToNoticeType const *castNotice = TfSafeDynamic_cast<ToNoticeType const *>(from);
           // this will abort with a clear error message if
           // castNotice is NULL
           TfNotice::_VerifyFailedCast(typeid(ToNoticeType), *from, castNotice);
@@ -491,7 +527,7 @@ private:
       return static_cast<ToNoticeType const *>(from);
     }
 
-  private:
+   private:
     // Linkage to the containing _DelivererList in the Tf_NoticeRegistry
     _DelivererList *_list;
     _DelivererList::iterator _listIter;
@@ -502,11 +538,12 @@ private:
     friend class Tf_NoticeRegistry;
   };
 
-  template <class Derived> class _StandardDeliverer : public _DelivererBase {
-  public:
+  template<class Derived> class _StandardDeliverer : public _DelivererBase {
+   public:
     virtual ~_StandardDeliverer() {}
 
-    virtual TfType GetNoticeType() const {
+    virtual TfType GetNoticeType() const
+    {
       typedef typename Derived::NoticeType NoticeType;
       TfType ret = TfType::Find<NoticeType>();
       if (ret.IsUnknown())
@@ -515,29 +552,32 @@ private:
       return ret;
     }
 
-    virtual bool Delivers(TfType const &noticeType,
-                          TfWeakBase const *sender) const {
+    virtual bool Delivers(TfType const &noticeType, TfWeakBase const *sender) const
+    {
       Derived const *derived = this->AsDerived();
-      return noticeType.IsA(GetNoticeType()) && !derived->_sender.IsInvalid() &&
-             sender && derived->_sender.GetWeakBase() == sender;
+      return noticeType.IsA(GetNoticeType()) && !derived->_sender.IsInvalid() && sender &&
+             derived->_sender.GetWeakBase() == sender;
     }
 
-    virtual TfWeakBase const *GetSenderWeakBase() const {
+    virtual TfWeakBase const *GetSenderWeakBase() const
+    {
       Derived const *derived = this->AsDerived();
       return derived->_sender ? derived->_sender.GetWeakBase() : 0;
     }
 
-    virtual _DelivererBase *Clone() const {
+    virtual _DelivererBase *Clone() const
+    {
       Derived const *derived = this->AsDerived();
-      return new Derived(derived->_listener, derived->_method, derived->_sender,
-                         GetNoticeType());
+      return new Derived(derived->_listener, derived->_method, derived->_sender, GetNoticeType());
     }
 
-    virtual bool
-    _SendToListener(const TfNotice &notice, const TfType &noticeType,
-                    const TfWeakBase *sender, const void *senderUniqueId,
-                    const std::type_info &senderType,
-                    const std::vector<TfNotice::WeakProbePtr> &probes) {
+    virtual bool _SendToListener(const TfNotice &notice,
+                                 const TfType &noticeType,
+                                 const TfWeakBase *sender,
+                                 const void *senderUniqueId,
+                                 const std::type_info &senderType,
+                                 const std::vector<TfNotice::WeakProbePtr> &probes)
+    {
       Derived *derived = this->AsDerived();
       typedef typename Derived::ListenerType ListenerType;
       typedef typename Derived::NoticeType NoticeType;
@@ -547,14 +587,20 @@ private:
         if (ARCH_UNLIKELY(!probes.empty())) {
           TfWeakBase const *senderWeakBase = GetSenderWeakBase(),
                            *listenerWeakBase = derived->_listener.GetWeakBase();
-          _BeginDelivery(notice, senderWeakBase,
+          _BeginDelivery(notice,
+                         senderWeakBase,
                          senderWeakBase ? senderType : typeid(void),
-                         listenerWeakBase, typeid(ListenerType), probes);
+                         listenerWeakBase,
+                         typeid(ListenerType),
+                         probes);
         }
 
-        derived->_InvokeListenerMethod(
-            listener, *_CastNotice<NoticeType>(&notice), noticeType, sender,
-            senderUniqueId, senderType);
+        derived->_InvokeListenerMethod(listener,
+                                       *_CastNotice<NoticeType>(&notice),
+                                       noticeType,
+                                       sender,
+                                       senderUniqueId,
+                                       senderType);
 
         if (ARCH_UNLIKELY(!probes.empty()))
           _EndDelivery(probes);
@@ -564,29 +610,40 @@ private:
       return false;
     }
 
-  private:
-    Derived *AsDerived() { return static_cast<Derived *>(this); }
+   private:
+    Derived *AsDerived()
+    {
+      return static_cast<Derived *>(this);
+    }
 
-    Derived const *AsDerived() const {
+    Derived const *AsDerived() const
+    {
       return static_cast<Derived const *>(this);
     }
   };
 
-  template <typename LPtr, typename SPtr, typename Method, typename Notice>
-  class _Deliverer
-      : public _StandardDeliverer<_Deliverer<LPtr, SPtr, Method, Notice>> {
-  public:
+  template<typename LPtr, typename SPtr, typename Method, typename Notice>
+  class _Deliverer : public _StandardDeliverer<_Deliverer<LPtr, SPtr, Method, Notice>> {
+   public:
     typedef Notice NoticeType;
     typedef typename LPtr::DataType ListenerType;
     typedef Method MethodPtr;
 
-    _Deliverer(LPtr const &listener, MethodPtr const &methodPtr,
-               SPtr const &sender = SPtr(), TfType const &noticeType = TfType())
-        : _listener(listener), _sender(sender), _method(methodPtr) {}
+    _Deliverer(LPtr const &listener,
+               MethodPtr const &methodPtr,
+               SPtr const &sender = SPtr(),
+               TfType const &noticeType = TfType())
+        : _listener(listener), _sender(sender), _method(methodPtr)
+    {
+    }
 
-    void _InvokeListenerMethod(ListenerType *listener, const NoticeType &notice,
-                               const TfType &noticeType, const TfWeakBase *,
-                               const void *, const std::type_info &) {
+    void _InvokeListenerMethod(ListenerType *listener,
+                               const NoticeType &notice,
+                               const TfType &noticeType,
+                               const TfWeakBase *,
+                               const void *,
+                               const std::type_info &)
+    {
       (listener->*_method)(notice);
     }
 
@@ -595,27 +652,35 @@ private:
     MethodPtr _method;
   };
 
-  template <class LPtr, class Method>
+  template<class LPtr, class Method>
   class _RawDeliverer : public _StandardDeliverer<_RawDeliverer<LPtr, Method>> {
-  public:
+   public:
     typedef TfNotice NoticeType;
     typedef typename LPtr::DataType ListenerType;
     typedef Method MethodPtr;
 
-    _RawDeliverer(LPtr const &listener, MethodPtr const &methodPtr,
-                  TfAnyWeakPtr const &sender, TfType const &noticeType)
-        : _noticeType(noticeType), _listener(listener), _method(methodPtr),
-          _sender(sender) {}
+    _RawDeliverer(LPtr const &listener,
+                  MethodPtr const &methodPtr,
+                  TfAnyWeakPtr const &sender,
+                  TfType const &noticeType)
+        : _noticeType(noticeType), _listener(listener), _method(methodPtr), _sender(sender)
+    {
+    }
 
-    virtual TfType GetNoticeType() const { return _noticeType; }
+    virtual TfType GetNoticeType() const
+    {
+      return _noticeType;
+    }
 
-    void _InvokeListenerMethod(ListenerType *listener, const NoticeType &notice,
+    void _InvokeListenerMethod(ListenerType *listener,
+                               const NoticeType &notice,
                                const TfType &noticeType,
                                const TfWeakBase *sender,
                                const void *senderUniqueId,
-                               const std::type_info &senderType) {
-      (listener->*_method)(notice, noticeType, const_cast<TfWeakBase *>(sender),
-                           senderUniqueId, senderType);
+                               const std::type_info &senderType)
+    {
+      (listener->*_method)(
+          notice, noticeType, const_cast<TfWeakBase *>(sender), senderUniqueId, senderType);
     }
 
     TfType _noticeType;
@@ -624,28 +689,32 @@ private:
     TfAnyWeakPtr _sender;
   };
 
-  template <class LPtr, class SPtr, class Method, class Notice>
+  template<class LPtr, class SPtr, class Method, class Notice>
   class _DelivererWithSender
-      : public _StandardDeliverer<
-            _DelivererWithSender<LPtr, SPtr, Method, Notice>> {
-  public:
+      : public _StandardDeliverer<_DelivererWithSender<LPtr, SPtr, Method, Notice>> {
+   public:
     typedef Notice NoticeType;
     typedef Method MethodPtr;
     typedef typename LPtr::DataType ListenerType;
 
     typedef typename SPtr::DataType SenderType;
 
-    _DelivererWithSender(LPtr const &listener, MethodPtr const &methodPtr,
+    _DelivererWithSender(LPtr const &listener,
+                         MethodPtr const &methodPtr,
                          SPtr const &sender,
                          TfType const &noticeType = TfType())
-        : _listener(listener), _sender(sender), _method(methodPtr) {}
+        : _listener(listener), _sender(sender), _method(methodPtr)
+    {
+    }
 
-    void _InvokeListenerMethod(ListenerType *listener, const NoticeType &notice,
+    void _InvokeListenerMethod(ListenerType *listener,
+                               const NoticeType &notice,
                                const TfType &noticeType,
-                               const TfWeakBase *sender, const void *,
-                               const std::type_info &) {
-      SenderType *deliveredSender =
-          static_cast<SenderType *>(const_cast<TfWeakBase *>(sender));
+                               const TfWeakBase *sender,
+                               const void *,
+                               const std::type_info &)
+    {
+      SenderType *deliveredSender = static_cast<SenderType *>(const_cast<TfWeakBase *>(sender));
       SPtr deliveredSPtr(deliveredSender);
       (listener->*_method)(notice, deliveredSPtr);
     }
@@ -655,7 +724,7 @@ private:
     MethodPtr _method;
   };
 
-private:
+ private:
   // Internal non-templated function to install listeners.
   TF_API
   static Key _Register(_DelivererBase *);
@@ -666,10 +735,12 @@ private:
                                 const TfNotice *castNotice);
 
   TF_API
-  size_t _Send(const TfWeakBase *sender, const void *senderUniqueId,
+  size_t _Send(const TfWeakBase *sender,
+               const void *senderUniqueId,
                const std::type_info &senderType) const;
   TF_API
-  size_t _SendWithType(const TfType &noticeType, const TfWeakBase *sender,
+  size_t _SendWithType(const TfType &noticeType,
+                       const TfWeakBase *sender,
                        const void *senderUniqueId,
                        const std::type_info &senderType) const;
 
@@ -680,13 +751,14 @@ private:
   friend class Tf_PyNotice;
 };
 
-template <typename SenderPtr> size_t TfNotice::Send(SenderPtr const &s) const {
+template<typename SenderPtr> size_t TfNotice::Send(SenderPtr const &s) const
+{
   const TfWeakBase *senderWeakBase = s ? s.GetWeakBase() : NULL;
-  return _Send(senderWeakBase, senderWeakBase ? s.GetUniqueIdentifier() : 0,
-               senderWeakBase ? typeid(typename SenderPtr::DataType)
-                              : typeid(void));
+  return _Send(senderWeakBase,
+               senderWeakBase ? s.GetUniqueIdentifier() : 0,
+               senderWeakBase ? typeid(typename SenderPtr::DataType) : typeid(void));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_NOTICE_H
+#endif  // PXR_BASE_TF_NOTICE_H

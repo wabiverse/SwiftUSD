@@ -32,7 +32,8 @@ using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-string TfGetenv(const string &envName, const string &defaultValue) {
+string TfGetenv(const string &envName, const string &defaultValue)
+{
   string value = ArchGetEnv(envName);
 
   if (value.empty())
@@ -41,7 +42,8 @@ string TfGetenv(const string &envName, const string &defaultValue) {
     return value;
 }
 
-int TfGetenvInt(const string &envName, int defaultValue) {
+int TfGetenvInt(const string &envName, int defaultValue)
+{
   string value = ArchGetEnv(envName);
 
   if (value.empty())
@@ -50,7 +52,8 @@ int TfGetenvInt(const string &envName, int defaultValue) {
     return std::stoi(value);
 }
 
-bool TfGetenvBool(const string &envName, bool defaultValue) {
+bool TfGetenvBool(const string &envName, bool defaultValue)
+{
   string value = ArchGetEnv(envName);
 
   if (value.empty())
@@ -63,7 +66,8 @@ bool TfGetenvBool(const string &envName, bool defaultValue) {
   }
 }
 
-double TfGetenvDouble(const string &envName, double defaultValue) {
+double TfGetenvDouble(const string &envName, double defaultValue)
+{
   string value = ArchGetEnv(envName);
 
   if (value.empty())

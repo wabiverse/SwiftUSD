@@ -72,11 +72,14 @@ SDF_DECLARE_HANDLES(SdfLayer);
 ///
 class UsdResolveTarget {
 
-public:
+ public:
   UsdResolveTarget() = default;
 
   /// Get the prim index of the resolve target.
-  const PcpPrimIndex *GetPrimIndex() const { return _expandedPrimIndex.get(); }
+  const PcpPrimIndex *GetPrimIndex() const
+  {
+    return _expandedPrimIndex.get();
+  }
 
   /// Returns the node that value resolution with this resolve target will
   /// start at.
@@ -99,9 +102,12 @@ public:
   SdfLayerHandle GetStopLayer() const;
 
   /// Returns true if this is a null resolve target.
-  bool IsNull() const { return !bool(_expandedPrimIndex); }
+  bool IsNull() const
+  {
+    return !bool(_expandedPrimIndex);
+  }
 
-private:
+ private:
   // Non-null UsdResolveTargets can only be created by functions in UsdPrim
   // and UsdPrimCompositionQueryArc.
   friend class UsdPrim;
@@ -112,12 +118,15 @@ private:
 
   USD_API
   UsdResolveTarget(const std::shared_ptr<PcpPrimIndex> &index,
-                   const PcpNodeRef &node, const SdfLayerHandle &layer);
+                   const PcpNodeRef &node,
+                   const SdfLayerHandle &layer);
 
   USD_API
   UsdResolveTarget(const std::shared_ptr<PcpPrimIndex> &index,
-                   const PcpNodeRef &node, const SdfLayerHandle &layer,
-                   const PcpNodeRef &stopNode, const SdfLayerHandle &stopLayer);
+                   const PcpNodeRef &node,
+                   const SdfLayerHandle &layer,
+                   const PcpNodeRef &stopNode,
+                   const SdfLayerHandle &stopLayer);
 
   // Resolve targets are created with an expanded prim index either from
   // a composition query (which owns and holds it) or from a UsdPrim (which
@@ -135,4 +144,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RESOLVE_TARGET_H
+#endif  // PXR_USD_USD_RESOLVE_TARGET_H

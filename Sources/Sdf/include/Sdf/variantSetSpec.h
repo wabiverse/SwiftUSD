@@ -62,20 +62,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfVariantSetSpec : public SdfSpec {
   SDF_DECLARE_SPEC(SdfVariantSetSpec, SdfSpec);
 
-public:
+ public:
   ///
   /// \name Spec construction
   /// @{
 
   /// Constructs a new instance.
   SDF_API
-  static SdfVariantSetSpecHandle New(const SdfPrimSpecHandle &prim,
-                                     const std::string &name);
+  static SdfVariantSetSpecHandle New(const SdfPrimSpecHandle &prim, const std::string &name);
 
   /// Constructs a new instance.
   SDF_API
-  static SdfVariantSetSpecHandle New(const SdfVariantSpecHandle &prim,
-                                     const std::string &name);
+  static SdfVariantSetSpecHandle New(const SdfVariantSpecHandle &prim, const std::string &name);
 
   /// @}
 
@@ -122,4 +120,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // SD_VARIANTSETSPEC_H
+#endif  // SD_VARIANTSETSPEC_H

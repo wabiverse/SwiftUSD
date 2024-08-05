@@ -33,13 +33,13 @@
 
 using std::string;
 
-#if (ARCH_COMPILER_GCC_MAJOR == 3 && ARCH_COMPILER_GCC_MINOR >= 1) ||          \
+#if (ARCH_COMPILER_GCC_MAJOR == 3 && ARCH_COMPILER_GCC_MINOR >= 1) || \
     ARCH_COMPILER_GCC_MAJOR > 3 || defined(ARCH_COMPILER_CLANG)
-#define _AT_LEAST_GCC_THREE_ONE_OR_CLANG
+#  define _AT_LEAST_GCC_THREE_ONE_OR_CLANG
 #endif
 
 #if defined(_AT_LEAST_GCC_THREE_ONE_OR_CLANG)
-#include <cxxabi.h>
+#  include <cxxabi.h>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -70,7 +70,8 @@ static string *_NewDemangledStringTypeName();
  * Make references to "string" just a bit more understandable...
  */
 
-static void _FixupStringNames(string *name) {
+static void _FixupStringNames(string *name)
+{
   static string *from = _NewDemangledStringTypeName();
   static string *to = new string("string");
 
@@ -88,8 +89,9 @@ static void _FixupStringNames(string *name) {
     // but on clang this comes in as Foo<std::__1::basic_string<...> >.
     // In both cases, we want to end the outer loop with Foo<std::string>.
     string::size_type numSpaces = 0;
-    for (string::size_type i = pos, e = name->size();
-         i != e && (*name)[i] == ' '; ++i, ++numSpaces) {
+    for (string::size_type i = pos, e = name->size(); i != e && (*name)[i] == ' ';
+         ++i, ++numSpaces)
+    {
     }
     name->erase(pos, numSpaces);
   }
@@ -119,10 +121,11 @@ static void _FixupStringNames(string *name) {
 
 #if PXR_USE_NAMESPACES
 
-#define ARCH_STRINGIZE_EXPAND(x) #x
-#define ARCH_STRINGIZE(x) ARCH_STRINGIZE_EXPAND(x)
+#  define ARCH_STRINGIZE_EXPAND(x) #x
+#  define ARCH_STRINGIZE(x) ARCH_STRINGIZE_EXPAND(x)
 
-static void _StripPxrInternalNamespace(string *name) {
+static void _StripPxrInternalNamespace(string *name)
+{
   // Note that this assumes PXR_INTERNAL_NS to be non-empty
   constexpr const char nsQualifier[] = ARCH_STRINGIZE(PXR_INTERNAL_NS) "::";
   constexpr const auto nsQualifierSize = sizeof(nsQualifier);
@@ -133,8 +136,8 @@ static void _StripPxrInternalNamespace(string *name) {
   }
 }
 
-#undef ARCH_STRINGIZE_EXPAND
-#undef ARCH_STRINGIZE
+#  undef ARCH_STRINGIZE_EXPAND
+#  undef ARCH_STRINGIZE
 
 #endif
 
@@ -143,10 +146,10 @@ static void _StripPxrInternalNamespace(string *name) {
 /*
  * This routine doesn't work when you get to gcc3.4.
  */
-static bool _DemangleOld(string *mangledTypeName) {
+static bool _DemangleOld(string *mangledTypeName)
+{
   int status;
-  if (char *realName =
-          abi::__cxa_demangle(mangledTypeName->c_str(), NULL, NULL, &status)) {
+  if (char *realName = abi::__cxa_demangle(mangledTypeName->c_str(), NULL, NULL, &status)) {
     *mangledTypeName = string(realName);
     free(realName);
     _FixupStringNames(mangledTypeName);
@@ -164,7 +167,8 @@ static bool _DemangleOld(string *mangledTypeName) {
  * Arch_DemangleFunctionName has been changed to call _DemangleOld if
  * using a version of gcc >= 3.1.
  */
-static bool _DemangleNewRaw(string *mangledTypeName) {
+static bool _DemangleNewRaw(string *mangledTypeName)
+{
   /*
    * The new gcc3.4 demangle, just like libiberty before it, doesn't like
    * simple types.  So given a mangled string xyz, we feed it Pxyz which
@@ -177,8 +181,7 @@ static bool _DemangleNewRaw(string *mangledTypeName) {
   int status;
   bool ok = false;
 
-  if (char *realName =
-          abi::__cxa_demangle(input.c_str(), NULL, NULL, &status)) {
+  if (char *realName = abi::__cxa_demangle(input.c_str(), NULL, NULL, &status)) {
     size_t len = strlen(realName);
     if (len > 1 && realName[len - 1] == '*') {
       *mangledTypeName = string(&realName[0], len - 1);
@@ -191,7 +194,8 @@ static bool _DemangleNewRaw(string *mangledTypeName) {
   return ok;
 }
 
-static bool _DemangleNew(string *mangledTypeName) {
+static bool _DemangleNew(string *mangledTypeName)
+{
   if (_DemangleNewRaw(mangledTypeName)) {
     _FixupStringNames(mangledTypeName);
     return true;
@@ -199,44 +203,49 @@ static bool _DemangleNew(string *mangledTypeName) {
   return false;
 }
 
-static string *_NewDemangledStringTypeName() {
+static string *_NewDemangledStringTypeName()
+{
   string *result = new string(typeid(string).name());
   _DemangleNewRaw(result);
   return result;
 }
 
-bool ArchDemangle(string *mangledTypeName) {
-#if defined(_PARANOID_CHECK_MODE)
+bool ArchDemangle(string *mangledTypeName)
+{
+#  if defined(_PARANOID_CHECK_MODE)
   string copy = *mangledTypeName;
   if (_DemangleNew(mangledTypeName)) {
     if (_DemangleOld(&copy) && copy != *mangledTypeName) {
       fprintf(stderr,
               "ArchDemangle: disagreement between old and new\n"
               "demangling schemes: '%s' (old way) vs '%s' (new way)\n",
-              copy.c_str(), mangledTypeName->c_str());
+              copy.c_str(),
+              mangledTypeName->c_str());
     }
 
-#if PXR_USE_NAMESPACES
+#    if PXR_USE_NAMESPACES
     _StripPxrInternalNamespace(mangledTypeName);
-#endif
+#    endif
     return true;
   }
   return false;
-#else
+#  else
   if (_DemangleNew(mangledTypeName)) {
-#if PXR_USE_NAMESPACES
+#    if PXR_USE_NAMESPACES
     _StripPxrInternalNamespace(mangledTypeName);
-#endif
+#    endif
     return true;
   }
 
   return false;
-#endif // _PARANOID_CHECK_MODE
+#  endif  // _PARANOID_CHECK_MODE
 }
 
-void Arch_DemangleFunctionName(string *mangledFunctionName) {
+void Arch_DemangleFunctionName(string *mangledFunctionName)
+{
   if (mangledFunctionName->size() > 2 && (*mangledFunctionName)[0] == '_' &&
-      (*mangledFunctionName)[1] == 'Z') {
+      (*mangledFunctionName)[1] == 'Z')
+  {
     // Note: _DemangleNew isn't doing the correct thing with
     //       function names, use the old codepath.
     _DemangleOld(mangledFunctionName);
@@ -245,32 +254,37 @@ void Arch_DemangleFunctionName(string *mangledFunctionName) {
 
 #elif defined(ARCH_OS_WINDOWS)
 
-static string *_NewDemangledStringTypeName() {
+static string *_NewDemangledStringTypeName()
+{
   return new string(typeid(string).name());
 }
 
-bool ArchDemangle(string *mangledTypeName) {
+bool ArchDemangle(string *mangledTypeName)
+{
   _FixupStringNames(mangledTypeName);
-#if PXR_USE_NAMESPACES
+#  if PXR_USE_NAMESPACES
   _StripPxrInternalNamespace(mangledTypeName);
-#endif
+#  endif
   return true;
 }
 
-void Arch_DemangleFunctionName(string *mangledFunctionName) {
+void Arch_DemangleFunctionName(string *mangledFunctionName)
+{
   ArchDemangle(mangledFunctionName);
 }
 
-#endif // _AT_LEAST_GCC_THREE_ONE_OR_CLANG
+#endif  // _AT_LEAST_GCC_THREE_ONE_OR_CLANG
 
-string ArchGetDemangled(const string &typeName) {
+string ArchGetDemangled(const string &typeName)
+{
   string r = typeName;
   if (ArchDemangle(&r))
     return r;
   return string();
 }
 
-string ArchGetDemangled(const char *typeName) {
+string ArchGetDemangled(const char *typeName)
+{
   if (typeName) {
     string r = typeName;
     if (ArchDemangle(&r)) {

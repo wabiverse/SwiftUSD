@@ -60,7 +60,7 @@ struct TfSkipCallerFrames {
 /// object.  Similarly utilties that call Python via Tf will re-throw the
 /// embedded C++ exception if the Python exception unwinds back into C++.
 class TfBaseException : public std::exception {
-public:
+ public:
   TF_API
   virtual ~TfBaseException();
 
@@ -72,15 +72,22 @@ public:
   /// Return the call context from the throw point associated with this
   /// exception.  Note that this context may be invalid if this exception was
   /// not thrown with TF_THROW().
-  TfCallContext const &GetThrowContext() const { return _callContext; }
+  TfCallContext const &GetThrowContext() const
+  {
+    return _callContext;
+  }
 
   /// Return the stack frame pointers from the throw point.  See
   /// ArchPrintStackFrames() to turn these into human-readable strings.
-  std::vector<uintptr_t> const &GetThrowStack() const { return _throwStack; }
+  std::vector<uintptr_t> const &GetThrowStack() const
+  {
+    return _throwStack;
+  }
 
   /// Move the stack frame pointers from the throw point to \p out.  See
   /// GetThrowStack() for more details.
-  void MoveThrowStackTo(std::vector<uintptr_t> &out) {
+  void MoveThrowStackTo(std::vector<uintptr_t> &out)
+  {
     out = std::move(_throwStack);
     _throwStack.clear();
   }
@@ -91,14 +98,15 @@ public:
   virtual const char *what() const noexcept override;
 
   // Friend throw support.
-  template <class Derived, class... Args>
-  friend void Tf_Throw(TfCallContext const &cc, TfSkipCallerFrames skipFrames,
-                       Args &&...args);
+  template<class Derived, class... Args>
+  friend void Tf_Throw(TfCallContext const &cc, TfSkipCallerFrames skipFrames, Args &&...args);
 
-private:
+ private:
   TF_API
-  static void _ThrowImpl(TfCallContext const &cc, TfBaseException &exc,
-                         TfFunctionRef<void()> thrower, int skipNCallerFrames);
+  static void _ThrowImpl(TfCallContext const &cc,
+                         TfBaseException &exc,
+                         TfFunctionRef<void()> thrower,
+                         int skipNCallerFrames);
 
   TfCallContext _callContext;
   std::vector<uintptr_t> _throwStack;
@@ -106,17 +114,17 @@ private:
 };
 
 // TF_THROW() support function.
-template <class Exception, class... Args>
-void Tf_Throw(TfCallContext const &cc, TfSkipCallerFrames skipFrames,
-              Args &&...args) {
+template<class Exception, class... Args>
+void Tf_Throw(TfCallContext const &cc, TfSkipCallerFrames skipFrames, Args &&...args)
+{
   Exception exc(std::forward<Args>(args)...);
   auto thrower = [&exc]() { throw std::move(exc); };
   TfBaseException::_ThrowImpl(cc, exc, thrower, skipFrames.numToSkip);
 }
 
 // TF_THROW() support function.
-template <class Exception, class... Args>
-void Tf_Throw(TfCallContext const &cc, Args &&...args) {
+template<class Exception, class... Args> void Tf_Throw(TfCallContext const &cc, Args &&...args)
+{
   Tf_Throw<Exception>(cc, TfSkipCallerFrames(), std::forward<Args>(args)...);
 }
 
@@ -128,16 +136,15 @@ void Tf_Throw(TfCallContext const &cc, Args &&...args) {
 /// embed in the exception.  If the exception goes unhandled these will be
 /// reported in the crash report that Tf's terminate handler generates, or in
 /// the unhandled exception message in the python interpreter.
-#define TF_THROW(Exception, Exception - ctor - args...)
-#define TF_THROW(Exception, TfSkipCallerFrames, Exception - ctor - args...)
+#  define TF_THROW(Exception, Exception - ctor - args...)
+#  define TF_THROW(Exception, TfSkipCallerFrames, Exception - ctor - args...)
 
 #else
 
-#define TF_THROW(Exception, ...)                                               \
-  Tf_Throw<Exception>(TF_CALL_CONTEXT, __VA_ARGS__)
+#  define TF_THROW(Exception, ...) Tf_Throw<Exception>(TF_CALL_CONTEXT, __VA_ARGS__)
 
 #endif
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_EXCEPTION_H
+#endif  // PXR_BASE_TF_EXCEPTION_H

@@ -35,33 +35,31 @@ PXR_NAMESPACE_OPEN_SCOPE
 class UsdStageCache;
 
 /// \class UsdShadeShaderDefParserPlugin
-/// 
-/// Parses shader definitions represented using USD scene description using the 
+///
+/// Parses shader definitions represented using USD scene description using the
 /// schemas provided by UsdShade.
-/// 
-class UsdShadeShaderDefParserPlugin : public NdrParserPlugin 
-{
-public: 
-    USDSHADE_API
-    UsdShadeShaderDefParserPlugin() = default;
+///
+class UsdShadeShaderDefParserPlugin : public NdrParserPlugin {
+ public:
+  USDSHADE_API
+  UsdShadeShaderDefParserPlugin() = default;
 
-    USDSHADE_API
-    ~UsdShadeShaderDefParserPlugin() override = default;
+  USDSHADE_API
+  ~UsdShadeShaderDefParserPlugin() override = default;
 
-    USDSHADE_API
-    NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult &discoveryResult) 
-        override;
+  USDSHADE_API
+  NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult &discoveryResult) override;
 
-    USDSHADE_API
-    const NdrTokenVec &GetDiscoveryTypes() const override;
+  USDSHADE_API
+  const NdrTokenVec &GetDiscoveryTypes() const override;
 
-    USDSHADE_API
-    const TfToken &GetSourceType() const override;    
+  USDSHADE_API
+  const TfToken &GetSourceType() const override;
 
-private:
-    static UsdStageCache _cache;
+ private:
+  static UsdStageCache _cache;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SHADE_SHADER_DEF_PARSER_H
+#endif  // PXR_USD_USD_SHADE_SHADER_DEF_PARSER_H

@@ -10,4 +10,4 @@
 #include <Sdr/shaderNode.h>
 #include <Sdr/shaderProperty.h>
 
-#endif // __PXR_USD_SDR_H__
+#endif  // __PXR_USD_SDR_H__

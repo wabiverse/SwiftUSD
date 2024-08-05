@@ -41,10 +41,10 @@
 #include <vector>
 
 #if defined(ARCH_OS_WINDOWS)
-#include <Shlwapi.h>
-#include <Windows.h>
+#  include <Shlwapi.h>
+#  include <Windows.h>
 #else
-#include <glob.h>
+#  include <glob.h>
 #endif
 
 using std::pair;
@@ -59,7 +59,8 @@ namespace {
 // Expands symlinks in path.  Used on Windows as a partial replacement
 // for realpath(), partial because is doesn't handle /./, /../ and
 // duplicate slashes.
-std::string _ExpandSymlinks(const std::string &path) {
+std::string _ExpandSymlinks(const std::string &path)
+{
   // Find the first directory in path that's a symbolic link, if any,
   // and the remaining part of the path.
   std::string::size_type i = path.find_first_of("/\\");
@@ -93,7 +94,8 @@ std::string _ExpandSymlinks(const std::string &path) {
 }
 #endif
 
-void _ClearError() {
+void _ClearError()
+{
 #if defined(ARCH_OS_WINDOWS)
   SetLastError(ERROR_SUCCESS);
 #else
@@ -101,7 +103,8 @@ void _ClearError() {
 #endif
 }
 
-void _GetError(std::string *err) {
+void _GetError(std::string *err)
+{
   if (err->empty()) {
 #if defined(ARCH_OS_WINDOWS)
     *err = ArchStrSysError(GetLastError());
@@ -111,10 +114,10 @@ void _GetError(std::string *err) {
   }
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-string TfRealPath(string const &path, bool allowInaccessibleSuffix,
-                  string *error) {
+string TfRealPath(string const &path, bool allowInaccessibleSuffix, string *error)
+{
   string localError;
   if (!error)
     error = &localError;
@@ -164,15 +167,15 @@ string TfRealPath(string const &path, bool allowInaccessibleSuffix,
 #endif
 }
 
-string::size_type TfFindLongestAccessiblePrefix(string const &path,
-                                                string *error) {
+string::size_type TfFindLongestAccessiblePrefix(string const &path, string *error)
+{
   typedef string::size_type size_type;
   static const size_type npos = string::npos;
 
   struct _Local {
     // Sentinel is greater than existing paths, less than non-existing ones.
-    static bool Compare(string const &str, size_type lhs, size_type rhs,
-                        string *err) {
+    static bool Compare(string const &str, size_type lhs, size_type rhs, string *err)
+    {
       if (lhs == rhs)
         return false;
       if (lhs == npos)
@@ -182,7 +185,8 @@ string::size_type TfFindLongestAccessiblePrefix(string const &path,
       return lhs < rhs;
     }
 
-    static bool Accessible(string const &str, size_type index, string *err) {
+    static bool Accessible(string const &str, size_type index, string *err)
+    {
       string checkPath(str, 0, index);
 
       // False if non-existent or if a symlink and the target is
@@ -192,13 +196,13 @@ string::size_type TfFindLongestAccessiblePrefix(string const &path,
         _GetError(err);
         return false;
       }
-      if (TfIsLink(checkPath) &&
-          !TfPathExists(checkPath, /* resolveSymlinks = */ true)) {
+      if (TfIsLink(checkPath) && !TfPathExists(checkPath, /* resolveSymlinks = */ true)) {
         _GetError(err);
         if (err->empty()) {
           *err = "encountered dangling symbolic link";
         }
-      } else {
+      }
+      else {
         _GetError(err);
       }
       return err->empty();
@@ -208,8 +212,8 @@ string::size_type TfFindLongestAccessiblePrefix(string const &path,
   // Build a vector of split point indexes.
   vector<size_type> splitPoints;
 #if defined(ARCH_OS_WINDOWS)
-  for (size_type p = path.find_first_of("/\\", path.find_first_not_of("/\\"));
-       p != npos; p = path.find_first_of("/\\", p + 1))
+  for (size_type p = path.find_first_of("/\\", path.find_first_not_of("/\\")); p != npos;
+       p = path.find_first_of("/\\", p + 1))
 #else
   for (size_type p = path.find('/', path.find_first_not_of('/')); p != npos;
        p = path.find('/', p + 1))
@@ -218,10 +222,11 @@ string::size_type TfFindLongestAccessiblePrefix(string const &path,
   splitPoints.push_back(path.size());
 
   // Lower-bound to find first non-existent path.
-  vector<size_type>::iterator result =
-      std::lower_bound(splitPoints.begin(), splitPoints.end(), npos,
-                       std::bind(_Local::Compare, path, std::placeholders::_1,
-                                 std::placeholders::_2, error));
+  vector<size_type>::iterator result = std::lower_bound(
+      splitPoints.begin(),
+      splitPoints.end(),
+      npos,
+      std::bind(_Local::Compare, path, std::placeholders::_1, std::placeholders::_2, error));
 
   // begin means nothing existed, end means everything did, else prior is last
   // existing path.
@@ -232,13 +237,18 @@ string::size_type TfFindLongestAccessiblePrefix(string const &path,
   return *(result - 1);
 }
 
-string TfNormPath(string const &inPath, bool stripDriveSpecifier) {
+string TfNormPath(string const &inPath, bool stripDriveSpecifier)
+{
   return ArchNormPath(inPath, stripDriveSpecifier);
 }
 
-string TfAbsPath(string const &path) { return ArchAbsPath(path); }
+string TfAbsPath(string const &path)
+{
+  return ArchAbsPath(path);
+}
 
-string TfGetExtension(string const &path) {
+string TfGetExtension(string const &path)
+{
   static const string emptyPath;
 
   if (path.empty()) {
@@ -256,20 +266,24 @@ string TfGetExtension(string const &path) {
   return TfStringGetSuffix(fileName);
 }
 
-string TfReadLink(string const &path) { return ArchReadLink(path.c_str()); }
+string TfReadLink(string const &path)
+{
+  return ArchReadLink(path.c_str());
+}
 
-bool TfIsRelativePath(std::string const &path) {
+bool TfIsRelativePath(std::string const &path)
+{
 #if defined(ARCH_OS_WINDOWS)
-  return path.empty() ||
-         (PathIsRelativeW(ArchWindowsUtf8ToUtf16(path).c_str()) &&
-          path[0] != '/' && path[0] != '\\');
+  return path.empty() || (PathIsRelativeW(ArchWindowsUtf8ToUtf16(path).c_str()) &&
+                          path[0] != '/' && path[0] != '\\');
 #else
   return path.empty() || path[0] != '/';
 #endif
 }
 
 #if !defined(ARCH_OS_WINDOWS)
-vector<string> TfGlob(vector<string> const &paths, unsigned int flags) {
+vector<string> TfGlob(vector<string> const &paths, unsigned int flags)
+{
   if (paths.empty()) {
     return vector<string>();
   }
@@ -300,8 +314,11 @@ vector<string> TfGlob(vector<string> const &paths, unsigned int flags) {
 
 namespace {
 
-static void Tf_Glob(vector<string> *result, const std::string &prefix,
-                    const std::string &pattern, unsigned int flags) {
+static void Tf_Glob(vector<string> *result,
+                    const std::string &prefix,
+                    const std::string &pattern,
+                    unsigned int flags)
+{
   // Search for the first wildcard in pattern.
   const string::size_type i = pattern.find_first_of("*?");
 
@@ -310,8 +327,7 @@ static void Tf_Glob(vector<string> *result, const std::string &prefix,
     // Conveniently GetFileAttributes() works on paths with a trailing
     // backslash.
     string path = prefix + pattern;
-    const DWORD attributes =
-        GetFileAttributesW(ArchWindowsUtf8ToUtf16(path).c_str());
+    const DWORD attributes = GetFileAttributesW(ArchWindowsUtf8ToUtf16(path).c_str());
     if (attributes != INVALID_FILE_ATTRIBUTES) {
       // File exists.
 
@@ -324,7 +340,8 @@ static void Tf_Glob(vector<string> *result, const std::string &prefix,
 
       result->push_back(path);
     }
-  } else {
+  }
+  else {
     // There are additional patterns to glob.  Find the next directory
     // after the wildcard.
     string::size_type j = pattern.find_first_of('\\', i);
@@ -344,22 +361,22 @@ static void Tf_Glob(vector<string> *result, const std::string &prefix,
 
     // Glob the leftmost pattern.
     WIN32_FIND_DATAW data;
-    HANDLE find =
-        FindFirstFileW(ArchWindowsUtf8ToUtf16(leftmostPattern).c_str(), &data);
+    HANDLE find = FindFirstFileW(ArchWindowsUtf8ToUtf16(leftmostPattern).c_str(), &data);
     if (find != INVALID_HANDLE_VALUE) {
       do {
         // Recurse with next pattern.
-        Tf_Glob(result, leftmostDir + ArchWindowsUtf16ToUtf8(data.cFileName),
-                remainingPattern, flags);
+        Tf_Glob(
+            result, leftmostDir + ArchWindowsUtf16ToUtf8(data.cFileName), remainingPattern, flags);
       } while (FindNextFileW(find, &data));
       FindClose(find);
     }
   }
 }
 
-} // namespace
+}  // namespace
 
-vector<string> TfGlob(vector<string> const &paths, unsigned int flags) {
+vector<string> TfGlob(vector<string> const &paths, unsigned int flags)
+{
   vector<string> result;
 
   for (auto path : paths) {
@@ -391,9 +408,9 @@ vector<string> TfGlob(vector<string> const &paths, unsigned int flags) {
 
 #endif
 
-vector<string> TfGlob(string const &path, unsigned int flags) {
-  return path.empty() ? vector<string>()
-                      : TfGlob(vector<string>(1, path), flags);
+vector<string> TfGlob(string const &path, unsigned int flags)
+{
+  return path.empty() ? vector<string>() : TfGlob(vector<string>(1, path), flags);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

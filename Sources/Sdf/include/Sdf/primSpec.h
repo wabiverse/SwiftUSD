@@ -74,7 +74,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfPrimSpec : public SdfSpec {
   SDF_DECLARE_SPEC(SdfPrimSpec, SdfSpec);
 
-public:
+ public:
   typedef SdfPrimSpecView NameChildrenView;
   typedef SdfPropertySpecView PropertySpecView;
   typedef SdfAttributeSpecView AttributeSpecView;
@@ -90,7 +90,8 @@ public:
   /// root prim in the given layer.
   SDF_API
   static SdfPrimSpecHandle New(const SdfLayerHandle &parentLayer,
-                               const std::string &name, SdfSpecifier spec,
+                               const std::string &name,
+                               SdfSpecifier spec,
                                const std::string &typeName = std::string());
 
   /// Create a prim spec.
@@ -102,7 +103,8 @@ public:
   /// ancestor specs as SdfSpecifierOver.
   SDF_API
   static SdfPrimSpecHandle New(const SdfPrimSpecHandle &parentPrim,
-                               const std::string &name, SdfSpecifier spec,
+                               const std::string &name,
+                               SdfSpecifier spec,
                                const std::string &typeName = std::string());
 
   /// \name Name
@@ -691,8 +693,7 @@ public:
   /// explicitly set the variant selection to be empty, use
   /// BlockVariantSelection instead.
   SDF_API
-  void SetVariantSelection(const std::string &variantSetName,
-                           const std::string &variantName);
+  void SetVariantSelection(const std::string &variantSetName, const std::string &variantName);
 
   /// Blocks the variant selected for the given variant set by setting
   /// the variant selection to empty.
@@ -734,7 +735,7 @@ public:
 
   /// @}
 
-private:
+ private:
   // Returns true if this object is the pseudo-root.
   bool _IsPseudoRoot() const;
 
@@ -747,9 +748,10 @@ private:
   // this function as write access validation.
   bool _ValidateEdit(const TfToken &key) const;
 
-private:
+ private:
   static SdfPrimSpecHandle _New(const SdfPrimSpecHandle &parentPrim,
-                                const TfToken &name, SdfSpecifier spec,
+                                const TfToken &name,
+                                SdfSpecifier spec,
                                 const TfToken &typeName);
 };
 
@@ -762,8 +764,7 @@ private:
 /// The new specs are created with SdfSpecifierOver and an empty type.
 /// primPath must be a valid prim path.
 SDF_API
-SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle &layer,
-                                       const SdfPath &primPath);
+SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle &layer, const SdfPath &primPath);
 
 /// Convenience function to create a prim at the given path, and any
 /// necessary parent prims, in the given layer.
@@ -774,9 +775,8 @@ SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle &layer,
 /// must be a valid prim path.  Return false and issue an error if we fail to
 /// author the required scene description.
 SDF_API
-bool SdfJustCreatePrimInLayer(const SdfLayerHandle &layer,
-                              const SdfPath &primPath);
+bool SdfJustCreatePrimInLayer(const SdfLayerHandle &layer, const SdfPath &primPath);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PRIM_SPEC_H
+#endif  // PXR_USD_SDF_PRIM_SPEC_H

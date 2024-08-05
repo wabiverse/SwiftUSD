@@ -32,7 +32,7 @@
 #define PXR_IMAGING_HD_SYSTEM_SCHEMA_H
 
 #include "Hd/api.h"
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 #include "Tf/declarePtrs.h"
 
@@ -40,11 +40,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDSYSTEM_SCHEMA_TOKENS \
-    (system) \
+#define HDSYSTEM_SCHEMA_TOKENS (system)
 
-TF_DECLARE_PUBLIC_TOKENS(HdSystemSchemaTokens, HD_API,
-    HDSYSTEM_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSystemSchemaTokens, HD_API, HDSYSTEM_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
@@ -55,71 +53,62 @@ TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 /// container.  A piece of system data is evaluated at a given location by
 /// walking up the namespace looking for a system container that contains the
 /// corresponding key.
-class HdSystemSchema : public HdSchema
-{
-public:
-    HdSystemSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdSystemSchema : public HdSchema {
+ public:
+  HdSystemSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
+  /// Evaluates the \p key at \p fromPath.  If \p key is found, the return
+  /// value will be non-null and \p foundAtPath will contain the path at
+  /// which the non-null result was found.  Otherwise, this returns null.
+  ///
+  /// This operation will be linear in the length of \p fromPath.
+  HD_API
+  static HdDataSourceBaseHandle GetFromPath(HdSceneIndexBaseRefPtr const &inputScene,
+                                            SdfPath const &fromPath,
+                                            TfToken const &key,
+                                            SdfPath *foundAtPath);
 
-    /// Evaluates the \p key at \p fromPath.  If \p key is found, the return
-    /// value will be non-null and \p foundAtPath will contain the path at
-    /// which the non-null result was found.  Otherwise, this returns null.
-    ///
-    /// This operation will be linear in the length of \p fromPath.
-    HD_API
-    static HdDataSourceBaseHandle GetFromPath(
-            HdSceneIndexBaseRefPtr const &inputScene,
-            SdfPath const &fromPath,
-            TfToken const &key,
-            SdfPath *foundAtPath);
+  /// Composes the system container in at \p fromPath by walking up the
+  /// prim.dataSources in \p inputScene and composing any system containers
+  /// it encounters.
+  ///
+  /// If no system containers were found, this returns null.
+  /// Otherwise, this will return a container data source with the composed
+  /// system data sources. If non-null, \p foundAtPath will be the last prim
+  /// at which system data was found.
+  HD_API
+  static HdContainerDataSourceHandle Compose(HdSceneIndexBaseRefPtr const &inputScene,
+                                             SdfPath const &fromPath,
+                                             SdfPath *foundAtPath);
 
-    /// Composes the system container in at \p fromPath by walking up the
-    /// prim.dataSources in \p inputScene and composing any system containers
-    /// it encounters.  
-    ///
-    /// If no system containers were found, this returns null.
-    /// Otherwise, this will return a container data source with the composed
-    /// system data sources. If non-null, \p foundAtPath will be the last prim
-    /// at which system data was found.
-    HD_API
-    static HdContainerDataSourceHandle Compose(
-            HdSceneIndexBaseRefPtr const &inputScene,
-            SdfPath const &fromPath,
-            SdfPath *foundAtPath);
+  /// Similar to `Compose` but this return value would be suitable for using
+  /// with HdOverlayContainerDataSource for a prim's dataSource:
+  /// ```
+  /// prim.dataSource = HdOverlayContainerDataSource::New(
+  ///   HdSystemSchema::ComposeAsPrimDataSource(...),
+  ///   prim.dataSource);
+  /// ```
+  HD_API
+  static HdContainerDataSourceHandle ComposeAsPrimDataSource(
+      HdSceneIndexBaseRefPtr const &inputScene, SdfPath const &fromPath, SdfPath *foundAtPath);
 
-    /// Similar to `Compose` but this return value would be suitable for using
-    /// with HdOverlayContainerDataSource for a prim's dataSource:
-    /// ```
-    /// prim.dataSource = HdOverlayContainerDataSource::New(
-    ///   HdSystemSchema::ComposeAsPrimDataSource(...),
-    ///   prim.dataSource);
-    /// ```
-    HD_API
-    static HdContainerDataSourceHandle ComposeAsPrimDataSource(
-            HdSceneIndexBaseRefPtr const &inputScene,
-            SdfPath const &fromPath,
-            SdfPath *foundAtPath);
+  /// Retrieves a container data source with the schema's default name token
+  /// "system" from the parent container and constructs a
+  /// HdSystemSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdSystemSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "system" from the parent container and constructs a
-    /// HdSystemSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdSystemSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

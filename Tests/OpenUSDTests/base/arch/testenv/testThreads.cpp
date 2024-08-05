@@ -22,9 +22,9 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
-#include "Arch/threads.h"
 #include "Arch/error.h"
+#include "Arch/threads.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 

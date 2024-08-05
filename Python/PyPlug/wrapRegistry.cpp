@@ -56,27 +56,31 @@ namespace {
 
 typedef TfWeakPtr<PlugRegistry> PlugRegistryPtr;
 
-static PlugPluginPtrVector _RegisterPlugins(PlugRegistryPtr self, string path) {
+static PlugPluginPtrVector _RegisterPlugins(PlugRegistryPtr self, string path)
+{
   return self->RegisterPlugins(path);
 }
 
-static PlugPluginPtrVector _RegisterPluginsList(PlugRegistryPtr self,
-                                                vector<string> paths) {
+static PlugPluginPtrVector _RegisterPluginsList(PlugRegistryPtr self, vector<string> paths)
+{
   return self->RegisterPlugins(paths);
 }
 
 // Disambiguate vs. the template
-static PlugPluginPtr _GetPluginForType(PlugRegistry &reg, const TfType &t) {
+static PlugPluginPtr _GetPluginForType(PlugRegistry &reg, const TfType &t)
+{
   return reg.GetPluginForType(t);
 }
 
 static std::string _GetStringFromPluginMetaData(PlugRegistry &reg,
                                                 const TfType &type,
-                                                const std::string &key) {
+                                                const std::string &key)
+{
   return reg.GetStringFromPluginMetaData(type, key);
 }
 
-static std::vector<TfType> _GetAllDerivedTypes(TfType const &type) {
+static std::vector<TfType> _GetAllDerivedTypes(TfType const &type)
+{
   std::set<TfType> types;
   PlugRegistry::GetAllDerivedTypes(type, &types);
   return vector<TfType>(types.begin(), types.end());
@@ -89,12 +93,12 @@ typedef std::function<PluginPredicateSig> PluginPredicateFn;
 
 struct SharedState : boost::noncopyable {
 
-  void ThreadTask() {
+  void ThreadTask()
+  {
     while (true) {
       // Try to take the next plugin to load.
       size_t cur = nextAvailable;
-      while (cur != plugins.size() &&
-             !nextAvailable.compare_exchange_strong(cur, cur + 1)) {
+      while (cur != plugins.size() && !nextAvailable.compare_exchange_strong(cur, cur + 1)) {
         cur = nextAvailable;
       }
 
@@ -112,16 +116,18 @@ struct SharedState : boost::noncopyable {
   std::atomic<size_t> nextAvailable;
 };
 
-template <class Range> string PluginNames(Range const &range) {
+template<class Range> string PluginNames(Range const &range)
+{
   using std::distance;
   vector<string> names(distance(boost::begin(range), boost::end(range)));
-  transform(boost::begin(range), boost::end(range), names.begin(),
-            [](PlugPluginPtr const &plug) { return plug->GetName(); });
+  transform(boost::begin(range), boost::end(range), names.begin(), [](PlugPluginPtr const &plug) {
+    return plug->GetName();
+  });
   return TfStringJoin(names.begin(), names.end(), ", ");
 }
 
-void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads,
-                              bool verbose) {
+void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads, bool verbose)
+{
   TF_PY_ALLOW_THREADS_IN_SCOPE();
 
   // Take all unloaded plugins for which pred(plugin) is true.
@@ -131,9 +137,8 @@ void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads,
   plugins.erase(partition(plugins.begin(), plugins.end(), pred), plugins.end());
 
   // Shuffle all already loaded plugins to the end.
-  PlugPluginPtrVector::iterator alreadyLoaded =
-      partition(plugins.begin(), plugins.end(),
-                [](PlugPluginPtr const &plug) { return !plug->IsLoaded(); });
+  PlugPluginPtrVector::iterator alreadyLoaded = partition(
+      plugins.begin(), plugins.end(), [](PlugPluginPtr const &plug) { return !plug->IsLoaded(); });
 
   // Report any already loaded plugins as skipped.
   if (verbose && alreadyLoaded != plugins.end()) {
@@ -154,13 +159,11 @@ void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads,
   // Otherwise use the min of the machine's physical threads and the number of
   // plugins we're loading.
   unsigned int hwThreads = std::thread::hardware_concurrency();
-  numThreads = numThreads ? numThreads
-                          : std::min(hwThreads, (unsigned int)plugins.size());
+  numThreads = numThreads ? numThreads : std::min(hwThreads, (unsigned int)plugins.size());
 
   // Report what we're doing.
   if (verbose) {
-    printf("Loading %zu plugins concurrently: %s\n", plugins.size(),
-           PluginNames(plugins).c_str());
+    printf("Loading %zu plugins concurrently: %s\n", plugins.size(), PluginNames(plugins).c_str());
   }
 
   // Establish shared state.
@@ -184,43 +187,41 @@ void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads,
   }
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRegistry() {
+void wrapRegistry()
+{
 
   typedef PlugRegistry This;
 
   class_<This, TfWeakPtr<This>, boost::noncopyable>("Registry", no_init)
       .def(TfPySingleton())
-      .def("RegisterPlugins", &_RegisterPlugins,
-           return_value_policy<TfPySequenceToList>())
-      .def("RegisterPlugins", &_RegisterPluginsList,
-           return_value_policy<TfPySequenceToList>())
+      .def("RegisterPlugins", &_RegisterPlugins, return_value_policy<TfPySequenceToList>())
+      .def("RegisterPlugins", &_RegisterPluginsList, return_value_policy<TfPySequenceToList>())
       .def("GetStringFromPluginMetaData", &_GetStringFromPluginMetaData)
       .def("GetPluginWithName", &This::GetPluginWithName)
       .def("GetPluginForType", &_GetPluginForType)
-      .def("GetAllPlugins", &This::GetAllPlugins,
-           return_value_policy<TfPySequenceToList>())
+      .def("GetAllPlugins", &This::GetAllPlugins, return_value_policy<TfPySequenceToList>())
 
-      .def("FindTypeByName", This::FindTypeByName,
-           return_value_policy<return_by_value>())
+      .def("FindTypeByName", This::FindTypeByName, return_value_policy<return_by_value>())
       .staticmethod("FindTypeByName")
 
       .def("FindDerivedTypeByName",
            (TfType(*)(TfType, std::string const &))This::FindDerivedTypeByName)
       .staticmethod("FindDerivedTypeByName")
 
-      .def("GetDirectlyDerivedTypes", This::GetDirectlyDerivedTypes,
+      .def("GetDirectlyDerivedTypes",
+           This::GetDirectlyDerivedTypes,
            return_value_policy<TfPySequenceToTuple>())
       .staticmethod("GetDirectlyDerivedTypes")
 
-      .def("GetAllDerivedTypes", _GetAllDerivedTypes,
-           return_value_policy<TfPySequenceToTuple>())
+      .def("GetAllDerivedTypes", _GetAllDerivedTypes, return_value_policy<TfPySequenceToTuple>())
       .staticmethod("GetAllDerivedTypes")
 
       ;
 
   TfPyFunctionFromPython<PluginPredicateSig>();
-  def("_LoadPluginsConcurrently", _LoadPluginsConcurrently,
+  def("_LoadPluginsConcurrently",
+      _LoadPluginsConcurrently,
       (arg("predicate"), arg("numThreads") = 0, arg("verbose") = false));
 }

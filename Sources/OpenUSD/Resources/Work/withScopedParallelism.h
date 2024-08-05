@@ -111,12 +111,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// ensures the GIL is released before invoking \p fn.  If this function
 /// released the GIL, it reacquires it before returning.
 ///
-template <class Fn>
-auto WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL = true) {
+template<class Fn> auto WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL = true)
+{
   if (dropPythonGIL) {
     TF_PY_ALLOW_THREADS_IN_SCOPE();
     return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
-  } else {
+  }
+  else {
     return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
   }
 }
@@ -127,8 +128,8 @@ auto WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL = true) {
 /// before the scoped parallelism ends, call WorkDispatcher::Wait() on the
 /// dispatcher instance.  The \p dropPythonGIL argument has the same meaning as
 /// it does for WorkWithScopedParallelism().
-template <class Fn>
-auto WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL = true) {
+template<class Fn> auto WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL = true)
+{
   return WorkWithScopedParallelism(
       [&fn]() {
         WorkDispatcher dispatcher;
@@ -140,4 +141,4 @@ auto WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL = true) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
+#endif  // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H

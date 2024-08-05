@@ -27,10 +27,10 @@
 #include "CameraUtil/conformWindow.h"
 
 #include "Gf/camera.h"
+#include "Gf/frustum.h"
+#include "Gf/range2d.h"
 #include "Gf/vec2d.h"
 #include "Gf/vec4d.h"
-#include "Gf/range2d.h"
-#include "Gf/frustum.h"
 
 #include "Tf/pyEnum.h"
 
@@ -40,41 +40,40 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void
-wrapConformWindow()
+void wrapConformWindow()
 {
-    typedef GfRange2d (*Signature1)(
-        const GfRange2d &, CameraUtilConformWindowPolicy, double);
+  typedef GfRange2d (*Signature1)(const GfRange2d &, CameraUtilConformWindowPolicy, double);
 
-    typedef GfVec2d (*Signature2)(
-        const GfVec2d &, CameraUtilConformWindowPolicy, double);
+  typedef GfVec2d (*Signature2)(const GfVec2d &, CameraUtilConformWindowPolicy, double);
 
-    typedef GfVec4d (*Signature3)(
-        const GfVec4d &, CameraUtilConformWindowPolicy, double);
+  typedef GfVec4d (*Signature3)(const GfVec4d &, CameraUtilConformWindowPolicy, double);
 
-    typedef GfMatrix4d (*Signature4)(
-        const GfMatrix4d &, CameraUtilConformWindowPolicy, double);
+  typedef GfMatrix4d (*Signature4)(const GfMatrix4d &, CameraUtilConformWindowPolicy, double);
 
-    typedef void (*Signature5)(
-        GfCamera *, CameraUtilConformWindowPolicy, double);
+  typedef void (*Signature5)(GfCamera *, CameraUtilConformWindowPolicy, double);
 
-    typedef void (*Signature6)(
-        GfFrustum *, CameraUtilConformWindowPolicy, double);
+  typedef void (*Signature6)(GfFrustum *, CameraUtilConformWindowPolicy, double);
 
-    def("ConformedWindow", (Signature1)&CameraUtilConformedWindow,
-        (arg("window"), arg("policy"), arg("targetAspect")));
-    def("ConformedWindow", (Signature2)&CameraUtilConformedWindow,
-        (arg("window"), arg("policy"), arg("targetAspect")));
-    def("ConformedWindow", (Signature3)&CameraUtilConformedWindow,
-        (arg("window"), arg("policy"), arg("targetAspect")));
-    def("ConformedWindow", (Signature4)&CameraUtilConformedWindow,
-        (arg("window"), arg("policy"), arg("targetAspect")));
-    
-    def("ConformWindow", (Signature5)&CameraUtilConformWindow,
-        (arg("camera"), arg("policy"), arg("targetAspect")));
+  def("ConformedWindow",
+      (Signature1)&CameraUtilConformedWindow,
+      (arg("window"), arg("policy"), arg("targetAspect")));
+  def("ConformedWindow",
+      (Signature2)&CameraUtilConformedWindow,
+      (arg("window"), arg("policy"), arg("targetAspect")));
+  def("ConformedWindow",
+      (Signature3)&CameraUtilConformedWindow,
+      (arg("window"), arg("policy"), arg("targetAspect")));
+  def("ConformedWindow",
+      (Signature4)&CameraUtilConformedWindow,
+      (arg("window"), arg("policy"), arg("targetAspect")));
 
-    def("ConformWindow", (Signature6)&CameraUtilConformWindow,
-        (arg("frustum"), arg("policy"), arg("targetAspect")));
+  def("ConformWindow",
+      (Signature5)&CameraUtilConformWindow,
+      (arg("camera"), arg("policy"), arg("targetAspect")));
 
-    TfPyWrapEnum<CameraUtilConformWindowPolicy>();
+  def("ConformWindow",
+      (Signature6)&CameraUtilConformWindow,
+      (arg("frustum"), arg("policy"), arg("targetAspect")));
+
+  TfPyWrapEnum<CameraUtilConformWindowPolicy>();
 }

@@ -25,7 +25,7 @@
 #define PXR_BASE_ARCH_DEMANGLE_H
 
 #if !defined(__cplusplus)
-#error This include file can only be included in C++ programs.
+#  error This include file can only be included in C++ programs.
 #endif
 
 /// \file arch/demangle.h
@@ -74,7 +74,8 @@ ARCH_API std::string ArchGetDemangled(const char *typeName);
 ///
 /// \see ArchDemangle()
 /// \overload
-inline std::string ArchGetDemangled(const std::type_info &typeInfo) {
+inline std::string ArchGetDemangled(const std::type_info &typeInfo)
+{
   return ArchGetDemangled(typeInfo.name());
 }
 
@@ -85,7 +86,8 @@ inline std::string ArchGetDemangled(const std::type_info &typeInfo) {
 ///
 /// \see ArchDemangle()
 /// \overload
-inline std::string ArchGetDemangled(const std::type_index &typeIndex) {
+inline std::string ArchGetDemangled(const std::type_index &typeIndex)
+{
   return ArchGetDemangled(typeIndex.name());
 }
 
@@ -95,7 +97,8 @@ inline std::string ArchGetDemangled(const std::type_index &typeIndex) {
 ///
 /// \see ArchDemangle()
 /// \overload
-template <typename T> inline std::string ArchGetDemangled() {
+template<typename T> inline std::string ArchGetDemangled()
+{
   return ArchGetDemangled(typeid(T).name());
 }
 
@@ -107,4 +110,4 @@ void Arch_DemangleFunctionName(std::string *functionName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_DEMANGLE_H
+#endif  // PXR_BASE_ARCH_DEMANGLE_H

@@ -10,4 +10,4 @@
 #include <Hf/pluginEntry.h>
 #include <Hf/pluginRegistry.h>
 
-#endif // __PXR_USD_HF_H__
+#endif  // __PXR_USD_HF_H__

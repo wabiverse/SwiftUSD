@@ -35,7 +35,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdCommon() {
+void wrapUsdCommon()
+{
   def("Describe", (std::string(*)(const UsdObject &))UsdDescribe);
   def("Describe", (std::string(*)(const UsdStageWeakPtr &))UsdDescribe);
   def("Describe", (std::string(*)(const UsdStageCache &))UsdDescribe);

@@ -50,32 +50,31 @@ class VtDictionary;
 //
 // The result of \p expression is assumed to be string-valued; if it is not, an
 // error will be generated and the empty string will be returned.
-std::string Pcp_EvaluateVariableExpression(
-    const std::string &expression, const PcpExpressionVariables &expressionVars,
-    const std::string &context, const SdfLayerHandle &sourceLayer,
-    const SdfPath &sourcePath, std::unordered_set<std::string> *usedVariables,
-    PcpErrorVector *errors);
+std::string Pcp_EvaluateVariableExpression(const std::string &expression,
+                                           const PcpExpressionVariables &expressionVars,
+                                           const std::string &context,
+                                           const SdfLayerHandle &sourceLayer,
+                                           const SdfPath &sourcePath,
+                                           std::unordered_set<std::string> *usedVariables,
+                                           PcpErrorVector *errors);
 
 // Convenience overload of above that does not populate \p usedVariables or
 // \p errors.
-std::string
-Pcp_EvaluateVariableExpression(const std::string &expression,
-                               const PcpExpressionVariables &expressionVars);
+std::string Pcp_EvaluateVariableExpression(const std::string &expression,
+                                           const PcpExpressionVariables &expressionVars);
 
 // Returns true if \p str is a variable expression, false otherwise.
 bool Pcp_IsVariableExpression(const std::string &str);
 
 // Returns an SdfLayer::FileFormatArguments object with the "target" argument
 // set to \p target if \p target is not empty.
-SdfLayer::FileFormatArguments
-Pcp_GetArgumentsForFileFormatTarget(const std::string &target);
+SdfLayer::FileFormatArguments Pcp_GetArgumentsForFileFormatTarget(const std::string &target);
 
 // Returns an SdfLayer::FileFormatArguments object with the "target" argument
 // set to \p target if \p target is not empty and a target is
 // not embedded within the given \p identifier.
-SdfLayer::FileFormatArguments
-Pcp_GetArgumentsForFileFormatTarget(const std::string &identifier,
-                                    const std::string &target);
+SdfLayer::FileFormatArguments Pcp_GetArgumentsForFileFormatTarget(const std::string &identifier,
+                                                                  const std::string &target);
 
 // \overload
 // Same as above, but modifies \p args instead of returning by value.
@@ -178,9 +177,8 @@ const SdfLayer::FileFormatArguments &Pcp_GetArgumentsForFileFormatTarget(
 // If this function used namespace depth to identify hierarchies
 // instead of depth below introduction, G/C3 would have been
 // incorrectly excluded.
-std::pair<PcpNodeRef, PcpNodeRef>
-Pcp_FindStartingNodeOfClassHierarchy(const PcpNodeRef &n);
+std::pair<PcpNodeRef, PcpNodeRef> Pcp_FindStartingNodeOfClassHierarchy(const PcpNodeRef &n);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_UTILS_H
+#endif  // PXR_USD_PCP_UTILS_H

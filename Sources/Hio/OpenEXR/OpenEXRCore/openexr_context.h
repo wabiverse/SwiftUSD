@@ -19,7 +19,7 @@ extern "C" {
 
 /** @file */
 
-/** 
+/**
  * @defgroup Context Context related definitions
  *
  * A context is a single instance of an OpenEXR file or stream. Beyond
@@ -39,10 +39,10 @@ extern "C" {
  * file and/or stream.
  */
 
-typedef struct _priv_exr_context_t*       exr_context_t;
-typedef const struct _priv_exr_context_t* exr_const_context_t;
+typedef struct _priv_exr_context_t *exr_context_t;
+typedef const struct _priv_exr_context_t *exr_const_context_t;
 
-/** 
+/**
  * @defgroup ContextFunctions OpenEXR Context Stream/File Functions
  *
  * @brief These are a group of function interfaces used to customize
@@ -58,9 +58,10 @@ typedef const struct _priv_exr_context_t* exr_const_context_t;
  *  library such that they can provide a nice error message to the
  *  user during stream operations.
  */
-typedef exr_result_t (*exr_stream_error_func_ptr_t) (
-    exr_const_context_t ctxt, exr_result_t code, const char* fmt, ...)
-    EXR_PRINTF_FUNC_ATTRIBUTE;
+typedef exr_result_t (*exr_stream_error_func_ptr_t)(exr_const_context_t ctxt,
+                                                    exr_result_t code,
+                                                    const char *fmt,
+                                                    ...) EXR_PRINTF_FUNC_ATTRIBUTE;
 
 /** @brief Error callback function
  *
@@ -71,8 +72,9 @@ typedef exr_result_t (*exr_stream_error_func_ptr_t) (
  *  handle. This will then be delivered on the same thread causing the
  *  error.
  */
-typedef void (*exr_error_handler_cb_t) (
-    exr_const_context_t ctxt, exr_result_t code, const char* msg);
+typedef void (*exr_error_handler_cb_t)(exr_const_context_t ctxt,
+                                       exr_result_t code,
+                                       const char *msg);
 
 /** Destroy custom stream function pointer
  *
@@ -85,8 +87,9 @@ typedef void (*exr_error_handler_cb_t) (
  *  @param ctxt The context
  *  @param userdata The userdata
  */
-typedef void (*exr_destroy_stream_func_ptr_t) (
-    exr_const_context_t ctxt, void* userdata, int failed);
+typedef void (*exr_destroy_stream_func_ptr_t)(exr_const_context_t ctxt,
+                                              void *userdata,
+                                              int failed);
 
 /** Query stream size function pointer
  *
@@ -98,8 +101,7 @@ typedef void (*exr_destroy_stream_func_ptr_t) (
  * for this file, although appropriate memory safeguards must be in
  * place in the calling application.
  */
-typedef int64_t (*exr_query_size_func_ptr_t) (
-    exr_const_context_t ctxt, void* userdata);
+typedef int64_t (*exr_query_size_func_ptr_t)(exr_const_context_t ctxt, void *userdata);
 
 /** @brief Read custom function pointer
  *
@@ -126,13 +128,12 @@ typedef int64_t (*exr_query_size_func_ptr_t) (
  * caching of data to give the appearance of being able to seek/read
  * atomically.
  */
-typedef int64_t (*exr_read_func_ptr_t) (
-    exr_const_context_t         ctxt,
-    void*                       userdata,
-    void*                       buffer,
-    uint64_t                    sz,
-    uint64_t                    offset,
-    exr_stream_error_func_ptr_t error_cb);
+typedef int64_t (*exr_read_func_ptr_t)(exr_const_context_t ctxt,
+                                       void *userdata,
+                                       void *buffer,
+                                       uint64_t sz,
+                                       uint64_t offset,
+                                       exr_stream_error_func_ptr_t error_cb);
 
 /** Write custom function pointer
  *
@@ -158,13 +159,12 @@ typedef int64_t (*exr_read_func_ptr_t) (
  *
  *  - at file close, the chunk offset tables are written to the file.
  */
-typedef int64_t (*exr_write_func_ptr_t) (
-    exr_const_context_t         ctxt,
-    void*                       userdata,
-    const void*                 buffer,
-    uint64_t                    sz,
-    uint64_t                    offset,
-    exr_stream_error_func_ptr_t error_cb);
+typedef int64_t (*exr_write_func_ptr_t)(exr_const_context_t ctxt,
+                                        void *userdata,
+                                        const void *buffer,
+                                        uint64_t sz,
+                                        uint64_t offset,
+                                        exr_stream_error_func_ptr_t error_cb);
 
 /** @brief Struct used to pass function pointers into the context
  * initialization routines.
@@ -187,140 +187,139 @@ typedef int64_t (*exr_write_func_ptr_t) (
  * \endcode
  *
  */
-typedef struct _exr_context_initializer_v3
-{
-    /** @brief Size member to tag initializer for version stability.
-     *
-     * This should be initialized to the size of the current
-     * structure. This allows EXR to add functions or other
-     * initializers in the future, and retain version compatibility
-     */
-    size_t size;
+typedef struct _exr_context_initializer_v3 {
+  /** @brief Size member to tag initializer for version stability.
+   *
+   * This should be initialized to the size of the current
+   * structure. This allows EXR to add functions or other
+   * initializers in the future, and retain version compatibility
+   */
+  size_t size;
 
-    /** @brief Error callback function pointer
-     *
-     * The error callback is allowed to be `NULL`, and will use a
-     * default print which outputs to \c stderr.
-     *
-     * @sa exr_error_handler_cb_t
-     */
-    exr_error_handler_cb_t error_handler_fn;
+  /** @brief Error callback function pointer
+   *
+   * The error callback is allowed to be `NULL`, and will use a
+   * default print which outputs to \c stderr.
+   *
+   * @sa exr_error_handler_cb_t
+   */
+  exr_error_handler_cb_t error_handler_fn;
 
-    /** Custom allocator, if `NULL`, will use malloc. @sa exr_memory_allocation_func_t */
-    exr_memory_allocation_func_t alloc_fn;
+  /** Custom allocator, if `NULL`, will use malloc. @sa exr_memory_allocation_func_t */
+  exr_memory_allocation_func_t alloc_fn;
 
-    /** Custom deallocator, if `NULL`, will use free. @sa exr_memory_free_func_t */
-    exr_memory_free_func_t free_fn;
+  /** Custom deallocator, if `NULL`, will use free. @sa exr_memory_free_func_t */
+  exr_memory_free_func_t free_fn;
 
-    /** Blind data passed to custom read, size, write, destroy
-     * functions below. Up to user to manage this pointer.
-     */
-    void* user_data;
+  /** Blind data passed to custom read, size, write, destroy
+   * functions below. Up to user to manage this pointer.
+   */
+  void *user_data;
 
-    /** @brief Custom read routine.
-     *
-     * This is only used during read or update contexts. If this is
-     * provided, it is expected that the caller has previously made
-     * the stream available, and placed whatever stream/file data
-     * into \c user_data above.
-     *
-     * If this is `NULL`, and the context requested is for reading an
-     * exr file, an internal implementation is provided for reading
-     * from normal filesystem files, and the filename provided is
-     * attempted to be opened as such.
-     *
-     * Expected to be `NULL` for a write-only operation, but is ignored
-     * if it is provided.
-     *
-     * For update contexts, both read and write functions must be
-     * provided if either is.
-     *
-     * @sa exr_read_func_ptr_t
-     */
-    exr_read_func_ptr_t read_fn;
+  /** @brief Custom read routine.
+   *
+   * This is only used during read or update contexts. If this is
+   * provided, it is expected that the caller has previously made
+   * the stream available, and placed whatever stream/file data
+   * into \c user_data above.
+   *
+   * If this is `NULL`, and the context requested is for reading an
+   * exr file, an internal implementation is provided for reading
+   * from normal filesystem files, and the filename provided is
+   * attempted to be opened as such.
+   *
+   * Expected to be `NULL` for a write-only operation, but is ignored
+   * if it is provided.
+   *
+   * For update contexts, both read and write functions must be
+   * provided if either is.
+   *
+   * @sa exr_read_func_ptr_t
+   */
+  exr_read_func_ptr_t read_fn;
 
-    /** @brief Custom size query routine.
-     *
-     * Used to provide validation when reading header values. If this
-     * is not provided, but a custom read routine is provided, this
-     * will disable some of the validation checks when parsing the
-     * image header.
-     *
-     * Expected to be `NULL` for a write-only operation, but is ignored
-     * if it is provided.
-     *
-     * @sa exr_query_size_func_ptr_t
-     */
-    exr_query_size_func_ptr_t size_fn;
+  /** @brief Custom size query routine.
+   *
+   * Used to provide validation when reading header values. If this
+   * is not provided, but a custom read routine is provided, this
+   * will disable some of the validation checks when parsing the
+   * image header.
+   *
+   * Expected to be `NULL` for a write-only operation, but is ignored
+   * if it is provided.
+   *
+   * @sa exr_query_size_func_ptr_t
+   */
+  exr_query_size_func_ptr_t size_fn;
 
-    /** @brief Custom write routine.
-     *
-     * This is only used during write or update contexts. If this is
-     * provided, it is expected that the caller has previously made
-     * the stream available, and placed whatever stream/file data
-     * into \c user_data above.
-     *
-     * If this is `NULL`, and the context requested is for writing an
-     * exr file, an internal implementation is provided for reading
-     * from normal filesystem files, and the filename provided is
-     * attempted to be opened as such.
-     *
-     * For update contexts, both read and write functions must be
-     * provided if either is.
-     *
-     * @sa exr_write_func_ptr_t
-     */
-    exr_write_func_ptr_t write_fn;
+  /** @brief Custom write routine.
+   *
+   * This is only used during write or update contexts. If this is
+   * provided, it is expected that the caller has previously made
+   * the stream available, and placed whatever stream/file data
+   * into \c user_data above.
+   *
+   * If this is `NULL`, and the context requested is for writing an
+   * exr file, an internal implementation is provided for reading
+   * from normal filesystem files, and the filename provided is
+   * attempted to be opened as such.
+   *
+   * For update contexts, both read and write functions must be
+   * provided if either is.
+   *
+   * @sa exr_write_func_ptr_t
+   */
+  exr_write_func_ptr_t write_fn;
 
-    /** @brief Optional function to destroy the user data block of a custom stream.
-     *
-     * Allows one to free any user allocated data, and close any handles.
-     *
-     * @sa exr_destroy_stream_func_ptr_t
-     * */
-    exr_destroy_stream_func_ptr_t destroy_fn;
+  /** @brief Optional function to destroy the user data block of a custom stream.
+   *
+   * Allows one to free any user allocated data, and close any handles.
+   *
+   * @sa exr_destroy_stream_func_ptr_t
+   * */
+  exr_destroy_stream_func_ptr_t destroy_fn;
 
-    /** Initialize a field specifying what the maximum image width
-     * allowed by the context is. See exr_set_default_maximum_image_size() to
-     * understand how this interacts with global defaults.
-     */
-    int max_image_width;
+  /** Initialize a field specifying what the maximum image width
+   * allowed by the context is. See exr_set_default_maximum_image_size() to
+   * understand how this interacts with global defaults.
+   */
+  int max_image_width;
 
-    /** Initialize a field specifying what the maximum image height
-     * allowed by the context is. See exr_set_default_maximum_image_size() to
-     * understand how this interacts with global defaults.
-     */
-    int max_image_height;
+  /** Initialize a field specifying what the maximum image height
+   * allowed by the context is. See exr_set_default_maximum_image_size() to
+   * understand how this interacts with global defaults.
+   */
+  int max_image_height;
 
-    /** Initialize a field specifying what the maximum tile width
-     * allowed by the context is. See exr_set_default_maximum_tile_size() to
-     * understand how this interacts with global defaults.
-     */
-    int max_tile_width;
+  /** Initialize a field specifying what the maximum tile width
+   * allowed by the context is. See exr_set_default_maximum_tile_size() to
+   * understand how this interacts with global defaults.
+   */
+  int max_tile_width;
 
-    /** Initialize a field specifying what the maximum tile height
-     * allowed by the context is. See exr_set_default_maximum_tile_size() to
-     * understand how this interacts with global defaults.
-     */
-    int max_tile_height;
+  /** Initialize a field specifying what the maximum tile height
+   * allowed by the context is. See exr_set_default_maximum_tile_size() to
+   * understand how this interacts with global defaults.
+   */
+  int max_tile_height;
 
-    /** Initialize a field specifying what the default zip compression level should be
-     * for this context. See exr_set_default_zip_compresion_level() to
-     * set it for all contexts.
-     */
-    int zip_level;
+  /** Initialize a field specifying what the default zip compression level should be
+   * for this context. See exr_set_default_zip_compresion_level() to
+   * set it for all contexts.
+   */
+  int zip_level;
 
-    /** Initialize the default dwa compression quality. See
-     * exr_set_default_dwa_compression_quality() to set the default
-     * for all contexts.
-     */
-    float dwa_quality;
+  /** Initialize the default dwa compression quality. See
+   * exr_set_default_dwa_compression_quality() to set the default
+   * for all contexts.
+   */
+  float dwa_quality;
 
-    /** Initialize with a bitwise or of the various context flags
-     */
-    int flags;
+  /** Initialize with a bitwise or of the various context flags
+   */
+  int flags;
 
-    uint8_t pad[4];
+  uint8_t pad[4];
 } exr_context_initializer_t;
 
 /** @brief context flag which will enforce strict header validation
@@ -359,8 +358,8 @@ typedef struct _exr_context_initializer_v3
  * `EXR_ERR_SUCCESS` if the file appears to be a valid file (or at least
  * has the correct magic number and can be read).
  */
-EXR_EXPORT exr_result_t exr_test_file_header (
-    const char* filename, const exr_context_initializer_t* ctxtdata);
+EXR_EXPORT exr_result_t exr_test_file_header(const char *filename,
+                                             const exr_context_initializer_t *ctxtdata);
 
 /** @brief Close and free any internally allocated memory,
  * calling any provided destroy function for custom streams.
@@ -368,7 +367,7 @@ EXR_EXPORT exr_result_t exr_test_file_header (
  * If the file was opened for write, first save the chunk offsets
  * or any other unwritten data.
  */
-EXR_EXPORT exr_result_t exr_finish (exr_context_t* ctxt);
+EXR_EXPORT exr_result_t exr_finish(exr_context_t *ctxt);
 
 /** @brief Create and initialize a read-only exr read context.
  *
@@ -390,21 +389,18 @@ EXR_EXPORT exr_result_t exr_finish (exr_context_t* ctxt);
  * documentation \ref exr_context_initializer_t. The @p ctxtdata parameter
  * is optional, if `NULL`, default values will be used.
  */
-EXR_EXPORT exr_result_t exr_start_read (
-    exr_context_t*                   ctxt,
-    const char*                      filename,
-    const exr_context_initializer_t* ctxtdata);
+EXR_EXPORT exr_result_t exr_start_read(exr_context_t *ctxt,
+                                       const char *filename,
+                                       const exr_context_initializer_t *ctxtdata);
 
 /** @brief Enum describing how default files are handled during write. */
-typedef enum exr_default_write_mode
-{
-    EXR_WRITE_FILE_DIRECTLY =
-        0, /**< Overwrite filename provided directly, deleted upon error. */
-    EXR_INTERMEDIATE_TEMP_FILE =
-        1 /**< Create a temporary file, renaming it upon successful write, leaving original upon error */
+typedef enum exr_default_write_mode {
+  EXR_WRITE_FILE_DIRECTLY = 0,   /**< Overwrite filename provided directly, deleted upon error. */
+  EXR_INTERMEDIATE_TEMP_FILE = 1 /**< Create a temporary file, renaming it upon successful write,
+                                    leaving original upon error */
 } exr_default_write_mode_t;
 
-/** @brief Create and initialize a write-only context. 
+/** @brief Create and initialize a write-only context.
  *
  * If a custom write function is provided, the filename is for
  * informational purposes only, and the @p default_mode parameter will be
@@ -442,11 +438,10 @@ typedef enum exr_default_write_mode
  * documentation \ref exr_context_initializer_t. The @p ctxtdata
  * parameter is optional, if `NULL`, default values will be used.
  */
-EXR_EXPORT exr_result_t exr_start_write (
-    exr_context_t*                   ctxt,
-    const char*                      filename,
-    exr_default_write_mode_t         default_mode,
-    const exr_context_initializer_t* ctxtdata);
+EXR_EXPORT exr_result_t exr_start_write(exr_context_t *ctxt,
+                                        const char *filename,
+                                        exr_default_write_mode_t default_mode,
+                                        const exr_context_initializer_t *ctxtdata);
 
 /** @brief Create a new context for updating an exr file in place.
  *
@@ -458,25 +453,22 @@ EXR_EXPORT exr_result_t exr_start_write (
  * documentation \ref exr_context_initializer_t. The @p ctxtdata parameter
  * is optional, if `NULL`, default values will be used.
  */
-EXR_EXPORT exr_result_t exr_start_inplace_header_update (
-    exr_context_t*                   ctxt,
-    const char*                      filename,
-    const exr_context_initializer_t* ctxtdata);
+EXR_EXPORT exr_result_t exr_start_inplace_header_update(exr_context_t *ctxt,
+                                                        const char *filename,
+                                                        const exr_context_initializer_t *ctxtdata);
 
 /** @brief Retrieve the file name the context is for as provided
  * during the start routine.
  *
  * Do not free the resulting string.
  */
-EXR_EXPORT exr_result_t
-exr_get_file_name (exr_const_context_t ctxt, const char** name);
+EXR_EXPORT exr_result_t exr_get_file_name(exr_const_context_t ctxt, const char **name);
 
 /** @brief Query the user data the context was constructed with. This
  * is perhaps useful in the error handler callback to jump back into
  * an object the user controls.
  */
-EXR_EXPORT exr_result_t
-exr_get_user_data (exr_const_context_t ctxt, void** userdata);
+EXR_EXPORT exr_result_t exr_get_user_data(exr_const_context_t ctxt, void **userdata);
 
 /** Any opaque attribute data entry of the specified type is tagged
  * with these functions enabling downstream users to unpack (or pack)
@@ -493,27 +485,20 @@ exr_get_user_data (exr_const_context_t ctxt, void** userdata);
  * size can be re-updated to have the final, precise size to put into
  * the file.
  */
-EXR_EXPORT exr_result_t exr_register_attr_type_handler (
+EXR_EXPORT exr_result_t exr_register_attr_type_handler(
     exr_context_t ctxt,
-    const char*   type,
-    exr_result_t (*unpack_func_ptr) (
-        exr_context_t ctxt,
-        const void*   data,
-        int32_t       attrsize,
-        int32_t*      outsize,
-        void**        outbuffer),
-    exr_result_t (*pack_func_ptr) (
-        exr_context_t ctxt,
-        const void*   data,
-        int32_t       datasize,
-        int32_t*      outsize,
-        void*         outbuffer),
-    void (*destroy_unpacked_func_ptr) (
-        exr_context_t ctxt, void* data, int32_t datasize));
+    const char *type,
+    exr_result_t (*unpack_func_ptr)(exr_context_t ctxt,
+                                    const void *data,
+                                    int32_t attrsize,
+                                    int32_t *outsize,
+                                    void **outbuffer),
+    exr_result_t (*pack_func_ptr)(
+        exr_context_t ctxt, const void *data, int32_t datasize, int32_t *outsize, void *outbuffer),
+    void (*destroy_unpacked_func_ptr)(exr_context_t ctxt, void *data, int32_t datasize));
 
 /** @brief Enable long name support in the output context */
-EXR_EXPORT exr_result_t
-exr_set_longname_support (exr_context_t ctxt, int onoff);
+EXR_EXPORT exr_result_t exr_set_longname_support(exr_context_t ctxt, int onoff);
 
 /** @brief Write the header data.
  *
@@ -524,12 +509,12 @@ exr_set_longname_support (exr_context_t ctxt, int onoff);
  * metadata up front, prior to calling the above exr_start_write(),
  * allow the data to be set, then once this is called, it switches
  * into a mode where the library assumes the data is now valid.
- * 
+ *
  * It will recompute the number of chunks that will be written, and
  * reset the chunk offsets. If you modify file attributes or part
  * information after a call to this, it will error.
  */
-EXR_EXPORT exr_result_t exr_write_header (exr_context_t ctxt);
+EXR_EXPORT exr_result_t exr_write_header(exr_context_t ctxt);
 
 /** @} */
 

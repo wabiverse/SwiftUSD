@@ -55,7 +55,7 @@ class TfType;
 /// classes implemented by the plugin.
 ///
 class PlugPlugin : public TfWeakBase {
-public:
+ public:
   PLUG_API ~PlugPlugin();
 
   /// Loads the plugin.
@@ -69,7 +69,7 @@ public:
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   /// Returns \c true if the plugin is a python module.
   PLUG_API bool IsPythonModule() const;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   /// Returns \c true if the plugin is resource-only.
   PLUG_API bool IsResource() const;
@@ -86,17 +86,25 @@ public:
   /// Returns true if \p type is declared by this plugin.
   /// If \p includeSubclasses is specified, also returns true if any
   /// subclasses of \p type have been declared.
-  PLUG_API bool DeclaresType(const TfType &type,
-                             bool includeSubclasses = false) const;
+  PLUG_API bool DeclaresType(const TfType &type, bool includeSubclasses = false) const;
 
   /// Returns the plugin's name.
-  std::string const &GetName() const { return _name; }
+  std::string const &GetName() const
+  {
+    return _name;
+  }
 
   /// Returns the plugin's filesystem path.
-  std::string const &GetPath() const { return _path; }
+  std::string const &GetPath() const
+  {
+    return _path;
+  }
 
   /// Returns the plugin's resources filesystem path.
-  std::string const &GetResourcePath() const { return _resourcePath; }
+  std::string const &GetResourcePath() const
+  {
+    return _resourcePath;
+  }
 
   /// Build a plugin resource path by returning a given absolute path or
   /// combining the plugin's resource path with a given relative path.
@@ -106,16 +114,17 @@ public:
   /// verifying that file exists.  If verification fails an empty path
   /// is returned.  Relative paths are relative to the plugin's resource
   /// path.
-  PLUG_API std::string FindPluginResource(const std::string &path,
-                                          bool verify = true) const;
+  PLUG_API std::string FindPluginResource(const std::string &path, bool verify = true) const;
 
-private:
+ private:
   enum _Type { LibraryType, PythonType, ResourceType };
 
   // Private ctor, plugins are constructed only by PlugRegistry.
   PLUG_LOCAL
-  PlugPlugin(const std::string &path, const std::string &name,
-             const std::string &resourcePath, const JsObject &plugInfo,
+  PlugPlugin(const std::string &path,
+             const std::string &name,
+             const std::string &resourcePath,
+             const JsObject &plugInfo,
              _Type type);
 
   PLUG_LOCAL
@@ -128,25 +137,26 @@ private:
   PLUG_LOCAL
   static PlugPluginPtrVector _GetAllPlugins();
 
-  template <class PluginMap>
-  PLUG_LOCAL static std::pair<PlugPluginPtr, bool>
-  _NewPlugin(const Plug_RegistrationMetadata &metadata, _Type pluginType,
-             const std::string &pluginCreationPath,
-             PluginMap *allPluginsByNamePtr);
+  template<class PluginMap>
+  PLUG_LOCAL static std::pair<PlugPluginPtr, bool> _NewPlugin(
+      const Plug_RegistrationMetadata &metadata,
+      _Type pluginType,
+      const std::string &pluginCreationPath,
+      PluginMap *allPluginsByNamePtr);
 
   PLUG_LOCAL
-  static std::pair<PlugPluginPtr, bool>
-  _NewDynamicLibraryPlugin(const Plug_RegistrationMetadata &metadata);
+  static std::pair<PlugPluginPtr, bool> _NewDynamicLibraryPlugin(
+      const Plug_RegistrationMetadata &metadata);
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   PLUG_LOCAL
-  static std::pair<PlugPluginPtr, bool>
-  _NewPythonModulePlugin(const Plug_RegistrationMetadata &metadata);
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+  static std::pair<PlugPluginPtr, bool> _NewPythonModulePlugin(
+      const Plug_RegistrationMetadata &metadata);
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
   PLUG_LOCAL
-  static std::pair<PlugPluginPtr, bool>
-  _NewResourcePlugin(const Plug_RegistrationMetadata &metadata);
+  static std::pair<PlugPluginPtr, bool> _NewResourcePlugin(
+      const Plug_RegistrationMetadata &metadata);
 
   PLUG_LOCAL
   bool _Load();
@@ -170,12 +180,12 @@ private:
   PLUG_LOCAL
   static constexpr char const *_GetPluginTypeDisplayName(_Type type);
 
-private:
+ private:
   std::string _name;
   std::string _path;
   std::string _resourcePath;
   JsObject _dict;
-  void *_handle; // the handle returned by ArchLibraryOpen() is a void*
+  void *_handle;  // the handle returned by ArchLibraryOpen() is a void*
   std::atomic<bool> _isLoaded;
   _Type _type;
 
@@ -188,8 +198,9 @@ private:
 /// plugin's resource path.
 PLUG_API
 std::string PlugFindPluginResource(const PlugPluginPtr &plugin,
-                                   const std::string &path, bool verify = true);
+                                   const std::string &path,
+                                   bool verify = true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_PLUGIN_H
+#endif  // PXR_BASE_PLUG_PLUGIN_H

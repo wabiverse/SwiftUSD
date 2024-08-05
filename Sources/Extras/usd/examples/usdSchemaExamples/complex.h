@@ -26,18 +26,18 @@
 
 /// \file usdSchemaExamples/complex.h
 
-#include <pxr/pxrns.h>
 #include "./api.h"
 #include "./simple.h"
+#include "./tokens.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
-#include "./tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -54,9 +54,8 @@ class SdfAssetPath;
 ///
 /// An example of a untyped IsA schema prim
 ///
-class UsdSchemaExamplesComplex : public UsdSchemaExamplesSimple
-{
-public:
+class UsdSchemaExamplesComplex : public UsdSchemaExamplesSimple {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -87,8 +86,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSCHEMAEXAMPLES_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSchemaExamplesComplex holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -100,8 +98,7 @@ public:
   /// \endcode
   ///
   USDSCHEMAEXAMPLES_API
-  static UsdSchemaExamplesComplex
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSchemaExamplesComplex Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -126,17 +123,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDSCHEMAEXAMPLES_API
-  static UsdSchemaExamplesComplex
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSchemaExamplesComplex Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSCHEMAEXAMPLES_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSCHEMAEXAMPLES_API
@@ -148,7 +144,7 @@ private:
   USDSCHEMAEXAMPLES_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // COMPLEXSTRING
   // --------------------------------------------------------------------- //
@@ -168,9 +164,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDSCHEMAEXAMPLES_API
-  UsdAttribute CreateComplexStringAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateComplexStringAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

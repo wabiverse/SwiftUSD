@@ -48,49 +48,52 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 ///
 class TraceCounterAccumulator : private TraceCollection::Visitor {
-public:
+ public:
   using CounterValues = std::vector<std::pair<TraceEvent::TimeStamp, double>>;
-  using CounterValuesMap =
-      std::unordered_map<TfToken, CounterValues, TfToken::HashFunctor>;
+  using CounterValuesMap = std::unordered_map<TfToken, CounterValues, TfToken::HashFunctor>;
   using CounterMap = std::unordered_map<TfToken, double, TfToken::HashFunctor>;
 
   /// Constructor.
   TraceCounterAccumulator() = default;
 
   /// Returns a map of the counter values over time.
-  const CounterValuesMap &GetCounters() const { return _counterValuesOverTime; }
+  const CounterValuesMap &GetCounters() const
+  {
+    return _counterValuesOverTime;
+  }
 
   /// Sets the current value of the counters.
   TRACE_API void SetCurrentValues(const CounterMap &);
 
   /// Returns the current value of the counters.
-  const CounterMap &GetCurrentValues() const { return _currentValues; }
+  const CounterMap &GetCurrentValues() const
+  {
+    return _currentValues;
+  }
 
   /// Reads events /p collection and updates the current values of the
   /// counters.
   TRACE_API void Update(const TraceCollection &collection);
 
-protected:
+ protected:
   /// Determines whether or not counter events with \p id should be processed.
   virtual bool _AcceptsCategory(TraceCategoryId id) = 0;
 
-private:
+ private:
   // TraceCollection::Visitor Interface
   virtual void OnBeginCollection() override;
   virtual void OnEndCollection() override;
   virtual void OnBeginThread(const TraceThreadId &) override;
   virtual void OnEndThread(const TraceThreadId &) override;
   virtual bool AcceptsCategory(TraceCategoryId) override;
-  virtual void OnEvent(const TraceThreadId &, const TfToken &,
-                       const TraceEvent &) override;
+  virtual void OnEvent(const TraceThreadId &, const TfToken &, const TraceEvent &) override;
 
   struct _CounterValue {
     double value;
     bool isDelta;
   };
 
-  using _CounterDeltaValues =
-      std::multimap<TraceEvent::TimeStamp, _CounterValue>;
+  using _CounterDeltaValues = std::multimap<TraceEvent::TimeStamp, _CounterValue>;
   using _CounterDeltaMap = std::map<TfToken, _CounterDeltaValues>;
 
   _CounterDeltaMap _counterDeltas;
@@ -100,4 +103,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_COUNTER_ACCUMULATOR_H
+#endif  // PXR_BASE_TRACE_COUNTER_ACCUMULATOR_H

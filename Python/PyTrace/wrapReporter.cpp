@@ -42,37 +42,43 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace boost::python;
 
-static void _Report(const TraceReporterPtr &self, int iterationCount) {
+static void _Report(const TraceReporterPtr &self, int iterationCount)
+{
   self->Report(std::cout, iterationCount);
 }
 
 static void _ReportToFile(const TraceReporterPtr &self,
-                          const std::string &fileName, int iterationCount,
-                          bool append) {
-  std::ofstream os(fileName.c_str(),
-                   append ? std::ios_base::app : std::ios_base::out);
+                          const std::string &fileName,
+                          int iterationCount,
+                          bool append)
+{
+  std::ofstream os(fileName.c_str(), append ? std::ios_base::app : std::ios_base::out);
   self->Report(os, iterationCount);
 }
 
-static void _ReportTimes(TraceReporterPtr self) {
+static void _ReportTimes(TraceReporterPtr self)
+{
   self->ReportTimes(std::cout);
 }
 
-static void _ReportChromeTracing(const TraceReporterPtr &self) {
+static void _ReportChromeTracing(const TraceReporterPtr &self)
+{
   self->ReportChromeTracing(std::cout);
 }
 
-static void _ReportChromeTracingToFile(const TraceReporterPtr &self,
-                                       const std::string &fileName) {
+static void _ReportChromeTracingToFile(const TraceReporterPtr &self, const std::string &fileName)
+{
   std::ofstream os(fileName.c_str());
   self->ReportChromeTracing(os);
 }
 
-static TraceReporterRefPtr _Constructor1(const std::string &label) {
+static TraceReporterRefPtr _Constructor1(const std::string &label)
+{
   return TraceReporter::New(label, TraceReporterDataSourceCollector::New());
 }
 
-void wrapReporter() {
+void wrapReporter()
+{
   using This = TraceReporter;
   using ThisPtr = TraceReporterPtr;
 
@@ -81,13 +87,11 @@ void wrapReporter() {
           .def(TfPyRefAndWeakPtr())
           .def(TfMakePyConstructor(_Constructor1))
 
-          .def("GetLabel", &This::GetLabel,
-               return_value_policy<return_by_value>())
+          .def("GetLabel", &This::GetLabel, return_value_policy<return_by_value>())
 
           .def("Report", &::_Report, (arg("iterationCount") = 1))
 
-          .def("Report", &::_ReportToFile,
-               (arg("iterationCount") = 1, arg("append") = false))
+          .def("Report", &::_ReportToFile, (arg("iterationCount") = 1, arg("append") = false))
 
           .def("ReportTimes", &::_ReportTimes)
 
@@ -100,11 +104,10 @@ void wrapReporter() {
 
           .def("ClearTree", &This::ClearTree)
 
-          .add_property("groupByFunction", &This::GetGroupByFunction,
-                        &This::SetGroupByFunction)
+          .add_property("groupByFunction", &This::GetGroupByFunction, &This::SetGroupByFunction)
 
-          .add_property("foldRecursiveCalls", &This::GetFoldRecursiveCalls,
-                        &This::SetFoldRecursiveCalls)
+          .add_property(
+              "foldRecursiveCalls", &This::GetFoldRecursiveCalls, &This::SetFoldRecursiveCalls)
 
           .add_property("shouldAdjustForOverheadAndNoise",
                         &This::ShouldAdjustForOverheadAndNoise,

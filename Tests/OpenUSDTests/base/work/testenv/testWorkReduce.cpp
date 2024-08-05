@@ -22,15 +22,15 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "pxr/base/work/reduce.h"
+#include "pxr/pxr.h"
 
 #include "pxr/base/work/threadLimits.h"
 
-#include "pxr/base/tf/stopwatch.h"
+#include "Arch/fileSystem.h"
 #include "pxr/base/tf/iterator.h"
 #include "pxr/base/tf/staticData.h"
-#include "Arch/fileSystem.h"
+#include "pxr/base/tf/stopwatch.h"
 
 #include <functional>
 
@@ -42,34 +42,29 @@ using namespace std::placeholders;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static int
-sum(size_t begin, size_t end, int val, const std::vector<int> &v)
+static int sum(size_t begin, size_t end, int val, const std::vector<int> &v)
 {
   for (size_t i = begin; i < end; ++i)
     val += v[i];
   return val;
 }
 
-static int
-plus(int lhs, int rhs)
+static int plus(int lhs, int rhs)
 {
   return lhs + rhs;
 }
 
-static void
-_PopulateVector(size_t arraySize, std::vector<int> &v)
+static void _PopulateVector(size_t arraySize, std::vector<int> &v)
 {
   v.clear();
   v.reserve(arraySize);
-  for (size_t i = 0; i < arraySize; ++i)
-  {
+  for (size_t i = 0; i < arraySize; ++i) {
     v.push_back(i);
   }
 }
 
 // Returns the number of seconds it took to complete this operation.
-double
-_DoTBBTest(bool verify, const int arraySize, const size_t numIterations)
+double _DoTBBTest(bool verify, const int arraySize, const size_t numIterations)
 {
   std::vector<int> v;
   _PopulateVector(arraySize, v);
@@ -77,16 +72,12 @@ _DoTBBTest(bool verify, const int arraySize, const size_t numIterations)
   TfStopwatch sw;
   sw.Start();
   int res = 0;
-  for (size_t i = 0; i < numIterations; i++)
-  {
-    res = WorkParallelReduceN(0,
-                              arraySize,
-                              std::bind(&sum, _1, _2, _3, v),
-                              std::bind(&plus, _1, _2));
+  for (size_t i = 0; i < numIterations; i++) {
+    res = WorkParallelReduceN(
+        0, arraySize, std::bind(&sum, _1, _2, _3, v), std::bind(&plus, _1, _2));
   }
 
-  if (verify)
-  {
+  if (verify) {
     TF_AXIOM(numIterations == 1);
     TF_AXIOM(res = arraySize * (arraySize - 1) / 2);
   }
@@ -99,8 +90,7 @@ _DoTBBTest(bool verify, const int arraySize, const size_t numIterations)
 // interchanged.
 void _DoSignatureTest()
 {
-  struct F
-  {
+  struct F {
     // Test that this can be non-const
     int operator()(size_t start, size_t end, int val)
     {
@@ -110,8 +100,7 @@ void _DoSignatureTest()
 
   F f;
 
-  struct B
-  {
+  struct B {
     // The reduction operator has to be const
     int operator()(int lhs, int rhs) const
     {
@@ -134,17 +123,16 @@ int main(int argc, char **argv)
 
   WorkSetMaximumConcurrencyLimit();
 
-  std::cout << "Initialized with " << WorkGetPhysicalConcurrencyLimit() << " cores..." << std::endl;
+  std::cout << "Initialized with " << WorkGetPhysicalConcurrencyLimit() << " cores..."
+            << std::endl;
 
   double tbbSeconds = _DoTBBTest(!perfMode, arraySize, numIterations);
 
-  std::cout << "TBB parallel_reduce.h took: " << tbbSeconds << " seconds"
-            << std::endl;
+  std::cout << "TBB parallel_reduce.h took: " << tbbSeconds << " seconds" << std::endl;
 
   _DoSignatureTest();
 
-  if (perfMode)
-  {
+  if (perfMode) {
 
     // XXX:perfgen only accepts metric names ending in _time.  See bug 97317
     FILE *outputFile = ArchOpenFile("perfstats.raw", "w");

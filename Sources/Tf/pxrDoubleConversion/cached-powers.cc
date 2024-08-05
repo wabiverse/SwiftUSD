@@ -135,15 +135,18 @@ static const CachedPower kCachedPowers[] = {
     {UINT64_2PART_C(0xaf87023b, 9bf0ee6b), 1066, 340},
 };
 
-static const int kCachedPowersOffset = 348; // -1 * the first decimal_exponent.
-static const double kD_1_LOG2_10 = 0.30102999566398114; //  1 / lg(10)
+static const int kCachedPowersOffset = 348;              // -1 * the first decimal_exponent.
+static const double kD_1_LOG2_10 = 0.30102999566398114;  //  1 / lg(10)
 // Difference between the decimal exponents in the table above.
 const int PowersOfTenCache::kDecimalExponentDistance = 8;
 const int PowersOfTenCache::kMinDecimalExponent = -348;
 const int PowersOfTenCache::kMaxDecimalExponent = 340;
 
-void PowersOfTenCache::GetCachedPowerForBinaryExponentRange(
-    int min_exponent, int max_exponent, DiyFp *power, int *decimal_exponent) {
+void PowersOfTenCache::GetCachedPowerForBinaryExponentRange(int min_exponent,
+                                                            int max_exponent,
+                                                            DiyFp *power,
+                                                            int *decimal_exponent)
+{
   int kQ = DiyFp::kSignificandSize;
   double k = ceil((min_exponent + kQ - 1) * kD_1_LOG2_10);
   int foo = kCachedPowersOffset;
@@ -151,7 +154,7 @@ void PowersOfTenCache::GetCachedPowerForBinaryExponentRange(
   ASSERT(0 <= index && index < static_cast<int>(ARRAY_SIZE(kCachedPowers)));
   CachedPower cached_power = kCachedPowers[index];
   ASSERT(min_exponent <= cached_power.binary_exponent);
-  (void)max_exponent; // Mark variable as used.
+  (void)max_exponent;  // Mark variable as used.
   ASSERT(cached_power.binary_exponent <= max_exponent);
   *decimal_exponent = cached_power.decimal_exponent;
   *power = DiyFp(cached_power.significand, cached_power.binary_exponent);
@@ -159,11 +162,11 @@ void PowersOfTenCache::GetCachedPowerForBinaryExponentRange(
 
 void PowersOfTenCache::GetCachedPowerForDecimalExponent(int requested_exponent,
                                                         DiyFp *power,
-                                                        int *found_exponent) {
+                                                        int *found_exponent)
+{
   ASSERT(kMinDecimalExponent <= requested_exponent);
   ASSERT(requested_exponent < kMaxDecimalExponent + kDecimalExponentDistance);
-  int index =
-      (requested_exponent + kCachedPowersOffset) / kDecimalExponentDistance;
+  int index = (requested_exponent + kCachedPowersOffset) / kDecimalExponentDistance;
   CachedPower cached_power = kCachedPowers[index];
   *power = DiyFp(cached_power.significand, cached_power.binary_exponent);
   *found_exponent = cached_power.decimal_exponent;
@@ -171,6 +174,6 @@ void PowersOfTenCache::GetCachedPowerForDecimalExponent(int requested_exponent,
   ASSERT(requested_exponent < *found_exponent + kDecimalExponentDistance);
 }
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE

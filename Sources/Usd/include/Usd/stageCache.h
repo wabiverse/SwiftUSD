@@ -85,7 +85,7 @@ class UsdStageCacheRequest;
 /// UsdStageCache::SetDebugName() and UsdStageCache::GetDebugName().
 ///
 class UsdStageCache {
-public:
+ public:
   /// \class Id
   ///
   /// A lightweight identifier that may be used to identify a
@@ -103,53 +103,78 @@ public:
 
     /// Create an Id from an integral value.  The supplied \p val must have
     /// been obtained by calling ToLongInt() previously.
-    static Id FromLongInt(long int val) { return Id(val); }
+    static Id FromLongInt(long int val)
+    {
+      return Id(val);
+    }
 
     /// Create an Id from a string value.  The supplied \p val must have
     /// been obtained by calling ToString() previously.
-    static Id FromString(const std::string &s) {
+    static Id FromString(const std::string &s)
+    {
       return FromLongInt(boost::lexical_cast<long int>(s));
     }
 
     /// Convert this Id to an integral representation.
-    long int ToLongInt() const { return _value; }
+    long int ToLongInt() const
+    {
+      return _value;
+    }
 
     /// Convert this Id to a string representation.
-    std::string ToString() const {
+    std::string ToString() const
+    {
       return boost::lexical_cast<std::string>(ToLongInt());
     }
 
     /// Return true if this Id is valid.
-    bool IsValid() const { return _value != -1; }
+    bool IsValid() const
+    {
+      return _value != -1;
+    }
 
     /// Return true if this Id is valid.
-    explicit operator bool() const { return IsValid(); }
+    explicit operator bool() const
+    {
+      return IsValid();
+    }
 
-  private:
+   private:
     /// Equality comparison.
-    friend bool operator==(const Id &lhs, const Id &rhs) {
+    friend bool operator==(const Id &lhs, const Id &rhs)
+    {
       return lhs.ToLongInt() == rhs.ToLongInt();
     }
     /// Inequality comparison.
-    friend bool operator!=(const Id &lhs, const Id &rhs) {
+    friend bool operator!=(const Id &lhs, const Id &rhs)
+    {
       return !(lhs == rhs);
     }
     /// Less-than comparison.
-    friend bool operator<(const Id &lhs, const Id &rhs) {
+    friend bool operator<(const Id &lhs, const Id &rhs)
+    {
       return lhs.ToLongInt() < rhs.ToLongInt();
     }
     /// Less-than or equal comparison.
-    friend bool operator<=(const Id &lhs, const Id &rhs) {
+    friend bool operator<=(const Id &lhs, const Id &rhs)
+    {
       return !(rhs < lhs);
     }
     /// Greater-than comparison.
-    friend bool operator>(const Id &lhs, const Id &rhs) { return rhs < lhs; }
+    friend bool operator>(const Id &lhs, const Id &rhs)
+    {
+      return rhs < lhs;
+    }
     /// Greater-than or equal comparison.
-    friend bool operator>=(const Id &lhs, const Id &rhs) {
+    friend bool operator>=(const Id &lhs, const Id &rhs)
+    {
       return !(lhs < rhs);
     }
     /// Hash.
-    friend size_t hash_value(Id id) { return ~size_t(id.ToLongInt()); }
+    friend size_t hash_value(Id id)
+    {
+      return ~size_t(id.ToLongInt());
+    }
 
     explicit Id(long int val) : _value(val) {}
 
@@ -185,7 +210,10 @@ public:
   size_t Size() const;
 
   /// Return true if this cache holds no stages, false otherwise.
-  bool IsEmpty() const { return Size() == 0; }
+  bool IsEmpty() const
+  {
+    return Size() == 0;
+  }
 
   /// Find an existing stage in the cache that satisfies \p request, or invoke
   /// request.Manufacture() to create one and insert it into the cache.
@@ -240,9 +268,8 @@ public:
   /// one.
   /// \sa FindAllMatching()
   USD_API
-  UsdStageRefPtr
-  FindOneMatching(const SdfLayerHandle &rootLayer,
-                  const ArResolverContext &pathResolverContext) const;
+  UsdStageRefPtr FindOneMatching(const SdfLayerHandle &rootLayer,
+                                 const ArResolverContext &pathResolverContext) const;
 
   /// Find a stage in this cache with \p rootLayer, \p sessionLayer, and
   /// \p pathResolverContext.  If there is no matching stage in this cache,
@@ -250,41 +277,36 @@ public:
   /// return an arbitrary matching one.
   /// \sa FindAllMatching()
   USD_API
-  UsdStageRefPtr
-  FindOneMatching(const SdfLayerHandle &rootLayer,
-                  const SdfLayerHandle &sessionLayer,
-                  const ArResolverContext &pathResolverContext) const;
+  UsdStageRefPtr FindOneMatching(const SdfLayerHandle &rootLayer,
+                                 const SdfLayerHandle &sessionLayer,
+                                 const ArResolverContext &pathResolverContext) const;
 
   /// Find all stages in this cache with \p rootLayer.  If there is no
   /// matching stage in this cache, return an empty vector.
   USD_API
-  std::vector<UsdStageRefPtr>
-  FindAllMatching(const SdfLayerHandle &rootLayer) const;
+  std::vector<UsdStageRefPtr> FindAllMatching(const SdfLayerHandle &rootLayer) const;
 
   /// Find all stages in this cache with \p rootLayer and \p sessionLayer.
   /// If there is no matching stage in this cache, return an empty vector.
   USD_API
-  std::vector<UsdStageRefPtr>
-  FindAllMatching(const SdfLayerHandle &rootLayer,
-                  const SdfLayerHandle &sessionLayer) const;
+  std::vector<UsdStageRefPtr> FindAllMatching(const SdfLayerHandle &rootLayer,
+                                              const SdfLayerHandle &sessionLayer) const;
 
   /// Find all stages in this cache with \p rootLayer and
   /// \p pathResolverContext.  If there is no matching stage in this cache,
   /// return an empty vector.
   USD_API
-  std::vector<UsdStageRefPtr>
-  FindAllMatching(const SdfLayerHandle &rootLayer,
-                  const ArResolverContext &pathResolverContext) const;
+  std::vector<UsdStageRefPtr> FindAllMatching(const SdfLayerHandle &rootLayer,
+                                              const ArResolverContext &pathResolverContext) const;
 
   /// Find all stages in this cache with \p rootLayer, \p sessionLayer, and
   /// \p pathResolverContext.  If there is no matching stage in this cache,
   /// return an empty vector.  If there is more than one matching stage in
   /// this cache, return an arbitrary matching one.
   USD_API
-  std::vector<UsdStageRefPtr>
-  FindAllMatching(const SdfLayerHandle &rootLayer,
-                  const SdfLayerHandle &sessionLayer,
-                  const ArResolverContext &pathResolverContext) const;
+  std::vector<UsdStageRefPtr> FindAllMatching(const SdfLayerHandle &rootLayer,
+                                              const SdfLayerHandle &sessionLayer,
+                                              const ArResolverContext &pathResolverContext) const;
 
   /// Return the Id associated with \p stage in this cache.  If \p stage is
   /// not present in this cache, return an invalid Id.
@@ -292,12 +314,16 @@ public:
   Id GetId(const UsdStageRefPtr &stage) const;
 
   /// Return true if \p stage is present in this cache, false otherwise.
-  bool Contains(const UsdStageRefPtr &stage) const {
+  bool Contains(const UsdStageRefPtr &stage) const
+  {
     return static_cast<bool>(GetId(stage));
   }
 
   /// Return true if \p id is present in this cache, false otherwise.
-  bool Contains(Id id) const { return Find(id); }
+  bool Contains(Id id) const
+  {
+    return Find(id);
+  }
 
   /// Insert \p stage into this cache and return its associated Id.  If the
   /// given \p stage is already present in this cache, simply return its
@@ -332,8 +358,7 @@ public:
   /// UsdStageRefPtr, erasing a stage from the cache will only destroy the
   /// stage if no other UsdStageRefPtrs exist referring to it.
   USD_API
-  size_t EraseAll(const SdfLayerHandle &rootLayer,
-                  const SdfLayerHandle &sessionLayer);
+  size_t EraseAll(const SdfLayerHandle &rootLayer, const SdfLayerHandle &sessionLayer);
 
   /// Erase all stages present in the cache with \p rootLayer,
   /// \p sessionLayer, and \p pathResolverContext and return the number
@@ -363,8 +388,11 @@ public:
   USD_API
   std::string GetDebugName() const;
 
-private:
-  friend void swap(UsdStageCache &lhs, UsdStageCache &rhs) { lhs.swap(rhs); }
+ private:
+  friend void swap(UsdStageCache &lhs, UsdStageCache &rhs)
+  {
+    lhs.swap(rhs);
+  }
 
   typedef struct Usd_StageCacheImpl _Impl;
   std::unique_ptr<_Impl> _impl;
@@ -372,7 +400,7 @@ private:
 } SWIFT_CONFORMS_TO_PROTOCOL(Swift.Sendable);
 
 class UsdStageCacheRequest {
-public:
+ public:
   USD_API
   virtual ~UsdStageCacheRequest();
 
@@ -387,7 +415,7 @@ public:
   // IsSatisfiedBy() must return true for the resulting stage.
   virtual UsdStageRefPtr Manufacture() = 0;
 
-private:
+ private:
   friend class UsdStageCache;
 
   struct _Mailbox;
@@ -402,4 +430,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_STAGE_CACHE_H
+#endif  // PXR_USD_USD_STAGE_CACHE_H

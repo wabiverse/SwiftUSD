@@ -25,394 +25,364 @@
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
 
-#include "pxr/usd/sdf/types.h"
 #include "pxr/usd/sdf/assetPath.h"
+#include "pxr/usd/sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdContrivedDerived,
-        TfType::Bases< UsdContrivedBase > >();
-    
-    // Register the usd prim typename as an alias under UsdSchemaBase. This
-    // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("Derived")
-    // to find TfType<UsdContrivedDerived>, which is how IsA queries are
-    // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdContrivedDerived>("Derived");
+  TfType::Define<UsdContrivedDerived, TfType::Bases<UsdContrivedBase>>();
+
+  // Register the usd prim typename as an alias under UsdSchemaBase. This
+  // enables one to call
+  // TfType::Find<UsdSchemaBase>().FindDerivedByName("Derived")
+  // to find TfType<UsdContrivedDerived>, which is how IsA queries are
+  // answered.
+  TfType::AddAlias<UsdSchemaBase, UsdContrivedDerived>("Derived");
 }
 
 /* virtual */
-UsdContrivedDerived::~UsdContrivedDerived()
+UsdContrivedDerived::~UsdContrivedDerived() {}
+
+/* static */
+UsdContrivedDerived UsdContrivedDerived::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdContrivedDerived();
+  }
+  return UsdContrivedDerived(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdContrivedDerived
-UsdContrivedDerived::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdContrivedDerived UsdContrivedDerived::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdContrivedDerived();
-    }
-    return UsdContrivedDerived(stage->GetPrimAtPath(path));
-}
-
-/* static */
-UsdContrivedDerived
-UsdContrivedDerived::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
-    static TfToken usdPrimTypeName("Derived");
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdContrivedDerived();
-    }
-    return UsdContrivedDerived(
-        stage->DefinePrim(path, usdPrimTypeName));
+  static TfToken usdPrimTypeName("Derived");
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdContrivedDerived();
+  }
+  return UsdContrivedDerived(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdContrivedDerived::_GetSchemaKind() const
 {
-    return UsdContrivedDerived::schemaKind;
+  return UsdContrivedDerived::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdContrivedDerived::_GetStaticTfType()
+const TfType &UsdContrivedDerived::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdContrivedDerived>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdContrivedDerived>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdContrivedDerived::_IsTypedSchema()
+bool UsdContrivedDerived::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdContrivedDerived::_GetTfType() const
+const TfType &UsdContrivedDerived::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdContrivedDerived::GetPivotPositionAttr() const
+UsdAttribute UsdContrivedDerived::GetPivotPositionAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->pivotPosition);
+  return GetPrim().GetAttribute(UsdContrivedTokens->pivotPosition);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreatePivotPositionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreatePivotPositionAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->pivotPosition,
-                       SdfValueTypeNames->Float3,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->pivotPosition,
+                                    SdfValueTypeNames->Float3,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetMyVecfArrayAttr() const
+UsdAttribute UsdContrivedDerived::GetMyVecfArrayAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->myVecfArray);
+  return GetPrim().GetAttribute(UsdContrivedTokens->myVecfArray);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateMyVecfArrayAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateMyVecfArrayAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->myVecfArray,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->myVecfArray,
+                                    SdfValueTypeNames->Float3Array,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetHoleIndicesAttr() const
+UsdAttribute UsdContrivedDerived::GetHoleIndicesAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->holeIndices);
+  return GetPrim().GetAttribute(UsdContrivedTokens->holeIndices);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateHoleIndicesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateHoleIndicesAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->holeIndices,
-                       SdfValueTypeNames->IntArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->holeIndices,
+                                    SdfValueTypeNames->IntArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetCornerIndicesAttr() const
+UsdAttribute UsdContrivedDerived::GetCornerIndicesAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->cornerIndices);
+  return GetPrim().GetAttribute(UsdContrivedTokens->cornerIndices);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateCornerIndicesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateCornerIndicesAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->cornerIndices,
-                       SdfValueTypeNames->IntArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->cornerIndices,
+                                    SdfValueTypeNames->IntArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetCornerSharpnessesAttr() const
+UsdAttribute UsdContrivedDerived::GetCornerSharpnessesAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->cornerSharpnesses);
+  return GetPrim().GetAttribute(UsdContrivedTokens->cornerSharpnesses);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateCornerSharpnessesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateCornerSharpnessesAttr(VtValue const &defaultValue,
+                                                              bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->cornerSharpnesses,
-                       SdfValueTypeNames->FloatArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->cornerSharpnesses,
+                                    SdfValueTypeNames->FloatArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetCreaseLengthsAttr() const
+UsdAttribute UsdContrivedDerived::GetCreaseLengthsAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->creaseLengths);
+  return GetPrim().GetAttribute(UsdContrivedTokens->creaseLengths);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateCreaseLengthsAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateCreaseLengthsAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->creaseLengths,
-                       SdfValueTypeNames->IntArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->creaseLengths,
+                                    SdfValueTypeNames->IntArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetTransformAttr() const
+UsdAttribute UsdContrivedDerived::GetTransformAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->transform);
+  return GetPrim().GetAttribute(UsdContrivedTokens->transform);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateTransformAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateTransformAttr(VtValue const &defaultValue,
+                                                      bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->transform,
-                       SdfValueTypeNames->Matrix4d,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->transform,
+                                    SdfValueTypeNames->Matrix4d,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetTestingAssetAttr() const
+UsdAttribute UsdContrivedDerived::GetTestingAssetAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->testingAsset);
+  return GetPrim().GetAttribute(UsdContrivedTokens->testingAsset);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateTestingAssetAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateTestingAssetAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->testingAsset,
-                       SdfValueTypeNames->AssetArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->testingAsset,
+                                    SdfValueTypeNames->AssetArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetNamespacedPropertyAttr() const
+UsdAttribute UsdContrivedDerived::GetNamespacedPropertyAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->namespacedProperty);
+  return GetPrim().GetAttribute(UsdContrivedTokens->namespacedProperty);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateNamespacedPropertyAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateNamespacedPropertyAttr(VtValue const &defaultValue,
+                                                               bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->namespacedProperty,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->namespacedProperty,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetJustDefaultAttr() const
+UsdAttribute UsdContrivedDerived::GetJustDefaultAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->justDefault);
+  return GetPrim().GetAttribute(UsdContrivedTokens->justDefault);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateJustDefaultAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateJustDefaultAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->justDefault,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->justDefault,
+                                    SdfValueTypeNames->Token,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetOverrideBaseTrueDerivedFalseAttr() const
+UsdAttribute UsdContrivedDerived::GetOverrideBaseTrueDerivedFalseAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseTrueDerivedFalse);
+  return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseTrueDerivedFalse);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateOverrideBaseTrueDerivedFalseAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateOverrideBaseTrueDerivedFalseAttr(
+    VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseTrueDerivedFalse,
-                       SdfValueTypeNames->Int,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseTrueDerivedFalse,
+                                    SdfValueTypeNames->Int,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetOverrideBaseTrueDerivedNoneAttr() const
+UsdAttribute UsdContrivedDerived::GetOverrideBaseTrueDerivedNoneAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseTrueDerivedNone);
+  return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseTrueDerivedNone);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateOverrideBaseTrueDerivedNoneAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateOverrideBaseTrueDerivedNoneAttr(
+    VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseTrueDerivedNone,
-                       SdfValueTypeNames->Int,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseTrueDerivedNone,
+                                    SdfValueTypeNames->Int,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetOverrideBaseFalseDerivedFalseAttr() const
+UsdAttribute UsdContrivedDerived::GetOverrideBaseFalseDerivedFalseAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseFalseDerivedFalse);
+  return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseFalseDerivedFalse);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateOverrideBaseFalseDerivedFalseAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateOverrideBaseFalseDerivedFalseAttr(
+    VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseFalseDerivedFalse,
-                       SdfValueTypeNames->Int,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseFalseDerivedFalse,
+                                    SdfValueTypeNames->Int,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetOverrideBaseFalseDerivedNoneAttr() const
+UsdAttribute UsdContrivedDerived::GetOverrideBaseFalseDerivedNoneAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseFalseDerivedNone);
+  return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseFalseDerivedNone);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateOverrideBaseFalseDerivedNoneAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateOverrideBaseFalseDerivedNoneAttr(
+    VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseFalseDerivedNone,
-                       SdfValueTypeNames->Int,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseFalseDerivedNone,
+                                    SdfValueTypeNames->Int,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdAttribute
-UsdContrivedDerived::GetOverrideBaseNoneDerivedFalseAttr() const
+UsdAttribute UsdContrivedDerived::GetOverrideBaseNoneDerivedFalseAttr() const
 {
-    return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseNoneDerivedFalse);
+  return GetPrim().GetAttribute(UsdContrivedTokens->overrideBaseNoneDerivedFalse);
 }
 
-UsdAttribute
-UsdContrivedDerived::CreateOverrideBaseNoneDerivedFalseAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdContrivedDerived::CreateOverrideBaseNoneDerivedFalseAttr(
+    VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseNoneDerivedFalse,
-                       SdfValueTypeNames->Int,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdContrivedTokens->overrideBaseNoneDerivedFalse,
+                                    SdfValueTypeNames->Int,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
-UsdRelationship
-UsdContrivedDerived::GetBindingRel() const
+UsdRelationship UsdContrivedDerived::GetBindingRel() const
 {
-    return GetPrim().GetRelationship(UsdContrivedTokens->binding);
+  return GetPrim().GetRelationship(UsdContrivedTokens->binding);
 }
 
-UsdRelationship
-UsdContrivedDerived::CreateBindingRel() const
+UsdRelationship UsdContrivedDerived::CreateBindingRel() const
 {
-    return GetPrim().CreateRelationship(UsdContrivedTokens->binding,
-                       /* custom = */ false);
+  return GetPrim().CreateRelationship(UsdContrivedTokens->binding,
+                                      /* custom = */ false);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdContrivedDerived::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdContrivedDerived::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-        UsdContrivedTokens->pivotPosition,
-        UsdContrivedTokens->myVecfArray,
-        UsdContrivedTokens->holeIndices,
-        UsdContrivedTokens->cornerIndices,
-        UsdContrivedTokens->cornerSharpnesses,
-        UsdContrivedTokens->creaseLengths,
-        UsdContrivedTokens->transform,
-        UsdContrivedTokens->testingAsset,
-        UsdContrivedTokens->namespacedProperty,
-        UsdContrivedTokens->justDefault,
-        UsdContrivedTokens->overrideBaseTrueDerivedFalse,
-        UsdContrivedTokens->overrideBaseTrueDerivedNone,
-        UsdContrivedTokens->overrideBaseFalseDerivedFalse,
-        UsdContrivedTokens->overrideBaseFalseDerivedNone,
-        UsdContrivedTokens->overrideBaseNoneDerivedFalse,
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdContrivedBase::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {
+      UsdContrivedTokens->pivotPosition,
+      UsdContrivedTokens->myVecfArray,
+      UsdContrivedTokens->holeIndices,
+      UsdContrivedTokens->cornerIndices,
+      UsdContrivedTokens->cornerSharpnesses,
+      UsdContrivedTokens->creaseLengths,
+      UsdContrivedTokens->transform,
+      UsdContrivedTokens->testingAsset,
+      UsdContrivedTokens->namespacedProperty,
+      UsdContrivedTokens->justDefault,
+      UsdContrivedTokens->overrideBaseTrueDerivedFalse,
+      UsdContrivedTokens->overrideBaseTrueDerivedNone,
+      UsdContrivedTokens->overrideBaseFalseDerivedFalse,
+      UsdContrivedTokens->overrideBaseFalseDerivedNone,
+      UsdContrivedTokens->overrideBaseNoneDerivedFalse,
+  };
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdContrivedBase::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

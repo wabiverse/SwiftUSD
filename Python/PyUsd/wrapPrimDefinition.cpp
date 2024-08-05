@@ -33,16 +33,16 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static TfPyObjWrapper
-_WrapGetAttributeFallbackValue(const UsdPrimDefinition &self,
-                               const TfToken &attrName) {
+static TfPyObjWrapper _WrapGetAttributeFallbackValue(const UsdPrimDefinition &self,
+                                                     const TfToken &attrName)
+{
   VtValue result;
   self.GetAttributeFallbackValue(attrName, &result);
   return UsdVtValueToPython(result);
 }
 
-static TfPyObjWrapper _WrapGetMetadata(const UsdPrimDefinition &self,
-                                       const TfToken &key) {
+static TfPyObjWrapper _WrapGetMetadata(const UsdPrimDefinition &self, const TfToken &key)
+{
   VtValue result;
   self.GetMetadata(key, &result);
   return UsdVtValueToPython(result);
@@ -50,7 +50,8 @@ static TfPyObjWrapper _WrapGetMetadata(const UsdPrimDefinition &self,
 
 static TfPyObjWrapper _WrapGetMetadataByDictKey(const UsdPrimDefinition &self,
                                                 const TfToken &key,
-                                                const TfToken &keyPath) {
+                                                const TfToken &keyPath)
+{
   VtValue result;
   self.GetMetadataByDictKey(key, keyPath, &result);
   return UsdVtValueToPython(result);
@@ -58,39 +59,42 @@ static TfPyObjWrapper _WrapGetMetadataByDictKey(const UsdPrimDefinition &self,
 
 static TfPyObjWrapper _WrapGetPropertyMetadata(const UsdPrimDefinition &self,
                                                const TfToken &propName,
-                                               const TfToken &key) {
+                                               const TfToken &key)
+{
   VtValue result;
   self.GetPropertyMetadata(propName, key, &result);
   return UsdVtValueToPython(result);
 }
 
-static TfPyObjWrapper
-_WrapGetPropertyMetadataByDictKey(const UsdPrimDefinition &self,
-                                  const TfToken &propName, const TfToken &key,
-                                  const TfToken &keyPath) {
+static TfPyObjWrapper _WrapGetPropertyMetadataByDictKey(const UsdPrimDefinition &self,
+                                                        const TfToken &propName,
+                                                        const TfToken &key,
+                                                        const TfToken &keyPath)
+{
   VtValue result;
   self.GetPropertyMetadataByDictKey(propName, key, keyPath, &result);
   return UsdVtValueToPython(result);
 }
 
-static TfPyObjWrapper
-_WrapPropertyGetMetadata(const UsdPrimDefinition::Property &self,
-                         const TfToken &key) {
+static TfPyObjWrapper _WrapPropertyGetMetadata(const UsdPrimDefinition::Property &self,
+                                               const TfToken &key)
+{
   VtValue result;
   self.GetMetadata(key, &result);
   return UsdVtValueToPython(result);
 }
 
-static TfPyObjWrapper
-_WrapPropertyGetMetadataByDictKey(const UsdPrimDefinition::Property &self,
-                                  const TfToken &key, const TfToken &keyPath) {
+static TfPyObjWrapper _WrapPropertyGetMetadataByDictKey(const UsdPrimDefinition::Property &self,
+                                                        const TfToken &key,
+                                                        const TfToken &keyPath)
+{
   VtValue result;
   self.GetMetadataByDictKey(key, keyPath, &result);
   return UsdVtValueToPython(result);
 }
 
-static TfPyObjWrapper
-_WrapAttributeGetFallbackValue(const UsdPrimDefinition::Attribute &self) {
+static TfPyObjWrapper _WrapAttributeGetFallbackValue(const UsdPrimDefinition::Attribute &self)
+{
   VtValue result;
   self.GetFallbackValue(&result);
   return UsdVtValueToPython(result);
@@ -98,97 +102,88 @@ _WrapAttributeGetFallbackValue(const UsdPrimDefinition::Attribute &self) {
 
 // Override that prevents crashing if an attempt is made to call data access
 // methods on an invalid UsdPrimDefinition::Property from python.
-static object __getattribute__Impl(object selfObj, const char *name,
-                                   const object &getattribute) {
+static object __getattribute__Impl(object selfObj, const char *name, const object &getattribute)
+{
   // Allow attribute lookups if the attribute name starts with '__', if the
   // object's Property is valid, or if the attribute is one of a specific
   // inclusion list.
-  if ((name[0] == '_' && name[1] == '_') ||
-      extract<UsdPrimDefinition::Property &>(selfObj)() ||
+  if ((name[0] == '_' && name[1] == '_') || extract<UsdPrimDefinition::Property &>(selfObj)() ||
       strcmp(name, "GetName") == 0 || strcmp(name, "IsAttribute") == 0 ||
-      strcmp(name, "IsRelationship") == 0) {
+      strcmp(name, "IsRelationship") == 0)
+  {
     // Dispatch to object's __getattribute__.
     return getattribute(selfObj, name);
-  } else {
+  }
+  else {
     // Otherwise raise a runtime error.
-    TfPyThrowRuntimeError(
-        TfStringPrintf("Accessed invalid UsdPrimDefinition.Property"));
+    TfPyThrowRuntimeError(TfStringPrintf("Accessed invalid UsdPrimDefinition.Property"));
   }
   // Unreachable.
   return object();
 }
 
-void wrapUsdPrimDefinition() {
+void wrapUsdPrimDefinition()
+{
   typedef UsdPrimDefinition This;
   scope s =
       class_<This, boost::noncopyable>("PrimDefinition", no_init)
-          .def("GetPropertyNames", &This::GetPropertyNames,
+          .def("GetPropertyNames",
+               &This::GetPropertyNames,
                return_value_policy<TfPySequenceToList>())
-          .def("GetAppliedAPISchemas", &This::GetAppliedAPISchemas,
+          .def("GetAppliedAPISchemas",
+               &This::GetAppliedAPISchemas,
                return_value_policy<TfPySequenceToList>())
           .def("GetSpecType", &This::GetSpecType, (arg("propName")))
 
-          .def("GetPropertyDefinition", &This::GetPropertyDefinition,
-               (arg("propName")))
-          .def("GetAttributeDefinition", &This::GetAttributeDefinition,
-               (arg("attrName")))
-          .def("GetRelationshipDefinition", &This::GetRelationshipDefinition,
-               (arg("relName")))
+          .def("GetPropertyDefinition", &This::GetPropertyDefinition, (arg("propName")))
+          .def("GetAttributeDefinition", &This::GetAttributeDefinition, (arg("attrName")))
+          .def("GetRelationshipDefinition", &This::GetRelationshipDefinition, (arg("relName")))
 
-          .def("GetSchemaPropertySpec", &This::GetSchemaPropertySpec,
-               (arg("propName")))
-          .def("GetSchemaAttributeSpec", &This::GetSchemaAttributeSpec,
-               (arg("attrName")))
-          .def("GetSchemaRelationshipSpec", &This::GetSchemaRelationshipSpec,
-               (arg("relName")))
-          .def("GetAttributeFallbackValue", &_WrapGetAttributeFallbackValue,
-               (arg("attrName")))
+          .def("GetSchemaPropertySpec", &This::GetSchemaPropertySpec, (arg("propName")))
+          .def("GetSchemaAttributeSpec", &This::GetSchemaAttributeSpec, (arg("attrName")))
+          .def("GetSchemaRelationshipSpec", &This::GetSchemaRelationshipSpec, (arg("relName")))
+          .def("GetAttributeFallbackValue", &_WrapGetAttributeFallbackValue, (arg("attrName")))
 
-          .def("ListMetadataFields", &This::ListMetadataFields,
+          .def("ListMetadataFields",
+               &This::ListMetadataFields,
                return_value_policy<TfPySequenceToList>())
           .def("GetMetadata", &_WrapGetMetadata, (arg("key")))
-          .def("GetMetadataByDictKey", &_WrapGetMetadataByDictKey,
-               (arg("key"), arg("keyPath")))
+          .def("GetMetadataByDictKey", &_WrapGetMetadataByDictKey, (arg("key"), arg("keyPath")))
           .def("GetDocumentation", &This::GetDocumentation)
 
-          .def("ListPropertyMetadataFields", &This::ListPropertyMetadataFields,
+          .def("ListPropertyMetadataFields",
+               &This::ListPropertyMetadataFields,
                return_value_policy<TfPySequenceToList>())
-          .def("GetPropertyMetadata", &_WrapGetPropertyMetadata,
-               (arg("propName"), arg("key")))
+          .def("GetPropertyMetadata", &_WrapGetPropertyMetadata, (arg("propName"), arg("key")))
           .def("GetPropertyMetadataByDictKey",
                &_WrapGetPropertyMetadataByDictKey,
                (arg("propName"), arg("key"), arg("keyPath")))
-          .def("GetPropertyDocumentation", &This::GetPropertyDocumentation,
-               (arg("propName")))
+          .def("GetPropertyDocumentation", &This::GetPropertyDocumentation, (arg("propName")))
           .def("FlattenTo",
-               (UsdPrim(This::*)(const UsdPrim &, SdfSpecifier) const) &
-                   This::FlattenTo,
+               (UsdPrim(This::*)(const UsdPrim &, SdfSpecifier) const) & This::FlattenTo,
                (arg("prim"), arg("newSpecSpecifier") = SdfSpecifierOver))
           .def("FlattenTo",
-               (UsdPrim(This::*)(const UsdPrim &, const TfToken &, SdfSpecifier)
-                    const) &
+               (UsdPrim(This::*)(const UsdPrim &, const TfToken &, SdfSpecifier) const) &
                    This::FlattenTo,
-               (arg("parent"), arg("name"),
-                arg("newSpecSpecifier") = SdfSpecifierOver))
+               (arg("parent"), arg("name"), arg("newSpecSpecifier") = SdfSpecifierOver))
           .def("FlattenTo",
-               (bool(This::*)(const SdfLayerHandle &, const SdfPath &,
-                              SdfSpecifier) const) &
+               (bool(This::*)(const SdfLayerHandle &, const SdfPath &, SdfSpecifier) const) &
                    This::FlattenTo,
-               (arg("layer"), arg("path"),
-                arg("newSpecSpecifier") = SdfSpecifierOver));
+               (arg("layer"), arg("path"), arg("newSpecSpecifier") = SdfSpecifierOver));
 
   {
     class_<This::Property> clsObj("Property");
     clsObj.def(!self)
-        .def("GetName", &This::Property::GetName,
-             return_value_policy<return_by_value>())
+        .def("GetName", &This::Property::GetName, return_value_policy<return_by_value>())
         .def("IsAttribute", &This::Property::IsAttribute)
         .def("IsRelationship", &This::Property::IsRelationship)
         .def("GetSpecType", &This::Property::GetSpecType)
-        .def("ListMetadataFields", &This::Property::ListMetadataFields,
+        .def("ListMetadataFields",
+             &This::Property::ListMetadataFields,
              return_value_policy<TfPySequenceToList>())
         .def("GetMetadata", &_WrapPropertyGetMetadata, (arg("key")))
-        .def("GetMetadataByDictKey", &_WrapPropertyGetMetadataByDictKey,
+        .def("GetMetadataByDictKey",
+             &_WrapPropertyGetMetadataByDictKey,
              (arg("key"), arg("keyPath")))
         .def("GetVariability", &This::Property::GetVariability)
         .def("GetDocumentation", &This::Property::GetDocumentation);

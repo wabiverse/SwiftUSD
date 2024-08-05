@@ -44,9 +44,10 @@ typedef boost::optional<JsValue> JsOptionalValue;
 /// returns an uninitialized optional JsValue. Otherwise, the \p
 /// defaultValue is returned.
 JS_API
-JsOptionalValue JsFindValue(const JsObject &object, const std::string &key,
+JsOptionalValue JsFindValue(const JsObject &object,
+                            const std::string &key,
                             const JsOptionalValue &defaultValue = boost::none);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_JS_UTILS_H
+#endif  // PXR_BASE_JS_UTILS_H

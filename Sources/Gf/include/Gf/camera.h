@@ -48,7 +48,7 @@ class GfFrustum;
 /// with a small number of computations.
 ///
 class GfCamera {
-public:
+ public:
   /// Projection type.
   enum Projection {
     Perspective = 0,
@@ -71,17 +71,19 @@ public:
   GF_API static const double DEFAULT_HORIZONTAL_APERTURE;
   GF_API static const double DEFAULT_VERTICAL_APERTURE;
 
-public:
+ public:
   GF_API
   GfCamera(const GfMatrix4d &transform = GfMatrix4d(1.0),
            Projection projection = Perspective,
            float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE,
            float verticalAperture = DEFAULT_VERTICAL_APERTURE,
            float horizontalApertureOffset = 0.0,
-           float verticalApertureOffset = 0.0, float focalLength = 50.0,
+           float verticalApertureOffset = 0.0,
+           float focalLength = 50.0,
            const GfRange1f &clippingRange = GfRange1f(1, 1000000),
            const std::vector<GfVec4f> &clippingPlanes = std::vector<GfVec4f>(),
-           float fStop = 0.0, float focusDistance = 0.0);
+           float fStop = 0.0,
+           float focusDistance = 0.0);
 
   /// Sets the transform of the filmback in world space to \p val.
   GF_API void SetTransform(const GfMatrix4d &val);
@@ -129,7 +131,9 @@ public:
   /// DepthOfField.
 
   GF_API void SetPerspectiveFromAspectRatioAndFieldOfView(
-      float aspectRatio, float fieldOfView, FOVDirection direction,
+      float aspectRatio,
+      float fieldOfView,
+      FOVDirection direction,
       float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE);
 
   /// Sets the frustum to be orthographic such that it has the given
@@ -228,7 +232,7 @@ public:
   // Inequality operator. true iff not equality.
   GF_API bool operator!=(const GfCamera &other) const;
 
-private:
+ private:
   // frustum
   GfMatrix4d _transform;
   Projection _projection;
@@ -247,4 +251,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_CAMERA_H
+#endif  // PXR_BASE_GF_CAMERA_H

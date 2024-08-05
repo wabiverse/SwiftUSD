@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdSkelPackedJointAnimation,
-                 TfType::Bases<UsdSkelAnimation>>();
+  TfType::Define<UsdSkelPackedJointAnimation, TfType::Bases<UsdSkelAnimation>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,13 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdSkelPackedJointAnimation::~UsdSkelPackedJointAnimation()
-{
-}
+UsdSkelPackedJointAnimation::~UsdSkelPackedJointAnimation() {}
 
 /* static */
-UsdSkelPackedJointAnimation
-UsdSkelPackedJointAnimation::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdSkelPackedJointAnimation UsdSkelPackedJointAnimation::Get(const UsdStagePtr &stage,
+                                                             const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdSkelPackedJointAnimation();
   }
@@ -62,18 +58,15 @@ UsdSkelPackedJointAnimation::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdSkelPackedJointAnimation
-UsdSkelPackedJointAnimation::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdSkelPackedJointAnimation UsdSkelPackedJointAnimation::Define(const UsdStagePtr &stage,
+                                                                const SdfPath &path)
 {
   static TfToken usdPrimTypeName("PackedJointAnimation");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdSkelPackedJointAnimation();
   }
-  return UsdSkelPackedJointAnimation(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdSkelPackedJointAnimation(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +76,7 @@ UsdSchemaKind UsdSkelPackedJointAnimation::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdSkelPackedJointAnimation::_GetStaticTfType()
+const TfType &UsdSkelPackedJointAnimation::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdSkelPackedJointAnimation>();
   return tfType;
@@ -98,19 +90,16 @@ bool UsdSkelPackedJointAnimation::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdSkelPackedJointAnimation::_GetTfType() const
+const TfType &UsdSkelPackedJointAnimation::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &
-UsdSkelPackedJointAnimation::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdSkelPackedJointAnimation::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames;
-  static TfTokenVector allNames =
-      UsdSkelAnimation::GetSchemaAttributeNames(true);
+  static TfTokenVector allNames = UsdSkelAnimation::GetSchemaAttributeNames(true);
 
   if (includeInherited)
     return allNames;

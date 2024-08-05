@@ -48,23 +48,25 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfPlane const &self) {
+static string _Repr(GfPlane const &self)
+{
   return TF_PY_REPR_PREFIX + "Plane(" + TfPyRepr(self.GetNormal()) + ", " +
          TfPyRepr(self.GetDistanceFromOrigin()) + ")";
 }
 
-static object _FitPlaneToPoints(const std::vector<GfVec3d> &points) {
+static object _FitPlaneToPoints(const std::vector<GfVec3d> &points)
+{
   GfPlane plane;
   return GfFitPlaneToPoints(points, &plane) ? object(plane) : object();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPlane() {
+void wrapPlane()
+{
   typedef GfPlane This;
 
-  object getNormal =
-      make_function(&This::GetNormal, return_value_policy<return_by_value>());
+  object getNormal = make_function(&This::GetNormal, return_value_policy<return_by_value>());
 
   def("FitPlaneToPoints", _FitPlaneToPoints);
 
@@ -76,13 +78,10 @@ void wrapPlane() {
 
       .def(TfTypePythonClass())
 
-      .def("Set", (void(This::*)(const GfVec3d &, double)) & This::Set,
-           return_self<>())
-      .def("Set", (void(This::*)(const GfVec3d &, const GfVec3d &)) & This::Set,
-           return_self<>())
+      .def("Set", (void(This::*)(const GfVec3d &, double)) & This::Set, return_self<>())
+      .def("Set", (void(This::*)(const GfVec3d &, const GfVec3d &)) & This::Set, return_self<>())
       .def("Set",
-           (void(This::*)(const GfVec3d &, const GfVec3d &, const GfVec3d &)) &
-               This::Set,
+           (void(This::*)(const GfVec3d &, const GfVec3d &, const GfVec3d &)) & This::Set,
            return_self<>())
       .def("Set", (void(This::*)(const GfVec4d &)) & This::Set, return_self<>())
 
@@ -100,12 +99,10 @@ void wrapPlane() {
       .def("Reorient", &This::Reorient, return_self<>())
 
       .def("IntersectsPositiveHalfSpace",
-           (bool(This::*)(const GfRange3d &) const) &
-               This::IntersectsPositiveHalfSpace)
+           (bool(This::*)(const GfRange3d &) const) & This::IntersectsPositiveHalfSpace)
 
       .def("IntersectsPositiveHalfSpace",
-           (bool(This::*)(const GfVec3d &) const) &
-               This::IntersectsPositiveHalfSpace)
+           (bool(This::*)(const GfVec3d &) const) & This::IntersectsPositiveHalfSpace)
 
       .def(str(self))
       .def(self == self)
@@ -114,6 +111,5 @@ void wrapPlane() {
       .def("__repr__", _Repr)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 }

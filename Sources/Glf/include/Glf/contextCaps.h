@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_GLF_CONTEXT_CAPS_H
 #define PXR_IMAGING_GLF_CONTEXT_CAPS_H
 
-#include <pxr/pxrns.h>
 #include "Glf/api.h"
 #include "Tf/singleton.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -53,9 +53,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     subscribe to when the caps changes, so they can
 ///     update and invalidate.
 ///
-class GlfContextCaps
-{
-public:
+class GlfContextCaps {
+ public:
   /// InitInstance queries the GL context for its capabilities.
   /// It should be called by the application before using systems
   /// that depend on the caps, such as Hydra.  A good example would be
@@ -70,7 +69,7 @@ public:
   static const GlfContextCaps &GetInstance();
 
   // GL version
-  int glVersion; // 400 (4.0), 410 (4.1), ...
+  int glVersion;  // 400 (4.0), 410 (4.1), ...
 
   // Whether or not we are running with core profile
   bool coreProfile;
@@ -78,7 +77,7 @@ public:
   // Max constants
   int maxArrayTextureLayers;
 
-private:
+ private:
   void _LoadCaps();
   GlfContextCaps();
   ~GlfContextCaps() = default;
@@ -94,4 +93,4 @@ GLF_API_TEMPLATE_CLASS(TfSingleton<GlfContextCaps>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GLF_CONTEXT_CAPS_H
+#endif  // PXR_IMAGING_GLF_CONTEXT_CAPS_H

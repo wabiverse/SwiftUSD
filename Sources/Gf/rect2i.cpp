@@ -34,16 +34,21 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfRect2i>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfRect2i>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfRect2i GfRect2i::GetNormalized() const {
+GfRect2i GfRect2i::GetNormalized() const
+{
   GfVec2i min, max;
 
   if (_max[0] < _min[0]) {
     min[0] = _max[0];
     max[0] = _min[0];
-  } else {
+  }
+  else {
     min[0] = _min[0];
     max[0] = _max[0];
   }
@@ -51,7 +56,8 @@ GfRect2i GfRect2i::GetNormalized() const {
   if (_max[1] < _min[1]) {
     min[1] = _max[1];
     max[1] = _min[1];
-  } else {
+  }
+  else {
     min[1] = _min[1];
     max[1] = _max[1];
   }
@@ -59,9 +65,10 @@ GfRect2i GfRect2i::GetNormalized() const {
   return GfRect2i(min, max);
 }
 
-std::ostream &operator<<(std::ostream &out, const GfRect2i &r) {
-  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << ":"
-             << Gf_OstreamHelperP(r.GetMax()) << ']';
+std::ostream &operator<<(std::ostream &out, const GfRect2i &r)
+{
+  return out << '[' << Gf_OstreamHelperP(r.GetMin()) << ":" << Gf_OstreamHelperP(r.GetMax())
+             << ']';
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -46,15 +46,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class SdfOpaqueValue final {};
 
-inline bool operator==(SdfOpaqueValue const &, SdfOpaqueValue const &) {
+inline bool operator==(SdfOpaqueValue const &, SdfOpaqueValue const &)
+{
   return true;
 }
 
-inline bool operator!=(SdfOpaqueValue const &, SdfOpaqueValue const &) {
+inline bool operator!=(SdfOpaqueValue const &, SdfOpaqueValue const &)
+{
   return false;
 }
 
-inline size_t hash_value(SdfOpaqueValue const &) {
+inline size_t hash_value(SdfOpaqueValue const &)
+{
   // Use a nonzero constant here because some bad hash functions don't deal
   // with zero well. Chosen by fair dice roll.
   return 9;

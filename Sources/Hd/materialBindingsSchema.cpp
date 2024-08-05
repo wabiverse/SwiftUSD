@@ -33,69 +33,53 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingsSchemaTokens,
-    HDMATERIALBINDINGS_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingsSchemaTokens, HDMATERIALBINDINGS_SCHEMA_TOKENS);
 
-
-HdMaterialBindingSchema
-HdMaterialBindingsSchema::GetMaterialBinding()
+HdMaterialBindingSchema HdMaterialBindingsSchema::GetMaterialBinding()
 {
-    return HdMaterialBindingSchema(
-        _GetTypedDataSource<HdContainerDataSource>(
-            HdMaterialBindingsSchemaTokens->allPurpose));
+  return HdMaterialBindingSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdMaterialBindingsSchemaTokens->allPurpose));
 }
 
-HdMaterialBindingSchema
-HdMaterialBindingsSchema::GetMaterialBinding(TfToken const &purpose)
+HdMaterialBindingSchema HdMaterialBindingsSchema::GetMaterialBinding(TfToken const &purpose)
 {
-    if (auto b = _GetTypedDataSource<HdContainerDataSource>(purpose)) {
-        return HdMaterialBindingSchema(b);
-    }
+  if (auto b = _GetTypedDataSource<HdContainerDataSource>(purpose)) {
+    return HdMaterialBindingSchema(b);
+  }
 
-    // If we can't find the purpose-specific binding, return the fallback.
-    return GetMaterialBinding();
-}
-
-
-/*static*/
-HdContainerDataSourceHandle
-HdMaterialBindingsSchema::BuildRetained(
-    const size_t count,
-    const TfToken * const names,
-    const HdDataSourceBaseHandle * const values)
-{
-    return HdRetainedContainerDataSource::New(count, names, values);
+  // If we can't find the purpose-specific binding, return the fallback.
+  return GetMaterialBinding();
 }
 
 /*static*/
-HdMaterialBindingsSchema
-HdMaterialBindingsSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdContainerDataSourceHandle HdMaterialBindingsSchema::BuildRetained(
+    const size_t count, const TfToken *const names, const HdDataSourceBaseHandle *const values)
 {
-    return HdMaterialBindingsSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdMaterialBindingsSchemaTokens->materialBindings))
-        : nullptr);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-const TfToken &
-HdMaterialBindingsSchema::GetSchemaToken()
+HdMaterialBindingsSchema HdMaterialBindingsSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdMaterialBindingsSchemaTokens->materialBindings;
+  return HdMaterialBindingsSchema(fromParentContainer ?
+                                      HdContainerDataSource::Cast(fromParentContainer->Get(
+                                          HdMaterialBindingsSchemaTokens->materialBindings)) :
+                                      nullptr);
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdMaterialBindingsSchema::GetDefaultLocator()
+const TfToken &HdMaterialBindingsSchema::GetSchemaToken()
 {
-    static const HdDataSourceLocator locator(
-        HdMaterialBindingsSchemaTokens->materialBindings
-    );
-    return locator;
-} 
+  return HdMaterialBindingsSchemaTokens->materialBindings;
+}
+
+/*static*/
+const HdDataSourceLocator &HdMaterialBindingsSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdMaterialBindingsSchemaTokens->materialBindings);
+  return locator;
+}
 PXR_NAMESPACE_CLOSE_SCOPE

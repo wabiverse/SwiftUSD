@@ -26,17 +26,20 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfPyMethodResult::TfPyMethodResult(TfPyMethodResult const &other) {
+TfPyMethodResult::TfPyMethodResult(TfPyMethodResult const &other)
+{
   TfPyLock lock;
   m_obj = other.m_obj;
 }
 
-TfPyMethodResult::~TfPyMethodResult() {
+TfPyMethodResult::~TfPyMethodResult()
+{
   TfPyLock lock;
   m_obj.reset();
 }
 
-TfPyMethodResult &TfPyMethodResult::operator=(TfPyMethodResult const &other) {
+TfPyMethodResult &TfPyMethodResult::operator=(TfPyMethodResult const &other)
+{
   if (this != &other) {
     TfPyLock lock;
     m_obj = other.m_obj;

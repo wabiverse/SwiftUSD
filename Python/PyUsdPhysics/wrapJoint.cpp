@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/joint.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/joint.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,108 +40,100 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateLocalPos0Attr(UsdPhysicsJoint &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
 {
+  return self.CreateLocalPos0Attr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f),
+                                  writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateLocalRot0Attr(UsdPhysicsJoint &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateLocalRot0Attr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf),
+                                  writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateLocalPos1Attr(UsdPhysicsJoint &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateLocalPos1Attr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f),
+                                  writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateLocalPos0Attr(UsdPhysicsJoint &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateLocalPos0Attr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f), writeSparsely);
-  }
+static UsdAttribute _CreateLocalRot1Attr(UsdPhysicsJoint &self,
+                                         object defaultVal,
+                                         bool writeSparsely)
+{
+  return self.CreateLocalRot1Attr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf),
+                                  writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateLocalRot0Attr(UsdPhysicsJoint &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateLocalRot0Attr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf), writeSparsely);
-  }
+static UsdAttribute _CreateJointEnabledAttr(UsdPhysicsJoint &self,
+                                            object defaultVal,
+                                            bool writeSparsely)
+{
+  return self.CreateJointEnabledAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool),
+                                     writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateLocalPos1Attr(UsdPhysicsJoint &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateLocalPos1Attr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Point3f), writeSparsely);
-  }
+static UsdAttribute _CreateCollisionEnabledAttr(UsdPhysicsJoint &self,
+                                                object defaultVal,
+                                                bool writeSparsely)
+{
+  return self.CreateCollisionEnabledAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool),
+                                         writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateLocalRot1Attr(UsdPhysicsJoint &self,
-                       object defaultVal, bool writeSparsely)
-  {
-    return self.CreateLocalRot1Attr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Quatf), writeSparsely);
-  }
+static UsdAttribute _CreateExcludeFromArticulationAttr(UsdPhysicsJoint &self,
+                                                       object defaultVal,
+                                                       bool writeSparsely)
+{
+  return self.CreateExcludeFromArticulationAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateJointEnabledAttr(UsdPhysicsJoint &self,
-                          object defaultVal, bool writeSparsely)
-  {
-    return self.CreateJointEnabledAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
+static UsdAttribute _CreateBreakForceAttr(UsdPhysicsJoint &self,
+                                          object defaultVal,
+                                          bool writeSparsely)
+{
+  return self.CreateBreakForceAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                   writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateCollisionEnabledAttr(UsdPhysicsJoint &self,
-                              object defaultVal, bool writeSparsely)
-  {
-    return self.CreateCollisionEnabledAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
+static UsdAttribute _CreateBreakTorqueAttr(UsdPhysicsJoint &self,
+                                           object defaultVal,
+                                           bool writeSparsely)
+{
+  return self.CreateBreakTorqueAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                    writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateExcludeFromArticulationAttr(UsdPhysicsJoint &self,
-                                     object defaultVal, bool writeSparsely)
-  {
-    return self.CreateExcludeFromArticulationAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
+static std::string _Repr(const UsdPhysicsJoint &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.Joint(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateBreakForceAttr(UsdPhysicsJoint &self,
-                        object defaultVal, bool writeSparsely)
-  {
-    return self.CreateBreakForceAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateBreakTorqueAttr(UsdPhysicsJoint &self,
-                         object defaultVal, bool writeSparsely)
-  {
-    return self.CreateBreakTorqueAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsJoint &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.Joint(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsJoint()
 {
   typedef UsdPhysicsJoint This;
 
-  class_<This, bases<UsdGeomImageable>>
-      cls("Joint");
+  class_<This, bases<UsdGeomImageable>> cls("Joint");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -157,84 +149,63 @@ void wrapUsdPhysicsJoint()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetLocalPos0Attr",
-           &This::GetLocalPos0Attr)
+      .def("GetLocalPos0Attr", &This::GetLocalPos0Attr)
       .def("CreateLocalPos0Attr",
            &_CreateLocalPos0Attr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetLocalRot0Attr",
-           &This::GetLocalRot0Attr)
+      .def("GetLocalRot0Attr", &This::GetLocalRot0Attr)
       .def("CreateLocalRot0Attr",
            &_CreateLocalRot0Attr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetLocalPos1Attr",
-           &This::GetLocalPos1Attr)
+      .def("GetLocalPos1Attr", &This::GetLocalPos1Attr)
       .def("CreateLocalPos1Attr",
            &_CreateLocalPos1Attr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetLocalRot1Attr",
-           &This::GetLocalRot1Attr)
+      .def("GetLocalRot1Attr", &This::GetLocalRot1Attr)
       .def("CreateLocalRot1Attr",
            &_CreateLocalRot1Attr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetJointEnabledAttr",
-           &This::GetJointEnabledAttr)
+      .def("GetJointEnabledAttr", &This::GetJointEnabledAttr)
       .def("CreateJointEnabledAttr",
            &_CreateJointEnabledAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetCollisionEnabledAttr",
-           &This::GetCollisionEnabledAttr)
+      .def("GetCollisionEnabledAttr", &This::GetCollisionEnabledAttr)
       .def("CreateCollisionEnabledAttr",
            &_CreateCollisionEnabledAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetExcludeFromArticulationAttr",
-           &This::GetExcludeFromArticulationAttr)
+      .def("GetExcludeFromArticulationAttr", &This::GetExcludeFromArticulationAttr)
       .def("CreateExcludeFromArticulationAttr",
            &_CreateExcludeFromArticulationAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBreakForceAttr",
-           &This::GetBreakForceAttr)
+      .def("GetBreakForceAttr", &This::GetBreakForceAttr)
       .def("CreateBreakForceAttr",
            &_CreateBreakForceAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBreakTorqueAttr",
-           &This::GetBreakTorqueAttr)
+      .def("GetBreakTorqueAttr", &This::GetBreakTorqueAttr)
       .def("CreateBreakTorqueAttr",
            &_CreateBreakTorqueAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetBody0Rel",
-           &This::GetBody0Rel)
-      .def("CreateBody0Rel",
-           &This::CreateBody0Rel)
+      .def("GetBody0Rel", &This::GetBody0Rel)
+      .def("CreateBody0Rel", &This::CreateBody0Rel)
 
-      .def("GetBody1Rel",
-           &This::GetBody1Rel)
-      .def("CreateBody1Rel",
-           &This::CreateBody1Rel)
+      .def("GetBody1Rel", &This::GetBody1Rel)
+      .def("CreateBody1Rel", &This::CreateBody1Rel)
       .def("__repr__", ::_Repr);
 
   _CustomWrapCode(cls);
@@ -259,11 +230,8 @@ void wrapUsdPhysicsJoint()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

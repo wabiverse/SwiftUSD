@@ -23,86 +23,80 @@
 //
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "pxr/pxr.h"
 #include "Arch/testArchUtil.h"
 #include "Arch/debugger.h"
 #include "Arch/defines.h"
 #include "Arch/error.h"
 #include "Arch/systemInfo.h"
-#include <thread>
+#include "pxr/pxr.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <thread>
 
 #if defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
-#include <process.h>
-#include <csignal>
+#  include <Windows.h>
+#  include <csignal>
+#  include <process.h>
 #else
-#include <sys/wait.h>
-#include <unistd.h>
+#  include <sys/wait.h>
+#  include <unistd.h>
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
 static const char *crashArgument[] = {
-    "--crash-raise",
-    "--crash-invalid-read",
-    "--crash-invalid-read-thread"};
+    "--crash-raise", "--crash-invalid-read", "--crash-invalid-read-thread"};
 #endif
 
 using namespace std;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
+namespace {
+
+/*
+ * Arch_ReadInvalidAddresses
+ *     causes the calling program to crash by reading from bad addresses, so
+ *     that crash handling behavior can be tested.  If 'spawnthread'
+ *     is true, it spawns a thread which is alive during the crash.  If the
+ *     program fails to crash, this aborts.
+ */
+void Arch_ReadInvalidAddresses(bool spawnthread)
 {
-
-  /*
-   * Arch_ReadInvalidAddresses
-   *     causes the calling program to crash by reading from bad addresses, so
-   *     that crash handling behavior can be tested.  If 'spawnthread'
-   *     is true, it spawns a thread which is alive during the crash.  If the
-   *     program fails to crash, this aborts.
-   */
-  void
-  Arch_ReadInvalidAddresses(bool spawnthread)
-  {
-    std::thread t;
-    if (spawnthread)
-    {
-      t = std::thread([]()
-                      { while(true) ; });
-    }
-
-#if defined(ARCH_OS_WINDOWS)
-    // On Windows we simply raise SIGSEGV.  Reading invalid addresses causes the
-    // program to terminate, but with a zero return code, which is not what we
-    // need for testing purposes here.  I spent a few minutes going down the
-    // Windows SEH rabbit hole, but there's no local "quick fix" that will let
-    // the pieces plug together. Frankly, if we wnat to support the kind of
-    // full-featured postmortem crash reporting we have on Linux, it's going to
-    // take a lot of work.  If we ever care to do that, we'll need to revisit
-    // this.
-    raise(SIGSEGV);
-#endif
-
-    for (size_t i = 0; i != ~0ull; ++i)
-    {
-      // This will eventually give us NULL in a way that the compiler probably
-      // cannot prove at compile-time.
-      char const *ptr = reinterpret_cast<char const *>(rand() & 7);
-      printf("byte %p = %d\n", ptr, *ptr);
-    }
-
-    fprintf(stderr, "FAILED to crash! Aborting.\n");
-    ArchAbort();
+  std::thread t;
+  if (spawnthread) {
+    t = std::thread([]() {
+      while (true)
+        ;
+    });
   }
 
-  void
-  Arch_TestCrash(ArchTestCrashMode mode)
-  {
-    switch (mode)
-    {
+#if defined(ARCH_OS_WINDOWS)
+  // On Windows we simply raise SIGSEGV.  Reading invalid addresses causes the
+  // program to terminate, but with a zero return code, which is not what we
+  // need for testing purposes here.  I spent a few minutes going down the
+  // Windows SEH rabbit hole, but there's no local "quick fix" that will let
+  // the pieces plug together. Frankly, if we wnat to support the kind of
+  // full-featured postmortem crash reporting we have on Linux, it's going to
+  // take a lot of work.  If we ever care to do that, we'll need to revisit
+  // this.
+  raise(SIGSEGV);
+#endif
+
+  for (size_t i = 0; i != ~0ull; ++i) {
+    // This will eventually give us NULL in a way that the compiler probably
+    // cannot prove at compile-time.
+    char const *ptr = reinterpret_cast<char const *>(rand() & 7);
+    printf("byte %p = %d\n", ptr, *ptr);
+  }
+
+  fprintf(stderr, "FAILED to crash! Aborting.\n");
+  ArchAbort();
+}
+
+void Arch_TestCrash(ArchTestCrashMode mode)
+{
+  switch (mode) {
     case ArchTestCrashMode::Error:
       ARCH_ERROR("Testing ArchError");
       break;
@@ -114,10 +108,10 @@ namespace
     case ArchTestCrashMode::ReadInvalidAddressesWithThread:
       Arch_ReadInvalidAddresses(true);
       break;
-    }
   }
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
 void ArchTestCrash(ArchTestCrashMode mode)
 {
@@ -127,9 +121,8 @@ void ArchTestCrash(ArchTestCrashMode mode)
 
   // Make a command line for a new copy of this program with an argument
   // to tell it to crash.
-  std::string cmdLine =
-      '"' + ArchGetExecutablePath() + "\" " +
-      crashArgument[static_cast<int>(mode)];
+  std::string cmdLine = '"' + ArchGetExecutablePath() + "\" " +
+                        crashArgument[static_cast<int>(mode)];
 
   // Start a new copy of this program and tell it to crash.
   STARTUPINFO startupInfo;
@@ -137,9 +130,16 @@ void ArchTestCrash(ArchTestCrashMode mode)
   startupInfo.cb = sizeof(startupInfo);
   PROCESS_INFORMATION processInfo;
   ZeroMemory(&processInfo, sizeof(processInfo));
-  if (!CreateProcess(NULL, const_cast<char *>(cmdLine.c_str()),
-                     NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL,
-                     &startupInfo, &processInfo))
+  if (!CreateProcess(NULL,
+                     const_cast<char *>(cmdLine.c_str()),
+                     NULL,
+                     NULL,
+                     FALSE,
+                     NORMAL_PRIORITY_CLASS,
+                     NULL,
+                     NULL,
+                     &startupInfo,
+                     &processInfo))
   {
     ARCH_WARNING("Failed to fork to test a crash");
     _exit(1);
@@ -157,13 +157,11 @@ void ArchTestCrash(ArchTestCrashMode mode)
 
   // Fork and crash in the child.
   int childPid;
-  if ((childPid = fork()) == 0)
-  {
+  if ((childPid = fork()) == 0) {
     Arch_TestCrash(mode);
     _exit(0);
   }
-  else if (childPid == -1)
-  {
+  else if (childPid == -1) {
     ARCH_WARNING("Failed to fork to test a crash");
     _exit(1);
   }
@@ -185,13 +183,9 @@ void ArchTestCrash(ArchTestCrashMode mode)
 void ArchTestCrashArgParse(int argc, char **argv)
 {
   // Scan for crash argument.
-  for (int i = 1; i != argc; ++i)
-  {
-    for (size_t j = 0, n = sizeof(crashArgument) / sizeof(crashArgument[0]);
-         j != n; ++j)
-    {
-      if (strcmp(argv[i], crashArgument[j]) == 0)
-      {
+  for (int i = 1; i != argc; ++i) {
+    for (size_t j = 0, n = sizeof(crashArgument) / sizeof(crashArgument[0]); j != n; ++j) {
+      if (strcmp(argv[i], crashArgument[j]) == 0) {
         Arch_TestCrash(static_cast<ArchTestCrashMode>(j));
         _exit(1);
       }

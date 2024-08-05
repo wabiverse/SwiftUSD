@@ -26,13 +26,13 @@
 
 /// \file glf/drawTarget.h
 
-#include <pxr/pxrns.h>
+#include "Garch/glApi.h"
 #include "Glf/api.h"
 #include "Glf/texture.h"
-#include "Garch/glApi.h"
+#include <pxr/pxrns.h>
 
-#include "Gf/vec2i.h"
 #include "Gf/matrix4d.h"
+#include "Gf/vec2i.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/refBase.h"
 #include "Tf/weakBase.h"
@@ -62,16 +62,14 @@ typedef std::shared_ptr<class GlfGLContext> GlfGLContextSharedPtr;
 /// are also available (by setting the format to GL_DEPTH_STENCIL and
 /// the internalFormat to GL_DEPTH24_STENCIL8)
 ///
-class GlfDrawTarget : public TfRefBase, public TfWeakBase
-{
-public:
+class GlfDrawTarget : public TfRefBase, public TfWeakBase {
+ public:
   typedef GlfDrawTarget This;
 
-public:
+ public:
   /// Returns a new instance.
   GLF_API
-  static GlfDrawTargetRefPtr New(GfVec2i const &size,
-                                 bool requestMSAA = false);
+  static GlfDrawTargetRefPtr New(GfVec2i const &size, bool requestMSAA = false);
 
   /// Returns a new instance.
   /// GL framebuffers cannot be shared across contexts, but texture
@@ -84,14 +82,16 @@ public:
   GLF_API
   static GlfDrawTargetRefPtr New(GlfDrawTargetPtr const &drawtarget);
 
-  class Attachment : public GlfTexture
-  {
-  public:
+  class Attachment : public GlfTexture {
+   public:
     typedef TfDeclarePtrs<class Attachment>::RefPtr AttachmentRefPtr;
 
     GLF_API
-    static AttachmentRefPtr New(int glIndex, GLenum format, GLenum type,
-                                GLenum internalFormat, GfVec2i size,
+    static AttachmentRefPtr New(int glIndex,
+                                GLenum format,
+                                GLenum type,
+                                GLenum internalFormat,
+                                GfVec2i size,
                                 unsigned int numSamples);
 
     GLF_API
@@ -101,19 +101,34 @@ public:
     GLuint GetGlTextureName() override;
 
     /// Returns the GL texture index multisampled of this attachment
-    GLuint GetGlTextureMSName() const { return _textureNameMS; }
+    GLuint GetGlTextureMSName() const
+    {
+      return _textureNameMS;
+    }
 
     /// Returns the GL format of the texture (GL_RGB, GL_DEPTH_COMPONENT...)
-    GLenum GetFormat() const { return _format; }
+    GLenum GetFormat() const
+    {
+      return _format;
+    }
 
     /// Returns the GL type of the texture (GL_BYTE, GL_INT, GL_FLOAT...)
-    GLenum GetType() const { return _type; }
+    GLenum GetType() const
+    {
+      return _type;
+    }
 
     /// Returns the GL internalFormat of the texture
-    GLenum GetInternalFormat() const { return _internalFormat; }
+    GLenum GetInternalFormat() const
+    {
+      return _internalFormat;
+    }
 
     /// Returns the GL attachment point index in the framebuffer.
-    int GetAttach() const { return _glIndex; }
+    int GetAttach() const
+    {
+      return _glIndex;
+    }
 
     /// Resize the attachment recreating the texture
     GLF_API
@@ -121,8 +136,7 @@ public:
 
     // GlfTexture overrides
     GLF_API
-    BindingVector GetBindings(TfToken const &identifier,
-                              GLuint samplerName) override;
+    BindingVector GetBindings(TfToken const &identifier, GLuint samplerName) override;
     GLF_API
     VtDictionary GetTextureInfo(bool forceLoad) override;
 
@@ -132,9 +146,12 @@ public:
     GLF_API
     void TouchContents();
 
-  private:
-    Attachment(int glIndex, GLenum format, GLenum type,
-               GLenum internalFormat, GfVec2i size,
+   private:
+    Attachment(int glIndex,
+               GLenum format,
+               GLenum type,
+               GLenum internalFormat,
+               GfVec2i size,
                unsigned int numSamples);
 
     void _GenTexture();
@@ -143,9 +160,7 @@ public:
     GLuint _textureName;
     GLuint _textureNameMS;
 
-    GLenum _format,
-        _type,
-        _internalFormat;
+    GLenum _format, _type, _internalFormat;
 
     int _glIndex;
 
@@ -160,8 +175,7 @@ public:
 
   /// Add an attachment to the DrawTarget.
   GLF_API
-  void AddAttachment(std::string const &name,
-                     GLenum format, GLenum type, GLenum internalFormat);
+  void AddAttachment(std::string const &name, GLenum format, GLenum type, GLenum internalFormat);
 
   /// Removes the named attachment from the DrawTarget.
   GLF_API
@@ -195,10 +209,16 @@ public:
   void SetSize(GfVec2i);
 
   /// Returns the size of the DrawTarget.
-  GfVec2i const &GetSize() const { return _size; }
+  GfVec2i const &GetSize() const
+  {
+    return _size;
+  }
 
   /// Returns if the draw target uses msaa
-  bool HasMSAA() const { return (_numSamples > 1); }
+  bool HasMSAA() const
+  {
+    return (_numSamples > 1);
+  }
 
   /// Returns the framebuffer object Id.
   GLF_API
@@ -242,13 +262,12 @@ public:
   GLF_API
   bool IsValid(std::string *reason = NULL);
 
-protected:
+ protected:
   /// Weak/Ref-based container for the the map of texture attachments.
   /// Multiple GlfDrawTargets can jointly share their attachment textures :
   /// this construction allows the use of a RefPtr on the map of attachments.
-  class AttachmentsContainer : public TfRefBase, public TfWeakBase
-  {
-  public:
+  class AttachmentsContainer : public TfRefBase, public TfWeakBase {
+   public:
     AttachmentsMap attachments;
   };
 
@@ -261,7 +280,7 @@ protected:
   GLF_API
   virtual ~GlfDrawTarget();
 
-private:
+ private:
   void _GenFrameBuffer();
 
   void _BindAttachment(GlfDrawTarget::AttachmentRefPtr const &a);
@@ -285,8 +304,7 @@ private:
   GLuint _framebuffer;
   GLuint _framebufferMS;
 
-  GLuint _unbindRestoreReadFB,
-      _unbindRestoreDrawFB;
+  GLuint _unbindRestoreReadFB, _unbindRestoreDrawFB;
 
   int _bindDepth;
 
@@ -300,4 +318,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // GLF_DRAW_TARGET_H
+#endif  // GLF_DRAW_TARGET_H

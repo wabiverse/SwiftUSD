@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdSchemaExamplesComplex,
-                 TfType::Bases<UsdSchemaExamplesSimple>>();
+  TfType::Define<UsdSchemaExamplesComplex, TfType::Bases<UsdSchemaExamplesSimple>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,13 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdSchemaExamplesComplex::~UsdSchemaExamplesComplex()
-{
-}
+UsdSchemaExamplesComplex::~UsdSchemaExamplesComplex() {}
 
 /* static */
-UsdSchemaExamplesComplex
-UsdSchemaExamplesComplex::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdSchemaExamplesComplex UsdSchemaExamplesComplex::Get(const UsdStagePtr &stage,
+                                                       const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdSchemaExamplesComplex();
   }
@@ -62,18 +58,15 @@ UsdSchemaExamplesComplex::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdSchemaExamplesComplex
-UsdSchemaExamplesComplex::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdSchemaExamplesComplex UsdSchemaExamplesComplex::Define(const UsdStagePtr &stage,
+                                                          const SdfPath &path)
 {
   static TfToken usdPrimTypeName("ComplexPrim");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdSchemaExamplesComplex();
   }
-  return UsdSchemaExamplesComplex(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdSchemaExamplesComplex(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +76,7 @@ UsdSchemaKind UsdSchemaExamplesComplex::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdSchemaExamplesComplex::_GetStaticTfType()
+const TfType &UsdSchemaExamplesComplex::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdSchemaExamplesComplex>();
   return tfType;
@@ -98,20 +90,18 @@ bool UsdSchemaExamplesComplex::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdSchemaExamplesComplex::_GetTfType() const
+const TfType &UsdSchemaExamplesComplex::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdSchemaExamplesComplex::GetComplexStringAttr() const
+UsdAttribute UsdSchemaExamplesComplex::GetComplexStringAttr() const
 {
   return GetPrim().GetAttribute(UsdSchemaExamplesTokens->complexString);
 }
 
-UsdAttribute
-UsdSchemaExamplesComplex::CreateComplexStringAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdSchemaExamplesComplex::CreateComplexStringAttr(VtValue const &defaultValue,
+                                                               bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdSchemaExamplesTokens->complexString,
                                     SdfValueTypeNames->String,
@@ -121,30 +111,26 @@ UsdSchemaExamplesComplex::CreateComplexStringAttr(VtValue const &defaultValue, b
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdSchemaExamplesComplex::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdSchemaExamplesComplex::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdSchemaExamplesTokens->complexString,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdSchemaExamplesSimple::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdSchemaExamplesSimple::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

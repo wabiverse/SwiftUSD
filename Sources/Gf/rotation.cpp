@@ -24,11 +24,11 @@
 
 #include <pxr/pxrns.h>
 
-#include "Gf/rotation.h"
 #include "Gf/math.h"
 #include "Gf/matrix3d.h"
 #include "Gf/matrix4d.h"
 #include "Gf/ostreamHelpers.h"
+#include "Gf/rotation.h"
 
 #include "Tf/diagnosticLite.h"
 #include "Tf/type.h"
@@ -38,10 +38,14 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfRotation>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfRotation>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfRotation &GfRotation::SetQuat(const GfQuatd &quat) {
+GfRotation &GfRotation::SetQuat(const GfQuatd &quat)
+{
   double len = quat.GetImaginary().GetLength();
   if (len > GF_MIN_VECTOR_LENGTH) {
     // Pass through the public API which normalizes axis.
@@ -49,14 +53,15 @@ GfRotation &GfRotation::SetQuat(const GfQuatd &quat) {
     // SetQuaternion which cannot be re-created via SetAxisAngle().
     double x = acos(GfClamp(quat.GetReal(), -1.0, 1.0));
     SetAxisAngle(quat.GetImaginary() / len, 2.0 * GfRadiansToDegrees(x));
-  } else
+  }
+  else
     SetIdentity();
 
   return *this;
 }
 
-GfRotation &GfRotation::SetRotateInto(const GfVec3d &rotateFrom,
-                                      const GfVec3d &rotateTo) {
+GfRotation &GfRotation::SetRotateInto(const GfVec3d &rotateFrom, const GfVec3d &rotateTo)
+{
   GfVec3d from = rotateFrom.GetNormalized();
   GfVec3d to = rotateTo.GetNormalized();
 
@@ -84,7 +89,8 @@ GfRotation &GfRotation::SetRotateInto(const GfVec3d &rotateFrom,
   return SetAxisAngle(axis, GfRadiansToDegrees(acos(cos)));
 }
 
-GfQuatd GfRotation::GetQuat() const {
+GfQuatd GfRotation::GetQuat() const
+{
   double radians = GfDegreesToRadians(_angle) / 2.0;
   double sinR, cosR;
   GfSinCos(radians, &sinR, &cosR);
@@ -93,10 +99,15 @@ GfQuatd GfRotation::GetQuat() const {
 }
 
 // helper function for Decompose and DecomposeRotation
-static double _GetEpsilon() { return 1e-6; }
+static double _GetEpsilon()
+{
+  return 1e-6;
+}
 
-GfVec3d GfRotation::Decompose(const GfVec3d &axis0, const GfVec3d &axis1,
-                              const GfVec3d &axis2) const {
+GfVec3d GfRotation::Decompose(const GfVec3d &axis0,
+                              const GfVec3d &axis1,
+                              const GfVec3d &axis2) const
+{
   GfMatrix4d mat;
   mat.SetRotate(*this);
 
@@ -110,12 +121,27 @@ GfVec3d GfRotation::Decompose(const GfVec3d &axis0, const GfVec3d &axis1,
   //     GfMatrix4d::HasOrthogonalRows3() could use).
   if (!(GfIsClose(GfDot(nAxis0, nAxis1), 0, GF_MIN_ORTHO_TOLERANCE) &&
         GfIsClose(GfDot(nAxis0, nAxis2), 0, GF_MIN_ORTHO_TOLERANCE) &&
-        GfIsClose(GfDot(nAxis1, nAxis2), 0, GF_MIN_ORTHO_TOLERANCE))) {
+        GfIsClose(GfDot(nAxis1, nAxis2), 0, GF_MIN_ORTHO_TOLERANCE)))
+  {
     TF_WARN("Rotation axes are not orthogonal.");
   }
 
-  GfMatrix4d axes(nAxis0[0], nAxis1[0], nAxis2[0], 0, nAxis0[1], nAxis1[1],
-                  nAxis2[1], 0, nAxis0[2], nAxis1[2], nAxis2[2], 0, 0, 0, 0, 1);
+  GfMatrix4d axes(nAxis0[0],
+                  nAxis1[0],
+                  nAxis2[0],
+                  0,
+                  nAxis0[1],
+                  nAxis1[1],
+                  nAxis2[1],
+                  0,
+                  nAxis0[2],
+                  nAxis1[2],
+                  nAxis2[2],
+                  0,
+                  0,
+                  0,
+                  0,
+                  1);
 
   // get a transformation that takes the given axis into a coordinate
   // frame that has those axis aligned with the x,y,z axis.
@@ -131,7 +157,8 @@ GfVec3d GfRotation::Decompose(const GfVec3d &axis0, const GfVec3d &axis1,
     r0 = atan2(m[k][j], m[k][k]);
     r1 = atan2(-m[k][i], cy);
     r2 = atan2(m[j][i], m[i][i]);
-  } else {
+  }
+  else {
     r0 = atan2(-m[j][k], m[j][j]);
     r1 = atan2(-m[k][i], cy);
     r2 = 0;
@@ -146,8 +173,7 @@ GfVec3d GfRotation::Decompose(const GfVec3d &axis0, const GfVec3d &axis1,
     r2 = -r2;
   }
 
-  return GfVec3d(GfRadiansToDegrees(r0), GfRadiansToDegrees(r1),
-                 GfRadiansToDegrees(r2));
+  return GfVec3d(GfRadiansToDegrees(r0), GfRadiansToDegrees(r1), GfRadiansToDegrees(r2));
 }
 
 // Brought over to ExtMover
@@ -163,8 +189,10 @@ GfVec3d GfRotation::Decompose(const GfVec3d &axis0, const GfVec3d &axis1,
 //    ::DualCross -> GfCross  ?
 //  CfgPointd -> GfVec3d
 
-GfRotation GfRotation::RotateOntoProjected(const GfVec3d &v1, const GfVec3d &v2,
-                                           const GfVec3d &axisParam) {
+GfRotation GfRotation::RotateOntoProjected(const GfVec3d &v1,
+                                           const GfVec3d &v2,
+                                           const GfVec3d &axisParam)
+{
   GfVec3d axis = axisParam.GetNormalized();
 
   GfVec3d v1Proj = v1 - GfDot(v1, axis) * axis;
@@ -179,14 +207,16 @@ GfRotation GfRotation::RotateOntoProjected(const GfVec3d &v1, const GfVec3d &v2,
     theta = atan2(sinTheta, cosTheta);
 
   const double toDeg = (180.0) / M_PI;
-  return GfRotation(axis, theta * toDeg); // GfRotation takes angle in degrees
+  return GfRotation(axis, theta * toDeg);  // GfRotation takes angle in degrees
 }
 
 // helper function for DecomposeRotation: Gets the rotation as a matrix and
 // returns theta in radians instead of degrees.
-static GfMatrix4d _RotateOntoProjected(const GfVec3d &v1, const GfVec3d &v2,
+static GfMatrix4d _RotateOntoProjected(const GfVec3d &v1,
+                                       const GfVec3d &v2,
                                        const GfVec3d &axisParam,
-                                       double *thetaInRadians) {
+                                       double *thetaInRadians)
+{
   GfMatrix4d mat;
   GfRotation r = GfRotation::RotateOntoProjected(v1, v2, axisParam);
   mat.SetRotate(r);
@@ -201,8 +231,8 @@ static GfMatrix4d _RotateOntoProjected(const GfVec3d &v1, const GfVec3d &v2,
 // helper function for DecomposeRotation
 // Given a vector of hint euler angles, alter the desired attempt values such
 // that each is the closest multiple of itself of 2pi to its respective hint.
-static GfVec4d _PiShift(const GfVec4d &hint, const GfVec4d &attempt,
-                        double mul = 2 * M_PI) {
+static GfVec4d _PiShift(const GfVec4d &hint, const GfVec4d &attempt, double mul = 2 * M_PI)
+{
   GfVec4d result(attempt);
   for (int i = 0; i < 4; i++) {
     while (result[i] > hint[i] + M_PI) {
@@ -218,8 +248,8 @@ static GfVec4d _PiShift(const GfVec4d &hint, const GfVec4d &attempt,
 // Another helper function to readjust the first and last angles of a three
 // euler anlge solution when the middle angle collapses first and last angles'
 // axes onto each other.
-static void _ShiftGimbalLock(double middleAngle, double *firstAngle,
-                             double *lastAngle) {
+static void _ShiftGimbalLock(double middleAngle, double *firstAngle, double *lastAngle)
+{
   // If the middle angle is PI or -PI, we flipped the axes so use the
   // difference of the two angles.
   if (fabs(fabs(middleAngle) - M_PI) < _GetEpsilon()) {
@@ -240,12 +270,17 @@ static void _ShiftGimbalLock(double middleAngle, double *firstAngle,
 namespace {
 // Enum of which angle is being zeroed out when selecting the closest roatation.
 enum _ZeroAngle { ZERO_NONE = 0, ZERO_TW, ZERO_FB, ZERO_LR, ZERO_SW };
-} // namespace
+}  // namespace
 
-void GfRotation::MatchClosestEulerRotation(double targetTw, double targetFB,
-                                           double targetLR, double targetSw,
-                                           double *thetaTw, double *thetaFB,
-                                           double *thetaLR, double *thetaSw) {
+void GfRotation::MatchClosestEulerRotation(double targetTw,
+                                           double targetFB,
+                                           double targetLR,
+                                           double targetSw,
+                                           double *thetaTw,
+                                           double *thetaFB,
+                                           double *thetaLR,
+                                           double *thetaSw)
+{
   // Any given euler rotation isn't unique.  Adding multiples of
   // 2pi is a no-op. With 3 angles, you can also add an odd
   // multiple of pi to each angle, and negate the middle one.
@@ -334,27 +369,27 @@ void GfRotation::MatchClosestEulerRotation(double targetTw, double targetFB,
   // to zero, but if we are zeroing an angle, then we only have two valid
   // options, the ones that don't flip the zeroed angle by pi.
   switch (zeroAngle) {
-  case ZERO_TW:
-    //  1 - transform last 3
-    vals[1] = GfVec4d(*thetaTw, thetaFBp, -thetaLRp, thetaSwp);
-    break;
-  case ZERO_FB:
-  case ZERO_LR:
-    //  1 - 1 & 3 composed
-    vals[1] = GfVec4d(thetaTwp, -*thetaFB, -*thetaLR, thetaSwp);
-    break;
-  case ZERO_SW:
-    //  1 - transform 1st 3
-    vals[1] = GfVec4d(thetaTwp, -thetaFBp, thetaLRp, *thetaSw);
-    break;
-  case ZERO_NONE:
-    //  1 - transform 1st 3
-    //  2 - 1 & 3 composed
-    //  3 - transform last 3
-    vals[1] = GfVec4d(thetaTwp, -thetaFBp, thetaLRp, *thetaSw);
-    vals[2] = GfVec4d(thetaTwp, -*thetaFB, -*thetaLR, thetaSwp);
-    vals[3] = GfVec4d(*thetaTw, thetaFBp, -thetaLRp, thetaSwp);
-    break;
+    case ZERO_TW:
+      //  1 - transform last 3
+      vals[1] = GfVec4d(*thetaTw, thetaFBp, -thetaLRp, thetaSwp);
+      break;
+    case ZERO_FB:
+    case ZERO_LR:
+      //  1 - 1 & 3 composed
+      vals[1] = GfVec4d(thetaTwp, -*thetaFB, -*thetaLR, thetaSwp);
+      break;
+    case ZERO_SW:
+      //  1 - transform 1st 3
+      vals[1] = GfVec4d(thetaTwp, -thetaFBp, thetaLRp, *thetaSw);
+      break;
+    case ZERO_NONE:
+      //  1 - transform 1st 3
+      //  2 - 1 & 3 composed
+      //  3 - transform last 3
+      vals[1] = GfVec4d(thetaTwp, -thetaFBp, thetaLRp, *thetaSw);
+      vals[2] = GfVec4d(thetaTwp, -*thetaFB, -*thetaLR, thetaSwp);
+      vals[3] = GfVec4d(*thetaTw, thetaFBp, -thetaLRp, thetaSwp);
+      break;
   };
 
   for (unsigned int i = 0; i < numVals; i++) {
@@ -385,18 +420,23 @@ void GfRotation::MatchClosestEulerRotation(double targetTw, double targetFB,
   *thetaSw = vals[mini][3];
 }
 
-void GfRotation::DecomposeRotation(const GfMatrix4d &rot, const GfVec3d &TwAxis,
-                                   const GfVec3d &FBAxis, const GfVec3d &LRAxis,
-                                   double handedness, double *thetaTw,
-                                   double *thetaFB, double *thetaLR,
-                                   double *thetaSw, bool useHint,
-                                   const double *swShift) {
+void GfRotation::DecomposeRotation(const GfMatrix4d &rot,
+                                   const GfVec3d &TwAxis,
+                                   const GfVec3d &FBAxis,
+                                   const GfVec3d &LRAxis,
+                                   double handedness,
+                                   double *thetaTw,
+                                   double *thetaFB,
+                                   double *thetaLR,
+                                   double *thetaSw,
+                                   bool useHint,
+                                   const double *swShift)
+{
   // Enum of which angle is being zeroed out when decomposing the roatation.
   // This is determined by which angle output (if any) is nullptr.
   _ZeroAngle zeroAngle = ZERO_NONE;
 
-  double angleStandin = 0.0f, hintTw = 0.0f, hintFB = 0.0f, hintLR = 0.0f,
-         hintSw = 0.0f;
+  double angleStandin = 0.0f, hintTw = 0.0f, hintFB = 0.0f, hintLR = 0.0f, hintSw = 0.0f;
   if (thetaTw == nullptr) {
     zeroAngle = ZERO_TW;
     thetaTw = &angleStandin;
@@ -427,8 +467,9 @@ void GfRotation::DecomposeRotation(const GfMatrix4d &rot, const GfVec3d &TwAxis,
   }
 
   if (swShift && zeroAngle != ZERO_NONE) {
-    TF_WARN("A swing shift was provided but we're not decomposing into"
-            " four angles.  The swing shift will be ignored.");
+    TF_WARN(
+        "A swing shift was provided but we're not decomposing into"
+        " four angles.  The swing shift will be ignored.");
   }
 
   // Update hint values if we're using them as hints.
@@ -456,66 +497,57 @@ void GfRotation::DecomposeRotation(const GfMatrix4d &rot, const GfVec3d &TwAxis,
   // The angles used and what order we rotate axes is determined by which
   // angle we're not decomposing into.
   switch (zeroAngle) {
-  case ZERO_SW:
-  case ZERO_NONE:
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, LRAxis, thetaLR);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
-    // negate the angles
-    *thetaFB *= -handedness;
-    *thetaLR *= -handedness;
-    *thetaTw *= -handedness;
+    case ZERO_SW:
+    case ZERO_NONE:
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, LRAxis, thetaLR);
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
+      r = r * _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
+      // negate the angles
+      *thetaFB *= -handedness;
+      *thetaLR *= -handedness;
+      *thetaTw *= -handedness;
 
-    // Set Sw to swShift if there is a swing shift, otherwise Sw is
-    // zeroed out.
-    *thetaSw = swShift ? *swShift : 0.0;
-    break;
+      // Set Sw to swShift if there is a swing shift, otherwise Sw is
+      // zeroed out.
+      *thetaSw = swShift ? *swShift : 0.0;
+      break;
 
-  case ZERO_TW:
-    r = r *
-        _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaSw);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, LRAxis, thetaLR);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
-    // negate the angles
-    *thetaSw *= -handedness;
-    *thetaFB *= -handedness;
-    *thetaLR *= -handedness;
-    break;
+    case ZERO_TW:
+      r = r * _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaSw);
+      r = r * _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, LRAxis, thetaLR);
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
+      // negate the angles
+      *thetaSw *= -handedness;
+      *thetaFB *= -handedness;
+      *thetaLR *= -handedness;
+      break;
 
-  case ZERO_FB:
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), FBAxis, TwAxis, thetaSw);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, LRAxis, thetaLR);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
-    // negate the angles
-    *thetaSw *= -handedness;
-    *thetaLR *= -handedness;
-    *thetaTw *= -handedness;
-    break;
+    case ZERO_FB:
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), FBAxis, TwAxis, thetaSw);
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, LRAxis, thetaLR);
+      r = r * _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
+      // negate the angles
+      *thetaSw *= -handedness;
+      *thetaLR *= -handedness;
+      *thetaTw *= -handedness;
+      break;
 
-  case ZERO_LR:
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), LRAxis, TwAxis, thetaSw);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
-    r = r *
-        _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
-    // negate the angles
-    *thetaSw *= -handedness;
-    *thetaFB *= -handedness;
-    *thetaTw *= -handedness;
-    break;
+    case ZERO_LR:
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), LRAxis, TwAxis, thetaSw);
+      r = r * _RotateOntoProjected(r.TransformDir(TwAxisR), TwAxis, FBAxis, thetaFB);
+      r = r * _RotateOntoProjected(r.TransformDir(FBAxisR), FBAxis, TwAxis, thetaTw);
+      // negate the angles
+      *thetaSw *= -handedness;
+      *thetaFB *= -handedness;
+      *thetaTw *= -handedness;
+      break;
   };
 
   // The decomposition isn't unique. Find the closest rotation to the hint.
-  MatchClosestEulerRotation(hintTw, hintFB, hintLR, hintSw,
+  MatchClosestEulerRotation(hintTw,
+                            hintFB,
+                            hintLR,
+                            hintSw,
                             zeroAngle == ZERO_TW ? nullptr : thetaTw,
                             zeroAngle == ZERO_FB ? nullptr : thetaFB,
                             zeroAngle == ZERO_LR ? nullptr : thetaLR,
@@ -543,21 +575,19 @@ void GfRotation::DecomposeRotation(const GfMatrix4d &rot, const GfVec3d &TwAxis,
   basis.SetRow(1, FBAxis);
   basis.SetRow(2, LRAxis);
   switch (zeroAngle) {
-  case ZERO_NONE:
-  case ZERO_SW:
-    _ShiftGimbalLock(*thetaFB + M_PI / 2 * basis.GetHandedness(), thetaTw,
-                     thetaLR);
-    break;
-  case ZERO_TW:
-    _ShiftGimbalLock(*thetaLR + M_PI / 2 * basis.GetHandedness(), thetaFB,
-                     thetaSw);
-    break;
-  case ZERO_FB:
-    _ShiftGimbalLock(*thetaLR, thetaTw, thetaSw);
-    break;
-  case ZERO_LR:
-    _ShiftGimbalLock(*thetaFB, thetaTw, thetaSw);
-    break;
+    case ZERO_NONE:
+    case ZERO_SW:
+      _ShiftGimbalLock(*thetaFB + M_PI / 2 * basis.GetHandedness(), thetaTw, thetaLR);
+      break;
+    case ZERO_TW:
+      _ShiftGimbalLock(*thetaLR + M_PI / 2 * basis.GetHandedness(), thetaFB, thetaSw);
+      break;
+    case ZERO_FB:
+      _ShiftGimbalLock(*thetaLR, thetaTw, thetaSw);
+      break;
+    case ZERO_LR:
+      _ShiftGimbalLock(*thetaFB, thetaTw, thetaSw);
+      break;
   };
 }
 
@@ -597,15 +627,18 @@ GfRotation::ComposeRotation(double         tw,
 
 #endif
 
-GfVec3f GfRotation::TransformDir(const GfVec3f &vec) const {
+GfVec3f GfRotation::TransformDir(const GfVec3f &vec) const
+{
   return GfMatrix4d().SetRotate(*this).TransformDir(vec);
 }
 
-GfVec3d GfRotation::TransformDir(const GfVec3d &vec) const {
+GfVec3d GfRotation::TransformDir(const GfVec3d &vec) const
+{
   return GfMatrix4d().SetRotate(*this).TransformDir(vec);
 }
 
-GfRotation &GfRotation::operator*=(const GfRotation &r) {
+GfRotation &GfRotation::operator*=(const GfRotation &r)
+{
   // Express both rotations as quaternions and multiply them
   GfQuaternion q = (r.GetQuaternion() * GetQuaternion()).GetNormalized();
 
@@ -618,7 +651,8 @@ GfRotation &GfRotation::operator*=(const GfRotation &r) {
   if (len > GF_MIN_VECTOR_LENGTH) {
     _axis = q.GetImaginary() / len;
     _angle = 2.0 * GfRadiansToDegrees(acos(q.GetReal()));
-  } else {
+  }
+  else {
     // Leave the axis as is; just set the angle to 0.
     _angle = 0.0;
   }
@@ -626,9 +660,10 @@ GfRotation &GfRotation::operator*=(const GfRotation &r) {
   return *this;
 }
 
-std::ostream &operator<<(std::ostream &out, const GfRotation &r) {
-  return out << '[' << Gf_OstreamHelperP(r.GetAxis()) << " "
-             << Gf_OstreamHelperP(r.GetAngle()) << ']';
+std::ostream &operator<<(std::ostream &out, const GfRotation &r)
+{
+  return out << '[' << Gf_OstreamHelperP(r.GetAxis()) << " " << Gf_OstreamHelperP(r.GetAngle())
+             << ']';
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

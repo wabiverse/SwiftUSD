@@ -48,8 +48,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \warning This differs from a TfHashSet in so far that inserting and
 /// removing elements invalidate all iterators of the container.
 ///
-template <class Element, class HashFn,
-          class EqualElement = std::equal_to<Element>, unsigned Threshold = 128>
+template<class Element,
+         class HashFn,
+         class EqualElement = std::equal_to<Element>,
+         unsigned Threshold = 128>
 class ARCH_EMPTY_BASES TfDenseHashSet :
     // Since sizeof(EqualElement) == 0 and sizeof(HashFn) == 0 in many cases
     // we use the empty base optimization to not pay a size penalty.
@@ -57,12 +59,12 @@ class ARCH_EMPTY_BASES TfDenseHashSet :
     // way to get this optimization.
     private HashFn,
     private EqualElement {
-public:
+ public:
   typedef Element value_type;
 
   ////////////////////////////////////////////////////////////////////////////////
 
-private:
+ private:
   // The vector type holding all data for this dense hash set.
   typedef std::vector<Element> _Vector;
 
@@ -71,7 +73,7 @@ private:
 
   ////////////////////////////////////////////////////////////////////////////////
 
-public:
+ public:
   /// An iterator type for this set.  Note that this one is const as well,
   /// as we can't allow in-place modification of elements due to the
   /// potentially allocated hash map.
@@ -83,18 +85,24 @@ public:
   /// Return type for insert() method.
   typedef std::pair<const_iterator, bool> insert_result;
 
-public:
+ public:
   /// Ctor.
   ///
   explicit TfDenseHashSet(const HashFn &hashFn = HashFn(),
                           const EqualElement &equalElement = EqualElement())
-      : HashFn(hashFn), EqualElement(equalElement) {}
+      : HashFn(hashFn), EqualElement(equalElement)
+  {
+  }
 
   /// Copy Ctor.
   ///
   TfDenseHashSet(const TfDenseHashSet &rhs)
-      : HashFn(rhs), EqualElement(rhs), _vector(rhs._vector),
-        _h(rhs._h ? std::make_unique<_HashMap>(*rhs._h) : nullptr) {}
+      : HashFn(rhs),
+        EqualElement(rhs),
+        _vector(rhs._vector),
+        _h(rhs._h ? std::make_unique<_HashMap>(*rhs._h) : nullptr)
+  {
+  }
 
   /// Move Ctor.
   ///
@@ -102,19 +110,22 @@ public:
 
   /// Construct from range.
   ///
-  template <class Iterator> TfDenseHashSet(Iterator begin, Iterator end) {
+  template<class Iterator> TfDenseHashSet(Iterator begin, Iterator end)
+  {
     insert(begin, end);
   }
 
   /// Construct from an initializer_list.
   ///
-  TfDenseHashSet(std::initializer_list<Element> l) {
+  TfDenseHashSet(std::initializer_list<Element> l)
+  {
     insert(l.begin(), l.end());
   }
 
   /// Copy assignment operator.
   ///
-  TfDenseHashSet &operator=(const TfDenseHashSet &rhs) {
+  TfDenseHashSet &operator=(const TfDenseHashSet &rhs)
+  {
     if (this != &rhs) {
       TfDenseHashSet temp(rhs);
       temp.swap(*this);
@@ -128,7 +139,8 @@ public:
 
   /// Assignment from an initializer_list.
   ///
-  TfDenseHashSet &operator=(std::initializer_list<Element> l) {
+  TfDenseHashSet &operator=(std::initializer_list<Element> l)
+  {
     clear();
     insert(l.begin(), l.end());
     return *this;
@@ -136,7 +148,8 @@ public:
 
   /// Equality operator.
   ///
-  bool operator==(const TfDenseHashSet &rhs) const {
+  bool operator==(const TfDenseHashSet &rhs) const
+  {
 
     if (size() != rhs.size())
       return false;
@@ -152,18 +165,23 @@ public:
     return true;
   }
 
-  bool operator!=(const TfDenseHashSet &rhs) const { return !(*this == rhs); }
+  bool operator!=(const TfDenseHashSet &rhs) const
+  {
+    return !(*this == rhs);
+  }
 
   /// Erases all of the elements
   ///
-  void clear() {
+  void clear()
+  {
     _vec().clear();
     _h.reset();
   }
 
   /// Swaps the contents of two sets.
   ///
-  void swap(TfDenseHashSet &rhs) {
+  void swap(TfDenseHashSet &rhs)
+  {
     using std::swap;
     swap(_hash(), rhs._hash());
     swap(_equ(), rhs._equ());
@@ -173,23 +191,36 @@ public:
 
   /// \c true if the \c set's size is 0.
   ///
-  bool empty() const { return _vec().empty(); }
+  bool empty() const
+  {
+    return _vec().empty();
+  }
 
   /// Returns the size of the set.
   ///
-  size_t size() const { return _vec().size(); }
+  size_t size() const
+  {
+    return _vec().size();
+  }
 
   /// Returns an const_iterator pointing to the beginning of the set.
   ///
-  const_iterator begin() const { return _vec().begin(); }
+  const_iterator begin() const
+  {
+    return _vec().begin();
+  }
 
   /// Returns an const_iterator pointing to the end of the set.
   ///
-  const_iterator end() const { return _vec().end(); }
+  const_iterator end() const
+  {
+    return _vec().end();
+  }
 
   /// Finds the element with key \p k.
   ///
-  const_iterator find(const Element &k) const {
+  const_iterator find(const Element &k) const
+  {
 
     if (_h) {
       typename _HashMap::const_iterator iter = _h->find(k);
@@ -210,25 +241,28 @@ public:
 
   /// Returns the number of elements with key \p k.  Which is either 0 or 1.
   ///
-  size_t count(const Element &k) const { return find(k) != end(); }
+  size_t count(const Element &k) const
+  {
+    return find(k) != end();
+  }
 
   /// Returns a pair of <iterator, bool> where iterator points to the element
   /// in the list and bool is true if a new element was inserted.
   ///
-  insert_result insert(const value_type &v) {
+  insert_result insert(const value_type &v)
+  {
 
     if (_h) {
 
       // Attempt to insert the new index.  If this fails, we can't
       // insert v.
 
-      std::pair<typename _HashMap::iterator, bool> res =
-          _h->insert(std::make_pair(v, size()));
+      std::pair<typename _HashMap::iterator, bool> res = _h->insert(std::make_pair(v, size()));
 
       if (!res.second)
         return insert_result(_vec().begin() + res.first->second, false);
-
-    } else {
+    }
+    else {
 
       // Bail if already inserted.
       const_iterator iter = find(v);
@@ -246,7 +280,8 @@ public:
   /// Insert a range into the hash set.  Note that \p i0 and \p i1 can't
   /// point into the hash set.
   ///
-  template <class IteratorType> void insert(IteratorType i0, IteratorType i1) {
+  template<class IteratorType> void insert(IteratorType i0, IteratorType i1)
+  {
     // Assume elements are more often than not unique, so if the sum of the
     // current size and the size of the range is greater than or equal to
     // the threshold, we create the table immediately so we don't do m*n
@@ -262,12 +297,14 @@ public:
   /// Insert a range of unique elements into the container.  [begin, end)
   /// *must not* contain any duplicate elements.
   ///
-  template <class Iterator> void insert_unique(Iterator begin, Iterator end) {
+  template<class Iterator> void insert_unique(Iterator begin, Iterator end)
+  {
     // Special-case empty container.
     if (empty()) {
       _vec().assign(begin, end);
       _CreateTableIfNeeded();
-    } else {
+    }
+    else {
       // Just insert, since duplicate checking will use the hash.
       insert(begin, end);
     }
@@ -275,7 +312,8 @@ public:
 
   /// Erase element with key \p k.  Returns the number of elements erased.
   ///
-  size_t erase(const Element &k) {
+  size_t erase(const Element &k)
+  {
 
     const_iterator iter = find(k);
     if (iter != end()) {
@@ -287,7 +325,8 @@ public:
 
   /// Erases element pointed to by \p iter.
   ///
-  void erase(const iterator &iter) {
+  void erase(const iterator &iter)
+  {
 
     // Erase key from hash table if applicable.
     if (_h)
@@ -312,7 +351,8 @@ public:
 
   /// Erases a range from the set.
   ///
-  void erase(const iterator &i0, const iterator &i1) {
+  void erase(const iterator &i0, const iterator &i1)
+  {
 
     if (_h) {
       for (const_iterator iter = i0; iter != i1; ++iter)
@@ -329,7 +369,8 @@ public:
 
   /// Optimize storage space.
   ///
-  void shrink_to_fit() {
+  void shrink_to_fit()
+  {
 
     // Shrink the vector to best size.
     _vec().shrink_to_fit();
@@ -343,8 +384,8 @@ public:
     if (sz < Threshold) {
 
       _h.reset();
-
-    } else {
+    }
+    else {
 
       // Otherwise, allocate a new hash map with the optimal size.
       _h.reset(new _HashMap(sz, _hash(), _equ()));
@@ -355,34 +396,54 @@ public:
 
   /// Index into set via \p index.
   ///
-  const Element &operator[](size_t index) const {
+  const Element &operator[](size_t index) const
+  {
     TF_VERIFY(index < size());
     return _vec()[index];
   }
 
   ////////////////////////////////////////////////////////////////////////////////
 
-private:
+ private:
   // Helper to access the storage vector.
-  _Vector &_vec() { return _vector; }
+  _Vector &_vec()
+  {
+    return _vector;
+  }
 
   // Helper to access the hash functor.
-  HashFn &_hash() { return *this; }
+  HashFn &_hash()
+  {
+    return *this;
+  }
 
   // Helper to access the equality functor.
-  EqualElement &_equ() { return *this; }
+  EqualElement &_equ()
+  {
+    return *this;
+  }
 
   // Helper to access the storage vector.
-  const _Vector &_vec() const { return _vector; }
+  const _Vector &_vec() const
+  {
+    return _vector;
+  }
 
   // Helper to access the hash functor.
-  const HashFn &_hash() const { return *this; }
+  const HashFn &_hash() const
+  {
+    return *this;
+  }
 
   // Helper to access the equality functor.
-  const EqualElement &_equ() const { return *this; }
+  const EqualElement &_equ() const
+  {
+    return *this;
+  }
 
   // Helper to create the acceleration table if size dictates.
-  inline void _CreateTableIfNeeded() {
+  inline void _CreateTableIfNeeded()
+  {
     if (size() >= Threshold) {
       _CreateTable();
     }
@@ -390,7 +451,8 @@ private:
 
   // Unconditionally create the acceleration table if it doesn't already
   // exist.
-  inline void _CreateTable() {
+  inline void _CreateTable()
+  {
     if (!_h) {
       _h.reset(new _HashMap(Threshold, _hash(), _equ()));
       for (size_t i = 0; i < size(); ++i)
@@ -407,4 +469,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_DENSE_HASH_SET_H
+#endif  // PXR_BASE_TF_DENSE_HASH_SET_H

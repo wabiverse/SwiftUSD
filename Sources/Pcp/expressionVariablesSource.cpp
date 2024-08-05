@@ -34,18 +34,21 @@ PcpExpressionVariablesSource::PcpExpressionVariablesSource() = default;
 PcpExpressionVariablesSource::PcpExpressionVariablesSource(
     const PcpLayerStackIdentifier &layerStackIdentifier,
     const PcpLayerStackIdentifier &rootLayerStackIdentifier)
-    : _identifier(layerStackIdentifier == rootLayerStackIdentifier
-                      ? nullptr
-                      : new PcpLayerStackIdentifier(layerStackIdentifier)) {}
+    : _identifier(layerStackIdentifier == rootLayerStackIdentifier ?
+                      nullptr :
+                      new PcpLayerStackIdentifier(layerStackIdentifier))
+{
+}
 
 PcpExpressionVariablesSource::~PcpExpressionVariablesSource() = default;
 
-size_t PcpExpressionVariablesSource::GetHash() const {
+size_t PcpExpressionVariablesSource::GetHash() const
+{
   return _identifier ? TfHash()(*_identifier) : TfHash()(0);
 }
 
-bool PcpExpressionVariablesSource::operator==(
-    const PcpExpressionVariablesSource &rhs) const {
+bool PcpExpressionVariablesSource::operator==(const PcpExpressionVariablesSource &rhs) const
+{
   if (this == &rhs) {
     return true;
   }
@@ -59,13 +62,13 @@ bool PcpExpressionVariablesSource::operator==(
   return hasId == rhsHasId;
 }
 
-bool PcpExpressionVariablesSource::operator!=(
-    const PcpExpressionVariablesSource &rhs) const {
+bool PcpExpressionVariablesSource::operator!=(const PcpExpressionVariablesSource &rhs) const
+{
   return !(*this == rhs);
 }
 
-bool PcpExpressionVariablesSource::operator<(
-    const PcpExpressionVariablesSource &rhs) const {
+bool PcpExpressionVariablesSource::operator<(const PcpExpressionVariablesSource &rhs) const
+{
   const bool hasId = static_cast<bool>(_identifier);
   const bool rhsHasId = static_cast<bool>(rhs._identifier);
 
@@ -75,18 +78,18 @@ bool PcpExpressionVariablesSource::operator<(
   return hasId < rhsHasId;
 }
 
-const PcpLayerStackIdentifier &
-PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
-    const PcpLayerStackIdentifier &rootLayerStackIdentifier) const {
+const PcpLayerStackIdentifier &PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
+    const PcpLayerStackIdentifier &rootLayerStackIdentifier) const
+{
   if (IsRootLayerStack()) {
     return rootLayerStackIdentifier;
   }
   return *_identifier;
 }
 
-const PcpLayerStackIdentifier &
-PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
-    const PcpCache &cache) const {
+const PcpLayerStackIdentifier &PcpExpressionVariablesSource::ResolveLayerStackIdentifier(
+    const PcpCache &cache) const
+{
   return ResolveLayerStackIdentifier(cache.GetLayerStackIdentifier());
 }
 

@@ -37,7 +37,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-template <class T> void wrap_TestPlugBase(const std::string &name) {
+template<class T> void wrap_TestPlugBase(const std::string &name)
+{
   typedef T This;
   typedef TfWeakPtr<T> ThisPtr;
   class_<This, ThisPtr, boost::noncopyable>(name.c_str(), no_init)
@@ -52,9 +53,10 @@ template <class T> void wrap_TestPlugBase(const std::string &name) {
       ;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrap_TestPlugBase() {
+void wrap_TestPlugBase()
+{
   wrap_TestPlugBase<_TestPlugBase1>("_TestPlugBase1");
   wrap_TestPlugBase<_TestPlugBase2>("_TestPlugBase2");
   wrap_TestPlugBase<_TestPlugBase3>("_TestPlugBase3");

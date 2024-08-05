@@ -40,8 +40,8 @@ class TfToken;
 ///
 /// Interface for private implementations used by SdfMapEditProxy.
 ///
-template <class MapType> class Sdf_MapEditor {
-public:
+template<class MapType> class Sdf_MapEditor {
+ public:
   typedef typename MapType::key_type key_type;
   typedef typename MapType::mapped_type mapped_type;
   typedef typename MapType::value_type value_type;
@@ -81,14 +81,14 @@ public:
 
   /// @}
 
-protected:
+ protected:
   Sdf_MapEditor();
 };
 
-template <class T>
-std::unique_ptr<Sdf_MapEditor<T>>
-Sdf_CreateMapEditor(const SdfSpecHandle &owner, const TfToken &field);
+template<class T>
+std::unique_ptr<Sdf_MapEditor<T>> Sdf_CreateMapEditor(const SdfSpecHandle &owner,
+                                                      const TfToken &field);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_MAP_EDITOR_H
+#endif  // PXR_USD_SDF_MAP_EDITOR_H

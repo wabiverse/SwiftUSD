@@ -22,62 +22,37 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "Arch/demangle.h"
 #include "Arch/error.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class DummyClassInNamespace
-{
-};
-class OtherDummyClassInNamespace
-{
-public:
-  class SubClass
-  {
-  };
+class DummyClassInNamespace {};
+class OtherDummyClassInNamespace {
+ public:
+  class SubClass {};
 };
 
-template <class T>
-class TemplatedDummyClassInNamespace
-{
-};
+template<class T> class TemplatedDummyClassInNamespace {};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-template <class T>
-class TemplatedDummyClass
-{
-};
+template<class T> class TemplatedDummyClass {};
 
-struct Mangled
-{
-};
+struct Mangled {};
 
-struct FooSsSsSsBar
-{
-};
+struct FooSsSsSsBar {};
 
-template <class T>
-class MangledAlso
-{
-};
+template<class T> class MangledAlso {};
 
 typedef Mangled Remangled;
 
-enum MangleEnum
-{
-  ONE,
-  TWO,
-  THREE
-};
+enum MangleEnum { ONE, TWO, THREE };
 
-template <typename T>
-static bool
-TestDemangle(const std::string &typeName)
+template<typename T> static bool TestDemangle(const std::string &typeName)
 {
   const std::type_info &typeInfo = typeid(T);
   std::string mangledName = typeInfo.name();
@@ -86,7 +61,9 @@ TestDemangle(const std::string &typeName)
   ARCH_AXIOM(ArchDemangle(&toBeDemangledName));
 
   printf("ArchDemangle('%s') => '%s', expected '%s'\n",
-         mangledName.c_str(), toBeDemangledName.c_str(), typeName.c_str());
+         mangledName.c_str(),
+         toBeDemangledName.c_str(),
+         typeName.c_str());
 
   ARCH_AXIOM(toBeDemangledName == typeName);
   ARCH_AXIOM(ArchGetDemangled(mangledName) == typeName);
@@ -104,8 +81,7 @@ int main()
   TestDemangle<MangleEnum>("MangleEnum");
   // We have special case code for std::string.
   TestDemangle<std::string>("string");
-  TestDemangle<TemplatedDummyClass<std::string>>(
-      "TemplatedDummyClass<string>");
+  TestDemangle<TemplatedDummyClass<std::string>>("TemplatedDummyClass<string>");
   // This one is a regression test for a demangle bug on Linux.
   TestDemangle<FooSsSsSsBar>("FooSsSsSsBar");
 

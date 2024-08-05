@@ -41,10 +41,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrmanInstancer : public HdInstancer
-{
+class HdPrmanInstancer : public HdInstancer {
 
-public:
+ public:
   HdPrmanInstancer(HdSceneDelegate *delegate, SdfPath const &id);
 
   /// Destructor.
@@ -81,17 +80,16 @@ public:
    *        for retrieving prototype-level attributes and light-linking
    *        categories, so they should (ideally) not be proxy paths.
    */
-  void Populate(
-      HdRenderParam *renderParam,
-      HdDirtyBits *dirtyBits,
-      const SdfPath &hydraPrototypeId,
-      const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
-      const riley::CoordinateSystemList &coordSysList,
-      const int32_t rileyPrimId,
-      const std::vector<riley::MaterialId> &rileyMaterialIds,
-      const SdfPathVector &prototypePaths);
+  void Populate(HdRenderParam *renderParam,
+                HdDirtyBits *dirtyBits,
+                const SdfPath &hydraPrototypeId,
+                const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
+                const riley::CoordinateSystemList &coordSysList,
+                const int32_t rileyPrimId,
+                const std::vector<riley::MaterialId> &rileyMaterialIds,
+                const SdfPathVector &prototypePaths);
 
-private:
+ private:
   // **********************************************
   // **              Private Types               **
   // **********************************************
@@ -99,8 +97,7 @@ private:
   using _GfMatrixSA = HdTimeSampleArray<GfMatrix4d, HDPRMAN_MAX_TIME_SAMPLES>;
   using _RtMatrixSA = HdTimeSampleArray<RtMatrix4x4, HDPRMAN_MAX_TIME_SAMPLES>;
 
-  struct _RtParamListHashFunctor
-  {
+  struct _RtParamListHashFunctor {
     size_t operator()(const RtParamList &params) const noexcept
     {
       // Wow this sucks, but RtParamList::Hash() is not const!
@@ -109,22 +106,19 @@ private:
     }
   };
 
-  struct _RtParamListEqualToFunctor
-  {
+  struct _RtParamListEqualToFunctor {
     bool operator()(const RtParamList &lhs, const RtParamList &rhs) const noexcept
     {
       return _RtParamListHashFunctor()(lhs) == _RtParamListHashFunctor()(rhs);
     }
   };
 
-  struct _PrimvarValue
-  {
+  struct _PrimvarValue {
     HdPrimvarDescriptor desc;
     VtValue value;
   };
 
-  struct _FlattenData
-  {
+  struct _FlattenData {
 
     // The set of light linking categories
     std::unordered_set<TfToken, TfToken::HashFunctor> categories;
@@ -136,15 +130,10 @@ private:
     RtParamList visibility;
 
     _FlattenData() {}
-    _FlattenData(const VtTokenArray &cats)
-        : categories(cats.begin(), cats.end())
+    _FlattenData(const VtTokenArray &cats) : categories(cats.begin(), cats.end()) {}
+    _FlattenData(const VtTokenArray &cats, bool vis) : categories(cats.begin(), cats.end())
     {
-    }
-    _FlattenData(const VtTokenArray &cats, bool vis)
-        : categories(cats.begin(), cats.end())
-    {
-      if (!vis)
-      {
+      if (!vis) {
         visibility.SetInteger(RixStr.k_visibility_camera, 0);
         visibility.SetInteger(RixStr.k_visibility_indirect, 0);
         visibility.SetInteger(RixStr.k_visibility_transmission, 0);
@@ -178,14 +167,12 @@ private:
              _RtParamListEqualToFunctor()(visibility, rhs.visibility);
     }
 
-    struct HashFunctor
-    {
+    struct HashFunctor {
       size_t operator()(const _FlattenData &fd) const noexcept
       {
         // simple order-independent XOR hash aggregation
         size_t hash = 0;
-        for (const TfToken &tok : fd.categories)
-        {
+        for (const TfToken &tok : fd.categories) {
           hash ^= tok.Hash();
         }
         return hash ^ _RtParamListHashFunctor()(fd.visibility);
@@ -193,20 +180,14 @@ private:
     };
   };
 
-  struct _InstanceData
-  {
+  struct _InstanceData {
     _FlattenData flattenData;
     RtParamList params;
     _GfMatrixSA transform;
 
     _InstanceData() {}
-    _InstanceData(
-        const VtTokenArray &cats,
-        bool vis,
-        const RtParamList &p,
-        _GfMatrixSA &xform)
-        : flattenData(cats, vis),
-          transform(xform)
+    _InstanceData(const VtTokenArray &cats, bool vis, const RtParamList &p, _GfMatrixSA &xform)
+        : flattenData(cats, vis), transform(xform)
     {
       params.Inherit(p);
     }
@@ -215,45 +196,37 @@ private:
   // A simple concurrent hashmap built from std::unordered_map with mutex
   // locking on read and write. Using this instead of tbb's
   // concurrent_hash_map because we need thread-safe erase and clear.
-  template <
-      typename Key,
-      typename T,
-      typename Hash = std::hash<Key>,
-      typename KeyEqual = std::equal_to<Key>>
-  class _LockingMap
-  {
-  public:
+  template<typename Key,
+           typename T,
+           typename Hash = std::hash<Key>,
+           typename KeyEqual = std::equal_to<Key>>
+  class _LockingMap {
+   public:
     bool has(const Key &key)
     {
       std::lock_guard<std::mutex> lock(_mutex);
       return _map.find(key) != _map.end();
     }
     // T must have default constructor
-    template <class = std::enable_if_t<
-                  std::is_default_constructible<std::remove_reference_t<T>>::value>>
+    template<
+        class = std::enable_if_t<std::is_default_constructible<std::remove_reference_t<T>>::value>>
     T &get(const Key &key)
     {
       std::lock_guard<std::mutex> lock(_mutex);
       auto it = _map.find(key);
-      if (it == _map.end())
-      {
-        it = _map.emplace(
-                     std::piecewise_construct,
-                     std::forward_as_tuple(key),
-                     std::tuple<>{})
+      if (it == _map.end()) {
+        it = _map.emplace(std::piecewise_construct, std::forward_as_tuple(key), std::tuple<>{})
                  .first;
       }
       return it->second;
     }
     // T must have copy assignment operator
-    template <class = std::enable_if_t<
-                  std::is_copy_assignable<std::remove_reference_t<T>>::value>>
+    template<class = std::enable_if_t<std::is_copy_assignable<std::remove_reference_t<T>>::value>>
     bool set(const Key &key, T &val)
     {
       std::lock_guard<std::mutex> lock(_mutex);
       auto it = _map.find(key);
-      if (it == _map.end())
-      {
+      if (it == _map.end()) {
         _map.insert({key, val});
         return true;
       }
@@ -263,8 +236,7 @@ private:
     void iterate(std::function<void(const Key &, T &)> fn)
     {
       std::lock_guard<std::mutex> lock(_mutex);
-      for (std::pair<const Key, T> &p : _map)
-      {
+      for (std::pair<const Key, T> &p : _map) {
         fn(p.first, p.second);
       }
     }
@@ -279,40 +251,33 @@ private:
       _map.clear();
     }
 
-  private:
+   private:
     std::unordered_map<Key, T, Hash, KeyEqual> _map;
     // XXX: A shared_mutex (C++17) would be preferable here
     std::mutex _mutex;
   };
 
-  using _LockingFlattenGroupMap = _LockingMap<
-      _FlattenData,
-      riley::GeometryPrototypeId,
-      _FlattenData::HashFunctor>;
+  using _LockingFlattenGroupMap =
+      _LockingMap<_FlattenData, riley::GeometryPrototypeId, _FlattenData::HashFunctor>;
 
-  struct _RileyInstanceId
-  {
+  struct _RileyInstanceId {
     riley::GeometryPrototypeId groupId;
     riley::GeometryInstanceId instanceId;
   };
 
   using _InstanceIdVec = std::vector<_RileyInstanceId>;
 
-  struct _ProtoIdHash
-  {
+  struct _ProtoIdHash {
     size_t operator()(const riley::GeometryPrototypeId &id) const noexcept
     {
       return std::hash<uint32_t>()(id.AsUInt32());
     }
   };
 
-  using _ProtoInstMap = std::unordered_map<
-      riley::GeometryPrototypeId,
-      _InstanceIdVec,
-      _ProtoIdHash>;
+  using _ProtoInstMap =
+      std::unordered_map<riley::GeometryPrototypeId, _InstanceIdVec, _ProtoIdHash>;
 
-  struct _ProtoMapEntry
-  {
+  struct _ProtoMapEntry {
     _ProtoInstMap map;
     bool dirty;
   };
@@ -326,20 +291,18 @@ private:
   // Helper for multiplying transform matrix arrays; this does not really *need*
   // to be a static class method, but it is so it can use the (private)
   // shortened type names.
-  static void _MultiplyTransforms(
-      const _GfMatrixSA &lhs,
-      const _GfMatrixSA &rhs,
-      _RtMatrixSA &dest);
+  static void _MultiplyTransforms(const _GfMatrixSA &lhs,
+                                  const _GfMatrixSA &rhs,
+                                  _RtMatrixSA &dest);
 
   // List of instance attributes pertaining to light-linking that are not
   // supported on instances inside geometry prototype groups
   static std::vector<RtUString> _GetLightLinkAttrs()
   {
-    static const std::vector<RtUString> LightLinkAttrs = {
-        RixStr.k_lightfilter_subset,
-        RixStr.k_lighting_subset,
-        RixStr.k_grouping_membership,
-        RixStr.k_lighting_excludesubset};
+    static const std::vector<RtUString> LightLinkAttrs = {RixStr.k_lightfilter_subset,
+                                                          RixStr.k_lighting_subset,
+                                                          RixStr.k_grouping_membership,
+                                                          RixStr.k_lighting_excludesubset};
     return LightLinkAttrs;
   }
 
@@ -347,10 +310,9 @@ private:
   // supported on instances inside geometry prototype groups
   static std::vector<RtUString> _GetVisAttrs()
   {
-    static const std::vector<RtUString> VisAttrs = {
-        RixStr.k_visibility_camera,
-        RixStr.k_visibility_indirect,
-        RixStr.k_visibility_transmission};
+    static const std::vector<RtUString> VisAttrs = {RixStr.k_visibility_camera,
+                                                    RixStr.k_visibility_indirect,
+                                                    RixStr.k_visibility_transmission};
     return VisAttrs;
   }
 
@@ -368,42 +330,38 @@ private:
 
   // Generates InstanceData structures for this instancer's instances;
   // will multiply those by any supplied subInstances
-  void _ComposeInstances(
-      const SdfPath &protoId,
-      const int primId,
-      const std::vector<_InstanceData> subInstances,
-      std::vector<_InstanceData> &instances);
+  void _ComposeInstances(const SdfPath &protoId,
+                         const int primId,
+                         const std::vector<_InstanceData> subInstances,
+                         std::vector<_InstanceData> &instances);
 
   // Generates FlattenData from a set of instance attributes by looking for
   // incompatible attributes and moving them from the RtParamList to the
   // FlattenData. Called by _ComposeInstances().
-  void _ComposeInstanceFlattenData(
-      const size_t instanceId,
-      RtParamList &instanceParams,
-      _FlattenData &fd,
-      const _FlattenData &fromBelow = _FlattenData());
+  void _ComposeInstanceFlattenData(const size_t instanceId,
+                                   RtParamList &instanceParams,
+                                   _FlattenData &fd,
+                                   const _FlattenData &fromBelow = _FlattenData());
 
   // Generates transform and relevant instance attribute sets for the given
   // prototype prim(s). Captures prototype-level primvars, constant/uniform
   // primvars inherited by the prototype, and prototype-level light linking.
-  void _ComposePrototypeData(
-      HdPrman_RenderParam *param,
-      const SdfPath &protoPath,
-      const std::vector<riley::GeometryPrototypeId> &protoIds,
-      const SdfPathVector &subProtoPaths,
-      const std::vector<_FlattenData> &subProtoFlats,
-      std::vector<RtParamList> &protoAttrs,
-      std::vector<_FlattenData> &protoFlats,
-      _GfMatrixSA &protoXform);
+  void _ComposePrototypeData(HdPrman_RenderParam *param,
+                             const SdfPath &protoPath,
+                             const std::vector<riley::GeometryPrototypeId> &protoIds,
+                             const SdfPathVector &subProtoPaths,
+                             const std::vector<_FlattenData> &subProtoFlats,
+                             std::vector<RtParamList> &protoAttrs,
+                             std::vector<_FlattenData> &protoFlats,
+                             _GfMatrixSA &protoXform);
 
   // Deletes riley instances owned by this instancer that are of riley
   // geometry prototypes that are no longer associated with the given
   // prototype prim. Returns true if there are any new riley geometry
   // prototype ids to associate with this prototype prim path.
-  bool _RemoveDeadInstances(
-      riley::Riley *riley,
-      const SdfPath &prototypePrimPath,
-      const std::vector<riley::GeometryPrototypeId> &protoIds);
+  bool _RemoveDeadInstances(riley::Riley *riley,
+                            const SdfPath &prototypePrimPath,
+                            const std::vector<riley::GeometryPrototypeId> &protoIds);
 
   // Flags all previously seen prototype prim paths as needing their instances
   // updated the next time they show up in a Populate call.
@@ -415,18 +373,17 @@ private:
   // prims (when called through the public Populate method) or may be
   // child instancers represented by riley geometry prototype groups. In
   // either case, the caller owns the riley prototypes.
-  void _PopulateInstances(
-      HdRenderParam *renderParam,
-      HdDirtyBits *dirtyBits,
-      const SdfPath &hydraPrototypeId,
-      const SdfPath &prototypePrimPath,
-      const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
-      const riley::CoordinateSystemList &coordSysList,
-      const int32_t rileyPrimId,
-      const std::vector<riley::MaterialId> &rileyMaterialIds,
-      const SdfPathVector &prototypePaths,
-      const std::vector<_InstanceData> &subInstances,
-      const std::vector<_FlattenData> &prototypeFlats);
+  void _PopulateInstances(HdRenderParam *renderParam,
+                          HdDirtyBits *dirtyBits,
+                          const SdfPath &hydraPrototypeId,
+                          const SdfPath &prototypePrimPath,
+                          const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
+                          const riley::CoordinateSystemList &coordSysList,
+                          const int32_t rileyPrimId,
+                          const std::vector<riley::MaterialId> &rileyMaterialIds,
+                          const SdfPathVector &prototypePaths,
+                          const std::vector<_InstanceData> &subInstances,
+                          const std::vector<_FlattenData> &prototypeFlats);
 
   // Get pointer to parent instancer, if one exists
   HdPrmanInstancer *_GetParentInstancer();
@@ -434,11 +391,10 @@ private:
   // Resize the instancer's interal state store for tracking riley instances.
   // Shrinking the number of instances for a given prototype path and id will
   // delete excess instances from riley. Call with newSize = 0 to kill 'em all.
-  void _ResizeProtoMap(
-      riley::Riley *riley,
-      const SdfPath &prototypePrimPath,
-      const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
-      const size_t newSize);
+  void _ResizeProtoMap(riley::Riley *riley,
+                       const SdfPath &prototypePrimPath,
+                       const std::vector<riley::GeometryPrototypeId> &rileyPrototypeIds,
+                       const size_t newSize);
 
   // Deletes any riley geometry prototype groups that are no longer needed.
   // Returns true if any groups were deleted.
@@ -447,28 +403,22 @@ private:
   // Obtain the riley geometry prototype group for a given set of FlattenData.
   // Returns true if the group had to be created. Gives InvalidId when this
   // instancer has no parent instancer.
-  bool _AcquireGroupId(
-      HdPrman_RenderParam *param,
-      const _FlattenData &flattenGroup,
-      riley::GeometryPrototypeId &groupId);
+  bool _AcquireGroupId(HdPrman_RenderParam *param,
+                       const _FlattenData &flattenGroup,
+                       riley::GeometryPrototypeId &groupId);
 
   // Retrieves instance-rate primvars for the given instance index from
   // the instancer's cache.
-  void _GetInstancePrimvars(
-      const size_t instanceIndex,
-      RtParamList &attrs);
+  void _GetInstancePrimvars(const size_t instanceIndex, RtParamList &attrs);
 
   // Gets constant and uniform primvars for the prototype
-  void _GetPrototypePrimvars(
-      const SdfPath &protoPath,
-      RtParamList &attrs);
+  void _GetPrototypePrimvars(const SdfPath &protoPath, RtParamList &attrs);
 
   // Retrieves the instance transform for the given index from the
   // instancer's cache.
-  void _GetInstanceTransform(
-      const size_t instanceIndex,
-      _GfMatrixSA &xform,
-      const _GfMatrixSA &left = _GfMatrixSA());
+  void _GetInstanceTransform(const size_t instanceIndex,
+                             _GfMatrixSA &xform,
+                             const _GfMatrixSA &left = _GfMatrixSA());
 
   // Calculates this instancer's depth in the nested instancing hierarchy.
   // An uninstanced instancer has depth 0. Instancers with depth > 4 cannot
@@ -523,4 +473,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INSTANCER_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INSTANCER_H

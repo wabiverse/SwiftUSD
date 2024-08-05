@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_SHADERFUNCTION_H
 #define PXR_IMAGING_HGI_SHADERFUNCTION_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/handle.h"
 #include "Hgi/shaderFunctionDesc.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -44,9 +44,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// apply to other graphics backends, such as Vulkan, where the shader functions
 /// are used during rendering.
 ///
-class HgiShaderFunction
-{
-public:
+class HgiShaderFunction {
+ public:
   HGI_API
   virtual ~HgiShaderFunction();
 
@@ -81,13 +80,13 @@ public:
   HGI_API
   virtual uint64_t GetRawResource() const = 0;
 
-protected:
+ protected:
   HGI_API
   HgiShaderFunction(HgiShaderFunctionDesc const &desc);
 
   HgiShaderFunctionDesc _descriptor;
 
-private:
+ private:
   HgiShaderFunction() = delete;
   HgiShaderFunction &operator=(const HgiShaderFunction &) = delete;
   HgiShaderFunction(const HgiShaderFunction &) = delete;

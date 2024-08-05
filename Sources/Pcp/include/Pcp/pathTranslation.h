@@ -90,19 +90,17 @@ SdfPath PcpTranslateTargetPathFromRootToNode(const PcpNodeRef &destNode,
 /// Convenience function like \a PcpTranslatePathFromRootToNode, but
 /// takes a function rather than a node.
 PCP_API
-SdfPath
-PcpTranslatePathFromRootToNodeUsingFunction(const PcpMapFunction &mapToRoot,
-                                            const SdfPath &pathInRootNamespace,
-                                            bool *pathWasTranslated = 0);
+SdfPath PcpTranslatePathFromRootToNodeUsingFunction(const PcpMapFunction &mapToRoot,
+                                                    const SdfPath &pathInRootNamespace,
+                                                    bool *pathWasTranslated = 0);
 
 /// Convenience function like \a PcpTranslatePathFromNodeToRoot, but
 /// takes a function rather than a node.
 PCP_API
-SdfPath
-PcpTranslatePathFromNodeToRootUsingFunction(const PcpMapFunction &mapToRoot,
-                                            const SdfPath &pathInNodeNamespace,
-                                            bool *pathWasTranslated = 0);
+SdfPath PcpTranslatePathFromNodeToRootUsingFunction(const PcpMapFunction &mapToRoot,
+                                                    const SdfPath &pathInNodeNamespace,
+                                                    bool *pathWasTranslated = 0);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PATH_TRANSLATION_H
+#endif  // PXR_USD_PCP_PATH_TRANSLATION_H

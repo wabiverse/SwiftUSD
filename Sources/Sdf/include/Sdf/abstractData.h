@@ -69,7 +69,7 @@ TF_DECLARE_PUBLIC_TOKENS(SdfDataTokens, SDF_API, SDF_DATA_TOKENS);
 /// Instead, it is a basis for building those things.
 ///
 class SdfAbstractData : public TfRefBase, public TfWeakBase {
-public:
+ public:
   SdfAbstractData() {}
   SDF_API
   virtual ~SdfAbstractData();
@@ -177,14 +177,14 @@ public:
   /// Returns whether a value exists for the given \a path and \a fieldName.
   /// Optionally returns the value if it exists.
   SDF_API
-  virtual bool Has(const SdfPath &path, const TfToken &fieldName,
+  virtual bool Has(const SdfPath &path,
+                   const TfToken &fieldName,
                    SdfAbstractDataValue *value) const = 0;
 
   /// Return whether a value exists for the given \a path and \a fieldName.
   /// Optionally returns the value if it exists.
   SDF_API
-  virtual bool Has(const SdfPath &path, const TfToken &fieldName,
-                   VtValue *value = NULL) const = 0;
+  virtual bool Has(const SdfPath &path, const TfToken &fieldName, VtValue *value = NULL) const = 0;
 
   /// Fill \p specType (which cannot be nullptr) as if by a call to
   /// GetSpecType(path).  If the resulting specType is not SdfSpecTypeUnknown,
@@ -197,7 +197,8 @@ public:
   /// return *specType != SdfSpecTypeUnknown && Has(path, fieldName, value);
   /// \endcode
   SDF_API
-  virtual bool HasSpecAndField(const SdfPath &path, const TfToken &fieldName,
+  virtual bool HasSpecAndField(const SdfPath &path,
+                               const TfToken &fieldName,
                                SdfAbstractDataValue *value,
                                SdfSpecType *specType) const;
 
@@ -212,8 +213,10 @@ public:
   /// return *specType != SdfSpecTypeUnknown && Has(path, fieldName, value);
   /// \endcode
   SDF_API
-  virtual bool HasSpecAndField(const SdfPath &path, const TfToken &fieldName,
-                               VtValue *value, SdfSpecType *specType) const;
+  virtual bool HasSpecAndField(const SdfPath &path,
+                               const TfToken &fieldName,
+                               VtValue *value,
+                               SdfSpecType *specType) const;
 
   /// Return the value for the given \a path and \a fieldName. Returns an
   /// empty value if none is set.
@@ -229,22 +232,21 @@ public:
   /// return Get(path, fieldName).GetTypeid();
   /// \endcode
   SDF_API
-  virtual std::type_info const &GetTypeid(const SdfPath &path,
-                                          const TfToken &fieldName) const;
+  virtual std::type_info const &GetTypeid(const SdfPath &path, const TfToken &fieldName) const;
 
   /// Set the value of the given \a path and \a fieldName.
   ///
   /// It's an error to set a field on a spec that does not exist. Setting a
   /// field to an empty VtValue is the same as calling Erase() on it.
   SDF_API
-  virtual void Set(const SdfPath &path, const TfToken &fieldName,
-                   const VtValue &value) = 0;
+  virtual void Set(const SdfPath &path, const TfToken &fieldName, const VtValue &value) = 0;
 
   /// Set the value of the given \a path and \a fieldName.
   ///
   /// It's an error to set a field on a spec that does not exist.
   SDF_API
-  virtual void Set(const SdfPath &path, const TfToken &fieldName,
+  virtual void Set(const SdfPath &path,
+                   const TfToken &fieldName,
                    const SdfAbstractDataConstValue &value) = 0;
 
   /// Remove the field at \p path and \p fieldName, if one exists.
@@ -257,9 +259,8 @@ public:
 
   /// Return the value for the given \a path and \a fieldName. Returns the
   /// provided \a defaultValue value if none is set.
-  template <class T>
-  inline T GetAs(const SdfPath &path, const TfToken &fieldName,
-                 const T &defaultValue = T()) const;
+  template<class T>
+  inline T GetAs(const SdfPath &path, const TfToken &fieldName, const T &defaultValue = T()) const;
 
   /// @}
 
@@ -272,12 +273,15 @@ public:
   // \p keyPath names an entire sub-dictionary, set \p value to that entire
   // sub-dictionary and return true.
   SDF_API
-  virtual bool HasDictKey(const SdfPath &path, const TfToken &fieldName,
+  virtual bool HasDictKey(const SdfPath &path,
+                          const TfToken &fieldName,
                           const TfToken &keyPath,
                           SdfAbstractDataValue *value) const;
   SDF_API
-  virtual bool HasDictKey(const SdfPath &path, const TfToken &fieldName,
-                          const TfToken &keyPath, VtValue *value = NULL) const;
+  virtual bool HasDictKey(const SdfPath &path,
+                          const TfToken &fieldName,
+                          const TfToken &keyPath,
+                          VtValue *value = NULL) const;
 
   // Same as HasDictKey but return empty VtValue on failure.
   SDF_API
@@ -291,10 +295,13 @@ public:
   // element at \p keyPath in it.  If \p value is empty, invoke
   // EraseDictValueByKey instead.
   SDF_API
-  virtual void SetDictValueByKey(const SdfPath &path, const TfToken &fieldName,
-                                 const TfToken &keyPath, const VtValue &value);
+  virtual void SetDictValueByKey(const SdfPath &path,
+                                 const TfToken &fieldName,
+                                 const TfToken &keyPath,
+                                 const VtValue &value);
   SDF_API
-  virtual void SetDictValueByKey(const SdfPath &path, const TfToken &fieldName,
+  virtual void SetDictValueByKey(const SdfPath &path,
+                                 const TfToken &fieldName,
                                  const TfToken &keyPath,
                                  const SdfAbstractDataConstValue &value);
 
@@ -330,38 +337,38 @@ public:
   virtual std::set<double> ListAllTimeSamples() const = 0;
 
   SDF_API
-  virtual std::set<double>
-  ListTimeSamplesForPath(const SdfPath &path) const = 0;
+  virtual std::set<double> ListTimeSamplesForPath(const SdfPath &path) const = 0;
 
   SDF_API
-  virtual bool GetBracketingTimeSamples(double time, double *tLower,
-                                        double *tUpper) const = 0;
+  virtual bool GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const = 0;
 
   SDF_API
   virtual size_t GetNumTimeSamplesForPath(const SdfPath &path) const = 0;
 
   SDF_API
-  virtual bool GetBracketingTimeSamplesForPath(const SdfPath &path, double time,
+  virtual bool GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                               double time,
                                                double *tLower,
                                                double *tUpper) const = 0;
 
   SDF_API
-  virtual bool QueryTimeSample(const SdfPath &path, double time,
+  virtual bool QueryTimeSample(const SdfPath &path,
+                               double time,
                                VtValue *optionalValue = NULL) const = 0;
   SDF_API
-  virtual bool QueryTimeSample(const SdfPath &path, double time,
+  virtual bool QueryTimeSample(const SdfPath &path,
+                               double time,
                                SdfAbstractDataValue *optionalValue) const = 0;
 
   SDF_API
-  virtual void SetTimeSample(const SdfPath &path, double time,
-                             const VtValue &value) = 0;
+  virtual void SetTimeSample(const SdfPath &path, double time, const VtValue &value) = 0;
 
   SDF_API
   virtual void EraseTimeSample(const SdfPath &path, double time) = 0;
 
   /// @}
 
-protected:
+ protected:
   /// Visits every spec in this SdfAbstractData object with the given
   /// \p visitor. The order in which specs are visited is undefined.
   /// The visitor may not modify the SdfAbstractData object it is visiting.
@@ -371,9 +378,11 @@ protected:
   virtual void _VisitSpecs(SdfAbstractDataSpecVisitor *visitor) const = 0;
 };
 
-template <class T>
-inline T SdfAbstractData::GetAs(const SdfPath &path, const TfToken &field,
-                                const T &defaultVal) const {
+template<class T>
+inline T SdfAbstractData::GetAs(const SdfPath &path,
+                                const TfToken &field,
+                                const T &defaultVal) const
+{
   VtValue val = Get(path, field);
   if (val.IsHolding<T>()) {
     return val.UncheckedGet<T>();
@@ -387,11 +396,12 @@ inline T SdfAbstractData::GetAs(const SdfPath &path, const TfToken &field,
 ///
 /// \sa SdfAbstractDataTypedValue
 class SdfAbstractDataValue {
-public:
+ public:
   virtual bool StoreValue(const VtValue &value) = 0;
   virtual bool StoreValue(VtValue &&value) = 0;
 
-  template <class T> bool StoreValue(const T &v) {
+  template<class T> bool StoreValue(const T &v)
+  {
     if (TfSafeTypeCompare(typeid(T), valueType)) {
       *static_cast<T *>(value) = v;
       return true;
@@ -400,7 +410,8 @@ public:
     return false;
   }
 
-  bool StoreValue(const SdfValueBlock &block) {
+  bool StoreValue(const SdfValueBlock &block)
+  {
     isValueBlock = true;
     return true;
   }
@@ -410,10 +421,11 @@ public:
   bool isValueBlock;
   bool typeMismatch;
 
-protected:
+ protected:
   SdfAbstractDataValue(void *value_, const std::type_info &valueType_)
-      : value(value_), valueType(valueType_), isValueBlock(false),
-        typeMismatch(false) {}
+      : value(value_), valueType(valueType_), isValueBlock(false), typeMismatch(false)
+  {
+  }
 };
 
 /// \class SdfAbstractDataTypedValue
@@ -429,13 +441,12 @@ protected:
 /// are solely used to get pointer information into and out of an
 /// SdfAbstractData container.
 ///
-template <class T>
-class SdfAbstractDataTypedValue : public SdfAbstractDataValue {
-public:
-  SdfAbstractDataTypedValue(T *value)
-      : SdfAbstractDataValue(value, typeid(T)) {}
+template<class T> class SdfAbstractDataTypedValue : public SdfAbstractDataValue {
+ public:
+  SdfAbstractDataTypedValue(T *value) : SdfAbstractDataValue(value, typeid(T)) {}
 
-  virtual bool StoreValue(const VtValue &v) override {
+  virtual bool StoreValue(const VtValue &v) override
+  {
     if (ARCH_LIKELY(v.IsHolding<T>())) {
       *static_cast<T *>(value) = v.UncheckedGet<T>();
       if (std::is_same<T, SdfValueBlock>::value) {
@@ -454,7 +465,8 @@ public:
     return false;
   }
 
-  virtual bool StoreValue(VtValue &&v) override {
+  virtual bool StoreValue(VtValue &&v) override
+  {
     if (ARCH_LIKELY(v.IsHolding<T>())) {
       *static_cast<T *>(value) = v.UncheckedRemove<T>();
       if (std::is_same<T, SdfValueBlock>::value) {
@@ -480,10 +492,11 @@ public:
 ///
 /// \sa SdfAbstractDataConstTypedValue
 class SdfAbstractDataConstValue {
-public:
+ public:
   virtual bool GetValue(VtValue *value) const = 0;
 
-  template <class T> bool GetValue(T *v) const {
+  template<class T> bool GetValue(T *v) const
+  {
     if (TfSafeTypeCompare(typeid(T), valueType)) {
       *v = *static_cast<const T *>(value);
       return true;
@@ -496,10 +509,11 @@ public:
   const void *value;
   const std::type_info &valueType;
 
-protected:
-  SdfAbstractDataConstValue(const void *value_,
-                            const std::type_info &valueType_)
-      : value(value_), valueType(valueType_) {}
+ protected:
+  SdfAbstractDataConstValue(const void *value_, const std::type_info &valueType_)
+      : value(value_), valueType(valueType_)
+  {
+  }
 };
 
 /// \class SdfAbstractDataConstTypedValue
@@ -515,36 +529,41 @@ protected:
 /// are solely used to get pointer information into an SdfAbstractData
 /// container.
 ///
-template <class T>
-class SdfAbstractDataConstTypedValue : public SdfAbstractDataConstValue {
-public:
-  SdfAbstractDataConstTypedValue(const T *value)
-      : SdfAbstractDataConstValue(value, typeid(T)) {}
+template<class T> class SdfAbstractDataConstTypedValue : public SdfAbstractDataConstValue {
+ public:
+  SdfAbstractDataConstTypedValue(const T *value) : SdfAbstractDataConstValue(value, typeid(T)) {}
 
-  virtual bool GetValue(VtValue *v) const {
+  virtual bool GetValue(VtValue *v) const
+  {
     *v = _GetValue();
     return true;
   }
 
-  virtual bool IsEqual(const VtValue &v) const {
+  virtual bool IsEqual(const VtValue &v) const
+  {
     return (v.IsHolding<T>() && v.UncheckedGet<T>() == _GetValue());
   }
 
-private:
-  const T &_GetValue() const { return *static_cast<const T *>(value); }
+ private:
+  const T &_GetValue() const
+  {
+    return *static_cast<const T *>(value);
+  }
 };
 
 // Specialization of SdAbstractDataConstTypedValue that converts character
 // arrays to std::string.
-template <int N>
+template<int N>
 class SdfAbstractDataConstTypedValue<char[N]>
     : public SdfAbstractDataConstTypedValue<std::string> {
-public:
+ public:
   typedef char CharArray[N];
   SdfAbstractDataConstTypedValue(const CharArray *value)
-      : SdfAbstractDataConstTypedValue<std::string>(&_str), _str(*value) {}
+      : SdfAbstractDataConstTypedValue<std::string>(&_str), _str(*value)
+  {
+  }
 
-private:
+ private:
   std::string _str;
 };
 
@@ -554,7 +573,7 @@ private:
 ///
 /// \sa SdfAbstractData::VisitSpecs.
 class SdfAbstractDataSpecVisitor {
-public:
+ public:
   SDF_API
   virtual ~SdfAbstractDataSpecVisitor();
 
@@ -572,4 +591,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_ABSTRACT_DATA_H
+#endif  // PXR_USD_SDF_ABSTRACT_DATA_H

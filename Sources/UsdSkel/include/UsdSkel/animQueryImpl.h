@@ -48,9 +48,8 @@ TF_DECLARE_REF_PTRS(UsdSkel_AnimQueryImpl);
 /// Internal implementation of anim animation query.
 /// Subclassing of animation queries is supported out of an expectation
 /// that additional core animation prim types may be added in the future.
-class UsdSkel_AnimQueryImpl : public TfRefBase
-{
-public:
+class UsdSkel_AnimQueryImpl : public TfRefBase {
+ public:
   /// Create an anim query for \p prim, if the prim is a valid type.
   static UsdSkel_AnimQueryImplRefPtr New(const UsdPrim &prim);
 
@@ -58,49 +57,46 @@ public:
 
   virtual UsdPrim GetPrim() const = 0;
 
-  virtual bool ComputeJointLocalTransforms(VtMatrix4dArray *xforms,
-                                           UsdTimeCode time) const = 0;
+  virtual bool ComputeJointLocalTransforms(VtMatrix4dArray *xforms, UsdTimeCode time) const = 0;
 
-  virtual bool ComputeJointLocalTransforms(VtMatrix4fArray *xforms,
-                                           UsdTimeCode time) const = 0;
+  virtual bool ComputeJointLocalTransforms(VtMatrix4fArray *xforms, UsdTimeCode time) const = 0;
 
-  virtual bool ComputeJointLocalTransformComponents(
-      VtVec3fArray *translations,
-      VtQuatfArray *rotations,
-      VtVec3hArray *scales,
-      UsdTimeCode time) const = 0;
+  virtual bool ComputeJointLocalTransformComponents(VtVec3fArray *translations,
+                                                    VtQuatfArray *rotations,
+                                                    VtVec3hArray *scales,
+                                                    UsdTimeCode time) const = 0;
 
-  virtual bool
-  GetJointTransformTimeSamples(const GfInterval &interval,
-                               std::vector<double> *times) const = 0;
+  virtual bool GetJointTransformTimeSamples(const GfInterval &interval,
+                                            std::vector<double> *times) const = 0;
 
-  virtual bool
-  GetJointTransformAttributes(std::vector<UsdAttribute> *attrs) const = 0;
+  virtual bool GetJointTransformAttributes(std::vector<UsdAttribute> *attrs) const = 0;
 
   virtual bool JointTransformsMightBeTimeVarying() const = 0;
 
-  virtual bool
-  ComputeBlendShapeWeights(VtFloatArray *weights,
-                           UsdTimeCode time = UsdTimeCode::Default()) const = 0;
+  virtual bool ComputeBlendShapeWeights(VtFloatArray *weights,
+                                        UsdTimeCode time = UsdTimeCode::Default()) const = 0;
 
-  virtual bool
-  GetBlendShapeWeightTimeSamples(const GfInterval &interval,
-                                 std::vector<double> *times) const = 0;
+  virtual bool GetBlendShapeWeightTimeSamples(const GfInterval &interval,
+                                              std::vector<double> *times) const = 0;
 
-  virtual bool
-  GetBlendShapeWeightAttributes(std::vector<UsdAttribute> *attrs) const = 0;
+  virtual bool GetBlendShapeWeightAttributes(std::vector<UsdAttribute> *attrs) const = 0;
 
-  virtual bool
-  BlendShapeWeightsMightBeTimeVarying() const = 0;
+  virtual bool BlendShapeWeightsMightBeTimeVarying() const = 0;
 
-  const VtTokenArray &GetJointOrder() const { return _jointOrder; }
+  const VtTokenArray &GetJointOrder() const
+  {
+    return _jointOrder;
+  }
 
-  const VtTokenArray &GetBlendShapeOrder() const { return _blendShapeOrder; }
+  const VtTokenArray &GetBlendShapeOrder() const
+  {
+    return _blendShapeOrder;
+  }
 
-protected:
+ protected:
   VtTokenArray _jointOrder, _blendShapeOrder;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // USDSKEL_ANIMQUERY_IMPL
+#endif  // USDSKEL_ANIMQUERY_IMPL

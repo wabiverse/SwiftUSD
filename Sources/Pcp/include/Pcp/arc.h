@@ -42,7 +42,7 @@ class PcpPrimIndex_Graph;
 /// in the index.
 ///
 class PcpArc {
-public:
+ public:
   PcpArc() : type(PcpArcTypeRoot), siblingNumAtOrigin(0), namespaceDepth(0) {}
 
   /// The type of this arc.
@@ -74,4 +74,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_ARC_H
+#endif  // PXR_USD_PCP_ARC_H

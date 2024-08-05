@@ -3,4 +3,4 @@
 
 /* no includes. */
 
-#endif // __PXR_IMAGING_PY_GEOM_UTIL_H__
+#endif  // __PXR_IMAGING_PY_GEOM_UTIL_H__

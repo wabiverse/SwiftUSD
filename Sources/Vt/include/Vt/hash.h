@@ -38,39 +38,46 @@ namespace Vt_HashDetail {
 VT_API void _IssueUnimplementedHashError(std::type_info const &t);
 
 // A constexpr function that determines hashability.
-template <class T, class = decltype(TfHash()(std::declval<T>()))>
-constexpr bool _IsHashable(long) {
+template<class T, class = decltype(TfHash()(std::declval<T>()))> constexpr bool _IsHashable(long)
+{
   return true;
 }
-template <class T> constexpr bool _IsHashable(...) { return false; }
+template<class T> constexpr bool _IsHashable(...)
+{
+  return false;
+}
 
 // Hash implementations -- We're using an overload resolution ordering trick
 // here (long vs ...) so that we pick TfHash() if possible, otherwise
 // we issue a runtime error.
-template <class T, class = decltype(TfHash()(std::declval<T>()))>
-inline size_t _HashValueImpl(T const &val, long) {
+template<class T, class = decltype(TfHash()(std::declval<T>()))>
+inline size_t _HashValueImpl(T const &val, long)
+{
   return TfHash()(val);
 }
 
-template <class T> inline size_t _HashValueImpl(T const &val, ...) {
+template<class T> inline size_t _HashValueImpl(T const &val, ...)
+{
   Vt_HashDetail::_IssueUnimplementedHashError(typeid(T));
   return 0;
 }
 
-} // namespace Vt_HashDetail
+}  // namespace Vt_HashDetail
 
 /// A constexpr function that returns true if T is hashable via VtHashValue,
 /// false otherwise.  This is true if we can invoke TfHash()() on a T instance.
-template <class T> constexpr bool VtIsHashable() {
+template<class T> constexpr bool VtIsHashable()
+{
   return Vt_HashDetail::_IsHashable<T>(0);
 }
 
 /// Compute a hash code for \p val by invoking TfHash()(val) or when not
 /// possible issue a coding error and return 0.
-template <class T> size_t VtHashValue(T const &val) {
+template<class T> size_t VtHashValue(T const &val)
+{
   return Vt_HashDetail::_HashValueImpl(val, 0);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_VT_HASH_H
+#endif  // PXR_BASE_VT_HASH_H

@@ -29,10 +29,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (strongerThanDescendants)
-);
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (strongerThanDescendants));
 
 namespace {
 
@@ -44,111 +41,100 @@ namespace {
 // Like an HdOverlayContainerDataSource, but looking at bindingStrength
 // to determine which data source is stronger.
 //
-class _MaterialBindingsDataSource : public HdContainerDataSource
-{
-public:
-    HD_DECLARE_DATASOURCE(_MaterialBindingsDataSource);
+class _MaterialBindingsDataSource : public HdContainerDataSource {
+ public:
+  HD_DECLARE_DATASOURCE(_MaterialBindingsDataSource);
 
-    TfTokenVector GetNames() override {
-        TfDenseHashSet<TfToken, TfToken::HashFunctor> allNames;
-        {
-            for (const TfTokenVector names : { _primBindings->GetNames(),
-                                               _parentBindings->GetNames() } ) {
-                allNames.insert(names.begin(), names.end());
-            }
-        }
-
-        return { allNames.begin(), allNames.end() };
+  TfTokenVector GetNames() override
+  {
+    TfDenseHashSet<TfToken, TfToken::HashFunctor> allNames;
+    {
+      for (const TfTokenVector names : {_primBindings->GetNames(), _parentBindings->GetNames()}) {
+        allNames.insert(names.begin(), names.end());
+      }
     }
 
-    HdDataSourceBaseHandle Get(const TfToken &name) override {
-        HdMaterialBindingSchema parentSchema(
-            HdContainerDataSource::Cast(
-                _parentBindings->Get(name)));
-        if (HdTokenDataSourceHandle const strengthDs =
-                parentSchema.GetBindingStrength()) {
-            const TfToken strength = strengthDs->GetTypedValue(0.0f);
-            if (strength == _tokens->strongerThanDescendants) {
-                return parentSchema.GetContainer();
-            }
-        }
-        if (HdDataSourceBaseHandle const bindingDs = _primBindings->Get(name)) {
-            return bindingDs;
-        }
+    return {allNames.begin(), allNames.end()};
+  }
+
+  HdDataSourceBaseHandle Get(const TfToken &name) override
+  {
+    HdMaterialBindingSchema parentSchema(HdContainerDataSource::Cast(_parentBindings->Get(name)));
+    if (HdTokenDataSourceHandle const strengthDs = parentSchema.GetBindingStrength()) {
+      const TfToken strength = strengthDs->GetTypedValue(0.0f);
+      if (strength == _tokens->strongerThanDescendants) {
         return parentSchema.GetContainer();
+      }
     }
-
-    // Return data source with the correct composition behavior.
-    //
-    // This avoids allocating the _MaterialBindingsDataSource if only one
-    // of the given handles is non-null.
-    static
-    HdContainerDataSourceHandle
-    UseOrCreateNew(
-        HdContainerDataSourceHandle const &primBindings,
-        HdContainerDataSourceHandle const &parentBindings)
-    {
-        if (!primBindings) {
-            return parentBindings;
-        }
-        if (!parentBindings) {
-            return primBindings;
-        }
-        return New(primBindings, parentBindings);
+    if (HdDataSourceBaseHandle const bindingDs = _primBindings->Get(name)) {
+      return bindingDs;
     }
+    return parentSchema.GetContainer();
+  }
 
-private:
-    _MaterialBindingsDataSource(
-        HdContainerDataSourceHandle const &primBindings,
-        HdContainerDataSourceHandle const &parentBindings)
-      : _primBindings(primBindings)
-      , _parentBindings(parentBindings)
-    {
+  // Return data source with the correct composition behavior.
+  //
+  // This avoids allocating the _MaterialBindingsDataSource if only one
+  // of the given handles is non-null.
+  static HdContainerDataSourceHandle UseOrCreateNew(
+      HdContainerDataSourceHandle const &primBindings,
+      HdContainerDataSourceHandle const &parentBindings)
+  {
+    if (!primBindings) {
+      return parentBindings;
     }
+    if (!parentBindings) {
+      return primBindings;
+    }
+    return New(primBindings, parentBindings);
+  }
 
-    HdContainerDataSourceHandle const _primBindings;
-    HdContainerDataSourceHandle const _parentBindings;
+ private:
+  _MaterialBindingsDataSource(HdContainerDataSourceHandle const &primBindings,
+                              HdContainerDataSourceHandle const &parentBindings)
+      : _primBindings(primBindings), _parentBindings(parentBindings)
+  {
+  }
+
+  HdContainerDataSourceHandle const _primBindings;
+  HdContainerDataSourceHandle const _parentBindings;
 };
 
-}
+}  // namespace
 
-HdContainerDataSourceHandle
-HdFlattenedMaterialBindingsDataSourceProvider::GetFlattenedDataSource(
+HdContainerDataSourceHandle HdFlattenedMaterialBindingsDataSourceProvider::GetFlattenedDataSource(
     const Context &ctx) const
 {
-    return 
-        _MaterialBindingsDataSource::UseOrCreateNew(
-            ctx.GetInputDataSource(),
-            ctx.GetFlattenedDataSourceFromParentPrim());
+  return _MaterialBindingsDataSource::UseOrCreateNew(ctx.GetInputDataSource(),
+                                                     ctx.GetFlattenedDataSourceFromParentPrim());
 }
 
-void
-HdFlattenedMaterialBindingsDataSourceProvider::ComputeDirtyLocatorsForDescendants(
-    HdDataSourceLocatorSet * const locators) const
+void HdFlattenedMaterialBindingsDataSourceProvider::ComputeDirtyLocatorsForDescendants(
+    HdDataSourceLocatorSet *const locators) const
 {
-    // Any locator of the form BindingPurpose:Foo will be turned into
-    // BindingPurpose.
-    //
-    // The reason. Foo could be bindingStrength and thus affect
-    // BindingPurpose:Path.
+  // Any locator of the form BindingPurpose:Foo will be turned into
+  // BindingPurpose.
+  //
+  // The reason. Foo could be bindingStrength and thus affect
+  // BindingPurpose:Path.
 
-    bool needsTransform = false;
+  bool needsTransform = false;
 
-    for (const HdDataSourceLocator &locator : *locators) {
-        if (locator.GetElementCount() != 1) {
-            needsTransform = true;
-            break;
-        }
+  for (const HdDataSourceLocator &locator : *locators) {
+    if (locator.GetElementCount() != 1) {
+      needsTransform = true;
+      break;
     }
-    if (!needsTransform) {
-        return;
-    }
-     
-    HdDataSourceLocatorSet result;
-    for (const HdDataSourceLocator &locator : *locators) {
-        result.insert(HdDataSourceLocator(locator.GetFirstElement()));
-    }
-    *locators = std::move(result);
+  }
+  if (!needsTransform) {
+    return;
+  }
+
+  HdDataSourceLocatorSet result;
+  for (const HdDataSourceLocator &locator : *locators) {
+    result.insert(HdDataSourceLocator(locator.GetFirstElement()));
+  }
+  *locators = std::move(result);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

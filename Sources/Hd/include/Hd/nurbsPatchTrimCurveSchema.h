@@ -33,125 +33,107 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDNURBSPATCHTRIMCURVE_SCHEMA_TOKENS \
-    (trimCurve) \
-    (counts) \
-    (orders) \
-    (vertexCounts) \
-    (knots) \
-    (ranges) \
-    (points) \
+  (trimCurve)(counts)(orders)(vertexCounts)(knots)(ranges)(points)
 
-TF_DECLARE_PUBLIC_TOKENS(HdNurbsPatchTrimCurveSchemaTokens, HD_API,
-    HDNURBSPATCHTRIMCURVE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdNurbsPatchTrimCurveSchemaTokens,
+                         HD_API,
+                         HDNURBSPATCHTRIMCURVE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdNurbsPatchTrimCurveSchema : public HdSchema
-{
-public:
-    HdNurbsPatchTrimCurveSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdNurbsPatchTrimCurveSchema : public HdSchema {
+ public:
+  HdNurbsPatchTrimCurveSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdIntArrayDataSourceHandle GetCounts();
+  HD_API
+  HdIntArrayDataSourceHandle GetOrders();
+  HD_API
+  HdIntArrayDataSourceHandle GetVertexCounts();
+  HD_API
+  HdDoubleArrayDataSourceHandle GetKnots();
+  HD_API
+  HdVec2dArrayDataSourceHandle GetRanges();
+  HD_API
+  HdVec3dArrayDataSourceHandle GetPoints();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdIntArrayDataSourceHandle &counts,
+                                                   const HdIntArrayDataSourceHandle &orders,
+                                                   const HdIntArrayDataSourceHandle &vertexCounts,
+                                                   const HdDoubleArrayDataSourceHandle &knots,
+                                                   const HdVec2dArrayDataSourceHandle &ranges,
+                                                   const HdVec3dArrayDataSourceHandle &points);
+
+  /// \class HdNurbsPatchTrimCurveSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdIntArrayDataSourceHandle GetCounts();
+    Builder &SetCounts(const HdIntArrayDataSourceHandle &counts);
     HD_API
-    HdIntArrayDataSourceHandle GetOrders();
+    Builder &SetOrders(const HdIntArrayDataSourceHandle &orders);
     HD_API
-    HdIntArrayDataSourceHandle GetVertexCounts();
+    Builder &SetVertexCounts(const HdIntArrayDataSourceHandle &vertexCounts);
     HD_API
-    HdDoubleArrayDataSourceHandle GetKnots();
+    Builder &SetKnots(const HdDoubleArrayDataSourceHandle &knots);
     HD_API
-    HdVec2dArrayDataSourceHandle GetRanges();
+    Builder &SetRanges(const HdVec2dArrayDataSourceHandle &ranges);
     HD_API
-    HdVec3dArrayDataSourceHandle GetPoints();
+    Builder &SetPoints(const HdVec3dArrayDataSourceHandle &points);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdIntArrayDataSourceHandle &counts,
-        const HdIntArrayDataSourceHandle &orders,
-        const HdIntArrayDataSourceHandle &vertexCounts,
-        const HdDoubleArrayDataSourceHandle &knots,
-        const HdVec2dArrayDataSourceHandle &ranges,
-        const HdVec3dArrayDataSourceHandle &points
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdNurbsPatchTrimCurveSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetCounts(
-            const HdIntArrayDataSourceHandle &counts);
-        HD_API
-        Builder &SetOrders(
-            const HdIntArrayDataSourceHandle &orders);
-        HD_API
-        Builder &SetVertexCounts(
-            const HdIntArrayDataSourceHandle &vertexCounts);
-        HD_API
-        Builder &SetKnots(
-            const HdDoubleArrayDataSourceHandle &knots);
-        HD_API
-        Builder &SetRanges(
-            const HdVec2dArrayDataSourceHandle &ranges);
-        HD_API
-        Builder &SetPoints(
-            const HdVec3dArrayDataSourceHandle &points);
+   private:
+    HdIntArrayDataSourceHandle _counts;
+    HdIntArrayDataSourceHandle _orders;
+    HdIntArrayDataSourceHandle _vertexCounts;
+    HdDoubleArrayDataSourceHandle _knots;
+    HdVec2dArrayDataSourceHandle _ranges;
+    HdVec3dArrayDataSourceHandle _points;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  /// Retrieves a container data source with the schema's default name token
+  /// "trimCurve" from the parent container and constructs a
+  /// HdNurbsPatchTrimCurveSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdNurbsPatchTrimCurveSchema GetFromParent(
+      const HdContainerDataSourceHandle &fromParentContainer);
 
-    private:
-        HdIntArrayDataSourceHandle _counts;
-        HdIntArrayDataSourceHandle _orders;
-        HdIntArrayDataSourceHandle _vertexCounts;
-        HdDoubleArrayDataSourceHandle _knots;
-        HdVec2dArrayDataSourceHandle _ranges;
-        HdVec3dArrayDataSourceHandle _points;
-    };
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Retrieves a container data source with the schema's default name token
-    /// "trimCurve" from the parent container and constructs a
-    /// HdNurbsPatchTrimCurveSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdNurbsPatchTrimCurveSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

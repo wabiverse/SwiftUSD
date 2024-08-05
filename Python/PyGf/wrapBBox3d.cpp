@@ -44,16 +44,21 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-string _Repr(GfBBox3d const &self) {
+string _Repr(GfBBox3d const &self)
+{
   return TF_PY_REPR_PREFIX + "BBox3d(" + TfPyRepr(self.GetRange()) + ", " +
          TfPyRepr(self.GetMatrix()) + ")";
 }
 
-static size_t __hash__(GfBBox3d const &self) { return TfHash()(self); }
+static size_t __hash__(GfBBox3d const &self)
+{
+  return TfHash()(self);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapBBox3d() {
+void wrapBBox3d()
+{
   typedef GfBBox3d This;
 
   class_<This>("BBox3d", "Arbitrarily oriented 3D bounding box", init<>())
@@ -66,37 +71,31 @@ void wrapBBox3d() {
       .def("Set", &This::Set, return_self<>())
 
       .add_property("box",
-                    make_function(&This::GetRange,
-                                  return_value_policy<copy_const_reference>()),
+                    make_function(&This::GetRange, return_value_policy<copy_const_reference>()),
                     &This::SetRange)
 
       .add_property("matrix",
-                    make_function(&This::GetMatrix,
-                                  return_value_policy<copy_const_reference>()),
+                    make_function(&This::GetMatrix, return_value_policy<copy_const_reference>()),
                     &This::SetMatrix)
 
       // In 2x, GetBox is a scriptable method instead of using the
       // "box" property.
-      .def("GetBox", make_function(&This::GetRange,
-                                   return_value_policy<copy_const_reference>()))
+      .def("GetBox", make_function(&This::GetRange, return_value_policy<copy_const_reference>()))
 
       // But in 3x, GetBox was renamed to GetRange and was not
       // scriptable.  We'd like to use GetRange in code in the
       // future so we're going to make the same interface available
       // via script.
-      .def("GetRange",
-           make_function(&This::GetRange,
-                         return_value_policy<copy_const_reference>()))
+      .def("GetRange", make_function(&This::GetRange, return_value_policy<copy_const_reference>()))
 
-      .def("GetInverseMatrix", &This::GetInverseMatrix,
-           return_value_policy<copy_const_reference>())
+      .def(
+          "GetInverseMatrix", &This::GetInverseMatrix, return_value_policy<copy_const_reference>())
 
       .def("GetMatrix",
-           make_function(&This::GetMatrix,
-                         return_value_policy<copy_const_reference>()))
+           make_function(&This::GetMatrix, return_value_policy<copy_const_reference>()))
 
-      .add_property("hasZeroAreaPrimitives", &This::HasZeroAreaPrimitives,
-                    &This::SetHasZeroAreaPrimitives)
+      .add_property(
+          "hasZeroAreaPrimitives", &This::HasZeroAreaPrimitives, &This::SetHasZeroAreaPrimitives)
 
       .def("GetVolume", &This::GetVolume)
 
@@ -130,10 +129,10 @@ void wrapBBox3d() {
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<This>,
-                      TfPySequenceToPython<std::vector<This>>>();
+  to_python_converter<std::vector<This>, TfPySequenceToPython<std::vector<This>>>();
 
   // Allow conversion of lists of GfBBox3d to std::vector<GfBBox3d>
   TfPyContainerConversions::from_python_sequence<
-      std::vector<This>, TfPyContainerConversions::variable_capacity_policy>();
+      std::vector<This>,
+      TfPyContainerConversions::variable_capacity_policy>();
 }

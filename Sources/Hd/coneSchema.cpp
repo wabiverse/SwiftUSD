@@ -33,125 +33,92 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdConeSchemaTokens,
-    HDCONE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdConeSchemaTokens, HDCONE_SCHEMA_TOKENS);
 
-
-
-HdDoubleDataSourceHandle
-HdConeSchema::GetHeight()
+HdDoubleDataSourceHandle HdConeSchema::GetHeight()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdConeSchemaTokens->height);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdConeSchemaTokens->height);
 }
 
-HdDoubleDataSourceHandle
-HdConeSchema::GetRadius()
+HdDoubleDataSourceHandle HdConeSchema::GetRadius()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdConeSchemaTokens->radius);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdConeSchemaTokens->radius);
 }
 
-HdTokenDataSourceHandle
-HdConeSchema::GetAxis()
+HdTokenDataSourceHandle HdConeSchema::GetAxis()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdConeSchemaTokens->axis);
+  return _GetTypedDataSource<HdTokenDataSource>(HdConeSchemaTokens->axis);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdConeSchema::BuildRetained(
-        const HdDoubleDataSourceHandle &height,
-        const HdDoubleDataSourceHandle &radius,
-        const HdTokenDataSourceHandle &axis
-)
+HdContainerDataSourceHandle HdConeSchema::BuildRetained(const HdDoubleDataSourceHandle &height,
+                                                        const HdDoubleDataSourceHandle &radius,
+                                                        const HdTokenDataSourceHandle &axis)
 {
-    TfToken names[3];
-    HdDataSourceBaseHandle values[3];
+  TfToken names[3];
+  HdDataSourceBaseHandle values[3];
 
-    size_t count = 0;
-    if (height) {
-        names[count] = HdConeSchemaTokens->height;
-        values[count++] = height;
-    }
+  size_t count = 0;
+  if (height) {
+    names[count] = HdConeSchemaTokens->height;
+    values[count++] = height;
+  }
 
-    if (radius) {
-        names[count] = HdConeSchemaTokens->radius;
-        values[count++] = radius;
-    }
+  if (radius) {
+    names[count] = HdConeSchemaTokens->radius;
+    values[count++] = radius;
+  }
 
-    if (axis) {
-        names[count] = HdConeSchemaTokens->axis;
-        values[count++] = axis;
-    }
+  if (axis) {
+    names[count] = HdConeSchemaTokens->axis;
+    values[count++] = axis;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdConeSchema
-HdConeSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdConeSchema HdConeSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdConeSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdConeSchemaTokens->cone))
-        : nullptr);
+  return HdConeSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                HdConeSchemaTokens->cone)) :
+                                            nullptr);
 }
 
 /*static*/
-const TfToken &
-HdConeSchema::GetSchemaToken()
+const TfToken &HdConeSchema::GetSchemaToken()
 {
-    return HdConeSchemaTokens->cone;
-} 
+  return HdConeSchemaTokens->cone;
+}
 /*static*/
-const HdDataSourceLocator &
-HdConeSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdConeSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdConeSchemaTokens->cone
-    );
-    return locator;
-} 
-HdConeSchema::Builder &
-HdConeSchema::Builder::SetHeight(
-    const HdDoubleDataSourceHandle &height)
+  static const HdDataSourceLocator locator(HdConeSchemaTokens->cone);
+  return locator;
+}
+HdConeSchema::Builder &HdConeSchema::Builder::SetHeight(const HdDoubleDataSourceHandle &height)
 {
-    _height = height;
-    return *this;
+  _height = height;
+  return *this;
 }
 
-HdConeSchema::Builder &
-HdConeSchema::Builder::SetRadius(
-    const HdDoubleDataSourceHandle &radius)
+HdConeSchema::Builder &HdConeSchema::Builder::SetRadius(const HdDoubleDataSourceHandle &radius)
 {
-    _radius = radius;
-    return *this;
+  _radius = radius;
+  return *this;
 }
 
-HdConeSchema::Builder &
-HdConeSchema::Builder::SetAxis(
-    const HdTokenDataSourceHandle &axis)
+HdConeSchema::Builder &HdConeSchema::Builder::SetAxis(const HdTokenDataSourceHandle &axis)
 {
-    _axis = axis;
-    return *this;
+  _axis = axis;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdConeSchema::Builder::Build()
+HdContainerDataSourceHandle HdConeSchema::Builder::Build()
 {
-    return HdConeSchema::BuildRetained(
-        _height,
-        _radius,
-        _axis
-    );
+  return HdConeSchema::BuildRetained(_height, _radius, _axis);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -28,7 +28,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayToken() {
+void wrapArrayToken()
+{
   VtWrapArray<VtArray<TfToken>>();
   VtWrapComparisonFunctions<VtArray<TfToken>>();
 }

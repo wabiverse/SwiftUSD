@@ -33,18 +33,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // For use by \c PLUG_REGISTER_INTERFACE_SINGLETON_TYPE.
 class Plug_InterfaceFactory {
-public:
+ public:
   struct Base : public TfType::FactoryBase {
-  public:
+   public:
     virtual void *New() = 0;
   };
 
-  template <class Interface, class Implementation>
-  struct SingletonFactory : public Base {
-  public:
-    virtual void *New() {
-      static_assert(std::is_abstract<Interface>::value,
-                    "Interface type must be abstract.");
+  template<class Interface, class Implementation> struct SingletonFactory : public Base {
+   public:
+    virtual void *New()
+    {
+      static_assert(std::is_abstract<Interface>::value, "Interface type must be abstract.");
       static Implementation impl;
       return static_cast<Interface *>(&impl);
     }
@@ -63,13 +62,13 @@ public:
 /// Clients that want to create instances of types defined in a plugin
 /// but not added to the TfType system should create a singleton with
 /// factory methods to create those objects.
-#define PLUG_REGISTER_INTERFACE_SINGLETON_TYPE(Interface, Implementation)      \
-  TF_REGISTRY_FUNCTION(TfType) {                                               \
-    TfType::Define<Interface>()                                                \
-        .SetFactory<Plug_InterfaceFactory::SingletonFactory<                   \
-            Interface, Implementation>>();                                     \
+#define PLUG_REGISTER_INTERFACE_SINGLETON_TYPE(Interface, Implementation) \
+  TF_REGISTRY_FUNCTION(TfType) \
+  { \
+    TfType::Define<Interface>() \
+        .SetFactory<Plug_InterfaceFactory::SingletonFactory<Interface, Implementation>>(); \
   }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_PLUG_INTERFACE_FACTORY_H
+#endif  // PXR_BASE_PLUG_INTERFACE_FACTORY_H

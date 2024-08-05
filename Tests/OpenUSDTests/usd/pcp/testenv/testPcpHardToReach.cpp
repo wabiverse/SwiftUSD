@@ -26,8 +26,8 @@
 
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/sdf/path.h"
-#include "pxr/usd/sdf/primSpec.h"
 #include "pxr/usd/sdf/payload.h"
+#include "pxr/usd/sdf/primSpec.h"
 #include "pxr/usd/sdf/reference.h"
 
 #include <iostream>
@@ -35,46 +35,41 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE;
 
-static void
-TestBug160419()
+static void TestBug160419()
 {
-    std::cout << "TestBug160419..." << std::endl;
+  std::cout << "TestBug160419..." << std::endl;
 
-    SdfLayerRefPtr payloadLayer = SdfLayer::CreateAnonymous();
-    SdfPrimSpecHandle payloadPrim = 
-        SdfCreatePrimInLayer(payloadLayer, SdfPath("/Payload"));
+  SdfLayerRefPtr payloadLayer = SdfLayer::CreateAnonymous();
+  SdfPrimSpecHandle payloadPrim = SdfCreatePrimInLayer(payloadLayer, SdfPath("/Payload"));
 
-    SdfLayerRefPtr rootLayer = SdfLayer::CreateAnonymous();
-    SdfPrimSpecHandle refPrim = 
-        SdfCreatePrimInLayer(rootLayer, SdfPath("/Ref/Child"));
-    refPrim->GetPayloadList().Prepend(
-        SdfPayload(payloadLayer->GetIdentifier(), payloadPrim->GetPath()));
+  SdfLayerRefPtr rootLayer = SdfLayer::CreateAnonymous();
+  SdfPrimSpecHandle refPrim = SdfCreatePrimInLayer(rootLayer, SdfPath("/Ref/Child"));
+  refPrim->GetPayloadList().Prepend(
+      SdfPayload(payloadLayer->GetIdentifier(), payloadPrim->GetPath()));
 
-    SdfPrimSpecHandle rootPrim = 
-        SdfCreatePrimInLayer(rootLayer, SdfPath("/Root"));
-    rootPrim->GetReferenceList().Prepend(
-        SdfReference(std::string(), refPrim->GetPath()));
-    
-    PcpCache cache{PcpLayerStackIdentifier(rootLayer), std::string(), true};
-    TF_AXIOM(cache.GetIncludedPayloads().empty());
+  SdfPrimSpecHandle rootPrim = SdfCreatePrimInLayer(rootLayer, SdfPath("/Root"));
+  rootPrim->GetReferenceList().Prepend(SdfReference(std::string(), refPrim->GetPath()));
 
-    PcpErrorVector errors;
-    cache.ComputePrimIndexesInParallel(
-        SdfPath("/"), &errors, 
-        [](const PcpPrimIndex&, TfTokenVector*) { return true; },
-        [](const SdfPath&) { return true; });
+  PcpCache cache{PcpLayerStackIdentifier(rootLayer), std::string(), true};
+  TF_AXIOM(cache.GetIncludedPayloads().empty());
 
-    TF_AXIOM(errors.empty());
-    TF_AXIOM((cache.GetIncludedPayloads() == 
-              PcpCache::PayloadSet {
-                  SdfPath("/Ref/Child"), SdfPath("/Root") }));
+  PcpErrorVector errors;
+  cache.ComputePrimIndexesInParallel(
+      SdfPath("/"),
+      &errors,
+      [](const PcpPrimIndex &, TfTokenVector *) { return true; },
+      [](const SdfPath &) { return true; });
+
+  TF_AXIOM(errors.empty());
+  TF_AXIOM((cache.GetIncludedPayloads() ==
+            PcpCache::PayloadSet{SdfPath("/Ref/Child"), SdfPath("/Root")}));
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    TestBug160419();
+  TestBug160419();
 
-    std::cout << "Passed!" << std::endl;
+  std::cout << "Passed!" << std::endl;
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

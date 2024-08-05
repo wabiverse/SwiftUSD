@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdRenderSettings,
-                 TfType::Bases<UsdRenderSettingsBase>>();
+  TfType::Define<UsdRenderSettings, TfType::Bases<UsdRenderSettingsBase>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdRenderSettings::~UsdRenderSettings()
-{
-}
+UsdRenderSettings::~UsdRenderSettings() {}
 
 /* static */
-UsdRenderSettings
-UsdRenderSettings::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderSettings UsdRenderSettings::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderSettings();
   }
@@ -62,18 +57,14 @@ UsdRenderSettings::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdRenderSettings
-UsdRenderSettings::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderSettings UsdRenderSettings::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("RenderSettings");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderSettings();
   }
-  return UsdRenderSettings(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdRenderSettings(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdRenderSettings::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdRenderSettings::_GetStaticTfType()
+const TfType &UsdRenderSettings::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdRenderSettings>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdRenderSettings::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdRenderSettings::_GetTfType() const
+const TfType &UsdRenderSettings::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdRenderSettings::GetIncludedPurposesAttr() const
+UsdAttribute UsdRenderSettings::GetIncludedPurposesAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->includedPurposes);
 }
 
-UsdAttribute
-UsdRenderSettings::CreateIncludedPurposesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettings::CreateIncludedPurposesAttr(VtValue const &defaultValue,
+                                                           bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->includedPurposes,
                                     SdfValueTypeNames->TokenArray,
@@ -121,14 +109,13 @@ UsdRenderSettings::CreateIncludedPurposesAttr(VtValue const &defaultValue, bool 
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettings::GetMaterialBindingPurposesAttr() const
+UsdAttribute UsdRenderSettings::GetMaterialBindingPurposesAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->materialBindingPurposes);
 }
 
-UsdAttribute
-UsdRenderSettings::CreateMaterialBindingPurposesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettings::CreateMaterialBindingPurposesAttr(VtValue const &defaultValue,
+                                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->materialBindingPurposes,
                                     SdfValueTypeNames->TokenArray,
@@ -138,14 +125,13 @@ UsdRenderSettings::CreateMaterialBindingPurposesAttr(VtValue const &defaultValue
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettings::GetRenderingColorSpaceAttr() const
+UsdAttribute UsdRenderSettings::GetRenderingColorSpaceAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->renderingColorSpace);
 }
 
-UsdAttribute
-UsdRenderSettings::CreateRenderingColorSpaceAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettings::CreateRenderingColorSpaceAttr(VtValue const &defaultValue,
+                                                              bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->renderingColorSpace,
                                     SdfValueTypeNames->Token,
@@ -155,45 +141,39 @@ UsdRenderSettings::CreateRenderingColorSpaceAttr(VtValue const &defaultValue, bo
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdRenderSettings::GetProductsRel() const
+UsdRelationship UsdRenderSettings::GetProductsRel() const
 {
   return GetPrim().GetRelationship(UsdRenderTokens->products);
 }
 
-UsdRelationship
-UsdRenderSettings::CreateProductsRel() const
+UsdRelationship UsdRenderSettings::CreateProductsRel() const
 {
   return GetPrim().CreateRelationship(UsdRenderTokens->products,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdRenderSettings::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdRenderSettings::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdRenderTokens->includedPurposes,
       UsdRenderTokens->materialBindingPurposes,
       UsdRenderTokens->renderingColorSpace,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdRenderSettingsBase::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdRenderSettingsBase::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;
@@ -212,28 +192,24 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-#include "UsdRender/product.h"
-#include "UsdRender/var.h"
-#include "UsdGeom/camera.h"
 #include "Gf/camera.h"
 #include "Gf/frustum.h"
+#include "UsdGeom/camera.h"
+#include "UsdRender/product.h"
+#include "UsdRender/var.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdRenderSettings
-UsdRenderSettings::GetStageRenderSettings(const UsdStageWeakPtr &stage)
+UsdRenderSettings UsdRenderSettings::GetStageRenderSettings(const UsdStageWeakPtr &stage)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid UsdStage");
     return UsdRenderSettings();
   }
-  if (stage->HasAuthoredMetadata(UsdRenderTokens->renderSettingsPrimPath))
-  {
+  if (stage->HasAuthoredMetadata(UsdRenderTokens->renderSettingsPrimPath)) {
     std::string pathStr;
     stage->GetMetadata(UsdRenderTokens->renderSettingsPrimPath, &pathStr);
-    if (!pathStr.empty())
-    {
+    if (!pathStr.empty()) {
       SdfPath path(pathStr);
       return UsdRenderSettings(stage->GetPrimAtPath(path));
     }

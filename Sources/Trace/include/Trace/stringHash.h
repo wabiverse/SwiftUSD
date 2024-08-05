@@ -39,26 +39,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// literals.
 ///
 class TraceStringHash {
-public:
+ public:
   /// Computes a compile time hash of \p str.
-  template <int N> static constexpr std::uint32_t Hash(const char (&str)[N]) {
+  template<int N> static constexpr std::uint32_t Hash(const char (&str)[N])
+  {
     return djb2HashStr<N - 1>(str);
   }
 
-private:
+ private:
   // Recursive function computing the xor variant of the djb2 hash
   // function.
-  template <int N> static constexpr std::uint32_t djb2HashStr(const char *str) {
+  template<int N> static constexpr std::uint32_t djb2HashStr(const char *str)
+  {
     return (djb2HashStr<N - 1>(str) * 33) ^ str[N - 1];
   }
 };
 
 // Template recursion base case.
-template <>
-constexpr std::uint32_t TraceStringHash::djb2HashStr<0>(const char *str) {
+template<> constexpr std::uint32_t TraceStringHash::djb2HashStr<0>(const char *str)
+{
   return 5381;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_STRING_HASH_H
+#endif  // PXR_BASE_TRACE_STRING_HASH_H

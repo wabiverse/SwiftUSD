@@ -26,8 +26,8 @@
 #include "pxr/usd/usd/primDefinition.h"
 #include "pxr/usd/usd/schemaRegistry.h"
 
-#include "pxr/base/plug/registry.h"
 #include "Arch/systemInfo.h"
+#include "pxr/base/plug/registry.h"
 PXR_NAMESPACE_USING_DIRECTIVE
 
 static const int SCHEMA_BASE_INIT = 1971;
@@ -40,12 +40,10 @@ static const int MUTATED_VAL = 22;
 // functionality like the templated accessors. The python testUsdSchemaRegistry
 // test handles the rest of the code coverage.
 
-static void
-TestPrimMetadata()
+static void TestPrimMetadata()
 {
-  const UsdPrimDefinition *primDef =
-      UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
-          TfToken("MetadataTest"));
+  const UsdPrimDefinition *primDef = UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
+      TfToken("MetadataTest"));
   TF_AXIOM(primDef);
 
   // Get various prim metadata fields from the templated GetMetadata on the
@@ -63,29 +61,24 @@ TestPrimMetadata()
   TF_AXIOM(hidden == true);
 
   std::string testCustomMetadata;
-  TF_AXIOM(primDef->GetMetadata(TfToken("testCustomMetadata"),
-                                &testCustomMetadata));
+  TF_AXIOM(primDef->GetMetadata(TfToken("testCustomMetadata"), &testCustomMetadata));
   TF_AXIOM(testCustomMetadata == "garply");
 
   // Dictionary metadata can be gotten by whole value as well as queried
   // for individual keys in the metadata value.
   VtDictionary testDictionaryMetadata;
-  TF_AXIOM(primDef->GetMetadata(TfToken("testDictionaryMetadata"),
-                                &testDictionaryMetadata));
-  TF_AXIOM(testDictionaryMetadata == VtDictionary(
-                                         {{"name", VtValue("foo")},
-                                          {"value", VtValue(2)}}));
+  TF_AXIOM(primDef->GetMetadata(TfToken("testDictionaryMetadata"), &testDictionaryMetadata));
+  TF_AXIOM(testDictionaryMetadata ==
+           VtDictionary({{"name", VtValue("foo")}, {"value", VtValue(2)}}));
 
   std::string testDictionaryMetadataName;
   TF_AXIOM(primDef->GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("name"),
-      &testDictionaryMetadataName));
+      TfToken("testDictionaryMetadata"), TfToken("name"), &testDictionaryMetadataName));
   TF_AXIOM(testDictionaryMetadataName == "foo");
 
   int testDictionaryMetadataValue;
   TF_AXIOM(primDef->GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("value"),
-      &testDictionaryMetadataValue));
+      TfToken("testDictionaryMetadata"), TfToken("value"), &testDictionaryMetadataValue));
   TF_AXIOM(testDictionaryMetadataValue == 2);
 
   // Verify getting existing values by the wrong type returns false and
@@ -100,32 +93,28 @@ TestPrimMetadata()
   // GetMetadataDictKey eventually calls) does not return false on a type
   // mismatch. This may be a bug or it may be intentional so for now at least,
   // this case will return true, but won't write out to the value.
-  TF_AXIOM(primDef->GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("name"), &val));
+  TF_AXIOM(
+      primDef->GetMetadataByDictKey(TfToken("testDictionaryMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
   // But calling GetMetaByDictKey on non-dicionary metadata or a non-existent
   // key in valid dictionary metadata does return false.
-  TF_AXIOM(!primDef->GetMetadataByDictKey(
-      TfToken("testCustomMetadata"), TfToken("name"), &val));
+  TF_AXIOM(!primDef->GetMetadataByDictKey(TfToken("testCustomMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(!primDef->GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
+  TF_AXIOM(
+      !primDef->GetMetadataByDictKey(TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
   TF_AXIOM(val == 0.0);
 }
 
-static void
-TestAttributeMetadata()
+static void TestAttributeMetadata()
 {
   // Get prim definition for our test schema.
-  const UsdPrimDefinition *primDef =
-      UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
-          TfToken("MetadataTest"));
+  const UsdPrimDefinition *primDef = UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
+      TfToken("MetadataTest"));
   TF_AXIOM(primDef);
 
   // Get the valid test attribute definition from the prim definition
   const TfToken attrNameToken("testAttr");
-  UsdPrimDefinition::Attribute attrDef =
-      primDef->GetAttributeDefinition(attrNameToken);
+  UsdPrimDefinition::Attribute attrDef = primDef->GetAttributeDefinition(attrNameToken);
 
   // Valid attribute conversion to bool
   TF_AXIOM(attrDef);
@@ -150,8 +139,7 @@ TestAttributeMetadata()
   }
   {
     TfToken typeName;
-    TF_AXIOM(primDef->GetPropertyMetadata(
-        attrNameToken, SdfFieldKeys->TypeName, &typeName));
+    TF_AXIOM(primDef->GetPropertyMetadata(attrNameToken, SdfFieldKeys->TypeName, &typeName));
     TF_AXIOM(typeName == "string");
   }
   // Verify the type name accessors on attr def (not templated)
@@ -167,8 +155,7 @@ TestAttributeMetadata()
   }
   {
     std::string fallback;
-    TF_AXIOM(primDef->GetPropertyMetadata(
-        attrNameToken, SdfFieldKeys->Default, &fallback));
+    TF_AXIOM(primDef->GetPropertyMetadata(attrNameToken, SdfFieldKeys->Default, &fallback));
     TF_AXIOM(fallback == "foo");
   }
   {
@@ -191,8 +178,8 @@ TestAttributeMetadata()
   }
   {
     VtTokenArray allowTokens;
-    TF_AXIOM(primDef->GetPropertyMetadata(
-        attrNameToken, SdfFieldKeys->AllowedTokens, &allowTokens));
+    TF_AXIOM(
+        primDef->GetPropertyMetadata(attrNameToken, SdfFieldKeys->AllowedTokens, &allowTokens));
     TF_AXIOM(allowTokens == VtTokenArray({TfToken("bar"), TfToken("baz")}));
   }
 
@@ -200,43 +187,38 @@ TestAttributeMetadata()
   // for individual keys in the metadata value.
   {
     VtDictionary testDictionaryMetadata;
-    TF_AXIOM(attrDef.GetMetadata(
-        TfToken("testDictionaryMetadata"),
-        &testDictionaryMetadata));
-    TF_AXIOM(testDictionaryMetadata == VtDictionary(
-                                           {{"name", VtValue("bar")},
-                                            {"value", VtValue(3)}}));
+    TF_AXIOM(attrDef.GetMetadata(TfToken("testDictionaryMetadata"), &testDictionaryMetadata));
+    TF_AXIOM(testDictionaryMetadata ==
+             VtDictionary({{"name", VtValue("bar")}, {"value", VtValue(3)}}));
 
     std::string testDictionaryMetadataName;
     TF_AXIOM(attrDef.GetMetadataByDictKey(
-        TfToken("testDictionaryMetadata"), TfToken("name"),
-        &testDictionaryMetadataName));
+        TfToken("testDictionaryMetadata"), TfToken("name"), &testDictionaryMetadataName));
     TF_AXIOM(testDictionaryMetadataName == "bar");
 
     int testDictionaryMetadataValue;
     TF_AXIOM(attrDef.GetMetadataByDictKey(
-        TfToken("testDictionaryMetadata"), TfToken("value"),
-        &testDictionaryMetadataValue));
+        TfToken("testDictionaryMetadata"), TfToken("value"), &testDictionaryMetadataValue));
     TF_AXIOM(testDictionaryMetadataValue == 3);
   }
   {
     VtDictionary testDictionaryMetadata;
-    TF_AXIOM(primDef->GetPropertyMetadata(attrNameToken,
-                                          TfToken("testDictionaryMetadata"),
-                                          &testDictionaryMetadata));
-    TF_AXIOM(testDictionaryMetadata == VtDictionary(
-                                           {{"name", VtValue("bar")},
-                                            {"value", VtValue(3)}}));
+    TF_AXIOM(primDef->GetPropertyMetadata(
+        attrNameToken, TfToken("testDictionaryMetadata"), &testDictionaryMetadata));
+    TF_AXIOM(testDictionaryMetadata ==
+             VtDictionary({{"name", VtValue("bar")}, {"value", VtValue(3)}}));
 
     std::string testDictionaryMetadataName;
     TF_AXIOM(primDef->GetPropertyMetadataByDictKey(attrNameToken,
-                                                   TfToken("testDictionaryMetadata"), TfToken("name"),
+                                                   TfToken("testDictionaryMetadata"),
+                                                   TfToken("name"),
                                                    &testDictionaryMetadataName));
     TF_AXIOM(testDictionaryMetadataName == "bar");
 
     int testDictionaryMetadataValue;
     TF_AXIOM(primDef->GetPropertyMetadataByDictKey(attrNameToken,
-                                                   TfToken("testDictionaryMetadata"), TfToken("value"),
+                                                   TfToken("testDictionaryMetadata"),
+                                                   TfToken("value"),
                                                    &testDictionaryMetadataValue));
     TF_AXIOM(testDictionaryMetadataValue == 3);
   }
@@ -250,8 +232,7 @@ TestAttributeMetadata()
   TF_AXIOM(val == 0.0);
   TF_AXIOM(!attrDef.GetMetadata(SdfFieldKeys->AllowedTokens, &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(!primDef->GetPropertyMetadata(
-      attrNameToken, SdfFieldKeys->AllowedTokens, &val));
+  TF_AXIOM(!primDef->GetPropertyMetadata(attrNameToken, SdfFieldKeys->AllowedTokens, &val));
   TF_AXIOM(val == 0.0);
 
   // XXX: It's reasonable to expect that calling GetMetadataDictKey using
@@ -260,41 +241,36 @@ TestAttributeMetadata()
   // GetMetadataDictKey eventually calls) does not return false on a type
   // mismatch. This may be a bug or it may be intentional so for now at least,
   // this case will return true, but won't write out to the value.
-  TF_AXIOM(attrDef.GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("name"), &val));
+  TF_AXIOM(attrDef.GetMetadataByDictKey(TfToken("testDictionaryMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(primDef->GetPropertyMetadataByDictKey(attrNameToken,
-                                                 TfToken("testDictionaryMetadata"), TfToken("name"), &val));
+  TF_AXIOM(primDef->GetPropertyMetadataByDictKey(
+      attrNameToken, TfToken("testDictionaryMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
   // But calling GetMetaByDictKey on non-dicionary metadata or a non-existent
   // key in valid dictionary metadata does return false.
-  TF_AXIOM(!attrDef.GetMetadataByDictKey(
-      TfToken("testCustomMetadata"), TfToken("name"), &val));
+  TF_AXIOM(!attrDef.GetMetadataByDictKey(TfToken("testCustomMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(!primDef->GetPropertyMetadataByDictKey(attrNameToken,
-                                                  TfToken("testCustomMetadata"), TfToken("name"), &val));
+  TF_AXIOM(!primDef->GetPropertyMetadataByDictKey(
+      attrNameToken, TfToken("testCustomMetadata"), TfToken("name"), &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(!attrDef.GetMetadataByDictKey(
-      TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
+  TF_AXIOM(
+      !attrDef.GetMetadataByDictKey(TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
   TF_AXIOM(val == 0.0);
-  TF_AXIOM(!primDef->GetPropertyMetadataByDictKey(attrNameToken,
-                                                  TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
+  TF_AXIOM(!primDef->GetPropertyMetadataByDictKey(
+      attrNameToken, TfToken("testDictionaryMetadata"), TfToken("bogus"), &val));
   TF_AXIOM(val == 0.0);
 }
 
-static void
-TestRelationshipMetadata()
+static void TestRelationshipMetadata()
 {
   // Get prim definition for our test schema.
-  const UsdPrimDefinition *primDef =
-      UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
-          TfToken("MetadataTest"));
+  const UsdPrimDefinition *primDef = UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
+      TfToken("MetadataTest"));
   TF_AXIOM(primDef);
 
   // Get the valid test relationship definition from the prim definition
   const TfToken relNameToken("testRel");
-  UsdPrimDefinition::Relationship relDef =
-      primDef->GetRelationshipDefinition(relNameToken);
+  UsdPrimDefinition::Relationship relDef = primDef->GetRelationshipDefinition(relNameToken);
 
   // Valid relationship conversion to bool
   TF_AXIOM(relDef);
@@ -319,8 +295,7 @@ TestRelationshipMetadata()
   }
   {
     SdfVariability variability;
-    TF_AXIOM(primDef->GetPropertyMetadata(
-        relNameToken, SdfFieldKeys->Variability, &variability));
+    TF_AXIOM(primDef->GetPropertyMetadata(relNameToken, SdfFieldKeys->Variability, &variability));
     TF_AXIOM(variability == SdfVariabilityUniform);
   }
   // Verify the variability accessor on rel def (not templated)
@@ -330,55 +305,48 @@ TestRelationshipMetadata()
   // for individual keys in the metadata value.
   {
     VtDictionary testDictionaryMetadata;
-    TF_AXIOM(relDef.GetMetadata(
-        TfToken("testDictionaryMetadata"),
-        &testDictionaryMetadata));
-    TF_AXIOM(testDictionaryMetadata == VtDictionary(
-                                           {{"name", VtValue("baz")},
-                                            {"value", VtValue(5)}}));
+    TF_AXIOM(relDef.GetMetadata(TfToken("testDictionaryMetadata"), &testDictionaryMetadata));
+    TF_AXIOM(testDictionaryMetadata ==
+             VtDictionary({{"name", VtValue("baz")}, {"value", VtValue(5)}}));
 
     std::string testDictionaryMetadataName;
     TF_AXIOM(relDef.GetMetadataByDictKey(
-        TfToken("testDictionaryMetadata"), TfToken("name"),
-        &testDictionaryMetadataName));
+        TfToken("testDictionaryMetadata"), TfToken("name"), &testDictionaryMetadataName));
     TF_AXIOM(testDictionaryMetadataName == "baz");
 
     int testDictionaryMetadataValue;
     TF_AXIOM(relDef.GetMetadataByDictKey(
-        TfToken("testDictionaryMetadata"), TfToken("value"),
-        &testDictionaryMetadataValue));
+        TfToken("testDictionaryMetadata"), TfToken("value"), &testDictionaryMetadataValue));
     TF_AXIOM(testDictionaryMetadataValue == 5);
   }
   {
     VtDictionary testDictionaryMetadata;
-    TF_AXIOM(primDef->GetPropertyMetadata(relNameToken,
-                                          TfToken("testDictionaryMetadata"),
-                                          &testDictionaryMetadata));
-    TF_AXIOM(testDictionaryMetadata == VtDictionary(
-                                           {{"name", VtValue("baz")},
-                                            {"value", VtValue(5)}}));
+    TF_AXIOM(primDef->GetPropertyMetadata(
+        relNameToken, TfToken("testDictionaryMetadata"), &testDictionaryMetadata));
+    TF_AXIOM(testDictionaryMetadata ==
+             VtDictionary({{"name", VtValue("baz")}, {"value", VtValue(5)}}));
 
     std::string testDictionaryMetadataName;
     TF_AXIOM(primDef->GetPropertyMetadataByDictKey(relNameToken,
-                                                   TfToken("testDictionaryMetadata"), TfToken("name"),
+                                                   TfToken("testDictionaryMetadata"),
+                                                   TfToken("name"),
                                                    &testDictionaryMetadataName));
     TF_AXIOM(testDictionaryMetadataName == "baz");
 
     int testDictionaryMetadataValue;
     TF_AXIOM(primDef->GetPropertyMetadataByDictKey(relNameToken,
-                                                   TfToken("testDictionaryMetadata"), TfToken("value"),
+                                                   TfToken("testDictionaryMetadata"),
+                                                   TfToken("value"),
                                                    &testDictionaryMetadataValue));
     TF_AXIOM(testDictionaryMetadataValue == 5);
   }
 }
 
-static void
-TestInvalidProperties()
+static void TestInvalidProperties()
 {
   // Get prim definition for our test schema.
-  const UsdPrimDefinition *primDef =
-      UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
-          TfToken("MetadataTest"));
+  const UsdPrimDefinition *primDef = UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(
+      TfToken("MetadataTest"));
   TF_AXIOM(primDef);
 
   // Default constructed property, attribute, relationship.

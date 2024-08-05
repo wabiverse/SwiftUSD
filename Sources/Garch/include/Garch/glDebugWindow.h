@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_GARCH_GL_DEBUG_WINDOW_H
 #define PXR_IMAGING_GARCH_GL_DEBUG_WINDOW_H
 
-#include <pxr/pxrns.h>
 #include "Garch/api.h"
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -36,9 +36,8 @@ class Garch_GLPlatformDebugWindow;
 ///
 /// Platform specific minimum GL widget for unit tests.
 ///
-class GarchGLDebugWindow
-{
-public:
+class GarchGLDebugWindow {
+ public:
   GARCH_API
   GarchGLDebugWindow(const char *title, int width, int height);
   GARCH_API
@@ -51,22 +50,17 @@ public:
   GARCH_API
   void ExitApp();
 
-  int GetWidth() const { return _width; }
-  int GetHeight() const { return _height; }
+  int GetWidth() const
+  {
+    return _width;
+  }
+  int GetHeight() const
+  {
+    return _height;
+  }
 
-  enum Buttons
-  {
-    MyButton1 = 0,
-    MyButton2 = 1,
-    MyButton3 = 2
-  };
-  enum ModifierKeys
-  {
-    NoModifiers = 0,
-    Shift = 1,
-    Alt = 2,
-    Ctrl = 4
-  };
+  enum Buttons { MyButton1 = 0, MyButton2 = 1, MyButton3 = 2 };
+  enum ModifierKeys { NoModifiers = 0, Shift = 1, Alt = 2, Ctrl = 4 };
 
   GARCH_API
   virtual void OnInitializeGL();
@@ -87,7 +81,7 @@ public:
   GARCH_API
   virtual void OnMouseMove(int x, int y, int modKeys);
 
-private:
+ private:
   Garch_GLPlatformDebugWindow *_private;
   std::string _title;
   int _width, _height;
@@ -95,4 +89,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GARCH_GL_DEBUG_WINDOW_H
+#endif  // PXR_IMAGING_GARCH_GL_DEBUG_WINDOW_H

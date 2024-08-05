@@ -39,10 +39,12 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
                           const UsdStageWeakPtr &stage,
                           const Usd_PrimFlagsPredicate &pred,
                           std::set<UsdObject> *includedObjects,
-                          SdfPathSet *includedPaths) {
+                          SdfPathSet *includedPaths)
+{
   if (!((bool)includedObjects ^ (bool)includedPaths)) {
-    TF_CODING_ERROR("Either includedObjects or includedPaths must be"
-                    " valid, but not both");
+    TF_CODING_ERROR(
+        "Either includedObjects or includedPaths must be"
+        " valid, but not both");
   }
 
   std::set<UsdObject> result;
@@ -61,23 +63,22 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
   };
 
   // Returns true if a property is excluded in the PathExpansionRuleMap.
-  auto IsPropertyExplicitlyExcluded =
-      [hasExcludes, pathExpRuleMap](const SdfPath &propPath) {
-        if (!hasExcludes) {
-          return false;
-        }
-        auto it = pathExpRuleMap.find(propPath);
-        if (it != pathExpRuleMap.end()) {
-          return it->second == UsdTokens->exclude;
-        }
-        return false;
-      };
+  auto IsPropertyExplicitlyExcluded = [hasExcludes, pathExpRuleMap](const SdfPath &propPath) {
+    if (!hasExcludes) {
+      return false;
+    }
+    auto it = pathExpRuleMap.find(propPath);
+    if (it != pathExpRuleMap.end()) {
+      return it->second == UsdTokens->exclude;
+    }
+    return false;
+  };
 
-  auto AppendIncludedObject = [includedObjects,
-                               includedPaths](const UsdObject &obj) {
+  auto AppendIncludedObject = [includedObjects, includedPaths](const UsdObject &obj) {
     if (includedObjects) {
       includedObjects->insert(obj);
-    } else if (includedPaths) {
+    }
+    else if (includedPaths) {
       includedPaths->insert(obj.GetPath());
     }
   };
@@ -99,22 +100,26 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
         if (p && pred(p)) {
           AppendIncludedObject(p);
         }
-      } else if (path.IsPropertyPath()) {
+      }
+      else if (path.IsPropertyPath()) {
         if (UsdProperty property = GetPropertyAtPath(path)) {
           AppendIncludedObject(property.As<UsdObject>());
         }
-      } else {
+      }
+      else {
         TF_CODING_ERROR("Unknown path type in membership-map.");
       }
     }
 
     else if (expansionRule == UsdTokens->expandPrims ||
-             expansionRule == UsdTokens->expandPrimsAndProperties) {
+             expansionRule == UsdTokens->expandPrimsAndProperties)
+    {
       if (path.IsPropertyPath()) {
         if (UsdProperty property = GetPropertyAtPath(path)) {
           AppendIncludedObject(property.As<UsdObject>());
         }
-      } else if (UsdPrim prim = stage->GetPrimAtPath(path)) {
+      }
+      else if (UsdPrim prim = stage->GetPrimAtPath(path)) {
 
         UsdPrimRange range(prim, pred);
         auto iter = range.begin();
@@ -143,8 +148,7 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
           //
           // Call GetPropertyNames() otherwise.
           if (includedObjects) {
-            std::vector<UsdProperty> properties =
-                descendantPrim.GetProperties();
+            std::vector<UsdProperty> properties = descendantPrim.GetProperties();
             for (const auto &property : properties) {
               // Add the property to the result only if it's
               // not explicitly excluded.
@@ -152,10 +156,10 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
                 AppendIncludedObject(property.As<UsdObject>());
               }
             }
-          } else {
+          }
+          else {
             for (const auto &propertyName : descendantPrim.GetPropertyNames()) {
-              SdfPath propertyPath =
-                  descendantPrim.GetPath().AppendProperty(propertyName);
+              SdfPath propertyPath = descendantPrim.GetPath().AppendProperty(propertyName);
               if (!IsPropertyExplicitlyExcluded(propertyPath)) {
                 // Can't call IncludeObject here since we're
                 // avoiding creation of the object.
@@ -169,30 +173,31 @@ void _ComputeIncludedImpl(const UsdCollectionMembershipQuery &query,
   }
 }
 
-} // namespace
+}  // namespace
 
 std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(
-    const UsdCollectionMembershipQuery &query, const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred) {
+    const UsdCollectionMembershipQuery &query,
+    const UsdStageWeakPtr &stage,
+    const Usd_PrimFlagsPredicate &pred)
+{
   std::set<UsdObject> result;
   _ComputeIncludedImpl(query, stage, pred, &result, nullptr);
   return result;
 }
 
-SdfPathSet
-UsdComputeIncludedPathsFromCollection(const UsdCollectionMembershipQuery &query,
-                                      const UsdStageWeakPtr &stage,
-                                      const Usd_PrimFlagsPredicate &pred) {
+SdfPathSet UsdComputeIncludedPathsFromCollection(const UsdCollectionMembershipQuery &query,
+                                                 const UsdStageWeakPtr &stage,
+                                                 const Usd_PrimFlagsPredicate &pred)
+{
   SdfPathSet result;
   _ComputeIncludedImpl(query, stage, pred, nullptr, &result);
   return result;
 }
 
 UsdCollectionMembershipQuery::UsdCollectionMembershipQuery(
-    const PathExpansionRuleMap &pathExpansionRuleMap,
-    const SdfPathSet &includedCollections)
-    : _pathExpansionRuleMap(pathExpansionRuleMap),
-      _includedCollections(includedCollections) {
+    const PathExpansionRuleMap &pathExpansionRuleMap, const SdfPathSet &includedCollections)
+    : _pathExpansionRuleMap(pathExpansionRuleMap), _includedCollections(includedCollections)
+{
   for (const auto &pathAndExpansionRule : _pathExpansionRuleMap) {
     if (pathAndExpansionRule.second == UsdTokens->exclude) {
       _hasExcludes = true;
@@ -202,10 +207,10 @@ UsdCollectionMembershipQuery::UsdCollectionMembershipQuery(
 }
 
 UsdCollectionMembershipQuery::UsdCollectionMembershipQuery(
-    PathExpansionRuleMap &&pathExpansionRuleMap,
-    SdfPathSet &&includedCollections)
+    PathExpansionRuleMap &&pathExpansionRuleMap, SdfPathSet &&includedCollections)
     : _pathExpansionRuleMap(std::move(pathExpansionRuleMap)),
-      _includedCollections(std::move(includedCollections)) {
+      _includedCollections(std::move(includedCollections))
+{
   for (const auto &pathAndExpansionRule : _pathExpansionRuleMap) {
     if (pathAndExpansionRule.second == UsdTokens->exclude) {
       _hasExcludes = true;
@@ -214,8 +219,9 @@ UsdCollectionMembershipQuery::UsdCollectionMembershipQuery(
   }
 }
 
-bool UsdCollectionMembershipQuery::IsPathIncluded(
-    const SdfPath &path, TfToken *expansionRule) const {
+bool UsdCollectionMembershipQuery::IsPathIncluded(const SdfPath &path,
+                                                  TfToken *expansionRule) const
+{
   // Coding Error if one passes in a relative path to IsPathIncluded
   // Passing one causes a infinite loop because of how `GetParentPath` works.
   if (!path.IsAbsolutePath()) {
@@ -238,7 +244,8 @@ bool UsdCollectionMembershipQuery::IsPathIncluded(
             *expansionRule = UsdTokens->exclude;
           }
           return false;
-        } else if (i->second != UsdTokens->explicitOnly || p == path) {
+        }
+        else if (i->second != UsdTokens->explicitOnly || p == path) {
           if (expansionRule) {
             *expansionRule = i->second;
           }
@@ -246,7 +253,8 @@ bool UsdCollectionMembershipQuery::IsPathIncluded(
         }
       }
     }
-  } else {
+  }
+  else {
     for (SdfPath p = path; p != SdfPath::EmptyPath(); p = p.GetParentPath()) {
       const auto i = _pathExpansionRuleMap.find(p);
       if (i != _pathExpansionRuleMap.end()) {
@@ -255,8 +263,10 @@ bool UsdCollectionMembershipQuery::IsPathIncluded(
             *expansionRule = UsdTokens->exclude;
           }
           return false;
-        } else if ((i->second == UsdTokens->expandPrimsAndProperties) ||
-                   (i->second == UsdTokens->explicitOnly && p == path)) {
+        }
+        else if ((i->second == UsdTokens->expandPrimsAndProperties) ||
+                 (i->second == UsdTokens->explicitOnly && p == path))
+        {
           if (expansionRule) {
             *expansionRule = i->second;
           }
@@ -271,9 +281,10 @@ bool UsdCollectionMembershipQuery::IsPathIncluded(
   return false;
 }
 
-bool UsdCollectionMembershipQuery::IsPathIncluded(
-    const SdfPath &path, const TfToken &parentExpansionRule,
-    TfToken *expansionRule) const {
+bool UsdCollectionMembershipQuery::IsPathIncluded(const SdfPath &path,
+                                                  const TfToken &parentExpansionRule,
+                                                  TfToken *expansionRule) const
+{
   // Coding Error if one passes in a relative path to IsPathIncluded
   if (!path.IsAbsolutePath()) {
     TF_CODING_ERROR("Relative paths are not allowed");
@@ -296,33 +307,30 @@ bool UsdCollectionMembershipQuery::IsPathIncluded(
   // There's no direct-entry, so decide based on the parent path's
   // expansion-rule.
   if (path.IsPrimPath()) {
-    bool parentIsExcludedOrExplicitlyIncluded =
-        (parentExpansionRule == UsdTokens->exclude ||
-         parentExpansionRule == UsdTokens->explicitOnly);
+    bool parentIsExcludedOrExplicitlyIncluded = (parentExpansionRule == UsdTokens->exclude ||
+                                                 parentExpansionRule == UsdTokens->explicitOnly);
 
     if (expansionRule) {
-      *expansionRule = parentIsExcludedOrExplicitlyIncluded
-                           ? UsdTokens->exclude
-                           : parentExpansionRule;
+      *expansionRule = parentIsExcludedOrExplicitlyIncluded ? UsdTokens->exclude :
+                                                              parentExpansionRule;
     }
 
     return !parentIsExcludedOrExplicitlyIncluded;
-
-  } else {
+  }
+  else {
     // If it's a property path, then the path is excluded unless its
     // parent-path's expansionRule is "expandPrimsAndProperties".
     if (expansionRule) {
-      *expansionRule =
-          (parentExpansionRule == UsdTokens->expandPrimsAndProperties)
-              ? UsdTokens->expandPrimsAndProperties
-              : UsdTokens->exclude;
+      *expansionRule = (parentExpansionRule == UsdTokens->expandPrimsAndProperties) ?
+                           UsdTokens->expandPrimsAndProperties :
+                           UsdTokens->exclude;
     }
     return parentExpansionRule == UsdTokens->expandPrimsAndProperties;
   }
 }
 
-size_t UsdCollectionMembershipQuery::Hash::operator()(
-    UsdCollectionMembershipQuery const &q) const {
+size_t UsdCollectionMembershipQuery::Hash::operator()(UsdCollectionMembershipQuery const &q) const
+{
   TRACE_FUNCTION();
 
   // Hashing unordered maps is costly because two maps holding the
@@ -334,8 +342,7 @@ size_t UsdCollectionMembershipQuery::Hash::operator()(
   // computing the hash once and storing it in the MembershipQuery,
   // as a finalization step in _ComputeMembershipQueryImpl().
   typedef std::pair<SdfPath, TfToken> _Entry;
-  std::vector<_Entry> entries(q._pathExpansionRuleMap.begin(),
-                              q._pathExpansionRuleMap.end());
+  std::vector<_Entry> entries(q._pathExpansionRuleMap.begin(), q._pathExpansionRuleMap.end());
   std::sort(entries.begin(), entries.end());
 
   // Don't hash _hasExcludes because it is derived from

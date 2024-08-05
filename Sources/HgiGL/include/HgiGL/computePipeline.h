@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGIGL_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGIGL_COMPUTE_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/computePipeline.h"
 #include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,9 +34,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// OpenGL implementation of HgiComputePipeline.
 ///
-class HgiGLComputePipeline final : public HgiComputePipeline
-{
-public:
+class HgiGLComputePipeline final : public HgiComputePipeline {
+ public:
   HGIGL_API
   ~HgiGLComputePipeline() override;
 
@@ -44,13 +43,13 @@ public:
   HGIGL_API
   void BindPipeline();
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
   HgiGLComputePipeline(HgiComputePipelineDesc const &desc);
 
-private:
+ private:
   HgiGLComputePipeline() = delete;
   HgiGLComputePipeline &operator=(const HgiGLComputePipeline &) = delete;
   HgiGLComputePipeline(const HgiGLComputePipeline &) = delete;

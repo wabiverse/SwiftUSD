@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HF_PLUGIN_DESC_H
 #define PXR_IMAGING_HF_PLUGIN_DESC_H
 
-#include <pxr/pxrns.h>
 #include "Tf/token.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -43,8 +43,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// the string version of id is used to sort alphabetically ('a' has priority
 /// over 'b').
 ///
-struct HfPluginDesc
-{
+struct HfPluginDesc {
   TfToken id;
   std::string displayName;
   int priority;
@@ -54,4 +53,4 @@ typedef std::vector<HfPluginDesc> HfPluginDescVector;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HF_PLUGIN_DESC_H
+#endif  // PXR_IMAGING_HF_PLUGIN_DESC_H

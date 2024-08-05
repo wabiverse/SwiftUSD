@@ -22,13 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include "Arch/fileSystem.h"
+#include "pxr/base/vt/value.h"
 #include "pxr/pxr.h"
+#include "pxr/usd/sdf/layer.h"
+#include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdGeom/cube.h"
 #include "pxr/usd/usdGeom/xform.h"
-#include "pxr/usd/usd/stage.h"
-#include "pxr/usd/sdf/layer.h"
-#include "pxr/base/vt/value.h"
-#include "Arch/fileSystem.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -53,14 +53,11 @@ void TestPrim()
     TF_VERIFY(mark.IsClean());
   }
 
-  TF_VERIFY(UsdGeomXform::Define(stage, primPath),
-            "Failed to create prim at %s",
-            primPath.GetText());
+  TF_VERIFY(
+      UsdGeomXform::Define(stage, primPath), "Failed to create prim at %s", primPath.GetText());
 
   UsdPrim prim(stage->GetPrimAtPath(primPath));
-  TF_VERIFY(prim,
-            "Failed to get Prim from %s",
-            primPath.GetText());
+  TF_VERIFY(prim, "Failed to get Prim from %s", primPath.GetText());
 
   TF_VERIFY(prim.CreateAttribute(prop, SdfValueTypeNames->String),
             "Failed to create property at %s",
@@ -74,9 +71,8 @@ void TestPrim()
             "Failed to get property at %s",
             propPath.c_str());
 
-  TF_VERIFY(tmp.IsHolding<std::string>(),
-            "Invalid type for value of property %s",
-            propPath.c_str());
+  TF_VERIFY(
+      tmp.IsHolding<std::string>(), "Invalid type for value of property %s", propPath.c_str());
 
   result = tmp.UncheckedGet<std::string>();
   TF_VERIFY(result == value,
@@ -87,8 +83,7 @@ void TestPrim()
 
   // Check that attribute fallback values are correctly returned for
   // time-sample queries when no time samples are present.
-  UsdGeomCube cube =
-      UsdGeomCube::Define(stage, SdfPath("/Cube"));
+  UsdGeomCube cube = UsdGeomCube::Define(stage, SdfPath("/Cube"));
   TF_VERIFY(cube);
   UsdAttribute sizeAttr = cube.GetSizeAttr();
   TF_VERIFY(sizeAttr);

@@ -33,77 +33,60 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSelectionSchemaTokens,
-    HDSELECTION_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSelectionSchemaTokens, HDSELECTION_SCHEMA_TOKENS);
 
-
-
-HdBoolDataSourceHandle
-HdSelectionSchema::GetFullySelected()
+HdBoolDataSourceHandle HdSelectionSchema::GetFullySelected()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdSelectionSchemaTokens->fullySelected);
+  return _GetTypedDataSource<HdBoolDataSource>(HdSelectionSchemaTokens->fullySelected);
 }
 
-HdInstanceIndicesVectorSchema
-HdSelectionSchema::GetNestedInstanceIndices()
+HdInstanceIndicesVectorSchema HdSelectionSchema::GetNestedInstanceIndices()
 {
-    return HdInstanceIndicesVectorSchema(_GetTypedDataSource<HdVectorDataSource>(
-        HdSelectionSchemaTokens->nestedInstanceIndices));
+  return HdInstanceIndicesVectorSchema(
+      _GetTypedDataSource<HdVectorDataSource>(HdSelectionSchemaTokens->nestedInstanceIndices));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdSelectionSchema::BuildRetained(
-        const HdBoolDataSourceHandle &fullySelected,
-        const HdVectorDataSourceHandle &nestedInstanceIndices
-)
-{
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
-
-    size_t count = 0;
-    if (fullySelected) {
-        names[count] = HdSelectionSchemaTokens->fullySelected;
-        values[count++] = fullySelected;
-    }
-
-    if (nestedInstanceIndices) {
-        names[count] = HdSelectionSchemaTokens->nestedInstanceIndices;
-        values[count++] = nestedInstanceIndices;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-
-HdSelectionSchema::Builder &
-HdSelectionSchema::Builder::SetFullySelected(
-    const HdBoolDataSourceHandle &fullySelected)
-{
-    _fullySelected = fullySelected;
-    return *this;
-}
-
-HdSelectionSchema::Builder &
-HdSelectionSchema::Builder::SetNestedInstanceIndices(
+HdContainerDataSourceHandle HdSelectionSchema::BuildRetained(
+    const HdBoolDataSourceHandle &fullySelected,
     const HdVectorDataSourceHandle &nestedInstanceIndices)
 {
-    _nestedInstanceIndices = nestedInstanceIndices;
-    return *this;
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
+
+  size_t count = 0;
+  if (fullySelected) {
+    names[count] = HdSelectionSchemaTokens->fullySelected;
+    values[count++] = fullySelected;
+  }
+
+  if (nestedInstanceIndices) {
+    names[count] = HdSelectionSchemaTokens->nestedInstanceIndices;
+    values[count++] = nestedInstanceIndices;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdSelectionSchema::Builder::Build()
+HdSelectionSchema::Builder &HdSelectionSchema::Builder::SetFullySelected(
+    const HdBoolDataSourceHandle &fullySelected)
 {
-    return HdSelectionSchema::BuildRetained(
-        _fullySelected,
-        _nestedInstanceIndices
-    );
+  _fullySelected = fullySelected;
+  return *this;
 }
 
+HdSelectionSchema::Builder &HdSelectionSchema::Builder::SetNestedInstanceIndices(
+    const HdVectorDataSourceHandle &nestedInstanceIndices)
+{
+  _nestedInstanceIndices = nestedInstanceIndices;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdSelectionSchema::Builder::Build()
+{
+  return HdSelectionSchema::BuildRetained(_fullySelected, _nestedInstanceIndices);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

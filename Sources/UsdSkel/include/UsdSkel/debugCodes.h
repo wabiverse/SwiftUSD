@@ -24,8 +24,8 @@
 #ifndef PXR_USD_USD_SKEL_DEBUG_CODES_H
 #define PXR_USD_USD_SKEL_DEBUG_CODES_H
 
-#include <pxr/pxrns.h>
 #include "Tf/debug.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,4 +37,4 @@ TF_DEBUG_CODES(
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_DEBUG_CODES_H
+#endif  // PXR_USD_USD_SKEL_DEBUG_CODES_H

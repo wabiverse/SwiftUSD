@@ -103,7 +103,7 @@ class SdfAssetPath;
 ///
 ///
 class UsdClipsAPI : public UsdAPISchemaBase {
-public:
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -113,14 +113,12 @@ public:
   /// Equivalent to UsdClipsAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdClipsAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim) {}
+  explicit UsdClipsAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdClipsAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdClipsAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdClipsAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj) {}
+  explicit UsdClipsAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
   /// Destructor.
   USD_API
@@ -130,8 +128,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USD_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdClipsAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -145,14 +142,14 @@ public:
   USD_API
   static UsdClipsAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USD_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USD_API
@@ -164,7 +161,7 @@ private:
   USD_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -247,8 +244,7 @@ public:
   /// This list is unordered, but elements in this list are referred to
   /// by index in other clip-related fields.
   USD_API
-  bool GetClipAssetPaths(VtArray<SdfAssetPath> *assetPaths,
-                         const std::string &clipSet) const;
+  bool GetClipAssetPaths(VtArray<SdfAssetPath> *assetPaths, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -258,8 +254,7 @@ public:
   /// Set the clip asset paths for the clip set named \p clipSet
   /// \sa GetClipAssetPaths()
   USD_API
-  bool SetClipAssetPaths(const VtArray<SdfAssetPath> &assetPaths,
-                         const std::string &clipSet);
+  bool SetClipAssetPaths(const VtArray<SdfAssetPath> &assetPaths, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -299,8 +294,7 @@ public:
   /// [(0.0, 0), (20.0, 1)] indicates that clip 0 is active at time 0
   /// and clip 1 is active at time 20.
   USD_API
-  bool GetClipActive(VtVec2dArray *activeClips,
-                     const std::string &clipSet) const;
+  bool GetClipActive(VtVec2dArray *activeClips, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -310,8 +304,7 @@ public:
   /// Set the active clip metadata for the clip set named \p clipSet.
   /// \sa GetClipActive()
   USD_API
-  bool SetClipActive(const VtVec2dArray &activeClips,
-                     const std::string &clipSet);
+  bool SetClipActive(const VtVec2dArray &activeClips, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -358,8 +351,7 @@ public:
   /// only look within this prim's clips if the attribute </Prim.size>
   /// exists and is varying in the manifest.
   USD_API
-  bool GetClipManifestAssetPath(SdfAssetPath *manifestAssetPath,
-                                const std::string &clipSet) const;
+  bool GetClipManifestAssetPath(SdfAssetPath *manifestAssetPath, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -369,8 +361,7 @@ public:
   /// Set the clip manifest asset path for this prim.
   /// \sa GetClipManifestAssetPath()
   USD_API
-  bool SetClipManifestAssetPath(const SdfAssetPath &manifestAssetPath,
-                                const std::string &clipSet);
+  bool SetClipManifestAssetPath(const SdfAssetPath &manifestAssetPath, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -391,16 +382,14 @@ public:
   ///
   /// Returns an invalid SdfLayerRefPtr on failure.
   USD_API
-  SdfLayerRefPtr
-  GenerateClipManifest(const std::string &clipSet,
-                       bool writeBlocksForClipsWithMissingValues = false) const;
+  SdfLayerRefPtr GenerateClipManifest(const std::string &clipSet,
+                                      bool writeBlocksForClipsWithMissingValues = false) const;
 
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
   USD_API
-  SdfLayerRefPtr
-  GenerateClipManifest(bool writeBlocksForClipsWithMissingValues = false) const;
+  SdfLayerRefPtr GenerateClipManifest(bool writeBlocksForClipsWithMissingValues = false) const;
 
   /// Create a clip manifest containing entries for all attributes in the
   /// given \p clipLayers that belong to the prim at \p clipPrimPath and
@@ -409,9 +398,8 @@ public:
   ///
   /// Returns an invalid SdfLayerRefPtr on failure.
   USD_API
-  static SdfLayerRefPtr
-  GenerateClipManifestFromLayers(const SdfLayerHandleVector &clipLayers,
-                                 const SdfPath &clipPrimPath);
+  static SdfLayerRefPtr GenerateClipManifestFromLayers(const SdfLayerHandleVector &clipLayers,
+                                                       const SdfPath &clipPrimPath);
 
   // Flag indicating whether values for a clip that does not contain authored
   // time samples are interpolated from surrounding clips.
@@ -421,8 +409,7 @@ public:
   // fallback value will be interpolated from values in surrounding clips.
   // This is disabled by default.
   USD_API
-  bool GetInterpolateMissingClipValues(bool *interpolate,
-                                       const std::string &clipSet) const;
+  bool GetInterpolateMissingClipValues(bool *interpolate, const std::string &clipSet) const;
 
   /// \overload
   /// This function operates on the default clip set.
@@ -432,8 +419,7 @@ public:
   /// Set whether missing clip values are interpolated from surrounding
   /// clips.
   USD_API
-  bool SetInterpolateMissingClipValues(bool interpolate,
-                                       const std::string &clipSet);
+  bool SetInterpolateMissingClipValues(bool interpolate, const std::string &clipSet);
 
   /// \overload
   /// This function operates on the default clip set.
@@ -494,8 +480,7 @@ public:
   /// searching for asset paths for the clip set named \p clipSet.
   /// \sa GetClipTemplateAssetPath.
   USD_API
-  bool GetClipTemplateStride(double *clipTemplateStride,
-                             const std::string &clipSet) const;
+  bool GetClipTemplateStride(double *clipTemplateStride, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -529,8 +514,7 @@ public:
   /// Set the template stride for the clip set named \p clipSet.
   /// \sa GetClipTemplateStride()
   USD_API
-  bool SetClipTemplateStride(const double clipTemplateStride,
-                             const std::string &clipSet);
+  bool SetClipTemplateStride(const double clipTemplateStride, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -542,8 +526,7 @@ public:
   /// This value is inclusive in that range.
   /// \sa GetClipTemplateAssetPath.
   USD_API
-  bool GetClipTemplateStartTime(double *clipTemplateStartTime,
-                                const std::string &clipSet) const;
+  bool GetClipTemplateStartTime(double *clipTemplateStartTime, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -553,8 +536,7 @@ public:
   /// Set the template start time for the clip set named \p clipSet.
   /// \sa GetClipTemplateStartTime
   USD_API
-  bool SetClipTemplateStartTime(const double clipTemplateStartTime,
-                                const std::string &clipSet);
+  bool SetClipTemplateStartTime(const double clipTemplateStartTime, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -566,8 +548,7 @@ public:
   /// This value is inclusive in that range.
   /// \sa GetClipTemplateAssetPath.
   USD_API
-  bool GetClipTemplateEndTime(double *clipTemplateEndTime,
-                              const std::string &clipSet) const;
+  bool GetClipTemplateEndTime(double *clipTemplateEndTime, const std::string &clipSet) const;
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -577,8 +558,7 @@ public:
   /// Set the template end time for the clipset named \p clipSet.
   /// \sa GetClipTemplateEndTime()
   USD_API
-  bool SetClipTemplateEndTime(const double clipTemplateEndTime,
-                              const std::string &clipSet);
+  bool SetClipTemplateEndTime(const double clipTemplateEndTime, const std::string &clipSet);
   /// \overload
   /// This function operates on the default clip set.
   /// \sa \ref UsdClipsAPISetNames
@@ -589,8 +569,8 @@ public:
 };
 
 /// \hideinitializer
-#define USDCLIPS_INFO_KEYS                                                     \
-  (active)(assetPaths)(                                                        \
+#define USDCLIPS_INFO_KEYS \
+  (active)(assetPaths)( \
       interpolateMissingClipValues)(manifestAssetPath)(primPath)(templateAssetPath)(templateEndTime)(templateStartTime)(templateStride)(templateActiveOffset)(times)
 
 /// \anchor UsdClipsAPIInfoKeys

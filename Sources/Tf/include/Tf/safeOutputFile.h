@@ -50,16 +50,19 @@ class TfSafeOutputFile {
   TfSafeOutputFile(TfSafeOutputFile const &) = delete;
   TfSafeOutputFile &operator=(TfSafeOutputFile const &) = delete;
 
-public:
+ public:
   TfSafeOutputFile() = default;
 
   TfSafeOutputFile(TfSafeOutputFile &&other)
-      : _file(other._file), _targetFileName(std::move(other._targetFileName)),
-        _tempFileName(std::move(other._tempFileName)) {
+      : _file(other._file),
+        _targetFileName(std::move(other._targetFileName)),
+        _tempFileName(std::move(other._tempFileName))
+  {
     other._file = nullptr;
   }
 
-  TfSafeOutputFile &operator=(TfSafeOutputFile &&other) {
+  TfSafeOutputFile &operator=(TfSafeOutputFile &&other)
+  {
     _file = other._file;
     _targetFileName = std::move(other._targetFileName);
     _tempFileName = std::move(other._tempFileName);
@@ -88,7 +91,10 @@ public:
   TF_API void Discard();
 
   /// Return the opened FILE *.
-  FILE *Get() const { return _file; }
+  FILE *Get() const
+  {
+    return _file;
+  }
 
   /// If the underlying file was opened by Update(), return it.  The caller
   /// takes responsibility for closing the file later.  It is an error to call
@@ -99,7 +105,7 @@ public:
   /// false otherwise.
   TF_API bool IsOpenForUpdate() const;
 
-private:
+ private:
   FILE *_file = nullptr;
   std::string _targetFileName;
   std::string _tempFileName;
@@ -107,4 +113,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SAFE_OUTPUT_FILE_H
+#endif  // PXR_BASE_TF_SAFE_OUTPUT_FILE_H

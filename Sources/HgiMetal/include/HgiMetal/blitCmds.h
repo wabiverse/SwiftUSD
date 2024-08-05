@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_METAL_BLIT_CMDS_H
 #define PXR_IMAGING_HGI_METAL_BLIT_CMDS_H
 
-#include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
 #include "Hgi/blitCmds.h"
+#include "HgiMetal/api.h"
+#include <pxr/pxrns.h>
 
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
@@ -39,9 +39,8 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiBlitCmds.
 ///
-class HgiMetalBlitCmds final : public HgiBlitCmds
-{
-public:
+class HgiMetalBlitCmds final : public HgiBlitCmds {
+ public:
   HGIMETAL_API
   ~HgiMetalBlitCmds() override;
 
@@ -81,7 +80,7 @@ public:
   HGIMETAL_API
   void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-protected:
+ protected:
   friend class HgiMetal;
 
   HGIMETAL_API
@@ -90,7 +89,7 @@ protected:
   HGIMETAL_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiMetalBlitCmds() = delete;
   HgiMetalBlitCmds &operator=(const HgiMetalBlitCmds &) = delete;
   HgiMetalBlitCmds(const HgiMetalBlitCmds &) = delete;

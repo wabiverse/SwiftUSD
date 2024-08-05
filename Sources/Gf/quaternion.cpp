@@ -33,12 +33,19 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // CODE_COVERAGE_OFF_GCOV_BUG
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfQuaternion>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfQuaternion>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
-double GfQuaternion::GetLength() const { return sqrt(_GetLengthSquared()); }
+double GfQuaternion::GetLength() const
+{
+  return sqrt(_GetLengthSquared());
+}
 
-GfQuaternion GfQuaternion::GetNormalized(double eps) const {
+GfQuaternion GfQuaternion::GetNormalized(double eps) const
+{
   double length = sqrt(_GetLengthSquared());
 
   if (length < eps)
@@ -47,7 +54,8 @@ GfQuaternion GfQuaternion::GetNormalized(double eps) const {
     return (*this) / length;
 }
 
-double GfQuaternion::Normalize(double eps) {
+double GfQuaternion::Normalize(double eps)
+{
   double length = sqrt(_GetLengthSquared());
 
   if (length < eps)
@@ -58,11 +66,13 @@ double GfQuaternion::Normalize(double eps) {
   return length;
 }
 
-GfQuaternion GfQuaternion::GetInverse() const {
+GfQuaternion GfQuaternion::GetInverse() const
+{
   return GfQuaternion(GetReal(), -GetImaginary()) / _GetLengthSquared();
 }
 
-GfQuaternion &GfQuaternion::operator*=(const GfQuaternion &q) {
+GfQuaternion &GfQuaternion::operator*=(const GfQuaternion &q)
+{
   double r1 = GetReal();
   double r2 = q.GetReal();
   const GfVec3d &i1 = GetImaginary();
@@ -80,21 +90,21 @@ GfQuaternion &GfQuaternion::operator*=(const GfQuaternion &q) {
   return *this;
 }
 
-GfQuaternion &GfQuaternion::operator*=(double s) {
+GfQuaternion &GfQuaternion::operator*=(double s)
+{
   _real *= s;
   _imaginary *= s;
   return *this;
 }
 
-GfQuaternion GfSlerp(const GfQuaternion &q0, const GfQuaternion &q1,
-                     double alpha) {
+GfQuaternion GfSlerp(const GfQuaternion &q0, const GfQuaternion &q1, double alpha)
+{
   return GfSlerp(alpha, q0, q1);
 }
 
-GfQuaternion GfSlerp(double alpha, const GfQuaternion &q0,
-                     const GfQuaternion &q1) {
-  double cosTheta =
-      q0.GetImaginary() * q1.GetImaginary() + q0.GetReal() * q1.GetReal();
+GfQuaternion GfSlerp(double alpha, const GfQuaternion &q0, const GfQuaternion &q1)
+{
+  double cosTheta = q0.GetImaginary() * q1.GetImaginary() + q0.GetReal() * q1.GetReal();
   bool flip1 = false;
 
   if (cosTheta < 0.0) {
@@ -110,7 +120,8 @@ GfQuaternion GfSlerp(double alpha, const GfQuaternion &q0,
 
     scale0 = sin((1.0 - alpha) * theta) / sinTheta;
     scale1 = sin(alpha * theta) / sinTheta;
-  } else {
+  }
+  else {
     // rot0 and rot1 very close - just do linear interp and renormalize.
     scale0 = 1.0 - alpha;
     scale1 = alpha;
@@ -122,7 +133,8 @@ GfQuaternion GfSlerp(double alpha, const GfQuaternion &q0,
   return scale0 * q0 + scale1 * q1;
 }
 
-std::ostream &operator<<(std::ostream &out, const GfQuaternion &q) {
+std::ostream &operator<<(std::ostream &out, const GfQuaternion &q)
+{
   return (out << '(' << Gf_OstreamHelperP(q.GetReal()) << " + "
               << Gf_OstreamHelperP(q.GetImaginary()) << ')');
 }

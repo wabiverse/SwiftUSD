@@ -33,292 +33,240 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdModelSchemaTokens,
-    HDMODEL_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdModelSchemaTokens, HDMODEL_SCHEMA_TOKENS);
 
-
-
-HdTokenDataSourceHandle
-HdModelSchema::GetDrawMode()
+HdTokenDataSourceHandle HdModelSchema::GetDrawMode()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdModelSchemaTokens->drawMode);
+  return _GetTypedDataSource<HdTokenDataSource>(HdModelSchemaTokens->drawMode);
 }
 
-HdBoolDataSourceHandle
-HdModelSchema::GetApplyDrawMode()
+HdBoolDataSourceHandle HdModelSchema::GetApplyDrawMode()
 {
-    return _GetTypedDataSource<HdBoolDataSource>(
-        HdModelSchemaTokens->applyDrawMode);
+  return _GetTypedDataSource<HdBoolDataSource>(HdModelSchemaTokens->applyDrawMode);
 }
 
-HdVec3fDataSourceHandle
-HdModelSchema::GetDrawModeColor()
+HdVec3fDataSourceHandle HdModelSchema::GetDrawModeColor()
 {
-    return _GetTypedDataSource<HdVec3fDataSource>(
-        HdModelSchemaTokens->drawModeColor);
+  return _GetTypedDataSource<HdVec3fDataSource>(HdModelSchemaTokens->drawModeColor);
 }
 
-HdTokenDataSourceHandle
-HdModelSchema::GetCardGeometry()
+HdTokenDataSourceHandle HdModelSchema::GetCardGeometry()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdModelSchemaTokens->cardGeometry);
+  return _GetTypedDataSource<HdTokenDataSource>(HdModelSchemaTokens->cardGeometry);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureXPos()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureXPos()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureXPos);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureXPos);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureYPos()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureYPos()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureYPos);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureYPos);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureZPos()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureZPos()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureZPos);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureZPos);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureXNeg()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureXNeg()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureXNeg);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureXNeg);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureYNeg()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureYNeg()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureYNeg);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureYNeg);
 }
 
-HdAssetPathDataSourceHandle
-HdModelSchema::GetCardTextureZNeg()
+HdAssetPathDataSourceHandle HdModelSchema::GetCardTextureZNeg()
 {
-    return _GetTypedDataSource<HdAssetPathDataSource>(
-        HdModelSchemaTokens->cardTextureZNeg);
+  return _GetTypedDataSource<HdAssetPathDataSource>(HdModelSchemaTokens->cardTextureZNeg);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdModelSchema::BuildRetained(
-        const HdTokenDataSourceHandle &drawMode,
-        const HdBoolDataSourceHandle &applyDrawMode,
-        const HdVec3fDataSourceHandle &drawModeColor,
-        const HdTokenDataSourceHandle &cardGeometry,
-        const HdAssetPathDataSourceHandle &cardTextureXPos,
-        const HdAssetPathDataSourceHandle &cardTextureYPos,
-        const HdAssetPathDataSourceHandle &cardTextureZPos,
-        const HdAssetPathDataSourceHandle &cardTextureXNeg,
-        const HdAssetPathDataSourceHandle &cardTextureYNeg,
-        const HdAssetPathDataSourceHandle &cardTextureZNeg
-)
-{
-    TfToken names[10];
-    HdDataSourceBaseHandle values[10];
-
-    size_t count = 0;
-    if (drawMode) {
-        names[count] = HdModelSchemaTokens->drawMode;
-        values[count++] = drawMode;
-    }
-
-    if (applyDrawMode) {
-        names[count] = HdModelSchemaTokens->applyDrawMode;
-        values[count++] = applyDrawMode;
-    }
-
-    if (drawModeColor) {
-        names[count] = HdModelSchemaTokens->drawModeColor;
-        values[count++] = drawModeColor;
-    }
-
-    if (cardGeometry) {
-        names[count] = HdModelSchemaTokens->cardGeometry;
-        values[count++] = cardGeometry;
-    }
-
-    if (cardTextureXPos) {
-        names[count] = HdModelSchemaTokens->cardTextureXPos;
-        values[count++] = cardTextureXPos;
-    }
-
-    if (cardTextureYPos) {
-        names[count] = HdModelSchemaTokens->cardTextureYPos;
-        values[count++] = cardTextureYPos;
-    }
-
-    if (cardTextureZPos) {
-        names[count] = HdModelSchemaTokens->cardTextureZPos;
-        values[count++] = cardTextureZPos;
-    }
-
-    if (cardTextureXNeg) {
-        names[count] = HdModelSchemaTokens->cardTextureXNeg;
-        values[count++] = cardTextureXNeg;
-    }
-
-    if (cardTextureYNeg) {
-        names[count] = HdModelSchemaTokens->cardTextureYNeg;
-        values[count++] = cardTextureYNeg;
-    }
-
-    if (cardTextureZNeg) {
-        names[count] = HdModelSchemaTokens->cardTextureZNeg;
-        values[count++] = cardTextureZNeg;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdModelSchema
-HdModelSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdModelSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdModelSchemaTokens->model))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdModelSchema::GetSchemaToken()
-{
-    return HdModelSchemaTokens->model;
-}
-
-/*static*/
-const HdDataSourceLocator &
-HdModelSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdModelSchemaTokens->model
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdModelSchema::GetDrawModeLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdModelSchemaTokens->model,
-        HdModelSchemaTokens->drawMode
-    );
-    return locator;
-}
-
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetDrawMode(
-    const HdTokenDataSourceHandle &drawMode)
-{
-    _drawMode = drawMode;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetApplyDrawMode(
-    const HdBoolDataSourceHandle &applyDrawMode)
-{
-    _applyDrawMode = applyDrawMode;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetDrawModeColor(
-    const HdVec3fDataSourceHandle &drawModeColor)
-{
-    _drawModeColor = drawModeColor;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardGeometry(
-    const HdTokenDataSourceHandle &cardGeometry)
-{
-    _cardGeometry = cardGeometry;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureXPos(
-    const HdAssetPathDataSourceHandle &cardTextureXPos)
-{
-    _cardTextureXPos = cardTextureXPos;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureYPos(
-    const HdAssetPathDataSourceHandle &cardTextureYPos)
-{
-    _cardTextureYPos = cardTextureYPos;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureZPos(
-    const HdAssetPathDataSourceHandle &cardTextureZPos)
-{
-    _cardTextureZPos = cardTextureZPos;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureXNeg(
-    const HdAssetPathDataSourceHandle &cardTextureXNeg)
-{
-    _cardTextureXNeg = cardTextureXNeg;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureYNeg(
-    const HdAssetPathDataSourceHandle &cardTextureYNeg)
-{
-    _cardTextureYNeg = cardTextureYNeg;
-    return *this;
-}
-
-HdModelSchema::Builder &
-HdModelSchema::Builder::SetCardTextureZNeg(
+HdContainerDataSourceHandle HdModelSchema::BuildRetained(
+    const HdTokenDataSourceHandle &drawMode,
+    const HdBoolDataSourceHandle &applyDrawMode,
+    const HdVec3fDataSourceHandle &drawModeColor,
+    const HdTokenDataSourceHandle &cardGeometry,
+    const HdAssetPathDataSourceHandle &cardTextureXPos,
+    const HdAssetPathDataSourceHandle &cardTextureYPos,
+    const HdAssetPathDataSourceHandle &cardTextureZPos,
+    const HdAssetPathDataSourceHandle &cardTextureXNeg,
+    const HdAssetPathDataSourceHandle &cardTextureYNeg,
     const HdAssetPathDataSourceHandle &cardTextureZNeg)
 {
-    _cardTextureZNeg = cardTextureZNeg;
-    return *this;
+  TfToken names[10];
+  HdDataSourceBaseHandle values[10];
+
+  size_t count = 0;
+  if (drawMode) {
+    names[count] = HdModelSchemaTokens->drawMode;
+    values[count++] = drawMode;
+  }
+
+  if (applyDrawMode) {
+    names[count] = HdModelSchemaTokens->applyDrawMode;
+    values[count++] = applyDrawMode;
+  }
+
+  if (drawModeColor) {
+    names[count] = HdModelSchemaTokens->drawModeColor;
+    values[count++] = drawModeColor;
+  }
+
+  if (cardGeometry) {
+    names[count] = HdModelSchemaTokens->cardGeometry;
+    values[count++] = cardGeometry;
+  }
+
+  if (cardTextureXPos) {
+    names[count] = HdModelSchemaTokens->cardTextureXPos;
+    values[count++] = cardTextureXPos;
+  }
+
+  if (cardTextureYPos) {
+    names[count] = HdModelSchemaTokens->cardTextureYPos;
+    values[count++] = cardTextureYPos;
+  }
+
+  if (cardTextureZPos) {
+    names[count] = HdModelSchemaTokens->cardTextureZPos;
+    values[count++] = cardTextureZPos;
+  }
+
+  if (cardTextureXNeg) {
+    names[count] = HdModelSchemaTokens->cardTextureXNeg;
+    values[count++] = cardTextureXNeg;
+  }
+
+  if (cardTextureYNeg) {
+    names[count] = HdModelSchemaTokens->cardTextureYNeg;
+    values[count++] = cardTextureYNeg;
+  }
+
+  if (cardTextureZNeg) {
+    names[count] = HdModelSchemaTokens->cardTextureZNeg;
+    values[count++] = cardTextureZNeg;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdModelSchema::Builder::Build()
+/*static*/
+HdModelSchema HdModelSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdModelSchema::BuildRetained(
-        _drawMode,
-        _applyDrawMode,
-        _drawModeColor,
-        _cardGeometry,
-        _cardTextureXPos,
-        _cardTextureYPos,
-        _cardTextureZPos,
-        _cardTextureXNeg,
-        _cardTextureYNeg,
-        _cardTextureZNeg
-    );
+  return HdModelSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                 HdModelSchemaTokens->model)) :
+                                             nullptr);
 }
 
+/*static*/
+const TfToken &HdModelSchema::GetSchemaToken()
+{
+  return HdModelSchemaTokens->model;
+}
+
+/*static*/
+const HdDataSourceLocator &HdModelSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdModelSchemaTokens->model);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdModelSchema::GetDrawModeLocator()
+{
+  static const HdDataSourceLocator locator(HdModelSchemaTokens->model,
+                                           HdModelSchemaTokens->drawMode);
+  return locator;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetDrawMode(
+    const HdTokenDataSourceHandle &drawMode)
+{
+  _drawMode = drawMode;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetApplyDrawMode(
+    const HdBoolDataSourceHandle &applyDrawMode)
+{
+  _applyDrawMode = applyDrawMode;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetDrawModeColor(
+    const HdVec3fDataSourceHandle &drawModeColor)
+{
+  _drawModeColor = drawModeColor;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardGeometry(
+    const HdTokenDataSourceHandle &cardGeometry)
+{
+  _cardGeometry = cardGeometry;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureXPos(
+    const HdAssetPathDataSourceHandle &cardTextureXPos)
+{
+  _cardTextureXPos = cardTextureXPos;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureYPos(
+    const HdAssetPathDataSourceHandle &cardTextureYPos)
+{
+  _cardTextureYPos = cardTextureYPos;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureZPos(
+    const HdAssetPathDataSourceHandle &cardTextureZPos)
+{
+  _cardTextureZPos = cardTextureZPos;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureXNeg(
+    const HdAssetPathDataSourceHandle &cardTextureXNeg)
+{
+  _cardTextureXNeg = cardTextureXNeg;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureYNeg(
+    const HdAssetPathDataSourceHandle &cardTextureYNeg)
+{
+  _cardTextureYNeg = cardTextureYNeg;
+  return *this;
+}
+
+HdModelSchema::Builder &HdModelSchema::Builder::SetCardTextureZNeg(
+    const HdAssetPathDataSourceHandle &cardTextureZNeg)
+{
+  _cardTextureZNeg = cardTextureZNeg;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdModelSchema::Builder::Build()
+{
+  return HdModelSchema::BuildRetained(_drawMode,
+                                      _applyDrawMode,
+                                      _drawModeColor,
+                                      _cardGeometry,
+                                      _cardTextureXPos,
+                                      _cardTextureYPos,
+                                      _cardTextureZPos,
+                                      _cardTextureXNeg,
+                                      _cardTextureYNeg,
+                                      _cardTextureZNeg);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

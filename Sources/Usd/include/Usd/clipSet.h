@@ -52,7 +52,7 @@ using Usd_ClipSetRefPtr = std::shared_ptr<Usd_ClipSet>;
 /// are retrieved during value resolution.
 ///
 class Usd_ClipSet {
-public:
+ public:
   /// Create a new clip set based on the given definition. If clip
   /// set creation fails, returns a null pointer and populates
   /// \p status with an error message. Otherwise \p status may be
@@ -66,23 +66,25 @@ public:
 
   /// Return the active clip at the given \p time. This should
   /// always be a valid Usd_ClipRefPtr.
-  const Usd_ClipRefPtr &GetActiveClip(double time) const {
+  const Usd_ClipRefPtr &GetActiveClip(double time) const
+  {
     return valueClips[_FindClipIndexForTime(time)];
   }
 
   /// Return bracketing time samples for the attribute at \p path
   /// at \p time.
-  bool GetBracketingTimeSamplesForPath(const SdfPath &path, double time,
-                                       double *lower, double *upper) const;
+  bool GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                       double time,
+                                       double *lower,
+                                       double *upper) const;
 
   /// Return set of time samples for attribute at \p path.
   std::set<double> ListTimeSamplesForPath(const SdfPath &path) const;
 
   /// Return list of time samples for attribute at \p path
   /// in the given \p interval.
-  std::vector<double>
-  GetTimeSamplesInInterval(const SdfPath &path,
-                           const GfInterval &interval) const;
+  std::vector<double> GetTimeSamplesInInterval(const SdfPath &path,
+                                               const GfInterval &interval) const;
 
   /// Query time sample for the attribute at \p path at \p time.
   /// If no time sample exists in the active clip at \p time,
@@ -92,9 +94,11 @@ public:
   /// value for the attribute declared in the manifest. If no
   /// default value is declared, use the fallback value for
   /// the attribute's value type.
-  template <class T>
-  bool QueryTimeSample(const SdfPath &path, double time,
-                       Usd_InterpolatorBase *interpolator, T *value) const;
+  template<class T>
+  bool QueryTimeSample(const SdfPath &path,
+                       double time,
+                       Usd_InterpolatorBase *interpolator,
+                       T *value) const;
 
   std::string name;
   PcpLayerStackPtr sourceLayerStack;
@@ -105,7 +109,7 @@ public:
   Usd_ClipRefPtrVector valueClips;
   bool interpolateMissingClipValues;
 
-private:
+ private:
   Usd_ClipSet(const std::string &name, const Usd_ClipSetDefinition &definition);
 
   // Return the index of the clip that is active at the given \p time.
@@ -114,16 +118,17 @@ private:
 
   // Return whether the specified clip contributes time sample values
   // to this clip set for the attribute at \p path.
-  bool _ClipContributesValue(const Usd_ClipRefPtr &clip,
-                             const SdfPath &path) const;
+  bool _ClipContributesValue(const Usd_ClipRefPtr &clip, const SdfPath &path) const;
 };
 
 // ------------------------------------------------------------
 
-template <class T>
-inline bool Usd_ClipSet::QueryTimeSample(const SdfPath &path, double time,
+template<class T>
+inline bool Usd_ClipSet::QueryTimeSample(const SdfPath &path,
+                                         double time,
                                          Usd_InterpolatorBase *interpolator,
-                                         T *value) const {
+                                         T *value) const
+{
   const Usd_ClipRefPtr &clip = GetActiveClip(time);
 
   // First query the clip for time samples at the specified time.
@@ -134,16 +139,18 @@ inline bool Usd_ClipSet::QueryTimeSample(const SdfPath &path, double time,
   // If no samples exist in the clip, get the default value from
   // the manifest. Return true if we get a non-block value, false
   // otherwise.
-  return Usd_HasDefault(manifestClip, path, value) ==
-         Usd_DefaultValueResult::Found;
+  return Usd_HasDefault(manifestClip, path, value) == Usd_DefaultValueResult::Found;
 }
 
 // ------------------------------------------------------------
 
-template <class T>
+template<class T>
 inline bool Usd_QueryTimeSample(const Usd_ClipSetRefPtr &clipSet,
-                                const SdfPath &path, double time,
-                                Usd_InterpolatorBase *interpolator, T *result) {
+                                const SdfPath &path,
+                                double time,
+                                Usd_InterpolatorBase *interpolator,
+                                T *result)
+{
   return clipSet->QueryTimeSample(path, time, interpolator, result);
 }
 
@@ -157,11 +164,10 @@ inline bool Usd_QueryTimeSample(const Usd_ClipSetRefPtr &clipSet,
 /// attribute.
 ///
 /// The layer will contain the given \p tag in its identifier.
-SdfLayerRefPtr
-Usd_GenerateClipManifest(const Usd_ClipRefPtrVector &clips,
-                         const SdfPath &clipPrimPath,
-                         const std::string &tag = std::string(),
-                         bool writeBlocksForClipsWithMissingValues = false);
+SdfLayerRefPtr Usd_GenerateClipManifest(const Usd_ClipRefPtrVector &clips,
+                                        const SdfPath &clipPrimPath,
+                                        const std::string &tag = std::string(),
+                                        bool writeBlocksForClipsWithMissingValues = false);
 
 /// Generate a manifest layer for the given \p clipLayers containing
 /// all attributes under the given \p clipPrimPath. The layer will contain
@@ -171,11 +177,10 @@ Usd_GenerateClipManifest(const Usd_ClipRefPtrVector &clips,
 /// for the corresponding layer in \p clipLayers. This will be used to
 /// author value blocks for each attribute at the activation times of clips
 /// that do not contain time samples for that attribute.
-SdfLayerRefPtr
-Usd_GenerateClipManifest(const SdfLayerHandleVector &clipLayers,
-                         const SdfPath &clipPrimPath,
-                         const std::string &tag = std::string(),
-                         const std::vector<double> *clipActive = nullptr);
+SdfLayerRefPtr Usd_GenerateClipManifest(const SdfLayerHandleVector &clipLayers,
+                                        const SdfPath &clipPrimPath,
+                                        const std::string &tag = std::string(),
+                                        const std::vector<double> *clipActive = nullptr);
 
 /// Return true if the given layer is a manifest that has been automatically
 /// generated because the user has not supplied one. These layers are anonymous

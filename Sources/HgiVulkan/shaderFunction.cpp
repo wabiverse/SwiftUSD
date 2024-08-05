@@ -21,28 +21,30 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
+#include "HgiVulkan/shaderFunction.h"
 #include "HgiVulkan/conversions.h"
 #include "HgiVulkan/device.h"
 #include "HgiVulkan/diagnostic.h"
 #include "HgiVulkan/garbageCollector.h"
 #include "HgiVulkan/hgi.h"
 #include "HgiVulkan/shaderCompiler.h"
-#include "HgiVulkan/shaderFunction.h"
 #include "HgiVulkan/shaderGenerator.h"
 
 #include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiVulkanShaderFunction::HgiVulkanShaderFunction(
-    HgiVulkanDevice *device,
-    Hgi const *hgi,
-    HgiShaderFunctionDesc const &desc,
-    int shaderVersion)
-    : HgiShaderFunction(desc), _device(device), _spirvByteSize(0), _vkShaderModule(nullptr), _inflightBits(0)
+HgiVulkanShaderFunction::HgiVulkanShaderFunction(HgiVulkanDevice *device,
+                                                 Hgi const *hgi,
+                                                 HgiShaderFunctionDesc const &desc,
+                                                 int shaderVersion)
+    : HgiShaderFunction(desc),
+      _device(device),
+      _spirvByteSize(0),
+      _vkShaderModule(nullptr),
+      _inflightBits(0)
 {
-  VkShaderModuleCreateInfo shaderCreateInfo =
-      {VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
+  VkShaderModuleCreateInfo shaderCreateInfo = {VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
 
   std::vector<unsigned int> spirv;
 
@@ -53,38 +55,25 @@ HgiVulkanShaderFunction::HgiVulkanShaderFunction(
   const char *shaderCode = shaderGenerator.GetGeneratedShaderCode();
 
   // Compile shader and capture errors
-  bool result = HgiVulkanCompileGLSL(
-      debugLbl,
-      &shaderCode,
-      1,
-      desc.shaderStage,
-      &spirv,
-      &_errors);
+  bool result = HgiVulkanCompileGLSL(debugLbl, &shaderCode, 1, desc.shaderStage, &spirv, &_errors);
 
   // Create vulkan module if there were no errors.
-  if (result)
-  {
+  if (result) {
     _spirvByteSize = spirv.size() * sizeof(unsigned int);
 
     shaderCreateInfo.codeSize = _spirvByteSize;
     shaderCreateInfo.pCode = (uint32_t *)spirv.data();
 
-    TF_VERIFY(
-        vkCreateShaderModule(
-            device->GetVulkanDevice(),
-            &shaderCreateInfo,
-            HgiVulkanAllocator(),
-            &_vkShaderModule) == VK_SUCCESS);
+    TF_VERIFY(vkCreateShaderModule(device->GetVulkanDevice(),
+                                   &shaderCreateInfo,
+                                   HgiVulkanAllocator(),
+                                   &_vkShaderModule) == VK_SUCCESS);
 
     // Debug label
-    if (!_descriptor.debugName.empty())
-    {
+    if (!_descriptor.debugName.empty()) {
       std::string debugLabel = "ShaderModule " + _descriptor.debugName;
       HgiVulkanSetDebugName(
-          device,
-          (uint64_t)_vkShaderModule,
-          VK_OBJECT_TYPE_SHADER_MODULE,
-          debugLabel.c_str());
+          device, (uint64_t)_vkShaderModule, VK_OBJECT_TYPE_SHADER_MODULE, debugLabel.c_str());
     }
 
     // Perform reflection on spirv to create descriptor set info for
@@ -106,30 +95,22 @@ HgiVulkanShaderFunction::HgiVulkanShaderFunction(
 
 HgiVulkanShaderFunction::~HgiVulkanShaderFunction()
 {
-  if (_vkShaderModule)
-  {
-    vkDestroyShaderModule(
-        _device->GetVulkanDevice(),
-        _vkShaderModule,
-        HgiVulkanAllocator());
+  if (_vkShaderModule) {
+    vkDestroyShaderModule(_device->GetVulkanDevice(), _vkShaderModule, HgiVulkanAllocator());
   }
 }
 
-VkShaderStageFlagBits
-HgiVulkanShaderFunction::GetShaderStage() const
+VkShaderStageFlagBits HgiVulkanShaderFunction::GetShaderStage() const
 {
-  return VkShaderStageFlagBits(
-      HgiVulkanConversions::GetShaderStages(_descriptor.shaderStage));
+  return VkShaderStageFlagBits(HgiVulkanConversions::GetShaderStages(_descriptor.shaderStage));
 }
 
-VkShaderModule
-HgiVulkanShaderFunction::GetShaderModule() const
+VkShaderModule HgiVulkanShaderFunction::GetShaderModule() const
 {
   return _vkShaderModule;
 }
 
-const char *
-HgiVulkanShaderFunction::GetShaderFunctionName() const
+const char *HgiVulkanShaderFunction::GetShaderFunctionName() const
 {
   static const std::string entry("main");
   return entry.c_str();
@@ -140,38 +121,32 @@ bool HgiVulkanShaderFunction::IsValid() const
   return _errors.empty();
 }
 
-std::string const &
-HgiVulkanShaderFunction::GetCompileErrors()
+std::string const &HgiVulkanShaderFunction::GetCompileErrors()
 {
   return _errors;
 }
 
-size_t
-HgiVulkanShaderFunction::GetByteSizeOfResource() const
+size_t HgiVulkanShaderFunction::GetByteSizeOfResource() const
 {
   return _spirvByteSize;
 }
 
-uint64_t
-HgiVulkanShaderFunction::GetRawResource() const
+uint64_t HgiVulkanShaderFunction::GetRawResource() const
 {
   return (uint64_t)_vkShaderModule;
 }
 
-HgiVulkanDescriptorSetInfoVector const &
-HgiVulkanShaderFunction::GetDescriptorSetInfo() const
+HgiVulkanDescriptorSetInfoVector const &HgiVulkanShaderFunction::GetDescriptorSetInfo() const
 {
   return _descriptorSetInfo;
 }
 
-HgiVulkanDevice *
-HgiVulkanShaderFunction::GetDevice() const
+HgiVulkanDevice *HgiVulkanShaderFunction::GetDevice() const
 {
   return _device;
 }
 
-uint64_t &
-HgiVulkanShaderFunction::GetInflightBits()
+uint64_t &HgiVulkanShaderFunction::GetInflightBits()
 {
   return _inflightBits;
 }

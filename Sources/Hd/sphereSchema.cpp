@@ -33,81 +33,59 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdSphereSchemaTokens,
-    HDSPHERE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdSphereSchemaTokens, HDSPHERE_SCHEMA_TOKENS);
 
-
-
-HdDoubleDataSourceHandle
-HdSphereSchema::GetRadius()
+HdDoubleDataSourceHandle HdSphereSchema::GetRadius()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdSphereSchemaTokens->radius);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdSphereSchemaTokens->radius);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdSphereSchema::BuildRetained(
-        const HdDoubleDataSourceHandle &radius
-)
+HdContainerDataSourceHandle HdSphereSchema::BuildRetained(const HdDoubleDataSourceHandle &radius)
 {
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
 
-    size_t count = 0;
-    if (radius) {
-        names[count] = HdSphereSchemaTokens->radius;
-        values[count++] = radius;
-    }
+  size_t count = 0;
+  if (radius) {
+    names[count] = HdSphereSchemaTokens->radius;
+    values[count++] = radius;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdSphereSchema
-HdSphereSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdSphereSchema HdSphereSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdSphereSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdSphereSchemaTokens->sphere))
-        : nullptr);
+  return HdSphereSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                  HdSphereSchemaTokens->sphere)) :
+                                              nullptr);
 }
 
 /*static*/
-const TfToken &
-HdSphereSchema::GetSchemaToken()
+const TfToken &HdSphereSchema::GetSchemaToken()
 {
-    return HdSphereSchemaTokens->sphere;
-} 
+  return HdSphereSchemaTokens->sphere;
+}
 /*static*/
-const HdDataSourceLocator &
-HdSphereSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdSphereSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdSphereSchemaTokens->sphere
-    );
-    return locator;
-} 
-HdSphereSchema::Builder &
-HdSphereSchema::Builder::SetRadius(
-    const HdDoubleDataSourceHandle &radius)
+  static const HdDataSourceLocator locator(HdSphereSchemaTokens->sphere);
+  return locator;
+}
+HdSphereSchema::Builder &HdSphereSchema::Builder::SetRadius(const HdDoubleDataSourceHandle &radius)
 {
-    _radius = radius;
-    return *this;
+  _radius = radius;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdSphereSchema::Builder::Build()
+HdContainerDataSourceHandle HdSphereSchema::Builder::Build()
 {
-    return HdSphereSchema::BuildRetained(
-        _radius
-    );
+  return HdSphereSchema::BuildRetained(_radius);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

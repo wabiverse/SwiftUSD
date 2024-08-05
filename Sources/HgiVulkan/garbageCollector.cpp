@@ -20,11 +20,11 @@
 // distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
+#include "HgiVulkan/garbageCollector.h"
 #include "HgiVulkan/buffer.h"
 #include "HgiVulkan/commandQueue.h"
 #include "HgiVulkan/computePipeline.h"
 #include "HgiVulkan/device.h"
-#include "HgiVulkan/garbageCollector.h"
 #include "HgiVulkan/graphicsPipeline.h"
 #include "HgiVulkan/hgi.h"
 #include "HgiVulkan/resourceBindings.h"
@@ -38,47 +38,34 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-std::vector<HgiVulkanBufferVector *>
-    HgiVulkanGarbageCollector::_bufferList;
-std::vector<HgiVulkanTextureVector *>
-    HgiVulkanGarbageCollector::_textureList;
-std::vector<HgiVulkanSamplerVector *>
-    HgiVulkanGarbageCollector::_samplerList;
-std::vector<HgiVulkanShaderFunctionVector *>
-    HgiVulkanGarbageCollector::_shaderFunctionList;
-std::vector<HgiVulkanShaderProgramVector *>
-    HgiVulkanGarbageCollector::_shaderProgramList;
-std::vector<HgiVulkanResourceBindingsVector *>
-    HgiVulkanGarbageCollector::_resourceBindingsList;
-std::vector<HgiVulkanGraphicsPipelineVector *>
-    HgiVulkanGarbageCollector::_graphicsPipelineList;
-std::vector<HgiVulkanComputePipelineVector *>
-    HgiVulkanGarbageCollector::_computePipelineList;
+std::vector<HgiVulkanBufferVector *> HgiVulkanGarbageCollector::_bufferList;
+std::vector<HgiVulkanTextureVector *> HgiVulkanGarbageCollector::_textureList;
+std::vector<HgiVulkanSamplerVector *> HgiVulkanGarbageCollector::_samplerList;
+std::vector<HgiVulkanShaderFunctionVector *> HgiVulkanGarbageCollector::_shaderFunctionList;
+std::vector<HgiVulkanShaderProgramVector *> HgiVulkanGarbageCollector::_shaderProgramList;
+std::vector<HgiVulkanResourceBindingsVector *> HgiVulkanGarbageCollector::_resourceBindingsList;
+std::vector<HgiVulkanGraphicsPipelineVector *> HgiVulkanGarbageCollector::_graphicsPipelineList;
+std::vector<HgiVulkanComputePipelineVector *> HgiVulkanGarbageCollector::_computePipelineList;
 
-template <class T>
-static void _EmptyTrash(
-    std::vector<std::vector<T *> *> *list,
-    VkDevice vkDevice,
-    uint64_t queueInflightBits)
+template<class T>
+static void _EmptyTrash(std::vector<std::vector<T *> *> *list,
+                        VkDevice vkDevice,
+                        uint64_t queueInflightBits)
 {
   // Loop the garbage vectors of each thread
-  for (auto vec : *list)
-  {
-    for (size_t i = vec->size(); i-- > 0;)
-    {
+  for (auto vec : *list) {
+    for (size_t i = vec->size(); i-- > 0;) {
       T *object = (*vec)[i];
 
       // Each device has its own queue, so its own set of inflight bits.
       // We must only destroy objects that belong to this device & queue.
       // (The garbage collector collects objects from all devices)
-      if (vkDevice != object->GetDevice()->GetVulkanDevice())
-      {
+      if (vkDevice != object->GetDevice()->GetVulkanDevice()) {
         continue;
       }
 
       // See comments in PerformGarbageCollection.
-      if ((queueInflightBits & object->GetInflightBits()) == 0)
-      {
+      if ((queueInflightBits & object->GetInflightBits()) == 0) {
         delete object;
         std::iter_swap(vec->begin() + i, vec->end() - 1);
         vec->pop_back();
@@ -95,57 +82,49 @@ HgiVulkanGarbageCollector::HgiVulkanGarbageCollector(HgiVulkan *hgi)
 HgiVulkanGarbageCollector::~HgiVulkanGarbageCollector() = default;
 
 /* Multi threaded */
-HgiVulkanBufferVector *
-HgiVulkanGarbageCollector::GetBufferList()
+HgiVulkanBufferVector *HgiVulkanGarbageCollector::GetBufferList()
 {
   return _GetThreadLocalStorageList(&_bufferList);
 }
 
 /* Multi threaded */
-HgiVulkanTextureVector *
-HgiVulkanGarbageCollector::GetTextureList()
+HgiVulkanTextureVector *HgiVulkanGarbageCollector::GetTextureList()
 {
   return _GetThreadLocalStorageList(&_textureList);
 }
 
 /* Multi threaded */
-HgiVulkanSamplerVector *
-HgiVulkanGarbageCollector::GetSamplerList()
+HgiVulkanSamplerVector *HgiVulkanGarbageCollector::GetSamplerList()
 {
   return _GetThreadLocalStorageList(&_samplerList);
 }
 
 /* Multi threaded */
-HgiVulkanShaderFunctionVector *
-HgiVulkanGarbageCollector::GetShaderFunctionList()
+HgiVulkanShaderFunctionVector *HgiVulkanGarbageCollector::GetShaderFunctionList()
 {
   return _GetThreadLocalStorageList(&_shaderFunctionList);
 }
 
 /* Multi threaded */
-HgiVulkanShaderProgramVector *
-HgiVulkanGarbageCollector::GetShaderProgramList()
+HgiVulkanShaderProgramVector *HgiVulkanGarbageCollector::GetShaderProgramList()
 {
   return _GetThreadLocalStorageList(&_shaderProgramList);
 }
 
 /* Multi threaded */
-HgiVulkanResourceBindingsVector *
-HgiVulkanGarbageCollector::GetResourceBindingsList()
+HgiVulkanResourceBindingsVector *HgiVulkanGarbageCollector::GetResourceBindingsList()
 {
   return _GetThreadLocalStorageList(&_resourceBindingsList);
 }
 
 /* Multi threaded */
-HgiVulkanGraphicsPipelineVector *
-HgiVulkanGarbageCollector::GetGraphicsPipelineList()
+HgiVulkanGraphicsPipelineVector *HgiVulkanGarbageCollector::GetGraphicsPipelineList()
 {
   return _GetThreadLocalStorageList(&_graphicsPipelineList);
 }
 
 /* Multi threaded */
-HgiVulkanComputePipelineVector *
-HgiVulkanGarbageCollector::GetComputePipelineList()
+HgiVulkanComputePipelineVector *HgiVulkanGarbageCollector::GetComputePipelineList()
 {
   return _GetThreadLocalStorageList(&_computePipelineList);
 }
@@ -197,11 +176,10 @@ void HgiVulkanGarbageCollector::PerformGarbageCollection(HgiVulkanDevice *device
   _isDestroying = false;
 }
 
-template <class T>
+template<class T>
 T *HgiVulkanGarbageCollector::_GetThreadLocalStorageList(std::vector<T *> *collector)
 {
-  if (ARCH_UNLIKELY(_isDestroying))
-  {
+  if (ARCH_UNLIKELY(_isDestroying)) {
     TF_CODING_ERROR("Cannot destroy object during garbage collection ");
     while (_isDestroying)
       ;
@@ -215,8 +193,7 @@ T *HgiVulkanGarbageCollector::_GetThreadLocalStorageList(std::vector<T *> *colle
   thread_local T *_tls = nullptr;
   static std::mutex garbageMutex;
 
-  if (!_tls)
-  {
+  if (!_tls) {
     _tls = new T();
     std::lock_guard<std::mutex> guard(garbageMutex);
     collector->push_back(_tls);

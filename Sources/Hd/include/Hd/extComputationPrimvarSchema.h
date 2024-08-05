@@ -32,107 +32,93 @@
 
 #include "Hd/primvarSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDEXTCOMPUTATIONPRIMVAR_SCHEMA_TOKENS \
-    (interpolation) \
-    (role) \
-    (sourceComputation) \
-    (sourceComputationOutputName) \
-    (valueType) \
+  (interpolation)(role)(sourceComputation)(sourceComputationOutputName)(valueType)
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationPrimvarSchemaTokens, HD_API,
-    HDEXTCOMPUTATIONPRIMVAR_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationPrimvarSchemaTokens,
+                         HD_API,
+                         HDEXTCOMPUTATIONPRIMVAR_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationPrimvarSchema : public HdSchema
-{
-public:
-    HdExtComputationPrimvarSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdExtComputationPrimvarSchema : public HdSchema {
+ public:
+  HdExtComputationPrimvarSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetInterpolation();
+  HD_API
+  HdTokenDataSourceHandle GetRole();
+  HD_API
+  HdPathDataSourceHandle GetSourceComputation();
+  HD_API
+  HdTokenDataSourceHandle GetSourceComputationOutputName();
+  HD_API
+  HdTupleTypeDataSourceHandle GetValueType();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdTokenDataSourceHandle &interpolation,
+      const HdTokenDataSourceHandle &role,
+      const HdPathDataSourceHandle &sourceComputation,
+      const HdTokenDataSourceHandle &sourceComputationOutputName,
+      const HdTupleTypeDataSourceHandle &valueType);
+
+  /// \class HdExtComputationPrimvarSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetInterpolation();
+    Builder &SetInterpolation(const HdTokenDataSourceHandle &interpolation);
     HD_API
-    HdTokenDataSourceHandle GetRole();
+    Builder &SetRole(const HdTokenDataSourceHandle &role);
     HD_API
-    HdPathDataSourceHandle GetSourceComputation();
+    Builder &SetSourceComputation(const HdPathDataSourceHandle &sourceComputation);
     HD_API
-    HdTokenDataSourceHandle GetSourceComputationOutputName();
+    Builder &SetSourceComputationOutputName(
+        const HdTokenDataSourceHandle &sourceComputationOutputName);
     HD_API
-    HdTupleTypeDataSourceHandle GetValueType();
+    Builder &SetValueType(const HdTupleTypeDataSourceHandle &valueType);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &interpolation,
-        const HdTokenDataSourceHandle &role,
-        const HdPathDataSourceHandle &sourceComputation,
-        const HdTokenDataSourceHandle &sourceComputationOutputName,
-        const HdTupleTypeDataSourceHandle &valueType
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdExtComputationPrimvarSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetInterpolation(
-            const HdTokenDataSourceHandle &interpolation);
-        HD_API
-        Builder &SetRole(
-            const HdTokenDataSourceHandle &role);
-        HD_API
-        Builder &SetSourceComputation(
-            const HdPathDataSourceHandle &sourceComputation);
-        HD_API
-        Builder &SetSourceComputationOutputName(
-            const HdTokenDataSourceHandle &sourceComputationOutputName);
-        HD_API
-        Builder &SetValueType(
-            const HdTupleTypeDataSourceHandle &valueType);
+   private:
+    HdTokenDataSourceHandle _interpolation;
+    HdTokenDataSourceHandle _role;
+    HdPathDataSourceHandle _sourceComputation;
+    HdTokenDataSourceHandle _sourceComputationOutputName;
+    HdTupleTypeDataSourceHandle _valueType;
+  };
 
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
+  // these return statically allocated instances for the common cases.
+  static HdTokenDataSourceHandle BuildInterpolationDataSource(TfToken interpolation)
+  {
+    return HdPrimvarSchema::BuildInterpolationDataSource(interpolation);
+  }
 
-    private:
-        HdTokenDataSourceHandle _interpolation;
-        HdTokenDataSourceHandle _role;
-        HdPathDataSourceHandle _sourceComputation;
-        HdTokenDataSourceHandle _sourceComputationOutputName;
-        HdTupleTypeDataSourceHandle _valueType;
-    };
-
-    // these return statically allocated instances for the common cases.
-    static HdTokenDataSourceHandle BuildInterpolationDataSource(
-            TfToken interpolation) {
-        return HdPrimvarSchema::BuildInterpolationDataSource(interpolation);
-    }
-
-    static HdTokenDataSourceHandle BuildRoleDataSource(TfToken role) {
-        return HdPrimvarSchema::BuildRoleDataSource(role);
-    }
-
-
+  static HdTokenDataSourceHandle BuildRoleDataSource(TfToken role)
+  {
+    return HdPrimvarSchema::BuildRoleDataSource(role);
+  }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

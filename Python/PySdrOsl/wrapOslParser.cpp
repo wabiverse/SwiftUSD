@@ -22,11 +22,11 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "Ndr/node.h"
 #include "Ndr/nodeDiscoveryResult.h"
 #include "Sdr/shaderNode.h"
 #include "SdrOsl/oslParser.h"
+#include <pxr/pxrns.h>
 
 #include <boost/python.hpp>
 
@@ -38,11 +38,10 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 // Expose the unique_ptr returned from `Parse()` as a raw ptr. The Python side
 // will be responsible for managing this object.
-static SdrShaderNodePtr
-_Parse(SdrOslParserPlugin &self, const NdrNodeDiscoveryResult &discoveryResult)
+static SdrShaderNodePtr _Parse(SdrOslParserPlugin &self,
+                               const NdrNodeDiscoveryResult &discoveryResult)
 {
-  return dynamic_cast<SdrShaderNodePtr>(
-      self.Parse(discoveryResult).release());
+  return dynamic_cast<SdrShaderNodePtr>(self.Parse(discoveryResult).release());
 }
 
 // Note that this parser is only wrapped for testing purposes. In real-world

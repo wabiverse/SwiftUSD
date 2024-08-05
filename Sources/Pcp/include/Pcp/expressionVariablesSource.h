@@ -39,7 +39,7 @@ class PcpLayerStackIdentifier;
 /// Represents the layer stack associated with a set of expression variables.
 /// This is typically a simple PcpLayerStackIdentifier.
 class PcpExpressionVariablesSource {
-public:
+ public:
   /// Create a PcpExpressionVariableSource representing the root layer stack
   /// of a prim index.
   PCP_API
@@ -50,9 +50,8 @@ public:
   /// is equal to \p rootLayerStackIdentifier, this is the same as
   /// the default constructor.
   PCP_API
-  PcpExpressionVariablesSource(
-      const PcpLayerStackIdentifier &layerStackIdentifier,
-      const PcpLayerStackIdentifier &rootLayerStackIdentifier);
+  PcpExpressionVariablesSource(const PcpLayerStackIdentifier &layerStackIdentifier,
+                               const PcpLayerStackIdentifier &rootLayerStackIdentifier);
 
   PCP_API
   ~PcpExpressionVariablesSource();
@@ -76,13 +75,17 @@ public:
   /// Return true if this object represents a prim index's root
   /// layer stack, false otherwise. If this function returns true,
   /// GetLayerStackIdentifier will return nullptr.
-  bool IsRootLayerStack() const { return !static_cast<bool>(_identifier); }
+  bool IsRootLayerStack() const
+  {
+    return !static_cast<bool>(_identifier);
+  }
 
   /// Return the identifier of the layer stack represented by this
   /// object if it is not the root layer stack. Return nullptr if
   /// this object represents the root layer stack (i.e., IsRootLayerStack
   /// returns true).
-  const PcpLayerStackIdentifier *GetLayerStackIdentifier() const {
+  const PcpLayerStackIdentifier *GetLayerStackIdentifier() const
+  {
     return _identifier ? _identifier.get() : nullptr;
   }
 
@@ -97,23 +100,21 @@ public:
   /// \overload
   /// Equivalent to ResolveLayerStackIdentifier(cache.GetLayerStackIdentifier())
   PCP_API
-  const PcpLayerStackIdentifier &
-  ResolveLayerStackIdentifier(const PcpCache &cache) const;
+  const PcpLayerStackIdentifier &ResolveLayerStackIdentifier(const PcpCache &cache) const;
 
   // Avoid possibly returning a const-reference to a temporary.
-  const PcpLayerStackIdentifier &
-  ResolveLayerStackIdentifier(PcpLayerStackIdentifier &&) const = delete;
-  const PcpLayerStackIdentifier &
-  ResolveLayerStackIdentifier(PcpCache &&) const = delete;
+  const PcpLayerStackIdentifier &ResolveLayerStackIdentifier(PcpLayerStackIdentifier &&) const =
+      delete;
+  const PcpLayerStackIdentifier &ResolveLayerStackIdentifier(PcpCache &&) const = delete;
 
-private:
+ private:
   // The identifier of the layer stack providing the associated
   // expression variables. A null value indicates the root layer stack.
   std::shared_ptr<PcpLayerStackIdentifier> _identifier;
 };
 
-template <typename HashState>
-void TfHashAppend(HashState &h, const PcpExpressionVariablesSource &x) {
+template<typename HashState> void TfHashAppend(HashState &h, const PcpExpressionVariablesSource &x)
+{
   h.Append(x.GetHash());
 }
 

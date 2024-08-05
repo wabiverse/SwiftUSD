@@ -30,9 +30,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfSize2>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfSize2>();
+}
 
-std::ostream &operator<<(std::ostream &o, GfSize2 const &v) {
+std::ostream &operator<<(std::ostream &o, GfSize2 const &v)
+{
   return o << "( " << v._vec[0] << " " << v._vec[1] << " )";
 }
 

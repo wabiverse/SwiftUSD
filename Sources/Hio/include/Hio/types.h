@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HIO_TYPES_H
 #define PXR_IMAGING_HIO_TYPES_H
 
-#include <pxr/pxrns.h>
 #include "Hio/api.h"
-#include <stdlib.h>
 #include <cinttypes>
+#include <pxr/pxrns.h>
+#include <stdlib.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,8 +39,7 @@ class GfVec3i;
 ///
 /// For reference, see:
 ///  https://www.khronos.org/registry/vulkan/specs/1.1/html/vkspec.html#VkFormat
-enum HioFormat
-{
+enum HioFormat {
   HioFormatInvalid = -1,
 
   // UNorm8 - a 1-byte value representing a float between 0 and 1.
@@ -134,19 +133,13 @@ enum HioFormat
 ///
 /// Available texture sampling dimensions.
 ///
-enum HioAddressDimension
-{
-  HioAddressDimensionU,
-  HioAddressDimensionV,
-  HioAddressDimensionW
-};
+enum HioAddressDimension { HioAddressDimensionU, HioAddressDimensionV, HioAddressDimensionW };
 
 /// \enum HioAddressMode
 ///
 /// Various modes used during sampling of a texture.
 ///
-enum HioAddressMode
-{
+enum HioAddressMode {
   HioAddressModeClampToEdge = 0,
   HioAddressModeMirrorClampToEdge,
   HioAddressModeRepeat,
@@ -158,8 +151,7 @@ enum HioAddressMode
 ///
 /// Various color channel representation formats.
 ///
-enum HioType
-{
+enum HioType {
   HioTypeUnsignedByte,
   HioTypeUnsignedByteSRGB,
   HioTypeSignedByte,
@@ -176,9 +168,7 @@ enum HioType
 
 /// Returns the HioFormat of containing nChannels of HioType type.
 HIO_API
-HioFormat HioGetFormat(uint32_t nchannels,
-                       HioType type,
-                       bool isSRGB);
+HioFormat HioGetFormat(uint32_t nchannels, HioType type, bool isSRGB);
 
 /// Return the HioType corresponding to the given HioFormat
 HIO_API

@@ -37,11 +37,11 @@ extern void Tf_DebugInitFromEnvironment();
 
 namespace {
 
-ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void) {
+ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void)
+{
   std::string capture = TfGetenv("TF_MALLOC_TAG_CAPTURE");
   std::string debug = TfGetenv("TF_MALLOC_TAG_DEBUG");
-  if (!capture.empty() || !debug.empty() ||
-      TfGetenvBool("TF_MALLOC_TAG", false)) {
+  if (!capture.empty() || !debug.empty() || TfGetenvBool("TF_MALLOC_TAG", false)) {
     std::string errMsg;
 
     /*
@@ -52,8 +52,10 @@ ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void) {
       fprintf(stderr,
               "%s: TF_MALLOC_TAG environment variable set, but\n"
               "            malloc tag initialization failed: %s\n",
-              ArchGetExecutablePath().c_str(), errMsg.c_str());
-    } else {
+              ArchGetExecutablePath().c_str(),
+              errMsg.c_str());
+    }
+    else {
       TfMallocTag::SetCapturedMallocStacksMatchList(capture);
       TfMallocTag::SetDebugMatchList(debug);
     }
@@ -65,10 +67,11 @@ ARCH_CONSTRUCTOR(Tf_InitConfig, 2, void) {
 // descriptions and exits.  If we call this before registry functions were
 // executed we would not see any added inside TF_REGISTRY_FUNCTION, which is
 // most of them.
-ARCH_CONSTRUCTOR(Tf_InitConfigPost, 202, void) {
+ARCH_CONSTRUCTOR(Tf_InitConfigPost, 202, void)
+{
   Tf_DebugInitFromEnvironment();
 }
 
-} // namespace
+}  // namespace
 
 PXR_NAMESPACE_CLOSE_SCOPE

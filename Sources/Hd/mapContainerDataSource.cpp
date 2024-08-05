@@ -25,36 +25,32 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdMapContainerDataSource::HdMapContainerDataSource(
-    const ValueFunction &f,
-    const HdContainerDataSourceHandle &src)
-  : _f(f)
-  , _src(src)
+HdMapContainerDataSource::HdMapContainerDataSource(const ValueFunction &f,
+                                                   const HdContainerDataSourceHandle &src)
+    : _f(f), _src(src)
 {
 }
 
 HdMapContainerDataSource::~HdMapContainerDataSource() = default;
 
-TfTokenVector
-HdMapContainerDataSource::GetNames()
+TfTokenVector HdMapContainerDataSource::GetNames()
 {
-    if (!_src) {
-        return {};
-    }
-    return _src->GetNames();
+  if (!_src) {
+    return {};
+  }
+  return _src->GetNames();
 }
 
-HdDataSourceBaseHandle
-HdMapContainerDataSource::Get(const TfToken &name)
+HdDataSourceBaseHandle HdMapContainerDataSource::Get(const TfToken &name)
 {
-    if (!_src) {
-        return nullptr;
-    }
+  if (!_src) {
+    return nullptr;
+  }
 
-    if (!_f) {
-        return _src->Get(name);
-    }
-    return _f(_src->Get(name));
+  if (!_f) {
+    return _src->Get(name);
+  }
+  return _f(_src->Get(name));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

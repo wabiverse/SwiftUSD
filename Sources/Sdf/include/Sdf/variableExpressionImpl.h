@@ -50,14 +50,19 @@ ValueType GetValueType(const VtValue &val);
 /// \class EvalResult
 /// Contains the result of evaluating an expression.
 class EvalResult {
-public:
-  template <class V> static EvalResult Value(V &&value) {
+ public:
+  template<class V> static EvalResult Value(V &&value)
+  {
     return {VtValue(std::forward<V>(value)), {}};
   }
 
-  static EvalResult NoValue() { return {}; }
+  static EvalResult NoValue()
+  {
+    return {};
+  }
 
-  static EvalResult Error(std::vector<std::string> &&errors) {
+  static EvalResult Error(std::vector<std::string> &&errors)
+  {
     return {VtValue(), std::move(errors)};
   }
 
@@ -68,7 +73,7 @@ public:
 /// \class EvalContext
 /// Contains information needed when evaluating expressions.
 class EvalContext {
-public:
+ public:
   explicit EvalContext(const VtDictionary *variables);
 
   /// Returns value of variable named \p var.
@@ -78,11 +83,12 @@ public:
   std::pair<EvalResult, bool> GetVariable(const std::string &var);
 
   /// Returns the set of variables that were queried using GetVariable.
-  std::unordered_set<std::string> &GetRequestedVariables() {
+  std::unordered_set<std::string> &GetRequestedVariables()
+  {
     return _requestedVariables;
   }
 
-private:
+ private:
   const VtDictionary *_variables;
   std::unordered_set<std::string> _requestedVariables;
   std::deque<std::string> _variableStack;
@@ -91,7 +97,7 @@ private:
 /// \class Node
 /// Base class for expression nodes.
 class Node {
-public:
+ public:
   virtual ~Node();
   virtual EvalResult Evaluate(EvalContext *ctx) const = 0;
 };
@@ -100,7 +106,7 @@ public:
 /// Expression node for string values with embedded variable references,
 /// e.g. `"a_${VAR}_string"`.
 class StringNode : public Node {
-public:
+ public:
   struct Part {
     std::string content;
     bool isVariable = false;
@@ -109,22 +115,22 @@ public:
   StringNode(std::vector<Part> &&parts);
   EvalResult Evaluate(EvalContext *ctx) const override;
 
-private:
+ private:
   std::vector<Part> _parts;
 };
 
 /// \class VariableNode
 /// Expression node for raw variable references, e.g. `${VAR}`.
 class VariableNode : public Node {
-public:
+ public:
   VariableNode(std::string &&var);
   EvalResult Evaluate(EvalContext *ctx) const override;
 
-private:
+ private:
   std::string _var;
 };
 
-} // end namespace Sdf_VariableExpressionImpl
+}  // end namespace Sdf_VariableExpressionImpl
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

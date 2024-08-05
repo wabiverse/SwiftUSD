@@ -31,412 +31,386 @@ PXR_NAMESPACE_OPEN_SCOPE
 // UsdTimeCode.Default() or the attribute has no time samples, the attribute is
 // sampled at the UsdTimeCode.Default().
 template<class T>
-static bool
-_GetAttrForTransforms(
-    const UsdAttribute& attr,
-    UsdTimeCode baseTime,
-    UsdTimeCode* attrSampleTime,
-    double* lowerTimeValue,
-    double* upperTimeValue,
-    bool* attrHasSamples,
-    T* attrData)
+static bool _GetAttrForTransforms(const UsdAttribute &attr,
+                                  UsdTimeCode baseTime,
+                                  UsdTimeCode *attrSampleTime,
+                                  double *lowerTimeValue,
+                                  double *upperTimeValue,
+                                  bool *attrHasSamples,
+                                  T *attrData)
 {
-    TRACE_FUNCTION();
+  TRACE_FUNCTION();
 
-    if (baseTime.IsNumeric()) {
+  if (baseTime.IsNumeric()) {
 
-        double sampleTimeValue = 0.0;
-        double sampleUpperTimeValue = 0.0;
-        bool hasSamples;
-        if (!attr.GetBracketingTimeSamples(
-                baseTime.GetValue(),
-                &sampleTimeValue,
-                &sampleUpperTimeValue,
-                &hasSamples)) {
-            return false;
-        }
-
-        UsdTimeCode sampleTime = UsdTimeCode::Default();
-        if (hasSamples) {
-            sampleTime = UsdTimeCode(sampleTimeValue);
-        }
-
-        if (!attr.Get(attrData, sampleTime)) {
-            return false;
-        }
-
-        // if the basetime is exactly at a sampled value, increase basetime by an 
-        // "epsilon" value based on the maximum time value and calculate bracketed 
-        // time sample values again
-
-        if (GfIsClose(
-                sampleTimeValue,
-                sampleUpperTimeValue,
-                std::numeric_limits<double>::epsilon())) {
-            double timeValueEpsilon = baseTime.GetValue() + UsdTimeCode::SafeStep();
-            UsdTimeCode baseTimeEpsilon = UsdTimeCode(timeValueEpsilon);
-            if (!attr.GetBracketingTimeSamples(
-                baseTimeEpsilon.GetValue(),
-                &sampleTimeValue,
-                &sampleUpperTimeValue,
-                &hasSamples)) {
-                return false;
-            }
-        }
-
-        *attrSampleTime = sampleTime;
-        *lowerTimeValue = sampleTimeValue;
-        *upperTimeValue = sampleUpperTimeValue;
-        *attrHasSamples = hasSamples;
-
-    } else {
-
-        // baseTime is UsdTimeCode.Default()
-        if (!attr.Get(attrData, baseTime)) {
-            return false;
-        }
-        *attrSampleTime = baseTime;
-        *lowerTimeValue = baseTime.GetValue();
-        *upperTimeValue = baseTime.GetValue();
-        *attrHasSamples = false;
-
-    }
-
-    return true;
-}
-
-// Check if the bracketing time samples for two different attributes are 
-// aligned. Fail if they are not aligned or if the number of time samples
-// do not match. Also check if the size of the array is correct.
-static bool
-_CheckSampleAlignment(
-    bool attribute1HasSamples,
-    double attribute1LowerTimeValue,
-    double attribute1UpperTimeValue,
-    UsdTimeCode attribute1SampleTime,
-    double attribute2LowerTimeValue,
-    double attribute2UpperTimeValue,
-    UsdTimeCode attribute2SampleTime,
-    VtValue attrData,
-    size_t correctAttrDataLength,
-    bool* alignmentValid,
-    bool* attrCorrectLength)
-{
-    // boolean value indicating whether or not the bracketing time samples for
-    // position and velocity are equivalent
-    bool bracketingTimeSamplesAligned = attribute1HasSamples && GfIsClose(
-            attribute1LowerTimeValue, 
-            attribute2LowerTimeValue, 
-            std::numeric_limits<double>::epsilon()) 
-            && GfIsClose(
-            attribute1UpperTimeValue,
-            attribute2UpperTimeValue,
-            std::numeric_limits<double>::epsilon());
-
-    *alignmentValid = true;
-    *attrCorrectLength = true;
-
-    if (!bracketingTimeSamplesAligned || !GfIsClose(
-            attribute1SampleTime.GetValue(),
-            attribute2SampleTime.GetValue(),
-            std::numeric_limits<double>::epsilon())) {
-        *alignmentValid = false;
-    }
-
-    if (attrData.GetArraySize() != correctAttrDataLength) {
-        *attrCorrectLength = false;
-    }
-
-    if (!(*alignmentValid) || !(*attrCorrectLength)) {
+    double sampleTimeValue = 0.0;
+    double sampleUpperTimeValue = 0.0;
+    bool hasSamples;
+    if (!attr.GetBracketingTimeSamples(
+            baseTime.GetValue(), &sampleTimeValue, &sampleUpperTimeValue, &hasSamples))
+    {
       return false;
     }
-    return true;
+
+    UsdTimeCode sampleTime = UsdTimeCode::Default();
+    if (hasSamples) {
+      sampleTime = UsdTimeCode(sampleTimeValue);
+    }
+
+    if (!attr.Get(attrData, sampleTime)) {
+      return false;
+    }
+
+    // if the basetime is exactly at a sampled value, increase basetime by an
+    // "epsilon" value based on the maximum time value and calculate bracketed
+    // time sample values again
+
+    if (GfIsClose(sampleTimeValue, sampleUpperTimeValue, std::numeric_limits<double>::epsilon())) {
+      double timeValueEpsilon = baseTime.GetValue() + UsdTimeCode::SafeStep();
+      UsdTimeCode baseTimeEpsilon = UsdTimeCode(timeValueEpsilon);
+      if (!attr.GetBracketingTimeSamples(
+              baseTimeEpsilon.GetValue(), &sampleTimeValue, &sampleUpperTimeValue, &hasSamples))
+      {
+        return false;
+      }
+    }
+
+    *attrSampleTime = sampleTime;
+    *lowerTimeValue = sampleTimeValue;
+    *upperTimeValue = sampleUpperTimeValue;
+    *attrHasSamples = hasSamples;
+  }
+  else {
+
+    // baseTime is UsdTimeCode.Default()
+    if (!attr.Get(attrData, baseTime)) {
+      return false;
+    }
+    *attrSampleTime = baseTime;
+    *lowerTimeValue = baseTime.GetValue();
+    *upperTimeValue = baseTime.GetValue();
+    *attrHasSamples = false;
+  }
+
+  return true;
 }
 
-bool
-UsdGeom_GetPositionsVelocitiesAndAccelerations(
-    const UsdAttribute& positionsAttr,
-    const UsdAttribute& velocitiesAttr,
-    const UsdAttribute& accelerationsAttr,
-    UsdTimeCode baseTime,
-    size_t expectedNumPositions,
-    VtVec3fArray* positions,
-    VtVec3fArray* velocities,
-    UsdTimeCode* velocitiesSampleTime,
-    VtVec3fArray* accelerations,
-    UsdPrim const &prim)
+// Check if the bracketing time samples for two different attributes are
+// aligned. Fail if they are not aligned or if the number of time samples
+// do not match. Also check if the size of the array is correct.
+static bool _CheckSampleAlignment(bool attribute1HasSamples,
+                                  double attribute1LowerTimeValue,
+                                  double attribute1UpperTimeValue,
+                                  UsdTimeCode attribute1SampleTime,
+                                  double attribute2LowerTimeValue,
+                                  double attribute2UpperTimeValue,
+                                  UsdTimeCode attribute2SampleTime,
+                                  VtValue attrData,
+                                  size_t correctAttrDataLength,
+                                  bool *alignmentValid,
+                                  bool *attrCorrectLength)
 {
-    // Get positions attribute and check array size
+  // boolean value indicating whether or not the bracketing time samples for
+  // position and velocity are equivalent
+  bool bracketingTimeSamplesAligned = attribute1HasSamples &&
+                                      GfIsClose(attribute1LowerTimeValue,
+                                                attribute2LowerTimeValue,
+                                                std::numeric_limits<double>::epsilon()) &&
+                                      GfIsClose(attribute1UpperTimeValue,
+                                                attribute2UpperTimeValue,
+                                                std::numeric_limits<double>::epsilon());
 
-    UsdTimeCode positionsSampleTime;
-    double positionsLowerTimeValue = 0.0;
-    double positionsUpperTimeValue = 0.0;
-    bool positionsHasSamples;
+  *alignmentValid = true;
+  *attrCorrectLength = true;
 
-    if (!_GetAttrForTransforms<VtVec3fArray>(
-            positionsAttr,
-            baseTime,
-            &positionsSampleTime,
-            &positionsLowerTimeValue,
-            &positionsUpperTimeValue,
-            &positionsHasSamples,
-            positions)) {
-        TF_WARN("%s -- no positions", prim.GetPath().GetText());
-        return false;
-    }
+  if (!bracketingTimeSamplesAligned || !GfIsClose(attribute1SampleTime.GetValue(),
+                                                  attribute2SampleTime.GetValue(),
+                                                  std::numeric_limits<double>::epsilon()))
+  {
+    *alignmentValid = false;
+  }
 
-    size_t correctAttrDataLength = positions->size();
+  if (attrData.GetArraySize() != correctAttrDataLength) {
+    *attrCorrectLength = false;
+  }
 
-    if (expectedNumPositions != 0) {
-        if (positions->size() != expectedNumPositions) {
-            TF_WARN("%s -- found [%zu] positions, but expected [%zu]",
-                prim.GetPath().GetText(),
-                positions->size(),
-                expectedNumPositions);
-            return false;
-        }
-    }
-
-    // Get velocities attribute and check sample alignment with positions
-    // attribute and array size
-
-    double velocitiesLowerTimeValue = 0.0;
-    double velocitiesUpperTimeValue = 0.0;
-    bool velocitiesHasSamples = true;
-    bool velocitiesAlignmentValid;
-    bool velocitiesCorrectLength;
-
-    if (!positionsHasSamples || !_GetAttrForTransforms<VtVec3fArray>(
-            velocitiesAttr,
-            baseTime,
-            velocitiesSampleTime,
-            &velocitiesLowerTimeValue,
-            &velocitiesUpperTimeValue,
-            &velocitiesHasSamples,
-            velocities)) {
-        velocities->clear();
-    }
-    if (!_CheckSampleAlignment(
-            velocitiesHasSamples,
-            positionsLowerTimeValue,
-            positionsUpperTimeValue,
-            positionsSampleTime,
-            velocitiesLowerTimeValue,
-            velocitiesUpperTimeValue,
-            *velocitiesSampleTime,
-            VtValue(*velocities),
-            correctAttrDataLength,
-            &velocitiesAlignmentValid,
-            &velocitiesCorrectLength)) {
-        if (!velocities->empty() && !velocitiesAlignmentValid) {
-            TF_WARN("%s -- velocity samples are not aligned with position samples",
-                prim.GetPath().GetText());
-        }
-        if (!velocities->empty() && 
-                velocitiesAlignmentValid && 
-                !velocitiesCorrectLength) {
-            TF_WARN("%s -- found [%zu] velocities, but expected [%zu]",
-                prim.GetPath().GetText(),
-                velocities->size(),
-                correctAttrDataLength);
-        }
-        velocities->clear();
-    }
-
-
-    // Get accelerations attribute and check sample alignment with velocities
-    // attribute and array size
-
-    UsdTimeCode accelerationsSampleTime;
-    double accelerationsLowerTimeValue = 0.0;
-    double accelerationsUpperTimeValue = 0.0;
-    bool accelerationsHasSamples = true;
-    bool accelerationsAlignmentValid;
-    bool accelerationsCorrectLength;
-
-    if (!velocitiesHasSamples || (velocities->size() == 0) 
-            || !_GetAttrForTransforms<VtVec3fArray>(
-                accelerationsAttr,
-                baseTime,
-                &accelerationsSampleTime,
-                &accelerationsLowerTimeValue,
-                &accelerationsUpperTimeValue,
-                &accelerationsHasSamples,
-                accelerations)) {
-        accelerations->clear();
-    }
-    if (!_CheckSampleAlignment(
-            accelerationsHasSamples,
-            velocitiesLowerTimeValue,
-            velocitiesUpperTimeValue,
-            *velocitiesSampleTime,
-            accelerationsLowerTimeValue,
-            accelerationsUpperTimeValue,
-            accelerationsSampleTime,
-            VtValue(*accelerations),
-            correctAttrDataLength,
-            &accelerationsAlignmentValid,
-            &accelerationsCorrectLength)) {
-        if (!accelerations->empty() && !accelerationsAlignmentValid) {
-            TF_WARN("%s -- acceleration samples are not aligned with velocity samples",
-                prim.GetPath().GetText());
-        }
-        if (!accelerations->empty() && 
-                accelerationsAlignmentValid && 
-                !accelerationsCorrectLength) {
-            TF_WARN("%s -- found [%zu] accelerations, but expected [%zu]",
-                prim.GetPath().GetText(),
-                accelerations->size(),
-                correctAttrDataLength);
-        }
-        accelerations->clear();
-    }
-
-    return true;
+  if (!(*alignmentValid) || !(*attrCorrectLength)) {
+    return false;
+  }
+  return true;
 }
 
-bool
-UsdGeom_GetOrientationsAndAngularVelocities(
-    const UsdAttribute& orientationsAttr,
-    const UsdAttribute& angularVelocitiesAttr,
-    UsdTimeCode baseTime,
-    size_t expectedNumOrientations,
-    VtQuathArray* orientations,
-    VtVec3fArray* angularVelocities,
-    UsdTimeCode* angularVelocitiesSampleTime,
-    UsdPrim const &prim)
+bool UsdGeom_GetPositionsVelocitiesAndAccelerations(const UsdAttribute &positionsAttr,
+                                                    const UsdAttribute &velocitiesAttr,
+                                                    const UsdAttribute &accelerationsAttr,
+                                                    UsdTimeCode baseTime,
+                                                    size_t expectedNumPositions,
+                                                    VtVec3fArray *positions,
+                                                    VtVec3fArray *velocities,
+                                                    UsdTimeCode *velocitiesSampleTime,
+                                                    VtVec3fArray *accelerations,
+                                                    UsdPrim const &prim)
 {
-    // Get orientations attribute and check array size
+  // Get positions attribute and check array size
 
-    UsdTimeCode orientationsSampleTime;
-    double orientationsLowerTimeValue = 0.0;
-    double orientationsUpperTimeValue = 0.0;
-    bool orientationsHasSamples = true;
+  UsdTimeCode positionsSampleTime;
+  double positionsLowerTimeValue = 0.0;
+  double positionsUpperTimeValue = 0.0;
+  bool positionsHasSamples;
 
-    if (!_GetAttrForTransforms<VtQuathArray>(
-            orientationsAttr,
-            baseTime,
-            &orientationsSampleTime,
-            &orientationsLowerTimeValue,
-            &orientationsUpperTimeValue,
-            &orientationsHasSamples,
-            orientations)) {
-        return false;
+  if (!_GetAttrForTransforms<VtVec3fArray>(positionsAttr,
+                                           baseTime,
+                                           &positionsSampleTime,
+                                           &positionsLowerTimeValue,
+                                           &positionsUpperTimeValue,
+                                           &positionsHasSamples,
+                                           positions))
+  {
+    TF_WARN("%s -- no positions", prim.GetPath().GetText());
+    return false;
+  }
+
+  size_t correctAttrDataLength = positions->size();
+
+  if (expectedNumPositions != 0) {
+    if (positions->size() != expectedNumPositions) {
+      TF_WARN("%s -- found [%zu] positions, but expected [%zu]",
+              prim.GetPath().GetText(),
+              positions->size(),
+              expectedNumPositions);
+      return false;
     }
+  }
 
-    size_t correctAttrDataLength = orientations->size();
+  // Get velocities attribute and check sample alignment with positions
+  // attribute and array size
 
-    if (expectedNumOrientations != 0) {
-        if (orientations->size() != expectedNumOrientations) {
-            TF_WARN("%s -- found [%zu] orientations, but expected [%zu]",
-                prim.GetPath().GetText(),
-                orientations->size(),
-                expectedNumOrientations);
-            return false;
-        }
+  double velocitiesLowerTimeValue = 0.0;
+  double velocitiesUpperTimeValue = 0.0;
+  bool velocitiesHasSamples = true;
+  bool velocitiesAlignmentValid;
+  bool velocitiesCorrectLength;
+
+  if (!positionsHasSamples || !_GetAttrForTransforms<VtVec3fArray>(velocitiesAttr,
+                                                                   baseTime,
+                                                                   velocitiesSampleTime,
+                                                                   &velocitiesLowerTimeValue,
+                                                                   &velocitiesUpperTimeValue,
+                                                                   &velocitiesHasSamples,
+                                                                   velocities))
+  {
+    velocities->clear();
+  }
+  if (!_CheckSampleAlignment(velocitiesHasSamples,
+                             positionsLowerTimeValue,
+                             positionsUpperTimeValue,
+                             positionsSampleTime,
+                             velocitiesLowerTimeValue,
+                             velocitiesUpperTimeValue,
+                             *velocitiesSampleTime,
+                             VtValue(*velocities),
+                             correctAttrDataLength,
+                             &velocitiesAlignmentValid,
+                             &velocitiesCorrectLength))
+  {
+    if (!velocities->empty() && !velocitiesAlignmentValid) {
+      TF_WARN("%s -- velocity samples are not aligned with position samples",
+              prim.GetPath().GetText());
     }
-
-    // Get angular velocities attribute and check sample alignment
-    // with orientations attribute and array size
-
-    double angularVelocitiesLowerTimeValue = 0.0;
-    double angularVelocitiesUpperTimeValue = 0.0;
-    bool angularVelocitiesHasSamples = true;
-    bool angularVelocitiesAlignmentValid;
-    bool angularVelocitiesCorrectLength;
-
-    if (!orientationsHasSamples || !_GetAttrForTransforms<VtVec3fArray>(
-            angularVelocitiesAttr,
-            baseTime,
-            angularVelocitiesSampleTime,
-            &angularVelocitiesLowerTimeValue,
-            &angularVelocitiesUpperTimeValue,
-            &angularVelocitiesHasSamples,
-            angularVelocities)) {
-        angularVelocities->clear();
+    if (!velocities->empty() && velocitiesAlignmentValid && !velocitiesCorrectLength) {
+      TF_WARN("%s -- found [%zu] velocities, but expected [%zu]",
+              prim.GetPath().GetText(),
+              velocities->size(),
+              correctAttrDataLength);
     }
-    if (!_CheckSampleAlignment(
-            angularVelocitiesHasSamples,
-            orientationsLowerTimeValue,
-            orientationsUpperTimeValue,
-            orientationsSampleTime,
-            angularVelocitiesLowerTimeValue,
-            angularVelocitiesUpperTimeValue,
-            *angularVelocitiesSampleTime,
-            VtValue(*angularVelocities),
-            correctAttrDataLength,
-            &angularVelocitiesAlignmentValid,
-            &angularVelocitiesCorrectLength)) {
-        if (!angularVelocities->empty() && !angularVelocitiesAlignmentValid) {
-            TF_WARN("%s -- angular velocity samples are not aligned with orientation samples",
-                prim.GetPath().GetText());
-        }
-        if (!angularVelocities->empty() && 
-                angularVelocitiesAlignmentValid && 
-                !angularVelocitiesCorrectLength) {
-            TF_WARN("%s -- found [%zu] angular velocities, but expected [%zu]",
-                prim.GetPath().GetText(),
-                angularVelocities->size(),
-                correctAttrDataLength);
-        }
-        angularVelocities->clear();
-    }
+    velocities->clear();
+  }
 
-    return true;
+  // Get accelerations attribute and check sample alignment with velocities
+  // attribute and array size
+
+  UsdTimeCode accelerationsSampleTime;
+  double accelerationsLowerTimeValue = 0.0;
+  double accelerationsUpperTimeValue = 0.0;
+  bool accelerationsHasSamples = true;
+  bool accelerationsAlignmentValid;
+  bool accelerationsCorrectLength;
+
+  if (!velocitiesHasSamples || (velocities->size() == 0) ||
+      !_GetAttrForTransforms<VtVec3fArray>(accelerationsAttr,
+                                           baseTime,
+                                           &accelerationsSampleTime,
+                                           &accelerationsLowerTimeValue,
+                                           &accelerationsUpperTimeValue,
+                                           &accelerationsHasSamples,
+                                           accelerations))
+  {
+    accelerations->clear();
+  }
+  if (!_CheckSampleAlignment(accelerationsHasSamples,
+                             velocitiesLowerTimeValue,
+                             velocitiesUpperTimeValue,
+                             *velocitiesSampleTime,
+                             accelerationsLowerTimeValue,
+                             accelerationsUpperTimeValue,
+                             accelerationsSampleTime,
+                             VtValue(*accelerations),
+                             correctAttrDataLength,
+                             &accelerationsAlignmentValid,
+                             &accelerationsCorrectLength))
+  {
+    if (!accelerations->empty() && !accelerationsAlignmentValid) {
+      TF_WARN("%s -- acceleration samples are not aligned with velocity samples",
+              prim.GetPath().GetText());
+    }
+    if (!accelerations->empty() && accelerationsAlignmentValid && !accelerationsCorrectLength) {
+      TF_WARN("%s -- found [%zu] accelerations, but expected [%zu]",
+              prim.GetPath().GetText(),
+              accelerations->size(),
+              correctAttrDataLength);
+    }
+    accelerations->clear();
+  }
+
+  return true;
 }
 
-
-bool
-UsdGeom_GetScales(
-    const UsdAttribute& scalesAttr,
-    const UsdTimeCode baseTime,
-    size_t expectedScales,
-    VtVec3fArray* scales,
-    UsdPrim const &prim)
+bool UsdGeom_GetOrientationsAndAngularVelocities(const UsdAttribute &orientationsAttr,
+                                                 const UsdAttribute &angularVelocitiesAttr,
+                                                 UsdTimeCode baseTime,
+                                                 size_t expectedNumOrientations,
+                                                 VtQuathArray *orientations,
+                                                 VtVec3fArray *angularVelocities,
+                                                 UsdTimeCode *angularVelocitiesSampleTime,
+                                                 UsdPrim const &prim)
 {
-    TRACE_FUNCTION();
+  // Get orientations attribute and check array size
 
-    // We don't currently support an attribute which linearly changes the
-    // scale (as velocity does for position). Instead, we lock the scale to
-    // the last authored value without performing any interpolation.
+  UsdTimeCode orientationsSampleTime;
+  double orientationsLowerTimeValue = 0.0;
+  double orientationsUpperTimeValue = 0.0;
+  bool orientationsHasSamples = true;
 
-    // Get scales attribute and check array size
+  if (!_GetAttrForTransforms<VtQuathArray>(orientationsAttr,
+                                           baseTime,
+                                           &orientationsSampleTime,
+                                           &orientationsLowerTimeValue,
+                                           &orientationsUpperTimeValue,
+                                           &orientationsHasSamples,
+                                           orientations))
+  {
+    return false;
+  }
 
-    UsdTimeCode scalesSampleTime;
-    bool scalesHasSamples;
-    // dummy values for passing into _GetAttrForTransforms
-    // when we do not need to use the resulting bracketing time values
-    double dummyLowerTimeValue = 0.0;
-    double dummyUpperTimeValue = 0.0;
+  size_t correctAttrDataLength = orientations->size();
 
-    if (!_GetAttrForTransforms<VtVec3fArray>(
-            scalesAttr,
-            baseTime,
-            &scalesSampleTime,
-            &dummyLowerTimeValue,
-            &dummyUpperTimeValue,
-            &scalesHasSamples,
-            scales)) {
-        return false;
+  if (expectedNumOrientations != 0) {
+    if (orientations->size() != expectedNumOrientations) {
+      TF_WARN("%s -- found [%zu] orientations, but expected [%zu]",
+              prim.GetPath().GetText(),
+              orientations->size(),
+              expectedNumOrientations);
+      return false;
     }
+  }
 
-    if (scales->size() != expectedScales) {
-        TF_WARN("%s -- found [%zu] scales, but expected [%zu]",
+  // Get angular velocities attribute and check sample alignment
+  // with orientations attribute and array size
+
+  double angularVelocitiesLowerTimeValue = 0.0;
+  double angularVelocitiesUpperTimeValue = 0.0;
+  bool angularVelocitiesHasSamples = true;
+  bool angularVelocitiesAlignmentValid;
+  bool angularVelocitiesCorrectLength;
+
+  if (!orientationsHasSamples ||
+      !_GetAttrForTransforms<VtVec3fArray>(angularVelocitiesAttr,
+                                           baseTime,
+                                           angularVelocitiesSampleTime,
+                                           &angularVelocitiesLowerTimeValue,
+                                           &angularVelocitiesUpperTimeValue,
+                                           &angularVelocitiesHasSamples,
+                                           angularVelocities))
+  {
+    angularVelocities->clear();
+  }
+  if (!_CheckSampleAlignment(angularVelocitiesHasSamples,
+                             orientationsLowerTimeValue,
+                             orientationsUpperTimeValue,
+                             orientationsSampleTime,
+                             angularVelocitiesLowerTimeValue,
+                             angularVelocitiesUpperTimeValue,
+                             *angularVelocitiesSampleTime,
+                             VtValue(*angularVelocities),
+                             correctAttrDataLength,
+                             &angularVelocitiesAlignmentValid,
+                             &angularVelocitiesCorrectLength))
+  {
+    if (!angularVelocities->empty() && !angularVelocitiesAlignmentValid) {
+      TF_WARN("%s -- angular velocity samples are not aligned with orientation samples",
+              prim.GetPath().GetText());
+    }
+    if (!angularVelocities->empty() && angularVelocitiesAlignmentValid &&
+        !angularVelocitiesCorrectLength)
+    {
+      TF_WARN("%s -- found [%zu] angular velocities, but expected [%zu]",
+              prim.GetPath().GetText(),
+              angularVelocities->size(),
+              correctAttrDataLength);
+    }
+    angularVelocities->clear();
+  }
+
+  return true;
+}
+
+bool UsdGeom_GetScales(const UsdAttribute &scalesAttr,
+                       const UsdTimeCode baseTime,
+                       size_t expectedScales,
+                       VtVec3fArray *scales,
+                       UsdPrim const &prim)
+{
+  TRACE_FUNCTION();
+
+  // We don't currently support an attribute which linearly changes the
+  // scale (as velocity does for position). Instead, we lock the scale to
+  // the last authored value without performing any interpolation.
+
+  // Get scales attribute and check array size
+
+  UsdTimeCode scalesSampleTime;
+  bool scalesHasSamples;
+  // dummy values for passing into _GetAttrForTransforms
+  // when we do not need to use the resulting bracketing time values
+  double dummyLowerTimeValue = 0.0;
+  double dummyUpperTimeValue = 0.0;
+
+  if (!_GetAttrForTransforms<VtVec3fArray>(scalesAttr,
+                                           baseTime,
+                                           &scalesSampleTime,
+                                           &dummyLowerTimeValue,
+                                           &dummyUpperTimeValue,
+                                           &scalesHasSamples,
+                                           scales))
+  {
+    return false;
+  }
+
+  if (scales->size() != expectedScales) {
+    TF_WARN("%s -- found [%zu] scales, but expected [%zu]",
             prim.GetPath().GetText(),
             scales->size(),
             expectedScales);
-    }
+  }
 
-    return true;
+  return true;
 }
 
-double
-UsdGeom_CalculateTimeDelta(
-    const UsdTimeCode time,
-    const UsdTimeCode sampleTime,
-    const double timeCodesPerSecond)
+double UsdGeom_CalculateTimeDelta(const UsdTimeCode time,
+                                  const UsdTimeCode sampleTime,
+                                  const double timeCodesPerSecond)
 {
-    return (time.GetValue() - sampleTime.GetValue()) / timeCodesPerSecond;
+  return (time.GetValue() - sampleTime.GetValue()) / timeCodesPerSecond;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

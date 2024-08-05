@@ -53,16 +53,20 @@ TF_DEFINE_PUBLIC_TOKENS(TraceReporterTokens, TRACE_REPORTER_TOKENS);
 //
 
 TraceReporter::TraceReporter(const string &label, DataSourcePtr dataSource)
-    : TraceReporterBase(std::move(dataSource)), _label(label),
-      _groupByFunction(true), _foldRecursiveCalls(false),
-      _shouldAdjustForOverheadAndNoise(true) {
+    : TraceReporterBase(std::move(dataSource)),
+      _label(label),
+      _groupByFunction(true),
+      _foldRecursiveCalls(false),
+      _shouldAdjustForOverheadAndNoise(true)
+{
   _aggregateTree = TraceAggregateTree::New();
   _eventTree = TraceEventTree::New();
 }
 
 TraceReporter::~TraceReporter() {}
 
-static std::string _IndentString(int indent) {
+static std::string _IndentString(int indent)
+{
   std::string s;
   s.resize(indent, ' ');
 
@@ -74,20 +78,27 @@ static std::string _IndentString(int indent) {
   return s;
 }
 
-static std::string _GetKeyName(const TfToken &key) { return key.GetString(); }
+static std::string _GetKeyName(const TfToken &key)
+{
+  return key.GetString();
+}
 
-static void _PrintLineTimes(ostream &s, double inclusive, double exclusive,
-                            int count, const string &label, int indent,
-                            bool recursive_node, int iterationCount) {
-  string inclusiveStr =
-      TfStringPrintf("%9.3f ms ", ArchTicksToSeconds(uint64_t(inclusive * 1e3) /
-                                                     iterationCount));
+static void _PrintLineTimes(ostream &s,
+                            double inclusive,
+                            double exclusive,
+                            int count,
+                            const string &label,
+                            int indent,
+                            bool recursive_node,
+                            int iterationCount)
+{
+  string inclusiveStr = TfStringPrintf(
+      "%9.3f ms ", ArchTicksToSeconds(uint64_t(inclusive * 1e3) / iterationCount));
   if (inclusive <= 0)
     inclusiveStr = string(inclusiveStr.size(), ' ');
 
-  string exclusiveStr =
-      TfStringPrintf("%9.3f ms ", ArchTicksToSeconds(uint64_t(exclusive * 1e3) /
-                                                     iterationCount));
+  string exclusiveStr = TfStringPrintf(
+      "%9.3f ms ", ArchTicksToSeconds(uint64_t(exclusive * 1e3) / iterationCount));
   if (exclusive <= 0)
     exclusiveStr = string(exclusiveStr.size(), ' ');
 
@@ -95,8 +106,7 @@ static void _PrintLineTimes(ostream &s, double inclusive, double exclusive,
   if (iterationCount == 1)
     countStr = TfStringPrintf("%7.0f samples ", double(count));
   else
-    countStr =
-        TfStringPrintf("%10.3f samples ", double(count) / iterationCount);
+    countStr = TfStringPrintf("%10.3f samples ", double(count) / iterationCount);
 
   if (count <= 0) {
     // CODE_COVERAGE_OFF -- shouldn't get a count of zero
@@ -115,8 +125,8 @@ static void _PrintLineTimes(ostream &s, double inclusive, double exclusive,
   s << label << "\n";
 }
 
-static void _PrintRecursionMarker(ostream &s, const std::string &label,
-                                  int indent) {
+static void _PrintRecursionMarker(ostream &s, const std::string &label, int indent)
+{
   string inclusiveStr(13, ' ');
   string exclusiveStr(13, ' ');
   string countStr(16, ' ');
@@ -128,8 +138,11 @@ static void _PrintRecursionMarker(ostream &s, const std::string &label,
   s << "[" << label << "]\n";
 }
 
-static void _PrintNodeTimes(ostream &s, TraceAggregateNodeRefPtr node,
-                            int indent, int iterationCount) {
+static void _PrintNodeTimes(ostream &s,
+                            TraceAggregateNodeRefPtr node,
+                            int indent,
+                            int iterationCount)
+{
   // The root of the tree has id == -1, no useful stats there.
 
   if (node->GetId().IsValid()) {
@@ -140,8 +153,13 @@ static void _PrintNodeTimes(ostream &s, TraceAggregateNodeRefPtr node,
     }
 
     bool r = node->IsRecursionHead();
-    _PrintLineTimes(s, node->GetInclusiveTime(), node->GetExclusiveTime(r),
-                    node->GetCount(r), _GetKeyName(node->GetKey()), indent, r,
+    _PrintLineTimes(s,
+                    node->GetInclusiveTime(),
+                    node->GetExclusiveTime(r),
+                    node->GetCount(r),
+                    _GetKeyName(node->GetKey()),
+                    indent,
+                    r,
                     iterationCount);
   }
 
@@ -156,25 +174,24 @@ static void _PrintNodeTimes(ostream &s, TraceAggregateNodeRefPtr node,
   }
 }
 
-void TraceReporter::_PrintTimes(ostream &s) {
+void TraceReporter::_PrintTimes(ostream &s)
+{
   using SortedTimes = std::multimap<TimeStamp, TfToken>;
 
   SortedTimes sortedTimes;
-  for (const TraceAggregateTree::EventTimes::value_type &it :
-       _aggregateTree->GetEventTimes()) {
+  for (const TraceAggregateTree::EventTimes::value_type &it : _aggregateTree->GetEventTimes()) {
     sortedTimes.insert(SortedTimes::value_type(it.second, it.first));
   }
   for (const SortedTimes::value_type &it : sortedTimes) {
-    s << TfStringPrintf("%9.3f ms ",
-                        ArchTicksToSeconds((uint64_t)(it.first * 1e3)))
+    s << TfStringPrintf("%9.3f ms ", ArchTicksToSeconds((uint64_t)(it.first * 1e3)))
       << _GetKeyName(it.second) << "\n";
   }
 }
 
-void TraceReporter::Report(std::ostream &s, int iterationCount) {
+void TraceReporter::Report(std::ostream &s, int iterationCount)
+{
   if (iterationCount < 1) {
-    TF_CODING_ERROR("iterationCount %d is invalid; falling back to 1",
-                    iterationCount);
+    TF_CODING_ERROR("iterationCount %d is invalid; falling back to 1", iterationCount);
     iterationCount = 1;
   }
 
@@ -206,7 +223,8 @@ void TraceReporter::Report(std::ostream &s, int iterationCount) {
   s << "\n";
 }
 
-void TraceReporter::ReportTimes(std::ostream &s) {
+void TraceReporter::ReportTimes(std::ostream &s)
+{
   UpdateTraceTrees();
 
   s << "\nTotal time for each key ==============\n";
@@ -214,14 +232,16 @@ void TraceReporter::ReportTimes(std::ostream &s) {
   s << "\n";
 }
 
-void TraceReporter::ReportChromeTracing(std::ostream &s) {
+void TraceReporter::ReportChromeTracing(std::ostream &s)
+{
   UpdateTraceTrees();
 
   JsWriter w(s);
   _eventTree->WriteChromeTraceObject(w);
 }
 
-void TraceReporter::_RebuildEventAndAggregateTrees() {
+void TraceReporter::_RebuildEventAndAggregateTrees()
+{
   // Get the latest from the collector and process the events.
   _Update();
 
@@ -232,72 +252,93 @@ void TraceReporter::_RebuildEventAndAggregateTrees() {
   TraceAggregateNodePtr root = _aggregateTree->GetRoot();
   if (root && !root->GetChildrenRef().empty() && TfMallocTag::IsInitialized()) {
     root->Append(TraceAggregateNode::Id(),
-                 TfToken(TraceReporterTokens->warningString.GetString() +
-                         " MallocTags enabled"),
-                 0, 1 /* count */, 1 /* exclusive count */);
+                 TfToken(TraceReporterTokens->warningString.GetString() + " MallocTags enabled"),
+                 0,
+                 1 /* count */,
+                 1 /* exclusive count */);
   }
 }
 
-void TraceReporter::UpdateTraceTrees() { _RebuildEventAndAggregateTrees(); }
+void TraceReporter::UpdateTraceTrees()
+{
+  _RebuildEventAndAggregateTrees();
+}
 
-void TraceReporter::ClearTree() {
+void TraceReporter::ClearTree()
+{
   _aggregateTree->Clear();
   _eventTree = TraceEventTree::New();
   _Clear();
 }
 
-TraceAggregateNodePtr TraceReporter::GetAggregateTreeRoot() {
+TraceAggregateNodePtr TraceReporter::GetAggregateTreeRoot()
+{
   return _aggregateTree->GetRoot();
 }
 
-TraceEventNodeRefPtr TraceReporter::GetEventRoot() {
+TraceEventNodeRefPtr TraceReporter::GetEventRoot()
+{
   return _eventTree->GetRoot();
 }
 
-TraceEventTreeRefPtr TraceReporter::GetEventTree() { return _eventTree; }
+TraceEventTreeRefPtr TraceReporter::GetEventTree()
+{
+  return _eventTree;
+}
 
-const TraceReporter::CounterMap &TraceReporter::GetCounters() const {
+const TraceReporter::CounterMap &TraceReporter::GetCounters() const
+{
   return _aggregateTree->GetCounters();
 }
 
-int TraceReporter::GetCounterIndex(const TfToken &key) const {
+int TraceReporter::GetCounterIndex(const TfToken &key) const
+{
   return _aggregateTree->GetCounterIndex(key);
 }
 
-bool TraceReporter::AddCounter(const TfToken &key, int index,
-                               double totalValue) {
+bool TraceReporter::AddCounter(const TfToken &key, int index, double totalValue)
+{
   return _aggregateTree->AddCounter(key, index, totalValue);
 }
 
-void TraceReporter::SetGroupByFunction(bool groupByFunction) {
+void TraceReporter::SetGroupByFunction(bool groupByFunction)
+{
   _groupByFunction = groupByFunction;
 }
 
-bool TraceReporter::GetGroupByFunction() const { return _groupByFunction; }
+bool TraceReporter::GetGroupByFunction() const
+{
+  return _groupByFunction;
+}
 
-void TraceReporter::SetFoldRecursiveCalls(bool foldRecursiveCalls) {
+void TraceReporter::SetFoldRecursiveCalls(bool foldRecursiveCalls)
+{
   _foldRecursiveCalls = foldRecursiveCalls;
 }
 
-bool TraceReporter::GetFoldRecursiveCalls() const {
+bool TraceReporter::GetFoldRecursiveCalls() const
+{
   return _foldRecursiveCalls;
 }
 
-void TraceReporter::SetShouldAdjustForOverheadAndNoise(bool shouldAdjust) {
+void TraceReporter::SetShouldAdjustForOverheadAndNoise(bool shouldAdjust)
+{
   _shouldAdjustForOverheadAndNoise = shouldAdjust;
 }
 
-bool TraceReporter::ShouldAdjustForOverheadAndNoise() const {
+bool TraceReporter::ShouldAdjustForOverheadAndNoise() const
+{
   return _shouldAdjustForOverheadAndNoise;
 }
 
 /* static */
-TraceAggregateNode::Id TraceReporter::CreateValidEventId() {
+TraceAggregateNode::Id TraceReporter::CreateValidEventId()
+{
   return TraceAggregateNode::Id(TraceGetThreadId());
 }
 
-void TraceReporter::_ProcessCollection(
-    const TraceReporterBase::CollectionPtr &collection) {
+void TraceReporter::_ProcessCollection(const TraceReporterBase::CollectionPtr &collection)
+{
   if (collection) {
 
     // We just always build the single (additional) event tree for the
@@ -311,11 +352,12 @@ void TraceReporter::_ProcessCollection(
   }
 }
 
-TraceReporterPtr TraceReporter::GetGlobalReporter() {
+TraceReporterPtr TraceReporter::GetGlobalReporter()
+{
   // Note that, like TfSingleton, the global reporter instance is not freed
   // at shutdown.
-  static const TraceReporterPtr globalReporter(new TraceReporter(
-      "Trace global reporter", TraceReporterDataSourceCollector::New()));
+  static const TraceReporterPtr globalReporter(
+      new TraceReporter("Trace global reporter", TraceReporterDataSourceCollector::New()));
   return globalReporter;
 }
 

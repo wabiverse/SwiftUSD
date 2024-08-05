@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "UsdPhysics/metrics.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/stage.h"
 
@@ -37,19 +37,19 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapUsdPhysicsMetrics()
 {
-  def("GetStageKilogramsPerUnit", UsdPhysicsGetStageKilogramsPerUnit,
-      arg("stage"));
+  def("GetStageKilogramsPerUnit", UsdPhysicsGetStageKilogramsPerUnit, arg("stage"));
   def("StageHasAuthoredKilogramsPerUnit",
-      UsdPhysicsStageHasAuthoredKilogramsPerUnit, arg("stage"));
-  def("SetStageKilogramsPerUnit", UsdPhysicsSetStageKilogramsPerUnit,
+      UsdPhysicsStageHasAuthoredKilogramsPerUnit,
+      arg("stage"));
+  def("SetStageKilogramsPerUnit",
+      UsdPhysicsSetStageKilogramsPerUnit,
       (arg("stage"), arg("metersPerUnit")));
-  def("MassUnitsAre", UsdPhysicsMassUnitsAre,
+  def("MassUnitsAre",
+      UsdPhysicsMassUnitsAre,
       (arg("authoredUnits"), arg("standardUnits"), arg("epsilon") = 1e-5));
 
-  boost::python::class_<UsdPhysicsMassUnits>
-      cls("MassUnits", boost::python::no_init);
-  cls
-      .def_readonly("kilograms", UsdPhysicsMassUnits::kilograms)
+  boost::python::class_<UsdPhysicsMassUnits> cls("MassUnits", boost::python::no_init);
+  cls.def_readonly("kilograms", UsdPhysicsMassUnits::kilograms)
       .def_readonly("grams", UsdPhysicsMassUnits::grams)
       .def_readonly("slugs", UsdPhysicsMassUnits::slugs);
 }

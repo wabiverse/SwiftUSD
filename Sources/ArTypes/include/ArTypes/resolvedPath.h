@@ -150,7 +150,7 @@ class ArResolvedPath {
   {
     return _resolvedPath;
   }
-  
+
  private:
   std::string _resolvedPath;
 };
@@ -160,8 +160,7 @@ template<class HashState> void TfHashAppend(HashState &h, const ArResolvedPath &
   h.Append(p.GetPathString());
 }
 
-struct ArResolvedPathUtils
-{
+struct ArResolvedPathUtils {
   /// Return true if the path is relative to this directory
   /// or its parent directory.
   ///

@@ -22,8 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/base/trace/stringHash.h"
 #include "pxr/base/tf/diagnostic.h"
+#include "pxr/base/trace/stringHash.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -31,10 +31,10 @@ PXR_NAMESPACE_USING_DIRECTIVE
 static_assert(0x7c885313 == TraceStringHash::Hash("Test"), "Hash Error");
 static_assert(5381 == TraceStringHash::Hash(""), "Hash Error");
 
-int
-main(int argc, char *argv[]) {
-    printf ("Testing runtime hash\n");
-    TF_AXIOM(0x7c885313 == TraceStringHash::Hash("Test"));
-    TF_AXIOM(5381 == TraceStringHash::Hash(""));
-    printf ("  passed\n");
+int main(int argc, char *argv[])
+{
+  printf("Testing runtime hash\n");
+  TF_AXIOM(0x7c885313 == TraceStringHash::Hash("Test"));
+  TF_AXIOM(5381 == TraceStringHash::Hash(""));
+  printf("  passed\n");
 }

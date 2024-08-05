@@ -78,7 +78,7 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 /// opinions in a layer in a stage's local LayerStack.
 ///
 class UsdEditTarget {
-public:
+ public:
   /// Construct a null EditTarget.  A null EditTarget will return paths
   /// unchanged when asked to map paths.
   USD_API
@@ -91,14 +91,12 @@ public:
   /// To automatically supply the appropriate layer offset for the given
   /// layer, see UsdStage::GetEditTargetForLayer().
   USD_API
-  UsdEditTarget(const SdfLayerHandle &layer,
-                SdfLayerOffset offset = SdfLayerOffset());
+  UsdEditTarget(const SdfLayerHandle &layer, SdfLayerOffset offset = SdfLayerOffset());
 
   /// Convenience implicit conversion from SdfLayerRefPtr.  See above
   /// constructor for more information.
   USD_API
-  UsdEditTarget(const SdfLayerRefPtr &layer,
-                SdfLayerOffset offset = SdfLayerOffset());
+  UsdEditTarget(const SdfLayerRefPtr &layer, SdfLayerOffset offset = SdfLayerOffset());
 
   /// Construct an EditTarget with \a layer and \a node.  The mapping
   /// will be used to map paths from the scene into the \a layer's namespace
@@ -123,21 +121,34 @@ public:
   bool operator==(const UsdEditTarget &other) const;
 
   /// Inequality comparison.
-  bool operator!=(const UsdEditTarget &other) const {
+  bool operator!=(const UsdEditTarget &other) const
+  {
     return !(*this == other);
   }
 
   /// Return true if this EditTarget is null.  Null EditTargets map
   /// paths unchanged, and have no layer or LayerStack identifier.
-  bool IsNull() const { return *this == UsdEditTarget(); }
+  bool IsNull() const
+  {
+    return *this == UsdEditTarget();
+  }
 
   /// Return true if this EditTarget is valid, false otherwise.  Edit
   /// targets are considered valid when they have a layer.
-  bool IsValid() const { return _layer; }
+  bool IsValid() const
+  {
+    return _layer;
+  }
 
   /// Return the layer this EditTarget contains.
-  const SdfLayerHandle &GetLayer() const & { return _layer; }
-  SdfLayerHandle GetLayer() && { return std::move(_layer); }
+  const SdfLayerHandle &GetLayer() const &
+  {
+    return _layer;
+  }
+  SdfLayerHandle GetLayer() &&
+  {
+    return std::move(_layer);
+  }
 
   /// Map the provided \a scenePath into a SdfSpec path for the
   /// EditTarget's layer, according to the EditTarget's mapping.  Null edit
@@ -156,15 +167,17 @@ public:
   SdfPrimSpecHandle GetPrimSpecForScenePath(const SdfPath &scenePath) const;
 
   USD_API
-  SdfPropertySpecHandle
-  GetPropertySpecForScenePath(const SdfPath &scenePath) const;
+  SdfPropertySpecHandle GetPropertySpecForScenePath(const SdfPath &scenePath) const;
 
   USD_API
   SdfSpecHandle GetSpecForScenePath(const SdfPath &scenePath) const;
 
   /// Returns the PcpMapFunction representing the map from source
   /// specs (including any variant selections) to the stage.
-  const PcpMapFunction &GetMapFunction() const { return _mapping; }
+  const PcpMapFunction &GetMapFunction() const
+  {
+    return _mapping;
+  }
 
   /// Return a new EditTarget composed over \a weaker.  This is
   /// typically used to make an EditTarget "explicit".  For example, an edit
@@ -178,7 +191,7 @@ public:
   USD_API
   UsdEditTarget ComposeOver(const UsdEditTarget &weaker) const;
 
-private:
+ private:
   UsdEditTarget(const SdfLayerHandle &layer, const PcpMapFunction &mapping);
 
   SdfLayerHandle _layer;
@@ -187,4 +200,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_EDIT_TARGET_H
+#endif  // PXR_USD_USD_EDIT_TARGET_H

@@ -31,7 +31,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(PcpDependencyTypeNone, "non-dependency");
   TF_ADD_ENUM_NAME(PcpDependencyTypeRoot, "root dependency");
   TF_ADD_ENUM_NAME(PcpDependencyTypePurelyDirect, "purely-direct dependency");
@@ -40,30 +41,31 @@ TF_REGISTRY_FUNCTION(TfEnum) {
   TF_ADD_ENUM_NAME(PcpDependencyTypeAncestral, "ancestral dependency");
   TF_ADD_ENUM_NAME(PcpDependencyTypeVirtual, "virtual dependency");
   TF_ADD_ENUM_NAME(PcpDependencyTypeNonVirtual, "non-virtual dependency");
-  TF_ADD_ENUM_NAME(PcpDependencyTypeAnyNonVirtual,
-                   "any non-virtual dependency");
+  TF_ADD_ENUM_NAME(PcpDependencyTypeAnyNonVirtual, "any non-virtual dependency");
   TF_ADD_ENUM_NAME(PcpDependencyTypeAnyIncludingVirtual, "any dependency");
 }
 
-bool PcpNodeIntroducesDependency(const PcpNodeRef &node) {
+bool PcpNodeIntroducesDependency(const PcpNodeRef &node)
+{
   if (node.IsInert()) {
     switch (node.GetArcType()) {
-    case PcpArcTypeInherit:
-    case PcpArcTypeSpecialize:
-      // Special case: inert, propagated class-based arcs do not
-      // represent dependencies.
-      if (node.GetOriginNode() != node.GetParentNode()) {
-        return false;
-      }
-      // Fall through
-    default:
-      break;
+      case PcpArcTypeInherit:
+      case PcpArcTypeSpecialize:
+        // Special case: inert, propagated class-based arcs do not
+        // represent dependencies.
+        if (node.GetOriginNode() != node.GetParentNode()) {
+          return false;
+        }
+        // Fall through
+      default:
+        break;
     }
   }
   return true;
 }
 
-PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &node) {
+PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &node)
+{
   if (node.GetArcType() == PcpArcTypeRoot) {
     return PcpDependencyTypeRoot;
   }
@@ -98,7 +100,8 @@ PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &node) {
   for (PcpNodeRef p = node; p.GetParentNode(); p = p.GetParentNode()) {
     if (p.IsDueToAncestor()) {
       anyAncestral = true;
-    } else {
+    }
+    else {
       anyDirect = true;
     }
     if (anyAncestral && anyDirect) {
@@ -108,10 +111,12 @@ PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &node) {
   if (anyDirect) {
     if (anyAncestral) {
       flags |= PcpDependencyTypePartlyDirect;
-    } else {
+    }
+    else {
       flags |= PcpDependencyTypePurelyDirect;
     }
-  } else {
+  }
+  else {
     if (anyAncestral) {
       flags |= PcpDependencyTypeAncestral;
     }
@@ -124,7 +129,8 @@ PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &node) {
   return flags;
 }
 
-std::string PcpDependencyFlagsToString(const PcpDependencyFlags depFlags) {
+std::string PcpDependencyFlagsToString(const PcpDependencyFlags depFlags)
+{
   std::set<std::string> tags;
   if (depFlags == PcpDependencyTypeNone) {
     tags.insert("none");

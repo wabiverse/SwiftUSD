@@ -3,4 +3,4 @@
 
 /* no includes. */
 
-#endif // __PXR_USD_PY_USDVOL_H__
+#endif  // __PXR_USD_PY_USDVOL_H__

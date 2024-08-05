@@ -44,7 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \see \ref ArResolver_scopedCache "Scoped Resolution Cache"
 class ArResolverScopedCache {
-public:
+ public:
   // Disallow copies
   ArResolverScopedCache(const ArResolverScopedCache &) = delete;
   ArResolverScopedCache &operator=(const ArResolverScopedCache &) = delete;
@@ -72,10 +72,10 @@ public:
   AR_API
   ~ArResolverScopedCache();
 
-private:
+ private:
   VtValue _cacheScopeData;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_RESOLVER_SCOPED_CACHE_H
+#endif  // PXR_USD_AR_RESOLVER_SCOPED_CACHE_H

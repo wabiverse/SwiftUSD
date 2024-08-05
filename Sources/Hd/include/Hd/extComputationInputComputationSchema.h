@@ -30,81 +30,75 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDEXTCOMPUTATIONINPUTCOMPUTATION_SCHEMA_TOKENS \
-    (name) \
-    (sourceComputation) \
-    (sourceComputationOutputName) \
+  (name)(sourceComputation)(sourceComputationOutputName)
 
-TF_DECLARE_PUBLIC_TOKENS(HdExtComputationInputComputationSchemaTokens, HD_API,
-    HDEXTCOMPUTATIONINPUTCOMPUTATION_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdExtComputationInputComputationSchemaTokens,
+                         HD_API,
+                         HDEXTCOMPUTATIONINPUTCOMPUTATION_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdExtComputationInputComputationSchema : public HdSchema
-{
-public:
-    HdExtComputationInputComputationSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdExtComputationInputComputationSchema : public HdSchema {
+ public:
+  HdExtComputationInputComputationSchema(HdContainerDataSourceHandle container)
+      : HdSchema(container)
+  {
+  }
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdTokenDataSourceHandle GetName();
+  HD_API
+  HdPathDataSourceHandle GetSourceComputation();
+  HD_API
+  HdTokenDataSourceHandle GetSourceComputationOutputName();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdTokenDataSourceHandle &name,
+      const HdPathDataSourceHandle &sourceComputation,
+      const HdTokenDataSourceHandle &sourceComputationOutputName);
+
+  /// \class HdExtComputationInputComputationSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdTokenDataSourceHandle GetName();
+    Builder &SetName(const HdTokenDataSourceHandle &name);
     HD_API
-    HdPathDataSourceHandle GetSourceComputation();
+    Builder &SetSourceComputation(const HdPathDataSourceHandle &sourceComputation);
     HD_API
-    HdTokenDataSourceHandle GetSourceComputationOutputName();
+    Builder &SetSourceComputationOutputName(
+        const HdTokenDataSourceHandle &sourceComputationOutputName);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdTokenDataSourceHandle &name,
-        const HdPathDataSourceHandle &sourceComputation,
-        const HdTokenDataSourceHandle &sourceComputationOutputName
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdExtComputationInputComputationSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetName(
-            const HdTokenDataSourceHandle &name);
-        HD_API
-        Builder &SetSourceComputation(
-            const HdPathDataSourceHandle &sourceComputation);
-        HD_API
-        Builder &SetSourceComputationOutputName(
-            const HdTokenDataSourceHandle &sourceComputationOutputName);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdTokenDataSourceHandle _name;
-        HdPathDataSourceHandle _sourceComputation;
-        HdTokenDataSourceHandle _sourceComputationOutputName;
-    };
-
+   private:
+    HdTokenDataSourceHandle _name;
+    HdPathDataSourceHandle _sourceComputation;
+    HdTokenDataSourceHandle _sourceComputationOutputName;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

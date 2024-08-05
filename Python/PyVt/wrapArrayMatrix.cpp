@@ -30,6 +30,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayMatrix() {
+void wrapArrayMatrix()
+{
   BOOST_PP_SEQ_FOR_EACH(VT_WRAP_ARRAY, ~, VT_MATRIX_VALUE_TYPES);
 }

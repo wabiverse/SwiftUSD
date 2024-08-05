@@ -24,9 +24,9 @@
 #ifndef PXR_USD_USD_SHADE_TYPES_H
 #define PXR_USD_USD_SHADE_TYPES_H
 
-#include <pxr/pxrns.h>
-#include "UsdShade/api.h"
 #include "Usd/attribute.h"
+#include "UsdShade/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/smallVector.h"
 
@@ -37,9 +37,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Specifies the type of a shading attribute.
 ///
 enum class UsdShadeAttributeType {
-    Invalid,
-    Input,
-    Output,
+  Invalid,
+  Input,
+  Output,
 };
 
 /// \enum UsdShadeConnectionModification
@@ -50,11 +50,7 @@ enum class UsdShadeAttributeType {
 /// there is a choice between prepending and appending to said list, which will
 /// be represented by Usd's list editing operations.
 ///
-enum class UsdShadeConnectionModification {
-    Replace,
-    Prepend,
-    Append
-};
+enum class UsdShadeConnectionModification { Replace, Prepend, Append };
 
 /// \typedef UsdShadeAttributeVector
 ///

@@ -27,21 +27,21 @@
 #include "Arch/export.h"
 
 #if defined(PXR_STATIC)
-#define TF_API
-#define TF_API_TEMPLATE_CLASS(...)
-#define TF_API_TEMPLATE_STRUCT(...)
-#define TF_LOCAL
+#  define TF_API
+#  define TF_API_TEMPLATE_CLASS(...)
+#  define TF_API_TEMPLATE_STRUCT(...)
+#  define TF_LOCAL
 #else
-#if defined(TF_EXPORTS)
-#define TF_API ARCH_EXPORT
-#define TF_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
-#define TF_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
-#else
-#define TF_API ARCH_IMPORT
-#define TF_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
-#define TF_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
-#endif
-#define TF_LOCAL ARCH_HIDDEN
+#  if defined(TF_EXPORTS)
+#    define TF_API ARCH_EXPORT
+#    define TF_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
+#    define TF_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
+#  else
+#    define TF_API ARCH_IMPORT
+#    define TF_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
+#    define TF_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
+#  endif
+#  define TF_LOCAL ARCH_HIDDEN
 #endif
 
 /// \file Tf/api.h
@@ -49,14 +49,14 @@
 
 #if defined(__cplusplus) || defined(doxygen)
 
-#include <pxr/pxrns.h>
+#  include <pxr/pxrns.h>
 
-#include "Arch/buildMode.h"
-#include "Arch/pxrinttypes.h"
-#include "Arch/pxrmath.h"
+#  include "Arch/buildMode.h"
+#  include "Arch/pxrinttypes.h"
+#  include "Arch/pxrmath.h"
 
-#include <math.h>
-#include <utility>
+#  include <math.h>
+#  include <utility>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -64,31 +64,39 @@ PXR_NAMESPACE_OPEN_SCOPE
 // many files need a higher limit and define this constant themselves before
 // including anything else.
 
-#ifndef TF_MAX_ARITY
-#define TF_MAX_ARITY 7
-#endif // TF_MAX_ARITY
+#  ifndef TF_MAX_ARITY
+#    define TF_MAX_ARITY 7
+#  endif  // TF_MAX_ARITY
 
 /// This value may be used by functions that return a \c size_t to indicate
 /// that a special or error condition has occurred.
 /// \ingroup group_tf_TfError
-#define TF_BAD_SIZE_T SIZE_MAX
+#  define TF_BAD_SIZE_T SIZE_MAX
 
 /// \addtogroup group_tf_BasicMath
 ///@{
 
 /// Returns the absolute value of the given \c int value.
-inline int TfAbs(int v) { return (v < 0 ? -v : v); }
+inline int TfAbs(int v)
+{
+  return (v < 0 ? -v : v);
+}
 
 /// Returns the absolute value of the given \c double value.
-inline double TfAbs(double v) { return fabs(v); }
+inline double TfAbs(double v)
+{
+  return fabs(v);
+}
 
 /// Returns the smaller of the two given \c  values.
-template <class T> inline T TfMin(const T &v1, const T &v2) {
+template<class T> inline T TfMin(const T &v1, const T &v2)
+{
   return (v1 < v2 ? v1 : v2);
 }
 
 /// Returns the larger of the two given \c  values.
-template <class T> inline T TfMax(const T &v1, const T &v2) {
+template<class T> inline T TfMax(const T &v1, const T &v2)
+{
   return (v1 > v2 ? v1 : v2);
 }
 
@@ -126,9 +134,13 @@ template <class T> inline T TfMax(const T &v1, const T &v2) {
 ///
 /// \ingroup group_tf_Stl
 struct TfDeleter {
-  template <class T> void operator()(T *t) const { delete t; }
+  template<class T> void operator()(T *t) const
+  {
+    delete t;
+  }
 
-  template <class T1, class T2> void operator()(std::pair<T1, T2 *> p) const {
+  template<class T1, class T2> void operator()(std::pair<T1, T2 *> p) const
+  {
     delete p.second;
   }
 };
@@ -167,11 +179,11 @@ struct TfDeleter {
  * or creating functions which only show up in some builds.
  */
 
-#define TF_DEV_BUILD ARCH_DEV_BUILD
+#  define TF_DEV_BUILD ARCH_DEV_BUILD
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__cplusplus)
+#endif  // defined(__cplusplus)
 
 /// Stops compiler from producing unused argument or variable warnings.
 /// This is useful mainly in C, because in C++ you can just leave
@@ -193,4 +205,4 @@ PXR_NAMESPACE_CLOSE_SCOPE
 /// \ingroup group_tf_TfCompilerAids
 #define TF_UNUSED(x) (void)x
 
-#endif // PXR_BASE_TF_API_H
+#endif  // PXR_BASE_TF_API_H

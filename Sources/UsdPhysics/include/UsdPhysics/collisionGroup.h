@@ -26,20 +26,20 @@
 
 /// \file usdPhysics/collisionGroup.h
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdPhysics/api.h"
 #include "UsdPhysics/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/collectionAPI.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -63,9 +63,8 @@ class SdfAssetPath;
 /// defines the members of this Collisiongroup.
 ///
 ///
-class UsdPhysicsCollisionGroup : public UsdTyped
-{
-public:
+class UsdPhysicsCollisionGroup : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -75,18 +74,12 @@ public:
   /// Equivalent to UsdPhysicsCollisionGroup::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdPhysicsCollisionGroup(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdPhysicsCollisionGroup(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdPhysicsCollisionGroup on the prim held by \p schemaObj .
   /// Should be preferred over UsdPhysicsCollisionGroup(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdPhysicsCollisionGroup(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdPhysicsCollisionGroup(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDPHYSICS_API
@@ -96,8 +89,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPHYSICS_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdPhysicsCollisionGroup holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -109,8 +101,7 @@ public:
   /// \endcode
   ///
   USDPHYSICS_API
-  static UsdPhysicsCollisionGroup
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsCollisionGroup Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -135,17 +126,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDPHYSICS_API
-  static UsdPhysicsCollisionGroup
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsCollisionGroup Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPHYSICS_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPHYSICS_API
@@ -157,7 +147,7 @@ private:
   USDPHYSICS_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // MERGEGROUPNAME
   // --------------------------------------------------------------------- //
@@ -180,9 +170,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateMergeGroupNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateMergeGroupNameAttr(VtValue const &defaultValue = VtValue(),
+                                        bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INVERTFILTEREDGROUPS
   // --------------------------------------------------------------------- //
@@ -205,9 +196,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPHYSICS_API
-  UsdAttribute CreateInvertFilteredGroupsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateInvertFilteredGroupsAttr(VtValue const &defaultValue = VtValue(),
+                                              bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FILTEREDGROUPS
   // --------------------------------------------------------------------- //
@@ -222,7 +214,7 @@ public:
   USDPHYSICS_API
   UsdRelationship CreateFilteredGroupsRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -242,8 +234,7 @@ public:
   /// Utility structure generated by ComputeCollisionGroupTable(); contains a
   /// table describing which pairs of collision groups have collisions
   /// enabled/disabled by the filtering rules.
-  struct CollisionGroupTable
-  {
+  struct CollisionGroupTable {
     /// Return the set of all UsdPhysicsCollisionGroup which this table
     /// contains
     USDPHYSICS_API
@@ -251,15 +242,13 @@ public:
 
     /// Return true if the groups at indices \a idxA and \a idxB collide
     USDPHYSICS_API
-    bool IsCollisionEnabled(const unsigned int idxA,
-                            const unsigned int idxB) const;
+    bool IsCollisionEnabled(const unsigned int idxA, const unsigned int idxB) const;
 
     /// Return true if the groups \a primA and \a primB collide
     USDPHYSICS_API
-    bool IsCollisionEnabled(const SdfPath &primA,
-                            const SdfPath &primB) const;
+    bool IsCollisionEnabled(const SdfPath &primA, const SdfPath &primB) const;
 
-  protected:
+   protected:
     friend class UsdPhysicsCollisionGroup;
     // < All collision groups known to this table
     SdfPathVector _groups;
@@ -272,9 +261,7 @@ public:
   /// stage. This can be used as a reference to validate an implementation of
   /// the collision groups filters. The returned table is diagonally
   /// symmetric.
-  static USDPHYSICS_API
-      CollisionGroupTable
-      ComputeCollisionGroupTable(const UsdStage &stage);
+  static USDPHYSICS_API CollisionGroupTable ComputeCollisionGroupTable(const UsdStage &stage);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

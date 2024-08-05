@@ -27,7 +27,7 @@
 
 #include "Hd/api.h"
 
-#include "Hd/vectorSchema.h" 
+#include "Hd/vectorSchema.h"
 #include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -36,39 +36,34 @@ class HdSelectionSchema;
 
 //-----------------------------------------------------------------------------
 
-#define HDSELECTIONS_SCHEMA_TOKENS \
-    (selections) \
+#define HDSELECTIONS_SCHEMA_TOKENS (selections)
 
-TF_DECLARE_PUBLIC_TOKENS(HdSelectionsSchemaTokens, HD_API,
-    HDSELECTIONS_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdSelectionsSchemaTokens, HD_API, HDSELECTIONS_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdSelectionsSchema : public HdSchemaBasedVectorSchema<HdSelectionSchema>
-{
-public:
-    HdSelectionsSchema(HdVectorDataSourceHandle const &vector)
-      : HdSchemaBasedVectorSchema(vector) {}
+class HdSelectionsSchema : public HdSchemaBasedVectorSchema<HdSelectionSchema> {
+ public:
+  HdSelectionsSchema(HdVectorDataSourceHandle const &vector) : HdSchemaBasedVectorSchema(vector) {}
 
-    /// Retrieves a vector data source with the schema's default name token
-    /// "selections" from the parent vector and constructs a
-    /// HdSelectionsSchema instance.
-    /// Because the requested vector data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
-    HD_API
-    static HdSelectionsSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+  /// Retrieves a vector data source with the schema's default name token
+  /// "selections" from the parent vector and constructs a
+  /// HdSelectionsSchema instance.
+  /// Because the requested vector data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdSelectionsSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the vector data source representing this schema is found by
-    /// default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the vector data source representing this schema is found by
+  /// default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

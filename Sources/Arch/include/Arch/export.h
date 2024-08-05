@@ -155,36 +155,33 @@
 #include "Arch/defines.h"
 
 #if defined(ARCH_OS_WINDOWS)
-#if defined(ARCH_COMPILER_GCC) && ARCH_COMPILER_GCC_MAJOR >= 4 ||              \
-    defined(ARCH_COMPILER_CLANG)
-#define ARCH_EXPORT __attribute__((dllexport))
-#define ARCH_IMPORT __attribute__((dllimport))
-#define ARCH_HIDDEN
-#define ARCH_EXPORT_TYPE
+#  if defined(ARCH_COMPILER_GCC) && ARCH_COMPILER_GCC_MAJOR >= 4 || defined(ARCH_COMPILER_CLANG)
+#    define ARCH_EXPORT __attribute__((dllexport))
+#    define ARCH_IMPORT __attribute__((dllimport))
+#    define ARCH_HIDDEN
+#    define ARCH_EXPORT_TYPE
+#  else
+#    define ARCH_EXPORT __declspec(dllexport)
+#    define ARCH_IMPORT __declspec(dllimport)
+#    define ARCH_HIDDEN
+#    define ARCH_EXPORT_TYPE
+#  endif
+#elif defined(ARCH_COMPILER_GCC) && ARCH_COMPILER_GCC_MAJOR >= 4 || defined(ARCH_COMPILER_CLANG)
+#  define ARCH_EXPORT __attribute__((visibility("default")))
+#  define ARCH_IMPORT
+#  define ARCH_HIDDEN __attribute__((visibility("hidden")))
+#  if defined(ARCH_COMPILER_CLANG)
+#    define ARCH_EXPORT_TYPE __attribute__((type_visibility("default")))
+#  else
+#    define ARCH_EXPORT_TYPE __attribute__((visibility("default")))
+#  endif
 #else
-#define ARCH_EXPORT __declspec(dllexport)
-#define ARCH_IMPORT __declspec(dllimport)
-#define ARCH_HIDDEN
-#define ARCH_EXPORT_TYPE
-#endif
-#elif defined(ARCH_COMPILER_GCC) && ARCH_COMPILER_GCC_MAJOR >= 4 ||            \
-    defined(ARCH_COMPILER_CLANG)
-#define ARCH_EXPORT __attribute__((visibility("default")))
-#define ARCH_IMPORT
-#define ARCH_HIDDEN __attribute__((visibility("hidden")))
-#if defined(ARCH_COMPILER_CLANG)
-#define ARCH_EXPORT_TYPE __attribute__((type_visibility("default")))
-#else
-#define ARCH_EXPORT_TYPE __attribute__((visibility("default")))
-#endif
-#else
-#define ARCH_EXPORT
-#define ARCH_IMPORT
-#define ARCH_HIDDEN
-#define ARCH_EXPORT_TYPE
+#  define ARCH_EXPORT
+#  define ARCH_IMPORT
+#  define ARCH_HIDDEN
+#  define ARCH_EXPORT_TYPE
 #endif
 #define ARCH_EXPORT_TEMPLATE(type, ...)
-#define ARCH_IMPORT_TEMPLATE(type, ...)                                        \
-  extern template type ARCH_IMPORT __VA_ARGS__
+#define ARCH_IMPORT_TEMPLATE(type, ...) extern template type ARCH_IMPORT __VA_ARGS__
 
-#endif // PXR_BASE_ARCH_EXPORT_H
+#endif  // PXR_BASE_ARCH_EXPORT_H

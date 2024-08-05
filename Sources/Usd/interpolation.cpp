@@ -29,7 +29,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(UsdInterpolationTypeHeld, "Held");
   TF_ADD_ENUM_NAME(UsdInterpolationTypeLinear, "Linear");
 }

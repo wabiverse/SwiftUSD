@@ -39,15 +39,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Python into a ArResolverContext object in C++.  This typically would be
 /// called in the source file where the Python wrapping for the context object
 /// is defined.
-template <class Context> void ArWrapResolverContextForPython();
+template<class Context> void ArWrapResolverContextForPython();
 
 #ifndef doxygen
 
-template <class Context> void ArWrapResolverContextForPython() {
+template<class Context> void ArWrapResolverContextForPython()
+{
   boost::python::implicitly_convertible<Context, ArResolverContext>();
 };
 
-#endif // doxygen
+#endif  // doxygen
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

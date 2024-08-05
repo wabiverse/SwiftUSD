@@ -26,20 +26,20 @@
 
 /// \file usdRender/pass.h
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
-#include "Usd/typed.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "Usd/typed.h"
+#include "UsdRender/api.h"
 #include "UsdRender/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Usd/collectionAPI.h"
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -86,9 +86,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRenderTokens->rightHanded
 /// as the value.
 ///
-class UsdRenderPass : public UsdTyped
-{
-public:
+class UsdRenderPass : public UsdTyped {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -98,18 +97,12 @@ public:
   /// Equivalent to UsdRenderPass::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRenderPass(const UsdPrim &prim = UsdPrim())
-      : UsdTyped(prim)
-  {
-  }
+  explicit UsdRenderPass(const UsdPrim &prim = UsdPrim()) : UsdTyped(prim) {}
 
   /// Construct a UsdRenderPass on the prim held by \p schemaObj .
   /// Should be preferred over UsdRenderPass(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRenderPass(const UsdSchemaBase &schemaObj)
-      : UsdTyped(schemaObj)
-  {
-  }
+  explicit UsdRenderPass(const UsdSchemaBase &schemaObj) : UsdTyped(schemaObj) {}
 
   /// Destructor.
   USDRENDER_API
@@ -119,8 +112,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRENDER_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRenderPass holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -132,8 +124,7 @@ public:
   /// \endcode
   ///
   USDRENDER_API
-  static UsdRenderPass
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderPass Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -158,17 +149,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDRENDER_API
-  static UsdRenderPass
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRenderPass Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRENDER_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRENDER_API
@@ -180,7 +170,7 @@ private:
   USDRENDER_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PASSTYPE
   // --------------------------------------------------------------------- //
@@ -208,9 +198,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreatePassTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreatePassTypeAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // COMMAND
   // --------------------------------------------------------------------- //
@@ -246,9 +237,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateCommandAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateCommandAttr(VtValue const &defaultValue = VtValue(),
+                                 bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // FILENAME
   // --------------------------------------------------------------------- //
@@ -271,9 +263,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateFileNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateFileNameAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DENOISEENABLE
   // --------------------------------------------------------------------- //
@@ -294,9 +287,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRENDER_API
-  UsdAttribute CreateDenoiseEnableAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateDenoiseEnableAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // RENDERSOURCE
   // --------------------------------------------------------------------- //
@@ -320,7 +314,7 @@ public:
   USDRENDER_API
   UsdRelationship CreateRenderSourceRel() const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INPUTPASSES
   // --------------------------------------------------------------------- //
@@ -353,7 +347,7 @@ public:
   USDRENDER_API
   UsdRelationship CreateInputPassesRel() const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // DENOISEPASS
   // --------------------------------------------------------------------- //
@@ -369,7 +363,7 @@ public:
   USDRENDER_API
   UsdRelationship CreateDenoisePassRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

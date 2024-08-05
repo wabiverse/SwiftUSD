@@ -23,16 +23,16 @@
 //
 #include "pxr/pxr.h"
 
-#include "pxr/usd/ar/asset.h"
-#include "pxr/usd/ar/filesystemAsset.h"
-#include "pxr/usd/ArTypes/resolvedPath.h"
-#include "pxr/usd/ar/resolver.h"
-#include "pxr/usd/ar/defaultResolver.h"
-#include "pxr/usd/ar/writableAsset.h"
-#include "pxr/base/tf/diagnostic.h"
-#include "pxr/base/tf/fileUtils.h"
 #include "Arch/fileSystem.h"
 #include "Arch/systemInfo.h"
+#include "pxr/base/tf/diagnostic.h"
+#include "pxr/base/tf/fileUtils.h"
+#include "pxr/usd/ArTypes/resolvedPath.h"
+#include "pxr/usd/ar/asset.h"
+#include "pxr/usd/ar/defaultResolver.h"
+#include "pxr/usd/ar/filesystemAsset.h"
+#include "pxr/usd/ar/resolver.h"
+#include "pxr/usd/ar/writableAsset.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE;
 
@@ -41,18 +41,17 @@ PXR_NAMESPACE_USING_DIRECTIVE;
 // asset tried to create the directory and one of them could fail.  Verify that
 // this is now a race free condition.
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <chrono>
 
 std::mutex threadSyncMutex;
 std::mutex errorMutex;
 std::vector<std::string> errors;
 
-static void
-_CreateAssetInThread(const std::string fullPath)
+static void _CreateAssetInThread(const std::string fullPath)
 {
   const ArResolvedPath arPath(fullPath);
   ArResolver &resolver = ArGetResolver();
@@ -61,32 +60,28 @@ _CreateAssetInThread(const std::string fullPath)
   threadSyncMutex.lock();
   threadSyncMutex.unlock();
 
-  std::shared_ptr<ArWritableAsset> asset =
-      resolver.OpenAssetForWrite(arPath, ArResolver::WriteMode::Replace);
+  std::shared_ptr<ArWritableAsset> asset = resolver.OpenAssetForWrite(
+      arPath, ArResolver::WriteMode::Replace);
 
-  if (asset)
-  {
+  if (asset) {
     // Write some data (the path) into the file
     asset->Write(fullPath.c_str(), fullPath.size(), 0);
     asset->Close();
   }
-  else
-  {
+  else {
     std::unique_lock<std::mutex> lock(errorMutex);
     errors.push_back("Failed to open asset for write: " + fullPath);
   }
 }
 
-static void
-_VerifyAsset(const std::string &fullPath)
+static void _VerifyAsset(const std::string &fullPath)
 {
   ArResolver &resolver = ArGetResolver();
 
   ArResolvedPath arPath(fullPath);
   std::shared_ptr<ArAsset> asset = resolver.OpenAsset(arPath);
 
-  if (!asset)
-  {
+  if (!asset) {
     std::cerr << "Failed to open asset for read: " << fullPath << std::endl;
     TF_AXIOM(asset);
   }
@@ -97,8 +92,7 @@ _VerifyAsset(const std::string &fullPath)
   TF_AXIOM(contents == fullPath);
 }
 
-static void
-TestThreadedAssetCreation()
+static void TestThreadedAssetCreation()
 {
   // If two assets were created "simultaneously" in a directory which did not
   // already exist, it was possible for one of them to fail when it tried to
@@ -132,8 +126,7 @@ TestThreadedAssetCreation()
   thread2.join();
 
   // Report any errors.
-  for (const std::string &error : errors)
-  {
+  for (const std::string &error : errors) {
     std::cerr << error << std::endl;
   }
 

@@ -33,93 +33,71 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdIntegratorSchemaTokens,
-    HDINTEGRATOR_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdIntegratorSchemaTokens, HDINTEGRATOR_SCHEMA_TOKENS);
 
-
-
-HdMaterialNodeSchema
-HdIntegratorSchema::GetResource()
+HdMaterialNodeSchema HdIntegratorSchema::GetResource()
 {
-    return HdMaterialNodeSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdIntegratorSchemaTokens->resource));
+  return HdMaterialNodeSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdIntegratorSchemaTokens->resource));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdIntegratorSchema::BuildRetained(
-        const HdContainerDataSourceHandle &resource
-)
-{
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
-
-    size_t count = 0;
-    if (resource) {
-        names[count] = HdIntegratorSchemaTokens->resource;
-        values[count++] = resource;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdIntegratorSchema
-HdIntegratorSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdIntegratorSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdIntegratorSchemaTokens->integrator))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdIntegratorSchema::GetSchemaToken()
-{
-    return HdIntegratorSchemaTokens->integrator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdIntegratorSchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdIntegratorSchemaTokens->integrator
-    );
-    return locator;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdIntegratorSchema::GetResourceLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdIntegratorSchemaTokens->integrator,
-        HdIntegratorSchemaTokens->resource
-    );
-    return locator;
-}
-
-
-HdIntegratorSchema::Builder &
-HdIntegratorSchema::Builder::SetResource(
+HdContainerDataSourceHandle HdIntegratorSchema::BuildRetained(
     const HdContainerDataSourceHandle &resource)
 {
-    _resource = resource;
-    return *this;
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
+
+  size_t count = 0;
+  if (resource) {
+    names[count] = HdIntegratorSchemaTokens->resource;
+    values[count++] = resource;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdIntegratorSchema::Builder::Build()
+/*static*/
+HdIntegratorSchema HdIntegratorSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdIntegratorSchema::BuildRetained(
-        _resource
-    );
+  return HdIntegratorSchema(fromParentContainer ?
+                                HdContainerDataSource::Cast(fromParentContainer->Get(
+                                    HdIntegratorSchemaTokens->integrator)) :
+                                nullptr);
 }
 
+/*static*/
+const TfToken &HdIntegratorSchema::GetSchemaToken()
+{
+  return HdIntegratorSchemaTokens->integrator;
+}
+/*static*/
+const HdDataSourceLocator &HdIntegratorSchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdIntegratorSchemaTokens->integrator);
+  return locator;
+}
+/*static*/
+const HdDataSourceLocator &HdIntegratorSchema::GetResourceLocator()
+{
+  static const HdDataSourceLocator locator(HdIntegratorSchemaTokens->integrator,
+                                           HdIntegratorSchemaTokens->resource);
+  return locator;
+}
+
+HdIntegratorSchema::Builder &HdIntegratorSchema::Builder::SetResource(
+    const HdContainerDataSourceHandle &resource)
+{
+  _resource = resource;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdIntegratorSchema::Builder::Build()
+{
+  return HdIntegratorSchema::BuildRetained(_resource);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

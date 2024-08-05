@@ -21,14 +21,14 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
-#include <boost/python/def.hpp>
 #include <boost/python.hpp>
+#include <boost/python/def.hpp>
+#include <pxr/pxrns.h>
 
 #include "UsdUtils/registeredVariantSet.h"
 
-#include "Tf/pyResultConversions.h"
 #include "Tf/pyEnum.h"
+#include "Tf/pyResultConversions.h"
 
 using namespace boost::python;
 
@@ -38,11 +38,10 @@ void wrapRegisteredVariantSet()
 {
   scope registeredVariantSet =
       class_<UsdUtilsRegisteredVariantSet>(
-          "RegisteredVariantSet",
-          "Info for registered variant set",
-          no_init)
+          "RegisteredVariantSet", "Info for registered variant set", no_init)
           .def_readonly("name", &UsdUtilsRegisteredVariantSet::name)
-          .def_readonly("selectionExportPolicy", &UsdUtilsRegisteredVariantSet::selectionExportPolicy);
+          .def_readonly("selectionExportPolicy",
+                        &UsdUtilsRegisteredVariantSet::selectionExportPolicy);
 
   typedef UsdUtilsRegisteredVariantSet::SelectionExportPolicy SelectionExportPolicy;
   enum_<SelectionExportPolicy>("SelectionExportPolicy")

@@ -30,9 +30,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((sceneIndexPluginName, "HdPrman_MeshLightResolvingSceneIndexPlugin")));
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         ((sceneIndexPluginName, "HdPrman_MeshLightResolvingSceneIndexPlugin")));
 
 static const char *const _pluginDisplayName = "Prman";
 
@@ -49,18 +48,15 @@ TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
   HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
       _pluginDisplayName,
       _tokens->sceneIndexPluginName,
-      nullptr, // No input args.
+      nullptr,  // No input args.
       insertionPhase,
       HdSceneIndexPluginRegistry::InsertionOrderAtStart);
 }
 
-HdPrman_MeshLightResolvingSceneIndexPlugin::
-    HdPrman_MeshLightResolvingSceneIndexPlugin() = default;
+HdPrman_MeshLightResolvingSceneIndexPlugin::HdPrman_MeshLightResolvingSceneIndexPlugin() = default;
 
-HdSceneIndexBaseRefPtr
-HdPrman_MeshLightResolvingSceneIndexPlugin::_AppendSceneIndex(
-    const HdSceneIndexBaseRefPtr &inputScene,
-    const HdContainerDataSourceHandle &inputArgs)
+HdSceneIndexBaseRefPtr HdPrman_MeshLightResolvingSceneIndexPlugin::_AppendSceneIndex(
+    const HdSceneIndexBaseRefPtr &inputScene, const HdContainerDataSourceHandle &inputArgs)
 {
   return HdPrmanMeshLightResolvingSceneIndex::New(inputScene);
 }

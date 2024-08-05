@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sprim.h"
 #include "Riley.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,9 +36,8 @@ class HdSceneDelegate;
 ///
 /// A container for maps of VtValues for use as Options, etc
 ///
-class HdPrmanParamsSetter final : public HdSprim
-{
-public:
+class HdPrmanParamsSetter final : public HdSprim {
+ public:
   HdPrmanParamsSetter(SdfPath const &id);
 
   void Sync(HdSceneDelegate *sceneDelegate,
@@ -52,4 +51,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_PARAMS_SPRIM_H

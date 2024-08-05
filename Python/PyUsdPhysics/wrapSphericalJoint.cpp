@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/sphericalJoint.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/sphericalJoint.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,60 +40,52 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateAxisAttr(UsdPhysicsSphericalJoint &self,
+                                    object defaultVal,
+                                    bool writeSparsely)
 {
+  return self.CreateAxisAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                             writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateConeAngle0LimitAttr(UsdPhysicsSphericalJoint &self,
+                                               object defaultVal,
+                                               bool writeSparsely)
+{
+  return self.CreateConeAngle0LimitAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                        writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateConeAngle1LimitAttr(UsdPhysicsSphericalJoint &self,
+                                               object defaultVal,
+                                               bool writeSparsely)
+{
+  return self.CreateConeAngle1LimitAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                        writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateAxisAttr(UsdPhysicsSphericalJoint &self,
-                  object defaultVal, bool writeSparsely)
-  {
-    return self.CreateAxisAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static std::string _Repr(const UsdPhysicsSphericalJoint &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.SphericalJoint(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateConeAngle0LimitAttr(UsdPhysicsSphericalJoint &self,
-                             object defaultVal, bool writeSparsely)
-  {
-    return self.CreateConeAngle0LimitAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateConeAngle1LimitAttr(UsdPhysicsSphericalJoint &self,
-                             object defaultVal, bool writeSparsely)
-  {
-    return self.CreateConeAngle1LimitAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsSphericalJoint &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.SphericalJoint(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsSphericalJoint()
 {
   typedef UsdPhysicsSphericalJoint This;
 
-  class_<This, bases<UsdPhysicsJoint>>
-      cls("SphericalJoint");
+  class_<This, bases<UsdPhysicsJoint>> cls("SphericalJoint");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -109,32 +101,27 @@ void wrapUsdPhysicsSphericalJoint()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetAxisAttr",
-           &This::GetAxisAttr)
+      .def("GetAxisAttr", &This::GetAxisAttr)
       .def("CreateAxisAttr",
            &_CreateAxisAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetConeAngle0LimitAttr",
-           &This::GetConeAngle0LimitAttr)
+      .def("GetConeAngle0LimitAttr", &This::GetConeAngle0LimitAttr)
       .def("CreateConeAngle0LimitAttr",
            &_CreateConeAngle0LimitAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetConeAngle1LimitAttr",
-           &This::GetConeAngle1LimitAttr)
+      .def("GetConeAngle1LimitAttr", &This::GetConeAngle1LimitAttr)
       .def("CreateConeAngle1LimitAttr",
            &_CreateConeAngle1LimitAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -160,11 +147,8 @@ void wrapUsdPhysicsSphericalJoint()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

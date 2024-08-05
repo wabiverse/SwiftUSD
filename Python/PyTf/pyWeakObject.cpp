@@ -23,8 +23,8 @@
 //
 #include <pxr/pxrns.h>
 
-#include "Tf/instantiateSingleton.h"
 #include "PyTf/pyWeakObject.h"
+#include "Tf/instantiateSingleton.h"
 
 #include <boost/python/class.hpp>
 
@@ -39,7 +39,7 @@ struct Tf_PyWeakObjectRegistry {
   Tf_PyWeakObjectPtr Lookup(PyObject *obj) const;
   void Remove(PyObject *obj);
 
-private:
+ private:
   Tf_PyWeakObjectRegistry() = default;
   friend class TfSingleton<This>;
 
@@ -48,21 +48,26 @@ private:
 
 TF_INSTANTIATE_SINGLETON(Tf_PyWeakObjectRegistry);
 
-Tf_PyWeakObjectRegistry &Tf_PyWeakObjectRegistry::GetInstance() {
+Tf_PyWeakObjectRegistry &Tf_PyWeakObjectRegistry::GetInstance()
+{
   return TfSingleton<This>::GetInstance();
 }
 
-void Tf_PyWeakObjectRegistry::Insert(PyObject *obj,
-                                     Tf_PyWeakObjectPtr const &weakObj) {
+void Tf_PyWeakObjectRegistry::Insert(PyObject *obj, Tf_PyWeakObjectPtr const &weakObj)
+{
   _weakObjects[obj] = weakObj;
 }
 
-Tf_PyWeakObjectPtr Tf_PyWeakObjectRegistry::Lookup(PyObject *obj) const {
+Tf_PyWeakObjectPtr Tf_PyWeakObjectRegistry::Lookup(PyObject *obj) const
+{
   auto iter = _weakObjects.find(obj);
   return iter == _weakObjects.end() ? Tf_PyWeakObjectPtr() : iter->second;
 }
 
-void Tf_PyWeakObjectRegistry::Remove(PyObject *obj) { _weakObjects.erase(obj); }
+void Tf_PyWeakObjectRegistry::Remove(PyObject *obj)
+{
+  _weakObjects.erase(obj);
+}
 
 // A deleter instance is passed to PyWeakref_NewRef as the callback object
 // so that when the python object we have the weak ref to dies, we can
@@ -72,11 +77,12 @@ struct Tf_PyWeakObjectDeleter {
   explicit Tf_PyWeakObjectDeleter(Tf_PyWeakObjectPtr const &self);
   void Deleted(PyObject * /* weakRef */);
 
-private:
+ private:
   Tf_PyWeakObjectPtr _self;
 };
 
-int Tf_PyWeakObjectDeleter::WrapIfNecessary() {
+int Tf_PyWeakObjectDeleter::WrapIfNecessary()
+{
   if (TfPyIsNone(TfPyGetClassObject<Tf_PyWeakObjectDeleter>())) {
     boost::python::class_<Tf_PyWeakObjectDeleter>("Tf_PyWeakObject__Deleter",
                                                   boost::python::no_init)
@@ -85,21 +91,21 @@ int Tf_PyWeakObjectDeleter::WrapIfNecessary() {
   return 1;
 }
 
-Tf_PyWeakObjectDeleter::Tf_PyWeakObjectDeleter(Tf_PyWeakObjectPtr const &self)
-    : _self(self) {
+Tf_PyWeakObjectDeleter::Tf_PyWeakObjectDeleter(Tf_PyWeakObjectPtr const &self) : _self(self)
+{
   static int ensureWrapped = WrapIfNecessary();
   (void)ensureWrapped;
 }
 
-void Tf_PyWeakObjectDeleter::Deleted(PyObject * /* weakRef */) {
+void Tf_PyWeakObjectDeleter::Deleted(PyObject * /* weakRef */)
+{
   _self->Delete();
 }
 
-Tf_PyWeakObjectPtr
-Tf_PyWeakObject::GetOrCreate(boost::python::object const &obj) {
+Tf_PyWeakObjectPtr Tf_PyWeakObject::GetOrCreate(boost::python::object const &obj)
+{
   // If it's in the registry, return it.
-  if (Tf_PyWeakObjectPtr p =
-          Tf_PyWeakObjectRegistry::GetInstance().Lookup(obj.ptr()))
+  if (Tf_PyWeakObjectPtr p = Tf_PyWeakObjectRegistry::GetInstance().Lookup(obj.ptr()))
     return p;
   // Otherwise, make sure we can create a python weak reference to the
   // object.
@@ -112,21 +118,22 @@ Tf_PyWeakObject::GetOrCreate(boost::python::object const &obj) {
   return Tf_PyWeakObjectPtr();
 }
 
-boost::python::object Tf_PyWeakObject::GetObject() const {
-  return boost::python::object(boost::python::handle<>(
-      boost::python::borrowed(PyWeakref_GetObject(_weakRef.get()))));
+boost::python::object Tf_PyWeakObject::GetObject() const
+{
+  return boost::python::object(
+      boost::python::handle<>(boost::python::borrowed(PyWeakref_GetObject(_weakRef.get()))));
 }
 
-void Tf_PyWeakObject::Delete() {
+void Tf_PyWeakObject::Delete()
+{
   Tf_PyWeakObjectRegistry::GetInstance().Remove(GetObject().ptr());
   delete this;
 }
 
 Tf_PyWeakObject::Tf_PyWeakObject(boost::python::object const &obj)
     : _weakRef(PyWeakref_NewRef(
-          obj.ptr(),
-          boost::python::object(Tf_PyWeakObjectDeleter(TfCreateWeakPtr(this)))
-              .ptr())) {
+          obj.ptr(), boost::python::object(Tf_PyWeakObjectDeleter(TfCreateWeakPtr(this))).ptr()))
+{
   Tf_PyWeakObjectPtr self(this);
 
   // Set our python identity, but release it immediately, since we are a weak

@@ -40,44 +40,57 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Is a key is known at compile time, it is preferable to use
 /// a static constexpr TraceStaticKeyData instance instead.
 class TraceDynamicKey {
-public:
+ public:
   /// Constructor for TfToken.
-  TraceDynamicKey(TfToken name) : _key(std::move(name)) {
+  TraceDynamicKey(TfToken name) : _key(std::move(name))
+  {
     _data._name = _key.GetText();
   }
 
   /// Constructor for string.
-  TraceDynamicKey(const std::string &name) : _key(name) {
+  TraceDynamicKey(const std::string &name) : _key(name)
+  {
     _data._name = _key.GetText();
   }
 
   /// Constructor for C string.
-  TraceDynamicKey(const char *name) : _key(name) {
+  TraceDynamicKey(const char *name) : _key(name)
+  {
     _data._name = _key.GetText();
   }
 
   /// Equality operator.
-  bool operator==(const TraceDynamicKey &other) const {
+  bool operator==(const TraceDynamicKey &other) const
+  {
     return _key == other._key;
   }
 
   /// Return a cached hash code for this key.
-  size_t Hash() const { return _key.Hash(); }
+  size_t Hash() const
+  {
+    return _key.Hash();
+  }
 
   /// A Hash functor which uses the cached hash which may be used to store
   /// keys in a TfHashMap.
   struct HashFunctor {
-    size_t operator()(const TraceDynamicKey &key) const { return key.Hash(); }
+    size_t operator()(const TraceDynamicKey &key) const
+    {
+      return key.Hash();
+    }
   };
 
   /// Returns a reference to TraceStaticKeyData.
-  const TraceStaticKeyData &GetData() const { return _data; }
+  const TraceStaticKeyData &GetData() const
+  {
+    return _data;
+  }
 
-private:
+ private:
   TraceStaticKeyData _data;
   TfToken _key;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_DYNAMIC_KEY_H
+#endif  // PXR_BASE_TRACE_DYNAMIC_KEY_H

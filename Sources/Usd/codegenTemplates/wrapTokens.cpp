@@ -22,13 +22,21 @@
 // language governing permissions and limitations under the Apache License.
 //
 // GENERATED FILE.  DO NOT EDIT.
-#include <boost/python/class.hpp>
 #include "{{ libraryPath }}/tokens.h"
+#include <boost/python/class.hpp>
 
-{% if useExportAPI %}
-{{ namespaceUsing }}
+{
+  % if useExportAPI %
+}
+{
+  {
+    namespaceUsing
+  }
+}
 
-{% endif %}
+{
+  % endif %
+}
 namespace {
 
 // Helper to return a static token as a string.  We wrap tokens as Python
@@ -36,37 +44,52 @@ namespace {
 // bypasses to-Python conversion, leading to the error that there's no
 // Python type for the C++ TfToken type.  So we wrap this functor instead.
 class _WrapStaticToken {
-public:
-    _WrapStaticToken(const TfToken* token) : _token(token) { }
+ public:
+  _WrapStaticToken(const TfToken *token) : _token(token) {}
 
-    std::string operator()() const
-    {
-        return _token->GetString();
-    }
+  std::string operator()() const
+  {
+    return _token->GetString();
+  }
 
-private:
-    const TfToken* _token;
+ private:
+  const TfToken *_token;
 };
 
-template <typename T>
-void
-_AddToken(T& cls, const char* name, const TfToken& token)
+template<typename T> void _AddToken(T &cls, const char *name, const TfToken &token)
 {
-    cls.add_static_property(name,
-                            boost::python::make_function(
-                                _WrapStaticToken(&token),
-                                boost::python::return_value_policy<
-                                    boost::python::return_by_value>(),
-                                boost::mpl::vector1<std::string>()));
+  cls.add_static_property(name,
+                          boost::python::make_function(
+                              _WrapStaticToken(&token),
+                              boost::python::return_value_policy<boost::python::return_by_value>(),
+                              boost::mpl::vector1<std::string>()));
 }
 
-} // anonymous
+}  // namespace
 
-void wrap{{ tokensPrefix }}Tokens()
+void wrap
 {
-    boost::python::class_<{{ tokensPrefix }}TokensType, boost::noncopyable>
-        cls("Tokens", boost::python::no_init);
-{% for token in tokens %}
-    _AddToken(cls, "{{ token.id }}", {{ tokensPrefix }}Tokens->{{ token.id }});
-{% endfor %}
+  {
+    tokensPrefix
+  }
+}
+Tokens()
+{
+  boost::python::class_ <
+  {
+    {
+      tokensPrefix
+    }
+  }
+  TokensType, boost::noncopyable > cls("Tokens", boost::python::no_init);
+  {% for token in tokens %
+  }
+  _AddToken(cls, "{{ token.id }}", {
+    {
+      tokensPrefix
+    }
+  } Tokens->{{token.id}});
+  {
+    % endfor %
+  }
 }

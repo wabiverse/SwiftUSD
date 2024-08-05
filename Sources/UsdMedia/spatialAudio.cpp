@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdMediaSpatialAudio,
-                 TfType::Bases<UsdGeomXformable>>();
+  TfType::Define<UsdMediaSpatialAudio, TfType::Bases<UsdGeomXformable>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdMediaSpatialAudio::~UsdMediaSpatialAudio()
-{
-}
+UsdMediaSpatialAudio::~UsdMediaSpatialAudio() {}
 
 /* static */
-UsdMediaSpatialAudio
-UsdMediaSpatialAudio::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdMediaSpatialAudio UsdMediaSpatialAudio::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdMediaSpatialAudio();
   }
@@ -62,18 +57,14 @@ UsdMediaSpatialAudio::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdMediaSpatialAudio
-UsdMediaSpatialAudio::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdMediaSpatialAudio UsdMediaSpatialAudio::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("SpatialAudio");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdMediaSpatialAudio();
   }
-  return UsdMediaSpatialAudio(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdMediaSpatialAudio(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdMediaSpatialAudio::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdMediaSpatialAudio::_GetStaticTfType()
+const TfType &UsdMediaSpatialAudio::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdMediaSpatialAudio>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdMediaSpatialAudio::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdMediaSpatialAudio::_GetTfType() const
+const TfType &UsdMediaSpatialAudio::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetFilePathAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetFilePathAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->filePath);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateFilePathAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateFilePathAttr(VtValue const &defaultValue,
+                                                      bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->filePath,
                                     SdfValueTypeNames->Asset,
@@ -121,14 +109,13 @@ UsdMediaSpatialAudio::CreateFilePathAttr(VtValue const &defaultValue, bool write
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetAuralModeAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetAuralModeAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->auralMode);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateAuralModeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateAuralModeAttr(VtValue const &defaultValue,
+                                                       bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->auralMode,
                                     SdfValueTypeNames->Token,
@@ -138,14 +125,13 @@ UsdMediaSpatialAudio::CreateAuralModeAttr(VtValue const &defaultValue, bool writ
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetPlaybackModeAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetPlaybackModeAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->playbackMode);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreatePlaybackModeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreatePlaybackModeAttr(VtValue const &defaultValue,
+                                                          bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->playbackMode,
                                     SdfValueTypeNames->Token,
@@ -155,14 +141,13 @@ UsdMediaSpatialAudio::CreatePlaybackModeAttr(VtValue const &defaultValue, bool w
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetStartTimeAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetStartTimeAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->startTime);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateStartTimeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateStartTimeAttr(VtValue const &defaultValue,
+                                                       bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->startTime,
                                     SdfValueTypeNames->TimeCode,
@@ -172,14 +157,13 @@ UsdMediaSpatialAudio::CreateStartTimeAttr(VtValue const &defaultValue, bool writ
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetEndTimeAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetEndTimeAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->endTime);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateEndTimeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateEndTimeAttr(VtValue const &defaultValue,
+                                                     bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->endTime,
                                     SdfValueTypeNames->TimeCode,
@@ -189,14 +173,13 @@ UsdMediaSpatialAudio::CreateEndTimeAttr(VtValue const &defaultValue, bool writeS
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetMediaOffsetAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetMediaOffsetAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->mediaOffset);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateMediaOffsetAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateMediaOffsetAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->mediaOffset,
                                     SdfValueTypeNames->Double,
@@ -206,14 +189,13 @@ UsdMediaSpatialAudio::CreateMediaOffsetAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::GetGainAttr() const
+UsdAttribute UsdMediaSpatialAudio::GetGainAttr() const
 {
   return GetPrim().GetAttribute(UsdMediaTokens->gain);
 }
 
-UsdAttribute
-UsdMediaSpatialAudio::CreateGainAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdMediaSpatialAudio::CreateGainAttr(VtValue const &defaultValue,
+                                                  bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdMediaTokens->gain,
                                     SdfValueTypeNames->Double,
@@ -223,22 +205,20 @@ UsdMediaSpatialAudio::CreateGainAttr(VtValue const &defaultValue, bool writeSpar
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdMediaSpatialAudio::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdMediaSpatialAudio::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdMediaTokens->filePath,
@@ -249,10 +229,8 @@ UsdMediaSpatialAudio::GetSchemaAttributeNames(bool includeInherited)
       UsdMediaTokens->mediaOffset,
       UsdMediaTokens->gain,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdGeomXformable::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdGeomXformable::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

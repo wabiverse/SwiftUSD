@@ -66,8 +66,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// }
 /// \endcode
 ///
-TF_DEFINE_STACKED(SdfCleanupEnabler, false, SDF_API) {
-public:
+TF_DEFINE_STACKED(SdfCleanupEnabler, false, SDF_API)
+{
+ public:
   SDF_API SdfCleanupEnabler();
 
   SDF_API ~SdfCleanupEnabler();
@@ -78,4 +79,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // #ifndef PXR_USD_SDF_CLEANUP_ENABLER_H
+#endif  // #ifndef PXR_USD_SDF_CLEANUP_ENABLER_H

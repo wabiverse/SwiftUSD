@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/limitAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/limitAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,88 +41,74 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateLowAttr(UsdPhysicsLimitAPI &self, object defaultVal, bool writeSparsely)
 {
+  return self.CreateLowAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                            writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateHighAttr(UsdPhysicsLimitAPI &self,
+                                    object defaultVal,
+                                    bool writeSparsely)
+{
+  return self.CreateHighAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                             writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static bool _WrapIsPhysicsLimitAPIPath(const SdfPath &path)
+{
+  TfToken collectionName;
+  return UsdPhysicsLimitAPI::IsPhysicsLimitAPIPath(path, &collectionName);
+}
 
-  static UsdAttribute
-  _CreateLowAttr(UsdPhysicsLimitAPI &self,
-                 object defaultVal, bool writeSparsely)
+static std::string _Repr(const UsdPhysicsLimitAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  std::string instanceName = self.GetName();
+  return TfStringPrintf("UsdPhysics.LimitAPI(%s, '%s')", primRepr.c_str(), instanceName.c_str());
+}
+
+struct UsdPhysicsLimitAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdPhysicsLimitAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    return self.CreateLowAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
   }
+};
 
-  static UsdAttribute
-  _CreateHighAttr(UsdPhysicsLimitAPI &self,
-                  object defaultVal, bool writeSparsely)
-  {
-    return self.CreateHighAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-  }
+static UsdPhysicsLimitAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim, const TfToken &name)
+{
+  std::string whyNot;
+  bool result = UsdPhysicsLimitAPI::CanApply(prim, name, &whyNot);
+  return UsdPhysicsLimitAPI_CanApplyResult(result, whyNot);
+}
 
-  static bool _WrapIsPhysicsLimitAPIPath(const SdfPath &path)
-  {
-    TfToken collectionName;
-    return UsdPhysicsLimitAPI::IsPhysicsLimitAPIPath(
-        path, &collectionName);
-  }
-
-  static std::string
-  _Repr(const UsdPhysicsLimitAPI &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    std::string instanceName = self.GetName();
-    return TfStringPrintf(
-        "UsdPhysics.LimitAPI(%s, '%s')",
-        primRepr.c_str(), instanceName.c_str());
-  }
-
-  struct UsdPhysicsLimitAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdPhysicsLimitAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
-
-  static UsdPhysicsLimitAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim, const TfToken &name)
-  {
-    std::string whyNot;
-    bool result = UsdPhysicsLimitAPI::CanApply(prim, name, &whyNot);
-    return UsdPhysicsLimitAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsLimitAPI()
 {
   typedef UsdPhysicsLimitAPI This;
 
-  UsdPhysicsLimitAPI_CanApplyResult::Wrap<UsdPhysicsLimitAPI_CanApplyResult>(
-      "_CanApplyResult", "whyNot");
+  UsdPhysicsLimitAPI_CanApplyResult::Wrap<UsdPhysicsLimitAPI_CanApplyResult>("_CanApplyResult",
+                                                                             "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("LimitAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("LimitAPI");
 
-  cls
-      .def(init<UsdPrim, TfToken>())
+  cls.def(init<UsdPrim, TfToken>())
       .def(init<UsdSchemaBase const &, TfToken>())
       .def(TfTypePythonClass())
 
       .def("Get",
-           (UsdPhysicsLimitAPI(*)(const UsdStagePtr &stage,
-                                  const SdfPath &path)) &
-               This::Get,
+           (UsdPhysicsLimitAPI(*)(const UsdStagePtr &stage, const SdfPath &path)) & This::Get,
            (arg("stage"), arg("path")))
       .def("Get",
-           (UsdPhysicsLimitAPI(*)(const UsdPrim &prim,
-                                  const TfToken &name)) &
-               This::Get,
+           (UsdPhysicsLimitAPI(*)(const UsdPrim &prim, const TfToken &name)) & This::Get,
            (arg("prim"), arg("name")))
       .staticmethod("Get")
 
@@ -149,25 +135,22 @@ void wrapUsdPhysicsLimitAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetLowAttr",
-           &This::GetLowAttr)
+      .def("GetLowAttr", &This::GetLowAttr)
       .def("CreateLowAttr",
            &_CreateLowAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetHighAttr",
-           &This::GetHighAttr)
+      .def("GetHighAttr", &This::GetHighAttr)
       .def("CreateHighAttr",
            &_CreateHighAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("IsPhysicsLimitAPIPath", _WrapIsPhysicsLimitAPIPath)
       .staticmethod("IsPhysicsLimitAPIPath")
@@ -195,11 +178,8 @@ void wrapUsdPhysicsLimitAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

@@ -26,8 +26,8 @@
 
 #include "Glf/contextCaps.h"
 
-#include "Glf/glContext.h"
 #include "Glf/debugCodes.h"
+#include "Glf/glContext.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/envSetting.h"
@@ -67,13 +67,11 @@ void GlfContextCaps::InitInstance()
 }
 
 /*static*/
-const GlfContextCaps &
-GlfContextCaps::GetInstance()
+const GlfContextCaps &GlfContextCaps::GetInstance()
 {
   GlfContextCaps &caps = TfSingleton<GlfContextCaps>::GetInstance();
 
-  if (caps.glVersion == 0)
-  {
+  if (caps.glVersion == 0) {
     TF_CODING_ERROR("GlfContextCaps has not been initialized");
     // Return the default set
   }
@@ -93,8 +91,7 @@ void GlfContextCaps::_LoadCaps()
   coreProfile = false;
   maxArrayTextureLayers = _DefaultMaxArrayTextureLayers;
 
-  if (!TF_VERIFY(GlfGLContext::GetCurrentGLContext()->IsValid()))
-  {
+  if (!TF_VERIFY(GlfGLContext::GetCurrentGLContext()->IsValid())) {
     return;
   }
 
@@ -107,9 +104,7 @@ void GlfContextCaps::_LoadCaps()
     return;
 
   const char *dot = strchr(glVersionStr, '.');
-  if (TF_VERIFY((dot && dot != glVersionStr),
-                "Can't parse GL_VERSION %s", glVersionStr))
-  {
+  if (TF_VERIFY((dot && dot != glVersionStr), "Can't parse GL_VERSION %s", glVersionStr)) {
     // GL_VERSION = "4.5.0 <vendor> <version>"
     //              "4.1 <vendor-os-ver> <version>"
     //              "4.1 <vendor-os-ver>"
@@ -118,30 +113,22 @@ void GlfContextCaps::_LoadCaps()
     glVersion = major * 100 + minor * 10;
   }
 
-  if (glVersion >= 320)
-  {
+  if (glVersion >= 320) {
     GLint profileMask = 0;
     glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
     coreProfile = (profileMask & GL_CONTEXT_CORE_PROFILE_BIT);
   }
 
-  if (glVersion >= 300)
-  {
+  if (glVersion >= 300) {
     glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxArrayTextureLayers);
   }
 
-  if (TfDebug::IsEnabled(GLF_DEBUG_CONTEXT_CAPS))
-  {
-    std::cout
-        << "GlfContextCaps: \n"
-        << "  GL_VENDOR                          = "
-        << glVendorStr << "\n"
-        << "  GL_RENDERER                        = "
-        << glRendererStr << "\n"
-        << "  GL_VERSION                         = "
-        << glVersionStr << "\n"
-        << "  GL version                         = "
-        << glVersion << "\n";
+  if (TfDebug::IsEnabled(GLF_DEBUG_CONTEXT_CAPS)) {
+    std::cout << "GlfContextCaps: \n"
+              << "  GL_VENDOR                          = " << glVendorStr << "\n"
+              << "  GL_RENDERER                        = " << glRendererStr << "\n"
+              << "  GL_VERSION                         = " << glVersionStr << "\n"
+              << "  GL version                         = " << glVersion << "\n";
   }
 }
 

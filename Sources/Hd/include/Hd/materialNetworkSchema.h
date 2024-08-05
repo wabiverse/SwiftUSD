@@ -33,73 +33,61 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDMATERIALNETWORK_SCHEMA_TOKENS \
-    (nodes) \
-    (terminals) \
+#define HDMATERIALNETWORK_SCHEMA_TOKENS (nodes)(terminals)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens, HD_API,
-    HDMATERIALNETWORK_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialNetworkSchemaTokens, HD_API, HDMATERIALNETWORK_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialNetworkSchema : public HdSchema
-{
-public:
-    HdMaterialNetworkSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMaterialNetworkSchema : public HdSchema {
+ public:
+  HdMaterialNetworkSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdContainerDataSourceHandle GetNodes();
+  HD_API
+  HdContainerDataSourceHandle GetTerminals();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdContainerDataSourceHandle &nodes,
+                                                   const HdContainerDataSourceHandle &terminals);
+
+  /// \class HdMaterialNetworkSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdContainerDataSourceHandle GetNodes();
+    Builder &SetNodes(const HdContainerDataSourceHandle &nodes);
     HD_API
-    HdContainerDataSourceHandle GetTerminals();
+    Builder &SetTerminals(const HdContainerDataSourceHandle &terminals);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdContainerDataSourceHandle &nodes,
-        const HdContainerDataSourceHandle &terminals
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMaterialNetworkSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetNodes(
-            const HdContainerDataSourceHandle &nodes);
-        HD_API
-        Builder &SetTerminals(
-            const HdContainerDataSourceHandle &terminals);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdContainerDataSourceHandle _nodes;
-        HdContainerDataSourceHandle _terminals;
-    };
-
+   private:
+    HdContainerDataSourceHandle _nodes;
+    HdContainerDataSourceHandle _terminals;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -40,4 +40,4 @@ typedef std::vector<JsValue> JsArray;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_JS_TYPES_H
+#endif  // PXR_BASE_JS_TYPES_H

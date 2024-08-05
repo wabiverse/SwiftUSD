@@ -29,8 +29,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void Sdf_VisitPathTableInParallel(void **entryStart, size_t numEntries,
-                                  TfFunctionRef<void(void *&)> const visitFn) {
+void Sdf_VisitPathTableInParallel(void **entryStart,
+                                  size_t numEntries,
+                                  TfFunctionRef<void(void *&)> const visitFn)
+{
   // We must release the GIL here if we have it; otherwise, if visitFn
   // attempted to take the GIL, the workers would deadlock.
   TF_PY_ALLOW_THREADS_IN_SCOPE();

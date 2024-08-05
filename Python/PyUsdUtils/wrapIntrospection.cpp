@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include <boost/python/def.hpp>
+#include <pxr/pxrns.h>
 
 #include "UsdUtils/introspection.h"
 
@@ -33,31 +33,28 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+VtDictionary _WrapUsdUtilsComputeUsdStageStats_1(const std::string &rootLayerPath)
 {
+  VtDictionary stats;
+  UsdUtilsComputeUsdStageStats(rootLayerPath, &stats);
+  return stats;
+}
 
-  VtDictionary
-  _WrapUsdUtilsComputeUsdStageStats_1(const std::string &rootLayerPath)
-  {
-    VtDictionary stats;
-    UsdUtilsComputeUsdStageStats(rootLayerPath, &stats);
-    return stats;
-  }
+VtDictionary _WrapUsdUtilsComputeUsdStageStats_2(const UsdStageWeakPtr &stage)
+{
+  VtDictionary stats;
+  UsdUtilsComputeUsdStageStats(stage, &stats);
+  return stats;
+}
 
-  VtDictionary
-  _WrapUsdUtilsComputeUsdStageStats_2(const UsdStageWeakPtr &stage)
-  {
-    VtDictionary stats;
-    UsdUtilsComputeUsdStageStats(stage, &stats);
-    return stats;
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapIntrospection()
 {
-  TF_PY_WRAP_PUBLIC_TOKENS("UsdStageStatsKeys", UsdUtilsUsdStageStatsKeys,
-                           USDUTILS_USDSTAGE_STATS);
+  TF_PY_WRAP_PUBLIC_TOKENS(
+      "UsdStageStatsKeys", UsdUtilsUsdStageStatsKeys, USDUTILS_USDSTAGE_STATS);
 
   def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_1);
   def("ComputeUsdStageStats", _WrapUsdUtilsComputeUsdStageStats_2);

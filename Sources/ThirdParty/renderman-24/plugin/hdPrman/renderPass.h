@@ -24,8 +24,8 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/renderPass.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
@@ -35,22 +35,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdPrman_RenderParam;
 
-class HdPrman_RenderPass final : public HdRenderPass
-{
-public:
-  HdPrman_RenderPass(
-      HdRenderIndex *index,
-      HdRprimCollection const &collection,
-      std::shared_ptr<HdPrman_RenderParam> renderParam);
+class HdPrman_RenderPass final : public HdRenderPass {
+ public:
+  HdPrman_RenderPass(HdRenderIndex *index,
+                     HdRprimCollection const &collection,
+                     std::shared_ptr<HdPrman_RenderParam> renderParam);
   ~HdPrman_RenderPass() override;
 
   bool IsConverged() const override;
 
-protected:
+ protected:
   void _Execute(HdRenderPassStateSharedPtr const &renderPassState,
                 TfTokenVector const &renderTags) override;
 
-private:
+ private:
   void _RenderInMainThread();
   void _RestartRenderIfNecessary(HdRenderDelegate *renderDelegate);
   std::shared_ptr<HdPrman_RenderParam> _renderParam;
@@ -65,4 +63,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_RENDER_PASS_H

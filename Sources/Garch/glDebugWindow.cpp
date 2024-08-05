@@ -30,11 +30,11 @@
 // not on Linux, so we have left this optional define, `WITH_GLX` which will
 // override the platform detection and force the inclusion of GLX code.
 #if defined(ARCH_OS_LINUX) || defined(WITH_GLX)
-#include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
+#  include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
 #elif defined(ARCH_OS_DARWIN)
-#include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
+#  include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
 #elif defined(ARCH_OS_WINDOWS)
-#include "Garch/GarchWindows/glPlatformDebugWindowWindows.h"
+#  include "Garch/GarchWindows/glPlatformDebugWindowWindows.h"
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -45,16 +45,25 @@ GarchGLDebugWindow::GarchGLDebugWindow(const char *title, int width, int height)
   _private = new Garch_GLPlatformDebugWindow(this);
 }
 
-GarchGLDebugWindow::~GarchGLDebugWindow() { delete _private; }
+GarchGLDebugWindow::~GarchGLDebugWindow()
+{
+  delete _private;
+}
 
 void GarchGLDebugWindow::Init()
 {
   _private->Init(_title.c_str(), _width, _height);
 }
 
-void GarchGLDebugWindow::Run() { _private->Run(); }
+void GarchGLDebugWindow::Run()
+{
+  _private->Run();
+}
 
-void GarchGLDebugWindow::ExitApp() { _private->ExitApp(); }
+void GarchGLDebugWindow::ExitApp()
+{
+  _private->ExitApp();
+}
 
 /* virtual */
 void GarchGLDebugWindow::OnInitializeGL() {}
@@ -82,9 +91,7 @@ void GarchGLDebugWindow::OnKeyRelease(int key) {}
 void GarchGLDebugWindow::OnMousePress(int button, int x, int y, int modKeys) {}
 
 /* virtual */
-void GarchGLDebugWindow::OnMouseRelease(int button, int x, int y, int modKeys)
-{
-}
+void GarchGLDebugWindow::OnMouseRelease(int button, int x, int y, int modKeys) {}
 
 /* virtual */
 void GarchGLDebugWindow::OnMouseMove(int x, int y, int modKeys) {}

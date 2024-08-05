@@ -36,7 +36,8 @@ struct UsdCrateInfo::_Impl {
 };
 
 /*static*/
-UsdCrateInfo UsdCrateInfo::Open(std::string const &fileName) {
+UsdCrateInfo UsdCrateInfo::Open(std::string const &fileName)
+{
   UsdCrateInfo result;
   if (auto newCrate = CrateFile::Open(fileName)) {
     result._impl.reset(new _Impl);
@@ -45,11 +46,13 @@ UsdCrateInfo UsdCrateInfo::Open(std::string const &fileName) {
   return result;
 }
 
-UsdCrateInfo::SummaryStats UsdCrateInfo::GetSummaryStats() const {
+UsdCrateInfo::SummaryStats UsdCrateInfo::GetSummaryStats() const
+{
   SummaryStats stats;
   if (!*this) {
     TF_CODING_ERROR("Invalid UsdCrateInfo object");
-  } else {
+  }
+  else {
     stats.numSpecs = _impl->crateFile->GetSpecs().size();
     stats.numUniquePaths = _impl->crateFile->GetPaths().size();
     stats.numUniqueTokens = _impl->crateFile->GetTokens().size();
@@ -60,11 +63,13 @@ UsdCrateInfo::SummaryStats UsdCrateInfo::GetSummaryStats() const {
   return stats;
 }
 
-std::vector<UsdCrateInfo::Section> UsdCrateInfo::GetSections() const {
+std::vector<UsdCrateInfo::Section> UsdCrateInfo::GetSections() const
+{
   std::vector<Section> result;
   if (!*this) {
     TF_CODING_ERROR("Invalid UsdCrateInfo object");
-  } else {
+  }
+  else {
     auto secs = _impl->crateFile->GetSectionsNameStartSize();
     for (auto const &s : secs) {
       result.emplace_back(std::get<0>(s), std::get<1>(s), std::get<2>(s));
@@ -73,7 +78,8 @@ std::vector<UsdCrateInfo::Section> UsdCrateInfo::GetSections() const {
   return result;
 }
 
-TfToken UsdCrateInfo::GetFileVersion() const {
+TfToken UsdCrateInfo::GetFileVersion() const
+{
   if (!*this) {
     TF_CODING_ERROR("Invalid UsdCrateInfo object");
     return TfToken();
@@ -81,7 +87,8 @@ TfToken UsdCrateInfo::GetFileVersion() const {
   return _impl->crateFile->GetFileVersionToken();
 }
 
-TfToken UsdCrateInfo::GetSoftwareVersion() const {
+TfToken UsdCrateInfo::GetSoftwareVersion() const
+{
   return CrateFile::GetSoftwareVersionToken();
 }
 

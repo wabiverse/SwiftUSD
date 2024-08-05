@@ -109,9 +109,8 @@ using HgiUniquePtr = std::unique_ptr<class Hgi>;
 ///     for i to num_threads
 ///         hgi->SubmitCmds( cmds[i] )
 ///
-class Hgi
-{
-public:
+class Hgi {
+ public:
   HGI_API
   Hgi();
 
@@ -127,9 +126,7 @@ public:
   /// the main thread so we can continue to support the OpenGL platform.
   /// See notes above.
   HGI_API
-  void SubmitCmds(
-      HgiCmds *cmds,
-      HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
+  void SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
 
   /// *** DEPRECATED *** Please use: CreatePlatformDefaultHgi
   HGI_API
@@ -161,8 +158,7 @@ public:
   /// created on the main thread, recorded into (exclusively) by one secondary
   /// thread and be submitted on the main thread. See notes above.
   HGI_API
-  virtual HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(
-      HgiGraphicsCmdsDesc const &desc) = 0;
+  virtual HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc) = 0;
 
   /// Returns a BlitCmds object (for temporary use) that is ready to execute
   /// resource copy commands. BlitCmds is a lightweight object that
@@ -180,8 +176,7 @@ public:
   /// created on the main thread, recorded into (exclusively) by one secondary
   /// thread and be submitted on the main thread. See notes above.
   HGI_API
-  virtual HgiComputeCmdsUniquePtr CreateComputeCmds(
-      HgiComputeCmdsDesc const &desc) = 0;
+  virtual HgiComputeCmdsUniquePtr CreateComputeCmds(HgiComputeCmdsDesc const &desc) = 0;
 
   /// Create a texture in rendering backend.
   /// Thread safety: Creation must happen on main thread. See notes above.
@@ -199,8 +194,7 @@ public:
   /// is not destroyed while the texture view is in use.
   /// Thread safety: Creation must happen on main thread. See notes above.
   HGI_API
-  virtual HgiTextureViewHandle CreateTextureView(
-      HgiTextureViewDesc const &desc) = 0;
+  virtual HgiTextureViewHandle CreateTextureView(HgiTextureViewDesc const &desc) = 0;
 
   /// Destroy a texture view in rendering backend.
   /// This will destroy the view's texture, but not the sourceTexture that
@@ -232,28 +226,24 @@ public:
   /// Create a new shader function.
   /// Thread safety: Creation must happen on main thread. See notes above.
   HGI_API
-  virtual HgiShaderFunctionHandle CreateShaderFunction(
-      HgiShaderFunctionDesc const &desc) = 0;
+  virtual HgiShaderFunctionHandle CreateShaderFunction(HgiShaderFunctionDesc const &desc) = 0;
 
   /// Destroy a shader function.
   /// Thread safety: Destruction must happen on main thread. See notes above.
   HGI_API
-  virtual void DestroyShaderFunction(
-      HgiShaderFunctionHandle *shaderFunctionHandle) = 0;
+  virtual void DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHandle) = 0;
 
   /// Create a new shader program.
   /// Thread safety: Creation must happen on main thread. See notes above.
   HGI_API
-  virtual HgiShaderProgramHandle CreateShaderProgram(
-      HgiShaderProgramDesc const &desc) = 0;
+  virtual HgiShaderProgramHandle CreateShaderProgram(HgiShaderProgramDesc const &desc) = 0;
 
   /// Destroy a shader program.
   /// Note that this does NOT automatically destroy the shader functions in
   /// the program since shader functions may be used by more than one program.
   /// Thread safety: Destruction must happen on main thread. See notes above.
   HGI_API
-  virtual void DestroyShaderProgram(
-      HgiShaderProgramHandle *shaderProgramHandle) = 0;
+  virtual void DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle) = 0;
 
   /// Create a new resource binding object.
   /// Thread safety: Creation must happen on main thread. See notes above.
@@ -264,8 +254,7 @@ public:
   /// Destroy a resource binding object.
   /// Thread safety: Destruction must happen on main thread. See notes above.
   HGI_API
-  virtual void DestroyResourceBindings(
-      HgiResourceBindingsHandle *resHandle) = 0;
+  virtual void DestroyResourceBindings(HgiResourceBindingsHandle *resHandle) = 0;
 
   /// Create a new graphics pipeline state object.
   /// Thread safety: Creation must happen on main thread. See notes above.
@@ -276,8 +265,7 @@ public:
   /// Destroy a graphics pipeline state object.
   /// Thread safety: Destruction must happen on main thread. See notes above.
   HGI_API
-  virtual void DestroyGraphicsPipeline(
-      HgiGraphicsPipelineHandle *pipeHandle) = 0;
+  virtual void DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle) = 0;
 
   /// Create a new compute pipeline state object.
   /// Thread safety: Creation must happen on main thread. See notes above.
@@ -321,7 +309,7 @@ public:
   HGI_API
   virtual void EndFrame() = 0;
 
-protected:
+ protected:
   // Returns a unique id for handle creation.
   // Thread safety: Thread-safe atomic increment.
   HGI_API
@@ -331,10 +319,9 @@ protected:
   // Derived classes can override this function if they need customize the
   // command submission. The default implementation calls cmds->_Submit().
   HGI_API
-  virtual bool _SubmitCmds(
-      HgiCmds *cmds, HgiSubmitWaitType wait);
+  virtual bool _SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait);
 
-private:
+ private:
   Hgi &operator=(const Hgi &) = delete;
   Hgi(const Hgi &) = delete;
 
@@ -344,16 +331,13 @@ private:
 ///
 /// Hgi factory for plugin system
 ///
-class HgiFactoryBase : public TfType::FactoryBase
-{
-public:
+class HgiFactoryBase : public TfType::FactoryBase {
+ public:
   virtual Hgi *New() const = 0;
 };
 
-template <class T>
-class HgiFactory : public HgiFactoryBase
-{
-public:
+template<class T> class HgiFactory : public HgiFactoryBase {
+ public:
   Hgi *New() const
   {
     return new T;
@@ -362,4 +346,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HGI_HGIIMPL_H
+#endif  // PXR_IMAGING_HGI_HGIIMPL_H

@@ -88,13 +88,15 @@ enum PcpRangeType {
 
 /// Returns true if \p arcType represents an inherit arc, false
 /// otherwise.
-inline bool PcpIsInheritArc(PcpArcType arcType) {
+inline bool PcpIsInheritArc(PcpArcType arcType)
+{
   return (arcType == PcpArcTypeInherit);
 }
 
 /// Returns true if \p arcType represents a specialize arc, false
 /// otherwise.
-inline bool PcpIsSpecializeArc(PcpArcType arcType) {
+inline bool PcpIsSpecializeArc(PcpArcType arcType)
+{
   return (arcType == PcpArcTypeSpecialize);
 }
 
@@ -104,7 +106,8 @@ inline bool PcpIsSpecializeArc(PcpArcType arcType) {
 /// The key characteristic of these arcs is that they imply
 /// additional sources of opinions outside of the site where
 /// the arc is introduced.
-inline bool PcpIsClassBasedArc(PcpArcType arcType) {
+inline bool PcpIsClassBasedArc(PcpArcType arcType)
+{
   return PcpIsInheritArc(arcType) || PcpIsSpecializeArc(arcType);
 }
 
@@ -126,28 +129,40 @@ typedef std::vector<PcpSiteTrackerSegment> PcpSiteTracker;
 
 // Internal type for Sd sites.
 struct Pcp_SdSiteRef {
-  Pcp_SdSiteRef(const SdfLayerRefPtr &layer_, const SdfPath &path_)
-      : layer(layer_), path(path_) {
+  Pcp_SdSiteRef(const SdfLayerRefPtr &layer_, const SdfPath &path_) : layer(layer_), path(path_)
+  {
     // Do nothing
   }
 
-  bool operator==(const Pcp_SdSiteRef &other) const {
+  bool operator==(const Pcp_SdSiteRef &other) const
+  {
     return layer == other.layer && path == other.path;
   }
 
-  bool operator!=(const Pcp_SdSiteRef &other) const {
+  bool operator!=(const Pcp_SdSiteRef &other) const
+  {
     return !(*this == other);
   }
 
-  bool operator<(const Pcp_SdSiteRef &other) const {
+  bool operator<(const Pcp_SdSiteRef &other) const
+  {
     return layer < other.layer || (!(other.layer < layer) && path < other.path);
   }
 
-  bool operator<=(const Pcp_SdSiteRef &other) const { return !(other < *this); }
+  bool operator<=(const Pcp_SdSiteRef &other) const
+  {
+    return !(other < *this);
+  }
 
-  bool operator>(const Pcp_SdSiteRef &other) const { return other < *this; }
+  bool operator>(const Pcp_SdSiteRef &other) const
+  {
+    return other < *this;
+  }
 
-  bool operator>=(const Pcp_SdSiteRef &other) const { return !(*this < other); }
+  bool operator>=(const Pcp_SdSiteRef &other) const
+  {
+    return !(*this < other);
+  }
 
   // These are held by reference for performance,
   // to avoid extra ref-counting operations.
@@ -159,14 +174,15 @@ struct Pcp_SdSiteRef {
 struct Pcp_CompressedSdSite {
   Pcp_CompressedSdSite(size_t nodeIndex_, size_t layerIndex_)
       : nodeIndex(static_cast<uint16_t>(nodeIndex_)),
-        layerIndex(static_cast<uint16_t>(layerIndex_)) {
+        layerIndex(static_cast<uint16_t>(layerIndex_))
+  {
     TF_VERIFY(nodeIndex_ < (size_t(1) << 16));
     TF_VERIFY(layerIndex_ < (size_t(1) << 16));
   }
 
   // These are small to minimize the size of vectors of these.
-  uint16_t nodeIndex;  // The index of the node in its graph.
-  uint16_t layerIndex; // The index of the layer in the node's layer stack.
+  uint16_t nodeIndex;   // The index of the node in its graph.
+  uint16_t layerIndex;  // The index of the layer in the node's layer stack.
 };
 typedef std::vector<Pcp_CompressedSdSite> Pcp_CompressedSdSiteVector;
 
@@ -202,4 +218,4 @@ constexpr size_t PCP_INVALID_INDEX = std::numeric_limits<size_t>::max();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_TYPES_H
+#endif  // PXR_USD_PCP_TYPES_H

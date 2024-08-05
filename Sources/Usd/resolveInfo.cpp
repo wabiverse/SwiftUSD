@@ -28,7 +28,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(UsdResolveInfoSourceNone, "No value");
   TF_ADD_ENUM_NAME(UsdResolveInfoSourceFallback, "Built-in fallback value");
   TF_ADD_ENUM_NAME(UsdResolveInfoSourceDefault, "Attribute default value");

@@ -26,7 +26,6 @@
 
 /// \file glf/texture.h
 
-#include <pxr/pxrns.h>
 #include "Glf/api.h"
 #include "Hio/image.h"
 #include "Tf/declarePtrs.h"
@@ -34,6 +33,7 @@
 #include "Tf/staticTokens.h"
 #include "Tf/weakPtr.h"
 #include "Vt/dictionary.h"
+#include <pxr/pxrns.h>
 
 #include "Garch/glApi.h"
 
@@ -43,8 +43,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define GLF_TEXTURE_TOKENS \
-  (texels)(layout)
+#define GLF_TEXTURE_TOKENS (texels)(layout)
 
 TF_DECLARE_PUBLIC_TOKENS(GlfTextureTokens, GLF_API, GLF_TEXTURE_TOKENS);
 
@@ -57,9 +56,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(GlfTexture);
 /// A texture is typically defined by reading texture image data from an image
 /// file but a texture might also represent an attachment of a draw target.
 ///
-class GlfTexture : public TfRefBase, public TfWeakBase
-{
-public:
+class GlfTexture : public TfRefBase, public TfWeakBase {
+ public:
   /// \class Binding
   ///
   /// A texture has one or more bindings which describe how the different
@@ -68,11 +66,11 @@ public:
   /// "texels", but some textures might need multiple bindings, e.g. a
   /// ptexTexture will have an additional binding for the role "layout".
   ///
-  struct Binding
-  {
-    Binding(TfToken name, TfToken role, GLenum target,
-            GLuint textureId, GLuint samplerId)
-        : name(name), role(role), target(target), textureId(textureId), samplerId(samplerId) {}
+  struct Binding {
+    Binding(TfToken name, TfToken role, GLenum target, GLuint textureId, GLuint samplerId)
+        : name(name), role(role), target(target), textureId(textureId), samplerId(samplerId)
+    {
+    }
 
     TfToken name;
     TfToken role;
@@ -92,8 +90,7 @@ public:
   /// Returns the bindings to use this texture for the shader resource
   /// named \a identifier. If \a samplerId is specified, the bindings
   /// returned will use this samplerId for resources which can be sampled.
-  virtual BindingVector GetBindings(TfToken const &identifier,
-                                    GLuint samplerId = 0) = 0;
+  virtual BindingVector GetBindings(TfToken const &identifier, GLuint samplerId = 0) = 0;
 
   /// Returns the OpenGl texture name for the texture.
   virtual GLuint GetGlTextureName() = 0;
@@ -137,7 +134,7 @@ public:
   GLF_API
   bool IsOriginLowerLeft() const;
 
-protected:
+ protected:
   GLF_API
   GlfTexture();
 
@@ -153,20 +150,19 @@ protected:
   GLF_API
   void _UpdateContentsID();
 
-private:
+ private:
   size_t _memoryUsed;
   size_t _memoryRequested;
   size_t _contentsID;
   HioImage::ImageOriginLocation _originLocation;
 };
 
-class GlfTextureFactoryBase : public TfType::FactoryBase
-{
-public:
+class GlfTextureFactoryBase : public TfType::FactoryBase {
+ public:
   virtual GlfTextureRefPtr New(const TfToken &texturePath,
                                HioImage::ImageOriginLocation originLocation) const = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GLF_TEXTURE_H
+#endif  // PXR_IMAGING_GLF_TEXTURE_H

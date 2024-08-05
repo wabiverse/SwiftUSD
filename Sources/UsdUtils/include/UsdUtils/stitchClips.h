@@ -30,11 +30,11 @@
 /// sequential time-varying data into
 /// \ref Usd_Page_ValueClips "USD Value Clips".
 
-#include <pxr/pxrns.h>
-#include "UsdUtils/api.h"
-#include "Usd/clipsAPI.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
+#include "Usd/clipsAPI.h"
+#include "UsdUtils/api.h"
+#include <pxr/pxrns.h>
 
 #include <limits>
 
@@ -232,8 +232,7 @@ bool UsdUtilsStitchClipsTemplate(const SdfLayerHandle &resultLayer,
 /// \p rootLayerName      The filepath used as a basis for generating
 ///                       our topology layer name.
 USDUTILS_API
-std::string
-UsdUtilsGenerateClipTopologyName(const std::string &rootLayerName);
+std::string UsdUtilsGenerateClipTopologyName(const std::string &rootLayerName);
 
 /// Generates a manifest file name based on an input file name
 ///
@@ -245,8 +244,7 @@ UsdUtilsGenerateClipTopologyName(const std::string &rootLayerName);
 /// \p rootLayerName      The filepath used as a basis for generating
 ///                       our manifest layer name.
 USDUTILS_API
-std::string
-UsdUtilsGenerateClipManifestName(const std::string &rootLayerName);
+std::string UsdUtilsGenerateClipManifestName(const std::string &rootLayerName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

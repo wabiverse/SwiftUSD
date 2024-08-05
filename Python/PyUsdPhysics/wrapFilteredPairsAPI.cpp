@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdPhysics/filteredPairsAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdPhysics/filteredPairsAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -41,39 +41,34 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static std::string _Repr(const UsdPhysicsFilteredPairsAPI &self)
 {
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdPhysics.FilteredPairsAPI(%s)", primRepr.c_str());
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
-
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static std::string
-  _Repr(const UsdPhysicsFilteredPairsAPI &self)
+struct UsdPhysicsFilteredPairsAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdPhysicsFilteredPairsAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
   {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdPhysics.FilteredPairsAPI(%s)",
-        primRepr.c_str());
   }
+};
 
-  struct UsdPhysicsFilteredPairsAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string>
-  {
-    UsdPhysicsFilteredPairsAPI_CanApplyResult(bool val, std::string const &msg) : TfPyAnnotatedBoolResult<std::string>(val, msg) {}
-  };
+static UsdPhysicsFilteredPairsAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
+{
+  std::string whyNot;
+  bool result = UsdPhysicsFilteredPairsAPI::CanApply(prim, &whyNot);
+  return UsdPhysicsFilteredPairsAPI_CanApplyResult(result, whyNot);
+}
 
-  static UsdPhysicsFilteredPairsAPI_CanApplyResult
-  _WrapCanApply(const UsdPrim &prim)
-  {
-    std::string whyNot;
-    bool result = UsdPhysicsFilteredPairsAPI::CanApply(prim, &whyNot);
-    return UsdPhysicsFilteredPairsAPI_CanApplyResult(result, whyNot);
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdPhysicsFilteredPairsAPI()
 {
@@ -82,11 +77,9 @@ void wrapUsdPhysicsFilteredPairsAPI()
   UsdPhysicsFilteredPairsAPI_CanApplyResult::Wrap<UsdPhysicsFilteredPairsAPI_CanApplyResult>(
       "_CanApplyResult", "whyNot");
 
-  class_<This, bases<UsdAPISchemaBase>>
-      cls("FilteredPairsAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("FilteredPairsAPI");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -105,16 +98,15 @@ void wrapUsdPhysicsFilteredPairsAPI()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetFilteredPairsRel",
-           &This::GetFilteredPairsRel)
-      .def("CreateFilteredPairsRel",
-           &This::CreateFilteredPairsRel)
+      .def("GetFilteredPairsRel", &This::GetFilteredPairsRel)
+      .def("CreateFilteredPairsRel", &This::CreateFilteredPairsRel)
       .def("__repr__", ::_Repr);
 
   _CustomWrapCode(cls);
@@ -139,11 +131,8 @@ void wrapUsdPhysicsFilteredPairsAPI()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

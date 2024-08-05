@@ -35,9 +35,9 @@
 #include "Tf/stringUtils.h"
 #include "Tf/weakPtr.h"
 
-#include "Arch/pxrinttypes.h"
 #include "Arch/attributes.h"
 #include "Arch/function.h"
+#include "Arch/pxrinttypes.h"
 
 #include <boost/any.hpp>
 #include <cstdarg>
@@ -64,24 +64,36 @@ class TfDiagnosticMgr;
 /// \c TF_ERROR(), \c TF_WARN and \c TF_STATUS also in the C++ API reference.
 ///
 class TfDiagnosticBase {
-public:
+ public:
   /// Return the call context where the message was issued.
-  const TfCallContext &GetContext() const { return _context; }
+  const TfCallContext &GetContext() const
+  {
+    return _context;
+  }
 
   /// Return the source file name that the diagnostic message was posted from.
-  std::string GetSourceFileName() const { return _context.GetFile(); }
+  std::string GetSourceFileName() const
+  {
+    return _context.GetFile();
+  }
 
   /// Return the source line number that the diagnostic message was posted
   /// from.
-  size_t GetSourceLineNumber() const { return _context.GetLine(); }
+  size_t GetSourceLineNumber() const
+  {
+    return _context.GetLine();
+  }
 
   /// Return the commentary string describing this diagnostic message.
-  std::string const &GetCommentary() const { return _commentary; }
+  std::string const &GetCommentary() const
+  {
+    return _commentary;
+  }
 
   /// Return the source function that the diagnostic message was posted from.
-  std::string GetSourceFunction() const {
-    return ArchGetPrettierFunctionName(_context.GetFunction(),
-                                       _context.GetPrettyFunction());
+  std::string GetSourceFunction() const
+  {
+    return ArchGetPrettierFunctionName(_context.GetFunction(), _context.GetPrettyFunction());
   }
 
   /// Add to the commentary string describing this diagnostic message.
@@ -94,7 +106,8 @@ public:
   /// \endcode
   /// always prints the entire commentary string as a newline
   /// separated sequence of messages.
-  void AugmentCommentary(const std::string &s) {
+  void AugmentCommentary(const std::string &s)
+  {
     if (_commentary.empty())
       _commentary = s;
     else {
@@ -104,7 +117,10 @@ public:
   }
 
   /// Return the diagnostic code posted.
-  TfEnum GetDiagnosticCode() const { return _code; }
+  TfEnum GetDiagnosticCode() const
+  {
+    return _code;
+  }
 
   /// Return the diagnostic code posted as a string.
   ///
@@ -124,7 +140,10 @@ public:
   /// \endcode
   /// will result in \c GetDiagnosticCodeAsString() returning the
   /// (uninformative) string "c".
-  const std::string &GetDiagnosticCodeAsString() const { return _codeString; }
+  const std::string &GetDiagnosticCodeAsString() const
+  {
+    return _codeString;
+  }
 
   /// Return a (possibly NULL) const pointer to the info object associated
   /// with this message.
@@ -145,13 +164,17 @@ public:
   /// then a const pointer to a copy of myInfo in the above example is
   /// returned by GetInfo<T>().  If the type T doesn't match the held type
   /// then GetInfo() returns NULL.
-  template <typename T> const T *GetInfo() const {
+  template<typename T> const T *GetInfo() const
+  {
     return boost::any_cast<T>(&_info);
   }
 
   /// Set the info object associated with this diagnostic message.
   /// \see GetInfo()
-  void SetInfo(TfDiagnosticInfo any) { _info = any; }
+  void SetInfo(TfDiagnosticInfo any)
+  {
+    _info = any;
+  }
 
   /// Return true if the message was posted via \c PostQuietly().
   ///
@@ -159,7 +182,10 @@ public:
   /// printout of the error is not desirable, because someone higher up on
   /// the stack may actually handle this error. This is rare, but it does
   /// happen on occasion.
-  bool GetQuiet() const { return _quiet; }
+  bool GetQuiet() const
+  {
+    return _quiet;
+  }
 
   /// Return true if this diagnostic's code is a fatal code.
   TF_API
@@ -172,11 +198,14 @@ public:
 
   /// Construct an instance.
   TF_API
-  TfDiagnosticBase(TfEnum code, char const *codeString,
-                   TfCallContext const &context, const std::string &commentary,
-                   TfDiagnosticInfo info, bool quiet);
+  TfDiagnosticBase(TfEnum code,
+                   char const *codeString,
+                   TfCallContext const &context,
+                   const std::string &commentary,
+                   TfDiagnosticInfo info,
+                   bool quiet);
 
-protected:
+ protected:
   TfCallContext _context;
 
   std::string _commentary;
@@ -193,4 +222,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_DIAGNOSTIC_BASE_H
+#endif  // PXR_BASE_TF_DIAGNOSTIC_BASE_H

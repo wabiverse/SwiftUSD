@@ -33,86 +33,75 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDPRIMORIGIN_SCHEMA_TOKENS \
-    (primOrigin) \
-    (scenePath) \
+#define HDPRIMORIGIN_SCHEMA_TOKENS (primOrigin)(scenePath)
 
-TF_DECLARE_PUBLIC_TOKENS(HdPrimOriginSchemaTokens, HD_API,
-    HDPRIMORIGIN_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdPrimOriginSchemaTokens, HD_API, HDPRIMORIGIN_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdPrimOriginSchema : public HdSchema
-{
-public:
-    HdPrimOriginSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdPrimOriginSchema : public HdSchema {
+ public:
+  HdPrimOriginSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
+  /// Wraps an SdfPath so that it is not affected by the
+  /// prefixing scene index.
+  class OriginPath {
+   public:
+    OriginPath(const SdfPath &path) : _path(path) {}
 
-    /// Wraps an SdfPath so that it is not affected by the
-    /// prefixing scene index.
-    class OriginPath {
-    public:
-        OriginPath(const SdfPath &path)
-         : _path(path)
-        {
-        }
+    const SdfPath &GetPath() const
+    {
+      return _path;
+    }
 
-        const SdfPath &GetPath() const { return _path; }
+    bool operator==(const OriginPath &other) const
+    {
+      return _path == other._path;
+    }
 
-        bool operator==(const OriginPath &other) const {
-            return _path == other._path;
-        }
-
-    private:
-        HD_API
-        friend std::ostream &operator <<(std::ostream &stream,
-                                         OriginPath const &p);
-
-        SdfPath _path;
-    };
-
-    using OriginPathDataSource = HdTypedSampledDataSource<OriginPath>;
-
-    /// Extracts SdfPath from container that was added via
-    /// OriginPathDataSource.
-    HD_API SdfPath GetOriginPath(const TfToken &name) const;
-
-
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "primOrigin" from the parent container and constructs a
-    /// HdPrimOriginSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+   private:
     HD_API
-    static HdPrimOriginSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
+    friend std::ostream &operator<<(std::ostream &stream, OriginPath const &p);
 
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
-    HD_API
-    static const TfToken &GetSchemaToken();
+    SdfPath _path;
+  };
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
-    HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
+  using OriginPathDataSource = HdTypedSampledDataSource<OriginPath>;
 
+  /// Extracts SdfPath from container that was added via
+  /// OriginPathDataSource.
+  HD_API SdfPath GetOriginPath(const TfToken &name) const;
 
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the scenepath data source can be found.
-    /// This is often useful for checking intersection against the
-    /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
-    HD_API
-    static const HdDataSourceLocator &GetScenePathLocator();
+  /// Retrieves a container data source with the schema's default name token
+  /// "primOrigin" from the parent container and constructs a
+  /// HdPrimOriginSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdPrimOriginSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
 
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the scenepath data source can be found.
+  /// This is often useful for checking intersection against the
+  /// HdDataSourceLocatorSet sent with HdDataSourceObserver::PrimsDirtied.
+  HD_API
+  static const HdDataSourceLocator &GetScenePathLocator();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

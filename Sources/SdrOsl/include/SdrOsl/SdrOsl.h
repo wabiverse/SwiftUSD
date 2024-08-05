@@ -5,4 +5,4 @@
 #include <SdrOsl/api.h>
 #include <SdrOsl/oslParser.h>
 
-#endif // __PXR_USD_PLUGIN_SDROSL_H__
+#endif  // __PXR_USD_PLUGIN_SDROSL_H__

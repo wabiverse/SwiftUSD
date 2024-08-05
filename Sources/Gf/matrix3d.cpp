@@ -42,24 +42,27 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfMatrix3d>(); }
-
-std::ostream &operator<<(std::ostream &out, const GfMatrix3d &m) {
-  return out << "( (" << Gf_OstreamHelperP(m[0][0]) << ", "
-             << Gf_OstreamHelperP(m[0][1]) << ", " << Gf_OstreamHelperP(m[0][2])
-             << "), (" << Gf_OstreamHelperP(m[1][0]) << ", "
-             << Gf_OstreamHelperP(m[1][1]) << ", " << Gf_OstreamHelperP(m[1][2])
-             << "), (" << Gf_OstreamHelperP(m[2][0]) << ", "
-             << Gf_OstreamHelperP(m[2][1]) << ", " << Gf_OstreamHelperP(m[2][2])
-             << ") )";
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfMatrix3d>();
 }
 
-GfMatrix3d::GfMatrix3d(const GfMatrix3f &m) {
-  Set(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1],
-      m[2][2]);
+std::ostream &operator<<(std::ostream &out, const GfMatrix3d &m)
+{
+  return out << "( (" << Gf_OstreamHelperP(m[0][0]) << ", " << Gf_OstreamHelperP(m[0][1]) << ", "
+             << Gf_OstreamHelperP(m[0][2]) << "), (" << Gf_OstreamHelperP(m[1][0]) << ", "
+             << Gf_OstreamHelperP(m[1][1]) << ", " << Gf_OstreamHelperP(m[1][2]) << "), ("
+             << Gf_OstreamHelperP(m[2][0]) << ", " << Gf_OstreamHelperP(m[2][1]) << ", "
+             << Gf_OstreamHelperP(m[2][2]) << ") )";
 }
 
-GfMatrix3d::GfMatrix3d(const std::vector<std::vector<double>> &v) {
+GfMatrix3d::GfMatrix3d(const GfMatrix3f &m)
+{
+  Set(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
+}
+
+GfMatrix3d::GfMatrix3d(const std::vector<std::vector<double>> &v)
+{
   double m[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
   for (size_t row = 0; row < 3 && row < v.size(); ++row) {
     for (size_t col = 0; col < 3 && col < v[row].size(); ++col) {
@@ -69,7 +72,8 @@ GfMatrix3d::GfMatrix3d(const std::vector<std::vector<double>> &v) {
   Set(m);
 }
 
-GfMatrix3d::GfMatrix3d(const std::vector<std::vector<float>> &v) {
+GfMatrix3d::GfMatrix3d(const std::vector<std::vector<float>> &v)
+{
   double m[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
   for (size_t row = 0; row < 3 && row < v.size(); ++row) {
     for (size_t col = 0; col < 3 && col < v[row].size(); ++col) {
@@ -79,11 +83,18 @@ GfMatrix3d::GfMatrix3d(const std::vector<std::vector<float>> &v) {
   Set(m);
 }
 
-GfMatrix3d::GfMatrix3d(const GfRotation &rot) { SetRotate(rot); }
+GfMatrix3d::GfMatrix3d(const GfRotation &rot)
+{
+  SetRotate(rot);
+}
 
-GfMatrix3d::GfMatrix3d(const GfQuatd &rot) { SetRotate(rot); }
+GfMatrix3d::GfMatrix3d(const GfQuatd &rot)
+{
+  SetRotate(rot);
+}
 
-GfMatrix3d &GfMatrix3d::SetDiagonal(double s) {
+GfMatrix3d &GfMatrix3d::SetDiagonal(double s)
+{
   _mtx[0][0] = s;
   _mtx[0][1] = 0.0;
   _mtx[0][2] = 0.0;
@@ -96,7 +107,8 @@ GfMatrix3d &GfMatrix3d::SetDiagonal(double s) {
   return *this;
 }
 
-GfMatrix3d &GfMatrix3d::SetDiagonal(const GfVec3d &v) {
+GfMatrix3d &GfMatrix3d::SetDiagonal(const GfVec3d &v)
+{
   _mtx[0][0] = v[0];
   _mtx[0][1] = 0.0;
   _mtx[0][2] = 0.0;
@@ -109,7 +121,8 @@ GfMatrix3d &GfMatrix3d::SetDiagonal(const GfVec3d &v) {
   return *this;
 }
 
-double *GfMatrix3d::Get(double m[3][3]) const {
+double *GfMatrix3d::Get(double m[3][3]) const
+{
   m[0][0] = _mtx[0][0];
   m[0][1] = _mtx[0][1];
   m[0][2] = _mtx[0][2];
@@ -122,23 +135,22 @@ double *GfMatrix3d::Get(double m[3][3]) const {
   return &m[0][0];
 }
 
-bool GfMatrix3d::operator==(const GfMatrix3d &m) const {
-  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] &&
-          _mtx[0][2] == m._mtx[0][2] && _mtx[1][0] == m._mtx[1][0] &&
-          _mtx[1][1] == m._mtx[1][1] && _mtx[1][2] == m._mtx[1][2] &&
-          _mtx[2][0] == m._mtx[2][0] && _mtx[2][1] == m._mtx[2][1] &&
-          _mtx[2][2] == m._mtx[2][2]);
+bool GfMatrix3d::operator==(const GfMatrix3d &m) const
+{
+  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] && _mtx[0][2] == m._mtx[0][2] &&
+          _mtx[1][0] == m._mtx[1][0] && _mtx[1][1] == m._mtx[1][1] && _mtx[1][2] == m._mtx[1][2] &&
+          _mtx[2][0] == m._mtx[2][0] && _mtx[2][1] == m._mtx[2][1] && _mtx[2][2] == m._mtx[2][2]);
 }
 
-bool GfMatrix3d::operator==(const GfMatrix3f &m) const {
-  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] &&
-          _mtx[0][2] == m._mtx[0][2] && _mtx[1][0] == m._mtx[1][0] &&
-          _mtx[1][1] == m._mtx[1][1] && _mtx[1][2] == m._mtx[1][2] &&
-          _mtx[2][0] == m._mtx[2][0] && _mtx[2][1] == m._mtx[2][1] &&
-          _mtx[2][2] == m._mtx[2][2]);
+bool GfMatrix3d::operator==(const GfMatrix3f &m) const
+{
+  return (_mtx[0][0] == m._mtx[0][0] && _mtx[0][1] == m._mtx[0][1] && _mtx[0][2] == m._mtx[0][2] &&
+          _mtx[1][0] == m._mtx[1][0] && _mtx[1][1] == m._mtx[1][1] && _mtx[1][2] == m._mtx[1][2] &&
+          _mtx[2][0] == m._mtx[2][0] && _mtx[2][1] == m._mtx[2][1] && _mtx[2][2] == m._mtx[2][2]);
 }
 
-GfMatrix3d GfMatrix3d::GetTranspose() const {
+GfMatrix3d GfMatrix3d::GetTranspose() const
+{
   GfMatrix3d transpose;
   transpose._mtx[0][0] = _mtx[0][0];
   transpose._mtx[1][0] = _mtx[0][1];
@@ -153,7 +165,8 @@ GfMatrix3d GfMatrix3d::GetTranspose() const {
   return transpose;
 }
 
-GfMatrix3d GfMatrix3d::GetInverse(double *detPtr, double eps) const {
+GfMatrix3d GfMatrix3d::GetInverse(double *detPtr, double eps) const
+{
   double a00, a01, a02, a10, a11, a12, a20, a21, a22;
   double det, rcp;
 
@@ -166,8 +179,8 @@ GfMatrix3d GfMatrix3d::GetInverse(double *detPtr, double eps) const {
   a20 = _mtx[2][0];
   a21 = _mtx[2][1];
   a22 = _mtx[2][2];
-  det = -(a02 * a11 * a20) + a01 * a12 * a20 + a02 * a10 * a21 -
-        a00 * a12 * a21 - a01 * a10 * a22 + a00 * a11 * a22;
+  det = -(a02 * a11 * a20) + a01 * a12 * a20 + a02 * a10 * a21 - a00 * a12 * a21 -
+        a01 * a10 * a22 + a00 * a11 * a22;
 
   if (detPtr) {
     *detPtr = det;
@@ -186,24 +199,23 @@ GfMatrix3d GfMatrix3d::GetInverse(double *detPtr, double eps) const {
     inverse._mtx[2][0] = (-(a11 * a20) + a10 * a21) * rcp;
     inverse._mtx[2][1] = (a01 * a20 - a00 * a21) * rcp;
     inverse._mtx[2][2] = (-(a01 * a10) + a00 * a11) * rcp;
-
-  } else {
+  }
+  else {
     inverse.SetScale(FLT_MAX);
   }
 
   return inverse;
 }
 
-double GfMatrix3d::GetDeterminant() const {
-  return (_mtx[0][0] * _mtx[1][1] * _mtx[2][2] +
-          _mtx[0][1] * _mtx[1][2] * _mtx[2][0] +
-          _mtx[0][2] * _mtx[1][0] * _mtx[2][1] -
-          _mtx[0][0] * _mtx[1][2] * _mtx[2][1] -
-          _mtx[0][1] * _mtx[1][0] * _mtx[2][2] -
-          _mtx[0][2] * _mtx[1][1] * _mtx[2][0]);
+double GfMatrix3d::GetDeterminant() const
+{
+  return (_mtx[0][0] * _mtx[1][1] * _mtx[2][2] + _mtx[0][1] * _mtx[1][2] * _mtx[2][0] +
+          _mtx[0][2] * _mtx[1][0] * _mtx[2][1] - _mtx[0][0] * _mtx[1][2] * _mtx[2][1] -
+          _mtx[0][1] * _mtx[1][0] * _mtx[2][2] - _mtx[0][2] * _mtx[1][1] * _mtx[2][0]);
 }
 
-double GfMatrix3d::GetHandedness() const {
+double GfMatrix3d::GetHandedness() const
+{
   // Note: This can be computed with fewer arithmetic operations using a
   //       cross and dot product, but it is more important that the result
   //       is consistent with the way the determinant is computed.
@@ -214,7 +226,8 @@ double GfMatrix3d::GetHandedness() const {
  * It is potentially slower if the matrix is far from orthonormal (i.e. if
  * the row basis vectors are close to colinear) but in the common case
  * of near-orthonormality it should be just as fast. */
-bool GfMatrix3d::Orthonormalize(bool issueWarning) {
+bool GfMatrix3d::Orthonormalize(bool issueWarning)
+{
   // orthogonalize and normalize row vectors
   GfVec3d r0(_mtx[0][0], _mtx[0][1], _mtx[0][2]);
   GfVec3d r1(_mtx[1][0], _mtx[1][1], _mtx[1][2]);
@@ -230,12 +243,14 @@ bool GfMatrix3d::Orthonormalize(bool issueWarning) {
   _mtx[2][1] = r2[1];
   _mtx[2][2] = r2[2];
   if (!result && issueWarning)
-    TF_WARN("OrthogonalizeBasis did not converge, matrix may not be "
-            "orthonormal.");
+    TF_WARN(
+        "OrthogonalizeBasis did not converge, matrix may not be "
+        "orthonormal.");
   return result;
 }
 
-GfMatrix3d GfMatrix3d::GetOrthonormalized(bool issueWarning) const {
+GfMatrix3d GfMatrix3d::GetOrthonormalized(bool issueWarning) const
+{
   GfMatrix3d result = *this;
   result.Orthonormalize(issueWarning);
   return result;
@@ -244,7 +259,8 @@ GfMatrix3d GfMatrix3d::GetOrthonormalized(bool issueWarning) const {
 /*
 ** Scaling
 */
-GfMatrix3d &GfMatrix3d::operator*=(double d) {
+GfMatrix3d &GfMatrix3d::operator*=(double d)
+{
   _mtx[0][0] *= d;
   _mtx[0][1] *= d;
   _mtx[0][2] *= d;
@@ -260,7 +276,8 @@ GfMatrix3d &GfMatrix3d::operator*=(double d) {
 /*
 ** Addition
 */
-GfMatrix3d &GfMatrix3d::operator+=(const GfMatrix3d &m) {
+GfMatrix3d &GfMatrix3d::operator+=(const GfMatrix3d &m)
+{
   _mtx[0][0] += m._mtx[0][0];
   _mtx[0][1] += m._mtx[0][1];
   _mtx[0][2] += m._mtx[0][2];
@@ -276,7 +293,8 @@ GfMatrix3d &GfMatrix3d::operator+=(const GfMatrix3d &m) {
 /*
 ** Subtraction
 */
-GfMatrix3d &GfMatrix3d::operator-=(const GfMatrix3d &m) {
+GfMatrix3d &GfMatrix3d::operator-=(const GfMatrix3d &m)
+{
   _mtx[0][0] -= m._mtx[0][0];
   _mtx[0][1] -= m._mtx[0][1];
   _mtx[0][2] -= m._mtx[0][2];
@@ -292,13 +310,21 @@ GfMatrix3d &GfMatrix3d::operator-=(const GfMatrix3d &m) {
 /*
 ** Negation
 */
-GfMatrix3d operator-(const GfMatrix3d &m) {
-  return GfMatrix3d(-m._mtx[0][0], -m._mtx[0][1], -m._mtx[0][2], -m._mtx[1][0],
-                    -m._mtx[1][1], -m._mtx[1][2], -m._mtx[2][0], -m._mtx[2][1],
+GfMatrix3d operator-(const GfMatrix3d &m)
+{
+  return GfMatrix3d(-m._mtx[0][0],
+                    -m._mtx[0][1],
+                    -m._mtx[0][2],
+                    -m._mtx[1][0],
+                    -m._mtx[1][1],
+                    -m._mtx[1][2],
+                    -m._mtx[2][0],
+                    -m._mtx[2][1],
                     -m._mtx[2][2]);
 }
 
-GfMatrix3d &GfMatrix3d::operator*=(const GfMatrix3d &m) {
+GfMatrix3d &GfMatrix3d::operator*=(const GfMatrix3d &m)
+{
   // Save current values before they are overwritten
   GfMatrix3d tmp = *this;
 
@@ -335,24 +361,21 @@ GfMatrix3d &GfMatrix3d::operator*=(const GfMatrix3d &m) {
 /*
  * Define multiplication between floating vector and double matrix.
  */
-GfVec3f operator*(const GfVec3f &vec, const GfMatrix3d &m) {
-  return GfVec3f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[1][0] +
-                       vec[2] * m._mtx[2][0]),
-                 float(vec[0] * m._mtx[0][1] + vec[1] * m._mtx[1][1] +
-                       vec[2] * m._mtx[2][1]),
-                 float(vec[0] * m._mtx[0][2] + vec[1] * m._mtx[1][2] +
-                       vec[2] * m._mtx[2][2]));
+GfVec3f operator*(const GfVec3f &vec, const GfMatrix3d &m)
+{
+  return GfVec3f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[1][0] + vec[2] * m._mtx[2][0]),
+                 float(vec[0] * m._mtx[0][1] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[2][1]),
+                 float(vec[0] * m._mtx[0][2] + vec[1] * m._mtx[1][2] + vec[2] * m._mtx[2][2]));
 }
 
-GfVec3f operator*(const GfMatrix3d &m, const GfVec3f &vec) {
-  return GfVec3f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[0][1] +
-                       vec[2] * m._mtx[0][2]),
-                 float(vec[0] * m._mtx[1][0] + vec[1] * m._mtx[1][1] +
-                       vec[2] * m._mtx[1][2]),
-                 float(vec[0] * m._mtx[2][0] + vec[1] * m._mtx[2][1] +
-                       vec[2] * m._mtx[2][2]));
+GfVec3f operator*(const GfMatrix3d &m, const GfVec3f &vec)
+{
+  return GfVec3f(float(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[0][1] + vec[2] * m._mtx[0][2]),
+                 float(vec[0] * m._mtx[1][0] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[1][2]),
+                 float(vec[0] * m._mtx[2][0] + vec[1] * m._mtx[2][1] + vec[2] * m._mtx[2][2]));
 }
-GfMatrix3d &GfMatrix3d::SetScale(double s) {
+GfMatrix3d &GfMatrix3d::SetScale(double s)
+{
   _mtx[0][0] = s;
   _mtx[0][1] = 0.0;
   _mtx[0][2] = 0.0;
@@ -366,18 +389,21 @@ GfMatrix3d &GfMatrix3d::SetScale(double s) {
   return *this;
 }
 
-GfMatrix3d &GfMatrix3d::SetRotate(const GfQuatd &rot) {
+GfMatrix3d &GfMatrix3d::SetRotate(const GfQuatd &rot)
+{
   _SetRotateFromQuat(rot.GetReal(), rot.GetImaginary());
   return *this;
 }
 
-GfMatrix3d &GfMatrix3d::SetRotate(const GfRotation &rot) {
+GfMatrix3d &GfMatrix3d::SetRotate(const GfRotation &rot)
+{
   GfQuaternion quat = rot.GetQuaternion();
   _SetRotateFromQuat(quat.GetReal(), GfVec3d(quat.GetImaginary()));
   return *this;
 }
 
-void GfMatrix3d::_SetRotateFromQuat(double r, const GfVec3d &i) {
+void GfMatrix3d::_SetRotateFromQuat(double r, const GfVec3d &i)
+{
   _mtx[0][0] = 1.0 - 2.0 * (i[1] * i[1] + i[2] * i[2]);
   _mtx[0][1] = 2.0 * (i[0] * i[1] + i[2] * r);
   _mtx[0][2] = 2.0 * (i[2] * i[0] - i[1] * r);
@@ -391,7 +417,8 @@ void GfMatrix3d::_SetRotateFromQuat(double r, const GfVec3d &i) {
   _mtx[2][2] = 1.0 - 2.0 * (i[1] * i[1] + i[0] * i[0]);
 }
 
-GfMatrix3d &GfMatrix3d::SetScale(const GfVec3d &s) {
+GfMatrix3d &GfMatrix3d::SetScale(const GfVec3d &s)
+{
   _mtx[0][0] = s[0];
   _mtx[0][1] = 0.0;
   _mtx[0][2] = 0.0;
@@ -405,7 +432,8 @@ GfMatrix3d &GfMatrix3d::SetScale(const GfVec3d &s) {
   return *this;
 }
 
-GfQuaternion GfMatrix3d::ExtractRotationQuaternion() const {
+GfQuaternion GfMatrix3d::ExtractRotationQuaternion() const
+{
   // This was adapted from the (open source) Open Inventor
   // SbRotation::SetValue(const SbMatrix &m)
 
@@ -425,7 +453,8 @@ GfQuaternion GfMatrix3d::ExtractRotationQuaternion() const {
     im.Set((_mtx[1][2] - _mtx[2][1]) / (4.0 * r),
            (_mtx[2][0] - _mtx[0][2]) / (4.0 * r),
            (_mtx[0][1] - _mtx[1][0]) / (4.0 * r));
-  } else {
+  }
+  else {
     int j = (i + 1) % 3;
     int k = (i + 2) % 3;
     double q = 0.5 * sqrt(_mtx[i][i] - _mtx[j][j] - _mtx[k][k] + 1);
@@ -439,17 +468,20 @@ GfQuaternion GfMatrix3d::ExtractRotationQuaternion() const {
   return GfQuaternion(GfClamp(r, -1.0, 1.0), im);
 }
 
-GfRotation GfMatrix3d::ExtractRotation() const {
+GfRotation GfMatrix3d::ExtractRotation() const
+{
   return GfRotation(ExtractRotationQuaternion());
 }
 
 GfVec3d GfMatrix3d::DecomposeRotation(const GfVec3d &axis0,
                                       const GfVec3d &axis1,
-                                      const GfVec3d &axis2) const {
+                                      const GfVec3d &axis2) const
+{
   return (ExtractRotation().Decompose(axis0, axis1, axis2));
 }
 
-bool GfIsClose(GfMatrix3d const &m1, GfMatrix3d const &m2, double tolerance) {
+bool GfIsClose(GfMatrix3d const &m1, GfMatrix3d const &m2, double tolerance)
+{
   for (size_t row = 0; row < 3; ++row) {
     for (size_t col = 0; col < 3; ++col) {
       if (!GfIsClose(m1[static_cast<int>(row)][col], m2[static_cast<int>(row)][col], tolerance))

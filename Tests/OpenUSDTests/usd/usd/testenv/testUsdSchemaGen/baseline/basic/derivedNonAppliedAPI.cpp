@@ -25,77 +25,68 @@
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
 
-#include "pxr/usd/sdf/types.h"
 #include "pxr/usd/sdf/assetPath.h"
+#include "pxr/usd/sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdContrivedDerivedNonAppliedAPI,
-        TfType::Bases< UsdContrivedNonAppliedAPI > >();
-    
+  TfType::Define<UsdContrivedDerivedNonAppliedAPI, TfType::Bases<UsdContrivedNonAppliedAPI>>();
 }
 
 /* virtual */
-UsdContrivedDerivedNonAppliedAPI::~UsdContrivedDerivedNonAppliedAPI()
-{
-}
+UsdContrivedDerivedNonAppliedAPI::~UsdContrivedDerivedNonAppliedAPI() {}
 
 /* static */
-UsdContrivedDerivedNonAppliedAPI
-UsdContrivedDerivedNonAppliedAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdContrivedDerivedNonAppliedAPI UsdContrivedDerivedNonAppliedAPI::Get(const UsdStagePtr &stage,
+                                                                       const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdContrivedDerivedNonAppliedAPI();
-    }
-    return UsdContrivedDerivedNonAppliedAPI(stage->GetPrimAtPath(path));
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdContrivedDerivedNonAppliedAPI();
+  }
+  return UsdContrivedDerivedNonAppliedAPI(stage->GetPrimAtPath(path));
 }
-
 
 /* virtual */
 UsdSchemaKind UsdContrivedDerivedNonAppliedAPI::_GetSchemaKind() const
 {
-    return UsdContrivedDerivedNonAppliedAPI::schemaKind;
+  return UsdContrivedDerivedNonAppliedAPI::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdContrivedDerivedNonAppliedAPI::_GetStaticTfType()
+const TfType &UsdContrivedDerivedNonAppliedAPI::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdContrivedDerivedNonAppliedAPI>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdContrivedDerivedNonAppliedAPI>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdContrivedDerivedNonAppliedAPI::_IsTypedSchema()
+bool UsdContrivedDerivedNonAppliedAPI::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdContrivedDerivedNonAppliedAPI::_GetTfType() const
+const TfType &UsdContrivedDerivedNonAppliedAPI::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdContrivedDerivedNonAppliedAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdContrivedDerivedNonAppliedAPI::GetSchemaAttributeNames(
+    bool includeInherited)
 {
-    static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdContrivedNonAppliedAPI::GetSchemaAttributeNames(true);
+  static TfTokenVector localNames;
+  static TfTokenVector allNames = UsdContrivedNonAppliedAPI::GetSchemaAttributeNames(true);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

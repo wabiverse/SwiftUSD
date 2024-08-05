@@ -26,10 +26,10 @@
 
 #if !PXR_METAL_SUPPORT_ENABLED && PXR_VULKAN_SUPPORT_ENABLED
 
-#include <pxr/pxrns.h>
-#include "Gf/vec4i.h"
-#include "Hgi/texture.h"
-#include "HgiInterop/api.h"
+#  include "Gf/vec4i.h"
+#  include "Hgi/texture.h"
+#  include "HgiInterop/api.h"
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -40,9 +40,8 @@ class VtValue;
 ///
 /// Provides Vulkan/GL interop.
 ///
-class HgiInteropVulkan final
-{
-public:
+class HgiInteropVulkan final {
+ public:
   HGIINTEROP_API
   HgiInteropVulkan(Hgi *hgiVulkan);
 
@@ -52,13 +51,12 @@ public:
   /// Composite provided color (and optional depth) textures over app's
   /// framebuffer contents.
   HGIINTEROP_API
-  void CompositeToInterop(
-      HgiTextureHandle const &color,
-      HgiTextureHandle const &depth,
-      VtValue const &framebuffer,
-      GfVec4i const &viewport);
+  void CompositeToInterop(HgiTextureHandle const &color,
+                          HgiTextureHandle const &depth,
+                          VtValue const &framebuffer,
+                          GfVec4i const &viewport);
 
-private:
+ private:
   HgiInteropVulkan() = delete;
 
   HgiVulkan *_hgiVulkan;

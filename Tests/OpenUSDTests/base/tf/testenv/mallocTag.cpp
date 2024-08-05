@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
-#include "pxr/base/tf/diagnosticLite.h"
-#include "pxr/base/tf/regTest.h"
 #include "pxr/base/tf/mallocTag.h"
 #include "Arch/defines.h"
 #include "Arch/mallocHook.h"
+#include "pxr/base/tf/diagnosticLite.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 #include <mutex>
 #include <thread>
@@ -46,21 +46,18 @@ std::mutex _mutex;
 int _total = 0;
 int _maxTotal = 0;
 
-static void
-MyMalloc(size_t n)
+static void MyMalloc(size_t n)
 {
   void *ptr = malloc(n);
   std::lock_guard<std::mutex> lock(_mutex);
   _requests.push_back(ptr);
   _total += n;
-  if (_total > _maxTotal)
-  {
+  if (_total > _maxTotal) {
     _maxTotal = _total;
   }
 }
 
-static void
-FreeAll()
+static void FreeAll()
 {
   for (size_t i = 0; i < _requests.size(); i++)
     free(::_requests[i]);
@@ -68,35 +65,29 @@ FreeAll()
   _total = 0;
 }
 
-static void
-FreeTaskNoTag()
+static void FreeTaskNoTag()
 {
   MyMalloc(100000);
 }
 
-static void
-FreeTaskWithTag()
+static void FreeTaskWithTag()
 {
   TfAutoMallocTag noname("freeTaskWithTag");
   MyMalloc(100000);
 }
 
-static void
-RegularTask(bool tag, int n)
+static void RegularTask(bool tag, int n)
 {
-  if (tag)
-  {
+  if (tag) {
     TfAutoMallocTag noname("threadTag");
     MyMalloc(n);
   }
-  else
-  {
+  else {
     MyMalloc(n);
   }
 }
 
-static int
-GetBytesForCallSite(const char *name, bool skipRepeated = true)
+static int GetBytesForCallSite(const char *name, bool skipRepeated = true)
 {
   TfMallocTag::CallTree ct;
   TfMallocTag::GetCallTree(&ct, skipRepeated);
@@ -118,36 +109,33 @@ static bool CloseEnough(int64_t a1, int64_t a2)
   if (a1 < 2048 && a2 < 2048)
     return true;
 
-  if (a1 >= (.95 * a2) && a1 <= (1.05 * a2))
-  {
+  if (a1 >= (.95 * a2) && a1 <= (1.05 * a2)) {
     return true;
   }
-  else
-  {
+  else {
     fprintf(stderr, "%zd not close to %zd\n", a1, a2);
     return false;
   }
 }
 
-static bool
-MemCheck()
+static bool MemCheck()
 {
-  int64_t m = _total,
-          current = TfMallocTag::GetTotalBytes();
+  int64_t m = _total, current = TfMallocTag::GetTotalBytes();
   bool ok = CloseEnough(m, current);
 
-  printf("Expected about %zd, actual is %zd: %s\n",
-         m, current, ok ? "[close enough]" : "[not good]");
+  printf(
+      "Expected about %zd, actual is %zd: %s\n", m, current, ok ? "[close enough]" : "[not good]");
 
   bool maxOk = CloseEnough(::_maxTotal, TfMallocTag::GetMaxTotalBytes());
   printf("Expected max of about %zd, actual is %zd: %s\n",
-         m, current, maxOk ? "[close enough]" : "[not good]");
+         m,
+         current,
+         maxOk ? "[close enough]" : "[not good]");
 
   return ok && maxOk;
 }
 
-static void
-TestFreeThread()
+static void TestFreeThread()
 {
   TfAutoMallocTag noname("site3");
 
@@ -159,28 +147,24 @@ TestFreeThread()
   FreeAll();
 }
 
-static void
-TestFreeThreadWithTag()
+static void TestFreeThreadWithTag()
 {
   TfAutoMallocTag noname("site4");
 
   std::thread t(FreeTaskWithTag);
   t.join();
 
-  printf("bytesForSite[freeTaskWithTag] = %d\n",
-         GetBytesForCallSite("freeTaskWithTag"));
+  printf("bytesForSite[freeTaskWithTag] = %d\n", GetBytesForCallSite("freeTaskWithTag"));
   TF_AXIOM(CloseEnough(GetBytesForCallSite("freeTaskWithTag"), 100000));
   TF_AXIOM(CloseEnough(GetBytesForCallSite("site4"), 0));
   FreeAll();
 
-  printf("bytesForSite[freeTaskWithTag] = %d\n",
-         GetBytesForCallSite("freeTaskWithTag"));
+  printf("bytesForSite[freeTaskWithTag] = %d\n", GetBytesForCallSite("freeTaskWithTag"));
   TF_AXIOM(CloseEnough(GetBytesForCallSite("freeTaskWithTag"), 0));
   TF_AXIOM(CloseEnough(GetBytesForCallSite("site4"), 0));
 }
 
-static void
-TestRegularTask()
+static void TestRegularTask()
 {
   // XXX: Picking up tags from the thread that spawned another thread has
   // never worked, since we don't have a way to "copy" this thread's tag stack
@@ -200,8 +184,7 @@ TestRegularTask()
   TF_AXIOM(CloseEnough(GetBytesForCallSite("name"), 0));
 }
 
-static void
-TestRegularTaskWithTag()
+static void TestRegularTaskWithTag()
 {
   // XXX: Picking up tags from the thread that spawned another thread has
   // never worked, since we don't have a way to "copy" this thread's tag stack
@@ -222,8 +205,7 @@ TestRegularTaskWithTag()
   TF_AXIOM(CloseEnough(GetBytesForCallSite("threadTag"), 0));
 }
 
-static void
-TestRepeated()
+static void TestRepeated()
 {
   TfAutoMallocTag noname1("site1");
   MyMalloc(100000);
@@ -246,8 +228,7 @@ TestRepeated()
   FreeAll();
 }
 
-static void
-TestMultiTags()
+static void TestMultiTags()
 {
   TfAutoMallocTag tags1("multi1", "multi2", "multi3", "multi4");
   MyMalloc(100000);
@@ -264,8 +245,7 @@ TestMultiTags()
   FreeAll();
 }
 
-static bool
-Test_TfMallocTag()
+static bool Test_TfMallocTag()
 {
   _requests.reserve(1024);
   TF_AXIOM(TfMallocTag::GetTotalBytes() == 0);
@@ -275,10 +255,8 @@ Test_TfMallocTag()
   void *mem1 = malloc(100000);
 
   string errMsg;
-  if (!TfMallocTag::Initialize(&errMsg))
-  {
-    fprintf(stderr, "Unable to initialize malloc tags: %s\n",
-            errMsg.c_str());
+  if (!TfMallocTag::Initialize(&errMsg)) {
+    fprintf(stderr, "Unable to initialize malloc tags: %s\n", errMsg.c_str());
     fprintf(stderr, "Skipping test\n");
     return true;
   }

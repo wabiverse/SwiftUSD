@@ -24,9 +24,9 @@
 #ifndef __PXR_BASE_TF_H__
 #define __PXR_BASE_TF_H__
 
-#include <Tf/api.h>
 #include <Tf/anyUniquePtr.h>
 #include <Tf/anyWeakPtr.h>
+#include <Tf/api.h>
 #include <Tf/atomicOfstreamWrapper.h>
 #include <Tf/atomicRenameUtil.h>
 #include <Tf/bigRWMutex.h>
@@ -63,8 +63,8 @@
 #include <Tf/instantiateSingleton.h>
 #include <Tf/instantiateStacked.h>
 #include <Tf/instantiateType.h>
-//#include <Tf/iterator.h>
-//#include <Tf/makePyConstructor.h>
+// #include <Tf/iterator.h>
+// #include <Tf/makePyConstructor.h>
 #include <Tf/mallocTag.h>
 #include <Tf/meta.h>
 #include <Tf/notice.h>
@@ -166,4 +166,4 @@
 #include <Tf/weakPtrFacade.h>
 #include <Tf/wrapTypeHelpers.h>
 
-#endif // __PXR_BASE_TF_H__
+#endif  // __PXR_BASE_TF_H__

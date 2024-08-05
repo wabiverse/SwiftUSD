@@ -21,17 +21,17 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdGeom/motionAPI.h"
 #include "Usd/schemaBase.h"
+#include "UsdGeom/motionAPI.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyAnnotatedBoolResult.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -43,126 +43,114 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-#define WRAP_CUSTOM                                                     \
-    template <class Cls> static void _CustomWrapCode(Cls &_class)
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.
 WRAP_CUSTOM;
 
-        
-static UsdAttribute
-_CreateMotionBlurScaleAttr(UsdGeomMotionAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateMotionBlurScaleAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateVelocityScaleAttr(UsdGeomMotionAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateVelocityScaleAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateNonlinearSampleCountAttr(UsdGeomMotionAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateNonlinearSampleCountAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int), writeSparsely);
+static UsdAttribute _CreateMotionBlurScaleAttr(UsdGeomMotionAPI &self,
+                                               object defaultVal,
+                                               bool writeSparsely)
+{
+  return self.CreateMotionBlurScaleAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                        writeSparsely);
 }
 
-static std::string
-_Repr(const UsdGeomMotionAPI &self)
+static UsdAttribute _CreateVelocityScaleAttr(UsdGeomMotionAPI &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
 {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdGeom.MotionAPI(%s)",
-        primRepr.c_str());
+  return self.CreateVelocityScaleAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float),
+                                      writeSparsely);
 }
 
-struct UsdGeomMotionAPI_CanApplyResult : 
-    public TfPyAnnotatedBoolResult<std::string>
+static UsdAttribute _CreateNonlinearSampleCountAttr(UsdGeomMotionAPI &self,
+                                                    object defaultVal,
+                                                    bool writeSparsely)
 {
-    UsdGeomMotionAPI_CanApplyResult(bool val, std::string const &msg) :
-        TfPyAnnotatedBoolResult<std::string>(val, msg) {}
+  return self.CreateNonlinearSampleCountAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Int), writeSparsely);
+}
+
+static std::string _Repr(const UsdGeomMotionAPI &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdGeom.MotionAPI(%s)", primRepr.c_str());
+}
+
+struct UsdGeomMotionAPI_CanApplyResult : public TfPyAnnotatedBoolResult<std::string> {
+  UsdGeomMotionAPI_CanApplyResult(bool val, std::string const &msg)
+      : TfPyAnnotatedBoolResult<std::string>(val, msg)
+  {
+  }
 };
 
-static UsdGeomMotionAPI_CanApplyResult
-_WrapCanApply(const UsdPrim& prim)
+static UsdGeomMotionAPI_CanApplyResult _WrapCanApply(const UsdPrim &prim)
 {
-    std::string whyNot;
-    bool result = UsdGeomMotionAPI::CanApply(prim, &whyNot);
-    return UsdGeomMotionAPI_CanApplyResult(result, whyNot);
+  std::string whyNot;
+  bool result = UsdGeomMotionAPI::CanApply(prim, &whyNot);
+  return UsdGeomMotionAPI_CanApplyResult(result, whyNot);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdGeomMotionAPI()
 {
-    typedef UsdGeomMotionAPI This;
+  typedef UsdGeomMotionAPI This;
 
-    UsdGeomMotionAPI_CanApplyResult::Wrap<UsdGeomMotionAPI_CanApplyResult>(
-        "_CanApplyResult", "whyNot");
+  UsdGeomMotionAPI_CanApplyResult::Wrap<UsdGeomMotionAPI_CanApplyResult>("_CanApplyResult",
+                                                                         "whyNot");
 
-    class_<This, bases<UsdAPISchemaBase> >
-        cls("MotionAPI");
+  class_<This, bases<UsdAPISchemaBase>> cls("MotionAPI");
 
-    cls
-        .def(init<UsdPrim>(arg("prim")))
-        .def(init<UsdSchemaBase const&>(arg("schemaObj")))
-        .def(TfTypePythonClass())
+  cls.def(init<UsdPrim>(arg("prim")))
+      .def(init<UsdSchemaBase const &>(arg("schemaObj")))
+      .def(TfTypePythonClass())
 
-        .def("Get", &This::Get, (arg("stage"), arg("path")))
-        .staticmethod("Get")
+      .def("Get", &This::Get, (arg("stage"), arg("path")))
+      .staticmethod("Get")
 
-        .def("CanApply", &_WrapCanApply, (arg("prim")))
-        .staticmethod("CanApply")
+      .def("CanApply", &_WrapCanApply, (arg("prim")))
+      .staticmethod("CanApply")
 
-        .def("Apply", &This::Apply, (arg("prim")))
-        .staticmethod("Apply")
+      .def("Apply", &This::Apply, (arg("prim")))
+      .staticmethod("Apply")
 
-        .def("GetSchemaAttributeNames",
-             &This::GetSchemaAttributeNames,
-             arg("includeInherited")=true,
-             return_value_policy<TfPySequenceToList>())
-        .staticmethod("GetSchemaAttributeNames")
+      .def("GetSchemaAttributeNames",
+           &This::GetSchemaAttributeNames,
+           arg("includeInherited") = true,
+           return_value_policy<TfPySequenceToList>())
+      .staticmethod("GetSchemaAttributeNames")
 
-        .def("_GetStaticTfType", (TfType const &(*)()) TfType::Find<This>,
-             return_value_policy<return_by_value>())
-        .staticmethod("_GetStaticTfType")
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
+           return_value_policy<return_by_value>())
+      .staticmethod("_GetStaticTfType")
 
-        .def(!self)
+      .def(!self)
 
-        
-        .def("GetMotionBlurScaleAttr",
-             &This::GetMotionBlurScaleAttr)
-        .def("CreateMotionBlurScaleAttr",
-             &_CreateMotionBlurScaleAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetVelocityScaleAttr",
-             &This::GetVelocityScaleAttr)
-        .def("CreateVelocityScaleAttr",
-             &_CreateVelocityScaleAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetNonlinearSampleCountAttr",
-             &This::GetNonlinearSampleCountAttr)
-        .def("CreateNonlinearSampleCountAttr",
-             &_CreateNonlinearSampleCountAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
+      .def("GetMotionBlurScaleAttr", &This::GetMotionBlurScaleAttr)
+      .def("CreateMotionBlurScaleAttr",
+           &_CreateMotionBlurScaleAttr,
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-        .def("__repr__", ::_Repr)
-    ;
+      .def("GetVelocityScaleAttr", &This::GetVelocityScaleAttr)
+      .def("CreateVelocityScaleAttr",
+           &_CreateVelocityScaleAttr,
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-    _CustomWrapCode(cls);
+      .def("GetNonlinearSampleCountAttr", &This::GetNonlinearSampleCountAttr)
+      .def("CreateNonlinearSampleCountAttr",
+           &_CreateNonlinearSampleCountAttr,
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
+
+      .def("__repr__", ::_Repr);
+
+  _CustomWrapCode(cls);
 }
 
 // ===================================================================== //
-// Feel free to add custom code below this line, it will be preserved by 
+// Feel free to add custom code below this line, it will be preserved by
 // the code generator.  The entry point for your custom code should look
 // minimally like the following:
 //
@@ -173,7 +161,7 @@ void wrapUsdGeomMotionAPI()
 // }
 //
 // Of course any other ancillary or support code may be provided.
-// 
+//
 // Just remember to wrap code in the appropriate delimiters:
 // 'namespace {', '}'.
 //
@@ -182,17 +170,18 @@ void wrapUsdGeomMotionAPI()
 
 namespace {
 
-WRAP_CUSTOM {
-    _class
-        .def("ComputeVelocityScale", &UsdGeomMotionAPI::ComputeVelocityScale,
-                (arg("time")=UsdTimeCode::Default()))
-        .def("ComputeNonlinearSampleCount",
-             &UsdGeomMotionAPI::ComputeNonlinearSampleCount,
-                (arg("time")=UsdTimeCode::Default()))
-        .def("ComputeMotionBlurScale", 
-             &UsdGeomMotionAPI::ComputeMotionBlurScale,
-             (arg("time")=UsdTimeCode::Default()))
-     ;
+WRAP_CUSTOM
+{
+  _class
+      .def("ComputeVelocityScale",
+           &UsdGeomMotionAPI::ComputeVelocityScale,
+           (arg("time") = UsdTimeCode::Default()))
+      .def("ComputeNonlinearSampleCount",
+           &UsdGeomMotionAPI::ComputeNonlinearSampleCount,
+           (arg("time") = UsdTimeCode::Default()))
+      .def("ComputeMotionBlurScale",
+           &UsdGeomMotionAPI::ComputeMotionBlurScale,
+           (arg("time") = UsdTimeCode::Default()));
 }
 
-} // anonymous namespace 
+}  // anonymous namespace

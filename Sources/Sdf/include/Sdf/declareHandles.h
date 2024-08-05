@@ -30,10 +30,10 @@
 
 #include "Arch/demangle.h"
 #include "Arch/hints.h"
+#include "Sdf/api.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/diagnostic.h"
 #include "Tf/weakPtrFacade.h"
-#include "Sdf/api.h"
 
 #include <Arch/swiftInterop.h>
 
@@ -61,9 +61,8 @@ using Sdf_IdentityRefPtr = boost::intrusive_ptr<Sdf_Identity>;
 /// object as an extra expiration check so that dormant objects appear to
 /// be expired.
 ///
-template <class T>
-class SdfHandle : private boost::totally_ordered<SdfHandle<T>> {
-public:
+template<class T> class SdfHandle : private boost::totally_ordered<SdfHandle<T>> {
+ public:
   using SpecType = T;
   using This = SdfHandle<SpecType>;
 
@@ -75,32 +74,40 @@ public:
   explicit SdfHandle(const Sdf_IdentityRefPtr &id) : _spec(id) {}
   SdfHandle(const SpecType &spec) : _spec(spec) {}
 
-  template <class U> SdfHandle(const SdfHandle<U> &x) : _spec(x._spec) {}
+  template<class U> SdfHandle(const SdfHandle<U> &x) : _spec(x._spec) {}
 
-  This &operator=(const This &x) {
+  This &operator=(const This &x)
+  {
     const_cast<NonConstSpecType &>(_spec) = x._spec;
     return *this;
   }
 
-  template <class U> This &operator=(const SdfHandle<U> &x) {
+  template<class U> This &operator=(const SdfHandle<U> &x)
+  {
     const_cast<NonConstSpecType &>(_spec) = x._spec;
     return *this;
   }
 
   /// Dereference.  Raises a fatal error if the object is invalid or
   /// dormant.
-  SpecType *operator->() const {
+  SpecType *operator->() const
+  {
     if (ARCH_UNLIKELY(_spec.IsDormant())) {
-      TF_FATAL_ERROR("Dereferenced an invalid %s",
-                     ArchGetDemangled(typeid(SpecType)).c_str());
+      TF_FATAL_ERROR("Dereferenced an invalid %s", ArchGetDemangled(typeid(SpecType)).c_str());
       return 0;
     }
     return const_cast<SpecType *>(&_spec);
   }
 
-  const SpecType &GetSpec() const { return _spec; }
+  const SpecType &GetSpec() const
+  {
+    return _spec;
+  }
 
-  void Reset() { const_cast<SpecType &>(_spec) = SpecType(); }
+  void Reset()
+  {
+    const_cast<SpecType &>(_spec) = SpecType();
+  }
 
 #if !defined(doxygen)
   typedef SpecType This::*UnspecifiedBoolType;
@@ -108,37 +115,45 @@ public:
 
   /// Returns \c true in a boolean context if the object is valid,
   /// \c false otherwise.
-  operator UnspecifiedBoolType() const {
+  operator UnspecifiedBoolType() const
+  {
     return _spec.IsDormant() ? 0 : &This::_spec;
   }
   /// Returns \c false in a boolean context if the object is valid,
   /// \c true otherwise.
-  bool operator!() const { return _spec.IsDormant(); }
+  bool operator!() const
+  {
+    return _spec.IsDormant();
+  }
 
   /// Compares handles for equality.
-  template <class U> bool operator==(const SdfHandle<U> &other) const {
+  template<class U> bool operator==(const SdfHandle<U> &other) const
+  {
     return _spec == other._spec;
   }
 
   /// Arranges handles in an arbitrary strict weak ordering.  Note that
   /// this ordering is stable across path changes.
-  template <class U> bool operator<(const SdfHandle<U> &other) const {
+  template<class U> bool operator<(const SdfHandle<U> &other) const
+  {
     return _spec < other._spec;
   }
 
   /// Hash.
-  friend size_t hash_value(const This &x) { return hash_value(x._spec); }
+  friend size_t hash_value(const This &x)
+  {
+    return hash_value(x._spec);
+  }
 
-private:
-  friend inline SpecType *get_pointer(const SdfHandle &x) {
-    return ARCH_UNLIKELY(x._spec.IsDormant())
-               ? nullptr
-               : const_cast<SpecType *>(&x._spec);
+ private:
+  friend inline SpecType *get_pointer(const SdfHandle &x)
+  {
+    return ARCH_UNLIKELY(x._spec.IsDormant()) ? nullptr : const_cast<SpecType *>(&x._spec);
   }
 
   SpecType _spec;
 
-  template <class U> friend class SdfHandle;
+  template<class U> friend class SdfHandle;
 } SWIFT_UNSAFE_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -151,7 +166,7 @@ using PXR_NS::get_pointer;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class T> struct SdfHandleTo {
+template<class T> struct SdfHandleTo {
   using Cls = T;
   using Handle = SdfHandle<Cls>;
   using ConstHandle = SdfHandle<const Cls>;
@@ -159,40 +174,41 @@ template <class T> struct SdfHandleTo {
   using ConstVector = std::vector<ConstHandle>;
 };
 
-template <> struct SdfHandleTo<SdfLayer> {
+template<> struct SdfHandleTo<SdfLayer> {
   using Handle = TfWeakPtr<SdfLayer>;
   using ConstHandle = TfWeakPtr<const SdfLayer>;
   using Vector = std::vector<Handle>;
   using ConstVector = std::vector<ConstHandle>;
 };
 
-template <typename T> typename SdfHandleTo<T>::Handle SdfCreateHandle(T *p) {
+template<typename T> typename SdfHandleTo<T>::Handle SdfCreateHandle(T *p)
+{
   return typename SdfHandleTo<T>::Handle(p ? *p : T());
 }
 
-template <> SDF_API SdfHandleTo<SdfLayer>::Handle SdfCreateHandle(SdfLayer *p);
+template<> SDF_API SdfHandleTo<SdfLayer>::Handle SdfCreateHandle(SdfLayer *p);
 
-template <typename T>
-typename SdfHandleTo<T>::Handle SdfCreateNonConstHandle(T const *p) {
+template<typename T> typename SdfHandleTo<T>::Handle SdfCreateNonConstHandle(T const *p)
+{
   return SdfCreateHandle(const_cast<T *>(p));
 }
 
 struct Sdf_CastAccess {
-  template <class DST, class SRC> static DST CastSpec(const SRC &spec) {
+  template<class DST, class SRC> static DST CastSpec(const SRC &spec)
+  {
     return DST(spec);
   }
 };
 
-SDF_API bool Sdf_CanCastToType(const SdfSpec &srcSpec,
-                               const std::type_info &destType);
+SDF_API bool Sdf_CanCastToType(const SdfSpec &srcSpec, const std::type_info &destType);
 
-SDF_API bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &srcSpec,
-                                          const std::type_info &destType);
+SDF_API bool Sdf_CanCastToTypeCheckSchema(const SdfSpec &srcSpec, const std::type_info &destType);
 
-template <class DST, class SRC>
+template<class DST, class SRC>
 struct Sdf_SpecTypesAreDirectlyRelated
-    : std::integral_constant<bool, std::is_base_of<DST, SRC>::value || std::is_base_of<SRC, DST>::value>
-{};
+    : std::integral_constant<bool,
+                             std::is_base_of<DST, SRC>::value ||
+                                 std::is_base_of<SRC, DST>::value> {};
 
 /// Convert SdfHandle<SRC> \p x to an SdfHandle<DST>. This function
 /// behaves similar to a dynamic_cast. If class DST cannot represent
@@ -204,9 +220,9 @@ struct Sdf_SpecTypesAreDirectlyRelated
 ///      This function will allow casting between spec classes even if
 ///      they are not directly related. Doing so could lead to schema
 ///      mismatches and other buggy behavior.
-template <typename DST, typename SRC>
-inline SdfHandle<typename DST::SpecType>
-TfDynamic_cast(const SdfHandle<SRC> &x) {
+template<typename DST, typename SRC>
+inline SdfHandle<typename DST::SpecType> TfDynamic_cast(const SdfHandle<SRC> &x)
+{
   using Spec = typename DST::SpecType;
   using Handle = SdfHandle<Spec>;
 
@@ -217,9 +233,9 @@ TfDynamic_cast(const SdfHandle<SRC> &x) {
   return Handle();
 }
 
-template <typename DST, typename SRC>
-inline SdfHandle<typename DST::SpecType>
-TfSafeDynamic_cast(const SdfHandle<SRC> &x) {
+template<typename DST, typename SRC>
+inline SdfHandle<typename DST::SpecType> TfSafeDynamic_cast(const SdfHandle<SRC> &x)
+{
   return TfDynamic_cast(x);
 }
 
@@ -227,9 +243,9 @@ TfSafeDynamic_cast(const SdfHandle<SRC> &x) {
 /// behaves similar to a static_cast. No runtime checks are performed
 /// to ensure the conversion is valid; it is up to the consumer to
 /// ensure this.
-template <typename DST, typename SRC>
-inline SdfHandle<typename DST::SpecType>
-TfStatic_cast(const SdfHandle<SRC> &x) {
+template<typename DST, typename SRC>
+inline SdfHandle<typename DST::SpecType> TfStatic_cast(const SdfHandle<SRC> &x)
+{
   using Spec = typename DST::SpecType;
   using Handle = SdfHandle<Spec>;
   static_assert(Sdf_SpecTypesAreDirectlyRelated<Spec, SRC>::value,
@@ -238,9 +254,9 @@ TfStatic_cast(const SdfHandle<SRC> &x) {
   return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
 }
 
-template <typename T>
-inline SdfHandle<typename T::SpecType>
-TfConst_cast(const SdfHandle<const typename T::SpecType> &x) {
+template<typename T>
+inline SdfHandle<typename T::SpecType> TfConst_cast(const SdfHandle<const typename T::SpecType> &x)
+{
   return TfStatic_cast<T>(x);
 }
 
@@ -248,9 +264,9 @@ TfConst_cast(const SdfHandle<const typename T::SpecType> &x) {
 /// similar to TfDynamic_cast, but it allows the SRC and DST spec to be
 /// indirectly related, so long as the schema associated with the DST
 /// spec type is a subclass of the schema associated with \p x.
-template <typename DST, typename SRC>
-inline SdfHandle<typename DST::SpecType>
-SdfSpecDynamic_cast(const SdfHandle<SRC> &x) {
+template<typename DST, typename SRC>
+inline SdfHandle<typename DST::SpecType> SdfSpecDynamic_cast(const SdfHandle<SRC> &x)
+{
   using Spec = typename DST::SpecType;
   using Handle = SdfHandle<Spec>;
 
@@ -264,17 +280,18 @@ SdfSpecDynamic_cast(const SdfHandle<SRC> &x) {
 /// Convert SdfHandle<SRC> \p x to an SdfHandle<DST>. This function is
 /// similar to TfStatic_cast, but it allows the SRC and DST spec to be
 /// indirectly related.
-template <typename DST, typename SRC>
-inline SdfHandle<typename DST::SpecType>
-SdfSpecStatic_cast(const SdfHandle<SRC> &x) {
+template<typename DST, typename SRC>
+inline SdfHandle<typename DST::SpecType> SdfSpecStatic_cast(const SdfHandle<SRC> &x)
+{
   using Spec = typename DST::SpecType;
   using Handle = SdfHandle<Spec>;
   return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
 }
 
 /// Convert SRC_SPEC to a DST_SPEC.
-template <typename DST_SPEC, typename SRC_SPEC>
-inline DST_SPEC SdfSpecStatic_cast(const SRC_SPEC &x) {
+template<typename DST_SPEC, typename SRC_SPEC>
+inline DST_SPEC SdfSpecStatic_cast(const SRC_SPEC &x)
+{
   return Sdf_CastAccess::CastSpec<DST_SPEC, SRC_SPEC>(x);
 }
 
@@ -282,12 +299,12 @@ using SdfLayerRefPtr = TfRefPtr<SdfLayer>;
 using SdfLayerRefPtrVector = std::vector<SdfLayerRefPtr>;
 using SdfLayerHandleSet = std::set<SdfHandleTo<SdfLayer>::Handle>;
 
-#define SDF_DECLARE_HANDLES(cls)                                               \
-  using cls##Handle = SdfHandleTo<class cls>::Handle;                          \
-  using cls##ConstHandle = SdfHandleTo<class cls>::ConstHandle;                \
-  using cls##HandleVector = SdfHandleTo<class cls>::Vector;                    \
+#define SDF_DECLARE_HANDLES(cls) \
+  using cls##Handle = SdfHandleTo<class cls>::Handle; \
+  using cls##ConstHandle = SdfHandleTo<class cls>::ConstHandle; \
+  using cls##HandleVector = SdfHandleTo<class cls>::Vector; \
   using cls##ConstHandleVector = SdfHandleTo<class cls>::ConstVector
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_DECLARE_HANDLES_H
+#endif  // PXR_USD_SDF_DECLARE_HANDLES_H

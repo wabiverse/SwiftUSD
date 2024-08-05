@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGI_METAL_CONVERSIONS_H
 #define PXR_IMAGING_HGI_METAL_CONVERSIONS_H
 
-#include <Metal/Metal.hpp>
-#include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
 #include "Hgi/enums.h"
 #include "Hgi/types.h"
+#include "HgiMetal/api.h"
+#include <Metal/Metal.hpp>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Converts from Hgi types to Metal types.
 ///
-class HgiMetalConversions final
-{
-public:
+class HgiMetalConversions final {
+ public:
   //
   // Hgi to Metal conversions
   //
@@ -92,7 +91,8 @@ public:
   HGIMETAL_API
   static MTL::SamplerBorderColor GetBorderColor(HgiBorderColor bc);
 
-#if (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+#if (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
   HGIMETAL_API
   static MTL::TextureSwizzle GetComponentSwizzle(HgiComponentSwizzle);
 #endif

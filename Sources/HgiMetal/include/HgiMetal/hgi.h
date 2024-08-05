@@ -24,41 +24,34 @@
 #ifndef PXR_IMAGING_HGI_METAL_HGI_H
 #define PXR_IMAGING_HGI_METAL_HGI_H
 
-#include <pxr/pxrns.h>
 #include "Arch/swiftInterop.h"
+#include <pxr/pxrns.h>
 
+#include "Hgi/hgiImpl.h"
+#include "Hgi/tokens.h"
 #include "HgiMetal/api.h"
 #include "HgiMetal/capabilities.h"
 #include "HgiMetal/indirectCommandEncoder.h"
-#include "Hgi/hgiImpl.h"
-#include "Hgi/tokens.h"
 
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
-#include <stack>
-#include <mutex>
 #include <memory>
+#include <mutex>
+#include <stack>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
 
-enum
-{
-  APIVersion_Metal1_0 = 0,
-  APIVersion_Metal2_0,
-  APIVersion_Metal3_0
-};
+enum { APIVersion_Metal1_0 = 0, APIVersion_Metal2_0, APIVersion_Metal3_0 };
 
 /// \class HgiMetal
 ///
 /// Metal implementation of the Hydra Graphics Interface.
 ///
-class HgiMetal final : public Hgi
-{
-public:
-  enum CommitCommandBufferWaitType
-  {
+class HgiMetal final : public Hgi {
+ public:
+  enum CommitCommandBufferWaitType {
     CommitCommandBuffer_NoWait = 0,
     CommitCommandBuffer_WaitUntilScheduled,
     CommitCommandBuffer_WaitUntilCompleted
@@ -69,7 +62,7 @@ public:
 
   HGIMETAL_API
   ~HgiMetal() override;
-  
+
   HGIMETAL_API
   static HgiMetalPtr CreateHgi();
 
@@ -77,12 +70,10 @@ public:
   bool IsBackendSupported() const override;
 
   HGIMETAL_API
-  HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(
-      HgiGraphicsCmdsDesc const &desc) override;
+  HgiGraphicsCmdsUniquePtr CreateGraphicsCmds(HgiGraphicsCmdsDesc const &desc) override;
 
   HGIMETAL_API
-  HgiComputeCmdsUniquePtr CreateComputeCmds(
-      HgiComputeCmdsDesc const &desc) override;
+  HgiComputeCmdsUniquePtr CreateComputeCmds(HgiComputeCmdsDesc const &desc) override;
 
   HGIMETAL_API
   HgiBlitCmdsUniquePtr CreateBlitCmds() override;
@@ -94,8 +85,7 @@ public:
   void DestroyTexture(HgiTextureHandle *texHandle) override;
 
   HGIMETAL_API
-  HgiTextureViewHandle CreateTextureView(
-      HgiTextureViewDesc const &desc) override;
+  HgiTextureViewHandle CreateTextureView(HgiTextureViewDesc const &desc) override;
 
   HGIMETAL_API
   void DestroyTextureView(HgiTextureViewHandle *viewHandle) override;
@@ -113,24 +103,19 @@ public:
   void DestroyBuffer(HgiBufferHandle *texHandle) override;
 
   HGIMETAL_API
-  HgiShaderFunctionHandle CreateShaderFunction(
-      HgiShaderFunctionDesc const &desc) override;
+  HgiShaderFunctionHandle CreateShaderFunction(HgiShaderFunctionDesc const &desc) override;
 
   HGIMETAL_API
-  void DestroyShaderFunction(
-      HgiShaderFunctionHandle *shaderFunctionHandle) override;
+  void DestroyShaderFunction(HgiShaderFunctionHandle *shaderFunctionHandle) override;
 
   HGIMETAL_API
-  HgiShaderProgramHandle CreateShaderProgram(
-      HgiShaderProgramDesc const &desc) override;
+  HgiShaderProgramHandle CreateShaderProgram(HgiShaderProgramDesc const &desc) override;
 
   HGIMETAL_API
-  void DestroyShaderProgram(
-      HgiShaderProgramHandle *shaderProgramHandle) override;
+  void DestroyShaderProgram(HgiShaderProgramHandle *shaderProgramHandle) override;
 
   HGIMETAL_API
-  HgiResourceBindingsHandle CreateResourceBindings(
-      HgiResourceBindingsDesc const &desc) override;
+  HgiResourceBindingsHandle CreateResourceBindings(HgiResourceBindingsDesc const &desc) override;
 
   HGIMETAL_API
   void DestroyResourceBindings(HgiResourceBindingsHandle *resHandle) override;
@@ -140,12 +125,10 @@ public:
       HgiGraphicsPipelineDesc const &pipeDesc) override;
 
   HGIMETAL_API
-  void DestroyGraphicsPipeline(
-      HgiGraphicsPipelineHandle *pipeHandle) override;
+  void DestroyGraphicsPipeline(HgiGraphicsPipelineHandle *pipeHandle) override;
 
   HGIMETAL_API
-  HgiComputePipelineHandle CreateComputePipeline(
-      HgiComputePipelineDesc const &pipeDesc) override;
+  HgiComputePipelineHandle CreateComputePipeline(HgiComputePipelineDesc const &pipeDesc) override;
 
   HGIMETAL_API
   void DestroyComputePipeline(HgiComputePipelineHandle *pipeHandle) override;
@@ -184,8 +167,7 @@ public:
   // For example, the client code may record in a HgiBlitCmds and a
   // HgiComputeCmds at the same time.
   HGIMETAL_API
-  MTL::CommandBuffer *GetPrimaryCommandBuffer(HgiCmds *requester = nullptr,
-                                              bool flush = true);
+  MTL::CommandBuffer *GetPrimaryCommandBuffer(HgiCmds *requester = nullptr, bool flush = true);
 
   HGIMETAL_API
   MTL::CommandBuffer *GetSecondaryCommandBuffer();
@@ -199,9 +181,8 @@ public:
       bool forceNewBuffer = false);
 
   HGIMETAL_API
-  void CommitSecondaryCommandBuffer(
-      MTL::CommandBuffer *commandBuffer,
-      CommitCommandBufferWaitType waitType);
+  void CommitSecondaryCommandBuffer(MTL::CommandBuffer *commandBuffer,
+                                    CommitCommandBufferWaitType waitType);
 
   HGIMETAL_API
   void ReleaseSecondaryCommandBuffer(MTL::CommandBuffer *commandBuffer);
@@ -215,18 +196,17 @@ public:
   HGIMETAL_API
   MTL::Buffer *GetArgBuffer();
 
-protected:
+ protected:
   HGIMETAL_API
   bool _SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiMetal &operator=(const HgiMetal &) = delete;
   HgiMetal(const HgiMetal &) = delete;
 
   // Invalidates the resource handle and destroys the object.
   // Metal's internal garbage collection will handle the rest.
-  template <class T>
-  void _TrashObject(HgiHandle<T> *handle)
+  template<class T> void _TrashObject(HgiHandle<T> *handle)
   {
     delete handle->Get();
     *handle = HgiHandle<T>();

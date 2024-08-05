@@ -67,76 +67,70 @@ class PxOsdMeshTopology;
 ///
 /// \endcode
 ///
-class GeomUtilCylinderMeshGenerator final
-    : public GeomUtilMeshGeneratorBase
-{
-public:
+class GeomUtilCylinderMeshGenerator final : public GeomUtilMeshGeneratorBase {
+ public:
   static constexpr size_t minNumRadial = 3;
 
   GEOMUTIL_API
-  static size_t ComputeNumPoints(
-      const size_t numRadial,
-      const bool closedSweep = true);
+  static size_t ComputeNumPoints(const size_t numRadial, const bool closedSweep = true);
 
   GEOMUTIL_API
-  static PxOsdMeshTopology GenerateTopology(
-      const size_t numRadial,
-      const bool closedSweep = true);
+  static PxOsdMeshTopology GenerateTopology(const size_t numRadial, const bool closedSweep = true);
 
-  template <typename PointIterType,
-            typename ScalarType,
-            typename Enabled =
-                typename _EnableIfGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter,
-      const size_t numRadial,
-      const ScalarType radius,
-      const ScalarType height,
-      const GfMatrix4d *framePtr = nullptr)
+  template<typename PointIterType,
+           typename ScalarType,
+           typename Enabled = typename _EnableIfGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter,
+                             const size_t numRadial,
+                             const ScalarType radius,
+                             const ScalarType height,
+                             const GfMatrix4d *framePtr = nullptr)
   {
     constexpr ScalarType sweep = 360;
 
-    GeneratePoints(iter, numRadial,
+    GeneratePoints(iter,
+                   numRadial,
                    /* bottomRadius = */ radius,
                    /* topRadius =    */ radius,
-                   height, sweep, framePtr);
+                   height,
+                   sweep,
+                   framePtr);
   }
 
-  template <typename PointIterType,
-            typename ScalarType,
-            typename Enabled =
-                typename _EnableIfGfVec3Iterator<PointIterType>::type>
-  static void GeneratePoints(
-      PointIterType iter,
-      const size_t numRadial,
-      const ScalarType bottomRadius,
-      const ScalarType topRadius,
-      const ScalarType height,
-      const ScalarType sweepDegrees,
-      const GfMatrix4d *framePtr = nullptr)
+  template<typename PointIterType,
+           typename ScalarType,
+           typename Enabled = typename _EnableIfGfVec3Iterator<PointIterType>::type>
+  static void GeneratePoints(PointIterType iter,
+                             const size_t numRadial,
+                             const ScalarType bottomRadius,
+                             const ScalarType topRadius,
+                             const ScalarType height,
+                             const ScalarType sweepDegrees,
+                             const GfMatrix4d *framePtr = nullptr)
   {
-    using PointType =
-        typename std::iterator_traits<PointIterType>::value_type;
+    using PointType = typename std::iterator_traits<PointIterType>::value_type;
 
-    _GeneratePointsImpl(numRadial, bottomRadius, topRadius, height,
+    _GeneratePointsImpl(numRadial,
+                        bottomRadius,
+                        topRadius,
+                        height,
                         sweepDegrees,
-                        framePtr ? _PointWriter<PointType>(iter, framePtr)
-                                 : _PointWriter<PointType>(iter));
+                        framePtr ? _PointWriter<PointType>(iter, framePtr) :
+                                   _PointWriter<PointType>(iter));
   }
 
   using GeomUtilMeshGeneratorBase::GeneratePoints;
 
-private:
-  template <typename PointType>
-  static void _GeneratePointsImpl(
-      const size_t numRadial,
-      const typename PointType::ScalarType bottomRadius,
-      const typename PointType::ScalarType topRadius,
-      const typename PointType::ScalarType height,
-      const typename PointType::ScalarType sweep,
-      const _PointWriter<PointType> &ptWriter);
+ private:
+  template<typename PointType>
+  static void _GeneratePointsImpl(const size_t numRadial,
+                                  const typename PointType::ScalarType bottomRadius,
+                                  const typename PointType::ScalarType topRadius,
+                                  const typename PointType::ScalarType height,
+                                  const typename PointType::ScalarType sweep,
+                                  const _PointWriter<PointType> &ptWriter);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_GEOM_UTIL_CYLINDER_MESH_GENERATOR_H
+#endif  // PXR_IMAGING_GEOM_UTIL_CYLINDER_MESH_GENERATOR_H

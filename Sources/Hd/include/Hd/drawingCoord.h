@@ -24,24 +24,24 @@
 #ifndef PXR_IMAGING_HD_DRAWING_COORD_H
 #define PXR_IMAGING_HD_DRAWING_COORD_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
 #include "Hd/version.h"
 #include "Tf/diagnostic.h"
+#include <pxr/pxrns.h>
 #include <stdint.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class HdDrawingCoord
 ///
-/// A tiny set of integers, which provides an indirection mapping from the 
-/// conceptual space of an HdRprim's resources (topological, primvar & 
+/// A tiny set of integers, which provides an indirection mapping from the
+/// conceptual space of an HdRprim's resources (topological, primvar &
 /// instancing) to the index within HdBufferArrayRangeContainer, where the
 /// resource is stored.
-/// 
+///
 /// Each HdDrawItem contains a HdDrawingCoord, with the relevant compositional
 /// hierarchy being:
-/// 
+///
 ///  HdRprim
 ///  |
 ///  +--HdRepr(s)
@@ -53,7 +53,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///  +--HdRprimSharedData           |
 ///     |                           |
 ///     +--HdBARContainer  <--------+
-///  
+///
 ///
 /// Having this indirection provides a recipe for how to configure
 /// a drawing coordinate, which is a bundle of HdBufferArrayRanges, while
@@ -81,13 +81,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// instance level=2 ---> [k+2]
 ///
 class HdDrawingCoord {
-public:
-    static const int CustomSlotsBegin = 8;
-    static const int DefaultNumSlots = 3; /* Constant, Vertex, Topology */
-    static const int Unassigned = -1;
+ public:
+  static const int CustomSlotsBegin = 8;
+  static const int DefaultNumSlots = 3; /* Constant, Vertex, Topology */
+  static const int Unassigned = -1;
 
-    HdDrawingCoord() :
-        // default slots:
+  HdDrawingCoord()
+      :  // default slots:
         _topology(2),
         _instancePrimvar(Unassigned),
         _constantPrimvar(0),
@@ -96,45 +96,97 @@ public:
         _instanceIndex(4),
         _faceVaryingPrimvar(5),
         _topologyVisibility(6),
-        _varyingPrimvar(7) {
-    }
+        _varyingPrimvar(7)
+  {
+  }
 
-    int GetConstantPrimvarIndex() const    { return _constantPrimvar; }
-    void SetConstantPrimvarIndex(int slot) { _constantPrimvar = slot; }
-    int GetVertexPrimvarIndex() const      { return _vertexPrimvar; }
-    void SetVertexPrimvarIndex(int slot)   { _vertexPrimvar = slot; }
-    int GetTopologyIndex() const           { return _topology; }
-    void SetTopologyIndex(int slot)        { _topology = slot; }
-    int GetElementPrimvarIndex() const     { return _elementPrimvar; }
-    void SetElementPrimvarIndex(int slot)  { _elementPrimvar = slot; }
-    int GetInstanceIndexIndex() const      { return _instanceIndex; }
-    void SetInstanceIndexIndex(int slot)   { _instanceIndex = slot; }
-    int GetFaceVaryingPrimvarIndex() const    { return _faceVaryingPrimvar; }
-    void SetFaceVaryingPrimvarIndex(int slot) { _faceVaryingPrimvar = slot; }
-    int GetTopologyVisibilityIndex() const    { return _topologyVisibility; }
-    void SetTopologyVisibilityIndex(int slot) { _topologyVisibility = slot; }
-    int GetVaryingPrimvarIndex() const      { return _varyingPrimvar; }
-    void SetVaryingPrimvarIndex(int slot)   { _varyingPrimvar = slot; }
+  int GetConstantPrimvarIndex() const
+  {
+    return _constantPrimvar;
+  }
+  void SetConstantPrimvarIndex(int slot)
+  {
+    _constantPrimvar = slot;
+  }
+  int GetVertexPrimvarIndex() const
+  {
+    return _vertexPrimvar;
+  }
+  void SetVertexPrimvarIndex(int slot)
+  {
+    _vertexPrimvar = slot;
+  }
+  int GetTopologyIndex() const
+  {
+    return _topology;
+  }
+  void SetTopologyIndex(int slot)
+  {
+    _topology = slot;
+  }
+  int GetElementPrimvarIndex() const
+  {
+    return _elementPrimvar;
+  }
+  void SetElementPrimvarIndex(int slot)
+  {
+    _elementPrimvar = slot;
+  }
+  int GetInstanceIndexIndex() const
+  {
+    return _instanceIndex;
+  }
+  void SetInstanceIndexIndex(int slot)
+  {
+    _instanceIndex = slot;
+  }
+  int GetFaceVaryingPrimvarIndex() const
+  {
+    return _faceVaryingPrimvar;
+  }
+  void SetFaceVaryingPrimvarIndex(int slot)
+  {
+    _faceVaryingPrimvar = slot;
+  }
+  int GetTopologyVisibilityIndex() const
+  {
+    return _topologyVisibility;
+  }
+  void SetTopologyVisibilityIndex(int slot)
+  {
+    _topologyVisibility = slot;
+  }
+  int GetVaryingPrimvarIndex() const
+  {
+    return _varyingPrimvar;
+  }
+  void SetVaryingPrimvarIndex(int slot)
+  {
+    _varyingPrimvar = slot;
+  }
 
-    // instance primvars take up a range of slots.
-    void SetInstancePrimvarBaseIndex(int slot) { _instancePrimvar = slot; }
-    int GetInstancePrimvarIndex(int level) const {
-        TF_VERIFY(_instancePrimvar != Unassigned);
-        return _instancePrimvar + level;
-    }
+  // instance primvars take up a range of slots.
+  void SetInstancePrimvarBaseIndex(int slot)
+  {
+    _instancePrimvar = slot;
+  }
+  int GetInstancePrimvarIndex(int level) const
+  {
+    TF_VERIFY(_instancePrimvar != Unassigned);
+    return _instancePrimvar + level;
+  }
 
-private:
-    int16_t _topology;
-    int16_t _instancePrimvar;
-    int8_t _constantPrimvar;
-    int8_t _vertexPrimvar;
-    int8_t _elementPrimvar;
-    int8_t _instanceIndex;
-    int8_t _faceVaryingPrimvar;
-    int8_t _topologyVisibility;
-    int8_t _varyingPrimvar;
+ private:
+  int16_t _topology;
+  int16_t _instancePrimvar;
+  int8_t _constantPrimvar;
+  int8_t _vertexPrimvar;
+  int8_t _elementPrimvar;
+  int8_t _instanceIndex;
+  int8_t _faceVaryingPrimvar;
+  int8_t _topologyVisibility;
+  int8_t _varyingPrimvar;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

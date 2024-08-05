@@ -38,11 +38,12 @@ namespace {
 
 TF_INSTANTIATE_NOTICE_WRAPPER(TfPyModuleWasLoaded, TfNotice);
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPyModuleNotice() {
+void wrapPyModuleNotice()
+{
 
   TfPyNoticeWrapper<TfPyModuleWasLoaded, TfNotice>::Wrap("PyModuleWasLoaded")
-      .def("name", make_function(&TfPyModuleWasLoaded::GetName,
-                                 return_value_policy<return_by_value>()));
+      .def("name",
+           make_function(&TfPyModuleWasLoaded::GetName, return_value_policy<return_by_value>()));
 }

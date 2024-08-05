@@ -30,11 +30,11 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdResolveTarget() {
+void wrapUsdResolveTarget()
+{
   class_<UsdResolveTarget>("ResolveTarget")
       .def(init<>())
-      .def("GetPrimIndex", &UsdResolveTarget::GetPrimIndex,
-           return_value_policy<return_by_value>())
+      .def("GetPrimIndex", &UsdResolveTarget::GetPrimIndex, return_value_policy<return_by_value>())
       .def("GetStartNode", &UsdResolveTarget::GetStartNode)
       .def("GetStartLayer", &UsdResolveTarget::GetStartLayer)
       .def("GetStopNode", &UsdResolveTarget::GetStopNode)

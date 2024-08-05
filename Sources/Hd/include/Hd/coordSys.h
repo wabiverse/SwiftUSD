@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_COORD_SYS_H
 #define PXR_IMAGING_HD_COORD_SYS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/sprim.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -53,39 +53,40 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// of the transform from its local space to world space.  In other
 /// words, it has the same interpretation as the transform for rprims.
 ///
-class HdCoordSys : public HdSprim
-{
-public:
-    HD_API
-    HdCoordSys(SdfPath const & id);
-    HD_API
-    ~HdCoordSys() override;
+class HdCoordSys : public HdSprim {
+ public:
+  HD_API
+  HdCoordSys(SdfPath const &id);
+  HD_API
+  ~HdCoordSys() override;
 
-    // Change tracking for HdCoordSys
-    enum DirtyBits : HdDirtyBits {
-        Clean                 = 0,
-        DirtyName             = 1 << 0,
-        DirtyTransform        = 1 << 1,
-        AllDirty              = (DirtyTransform
-                                |DirtyName)
-    };
+  // Change tracking for HdCoordSys
+  enum DirtyBits : HdDirtyBits {
+    Clean = 0,
+    DirtyName = 1 << 0,
+    DirtyTransform = 1 << 1,
+    AllDirty = (DirtyTransform | DirtyName)
+  };
 
-    /// Returns the name bound to this coordinate system.
-    ///
-    /// There may be multiple coordinate systems with the same
-    /// name, but they must associate with disjoint sets of rprims.
-    TfToken GetName() const { return _name; }
+  /// Returns the name bound to this coordinate system.
+  ///
+  /// There may be multiple coordinate systems with the same
+  /// name, but they must associate with disjoint sets of rprims.
+  TfToken GetName() const
+  {
+    return _name;
+  }
 
-    HD_API
-    void Sync(HdSceneDelegate *sceneDelegate,
-              HdRenderParam   *renderParam,
-              HdDirtyBits     *dirtyBits) override;
+  HD_API
+  void Sync(HdSceneDelegate *sceneDelegate,
+            HdRenderParam *renderParam,
+            HdDirtyBits *dirtyBits) override;
 
-    HD_API
-    HdDirtyBits GetInitialDirtyBitsMask() const override;
+  HD_API
+  HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-private:
-    TfToken _name;
+ private:
+  TfToken _name;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -47,7 +47,7 @@ class PcpPrimIndex;
 /// and properties and thus can share the same prototype.
 ///
 class Usd_InstanceKey {
-public:
+ public:
   Usd_InstanceKey();
 
   /// Create an instance key for the given instanceable prim index.
@@ -57,11 +57,12 @@ public:
 
   /// Comparison operators.
   bool operator==(const Usd_InstanceKey &rhs) const;
-  inline bool operator!=(const Usd_InstanceKey &rhs) const {
+  inline bool operator!=(const Usd_InstanceKey &rhs) const
+  {
     return !(*this == rhs);
   }
 
-private:
+ private:
   friend size_t hash_value(const Usd_InstanceKey &key);
 
   friend std::ostream &operator<<(std::ostream &os, const Usd_InstanceKey &key);
@@ -76,8 +77,11 @@ private:
 };
 
 /// Return the hash code for \p key.
-inline size_t hash_value(const Usd_InstanceKey &key) { return key._hash; }
+inline size_t hash_value(const Usd_InstanceKey &key)
+{
+  return key._hash;
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_INSTANCE_KEY_H
+#endif  // PXR_USD_USD_INSTANCE_KEY_H

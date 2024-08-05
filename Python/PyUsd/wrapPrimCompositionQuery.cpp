@@ -36,46 +36,45 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-template <typename ProxyType>
-tuple _GetIntroducingListEditor(const UsdPrimCompositionQueryArc &arc) {
+template<typename ProxyType> tuple _GetIntroducingListEditor(const UsdPrimCompositionQueryArc &arc)
+{
   ProxyType editor;
   typename ProxyType::value_type value;
   if (arc.GetIntroducingListEditor(&editor, &value)) {
     return make_tuple(object(editor), object(value));
   }
-  TF_CODING_ERROR("Failed to get list editor value for the given type of "
-                  "of the composition arc");
+  TF_CODING_ERROR(
+      "Failed to get list editor value for the given type of "
+      "of the composition arc");
   return make_tuple(object(), object());
 }
 
-static tuple
-_WrapGetIntroducingListEditor(const UsdPrimCompositionQueryArc &arc) {
+static tuple _WrapGetIntroducingListEditor(const UsdPrimCompositionQueryArc &arc)
+{
   switch (arc.GetArcType()) {
-  case PcpArcTypeReference:
-    return _GetIntroducingListEditor<SdfReferenceEditorProxy>(arc);
-  case PcpArcTypePayload:
-    return _GetIntroducingListEditor<SdfPayloadEditorProxy>(arc);
-  case PcpArcTypeInherit:
-  case PcpArcTypeSpecialize:
-    return _GetIntroducingListEditor<SdfPathEditorProxy>(arc);
-  case PcpArcTypeVariant:
-    return _GetIntroducingListEditor<SdfNameEditorProxy>(arc);
-  default:
-    return make_tuple(object(), object());
+    case PcpArcTypeReference:
+      return _GetIntroducingListEditor<SdfReferenceEditorProxy>(arc);
+    case PcpArcTypePayload:
+      return _GetIntroducingListEditor<SdfPayloadEditorProxy>(arc);
+    case PcpArcTypeInherit:
+    case PcpArcTypeSpecialize:
+      return _GetIntroducingListEditor<SdfPathEditorProxy>(arc);
+    case PcpArcTypeVariant:
+      return _GetIntroducingListEditor<SdfNameEditorProxy>(arc);
+    default:
+      return make_tuple(object(), object());
   }
 }
 
-void wrapUsdPrimCompositionQueryArc() {
+void wrapUsdPrimCompositionQueryArc()
+{
   class_<UsdPrimCompositionQueryArc>("CompositionArc", no_init)
       .def("GetTargetNode", &UsdPrimCompositionQueryArc::GetTargetNode)
-      .def("GetIntroducingNode",
-           &UsdPrimCompositionQueryArc::GetIntroducingNode)
+      .def("GetIntroducingNode", &UsdPrimCompositionQueryArc::GetIntroducingNode)
       .def("GetTargetLayer", &UsdPrimCompositionQueryArc::GetTargetLayer)
       .def("GetTargetPrimPath", &UsdPrimCompositionQueryArc::GetTargetPrimPath)
-      .def("GetIntroducingLayer",
-           &UsdPrimCompositionQueryArc::GetIntroducingLayer)
-      .def("GetIntroducingPrimPath",
-           &UsdPrimCompositionQueryArc::GetIntroducingPrimPath)
+      .def("GetIntroducingLayer", &UsdPrimCompositionQueryArc::GetIntroducingLayer)
+      .def("GetIntroducingPrimPath", &UsdPrimCompositionQueryArc::GetIntroducingPrimPath)
       .def("GetIntroducingListEditor", &_WrapGetIntroducingListEditor)
       .def("GetArcType", &UsdPrimCompositionQueryArc::GetArcType)
       .def("IsImplicit", &UsdPrimCompositionQueryArc::IsImplicit)
@@ -93,14 +92,15 @@ void wrapUsdPrimCompositionQueryArc() {
            arg("subLayer") = object());
 }
 
-void wrapUsdPrimCompositionQuery() {
+void wrapUsdPrimCompositionQuery()
+{
   using This = UsdPrimCompositionQuery;
 
   scope s = class_<This>("PrimCompositionQuery", no_init)
                 .def(init<const UsdPrim &>(arg("prim")))
-                .def(init<const UsdPrim &, const This::Filter &>(
-                    (arg("prim"), arg("filter"))))
-                .def("GetDirectReferences", &This::GetDirectReferences,
+                .def(init<const UsdPrim &, const This::Filter &>((arg("prim"), arg("filter"))))
+                .def("GetDirectReferences",
+                     &This::GetDirectReferences,
                      return_value_policy<return_by_value>())
                 .staticmethod("GetDirectReferences")
                 .def("GetDirectInherits", &This::GetDirectInherits)
@@ -108,13 +108,13 @@ void wrapUsdPrimCompositionQuery() {
                 .def("GetDirectRootLayerArcs", &This::GetDirectRootLayerArcs)
                 .staticmethod("GetDirectRootLayerArcs")
                 .add_property("filter", &This::GetFilter, &This::SetFilter)
-                .def("GetCompositionArcs", &This::GetCompositionArcs,
+                .def("GetCompositionArcs",
+                     &This::GetCompositionArcs,
                      return_value_policy<TfPySequenceToList>());
 
   enum_<This::ArcIntroducedFilter>("ArcIntroducedFilter")
       .value("All", This::ArcIntroducedFilter::All)
-      .value("IntroducedInRootLayerStack",
-             This::ArcIntroducedFilter::IntroducedInRootLayerStack)
+      .value("IntroducedInRootLayerStack", This::ArcIntroducedFilter::IntroducedInRootLayerStack)
       .value("IntroducedInRootLayerPrimSpec",
              This::ArcIntroducedFilter::IntroducedInRootLayerPrimSpec);
   enum_<This::ArcTypeFilter>("ArcTypeFilter")
@@ -126,10 +126,8 @@ void wrapUsdPrimCompositionQuery() {
       .value("Variant", This::ArcTypeFilter::Variant)
       .value("ReferenceOrPayload", This::ArcTypeFilter::ReferenceOrPayload)
       .value("InheritOrSpecialize", This::ArcTypeFilter::InheritOrSpecialize)
-      .value("NotReferenceOrPayload",
-             This::ArcTypeFilter::NotReferenceOrPayload)
-      .value("NotInheritOrSpecialize",
-             This::ArcTypeFilter::NotInheritOrSpecialize)
+      .value("NotReferenceOrPayload", This::ArcTypeFilter::NotReferenceOrPayload)
+      .value("NotInheritOrSpecialize", This::ArcTypeFilter::NotInheritOrSpecialize)
       .value("NotVariant", This::ArcTypeFilter::NotVariant);
   enum_<This::DependencyTypeFilter>("DependencyTypeFilter")
       .value("All", This::DependencyTypeFilter::All)
@@ -144,8 +142,7 @@ void wrapUsdPrimCompositionQuery() {
       .def(init<>())
       .def_readwrite("arcIntroducedFilter", &This::Filter::arcIntroducedFilter)
       .def_readwrite("arcTypeFilter", &This::Filter::arcTypeFilter)
-      .def_readwrite("dependencyTypeFilter",
-                     &This::Filter::dependencyTypeFilter)
+      .def_readwrite("dependencyTypeFilter", &This::Filter::dependencyTypeFilter)
       .def_readwrite("hasSpecsFilter", &This::Filter::hasSpecsFilter)
       .def(self == self)
       .def(self != self);

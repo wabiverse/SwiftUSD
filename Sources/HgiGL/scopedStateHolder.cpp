@@ -23,24 +23,52 @@
 //
 #include "Garch/glApi.h"
 
-#include "HgiGL/scopedStateHolder.h"
 #include "HgiGL/conversions.h"
 #include "HgiGL/diagnostic.h"
+#include "HgiGL/scopedStateHolder.h"
 
-#include "Trace/traceImpl.h"
 #include "Tf/diagnostic.h"
 #include "Tf/iterator.h"
+#include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 HgiGL_ScopedStateHolder::HgiGL_ScopedStateHolder()
-    : _restoreRenderBuffer(0), _restoreVao(0), _restoreDepthTest(false), _restoreDepthWriteMask(false), _restoreDepthFunc(0), _restoreDepthBias(false), _restoreDepthBiasConstantFactor(0), _restoreDepthBiasSlopeFactor(0), _restoreStencilTest(false), _restoreStencilCompareFn{0, 0}, _restoreStencilReferenceValue{0, 0}, _restoreStencilReadMask{0, 0}, _restoreStencilWriteMask{0, 0}, _restoreViewport{0, 0, 0, 0}, _restoreBlendEnabled(false), _restoreColorOp(0), _restoreAlphaOp(0), _restoreAlphaToCoverage(false), _restoreSampleAlphaToOne(false), _lineWidth(1.0f), _cullFace(true), _cullMode(GL_BACK), _frontFace(GL_CCW), _rasterizerDiscard(true), _restoreDepthClamp(false), _depthRange{0.f, 1.f}, _restoreFramebufferSRGB(false), _restoreConservativeRaster(false), _restoreMultiSample(false), _restorePointSmooth(false)
+    : _restoreRenderBuffer(0),
+      _restoreVao(0),
+      _restoreDepthTest(false),
+      _restoreDepthWriteMask(false),
+      _restoreDepthFunc(0),
+      _restoreDepthBias(false),
+      _restoreDepthBiasConstantFactor(0),
+      _restoreDepthBiasSlopeFactor(0),
+      _restoreStencilTest(false),
+      _restoreStencilCompareFn{0, 0},
+      _restoreStencilReferenceValue{0, 0},
+      _restoreStencilReadMask{0, 0},
+      _restoreStencilWriteMask{0, 0},
+      _restoreViewport{0, 0, 0, 0},
+      _restoreBlendEnabled(false),
+      _restoreColorOp(0),
+      _restoreAlphaOp(0),
+      _restoreAlphaToCoverage(false),
+      _restoreSampleAlphaToOne(false),
+      _lineWidth(1.0f),
+      _cullFace(true),
+      _cullMode(GL_BACK),
+      _frontFace(GL_CCW),
+      _rasterizerDiscard(true),
+      _restoreDepthClamp(false),
+      _depthRange{0.f, 1.f},
+      _restoreFramebufferSRGB(false),
+      _restoreConservativeRaster(false),
+      _restoreMultiSample(false),
+      _restorePointSmooth(false)
 {
   TRACE_FUNCTION();
 
 #if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, -1, "Capture state");
   }
 #endif
@@ -81,12 +109,8 @@ HgiGL_ScopedStateHolder::HgiGL_ScopedStateHolder()
   glGetIntegerv(GL_BLEND_DST_RGB, &_restoreColorDstFnOp);
   glGetIntegerv(GL_BLEND_DST_ALPHA, &_restoreAlphaDstFnOp);
   glGetFloatv(GL_BLEND_COLOR, _restoreBlendColor);
-  glGetBooleanv(
-      GL_SAMPLE_ALPHA_TO_COVERAGE,
-      (GLboolean *)&_restoreAlphaToCoverage);
-  glGetBooleanv(
-      GL_SAMPLE_ALPHA_TO_ONE,
-      (GLboolean *)&_restoreSampleAlphaToOne);
+  glGetBooleanv(GL_SAMPLE_ALPHA_TO_COVERAGE, (GLboolean *)&_restoreAlphaToCoverage);
+  glGetBooleanv(GL_SAMPLE_ALPHA_TO_ONE, (GLboolean *)&_restoreSampleAlphaToOne);
   glGetFloatv(GL_LINE_WIDTH, &_lineWidth);
   glGetBooleanv(GL_CULL_FACE, (GLboolean *)&_cullFace);
   glGetIntegerv(GL_CULL_FACE_MODE, &_cullMode);
@@ -96,17 +120,14 @@ HgiGL_ScopedStateHolder::HgiGL_ScopedStateHolder()
   glGetFloatv(GL_DEPTH_RANGE, _depthRange);
   glGetBooleanv(GL_FRAMEBUFFER_SRGB, (GLboolean *)&_restoreFramebufferSRGB);
 
-  if (GARCH_GLAPI_HAS(NV_conservative_raster))
-  {
-    glGetBooleanv(GL_CONSERVATIVE_RASTERIZATION_NV,
-                  (GLboolean *)&_restoreConservativeRaster);
+  if (GARCH_GLAPI_HAS(NV_conservative_raster)) {
+    glGetBooleanv(GL_CONSERVATIVE_RASTERIZATION_NV, (GLboolean *)&_restoreConservativeRaster);
   }
 
   GLint maxClipPlanes;
   glGetIntegerv(GL_MAX_CLIP_PLANES, &maxClipPlanes);
   _restoreClipDistances.resize(maxClipPlanes);
-  for (int i = 0; i < maxClipPlanes; i++)
-  {
+  for (int i = 0; i < maxClipPlanes; i++) {
     bool clipDistanceEnabled = false;
     glGetBooleanv(GL_CLIP_DISTANCE0 + i, (GLboolean *)&clipDistanceEnabled);
     _restoreClipDistances[i] = clipDistanceEnabled;
@@ -117,8 +138,7 @@ HgiGL_ScopedStateHolder::HgiGL_ScopedStateHolder()
 
   HGIGL_POST_PENDING_GL_ERRORS();
 #if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPopDebugGroup();
   }
 #endif
@@ -129,8 +149,7 @@ HgiGL_ScopedStateHolder::~HgiGL_ScopedStateHolder()
   TRACE_FUNCTION();
 
 #if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, -1, "Restore state");
   }
 #endif
@@ -138,176 +157,136 @@ HgiGL_ScopedStateHolder::~HgiGL_ScopedStateHolder()
   //
   // Depth Stencil State
   //
-  if (_restoreDepthTest)
-  {
+  if (_restoreDepthTest) {
     glEnable(GL_DEPTH_TEST);
   }
-  else
-  {
+  else {
     glDisable(GL_DEPTH_TEST);
   }
   glDepthMask(_restoreDepthWriteMask);
   glDepthFunc(_restoreDepthFunc);
 
-  if (_restoreDepthBias)
-  {
+  if (_restoreDepthBias) {
     glEnable(GL_POLYGON_OFFSET_FILL);
   }
-  else
-  {
+  else {
     glDisable(GL_POLYGON_OFFSET_FILL);
   }
-  glPolygonOffset(_restoreDepthBiasSlopeFactor,
-                  _restoreDepthBiasConstantFactor);
+  glPolygonOffset(_restoreDepthBiasSlopeFactor, _restoreDepthBiasConstantFactor);
 
-  if (_restoreStencilTest)
-  {
+  if (_restoreStencilTest) {
     glEnable(GL_STENCIL_TEST);
   }
-  else
-  {
+  else {
     glDisable(GL_STENCIL_TEST);
   }
   glStencilFuncSeparate(GL_FRONT,
                         _restoreStencilCompareFn[0],
                         _restoreStencilReferenceValue[0],
                         _restoreStencilReadMask[0]);
-  glStencilOpSeparate(GL_FRONT,
-                      _restoreStencilFail[0],
-                      _restoreStencilDepthFail[0],
-                      _restoreStencilDepthPass[0]);
-  glStencilMaskSeparate(GL_FRONT,
-                        _restoreStencilWriteMask[0]);
+  glStencilOpSeparate(
+      GL_FRONT, _restoreStencilFail[0], _restoreStencilDepthFail[0], _restoreStencilDepthPass[0]);
+  glStencilMaskSeparate(GL_FRONT, _restoreStencilWriteMask[0]);
 
   glStencilFuncSeparate(GL_BACK,
                         _restoreStencilCompareFn[1],
                         _restoreStencilReferenceValue[1],
                         _restoreStencilReadMask[1]);
-  glStencilOpSeparate(GL_BACK,
-                      _restoreStencilFail[1],
-                      _restoreStencilDepthFail[1],
-                      _restoreStencilDepthPass[1]);
-  glStencilMaskSeparate(GL_BACK,
-                        _restoreStencilWriteMask[1]);
+  glStencilOpSeparate(
+      GL_BACK, _restoreStencilFail[1], _restoreStencilDepthFail[1], _restoreStencilDepthPass[1]);
+  glStencilMaskSeparate(GL_BACK, _restoreStencilWriteMask[1]);
 
-  if (_restoreAlphaToCoverage)
-  {
+  if (_restoreAlphaToCoverage) {
     glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
   }
-  else
-  {
+  else {
     glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
   }
 
-  if (_restoreSampleAlphaToOne)
-  {
+  if (_restoreSampleAlphaToOne) {
     glEnable(GL_SAMPLE_ALPHA_TO_ONE);
   }
-  else
-  {
+  else {
     glDisable(GL_SAMPLE_ALPHA_TO_ONE);
   }
 
-  glBlendFuncSeparate(_restoreColorSrcFnOp, _restoreColorDstFnOp,
-                      _restoreAlphaSrcFnOp, _restoreAlphaDstFnOp);
+  glBlendFuncSeparate(
+      _restoreColorSrcFnOp, _restoreColorDstFnOp, _restoreAlphaSrcFnOp, _restoreAlphaDstFnOp);
   glBlendEquationSeparate(_restoreColorOp, _restoreAlphaOp);
-  glBlendColor(_restoreBlendColor[0],
-               _restoreBlendColor[1],
-               _restoreBlendColor[2],
-               _restoreBlendColor[3]);
+  glBlendColor(
+      _restoreBlendColor[0], _restoreBlendColor[1], _restoreBlendColor[2], _restoreBlendColor[3]);
 
-  if (_restoreBlendEnabled)
-  {
+  if (_restoreBlendEnabled) {
     glEnable(GL_BLEND);
   }
-  else
-  {
+  else {
     glDisable(GL_BLEND);
   }
 
-  glViewport(_restoreViewport[0], _restoreViewport[1],
-             _restoreViewport[2], _restoreViewport[3]);
+  glViewport(_restoreViewport[0], _restoreViewport[1], _restoreViewport[2], _restoreViewport[3]);
   glBindVertexArray(_restoreVao);
   glBindRenderbuffer(GL_RENDERBUFFER, _restoreRenderBuffer);
   glLineWidth(_lineWidth);
-  if (_cullFace)
-  {
+  if (_cullFace) {
     glEnable(GL_CULL_FACE);
   }
-  else
-  {
+  else {
     glDisable(GL_CULL_FACE);
   }
   glCullFace(_cullMode);
   glFrontFace(_frontFace);
 
-  if (_rasterizerDiscard)
-  {
+  if (_rasterizerDiscard) {
     glEnable(GL_RASTERIZER_DISCARD);
   }
-  else
-  {
+  else {
     glDisable(GL_RASTERIZER_DISCARD);
   }
 
-  if (_restoreDepthClamp)
-  {
+  if (_restoreDepthClamp) {
     glEnable(GL_DEPTH_CLAMP);
   }
-  else
-  {
+  else {
     glDisable(GL_DEPTH_CLAMP);
   }
   glDepthRangef(_depthRange[0], _depthRange[1]);
 
-  if (_restoreFramebufferSRGB)
-  {
+  if (_restoreFramebufferSRGB) {
     glEnable(GL_FRAMEBUFFER_SRGB);
   }
-  else
-  {
+  else {
     glDisable(GL_FRAMEBUFFER_SRGB);
   }
 
-  if (GARCH_GLAPI_HAS(NV_conservative_raster))
-  {
-    if (_restoreConservativeRaster)
-    {
+  if (GARCH_GLAPI_HAS(NV_conservative_raster)) {
+    if (_restoreConservativeRaster) {
       glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
     }
-    else
-    {
+    else {
       glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
     }
   }
 
-  for (size_t i = 0; i < _restoreClipDistances.size(); i++)
-  {
-    if (_restoreClipDistances[i])
-    {
+  for (size_t i = 0; i < _restoreClipDistances.size(); i++) {
+    if (_restoreClipDistances[i]) {
       glEnable(GL_CLIP_DISTANCE0 + i);
     }
-    else
-    {
+    else {
       glDisable(GL_CLIP_DISTANCE0 + i);
     }
   }
 
-  if (_restoreMultiSample)
-  {
+  if (_restoreMultiSample) {
     glEnable(GL_MULTISAMPLE);
   }
-  else
-  {
+  else {
     glDisable(GL_MULTISAMPLE);
   }
 
-  if (_restorePointSmooth)
-  {
+  if (_restorePointSmooth) {
     glEnable(GL_POINT_SMOOTH);
   }
-  else
-  {
+  else {
     glDisable(GL_POINT_SMOOTH);
   }
 
@@ -318,8 +297,7 @@ HgiGL_ScopedStateHolder::~HgiGL_ScopedStateHolder()
 
   HGIGL_POST_PENDING_GL_ERRORS();
 #if defined(GL_KHR_debug)
-  if (GARCH_GLAPI_HAS(KHR_debug))
-  {
+  if (GARCH_GLAPI_HAS(KHR_debug)) {
     glPopDebugGroup();
   }
 #endif

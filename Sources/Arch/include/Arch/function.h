@@ -51,4 +51,4 @@ std::string ArchGetPrettierFunctionName(const std::string &function,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_FUNCTION_H
+#endif  // PXR_BASE_ARCH_FUNCTION_H

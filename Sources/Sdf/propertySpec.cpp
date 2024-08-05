@@ -47,27 +47,29 @@ SDF_DEFINE_ABSTRACT_SPEC(SdfSchema, SdfPropertySpec, SdfSpec);
 // Name
 //
 
-const std::string &SdfPropertySpec::GetName() const {
+const std::string &SdfPropertySpec::GetName() const
+{
   return GetPath().GetName();
 }
 
-TfToken SdfPropertySpec::GetNameToken() const {
+TfToken SdfPropertySpec::GetNameToken() const
+{
   return GetPath().GetNameToken();
 }
 
-bool SdfPropertySpec::CanSetName(const std::string &newName,
-                                 std::string *whyNot) const {
-  return Sdf_ChildrenUtils<Sdf_PropertyChildPolicy>::CanRename(*this,
-                                                               TfToken(newName))
+bool SdfPropertySpec::CanSetName(const std::string &newName, std::string *whyNot) const
+{
+  return Sdf_ChildrenUtils<Sdf_PropertyChildPolicy>::CanRename(*this, TfToken(newName))
       .IsAllowed(whyNot);
 }
 
-bool SdfPropertySpec::SetName(const std::string &newName, bool validate) {
-  return Sdf_ChildrenUtils<Sdf_PropertyChildPolicy>::Rename(*this,
-                                                            TfToken(newName));
+bool SdfPropertySpec::SetName(const std::string &newName, bool validate)
+{
+  return Sdf_ChildrenUtils<Sdf_PropertyChildPolicy>::Rename(*this, TfToken(newName));
 }
 
-bool SdfPropertySpec::IsValidName(const std::string &name) {
+bool SdfPropertySpec::IsValidName(const std::string &name)
+{
   return Sdf_ChildrenUtils<Sdf_PropertyChildPolicy>::IsValidName(name);
 }
 
@@ -75,7 +77,8 @@ bool SdfPropertySpec::IsValidName(const std::string &name) {
 // Ownership
 //
 
-SdfSpecHandle SdfPropertySpec::GetOwner() const {
+SdfSpecHandle SdfPropertySpec::GetOwner() const
+{
   SdfPath parentPath = GetPath().GetParentPath();
 
   // If this spec is a relational attribute, its parent path will be
@@ -109,15 +112,13 @@ SDF_DEFINE_GET_SET(Suffix, SdfFieldKeys->Suffix, std::string)
 SDF_DEFINE_GET_SET(SymmetricPeer, SdfFieldKeys->SymmetricPeer, std::string)
 SDF_DEFINE_GET_SET(SymmetryFunction, SdfFieldKeys->SymmetryFunction, TfToken)
 
-SDF_DEFINE_TYPED_GET_SET(Permission, SdfFieldKeys->Permission, SdfPermission,
-                         SdfPermission)
+SDF_DEFINE_TYPED_GET_SET(Permission, SdfFieldKeys->Permission, SdfPermission, SdfPermission)
 
-SDF_DEFINE_DICTIONARY_GET_SET(GetCustomData, SetCustomData,
-                              SdfFieldKeys->CustomData);
-SDF_DEFINE_DICTIONARY_GET_SET(GetSymmetryArguments, SetSymmetryArgument,
+SDF_DEFINE_DICTIONARY_GET_SET(GetCustomData, SetCustomData, SdfFieldKeys->CustomData);
+SDF_DEFINE_DICTIONARY_GET_SET(GetSymmetryArguments,
+                              SetSymmetryArgument,
                               SdfFieldKeys->SymmetryArguments);
-SDF_DEFINE_DICTIONARY_GET_SET(GetAssetInfo, SetAssetInfo,
-                              SdfFieldKeys->AssetInfo);
+SDF_DEFINE_DICTIONARY_GET_SET(GetAssetInfo, SetAssetInfo, SdfFieldKeys->AssetInfo);
 
 // Property Value API
 // Note: Default value is split up into individual macro calls as the Set
@@ -147,7 +148,8 @@ SDF_DEFINE_GET_PRIVATE(AttributeValueTypeName, SdfFieldKeys->TypeName, TfToken)
 // (methods requiring additional logic)
 //
 
-bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue) {
+bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue)
+{
   if (defaultValue.IsEmpty()) {
     ClearDefaultValue();
     return true;
@@ -159,17 +161,20 @@ bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue) {
       // Allow blocking unknown types.
       return SetField(SdfFieldKeys->Default, defaultValue);
     }
-    TF_CODING_ERROR("Can't set value on attribute <%s> with "
-                    "unknown type \"%s\"",
-                    GetPath().GetText(), GetTypeName().GetAsToken().GetText());
+    TF_CODING_ERROR(
+        "Can't set value on attribute <%s> with "
+        "unknown type \"%s\"",
+        GetPath().GetText(),
+        GetTypeName().GetAsToken().GetText());
     return false;
   }
   static const TfType opaqueType = TfType::Find<SdfOpaqueValue>();
   if (valueType == opaqueType) {
-    TF_CODING_ERROR("Can't set value on <%s>: %s-typed attributes "
-                    "cannot have an authored default value",
-                    GetPath().GetAsString().c_str(),
-                    GetTypeName().GetAsToken().GetText());
+    TF_CODING_ERROR(
+        "Can't set value on <%s>: %s-typed attributes "
+        "cannot have an authored default value",
+        GetPath().GetAsString().c_str(),
+        GetTypeName().GetAsToken().GetText());
     return false;
   }
 
@@ -182,13 +187,14 @@ bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue) {
     if (valueType == defaultValue.GetType()) {
       return SetField(SdfFieldKeys->Default, defaultValue);
     }
-
-  } else {
+  }
+  else {
     // Otherwise check if defaultValue is castable to valueType
     VtValue value = VtValue::CastToTypeid(defaultValue, valueType.GetTypeid());
     if (!value.IsEmpty()) {
       return SetField(SdfFieldKeys->Default, value);
-    } else if (defaultValue.IsHolding<SdfValueBlock>()) {
+    }
+    else if (defaultValue.IsHolding<SdfValueBlock>()) {
       // If we're setting a value block, always allow that.
       return SetField(SdfFieldKeys->Default, defaultValue);
     }
@@ -196,18 +202,22 @@ bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue) {
 
   // If we reach here, we are either assigning invalid values to enum types
   // or defaultValue can't cast to valueType.
-  TF_CODING_ERROR("Can't set value on <%s> to %s: "
-                  "expected a value of type \"%s\"",
-                  GetPath().GetText(), TfStringify(defaultValue).c_str(),
-                  valueType.GetTypeName().c_str());
+  TF_CODING_ERROR(
+      "Can't set value on <%s> to %s: "
+      "expected a value of type \"%s\"",
+      GetPath().GetText(),
+      TfStringify(defaultValue).c_str(),
+      valueType.GetTypeName().c_str());
   return false;
 }
 
-SdfTimeSampleMap SdfPropertySpec::GetTimeSampleMap() const {
+SdfTimeSampleMap SdfPropertySpec::GetTimeSampleMap() const
+{
   return GetFieldAs<SdfTimeSampleMap>(SdfFieldKeys->TimeSamples);
 }
 
-TfType SdfPropertySpec::GetValueType() const {
+TfType SdfPropertySpec::GetValueType() const
+{
   // The value type of an attribute is specified by the user when it is
   // constructed, while the value type of a relationship is always SdfPath.
   // Normally, one would use virtual functions to encapsulate this difference;
@@ -215,40 +225,40 @@ TfType SdfPropertySpec::GetValueType() const {
   // intended to be simple value types that are merely wrappers around
   // a layer. So, we have this hacky 'virtual' function.
   switch (GetSpecType()) {
-  case SdfSpecTypeAttribute:
-    return GetSchema().FindType(_GetAttributeValueTypeName()).GetType();
+    case SdfSpecTypeAttribute:
+      return GetSchema().FindType(_GetAttributeValueTypeName()).GetType();
 
-  case SdfSpecTypeRelationship: {
-    static const TfType type = TfType::Find<SdfPath>();
-    return type;
-  }
+    case SdfSpecTypeRelationship: {
+      static const TfType type = TfType::Find<SdfPath>();
+      return type;
+    }
 
-  default:
-    TF_CODING_ERROR("Unrecognized subclass of SdfPropertySpec on <%s>",
-                    GetPath().GetText());
-    return TfType();
+    default:
+      TF_CODING_ERROR("Unrecognized subclass of SdfPropertySpec on <%s>", GetPath().GetText());
+      return TfType();
   }
 }
 
-SdfValueTypeName SdfPropertySpec::GetTypeName() const {
+SdfValueTypeName SdfPropertySpec::GetTypeName() const
+{
   // See comment in GetValueType().
   switch (GetSpecType()) {
-  case SdfSpecTypeAttribute:
-    return GetSchema().FindOrCreateType(_GetAttributeValueTypeName());
+    case SdfSpecTypeAttribute:
+      return GetSchema().FindOrCreateType(_GetAttributeValueTypeName());
 
-  case SdfSpecTypeRelationship:
-    return SdfValueTypeName();
+    case SdfSpecTypeRelationship:
+      return SdfValueTypeName();
 
-  default:
-    TF_CODING_ERROR("Unrecognized subclass of SdfPropertySpec on <%s>",
-                    GetPath().GetText());
-    return SdfValueTypeName();
+    default:
+      TF_CODING_ERROR("Unrecognized subclass of SdfPropertySpec on <%s>", GetPath().GetText());
+      return SdfValueTypeName();
   }
 }
 
-bool SdfPropertySpec::HasOnlyRequiredFields() const {
-  return GetLayer()->_IsInert(GetPath(), true /*ignoreChildren*/,
-                              true /* requiredFieldOnlyPropertiesAreInert */);
+bool SdfPropertySpec::HasOnlyRequiredFields() const
+{
+  return GetLayer()->_IsInert(
+      GetPath(), true /*ignoreChildren*/, true /* requiredFieldOnlyPropertiesAreInert */);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

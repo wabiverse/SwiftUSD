@@ -24,12 +24,12 @@
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_IMPL_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_IMPL_H
 
-#include <pxr/pxrns.h>
-#include "data.h"
-#include "Sdf/api.h"
 #include "Sdf/abstractData.h"
+#include "Sdf/api.h"
 #include "Tf/token.h"
 #include "Vt/value.h"
+#include "data.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
@@ -44,26 +44,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// of animation data, while the rest is computed on the fly when queried.
 /// See data.h for the overall explanation of what this data represents.
 ///
-class UsdDancingCubesExample_DataImpl
-{
-public:
+class UsdDancingCubesExample_DataImpl {
+ public:
   UsdDancingCubesExample_DataImpl();
 
-  UsdDancingCubesExample_DataImpl(
-      const UsdDancingCubesExample_DataParams &params);
+  UsdDancingCubesExample_DataImpl(const UsdDancingCubesExample_DataParams &params);
 
   /// Generates the spec type for the path.
   SdfSpecType GetSpecType(const SdfPath &path) const;
 
   /// Returns whether a value should exist for the given \a path and
   /// \a fieldName. Optionally returns the value if it exists.
-  bool Has(const SdfPath &path, const TfToken &field,
-           VtValue *value = NULL) const;
+  bool Has(const SdfPath &path, const TfToken &field, VtValue *value = NULL) const;
 
   /// Visits every spec generated from our params with the given
   /// \p visitor.
-  void VisitSpecs(const SdfAbstractData &data,
-                  SdfAbstractDataSpecVisitor *visitor) const;
+  void VisitSpecs(const SdfAbstractData &data, SdfAbstractDataSpecVisitor *visitor) const;
 
   /// Returns the list of all fields generated for spec path.
   const std::vector<TfToken> &List(const SdfPath &path) const;
@@ -75,8 +71,7 @@ public:
   /// Returns the same set as ListAllTimeSamples if the spec path is for one
   /// of the animated properties. Returns an empty set for all other spec
   /// paths.
-  const std::set<double> &ListTimeSamplesForPath(
-      const SdfPath &path) const;
+  const std::set<double> &ListTimeSamplesForPath(const SdfPath &path) const;
 
   /// Returns the total number of animation frames iif the spec path is for
   /// one of the animated properties. Returns 0 for all other spec paths.
@@ -84,22 +79,21 @@ public:
 
   /// Sets the upper and lower bound time samples of the value time and
   /// returns true as long as there are any animated frames for this data.
-  bool GetBracketingTimeSamples(
-      double time, double *tLower, double *tUpper) const;
+  bool GetBracketingTimeSamples(double time, double *tLower, double *tUpper) const;
 
   /// Sets the upper and lower bound time samples of the value time and
   /// returns true if the spec path is for one of the animated properties.
   /// Returns false for all other spec paths.
-  bool GetBracketingTimeSamplesForPath(
-      const SdfPath &path, double time,
-      double *tLower, double *tUpper) const;
+  bool GetBracketingTimeSamplesForPath(const SdfPath &path,
+                                       double time,
+                                       double *tLower,
+                                       double *tUpper) const;
 
   /// Computes the value for the time sample if the spec path is one of the
   /// animated properties.
-  bool QueryTimeSample(const SdfPath &path, double time,
-                       VtValue *value) const;
+  bool QueryTimeSample(const SdfPath &path, double time, VtValue *value) const;
 
-private:
+ private:
   // Initializes the cached data from the params object.
   void _InitFromParams();
 
@@ -130,16 +124,14 @@ private:
   std::vector<TfToken> _primChildNames;
 
   // Cached default position and animation frame offset for each leaf prim
-  struct _LeafPrimData
-  {
+  struct _LeafPrimData {
     GfVec3d pos;
     double frameOffset;
   };
   TfHashMap<SdfPath, _LeafPrimData, SdfPath::Hash> _leafPrimDataMap;
 
   // Cached animation data for each frame in a single animation cycle.
-  struct _AnimData
-  {
+  struct _AnimData {
     double transOffset;
     GfVec3f color;
   };
@@ -148,4 +140,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_IMPL_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_DANCING_CUBES_EXAMPLE_DATA_IMPL_H

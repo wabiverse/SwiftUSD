@@ -35,195 +35,154 @@
 
 #include "Hd/nurbsPatchTrimCurveSchema.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDNURBSPATCH_SCHEMA_TOKENS \
-    (nurbsPatch) \
-    (uVertexCount) \
-    (vVertexCount) \
-    (uOrder) \
-    (vOrder) \
-    (uKnots) \
-    (vKnots) \
-    (uForm) \
-    (vForm) \
-    (uRange) \
-    (vRange) \
-    (trimCurve) \
-    (orientation) \
-    (doubleSided) \
-    (open) \
-    (closed) \
-    (periodic) \
-    (leftHanded) \
-    (rightHanded) \
+  (nurbsPatch)(uVertexCount)( \
+      vVertexCount)(uOrder)(vOrder)(uKnots)(vKnots)(uForm)(vForm)(uRange)(vRange)(trimCurve)(orientation)(doubleSided)(open)(closed)(periodic)(leftHanded)(rightHanded)
 
-TF_DECLARE_PUBLIC_TOKENS(HdNurbsPatchSchemaTokens, HD_API,
-    HDNURBSPATCH_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdNurbsPatchSchemaTokens, HD_API, HDNURBSPATCH_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdNurbsPatchSchema : public HdSchema
-{
-public:
-    HdNurbsPatchSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdNurbsPatchSchema : public HdSchema {
+ public:
+  HdNurbsPatchSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
-    HD_API
-    HdIntDataSourceHandle GetUVertexCount();
-    HD_API
-    HdIntDataSourceHandle GetVVertexCount();
-    HD_API
-    HdIntDataSourceHandle GetUOrder();
-    HD_API
-    HdIntDataSourceHandle GetVOrder();
-    HD_API
-    HdDoubleArrayDataSourceHandle GetUKnots();
-    HD_API
-    HdDoubleArrayDataSourceHandle GetVKnots();
-    HD_API
-    HdTokenDataSourceHandle GetUForm();
-    HD_API
-    HdTokenDataSourceHandle GetVForm();
-    HD_API
-    HdVec2dDataSourceHandle GetURange();
-    HD_API
-    HdVec2dDataSourceHandle GetVRange();
-    HD_API
-    HdNurbsPatchTrimCurveSchema GetTrimCurve();
-    HD_API
-    HdTokenDataSourceHandle GetOrientation();
-    HD_API
-    HdBoolDataSourceHandle GetDoubleSided();
+  HD_API
+  HdIntDataSourceHandle GetUVertexCount();
+  HD_API
+  HdIntDataSourceHandle GetVVertexCount();
+  HD_API
+  HdIntDataSourceHandle GetUOrder();
+  HD_API
+  HdIntDataSourceHandle GetVOrder();
+  HD_API
+  HdDoubleArrayDataSourceHandle GetUKnots();
+  HD_API
+  HdDoubleArrayDataSourceHandle GetVKnots();
+  HD_API
+  HdTokenDataSourceHandle GetUForm();
+  HD_API
+  HdTokenDataSourceHandle GetVForm();
+  HD_API
+  HdVec2dDataSourceHandle GetURange();
+  HD_API
+  HdVec2dDataSourceHandle GetVRange();
+  HD_API
+  HdNurbsPatchTrimCurveSchema GetTrimCurve();
+  HD_API
+  HdTokenDataSourceHandle GetOrientation();
+  HD_API
+  HdBoolDataSourceHandle GetDoubleSided();
 
-    // RETRIEVING AND CONSTRUCTING
+  // RETRIEVING AND CONSTRUCTING
 
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(const HdIntDataSourceHandle &uVertexCount,
+                                                   const HdIntDataSourceHandle &vVertexCount,
+                                                   const HdIntDataSourceHandle &uOrder,
+                                                   const HdIntDataSourceHandle &vOrder,
+                                                   const HdDoubleArrayDataSourceHandle &uKnots,
+                                                   const HdDoubleArrayDataSourceHandle &vKnots,
+                                                   const HdTokenDataSourceHandle &uForm,
+                                                   const HdTokenDataSourceHandle &vForm,
+                                                   const HdVec2dDataSourceHandle &uRange,
+                                                   const HdVec2dDataSourceHandle &vRange,
+                                                   const HdContainerDataSourceHandle &trimCurve,
+                                                   const HdTokenDataSourceHandle &orientation,
+                                                   const HdBoolDataSourceHandle &doubleSided);
+
+  /// \class HdNurbsPatchSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdIntDataSourceHandle &uVertexCount,
-        const HdIntDataSourceHandle &vVertexCount,
-        const HdIntDataSourceHandle &uOrder,
-        const HdIntDataSourceHandle &vOrder,
-        const HdDoubleArrayDataSourceHandle &uKnots,
-        const HdDoubleArrayDataSourceHandle &vKnots,
-        const HdTokenDataSourceHandle &uForm,
-        const HdTokenDataSourceHandle &vForm,
-        const HdVec2dDataSourceHandle &uRange,
-        const HdVec2dDataSourceHandle &vRange,
-        const HdContainerDataSourceHandle &trimCurve,
-        const HdTokenDataSourceHandle &orientation,
-        const HdBoolDataSourceHandle &doubleSided
-    );
-
-    /// \class HdNurbsPatchSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetUVertexCount(
-            const HdIntDataSourceHandle &uVertexCount);
-        HD_API
-        Builder &SetVVertexCount(
-            const HdIntDataSourceHandle &vVertexCount);
-        HD_API
-        Builder &SetUOrder(
-            const HdIntDataSourceHandle &uOrder);
-        HD_API
-        Builder &SetVOrder(
-            const HdIntDataSourceHandle &vOrder);
-        HD_API
-        Builder &SetUKnots(
-            const HdDoubleArrayDataSourceHandle &uKnots);
-        HD_API
-        Builder &SetVKnots(
-            const HdDoubleArrayDataSourceHandle &vKnots);
-        HD_API
-        Builder &SetUForm(
-            const HdTokenDataSourceHandle &uForm);
-        HD_API
-        Builder &SetVForm(
-            const HdTokenDataSourceHandle &vForm);
-        HD_API
-        Builder &SetURange(
-            const HdVec2dDataSourceHandle &uRange);
-        HD_API
-        Builder &SetVRange(
-            const HdVec2dDataSourceHandle &vRange);
-        HD_API
-        Builder &SetTrimCurve(
-            const HdContainerDataSourceHandle &trimCurve);
-        HD_API
-        Builder &SetOrientation(
-            const HdTokenDataSourceHandle &orientation);
-        HD_API
-        Builder &SetDoubleSided(
-            const HdBoolDataSourceHandle &doubleSided);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdIntDataSourceHandle _uVertexCount;
-        HdIntDataSourceHandle _vVertexCount;
-        HdIntDataSourceHandle _uOrder;
-        HdIntDataSourceHandle _vOrder;
-        HdDoubleArrayDataSourceHandle _uKnots;
-        HdDoubleArrayDataSourceHandle _vKnots;
-        HdTokenDataSourceHandle _uForm;
-        HdTokenDataSourceHandle _vForm;
-        HdVec2dDataSourceHandle _uRange;
-        HdVec2dDataSourceHandle _vRange;
-        HdContainerDataSourceHandle _trimCurve;
-        HdTokenDataSourceHandle _orientation;
-        HdBoolDataSourceHandle _doubleSided;
-    };
-
-    /// Retrieves a container data source with the schema's default name token
-    /// "nurbsPatch" from the parent container and constructs a
-    /// HdNurbsPatchSchema instance.
-    /// Because the requested container data source may not exist, the result
-    /// should be checked with IsDefined() or a bool comparison before use.
+    Builder &SetUVertexCount(const HdIntDataSourceHandle &uVertexCount);
     HD_API
-    static HdNurbsPatchSchema GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer);
-
-    /// Returns a token where the container representing this schema is found in
-    /// a container by default.
+    Builder &SetVVertexCount(const HdIntDataSourceHandle &vVertexCount);
     HD_API
-    static const TfToken &GetSchemaToken();
-
-    /// Returns an HdDataSourceLocator (relative to the prim-level data source)
-    /// where the container representing this schema is found by default.
+    Builder &SetUOrder(const HdIntDataSourceHandle &uOrder);
     HD_API
-    static const HdDataSourceLocator &GetDefaultLocator();
-
-    /// Returns token data source for use as form value.
-    /// Values of...
-    /// - HdNurbsPatchSchemaTokens->open
-    /// - HdNurbsPatchSchemaTokens->closed
-    /// - HdNurbsPatchSchemaTokens->periodic
-    ///     ...will be stored statically and reused for future calls.
+    Builder &SetVOrder(const HdIntDataSourceHandle &vOrder);
     HD_API
-    static HdTokenDataSourceHandle BuildFormDataSource(
-        const TfToken &form);
+    Builder &SetUKnots(const HdDoubleArrayDataSourceHandle &uKnots);
+    HD_API
+    Builder &SetVKnots(const HdDoubleArrayDataSourceHandle &vKnots);
+    HD_API
+    Builder &SetUForm(const HdTokenDataSourceHandle &uForm);
+    HD_API
+    Builder &SetVForm(const HdTokenDataSourceHandle &vForm);
+    HD_API
+    Builder &SetURange(const HdVec2dDataSourceHandle &uRange);
+    HD_API
+    Builder &SetVRange(const HdVec2dDataSourceHandle &vRange);
+    HD_API
+    Builder &SetTrimCurve(const HdContainerDataSourceHandle &trimCurve);
+    HD_API
+    Builder &SetOrientation(const HdTokenDataSourceHandle &orientation);
+    HD_API
+    Builder &SetDoubleSided(const HdBoolDataSourceHandle &doubleSided);
 
+    /// Returns a container data source containing the members set thus far.
+    HD_API
+    HdContainerDataSourceHandle Build();
+
+   private:
+    HdIntDataSourceHandle _uVertexCount;
+    HdIntDataSourceHandle _vVertexCount;
+    HdIntDataSourceHandle _uOrder;
+    HdIntDataSourceHandle _vOrder;
+    HdDoubleArrayDataSourceHandle _uKnots;
+    HdDoubleArrayDataSourceHandle _vKnots;
+    HdTokenDataSourceHandle _uForm;
+    HdTokenDataSourceHandle _vForm;
+    HdVec2dDataSourceHandle _uRange;
+    HdVec2dDataSourceHandle _vRange;
+    HdContainerDataSourceHandle _trimCurve;
+    HdTokenDataSourceHandle _orientation;
+    HdBoolDataSourceHandle _doubleSided;
+  };
+
+  /// Retrieves a container data source with the schema's default name token
+  /// "nurbsPatch" from the parent container and constructs a
+  /// HdNurbsPatchSchema instance.
+  /// Because the requested container data source may not exist, the result
+  /// should be checked with IsDefined() or a bool comparison before use.
+  HD_API
+  static HdNurbsPatchSchema GetFromParent(const HdContainerDataSourceHandle &fromParentContainer);
+
+  /// Returns a token where the container representing this schema is found in
+  /// a container by default.
+  HD_API
+  static const TfToken &GetSchemaToken();
+
+  /// Returns an HdDataSourceLocator (relative to the prim-level data source)
+  /// where the container representing this schema is found by default.
+  HD_API
+  static const HdDataSourceLocator &GetDefaultLocator();
+
+  /// Returns token data source for use as form value.
+  /// Values of...
+  /// - HdNurbsPatchSchemaTokens->open
+  /// - HdNurbsPatchSchemaTokens->closed
+  /// - HdNurbsPatchSchemaTokens->periodic
+  ///     ...will be stored statically and reused for future calls.
+  HD_API
+  static HdTokenDataSourceHandle BuildFormDataSource(const TfToken &form);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

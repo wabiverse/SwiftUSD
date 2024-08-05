@@ -32,7 +32,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class Sig> class TfFunctionRef;
+template<class Sig> class TfFunctionRef;
 
 /// \class TfFunctionRef
 ///
@@ -94,22 +94,22 @@ template <class Sig> class TfFunctionRef;
 /// allocation, and the cost to invoke the predicate in the implementation is
 /// just the cost of calling a function pointer.
 ///
-template <class Ret, class... Args> class TfFunctionRef<Ret(Args...)> {
+template<class Ret, class... Args> class TfFunctionRef<Ret(Args...)> {
   // Type trait to detect when an argument is a potentially cv-qualified
   // TfFunctionRef.  This is used to disable the generic constructor and
   // assignment operator so that TfFunctionRef arguments are copied rather
   // than forming TfFunctionRefs pointing to TfFunctionRefs.
-  template <typename Fn>
+  template<typename Fn>
   using _IsFunctionRef =
-      std::is_same<std::remove_cv_t<std::remove_reference_t<Fn>>,
-                   TfFunctionRef>;
+      std::is_same<std::remove_cv_t<std::remove_reference_t<Fn>>, TfFunctionRef>;
 
-public:
+ public:
   /// Construct with an lvalue callable \p fn.
-  template <class Fn, class = std::enable_if_t<!_IsFunctionRef<Fn>::value>>
+  template<class Fn, class = std::enable_if_t<!_IsFunctionRef<Fn>::value>>
   constexpr TfFunctionRef(Fn &fn) noexcept
-      : _fn(static_cast<void const *>(std::addressof(fn))),
-        _invoke(_InvokeFn<Fn>) {}
+      : _fn(static_cast<void const *>(std::addressof(fn))), _invoke(_InvokeFn<Fn>)
+  {
+  }
 
   /// Copy construct from another TfFunctionRef.  The constructed
   /// TfFunctionRef refers to the same callable as \p rhs.
@@ -120,29 +120,31 @@ public:
   TfFunctionRef &operator=(TfFunctionRef const &rhs) noexcept = default;
 
   /// Assign from an lvalue callable \p fn.
-  template <class Fn>
-  std::enable_if_t<!_IsFunctionRef<Fn>::value, TfFunctionRef &>
-  operator=(Fn &fn) noexcept {
+  template<class Fn>
+  std::enable_if_t<!_IsFunctionRef<Fn>::value, TfFunctionRef &> operator=(Fn &fn) noexcept
+  {
     *this = TfFunctionRef(fn);
     return *this;
   }
 
   /// Swap this and \p other.  After the swap, this refers to \p other's
   /// previous callable, and \p other refers to this's previous callable.
-  void swap(TfFunctionRef &other) noexcept {
+  void swap(TfFunctionRef &other) noexcept
+  {
     std::swap(_fn, other._fn);
     std::swap(_invoke, other._invoke);
   }
 
   /// Invoke the callable that this object refers to with \p args.
-  inline Ret operator()(Args... args) const {
+  inline Ret operator()(Args... args) const
+  {
     return _invoke(_fn, std::forward<Args>(args)...);
   }
 
-private:
-  template <class Fn> static Ret _InvokeFn(void const *fn, Args... args) {
-    using FnPtr =
-        typename std::add_pointer<typename std::add_const<Fn>::type>::type;
+ private:
+  template<class Fn> static Ret _InvokeFn(void const *fn, Args... args)
+  {
+    using FnPtr = typename std::add_pointer<typename std::add_const<Fn>::type>::type;
     return (*static_cast<FnPtr>(fn))(std::forward<Args>(args)...);
   }
 
@@ -151,11 +153,11 @@ private:
 };
 
 /// Swap \p lhs and \p rhs.  Equivalent to lhs.swap(rhs).
-template <class Sig>
-inline void swap(TfFunctionRef<Sig> &lhs, TfFunctionRef<Sig> &rhs) {
+template<class Sig> inline void swap(TfFunctionRef<Sig> &lhs, TfFunctionRef<Sig> &rhs)
+{
   lhs.swap(rhs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_FUNCTION_REF_H
+#endif  // PXR_BASE_TF_FUNCTION_REF_H

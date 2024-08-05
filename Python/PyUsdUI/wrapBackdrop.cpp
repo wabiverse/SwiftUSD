@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdUI/backdrop.h"
 #include "Usd/schemaBase.h"
+#include "UsdUI/backdrop.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,44 +40,36 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateDescriptionAttr(UsdUIBackdrop &self,
+                                           object defaultVal,
+                                           bool writeSparsely)
 {
+  return self.CreateDescriptionAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                    writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static std::string _Repr(const UsdUIBackdrop &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdUI.Backdrop(%s)", primRepr.c_str());
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
-
-  static UsdAttribute
-  _CreateDescriptionAttr(UsdUIBackdrop &self,
-                         object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDescriptionAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdUIBackdrop &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdUI.Backdrop(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdUIBackdrop()
 {
   typedef UsdUIBackdrop This;
 
-  class_<This, bases<UsdTyped>>
-      cls("Backdrop");
+  class_<This, bases<UsdTyped>> cls("Backdrop");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -93,18 +85,17 @@ void wrapUsdUIBackdrop()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetDescriptionAttr",
-           &This::GetDescriptionAttr)
+      .def("GetDescriptionAttr", &This::GetDescriptionAttr)
       .def("CreateDescriptionAttr",
            &_CreateDescriptionAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -130,11 +121,8 @@ void wrapUsdUIBackdrop()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
-{
+namespace {
 
-  WRAP_CUSTOM
-  {
-  }
+WRAP_CUSTOM {}
 
-}
+}  // namespace

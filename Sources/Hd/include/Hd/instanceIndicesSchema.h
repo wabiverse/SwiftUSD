@@ -33,81 +33,68 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
-#define HDINSTANCEINDICES_SCHEMA_TOKENS \
-    (instancer) \
-    (prototypeIndex) \
-    (instanceIndices) \
+#define HDINSTANCEINDICES_SCHEMA_TOKENS (instancer)(prototypeIndex)(instanceIndices)
 
-TF_DECLARE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens, HD_API,
-    HDINSTANCEINDICES_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdInstanceIndicesSchemaTokens, HD_API, HDINSTANCEINDICES_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdInstanceIndicesSchema : public HdSchema
-{
-public:
-    HdInstanceIndicesSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdInstanceIndicesSchema : public HdSchema {
+ public:
+  HdInstanceIndicesSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdPathDataSourceHandle GetInstancer();
+  HD_API
+  HdIntDataSourceHandle GetPrototypeIndex();
+  HD_API
+  HdIntArrayDataSourceHandle GetInstanceIndices();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdPathDataSourceHandle &instancer,
+      const HdIntDataSourceHandle &prototypeIndex,
+      const HdIntArrayDataSourceHandle &instanceIndices);
+
+  /// \class HdInstanceIndicesSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdPathDataSourceHandle GetInstancer();
+    Builder &SetInstancer(const HdPathDataSourceHandle &instancer);
     HD_API
-    HdIntDataSourceHandle GetPrototypeIndex();
+    Builder &SetPrototypeIndex(const HdIntDataSourceHandle &prototypeIndex);
     HD_API
-    HdIntArrayDataSourceHandle GetInstanceIndices();
+    Builder &SetInstanceIndices(const HdIntArrayDataSourceHandle &instanceIndices);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdPathDataSourceHandle &instancer,
-        const HdIntDataSourceHandle &prototypeIndex,
-        const HdIntArrayDataSourceHandle &instanceIndices
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdInstanceIndicesSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetInstancer(
-            const HdPathDataSourceHandle &instancer);
-        HD_API
-        Builder &SetPrototypeIndex(
-            const HdIntDataSourceHandle &prototypeIndex);
-        HD_API
-        Builder &SetInstanceIndices(
-            const HdIntArrayDataSourceHandle &instanceIndices);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdPathDataSourceHandle _instancer;
-        HdIntDataSourceHandle _prototypeIndex;
-        HdIntArrayDataSourceHandle _instanceIndices;
-    };
-
+   private:
+    HdPathDataSourceHandle _instancer;
+    HdIntDataSourceHandle _prototypeIndex;
+    HdIntArrayDataSourceHandle _instanceIndices;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

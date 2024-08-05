@@ -33,77 +33,58 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens,
-    HDMATERIALBINDING_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMaterialBindingSchemaTokens, HDMATERIALBINDING_SCHEMA_TOKENS);
 
-
-
-HdPathDataSourceHandle
-HdMaterialBindingSchema::GetPath()
+HdPathDataSourceHandle HdMaterialBindingSchema::GetPath()
 {
-    return _GetTypedDataSource<HdPathDataSource>(
-        HdMaterialBindingSchemaTokens->path);
+  return _GetTypedDataSource<HdPathDataSource>(HdMaterialBindingSchemaTokens->path);
 }
 
-HdTokenDataSourceHandle
-HdMaterialBindingSchema::GetBindingStrength()
+HdTokenDataSourceHandle HdMaterialBindingSchema::GetBindingStrength()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdMaterialBindingSchemaTokens->bindingStrength);
+  return _GetTypedDataSource<HdTokenDataSource>(HdMaterialBindingSchemaTokens->bindingStrength);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdMaterialBindingSchema::BuildRetained(
-        const HdPathDataSourceHandle &path,
-        const HdTokenDataSourceHandle &bindingStrength
-)
+HdContainerDataSourceHandle HdMaterialBindingSchema::BuildRetained(
+    const HdPathDataSourceHandle &path, const HdTokenDataSourceHandle &bindingStrength)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (path) {
-        names[count] = HdMaterialBindingSchemaTokens->path;
-        values[count++] = path;
-    }
+  size_t count = 0;
+  if (path) {
+    names[count] = HdMaterialBindingSchemaTokens->path;
+    values[count++] = path;
+  }
 
-    if (bindingStrength) {
-        names[count] = HdMaterialBindingSchemaTokens->bindingStrength;
-        values[count++] = bindingStrength;
-    }
+  if (bindingStrength) {
+    names[count] = HdMaterialBindingSchemaTokens->bindingStrength;
+    values[count++] = bindingStrength;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-
-HdMaterialBindingSchema::Builder &
-HdMaterialBindingSchema::Builder::SetPath(
+HdMaterialBindingSchema::Builder &HdMaterialBindingSchema::Builder::SetPath(
     const HdPathDataSourceHandle &path)
 {
-    _path = path;
-    return *this;
+  _path = path;
+  return *this;
 }
 
-HdMaterialBindingSchema::Builder &
-HdMaterialBindingSchema::Builder::SetBindingStrength(
+HdMaterialBindingSchema::Builder &HdMaterialBindingSchema::Builder::SetBindingStrength(
     const HdTokenDataSourceHandle &bindingStrength)
 {
-    _bindingStrength = bindingStrength;
-    return *this;
+  _bindingStrength = bindingStrength;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdMaterialBindingSchema::Builder::Build()
+HdContainerDataSourceHandle HdMaterialBindingSchema::Builder::Build()
 {
-    return HdMaterialBindingSchema::BuildRetained(
-        _path,
-        _bindingStrength
-    );
+  return HdMaterialBindingSchema::BuildRetained(_path, _bindingStrength);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

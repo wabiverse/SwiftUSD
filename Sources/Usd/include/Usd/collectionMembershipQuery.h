@@ -47,7 +47,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// UsdCollectionMembershipQuery object can be used to answer queries about
 /// membership of paths in the collection efficiently.
 class UsdCollectionMembershipQuery {
-public:
+ public:
   /// Holds an unordered map describing membership of paths in this collection
   /// and the associated expansionRule for how the paths are to be expanded.
   /// Valid expansionRules are UsdTokens->explicitOnly,
@@ -57,8 +57,7 @@ public:
   /// If a collection includes another collection, the included collection's
   /// PathExpansionRuleMap is merged into this one. If a path is excluded,
   /// its expansion rule is set to UsdTokens->exclude.
-  using PathExpansionRuleMap =
-      std::unordered_map<SdfPath, TfToken, SdfPath::Hash>;
+  using PathExpansionRuleMap = std::unordered_map<SdfPath, TfToken, SdfPath::Hash>;
 
   /// Default Constructor, creates an empty UsdCollectionMembershipQuery
   /// object
@@ -97,8 +96,7 @@ public:
   /// The python version of this method only returns the boolean result.
   /// It does not return \p expansionRule.
   USD_API
-  bool IsPathIncluded(const SdfPath &path,
-                      TfToken *expansionRule = nullptr) const;
+  bool IsPathIncluded(const SdfPath &path, TfToken *expansionRule = nullptr) const;
 
   /// \overload
   /// Returns whether the given path, \p path is included in the
@@ -114,22 +112,28 @@ public:
   /// The python version of this method only returns the boolean result.
   /// It does not return \p expansionRule.
   USD_API
-  bool IsPathIncluded(const SdfPath &path, const TfToken &parentExpansionRule,
+  bool IsPathIncluded(const SdfPath &path,
+                      const TfToken &parentExpansionRule,
                       TfToken *expansionRule = nullptr) const;
 
   /// Returns true if the collection excludes one or more paths below an
   /// included path.
-  bool HasExcludes() const { return _hasExcludes; }
+  bool HasExcludes() const
+  {
+    return _hasExcludes;
+  }
 
   /// Equality operator
-  bool operator==(UsdCollectionMembershipQuery const &rhs) const {
+  bool operator==(UsdCollectionMembershipQuery const &rhs) const
+  {
     return _hasExcludes == rhs._hasExcludes &&
            _pathExpansionRuleMap == rhs._pathExpansionRuleMap &&
            _includedCollections == rhs._includedCollections;
   }
 
   /// Inequality operator
-  bool operator!=(UsdCollectionMembershipQuery const &rhs) const {
+  bool operator!=(UsdCollectionMembershipQuery const &rhs) const
+  {
     return !(*this == rhs);
   }
 
@@ -140,12 +144,16 @@ public:
   };
 
   /// Hash function
-  inline size_t GetHash() const { return Hash()(*this); }
+  inline size_t GetHash() const
+  {
+    return Hash()(*this);
+  }
 
   /// Returns a raw map of the paths included or excluded in the
   /// collection along with the expansion rules for the included
   /// paths.
-  const PathExpansionRuleMap &GetAsPathExpansionRuleMap() const {
+  const PathExpansionRuleMap &GetAsPathExpansionRuleMap() const
+  {
     return _pathExpansionRuleMap;
   }
 
@@ -155,11 +163,12 @@ public:
   /// by other collections will be part of this set. The collection from
   /// which this UsdCollectionMembershipQuery object was computed is *not*
   /// part of this set.
-  const SdfPathSet &GetIncludedCollections() const {
+  const SdfPathSet &GetIncludedCollections() const
+  {
     return _includedCollections;
   }
 
-private:
+ private:
   PathExpansionRuleMap _pathExpansionRuleMap;
 
   SdfPathSet _includedCollections;
@@ -176,7 +185,8 @@ private:
 /// The results depends on the load state of the UsdStage, \p stage.
 USD_API
 std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(
-    const UsdCollectionMembershipQuery &query, const UsdStageWeakPtr &stage,
+    const UsdCollectionMembershipQuery &query,
+    const UsdStageWeakPtr &stage,
     const Usd_PrimFlagsPredicate &pred = UsdPrimDefaultPredicate);
 
 /// Returns all the paths that satisfy the predicate, \p pred in the
@@ -186,7 +196,8 @@ std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(
 /// The result depends on the load state of the UsdStage, \p stage.
 USD_API
 SdfPathSet UsdComputeIncludedPathsFromCollection(
-    const UsdCollectionMembershipQuery &query, const UsdStageWeakPtr &stage,
+    const UsdCollectionMembershipQuery &query,
+    const UsdStageWeakPtr &stage,
     const Usd_PrimFlagsPredicate &pred = UsdPrimDefaultPredicate);
 
 PXR_NAMESPACE_CLOSE_SCOPE

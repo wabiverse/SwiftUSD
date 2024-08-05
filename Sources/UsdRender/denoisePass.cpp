@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdRenderDenoisePass,
-                 TfType::Bases<UsdTyped>>();
+  TfType::Define<UsdRenderDenoisePass, TfType::Bases<UsdTyped>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdRenderDenoisePass::~UsdRenderDenoisePass()
-{
-}
+UsdRenderDenoisePass::~UsdRenderDenoisePass() {}
 
 /* static */
-UsdRenderDenoisePass
-UsdRenderDenoisePass::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderDenoisePass UsdRenderDenoisePass::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderDenoisePass();
   }
@@ -62,18 +57,14 @@ UsdRenderDenoisePass::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdRenderDenoisePass
-UsdRenderDenoisePass::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderDenoisePass UsdRenderDenoisePass::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("RenderDenoisePass");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderDenoisePass();
   }
-  return UsdRenderDenoisePass(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdRenderDenoisePass(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdRenderDenoisePass::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdRenderDenoisePass::_GetStaticTfType()
+const TfType &UsdRenderDenoisePass::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdRenderDenoisePass>();
   return tfType;
@@ -98,19 +88,16 @@ bool UsdRenderDenoisePass::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdRenderDenoisePass::_GetTfType() const
+const TfType &UsdRenderDenoisePass::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &
-UsdRenderDenoisePass::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdRenderDenoisePass::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames;
-  static TfTokenVector allNames =
-      UsdTyped::GetSchemaAttributeNames(true);
+  static TfTokenVector allNames = UsdTyped::GetSchemaAttributeNames(true);
 
   if (includeInherited)
     return allNames;

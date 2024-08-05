@@ -34,21 +34,25 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _GetFileString(TfCallContext const &cc) {
+static string _GetFileString(TfCallContext const &cc)
+{
   return string(cc.GetFile());
 }
 
-static string _GetFunctionString(TfCallContext const &cc) {
+static string _GetFunctionString(TfCallContext const &cc)
+{
   return string(cc.GetFunction());
 }
 
-static string _GetPrettyFunctionString(TfCallContext const &cc) {
+static string _GetPrettyFunctionString(TfCallContext const &cc)
+{
   return string(cc.GetPrettyFunction());
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapCallContext() {
+void wrapCallContext()
+{
   typedef TfCallContext This;
 
   class_<This>("CallContext", no_init)

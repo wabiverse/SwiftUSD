@@ -39,28 +39,33 @@ using _ListEditImpl = Usd_ListEditImpl<UsdInherits, SdfInheritsProxy>;
 
 // The implementation doesn't define this function as it needs to be specialized
 // so we implement it here.
-template <>
-SdfInheritsProxy
-_ListEditImpl::_GetListEditorForSpec(const SdfPrimSpecHandle &spec) {
+template<> SdfInheritsProxy _ListEditImpl::_GetListEditorForSpec(const SdfPrimSpecHandle &spec)
+{
   return spec->GetInheritPathList();
 }
 
-bool UsdInherits::AddInherit(const SdfPath &primPathIn,
-                             UsdListPosition position) {
+bool UsdInherits::AddInherit(const SdfPath &primPathIn, UsdListPosition position)
+{
   return _ListEditImpl::Add(*this, primPathIn, position);
 }
 
-bool UsdInherits::RemoveInherit(const SdfPath &primPathIn) {
+bool UsdInherits::RemoveInherit(const SdfPath &primPathIn)
+{
   return _ListEditImpl::Remove(*this, primPathIn);
 }
 
-bool UsdInherits::ClearInherits() { return _ListEditImpl::Clear(*this); }
+bool UsdInherits::ClearInherits()
+{
+  return _ListEditImpl::Clear(*this);
+}
 
-bool UsdInherits::SetInherits(const SdfPathVector &itemsIn) {
+bool UsdInherits::SetInherits(const SdfPathVector &itemsIn)
+{
   return _ListEditImpl::Set(*this, itemsIn);
 }
 
-SdfPathVector UsdInherits::GetAllDirectInherits() const {
+SdfPathVector UsdInherits::GetAllDirectInherits() const
+{
   SdfPathVector ret;
   if (!_prim) {
     TF_CODING_ERROR("Invalid prim: %s", UsdDescribe(_prim).c_str());
@@ -70,9 +75,9 @@ SdfPathVector UsdInherits::GetAllDirectInherits() const {
   std::unordered_set<SdfPath, SdfPath::Hash> seen;
 
   auto addIfDirectInheritFn = [&](const PcpNodeRef &node) {
-    if (node.GetArcType() == PcpArcTypeInherit &&
-        !node.GetOriginRootNode().IsDueToAncestor() &&
-        seen.insert(node.GetPath()).second) {
+    if (node.GetArcType() == PcpArcTypeInherit && !node.GetOriginRootNode().IsDueToAncestor() &&
+        seen.insert(node.GetPath()).second)
+    {
       ret.push_back(node.GetPath());
     }
   };
@@ -95,12 +100,10 @@ SdfPathVector UsdInherits::GetAllDirectInherits() const {
   //
   // Note that this relies on the fact that propagated direct class base arcs
   // are not culled from the prim index even if they do not produce specs.
-  for (const PcpNodeRef &node :
-       _prim.GetPrimIndex().GetNodeRange(PcpRangeTypeInherit)) {
+  for (const PcpNodeRef &node : _prim.GetPrimIndex().GetNodeRange(PcpRangeTypeInherit)) {
     addIfDirectInheritFn(node);
   }
-  for (const PcpNodeRef &node :
-       _prim.GetPrimIndex().GetNodeRange(PcpRangeTypeSpecialize)) {
+  for (const PcpNodeRef &node : _prim.GetPrimIndex().GetNodeRange(PcpRangeTypeSpecialize)) {
     addIfDirectInheritFn(node);
   }
   return ret;

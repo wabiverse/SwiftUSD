@@ -54,36 +54,47 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string __repr__(GfQuatd const &self) {
+static string __repr__(GfQuatd const &self)
+{
   return TF_PY_REPR_PREFIX + "Quatd(" + TfPyRepr(self.GetReal()) + ", " +
          TfPyRepr(self.GetImaginary()) + ")";
 }
 
-static GfQuatd __truediv__(const GfQuatd &self, double value) {
+static GfQuatd __truediv__(const GfQuatd &self, double value)
+{
   return self / value;
 }
 
-static GfQuatd &__itruediv__(GfQuatd &self, double value) {
+static GfQuatd &__itruediv__(GfQuatd &self, double value)
+{
   return self /= value;
 }
 
-static size_t __hash__(GfQuatd const &self) { return TfHash()(self); }
+static size_t __hash__(GfQuatd const &self)
+{
+  return TfHash()(self);
+}
 
 // Zero-initialized default ctor for python.
-static GfQuatd *__init__() { return new GfQuatd(0); }
+static GfQuatd *__init__()
+{
+  return new GfQuatd(0);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapQuatd() {
+void wrapQuatd()
+{
   object getImaginary = make_function(&GfQuatd::GetImaginary,
                                       return_value_policy<return_by_value>());
 
   object setImaginaryVec = make_function((void(GfQuatd::*)(const GfVec3d &)) &
                                          GfQuatd::SetImaginary);
 
-  object setImaginaryScl = make_function(
-      (void(GfQuatd::*)(double, double, double)) & GfQuatd::SetImaginary,
-      default_call_policies(), (arg("i"), arg("j"), arg("k")));
+  object setImaginaryScl = make_function((void(GfQuatd::*)(double, double, double)) &
+                                             GfQuatd::SetImaginary,
+                                         default_call_policies(),
+                                         (arg("i"), arg("j"), arg("k")));
 
   def("Slerp", (GfQuatd(*)(double, const GfQuatd &, const GfQuatd &))GfSlerp);
 
@@ -97,8 +108,7 @@ void wrapQuatd() {
       .def(init<GfQuatd>())
       .def(init<double>(arg("real")))
       .def(init<double, const GfVec3d &>((arg("real"), arg("imaginary"))))
-      .def(init<double, double, double, double>(
-          (arg("real"), arg("i"), arg("j"), arg("k"))))
+      .def(init<double, double, double, double>((arg("real"), arg("i"), arg("j"), arg("k"))))
 
       .def("GetZero", &GfQuatd::GetZero)
       .staticmethod("GetZero")
@@ -117,10 +127,8 @@ void wrapQuatd() {
 
       .def("GetLength", &GfQuatd::GetLength)
 
-      .def("GetNormalized", &GfQuatd::GetNormalized,
-           (arg("eps") = GF_MIN_VECTOR_LENGTH))
-      .def("Normalize", &GfQuatd::Normalize,
-           (arg("eps") = GF_MIN_VECTOR_LENGTH), return_self<>())
+      .def("GetNormalized", &GfQuatd::GetNormalized, (arg("eps") = GF_MIN_VECTOR_LENGTH))
+      .def("Normalize", &GfQuatd::Normalize, (arg("eps") = GF_MIN_VECTOR_LENGTH), return_self<>())
 
       .def("GetConjugate", &GfQuatd::GetConjugate)
       .def("GetInverse", &GfQuatd::GetInverse)
@@ -148,8 +156,7 @@ void wrapQuatd() {
   implicitly_convertible<GfQuatf, GfQuatd>();
   implicitly_convertible<GfQuath, GfQuatd>();
 
-  to_python_converter<std::vector<GfQuatd>,
-                      TfPySequenceToPython<std::vector<GfQuatd>>>();
+  to_python_converter<std::vector<GfQuatd>, TfPySequenceToPython<std::vector<GfQuatd>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / double() ) above, which

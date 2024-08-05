@@ -21,54 +21,48 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "Hd/mesh.h"
 #include "Hd/tokens.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PUBLIC_TOKENS(HdMeshReprDescTokens, HD_MESH_REPR_DESC_TOKENS);
 
-HdMesh::HdMesh(SdfPath const& id)
-    : HdRprim(id)
+HdMesh::HdMesh(SdfPath const &id) : HdRprim(id)
 {
-    /*NOTHING*/
+  /*NOTHING*/
 }
 
 HdMesh::~HdMesh() = default;
 
 /* virtual */
-TfTokenVector const &
-HdMesh::GetBuiltinPrimvarNames() const
+TfTokenVector const &HdMesh::GetBuiltinPrimvarNames() const
 {
-    static const TfTokenVector primvarNames = {
-        HdTokens->points,
-        HdTokens->normals,
-    };
-    return primvarNames;
+  static const TfTokenVector primvarNames = {
+      HdTokens->points,
+      HdTokens->normals,
+  };
+  return primvarNames;
 }
 
 // static repr configuration
 HdMesh::_MeshReprConfig HdMesh::_reprDescConfig;
 
 /* static */
-void
-HdMesh::ConfigureRepr(TfToken const &reprName,
-                      HdMeshReprDesc desc1,
-                      HdMeshReprDesc desc2/*=HdMeshReprDesc()*/)
+void HdMesh::ConfigureRepr(TfToken const &reprName,
+                           HdMeshReprDesc desc1,
+                           HdMeshReprDesc desc2 /*=HdMeshReprDesc()*/)
 {
-    HD_TRACE_FUNCTION();
+  HD_TRACE_FUNCTION();
 
-    _reprDescConfig.AddOrUpdate(
-        reprName, _MeshReprConfig::DescArray{desc1, desc2});
+  _reprDescConfig.AddOrUpdate(reprName, _MeshReprConfig::DescArray{desc1, desc2});
 }
 
 /* static */
-HdMesh::_MeshReprConfig::DescArray
-HdMesh::_GetReprDesc(TfToken const &reprName)
+HdMesh::_MeshReprConfig::DescArray HdMesh::_GetReprDesc(TfToken const &reprName)
 {
-    return _reprDescConfig.Find(reprName);
+  return _reprDescConfig.Find(reprName);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

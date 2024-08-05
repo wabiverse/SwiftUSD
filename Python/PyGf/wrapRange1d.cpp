@@ -52,29 +52,34 @@ namespace {
 
 static const int _dimension = 1;
 
-static string _Repr(GfRange1d const &self) {
+static string _Repr(GfRange1d const &self)
+{
   return TF_PY_REPR_PREFIX + "Range1d(" + TfPyRepr(self.GetMin()) + ", " +
          TfPyRepr(self.GetMax()) + ")";
 }
 
-static GfRange1d __truediv__(const GfRange1d &self, double value) {
+static GfRange1d __truediv__(const GfRange1d &self, double value)
+{
   return self / value;
 }
 
-static GfRange1d &__itruediv__(GfRange1d &self, double value) {
+static GfRange1d &__itruediv__(GfRange1d &self, double value)
+{
   return self /= value;
 }
 
-static size_t __hash__(GfRange1d const &r) { return TfHash{}(r); }
+static size_t __hash__(GfRange1d const &r)
+{
+  return TfHash{}(r);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRange1d() {
-  object getMin =
-      make_function(&GfRange1d::GetMin, return_value_policy<return_by_value>());
+void wrapRange1d()
+{
+  object getMin = make_function(&GfRange1d::GetMin, return_value_policy<return_by_value>());
 
-  object getMax =
-      make_function(&GfRange1d::GetMax, return_value_policy<return_by_value>());
+  object getMax = make_function(&GfRange1d::GetMax, return_value_policy<return_by_value>());
 
   class_<GfRange1d> cls("Range1d", init<>());
   cls.def(init<GfRange1d>())
@@ -103,8 +108,7 @@ void wrapRange1d() {
       .def("SetEmpty", &GfRange1d::SetEmpty)
 
       .def("Contains", (bool(GfRange1d::*)(double) const) & GfRange1d::Contains)
-      .def("Contains",
-           (bool(GfRange1d::*)(const GfRange1d &) const) & GfRange1d::Contains)
+      .def("Contains", (bool(GfRange1d::*)(const GfRange1d &) const) & GfRange1d::Contains)
 
       .def("GetUnion", &GfRange1d::GetUnion)
       .staticmethod("GetUnion")
@@ -113,16 +117,14 @@ void wrapRange1d() {
            (const GfRange1d &(GfRange1d::*)(double)) & GfRange1d::UnionWith,
            return_self<>())
       .def("UnionWith",
-           (const GfRange1d &(GfRange1d::*)(const GfRange1d &)) &
-               GfRange1d::UnionWith,
+           (const GfRange1d &(GfRange1d::*)(const GfRange1d &)) & GfRange1d::UnionWith,
            return_self<>())
 
       .def("GetIntersection", &GfRange1d::GetIntersection)
       .staticmethod("GetIntersection")
 
       .def("IntersectWith",
-           (const GfRange1d &(GfRange1d::*)(const GfRange1d &)) &
-               GfRange1d::IntersectWith,
+           (const GfRange1d &(GfRange1d::*)(const GfRange1d &)) & GfRange1d::IntersectWith,
            return_self<>())
 
       .def("GetDistanceSquared", &GfRange1d::GetDistanceSquared)
@@ -145,8 +147,7 @@ void wrapRange1d() {
       .def("__hash__", __hash__)
 
       ;
-  to_python_converter<std::vector<GfRange1d>,
-                      TfPySequenceToPython<std::vector<GfRange1d>>>();
+  to_python_converter<std::vector<GfRange1d>, TfPySequenceToPython<std::vector<GfRange1d>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / double() ) above, which

@@ -28,16 +28,15 @@
  * thus we can prefer the ease of including all sources in the build
  * which is far more maintainable, especially for package consumers.
  * ----------------------------------------------------------------- */
-#include "Garch/GarchWindows/glPlatformContextWindows.h"
+#  include "Garch/GarchWindows/glPlatformContextWindows.h"
 
-#include <boost/functional/hash.hpp>
-#include <Windows.h>
+#  include <Windows.h>
+#  include <boost/functional/hash.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchWGLContextState::_Detail
-{
-public:
+class GarchWGLContextState::_Detail {
+ public:
   _Detail(HDC hdc, HGLRC hglrc) : hdc(hdc), hglrc(hglrc) {}
 
   HDC hdc;
@@ -48,24 +47,24 @@ public:
 // GarchWGLContextState
 //
 
-GarchWGLContextState::GarchWGLContextState() : _detail(std::make_shared<_Detail>(wglGetCurrentDC(), wglGetCurrentContext()))
+GarchWGLContextState::GarchWGLContextState()
+    : _detail(std::make_shared<_Detail>(wglGetCurrentDC(), wglGetCurrentContext()))
 {
   // Do nothing
 }
 
-GarchWGLContextState::GarchWGLContextState(NullState) : _detail(std::make_shared<_Detail>(HDC(0), HGLRC(0)))
+GarchWGLContextState::GarchWGLContextState(NullState)
+    : _detail(std::make_shared<_Detail>(HDC(0), HGLRC(0)))
 {
   // Do nothing
 }
 
 bool GarchWGLContextState::operator==(const GarchWGLContextState &rhs) const
 {
-  return _detail->hdc == rhs._detail->hdc &&
-         _detail->hglrc == rhs._detail->hglrc;
+  return _detail->hdc == rhs._detail->hdc && _detail->hglrc == rhs._detail->hglrc;
 }
 
-size_t
-GarchWGLContextState::GetHash() const
+size_t GarchWGLContextState::GetHash() const
 {
   size_t result = 0;
   boost::hash_combine(result, _detail->hdc);
@@ -89,8 +88,7 @@ void GarchWGLContextState::DoneCurrent()
 }
 
 GARCH_API
-GarchGLPlatformContextState
-GarchGetNullGLPlatformContextState()
+GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 {
   return GarchWGLContextState(GarchWGLContextState::NullState::nullstate);
 }

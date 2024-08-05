@@ -71,10 +71,11 @@ extern int TfPyRunSimpleString(const std::string &cmd);
 /// values of \p globals and \p locals.  Holding the GIL will also make it safe
 /// to inspect the returned boost::python::handle.
 TF_API
-extern boost::python::handle<>
-TfPyRunString(const std::string &cmd, int start,
-              boost::python::object const &globals = boost::python::object(),
-              boost::python::object const &locals = boost::python::object());
+extern boost::python::handle<> TfPyRunString(
+    const std::string &cmd,
+    int start,
+    boost::python::object const &globals = boost::python::object(),
+    boost::python::object const &locals = boost::python::object());
 
 /// Runs the given file using PyRun_File().
 ///
@@ -91,11 +92,12 @@ TfPyRunString(const std::string &cmd, int start,
 /// values of \p globals and \p locals.  Holding the GIL will also make it safe
 /// to inspect the returned boost::python::handle.
 TF_API
-extern boost::python::handle<>
-TfPyRunFile(const std::string &filename, int start,
-            boost::python::object const &globals = boost::python::object(),
-            boost::python::object const &locals = boost::python::object());
+extern boost::python::handle<> TfPyRunFile(
+    const std::string &filename,
+    int start,
+    boost::python::object const &globals = boost::python::object(),
+    boost::python::object const &locals = boost::python::object());
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_INTERPRETER_H
+#endif  // PXR_BASE_TF_PY_INTERPRETER_H

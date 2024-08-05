@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdRenderSettingsBase,
-                 TfType::Bases<UsdTyped>>();
+  TfType::Define<UsdRenderSettingsBase, TfType::Bases<UsdTyped>>();
 }
 
 /* virtual */
-UsdRenderSettingsBase::~UsdRenderSettingsBase()
-{
-}
+UsdRenderSettingsBase::~UsdRenderSettingsBase() {}
 
 /* static */
-UsdRenderSettingsBase
-UsdRenderSettingsBase::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdRenderSettingsBase UsdRenderSettingsBase::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRenderSettingsBase();
   }
@@ -61,8 +56,7 @@ UsdSchemaKind UsdRenderSettingsBase::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdRenderSettingsBase::_GetStaticTfType()
+const TfType &UsdRenderSettingsBase::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdRenderSettingsBase>();
   return tfType;
@@ -76,20 +70,18 @@ bool UsdRenderSettingsBase::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdRenderSettingsBase::_GetTfType() const
+const TfType &UsdRenderSettingsBase::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetResolutionAttr() const
+UsdAttribute UsdRenderSettingsBase::GetResolutionAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->resolution);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreateResolutionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreateResolutionAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->resolution,
                                     SdfValueTypeNames->Int2,
@@ -99,14 +91,13 @@ UsdRenderSettingsBase::CreateResolutionAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetPixelAspectRatioAttr() const
+UsdAttribute UsdRenderSettingsBase::GetPixelAspectRatioAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->pixelAspectRatio);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreatePixelAspectRatioAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreatePixelAspectRatioAttr(VtValue const &defaultValue,
+                                                               bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->pixelAspectRatio,
                                     SdfValueTypeNames->Float,
@@ -116,14 +107,13 @@ UsdRenderSettingsBase::CreatePixelAspectRatioAttr(VtValue const &defaultValue, b
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetAspectRatioConformPolicyAttr() const
+UsdAttribute UsdRenderSettingsBase::GetAspectRatioConformPolicyAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->aspectRatioConformPolicy);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreateAspectRatioConformPolicyAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreateAspectRatioConformPolicyAttr(VtValue const &defaultValue,
+                                                                       bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->aspectRatioConformPolicy,
                                     SdfValueTypeNames->Token,
@@ -133,14 +123,13 @@ UsdRenderSettingsBase::CreateAspectRatioConformPolicyAttr(VtValue const &default
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetDataWindowNDCAttr() const
+UsdAttribute UsdRenderSettingsBase::GetDataWindowNDCAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->dataWindowNDC);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreateDataWindowNDCAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreateDataWindowNDCAttr(VtValue const &defaultValue,
+                                                            bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->dataWindowNDC,
                                     SdfValueTypeNames->Float4,
@@ -150,14 +139,13 @@ UsdRenderSettingsBase::CreateDataWindowNDCAttr(VtValue const &defaultValue, bool
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetInstantaneousShutterAttr() const
+UsdAttribute UsdRenderSettingsBase::GetInstantaneousShutterAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->instantaneousShutter);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreateInstantaneousShutterAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreateInstantaneousShutterAttr(VtValue const &defaultValue,
+                                                                   bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->instantaneousShutter,
                                     SdfValueTypeNames->Bool,
@@ -167,14 +155,13 @@ UsdRenderSettingsBase::CreateInstantaneousShutterAttr(VtValue const &defaultValu
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::GetDisableMotionBlurAttr() const
+UsdAttribute UsdRenderSettingsBase::GetDisableMotionBlurAttr() const
 {
   return GetPrim().GetAttribute(UsdRenderTokens->disableMotionBlur);
 }
 
-UsdAttribute
-UsdRenderSettingsBase::CreateDisableMotionBlurAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRenderSettingsBase::CreateDisableMotionBlurAttr(VtValue const &defaultValue,
+                                                                bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdRenderTokens->disableMotionBlur,
                                     SdfValueTypeNames->Bool,
@@ -184,35 +171,31 @@ UsdRenderSettingsBase::CreateDisableMotionBlurAttr(VtValue const &defaultValue, 
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdRenderSettingsBase::GetCameraRel() const
+UsdRelationship UsdRenderSettingsBase::GetCameraRel() const
 {
   return GetPrim().GetRelationship(UsdRenderTokens->camera);
 }
 
-UsdRelationship
-UsdRenderSettingsBase::CreateCameraRel() const
+UsdRelationship UsdRenderSettingsBase::CreateCameraRel() const
 {
   return GetPrim().CreateRelationship(UsdRenderTokens->camera,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdRenderSettingsBase::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdRenderSettingsBase::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdRenderTokens->resolution,
@@ -222,10 +205,8 @@ UsdRenderSettingsBase::GetSchemaAttributeNames(bool includeInherited)
       UsdRenderTokens->instantaneousShutter,
       UsdRenderTokens->disableMotionBlur,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdTyped::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdTyped::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

@@ -24,8 +24,8 @@
 #ifndef PXR_USD_USDLUX_DISCOVERY_PLUGIN_H
 #define PXR_USD_USDLUX_DISCOVERY_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "UsdLux/api.h"
+#include <pxr/pxrns.h>
 
 #include "Ndr/declare.h"
 #include "Ndr/discoveryPlugin.h"
@@ -34,25 +34,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class UsdLux_DiscoveryPlugin
 ///
-/// Discovers nodes for corresponding concrete light types that are defined in 
+/// Discovers nodes for corresponding concrete light types that are defined in
 /// the UsdLux library.
 ///
 class UsdLux_DiscoveryPlugin : public NdrDiscoveryPlugin {
-public:
-    USDLUX_API
-    UsdLux_DiscoveryPlugin() = default;
+ public:
+  USDLUX_API
+  UsdLux_DiscoveryPlugin() = default;
 
-    USDLUX_API
-    ~UsdLux_DiscoveryPlugin() override = default;
-    
-    USDLUX_API
-    virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) 
-        override;
+  USDLUX_API
+  ~UsdLux_DiscoveryPlugin() override = default;
 
-    USDLUX_API
-    virtual const NdrStringVec& GetSearchURIs() const override;
+  USDLUX_API
+  virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context) override;
+
+  USDLUX_API
+  virtual const NdrStringVec &GetSearchURIs() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USDLUX_DISCOVERY_PLUGIN_H
+#endif  // PXR_USD_USDLUX_DISCOVERY_PLUGIN_H

@@ -30,7 +30,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool SdfPredicateParamNamesAndDefaults::CheckValidity() const {
+bool SdfPredicateParamNamesAndDefaults::CheckValidity() const
+{
   // Basic check -- names cannot be empty, once an arg with a default appears,
   // all subsequent args must have defaults.
   TfErrorMark m;
@@ -42,11 +43,14 @@ bool SdfPredicateParamNamesAndDefaults::CheckValidity() const {
     bool hasDefault = !param.val.IsEmpty();
     if (firstDefault) {
       if (!hasDefault) {
-        TF_CODING_ERROR("Non-default predicate function parameter "
-                        "'%s' follows default parameter '%s'",
-                        param.name.c_str(), firstDefault->name.c_str());
+        TF_CODING_ERROR(
+            "Non-default predicate function parameter "
+            "'%s' follows default parameter '%s'",
+            param.name.c_str(),
+            firstDefault->name.c_str());
       }
-    } else if (hasDefault) {
+    }
+    else if (hasDefault) {
       firstDefault = &param;
     }
   }

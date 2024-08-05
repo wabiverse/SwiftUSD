@@ -24,9 +24,9 @@
 #include "Glf/drawTarget.h"
 
 #include "Tf/makePyConstructor.h"
+#include "Tf/pyEnum.h"
 #include "Tf/pyPtrHelpers.h"
 #include "Tf/pyResultConversions.h"
-#include "Tf/pyEnum.h"
 
 #include <boost/python/bases.hpp>
 #include <boost/python/class.hpp>
@@ -36,22 +36,19 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+static GlfDrawTargetRefPtr _NewDrawTarget(GfVec2i const &size)
 {
+  return GlfDrawTarget::New(size);
+}
 
-  static GlfDrawTargetRefPtr _NewDrawTarget(
-      GfVec2i const &size)
-  {
-    return GlfDrawTarget::New(size);
-  }
+static GlfDrawTargetRefPtr _NewDrawTarget2(unsigned int width, unsigned int height)
+{
+  return GlfDrawTarget::New(GfVec2i(width, height));
+}
 
-  static GlfDrawTargetRefPtr _NewDrawTarget2(
-      unsigned int width, unsigned int height)
-  {
-    return GlfDrawTarget::New(GfVec2i(width, height));
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapDrawTarget()
 {
@@ -66,7 +63,11 @@ void wrapDrawTarget()
       .def("Bind", &This::Bind)
       .def("Unbind", &This::Unbind)
       .def("WriteToFile",
-           &This::WriteToFile, (arg("attachment"), arg("filename"), arg("viewMatrix") = GfMatrix4d(1), arg("projectionMatrix") = GfMatrix4d(1)))
+           &This::WriteToFile,
+           (arg("attachment"),
+            arg("filename"),
+            arg("viewMatrix") = GfMatrix4d(1),
+            arg("projectionMatrix") = GfMatrix4d(1)))
 
       ;
 }

@@ -27,12 +27,12 @@
 #include <Pcp/mapExpression.h>
 #include <Pcp/mapFunction.h>
 #include <Pcp/namespaceEdits.h>
-#include <Pcp/node_Iterator.h>
 #include <Pcp/node.h>
+#include <Pcp/node_Iterator.h>
 #include <Pcp/pathTranslation.h>
+#include <Pcp/primIndex.h>
 #include <Pcp/primIndex_Graph.h>
 #include <Pcp/primIndex_StackFrame.h>
-#include <Pcp/primIndex.h>
 #include <Pcp/propertyIndex.h>
 #include <Pcp/pyUtils.h>
 #include <Pcp/site.h>
@@ -42,4 +42,4 @@
 #include <Pcp/types.h>
 #include <Pcp/utils.h>
 
-#endif // __PXR_USD_PCP_H__
+#endif  // __PXR_USD_PCP_H__

@@ -35,16 +35,21 @@ using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfPyExceptionState::~TfPyExceptionState() { Release(); }
+TfPyExceptionState::~TfPyExceptionState()
+{
+  Release();
+}
 
-void TfPyExceptionState::Release() {
+void TfPyExceptionState::Release()
+{
   TfPyLock lock;
   _type.release();
   _value.release();
   _trace.release();
 }
 
-string TfPyExceptionState::GetExceptionString() const {
+string TfPyExceptionState::GetExceptionString() const
+{
   TfPyLock lock;
   string s;
   // Save the exception state so we can restore it -- getting the exception
@@ -57,7 +62,8 @@ string TfPyExceptionState::GetExceptionString() const {
     for (boost::python::ssize_t i = 0; i < size; ++i) {
       s += extract<string>(exception[i]);
     }
-  } catch (boost::python::error_already_set const &) {
+  }
+  catch (boost::python::error_already_set const &) {
     // Just ignore the exception.
   }
   return s;

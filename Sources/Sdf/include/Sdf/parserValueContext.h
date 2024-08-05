@@ -61,7 +61,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Ideally this would be self-contained, but the parser currently accesses lots
 // of public member variables.
 class Sdf_ParserValueContext {
-public:
+ public:
   typedef Sdf_ParserHelpers::Value Value;
   typedef std::function<void(const std::string &)> ErrorReporter;
 
@@ -133,11 +133,11 @@ public:
   // Hook to override the recorded text
   void SetRecordedString(const std::string &text);
 
-private:
+ private:
   bool _needComma, _isRecordingString;
   std::string _recordedString;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PARSER_VALUE_CONTEXT_H
+#endif  // PXR_USD_SDF_PARSER_VALUE_CONTEXT_H

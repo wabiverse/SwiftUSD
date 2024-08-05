@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGI_INDIRECT_COMMAND_ENCODER_H
 #define PXR_IMAGING_HGI_INDIRECT_COMMAND_ENCODER_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/cmds.h"
-#include "Hgi/resourceBindings.h"
 #include "Hgi/graphicsPipeline.h"
+#include "Hgi/resourceBindings.h"
+#include <pxr/pxrns.h>
 
 #include <memory>
 #include <stdint.h>
@@ -39,12 +39,13 @@ class Hgi;
 class HgiComputeCmds;
 class HgiGraphicsCmds;
 
-struct HgiIndirectCommands
-{
+struct HgiIndirectCommands {
   HgiIndirectCommands(uint32_t drawCount,
                       HgiGraphicsPipelineHandle const &graphicsPipeline,
                       HgiResourceBindingsHandle const &resourceBindings)
-      : drawCount(drawCount), graphicsPipeline(graphicsPipeline), resourceBindings(resourceBindings)
+      : drawCount(drawCount),
+        graphicsPipeline(graphicsPipeline),
+        resourceBindings(resourceBindings)
   {
   }
 
@@ -68,9 +69,8 @@ using HgiIndirectCommandsUniquePtr = std::unique_ptr<HgiIndirectCommands>;
 /// Execute draw takes the HgiIndirectCommands structure and replays it on the
 /// device.  Currently this is only implemented on the Metal HGI device.
 ///
-class HgiIndirectCommandEncoder : public HgiCmds
-{
-public:
+class HgiIndirectCommandEncoder : public HgiCmds {
+ public:
   HGI_API
   ~HgiIndirectCommandEncoder() override;
 
@@ -107,15 +107,13 @@ public:
   /// Excutes an indirect command batch from the HgiIndirectCommands
   /// structure.
   HGI_API
-  virtual void ExecuteDraw(
-      HgiGraphicsCmds *gfxCmds,
-      HgiIndirectCommands const *commands) = 0;
+  virtual void ExecuteDraw(HgiGraphicsCmds *gfxCmds, HgiIndirectCommands const *commands) = 0;
 
-protected:
+ protected:
   HGI_API
   HgiIndirectCommandEncoder();
 
-private:
+ private:
   HgiIndirectCommandEncoder &operator=(const HgiIndirectCommandEncoder &) = delete;
   HgiIndirectCommandEncoder(const HgiIndirectCommandEncoder &) = delete;
 };

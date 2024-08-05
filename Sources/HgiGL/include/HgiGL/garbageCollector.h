@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HGI_GL_GARBAGE_COLLECTOR_H
 #define PXR_IMAGING_HGI_GL_GARBAGE_COLLECTOR_H
 
-#include <pxr/pxrns.h>
 #include "Tf/diagnostic.h"
+#include <pxr/pxrns.h>
 
 #include "Hgi/hgiImpl.h"
 #include "HgiGL/api.h"
@@ -42,9 +42,8 @@ class HgiGL;
 /// Handles garbage collection of opengl objects by delaying their destruction
 /// until those objects are no longer used.
 ///
-class HgiGLGarbageCollector final
-{
-public:
+class HgiGLGarbageCollector final {
+ public:
   HGIGL_API
   HgiGLGarbageCollector();
 
@@ -70,15 +69,14 @@ public:
   HgiGraphicsPipelineHandleVector *GetGraphicsPipelineList();
   HgiComputePipelineHandleVector *GetComputePipelineList();
 
-private:
+ private:
   HgiGLGarbageCollector &operator=(const HgiGLGarbageCollector &) = delete;
   HgiGLGarbageCollector(const HgiGLGarbageCollector &) = delete;
 
   /// Returns a thread_local vector in which to store a object handle.
   /// Thread safety: The returned vector is a thread_local vector so this call
   /// is thread safe as long as the vector is only used by the calling thread.
-  template <class T>
-  T *_GetThreadLocalStorageList(std::vector<T *> *collector);
+  template<class T> T *_GetThreadLocalStorageList(std::vector<T *> *collector);
 
   // List of all the per-thread-vectors of objects that need to be destroyed.
   // The vectors are static (shared across HGIs), because we use thread_local

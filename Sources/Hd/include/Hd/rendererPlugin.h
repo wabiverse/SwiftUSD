@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HD_RENDERER_PLUGIN_H
 #define PXR_IMAGING_HD_RENDERER_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hf/pluginBase.h"
 #include "Hd/renderDelegate.h"
+#include "Hf/pluginBase.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,76 +47,71 @@ class HdPluginRenderDelegateUniqueHandle;
 /// to other parts of the Hydra Ecosystem.
 ///
 class HdRendererPlugin : public HfPluginBase {
-public:
+ public:
+  ///
+  /// Create a render delegate through the plugin and wrap it in a
+  /// handle that keeps this plugin alive until render delegate is
+  /// destroyed. Initial settings can be passed in.
+  ///
+  HD_API
+  HdPluginRenderDelegateUniqueHandle CreateDelegate(HdRenderSettingsMap const &settingsMap = {});
 
-    ///
-    /// Create a render delegate through the plugin and wrap it in a
-    /// handle that keeps this plugin alive until render delegate is
-    /// destroyed. Initial settings can be passed in.
-    ///
-    HD_API
-    HdPluginRenderDelegateUniqueHandle CreateDelegate(
-        HdRenderSettingsMap const &settingsMap = {});
+  ///
+  /// Look-up plugin id in plugin registry.
+  ///
+  HD_API
+  TfToken GetPluginId() const;
 
-    ///
-    /// Look-up plugin id in plugin registry.
-    ///
-    HD_API
-    TfToken GetPluginId() const;
+  ///
+  /// Clients should use CreateDelegate since this method
+  /// will eventually become protected, use CreateRenderDelegateHandle
+  /// instead.
+  ///
+  /// Factory a Render Delegate object, that Hydra can use to
+  /// factory prims and communicate with a renderer.
+  ///
+  virtual HdRenderDelegate *CreateRenderDelegate() = 0;
 
-    ///
-    /// Clients should use CreateDelegate since this method
-    /// will eventually become protected, use CreateRenderDelegateHandle
-    /// instead.
-    ///
-    /// Factory a Render Delegate object, that Hydra can use to
-    /// factory prims and communicate with a renderer.
-    ///
-    virtual HdRenderDelegate *CreateRenderDelegate() = 0;
+  ///
+  /// Clients should use CreateDelegate since this method
+  /// will eventually become protected.
+  ///
+  /// Factory a Render Delegate object, that Hydra can use to
+  /// factory prims and communicate with a renderer.  Pass in initial
+  /// settings...
+  ///
+  HD_API
+  virtual HdRenderDelegate *CreateRenderDelegate(HdRenderSettingsMap const &settingsMap);
 
-    ///
-    /// Clients should use CreateDelegate since this method
-    /// will eventually become protected.
-    ///
-    /// Factory a Render Delegate object, that Hydra can use to
-    /// factory prims and communicate with a renderer.  Pass in initial
-    /// settings...
-    ///
-    HD_API
-    virtual HdRenderDelegate *CreateRenderDelegate(
-        HdRenderSettingsMap const& settingsMap);
+  ///
+  /// Clients should use CreateDelegate since this method
+  /// will eventually become protected.
+  ///
+  /// Release the object factoried by CreateRenderDelegate().
+  ///
+  virtual void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) = 0;
 
-    ///
-    /// Clients should use CreateDelegate since this method
-    /// will eventually become protected.
-    ///
-    /// Release the object factoried by CreateRenderDelegate().
-    ///
-    virtual void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) = 0;
+  ///
+  /// Returns \c true if this renderer plugin is supported in the running
+  /// process and \c false if not.
+  ///
+  /// This gives the plugin a chance to perform some runtime checks to make
+  /// sure that the system meets minimum requirements.  The \p gpuEnabled
+  /// parameter indicates if the GPU is available for use by the plugin in
+  /// case this information is necessary to make this determination.
+  ///
+  virtual bool IsSupported(bool gpuEnabled = true) const = 0;
 
-    ///
-    /// Returns \c true if this renderer plugin is supported in the running 
-    /// process and \c false if not.
-    /// 
-    /// This gives the plugin a chance to perform some runtime checks to make
-    /// sure that the system meets minimum requirements.  The \p gpuEnabled
-    /// parameter indicates if the GPU is available for use by the plugin in
-    /// case this information is necessary to make this determination.
-    ///
-    virtual bool IsSupported(bool gpuEnabled = true) const = 0;
+ protected:
+  HdRendererPlugin() = default;
+  HD_API
+  ~HdRendererPlugin() override;
 
-protected:
-    HdRendererPlugin() = default;
-    HD_API
-    ~HdRendererPlugin() override;
-
-private:
-    // This class doesn't require copy support.
-    HdRendererPlugin(const HdRendererPlugin &)             = delete;
-    HdRendererPlugin &operator =(const HdRendererPlugin &) = delete;
-
+ private:
+  // This class doesn't require copy support.
+  HdRendererPlugin(const HdRendererPlugin &) = delete;
+  HdRendererPlugin &operator=(const HdRendererPlugin &) = delete;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

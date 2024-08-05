@@ -32,7 +32,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-int Tf_RefPtr_UniqueChangedCounter::_AddRef(TfRefBase const *refBase) {
+int Tf_RefPtr_UniqueChangedCounter::_AddRef(TfRefBase const *refBase)
+{
   // Read the current value, and try to CAS it one greater if it looks like we
   // won't take it 1 -> 2.  If we're successful at this, we can skip the whole
   // locking business.  If instead the current count is 1, we pay the price
@@ -47,8 +48,7 @@ int Tf_RefPtr_UniqueChangedCounter::_AddRef(TfRefBase const *refBase) {
   }
 
   // prevCount is 1 or it changed in the meantime.
-  TfRefBase::UniqueChangedListener const &listener =
-      TfRefBase::_uniqueChangedListener;
+  TfRefBase::UniqueChangedListener const &listener = TfRefBase::_uniqueChangedListener;
   listener.lock();
   prevCount = refBase->GetRefCount()._FetchAndAdd(1);
   if (prevCount == 1) {
@@ -59,7 +59,8 @@ int Tf_RefPtr_UniqueChangedCounter::_AddRef(TfRefBase const *refBase) {
   return prevCount;
 }
 
-bool Tf_RefPtr_UniqueChangedCounter::_RemoveRef(TfRefBase const *refBase) {
+bool Tf_RefPtr_UniqueChangedCounter::_RemoveRef(TfRefBase const *refBase)
+{
   // Read the current value, and try to CAS it one less if it looks like we
   // won't take it 2 -> 1.  If we're successful at this, we can skip the whole
   // locking business.  If instead the current count is 2, we pay the price
@@ -74,8 +75,7 @@ bool Tf_RefPtr_UniqueChangedCounter::_RemoveRef(TfRefBase const *refBase) {
   }
 
   // prevCount is 2 or it changed in the meantime.
-  TfRefBase::UniqueChangedListener const &listener =
-      TfRefBase::_uniqueChangedListener;
+  TfRefBase::UniqueChangedListener const &listener = TfRefBase::_uniqueChangedListener;
   listener.lock();
   prevCount = refBase->GetRefCount()._FetchAndAdd(-1);
   if (prevCount == 2) {
@@ -86,8 +86,8 @@ bool Tf_RefPtr_UniqueChangedCounter::_RemoveRef(TfRefBase const *refBase) {
   return prevCount == 1;
 }
 
-bool Tf_RefPtr_UniqueChangedCounter::_AddRefIfNonzero(
-    TfRefBase const *refBase) {
+bool Tf_RefPtr_UniqueChangedCounter::_AddRefIfNonzero(TfRefBase const *refBase)
+{
   // Read the current value, and try to CAS it one greater if it looks like we
   // won't take it 1 -> 2.  If we're successful at this, we can skip the whole
   // locking business.  If instead the current count is 1, we pay the price
@@ -108,8 +108,7 @@ bool Tf_RefPtr_UniqueChangedCounter::_AddRefIfNonzero(
 
   // Otherwise we saw a 1, so we may have to lock & invoke the unique changed
   // counter.
-  TfRefBase::UniqueChangedListener const &listener =
-      TfRefBase::_uniqueChangedListener;
+  TfRefBase::UniqueChangedListener const &listener = TfRefBase::_uniqueChangedListener;
   listener.lock();
   prevCount = counter.load();
   while (true) {
@@ -133,11 +132,10 @@ bool Tf_RefPtr_UniqueChangedCounter::_AddRefIfNonzero(
   return true;
 }
 
-void Tf_PostNullSmartPtrDereferenceFatalError(const TfCallContext &ctx,
-                                              const char *typeName) {
+void Tf_PostNullSmartPtrDereferenceFatalError(const TfCallContext &ctx, const char *typeName)
+{
   Tf_DiagnosticHelper(ctx, TF_DIAGNOSTIC_FATAL_ERROR_TYPE)
-      .IssueFatalError("attempted member lookup on NULL %s",
-                       ArchGetDemangled(typeName).c_str());
+      .IssueFatalError("attempted member lookup on NULL %s", ArchGetDemangled(typeName).c_str());
   ArchAbort();
 }
 

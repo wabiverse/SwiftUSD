@@ -24,11 +24,11 @@
 #ifndef PXR_IMAGING_HGIVULKAN_COMMAND_BUFFER_H
 #define PXR_IMAGING_HGIVULKAN_COMMAND_BUFFER_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/enums.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
 #include <functional>
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -43,9 +43,8 @@ using HgiVulkanCompletedHandlerVector = std::vector<HgiVulkanCompletedHandler>;
 /// Represents a primary command buffer in Vulkan.
 /// Command buffers are managed by the CommandQueue.
 ///
-class HgiVulkanCommandBuffer final
-{
-public:
+class HgiVulkanCommandBuffer final {
+ public:
   HGIVULKAN_API
   HgiVulkanCommandBuffer(HgiVulkanDevice *device, VkCommandPool pool);
 
@@ -120,7 +119,7 @@ public:
   HGIVULKAN_API
   void RunAndClearCompletedHandlers();
 
-private:
+ private:
   HgiVulkanCommandBuffer() = delete;
   HgiVulkanCommandBuffer &operator=(const HgiVulkanCommandBuffer &) = delete;
   HgiVulkanCommandBuffer(const HgiVulkanCommandBuffer &) = delete;

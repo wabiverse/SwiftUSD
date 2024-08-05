@@ -29,178 +29,137 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const TfTokenVector HdTinyRenderDelegate::SUPPORTED_RPRIM_TYPES =
-{
+const TfTokenVector HdTinyRenderDelegate::SUPPORTED_RPRIM_TYPES = {
     HdPrimTypeTokens->mesh,
 };
 
-const TfTokenVector HdTinyRenderDelegate::SUPPORTED_SPRIM_TYPES =
-{
-};
+const TfTokenVector HdTinyRenderDelegate::SUPPORTED_SPRIM_TYPES = {};
 
-const TfTokenVector HdTinyRenderDelegate::SUPPORTED_BPRIM_TYPES =
-{
-};
+const TfTokenVector HdTinyRenderDelegate::SUPPORTED_BPRIM_TYPES = {};
 
-HdTinyRenderDelegate::HdTinyRenderDelegate()
-    : HdRenderDelegate()
+HdTinyRenderDelegate::HdTinyRenderDelegate() : HdRenderDelegate()
 {
-    _Initialize();
+  _Initialize();
 }
 
-HdTinyRenderDelegate::HdTinyRenderDelegate(
-    HdRenderSettingsMap const& settingsMap)
+HdTinyRenderDelegate::HdTinyRenderDelegate(HdRenderSettingsMap const &settingsMap)
     : HdRenderDelegate(settingsMap)
 {
-    _Initialize();
+  _Initialize();
 }
 
-void
-HdTinyRenderDelegate::_Initialize()
+void HdTinyRenderDelegate::_Initialize()
 {
-    std::cout << "Creating Tiny RenderDelegate" << std::endl;
-    _resourceRegistry = std::make_shared<HdResourceRegistry>();
+  std::cout << "Creating Tiny RenderDelegate" << std::endl;
+  _resourceRegistry = std::make_shared<HdResourceRegistry>();
 }
 
 HdTinyRenderDelegate::~HdTinyRenderDelegate()
 {
-    _resourceRegistry.reset();
-    std::cout << "Destroying Tiny RenderDelegate" << std::endl;
+  _resourceRegistry.reset();
+  std::cout << "Destroying Tiny RenderDelegate" << std::endl;
 }
 
-TfTokenVector const&
-HdTinyRenderDelegate::GetSupportedRprimTypes() const
+TfTokenVector const &HdTinyRenderDelegate::GetSupportedRprimTypes() const
 {
-    return SUPPORTED_RPRIM_TYPES;
+  return SUPPORTED_RPRIM_TYPES;
 }
 
-TfTokenVector const&
-HdTinyRenderDelegate::GetSupportedSprimTypes() const
+TfTokenVector const &HdTinyRenderDelegate::GetSupportedSprimTypes() const
 {
-    return SUPPORTED_SPRIM_TYPES;
+  return SUPPORTED_SPRIM_TYPES;
 }
 
-TfTokenVector const&
-HdTinyRenderDelegate::GetSupportedBprimTypes() const
+TfTokenVector const &HdTinyRenderDelegate::GetSupportedBprimTypes() const
 {
-    return SUPPORTED_BPRIM_TYPES;
+  return SUPPORTED_BPRIM_TYPES;
 }
 
-HdResourceRegistrySharedPtr
-HdTinyRenderDelegate::GetResourceRegistry() const
+HdResourceRegistrySharedPtr HdTinyRenderDelegate::GetResourceRegistry() const
 {
-    return _resourceRegistry;
+  return _resourceRegistry;
 }
 
-void 
-HdTinyRenderDelegate::CommitResources(HdChangeTracker *tracker)
+void HdTinyRenderDelegate::CommitResources(HdChangeTracker *tracker)
 {
-    std::cout << "=> CommitResources RenderDelegate" << std::endl;
+  std::cout << "=> CommitResources RenderDelegate" << std::endl;
 }
 
-HdRenderPassSharedPtr 
-HdTinyRenderDelegate::CreateRenderPass(
-    HdRenderIndex *index,
-    HdRprimCollection const& collection)
+HdRenderPassSharedPtr HdTinyRenderDelegate::CreateRenderPass(HdRenderIndex *index,
+                                                             HdRprimCollection const &collection)
 {
-    std::cout << "Create RenderPass with Collection=" 
-        << collection.GetName() << std::endl; 
+  std::cout << "Create RenderPass with Collection=" << collection.GetName() << std::endl;
 
-    return HdRenderPassSharedPtr(new HdTinyRenderPass(index, collection));  
+  return HdRenderPassSharedPtr(new HdTinyRenderPass(index, collection));
 }
 
-HdRprim *
-HdTinyRenderDelegate::CreateRprim(TfToken const& typeId,
-                                    SdfPath const& rprimId)
+HdRprim *HdTinyRenderDelegate::CreateRprim(TfToken const &typeId, SdfPath const &rprimId)
 {
-    std::cout << "Create Tiny Rprim type=" << typeId.GetText() 
-        << " id=" << rprimId 
-        << std::endl;
+  std::cout << "Create Tiny Rprim type=" << typeId.GetText() << " id=" << rprimId << std::endl;
 
-    if (typeId == HdPrimTypeTokens->mesh) {
-        return new HdTinyMesh(rprimId);
-    } else {
-        TF_CODING_ERROR("Unknown Rprim type=%s id=%s", 
-            typeId.GetText(), 
-            rprimId.GetText());
-    }
-    return nullptr;
+  if (typeId == HdPrimTypeTokens->mesh) {
+    return new HdTinyMesh(rprimId);
+  }
+  else {
+    TF_CODING_ERROR("Unknown Rprim type=%s id=%s", typeId.GetText(), rprimId.GetText());
+  }
+  return nullptr;
 }
 
-void
-HdTinyRenderDelegate::DestroyRprim(HdRprim *rPrim)
+void HdTinyRenderDelegate::DestroyRprim(HdRprim *rPrim)
 {
-    std::cout << "Destroy Tiny Rprim id=" << rPrim->GetId() << std::endl;
-    delete rPrim;
+  std::cout << "Destroy Tiny Rprim id=" << rPrim->GetId() << std::endl;
+  delete rPrim;
 }
 
-HdSprim *
-HdTinyRenderDelegate::CreateSprim(TfToken const& typeId,
-                                    SdfPath const& sprimId)
+HdSprim *HdTinyRenderDelegate::CreateSprim(TfToken const &typeId, SdfPath const &sprimId)
 {
-    TF_CODING_ERROR("Unknown Sprim type=%s id=%s", 
-        typeId.GetText(), 
-        sprimId.GetText());
-    return nullptr;
+  TF_CODING_ERROR("Unknown Sprim type=%s id=%s", typeId.GetText(), sprimId.GetText());
+  return nullptr;
 }
 
-HdSprim *
-HdTinyRenderDelegate::CreateFallbackSprim(TfToken const& typeId)
+HdSprim *HdTinyRenderDelegate::CreateFallbackSprim(TfToken const &typeId)
 {
-    TF_CODING_ERROR("Creating unknown fallback sprim type=%s", 
-        typeId.GetText()); 
-    return nullptr;
+  TF_CODING_ERROR("Creating unknown fallback sprim type=%s", typeId.GetText());
+  return nullptr;
 }
 
-void
-HdTinyRenderDelegate::DestroySprim(HdSprim *sPrim)
+void HdTinyRenderDelegate::DestroySprim(HdSprim *sPrim)
 {
-    TF_CODING_ERROR("Destroy Sprim not supported");
+  TF_CODING_ERROR("Destroy Sprim not supported");
 }
 
-HdBprim *
-HdTinyRenderDelegate::CreateBprim(TfToken const& typeId, SdfPath const& bprimId)
+HdBprim *HdTinyRenderDelegate::CreateBprim(TfToken const &typeId, SdfPath const &bprimId)
 {
-    TF_CODING_ERROR("Unknown Bprim type=%s id=%s", 
-        typeId.GetText(), 
-        bprimId.GetText());
-    return nullptr;
+  TF_CODING_ERROR("Unknown Bprim type=%s id=%s", typeId.GetText(), bprimId.GetText());
+  return nullptr;
 }
 
-HdBprim *
-HdTinyRenderDelegate::CreateFallbackBprim(TfToken const& typeId)
+HdBprim *HdTinyRenderDelegate::CreateFallbackBprim(TfToken const &typeId)
 {
-    TF_CODING_ERROR("Creating unknown fallback bprim type=%s", 
-        typeId.GetText()); 
-    return nullptr;
+  TF_CODING_ERROR("Creating unknown fallback bprim type=%s", typeId.GetText());
+  return nullptr;
 }
 
-void
-HdTinyRenderDelegate::DestroyBprim(HdBprim *bPrim)
+void HdTinyRenderDelegate::DestroyBprim(HdBprim *bPrim)
 {
-    TF_CODING_ERROR("Destroy Bprim not supported");
+  TF_CODING_ERROR("Destroy Bprim not supported");
 }
 
-HdInstancer *
-HdTinyRenderDelegate::CreateInstancer(
-    HdSceneDelegate *delegate,
-    SdfPath const& id)
+HdInstancer *HdTinyRenderDelegate::CreateInstancer(HdSceneDelegate *delegate, SdfPath const &id)
 {
-    TF_CODING_ERROR("Creating Instancer not supported id=%s", 
-        id.GetText());
-    return nullptr;
+  TF_CODING_ERROR("Creating Instancer not supported id=%s", id.GetText());
+  return nullptr;
 }
 
-void 
-HdTinyRenderDelegate::DestroyInstancer(HdInstancer *instancer)
+void HdTinyRenderDelegate::DestroyInstancer(HdInstancer *instancer)
 {
-    TF_CODING_ERROR("Destroy instancer not supported");
+  TF_CODING_ERROR("Destroy instancer not supported");
 }
 
-HdRenderParam *
-HdTinyRenderDelegate::GetRenderParam() const
+HdRenderParam *HdTinyRenderDelegate::GetRenderParam() const
 {
-    return nullptr;
+  return nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

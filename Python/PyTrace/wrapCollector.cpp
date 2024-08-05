@@ -40,40 +40,44 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using PythonKey = std::string;
 
-static double GetElapsedSeconds(TraceEvent::TimeStamp begin,
-                                TraceEvent::TimeStamp end) {
+static double GetElapsedSeconds(TraceEvent::TimeStamp begin, TraceEvent::TimeStamp end)
+{
   if (begin > end) {
-    TF_CODING_ERROR("Invalid interval: begin=%zu, end=%zu", static_cast<size_t>(begin), static_cast<size_t>(end));
+    TF_CODING_ERROR("Invalid interval: begin=%zu, end=%zu",
+                    static_cast<size_t>(begin),
+                    static_cast<size_t>(end));
     return 0.0;
   }
   return ArchTicksToSeconds(end - begin);
 }
 
-static TraceEvent::TimeStamp BeginEventHelper(const TraceCollectorPtr &self,
-                                              const PythonKey &key) {
+static TraceEvent::TimeStamp BeginEventHelper(const TraceCollectorPtr &self, const PythonKey &key)
+{
   return self->BeginEvent(key);
 }
 
-static TraceEvent::TimeStamp EndEventHelper(const TraceCollectorPtr &self,
-                                            const PythonKey &key) {
+static TraceEvent::TimeStamp EndEventHelper(const TraceCollectorPtr &self, const PythonKey &key)
+{
   return self->EndEvent(key);
 }
 
-static void BeginEventAtTimeHelper(const TraceCollectorPtr &self,
-                                   const PythonKey &key, double ms) {
+static void BeginEventAtTimeHelper(const TraceCollectorPtr &self, const PythonKey &key, double ms)
+{
   self->BeginEventAtTime(key, ms);
 }
 
-static void EndEventAtTimeHelper(const TraceCollectorPtr &self,
-                                 const PythonKey &key, double ms) {
+static void EndEventAtTimeHelper(const TraceCollectorPtr &self, const PythonKey &key, double ms)
+{
   self->EndEventAtTime(key, ms);
 }
 
-static bool IsEnabledHelper(const TraceCollectorPtr &self) {
+static bool IsEnabledHelper(const TraceCollectorPtr &self)
+{
   return TraceCollector::IsEnabled();
 }
 
-void wrapCollector() {
+void wrapCollector()
+{
   using This = TraceCollector;
   using ThisPtr = TfWeakPtr<TraceCollector>;
 
@@ -91,8 +95,8 @@ void wrapCollector() {
       .def("Clear", &This::Clear)
 
       .add_property("enabled", IsEnabledHelper, &This::SetEnabled)
-      .add_property("pythonTracingEnabled", &This::IsPythonTracingEnabled,
-                    &This::SetPythonTracingEnabled);
+      .add_property(
+          "pythonTracingEnabled", &This::IsPythonTracingEnabled, &This::SetPythonTracingEnabled);
 
   def("GetElapsedSeconds", GetElapsedSeconds);
 };

@@ -59,7 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfPropertySpec : public SdfSpec {
   SDF_DECLARE_ABSTRACT_SPEC(SdfPropertySpec, SdfSpec);
 
-public:
+ public:
   ///
   /// \name Name
   /// @{
@@ -368,10 +368,10 @@ public:
   SDF_API
   bool HasOnlyRequiredFields() const;
 
-private:
+ private:
   inline TfToken _GetAttributeValueTypeName() const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // #ifndef PXR_USD_SDF_PROPERTY_SPEC_H
+#endif  // #ifndef PXR_USD_SDF_PROPERTY_SPEC_H

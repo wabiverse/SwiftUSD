@@ -52,4 +52,4 @@ int PcpCompareNodeStrength(const PcpNodeRef &a, const PcpNodeRef &b);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_STRENGTH_ORDERING_H
+#endif  // PXR_USD_PCP_STRENGTH_ORDERING_H

@@ -27,11 +27,11 @@
 
 /// \file ndr/property.h
 
-#include <pxr/pxrns.h>
 #include "Ndr/api.h"
+#include "Ndr/declare.h"
 #include "Tf/token.h"
 #include "Vt/value.h"
-#include "Ndr/declare.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,147 +47,165 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// In almost all cases, this class will not be used directly. More specialized
 /// properties can be created that derive from `NdrProperty`; those specialized
 /// properties can add their own domain-specific data and methods.
-class NdrProperty
-{
-public:
-    /// Constructor.
-    NDR_API
-    NdrProperty(
-        const TfToken& name,
-        const TfToken& type,
-        const VtValue& defaultValue,
-        bool isOutput,
-        size_t arraySize,
-        bool isDynamicArray,
-        const NdrTokenMap& metadata
-    );
+class NdrProperty {
+ public:
+  /// Constructor.
+  NDR_API
+  NdrProperty(const TfToken &name,
+              const TfToken &type,
+              const VtValue &defaultValue,
+              bool isOutput,
+              size_t arraySize,
+              bool isDynamicArray,
+              const NdrTokenMap &metadata);
 
-    /// Destructor.
-    NDR_API
-    virtual ~NdrProperty();
+  /// Destructor.
+  NDR_API
+  virtual ~NdrProperty();
 
-    /// \name The Basics
-    /// @{
+  /// \name The Basics
+  /// @{
 
-    /// Gets the name of the property.
-    NDR_API
-    const TfToken& GetName() const { return _name; }
+  /// Gets the name of the property.
+  NDR_API
+  const TfToken &GetName() const
+  {
+    return _name;
+  }
 
-    /// Gets the type of the property.
-    NDR_API
-    const TfToken& GetType() const { return _type; }
+  /// Gets the type of the property.
+  NDR_API
+  const TfToken &GetType() const
+  {
+    return _type;
+  }
 
-    /// Gets this property's default value associated with the type of the
-    /// property.
-    /// 
-    /// \sa GetType()
-    NDR_API
-    const VtValue& GetDefaultValue() const { return _defaultValue; }
+  /// Gets this property's default value associated with the type of the
+  /// property.
+  ///
+  /// \sa GetType()
+  NDR_API
+  const VtValue &GetDefaultValue() const
+  {
+    return _defaultValue;
+  }
 
-    /// Whether this property is an output.
-    NDR_API
-    bool IsOutput() const { return _isOutput; }
+  /// Whether this property is an output.
+  NDR_API
+  bool IsOutput() const
+  {
+    return _isOutput;
+  }
 
-    /// Whether this property's type is an array type.
-    NDR_API
-    bool IsArray() const { return (_arraySize > 0) || _isDynamicArray; }
+  /// Whether this property's type is an array type.
+  NDR_API
+  bool IsArray() const
+  {
+    return (_arraySize > 0) || _isDynamicArray;
+  }
 
-    /// Whether this property's array type is dynamically-sized.
-    NDR_API
-    bool IsDynamicArray() const { return _isDynamicArray; };
+  /// Whether this property's array type is dynamically-sized.
+  NDR_API
+  bool IsDynamicArray() const
+  {
+    return _isDynamicArray;
+  };
 
-    /// Gets this property's array size.
-    ///
-    /// If this property is a fixed-size array type, the array size is returned.
-    /// In the case of a dynamically-sized array, this method returns the array
-    /// size that the parser reports, and should not be relied upon to be
-    /// accurate. A parser may report -1 for the array size, for example, to
-    /// indicate a dynamically-sized array. For types that are not a fixed-size
-    /// array or dynamic array, this returns 0.
-    NDR_API
-    int GetArraySize() const { return static_cast<int>(_arraySize); }
+  /// Gets this property's array size.
+  ///
+  /// If this property is a fixed-size array type, the array size is returned.
+  /// In the case of a dynamically-sized array, this method returns the array
+  /// size that the parser reports, and should not be relied upon to be
+  /// accurate. A parser may report -1 for the array size, for example, to
+  /// indicate a dynamically-sized array. For types that are not a fixed-size
+  /// array or dynamic array, this returns 0.
+  NDR_API
+  int GetArraySize() const
+  {
+    return static_cast<int>(_arraySize);
+  }
 
-    /// Gets a string with basic information about this property. Helpful for
-    /// things like adding this property to a log.
-    NDR_API
-    virtual std::string GetInfoString() const;
+  /// Gets a string with basic information about this property. Helpful for
+  /// things like adding this property to a log.
+  NDR_API
+  virtual std::string GetInfoString() const;
 
-    /// @}
+  /// @}
 
+  /// \name Metadata
+  /// The metadata returned here is a direct result of what the parser plugin
+  /// is able to determine about the node. See the documentation for a
+  /// specific parser plugin to get help on what the parser is looking for to
+  /// populate these values.
+  /// @{
 
-    /// \name Metadata
-    /// The metadata returned here is a direct result of what the parser plugin
-    /// is able to determine about the node. See the documentation for a
-    /// specific parser plugin to get help on what the parser is looking for to
-    /// populate these values.
-    /// @{
+  /// All of the metadata that came from the parse process.
+  NDR_API
+  virtual const NdrTokenMap &GetMetadata() const
+  {
+    return _metadata;
+  }
 
-    /// All of the metadata that came from the parse process.
-    NDR_API
-    virtual const NdrTokenMap& GetMetadata() const { return _metadata; }
+  /// @}
 
-    /// @}
+  /// \name Connection Information
+  /// @{
 
+  /// Whether this property can be connected to other properties.
+  NDR_API
+  virtual bool IsConnectable() const;
 
-    /// \name Connection Information
-    /// @{
+  /// Determines if this property can be connected to the specified property.
+  NDR_API
+  virtual bool CanConnectTo(const NdrProperty &other) const;
 
-    /// Whether this property can be connected to other properties.
-    NDR_API
-    virtual bool IsConnectable() const;
+  /// @}
 
-    /// Determines if this property can be connected to the specified property.
-    NDR_API
-    virtual bool CanConnectTo(const NdrProperty& other) const;
+  /// \name Utilities
+  /// @{
 
-    /// @}
+  /// Converts the property's type from `GetType()` into a `SdfValueTypeName`.
+  ///
+  /// Two scenarios can result: an exact mapping from property type to Sdf
+  /// type, and an inexact mapping. In the first scenario, the first element
+  /// in the pair will be the cleanly-mapped Sdf type, and the second element,
+  /// a TfToken, will be empty. In the second scenario, the Sdf type will be
+  /// set to `Token` to indicate an unclean mapping, and the second element
+  /// will be set to the original type returned by `GetType()`.
+  ///
+  /// This base property class is generic and cannot know ahead of time how to
+  /// perform this mapping reliably, thus it will always fall into the second
+  /// scenario. It is up to specialized properties to perform the mapping.
+  ///
+  /// \sa GetDefaultValueAsSdfType()
+  NDR_API
+  virtual const NdrSdfTypeIndicator GetTypeAsSdfType() const;
 
+  /// Provides default value corresponding to the SdfValueTypeName returned
+  /// by GetTypeAsSdfType.
+  ///
+  /// Derived classes providing an implementation for GetTypeAsSdfType should
+  /// also provide an implementation for this.
+  ///
+  /// \sa GetTypeAsSdfType()
+  NDR_API
+  virtual const VtValue &GetDefaultValueAsSdfType() const;
 
-    /// \name Utilities
-    /// @{
+  /// @}
 
-    /// Converts the property's type from `GetType()` into a `SdfValueTypeName`.
-    ///
-    /// Two scenarios can result: an exact mapping from property type to Sdf
-    /// type, and an inexact mapping. In the first scenario, the first element
-    /// in the pair will be the cleanly-mapped Sdf type, and the second element,
-    /// a TfToken, will be empty. In the second scenario, the Sdf type will be
-    /// set to `Token` to indicate an unclean mapping, and the second element
-    /// will be set to the original type returned by `GetType()`.
-    ///
-    /// This base property class is generic and cannot know ahead of time how to
-    /// perform this mapping reliably, thus it will always fall into the second
-    /// scenario. It is up to specialized properties to perform the mapping.
-    ///
-    /// \sa GetDefaultValueAsSdfType()
-    NDR_API
-    virtual const NdrSdfTypeIndicator GetTypeAsSdfType() const;
+ protected:
+  NdrProperty &operator=(const NdrProperty &) = delete;
 
-    /// Provides default value corresponding to the SdfValueTypeName returned 
-    /// by GetTypeAsSdfType. 
-    /// 
-    /// Derived classes providing an implementation for GetTypeAsSdfType should
-    /// also provide an implementation for this.
-    ///
-    /// \sa GetTypeAsSdfType()
-    NDR_API
-    virtual const VtValue& GetDefaultValueAsSdfType() const;
-
-    /// @}
-
-protected:
-    NdrProperty& operator=(const NdrProperty&) = delete;
-
-    TfToken _name;
-    TfToken _type;
-    VtValue _defaultValue;
-    bool _isOutput;
-    size_t _arraySize;
-    bool _isDynamicArray;
-    bool _isConnectable;
-    NdrTokenMap _metadata;
+  TfToken _name;
+  TfToken _type;
+  VtValue _defaultValue;
+  bool _isOutput;
+  size_t _arraySize;
+  bool _isDynamicArray;
+  bool _isConnectable;
+  NdrTokenMap _metadata;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_PROPERTY_H
+#endif  // PXR_USD_NDR_PROPERTY_H

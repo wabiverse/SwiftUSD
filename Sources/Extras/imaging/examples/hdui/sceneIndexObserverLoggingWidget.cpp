@@ -29,66 +29,57 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HduiSceneIndexObserverLoggingWidget::HduiSceneIndexObserverLoggingWidget(
-    QWidget *parent)
-: QWidget(parent)
+HduiSceneIndexObserverLoggingWidget::HduiSceneIndexObserverLoggingWidget(QWidget *parent)
+    : QWidget(parent)
 {
-    setWindowTitle("Scene Index Notice Logger");
+  setWindowTitle("Scene Index Notice Logger");
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QHBoxLayout *toolbarLayout = new QHBoxLayout;
-    mainLayout->addLayout(toolbarLayout);
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  QHBoxLayout *toolbarLayout = new QHBoxLayout;
+  mainLayout->addLayout(toolbarLayout);
 
-    _startStopButton = new QPushButton("Start Recording");
-    _clearButton = new QPushButton("Clear");
+  _startStopButton = new QPushButton("Start Recording");
+  _clearButton = new QPushButton("Clear");
 
-    _label = new QLabel("");
+  _label = new QLabel("");
 
-    toolbarLayout->addWidget(_startStopButton);
-    toolbarLayout->addWidget(_label, 10);
-    toolbarLayout->addStretch();
-    toolbarLayout->addWidget(_clearButton);
+  toolbarLayout->addWidget(_startStopButton);
+  toolbarLayout->addWidget(_label, 10);
+  toolbarLayout->addStretch();
+  toolbarLayout->addWidget(_clearButton);
 
-    _treeView = new HduiSceneIndexObserverLoggingTreeView;
+  _treeView = new HduiSceneIndexObserverLoggingTreeView;
 
-    mainLayout->addWidget(_treeView, 10);
+  mainLayout->addWidget(_treeView, 10);
 
-    QObject::connect(_startStopButton, &QPushButton::clicked,
-        [this](){
-        if (this->_treeView->IsRecording()) {
-            this->_treeView->StopRecording();
-        } else {
-            this->_treeView->StartRecording();
-        }
-    });
+  QObject::connect(_startStopButton, &QPushButton::clicked, [this]() {
+    if (this->_treeView->IsRecording()) {
+      this->_treeView->StopRecording();
+    }
+    else {
+      this->_treeView->StartRecording();
+    }
+  });
 
-    QObject::connect(_clearButton, &QPushButton::clicked,
-        [this](){
-        this->_treeView->Clear();
-    });
+  QObject::connect(_clearButton, &QPushButton::clicked, [this]() { this->_treeView->Clear(); });
 
-    QObject::connect(_treeView,
-        &HduiSceneIndexObserverLoggingTreeView::RecordingStarted, [this]() {
-        this->_startStopButton->setText("Stop Recording");
-    });
+  QObject::connect(_treeView, &HduiSceneIndexObserverLoggingTreeView::RecordingStarted, [this]() {
+    this->_startStopButton->setText("Stop Recording");
+  });
 
-    QObject::connect(_treeView,
-        &HduiSceneIndexObserverLoggingTreeView::RecordingStopped, [this]() {
-        this->_startStopButton->setText("Start Recording");
-    });
+  QObject::connect(_treeView, &HduiSceneIndexObserverLoggingTreeView::RecordingStopped, [this]() {
+    this->_startStopButton->setText("Start Recording");
+  });
 }
 
-
-HduiSceneIndexObserverLoggingTreeView *
-HduiSceneIndexObserverLoggingWidget::GetTreeView()
+HduiSceneIndexObserverLoggingTreeView *HduiSceneIndexObserverLoggingWidget::GetTreeView()
 {
-    return _treeView;
+  return _treeView;
 }
 
-void
-HduiSceneIndexObserverLoggingWidget::SetLabel(const std::string &labelText)
+void HduiSceneIndexObserverLoggingWidget::SetLabel(const std::string &labelText)
 {
-    _label->setText(labelText.c_str());
+  _label->setText(labelText.c_str());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -46,39 +46,43 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string _Repr(GfLineSeg const &self) {
+static string _Repr(GfLineSeg const &self)
+{
   return TF_PY_REPR_PREFIX + "LineSeg(" + TfPyRepr(self.GetPoint(0.0)) + ", " +
          TfPyRepr(self.GetPoint(1.0)) + ")";
 }
 
-static tuple FindClosestPointsHelper1(const GfLine &l1, const GfLineSeg &l2) {
+static tuple FindClosestPointsHelper1(const GfLine &l1, const GfLineSeg &l2)
+{
   GfVec3d p1(0), p2(0);
   double t1 = 0, t2 = 0;
   bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
   return boost::python::make_tuple(result, p1, p2, t1, t2);
 }
 
-static tuple FindClosestPointsHelper2(const GfLineSeg &l1,
-                                      const GfLineSeg &l2) {
+static tuple FindClosestPointsHelper2(const GfLineSeg &l1, const GfLineSeg &l2)
+{
   GfVec3d p1(0), p2(0);
   double t1 = 0, t2 = 0;
   bool result = GfFindClosestPoints(l1, l2, &p1, &p2, &t1, &t2);
   return boost::python::make_tuple(result, p1, p2, t1, t2);
 }
 
-static tuple FindClosestPointHelper(const GfLineSeg &self,
-                                    const GfVec3d &point) {
+static tuple FindClosestPointHelper(const GfLineSeg &self, const GfVec3d &point)
+{
   double t;
   GfVec3d p1 = self.FindClosestPoint(point, &t);
   return boost::python::make_tuple(p1, t);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapLineSeg() {
+void wrapLineSeg()
+{
   typedef GfLineSeg This;
 
-  def("FindClosestPoints", FindClosestPointsHelper1,
+  def("FindClosestPoints",
+      FindClosestPointsHelper1,
       "FindClosestPoints( l1, s2 ) -> tuple< intersects = bool, "
       "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
       "\n\n"
@@ -91,7 +95,8 @@ void wrapLineSeg() {
       "p1 and p2.  The parametric distance of each point on the "
       "line and line segment is returned in t1 and t2.\n"
       "----------------------------------------------------------------------");
-  def("FindClosestPoints", FindClosestPointsHelper2,
+  def("FindClosestPoints",
+      FindClosestPointsHelper2,
       "FindClosestPoints( s1, s2 ) -> tuple<result = bool,"
       "p1 = GfVec3d, p2 = GfVec3d, t1 = double, t2 = double>"
       "\n\n"
@@ -105,8 +110,7 @@ void wrapLineSeg() {
       "line and line segment is returned in t1 and t2.\n"
       "----------------------------------------------------------------------");
 
-  object getDirection = make_function(&This::GetDirection,
-                                      return_value_policy<return_by_value>());
+  object getDirection = make_function(&This::GetDirection, return_value_policy<return_by_value>());
 
   class_<This>("LineSeg", "Line segment class", init<>())
       .def(init<const GfVec3d &, const GfVec3d &>())

@@ -26,8 +26,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdExtComputationContext::~HdExtComputationContext()
-{
-}
+HdExtComputationContext::~HdExtComputationContext() {}
 
 PXR_NAMESPACE_CLOSE_SCOPE

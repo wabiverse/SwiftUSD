@@ -37,12 +37,10 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiSampler
 ///
-class HgiMetalSampler final : public HgiSampler
-{
-public:
+class HgiMetalSampler final : public HgiSampler {
+ public:
   HGIMETAL_API
-  HgiMetalSampler(HgiMetal *hgi,
-                  HgiSamplerDesc const &desc);
+  HgiMetalSampler(HgiMetal *hgi, HgiSamplerDesc const &desc);
 
   HGIMETAL_API
   ~HgiMetalSampler() override;
@@ -53,12 +51,12 @@ public:
   HGIMETAL_API
   MTL::SamplerState *GetSamplerId() const;
 
-private:
+ private:
   HgiMetalSampler() = delete;
   HgiMetalSampler &operator=(const HgiMetalSampler &) = delete;
   HgiMetalSampler(const HgiMetalSampler &) = delete;
 
-private:
+ private:
   MTL::SamplerState *_samplerId;
   NS::String *_label;
 };

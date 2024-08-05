@@ -50,34 +50,40 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<TfEnum>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<TfEnum>();
+}
 
 // Convenience typedefs for value/name tables.
 typedef TfHashMap<TfEnum, string, TfHash> _EnumToNameTableType;
 typedef TfHashMap<string, TfEnum, TfHash> _NameToEnumTableType;
-typedef TfHashMap<string, vector<string>, TfHash>
-    _TypeNameToNameVectorTableType;
+typedef TfHashMap<string, vector<string>, TfHash> _TypeNameToNameVectorTableType;
 typedef TfHashMap<string, const type_info *, TfHash> _TypeNameToTypeTableType;
 
 class Tf_EnumRegistry {
   Tf_EnumRegistry(const Tf_EnumRegistry &) = delete;
   Tf_EnumRegistry &operator=(Tf_EnumRegistry &) = delete;
 
-private:
-  static Tf_EnumRegistry &_GetInstance() {
+ private:
+  static Tf_EnumRegistry &_GetInstance()
+  {
     return TfSingleton<Tf_EnumRegistry>::GetInstance();
   }
 
-  Tf_EnumRegistry() {
+  Tf_EnumRegistry()
+  {
     TfSingleton<Tf_EnumRegistry>::SetInstanceConstructed(*this);
     TfRegistryManager::GetInstance().SubscribeTo<TfEnum>();
   }
 
-  ~Tf_EnumRegistry() {
+  ~Tf_EnumRegistry()
+  {
     TfRegistryManager::GetInstance().UnsubscribeFrom<TfEnum>();
   }
 
-  void _Remove(TfEnum val) {
+  void _Remove(TfEnum val)
+  {
     tbb::spin_mutex::scoped_lock lock(_tableLock);
 
     _typeNameToType.erase(ArchGetDemangled(val.GetType()));
@@ -111,8 +117,8 @@ private:
 
 TF_INSTANTIATE_SINGLETON(Tf_EnumRegistry);
 
-void TfEnum::_AddName(TfEnum val, const string &valName,
-                      const string &displayName) {
+void TfEnum::_AddName(TfEnum val, const string &valName, const string &displayName)
+{
   TfAutoMallocTag2 tag("Tf", "TfEnum::_AddName");
   string typeName = ArchGetDemangled(val.GetType());
 
@@ -138,11 +144,11 @@ void TfEnum::_AddName(TfEnum val, const string &valName,
   r._typeNameToNameVector[val.GetType().name()].push_back(shortName);
   r._typeNameToType[typeName] = &val.GetType();
 
-  TfRegistryManager::GetInstance().AddFunctionForUnload(
-      [&r, val]() { r._Remove(val); });
+  TfRegistryManager::GetInstance().AddFunctionForUnload([&r, val]() { r._Remove(val); });
 }
 
-string TfEnum::GetName(TfEnum val) {
+string TfEnum::GetName(TfEnum val)
+{
   if (TfSafeTypeCompare(val.GetType(), typeid(int)))
     return TfIntToString(val.GetValueAsInt());
 
@@ -153,7 +159,8 @@ string TfEnum::GetName(TfEnum val) {
   return (i != r._enumToName.end() ? i->second : "");
 }
 
-string TfEnum::GetFullName(TfEnum val) {
+string TfEnum::GetFullName(TfEnum val)
+{
   if (TfSafeTypeCompare(val.GetType(), typeid(int)))
     return TfStringPrintf("int::%d", val.GetValueAsInt());
 
@@ -164,7 +171,8 @@ string TfEnum::GetFullName(TfEnum val) {
   return (i != r._enumToFullName.end() ? i->second : "");
 }
 
-string TfEnum::GetDisplayName(TfEnum val) {
+string TfEnum::GetDisplayName(TfEnum val)
+{
   if (TfSafeTypeCompare(val.GetType(), typeid(int)))
     return TfIntToString(val.GetValueAsInt());
 
@@ -175,19 +183,20 @@ string TfEnum::GetDisplayName(TfEnum val) {
   return (i != r._enumToDisplayName.end() ? i->second : "");
 }
 
-vector<string> TfEnum::GetAllNames(const type_info &ti) {
+vector<string> TfEnum::GetAllNames(const type_info &ti)
+{
   if (TfSafeTypeCompare(ti, typeid(int)))
     return vector<string>();
 
   Tf_EnumRegistry &r = Tf_EnumRegistry::_GetInstance();
   tbb::spin_mutex::scoped_lock lock(r._tableLock);
 
-  _TypeNameToNameVectorTableType::iterator i =
-      r._typeNameToNameVector.find(ti.name());
+  _TypeNameToNameVectorTableType::iterator i = r._typeNameToNameVector.find(ti.name());
   return (i != r._typeNameToNameVector.end() ? i->second : vector<string>());
 }
 
-const type_info *TfEnum::GetTypeFromName(const string &typeName) {
+const type_info *TfEnum::GetTypeFromName(const string &typeName)
+{
   Tf_EnumRegistry &r = Tf_EnumRegistry::_GetInstance();
   tbb::spin_mutex::scoped_lock lock(r._tableLock);
 
@@ -197,11 +206,10 @@ const type_info *TfEnum::GetTypeFromName(const string &typeName) {
   return i->second;
 }
 
-TfEnum TfEnum::GetValueFromName(const type_info &ti, const string &name,
-                                bool *foundIt) {
+TfEnum TfEnum::GetValueFromName(const type_info &ti, const string &name, bool *foundIt)
+{
   bool found = false;
-  TfEnum value =
-      GetValueFromFullName(ArchGetDemangled(ti) + "::" + name, &found);
+  TfEnum value = GetValueFromFullName(ArchGetDemangled(ti) + "::" + name, &found);
 
   // Make sure that the found enum is the correct type.
   found = found && TfSafeTypeCompare(*(value._typeInfo), ti);
@@ -210,7 +218,8 @@ TfEnum TfEnum::GetValueFromName(const type_info &ti, const string &name,
   return found ? value : TfEnum(-1);
 }
 
-TfEnum TfEnum::GetValueFromFullName(const string &fullname, bool *foundIt) {
+TfEnum TfEnum::GetValueFromFullName(const string &fullname, bool *foundIt)
+{
   Tf_EnumRegistry &r = Tf_EnumRegistry::_GetInstance();
   tbb::spin_mutex::scoped_lock lock(r._tableLock);
 
@@ -219,24 +228,30 @@ TfEnum TfEnum::GetValueFromFullName(const string &fullname, bool *foundIt) {
     if (foundIt)
       *foundIt = true;
     return TfEnum(i->second);
-  } else if (fullname.find("int::") == 0) {
+  }
+  else if (fullname.find("int::") == 0) {
     if (foundIt)
       *foundIt = true;
     return TfEnum(atoi(fullname.c_str() + 5));
-  } else {
+  }
+  else {
     if (foundIt)
       *foundIt = false;
     return TfEnum(-1);
   }
 }
 
-void TfEnum::_FatalGetValueError(std::type_info const &typeInfo) const {
-  TF_FATAL_ERROR("Attempted to get a '%s' from a TfEnum holding "
-                 "a '%s'.",
-                 ArchGetDemangled(typeInfo).c_str(), _typeInfo->name());
+void TfEnum::_FatalGetValueError(std::type_info const &typeInfo) const
+{
+  TF_FATAL_ERROR(
+      "Attempted to get a '%s' from a TfEnum holding "
+      "a '%s'.",
+      ArchGetDemangled(typeInfo).c_str(),
+      _typeInfo->name());
 }
 
-bool TfEnum::IsKnownEnumType(const std::string &typeName) {
+bool TfEnum::IsKnownEnumType(const std::string &typeName)
+{
   Tf_EnumRegistry &r = Tf_EnumRegistry::_GetInstance();
   tbb::spin_mutex::scoped_lock lock(r._tableLock);
 
@@ -246,7 +261,8 @@ bool TfEnum::IsKnownEnumType(const std::string &typeName) {
   return true;
 }
 
-std::ostream &operator<<(std::ostream &out, const TfEnum &e) {
+std::ostream &operator<<(std::ostream &out, const TfEnum &e)
+{
   return out << TfEnum::GetFullName(e);
 }
 

@@ -52,7 +52,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 typedef std::set<PcpNodeRef> Pcp_NodeSet;
 
-static const char *_GetString(bool b) { return b ? "TRUE" : "FALSE"; }
+static const char *_GetString(bool b)
+{
+  return b ? "TRUE" : "FALSE";
+}
 
 typedef std::map<PcpNodeRef, int> _NodeToStrengthOrderMap;
 typedef std::map<PcpNodeRef, SdfPrimSpecHandleVector> _NodeToPrimSpecsMap;
@@ -60,18 +63,17 @@ typedef std::map<PcpNodeRef, SdfPrimSpecHandleVector> _NodeToPrimSpecsMap;
 std::string Pcp_Dump(const PcpNodeRef &node,
                      const _NodeToStrengthOrderMap &nodeToStrengthOrder,
                      const _NodeToPrimSpecsMap &nodeToPrimSpecs,
-                     bool includeInheritOriginInfo, bool includeMaps) {
+                     bool includeInheritOriginInfo,
+                     bool includeMaps)
+{
   const PcpNodeRef parentNode = node.GetParentNode();
 
   std::string s;
-  s += TfStringPrintf("Node %d:\n",
-                      TfMapLookupByValue(nodeToStrengthOrder, node, 0));
+  s += TfStringPrintf("Node %d:\n", TfMapLookupByValue(nodeToStrengthOrder, node, 0));
   s += TfStringPrintf(
       "    Parent node:              %s\n",
-      parentNode
-          ? TfStringify(TfMapLookupByValue(nodeToStrengthOrder, parentNode, 0))
-                .c_str()
-          : "NONE");
+      parentNode ? TfStringify(TfMapLookupByValue(nodeToStrengthOrder, parentNode, 0)).c_str() :
+                   "NONE");
   s += TfStringPrintf("    Type:                     %s\n",
                       TfEnum::GetDisplayName(node.GetArcType()).c_str());
 
@@ -80,93 +82,86 @@ std::string Pcp_Dump(const PcpNodeRef &node,
   const int depFlags = PcpClassifyNodeDependency(node);
   s += PcpDependencyFlagsToString(depFlags) + "\n";
 
-  s += TfStringPrintf("    Source path:              <%s>\n",
-                      node.GetPath().GetText());
+  s += TfStringPrintf("    Source path:              <%s>\n", node.GetPath().GetText());
   s += TfStringPrintf("    Source layer stack:       %s\n",
                       TfStringify(node.GetLayerStack()).c_str());
   s += TfStringPrintf("    Target path:              <%s>\n",
                       parentNode ? parentNode.GetPath().GetText() : "NONE");
-  s += TfStringPrintf(
-      "    Target layer stack:       %s\n",
-      parentNode ? TfStringify(parentNode.GetLayerStack()).c_str() : "NONE");
+  s += TfStringPrintf("    Target layer stack:       %s\n",
+                      parentNode ? TfStringify(parentNode.GetLayerStack()).c_str() : "NONE");
 
   const PcpNodeRef originNode = node.GetOriginNode();
   if (originNode != parentNode) {
     s += TfStringPrintf("    Origin node:              %d\n",
                         TfMapLookupByValue(nodeToStrengthOrder, originNode, 0));
-    s += TfStringPrintf("    Sibling # at origin:      %d\n",
-                        node.GetSiblingNumAtOrigin());
+    s += TfStringPrintf("    Sibling # at origin:      %d\n", node.GetSiblingNumAtOrigin());
   }
 
   if (includeMaps) {
     s += TfStringPrintf("    Map to parent:\n");
     s += TfStringPrintf(
         "        %s\n",
-        TfStringReplace(node.GetMapToParent().GetString(), "\n", "\n        ")
-            .c_str());
+        TfStringReplace(node.GetMapToParent().GetString(), "\n", "\n        ").c_str());
     s += TfStringPrintf("    Map to root:\n");
     s += TfStringPrintf(
         "        %s\n",
-        TfStringReplace(node.GetMapToRoot().GetString(), "\n", "\n        ")
-            .c_str());
+        TfStringReplace(node.GetMapToRoot().GetString(), "\n", "\n        ").c_str());
   }
 
-  s += TfStringPrintf("    Namespace depth:          %d\n",
-                      node.GetNamespaceDepth());
-  s += TfStringPrintf("    Depth below introduction: %d\n",
-                      node.GetDepthBelowIntroduction());
+  s += TfStringPrintf("    Namespace depth:          %d\n", node.GetNamespaceDepth());
+  s += TfStringPrintf("    Depth below introduction: %d\n", node.GetDepthBelowIntroduction());
   s += TfStringPrintf("    Permission:               %s\n",
                       TfEnum::GetDisplayName(node.GetPermission()).c_str());
-  s += TfStringPrintf("    Is restricted:            %s\n",
-                      _GetString(node.IsRestricted()));
-  s += TfStringPrintf("    Is inert:                 %s\n",
-                      _GetString(node.IsInert()));
-  s += TfStringPrintf("    Contribute specs:         %s\n",
-                      _GetString(node.CanContributeSpecs()));
-  s += TfStringPrintf("    Has specs:                %s\n",
-                      _GetString(node.HasSpecs()));
-  s += TfStringPrintf("    Has symmetry:             %s\n",
-                      _GetString(node.HasSymmetry()));
+  s += TfStringPrintf("    Is restricted:            %s\n", _GetString(node.IsRestricted()));
+  s += TfStringPrintf("    Is inert:                 %s\n", _GetString(node.IsInert()));
+  s += TfStringPrintf("    Contribute specs:         %s\n", _GetString(node.CanContributeSpecs()));
+  s += TfStringPrintf("    Has specs:                %s\n", _GetString(node.HasSpecs()));
+  s += TfStringPrintf("    Has symmetry:             %s\n", _GetString(node.HasSymmetry()));
 
   const SdfPrimSpecHandleVector *specs = TfMapLookupPtr(nodeToPrimSpecs, node);
   if (specs) {
     s += "    Prim stack:\n";
-    TF_FOR_ALL(primIt, *specs) {
+    TF_FOR_ALL(primIt, *specs)
+    {
       const SdfPrimSpecHandle &primSpec = *primIt;
       std::string layerPath;
       SdfLayer::FileFormatArguments args;
-      SdfLayer::SplitIdentifier(primSpec->GetLayer()->GetIdentifier(),
-                                &layerPath, &args);
+      SdfLayer::SplitIdentifier(primSpec->GetLayer()->GetIdentifier(), &layerPath, &args);
       std::string basename = TfGetBaseName(layerPath);
       s += TfStringPrintf("      <%s> %s - @%s@\n",
-                          primSpec->GetPath().GetText(), basename.c_str(),
+                          primSpec->GetPath().GetText(),
+                          basename.c_str(),
                           primSpec->GetLayer()->GetIdentifier().c_str());
     }
   }
 
-  TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node)) {
-    s += Pcp_Dump(*childIt, nodeToStrengthOrder, nodeToPrimSpecs,
-                  includeInheritOriginInfo, includeMaps);
+  TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node))
+  {
+    s += Pcp_Dump(
+        *childIt, nodeToStrengthOrder, nodeToPrimSpecs, includeInheritOriginInfo, includeMaps);
   }
   s += "\n";
   return s;
 }
 
-std::string PcpDump(const PcpNodeRef &rootNode, bool includeInheritOriginInfo,
-                    bool includeMaps) {
+std::string PcpDump(const PcpNodeRef &rootNode, bool includeInheritOriginInfo, bool includeMaps)
+{
   if (!rootNode) {
     return std::string();
   }
 
   struct _Collector {
-    _Collector(const PcpNodeRef &node) {
+    _Collector(const PcpNodeRef &node)
+    {
       int tmp = 0;
       _CollectRecursively(node, tmp);
     }
 
-    void _CollectRecursively(const PcpNodeRef &node, int &nodeIdx) {
+    void _CollectRecursively(const PcpNodeRef &node, int &nodeIdx)
+    {
       nodeToStrengthMap[node] = nodeIdx++;
-      TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node)) {
+      TF_FOR_ALL(childIt, Pcp_GetChildrenRange(node))
+      {
         _CollectRecursively(*childIt, nodeIdx);
       }
     }
@@ -175,12 +170,12 @@ std::string PcpDump(const PcpNodeRef &rootNode, bool includeInheritOriginInfo,
   };
 
   _Collector c(rootNode);
-  return Pcp_Dump(rootNode, c.nodeToStrengthMap, _NodeToPrimSpecsMap(),
-                  includeInheritOriginInfo, includeMaps);
+  return Pcp_Dump(
+      rootNode, c.nodeToStrengthMap, _NodeToPrimSpecsMap(), includeInheritOriginInfo, includeMaps);
 }
 
-std::string PcpDump(const PcpPrimIndex &primIndex,
-                    bool includeInheritOriginInfo, bool includeMaps) {
+std::string PcpDump(const PcpPrimIndex &primIndex, bool includeInheritOriginInfo, bool includeMaps)
+{
   if (!primIndex.GetRootNode()) {
     return std::string();
   }
@@ -193,24 +188,32 @@ std::string PcpDump(const PcpPrimIndex &primIndex,
       nodeToIndexMap[node] = nodeIdx++;
     }
 
-    TF_FOR_ALL(it, primIndex.GetPrimRange()) {
+    TF_FOR_ALL(it, primIndex.GetPrimRange())
+    {
       const SdfPrimSpecHandle prim = SdfGetPrimAtPath(*it);
       nodeToSpecsMap[it.base().GetNode()].push_back(prim);
     }
   }
 
-  return Pcp_Dump(primIndex.GetRootNode(), nodeToIndexMap, nodeToSpecsMap,
-                  includeInheritOriginInfo, includeMaps);
+  return Pcp_Dump(primIndex.GetRootNode(),
+                  nodeToIndexMap,
+                  nodeToSpecsMap,
+                  includeInheritOriginInfo,
+                  includeMaps);
 }
 
-static void _WriteGraphHeader(std::ostream &out) {
+static void _WriteGraphHeader(std::ostream &out)
+{
   out << "digraph PcpPrimIndex {\n";
 }
 
-static int _WriteGraph(std::ostream &out, const PcpNodeRef &node,
-                       bool includeInheritOriginInfo, bool includeMaps,
+static int _WriteGraph(std::ostream &out,
+                       const PcpNodeRef &node,
+                       bool includeInheritOriginInfo,
+                       bool includeMaps,
                        const Pcp_NodeSet &nodesToHighlight = Pcp_NodeSet(),
-                       int count = 0) {
+                       int count = 0)
+{
   if (!node) {
     // This usually happens if we don't have a root node yet. To
     // ensure we see something in the graph, just write out an empty
@@ -250,11 +253,12 @@ static int _WriteGraph(std::ostream &out, const PcpNodeRef &node,
     nodeStyle += ", filled";
   }
 
-  out << TfStringPrintf(
-      "\t%zu [label=\"%s (%i)\\n%s\", shape=\"box\", style=\"%s\"];\n",
-      size_t(node.GetUniqueIdentifier()),
-      Pcp_FormatSite(node.GetSite()).c_str(), count, nodeDesc.c_str(),
-      nodeStyle.c_str());
+  out << TfStringPrintf("\t%zu [label=\"%s (%i)\\n%s\", shape=\"box\", style=\"%s\"];\n",
+                        size_t(node.GetUniqueIdentifier()),
+                        Pcp_FormatSite(node.GetSite()).c_str(),
+                        count,
+                        nodeDesc.c_str(),
+                        nodeStyle.c_str());
 
   count++;
 
@@ -272,31 +276,30 @@ static int _WriteGraph(std::ostream &out, const PcpNodeRef &node,
 
   std::string style;
   switch (node.GetArcType()) {
-  case PcpArcTypeInherit:
-    style += TfStringPrintf("color=green, label=\"inherit%s\"", msg.c_str());
-    break;
-  case PcpArcTypeReference:
-    style += TfStringPrintf("color=red, label=\"reference%s\"", msg.c_str());
-    break;
-  case PcpArcTypeRelocate:
-    style += TfStringPrintf("color=purple, label=\"relocate%s\"", msg.c_str());
-    break;
-  case PcpArcTypeVariant:
-    style += TfStringPrintf("color=orange, label=\"variant\"");
-    break;
-  case PcpArcTypePayload:
-    style += TfStringPrintf("color=indigo, label=\"payload%s\"", msg.c_str());
-    break;
-  case PcpArcTypeSpecialize:
-    style +=
-        TfStringPrintf("color=sienna, label=\"specialize%s\"", msg.c_str());
-    break;
+    case PcpArcTypeInherit:
+      style += TfStringPrintf("color=green, label=\"inherit%s\"", msg.c_str());
+      break;
+    case PcpArcTypeReference:
+      style += TfStringPrintf("color=red, label=\"reference%s\"", msg.c_str());
+      break;
+    case PcpArcTypeRelocate:
+      style += TfStringPrintf("color=purple, label=\"relocate%s\"", msg.c_str());
+      break;
+    case PcpArcTypeVariant:
+      style += TfStringPrintf("color=orange, label=\"variant\"");
+      break;
+    case PcpArcTypePayload:
+      style += TfStringPrintf("color=indigo, label=\"payload%s\"", msg.c_str());
+      break;
+    case PcpArcTypeSpecialize:
+      style += TfStringPrintf("color=sienna, label=\"specialize%s\"", msg.c_str());
+      break;
 
-  case PcpArcTypeRoot:
-    break;
-  case PcpNumArcTypes:
-    TF_CODING_ERROR("Invalid arc type");
-    break;
+    case PcpArcTypeRoot:
+      break;
+    case PcpNumArcTypes:
+      TF_CODING_ERROR("Invalid arc type");
+      break;
   }
   if (node.GetOriginNode() && node.GetOriginNode() != node.GetParentNode()) {
     if (!style.empty())
@@ -313,36 +316,48 @@ static int _WriteGraph(std::ostream &out, const PcpNodeRef &node,
   if (node.GetParentNode()) {
     out << TfStringPrintf("\t%zu -> %zu [%s];\n",
                           size_t(node.GetParentNode().GetUniqueIdentifier()),
-                          size_t(node.GetUniqueIdentifier()), style.c_str());
+                          size_t(node.GetUniqueIdentifier()),
+                          style.c_str());
   }
 
   // Origin arc
   if (includeInheritOriginInfo && node.GetOriginNode() &&
-      node.GetOriginNode() != node.GetParentNode()) {
-    out << TfStringPrintf("\t%zu -> %zu [style=dotted label=\"origin\" "
-                          "constraint=\"false\"];\n",
-                          size_t(node.GetUniqueIdentifier()),
-                          size_t(node.GetOriginNode().GetUniqueIdentifier()));
+      node.GetOriginNode() != node.GetParentNode())
+  {
+    out << TfStringPrintf(
+        "\t%zu -> %zu [style=dotted label=\"origin\" "
+        "constraint=\"false\"];\n",
+        size_t(node.GetUniqueIdentifier()),
+        size_t(node.GetOriginNode().GetUniqueIdentifier()));
   }
 
   // Arbitrary-order traversal.
-  TF_FOR_ALL(child, Pcp_GetChildrenRange(node)) {
-    count = _WriteGraph(out, *child, includeInheritOriginInfo, includeMaps,
-                        nodesToHighlight, count);
+  TF_FOR_ALL(child, Pcp_GetChildrenRange(node))
+  {
+    count = _WriteGraph(
+        out, *child, includeInheritOriginInfo, includeMaps, nodesToHighlight, count);
   }
   return count;
 }
 
-static void _WriteGraphFooter(std::ostream &out) { out << "}\n"; }
-
-void PcpDumpDotGraph(const PcpPrimIndex &primIndex, const char *filename,
-                     bool includeInheritOriginInfo, bool includeMaps) {
-  PcpDumpDotGraph(primIndex.GetRootNode(), filename, includeInheritOriginInfo,
-                  includeMaps);
+static void _WriteGraphFooter(std::ostream &out)
+{
+  out << "}\n";
 }
 
-void PcpDumpDotGraph(const PcpNodeRef &node, const char *filename,
-                     bool includeInheritOriginInfo, bool includeMaps) {
+void PcpDumpDotGraph(const PcpPrimIndex &primIndex,
+                     const char *filename,
+                     bool includeInheritOriginInfo,
+                     bool includeMaps)
+{
+  PcpDumpDotGraph(primIndex.GetRootNode(), filename, includeInheritOriginInfo, includeMaps);
+}
+
+void PcpDumpDotGraph(const PcpNodeRef &node,
+                     const char *filename,
+                     bool includeInheritOriginInfo,
+                     bool includeMaps)
+{
   if (!node) {
     return;
   }
@@ -352,18 +367,21 @@ void PcpDumpDotGraph(const PcpNodeRef &node, const char *filename,
     _WriteGraphHeader(f);
     _WriteGraph(f, node, includeInheritOriginInfo, includeMaps);
     _WriteGraphFooter(f);
-  } else {
+  }
+  else {
     TF_RUNTIME_ERROR("Could not write to %s\n", filename);
   }
 }
 
-std::string Pcp_FormatSite(const PcpSite &site) {
+std::string Pcp_FormatSite(const PcpSite &site)
+{
   std::ostringstream stream;
   stream << PcpIdentifierFormatBaseName << site;
   return stream.str();
 }
 
-std::string Pcp_FormatSite(const PcpLayerStackSite &site) {
+std::string Pcp_FormatSite(const PcpLayerStackSite &site)
+{
   std::ostringstream stream;
   stream << PcpIdentifierFormatBaseName << site;
   return stream.str();
@@ -374,27 +392,28 @@ std::string Pcp_FormatSite(const PcpLayerStackSite &site) {
 // Helper class for managing the output of the various indexing debugging
 // annotations.
 class Pcp_IndexingOutputManager {
-public:
+ public:
   Pcp_IndexingOutputManager();
   Pcp_IndexingOutputManager(Pcp_IndexingOutputManager const &) = delete;
-  Pcp_IndexingOutputManager &
-  operator=(Pcp_IndexingOutputManager const &) = delete;
+  Pcp_IndexingOutputManager &operator=(Pcp_IndexingOutputManager const &) = delete;
 
   void PushIndex(PcpPrimIndex const *originatingIndex,
-                 PcpPrimIndex const *index, PcpLayerStackSite const &site);
+                 PcpPrimIndex const *index,
+                 PcpLayerStackSite const &site);
   void PopIndex(PcpPrimIndex const *originatingIndex);
 
-  void BeginPhase(PcpPrimIndex const *originatingIndex, std::string &&msg,
+  void BeginPhase(PcpPrimIndex const *originatingIndex,
+                  std::string &&msg,
                   const PcpNodeRef &nodeForPhase = PcpNodeRef());
   void EndPhase(PcpPrimIndex const *originatingIndex);
 
   void Update(PcpPrimIndex const *originatingIndex,
-              const PcpNodeRef &updatedNode, std::string &&msg);
+              const PcpNodeRef &updatedNode,
+              std::string &&msg);
 
-  void Msg(PcpPrimIndex const *originatingIndex, std::string &&msg,
-           const Pcp_NodeSet &nodes);
+  void Msg(PcpPrimIndex const *originatingIndex, std::string &&msg, const Pcp_NodeSet &nodes);
 
-private:
+ private:
   struct _Phase {
     explicit _Phase(std::string &&desc) : description(std::move(desc)) {}
     std::string description;
@@ -404,7 +423,9 @@ private:
 
   struct _IndexInfo {
     _IndexInfo(PcpPrimIndex const *index, const SdfPath &path)
-        : index(index), path(path), needsOutput(false) {}
+        : index(index), path(path), needsOutput(false)
+    {
+    }
 
     PcpPrimIndex const *index;
     SdfPath path;
@@ -415,8 +436,8 @@ private:
   };
 
   struct _DebugInfo {
-    void BeginPhase(std::string &&msg,
-                    const PcpNodeRef &nodeForPhase = PcpNodeRef()) {
+    void BeginPhase(std::string &&msg, const PcpNodeRef &nodeForPhase = PcpNodeRef())
+    {
       if (!TF_VERIFY(!indexStack.empty())) {
         return;
       }
@@ -432,9 +453,9 @@ private:
       UpdateCurrentDotGraphLabel();
     }
 
-    void EndPhase() {
-      if (!TF_VERIFY(!indexStack.empty()) ||
-          !TF_VERIFY(!indexStack.back().phases.empty())) {
+    void EndPhase()
+    {
+      if (!TF_VERIFY(!indexStack.empty()) || !TF_VERIFY(!indexStack.back().phases.empty())) {
         return;
       }
       // We don't output anything to the terminal at the end of a phase.
@@ -450,9 +471,9 @@ private:
       }
     }
 
-    void Update(const PcpNodeRef &updatedNode, std::string &&msg) {
-      if (!TF_VERIFY(!indexStack.empty()) ||
-          !TF_VERIFY(!indexStack.back().phases.empty())) {
+    void Update(const PcpNodeRef &updatedNode, std::string &&msg)
+    {
+      if (!TF_VERIFY(!indexStack.empty()) || !TF_VERIFY(!indexStack.back().phases.empty())) {
         return;
       }
 
@@ -468,9 +489,9 @@ private:
       FlushGraphIfNeedsOutput();
     }
 
-    void Msg(std::string &&msg, const Pcp_NodeSet &nodes) {
-      if (!TF_VERIFY(!indexStack.empty()) ||
-          !TF_VERIFY(!indexStack.back().phases.empty())) {
+    void Msg(std::string &&msg, const Pcp_NodeSet &nodes)
+    {
+      if (!TF_VERIFY(!indexStack.empty()) || !TF_VERIFY(!indexStack.back().phases.empty())) {
         return;
       }
 
@@ -488,18 +509,19 @@ private:
       UpdateCurrentDotGraphLabel();
     }
 
-    void WriteDebugMessage(const std::string &msg) const {
+    void WriteDebugMessage(const std::string &msg) const
+    {
       const size_t indent = GetNumPhases();
       const size_t numSpacesPerIndent = 4;
       const std::string indentation(indent * numSpacesPerIndent, ' ');
-      const std::string finalMsg =
-          TfStringReplace(TfStringTrim(msg), "\n", "\n" + indentation);
+      const std::string finalMsg = TfStringReplace(TfStringTrim(msg), "\n", "\n" + indentation);
 
       // Append output.
       outputBuffer.push_back(indentation + finalMsg + "\n");
     }
 
-    void OutputGraph() const {
+    void OutputGraph() const
+    {
       if (!TfDebug::IsEnabled(PCP_PRIM_INDEX_GRAPHS)) {
         return;
       }
@@ -514,8 +536,7 @@ private:
           TfStringReplace(indexStack.front().path.GetName(), "/", "_").c_str(),
           nextGraphFileIndex);
 
-      std::ofstream f(filename.c_str(),
-                      std::ofstream::out | std::ofstream::trunc);
+      std::ofstream f(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
       if (!f) {
         TF_RUNTIME_ERROR("Unable to open %s to write graph", filename.c_str());
         return;
@@ -534,7 +555,8 @@ private:
       _WriteGraphFooter(f);
     }
 
-    void FlushGraphIfNeedsOutput() {
+    void FlushGraphIfNeedsOutput()
+    {
       if (!indexStack.empty() && indexStack.back().needsOutput) {
         OutputGraph();
 
@@ -544,13 +566,13 @@ private:
       }
     }
 
-    void UpdateCurrentDotGraph() {
+    void UpdateCurrentDotGraph()
+    {
       if (!TfDebug::IsEnabled(PCP_PRIM_INDEX_GRAPHS)) {
         return;
       }
 
-      if (!TF_VERIFY(!indexStack.empty()) ||
-          !TF_VERIFY(!indexStack.back().phases.empty())) {
+      if (!TF_VERIFY(!indexStack.empty()) || !TF_VERIFY(!indexStack.back().phases.empty())) {
         return;
       }
 
@@ -559,22 +581,24 @@ private:
 
       std::stringstream ss;
 
-      _WriteGraph(ss, currentIndex.index->GetRootNode(),
+      _WriteGraph(ss,
+                  currentIndex.index->GetRootNode(),
                   /* includeInheritOriginInfo = */ true,
-                  /* includeMaps = */ false, currentPhase.nodesToHighlight);
+                  /* includeMaps = */ false,
+                  currentPhase.nodesToHighlight);
 
       currentIndex.dotGraph = ss.str();
       currentIndex.needsOutput = true;
     }
 
-    void UpdateCurrentDotGraphLabel() {
+    void UpdateCurrentDotGraphLabel()
+    {
 
       if (!TfDebug::IsEnabled(PCP_PRIM_INDEX_GRAPHS)) {
         return;
       }
 
-      if (!TF_VERIFY(!indexStack.empty()) ||
-          !TF_VERIFY(!indexStack.back().phases.empty())) {
+      if (!TF_VERIFY(!indexStack.empty()) || !TF_VERIFY(!indexStack.back().phases.empty())) {
         return;
       }
 
@@ -603,7 +627,8 @@ private:
       std::string infoAboutCurrentPhase = TfStringPrintf(
           "%d. %s\n", numPhases--, currentPhase.description.c_str());
 
-      TF_FOR_ALL(msgIt, currentPhase.messages) {
+      TF_FOR_ALL(msgIt, currentPhase.messages)
+      {
         infoAboutCurrentPhase += "- " + *msgIt + "\n";
       }
 
@@ -615,12 +640,14 @@ private:
       int numActivePhasesToShow = 5;
 
       std::string infoAboutPendingPhases;
-      TF_REVERSE_FOR_ALL(graphIt, indexStack) {
+      TF_REVERSE_FOR_ALL(graphIt, indexStack)
+      {
         if (numActivePhasesToShow == 0) {
           break;
         }
 
-        TF_REVERSE_FOR_ALL(phaseIt, graphIt->phases) {
+        TF_REVERSE_FOR_ALL(phaseIt, graphIt->phases)
+        {
           if (&*phaseIt != &currentPhase) {
             infoAboutPendingPhases += TfStringPrintf(
                 "%d. %s\n", numPhases--, phaseIt->description.c_str());
@@ -635,13 +662,13 @@ private:
       infoAboutPendingPhases = TfStringReplace(
           TfGetXmlEscapedString(infoAboutPendingPhases), "\n", "<br/>\n");
 
-      currentIndex.dotGraphLabel =
-          TfStringPrintf(tableFormat.c_str(), infoAboutCurrentPhase.c_str(),
-                         infoAboutPendingPhases.c_str());
+      currentIndex.dotGraphLabel = TfStringPrintf(
+          tableFormat.c_str(), infoAboutCurrentPhase.c_str(), infoAboutPendingPhases.c_str());
       currentIndex.needsOutput = true;
     }
 
-    size_t GetNumPhases() const {
+    size_t GetNumPhases() const
+    {
       size_t numPhases = 0;
       for (auto const &indexInfo : indexStack) {
         numPhases += indexInfo.phases.size();
@@ -649,7 +676,8 @@ private:
       return numPhases;
     }
 
-    void FlushBufferedOutput() const {
+    void FlushBufferedOutput() const
+    {
       static std::mutex mutex;
       std::lock_guard<std::mutex> lock(mutex);
       // Issue TfDebug messages.
@@ -662,19 +690,23 @@ private:
     mutable std::vector<std::string> outputBuffer;
   };
 
-private:
-  using _DebugInfoMap =
-      tbb::concurrent_hash_map<PcpPrimIndex const *, _DebugInfo>;
+ private:
+  using _DebugInfoMap = tbb::concurrent_hash_map<PcpPrimIndex const *, _DebugInfo>;
 
-  void _Erase(PcpPrimIndex const *index) { _debugInfo.erase(index); }
+  void _Erase(PcpPrimIndex const *index)
+  {
+    _debugInfo.erase(index);
+  }
 
-  _DebugInfo *_Get(PcpPrimIndex const *index) {
+  _DebugInfo *_Get(PcpPrimIndex const *index)
+  {
     _DebugInfoMap::accessor acc;
     _debugInfo.insert(acc, index);
     return &acc->second;
   }
 
-  _DebugInfo const *_Get(PcpPrimIndex const *index) const {
+  _DebugInfo const *_Get(PcpPrimIndex const *index) const
+  {
     _DebugInfoMap::const_accessor acc;
     return _debugInfo.find(acc, index) ? &acc->second : nullptr;
   }
@@ -686,18 +718,19 @@ Pcp_IndexingOutputManager::Pcp_IndexingOutputManager() {}
 
 void Pcp_IndexingOutputManager::PushIndex(PcpPrimIndex const *originatingIndex,
                                           PcpPrimIndex const *index,
-                                          const PcpLayerStackSite &site) {
+                                          const PcpLayerStackSite &site)
+{
   _DebugInfo *info = _Get(originatingIndex);
   info->FlushGraphIfNeedsOutput();
   info->indexStack.emplace_back(index, site.path);
-  info->BeginPhase(TfStringPrintf("Computing prim index for %s",
-                                  Pcp_FormatSite(site).c_str()));
+  info->BeginPhase(TfStringPrintf("Computing prim index for %s", Pcp_FormatSite(site).c_str()));
 }
 
-void Pcp_IndexingOutputManager::PopIndex(PcpPrimIndex const *originatingIndex) {
+void Pcp_IndexingOutputManager::PopIndex(PcpPrimIndex const *originatingIndex)
+{
   _DebugInfo *info = _Get(originatingIndex);
-  if (!TF_VERIFY(!info->indexStack.empty()) ||
-      !TF_VERIFY(!info->indexStack.back().phases.empty())) {
+  if (!TF_VERIFY(!info->indexStack.empty()) || !TF_VERIFY(!info->indexStack.back().phases.empty()))
+  {
     return;
   }
 
@@ -719,23 +752,27 @@ void Pcp_IndexingOutputManager::PopIndex(PcpPrimIndex const *originatingIndex) {
 
 void Pcp_IndexingOutputManager::BeginPhase(PcpPrimIndex const *originatingIndex,
                                            std::string &&msg,
-                                           const PcpNodeRef &nodeForPhase) {
+                                           const PcpNodeRef &nodeForPhase)
+{
   _Get(originatingIndex)->BeginPhase(std::move(msg), nodeForPhase);
 }
 
-void Pcp_IndexingOutputManager::EndPhase(PcpPrimIndex const *originatingIndex) {
+void Pcp_IndexingOutputManager::EndPhase(PcpPrimIndex const *originatingIndex)
+{
   _Get(originatingIndex)->EndPhase();
 }
 
 void Pcp_IndexingOutputManager::Update(PcpPrimIndex const *originatingIndex,
                                        const PcpNodeRef &updatedNode,
-                                       std::string &&msg) {
+                                       std::string &&msg)
+{
   _Get(originatingIndex)->Update(updatedNode, std::move(msg));
 }
 
 void Pcp_IndexingOutputManager::Msg(PcpPrimIndex const *originatingIndex,
                                     std::string &&msg,
-                                    const Pcp_NodeSet &nodes) {
+                                    const Pcp_NodeSet &nodes)
+{
   _Get(originatingIndex)->Msg(std::move(msg), nodes);
 }
 
@@ -743,32 +780,36 @@ static TfStaticData<Pcp_IndexingOutputManager> _outputManager;
 
 ////////////////////////////////////////////////////////////
 
-void Pcp_PrimIndexingDebug::_PushIndex(const PcpLayerStackSite &site) const {
+void Pcp_PrimIndexingDebug::_PushIndex(const PcpLayerStackSite &site) const
+{
   _outputManager->PushIndex(_originatingIndex, _index, site);
 }
 
-void Pcp_PrimIndexingDebug::_PopIndex() const {
+void Pcp_PrimIndexingDebug::_PopIndex() const
+{
   _outputManager->PopIndex(_originatingIndex);
 }
 
 Pcp_IndexingPhaseScope::Pcp_IndexingPhaseScope(PcpPrimIndex const *index,
                                                const PcpNodeRef &node,
                                                std::string &&msg)
-    : _index(index) {
+    : _index(index)
+{
   _outputManager->BeginPhase(_index, std::move(msg), node);
 }
 
-void Pcp_IndexingPhaseScope::_EndScope() const {
+void Pcp_IndexingPhaseScope::_EndScope() const
+{
   _outputManager->EndPhase(_index);
 }
 
-void Pcp_IndexingUpdate(PcpPrimIndex const *index, const PcpNodeRef &node,
-                        std::string &&msg) {
+void Pcp_IndexingUpdate(PcpPrimIndex const *index, const PcpNodeRef &node, std::string &&msg)
+{
   _outputManager->Update(index, node, std::move(msg));
 }
 
-void Pcp_IndexingMsg(PcpPrimIndex const *index, const PcpNodeRef &a1,
-                     char const *fmt, ...) {
+void Pcp_IndexingMsg(PcpPrimIndex const *index, const PcpNodeRef &a1, char const *fmt, ...)
+{
   va_list ap;
   va_start(ap, fmt);
   std::string msg = TfVStringPrintf(fmt, ap);
@@ -778,8 +819,9 @@ void Pcp_IndexingMsg(PcpPrimIndex const *index, const PcpNodeRef &a1,
   _outputManager->Msg(index, std::move(msg), nodes);
 }
 
-void Pcp_IndexingMsg(PcpPrimIndex const *index, const PcpNodeRef &a1,
-                     const PcpNodeRef &a2, char const *fmt, ...) {
+void Pcp_IndexingMsg(
+    PcpPrimIndex const *index, const PcpNodeRef &a1, const PcpNodeRef &a2, char const *fmt, ...)
+{
   va_list ap;
   va_start(ap, fmt);
   std::string msg = TfVStringPrintf(fmt, ap);

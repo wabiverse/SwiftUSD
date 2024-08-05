@@ -49,7 +49,8 @@ struct Tf_PyNoticeObjectGenerator {
   typedef boost::python::object (*MakeObjectFunc)(TfNotice const &);
 
   // Register the generator for notice type T.
-  template <typename T> static void Register() {
+  template<typename T> static void Register()
+  {
     // XXX this stuff should be keyed directly off TfType now
     (*_generators)[typeid(T).name()] = This::_Generate<T>;
   }
@@ -57,9 +58,9 @@ struct Tf_PyNoticeObjectGenerator {
   // Produce a boost::python::object for the correct derived type of \a n.
   TF_API static boost::python::object Invoke(TfNotice const &n);
 
-private:
-  template <typename T>
-  static boost::python::object _Generate(TfNotice const &n) {
+ private:
+  template<typename T> static boost::python::object _Generate(TfNotice const &n)
+  {
     // Python locking is left to the caller.
     return boost::python::object(static_cast<T const &>(n));
   }
@@ -74,10 +75,10 @@ struct TfPyNoticeWrapperBase : public TfType::PyPolymorphicBase {
   virtual boost::python::handle<> GetNoticePythonObject() const = 0;
 };
 
-template <class Notice>
-struct Tf_PyNoticeObjectFinder : public Tf_PyObjectFinderBase {
+template<class Notice> struct Tf_PyNoticeObjectFinder : public Tf_PyObjectFinderBase {
   virtual ~Tf_PyNoticeObjectFinder() {}
-  virtual boost::python::object Find(void const *objPtr) const {
+  virtual boost::python::object Find(void const *objPtr) const
+  {
     using namespace boost::python;
     TfPyLock lock;
     Notice const *wrapper = static_cast<Notice const *>(objPtr);
@@ -85,9 +86,9 @@ struct Tf_PyNoticeObjectFinder : public Tf_PyObjectFinderBase {
   }
 };
 
-template <typename NoticeType, typename BaseType>
+template<typename NoticeType, typename BaseType>
 struct TfPyNoticeWrapper : public NoticeType, public TfPyNoticeWrapperBase {
-private:
+ private:
   static_assert(std::is_base_of<TfNotice, NoticeType>::value ||
                     std::is_same<TfNotice, NoticeType>::value,
                 "Notice type must be derived from or equal to TfNotice.");
@@ -102,7 +103,7 @@ private:
                 "BaseType type must be a base of notice, unless both "
                 "BaseType and Notice type are equal to TfNotice.");
 
-public:
+ public:
   typedef TfPyNoticeWrapper<NoticeType, BaseType> This;
 
   // If Notice is really TfNotice, then this is the root of the hierarchy and
@@ -113,7 +114,8 @@ public:
 
   typedef boost::python::class_<NoticeType, This, Bases> ClassType;
 
-  static ClassType Wrap(std::string const &name = std::string()) {
+  static ClassType Wrap(std::string const &name = std::string())
+  {
     std::string wrappedName = name;
     if (wrappedName.empty()) {
       // Assume they want the last bit of a qualified name.
@@ -122,34 +124,35 @@ public:
         wrappedName = TfStringGetSuffix(wrappedName, ':');
     }
     Tf_PyNoticeObjectGenerator::Register<NoticeType>();
-    Tf_RegisterPythonObjectFinderInternal(
-        typeid(TfPyNoticeWrapper),
-        new Tf_PyNoticeObjectFinder<TfPyNoticeWrapper>);
-    return ClassType(wrappedName.c_str(), boost::python::no_init)
-        .def(TfTypePythonClass());
+    Tf_RegisterPythonObjectFinderInternal(typeid(TfPyNoticeWrapper),
+                                          new Tf_PyNoticeObjectFinder<TfPyNoticeWrapper>);
+    return ClassType(wrappedName.c_str(), boost::python::no_init).def(TfTypePythonClass());
   }
 
   // Implement the base class's virtual method.
-  virtual boost::python::handle<> GetNoticePythonObject() const {
+  virtual boost::python::handle<> GetNoticePythonObject() const
+  {
     TfPyLock lock;
     return boost::python::handle<>(boost::python::borrowed(_self));
   }
 
   // Arbitrary argument constructor (with a leading PyObject *) which
   // forwards to the base Notice class's constructor.
-  template <typename... Args>
-  TfPyNoticeWrapper(PyObject *self, Args... args)
-      : NoticeType(args...), _self(self) {}
+  template<typename... Args>
+  TfPyNoticeWrapper(PyObject *self, Args... args) : NoticeType(args...), _self(self)
+  {
+  }
 
-private:
+ private:
   PyObject *_self;
 };
 
-#define TF_INSTANTIATE_NOTICE_WRAPPER(T, Base)                                 \
-  TF_REGISTRY_FUNCTION(TfType) {                                               \
-    TfType::Define<TfPyNoticeWrapper<T, Base>, TfType::Bases<Base>>();         \
+#define TF_INSTANTIATE_NOTICE_WRAPPER(T, Base) \
+  TF_REGISTRY_FUNCTION(TfType) \
+  { \
+    TfType::Define<TfPyNoticeWrapper<T, Base>, TfType::Bases<Base>>(); \
   }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_NOTICE_WRAPPER_H
+#endif  // PXR_BASE_TF_PY_NOTICE_WRAPPER_H

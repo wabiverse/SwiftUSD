@@ -45,14 +45,14 @@ typedef TfWeakPtr<struct Tf_PyWeakObject> Tf_PyWeakObjectPtr;
 
 // A weak pointable weak reference to a python object.
 struct Tf_PyWeakObject : public TfWeakBase {
-public:
+ public:
   typedef Tf_PyWeakObject This;
 
   static Tf_PyWeakObjectPtr GetOrCreate(boost::python::object const &obj);
   boost::python::object GetObject() const;
   void Delete();
 
-private:
+ private:
   explicit Tf_PyWeakObject(boost::python::object const &obj);
 
   boost::python::handle<> _weakRef;
@@ -60,4 +60,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_WEAK_OBJECT_H
+#endif  // PXR_BASE_TF_PY_WEAK_OBJECT_H

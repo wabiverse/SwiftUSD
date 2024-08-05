@@ -26,15 +26,14 @@
 
 /// \file glf/simpleMaterial.h
 
-#include <pxr/pxrns.h>
-#include "Glf/api.h"
 #include "Gf/vec4f.h"
+#include "Glf/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GlfSimpleMaterial final
-{
-public:
+class GlfSimpleMaterial final {
+ public:
   GLF_API
   GlfSimpleMaterial();
   GLF_API
@@ -70,7 +69,7 @@ public:
   GLF_API
   bool operator!=(GlfSimpleMaterial const &other) const;
 
-private:
+ private:
   GfVec4f _ambient;
   GfVec4f _diffuse;
   GfVec4f _specular;

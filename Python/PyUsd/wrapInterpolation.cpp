@@ -27,4 +27,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapUsdInterpolationType() { TfPyWrapEnum<UsdInterpolationType>(); }
+void wrapUsdInterpolationType()
+{
+  TfPyWrapEnum<UsdInterpolationType>();
+}

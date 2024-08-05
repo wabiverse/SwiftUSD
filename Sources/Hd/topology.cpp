@@ -25,13 +25,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-std::ostream&
-operator << (std::ostream &out, HdTopology const &topo)
+std::ostream &operator<<(std::ostream &out, HdTopology const &topo)
 {
-    out << "HdTopology()";
-    return out;
+  out << "HdTopology()";
+  return out;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

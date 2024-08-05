@@ -54,27 +54,23 @@ HgiMetalSampler::HgiMetalSampler(HgiMetal *hgi, HgiSamplerDesc const &desc)
 
 HgiMetalSampler::~HgiMetalSampler()
 {
-  if (_label)
-  {
+  if (_label) {
     _label->release();
     _label = nil;
   }
 
-  if (_samplerId != nil)
-  {
+  if (_samplerId != nil) {
     _samplerId->release();
     _samplerId = nil;
   }
 }
 
-uint64_t
-HgiMetalSampler::GetRawResource() const
+uint64_t HgiMetalSampler::GetRawResource() const
 {
   return (uint64_t)_samplerId;
 }
 
-MTL::SamplerState *
-HgiMetalSampler::GetSamplerId() const
+MTL::SamplerState *HgiMetalSampler::GetSamplerId() const
 {
   return _samplerId;
 }

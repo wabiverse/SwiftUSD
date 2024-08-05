@@ -26,8 +26,8 @@
 
 /// \file usdSkel/binding.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "UsdSkel/skeleton.h"
 #include "UsdSkel/skinningQuery.h"
@@ -40,17 +40,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// skinnable objects. The set of skinnable objects is given as
 /// UsdSkelSkinningQuery prims, which can be used both to identify the
 /// skinned prim as well compute skinning properties of the prim.
-class UsdSkelBinding
-{
-public:
+class UsdSkelBinding {
+ public:
   UsdSkelBinding() {}
 
-  UsdSkelBinding(const UsdSkelSkeleton &skel,
-                 const VtArray<UsdSkelSkinningQuery> &skinningQueries)
-      : _skel(skel), _skinningQueries(skinningQueries) {}
+  UsdSkelBinding(const UsdSkelSkeleton &skel, const VtArray<UsdSkelSkinningQuery> &skinningQueries)
+      : _skel(skel), _skinningQueries(skinningQueries)
+  {
+  }
 
   /// Returns the bound skeleton.
-  const UsdSkelSkeleton &GetSkeleton() const { return _skel; }
+  const UsdSkelSkeleton &GetSkeleton() const
+  {
+    return _skel;
+  }
 
   /// Returns the set skinning targets.
   const VtArray<UsdSkelSkinningQuery> &GetSkinningTargets() const
@@ -58,11 +61,11 @@ public:
     return _skinningQueries;
   }
 
-private:
+ private:
   UsdSkelSkeleton _skel;
   VtArray<UsdSkelSkinningQuery> _skinningQueries;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // USDSKEL_SKINNING_MAP
+#endif  // USDSKEL_SKINNING_MAP

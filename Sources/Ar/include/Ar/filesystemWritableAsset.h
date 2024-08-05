@@ -25,9 +25,9 @@
 
 /// \file ar/filesystemWritableAsset.h
 
-#include "ArTypes/api.h"
 #include "Ar/resolver.h"
 #include "Ar/writableAsset.h"
+#include "ArTypes/api.h"
 #include <pxr/pxrns.h>
 
 #include "Tf/safeOutputFile.h"
@@ -44,13 +44,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// file which will be renamed over the destination file when this object
 /// is destroyed. See documentation for TfSafeOutputFile for more details.
 class ArFilesystemWritableAsset : public ArWritableAsset {
-public:
+ public:
   /// Constructs a new ArFilesystemWritableAsset for the file at
   /// \p resolvedPath with the given \p writeMode. Returns a null pointer
   /// if the file could not be opened.
   AR_API
-  static std::shared_ptr<ArFilesystemWritableAsset>
-  Create(const ArResolvedPath &resolvedPath, ArResolver::WriteMode writeMode);
+  static std::shared_ptr<ArFilesystemWritableAsset> Create(const ArResolvedPath &resolvedPath,
+                                                           ArResolver::WriteMode writeMode);
 
   /// Constructs an ArFilesystemWritableAsset for the given \p file.
   /// The ArFilesystemWritableAsset takes ownership of \p file.
@@ -70,10 +70,9 @@ public:
   /// of the file held by this object. Returns number of bytes written, or
   /// 0 on error.
   AR_API
-  virtual size_t Write(const void *buffer, size_t count,
-                       size_t offset) override;
+  virtual size_t Write(const void *buffer, size_t count, size_t offset) override;
 
-private:
+ private:
   TfSafeOutputFile _file;
 };
 

@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdSchemaExamplesSimple,
-                 TfType::Bases<UsdTyped>>();
+  TfType::Define<UsdSchemaExamplesSimple, TfType::Bases<UsdTyped>>();
 }
 
 /* virtual */
-UsdSchemaExamplesSimple::~UsdSchemaExamplesSimple()
-{
-}
+UsdSchemaExamplesSimple::~UsdSchemaExamplesSimple() {}
 
 /* static */
-UsdSchemaExamplesSimple
-UsdSchemaExamplesSimple::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdSchemaExamplesSimple UsdSchemaExamplesSimple::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdSchemaExamplesSimple();
   }
@@ -61,8 +56,7 @@ UsdSchemaKind UsdSchemaExamplesSimple::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdSchemaExamplesSimple::_GetStaticTfType()
+const TfType &UsdSchemaExamplesSimple::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdSchemaExamplesSimple>();
   return tfType;
@@ -76,20 +70,18 @@ bool UsdSchemaExamplesSimple::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdSchemaExamplesSimple::_GetTfType() const
+const TfType &UsdSchemaExamplesSimple::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdSchemaExamplesSimple::GetIntAttrAttr() const
+UsdAttribute UsdSchemaExamplesSimple::GetIntAttrAttr() const
 {
   return GetPrim().GetAttribute(UsdSchemaExamplesTokens->intAttr);
 }
 
-UsdAttribute
-UsdSchemaExamplesSimple::CreateIntAttrAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdSchemaExamplesSimple::CreateIntAttrAttr(VtValue const &defaultValue,
+                                                        bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdSchemaExamplesTokens->intAttr,
                                     SdfValueTypeNames->Int,
@@ -99,43 +91,37 @@ UsdSchemaExamplesSimple::CreateIntAttrAttr(VtValue const &defaultValue, bool wri
                                     writeSparsely);
 }
 
-UsdRelationship
-UsdSchemaExamplesSimple::GetTargetRel() const
+UsdRelationship UsdSchemaExamplesSimple::GetTargetRel() const
 {
   return GetPrim().GetRelationship(UsdSchemaExamplesTokens->target);
 }
 
-UsdRelationship
-UsdSchemaExamplesSimple::CreateTargetRel() const
+UsdRelationship UsdSchemaExamplesSimple::CreateTargetRel() const
 {
   return GetPrim().CreateRelationship(UsdSchemaExamplesTokens->target,
                                       /* custom = */ false);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdSchemaExamplesSimple::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdSchemaExamplesSimple::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdSchemaExamplesTokens->intAttr,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdTyped::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdTyped::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

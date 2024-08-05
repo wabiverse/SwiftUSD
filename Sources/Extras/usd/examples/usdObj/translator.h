@@ -23,8 +23,8 @@
 //
 #ifndef PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_TRANSLATOR_H
 #define PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_TRANSLATOR_H
-#include <pxr/pxrns.h>
 #include "Tf/declarePtrs.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -32,9 +32,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfLayer);
 
 /// Return an anonymous (in-memory-only) layer with data from \p objStream
 /// translated to Usd.
-SdfLayerRefPtr
-UsdObjTranslateObjToUsd(const class UsdObjStream &objStream);
+SdfLayerRefPtr UsdObjTranslateObjToUsd(const class UsdObjStream &objStream);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_TRANSLATOR_H
+#endif  // PXR_EXTRAS_USD_EXAMPLES_USD_OBJ_TRANSLATOR_H

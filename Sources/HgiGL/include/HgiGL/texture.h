@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_GL_TEXTURE_H
 #define PXR_IMAGING_HGI_GL_TEXTURE_H
 
-#include <pxr/pxrns.h>
-#include "HgiGL/api.h"
 #include "Hgi/texture.h"
+#include "HgiGL/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 #include "Tf/weakBase.h"
@@ -43,9 +43,8 @@ TF_DECLARE_WEAK_PTRS(HgiGLTexture);
 /// This is useful to invalidate container objects such as framebuffer objects
 /// that reference a deleted texture resource as an attachment.
 ///
-class HgiGLTexture final : public HgiTexture, public TfWeakBase
-{
-public:
+class HgiGLTexture final : public HgiTexture, public TfWeakBase {
+ public:
   HGIGL_API
   ~HgiGLTexture() override;
 
@@ -56,13 +55,16 @@ public:
   uint64_t GetRawResource() const override;
 
   /// Returns the OpenGL id / name of the texture.
-  uint32_t GetTextureId() const { return _textureId; }
+  uint32_t GetTextureId() const
+  {
+    return _textureId;
+  }
 
   /// Returns the bindless gpu handle (caller must verify extension support)
   HGIGL_API
   uint64_t GetBindlessHandle();
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
@@ -71,7 +73,7 @@ protected:
   HGIGL_API
   HgiGLTexture(HgiTextureViewDesc const &desc);
 
-private:
+ private:
   HgiGLTexture() = delete;
   HgiGLTexture &operator=(const HgiGLTexture &) = delete;
   HgiGLTexture(const HgiGLTexture &) = delete;

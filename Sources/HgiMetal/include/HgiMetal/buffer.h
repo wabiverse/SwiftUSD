@@ -26,9 +26,9 @@
 
 #include <Metal/Metal.hpp>
 
-#include <pxr/pxrns.h>
-#include "HgiMetal/api.h"
 #include "Hgi/buffer.h"
+#include "HgiMetal/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,9 +38,8 @@ class HgiMetal;
 ///
 /// Represents a Metal GPU buffer resource.
 ///
-class HgiMetalBuffer final : public HgiBuffer
-{
-public:
+class HgiMetalBuffer final : public HgiBuffer {
+ public:
   HGIMETAL_API
   HgiMetalBuffer(HgiMetal *hgi, HgiBufferDesc const &desc);
 
@@ -56,9 +55,12 @@ public:
   HGIMETAL_API
   void *GetCPUStagingAddress() override;
 
-  MTL::Buffer *GetBufferId() const { return _bufferId; }
+  MTL::Buffer *GetBufferId() const
+  {
+    return _bufferId;
+  }
 
-private:
+ private:
   HgiMetalBuffer() = delete;
   HgiMetalBuffer &operator=(const HgiMetalBuffer &) = delete;
   HgiMetalBuffer(const HgiMetalBuffer &) = delete;

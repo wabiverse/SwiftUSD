@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGI_COMPUTE_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
+#include "Hgi/cmds.h"
 #include "Hgi/computePipeline.h"
 #include "Hgi/resourceBindings.h"
-#include "Hgi/cmds.h"
 #include <memory>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -41,9 +41,8 @@ using HgiComputeCmdsUniquePtr = std::unique_ptr<class HgiComputeCmds>;
 /// HgiComputeCmds is a lightweight object that cannot be re-used after it has
 /// been submitted. A new cmds object should be acquired for each frame.
 ///
-class HgiComputeCmds : public HgiCmds
-{
-public:
+class HgiComputeCmds : public HgiCmds {
+ public:
   HGI_API
   ~HgiComputeCmds() override;
 
@@ -77,11 +76,10 @@ public:
   /// `byteSize` is the size of the data you are updating.
   /// `data` is the data you are copying into the push constants block.
   HGI_API
-  virtual void SetConstantValues(
-      HgiComputePipelineHandle pipeline,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) = 0;
+  virtual void SetConstantValues(HgiComputePipelineHandle pipeline,
+                                 uint32_t bindIndex,
+                                 uint32_t byteSize,
+                                 const void *data) = 0;
 
   /// Execute a compute shader with provided thread group count in each
   /// dimension.
@@ -97,11 +95,11 @@ public:
   HGI_API
   virtual HgiComputeDispatch GetDispatchMethod() const = 0;
 
-protected:
+ protected:
   HGI_API
   HgiComputeCmds();
 
-private:
+ private:
   HgiComputeCmds &operator=(const HgiComputeCmds &) = delete;
   HgiComputeCmds(const HgiComputeCmds &) = delete;
 };

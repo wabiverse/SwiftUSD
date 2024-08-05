@@ -55,7 +55,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This returns an opaque handle to the opened library or \c NULL on
 /// failure.
 TF_API
-void *TfDlopen(const std::string &filename, int flag, std::string *error = NULL,
+void *TfDlopen(const std::string &filename,
+               int flag,
+               std::string *error = NULL,
                bool loadScriptBindings = true);
 
 /// Close a dynamic library.

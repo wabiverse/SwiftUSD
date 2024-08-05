@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_GL_COMPUTE_CMDS_H
 #define PXR_IMAGING_HGI_GL_COMPUTE_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
 #include "HgiGL/api.h"
 #include "HgiGL/hgi.h"
 #include <cstdint>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,9 +39,8 @@ struct HgiComputeCmdsDesc;
 ///
 /// OpenGL implementation of HgiComputeCmds.
 ///
-class HgiGLComputeCmds final : public HgiComputeCmds
-{
-public:
+class HgiGLComputeCmds final : public HgiComputeCmds {
+ public:
   HGIGL_API
   ~HgiGLComputeCmds() override;
 
@@ -58,11 +57,10 @@ public:
   void BindResources(HgiResourceBindingsHandle resources) override;
 
   HGIGL_API
-  void SetConstantValues(
-      HgiComputePipelineHandle pipeline,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) override;
+  void SetConstantValues(HgiComputePipelineHandle pipeline,
+                         uint32_t bindIndex,
+                         uint32_t byteSize,
+                         const void *data) override;
 
   HGIGL_API
   void Dispatch(int dimX, int dimY) override;
@@ -73,7 +71,7 @@ public:
   HGIGL_API
   HgiComputeDispatch GetDispatchMethod() const override;
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
@@ -82,7 +80,7 @@ protected:
   HGIGL_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiGLComputeCmds() = delete;
   HgiGLComputeCmds &operator=(const HgiGLComputeCmds &) = delete;
   HgiGLComputeCmds(const HgiGLComputeCmds &) = delete;

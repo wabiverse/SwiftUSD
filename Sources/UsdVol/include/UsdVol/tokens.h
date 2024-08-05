@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdVol/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdVol/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdVolTokens->bool_);
 /// \endcode
-struct UsdVolTokensType
-{
+struct UsdVolTokensType {
   USDVOL_API UsdVolTokensType();
   /// \brief "bool"
   ///
@@ -76,11 +75,13 @@ struct UsdVolTokensType
   const TfToken double2;
   /// \brief "double3"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken double3;
   /// \brief "double"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken double_;
   /// \brief "field"
   ///
@@ -116,11 +117,13 @@ struct UsdVolTokensType
   const TfToken float2;
   /// \brief "float3"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken float3;
   /// \brief "float"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken float_;
   /// \brief "fogVolume"
   ///
@@ -128,7 +131,8 @@ struct UsdVolTokensType
   const TfToken fogVolume;
   /// \brief "half"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken half;
   /// \brief "half2"
   ///
@@ -136,7 +140,8 @@ struct UsdVolTokensType
   const TfToken half2;
   /// \brief "half3"
   ///
-  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
+  /// Possible value for UsdVolField3DAsset::GetFieldDataTypeAttr(), Possible value for
+  /// UsdVolOpenVDBAsset::GetFieldDataTypeAttr()
   const TfToken half3;
   /// \brief "int2"
   ///

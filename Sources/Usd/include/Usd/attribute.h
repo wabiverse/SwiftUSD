@@ -175,7 +175,7 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 /// performance.
 ///
 class UsdAttribute : public UsdProperty {
-public:
+ public:
   /// Construct an invalid attribute.
   UsdAttribute() : UsdProperty(_Null<UsdAttribute>()) {}
 
@@ -263,8 +263,7 @@ public:
   ///
   /// \sa UsdAttribute::GetTimeSamples
   USD_API
-  bool GetTimeSamplesInInterval(const GfInterval &interval,
-                                std::vector<double> *times) const;
+  bool GetTimeSamplesInInterval(const GfInterval &interval, std::vector<double> *times) const;
 
   /// Populates the given vector, \p times with the union of all the
   /// authored sample times on all of the given attributes, \p attrs.
@@ -308,10 +307,9 @@ public:
   /// \sa UsdAttribute::GetTimeSamplesInInterval
   /// \sa UsdAttribute::GetUnionedTimeSamples
   USD_API
-  static bool
-  GetUnionedTimeSamplesInInterval(const std::vector<UsdAttribute> &attrs,
-                                  const GfInterval &interval,
-                                  std::vector<double> *times);
+  static bool GetUnionedTimeSamplesInInterval(const std::vector<UsdAttribute> &attrs,
+                                              const GfInterval &interval,
+                                              std::vector<double> *times);
 
   /// Returns the number of time samples that have been authored.
   ///
@@ -351,8 +349,10 @@ public:
   /// All four cases above are considered to be successful, thus the return
   /// value will be true and no error message will be emitted.
   USD_API
-  bool GetBracketingTimeSamples(double desiredTime, double *lower,
-                                double *upper, bool *hasTimeSamples) const;
+  bool GetBracketingTimeSamples(double desiredTime,
+                                double *lower,
+                                double *upper,
+                                bool *hasTimeSamples) const;
 
   /// Return true if this attribute has an authored default value, authored
   /// time samples or a fallback value provided by a registered schema. If
@@ -431,8 +431,8 @@ public:
   /// For more details, see \ref Usd_ValueResolution , and also
   /// \ref Usd_AssetPathValuedAttributes for information on how to
   /// retrieve resolved asset paths from SdfAssetPath-valued attributes.
-  template <typename T>
-  bool Get(T *value, UsdTimeCode time = UsdTimeCode::Default()) const {
+  template<typename T> bool Get(T *value, UsdTimeCode time = UsdTimeCode::Default()) const
+  {
     static_assert(!std::is_const<T>::value, "");
     static_assert(SdfValueTypeTraits<T>::IsValueType, "");
     return _Get(value, time);
@@ -470,12 +470,10 @@ public:
   /// \return false and generate an error if type \c T does not match
   /// this attribute's defined scene description type <b>exactly</b>,
   /// or if there is no existing definition for the attribute.
-  template <typename T>
-  bool Set(const T &value, UsdTimeCode time = UsdTimeCode::Default()) const {
+  template<typename T> bool Set(const T &value, UsdTimeCode time = UsdTimeCode::Default()) const
+  {
     static_assert(!std::is_pointer<T>::value, "");
-    static_assert(SdfValueTypeTraits<T>::IsValueType ||
-                      std::is_same<T, SdfValueBlock>::value,
-                  "");
+    static_assert(SdfValueTypeTraits<T>::IsValueType || std::is_same<T, SdfValueBlock>::value, "");
     return _Set(value, time);
   }
 
@@ -487,8 +485,7 @@ public:
 
   /// \overload
   USD_API
-  bool Set(const VtValue &value,
-           UsdTimeCode time = UsdTimeCode::Default()) const;
+  bool Set(const VtValue &value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Clears the authored default value and all time samples for this
   /// attribute at the current EditTarget and returns true on success.
@@ -538,9 +535,8 @@ public:
   /// authored in the authoring layer, with respect to list-editing
   /// semantics, which we will document soon
   USD_API
-  bool AddConnection(
-      const SdfPath &source,
-      UsdListPosition position = UsdListPositionBackOfPrependList) const;
+  bool AddConnection(const SdfPath &source,
+                     UsdListPosition position = UsdListPositionBackOfPrependList) const;
 
   /// Removes \p target from the list of targets.
   ///
@@ -631,7 +627,7 @@ public:
   // ---------------------------------------------------------------------- //
   // Private Methods and Members
   // ---------------------------------------------------------------------- //
-private:
+ private:
   friend class UsdAttributeQuery;
   friend class UsdObject;
   friend class UsdPrim;
@@ -639,13 +635,20 @@ private:
   friend class Usd_PrimData;
   friend struct UsdPrim_AttrConnectionFinder;
 
-  UsdAttribute(const Usd_PrimDataHandle &prim, const SdfPath &proxyPrimPath,
+  UsdAttribute(const Usd_PrimDataHandle &prim,
+               const SdfPath &proxyPrimPath,
                const TfToken &attrName)
-      : UsdProperty(UsdTypeAttribute, prim, proxyPrimPath, attrName) {}
+      : UsdProperty(UsdTypeAttribute, prim, proxyPrimPath, attrName)
+  {
+  }
 
-  UsdAttribute(UsdObjType objType, const Usd_PrimDataHandle &prim,
-               const SdfPath &proxyPrimPath, const TfToken &propName)
-      : UsdProperty(objType, prim, proxyPrimPath, propName) {}
+  UsdAttribute(UsdObjType objType,
+               const Usd_PrimDataHandle &prim,
+               const SdfPath &proxyPrimPath,
+               const TfToken &propName)
+      : UsdProperty(objType, prim, proxyPrimPath, propName)
+  {
+  }
 
   SdfAttributeSpecHandle _CreateSpec(const SdfValueTypeName &typeName,
                                      bool custom,
@@ -656,16 +659,17 @@ private:
   // new information.
   SdfAttributeSpecHandle _CreateSpec() const;
 
-  bool _Create(const SdfValueTypeName &typeName, bool custom,
+  bool _Create(const SdfValueTypeName &typeName,
+               bool custom,
                const SdfVariability &variability) const;
 
-  template <typename T> bool _Get(T *value, UsdTimeCode time) const;
+  template<typename T> bool _Get(T *value, UsdTimeCode time) const;
 
-  template <typename T> bool _Set(const T &value, UsdTimeCode time) const;
+  template<typename T> bool _Set(const T &value, UsdTimeCode time) const;
 
   SdfPath _GetPathForAuthoring(const SdfPath &path, std::string *whyNot) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ATTRIBUTE_H
+#endif  // PXR_USD_USD_ATTRIBUTE_H

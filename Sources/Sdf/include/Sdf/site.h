@@ -42,16 +42,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// within that layer.
 ///
 class SdfSite : public boost::totally_ordered<SdfSite> {
-public:
+ public:
   SdfSite() {}
-  SdfSite(const SdfLayerHandle &layer_, const SdfPath &path_)
-      : layer(layer_), path(path_) {}
+  SdfSite(const SdfLayerHandle &layer_, const SdfPath &path_) : layer(layer_), path(path_) {}
 
-  bool operator==(const SdfSite &other) const {
+  bool operator==(const SdfSite &other) const
+  {
     return layer == other.layer && path == other.path;
   }
 
-  bool operator<(const SdfSite &other) const {
+  bool operator<(const SdfSite &other) const
+  {
     return layer < other.layer || (!(other.layer < layer) && path < other.path);
   }
 
@@ -59,9 +60,12 @@ public:
   /// both the layer and path fields are filled with valid values, \c false
   /// otherwise.
   /// This does NOT imply that there are opinions in the layer at that path.
-  explicit operator bool() const { return layer && !path.IsEmpty(); }
+  explicit operator bool() const
+  {
+    return layer && !path.IsEmpty();
+  }
 
-public:
+ public:
   SdfLayerHandle layer;
   SdfPath path;
 };
@@ -71,4 +75,4 @@ typedef std::vector<SdfSite> SdfSiteVector;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SITE_H
+#endif  // PXR_USD_SDF_SITE_H

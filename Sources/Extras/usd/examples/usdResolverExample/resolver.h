@@ -25,8 +25,8 @@
 
 #include "Ar/asset.h"
 #include "Ar/resolver.h"
-#include "ArTypes/resolvedPath.h"
 #include "Ar/writableAsset.h"
+#include "ArTypes/resolvedPath.h"
 #include "Vt/value.h"
 
 #include <memory>
@@ -37,60 +37,45 @@
 /// Example URI resolver supporting asset paths of the form:
 ///     asset:<asset_name>/<path_to_file>
 ///
-class UsdResolverExampleResolver final
-    : public PXR_NS::ArResolver
-{
-public:
+class UsdResolverExampleResolver final : public PXR_NS::ArResolver {
+ public:
   UsdResolverExampleResolver();
   virtual ~UsdResolverExampleResolver();
 
-protected:
-  std::string _CreateIdentifier(
-      const std::string &assetPath,
-      const PXR_NS::ArResolvedPath &anchorAssetPath) const final;
+ protected:
+  std::string _CreateIdentifier(const std::string &assetPath,
+                                const PXR_NS::ArResolvedPath &anchorAssetPath) const final;
 
   std::string _CreateIdentifierForNewAsset(
-      const std::string &assetPath,
-      const PXR_NS::ArResolvedPath &anchorAssetPath) const final;
+      const std::string &assetPath, const PXR_NS::ArResolvedPath &anchorAssetPath) const final;
 
-  PXR_NS::ArResolvedPath _Resolve(
-      const std::string &assetPath) const final;
+  PXR_NS::ArResolvedPath _Resolve(const std::string &assetPath) const final;
 
-  PXR_NS::ArResolvedPath _ResolveForNewAsset(
-      const std::string &assetPath) const final;
+  PXR_NS::ArResolvedPath _ResolveForNewAsset(const std::string &assetPath) const final;
 
   PXR_NS::ArResolverContext _CreateDefaultContext() const final;
 
   PXR_NS::ArResolverContext _CreateDefaultContextForAsset(
       const std::string &assetPath) const final;
 
-  PXR_NS::ArResolverContext _CreateContextFromString(
-      const std::string &contextStr) const final;
+  PXR_NS::ArResolverContext _CreateContextFromString(const std::string &contextStr) const final;
 
-  bool _IsContextDependentPath(
-      const std::string &assetPath) const final;
+  bool _IsContextDependentPath(const std::string &assetPath) const final;
 
-  void _RefreshContext(
-      const PXR_NS::ArResolverContext &context) final;
+  void _RefreshContext(const PXR_NS::ArResolverContext &context) final;
 
   PXR_NS::ArTimestamp _GetModificationTimestamp(
-      const std::string &assetPath,
-      const PXR_NS::ArResolvedPath &resolvedPath) const final;
+      const std::string &assetPath, const PXR_NS::ArResolvedPath &resolvedPath) const final;
 
-  PXR_NS::ArAssetInfo _GetAssetInfo(
-      const std::string &assetPath,
-      const PXR_NS::ArResolvedPath &resolvedPath) const final;
+  PXR_NS::ArAssetInfo _GetAssetInfo(const std::string &assetPath,
+                                    const PXR_NS::ArResolvedPath &resolvedPath) const final;
 
   std::shared_ptr<PXR_NS::ArAsset> _OpenAsset(
       const PXR_NS::ArResolvedPath &resolvedPath) const final;
 
-  std::shared_ptr<PXR_NS::ArWritableAsset>
-  _OpenAssetForWrite(
-      const PXR_NS::ArResolvedPath &resolvedPath,
-      WriteMode writeMode) const final;
+  std::shared_ptr<PXR_NS::ArWritableAsset> _OpenAssetForWrite(
+      const PXR_NS::ArResolvedPath &resolvedPath, WriteMode writeMode) const final;
 
-private:
-  PXR_NS::ArResolvedPath _ResolveHelper(
-      const std::string &assetPath,
-      bool forNewAsset) const;
+ private:
+  PXR_NS::ArResolvedPath _ResolveHelper(const std::string &assetPath, bool forNewAsset) const;
 };

@@ -37,7 +37,8 @@ void Arch_InitTickTimer();
 
 namespace {
 
-ARCH_CONSTRUCTOR(Arch_InitConfig, 2, void) {
+ARCH_CONSTRUCTOR(Arch_InitConfig, 2, void)
+{
   // Initialize the application start time.  First so it's a close as
   // possible to the real start time.
   Arch_SetAppLaunchTime();
@@ -66,6 +67,6 @@ ARCH_CONSTRUCTOR(Arch_InitConfig, 2, void) {
   Arch_InitDebuggerAttach();
 }
 
-} // namespace
+}  // namespace
 
 PXR_NAMESPACE_CLOSE_SCOPE

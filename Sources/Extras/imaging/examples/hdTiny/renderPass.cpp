@@ -27,24 +27,20 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdTinyRenderPass::HdTinyRenderPass(
-    HdRenderIndex *index,
-    HdRprimCollection const &collection)
+HdTinyRenderPass::HdTinyRenderPass(HdRenderIndex *index, HdRprimCollection const &collection)
     : HdRenderPass(index, collection)
 {
 }
 
 HdTinyRenderPass::~HdTinyRenderPass()
 {
-    std::cout << "Destroying renderPass" << std::endl;
+  std::cout << "Destroying renderPass" << std::endl;
 }
 
-void
-HdTinyRenderPass::_Execute(
-    HdRenderPassStateSharedPtr const& renderPassState,
-    TfTokenVector const &renderTags)
+void HdTinyRenderPass::_Execute(HdRenderPassStateSharedPtr const &renderPassState,
+                                TfTokenVector const &renderTags)
 {
-    std::cout << "=> Execute RenderPass" << std::endl;
+  std::cout << "=> Execute RenderPass" << std::endl;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

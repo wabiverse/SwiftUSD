@@ -22,8 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "UsdUtils/conditionalAbortDiagnosticDelegate.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/pyResultConversions.h"
 
@@ -45,14 +45,14 @@ void wrapConditionalAbortDiagnosticDelegate()
   class_<ErrorFilters>("ConditionalAbortDiagnosticDelegateErrorFilters",
                        init<std::vector<std::string>, std::vector<std::string>>())
       .def(init<>())
-      .def("GetCodePathFilters", &ErrorFilters::GetCodePathFilters,
+      .def("GetCodePathFilters",
+           &ErrorFilters::GetCodePathFilters,
            return_value_policy<TfPySequenceToList>())
-      .def("GetStringFilters", &ErrorFilters::GetStringFilters,
+      .def("GetStringFilters",
+           &ErrorFilters::GetStringFilters,
            return_value_policy<TfPySequenceToList>())
-      .def("SetStringFilters", &ErrorFilters::SetStringFilters,
-           args("stringFilters"))
-      .def("SetCodePathFilters", &ErrorFilters::SetCodePathFilters,
-           args("codePathFilters"));
+      .def("SetStringFilters", &ErrorFilters::SetStringFilters, args("stringFilters"))
+      .def("SetCodePathFilters", &ErrorFilters::SetCodePathFilters, args("codePathFilters"));
 
   using This = UsdUtilsConditionalAbortDiagnosticDelegate;
   class_<This, boost::noncopyable>("ConditionalAbortDiagnosticDelegate",

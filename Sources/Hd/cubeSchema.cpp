@@ -33,81 +33,58 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdCubeSchemaTokens,
-    HDCUBE_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdCubeSchemaTokens, HDCUBE_SCHEMA_TOKENS);
 
-
-
-HdDoubleDataSourceHandle
-HdCubeSchema::GetSize()
+HdDoubleDataSourceHandle HdCubeSchema::GetSize()
 {
-    return _GetTypedDataSource<HdDoubleDataSource>(
-        HdCubeSchemaTokens->size);
+  return _GetTypedDataSource<HdDoubleDataSource>(HdCubeSchemaTokens->size);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdCubeSchema::BuildRetained(
-        const HdDoubleDataSourceHandle &size
-)
+HdContainerDataSourceHandle HdCubeSchema::BuildRetained(const HdDoubleDataSourceHandle &size)
 {
-    TfToken names[1];
-    HdDataSourceBaseHandle values[1];
+  TfToken names[1];
+  HdDataSourceBaseHandle values[1];
 
-    size_t count = 0;
-    if (size) {
-        names[count] = HdCubeSchemaTokens->size;
-        values[count++] = size;
-    }
+  size_t count = 0;
+  if (size) {
+    names[count] = HdCubeSchemaTokens->size;
+    values[count++] = size;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdCubeSchema
-HdCubeSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdCubeSchema HdCubeSchema::GetFromParent(const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdCubeSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdCubeSchemaTokens->cube))
-        : nullptr);
+  return HdCubeSchema(fromParentContainer ? HdContainerDataSource::Cast(fromParentContainer->Get(
+                                                HdCubeSchemaTokens->cube)) :
+                                            nullptr);
 }
 
 /*static*/
-const TfToken &
-HdCubeSchema::GetSchemaToken()
+const TfToken &HdCubeSchema::GetSchemaToken()
 {
-    return HdCubeSchemaTokens->cube;
-} 
+  return HdCubeSchemaTokens->cube;
+}
 /*static*/
-const HdDataSourceLocator &
-HdCubeSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdCubeSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdCubeSchemaTokens->cube
-    );
-    return locator;
-} 
-HdCubeSchema::Builder &
-HdCubeSchema::Builder::SetSize(
-    const HdDoubleDataSourceHandle &size)
+  static const HdDataSourceLocator locator(HdCubeSchemaTokens->cube);
+  return locator;
+}
+HdCubeSchema::Builder &HdCubeSchema::Builder::SetSize(const HdDoubleDataSourceHandle &size)
 {
-    _size = size;
-    return *this;
+  _size = size;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdCubeSchema::Builder::Build()
+HdContainerDataSourceHandle HdCubeSchema::Builder::Build()
 {
-    return HdCubeSchema::BuildRetained(
-        _size
-    );
+  return HdCubeSchema::BuildRetained(_size);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

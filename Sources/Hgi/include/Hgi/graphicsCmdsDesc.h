@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_GRAPHICS_CMDS_DESC_H
 #define PXR_IMAGING_HGI_GRAPHICS_CMDS_DESC_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/attachmentDesc.h"
 #include "Hgi/texture.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -57,10 +57,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   Render target height (in pixels)</li>
 /// </ul>
 ///
-struct HgiGraphicsCmdsDesc
-{
+struct HgiGraphicsCmdsDesc {
   HgiGraphicsCmdsDesc()
-      : colorAttachmentDescs(), depthAttachmentDesc(), colorTextures(), colorResolveTextures(), depthTexture(), depthResolveTexture()
+      : colorAttachmentDescs(),
+        depthAttachmentDesc(),
+        colorTextures(),
+        colorResolveTextures(),
+        depthTexture(),
+        depthResolveTexture()
   {
   }
 
@@ -80,19 +84,13 @@ struct HgiGraphicsCmdsDesc
 };
 
 HGI_API
-bool operator==(
-    const HgiGraphicsCmdsDesc &lhs,
-    const HgiGraphicsCmdsDesc &rhs);
+bool operator==(const HgiGraphicsCmdsDesc &lhs, const HgiGraphicsCmdsDesc &rhs);
 
 HGI_API
-bool operator!=(
-    const HgiGraphicsCmdsDesc &lhs,
-    const HgiGraphicsCmdsDesc &rhs);
+bool operator!=(const HgiGraphicsCmdsDesc &lhs, const HgiGraphicsCmdsDesc &rhs);
 
 HGI_API
-std::ostream &operator<<(
-    std::ostream &out,
-    const HgiGraphicsCmdsDesc &desc);
+std::ostream &operator<<(std::ostream &out, const HgiGraphicsCmdsDesc &desc);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

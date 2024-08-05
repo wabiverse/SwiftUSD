@@ -78,7 +78,7 @@ class TfAtomicOfstreamWrapper {
   TfAtomicOfstreamWrapper(const TfAtomicOfstreamWrapper &) = delete;
   TfAtomicOfstreamWrapper &operator=(const TfAtomicOfstreamWrapper &) = delete;
 
-public:
+ public:
   /// Constructor.
   TF_API explicit TfAtomicOfstreamWrapper(const std::string &filePath);
 
@@ -106,9 +106,12 @@ public:
   /// Returns the stream. If this is called before a call to Open, the
   /// returned file stream is not yet initialized. If called after Commit or
   /// Cancel, the returned file stream is closed.
-  std::ofstream &GetStream() { return _stream; }
+  std::ofstream &GetStream()
+  {
+    return _stream;
+  }
 
-private:
+ private:
   std::string _filePath;
   std::string _tmpFilePath;
   std::ofstream _stream;
@@ -116,4 +119,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ATOMIC_OFSTREAM_WRAPPER_H
+#endif  // PXR_BASE_TF_ATOMIC_OFSTREAM_WRAPPER_H

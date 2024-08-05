@@ -45,7 +45,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <> struct GfIsGfMatrix<class GfMatrix3f> {
+template<> struct GfIsGfMatrix<class GfMatrix3f> {
   static const bool value = true;
 };
 
@@ -81,7 +81,7 @@ class GfQuatf;
 ///        product R*S  will rotate a row vector, then scale
 ///        it.
 class GfMatrix3f {
-public:
+ public:
   typedef float ScalarType;
 
   static const size_t numRows = 3;
@@ -93,26 +93,46 @@ public:
   /// Constructor. Initializes the matrix from 9 independent
   /// \c float values, specified in row-major order. For example,
   /// parameter \e m10 specifies the value in row 1 and column 0.
-  GfMatrix3f(float m00, float m01, float m02, float m10, float m11, float m12,
-             float m20, float m21, float m22) {
+  GfMatrix3f(float m00,
+             float m01,
+             float m02,
+             float m10,
+             float m11,
+             float m12,
+             float m20,
+             float m21,
+             float m22)
+  {
     Set(m00, m01, m02, m10, m11, m12, m20, m21, m22);
   }
 
   /// Constructor. Initializes the matrix from a 3x3 array
   /// of \c float values, specified in row-major order.
-  GfMatrix3f(const float m[3][3]) { Set(m); }
+  GfMatrix3f(const float m[3][3])
+  {
+    Set(m);
+  }
 
   /// Constructor. Explicitly initializes the matrix to \e s times the
   /// identity matrix.
-  explicit GfMatrix3f(float s) { SetDiagonal(s); }
+  explicit GfMatrix3f(float s)
+  {
+    SetDiagonal(s);
+  }
 
   /// This explicit constructor initializes the matrix to \p s times
   /// the identity matrix.
-  explicit GfMatrix3f(int s) { SetDiagonal(s); }
+  explicit GfMatrix3f(int s)
+  {
+    SetDiagonal(s);
+  }
 
   /// Constructor. Explicitly initializes the matrix to diagonal form,
   /// with the \e i th element on the diagonal set to <c>v[i]</c>.
-  explicit GfMatrix3f(const GfVec3f &v) { SetDiagonal(v); }
+  explicit GfMatrix3f(const GfVec3f &v)
+  {
+    SetDiagonal(v);
+  }
 
   /// Constructor.  Initialize the matrix from a vector of vectors of
   /// double. The vector is expected to be 3x3. If it is
@@ -145,34 +165,46 @@ public:
   explicit GfMatrix3f(const class GfMatrix3d &m);
 
   /// Sets a row of the matrix from a Vec3.
-  void SetRow(int i, const GfVec3f &v) {
+  void SetRow(int i, const GfVec3f &v)
+  {
     _mtx[i][0] = v[0];
     _mtx[i][1] = v[1];
     _mtx[i][2] = v[2];
   }
 
   /// Sets a column of the matrix from a Vec3.
-  void SetColumn(int i, const GfVec3f &v) {
+  void SetColumn(int i, const GfVec3f &v)
+  {
     _mtx[0][i] = v[0];
     _mtx[1][i] = v[1];
     _mtx[2][i] = v[2];
   }
 
   /// Gets a row of the matrix as a Vec3.
-  GfVec3f GetRow(int i) const {
+  GfVec3f GetRow(int i) const
+  {
     return GfVec3f(_mtx[i][0], _mtx[i][1], _mtx[i][2]);
   }
 
   /// Gets a column of the matrix as a Vec3.
-  GfVec3f GetColumn(int i) const {
+  GfVec3f GetColumn(int i) const
+  {
     return GfVec3f(_mtx[0][i], _mtx[1][i], _mtx[2][i]);
   }
 
   /// Sets the matrix from 9 independent \c float values,
   /// specified in row-major order. For example, parameter \e m10 specifies
   /// the value in row 1 and column 0.
-  GfMatrix3f &Set(float m00, float m01, float m02, float m10, float m11,
-                  float m12, float m20, float m21, float m22) {
+  GfMatrix3f &Set(float m00,
+                  float m01,
+                  float m02,
+                  float m10,
+                  float m11,
+                  float m12,
+                  float m20,
+                  float m21,
+                  float m22)
+  {
     _mtx[0][0] = m00;
     _mtx[0][1] = m01;
     _mtx[0][2] = m02;
@@ -187,7 +219,8 @@ public:
 
   /// Sets the matrix from a 3x3 array of \c float
   /// values, specified in row-major order.
-  GfMatrix3f &Set(const float m[3][3]) {
+  GfMatrix3f &Set(const float m[3][3])
+  {
     _mtx[0][0] = m[0][0];
     _mtx[0][1] = m[0][1];
     _mtx[0][2] = m[0][2];
@@ -201,10 +234,16 @@ public:
   }
 
   /// Sets the matrix to the identity matrix.
-  GfMatrix3f &SetIdentity() { return SetDiagonal(1); }
+  GfMatrix3f &SetIdentity()
+  {
+    return SetDiagonal(1);
+  }
 
   /// Sets the matrix to zero.
-  GfMatrix3f &SetZero() { return SetDiagonal(0); }
+  GfMatrix3f &SetZero()
+  {
+    return SetDiagonal(0);
+  }
 
   /// Sets the matrix to \e s times the identity matrix.
   GF_API
@@ -221,33 +260,58 @@ public:
 
   /// Returns raw access to components of matrix as an array of
   /// \c float values.  Components are in row-major order.
-  float *data() { return _mtx.GetData(); }
+  float *data()
+  {
+    return _mtx.GetData();
+  }
 
   /// Returns const raw access to components of matrix as an array of
   /// \c float values.  Components are in row-major order.
-  const float *data() const { return _mtx.GetData(); }
+  const float *data() const
+  {
+    return _mtx.GetData();
+  }
 
   /// Returns vector components as an array of \c float values.
-  float *GetArray() { return _mtx.GetData(); }
+  float *GetArray()
+  {
+    return _mtx.GetData();
+  }
 
   /// Returns vector components as a const array of \c float values.
-  const float *GetArray() const { return _mtx.GetData(); }
+  const float *GetArray() const
+  {
+    return _mtx.GetData();
+  }
 
   /// Accesses an indexed row \e i of the matrix as an array of 3 \c
   /// float values so that standard indexing (such as <c>m[0][1]</c>)
   /// works correctly.
-  float *operator[](int i) { return _mtx[i]; }
+  float *operator[](int i)
+  {
+    return _mtx[i];
+  }
 
   /// Accesses an indexed row \e i of the matrix as an array of 3 \c
   /// float values so that standard indexing (such as <c>m[0][1]</c>)
   /// works correctly.
-  const float *operator[](int i) const { return _mtx[i]; }
+  const float *operator[](int i) const
+  {
+    return _mtx[i];
+  }
 
   /// Hash.
-  friend inline size_t hash_value(GfMatrix3f const &m) {
-    return TfHash::Combine(m._mtx[0][0], m._mtx[0][1], m._mtx[0][2],
-                           m._mtx[1][0], m._mtx[1][1], m._mtx[1][2],
-                           m._mtx[2][0], m._mtx[2][1], m._mtx[2][2]);
+  friend inline size_t hash_value(GfMatrix3f const &m)
+  {
+    return TfHash::Combine(m._mtx[0][0],
+                           m._mtx[0][1],
+                           m._mtx[0][2],
+                           m._mtx[1][0],
+                           m._mtx[1][1],
+                           m._mtx[1][2],
+                           m._mtx[2][0],
+                           m._mtx[2][1],
+                           m._mtx[2][2]);
   }
 
   /// Tests for element-wise matrix equality. All elements must match
@@ -262,11 +326,17 @@ public:
 
   /// Tests for element-wise matrix inequality. All elements must match
   /// exactly for matrices to be considered equal.
-  bool operator!=(const GfMatrix3d &m) const { return !(*this == m); }
+  bool operator!=(const GfMatrix3d &m) const
+  {
+    return !(*this == m);
+  }
 
   /// Tests for element-wise matrix inequality. All elements must match
   /// exactly for matrices to be considered equal.
-  bool operator!=(const GfMatrix3f &m) const { return !(*this == m); }
+  bool operator!=(const GfMatrix3f &m) const
+  {
+    return !(*this == m);
+  }
 
   /// Returns the transpose of the matrix.
   GF_API
@@ -307,11 +377,17 @@ public:
 
   /// Returns true if the vectors in the matrix form a right-handed
   /// coordinate system.
-  bool IsRightHanded() const { return GetHandedness() == 1.0; }
+  bool IsRightHanded() const
+  {
+    return GetHandedness() == 1.0;
+  }
 
   /// Returns true if the vectors in matrix form a left-handed
   /// coordinate system.
-  bool IsLeftHanded() const { return GetHandedness() == -1.0; }
+  bool IsLeftHanded() const
+  {
+    return GetHandedness() == -1.0;
+  }
 
   /// Post-multiplies matrix \e m into this matrix.
   GF_API
@@ -322,14 +398,18 @@ public:
   GfMatrix3f &operator*=(double);
 
   /// Returns the product of a matrix and a float.
-  friend GfMatrix3f operator*(const GfMatrix3f &m1, double d) {
+  friend GfMatrix3f operator*(const GfMatrix3f &m1, double d)
+  {
     GfMatrix3f m = m1;
     return m *= d;
   }
 
   ///
   // Returns the product of a matrix and a float.
-  friend GfMatrix3f operator*(double d, const GfMatrix3f &m) { return m * d; }
+  friend GfMatrix3f operator*(double d, const GfMatrix3f &m)
+  {
+    return m * d;
+  }
 
   /// Adds matrix \e m to this matrix.
   GF_API
@@ -344,45 +424,49 @@ public:
   friend GfMatrix3f operator-(const GfMatrix3f &m);
 
   /// Adds matrix \e m2 to \e m1
-  friend GfMatrix3f operator+(const GfMatrix3f &m1, const GfMatrix3f &m2) {
+  friend GfMatrix3f operator+(const GfMatrix3f &m1, const GfMatrix3f &m2)
+  {
     GfMatrix3f tmp(m1);
     tmp += m2;
     return tmp;
   }
 
   /// Subtracts matrix \e m2 from \e m1.
-  friend GfMatrix3f operator-(const GfMatrix3f &m1, const GfMatrix3f &m2) {
+  friend GfMatrix3f operator-(const GfMatrix3f &m1, const GfMatrix3f &m2)
+  {
     GfMatrix3f tmp(m1);
     tmp -= m2;
     return tmp;
   }
 
   /// Multiplies matrix \e m1 by \e m2.
-  friend GfMatrix3f operator*(const GfMatrix3f &m1, const GfMatrix3f &m2) {
+  friend GfMatrix3f operator*(const GfMatrix3f &m1, const GfMatrix3f &m2)
+  {
     GfMatrix3f tmp(m1);
     tmp *= m2;
     return tmp;
   }
 
   /// Divides matrix \e m1 by \e m2 (that is, <c>m1 * inv(m2)</c>).
-  friend GfMatrix3f operator/(const GfMatrix3f &m1, const GfMatrix3f &m2) {
+  friend GfMatrix3f operator/(const GfMatrix3f &m1, const GfMatrix3f &m2)
+  {
     return (m1 * m2.GetInverse());
   }
 
   /// Returns the product of a matrix \e m and a column vector \e vec.
-  friend inline GfVec3f operator*(const GfMatrix3f &m, const GfVec3f &vec) {
-    return GfVec3f(
-        vec[0] * m._mtx[0][0] + vec[1] * m._mtx[0][1] + vec[2] * m._mtx[0][2],
-        vec[0] * m._mtx[1][0] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[1][2],
-        vec[0] * m._mtx[2][0] + vec[1] * m._mtx[2][1] + vec[2] * m._mtx[2][2]);
+  friend inline GfVec3f operator*(const GfMatrix3f &m, const GfVec3f &vec)
+  {
+    return GfVec3f(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[0][1] + vec[2] * m._mtx[0][2],
+                   vec[0] * m._mtx[1][0] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[1][2],
+                   vec[0] * m._mtx[2][0] + vec[1] * m._mtx[2][1] + vec[2] * m._mtx[2][2]);
   }
 
   /// Returns the product of row vector \e vec and a matrix \e m.
-  friend inline GfVec3f operator*(const GfVec3f &vec, const GfMatrix3f &m) {
-    return GfVec3f(
-        vec[0] * m._mtx[0][0] + vec[1] * m._mtx[1][0] + vec[2] * m._mtx[2][0],
-        vec[0] * m._mtx[0][1] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[2][1],
-        vec[0] * m._mtx[0][2] + vec[1] * m._mtx[1][2] + vec[2] * m._mtx[2][2]);
+  friend inline GfVec3f operator*(const GfVec3f &vec, const GfMatrix3f &m)
+  {
+    return GfVec3f(vec[0] * m._mtx[0][0] + vec[1] * m._mtx[1][0] + vec[2] * m._mtx[2][0],
+                   vec[0] * m._mtx[0][1] + vec[1] * m._mtx[1][1] + vec[2] * m._mtx[2][1],
+                   vec[0] * m._mtx[0][2] + vec[1] * m._mtx[1][2] + vec[2] * m._mtx[2][2]);
   }
 
   /// Sets matrix to specify a uniform scaling by \e scaleFactor.
@@ -420,7 +504,8 @@ public:
   /// This is a convenience method that is equivalent to calling
   /// ExtractRotation().Decompose().
   GF_API
-  GfVec3f DecomposeRotation(const GfVec3f &axis0, const GfVec3f &axis1,
+  GfVec3f DecomposeRotation(const GfVec3f &axis0,
+                            const GfVec3f &axis1,
                             const GfVec3f &axis2) const;
 
   /// Returns the quaternion corresponding to this matrix. This works
@@ -433,12 +518,12 @@ public:
 
   /// @}
 
-private:
+ private:
   /// Set the matrix to the rotation given by a quaternion,
   /// defined by the real component \p r and imaginary components \p i.
   void _SetRotateFromQuat(float r, const GfVec3f &i);
 
-private:
+ private:
   /// Matrix storage, in row-major order.
   GfMatrixData<float, 3, 3> _mtx;
 
@@ -458,4 +543,4 @@ GF_API std::ostream &operator<<(std::ostream &, GfMatrix3f const &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_MATRIX3F_H
+#endif  // PXR_BASE_GF_MATRIX3F_H

@@ -54,7 +54,7 @@ class WorkDispatcher;
 /// without locking.
 ///
 class WorkSingularTask {
-public:
+ public:
   WorkSingularTask(WorkSingularTask const &) = delete;
   WorkSingularTask &operator=(WorkSingularTask const &) = delete;
 
@@ -68,34 +68,35 @@ public:
   ///
   /// After constructing a WorkSingularTask, call Wake() to ensure that the
   /// task runs at least once.
-  template <class Callable, class A1, class A2, ... class AN>
-  WorkSingularTask(WorkDispatcher &dispatcher, Callable &&c, A1 &&a1, A2 &&a2,
-                   ... AN &&aN);
+  template<class Callable, class A1, class A2, ... class AN>
+  WorkSingularTask(WorkDispatcher &dispatcher, Callable &&c, A1 &&a1, A2 &&a2, ... AN &&aN);
 
-#else // doxygen
+#else  // doxygen
 
-  template <class Callable, class... Args>
+  template<class Callable, class... Args>
   WorkSingularTask(WorkDispatcher &d, Callable &&c, Args &&...args)
-      : _waker(_MakeWaker(d, std::bind(std::forward<Callable>(c),
-                                       std::forward<Args>(args)...))),
-        _count(0) {}
+      : _waker(_MakeWaker(d, std::bind(std::forward<Callable>(c), std::forward<Args>(args)...))),
+        _count(0)
+  {
+  }
 
-#endif // doxygen
+#endif  // doxygen
 
   /// Ensure that this task runs at least once after this call.  The task is
   /// not guaranteed to run as many times as Wake() is invoked, only that it
   /// run at least once after a call to Wake().
-  inline void Wake() {
+  inline void Wake()
+  {
     if (++_count == 1)
       _waker(_count);
   }
 
-private:
-  template <class Dispatcher, class Fn> struct _Waker {
-    explicit _Waker(Dispatcher &d, Fn &&fn)
-        : _dispatcher(d), _fn(std::move(fn)) {}
+ private:
+  template<class Dispatcher, class Fn> struct _Waker {
+    explicit _Waker(Dispatcher &d, Fn &&fn) : _dispatcher(d), _fn(std::move(fn)) {}
 
-    void operator()(std::atomic_size_t &count) const {
+    void operator()(std::atomic_size_t &count) const
+    {
       _dispatcher.Run([this, &count]() {
         // We read the current refCount into oldCount, then we
         // invoke the task function.  Finally we try to CAS the
@@ -114,12 +115,11 @@ private:
     Fn _fn;
   };
 
-  template <class Dispatcher, class Fn>
-  static std::function<void(std::atomic_size_t &)> _MakeWaker(Dispatcher &d,
-                                                              Fn &&fn) {
+  template<class Dispatcher, class Fn>
+  static std::function<void(std::atomic_size_t &)> _MakeWaker(Dispatcher &d, Fn &&fn)
+  {
     return std::function<void(std::atomic_size_t &)>(
-        _Waker<Dispatcher, typename std::decay<Fn>::type>(
-            d, std::forward<Fn>(fn)));
+        _Waker<Dispatcher, typename std::decay<Fn>::type>(d, std::forward<Fn>(fn)));
   }
 
   std::function<void(std::atomic_size_t &)> _waker;
@@ -128,4 +128,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_SINGULAR_TASK_H
+#endif  // PXR_BASE_WORK_SINGULAR_TASK_H

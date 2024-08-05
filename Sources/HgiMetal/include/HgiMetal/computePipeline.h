@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HGI_METAL_COMPUTE_PIPELINE_H
 #define PXR_IMAGING_HGI_METAL_COMPUTE_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/computePipeline.h"
+#include <pxr/pxrns.h>
 
 #include "HgiMetal/api.h"
 
@@ -37,9 +37,8 @@ class HgiMetal;
 ///
 /// Metal implementation of HgiComputePipeline.
 ///
-class HgiMetalComputePipeline final : public HgiComputePipeline
-{
-public:
+class HgiMetalComputePipeline final : public HgiComputePipeline {
+ public:
   HGIMETAL_API
   HgiMetalComputePipeline(HgiMetal *hgi, HgiComputePipelineDesc const &desc);
 
@@ -53,7 +52,7 @@ public:
   HGIMETAL_API
   MTL::ComputePipelineState *GetMetalPipelineState();
 
-private:
+ private:
   HgiMetalComputePipeline() = delete;
   HgiMetalComputePipeline &operator=(const HgiMetalComputePipeline &) = delete;
   HgiMetalComputePipeline(const HgiMetalComputePipeline &) = delete;

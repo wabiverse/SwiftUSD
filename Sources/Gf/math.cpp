@@ -27,7 +27,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-double GfMod(double a, double b) {
+double GfMod(double a, double b)
+{
   double c = fmod(a, b);
   if (a < 0)
     return c ? (b + c) : 0;
@@ -35,7 +36,8 @@ double GfMod(double a, double b) {
     return c;
 }
 
-float GfMod(float a, float b) {
+float GfMod(float a, float b)
+{
   double c = fmodf(a, b);
   if (a < 0)
     return c ? (b + c) : 0;

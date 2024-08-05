@@ -29,10 +29,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Tf_MakePyConstructor {
 
-bp::object _DummyInit(bp::tuple const & /* args */, bp::dict const & /* kw */) {
+bp::object _DummyInit(bp::tuple const & /* args */, bp::dict const & /* kw */)
+{
   return bp::object();
 }
 
-} // namespace Tf_MakePyConstructor
+}  // namespace Tf_MakePyConstructor
 
 PXR_NAMESPACE_CLOSE_SCOPE

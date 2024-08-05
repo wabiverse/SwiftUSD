@@ -26,17 +26,17 @@
 
 /// \file usdSkel/root.h
 
-#include <pxr/pxrns.h>
-#include "UsdSkel/api.h"
-#include "UsdGeom/boundable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/boundable.h"
+#include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -60,9 +60,8 @@ class SdfAssetPath;
 /// See the extended \ref UsdSkel_SkelRoot "Skel Root Schema" documentation for
 /// more information.
 ///
-class UsdSkelRoot : public UsdGeomBoundable
-{
-public:
+class UsdSkelRoot : public UsdGeomBoundable {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -72,18 +71,12 @@ public:
   /// Equivalent to UsdSkelRoot::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdSkelRoot(const UsdPrim &prim = UsdPrim())
-      : UsdGeomBoundable(prim)
-  {
-  }
+  explicit UsdSkelRoot(const UsdPrim &prim = UsdPrim()) : UsdGeomBoundable(prim) {}
 
   /// Construct a UsdSkelRoot on the prim held by \p schemaObj .
   /// Should be preferred over UsdSkelRoot(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdSkelRoot(const UsdSchemaBase &schemaObj)
-      : UsdGeomBoundable(schemaObj)
-  {
-  }
+  explicit UsdSkelRoot(const UsdSchemaBase &schemaObj) : UsdGeomBoundable(schemaObj) {}
 
   /// Destructor.
   USDSKEL_API
@@ -93,8 +86,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSKEL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSkelRoot holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -106,8 +98,7 @@ public:
   /// \endcode
   ///
   USDSKEL_API
-  static UsdSkelRoot
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelRoot Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -132,17 +123,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDSKEL_API
-  static UsdSkelRoot
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelRoot Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSKEL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSKEL_API
@@ -154,7 +144,7 @@ private:
   USDSKEL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

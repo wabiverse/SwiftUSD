@@ -28,36 +28,31 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 /*static*/
-HdVectorDataSourceHandle
-HdVectorSchema::BuildRetained(
-    const size_t count,
-    const HdDataSourceBaseHandle *values)
+HdVectorDataSourceHandle HdVectorSchema::BuildRetained(const size_t count,
+                                                       const HdDataSourceBaseHandle *values)
 {
-    return HdRetainedSmallVectorDataSource::New(count, values);
+  return HdRetainedSmallVectorDataSource::New(count, values);
 }
 
-HdVectorDataSourceHandle
-HdVectorSchema::GetVector()
+HdVectorDataSourceHandle HdVectorSchema::GetVector()
 {
-    return _vector;
+  return _vector;
 }
 
-bool
-HdVectorSchema::IsDefined() const
+bool HdVectorSchema::IsDefined() const
 {
-    if (_vector) {
-        return true;
-    }
-    return false;
+  if (_vector) {
+    return true;
+  }
+  return false;
 }
 
-size_t
-HdVectorSchema::GetNumElements() const
+size_t HdVectorSchema::GetNumElements() const
 {
-    if (_vector) {
-        return _vector->GetNumElements();
-    }
-    return 0;
+  if (_vector) {
+    return _vector->GetNumElements();
+  }
+  return 0;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

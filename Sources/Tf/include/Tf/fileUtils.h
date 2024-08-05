@@ -118,8 +118,8 @@ bool TfMakeDirs(std::string const &path, int mode = -1, bool existOk = false);
 /// with \c topDown set to \c false. The final parameter is a vector of file
 /// names found in the directory path. The returned value determines whether
 /// the walk should be terminated (\c false), or continue (\c true).
-typedef std::function<bool(std::string const &, std::vector<std::string> *,
-                           std::vector<std::string> const &)>
+typedef std::function<bool(
+    std::string const &, std::vector<std::string> *, std::vector<std::string> const &)>
     TfWalkFunction;
 
 /// TfRmTree error handler function.
@@ -127,8 +127,7 @@ typedef std::function<bool(std::string const &, std::vector<std::string> *,
 /// The first parameter is the path which caused the error (file or directory),
 /// and the second parameter is an error message indicating why the error
 /// occurred.
-typedef std::function<void(std::string const &, std::string const &)>
-    TfWalkErrorHandler;
+typedef std::function<void(std::string const &, std::string const &)> TfWalkErrorHandler;
 
 /// error handler to use when you want to ignore errors
 ///
@@ -177,8 +176,11 @@ void TfWalkIgnoreErrorHandler(std::string const &path, std::string const &msg);
 /// the value of \p followLinks. Calling TfWalkDirs with a file argument
 /// returns immediately without calling \p fn.
 TF_API
-void TfWalkDirs(std::string const &top, TfWalkFunction fn, bool topDown = true,
-                TfWalkErrorHandler onError = 0, bool followLinks = false);
+void TfWalkDirs(std::string const &top,
+                TfWalkFunction fn,
+                bool topDown = true,
+                TfWalkErrorHandler onError = 0,
+                bool followLinks = false);
 
 /// Recursively delete a directory tree rooted at \p path.
 ///
@@ -196,8 +198,7 @@ void TfRmTree(std::string const &path, TfWalkErrorHandler onError = 0);
 /// in the listing.  If \p recursive is true, the directory listing will
 /// include all subdirectory structure of \p path.
 TF_API
-std::vector<std::string> TfListDir(std::string const &path,
-                                   bool recursive = false);
+std::vector<std::string> TfListDir(std::string const &path, bool recursive = false);
 
 /// Read the contents of \p dirPath and append the names of the contained
 /// directories, files, and symlinks to \p dirnames, \p filenames, and
@@ -210,7 +211,8 @@ std::vector<std::string> TfListDir(std::string const &path,
 /// It is safe to pass NULL for any of \p dirnames, \p filenames, and
 /// \p symlinknames. In that case those elements are not reported
 TF_API
-bool TfReadDir(std::string const &dirPath, std::vector<std::string> *dirnames,
+bool TfReadDir(std::string const &dirPath,
+               std::vector<std::string> *dirnames,
                std::vector<std::string> *filenames,
                std::vector<std::string> *symlinknames,
                std::string *errMsg = NULL);
@@ -227,4 +229,4 @@ bool TfTouchFile(std::string const &fileName, bool create = true);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_FILE_UTILS_H
+#endif  // PXR_BASE_TF_FILE_UTILS_H

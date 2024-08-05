@@ -51,39 +51,38 @@
  * has value 0xFF and that s1 and s2 started with the highest possible values
  * modulo the divisor.
  */
-#define MAX_CHUNK_LEN	5552
+#define MAX_CHUNK_LEN 5552
 
-static u32 MAYBE_UNUSED
-adler32_generic(u32 adler, const u8 *p, size_t len)
+static u32 MAYBE_UNUSED adler32_generic(u32 adler, const u8 *p, size_t len)
 {
-	u32 s1 = adler & 0xFFFF;
-	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
+  u32 s1 = adler & 0xFFFF;
+  u32 s2 = adler >> 16;
+  const u8 *const end = p + len;
 
-	while (p != end) {
-		size_t chunk_len = MIN(end - p, MAX_CHUNK_LEN);
-		const u8 *chunk_end = p + chunk_len;
-		size_t num_unrolled_iterations = chunk_len / 4;
+  while (p != end) {
+    size_t chunk_len = MIN(end - p, MAX_CHUNK_LEN);
+    const u8 *chunk_end = p + chunk_len;
+    size_t num_unrolled_iterations = chunk_len / 4;
 
-		while (num_unrolled_iterations--) {
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-		}
-		while (p != chunk_end) {
-			s1 += *p++;
-			s2 += s1;
-		}
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+    while (num_unrolled_iterations--) {
+      s1 += *p++;
+      s2 += s1;
+      s1 += *p++;
+      s2 += s1;
+      s1 += *p++;
+      s2 += s1;
+      s1 += *p++;
+      s2 += s1;
+    }
+    while (p != chunk_end) {
+      s1 += *p++;
+      s2 += s1;
+    }
+    s1 %= DIVISOR;
+    s2 %= DIVISOR;
+  }
 
-	return (s2 << 16) | s1;
+  return (s2 << 16) | s1;
 }
 
 /* Include architecture-specific implementation(s) if available. */
@@ -108,23 +107,22 @@ static volatile adler32_func_t adler32_impl = dispatch_adler32;
 /* Choose the best implementation at runtime. */
 static u32 dispatch_adler32(u32 adler, const u8 *p, size_t len)
 {
-	adler32_func_t f = arch_select_adler32_func();
+  adler32_func_t f = arch_select_adler32_func();
 
-	if (f == NULL)
-		f = DEFAULT_IMPL;
+  if (f == NULL)
+    f = DEFAULT_IMPL;
 
-	adler32_impl = f;
-	return f(adler, p, len);
+  adler32_impl = f;
+  return f(adler, p, len);
 }
 #else
 /* The best implementation is statically known, so call it directly. */
-#define adler32_impl DEFAULT_IMPL
+#  define adler32_impl DEFAULT_IMPL
 #endif
 
-LIBDEFLATEAPI u32
-libdeflate_adler32(u32 adler, const void *buffer, size_t len)
+LIBDEFLATEAPI u32 libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 {
-	if (buffer == NULL) /* Return initial value. */
-		return 1;
-	return adler32_impl(adler, (const u8*) buffer, len);
+  if (buffer == NULL) /* Return initial value. */
+    return 1;
+  return adler32_impl(adler, (const u8 *)buffer, len);
 }

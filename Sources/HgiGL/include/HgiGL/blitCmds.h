@@ -24,10 +24,10 @@
 #ifndef PXR_IMAGING_HGI_GL_BLIT_CMDS_H
 #define PXR_IMAGING_HGI_GL_BLIT_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/blitCmds.h"
 #include "HgiGL/api.h"
 #include "HgiGL/hgi.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,9 +35,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// OpenGL implementation of HgiBlitCmds.
 ///
-class HgiGLBlitCmds final : public HgiBlitCmds
-{
-public:
+class HgiGLBlitCmds final : public HgiBlitCmds {
+ public:
   HGIGL_API
   ~HgiGLBlitCmds() override;
 
@@ -77,7 +76,7 @@ public:
   HGIGL_API
   void InsertMemoryBarrier(HgiMemoryBarrier barrier) override;
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
@@ -86,7 +85,7 @@ protected:
   HGIGL_API
   bool _Submit(Hgi *hgi, HgiSubmitWaitType wait) override;
 
-private:
+ private:
   HgiGLBlitCmds &operator=(const HgiGLBlitCmds &) = delete;
   HgiGLBlitCmds(const HgiGLBlitCmds &) = delete;
 

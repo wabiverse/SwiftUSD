@@ -24,16 +24,15 @@
 #ifndef PXR_USD_PLUGIN_USD_ABC_ALEMBIC_FILE_FORMAT_H
 #define PXR_USD_PLUGIN_USD_ABC_ALEMBIC_FILE_FORMAT_H
 
-#include <pxr/pxrns.h>
 #include "Sdf/fileFormat.h"
 #include "Tf/staticTokens.h"
 #include <iosfwd>
+#include <pxr/pxrns.h>
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define USDABC_ALEMBIC_FILE_FORMAT_TOKENS \
-  ((Id, "abc"))((Version, "1.0"))((Target, "usd"))
+#define USDABC_ALEMBIC_FILE_FORMAT_TOKENS ((Id, "abc"))((Version, "1.0"))((Target, "usd"))
 
 TF_DECLARE_PUBLIC_TOKENS(UsdAbcAlembicFileFormatTokens, USDABC_ALEMBIC_FILE_FORMAT_TOKENS);
 
@@ -41,9 +40,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdAbcAlembicFileFormat);
 
 /// \class UsdAbcAlembicFileFormat
 ///
-class UsdAbcAlembicFileFormat : public SdfFileFormat
-{
-public:
+class UsdAbcAlembicFileFormat : public SdfFileFormat {
+ public:
   // SdfFileFormat overrides
   virtual SdfAbstractDataRefPtr InitData(const FileFormatArguments &) const override;
   virtual bool CanRead(const std::string &file) const override;
@@ -53,34 +51,30 @@ public:
   virtual bool WriteToFile(const SdfLayer &layer,
                            const std::string &filePath,
                            const std::string &comment = std::string(),
-                           const FileFormatArguments &args =
-                               FileFormatArguments()) const override;
-  virtual bool ReadFromString(SdfLayer *layer,
-                              const std::string &str) const override;
+                           const FileFormatArguments &args = FileFormatArguments()) const override;
+  virtual bool ReadFromString(SdfLayer *layer, const std::string &str) const override;
   virtual bool WriteToString(const SdfLayer &layer,
                              std::string *str,
-                             const std::string &comment = std::string())
-      const override;
+                             const std::string &comment = std::string()) const override;
   virtual bool WriteToStream(const SdfSpecHandle &spec,
                              std::ostream &out,
                              size_t indent) const override;
 
-protected:
+ protected:
   SDF_FILE_FORMAT_FACTORY_ACCESS;
 
   virtual ~UsdAbcAlembicFileFormat();
 
   UsdAbcAlembicFileFormat();
 
-  bool _ReadDetached(
-      SdfLayer *layer,
-      const std::string &resolvedPath,
-      bool metadataOnly) const override;
+  bool _ReadDetached(SdfLayer *layer,
+                     const std::string &resolvedPath,
+                     bool metadataOnly) const override;
 
-private:
+ private:
   SdfFileFormatConstPtr _usda;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_FILE_FORMAT_H
+#endif  // PXR_USD_PLUGIN_USD_ABC_ALEMBIC_FILE_FORMAT_H

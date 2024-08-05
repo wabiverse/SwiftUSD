@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdMedia/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdMedia/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdMediaTokens->auralMode);
 /// \endcode
-struct UsdMediaTokensType
-{
+struct UsdMediaTokensType {
   USDMEDIA_API UsdMediaTokensType();
   /// \brief "auralMode"
   ///
@@ -136,7 +135,8 @@ struct UsdMediaTokensType
   const TfToken startTime;
   /// \brief "thumbnails"
   ///
-  /// Dictionary key in the assetInfo["previews"]  dictionary for thumbnails previews sub-dictionary.
+  /// Dictionary key in the assetInfo["previews"]  dictionary for thumbnails previews
+  /// sub-dictionary.
   const TfToken thumbnails;
   /// \brief "AssetPreviewsAPI"
   ///

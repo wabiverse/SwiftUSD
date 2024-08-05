@@ -24,17 +24,16 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MESH_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MESH_H
 
-#include <pxr/pxrns.h>
-#include "hdPrman/gprim.h"
 #include "Hd/mesh.h"
+#include "hdPrman/gprim.h"
+#include <pxr/pxrns.h>
 
 #include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdPrman_Mesh final : public HdPrman_Gprim<HdMesh>
-{
-public:
+class HdPrman_Mesh final : public HdPrman_Gprim<HdMesh> {
+ public:
   using BASE = HdPrman_Gprim<HdMesh>;
 
   HF_MALLOC_TAG_NEW("new HdPrman_Mesh");
@@ -43,20 +42,19 @@ public:
 
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-protected:
-  RtPrimVarList
-  _ConvertGeometry(HdPrman_RenderParam *renderParam,
-                   HdSceneDelegate *sceneDelegate,
-                   const SdfPath &id,
-                   RtUString *primType,
-                   std::vector<HdGeomSubset> *geomSubsets) override;
+ protected:
+  RtPrimVarList _ConvertGeometry(HdPrman_RenderParam *renderParam,
+                                 HdSceneDelegate *sceneDelegate,
+                                 const SdfPath &id,
+                                 RtUString *primType,
+                                 std::vector<HdGeomSubset> *geomSubsets) override;
 
   bool _PrototypeOnly() override;
 
-private:
+ private:
   bool _isMeshLight;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MESH_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_MESH_H

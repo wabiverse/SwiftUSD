@@ -24,4 +24,3 @@
 #include "hdPrman/rixStrings.h"
 
 RiPredefinedStrings RixStr;
-

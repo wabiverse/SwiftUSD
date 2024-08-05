@@ -22,11 +22,11 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
-#include "Tf/pyResultConversions.h"
-#include "Tf/weakPtr.h"
 #include "Ndr/property.h"
 #include "Sdf/types.h"
+#include "Tf/pyResultConversions.h"
+#include "Tf/weakPtr.h"
+#include <pxr/pxrns.h>
 
 #include <boost/python.hpp>
 
@@ -36,26 +36,23 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 void wrapProperty()
 {
-    typedef NdrProperty This;
-    typedef NdrPropertyPtr ThisPtr;
+  typedef NdrProperty This;
+  typedef NdrPropertyPtr ThisPtr;
 
-    return_value_policy<copy_const_reference> copyRefPolicy;
+  return_value_policy<copy_const_reference> copyRefPolicy;
 
-    class_<This, ThisPtr, boost::noncopyable>("Property", no_init)
-        .def("__repr__", &This::GetInfoString)
-        .def("GetName", &This::GetName, copyRefPolicy)
-        .def("GetType", &This::GetType, copyRefPolicy)
-        .def("GetDefaultValue", &This::GetDefaultValue, copyRefPolicy)
-        .def("IsOutput", &This::IsOutput)
-        .def("IsArray", &This::IsArray)
-        .def("IsDynamicArray", &This::IsDynamicArray)
-        .def("GetArraySize", &This::GetArraySize)
-        .def("GetInfoString", &This::GetInfoString)
-        .def("GetMetadata", &This::GetMetadata,
-            return_value_policy<TfPyMapToDictionary>())
-        .def("IsConnectable", &This::IsConnectable)
-        .def("CanConnectTo", &This::CanConnectTo)
-        .def("GetTypeAsSdfType", &This::GetTypeAsSdfType,
-            return_value_policy<TfPyPairToTuple>())
-        ;
+  class_<This, ThisPtr, boost::noncopyable>("Property", no_init)
+      .def("__repr__", &This::GetInfoString)
+      .def("GetName", &This::GetName, copyRefPolicy)
+      .def("GetType", &This::GetType, copyRefPolicy)
+      .def("GetDefaultValue", &This::GetDefaultValue, copyRefPolicy)
+      .def("IsOutput", &This::IsOutput)
+      .def("IsArray", &This::IsArray)
+      .def("IsDynamicArray", &This::IsDynamicArray)
+      .def("GetArraySize", &This::GetArraySize)
+      .def("GetInfoString", &This::GetInfoString)
+      .def("GetMetadata", &This::GetMetadata, return_value_policy<TfPyMapToDictionary>())
+      .def("IsConnectable", &This::IsConnectable)
+      .def("CanConnectTo", &This::CanConnectTo)
+      .def("GetTypeAsSdfType", &This::GetTypeAsSdfType, return_value_policy<TfPyPairToTuple>());
 }

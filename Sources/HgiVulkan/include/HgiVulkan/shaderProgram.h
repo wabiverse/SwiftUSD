@@ -40,9 +40,8 @@ class HgiVulkanDevice;
 ///
 /// Vulkan implementation of HgiShaderProgram
 ///
-class HgiVulkanShaderProgram final : public HgiShaderProgram
-{
-public:
+class HgiVulkanShaderProgram final : public HgiShaderProgram {
+ public:
   HGIVULKAN_API
   ~HgiVulkanShaderProgram() override = default;
 
@@ -70,15 +69,13 @@ public:
   HGIVULKAN_API
   uint64_t &GetInflightBits();
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
-  HgiVulkanShaderProgram(
-      HgiVulkanDevice *device,
-      HgiShaderProgramDesc const &desc);
+  HgiVulkanShaderProgram(HgiVulkanDevice *device, HgiShaderProgramDesc const &desc);
 
-private:
+ private:
   HgiVulkanShaderProgram() = delete;
   HgiVulkanShaderProgram &operator=(const HgiVulkanShaderProgram &) = delete;
   HgiVulkanShaderProgram(const HgiVulkanShaderProgram &) = delete;

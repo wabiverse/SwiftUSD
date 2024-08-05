@@ -30,24 +30,24 @@
 #include <string>
 
 #if defined(ARCH_OS_WINDOWS)
-#define ARCH_LIBRARY_LAZY 0
-#define ARCH_LIBRARY_NOW 0
-#define ARCH_LIBRARY_LOCAL 0
-#define ARCH_LIBRARY_GLOBAL 0
-#define ARCH_LIBRARY_SUFFIX ".dll"
-#define ARCH_STATIC_LIBRARY_SUFFIX ".lib"
+#  define ARCH_LIBRARY_LAZY 0
+#  define ARCH_LIBRARY_NOW 0
+#  define ARCH_LIBRARY_LOCAL 0
+#  define ARCH_LIBRARY_GLOBAL 0
+#  define ARCH_LIBRARY_SUFFIX ".dll"
+#  define ARCH_STATIC_LIBRARY_SUFFIX ".lib"
 #else
-#include <dlfcn.h>
-#define ARCH_LIBRARY_LAZY RTLD_LAZY
-#define ARCH_LIBRARY_NOW RTLD_NOW
-#define ARCH_LIBRARY_LOCAL RTLD_LOCAL
-#define ARCH_LIBRARY_GLOBAL RTLD_GLOBAL
-#if defined(ARCH_OS_DARWIN)
-#define ARCH_LIBRARY_SUFFIX ".dylib"
-#else
-#define ARCH_LIBRARY_SUFFIX ".so"
-#endif
-#define ARCH_STATIC_LIBRARY_SUFFIX ".a"
+#  include <dlfcn.h>
+#  define ARCH_LIBRARY_LAZY RTLD_LAZY
+#  define ARCH_LIBRARY_NOW RTLD_NOW
+#  define ARCH_LIBRARY_LOCAL RTLD_LOCAL
+#  define ARCH_LIBRARY_GLOBAL RTLD_GLOBAL
+#  if defined(ARCH_OS_DARWIN)
+#    define ARCH_LIBRARY_SUFFIX ".dylib"
+#  else
+#    define ARCH_LIBRARY_SUFFIX ".so"
+#  endif
+#  define ARCH_STATIC_LIBRARY_SUFFIX ".a"
 #endif
 
 // On MacOS shared libraries and loadable modules (aka loadable bundles aka
@@ -55,9 +55,9 @@
 // that create  loadable modules use .so as the extension on MacOS for
 // compatibility, so we use that here.
 #if defined(ARCH_OS_DARWIN)
-#define ARCH_PLUGIN_SUFFIX ".so"
+#  define ARCH_PLUGIN_SUFFIX ".so"
 #else
-#define ARCH_PLUGIN_SUFFIX ARCH_LIBRARY_SUFFIX
+#  define ARCH_PLUGIN_SUFFIX ARCH_LIBRARY_SUFFIX
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -96,4 +96,4 @@ void *ArchLibraryGetSymbolAddress(void *handle, const char *name);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_LIBRARY_H
+#endif  // PXR_BASE_ARCH_LIBRARY_H

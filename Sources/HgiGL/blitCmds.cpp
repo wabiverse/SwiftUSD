@@ -23,6 +23,7 @@
 //
 #include "Garch/glApi.h"
 
+#include "Hgi/blitCmdsOps.h"
 #include "HgiGL/blitCmds.h"
 #include "HgiGL/buffer.h"
 #include "HgiGL/conversions.h"
@@ -32,23 +33,18 @@
 #include "HgiGL/ops.h"
 #include "HgiGL/scopedStateHolder.h"
 #include "HgiGL/texture.h"
-#include "Hgi/blitCmdsOps.h"
 
 #include "Tf/diagnostic.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiGLBlitCmds::HgiGLBlitCmds()
-    : HgiBlitCmds(), _pushStack(0)
-{
-}
+HgiGLBlitCmds::HgiGLBlitCmds() : HgiBlitCmds(), _pushStack(0) {}
 
 HgiGLBlitCmds::~HgiGLBlitCmds() = default;
 
 void HgiGLBlitCmds::PushDebugGroup(const char *label)
 {
-  if (HgiGLDebugEnabled())
-  {
+  if (HgiGLDebugEnabled()) {
     _pushStack++;
     _ops.push_back(HgiGLOps::PushDebugGroup(label));
   }
@@ -56,15 +52,13 @@ void HgiGLBlitCmds::PushDebugGroup(const char *label)
 
 void HgiGLBlitCmds::PopDebugGroup()
 {
-  if (HgiGLDebugEnabled())
-  {
+  if (HgiGLDebugEnabled()) {
     _pushStack--;
     _ops.push_back(HgiGLOps::PopDebugGroup());
   }
 }
 
-void HgiGLBlitCmds::CopyTextureGpuToCpu(
-    HgiTextureGpuToCpuOp const &copyOp)
+void HgiGLBlitCmds::CopyTextureGpuToCpu(HgiTextureGpuToCpuOp const &copyOp)
 {
   _ops.push_back(HgiGLOps::CopyTextureGpuToCpu(copyOp));
 }
@@ -74,8 +68,7 @@ void HgiGLBlitCmds::CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const &copyOp)
   _ops.push_back(HgiGLOps::CopyTextureCpuToGpu(copyOp));
 }
 
-void HgiGLBlitCmds::CopyBufferGpuToGpu(
-    HgiBufferGpuToGpuOp const &copyOp)
+void HgiGLBlitCmds::CopyBufferGpuToGpu(HgiBufferGpuToGpuOp const &copyOp)
 {
   _ops.push_back(HgiGLOps::CopyBufferGpuToGpu(copyOp));
 }
@@ -117,8 +110,7 @@ void HgiGLBlitCmds::InsertMemoryBarrier(HgiMemoryBarrier barrier)
 
 bool HgiGLBlitCmds::_Submit(Hgi *hgi, HgiSubmitWaitType wait)
 {
-  if (_ops.empty())
-  {
+  if (_ops.empty()) {
     return false;
   }
 

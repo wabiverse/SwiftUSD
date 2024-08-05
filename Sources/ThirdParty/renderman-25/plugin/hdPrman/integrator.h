@@ -24,19 +24,18 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INTEGRATOR_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INTEGRATOR_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sprim.h"
+#include <pxr/pxrns.h>
 
-#include "Riley.h"
 #include "Hd/material.h"
+#include "Riley.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdPrman_RenderParam;
 
-class HdPrman_Integrator : public HdSprim
-{
-public:
+class HdPrman_Integrator : public HdSprim {
+ public:
   HdPrman_Integrator(SdfPath const &id);
 
   void Sync(HdSceneDelegate *sceneDelegate,
@@ -50,4 +49,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INTEGRATOR_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_INTEGRATOR_H

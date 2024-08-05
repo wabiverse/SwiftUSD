@@ -40,8 +40,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class SdfChangeList;
-typedef std::vector<std::pair<SdfLayerHandle, SdfChangeList>>
-    SdfLayerChangeListVec;
+typedef std::vector<std::pair<SdfLayerHandle, SdfChangeList>> SdfLayerChangeListVec;
 
 /// \class SdfChangeList
 ///
@@ -49,7 +48,7 @@ typedef std::vector<std::pair<SdfLayerHandle, SdfChangeList>>
 /// paths where the changes occur.
 ///
 class SdfChangeList {
-public:
+ public:
   SdfChangeList() = default;
   SDF_API SdfChangeList(SdfChangeList const &);
   SdfChangeList(SdfChangeList &&) = default;
@@ -62,8 +61,7 @@ public:
   void DidReloadLayerContent();
   void DidChangeLayerResolvedPath();
   void DidChangeLayerIdentifier(const std::string &oldIdentifier);
-  void DidChangeSublayerPaths(const std::string &subLayerPath,
-                              SubLayerChangeType changeType);
+  void DidChangeSublayerPaths(const std::string &subLayerPath, SubLayerChangeType changeType);
 
   void DidAddPrim(const SdfPath &primPath, bool inert);
   void DidRemovePrim(const SdfPath &primPath, bool inert);
@@ -85,8 +83,10 @@ public:
   void DidAddTarget(const SdfPath &targetPath);
   void DidRemoveTarget(const SdfPath &targetPath);
 
-  void DidChangeInfo(const SdfPath &path, const TfToken &key,
-                     VtValue &&oldValue, const VtValue &newValue);
+  void DidChangeInfo(const SdfPath &path,
+                     const TfToken &key,
+                     VtValue &&oldValue,
+                     const VtValue &newValue);
 
   /// \struct Entry
   ///
@@ -116,10 +116,10 @@ public:
 
     /// Return the iterator in infoChanged whose first element is \p key, or
     /// infoChanged.end() if there is no such element.
-    InfoChangeVec::const_iterator FindInfoChange(TfToken const &key) const {
+    InfoChangeVec::const_iterator FindInfoChange(TfToken const &key) const
+    {
       InfoChangeVec::const_iterator iter = infoChanged.begin();
-      for (InfoChangeVec::const_iterator end = infoChanged.end(); iter != end;
-           ++iter) {
+      for (InfoChangeVec::const_iterator end = infoChanged.end(); iter != end; ++iter) {
         if (iter->first == key) {
           break;
         }
@@ -129,7 +129,8 @@ public:
 
     /// Return true if this entry has an info change for \p key, false
     /// otherwise.
-    bool HasInfoChange(TfToken const &key) const {
+    bool HasInfoChange(TfToken const &key) const
+    {
       return FindInfoChange(key) != infoChanged.end();
     }
 
@@ -144,7 +145,10 @@ public:
 
     // Most changes are stored as simple bits.
     struct _Flags {
-      _Flags() { memset(this, 0, sizeof(*this)); }
+      _Flags()
+      {
+        memset(this, 0, sizeof(*this));
+      }
 
       // SdfLayer
       bool didChangeIdentifier : 1;
@@ -193,8 +197,11 @@ public:
   /// single round of changes.
   using EntryList = TfSmallVector<std::pair<SdfPath, Entry>, 1>;
 
-public:
-  const EntryList &GetEntryList() const { return _entries; }
+ public:
+  const EntryList &GetEntryList() const
+  {
+    return _entries;
+  }
 
   // Change accessors/mutators
   SDF_API
@@ -205,16 +212,29 @@ public:
   SDF_API
   const_iterator FindEntry(SdfPath const &) const;
 
-  const_iterator begin() const { return _entries.begin(); }
+  const_iterator begin() const
+  {
+    return _entries.begin();
+  }
 
-  const_iterator cbegin() const { return _entries.cbegin(); }
+  const_iterator cbegin() const
+  {
+    return _entries.cbegin();
+  }
 
-  const_iterator end() const { return _entries.end(); }
+  const_iterator end() const
+  {
+    return _entries.end();
+  }
 
-  const_iterator cend() const { return _entries.cend(); }
+  const_iterator cend() const
+  {
+    return _entries.cend();
+  }
 
-private:
-  friend void swap(SdfChangeList &a, SdfChangeList &b) {
+ private:
+  friend void swap(SdfChangeList &a, SdfChangeList &b)
+  {
     a._entries.swap(b._entries);
     a._entriesAccel.swap(b._entriesAccel);
   }
@@ -245,4 +265,4 @@ SDF_API std::ostream &operator<<(std::ostream &, const SdfChangeList &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CHANGE_LIST_H
+#endif  // PXR_USD_SDF_CHANGE_LIST_H

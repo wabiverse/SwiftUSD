@@ -30,11 +30,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceReporterBase::TraceReporterBase(DataSourcePtr dataSource)
-    : _dataSource(std::move(dataSource)) {}
+TraceReporterBase::TraceReporterBase(DataSourcePtr dataSource) : _dataSource(std::move(dataSource))
+{
+}
 
-bool TraceReporterBase::SerializeProcessedCollections(
-    std::ostream &ostr) const {
+bool TraceReporterBase::SerializeProcessedCollections(std::ostream &ostr) const
+{
   std::vector<CollectionPtr> collections;
   for (const CollectionPtr &col : _processedCollections) {
     collections.push_back(col);
@@ -44,14 +45,16 @@ bool TraceReporterBase::SerializeProcessedCollections(
 
 TraceReporterBase::~TraceReporterBase() {}
 
-void TraceReporterBase::_Clear() {
+void TraceReporterBase::_Clear()
+{
   _processedCollections.clear();
   if (_dataSource) {
     _dataSource->Clear();
   }
 }
 
-void TraceReporterBase::_Update() {
+void TraceReporterBase::_Update()
+{
   if (!_dataSource)
     return;
 

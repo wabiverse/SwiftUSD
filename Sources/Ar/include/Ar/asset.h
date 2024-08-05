@@ -42,7 +42,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \see ArResolver::OpenAsset for how to retrieve instances of this object.
 class ArAsset {
-public:
+ public:
   AR_API
   virtual ~ArAsset();
 
@@ -102,11 +102,11 @@ public:
   AR_API
   virtual std::shared_ptr<ArAsset> GetDetachedAsset() const;
 
-protected:
+ protected:
   AR_API
   ArAsset();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_ASSET_H
+#endif  // PXR_USD_AR_ASSET_H

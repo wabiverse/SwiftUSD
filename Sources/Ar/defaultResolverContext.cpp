@@ -32,8 +32,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-ArDefaultResolverContext::ArDefaultResolverContext(
-    const std::vector<std::string> &searchPath) {
+ArDefaultResolverContext::ArDefaultResolverContext(const std::vector<std::string> &searchPath)
+{
   _searchPath.reserve(searchPath.size());
   for (const std::string &p : searchPath) {
     if (p.empty()) {
@@ -42,9 +42,10 @@ ArDefaultResolverContext::ArDefaultResolverContext(
 
     const std::string absPath = TfAbsPath(p);
     if (absPath.empty()) {
-      TF_WARN("Could not determine absolute path for search path prefix "
-              "'%s'",
-              p.c_str());
+      TF_WARN(
+          "Could not determine absolute path for search path prefix "
+          "'%s'",
+          p.c_str());
       continue;
     }
 
@@ -52,26 +53,28 @@ ArDefaultResolverContext::ArDefaultResolverContext(
   }
 }
 
-bool ArDefaultResolverContext::operator<(
-    const ArDefaultResolverContext &rhs) const {
+bool ArDefaultResolverContext::operator<(const ArDefaultResolverContext &rhs) const
+{
   return _searchPath < rhs._searchPath;
 }
 
-bool ArDefaultResolverContext::operator==(
-    const ArDefaultResolverContext &rhs) const {
+bool ArDefaultResolverContext::operator==(const ArDefaultResolverContext &rhs) const
+{
   return _searchPath == rhs._searchPath;
 }
 
-bool ArDefaultResolverContext::operator!=(
-    const ArDefaultResolverContext &rhs) const {
+bool ArDefaultResolverContext::operator!=(const ArDefaultResolverContext &rhs) const
+{
   return !(*this == rhs);
 }
 
-std::string ArDefaultResolverContext::GetAsString() const {
+std::string ArDefaultResolverContext::GetAsString() const
+{
   std::string result = "Search path: ";
   if (_searchPath.empty()) {
     result += "[ ]";
-  } else {
+  }
+  else {
     result += "[\n    ";
     result += TfStringJoin(_searchPath, "\n    ");
     result += "\n]";
@@ -79,7 +82,8 @@ std::string ArDefaultResolverContext::GetAsString() const {
   return result;
 }
 
-size_t hash_value(const ArDefaultResolverContext &context) {
+size_t hash_value(const ArDefaultResolverContext &context)
+{
   return TfHash()(context.GetSearchPath());
 }
 

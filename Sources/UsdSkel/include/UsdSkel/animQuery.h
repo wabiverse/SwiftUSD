@@ -26,8 +26,8 @@
 
 /// \file usdSkel/animQuery.h
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/declarePtrs.h"
 #include "Vt/types.h"
@@ -47,30 +47,33 @@ TF_DECLARE_REF_PTRS(UsdSkel_AnimQueryImpl);
 /// \class UsdSkelAnimQuery
 ///
 /// Class providing efficient queries of primitives that provide skel animation.
-class UsdSkelAnimQuery
-{
-public:
+class UsdSkelAnimQuery {
+ public:
   USDSKEL_API
   UsdSkelAnimQuery() {}
 
   /// Return true if this query is valid.
-  bool IsValid() const { return (bool)_impl; }
+  bool IsValid() const
+  {
+    return (bool)_impl;
+  }
 
   /// Boolean conversion operator. Equivalent to IsValid().
-  explicit operator bool() const { return IsValid(); }
+  explicit operator bool() const
+  {
+    return IsValid();
+  }
 
   /// Equality comparison.  Return true if \a lhs and \a rhs represent the
   /// same UsdSkelAnimQuery, false otherwise.
-  friend bool operator==(const UsdSkelAnimQuery &lhs,
-                         const UsdSkelAnimQuery &rhs)
+  friend bool operator==(const UsdSkelAnimQuery &lhs, const UsdSkelAnimQuery &rhs)
   {
     return lhs.GetPrim() == rhs.GetPrim();
   }
 
   /// Inequality comparison. Return false if \a lhs and \a rhs represent the
   /// same UsdSkelAnimQuery, true otherwise.
-  friend bool operator!=(const UsdSkelAnimQuery &lhs,
-                         const UsdSkelAnimQuery &rhs)
+  friend bool operator!=(const UsdSkelAnimQuery &lhs, const UsdSkelAnimQuery &rhs)
   {
     return !(lhs == rhs);
   }
@@ -88,26 +91,23 @@ public:
   /// Compute joint transforms in joint-local space.
   /// Transforms are returned in the order specified by the joint ordering
   /// of the animation primitive itself.
-  template <typename Matrix4>
-  USDSKEL_API bool ComputeJointLocalTransforms(
-      VtArray<Matrix4> *xforms,
-      UsdTimeCode time = UsdTimeCode::Default()) const;
+  template<typename Matrix4>
+  USDSKEL_API bool ComputeJointLocalTransforms(VtArray<Matrix4> *xforms,
+                                               UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Compute translation,rotation,scale components of the joint transforms
   /// in joint-local space. This is provided to facilitate direct streaming
   /// of animation data in a form that can efficiently be processed for
   /// animation blending.
   USDSKEL_API
-  bool ComputeJointLocalTransformComponents(
-      VtVec3fArray *translations,
-      VtQuatfArray *rotations,
-      VtVec3hArray *scales,
-      UsdTimeCode time = UsdTimeCode::Default()) const;
+  bool ComputeJointLocalTransformComponents(VtVec3fArray *translations,
+                                            VtQuatfArray *rotations,
+                                            VtVec3hArray *scales,
+                                            UsdTimeCode time = UsdTimeCode::Default()) const;
 
   USDSKEL_API
-  bool ComputeBlendShapeWeights(
-      VtFloatArray *weights,
-      UsdTimeCode time = UsdTimeCode::Default()) const;
+  bool ComputeBlendShapeWeights(VtFloatArray *weights,
+                                UsdTimeCode time = UsdTimeCode::Default()) const;
 
   /// Get the time samples at which values contributing to joint transforms
   /// are set. This only computes the time samples for sampling transforms in
@@ -181,9 +181,8 @@ public:
   USDSKEL_API
   std::string GetDescription() const;
 
-private:
-  UsdSkelAnimQuery(const UsdSkel_AnimQueryImplRefPtr &impl)
-      : _impl(impl) {}
+ private:
+  UsdSkelAnimQuery(const UsdSkel_AnimQueryImplRefPtr &impl) : _impl(impl) {}
 
   UsdSkel_AnimQueryImplRefPtr _impl;
 
@@ -192,4 +191,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_ANIM_QUERY_H
+#endif  // PXR_USD_USD_SKEL_ANIM_QUERY_H

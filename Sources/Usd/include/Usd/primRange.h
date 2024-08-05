@@ -119,7 +119,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// documented in the python help system.
 ///
 class UsdPrimRange {
-public:
+ public:
   class iterator;
 
   /// \class EndSentinel
@@ -127,7 +127,7 @@ public:
   /// This class lets us represent past-the-end without the full weight of an
   /// iterator.
   class EndSentinel {
-  private:
+   private:
     friend class UsdPrimRange;
     explicit EndSentinel(UsdPrimRange const *range) : _range(range) {}
     friend class UsdPrimRange::iterator;
@@ -139,23 +139,24 @@ public:
   /// A forward iterator into a UsdPrimRange.  Iterators are valid for the
   /// range they were obtained from.  An iterator \em i obtained from a range
   /// \em r is not valid for a range \em c copied from \em r.
-  class iterator : public boost::iterator_adaptor<
-                       iterator,                     // crtp base.
-                       Usd_PrimDataConstPtr,         // base iterator.
-                       UsdPrim,                      // value type.
-                       boost::forward_traversal_tag, // traversal.
-                       UsdPrim>                      // reference type.
+  class iterator : public boost::iterator_adaptor<iterator,                      // crtp base.
+                                                  Usd_PrimDataConstPtr,          // base iterator.
+                                                  UsdPrim,                       // value type.
+                                                  boost::forward_traversal_tag,  // traversal.
+                                                  UsdPrim>                       // reference type.
   {
-  public:
+   public:
     iterator() : iterator_adaptor_(nullptr) {}
 
     /// Allow implicit conversion from EndSentinel.
-    iterator(EndSentinel e)
-        : iterator_adaptor_(e._range->_end), _range(e._range) {}
+    iterator(EndSentinel e) : iterator_adaptor_(e._range->_end), _range(e._range) {}
 
     /// Return true if the iterator points to a prim visited the second time
     /// (in post order) for a pre- and post-order iterator, false otherwise.
-    bool IsPostVisit() const { return _isPost; }
+    bool IsPostVisit() const
+    {
+      return _isPost;
+    }
 
     /// Behave as if the current prim has no children when next advanced.
     /// Issue an error if this is a pre- and post-order iterator that
@@ -163,40 +164,47 @@ public:
     USD_API void PruneChildren();
 
     /// Return true if this iterator is equivalent to \p other.
-    inline bool operator==(iterator const &other) const {
+    inline bool operator==(iterator const &other) const
+    {
       return _range == other._range && base() == other.base() &&
              _proxyPrimPath == other._proxyPrimPath && _depth == other._depth &&
-             _pruneChildrenFlag == other._pruneChildrenFlag &&
-             _isPost == other._isPost;
+             _pruneChildrenFlag == other._pruneChildrenFlag && _isPost == other._isPost;
     }
 
     /// Return true if this iterator is equivalent to \p other.
-    inline bool operator==(EndSentinel const &other) const {
+    inline bool operator==(EndSentinel const &other) const
+    {
       return _range == other._range && base() == _range->_end;
     }
 
     /// Return true if this iterator is not equivalent to \p other.
-    inline bool operator!=(iterator const &other) const {
+    inline bool operator!=(iterator const &other) const
+    {
       return !(*this == other);
     }
 
     /// Return true if this iterator is not equivalent to \p other.
-    inline bool operator!=(EndSentinel const &other) const {
+    inline bool operator!=(EndSentinel const &other) const
+    {
       return !(*this == other);
     }
 
-  private:
+   private:
     friend class UsdPrimRange;
     friend class boost::iterator_core_access;
 
-    iterator(UsdPrimRange const *range, Usd_PrimDataConstPtr prim,
-             SdfPath proxyPrimPath, unsigned int depth)
-        : iterator_adaptor_(prim), _range(range), _proxyPrimPath(proxyPrimPath),
-          _depth(depth) {}
+    iterator(UsdPrimRange const *range,
+             Usd_PrimDataConstPtr prim,
+             SdfPath proxyPrimPath,
+             unsigned int depth)
+        : iterator_adaptor_(prim), _range(range), _proxyPrimPath(proxyPrimPath), _depth(depth)
+    {
+    }
 
     USD_API void increment();
 
-    inline reference dereference() const {
+    inline reference dereference() const
+    {
       return UsdPrim(base(), _proxyPrimPath);
     }
 
@@ -214,20 +222,21 @@ public:
 
   using const_iterator = iterator;
 
-  UsdPrimRange()
-      : _begin(nullptr), _end(nullptr), _initDepth(0), _postOrder(false) {}
+  UsdPrimRange() : _begin(nullptr), _end(nullptr), _initDepth(0), _postOrder(false) {}
 
   /// Construct a PrimRange that traverses the subtree rooted at \p start in
   /// depth-first order, visiting prims that pass the default predicate (as
   /// defined by #UsdPrimDefaultPredicate).
-  explicit UsdPrimRange(const UsdPrim &start) {
+  explicit UsdPrimRange(const UsdPrim &start)
+  {
     Usd_PrimDataConstPtr p = get_pointer(start._Prim());
     _Init(p, p ? p->GetNextPrim() : nullptr, start._ProxyPrimPath());
   }
 
   /// Construct a PrimRange that traverses the subtree rooted at \p start in
   /// depth-first order, visiting prims that pass \p predicate.
-  UsdPrimRange(const UsdPrim &start, const Usd_PrimFlagsPredicate &predicate) {
+  UsdPrimRange(const UsdPrim &start, const Usd_PrimFlagsPredicate &predicate)
+  {
     Usd_PrimDataConstPtr p = get_pointer(start._Prim());
     _Init(p, p ? p->GetNextPrim() : nullptr, start._ProxyPrimPath(), predicate);
   }
@@ -242,7 +251,8 @@ public:
   /// ordinary traversal but also immediately following its descendants.  This
   /// lets client code maintain state for subtrees.  See
   /// UsdPrimRange::iterator::IsPostVisit().
-  static UsdPrimRange PreAndPostVisit(const UsdPrim &start) {
+  static UsdPrimRange PreAndPostVisit(const UsdPrim &start)
+  {
     UsdPrimRange result(start);
     result._postOrder = true;
     return result;
@@ -258,7 +268,8 @@ public:
   /// lets client code maintain state for subtrees.  See
   /// UsdPrimRange::iterator::IsPostVisit().
   static UsdPrimRange PreAndPostVisit(const UsdPrim &start,
-                                      const Usd_PrimFlagsPredicate &predicate) {
+                                      const Usd_PrimFlagsPredicate &predicate)
+  {
     UsdPrimRange result(start, predicate);
     result._postOrder = true;
     return result;
@@ -267,7 +278,8 @@ public:
   /// Construct a PrimRange that traverses the subtree rooted at \p start in
   /// depth-first order, visiting all prims (including deactivated, undefined,
   /// and abstract prims).
-  static UsdPrimRange AllPrims(const UsdPrim &start) {
+  static UsdPrimRange AllPrims(const UsdPrim &start)
+  {
     return UsdPrimRange(start, UsdPrimAllPrimsPredicate);
   }
 
@@ -280,7 +292,8 @@ public:
   /// ordinary traversal but also immediately following its descendants.  This
   /// lets client code maintain state for subtrees.  See
   /// UsdPrimRange::iterator::IsPostVisit().
-  static UsdPrimRange AllPrimsPreAndPostVisit(const UsdPrim &start) {
+  static UsdPrimRange AllPrimsPreAndPostVisit(const UsdPrim &start)
+  {
     return PreAndPostVisit(start, UsdPrimAllPrimsPredicate);
   }
 
@@ -288,46 +301,59 @@ public:
   /// visits those that pass the default predicate (as defined by
   /// #UsdPrimDefaultPredicate).
   USD_API
-  static UsdPrimRange
-  Stage(const UsdStagePtr &stage,
-        const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate);
+  static UsdPrimRange Stage(const UsdStagePtr &stage,
+                            const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate);
 
   /// Create a PrimRange that traverses all the prims on \p stage, and
   /// visits those that pass the default predicate (as defined by
   /// #UsdPrimDefaultPredicate).
   USD_API
-  static UsdPrimRange
-  Stage(const UsdStagePtr &stage);
+  static UsdPrimRange Stage(const UsdStagePtr &stage);
 
   /// Return an iterator to the start of this range.
-  iterator begin() const {
+  iterator begin() const
+  {
     return iterator(this, _begin, _initProxyPrimPath, _initDepth);
   }
   /// Return a const_iterator to the start of this range.
-  const_iterator cbegin() const {
+  const_iterator cbegin() const
+  {
     return iterator(this, _begin, _initProxyPrimPath, _initDepth);
   }
 
   /// Return the first element of this range.  The range must not be empty().
-  UsdPrim front() const { return *begin(); }
+  UsdPrim front() const
+  {
+    return *begin();
+  }
 
   // XXX C++11 & 14 require that c/end() return the same type as c/begin() for
   // range-based-for loops to work correctly.  C++17 relaxes that requirement.
   // Change the return type to EndSentinel once we are on C++17.
 
   /// Return the past-the-end iterator for this range.
-  iterator end() const { return EndSentinel(this); }
+  iterator end() const
+  {
+    return EndSentinel(this);
+  }
   /// Return the past-the-end const_iterator for this range.
-  const_iterator cend() const { return EndSentinel(this); }
+  const_iterator cend() const
+  {
+    return EndSentinel(this);
+  }
 
   /// Modify this range by advancing the beginning by one.  The range must not
   /// be empty, and the range must not be a pre- and post-order range.
-  void increment_begin() { set_begin(++begin()); }
+  void increment_begin()
+  {
+    set_begin(++begin());
+  }
 
   /// Set the start of this range to \p newBegin.  The \p newBegin iterator
   /// must be within this range's begin() and end(), and must not have
   /// UsdPrimRange::iterator::IsPostVisit() be true.
-  void set_begin(iterator const &newBegin) {
+  void set_begin(iterator const &newBegin)
+  {
     TF_VERIFY(!newBegin.IsPostVisit());
     _begin = newBegin.base();
     _initProxyPrimPath = newBegin._proxyPrimPath;
@@ -335,50 +361,59 @@ public:
   }
 
   /// Return true if this range contains no prims, false otherwise.
-  bool empty() const { return begin() == end(); }
+  bool empty() const
+  {
+    return begin() == end();
+  }
 
   /// Return true if this range contains one or more prims, false otherwise.
-  explicit operator bool() const { return !empty(); }
+  explicit operator bool() const
+  {
+    return !empty();
+  }
 
   /// Return true if this range is equivalent to \p other.
-  bool operator==(UsdPrimRange const &other) const {
+  bool operator==(UsdPrimRange const &other) const
+  {
     return this == &other ||
            (_begin == other._begin && _end == other._end &&
-            _initProxyPrimPath == other._initProxyPrimPath &&
-            _predicate == other._predicate && _postOrder == other._postOrder &&
-            _initDepth == other._initDepth);
+            _initProxyPrimPath == other._initProxyPrimPath && _predicate == other._predicate &&
+            _postOrder == other._postOrder && _initDepth == other._initDepth);
   }
 
   /// Return true if this range is not equivalent to \p other.
-  bool operator!=(UsdPrimRange const &other) const { return !(*this == other); }
+  bool operator!=(UsdPrimRange const &other) const
+  {
+    return !(*this == other);
+  }
 
-private:
-  UsdPrimRange(
-      Usd_PrimDataConstPtr begin, Usd_PrimDataConstPtr end,
-      const SdfPath &proxyPrimPath,
-      const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate) {
+ private:
+  UsdPrimRange(Usd_PrimDataConstPtr begin,
+               Usd_PrimDataConstPtr end,
+               const SdfPath &proxyPrimPath,
+               const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate)
+  {
     _Init(begin, end, proxyPrimPath, predicate);
   }
 
   ////////////////////////////////////////////////////////////////////////
   // Helpers.
-  void
-  _Init(const Usd_PrimData *first, const Usd_PrimData *last,
-        const SdfPath &proxyPrimPath,
-        const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate) {
+  void _Init(const Usd_PrimData *first,
+             const Usd_PrimData *last,
+             const SdfPath &proxyPrimPath,
+             const Usd_PrimFlagsPredicate &predicate = UsdPrimDefaultPredicate)
+  {
     _begin = first;
     _end = last;
     _initProxyPrimPath = proxyPrimPath;
-    _predicate = _begin ? Usd_CreatePredicateForTraversal(_begin, proxyPrimPath,
-                                                          predicate)
-                        : predicate;
+    _predicate = _begin ? Usd_CreatePredicateForTraversal(_begin, proxyPrimPath, predicate) :
+                          predicate;
     _postOrder = false;
     _initDepth = 0;
 
     // Advance to the first prim that passes the predicate.
     iterator b = begin();
-    if (b.base() != _end &&
-        !Usd_EvalPredicate(_predicate, b.base(), proxyPrimPath)) {
+    if (b.base() != _end && !Usd_EvalPredicate(_predicate, b.base(), proxyPrimPath)) {
       b._pruneChildrenFlag = true;
       set_begin(++b);
     }
@@ -398,4 +433,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_RANGE_H
+#endif  // PXR_USD_USD_PRIM_RANGE_H

@@ -26,18 +26,18 @@
 
 /// \file usdLux/nonboundableLightBase.h
 
-#include <pxr/pxrns.h>
-#include "UsdLux/api.h"
-#include "UsdGeom/xformable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
-#include "UsdLux/lightAPI.h" 
+#include "UsdGeom/xformable.h"
+#include "UsdLux/api.h"
+#include "UsdLux/lightAPI.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -53,191 +53,176 @@ class SdfAssetPath;
 /// \class UsdLuxNonboundableLightBase
 ///
 /// Base class for intrinsic lights that are not boundable.
-/// 
-/// The primary purpose of this class is to provide a direct API to the 
-/// functions provided by LightAPI for concrete derived light types.
-/// 
 ///
-class UsdLuxNonboundableLightBase : public UsdGeomXformable
-{
-public:
-    /// Compile time constant representing what kind of schema this class is.
-    ///
-    /// \sa UsdSchemaKind
-    static const UsdSchemaKind schemaKind = UsdSchemaKind::AbstractTyped;
+/// The primary purpose of this class is to provide a direct API to the
+/// functions provided by LightAPI for concrete derived light types.
+///
+///
+class UsdLuxNonboundableLightBase : public UsdGeomXformable {
+ public:
+  /// Compile time constant representing what kind of schema this class is.
+  ///
+  /// \sa UsdSchemaKind
+  static const UsdSchemaKind schemaKind = UsdSchemaKind::AbstractTyped;
 
-    /// Construct a UsdLuxNonboundableLightBase on UsdPrim \p prim .
-    /// Equivalent to UsdLuxNonboundableLightBase::Get(prim.GetStage(), prim.GetPath())
-    /// for a \em valid \p prim, but will not immediately throw an error for
-    /// an invalid \p prim
-    explicit UsdLuxNonboundableLightBase(const UsdPrim& prim=UsdPrim())
-        : UsdGeomXformable(prim)
-    {
-    }
+  /// Construct a UsdLuxNonboundableLightBase on UsdPrim \p prim .
+  /// Equivalent to UsdLuxNonboundableLightBase::Get(prim.GetStage(), prim.GetPath())
+  /// for a \em valid \p prim, but will not immediately throw an error for
+  /// an invalid \p prim
+  explicit UsdLuxNonboundableLightBase(const UsdPrim &prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
-    /// Construct a UsdLuxNonboundableLightBase on the prim held by \p schemaObj .
-    /// Should be preferred over UsdLuxNonboundableLightBase(schemaObj.GetPrim()),
-    /// as it preserves SchemaBase state.
-    explicit UsdLuxNonboundableLightBase(const UsdSchemaBase& schemaObj)
-        : UsdGeomXformable(schemaObj)
-    {
-    }
+  /// Construct a UsdLuxNonboundableLightBase on the prim held by \p schemaObj .
+  /// Should be preferred over UsdLuxNonboundableLightBase(schemaObj.GetPrim()),
+  /// as it preserves SchemaBase state.
+  explicit UsdLuxNonboundableLightBase(const UsdSchemaBase &schemaObj)
+      : UsdGeomXformable(schemaObj)
+  {
+  }
 
-    /// Destructor.
-    USDLUX_API
-    virtual ~UsdLuxNonboundableLightBase();
+  /// Destructor.
+  USDLUX_API
+  virtual ~UsdLuxNonboundableLightBase();
 
-    /// Return a vector of names of all pre-declared attributes for this schema
-    /// class and all its ancestor classes.  Does not include attributes that
-    /// may be authored by custom/extended methods of the schemas involved.
-    USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+  /// Return a vector of names of all pre-declared attributes for this schema
+  /// class and all its ancestor classes.  Does not include attributes that
+  /// may be authored by custom/extended methods of the schemas involved.
+  USDLUX_API
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
-    /// Return a UsdLuxNonboundableLightBase holding the prim adhering to this
-    /// schema at \p path on \p stage.  If no prim exists at \p path on
-    /// \p stage, or if the prim at that path does not adhere to this schema,
-    /// return an invalid schema object.  This is shorthand for the following:
-    ///
-    /// \code
-    /// UsdLuxNonboundableLightBase(stage->GetPrimAtPath(path));
-    /// \endcode
-    ///
-    USDLUX_API
-    static UsdLuxNonboundableLightBase
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+  /// Return a UsdLuxNonboundableLightBase holding the prim adhering to this
+  /// schema at \p path on \p stage.  If no prim exists at \p path on
+  /// \p stage, or if the prim at that path does not adhere to this schema,
+  /// return an invalid schema object.  This is shorthand for the following:
+  ///
+  /// \code
+  /// UsdLuxNonboundableLightBase(stage->GetPrimAtPath(path));
+  /// \endcode
+  ///
+  USDLUX_API
+  static UsdLuxNonboundableLightBase Get(const UsdStagePtr &stage, const SdfPath &path);
 
+ protected:
+  /// Returns the kind of schema this class belongs to.
+  ///
+  /// \sa UsdSchemaKind
+  USDLUX_API
+  UsdSchemaKind _GetSchemaKind() const override;
 
-protected:
-    /// Returns the kind of schema this class belongs to.
-    ///
-    /// \sa UsdSchemaKind
-    USDLUX_API
-    UsdSchemaKind _GetSchemaKind() const override;
+ private:
+  // needs to invoke _GetStaticTfType.
+  friend class UsdSchemaRegistry;
+  USDLUX_API
+  static const TfType &_GetStaticTfType();
 
-private:
-    // needs to invoke _GetStaticTfType.
-    friend class UsdSchemaRegistry;
-    USDLUX_API
-    static const TfType &_GetStaticTfType();
+  static bool _IsTypedSchema();
 
-    static bool _IsTypedSchema();
+  // override SchemaBase virtuals.
+  USDLUX_API
+  const TfType &_GetTfType() const override;
 
-    // override SchemaBase virtuals.
-    USDLUX_API
-    const TfType &_GetTfType() const override;
+ public:
+  // ===================================================================== //
+  // Feel free to add custom code below this line, it will be preserved by
+  // the code generator.
+  //
+  // Just remember to:
+  //  - Close the class declaration with };
+  //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
+  //  - Close the include guard with #endif
+  // ===================================================================== //
+  // --(BEGIN CUSTOM CODE)--
 
-public:
-    // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
-    //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
-    //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
-    //  - Close the include guard with #endif
-    // ===================================================================== //
-    // --(BEGIN CUSTOM CODE)--
+  /// \name LightAPI
+  ///
+  /// Convenience accessors for the light's built-in UsdLuxLightAPI
+  ///
+  /// @{
 
-    /// \name LightAPI
-    /// 
-    /// Convenience accessors for the light's built-in UsdLuxLightAPI
-    /// 
-    /// @{
+  /// Contructs and returns a UsdLuxLightAPI object for this light.
+  USDLUX_API
+  UsdLuxLightAPI LightAPI() const;
 
-    /// Contructs and returns a UsdLuxLightAPI object for this light.
-    USDLUX_API
-    UsdLuxLightAPI LightAPI() const;
+  /// See UsdLuxLightAPI::GetIntensityAttr().
+  USDLUX_API
+  UsdAttribute GetIntensityAttr() const;
 
-    /// See UsdLuxLightAPI::GetIntensityAttr().
-    USDLUX_API
-    UsdAttribute GetIntensityAttr() const;
+  /// See UsdLuxLightAPI::CreateIntensityAttr().
+  USDLUX_API
+  UsdAttribute CreateIntensityAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateIntensityAttr().
-    USDLUX_API
-    UsdAttribute CreateIntensityAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetExposureAttr().
+  USDLUX_API
+  UsdAttribute GetExposureAttr() const;
 
-    /// See UsdLuxLightAPI::GetExposureAttr().
-    USDLUX_API
-    UsdAttribute GetExposureAttr() const;
+  /// See UsdLuxLightAPI::CreateExposureAttr().
+  USDLUX_API
+  UsdAttribute CreateExposureAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateExposureAttr().
-    USDLUX_API
-    UsdAttribute CreateExposureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetDiffuseAttr().
+  USDLUX_API
+  UsdAttribute GetDiffuseAttr() const;
 
-    /// See UsdLuxLightAPI::GetDiffuseAttr().
-    USDLUX_API
-    UsdAttribute GetDiffuseAttr() const;
+  /// See UsdLuxLightAPI::CreateDiffuseAttr().
+  USDLUX_API
+  UsdAttribute CreateDiffuseAttr(VtValue const &defaultValue = VtValue(),
+                                 bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateDiffuseAttr().
-    USDLUX_API
-    UsdAttribute CreateDiffuseAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetSpecularAttr().
+  USDLUX_API
+  UsdAttribute GetSpecularAttr() const;
 
-    /// See UsdLuxLightAPI::GetSpecularAttr().
-    USDLUX_API
-    UsdAttribute GetSpecularAttr() const;
+  /// See UsdLuxLightAPI::CreateSpecularAttr().
+  USDLUX_API
+  UsdAttribute CreateSpecularAttr(VtValue const &defaultValue = VtValue(),
+                                  bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateSpecularAttr().
-    USDLUX_API
-    UsdAttribute CreateSpecularAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetNormalizeAttr().
+  USDLUX_API
+  UsdAttribute GetNormalizeAttr() const;
 
-    /// See UsdLuxLightAPI::GetNormalizeAttr().
-    USDLUX_API
-    UsdAttribute GetNormalizeAttr() const;
+  /// See UsdLuxLightAPI::CreateNormalizeAttr().
+  USDLUX_API
+  UsdAttribute CreateNormalizeAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateNormalizeAttr().
-    USDLUX_API
-    UsdAttribute CreateNormalizeAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetColorAttr().
+  USDLUX_API
+  UsdAttribute GetColorAttr() const;
 
-    /// See UsdLuxLightAPI::GetColorAttr().
-    USDLUX_API
-    UsdAttribute GetColorAttr() const;
+  /// See UsdLuxLightAPI::CreateColorAttr().
+  USDLUX_API
+  UsdAttribute CreateColorAttr(VtValue const &defaultValue = VtValue(),
+                               bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateColorAttr().
-    USDLUX_API
-    UsdAttribute CreateColorAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetEnableColorTemperatureAttr().
+  USDLUX_API
+  UsdAttribute GetEnableColorTemperatureAttr() const;
 
-    /// See UsdLuxLightAPI::GetEnableColorTemperatureAttr().
-    USDLUX_API
-    UsdAttribute GetEnableColorTemperatureAttr() const;
+  /// See UsdLuxLightAPI::CreateEnableColorTemperatureAttr().
+  USDLUX_API
+  UsdAttribute CreateEnableColorTemperatureAttr(VtValue const &defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateEnableColorTemperatureAttr().
-    USDLUX_API
-    UsdAttribute CreateEnableColorTemperatureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetColorTemperatureAttr().
+  USDLUX_API
+  UsdAttribute GetColorTemperatureAttr() const;
 
-    /// See UsdLuxLightAPI::GetColorTemperatureAttr().
-    USDLUX_API
-    UsdAttribute GetColorTemperatureAttr() const;
+  /// See UsdLuxLightAPI::CreateColorTemperatureAttr().
+  USDLUX_API
+  UsdAttribute CreateColorTemperatureAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-    /// See UsdLuxLightAPI::CreateColorTemperatureAttr().
-    USDLUX_API
-    UsdAttribute CreateColorTemperatureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+  /// See UsdLuxLightAPI::GetFiltersRel().
+  USDLUX_API
+  UsdRelationship GetFiltersRel() const;
 
-    /// See UsdLuxLightAPI::GetFiltersRel().
-    USDLUX_API
-    UsdRelationship GetFiltersRel() const;
+  /// See UsdLuxLightAPI::CreateFiltersRel().
+  USDLUX_API
+  UsdRelationship CreateFiltersRel() const;
 
-    /// See UsdLuxLightAPI::CreateFiltersRel().
-    USDLUX_API
-    UsdRelationship CreateFiltersRel() const;
-
-    /// @}
+  /// @}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

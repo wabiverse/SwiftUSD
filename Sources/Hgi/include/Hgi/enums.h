@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_ENUMS_H
 #define PXR_IMAGING_HGI_ENUMS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include <cstdint>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -76,8 +76,7 @@ using HgiBits = uint32_t;
 ///   Indirect command buffers are supported</li>
 /// </ul>
 ///
-enum HgiDeviceCapabilitiesBits : HgiBits
-{
+enum HgiDeviceCapabilitiesBits : HgiBits {
   HgiDeviceCapabilitiesBitsPresentation = 1 << 0,
   HgiDeviceCapabilitiesBitsBindlessBuffers = 1 << 1,
   HgiDeviceCapabilitiesBitsConcurrentDispatch = 1 << 2,
@@ -117,8 +116,7 @@ using HgiDeviceCapabilities = HgiBits;
 ///   An array of two-dimensional textures.</li>
 /// </ul>
 ///
-enum HgiTextureType
-{
+enum HgiTextureType {
   HgiTextureType1D = 0,
   HgiTextureType2D,
   HgiTextureType3D,
@@ -152,8 +150,7 @@ enum HgiTextureType
 ///   specific  bits to the usage bit. </li>
 /// </ul>
 ///
-enum HgiTextureUsageBits : HgiBits
-{
+enum HgiTextureUsageBits : HgiBits {
   HgiTextureUsageBitsColorTarget = 1 << 0,
   HgiTextureUsageBitsDepthTarget = 1 << 1,
   HgiTextureUsageBitsStencilTarget = 1 << 2,
@@ -169,8 +166,7 @@ using HgiTextureUsage = HgiBits;
 ///
 /// Various modes used during sampling of a texture.
 ///
-enum HgiSamplerAddressMode
-{
+enum HgiSamplerAddressMode {
   HgiSamplerAddressModeClampToEdge = 0,
   HgiSamplerAddressModeMirrorClampToEdge,
   HgiSamplerAddressModeRepeat,
@@ -191,8 +187,7 @@ enum HgiSamplerAddressMode
 ///   Combines the values of multiple mipmap levels.</li>
 /// </ul>
 ///
-enum HgiSamplerFilter
-{
+enum HgiSamplerFilter {
   HgiSamplerFilterNearest = 0,
   HgiSamplerFilterLinear = 1,
 
@@ -212,8 +207,7 @@ enum HgiSamplerFilter
 ///   Linear interpolates the values of up to two mipmap levels.</li>
 /// </ul>
 ///
-enum HgiMipFilter
-{
+enum HgiMipFilter {
   HgiMipFilterNotMipmapped = 0,
   HgiMipFilterNearest = 1,
   HgiMipFilterLinear = 2,
@@ -231,8 +225,7 @@ enum HgiMipFilter
 /// <li>HgiBorderColorOpaqueWhite</li>
 /// </ul>
 ///
-enum HgiBorderColor
-{
+enum HgiBorderColor {
   HgiBorderColorTransparentBlack = 0,
   HgiBorderColorOpaqueBlack = 1,
   HgiBorderColorOpaqueWhite = 2,
@@ -244,8 +237,7 @@ enum HgiBorderColor
 ///
 /// Sample count for multi-sampling
 ///
-enum HgiSampleCount
-{
+enum HgiSampleCount {
   HgiSampleCount1 = 1,
   HgiSampleCount2 = 2,
   HgiSampleCount4 = 4,
@@ -268,8 +260,7 @@ enum HgiSampleCount
 ///   Previous pixel data is loaded into attachment prior to rendering.</li>
 /// </ul>
 ///
-enum HgiAttachmentLoadOp
-{
+enum HgiAttachmentLoadOp {
   HgiAttachmentLoadOpDontCare = 0,
   HgiAttachmentLoadOpClear,
   HgiAttachmentLoadOpLoad,
@@ -288,8 +279,7 @@ enum HgiAttachmentLoadOp
 ///   The attachment pixel data is stored in memory.</li>
 /// </ul>
 ///
-enum HgiAttachmentStoreOp
-{
+enum HgiAttachmentStoreOp {
   HgiAttachmentStoreOpDontCare = 0,
   HgiAttachmentStoreOpStore,
 
@@ -315,8 +305,7 @@ enum HgiAttachmentStoreOp
 ///   specific  bits to the usage bit. </li>
 /// </ul>
 ///
-enum HgiBufferUsageBits : HgiBits
-{
+enum HgiBufferUsageBits : HgiBits {
   HgiBufferUsageUniform = 1 << 0,
   HgiBufferUsageIndex32 = 1 << 1,
   HgiBufferUsageVertex = 1 << 2,
@@ -354,8 +343,7 @@ using HgiBufferUsage = HgiBits;
 ///   vertex processing.</li>
 /// </ul>
 ///
-enum HgiShaderStageBits : HgiBits
-{
+enum HgiShaderStageBits : HgiBits {
   HgiShaderStageVertex = 1 << 0,
   HgiShaderStageFragment = 1 << 1,
   HgiShaderStageCompute = 1 << 2,
@@ -394,8 +382,7 @@ using HgiShaderStage = HgiBits;
 ///   Tessellation factors for Metal tessellation.</li>
 /// </ul>
 ///
-enum HgiBindResourceType
-{
+enum HgiBindResourceType {
   HgiBindResourceTypeSampler = 0,
   HgiBindResourceTypeSampledImage,
   HgiBindResourceTypeCombinedSamplerImage,
@@ -420,8 +407,7 @@ enum HgiBindResourceType
 ///   Polygon vertices are drawn as points.</li>
 /// </ul>
 ///
-enum HgiPolygonMode
-{
+enum HgiPolygonMode {
   HgiPolygonModeFill = 0,
   HgiPolygonModeLine,
   HgiPolygonModePoint,
@@ -444,8 +430,7 @@ enum HgiPolygonMode
 ///   All primitive are discarded.</li>
 /// </ul>
 ///
-enum HgiCullMode
-{
+enum HgiCullMode {
   HgiCullModeNone = 0,
   HgiCullModeFront,
   HgiCullModeBack,
@@ -465,8 +450,7 @@ enum HgiCullMode
 ///   Primitives with counter-clockwise vertex-order are front facing.</li>
 /// </ul>
 ///
-enum HgiWinding
-{
+enum HgiWinding {
   HgiWindingClockwise = 0,
   HgiWindingCounterClockwise,
 
@@ -477,8 +461,7 @@ enum HgiWinding
 ///
 /// Blend operations
 ///
-enum HgiBlendOp
-{
+enum HgiBlendOp {
   HgiBlendOpAdd = 0,
   HgiBlendOpSubtract,
   HgiBlendOpReverseSubtract,
@@ -492,8 +475,7 @@ enum HgiBlendOp
 ///
 /// Blend factors
 ///
-enum HgiBlendFactor
-{
+enum HgiBlendFactor {
   HgiBlendFactorZero = 0,
   HgiBlendFactorOne,
   HgiBlendFactorSrcColor,
@@ -522,8 +504,7 @@ enum HgiBlendFactor
 /// Describes whether to permit or restrict writing to color components
 /// of a color attachment.
 ///
-enum HgiColorMaskBits : HgiBits
-{
+enum HgiColorMaskBits : HgiBits {
   HgiColorMaskRed = 1 << 0,
   HgiColorMaskGreen = 1 << 1,
   HgiColorMaskBlue = 1 << 2,
@@ -535,8 +516,7 @@ using HgiColorMask = HgiBits;
 ///
 /// Compare functions.
 ///
-enum HgiCompareFunction
-{
+enum HgiCompareFunction {
   HgiCompareFunctionNever = 0,
   HgiCompareFunctionLess,
   HgiCompareFunctionEqual,
@@ -553,8 +533,7 @@ enum HgiCompareFunction
 ///
 /// Stencil operations.
 ///
-enum HgiStencilOp
-{
+enum HgiStencilOp {
   HgiStencilOpKeep = 0,
   HgiStencilOpZero,
   HgiStencilOpReplace,
@@ -571,8 +550,7 @@ enum HgiStencilOp
 ///
 /// Swizzle for a component.
 ///
-enum HgiComponentSwizzle
-{
+enum HgiComponentSwizzle {
   HgiComponentSwizzleZero = 0,
   HgiComponentSwizzleOne,
   HgiComponentSwizzleR,
@@ -604,8 +582,7 @@ enum HgiComponentSwizzle
 ///   Rasterize two triangles for every separate set of four vertices.</li>
 /// </ul>
 ///
-enum HgiPrimitiveType
-{
+enum HgiPrimitiveType {
   HgiPrimitiveTypePointList = 0,
   HgiPrimitiveTypeLineList,
   HgiPrimitiveTypeLineStrip,
@@ -635,8 +612,7 @@ enum HgiPrimitiveType
 ///   New attribute data is fetched for each draw in a multi-draw command.</li>
 /// </ul>
 ///
-enum HgiVertexBufferStepFunction
-{
+enum HgiVertexBufferStepFunction {
   HgiVertexBufferStepFunctionConstant = 0,
   HgiVertexBufferStepFunctionPerVertex,
   HgiVertexBufferStepFunctionPerInstance,
@@ -658,8 +634,7 @@ enum HgiVertexBufferStepFunction
 ///   The CPU waits ("blocked") until the GPU has consumed the cmds.</li>
 /// </ul>
 ///
-enum HgiSubmitWaitType
-{
+enum HgiSubmitWaitType {
   HgiSubmitWaitTypeNoWait = 0,
   HgiSubmitWaitTypeWaitUntilCompleted,
 };
@@ -675,11 +650,7 @@ enum HgiSubmitWaitType
 ///   The barrier affects all memory writes and reads.</li>
 /// </ul>
 ///
-enum HgiMemoryBarrierBits
-{
-  HgiMemoryBarrierNone = 0,
-  HgiMemoryBarrierAll = 1 << 0
-};
+enum HgiMemoryBarrierBits { HgiMemoryBarrierNone = 0, HgiMemoryBarrierAll = 1 << 0 };
 using HgiMemoryBarrier = HgiBits;
 
 /// \enum HgiBindingType
@@ -709,8 +680,7 @@ using HgiMemoryBarrier = HgiBits;
 ///   Msl example: int *parameter;</li>
 /// </ul>
 ///
-enum HgiBindingType
-{
+enum HgiBindingType {
   HgiBindingTypeValue = 0,
   HgiBindingTypeUniformValue,
   HgiBindingTypeArray,
@@ -737,8 +707,7 @@ enum HgiBindingType
 ///   Msl example: vec2 parameter[[center_no_perspective]];</li>
 /// </ul>
 ///
-enum HgiInterpolationType
-{
+enum HgiInterpolationType {
   HgiInterpolationDefault = 0,
   HgiInterpolationFlat,
   HgiInterpolationNoPerspective,
@@ -763,8 +732,7 @@ enum HgiInterpolationType
 ///   Msl example: vec2 parameter[[sample_perspective]];</li>
 /// </ul>
 ///
-enum HgiSamplingType
-{
+enum HgiSamplingType {
   HgiSamplingDefault = 0,
   HgiSamplingCentroid,
   HgiSamplingSample,
@@ -783,8 +751,7 @@ enum HgiSamplingType
 ///   Glsl example: patch vec2 parameter;</li>
 /// </ul>
 ///
-enum HgiStorageType
-{
+enum HgiStorageType {
   HgiStorageDefault = 0,
   HgiStoragePatch,
 };
@@ -802,8 +769,7 @@ enum HgiStorageType
 ///   Indicates an array texture.</li>
 /// </ul>
 ///
-enum HgiShaderTextureType
-{
+enum HgiShaderTextureType {
   HgiShaderTextureTypeTexture = 0,
   HgiShaderTextureTypeShadowTexture,
   HgiShaderTextureTypeArrayTexture
@@ -820,11 +786,7 @@ enum HgiShaderTextureType
 ///   Kernels are dispatched concurrently, if supported by the API</li>
 /// </ul>
 ///
-enum HgiComputeDispatch
-{
-  HgiComputeDispatchSerial = 0,
-  HgiComputeDispatchConcurrent
-};
+enum HgiComputeDispatch { HgiComputeDispatchSerial = 0, HgiComputeDispatchConcurrent };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

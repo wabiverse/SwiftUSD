@@ -22,99 +22,87 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "Hd/rendererPluginRegistry.h"
+#include "Hd/pluginRenderDelegateUniqueHandle.h"
 #include "Hd/rendererPlugin.h"
 #include "Hd/rendererPluginHandle.h"
-#include "Hd/pluginRenderDelegateUniqueHandle.h"
 
 #include "Tf/instantiateSingleton.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+TF_INSTANTIATE_SINGLETON(HdRendererPluginRegistry);
 
-TF_INSTANTIATE_SINGLETON( HdRendererPluginRegistry );
-
-HdRendererPluginRegistry &
-HdRendererPluginRegistry::GetInstance()
+HdRendererPluginRegistry &HdRendererPluginRegistry::GetInstance()
 {
-    return TfSingleton< HdRendererPluginRegistry >::GetInstance();
+  return TfSingleton<HdRendererPluginRegistry>::GetInstance();
 }
-
 
 HdRendererPluginRegistry::HdRendererPluginRegistry()
- : HfPluginRegistry(TfType::Find<HdRendererPlugin>())
+    : HfPluginRegistry(TfType::Find<HdRendererPlugin>())
 {
 }
-
 
 HdRendererPluginRegistry::~HdRendererPluginRegistry() = default;
 
-TfToken 
-HdRendererPluginRegistry::GetDefaultPluginId(bool gpuEnabled)
+TfToken HdRendererPluginRegistry::GetDefaultPluginId(bool gpuEnabled)
 {
-    // Get all the available plugins to see if any of them is supported on this
-    // platform and use the first one as the default.
-    // 
-    // Important note, we want to avoid loading plugins as much as possible, 
-    // we would prefer to only load plugins when the user asks for them.  So
-    // we will only load plugins until we find the first one that works.
-    HfPluginDescVector pluginDescriptors;
-    GetPluginDescs(&pluginDescriptors);
-    for (const HfPluginDesc &desc : pluginDescriptors) {
-        
-        HdRendererPlugin *plugin = HdRendererPluginRegistry::GetInstance().
-            GetRendererPlugin(desc.id);
+  // Get all the available plugins to see if any of them is supported on this
+  // platform and use the first one as the default.
+  //
+  // Important note, we want to avoid loading plugins as much as possible,
+  // we would prefer to only load plugins when the user asks for them.  So
+  // we will only load plugins until we find the first one that works.
+  HfPluginDescVector pluginDescriptors;
+  GetPluginDescs(&pluginDescriptors);
+  for (const HfPluginDesc &desc : pluginDescriptors) {
 
-        // Important to bail out as soon as we found a plugin that works to
-        // avoid loading plugins unnecessary as that can be arbitrarily
-        // expensive.
-        if (plugin && plugin->IsSupported(gpuEnabled)) {
-            HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
-            return desc.id;
-        }
+    HdRendererPlugin *plugin = HdRendererPluginRegistry::GetInstance().GetRendererPlugin(desc.id);
 
-        HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
+    // Important to bail out as soon as we found a plugin that works to
+    // avoid loading plugins unnecessary as that can be arbitrarily
+    // expensive.
+    if (plugin && plugin->IsSupported(gpuEnabled)) {
+      HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
+      return desc.id;
     }
 
-    return TfToken();
+    HdRendererPluginRegistry::GetInstance().ReleasePlugin(plugin);
+  }
+
+  return TfToken();
 }
 
-HdRendererPlugin *
-HdRendererPluginRegistry::GetRendererPlugin(const TfToken &pluginId)
+HdRendererPlugin *HdRendererPluginRegistry::GetRendererPlugin(const TfToken &pluginId)
 {
-    return static_cast<HdRendererPlugin *>(GetPlugin(pluginId));
+  return static_cast<HdRendererPlugin *>(GetPlugin(pluginId));
 }
 
-HdRendererPluginHandle
-HdRendererPluginRegistry::GetOrCreateRendererPlugin(const TfToken &pluginId)
+HdRendererPluginHandle HdRendererPluginRegistry::GetOrCreateRendererPlugin(const TfToken &pluginId)
 {
-    return HdRendererPluginHandle(GetRendererPlugin(pluginId));
+  return HdRendererPluginHandle(GetRendererPlugin(pluginId));
 }
 
-HdPluginRenderDelegateUniqueHandle
-HdRendererPluginRegistry::CreateRenderDelegate(
-    const TfToken &pluginId,
-    HdRenderSettingsMap const & settingsMap)
+HdPluginRenderDelegateUniqueHandle HdRendererPluginRegistry::CreateRenderDelegate(
+    const TfToken &pluginId, HdRenderSettingsMap const &settingsMap)
 {
-    HdRendererPluginHandle plugin = GetOrCreateRendererPlugin(pluginId);
-    if (!plugin) {
-        TF_CODING_ERROR("Couldn't find plugin for id %s", pluginId.GetText());
-        return nullptr;
+  HdRendererPluginHandle plugin = GetOrCreateRendererPlugin(pluginId);
+  if (!plugin) {
+    TF_CODING_ERROR("Couldn't find plugin for id %s", pluginId.GetText());
+    return nullptr;
+  }
+
+  HdPluginRenderDelegateUniqueHandle result = plugin->CreateDelegate(settingsMap);
+
+  if (result) {
+    HfPluginDesc desc;
+    if (GetPluginDesc(pluginId, &desc)) {
+      // provide render delegate instance with display name to facilitate
+      // association of this renderer to other code and resources
+      result->_SetRendererDisplayName(desc.displayName);
     }
+  }
 
-    HdPluginRenderDelegateUniqueHandle result =
-        plugin->CreateDelegate(settingsMap);
-
-    if (result) {
-        HfPluginDesc desc;
-        if (GetPluginDesc(pluginId, &desc)) {
-            // provide render delegate instance with display name to facilitate
-            // association of this renderer to other code and resources
-            result->_SetRendererDisplayName(desc.displayName);
-        }
-    }
-
-    return result;
+  return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

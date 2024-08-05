@@ -55,38 +55,42 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static string __repr__(GfDualQuatf const &self) {
+static string __repr__(GfDualQuatf const &self)
+{
   return TF_PY_REPR_PREFIX + "DualQuatf(" + TfPyRepr(self.GetReal()) + ", " +
          TfPyRepr(self.GetDual()) + ")";
 }
 
-static GfDualQuatf __truediv__(const GfDualQuatf &self, float value) {
+static GfDualQuatf __truediv__(const GfDualQuatf &self, float value)
+{
   return self / value;
 }
 
-static GfDualQuatf &__itruediv__(GfDualQuatf &self, float value) {
+static GfDualQuatf &__itruediv__(GfDualQuatf &self, float value)
+{
   return self /= value;
 }
 
-static size_t __hash__(GfDualQuatf const &self) { return TfHash{}(self); }
+static size_t __hash__(GfDualQuatf const &self)
+{
+  return TfHash{}(self);
+}
 
 // Zero-initialized default ctor for python.
-static GfDualQuatf *__init__() {
+static GfDualQuatf *__init__()
+{
   return new GfDualQuatf(GfQuatf(0), GfQuatf(0));
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapDualQuatf() {
-  object getReal = make_function(&GfDualQuatf::GetReal,
-                                 return_value_policy<return_by_value>());
-  object setReal = make_function((void(GfDualQuatf::*)(const GfQuatf &)) &
-                                 GfDualQuatf::SetReal);
+void wrapDualQuatf()
+{
+  object getReal = make_function(&GfDualQuatf::GetReal, return_value_policy<return_by_value>());
+  object setReal = make_function((void(GfDualQuatf::*)(const GfQuatf &)) & GfDualQuatf::SetReal);
 
-  object getDual = make_function(&GfDualQuatf::GetDual,
-                                 return_value_policy<return_by_value>());
-  object setDual = make_function((void(GfDualQuatf::*)(const GfQuatf &)) &
-                                 GfDualQuatf::SetDual);
+  object getDual = make_function(&GfDualQuatf::GetDual, return_value_policy<return_by_value>());
+  object setDual = make_function((void(GfDualQuatf::*)(const GfQuatf &)) & GfDualQuatf::SetDual);
 
   def("Dot", (float (*)(const GfDualQuatf &, const GfDualQuatf &))GfDot);
 
@@ -99,8 +103,7 @@ void wrapDualQuatf() {
       .def(init<float>(arg("realVal")))
       .def(init<const GfQuatf &>(arg("real")))
       .def(init<const GfQuatf &, const GfQuatf &>((arg("real"), arg("dual"))))
-      .def(init<const GfQuatf &, const GfVec3f &>(
-          (arg("rotation"), arg("translation"))))
+      .def(init<const GfQuatf &, const GfVec3f &>((arg("rotation"), arg("translation"))))
       .def(init<const GfDualQuatd &>())
 
       .def("GetZero", &GfDualQuatf::GetZero)
@@ -119,19 +122,18 @@ void wrapDualQuatf() {
 
       .def("GetLength", &GfDualQuatf::GetLength)
 
-      .def("GetNormalized", &GfDualQuatf::GetNormalized,
-           (arg("eps") = GF_MIN_VECTOR_LENGTH))
-      .def("Normalize", &GfDualQuatf::Normalize,
-           (arg("eps") = GF_MIN_VECTOR_LENGTH), return_self<>())
+      .def("GetNormalized", &GfDualQuatf::GetNormalized, (arg("eps") = GF_MIN_VECTOR_LENGTH))
+      .def("Normalize",
+           &GfDualQuatf::Normalize,
+           (arg("eps") = GF_MIN_VECTOR_LENGTH),
+           return_self<>())
 
       .def("GetConjugate", &GfDualQuatf::GetConjugate)
       .def("GetInverse", &GfDualQuatf::GetInverse)
-      .def("SetTranslation", (void(GfDualQuatf::*)(const GfVec3f &)) &
-                                 GfDualQuatf::SetTranslation)
+      .def("SetTranslation", (void(GfDualQuatf::*)(const GfVec3f &)) & GfDualQuatf::SetTranslation)
       .def("GetTranslation", &GfDualQuatf::GetTranslation)
 
-      .def("Transform", (GfVec3f(GfDualQuatf::*)(const GfVec3f &) const) &
-                            GfDualQuatf::Transform)
+      .def("Transform", (GfVec3f(GfDualQuatf::*)(const GfVec3f &) const) & GfDualQuatf::Transform)
 
       .def(str(self))
       .def(self == self)
@@ -153,8 +155,7 @@ void wrapDualQuatf() {
 
   implicitly_convertible<GfDualQuath, GfDualQuatf>();
 
-  to_python_converter<std::vector<GfDualQuatf>,
-                      TfPySequenceToPython<std::vector<GfDualQuatf>>>();
+  to_python_converter<std::vector<GfDualQuatf>, TfPySequenceToPython<std::vector<GfDualQuatf>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / float() ) above, which

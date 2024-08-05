@@ -8,9 +8,9 @@
 #include <Usd/attributeQuery.h>
 #include <Usd/clip.h>
 #include <Usd/clipCache.h>
-#include <Usd/clipsAPI.h>
 #include <Usd/clipSet.h>
 #include <Usd/clipSetDefinition.h>
+#include <Usd/clipsAPI.h>
 #include <Usd/collectionAPI.h>
 #include <Usd/collectionMembershipQuery.h>
 #include <Usd/common.h>
@@ -49,8 +49,8 @@
 #include <Usd/references.h>
 #include <Usd/relationship.h>
 #include <Usd/resolveInfo.h>
-#include <Usd/resolver.h>
 #include <Usd/resolveTarget.h>
+#include <Usd/resolver.h>
 #include <Usd/schemaBase.h>
 #include <Usd/schemaRegistry.h>
 #include <Usd/shared.h>
@@ -62,9 +62,9 @@
 #include <Usd/timeCode.h>
 #include <Usd/tokens.h>
 #include <Usd/typed.h>
+#include <Usd/usdFileFormat.h>
 #include <Usd/usdaFileFormat.h>
 #include <Usd/usdcFileFormat.h>
-#include <Usd/usdFileFormat.h>
 #include <Usd/usdzFileFormat.h>
 #include <Usd/usdzResolver.h>
 #include <Usd/valueUtils.h>
@@ -74,4 +74,4 @@
 
 #include <Usd/stage.h>
 
-#endif // __PXR_USD_USD_H__
+#endif  // __PXR_USD_USD_H__

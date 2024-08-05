@@ -155,7 +155,7 @@ class SdfAssetPath;
 /// UsdTokens->rightHanded as the value.
 ///
 class UsdCollectionAPI : public UsdAPISchemaBase {
-public:
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -170,16 +170,19 @@ public:
   ///
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdCollectionAPI(const UsdPrim &prim = UsdPrim(),
-                            const TfToken &name = TfToken())
-      : UsdAPISchemaBase(prim, /*instanceName*/ name) {}
+  explicit UsdCollectionAPI(const UsdPrim &prim = UsdPrim(), const TfToken &name = TfToken())
+      : UsdAPISchemaBase(prim, /*instanceName*/ name)
+  {
+  }
 
   /// Construct a UsdCollectionAPI on the prim held by \p schemaObj with
   /// name \p name.  Should be preferred over
   /// UsdCollectionAPI(schemaObj.GetPrim(), name), as it preserves
   /// SchemaBase state.
   explicit UsdCollectionAPI(const UsdSchemaBase &schemaObj, const TfToken &name)
-      : UsdAPISchemaBase(schemaObj, /*instanceName*/ name) {}
+      : UsdAPISchemaBase(schemaObj, /*instanceName*/ name)
+  {
+  }
 
   /// Destructor.
   USD_API
@@ -189,8 +192,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USD_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a vector of names of all pre-declared attributes for this schema
   /// class and all its ancestor classes for a given instance name.  Does not
@@ -198,11 +200,13 @@ public:
   /// the schemas involved. The names returned will have the proper namespace
   /// prefix.
   USD_API
-  static TfTokenVector GetSchemaAttributeNames(bool includeInherited,
-                                               const TfToken &instanceName);
+  static TfTokenVector GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
 
   /// Returns the name of this multiple-apply schema instance
-  TfToken GetName() const { return _GetInstanceName(); }
+  TfToken GetName() const
+  {
+    return _GetInstanceName();
+  }
 
   /// Return a UsdCollectionAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -259,8 +263,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USD_API
-  static bool CanApply(const UsdPrim &prim, const TfToken &name,
-                       std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, const TfToken &name, std::string *whyNot = nullptr);
 
   /// Applies this <b>multiple-apply</b> API schema to the given \p prim
   /// along with the given instance name, \p name.
@@ -284,14 +287,14 @@ public:
   USD_API
   static UsdCollectionAPI Apply(const UsdPrim &prim, const TfToken &name);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USD_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USD_API
@@ -303,7 +306,7 @@ private:
   USD_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // EXPANSIONRULE
   // --------------------------------------------------------------------- //
@@ -330,7 +333,7 @@ public:
   UsdAttribute CreateExpansionRuleAttr(VtValue const &defaultValue = VtValue(),
                                        bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INCLUDEROOT
   // --------------------------------------------------------------------- //
@@ -357,7 +360,7 @@ public:
   UsdAttribute CreateIncludeRootAttr(VtValue const &defaultValue = VtValue(),
                                      bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // COLLECTION
   // --------------------------------------------------------------------- //
@@ -386,7 +389,7 @@ public:
   UsdAttribute CreateCollectionAttr(VtValue const &defaultValue = VtValue(),
                                     bool writeSparsely = false) const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // INCLUDES
   // --------------------------------------------------------------------- //
@@ -404,7 +407,7 @@ public:
   USD_API
   UsdRelationship CreateIncludesRel() const;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // EXCLUDES
   // --------------------------------------------------------------------- //
@@ -429,7 +432,7 @@ public:
   USD_API
   UsdRelationship CreateExcludesRel() const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -441,18 +444,16 @@ public:
   // ===================================================================== //
   // --(BEGIN CUSTOM CODE)--
 
-public:
+ public:
   /// Returns the collection represented by the given collection path,
   /// \p collectionPath on the given USD stage.
   USD_API
-  static UsdCollectionAPI GetCollection(const UsdStagePtr &stage,
-                                        const SdfPath &collectionPath);
+  static UsdCollectionAPI GetCollection(const UsdStagePtr &stage, const SdfPath &collectionPath);
 
   /// Returns the schema object representing a collection named \p name on
   /// the given \p prim.
   USD_API
-  static UsdCollectionAPI GetCollection(const UsdPrim &prim,
-                                        const TfToken &name);
+  static UsdCollectionAPI GetCollection(const UsdPrim &prim, const TfToken &name);
 
   /// Returns all the named collections on the given USD prim.
   /// \deprecated Use GetAll(prim) instead.
@@ -473,8 +474,7 @@ public:
   ///
   /// \sa GetCollectionPath()
   USD_API
-  static SdfPath GetNamedCollectionPath(const UsdPrim &prim,
-                                        const TfToken &collectionName);
+  static SdfPath GetNamedCollectionPath(const UsdPrim &prim, const TfToken &collectionName);
 
   // Convenient alias for UsdCollectionMembershipQuery object
   using MembershipQuery = UsdCollectionMembershipQuery;
@@ -506,7 +506,8 @@ public:
   /// The results depends on the load state of the UsdStage, \p stage.
   USD_API
   static std::set<UsdObject> ComputeIncludedObjects(
-      const UsdCollectionMembershipQuery &query, const UsdStageWeakPtr &stage,
+      const UsdCollectionMembershipQuery &query,
+      const UsdStageWeakPtr &stage,
       const Usd_PrimFlagsPredicate &pred = UsdPrimDefaultPredicate);
 
   /// Returns all the paths that satisfy the predicate, \p pred in the
@@ -516,7 +517,8 @@ public:
   /// The result depends on the load state of the UsdStage, \p stage.
   USD_API
   static SdfPathSet ComputeIncludedPaths(
-      const UsdCollectionMembershipQuery &query, const UsdStageWeakPtr &stage,
+      const UsdCollectionMembershipQuery &query,
+      const UsdStageWeakPtr &stage,
       const Usd_PrimFlagsPredicate &pred = UsdPrimDefaultPredicate);
 
   /// @}
@@ -590,7 +592,7 @@ public:
   USD_API
   static bool CanContainPropertyName(const TfToken &name);
 
-private:
+ private:
   // Helper method for computing the UsdCollectionMembershipQuery object for
   // a collection.
   // This makes recursive calls if the collection includes other collections.
@@ -601,10 +603,9 @@ private:
   // circular dependency is detected amongst the included collections.
   // If it is nullptr, a warning is issued when a circular dependency is
   // detected.
-  void
-  _ComputeMembershipQueryImpl(UsdCollectionMembershipQuery *query,
-                              const SdfPathSet &chainedCollectionPaths,
-                              bool *foundCircularDependency = nullptr) const;
+  void _ComputeMembershipQueryImpl(UsdCollectionMembershipQuery *query,
+                                   const SdfPathSet &chainedCollectionPaths,
+                                   bool *foundCircularDependency = nullptr) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

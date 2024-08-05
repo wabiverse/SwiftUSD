@@ -44,12 +44,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 // ----------------------------------------
 // A set of functions using TRACE_FUNCTION, TRACE_SCOPE
 
-static void TestNestingFunc2() {
+static void TestNestingFunc2()
+{
   TRACE_FUNCTION();
   std::this_thread::sleep_for(1us);
 }
 
-static void TestNestingFunc3() {
+static void TestNestingFunc3()
+{
   TRACE_FUNCTION();
   std::this_thread::sleep_for(1us);
   TRACE_SCOPE("Foo");
@@ -59,7 +61,8 @@ static void TestNestingFunc3() {
   TF_UNUSED(gc);
 }
 
-static void TestNestingFunc1() {
+static void TestNestingFunc1()
+{
   TRACE_FUNCTION();
   std::this_thread::sleep_for(1us);
 
@@ -67,7 +70,8 @@ static void TestNestingFunc1() {
   TestNestingFunc3();
 }
 
-static void TestNesting() {
+static void TestNesting()
+{
   TRACE_FUNCTION();
   std::this_thread::sleep_for(1us);
 
@@ -77,17 +81,20 @@ static void TestNesting() {
 // ----------------------------------------
 // A set of functions using TraceAuto
 
-static void TestAutoFunc2() {
+static void TestAutoFunc2()
+{
   TraceAuto t(TF_FUNC_NAME());
   std::this_thread::sleep_for(1us);
 }
 
-static void TestAutoFunc3() {
+static void TestAutoFunc3()
+{
   TraceAuto t(TF_FUNC_NAME());
   std::this_thread::sleep_for(1us);
 }
 
-static void TestAutoFunc1() {
+static void TestAutoFunc1()
+{
   TraceAuto t(TF_FUNC_NAME());
   std::this_thread::sleep_for(1us);
 
@@ -95,22 +102,28 @@ static void TestAutoFunc1() {
   TestAutoFunc3();
 }
 
-static void TestAuto() {
+static void TestAuto()
+{
   TraceAuto t(TF_FUNC_NAME());
   std::this_thread::sleep_for(1us);
 
   TestAutoFunc1();
 }
 
-static std::string TestEventName() { return "C_PLUS_PLUS_EVENT"; }
+static std::string TestEventName()
+{
+  return "C_PLUS_PLUS_EVENT";
+}
 
-static void TestCreateEvents() {
+static void TestCreateEvents()
+{
   TraceCollector *gc = &TraceCollector::GetInstance();
   gc->BeginEvent(TestEventName());
   gc->EndEvent(TestEventName());
 }
 
-void wrapTestTrace() {
+void wrapTestTrace()
+{
   def("TestNesting", &::TestNesting);
   def("TestAuto", &::TestAuto);
   def("TestCreateEvents", &::TestCreateEvents);

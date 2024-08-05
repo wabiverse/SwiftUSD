@@ -33,18 +33,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Given a python object and a pointer to a variable,
 // attempts to extract a value of the variable's type out of the object
 // If successful, returns the pointer; otherwise returns null
-template <typename T> static T *_ExtractValue(object &pyObject, T *varPtr) {
+template<typename T> static T *_ExtractValue(object &pyObject, T *varPtr)
+{
   extract<T> extractor(pyObject);
   if (extractor.check()) {
     *varPtr = extractor();
     return varPtr;
-  } else {
+  }
+  else {
     return NULL;
   }
 }
 
-bool PcpVariantFallbackMapFromPython(const dict &d,
-                                     PcpVariantFallbackMap *result) {
+bool PcpVariantFallbackMapFromPython(const dict &d, PcpVariantFallbackMap *result)
+{
   object iterItems = d.items();
   for (int i = 0; i < len(iterItems); ++i) {
     object key = iterItems[i][0];

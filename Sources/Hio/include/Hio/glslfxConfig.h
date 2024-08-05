@@ -26,10 +26,10 @@
 
 /// \file hio/glslfxConfig.h
 
-#include <pxr/pxrns.h>
 #include "Hio/api.h"
 #include "Tf/token.h"
 #include "Vt/dictionary.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 
@@ -42,9 +42,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// HioGlslfxConfig provides an API for querying the configuration of a
 /// glslfx file
 ///
-class HioGlslfxConfig
-{
-public:
+class HioGlslfxConfig {
+ public:
   /// Enumerates Roles that parameters can have.
   ///
   /// <b>enum Role:</b>
@@ -53,8 +52,7 @@ public:
   ///     <li><b><c> RoleColor = 1</c></b>   Color: the role of a color
   /// </ul>
   ///
-  enum Role
-  {
+  enum Role {
     RoleNone = 0,
     RoleColor = 1,
   };
@@ -63,16 +61,15 @@ public:
   ///
   /// A class representing a parameter.
   ///
-  class Parameter
-  {
-  public:
+  class Parameter {
+   public:
     Parameter(std::string const &name,
               VtValue const &defaultValue,
               std::string const &docString = "",
-              Role const &role = RoleNone) : name(name),
-                                             defaultValue(defaultValue),
-                                             docString(docString),
-                                             role(role) {}
+              Role const &role = RoleNone)
+        : name(name), defaultValue(defaultValue), docString(docString), role(role)
+    {
+    }
 
     std::string name;
     VtValue defaultValue;
@@ -86,14 +83,14 @@ public:
   ///
   /// A class representing a texture.
   ///
-  class Texture
-  {
-  public:
+  class Texture {
+   public:
     Texture(std::string const &name,
             VtValue const &defaultValue,
-            std::string const &docString = "") : name(name),
-                                                 defaultValue(defaultValue),
-                                                 docString(docString) {}
+            std::string const &docString = "")
+        : name(name), defaultValue(defaultValue), docString(docString)
+    {
+    }
 
     std::string name;
     VtValue defaultValue;
@@ -106,14 +103,14 @@ public:
   ///
   /// A class representing an attribute.
   ///
-  class Attribute
-  {
-  public:
+  class Attribute {
+   public:
     Attribute(std::string const &name,
               VtValue const &defaultValue,
-              std::string const &docString = "") : name(name),
-                                                   defaultValue(defaultValue),
-                                                   docString(docString) {}
+              std::string const &docString = "")
+        : name(name), defaultValue(defaultValue), docString(docString)
+    {
+    }
 
     std::string name;
     VtValue defaultValue;
@@ -156,28 +153,21 @@ public:
   HIO_API
   MetadataDictionary GetMetadata() const;
 
-private:
+ private:
   // private ctor. should only be called by ::Read
-  HioGlslfxConfig(TfToken const &technique,
-                  VtDictionary const &dict,
-                  std::string *errorStr);
+  HioGlslfxConfig(TfToken const &technique, VtDictionary const &dict, std::string *errorStr);
 
   void _Init(VtDictionary const &dict, std::string *errorStr);
 
-  Parameters _GetParameters(VtDictionary const &dict,
-                            std::string *errorStr) const;
-  Textures _GetTextures(VtDictionary const &dict,
-                        std::string *errorStr) const;
+  Parameters _GetParameters(VtDictionary const &dict, std::string *errorStr) const;
+  Textures _GetTextures(VtDictionary const &dict, std::string *errorStr) const;
 
-  Attributes _GetAttributes(VtDictionary const &dict,
-                            std::string *errorStr) const;
+  Attributes _GetAttributes(VtDictionary const &dict, std::string *errorStr) const;
 
-  MetadataDictionary _GetMetadata(VtDictionary const &dict,
-                                  std::string *errorStr) const;
+  MetadataDictionary _GetMetadata(VtDictionary const &dict, std::string *errorStr) const;
 
   typedef std::map<std::string, SourceKeys> _SourceKeyMap;
-  _SourceKeyMap _GetSourceKeyMap(VtDictionary const &dict,
-                                 std::string *errorStr) const;
+  _SourceKeyMap _GetSourceKeyMap(VtDictionary const &dict, std::string *errorStr) const;
 
   TfToken _technique;
   Parameters _params;

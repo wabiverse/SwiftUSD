@@ -30,26 +30,23 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HduiDataSourceTreeWidget : public QTreeWidget
-{
+class HduiDataSourceTreeWidget : public QTreeWidget {
   Q_OBJECT;
 
-public:
+ public:
   HduiDataSourceTreeWidget(QWidget *parent = Q_NULLPTR);
 
-  void SetPrimDataSource(const SdfPath &primPath,
-                         HdContainerDataSourceHandle const &dataSource);
+  void SetPrimDataSource(const SdfPath &primPath, HdContainerDataSourceHandle const &dataSource);
 
-protected:
+ protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
 
-public Q_SLOTS:
-  void PrimDirtied(
-      const SdfPath &primPath,
-      const HdContainerDataSourceHandle &primDataSource,
-      const HdDataSourceLocatorSet &locators);
+ public Q_SLOTS:
+  void PrimDirtied(const SdfPath &primPath,
+                   const HdContainerDataSourceHandle &primDataSource,
+                   const HdDataSourceLocatorSet &locators);
 
-Q_SIGNALS:
+ Q_SIGNALS:
   void DataSourceSelected(HdDataSourceBaseHandle dataSource);
 };
 

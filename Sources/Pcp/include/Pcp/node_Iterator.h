@@ -48,32 +48,37 @@ class PcpNodeRef_PrivateChildrenConstIterator
           /* Derived =   */ PcpNodeRef_PrivateChildrenConstIterator,
           /* ValueType = */ const PcpNodeRef,
           /* Category =  */ boost::forward_traversal_tag> {
-public:
+ public:
   // Required by TF_FOR_ALL but always assigned to afterwards.
   PcpNodeRef_PrivateChildrenConstIterator() {}
 
   /// Constructs an iterator pointing to \p node's first or past its
   /// last child.
-  PcpNodeRef_PrivateChildrenConstIterator(const PcpNodeRef &node,
-                                          bool end = false)
-      : _node(node), _nodes(&_node._graph->_GetNode(0)) {
-    _node._nodeIdx = end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex
-                         : _nodes[_node._nodeIdx].indexes.firstChildIndex;
+  PcpNodeRef_PrivateChildrenConstIterator(const PcpNodeRef &node, bool end = false)
+      : _node(node), _nodes(&_node._graph->_GetNode(0))
+  {
+    _node._nodeIdx = end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex :
+                           _nodes[_node._nodeIdx].indexes.firstChildIndex;
   }
 
-private:
+ private:
   friend class boost::iterator_core_access;
-  void increment() {
+  void increment()
+  {
     _node._nodeIdx = _nodes[_node._nodeIdx].indexes.nextSiblingIndex;
   }
 
-  bool equal(const PcpNodeRef_PrivateChildrenConstIterator &other) const {
+  bool equal(const PcpNodeRef_PrivateChildrenConstIterator &other) const
+  {
     return _node == other._node;
   }
 
-  reference dereference() const { return _node; }
+  reference dereference() const
+  {
+    return _node;
+  }
 
-private:
+ private:
   // Current graph node this iterator is pointing at.
   PcpNodeRef _node;
   const PcpPrimIndex_Graph::_Node *_nodes;
@@ -89,33 +94,37 @@ class PcpNodeRef_PrivateChildrenConstReverseIterator
           /* Derived =   */ PcpNodeRef_PrivateChildrenConstReverseIterator,
           /* ValueType = */ const PcpNodeRef,
           /* Category =  */ boost::forward_traversal_tag> {
-public:
+ public:
   // Required by TF_FOR_ALL but always assigned to afterwards.
   PcpNodeRef_PrivateChildrenConstReverseIterator() {}
 
   /// Constructs an iterator pointing to \p node's first or past its
   /// last child.
-  PcpNodeRef_PrivateChildrenConstReverseIterator(const PcpNodeRef &node,
-                                                 bool end = false)
-      : _node(node), _nodes(&_node._graph->_GetNode(0)) {
-    _node._nodeIdx = end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex
-                         : _nodes[_node._nodeIdx].indexes.lastChildIndex;
+  PcpNodeRef_PrivateChildrenConstReverseIterator(const PcpNodeRef &node, bool end = false)
+      : _node(node), _nodes(&_node._graph->_GetNode(0))
+  {
+    _node._nodeIdx = end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex :
+                           _nodes[_node._nodeIdx].indexes.lastChildIndex;
   }
 
-private:
+ private:
   friend class boost::iterator_core_access;
-  void increment() {
+  void increment()
+  {
     _node._nodeIdx = _nodes[_node._nodeIdx].indexes.prevSiblingIndex;
   }
 
-  bool
-  equal(const PcpNodeRef_PrivateChildrenConstReverseIterator &other) const {
+  bool equal(const PcpNodeRef_PrivateChildrenConstReverseIterator &other) const
+  {
     return _node == other._node;
   }
 
-  reference dereference() const { return _node; }
+  reference dereference() const
+  {
+    return _node;
+  }
 
-private:
+ private:
   // Current graph node this iterator is pointing at.
   PcpNodeRef _node;
   const PcpPrimIndex_Graph::_Node *_nodes;
@@ -123,46 +132,48 @@ private:
 
 // Wrapper type for TF_FOR_ALL().
 class PcpNodeRef_PrivateChildrenConstRange {
-public:
+ public:
   PcpNodeRef_PrivateChildrenConstRange(const PcpNodeRef &node_) : node(node_) {}
   PcpNodeRef node;
 };
 
 // TF_FOR_ALL() traits.  We build the iterators on demand.
-template <>
-struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, false> {
+template<> struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, false> {
   typedef PcpNodeRef_PrivateChildrenConstRange RangeType;
   typedef PcpNodeRef_PrivateChildrenConstIterator IteratorType;
-  static IteratorType Begin(RangeType const &c) {
+  static IteratorType Begin(RangeType const &c)
+  {
     return IteratorType(c.node, /* end = */ false);
   }
-  static IteratorType End(RangeType const &c) {
+  static IteratorType End(RangeType const &c)
+  {
     return IteratorType(c.node, /* end = */ true);
   }
 };
-template <>
-struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, true> {
+template<> struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, true> {
   typedef PcpNodeRef_PrivateChildrenConstRange RangeType;
   typedef PcpNodeRef_PrivateChildrenConstReverseIterator IteratorType;
-  static IteratorType Begin(RangeType const &c) {
+  static IteratorType Begin(RangeType const &c)
+  {
     return IteratorType(c.node, /* end = */ false);
   }
-  static IteratorType End(RangeType const &c) {
+  static IteratorType End(RangeType const &c)
+  {
     return IteratorType(c.node, /* end = */ true);
   }
 };
-template <>
-struct Tf_ShouldIterateOverCopy<PcpNodeRef_PrivateChildrenConstRange>
-    : std::true_type {};
+template<>
+struct Tf_ShouldIterateOverCopy<PcpNodeRef_PrivateChildrenConstRange> : std::true_type {};
 
 // Wrap a node for use by TF_FOR_ALL().
-inline PcpNodeRef_PrivateChildrenConstRange
-Pcp_GetChildrenRange(const PcpNodeRef &node) {
+inline PcpNodeRef_PrivateChildrenConstRange Pcp_GetChildrenRange(const PcpNodeRef &node)
+{
   return PcpNodeRef_PrivateChildrenConstRange(node);
 }
 
 // Return all of a node's children, strong-to-weak.
-inline PcpNodeRefVector Pcp_GetChildren(const PcpNodeRef &node) {
+inline PcpNodeRefVector Pcp_GetChildren(const PcpNodeRef &node)
+{
   typedef PcpNodeRef_PrivateChildrenConstIterator IteratorType;
   return PcpNodeRefVector(IteratorType(node, /* end = */ false),
                           IteratorType(node, /* end = */ true));
@@ -170,4 +181,4 @@ inline PcpNodeRefVector Pcp_GetChildren(const PcpNodeRef &node) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_NODE_ITERATOR_H
+#endif  // PXR_USD_PCP_NODE_ITERATOR_H

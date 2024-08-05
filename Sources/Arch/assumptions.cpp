@@ -36,18 +36,19 @@
 #include <limits>
 
 #if defined(ARCH_OS_LINUX)
-#include <unistd.h>
+#  include <unistd.h>
 #elif defined(ARCH_OS_DARWIN)
-#include <mach-o/arch.h>
-#include <sys/sysctl.h>
+#  include <mach-o/arch.h>
+#  include <sys/sysctl.h>
 #elif defined(ARCH_OS_WINDOWS)
-#include <Windows.h>
-#include <memory>
+#  include <Windows.h>
+#  include <memory>
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static size_t Arch_ObtainCacheLineSize() {
+static size_t Arch_ObtainCacheLineSize()
+{
 #if defined(ARCH_OS_LINUX)
   return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif defined(ARCH_OS_DARWIN)
@@ -71,8 +72,7 @@ static size_t Arch_ObtainCacheLineSize() {
   size_t lineSize = 0;
   if (::GetLogicalProcessorInformation(&buffer[0], &bufferSize)) {
     for (size_t current = 0; current != total; ++current) {
-      if (buffer[current].Relationship == RelationCache &&
-          1 == buffer[current].Cache.Level) {
+      if (buffer[current].Relationship == RelationCache && 1 == buffer[current].Cache.Level) {
         lineSize = buffer[current].Cache.LineSize;
         break;
       }
@@ -81,12 +81,13 @@ static size_t Arch_ObtainCacheLineSize() {
 
   return lineSize;
 #else
-#error Arch_ObtainCacheLineSize not implemented for OS.
+#  error Arch_ObtainCacheLineSize not implemented for OS.
 #endif
 }
 
 ARCH_HIDDEN
-void Arch_ValidateAssumptions() {
+void Arch_ValidateAssumptions()
+{
   enum SomeEnum { BLAH };
 
   /*
@@ -103,8 +104,7 @@ void Arch_ValidateAssumptions() {
   /*
    * Verify that float and double are IEEE-754 compliant.
    */
-  static_assert(sizeof(float) == sizeof(uint32_t) &&
-                    sizeof(double) == sizeof(uint64_t) &&
+  static_assert(sizeof(float) == sizeof(uint32_t) && sizeof(double) == sizeof(uint64_t) &&
                     std::numeric_limits<float>::is_iec559 &&
                     std::numeric_limits<double>::is_iec559,
                 "float/double not IEEE-754 compliant");
@@ -132,8 +132,7 @@ void Arch_ValidateAssumptions() {
   NXArchInfo const *archInfo = NXGetLocalArchInfo();
   if (archInfo && ((archInfo->cputype & ~CPU_ARCH_MASK) == CPU_TYPE_ARM)) {
     if ((cacheLineSize != ROSETTA_WORKAROUND_CACHE_LINE_SIZE)) {
-      ARCH_WARNING(
-          "Cache-line size mismatch may negatively impact performance.");
+      ARCH_WARNING("Cache-line size mismatch may negatively impact performance.");
     }
     cacheLineSize = ARCH_CACHE_LINE_SIZE;
   }

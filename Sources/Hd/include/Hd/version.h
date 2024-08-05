@@ -52,7 +52,7 @@
 //           HdResourceRegistry.
 //           Added HdSceneDelegate::GetInstancerPrototypes.
 // 39 -> 40: Removed Bind and Unbind API from HdRenderPassState.
-// 40 -> 41: Renamed HdDelegate::GetMaterialNeworkselector() to 
+// 40 -> 41: Renamed HdDelegate::GetMaterialNeworkselector() to
 //           GetMaterialRenderContexts(). It now returns a TfTokenVector.
 // 41 -> 42: Removed GetMaterialTag() from HdRenderIndex.
 // 42 -> 43: Removed HdCamera pulling on view and projection matrix.
@@ -62,7 +62,7 @@
 // 45 -> 46: New signatures for HdRendererPlugin::IsSupported and
 //           HdRendererPluginRegistry::GetDefaultPluginId
 // 46 -> 47: Adding HdRenderDelegate::GetRenderSettingsNamespaces()
-// 47 -> 48: New signature for HdRenderIndex::InsertSceneIndex: added optional 
+// 47 -> 48: New signature for HdRenderIndex::InsertSceneIndex: added optional
 //           argument needsPrefixing
 // 48 -> 49: Moved HdExtCompCpuComputation, Hd_ExtCompInputSource,
 //           Hd_CompExtCompInputSource, and Hd_SceneExtCompInputSource to hdSt.
@@ -79,4 +79,4 @@
 // 1  ->  2: SimpleLighting -> FallbackLighting
 #define HD_SHADER_API 2
 
-#endif // PXR_IMAGING_HD_VERSION_H
+#endif  // PXR_IMAGING_HD_VERSION_H

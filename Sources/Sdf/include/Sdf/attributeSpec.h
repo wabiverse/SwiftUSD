@@ -58,7 +58,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfAttributeSpec : public SdfPropertySpec {
   SDF_DECLARE_SPEC(SdfAttributeSpec, SdfPropertySpec);
 
-public:
+ public:
   typedef SdfAttributeSpec This;
   typedef SdfPropertySpec Parent;
 
@@ -71,10 +71,11 @@ public:
   /// Creates and returns a new attribute for the given prim.
   /// The \p owner will own the newly created attribute.
   SDF_API
-  static SdfAttributeSpecHandle
-  New(const SdfPrimSpecHandle &owner, const std::string &name,
-      const SdfValueTypeName &typeName,
-      SdfVariability variability = SdfVariabilityVarying, bool custom = false);
+  static SdfAttributeSpecHandle New(const SdfPrimSpecHandle &owner,
+                                    const std::string &name,
+                                    const SdfValueTypeName &typeName,
+                                    SdfVariability variability = SdfVariabilityVarying,
+                                    bool custom = false);
 
   /// @}
 
@@ -178,11 +179,12 @@ public:
 /// property path (see SdfPath::IsPrimPropertyPath()).  Return false and issue
 /// an error if we fail to author the required scene description.
 SDF_API
-bool SdfJustCreatePrimAttributeInLayer(
-    const SdfLayerHandle &layer, const SdfPath &attrPath,
-    const SdfValueTypeName &typeName,
-    SdfVariability variability = SdfVariabilityVarying, bool isCustom = false);
+bool SdfJustCreatePrimAttributeInLayer(const SdfLayerHandle &layer,
+                                       const SdfPath &attrPath,
+                                       const SdfValueTypeName &typeName,
+                                       SdfVariability variability = SdfVariabilityVarying,
+                                       bool isCustom = false);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_ATTRIBUTE_SPEC_H
+#endif  // PXR_USD_SDF_ATTRIBUTE_SPEC_H

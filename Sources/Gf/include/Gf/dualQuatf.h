@@ -44,7 +44,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <> struct GfIsGfDualQuat<class GfDualQuatf> {
+template<> struct GfIsGfDualQuat<class GfDualQuatf> {
   static const bool value = true;
 };
 
@@ -65,7 +65,7 @@ float GfDot(const GfDualQuatf &dq1, const GfDualQuatf &dq2);
 ///    http://web.cs.iastate.edu/~cs577/handouts/dual-quaternion.pdf
 ///
 class GfDualQuatf final {
-public:
+ public:
   typedef float ScalarType;
 
   /// The default constructor leaves the dual quaternion undefined.
@@ -86,12 +86,11 @@ public:
   explicit GfDualQuatf(const GfQuatf &real) : _real(real), _dual(0) {}
 
   /// This constructor initializes the real and dual parts.
-  GfDualQuatf(const GfQuatf &real, const GfQuatf &dual)
-      : _real(real), _dual(dual) {}
+  GfDualQuatf(const GfQuatf &real, const GfQuatf &dual) : _real(real), _dual(dual) {}
 
   /// This constructor initializes from a rotation and a translation components.
-  GfDualQuatf(const GfQuatf &rotation, const GfVec3f &translation)
-      : _real(rotation) {
+  GfDualQuatf(const GfQuatf &rotation, const GfVec3f &translation) : _real(rotation)
+  {
     SetTranslation(translation);
   }
 
@@ -103,26 +102,40 @@ public:
   GfDualQuatf(const GfDualQuath &other);
 
   /// Sets the real part of the dual quaternion.
-  void SetReal(const GfQuatf &real) { _real = real; }
+  void SetReal(const GfQuatf &real)
+  {
+    _real = real;
+  }
 
   /// Sets the dual part of the dual quaternion.
-  void SetDual(const GfQuatf &dual) { _dual = dual; }
+  void SetDual(const GfQuatf &dual)
+  {
+    _dual = dual;
+  }
 
   /// Returns the real part of the dual quaternion.
-  const GfQuatf &GetReal() const { return _real; }
+  const GfQuatf &GetReal() const
+  {
+    return _real;
+  }
 
   /// Returns the dual part of the dual quaternion.
-  const GfQuatf &GetDual() const { return _dual; }
+  const GfQuatf &GetDual() const
+  {
+    return _dual;
+  }
 
   /// Returns the zero dual quaternion, which has a real part of (0,0,0,0) and
   /// a dual part of (0,0,0,0).
-  static GfDualQuatf GetZero() {
+  static GfDualQuatf GetZero()
+  {
     return GfDualQuatf(GfQuatf::GetZero(), GfQuatf::GetZero());
   }
 
   /// Returns the identity dual quaternion, which has a real part of (1,0,0,0)
   /// and a dual part of (0,0,0,0).
-  static GfDualQuatf GetIdentity() {
+  static GfDualQuatf GetIdentity()
+  {
     return GfDualQuatf(GfQuatf::GetIdentity(), GfQuatf::GetZero());
   }
 
@@ -160,29 +173,36 @@ public:
   GfVec3f GetTranslation() const;
 
   /// Hash.
-  friend inline size_t hash_value(const GfDualQuatf &dq) {
+  friend inline size_t hash_value(const GfDualQuatf &dq)
+  {
     return TfHash::Combine(dq.GetReal(), dq.GetDual());
   }
 
   /// Component-wise dual quaternion equality test. The real and dual parts
   /// must match exactly for dual quaternions to be considered equal.
-  bool operator==(const GfDualQuatf &dq) const {
+  bool operator==(const GfDualQuatf &dq) const
+  {
     return (GetReal() == dq.GetReal() && GetDual() == dq.GetDual());
   }
 
   /// Component-wise dual quaternion inequality test. The real and dual
   /// parts must match exactly for dual quaternions to be considered equal.
-  bool operator!=(const GfDualQuatf &dq) const { return !(*this == dq); }
+  bool operator!=(const GfDualQuatf &dq) const
+  {
+    return !(*this == dq);
+  }
 
   /// Component-wise unary sum operator.
-  GfDualQuatf &operator+=(const GfDualQuatf &dq) {
+  GfDualQuatf &operator+=(const GfDualQuatf &dq)
+  {
     _real += dq._real;
     _dual += dq._dual;
     return *this;
   }
 
   /// Component-wise unary difference operator.
-  GfDualQuatf &operator-=(const GfDualQuatf &dq) {
+  GfDualQuatf &operator-=(const GfDualQuatf &dq)
+  {
     _real -= dq._real;
     _dual -= dq._dual;
     return *this;
@@ -193,47 +213,57 @@ public:
   GfDualQuatf &operator*=(const GfDualQuatf &dq);
 
   /// Scales this dual quaternion by \p s.
-  GfDualQuatf &operator*=(float s) {
+  GfDualQuatf &operator*=(float s)
+  {
     _real *= s;
     _dual *= s;
     return *this;
   }
 
   /// Scales this dual quaternion by 1 / \p s.
-  GfDualQuatf &operator/=(float s) { return (*this) *= 1.0 / s; }
+  GfDualQuatf &operator/=(float s)
+  {
+    return (*this) *= 1.0 / s;
+  }
 
   /// Component-wise binary sum operator.
-  friend GfDualQuatf operator+(const GfDualQuatf &dq1, const GfDualQuatf &dq2) {
+  friend GfDualQuatf operator+(const GfDualQuatf &dq1, const GfDualQuatf &dq2)
+  {
     GfDualQuatf dqt = dq1;
     return dqt += dq2;
   }
 
   /// Component-wise binary difference operator.
-  friend GfDualQuatf operator-(const GfDualQuatf &dq1, const GfDualQuatf &dq2) {
+  friend GfDualQuatf operator-(const GfDualQuatf &dq1, const GfDualQuatf &dq2)
+  {
     GfDualQuatf dqt = dq1;
     return dqt -= dq2;
   }
 
   /// Returns the product of dual quaternions \p dq1 and \p dq2.
-  friend GfDualQuatf operator*(const GfDualQuatf &dq1, const GfDualQuatf &dq2) {
+  friend GfDualQuatf operator*(const GfDualQuatf &dq1, const GfDualQuatf &dq2)
+  {
     GfDualQuatf dqt = dq1;
     return dqt *= dq2;
   }
 
   /// Returns the product of dual quaternion \p dq and scalar \p s.
-  friend GfDualQuatf operator*(const GfDualQuatf &dq, float s) {
+  friend GfDualQuatf operator*(const GfDualQuatf &dq, float s)
+  {
     GfDualQuatf dqt = dq;
     return dqt *= s;
   }
 
   /// Returns the product of dual quaternion \p dq and scalar \p s.
-  friend GfDualQuatf operator*(float s, const GfDualQuatf &dq) {
+  friend GfDualQuatf operator*(float s, const GfDualQuatf &dq)
+  {
     GfDualQuatf dqt = dq;
     return dqt *= s;
   }
 
   /// Returns the product of dual quaternion \p dq and scalar 1 / \p s.
-  friend GfDualQuatf operator/(const GfDualQuatf &dq, float s) {
+  friend GfDualQuatf operator/(const GfDualQuatf &dq, float s)
+  {
     GfDualQuatf dqt = dq;
     return dqt /= s;
   }
@@ -242,9 +272,9 @@ public:
   GF_API
   GfVec3f Transform(const GfVec3f &vec) const;
 
-private:
-  GfQuatf _real; // for rotation
-  GfQuatf _dual; // for translation
+ private:
+  GfQuatf _real;  // for rotation
+  GfQuatf _dual;  // for translation
 };
 
 /// Output a GfDualQuatf using the format ((rw, rx, ry, rz), (dw, dx, dy, dz)).
@@ -252,11 +282,11 @@ private:
 GF_API std::ostream &operator<<(std::ostream &out, const GfDualQuatf &dq);
 
 /// Returns the dot (inner) product of two dual quaternions.
-inline float GfDot(const GfDualQuatf &dq1, const GfDualQuatf &dq2) {
-  return GfDot(dq1.GetReal(), dq2.GetReal()) +
-         GfDot(dq1.GetDual(), dq2.GetDual());
+inline float GfDot(const GfDualQuatf &dq1, const GfDualQuatf &dq2)
+{
+  return GfDot(dq1.GetReal(), dq2.GetReal()) + GfDot(dq1.GetDual(), dq2.GetDual());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_DUALQUATF_H
+#endif  // PXR_BASE_GF_DUALQUATF_H

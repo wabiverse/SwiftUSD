@@ -47,26 +47,27 @@ struct _TfPyClassMethod : def_visitor<_TfPyClassMethod> {
   _TfPyClassMethod(const std::string &methodName) : _methodName(methodName) {}
   explicit _TfPyClassMethod(const char *methodName) : _methodName(methodName) {}
 
-  template <typename CLS> void visit(CLS &c) const {
+  template<typename CLS> void visit(CLS &c) const
+  {
     PyTypeObject *self = downcast<PyTypeObject>(c.ptr());
     dict d((handle<>(borrowed(self->tp_dict))));
 
     object method(d[_methodName]);
 
-    c.attr(_methodName.c_str()) =
-        object(handle<>(PyClassMethod_New((_CallableCheck)(method.ptr()))));
+    c.attr(_methodName.c_str()) = object(
+        handle<>(PyClassMethod_New((_CallableCheck)(method.ptr()))));
   }
 
-private:
-  PyObject *_CallableCheck(PyObject *callable) const {
+ private:
+  PyObject *_CallableCheck(PyObject *callable) const
+  {
     if (PyCallable_Check(expect_non_null(callable)))
       return callable;
 
-    PyErr_Format(
-        PyExc_TypeError,
-        "classmethod expects callable object; got an object of type %s, "
-        "which is not callable",
-        callable->ob_type->tp_name);
+    PyErr_Format(PyExc_TypeError,
+                 "classmethod expects callable object; got an object of type %s, "
+                 "which is not callable",
+                 callable->ob_type->tp_name);
 
     throw_error_already_set();
     return 0;
@@ -75,7 +76,7 @@ private:
   const std::string _methodName;
 };
 
-} // namespace Tf_PyClassMethod
+}  // namespace Tf_PyClassMethod
 
 /// A boost.python class visitor which replaces the named method with a
 /// classmethod()-wrapped one.
@@ -93,4 +94,4 @@ typedef Tf_PyClassMethod::_TfPyClassMethod TfPyClassMethod;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_CLASS_METHOD_H
+#endif  // PXR_BASE_TF_PY_CLASS_METHOD_H

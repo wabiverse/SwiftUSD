@@ -31,7 +31,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapLimits() {
+void wrapLimits()
+{
   scope().attr("MIN_VECTOR_LENGTH") = GF_MIN_VECTOR_LENGTH;
   scope().attr("MIN_ORTHO_TOLERANCE") = GF_MIN_ORTHO_TOLERANCE;
 }

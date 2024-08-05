@@ -24,18 +24,16 @@
 #ifndef PXR_IMAGING_HD_FIELD_H
 #define PXR_IMAGING_HD_FIELD_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/bprim.h"
+#include "Hd/version.h"
+#include <pxr/pxrns.h>
 
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define HD_FIELD_TOKENS                                    \
-    (filePath)                                             \
-    (fieldName)
+#define HD_FIELD_TOKENS (filePath)(fieldName)
 
 TF_DECLARE_PUBLIC_TOKENS(HdFieldTokens, HD_API, HD_FIELD_TOKENS);
 
@@ -47,22 +45,20 @@ using HdFieldPtrConstVector = std::vector<class HdField const *>;
 /// Hydra schema for a USD field primitive. Acts like a texture, combined
 /// with other fields to make up a renderable volume.
 ///
-class HdField : public HdBprim
-{
-public:
-    HD_API
-    HdField(SdfPath const & id);
-    HD_API
-    ~HdField() override;
+class HdField : public HdBprim {
+ public:
+  HD_API
+  HdField(SdfPath const &id);
+  HD_API
+  ~HdField() override;
 
-    // Change tracking for HdField
-    enum DirtyBits : HdDirtyBits {
-        Clean                 = 0,
-        DirtyTransform        = 1 << 0,
-        DirtyParams           = 1 << 1,
-        AllDirty              = (DirtyTransform
-                                 |DirtyParams)
-    };
+  // Change tracking for HdField
+  enum DirtyBits : HdDirtyBits {
+    Clean = 0,
+    DirtyTransform = 1 << 0,
+    DirtyParams = 1 << 1,
+    AllDirty = (DirtyTransform | DirtyParams)
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

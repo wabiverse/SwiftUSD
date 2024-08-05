@@ -21,15 +21,15 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "stream.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/enum.h"
-#include "Tf/stringUtils.h"
 #include "Tf/registryManager.h"
+#include "Tf/stringUtils.h"
 
-#include <map>
 #include <cstdio>
+#include <map>
 
 using std::map;
 using std::string;
@@ -47,15 +47,11 @@ TF_REGISTRY_FUNCTION(TfEnum)
   TF_ADD_ENUM_NAME(UsdObjStream::SequenceElem::ArbitraryText);
 }
 
-UsdObjStream::Face::Face()
-    : pointsBegin(0), pointsEnd(0)
-{
-}
+UsdObjStream::Face::Face() : pointsBegin(0), pointsEnd(0) {}
 
 bool operator==(UsdObjStream::Face const &lhs, UsdObjStream::Face const &rhs)
 {
-  return lhs.pointsBegin == rhs.pointsBegin &&
-         lhs.pointsEnd == rhs.pointsEnd;
+  return lhs.pointsBegin == rhs.pointsBegin && lhs.pointsEnd == rhs.pointsEnd;
 }
 
 bool operator!=(UsdObjStream::Face const &lhs, UsdObjStream::Face const &rhs)
@@ -63,9 +59,7 @@ bool operator!=(UsdObjStream::Face const &lhs, UsdObjStream::Face const &rhs)
   return !(lhs == rhs);
 }
 
-UsdObjStream::UsdObjStream()
-{
-}
+UsdObjStream::UsdObjStream() {}
 
 ////////////////////////////////////////////////////////////////////////
 // Verts
@@ -82,8 +76,7 @@ void UsdObjStream::_AddVertsInternal(vector<GfVec3f>::iterator begin)
   _AddSequence(SequenceElem::Verts, std::distance(begin, _verts.end()));
 }
 
-vector<GfVec3f> const &
-UsdObjStream::GetVerts() const
+vector<GfVec3f> const &UsdObjStream::GetVerts() const
 {
   return _verts;
 }
@@ -103,8 +96,7 @@ void UsdObjStream::_AddUVsInternal(vector<GfVec2f>::iterator begin)
   _AddSequence(SequenceElem::UVs, std::distance(begin, _uvs.end()));
 }
 
-vector<GfVec2f> const &
-UsdObjStream::GetUVs() const
+vector<GfVec2f> const &UsdObjStream::GetUVs() const
 {
   return _uvs;
 }
@@ -124,8 +116,7 @@ void UsdObjStream::_AddNormalsInternal(vector<GfVec3f>::iterator begin)
   _AddSequence(SequenceElem::Normals, std::distance(begin, _normals.end()));
 }
 
-vector<GfVec3f> const &
-UsdObjStream::GetNormals() const
+vector<GfVec3f> const &UsdObjStream::GetNormals() const
 {
   return _normals;
 }
@@ -137,16 +128,14 @@ void UsdObjStream::AddPoint(Point const &point)
   _points.push_back(point);
 }
 
-std::vector<UsdObjStream::Point> const &
-UsdObjStream::GetPoints() const
+std::vector<UsdObjStream::Point> const &UsdObjStream::GetPoints() const
 {
   return _points;
 }
 
 bool UsdObjStream::AddGroup(string const &name)
 {
-  if (!FindGroup(name))
-  {
+  if (!FindGroup(name)) {
     Group g;
     g.name = name;
     _groups.push_back(g);
@@ -156,20 +145,16 @@ bool UsdObjStream::AddGroup(string const &name)
   return false;
 }
 
-UsdObjStream::Group const *
-UsdObjStream::FindGroup(std::string const &name) const
+UsdObjStream::Group const *UsdObjStream::FindGroup(std::string const &name) const
 {
-  for (vector<Group>::const_iterator i = _groups.begin(), end = _groups.end();
-       i != end; ++i)
-  {
+  for (vector<Group>::const_iterator i = _groups.begin(), end = _groups.end(); i != end; ++i) {
     if (i->name == name)
       return &(*i);
   }
   return 0;
 }
 
-std::vector<UsdObjStream::Group> const &
-UsdObjStream::GetGroups() const
+std::vector<UsdObjStream::Group> const &UsdObjStream::GetGroups() const
 {
   return _groups;
 }
@@ -177,21 +162,18 @@ UsdObjStream::GetGroups() const
 void UsdObjStream::AddFace(Face const &face)
 {
   // If there aren't any groups, add one first.
-  if (_groups.empty())
-  {
+  if (_groups.empty()) {
     AddGroup(string());
   }
   _groups.back().faces.push_back(face);
 }
 
-static bool
-_IsComment(string const &text)
+static bool _IsComment(string const &text)
 {
   return text.find('#') < text.find_first_not_of(" \t#");
 }
 
-static string
-_MakeComment(string const &text)
+static string _MakeComment(string const &text)
 {
   return _IsComment(text) ? text : ("# " + text);
 }
@@ -199,8 +181,7 @@ _MakeComment(string const &text)
 void UsdObjStream::AppendComments(std::string const &text)
 {
   vector<string> lines = TfStringSplit(text, "\n");
-  for (const auto &line : lines)
-  {
+  for (const auto &line : lines) {
     _comments.push_back(_MakeComment(line));
   }
   _AddSequence(SequenceElem::Comments, lines.size());
@@ -210,8 +191,7 @@ void UsdObjStream::PrependComments(string const &text)
 {
   vector<string> lines = TfStringSplit(text, "\n");
   // Mutate all the lines into comments.
-  for (auto &line : lines)
-  {
+  for (auto &line : lines) {
     line = _MakeComment(line);
   }
   // Insert them at the beginning.
@@ -219,8 +199,7 @@ void UsdObjStream::PrependComments(string const &text)
   _PrependSequence(SequenceElem::Comments, lines.size());
 }
 
-vector<string> const &
-UsdObjStream::GetComments() const
+vector<string> const &UsdObjStream::GetComments() const
 {
   return _comments;
 }
@@ -228,14 +207,11 @@ UsdObjStream::GetComments() const
 void UsdObjStream::AppendArbitraryText(std::string const &text)
 {
   vector<string> lines = TfStringSplit(text, "\n");
-  for (const auto &line : lines)
-  {
-    if (_IsComment(line))
-    {
+  for (const auto &line : lines) {
+    if (_IsComment(line)) {
       AppendComments(line);
     }
-    else
-    {
+    else {
       _arbitraryText.push_back(line);
       _AddSequence(SequenceElem::ArbitraryText);
     }
@@ -245,29 +221,24 @@ void UsdObjStream::AppendArbitraryText(std::string const &text)
 void UsdObjStream::PrependArbitraryText(string const &text)
 {
   vector<string> lines = TfStringSplit(text, "\n");
-  for (auto lineIter = lines.rbegin(); lineIter != lines.rend(); ++lineIter)
-  {
+  for (auto lineIter = lines.rbegin(); lineIter != lines.rend(); ++lineIter) {
     const auto &line = *lineIter;
-    if (_IsComment(line))
-    {
+    if (_IsComment(line)) {
       PrependComments(line);
     }
-    else
-    {
+    else {
       _arbitraryText.insert(_arbitraryText.begin(), line);
       _PrependSequence(SequenceElem::ArbitraryText);
     }
   }
 }
 
-vector<string> const &
-UsdObjStream::GetArbitraryText() const
+vector<string> const &UsdObjStream::GetArbitraryText() const
 {
   return _arbitraryText;
 }
 
-std::vector<UsdObjStream::SequenceElem> const &
-UsdObjStream::GetSequence() const
+std::vector<UsdObjStream::SequenceElem> const &UsdObjStream::GetSequence() const
 {
   return _sequence;
 }
@@ -276,12 +247,10 @@ void UsdObjStream::_AddSequence(SequenceElem::ElemType type, int repeat)
 {
   // Check to see if we can add to an existing sequence, otherwise add a new
   // sequence element.
-  if (!_sequence.empty() && _sequence.back().type == type)
-  {
+  if (!_sequence.empty() && _sequence.back().type == type) {
     _sequence.back().repeat += repeat;
   }
-  else
-  {
+  else {
     _sequence.push_back(SequenceElem(type, repeat));
   }
 }
@@ -290,12 +259,10 @@ void UsdObjStream::_PrependSequence(SequenceElem::ElemType type, int repeat)
 {
   // Check to see if we can add to an existing sequence, otherwise add a new
   // sequence element.
-  if (!_sequence.empty() && _sequence.front().type == type)
-  {
+  if (!_sequence.empty() && _sequence.front().type == type) {
     _sequence.front().repeat += repeat;
   }
-  else
-  {
+  else {
     _sequence.insert(_sequence.begin(), SequenceElem(type, repeat));
   }
 }
@@ -318,8 +285,7 @@ void UsdObjStream::swap(UsdObjStream &other)
   _sequence.swap(other._sequence);
 }
 
-string
-UsdObjStream::_GetUniqueGroupName(string const &name) const
+string UsdObjStream::_GetUniqueGroupName(string const &name) const
 {
   string curName = name;
   int serial = 0;
@@ -328,8 +294,7 @@ UsdObjStream::_GetUniqueGroupName(string const &name) const
   return curName;
 }
 
-static UsdObjStream::Point
-OffsetPoint(UsdObjStream::Point p, UsdObjStream::Point offset)
+static UsdObjStream::Point OffsetPoint(UsdObjStream::Point p, UsdObjStream::Point offset)
 {
   p.vertIndex += p.vertIndex == -1 ? 0 : offset.vertIndex;
   p.uvIndex += p.uvIndex == -1 ? 0 : offset.uvIndex;
@@ -340,8 +305,7 @@ OffsetPoint(UsdObjStream::Point p, UsdObjStream::Point offset)
 void UsdObjStream::AddData(UsdObjStream const &other)
 {
 
-  UsdObjStream::Point offset(
-      GetVerts().size(), GetUVs().size(), GetNormals().size());
+  UsdObjStream::Point offset(GetVerts().size(), GetUVs().size(), GetNormals().size());
 
   int pointsOffset = GetPoints().size();
 
@@ -350,53 +314,46 @@ void UsdObjStream::AddData(UsdObjStream const &other)
   vector<GfVec3f>::const_iterator normalIter = other.GetNormals().begin();
   vector<Group>::const_iterator groupIter = other.GetGroups().begin();
   vector<string>::const_iterator commentsIter = other.GetComments().begin();
-  vector<string>::const_iterator arbitraryTextIter =
-      other.GetArbitraryText().begin();
+  vector<string>::const_iterator arbitraryTextIter = other.GetArbitraryText().begin();
   vector<Point> const &points = other.GetPoints();
 
   // Add elements from the other data in sequence.
-  for (const auto &elem : other.GetSequence())
-  {
-    switch (elem.type)
-    {
-    default:
-      TF_CODING_ERROR("Unknown sequence element '%s', aborting",
-                      TfStringify(elem.type).c_str());
-      return;
-    case SequenceElem::Verts:
-      for (int i = 0; i != elem.repeat; ++i)
-        AddVert(*vertIter++);
-      break;
-    case SequenceElem::UVs:
-      for (int i = 0; i != elem.repeat; ++i)
-        AddUV(*uvIter++);
-      break;
-    case SequenceElem::Normals:
-      for (int i = 0; i != elem.repeat; ++i)
-        AddNormal(*normalIter++);
-      break;
-    case SequenceElem::Groups:
-      for (int i = 0; i != elem.repeat; ++i, ++groupIter)
-      {
-        AddGroup(_GetUniqueGroupName(groupIter->name));
-        for (const auto &face : groupIter->faces)
-        {
-          for (int j = face.pointsBegin; j != face.pointsEnd; ++j)
-            AddPoint(OffsetPoint(points[j], offset));
+  for (const auto &elem : other.GetSequence()) {
+    switch (elem.type) {
+      default:
+        TF_CODING_ERROR("Unknown sequence element '%s', aborting", TfStringify(elem.type).c_str());
+        return;
+      case SequenceElem::Verts:
+        for (int i = 0; i != elem.repeat; ++i)
+          AddVert(*vertIter++);
+        break;
+      case SequenceElem::UVs:
+        for (int i = 0; i != elem.repeat; ++i)
+          AddUV(*uvIter++);
+        break;
+      case SequenceElem::Normals:
+        for (int i = 0; i != elem.repeat; ++i)
+          AddNormal(*normalIter++);
+        break;
+      case SequenceElem::Groups:
+        for (int i = 0; i != elem.repeat; ++i, ++groupIter) {
+          AddGroup(_GetUniqueGroupName(groupIter->name));
+          for (const auto &face : groupIter->faces) {
+            for (int j = face.pointsBegin; j != face.pointsEnd; ++j)
+              AddPoint(OffsetPoint(points[j], offset));
 
-          AddFace(Face(face.pointsBegin + pointsOffset,
-                       face.pointsEnd + pointsOffset));
+            AddFace(Face(face.pointsBegin + pointsOffset, face.pointsEnd + pointsOffset));
+          }
         }
-      }
-      break;
-    case SequenceElem::Comments:
-      for (int i = 0; i != elem.repeat; ++i)
-        AppendComments(*commentsIter++);
-      break;
-    case SequenceElem::ArbitraryText:
-      for (int i = 0; i != elem.repeat; ++i)
-        AppendArbitraryText(*arbitraryTextIter++);
-      break;
+        break;
+      case SequenceElem::Comments:
+        for (int i = 0; i != elem.repeat; ++i)
+          AppendComments(*commentsIter++);
+        break;
+      case SequenceElem::ArbitraryText:
+        for (int i = 0; i != elem.repeat; ++i)
+          AppendArbitraryText(*arbitraryTextIter++);
+        break;
     }
   }
 }

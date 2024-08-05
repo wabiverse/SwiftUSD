@@ -115,17 +115,17 @@
 /// if the file is malformed, errors are printed to stderr.
 
 #include "Arch/hints.h"
-#include "Tf/registryManager.h"
 #include "Tf/hash.h"
 #include "Tf/hashmap.h"
+#include "Tf/registryManager.h"
 #include <pxr/pxrns.h>
 
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 
 #include <atomic>
-#include <string>
 #include <mutex>
+#include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -134,9 +134,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 // We store the atomic_value separately and refer to it via pointer because we
 // cannot use aggregate-initialization on a struct holding an atomic, but we
 // can value-initialize a single std::atomic.
-template <class T> struct TfEnvSetting {
+template<class T> struct TfEnvSetting {
   using AtomicValue = std::atomic<T *>;
-  
+
   AtomicValue *_value;
   T _default;
   char const *_name;
@@ -145,20 +145,21 @@ template <class T> struct TfEnvSetting {
 
 // Specialize for string, default is stored as char const * (pointing to a
 // literal).
-template <> struct TfEnvSetting<std::string> {
+template<> struct TfEnvSetting<std::string> {
   using AtomicValue = std::atomic<std::string *>;
-  
+
   AtomicValue *_value;
   char const *_default;
   char const *_name;
   char const *_description;
 };
 
-template <class T> void Tf_InitializeEnvSetting(TfEnvSetting<T> *);
+template<class T> void Tf_InitializeEnvSetting(TfEnvSetting<T> *);
 
 /// Returns the value of the specified env setting, registered using
 /// \c TF_DEFINE_ENV_SETTING.
-template <class T> inline T const &TfGetEnvSetting(TfEnvSetting<T> &setting) {
+template<class T> inline T const &TfGetEnvSetting(TfEnvSetting<T> &setting)
+{
   T *val = setting._value->load();
   if (ARCH_UNLIKELY(!val)) {
     Tf_InitializeEnvSetting(&setting);
@@ -174,24 +175,22 @@ bool Tf_ChooseEnvSettingType(bool);
 int Tf_ChooseEnvSettingType(int);
 std::string Tf_ChooseEnvSettingType(char const *);
 
-class Tf_EnvSettingRegistry 
-{
+class Tf_EnvSettingRegistry {
  public:
   Tf_EnvSettingRegistry(const Tf_EnvSettingRegistry &) = delete;
   Tf_EnvSettingRegistry &operator=(const Tf_EnvSettingRegistry &) = delete;
-  
+
   static Tf_EnvSettingRegistry &GetInstance();
-  
+
   Tf_EnvSettingRegistry();
-  
+
   using VariantType = boost::variant<int, bool, std::string>;
-  
-  template <typename U>
-  bool Define(std::string const &varName, U const &value,
-              std::atomic<U *> *cachedValue);
-  
+
+  template<typename U>
+  bool Define(std::string const &varName, U const &value, std::atomic<U *> *cachedValue);
+
   VariantType const *LookupByName(std::string const &name) const;
-  
+
  private:
   mutable std::mutex _lock;
   TfHashMap<std::string, VariantType, TfHash> _valuesByName;
@@ -201,14 +200,15 @@ class Tf_EnvSettingRegistry
 /// Define an env setting named \p envVar with default value \p defValue and a
 /// descriptive string \p description.
 /// \hideinitializer
-#define TF_DEFINE_ENV_SETTING(envVar, defValue, description)                   \
-  std::atomic<decltype(Tf_ChooseEnvSettingType(defValue)) *> envVar##_value;   \
-  TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = {         \
-      &envVar##_value, defValue, #envVar, description};                        \
-  TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) {               \
-    (void)TfGetEnvSetting(envVar);                                             \
+#define TF_DEFINE_ENV_SETTING(envVar, defValue, description) \
+  std::atomic<decltype(Tf_ChooseEnvSettingType(defValue)) *> envVar##_value; \
+  TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = { \
+      &envVar##_value, defValue, #envVar, description}; \
+  TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) \
+  { \
+    (void)TfGetEnvSetting(envVar); \
   }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ENV_SETTING_H
+#endif  // PXR_BASE_TF_ENV_SETTING_H

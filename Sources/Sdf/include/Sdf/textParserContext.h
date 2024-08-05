@@ -54,7 +54,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 // from the file.
 
 class Sdf_TextParserContext {
-public:
+ public:
   // Constructor.
   Sdf_TextParserContext();
 
@@ -164,4 +164,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_TEXT_PARSER_CONTEXT_H
+#endif  // PXR_USD_SDF_TEXT_PARSER_CONTEXT_H

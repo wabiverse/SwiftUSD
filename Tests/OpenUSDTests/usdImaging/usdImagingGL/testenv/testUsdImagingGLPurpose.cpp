@@ -36,8 +36,8 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
+#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
 #include "pxr/usdImaging/usdImagingGL/engine.h"
 #include "pxr/usdImaging/usdImagingGL/unitTestGLDrawing.h"
@@ -50,131 +50,131 @@ using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
 int main(int argc, char *argv[])
 {
-    std::string stageFilePath;
-    std::string imageFilePath = "out";
+  std::string stageFilePath;
+  std::string imageFilePath = "out";
 
-    SdfPath purposePath = SdfPath::AbsoluteRootPath();
+  SdfPath purposePath = SdfPath::AbsoluteRootPath();
 
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "--stage") {
-            stageFilePath = argv[++i];
-        } else if (arg == "--purpose") {
-            purposePath = SdfPath(argv[++i]);
-        } else if (arg == "--write") {
-            imageFilePath = argv[++i];
-        }
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
+    if (arg == "--stage") {
+      stageFilePath = argv[++i];
     }
-
-    imageFilePath = TfStringReplace(imageFilePath, ".png", "");
-
-    // prepare GL context
-    int width = 512, height = 512;
-    GarchGLDebugWindow window("UsdImagingGL Test", width, height);
-    window.Init();
-
-    // open stage
-    UsdStageRefPtr stage = UsdStage::Open(stageFilePath);
-    UsdImagingGLEngineSharedPtr engine;
-    SdfPathVector excludedPaths;
-
-    engine.reset(
-        new UsdImagingGLEngine(stage->GetPseudoRoot().GetPath(), 
-                excludedPaths));
-
-    TfTokenVector purposes;
-    purposes.push_back(UsdGeomTokens->default_);
-
-    // Extent hints are sometimes authored as an optimization to avoid
-    // computing bounds, they are particularly useful for some tests where
-    // there is no bound on the first frame.
-    bool useExtentHints = true;
-    UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), purposes, useExtentHints);
-
-    GfBBox3d bbox = bboxCache.ComputeWorldBound(stage->GetPseudoRoot());
-    GfRange3d world = bbox.ComputeAlignedRange();
-
-    GfVec3d worldCenter = (world.GetMin() + world.GetMax()) / 2.0;
-    GfVec3d translate;
-    double worldSize = world.GetSize().GetLength();
-
-    std::cout << "worldCenter: " << worldCenter << "\n";
-    std::cout << "worldSize: " << worldSize << "\n";
-    if (UsdGeomGetStageUpAxis(stage) == UsdGeomTokens->z) {
-        // transpose y and z centering translation
-        translate[0] = -worldCenter[0];
-        translate[1] = -worldCenter[2];
-        translate[2] = -worldCenter[1] - worldSize;
-    } else {
-        translate[0] = -worldCenter[0];
-        translate[1] = -worldCenter[1];
-        translate[2] = -worldCenter[2] - worldSize;
+    else if (arg == "--purpose") {
+      purposePath = SdfPath(argv[++i]);
     }
-
-    double aspectRatio = double(width)/height;
-    GfFrustum frustum;
-    frustum.SetPerspective(60.0, aspectRatio, 1, 100000.0);
-    GfMatrix4d viewMatrix = GfMatrix4d().SetTranslate(translate);
-    GfMatrix4d projMatrix = frustum.ComputeProjectionMatrix();
-    GfMatrix4d modelViewMatrix = viewMatrix;
-    if (UsdGeomGetStageUpAxis(stage) == UsdGeomTokens->z) {
-        // rotate from z-up to y-up
-        modelViewMatrix =
-            GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0,0.0,0.0), -90.0)) *
-            modelViewMatrix;
+    else if (arg == "--write") {
+      imageFilePath = argv[++i];
     }
+  }
 
-    // --------------------------------------------------------------------
-    // draw.
+  imageFilePath = TfStringReplace(imageFilePath, ".png", "");
 
-    GfVec4d viewport(0, 0, width, height);
-    engine->SetCameraState(modelViewMatrix, projMatrix);
-    engine->SetRenderViewport(viewport);
+  // prepare GL context
+  int width = 512, height = 512;
+  GarchGLDebugWindow window("UsdImagingGL Test", width, height);
+  window.Init();
 
-    UsdImagingGLRenderParams params;
-    params.drawMode = UsdImagingGLDrawMode::DRAW_SHADED_SMOOTH;
-    params.enableLighting = false;
-    params.showGuides = false;
-    params.showProxy = false;
-    params.showRender = false;
-    params.clearColor = GfVec4f{ 0.1f, 0.1f, 0.1f, 1.0f };
+  // open stage
+  UsdStageRefPtr stage = UsdStage::Open(stageFilePath);
+  UsdImagingGLEngineSharedPtr engine;
+  SdfPathVector excludedPaths;
 
-    engine->SetRendererAov(HdAovTokens->color);
+  engine.reset(new UsdImagingGLEngine(stage->GetPseudoRoot().GetPath(), excludedPaths));
 
-    engine->Render(stage->GetPseudoRoot(), params);
+  TfTokenVector purposes;
+  purposes.push_back(UsdGeomTokens->default_);
 
-    UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
-        engine.get(), HdAovTokens->color, imageFilePath + "_0.png");
+  // Extent hints are sometimes authored as an optimization to avoid
+  // computing bounds, they are particularly useful for some tests where
+  // there is no bound on the first frame.
+  bool useExtentHints = true;
+  UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), purposes, useExtentHints);
 
-    // Change purpose.
-    UsdGeomImageable prim(stage->GetPrimAtPath(purposePath));
-    if (!TF_VERIFY(prim)) {
-        return EXIT_FAILURE;
-    }
-    UsdAttribute purposeAttr = prim.CreatePurposeAttr();
-    purposeAttr.Set(UsdGeomTokens->render);
+  GfBBox3d bbox = bboxCache.ComputeWorldBound(stage->GetPseudoRoot());
+  GfRange3d world = bbox.ComputeAlignedRange();
 
-    engine->Render(stage->GetPseudoRoot(), params);
+  GfVec3d worldCenter = (world.GetMin() + world.GetMax()) / 2.0;
+  GfVec3d translate;
+  double worldSize = world.GetSize().GetLength();
 
-    UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
-        engine.get(), HdAovTokens->color, imageFilePath + "_1.png");
+  std::cout << "worldCenter: " << worldCenter << "\n";
+  std::cout << "worldSize: " << worldSize << "\n";
+  if (UsdGeomGetStageUpAxis(stage) == UsdGeomTokens->z) {
+    // transpose y and z centering translation
+    translate[0] = -worldCenter[0];
+    translate[1] = -worldCenter[2];
+    translate[2] = -worldCenter[1] - worldSize;
+  }
+  else {
+    translate[0] = -worldCenter[0];
+    translate[1] = -worldCenter[1];
+    translate[2] = -worldCenter[2] - worldSize;
+  }
 
-    // Enable "render" purpose.
-    params.showRender = true;
+  double aspectRatio = double(width) / height;
+  GfFrustum frustum;
+  frustum.SetPerspective(60.0, aspectRatio, 1, 100000.0);
+  GfMatrix4d viewMatrix = GfMatrix4d().SetTranslate(translate);
+  GfMatrix4d projMatrix = frustum.ComputeProjectionMatrix();
+  GfMatrix4d modelViewMatrix = viewMatrix;
+  if (UsdGeomGetStageUpAxis(stage) == UsdGeomTokens->z) {
+    // rotate from z-up to y-up
+    modelViewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
+                      modelViewMatrix;
+  }
 
-    engine->Render(stage->GetPseudoRoot(), params);
+  // --------------------------------------------------------------------
+  // draw.
 
-    UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
-        engine.get(), HdAovTokens->color, imageFilePath + "_2.png");
+  GfVec4d viewport(0, 0, width, height);
+  engine->SetCameraState(modelViewMatrix, projMatrix);
+  engine->SetRenderViewport(viewport);
 
-    // Revert purpose change & params change.
-    params.showRender = false;
-    purposeAttr.Set(UsdGeomTokens->default_);
+  UsdImagingGLRenderParams params;
+  params.drawMode = UsdImagingGLDrawMode::DRAW_SHADED_SMOOTH;
+  params.enableLighting = false;
+  params.showGuides = false;
+  params.showProxy = false;
+  params.showRender = false;
+  params.clearColor = GfVec4f{0.1f, 0.1f, 0.1f, 1.0f};
 
-    engine->Render(stage->GetPseudoRoot(), params);
+  engine->SetRendererAov(HdAovTokens->color);
 
-    UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
-        engine.get(), HdAovTokens->color, imageFilePath + "_3.png");
+  engine->Render(stage->GetPseudoRoot(), params);
 
-    return EXIT_SUCCESS;
+  UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
+      engine.get(), HdAovTokens->color, imageFilePath + "_0.png");
+
+  // Change purpose.
+  UsdGeomImageable prim(stage->GetPrimAtPath(purposePath));
+  if (!TF_VERIFY(prim)) {
+    return EXIT_FAILURE;
+  }
+  UsdAttribute purposeAttr = prim.CreatePurposeAttr();
+  purposeAttr.Set(UsdGeomTokens->render);
+
+  engine->Render(stage->GetPseudoRoot(), params);
+
+  UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
+      engine.get(), HdAovTokens->color, imageFilePath + "_1.png");
+
+  // Enable "render" purpose.
+  params.showRender = true;
+
+  engine->Render(stage->GetPseudoRoot(), params);
+
+  UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
+      engine.get(), HdAovTokens->color, imageFilePath + "_2.png");
+
+  // Revert purpose change & params change.
+  params.showRender = false;
+  purposeAttr.Set(UsdGeomTokens->default_);
+
+  engine->Render(stage->GetPseudoRoot(), params);
+
+  UsdImagingGL_UnitTestGLDrawing::WriteAovToFile(
+      engine.get(), HdAovTokens->color, imageFilePath + "_3.png");
+
+  return EXIT_SUCCESS;
 }

@@ -26,8 +26,8 @@
 
 /// \file ar/resolverContextBinder.h
 
-#include "ArTypes/api.h"
 #include "Ar/resolverContext.h"
+#include "ArTypes/api.h"
 #include "Vt/value.h"
 #include <pxr/pxrns.h>
 
@@ -46,7 +46,7 @@ class ArResolver;
 ///
 /// \see \ref ArResolver_context "Asset Resolver Context Operations"
 class ArResolverContextBinder {
-public:
+ public:
   /// Bind the given \p context with the asset resolver.
   ///
   /// Calls ArResolver::BindContext on the configured asset resolver
@@ -59,8 +59,7 @@ public:
   /// Calls ArResolver::BindContext on the given \p assetResolver
   /// and saves the bindingData populated by that function.
   AR_API
-  ArResolverContextBinder(ArResolver *assetResolver,
-                          const ArResolverContext &context);
+  ArResolverContextBinder(ArResolver *assetResolver, const ArResolverContext &context);
 
   /// Unbinds the context specified in the constructor of this
   /// object from the asset resolver.
@@ -70,7 +69,7 @@ public:
   AR_API
   ~ArResolverContextBinder();
 
-private:
+ private:
   ArResolver *_resolver;
   ArResolverContext _context;
   VtValue _bindingData;
@@ -78,4 +77,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_AR_RESOLVER_CONTEXT_BINDER_H
+#endif  // PXR_USD_AR_RESOLVER_CONTEXT_BINDER_H

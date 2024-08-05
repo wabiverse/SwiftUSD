@@ -29,311 +29,255 @@
 #include <set>
 #include <unordered_map>
 
-#include "Tf/staticTokens.h"
+#include "Hd/materialNetwork2Interface.h"
 #include "Sdr/registry.h"
 #include "Sdr/shaderNode.h"
 #include "Sdr/shaderProperty.h"
-#include "Hd/materialNetwork2Interface.h"
+#include "Tf/staticTokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (vstructmemberaliases));
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (vstructmemberaliases));
 
-namespace
-{
+namespace {
 
-  /// For a single vstruct placeholder input/output, this describes mappings from:
-  /// 1) associated member input/output -> member name (or names via alias)
-  /// 2) member name -> associated member input/output
-  /// 3) associated member input/output -> parsed conditional expression
-  struct _VstructInfoEntry
+/// For a single vstruct placeholder input/output, this describes mappings from:
+/// 1) associated member input/output -> member name (or names via alias)
+/// 2) member name -> associated member input/output
+/// 3) associated member input/output -> parsed conditional expression
+struct _VstructInfoEntry {
+  typedef std::shared_ptr<_VstructInfoEntry> Ptr;
+
+  typedef std::unordered_map<TfToken, std::vector<TfToken>, TfToken::HashFunctor> MemberMap;
+  typedef std::unordered_map<TfToken, TfToken, TfToken::HashFunctor> ReverseMemberMap;
+  typedef std::
+      unordered_map<TfToken, MatfiltVstructConditionalEvaluator::Ptr, TfToken::HashFunctor>
+          ConditionalMap;
+
+  MemberMap members;
+  ReverseMemberMap reverseMembers;
+  ConditionalMap conditionals;
+};
+
+/// For a single shader, this stores mappings from:
+/// 1) vstruct placeholder input/output -> _VstructInfoEntry
+///
+/// These are typically built once per shader type and cached as it requires
+/// interpretation of metadata which would be wasteful to do repeatedly.
+struct _ShaderInfoEntry {
+  typedef std::shared_ptr<_ShaderInfoEntry> Ptr;
+  typedef std::map<TfToken, _VstructInfoEntry::Ptr> VstructInfoMap;
+
+  VstructInfoMap vstructs;
+
+  /// Constructs a _ShaderInfoEntry::Ptr for a single shader without caching
+  static Ptr Build(const TfToken &nodeTypeId, const NdrTokenVec &shaderTypePriority)
   {
-    typedef std::shared_ptr<_VstructInfoEntry> Ptr;
-
-    typedef std::unordered_map<TfToken, std::vector<TfToken>,
-                               TfToken::HashFunctor>
-        MemberMap;
-    typedef std::unordered_map<TfToken, TfToken,
-                               TfToken::HashFunctor>
-        ReverseMemberMap;
-    typedef std::unordered_map<TfToken, MatfiltVstructConditionalEvaluator::Ptr,
-                               TfToken::HashFunctor>
-        ConditionalMap;
-
-    MemberMap members;
-    ReverseMemberMap reverseMembers;
-    ConditionalMap conditionals;
-  };
-
-  /// For a single shader, this stores mappings from:
-  /// 1) vstruct placeholder input/output -> _VstructInfoEntry
-  ///
-  /// These are typically built once per shader type and cached as it requires
-  /// interpretation of metadata which would be wasteful to do repeatedly.
-  struct _ShaderInfoEntry
-  {
-    typedef std::shared_ptr<_ShaderInfoEntry> Ptr;
-    typedef std::map<TfToken, _VstructInfoEntry::Ptr> VstructInfoMap;
-
-    VstructInfoMap vstructs;
-
-    /// Constructs a _ShaderInfoEntry::Ptr for a single shader without caching
-    static Ptr
-    Build(const TfToken &nodeTypeId,
-          const NdrTokenVec &shaderTypePriority)
+    auto result = Ptr(new _ShaderInfoEntry);
+    if (auto sdrShader = SdrRegistry::GetInstance().GetShaderNodeByIdentifier(nodeTypeId,
+                                                                              shaderTypePriority))
     {
-      auto result = Ptr(new _ShaderInfoEntry);
-      if (auto sdrShader =
-              SdrRegistry::GetInstance().GetShaderNodeByIdentifier(
-                  nodeTypeId, shaderTypePriority))
-      {
-        for (const auto &inputName : sdrShader->GetInputNames())
-        {
-          auto sdrInput = sdrShader->GetShaderInput(inputName);
-          if (!sdrInput)
-          {
-            continue;
-          }
-          _ProcessProperty(result, sdrInput);
+      for (const auto &inputName : sdrShader->GetInputNames()) {
+        auto sdrInput = sdrShader->GetShaderInput(inputName);
+        if (!sdrInput) {
+          continue;
         }
-        for (const auto &outputName : sdrShader->GetOutputNames())
-        {
-          auto sdrOutput = sdrShader->GetShaderOutput(outputName);
-          if (!sdrOutput)
-          {
-            continue;
-          }
-          _ProcessProperty(result, sdrOutput);
-        }
+        _ProcessProperty(result, sdrInput);
       }
+      for (const auto &outputName : sdrShader->GetOutputNames()) {
+        auto sdrOutput = sdrShader->GetShaderOutput(outputName);
+        if (!sdrOutput) {
+          continue;
+        }
+        _ProcessProperty(result, sdrOutput);
+      }
+    }
 
+    return result;
+  }
+
+  /// Constructs and caches a _ShaderInfoEntry::Ptr for a single shader
+  static Ptr Get(const TfToken &nodeTypeId, const NdrTokenVec &shaderTypePriority)
+  {
+    std::lock_guard<std::mutex> lock(_cachedEntryMutex);
+
+    auto I = _cachedEntries.find(nodeTypeId);
+    if (I == _cachedEntries.end()) {
+      auto result = Build(nodeTypeId, shaderTypePriority);
+      _cachedEntries[nodeTypeId] = result;
       return result;
     }
+    return (*I).second;
+  }
 
-    /// Constructs and caches a _ShaderInfoEntry::Ptr for a single shader
-    static Ptr
-    Get(const TfToken &nodeTypeId,
-        const NdrTokenVec &shaderTypePriority)
-    {
-      std::lock_guard<std::mutex> lock(_cachedEntryMutex);
+ private:
+  static std::unordered_map<TfToken, Ptr, TfToken::HashFunctor> _cachedEntries;
+  static std::mutex _cachedEntryMutex;
 
-      auto I = _cachedEntries.find(nodeTypeId);
-      if (I == _cachedEntries.end())
-      {
-        auto result = Build(nodeTypeId, shaderTypePriority);
-        _cachedEntries[nodeTypeId] = result;
-        return result;
-      }
-      return (*I).second;
-    }
-
-  private:
-    static std::unordered_map<TfToken, Ptr, TfToken::HashFunctor>
-        _cachedEntries;
-    static std::mutex _cachedEntryMutex;
-
-    static void
-    _ProcessProperty(Ptr result, SdrShaderPropertyConstPtr prop)
-    {
-      if (!prop->IsVStructMember())
-      {
-        return;
-      }
-
-      const TfToken &vsName = prop->GetVStructMemberOf();
-      const TfToken &vsMemberName = prop->GetVStructMemberName();
-      if (vsName.IsEmpty() || vsMemberName.IsEmpty())
-      {
-        return;
-      }
-
-      _VstructInfoEntry::Ptr entry;
-      auto I = result->vstructs.find(vsName);
-      if (I != result->vstructs.end())
-      {
-        entry = (*I).second;
-      }
-      else
-      {
-        entry.reset(new _VstructInfoEntry);
-        result->vstructs[vsName] = entry;
-      }
-
-      TfToken vsMemberAlias;
-
-      const auto &metadata = prop->GetMetadata();
-      {
-        auto I = metadata.find(_tokens->vstructmemberaliases);
-        if (I != metadata.end())
-        {
-          vsMemberAlias = TfToken((*I).second);
-        }
-      }
-
-      auto &memberNames = entry->members[prop->GetName()];
-      memberNames.push_back(vsMemberName);
-
-      entry->reverseMembers[vsMemberName] = prop->GetName();
-
-      if (!vsMemberAlias.IsEmpty())
-      {
-        memberNames.push_back(vsMemberAlias);
-        entry->reverseMembers[vsMemberAlias] = prop->GetName();
-      }
-
-      const TfToken &condExpr = prop->GetVStructConditionalExpr();
-
-      if (!condExpr.IsEmpty())
-      {
-        entry->conditionals[prop->GetName()] =
-            MatfiltVstructConditionalEvaluator::Parse(condExpr.data());
-      }
-    }
-  };
-
-  std::unordered_map<TfToken, _ShaderInfoEntry::Ptr, TfToken::HashFunctor>
-      _ShaderInfoEntry::_cachedEntries;
-
-  std::mutex _ShaderInfoEntry::_cachedEntryMutex;
-
-} // anonymous namespace
-
-static void
-_ResolveVstructsForNode(
-    HdMaterialNetworkInterface *interface,
-    const TfToken &nodeId,
-    std::set<TfToken> &resolvedNodeNames,
-    const NdrTokenVec &shaderTypePriority,
-    bool enableConditions)
-{
-  if (resolvedNodeNames.find(nodeId) != resolvedNodeNames.end())
+  static void _ProcessProperty(Ptr result, SdrShaderPropertyConstPtr prop)
   {
-    TF_DEBUG(HDPRMAN_VSTRUCTS)
-        .Msg("No resovled node name for %s\n", nodeId.data());
+    if (!prop->IsVStructMember()) {
+      return;
+    }
+
+    const TfToken &vsName = prop->GetVStructMemberOf();
+    const TfToken &vsMemberName = prop->GetVStructMemberName();
+    if (vsName.IsEmpty() || vsMemberName.IsEmpty()) {
+      return;
+    }
+
+    _VstructInfoEntry::Ptr entry;
+    auto I = result->vstructs.find(vsName);
+    if (I != result->vstructs.end()) {
+      entry = (*I).second;
+    }
+    else {
+      entry.reset(new _VstructInfoEntry);
+      result->vstructs[vsName] = entry;
+    }
+
+    TfToken vsMemberAlias;
+
+    const auto &metadata = prop->GetMetadata();
+    {
+      auto I = metadata.find(_tokens->vstructmemberaliases);
+      if (I != metadata.end()) {
+        vsMemberAlias = TfToken((*I).second);
+      }
+    }
+
+    auto &memberNames = entry->members[prop->GetName()];
+    memberNames.push_back(vsMemberName);
+
+    entry->reverseMembers[vsMemberName] = prop->GetName();
+
+    if (!vsMemberAlias.IsEmpty()) {
+      memberNames.push_back(vsMemberAlias);
+      entry->reverseMembers[vsMemberAlias] = prop->GetName();
+    }
+
+    const TfToken &condExpr = prop->GetVStructConditionalExpr();
+
+    if (!condExpr.IsEmpty()) {
+      entry->conditionals[prop->GetName()] = MatfiltVstructConditionalEvaluator::Parse(
+          condExpr.data());
+    }
+  }
+};
+
+std::unordered_map<TfToken, _ShaderInfoEntry::Ptr, TfToken::HashFunctor>
+    _ShaderInfoEntry::_cachedEntries;
+
+std::mutex _ShaderInfoEntry::_cachedEntryMutex;
+
+}  // anonymous namespace
+
+static void _ResolveVstructsForNode(HdMaterialNetworkInterface *interface,
+                                    const TfToken &nodeId,
+                                    std::set<TfToken> &resolvedNodeNames,
+                                    const NdrTokenVec &shaderTypePriority,
+                                    bool enableConditions)
+{
+  if (resolvedNodeNames.find(nodeId) != resolvedNodeNames.end()) {
+    TF_DEBUG(HDPRMAN_VSTRUCTS).Msg("No resovled node name for %s\n", nodeId.data());
     return;
   }
 
   resolvedNodeNames.insert(nodeId);
-  auto shaderInfo =
-      _ShaderInfoEntry::Get(interface->GetNodeType(nodeId),
-                            shaderTypePriority);
+  auto shaderInfo = _ShaderInfoEntry::Get(interface->GetNodeType(nodeId), shaderTypePriority);
 
   // don't do anything if the node has no vstruct definitions
-  if (shaderInfo->vstructs.empty())
-  {
+  if (shaderInfo->vstructs.empty()) {
     TF_DEBUG(HDPRMAN_VSTRUCTS)
-        .Msg("Node %s has no vstructs\n",
-             interface->GetNodeType(nodeId).GetText());
+        .Msg("Node %s has no vstructs\n", interface->GetNodeType(nodeId).GetText());
     return;
   }
 
-  for (const TfToken &inputName :
-       interface->GetNodeInputConnectionNames(nodeId))
-  {
+  for (const TfToken &inputName : interface->GetNodeInputConnectionNames(nodeId)) {
 
     auto I = shaderInfo->vstructs.find(inputName);
-    if (I == shaderInfo->vstructs.end())
-    {
+    if (I == shaderInfo->vstructs.end()) {
       continue;
     }
-    TF_DEBUG(HDPRMAN_VSTRUCTS)
-        .Msg("Found input %s with a vstruct\n", inputName.GetText());
+    TF_DEBUG(HDPRMAN_VSTRUCTS).Msg("Found input %s with a vstruct\n", inputName.GetText());
 
     const auto &vstructInfo = (*I).second;
 
-    HdMaterialNetworkInterface::InputConnectionVector
-        upstreamConnections =
-            interface->GetNodeInputConnection(nodeId, inputName);
+    HdMaterialNetworkInterface::InputConnectionVector upstreamConnections =
+        interface->GetNodeInputConnection(nodeId, inputName);
 
-    if (upstreamConnections.empty())
-    {
-      TF_DEBUG(HDPRMAN_VSTRUCTS)
-          .Msg("Ignoring since no connection\n");
+    if (upstreamConnections.empty()) {
+      TF_DEBUG(HDPRMAN_VSTRUCTS).Msg("Ignoring since no connection\n");
       continue;
     }
-    TF_DEBUG(HDPRMAN_VSTRUCTS)
-        .Msg("Found upstream vstruct connection\n");
+    TF_DEBUG(HDPRMAN_VSTRUCTS).Msg("Found upstream vstruct connection\n");
 
     const auto &upstreamConnection = upstreamConnections.front();
 
-    TfToken upstreamTypeId = interface->GetNodeType(
-        upstreamConnection.upstreamNodeName);
+    TfToken upstreamTypeId = interface->GetNodeType(upstreamConnection.upstreamNodeName);
 
     // confirm connected node exists
-    if (upstreamTypeId.IsEmpty())
-    {
+    if (upstreamTypeId.IsEmpty()) {
       continue;
     }
 
     // confirm connected upstream output is a vstruct
-    auto upstreamShaderInfo = _ShaderInfoEntry::Get(
-        upstreamTypeId, shaderTypePriority);
+    auto upstreamShaderInfo = _ShaderInfoEntry::Get(upstreamTypeId, shaderTypePriority);
     auto upstreamVstructI = upstreamShaderInfo->vstructs.find(
         upstreamConnection.upstreamOutputName);
-    if (upstreamVstructI == upstreamShaderInfo->vstructs.end())
-    {
+    if (upstreamVstructI == upstreamShaderInfo->vstructs.end()) {
       continue;
     }
 
     auto upstreamVstruct = (*upstreamVstructI).second;
 
     // ensure that all connections/conditions are expanded upstream first
-    _ResolveVstructsForNode(interface, upstreamConnection.upstreamNodeName,
-                            resolvedNodeNames, shaderTypePriority, enableConditions);
+    _ResolveVstructsForNode(interface,
+                            upstreamConnection.upstreamNodeName,
+                            resolvedNodeNames,
+                            shaderTypePriority,
+                            enableConditions);
 
     // delete the placeholder connection
     // node.inputConnections.erase(inputName);
     interface->DeleteNodeInputConnection(nodeId, inputName);
 
-    for (auto &memberI : vstructInfo->members)
-    {
+    for (auto &memberI : vstructInfo->members) {
       const TfToken &memberInputName = memberI.first;
 
       // If there's an existing connection to a member input, skip
       // expansion as a direct connection has a stronger opinion.
-      if (!interface->GetNodeInputConnection(
-                        nodeId, memberInputName)
-               .empty())
-      {
+      if (!interface->GetNodeInputConnection(nodeId, memberInputName).empty()) {
         continue;
       }
 
       // loop over member names (which may be > 1 due to member aliases)
-      for (const TfToken &memberName : memberI.second)
-      {
-        auto revMemberI =
-            upstreamVstruct->reverseMembers.find(memberName);
+      for (const TfToken &memberName : memberI.second) {
+        auto revMemberI = upstreamVstruct->reverseMembers.find(memberName);
 
-        if (revMemberI == upstreamVstruct->reverseMembers.end())
-        {
+        if (revMemberI == upstreamVstruct->reverseMembers.end()) {
           continue;
         }
         const TfToken &upstreamMemberOutputName = (*revMemberI).second;
 
         // check for condition, otherwise connect
-        auto condI = upstreamVstruct->conditionals.find(
-            upstreamMemberOutputName);
+        auto condI = upstreamVstruct->conditionals.find(upstreamMemberOutputName);
 
-        if (enableConditions &&
-            condI != upstreamVstruct->conditionals.end())
-        {
+        if (enableConditions && condI != upstreamVstruct->conditionals.end()) {
           auto &evaluator = (*condI).second;
-          evaluator->Evaluate(
+          evaluator->Evaluate(nodeId,
+                              memberInputName,
+                              upstreamConnection.upstreamNodeName,
+                              upstreamMemberOutputName,
+                              shaderTypePriority,
+                              interface);
+        }
+        else {
+          // no condition, just connect
+          interface->SetNodeInputConnection(
               nodeId,
               memberInputName,
-              upstreamConnection.upstreamNodeName,
-              upstreamMemberOutputName,
-              shaderTypePriority,
-              interface);
-        }
-        else
-        {
-          // no condition, just connect
-          interface->SetNodeInputConnection(nodeId, memberInputName,
-                                            {{upstreamConnection.upstreamNodeName,
-                                              upstreamMemberOutputName}});
+              {{upstreamConnection.upstreamNodeName, upstreamMemberOutputName}});
 
           TF_DEBUG(HDPRMAN_VSTRUCTS)
               .Msg("Connected condition-less %s.%s to %s.%s\n",
@@ -348,13 +292,10 @@ _ResolveVstructsForNode(
   }
 }
 
-void MatfiltResolveVstructs(
-    HdMaterialNetworkInterface *interface,
-    bool enableConditions)
+void MatfiltResolveVstructs(HdMaterialNetworkInterface *interface, bool enableConditions)
 {
 
-  if (!interface)
-  {
+  if (!interface) {
     return;
   }
 
@@ -365,14 +306,9 @@ void MatfiltResolveVstructs(
 
   std::set<TfToken> resolvedNodeNames;
 
-  for (const TfToken &nodeName : interface->GetNodeNames())
-  {
+  for (const TfToken &nodeName : interface->GetNodeNames()) {
     _ResolveVstructsForNode(
-        interface,
-        nodeName,
-        resolvedNodeNames,
-        shaderTypePriority,
-        enableConditions);
+        interface, nodeName, resolvedNodeNames, shaderTypePriority, enableConditions);
   }
 }
 

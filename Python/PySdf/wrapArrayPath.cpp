@@ -30,18 +30,23 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Vt_WrapArray {
-template <> std::string GetVtArrayName<VtArray<SdfPath>>() {
+template<> std::string GetVtArrayName<VtArray<SdfPath>>()
+{
   return "PathArray";
 }
-} // namespace Vt_WrapArray
+}  // namespace Vt_WrapArray
 
-template <> SdfPath VtZero() { return SdfPath(); }
+template<> SdfPath VtZero()
+{
+  return SdfPath();
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapArrayPath() {
+void wrapArrayPath()
+{
   VtWrapArray<VtArray<SdfPath>>();
   VtValueFromPythonLValue<VtArray<SdfPath>>();
 }

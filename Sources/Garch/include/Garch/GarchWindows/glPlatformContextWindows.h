@@ -26,23 +26,19 @@
 
 #if defined(_WIN32)
 
-#include <pxr/pxrns.h>
-#include "Garch/api.h"
-#include <memory>
+#  include "Garch/api.h"
+#  include <memory>
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchWGLContextState
-{
-public:
+class GarchWGLContextState {
+ public:
   /// Construct with the current state.
   GARCH_API
   GarchWGLContextState();
 
-  enum class NullState
-  {
-    nullstate
-  };
+  enum class NullState { nullstate };
 
   /// Construct with the null state.
   GARCH_API
@@ -68,7 +64,7 @@ public:
   GARCH_API
   static void DoneCurrent();
 
-private:
+ private:
   class _Detail;
   std::shared_ptr<_Detail> _detail;
 };
@@ -78,6 +74,6 @@ typedef GarchWGLContextState GarchGLPlatformContextState;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(_WIN32)
+#endif  // defined(_WIN32)
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_WINDOWS_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_WINDOWS_H

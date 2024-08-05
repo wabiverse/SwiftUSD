@@ -38,28 +38,28 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static SdfPropertySpecHandleVector
-_WrapPropertyStack(const PcpPropertyIndex &propIndex) {
+static SdfPropertySpecHandleVector _WrapPropertyStack(const PcpPropertyIndex &propIndex)
+{
   const PcpPropertyRange range = propIndex.GetPropertyRange();
   return SdfPropertySpecHandleVector(range.first, range.second);
 }
 
-static SdfPropertySpecHandleVector
-_WrapLocalPropertyStack(const PcpPropertyIndex &propIndex) {
-  const PcpPropertyRange range =
-      propIndex.GetPropertyRange(/* localOnly= */ true);
+static SdfPropertySpecHandleVector _WrapLocalPropertyStack(const PcpPropertyIndex &propIndex)
+{
+  const PcpPropertyRange range = propIndex.GetPropertyRange(/* localOnly= */ true);
   return SdfPropertySpecHandleVector(range.first, range.second);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPropertyIndex() {
+void wrapPropertyIndex()
+{
   typedef PcpPropertyIndex This;
 
   class_<This>("PropertyIndex", "", no_init)
       .add_property("propertyStack", _WrapPropertyStack)
       .add_property("localPropertyStack", _WrapLocalPropertyStack)
-      .add_property("localErrors",
-                    make_function(&This::GetLocalErrors,
-                                  return_value_policy<TfPySequenceToList>()));
+      .add_property(
+          "localErrors",
+          make_function(&This::GetLocalErrors, return_value_policy<TfPySequenceToList>()));
 }

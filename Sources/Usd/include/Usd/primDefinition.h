@@ -46,23 +46,27 @@ class UsdPrim;
 ///
 /// Instances of this class can only be created by the UsdSchemaRegistry.
 class UsdPrimDefinition {
-public:
+ public:
   ~UsdPrimDefinition() = default;
 
   /// Return the list of names of builtin properties for this prim definition.
-  const TfTokenVector &GetPropertyNames() const { return _properties; }
+  const TfTokenVector &GetPropertyNames() const
+  {
+    return _properties;
+  }
 
   /// Return the list of names of the API schemas that have been applied to
   /// this prim definition in order.
-  const TfTokenVector &GetAppliedAPISchemas() const {
+  const TfTokenVector &GetAppliedAPISchemas() const
+  {
     return _appliedAPISchemas;
   }
 
-private:
+ private:
   // Forward declaration required by Property.
   struct _LayerAndPath;
 
-public:
+ public:
   /// Accessor to a property's definition in the prim definition.
   ///
   /// These are returned by calls to UsdPrimDefinition::GetPropertyDefinition
@@ -74,7 +78,7 @@ public:
   /// the UsdPrimDefinition that creates it and cannot be stored or accessed
   /// beyond the lifetime of the prim definition itself.
   class Property {
-  public:
+   public:
     /// Default constructor returns an invalid property.
     Property() = default;
 
@@ -86,7 +90,10 @@ public:
 
     /// Conversion to bool returns true if this represents a valid property
     /// in the prim definition, and false otherwise.
-    explicit operator bool() const { return _layerAndPath; }
+    explicit operator bool() const
+    {
+      return _layerAndPath;
+    }
 
     /// Return true if the property is a valid is a valid property in the
     /// prim definition and is an attribute.
@@ -127,7 +134,7 @@ public:
     ///
     /// Returns true if a value is defined for the given metadata \p key for
     /// this property. Returns false otherwise.
-    template <class T> bool GetMetadata(const TfToken &key, T *value) const;
+    template<class T> bool GetMetadata(const TfToken &key, T *value) const;
 
     /// Retrieves the value at \p keyPath from the dictionary value for the
     /// dictionary metadata field named \p key, that is defined for this
@@ -137,9 +144,8 @@ public:
     /// Returns true if a dictionary value is defined for the given metadata
     /// \p key for this property and it contains a value at \p keyPath.
     /// Returns false otherwise.
-    template <class T>
-    bool GetMetadataByDictKey(const TfToken &key, const TfToken &keyPath,
-                              T *value) const;
+    template<class T>
+    bool GetMetadataByDictKey(const TfToken &key, const TfToken &keyPath, T *value) const;
 
     /// Returns the variability of this property in the prim definition.
     USD_API
@@ -152,11 +158,13 @@ public:
 
     /// @}
 
-  protected:
+   protected:
     // Only the prim definition can create real property accessors.
     friend class UsdPrimDefinition;
     Property(const TfToken &name, const _LayerAndPath *layerAndPath)
-        : _name(name), _layerAndPath(layerAndPath) {}
+        : _name(name), _layerAndPath(layerAndPath)
+    {
+    }
     Property(const _LayerAndPath *layerAndPath) : _layerAndPath(layerAndPath) {}
 
     TfToken _name;
@@ -175,7 +183,7 @@ public:
   /// the UsdPrimDefinition that creates it and cannot be stored or accessed
   /// beyond the lifetime of the prim definition itself.
   class Attribute : public Property {
-  public:
+   public:
     /// Default constructor returns an invalid attribute.
     Attribute() = default;
 
@@ -189,7 +197,10 @@ public:
 
     /// Conversion to bool returns true if this represents a valid property
     /// in the prim definition that is an attribute, and false otherwise.
-    explicit operator bool() const { return IsAttribute(); }
+    explicit operator bool() const
+    {
+      return IsAttribute();
+    }
 
     /// \name Field Access Methods
     /// These methods help get values for additional fields defined on a
@@ -220,7 +231,7 @@ public:
     ///
     /// Returns true if this attribute has a fallback value defined with
     /// the expected type. Returns false otherwise.
-    template <class T> bool GetFallbackValue(T *value) const;
+    template<class T> bool GetFallbackValue(T *value) const;
 
     /// @}
   };
@@ -238,7 +249,7 @@ public:
   /// the UsdPrimDefinition that creates it and cannot be stored or accessed
   /// beyond the lifetime of the prim definition itself.
   class Relationship : public Property {
-  public:
+   public:
     /// Default constructor returns an invalid relationship.
     Relationship() = default;
 
@@ -252,7 +263,10 @@ public:
 
     /// Conversion to bool returns true if this represents a valid property
     /// in the prim definition that is a relationship, and false otherwise.
-    explicit operator bool() const { return IsRelationship(); }
+    explicit operator bool() const
+    {
+      return IsRelationship();
+    }
   };
 
   /// Returns a property accessor the property named \p propName if it is
@@ -303,16 +317,15 @@ public:
   /// TfDynamic_cast<SdfRelationshipSpecHandle>(
   ///     GetSchemaPropertySpec(primType, relName));
   USD_API
-  SdfRelationshipSpecHandle
-  GetSchemaRelationshipSpec(const TfToken &relName) const;
+  SdfRelationshipSpecHandle GetSchemaRelationshipSpec(const TfToken &relName) const;
 
   /// Retrieves the fallback value for the attribute named \p attrName and
   /// stores it in \p value if possible.
   ///
   /// Returns true if the attribute exists in this prim definition and it has
   /// a fallback value defined. Returns false otherwise.
-  template <class T>
-  bool GetAttributeFallbackValue(const TfToken &attrName, T *value) const {
+  template<class T> bool GetAttributeFallbackValue(const TfToken &attrName, T *value) const
+  {
     return _HasField(attrName, SdfFieldKeys->Default, value);
   }
 
@@ -327,7 +340,8 @@ public:
   ///
   /// Returns true if a fallback value is defined for the given metadata
   /// \p key. Returns false otherwise.
-  template <class T> bool GetMetadata(const TfToken &key, T *value) const {
+  template<class T> bool GetMetadata(const TfToken &key, T *value) const
+  {
     if (UsdSchemaRegistry::IsDisallowedField(key)) {
       return false;
     }
@@ -342,9 +356,9 @@ public:
   /// Returns true if a fallback dictionary value is defined for the given
   /// metadata \p key and it contains a value at \p keyPath. Returns false
   /// otherwise.
-  template <class T>
-  bool GetMetadataByDictKey(const TfToken &key, const TfToken &keyPath,
-                            T *value) const {
+  template<class T>
+  bool GetMetadataByDictKey(const TfToken &key, const TfToken &keyPath, T *value) const
+  {
     if (UsdSchemaRegistry::IsDisallowedField(key)) {
       return false;
     }
@@ -368,9 +382,9 @@ public:
   ///
   /// Returns true if a fallback value is defined for the given metadata
   /// \p key for the named property. Returns false otherwise.
-  template <class T>
-  bool GetPropertyMetadata(const TfToken &propName, const TfToken &key,
-                           T *value) const {
+  template<class T>
+  bool GetPropertyMetadata(const TfToken &propName, const TfToken &key, T *value) const
+  {
     if (Property prop = GetPropertyDefinition(propName)) {
       return prop.GetMetadata(key, value);
     }
@@ -385,9 +399,12 @@ public:
   /// Returns true if a fallback dictionary value is defined for the given
   /// metadata \p key for the named property and it contains a value at
   /// \p keyPath. Returns false otherwise.
-  template <class T>
-  bool GetPropertyMetadataByDictKey(const TfToken &propName, const TfToken &key,
-                                    const TfToken &keyPath, T *value) const {
+  template<class T>
+  bool GetPropertyMetadataByDictKey(const TfToken &propName,
+                                    const TfToken &key,
+                                    const TfToken &keyPath,
+                                    T *value) const
+  {
     if (Property prop = GetPropertyDefinition(propName)) {
       return prop.GetMetadataByDictKey(key, keyPath, value);
     }
@@ -423,7 +440,8 @@ public:
   /// \ref UsdSchemaRegistry::IsDisallowedField "schema allowed metadata" are
   /// cleared before it is populated from the prim definition.
   USD_API
-  bool FlattenTo(const SdfLayerHandle &layer, const SdfPath &path,
+  bool FlattenTo(const SdfLayerHandle &layer,
+                 const SdfPath &path,
                  SdfSpecifier newSpecSpecifier = SdfSpecifierOver) const;
 
   /// \overload
@@ -431,17 +449,17 @@ public:
   /// current edit target for a prim with the given \p name under the prim
   /// \p parent.
   USD_API
-  UsdPrim FlattenTo(const UsdPrim &parent, const TfToken &name,
+  UsdPrim FlattenTo(const UsdPrim &parent,
+                    const TfToken &name,
                     SdfSpecifier newSpecSpecifier = SdfSpecifierOver) const;
 
   /// \overload
   /// Copies the contents of this prim definition to a prim spec at the
   /// current edit target for the given \p prim.
   USD_API
-  UsdPrim FlattenTo(const UsdPrim &prim,
-                    SdfSpecifier newSpecSpecifier = SdfSpecifierOver) const;
+  UsdPrim FlattenTo(const UsdPrim &prim, SdfSpecifier newSpecSpecifier = SdfSpecifierOver) const;
 
-private:
+ private:
   // Only the UsdSchemaRegistry can construct prim definitions.
   friend class UsdSchemaRegistry;
 
@@ -450,15 +468,16 @@ private:
   // the extra step of filtering out disallowed or private metadata fields
   // from the SdfSpecs before retrieving metadata. Value resolution does not
   // want to pay that extra cost so uses this function instead.
-  template <class T>
+  template<class T>
   friend bool Usd_GetFallbackValue(const UsdPrimDefinition &primDef,
                                    const TfToken &propName,
                                    const TfToken &fieldName,
-                                   const TfToken &keyPath, T *value) {
+                                   const TfToken &keyPath,
+                                   T *value)
+  {
     // Try to read fallback value.
-    return keyPath.IsEmpty()
-               ? primDef._HasField(propName, fieldName, value)
-               : primDef._HasFieldDictKey(propName, fieldName, keyPath, value);
+    return keyPath.IsEmpty() ? primDef._HasField(propName, fieldName, value) :
+                               primDef._HasFieldDictKey(propName, fieldName, keyPath, value);
   }
 
   // Prim definitions store property access via a pointer to the schematics
@@ -473,13 +492,14 @@ private:
 
     // Accessors for the common data we extract from the schematics, inline
     // for efficiency during value resolution
-    template <class T> bool HasField(const TfToken &fieldName, T *value) const {
+    template<class T> bool HasField(const TfToken &fieldName, T *value) const
+    {
       return layer->HasField(path, fieldName, value);
     }
 
-    template <class T>
-    bool HasFieldDictKey(const TfToken &fieldName, const TfToken &keyPath,
-                         T *value) const {
+    template<class T>
+    bool HasFieldDictKey(const TfToken &fieldName, const TfToken &keyPath, T *value) const
+    {
       return layer->HasFieldDictKey(path, fieldName, keyPath, value);
     }
   };
@@ -487,21 +507,22 @@ private:
   /// It is preferable to use the _HasField and _HasFieldDictKey methods to
   /// access property field values, as opposed to getting a spec handle from
   /// the GetSchemaXXXSpec functions, as these methods are faster.
-  template <class T>
-  bool _HasField(const TfToken &propName, const TfToken &fieldName,
-                 T *value) const {
-    if (const _LayerAndPath *layerAndPath =
-            _GetPropertyLayerAndPath(propName)) {
+  template<class T>
+  bool _HasField(const TfToken &propName, const TfToken &fieldName, T *value) const
+  {
+    if (const _LayerAndPath *layerAndPath = _GetPropertyLayerAndPath(propName)) {
       return layerAndPath->HasField(fieldName, value);
     }
     return false;
   }
 
-  template <class T>
-  bool _HasFieldDictKey(const TfToken &propName, const TfToken &fieldName,
-                        const TfToken &keyPath, T *value) const {
-    if (const _LayerAndPath *layerAndPath =
-            _GetPropertyLayerAndPath(propName)) {
+  template<class T>
+  bool _HasFieldDictKey(const TfToken &propName,
+                        const TfToken &fieldName,
+                        const TfToken &keyPath,
+                        T *value) const
+  {
+    if (const _LayerAndPath *layerAndPath = _GetPropertyLayerAndPath(propName)) {
       return layerAndPath->HasFieldDictKey(fieldName, keyPath, value);
     }
     return false;
@@ -525,32 +546,30 @@ private:
   bool _MapSchematicsPropertyPaths(const VtTokenArray &propertiesToIgnore);
 
   // Accessors for looking property spec paths by name.
-  const _LayerAndPath *_GetPropertyLayerAndPath(const TfToken &propName) const {
+  const _LayerAndPath *_GetPropertyLayerAndPath(const TfToken &propName) const
+  {
     return TfMapLookupPtr(_propLayerAndPathMap, propName);
   }
 
-  _LayerAndPath *_GetPropertyLayerAndPath(const TfToken &propName) {
+  _LayerAndPath *_GetPropertyLayerAndPath(const TfToken &propName)
+  {
     return TfMapLookupPtr(_propLayerAndPathMap, propName);
   }
 
   // Helpers for constructing the prim definition.
   void _ComposePropertiesFromPrimDef(const UsdPrimDefinition &weakerPrimDef);
 
-  void
-  _ComposePropertiesFromPrimDefInstance(const UsdPrimDefinition &weakerPrimDef,
-                                        const std::string &instanceName);
+  void _ComposePropertiesFromPrimDefInstance(const UsdPrimDefinition &weakerPrimDef,
+                                             const std::string &instanceName);
 
-  void _AddOrComposeProperty(const TfToken &propName,
-                             const _LayerAndPath &layerAndPath);
+  void _AddOrComposeProperty(const TfToken &propName, const _LayerAndPath &layerAndPath);
 
-  SdfPropertySpecHandle
-  _FindOrCreatePropertySpecForComposition(const TfToken &propName,
-                                          const _LayerAndPath &srcLayerAndPath);
+  SdfPropertySpecHandle _FindOrCreatePropertySpecForComposition(
+      const TfToken &propName, const _LayerAndPath &srcLayerAndPath);
 
-  SdfPropertySpecHandle
-  _CreateComposedPropertyIfNeeded(const TfToken &propName,
-                                  const _LayerAndPath &strongProp,
-                                  const _LayerAndPath &weakProp);
+  SdfPropertySpecHandle _CreateComposedPropertyIfNeeded(const TfToken &propName,
+                                                        const _LayerAndPath &strongProp,
+                                                        const _LayerAndPath &weakProp);
 
   USD_API
   void _ComposeOverAndReplaceExistingProperty(const TfToken &propName,
@@ -562,11 +581,11 @@ private:
 
   USD_API
   bool _ComposeWeakerAPIPrimDefinition(
-      const UsdPrimDefinition &apiPrimDef, const TfToken &instanceName,
+      const UsdPrimDefinition &apiPrimDef,
+      const TfToken &instanceName,
       _FamilyAndInstanceToVersionMap *alreadyAppliedSchemaFamilyVersions);
 
-  static bool _PropertyTypesMatch(const Property &strongProp,
-                                  const Property &weakProp);
+  static bool _PropertyTypesMatch(const Property &strongProp, const Property &weakProp);
 
   // Path to the prim in the schematics for this prim definition.
   _LayerAndPath _primLayerAndPath;
@@ -587,30 +606,30 @@ private:
   SdfLayerRefPtr _composedPropertyLayer;
 };
 
-template <class T>
-bool UsdPrimDefinition::Property::GetMetadata(const TfToken &key,
-                                              T *value) const {
+template<class T> bool UsdPrimDefinition::Property::GetMetadata(const TfToken &key, T *value) const
+{
   if (UsdSchemaRegistry::IsDisallowedField(key)) {
     return false;
   }
   return _layerAndPath->HasField(key, value);
 }
 
-template <class T>
+template<class T>
 bool UsdPrimDefinition::Property::GetMetadataByDictKey(const TfToken &key,
                                                        const TfToken &keyPath,
-                                                       T *value) const {
+                                                       T *value) const
+{
   if (UsdSchemaRegistry::IsDisallowedField(key)) {
     return false;
   }
   return _layerAndPath->HasFieldDictKey(key, keyPath, value);
 }
 
-template <class T>
-bool UsdPrimDefinition::Attribute::GetFallbackValue(T *value) const {
+template<class T> bool UsdPrimDefinition::Attribute::GetFallbackValue(T *value) const
+{
   return _layerAndPath->HasField(SdfFieldKeys->Default, value);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_DEFINITION_H
+#endif  // PXR_USD_USD_PRIM_DEFINITION_H

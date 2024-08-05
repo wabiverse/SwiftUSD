@@ -24,9 +24,9 @@
 #ifndef HDPRMAN_XCPT_H
 #define HDPRMAN_XCPT_H
 
-#include <pxr/pxrns.h>
 #include "hdPrman/api.h"
 #include "ri.hpp"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,14 +34,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Xcpt messages from prman appropriately and to intercept severe errors
 /// rather than accept prman's default exit behavior.
 
-class HdPrman_Xcpt : public RixXcpt::XcptHandler
-{
-public:
-  HDPRMAN_API virtual void HandleXcpt(int code, int severity,
-                                      const char *msg);
+class HdPrman_Xcpt : public RixXcpt::XcptHandler {
+ public:
+  HDPRMAN_API virtual void HandleXcpt(int code, int severity, const char *msg);
   HDPRMAN_API virtual void HandleExitRequest(int code);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // HDPRMAN_XCPT_H
+#endif  // HDPRMAN_XCPT_H

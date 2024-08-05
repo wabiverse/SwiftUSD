@@ -36,13 +36,12 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapScriptModuleLoader() {
+void wrapScriptModuleLoader()
+{
   typedef TfScriptModuleLoader This;
-  class_<This, TfWeakPtr<This>, boost::noncopyable>("ScriptModuleLoader",
-                                                    no_init)
+  class_<This, TfWeakPtr<This>, boost::noncopyable>("ScriptModuleLoader", no_init)
       .def(TfPySingleton())
-      .def("GetModuleNames", &This::GetModuleNames,
-           return_value_policy<TfPySequenceToList>())
+      .def("GetModuleNames", &This::GetModuleNames, return_value_policy<TfPySequenceToList>())
       .def("GetModulesDict", &This::GetModulesDict)
       .def("WriteDotFile", &This::WriteDotFile)
 

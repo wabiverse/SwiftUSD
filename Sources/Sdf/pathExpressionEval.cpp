@@ -30,10 +30,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_EvalExpr(
-    TfFunctionRef<SdfPredicateFunctionResult(bool /*skip*/)> evalPattern)
-    const {
-  SdfPredicateFunctionResult result =
-      SdfPredicateFunctionResult::MakeConstant(false);
+    TfFunctionRef<SdfPredicateFunctionResult(bool /*skip*/)> evalPattern) const
+{
+  SdfPredicateFunctionResult result = SdfPredicateFunctionResult::MakeConstant(false);
   int nest = 0;
   auto opIter = _ops.cbegin(), opEnd = _ops.cend();
 
@@ -49,21 +48,21 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_EvalExpr(
     const int origNest = nest;
     for (; opIter != opEnd; ++opIter) {
       switch (*opIter) {
-      case EvalPattern:
-        evalPattern(/*skip=*/true);
-        break; // Skip matches.
-      case Not:
-      case And:
-      case Or:
-        break; // Skip operations.
-      case Open:
-        ++nest;
-        break;
-      case Close:
-        if (--nest == origNest) {
-          return;
-        }
-        break;
+        case EvalPattern:
+          evalPattern(/*skip=*/true);
+          break;  // Skip matches.
+        case Not:
+        case And:
+        case Or:
+          break;  // Skip operations.
+        case Open:
+          ++nest;
+          break;
+        case Close:
+          if (--nest == origNest) {
+            return;
+          }
+          break;
       };
     }
   };
@@ -72,27 +71,27 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_EvalExpr(
   // predicate functions.
   for (; opIter != opEnd; ++opIter) {
     switch (*opIter) {
-    case EvalPattern:
-      result.SetAndPropagateConstancy(evalPattern(/*skip=*/false));
-      break;
-    case Not:
-      result = !result;
-      break;
-    case And:
-    case Or: {
-      const bool decidingValue = *opIter != And;
-      // If the And/Or result is already the deciding value,
-      // short-circuit.  Otherwise the result is the rhs, so continue.
-      if (result == decidingValue) {
-        shortCircuit();
-      }
-    } break;
-    case Open:
-      ++nest;
-      break;
-    case Close:
-      --nest;
-      break;
+      case EvalPattern:
+        result.SetAndPropagateConstancy(evalPattern(/*skip=*/false));
+        break;
+      case Not:
+        result = !result;
+        break;
+      case And:
+      case Or: {
+        const bool decidingValue = *opIter != And;
+        // If the And/Or result is already the deciding value,
+        // short-circuit.  Otherwise the result is the rhs, so continue.
+        if (result == decidingValue) {
+          shortCircuit();
+        }
+      } break;
+      case Open:
+        ++nest;
+        break;
+      case Close:
+        --nest;
+        break;
     };
   }
   return result;
@@ -100,7 +99,8 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_EvalExpr(
 
 void Sdf_PathExpressionEvalBase::_PatternImplBase::_Init(
     SdfPathExpression::PathPattern const &pattern,
-    TfFunctionRef<int(SdfPredicateExpression const &)> linkPredicate) {
+    TfFunctionRef<int(SdfPredicateExpression const &)> linkPredicate)
+{
   // Build a matcher.
   _prefix = pattern.GetPrefix();
   _isProperty = pattern.IsProperty();
@@ -111,9 +111,10 @@ void Sdf_PathExpressionEvalBase::_PatternImplBase::_Init(
   // This will technically over-reserve by the number of 'stretch' (//)
   // components, but it's worth it to not thrash the heap.
   _components.reserve(pattern.GetComponents().size());
-  for (auto iter = std::cbegin(pattern.GetComponents()),
-            end = std::cend(pattern.GetComponents());
-       iter != end; ++iter) {
+  for (auto iter = std::cbegin(pattern.GetComponents()), end = std::cend(pattern.GetComponents());
+       iter != end;
+       ++iter)
+  {
     SdfPathExpression::PathPattern::Component const &component = *iter;
     // A 'stretch' (//) component.
     if (component.IsStretch()) {
@@ -137,8 +138,7 @@ void Sdf_PathExpressionEvalBase::_PatternImplBase::_Init(
     // A literal text name (or empty name which must have a predicate).
     if (component.isLiteral || component.text.empty()) {
       _explicitNames.push_back(component.text);
-      _components.push_back(
-          {ExplicitName, static_cast<int>(_explicitNames.size() - 1), -1});
+      _components.push_back({ExplicitName, static_cast<int>(_explicitNames.size() - 1), -1});
     }
     // A glob pattern (we translate to regex).
     else {
@@ -147,8 +147,7 @@ void Sdf_PathExpressionEvalBase::_PatternImplBase::_Init(
     }
     // If the component has a predicate, link that.
     if (component.predicateIndex != -1) {
-      _components.back().predicateIndex =
-          linkPredicate(predicateExprs[component.predicateIndex]);
+      _components.back().predicateIndex = linkPredicate(predicateExprs[component.predicateIndex]);
     }
   }
   // Close the final segment.
@@ -162,16 +161,17 @@ void Sdf_PathExpressionEvalBase::_PatternImplBase::_Init(
 
 SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
     SdfPath const &path,
-    TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)>
-        runNthPredicate) const {
+    TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)> runNthPredicate) const
+{
   using ComponentIter = typename std::vector<_Component>::const_iterator;
   using Result = SdfPredicateFunctionResult;
 
   // Only support prim and prim property paths.
   if (!path.IsAbsoluteRootOrPrimPath() && !path.IsPrimPropertyPath()) {
-    TF_WARN("Unsupported path <%s>; can only match prim or "
-            "prim-property paths",
-            path.GetAsString().c_str());
+    TF_WARN(
+        "Unsupported path <%s>; can only match prim or "
+        "prim-property paths",
+        path.GetAsString().c_str());
     return Result::MakeConstant(false);
   }
 
@@ -202,8 +202,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
   // Split the path into prefixes but skip any covered by _prefix.
   // XXX:TODO Plumb-in caller-supplied vector for reuse by GetPrefixes().
   SdfPathVector prefixes;
-  path.GetPrefixes(&prefixes,
-                   path.GetPathElementCount() - _prefix.GetPathElementCount());
+  path.GetPrefixes(&prefixes, path.GetPathElementCount() - _prefix.GetPathElementCount());
 
   SdfPathVector::const_iterator matchLoc = prefixes.begin();
   const SdfPathVector::const_iterator matchEnd = prefixes.end();
@@ -217,27 +216,27 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
   // segment [qux] must match at the end.
 
   // Check if \p segment matches at exactly \p pathIter.
-  auto checkMatch = [this,
-                     &runNthPredicate](_Segment const &seg,
-                                       SdfPathVector::const_iterator pathIter) {
-    for (auto iter = _components.cbegin() + seg.begin,
-              end = _components.cbegin() + seg.end;
-         iter != end; ++iter, ++pathIter) {
+  auto checkMatch = [this, &runNthPredicate](_Segment const &seg,
+                                             SdfPathVector::const_iterator pathIter) {
+    for (auto iter = _components.cbegin() + seg.begin, end = _components.cbegin() + seg.end;
+         iter != end;
+         ++iter, ++pathIter)
+    {
       switch (iter->type) {
-      case ExplicitName: {
-        // ExplicitName entries with empty text are components with only
-        // predicates. (e.g. //{somePredicate}) They implicitly match
-        // all names.
-        std::string const &name = _explicitNames[iter->patternIndex];
-        if (!name.empty() && name != pathIter->GetName()) {
-          return Result::MakeVarying(false);
-        }
-      } break;
-      case Regex:
-        if (!_regexes[iter->patternIndex].Match(pathIter->GetName())) {
-          return Result::MakeVarying(false);
-        }
-        break;
+        case ExplicitName: {
+          // ExplicitName entries with empty text are components with only
+          // predicates. (e.g. //{somePredicate}) They implicitly match
+          // all names.
+          std::string const &name = _explicitNames[iter->patternIndex];
+          if (!name.empty() && name != pathIter->GetName()) {
+            return Result::MakeVarying(false);
+          }
+        } break;
+        case Regex:
+          if (!_regexes[iter->patternIndex].Match(pathIter->GetName())) {
+            return Result::MakeVarying(false);
+          }
+          break;
       };
       // Evaluate a predicate if this component has one.
       if (iter->predicateIndex != -1) {
@@ -265,8 +264,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
       return Result::MakeVarying(false);
     }
 
-    SdfPathVector::const_iterator pathSearchEnd =
-        pathBegin + (numPaths - segSize) + 1;
+    SdfPathVector::const_iterator pathSearchEnd = pathBegin + (numPaths - segSize) + 1;
 
     Result result;
     for (; pathBegin != pathSearchEnd; ++pathBegin) {
@@ -303,8 +301,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
       }
       matchLoc += segment.GetSize();
       // If there is only one segment, it needs to match the whole.
-      if (!_stretchEnd && segment.EndsAt(componentsSize) &&
-          matchLoc != matchEnd) {
+      if (!_stretchEnd && segment.EndsAt(componentsSize) && matchLoc != matchEnd) {
         return Result::MakeVarying(false);
       }
     }
@@ -320,8 +317,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
     else {
       // We can restrict the search range by considering how many
       // components we have remaining to match against.
-      const Result result =
-          searchMatch(segment, matchLoc, matchEnd - numComponentsLeft);
+      const Result result = searchMatch(segment, matchLoc, matchEnd - numComponentsLeft);
       if (!result) {
         return result;
       }
@@ -333,9 +329,10 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase::_PatternImplBase::_Match(
 }
 
 SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
-    _PatternIncrSearchState &search, SdfPath const &path,
-    TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)>
-        runNthPredicate) const {
+    _PatternIncrSearchState &search,
+    SdfPath const &path,
+    TfFunctionRef<SdfPredicateFunctionResult(int, SdfPath const &)> runNthPredicate) const
+{
   using Result = SdfPredicateFunctionResult;
 
   // If we're constant, return the constant value.
@@ -345,9 +342,10 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
 
   // Only support prim and prim property paths.
   if (!path.IsAbsoluteRootOrPrimPath() && !path.IsPrimPropertyPath()) {
-    TF_WARN("Unsupported path <%s>; can only match prim or "
-            "prim-property paths",
-            path.GetAsString().c_str());
+    TF_WARN(
+        "Unsupported path <%s>; can only match prim or "
+        "prim-property paths",
+        path.GetAsString().c_str());
     search._constantDepth = 0;
     search._constantValue = false;
     return Result::MakeConstant(false);
@@ -380,7 +378,8 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
       search._constantDepth = 0;
       search._constantValue = true;
       return Result::MakeConstant(search._constantValue);
-    } else if (pathElemCount > prefixElemCount) {
+    }
+    else if (pathElemCount > prefixElemCount) {
       // The given path is descendant to the prefix, but the pattern
       // requires an exact match.
       search._constantDepth = 0;
@@ -413,10 +412,10 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
   // If we are attempting to match the first segment, ensure we have enough
   // components (or exactly the right number if there is no stretch begin).
 
-  const size_t numMatchComponents =
-      pathElemCount -
-      (prevSegPtr ? search._segmentMatchDepths.back() + prevSegPtr->GetSize()
-                  : prefixElemCount);
+  const size_t numMatchComponents = pathElemCount - (prevSegPtr ?
+                                                         search._segmentMatchDepths.back() +
+                                                             prevSegPtr->GetSize() :
+                                                         prefixElemCount);
 
   if (numMatchComponents < curSeg.GetSize()) {
     // Not enough path components yet, but we could match once we
@@ -441,8 +440,7 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
        compEnd = make_reverse_iterator(_components.cbegin() + curSeg.begin);
 
   // First pass explicit names & their predicates.
-  for (; compIter != compEnd;
-       ++compIter, workingPath = workingPath.GetParentPath()) {
+  for (; compIter != compEnd; ++compIter, workingPath = workingPath.GetParentPath()) {
     if (compIter->type == _PatternImplBase::ExplicitName) {
       // ExplicitName entries with empty text are components with only
       // predicates. (e.g. //{somePredicate}) They implicitly match all
@@ -453,8 +451,8 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
       }
       // Invoke predicate if this component has one.
       if (compIter->predicateIndex != -1) {
-        SdfPredicateFunctionResult predResult =
-            runNthPredicate(compIter->predicateIndex, workingPath);
+        SdfPredicateFunctionResult predResult = runNthPredicate(compIter->predicateIndex,
+                                                                workingPath);
         if (!predResult) {
           if (predResult.IsConstant()) {
             search._constantDepth = static_cast<int>(pathElemCount);
@@ -468,16 +466,15 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
   // Second pass, regexes & their predicates.
   compIter = make_reverse_iterator(_components.cbegin() + curSeg.end);
   workingPath = path;
-  for (; compIter != compEnd;
-       ++compIter, workingPath = workingPath.GetParentPath()) {
+  for (; compIter != compEnd; ++compIter, workingPath = workingPath.GetParentPath()) {
     if (compIter->type == _PatternImplBase::Regex) {
       if (!_regexes[compIter->patternIndex].Match(workingPath.GetName())) {
         return Result::MakeVarying(false);
       }
       // Invoke predicate if this component has one.
       if (compIter->predicateIndex != -1) {
-        SdfPredicateFunctionResult predResult =
-            runNthPredicate(compIter->predicateIndex, workingPath);
+        SdfPredicateFunctionResult predResult = runNthPredicate(compIter->predicateIndex,
+                                                                workingPath);
         if (!predResult) {
           if (predResult.IsConstant()) {
             search._constantDepth = static_cast<int>(pathElemCount);
@@ -508,17 +505,19 @@ SdfPredicateFunctionResult Sdf_PathExpressionEvalBase ::_PatternImplBase::_Next(
 }
 
 bool Sdf_MakePathExpressionEvalImpl(
-    Sdf_PathExpressionEvalBase &eval, SdfPathExpression const &expr,
-    TfFunctionRef<void(SdfPathExpression::PathPattern const &)>
-        translatePattern) {
+    Sdf_PathExpressionEvalBase &eval,
+    SdfPathExpression const &expr,
+    TfFunctionRef<void(SdfPathExpression::PathPattern const &)> translatePattern)
+{
   using Expr = SdfPathExpression;
   using Eval = Sdf_PathExpressionEvalBase;
 
   if (!expr.IsComplete()) {
-    TF_CODING_ERROR("Cannot build evaluator for incomplete "
-                    "SdfPathExpression; must contain only absolute "
-                    "paths and no expression references: <%s>",
-                    expr.GetText().c_str());
+    TF_CODING_ERROR(
+        "Cannot build evaluator for incomplete "
+        "SdfPathExpression; must contain only absolute "
+        "paths and no expression references: <%s>",
+        expr.GetText().c_str());
     return false;
   }
 
@@ -527,55 +526,58 @@ bool Sdf_MakePathExpressionEvalImpl(
 
   auto exprToEvalOp = [](Expr::Op op) {
     switch (op) {
-    case Expr::Complement:
-      return Eval::Not;
-    case Expr::Union:
-    case Expr::ImpliedUnion:
-      return Eval::Or;
-    case Expr::Intersection:
-    case Expr::Difference:
-      return Eval::And;
-      // Note that Difference(A, B) is transformed to And(A, !B) below.
-    case Expr::Pattern:
-      return Eval::EvalPattern;
-    case Expr::ExpressionRef:
-      TF_CODING_ERROR("Building evaluator for incomplete "
-                      "SdfPathExpression");
-      break;
+      case Expr::Complement:
+        return Eval::Not;
+      case Expr::Union:
+      case Expr::ImpliedUnion:
+        return Eval::Or;
+      case Expr::Intersection:
+      case Expr::Difference:
+        return Eval::And;
+        // Note that Difference(A, B) is transformed to And(A, !B) below.
+      case Expr::Pattern:
+        return Eval::EvalPattern;
+      case Expr::ExpressionRef:
+        TF_CODING_ERROR(
+            "Building evaluator for incomplete "
+            "SdfPathExpression");
+        break;
     };
     return static_cast<typename Eval::_Op>(-1);
   };
 
   auto translateLogic = [&](Expr::Op op, int argIndex) {
     switch (op) {
-    case Expr::Complement: // Complement (aka Not) is postfix, RPN-style.
-      if (argIndex == 1) {
-        eval._ops.push_back(Eval::Not);
-      }
-      break;
-    case Expr::Union:        // Binary logic ops are infix to facilitate
-    case Expr::ImpliedUnion: // short-circuiting.
-    case Expr::Intersection:
-    case Expr::Difference:
-      if (argIndex == 1) {
-        eval._ops.push_back(exprToEvalOp(op));
-        eval._ops.push_back(Eval::Open);
-      } else if (argIndex == 2) {
-        // The set-difference operation (a - b) is transformed to (a &
-        // ~b) which is represented in boolean logic as (a and not b),
-        // so we apply a postfix Not here if the op is 'Difference'.
-        if (op == Expr::Difference) {
+      case Expr::Complement:  // Complement (aka Not) is postfix, RPN-style.
+        if (argIndex == 1) {
           eval._ops.push_back(Eval::Not);
         }
-        eval._ops.push_back(Eval::Close);
-      }
-      break;
-    case Expr::Pattern:
-      break; // do nothing, handled in translatePattern.
-    case Expr::ExpressionRef:
-      TF_CODING_ERROR("Cannot build evaluator for incomplete "
-                      "SdfPathExpression");
-      break;
+        break;
+      case Expr::Union:         // Binary logic ops are infix to facilitate
+      case Expr::ImpliedUnion:  // short-circuiting.
+      case Expr::Intersection:
+      case Expr::Difference:
+        if (argIndex == 1) {
+          eval._ops.push_back(exprToEvalOp(op));
+          eval._ops.push_back(Eval::Open);
+        }
+        else if (argIndex == 2) {
+          // The set-difference operation (a - b) is transformed to (a &
+          // ~b) which is represented in boolean logic as (a and not b),
+          // so we apply a postfix Not here if the op is 'Difference'.
+          if (op == Expr::Difference) {
+            eval._ops.push_back(Eval::Not);
+          }
+          eval._ops.push_back(Eval::Close);
+        }
+        break;
+      case Expr::Pattern:
+        break;  // do nothing, handled in translatePattern.
+      case Expr::ExpressionRef:
+        TF_CODING_ERROR(
+            "Cannot build evaluator for incomplete "
+            "SdfPathExpression");
+        break;
     };
   };
 
@@ -583,8 +585,7 @@ bool Sdf_MakePathExpressionEvalImpl(
   // "completeness" above, which means that it must have no unresolved
   // references.
   auto issueReferenceError = [&expr](Expr::ExpressionReference const &) {
-    TF_CODING_ERROR("Unexpected reference in path expression: <%s>",
-                    expr.GetText().c_str());
+    TF_CODING_ERROR("Unexpected reference in path expression: <%s>", expr.GetText().c_str());
   };
 
   TfErrorMark m;

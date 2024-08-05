@@ -30,9 +30,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceAggregateNodeRefPtr TraceAggregateNode::Append(Id id, const TfToken &key,
-                                                    TimeStamp ts, int c,
-                                                    int xc) {
+TraceAggregateNodeRefPtr TraceAggregateNode::Append(
+    Id id, const TfToken &key, TimeStamp ts, int c, int xc)
+{
   TraceAggregateNodeRefPtr n = GetChild(key);
   if (n) {
     n->_id = id;
@@ -42,7 +42,8 @@ TraceAggregateNodeRefPtr TraceAggregateNode::Append(Id id, const TfToken &key,
     n->_exclusiveCount += xc;
     n->_exclusiveTs += ts;
     n->_recursiveExclusiveTs += ts;
-  } else {
+  }
+  else {
     n = TraceAggregateNode::New(id, key, ts, c, xc);
     _children.push_back(n);
     _childrenByKey[key] = _children.size() - 1;
@@ -50,13 +51,13 @@ TraceAggregateNodeRefPtr TraceAggregateNode::Append(Id id, const TfToken &key,
 
   // Update our exclusive time to discount our new child's time.
   _exclusiveTs = (_exclusiveTs >= ts) ? _exclusiveTs - ts : 0;
-  _recursiveExclusiveTs =
-      (_recursiveExclusiveTs >= ts) ? _recursiveExclusiveTs - ts : 0;
+  _recursiveExclusiveTs = (_recursiveExclusiveTs >= ts) ? _recursiveExclusiveTs - ts : 0;
 
   return n;
 }
 
-void TraceAggregateNode::Append(TraceAggregateNodeRefPtr child) {
+void TraceAggregateNode::Append(TraceAggregateNodeRefPtr child)
+{
   TraceAggregateNodeRefPtr n = GetChild(child->GetKey());
   if (n) {
     n->_id = child->_id;
@@ -76,53 +77,61 @@ void TraceAggregateNode::Append(TraceAggregateNodeRefPtr child) {
     for (TraceAggregateNodeRefPtr &c : child->_children) {
       n->Append(c);
     }
-  } else {
+  }
+  else {
     _children.push_back(child);
     _childrenByKey[child->GetKey()] = _children.size() - 1;
   }
 
   // Update our exclusive time to discount our new child's time.
   _exclusiveTs = (_exclusiveTs >= child->_ts) ? _exclusiveTs - child->_ts : 0;
-  _recursiveExclusiveTs = (_recursiveExclusiveTs >= child->_ts)
-                              ? _recursiveExclusiveTs - child->_ts
-                              : 0;
+  _recursiveExclusiveTs = (_recursiveExclusiveTs >= child->_ts) ?
+                              _recursiveExclusiveTs - child->_ts :
+                              0;
 }
 
-TraceAggregateNode::TimeStamp
-TraceAggregateNode::GetExclusiveTime(bool recursive) {
+TraceAggregateNode::TimeStamp TraceAggregateNode::GetExclusiveTime(bool recursive)
+{
   return recursive ? _recursiveExclusiveTs : _exclusiveTs;
 }
 
-void TraceAggregateNode::AppendInclusiveCounterValue(int index, double value) {
+void TraceAggregateNode::AppendInclusiveCounterValue(int index, double value)
+{
   _counterValues[index].inclusive += value;
 }
 
-double TraceAggregateNode::GetInclusiveCounterValue(int index) const {
+double TraceAggregateNode::GetInclusiveCounterValue(int index) const
+{
   _CounterValues::const_iterator it = _counterValues.find(index);
   return it != _counterValues.end() ? it->second.inclusive : 0.0;
 }
 
-void TraceAggregateNode::AppendExclusiveCounterValue(int index, double value) {
+void TraceAggregateNode::AppendExclusiveCounterValue(int index, double value)
+{
   _counterValues[index].exclusive += value;
 }
 
-double TraceAggregateNode::GetExclusiveCounterValue(int index) const {
+double TraceAggregateNode::GetExclusiveCounterValue(int index) const
+{
   _CounterValues::const_iterator it = _counterValues.find(index);
   return it != _counterValues.end() ? it->second.exclusive : 0.0;
 }
 
-TraceAggregateNodeRefPtr TraceAggregateNode::GetChild(const TfToken &key) {
+TraceAggregateNodeRefPtr TraceAggregateNode::GetChild(const TfToken &key)
+{
   _ChildDictionary::const_iterator i = _childrenByKey.find(key);
   if (i != _childrenByKey.end()) {
     return _children[i->second];
-  } else {
+  }
+  else {
     return TraceAggregateNodeRefPtr(0);
   }
 }
 
-void TraceAggregateNode::AdjustForOverheadAndNoise(
-    TimeStamp scopeOverhead, TimeStamp timerQuantum,
-    uint64_t *numDescendantNodes) {
+void TraceAggregateNode::AdjustForOverheadAndNoise(TimeStamp scopeOverhead,
+                                                   TimeStamp timerQuantum,
+                                                   uint64_t *numDescendantNodes)
+{
 
   // Walk everything depth-first and accumulate descendant counts.  On the way
   // out, subtract scopeOverhead times number of descendant scopes from
@@ -130,8 +139,7 @@ void TraceAggregateNode::AdjustForOverheadAndNoise(
 
   uint64_t localNumDescendantNodes = _children.size();
   for (TraceAggregateNodeRefPtr const &child : _children) {
-    child->AdjustForOverheadAndNoise(scopeOverhead, timerQuantum,
-                                     &localNumDescendantNodes);
+    child->AdjustForOverheadAndNoise(scopeOverhead, timerQuantum, &localNumDescendantNodes);
   }
 
   TimeStamp totalOverhead = scopeOverhead * localNumDescendantNodes;
@@ -158,9 +166,9 @@ void TraceAggregateNode::AdjustForOverheadAndNoise(
   for (TraceAggregateNodeRefPtr const &child : _children) {
     if (isNoisy(child->_ts, child->_count)) {
       child->_ts = child->_exclusiveTs = 0;
-    } else {
-      newExclusiveTs -=
-          (newExclusiveTs > child->_ts) ? child->_ts : newExclusiveTs;
+    }
+    else {
+      newExclusiveTs -= (newExclusiveTs > child->_ts) ? child->_ts : newExclusiveTs;
     }
   }
 
@@ -175,8 +183,8 @@ void TraceAggregateNode::AdjustForOverheadAndNoise(
 // This stack node is a convenient container for the data we need to keep
 // track of during an iterative post-order traversal of our tree.
 struct _StackNode {
-  _StackNode(TraceAggregateNodePtr node, int parentIdx)
-      : eventNode(node), parentIdx(parentIdx) {
+  _StackNode(TraceAggregateNodePtr node, int parentIdx) : eventNode(node), parentIdx(parentIdx)
+  {
     remainingChildren = static_cast<int>(node->GetChildrenRef().size());
   }
 
@@ -185,7 +193,8 @@ struct _StackNode {
   int remainingChildren;
 };
 
-void TraceAggregateNode::MarkRecursiveChildren() {
+void TraceAggregateNode::MarkRecursiveChildren()
+{
   // Trivial case, if we are already marked, there is nothing left to do.
   if (IsRecursionHead())
     return;
@@ -240,7 +249,7 @@ void TraceAggregateNode::MarkRecursiveChildren() {
           curNode->_SetAsRecursionMarker(parentNode);
           break;
         }
-        p = stack[p].parentIdx; // next parent up
+        p = stack[p].parentIdx;  // next parent up
       }
 
       // If we have a valid parent, decrease the count of children
@@ -248,7 +257,8 @@ void TraceAggregateNode::MarkRecursiveChildren() {
       if (parentIdx > -1)
         stack[parentIdx].remainingChildren -= 1;
       stack.pop_back();
-    } else {
+    }
+    else {
       // Here our node has children, so before we go on, we must
       // push our children on the child stack.  This gives us the
       // post-order traversal we need.
@@ -267,7 +277,8 @@ void TraceAggregateNode::MarkRecursiveChildren() {
   }
 }
 
-void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
+void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node)
+{
   // Merge our times with this node's times.  Note that here we only
   // use the recursion data in order to keep the original state intact.
   if (IsRecursionMarker()) {
@@ -281,7 +292,8 @@ void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
     }
     _recursionParent->_MergeRecursive(node);
     return;
-  } else {
+  }
+  else {
     _recursiveCount += node->GetCount(true /* recursion */);
     _recursiveExclusiveTs += node->GetExclusiveTime(true /* recursion */);
   }
@@ -309,8 +321,10 @@ void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
 
     if (!n) {
       // Create an empty node to merge with.
-      n = TraceAggregateNode::New(child->GetId(), child->GetKey(),
-                                  child->GetInclusiveTime(), 0,
+      n = TraceAggregateNode::New(child->GetId(),
+                                  child->GetKey(),
+                                  child->GetInclusiveTime(),
+                                  0,
                                   child->GetExclusiveCount());
 
       // On our new node, we want the exclusiveTs to be computed by
@@ -329,7 +343,8 @@ void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
       else
         // We always want to merge new nodes.
         n->_MergeRecursive(child);
-    } else {
+    }
+    else {
       // This key already exists, determine if we want to merge it in.
 
       // We have to make sure that we are not merging in recursion markers
@@ -337,16 +352,14 @@ void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
       //
       // non-marker into non-marker:
       //  both nodes contain useful information, merge them.
-      bool nonMarkerIntoNonMarker =
-          (!child->IsRecursionMarker() && !n->IsRecursionMarker());
+      bool nonMarkerIntoNonMarker = (!child->IsRecursionMarker() && !n->IsRecursionMarker());
       //
       // non-marker into maker:
       //      this case can happen when we have two branches that come
       //      out from the same root and have the same recursive pattern.
       //      we can't control the order that the siblings will be merged,
       //      and therefore we have to handle this case.
-      bool nonMarkerIntoMarker =
-          (!child->IsRecursionMarker() && n->IsRecursionMarker());
+      bool nonMarkerIntoMarker = (!child->IsRecursionMarker() && n->IsRecursionMarker());
       //
       // marker into non-marker:
       //  non-marker will eventually become a marker, and we already
@@ -363,7 +376,8 @@ void TraceAggregateNode::_MergeRecursive(const TraceAggregateNodeRefPtr &node) {
   }
 }
 
-void TraceAggregateNode::_SetAsRecursionMarker(TraceAggregateNodePtr parent) {
+void TraceAggregateNode::_SetAsRecursionMarker(TraceAggregateNodePtr parent)
+{
   _isRecursionMarker = true;
   _recursionParent = parent;
   if (!parent) {
@@ -376,7 +390,8 @@ void TraceAggregateNode::_SetAsRecursionMarker(TraceAggregateNodePtr parent) {
   // tree, we have to keep them untouched.
 }
 
-void TraceAggregateNode::CalculateInclusiveCounterValues() {
+void TraceAggregateNode::CalculateInclusiveCounterValues()
+{
   for (TraceAggregateNodeRefPtr &c : _children) {
     c->CalculateInclusiveCounterValues();
   }

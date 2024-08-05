@@ -42,11 +42,16 @@ class UsdAttribute;
 /// authored time samples.
 ///
 class Usd_InterpolatorBase {
-public:
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) = 0;
+ public:
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) = 0;
   virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
                            double upper) = 0;
 };
 
@@ -56,15 +61,22 @@ public:
 /// not expected.
 ///
 class Usd_NullInterpolator : public Usd_InterpolatorBase {
-public:
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) final {
+ public:
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return false;
   }
 
   virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
-                           double upper) {
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper)
+  {
     return false;
   }
 };
@@ -78,23 +90,28 @@ public:
 /// type lookups to dispatch to the appropriate interpolator.
 ///
 class Usd_UntypedInterpolator : public Usd_InterpolatorBase {
-public:
-  Usd_UntypedInterpolator(const UsdAttribute &attr, VtValue *result)
-      : _attr(attr), _result(result) {}
+ public:
+  Usd_UntypedInterpolator(const UsdAttribute &attr, VtValue *result) : _attr(attr), _result(result)
+  {
+  }
 
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) final;
-
-  virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
                            double upper) final;
 
-private:
-  template <class Src>
-  bool _Interpolate(const Src &src, const SdfPath &path, double time,
-                    double lower, double upper);
+  virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final;
 
-private:
+ private:
+  template<class Src>
+  bool _Interpolate(const Src &src, const SdfPath &path, double time, double lower, double upper);
+
+ private:
   const UsdAttribute &_attr;
   VtValue *_result;
 };
@@ -108,42 +125,49 @@ private:
 /// attribute value for a time with no samples authored is the nearest
 /// preceding value.
 ///
-template <class T> class Usd_HeldInterpolator : public Usd_InterpolatorBase {
-public:
+template<class T> class Usd_HeldInterpolator : public Usd_InterpolatorBase {
+ public:
   Usd_HeldInterpolator(T *result) : _result(result) {}
 
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) final {
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return layer->QueryTimeSample(path, lower, _result);
   }
 
   virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
-                           double upper) final {
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return clipSet->QueryTimeSample(path, lower, this, _result);
   }
 
-private:
+ private:
   T *_result;
 };
 
-template <class T>
-inline T Usd_Lerp(double alpha, const T &lower, const T &upper) {
+template<class T> inline T Usd_Lerp(double alpha, const T &lower, const T &upper)
+{
   return GfLerp(alpha, lower, upper);
 }
 
-inline GfQuath Usd_Lerp(double alpha, const GfQuath &lower,
-                        const GfQuath &upper) {
+inline GfQuath Usd_Lerp(double alpha, const GfQuath &lower, const GfQuath &upper)
+{
   return GfSlerp(alpha, lower, upper);
 }
 
-inline GfQuatf Usd_Lerp(double alpha, const GfQuatf &lower,
-                        const GfQuatf &upper) {
+inline GfQuatf Usd_Lerp(double alpha, const GfQuatf &lower, const GfQuatf &upper)
+{
   return GfSlerp(alpha, lower, upper);
 }
 
-inline GfQuatd Usd_Lerp(double alpha, const GfQuatd &lower,
-                        const GfQuatd &upper) {
+inline GfQuatd Usd_Lerp(double alpha, const GfQuatd &lower, const GfQuatd &upper)
+{
   return GfSlerp(alpha, lower, upper);
 }
 
@@ -154,25 +178,32 @@ inline GfQuatd Usd_Lerp(double alpha, const GfQuatd &lower,
 /// With linear interpolation, the attribute value for a time with no samples
 /// will be linearly interpolated from the previous and next time samples.
 ///
-template <class T> class Usd_LinearInterpolator : public Usd_InterpolatorBase {
-public:
+template<class T> class Usd_LinearInterpolator : public Usd_InterpolatorBase {
+ public:
   Usd_LinearInterpolator(T *result) : _result(result) {}
 
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) final {
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return _Interpolate(layer, path, time, lower, upper);
   }
 
   virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
-                           double upper) final {
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return _Interpolate(clipSet, path, time, lower, upper);
   }
 
-private:
-  template <class Src>
-  bool _Interpolate(const Src &src, const SdfPath &path, double time,
-                    double lower, double upper) {
+ private:
+  template<class Src>
+  bool _Interpolate(const Src &src, const SdfPath &path, double time, double lower, double upper)
+  {
     T lowerValue, upperValue;
 
     // In the presence of a value block we use held interpolation.
@@ -183,11 +214,10 @@ private:
     Usd_LinearInterpolator<T> lowerInterpolator(&lowerValue);
     Usd_LinearInterpolator<T> upperInterpolator(&upperValue);
 
-    if (!Usd_QueryTimeSample(src, path, lower, &lowerInterpolator,
-                             &lowerValue)) {
+    if (!Usd_QueryTimeSample(src, path, lower, &lowerInterpolator, &lowerValue)) {
       return false;
-    } else if (!Usd_QueryTimeSample(src, path, upper, &upperInterpolator,
-                                    &upperValue)) {
+    }
+    else if (!Usd_QueryTimeSample(src, path, upper, &upperInterpolator, &upperValue)) {
       upperValue = lowerValue;
     }
 
@@ -196,32 +226,38 @@ private:
     return true;
   }
 
-private:
+ private:
   T *_result;
 };
 
 // Specialization to linearly interpolate each element for
 // array types.
-template <class T>
-class Usd_LinearInterpolator<VtArray<T>> : public Usd_InterpolatorBase {
-public:
+template<class T> class Usd_LinearInterpolator<VtArray<T>> : public Usd_InterpolatorBase {
+ public:
   Usd_LinearInterpolator(VtArray<T> *result) : _result(result) {}
 
-  virtual bool Interpolate(const SdfLayerRefPtr &layer, const SdfPath &path,
-                           double time, double lower, double upper) final {
+  virtual bool Interpolate(const SdfLayerRefPtr &layer,
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return _Interpolate(layer, path, time, lower, upper);
   }
 
   virtual bool Interpolate(const Usd_ClipSetRefPtr &clipSet,
-                           const SdfPath &path, double time, double lower,
-                           double upper) final {
+                           const SdfPath &path,
+                           double time,
+                           double lower,
+                           double upper) final
+  {
     return _Interpolate(clipSet, path, time, lower, upper);
   }
 
-private:
-  template <class Src>
-  bool _Interpolate(const Src &src, const SdfPath &path, double time,
-                    double lower, double upper) {
+ private:
+  template<class Src>
+  bool _Interpolate(const Src &src, const SdfPath &path, double time, double lower, double upper)
+  {
     VtArray<T> lowerValue, upperValue;
 
     // In the presence of a value block we use held interpolation.
@@ -232,11 +268,10 @@ private:
     Usd_LinearInterpolator<VtArray<T>> lowerInterpolator(&lowerValue);
     Usd_LinearInterpolator<VtArray<T>> upperInterpolator(&upperValue);
 
-    if (!Usd_QueryTimeSample(src, path, lower, &lowerInterpolator,
-                             &lowerValue)) {
+    if (!Usd_QueryTimeSample(src, path, lower, &lowerInterpolator, &lowerValue)) {
       return false;
-    } else if (!Usd_QueryTimeSample(src, path, upper, &upperInterpolator,
-                                    &upperValue)) {
+    }
+    else if (!Usd_QueryTimeSample(src, path, upper, &upperInterpolator, &upperValue)) {
       upperValue = lowerValue;
     }
 
@@ -254,10 +289,12 @@ private:
     if (parametricTime == 0.0) {
       // just swap the lower value in.
       _result->swap(lowerValue);
-    } else if (parametricTime == 1.0) {
+    }
+    else if (parametricTime == 1.0) {
       // just swap the upper value in.
       _result->swap(upperValue);
-    } else {
+    }
+    else {
       _result->resize(lowerValue.size());
 
       // must actually calculate interpolated values.
@@ -272,7 +309,7 @@ private:
     return true;
   }
 
-private:
+ private:
   VtArray<T> *_result;
 };
 
@@ -280,14 +317,17 @@ private:
 /// that time in the given \p src clip or layer. Otherwise,
 /// interpolates the value at the given \p time between \p lower
 /// and \p upper using the given \p interpolator.
-template <class Src, class T>
-inline bool Usd_GetOrInterpolateValue(const Src &src, const SdfPath &path,
-                                      double time, double lower, double upper,
+template<class Src, class T>
+inline bool Usd_GetOrInterpolateValue(const Src &src,
+                                      const SdfPath &path,
+                                      double time,
+                                      double lower,
+                                      double upper,
                                       Usd_InterpolatorBase *interpolator,
-                                      T *result) {
+                                      T *result)
+{
   if (GfIsClose(lower, upper, /* epsilon = */ 1e-6)) {
-    bool queryResult =
-        Usd_QueryTimeSample(src, path, lower, interpolator, result);
+    bool queryResult = Usd_QueryTimeSample(src, path, lower, interpolator, result);
     return queryResult && (!Usd_ClearValueIfBlocked(result));
   }
 
@@ -296,4 +336,4 @@ inline bool Usd_GetOrInterpolateValue(const Src &src, const SdfPath &path,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_INTERPOLATORS_H
+#endif  // PXR_USD_USD_INTERPOLATORS_H

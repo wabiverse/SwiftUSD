@@ -33,126 +33,97 @@
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdBasisCurvesSchemaTokens,
-    HDBASISCURVES_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdBasisCurvesSchemaTokens, HDBASISCURVES_SCHEMA_TOKENS);
 
-
-
-HdBasisCurvesTopologySchema
-HdBasisCurvesSchema::GetTopology()
+HdBasisCurvesTopologySchema HdBasisCurvesSchema::GetTopology()
 {
-    return HdBasisCurvesTopologySchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdBasisCurvesSchemaTokens->topology));
+  return HdBasisCurvesTopologySchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdBasisCurvesSchemaTokens->topology));
 }
 
-HdGeomSubsetsSchema
-HdBasisCurvesSchema::GetGeomSubsets()
+HdGeomSubsetsSchema HdBasisCurvesSchema::GetGeomSubsets()
 {
-    return HdGeomSubsetsSchema(_GetTypedDataSource<HdContainerDataSource>(
-        HdBasisCurvesSchemaTokens->geomSubsets));
+  return HdGeomSubsetsSchema(
+      _GetTypedDataSource<HdContainerDataSource>(HdBasisCurvesSchemaTokens->geomSubsets));
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdBasisCurvesSchema::BuildRetained(
-        const HdContainerDataSourceHandle &topology,
-        const HdContainerDataSourceHandle &geomSubsets
-)
+HdContainerDataSourceHandle HdBasisCurvesSchema::BuildRetained(
+    const HdContainerDataSourceHandle &topology, const HdContainerDataSourceHandle &geomSubsets)
 {
-    TfToken names[2];
-    HdDataSourceBaseHandle values[2];
+  TfToken names[2];
+  HdDataSourceBaseHandle values[2];
 
-    size_t count = 0;
-    if (topology) {
-        names[count] = HdBasisCurvesSchemaTokens->topology;
-        values[count++] = topology;
-    }
+  size_t count = 0;
+  if (topology) {
+    names[count] = HdBasisCurvesSchemaTokens->topology;
+    values[count++] = topology;
+  }
 
-    if (geomSubsets) {
-        names[count] = HdBasisCurvesSchemaTokens->geomSubsets;
-        values[count++] = geomSubsets;
-    }
+  if (geomSubsets) {
+    names[count] = HdBasisCurvesSchemaTokens->geomSubsets;
+    values[count++] = geomSubsets;
+  }
 
-    return HdRetainedContainerDataSource::New(count, names, values);
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
 /*static*/
-HdBasisCurvesSchema
-HdBasisCurvesSchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
+HdBasisCurvesSchema HdBasisCurvesSchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdBasisCurvesSchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdBasisCurvesSchemaTokens->basisCurves))
-        : nullptr);
+  return HdBasisCurvesSchema(fromParentContainer ?
+                                 HdContainerDataSource::Cast(fromParentContainer->Get(
+                                     HdBasisCurvesSchemaTokens->basisCurves)) :
+                                 nullptr);
 }
 
 /*static*/
-const TfToken &
-HdBasisCurvesSchema::GetSchemaToken()
+const TfToken &HdBasisCurvesSchema::GetSchemaToken()
 {
-    return HdBasisCurvesSchemaTokens->basisCurves;
-} 
+  return HdBasisCurvesSchemaTokens->basisCurves;
+}
 /*static*/
-const HdDataSourceLocator &
-HdBasisCurvesSchema::GetDefaultLocator()
+const HdDataSourceLocator &HdBasisCurvesSchema::GetDefaultLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdBasisCurvesSchemaTokens->basisCurves
-    );
-    return locator;
-} 
+  static const HdDataSourceLocator locator(HdBasisCurvesSchemaTokens->basisCurves);
+  return locator;
+}
 /*static*/
-const HdDataSourceLocator &
-HdBasisCurvesSchema::GetTopologyLocator()
+const HdDataSourceLocator &HdBasisCurvesSchema::GetTopologyLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdBasisCurvesSchemaTokens->basisCurves,
-        HdBasisCurvesSchemaTokens->topology
-    );
-    return locator;
+  static const HdDataSourceLocator locator(HdBasisCurvesSchemaTokens->basisCurves,
+                                           HdBasisCurvesSchemaTokens->topology);
+  return locator;
 }
 
 /*static*/
-const HdDataSourceLocator &
-HdBasisCurvesSchema::GetGeomSubsetsLocator()
+const HdDataSourceLocator &HdBasisCurvesSchema::GetGeomSubsetsLocator()
 {
-    static const HdDataSourceLocator locator(
-        HdBasisCurvesSchemaTokens->basisCurves,
-        HdBasisCurvesSchemaTokens->geomSubsets
-    );
-    return locator;
+  static const HdDataSourceLocator locator(HdBasisCurvesSchemaTokens->basisCurves,
+                                           HdBasisCurvesSchemaTokens->geomSubsets);
+  return locator;
 }
 
-
-HdBasisCurvesSchema::Builder &
-HdBasisCurvesSchema::Builder::SetTopology(
+HdBasisCurvesSchema::Builder &HdBasisCurvesSchema::Builder::SetTopology(
     const HdContainerDataSourceHandle &topology)
 {
-    _topology = topology;
-    return *this;
+  _topology = topology;
+  return *this;
 }
 
-HdBasisCurvesSchema::Builder &
-HdBasisCurvesSchema::Builder::SetGeomSubsets(
+HdBasisCurvesSchema::Builder &HdBasisCurvesSchema::Builder::SetGeomSubsets(
     const HdContainerDataSourceHandle &geomSubsets)
 {
-    _geomSubsets = geomSubsets;
-    return *this;
+  _geomSubsets = geomSubsets;
+  return *this;
 }
 
-HdContainerDataSourceHandle
-HdBasisCurvesSchema::Builder::Build()
+HdContainerDataSourceHandle HdBasisCurvesSchema::Builder::Build()
 {
-    return HdBasisCurvesSchema::BuildRetained(
-        _topology,
-        _geomSubsets
-    );
+  return HdBasisCurvesSchema::BuildRetained(_topology, _geomSubsets);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

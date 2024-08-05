@@ -33,10 +33,10 @@
 //
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include <pxr/pxrns.h>
-#include "UsdRender/api.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
+#include "UsdRender/api.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -59,8 +59,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set(UsdRenderTokens->adjustApertureHeight);
 /// \endcode
-struct UsdRenderTokensType
-{
+struct UsdRenderTokensType {
   USDRENDER_API UsdRenderTokensType();
   /// \brief "adjustApertureHeight"
   ///
@@ -188,7 +187,8 @@ struct UsdRenderTokensType
   const TfToken productType;
   /// \brief "raster"
   ///
-  /// Fallback value for UsdRenderProduct::GetProductTypeAttr(), RenderProduct productType value that indicates a 2D raster image of pixels.
+  /// Fallback value for UsdRenderProduct::GetProductTypeAttr(), RenderProduct productType value
+  /// that indicates a 2D raster image of pixels.
   const TfToken raster;
   /// \brief "raw"
   ///
@@ -208,7 +208,8 @@ struct UsdRenderTokensType
   const TfToken renderSource;
   /// \brief "renderVisibility"
   ///
-  ///  This token represents the collection name to use with UsdCollectionAPI to represent renderVisibility of a RenderPass prim.
+  ///  This token represents the collection name to use with UsdCollectionAPI to represent
+  ///  renderVisibility of a RenderPass prim.
   const TfToken renderVisibility;
   /// \brief "resolution"
   ///

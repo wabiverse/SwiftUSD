@@ -36,24 +36,21 @@
 /// allows the client to specify a version mapping file to use for
 /// {$VERSION} substitutions during asset resolution. See overview
 /// for more details.
-class UsdResolverExampleResolverContext
-{
-public:
+class UsdResolverExampleResolverContext {
+ public:
   /// Create a context that specifies that the version mappings in
   /// \p mappingFile should be used when resolving asset paths with
   /// this context bound. \p mappingFile may be an absolute or
   /// relative file path; if relative, it will be anchored to the
   /// current working directory.
   USDRESOLVEREXAMPLE_API
-  explicit UsdResolverExampleResolverContext(
-      const std::string &mappingFile);
+  explicit UsdResolverExampleResolverContext(const std::string &mappingFile);
 
   USDRESOLVEREXAMPLE_API
   UsdResolverExampleResolverContext();
 
   USDRESOLVEREXAMPLE_API
-  UsdResolverExampleResolverContext(
-      const UsdResolverExampleResolverContext &rhs);
+  UsdResolverExampleResolverContext(const UsdResolverExampleResolverContext &rhs);
 
   USDRESOLVEREXAMPLE_API
   bool operator<(const UsdResolverExampleResolverContext &rhs) const;
@@ -67,7 +64,7 @@ public:
   USDRESOLVEREXAMPLE_API
   const std::string &GetMappingFile() const;
 
-private:
+ private:
   std::string _mappingFile;
 };
 

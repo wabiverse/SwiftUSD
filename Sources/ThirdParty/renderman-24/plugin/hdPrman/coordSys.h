@@ -24,10 +24,10 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_COORD_SYS_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_COORD_SYS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/coordSys.h"
 #include "Hd/version.h"
 #include "Riley.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -38,9 +38,8 @@ class HdPrman_RenderParam;
 ///
 /// A representation for coordinate systems.
 ///
-class HdPrmanCoordSys final : public HdCoordSys
-{
-public:
+class HdPrmanCoordSys final : public HdCoordSys {
+ public:
   HdPrmanCoordSys(SdfPath const &id);
   ~HdPrmanCoordSys() override;
 
@@ -56,14 +55,17 @@ public:
   HdDirtyBits GetInitialDirtyBitsMask() const override;
 #endif
 
-  riley::CoordinateSystemId GetCoordSysId() const { return _coordSysId; }
+  riley::CoordinateSystemId GetCoordSysId() const
+  {
+    return _coordSysId;
+  }
 
   /// Return true if this material is valid.
   bool IsValid() const;
 
   void Finalize(HdRenderParam *renderParam) override;
 
-private:
+ private:
   void _ResetCoordSys(HdPrman_RenderParam *renderParam);
 
   riley::CoordinateSystemId _coordSysId;
@@ -71,4 +73,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_COORD_SYS_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_COORD_SYS_H

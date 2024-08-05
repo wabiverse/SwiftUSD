@@ -33,9 +33,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-int
-TestTfDl_SaySomething()
+int TestTfDl_SaySomething()
 {
-    printf("We've got a piper down, I repeat, the piper is DOWN!\n");
-    return 0;
+  printf("We've got a piper down, I repeat, the piper is DOWN!\n");
+  return 0;
 }

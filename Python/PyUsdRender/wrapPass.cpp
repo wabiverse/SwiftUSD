@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdRender/pass.h"
 #include "Usd/schemaBase.h"
+#include "UsdRender/pass.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,68 +40,54 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreatePassTypeAttr(UsdRenderPass &self, object defaultVal, bool writeSparsely)
 {
+  return self.CreatePassTypeAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token),
+                                 writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateCommandAttr(UsdRenderPass &self, object defaultVal, bool writeSparsely)
+{
+  return self.CreateCommandAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->StringArray),
+                                writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreateFileNameAttr(UsdRenderPass &self, object defaultVal, bool writeSparsely)
+{
+  return self.CreateFileNameAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset),
+                                 writeSparsely);
+}
 
-  static UsdAttribute
-  _CreatePassTypeAttr(UsdRenderPass &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreatePassTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-  }
+static UsdAttribute _CreateDenoiseEnableAttr(UsdRenderPass &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
+{
+  return self.CreateDenoiseEnableAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool),
+                                      writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateCommandAttr(UsdRenderPass &self,
-                     object defaultVal, bool writeSparsely)
-  {
-    return self.CreateCommandAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->StringArray), writeSparsely);
-  }
+static std::string _Repr(const UsdRenderPass &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdRender.Pass(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateFileNameAttr(UsdRenderPass &self,
-                      object defaultVal, bool writeSparsely)
-  {
-    return self.CreateFileNameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreateDenoiseEnableAttr(UsdRenderPass &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreateDenoiseEnableAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdRenderPass &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdRender.Pass(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdRenderPass()
 {
   typedef UsdRenderPass This;
 
-  class_<This, bases<UsdTyped>>
-      cls("Pass");
+  class_<This, bases<UsdTyped>> cls("Pass");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -117,54 +103,41 @@ void wrapUsdRenderPass()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetPassTypeAttr",
-           &This::GetPassTypeAttr)
+      .def("GetPassTypeAttr", &This::GetPassTypeAttr)
       .def("CreatePassTypeAttr",
            &_CreatePassTypeAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetCommandAttr",
-           &This::GetCommandAttr)
+      .def("GetCommandAttr", &This::GetCommandAttr)
       .def("CreateCommandAttr",
            &_CreateCommandAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetFileNameAttr",
-           &This::GetFileNameAttr)
+      .def("GetFileNameAttr", &This::GetFileNameAttr)
       .def("CreateFileNameAttr",
            &_CreateFileNameAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetDenoiseEnableAttr",
-           &This::GetDenoiseEnableAttr)
+      .def("GetDenoiseEnableAttr", &This::GetDenoiseEnableAttr)
       .def("CreateDenoiseEnableAttr",
            &_CreateDenoiseEnableAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetRenderSourceRel",
-           &This::GetRenderSourceRel)
-      .def("CreateRenderSourceRel",
-           &This::CreateRenderSourceRel)
+      .def("GetRenderSourceRel", &This::GetRenderSourceRel)
+      .def("CreateRenderSourceRel", &This::CreateRenderSourceRel)
 
-      .def("GetInputPassesRel",
-           &This::GetInputPassesRel)
-      .def("CreateInputPassesRel",
-           &This::CreateInputPassesRel)
+      .def("GetInputPassesRel", &This::GetInputPassesRel)
+      .def("CreateInputPassesRel", &This::CreateInputPassesRel)
 
-      .def("GetDenoisePassRel",
-           &This::GetDenoisePassRel)
-      .def("CreateDenoisePassRel",
-           &This::CreateDenoisePassRel)
+      .def("GetDenoisePassRel", &This::GetDenoisePassRel)
+      .def("CreateDenoisePassRel", &This::CreateDenoisePassRel)
       .def("__repr__", ::_Repr);
 
   _CustomWrapCode(cls);
@@ -189,14 +162,11 @@ void wrapUsdRenderPass()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
+namespace {
+
+WRAP_CUSTOM
 {
-
-  WRAP_CUSTOM
-  {
-    _class
-        .def("GetRenderVisibilityCollectionAPI",
-             &UsdRenderPass::GetRenderVisibilityCollectionAPI);
-  }
-
+  _class.def("GetRenderVisibilityCollectionAPI", &UsdRenderPass::GetRenderVisibilityCollectionAPI);
 }
+
+}  // namespace

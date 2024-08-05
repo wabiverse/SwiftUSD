@@ -23,8 +23,8 @@
 //
 #include <pxr/pxrns.h>
 
-#include "Tf/errorMark.h"
 #include "Gf/matrix4f.h"
+#include "Tf/errorMark.h"
 
 #include "Hd/engine.h"
 #include "Hd/rendererPlugin.h"
@@ -41,8 +41,8 @@ void RunHydra()
   // Get the renderer plugin and create a new render delegate and index.
   const TfToken tinyRendererPluginId("HdTinyRendererPlugin");
 
-  HdRendererPlugin *rendererPlugin = HdRendererPluginRegistry::GetInstance()
-                                         .GetRendererPlugin(tinyRendererPluginId);
+  HdRendererPlugin *rendererPlugin = HdRendererPluginRegistry::GetInstance().GetRendererPlugin(
+      tinyRendererPluginId);
   TF_VERIFY(rendererPlugin != nullptr);
 
   HdRenderDelegate *renderDelegate = rendererPlugin->CreateRenderDelegate();
@@ -84,12 +84,11 @@ void RunHydra()
   // };
   SdfPath renderTask("/renderTask");
   sceneDelegate->AddTask<HdxRenderTask>(renderTask);
-  sceneDelegate->UpdateTask(renderTask, HdTokens->params,
-                            VtValue(HdxRenderTaskParams()));
-  sceneDelegate->UpdateTask(renderTask,
-                            HdTokens->collection,
-                            VtValue(HdRprimCollection(HdTokens->geometry,
-                                                      HdReprSelector(HdReprTokens->refined))));
+  sceneDelegate->UpdateTask(renderTask, HdTokens->params, VtValue(HdxRenderTaskParams()));
+  sceneDelegate->UpdateTask(
+      renderTask,
+      HdTokens->collection,
+      VtValue(HdRprimCollection(HdTokens->geometry, HdReprSelector(HdReprTokens->refined))));
 
   // Ask Hydra to execute our render task.
   HdEngine engine;
@@ -108,13 +107,11 @@ int main(int argc, char *argv[])
   RunHydra();
 
   // If no error messages were logged, return success.
-  if (mark.IsClean())
-  {
+  if (mark.IsClean()) {
     std::cout << "OK" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
+  else {
     std::cout << "FAILED" << std::endl;
     return EXIT_FAILURE;
   }

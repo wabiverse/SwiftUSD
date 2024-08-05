@@ -25,96 +25,85 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdLuxPluginLightFilter,
-        TfType::Bases< UsdLuxLightFilter > >();
-    
-    // Register the usd prim typename as an alias under UsdSchemaBase. This
-    // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("PluginLightFilter")
-    // to find TfType<UsdLuxPluginLightFilter>, which is how IsA queries are
-    // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdLuxPluginLightFilter>("PluginLightFilter");
+  TfType::Define<UsdLuxPluginLightFilter, TfType::Bases<UsdLuxLightFilter>>();
+
+  // Register the usd prim typename as an alias under UsdSchemaBase. This
+  // enables one to call
+  // TfType::Find<UsdSchemaBase>().FindDerivedByName("PluginLightFilter")
+  // to find TfType<UsdLuxPluginLightFilter>, which is how IsA queries are
+  // answered.
+  TfType::AddAlias<UsdSchemaBase, UsdLuxPluginLightFilter>("PluginLightFilter");
 }
 
 /* virtual */
-UsdLuxPluginLightFilter::~UsdLuxPluginLightFilter()
+UsdLuxPluginLightFilter::~UsdLuxPluginLightFilter() {}
+
+/* static */
+UsdLuxPluginLightFilter UsdLuxPluginLightFilter::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxPluginLightFilter();
+  }
+  return UsdLuxPluginLightFilter(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdLuxPluginLightFilter
-UsdLuxPluginLightFilter::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxPluginLightFilter UsdLuxPluginLightFilter::Define(const UsdStagePtr &stage,
+                                                        const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxPluginLightFilter();
-    }
-    return UsdLuxPluginLightFilter(stage->GetPrimAtPath(path));
-}
-
-/* static */
-UsdLuxPluginLightFilter
-UsdLuxPluginLightFilter::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
-    static TfToken usdPrimTypeName("PluginLightFilter");
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxPluginLightFilter();
-    }
-    return UsdLuxPluginLightFilter(
-        stage->DefinePrim(path, usdPrimTypeName));
+  static TfToken usdPrimTypeName("PluginLightFilter");
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxPluginLightFilter();
+  }
+  return UsdLuxPluginLightFilter(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdLuxPluginLightFilter::_GetSchemaKind() const
 {
-    return UsdLuxPluginLightFilter::schemaKind;
+  return UsdLuxPluginLightFilter::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxPluginLightFilter::_GetStaticTfType()
+const TfType &UsdLuxPluginLightFilter::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdLuxPluginLightFilter>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdLuxPluginLightFilter>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdLuxPluginLightFilter::_IsTypedSchema()
+bool UsdLuxPluginLightFilter::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxPluginLightFilter::_GetTfType() const
+const TfType &UsdLuxPluginLightFilter::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdLuxPluginLightFilter::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdLuxPluginLightFilter::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdLuxLightFilter::GetSchemaAttributeNames(true);
+  static TfTokenVector localNames;
+  static TfTokenVector allNames = UsdLuxLightFilter::GetSchemaAttributeNames(true);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -130,10 +119,9 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdShadeNodeDefAPI 
-UsdLuxPluginLightFilter::GetNodeDefAPI() const
+UsdShadeNodeDefAPI UsdLuxPluginLightFilter::GetNodeDefAPI() const
 {
-    return UsdShadeNodeDefAPI(GetPrim());
+  return UsdShadeNodeDefAPI(GetPrim());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

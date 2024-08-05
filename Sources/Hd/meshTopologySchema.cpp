@@ -29,174 +29,143 @@
 /* ************************************************************************** */
 
 #include "Hd/meshTopologySchema.h"
-#include "Hd/retainedDataSource.h"
 #include "Hd/meshSchema.h"
+#include "Hd/retainedDataSource.h"
 
 #include "Trace/traceImpl.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(HdMeshTopologySchemaTokens,
-    HDMESHTOPOLOGY_SCHEMA_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(HdMeshTopologySchemaTokens, HDMESHTOPOLOGY_SCHEMA_TOKENS);
 
-
-
-HdIntArrayDataSourceHandle
-HdMeshTopologySchema::GetFaceVertexCounts()
+HdIntArrayDataSourceHandle HdMeshTopologySchema::GetFaceVertexCounts()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdMeshTopologySchemaTokens->faceVertexCounts);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdMeshTopologySchemaTokens->faceVertexCounts);
 }
 
-HdIntArrayDataSourceHandle
-HdMeshTopologySchema::GetFaceVertexIndices()
+HdIntArrayDataSourceHandle HdMeshTopologySchema::GetFaceVertexIndices()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdMeshTopologySchemaTokens->faceVertexIndices);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdMeshTopologySchemaTokens->faceVertexIndices);
 }
 
-HdIntArrayDataSourceHandle
-HdMeshTopologySchema::GetHoleIndices()
+HdIntArrayDataSourceHandle HdMeshTopologySchema::GetHoleIndices()
 {
-    return _GetTypedDataSource<HdIntArrayDataSource>(
-        HdMeshTopologySchemaTokens->holeIndices);
+  return _GetTypedDataSource<HdIntArrayDataSource>(HdMeshTopologySchemaTokens->holeIndices);
 }
 
-HdTokenDataSourceHandle
-HdMeshTopologySchema::GetOrientation()
+HdTokenDataSourceHandle HdMeshTopologySchema::GetOrientation()
 {
-    return _GetTypedDataSource<HdTokenDataSource>(
-        HdMeshTopologySchemaTokens->orientation);
+  return _GetTypedDataSource<HdTokenDataSource>(HdMeshTopologySchemaTokens->orientation);
 }
 
 /*static*/
-HdContainerDataSourceHandle
-HdMeshTopologySchema::BuildRetained(
-        const HdIntArrayDataSourceHandle &faceVertexCounts,
-        const HdIntArrayDataSourceHandle &faceVertexIndices,
-        const HdIntArrayDataSourceHandle &holeIndices,
-        const HdTokenDataSourceHandle &orientation
-)
-{
-    TfToken names[4];
-    HdDataSourceBaseHandle values[4];
-
-    size_t count = 0;
-    if (faceVertexCounts) {
-        names[count] = HdMeshTopologySchemaTokens->faceVertexCounts;
-        values[count++] = faceVertexCounts;
-    }
-
-    if (faceVertexIndices) {
-        names[count] = HdMeshTopologySchemaTokens->faceVertexIndices;
-        values[count++] = faceVertexIndices;
-    }
-
-    if (holeIndices) {
-        names[count] = HdMeshTopologySchemaTokens->holeIndices;
-        values[count++] = holeIndices;
-    }
-
-    if (orientation) {
-        names[count] = HdMeshTopologySchemaTokens->orientation;
-        values[count++] = orientation;
-    }
-
-    return HdRetainedContainerDataSource::New(count, names, values);
-}
-
-/*static*/
-HdMeshTopologySchema
-HdMeshTopologySchema::GetFromParent(
-        const HdContainerDataSourceHandle &fromParentContainer)
-{
-    return HdMeshTopologySchema(
-        fromParentContainer
-        ? HdContainerDataSource::Cast(fromParentContainer->Get(
-                HdMeshTopologySchemaTokens->topology))
-        : nullptr);
-}
-
-/*static*/
-const TfToken &
-HdMeshTopologySchema::GetSchemaToken()
-{
-    return HdMeshTopologySchemaTokens->topology;
-} 
-/*static*/
-const HdDataSourceLocator &
-HdMeshTopologySchema::GetDefaultLocator()
-{
-    static const HdDataSourceLocator locator(
-        HdMeshSchemaTokens->mesh,
-        HdMeshTopologySchemaTokens->topology
-    );
-    return locator;
-} 
-
-/*static*/
-HdTokenDataSourceHandle
-HdMeshTopologySchema::BuildOrientationDataSource(
-    const TfToken &orientation)
-{
-    if (orientation == HdMeshTopologySchemaTokens->leftHanded) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
-        return ds;
-    }
-    if (orientation == HdMeshTopologySchemaTokens->rightHanded) {
-        static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
-            HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
-        return ds;
-    }
-
-    // fallback for unknown token
-    return HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
-}
-
-HdMeshTopologySchema::Builder &
-HdMeshTopologySchema::Builder::SetFaceVertexCounts(
-    const HdIntArrayDataSourceHandle &faceVertexCounts)
-{
-    _faceVertexCounts = faceVertexCounts;
-    return *this;
-}
-
-HdMeshTopologySchema::Builder &
-HdMeshTopologySchema::Builder::SetFaceVertexIndices(
-    const HdIntArrayDataSourceHandle &faceVertexIndices)
-{
-    _faceVertexIndices = faceVertexIndices;
-    return *this;
-}
-
-HdMeshTopologySchema::Builder &
-HdMeshTopologySchema::Builder::SetHoleIndices(
-    const HdIntArrayDataSourceHandle &holeIndices)
-{
-    _holeIndices = holeIndices;
-    return *this;
-}
-
-HdMeshTopologySchema::Builder &
-HdMeshTopologySchema::Builder::SetOrientation(
+HdContainerDataSourceHandle HdMeshTopologySchema::BuildRetained(
+    const HdIntArrayDataSourceHandle &faceVertexCounts,
+    const HdIntArrayDataSourceHandle &faceVertexIndices,
+    const HdIntArrayDataSourceHandle &holeIndices,
     const HdTokenDataSourceHandle &orientation)
 {
-    _orientation = orientation;
-    return *this;
+  TfToken names[4];
+  HdDataSourceBaseHandle values[4];
+
+  size_t count = 0;
+  if (faceVertexCounts) {
+    names[count] = HdMeshTopologySchemaTokens->faceVertexCounts;
+    values[count++] = faceVertexCounts;
+  }
+
+  if (faceVertexIndices) {
+    names[count] = HdMeshTopologySchemaTokens->faceVertexIndices;
+    values[count++] = faceVertexIndices;
+  }
+
+  if (holeIndices) {
+    names[count] = HdMeshTopologySchemaTokens->holeIndices;
+    values[count++] = holeIndices;
+  }
+
+  if (orientation) {
+    names[count] = HdMeshTopologySchemaTokens->orientation;
+    values[count++] = orientation;
+  }
+
+  return HdRetainedContainerDataSource::New(count, names, values);
 }
 
-HdContainerDataSourceHandle
-HdMeshTopologySchema::Builder::Build()
+/*static*/
+HdMeshTopologySchema HdMeshTopologySchema::GetFromParent(
+    const HdContainerDataSourceHandle &fromParentContainer)
 {
-    return HdMeshTopologySchema::BuildRetained(
-        _faceVertexCounts,
-        _faceVertexIndices,
-        _holeIndices,
-        _orientation
-    );
+  return HdMeshTopologySchema(fromParentContainer ?
+                                  HdContainerDataSource::Cast(fromParentContainer->Get(
+                                      HdMeshTopologySchemaTokens->topology)) :
+                                  nullptr);
 }
 
+/*static*/
+const TfToken &HdMeshTopologySchema::GetSchemaToken()
+{
+  return HdMeshTopologySchemaTokens->topology;
+}
+/*static*/
+const HdDataSourceLocator &HdMeshTopologySchema::GetDefaultLocator()
+{
+  static const HdDataSourceLocator locator(HdMeshSchemaTokens->mesh,
+                                           HdMeshTopologySchemaTokens->topology);
+  return locator;
+}
+
+/*static*/
+HdTokenDataSourceHandle HdMeshTopologySchema::BuildOrientationDataSource(
+    const TfToken &orientation)
+{
+  if (orientation == HdMeshTopologySchemaTokens->leftHanded) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
+    return ds;
+  }
+  if (orientation == HdMeshTopologySchemaTokens->rightHanded) {
+    static const HdRetainedTypedSampledDataSource<TfToken>::Handle ds =
+        HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
+    return ds;
+  }
+
+  // fallback for unknown token
+  return HdRetainedTypedSampledDataSource<TfToken>::New(orientation);
+}
+
+HdMeshTopologySchema::Builder &HdMeshTopologySchema::Builder::SetFaceVertexCounts(
+    const HdIntArrayDataSourceHandle &faceVertexCounts)
+{
+  _faceVertexCounts = faceVertexCounts;
+  return *this;
+}
+
+HdMeshTopologySchema::Builder &HdMeshTopologySchema::Builder::SetFaceVertexIndices(
+    const HdIntArrayDataSourceHandle &faceVertexIndices)
+{
+  _faceVertexIndices = faceVertexIndices;
+  return *this;
+}
+
+HdMeshTopologySchema::Builder &HdMeshTopologySchema::Builder::SetHoleIndices(
+    const HdIntArrayDataSourceHandle &holeIndices)
+{
+  _holeIndices = holeIndices;
+  return *this;
+}
+
+HdMeshTopologySchema::Builder &HdMeshTopologySchema::Builder::SetOrientation(
+    const HdTokenDataSourceHandle &orientation)
+{
+  _orientation = orientation;
+  return *this;
+}
+
+HdContainerDataSourceHandle HdMeshTopologySchema::Builder::Build()
+{
+  return HdMeshTopologySchema::BuildRetained(
+      _faceVertexCounts, _faceVertexIndices, _holeIndices, _orientation);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

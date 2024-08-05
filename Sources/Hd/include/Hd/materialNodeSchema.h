@@ -33,114 +33,99 @@
 
 #include "Hd/api.h"
 
-#include "Hd/schema.h" 
+#include "Hd/schema.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 //-----------------------------------------------------------------------------
 
 #define HDMATERIALNODE_SCHEMA_TOKENS \
-    (parameters) \
-    (inputConnections) \
-    (nodeIdentifier) \
-    (renderContextNodeIdentifiers) \
-    (nodeTypeInfo) \
+  (parameters)(inputConnections)(nodeIdentifier)(renderContextNodeIdentifiers)(nodeTypeInfo)
 
-TF_DECLARE_PUBLIC_TOKENS(HdMaterialNodeSchemaTokens, HD_API,
-    HDMATERIALNODE_SCHEMA_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdMaterialNodeSchemaTokens, HD_API, HDMATERIALNODE_SCHEMA_TOKENS);
 
 //-----------------------------------------------------------------------------
 
-class HdMaterialNodeSchema : public HdSchema
-{
-public:
-    HdMaterialNodeSchema(HdContainerDataSourceHandle container)
-    : HdSchema(container) {}
+class HdMaterialNodeSchema : public HdSchema {
+ public:
+  HdMaterialNodeSchema(HdContainerDataSourceHandle container) : HdSchema(container) {}
 
-    //ACCESSORS
+  // ACCESSORS
 
+  HD_API
+  HdContainerDataSourceHandle GetParameters();
+  HD_API
+  HdContainerDataSourceHandle GetInputConnections();
+
+  // This identifies the shader the node represents. The
+  // renderContextNodeIdentifier container can store alternative values for
+  // this. A consumer which is interested in a specific render context
+  // should check for that token within renderContextNodeIdentifiers and
+  // fall back on this value in its absence.
+  HD_API
+  HdTokenDataSourceHandle GetNodeIdentifier();
+
+  // A shading node can hold a nodeIdentifier value for multiple render
+  // contexts at once. This allows multiple renderer target representations
+  // to coexist in the same renderable scene. The contents of this
+  // container are alternate possible values for nodeIdentifier. A consumer
+  // which is interested in a specific render context should check for that
+  // token within this container and fall back on nodeIdentifier in its
+  // absence.
+  HD_API
+  HdContainerDataSourceHandle GetRenderContextNodeIdentifiers();
+
+  // Rather than having an identifier, a shader can be specified by other
+  // information.
+  HD_API
+  HdContainerDataSourceHandle GetNodeTypeInfo();
+
+  // RETRIEVING AND CONSTRUCTING
+
+  /// Builds a container data source which includes the provided child data
+  /// sources. Parameters with nullptr values are excluded. This is a
+  /// low-level interface. For cases in which it's desired to define
+  /// the container with a sparse set of child fields, the Builder class
+  /// is often more convenient and readable.
+  HD_API
+  static HdContainerDataSourceHandle BuildRetained(
+      const HdContainerDataSourceHandle &parameters,
+      const HdContainerDataSourceHandle &inputConnections,
+      const HdTokenDataSourceHandle &nodeIdentifier,
+      const HdContainerDataSourceHandle &renderContextNodeIdentifiers,
+      const HdContainerDataSourceHandle &nodeTypeInfo);
+
+  /// \class HdMaterialNodeSchema::Builder
+  ///
+  /// Utility class for setting sparse sets of child data source fields to be
+  /// filled as arguments into BuildRetained. Because all setter methods
+  /// return a reference to the instance, this can be used in the "builder
+  /// pattern" form.
+  class Builder {
+   public:
     HD_API
-    HdContainerDataSourceHandle GetParameters();
+    Builder &SetParameters(const HdContainerDataSourceHandle &parameters);
     HD_API
-    HdContainerDataSourceHandle GetInputConnections();
-
-    // This identifies the shader the node represents. The
-    // renderContextNodeIdentifier container can store alternative values for
-    // this. A consumer which is interested in a specific render context
-    // should check for that token within renderContextNodeIdentifiers and
-    // fall back on this value in its absence.
+    Builder &SetInputConnections(const HdContainerDataSourceHandle &inputConnections);
     HD_API
-    HdTokenDataSourceHandle GetNodeIdentifier();
-
-    // A shading node can hold a nodeIdentifier value for multiple render
-    // contexts at once. This allows multiple renderer target representations
-    // to coexist in the same renderable scene. The contents of this
-    // container are alternate possible values for nodeIdentifier. A consumer
-    // which is interested in a specific render context should check for that
-    // token within this container and fall back on nodeIdentifier in its
-    // absence.
+    Builder &SetNodeIdentifier(const HdTokenDataSourceHandle &nodeIdentifier);
     HD_API
-    HdContainerDataSourceHandle GetRenderContextNodeIdentifiers();
-
-    // Rather than having an identifier, a shader can be specified by other
-    // information.
+    Builder &SetRenderContextNodeIdentifiers(
+        const HdContainerDataSourceHandle &renderContextNodeIdentifiers);
     HD_API
-    HdContainerDataSourceHandle GetNodeTypeInfo();
+    Builder &SetNodeTypeInfo(const HdContainerDataSourceHandle &nodeTypeInfo);
 
-    // RETRIEVING AND CONSTRUCTING
-
-    /// Builds a container data source which includes the provided child data
-    /// sources. Parameters with nullptr values are excluded. This is a
-    /// low-level interface. For cases in which it's desired to define
-    /// the container with a sparse set of child fields, the Builder class
-    /// is often more convenient and readable.
+    /// Returns a container data source containing the members set thus far.
     HD_API
-    static HdContainerDataSourceHandle
-    BuildRetained(
-        const HdContainerDataSourceHandle &parameters,
-        const HdContainerDataSourceHandle &inputConnections,
-        const HdTokenDataSourceHandle &nodeIdentifier,
-        const HdContainerDataSourceHandle &renderContextNodeIdentifiers,
-        const HdContainerDataSourceHandle &nodeTypeInfo
-    );
+    HdContainerDataSourceHandle Build();
 
-    /// \class HdMaterialNodeSchema::Builder
-    /// 
-    /// Utility class for setting sparse sets of child data source fields to be
-    /// filled as arguments into BuildRetained. Because all setter methods
-    /// return a reference to the instance, this can be used in the "builder
-    /// pattern" form.
-    class Builder
-    {
-    public:
-        HD_API
-        Builder &SetParameters(
-            const HdContainerDataSourceHandle &parameters);
-        HD_API
-        Builder &SetInputConnections(
-            const HdContainerDataSourceHandle &inputConnections);
-        HD_API
-        Builder &SetNodeIdentifier(
-            const HdTokenDataSourceHandle &nodeIdentifier);
-        HD_API
-        Builder &SetRenderContextNodeIdentifiers(
-            const HdContainerDataSourceHandle &renderContextNodeIdentifiers);
-        HD_API
-        Builder &SetNodeTypeInfo(
-            const HdContainerDataSourceHandle &nodeTypeInfo);
-
-        /// Returns a container data source containing the members set thus far.
-        HD_API
-        HdContainerDataSourceHandle Build();
-
-    private:
-        HdContainerDataSourceHandle _parameters;
-        HdContainerDataSourceHandle _inputConnections;
-        HdTokenDataSourceHandle _nodeIdentifier;
-        HdContainerDataSourceHandle _renderContextNodeIdentifiers;
-        HdContainerDataSourceHandle _nodeTypeInfo;
-    };
-
+   private:
+    HdContainerDataSourceHandle _parameters;
+    HdContainerDataSourceHandle _inputConnections;
+    HdTokenDataSourceHandle _nodeIdentifier;
+    HdContainerDataSourceHandle _renderContextNodeIdentifiers;
+    HdContainerDataSourceHandle _nodeTypeInfo;
+  };
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

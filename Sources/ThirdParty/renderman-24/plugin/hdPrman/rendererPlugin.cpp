@@ -21,8 +21,8 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "hdPrman/renderDelegate.h"
 #include "pxr/imaging/plugin/hdPrmanLoader/rendererPlugin.h"
+#include "hdPrman/renderDelegate.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -30,13 +30,13 @@ PXR_NAMESPACE_USING_DIRECTIVE
 // a symbol here that can be picked up by HdPrmanLoader::Load.
 HDPRMAN_LOADER_CREATE_DELEGATE
 {
-    return new HdPrmanRenderDelegate(settingsMap);
+  return new HdPrmanRenderDelegate(settingsMap);
 }
 
 HDPRMAN_LOADER_DELETE_DELEGATE
 {
-    // The HdPrman_InteractiveRenderParam is owned by delegate and
-    // will be automatically destroyed by ref-counting, shutting
-    // down the attached PRMan instance.
-    delete renderDelegate;
+  // The HdPrman_InteractiveRenderParam is owned by delegate and
+  // will be automatically destroyed by ref-counting, shutting
+  // down the attached PRMan instance.
+  delete renderDelegate;
 }

@@ -26,9 +26,9 @@
 
 /// \file hio/fieldTextureData.h
 
-#include <pxr/pxrns.h>
 #include "Hio/api.h"
 #include "Hio/image.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/bbox3d.h"
 
@@ -46,9 +46,8 @@ using HioFieldTextureDataSharedPtr = std::shared_ptr<class HioFieldTextureData>;
 /// An interface class for reading volume files having a
 /// transformation.
 ///
-class HioFieldTextureData
-{
-public:
+class HioFieldTextureData {
+ public:
   HIO_API
   HioFieldTextureData();
 
@@ -66,12 +65,11 @@ public:
   /// loaded.
   ///
   HIO_API
-  static HioFieldTextureDataSharedPtr New(
-      std::string const &filePath,
-      std::string const &fieldName,
-      int fieldIndex,
-      std::string const &fieldPurpose,
-      size_t targetMemory);
+  static HioFieldTextureDataSharedPtr New(std::string const &filePath,
+                                          std::string const &fieldName,
+                                          int fieldIndex,
+                                          std::string const &fieldPurpose,
+                                          size_t targetMemory);
 
   /// Bounding box describing how 3d texture maps into
   /// world space.
@@ -92,7 +90,7 @@ public:
 
   virtual unsigned char const *GetRawBuffer() const = 0;
 
-private:
+ private:
   // Disallow copies
   HioFieldTextureData(const HioFieldTextureData &) = delete;
   HioFieldTextureData &operator=(const HioFieldTextureData &) = delete;
@@ -102,17 +100,15 @@ private:
 ///
 /// A base class to make HioFieldTextureData objects, implemented by plugins.
 ///
-class HIO_API HioFieldTextureDataFactoryBase : public TfType::FactoryBase
-{
-protected:
+class HIO_API HioFieldTextureDataFactoryBase : public TfType::FactoryBase {
+ protected:
   friend class HioFieldTextureData;
 
-  virtual HioFieldTextureDataSharedPtr _New(
-      std::string const &filePath,
-      std::string const &fieldName,
-      int fieldIndex,
-      std::string const &fieldPurpose,
-      size_t targetMemory) const = 0;
+  virtual HioFieldTextureDataSharedPtr _New(std::string const &filePath,
+                                            std::string const &fieldName,
+                                            int fieldIndex,
+                                            std::string const &fieldPurpose,
+                                            size_t targetMemory) const = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

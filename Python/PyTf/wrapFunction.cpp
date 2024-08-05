@@ -34,7 +34,8 @@ using namespace boost;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapFunction() {
+void wrapFunction()
+{
   TfPyFunctionFromPython<void()>();
   TfPyFunctionFromPython<bool()>();
   TfPyFunctionFromPython<int()>();

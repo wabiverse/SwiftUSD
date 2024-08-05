@@ -22,15 +22,14 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
 #include "pxr/base/tf/getenv.h"
-#include "pxr/base/tf/regTest.h"
 #include "Arch/env.h"
+#include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-static bool
-Test_TfGetenv()
+static bool Test_TfGetenv()
 {
   bool status = true;
   std::string testVar = "GetEnvTestsuiteTestVar";

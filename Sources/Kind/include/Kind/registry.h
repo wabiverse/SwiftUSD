@@ -31,8 +31,8 @@
 #include "Kind/api.h"
 
 #include "Tf/singleton.h"
-#include "Tf/token.h"
 #include "Tf/staticTokens.h"
+#include "Tf/token.h"
 #include "Tf/weakBase.h"
 
 #include <unordered_map>
@@ -68,7 +68,7 @@ class KindRegistry : public TfWeakBase {
   KindRegistry(const KindRegistry &) = delete;
   KindRegistry &operator=(const KindRegistry &) = delete;
 
-public:
+ public:
   /// Return the single \c KindRegistry instance.
   KIND_API static KindRegistry &GetInstance();
 
@@ -94,7 +94,7 @@ public:
   /// Return an unordered vector of all kinds known to the registry.
   KIND_API static std::vector<TfToken> GetAllKinds();
 
-private:
+ private:
   friend class TfSingleton<KindRegistry>;
 
   KindRegistry();
@@ -121,7 +121,7 @@ private:
 
   typedef std::unordered_map<TfToken, _KindData, TfToken::HashFunctor> _KindMap;
 
-private:
+ private:
   _KindMap _kindMap;
 };
 
@@ -129,4 +129,4 @@ KIND_API_TEMPLATE_CLASS(TfSingleton<KindRegistry>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_KIND_REGISTRY_H
+#endif  // PXR_USD_KIND_REGISTRY_H

@@ -37,14 +37,12 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace boost::python;
 
-static size_t
-_Hash(const UsdResolverExampleResolverContext &ctx)
+static size_t _Hash(const UsdResolverExampleResolverContext &ctx)
 {
   return hash_value(ctx);
 }
 
-static std::string
-_Repr(const UsdResolverExampleResolverContext &ctx)
+static std::string _Repr(const UsdResolverExampleResolverContext &ctx)
 {
   return TF_PY_REPR_PREFIX + "ResolverContext" +
          (ctx.GetMappingFile().empty() ? "()" : "('" + ctx.GetMappingFile() + "')");
@@ -60,8 +58,7 @@ void wrapResolverContext()
       .def("__hash__", _Hash)
       .def("__repr__", _Repr)
 
-      .def("GetMappingFile", &This::GetMappingFile,
-           return_value_policy<return_by_value>());
+      .def("GetMappingFile", &This::GetMappingFile, return_value_policy<return_by_value>());
 
   ArWrapResolverContextForPython<This>();
 }

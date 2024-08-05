@@ -33,20 +33,18 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 static VtDictionary Pcp_ComposeExpressionVariablesOver(
-    const PcpLayerStackIdentifier &identifier,
-    const VtDictionary *expressionVariableOverrides) {
+    const PcpLayerStackIdentifier &identifier, const VtDictionary *expressionVariableOverrides)
+{
   VtDictionary expressionVars;
 
-  VtDictionaryOver(
-      identifier.rootLayer->template GetFieldAs<VtDictionary>(
-          SdfPath::AbsoluteRootPath(), SdfFieldKeys->ExpressionVariables),
-      &expressionVars);
+  VtDictionaryOver(identifier.rootLayer->template GetFieldAs<VtDictionary>(
+                       SdfPath::AbsoluteRootPath(), SdfFieldKeys->ExpressionVariables),
+                   &expressionVars);
 
   if (identifier.sessionLayer) {
-    VtDictionaryOver(
-        identifier.sessionLayer->template GetFieldAs<VtDictionary>(
-            SdfPath::AbsoluteRootPath(), SdfFieldKeys->ExpressionVariables),
-        &expressionVars);
+    VtDictionaryOver(identifier.sessionLayer->template GetFieldAs<VtDictionary>(
+                         SdfPath::AbsoluteRootPath(), SdfFieldKeys->ExpressionVariables),
+                     &expressionVars);
   }
 
   if (expressionVariableOverrides) {
@@ -59,21 +57,23 @@ static VtDictionary Pcp_ComposeExpressionVariablesOver(
 namespace {
 
 struct NoCache {
-public:
-  PcpExpressionVariables *GetEntry(const PcpLayerStackIdentifier &id) {
+ public:
+  PcpExpressionVariables *GetEntry(const PcpLayerStackIdentifier &id)
+  {
     return nullptr;
   }
 
   PcpExpressionVariables *CacheEntry(const PcpLayerStackIdentifier &id,
-                                     const PcpExpressionVariables &) {
+                                     const PcpExpressionVariables &)
+  {
     // This function gets called when we compute a PcpExpressionVariables
     // object that hasn't changed from the previous computation.
     // We can just return a pointer to our current result.
     return &result;
   }
 
-  PcpExpressionVariables *CacheEntry(const PcpLayerStackIdentifier &id,
-                                     PcpExpressionVariables &&s) {
+  PcpExpressionVariables *CacheEntry(const PcpLayerStackIdentifier &id, PcpExpressionVariables &&s)
+  {
     result = std::move(s);
     return &result;
   }
@@ -82,35 +82,36 @@ public:
 };
 
 struct Cache {
-public:
-  template <class Map> Cache(Map *cache) : _cache(cache) {}
+ public:
+  template<class Map> Cache(Map *cache) : _cache(cache) {}
 
-  PcpExpressionVariables *GetEntry(const PcpLayerStackIdentifier &id) {
+  PcpExpressionVariables *GetEntry(const PcpLayerStackIdentifier &id)
+  {
     return TfMapLookupPtr(*_cache, id);
   }
 
-  template <class ExpressionVarsAndSource>
-  PcpExpressionVariables *
-  CacheEntry(const PcpLayerStackIdentifier &id,
-             ExpressionVarsAndSource &&expressionVarsAndSource) {
-    auto mapResult =
-        _cache->emplace(id, std::forward<decltype(expressionVarsAndSource)>(
-                                expressionVarsAndSource));
+  template<class ExpressionVarsAndSource>
+  PcpExpressionVariables *CacheEntry(const PcpLayerStackIdentifier &id,
+                                     ExpressionVarsAndSource &&expressionVarsAndSource)
+  {
+    auto mapResult = _cache->emplace(
+        id, std::forward<decltype(expressionVarsAndSource)>(expressionVarsAndSource));
     TF_VERIFY(mapResult.second);
     return &mapResult.first->second;
   }
 
-private:
-  std::unordered_map<PcpLayerStackIdentifier, PcpExpressionVariables, TfHash>
-      *_cache;
+ private:
+  std::unordered_map<PcpLayerStackIdentifier, PcpExpressionVariables, TfHash> *_cache;
 };
 
-} // end anonymous namespace
+}  // end anonymous namespace
 
-template <class CachePolicy>
+template<class CachePolicy>
 static const PcpExpressionVariables *Pcp_ComposeExpressionVariables(
     const PcpLayerStackIdentifier &sourceLayerStackId,
-    const PcpLayerStackIdentifier &rootLayerStackId, CachePolicy *cache) {
+    const PcpLayerStackIdentifier &rootLayerStackId,
+    CachePolicy *cache)
+{
   PcpExpressionVariables localExpressionVars;
   const PcpExpressionVariables *expressionVars = &localExpressionVars;
 
@@ -119,8 +120,9 @@ static const PcpExpressionVariables *Pcp_ComposeExpressionVariables(
   std::vector<PcpLayerStackIdentifier> sources;
   for (const PcpLayerStackIdentifier *currId = &sourceLayerStackId;
        sources.empty() || sources.back() != rootLayerStackId;
-       currId = &currId->expressionVariablesOverrideSource
-                     .ResolveLayerStackIdentifier(rootLayerStackId)) {
+       currId = &currId->expressionVariablesOverrideSource.ResolveLayerStackIdentifier(
+           rootLayerStackId))
+  {
 
     // If we have a cached entry for an override source, we can start
     // composing from this point.
@@ -144,13 +146,12 @@ static const PcpExpressionVariables *Pcp_ComposeExpressionVariables(
     // object.
     if (overriddenVars == expressionVars->GetVariables()) {
       expressionVars = cache->CacheEntry(sources[i], *expressionVars);
-    } else {
+    }
+    else {
       PcpExpressionVariables newExpressionVars(
-          PcpExpressionVariablesSource(sources[i], rootLayerStackId),
-          std::move(overriddenVars));
+          PcpExpressionVariablesSource(sources[i], rootLayerStackId), std::move(overriddenVars));
 
-      expressionVars =
-          cache->CacheEntry(sources[i], std::move(newExpressionVars));
+      expressionVars = cache->CacheEntry(sources[i], std::move(newExpressionVars));
     }
   }
 
@@ -161,10 +162,11 @@ static const PcpExpressionVariables *Pcp_ComposeExpressionVariables(
 PcpExpressionVariables PcpExpressionVariables::Compute(
     const PcpLayerStackIdentifier &sourceLayerStackId,
     const PcpLayerStackIdentifier &rootLayerStackId,
-    const PcpExpressionVariables *overrideVars) {
+    const PcpExpressionVariables *overrideVars)
+{
   if (overrideVars) {
-    VtDictionary composedVars = Pcp_ComposeExpressionVariablesOver(
-        sourceLayerStackId, &overrideVars->GetVariables());
+    VtDictionary composedVars = Pcp_ComposeExpressionVariablesOver(sourceLayerStackId,
+                                                                   &overrideVars->GetVariables());
 
     if (composedVars == overrideVars->GetVariables()) {
       return *overrideVars;
@@ -178,19 +180,20 @@ PcpExpressionVariables PcpExpressionVariables::Compute(
   // Pcp_ComposeExpressionVariables will return a pointer to an object
   // stored in the NoCache object, so we must return by value.
   NoCache noCache;
-  return *Pcp_ComposeExpressionVariables(sourceLayerStackId, rootLayerStackId,
-                                         &noCache);
+  return *Pcp_ComposeExpressionVariables(sourceLayerStackId, rootLayerStackId, &noCache);
 }
 
 // ------------------------------------------------------------
 
 PcpExpressionVariableCachingComposer::PcpExpressionVariableCachingComposer(
     const PcpLayerStackIdentifier &rootLayerStackId)
-    : _rootLayerStackId(rootLayerStackId) {}
+    : _rootLayerStackId(rootLayerStackId)
+{
+}
 
-const PcpExpressionVariables &
-PcpExpressionVariableCachingComposer::ComputeExpressionVariables(
-    const PcpLayerStackIdentifier &id) {
+const PcpExpressionVariables &PcpExpressionVariableCachingComposer::ComputeExpressionVariables(
+    const PcpLayerStackIdentifier &id)
+{
   // Pcp_ComposeExpressionVariables will return a pointer to an object in
   // the _identifierToExpressionVars map, so it's safe to return by
   // const reference.

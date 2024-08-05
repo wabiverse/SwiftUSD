@@ -26,17 +26,17 @@
 
 /// \file usdRi/splineAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdRi/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdRi/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -71,9 +71,8 @@ class SdfAssetPath;
 /// - Catmull-Rom (UsdRiTokens->catmullRom)
 ///
 ///
-class UsdRiSplineAPI : public UsdAPISchemaBase
-{
-public:
+class UsdRiSplineAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -83,18 +82,12 @@ public:
   /// Equivalent to UsdRiSplineAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdRiSplineAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
-  {
-  }
+  explicit UsdRiSplineAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
   /// Construct a UsdRiSplineAPI on the prim held by \p schemaObj .
   /// Should be preferred over UsdRiSplineAPI(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdRiSplineAPI(const UsdSchemaBase &schemaObj)
-      : UsdAPISchemaBase(schemaObj)
-  {
-  }
+  explicit UsdRiSplineAPI(const UsdSchemaBase &schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
   /// Destructor.
   USDRI_API
@@ -104,8 +97,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDRI_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdRiSplineAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -117,8 +109,7 @@ public:
   /// \endcode
   ///
   USDRI_API
-  static UsdRiSplineAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdRiSplineAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -137,8 +128,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "RiSplineAPI" to the
@@ -156,17 +146,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDRI_API
-  static UsdRiSplineAPI
-  Apply(const UsdPrim &prim);
+  static UsdRiSplineAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDRI_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDRI_API
@@ -178,7 +167,7 @@ private:
   USDRI_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -192,10 +181,14 @@ public:
 
   /// Construct a UsdRiSplineAPI with the given \p splineName on
   /// the UsdPrim \p prim .
-  explicit UsdRiSplineAPI(const UsdPrim &prim, const TfToken &splineName,
+  explicit UsdRiSplineAPI(const UsdPrim &prim,
+                          const TfToken &splineName,
                           const SdfValueTypeName &valuesTypeName,
                           bool doesDuplicateBSplineEndpoints)
-      : UsdAPISchemaBase(prim), _splineName(splineName), _valuesTypeName(valuesTypeName), _duplicateBSplineEndpoints(doesDuplicateBSplineEndpoints)
+      : UsdAPISchemaBase(prim),
+        _splineName(splineName),
+        _valuesTypeName(valuesTypeName),
+        _duplicateBSplineEndpoints(doesDuplicateBSplineEndpoints)
   {
   }
 
@@ -205,7 +198,10 @@ public:
                           const TfToken &splineName,
                           const SdfValueTypeName &valuesTypeName,
                           bool doesDuplicateBSplineEndpoints)
-      : UsdAPISchemaBase(schemaObj.GetPrim()), _splineName(splineName), _valuesTypeName(valuesTypeName), _duplicateBSplineEndpoints(doesDuplicateBSplineEndpoints)
+      : UsdAPISchemaBase(schemaObj.GetPrim()),
+        _splineName(splineName),
+        _valuesTypeName(valuesTypeName),
+        _duplicateBSplineEndpoints(doesDuplicateBSplineEndpoints)
   {
   }
 
@@ -246,7 +242,8 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreateInterpolationAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateInterpolationAttr(VtValue const &defaultValue = VtValue(),
+                                       bool writeSparsely = false) const;
 
   // --------------------------------------------------------------------- //
   // POSITIONS
@@ -266,7 +263,8 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreatePositionsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreatePositionsAttr(VtValue const &defaultValue = VtValue(),
+                                   bool writeSparsely = false) const;
 
   // --------------------------------------------------------------------- //
   // VALUES
@@ -286,7 +284,8 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDRI_API
-  UsdAttribute CreateValuesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateValuesAttr(VtValue const &defaultValue = VtValue(),
+                                bool writeSparsely = false) const;
 
   /// \anchor UsdRiSplineAPI_Validation
   /// \name Spline Validation API
@@ -313,12 +312,12 @@ public:
 
   /// @}
 
-private:
+ private:
   /// Returns the properly-scoped form of the given property name,
   /// accounting for the spline name.
   TfToken _GetScopedPropertyName(const TfToken &baseName) const;
 
-private:
+ private:
   const TfToken _splineName;
   const SdfValueTypeName _valuesTypeName;
   bool _duplicateBSplineEndpoints;

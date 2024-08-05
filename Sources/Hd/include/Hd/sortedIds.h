@@ -24,8 +24,8 @@
 #ifndef PXR_IMAGING_HD_SORTED_IDS_H
 #define PXR_IMAGING_HD_SORTED_IDS_H
 
-#include <pxr/pxrns.h>
 #include "Hd/api.h"
+#include <pxr/pxrns.h>
 
 #include "Sdf/path.h"
 
@@ -41,51 +41,51 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// there are in the list.
 ///
 class Hd_SortedIds {
-public:
-    HD_API
-    Hd_SortedIds();
+ public:
+  HD_API
+  Hd_SortedIds();
 
-    HD_API
-    ~Hd_SortedIds() = default;
+  HD_API
+  ~Hd_SortedIds() = default;
 
-    HD_API
-    Hd_SortedIds(Hd_SortedIds &&other);
+  HD_API
+  Hd_SortedIds(Hd_SortedIds &&other);
 
-    /// Sorts the ids if needed and returns the sorted list of ids.
-    HD_API
-    const SdfPathVector &GetIds();
+  /// Sorts the ids if needed and returns the sorted list of ids.
+  HD_API
+  const SdfPathVector &GetIds();
 
-    /// Add a new id to the collection
-    HD_API
-    void Insert(const SdfPath &id);
+  /// Add a new id to the collection
+  HD_API
+  void Insert(const SdfPath &id);
 
-    /// Remove an id from the collection.
-    HD_API
-    void Remove(const SdfPath &id);
+  /// Remove an id from the collection.
+  HD_API
+  void Remove(const SdfPath &id);
 
-    /// Remove a range of id from the collection.
-    /// Range defined by position index in sorted list.
-    /// end is inclusive.
-    HD_API
-    void RemoveRange(size_t start, size_t end);
+  /// Remove a range of id from the collection.
+  /// Range defined by position index in sorted list.
+  /// end is inclusive.
+  HD_API
+  void RemoveRange(size_t start, size_t end);
 
-    /// Removes all ids from the collection.
-    HD_API
-    void Clear();
+  /// Removes all ids from the collection.
+  HD_API
+  void Clear();
 
-private:
-    SdfPathVector           _ids;
-    size_t                  _sortedCount;
-    ptrdiff_t               _afterLastDeletePoint;
+ private:
+  SdfPathVector _ids;
+  size_t _sortedCount;
+  ptrdiff_t _afterLastDeletePoint;
 
-    void _InsertSort();
-    void _FullSort();
-    void _Sort();
+  void _InsertSort();
+  void _FullSort();
+  void _Sort();
 
-    Hd_SortedIds(const Hd_SortedIds &) = delete;
-    Hd_SortedIds &operator =(const Hd_SortedIds &) = delete;
+  Hd_SortedIds(const Hd_SortedIds &) = delete;
+  Hd_SortedIds &operator=(const Hd_SortedIds &) = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_SORTED_IDS_H
+#endif  // PXR_IMAGING_HD_SORTED_IDS_H

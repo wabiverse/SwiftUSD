@@ -52,10 +52,10 @@ using TraceCategoryId = uint32_t;
 /// way to associate TraceCategoryId values with human readable names.
 ///
 class TraceCategory {
-public:
+ public:
   /// Computes an id for the given a string literal \p str.
-  template <int N>
-  static constexpr TraceCategoryId CreateTraceCategoryId(const char (&str)[N]) {
+  template<int N> static constexpr TraceCategoryId CreateTraceCategoryId(const char (&str)[N])
+  {
     return TraceStringHash::Hash(str);
   }
 
@@ -73,7 +73,7 @@ public:
   /// Singleton accessor.
   TRACE_API static TraceCategory &GetInstance();
 
-private:
+ private:
   friend class TfSingleton<TraceCategory>;
 
   TraceCategory();
@@ -86,4 +86,4 @@ TRACE_API_TEMPLATE_CLASS(TfSingleton<TraceCategory>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_CATEGORY_H
+#endif  // PXR_BASE_TRACE_CATEGORY_H

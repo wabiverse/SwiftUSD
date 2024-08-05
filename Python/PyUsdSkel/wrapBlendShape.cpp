@@ -21,16 +21,16 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "UsdSkel/blendShape.h"
 #include "Usd/schemaBase.h"
+#include "UsdSkel/blendShape.h"
 
 #include "Sdf/primSpec.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -40,60 +40,52 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+#define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
+
+// fwd decl.
+WRAP_CUSTOM;
+
+static UsdAttribute _CreateOffsetsAttr(UsdSkelBlendShape &self,
+                                       object defaultVal,
+                                       bool writeSparsely)
 {
+  return self.CreateOffsetsAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Vector3fArray),
+                                writeSparsely);
+}
 
-#define WRAP_CUSTOM    \
-  template <class Cls> \
-  static void _CustomWrapCode(Cls &_class)
+static UsdAttribute _CreateNormalOffsetsAttr(UsdSkelBlendShape &self,
+                                             object defaultVal,
+                                             bool writeSparsely)
+{
+  return self.CreateNormalOffsetsAttr(
+      UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Vector3fArray), writeSparsely);
+}
 
-  // fwd decl.
-  WRAP_CUSTOM;
+static UsdAttribute _CreatePointIndicesAttr(UsdSkelBlendShape &self,
+                                            object defaultVal,
+                                            bool writeSparsely)
+{
+  return self.CreatePointIndicesAttr(UsdPythonToSdfType(defaultVal, SdfValueTypeNames->IntArray),
+                                     writeSparsely);
+}
 
-  static UsdAttribute
-  _CreateOffsetsAttr(UsdSkelBlendShape &self,
-                     object defaultVal, bool writeSparsely)
-  {
-    return self.CreateOffsetsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Vector3fArray), writeSparsely);
-  }
+static std::string _Repr(const UsdSkelBlendShape &self)
+{
+  std::string primRepr = TfPyRepr(self.GetPrim());
+  return TfStringPrintf("UsdSkel.BlendShape(%s)", primRepr.c_str());
+}
 
-  static UsdAttribute
-  _CreateNormalOffsetsAttr(UsdSkelBlendShape &self,
-                           object defaultVal, bool writeSparsely)
-  {
-    return self.CreateNormalOffsetsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Vector3fArray), writeSparsely);
-  }
-
-  static UsdAttribute
-  _CreatePointIndicesAttr(UsdSkelBlendShape &self,
-                          object defaultVal, bool writeSparsely)
-  {
-    return self.CreatePointIndicesAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->IntArray), writeSparsely);
-  }
-
-  static std::string
-  _Repr(const UsdSkelBlendShape &self)
-  {
-    std::string primRepr = TfPyRepr(self.GetPrim());
-    return TfStringPrintf(
-        "UsdSkel.BlendShape(%s)",
-        primRepr.c_str());
-  }
-
-} // anonymous namespace
+}  // anonymous namespace
 
 void wrapUsdSkelBlendShape()
 {
   typedef UsdSkelBlendShape This;
 
-  class_<This, bases<UsdTyped>>
-      cls("BlendShape");
+  class_<This, bases<UsdTyped>> cls("BlendShape");
 
-  cls
-      .def(init<UsdPrim>(arg("prim")))
+  cls.def(init<UsdPrim>(arg("prim")))
       .def(init<UsdSchemaBase const &>(arg("schemaObj")))
       .def(TfTypePythonClass())
 
@@ -109,32 +101,27 @@ void wrapUsdSkelBlendShape()
            return_value_policy<TfPySequenceToList>())
       .staticmethod("GetSchemaAttributeNames")
 
-      .def("_GetStaticTfType", (TfType const &(*)())TfType::Find<This>,
+      .def("_GetStaticTfType",
+           (TfType const &(*)())TfType::Find<This>,
            return_value_policy<return_by_value>())
       .staticmethod("_GetStaticTfType")
 
       .def(!self)
 
-      .def("GetOffsetsAttr",
-           &This::GetOffsetsAttr)
+      .def("GetOffsetsAttr", &This::GetOffsetsAttr)
       .def("CreateOffsetsAttr",
            &_CreateOffsetsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetNormalOffsetsAttr",
-           &This::GetNormalOffsetsAttr)
+      .def("GetNormalOffsetsAttr", &This::GetNormalOffsetsAttr)
       .def("CreateNormalOffsetsAttr",
            &_CreateNormalOffsetsAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
-      .def("GetPointIndicesAttr",
-           &This::GetPointIndicesAttr)
+      .def("GetPointIndicesAttr", &This::GetPointIndicesAttr)
       .def("CreatePointIndicesAttr",
            &_CreatePointIndicesAttr,
-           (arg("defaultValue") = object(),
-            arg("writeSparsely") = false))
+           (arg("defaultValue") = object(), arg("writeSparsely") = false))
 
       .def("__repr__", ::_Repr);
 
@@ -160,37 +147,31 @@ void wrapUsdSkelBlendShape()
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-namespace
+namespace {
+
+tuple _ValidatePointIndices(TfSpan<const int> pointIndices, size_t numPoints)
+{
+  std::string reason;
+  bool valid = UsdSkelBlendShape::ValidatePointIndices(pointIndices, numPoints, &reason);
+  return boost::python::make_tuple(valid, reason);
+}
+
+WRAP_CUSTOM
 {
 
-  tuple
-  _ValidatePointIndices(TfSpan<const int> pointIndices,
-                        size_t numPoints)
-  {
-    std::string reason;
-    bool valid = UsdSkelBlendShape::ValidatePointIndices(
-        pointIndices, numPoints, &reason);
-    return boost::python::make_tuple(valid, reason);
-  }
+  using This = UsdSkelBlendShape;
 
-  WRAP_CUSTOM
-  {
+  _class.def("CreateInbetween", &This::CreateInbetween, arg("name"))
+      .def("GetInbetween", &This::GetInbetween, arg("name"))
+      .def("HasInbetween", &This::HasInbetween, arg("name"))
 
-    using This = UsdSkelBlendShape;
+      .def("GetInbetweens", &This::GetInbetweens, return_value_policy<TfPySequenceToList>())
+      .def("GetAuthoredInbetweens",
+           &This::GetAuthoredInbetweens,
+           return_value_policy<TfPySequenceToList>())
 
-    _class
-        .def("CreateInbetween", &This::CreateInbetween, arg("name"))
-        .def("GetInbetween", &This::GetInbetween, arg("name"))
-        .def("HasInbetween", &This::HasInbetween, arg("name"))
-
-        .def("GetInbetweens", &This::GetInbetweens,
-             return_value_policy<TfPySequenceToList>())
-        .def("GetAuthoredInbetweens", &This::GetAuthoredInbetweens,
-             return_value_policy<TfPySequenceToList>())
-
-        .def("ValidatePointIndices", &_ValidatePointIndices,
-             (arg("pointIndices"), arg("numPoints")))
-        .staticmethod("ValidatePointIndices");
-  }
-
+      .def("ValidatePointIndices", &_ValidatePointIndices, (arg("pointIndices"), arg("numPoints")))
+      .staticmethod("ValidatePointIndices");
 }
+
+}  // namespace

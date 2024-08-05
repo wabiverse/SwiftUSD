@@ -23,26 +23,24 @@
 //
 #include "Garch/glPlatformDebugContext.h"
 
+#include "Arch/defines.h"
 #include "Garch/glApi.h"
 #include "Tf/diagnostic.h"
 #include "Tf/getenv.h"
-#include "Arch/defines.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 /* static */
 bool GarchGLPlatformDebugContext::IsEnabledDebugOutput()
 {
-  static bool isEnabledDebugOutput =
-      TfGetenvBool("GLF_ENABLE_DEBUG_OUTPUT", false);
+  static bool isEnabledDebugOutput = TfGetenvBool("GLF_ENABLE_DEBUG_OUTPUT", false);
   return isEnabledDebugOutput;
 }
 
 /* static */
 bool GarchGLPlatformDebugContext::IsEnabledCoreProfile()
 {
-  static bool isEnabledCoreProfile =
-      TfGetenvBool("GLF_ENABLE_CORE_PROFILE", false);
+  static bool isEnabledCoreProfile = TfGetenvBool("GLF_ENABLE_CORE_PROFILE", false);
   return isEnabledCoreProfile;
 }
 
@@ -51,18 +49,18 @@ PXR_NAMESPACE_CLOSE_SCOPE
 ////////////////////////////////////////////////////////////
 #if defined(ARCH_OS_LINUX)
 
-#include <GL/glx.h>
-#include <GL/glxtokens.h>
-#include <X11/Xlib.h>
+#  include <GL/glx.h>
+#  include <GL/glxtokens.h>
+#  include <X11/Xlib.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class GarchGLPlatformDebugContextPrivate
-{
-public:
-  GarchGLPlatformDebugContextPrivate(
-      int majorVersion, int minorVersion,
-      bool coreProfile, bool directRendering);
+class GarchGLPlatformDebugContextPrivate {
+ public:
+  GarchGLPlatformDebugContextPrivate(int majorVersion,
+                                     int minorVersion,
+                                     bool coreProfile,
+                                     bool directRendering);
   ~GarchGLPlatformDebugContextPrivate();
 
   void MakeCurrent();
@@ -71,9 +69,10 @@ public:
   GLXContext _ctx;
 };
 
-GarchGLPlatformDebugContextPrivate::GarchGLPlatformDebugContextPrivate(
-    int majorVersion, int minorVersion,
-    bool coreProfile, bool directRendering)
+GarchGLPlatformDebugContextPrivate::GarchGLPlatformDebugContextPrivate(int majorVersion,
+                                                                       int minorVersion,
+                                                                       bool coreProfile,
+                                                                       bool directRendering)
     : _dpy(NULL), _ctx(NULL)
 {
   Display *shareDisplay = glXGetCurrentDisplay();
@@ -92,15 +91,12 @@ GarchGLPlatformDebugContextPrivate::GarchGLPlatformDebugContextPrivate(
   GLXFBConfig *configs = NULL;
   int configCount = 0;
   configs = glXChooseFBConfig(shareDisplay, screen, configSpec, &configCount);
-  if (!TF_VERIFY(configCount > 0))
-  {
+  if (!TF_VERIFY(configCount > 0)) {
     return;
   }
 
-  const int profile =
-      coreProfile
-          ? GLX_CONTEXT_CORE_PROFILE_BIT_ARB
-          : GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+  const int profile = coreProfile ? GLX_CONTEXT_CORE_PROFILE_BIT_ARB :
+                                    GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
 
   int attribs[] = {
       GLX_CONTEXT_MAJOR_VERSION_ARB,
@@ -115,26 +111,20 @@ GarchGLPlatformDebugContextPrivate::GarchGLPlatformDebugContextPrivate(
   };
 
   // Extension entry points must be resolved at run-time.
-  PFNGLXCREATECONTEXTATTRIBSARBPROC createContextAttribs =
-      (PFNGLXCREATECONTEXTATTRIBSARBPROC)
-          glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
+  PFNGLXCREATECONTEXTATTRIBSARBPROC createContextAttribs = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
+      glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
 
   // Create a GL context with the requested capabilities.
-  if (createContextAttribs)
-  {
-    _ctx = (*createContextAttribs)(shareDisplay, configs[0],
-                                   shareContext, directRendering,
-                                   attribs);
+  if (createContextAttribs) {
+    _ctx = (*createContextAttribs)(
+        shareDisplay, configs[0], shareContext, directRendering, attribs);
   }
-  else
-  {
+  else {
     TF_WARN("Unable to create GL debug context.");
     XVisualInfo *vis = glXGetVisualFromFBConfig(shareDisplay, configs[0]);
-    _ctx = glXCreateContext(shareDisplay, vis,
-                            shareContext, directRendering);
+    _ctx = glXCreateContext(shareDisplay, vis, shareContext, directRendering);
   }
-  if (!TF_VERIFY(_ctx))
-  {
+  if (!TF_VERIFY(_ctx)) {
     return;
   }
 
@@ -143,8 +133,7 @@ GarchGLPlatformDebugContextPrivate::GarchGLPlatformDebugContextPrivate(
 
 GarchGLPlatformDebugContextPrivate::~GarchGLPlatformDebugContextPrivate()
 {
-  if (_dpy && _ctx)
-  {
+  if (_dpy && _ctx) {
     glXDestroyContext(_dpy, _ctx);
   }
 }
@@ -161,7 +150,7 @@ void *GarchSelectCoreProfileMacVisual()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // ARCH_OS_LINUX
+#endif  // ARCH_OS_LINUX
 
 ////////////////////////////////////////////////////////////
 
@@ -170,22 +159,24 @@ PXR_NAMESPACE_CLOSE_SCOPE
 PXR_NAMESPACE_OPEN_SCOPE
 
 // XXX: implement debug context
-class GarchGLPlatformDebugContextPrivate
-{
-public:
-  GarchGLPlatformDebugContextPrivate(
-      int majorVersion, int minorVersion,
-      bool coreProfile, bool directRendering) {}
+class GarchGLPlatformDebugContextPrivate {
+ public:
+  GarchGLPlatformDebugContextPrivate(int majorVersion,
+                                     int minorVersion,
+                                     bool coreProfile,
+                                     bool directRendering)
+  {
+  }
   ~GarchGLPlatformDebugContextPrivate() {}
 
   void MakeCurrent() {}
 };
 
-void *GarchSelectCoreProfileMacVisual(); // extern obj-c
+void *GarchSelectCoreProfileMacVisual();  // extern obj-c
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // ARCH_OS_DARWIN
+#endif  // ARCH_OS_DARWIN
 
 ////////////////////////////////////////////////////////////
 
@@ -194,12 +185,14 @@ PXR_NAMESPACE_CLOSE_SCOPE
 PXR_NAMESPACE_OPEN_SCOPE
 
 // XXX: implement debug context
-class GarchGLPlatformDebugContextPrivate
-{
-public:
-  GarchGLPlatformDebugContextPrivate(
-      int majorVersion, int minorVersion,
-      bool coreProfile, bool directRendering) {}
+class GarchGLPlatformDebugContextPrivate {
+ public:
+  GarchGLPlatformDebugContextPrivate(int majorVersion,
+                                     int minorVersion,
+                                     bool coreProfile,
+                                     bool directRendering)
+  {
+  }
   ~GarchGLPlatformDebugContextPrivate() {}
 
   void MakeCurrent() {}
@@ -212,7 +205,7 @@ void *GarchSelectCoreProfileMacVisual()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // ARCH_OS_WINDOWS
+#endif  // ARCH_OS_WINDOWS
 
 ////////////////////////////////////////////////////////////
 
@@ -225,14 +218,11 @@ GarchGLPlatformDebugContext::GarchGLPlatformDebugContext(int majorVersion,
     : _coreProfile(coreProfile)
 
 {
-  if (!GarchGLPlatformDebugContext::IsEnabledDebugOutput())
-  {
+  if (!GarchGLPlatformDebugContext::IsEnabledDebugOutput()) {
     return;
   }
-  _private.reset(new GarchGLPlatformDebugContextPrivate(majorVersion,
-                                                        minorVersion,
-                                                        coreProfile,
-                                                        directRendering));
+  _private.reset(new GarchGLPlatformDebugContextPrivate(
+      majorVersion, minorVersion, coreProfile, directRendering));
 }
 
 GarchGLPlatformDebugContext::~GarchGLPlatformDebugContext()
@@ -244,29 +234,23 @@ GarchGLPlatformDebugContext::~GarchGLPlatformDebugContext()
 void GarchGLPlatformDebugContext::makeCurrent()
 {
   // note: if not enabled, returns without making context current.
-  if (!GarchGLPlatformDebugContext::IsEnabledDebugOutput())
-  {
+  if (!GarchGLPlatformDebugContext::IsEnabledDebugOutput()) {
     return;
   }
 
-  if (!TF_VERIFY(_private))
-  {
+  if (!TF_VERIFY(_private)) {
     return;
   }
 
   _private->MakeCurrent();
 }
 
-void *
-GarchGLPlatformDebugContext::chooseMacVisual()
+void *GarchGLPlatformDebugContext::chooseMacVisual()
 {
-  if (_coreProfile ||
-      GarchGLPlatformDebugContext::IsEnabledCoreProfile())
-  {
+  if (_coreProfile || GarchGLPlatformDebugContext::IsEnabledCoreProfile()) {
     return GarchSelectCoreProfileMacVisual();
   }
-  else
-  {
+  else {
     return nullptr;
   }
   return nullptr;

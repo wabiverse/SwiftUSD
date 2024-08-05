@@ -24,14 +24,14 @@
 #ifndef PXR_IMAGING_HGI_GRAPHICS_CMDS_H
 #define PXR_IMAGING_HGI_GRAPHICS_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec4i.h"
 #include "Hgi/api.h"
+#include "Hgi/cmds.h"
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
 #include "Hgi/resourceBindings.h"
-#include "Hgi/cmds.h"
 #include <memory>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -43,9 +43,8 @@ using HgiGraphicsCmdsUniquePtr = std::unique_ptr<class HgiGraphicsCmds>;
 /// HgiGraphicsCmds is a lightweight object that cannot be re-used after it has
 /// been submitted. A new cmds object should be acquired for each frame.
 ///
-class HgiGraphicsCmds : public HgiCmds
-{
-public:
+class HgiGraphicsCmds : public HgiCmds {
+ public:
   HGI_API
   ~HgiGraphicsCmds() override;
 
@@ -90,17 +89,15 @@ public:
   /// `byteSize` is the size of the data you are updating.
   /// `data` is the data you are copying into the push constants block.
   HGI_API
-  virtual void SetConstantValues(
-      HgiGraphicsPipelineHandle pipeline,
-      HgiShaderStage stages,
-      uint32_t bindIndex,
-      uint32_t byteSize,
-      const void *data) = 0;
+  virtual void SetConstantValues(HgiGraphicsPipelineHandle pipeline,
+                                 HgiShaderStage stages,
+                                 uint32_t bindIndex,
+                                 uint32_t byteSize,
+                                 const void *data) = 0;
 
   /// Binds the vertex buffer(s) that describe the vertex attributes.
   HGI_API
-  virtual void BindVertexBuffers(
-      HgiVertexBufferBindingVector const &bindings) = 0;
+  virtual void BindVertexBuffers(HgiVertexBufferBindingVector const &bindings) = 0;
 
   /// Records a draw command that renders one or more instances of primitives
   /// using the number of vertices provided.
@@ -111,11 +108,10 @@ public:
   /// `instanceCount`: Number of instances to draw.
   /// `baseInstance`: The first instance to draw.
   HGI_API
-  virtual void Draw(
-      uint32_t vertexCount,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance) = 0;
+  virtual void Draw(uint32_t vertexCount,
+                    uint32_t baseVertex,
+                    uint32_t instanceCount,
+                    uint32_t baseInstance) = 0;
 
   /// Records a multi-draw command that reads the draw parameters
   /// from a provided drawParameterBuffer.
@@ -132,11 +128,10 @@ public:
   /// `drawCount`: The number of draws to execute.
   /// `stride`: byte stride between successive sets of draw parameters.
   HGI_API
-  virtual void DrawIndirect(
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride) = 0;
+  virtual void DrawIndirect(HgiBufferHandle const &drawParameterBuffer,
+                            uint32_t drawBufferByteOffset,
+                            uint32_t drawCount,
+                            uint32_t stride) = 0;
 
   /// Records a draw command that renders one or more instances of primitives
   /// using an indexBuffer starting from the base vertex.
@@ -150,13 +145,12 @@ public:
   /// `instanceCount`: Number of instances to draw.
   /// `baseInstance`: The first instance to draw.
   HGI_API
-  virtual void DrawIndexed(
-      HgiBufferHandle const &indexBuffer,
-      uint32_t indexCount,
-      uint32_t indexBufferByteOffset,
-      uint32_t baseVertex,
-      uint32_t instanceCount,
-      uint32_t baseInstance) = 0;
+  virtual void DrawIndexed(HgiBufferHandle const &indexBuffer,
+                           uint32_t indexCount,
+                           uint32_t indexBufferByteOffset,
+                           uint32_t baseVertex,
+                           uint32_t instanceCount,
+                           uint32_t baseInstance) = 0;
 
   /// Records a indexed multi-draw command that reads the draw parameters
   /// from a provided drawParameterBuffer, and indices from indexBuffer.
@@ -188,25 +182,24 @@ public:
   /// which must be applied to each HgiVertexBufferPerPatchControlPoint
   /// vertex buffer for each patch draw for Metal.
   HGI_API
-  virtual void DrawIndexedIndirect(
-      HgiBufferHandle const &indexBuffer,
-      HgiBufferHandle const &drawParameterBuffer,
-      uint32_t drawBufferByteOffset,
-      uint32_t drawCount,
-      uint32_t stride,
-      std::vector<uint32_t> const &drawParameterBufferUInt32,
-      uint32_t patchBaseVertexByteOffset) = 0;
+  virtual void DrawIndexedIndirect(HgiBufferHandle const &indexBuffer,
+                                   HgiBufferHandle const &drawParameterBuffer,
+                                   uint32_t drawBufferByteOffset,
+                                   uint32_t drawCount,
+                                   uint32_t stride,
+                                   std::vector<uint32_t> const &drawParameterBufferUInt32,
+                                   uint32_t patchBaseVertexByteOffset) = 0;
 
   /// Inserts a barrier so that data written to memory by commands before
   /// the barrier is available to commands after the barrier.
   HGI_API
   virtual void InsertMemoryBarrier(HgiMemoryBarrier barrier) = 0;
 
-protected:
+ protected:
   HGI_API
   HgiGraphicsCmds();
 
-private:
+ private:
   HgiGraphicsCmds &operator=(const HgiGraphicsCmds &) = delete;
   HgiGraphicsCmds(const HgiGraphicsCmds &) = delete;
 };

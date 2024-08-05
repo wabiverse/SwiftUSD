@@ -34,61 +34,65 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
-static SdfPrimSpecHandleVector _GetPrimStack(const PcpPrimIndex &self) {
+static SdfPrimSpecHandleVector _GetPrimStack(const PcpPrimIndex &self)
+{
   const PcpPrimRange primRange = self.GetPrimRange();
 
   SdfPrimSpecHandleVector primStack;
   primStack.reserve(std::distance(primRange.first, primRange.second));
-  TF_FOR_ALL(it, primRange) { primStack.push_back(SdfGetPrimAtPath(*it)); }
+  TF_FOR_ALL(it, primRange)
+  {
+    primStack.push_back(SdfGetPrimAtPath(*it));
+  }
 
   return primStack;
 }
 
-static boost::python::tuple _ComputePrimChildNames(PcpPrimIndex &index) {
+static boost::python::tuple _ComputePrimChildNames(PcpPrimIndex &index)
+{
   TfTokenVector nameOrder;
   PcpTokenSet prohibitedNameSet;
   index.ComputePrimChildNames(&nameOrder, &prohibitedNameSet);
-  TfTokenVector prohibitedNamesVector(prohibitedNameSet.begin(),
-                                      prohibitedNameSet.end());
+  TfTokenVector prohibitedNamesVector(prohibitedNameSet.begin(), prohibitedNameSet.end());
   return boost::python::make_tuple(nameOrder, prohibitedNamesVector);
 }
 
-static TfTokenVector _ComputePrimPropertyNames(PcpPrimIndex &index) {
+static TfTokenVector _ComputePrimPropertyNames(PcpPrimIndex &index)
+{
   TfTokenVector result;
   index.ComputePrimPropertyNames(&result);
   return result;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapPrimIndex() {
+void wrapPrimIndex()
+{
   typedef PcpPrimIndex This;
 
   class_<This>("PrimIndex", "", no_init)
       .add_property("primStack",
-                    make_function(&_GetPrimStack,
-                                  return_value_policy<TfPySequenceToList>()))
+                    make_function(&_GetPrimStack, return_value_policy<TfPySequenceToList>()))
       .add_property("rootNode", &This::GetRootNode)
       .add_property("hasAnyPayloads", &This::HasAnyPayloads)
-      .add_property("localErrors",
-                    make_function(&This::GetLocalErrors,
-                                  return_value_policy<TfPySequenceToList>()))
+      .add_property(
+          "localErrors",
+          make_function(&This::GetLocalErrors, return_value_policy<TfPySequenceToList>()))
 
       .def("IsValid", &This::IsValid)
       .def("IsInstanceable", &This::IsInstanceable)
 
       .def("ComputePrimChildNames", &_ComputePrimChildNames)
-      .def("ComputePrimPropertyNames", &_ComputePrimPropertyNames,
+      .def("ComputePrimPropertyNames",
+           &_ComputePrimPropertyNames,
            return_value_policy<TfPySequenceToList>())
       .def("ComposeAuthoredVariantSelections",
            &This::ComposeAuthoredVariantSelections,
            return_value_policy<TfPyMapToDictionary>())
-      .def("GetSelectionAppliedForVariantSet",
-           &This::GetSelectionAppliedForVariantSet)
+      .def("GetSelectionAppliedForVariantSet", &This::GetSelectionAppliedForVariantSet)
 
       .def("GetNodeProvidingSpec",
-           (PcpNodeRef(This::*)(const SdfPrimSpecHandle &)
-                const)(&This::GetNodeProvidingSpec),
+           (PcpNodeRef(This::*)(const SdfPrimSpecHandle &) const)(&This::GetNodeProvidingSpec),
            args("primSpec"))
       .def("GetNodeProvidingSpec",
            (PcpNodeRef(This::*)(const SdfLayerHandle &, const SdfPath &)
@@ -96,10 +100,12 @@ void wrapPrimIndex() {
            (args("layer"), args("path")))
 
       .def("PrintStatistics", &This::PrintStatistics)
-      .def(
-          "DumpToString", &This::DumpToString,
-          (args("includeInheritOriginInfo") = true, args("includeMaps") = true))
-      .def("DumpToDotGraph", &This::DumpToDotGraph,
-           (args("filename"), args("includeInheritOriginInfo") = true,
+      .def("DumpToString",
+           &This::DumpToString,
+           (args("includeInheritOriginInfo") = true, args("includeMaps") = true))
+      .def("DumpToDotGraph",
+           &This::DumpToDotGraph,
+           (args("filename"),
+            args("includeInheritOriginInfo") = true,
             args("includeMaps") = false));
 }

@@ -48,13 +48,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <typename Derived>
-struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
-                         public boost::python::wrapper<Derived> {
+template<typename Derived>
+struct TfPyPolymorphic : public TfType::PyPolymorphicBase, public boost::python::wrapper<Derived> {
   typedef TfPyPolymorphic<Derived> This;
   typedef TfPyOverride Override;
 
-  Override GetOverride(char const *func) const {
+  Override GetOverride(char const *func) const
+  {
     TfPyLock pyLock;
 
     using namespace boost::python;
@@ -69,22 +69,22 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
       // using pythons mro, get the attribute string that represents
       // the named function. this will return something valid if it exists
       // in this or any ancestor class
-      if (handle<> m = handle<>(allow_null(
-              PyObject_GetAttrString(m_self, const_cast<char *>(func))))) {
+      if (handle<> m = handle<>(
+              allow_null(PyObject_GetAttrString(m_self, const_cast<char *>(func)))))
+      {
         // now get the typehandle to the class. we will use this to
         // determine if this method exists on the derived class
-        type_handle typeHandle =
-            objects::registered_class_object(typeid(Derived));
+        type_handle typeHandle = objects::registered_class_object(typeid(Derived));
         PyTypeObject *class_object = typeHandle.get();
 
         PyObject *func_object = 0;
 
-        if (PyMethod_Check(m.get()) &&
-            ((PyMethodObject *)m.get())->im_self == m_self &&
-            class_object->tp_dict != 0) {
+        if (PyMethod_Check(m.get()) && ((PyMethodObject *)m.get())->im_self == m_self &&
+            class_object->tp_dict != 0)
+        {
           // look for the method on the class object.
-          handle<> borrowed_f(allow_null(PyObject_GetAttrString(
-              (PyObject *)class_object, const_cast<char *>(func))));
+          handle<> borrowed_f(allow_null(
+              PyObject_GetAttrString((PyObject *)class_object, const_cast<char *>(func))));
 
           // Don't leave an exception if there's no base class method
           PyErr_Clear();
@@ -103,12 +103,13 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
           return Override(m);
       }
     }
-    PyErr_Clear(); // Don't leave an exception if there's no override.
+    PyErr_Clear();  // Don't leave an exception if there's no override.
 
     return Override(handle<>(boost::python::detail::none()));
   }
 
-  Override GetPureOverride(char const *func) const {
+  Override GetPureOverride(char const *func) const
+  {
     TfPyLock pyLock;
     Override ret = GetOverride(func);
     if (!ret) {
@@ -126,67 +127,67 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase,
     return ret;
   }
 
-  template <typename Ret>
-  TfPyCall<Ret> CallPureVirtual(char const *func) const {
+  template<typename Ret> TfPyCall<Ret> CallPureVirtual(char const *func) const
+  {
     TfPyLock lock;
     return TfPyCall<Ret>(GetPureOverride(func));
   }
 
-  template <class Ret, class Cls, typename... Arg>
+  template<class Ret, class Cls, typename... Arg>
+  std::function<Ret(Arg...)> CallVirtual(char const *fname, Ret (Cls::*defaultImpl)(Arg...));
+
+  template<class Ret, class Cls, typename... Arg>
   std::function<Ret(Arg...)> CallVirtual(char const *fname,
-                                         Ret (Cls::*defaultImpl)(Arg...));
+                                         Ret (Cls::*defaultImpl)(Arg...) const) const;
 
-  template <class Ret, class Cls, typename... Arg>
-  std::function<Ret(Arg...)>
-  CallVirtual(char const *fname, Ret (Cls::*defaultImpl)(Arg...) const) const;
-
-protected:
+ protected:
   virtual ~TfPyPolymorphic();
 
-private:
+ private:
   // Helper to bind a pointer-to-member-function and a pointer to an
   // instance.
-  template <class Ret, class Cls, typename... Args> struct _BindMemFn {
+  template<class Ret, class Cls, typename... Args> struct _BindMemFn {
     using MemFn = typename std::conditional<std::is_const<Cls>::value,
                                             Ret (Cls::*)(Args...) const,
                                             Ret (Cls::*)(Args...)>::type;
 
     _BindMemFn(MemFn memFn, Cls *obj) : _memFn(memFn), _obj(obj) {}
 
-    Ret operator()(Args... args) const { return (_obj->*_memFn)(args...); }
+    Ret operator()(Args... args) const
+    {
+      return (_obj->*_memFn)(args...);
+    }
 
-  private:
+   private:
     MemFn _memFn;
     Cls *_obj;
   };
 };
 
-template <typename Derived> TfPyPolymorphic<Derived>::~TfPyPolymorphic() {}
+template<typename Derived> TfPyPolymorphic<Derived>::~TfPyPolymorphic() {}
 
-template <typename Derived>
-template <class Ret, class Cls, typename... Args>
-inline std::function<Ret(Args...)>
-TfPyPolymorphic<Derived>::CallVirtual(char const *fname,
-                                      Ret (Cls::*defaultImpl)(Args...)) {
-  static_assert(std::is_base_of<This, Cls>::value,
-                "This must be a base of Cls.");
+template<typename Derived>
+template<class Ret, class Cls, typename... Args>
+inline std::function<Ret(Args...)> TfPyPolymorphic<Derived>::CallVirtual(
+    char const *fname, Ret (Cls::*defaultImpl)(Args...))
+{
+  static_assert(std::is_base_of<This, Cls>::value, "This must be a base of Cls.");
   TfPyLock lock;
   if (Override o = GetOverride(fname))
     return std::function<Ret(Args...)>(TfPyCall<Ret>(o));
   return _BindMemFn<Ret, Cls, Args...>(defaultImpl, static_cast<Cls *>(this));
 }
 
-template <typename Derived>
-template <class Ret, class Cls, typename... Args>
+template<typename Derived>
+template<class Ret, class Cls, typename... Args>
 inline std::function<Ret(Args...)> TfPyPolymorphic<Derived>::CallVirtual(
-    char const *fname, Ret (Cls::*defaultImpl)(Args...) const) const {
-  static_assert(std::is_base_of<This, Cls>::value,
-                "This must be a base of Cls.");
+    char const *fname, Ret (Cls::*defaultImpl)(Args...) const) const
+{
+  static_assert(std::is_base_of<This, Cls>::value, "This must be a base of Cls.");
   TfPyLock lock;
   if (Override o = GetOverride(fname))
     return std::function<Ret(Args...)>(TfPyCall<Ret>(o));
-  return _BindMemFn<Ret, Cls const, Args...>(defaultImpl,
-                                             static_cast<Cls const *>(this));
+  return _BindMemFn<Ret, Cls const, Args...>(defaultImpl, static_cast<Cls const *>(this));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
@@ -195,29 +196,28 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // PyObject* as the 1st argument to TfPyPolymorphic's ctor.
 namespace boost {
 namespace python {
-template <typename T>
-struct has_back_reference<PXR_NS::TfPyPolymorphic<T>> : mpl::true_ {};
-} // namespace python
-} // end namespace boost
+template<typename T> struct has_back_reference<PXR_NS::TfPyPolymorphic<T>> : mpl::true_ {};
+}  // namespace python
+}  // end namespace boost
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Base case for internal Tf_PyMemberFunctionPointerUpcast.
-template <typename Base, typename Fn> struct Tf_PyMemberFunctionPointerUpcast;
+template<typename Base, typename Fn> struct Tf_PyMemberFunctionPointerUpcast;
 
-template <typename Base, typename Derived, typename Ret, typename... Args>
+template<typename Base, typename Derived, typename Ret, typename... Args>
 struct Tf_PyMemberFunctionPointerUpcast<Base, Ret (Derived::*)(Args...)> {
   typedef Ret (Base::*Type)(Args...);
 };
 
-template <typename Base, typename Derived, typename Ret, typename... Args>
+template<typename Base, typename Derived, typename Ret, typename... Args>
 struct Tf_PyMemberFunctionPointerUpcast<Base, Ret (Derived::*)(Args...) const> {
   typedef Ret (Base::*Type)(Args...) const;
 };
 
-template <typename Base, typename Fn>
-typename Tf_PyMemberFunctionPointerUpcast<Base, Fn>::Type
-TfPyProtectedVirtual(Fn fn) {
+template<typename Base, typename Fn>
+typename Tf_PyMemberFunctionPointerUpcast<Base, Fn>::Type TfPyProtectedVirtual(Fn fn)
+{
   typedef typename Tf_PyMemberFunctionPointerUpcast<Base, Fn>::Type Ret;
 
   return static_cast<Ret>(fn);
@@ -225,4 +225,4 @@ TfPyProtectedVirtual(Fn fn) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_POLYMORPHIC_H
+#endif  // PXR_BASE_TF_PY_POLYMORPHIC_H

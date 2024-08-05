@@ -29,30 +29,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-std::vector<HgiBufferHandleVector *>
-    HgiGLGarbageCollector::_bufferList;
-std::vector<HgiTextureHandleVector *>
-    HgiGLGarbageCollector::_textureList;
-std::vector<HgiSamplerHandleVector *>
-    HgiGLGarbageCollector::_samplerList;
-std::vector<HgiShaderFunctionHandleVector *>
-    HgiGLGarbageCollector::_shaderFunctionList;
-std::vector<HgiShaderProgramHandleVector *>
-    HgiGLGarbageCollector::_shaderProgramList;
-std::vector<HgiResourceBindingsHandleVector *>
-    HgiGLGarbageCollector::_resourceBindingsList;
-std::vector<HgiGraphicsPipelineHandleVector *>
-    HgiGLGarbageCollector::_graphicsPipelineList;
-std::vector<HgiComputePipelineHandleVector *>
-    HgiGLGarbageCollector::_computePipelineList;
+std::vector<HgiBufferHandleVector *> HgiGLGarbageCollector::_bufferList;
+std::vector<HgiTextureHandleVector *> HgiGLGarbageCollector::_textureList;
+std::vector<HgiSamplerHandleVector *> HgiGLGarbageCollector::_samplerList;
+std::vector<HgiShaderFunctionHandleVector *> HgiGLGarbageCollector::_shaderFunctionList;
+std::vector<HgiShaderProgramHandleVector *> HgiGLGarbageCollector::_shaderProgramList;
+std::vector<HgiResourceBindingsHandleVector *> HgiGLGarbageCollector::_resourceBindingsList;
+std::vector<HgiGraphicsPipelineHandleVector *> HgiGLGarbageCollector::_graphicsPipelineList;
+std::vector<HgiComputePipelineHandleVector *> HgiGLGarbageCollector::_computePipelineList;
 
-template <class T>
-static void _EmptyTrash(std::vector<std::vector<HgiHandle<T>> *> *list)
+template<class T> static void _EmptyTrash(std::vector<std::vector<HgiHandle<T>> *> *list)
 {
-  for (auto vec : *list)
-  {
-    for (auto objectHandle : *vec)
-    {
+  for (auto vec : *list) {
+    for (auto objectHandle : *vec) {
       delete objectHandle.Get();
     }
     vec->clear();
@@ -60,10 +49,7 @@ static void _EmptyTrash(std::vector<std::vector<HgiHandle<T>> *> *list)
   }
 }
 
-HgiGLGarbageCollector::HgiGLGarbageCollector()
-    : _isDestroying(false)
-{
-}
+HgiGLGarbageCollector::HgiGLGarbageCollector() : _isDestroying(false) {}
 
 HgiGLGarbageCollector::~HgiGLGarbageCollector()
 {
@@ -71,57 +57,49 @@ HgiGLGarbageCollector::~HgiGLGarbageCollector()
 }
 
 /* Multi threaded */
-HgiBufferHandleVector *
-HgiGLGarbageCollector::GetBufferList()
+HgiBufferHandleVector *HgiGLGarbageCollector::GetBufferList()
 {
   return _GetThreadLocalStorageList(&_bufferList);
 }
 
 /* Multi threaded */
-HgiTextureHandleVector *
-HgiGLGarbageCollector::GetTextureList()
+HgiTextureHandleVector *HgiGLGarbageCollector::GetTextureList()
 {
   return _GetThreadLocalStorageList(&_textureList);
 }
 
 /* Multi threaded */
-HgiSamplerHandleVector *
-HgiGLGarbageCollector::GetSamplerList()
+HgiSamplerHandleVector *HgiGLGarbageCollector::GetSamplerList()
 {
   return _GetThreadLocalStorageList(&_samplerList);
 }
 
 /* Multi threaded */
-HgiShaderFunctionHandleVector *
-HgiGLGarbageCollector::GetShaderFunctionList()
+HgiShaderFunctionHandleVector *HgiGLGarbageCollector::GetShaderFunctionList()
 {
   return _GetThreadLocalStorageList(&_shaderFunctionList);
 }
 
 /* Multi threaded */
-HgiShaderProgramHandleVector *
-HgiGLGarbageCollector::GetShaderProgramList()
+HgiShaderProgramHandleVector *HgiGLGarbageCollector::GetShaderProgramList()
 {
   return _GetThreadLocalStorageList(&_shaderProgramList);
 }
 
 /* Multi threaded */
-HgiResourceBindingsHandleVector *
-HgiGLGarbageCollector::GetResourceBindingsList()
+HgiResourceBindingsHandleVector *HgiGLGarbageCollector::GetResourceBindingsList()
 {
   return _GetThreadLocalStorageList(&_resourceBindingsList);
 }
 
 /* Multi threaded */
-HgiGraphicsPipelineHandleVector *
-HgiGLGarbageCollector::GetGraphicsPipelineList()
+HgiGraphicsPipelineHandleVector *HgiGLGarbageCollector::GetGraphicsPipelineList()
 {
   return _GetThreadLocalStorageList(&_graphicsPipelineList);
 }
 
 /* Multi threaded */
-HgiComputePipelineHandleVector *
-HgiGLGarbageCollector::GetComputePipelineList()
+HgiComputePipelineHandleVector *HgiGLGarbageCollector::GetComputePipelineList()
 {
   return _GetThreadLocalStorageList(&_computePipelineList);
 }
@@ -143,11 +121,9 @@ void HgiGLGarbageCollector::PerformGarbageCollection()
   _isDestroying = false;
 }
 
-template <class T>
-T *HgiGLGarbageCollector::_GetThreadLocalStorageList(std::vector<T *> *collector)
+template<class T> T *HgiGLGarbageCollector::_GetThreadLocalStorageList(std::vector<T *> *collector)
 {
-  if (ARCH_UNLIKELY(_isDestroying))
-  {
+  if (ARCH_UNLIKELY(_isDestroying)) {
     TF_CODING_ERROR("Cannot destroy object during garbage collection ");
     while (_isDestroying)
       ;
@@ -161,8 +137,7 @@ T *HgiGLGarbageCollector::_GetThreadLocalStorageList(std::vector<T *> *collector
   thread_local T *_tls = nullptr;
   static std::mutex garbageMutex;
 
-  if (!_tls)
-  {
+  if (!_tls) {
     _tls = new T();
     std::lock_guard<std::mutex> guard(garbageMutex);
     collector->push_back(_tls);

@@ -7,4 +7,4 @@
 #include <UsdMedia/spatialAudio.h>
 #include <UsdMedia/tokens.h>
 
-#endif // __PXR_USD_USDMEDIA_H__
+#endif  // __PXR_USD_USDMEDIA_H__

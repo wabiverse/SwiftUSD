@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_EXT_COMPUTATION_PRIMVAR_PRUNING_SCENE_INDEX_PLUGIN_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_EXT_COMPUTATION_PRIMVAR_PRUNING_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -35,17 +35,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Prman scene index plugin that filters out computed primvars and presents
 /// them as authored primvars.
 ///
-class HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_ExtComputationPrimvarPruningSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_EXT_COMPUTATION_PRIMVAR_PRUNING_SCENE_INDEX_PLUGIN_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_EXT_COMPUTATION_PRIMVAR_PRUNING_SCENE_INDEX_PLUGIN_H

@@ -23,8 +23,8 @@
 //
 #include "Hd/rendererPlugin.h"
 
-#include "Hd/rendererPluginRegistry.h"
 #include "Hd/pluginRenderDelegateUniqueHandle.h"
+#include "Hd/rendererPluginRegistry.h"
 
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
@@ -33,15 +33,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<HdRendererPlugin>();
+  TfType::Define<HdRendererPlugin>();
 }
 
-HdRenderDelegate*
-HdRendererPlugin::CreateRenderDelegate(HdRenderSettingsMap const& settingsMap)
+HdRenderDelegate *HdRendererPlugin::CreateRenderDelegate(HdRenderSettingsMap const &settingsMap)
 {
-    // The settings map is currently an opt-in API, so if there's no
-    // derived implementation, fall back to the settings-less factory.
-    return CreateRenderDelegate();
+  // The settings map is currently an opt-in API, so if there's no
+  // derived implementation, fall back to the settings-less factory.
+  return CreateRenderDelegate();
 }
 
 //
@@ -57,25 +56,22 @@ HdRendererPlugin::CreateRenderDelegate(HdRenderSettingsMap const& settingsMap)
 // in this compilation unit.
 HdRendererPlugin::~HdRendererPlugin() = default;
 
-HdPluginRenderDelegateUniqueHandle
-HdRendererPlugin::CreateDelegate(HdRenderSettingsMap const& settingsMap)
+HdPluginRenderDelegateUniqueHandle HdRendererPlugin::CreateDelegate(
+    HdRenderSettingsMap const &settingsMap)
 {
-    if (!IsSupported()) {
-        return nullptr;
-    }
+  if (!IsSupported()) {
+    return nullptr;
+  }
 
-    HdRendererPluginRegistry::GetInstance().AddPluginReference(this);
+  HdRendererPluginRegistry::GetInstance().AddPluginReference(this);
 
-    return HdPluginRenderDelegateUniqueHandle(
-        HdRendererPluginHandle(this),
-        CreateRenderDelegate(settingsMap));
+  return HdPluginRenderDelegateUniqueHandle(HdRendererPluginHandle(this),
+                                            CreateRenderDelegate(settingsMap));
 }
 
-TfToken
-HdRendererPlugin::GetPluginId() const
+TfToken HdRendererPlugin::GetPluginId() const
 {
-    return HdRendererPluginRegistry::GetInstance().GetPluginId(this);
+  return HdRendererPluginRegistry::GetInstance().GetPluginId(this);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

@@ -27,13 +27,13 @@
 #include <pxr/pxrns.h>
 
 #if defined(ARCH_OS_DARWIN)
-# if defined(ARCH_OS_IOS)
-#  include <stdlib.h>
-# else
-#  include <sys/malloc.h>
-# endif
+#  if defined(ARCH_OS_IOS)
+#    include <stdlib.h>
+#  else
+#    include <sys/malloc.h>
+#  endif
 #else
-# include <malloc.h>
+#  include <malloc.h>
 #endif /* defined(ARCH_OS_DARWIN) */
 
 #include <cstdlib>
@@ -41,10 +41,10 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// Aligned memory allocation.
-void *ArchAlignedAlloc(size_t alignment, size_t size) {
-#if defined(ARCH_OS_DARWIN) ||                                                 \
-    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) &&                         \
-     !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
+void *ArchAlignedAlloc(size_t alignment, size_t size)
+{
+#if defined(ARCH_OS_DARWIN) || \
+    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
   // alignment must be >= sizeof(void*)
   if (alignment < sizeof(void *)) {
     alignment = sizeof(void *);
@@ -64,10 +64,10 @@ void *ArchAlignedAlloc(size_t alignment, size_t size) {
 }
 
 /// Free memory allocated by ArchAlignedAlloc.
-void ArchAlignedFree(void *ptr) {
-#if defined(ARCH_OS_DARWIN) ||                                                 \
-    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) &&                         \
-     !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
+void ArchAlignedFree(void *ptr)
+{
+#if defined(ARCH_OS_DARWIN) || \
+    (defined(ARCH_OS_LINUX) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
   free(ptr);
 #elif defined(ARCH_OS_WINDOWS)
   _aligned_free(ptr);

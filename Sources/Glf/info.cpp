@@ -26,8 +26,8 @@
 
 #include "Garch/glApi.h"
 
-#include "Glf/info.h"
 #include "Glf/glContext.h"
+#include "Glf/info.h"
 
 #include "Tf/stringUtils.h"
 
@@ -41,19 +41,16 @@ using std::set;
 using std::string;
 using std::vector;
 
-static set<string>
-Glf_BuildAvailableExtensions()
+static set<string> Glf_BuildAvailableExtensions()
 {
   GlfSharedGLContextScopeHolder sharedContextScopeHolder;
 
   set<string> availableExtensions;
 
   // Get the available extensions from OpenGL if we haven't yet.
-  if (const char *extensions = (const char *)glGetString(GL_EXTENSIONS))
-  {
+  if (const char *extensions = (const char *)glGetString(GL_EXTENSIONS)) {
     const vector<string> extensionsList = TfStringTokenize(extensions);
-    for (std::string const &extension : extensionsList)
-    {
+    for (std::string const &extension : extensionsList) {
       availableExtensions.insert(extension);
     }
   }
@@ -68,10 +65,8 @@ bool GlfHasExtensions(string const &queryExtensions)
   const vector<string> extensionsList = TfStringTokenize(queryExtensions);
 
   // Return false if any queried extension is not available.
-  for (std::string const &extension : extensionsList)
-  {
-    if (!availableExtensions.count(extension))
-    {
+  for (std::string const &extension : extensionsList) {
+    if (!availableExtensions.count(extension)) {
       return false;
     }
   }

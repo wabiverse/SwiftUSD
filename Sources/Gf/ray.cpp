@@ -24,7 +24,6 @@
 
 #include <pxr/pxrns.h>
 
-#include "Gf/ray.h"
 #include "Gf/bbox3d.h"
 #include "Gf/line.h"
 #include "Gf/lineSeg.h"
@@ -32,6 +31,7 @@
 #include "Gf/ostreamHelpers.h"
 #include "Gf/plane.h"
 #include "Gf/range3d.h"
+#include "Gf/ray.h"
 #include "Gf/rotation.h"
 #include "Gf/vec2d.h"
 #include "Tf/type.h"
@@ -44,32 +44,37 @@ PXR_NAMESPACE_OPEN_SCOPE
 static const double tolerance = 1e-6;
 
 // CODE_COVERAGE_OFF_GCOV_BUG - gcov is finicky
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfRay>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfRay>();
+}
 // CODE_COVERAGE_ON_GCOV_BUG
 
 // Menv 2x uses SetDirection, but it looks like it is only in
 // sgu/rayIntersectAction.cpp so I'm just going to change the name
 // and let the compiler complain about any problems.
-void GfRay::SetPointAndDirection(const GfVec3d &startPoint,
-                                 const GfVec3d &direction) {
+void GfRay::SetPointAndDirection(const GfVec3d &startPoint, const GfVec3d &direction)
+{
   _startPoint = startPoint;
   _direction = direction;
 }
 
-void GfRay::SetEnds(const GfVec3d &startPoint, const GfVec3d &endPoint) {
+void GfRay::SetEnds(const GfVec3d &startPoint, const GfVec3d &endPoint)
+{
   _startPoint = startPoint;
   _direction = endPoint - startPoint;
 }
 
-GfRay &GfRay::Transform(const GfMatrix4d &matrix) {
+GfRay &GfRay::Transform(const GfMatrix4d &matrix)
+{
   _startPoint = matrix.Transform(_startPoint);
   _direction = matrix.TransformDir(_direction);
 
   return *this;
 }
 
-GfVec3d GfRay::FindClosestPoint(const GfVec3d &point,
-                                double *rayDistance) const {
+GfVec3d GfRay::FindClosestPoint(const GfVec3d &point, double *rayDistance) const
+{
   GfLine l;
   double len = l.Set(_startPoint, _direction);
   double lrd;
@@ -84,9 +89,13 @@ GfVec3d GfRay::FindClosestPoint(const GfVec3d &point,
   return l.GetPoint(lrd);
 }
 
-bool GfFindClosestPoints(const GfRay &ray, const GfLine &line,
-                         GfVec3d *rayPoint, GfVec3d *linePoint,
-                         double *rayDistance, double *lineDistance) {
+bool GfFindClosestPoints(const GfRay &ray,
+                         const GfLine &line,
+                         GfVec3d *rayPoint,
+                         GfVec3d *linePoint,
+                         double *rayDistance,
+                         double *lineDistance)
+{
   GfLine l;
   double len = l.Set(ray._startPoint, ray._direction);
 
@@ -114,9 +123,13 @@ bool GfFindClosestPoints(const GfRay &ray, const GfLine &line,
   return true;
 }
 
-bool GfFindClosestPoints(const GfRay &ray, const GfLineSeg &seg,
-                         GfVec3d *rayPoint, GfVec3d *segPoint,
-                         double *rayDistance, double *segDistance) {
+bool GfFindClosestPoints(const GfRay &ray,
+                         const GfLineSeg &seg,
+                         GfVec3d *rayPoint,
+                         GfVec3d *segPoint,
+                         double *rayDistance,
+                         double *segDistance)
+{
   GfLine l;
   double len = l.Set(ray._startPoint, ray._direction);
 
@@ -144,9 +157,14 @@ bool GfFindClosestPoints(const GfRay &ray, const GfLineSeg &seg,
   return true;
 }
 
-bool GfRay::Intersect(const GfVec3d &p0, const GfVec3d &p1, const GfVec3d &p2,
-                      double *distance, GfVec3d *barycentricCoords,
-                      bool *frontFacing, double maxDist) const {
+bool GfRay::Intersect(const GfVec3d &p0,
+                      const GfVec3d &p1,
+                      const GfVec3d &p2,
+                      double *distance,
+                      GfVec3d *barycentricCoords,
+                      bool *frontFacing,
+                      double maxDist) const
+{
   // Intersect the ray with the plane containing the three points.
   GfPlane plane(p0, p1, p2);
   double intersectionDist;
@@ -166,10 +184,12 @@ bool GfRay::Intersect(const GfVec3d &p0, const GfVec3d &p1, const GfVec3d &p2,
   if (xAbs > yAbs && xAbs > zAbs) {
     axis0 = 1;
     axis1 = 2;
-  } else if (yAbs > zAbs) {
+  }
+  else if (yAbs > zAbs) {
     axis0 = 2;
     axis1 = 0;
-  } else {
+  }
+  else {
     axis0 = 0;
     axis1 = 1;
   }
@@ -186,8 +206,7 @@ bool GfRay::Intersect(const GfVec3d &p0, const GfVec3d &p1, const GfVec3d &p2,
 
   // XXX This code can miss some intersections on very tiny tris.
   double alpha;
-  double beta =
-      ((d0[1] * d1[0] - d0[0] * d1[1]) / (d2[1] * d1[0] - d2[0] * d1[1]));
+  double beta = ((d0[1] * d1[0] - d0[0] * d1[1]) / (d2[1] * d1[0] - d2[0] * d1[1]));
   // clamp beta to 0 if it is only very slightly less than 0
   if (beta < 0 && beta > -GF_MIN_VECTOR_LENGTH) {
     // CODE_COVERAGE_OFF_NO_REPORT - architecture dependent numerics
@@ -228,8 +247,8 @@ bool GfRay::Intersect(const GfVec3d &p0, const GfVec3d &p1, const GfVec3d &p2,
   return true;
 }
 
-bool GfRay::Intersect(const GfPlane &plane, double *distance,
-                      bool *frontFacing) const {
+bool GfRay::Intersect(const GfPlane &plane, double *distance, bool *frontFacing) const
+{
   // The dot product of the ray direction and the plane normal
   // indicates the angle between them. Reject glancing
   // intersections. Note: this also rejects ill-formed planes with
@@ -255,8 +274,8 @@ bool GfRay::Intersect(const GfPlane &plane, double *distance,
   return true;
 }
 
-bool GfRay::Intersect(const GfRange3d &box, double *enterDistance,
-                      double *exitDistance) const {
+bool GfRay::Intersect(const GfRange3d &box, double *enterDistance, double *exitDistance) const
+{
   if (box.IsEmpty())
     return false;
 
@@ -271,10 +290,10 @@ bool GfRay::Intersect(const GfRange3d &box, double *enterDistance,
     if (GfAbs(d) < GF_MIN_VECTOR_LENGTH) {
       // ray is parallel to this set of planes.
       // If origin is not between them, no intersection.
-      if (GetStartPoint()[i] < box.GetMin()[i] ||
-          GetStartPoint()[i] > box.GetMax()[i]) {
+      if (GetStartPoint()[i] < box.GetMin()[i] || GetStartPoint()[i] > box.GetMax()[i]) {
         return false;
-      } else {
+      }
+      else {
         continue;
       }
     }
@@ -311,8 +330,8 @@ bool GfRay::Intersect(const GfRange3d &box, double *enterDistance,
   return true;
 }
 
-bool GfRay::Intersect(const GfBBox3d &box, double *enterDistance,
-                      double *exitDistance) const {
+bool GfRay::Intersect(const GfBBox3d &box, double *enterDistance, double *exitDistance) const
+{
   // Transform the ray to the local space of the bbox.
   GfRay localRay(*this);
   localRay.Transform(box.GetInverseMatrix());
@@ -323,8 +342,11 @@ bool GfRay::Intersect(const GfBBox3d &box, double *enterDistance,
   return localRay.Intersect(box.GetRange(), enterDistance, exitDistance);
 }
 
-bool GfRay::Intersect(const GfVec3d &center, double radius,
-                      double *enterDistance, double *exitDistance) const {
+bool GfRay::Intersect(const GfVec3d &center,
+                      double radius,
+                      double *enterDistance,
+                      double *exitDistance) const
+{
 
   GfVec3d p1 = _startPoint;
   GfVec3d p2 = p1 + _direction;
@@ -346,17 +368,19 @@ bool GfRay::Intersect(const GfVec3d &center, double radius,
   z3 = center[2];
 
   A = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1);
-  B = 2 *
-      ((x2 - x1) * (x1 - x3) + (y2 - y1) * (y1 - y3) + (z2 - z1) * (z1 - z3));
+  B = 2 * ((x2 - x1) * (x1 - x3) + (y2 - y1) * (y1 - y3) + (z2 - z1) * (z1 - z3));
   C = x3 * x3 + y3 * y3 + z3 * z3 + x1 * x1 + y1 * y1 + z1 * z1 -
       2 * (x3 * x1 + y3 * y1 + z3 * z1) - radius * radius;
 
   return _SolveQuadratic(A, B, C, enterDistance, exitDistance);
 }
 
-bool GfRay::Intersect(const GfVec3d &origin, const GfVec3d &axis,
-                      const double radius, double *enterDistance,
-                      double *exitDistance) const {
+bool GfRay::Intersect(const GfVec3d &origin,
+                      const GfVec3d &axis,
+                      const double radius,
+                      double *enterDistance,
+                      double *exitDistance) const
+{
   GfVec3d unitAxis = axis.GetNormalized();
 
   GfVec3d delta = _startPoint - origin;
@@ -371,9 +395,13 @@ bool GfRay::Intersect(const GfVec3d &origin, const GfVec3d &axis,
   return _SolveQuadratic(a, b, c, enterDistance, exitDistance);
 }
 
-bool GfRay::Intersect(const GfVec3d &origin, const GfVec3d &axis,
-                      const double radius, const double height,
-                      double *enterDistance, double *exitDistance) const {
+bool GfRay::Intersect(const GfVec3d &origin,
+                      const GfVec3d &axis,
+                      const double radius,
+                      const double height,
+                      double *enterDistance,
+                      double *exitDistance) const
+{
   GfVec3d unitAxis = axis.GetNormalized();
 
   // Apex of cone
@@ -409,15 +437,20 @@ bool GfRay::Intersect(const GfVec3d &origin, const GfVec3d &axis,
 
   if (!enterValid) {
     *enterDistance = *exitDistance;
-  } else if (!exitValid) {
+  }
+  else if (!exitValid) {
     *exitDistance = *enterDistance;
   }
 
   return true;
 }
 
-bool GfRay::_SolveQuadratic(const double a, const double b, const double c,
-                            double *enterDistance, double *exitDistance) const {
+bool GfRay::_SolveQuadratic(const double a,
+                            const double b,
+                            const double c,
+                            double *enterDistance,
+                            double *exitDistance) const
+{
   if (GfIsClose(a, 0.0, tolerance)) {
     if (GfIsClose(b, 0.0, tolerance)) {
 
@@ -496,7 +529,8 @@ bool GfRay::_SolveQuadratic(const double a, const double b, const double c,
   return false;
 }
 
-std::ostream &operator<<(std::ostream &out, const GfRay &r) {
+std::ostream &operator<<(std::ostream &out, const GfRay &r)
+{
   return out << '[' << Gf_OstreamHelperP(r.GetStartPoint()) << " >> "
              << Gf_OstreamHelperP(r.GetDirection()) << ']';
 }

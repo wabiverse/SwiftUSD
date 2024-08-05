@@ -24,20 +24,20 @@
 
 #include "pxr/pxr.h"
 #include "pxr/usd/usd/attribute.h"
+#include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/references.h"
 #include "pxr/usd/usd/stage.h"
-#include "pxr/usd/usd/prim.h"
 
 #include "pxr/usd/sdf/attributeSpec.h"
 #include "pxr/usd/sdf/schema.h"
 
-#include "pxr/base/vt/value.h"
-#include "pxr/base/tf/debug.h"
 #include "Arch/fileSystem.h"
+#include "pxr/base/tf/debug.h"
+#include "pxr/base/vt/value.h"
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-#include "pxr/base/tf/pySafePython.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#  include "pxr/base/tf/pySafePython.h"
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <iostream>
 
@@ -64,14 +64,10 @@ void TestPrim()
     TF_VERIFY(mark.IsClean());
   }
 
-  TF_VERIFY(stage->OverridePrim(primPath),
-            "Failed to create prim at %s",
-            primPath.GetText());
+  TF_VERIFY(stage->OverridePrim(primPath), "Failed to create prim at %s", primPath.GetText());
 
   UsdPrim prim(stage->GetPrimAtPath(primPath));
-  TF_VERIFY(prim,
-            "Failed to get Prim from %s",
-            primPath.GetText());
+  TF_VERIFY(prim, "Failed to get Prim from %s", primPath.GetText());
 
   TF_VERIFY(prim.CreateAttribute(prop, SdfValueTypeNames->String),
             "Failed to create property at %s",
@@ -85,9 +81,8 @@ void TestPrim()
             "Failed to get property at %s",
             propPath.c_str());
 
-  TF_VERIFY(tmp.IsHolding<std::string>(),
-            "Invalid type for value of property %s",
-            propPath.c_str());
+  TF_VERIFY(
+      tmp.IsHolding<std::string>(), "Invalid type for value of property %s", propPath.c_str());
 
   result = tmp.UncheckedGet<std::string>();
   TF_VERIFY(result == value,
@@ -126,8 +121,7 @@ void TestIsDefined()
   //
   stage = UsdStage::Open(strongLayer->GetIdentifier());
   p = stage->OverridePrim(SdfPath("/Parent"));
-  p.GetReferences().AddReference(
-      SdfReference(weakLayer->GetIdentifier(), SdfPath("/Parent")));
+  p.GetReferences().AddReference(SdfReference(weakLayer->GetIdentifier(), SdfPath("/Parent")));
 
   //
   // Now that we've referenced in the weak layer, make sure our definition
@@ -146,9 +140,8 @@ void TestIsDefined()
   TF_VERIFY(p.GetAttribute(attr1).IsAuthoredAt(strongLayer));
 }
 
-class ExpectedError
-{
-public:
+class ExpectedError {
+ public:
   ExpectedError()
   {
     std::cerr << "--- BEGIN EXPECTED ERROR ---\n";
@@ -160,12 +153,14 @@ public:
     TF_VERIFY(!_mark.IsClean());
   }
 
-private:
+ private:
   TfErrorMark _mark;
 };
 
-void VerifyTimeSampleRange(UsdAttribute const &attr, size_t expectedNumSamples,
-                           double expectedMin = 0, double expectedMax = 0)
+void VerifyTimeSampleRange(UsdAttribute const &attr,
+                           size_t expectedNumSamples,
+                           double expectedMin = 0,
+                           double expectedMax = 0)
 {
   std::vector<double> samples;
   if (!TF_VERIFY(attr.GetTimeSamples(&samples)))
@@ -175,20 +170,18 @@ void VerifyTimeSampleRange(UsdAttribute const &attr, size_t expectedNumSamples,
 
   double upper = 0., lower = 0.;
   bool hasTimeSamples = false;
-  attr.GetBracketingTimeSamples((expectedMin + expectedMax) / 2.0,
-                                &lower, &upper, &hasTimeSamples);
+  attr.GetBracketingTimeSamples(
+      (expectedMin + expectedMax) / 2.0, &lower, &upper, &hasTimeSamples);
 
   size_t numSamples = attr.GetNumTimeSamples();
 
   // Break-out verifies for better reporting.
-  if (expectedNumSamples == 0)
-  {
+  if (expectedNumSamples == 0) {
     TF_VERIFY(samples.empty());
     TF_VERIFY(!hasTimeSamples);
     TF_VERIFY(numSamples == 0);
   }
-  else
-  {
+  else {
     TF_VERIFY(!samples.empty());
     TF_VERIFY(hasTimeSamples);
     TF_VERIFY(numSamples == expectedNumSamples);
@@ -586,8 +579,7 @@ void TestQueryTimeSample()
 {
   SdfLayerRefPtr l = SdfLayer::CreateAnonymous("f.usdc");
   SdfPrimSpecHandle p = SdfPrimSpec::New(l, "Foo", SdfSpecifierDef, "Scope");
-  SdfAttributeSpecHandle a = SdfAttributeSpec::New(p, "attr",
-                                                   SdfValueTypeNames->String);
+  SdfAttributeSpecHandle a = SdfAttributeSpec::New(p, "attr", SdfValueTypeNames->String);
   SdfTimeSampleMap tsm;
   tsm[1.0] = "Foo";
   a->SetInfo(TfToken("timeSamples"), VtValue(tsm));
@@ -625,5 +617,5 @@ int main()
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
   TF_AXIOM(!Py_IsInitialized());
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 }

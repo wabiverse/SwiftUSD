@@ -46,18 +46,15 @@ class HgiVulkanDevice;
 /// The CommandQueue manages command buffers and their submission to the
 /// GPU device queue.
 ///
-class HgiVulkanCommandQueue final
-{
-public:
+class HgiVulkanCommandQueue final {
+ public:
   // Holds one thread's command pool and list of command buffers .
-  struct HgiVulkan_CommandPool
-  {
+  struct HgiVulkan_CommandPool {
     VkCommandPool vkCommandPool = nullptr;
     std::vector<HgiVulkanCommandBuffer *> commandBuffers;
   };
 
-  using CommandPoolPtrMap =
-      std::unordered_map<std::thread::id, HgiVulkan_CommandPool *>;
+  using CommandPoolPtrMap = std::unordered_map<std::thread::id, HgiVulkan_CommandPool *>;
 
   /// Construct a new queue for the provided device.
   HGIVULKAN_API
@@ -70,9 +67,8 @@ public:
   /// After submission the command buffer must not be re-used by client.
   /// Thread safety: Submission must be externally synchronized. Clients
   /// should call HgiVulkan::SubmitToQueue.
-  void SubmitToQueue(
-      HgiVulkanCommandBuffer *cmdBuffer,
-      HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
+  void SubmitToQueue(HgiVulkanCommandBuffer *cmdBuffer,
+                     HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
 
   /// Returns a command buffer that is ready to record commands.
   /// The ownership of the command buffer (ptr) remains with this queue. The
@@ -108,18 +104,16 @@ public:
   /// Thread safety: This call is not thread safe. This function should be
   /// called once from main thread while no other threads are recording.
   HGIVULKAN_API
-  void ResetConsumedCommandBuffers(
-      HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
+  void ResetConsumedCommandBuffers(HgiSubmitWaitType wait = HgiSubmitWaitTypeNoWait);
 
-private:
+ private:
   HgiVulkanCommandQueue() = delete;
   HgiVulkanCommandQueue &operator=(const HgiVulkanCommandQueue &) = delete;
   HgiVulkanCommandQueue(const HgiVulkanCommandQueue &) = delete;
 
   // Returns the command pool for a thread.
   // Thread safety: This call is thread safe.
-  HgiVulkan_CommandPool *_AcquireThreadCommandPool(
-      std::thread::id const &threadId);
+  HgiVulkan_CommandPool *_AcquireThreadCommandPool(std::thread::id const &threadId);
 
   // Returns an id-bit that uniquely identifies the cmd buffer amongst all
   // in-flight cmd buffers.

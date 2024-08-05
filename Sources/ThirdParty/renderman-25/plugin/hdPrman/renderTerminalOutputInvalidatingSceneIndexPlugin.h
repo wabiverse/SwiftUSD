@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HDPRMAN_RENDER_TERMINAL_OUTPUT_INVALIDATING_SCENE_INDEX_PLUGIN_H
 #define PXR_IMAGING_HDPRMAN_RENDER_TERMINAL_OUTPUT_INVALIDATING_SCENE_INDEX_PLUGIN_H
 
-#include <pxr/pxrns.h>
 #include "Hd/sceneIndexPlugin.h"
 #include "hdPrman/api.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,18 +36,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// dirty the Integrator, Sample and Display Filters connected to the
 /// Render Settings Prim when changed.
 ///
-class HdPrman_RenderTerminalOutputInvalidatingSceneIndexPlugin
-    : public HdSceneIndexPlugin
-{
-public:
+class HdPrman_RenderTerminalOutputInvalidatingSceneIndexPlugin : public HdSceneIndexPlugin {
+ public:
   HdPrman_RenderTerminalOutputInvalidatingSceneIndexPlugin();
 
-protected:
-  HdSceneIndexBaseRefPtr _AppendSceneIndex(
-      const HdSceneIndexBaseRefPtr &inputScene,
-      const HdContainerDataSourceHandle &inputArgs) override;
+ protected:
+  HdSceneIndexBaseRefPtr _AppendSceneIndex(const HdSceneIndexBaseRefPtr &inputScene,
+                                           const HdContainerDataSourceHandle &inputArgs) override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HDPRMAN_RENDER_TERMINAL_OUTPUT_INVALIDATING_SCENE_INDEX_PLUGIN_H
+#endif  // PXR_IMAGING_HDPRMAN_RENDER_TERMINAL_OUTPUT_INVALIDATING_SCENE_INDEX_PLUGIN_H

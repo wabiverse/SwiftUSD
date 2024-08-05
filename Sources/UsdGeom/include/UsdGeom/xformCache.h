@@ -24,10 +24,10 @@
 #ifndef PXR_USD_USD_GEOM_XFORM_CACHE_H
 #define PXR_USD_USD_GEOM_XFORM_CACHE_H
 
-#include <pxr/pxrns.h>
-#include "UsdGeom/api.h"
 #include "Usd/attributeQuery.h"
 #include "Usd/prim.h"
+#include "UsdGeom/api.h"
+#include <pxr/pxrns.h>
 
 #include "UsdGeom/xformable.h"
 
@@ -37,7 +37,6 @@
 #include "Tf/token.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdGeomXformCache
 ///
@@ -54,131 +53,126 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// separate instance of this class should be used per-thread, calling the Get*
 /// methods from multiple threads is not safe, as they mutate internal state.
 ///
-class UsdGeomXformCache
-{
-public:
-    /// Construct a new XformCache for the specified \p time.
-    USDGEOM_API
-    explicit UsdGeomXformCache(const UsdTimeCode time);
+class UsdGeomXformCache {
+ public:
+  /// Construct a new XformCache for the specified \p time.
+  USDGEOM_API
+  explicit UsdGeomXformCache(const UsdTimeCode time);
 
-    /// Construct a new XformCache for UsdTimeCode::Default().
-    USDGEOM_API
-    UsdGeomXformCache();
+  /// Construct a new XformCache for UsdTimeCode::Default().
+  USDGEOM_API
+  UsdGeomXformCache();
 
-    /// Compute the transformation matrix for the given \p prim, including the
-    /// transform authored on the Prim itself, if present.
-    ///
-    /// \note This method may mutate internal cache state and is not thread
-    /// safe.
-    USDGEOM_API
-    GfMatrix4d GetLocalToWorldTransform(const UsdPrim& prim);
+  /// Compute the transformation matrix for the given \p prim, including the
+  /// transform authored on the Prim itself, if present.
+  ///
+  /// \note This method may mutate internal cache state and is not thread
+  /// safe.
+  USDGEOM_API
+  GfMatrix4d GetLocalToWorldTransform(const UsdPrim &prim);
 
-    /// Compute the transformation matrix for the given \p prim, but do NOT
-    /// include the transform authored on the prim itself.
-    ///
-    /// \note This method may mutate internal cache state and is not thread
-    /// safe.
-    USDGEOM_API
-    GfMatrix4d GetParentToWorldTransform(const UsdPrim& prim);
+  /// Compute the transformation matrix for the given \p prim, but do NOT
+  /// include the transform authored on the prim itself.
+  ///
+  /// \note This method may mutate internal cache state and is not thread
+  /// safe.
+  USDGEOM_API
+  GfMatrix4d GetParentToWorldTransform(const UsdPrim &prim);
 
-    /// Returns the local transformation of the prim. Uses the cached 
-    /// XformQuery to compute the result quickly. The \p resetsXformStack
-    /// pointer must be valid. It will be set to true if \p prim resets
-    /// the transform stack.
-    /// The result of this call is cached.
-    USDGEOM_API
-    GfMatrix4d GetLocalTransformation(const UsdPrim &prim,
-                                      bool *resetsXformStack);
+  /// Returns the local transformation of the prim. Uses the cached
+  /// XformQuery to compute the result quickly. The \p resetsXformStack
+  /// pointer must be valid. It will be set to true if \p prim resets
+  /// the transform stack.
+  /// The result of this call is cached.
+  USDGEOM_API
+  GfMatrix4d GetLocalTransformation(const UsdPrim &prim, bool *resetsXformStack);
 
-    /// Returns the result of concatenating all transforms beneath \p ancestor
-    /// that affect \p prim. This includes the local transform of \p prim
-    /// itself, but not the local transform of \p ancestor. If \p ancestor is
-    /// not an ancestor of \p prim, the resulting transform is the
-    /// local-to-world transformation of \p prim.    
-    /// The \p resetXformTsack pointer must be valid. If any intermediate prims
-    /// reset the transform stack, \p resetXformStack will be set to true.
-    /// Intermediate transforms are cached, but the result of this call itself
-    /// is not cached.
-    USDGEOM_API
-    GfMatrix4d ComputeRelativeTransform(const UsdPrim &prim,
-                                        const UsdPrim &ancestor,
-                                        bool *resetXformStack);
+  /// Returns the result of concatenating all transforms beneath \p ancestor
+  /// that affect \p prim. This includes the local transform of \p prim
+  /// itself, but not the local transform of \p ancestor. If \p ancestor is
+  /// not an ancestor of \p prim, the resulting transform is the
+  /// local-to-world transformation of \p prim.
+  /// The \p resetXformTsack pointer must be valid. If any intermediate prims
+  /// reset the transform stack, \p resetXformStack will be set to true.
+  /// Intermediate transforms are cached, but the result of this call itself
+  /// is not cached.
+  USDGEOM_API
+  GfMatrix4d ComputeRelativeTransform(const UsdPrim &prim,
+                                      const UsdPrim &ancestor,
+                                      bool *resetXformStack);
 
-    /// Whether the attribute named \p attrName, belonging to the 
-    /// given \p prim affects the local transform value at the prim.
-    /// 
-    /// \note This method may mutate internal cache state and is not thread
-    /// safe.
-    USDGEOM_API
-    bool IsAttributeIncludedInLocalTransform(const UsdPrim &prim, 
-                                             const TfToken &attrName);
+  /// Whether the attribute named \p attrName, belonging to the
+  /// given \p prim affects the local transform value at the prim.
+  ///
+  /// \note This method may mutate internal cache state and is not thread
+  /// safe.
+  USDGEOM_API
+  bool IsAttributeIncludedInLocalTransform(const UsdPrim &prim, const TfToken &attrName);
 
-    /// Whether the local transformation value at the prim may vary over time.
-    /// 
-    /// \note This method may mutate internal cache state and is not thread
-    /// safe.
-    USDGEOM_API
-    bool TransformMightBeTimeVarying(const UsdPrim &prim);
+  /// Whether the local transformation value at the prim may vary over time.
+  ///
+  /// \note This method may mutate internal cache state and is not thread
+  /// safe.
+  USDGEOM_API
+  bool TransformMightBeTimeVarying(const UsdPrim &prim);
 
-    /// Whether the xform stack is reset at the given prim.
-    /// 
-    /// \note This method may mutate internal cache state and is not thread
-    /// safe.
-    USDGEOM_API
-    bool GetResetXformStack(const UsdPrim &prim);
+  /// Whether the xform stack is reset at the given prim.
+  ///
+  /// \note This method may mutate internal cache state and is not thread
+  /// safe.
+  USDGEOM_API
+  bool GetResetXformStack(const UsdPrim &prim);
 
-    /// Clears all pre-cached values.
-    USDGEOM_API
-    void Clear();
+  /// Clears all pre-cached values.
+  USDGEOM_API
+  void Clear();
 
-    /// Use the new \p time when computing values and may clear any existing
-    /// values cached for the previous time. Setting \p time to the current time
-    /// is a no-op.
-    USDGEOM_API
-    void SetTime(UsdTimeCode time);
+  /// Use the new \p time when computing values and may clear any existing
+  /// values cached for the previous time. Setting \p time to the current time
+  /// is a no-op.
+  USDGEOM_API
+  void SetTime(UsdTimeCode time);
 
-    /// Get the current time from which this cache is reading values.
-    UsdTimeCode GetTime() { return _time; }
+  /// Get the current time from which this cache is reading values.
+  UsdTimeCode GetTime()
+  {
+    return _time;
+  }
 
-    /// Swap the contents of this XformCache with \p other.
-    USDGEOM_API
-    void Swap(UsdGeomXformCache& other);
+  /// Swap the contents of this XformCache with \p other.
+  USDGEOM_API
+  void Swap(UsdGeomXformCache &other);
 
-private:
+ private:
+  // Traverses backwards the hierarchy starting from prim
+  // all the way to the root and computes the ctm
+  GfMatrix4d const *_GetCtm(const UsdPrim &prim);
 
-    // Traverses backwards the hierarchy starting from prim
-    // all the way to the root and computes the ctm
-    GfMatrix4d const* _GetCtm(const UsdPrim& prim);
+  // Map of cached values.
+  struct _Entry {
+    _Entry() = default;
+    _Entry(const UsdGeomXformable::XformQuery &query_, const GfMatrix4d &ctm_, bool ctmIsValid_)
+        : query(query_), ctm(ctm_), ctmIsValid(ctmIsValid_)
+    {
+    }
 
-    // Map of cached values.
-    struct _Entry {
-        _Entry() = default;
-        _Entry(const UsdGeomXformable::XformQuery & query_,
-               const GfMatrix4d& ctm_,
-               bool ctmIsValid_)
-            : query(query_)
-            , ctm(ctm_)
-            , ctmIsValid(ctmIsValid_)
-        { }
+    UsdGeomXformable::XformQuery query;
+    GfMatrix4d ctm;
+    bool ctmIsValid;
+  };
 
-        UsdGeomXformable::XformQuery query;
-        GfMatrix4d ctm;
-        bool ctmIsValid;
-    };
+  // Helper function to get or create a new entry for a prim in the ctm cache.
+  _Entry *_GetCacheEntryForPrim(const UsdPrim &prim);
 
-    // Helper function to get or create a new entry for a prim in the ctm cache.
-    _Entry * _GetCacheEntryForPrim(const UsdPrim &prim);
+  typedef TfHashMap<UsdPrim, _Entry, TfHash> _PrimHashMap;
+  _PrimHashMap _ctmCache;
 
-    typedef TfHashMap<UsdPrim, _Entry, TfHash> _PrimHashMap;
-    _PrimHashMap _ctmCache;
-    
-    // The time at which this stack is querying and caching attribute values.
-    UsdTimeCode _time;
+  // The time at which this stack is querying and caching attribute values.
+  UsdTimeCode _time;
 };
 
 #define USDGEOM_XFORM_CACHE_API_VERSION 1
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_GEOM_XFORM_CACHE_H
+#endif  // PXR_USD_USD_GEOM_XFORM_CACHE_H

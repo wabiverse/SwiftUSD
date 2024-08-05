@@ -25,8 +25,8 @@
 #ifndef PXR_USD_PLUGIN_USD_DRACO_WRITER_H
 #define PXR_USD_PLUGIN_USD_DRACO_WRITER_H
 
-#include <pxr/pxrns.h>
 #include "UsdGeom/mesh.h"
+#include <pxr/pxrns.h>
 
 #include <string>
 
@@ -50,4 +50,4 @@ bool UsdDraco_PrimvarSupported(const UsdGeomPrimvar &primvar);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PLUGIN_USD_DRACO_WRITER_H
+#endif  // PXR_USD_PLUGIN_USD_DRACO_WRITER_H

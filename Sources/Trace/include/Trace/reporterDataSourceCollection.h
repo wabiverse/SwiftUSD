@@ -43,14 +43,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// useful if you want to generate reports from serialized TraceCollections.
 ///
 class TraceReporterDataSourceCollection : public TraceReporterDataSourceBase {
-public:
+ public:
   using This = TraceReporterDataSourceCollection;
   using ThisRefPtr = std::unique_ptr<This>;
 
-  static ThisRefPtr New(CollectionPtr collection) {
+  static ThisRefPtr New(CollectionPtr collection)
+  {
     return ThisRefPtr(new This(collection));
   }
-  static ThisRefPtr New(std::vector<CollectionPtr> collections) {
+  static ThisRefPtr New(std::vector<CollectionPtr> collections)
+  {
     return ThisRefPtr(new This(std::move(collections)));
   }
 
@@ -60,7 +62,7 @@ public:
   /// Returns the next TraceCollections which need to be processed.
   TRACE_API std::vector<CollectionPtr> ConsumeData() override;
 
-private:
+ private:
   TRACE_API TraceReporterDataSourceCollection(CollectionPtr collection);
   TRACE_API
   TraceReporterDataSourceCollection(std::vector<CollectionPtr> collections);
@@ -70,4 +72,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_COLLECTION_H
+#endif  // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_COLLECTION_H

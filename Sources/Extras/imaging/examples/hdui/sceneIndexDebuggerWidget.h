@@ -27,8 +27,8 @@
 #include "Hd/sceneIndex.h"
 
 #include <QLabel>
-#include <QPushButton>
 #include <QMenu>
+#include <QPushButton>
 #include <QTreeWidgetItem>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -38,22 +38,23 @@ class HduiDataSourceTreeWidget;
 class HduiDataSourceValueTreeView;
 class HduiRegisteredSceneIndexChooser;
 
-class HduiSceneIndexDebuggerWidget : public QWidget, public TfWeakBase
-{
+class HduiSceneIndexDebuggerWidget : public QWidget, public TfWeakBase {
   Q_OBJECT;
 
-public:
+ public:
   HduiSceneIndexDebuggerWidget(QWidget *parent = Q_NULLPTR);
 
   void SetSceneIndex(const std::string &displayName,
-                     HdSceneIndexBaseRefPtr sceneIndex, bool pullRoot);
+                     HdSceneIndexBaseRefPtr sceneIndex,
+                     bool pullRoot);
 
-private Q_SLOTS:
+ private Q_SLOTS:
   void _FillGoToInputMenu();
   void _AddSceneIndexToTreeMenu(QTreeWidgetItem *parentItem,
-                                HdSceneIndexBaseRefPtr sceneIndex, bool includeSelf);
+                                HdSceneIndexBaseRefPtr sceneIndex,
+                                bool includeSelf);
 
-private:
+ private:
   HduiSceneIndexTreeWidget *_siTreeWidget;
   HduiDataSourceTreeWidget *_dsTreeWidget;
   HduiRegisteredSceneIndexChooser *_siChooser;

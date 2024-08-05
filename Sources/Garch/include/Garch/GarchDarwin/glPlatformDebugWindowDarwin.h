@@ -26,7 +26,7 @@
 
 #if defined(__APPLE__)
 
-#include <pxr/pxrns.h>
+#  include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,21 +34,20 @@ class GarchGLDebugWindow;
 
 /// \class Garch_GLPlatformDebugWindow
 ///
-class Garch_GLPlatformDebugWindow
-{
-public:
+class Garch_GLPlatformDebugWindow {
+ public:
   Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w);
 
   void Init(const char *title, int width, int height, int nSamples = 1);
   void Run();
   void ExitApp();
 
-private:
+ private:
   GarchGLDebugWindow *_callback;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__APPLE__)
+#endif  // defined(__APPLE__)
 
-#endif // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_DARWIN_H
+#endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_DARWIN_H

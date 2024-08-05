@@ -37,7 +37,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace pxr_double_conversion {
 
 class Bignum {
-public:
+ public:
   // 3584 = 128 * 28. We can represent 2^3584 > 10^1000 accurately.
   // This bignum can encode much bigger numbers, since it contains an
   // exponent.
@@ -63,7 +63,10 @@ public:
   void MultiplyByUInt32(uint32_t factor);
   void MultiplyByUInt64(uint64_t factor);
   void MultiplyByPowerOfTen(int exponent);
-  void Times10() { return MultiplyByUInt32(10); }
+  void Times10()
+  {
+    return MultiplyByUInt32(10);
+  }
   // Pseudocode:
   //  int result = this / other;
   //  this = this % other;
@@ -77,31 +80,37 @@ public:
   //   0 if a == b, and
   //  +1 if a > b.
   static int Compare(const Bignum &a, const Bignum &b);
-  static bool Equal(const Bignum &a, const Bignum &b) {
+  static bool Equal(const Bignum &a, const Bignum &b)
+  {
     return Compare(a, b) == 0;
   }
-  static bool LessEqual(const Bignum &a, const Bignum &b) {
+  static bool LessEqual(const Bignum &a, const Bignum &b)
+  {
     return Compare(a, b) <= 0;
   }
-  static bool Less(const Bignum &a, const Bignum &b) {
+  static bool Less(const Bignum &a, const Bignum &b)
+  {
     return Compare(a, b) < 0;
   }
   // Returns Compare(a + b, c);
   static int PlusCompare(const Bignum &a, const Bignum &b, const Bignum &c);
   // Returns a + b == c
-  static bool PlusEqual(const Bignum &a, const Bignum &b, const Bignum &c) {
+  static bool PlusEqual(const Bignum &a, const Bignum &b, const Bignum &c)
+  {
     return PlusCompare(a, b, c) == 0;
   }
   // Returns a + b <= c
-  static bool PlusLessEqual(const Bignum &a, const Bignum &b, const Bignum &c) {
+  static bool PlusLessEqual(const Bignum &a, const Bignum &b, const Bignum &c)
+  {
     return PlusCompare(a, b, c) <= 0;
   }
   // Returns a + b < c
-  static bool PlusLess(const Bignum &a, const Bignum &b, const Bignum &c) {
+  static bool PlusLess(const Bignum &a, const Bignum &b, const Bignum &c)
+  {
     return PlusCompare(a, b, c) < 0;
   }
 
-private:
+ private:
   typedef uint32_t Chunk;
   typedef uint64_t DoubleChunk;
 
@@ -115,7 +124,8 @@ private:
   // grow. There are no checks if the stack-allocated space is sufficient.
   static const int kBigitCapacity = kMaxSignificantBits / kBigitSize;
 
-  void EnsureCapacity(int size) {
+  void EnsureCapacity(int size)
+  {
     if (size > kBigitCapacity) {
       UNREACHABLE();
     }
@@ -129,7 +139,10 @@ private:
   // shift_amount must be < kBigitSize.
   void BigitsShiftLeft(int shift_amount);
   // BigitLength includes the "hidden" digits encoded in the exponent.
-  int BigitLength() const { return used_digits_ + exponent_; }
+  int BigitLength() const
+  {
+    return used_digits_ + exponent_;
+  }
   Chunk BigitAt(int index) const;
   void SubtractTimes(const Bignum &other, int factor);
 
@@ -144,8 +157,8 @@ private:
   DISALLOW_COPY_AND_ASSIGN(Bignum);
 };
 
-} // namespace pxr_double_conversion
+}  // namespace pxr_double_conversion
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // DOUBLE_CONVERSION_BIGNUM_H_
+#endif  // DOUBLE_CONVERSION_BIGNUM_H_

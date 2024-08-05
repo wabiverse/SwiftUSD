@@ -32,11 +32,15 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType) { TfType::Define<GfSize3>(); }
+TF_REGISTRY_FUNCTION(TfType)
+{
+  TfType::Define<GfSize3>();
+}
 
 //  This should probably be moved to ostreamMethods.cpp
 //! Output operator
-std::ostream &operator<<(std::ostream &o, GfSize3 const &v) {
+std::ostream &operator<<(std::ostream &o, GfSize3 const &v)
+{
   return o << "( " << v._vec[0] << " " << v._vec[1] << " " << v._vec[2] << " )";
 }
 

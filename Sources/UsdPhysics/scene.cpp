@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsScene,
-                 TfType::Bases<UsdTyped>>();
+  TfType::Define<UsdPhysicsScene, TfType::Bases<UsdTyped>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdPhysicsScene::~UsdPhysicsScene()
-{
-}
+UsdPhysicsScene::~UsdPhysicsScene() {}
 
 /* static */
-UsdPhysicsScene
-UsdPhysicsScene::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsScene UsdPhysicsScene::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsScene();
   }
@@ -62,18 +57,14 @@ UsdPhysicsScene::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdPhysicsScene
-UsdPhysicsScene::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsScene UsdPhysicsScene::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("PhysicsScene");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsScene();
   }
-  return UsdPhysicsScene(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdPhysicsScene(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdPhysicsScene::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdPhysicsScene::_GetStaticTfType()
+const TfType &UsdPhysicsScene::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdPhysicsScene>();
   return tfType;
@@ -98,20 +88,18 @@ bool UsdPhysicsScene::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsScene::_GetTfType() const
+const TfType &UsdPhysicsScene::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdPhysicsScene::GetGravityDirectionAttr() const
+UsdAttribute UsdPhysicsScene::GetGravityDirectionAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsGravityDirection);
 }
 
-UsdAttribute
-UsdPhysicsScene::CreateGravityDirectionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsScene::CreateGravityDirectionAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsGravityDirection,
                                     SdfValueTypeNames->Vector3f,
@@ -121,14 +109,13 @@ UsdPhysicsScene::CreateGravityDirectionAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsScene::GetGravityMagnitudeAttr() const
+UsdAttribute UsdPhysicsScene::GetGravityMagnitudeAttr() const
 {
   return GetPrim().GetAttribute(UsdPhysicsTokens->physicsGravityMagnitude);
 }
 
-UsdAttribute
-UsdPhysicsScene::CreateGravityMagnitudeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdPhysicsScene::CreateGravityMagnitudeAttr(VtValue const &defaultValue,
+                                                         bool writeSparsely) const
 {
   return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsGravityMagnitude,
                                     SdfValueTypeNames->Float,
@@ -138,31 +125,27 @@ UsdPhysicsScene::CreateGravityMagnitudeAttr(VtValue const &defaultValue, bool wr
                                     writeSparsely);
 }
 
-namespace
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-  static inline TfTokenVector
-  _ConcatenateAttributeNames(const TfTokenVector &left, const TfTokenVector &right)
-  {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
-  }
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
+}  // namespace
 
 /*static*/
-const TfTokenVector &
-UsdPhysicsScene::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdPhysicsScene::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames = {
       UsdPhysicsTokens->physicsGravityDirection,
       UsdPhysicsTokens->physicsGravityMagnitude,
   };
-  static TfTokenVector allNames =
-      _ConcatenateAttributeNames(
-          UsdTyped::GetSchemaAttributeNames(true),
-          localNames);
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdTyped::GetSchemaAttributeNames(true), localNames);
 
   if (includeInherited)
     return allNames;

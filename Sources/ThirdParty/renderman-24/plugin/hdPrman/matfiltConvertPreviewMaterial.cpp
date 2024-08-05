@@ -22,82 +22,75 @@
 // language governing permissions and limitations under the Apache License.
 //
 #include "hdPrman/matfiltConvertPreviewMaterial.h"
-#include "hdPrman/debugCodes.h"
-#include "Sdf/types.h"
 #include "Arch/library.h"
-#include "Tf/staticTokens.h"
 #include "Hd/materialNetwork2Interface.h"
 #include "Hd/sceneDelegate.h"
+#include "Sdf/types.h"
+#include "Tf/staticTokens.h"
+#include "hdPrman/debugCodes.h"
 
 #include "Ar/resolver.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Tokens for converting UsdPreviewSurface
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
 
-    // Usd preview shading node types
-    (UsdPreviewSurface)(UsdUVTexture)(UsdTransform2d)(UsdPrimvarReader_float)(UsdPrimvarReader_float2)(UsdPrimvarReader_float3)
+                         // Usd preview shading node types
+                         (UsdPreviewSurface)(UsdUVTexture)(UsdTransform2d)(UsdPrimvarReader_float)(UsdPrimvarReader_float2)(UsdPrimvarReader_float3)
 
-    // UsdPreviewSurface tokens
-    (displacement)(file)(normal)(opacityThreshold)
+                         // UsdPreviewSurface tokens
+                         (displacement)(file)(normal)(opacityThreshold)
 
-    // UsdPreviewSurface conversion to Pxr nodes
-    (PxrDisplace)(PxrSurface)
+                         // UsdPreviewSurface conversion to Pxr nodes
+                         (PxrDisplace)(PxrSurface)
 
-    // Usd preview shading nodes osl tokens
-    (UsdPreviewSurfaceParameters)(bumpNormal)(bumpNormalOut)(clearcoatEdgeColor)(clearcoatEdgeColorOut)(clearcoatFaceColor)(clearcoatFaceColorOut)(clearcoatRoughness)(clearcoatRoughnessOut)(diffuseGain)(diffuseGainOut)(diffuseColor)(diffuseColorOut)(dispAmount)(dispAmountOut)(dispScalar)(dispScalarOut)(glassIor)(glassIorOut)(glowGain)(glowGainOut)(glowColor)(glowColorOut)(normalIn)(refractionGain)(refractionGainOut)(specularEdgeColor)(specularEdgeColorOut)(specularFaceColor)(specularFaceColorOut)(specularIor)(specularIorOut)(specularModelType)(specularRoughness)(specularRoughnessOut)(presence)(presenceOut)
+                         // Usd preview shading nodes osl tokens
+                         (UsdPreviewSurfaceParameters)(bumpNormal)(bumpNormalOut)(clearcoatEdgeColor)(clearcoatEdgeColorOut)(clearcoatFaceColor)(clearcoatFaceColorOut)(clearcoatRoughness)(clearcoatRoughnessOut)(diffuseGain)(diffuseGainOut)(diffuseColor)(diffuseColorOut)(dispAmount)(dispAmountOut)(dispScalar)(dispScalarOut)(glassIor)(glassIorOut)(glowGain)(glowGainOut)(glowColor)(glowColorOut)(normalIn)(refractionGain)(refractionGainOut)(specularEdgeColor)(specularEdgeColorOut)(specularFaceColor)(specularFaceColorOut)(specularIor)(specularIorOut)(specularModelType)(specularRoughness)(specularRoughnessOut)(presence)(presenceOut)
 
-    // UsdUVTexture parameters
-    (st)(wrapS)(wrapT)(useMetadata)(sourceColorSpace)(sRGB)(raw)((colorSpaceAuto, "auto"))
+                         // UsdUVTexture parameters
+                         (st)(wrapS)(wrapT)(useMetadata)(sourceColorSpace)(sRGB)(raw)((
+                             colorSpaceAuto, "auto"))
 
-    // UsdTransform2d parameters
-    (in)(scale)(translation)(result)
+                         // UsdTransform2d parameters
+                         (in)(scale)(translation)(result)
 
-    // Dummy node used to express material primvar opinions
-    (PrimvarPass)
+                         // Dummy node used to express material primvar opinions
+                         (PrimvarPass)
 
-    // Primvars set by the material
-    ((displacementBoundSphere, "displacementbound:sphere"))
+                         // Primvars set by the material
+                         ((displacementBoundSphere, "displacementbound:sphere"))
 
-    // Doublesided PxrSurface parameters
-    (diffuseDoubleSided)(specularDoubleSided)(roughSpecularDoubleSided)(clearcoatDoubleSided));
+                         // Doublesided PxrSurface parameters
+                         (diffuseDoubleSided)(specularDoubleSided)(roughSpecularDoubleSided)(clearcoatDoubleSided));
 
 // Returns a sibling path to nodeName.
 // e.g.: /path/to/foo with suffix _bar would return /path/to/foo_bar
-static TfToken
-_GetSiblingNodeName(std::string const &nodeName, std::string const &suffix)
+static TfToken _GetSiblingNodeName(std::string const &nodeName, std::string const &suffix)
 {
   SdfPath nodePath = SdfPath(nodeName);
   std::string siblingName = nodePath.GetName() + suffix;
   return nodePath.GetParentPath().AppendChild(TfToken(siblingName)).GetAsToken();
 }
 
-static bool
-_GetParameter(
-    HdMaterialNetworkInterface *netInterface,
-    TfToken const &nodeName,
-    TfToken const &paramName,
-    VtValue *v)
+static bool _GetParameter(HdMaterialNetworkInterface *netInterface,
+                          TfToken const &nodeName,
+                          TfToken const &paramName,
+                          VtValue *v)
 {
-  if (!TF_VERIFY(v))
-  {
+  if (!TF_VERIFY(v)) {
     return false;
   }
   *v = std::move(netInterface->GetNodeParameterValue(nodeName, paramName));
   return !v->IsEmpty();
 }
 
-static bool
-_GetInputConnection(
-    HdMaterialNetworkInterface *netInterface,
-    TfToken const &nodeName,
-    TfToken const &inputName,
-    HdMaterialNetworkInterface::InputConnectionVector *v)
+static bool _GetInputConnection(HdMaterialNetworkInterface *netInterface,
+                                TfToken const &nodeName,
+                                TfToken const &inputName,
+                                HdMaterialNetworkInterface::InputConnectionVector *v)
 {
-  if (!TF_VERIFY(v))
-  {
+  if (!TF_VERIFY(v)) {
     return false;
   }
   *v = std::move(netInterface->GetNodeInputConnection(nodeName, inputName));
@@ -106,10 +99,9 @@ _GetInputConnection(
   return !v->empty();
 }
 
-void _ProcessPreviewSurfaceNode(
-    HdMaterialNetworkInterface *netInterface,
-    const TfToken &nodeName,
-    std::vector<std::string> *outputErrorMessages)
+void _ProcessPreviewSurfaceNode(HdMaterialNetworkInterface *netInterface,
+                                const TfToken &nodeName,
+                                std::vector<std::string> *outputErrorMessages)
 {
   TF_UNUSED(outputErrorMessages);
 
@@ -121,26 +113,20 @@ void _ProcessPreviewSurfaceNode(
   // UsdPreviewSurface's "normal", adjust that here.
   {
     VtValue vtNormal;
-    if (_GetParameter(netInterface, nodeName, _tokens->normal, &vtNormal))
-    {
-      netInterface->SetNodeParameterValue(
-          nodeName, _tokens->normalIn, vtNormal);
+    if (_GetParameter(netInterface, nodeName, _tokens->normal, &vtNormal)) {
+      netInterface->SetNodeParameterValue(nodeName, _tokens->normalIn, vtNormal);
       netInterface->DeleteNodeParameter(nodeName, _tokens->normal);
     }
 
     HdMaterialNetworkInterface::InputConnectionVector cvNormal;
-    if (_GetInputConnection(
-            netInterface, nodeName, _tokens->normal, &cvNormal))
-    {
-      netInterface->SetNodeInputConnection(
-          nodeName, _tokens->normalIn, cvNormal);
+    if (_GetInputConnection(netInterface, nodeName, _tokens->normal, &cvNormal)) {
+      netInterface->SetNodeInputConnection(nodeName, _tokens->normalIn, cvNormal);
       netInterface->DeleteNodeInputConnection(nodeName, _tokens->normal);
     }
   }
 
   // Insert a PxrSurface and connect it to the above node.
-  TfToken pxrSurfaceNodeName =
-      _GetSiblingNodeName(nodeName.GetString(), "_PxrSurface");
+  TfToken pxrSurfaceNodeName = _GetSiblingNodeName(nodeName.GetString(), "_PxrSurface");
   netInterface->SetNodeType(pxrSurfaceNodeName, _tokens->PxrSurface);
   // parameters:
   {
@@ -181,25 +167,18 @@ void _ProcessPreviewSurfaceNode(
         {_tokens->clearcoatRoughness, _tokens->clearcoatRoughnessOut},
         {_tokens->presence, _tokens->presenceOut}};
 
-    for (const auto &inOutPair : mapping)
-    {
+    for (const auto &inOutPair : mapping) {
       netInterface->SetNodeInputConnection(
-          pxrSurfaceNodeName, inOutPair.first,
-          {{nodeName, inOutPair.second}});
+          pxrSurfaceNodeName, inOutPair.first, {{nodeName, inOutPair.second}});
     }
 
     // If opacityThreshold is > 0, do *not* use refraction.
     VtValue vtOpThres;
-    if (_GetParameter(
-            netInterface, nodeName, _tokens->opacityThreshold,
-            &vtOpThres))
-    {
+    if (_GetParameter(netInterface, nodeName, _tokens->opacityThreshold, &vtOpThres)) {
 
-      if (vtOpThres.Get<float>() <= 0.0f)
-      {
+      if (vtOpThres.Get<float>() <= 0.0f) {
         netInterface->SetNodeInputConnection(
-            pxrSurfaceNodeName, _tokens->refractionGain,
-            {{nodeName, _tokens->refractionGainOut}});
+            pxrSurfaceNodeName, _tokens->refractionGain, {{nodeName, _tokens->refractionGainOut}});
       }
     }
   }
@@ -209,41 +188,32 @@ void _ProcessPreviewSurfaceNode(
   bool displacement = false;
   {
     VtValue vtDisp;
-    if (_GetParameter(
-            netInterface, nodeName, _tokens->displacement, &vtDisp))
-    {
-      if (vtDisp.Get<float>() != 0.0f)
-      {
+    if (_GetParameter(netInterface, nodeName, _tokens->displacement, &vtDisp)) {
+      if (vtDisp.Get<float>() != 0.0f) {
         displacement = true;
       }
     }
-    if (!displacement)
-    {
-      const auto connections = netInterface->GetNodeInputConnection(
-          nodeName, _tokens->displacement);
+    if (!displacement) {
+      const auto connections = netInterface->GetNodeInputConnection(nodeName,
+                                                                    _tokens->displacement);
       // Note that we don't validate the connection entries themselves.
       displacement = !connections.empty();
     }
   }
   // Need additional node, PxrDisplace, for displacement
-  if (displacement)
-  {
-    pxrDispNodeName =
-        _GetSiblingNodeName(nodeName.GetString(), "_PxrDisplace");
+  if (displacement) {
+    pxrDispNodeName = _GetSiblingNodeName(nodeName.GetString(), "_PxrDisplace");
     netInterface->SetNodeType(pxrDispNodeName, _tokens->PxrDisplace);
     // No parameters, only connections
     netInterface->SetNodeInputConnection(
-        pxrDispNodeName, _tokens->dispAmount,
-        {{nodeName, _tokens->dispAmountOut}});
+        pxrDispNodeName, _tokens->dispAmount, {{nodeName, _tokens->dispAmountOut}});
     netInterface->SetNodeInputConnection(
-        pxrDispNodeName, _tokens->dispScalar,
-        {{nodeName, _tokens->dispScalarOut}});
+        pxrDispNodeName, _tokens->dispScalar, {{nodeName, _tokens->dispScalarOut}});
   }
 
   // One additional "dummy" node to author primvar opinions on the
   // material to be passed to the gprim.
-  TfToken primvarPassNodeName =
-      _GetSiblingNodeName(nodeName.GetString(), "_PrimvarPass");
+  TfToken primvarPassNodeName = _GetSiblingNodeName(nodeName.GetString(), "_PrimvarPass");
   netInterface->SetNodeType(primvarPassNodeName, _tokens->PrimvarPass);
   // Parameters (no connections):
   // We wish to always set this primvar on meshes using
@@ -256,32 +226,28 @@ void _ProcessPreviewSurfaceNode(
       primvarPassNodeName, _tokens->displacementBoundSphere, VtValue(1.f));
 
   // XXX Wire the primvarPass node so it isn't pruned during network traversal.
-  netInterface->SetNodeInputConnection(
-      pxrSurfaceNodeName, _tokens->displacementBoundSphere,
-      {{primvarPassNodeName, _tokens->displacementBoundSphere}});
+  netInterface->SetNodeInputConnection(pxrSurfaceNodeName,
+                                       _tokens->displacementBoundSphere,
+                                       {{primvarPassNodeName, _tokens->displacementBoundSphere}});
 
   // Update network terminals to point to the PxrSurface and PxrDisplacement
   // nodes that were added.
   netInterface->SetTerminalConnection(HdMaterialTerminalTokens->surface,
                                       {pxrSurfaceNodeName, TfToken()});
-  if (displacement)
-  {
-    netInterface->SetTerminalConnection(
-        HdMaterialTerminalTokens->displacement,
-        {pxrDispNodeName, TfToken()});
+  if (displacement) {
+    netInterface->SetTerminalConnection(HdMaterialTerminalTokens->displacement,
+                                        {pxrDispNodeName, TfToken()});
   }
-  else
-  {
+  else {
     netInterface->DeleteTerminal(HdMaterialTerminalTokens->displacement);
   }
 }
 
 // Update texture nodes that use non-native texture formats
 // to read them via a Renderman texture plugin.
-void _ProcessUVTextureNode(
-    HdMaterialNetworkInterface *netInterface,
-    const TfToken &nodeName,
-    std::vector<std::string> *outputErrorMessages)
+void _ProcessUVTextureNode(HdMaterialNetworkInterface *netInterface,
+                           const TfToken &nodeName,
+                           std::vector<std::string> *outputErrorMessages)
 {
   TF_UNUSED(outputErrorMessages);
 
@@ -294,51 +260,42 @@ void _ProcessUVTextureNode(
     std::string path = vtFile.Get<SdfAssetPath>().GetResolvedPath();
     std::string ext = ArGetResolver().GetExtension(path);
 
-    if (!ext.empty() && ext != "tex" && ext != "dds")
-    {
-      std::string pluginName =
-          std::string("RtxHioImage") + ARCH_LIBRARY_SUFFIX;
+    if (!ext.empty() && ext != "tex" && ext != "dds") {
+      std::string pluginName = std::string("RtxHioImage") + ARCH_LIBRARY_SUFFIX;
       // Check for wrap mode. In Renderman, the
       // texture asset specifies its wrap mode, so we
       // must pass this from the shading node into the
       // texture plugin parameters.
-      VtValue wrapSVal =
-          netInterface->GetNodeParameterValue(nodeName, _tokens->wrapS);
-      VtValue wrapTVal =
-          netInterface->GetNodeParameterValue(nodeName, _tokens->wrapT);
-      TfToken wrapS =
-          wrapSVal.GetWithDefault(_tokens->useMetadata);
-      TfToken wrapT =
-          wrapSVal.GetWithDefault(_tokens->useMetadata);
+      VtValue wrapSVal = netInterface->GetNodeParameterValue(nodeName, _tokens->wrapS);
+      VtValue wrapTVal = netInterface->GetNodeParameterValue(nodeName, _tokens->wrapT);
+      TfToken wrapS = wrapSVal.GetWithDefault(_tokens->useMetadata);
+      TfToken wrapT = wrapSVal.GetWithDefault(_tokens->useMetadata);
 
       // Check for source colorspace.
-      VtValue sourceColorSpaceVal = netInterface->GetNodeParameterValue(
-          nodeName, _tokens->sourceColorSpace);
+      VtValue sourceColorSpaceVal = netInterface->GetNodeParameterValue(nodeName,
+                                                                        _tokens->sourceColorSpace);
       // XXX: This is a workaround for Presto. If there's no
       // colorspace token, check if there's a colorspace
       // string.
-      TfToken sourceColorSpace =
-          sourceColorSpaceVal.GetWithDefault(TfToken());
-      if (sourceColorSpace.IsEmpty())
-      {
-        const std::string sourceColorSpaceStr =
-            sourceColorSpaceVal.GetWithDefault(
-                _tokens->colorSpaceAuto.GetString());
+      TfToken sourceColorSpace = sourceColorSpaceVal.GetWithDefault(TfToken());
+      if (sourceColorSpace.IsEmpty()) {
+        const std::string sourceColorSpaceStr = sourceColorSpaceVal.GetWithDefault(
+            _tokens->colorSpaceAuto.GetString());
         sourceColorSpace = TfToken(sourceColorSpaceStr);
       }
-      path =
-          TfStringPrintf("rtxplugin:%s?filename=%s"
-                         "&wrapS=%s&wrapT=%s&"
-                         "sourceColorSpace=%s",
-                         pluginName.c_str(), path.c_str(),
-                         wrapS.GetText(), wrapT.GetText(),
-                         sourceColorSpace.GetText());
+      path = TfStringPrintf(
+          "rtxplugin:%s?filename=%s"
+          "&wrapS=%s&wrapT=%s&"
+          "sourceColorSpace=%s",
+          pluginName.c_str(),
+          path.c_str(),
+          wrapS.GetText(),
+          wrapT.GetText(),
+          sourceColorSpace.GetText());
 
-      netInterface->SetNodeParameterValue(
-          nodeName, _tokens->file, VtValue(path));
+      netInterface->SetNodeParameterValue(nodeName, _tokens->file, VtValue(path));
     }
-    else if (ext == "tex")
-    {
+    else if (ext == "tex") {
       // USD Preview Materials use a texture coordinate
       // convention where (0,0) is in the bottom-left;
       // RenderMan's texture system uses a convention
@@ -346,71 +303,58 @@ void _ProcessUVTextureNode(
       needInvertT = true;
     }
     TF_DEBUG(HDPRMAN_IMAGE_ASSET_RESOLVE)
-        .Msg("Resolved preview material asset path: %s\n",
-             path.c_str());
-  } // handle 'file' parameter
+        .Msg("Resolved preview material asset path: %s\n", path.c_str());
+  }  // handle 'file' parameter
 
   HdMaterialNetworkInterface::InputConnectionVector cvSt;
-  if (needInvertT &&
-      _GetInputConnection(netInterface, nodeName, _tokens->st, &cvSt))
-  {
+  if (needInvertT && _GetInputConnection(netInterface, nodeName, _tokens->st, &cvSt)) {
 
     // Invert the T axis by splicing in a UsdTransform2d node.
-    TfToken transform2dNodeName =
-        _GetSiblingNodeName(nodeName.GetString(), "_InvertT");
+    TfToken transform2dNodeName = _GetSiblingNodeName(nodeName.GetString(), "_InvertT");
 
     // Add new node.
-    netInterface->SetNodeType(
-        transform2dNodeName, _tokens->UsdTransform2d);
+    netInterface->SetNodeType(transform2dNodeName, _tokens->UsdTransform2d);
 
     // parameters:
-    netInterface->SetNodeParameterValue(transform2dNodeName,
-                                        _tokens->scale, VtValue(GfVec2f(1.0f, -1.0f)));
-    netInterface->SetNodeParameterValue(transform2dNodeName,
-                                        _tokens->translation, VtValue(GfVec2f(0.0f, 1.0f)));
+    netInterface->SetNodeParameterValue(
+        transform2dNodeName, _tokens->scale, VtValue(GfVec2f(1.0f, -1.0f)));
+    netInterface->SetNodeParameterValue(
+        transform2dNodeName, _tokens->translation, VtValue(GfVec2f(0.0f, 1.0f)));
 
     // connections:
-    netInterface->SetNodeInputConnection(
-        transform2dNodeName, _tokens->in, cvSt);
+    netInterface->SetNodeInputConnection(transform2dNodeName, _tokens->in, cvSt);
 
     // Splice it into UsdUvTexture, replacing the existing
     // connection.
-    netInterface->SetNodeInputConnection(nodeName, _tokens->st,
-                                         {{transform2dNodeName, _tokens->result}});
+    netInterface->SetNodeInputConnection(
+        nodeName, _tokens->st, {{transform2dNodeName, _tokens->result}});
   }
 }
 
-void MatfiltConvertPreviewMaterial(
-    HdMaterialNetworkInterface *netInterface,
-    std::vector<std::string> *outputErrorMessages)
+void MatfiltConvertPreviewMaterial(HdMaterialNetworkInterface *netInterface,
+                                   std::vector<std::string> *outputErrorMessages)
 {
-  if (!netInterface)
-  {
+  if (!netInterface) {
     return;
   }
 
   const TfTokenVector nodeNames = netInterface->GetNodeNames();
   bool foundPreviewSurface = false;
 
-  for (TfToken const &nodeName : nodeNames)
-  {
+  for (TfToken const &nodeName : nodeNames) {
     const TfToken nodeType = netInterface->GetNodeType(nodeName);
 
-    if (nodeType == _tokens->UsdPreviewSurface)
-    {
-      if (foundPreviewSurface)
-      {
-        outputErrorMessages->push_back(TfStringPrintf(
-            "Found multiple UsdPreviewSurface nodes in <%s>",
-            netInterface->GetMaterialPrimPath().GetText()));
+    if (nodeType == _tokens->UsdPreviewSurface) {
+      if (foundPreviewSurface) {
+        outputErrorMessages->push_back(
+            TfStringPrintf("Found multiple UsdPreviewSurface nodes in <%s>",
+                           netInterface->GetMaterialPrimPath().GetText()));
         continue;
       }
       foundPreviewSurface = true;
-      _ProcessPreviewSurfaceNode(
-          netInterface, nodeName, outputErrorMessages);
+      _ProcessPreviewSurfaceNode(netInterface, nodeName, outputErrorMessages);
     }
-    else if (nodeType == _tokens->UsdUVTexture)
-    {
+    else if (nodeType == _tokens->UsdUVTexture) {
       _ProcessUVTextureNode(netInterface, nodeName, outputErrorMessages);
     }
   }

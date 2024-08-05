@@ -43,11 +43,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// or destroyed instanceable prim indexes.
 ///
 class Usd_InstanceChanges {
-public:
-  void AppendChanges(const Usd_InstanceChanges &c) {
-    newPrototypePrims.insert(newPrototypePrims.end(),
-                             c.newPrototypePrims.begin(),
-                             c.newPrototypePrims.end());
+ public:
+  void AppendChanges(const Usd_InstanceChanges &c)
+  {
+    newPrototypePrims.insert(
+        newPrototypePrims.end(), c.newPrototypePrims.begin(), c.newPrototypePrims.end());
 
     newPrototypePrimIndexes.insert(newPrototypePrimIndexes.end(),
                                    c.newPrototypePrimIndexes.begin(),
@@ -61,9 +61,8 @@ public:
                                        c.changedPrototypePrimIndexes.begin(),
                                        c.changedPrototypePrimIndexes.end());
 
-    deadPrototypePrims.insert(deadPrototypePrims.end(),
-                              c.deadPrototypePrims.begin(),
-                              c.deadPrototypePrims.end());
+    deadPrototypePrims.insert(
+        deadPrototypePrims.end(), c.deadPrototypePrims.begin(), c.deadPrototypePrims.end());
   }
 
   /// List of new prototype prims and their corresponding source
@@ -117,7 +116,7 @@ class Usd_InstanceCache {
   Usd_InstanceCache(Usd_InstanceCache const &) = delete;
   Usd_InstanceCache &operator=(Usd_InstanceCache const &) = delete;
 
-public:
+ public:
   Usd_InstanceCache();
 
   /// Registers the given instance prim index \p index with the cache.
@@ -153,8 +152,7 @@ public:
 
   /// Return instance prim indexes registered for \p prototypePath, an empty
   /// vector otherwise
-  std::vector<SdfPath>
-  GetInstancePrimIndexesForPrototype(const SdfPath &prototype) const;
+  std::vector<SdfPath> GetInstancePrimIndexesForPrototype(const SdfPath &prototype) const;
 
   /// Returns the paths of all prototype prims for instance prim
   /// indexes registered with this cache.
@@ -185,14 +183,12 @@ public:
   /// this function will return the path of the nested instance under the
   /// outer prototype, and also the prototype path corresponding to that
   /// nested instance.
-  std::vector<SdfPath>
-  GetPrimsInPrototypesUsingPrimIndexPath(const SdfPath &primIndexPath) const;
+  std::vector<SdfPath> GetPrimsInPrototypesUsingPrimIndexPath(const SdfPath &primIndexPath) const;
 
   /// Return a vector of pair of prototype and respective source prim index
   /// path for all prototypes using the prim index at \p primIndexPath or as
   /// descendent of \p primIndexPath.
-  std::vector<std::pair<SdfPath, SdfPath>>
-  GetPrototypesUsingPrimIndexPathOrDescendents(
+  std::vector<std::pair<SdfPath, SdfPath>> GetPrototypesUsingPrimIndexPathOrDescendents(
       const SdfPath &primIndexPath) const;
 
   /// Return true if a prim in a prototype uses the prim index at
@@ -203,8 +199,7 @@ public:
   /// \p primIndexPath.  If \p primIndexPath is not instanceable, or if it
   /// has no associated prototype because it lacks composition arcs, return
   /// the empty path.
-  SdfPath
-  GetPrototypeForInstanceablePrimIndexPath(const SdfPath &primIndexPath) const;
+  SdfPath GetPrototypeForInstanceablePrimIndexPath(const SdfPath &primIndexPath) const;
 
   /// Returns true if \p primPath is descendent to an instance.  That is,
   /// return true if a strict ancestor path of \p usdPrimPath identifies an
@@ -220,40 +215,37 @@ public:
   /// otherwise the empty path.
   SdfPath GetPathInPrototypeForInstancePath(const SdfPath &primPath) const;
 
-private:
+ private:
   typedef std::vector<SdfPath> _PrimIndexPaths;
 
   void _CreateOrUpdatePrototypeForInstances(
-      const Usd_InstanceKey &instanceKey, _PrimIndexPaths *primIndexPaths,
+      const Usd_InstanceKey &instanceKey,
+      _PrimIndexPaths *primIndexPaths,
       Usd_InstanceChanges *changes,
-      std::unordered_map<SdfPath, SdfPath, SdfPath::Hash> const
-          &prototypeToOldSourceIndexPath);
+      std::unordered_map<SdfPath, SdfPath, SdfPath::Hash> const &prototypeToOldSourceIndexPath);
 
-  void _RemoveInstances(const Usd_InstanceKey &instanceKey,
-                        const _PrimIndexPaths &primIndexPaths,
-                        Usd_InstanceChanges *changes,
-                        std::unordered_map<SdfPath, SdfPath, SdfPath::Hash>
-                            *prototypeToOldSourceIndexPath);
+  void _RemoveInstances(
+      const Usd_InstanceKey &instanceKey,
+      const _PrimIndexPaths &primIndexPaths,
+      Usd_InstanceChanges *changes,
+      std::unordered_map<SdfPath, SdfPath, SdfPath::Hash> *prototypeToOldSourceIndexPath);
 
   void _RemovePrototypeIfNoInstances(const Usd_InstanceKey &instanceKey,
                                      Usd_InstanceChanges *changes);
 
-  bool _PrototypeUsesPrimIndexPath(
-      const SdfPath &primIndexPath,
-      std::vector<SdfPath> *prototypePaths = nullptr) const;
+  bool _PrototypeUsesPrimIndexPath(const SdfPath &primIndexPath,
+                                   std::vector<SdfPath> *prototypePaths = nullptr) const;
 
   SdfPath _GetNextPrototypePath(const Usd_InstanceKey &key);
 
-private:
+ private:
   tbb::spin_mutex _mutex;
 
   // Mapping from instance key <-> prototype prim path.
   // This stores the path of the prototype prim that should be used
   // for all instanceable prim indexes with the given instance key.
-  typedef TfHashMap<Usd_InstanceKey, SdfPath, TfHash>
-      _InstanceKeyToPrototypeMap;
-  typedef TfHashMap<SdfPath, Usd_InstanceKey, SdfPath::Hash>
-      _PrototypeToInstanceKeyMap;
+  typedef TfHashMap<Usd_InstanceKey, SdfPath, TfHash> _InstanceKeyToPrototypeMap;
+  typedef TfHashMap<SdfPath, Usd_InstanceKey, SdfPath::Hash> _PrototypeToInstanceKeyMap;
   _InstanceKeyToPrototypeMap _instanceKeyToPrototypeMap;
   _PrototypeToInstanceKeyMap _prototypeToInstanceKeyMap;
 
@@ -276,8 +268,7 @@ private:
   // Map from instance key -> list of prim index paths
   // These maps contain lists of pending changes and are the only containers
   // that should be modified during registration and unregistration.
-  typedef TfHashMap<Usd_InstanceKey, _PrimIndexPaths, TfHash>
-      _InstanceKeyToPrimIndexesMap;
+  typedef TfHashMap<Usd_InstanceKey, _PrimIndexPaths, TfHash> _InstanceKeyToPrimIndexesMap;
   _InstanceKeyToPrimIndexesMap _pendingAddedPrimIndexes;
   _InstanceKeyToPrimIndexesMap _pendingRemovedPrimIndexes;
 
@@ -288,4 +279,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_INSTANCE_CACHE_H
+#endif  // PXR_USD_USD_INSTANCE_CACHE_H

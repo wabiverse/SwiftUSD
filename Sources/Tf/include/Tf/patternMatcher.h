@@ -47,7 +47,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class TfPatternMatcher {
 
-public:
+ public:
   /// Construct an empty (invalid) TfPatternMatcher.
   TF_API TfPatternMatcher();
 
@@ -58,8 +58,7 @@ public:
   /// pattern compilation will not occur until the first call to \a Match()
   /// or \a IsValid().
   TF_API
-  TfPatternMatcher(const std::string &pattern, bool caseSensitive = false,
-                   bool isGlob = false);
+  TfPatternMatcher(const std::string &pattern, bool caseSensitive = false, bool isGlob = false);
 
   /// Destructor.
   TF_API ~TfPatternMatcher();
@@ -69,14 +68,23 @@ public:
 
   /// Returns true if the matcher has been set to be case sensitive, false
   /// otherwise.
-  bool IsCaseSensitive() const { return _caseSensitive; }
+  bool IsCaseSensitive() const
+  {
+    return _caseSensitive;
+  }
 
   /// Returns true if the matcher has been set to treat patterns as glob
   /// patterns, false otherwise.
-  bool IsGlobPattern() const { return _isGlob; }
+  bool IsGlobPattern() const
+  {
+    return _isGlob;
+  }
 
   /// Returns the matcher's pattern string.
-  TF_API const std::string &GetPattern() const { return _pattern; }
+  TF_API const std::string &GetPattern() const
+  {
+    return _pattern;
+  }
 
   /// Returns true if the matcher has a valid pattern.  Note that empty
   /// patterns are considered invalid.  This will cause a compile of
@@ -94,8 +102,7 @@ public:
   /// partial match is not acceptable, it is necessary to anchor the pattern
   /// passed to the constructor, e.g. "^mypattern$".
   ///
-  TF_API bool Match(const std::string &query,
-                    std::string *errorMsg = NULL) const;
+  TF_API bool Match(const std::string &query, std::string *errorMsg = NULL) const;
 
   /// Set this matcher to match case-sensitively or not.
   TF_API void SetIsCaseSensitive(bool sensitive);
@@ -109,7 +116,7 @@ public:
   /// Set the pattern that this matcher will use to match against.
   TF_API void SetPattern(const std::string &pattern);
 
-private:
+ private:
   void _Compile() const;
 
   bool _caseSensitive;
@@ -121,4 +128,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PATTERN_MATCHER_H
+#endif  // PXR_BASE_TF_PATTERN_MATCHER_H

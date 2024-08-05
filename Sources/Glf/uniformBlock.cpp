@@ -26,18 +26,17 @@
 
 #include "Garch/glApi.h"
 
-#include "Glf/diagnostic.h"
-#include "Glf/uniformBlock.h"
 #include "Glf/bindingMap.h"
+#include "Glf/diagnostic.h"
 #include "Glf/glContext.h"
+#include "Glf/uniformBlock.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 GlfUniformBlock::GlfUniformBlock(char const *label) : _buffer(0), _size(0)
 {
   glGenBuffers(1, &_buffer);
-  if (label)
-  {
+  if (label) {
     // Using 'glObjectLabel' is only guaranteed to work on GL resources that
     // have been created. glGenBuffers only reserves an id.
     // Postpone setting up the debug label until buffer binding.
@@ -49,20 +48,17 @@ GlfUniformBlock::~GlfUniformBlock()
 {
   GlfSharedGLContextScopeHolder sharedGLContextScopeHolder;
 
-  if (glIsBuffer(_buffer) == GL_TRUE)
-  {
+  if (glIsBuffer(_buffer) == GL_TRUE) {
     glDeleteBuffers(1, &_buffer);
   }
 }
 
-GlfUniformBlockRefPtr
-GlfUniformBlock::New(char const *label)
+GlfUniformBlockRefPtr GlfUniformBlock::New(char const *label)
 {
   return TfCreateRefPtr(new GlfUniformBlock(label));
 }
 
-void GlfUniformBlock::Bind(GlfBindingMapPtr const &bindingMap,
-                           std::string const &identifier)
+void GlfUniformBlock::Bind(GlfBindingMapPtr const &bindingMap, std::string const &identifier)
 {
   if (!bindingMap)
     return;
@@ -71,8 +67,7 @@ void GlfUniformBlock::Bind(GlfBindingMapPtr const &bindingMap,
   glBindBufferBase(GL_UNIFORM_BUFFER, binding, _buffer);
 
   // Binding the buffer should ensure it is created so we can assign debug lbl
-  if (!_debugLabel.empty())
-  {
+  if (!_debugLabel.empty()) {
     GlfDebugLabelBuffer(_buffer, _debugLabel.c_str());
   }
 }
@@ -82,13 +77,11 @@ void GlfUniformBlock::Update(const void *data, int size)
   GLF_GROUP_FUNCTION();
 
   glBindBuffer(GL_UNIFORM_BUFFER, _buffer);
-  if (_size != size)
-  {
+  if (_size != size) {
     glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
     _size = size;
   }
-  if (size > 0)
-  {
+  if (size > 0) {
     // Bug 95969 BufferSubData w/ size == 0 should be a noop but
     // raises errors on some NVIDIA drivers.
     glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);

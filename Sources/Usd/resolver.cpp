@@ -34,7 +34,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 Usd_Resolver::Usd_Resolver(const PcpPrimIndex *index, bool skipEmptyNodes)
-    : _index(index), _skipEmptyNodes(skipEmptyNodes), _resolveTarget(nullptr) {
+    : _index(index), _skipEmptyNodes(skipEmptyNodes), _resolveTarget(nullptr)
+{
   PcpNodeRange range = _index->GetNodeRange();
   _curNode = range.first;
   _endNode = range.second;
@@ -49,9 +50,9 @@ Usd_Resolver::Usd_Resolver(const PcpPrimIndex *index, bool skipEmptyNodes)
   }
 }
 
-Usd_Resolver::Usd_Resolver(const UsdResolveTarget *resolveTarget,
-                           bool skipEmptyNodes)
-    : _skipEmptyNodes(skipEmptyNodes), _resolveTarget(resolveTarget) {
+Usd_Resolver::Usd_Resolver(const UsdResolveTarget *resolveTarget, bool skipEmptyNodes)
+    : _skipEmptyNodes(skipEmptyNodes), _resolveTarget(resolveTarget)
+{
   if (!TF_VERIFY(_resolveTarget)) {
     _index = nullptr;
     return;
@@ -70,8 +71,7 @@ Usd_Resolver::Usd_Resolver(const UsdResolveTarget *resolveTarget,
     // Check if the stop layer is past the beginning of the stop node layer
     // stack. If so, we'll need to iterate into the stop node to catch those
     // layers, so move the end node forward.
-    const SdfLayerRefPtrVector &layers =
-        _resolveTarget->_stopNodeIt->GetLayerStack()->GetLayers();
+    const SdfLayerRefPtrVector &layers = _resolveTarget->_stopNodeIt->GetLayerStack()->GetLayers();
     if (_resolveTarget->_stopLayerIt != layers.begin()) {
       ++_endNode;
     }
@@ -88,7 +88,8 @@ Usd_Resolver::Usd_Resolver(const UsdResolveTarget *resolveTarget,
     // with the resolve target's start layer.
     if (_curNode == _resolveTarget->_startNodeIt) {
       _curLayer = _resolveTarget->_startLayerIt;
-    } else {
+    }
+    else {
       _curLayer = layers.begin();
     }
 
@@ -96,26 +97,29 @@ Usd_Resolver::Usd_Resolver(const UsdResolveTarget *resolveTarget,
     // the "stop at layer" determines what the end layer is.
     if (_curNode == _resolveTarget->_stopNodeIt) {
       _endLayer = _resolveTarget->_stopLayerIt;
-    } else {
+    }
+    else {
       _endLayer = layers.end();
     }
   }
 }
 
-void Usd_Resolver::_SkipEmptyNodes() {
+void Usd_Resolver::_SkipEmptyNodes()
+{
   if (_skipEmptyNodes) {
-    for (; IsValid() && (!_curNode->HasSpecs() || _curNode->IsInert());
-         ++_curNode) {
+    for (; IsValid() && (!_curNode->HasSpecs() || _curNode->IsInert()); ++_curNode) {
       // do nothing.
     }
-  } else {
+  }
+  else {
     for (; IsValid() && _curNode->IsInert(); ++_curNode) {
       // do nothing.
     }
   }
 }
 
-void Usd_Resolver::NextNode() {
+void Usd_Resolver::NextNode()
+{
   ++_curNode;
   _SkipEmptyNodes();
   if (IsValid()) {
@@ -126,13 +130,15 @@ void Usd_Resolver::NextNode() {
     // the "stop at layer" determines what the end layer is.
     if (_resolveTarget && _curNode == _resolveTarget->_stopNodeIt) {
       _endLayer = _resolveTarget->_stopLayerIt;
-    } else {
+    }
+    else {
       _endLayer = layers.end();
     }
   }
 }
 
-bool Usd_Resolver::NextLayer() {
+bool Usd_Resolver::NextLayer()
+{
   if (++_curLayer == _endLayer) {
     // We hit the last layer in this LayerStack, move on to the next node.
     NextNode();

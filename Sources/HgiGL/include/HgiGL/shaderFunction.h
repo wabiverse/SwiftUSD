@@ -36,9 +36,8 @@ class Hgi;
 ///
 /// OpenGL implementation of HgiShaderFunction
 ///
-class HgiGLShaderFunction final : public HgiShaderFunction
-{
-public:
+class HgiGLShaderFunction final : public HgiShaderFunction {
+ public:
   HGIGL_API
   ~HgiGLShaderFunction() override;
 
@@ -58,18 +57,18 @@ public:
   HGIGL_API
   uint32_t GetShaderId() const;
 
-protected:
+ protected:
   friend class HgiGL;
 
   HGIGL_API
   HgiGLShaderFunction(Hgi const *hgi, HgiShaderFunctionDesc const &desc);
 
-private:
+ private:
   HgiGLShaderFunction() = delete;
   HgiGLShaderFunction &operator=(const HgiGLShaderFunction &) = delete;
   HgiGLShaderFunction(const HgiGLShaderFunction &) = delete;
 
-private:
+ private:
   std::string _errors;
   uint32_t _shaderId;
 };

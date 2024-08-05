@@ -58,7 +58,7 @@ enum SdfListOpType {
 /// Trait classes for specializing behaviors of SdfListOp for a given item
 /// type.
 ///
-template <class T> struct Sdf_ListOpTraits {
+template<class T> struct Sdf_ListOpTraits {
   typedef std::less<T> ItemComparator;
 };
 
@@ -69,8 +69,8 @@ template <class T> struct Sdf_ListOpTraits {
 /// SdfListOp is a value type representing an operation that edits a list.
 /// It may add or remove items, reorder them, or replace the list entirely.
 ///
-template <typename T> class SdfListOp {
-public:
+template<typename T> class SdfListOp {
+ public:
   typedef T ItemType;
   typedef std::vector<ItemType> ItemVector;
   typedef ItemType value_type;
@@ -78,8 +78,7 @@ public:
 
   /// Create a ListOp in explicit mode with the given \p explicitItems.
   SDF_API
-  static SdfListOp
-  CreateExplicit(const ItemVector &explicitItems = ItemVector());
+  static SdfListOp CreateExplicit(const ItemVector &explicitItems = ItemVector());
 
   /// Create a ListOp in non-explicit mode with the given
   /// \p prependedItems, \p appendedItems, and \p deletedItems
@@ -96,12 +95,14 @@ public:
   /// Returns \c true if the editor has an explicit list (even if it's
   /// empty) or it has any added, prepended, appended, deleted,
   /// or ordered keys.
-  bool HasKeys() const {
+  bool HasKeys() const
+  {
     if (IsExplicit()) {
       return true;
     }
-    if (_addedItems.size() != 0 || _prependedItems.size() != 0 ||
-        _appendedItems.size() != 0 || _deletedItems.size() != 0) {
+    if (_addedItems.size() != 0 || _prependedItems.size() != 0 || _appendedItems.size() != 0 ||
+        _deletedItems.size() != 0)
+    {
       return true;
     }
     return _orderedItems.size() != 0;
@@ -111,25 +112,46 @@ public:
   SDF_API bool HasItem(const T &item) const;
 
   /// Returns \c true if the list is explicit.
-  bool IsExplicit() const { return _isExplicit; }
+  bool IsExplicit() const
+  {
+    return _isExplicit;
+  }
 
   /// Returns the explicit items.
-  const ItemVector &GetExplicitItems() const { return _explicitItems; }
+  const ItemVector &GetExplicitItems() const
+  {
+    return _explicitItems;
+  }
 
   /// Returns the explicit items.
-  const ItemVector &GetAddedItems() const { return _addedItems; }
+  const ItemVector &GetAddedItems() const
+  {
+    return _addedItems;
+  }
 
   /// Returns the explicit items.
-  const ItemVector &GetPrependedItems() const { return _prependedItems; }
+  const ItemVector &GetPrependedItems() const
+  {
+    return _prependedItems;
+  }
 
   /// Returns the explicit items.
-  const ItemVector &GetAppendedItems() const { return _appendedItems; }
+  const ItemVector &GetAppendedItems() const
+  {
+    return _appendedItems;
+  }
 
   /// Returns the deleted items.
-  const ItemVector &GetDeletedItems() const { return _deletedItems; }
+  const ItemVector &GetDeletedItems() const
+  {
+    return _deletedItems;
+  }
 
   /// Returns the ordered items.
-  const ItemVector &GetOrderedItems() const { return _orderedItems; }
+  const ItemVector &GetOrderedItems() const
+  {
+    return _orderedItems;
+  }
 
   /// Return the item vector identified by \p type.
   SDF_API const ItemVector &GetItems(SdfListOpType type) const;
@@ -159,9 +181,7 @@ public:
   SDF_API void ClearAndMakeExplicit();
 
   /// Callback type for ApplyOperations.
-  typedef std::function<boost::optional<ItemType>(SdfListOpType,
-                                                  const ItemType &)>
-      ApplyCallback;
+  typedef std::function<boost::optional<ItemType>(SdfListOpType, const ItemType &)> ApplyCallback;
 
   /// Applies edit operations to the given ItemVector.
   /// If supplied, \p cb will be called on each item in the operation vectors
@@ -169,8 +189,7 @@ public:
   /// the items stored in the operation vectors to match what's stored in
   /// \p vec.
   SDF_API
-  void ApplyOperations(ItemVector *vec,
-                       const ApplyCallback &cb = ApplyCallback()) const;
+  void ApplyOperations(ItemVector *vec, const ApplyCallback &cb = ApplyCallback()) const;
 
   /// Applies edit operations to the given ListOp.
   ///
@@ -183,12 +202,10 @@ public:
   /// the explicit, prepended, appended, and deleted portions of
   /// SdfListOp are closed under composition with ApplyOperations().
   SDF_API
-  boost::optional<SdfListOp<T>>
-  ApplyOperations(const SdfListOp<T> &inner) const;
+  boost::optional<SdfListOp<T>> ApplyOperations(const SdfListOp<T> &inner) const;
 
   /// Callback type for ModifyOperations.
-  typedef std::function<boost::optional<ItemType>(const ItemType &)>
-      ModifyCallback;
+  typedef std::function<boost::optional<ItemType>(const ItemType &)> ModifyCallback;
 
   /// Modifies operations specified in this object.
   /// \p callback is called for every item in all operation vectors.  If the
@@ -201,14 +218,15 @@ public:
   ///
   /// Returns true if a change was made, false otherwise.
   SDF_API
-  bool ModifyOperations(const ModifyCallback &callback,
-                        bool removeDuplicates = false);
+  bool ModifyOperations(const ModifyCallback &callback, bool removeDuplicates = false);
 
   /// Replaces the items in the specified operation vector in the range
   /// (index, index + n] with the given \p newItems. If \p newItems is empty
   /// the items in the range will simply be removed.
   SDF_API
-  bool ReplaceOperations(const SdfListOpType op, size_t index, size_t n,
+  bool ReplaceOperations(const SdfListOpType op,
+                         size_t index,
+                         size_t n,
                          const ItemVector &newItems);
 
   /// Composes a stronger SdfListOp's opinions for a given operation list
@@ -216,44 +234,59 @@ public:
   SDF_API
   void ComposeOperations(const SdfListOp<T> &stronger, SdfListOpType op);
 
-  friend inline size_t hash_value(const SdfListOp &op) {
-    return TfHash::Combine(op._isExplicit, op._explicitItems, op._addedItems,
-                           op._prependedItems, op._appendedItems,
-                           op._deletedItems, op._orderedItems);
+  friend inline size_t hash_value(const SdfListOp &op)
+  {
+    return TfHash::Combine(op._isExplicit,
+                           op._explicitItems,
+                           op._addedItems,
+                           op._prependedItems,
+                           op._appendedItems,
+                           op._deletedItems,
+                           op._orderedItems);
   }
 
-  bool operator==(const SdfListOp<T> &rhs) const {
-    return _isExplicit == rhs._isExplicit &&
-           _explicitItems == rhs._explicitItems &&
-           _addedItems == rhs._addedItems &&
-           _prependedItems == rhs._prependedItems &&
-           _appendedItems == rhs._appendedItems &&
-           _deletedItems == rhs._deletedItems &&
+  bool operator==(const SdfListOp<T> &rhs) const
+  {
+    return _isExplicit == rhs._isExplicit && _explicitItems == rhs._explicitItems &&
+           _addedItems == rhs._addedItems && _prependedItems == rhs._prependedItems &&
+           _appendedItems == rhs._appendedItems && _deletedItems == rhs._deletedItems &&
            _orderedItems == rhs._orderedItems;
   };
 
-  bool operator!=(const SdfListOp<T> &rhs) const { return !(*this == rhs); };
+  bool operator!=(const SdfListOp<T> &rhs) const
+  {
+    return !(*this == rhs);
+  };
 
-private:
+ private:
   void _SetExplicit(bool isExplicit);
 
   typedef typename Sdf_ListOpTraits<T>::ItemComparator _ItemComparator;
   typedef std::list<ItemType> _ApplyList;
-  typedef std::map<ItemType, typename _ApplyList::iterator, _ItemComparator>
-      _ApplyMap;
+  typedef std::map<ItemType, typename _ApplyList::iterator, _ItemComparator> _ApplyMap;
 
-  void _AddKeys(SdfListOpType, const ApplyCallback &cb, _ApplyList *result,
+  void _AddKeys(SdfListOpType,
+                const ApplyCallback &cb,
+                _ApplyList *result,
                 _ApplyMap *search) const;
-  void _PrependKeys(SdfListOpType, const ApplyCallback &cb, _ApplyList *result,
+  void _PrependKeys(SdfListOpType,
+                    const ApplyCallback &cb,
+                    _ApplyList *result,
                     _ApplyMap *search) const;
-  void _AppendKeys(SdfListOpType, const ApplyCallback &cb, _ApplyList *result,
+  void _AppendKeys(SdfListOpType,
+                   const ApplyCallback &cb,
+                   _ApplyList *result,
                    _ApplyMap *search) const;
-  void _DeleteKeys(SdfListOpType, const ApplyCallback &cb, _ApplyList *result,
+  void _DeleteKeys(SdfListOpType,
+                   const ApplyCallback &cb,
+                   _ApplyList *result,
                    _ApplyMap *search) const;
-  void _ReorderKeys(SdfListOpType, const ApplyCallback &cb, _ApplyList *result,
+  void _ReorderKeys(SdfListOpType,
+                    const ApplyCallback &cb,
+                    _ApplyList *result,
                     _ApplyMap *search) const;
 
-private:
+ private:
   bool _isExplicit;
   ItemVector _explicitItems;
   ItemVector _addedItems;
@@ -264,18 +297,19 @@ private:
 };
 
 // ADL swap.
-template <class T> void swap(SdfListOp<T> &x, SdfListOp<T> &y) { x.Swap(y); }
+template<class T> void swap(SdfListOp<T> &x, SdfListOp<T> &y)
+{
+  x.Swap(y);
+}
 
 // Helper function for applying an ordering operation described by \p
 // orderVector to vector \p v.
-template <class ItemType>
-SDF_API void SdfApplyListOrdering(std::vector<ItemType> *v,
-                                  const std::vector<ItemType> &order);
+template<class ItemType>
+SDF_API void SdfApplyListOrdering(std::vector<ItemType> *v, const std::vector<ItemType> &order);
 
 // Ostream output methods for list values (useful for debugging and required
 // for storing a list value in a VtValue).
-template <typename T>
-SDF_API std::ostream &operator<<(std::ostream &, const SdfListOp<T> &);
+template<typename T> SDF_API std::ostream &operator<<(std::ostream &, const SdfListOp<T> &);
 
 // Concrete, instantiated listop types.
 typedef class SdfListOp<int> SdfIntListOp;
@@ -291,4 +325,4 @@ typedef class SdfListOp<class SdfUnregisteredValue> SdfUnregisteredValueListOp;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LIST_OP_H
+#endif  // PXR_USD_SDF_LIST_OP_H

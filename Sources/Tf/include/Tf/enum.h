@@ -40,8 +40,8 @@
 
 #include <iosfwd>
 #include <string>
-#include <typeinfo>
 #include <type_traits>
+#include <typeinfo>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -136,14 +136,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 class TfEnum {
-public:
+ public:
   /// Default constructor assigns integer value zero.
   TfEnum() : _typeInfo(&typeid(int)), _value(0) {}
 
   /// Initializes value to enum variable \c value of enum type \c T.
-  template <class T>
+  template<class T>
   TfEnum(T value, std::enable_if_t<std::is_enum<T>::value> * = 0)
-      : _typeInfo(&typeid(T)), _value(int(value)) {}
+      : _typeInfo(&typeid(T)), _value(int(value))
+  {
+  }
 
   /// Initializes value to integral value \p value with enum type \c ti.
   ///
@@ -153,77 +155,99 @@ public:
   TfEnum(const std::type_info &ti, int value) : _typeInfo(&ti), _value(value) {}
 
   /// True if \c *this and \c t have both the same type and value.
-  bool operator==(const TfEnum &t) const {
+  bool operator==(const TfEnum &t) const
+  {
     return t._value == _value && TfSafeTypeCompare(*t._typeInfo, *_typeInfo);
   }
 
   /// Inequality operator
   /// \sa TfEnum::operator==(const TfEnum&)
-  bool operator!=(const TfEnum &t) const { return !(*this == t); }
+  bool operator!=(const TfEnum &t) const
+  {
+    return !(*this == t);
+  }
 
   /// Less than comparison. Enum values belonging to the same type are
   /// ordered according to their numeric value.  Enum values belonging to
   /// different types are ordered in a consistent but arbitrary way which
   /// may vary between program runs.
-  bool operator<(const TfEnum &t) const {
+  bool operator<(const TfEnum &t) const
+  {
     return _typeInfo->before(*t._typeInfo) ||
            (!t._typeInfo->before(*_typeInfo) && _value < t._value);
   }
 
   /// Less than or equal operator
   /// \sa TfEnum::operator<(const TfEnum&)
-  bool operator<=(const TfEnum &t) const { return !(t < *this); }
+  bool operator<=(const TfEnum &t) const
+  {
+    return !(t < *this);
+  }
 
   /// Greater than operator
   /// \sa TfEnum::operator<(const TfEnum&)
-  bool operator>(const TfEnum &t) const { return t < *this; }
+  bool operator>(const TfEnum &t) const
+  {
+    return t < *this;
+  }
 
   /// Greater than or equal operator
   /// \sa TfEnum::operator<(const TfEnum&)
-  bool operator>=(const TfEnum &t) const { return !(*this < t); }
+  bool operator>=(const TfEnum &t) const
+  {
+    return !(*this < t);
+  }
 
   /// True if \c *this has been assigned with \c value.
-  template <class T>
-  std::enable_if_t<std::is_enum<T>::value, bool> operator==(T value) const {
+  template<class T> std::enable_if_t<std::is_enum<T>::value, bool> operator==(T value) const
+  {
     return int(value) == _value && IsA<T>();
   }
 
   /// False if \c *this has been assigned with \c value.
-  template <class T>
-  std::enable_if_t<std::is_enum<T>::value, bool> operator!=(T value) const {
+  template<class T> std::enable_if_t<std::is_enum<T>::value, bool> operator!=(T value) const
+  {
     return int(value) != _value || !IsA<T>();
   }
 
   /// Compare a literal enum value \a val of enum type \a T with TfEnum \a e.
-  template <class T>
-  friend std::enable_if_t<std::is_enum<T>::value, bool>
-  operator==(T val, TfEnum const &e) {
+  template<class T>
+  friend std::enable_if_t<std::is_enum<T>::value, bool> operator==(T val, TfEnum const &e)
+  {
     return e == val;
   }
 
   /// Compare a literal enum value \a val of enum type \a T with TfEnum \a e.
-  template <class T>
-  friend std::enable_if_t<std::is_enum<T>::value, bool>
-  operator!=(T val, TfEnum const &e) {
+  template<class T>
+  friend std::enable_if_t<std::is_enum<T>::value, bool> operator!=(T val, TfEnum const &e)
+  {
     return e != val;
   }
 
   /// True if \c *this has been assigned any enumerated value of type \c T.
-  template <class T> bool IsA() const {
+  template<class T> bool IsA() const
+  {
     return TfSafeTypeCompare(*_typeInfo, typeid(T));
   }
 
   /// True if \c *this has been assigned any enumerated value of type
   /// \c T with \c typeid(T)==t.
-  bool IsA(const std::type_info &t) const {
+  bool IsA(const std::type_info &t) const
+  {
     return TfSafeTypeCompare(*_typeInfo, t);
   }
 
   /// Returns the type of the enum value, as an \c std::type_info.
-  const std::type_info &GetType() const { return *_typeInfo; }
+  const std::type_info &GetType() const
+  {
+    return *_typeInfo;
+  }
 
   /// Returns the integral value of the enum value.
-  const int &GetValueAsInt() const { return _value; }
+  const int &GetValueAsInt() const
+  {
+    return _value;
+  }
 
   /// Returns the enum value for the enum type \c T.
   ///
@@ -236,7 +260,8 @@ public:
   ///
   /// Note that if \c IsA<T>() succeeds, then \c GetValue<T>() will also
   /// succeed.
-  template <typename T> T GetValue() const {
+  template<typename T> T GetValue() const
+  {
     if (!IsA<T>())
       _FatalGetValueError(typeid(T));
 
@@ -244,10 +269,11 @@ public:
   }
 
   /// Conversion operator for enum and integral types only.
-  template <typename T,
-            typename = typename std::enable_if<std::is_integral<T>::value ||
-                                               std::is_enum<T>::value>::type>
-  operator T() const {
+  template<typename T,
+           typename =
+               typename std::enable_if<std::is_integral<T>::value || std::is_enum<T>::value>::type>
+  operator T() const
+  {
     return T(_value);
   }
 
@@ -285,7 +311,8 @@ public:
   /// containing "SPRING", "SUMMER", "AUTUMN", and "WINTER".
   ///
   /// If there are no such names registered, an empty vector is returned.
-  static std::vector<std::string> GetAllNames(TfEnum val) {
+  static std::vector<std::string> GetAllNames(TfEnum val)
+  {
     return GetAllNames(val.GetType());
   }
 
@@ -300,7 +327,8 @@ public:
   /// containing "SPRING", "SUMMER", "AUTUMN", and "WINTER".
   ///
   /// If there are no such names registered, an empty vector is returned.
-  template <class T> static std::vector<std::string> GetAllNames() {
+  template<class T> static std::vector<std::string> GetAllNames()
+  {
     return GetAllNames(typeid(T));
   }
 
@@ -317,8 +345,8 @@ public:
   /// If there is no such name registered, this returns -1. Since -1 can
   /// sometimes be a valid value, the \p foundIt flag pointer, if not \c
   /// NULL, is set to \c true if the name was found and \c false otherwise.
-  template <class T>
-  static T GetValueFromName(const std::string &name, bool *foundIt = NULL) {
+  template<class T> static T GetValueFromName(const std::string &name, bool *foundIt = NULL)
+  {
     TfEnum e = GetValueFromName(typeid(T), name, foundIt);
     return T(e.GetValueAsInt());
   }
@@ -328,7 +356,8 @@ public:
   /// This is a template-independent version of \c GetValueFromName().
   TF_API
   static TfEnum GetValueFromName(const std::type_info &ti,
-                                 const std::string &name, bool *foundIt = NULL);
+                                 const std::string &name,
+                                 bool *foundIt = NULL);
 
   /// Returns the enumerated value for a fully-qualified name.
   ///
@@ -340,8 +369,7 @@ public:
   /// otherwise. Also, since this is not a templated function, it has
   /// to return a generic value type, so we use \c TfEnum.
   TF_API
-  static TfEnum GetValueFromFullName(const std::string &fullname,
-                                     bool *foundIt = NULL);
+  static TfEnum GetValueFromFullName(const std::string &fullname, bool *foundIt = NULL);
 
   /// Returns true if \p typeName is a known enum type.
   ///
@@ -358,30 +386,31 @@ public:
   /// should NOT be called directly. Instead, call AddName(), which does
   /// exactly the same thing.
   TF_API
-  static void _AddName(TfEnum val, const std::string &valName,
+  static void _AddName(TfEnum val,
+                       const std::string &valName,
                        const std::string &displayName = "");
 
   /// Associates a name with an enumerated value.
   /// \see _AddName().
-  static void AddName(TfEnum val, const std::string &valName,
-                      const std::string &displayName = "") {
+  static void AddName(TfEnum val, const std::string &valName, const std::string &displayName = "")
+  {
     _AddName(val, valName, displayName);
   }
 
-  template <typename T> static TfEnum IntegralEnum(T value) {
+  template<typename T> static TfEnum IntegralEnum(T value)
+  {
     TfEnum e;
     e._typeInfo = &typeid(T);
     e._value = int(value);
     return e;
   }
 
-private:
+ private:
   // Internal constructor for int values.
   explicit TfEnum(int value) : _typeInfo(&typeid(int)), _value(value) {}
 
   // Internal constructor for size_t values.
-  explicit TfEnum(size_t value)
-      : _typeInfo(&typeid(size_t)), _value(static_cast<int>(value)) {}
+  explicit TfEnum(size_t value) : _typeInfo(&typeid(size_t)), _value(static_cast<int>(value)) {}
 
   TF_API
   void _FatalGetValueError(std::type_info const &typeInfo) const;
@@ -393,9 +422,9 @@ private:
 // TfHash support.  Make the enum parameter be a deduced template type but
 // enable the overload only for TfEnum.  This disables implicit conversion from
 // ordinary enum types to TfEnum.
-template <class HashState, class Enum>
-std::enable_if_t<std::is_same<Enum, TfEnum>::value>
-TfHashAppend(HashState &h, Enum const &e) {
+template<class HashState, class Enum>
+std::enable_if_t<std::is_same<Enum, TfEnum>::value> TfHashAppend(HashState &h, Enum const &e)
+{
   h.Append(TfHashAsCStr(e.GetType().name()));
   h.Append(e.GetValueAsInt());
 }
@@ -429,9 +458,9 @@ TF_API std::ostream &operator<<(std::ostream &out, const TfEnum &e);
 ///
 /// \ingroup group_tf_RuntimeTyping
 /// \hideinitializer
-#define TF_ADD_ENUM_NAME(VAL, ...)                                             \
+#define TF_ADD_ENUM_NAME(VAL, ...) \
   TfEnum::_AddName(VAL, TF_PP_STRINGIZE(VAL), std::string{__VA_ARGS__});
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ENUM_H
+#endif  // PXR_BASE_TF_ENUM_H

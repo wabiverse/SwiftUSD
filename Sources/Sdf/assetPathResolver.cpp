@@ -50,18 +50,16 @@ using std::vector;
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(_Tokens,
-                         ((AnonLayerPrefix, "anon:"))((ArgsDelimiter,
-                                                       ":SDF_FORMAT_ARGS:")));
+                         ((AnonLayerPrefix, "anon:"))((ArgsDelimiter, ":SDF_FORMAT_ARGS:")));
 
-bool operator==(const Sdf_AssetInfo &lhs, const Sdf_AssetInfo &rhs) {
-  return (lhs.identifier == rhs.identifier) &&
-         (lhs.resolvedPath == rhs.resolvedPath) &&
-         (lhs.resolverContext == rhs.resolverContext) &&
-         (lhs.assetInfo == rhs.assetInfo);
+bool operator==(const Sdf_AssetInfo &lhs, const Sdf_AssetInfo &rhs)
+{
+  return (lhs.identifier == rhs.identifier) && (lhs.resolvedPath == rhs.resolvedPath) &&
+         (lhs.resolverContext == rhs.resolverContext) && (lhs.assetInfo == rhs.assetInfo);
 }
 
-bool Sdf_CanCreateNewLayerWithIdentifier(const string &identifier,
-                                         string *whyNot) {
+bool Sdf_CanCreateNewLayerWithIdentifier(const string &identifier, string *whyNot)
+{
   if (identifier.empty()) {
     if (whyNot) {
       *whyNot = "cannot use empty identifier.";
@@ -86,19 +84,20 @@ bool Sdf_CanCreateNewLayerWithIdentifier(const string &identifier,
   return true;
 }
 
-ArResolvedPath Sdf_ResolvePath(const string &layerPath,
-                               ArAssetInfo *assetInfo) {
+ArResolvedPath Sdf_ResolvePath(const string &layerPath, ArAssetInfo *assetInfo)
+{
   TRACE_FUNCTION();
   return ArGetResolver().Resolve(layerPath);
 }
 
-bool Sdf_CanWriteLayerToPath(const ArResolvedPath &resolvedPath) {
+bool Sdf_CanWriteLayerToPath(const ArResolvedPath &resolvedPath)
+{
   return ArGetResolver().CanWriteAssetToPath(resolvedPath,
                                              /* whyNot = */ nullptr);
 }
 
-ArResolvedPath Sdf_ComputeFilePath(const string &layerPath,
-                                   ArAssetInfo *assetInfo) {
+ArResolvedPath Sdf_ComputeFilePath(const string &layerPath, ArAssetInfo *assetInfo)
+{
   TRACE_FUNCTION();
 
   ArResolvedPath resolvedPath = Sdf_ResolvePath(layerPath, assetInfo);
@@ -114,90 +113,96 @@ ArResolvedPath Sdf_ComputeFilePath(const string &layerPath,
   return resolvedPath;
 }
 
-VtValue Sdf_ComputeLayerModificationTimestamp(const SdfLayer &layer) {
+VtValue Sdf_ComputeLayerModificationTimestamp(const SdfLayer &layer)
+{
   std::string layerPath, args;
   Sdf_SplitIdentifier(layer.GetIdentifier(), &layerPath, &args);
 
-  return VtValue(ArGetResolver().GetModificationTimestamp(
-      layerPath, layer.GetResolvedPath()));
+  return VtValue(ArGetResolver().GetModificationTimestamp(layerPath, layer.GetResolvedPath()));
 }
 
-VtDictionary
-Sdf_ComputeExternalAssetModificationTimestamps(const SdfLayer &layer) {
+VtDictionary Sdf_ComputeExternalAssetModificationTimestamps(const SdfLayer &layer)
+{
   VtDictionary result;
-  std::set<std::string> externalAssetDependencies =
-      layer.GetExternalAssetDependencies();
+  std::set<std::string> externalAssetDependencies = layer.GetExternalAssetDependencies();
   for (const std::string &resolvedPath : externalAssetDependencies) {
     // Get the modification timestamp for the path. Note that external
     // asset dependencies only returns resolved paths so pass the same
     // path for both params.
-    result[resolvedPath] = ArGetResolver().GetModificationTimestamp(
-        resolvedPath, ArResolvedPath(resolvedPath));
+    result[resolvedPath] = ArGetResolver().GetModificationTimestamp(resolvedPath,
+                                                                    ArResolvedPath(resolvedPath));
   }
   return result;
 }
 
-Sdf_AssetInfo *Sdf_ComputeAssetInfoFromIdentifier(
-    const string &identifier, const string &filePath,
-    const ArAssetInfo &inResolveInfo, const string &fileVersion) {
+Sdf_AssetInfo *Sdf_ComputeAssetInfoFromIdentifier(const string &identifier,
+                                                  const string &filePath,
+                                                  const ArAssetInfo &inResolveInfo,
+                                                  const string &fileVersion)
+{
   // Allocate a new asset info object. The caller is responsible for
   // managing the returned object.
   Sdf_AssetInfo *assetInfo = new Sdf_AssetInfo;
   ArAssetInfo resolveInfo = inResolveInfo;
 
-  TF_DEBUG(SDF_ASSET).Msg(
-      "Sdf_ComputeAssetInfoFromIdentifier('%s', '%s', '%s')\n",
-      identifier.c_str(), filePath.c_str(), fileVersion.c_str());
+  TF_DEBUG(SDF_ASSET).Msg("Sdf_ComputeAssetInfoFromIdentifier('%s', '%s', '%s')\n",
+                          identifier.c_str(),
+                          filePath.c_str(),
+                          fileVersion.c_str());
 
   if (Sdf_IsAnonLayerIdentifier(identifier)) {
     // If the identifier is an anonymous layer identifier, don't
     // normalize, and also don't set any of the other assetInfo fields.
     // Anonymous layers do not have repository, overlay, or real paths.
     assetInfo->identifier = identifier;
-  } else {
+  }
+  else {
     assetInfo->identifier = identifier;
 
     string layerPath, arguments;
     Sdf_SplitIdentifier(assetInfo->identifier, &layerPath, &arguments);
     if (filePath.empty()) {
       assetInfo->resolvedPath = Sdf_ComputeFilePath(layerPath, &resolveInfo);
-    } else {
+    }
+    else {
       assetInfo->resolvedPath = ArResolvedPath(filePath);
     }
 
-    resolveInfo =
-        ArGetResolver().GetAssetInfo(layerPath, assetInfo->resolvedPath);
+    resolveInfo = ArGetResolver().GetAssetInfo(layerPath, assetInfo->resolvedPath);
   }
 
   assetInfo->resolverContext = ArGetResolver().GetCurrentContext();
   assetInfo->assetInfo = resolveInfo;
 
-  TF_DEBUG(SDF_ASSET).Msg("Sdf_ComputeAssetInfoFromIdentifier:\n"
-                          "  assetInfo->identifier = '%s'\n"
-                          "  assetInfo->resolvedPath = '%s'\n"
-                          "  assetInfo->repoPath = '%s'\n"
-                          "  assetInfo->assetName = '%s'\n"
-                          "  assetInfo->version = '%s'\n",
-                          assetInfo->identifier.c_str(),
-                          assetInfo->resolvedPath.GetPathString().c_str(),
-                          resolveInfo.repoPath.c_str(),
-                          resolveInfo.assetName.c_str(),
-                          resolveInfo.version.c_str());
+  TF_DEBUG(SDF_ASSET).Msg(
+      "Sdf_ComputeAssetInfoFromIdentifier:\n"
+      "  assetInfo->identifier = '%s'\n"
+      "  assetInfo->resolvedPath = '%s'\n"
+      "  assetInfo->repoPath = '%s'\n"
+      "  assetInfo->assetName = '%s'\n"
+      "  assetInfo->version = '%s'\n",
+      assetInfo->identifier.c_str(),
+      assetInfo->resolvedPath.GetPathString().c_str(),
+      resolveInfo.repoPath.c_str(),
+      resolveInfo.assetName.c_str(),
+      resolveInfo.version.c_str());
 
   return assetInfo;
 }
 
-string Sdf_ComputeAnonLayerIdentifier(const string &identifierTemplate,
-                                      const SdfLayer *layer) {
+string Sdf_ComputeAnonLayerIdentifier(const string &identifierTemplate, const SdfLayer *layer)
+{
   TF_VERIFY(layer);
   return TfStringPrintf(identifierTemplate.c_str(), layer);
 }
 
-bool Sdf_IsAnonLayerIdentifier(const string &identifier) {
+bool Sdf_IsAnonLayerIdentifier(const string &identifier)
+{
   return TfStringStartsWith(identifier, _Tokens->AnonLayerPrefix.GetString());
 }
 
-string Sdf_GetAnonLayerDisplayName(const string &identifier) {
+string Sdf_GetAnonLayerDisplayName(const string &identifier)
+{
   // We want to find the second occurence of ':', traversing from the left,
   // in our identifier which is of the form anon:0x4rfs23:displayName
   auto fst = std::find(identifier.begin(), identifier.end(), ':');
@@ -213,7 +218,8 @@ string Sdf_GetAnonLayerDisplayName(const string &identifier) {
   return identifier.substr(std::distance(identifier.begin(), snd) + 1);
 }
 
-string Sdf_GetAnonLayerIdentifierTemplate(const string &tag) {
+string Sdf_GetAnonLayerIdentifierTemplate(const string &tag)
+{
   string idTag = tag.empty() ? tag : TfStringTrim(tag);
 
   // Ensure that URL-encoded characters are not misinterpreted as
@@ -221,17 +227,18 @@ string Sdf_GetAnonLayerIdentifierTemplate(const string &tag) {
   // See discussion in https://github.com/PixarAnimationStudios/USD/pull/2022
   idTag = TfStringReplace(idTag, "%", "%%");
 
-  return _Tokens->AnonLayerPrefix.GetString() + "%p" +
-         (idTag.empty() ? idTag : ":" + idTag);
+  return _Tokens->AnonLayerPrefix.GetString() + "%p" + (idTag.empty() ? idTag : ":" + idTag);
 }
 
-string Sdf_CreateIdentifier(const string &layerPath, const string &arguments) {
+string Sdf_CreateIdentifier(const string &layerPath, const string &arguments)
+{
   return layerPath + arguments;
 }
 
 // XXX: May need to escape characters in the arguments map
 // when encoding arguments and unescape then when decoding?
-static string Sdf_EncodeArguments(const SdfLayer::FileFormatArguments &args) {
+static string Sdf_EncodeArguments(const SdfLayer::FileFormatArguments &args)
+{
   const char *delimiter = _Tokens->ArgsDelimiter.GetText();
   string argString;
   for (const auto &entry : args) {
@@ -246,8 +253,8 @@ static string Sdf_EncodeArguments(const SdfLayer::FileFormatArguments &args) {
   return argString;
 }
 
-static bool Sdf_DecodeArguments(const string &argString,
-                                SdfLayer::FileFormatArguments *args) {
+static bool Sdf_DecodeArguments(const string &argString, SdfLayer::FileFormatArguments *args)
+{
   if (argString.empty() || argString.size() == _Tokens->ArgsDelimiter.size()) {
     args->clear();
     return true;
@@ -275,7 +282,8 @@ static bool Sdf_DecodeArguments(const string &argString,
     if (sepIdx == string::npos) {
       tmpArgs[key] = argString.substr(startIdx);
       break;
-    } else {
+    }
+    else {
       tmpArgs[key] = argString.substr(startIdx, sepIdx - startIdx);
       startIdx = sepIdx + 1;
     }
@@ -286,12 +294,14 @@ static bool Sdf_DecodeArguments(const string &argString,
 }
 
 string Sdf_CreateIdentifier(const string &layerPath,
-                            const SdfLayer::FileFormatArguments &arguments) {
+                            const SdfLayer::FileFormatArguments &arguments)
+{
   return layerPath + Sdf_EncodeArguments(arguments);
 }
 
 bool Sdf_StripIdentifierArgumentsIfPresent(const std::string &identifier,
-                                           std::string *strippedIdentifier) {
+                                           std::string *strippedIdentifier)
+{
   size_t argPos = identifier.find(_Tokens->ArgsDelimiter.GetString());
   if (argPos == string::npos) {
     return false;
@@ -301,8 +311,8 @@ bool Sdf_StripIdentifierArgumentsIfPresent(const std::string &identifier,
   return true;
 }
 
-bool Sdf_SplitIdentifier(const string &identifier, string *layerPath,
-                         string *arguments) {
+bool Sdf_SplitIdentifier(const string &identifier, string *layerPath, string *arguments)
+{
   size_t argPos = identifier.find(_Tokens->ArgsDelimiter.GetString());
   if (argPos == string::npos) {
     argPos = identifier.size();
@@ -313,8 +323,10 @@ bool Sdf_SplitIdentifier(const string &identifier, string *layerPath,
   return true;
 }
 
-bool Sdf_SplitIdentifier(const string &identifier, string *layerPath,
-                         SdfLayer::FileFormatArguments *args) {
+bool Sdf_SplitIdentifier(const string &identifier,
+                         string *layerPath,
+                         SdfLayer::FileFormatArguments *args)
+{
   string tmpLayerPath, tmpArgs;
   if (!Sdf_SplitIdentifier(identifier, &tmpLayerPath, &tmpArgs)) {
     return false;
@@ -328,11 +340,13 @@ bool Sdf_SplitIdentifier(const string &identifier, string *layerPath,
   return true;
 }
 
-bool Sdf_IdentifierContainsArguments(const string &identifier) {
+bool Sdf_IdentifierContainsArguments(const string &identifier)
+{
   return identifier.find(_Tokens->ArgsDelimiter.GetString()) != string::npos;
 }
 
-string Sdf_GetLayerDisplayName(const string &identifier) {
+string Sdf_GetLayerDisplayName(const string &identifier)
+{
 
   string layerPath, arguments;
   Sdf_SplitIdentifier(identifier, &layerPath, &arguments);
@@ -348,8 +362,7 @@ string Sdf_GetLayerDisplayName(const string &identifier) {
   // we want:
   //    "asset.package[sub/dir/file.sdf]".
   if (ArIsPackageRelativePath(layerPath)) {
-    std::pair<std::string, std::string> packagePath =
-        ArSplitPackageRelativePathOuter(layerPath);
+    std::pair<std::string, std::string> packagePath = ArSplitPackageRelativePathOuter(layerPath);
     packagePath.first = TfGetBaseName(packagePath.first);
     return ArJoinPackageRelativePath(packagePath);
   }
@@ -357,14 +370,14 @@ string Sdf_GetLayerDisplayName(const string &identifier) {
   return TfGetBaseName(layerPath);
 }
 
-string Sdf_GetExtension(const string &identifier) {
+string Sdf_GetExtension(const string &identifier)
+{
   // Split the identifier to get the layer asset path without
   // any file format arguments.
   string strippedPath;
-  const string &assetPath =
-      Sdf_StripIdentifierArgumentsIfPresent(identifier, &strippedPath)
-          ? strippedPath
-          : identifier;
+  const string &assetPath = Sdf_StripIdentifierArgumentsIfPresent(identifier, &strippedPath) ?
+                                strippedPath :
+                                identifier;
 
   if (Sdf_IsAnonLayerIdentifier(assetPath)) {
     // Strip off the "anon:0x...:" portion of the anonymous layer
@@ -386,13 +399,14 @@ string Sdf_GetExtension(const string &identifier) {
   return ArGetResolver().GetExtension(assetPath);
 }
 
-bool Sdf_IsPackageOrPackagedLayer(const SdfLayerHandle &layer) {
-  return Sdf_IsPackageOrPackagedLayer(layer->GetFileFormat(),
-                                      layer->GetIdentifier());
+bool Sdf_IsPackageOrPackagedLayer(const SdfLayerHandle &layer)
+{
+  return Sdf_IsPackageOrPackagedLayer(layer->GetFileFormat(), layer->GetIdentifier());
 }
 
 bool Sdf_IsPackageOrPackagedLayer(const SdfFileFormatConstPtr &fileFormat,
-                                  const std::string &identifier) {
+                                  const std::string &identifier)
+{
   return fileFormat->IsPackage() || ArIsPackageRelativePath(identifier);
 }
 

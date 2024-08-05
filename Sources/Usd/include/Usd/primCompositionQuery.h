@@ -51,7 +51,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// root node of the graph which represents any local opinions that may be
 /// defined for the prim in the root layer stack.
 class UsdPrimCompositionQueryArc {
-public:
+ public:
   ~UsdPrimCompositionQueryArc() = default;
 
   /// \name Target and Introducing Nodes
@@ -110,8 +110,7 @@ public:
   /// respect to this arc; all layers will still be considered in the arcs
   /// weaker than this arc).
   USD_API
-  UsdResolveTarget
-  MakeResolveTargetUpTo(const SdfLayerHandle &subLayer = nullptr) const;
+  UsdResolveTarget MakeResolveTargetUpTo(const SdfLayerHandle &subLayer = nullptr) const;
 
   /// Creates and returns a resolve target that, when passed to a
   /// UsdAttributeQuery for one of this prim's attributes, causes value
@@ -123,8 +122,7 @@ public:
   /// this arc but only if they are stronger than subLayer within this arc's
   /// layer stack.
   USD_API
-  UsdResolveTarget
-  MakeResolveTargetStrongerThan(const SdfLayerHandle &subLayer = nullptr) const;
+  UsdResolveTarget MakeResolveTargetStrongerThan(const SdfLayerHandle &subLayer = nullptr) const;
 
   /// @}
 
@@ -164,8 +162,7 @@ public:
   /// \ref PcpArcType "reference" and there are no errors; it returns false
   /// for all other arc types.
   USD_API
-  bool GetIntroducingListEditor(SdfReferenceEditorProxy *editor,
-                                SdfReference *ref) const;
+  bool GetIntroducingListEditor(SdfReferenceEditorProxy *editor, SdfReference *ref) const;
 
   /// Gets the list editor and authored SdfPayload value that introduces
   /// this arc to the composition graph for payload arcs. If this arc's
@@ -177,8 +174,7 @@ public:
   /// \ref PcpArcType "payload" and there are no errors; it returns false
   /// for all other arc types.
   USD_API
-  bool GetIntroducingListEditor(SdfPayloadEditorProxy *editor,
-                                SdfPayload *payload) const;
+  bool GetIntroducingListEditor(SdfPayloadEditorProxy *editor, SdfPayload *payload) const;
 
   /// Gets the list editor and authored SdfPath value that introduced
   /// this arc to the composition graph for class arcs. If this arc's
@@ -190,8 +186,7 @@ public:
   /// \ref PcpArcType "inherit" or \ref PcpArcType "specialize" and
   /// there are no errors; it returns false for all other arc types.
   USD_API
-  bool GetIntroducingListEditor(SdfPathEditorProxy *editor,
-                                SdfPath *path) const;
+  bool GetIntroducingListEditor(SdfPathEditorProxy *editor, SdfPath *path) const;
 
   /// Gets the list editor and authored string value that introduces
   /// this arc to the composition graph for variant arcs. If this arc's
@@ -203,8 +198,7 @@ public:
   /// \ref PcpArcType "variant" and there are no errors; it returns false
   /// for all other arc types.
   USD_API
-  bool GetIntroducingListEditor(SdfNameEditorProxy *editor,
-                                std::string *name) const;
+  bool GetIntroducingListEditor(SdfNameEditorProxy *editor, std::string *name) const;
 
   /// @}
 
@@ -249,7 +243,7 @@ public:
 
   /// @}
 
-private:
+ private:
   // These will only be created by a UsdPrimCompositionQuery itself.
   friend class UsdPrimCompositionQuery;
   UsdPrimCompositionQueryArc(const PcpNodeRef &node);
@@ -274,7 +268,7 @@ private:
 /// Failing to do so may result in incorrect values or crashes due to
 /// dereferencing invalid objects.
 class UsdPrimCompositionQuery {
-public:
+ public:
   /// Choices for filtering composition arcs based on arc type
   enum class ArcTypeFilter {
     All = 0,
@@ -344,16 +338,20 @@ public:
     /// Filters by whether the arc provides specs for the prim.
     HasSpecsFilter hasSpecsFilter{HasSpecsFilter::All};
 
-    Filter(){};
+    Filter() {};
 
-    bool operator==(const Filter &rhs) {
+    bool operator==(const Filter &rhs)
+    {
       return arcIntroducedFilter == rhs.arcIntroducedFilter &&
              arcTypeFilter == rhs.arcTypeFilter &&
              dependencyTypeFilter == rhs.dependencyTypeFilter &&
              hasSpecsFilter == rhs.hasSpecsFilter;
     };
 
-    bool operator!=(const Filter &rhs) { return !(*this == rhs); };
+    bool operator!=(const Filter &rhs)
+    {
+      return !(*this == rhs);
+    };
   };
 
   /// Returns a prim composition query for the given \p prim with a preset
@@ -393,7 +391,7 @@ public:
   USD_API
   std::vector<UsdPrimCompositionQueryArc> GetCompositionArcs();
 
-private:
+ private:
   UsdPrim _prim;
   Filter _filter;
   std::shared_ptr<PcpPrimIndex> _expandedPrimIndex;
@@ -402,4 +400,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PRIM_COMPOSITION_QUERY_H
+#endif  // PXR_USD_USD_PRIM_COMPOSITION_QUERY_H

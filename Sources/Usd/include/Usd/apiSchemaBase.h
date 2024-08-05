@@ -114,7 +114,7 @@ class SdfAssetPath;
 ///
 ///
 class UsdAPISchemaBase : public UsdSchemaBase {
-public:
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -124,14 +124,12 @@ public:
   /// Equivalent to UsdAPISchemaBase::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdAPISchemaBase(const UsdPrim &prim = UsdPrim())
-      : UsdSchemaBase(prim) {}
+  explicit UsdAPISchemaBase(const UsdPrim &prim = UsdPrim()) : UsdSchemaBase(prim) {}
 
   /// Construct a UsdAPISchemaBase on the prim held by \p schemaObj .
   /// Should be preferred over UsdAPISchemaBase(schemaObj.GetPrim()),
   /// as it preserves SchemaBase state.
-  explicit UsdAPISchemaBase(const UsdSchemaBase &schemaObj)
-      : UsdSchemaBase(schemaObj) {}
+  explicit UsdAPISchemaBase(const UsdSchemaBase &schemaObj) : UsdSchemaBase(schemaObj) {}
 
   /// Destructor.
   USD_API
@@ -141,17 +139,16 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USD_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USD_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USD_API
@@ -163,7 +160,7 @@ private:
   USD_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.
@@ -175,24 +172,30 @@ public:
   // ===================================================================== //
   // --(BEGIN CUSTOM CODE)--
 
-protected:
+ protected:
   /// Construct a multiple-apply UsdAPISchemaBase on UsdPrim \p prim with
   /// the specified \p instanceName.
   explicit UsdAPISchemaBase(const UsdPrim &prim, const TfToken &instanceName)
-      : UsdSchemaBase(prim), _instanceName(instanceName) {}
+      : UsdSchemaBase(prim), _instanceName(instanceName)
+  {
+  }
 
   /// Construct a multiple-apply UsdAPISchemaBase on the prim held by
   /// \p schemaObj with the given \p instanceName.
-  explicit UsdAPISchemaBase(const UsdSchemaBase &schemaObj,
-                            const TfToken &instanceName)
-      : UsdSchemaBase(schemaObj), _instanceName(instanceName) {}
+  explicit UsdAPISchemaBase(const UsdSchemaBase &schemaObj, const TfToken &instanceName)
+      : UsdSchemaBase(schemaObj), _instanceName(instanceName)
+  {
+  }
 
   /// Returns the instance name of the API schema object belonging to a
   /// multiple-apply API schema.
   ///
   /// The returned instance name will be empty for non-applied and
   /// single-apply API schemas.
-  const TfToken &_GetInstanceName() const { return _instanceName; }
+  const TfToken &_GetInstanceName() const
+  {
+    return _instanceName;
+  }
 
   /// Returns a vector of names of API schema objects belonging to a
   /// multiple-apply API schema applied to a given prim.
@@ -200,7 +203,7 @@ protected:
   static TfTokenVector _GetMultipleApplyInstanceNames(const UsdPrim &prim,
                                                       const TfType &schemaType);
 
-protected:
+ protected:
   /// Check whether this APISchema object is valid for the currently held
   /// prim.
   ///
@@ -216,7 +219,7 @@ protected:
   USD_API
   bool _IsCompatible() const override;
 
-private:
+ private:
   // The instance name associated with this schema object, if it is a
   // multiple-apply API schema. For example, in the case of UsdCollectionAPI,
   // this will hold the name of the collection.

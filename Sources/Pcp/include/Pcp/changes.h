@@ -51,7 +51,7 @@ class PcpSite;
 /// Types of changes per layer stack.
 ///
 class PcpLayerStackChanges {
-public:
+ public:
   /// Must rebuild the layer tree.  Implies didChangeLayerOffsets.
   bool didChangeLayers;
 
@@ -89,12 +89,16 @@ public:
   VtDictionary newExpressionVariables;
 
   PcpLayerStackChanges()
-      : didChangeLayers(false), didChangeLayerOffsets(false),
-        didChangeRelocates(false), didChangeExpressionVariables(false),
+      : didChangeLayers(false),
+        didChangeLayerOffsets(false),
+        didChangeRelocates(false),
+        didChangeExpressionVariables(false),
         didChangeSignificantly(false),
-        _didChangeExpressionVariablesSource(false) {}
+        _didChangeExpressionVariablesSource(false)
+  {
+  }
 
-private:
+ private:
   friend class PcpChanges;
   friend class PcpLayerStack;
 
@@ -110,11 +114,8 @@ private:
 /// Types of changes per cache.
 ///
 class PcpCacheChanges {
-public:
-  enum TargetType {
-    TargetTypeConnection = 1 << 0,
-    TargetTypeRelationshipTarget = 1 << 1
-  };
+ public:
+  enum TargetType { TargetTypeConnection = 1 << 0, TargetTypeRelationshipTarget = 1 << 1 };
 
   /// Must rebuild the indexes at and below each path.  This
   /// implies rebuilding the prim/property stacks at
@@ -140,7 +141,7 @@ public:
   /// Layers used in the composition may have changed.
   bool didMaybeChangeLayers = false;
 
-private:
+ private:
   friend class PcpCache;
   friend class PcpChanges;
 
@@ -154,7 +155,7 @@ private:
 /// Structure used to temporarily retain layers and layerStacks within
 /// a code block.  Analogous to the autorelease pool in obj-c.
 class PcpLifeboat {
-public:
+ public:
   PcpLifeboat();
   ~PcpLifeboat();
 
@@ -171,7 +172,7 @@ public:
   /// Swap the contents of this and \p other.
   void Swap(PcpLifeboat &other);
 
-private:
+ private:
   std::set<SdfLayerRefPtr> _layers;
   std::set<PcpLayerStackRefPtr> _layerStacks;
 };
@@ -186,7 +187,7 @@ private:
 /// changes.
 ///
 class PcpChanges {
-public:
+ public:
   PCP_API PcpChanges();
   PCP_API ~PcpChanges();
 
@@ -205,13 +206,15 @@ public:
   /// and all prims in \p cache using any prim in any of those layer stacks
   /// are marked as changed.
   PCP_API
-  void DidMaybeFixSublayer(const PcpCache *cache, const SdfLayerHandle &layer,
+  void DidMaybeFixSublayer(const PcpCache *cache,
+                           const SdfLayerHandle &layer,
                            const std::string &assetPath);
 
   /// Tries to load the asset at \p assetPath.  If successful, any prim
   /// in \p cache using the site \p site is marked as changed.
   PCP_API
-  void DidMaybeFixAsset(const PcpCache *cache, const PcpSite &site,
+  void DidMaybeFixAsset(const PcpCache *cache,
+                        const PcpSite &site,
                         const SdfLayerHandle &srcLayer,
                         const std::string &assetPath);
 
@@ -247,7 +250,8 @@ public:
   /// any change requires rebuilding the property stack.  It implies that
   /// dependencies on those specs has changed.
   PCP_API
-  void DidChangeSpecs(const PcpCache *cache, const SdfPath &path,
+  void DidChangeSpecs(const PcpCache *cache,
+                      const SdfPath &path,
                       const SdfLayerHandle &changedLayer,
                       const SdfPath &changedPath);
 
@@ -259,7 +263,8 @@ public:
   /// The connections on the attribute or targets on the relationship have
   /// changed.
   PCP_API
-  void DidChangeTargets(const PcpCache *cache, const SdfPath &path,
+  void DidChangeTargets(const PcpCache *cache,
+                        const SdfPath &path,
                         PcpCacheChanges::TargetType targetType);
 
   /// The relocates that affect prims and properties at and below
@@ -273,8 +278,7 @@ public:
   /// that are not so subsumed will be converted to DidChangePrimGraph()
   /// and/or DidChangeSpecs() changes.
   PCP_API
-  void DidChangePaths(const PcpCache *cache, const SdfPath &oldPath,
-                      const SdfPath &newPath);
+  void DidChangePaths(const PcpCache *cache, const SdfPath &oldPath, const SdfPath &newPath);
 
   /// Remove any changes for \p cache.
   PCP_API
@@ -318,7 +322,7 @@ public:
   PCP_API
   void Apply() const;
 
-private:
+ private:
   // Internal data types for namespace edits from Sd.
   typedef std::map<SdfPath, SdfPath> _PathEditMap;
   typedef std::map<PcpCache *, _PathEditMap> _RenameChanges;
@@ -345,7 +349,8 @@ private:
   void _Optimize(PcpCacheChanges *);
 
   // Optimize path changes.
-  void _OptimizePathChanges(const PcpCache *cache, PcpCacheChanges *changes,
+  void _OptimizePathChanges(const PcpCache *cache,
+                            PcpCacheChanges *changes,
                             const _PathEditMap *pathChanges);
 
   // Sublayer change type for _DidChangeSublayer.
@@ -381,7 +386,8 @@ private:
                           const std::string &sublayerPath,
                           const SdfLayerHandle &sublayer,
                           _SublayerChangeType sublayerChange,
-                          std::string *debugSummary, bool *significant);
+                          std::string *debugSummary,
+                          bool *significant);
 
   // Propagates changes due to the addition/removal of the sublayer
   // at the given \p sublayerPath to/from the parent \p layer.
@@ -418,17 +424,16 @@ private:
   // Register changes to layer stacks and prim indexes in \p cache that are
   // affected by a change to a layer's expression variables used by
   // \p layerStack.
-  void
-  _DidChangeLayerStackExpressionVariables(const PcpCache *cache,
-                                          const PcpLayerStackPtr &layerStack,
-                                          std::string *debugSummary);
+  void _DidChangeLayerStackExpressionVariables(const PcpCache *cache,
+                                               const PcpLayerStackPtr &layerStack,
+                                               std::string *debugSummary);
 
   // The spec stack for the prim or property index at \p path must be
   // recomputed due to a change that affects only the internal representation
   // of the stack and not its contents.
   void _DidChangeSpecStackInternal(const PcpCache *cache, const SdfPath &path);
 
-private:
+ private:
   LayerStackChanges _layerStackChanges;
   CacheChanges _cacheChanges;
   _RenameChanges _renameChanges;
@@ -437,4 +442,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_CHANGES_H
+#endif  // PXR_USD_PCP_CHANGES_H

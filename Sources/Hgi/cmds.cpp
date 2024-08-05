@@ -25,10 +25,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiCmds::HgiCmds()
-    : _submitted(false)
-{
-}
+HgiCmds::HgiCmds() : _submitted(false) {}
 
 HgiCmds::~HgiCmds() = default;
 

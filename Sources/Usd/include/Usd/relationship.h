@@ -125,7 +125,7 @@ typedef std::vector<UsdRelationship> UsdRelationshipVector;
 ///     which may vary depending on the model's configured VariantSets.
 ///
 class UsdRelationship : public UsdProperty {
-public:
+ public:
   /// Construct an invalid relationship.
   UsdRelationship() : UsdProperty(_Null<UsdRelationship>()) {}
 
@@ -149,9 +149,8 @@ public:
   /// authored in the authoring layer, with respect to list-editing
   /// semantics, which we will document soon
   USD_API
-  bool
-  AddTarget(const SdfPath &target,
-            UsdListPosition position = UsdListPositionBackOfPrependList) const;
+  bool AddTarget(const SdfPath &target,
+                 UsdListPosition position = UsdListPositionBackOfPrependList) const;
 
   /// Removes \p target from the list of targets.
   ///
@@ -240,34 +239,41 @@ public:
 
   /// @}
 
-private:
+ private:
   friend class UsdObject;
   friend class UsdPrim;
   friend class Usd_PrimData;
-  template <class A0, class A1> friend struct UsdPrim_TargetFinder;
+  template<class A0, class A1> friend struct UsdPrim_TargetFinder;
 
-  UsdRelationship(const Usd_PrimDataHandle &prim, const SdfPath &proxyPrimPath,
+  UsdRelationship(const Usd_PrimDataHandle &prim,
+                  const SdfPath &proxyPrimPath,
                   const TfToken &relName)
-      : UsdProperty(UsdTypeRelationship, prim, proxyPrimPath, relName) {}
+      : UsdProperty(UsdTypeRelationship, prim, proxyPrimPath, relName)
+  {
+  }
 
-  UsdRelationship(UsdObjType objType, const Usd_PrimDataHandle &prim,
-                  const SdfPath &proxyPrimPath, const TfToken &propName)
-      : UsdProperty(objType, prim, proxyPrimPath, propName) {}
+  UsdRelationship(UsdObjType objType,
+                  const Usd_PrimDataHandle &prim,
+                  const SdfPath &proxyPrimPath,
+                  const TfToken &propName)
+      : UsdProperty(objType, prim, proxyPrimPath, propName)
+  {
+  }
 
   SdfRelationshipSpecHandle _CreateSpec(bool fallbackCustom = true) const;
   bool _Create(bool fallbackCustom) const;
 
-  bool _GetForwardedTargets(SdfPathVector *targets,
-                            bool includeForwardingRels) const;
+  bool _GetForwardedTargets(SdfPathVector *targets, bool includeForwardingRels) const;
 
-  bool _GetForwardedTargetsImpl(SdfPathSet *visited, SdfPathSet *uniqueTargets,
-                                SdfPathVector *targets, bool *foundAnyErrors,
+  bool _GetForwardedTargetsImpl(SdfPathSet *visited,
+                                SdfPathSet *uniqueTargets,
+                                SdfPathVector *targets,
+                                bool *foundAnyErrors,
                                 bool includeForwardingRels) const;
 
-  SdfPath _GetTargetForAuthoring(const SdfPath &targetPath,
-                                 std::string *whyNot = 0) const;
+  SdfPath _GetTargetForAuthoring(const SdfPath &targetPath, std::string *whyNot = 0) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RELATIONSHIP_H
+#endif  // PXR_USD_USD_RELATIONSHIP_H

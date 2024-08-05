@@ -25,35 +25,23 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiShaderProgram::HgiShaderProgram(HgiShaderProgramDesc const &desc)
-    : _descriptor(desc)
-{
-}
+HgiShaderProgram::HgiShaderProgram(HgiShaderProgramDesc const &desc) : _descriptor(desc) {}
 
 HgiShaderProgram::~HgiShaderProgram() = default;
 
-HgiShaderProgramDesc const &
-HgiShaderProgram::GetDescriptor() const
+HgiShaderProgramDesc const &HgiShaderProgram::GetDescriptor() const
 {
   return _descriptor;
 }
 
-HgiShaderProgramDesc::HgiShaderProgramDesc()
-    : shaderFunctions(HgiShaderFunctionHandleVector())
+HgiShaderProgramDesc::HgiShaderProgramDesc() : shaderFunctions(HgiShaderFunctionHandleVector()) {}
+
+bool operator==(const HgiShaderProgramDesc &lhs, const HgiShaderProgramDesc &rhs)
 {
+  return lhs.debugName == rhs.debugName && lhs.shaderFunctions == rhs.shaderFunctions;
 }
 
-bool operator==(
-    const HgiShaderProgramDesc &lhs,
-    const HgiShaderProgramDesc &rhs)
-{
-  return lhs.debugName == rhs.debugName &&
-         lhs.shaderFunctions == rhs.shaderFunctions;
-}
-
-bool operator!=(
-    const HgiShaderProgramDesc &lhs,
-    const HgiShaderProgramDesc &rhs)
+bool operator!=(const HgiShaderProgramDesc &lhs, const HgiShaderProgramDesc &rhs)
 {
   return !(lhs == rhs);
 }

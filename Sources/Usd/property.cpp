@@ -29,90 +29,104 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SdfPropertySpecHandleVector
-UsdProperty::GetPropertyStack(UsdTimeCode time) const {
+SdfPropertySpecHandleVector UsdProperty::GetPropertyStack(UsdTimeCode time) const
+{
   return _GetStage()->_GetPropertyStack(*this, time);
 }
 
-std::vector<std::pair<SdfPropertySpecHandle, SdfLayerOffset>>
-UsdProperty::GetPropertyStackWithLayerOffsets(UsdTimeCode time) const {
+std::vector<std::pair<SdfPropertySpecHandle, SdfLayerOffset>> UsdProperty::
+    GetPropertyStackWithLayerOffsets(UsdTimeCode time) const
+{
   return _GetStage()->_GetPropertyStackWithLayerOffsets(*this, time);
 }
 
-TfToken UsdProperty::GetBaseName() const {
+TfToken UsdProperty::GetBaseName() const
+{
   std::string const &fullName = _PropName().GetString();
   size_t delim = fullName.rfind(GetNamespaceDelimiter());
 
   if (!TF_VERIFY(delim != fullName.size() - 1))
     return TfToken();
 
-  return ((delim == std::string::npos) ? _PropName()
-                                       : TfToken(fullName.c_str() + delim + 1));
+  return ((delim == std::string::npos) ? _PropName() : TfToken(fullName.c_str() + delim + 1));
 }
 
-TfToken UsdProperty::GetNamespace() const {
+TfToken UsdProperty::GetNamespace() const
+{
   std::string const &fullName = _PropName().GetString();
   size_t delim = fullName.rfind(GetNamespaceDelimiter());
 
   if (!TF_VERIFY(delim != fullName.size() - 1))
     return TfToken();
 
-  return ((delim == std::string::npos) ? TfToken()
-                                       : TfToken(fullName.substr(0, delim)));
+  return ((delim == std::string::npos) ? TfToken() : TfToken(fullName.substr(0, delim)));
 }
 
-std::vector<std::string> UsdProperty::SplitName() const {
+std::vector<std::string> UsdProperty::SplitName() const
+{
   return SdfPath::TokenizeIdentifier(_PropName());
 }
 
-std::string UsdProperty::GetDisplayGroup() const {
+std::string UsdProperty::GetDisplayGroup() const
+{
   std::string result;
   GetMetadata(SdfFieldKeys->DisplayGroup, &result);
   return result;
 }
 
-bool UsdProperty::SetDisplayGroup(const std::string &displayGroup) const {
+bool UsdProperty::SetDisplayGroup(const std::string &displayGroup) const
+{
   return SetMetadata(SdfFieldKeys->DisplayGroup, displayGroup);
 }
 
-bool UsdProperty::ClearDisplayGroup() const {
+bool UsdProperty::ClearDisplayGroup() const
+{
   return ClearMetadata(SdfFieldKeys->DisplayGroup);
 }
 
-bool UsdProperty::HasAuthoredDisplayGroup() const {
+bool UsdProperty::HasAuthoredDisplayGroup() const
+{
   return HasAuthoredMetadata(SdfFieldKeys->DisplayGroup);
 }
 
-std::vector<std::string> UsdProperty::GetNestedDisplayGroups() const {
+std::vector<std::string> UsdProperty::GetNestedDisplayGroups() const
+{
   return TfStringTokenize(GetDisplayGroup(), ":");
 }
 
-bool UsdProperty::SetNestedDisplayGroups(
-    const std::vector<std::string> &nestedGroups) const {
+bool UsdProperty::SetNestedDisplayGroups(const std::vector<std::string> &nestedGroups) const
+{
   return SetDisplayGroup(SdfPath::JoinIdentifier(nestedGroups));
 }
 
-bool UsdProperty::IsCustom() const { return _GetStage()->_IsCustom(*this); }
+bool UsdProperty::IsCustom() const
+{
+  return _GetStage()->_IsCustom(*this);
+}
 
-bool UsdProperty::SetCustom(bool isCustom) const {
+bool UsdProperty::SetCustom(bool isCustom) const
+{
   return SetMetadata(SdfFieldKeys->Custom, isCustom);
 }
 
-bool UsdProperty::IsDefined() const { return IsValid(); }
+bool UsdProperty::IsDefined() const
+{
+  return IsValid();
+}
 
-bool UsdProperty::IsAuthored() const {
+bool UsdProperty::IsAuthored() const
+{
   // Look for the strongest authored property spec.
-  for (Usd_Resolver res(&GetPrim().GetPrimIndex()); res.IsValid();
-       res.NextLayer()) {
-    if (res.GetLayer()->HasSpec(
-            res.GetLocalPath().AppendProperty(_PropName()))) {
+  for (Usd_Resolver res(&GetPrim().GetPrimIndex()); res.IsValid(); res.NextLayer()) {
+    if (res.GetLayer()->HasSpec(res.GetLocalPath().AppendProperty(_PropName()))) {
       return true;
     }
   }
   return false;
 }
 
-bool UsdProperty::IsAuthoredAt(const UsdEditTarget &editTarget) const {
+bool UsdProperty::IsAuthoredAt(const UsdEditTarget &editTarget) const
+{
   if (editTarget.IsValid()) {
     SdfPath mappedPath = editTarget.MapToSpecPath(GetPath());
     return !mappedPath.IsEmpty() && editTarget.GetLayer()->HasSpec(mappedPath);
@@ -120,25 +134,27 @@ bool UsdProperty::IsAuthoredAt(const UsdEditTarget &editTarget) const {
   return false;
 }
 
-UsdProperty UsdProperty::FlattenTo(const UsdPrim &parent) const {
+UsdProperty UsdProperty::FlattenTo(const UsdPrim &parent) const
+{
   return _GetStage()->_FlattenProperty(*this, parent, GetName());
 }
 
-UsdProperty UsdProperty::FlattenTo(const UsdPrim &parent,
-                                   const TfToken &propName) const {
+UsdProperty UsdProperty::FlattenTo(const UsdPrim &parent, const TfToken &propName) const
+{
   return _GetStage()->_FlattenProperty(*this, parent, propName);
 }
 
-UsdProperty UsdProperty::FlattenTo(const UsdProperty &property) const {
-  return _GetStage()->_FlattenProperty(*this, property.GetPrim(),
-                                       property.GetName());
+UsdProperty UsdProperty::FlattenTo(const UsdProperty &property) const
+{
+  return _GetStage()->_FlattenProperty(*this, property.GetPrim(), property.GetName());
 }
 
 // Map from path to replacement for remapping target paths during flattening.
 using _PathMap = std::vector<std::pair<SdfPath, SdfPath>>;
 
 // Apply path remappings to a list of target paths.
-static SdfPath _MapPath(_PathMap const &map, SdfPath const &path) {
+static SdfPath _MapPath(_PathMap const &map, SdfPath const &path)
+{
   if (map.empty()) {
     return path;
   }
@@ -150,10 +166,9 @@ static SdfPath _MapPath(_PathMap const &map, SdfPath const &path) {
   return path;
 }
 
-bool UsdProperty::_GetTargets(SdfSpecType specType, SdfPathVector *out,
-                              bool *foundErrors) const {
-  if (!TF_VERIFY(specType == SdfSpecTypeAttribute ||
-                 specType == SdfSpecTypeRelationship)) {
+bool UsdProperty::_GetTargets(SdfSpecType specType, SdfPathVector *out, bool *foundErrors) const
+{
+  if (!TF_VERIFY(specType == SdfSpecTypeAttribute || specType == SdfSpecTypeRelationship)) {
     return false;
   }
 
@@ -175,10 +190,8 @@ bool UsdProperty::_GetTargets(SdfSpecType specType, SdfPathVector *out,
     // composition/indexing, though, so the added expense may be neglible.
     const PcpSite propSite(pcpCache.GetLayerStackIdentifier(), GetPath());
     PcpPropertyIndex propIndex;
-    PcpBuildPrimPropertyIndex(propSite.path, pcpCache, primIndex, &propIndex,
-                              &pcpErrors);
-    PcpBuildTargetIndex(propSite, propIndex, specType, &targetIndex,
-                        &pcpErrors);
+    PcpBuildPrimPropertyIndex(propSite.path, pcpCache, primIndex, &propIndex, &pcpErrors);
+    PcpBuildTargetIndex(propSite, propIndex, specType, &targetIndex, &pcpErrors);
   }
 
   if (!targetIndex.paths.empty() && _Prim()->IsInPrototype()) {
@@ -201,12 +214,12 @@ bool UsdProperty::_GetTargets(SdfSpecType specType, SdfPathVector *out,
       UsdPrim prototype;
       if (prim.IsInstance()) {
         prototype = prim.GetPrototype();
-      } else if (prim.IsPrototype()) {
+      }
+      else if (prim.IsPrototype()) {
         prototype = prim;
       }
       if (prototype) {
-        pathMap.emplace_back(prototype._GetSourcePrimIndex().GetPath(),
-                             prim.GetPath());
+        pathMap.emplace_back(prototype._GetSourcePrimIndex().GetPath(), prim.GetPath());
       }
     };
     std::sort(pathMap.begin(), pathMap.end());
@@ -218,18 +231,19 @@ bool UsdProperty::_GetTargets(SdfSpecType specType, SdfPathVector *out,
         out->pop_back();
       }
     }
-  } else {
+  }
+  else {
     out->swap(targetIndex.paths);
   }
 
   // TODO: handle errors
   const bool isClean = pcpErrors.empty();
   if (!isClean) {
-    stage->_ReportPcpErrors(
-        pcpErrors, TfStringPrintf(specType == SdfSpecTypeAttribute
-                                      ? "getting connections for attribute <%s>"
-                                      : "getting targets for relationship <%s>",
-                                  GetPath().GetText()));
+    stage->_ReportPcpErrors(pcpErrors,
+                            TfStringPrintf(specType == SdfSpecTypeAttribute ?
+                                               "getting connections for attribute <%s>" :
+                                               "getting targets for relationship <%s>",
+                                           GetPath().GetText()));
     if (foundErrors) {
       *foundErrors = true;
     }

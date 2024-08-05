@@ -8,4 +8,4 @@
 #include <UsdUI/sceneGraphPrimAPI.h>
 #include <UsdUI/tokens.h>
 
-#endif // __PXR_USD_USDUI_H__
+#endif  // __PXR_USD_USDUI_H__

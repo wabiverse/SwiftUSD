@@ -24,15 +24,15 @@
 #ifndef PXR_USD_USD_MASS_PROPERTIES_H
 #define PXR_USD_USD_MASS_PROPERTIES_H
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
 #include "Usd/common.h"
+#include "UsdPhysics/api.h"
+#include <pxr/pxrns.h>
 
-#include "Gf/vec3f.h"
-#include "Gf/quatf.h"
-#include "Gf/rotation.h"
 #include "Gf/matrix3f.h"
 #include "Gf/matrix4f.h"
+#include "Gf/quatf.h"
+#include "Gf/rotation.h"
+#include "Gf/vec3f.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -55,33 +55,35 @@ GfVec3f UsdPhysicsDiagonalize(const GfMatrix3f &m, GfQuatf &massFrame)
   GfQuatf q = GfQuatf(1.0);
 
   GfMatrix3f d;
-  for (uint32_t i = 0; i < MAX_ITERS; i++)
-  {
+  for (uint32_t i = 0; i < MAX_ITERS; i++) {
     GfMatrix3f axes(q);
     d = axes * m * axes.GetTranspose();
 
     float d0 = fabs(d[1][2]), d1 = fabs(d[0][2]), d2 = fabs(d[0][1]);
-    uint32_t a = uint32_t(d0 > d1 && d0 > d2 ? 0 : d1 > d2 ? 1
-                                                           : 2); // rotation axis index, from largest
-                                                                 // off-diagonal
-                                                                 // element
+    uint32_t a = uint32_t(d0 > d1 && d0 > d2 ? 0 :
+                          d1 > d2            ? 1 :
+                                               2);  // rotation axis index, from largest
+                                         // off-diagonal
+                                         // element
 
     uint32_t a1 = UsdPhysicsGetNextIndex3(a), a2 = UsdPhysicsGetNextIndex3(a1);
     if (d[a1][a2] == 0.0f || fabs(d[a1][a1] - d[a2][a2]) > 2e6 * fabs(2.0 * d[a1][a2]))
       break;
 
-    float w = (d[a1][a1] - d[a2][a2]) / (2.0f * d[a1][a2]); // cot(2 * phi), where phi is the rotation angle
+    float w = (d[a1][a1] - d[a2][a2]) /
+              (2.0f * d[a1][a2]);  // cot(2 * phi), where phi is the rotation angle
     float absw = fabs(w);
 
     GfQuatf r;
     if (absw > 1000)
-      r = UsdPhysicsIndexedRotation(a, 1 / (4 * w), 1.0f); // h will be very close to 1, so use small angle approx instead
-    else
-    {
-      float t = 1 / (absw + sqrt(w * w + 1)); // absolute value of tan phi
-      float h = 1 / sqrt(t * t + 1);          // absolute value of cos phi
+      r = UsdPhysicsIndexedRotation(
+          a, 1 / (4 * w), 1.0f);  // h will be very close to 1, so use small angle approx instead
+    else {
+      float t = 1 / (absw + sqrt(w * w + 1));  // absolute value of tan phi
+      float h = 1 / sqrt(t * t + 1);           // absolute value of cos phi
 
-      r = UsdPhysicsIndexedRotation(a, sqrt((1 - h) / 2) * ((w >= 0.0f) ? 1.0f : -1.0f), sqrt((1 + h) / 2));
+      r = UsdPhysicsIndexedRotation(
+          a, sqrt((1 - h) / 2) * ((w >= 0.0f) ? 1.0f : -1.0f), sqrt((1 + h) / 2));
     }
 
     q = (q * r).GetNormalized();
@@ -100,11 +102,11 @@ GfVec3f UsdPhysicsDiagonalize(const GfMatrix3f &m, GfQuatf &massFrame)
 /// Mass properties computation class. Used to combine together individual mass
 /// properties and produce final one.
 ///
-class UsdPhysicsMassProperties
-{
-public:
+class UsdPhysicsMassProperties {
+ public:
   /// Construct a MassProperties
-  USDPHYSICS_API UsdPhysicsMassProperties() : _inertiaTensor(0.0f), _centerOfMass(0.0f), _mass(1.0f)
+  USDPHYSICS_API UsdPhysicsMassProperties()
+      : _inertiaTensor(0.0f), _centerOfMass(0.0f), _mass(1.0f)
   {
     _inertiaTensor[0][0] = 1.0;
     _inertiaTensor[1][1] = 1.0;
@@ -112,7 +114,9 @@ public:
   }
 
   /// Construct from individual elements.
-  USDPHYSICS_API UsdPhysicsMassProperties(const float m, const GfMatrix3f &inertiaT, const GfVec3f &com)
+  USDPHYSICS_API UsdPhysicsMassProperties(const float m,
+                                          const GfMatrix3f &inertiaT,
+                                          const GfVec3f &com)
       : _inertiaTensor(inertiaT), _centerOfMass(com), _mass(m)
   {
   }
@@ -149,7 +153,9 @@ public:
   /// \p mass The mass of the object.
   /// \p t The relative frame to translate the inertia tensor to.
   /// \return The translated inertia tensor.
-  USDPHYSICS_API static GfMatrix3f TranslateInertia(const GfMatrix3f &inertia, const float mass, const GfVec3f &t)
+  USDPHYSICS_API static GfMatrix3f TranslateInertia(const GfMatrix3f &inertia,
+                                                    const float mass,
+                                                    const GfVec3f &t)
   {
     GfMatrix3f s;
     s.SetColumn(0, GfVec3f(0, t[2], -t[1]));
@@ -176,14 +182,15 @@ public:
   /// \p transforms Reference transforms for each mass properties entry.
   /// \p count The number of mass properties to sum up.
   /// \return The summed up mass properties.
-  USDPHYSICS_API static UsdPhysicsMassProperties Sum(const UsdPhysicsMassProperties *props, const GfMatrix4f *transforms, const uint32_t count)
+  USDPHYSICS_API static UsdPhysicsMassProperties Sum(const UsdPhysicsMassProperties *props,
+                                                     const GfMatrix4f *transforms,
+                                                     const uint32_t count)
   {
     float combinedMass = 0.0f;
     GfVec3f combinedCoM(0.0f);
     GfMatrix3f combinedInertiaT = GfMatrix3f(0.0f);
 
-    for (uint32_t i = 0; i < count; i++)
-    {
+    for (uint32_t i = 0; i < count; i++) {
       combinedMass += props[i]._mass;
       const GfVec3f comTm = transforms[i].Transform(props[i]._centerOfMass);
       combinedCoM += comTm * props[i]._mass;
@@ -192,12 +199,13 @@ public:
     if (combinedMass > 0.f)
       combinedCoM /= combinedMass;
 
-    for (uint32_t i = 0; i < count; i++)
-    {
+    for (uint32_t i = 0; i < count; i++) {
       const GfVec3f comTm = transforms[i].Transform(props[i]._centerOfMass);
       combinedInertiaT += TranslateInertia(
-          RotateInertia(props[i]._inertiaTensor, GfQuatf(transforms[i].ExtractRotation().GetQuat())),
-          props[i]._mass, combinedCoM - comTm);
+          RotateInertia(props[i]._inertiaTensor,
+                        GfQuatf(transforms[i].ExtractRotation().GetQuat())),
+          props[i]._mass,
+          combinedCoM - comTm);
     }
 
     return UsdPhysicsMassProperties(combinedMass, combinedInertiaT, combinedCoM);
@@ -238,10 +246,10 @@ public:
     _mass = inMass;
   }
 
-private:
-  GfMatrix3f _inertiaTensor; //!< The inertia tensor of the object.
-  GfVec3f _centerOfMass;     //!< The center of mass of the object.
-  float _mass;               //!< The mass of the object.
+ private:
+  GfMatrix3f _inertiaTensor;  //!< The inertia tensor of the object.
+  GfVec3f _centerOfMass;      //!< The center of mass of the object.
+  float _mass;                //!< The mass of the object.
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

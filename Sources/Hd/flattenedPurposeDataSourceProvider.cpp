@@ -23,41 +23,37 @@
 //
 #include "Hd/flattenedPurposeDataSourceProvider.h"
 
-#include "Hd/retainedDataSource.h"
 #include "Hd/purposeSchema.h"
+#include "Hd/retainedDataSource.h"
 #include "Hd/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle
-HdFlattenedPurposeDataSourceProvider::GetFlattenedDataSource(
+HdContainerDataSourceHandle HdFlattenedPurposeDataSourceProvider::GetFlattenedDataSource(
     const Context &ctx) const
 {
-    HdPurposeSchema inputPurpose(ctx.GetInputDataSource());
-    if (inputPurpose.GetPurpose()) {
-        return inputPurpose.GetContainer();
-    }
+  HdPurposeSchema inputPurpose(ctx.GetInputDataSource());
+  if (inputPurpose.GetPurpose()) {
+    return inputPurpose.GetContainer();
+  }
 
-    HdPurposeSchema parentPurpose(ctx.GetFlattenedDataSourceFromParentPrim());
-    if (parentPurpose.GetPurpose()) {
-        return parentPurpose.GetContainer();
-    }
+  HdPurposeSchema parentPurpose(ctx.GetFlattenedDataSourceFromParentPrim());
+  if (parentPurpose.GetPurpose()) {
+    return parentPurpose.GetContainer();
+  }
 
-    static const HdContainerDataSourceHandle identityPurpose =
-        HdPurposeSchema::Builder()
-            .SetPurpose(
-                HdRetainedTypedSampledDataSource<TfToken>::New(
-                    HdRenderTagTokens->geometry))
-            .Build();
+  static const HdContainerDataSourceHandle identityPurpose =
+      HdPurposeSchema::Builder()
+          .SetPurpose(HdRetainedTypedSampledDataSource<TfToken>::New(HdRenderTagTokens->geometry))
+          .Build();
 
-    return identityPurpose;
+  return identityPurpose;
 }
 
-void
-HdFlattenedPurposeDataSourceProvider::ComputeDirtyLocatorsForDescendants(
-    HdDataSourceLocatorSet * const locators) const
+void HdFlattenedPurposeDataSourceProvider::ComputeDirtyLocatorsForDescendants(
+    HdDataSourceLocatorSet *const locators) const
 {
-    *locators = HdDataSourceLocatorSet::UniversalSet();
+  *locators = HdDataSourceLocatorSet::UniversalSet();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

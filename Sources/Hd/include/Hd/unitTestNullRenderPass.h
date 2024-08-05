@@ -27,8 +27,8 @@
 #include <pxr/pxrns.h>
 
 #include "Hd/api.h"
-#include "Hd/version.h"
 #include "Hd/renderPass.h"
+#include "Hd/version.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,19 +36,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \class Hd_UnitTestNullRenderPass
 /// Implements the sync part of the render pass, but not the draw part, for
 /// core hydra unit tests.
-class Hd_UnitTestNullRenderPass : public HdRenderPass
-{
-public:
-    Hd_UnitTestNullRenderPass(HdRenderIndex *index,
-                              HdRprimCollection const &collection)
-        : HdRenderPass(index, collection)
-        {}
-    virtual ~Hd_UnitTestNullRenderPass() {}
+class Hd_UnitTestNullRenderPass : public HdRenderPass {
+ public:
+  Hd_UnitTestNullRenderPass(HdRenderIndex *index, HdRprimCollection const &collection)
+      : HdRenderPass(index, collection)
+  {
+  }
+  virtual ~Hd_UnitTestNullRenderPass() {}
 
-    void _Execute(HdRenderPassStateSharedPtr const &renderPassState,
-                  TfTokenVector const &renderTags) override {}
+  void _Execute(HdRenderPassStateSharedPtr const &renderPassState,
+                TfTokenVector const &renderTags) override
+  {
+  }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_PASS_H
+#endif  // PXR_IMAGING_HD_UNIT_TEST_NULL_RENDER_PASS_H

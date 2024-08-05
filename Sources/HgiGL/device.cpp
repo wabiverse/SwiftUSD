@@ -35,34 +35,26 @@ HgiGLDevice::HgiGLDevice()
   HgiGLSetupGL4Debug();
 }
 
-HgiGLDevice::~HgiGLDevice()
-{
-}
+HgiGLDevice::~HgiGLDevice() {}
 
 void HgiGLDevice::SubmitOps(HgiGLOpsVector const &ops)
 {
-  for (HgiGLOpsFn const &f : ops)
-  {
+  for (HgiGLOpsFn const &f : ops) {
     f();
   }
 }
 
 void HgiGLDevice::SetCurrentArena(HgiGLContextArenaHandle const &arena)
 {
-  if (arena)
-  {
+  if (arena) {
     _activeArena = arena.Get();
   }
-  else
-  {
+  else {
     _activeArena = &_defaultArena;
   }
 }
 
-uint32_t
-HgiGLDevice::AcquireFramebuffer(
-    HgiGraphicsCmdsDesc const &desc,
-    bool resolved)
+uint32_t HgiGLDevice::AcquireFramebuffer(HgiGraphicsCmdsDesc const &desc, bool resolved)
 {
   return _GetArena()->_AcquireFramebuffer(desc, resolved);
 }
@@ -72,20 +64,16 @@ void HgiGLDevice::GarbageCollect()
   return _GetArena()->_GarbageCollect();
 }
 
-HgiGLContextArena const *
-HgiGLDevice::_GetArena() const
+HgiGLContextArena const *HgiGLDevice::_GetArena() const
 {
   return _activeArena;
 }
-HgiGLContextArena *
-HgiGLDevice::_GetArena()
+HgiGLContextArena *HgiGLDevice::_GetArena()
 {
   return _activeArena;
 }
 
-std::ofstream &operator<<(
-    std::ofstream &out,
-    const HgiGLDevice &dev)
+std::ofstream &operator<<(std::ofstream &out, const HgiGLDevice &dev)
 {
   out << *dev._GetArena();
   return out;

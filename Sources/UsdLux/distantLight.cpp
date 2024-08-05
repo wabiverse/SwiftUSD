@@ -25,129 +25,115 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdLuxDistantLight,
-        TfType::Bases< UsdLuxNonboundableLightBase > >();
-    
-    // Register the usd prim typename as an alias under UsdSchemaBase. This
-    // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("DistantLight")
-    // to find TfType<UsdLuxDistantLight>, which is how IsA queries are
-    // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdLuxDistantLight>("DistantLight");
+  TfType::Define<UsdLuxDistantLight, TfType::Bases<UsdLuxNonboundableLightBase>>();
+
+  // Register the usd prim typename as an alias under UsdSchemaBase. This
+  // enables one to call
+  // TfType::Find<UsdSchemaBase>().FindDerivedByName("DistantLight")
+  // to find TfType<UsdLuxDistantLight>, which is how IsA queries are
+  // answered.
+  TfType::AddAlias<UsdSchemaBase, UsdLuxDistantLight>("DistantLight");
 }
 
 /* virtual */
-UsdLuxDistantLight::~UsdLuxDistantLight()
+UsdLuxDistantLight::~UsdLuxDistantLight() {}
+
+/* static */
+UsdLuxDistantLight UsdLuxDistantLight::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxDistantLight();
+  }
+  return UsdLuxDistantLight(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdLuxDistantLight
-UsdLuxDistantLight::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdLuxDistantLight UsdLuxDistantLight::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxDistantLight();
-    }
-    return UsdLuxDistantLight(stage->GetPrimAtPath(path));
-}
-
-/* static */
-UsdLuxDistantLight
-UsdLuxDistantLight::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
-    static TfToken usdPrimTypeName("DistantLight");
-    if (!stage) {
-        TF_CODING_ERROR("Invalid stage");
-        return UsdLuxDistantLight();
-    }
-    return UsdLuxDistantLight(
-        stage->DefinePrim(path, usdPrimTypeName));
+  static TfToken usdPrimTypeName("DistantLight");
+  if (!stage) {
+    TF_CODING_ERROR("Invalid stage");
+    return UsdLuxDistantLight();
+  }
+  return UsdLuxDistantLight(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
 UsdSchemaKind UsdLuxDistantLight::_GetSchemaKind() const
 {
-    return UsdLuxDistantLight::schemaKind;
+  return UsdLuxDistantLight::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxDistantLight::_GetStaticTfType()
+const TfType &UsdLuxDistantLight::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdLuxDistantLight>();
-    return tfType;
+  static TfType tfType = TfType::Find<UsdLuxDistantLight>();
+  return tfType;
 }
 
 /* static */
-bool 
-UsdLuxDistantLight::_IsTypedSchema()
+bool UsdLuxDistantLight::_IsTypedSchema()
 {
-    static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
-    return isTyped;
+  static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
+  return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxDistantLight::_GetTfType() const
+const TfType &UsdLuxDistantLight::_GetTfType() const
 {
-    return _GetStaticTfType();
+  return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdLuxDistantLight::GetAngleAttr() const
+UsdAttribute UsdLuxDistantLight::GetAngleAttr() const
 {
-    return GetPrim().GetAttribute(UsdLuxTokens->inputsAngle);
+  return GetPrim().GetAttribute(UsdLuxTokens->inputsAngle);
 }
 
-UsdAttribute
-UsdLuxDistantLight::CreateAngleAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdLuxDistantLight::CreateAngleAttr(VtValue const &defaultValue,
+                                                 bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsAngle,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+  return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsAngle,
+                                    SdfValueTypeNames->Float,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector &left,
+                                                       const TfTokenVector &right)
 {
-    TfTokenVector result;
-    result.reserve(left.size() + right.size());
-    result.insert(result.end(), left.begin(), left.end());
-    result.insert(result.end(), right.begin(), right.end());
-    return result;
+  TfTokenVector result;
+  result.reserve(left.size() + right.size());
+  result.insert(result.end(), left.begin(), left.end());
+  result.insert(result.end(), right.begin(), right.end());
+  return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxDistantLight::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdLuxDistantLight::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames = {
-        UsdLuxTokens->inputsAngle,
-    };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdLuxNonboundableLightBase::GetSchemaAttributeNames(true),
-            localNames);
+  static TfTokenVector localNames = {
+      UsdLuxTokens->inputsAngle,
+  };
+  static TfTokenVector allNames = _ConcatenateAttributeNames(
+      UsdLuxNonboundableLightBase::GetSchemaAttributeNames(true), localNames);
 
-    if (includeInherited)
-        return allNames;
-    else
-        return localNames;
+  if (includeInherited)
+    return allNames;
+  else
+    return localNames;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

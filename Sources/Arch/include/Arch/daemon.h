@@ -65,4 +65,4 @@ int ArchCloseAllFiles(int nExcept, const int *exceptFds);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_DAEMON_H
+#endif  // PXR_BASE_ARCH_DAEMON_H

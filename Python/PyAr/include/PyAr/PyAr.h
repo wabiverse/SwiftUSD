@@ -3,4 +3,4 @@
 
 #include <PyAr/pyResolverContext.h>
 
-#endif // __PXR_USD_PY_AR_H__
+#endif  // __PXR_USD_PY_AR_H__

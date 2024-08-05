@@ -26,17 +26,17 @@
 
 /// \file usdSkel/packedJointAnimation.h
 
-#include <pxr/pxrns.h>
-#include "UsdSkel/api.h"
-#include "UsdSkel/animation.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdSkel/animation.h"
+#include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -53,9 +53,8 @@ class SdfAssetPath;
 ///
 /// Deprecated. Please use SkelAnimation instead.
 ///
-class UsdSkelPackedJointAnimation : public UsdSkelAnimation
-{
-public:
+class UsdSkelPackedJointAnimation : public UsdSkelAnimation {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -65,10 +64,7 @@ public:
   /// Equivalent to UsdSkelPackedJointAnimation::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdSkelPackedJointAnimation(const UsdPrim &prim = UsdPrim())
-      : UsdSkelAnimation(prim)
-  {
-  }
+  explicit UsdSkelPackedJointAnimation(const UsdPrim &prim = UsdPrim()) : UsdSkelAnimation(prim) {}
 
   /// Construct a UsdSkelPackedJointAnimation on the prim held by \p schemaObj .
   /// Should be preferred over UsdSkelPackedJointAnimation(schemaObj.GetPrim()),
@@ -86,8 +82,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDSKEL_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdSkelPackedJointAnimation holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -99,8 +94,7 @@ public:
   /// \endcode
   ///
   USDSKEL_API
-  static UsdSkelPackedJointAnimation
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelPackedJointAnimation Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -125,17 +119,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDSKEL_API
-  static UsdSkelPackedJointAnimation
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdSkelPackedJointAnimation Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDSKEL_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDSKEL_API
@@ -147,7 +140,7 @@ private:
   USDSKEL_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

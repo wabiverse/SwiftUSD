@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_BLIT_CMDS_H
 #define PXR_IMAGING_HGI_BLIT_CMDS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/api.h"
 #include "Hgi/buffer.h"
 #include "Hgi/cmds.h"
 #include "Hgi/texture.h"
 #include <memory>
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -50,9 +50,8 @@ using HgiBlitCmdsUniquePtr = std::unique_ptr<class HgiBlitCmds>;
 /// HgiBlitCmds is a lightweight object that cannot be re-used after it has
 /// been submitted. A new cmds object should be acquired for each frame.
 ///
-class HgiBlitCmds : public HgiCmds
-{
-public:
+class HgiBlitCmds : public HgiCmds {
+ public:
   HGI_API
   ~HgiBlitCmds() override;
 
@@ -110,11 +109,11 @@ public:
   HGI_API
   virtual void InsertMemoryBarrier(HgiMemoryBarrier barrier) = 0;
 
-protected:
+ protected:
   HGI_API
   HgiBlitCmds();
 
-private:
+ private:
   HgiBlitCmds &operator=(const HgiBlitCmds &) = delete;
   HgiBlitCmds(const HgiBlitCmds &) = delete;
 };

@@ -26,8 +26,8 @@
 
 /// \file glf/debugCodes.h
 
-#include <pxr/pxrns.h>
 #include "Tf/debug.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -44,26 +44,27 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// or evaluates to \c false and has a string annotation.
 ///
 class SdfAllowed {
-private:
+ private:
   typedef boost::optional<std::string> _State;
 
-public:
+ public:
   typedef std::pair<bool, std::string> Pair;
 
   /// Construct \c true.
   SdfAllowed() {}
   /// Construct \c true.
-  SdfAllowed(bool x) { TF_AXIOM(x); }
+  SdfAllowed(bool x)
+  {
+    TF_AXIOM(x);
+  }
   /// Construct \c false with annotation \p whyNot.
   SdfAllowed(const char *whyNot) : _state(std::string(whyNot)) {}
   /// Construct \c false with annotation \p whyNot.
   SdfAllowed(const std::string &whyNot) : _state(whyNot) {}
   /// Construct in \p condition with annotation \p whyNot if \c false.
-  SdfAllowed(bool condition, const char *whyNot)
-      : _state(!condition, std::string(whyNot)) {}
+  SdfAllowed(bool condition, const char *whyNot) : _state(!condition, std::string(whyNot)) {}
   /// Construct in \p condition with annotation \p whyNot if \c false.
-  SdfAllowed(bool condition, const std::string &whyNot)
-      : _state(!condition, whyNot) {}
+  SdfAllowed(bool condition, const std::string &whyNot) : _state(!condition, whyNot) {}
   /// Construct from bool,string pair \p x.
   SdfAllowed(const Pair &x) : _state(!x.first, x.second) {}
   ~SdfAllowed() {}
@@ -73,16 +74,23 @@ public:
 #endif
 
   /// Returns \c true in a boolean context if allowed, \c false otherwise.
-  operator UnspecifiedBoolType() const {
+  operator UnspecifiedBoolType() const
+  {
     return _state ? NULL : &SdfAllowed::_state;
   }
 
   /// Returns \c false in a boolean context if allowed, \c true otherwise.
-  bool operator!() const { return static_cast<bool>(_state); }
+  bool operator!() const
+  {
+    return static_cast<bool>(_state);
+  }
 
   /// Returns the reason why the operation is not allowed.  If the
   /// operation is allowed this returns the empty string.
-  operator const std::string &() const { return GetWhyNot(); }
+  operator const std::string &() const
+  {
+    return GetWhyNot();
+  }
 
   /// Returns the reason why the operation is not allowed.  If the
   /// operation is allowed this returns the empty string.
@@ -90,7 +98,8 @@ public:
 
   /// Returns \c true if allowed, otherwise fills \p whyNot if not \c NULL
   /// and returns \c false.
-  bool IsAllowed(std::string *whyNot) const {
+  bool IsAllowed(std::string *whyNot) const
+  {
     if (whyNot && _state) {
       *whyNot = *_state;
     }
@@ -99,16 +108,20 @@ public:
 
   /// Compare to \p other.  Returns \c true if both are \c true or
   /// both are \c false and reasons why not are identical.
-  bool operator==(const SdfAllowed &other) const {
+  bool operator==(const SdfAllowed &other) const
+  {
     return _state == other._state;
   }
 
-  bool operator!=(const SdfAllowed &other) const { return !(*this == other); }
+  bool operator!=(const SdfAllowed &other) const
+  {
+    return !(*this == other);
+  }
 
-private:
+ private:
   _State _state;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_ALLOWED_H
+#endif  // PXR_USD_SDF_ALLOWED_H

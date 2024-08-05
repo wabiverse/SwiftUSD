@@ -24,15 +24,15 @@
 #ifndef EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H
 #define EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H
 
-#include <pxr/pxrns.h>
 #include "Hd/types.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/matrix4d.h"
 
 #include "Riley.h"
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
 class RixContext;
 
@@ -42,11 +42,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This lives in a separate small library so it can be accessible to
 /// both the hdPrman hydra plgin at the d_hydra display driver plugin,
 /// without requiring either to know about the other.
-class HdPrmanFramebuffer
-{
-public:
-  enum HdPrmanAccumulationRule
-  {
+class HdPrmanFramebuffer {
+ public:
+  enum HdPrmanAccumulationRule {
     k_accumulationRuleFilter,
     k_accumulationRuleAverage,
     k_accumulationRuleMin,
@@ -56,8 +54,7 @@ public:
     k_accumulationRuleSum
   };
 
-  struct AovDesc
-  {
+  struct AovDesc {
     TfToken name;
     HdFormat format;
     VtValue clearValue;
@@ -71,8 +68,7 @@ public:
     }
   };
 
-  struct AovBuffer
-  {
+  struct AovBuffer {
     AovDesc desc;
     std::vector<uint32_t> pixels;
   };
@@ -97,9 +93,12 @@ public:
   void CreateAovBuffers(const AovDescVector &aovDescs);
 
   /// Resize the buffer.
-  void Resize(int width, int height,
-              int cropXMin = 0, int cropYMin = 0,
-              int cropWidth = 0, int cropHeight = 0);
+  void Resize(int width,
+              int height,
+              int cropXMin = 0,
+              int cropYMin = 0,
+              int cropWidth = 0,
+              int cropHeight = 0);
 
   void Clear();
 
@@ -122,4 +121,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H
+#endif  // EXT_RMANPKG_25_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_FRAMEBUFFER_H

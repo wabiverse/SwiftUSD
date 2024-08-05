@@ -22,14 +22,14 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
+#include "Sdr/shaderNode.h"
+#include "Sdr/shaderProperty.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/pyPtrHelpers.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyStaticTokens.h"
 #include "Tf/weakPtr.h"
-#include "Sdr/shaderNode.h"
-#include "Sdr/shaderProperty.h"
+#include <pxr/pxrns.h>
 
 #include <boost/python.hpp>
 #include <boost/python/return_internal_reference.hpp>
@@ -40,8 +40,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 // Boost treats a const ptr differently than a non-const ptr, so a custom
 // converter is needed to deal with the const-ness
-struct SdrShaderNodeConstPtrToPythonConverter
-{
+struct SdrShaderNodeConstPtrToPythonConverter {
   static PyObject *convert(SdrShaderNodeConstPtr shaderNode)
   {
     object shaderNodeObject(ptr(shaderNode));
@@ -55,35 +54,28 @@ void wrapShaderNode()
   typedef SdrShaderNode This;
   typedef SdrShaderNodePtr ThisPtr;
 
-  TF_PY_WRAP_PUBLIC_TOKENS(
-      "NodeMetadata", SdrNodeMetadata, SDR_NODE_METADATA_TOKENS);
-  TF_PY_WRAP_PUBLIC_TOKENS(
-      "NodeContext", SdrNodeContext, SDR_NODE_CONTEXT_TOKENS);
+  TF_PY_WRAP_PUBLIC_TOKENS("NodeMetadata", SdrNodeMetadata, SDR_NODE_METADATA_TOKENS);
+  TF_PY_WRAP_PUBLIC_TOKENS("NodeContext", SdrNodeContext, SDR_NODE_CONTEXT_TOKENS);
 
-  TF_PY_WRAP_PUBLIC_TOKENS(
-      "NodeRole", SdrNodeRole, SDR_NODE_ROLE_TOKENS);
+  TF_PY_WRAP_PUBLIC_TOKENS("NodeRole", SdrNodeRole, SDR_NODE_ROLE_TOKENS);
 
   return_value_policy<copy_const_reference> copyRefPolicy;
-  to_python_converter<SdrShaderNodeConstPtr,
-                      SdrShaderNodeConstPtrToPythonConverter>();
+  to_python_converter<SdrShaderNodeConstPtr, SdrShaderNodeConstPtrToPythonConverter>();
 
   class_<This, ThisPtr, bases<NdrNode>, boost::noncopyable>("ShaderNode", no_init)
-      .def("GetShaderInput", &This::GetShaderInput,
-           return_internal_reference<>())
-      .def("GetShaderOutput", &This::GetShaderOutput,
-           return_internal_reference<>())
-      .def("GetAssetIdentifierInputNames", &This::GetAssetIdentifierInputNames,
+      .def("GetShaderInput", &This::GetShaderInput, return_internal_reference<>())
+      .def("GetShaderOutput", &This::GetShaderOutput, return_internal_reference<>())
+      .def("GetAssetIdentifierInputNames",
+           &This::GetAssetIdentifierInputNames,
            return_value_policy<TfPySequenceToList>())
-      .def("GetDefaultInput", &This::GetDefaultInput,
-           return_internal_reference<>())
+      .def("GetDefaultInput", &This::GetDefaultInput, return_internal_reference<>())
       .def("GetLabel", &This::GetLabel, copyRefPolicy)
       .def("GetCategory", &This::GetCategory, copyRefPolicy)
       .def("GetHelp", &This::GetHelp)
       .def("GetDepartments", &This::GetDepartments, copyRefPolicy)
       .def("GetPages", &This::GetPages, copyRefPolicy)
       .def("GetPrimvars", &This::GetPrimvars, copyRefPolicy)
-      .def("GetAdditionalPrimvarProperties",
-           &This::GetAdditionalPrimvarProperties, copyRefPolicy)
+      .def("GetAdditionalPrimvarProperties", &This::GetAdditionalPrimvarProperties, copyRefPolicy)
       .def("GetImplementationName", &This::GetImplementationName)
       .def("GetRole", &This::GetRole)
       .def("GetPropertyNamesForPage", &This::GetPropertyNamesForPage)

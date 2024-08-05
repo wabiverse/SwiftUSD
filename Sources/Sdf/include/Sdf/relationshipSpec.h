@@ -51,7 +51,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfRelationshipSpec : public SdfPropertySpec {
   SDF_DECLARE_SPEC(SdfRelationshipSpec, SdfPropertySpec);
 
-public:
+ public:
   typedef SdfRelationshipSpec This;
   typedef SdfPropertySpec Parent;
 
@@ -64,9 +64,10 @@ public:
   /// Creates and returns a new relationship for the given prim.
   /// The \p owner will own the newly created relationship.
   SDF_API
-  static SdfRelationshipSpecHandle
-  New(const SdfPrimSpecHandle &owner, const std::string &name,
-      bool custom = true, SdfVariability variability = SdfVariabilityUniform);
+  static SdfRelationshipSpecHandle New(const SdfPrimSpecHandle &owner,
+                                       const std::string &name,
+                                       bool custom = true,
+                                       SdfVariability variability = SdfVariabilityUniform);
 
   /// @}
 
@@ -116,7 +117,7 @@ public:
   SDF_API
   void SetNoLoadHint(bool noload);
 
-private:
+ private:
   SdfPath _CanonicalizeTargetPath(const SdfPath &path) const;
 
   SdfPath _MakeCompleteTargetSpecPath(const SdfPath &srcPath) const;
@@ -132,4 +133,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_RELATIONSHIP_SPEC_H
+#endif  // PXR_USD_SDF_RELATIONSHIP_SPEC_H

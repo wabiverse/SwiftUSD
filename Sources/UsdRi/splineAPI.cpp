@@ -25,29 +25,24 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdRiSplineAPI,
-                 TfType::Bases<UsdAPISchemaBase>>();
+  TfType::Define<UsdRiSplineAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdRiSplineAPI::~UsdRiSplineAPI()
-{
-}
+UsdRiSplineAPI::~UsdRiSplineAPI() {}
 
 /* static */
-UsdRiSplineAPI
-UsdRiSplineAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdRiSplineAPI UsdRiSplineAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdRiSplineAPI();
   }
@@ -61,26 +56,22 @@ UsdSchemaKind UsdRiSplineAPI::_GetSchemaKind() const
 }
 
 /* static */
-bool UsdRiSplineAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
+bool UsdRiSplineAPI::CanApply(const UsdPrim &prim, std::string *whyNot)
 {
   return prim.CanApplyAPI<UsdRiSplineAPI>(whyNot);
 }
 
 /* static */
-UsdRiSplineAPI
-UsdRiSplineAPI::Apply(const UsdPrim &prim)
+UsdRiSplineAPI UsdRiSplineAPI::Apply(const UsdPrim &prim)
 {
-  if (prim.ApplyAPI<UsdRiSplineAPI>())
-  {
+  if (prim.ApplyAPI<UsdRiSplineAPI>()) {
     return UsdRiSplineAPI(prim);
   }
   return UsdRiSplineAPI();
 }
 
 /* static */
-const TfType &
-UsdRiSplineAPI::_GetStaticTfType()
+const TfType &UsdRiSplineAPI::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdRiSplineAPI>();
   return tfType;
@@ -94,19 +85,16 @@ bool UsdRiSplineAPI::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdRiSplineAPI::_GetTfType() const
+const TfType &UsdRiSplineAPI::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &
-UsdRiSplineAPI::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdRiSplineAPI::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames;
-  static TfTokenVector allNames =
-      UsdAPISchemaBase::GetSchemaAttributeNames(true);
+  static TfTokenVector allNames = UsdAPISchemaBase::GetSchemaAttributeNames(true);
 
   if (includeInherited)
     return allNames;
@@ -130,26 +118,21 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfToken
-UsdRiSplineAPI::_GetScopedPropertyName(const TfToken &baseName) const
+TfToken UsdRiSplineAPI::_GetScopedPropertyName(const TfToken &baseName) const
 {
-  return TfToken(
-      SdfPath::JoinIdentifier(
-          SdfPath::JoinIdentifier(
-              _splineName.GetString(),
-              UsdRiTokens->spline.GetString()),
-          baseName.GetString()));
+  return TfToken(SdfPath::JoinIdentifier(
+      SdfPath::JoinIdentifier(_splineName.GetString(), UsdRiTokens->spline.GetString()),
+      baseName.GetString()));
 }
 
-UsdAttribute
-UsdRiSplineAPI::GetInterpolationAttr() const
+UsdAttribute UsdRiSplineAPI::GetInterpolationAttr() const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->interpolation);
   return GetPrim().GetAttribute(name);
 }
 
-UsdAttribute
-UsdRiSplineAPI::CreateInterpolationAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRiSplineAPI::CreateInterpolationAttr(VtValue const &defaultValue,
+                                                     bool writeSparsely) const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->interpolation);
   return UsdSchemaBase::_CreateAttr(name,
@@ -160,15 +143,14 @@ UsdRiSplineAPI::CreateInterpolationAttr(VtValue const &defaultValue, bool writeS
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRiSplineAPI::GetPositionsAttr() const
+UsdAttribute UsdRiSplineAPI::GetPositionsAttr() const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->positions);
   return GetPrim().GetAttribute(name);
 }
 
-UsdAttribute
-UsdRiSplineAPI::CreatePositionsAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRiSplineAPI::CreatePositionsAttr(VtValue const &defaultValue,
+                                                 bool writeSparsely) const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->positions);
   return UsdSchemaBase::_CreateAttr(name,
@@ -179,15 +161,14 @@ UsdRiSplineAPI::CreatePositionsAttr(VtValue const &defaultValue, bool writeSpars
                                     writeSparsely);
 }
 
-UsdAttribute
-UsdRiSplineAPI::GetValuesAttr() const
+UsdAttribute UsdRiSplineAPI::GetValuesAttr() const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->values);
   return GetPrim().GetAttribute(name);
 }
 
-UsdAttribute
-UsdRiSplineAPI::CreateValuesAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAttribute UsdRiSplineAPI::CreateValuesAttr(VtValue const &defaultValue,
+                                              bool writeSparsely) const
 {
   TfToken name = _GetScopedPropertyName(UsdRiTokens->values);
   return UsdSchemaBase::_CreateAttr(name,
@@ -200,8 +181,7 @@ UsdRiSplineAPI::CreateValuesAttr(VtValue const &defaultValue, bool writeSparsely
 
 bool UsdRiSplineAPI::Validate(std::string *reason) const
 {
-  if (_splineName.IsEmpty())
-  {
+  if (_splineName.IsEmpty()) {
     *reason += "SplineAPI is not correctly initialized";
     return false;
   }
@@ -217,69 +197,55 @@ bool UsdRiSplineAPI::Validate(std::string *reason) const
                _valuesTypeName.GetAsToken().GetString() + "'";
     return false;
   }
-  if (!interpAttr)
-  {
+  if (!interpAttr) {
     *reason += "Could not get the interpolation attribute.";
     return false;
   }
-  if (!posAttr)
-  {
+  if (!posAttr) {
     *reason += "Could not get the position attribute.";
     return false;
   }
   TfToken interp;
   interpAttr.Get(&interp);
-  if (interp != UsdRiTokens->constant &&
-      interp != UsdRiTokens->linear &&
-      interp != UsdRiTokens->catmullRom &&
-      interp != UsdRiTokens->bspline)
+  if (interp != UsdRiTokens->constant && interp != UsdRiTokens->linear &&
+      interp != UsdRiTokens->catmullRom && interp != UsdRiTokens->bspline)
   {
-    *reason += "Interpolation attribute has invalid value '" +
-               interp.GetString() + "'";
+    *reason += "Interpolation attribute has invalid value '" + interp.GetString() + "'";
     return false;
   }
-  if (posAttr.GetTypeName() != SdfValueTypeNames->FloatArray)
-  {
+  if (posAttr.GetTypeName() != SdfValueTypeNames->FloatArray) {
     *reason += "Values attribute has incorrect type; found '" +
-               valAttr.GetTypeName().GetAsToken().GetString() +
-               "' but expected '" +
-               SdfValueTypeNames->FloatArray.GetAsToken().GetString() +
-               "'";
+               valAttr.GetTypeName().GetAsToken().GetString() + "' but expected '" +
+               SdfValueTypeNames->FloatArray.GetAsToken().GetString() + "'";
     return false;
   }
   VtFloatArray positions;
   posAttr.Get(&positions);
-  if (!std::is_sorted(positions.begin(), positions.end()))
-  {
+  if (!std::is_sorted(positions.begin(), positions.end())) {
     *reason += "Positions attribute must be sorted in increasing order";
     return false;
   }
-  if (valAttr.GetTypeName() != _valuesTypeName)
-  {
+  if (valAttr.GetTypeName() != _valuesTypeName) {
     *reason += "Values attribute has incorrect type; found '" +
-               valAttr.GetTypeName().GetAsToken().GetString() +
-               "' but expected '" +
-               _valuesTypeName.GetAsToken().GetString() +
-               "'";
+               valAttr.GetTypeName().GetAsToken().GetString() + "' but expected '" +
+               _valuesTypeName.GetAsToken().GetString() + "'";
     return false;
   }
   size_t numValues = 0;
-  if (_valuesTypeName == SdfValueTypeNames->FloatArray)
-  {
+  if (_valuesTypeName == SdfValueTypeNames->FloatArray) {
     VtFloatArray vals;
     valAttr.Get(&vals);
     numValues = vals.size();
   }
-  else if (_valuesTypeName == SdfValueTypeNames->Color3fArray)
-  {
+  else if (_valuesTypeName == SdfValueTypeNames->Color3fArray) {
     VtVec3fArray vals;
     valAttr.Get(&vals);
     numValues = vals.size();
   }
-  if (positions.size() != numValues)
-  {
-    *reason += "Values attribute and positions attribute must "
-               "have the same number of entries";
+  if (positions.size() != numValues) {
+    *reason +=
+        "Values attribute and positions attribute must "
+        "have the same number of entries";
     return false;
   }
 

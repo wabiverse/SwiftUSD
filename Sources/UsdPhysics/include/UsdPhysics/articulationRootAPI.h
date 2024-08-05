@@ -26,17 +26,17 @@
 
 /// \file usdPhysics/articulationRootAPI.h
 
-#include <pxr/pxrns.h>
-#include "UsdPhysics/api.h"
 #include "Usd/apiSchemaBase.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdPhysics/api.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -59,9 +59,8 @@ class SdfAssetPath;
 /// or indirect parent of the root joint which is connected to the world, or
 /// on the joint itself..
 ///
-class UsdPhysicsArticulationRootAPI : public UsdAPISchemaBase
-{
-public:
+class UsdPhysicsArticulationRootAPI : public UsdAPISchemaBase {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -71,8 +70,7 @@ public:
   /// Equivalent to UsdPhysicsArticulationRootAPI::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdPhysicsArticulationRootAPI(const UsdPrim &prim = UsdPrim())
-      : UsdAPISchemaBase(prim)
+  explicit UsdPhysicsArticulationRootAPI(const UsdPrim &prim = UsdPrim()) : UsdAPISchemaBase(prim)
   {
   }
 
@@ -92,8 +90,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPHYSICS_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdPhysicsArticulationRootAPI holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -105,8 +102,7 @@ public:
   /// \endcode
   ///
   USDPHYSICS_API
-  static UsdPhysicsArticulationRootAPI
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdPhysicsArticulationRootAPI Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Returns true if this <b>single-apply</b> API schema can be applied to
   /// the given \p prim. If this schema can not be a applied to the prim,
@@ -125,8 +121,7 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDPHYSICS_API
-  static bool
-  CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
+  static bool CanApply(const UsdPrim &prim, std::string *whyNot = nullptr);
 
   /// Applies this <b>single-apply</b> API schema to the given \p prim.
   /// This information is stored by adding "PhysicsArticulationRootAPI" to the
@@ -144,17 +139,16 @@ public:
   /// \sa UsdPrim::RemoveAPI()
   ///
   USDPHYSICS_API
-  static UsdPhysicsArticulationRootAPI
-  Apply(const UsdPrim &prim);
+  static UsdPhysicsArticulationRootAPI Apply(const UsdPrim &prim);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPHYSICS_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPHYSICS_API
@@ -166,7 +160,7 @@ private:
   USDPHYSICS_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

@@ -22,8 +22,8 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include <pxr/pxrns.h>
 #include "UsdUtils/coalescingDiagnosticDelegate.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/pyResultConversions.h"
 
@@ -39,58 +39,48 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace boost::python;
 
-static void
-_DumpCoalescedDiagnosticsToStdout(UsdUtilsCoalescingDiagnosticDelegate &d)
+static void _DumpCoalescedDiagnosticsToStdout(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   d.DumpCoalescedDiagnostics(std::cout);
 }
 
-static void
-_DumpCoalescedDiagnosticsToStderr(UsdUtilsCoalescingDiagnosticDelegate &d)
+static void _DumpCoalescedDiagnosticsToStderr(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   d.DumpCoalescedDiagnostics(std::cerr);
 }
 
-static void
-_DumpUncoalescedDiagnosticsToStdout(UsdUtilsCoalescingDiagnosticDelegate &d)
+static void _DumpUncoalescedDiagnosticsToStdout(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   d.DumpUncoalescedDiagnostics(std::cout);
 }
 
-static void
-_DumpUncoalescedDiagnosticsToStderr(UsdUtilsCoalescingDiagnosticDelegate &d)
+static void _DumpUncoalescedDiagnosticsToStderr(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   d.DumpUncoalescedDiagnostics(std::cerr);
 }
 
-static boost::python::list
-_TakeUncoalescedDiagnostics(UsdUtilsCoalescingDiagnosticDelegate &d)
+static boost::python::list _TakeUncoalescedDiagnostics(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   boost::python::list result;
-  for (auto const &item : d.TakeUncoalescedDiagnostics())
-  {
+  for (auto const &item : d.TakeUncoalescedDiagnostics()) {
     result.append(*item.get());
   }
   return result;
 }
 
-static boost::python::list
-_TakeCoalescedDiagnostics(UsdUtilsCoalescingDiagnosticDelegate &d)
+static boost::python::list _TakeCoalescedDiagnostics(UsdUtilsCoalescingDiagnosticDelegate &d)
 {
   boost::python::list result;
-  for (auto const &item : d.TakeCoalescedDiagnostics())
-  {
+  for (auto const &item : d.TakeCoalescedDiagnostics()) {
     result.append(item);
   }
   return result;
 }
 
-static boost::python::list
-_GetUnsharedItems(UsdUtilsCoalescingDiagnosticDelegateItem const &d)
+static boost::python::list _GetUnsharedItems(UsdUtilsCoalescingDiagnosticDelegateItem const &d)
 {
   boost::python::list result;
-  for (auto const &item : d.unsharedItems)
-  {
+  for (auto const &item : d.unsharedItems) {
     result.append(item);
   }
 
@@ -117,14 +107,10 @@ void wrapCoalescingDiagnosticDelegate()
 
   using This = UsdUtilsCoalescingDiagnosticDelegate;
   class_<This, boost::noncopyable>("CoalescingDiagnosticDelegate")
-      .def("DumpCoalescedDiagnosticsToStdout",
-           &_DumpCoalescedDiagnosticsToStdout)
-      .def("DumpUncoalescedDiagnostics",
-           &_DumpUncoalescedDiagnosticsToStdout)
-      .def("DumpCoalescedDiagnosticsToStderr",
-           &_DumpCoalescedDiagnosticsToStderr)
-      .def("DumpUncoalescedDiagnostics",
-           &_DumpUncoalescedDiagnosticsToStderr)
+      .def("DumpCoalescedDiagnosticsToStdout", &_DumpCoalescedDiagnosticsToStdout)
+      .def("DumpUncoalescedDiagnostics", &_DumpUncoalescedDiagnosticsToStdout)
+      .def("DumpCoalescedDiagnosticsToStderr", &_DumpCoalescedDiagnosticsToStderr)
+      .def("DumpUncoalescedDiagnostics", &_DumpUncoalescedDiagnosticsToStderr)
       .def("TakeCoalescedDiagnostics", &_TakeCoalescedDiagnostics)
       .def("TakeUncoalescedDiagnostics", &_TakeUncoalescedDiagnostics);
 }

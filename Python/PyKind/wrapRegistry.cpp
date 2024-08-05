@@ -33,7 +33,8 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-void wrapKindRegistry() {
+void wrapKindRegistry()
+{
   typedef KindRegistry This;
   typedef TfWeakPtr<KindRegistry> ThisPtr;
 
@@ -41,8 +42,7 @@ void wrapKindRegistry() {
       .def(TfPySingleton())
       .def("HasKind", &This::HasKind)
       .staticmethod("HasKind")
-      .def("GetAllKinds", &This::GetAllKinds,
-           return_value_policy<TfPySequenceToList>())
+      .def("GetAllKinds", &This::GetAllKinds, return_value_policy<TfPySequenceToList>())
       .staticmethod("GetAllKinds")
       .def("GetBaseKind", &This::GetBaseKind)
       .staticmethod("GetBaseKind")

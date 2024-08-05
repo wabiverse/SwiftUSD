@@ -36,26 +36,31 @@ PXR_NAMESPACE_USING_DIRECTIVE
 namespace {
 
 class _PyResolverScopedCache : public boost::noncopyable {
-public:
+ public:
   _PyResolverScopedCache() {}
 
-  void Enter() { _scopedCache.reset(new ArResolverScopedCache); }
+  void Enter()
+  {
+    _scopedCache.reset(new ArResolverScopedCache);
+  }
 
   bool Exit(boost::python::object & /* exc_type */,
             boost::python::object & /* exc_val  */,
-            boost::python::object & /* exc_tb   */) {
+            boost::python::object & /* exc_tb   */)
+  {
     _scopedCache.reset(0);
     // Re-raise exceptions.
     return false;
   }
 
-private:
+ private:
   std::unique_ptr<ArResolverScopedCache> _scopedCache;
 };
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapResolverScopedCache() {
+void wrapResolverScopedCache()
+{
   typedef _PyResolverScopedCache This;
 
   class_<This, boost::noncopyable>("ResolverScopedCache")

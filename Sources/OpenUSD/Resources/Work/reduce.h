@@ -94,9 +94,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// you want to have at least 10,000 instructions to count for the overhead of
 /// launching that task.
 ///
-template <typename Fn, typename Rn, typename V>
-V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
-                      Rn &&reductionCallback, size_t grainSize) {
+template<typename Fn, typename Rn, typename V>
+V WorkParallelReduceN(
+    const V &identity, size_t n, Fn &&loopCallback, Rn &&reductionCallback, size_t grainSize)
+{
   if (n == 0)
     return identity;
 
@@ -104,10 +105,11 @@ V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
   if (WorkHasConcurrency()) {
 
     class Work_Body_TBB {
-    public:
+     public:
       Work_Body_TBB(Fn &fn) : _fn(fn) {}
 
-      V operator()(const tbb::blocked_range<size_t> &r, const V &value) const {
+      V operator()(const tbb::blocked_range<size_t> &r, const V &value) const
+      {
         // Note that we std::forward _fn using Fn in order get the
         // right operator().
         // We maintain the right type in this way:
@@ -116,7 +118,7 @@ V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
         return std::forward<Fn>(_fn)(r.begin(), r.end(), value);
       }
 
-    private:
+     private:
       Fn &_fn;
     };
 
@@ -124,9 +126,11 @@ V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
     // parent context, so we create an isolated task group context.
     tbb::task_group_context ctx(tbb::task_group_context::isolated);
     return tbb::parallel_reduce(tbb::blocked_range<size_t>(0, n, grainSize),
-                                identity, Work_Body_TBB(loopCallback),
+                                identity,
+                                Work_Body_TBB(loopCallback),
                                 std::forward<Rn>(reductionCallback),
-                                tbb::auto_partitioner(), ctx);
+                                tbb::auto_partitioner(),
+                                ctx);
   }
 
   // If concurrency is limited to 1, execute serially.
@@ -141,12 +145,12 @@ V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
 /// to automatically deduce a grain size that is optimal for the current
 /// resource utilization and provided workload.
 ///
-template <typename Fn, typename Rn, typename V>
-V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback,
-                      Rn &&reductionCallback) {
+template<typename Fn, typename Rn, typename V>
+V WorkParallelReduceN(const V &identity, size_t n, Fn &&loopCallback, Rn &&reductionCallback)
+{
   return WorkParallelReduceN(identity, n, loopCallback, reductionCallback, 1);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_REDUCE_H
+#endif  // PXR_BASE_WORK_REDUCE_H

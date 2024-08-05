@@ -33,7 +33,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum) {
+TF_REGISTRY_FUNCTION(TfEnum)
+{
   TF_ADD_ENUM_NAME(UsdStageLoadRules::AllRule);
   TF_ADD_ENUM_NAME(UsdStageLoadRules::OnlyRule);
   TF_ADD_ENUM_NAME(UsdStageLoadRules::NoneRule);
@@ -41,36 +42,38 @@ TF_REGISTRY_FUNCTION(TfEnum) {
 
 using _GetPath = TfGet<0>;
 
-UsdStageLoadRules UsdStageLoadRules::LoadNone() {
+UsdStageLoadRules UsdStageLoadRules::LoadNone()
+{
   UsdStageLoadRules ret;
   ret._rules.emplace_back(SdfPath::AbsoluteRootPath(), NoneRule);
   return ret;
 }
 
-void UsdStageLoadRules::LoadWithDescendants(SdfPath const &path) {
-  auto range =
-      SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
+void UsdStageLoadRules::LoadWithDescendants(SdfPath const &path)
+{
+  auto range = SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
 
   _rules.insert(_rules.erase(range.first, range.second), {path, AllRule});
 }
 
-void UsdStageLoadRules::LoadWithoutDescendants(SdfPath const &path) {
-  auto range =
-      SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
+void UsdStageLoadRules::LoadWithoutDescendants(SdfPath const &path)
+{
+  auto range = SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
 
   _rules.insert(_rules.erase(range.first, range.second), {path, OnlyRule});
 }
 
-void UsdStageLoadRules::Unload(SdfPath const &path) {
-  auto range =
-      SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
+void UsdStageLoadRules::Unload(SdfPath const &path)
+{
+  auto range = SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
 
   _rules.emplace(_rules.erase(range.first, range.second), path, NoneRule);
 }
 
 void UsdStageLoadRules::LoadAndUnload(const SdfPathSet &loadSet,
                                       const SdfPathSet &unloadSet,
-                                      UsdLoadPolicy policy) {
+                                      UsdLoadPolicy policy)
+{
   // XXX Could potentially be faster...
   for (SdfPath const &path : unloadSet) {
     Unload(path);
@@ -78,35 +81,38 @@ void UsdStageLoadRules::LoadAndUnload(const SdfPathSet &loadSet,
   for (SdfPath const &path : loadSet) {
     if (policy == UsdLoadWithDescendants) {
       LoadWithDescendants(path);
-    } else if (policy == UsdLoadWithoutDescendants) {
+    }
+    else if (policy == UsdLoadWithoutDescendants) {
       LoadWithoutDescendants(path);
     }
   }
 }
 
-void UsdStageLoadRules::AddRule(SdfPath const &path, Rule rule) {
+void UsdStageLoadRules::AddRule(SdfPath const &path, Rule rule)
+{
   auto iter = _LowerBound(path);
   if (iter != _rules.end() && iter->first == path) {
     iter->second = rule;
-  } else {
+  }
+  else {
     _rules.emplace(iter, path, rule);
   }
 }
 
-void UsdStageLoadRules::SetRules(
-    std::vector<std::pair<SdfPath, Rule>> const &rules) {
+void UsdStageLoadRules::SetRules(std::vector<std::pair<SdfPath, Rule>> const &rules)
+{
   _rules = rules;
 }
 
-void UsdStageLoadRules::Minimize() {
+void UsdStageLoadRules::Minimize()
+{
   if (_rules.empty()) {
     return;
   }
 
   // If there's an 'AllRule' for '/', remove it -- the implicit rule for '/'
   // with no entry present is already 'AllRule'.
-  if (_rules.front().second == AllRule &&
-      _rules.front().first == SdfPath::AbsoluteRootPath()) {
+  if (_rules.front().second == AllRule && _rules.front().first == SdfPath::AbsoluteRootPath()) {
     _rules.erase(_rules.begin());
   }
 
@@ -124,38 +130,38 @@ void UsdStageLoadRules::Minimize() {
 
     // Pop ancestral rules off the stack until we find the one for cur, or
     // until there are no more ancestral rules.
-    while (!parentIdxStack.empty() &&
-           !cur.first.HasPrefix(_rules[parentIdxStack.back()].first)) {
+    while (!parentIdxStack.empty() && !cur.first.HasPrefix(_rules[parentIdxStack.back()].first)) {
       parentIdxStack.pop_back();
     }
 
     // Parent rule is implicitly 'AllRule' if there is no parent.
-    Rule parentRule =
-        parentIdxStack.empty() ? AllRule : _rules[parentIdxStack.back()].second;
+    Rule parentRule = parentIdxStack.empty() ? AllRule : _rules[parentIdxStack.back()].second;
     if (cur.second == parentRule) {
       // Remove this rule.
       _rules.erase(_rules.begin() + i);
       --i;
-    } else {
+    }
+    else {
       // This rule is kept and becomes the next parent.
       parentIdxStack.push_back(i);
     }
   }
 }
 
-bool UsdStageLoadRules::IsLoaded(SdfPath const &path) const {
+bool UsdStageLoadRules::IsLoaded(SdfPath const &path) const
+{
   return GetEffectiveRuleForPath(path) != NoneRule;
 }
 
-bool UsdStageLoadRules::IsLoadedWithAllDescendants(SdfPath const &path) const {
+bool UsdStageLoadRules::IsLoadedWithAllDescendants(SdfPath const &path) const
+{
   if (_rules.empty()) {
     // LoadAll case.
     return true;
   }
 
   // Find the longest prefix of \p path.  It must be an AllRule.
-  auto prefixIter =
-      SdfPathFindLongestPrefix(_rules.begin(), _rules.end(), path, _GetPath());
+  auto prefixIter = SdfPathFindLongestPrefix(_rules.begin(), _rules.end(), path, _GetPath());
 
   // There must either be no prefix, or a prefix that's AllRule.
   if (prefixIter != _rules.end() && prefixIter->second != AllRule) {
@@ -164,8 +170,7 @@ bool UsdStageLoadRules::IsLoadedWithAllDescendants(SdfPath const &path) const {
 
   // Find the range of paths prefixed by the given path.  There must either be
   // none, or all of them must be AllRules.
-  auto range =
-      SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
+  auto range = SdfPathFindPrefixedRange(_rules.begin(), _rules.end(), path, _GetPath());
 
   for (auto iter = range.first; iter != range.second; ++iter) {
     if (iter->second != AllRule) {
@@ -177,7 +182,8 @@ bool UsdStageLoadRules::IsLoadedWithAllDescendants(SdfPath const &path) const {
   return true;
 }
 
-bool UsdStageLoadRules::IsLoadedWithNoDescendants(SdfPath const &path) const {
+bool UsdStageLoadRules::IsLoadedWithNoDescendants(SdfPath const &path) const
+{
   if (_rules.empty()) {
     // LoadAll case.
     return false;
@@ -205,8 +211,8 @@ bool UsdStageLoadRules::IsLoadedWithNoDescendants(SdfPath const &path) const {
   return true;
 }
 
-UsdStageLoadRules::Rule
-UsdStageLoadRules::GetEffectiveRuleForPath(SdfPath const &path) const {
+UsdStageLoadRules::Rule UsdStageLoadRules::GetEffectiveRuleForPath(SdfPath const &path) const
+{
   if (_rules.empty()) {
     // LoadAll case.
     return AllRule;
@@ -215,8 +221,7 @@ UsdStageLoadRules::GetEffectiveRuleForPath(SdfPath const &path) const {
   // Find the longest prefix of \p path.  If it is an AllRule, or it is an
   // OnlyRule and its path is the same as this path, then this path is
   // included.
-  auto prefixIter =
-      SdfPathFindLongestPrefix(_rules.begin(), _rules.end(), path, _GetPath());
+  auto prefixIter = SdfPathFindLongestPrefix(_rules.begin(), _rules.end(), path, _GetPath());
 
   // If no prefix present, this path is included.
   if (prefixIter == _rules.end()) {
@@ -243,8 +248,7 @@ UsdStageLoadRules::GetEffectiveRuleForPath(SdfPath const &path) const {
   // path is excluded.
 
   ++prefixIter;
-  auto range =
-      SdfPathFindPrefixedRange(prefixIter, _rules.end(), path, _GetPath());
+  auto range = SdfPathFindPrefixedRange(prefixIter, _rules.end(), path, _GetPath());
 
   // If there are no such paths, this path is a NoneRule.
   if (range.first == range.second) {
@@ -266,43 +270,48 @@ UsdStageLoadRules::GetEffectiveRuleForPath(SdfPath const &path) const {
   return NoneRule;
 }
 
-bool UsdStageLoadRules::operator==(UsdStageLoadRules const &other) const {
+bool UsdStageLoadRules::operator==(UsdStageLoadRules const &other) const
+{
   return _rules == other._rules;
 }
 
-std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>>::const_iterator
-UsdStageLoadRules::_LowerBound(SdfPath const &path) const {
+std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>>::const_iterator UsdStageLoadRules::
+    _LowerBound(SdfPath const &path) const
+{
   return std::lower_bound(
-      _rules.begin(), _rules.end(), path,
-      [](std::pair<SdfPath, Rule> const &elem, SdfPath const &path) {
-        return elem.first < path;
-      });
+      _rules.begin(),
+      _rules.end(),
+      path,
+      [](std::pair<SdfPath, Rule> const &elem, SdfPath const &path) { return elem.first < path; });
 }
 
-std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>>::iterator
-UsdStageLoadRules::_LowerBound(SdfPath const &path) {
+std::vector<std::pair<SdfPath, UsdStageLoadRules::Rule>>::iterator UsdStageLoadRules::_LowerBound(
+    SdfPath const &path)
+{
   return std::lower_bound(
-      _rules.begin(), _rules.end(), path,
-      [](std::pair<SdfPath, Rule> const &elem, SdfPath const &path) {
-        return elem.first < path;
-      });
+      _rules.begin(),
+      _rules.end(),
+      path,
+      [](std::pair<SdfPath, Rule> const &elem, SdfPath const &path) { return elem.first < path; });
 }
 
-std::ostream &operator<<(std::ostream &os,
-                         std::pair<SdfPath, UsdStageLoadRules::Rule> const &p) {
+std::ostream &operator<<(std::ostream &os, std::pair<SdfPath, UsdStageLoadRules::Rule> const &p)
+{
   return os << "(<" << p.first << ">, "
-            << (p.second == UsdStageLoadRules::AllRule    ? "AllRule"
-                : p.second == UsdStageLoadRules::OnlyRule ? "OnlyRule"
-                : p.second == UsdStageLoadRules::NoneRule ? "NoneRule"
-                                                          : "<invalid value>")
+            << (p.second == UsdStageLoadRules::AllRule  ? "AllRule" :
+                p.second == UsdStageLoadRules::OnlyRule ? "OnlyRule" :
+                p.second == UsdStageLoadRules::NoneRule ? "NoneRule" :
+                                                          "<invalid value>")
             << ")";
 }
 
-std::ostream &operator<<(std::ostream &os, UsdStageLoadRules const &rules) {
+std::ostream &operator<<(std::ostream &os, UsdStageLoadRules const &rules)
+{
   return os << "UsdStageLoadRules(" << rules._rules << ")";
 }
 
-size_t hash_value(UsdStageLoadRules const &rules) {
+size_t hash_value(UsdStageLoadRules const &rules)
+{
   return TfHash()(rules._rules);
 }
 

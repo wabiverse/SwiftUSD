@@ -36,16 +36,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Register this class with the TfType registry
 // Array registration included to facilitate Sdf/Types and Sdf/ParserHelpers
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<SdfTimeCode>();
   TfType::Define<VtArray<SdfTimeCode>>();
 }
 
-TF_REGISTRY_FUNCTION(VtValue) {
+TF_REGISTRY_FUNCTION(VtValue)
+{
   VtValue::RegisterSimpleBidirectionalCast<double, SdfTimeCode>();
 }
 
-std::ostream &operator<<(std::ostream &out, const SdfTimeCode &ap) {
+std::ostream &operator<<(std::ostream &out, const SdfTimeCode &ap)
+{
   return out << ap.GetValue();
 }
 

@@ -54,10 +54,10 @@ class ArAsset;
 ///   class.
 ///
 class UsdZipFile {
-private:
+ private:
   class _Impl;
 
-public:
+ public:
   /// Opens the zip archive at \p filePath.
   /// Returns invalid object on error.
   USD_API
@@ -77,12 +77,15 @@ public:
 
   /// Return true if this object is valid, false otherwise.
   USD_API
-  explicit operator bool() const { return static_cast<bool>(_impl); }
+  explicit operator bool() const
+  {
+    return static_cast<bool>(_impl);
+  }
 
   /// \class FileInfo
   /// Information for a file in the zip archive.
   class FileInfo {
-  public:
+   public:
     /// Offset of the beginning of this file's data from the start of
     /// the zip archive.
     size_t dataOffset = 0;
@@ -114,15 +117,18 @@ public:
     // Proxy type for operator->(), needed since this iterator's value
     // is generated on the fly.
     class _ArrowProxy {
-    public:
+     public:
       explicit _ArrowProxy(const std::string &s) : _s(s) {}
-      const std::string *operator->() const { return &_s; }
+      const std::string *operator->() const
+      {
+        return &_s;
+      }
 
-    private:
+     private:
       std::string _s;
     };
 
-  public:
+   public:
     USD_API
     Iterator();
 
@@ -179,7 +185,7 @@ public:
     USD_API
     FileInfo GetFileInfo() const;
 
-  private:
+   private:
     friend class UsdZipFile;
     Iterator(const _Impl *impl, size_t offset = 0);
 
@@ -192,14 +198,20 @@ public:
   Iterator begin() const;
 
   /// Returns iterator pointing to the first file in the zip archive.
-  Iterator cbegin() const { return begin(); }
+  Iterator cbegin() const
+  {
+    return begin();
+  }
 
   /// Returns end iterator for this zip archive.
   USD_API
   Iterator end() const;
 
   /// Returns end iterator for this zip archive.
-  Iterator cend() const { return end(); }
+  Iterator cend() const
+  {
+    return end();
+  }
 
   /// Returns iterator to the file with the given \p path in this zip
   /// archive, or end() if no such file exists.
@@ -211,7 +223,7 @@ public:
   USD_API
   void DumpContents() const;
 
-private:
+ private:
   UsdZipFile(std::shared_ptr<_Impl> &&impl);
 
   std::shared_ptr<_Impl> _impl;
@@ -226,7 +238,7 @@ private:
 /// libraries and utilities.
 ///
 class UsdZipFileWriter {
-public:
+ public:
   /// Create a new file writer with \p filePath as the destination file path
   /// where the zip archive will be written. The zip file will not be written
   /// to \p filePath until the writer is destroyed or Save() is called.
@@ -253,7 +265,10 @@ public:
 
   /// Returns true if this is a valid object, false otherwise.
   USD_API
-  explicit operator bool() const { return static_cast<bool>(_impl); }
+  explicit operator bool() const
+  {
+    return static_cast<bool>(_impl);
+  }
 
   /// Adds the file at \p filePath to the zip archive with no compression
   /// applied. If \p filePathInArchive is non-empty, the file will be
@@ -280,7 +295,7 @@ public:
   USD_API
   void Discard();
 
-private:
+ private:
   class _Impl;
   UsdZipFileWriter(std::unique_ptr<_Impl> &&impl);
 
@@ -289,4 +304,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ZIP_FILE_H
+#endif  // PXR_USD_USD_ZIP_FILE_H

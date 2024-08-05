@@ -35,14 +35,25 @@ struct TfPyExceptionState {
   TfPyExceptionState(boost::python::handle<> const &type,
                      boost::python::handle<> const &value,
                      boost::python::handle<> const &trace)
-      : _type(type), _value(value), _trace(trace) {}
+      : _type(type), _value(value), _trace(trace)
+  {
+  }
 
   TF_API
   ~TfPyExceptionState();
 
-  boost::python::handle<> const &GetType() const { return _type; }
-  boost::python::handle<> const &GetValue() const { return _value; }
-  boost::python::handle<> const &GetTrace() const { return _trace; }
+  boost::python::handle<> const &GetType() const
+  {
+    return _type;
+  }
+  boost::python::handle<> const &GetValue() const
+  {
+    return _value;
+  }
+  boost::python::handle<> const &GetTrace() const
+  {
+    return _trace;
+  }
 
   TF_API
   void Release();
@@ -50,7 +61,7 @@ struct TfPyExceptionState {
   TF_API
   std::string GetExceptionString() const;
 
-private:
+ private:
   boost::python::handle<> _type, _value, _trace;
 };
 

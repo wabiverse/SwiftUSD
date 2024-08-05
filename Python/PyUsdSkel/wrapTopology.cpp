@@ -23,11 +23,11 @@
 //
 #include "UsdSkel/topology.h"
 
-#include "Usd/pyConversions.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/wrapTypeHelpers.h"
+#include "Usd/pyConversions.h"
 
 #include <boost/python.hpp>
 
@@ -35,18 +35,16 @@ using namespace boost::python;
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-namespace
+namespace {
+
+tuple _Validate(const UsdSkelTopology &self)
 {
+  std::string reason;
+  bool success = self.Validate(&reason);
+  return boost::python::make_tuple(success, reason);
+}
 
-  tuple
-  _Validate(const UsdSkelTopology &self)
-  {
-    std::string reason;
-    bool success = self.Validate(&reason);
-    return boost::python::make_tuple(success, reason);
-  }
-
-} // namespace
+}  // namespace
 
 void wrapUsdSkelTopology()
 {
@@ -61,8 +59,7 @@ void wrapUsdSkelTopology()
 
       .def("IsRoot", &This::IsRoot)
 
-      .def("GetParentIndices", &This::GetParentIndices,
-           return_value_policy<return_by_value>())
+      .def("GetParentIndices", &This::GetParentIndices, return_value_policy<return_by_value>())
 
       .def("GetNumJoints", &This::GetNumJoints)
 

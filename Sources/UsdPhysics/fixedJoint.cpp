@@ -25,16 +25,15 @@
 #include "Usd/schemaRegistry.h"
 #include "Usd/typed.h"
 
-#include "Sdf/types.h"
 #include "Sdf/assetPath.h"
+#include "Sdf/types.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-  TfType::Define<UsdPhysicsFixedJoint,
-                 TfType::Bases<UsdPhysicsJoint>>();
+  TfType::Define<UsdPhysicsFixedJoint, TfType::Bases<UsdPhysicsJoint>>();
 
   // Register the usd prim typename as an alias under UsdSchemaBase. This
   // enables one to call
@@ -45,16 +44,12 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdPhysicsFixedJoint::~UsdPhysicsFixedJoint()
-{
-}
+UsdPhysicsFixedJoint::~UsdPhysicsFixedJoint() {}
 
 /* static */
-UsdPhysicsFixedJoint
-UsdPhysicsFixedJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsFixedJoint UsdPhysicsFixedJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsFixedJoint();
   }
@@ -62,18 +57,14 @@ UsdPhysicsFixedJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdPhysicsFixedJoint
-UsdPhysicsFixedJoint::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
+UsdPhysicsFixedJoint UsdPhysicsFixedJoint::Define(const UsdStagePtr &stage, const SdfPath &path)
 {
   static TfToken usdPrimTypeName("PhysicsFixedJoint");
-  if (!stage)
-  {
+  if (!stage) {
     TF_CODING_ERROR("Invalid stage");
     return UsdPhysicsFixedJoint();
   }
-  return UsdPhysicsFixedJoint(
-      stage->DefinePrim(path, usdPrimTypeName));
+  return UsdPhysicsFixedJoint(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
@@ -83,8 +74,7 @@ UsdSchemaKind UsdPhysicsFixedJoint::_GetSchemaKind() const
 }
 
 /* static */
-const TfType &
-UsdPhysicsFixedJoint::_GetStaticTfType()
+const TfType &UsdPhysicsFixedJoint::_GetStaticTfType()
 {
   static TfType tfType = TfType::Find<UsdPhysicsFixedJoint>();
   return tfType;
@@ -98,19 +88,16 @@ bool UsdPhysicsFixedJoint::_IsTypedSchema()
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsFixedJoint::_GetTfType() const
+const TfType &UsdPhysicsFixedJoint::_GetTfType() const
 {
   return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector &
-UsdPhysicsFixedJoint::GetSchemaAttributeNames(bool includeInherited)
+const TfTokenVector &UsdPhysicsFixedJoint::GetSchemaAttributeNames(bool includeInherited)
 {
   static TfTokenVector localNames;
-  static TfTokenVector allNames =
-      UsdPhysicsJoint::GetSchemaAttributeNames(true);
+  static TfTokenVector allNames = UsdPhysicsJoint::GetSchemaAttributeNames(true);
 
   if (includeInherited)
     return allNames;

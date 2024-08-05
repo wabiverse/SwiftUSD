@@ -57,20 +57,23 @@ struct Tf_TokenRegistry {
   typedef TfPointerAndBits<const TfToken::_Rep> _RepPtrAndBits;
 
   struct _Eq {
-    inline size_t operator()(TfToken::_Rep const &rep1,
-                             TfToken::_Rep const &rep2) const {
+    inline size_t operator()(TfToken::_Rep const &rep1, TfToken::_Rep const &rep2) const
+    {
       return (*this)(rep1._cstr, rep2._cstr);
     }
-    inline bool operator()(const char *s1, const char *s2) const {
+    inline bool operator()(const char *s1, const char *s2) const
+    {
       return !strcmp(s1, s2);
     }
   };
 
-  template <int Mul> struct _Hash {
-    inline size_t operator()(TfToken::_Rep const &rep) const {
+  template<int Mul> struct _Hash {
+    inline size_t operator()(TfToken::_Rep const &rep) const
+    {
       return (*this)(rep._cstr);
     }
-    inline size_t operator()(char const *s) const {
+    inline size_t operator()(char const *s) const
+    {
       // Matches STL original implementation for now.  Switch to something
       // better?
       unsigned int h = 0;
@@ -88,10 +91,9 @@ struct Tf_TokenRegistry {
 
   // Utility to pad an instance to take up a whole number of cache lines to
   // avoid false sharing.
-  template <class T> struct _CacheLinePadded {
+  template<class T> struct _CacheLinePadded {
     T val;
-    char _unused_padding[ARCH_CACHE_LINE_SIZE -
-                         (sizeof(T) % ARCH_CACHE_LINE_SIZE)];
+    char _unused_padding[ARCH_CACHE_LINE_SIZE - (sizeof(T) % ARCH_CACHE_LINE_SIZE)];
   };
 
   // It's not ideal to use TfHashSet here.  It would be better to use
@@ -106,28 +108,34 @@ struct Tf_TokenRegistry {
   _RepSet _sets[_NumSets];
   mutable _CacheLinePadded<tbb::spin_mutex> _locks[_NumSets];
 
-  static Tf_TokenRegistry &_GetInstance() {
+  static Tf_TokenRegistry &_GetInstance()
+  {
     return TfSingleton<Tf_TokenRegistry>::GetInstance();
   }
 
-  inline size_t _GetSetNum(char const *s) const {
+  inline size_t _GetSetNum(char const *s) const
+  {
     _OuterHash h;
     return h(s) & _SetMask;
   }
 
-  inline _RepPtrAndBits _GetPtrChar(char const *s, bool makeImmortal) {
+  inline _RepPtrAndBits _GetPtrChar(char const *s, bool makeImmortal)
+  {
     return _GetPtrImpl(s, makeImmortal);
   }
-  inline _RepPtrAndBits _GetPtrStr(string const &s, bool makeImmortal) {
+  inline _RepPtrAndBits _GetPtrStr(string const &s, bool makeImmortal)
+  {
     // Explicitly specify template arg -- if unspecified, it will deduce
     // string by-value, which we don't want.
     return _GetPtrImpl<string const &>(s, makeImmortal);
   }
 
-  inline _RepPtrAndBits _FindPtrChar(char const *s) const {
+  inline _RepPtrAndBits _FindPtrChar(char const *s) const
+  {
     return _FindPtrImpl(s);
   }
-  inline _RepPtrAndBits _FindPtrStr(string const &s) const {
+  inline _RepPtrAndBits _FindPtrStr(string const &s) const
+  {
     // Explicitly specify template arg -- if unspecified, it will deduce
     // string by-value, which we don't want.
     return _FindPtrImpl<string const &>(s);
@@ -137,7 +145,8 @@ struct Tf_TokenRegistry {
    * rep may be dying.  remove its key and raw pointer reference
    * from the table if it truly is.
    */
-  void _PossiblyDestroyRep(_RepPtr rep) {
+  void _PossiblyDestroyRep(_RepPtr rep)
+  {
     bool repFoundInSet = true;
     string repString;
     {
@@ -160,35 +169,52 @@ struct Tf_TokenRegistry {
         repString = rep->_str;
       }
     }
-    TF_VERIFY(repFoundInSet,
-              "failed to find token '%s' in table for destruction",
-              repString.c_str());
+    TF_VERIFY(
+        repFoundInSet, "failed to find token '%s' in table for destruction", repString.c_str());
   }
 
-  void _DumpStats() const {
+  void _DumpStats() const
+  {
     std::vector<std::pair<size_t, size_t>> sizesWithSet;
     for (size_t i = 0; i != _NumSets; ++i) {
       sizesWithSet.push_back(std::make_pair(_sets[i].size(), i));
     }
     std::sort(sizesWithSet.begin(), sizesWithSet.end());
     printf("Set # -- Size\n");
-    TF_FOR_ALL(i, sizesWithSet) { printf("%zu -- %zu\n", i->second, i->first); }
+    TF_FOR_ALL(i, sizesWithSet)
+    {
+      printf("%zu -- %zu\n", i->second, i->first);
+    }
   }
 
-private:
-  inline bool _IsEmpty(char const *s) const { return !s || !s[0]; }
-  inline bool _IsEmpty(string const &s) const { return s.empty(); }
+ private:
+  inline bool _IsEmpty(char const *s) const
+  {
+    return !s || !s[0];
+  }
+  inline bool _IsEmpty(string const &s) const
+  {
+    return s.empty();
+  }
 
-  inline char const *_CStr(char const *s) const { return s; }
-  inline char const *_CStr(string const &s) const { return s.c_str(); }
+  inline char const *_CStr(char const *s) const
+  {
+    return s;
+  }
+  inline char const *_CStr(string const &s) const
+  {
+    return s.c_str();
+  }
 
-  static TfToken::_Rep _LookupRep(char const *cstr) {
+  static TfToken::_Rep _LookupRep(char const *cstr)
+  {
     TfToken::_Rep ret;
     ret._cstr = cstr;
     return ret;
   }
 
-  static inline uint64_t _ComputeCompareCode(char const *p) {
+  static inline uint64_t _ComputeCompareCode(char const *p)
+  {
     uint64_t compCode = 0;
     int nchars = sizeof(compCode);
     while (nchars--) {
@@ -204,8 +230,8 @@ private:
    * Either finds a key that is stringwise-equal to s,
    * or puts a new _Rep into the map for s.
    */
-  template <class Str>
-  inline _RepPtrAndBits _GetPtrImpl(Str s, bool makeImmortal) {
+  template<class Str> inline _RepPtrAndBits _GetPtrImpl(Str s, bool makeImmortal)
+  {
     if (_IsEmpty(s))
       return _RepPtrAndBits();
 
@@ -225,7 +251,8 @@ private:
           ++rep->_refCount;
       }
       return _RepPtrAndBits(rep, isCounted);
-    } else {
+    }
+    else {
       // No entry present, add a new entry.
       TfAutoMallocTag noname("TfToken");
       _RepPtr rep = &(*_sets[setNum].insert(TfToken::_Rep(s)).first);
@@ -238,7 +265,8 @@ private:
     }
   }
 
-  template <class Str> _RepPtrAndBits _FindPtrImpl(Str s) const {
+  template<class Str> _RepPtrAndBits _FindPtrImpl(Str s) const
+  {
     if (_IsEmpty(s))
       return _RepPtrAndBits();
 
@@ -256,52 +284,68 @@ private:
 
 TF_INSTANTIATE_SINGLETON(Tf_TokenRegistry);
 
-TF_REGISTRY_FUNCTION(TfType) {
+TF_REGISTRY_FUNCTION(TfType)
+{
   TfType::Define<TfToken>();
   TfType::Define<vector<TfToken>>().Alias(TfType::GetRoot(), "vector<TfToken>");
 }
 
-void TfToken::_PossiblyDestroyRep() const {
+void TfToken::_PossiblyDestroyRep() const
+{
   Tf_TokenRegistry::_GetInstance()._PossiblyDestroyRep(_rep.Get());
 }
 
-string const &TfToken::_GetEmptyString() {
+string const &TfToken::_GetEmptyString()
+{
   static std::string empty;
   return empty;
 }
 
 TfToken::TfToken(const string &s)
-    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrStr(
-          s, /*makeImmortal*/ false)) {}
+    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrStr(s, /*makeImmortal*/ false))
+{
+}
 
 TfToken::TfToken(const char *s)
-    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrChar(
-          s, /*makeImmortal*/ false)) {}
+    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrChar(s, /*makeImmortal*/ false))
+{
+}
 
 TfToken::TfToken(const string &s, _ImmortalTag)
     : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrStr(s,
-                                                       /*makeImmortal*/ true)) {
+                                                       /*makeImmortal*/ true))
+{
 }
 
 TfToken::TfToken(const char *s, _ImmortalTag)
-    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrChar(
-          s, /*makeImmortal*/ true)) {}
+    : _rep(Tf_TokenRegistry::_GetInstance()._GetPtrChar(s, /*makeImmortal*/ true))
+{
+}
 
-TfToken TfToken::Find(const string &s) {
+TfToken TfToken::Find(const string &s)
+{
   TfToken t;
   t._rep = Tf_TokenRegistry::_GetInstance()._FindPtrStr(s);
   return t;
 }
 
-bool TfToken::operator==(const string &o) const { return GetString() == o; }
+bool TfToken::operator==(const string &o) const
+{
+  return GetString() == o;
+}
 
-bool TfToken::operator==(const char *o) const { return GetString() == o; }
+bool TfToken::operator==(const char *o) const
+{
+  return GetString() == o;
+}
 
-std::vector<TfToken> TfToTokenVector(const std::vector<string> &sv) {
+std::vector<TfToken> TfToTokenVector(const std::vector<string> &sv)
+{
   return vector<TfToken>(sv.begin(), sv.end());
 }
 
-std::vector<string> TfToStringVector(const std::vector<TfToken> &tv) {
+std::vector<string> TfToStringVector(const std::vector<TfToken> &tv)
+{
   std::vector<string> sv(tv.size());
 
   for (size_t i = 0; i != tv.size(); i++)
@@ -310,11 +354,13 @@ std::vector<string> TfToStringVector(const std::vector<TfToken> &tv) {
   return sv;
 }
 
-std::ostream &operator<<(std::ostream &stream, const TfToken &token) {
+std::ostream &operator<<(std::ostream &stream, const TfToken &token)
+{
   return stream << token.GetText();
 }
 
-TF_API void TfDumpTokenStats() {
+TF_API void TfDumpTokenStats()
+{
   Tf_TokenRegistry::_GetInstance()._DumpStats();
 }
 

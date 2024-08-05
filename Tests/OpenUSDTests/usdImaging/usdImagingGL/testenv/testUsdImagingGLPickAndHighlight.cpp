@@ -43,12 +43,12 @@
 #include "pxr/usd/usdGeom/metrics.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 #include "pxr/usdImaging/usdImaging/tokens.h"
+#include "pxr/usdImaging/usdImaging/unitTestHelper.h"
 
-#include "pxr/usdImaging/usdImagingGL/engine.h"
-#include "pxr/imaging/glf/simpleLightingContext.h"
 #include "pxr/base/tf/getenv.h"
+#include "pxr/imaging/glf/simpleLightingContext.h"
+#include "pxr/usdImaging/usdImagingGL/engine.h"
 
 #include <iomanip>
 #include <iostream>
@@ -58,8 +58,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
-struct OutHit
-{
+struct OutHit {
   GfVec3d outHitPoint;
   GfVec3d outHitNormal;
   SdfPath outHitPrimPath;
@@ -67,12 +66,10 @@ struct OutHit
   int outHitInstanceIndex;
 };
 
-static bool
-_CompareOutHit(OutHit const &lhs, OutHit const &rhs)
+static bool _CompareOutHit(OutHit const &lhs, OutHit const &rhs)
 {
   static const bool skipInstancerDetails = TfGetenvBool(
-      "USD_IMAGING_GL_PICK_TEST_SKIP_INSTANCER_DETAILS",
-      false);
+      "USD_IMAGING_GL_PICK_TEST_SKIP_INSTANCER_DETAILS", false);
 
   double const epsilon = 1e-6;
   return GfIsClose(lhs.outHitPoint[0], rhs.outHitPoint[0], epsilon) &&
@@ -82,14 +79,12 @@ _CompareOutHit(OutHit const &lhs, OutHit const &rhs)
          GfIsClose(lhs.outHitNormal[1], rhs.outHitNormal[1], epsilon) &&
          GfIsClose(lhs.outHitNormal[2], rhs.outHitNormal[2], epsilon) &&
          lhs.outHitPrimPath == rhs.outHitPrimPath &&
-         (skipInstancerDetails ||
-          (lhs.outHitInstancerPath == rhs.outHitInstancerPath &&
-           lhs.outHitInstanceIndex == rhs.outHitInstanceIndex));
+         (skipInstancerDetails || (lhs.outHitInstancerPath == rhs.outHitInstancerPath &&
+                                   lhs.outHitInstanceIndex == rhs.outHitInstanceIndex));
 }
 
-class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing
-{
-public:
+class My_TestGLDrawing : public UsdImagingGL_UnitTestGLDrawing {
+ public:
   My_TestGLDrawing()
   {
     _mousePos[0] = _mousePos[1] = 0;
@@ -111,7 +106,7 @@ public:
   void Pick(GfVec2i const &startPos, GfVec2i const &endPos);
   void Pick(GfVec2i const &startPos, GfVec2i const &endPos, OutHit *out);
 
-private:
+ private:
   UsdStageRefPtr _stage;
   UsdImagingGLEngineSharedPtr _engine;
 
@@ -130,26 +125,19 @@ void My_TestGLDrawing::InitTest()
   _stage = UsdStage::Open(GetStageFilePath());
   SdfPathVector excludedPaths;
 
-  _engine.reset(
-      new UsdImagingGLEngine(_stage->GetPseudoRoot().GetPath(),
-                             excludedPaths));
-  if (!_GetRenderer().IsEmpty())
-  {
-    if (!_engine->SetRendererPlugin(_GetRenderer()))
-    {
+  _engine.reset(new UsdImagingGLEngine(_stage->GetPseudoRoot().GetPath(), excludedPaths));
+  if (!_GetRenderer().IsEmpty()) {
+    if (!_engine->SetRendererPlugin(_GetRenderer())) {
       std::cerr << "Couldn't set renderer plugin: " << _GetRenderer().GetText() << std::endl;
       exit(-1);
     }
-    else
-    {
-      std::cout << "Renderer plugin: " << _GetRenderer().GetText()
-                << std::endl;
+    else {
+      std::cout << "Renderer plugin: " << _GetRenderer().GetText() << std::endl;
     }
   }
   _engine->SetSelectionColor(GfVec4f(1, 1, 0, 1));
 
-  if (_ShouldFrameAll())
-  {
+  if (_ShouldFrameAll()) {
     TfTokenVector purposes;
     purposes.push_back(UsdGeomTokens->default_);
     purposes.push_back(UsdGeomTokens->proxy);
@@ -168,22 +156,19 @@ void My_TestGLDrawing::InitTest()
 
     std::cerr << "worldCenter: " << worldCenter << "\n";
     std::cerr << "worldSize: " << worldSize << "\n";
-    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-    {
+    if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
       // transpose y and z centering translation
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[2];
       _translate[2] = -worldCenter[1] - worldSize;
     }
-    else
-    {
+    else {
       _translate[0] = -worldCenter[0];
       _translate[1] = -worldCenter[1];
       _translate[2] = -worldCenter[2] - worldSize;
     }
   }
-  else
-  {
+  else {
     _translate[0] = 0.0;
     _translate[1] = -1000.0;
     _translate[2] = -2500.0;
@@ -200,7 +185,10 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
        {GfVec3d(3.386115312576294, -2.0000052452087402, -0.5881438851356506),
         GfVec3d(0, -0.9980430603027344, 2.2161007702308985e-16),
         SdfPath("/Group/GI1/I1/Mesh1/Plane1"),
-        _stage->GetPrimAtPath(SdfPath("/Group/GI1/I1")).GetPrototype().GetPath().AppendPath(SdfPath("Mesh1")),
+        _stage->GetPrimAtPath(SdfPath("/Group/GI1/I1"))
+            .GetPrototype()
+            .GetPath()
+            .AppendPath(SdfPath("Mesh1")),
         2}},
       {TfToken("HdEmbreeRendererPlugin"),
        {GfVec3d(5.819578170776367, -15.916473388671875, -4.240192413330078),
@@ -215,8 +203,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
   Pick(GfVec2i(320, 130), GfVec2i(171, 131), &testOut);
   TF_VERIFY(_CompareOutHit(testOut, expectedOut));
 
-  if (offscreen)
-  {
+  if (offscreen) {
     Draw();
     Pick(GfVec2i(170, 130), GfVec2i(171, 131));
     Draw();
@@ -227,8 +214,7 @@ void My_TestGLDrawing::DrawTest(bool offscreen)
     Pick(GfVec2i(400, 200), GfVec2i(401, 201));
     Draw();
   }
-  else
-  {
+  else {
     Draw();
   }
 }
@@ -247,12 +233,9 @@ void My_TestGLDrawing::Draw(bool render)
 
   GfMatrix4d projMatrix = _frustum.ComputeProjectionMatrix();
 
-  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z)
-  {
+  if (UsdGeomGetStageUpAxis(_stage) == UsdGeomTokens->z) {
     // rotate from z-up to y-up
-    _viewMatrix =
-        GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) *
-        _viewMatrix;
+    _viewMatrix = GfMatrix4d().SetRotate(GfRotation(GfVec3d(1.0, 0.0, 0.0), -90.0)) * _viewMatrix;
   }
 
   GfVec4d viewport(0, 0, width, height);
@@ -269,8 +252,7 @@ void My_TestGLDrawing::Draw(bool render)
   params.highlight = true;
   params.clearColor = GetClearColor();
 
-  if (IsEnabledTestLighting())
-  {
+  if (IsEnabledTestLighting()) {
     GlfSimpleLightingContextRefPtr lightingContext = GlfSimpleLightingContext::New();
     lightingContext->SetStateFromOpenGL();
     _engine->SetLightingState(lightingContext);
@@ -278,16 +260,13 @@ void My_TestGLDrawing::Draw(bool render)
 
   params.clipPlanes = GetClipPlanes();
 
-  if (render)
-  {
-    do
-    {
+  if (render) {
+    do {
       _engine->Render(_stage->GetPseudoRoot(), params);
     } while (!_engine->IsConverged());
 
     std::string imageFilePath = GetOutputFilePath();
-    if (!imageFilePath.empty())
-    {
+    if (!imageFilePath.empty()) {
       static size_t i = 0;
 
       std::stringstream suffix;
@@ -318,8 +297,7 @@ void My_TestGLDrawing::MouseRelease(int button, int x, int y, int modKeys)
 {
   _mouseButton[button] = 0;
 
-  if (!(modKeys & GarchGLDebugWindow::Alt))
-  {
+  if (!(modKeys & GarchGLDebugWindow::Alt)) {
     std::cerr << "Pick " << x << ", " << y << "\n";
     GfVec2i startPos = GfVec2i(_mousePos[0] - 1, _mousePos[1] - 1);
     GfVec2i endPos = GfVec2i(_mousePos[0] + 1, _mousePos[1] + 1);
@@ -332,18 +310,15 @@ void My_TestGLDrawing::MouseMove(int x, int y, int modKeys)
   int dx = x - _mousePos[0];
   int dy = y - _mousePos[1];
 
-  if (_mouseButton[0])
-  {
+  if (_mouseButton[0]) {
     _rotate[0] += dx;
     _rotate[1] += dy;
   }
-  else if (_mouseButton[1])
-  {
+  else if (_mouseButton[1]) {
     _translate[0] += dx;
     _translate[1] -= dy;
   }
-  else if (_mouseButton[2])
-  {
+  else if (_mouseButton[2]) {
     _translate[2] += dx;
   }
 
@@ -356,8 +331,7 @@ void My_TestGLDrawing::Pick(GfVec2i const &startPos, GfVec2i const &endPos)
   Pick(startPos, endPos, nullptr);
 }
 
-void My_TestGLDrawing::Pick(GfVec2i const &startPos, GfVec2i const &endPos,
-                            OutHit *out)
+void My_TestGLDrawing::Pick(GfVec2i const &startPos, GfVec2i const &endPos, OutHit *out)
 {
   GfFrustum frustum = _frustum;
   float width = GetWidth(), height = GetHeight();
@@ -380,35 +354,29 @@ void My_TestGLDrawing::Pick(GfVec2i const &startPos, GfVec2i const &endPos,
 
   SdfPathVector selection;
 
-  if (_engine->TestIntersection(
-          _viewMatrix,
-          frustum.ComputeProjectionMatrix(),
-          _stage->GetPseudoRoot(),
-          params,
-          &outHit.outHitPoint,
-          &outHit.outHitNormal,
-          &outHit.outHitPrimPath,
-          &outHit.outHitInstancerPath,
-          &outHit.outHitInstanceIndex))
+  if (_engine->TestIntersection(_viewMatrix,
+                                frustum.ComputeProjectionMatrix(),
+                                _stage->GetPseudoRoot(),
+                                params,
+                                &outHit.outHitPoint,
+                                &outHit.outHitNormal,
+                                &outHit.outHitPrimPath,
+                                &outHit.outHitInstancerPath,
+                                &outHit.outHitInstanceIndex))
   {
 
-    std::cout << "Hit "
-              << outHit.outHitPoint << ", "
-              << outHit.outHitNormal << ", "
-              << outHit.outHitPrimPath << ", "
-              << outHit.outHitInstancerPath << ", "
+    std::cout << "Hit " << outHit.outHitPoint << ", " << outHit.outHitNormal << ", "
+              << outHit.outHitPrimPath << ", " << outHit.outHitInstancerPath << ", "
               << outHit.outHitInstanceIndex << "\n";
 
     _engine->SetSelectionColor(GfVec4f(1, 1, 0, 1));
     selection.push_back(outHit.outHitPrimPath);
   }
 
-  if (out)
-  {
+  if (out) {
     *out = outHit;
   }
-  else
-  {
+  else {
     _engine->SetSelected(selection);
   }
 }

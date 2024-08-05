@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGIVULKAN_CONVERSIONS_H
 #define PXR_IMAGING_HGIVULKAN_CONVERSIONS_H
 
-#include <pxr/pxrns.h>
 #include "Hgi/enums.h"
 #include "Hgi/types.h"
+#include <pxr/pxrns.h>
 
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
@@ -38,9 +38,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Converts from Hgi types to Vulkan types.
 ///
-class HgiVulkanConversions final
-{
-public:
+class HgiVulkanConversions final {
+ public:
   HGIVULKAN_API
   static VkFormat GetFormat(HgiFormat inFormat, bool depthFormat = false);
 

@@ -24,8 +24,8 @@
 #ifndef PXR_USD_USD_SKEL_BAKE_SKINNING_H
 #define PXR_USD_USD_SKEL_BAKE_SKINNING_H
 
-#include <pxr/pxrns.h>
 #include "UsdSkel/api.h"
+#include <pxr/pxrns.h>
 
 #include "Gf/interval.h"
 #include "Vt/array.h"
@@ -43,21 +43,17 @@ class UsdSkelCache;
 class UsdSkelRoot;
 
 /// Parameters for configuring UsdSkelBakeSkinning.
-struct UsdSkelBakeSkinningParms
-{
+struct UsdSkelBakeSkinningParms {
   /// Flags for identifying different deformation paths.
-  enum DeformationFlags
-  {
+  enum DeformationFlags {
     DeformPointsWithSkinning = 1 << 0,
     DeformNormalsWithSkinning = 1 << 1,
     DeformXformWithSkinning = 1 << 2,
     DeformPointsWithBlendShapes = 1 << 3,
     DeformNormalsWithBlendShapes = 1 << 4,
-    DeformWithSkinning = (DeformPointsWithSkinning |
-                          DeformNormalsWithSkinning |
+    DeformWithSkinning = (DeformPointsWithSkinning | DeformNormalsWithSkinning |
                           DeformXformWithSkinning),
-    DeformWithBlendShapes = (DeformPointsWithBlendShapes |
-                             DeformNormalsWithBlendShapes),
+    DeformWithBlendShapes = (DeformPointsWithBlendShapes | DeformNormalsWithBlendShapes),
     DeformAll = DeformWithSkinning | DeformWithBlendShapes,
     /// Flags indicating which components of skinned prims may be
     /// modified, based on the active deformations.
@@ -158,4 +154,4 @@ bool UsdSkelBakeSkinning(const UsdPrimRange &range,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_BAKE_SKINNING_H
+#endif  // PXR_USD_USD_SKEL_BAKE_SKINNING_H

@@ -26,40 +26,35 @@
 #define PXR_IMAGING_HGIVULKAN_SHADERGENERATOR_H
 
 #include "Hgi/shaderGenerator.h"
-#include "HgiVulkan/shaderSection.h"
 #include "HgiVulkan/api.h"
+#include "HgiVulkan/shaderSection.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class Hgi;
 
-using HgiVulkanShaderSectionUniquePtrVector =
-    std::vector<std::unique_ptr<HgiVulkanShaderSection>>;
+using HgiVulkanShaderSectionUniquePtrVector = std::vector<std::unique_ptr<HgiVulkanShaderSection>>;
 
 /// \class HgiVulkanShaderGenerator
 ///
 /// Takes in a descriptor and spits out GLSL code through it's execute function.
 ///
-class HgiVulkanShaderGenerator final : public HgiShaderGenerator
-{
-public:
+class HgiVulkanShaderGenerator final : public HgiShaderGenerator {
+ public:
   HGIVULKAN_API
-  explicit HgiVulkanShaderGenerator(
-      Hgi const *hgi,
-      const HgiShaderFunctionDesc &descriptor);
+  explicit HgiVulkanShaderGenerator(Hgi const *hgi, const HgiShaderFunctionDesc &descriptor);
 
   // This is not commonly consumed by the end user, but is available.
   HGIVULKAN_API
   HgiVulkanShaderSectionUniquePtrVector *GetShaderSections();
 
-  template <typename SectionType, typename... T>
-  SectionType *CreateShaderSection(T &&...t);
+  template<typename SectionType, typename... T> SectionType *CreateShaderSection(T &&...t);
 
-protected:
+ protected:
   HGIVULKAN_API
   void _Execute(std::ostream &ss) override;
 
-private:
+ private:
   HgiVulkanShaderGenerator() = delete;
   HgiVulkanShaderGenerator &operator=(const HgiVulkanShaderGenerator &) = delete;
   HgiVulkanShaderGenerator(const HgiVulkanShaderGenerator &) = delete;
@@ -70,20 +65,17 @@ private:
 
   void _WriteMacros(std::ostream &ss);
 
-  void _WriteConstantParams(
-      const HgiShaderFunctionParamDescVector &parameters);
+  void _WriteConstantParams(const HgiShaderFunctionParamDescVector &parameters);
 
   void _WriteTextures(const HgiShaderFunctionTextureDescVector &textures);
 
   void _WriteBuffers(const HgiShaderFunctionBufferDescVector &buffers);
 
   // For writing shader inputs and outputs who are very similarly written
-  void _WriteInOuts(
-      const HgiShaderFunctionParamDescVector &parameters,
-      const std::string &qualifier);
-  void _WriteInOutBlocks(
-      const HgiShaderFunctionParamBlockDescVector &parameterBlocks,
-      const std::string &qualifier);
+  void _WriteInOuts(const HgiShaderFunctionParamDescVector &parameters,
+                    const std::string &qualifier);
+  void _WriteInOutBlocks(const HgiShaderFunctionParamBlockDescVector &parameterBlocks,
+                         const std::string &qualifier);
 
   HgiVulkanShaderSectionUniquePtrVector _shaderSections;
   Hgi const *_hgi;

@@ -52,29 +52,34 @@ namespace {
 
 static const int _dimension = 3;
 
-static string _Repr(GfRange3d const &self) {
+static string _Repr(GfRange3d const &self)
+{
   return TF_PY_REPR_PREFIX + "Range3d(" + TfPyRepr(self.GetMin()) + ", " +
          TfPyRepr(self.GetMax()) + ")";
 }
 
-static GfRange3d __truediv__(const GfRange3d &self, double value) {
+static GfRange3d __truediv__(const GfRange3d &self, double value)
+{
   return self / value;
 }
 
-static GfRange3d &__itruediv__(GfRange3d &self, double value) {
+static GfRange3d &__itruediv__(GfRange3d &self, double value)
+{
   return self /= value;
 }
 
-static size_t __hash__(GfRange3d const &r) { return TfHash{}(r); }
+static size_t __hash__(GfRange3d const &r)
+{
+  return TfHash{}(r);
+}
 
-} // anonymous namespace
+}  // anonymous namespace
 
-void wrapRange3d() {
-  object getMin =
-      make_function(&GfRange3d::GetMin, return_value_policy<return_by_value>());
+void wrapRange3d()
+{
+  object getMin = make_function(&GfRange3d::GetMin, return_value_policy<return_by_value>());
 
-  object getMax =
-      make_function(&GfRange3d::GetMax, return_value_policy<return_by_value>());
+  object getMax = make_function(&GfRange3d::GetMax, return_value_policy<return_by_value>());
 
   class_<GfRange3d> cls("Range3d", init<>());
   cls.def(init<GfRange3d>())
@@ -102,29 +107,24 @@ void wrapRange3d() {
 
       .def("SetEmpty", &GfRange3d::SetEmpty)
 
-      .def("Contains",
-           (bool(GfRange3d::*)(const GfVec3d &) const) & GfRange3d::Contains)
-      .def("Contains",
-           (bool(GfRange3d::*)(const GfRange3d &) const) & GfRange3d::Contains)
+      .def("Contains", (bool(GfRange3d::*)(const GfVec3d &) const) & GfRange3d::Contains)
+      .def("Contains", (bool(GfRange3d::*)(const GfRange3d &) const) & GfRange3d::Contains)
 
       .def("GetUnion", &GfRange3d::GetUnion)
       .staticmethod("GetUnion")
 
       .def("UnionWith",
-           (const GfRange3d &(GfRange3d::*)(const GfVec3d &)) &
-               GfRange3d::UnionWith,
+           (const GfRange3d &(GfRange3d::*)(const GfVec3d &)) & GfRange3d::UnionWith,
            return_self<>())
       .def("UnionWith",
-           (const GfRange3d &(GfRange3d::*)(const GfRange3d &)) &
-               GfRange3d::UnionWith,
+           (const GfRange3d &(GfRange3d::*)(const GfRange3d &)) & GfRange3d::UnionWith,
            return_self<>())
 
       .def("GetIntersection", &GfRange3d::GetIntersection)
       .staticmethod("GetIntersection")
 
       .def("IntersectWith",
-           (const GfRange3d &(GfRange3d::*)(const GfRange3d &)) &
-               GfRange3d::IntersectWith,
+           (const GfRange3d &(GfRange3d::*)(const GfRange3d &)) & GfRange3d::IntersectWith,
            return_self<>())
 
       .def("GetDistanceSquared", &GfRange3d::GetDistanceSquared)
@@ -151,8 +151,7 @@ void wrapRange3d() {
       .def_readonly("unitCube", &GfRange3d::UnitCube)
 
       ;
-  to_python_converter<std::vector<GfRange3d>,
-                      TfPySequenceToPython<std::vector<GfRange3d>>>();
+  to_python_converter<std::vector<GfRange3d>, TfPySequenceToPython<std::vector<GfRange3d>>>();
 
   if (!PyObject_HasAttrString(cls.ptr(), "__truediv__")) {
     // __truediv__ not added by .def( self / double() ) above, which

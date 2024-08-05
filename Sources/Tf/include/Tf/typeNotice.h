@@ -35,17 +35,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// TfNotice sent after a TfType is declared.
 class TfTypeWasDeclaredNotice : public TfNotice {
-public:
+ public:
   TfTypeWasDeclaredNotice(TfType t);
   virtual ~TfTypeWasDeclaredNotice();
 
   /// Get the newly declared TfType.
-  TfType GetType() const { return _type; }
+  TfType GetType() const
+  {
+    return _type;
+  }
 
-private:
+ private:
   TfType _type;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TYPE_NOTICE_H
+#endif  // PXR_BASE_TF_TYPE_NOTICE_H

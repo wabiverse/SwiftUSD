@@ -42,13 +42,16 @@ class SdfReference;
 /// Key policy for \c std::string names.
 ///
 class SdfNameKeyPolicy {
-public:
+ public:
   typedef std::string value_type;
 
-  static const value_type &Canonicalize(const value_type &x) { return x; }
+  static const value_type &Canonicalize(const value_type &x)
+  {
+    return x;
+  }
 
-  static const std::vector<value_type> &
-  Canonicalize(const std::vector<value_type> &x) {
+  static const std::vector<value_type> &Canonicalize(const std::vector<value_type> &x)
+  {
     return x;
   }
 };
@@ -58,13 +61,16 @@ public:
 /// Key policy for \c TfToken names.
 ///
 class SdfNameTokenKeyPolicy {
-public:
+ public:
   typedef TfToken value_type;
 
-  static const value_type &Canonicalize(const value_type &x) { return x; }
+  static const value_type &Canonicalize(const value_type &x)
+  {
+    return x;
+  }
 
-  static const std::vector<value_type> &
-  Canonicalize(const std::vector<value_type> &x) {
+  static const std::vector<value_type> &Canonicalize(const std::vector<value_type> &x)
+  {
     return x;
   }
 };
@@ -74,17 +80,19 @@ public:
 /// Key policy for \c SdfPath; converts all SdfPaths to absolute.
 ///
 class SdfPathKeyPolicy {
-public:
+ public:
   typedef SdfPath value_type;
 
   SdfPathKeyPolicy() {}
   explicit SdfPathKeyPolicy(const SdfSpecHandle &owner) : _owner(owner) {}
 
-  value_type Canonicalize(const value_type &x) const {
+  value_type Canonicalize(const value_type &x) const
+  {
     return _Canonicalize(x, _GetAnchor());
   }
 
-  std::vector<value_type> Canonicalize(const std::vector<value_type> &x) const {
+  std::vector<value_type> Canonicalize(const std::vector<value_type> &x) const
+  {
     if (x.empty()) {
       return x;
     }
@@ -92,29 +100,34 @@ public:
     const SdfPath anchor = _GetAnchor();
 
     std::vector<value_type> result = x;
-    TF_FOR_ALL(it, result) { *it = _Canonicalize(*it, anchor); }
+    TF_FOR_ALL(it, result)
+    {
+      *it = _Canonicalize(*it, anchor);
+    }
     return result;
   }
 
-private:
+ private:
   // Get the most recent SdfPath of the owning object, for expanding
   // relative SdfPaths to absolute
-  SdfPath _GetAnchor() const {
-    return _owner ? _owner->GetPath().GetPrimPath()
-                  : SdfPath::AbsoluteRootPath();
+  SdfPath _GetAnchor() const
+  {
+    return _owner ? _owner->GetPath().GetPrimPath() : SdfPath::AbsoluteRootPath();
   }
 
-  value_type _Canonicalize(const value_type &x, const SdfPath &primPath) const {
+  value_type _Canonicalize(const value_type &x, const SdfPath &primPath) const
+  {
     return x.IsEmpty() ? value_type() : x.MakeAbsolutePath(primPath);
   }
 
-private:
+ private:
   SdfSpecHandle _owner;
 };
 
 // Cannot get from a VtValue except as the correct type.
-template <> struct Vt_DefaultValueFactory<SdfPathKeyPolicy> {
-  static Vt_DefaultValueHolder Invoke() {
+template<> struct Vt_DefaultValueFactory<SdfPathKeyPolicy> {
+  static Vt_DefaultValueHolder Invoke()
+  {
     TF_AXIOM(false && "Failed VtValue::Get<SdfPathKeyPolicy> not allowed");
     return Vt_DefaultValueHolder::Create((void *)0);
   }
@@ -125,20 +138,24 @@ template <> struct Vt_DefaultValueFactory<SdfPathKeyPolicy> {
 /// List editor type policy for \c SdfPayload.
 ///
 class SdfPayloadTypePolicy {
-public:
+ public:
   typedef SdfPayload value_type;
 
-  static const value_type &Canonicalize(const value_type &x) { return x; }
+  static const value_type &Canonicalize(const value_type &x)
+  {
+    return x;
+  }
 
-  static const std::vector<value_type> &
-  Canonicalize(const std::vector<value_type> &x) {
+  static const std::vector<value_type> &Canonicalize(const std::vector<value_type> &x)
+  {
     return x;
   }
 };
 
 // Cannot get from a VtValue except as the correct type.
-template <> struct Vt_DefaultValueFactory<SdfPayloadTypePolicy> {
-  static Vt_DefaultValueHolder Invoke() {
+template<> struct Vt_DefaultValueFactory<SdfPayloadTypePolicy> {
+  static Vt_DefaultValueHolder Invoke()
+  {
     TF_AXIOM(false && "Failed VtValue::Get<SdfPayloadTypePolicy> not allowed");
     return Vt_DefaultValueHolder::Create((void *)0);
   }
@@ -149,22 +166,25 @@ template <> struct Vt_DefaultValueFactory<SdfPayloadTypePolicy> {
 /// List editor type policy for \c SdfReference.
 ///
 class SdfReferenceTypePolicy {
-public:
+ public:
   typedef SdfReference value_type;
 
-  static const value_type &Canonicalize(const value_type &x) { return x; }
+  static const value_type &Canonicalize(const value_type &x)
+  {
+    return x;
+  }
 
-  static const std::vector<value_type> &
-  Canonicalize(const std::vector<value_type> &x) {
+  static const std::vector<value_type> &Canonicalize(const std::vector<value_type> &x)
+  {
     return x;
   }
 };
 
 // Cannot get from a VtValue except as the correct type.
-template <> struct Vt_DefaultValueFactory<SdfReferenceTypePolicy> {
-  static Vt_DefaultValueHolder Invoke() {
-    TF_AXIOM(false &&
-             "Failed VtValue::Get<SdfReferenceTypePolicy> not allowed");
+template<> struct Vt_DefaultValueFactory<SdfReferenceTypePolicy> {
+  static Vt_DefaultValueHolder Invoke()
+  {
+    TF_AXIOM(false && "Failed VtValue::Get<SdfReferenceTypePolicy> not allowed");
     return Vt_DefaultValueHolder::Create((void *)0);
   }
 };
@@ -174,13 +194,16 @@ template <> struct Vt_DefaultValueFactory<SdfReferenceTypePolicy> {
 /// List editor type policy for sublayers.
 ///
 class SdfSubLayerTypePolicy {
-public:
+ public:
   typedef std::string value_type;
 
-  static const value_type &Canonicalize(const value_type &x) { return x; }
+  static const value_type &Canonicalize(const value_type &x)
+  {
+    return x;
+  }
 
-  static const std::vector<value_type> &
-  Canonicalize(const std::vector<value_type> &x) {
+  static const std::vector<value_type> &Canonicalize(const std::vector<value_type> &x)
+  {
     return x;
   }
 };
@@ -191,7 +214,7 @@ public:
 /// paths.
 ///
 class SdfRelocatesMapProxyValuePolicy {
-public:
+ public:
   typedef std::map<SdfPath, SdfPath> Type;
   typedef Type::key_type key_type;
   typedef Type::mapped_type mapped_type;
@@ -202,11 +225,9 @@ public:
   SDF_API
   static key_type CanonicalizeKey(const SdfSpecHandle &v, const key_type &x);
   SDF_API
-  static mapped_type CanonicalizeValue(const SdfSpecHandle &v,
-                                       const mapped_type &x);
+  static mapped_type CanonicalizeValue(const SdfSpecHandle &v, const mapped_type &x);
   SDF_API
-  static value_type CanonicalizePair(const SdfSpecHandle &v,
-                                     const value_type &x);
+  static value_type CanonicalizePair(const SdfSpecHandle &v, const value_type &x);
 };
 
 /// \class SdfGenericSpecViewPredicate
@@ -214,10 +235,11 @@ public:
 /// Predicate for viewing properties.
 ///
 class SdfGenericSpecViewPredicate {
-public:
+ public:
   SdfGenericSpecViewPredicate(SdfSpecType type) : _type(type) {}
 
-  template <class T> bool operator()(const SdfHandle<T> &x) const {
+  template<class T> bool operator()(const SdfHandle<T> &x) const
+  {
     // XXX: x is sometimes null. why?
     if (x) {
       return x->GetSpecType() == _type;
@@ -225,7 +247,7 @@ public:
     return false;
   }
 
-private:
+ private:
   SdfSpecType _type;
 };
 
@@ -234,7 +256,7 @@ private:
 /// Predicate for viewing attributes.
 ///
 class SdfAttributeViewPredicate : public SdfGenericSpecViewPredicate {
-public:
+ public:
   SDF_API
   SdfAttributeViewPredicate();
 };
@@ -244,11 +266,11 @@ public:
 /// Predicate for viewing relationships.
 ///
 class SdfRelationshipViewPredicate : public SdfGenericSpecViewPredicate {
-public:
+ public:
   SDF_API
   SdfRelationshipViewPredicate();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PROXY_POLICIES_H
+#endif  // PXR_USD_SDF_PROXY_POLICIES_H

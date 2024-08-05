@@ -24,12 +24,12 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_PIPELINE_H
 #define PXR_IMAGING_HGI_VULKAN_PIPELINE_H
 
-#include <pxr/pxrns.h>
 #include "Gf/vec2i.h"
 #include "Hgi/graphicsCmdsDesc.h"
 #include "Hgi/graphicsPipeline.h"
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -43,9 +43,8 @@ using VkClearValueVector = std::vector<VkClearValue>;
 ///
 /// Vulkan implementation of HgiGraphicsPipeline.
 ///
-class HgiVulkanGraphicsPipeline final : public HgiGraphicsPipeline
-{
-public:
+class HgiVulkanGraphicsPipeline final : public HgiGraphicsPipeline {
+ public:
   HGIVULKAN_API
   ~HgiVulkanGraphicsPipeline() override;
 
@@ -67,9 +66,7 @@ public:
 
   /// Returns the vulkan frame buffer, creating it if needed.
   HGIVULKAN_API
-  VkFramebuffer AcquireVulkanFramebuffer(
-      HgiGraphicsCmdsDesc const &gfxDesc,
-      GfVec2i *dimensions);
+  VkFramebuffer AcquireVulkanFramebuffer(HgiGraphicsCmdsDesc const &gfxDesc, GfVec2i *dimensions);
 
   /// Returns the clear values for each color and depth attachment.
   HGIVULKAN_API
@@ -79,23 +76,20 @@ public:
   HGIVULKAN_API
   uint64_t &GetInflightBits();
 
-protected:
+ protected:
   friend class HgiVulkan;
 
   HGIVULKAN_API
-  HgiVulkanGraphicsPipeline(
-      HgiVulkanDevice *device,
-      HgiGraphicsPipelineDesc const &desc);
+  HgiVulkanGraphicsPipeline(HgiVulkanDevice *device, HgiGraphicsPipelineDesc const &desc);
 
-private:
+ private:
   HgiVulkanGraphicsPipeline() = delete;
   HgiVulkanGraphicsPipeline &operator=(const HgiVulkanGraphicsPipeline &) = delete;
   HgiVulkanGraphicsPipeline(const HgiVulkanGraphicsPipeline &) = delete;
 
   void _CreateRenderPass();
 
-  struct HgiVulkan_Framebuffer
-  {
+  struct HgiVulkan_Framebuffer {
     GfVec2i dimensions;
     HgiGraphicsCmdsDesc desc;
     VkFramebuffer vkFramebuffer;

@@ -34,31 +34,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace HdUtils {
 
 /* static */
-bool
-HasActiveRenderSettingsPrim(
-    const HdSceneIndexBaseRefPtr &si,
-    SdfPath *primPath /* = nullptr */)
+bool HasActiveRenderSettingsPrim(const HdSceneIndexBaseRefPtr &si,
+                                 SdfPath *primPath /* = nullptr */)
 {
-    if (!si) {
-        return false;
-    }
-
-    HdSceneGlobalsSchema sgSchema =
-        HdSceneGlobalsSchema::GetFromSceneIndex(si);
-    if (!sgSchema) {
-        return false;
-    }
-
-    if (auto pathHandle = sgSchema.GetActiveRenderSettingsPrim()) {
-        if (primPath) {
-            *primPath = pathHandle->GetTypedValue(0);
-        }
-        return true;
-    }
-
+  if (!si) {
     return false;
+  }
+
+  HdSceneGlobalsSchema sgSchema = HdSceneGlobalsSchema::GetFromSceneIndex(si);
+  if (!sgSchema) {
+    return false;
+  }
+
+  if (auto pathHandle = sgSchema.GetActiveRenderSettingsPrim()) {
+    if (primPath) {
+      *primPath = pathHandle->GetTypedValue(0);
+    }
+    return true;
+  }
+
+  return false;
 }
 
-}
+}  // namespace HdUtils
 
 PXR_NAMESPACE_CLOSE_SCOPE

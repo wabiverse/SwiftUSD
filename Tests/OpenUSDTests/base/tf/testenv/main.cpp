@@ -21,13 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/pxr.h"
 #include "pxr/base/tf/regTest.h"
+#include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    return TfRegTest::Main(argc, argv);
+  return TfRegTest::Main(argc, argv);
 }

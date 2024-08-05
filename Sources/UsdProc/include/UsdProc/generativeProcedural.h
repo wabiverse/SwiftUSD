@@ -26,18 +26,18 @@
 
 /// \file usdProc/generativeProcedural.h
 
-#include <pxr/pxrns.h>
-#include "UsdProc/api.h"
-#include "UsdGeom/boundable.h"
 #include "Usd/prim.h"
 #include "Usd/stage.h"
+#include "UsdGeom/boundable.h"
+#include "UsdProc/api.h"
 #include "UsdProc/tokens.h"
+#include <pxr/pxrns.h>
 
 #include "Vt/value.h"
 
+#include "Gf/matrix4d.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
-#include "Gf/matrix4d.h"
 
 #include "Tf/token.h"
 #include "Tf/type.h"
@@ -71,9 +71,8 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdProcTokens->rightHanded
 /// as the value.
 ///
-class UsdProcGenerativeProcedural : public UsdGeomBoundable
-{
-public:
+class UsdProcGenerativeProcedural : public UsdGeomBoundable {
+ public:
   /// Compile time constant representing what kind of schema this class is.
   ///
   /// \sa UsdSchemaKind
@@ -83,10 +82,7 @@ public:
   /// Equivalent to UsdProcGenerativeProcedural::Get(prim.GetStage(), prim.GetPath())
   /// for a \em valid \p prim, but will not immediately throw an error for
   /// an invalid \p prim
-  explicit UsdProcGenerativeProcedural(const UsdPrim &prim = UsdPrim())
-      : UsdGeomBoundable(prim)
-  {
-  }
+  explicit UsdProcGenerativeProcedural(const UsdPrim &prim = UsdPrim()) : UsdGeomBoundable(prim) {}
 
   /// Construct a UsdProcGenerativeProcedural on the prim held by \p schemaObj .
   /// Should be preferred over UsdProcGenerativeProcedural(schemaObj.GetPrim()),
@@ -104,8 +100,7 @@ public:
   /// class and all its ancestor classes.  Does not include attributes that
   /// may be authored by custom/extended methods of the schemas involved.
   USDPROC_API
-  static const TfTokenVector &
-  GetSchemaAttributeNames(bool includeInherited = true);
+  static const TfTokenVector &GetSchemaAttributeNames(bool includeInherited = true);
 
   /// Return a UsdProcGenerativeProcedural holding the prim adhering to this
   /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -117,8 +112,7 @@ public:
   /// \endcode
   ///
   USDPROC_API
-  static UsdProcGenerativeProcedural
-  Get(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdProcGenerativeProcedural Get(const UsdStagePtr &stage, const SdfPath &path);
 
   /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
   /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -143,17 +137,16 @@ public:
   /// the opinion at the current EditTarget.
   ///
   USDPROC_API
-  static UsdProcGenerativeProcedural
-  Define(const UsdStagePtr &stage, const SdfPath &path);
+  static UsdProcGenerativeProcedural Define(const UsdStagePtr &stage, const SdfPath &path);
 
-protected:
+ protected:
   /// Returns the kind of schema this class belongs to.
   ///
   /// \sa UsdSchemaKind
   USDPROC_API
   UsdSchemaKind _GetSchemaKind() const override;
 
-private:
+ private:
   // needs to invoke _GetStaticTfType.
   friend class UsdSchemaRegistry;
   USDPROC_API
@@ -165,7 +158,7 @@ private:
   USDPROC_API
   const TfType &_GetTfType() const override;
 
-public:
+ public:
   // --------------------------------------------------------------------- //
   // PROCEDURALSYSTEM
   // --------------------------------------------------------------------- //
@@ -187,9 +180,10 @@ public:
   /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
   /// the default for \p writeSparsely is \c false.
   USDPROC_API
-  UsdAttribute CreateProceduralSystemAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely = false) const;
+  UsdAttribute CreateProceduralSystemAttr(VtValue const &defaultValue = VtValue(),
+                                          bool writeSparsely = false) const;
 
-public:
+ public:
   // ===================================================================== //
   // Feel free to add custom code below this line, it will be preserved by
   // the code generator.

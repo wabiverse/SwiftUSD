@@ -24,9 +24,9 @@
 #ifndef PXR_IMAGING_HGI_VULKAN_PIPELINE_CACHE_H
 #define PXR_IMAGING_HGI_VULKAN_PIPELINE_CACHE_H
 
-#include <pxr/pxrns.h>
 #include "HgiVulkan/api.h"
 #include "HgiVulkan/vulkan.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -36,9 +36,8 @@ class HgiVulkanDevice;
 ///
 /// Wrapper for Vulkan pipeline cache.
 ///
-class HgiVulkanPipelineCache final
-{
-public:
+class HgiVulkanPipelineCache final {
+ public:
   HGIVULKAN_API
   HgiVulkanPipelineCache(HgiVulkanDevice *device);
 
@@ -49,7 +48,7 @@ public:
   HGIVULKAN_API
   VkPipelineCache GetVulkanPipelineCache() const;
 
-private:
+ private:
   HgiVulkanPipelineCache() = delete;
   HgiVulkanPipelineCache &operator=(const HgiVulkanPipelineCache &) = delete;
   HgiVulkanPipelineCache(const HgiVulkanPipelineCache &) = delete;

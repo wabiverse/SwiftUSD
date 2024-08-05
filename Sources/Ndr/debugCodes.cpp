@@ -21,23 +21,23 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include <pxr/pxrns.h>
 #include "Ndr/debugCodes.h"
+#include <pxr/pxrns.h>
 
 #include "Tf/debug.h"
 #include "Tf/registryManager.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_REGISTRY_FUNCTION(TfDebug)
 {
-    TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_DISCOVERY, "Diagnostics from discovering nodes for Node Definition Registry");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_PARSING, "Diagnostics from parsing nodes for Node Definition Registry");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_INFO, "Advisory information for Node Definition Registry");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_STATS, "Statistics for registries derived from NdrRegistry");
-    TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_DEBUG, "Advanced debugging for Node Definition Registry");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_DISCOVERY,
+                              "Diagnostics from discovering nodes for Node Definition Registry");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_PARSING,
+                              "Diagnostics from parsing nodes for Node Definition Registry");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_INFO, "Advisory information for Node Definition Registry");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_STATS, "Statistics for registries derived from NdrRegistry");
+  TF_DEBUG_ENVIRONMENT_SYMBOL(NDR_DEBUG, "Advanced debugging for Node Definition Registry");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

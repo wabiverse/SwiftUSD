@@ -24,9 +24,9 @@
 #ifndef EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_H
 #define EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_H
 
-#include <pxr/pxrns.h>
 #include "Hd/light.h"
 #include "Riley.h"
+#include <pxr/pxrns.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -37,9 +37,8 @@ class HdPrman_RenderParam;
 ///
 /// A representation for lights.
 ///
-class HdPrmanLight final : public HdLight
-{
-public:
+class HdPrmanLight final : public HdLight {
+ public:
   HdPrmanLight(SdfPath const &id, TfToken const &lightType);
   ~HdPrmanLight() override;
 
@@ -58,7 +57,7 @@ public:
 
   void Finalize(HdRenderParam *renderParam) override;
 
-private:
+ private:
   void _ResetLight(HdPrman_RenderParam *renderParam, bool clearFilterPaths);
 
   const TfToken _hdLightType;
@@ -76,4 +75,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_H
+#endif  // EXT_RMANPKG_24_0_PLUGIN_RENDERMAN_PLUGIN_HD_PRMAN_LIGHT_H
