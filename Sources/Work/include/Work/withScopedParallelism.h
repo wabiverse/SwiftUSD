@@ -31,7 +31,7 @@
 #include "Work/dispatcher.h"
 #include <pxr/pxrns.h>
 
-#include <tbb/task_arena.h>
+#include <OneTBB/tbb/task_arena.h>
 
 #include <utility>
 

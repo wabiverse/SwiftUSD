@@ -49,7 +49,7 @@
 #include "Gf/vec2d.h"
 #include "Work/loops.h"
 
-#include <tbb/parallel_reduce.h>
+#include <OneTBB/tbb/parallel_reduce.h>
 
 #include <set>
 #include <string>

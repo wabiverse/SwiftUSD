@@ -475,7 +475,7 @@ class "MaterialBindingAPI"
 #include "Usd/collectionAPI.h"
 #include "UsdGeom/subset.h"
 #include "UsdShade/material.h"
-#include <tbb/concurrent_unordered_map.h>"""
+#include <OneTBB/tbb/concurrent_unordered_map.h>"""
          dictionary schemaTokens = {
             dictionary materialBinding = {
                 string value = "material:binding"

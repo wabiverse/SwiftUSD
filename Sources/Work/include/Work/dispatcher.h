@@ -33,12 +33,12 @@
 #include "Tf/errorMark.h"
 #include "Tf/errorTransport.h"
 
-#include <tbb/concurrent_vector.h>
-#include <tbb/task.h>
+#include <OneTBB/tbb/concurrent_vector.h>
+#include <OneTBB/tbb/task.h>
 #if !WITH_TBB_LEGACY
-#include <tbb/global_control.h>
-#include <tbb/task_group.h>
-#include <tbb/task_scheduler_observer.h>
+#include <OneTBB/tbb/global_control.h>
+#include <OneTBB/tbb/task_group.h>
+#include <OneTBB/tbb/task_scheduler_observer.h>
 #endif /* WITH_TBB_LEGACY */
 
 #include <functional>

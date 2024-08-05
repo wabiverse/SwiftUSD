@@ -37,7 +37,7 @@
 #include "Pcp/layerStackIdentifier.h"
 #include "Pcp/mapExpression.h"
 
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_mutex.h>
 #include <iosfwd>
 #include <memory>
 #include <string>

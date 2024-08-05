@@ -26,7 +26,7 @@
 #include "Tf/pxrTslRobinMap/robin_map.h"
 #include <pxr/pxrns.h>
 
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_mutex.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

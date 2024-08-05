@@ -38,7 +38,7 @@
 #include "Arch/demangle.h"
 #include "Arch/export.h"
 
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/spin_mutex.h>
 
 #include <algorithm>
 #include <atomic>

@@ -47,7 +47,7 @@
 #include "Gf/vec4i.h"
 #include "Tf/hashmap.h"
 
-#include <tbb/enumerable_thread_specific.h>
+#include <OneTBB/tbb/enumerable_thread_specific.h>
 
 #include <vector>
 #include <unordered_map>

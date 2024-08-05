@@ -33,9 +33,9 @@
 #include "Tf/errorMark.h"
 #include "Tf/errorTransport.h"
 
-#include <tbb/concurrent_vector.h>
-#include <tbb/task.h>
-#include <tbb/task_group.h>
+#include <OneTBB/tbb/concurrent_vector.h>
+#include <OneTBB/tbb/task.h>
+#include <OneTBB/tbb/task_group.h>
 
 #include <functional>
 #include <type_traits>

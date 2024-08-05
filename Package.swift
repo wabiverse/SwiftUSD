@@ -1510,6 +1510,8 @@ enum Arch
     case web
     /// everything not windows (apple + linux).
     case nix
+    /// everything not linux (apple + windows).
+    case applewindows
     /// everything not apple (linux + windows).
     case linwin
 
@@ -1522,6 +1524,7 @@ enum Arch
         case .windows: [.windows]
         case .web: [.wasi]
         case .nix: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .linux, .android, .openbsd]
+        case .applewindows: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .windows]
         case .linwin: [.linux, .android, .openbsd, .windows]
       }
     }

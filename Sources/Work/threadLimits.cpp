@@ -29,8 +29,8 @@
 
 #include "Tf/envSetting.h"
 
-#include <tbb/global_control.h>
-#include <tbb/task_arena.h>
+#include <OneTBB/tbb/global_control.h>
+#include <OneTBB/tbb/task_arena.h>
 
 #include <algorithm>
 #include <atomic>

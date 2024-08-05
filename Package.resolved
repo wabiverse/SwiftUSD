@@ -1,5 +1,5 @@
 {
-  "originHash" : "b6dbd07823040b8eb65c53f596893481e2f6b31e3806c0304ecbf9d7ff4de7b1",
+  "originHash" : "09a37217d26d064bbfb26491267019087c42146ab45bd3625ad90873ba20141d",
   "pins" : [
     {
       "identity" : "aexml",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "38f7d00b23ecd891e1ee656fa6aeebd6ba04ecc3",
         "version" : "4.6.1"
+      }
+    },
+    {
+      "identity" : "galah",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/galah.git",
+      "state" : {
+        "revision" : "a90d086184e8e0fb3d32803b051acf75ff50d66d",
+        "version" : "1.0.0"
       }
     },
     {
@@ -38,12 +47,39 @@
       }
     },
     {
+      "identity" : "metaversepythonframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/MetaversePythonFramework",
+      "state" : {
+        "revision" : "e2f4ba867b7e287a283a27a0005ab64deef14279",
+        "version" : "3.11.7"
+      }
+    },
+    {
+      "identity" : "metaversevulkanframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
+      "state" : {
+        "revision" : "13c7061599c61a4959c558d8ec1836e5b32b640b",
+        "version" : "1.26.2"
+      }
+    },
+    {
       "identity" : "pathkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kylef/PathKit.git",
       "state" : {
         "revision" : "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
         "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "pythonkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pvieito/PythonKit.git",
+      "state" : {
+        "revision" : "43647b36cacb99558e57ef98e97ef598f91d1164",
+        "version" : "0.5.0"
       }
     },
     {
@@ -143,6 +179,15 @@
       "state" : {
         "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
         "version" : "1.6.1"
+      }
+    },
+    {
+      "identity" : "swift-macro-toolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stackotter/swift-macro-toolkit",
+      "state" : {
+        "revision" : "106daeb38eb3f52b1540aed981fc63fa22274576",
+        "version" : "0.3.1"
       }
     },
     {

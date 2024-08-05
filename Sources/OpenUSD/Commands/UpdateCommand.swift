@@ -406,7 +406,7 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "<tbb/mutex.h>", with: "<mutex>")
       source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
       // modern versions of tbb no longer contain a task_scheduler_init.
-      source = source.replacingOccurrences(of: "#include <tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
+      source = source.replacingOccurrences(of: "#include <OneTBB/tbb/task_scheduler_init.h>", with: "#if WITH_TBB_LEGACY\n#include <OneTBB/tbb/task_scheduler_init.h>\n#endif /* WITH_TBB_LEGACY */")
 
       /* ---- materialx headers ----------- */
 

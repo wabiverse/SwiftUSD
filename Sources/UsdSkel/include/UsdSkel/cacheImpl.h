@@ -40,8 +40,8 @@
 
 #include <boost/optional.hpp>
 
-#include <tbb/concurrent_hash_map.h>
-#include <tbb/queuing_rw_mutex.h>
+#include <OneTBB/tbb/concurrent_hash_map.h>
+#include <OneTBB/tbb/queuing_rw_mutex.h>
 
 #include <unordered_map>
 

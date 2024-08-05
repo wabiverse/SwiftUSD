@@ -31,7 +31,7 @@
 #include "ArTypes/resolvedPath.h"
 #include "Ar/resolver.h"
 
-#include <tbb/concurrent_hash_map.h>
+#include <OneTBB/tbb/concurrent_hash_map.h>
 
 #include <memory>
 

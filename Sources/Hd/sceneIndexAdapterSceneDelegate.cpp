@@ -94,7 +94,7 @@
 #include "Hd/volumeFieldSchema.h"
 #include "Hd/xformSchema.h"
 
-#include <tbb/concurrent_unordered_set.h>
+#include <OneTBB/tbb/concurrent_unordered_set.h>
 
 #include "Hf/perfLog.h"
 

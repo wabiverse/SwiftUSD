@@ -27,7 +27,7 @@
 #include "Hd/primvarSchema.h"
 #include "Hd/primvarsSchema.h"
 
-#include <tbb/concurrent_hash_map.h>
+#include <OneTBB/tbb/concurrent_hash_map.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

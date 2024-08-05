@@ -34,7 +34,7 @@
 
 #include "Tf/declarePtrs.h"
 
-#include <tbb/concurrent_vector.h>
+#include <OneTBB/tbb/concurrent_vector.h>
 
 #include <ostream>
 

@@ -37,8 +37,8 @@
 #include "Tf/staticData.h"
 #include "Tf/token.h"
 
-#include <tbb/concurrent_unordered_map.h>
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/concurrent_unordered_map.h>
+#include <OneTBB/tbb/spin_mutex.h>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/preprocessor.hpp>
 

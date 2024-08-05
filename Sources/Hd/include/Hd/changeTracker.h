@@ -32,7 +32,7 @@
 #include "Sdf/path.h"
 #include "Tf/hashmap.h"
 
-#include <tbb/concurrent_hash_map.h>
+#include <OneTBB/tbb/concurrent_hash_map.h>
 #include <atomic>
 
 PXR_NAMESPACE_OPEN_SCOPE

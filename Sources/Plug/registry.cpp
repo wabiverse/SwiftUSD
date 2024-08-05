@@ -43,8 +43,8 @@
 #include "Tf/type.h"
 #include "Work/withScopedParallelism.h"
 
-#include <tbb/concurrent_vector.h>
-#include <tbb/spin_mutex.h>
+#include <OneTBB/tbb/concurrent_vector.h>
+#include <OneTBB/tbb/spin_mutex.h>
 
 #include <functional>
 
