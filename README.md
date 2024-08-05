@@ -26,7 +26,7 @@
 
 <h4 align="center">
   <a href="https://wabiverse.github.io/SwiftUSD/documentation/pixarusd/">
-    <img src="https://img.shields.io/badge/v23%2E11%2E39-DocumentationSource?style=flat-square&label=docs&labelColor=F05138&logo=swift&color=gray&logoColor=white">
+    <img src="https://img.shields.io/badge/v23%2E11%2E43-DocumentationSource?style=flat-square&label=docs&labelColor=F05138&logo=swift&color=gray&logoColor=white">
   </a>
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ubuntu.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
@@ -78,7 +78,7 @@ For more details, please visit the web site [here](http://openusd.org).
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
-  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.39"),
+  .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.43"),
 ]
 ```
 
@@ -109,7 +109,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.39")
+    .package(url: "https://github.com/wabiverse/SwiftUSD.git", from: "23.11.43")
   ],
   targets: [
     /* 📕 For library products... */
