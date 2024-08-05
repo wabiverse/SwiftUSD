@@ -288,7 +288,7 @@ let package = Package(
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
-        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.nix.platform))
+        .product(name: "Rainbow", package: "Rainbow")
       ] + Arch.OS.dependency(.boost),
       publicHeadersPath: "include",
       cxxSettings: [
@@ -1308,7 +1308,7 @@ let package = Package(
         .product(name: "Version", package: "Version"),
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
         .product(name: "Logging", package: "swift-log"),
-        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.nix.platform))
+        .product(name: "Rainbow", package: "Rainbow")
       ],
       resources: [
         // usd source files that need modifications to work with swift are maintained out of these

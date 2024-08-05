@@ -30,9 +30,7 @@
 
 import Foundation
 import Logging
-#if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS) || os(Linux)
 import Rainbow
-#endif
 
 /// The standard error stream used for logging errors.
 var standardError = FileHandle.standardError

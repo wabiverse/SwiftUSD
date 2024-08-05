@@ -29,9 +29,7 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-#if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS) || os(Linux)
 import Rainbow
-#endif
 
 @main
 struct AsyncMain
