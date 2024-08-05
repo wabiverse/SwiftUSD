@@ -94,59 +94,6 @@ final class ArchTests: XCTestCase
 }
 
 /* ---- xxx ----
- *   JS  TESTS
- * ---- xxx ---- */
-
-final class JsTests: XCTestCase
-{
-  func testArray()
-  {
-    let array = Js.Array()
-    Msg.logger.log(level: .info, "Js.Array -> \(array)")
-
-    let jsArray = JsArray()
-    Msg.logger.log(level: .info, "JsArray -> \(jsArray)")
-
-    XCTAssertEqual(array.count, jsArray.count)
-  }
-
-  func testObject()
-  {
-    let object = Js.Object()
-    Msg.logger.log(level: .info, "Js.Object -> \(object)")
-
-    let jsObject = JsObject()
-    Msg.logger.log(level: .info, "JsObject -> \(jsObject)")
-
-    XCTAssertEqual(object.empty(), jsObject.empty())
-  }
-
-  func testParseError()
-  {
-    let parseError = Js.ParseError()
-    Msg.logger.log(level: .info, "Js.ParseError -> \(parseError)")
-
-    let jsParseError = JsParseError()
-    Msg.logger.log(level: .info, "ParseError -> \(jsParseError)")
-
-    XCTAssertEqual(parseError.reason, jsParseError.reason)
-  }
-
-  func testValue()
-  {
-    let value = Js.Value(true)
-    Msg.logger.log(level: .info, "Js.Value -> \(value.GetBool())")
-    XCTAssertEqual(value.GetBool(), true)
-
-    let jsValue = JsValue(true)
-    Msg.logger.log(level: .info, "JsValue -> \(jsValue.GetBool())")
-    XCTAssertEqual(jsValue.GetBool(), true)
-
-    XCTAssertEqual(value.GetBool(), jsValue.GetBool())
-  }
-}
-
-/* ---- xxx ----
  *   GF  TESTS
  * ---- xxx ---- */
 
