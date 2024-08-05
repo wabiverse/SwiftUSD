@@ -2508,26 +2508,26 @@ struct Galah
   init(supported: Bool = false)
   {
     var withGalah = supported
-    
+
     // if we are on these platforms, we are on swift 6, enable galah.
-#if os(macOS)
-    if #available(macOS 15, visionOS 2, iOS 18, tvOS 18, watchOS 18, *)
-    {
-      withGalah = true
-    }
-#endif
-    
+    #if os(macOS)
+      if #available(macOS 15, visionOS 2, iOS 18, tvOS 18, watchOS 18, *)
+      {
+        withGalah = true
+      }
+    #endif
+
     // if swift is version 6 or later, enable galah. need to check how
     // this preprocesses if linux has swift 6.0 installed (we want to
     // continue to allow a minimum swift-tools-version of 5.10, while
     // opening up features for later swift versions, if available).
-#if swift(>=6.0)
-    withGalah = true
-#endif /* swift(>=6.0) */
-    
+    #if swift(>=6.0)
+      withGalah = true
+    #endif /* swift(>=6.0) */
+
     if withGalah { Galah.enableGalah() }
   }
-  
+
   static func enableGalah()
   {
     galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0")]
