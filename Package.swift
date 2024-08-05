@@ -262,7 +262,10 @@ let package = Package(
     .target(
       name: "pxr",
       dependencies: [],
-      publicHeadersPath: "include"
+      publicHeadersPath: "include",
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
     ),
 
     .target(
@@ -312,7 +315,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Arch"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Arch"),
         .define("MFB_PACKAGE_MODULE", to: "Arch"),
-        .define("ARCH_EXPORTS", to: "1")
+        .define("ARCH_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -326,7 +330,8 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Tf"),
         .define("MFB_PACKAGE_MODULE", to: "Tf"),
         .define("TF_EXPORTS", to: "1"),
-        .headerSearchPath("include/Tf")
+        .headerSearchPath("include/Tf"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -341,7 +346,8 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Js"),
         .define("MFB_PACKAGE_MODULE", to: "Js"),
         .define("JS_EXPORTS", to: "1"),
-        .headerSearchPath("include/Js")
+        .headerSearchPath("include/Js"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -355,7 +361,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Gf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
         .define("MFB_PACKAGE_MODULE", to: "Gf"),
-        .define("GF_EXPORTS", to: "1")
+        .define("GF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -373,7 +380,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Trace"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Trace"),
         .define("MFB_PACKAGE_MODULE", to: "Trace"),
-        .define("TRACE_EXPORTS", to: "1")
+        .define("TRACE_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -389,7 +397,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Vt"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Vt"),
         .define("MFB_PACKAGE_MODULE", to: "Vt"),
-        .define("VT_EXPORTS", to: "1")
+        .define("VT_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -404,7 +413,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Work"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Work"),
         .define("MFB_PACKAGE_MODULE", to: "Work"),
-        .define("WORK_EXPORTS", to: "1")
+        .define("WORK_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -421,7 +431,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Plug"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Plug"),
         .define("MFB_PACKAGE_MODULE", to: "Plug"),
-        .define("PLUG_EXPORTS", to: "1")
+        .define("PLUG_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -438,7 +449,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Ar"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
         .define("MFB_PACKAGE_MODULE", to: "Ar"),
-        .define("AR_EXPORTS", to: "1")
+        .define("AR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -470,7 +482,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Ar"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
         .define("MFB_PACKAGE_MODULE", to: "Ar"),
-        .define("AR_EXPORTS", to: "1")
+        .define("AR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -485,7 +498,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Kind"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Kind"),
         .define("MFB_PACKAGE_MODULE", to: "Kind"),
-        .define("KIND_EXPORTS", to: "1")
+        .define("KIND_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -508,7 +522,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdf"),
         .define("MFB_PACKAGE_MODULE", to: "Sdf"),
-        .define("SDF_EXPORTS", to: "1")
+        .define("SDF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -527,7 +542,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Pcp"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Pcp"),
         .define("MFB_PACKAGE_MODULE", to: "Pcp"),
-        .define("PCP_EXPORTS", to: "1")
+        .define("PCP_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -554,7 +570,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Usd"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Usd"),
         .define("MFB_PACKAGE_MODULE", to: "Usd"),
-        .define("USD_EXPORTS", to: "1")
+        .define("USD_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -576,7 +593,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Ndr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Ndr"),
         .define("MFB_PACKAGE_MODULE", to: "Ndr"),
-        .define("NDR_EXPORTS", to: "1")
+        .define("NDR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -594,7 +612,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Sdr"),
         .define("MFB_PACKAGE_MODULE", to: "Sdr"),
-        .define("SDR_EXPORTS", to: "1")
+        .define("SDR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -621,7 +640,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdGeom"),
         .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
-        .define("USDGEOM_EXPORTS", to: "1")
+        .define("USDGEOM_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -644,7 +664,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdShade"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdShade"),
         .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
-        .define("USDSHADE_EXPORTS", to: "1")
+        .define("USDSHADE_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -665,7 +686,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdShaders"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdShaders"),
         .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
-        .define("USDSHADERS_EXPORTS", to: "1")
+        .define("USDSHADERS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -691,7 +713,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdLux"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdLux"),
         .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
-        .define("USDLUX_EXPORTS", to: "1")
+        .define("USDLUX_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -713,7 +736,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdHydra"),
         .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
-        .define("USDHYDRA_EXPORTS", to: "1")
+        .define("USDHYDRA_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -737,6 +761,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "SdrOsl"),
         .define("SDROSL_EXPORTS", to: "1"),
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -759,7 +784,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdAbc"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdAbc"),
         .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
-        .define("USDABC_EXPORTS", to: "1")
+        .define("USDABC_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -781,7 +807,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdDraco"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdDraco"),
         .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
-        .define("USDDRACO_EXPORTS", to: "1")
+        .define("USDDRACO_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -801,7 +828,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdMedia"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdMedia"),
         .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
-        .define("USDMEDIA_EXPORTS", to: "1")
+        .define("USDMEDIA_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -831,6 +859,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdMtlx"),
         .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
         .define("USDMTLX_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -855,7 +884,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdPhysics"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdPhysics"),
         .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
-        .define("USDPHYSICS_EXPORTS", to: "1")
+        .define("USDPHYSICS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -874,7 +904,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdProc"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdProc"),
         .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
-        .define("USDPROC_EXPORTS", to: "1")
+        .define("USDPROC_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -896,7 +927,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdRender"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdRender"),
         .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
-        .define("USDRENDER_EXPORTS", to: "1")
+        .define("USDRENDER_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -919,7 +951,8 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdRi"),
         .define("MFB_PACKAGE_MODULE", to: "UsdRi"),
         .define("USDRI_EXPORTS", to: "1"),
-        .headerSearchPath("include/UsdRi")
+        .headerSearchPath("include/UsdRi"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -944,7 +977,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdSkel"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdSkel"),
         .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
-        .define("USDSKEL_EXPORTS", to: "1")
+        .define("USDSKEL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -963,7 +997,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdUI"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdUI"),
         .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
-        .define("USDUI_EXPORTS", to: "1")
+        .define("USDUI_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -989,7 +1024,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdUtils"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdUtils"),
         .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
-        .define("USDUTILS_EXPORTS", to: "1")
+        .define("USDUTILS_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1013,7 +1049,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "UsdVol"),
         .define("MFB_ALT_PACKAGE_NAME", to: "UsdVol"),
         .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
-        .define("USDVOL_EXPORTS", to: "1")
+        .define("USDVOL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1028,7 +1065,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "CameraUtil"),
         .define("MFB_ALT_PACKAGE_NAME", to: "CameraUtil"),
         .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
-        .define("CAMERAUTIL_EXPORTS", to: "1")
+        .define("CAMERAUTIL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1043,7 +1081,8 @@ let package = Package(
         .define("MFB_PACKAGE_NAME", to: "Hf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Hf"),
         .define("MFB_PACKAGE_MODULE", to: "Hf"),
-        .define("HF_EXPORTS", to: "1")
+        .define("HF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1059,6 +1098,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "PxOsd"),
         .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
         .define("PXOSD_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1083,6 +1123,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Hd"),
         .define("MFB_PACKAGE_MODULE", to: "Hd"),
         .define("HD_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1097,6 +1138,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
         .define("MFB_PACKAGE_MODULE", to: "Garch"),
         .define("GARCH_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
@@ -1129,6 +1171,7 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1151,6 +1194,7 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("Metal", .when(platforms: Arch.OS.apple.platform)),
@@ -1197,6 +1241,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "HgiGL"),
         .define("MFB_PACKAGE_MODULE", to: "HgiGL"),
         .define("HGIGL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1221,6 +1266,7 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("CoreVideo", .when(platforms: Arch.OS.apple.platform))
@@ -1247,6 +1293,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Hio"),
         .define("MFB_PACKAGE_MODULE", to: "Hio"),
         .define("HIO_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1272,6 +1319,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "Glf"),
         .define("MFB_PACKAGE_MODULE", to: "Glf"),
         .define("GLF_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1289,6 +1337,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
         .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
         .define("GEOMUTIL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1296,6 +1345,9 @@ let package = Package(
       name: "UsdView",
       dependencies: [
         .target(name: "PixarUSD"),
+      ],
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
@@ -1317,6 +1369,9 @@ let package = Package(
         // of each of the matching upstream pixar files will have their contents replaced with each
         // of the respective source code files found in any of these directories.
         .copy("Resources/Work")
+      ],
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .enableUpcomingFeature("BareSlashRegexLiterals"),
@@ -1462,6 +1517,7 @@ let package = Package(
       cxxSettings: [
         // enable to debug swift retain/release calls.
         .define("DEBUG_MEMORY_MANAGEMENT", to: "0"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         // enable to debug bundled (python, plugins, resources).
@@ -1473,6 +1529,9 @@ let package = Package(
     .executableTarget(
       name: "Examples",
       dependencies: galahTargetDeps,
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ],
       swiftSettings: galahSettings
     ),
 
@@ -1480,6 +1539,9 @@ let package = Package(
       name: "PixarUSDTests",
       dependencies: [
         .target(name: "PixarUSD"),
+      ],
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
