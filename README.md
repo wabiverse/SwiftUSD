@@ -235,4 +235,4 @@ on in - checkout [**swift-sh**](https://github.com/mxcl/swift-sh)!
 <hr/>
 
 ###### *if you can `mmap` a **pixel**, you can `mmap` a **metaverse**.*
-###### SwiftUSD is licensed under the terms of the Apache 2.0 License.
+###### SwiftUSD is licensed under the terms of the [Tomorrow Open Source Technology 1.0 License](https://openusd.org/license).
