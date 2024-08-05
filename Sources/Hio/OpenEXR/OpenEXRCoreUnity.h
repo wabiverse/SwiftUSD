@@ -1,15 +1,21 @@
 
 #include "OpenEXRCore/openexr_conf.h"
 
-#include "deflate/common_defs.h"
-#include "deflate/lib/arm/cpu_features.c"
-#include "deflate/lib/deflate_compress.c"
 #include "deflate/lib/lib_common.h"
+
+#include "deflate/common_defs.h"
+
 #include "deflate/lib/utils.c"
+
+#include "deflate/lib/arm/cpu_features.c"
 #include "deflate/lib/x86/cpu_features.c"
+
+#include "deflate/lib/deflate_compress.c"
+
 #undef BITBUF_NBITS
-#include "deflate/lib/adler32.c"
 #include "deflate/lib/deflate_decompress.c"
+
+#include "deflate/lib/adler32.c"
 #include "deflate/lib/zlib_compress.c"
 #include "deflate/lib/zlib_decompress.c"
 
@@ -11635,16 +11641,19 @@ exr_result_t internal_exr_undo_b44a(exr_decode_pipeline_t *decode,
 #include "OpenEXRCore/internal_rle.c"
 #include "OpenEXRCore/internal_structs.c"
 #include "OpenEXRCore/internal_zip.c"
+
 #include "OpenEXRCore/memory.c"
 #include "OpenEXRCore/opaque.c"
 #include "OpenEXRCore/pack.c"
 #include "OpenEXRCore/parse_header.c"
-#include "OpenEXRCore/part.c"
 #include "OpenEXRCore/part_attr.c"
+
+#include "OpenEXRCore/part.c"
 #include "OpenEXRCore/preview.c"
 #include "OpenEXRCore/std_attr.c"
-#include "OpenEXRCore/string.c"
 #include "OpenEXRCore/string_vector.c"
+
+#include "OpenEXRCore/string.c"
 #include "OpenEXRCore/unpack.c"
 #include "OpenEXRCore/validation.c"
 #include "OpenEXRCore/write_header.c"

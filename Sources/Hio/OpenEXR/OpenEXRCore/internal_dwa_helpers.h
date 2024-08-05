@@ -55,11 +55,14 @@ static inline size_t std_max(size_t a, size_t b)
   return a < b ? b : a;
 }
 
+#include "internal_dwa_simd.h"
+
 #include "internal_dwa_channeldata.h"
 #include "internal_dwa_classifier.h"
-#include "internal_dwa_compressor.h"
+
 #include "internal_dwa_decoder.h"
 #include "internal_dwa_encoder.h"
-#include "internal_dwa_simd.h"
+
+#include "internal_dwa_compressor.h"
 
 #endif /* IMF_INTERNAL_DWA_HELPERS_H_HAS_BEEN_INCLUDED */

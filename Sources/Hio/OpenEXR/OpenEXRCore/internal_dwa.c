@@ -100,10 +100,11 @@
  *---------------------------------------------------
  */
 
-#include "internal_coding.h"
 #include "internal_compress.h"
 #include "internal_decompress.h"
 #include "internal_memory.h"
+
+#include "internal_coding.h"
 
 #include "openexr_compression.h"
 
