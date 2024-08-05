@@ -56,9 +56,7 @@ using namespace boost::python;
 
 namespace {
 
-{
-  % endif %
-}
+{ % endif % }
 #define WRAP_CUSTOM template<class Cls> static void _CustomWrapCode(Cls &_class)
 
 // fwd decl.

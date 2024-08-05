@@ -91,12 +91,12 @@ TF_DECLARE_PUBLIC_TOKENS(UsdAbcPrimTypeNames, USD_ABC_PRIM_TYPE_NAMES);
       (stIndices, "primvars:st:indices")) /* end */
 #define USD_ABC_PROPERTY_NAMES \
   USD_ABC_GPRIM_NAMES \
-  USD_ABC_POINTBASED_NAMES \
+  USD_ABC_POINTBASED_NAMES
 /* end */
 TF_DECLARE_PUBLIC_TOKENS(UsdAbcPropertyNames, USD_ABC_PROPERTY_NAMES);
 
-#define USD_ABC_CUSTOM_METADATA (gprimDataRender)(riName)(riType)(singleSampleAsDefault) /* end \
-                                                                                          */
+#define USD_ABC_CUSTOM_METADATA (gprimDataRender)(riName)(riType)(singleSampleAsDefault)
+/* end */
 TF_DECLARE_PUBLIC_TOKENS(UsdAbcCustomMetadata, USD_ABC_CUSTOM_METADATA);
 
 //

@@ -1659,15 +1659,17 @@ template<typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR> cl
       __declspec(thread) static char buffer[sizeof(GenericValue)];
       return *new (buffer) GenericValue();
 #elif defined(__GNUC__) || defined(__clang__)
-            // This will generate -Wexit-time-destructors in clang, but that's
-            // better than having under-alignment.
-            __thread static GenericValue buffer;
-            return buffer;
+                                    // This will generate -Wexit-time-destructors in clang, but
+                                    // that's
+          // better than having under-alignment.
+          __thread static GenericValue buffer;
+          return buffer;
 #else
-            // Don't know what compiler this is, so don't know how to ensure
-            // thread-locality.
-            static GenericValue buffer;
-            return buffer;
+                                    // Don't know what compiler this is, so don't know how to
+                                    // ensure
+          // thread-locality.
+          static GenericValue buffer;
+          return buffer;
 #endif
     }
   }
@@ -2708,7 +2710,7 @@ template<typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR> cl
 #elif RAPIDJSON_64BIT
     char payload[sizeof(SizeType) * 2 + sizeof(void *) + 6];  // 6 padding bytes
 #else
-          char payload[sizeof(SizeType) * 2 + sizeof(void *) + 2];  // 2 padding bytes
+        char payload[sizeof(SizeType) * 2 + sizeof(void *) + 2];  // 2 padding bytes
 #endif
     uint16_t flags;
   };

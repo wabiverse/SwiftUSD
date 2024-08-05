@@ -41,17 +41,13 @@ struct _FormatDesc {
 static const _FormatDesc FORMAT_DESC[] = {
     // format,  type,             internal format
     {GL_RED, GL_UNSIGNED_BYTE, GL_R8},  // UNorm8
-    {GL_RG,
-     GL_UNSIGNED_BYTE,
-     GL_RG8},  // UNorm8Vec2
-               // {GL_RGB,  GL_UNSIGNED_BYTE, GL_RGB8       }, // Unsupported by HgiFormat
+    {GL_RG, GL_UNSIGNED_BYTE, GL_RG8},  // UNorm8Vec2
+    // {GL_RGB,  GL_UNSIGNED_BYTE, GL_RGB8       }, // Unsupported by HgiFormat
     {GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA8},  // UNorm8Vec4
 
     {GL_RED, GL_BYTE, GL_R8_SNORM},  // SNorm8
-    {GL_RG,
-     GL_BYTE,
-     GL_RG8_SNORM},  // SNorm8Vec2
-                     // {GL_RGB,  GL_BYTE,         GL_RGB8_SNORM  }, // Unsupported by HgiFormat
+    {GL_RG, GL_BYTE, GL_RG8_SNORM},  // SNorm8Vec2
+    // {GL_RGB,  GL_BYTE,         GL_RGB8_SNORM  }, // Unsupported by HgiFormat
     {GL_RGBA, GL_BYTE, GL_RGBA8_SNORM},  // SNorm8Vec4
 
     {GL_RED, GL_HALF_FLOAT, GL_R16F},      // Float16

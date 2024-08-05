@@ -29,16 +29,16 @@
  * ----------------------------------------------------------------
  * Portions of this file derive from an original work of Apple Inc.
  * from the swift/bridging file.
- * 
+ *
  * This source file is apart of the Swift.org open source project &
  * under the terms of the Apache License version 2.0 with a Runtime
  * Library Exception modification.
  *
  * See more license information here: https://swift.org/LICENSE.txt
- * 
+ *
  * See the list of Swift project authors by visiting this resource:
  * https://swift.org/CONTRIBUTORS.txt
- * 
+ *
  *     Copyright (C) 2017 Apple Inc. and the Swift project authors.
  * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
@@ -47,7 +47,7 @@
 #define __PXR_BASE_ARCH_SWIFT_INTEROP_H__
 
 /**
- * @brief 
+ * @brief
  * This file provides common utilities and annotations that are
  * useful for C++ codebases that interoperate with Swift.
  */
