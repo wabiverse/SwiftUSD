@@ -396,12 +396,16 @@ public enum Pxr: String, CaseIterable
       /* ----- tbb headers. --------------- */
 
       // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
-      source = source.replacingOccurrences(of: "<tbb/", with: "<tbb/")
+      // the normal <tbb/xxx.h> include paths can only be utilized once Swift on Linux is
+      // fixed, possibly as soon as Swift 6, refer to the following PR:
+      // https://github.com/swiftlang/swift/pull/75662
+      source = source.replacingOccurrences(of: "<tbb/", with: "<OneTBB/tbb/")
       // modern versions of tbb no longer have atomic, get it from std.
       source = source.replacingOccurrences(of: "<tbb/atomic.h>", with: "<atomic>")
       source = source.replacingOccurrences(of: "tbb::atomic", with: "std::atomic")
-      source = source.replacingOccurrences(of: "fetch_and_decrement()", with: "fetch_sub(1)")
-      source = source.replacingOccurrences(of: "fetch_and_increment()", with: "fetch_add(1)")
+      // not a safe assumption, migration to modern tbb requires slightly more intricate changes.
+      // source = source.replacingOccurrences(of: "fetch_and_decrement()", with: "fetch_sub(1)")
+      // source = source.replacingOccurrences(of: "fetch_and_increment()", with: "fetch_add(1)")
       // modern versions of tbb no longer have mutex, get it from std.
       source = source.replacingOccurrences(of: "<tbb/mutex.h>", with: "<mutex>")
       source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
