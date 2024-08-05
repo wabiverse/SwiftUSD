@@ -1,28 +1,10 @@
 /* ----------------------------------------------------------------
  * :: :  M  E  T  A  V  E  R  S  E  :                            ::
  * ----------------------------------------------------------------
- * This software is Licensed under the terms of the Apache License,
- * version 2.0 (the "Apache License") with the following additional
- * modification; you may not use this file except within compliance
- * of the Apache License and the following modification made to it.
- * Section 6. Trademarks. is deleted and replaced with:
+ * Licensed under the terms set forth in the LICENSE.txt file, this
+ * file is available at https://openusd.org/license.
  *
- * Trademarks. This License does not grant permission to use any of
- * its trade names, trademarks, service marks, or the product names
- * of this Licensor or its affiliates, except as required to comply
- * with Section 4(c.) of this License, and to reproduce the content
- * of the NOTICE file.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND without even an
- * implied warranty of MERCHANTABILITY, or FITNESS FOR A PARTICULAR
- * PURPOSE. See the Apache License for more details.
- *
- * You should have received a copy for this software license of the
- * Apache License along with this program; or, if not, please write
- * to the Free Software Foundation Inc., with the following address
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
+ *                                        Copyright (C) 2016 Pixar.
  *         Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
  * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
@@ -160,13 +142,16 @@ public enum Pxr: String, CaseIterable
       try createTargetDirectories(packagePath: packagePath, target: target)
       try createPythonDirectories(packagePath: packagePath, target: target)
 
+      var sourceFile = source.lastPathComponent
+      ensureSourceFilename(in: target, for: &sourceFile)
+
       // ------ copy source files to dest (Sources/Target/*) -----
 
       if ["cpp", "cc", "c", "cxx"].contains(source.pathExtension)
       {
-        if source.lastPathComponent.contains("wrap") || source.lastPathComponent.contains("module")
+        if sourceFile.contains("wrap") || sourceFile.contains("module")
         {
-          let dest = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(source.lastPathComponent)")
+          let dest = URL(fileURLWithPath: "\(packagePath)/Python/Py\(target)/\(sourceFile)")
 
           // move wrap and module files to Python/PyTarget/*
           try? FileManager.default.removeItem(at: dest)
@@ -178,7 +163,7 @@ public enum Pxr: String, CaseIterable
         }
         else
         {
-          let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(source.lastPathComponent)")
+          let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/\(sourceFile)")
 
           // move source files to Sources/Target/*
           try? FileManager.default.removeItem(at: dest)
@@ -194,12 +179,35 @@ public enum Pxr: String, CaseIterable
 
       if ["h", "hpp", "hxx"].contains(source.pathExtension)
       {
-        let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(source.lastPathComponent)")
+        // pxr headers must not have the name of the umbrella header.
+        if sourceFile == "\(target.first?.lowercased() ?? "").h"
+        {
+          // so we suffix them with (ex. ar.h -> arImpl.h).
+          sourceFile = "\(target.first?.lowercased() ?? "")Impl.h"
+        }
+
+        let dest = URL(fileURLWithPath: "\(packagePath)/Sources/\(target)/include/\(target)/\(sourceFile)")
 
         try? FileManager.default.removeItem(at: dest)
         try FileManager.default.moveItem(at: source, to: dest)
         log.info("updating header: \(dest.path)")
         updateSource(fileURL: dest, target: target)
+
+        // generate this target's umbrella header...
+
+        let umbrellaPath = "\(packagePath)/Sources/\(target)/include/\(target)/\(target).h"
+        if !FileManager.default.fileExists(atPath: umbrellaPath, isDirectory: nil)
+        {
+          // copying over the existing umbrella header's file contents...
+          let contents = FileManager.default.contents(atPath: umbrellaPath)
+
+          // creating the umbrella header file if it does not exist...
+          FileManager.default.createFile(atPath: umbrellaPath, contents: contents, attributes: nil)
+        }
+
+        // and appending all its headers to this single file.
+        let umbrellaURL = URL(fileURLWithPath: umbrellaPath)
+        generateUmbrellaHeader(fileURL: umbrellaURL, for: target, appending: sourceFile)
 
         return dest
       }
@@ -207,6 +215,63 @@ public enum Pxr: String, CaseIterable
       // ----------------------------------------------------------
 
       return nil
+    }
+  }
+
+  private func generateUmbrellaHeader(fileURL: URL, for target: String, appending header: String)
+  {
+    do
+    {
+      // get the existing contents of the umbrella header.
+      var umbrellaHeader = try String(contentsOf: fileURL, encoding: .utf8)
+
+      // check for the include guard (ex. '__PXR_BASE_ARCH_H__').
+      let includeGuard = "__PXR_\(rawValue.uppercased())_\(target.uppercased())_H__"
+      if !umbrellaHeader.contains("#ifndef \(includeGuard)")
+      {
+        // create the include guard opener if it does not exist.
+        umbrellaHeader = umbrellaHeader.appending("#ifndef \(includeGuard)\n")
+        umbrellaHeader = umbrellaHeader.appending("#define \(includeGuard)\n\n")
+        umbrellaHeader = umbrellaHeader.appending("// \(target)\n")
+      }
+
+      if umbrellaHeader.contains("#include <\(target)/\(header)>")
+      {
+        // copy existing header entries in place to keep sorted, and mark the source as edited.
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: "#include <\(target)/\(header)>", with: "#include <\(target)/\(header)>")
+      }
+      else
+      {
+        // append new header entries.
+        umbrellaHeader = umbrellaHeader.appending("#include <\(target)/\(header)>\n")
+      }
+
+      // check for the closing include guard (ex. '__PXR_BASE_ARCH_H__').
+      if umbrellaHeader.contains("#endif  // \(includeGuard)") || umbrellaHeader.contains("#endif // \(includeGuard)")
+      {
+        // remove the closing include guard, since it may no longer be at the bottom of the file.
+        // additional checks so we do not incidentally keep appending endless new lines each time
+        // we update openusd source code.
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: "#endif  // \(includeGuard)\n", with: "")
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: "#endif // \(includeGuard)\n", with: "")
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: "#endif  // \(includeGuard)", with: "")
+        umbrellaHeader = umbrellaHeader.replacingOccurrences(of: "#endif // \(includeGuard)", with: "")
+
+        // re-append it to the end of the file.
+        umbrellaHeader = umbrellaHeader.appending("#endif  // \(includeGuard)\n")
+      }
+      else
+      {
+        // append the closing include guard.
+        umbrellaHeader = umbrellaHeader.appending("#endif  // \(includeGuard)\n")
+      }
+
+      // write the modified file contents back out to the umbrella header.
+      try umbrellaHeader.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
+    catch
+    {
+      log.error("error: failed to generate umbrella header '\(fileURL.path)'. \(error.localizedDescription).")
     }
   }
 
@@ -239,6 +304,9 @@ public enum Pxr: String, CaseIterable
 
         ensureCasing(for: &newInclude)
         pxrSrc = pxrSrc.replacingOccurrences(of: include, with: newInclude)
+
+        // fixes any conflicting headers (ex. Arch/errno.h -> Arch/pxrerrno.h)
+        ensureSourceFilename(in: target, for: &pxrSrc)
       }
 
       try pxrSrc.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -295,6 +363,27 @@ public enum Pxr: String, CaseIterable
   private func path(from enumerated: NSEnumerator.Element) -> String
   {
     enumerated as? String ?? ""
+  }
+
+  /**
+   * Ensure the source filename is correct for the given path.
+   */
+  private func ensureSourceFilename(in target: String, for source: inout String)
+  {
+    switch self
+    {
+      case .base:
+        if target.contains("Arch")
+        {
+          // since these names conflict with stdlib, we prefix them with pxr.
+          source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/pxrerrno.h")
+          source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/pxrinttypes.h")
+          source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/pxrmath.h")
+          source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/pxrregex.h")
+        }
+      default:
+        break
+    }
   }
 
   /**
@@ -388,10 +477,11 @@ public enum Pxr: String, CaseIterable
 
       source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
-      /* ----- sdf dtor ------------------- */
-
-      source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
-      source = source.replacingOccurrences(of: "virtual ~UsdStage();", with: "virtual ~UsdStage() noexcept;")
+      // since these names conflict with stdlib, we prefix them with pxr.
+      source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/pxrerrno.h")
+      source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/pxrinttypes.h")
+      source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/pxrmath.h")
+      source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/pxrregex.h")
 
       /* ----- tbb headers. --------------- */
 
