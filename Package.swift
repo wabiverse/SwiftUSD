@@ -1133,6 +1133,7 @@ let package = Package(
         .target(name: "Vt"),
         .target(name: "Work"),
         .target(name: "Sdf"),
+        .target(name: "Sdr"),
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
         .target(name: "PxOsd"),
