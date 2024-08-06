@@ -6,8 +6,13 @@
 
 #include "config.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-enum class tracking_mode : bool { eager, lazy };
+namespace PXR_PEGTL_NAMESPACE
+{
+   enum class tracking_mode : bool
+   {
+      eager,
+      lazy
+   };
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

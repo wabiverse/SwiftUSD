@@ -6,12 +6,14 @@
 
 #include "config.hpp"
 
-#include "result_on_found.hpp"
-#include "rules.hpp"
+#include "internal/result_on_found.hpp"
+#include "internal/rules.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-inline namespace ascii {
-// clang-format off
+namespace PXR_PEGTL_NAMESPACE
+{
+   inline namespace ascii
+   {
+      // clang-format off
       struct alnum : internal::ranges< internal::peek_char, 'a', 'z', 'A', 'Z', '0', '9' > {};
       struct alpha : internal::ranges< internal::peek_char, 'a', 'z', 'A', 'Z' > {};
       struct any : internal::any< internal::peek_char > {};
@@ -41,12 +43,12 @@ inline namespace ascii {
       template< char C > struct two : internal::string< C, C > {};
       struct upper : internal::range< internal::result_on_found::success, internal::peek_char, 'A', 'Z' > {};
       struct xdigit : internal::ranges< internal::peek_char, '0', '9', 'a', 'f', 'A', 'F' > {};
-// clang-format on
+      // clang-format on
 
-}  // namespace ascii
+   }  // namespace ascii
 
 }  // namespace PXR_PEGTL_NAMESPACE
 
-#include "pegtl_string.hpp"
+#include "internal/pegtl_string.hpp"
 
 #endif

@@ -2926,7 +2926,7 @@ static yyconst flex_int32_t yy_ec[256] = {
 #include "pxr/pxrns.h"
 
 // Token table from yacc file
-#include "textFileFormat.tab.h"
+#include "Sdf/textFileFormat.tab.h"
 
 #ifndef fileno
 #  define fileno(fd) ArchFileNo(fd)

@@ -12,84 +12,86 @@
 
 #include "config.hpp"
 
-#include "iterator.hpp"
+#include "internal/iterator.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-struct position {
-  position() = delete;
+namespace PXR_PEGTL_NAMESPACE
+{
+   struct position
+   {
+      position() = delete;
 
-#if defined(__GNUC__) && !defined(__clang__)
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#if defined( __GNUC__ ) && !defined( __clang__ )
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
-  position(position &&p) noexcept
-      : byte(p.byte), line(p.line), column(p.column), source(std::move(p.source))
-  {
-  }
-#if defined(__GNUC__) && !defined(__clang__)
-#  pragma GCC diagnostic pop
+      position( position&& p ) noexcept
+         : byte( p.byte ),
+           line( p.line ),
+           column( p.column ),
+           source( std::move( p.source ) )
+      {}
+#if defined( __GNUC__ ) && !defined( __clang__ )
+#pragma GCC diagnostic pop
 #endif
 
-  position(const position &) = default;
+      position( const position& ) = default;
 
-  position &operator=(position &&p) noexcept
-  {
-    byte = p.byte;
-    line = p.line;
-    column = p.column;
-    source = std::move(p.source);
-    return *this;
-  }
+      position& operator=( position&& p ) noexcept
+      {
+         byte = p.byte;
+         line = p.line;
+         column = p.column;
+         source = std::move( p.source );
+         return *this;
+      }
 
-  position &operator=(const position &) = default;
+      position& operator=( const position& ) = default;
 
-  template<typename T>
-  position(const internal::iterator &in_iter, T &&in_source)
-      : byte(in_iter.byte),
-        line(in_iter.line),
-        column(in_iter.column),
-        source(std::forward<T>(in_source))
-  {
-  }
+      template< typename T >
+      position( const internal::iterator& in_iter, T&& in_source )
+         : byte( in_iter.byte ),
+           line( in_iter.line ),
+           column( in_iter.column ),
+           source( std::forward< T >( in_source ) )
+      {}
 
-  template<typename T>
-  position(const std::size_t in_byte,
-           const std::size_t in_line,
-           const std::size_t in_column,
-           T &&in_source)
-      : byte(in_byte), line(in_line), column(in_column), source(in_source)
-  {
-  }
+      template< typename T >
+      position( const std::size_t in_byte, const std::size_t in_line, const std::size_t in_column, T&& in_source )
+         : byte( in_byte ),
+           line( in_line ),
+           column( in_column ),
+           source( in_source )
+      {}
 
-  ~position() = default;
+      ~position() = default;
 
-  std::size_t byte;
-  std::size_t line;
-  std::size_t column;
-  std::string source;
-};
+      std::size_t byte;
+      std::size_t line;
+      std::size_t column;
+      std::string source;
+   };
 
-inline bool operator==(const position &lhs, const position &rhs) noexcept
-{
-  return (lhs.byte == rhs.byte) && (lhs.source == rhs.source);
-}
+   inline bool operator==( const position& lhs, const position& rhs ) noexcept
+   {
+      return ( lhs.byte == rhs.byte ) && ( lhs.source == rhs.source );
+   }
 
-inline bool operator!=(const position &lhs, const position &rhs) noexcept
-{
-  return !(lhs == rhs);
-}
+   inline bool operator!=( const position& lhs, const position& rhs ) noexcept
+   {
+      return !( lhs == rhs );
+   }
 
-inline std::ostream &operator<<(std::ostream &os, const position &p)
-{
-  return os << p.source << ':' << p.line << ':' << p.column;
-}
+   inline std::ostream& operator<<( std::ostream& os, const position& p )
+   {
+      return os << p.source << ':' << p.line << ':' << p.column;
+   }
 
-[[nodiscard]] inline std::string to_string(const position &p)
-{
-  std::ostringstream oss;
-  oss << p;
-  return std::move(oss).str();
-}
+   [[nodiscard]] inline std::string to_string( const position& p )
+   {
+      std::ostringstream oss;
+      oss << p;
+      return std::move( oss ).str();
+   }
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

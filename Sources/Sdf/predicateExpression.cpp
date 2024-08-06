@@ -12,8 +12,8 @@
 #include "Tf/enum.h"
 #include "Vt/value.h"
 
-#include "fileIO_Common.h"
-#include "predicateExpressionParser.h"
+#include "Sdf/fileIO_Common.h"
+#include "Sdf/predicateExpressionParser.h"
 
 #include <functional>
 #include <iterator>
