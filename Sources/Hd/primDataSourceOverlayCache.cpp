@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "primDataSourceOverlayCache.h"
+#include "Hd/primDataSourceOverlayCache.h"
 
 #include "Tf/denseHashSet.h"
 #include "Trace/traceImpl.h"
