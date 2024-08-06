@@ -5,7 +5,7 @@
 #ifndef PXR_PEGTL_CONTRIB_PEG_HPP
 #define PXR_PEGTL_CONTRIB_PEG_HPP
 
-#include <tao/pegtl.hpp>
+#include "pegtl.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::peg {
 // PEG grammar from https://pdos.csail.mit.edu/~baford/packrat/popl04/peg-popl04.pdf
