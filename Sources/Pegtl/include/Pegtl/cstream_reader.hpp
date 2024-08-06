@@ -14,7 +14,7 @@
 #  include <exception>
 #endif
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 struct cstream_reader {

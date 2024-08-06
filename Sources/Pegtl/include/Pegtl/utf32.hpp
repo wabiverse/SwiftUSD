@@ -6,10 +6,10 @@
 
 #include "internal.hpp"
 
-#include "../../config.hpp"
-#include "../utf32.hpp"
+#include "config.hpp"
+#include "utf32.hpp"
 
-#include "../internal/peek_utf32.hpp"
+#include "peek_utf32.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace utf32_be::icu {

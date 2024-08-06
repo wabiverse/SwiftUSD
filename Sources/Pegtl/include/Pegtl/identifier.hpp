@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_IDENTIFIER_HPP
 #define PXR_PEGTL_INTERNAL_IDENTIFIER_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "peek_char.hpp"
 #include "ranges.hpp"

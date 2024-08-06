@@ -7,11 +7,11 @@
 #include <cstddef>
 #include <type_traits>
 
-#include "../apply_mode.hpp"
-#include "../ascii.hpp"
-#include "../config.hpp"
-#include "../rewind_mode.hpp"
-#include "../rules.hpp"
+#include "apply_mode.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
+#include "rewind_mode.hpp"
+#include "rules.hpp"
 
 #include "analyze_traits.hpp"
 
@@ -106,7 +106,7 @@ template<typename Cond> struct raw_string_until<Cond> {
            typename... States>
   [[nodiscard]] static bool match(ParseInput &in,
                                   const std::size_t &marker_size,
-                                  States &&.../*unused*/)
+                                  States &&.*unused*/)
   {
     auto m = in.template mark<M>();
 

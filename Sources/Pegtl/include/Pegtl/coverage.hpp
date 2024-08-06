@@ -11,15 +11,15 @@
 
 #include "state_control.hpp"
 
-#include "../apply_mode.hpp"
-#include "../config.hpp"
-#include "../demangle.hpp"
-#include "../normal.hpp"
-#include "../nothing.hpp"
-#include "../parse.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
-#include "../visit.hpp"
+#include "apply_mode.hpp"
+#include "config.hpp"
+#include "demangle.hpp"
+#include "normal.hpp"
+#include "nothing.hpp"
+#include "parse.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
+#include "visit.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 struct coverage_info {
@@ -61,7 +61,7 @@ struct coverage_state {
   std::vector<std::string_view> stack;
 
   template<typename Rule, typename ParseInput, typename... States>
-  void start(const ParseInput & /*unused*/, States &&.../*unused*/)
+  void start(const ParseInput & /*unused*/, States &&.*unused*/)
   {
     const auto name = demangle<Rule>();
     ++result.at(name).start;
@@ -72,7 +72,7 @@ struct coverage_state {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void success(const ParseInput & /*unused*/, States &&.../*unused*/)
+  void success(const ParseInput & /*unused*/, States &&.*unused*/)
   {
     stack.pop_back();
     const auto name = demangle<Rule>();
@@ -83,7 +83,7 @@ struct coverage_state {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void failure(const ParseInput & /*unused*/, States &&.../*unused*/)
+  void failure(const ParseInput & /*unused*/, States &&.*unused*/)
   {
     stack.pop_back();
     const auto name = demangle<Rule>();
@@ -94,7 +94,7 @@ struct coverage_state {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void raise(const ParseInput & /*unused*/, States &&.../*unused*/)
+  void raise(const ParseInput & /*unused*/, States &&.*unused*/)
   {
     const auto name = demangle<Rule>();
     ++result.at(name).raise;
@@ -104,7 +104,7 @@ struct coverage_state {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void unwind(const ParseInput & /*unused*/, States &&.../*unused*/)
+  void unwind(const ParseInput & /*unused*/, States &&.*unused*/)
   {
     stack.pop_back();
     const auto name = demangle<Rule>();
@@ -115,12 +115,12 @@ struct coverage_state {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void apply(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  void apply(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void apply0(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  void apply0(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 };

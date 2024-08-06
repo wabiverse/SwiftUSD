@@ -6,9 +6,9 @@
 
 #include <utility>
 
-#include "../config.hpp"
-#include "../match.hpp"
-#include "../nothing.hpp"
+#include "config.hpp"
+#include "match.hpp"
+#include "nothing.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {
@@ -66,17 +66,17 @@ struct control_action : maybe_nothing {
   }
 
   template<typename ParseInput, typename... States>
-  static void start(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void start(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void success(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void success(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void failure(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void failure(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 

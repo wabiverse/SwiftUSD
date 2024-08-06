@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_CONTRIB_ALPHABET_HPP
 #define PXR_PEGTL_CONTRIB_ALPHABET_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::alphabet {
 static const char a = 'a';

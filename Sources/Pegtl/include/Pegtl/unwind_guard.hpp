@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_UNWIND_GUARD_HPP
 #define PXR_PEGTL_INTERNAL_UNWIND_GUARD_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include <optional>
 #include <utility>

@@ -25,10 +25,10 @@
 #include "position.hpp"
 #include "tracking_mode.hpp"
 
-#include "internal/action_input.hpp"
-#include "internal/bump.hpp"
-#include "internal/iterator.hpp"
-#include "internal/marker.hpp"
+#include "action_input.hpp"
+#include "bump.hpp"
+#include "iterator.hpp"
+#include "marker.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<typename Reader,

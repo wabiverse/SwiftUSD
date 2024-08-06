@@ -6,8 +6,8 @@
 
 #include "config.hpp"
 
-#include "internal/result_on_found.hpp"
-#include "internal/rules.hpp"
+#include "result_on_found.hpp"
+#include "rules.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 inline namespace ascii {
@@ -47,6 +47,6 @@ inline namespace ascii {
 
 }  // namespace PXR_PEGTL_NAMESPACE
 
-#include "internal/pegtl_string.hpp"
+#include "pegtl_string.hpp"
 
 #endif

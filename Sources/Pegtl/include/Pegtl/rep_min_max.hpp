@@ -6,16 +6,16 @@
 
 #include <type_traits>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 #include "failure.hpp"
 #include "not_at.hpp"
 #include "seq.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<unsigned Min, unsigned Max, typename... Rules>

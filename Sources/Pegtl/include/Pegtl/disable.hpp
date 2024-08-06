@@ -4,15 +4,15 @@
 #ifndef PXR_PEGTL_INTERNAL_DISABLE_HPP
 #define PXR_PEGTL_INTERNAL_DISABLE_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 #include "seq.hpp"
 #include "success.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename... Rules> struct disable : disable<seq<Rules...>> {};

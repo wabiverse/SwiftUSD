@@ -6,12 +6,12 @@
 
 #include <unicode/uchar.h>
 
-#include "../analyze_traits.hpp"
+#include "analyze_traits.hpp"
 
-#include "../../config.hpp"
-#include "../../type_list.hpp"
+#include "config.hpp"
+#include "type_list.hpp"
 
-#include "../../internal/enable_control.hpp"
+#include "enable_control.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

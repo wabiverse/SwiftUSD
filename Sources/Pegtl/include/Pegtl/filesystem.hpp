@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_FILESYSTEM_HPP
 #define PXR_PEGTL_INTERNAL_FILESYSTEM_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #if defined(PXR_PEGTL_BOOST_FILESYSTEM)
 

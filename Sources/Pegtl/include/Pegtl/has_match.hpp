@@ -6,9 +6,9 @@
 
 #include <utility>
 
-#include "../apply_mode.hpp"
-#include "../config.hpp"
-#include "../rewind_mode.hpp"
+#include "apply_mode.hpp"
+#include "config.hpp"
+#include "rewind_mode.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename,

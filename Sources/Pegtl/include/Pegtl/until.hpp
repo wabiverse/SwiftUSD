@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_UNTIL_HPP
 #define PXR_PEGTL_INTERNAL_UNTIL_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "bytes.hpp"
 #include "enable_control.hpp"
@@ -13,9 +13,9 @@
 #include "seq.hpp"
 #include "star.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Cond, typename... Rules> struct until : until<Cond, seq<Rules...>> {};

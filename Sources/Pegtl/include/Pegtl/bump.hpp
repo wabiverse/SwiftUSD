@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_BUMP_HPP
 #define PXR_PEGTL_INTERNAL_BUMP_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "iterator.hpp"
 

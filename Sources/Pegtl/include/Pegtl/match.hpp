@@ -13,13 +13,13 @@
 #include "require_apply0.hpp"
 #include "rewind_mode.hpp"
 
-#include "internal/has_apply.hpp"
-#include "internal/has_apply0.hpp"
-#include "internal/has_unwind.hpp"
-#include "internal/marker.hpp"
-#include "internal/missing_apply.hpp"
-#include "internal/missing_apply0.hpp"
-#include "internal/unwind_guard.hpp"
+#include "has_apply.hpp"
+#include "has_apply0.hpp"
+#include "has_unwind.hpp"
+#include "marker.hpp"
+#include "missing_apply.hpp"
+#include "missing_apply0.hpp"
+#include "unwind_guard.hpp"
 
 #if defined(_MSC_VER)
 #  pragma warning(push)
@@ -53,7 +53,7 @@ template<typename Rule,
          typename ParseInput,
          typename... States>
 [[nodiscard]] static auto match_no_control(ParseInput &in,
-                                           States &&.../*unused*/) -> decltype(Rule::match(in))
+                                           States &&.*unused*/) -> decltype(Rule::match(in))
 {
   return Rule::match(in);
 }

@@ -7,9 +7,9 @@
 #include <tuple>
 #include <utility>
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../internal/has_unwind.hpp"
+#include "has_unwind.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 // The last N states are removed for most of the control functions forwarded to Base,

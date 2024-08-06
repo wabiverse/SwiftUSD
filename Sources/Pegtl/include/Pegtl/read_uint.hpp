@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include "../../config.hpp"
+#include "config.hpp"
 
 #include "endian.hpp"
 

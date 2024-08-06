@@ -6,10 +6,10 @@
 
 #include <ostream>
 
-#include "../config.hpp"
-#include "../demangle.hpp"
-#include "../type_list.hpp"
-#include "../visit.hpp"
+#include "config.hpp"
+#include "demangle.hpp"
+#include "type_list.hpp"
+#include "visit.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

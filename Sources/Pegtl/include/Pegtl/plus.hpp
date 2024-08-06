@@ -6,14 +6,14 @@
 
 #include <type_traits>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 #include "seq.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 // While plus<> could easily be implemented with

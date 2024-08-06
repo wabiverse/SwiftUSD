@@ -8,8 +8,8 @@
 
 #include "shuffle_states.hpp"
 
-#include "../config.hpp"
-#include "../internal/has_unwind.hpp"
+#include "config.hpp"
+#include "has_unwind.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<template<typename...> class Control> struct state_control {

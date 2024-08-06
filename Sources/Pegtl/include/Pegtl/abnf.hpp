@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_CONTRIB_ABNF_HPP
 #define PXR_PEGTL_CONTRIB_ABNF_HPP
 
-#include "../config.hpp"
-#include "../internal/rules.hpp"
+#include "config.hpp"
+#include "rules.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::abnf {
 // Core ABNF rules according to RFC 5234, Appendix B

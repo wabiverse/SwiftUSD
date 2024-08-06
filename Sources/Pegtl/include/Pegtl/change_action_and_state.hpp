@@ -12,7 +12,7 @@
 #include "nothing.hpp"
 #include "rewind_mode.hpp"
 
-#include "internal/dependent_false.hpp"
+#include "dependent_false.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<template<typename...> class NewAction, typename NewState>

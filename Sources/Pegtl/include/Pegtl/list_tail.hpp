@@ -4,13 +4,13 @@
 #ifndef PXR_PEGTL_INTERNAL_LIST_TAIL_HPP
 #define PXR_PEGTL_INTERNAL_LIST_TAIL_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "opt.hpp"
 #include "seq.hpp"
 #include "star.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Rule, typename Sep> using list_tail = seq<Rule, star<Sep, Rule>, opt<Sep>>;

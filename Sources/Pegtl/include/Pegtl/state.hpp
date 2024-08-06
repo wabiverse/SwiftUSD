@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_STATE_HPP
 #define PXR_PEGTL_INTERNAL_STATE_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include <type_traits>
 
@@ -13,9 +13,9 @@
 #include "seq.hpp"
 #include "success.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename NewState, typename... Rules> struct state : state<NewState, seq<Rules...>> {};

@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstddef>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 struct cstring_reader {

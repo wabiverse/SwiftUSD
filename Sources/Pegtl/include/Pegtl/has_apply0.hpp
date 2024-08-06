@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename, typename, template<typename...> class, typename...>

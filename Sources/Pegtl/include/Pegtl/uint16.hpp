@@ -4,12 +4,12 @@
 #ifndef PXR_PEGTL_CONTRIB_UINT16_HPP
 #define PXR_PEGTL_CONTRIB_UINT16_HPP
 
-#include "../config.hpp"
-#include "../internal/result_on_found.hpp"
-#include "../internal/rules.hpp"
+#include "config.hpp"
+#include "result_on_found.hpp"
+#include "rules.hpp"
 
-#include "internal/peek_mask_uint.hpp"
-#include "internal/peek_uint.hpp"
+#include "peek_mask_uint.hpp"
+#include "peek_uint.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace uint16_be {

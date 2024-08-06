@@ -6,8 +6,8 @@
 
 #include <cstddef>
 
-#include "../../config.hpp"
-#include "../../internal/input_pair.hpp"
+#include "config.hpp"
+#include "input_pair.hpp"
 
 #include "read_uint.hpp"
 

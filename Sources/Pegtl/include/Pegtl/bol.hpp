@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_INTERNAL_BOL_HPP
 #define PXR_PEGTL_INTERNAL_BOL_HPP
 
-#include "../config.hpp"
-#include "../type_list.hpp"
+#include "config.hpp"
+#include "type_list.hpp"
 
 #include "enable_control.hpp"
 

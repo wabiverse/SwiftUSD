@@ -6,13 +6,13 @@
 
 #include <type_traits>
 
-#include "../apply_mode.hpp"
-#include "../config.hpp"
-#include "../match.hpp"
-#include "../nothing.hpp"
-#include "../rewind_mode.hpp"
+#include "apply_mode.hpp"
+#include "config.hpp"
+#include "match.hpp"
+#include "nothing.hpp"
+#include "rewind_mode.hpp"
 
-#include "../internal/dependent_false.hpp"
+#include "dependent_false.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<typename AddState> struct add_state : maybe_nothing {

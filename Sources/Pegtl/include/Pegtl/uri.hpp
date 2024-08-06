@@ -10,10 +10,10 @@
 
 #  include <cstdint>
 
-#  include "../ascii.hpp"
-#  include "../config.hpp"
-#  include "../rules.hpp"
-#  include "../utf8.hpp"
+#  include "ascii.hpp"
+#  include "config.hpp"
+#  include "rules.hpp"
+#  include "utf8.hpp"
 
 #  include "abnf.hpp"
 #  include "integer.hpp"

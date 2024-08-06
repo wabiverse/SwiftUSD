@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_LIST_HPP
 #define PXR_PEGTL_INTERNAL_LIST_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "seq.hpp"
 #include "star.hpp"

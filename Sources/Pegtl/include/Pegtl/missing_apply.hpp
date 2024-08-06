@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_INTERNAL_MISSING_APPLY_HPP
 #define PXR_PEGTL_INTERNAL_MISSING_APPLY_HPP
 
-#include "../config.hpp"
-#include "../rewind_mode.hpp"
+#include "config.hpp"
+#include "rewind_mode.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Control,
