@@ -81,7 +81,7 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
  public:
   /// Destructor
   SDF_API
-  virtual ~SdfLayer();
+  virtual ~SdfLayer() noexcept;
 
   /// Noncopyable
   SdfLayer(const SdfLayer &) = delete;
