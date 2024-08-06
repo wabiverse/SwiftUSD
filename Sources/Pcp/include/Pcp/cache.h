@@ -18,7 +18,7 @@
 #include "Sdf/pathTable.h"
 #include "pxr/pxrns.h"
 
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/resolverContext.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/functionRef.h"

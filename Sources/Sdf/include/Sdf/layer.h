@@ -9,7 +9,7 @@
 
 /// \file sdf/layer.h
 
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/assetInfo.h"
 #include "Ar/resolvedPath.h"
 #include "Sdf/api.h"

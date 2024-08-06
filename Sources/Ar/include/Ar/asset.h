@@ -10,7 +10,7 @@
 /// \file ar/asset.h
 
 #include "Ar/api.h"
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "pxr/pxrns.h"
 
 #include <cstdio>
