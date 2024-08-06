@@ -483,6 +483,11 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/pxrmath.h")
       source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/pxrregex.h")
 
+      /* ------ refbase ------------------- */
+
+      source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
+      source = source.replacingOccurrences(of: "virtual ~UsdStage();", with: "virtual ~UsdStage() noexcept;")
+
       /* ----- tbb headers. --------------- */
 
       // currently, metaversekit places tbb in a OneTBB parent directory, so add that here.
