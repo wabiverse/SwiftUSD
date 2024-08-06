@@ -4,45 +4,45 @@
 #ifndef PXR_PEGTL_HPP
 #define PXR_PEGTL_HPP
 
-#include "pegtl/config.hpp"
-#include "pegtl/demangle.hpp"
-#include "pegtl/parse.hpp"
-#include "pegtl/version.hpp"
+#include "Pegtl/config.hpp"
+#include "Pegtl/demangle.hpp"
+#include "Pegtl/parse.hpp"
+#include "Pegtl/version.hpp"
 
-#include "pegtl/ascii.hpp"
-#include "pegtl/rules.hpp"
-#include "pegtl/utf8.hpp"
+#include "Pegtl/ascii.hpp"
+#include "Pegtl/rules.hpp"
+#include "Pegtl/utf8.hpp"
 
-#include "pegtl/argv_input.hpp"
-#include "pegtl/buffer_input.hpp"
-#include "pegtl/cstream_input.hpp"
-#include "pegtl/istream_input.hpp"
-#include "pegtl/memory_input.hpp"
-#include "pegtl/read_input.hpp"
-#include "pegtl/string_input.hpp"
+#include "Pegtl/argv_input.hpp"
+#include "Pegtl/buffer_input.hpp"
+#include "Pegtl/cstream_input.hpp"
+#include "Pegtl/istream_input.hpp"
+#include "Pegtl/memory_input.hpp"
+#include "Pegtl/read_input.hpp"
+#include "Pegtl/string_input.hpp"
 
 // This has to be included *after* the above inputs,
 // otherwise the amalgamated header will not work!
-#include "pegtl/file_input.hpp"
+#include "Pegtl/file_input.hpp"
 
-#include "pegtl/change_action.hpp"
-#include "pegtl/change_action_and_state.hpp"
-#include "pegtl/change_action_and_states.hpp"
-#include "pegtl/change_control.hpp"
-#include "pegtl/change_state.hpp"
-#include "pegtl/change_states.hpp"
+#include "Pegtl/change_action.hpp"
+#include "Pegtl/change_action_and_state.hpp"
+#include "Pegtl/change_action_and_states.hpp"
+#include "Pegtl/change_control.hpp"
+#include "Pegtl/change_state.hpp"
+#include "Pegtl/change_states.hpp"
 
-#include "pegtl/disable_action.hpp"
-#include "pegtl/enable_action.hpp"
+#include "Pegtl/disable_action.hpp"
+#include "Pegtl/enable_action.hpp"
 
-#include "pegtl/discard_input.hpp"
-#include "pegtl/discard_input_on_failure.hpp"
-#include "pegtl/discard_input_on_success.hpp"
+#include "Pegtl/discard_input.hpp"
+#include "Pegtl/discard_input_on_failure.hpp"
+#include "Pegtl/discard_input_on_success.hpp"
 
-#include "pegtl/visit.hpp"
+#include "Pegtl/visit.hpp"
 
 #if defined(__cpp_exceptions)
-#  include "pegtl/must_if.hpp"
+#  include "Pegtl/must_if.hpp"
 #endif
 
 #endif
