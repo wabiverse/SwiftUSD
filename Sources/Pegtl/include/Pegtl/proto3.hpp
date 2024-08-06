@@ -4,9 +4,9 @@
 #ifndef PXR_PEGTL_CONTRIB_PROTO3_HPP
 #define PXR_PEGTL_CONTRIB_PROTO3_HPP
 
-#include "../ascii.hpp"
-#include "../config.hpp"
-#include "../rules.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
+#include "rules.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::proto3 {
 // protocol buffer v3

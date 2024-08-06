@@ -4,14 +4,14 @@
 #ifndef PXR_PEGTL_INTERNAL_REMATCH_HPP
 #define PXR_PEGTL_INTERNAL_REMATCH_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 
-#include "../apply_mode.hpp"
-#include "../memory_input.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "memory_input.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Head, typename... Rules> struct rematch;

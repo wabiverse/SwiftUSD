@@ -17,7 +17,7 @@
 
 #include <utility>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "filesystem.hpp"
 

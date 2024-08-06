@@ -5,17 +5,17 @@
 #define PXR_PEGTL_INTERNAL_IF_MUST_HPP
 
 #if !defined(__cpp_exceptions)
-#  error "Exception support required for tao/pegtl/internal/if_must.hpp"
+#  error "Exception support required for tao/pegtl/if_must.hpp"
 #else
 
-#  include "../config.hpp"
+#  include "config.hpp"
 
 #  include "enable_control.hpp"
 #  include "must.hpp"
 
-#  include "../apply_mode.hpp"
-#  include "../rewind_mode.hpp"
-#  include "../type_list.hpp"
+#  include "apply_mode.hpp"
+#  include "rewind_mode.hpp"
+#  include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<bool Default, typename Cond, typename... Rules> struct if_must {

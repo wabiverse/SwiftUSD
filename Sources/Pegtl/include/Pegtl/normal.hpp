@@ -14,13 +14,13 @@
 #include "parse_error.hpp"
 #include "rewind_mode.hpp"
 
-#include "internal/enable_control.hpp"
-#include "internal/has_match.hpp"
+#include "enable_control.hpp"
+#include "has_match.hpp"
 
 #if defined(__cpp_exceptions)
 #  include "demangle.hpp"
 #else
-#  include "internal/dependent_false.hpp"
+#  include "dependent_false.hpp"
 #  include <exception>
 #endif
 
@@ -29,22 +29,22 @@ template<typename Rule> struct normal {
   static constexpr bool enable = internal::enable_control<Rule>;
 
   template<typename ParseInput, typename... States>
-  static void start(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void start(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void success(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void success(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void failure(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  static void failure(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  [[noreturn]] static void raise(const ParseInput &in, States &&.../*unused*/)
+  [[noreturn]] static void raise(const ParseInput &in, States &&.*unused*/)
   {
 #if defined(__cpp_exceptions)
     throw parse_error("parse error matching " + std::string(demangle<Rule>()), in);

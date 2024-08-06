@@ -11,9 +11,9 @@
 #include "string_input.hpp"
 #include "tracking_mode.hpp"
 
-#include "internal/file_reader.hpp"
-#include "internal/filesystem.hpp"
-#include "internal/path_to_string.hpp"
+#include "file_reader.hpp"
+#include "filesystem.hpp"
+#include "path_to_string.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<tracking_mode P = tracking_mode::eager, typename Eol = eol::lf_crlf>

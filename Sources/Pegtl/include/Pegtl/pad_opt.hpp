@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_PAD_OPT_HPP
 #define PXR_PEGTL_INTERNAL_PAD_OPT_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "opt.hpp"
 #include "seq.hpp"

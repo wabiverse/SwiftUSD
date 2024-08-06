@@ -7,8 +7,8 @@
 #include <cstddef>
 #include <type_traits>
 
-#include "../ascii.hpp"
-#include "../config.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 // Inspired by https://github.com/irrequietus/typestring

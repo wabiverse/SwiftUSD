@@ -11,8 +11,8 @@
 
 #include "iterator.hpp"
 
-#include "../config.hpp"
-#include "../position.hpp"
+#include "config.hpp"
+#include "position.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename ParseInput> class action_input {

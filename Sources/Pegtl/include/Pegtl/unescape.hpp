@@ -8,9 +8,9 @@
 #include <exception>
 #include <string>
 
-#include "../ascii.hpp"
-#include "../config.hpp"
-#include "../parse_error.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
+#include "parse_error.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::unescape {
 // Utility functions for the unescape actions.

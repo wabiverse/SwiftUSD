@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_LIST_TAIL_PAD_HPP
 #define PXR_PEGTL_INTERNAL_LIST_TAIL_PAD_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "list.hpp"
 #include "opt.hpp"

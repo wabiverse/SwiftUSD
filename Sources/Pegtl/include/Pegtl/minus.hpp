@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_MINUS_HPP
 #define PXR_PEGTL_INTERNAL_MINUS_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "eof.hpp"
 #include "not_at.hpp"

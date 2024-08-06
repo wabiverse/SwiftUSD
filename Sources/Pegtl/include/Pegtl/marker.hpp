@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_INTERNAL_MARKER_HPP
 #define PXR_PEGTL_INTERNAL_MARKER_HPP
 
-#include "../config.hpp"
-#include "../rewind_mode.hpp"
+#include "config.hpp"
+#include "rewind_mode.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Iterator, rewind_mode M> class [[nodiscard]] marker {

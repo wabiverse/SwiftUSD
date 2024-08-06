@@ -4,14 +4,14 @@
 #ifndef PXR_PEGTL_INTERNAL_RANGE_HPP
 #define PXR_PEGTL_INTERNAL_RANGE_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "bump_help.hpp"
 #include "enable_control.hpp"
 #include "one.hpp"
 #include "result_on_found.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<result_on_found R, typename Peek, typename Peek::data_t Lo, typename Peek::data_t Hi>

@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_RANGES_HPP
 #define PXR_PEGTL_INTERNAL_RANGES_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include <utility>
 
@@ -14,7 +14,7 @@
 #include "one.hpp"
 #include "range.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Char, Char Lo, Char Hi> constexpr bool validate_range(Char c) noexcept

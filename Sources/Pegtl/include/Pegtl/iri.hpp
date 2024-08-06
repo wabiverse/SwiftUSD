@@ -9,9 +9,9 @@
 #  error "Exception support required for tao/pegtl/contrib/iri.hpp"
 #else
 
-#  include "../config.hpp"
-#  include "../rules.hpp"
-#  include "../utf8.hpp"
+#  include "config.hpp"
+#  include "rules.hpp"
+#  include "utf8.hpp"
 
 #  include "abnf.hpp"
 #  include "uri.hpp"

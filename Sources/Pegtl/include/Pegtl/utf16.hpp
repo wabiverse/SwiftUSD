@@ -6,10 +6,10 @@
 
 #include "internal.hpp"
 
-#include "../../config.hpp"
-#include "../utf16.hpp"
+#include "config.hpp"
+#include "utf16.hpp"
 
-#include "../internal/peek_utf16.hpp"
+#include "peek_utf16.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace utf16_be::icu {

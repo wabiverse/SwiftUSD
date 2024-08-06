@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename... Cs> class [[nodiscard]] vector_stack_guard {

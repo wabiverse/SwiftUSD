@@ -4,12 +4,12 @@
 #ifndef PXR_PEGTL_CONTRIB_INSTANTIATE_HPP
 #define PXR_PEGTL_CONTRIB_INSTANTIATE_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../apply_mode.hpp"
-#include "../match.hpp"
-#include "../nothing.hpp"
-#include "../rewind_mode.hpp"
+#include "apply_mode.hpp"
+#include "match.hpp"
+#include "nothing.hpp"
+#include "rewind_mode.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<typename T> struct instantiate : maybe_nothing {

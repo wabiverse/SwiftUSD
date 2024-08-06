@@ -7,7 +7,7 @@
 #include <set>
 #include <utility>
 
-#include "../../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename... Cs> class [[nodiscard]] set_stack_guard {

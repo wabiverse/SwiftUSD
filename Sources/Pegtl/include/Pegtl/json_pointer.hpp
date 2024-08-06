@@ -4,10 +4,10 @@
 #ifndef PXR_PEGTL_CONTRIB_JSON_POINTER_HPP
 #define PXR_PEGTL_CONTRIB_JSON_POINTER_HPP
 
-#include "../ascii.hpp"
-#include "../config.hpp"
-#include "../rules.hpp"
-#include "../utf8.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
+#include "rules.hpp"
+#include "utf8.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::json_pointer {
 // JSON pointer grammar according to RFC 6901

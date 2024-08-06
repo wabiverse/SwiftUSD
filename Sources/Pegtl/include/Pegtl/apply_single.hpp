@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_APPLY_SINGLE_HPP
 #define PXR_PEGTL_INTERNAL_APPLY_SINGLE_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include <type_traits>
 

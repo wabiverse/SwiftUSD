@@ -17,18 +17,18 @@
 #include "remove_first_state.hpp"
 #include "shuffle_states.hpp"
 
-#include "../apply_mode.hpp"
-#include "../config.hpp"
-#include "../demangle.hpp"
-#include "../memory_input.hpp"
-#include "../normal.hpp"
-#include "../nothing.hpp"
-#include "../parse.hpp"
-#include "../rewind_mode.hpp"
+#include "apply_mode.hpp"
+#include "config.hpp"
+#include "demangle.hpp"
+#include "memory_input.hpp"
+#include "normal.hpp"
+#include "nothing.hpp"
+#include "parse.hpp"
+#include "rewind_mode.hpp"
 
-#include "../internal/enable_control.hpp"
-#include "../internal/has_unwind.hpp"
-#include "../internal/iterator.hpp"
+#include "enable_control.hpp"
+#include "has_unwind.hpp"
+#include "iterator.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::parse_tree {
 template<typename T, typename Source = std::string_view> struct basic_node {
@@ -106,14 +106,14 @@ template<typename T, typename Source = std::string_view> struct basic_node {
     return {m_begin.data, m_end.data, source, m_begin.byte, m_begin.line, m_begin.column};
   }
 
-  template<typename... States> void remove_content(States &&.../*unused*/) noexcept
+  template<typename... States> void remove_content(States &&.*unused*/) noexcept
   {
     m_end = PXR_PEGTL_NAMESPACE::internal::iterator();
   }
 
   // all non-root nodes are initialized by calling this method
   template<typename Rule, typename ParseInput, typename... States>
-  void start(const ParseInput &in, States &&.../*unused*/)
+  void start(const ParseInput &in, States &&.*unused*/)
   {
     set_type<Rule>();
     source = in.source();
@@ -122,14 +122,14 @@ template<typename T, typename Source = std::string_view> struct basic_node {
 
   // if parsing of the rule succeeded, this method is called
   template<typename Rule, typename ParseInput, typename... States>
-  void success(const ParseInput &in, States &&.../*unused*/) noexcept
+  void success(const ParseInput &in, States &&.*unused*/) noexcept
   {
     m_end = PXR_PEGTL_NAMESPACE::internal::iterator(in.iterator());
   }
 
   // if parsing of the rule failed, this method is called
   template<typename Rule, typename ParseInput, typename... States>
-  void failure(const ParseInput & /*unused*/, States &&.../*unused*/) noexcept
+  void failure(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
   {
   }
 
@@ -138,7 +138,7 @@ template<typename T, typename Source = std::string_view> struct basic_node {
   // note that "child" is the node whose Rule just succeeded
   // and "*this" is the parent where the node should be appended.
   template<typename... States>
-  void emplace_back(std::unique_ptr<node_t> &&child, States &&.../*unused*/)
+  void emplace_back(std::unique_ptr<node_t> &&child, States &&.*unused*/)
   {
     assert(child);
     children.emplace_back(std::move(child));
@@ -175,7 +175,7 @@ template<typename Node> struct state {
 };
 
 template<typename Selector, typename... Parameters>
-void transform(Parameters &&.../*unused*/) noexcept
+void transform(Parameters &&.*unused*/) noexcept
 {
 }
 
@@ -246,13 +246,13 @@ struct make_control<Node, Selector, Control>::state_handler<Rule, false, false>
   static constexpr bool enable = true;
 
   template<typename ParseInput, typename... States>
-  static void start(const ParseInput & /*unused*/, state<Node> &state, States &&.../*unused*/)
+  static void start(const ParseInput & /*unused*/, state<Node> &state, States &&.*unused*/)
   {
     state.emplace_back();
   }
 
   template<typename ParseInput, typename... States>
-  static void success(const ParseInput & /*unused*/, state<Node> &state, States &&.../*unused*/)
+  static void success(const ParseInput & /*unused*/, state<Node> &state, States &&.*unused*/)
   {
     auto n = std::move(state.back());
     state.pop_back();
@@ -262,13 +262,13 @@ struct make_control<Node, Selector, Control>::state_handler<Rule, false, false>
   }
 
   template<typename ParseInput, typename... States>
-  static void failure(const ParseInput & /*unused*/, state<Node> &state, States &&.../*unused*/)
+  static void failure(const ParseInput & /*unused*/, state<Node> &state, States &&.*unused*/)
   {
     state.pop_back();
   }
 
   template<typename ParseInput, typename... States>
-  static void unwind(const ParseInput & /*unused*/, state<Node> &state, States &&.../*unused*/)
+  static void unwind(const ParseInput & /*unused*/, state<Node> &state, States &&.*unused*/)
   {
     state.pop_back();
   }

@@ -6,10 +6,10 @@
 
 #include <type_traits>
 
-#include "../ascii.hpp"
-#include "../config.hpp"
-#include "../rules.hpp"
-#include "../type_list.hpp"
+#include "ascii.hpp"
+#include "config.hpp"
+#include "rules.hpp"
+#include "type_list.hpp"
 
 #include "forward.hpp"
 

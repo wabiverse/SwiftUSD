@@ -26,7 +26,7 @@
 #  undef PXR_PEGTL_WIN32_LEAN_AND_MEAN_WAS_DEFINED
 #endif
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #if !defined(__cpp_exceptions)
 #  include <cstdio>

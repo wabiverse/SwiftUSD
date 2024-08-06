@@ -4,15 +4,15 @@
 #ifndef PXR_PEGTL_INTERNAL_REP_OPT_HPP
 #define PXR_PEGTL_INTERNAL_REP_OPT_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 #include "seq.hpp"
 #include "success.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<unsigned Max, typename... Rules> struct rep_opt : rep_opt<Max, seq<Rules...>> {};

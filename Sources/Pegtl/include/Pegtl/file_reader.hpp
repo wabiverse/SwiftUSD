@@ -13,7 +13,7 @@
 #  include <exception>
 #endif
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "filesystem.hpp"
 

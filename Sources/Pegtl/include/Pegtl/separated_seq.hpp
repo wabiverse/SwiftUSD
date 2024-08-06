@@ -4,10 +4,10 @@
 #ifndef PXR_PEGTL_CONTRIB_SEPARATED_SEQ_HPP
 #define PXR_PEGTL_CONTRIB_SEPARATED_SEQ_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../internal/seq.hpp"
-#include "../type_list.hpp"
+#include "seq.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

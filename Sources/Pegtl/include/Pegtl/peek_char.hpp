@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "input_pair.hpp"
 

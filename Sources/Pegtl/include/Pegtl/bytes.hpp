@@ -4,12 +4,12 @@
 #ifndef PXR_PEGTL_INTERNAL_BYTES_HPP
 #define PXR_PEGTL_INTERNAL_BYTES_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 #include "success.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<unsigned Cnt> struct bytes {

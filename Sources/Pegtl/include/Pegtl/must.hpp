@@ -5,18 +5,18 @@
 #define PXR_PEGTL_INTERNAL_MUST_HPP
 
 #if !defined(__cpp_exceptions)
-#  error "Exception support required for tao/pegtl/internal/must.hpp"
+#  error "Exception support required for tao/pegtl/must.hpp"
 #else
 
-#  include "../config.hpp"
+#  include "config.hpp"
 
 #  include "enable_control.hpp"
 #  include "seq.hpp"
 #  include "success.hpp"
 
-#  include "../apply_mode.hpp"
-#  include "../rewind_mode.hpp"
-#  include "../type_list.hpp"
+#  include "apply_mode.hpp"
+#  include "rewind_mode.hpp"
+#  include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 // The general case applies must<> to each of the

@@ -15,10 +15,10 @@
 #  include <string_view>
 #  include <type_traits>
 
-#  include "../ascii.hpp"
-#  include "../parse.hpp"
-#  include "../parse_error.hpp"
-#  include "../rules.hpp"
+#  include "ascii.hpp"
+#  include "parse.hpp"
+#  include "parse_error.hpp"
+#  include "rules.hpp"
 
 #  include "analyze_traits.hpp"
 
@@ -258,7 +258,7 @@ struct unsigned_rule_with_action {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static auto match(ParseInput &in, States &&.../*unused*/) noexcept(
+  [[nodiscard]] static auto match(ParseInput &in, States &&.*unused*/) noexcept(
       noexcept(in.empty())) -> std::enable_if_t<A == apply_mode::nothing, bool>
   {
     return internal::match_unsigned(in);  // Does not check for any overflow.
@@ -328,7 +328,7 @@ struct maximum_rule_with_action {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static auto match(ParseInput &in, States &&.../*unused*/)
+  [[nodiscard]] static auto match(ParseInput &in, States &&.*unused*/)
       -> std::enable_if_t<A == apply_mode::nothing, bool>
   {
     Unsigned st = 0;
@@ -399,7 +399,7 @@ struct signed_rule_with_action {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static auto match(ParseInput &in, States &&.../*unused*/) noexcept(
+  [[nodiscard]] static auto match(ParseInput &in, States &&.*unused*/) noexcept(
       noexcept(in.empty())) -> std::enable_if_t<A == apply_mode::nothing, bool>
   {
     return PXR_PEGTL_NAMESPACE::parse<signed_rule_new>(in);  // Does not check for any overflow.

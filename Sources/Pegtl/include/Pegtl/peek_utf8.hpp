@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_PEEK_UTF8_HPP
 #define PXR_PEGTL_INTERNAL_PEEK_UTF8_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "input_pair.hpp"
 

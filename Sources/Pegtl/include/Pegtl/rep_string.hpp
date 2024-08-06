@@ -6,8 +6,8 @@
 
 #include <cstddef>
 
-#include "../config.hpp"
-#include "../internal/string.hpp"
+#include "config.hpp"
+#include "string.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

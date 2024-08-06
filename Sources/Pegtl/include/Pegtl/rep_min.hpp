@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_REP_MIN_HPP
 #define PXR_PEGTL_INTERNAL_REP_MIN_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "rep.hpp"
 #include "seq.hpp"

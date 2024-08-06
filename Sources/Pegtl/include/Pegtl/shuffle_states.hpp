@@ -8,9 +8,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../internal/has_unwind.hpp"
+#include "has_unwind.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

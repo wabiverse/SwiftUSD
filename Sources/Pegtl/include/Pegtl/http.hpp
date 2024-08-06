@@ -8,11 +8,11 @@
 #  error "Exception support required for tao/pegtl/contrib/http.hpp"
 #else
 
-#  include "../ascii.hpp"
-#  include "../config.hpp"
-#  include "../nothing.hpp"
-#  include "../rules.hpp"
-#  include "../utf8.hpp"
+#  include "ascii.hpp"
+#  include "config.hpp"
+#  include "nothing.hpp"
+#  include "rules.hpp"
+#  include "utf8.hpp"
 
 #  include "abnf.hpp"
 #  include "forward.hpp"
@@ -138,7 +138,7 @@ struct chunk_size {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, std::size_t &size, States &&.../*unused*/)
+  [[nodiscard]] static bool match(ParseInput &in, std::size_t &size, States &&.*unused*/)
   {
     size = 0;
     std::size_t i = 0;
@@ -186,7 +186,7 @@ struct chunk_data {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, const std::size_t size, States &&.../*unused*/)
+  [[nodiscard]] static bool match(ParseInput &in, const std::size_t size, States &&.*unused*/)
   {
     if (in.size(size) >= size) {
       in.bump(size);

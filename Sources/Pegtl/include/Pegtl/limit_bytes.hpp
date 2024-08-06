@@ -6,14 +6,14 @@
 
 #include <algorithm>
 
-#include "../apply_mode.hpp"
-#include "../config.hpp"
-#include "../match.hpp"
-#include "../nothing.hpp"
-#include "../rewind_mode.hpp"
+#include "apply_mode.hpp"
+#include "config.hpp"
+#include "match.hpp"
+#include "nothing.hpp"
+#include "rewind_mode.hpp"
 
 #if defined(__cpp_exceptions)
-#  include "../parse_error.hpp"
+#  include "parse_error.hpp"
 #else
 #  include <cstdio>
 #  include <exception>

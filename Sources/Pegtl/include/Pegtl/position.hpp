@@ -12,7 +12,7 @@
 
 #include "config.hpp"
 
-#include "internal/iterator.hpp"
+#include "iterator.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 struct position {

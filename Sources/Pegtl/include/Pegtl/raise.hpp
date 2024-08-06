@@ -5,18 +5,18 @@
 #define PXR_PEGTL_INTERNAL_RAISE_HPP
 
 #if !defined(__cpp_exceptions)
-#  error "Exception support required for tao/pegtl/internal/raise.hpp"
+#  error "Exception support required for tao/pegtl/raise.hpp"
 #else
 
 #  include <stdexcept>
 
-#  include "../config.hpp"
+#  include "config.hpp"
 
 #  include "enable_control.hpp"
 
-#  include "../apply_mode.hpp"
-#  include "../rewind_mode.hpp"
-#  include "../type_list.hpp"
+#  include "apply_mode.hpp"
+#  include "rewind_mode.hpp"
+#  include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename T> struct raise {

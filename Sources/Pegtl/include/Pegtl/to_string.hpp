@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

@@ -14,13 +14,13 @@
 #include <utility>
 #include <vector>
 
-#include "../config.hpp"
-#include "../demangle.hpp"
+#include "config.hpp"
+#include "demangle.hpp"
 
 #include "analyze_traits.hpp"
 
-#include "internal/set_stack_guard.hpp"
-#include "internal/vector_stack_guard.hpp"
+#include "set_stack_guard.hpp"
+#include "vector_stack_guard.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

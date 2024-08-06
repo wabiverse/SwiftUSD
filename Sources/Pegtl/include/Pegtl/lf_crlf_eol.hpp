@@ -4,8 +4,8 @@
 #ifndef PXR_PEGTL_INTERNAL_LF_CRLF_EOL_HPP
 #define PXR_PEGTL_INTERNAL_LF_CRLF_EOL_HPP
 
-#include "../config.hpp"
-#include "../eol_pair.hpp"
+#include "config.hpp"
+#include "eol_pair.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 struct lf_crlf_eol {

@@ -5,7 +5,7 @@
 #define PXR_PEGTL_MUST_IF_HPP
 
 #if !defined(__cpp_exceptions)
-#  error "Exception support required for tao/pegtl/internal/must.hpp"
+#  error "Exception support required for tao/pegtl/must.hpp"
 #else
 
 #  include <type_traits>

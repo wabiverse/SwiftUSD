@@ -4,7 +4,7 @@
 #ifndef PXR_PEGTL_INTERNAL_MISSING_APPLY0_HPP
 #define PXR_PEGTL_INTERNAL_MISSING_APPLY0_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<typename Control,

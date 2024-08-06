@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "any.hpp"
 #include "bump_help.hpp"
@@ -14,7 +14,7 @@
 #include "failure.hpp"
 #include "result_on_found.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<result_on_found R, typename Peek, typename Peek::data_t... Cs> struct one {

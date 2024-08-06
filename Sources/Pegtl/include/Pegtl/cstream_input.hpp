@@ -10,7 +10,7 @@
 #include "config.hpp"
 #include "eol.hpp"
 
-#include "internal/cstream_reader.hpp"
+#include "cstream_reader.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 template<typename Eol = eol::lf_crlf, std::size_t Chunk = 64>

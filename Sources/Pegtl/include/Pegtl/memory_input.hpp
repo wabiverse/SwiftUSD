@@ -20,13 +20,13 @@
 #include "position.hpp"
 #include "tracking_mode.hpp"
 
-#include "internal/action_input.hpp"
-#include "internal/at.hpp"
-#include "internal/bump.hpp"
-#include "internal/eolf.hpp"
-#include "internal/iterator.hpp"
-#include "internal/marker.hpp"
-#include "internal/until.hpp"
+#include "action_input.hpp"
+#include "at.hpp"
+#include "bump.hpp"
+#include "eolf.hpp"
+#include "iterator.hpp"
+#include "marker.hpp"
+#include "until.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

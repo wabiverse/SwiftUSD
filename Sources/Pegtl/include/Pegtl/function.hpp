@@ -4,13 +4,13 @@
 #ifndef PXR_PEGTL_CONTRIB_FUNCTION_HPP
 #define PXR_PEGTL_CONTRIB_FUNCTION_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../apply_mode.hpp"
-#include "../rewind_mode.hpp"
-#include "../type_list.hpp"
+#include "apply_mode.hpp"
+#include "rewind_mode.hpp"
+#include "type_list.hpp"
 
-#include "../internal/enable_control.hpp"
+#include "enable_control.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

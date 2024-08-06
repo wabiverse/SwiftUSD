@@ -6,13 +6,13 @@
 
 #include "config.hpp"
 
-#include "internal/eol.hpp"
+#include "eol.hpp"
 
-#include "internal/cr_crlf_eol.hpp"
-#include "internal/cr_eol.hpp"
-#include "internal/crlf_eol.hpp"
-#include "internal/lf_crlf_eol.hpp"
-#include "internal/lf_eol.hpp"
+#include "cr_crlf_eol.hpp"
+#include "cr_eol.hpp"
+#include "crlf_eol.hpp"
+#include "lf_crlf_eol.hpp"
+#include "lf_eol.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 inline namespace ascii {

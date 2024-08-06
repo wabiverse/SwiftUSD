@@ -4,11 +4,11 @@
 #ifndef PXR_PEGTL_INTERNAL_DISCARD_HPP
 #define PXR_PEGTL_INTERNAL_DISCARD_HPP
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "enable_control.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 struct discard {

@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstdlib>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 struct iterator {

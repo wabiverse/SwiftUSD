@@ -4,15 +4,15 @@
 #ifndef PXR_PEGTL_CONTRIB_PREDICATES_HPP
 #define PXR_PEGTL_CONTRIB_PREDICATES_HPP
 
-#include "../config.hpp"
-#include "../type_list.hpp"
+#include "config.hpp"
+#include "type_list.hpp"
 
-#include "../internal/bump_help.hpp"
-#include "../internal/dependent_false.hpp"
-#include "../internal/enable_control.hpp"
-#include "../internal/failure.hpp"
-#include "../internal/peek_char.hpp"
-#include "../internal/peek_utf8.hpp"
+#include "bump_help.hpp"
+#include "dependent_false.hpp"
+#include "enable_control.hpp"
+#include "failure.hpp"
+#include "peek_char.hpp"
+#include "peek_utf8.hpp"
 
 #include "analyze_traits.hpp"
 

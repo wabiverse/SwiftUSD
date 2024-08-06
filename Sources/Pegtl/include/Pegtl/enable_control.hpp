@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 // This class is a simple tagging mechanism.

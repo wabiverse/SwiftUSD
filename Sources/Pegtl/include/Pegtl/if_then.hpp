@@ -6,13 +6,13 @@
 
 #include <type_traits>
 
-#include "../config.hpp"
+#include "config.hpp"
 
-#include "../internal/enable_control.hpp"
-#include "../internal/failure.hpp"
-#include "../internal/if_then_else.hpp"
-#include "../internal/seq.hpp"
-#include "../internal/success.hpp"
+#include "enable_control.hpp"
+#include "failure.hpp"
+#include "if_then_else.hpp"
+#include "seq.hpp"
+#include "success.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
 namespace internal {

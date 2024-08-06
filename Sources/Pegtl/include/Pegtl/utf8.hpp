@@ -6,10 +6,10 @@
 
 #include "internal.hpp"
 
-#include "../../config.hpp"
-#include "../../utf8.hpp"
+#include "config.hpp"
+#include "utf8.hpp"
 
-#include "../../internal/peek_utf8.hpp"
+#include "peek_utf8.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::utf8::icu {
 template<UProperty P, bool V = true>

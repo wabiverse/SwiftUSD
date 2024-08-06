@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-#include "../config.hpp"
+#include "config.hpp"
 
 #include "bump_help.hpp"
 #include "enable_control.hpp"
@@ -14,7 +14,7 @@
 #include "result_on_found.hpp"
 #include "success.hpp"
 
-#include "../type_list.hpp"
+#include "type_list.hpp"
 
 namespace PXR_PEGTL_NAMESPACE::internal {
 template<char C>

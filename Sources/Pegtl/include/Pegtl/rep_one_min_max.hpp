@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "../config.hpp"
-#include "../type_list.hpp"
+#include "config.hpp"
+#include "type_list.hpp"
 
-#include "../internal/bump_help.hpp"
-#include "../internal/bytes.hpp"
-#include "../internal/enable_control.hpp"
-#include "../internal/opt.hpp"
+#include "bump_help.hpp"
+#include "bytes.hpp"
+#include "enable_control.hpp"
+#include "opt.hpp"
 
 #include "analyze_traits.hpp"
 

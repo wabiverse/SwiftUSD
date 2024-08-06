@@ -5,10 +5,10 @@
 #define PXR_PEGTL_INTERNAL_LIST_MUST_HPP
 
 #if !defined(__cpp_exceptions)
-#  error "Exception support required for tao/pegtl/internal/list_must.hpp"
+#  error "Exception support required for tao/pegtl/list_must.hpp"
 #else
 
-#  include "../config.hpp"
+#  include "config.hpp"
 
 #  include "must.hpp"
 #  include "seq.hpp"
