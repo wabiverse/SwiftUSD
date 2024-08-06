@@ -37,7 +37,7 @@
 #include <Tf/span.h>
 #include <Tf/spinRWMutex.h>
 #include <Tf/staticTokens.h>
-#include <Tf/tf.h>
+#include <Tf/tfImpl.h>
 #include <Tf/token.h>
 #include <Tf/typeInfoMap.h>
 #include <Tf/unicodeCharacterClasses.h>
