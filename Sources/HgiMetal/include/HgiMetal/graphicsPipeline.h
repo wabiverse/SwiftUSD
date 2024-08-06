@@ -42,7 +42,7 @@ class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline {
   void _CreateDepthStencilState(HgiMetal *hgi);
   void _CreateRenderPipelineState(HgiMetal *hgi);
 
-  MTLVertexDescriptor *_vertexDescriptor;
+  MTL::VertexDescriptor *_vertexDescriptor;
   MTL::DepthStencilState* _depthStencilState;
   MTL::RenderPipelineState* _renderPipelineState;
   MTL::Buffer* _constantTessFactors;
