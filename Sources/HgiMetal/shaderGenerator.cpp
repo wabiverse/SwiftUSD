@@ -24,9 +24,9 @@
 
 #include <Metal/Metal.hpp>
 
-#include "HgiMetal/shaderGenerator.h"
 #include "Hgi/tokens.h"
 #include "HgiMetal/resourceBindings.h"
+#include "HgiMetal/shaderGenerator.h"
 
 #include <sstream>
 #include <unordered_map>
@@ -583,6 +583,8 @@ HgiMetalShaderSectionPtrVector ShaderStageData::AccumulateParams(
     HgiShaderStage stage,
     bool iterateAttrs)
 {
+  // Currently we don't add qualifiers for function parameters.
+  const static std::string emptyQualifiers("");
   HgiMetalShaderSectionPtrVector stageShaderSections;
   // only some roles have an index
   if (!iterateAttrs) {
@@ -615,20 +617,12 @@ HgiMetalShaderSectionPtrVector ShaderStageData::AccumulateParams(
         attributes.push_back(HgiShaderSectionAttribute{role, indexAsStr});
       }
 
-      switch (p.interpolation) {
-        case HgiInterpolationDefault:
-          break;
-        case HgiInterpolationFlat:
-          attributes.push_back(HgiShaderSectionAttribute{"flat", ""});
-          break;
-        case HgiInterpolationNoPerspective:
-          attributes.push_back(HgiShaderSectionAttribute{"center_no_perspective", ""});
-          break;
-      }
+      attributes.push_back(
+          HgiShaderSectionAttribute{_GetInterpolationString(p.interpolation, p.sampling), ""});
 
       HgiMetalMemberShaderSection *const section =
           generator->CreateShaderSection<HgiMetalMemberShaderSection>(
-              p.nameInShader, p.type, attributes, p.arraySize);
+              p.nameInShader, p.type, emptyQualifiers, attributes, p.arraySize);
       stageShaderSections.push_back(section);
     }
   }
@@ -648,11 +642,10 @@ HgiMetalShaderSectionPtrVector ShaderStageData::AccumulateParams(
 
       HgiMetalMemberShaderSection *const section =
           generator->CreateShaderSection<HgiMetalMemberShaderSection>(
-              p.nameInShader, p.type, attributes, p.arraySize);
+              p.nameInShader, p.type, emptyQualifiers, attributes, p.arraySize);
       stageShaderSections.push_back(section);
     }
   }
-
   return stageShaderSections;
 }
 
@@ -674,7 +667,12 @@ HgiMetalInterstageBlockShaderSectionPtrVector ShaderStageData::AccumulateParamBl
 
       HgiMetalMemberShaderSection *const memberSection =
           generator->CreateShaderSection<HgiMetalMemberShaderSection>(
-              m.name, m.type, attributes, std::string(), p.instanceName);
+              m.name,
+              m.type,
+              _GetInterpolationString(m.interpolation, m.sampling),
+              attributes,
+              std::string(),
+              p.instanceName);
       blockMembers.push_back(memberSection);
     }
 
@@ -1152,21 +1150,34 @@ std::unique_ptr<HgiMetalShaderStageEntryPoint> HgiMetalShaderGenerator::
   }
 }
 
-HgiMetalShaderGenerator::HgiMetalShaderGenerator(const HgiShaderFunctionDesc &descriptor,
-                                                 MTL::Device *device)
+HgiMetalShaderGenerator::HgiMetalShaderGenerator(HgiMetal const *hgi,
+                                                 const HgiShaderFunctionDesc &descriptor)
     : HgiShaderGenerator(descriptor),
+      _hgi(hgi),
       _generatorShaderSections(_BuildShaderStageEntryPoints(descriptor))
 {
+  // Currently we don't add qualifiers for global uniforms.
+  const static std::string emptyQualifiers("");
   for (const auto &member : descriptor.stageGlobalMembers) {
     HgiShaderSectionAttributeVector attrs;
     CreateShaderSection<HgiMetalMemberShaderSection>(
-        member.nameInShader, member.type, attrs, member.arraySize);
+        member.nameInShader, member.type, emptyQualifiers, attrs, member.arraySize);
   }
+
   std::stringstream macroSection;
-  macroSection << _GetHeader(device, descriptor.shaderStage);
+  macroSection << _GetHeader(hgi->GetPrimaryDevice(), descriptor.shaderStage);
+
   if (_IsTessFunction(descriptor)) {
     macroSection << "#define VERTEX_CONTROL_POINTS_PER_PATCH "
                  << descriptor.tessellationDescriptor.numVertsPerPatchIn << "\n";
+  }
+
+  if (_hgi->GetCapabilities()->requiresReturnAfterDiscard) {
+    macroSection << "#define discard discard_fragment(); "
+                    "discarded_fragment = true;\n";
+  }
+  else {
+    macroSection << "#define discard discard_fragment();\n";
   }
 
   CreateShaderSection<HgiMetalMacroShaderSection>(macroSection.str(), "Headers");
@@ -1204,6 +1215,11 @@ void HgiMetalShaderGenerator::_Execute(std::ostream &ss)
     section->VisitScopeStructs(ss);
   }
   ss << "\n// //////// Scope Member Declarations ////////\n";
+  if (_hgi->GetCapabilities()->requiresReturnAfterDiscard) {
+    if (this->_GetShaderStage() == HgiShaderStageFragment) {
+      ss << "bool discarded_fragment;\n";
+    }
+  }
   for (const HgiMetalShaderSectionUniquePtr &section : *shaderSections) {
     section->VisitScopeMemberDeclarations(ss);
   }
@@ -1315,11 +1331,29 @@ void HgiMetalShaderGenerator::_Execute(std::ostream &ss)
 
   // Execute all code that hooks into the entry point function
   ss << "\n// //////// Entry Point Function Executions ////////\n";
+  if (_hgi->GetCapabilities()->requiresReturnAfterDiscard) {
+    if (this->_GetShaderStage() == HgiShaderStageFragment) {
+      ss << _generatorShaderSections->GetScopeInstanceName() << ".discarded_fragment = false;\n";
+    }
+  }
   for (const HgiMetalShaderSectionUniquePtr &section : *shaderSections) {
     if (section->VisitEntryPointFunctionExecutions(
             ss, _generatorShaderSections->GetScopeInstanceName()))
     {
       ss << "\n";
+    }
+  }
+  if (_hgi->GetCapabilities()->requiresReturnAfterDiscard) {
+    if (this->_GetShaderStage() == HgiShaderStageFragment) {
+      ss << "if (" << _generatorShaderSections->GetScopeInstanceName() << ".discarded_fragment)\n";
+      ss << "{\n";
+      if (outputs) {
+        ss << "    return {};\n";
+      }
+      else {
+        ss << "    return;\n";
+      }
+      ss << "}\n";
     }
   }
   // return the instance of the shader entrypoint output type
