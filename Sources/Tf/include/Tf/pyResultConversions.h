@@ -11,9 +11,11 @@
 
 #include "Tf/pyUtils.h"
 
+#if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/tuple.hpp>
+#endif // __has_include(<boost/python/dict.hpp>)
 
 #include <type_traits>
 

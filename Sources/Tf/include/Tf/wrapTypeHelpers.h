@@ -12,8 +12,11 @@
 #include "Tf/api.h"
 #include "Tf/pyObjWrapper.h"
 #include "Tf/type.h"
+
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/def_visitor.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

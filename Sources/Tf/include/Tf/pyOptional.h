@@ -12,11 +12,14 @@
 #include "pxr/pxrns.h"
 
 #include "Tf/pyUtils.h"
+
+#if __has_include(<boost/python/converter/from_python.hpp>)
 #include <boost/optional.hpp>
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/to_python_value.hpp>
+#endif // __has_include(<boost/python/converter/from_python.hpp>)
 
 #include <optional>
 

@@ -12,9 +12,11 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyUtils.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/operators.hpp>
 #include <boost/python/return_by_value.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 #include <string>
 

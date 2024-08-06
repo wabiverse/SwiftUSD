@@ -29,6 +29,7 @@
 
 #include "Arch/demangle.h"
 
+#if __has_include(<boost/python/def_visitor.hpp>)
 #include <boost/python/def_visitor.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/errors.hpp>
@@ -37,6 +38,7 @@
 #include <boost/python/raw_function.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/type_id.hpp>
+#endif // __has_include(<boost/python/def_visitor.hpp>)
 
 #include <array>
 #include <string>

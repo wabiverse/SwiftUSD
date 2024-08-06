@@ -27,10 +27,12 @@
 #include "Tf/refPtr.h"
 #include "Tf/weakPtr.h"
 
+#if __has_include(<boost/python/extract.hpp>)
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/tuple.hpp>
+#endif // __has_include(<boost/python/extract.hpp>)
 
 #include <deque>
 #include <list>

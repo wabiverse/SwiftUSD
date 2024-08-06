@@ -12,7 +12,9 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
 
+#if __has_include(<boost/python/override.hpp>)
 #include <boost/python/override.hpp>
+#endif // __has_include(<boost/python/override.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

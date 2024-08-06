@@ -26,11 +26,13 @@
 #include <typeinfo>
 #include <vector>
 
+#if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/handle.hpp>
 #include <boost/python/object.hpp>
 #include <boost/python/type_id.hpp>
+#endif // __has_include(<boost/python/dict.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
