@@ -47,7 +47,6 @@ HgiMetalComputeCmds::HgiMetalComputeCmds(HgiMetal *hgi, HgiComputeCmdsDesc const
       _argumentBuffer(nil),
       _encoder(nil),
       _secondaryCommandBuffer(false),
-      _hasWork(false),
       _dispatchMethod(desc.dispatchMethod)
 {
   _CreateEncoder();
@@ -140,7 +139,10 @@ void HgiMetalComputeCmds::Dispatch(int dimX, int dimY)
                                             thread_height < dimY ? thread_height : dimY,
                                             1));
 
-  _hasWork = true;
+  if (!_secondaryCommandBuffer) {
+    _hgi->SetHasWork();
+  }
+
   _argumentBuffer = nil;
 }
 
