@@ -15,7 +15,9 @@
 #include "Tf/api.h"
 #include "Tf/errorMark.h"
 
+#if __has_include(<boost/python/default_call_policies.hpp>)
 #include <boost/python/default_call_policies.hpp>
+#endif // __has_include(<boost/python/default_call_policies.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

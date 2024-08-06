@@ -17,9 +17,11 @@
 // for build issues when including Python.h
 #  include "Tf/pySafePython.h"
 
+#if __has_include(<boost/python/hash.hpp>)
 #  include <boost/functional/hash.hpp>
 #  include <boost/python/object_fwd.hpp>
 #  include <boost/python/object_operators.hpp>
+#endif // __has_include(<boost/python/hash.hpp>)
 
 #  include <iosfwd>
 #  include <memory>

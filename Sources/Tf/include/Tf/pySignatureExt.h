@@ -7,6 +7,8 @@
 #ifndef PXR_BASE_TF_PY_SIGNATURE_EXT_H
 #define PXR_BASE_TF_PY_SIGNATURE_EXT_H
 
+#if __has_include(<boost/mpl/vector.hpp>)
+
 #include <boost/mpl/vector.hpp>
 
 // This file extends boost::python::detail::get_signature to support member
@@ -47,5 +49,7 @@ auto get_signature(Ret (TheCls::*)(Args...) const &, void * = nullptr)
 }  // namespace boost
 
 #include <boost/python/signature.hpp>
+
+#endif // __has_include(<boost/mpl/vector.hpp>)
 
 #endif  // PXR_BASE_TF_PY_SIGNATURE_EXT_H

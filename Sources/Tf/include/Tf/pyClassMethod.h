@@ -9,10 +9,12 @@
 
 #include "pxr/pxrns.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/def_visitor.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/object.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

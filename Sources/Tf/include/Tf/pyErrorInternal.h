@@ -11,8 +11,11 @@
 
 #include "Tf/api.h"
 #include "Tf/pyExceptionState.h"
+
+#if __has_include(<boost/python/handle.hpp>)
 #include <boost/python/handle.hpp>
 #include <boost/python/object_fwd.hpp>
+#endif // __has_include(<boost/python/handle.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

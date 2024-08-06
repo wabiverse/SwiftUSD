@@ -12,8 +12,10 @@
 #include "Tf/api.h"
 #include "Tf/pyIdentity.h"
 
+#if __has_include(<boost/python/handle.hpp>)
 #include <boost/python/handle.hpp>
 #include <boost/python/object.hpp>
+#endif // __has_include(<boost/python/handle.hpp>)
 
 #include <typeinfo>
 

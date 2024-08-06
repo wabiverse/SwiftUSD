@@ -23,6 +23,7 @@
 #include "Tf/stringUtils.h"
 #include "Tf/weakPtr.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/converter/registered.hpp>
@@ -34,6 +35,7 @@
 #include <boost/python/handle.hpp>
 #include <boost/python/implicit.hpp>
 #include <boost/python/to_python_converter.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 #include <memory>
 #include <type_traits>

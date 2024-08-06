@@ -13,8 +13,12 @@
 #include "pxr/pxrns.h"
 
 #include "Tf/api.h"
+
+#if __has_include(<boost/python/handle.hpp>)
 #include <boost/python/handle.hpp>
 #include <boost/python/object.hpp>
+#endif // __has_include(<boost/python/handle.hpp>)
+
 #include <string>
 
 PXR_NAMESPACE_OPEN_SCOPE

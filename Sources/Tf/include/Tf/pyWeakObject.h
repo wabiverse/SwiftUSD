@@ -17,8 +17,10 @@
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
 
+#if __has_include(<boost/python/handle.hpp>)
 #include <boost/python/handle.hpp>
 #include <boost/python/object.hpp>
+#endif // __has_include(<boost/python/handle.hpp>)
 
 #include "Tf/hashmap.h"
 

@@ -15,7 +15,9 @@
 #include "Tf/api.h"
 #include "Tf/preprocessorUtilsLite.h"
 
+#if __has_include(<boost/python/module.hpp>)
 #include <boost/python/module.hpp>
+#endif // __has_include(<boost/python/module.hpp>)
 
 // Helper macros for module files.  If you implement your wrappers for classes
 // as functions named wrapClassName(), then you can create your module like

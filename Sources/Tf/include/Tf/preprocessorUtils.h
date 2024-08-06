@@ -33,6 +33,8 @@
 
 #include "Arch/defines.h"
 #include "Arch/pragmas.h"
+
+#if __has_include(<boost/preprocessor/arithmetic/inc.hpp>)
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/arithmetic/sub.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -49,6 +51,7 @@
 #  include <boost/vmd/is_empty.hpp>
 ARCH_PRAGMA_MACRO_TOO_FEW_ARGUMENTS
 #endif
+#endif // __has_include(<boost/preprocessor/arithmetic/inc.hpp>)
 
 // In boost version 1.51, they seem to have neglected to define this.
 // Without it, some functions will get confused about macros with no arguments

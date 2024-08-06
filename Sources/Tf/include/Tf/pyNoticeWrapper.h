@@ -16,10 +16,12 @@
 #include "Tf/wrapTypeHelpers.h"
 #include "pxr/pxrns.h"
 
+#if __has_include(<boost/python/bases.hpp>)
 #include <boost/python/bases.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/handle.hpp>
+#endif // __has_include(<boost/python/bases.hpp>)
 
 #include <map>
 #include <string>

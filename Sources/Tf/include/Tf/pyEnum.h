@@ -25,6 +25,7 @@
 #include "Tf/singleton.h"
 #include "Tf/stringUtils.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/converter/registered.hpp>
@@ -36,6 +37,7 @@
 #include <boost/python/scope.hpp>
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/tuple.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 #include <string>
 

@@ -17,7 +17,9 @@
 
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
+#if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
+#endif // __has_include(<boost/python/dict.hpp>)
 #include <locale>
 
 #include "Tf/hashmap.h"

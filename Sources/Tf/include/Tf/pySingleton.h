@@ -16,10 +16,12 @@
 #include "Tf/singleton.h"
 #include "Tf/weakPtr.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/def_visitor.hpp>
 #include <boost/python/default_call_policies.hpp>
 #include <boost/python/raw_function.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 #include <functional>
 #include <string>

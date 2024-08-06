@@ -14,6 +14,7 @@
 #include "Tf/pyObjWrapper.h"
 #include "Tf/pyUtils.h"
 
+#if __has_include(<boost/python/converter/from_python.hpp>)
 #include <boost/python/converter/from_python.hpp>
 #include <boost/python/converter/registered.hpp>
 #include <boost/python/converter/rvalue_from_python_data.hpp>
@@ -22,6 +23,7 @@
 #include <boost/python/object.hpp>
 
 #include <boost/function.hpp>
+#endif // __has_include(<boost/python/converter/from_python.hpp>)
 
 #include <functional>
 

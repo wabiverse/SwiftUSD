@@ -19,7 +19,9 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
 
+#if __has_include(<boost/python/call.hpp>)
 #include <boost/python/call.hpp>
+#endif // __has_include(<boost/python/call.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 

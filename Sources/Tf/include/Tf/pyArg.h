@@ -10,8 +10,11 @@
 #include "Tf/api.h"
 #include "pxr/pxrns.h"
 
+#if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
 #include <boost/python/tuple.hpp>
+#endif // __has_include(<boost/python/dict.hpp>)
+
 #include <string>
 #include <vector>
 

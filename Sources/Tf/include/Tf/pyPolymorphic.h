@@ -20,9 +20,11 @@
 #include "Tf/type.h"
 #include "Tf/weakPtr.h"
 
+#if __has_include(<boost/python/has_back_reference.hpp>)
 #include <boost/python/has_back_reference.hpp>
 #include <boost/python/object/class_detail.hpp>
 #include <boost/python/wrapper.hpp>
+#endif // __has_include(<boost/python/has_back_reference.hpp>)
 
 #include <functional>
 #include <type_traits>

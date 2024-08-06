@@ -19,10 +19,12 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
 
+#if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/object.hpp>
+#endif // __has_include(<boost/python/dict.hpp>)
 
 #include <cstddef>
 #include <memory>

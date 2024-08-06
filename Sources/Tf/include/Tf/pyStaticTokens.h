@@ -17,8 +17,10 @@
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/staticTokens.h"
 
+#if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/scope.hpp>
+#endif // __has_include(<boost/python/class.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
