@@ -4,6 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#if defined(_WIN32)
+
 #include "Garch/glPlatformContextWindows.h"
 #include "Tf/hash.h"
 
@@ -67,3 +69,5 @@ GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(_WIN32)

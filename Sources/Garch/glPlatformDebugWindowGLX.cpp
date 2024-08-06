@@ -4,6 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#if defined(__linux__)
 
 #include "Garch/glPlatformDebugWindowGLX.h"
 #include "Garch/glDebugWindow.h"
@@ -210,3 +211,5 @@ void Garch_GLPlatformDebugWindow::ExitApp()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(__linux__)
