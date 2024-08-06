@@ -15,7 +15,7 @@
 
 #include "Tf/nullPtr.h"
 #include "Tf/refPtr.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/weakBase.h"
 #include "Tf/weakPtrFacade.h"
 

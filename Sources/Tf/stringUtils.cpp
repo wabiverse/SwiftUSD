@@ -14,7 +14,7 @@
 #include "Tf/pathUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/token.h"
 
 #include <algorithm>
