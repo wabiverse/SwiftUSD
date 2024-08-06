@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "pxr/base/arch/pragmas.h"
+#include "Arch/pragmas.h"
 
 // Not all functions in the OpenEXR library are used by Hio, and the OpenEXR
 // symbols themselves are declared static for inclusion within Hio.
