@@ -10,26 +10,29 @@
 #include "nothing.hpp"
 #include "rewind_mode.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-struct discard_input_on_success : maybe_nothing {
-  template<typename Rule,
-           apply_mode A,
-           rewind_mode M,
-           template<typename...>
-           class Action,
-           template<typename...>
-           class Control,
-           typename ParseInput,
-           typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, States &&...st)
-  {
-    const bool result = PXR_PEGTL_NAMESPACE::match<Rule, A, M, Action, Control>(in, st...);
-    if (result) {
-      in.discard();
-    }
-    return result;
-  }
-};
+namespace PXR_PEGTL_NAMESPACE
+{
+   struct discard_input_on_success
+      : maybe_nothing
+   {
+      template< typename Rule,
+                apply_mode A,
+                rewind_mode M,
+                template< typename... >
+                class Action,
+                template< typename... >
+                class Control,
+                typename ParseInput,
+                typename... States >
+      [[nodiscard]] static bool match( ParseInput& in, States&&... st )
+      {
+         const bool result = PXR_PEGTL_NAMESPACE::match< Rule, A, M, Action, Control >( in, st... );
+         if( result ) {
+            in.discard();
+         }
+         return result;
+      }
+   };
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

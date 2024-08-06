@@ -6,10 +6,13 @@
 
 #include "config.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-template<typename Rule> struct nothing {};
+namespace PXR_PEGTL_NAMESPACE
+{
+   template< typename Rule >
+   struct nothing
+   {};
 
-using maybe_nothing = nothing<void>;
+   using maybe_nothing = nothing< void >;
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

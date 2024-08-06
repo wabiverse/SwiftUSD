@@ -6,8 +6,10 @@
 
 #include "config.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-struct require_apply {};
+namespace PXR_PEGTL_NAMESPACE
+{
+   struct require_apply
+   {};
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

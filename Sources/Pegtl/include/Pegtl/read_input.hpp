@@ -11,43 +11,43 @@
 #include "string_input.hpp"
 #include "tracking_mode.hpp"
 
-#include "file_reader.hpp"
-#include "filesystem.hpp"
-#include "path_to_string.hpp"
+#include "internal/file_reader.hpp"
+#include "internal/filesystem.hpp"
+#include "internal/path_to_string.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-template<tracking_mode P = tracking_mode::eager, typename Eol = eol::lf_crlf>
-struct read_input : string_input<P, Eol> {
-  read_input(const internal::filesystem::path &path, const std::string &source)
-      : string_input<P, Eol>(internal::file_reader(path).read(), source)
-  {
-  }
+namespace PXR_PEGTL_NAMESPACE
+{
+   template< tracking_mode P = tracking_mode::eager, typename Eol = eol::lf_crlf >
+   struct read_input
+      : string_input< P, Eol >
+   {
+      read_input( const internal::filesystem::path& path, const std::string& source )
+         : string_input< P, Eol >( internal::file_reader( path ).read(), source )
+      {}
 
-  explicit read_input(const internal::filesystem::path &path)
-      : read_input(path, internal::path_to_string(path))
-  {
-  }
+      explicit read_input( const internal::filesystem::path& path )
+         : read_input( path, internal::path_to_string( path ) )
+      {}
 
-  read_input(FILE *file, const internal::filesystem::path &path, const std::string &source)
-      : string_input<P, Eol>(internal::file_reader(file, path).read(), source)
-  {
-  }
+      read_input( FILE* file, const internal::filesystem::path& path, const std::string& source )
+         : string_input< P, Eol >( internal::file_reader( file, path ).read(), source )
+      {}
 
-  read_input(FILE *file, const internal::filesystem::path &path)
-      : read_input(file, path, internal::path_to_string(path))
-  {
-  }
+      read_input( FILE* file, const internal::filesystem::path& path )
+         : read_input( file, path, internal::path_to_string( path ) )
+      {}
 
-  read_input(const read_input &) = delete;
-  read_input(read_input &&) = delete;
+      read_input( const read_input& ) = delete;
+      read_input( read_input&& ) = delete;
 
-  ~read_input() = default;
+      ~read_input() = default;
 
-  read_input &operator=(const read_input &) = delete;
-  read_input &operator=(read_input &&) = delete;
-};
+      read_input& operator=( const read_input& ) = delete;
+      read_input& operator=( read_input&& ) = delete;
+   };
 
-template<typename... Ts> explicit read_input(Ts &&...) -> read_input<>;
+   template< typename... Ts >
+   explicit read_input( Ts&&... ) -> read_input<>;
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

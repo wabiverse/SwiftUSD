@@ -14,86 +14,85 @@
 #include "parse_error.hpp"
 #include "rewind_mode.hpp"
 
-#include "enable_control.hpp"
-#include "has_match.hpp"
+#include "internal/enable_control.hpp"
+#include "internal/has_match.hpp"
 
-#if defined(__cpp_exceptions)
-#  include "demangle.hpp"
+#if defined( __cpp_exceptions )
+#include "demangle.hpp"
 #else
-#  include "dependent_false.hpp"
-#  include <exception>
+#include "internal/dependent_false.hpp"
+#include <exception>
 #endif
 
-namespace PXR_PEGTL_NAMESPACE {
-template<typename Rule> struct normal {
-  static constexpr bool enable = internal::enable_control<Rule>;
+namespace PXR_PEGTL_NAMESPACE
+{
+   template< typename Rule >
+   struct normal
+   {
+      static constexpr bool enable = internal::enable_control< Rule >;
 
-  template<typename ParseInput, typename... States>
-  static void start(const ParseInput & /*unused*/, States &&...) noexcept
-  {
-  }
+      template< typename ParseInput, typename... States >
+      static void start( const ParseInput& /*unused*/, States&&... /*unused*/ ) noexcept
+      {}
 
-  template<typename ParseInput, typename... States>
-  static void success(const ParseInput & /*unused*/, States &&...) noexcept
-  {
-  }
+      template< typename ParseInput, typename... States >
+      static void success( const ParseInput& /*unused*/, States&&... /*unused*/ ) noexcept
+      {}
 
-  template<typename ParseInput, typename... States>
-  static void failure(const ParseInput & /*unused*/, States &&...) noexcept
-  {
-  }
+      template< typename ParseInput, typename... States >
+      static void failure( const ParseInput& /*unused*/, States&&... /*unused*/ ) noexcept
+      {}
 
-  template<typename ParseInput, typename... States>
-  [[noreturn]] static void raise(const ParseInput &in, States &&...)
-  {
-#if defined(__cpp_exceptions)
-    throw parse_error("parse error matching " + std::string(demangle<Rule>()), in);
+      template< typename ParseInput, typename... States >
+      [[noreturn]] static void raise( const ParseInput& in, States&&... /*unused*/ )
+      {
+#if defined( __cpp_exceptions )
+         throw parse_error( "parse error matching " + std::string( demangle< Rule >() ), in );
 #else
-    static_assert(internal::dependent_false<Rule>,
-                  "exception support required for normal< Rule >::raise()");
-    (void)in;
-    std::terminate();
+         static_assert( internal::dependent_false< Rule >, "exception support required for normal< Rule >::raise()" );
+         (void)in;
+         std::terminate();
 #endif
-  }
+      }
 
-  template<template<typename...> class Action,
-           typename Iterator,
-           typename ParseInput,
-           typename... States>
-  static auto apply(const Iterator &begin, const ParseInput &in, States &&...st) noexcept(
-      noexcept(Action<Rule>::apply(std::declval<const typename ParseInput::action_t &>(), st...)))
-      -> decltype(Action<Rule>::apply(std::declval<const typename ParseInput::action_t &>(),
-                                      st...))
-  {
-    const typename ParseInput::action_t action_input(begin, in);
-    return Action<Rule>::apply(action_input, st...);
-  }
+      template< template< typename... > class Action,
+                typename Iterator,
+                typename ParseInput,
+                typename... States >
+      static auto apply( const Iterator& begin, const ParseInput& in, States&&... st ) noexcept( noexcept( Action< Rule >::apply( std::declval< const typename ParseInput::action_t& >(), st... ) ) )
+         -> decltype( Action< Rule >::apply( std::declval< const typename ParseInput::action_t& >(), st... ) )
+      {
+         const typename ParseInput::action_t action_input( begin, in );
+         return Action< Rule >::apply( action_input, st... );
+      }
 
-  template<template<typename...> class Action, typename ParseInput, typename... States>
-  static auto apply0(const ParseInput & /*unused*/, States &&...st) noexcept(
-      noexcept(Action<Rule>::apply0(st...))) -> decltype(Action<Rule>::apply0(st...))
-  {
-    return Action<Rule>::apply0(st...);
-  }
+      template< template< typename... > class Action,
+                typename ParseInput,
+                typename... States >
+      static auto apply0( const ParseInput& /*unused*/, States&&... st ) noexcept( noexcept( Action< Rule >::apply0( st... ) ) )
+         -> decltype( Action< Rule >::apply0( st... ) )
+      {
+         return Action< Rule >::apply0( st... );
+      }
 
-  template<apply_mode A,
-           rewind_mode M,
-           template<typename...>
-           class Action,
-           template<typename...>
-           class Control,
-           typename ParseInput,
-           typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, States &&...st)
-  {
-    if constexpr (internal::has_match<bool, Rule, A, M, Action, Control, ParseInput, States...>) {
-      return Action<Rule>::template match<Rule, A, M, Action, Control>(in, st...);
-    }
-    else {
-      return PXR_PEGTL_NAMESPACE::match<Rule, A, M, Action, Control>(in, st...);
-    }
-  }
-};
+      template< apply_mode A,
+                rewind_mode M,
+                template< typename... >
+                class Action,
+                template< typename... >
+                class Control,
+                typename ParseInput,
+                typename... States >
+      [[nodiscard]] static bool match( ParseInput& in, States&&... st )
+      {
+         if constexpr( internal::has_match< bool, Rule, A, M, Action, Control, ParseInput, States... > ) {
+            return Action< Rule >::template match< Rule, A, M, Action, Control >( in, st... );
+         }
+         else {
+            return PXR_PEGTL_NAMESPACE::match< Rule, A, M, Action, Control >( in, st... );
+         }
+      }
+   };
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

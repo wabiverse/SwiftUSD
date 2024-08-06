@@ -4,14 +4,16 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Sdf/variableExpressionParser.h"
 #include "pxr/pxrns.h"
+#include "Sdf/variableExpressionParser.h"
 
 #include "Sdf/debugCodes.h"
 #include "Sdf/variableExpressionImpl.h"
 
 #include "Pegtl/Pegtl.hpp"
-#include "Pegtl/trace.hpp"
+
+#include "Pegtl/contrib/trace.hpp"
+
 #include "Tf/stringUtils.h"
 
 #include <tuple>
@@ -21,8 +23,6 @@ using namespace PXR_PEGTL_NAMESPACE;
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-
-using namespace PXR_PEGTL_NAMESPACE;
 
 namespace Impl = Sdf_VariableExpressionImpl;
 

@@ -6,8 +6,14 @@
 
 #include "config.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-enum class rewind_mode : char { active, required, dontcare };
+namespace PXR_PEGTL_NAMESPACE
+{
+   enum class rewind_mode : char
+   {
+      active,
+      required,
+      dontcare
+   };
 
 }  // namespace PXR_PEGTL_NAMESPACE
 

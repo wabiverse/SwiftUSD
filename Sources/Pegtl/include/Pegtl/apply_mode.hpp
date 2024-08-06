@@ -6,8 +6,13 @@
 
 #include "config.hpp"
 
-namespace PXR_PEGTL_NAMESPACE {
-enum class apply_mode : bool { action = true, nothing = false };
+namespace PXR_PEGTL_NAMESPACE
+{
+   enum class apply_mode : bool
+   {
+      action = true,
+      nothing = false
+   };
 
 }  // namespace PXR_PEGTL_NAMESPACE
 
