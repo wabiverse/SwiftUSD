@@ -1,44 +1,26 @@
 //
 // Copyright 2020 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
-//
-#ifndef PXR_IMAGING_HGIINTEROP_HGIINTEROPIMPL_H
-#define PXR_IMAGING_HGIINTEROP_HGIINTEROPIMPL_H
+#ifndef PXR_IMAGING_HGIINTEROP_HGIINTEROP_H
+#define PXR_IMAGING_HGIINTEROP_HGIINTEROP_H
 
 #include "Gf/vec4i.h"
 #include "Hgi/texture.h"
 #include "HgiInterop/api.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <memory>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class Hgi;
-class HgiInteropMetal;
-class HgiInteropOpenGL;
-class HgiInteropVulkan;
 class VtValue;
+
+struct HgiInteropImpl;
 
 /// \class HgiInterop
 ///
@@ -98,15 +80,10 @@ class HgiInterop final {
   HgiInterop &operator=(const HgiInterop &) = delete;
   HgiInterop(const HgiInterop &) = delete;
 
-#if PXR_METAL_SUPPORT_ENABLED
-  std::unique_ptr<HgiInteropMetal> _metalToOpenGL;
-#elif PXR_VULKAN_SUPPORT_ENABLED
-  std::unique_ptr<HgiInteropVulkan> _vulkanToOpenGL;
-#else
-  std::unique_ptr<HgiInteropOpenGL> _openGLToOpenGL;
-#endif
+  std::unique_ptr<HgiInteropImpl> _hgiInteropImpl;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif /* PXR_IMAGING_HGIINTEROP_HGIINTEROPIMPL_H */
+#endif
+
