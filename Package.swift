@@ -297,7 +297,7 @@ let package = Package(
       cxxSettings: [
         /* ---------- Turn everything on. ---------- */
         .define("PXR_USE_NAMESPACES", to: "1"),
-        .define("PXR_PYTHON_SUPPORT_ENABLED", to: "1"),
+        .define("PXR_PYTHON_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.nix.platform)),
         .define("PXR_PREFER_SAFETY_OVER_SPEED", to: "1"),
         .define("PXR_OCIO_PLUGIN_ENABLED", to: "1"),
         .define("PXR_OIIO_PLUGIN_ENABLED", to: "1"),
