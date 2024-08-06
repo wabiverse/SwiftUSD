@@ -1,25 +1,8 @@
 //
 // Copyright 2020 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "HgiVulkan/texture.h"
 #include "HgiVulkan/buffer.h"
@@ -92,11 +75,6 @@ HgiVulkanTexture::HgiVulkanTexture(HgiVulkan *hgi,
 
   // XXX STORAGE_IMAGE requires VK_IMAGE_USAGE_STORAGE_BIT, but Hgi
   // doesn't tell us if a texture will be used as image load/store.
-  if ((desc.usage & HgiTextureUsageBitsShaderRead) ||
-      (desc.usage & HgiTextureUsageBitsShaderWrite))
-  {
-    imageCreateInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
-  }
 
   VkFormatFeatureFlags formatValidationFlags = HgiVulkanConversions::GetFormatFeature(desc.usage);
 
@@ -439,6 +417,73 @@ void HgiVulkanTexture::CopyBufferToTexture(HgiVulkanCommandBuffer *cb,
                          VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT);  // Consumer stage
 }
 
+void HgiVulkanTexture::SubmitLayoutChange(HgiTextureUsage newLayout)
+{
+  VkImageLayout newVkLayout = HgiVulkanTexture::GetDefaultImageLayout(newLayout);
+
+  HgiVulkanCommandQueue *queue = _device->GetCommandQueue();
+  HgiVulkanCommandBuffer *cb = queue->AcquireResourceCommandBuffer();
+
+  VkAccessFlags srcAccessMask, dstAccessMask = VK_ACCESS_NONE;
+
+  // The following cases are based on few initial assumptions to provide
+  // an infrastructure for access mask selection based on layouts.
+  // Feel free to update depending on need and use cases.
+  switch (GetImageLayout()) {
+    case VK_IMAGE_LAYOUT_PREINITIALIZED:
+      srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+      srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+      srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+      srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+      srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+      break;
+    default:
+      srcAccessMask = VK_ACCESS_NONE;
+      break;
+  }
+
+  switch (newVkLayout) {
+    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+      dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+      srcAccessMask |= VK_ACCESS_TRANSFER_READ_BIT;
+      dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+      srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+      dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+      dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+      break;
+    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+      srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+      dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+      break;
+    default:
+      dstAccessMask = VK_ACCESS_NONE;
+      break;
+  }
+
+  TransitionImageBarrier(cb,
+                         this,
+                         GetImageLayout(),
+                         newVkLayout,
+                         srcAccessMask,
+                         dstAccessMask,
+                         VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+                         VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT);
+}
+
 void HgiVulkanTexture::TransitionImageBarrier(HgiVulkanCommandBuffer *cb,
                                               HgiVulkanTexture *tex,
                                               VkImageLayout oldLayout,
@@ -486,15 +531,17 @@ VkImageLayout HgiVulkanTexture::GetDefaultImageLayout(HgiTextureUsage usage)
   if (usage & HgiTextureUsageBitsShaderWrite) {
     // Assume the ShaderWrite means its a storage image.
     return VK_IMAGE_LAYOUT_GENERAL;
-  }
-  else if (usage & HgiTextureUsageBitsShaderRead) {
-    return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-  }
-  else if (usage & HgiTextureUsageBitsDepthTarget) {
-    return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    // Prioritize attachment layouts over shader read layout. Some textures
+    // might have both usages.
   }
   else if (usage & HgiTextureUsageBitsColorTarget) {
     return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  }
+  else if (usage & HgiTextureUsageBitsDepthTarget || usage & HgiTextureUsageBitsStencilTarget) {
+    return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+  }
+  else if (usage & HgiTextureUsageBitsShaderRead) {
+    return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
   }
 
   return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

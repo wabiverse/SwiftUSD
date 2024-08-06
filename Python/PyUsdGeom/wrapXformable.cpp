@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Usd/schemaBase.h"
 #include "UsdGeom/xformable.h"
@@ -174,87 +157,143 @@ WRAP_CUSTOM
                 .def("AddXformOp",
                      &This::AddXformOp,
                      (arg("opType"),
-                      arg("precision") = UsdGeomXformOp::Precision::PrecisionDouble,
+                      arg("precision") = UsdGeomXformOp::PrecisionDouble,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddTranslateOp",
                      &This::AddTranslateOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionDouble,
+                     (arg("precision") = UsdGeomXformOp::PrecisionDouble,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddScaleOp",
                      &This::AddScaleOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateXOp",
                      &This::AddRotateXOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateYOp",
                      &This::AddRotateYOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateZOp",
                      &This::AddRotateZOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateXYZOp",
                      &This::AddRotateXYZOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateXZYOp",
                      &This::AddRotateXZYOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateYXZOp",
                      &This::AddRotateYXZOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateYZXOp",
                      &This::AddRotateYZXOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateZXYOp",
                      &This::AddRotateZXYOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddRotateZYXOp",
                      &This::AddRotateZYXOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddOrientOp",
                      &This::AddOrientOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionFloat,
+                     (arg("precision") = UsdGeomXformOp::PrecisionFloat,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
 
                 .def("AddTransformOp",
                      &This::AddTransformOp,
-                     (arg("precision") = UsdGeomXformOp::Precision::PrecisionDouble,
+                     (arg("precision") = UsdGeomXformOp::PrecisionDouble,
                       arg("opSuffix") = TfToken(),
                       arg("isInverseOp") = false))
+
+                .def("GetXformOp",
+                     &This::GetXformOp,
+                     (arg("opType"), arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetTranslateOp",
+                     &This::GetTranslateOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetScaleOp",
+                     &This::GetScaleOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateXOp",
+                     &This::GetRotateXOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateYOp",
+                     &This::GetRotateYOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateZOp",
+                     &This::GetRotateZOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateXYZOp",
+                     &This::GetRotateXYZOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateXZYOp",
+                     &This::GetRotateXZYOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateYXZOp",
+                     &This::GetRotateYXZOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateYZXOp",
+                     &This::GetRotateYZXOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateZXYOp",
+                     &This::GetRotateZXYOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetRotateZYXOp",
+                     &This::GetRotateZYXOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetOrientOp",
+                     &This::GetOrientOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
+
+                .def("GetTransformOp",
+                     &This::GetTransformOp,
+                     (arg("opSuffix") = TfToken(), arg("isInverseOp") = false))
 
                 .def("SetResetXformStack", &This::SetResetXformStack, (arg("resetXform")))
 

@@ -1,7 +1,7 @@
 #ifndef __PXR_USD_USDSHADE_H__
 #define __PXR_USD_USDSHADE_H__
 
-// usdShade
+// UsdShade
 #include <UsdShade/api.h>
 #include <UsdShade/connectableAPI.h>
 #include <UsdShade/connectableAPIBehavior.h>
@@ -19,5 +19,6 @@
 #include <UsdShade/types.h>
 #include <UsdShade/udimUtils.h>
 #include <UsdShade/utils.h>
+#include <UsdShade/validatorTokens.h>
 
-#endif /* __PXR_USD_USDSHADE_H__ */
+#endif  // __PXR_USD_USDSHADE_H__

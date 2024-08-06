@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef USDSHADE_GENERATED_MATERIALBINDINGAPI_H
 #define USDSHADE_GENERATED_MATERIALBINDINGAPI_H
@@ -31,7 +14,7 @@
 #include "Usd/stage.h"
 #include "UsdShade/api.h"
 #include "UsdShade/tokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Usd/collectionAPI.h"
 #include "UsdGeom/subset.h"
@@ -96,19 +79,19 @@ class SdfAssetPath;
 /// binding relationship.
 /// <ul><li>
 /// In the case of a direct binding, the <i>allPurpose</i> binding is
-/// represented by the relationship named <b>"material:binding"</b>.
+/// represented by the relationship named <b>material:binding</b>.
 /// Special-purpose direct bindings are represented by relationships named
-/// <b>"material:binding:<i>purpose</i></b>. A direct binding relationship
+/// <b>material:binding:<i>purpose</i></b>. A direct binding relationship
 /// must have a single target path that points to a <b>UsdShadeMaterial</b>.</li>
 /// <li>
 /// In the case of a collection-based binding, the <i>allPurpose</i> binding is
 /// represented by a relationship named
-/// "material:binding:collection:<i>bindingName</i>", where
+/// <b>material:binding:collection:<i>bindingName</i></b>, where
 /// <b>bindingName</b> establishes an identity for the binding that is unique
 /// on the prim. Attempting to establish two collection bindings of the same
 /// name on the same prim will result in the first binding simply being
 /// overridden. A special-purpose collection-based binding is represented by a
-/// relationship named "material:binding:collection:<i>purpose:bindingName</i>".
+/// relationship named <b>material:binding:collection:<i>purpose:bindingName</i></b>.
 /// A collection-based binding relationship must have exacly two targets, one of
 /// which should be a collection-path (see
 /// ef UsdCollectionAPI::GetCollectionPath()) and the other should point to a
@@ -899,15 +882,15 @@ class UsdShadeMaterialBindingAPI : public UsdAPISchemaBase {
   /// //.. populate faceIndices here.
   /// //..
   ///
-  /// UsdGeomMaterialBindingAPI meshBindingAPI(mesh.GetPrim());
+  /// UsdShadeMaterialBindingAPI meshBindingAPI(mesh.GetPrim());
   /// UsdGeomSubset plasticSubset = meshBindingAPI.CreateMaterialBindSubset(
   ///                 "plasticSubset", plasticFaces);
   /// UsdGeomSubset metalSubset = meshBindingAPI.CreateMaterialBindSubset(
   ///                 "metalSubset", metalFaces);
   ///
   /// // Bind materials to the created geom-subsets.
-  /// UsdShadeMaterialBindingAPI(pasticSubset.GetPrim()).Bind(plastic)
-  /// UsdShadeMaterialBindingAPI(metalSubset.GetPrim()).Bind(metal)
+  /// UsdShadeMaterialBindingAPI::Apply(plasticSubset.GetPrim()).Bind(plastic)
+  /// UsdShadeMaterialBindingAPI::Apply(metalSubset.GetPrim()).Bind(metal)
   ///
   /// \endcode
   /// @{

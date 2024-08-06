@@ -1,44 +1,23 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_DECLARE_HANDLES_H
 #define PXR_USD_SDF_DECLARE_HANDLES_H
 
 /// \file sdf/declareHandles.h
 
-#include <pxr/pxrns.h>
-
 #include "Arch/demangle.h"
 #include "Arch/hints.h"
 #include "Sdf/api.h"
 #include "Tf/declarePtrs.h"
+#include "Tf/delegatedCountPtr.h"
 #include "Tf/diagnostic.h"
 #include "Tf/weakPtrFacade.h"
+#include "pxr/pxrns.h"
 
-#include <Arch/swiftInterop.h>
-
-#include <boost/intrusive_ptr.hpp>
-#include <boost/operators.hpp>
 #include <set>
 #include <type_traits>
 #include <typeinfo>
@@ -48,12 +27,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class SdfLayer;
 class SdfSpec;
+template<class T> class TfRefPtr;
 class Sdf_Identity;
 
-// Sdf_Identities are held via intrusive_ptr so that we can carefully
+// Sdf_Identities are held via TfDelegatedCountPtr so that we can carefully
 // manage the ref-count to avoid race conditions -- see
 // Sdf_IdentityRegistry::Identify().
-using Sdf_IdentityRefPtr = boost::intrusive_ptr<Sdf_Identity>;
+using Sdf_IdentityRefPtr = TfDelegatedCountPtr<Sdf_Identity>;
 
 /// \class SdfHandle
 ///
@@ -61,10 +41,10 @@ using Sdf_IdentityRefPtr = boost::intrusive_ptr<Sdf_Identity>;
 /// object as an extra expiration check so that dormant objects appear to
 /// be expired.
 ///
-template<class T> class SdfHandle : private boost::totally_ordered<SdfHandle<T>> {
+template<class T> class SdfHandle {
  public:
-  using SpecType = T;
-  using This = SdfHandle<SpecType>;
+  typedef SdfHandle<T> This;
+  typedef T SpecType;
 
   typedef typename std::remove_const<SpecType>::type NonConstSpecType;
   typedef SdfHandle<NonConstSpecType> NonConstThis;
@@ -132,11 +112,35 @@ template<class T> class SdfHandle : private boost::totally_ordered<SdfHandle<T>>
     return _spec == other._spec;
   }
 
+  /// \sa SdfHandle::operator==
+  friend bool operator!=(const SdfHandle &lhs, const SdfHandle &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
   /// Arranges handles in an arbitrary strict weak ordering.  Note that
   /// this ordering is stable across path changes.
   template<class U> bool operator<(const SdfHandle<U> &other) const
   {
     return _spec < other._spec;
+  }
+
+  /// \sa SdfHandle::operator<
+  friend bool operator>(const SdfHandle &lhs, const SdfHandle &rhs)
+  {
+    return rhs < lhs;
+  }
+
+  /// \sa SdfHandle::operator<
+  friend bool operator<=(const SdfHandle &lhs, const SdfHandle &rhs)
+  {
+    return !(rhs < lhs);
+  }
+
+  /// \sa SdfHandle::operator<
+  friend bool operator>=(const SdfHandle &lhs, const SdfHandle &rhs)
+  {
+    return !(lhs < rhs);
   }
 
   /// Hash.
@@ -154,7 +158,7 @@ template<class T> class SdfHandle : private boost::totally_ordered<SdfHandle<T>>
   SpecType _spec;
 
   template<class U> friend class SdfHandle;
-} SWIFT_UNSAFE_REFERENCE;
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
@@ -167,18 +171,17 @@ using PXR_NS::get_pointer;
 PXR_NAMESPACE_OPEN_SCOPE
 
 template<class T> struct SdfHandleTo {
-  using Cls = T;
-  using Handle = SdfHandle<Cls>;
-  using ConstHandle = SdfHandle<const Cls>;
-  using Vector = std::vector<Handle>;
-  using ConstVector = std::vector<ConstHandle>;
+  typedef SdfHandle<T> Handle;
+  typedef SdfHandle<const T> ConstHandle;
+  typedef std::vector<Handle> Vector;
+  typedef std::vector<ConstHandle> ConstVector;
 };
 
 template<> struct SdfHandleTo<SdfLayer> {
-  using Handle = TfWeakPtr<SdfLayer>;
-  using ConstHandle = TfWeakPtr<const SdfLayer>;
-  using Vector = std::vector<Handle>;
-  using ConstVector = std::vector<ConstHandle>;
+  typedef TfWeakPtr<SdfLayer> Handle;
+  typedef TfWeakPtr<const SdfLayer> ConstHandle;
+  typedef std::vector<Handle> Vector;
+  typedef std::vector<ConstHandle> ConstVector;
 };
 
 template<typename T> typename SdfHandleTo<T>::Handle SdfCreateHandle(T *p)
@@ -223,8 +226,8 @@ struct Sdf_SpecTypesAreDirectlyRelated
 template<typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType> TfDynamic_cast(const SdfHandle<SRC> &x)
 {
-  using Spec = typename DST::SpecType;
-  using Handle = SdfHandle<Spec>;
+  typedef typename DST::SpecType Spec;
+  typedef SdfHandle<Spec> Handle;
 
   if (Sdf_CanCastToType(x.GetSpec(), typeid(Spec))) {
     return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
@@ -246,8 +249,8 @@ inline SdfHandle<typename DST::SpecType> TfSafeDynamic_cast(const SdfHandle<SRC>
 template<typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType> TfStatic_cast(const SdfHandle<SRC> &x)
 {
-  using Spec = typename DST::SpecType;
-  using Handle = SdfHandle<Spec>;
+  typedef typename DST::SpecType Spec;
+  typedef SdfHandle<Spec> Handle;
   static_assert(Sdf_SpecTypesAreDirectlyRelated<Spec, SRC>::value,
                 "Spec and SRC must be directly related.");
 
@@ -267,8 +270,8 @@ inline SdfHandle<typename T::SpecType> TfConst_cast(const SdfHandle<const typena
 template<typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType> SdfSpecDynamic_cast(const SdfHandle<SRC> &x)
 {
-  using Spec = typename DST::SpecType;
-  using Handle = SdfHandle<Spec>;
+  typedef typename DST::SpecType Spec;
+  typedef SdfHandle<Spec> Handle;
 
   if (Sdf_CanCastToTypeCheckSchema(x.GetSpec(), typeid(Spec))) {
     return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
@@ -283,8 +286,8 @@ inline SdfHandle<typename DST::SpecType> SdfSpecDynamic_cast(const SdfHandle<SRC
 template<typename DST, typename SRC>
 inline SdfHandle<typename DST::SpecType> SdfSpecStatic_cast(const SdfHandle<SRC> &x)
 {
-  using Spec = typename DST::SpecType;
-  using Handle = SdfHandle<Spec>;
+  typedef typename DST::SpecType Spec;
+  typedef SdfHandle<Spec> Handle;
   return Handle(Sdf_CastAccess::CastSpec<Spec, SRC>(x.GetSpec()));
 }
 
@@ -295,15 +298,15 @@ inline DST_SPEC SdfSpecStatic_cast(const SRC_SPEC &x)
   return Sdf_CastAccess::CastSpec<DST_SPEC, SRC_SPEC>(x);
 }
 
-using SdfLayerRefPtr = TfRefPtr<SdfLayer>;
-using SdfLayerRefPtrVector = std::vector<SdfLayerRefPtr>;
-using SdfLayerHandleSet = std::set<SdfHandleTo<SdfLayer>::Handle>;
+typedef TfRefPtr<SdfLayer> SdfLayerRefPtr;
+typedef std::vector<TfRefPtr<SdfLayer>> SdfLayerRefPtrVector;
+typedef std::set<SdfHandleTo<SdfLayer>::Handle> SdfLayerHandleSet;
 
 #define SDF_DECLARE_HANDLES(cls) \
-  using cls##Handle = SdfHandleTo<class cls>::Handle; \
-  using cls##ConstHandle = SdfHandleTo<class cls>::ConstHandle; \
-  using cls##HandleVector = SdfHandleTo<class cls>::Vector; \
-  using cls##ConstHandleVector = SdfHandleTo<class cls>::ConstVector
+  typedef SdfHandleTo<class cls>::Handle cls##Handle; \
+  typedef SdfHandleTo<class cls>::ConstHandle cls##ConstHandle; \
+  typedef SdfHandleTo<class cls>::Vector cls##HandleVector; \
+  typedef SdfHandleTo<class cls>::ConstVector cls##ConstHandleVector
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

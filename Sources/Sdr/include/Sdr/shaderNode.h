@@ -1,25 +1,8 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #ifndef PXR_USD_SDR_SHADER_NODE_H
@@ -31,7 +14,9 @@
 #include "Sdr/api.h"
 #include "Sdr/declare.h"
 #include "Tf/staticTokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
+
+#include <unordered_map>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -215,6 +200,25 @@ class SdrShaderNode : public NdrNode {
   NdrTokenVec GetAllVstructNames() const;
 
   /// @}
+
+  // Stores the result of the compliance check of property names to
+  // sdrShaderNodeIdentifiers
+  using ComplianceResults =
+      std::unordered_map<TfToken, std::vector<NdrIdentifier>, TfToken::HashFunctor>;
+
+  /// This method checks if same named properties of \p shaderNodes are
+  /// compatible with each other.
+  ///
+  /// Checks if the same name properties have matching types and default
+  /// values. In order to determine if same name properties from different
+  /// shader nodes are compliant, we assume that the first shaderNode in the
+  /// list providing this property is authoritative, and other nodes differing
+  /// wrt this property are non-compliant. A map of property names and their
+  /// respective shaderNodes are stored in the map. An empty map returned
+  /// represents no compliance issues.
+  SDR_API
+  static ComplianceResults CheckPropertyCompliance(
+      const std::vector<SdrShaderNodeConstPtr> &shaderNodes);
 
   /// \cond
   /// Hide from the API.

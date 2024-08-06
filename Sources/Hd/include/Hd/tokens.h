@@ -1,39 +1,24 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HD_TOKENS_H
 #define PXR_IMAGING_HD_TOKENS_H
 
 #include "Hd/api.h"
 #include "Hd/version.h"
+#include "Tf/envSetting.h"
 #include "Tf/staticTokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 #define HD_TOKENS \
   (accelerations)                             \
     (adjacency)                                 \
+    (angularVelocities)                         \
     (bboxLocalMin)                              \
     (bboxLocalMax)                              \
     (bbox)                                      \
@@ -77,6 +62,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     (leftHanded)                                \
     (linear)                                    \
     (lightLink)                                 \
+    (filterLink)                                \
     (lightFilterLink)                           \
     (lightFilterType)                           \
     (meshLight)                                 \
@@ -91,6 +77,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     (pinned)                                    \
     (points)                                    \
     (pointsIndices)                             \
+    (portals)                                   \
     (power)                                     \
     (preview)                                   \
     (pointsVisibility)                          \
@@ -127,7 +114,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 #define HD_INSTANCER_TOKENS \
   (culledInstanceIndices)(instancer)( \
-      instancerTransform)(instancerTransformInverse)(instanceIndices)(instanceIndexBase)(instanceTransform)(rotate)(scale)(translate)
+      instancerTransform)(instancerTransformInverse)(instanceIndices)(instanceIndexBase) \
+\
+      /* New instance xform tokens */ \
+      ((instanceTransforms, "hydra:instanceTransforms"))( \
+          (instanceRotations, "hydra:instanceRotations"))( \
+          (instanceScales, "hydra:instanceScales"))( \
+          (instanceTranslations, "hydra:instanceTranslations"))
 
 #define HD_REPR_TOKENS \
   (disabled)(hull)(points)(smoothHull)(refined)(refinedWire)(refinedWireOnSurf)(wire)(wireOnSurf)
@@ -142,16 +135,17 @@ PXR_NAMESPACE_OPEN_SCOPE
   (adjacencyBufSize)(basisCurvesTopology)( \
       bufferSourcesResolved)(bufferArrayRangeMigrated)(bufferArrayRangeContainerResized)(computationsCommited)(drawBatches)(drawCalls)(dirtyLists)(dirtyListsRebuilt)(garbageCollected)(garbageCollectedSsbo)(garbageCollectedUbo)(garbageCollectedVbo)(gpuMemoryUsed)(instBasisCurvesTopology)(instBasisCurvesTopologyRange)(instExtComputationDataRange)(instMeshTopology)(instMeshTopologyRange)(instPrimvarRange)(instVertexAdjacency)(meshTopology)(nonUniformSize)(numCompletedSamples)(quadrangulateCPU)(quadrangulateGPU)(quadrangulateFaceVarying)(quadrangulatedVerts)(rebuildBatches)(singleBufferSize)(ssboSize)(skipInvisibleRprimSync)(subdivisionRefineCPU)(subdivisionRefineGPU)(textureMemory)(triangulateFaceVarying)(uboSize)(vboRelocated)
 
+// XXX Move to hdSt.
 #define HD_SHADER_TOKENS \
-  ( \
-      alphaThreshold)(clipPlanes)(commonShaderSource)(computeShader)(cullStyle)(drawRange)(environmentMap)(displacementShader)(fragmentShader)(geometryShader)(imageToWorldMatrix)(imageToHorizontallyNormalizedFilmback)(indicatorColor)(lightingBlendAmount)(overrideColor)(maskColor)(projectionMatrix)(pointColor)(pointSize)(pointSelectedSize)(materialTag)(tessControlShader)(tessEvalShader)(postTessControlShader)(postTessVertexShader)(tessLevel)(viewport)(vertexShader)(wireframeColor)(worldToViewMatrix)(worldToViewInverseMatrix)(stepSize)(stepSizeLighting)
+  (alphaThreshold)(clipPlanes)(commonShaderSource)(computeShader)(cullStyle)(drawRange)(environmentMap)(displacementShader)(fragmentShader)(geometryShader)(imageToWorldMatrix)(imageToHorizontallyNormalizedFilmback)(indicatorColor)(lightingBlendAmount)(overrideColor)(maskColor)(projectionMatrix)(pointColor)(pointSize)(pointSelectedSize)(materialTag)(numClipPlanes)(tessControlShader)(tessEvalShader)(postTessControlShader)(postTessVertexShader)(tessLevel)(viewport)(vertexShader)(wireframeColor)(worldToViewMatrix)(worldToViewInverseMatrix)(stepSize)(stepSizeLighting)
 
 // Deprecated. Use: HdStMaterialTagTokens
 #define HD_MATERIALTAG_TOKENS (defaultMaterialTag)
 
 /* Terminal keys used in material networks.
  */
-#define HD_MATERIAL_TERMINAL_TOKENS (surface)(displacement)(volume)(light)(lightFilter)
+#define HD_MATERIAL_TERMINAL_TOKENS \
+  (surface)(displacement)(volume)(light)(lightFilter)(imageShader)
 
 #define HD_RENDERTAG_TOKENS (geometry)(guide)(hidden)(proxy)(render)(widget)
 
@@ -161,16 +155,25 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 #define HD_RPRIMTYPE_TOKENS \
   /* Rprims */ \
-  (capsule)(cone)( \
-      cube)(cylinder)(mesh)(nurbsPatch)(basisCurves)(nurbsCurves)(points)(sphere)(volume)(model)
+  (capsule)(capsule_1)( \
+      cone)(cube)(cylinder)(cylinder_1)(geomSubset)(mesh)(tetMesh)(nurbsPatch)(basisCurves)(nurbsCurves)(points)(sphere)(volume)(model)
+
+// XXX Unfortunately, we export a function of the name HdLightPrimTypeTokens.
+//     Omit 'Prim' from the name.
+#define HD_LIGHT_TYPE_TOKENS \
+  (cylinderLight)(diskLight)( \
+      distantLight)(domeLight)(light)(meshLight)(pluginLight)(rectLight)(simpleLight)(sphereLight)
+
+#define HD_LIGHT_FILTER_TYPE_TOKENS (lightFilter)
 
 #define HD_SPRIMTYPE_TOKENS \
   /* Sprims */ \
   (camera)(drawTarget)( \
-      material)(coordSys)(instancer)(instance)(integrator)(sampleFilter)(displayFilter) /* Sprims \
-                                                                                           Lights \
-                                                                                         */ \
-      (simpleLight)(cylinderLight)(diskLight)(distantLight)(domeLight)(light)(lightFilter)(meshLight)(pluginLight)(rectLight)(sphereLight) /* Sprims ExtComputations */ \
+      material)(coordSys)(instancer)(instance)(integrator)(sampleFilter)(displayFilter)(imageShader) \
+\
+      HD_LIGHT_TYPE_TOKENS HD_LIGHT_FILTER_TYPE_TOKENS \
+\
+      /* Sprims ExtComputations */ \
       (extComputation)
 
 #define HD_BPRIMTYPE_TOKENS \
@@ -180,13 +183,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 #define HD_PRIMTYPE_TOKENS \
   HD_RPRIMTYPE_TOKENS \
   HD_SPRIMTYPE_TOKENS \
-  HD_BPRIMTYPE_TOKENS
+  HD_BPRIMTYPE_TOKENS /* Scene-index-only prim types */ \
+      (renderPass)
 
 HD_API
 bool HdPrimTypeIsGprim(TfToken const &primType);
 
 HD_API
 bool HdPrimTypeIsLight(TfToken const &primType);
+
+HD_API
+bool HdPrimTypeSupportsGeomSubsets(const TfToken &primType);
 
 HD_API
 const TfTokenVector &HdLightPrimTypeTokens();
@@ -283,11 +290,25 @@ TfToken HdAovTokensMakeShader(TfToken const &shader);
 
 #define HD_RENDER_SETTINGS_PRIM_TOKENS \
   (active)(namespacedSettings)( \
-      renderProducts)(includedPurposes)(materialBindingPurposes)(renderingColorSpace)
+      renderProducts)(includedPurposes)(materialBindingPurposes)(renderingColorSpace)(shutterInterval)
+
+/* Aspect Ratio Conform Policy Tokens used on render settings prims
+ * Note that these mirror the conform policy tokens in UsdRenderTokens */
+#define HD_ASPECT_RATIO_CONFORM_POLICY \
+  (adjustApertureWidth)(adjustApertureHeight)(expandAperture)(cropAperture)(adjustPixelAspectRatio)
 
 #define HD_RESOURCE_TYPE_TOKENS (texture)(shaderFile)
 
 #define HD_SCENE_INDEX_EMULATION_TOKENS (sceneDelegate)
+
+/* Tokens used to emulate collections for light linking. The collection names
+   match the UsdLuxLightAPI. Hydra 1.0 uses lightFilterLink instead of
+   filterLink.
+*/
+#define HD_COLLECTION_EMULATION_TOKENS \
+  ((lightLinkCollection, "lightLink"))((shadowLinkCollection, "shadowLink"))( \
+      (filterLinkCollection, "filterLink"))( \
+      lightLinkCollectionMembershipExpression)(shadowLinkCollectionMembershipExpression)(filterLinkCollectionMembershipExpression)
 
 TF_DECLARE_PUBLIC_TOKENS(HdTokens, HD_API, HD_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdInstancerTokens, HD_API, HD_INSTANCER_TOKENS);
@@ -301,6 +322,8 @@ TF_DECLARE_PUBLIC_TOKENS(HdMaterialTerminalTokens, HD_API, HD_MATERIAL_TERMINAL_
 TF_DECLARE_PUBLIC_TOKENS(HdRenderTagTokens, HD_API, HD_RENDERTAG_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderContextTokens, HD_API, HD_RENDER_CONTEXT_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdOptionTokens, HD_API, HD_OPTION_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLightTypeTokens, HD_API, HD_LIGHT_TYPE_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdLightFilterTypeTokens, HD_API, HD_LIGHT_FILTER_TYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRprimTypeTokens, HD_API, HD_RPRIMTYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdSprimTypeTokens, HD_API, HD_SPRIMTYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdBprimTypeTokens, HD_API, HD_BPRIMTYPE_TOKENS);
@@ -309,8 +332,10 @@ TF_DECLARE_PUBLIC_TOKENS(HdPrimvarRoleTokens, HD_API, HD_PRIMVAR_ROLE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdAovTokens, HD_API, HD_AOV_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsTokens, HD_API, HD_RENDER_SETTINGS_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdRenderSettingsPrimTokens, HD_API, HD_RENDER_SETTINGS_PRIM_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdAspectRatioConformPolicyTokens, HD_API, HD_ASPECT_RATIO_CONFORM_POLICY);
 TF_DECLARE_PUBLIC_TOKENS(HdResourceTypeTokens, HD_API, HD_RESOURCE_TYPE_TOKENS);
 TF_DECLARE_PUBLIC_TOKENS(HdSceneIndexEmulationTokens, HD_API, HD_SCENE_INDEX_EMULATION_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(HdCollectionEmulationTokens, HD_API, HD_COLLECTION_EMULATION_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

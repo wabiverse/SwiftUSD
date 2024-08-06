@@ -1,32 +1,15 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Pcp/errors.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyPtrHelpers.h"
 #include "Tf/pyResultConversions.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/pyEnum.h"
 #include <boost/python.hpp>
@@ -42,6 +25,11 @@ static TfEnum _GetErrorType(PcpErrorBasePtr const &err)
   return err->errorType;
 }
 
+static PcpSite _GetRootSite(PcpErrorBasePtr const &err)
+{
+  return err->rootSite;
+}
+
 void wrapErrors()
 {
   TfPyWrapEnum<PcpErrorType>("ErrorType");
@@ -55,6 +43,7 @@ void wrapErrors()
 
   class_<PcpErrorBase, boost::noncopyable, PcpErrorBasePtr>("ErrorBase", "", no_init)
       .add_property("errorType", _GetErrorType)
+      .add_property("rootSite", _GetRootSite)
       .def("__str__", &PcpErrorBase::ToString);
 
   class_<PcpErrorTargetPathBase,
@@ -62,10 +51,18 @@ void wrapErrors()
          bases<PcpErrorBase>,
          PcpErrorTargetPathBasePtr>("ErrorTargetPathBase", "", no_init);
 
+  class_<PcpErrorRelocationBase,
+         boost::noncopyable,
+         bases<PcpErrorBase>,
+         PcpErrorRelocationBasePtr>("ErrorRelocationBase", "", no_init);
+
   class_<PcpErrorArcCycle, bases<PcpErrorBase>, PcpErrorArcCyclePtr>("ErrorArcCycle", "", no_init);
 
   class_<PcpErrorArcPermissionDenied, bases<PcpErrorBase>, PcpErrorArcPermissionDeniedPtr>(
       "ErrorArcPermissionDenied", "", no_init);
+
+  class_<PcpErrorArcToProhibitedChild, bases<PcpErrorBase>, PcpErrorArcToProhibitedChildPtr>(
+      "ErrorArcToProhibitedChild", "", no_init);
 
   class_<PcpErrorCapacityExceeded, bases<PcpErrorBase>, PcpErrorCapacityExceededPtr>(
       "ErrorCapacityExceeded", "", no_init);
@@ -121,6 +118,20 @@ void wrapErrors()
 
   class_<PcpErrorInvalidSublayerPath, bases<PcpErrorBase>, PcpErrorInvalidSublayerPathPtr>(
       "ErrorInvalidSublayerPath", "", no_init);
+
+  class_<PcpErrorInvalidAuthoredRelocation,
+         bases<PcpErrorRelocationBase>,
+         PcpErrorInvalidAuthoredRelocationPtr>("ErrorInvalidAuthoredRelocation", "", no_init);
+
+  class_<PcpErrorInvalidConflictingRelocation,
+         bases<PcpErrorRelocationBase>,
+         PcpErrorInvalidConflictingRelocationPtr>(
+      "ErrorInvalidConflictingRelocation", "", no_init);
+
+  class_<PcpErrorInvalidSameTargetRelocations,
+         bases<PcpErrorRelocationBase>,
+         PcpErrorInvalidSameTargetRelocationsPtr>(
+      "ErrorInvalidSameTargetRelocations", "", no_init);
 
   class_<PcpErrorOpinionAtRelocationSource,
          bases<PcpErrorBase>,

@@ -45,9 +45,8 @@
 
 #include <assert.h>
 
-#include <pxr/pxrns.h>
-
 #include "Gf/ilmbase_half.h"
+#include "pxr/pxrns.h"
 
 #include <istream>
 #include <ostream>
@@ -79,7 +78,7 @@ GF_API const half::uif half::_toFloat[1 << 16] =
 
   for (int i = 0; i < 10; i++)
     f *= f;  // this will overflow before
-             // the for�loop terminates
+             // the for-loop terminates
   return f;
 }
 

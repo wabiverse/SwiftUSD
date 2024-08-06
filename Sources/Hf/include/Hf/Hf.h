@@ -11,3 +11,8 @@
 #include <Hf/pluginRegistry.h>
 
 #endif  // __PXR_USD_HF_H__
+#ifndef __PXR_IMAGING_HF_H__
+#define __PXR_IMAGING_HF_H__
+
+// Hf
+#endif  // __PXR_IMAGING_HF_H__

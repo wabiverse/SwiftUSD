@@ -28,4 +28,5 @@
 #include <UsdLux/tokens.h>
 #include <UsdLux/volumeLightAPI.h>
 
-#endif /* __PXR_USD_USDLUX_H__ */
+#include <UsdLux/domeLight_1.h>
+#endif  // __PXR_USD_USDLUX_H__

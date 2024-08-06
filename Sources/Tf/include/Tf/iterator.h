@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_ITERATOR_H
 #define PXR_BASE_TF_ITERATOR_H
@@ -28,11 +11,9 @@
 /// \ingroup group_tf_Containers
 /// A simple iterator adapter for \c STL containers.
 
-#include <pxr/pxrns.h>
-
 #include "Arch/hints.h"
-
 #include "Tf/diagnosticLite.h"
+#include "pxr/pxrns.h"
 
 #include <iterator>
 #include <type_traits>
@@ -438,11 +419,7 @@ template<typename UnderlyingIterator>
 class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<UnderlyingIterator> {
   // private API for interacting with an STL reverse_iterator of the
   // UnderlyingIterator
- public:
-  using This = Tf_ProxyReferenceReverseIterator;
   using ReverseIterator = std::reverse_iterator<UnderlyingIterator>;
-
- private:
   const ReverseIterator &_reverse_iterator() const
   {
     return *this;
@@ -462,18 +439,14 @@ class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<Underlyin
   using pointer = typename ReverseIterator::pointer;
   using difference_type = typename ReverseIterator::difference_type;
 
-  /// @WABI: FIX ME
-  // static_assert(!std::is_reference<reference>::value,
-  //               "Tf_ProxyReferenceReverseIterator should only be used "
-  //               "when the underlying iterator's reference type is a "
-  //               "proxy (MyTypeRef) and not a true reference (MyType&)."
-  //               "Use std::reverse_iterator instead.");
-
-  /// @WABI: FIX ME
-  // static_assert(std::is_same<iterator_category,
-  //                            std::random_access_iterator_tag>::value,
-  //               "Tf_ProxyReferenceReverseIterator must wrap a random "
-  //               "access iterator.");
+  static_assert(!std::is_reference<reference>::value,
+                "Tf_ProxyReferenceReverseIterator should only be used "
+                "when the underlying iterator's reference type is a "
+                "proxy (MyTypeRef) and not a true reference (MyType&)."
+                "Use std::reverse_iterator instead.");
+  static_assert(std::is_same<iterator_category, std::random_access_iterator_tag>::value,
+                "Tf_ProxyReferenceReverseIterator must wrap a random "
+                "access iterator.");
 
   Tf_ProxyReferenceReverseIterator() = default;
   explicit Tf_ProxyReferenceReverseIterator(UnderlyingIterator it) : ReverseIterator(it) {}
@@ -493,40 +466,40 @@ class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<Underlyin
 
   // Many  methods can use the underlying STL implementation but need to
   // avoid returning a `std::reverse_iterator`
-  This &operator++()
+  Tf_ProxyReferenceReverseIterator &operator++()
   {
     ++_reverse_iterator();
     return *this;
   }
 
-  This operator++(int)
+  Tf_ProxyReferenceReverseIterator operator++(int)
   {
-    This result{_reverse_iterator()};
+    Tf_ProxyReferenceReverseIterator result{_reverse_iterator()};
     ++_reverse_iterator();
     return result;
   }
 
-  This &operator--()
+  Tf_ProxyReferenceReverseIterator &operator--()
   {
     --_reverse_iterator();
     return *this;
   }
 
-  This operator--(int)
+  Tf_ProxyReferenceReverseIterator operator--(int)
   {
-    This result{_reverse_iterator()};
+    Tf_ProxyReferenceReverseIterator result{_reverse_iterator()};
     --_reverse_iterator();
     return result;
   }
 
-  This operator+(difference_type increment) const
+  Tf_ProxyReferenceReverseIterator operator+(difference_type increment) const
   {
-    return This(_reverse_iterator() + increment);
+    return Tf_ProxyReferenceReverseIterator(_reverse_iterator() + increment);
   }
 
-  This operator-(difference_type decrement) const
+  Tf_ProxyReferenceReverseIterator operator-(difference_type decrement) const
   {
-    return This(_reverse_iterator() - decrement);
+    return Tf_ProxyReferenceReverseIterator(_reverse_iterator() - decrement);
   }
 
   template<typename OtherIt>
@@ -535,61 +508,62 @@ class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<Underlyin
     return _reverse_iterator() - other._reverse_iterator();
   }
 
-  This &operator+=(difference_type increment)
+  Tf_ProxyReferenceReverseIterator &operator+=(difference_type increment)
   {
     _reverse_iterator() += increment;
     return *this;
   }
 
-  This &operator-=(difference_type decrement)
+  Tf_ProxyReferenceReverseIterator &operator-=(difference_type decrement)
   {
     _reverse_iterator() -= decrement;
     return *this;
   }
 
-  inline friend This operator+(const difference_type increment, const This &iterator)
+  inline friend Tf_ProxyReferenceReverseIterator operator+(
+      const difference_type increment, const Tf_ProxyReferenceReverseIterator &iterator)
   {
     return Tf_ProxyReferenceReverseIterator(increment + iterator._reverse_iterator());
   }
 
   // Comparison operators defer to the STL implementation
   template<typename OtherIt>
-  inline friend bool operator==(const This &lhs,
+  inline friend bool operator==(const Tf_ProxyReferenceReverseIterator &lhs,
                                 const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() == rhs._reverse_iterator();
   }
 
   template<typename OtherIt>
-  inline friend bool operator!=(const This &lhs,
+  inline friend bool operator!=(const Tf_ProxyReferenceReverseIterator &lhs,
                                 const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() != rhs._reverse_iterator();
   }
 
   template<typename OtherIt>
-  inline friend bool operator<(const This &lhs,
+  inline friend bool operator<(const Tf_ProxyReferenceReverseIterator &lhs,
                                const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() < rhs._reverse_iterator();
   }
 
   template<typename OtherIt>
-  inline friend bool operator>(const This &lhs,
+  inline friend bool operator>(const Tf_ProxyReferenceReverseIterator &lhs,
                                const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() > rhs._reverse_iterator();
   }
 
   template<typename OtherIt>
-  inline friend bool operator<=(const This &lhs,
+  inline friend bool operator<=(const Tf_ProxyReferenceReverseIterator &lhs,
                                 const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() <= rhs._reverse_iterator();
   }
 
   template<typename OtherIt>
-  inline friend bool operator>=(const This &lhs,
+  inline friend bool operator>=(const Tf_ProxyReferenceReverseIterator &lhs,
                                 const Tf_ProxyReferenceReverseIterator<OtherIt> &rhs)
   {
     return lhs._reverse_iterator() >= rhs._reverse_iterator();

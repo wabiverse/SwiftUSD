@@ -1,33 +1,14 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
-//
-
-#include <pxr/pxrns.h>
-
 #include <boost/python/def.hpp>
 
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyUtils.h"
+#include "pxr/pxrns.h"
 
 #include "Gf/math.h"
 
@@ -72,88 +53,78 @@ void wrapMath()
       (float (*)(float))GfSqrt,
       "Sqrtf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Sqrt() to return the square root of f as a float instead "
-      "of a double.");
+      "Use instead of Sqrt() to return the square root of f as a float instead of a double.");
 
   def("Exp", (double (*)(double))GfExp);
   def("Expf",
       (float (*)(float))GfExp,
       "Expf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Exp() to return the exponent of f as a float instead of "
-      "a double.");
+      "Use instead of Exp() to return the exponent of f as a float instead of a double.");
 
   def("Log", (double (*)(double))GfLog);
   def("Logf",
       (float (*)(float))GfLog,
       "Logf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Log() to return the logarithm of f as a float instead of "
-      "a double.");
+      "Use instead of Log() to return the logarithm of f as a float instead of a double.");
 
   def("Floor", (double (*)(double))GfFloor);
   def("Floorf",
       (float (*)(float))GfFloor,
       "Floorf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Floor() to return the floor of f as a float instead of a "
-      "double.");
+      "Use instead of Floor() to return the floor of f as a float instead of a double.");
 
   def("Ceil", (double (*)(double))GfCeil);
   def("Ceilf",
       (float (*)(float))GfCeil,
       "Ceilf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Ceil() to return the ceiling of f as a float instead of "
-      "a double.");
+      "Use instead of Ceil() to return the ceiling of f as a float instead of a double.");
 
   def("Abs", (double (*)(double))GfAbs);
   def("Absf",
       (float (*)(float))GfAbs,
       "Absf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Abs() to return the absolute value of f as a float "
-      "instead of a double.");
+      "Use instead of Abs() to return the absolute value of f as a float instead of a double.");
 
   def("Round", (double (*)(double))GfRound);
   def("Roundf",
       (float (*)(float))GfRound,
       "Roundf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Round() to return the rounded value of f as a float "
-      "instead of a double.");
+      "Use instead of Round() to return the rounded value of f as a float instead of a double.");
 
   def("Pow", (double (*)(double, double))GfPow);
   def("Powf",
       (float (*)(float, float))GfPow,
       "Powf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Pow() to return the power of f as a float instead of a "
-      "double.");
+      "Use instead of Pow() to return the power of f as a float instead of a double.");
 
   def("Clamp", (double (*)(double, double, double))GfClamp);
   def("Clampf",
       (float (*)(float, float, float))GfClamp,
       "Clampf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Clamp() to return the clamped value of f as a float "
-      "instead of a double.");
+      "Use instead of Clamp() to return the clamped value of f as a float instead of a double.");
 
   def("Mod", (double (*)(double, double))GfMod);
   def("Modf",
       (float (*)(float, float))GfMod,
       "Modf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Mod() to return the modulus of f as a float instead of a "
-      "double.");
+      "Use instead of Mod() to return the modulus of f as a float instead of a double.");
 
   def("Lerp", GfLerp<double>);
   def("Lerpf",
       GfLerp<float>,
       "Lerpf(f) -> float\n\n"
       "f : float\n\n"
-      "Use instead of Lerp() to return the linear interpolation of f as a "
-      "float instead of a double.");
+      "Use instead of Lerp() to return the linear interpolation of f as a float instead of a "
+      "double.");
 
   def("Lerp", GfLerp<GfVec2i>);
   def("Lerp", GfLerp<GfVec3i>);

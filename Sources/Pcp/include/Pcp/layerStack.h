@@ -1,41 +1,21 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_LAYER_STACK_H
 #define PXR_USD_PCP_LAYER_STACK_H
 
 /// \file pcp/layerStack.h
 
-#include <pxr/pxrns.h>
-
-#include "Tf/declarePtrs.h"
-
-#include "Sdf/layerTree.h"
-
 #include "Pcp/api.h"
 #include "Pcp/errors.h"
 #include "Pcp/layerStackIdentifier.h"
 #include "Pcp/mapExpression.h"
+#include "Sdf/layerTree.h"
+#include "Tf/declarePtrs.h"
+#include "pxr/pxrns.h"
 
 #include <OneTBB/tbb/spin_mutex.h>
 #include <iosfwd>
@@ -80,6 +60,12 @@ class PcpLayerStack : public TfRefBase, public TfWeakBase {
   PCP_API
   const PcpLayerStackIdentifier &GetIdentifier() const;
 
+  /// Return true if this layer stack is in USD mode.
+  bool IsUsd() const
+  {
+    return _isUsd;
+  };
+
   /// Returns the layers in this layer stack in strong-to-weak order.
   /// Note that this is only the *local* layer stack -- it does not
   /// include any layers brought in by references inside prims.
@@ -91,10 +77,15 @@ class PcpLayerStack : public TfRefBase, public TfWeakBase {
   PCP_API
   SdfLayerHandleVector GetSessionLayers() const;
 
-  /// Returns the layer tree representing the structure of this layer
-  /// stack.
+  /// Returns the layer tree representing the structure of the non-session
+  /// layers in the layer stack.
   PCP_API
   const SdfLayerTreeHandle &GetLayerTree() const;
+
+  /// Returns the layer tree representing the structure of the session
+  /// layers in the layer stack or null if there are no session layers.
+  PCP_API
+  const SdfLayerTreeHandle &GetSessionLayerTree() const;
 
   /// Returns the layer offset for the given layer, or NULL if the layer
   /// can't be found or is the identity.
@@ -217,9 +208,15 @@ class PcpLayerStack : public TfRefBase, public TfWeakBase {
   /// Return a PcpMapExpression representing the relocations that affect
   /// namespace at and below the given path.  The value of this
   /// expression will continue to track the effective relocations if
-  /// they are changed later.
+  /// they are changed later. In USD mode only, this will return a null
+  /// expression if there are no relocations on this layer stack.
   PCP_API
   PcpMapExpression GetExpressionForRelocatesAtPath(const SdfPath &path);
+
+  /// Return true if there are any relocated prim paths in this layer
+  /// stack.
+  PCP_API
+  bool HasRelocates() const;
 
  private:
   // Only a registry can create a layer stack.
@@ -284,6 +281,10 @@ class PcpLayerStack : public TfRefBase, public TfWeakBase {
   /// Stored separately because this is needed only occasionally.
   SdfLayerTreeHandle _layerTree;
 
+  /// The tree structure of the session layer stack.
+  /// Stored separately because this is needed only occasionally.
+  SdfLayerTreeHandle _sessionLayerTree;
+
   /// Tracks information used to compute sublayer asset paths.
   struct _SublayerSourceInfo {
     _SublayerSourceInfo() = default;
@@ -343,15 +344,30 @@ std::ostream &operator<<(std::ostream &, const PcpLayerStackPtr &);
 PCP_API
 std::ostream &operator<<(std::ostream &, const PcpLayerStackRefPtr &);
 
+/// Checks if the source and target paths constitute a valid relocates. This
+/// validation is not context specific, i.e. if this returns false, the
+/// combination of source and target paths is always invalid for any attempted
+/// relocation.
+bool Pcp_IsValidRelocatesEntry(const SdfPath &source,
+                               const SdfPath &target,
+                               std::string *errorMessage);
+
+/// Builds a relocates map from a list of layer and SdfRelocates value pairs.
+void Pcp_BuildRelocateMap(
+    const std::vector<std::pair<SdfLayerHandle, SdfRelocates>> &layerRelocates,
+    SdfRelocatesMap *relocatesMap,
+    PcpErrorVector *errors);
+
 /// Compose the relocation arcs in the given stack of layers,
 /// putting the results into the given sourceToTarget and targetToSource
 /// maps.
-void Pcp_ComputeRelocationsForLayerStack(const SdfLayerRefPtrVector &layers,
+void Pcp_ComputeRelocationsForLayerStack(const PcpLayerStack &layerStack,
                                          SdfRelocatesMap *relocatesSourceToTarget,
                                          SdfRelocatesMap *relocatesTargetToSource,
                                          SdfRelocatesMap *incrementalRelocatesSourceToTarget,
                                          SdfRelocatesMap *incrementalRelocatesTargetToSource,
-                                         SdfPathVector *relocatesPrimPaths);
+                                         SdfPathVector *relocatesPrimPaths,
+                                         PcpErrorVector *errors);
 
 // Returns true if \p layerStack should be recomputed due to changes to
 // any computed asset paths that were used to find or open layers

@@ -1,42 +1,24 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_PARSER_HELPERS_H
 #define PXR_USD_SDF_PARSER_HELPERS_H
 
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
+#include "Gf/numericCast.h"
 #include "Sdf/assetPath.h"
 #include "Sdf/valueTypeName.h"
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
-
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/variant.hpp>
+#include "pxr/pxrns.h"
 
 #include <functional>
 #include <limits>
 #include <string>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -46,7 +28,7 @@ bool Sdf_BoolFromString(const std::string &, bool *parseOk);
 namespace Sdf_ParserHelpers {
 
 // Internal variant type.
-typedef boost::variant<uint64_t, int64_t, double, std::string, TfToken, SdfAssetPath> _Variant;
+using _Variant = std::variant<uint64_t, int64_t, double, std::string, TfToken, SdfAssetPath>;
 
 ////////////////////////////////////////////////////////////////////////
 // Utilities that implement the Sdf_ParserHelpers::Value::Get<T>() method.  The
@@ -59,28 +41,26 @@ template<class T, class Enable = void> struct _GetImpl {
   typedef const T &ResultType;
   static const T &Visit(_Variant const &variant)
   {
-    return boost::get<T>(variant);
+    return std::get<T>(variant);
   }
 };
 
 ////////////////////////////////////////////////////////////////////////
 // _GetImpl<T> for integral type T.  Convert finite doubles by static_cast,
-// throw bad_get for non-finite doubles.  Throw bad_get for out-of-range
-// integral values.
-template<class T>
-struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>>
-    : public boost::static_visitor<T> {
+// throw bad_variant_access for non-finite doubles.  Throw bad_variant_access
+// for out-of-range integral values.
+template<class T> struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>> {
   typedef T ResultType;
 
   T Visit(_Variant const &variant)
   {
-    return boost::apply_visitor(*this, variant);
+    return std::visit(*this, variant);
   }
 
-  // Fallback case: throw bad_get.
+  // Fallback case: throw bad_variant_access.
   template<class Held> T operator()(Held held)
   {
-    throw boost::bad_get();
+    throw std::bad_variant_access();
   }
 
   // Attempt to cast unsigned and signed int64_t.
@@ -98,17 +78,17 @@ struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>>
   {
     if (std::isfinite(in))
       return _Cast(in);
-    throw boost::bad_get();
+    throw std::bad_variant_access();
   }
 
  private:
   template<class In> T _Cast(In in)
   {
     try {
-      return boost::numeric_cast<T>(in);
+      return GfNumericCast<T>(in).value();
     }
-    catch (const boost::bad_numeric_cast &) {
-      throw boost::bad_get();
+    catch (const std::bad_optional_access &) {
+      throw std::bad_variant_access();
     }
   }
 };
@@ -118,20 +98,18 @@ struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>>
 // _GetImpl<T> for floating point type T.  Attempts to cast numeric values.
 // Also handles strings like "inf", "-inf", and "nan" to produce +/- infinity
 // and a quiet NaN.
-template<class T>
-struct _GetImpl<T, std::enable_if_t<std::is_floating_point<T>::value>>
-    : public boost::static_visitor<T> {
+template<class T> struct _GetImpl<T, std::enable_if_t<std::is_floating_point<T>::value>> {
   typedef T ResultType;
 
   T Visit(_Variant const &variant)
   {
-    return boost::apply_visitor(*this, variant);
+    return std::visit(*this, variant);
   }
 
-  // Fallback case: throw bad_get.
+  // Fallback case: throw bad_variant_access.
   template<class Held> T operator()(Held held)
   {
-    throw boost::bad_get();
+    throw std::bad_variant_access();
   }
 
   // For numeric types, attempt to cast.
@@ -168,43 +146,44 @@ struct _GetImpl<T, std::enable_if_t<std::is_floating_point<T>::value>>
       return -std::numeric_limits<T>::infinity();
     if (str == "nan")
       return std::numeric_limits<T>::quiet_NaN();
-    throw boost::bad_get();
+    throw std::bad_variant_access();
   }
 
   template<class In> T _Cast(In in)
   {
     try {
-      return boost::numeric_cast<T>(in);
+      return GfNumericCast<T>(in).value();
     }
-    catch (const boost::bad_numeric_cast &) {
-      throw boost::bad_get();
+    catch (const std::bad_optional_access &) {
+      throw std::bad_variant_access();
     }
   }
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-// Get an asset path: converts string to asset path, otherwise throw bad_get.
+// Get an asset path: converts string to asset path, otherwise throw
+// bad_variant_access.
 template<> struct _GetImpl<SdfAssetPath> {
   typedef SdfAssetPath ResultType;
 
   SdfAssetPath Visit(_Variant const &variant)
   {
-    if (std::string const *str = boost::get<std::string>(&variant))
+    if (std::string const *str = std::get_if<std::string>(&variant))
       return SdfAssetPath(*str);
-    return boost::get<SdfAssetPath>(variant);
+    return std::get<SdfAssetPath>(variant);
   }
 };
 
 // Get a bool.  Numbers are considered true if nonzero, false otherwise.
 // Strings and tokens get parsed via Sdf_BoolFromString.  Otherwise throw
-// bad_get.
-template<> struct _GetImpl<bool> : public boost::static_visitor<bool> {
+// bad_variant_access.
+template<> struct _GetImpl<bool> {
   typedef bool ResultType;
 
   bool Visit(_Variant const &variant)
   {
-    return boost::apply_visitor(*this, variant);
+    return std::visit(*this, variant);
   }
 
   // Parse string via Sdf_BoolFromString.
@@ -213,7 +192,7 @@ template<> struct _GetImpl<bool> : public boost::static_visitor<bool> {
     bool parseOK = false;
     bool result = Sdf_BoolFromString(str, &parseOK);
     if (!parseOK)
-      throw boost::bad_get();
+      throw std::bad_variant_access();
     return result;
   }
 
@@ -230,10 +209,10 @@ template<> struct _GetImpl<bool> : public boost::static_visitor<bool> {
     return val != static_cast<Number>(0);
   }
 
-  // For anything else, throw bad_get().
+  // For anything else, throw bad_variant_access().
   template<class T> std::enable_if_t<!std::is_arithmetic<T>::value, bool> operator()(T)
   {
-    throw boost::bad_get();
+    throw std::bad_variant_access();
   }
 };
 
@@ -251,8 +230,9 @@ template<> struct _GetImpl<bool> : public boost::static_visitor<bool> {
 // to call Get<float>() on a Value that's holding an integral type, a double, or
 // a string if that string's value is one of 'inf', '-inf', or 'nan'.  Similarly
 // Get<bool>() works on numbers and strings like 'yes', 'no', 'on', 'off',
-// 'true', 'false'.  If a Get<T>() call fails, it throws boost::bad_get, which
-// the parser responds to and raises a parse error.
+// 'true', 'false'.  If a Get<T>() call fails, it throws
+// std::bad_variant_access, which the parser responds to and raises a parse
+// error.
 //
 // The lexer constructs Value objects from input tokens.  It creates them to
 // retain all the input information possible.  For example, negative integers
@@ -296,32 +276,37 @@ struct Value {
 
   // Attempt to get a value of type T from this Value, applying appropriate
   // conversions.  If this value cannot be converted to T, throw
-  // boost::bad_get.
+  // std::bad_variant_access.
   template<class T> typename _GetImpl<T>::ResultType Get() const
   {
-    return _GetImpl<T>().Visit(_variant);
+    try {
+      return _GetImpl<T>().Visit(_variant);
+    }
+    catch (std::bad_variant_access &e) {
+      throw std::bad_variant_access();
+    }
   }
 
   // Hopefully short-lived API that applies an external visitor to the held
   // variant type.
-  template<class Visitor> typename Visitor::result_type ApplyVisitor(const Visitor &visitor)
+  template<class Visitor> auto ApplyVisitor(const Visitor &visitor)
   {
-    return boost::apply_visitor(visitor, _variant);
+    return std::visit(visitor, _variant);
   }
 
-  template<class Visitor> typename Visitor::result_type ApplyVisitor(Visitor &visitor)
+  template<class Visitor> auto ApplyVisitor(Visitor &visitor)
   {
-    return boost::apply_visitor(visitor, _variant);
+    return std::visit(visitor, _variant);
   }
 
-  template<class Visitor> typename Visitor::result_type ApplyVisitor(const Visitor &visitor) const
+  template<class Visitor> auto ApplyVisitor(const Visitor &visitor) const
   {
-    return _variant.apply_visitor(visitor);
+    return std::visit(visitor, _variant);
   }
 
-  template<class Visitor> typename Visitor::result_type ApplyVisitor(Visitor &visitor) const
+  template<class Visitor> auto ApplyVisitor(Visitor &visitor) const
   {
-    return _variant.apply_visitor(visitor);
+    return std::visit(visitor, _variant);
   }
 
  private:

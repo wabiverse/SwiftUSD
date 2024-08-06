@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_PRIM_H
 #define PXR_USD_USD_PRIM_H
@@ -31,7 +14,7 @@
 #include "Usd/object.h"
 #include "Usd/primFlags.h"
 #include "Usd/schemaRegistry.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Sdf/schema.h"
 #include "Trace/traceImpl.h"
@@ -43,9 +26,7 @@
 
 #include "Sdf/path.h"
 
-#include <boost/iterator/iterator_adaptor.hpp>
-#include <boost/range/iterator_range.hpp>
-
+#include <iterator>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -73,10 +54,10 @@ class UsdVariantSet;
 class SdfPayload;
 
 class UsdPrimSiblingIterator;
-typedef boost::iterator_range<UsdPrimSiblingIterator> UsdPrimSiblingRange;
+class UsdPrimSiblingRange;
 
 class UsdPrimSubtreeIterator;
-typedef boost::iterator_range<UsdPrimSubtreeIterator> UsdPrimSubtreeRange;
+class UsdPrimSubtreeRange;
 
 /// \class UsdPrim
 ///
@@ -87,9 +68,9 @@ typedef boost::iterator_range<UsdPrimSubtreeIterator> UsdPrimSubtreeRange;
 /// A UsdPrim is the principal container of other types of scene description.
 /// It provides API for accessing and creating all of the contained kinds
 /// of scene description, which include:
-/// \li UsdVariantSets - all VariantSets on the prim (GetVariantSets(),
-/// GetVariantSet()) \li UsdReferences - all references on the prim
-/// (GetReferences()) \li UsdInherits - all inherits on the prim (GetInherits())
+/// \li UsdVariantSets - all VariantSets on the prim (GetVariantSets(), GetVariantSet())
+/// \li UsdReferences - all references on the prim (GetReferences())
+/// \li UsdInherits - all inherits on the prim (GetInherits())
 /// \li UsdSpecializes - all specializes on the prim (GetSpecializes())
 ///
 /// As well as access to the API objects for properties contained within the
@@ -298,9 +279,32 @@ class UsdPrim : public UsdObject {
   /// Return true if this prim is a model group based on its kind metadata,
   /// false otherwise.  If this prim is a group, it is also necessarily a
   /// model.
+  ///
+  /// Note that pseudoroot is always a group (in order to respect model
+  /// hierarchy rules), even though it cannot have a kind.
   bool IsGroup() const
   {
     return _Prim()->IsGroup();
+  }
+
+  /// Return true if this prim is a component model based on its kind
+  /// metadata, false otherwise. If this prim is a component, it is also
+  /// necessarily a model.
+  bool IsComponent() const
+  {
+    return _Prim()->IsComponent();
+  }
+
+  /// Return true if this prim is a subcomponent based on its kind metadata,
+  /// false otherwise.
+  ///
+  /// Note that subcomponent query is not cached because we only cache
+  /// model-hierarchy-related information, and therefore will be considerably
+  /// slower than other kind-based queries.
+  USD_API
+  bool IsSubComponent() const
+  {
+    return _Prim()->IsSubComponent();
   }
 
   /// Return true if this prim or any of its ancestors is a class.
@@ -517,6 +521,32 @@ class UsdPrim : public UsdObject {
   USD_API
   bool HasProperty(const TfToken &propName) const;
 
+  /// Retrieve the authored \p kind for this prim.
+  ///
+  /// To test whether the returned \p kind matches a particular known
+  /// "clientKind":
+  /// \code
+  /// TfToken kind;
+  ///
+  /// bool isClientKind = prim.GetKind(&kind) and
+  ///                     KindRegistry::IsA(kind, clientKind);
+  /// \endcode
+  ///
+  /// \return true if there was an authored kind that was successfully read,
+  /// otherwise false. Note that this will return false for pseudoroot even
+  /// though pseudoroot is always a group, without any kind (in order to
+  /// respect model hierarchy rules)
+  ///
+  /// \sa \ref mainpage_kind "The Kind module" for further details on
+  /// how to use Kind for classification, and how to extend the taxonomy.
+  USD_API
+  bool GetKind(TfToken *kind) const;
+
+  /// Author a \p kind for this prim, at the current UsdEditTarget.
+  /// \return true if \p kind was successully authored, otherwise false.
+  USD_API
+  bool SetKind(const TfToken &kind) const;
+
  private:
   // Helper functions for the public schema query and API schema
   // authoring functions. The public functions have overloads that take
@@ -607,10 +637,9 @@ class UsdPrim : public UsdObject {
                   UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
-  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "IsInFamily" that finds a
-  /// registered schema for the C++ schema class \p SchemaType and uses that
-  /// schema's family and version.
+  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "IsInFamily" that finds a registered schema for the C++ schema class \p SchemaType and uses
+  /// that schema's family and version.
   template<typename SchemaType>
   bool IsInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const
   {
@@ -630,17 +659,16 @@ class UsdPrim : public UsdObject {
   };
 
   /// Overload for convenience of
-  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "IsInFamily" that finds a
-  /// registered schema for the given \p schemaType and uses that schema's
-  /// family and version.
+  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "IsInFamily" that finds a registered schema for the given \p schemaType and uses that
+  /// schema's family and version.
   USD_API
   bool IsInFamily(const TfType &schemaType, UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
-  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "IsInFamily" that parses the
-  /// schema family and version to use from the given \p schemaIdentifier.
+  /// \ref IsInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "IsInFamily" that parses the schema family and version to use from the given \p
+  /// schemaIdentifier.
   ///
   /// Note that the schema identifier is not required to be a registered
   /// schema as it only parsed to get what its family and version would be
@@ -822,10 +850,9 @@ class UsdPrim : public UsdObject {
                       const TfToken &instanceName) const;
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "HasAPIInFamily" that finds a
-  /// registered schema for the C++ schema class \p SchemaType and uses that
-  /// schema's family and version.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "HasAPIInFamily" that finds a registered schema for the C++ schema class \p SchemaType and
+  /// uses that schema's family and version.
   template<typename SchemaType>
   bool HasAPIInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy) const
   {
@@ -845,10 +872,9 @@ class UsdPrim : public UsdObject {
   };
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy, const TfToken &) const "HasAPIInFamily"
-  /// that finds a registered schema for the C++ schema class \p SchemaType
-  /// and uses that schema's family and version.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy, const
+  /// TfToken &) const "HasAPIInFamily" that finds a registered schema for the C++ schema class \p
+  /// SchemaType and uses that schema's family and version.
   template<typename SchemaType>
   bool HasAPIInFamily(UsdSchemaRegistry::VersionPolicy versionPolicy,
                       const TfToken &instanceName) const
@@ -869,28 +895,26 @@ class UsdPrim : public UsdObject {
   };
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "HasAPIInFamily" that finds a
-  /// registered schema for the given \p schemaType and uses that schema's
-  /// family and version.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "HasAPIInFamily" that finds a registered schema for the given \p schemaType and uses that
+  /// schema's family and version.
   USD_API
   bool HasAPIInFamily(const TfType &schemaType,
                       UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy, const TfToken &) const "HasAPIInFamily"
-  /// that finds a registered schema for the given \p schemaType and uses that
-  /// schema's family and version.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy, const
+  /// TfToken &) const "HasAPIInFamily" that finds a registered schema for the given \p schemaType
+  /// and uses that schema's family and version.
   USD_API
   bool HasAPIInFamily(const TfType &schemaType,
                       UsdSchemaRegistry::VersionPolicy versionPolicy,
                       const TfToken &instanceName) const;
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy) const "HasAPIInFamily" that parses the
-  /// schema family and version to use from the given \p schemaIdentifier.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy) const
+  /// "HasAPIInFamily" that parses the schema family and version to use from the given \p
+  /// schemaIdentifier.
   ///
   /// Note that the schema identifier is not required to be a registered
   /// schema as it only parsed to get what its family and version would be
@@ -900,10 +924,9 @@ class UsdPrim : public UsdObject {
                       UsdSchemaRegistry::VersionPolicy versionPolicy) const;
 
   /// Overload for convenience of
-  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion,
-  /// UsdSchemaRegistry::VersionPolicy, const TfToken &) const "HasAPIInFamily"
-  /// that parses the schema family and version to use from the given
-  /// \p schemaIdentifier.
+  /// \ref HasAPIInFamily(const TfToken&, UsdSchemaVersion, UsdSchemaRegistry::VersionPolicy, const
+  /// TfToken &) const "HasAPIInFamily" that parses the schema family and version to use from the
+  /// given \p schemaIdentifier.
   ///
   /// Note that the schema identifier is not required to be a registered
   /// schema as it only parsed to get what its family and version would be
@@ -1706,11 +1729,21 @@ class UsdPrim : public UsdObject {
   USD_API
   bool HasAttribute(const TfToken &attrName) const;
 
-  /// Search the prim subtree rooted at this prim for attributes for which
-  /// \p predicate returns true, collect their connection source paths and
-  /// return them in an arbitrary order.  If \p recurseOnSources is true,
-  /// act as if this function was invoked on the connected prims and owning
-  /// prims of connected properties also and return the union.
+  /// Search the prim subtree rooted at this prim according to \p
+  /// traversalPredicate for attributes for which \p predicate returns true,
+  /// collect their connection source paths and return them in an arbitrary
+  /// order.  If \p recurseOnSources is true, act as if this function was
+  /// invoked on the connected prims and owning prims of connected properties
+  /// also and return the union.
+  USD_API
+  SdfPathVector FindAllAttributeConnectionPaths(
+      Usd_PrimFlagsPredicate const &traversalPredicate,
+      std::function<bool(UsdAttribute const &)> const &pred = nullptr,
+      bool recurseOnSources = false) const;
+
+  /// \overload
+  /// Invoke FindAllAttributeConnectionPaths() with the
+  /// UsdPrimDefaultPredicate as its traversalPredicate.
   USD_API
   SdfPathVector FindAllAttributeConnectionPaths(
       std::function<bool(UsdAttribute const &)> const &pred = nullptr,
@@ -1796,12 +1829,21 @@ class UsdPrim : public UsdObject {
   USD_API
   bool HasRelationship(const TfToken &relName) const;
 
-  /// Search the prim subtree rooted at this prim for relationships for which
-  /// \p predicate returns true, collect their target paths and return them in
-  /// an arbitrary order.  If \p recurseOnTargets is true, act as if this
-  /// function was invoked on the targeted prims and owning prims of targeted
-  /// properties also (but not of forwarding relationships) and return the
-  /// union.
+  /// Search the prim subtree rooted at this prim according to \p
+  /// traversalPredicate for relationships for which \p predicate returns
+  /// true, collect their target paths and return them in an arbitrary order.
+  /// If \p recurseOnTargets is true, act as if this function was invoked on
+  /// the targeted prims and owning prims of targeted properties also (but not
+  /// of forwarding relationships) and return the union.
+  USD_API
+  SdfPathVector FindAllRelationshipTargetPaths(
+      Usd_PrimFlagsPredicate const &traversalPredicate,
+      std::function<bool(UsdRelationship const &)> const &pred = nullptr,
+      bool recurseOnTargets = false) const;
+
+  /// \overload
+  /// Invoke FindAllRelationshipTargetPaths() with the UsdPrimDefaultPredicate
+  /// as its traversalPredicate.
   USD_API
   SdfPathVector FindAllRelationshipTargetPaths(
       std::function<bool(UsdRelationship const &)> const &pred = nullptr,
@@ -2135,6 +2177,17 @@ class UsdPrim : public UsdObject {
   /// @}
 
  private:
+  class _ProtoToInstancePathMap {
+    friend class UsdPrim;
+
+   public:
+    using _Map = std::vector<std::pair<SdfPath, SdfPath>>;
+    SdfPath MapProtoToInstance(SdfPath const &protoPath) const;
+
+   private:
+    _Map _map;
+  };
+
   friend class UsdObject;
   friend class UsdPrimSiblingIterator;
   friend class UsdPrimSubtreeIterator;
@@ -2142,6 +2195,7 @@ class UsdPrim : public UsdObject {
   friend class UsdSchemaBase;
   friend class UsdAPISchemaBase;
   friend class UsdStage;
+  friend class Usd_StageImplAccess;
   friend class UsdPrimRange;
   friend class Usd_PrimData;
   friend class Usd_PrimFlagsPredicate;
@@ -2206,34 +2260,111 @@ class UsdPrim : public UsdObject {
   // MakeResolveTargetStrongerThanEditTarget.
   UsdResolveTarget _MakeResolveTargetFromEditTarget(const UsdEditTarget &editTarget,
                                                     bool makeAsStrongerThan) const;
-};
 
-#ifdef doxygen
+  _ProtoToInstancePathMap _GetProtoToInstancePathMap() const;
+};
 
 /// Forward traversal iterator of sibling ::UsdPrim s.  This is a
 /// standard-compliant iterator that may be used with STL algorithms, etc.
+/// Filters according to a supplied predicate.
 class UsdPrimSiblingIterator {
+  using _UnderlyingIterator = const Usd_PrimData *;
+  class _PtrProxy {
+   public:
+    UsdPrim *operator->()
+    {
+      return &_prim;
+    }
+
+   private:
+    friend class UsdPrimSiblingIterator;
+    explicit _PtrProxy(const UsdPrim &prim) : _prim(prim) {}
+    UsdPrim _prim;
+  };
+
  public:
-  /// Iterator value type.
-  typedef UsdPrim value_type;
-  /// Iterator reference type, in this case the same as \a value_type.
-  typedef value_type reference;
-  /// Iterator difference type.
-  typedef unspecified - integral - type difference_type;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = UsdPrim;
+  using reference = UsdPrim;
+  using pointer = _PtrProxy;
+  using difference_type = std::ptrdiff_t;
+
+  // Default ctor.
+  UsdPrimSiblingIterator() = default;
+
   /// Dereference.
-  reference operator*() const;
+  reference operator*() const
+  {
+    return dereference();
+  }
+
   /// Indirection.
-  unspecified - type operator->() const;
-  /// Postincrement.
-  UsdPrimSiblingIterator &operator++();
+  pointer operator->() const
+  {
+    return pointer(dereference());
+  }
+
   /// Preincrement.
-  UsdPrimSiblingIterator operator++(int);
+  UsdPrimSiblingIterator &operator++()
+  {
+    increment();
+    return *this;
+  }
+
+  /// Postincrement.
+  UsdPrimSiblingIterator operator++(int)
+  {
+    UsdPrimSiblingIterator result = *this;
+    increment();
+    return result;
+  }
+
+  bool operator==(const UsdPrimSiblingIterator &other) const
+  {
+    return equal(other);
+  }
+
+  bool operator!=(const UsdPrimSiblingIterator &other) const
+  {
+    return !equal(other);
+  }
 
  private:
-  /// Equality.
-  friend bool operator==(const UsdPrimSiblingIterator &lhs, const UsdPrimSiblingIterator &rhs);
-  /// Inequality.
-  friend bool operator!=(const UsdPrimSiblingIterator &lhs, const UsdPrimSiblingIterator &rhs);
+  friend class UsdPrim;
+
+  // Constructor used by Prim.
+  UsdPrimSiblingIterator(const _UnderlyingIterator &i,
+                         const SdfPath &proxyPrimPath,
+                         const Usd_PrimFlagsPredicate &predicate)
+      : _underlyingIterator(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
+  {
+    // Need to advance iterator to first matching element.
+    if (_underlyingIterator && !Usd_EvalPredicate(_predicate, _underlyingIterator, _proxyPrimPath))
+      increment();
+  }
+
+  bool equal(const UsdPrimSiblingIterator &other) const
+  {
+    return _underlyingIterator == other._underlyingIterator &&
+           _proxyPrimPath == other._proxyPrimPath && _predicate == other._predicate;
+  }
+
+  void increment()
+  {
+    if (Usd_MoveToNextSiblingOrParent(_underlyingIterator, _proxyPrimPath, _predicate)) {
+      _underlyingIterator = nullptr;
+      _proxyPrimPath = SdfPath();
+    }
+  }
+
+  reference dereference() const
+  {
+    return UsdPrim(_underlyingIterator, _proxyPrimPath);
+  }
+
+  _UnderlyingIterator _underlyingIterator = nullptr;
+  SdfPath _proxyPrimPath;
+  Usd_PrimFlagsPredicate _predicate;
 };
 
 /// Forward iterator range of sibling ::UsdPrim s.  This range type contains a
@@ -2247,115 +2378,136 @@ class UsdPrimSiblingRange {
   /// Const iterator type.
   typedef UsdPrimSiblingIterator const_iterator;
   /// Iterator difference type.
-  typedef unspecified - integral - type difference_type;
+  typedef std::ptrdiff_t difference_type;
   /// Iterator value_type.
   typedef iterator::value_type value_type;
   /// Iterator reference_type.
   typedef iterator::reference reference;
 
+  UsdPrimSiblingRange() = default;
+
   /// Construct with a pair of iterators.
-  UsdPrimSiblingRange(UsdPrimSiblingIterator begin, UsdPrimSiblingIterator end);
-
-  /// Construct/convert from another compatible range type.
-  template<class ForwardRange> UsdPrimSiblingRange(const ForwardRange &r);
-
-  /// Assign from another compatible range type.
-  template<class ForwardRange> UsdPrimSiblingRange &operator=(const ForwardRange &r);
+  UsdPrimSiblingRange(UsdPrimSiblingIterator begin, UsdPrimSiblingIterator end)
+      : _begin(begin), _end(end)
+  {
+  }
 
   /// First iterator.
-  iterator begin() const;
+  iterator begin() const
+  {
+    return _begin;
+  }
+
+  /// First iterator.
+  const_iterator cbegin() const
+  {
+    return _begin;
+  }
 
   /// Past-the-end iterator.
-  iterator end() const;
+  iterator end() const
+  {
+    return _end;
+  }
+
+  /// Past-the-end iterator.
+  const_iterator cend() const
+  {
+    return _end;
+  }
 
   /// Return !empty().
-  operator unspecified_bool_type() const;
+  explicit operator bool() const
+  {
+    return !empty();
+  }
 
   /// Equality compare.
-  bool equal(const iterator_range &) const;
+  bool equal(const UsdPrimSiblingRange &other) const
+  {
+    return _begin == other._begin && _end == other._end;
+  }
 
   /// Return *begin().  This range must not be empty.
-  reference front() const;
+  reference front() const
+  {
+    TF_DEV_AXIOM(!empty());
+    return *begin();
+  }
 
   /// Advance this range's begin iterator.
-  iterator_range &advance_begin(difference_type n);
+  UsdPrimSiblingRange &advance_begin(difference_type n)
+  {
+    std::advance(_begin, n);
+    return *this;
+  }
 
   /// Advance this range's end iterator.
-  iterator_range &advance_end(difference_type n);
+  UsdPrimSiblingRange &advance_end(difference_type n)
+  {
+    std::advance(_end, n);
+    return *this;
+  }
 
-  ;  /// Return begin() == end().
-  bool empty() const;
+  /// Return begin() == end().
+  bool empty() const
+  {
+    return begin() == end();
+  }
 
  private:
   /// Equality comparison.
-  friend bool operator==(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs);
+  friend bool operator==(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs)
+  {
+    return lhs.equal(rhs);
+  }
+
+  /// Equality comparison.
+  template<class ForwardRange>
+  friend bool operator==(const UsdPrimSiblingRange &lhs, const ForwardRange &rhs)
+  {
+    static_assert(std::is_same<typename decltype(std::cbegin(rhs))::iterator_category,
+                               std::forward_iterator_tag>::value,
+                  "rhs must be a forward iterator.");
+    return (std::distance(std::cbegin(lhs), std::cend(lhs)) ==
+            std::distance(std::cbegin(rhs), std::cend(rhs))) &&
+           std::equal(std::cbegin(lhs), std::cend(lhs), std::cbegin(rhs));
+  }
+
+  /// Equality comparison.
+  template<class ForwardRange>
+  friend bool operator==(const ForwardRange &lhs, const UsdPrimSiblingRange &rhs)
+  {
+    return rhs == lhs;
+  }
+
   /// Inequality comparison.
-  friend bool operator!=(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs);
+  friend bool operator!=(const UsdPrimSiblingRange &lhs, const UsdPrimSiblingRange &rhs)
+  {
+    return !lhs.equal(rhs);
+  }
+
+  /// Inequality comparison.
+  template<class ForwardRange>
+  friend bool operator!=(const ForwardRange &lhs, const UsdPrimSiblingRange &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  /// Inequality comparison.
+  template<class ForwardRange>
+  friend bool operator!=(const UsdPrimSiblingRange &lhs, const ForwardRange &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  iterator _begin;
+  iterator _end;
 };
-
-#else
-
-// Sibling iterator class.  Converts ref to weak and filters according to a
-// supplied predicate.
-class UsdPrimSiblingIterator
-    : public boost::iterator_adaptor<UsdPrimSiblingIterator,        // crtp base.
-                                     const Usd_PrimData *,          // base iterator.
-                                     UsdPrim,                       // value type.
-                                     boost::forward_traversal_tag,  // traversal
-                                     UsdPrim>                       // reference type.
-{
- public:
-  // Default ctor.
-  UsdPrimSiblingIterator() {}
-
- private:
-  friend class UsdPrim;
-
-  // Constructor used by Prim.
-  UsdPrimSiblingIterator(const base_type &i,
-                         const SdfPath &proxyPrimPath,
-                         const Usd_PrimFlagsPredicate &predicate)
-      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
-  {
-    // Need to advance iterator to first matching element.
-    if (base() && !Usd_EvalPredicate(_predicate, base(), _proxyPrimPath))
-      increment();
-  }
-
-  // Core implementation invoked by iterator_adaptor.
-  friend class boost::iterator_core_access;
-  bool equal(const UsdPrimSiblingIterator &other) const
-  {
-    return base() == other.base() && _proxyPrimPath == other._proxyPrimPath &&
-           _predicate == other._predicate;
-  }
-
-  void increment()
-  {
-    base_type &base = base_reference();
-    if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, _predicate)) {
-      base = nullptr;
-      _proxyPrimPath = SdfPath();
-    }
-  }
-
-  reference dereference() const
-  {
-    return UsdPrim(base(), _proxyPrimPath);
-  }
-
-  SdfPath _proxyPrimPath;
-  Usd_PrimFlagsPredicate _predicate;
-};
-
-// Typedef iterator range.
-typedef boost::iterator_range<UsdPrimSiblingIterator> UsdPrimSiblingRange;
 
 // Inform TfIterator it should feel free to make copies of the range type.
 template<> struct Tf_ShouldIterateOverCopy<UsdPrimSiblingRange> : std::true_type {};
 template<> struct Tf_ShouldIterateOverCopy<const UsdPrimSiblingRange> : std::true_type {};
-
-#endif  // doxygen
 
 UsdPrimSiblingRange UsdPrim::GetFilteredChildren(const Usd_PrimFlagsPredicate &pred) const
 {
@@ -2386,32 +2538,113 @@ UsdPrim::SiblingRange UsdPrim::_MakeSiblingRange(const Usd_PrimFlagsPredicate &p
                       SiblingIterator(nullptr, SdfPath(), pred));
 }
 
-#ifdef doxygen
-
 /// Forward traversal iterator of sibling ::UsdPrim s.  This is a
 /// standard-compliant iterator that may be used with STL algorithms, etc.
+/// Filters according to a supplied predicate.
 class UsdPrimSubtreeIterator {
+  using _UnderlyingIterator = Usd_PrimDataConstPtr;
+  class _PtrProxy {
+   public:
+    UsdPrim *operator->()
+    {
+      return &_prim;
+    }
+
+   private:
+    friend class UsdPrimSubtreeIterator;
+    explicit _PtrProxy(const UsdPrim &prim) : _prim(prim) {}
+    UsdPrim _prim;
+  };
+
  public:
-  /// Iterator value type.
-  typedef UsdPrim value_type;
-  /// Iterator reference type, in this case the same as \a value_type.
-  typedef value_type reference;
-  /// Iterator difference type.
-  typedef unspecified - integral - type difference_type;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = UsdPrim;
+  using reference = UsdPrim;
+  using pointer = _PtrProxy;
+  using difference_type = std::ptrdiff_t;
+
+  // Default ctor.
+  UsdPrimSubtreeIterator() = default;
+
   /// Dereference.
-  reference operator*() const;
+  reference operator*() const
+  {
+    return dereference();
+  }
   /// Indirection.
-  unspecified - type operator->() const;
-  /// Postincrement.
-  UsdPrimSubtreeIterator &operator++();
+  pointer operator->() const
+  {
+    return pointer(dereference());
+  }
+
   /// Preincrement.
-  UsdPrimSubtreeIterator operator++(int);
+  UsdPrimSubtreeIterator &operator++()
+  {
+    increment();
+    return *this;
+  }
+
+  /// Postincrement.
+  UsdPrimSubtreeIterator operator++(int)
+  {
+    UsdPrimSubtreeIterator result;
+    increment();
+    return result;
+  }
+
+  /// Equality.
+  bool operator==(const UsdPrimSubtreeIterator &other) const
+  {
+    return equal(other);
+  }
+
+  /// Inequality.
+  bool operator!=(const UsdPrimSubtreeIterator &other) const
+  {
+    return !equal(other);
+  }
 
  private:
-  /// Equality.
-  friend bool operator==(const UsdPrimSubtreeIterator &lhs, const UsdPrimSubtreeIterator &rhs);
-  /// Inequality.
-  friend bool operator!=(const UsdPrimSubtreeIterator &lhs, const UsdPrimSubtreeIterator &rhs);
+  friend class UsdPrim;
+
+  // Constructor used by Prim.
+  UsdPrimSubtreeIterator(const _UnderlyingIterator &i,
+                         const SdfPath &proxyPrimPath,
+                         const Usd_PrimFlagsPredicate &predicate)
+      : _underlyingIterator(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
+  {
+    // Need to advance iterator to first matching element.
+    if (_underlyingIterator && !Usd_EvalPredicate(_predicate, _underlyingIterator, _proxyPrimPath))
+    {
+      if (Usd_MoveToNextSiblingOrParent(_underlyingIterator, _proxyPrimPath, _predicate)) {
+        _underlyingIterator = nullptr;
+        _proxyPrimPath = SdfPath();
+      }
+    }
+  }
+
+  bool equal(const UsdPrimSubtreeIterator &other) const
+  {
+    return _underlyingIterator == other._underlyingIterator &&
+           _proxyPrimPath == other._proxyPrimPath && _predicate == other._predicate;
+  }
+
+  void increment()
+  {
+    if (!Usd_MoveToChild(_underlyingIterator, _proxyPrimPath, _predicate)) {
+      while (Usd_MoveToNextSiblingOrParent(_underlyingIterator, _proxyPrimPath, _predicate)) {
+      }
+    }
+  }
+
+  reference dereference() const
+  {
+    return UsdPrim(_underlyingIterator, _proxyPrimPath);
+  }
+
+  _UnderlyingIterator _underlyingIterator = nullptr;
+  SdfPath _proxyPrimPath;
+  Usd_PrimFlagsPredicate _predicate;
 };
 
 /// Forward iterator range of sibling ::UsdPrim s.  This range type contains a
@@ -2425,120 +2658,136 @@ class UsdPrimSubtreeRange {
   /// Const iterator type.
   typedef UsdPrimSubtreeIterator const_iterator;
   /// Iterator difference type.
-  typedef unspecified - integral - type difference_type;
+  typedef std::ptrdiff_t difference_type;
   /// Iterator value_type.
   typedef iterator::value_type value_type;
   /// Iterator reference_type.
   typedef iterator::reference reference;
 
+  UsdPrimSubtreeRange() = default;
+
   /// Construct with a pair of iterators.
-  UsdPrimSubtreeRange(UsdPrimSubtreeIterator begin, UsdPrimSubtreeIterator end);
-
-  /// Construct/convert from another compatible range type.
-  template<class ForwardRange> UsdPrimSubtreeRange(const ForwardRange &r);
-
-  /// Assign from another compatible range type.
-  template<class ForwardRange> UsdPrimSubtreeRange &operator=(const ForwardRange &r);
+  UsdPrimSubtreeRange(UsdPrimSubtreeIterator begin, UsdPrimSubtreeIterator end)
+      : _begin(begin), _end(end)
+  {
+  }
 
   /// First iterator.
-  iterator begin() const;
+  iterator begin() const
+  {
+    return _begin;
+  }
+
+  /// First iterator.
+  const_iterator cbegin() const
+  {
+    return _begin;
+  }
 
   /// Past-the-end iterator.
-  iterator end() const;
+  iterator end() const
+  {
+    return _end;
+  }
+
+  /// Past-the-end iterator.
+  const_iterator cend() const
+  {
+    return _end;
+  }
 
   /// Return !empty().
-  operator unspecified_bool_type() const;
+  explicit operator bool() const
+  {
+    return !empty();
+  }
 
   /// Equality compare.
-  bool equal(const iterator_range &) const;
+  bool equal(const UsdPrimSubtreeRange &other) const
+  {
+    return _begin == other._begin && _end == other._end;
+  }
 
   /// Return *begin().  This range must not be empty.
-  reference front() const;
+  reference front() const
+  {
+    TF_DEV_AXIOM(!empty());
+    return *begin();
+  }
 
   /// Advance this range's begin iterator.
-  iterator_range &advance_begin(difference_type n);
+  UsdPrimSubtreeRange &advance_begin(difference_type n)
+  {
+    std::advance(_begin, n);
+    return *this;
+  }
 
   /// Advance this range's end iterator.
-  iterator_range &advance_end(difference_type n);
+  UsdPrimSubtreeRange &advance_end(difference_type n)
+  {
+    std::advance(_end, n);
+    return *this;
+  }
 
   /// Return begin() == end().
-  bool empty() const;
+  bool empty() const
+  {
+    return begin() == end();
+  }
 
  private:
   /// Equality comparison.
-  friend bool operator==(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs);
+  friend bool operator==(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs)
+  {
+    return lhs.equal(rhs);
+  }
+
+  /// Equality comparison.
+  template<class ForwardRange>
+  friend bool operator==(const UsdPrimSubtreeRange &lhs, const ForwardRange &rhs)
+  {
+    static_assert(std::is_convertible<typename decltype(std::cbegin(rhs))::iterator_category,
+                                      std::forward_iterator_tag>::value,
+                  "rhs must be a forward iterator.");
+    return (std::distance(std::cbegin(lhs), std::cend(lhs)) ==
+            std::distance(std::cbegin(rhs), std::cend(rhs))) &&
+           std::equal(std::cbegin(lhs), std::cend(lhs), std::cbegin(rhs));
+  }
+
+  /// Equality comparison.
+  template<class ForwardRange>
+  friend bool operator==(const ForwardRange &lhs, const UsdPrimSubtreeRange &rhs)
+  {
+    return rhs == lhs;
+  }
+
   /// Inequality comparison.
-  friend bool operator!=(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs);
+  friend bool operator!=(const UsdPrimSubtreeRange &lhs, const UsdPrimSubtreeRange &rhs)
+  {
+    return !lhs.equal(rhs);
+  }
+
+  /// Inequality comparison.
+  template<class ForwardRange>
+  friend bool operator!=(const ForwardRange &lhs, const UsdPrimSubtreeRange &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  /// Inequality comparison.
+  template<class ForwardRange>
+  friend bool operator!=(const UsdPrimSubtreeRange &lhs, const ForwardRange &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  iterator _begin;
+  iterator _end;
 };
-
-#else
-
-// Subtree iterator class.  Converts ref to weak and filters according to a
-// supplied predicate.
-class UsdPrimSubtreeIterator
-    : public boost::iterator_adaptor<UsdPrimSubtreeIterator,        // crtp base.
-                                     const Usd_PrimData *,          // base iterator.
-                                     UsdPrim,                       // value type.
-                                     boost::forward_traversal_tag,  // traversal
-                                     UsdPrim>                       // reference type.
-{
- public:
-  // Default ctor.
-  UsdPrimSubtreeIterator() {}
-
- private:
-  friend class UsdPrim;
-
-  // Constructor used by Prim.
-  UsdPrimSubtreeIterator(const base_type &i,
-                         const SdfPath &proxyPrimPath,
-                         const Usd_PrimFlagsPredicate &predicate)
-      : iterator_adaptor_(i), _proxyPrimPath(proxyPrimPath), _predicate(predicate)
-  {
-    // Need to advance iterator to first matching element.
-    base_type &base = base_reference();
-    if (base && !Usd_EvalPredicate(_predicate, base, _proxyPrimPath)) {
-      if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, _predicate)) {
-        base = nullptr;
-        _proxyPrimPath = SdfPath();
-      }
-    }
-  }
-
-  // Core implementation invoked by iterator_adaptor.
-  friend class boost::iterator_core_access;
-  bool equal(const UsdPrimSubtreeIterator &other) const
-  {
-    return base() == other.base() && _proxyPrimPath == other._proxyPrimPath &&
-           _predicate == other._predicate;
-  }
-
-  void increment()
-  {
-    base_type &base = base_reference();
-    if (!Usd_MoveToChild(base, _proxyPrimPath, _predicate)) {
-      while (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, _predicate)) {
-      }
-    }
-  }
-
-  reference dereference() const
-  {
-    return UsdPrim(base(), _proxyPrimPath);
-  }
-
-  SdfPath _proxyPrimPath;
-  Usd_PrimFlagsPredicate _predicate;
-};
-
-// Typedef iterator range.
-typedef boost::iterator_range<UsdPrimSubtreeIterator> UsdPrimSubtreeRange;
 
 // Inform TfIterator it should feel free to make copies of the range type.
 template<> struct Tf_ShouldIterateOverCopy<UsdPrimSubtreeRange> : std::true_type {};
 template<> struct Tf_ShouldIterateOverCopy<const UsdPrimSubtreeRange> : std::true_type {};
-
-#endif  // doxygen
 
 UsdPrimSubtreeRange UsdPrim::GetFilteredDescendants(const Usd_PrimFlagsPredicate &pred) const
 {

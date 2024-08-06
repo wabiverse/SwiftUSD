@@ -1,7 +1,7 @@
-#ifndef __PXR_IMAGING_HGI_VULKAN_HGIVULKAN_H__
-#define __PXR_IMAGING_HGI_VULKAN_HGIVULKAN_H__
+#ifndef __PXR_IMAGING_HGIVULKAN_H__
+#define __PXR_IMAGING_HGIVULKAN_H__
 
-// hgiVulkan.
+// HgiVulkan
 #include <HgiVulkan/api.h>
 #include <HgiVulkan/blitCmds.h>
 #include <HgiVulkan/buffer.h>
@@ -31,4 +31,4 @@
 #include <HgiVulkan/vk_mem_alloc.h>
 #include <HgiVulkan/vulkan.h>
 
-#endif /* __PXR_IMAGING_HGI_VULKAN_HGIVULKAN_H__ */
+#endif  // __PXR_IMAGING_HGIVULKAN_H__

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef USDGEOM_GENERATED_MODELAPI_H
 #define USDGEOM_GENERATED_MODELAPI_H
@@ -31,7 +14,7 @@
 #include "Usd/stage.h"
 #include "UsdGeom/api.h"
 #include "UsdGeom/tokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "UsdGeom/bboxCache.h"
 #include "UsdGeom/constraintTarget.h"
@@ -95,10 +78,15 @@ class SdfAssetPath;
 /// \em model:applyDrawMode set at a lower level so each particle
 /// group draws individually.
 ///
-/// Models of kind component are treated as if \em model:applyDrawMode
-/// were true.  This means a prim is drawn with proxy geometry when: the
-/// prim has kind component, and/or \em model:applyDrawMode is set; and
-/// the prim's resolved value for \em model:drawMode is not _default_.
+/// Models of kind component are automatically treated as if
+/// \em model:applyDrawMode were true if \em model:applyDrawMode is not
+/// authored on the component prim. A component prim will be drawn drawn with a
+/// simplified representation when the prim has kind component,
+/// \em model:applyDrawMode is not authored (or authored to be true), and the
+/// resolved (i.e. inherited down namespace) value for \em model:drawMode is
+/// not _default_. If you don't want component prims to use the resolved
+/// non-default drawMode, you must apply the UsdGeomModelAPI schema on the prim
+/// and explicitly set \em model:applyDrawMode to false.
 ///
 /// \section UsdGeomModelAPI_cardGeometry Cards Geometry
 ///
@@ -247,7 +235,8 @@ class UsdGeomModelAPI : public UsdAPISchemaBase {
   // --------------------------------------------------------------------- //
   /// Alternate imaging mode; applied to this prim or child prims
   /// where \em model:applyDrawMode is true, or where the prim
-  /// has kind \em component. See \ref UsdGeomModelAPI_drawMode
+  /// has kind \em component and \em model:applyDrawMode is not
+  /// authored. See \ref UsdGeomModelAPI_drawMode
   /// for mode descriptions.
   ///
   /// | ||

@@ -10,3 +10,8 @@
 #include <GeomUtil/sphereMeshGenerator.h>
 
 #endif  // __PXR_IMAGING_GEOM_UTIL_H__
+#ifndef __PXR_IMAGING_GEOMUTIL_H__
+#define __PXR_IMAGING_GEOMUTIL_H__
+
+// GeomUtil
+#endif  // __PXR_IMAGING_GEOMUTIL_H__

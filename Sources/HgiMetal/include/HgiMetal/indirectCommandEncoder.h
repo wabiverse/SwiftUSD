@@ -1,25 +1,8 @@
 //
 // Copyright 2022 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HGI_METAL_INDIRECT_COMMAND_ENCODER_H
 #define PXR_IMAGING_HGI_METAL_INDIRECT_COMMAND_ENCODER_H
@@ -27,9 +10,9 @@
 #include "Hgi/indirectCommandEncoder.h"
 #include "HgiMetal/api.h"
 #include "HgiMetal/stepFunctions.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
-#include <Metal/Metal.hpp>
+#import <Metal/Metal.h>
 
 #include <map>
 #include <mutex>
@@ -84,9 +67,9 @@ class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
   HgiMetalIndirectCommandEncoder(const HgiMetalIndirectCommandEncoder &) = delete;
 
   struct FunctionState {
-    MTL::Function *function;
-    MTL::ComputePipelineState *pipelineState;
-    MTL::ArgumentEncoder *argumentEncoder;
+    id<MTLFunction> function;
+    id<MTLComputePipelineState> pipelineState;
+    id<MTLArgumentEncoder> argumentEncoder;
   };
 
   HGIMETAL_API
@@ -104,21 +87,21 @@ class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
                                            uint32_t patchBaseVertexByteOffset);
 
   HGIMETAL_API
-  MTL::IndirectCommandBuffer *_AllocateCommandBuffer(uint32_t drawCount);
+  id<MTLIndirectCommandBuffer> _AllocateCommandBuffer(uint32_t drawCount);
 
   HGIMETAL_API
-  MTL::Buffer *_AllocateArgumentBuffer(uint32_t encodedLength);
+  id<MTLBuffer> _AllocateArgumentBuffer(uint32_t encodedLength);
 
   HgiMetal *_hgi;
-  MTL::Device *_device;
-  MTL::Library *_library;
+  id<MTLDevice> _device;
+  id<MTLLibrary> _library;
   std::vector<FunctionState> _functions;
-  MTL::ResourceOptions _bufferStorageMode;
-  MTL::Buffer *_triangleTessFactors;
-  MTL::Buffer *_quadTessFactors;
+  MTLResourceOptions _bufferStorageMode;
+  id<MTLBuffer> _triangleTessFactors;
+  id<MTLBuffer> _quadTessFactors;
 
-  using FreeCommandBuffers = std::multimap<uint32_t, MTL::IndirectCommandBuffer *>;
-  using FreeArgumentBuffers = std::multimap<uint32_t, MTL::Buffer *>;
+  using FreeCommandBuffers = std::multimap<uint32_t, id<MTLIndirectCommandBuffer>>;
+  using FreeArgumentBuffers = std::multimap<uint32_t, id<MTLBuffer>>;
 
   std::mutex _poolMutex;
   FreeCommandBuffers _commandBufferPool;

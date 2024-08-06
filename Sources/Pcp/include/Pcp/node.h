@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_NODE_H
 #define PXR_USD_PCP_NODE_H
@@ -29,10 +12,7 @@
 #include "Sdf/types.h"
 #include "Tf/hashset.h"
 #include "Tf/iterator.h"
-#include <pxr/pxrns.h>
-
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/reverse_iterator.hpp>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -65,9 +45,9 @@ TF_DECLARE_REF_PTRS(PcpPrimIndex_Graph);
 ///
 class PcpNodeRef {
  public:
-  using child_const_iterator = PcpNodeRef_ChildrenIterator;
-  using child_const_reverse_iterator = PcpNodeRef_ChildrenReverseIterator;
-  using child_const_range = std::pair<child_const_iterator, child_const_iterator>;
+  typedef PcpNodeRef_ChildrenIterator child_const_iterator;
+  typedef PcpNodeRef_ChildrenReverseIterator child_const_reverse_iterator;
+  typedef std::pair<child_const_iterator, child_const_iterator> child_const_range;
 
   PcpNodeRef() : _graph(0), _nodeIdx(PCP_INVALID_INDEX) {}
 
@@ -300,6 +280,24 @@ class PcpNodeRef {
   PCP_API
   bool CanContributeSpecs() const;
 
+  /// Returns the namespace depth (i.e., the path element count) of
+  /// this node's path when it was restricted from contributing
+  /// opinions for composition. If this spec has no such restriction,
+  /// returns 0.
+  ///
+  /// Note that unlike the value returned by GetNamespaceDepth,
+  /// this value *does* include variant selections.
+  PCP_API
+  size_t GetSpecContributionRestrictedDepth() const;
+
+  /// Set this node's contribution restriction depth.
+  ///
+  /// Note that this function typically does not need to be called,
+  /// since functions that restrict contributions (e.g., SetInert)
+  /// automatically set the restriction depth appropriately.
+  PCP_API
+  void SetSpecContributionRestrictedDepth(size_t depth);
+
   /// Returns true if this node has opinions authored
   /// for composition, false otherwise.
   PCP_API
@@ -322,6 +320,8 @@ class PcpNodeRef {
   friend class PcpNodeRef_ChildrenReverseIterator;
   friend class PcpNodeRef_PrivateChildrenConstIterator;
   friend class PcpNodeRef_PrivateChildrenConstReverseIterator;
+  friend class PcpNodeRef_PrivateSubtreeConstIterator;
+  template<class T> friend class Pcp_TraversalCache;
 
   // Private constructor for internal use.
   PcpNodeRef(PcpPrimIndex_Graph *graph, size_t idx) : _graph(graph), _nodeIdx(idx) {}
@@ -333,6 +333,12 @@ class PcpNodeRef {
 
   inline size_t _GetParentIndex() const;
   inline size_t _GetOriginIndex() const;
+
+  inline void _SetInert(bool inert);
+  inline void _SetRestricted(bool restricted);
+
+  enum class _Restricted { Yes, Unknown };
+  void _RecordRestrictionDepth(_Restricted isRestricted);
 
  private:  // Data
   PcpPrimIndex_Graph *_graph;
@@ -349,20 +355,36 @@ inline size_t hash_value(const PcpNodeRef &x)
   return TfHash{}(x);
 }
 
-using PcpNodeRefHashSet = TfHashSet<PcpNodeRef, PcpNodeRef::Hash>;
-using PcpNodeRefVector = std::vector<PcpNodeRef>;
+typedef TfHashSet<PcpNodeRef, PcpNodeRef::Hash> PcpNodeRefHashSet;
+typedef std::vector<PcpNodeRef> PcpNodeRefVector;
+
+class PcpNodeRef_PtrProxy {
+ public:
+  PcpNodeRef *operator->()
+  {
+    return &_nodeRef;
+  }
+
+ private:
+  friend class PcpNodeRef_ChildrenIterator;
+  friend class PcpNodeRef_ChildrenReverseIterator;
+  explicit PcpNodeRef_PtrProxy(const PcpNodeRef &nodeRef) : _nodeRef(nodeRef) {}
+  PcpNodeRef _nodeRef;
+};
 
 /// \class PcpNodeRef_ChildrenIterator
 ///
 /// Object used to iterate over child nodes (not all descendant nodes) of a
 /// node in the prim index graph in strong-to-weak order.
 ///
-class PcpNodeRef_ChildrenIterator : public boost::iterator_facade<
-                                        /* Derived =   */ PcpNodeRef_ChildrenIterator,
-                                        /* ValueType = */ PcpNodeRef,
-                                        /* Category =  */ boost::forward_traversal_tag,
-                                        /* RefType =   */ PcpNodeRef> {
+class PcpNodeRef_ChildrenIterator {
  public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = PcpNodeRef;
+  using reference = PcpNodeRef;
+  using pointer = PcpNodeRef_PtrProxy;
+  using difference_type = std::ptrdiff_t;
+
   /// Constructs an invalid iterator.
   PCP_API
   PcpNodeRef_ChildrenIterator();
@@ -372,8 +394,39 @@ class PcpNodeRef_ChildrenIterator : public boost::iterator_facade<
   PCP_API
   PcpNodeRef_ChildrenIterator(const PcpNodeRef &node, bool end = false);
 
+  reference operator*() const
+  {
+    return dereference();
+  }
+  pointer operator->() const
+  {
+    return pointer(dereference());
+  }
+
+  PcpNodeRef_ChildrenIterator &operator++()
+  {
+    increment();
+    return *this;
+  }
+
+  PcpNodeRef_ChildrenIterator operator++(int)
+  {
+    const PcpNodeRef_ChildrenIterator result = *this;
+    increment();
+    return result;
+  }
+
+  bool operator==(const PcpNodeRef_ChildrenIterator &other) const
+  {
+    return equal(other);
+  }
+
+  bool operator!=(const PcpNodeRef_ChildrenIterator &other) const
+  {
+    return !equal(other);
+  }
+
  private:
-  friend class boost::iterator_core_access;
   PCP_API
   void increment();
   bool equal(const PcpNodeRef_ChildrenIterator &other) const
@@ -402,13 +455,14 @@ class PcpNodeRef_ChildrenIterator : public boost::iterator_facade<
 /// Object used to iterate over nodes in the prim index graph in weak-to-strong
 /// order.
 ///
-class PcpNodeRef_ChildrenReverseIterator
-    : public boost::iterator_facade<
-          /* Derived =   */ PcpNodeRef_ChildrenReverseIterator,
-          /* ValueType = */ PcpNodeRef,
-          /* Category =  */ boost::forward_traversal_tag,
-          /* RefType =   */ PcpNodeRef> {
+class PcpNodeRef_ChildrenReverseIterator {
  public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = PcpNodeRef;
+  using reference = PcpNodeRef;
+  using pointer = PcpNodeRef_PtrProxy;
+  using difference_type = std::ptrdiff_t;
+
   /// Constructs an invalid iterator.
   PCP_API
   PcpNodeRef_ChildrenReverseIterator();
@@ -422,8 +476,39 @@ class PcpNodeRef_ChildrenReverseIterator
   PCP_API
   PcpNodeRef_ChildrenReverseIterator(const PcpNodeRef &node, bool end = false);
 
+  reference operator*() const
+  {
+    return dereference();
+  }
+  pointer operator->() const
+  {
+    return pointer(dereference());
+  }
+
+  PcpNodeRef_ChildrenReverseIterator &operator++()
+  {
+    increment();
+    return *this;
+  }
+
+  PcpNodeRef_ChildrenReverseIterator operator++(int)
+  {
+    const PcpNodeRef_ChildrenReverseIterator result = *this;
+    increment();
+    return result;
+  }
+
+  bool operator==(const PcpNodeRef_ChildrenReverseIterator &other) const
+  {
+    return equal(other);
+  }
+
+  bool operator!=(const PcpNodeRef_ChildrenReverseIterator &other) const
+  {
+    return !equal(other);
+  }
+
  private:
-  friend class boost::iterator_core_access;
   PCP_API
   void increment();
   bool equal(const PcpNodeRef_ChildrenReverseIterator &other) const

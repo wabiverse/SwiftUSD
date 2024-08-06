@@ -1,35 +1,18 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_HASH_H
 #define PXR_BASE_TF_HASH_H
 
-/// \file Tf/hash.h
+/// \file tf/hash.h
 /// \ingroup group_tf_String
 
-#include <pxr/pxrns.h>
-
 #include "Tf/api.h"
+#include "Tf/tf.h"
+#include "pxr/pxrns.h"
 
 #include <cstring>
 #include <map>
@@ -96,9 +79,11 @@ inline void TfHashAppend(HashState &h, std::pair<T, U> const &p)
 
 // Support std::vector. std::vector<bool> specialized below.
 template<class HashState, class T>
-inline std::enable_if_t<!std::is_same<std::remove_const_t<T>, bool>::value> TfHashAppend(
-    HashState &h, std::vector<T> const &vec)
+inline void TfHashAppend(HashState &h, std::vector<T> const &vec)
 {
+  static_assert(!std::is_same_v<std::remove_cv_t<T>, bool>,
+                "Unexpected usage of vector of 'bool'."
+                "Expected explicit overload.");
   h.AppendContiguous(vec.data(), vec.size());
 }
 
@@ -126,13 +111,6 @@ inline void TfHashAppend(HashState &h, std::map<Key, Value, Compare> const &elem
   h.AppendRange(std::begin(elements), std::end(elements));
 }
 
-// Support std::type_index.  When TfHash support for std::hash is enabled,
-// this explicit specialization will no longer be necessary.
-template<class HashState> inline void TfHashAppend(HashState &h, std::type_index const &type_index)
-{
-  return h.Append(type_index.hash_code());
-}
-
 // Support for hashing std::string.
 template<class HashState> inline void TfHashAppend(HashState &h, const std::string &s)
 {
@@ -144,22 +122,6 @@ template<class HashState> inline void TfHashAppend(HashState &h, const std::stri
 template<class HashState, class T> inline void TfHashAppend(HashState &h, const T *ptr)
 {
   return h.Append(reinterpret_cast<uintptr_t>(ptr));
-}
-
-// Support for hashing std::shared_ptr. When TfHash support for std::hash is
-// enabled, this explicit specialization will no longer be necessary.
-template<class HashState, class T>
-inline void TfHashAppend(HashState &h, const std::shared_ptr<T> &ptr)
-{
-  h.Append(std::hash<std::shared_ptr<T>>{}(ptr));
-}
-
-// Support for hashing std::unique_ptr. When TfHash support for std::hash is
-// enabled, this explicit specialization will no longer be necessary.
-template<class HashState, class T>
-inline void TfHashAppend(HashState &h, const std::unique_ptr<T> &ptr)
-{
-  h.Append(std::hash<std::unique_ptr<T>>{}(ptr));
 }
 
 // We refuse to hash [const] char *.  You're almost certainly trying to hash the
@@ -196,30 +158,23 @@ template<class HashState> inline void TfHashAppend(HashState &h, TfCStrHashWrapp
 }
 
 // Implementation detail: dispatch based on hash capability: Try TfHashAppend
-// first, otherwise try hash_value.  We'd like to otherwise try std::hash<T>,
-// but std::hash<> is not SFINAE-friendly until c++17 and this code needs to
-// support c++14 currently.  We rely on a combination of expression SFINAE and
-// establishing preferred order by passing a 0 constant and having the overloads
-// take int (highest priority), long (next priority) and '...' (lowest
-// priority).
+// first, otherwise try std::hash, followed by hash_value. We rely on a
+// combination of expression SFINAE and establishing preferred order by passing
+// a 0 constant and having the overloads take int (highest priority), long
+// (next priority) and '...' (lowest priority).
 
-// std::hash version, attempted last.  Consider adding when we move to
-// C++17 or newer.
-
-/**
- * @furby:
- * added in since i've already jumped to C++17. */
+// std::hash version, attempted second.
 template<class HashState, class T>
-inline auto Tf_HashImpl(HashState &h, T &&obj, ...)
+inline auto Tf_HashImpl(HashState &h, T &&obj, long)
     -> decltype(std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)), void())
 {
   TfHashAppend(h, std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)));
 }
 
-// hash_value, attempted second.
+// hash_value, attempted last.
 template<class HashState, class T>
-inline auto Tf_HashImpl(HashState &h, T &&obj, long) -> decltype(hash_value(std::forward<T>(obj)),
-                                                                 void())
+inline auto Tf_HashImpl(HashState &h, T &&obj, ...) -> decltype(hash_value(std::forward<T>(obj)),
+                                                                void())
 {
   TfHashAppend(h, hash_value(std::forward<T>(obj)));
 }
@@ -423,9 +378,8 @@ class Tf_HashState : public Tf_HashStateAPI<Tf_HashState> {
 /// some STL types and types in Tf.  TfHash uses three methods to attempt to
 /// hash a passed object.  First, TfHash tries to call TfHashAppend() on its
 /// argument.  This is the primary customization point for TfHash.  If that is
-/// not viable, TfHash makes an unqualified call to hash_value().  We would like
-/// TfHash to try to use std::hash<T> next, but std::hash<T> is not
-/// SFINAE-friendly until c++17, and this code needs to support c++14.
+/// not viable, TfHash tries to call std::hash<T>{}(). Lastly, TfHash makes an
+/// unqualified call to hash_value.
 ///
 /// The best way to add TfHash support for user-defined types is to provide a
 /// function overload like the following.
@@ -473,6 +427,7 @@ class Tf_HashState : public Tf_HashStateAPI<Tf_HashState> {
 ///   \li TfEnum
 ///   \li const void*
 ///   \li types that provide overloads for TfHashAppend
+///   \li types that provide overloads for std::hash
 ///   \li types that provide overloads for hash_value
 ///
 /// The \c TfHash class can be used to instantiate a \c TfHashMap with \c string

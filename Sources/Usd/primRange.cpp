@@ -1,28 +1,11 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Usd/primRange.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Usd/prim.h"
 #include "Usd/stage.h"
@@ -45,14 +28,9 @@ UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage, const Usd_PrimFlagsPr
   return ret;
 }
 
-UsdPrimRange UsdPrimRange::Stage(const UsdStagePtr &stage)
-{
-  return Stage(stage, UsdPrimDefaultPredicate);
-}
-
 void UsdPrimRange::iterator::PruneChildren()
 {
-  if (base() == _range->_end) {
+  if (_underlyingIterator == _range->_end) {
     TF_CODING_ERROR("Iterator past-the-end");
     return;
   }
@@ -69,22 +47,25 @@ void UsdPrimRange::iterator::PruneChildren()
 
 void UsdPrimRange::iterator::increment()
 {
-  base_type &base = base_reference();
-  base_type end = _range->_end;
+  _UnderlyingIterator end = _range->_end;
   if (ARCH_UNLIKELY(_isPost)) {
     _isPost = false;
-    if (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end, _range->_predicate)) {
+    if (Usd_MoveToNextSiblingOrParent(
+            _underlyingIterator, _proxyPrimPath, end, _range->_predicate))
+    {
       if (_depth) {
         --_depth;
         _isPost = true;
       }
       else {
-        base = end;
+        _underlyingIterator = end;
         _proxyPrimPath = SdfPath();
       }
     }
   }
-  else if (!_pruneChildrenFlag && Usd_MoveToChild(base, _proxyPrimPath, end, _range->_predicate)) {
+  else if (!_pruneChildrenFlag &&
+           Usd_MoveToChild(_underlyingIterator, _proxyPrimPath, end, _range->_predicate))
+  {
     ++_depth;
   }
   else {
@@ -92,12 +73,14 @@ void UsdPrimRange::iterator::increment()
       _isPost = true;
     }
     else {
-      while (Usd_MoveToNextSiblingOrParent(base, _proxyPrimPath, end, _range->_predicate)) {
+      while (Usd_MoveToNextSiblingOrParent(
+          _underlyingIterator, _proxyPrimPath, end, _range->_predicate))
+      {
         if (_depth) {
           --_depth;
         }
         else {
-          base = end;
+          _underlyingIterator = end;
           _proxyPrimPath = SdfPath();
           break;
         }

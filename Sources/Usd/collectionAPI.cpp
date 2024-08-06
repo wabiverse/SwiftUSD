@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Usd/collectionAPI.h"
 #include "Usd/schemaRegistry.h"
@@ -28,8 +11,6 @@
 #include "Sdf/assetPath.h"
 #include "Sdf/types.h"
 
-#include "Tf/staticTokens.h"
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
@@ -37,8 +18,6 @@ TF_REGISTRY_FUNCTION(TfType)
 {
   TfType::Define<UsdCollectionAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
-
-TF_DEFINE_PRIVATE_TOKENS(_schemaTokens, (collection));
 
 /* virtual */
 UsdCollectionAPI::~UsdCollectionAPI() {}
@@ -86,6 +65,8 @@ bool UsdCollectionAPI::IsSchemaPropertyBaseName(const TfToken &baseName)
       UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
           UsdTokens->collection_MultipleApplyTemplate_IncludeRoot),
       UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+          UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
+      UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
           UsdTokens->collection_MultipleApplyTemplate_),
       UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
           UsdTokens->collection_MultipleApplyTemplate_Includes),
@@ -114,8 +95,8 @@ bool UsdCollectionAPI::IsCollectionAPIPath(const SdfPath &path, TfToken *name)
     return false;
   }
 
-  if (tokens.size() >= 2 && tokens[0] == _schemaTokens->collection) {
-    *name = TfToken(propertyName.substr(_schemaTokens->collection.GetString().size() + 1));
+  if (tokens.size() >= 2 && tokens[0] == UsdTokens->collection) {
+    *name = TfToken(propertyName.substr(UsdTokens->collection.GetString().size() + 1));
     return true;
   }
 
@@ -210,6 +191,25 @@ UsdAttribute UsdCollectionAPI::CreateIncludeRootAttr(VtValue const &defaultValue
       writeSparsely);
 }
 
+UsdAttribute UsdCollectionAPI::GetMembershipExpressionAttr() const
+{
+  return GetPrim().GetAttribute(_GetNamespacedPropertyName(
+      GetName(), UsdTokens->collection_MultipleApplyTemplate_MembershipExpression));
+}
+
+UsdAttribute UsdCollectionAPI::CreateMembershipExpressionAttr(VtValue const &defaultValue,
+                                                              bool writeSparsely) const
+{
+  return UsdSchemaBase::_CreateAttr(
+      _GetNamespacedPropertyName(GetName(),
+                                 UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
+      SdfValueTypeNames->PathExpression,
+      /* custom = */ false,
+      SdfVariabilityUniform,
+      defaultValue,
+      writeSparsely);
+}
+
 UsdAttribute UsdCollectionAPI::GetCollectionAttr() const
 {
   return GetPrim().GetAttribute(
@@ -272,6 +272,7 @@ const TfTokenVector &UsdCollectionAPI::GetSchemaAttributeNames(bool includeInher
   static TfTokenVector localNames = {
       UsdTokens->collection_MultipleApplyTemplate_ExpansionRule,
       UsdTokens->collection_MultipleApplyTemplate_IncludeRoot,
+      UsdTokens->collection_MultipleApplyTemplate_MembershipExpression,
       UsdTokens->collection_MultipleApplyTemplate_,
   };
   static TfTokenVector allNames = _ConcatenateAttributeNames(
@@ -464,6 +465,62 @@ bool UsdCollectionAPI::HasNoIncludedPaths() const
   return includes.empty() && !includeRoot;
 }
 
+SdfPathExpression UsdCollectionAPI::ResolveCompleteMembershipExpression() const
+{
+  SdfPathExpression thisExpr;
+  UsdPrim thisPrim = GetPrim();
+
+  if (!thisPrim || !GetMembershipExpressionAttr().Get(&thisExpr)) {
+    return thisExpr;
+  }
+
+  // Resolve any references.
+  auto resolveRefs = [&](SdfPathExpression::ExpressionReference const &ref) {
+    // We support references like %<path>:<name> and %:<name>.  In both
+    // cases they identify a collection API, the latter is just shorthand
+    // for the named collection on this collection prim.
+    if (ref.name.empty()) {
+      TF_CODING_ERROR(
+          "Unexpected reference to empty name in expression '%s' from "
+          "collection '%s' on prim <%s>; substituting empty expression",
+          thisExpr.GetText().c_str(),
+          GetName().GetText(),
+          thisPrim.GetPath().GetAsString().c_str());
+      return SdfPathExpression::Nothing();
+    }
+
+    // Replace "weaker" references with Nothing.
+    if (ref == SdfPathExpression::ExpressionReference::Weaker()) {
+      return SdfPathExpression::Nothing();
+    }
+
+    TfToken collectionName{ref.name};
+    UsdPrim collectionPrim = ref.path.IsEmpty() ? GetPrim() :
+                                                  thisPrim.GetStage()->GetPrimAtPath(ref.path);
+
+    UsdCollectionAPI refCollection = UsdCollectionAPI(collectionPrim, collectionName);
+
+    // If we can't find a prim, warn and resolve the reference to
+    // Nothing.
+    if (!refCollection) {
+      TF_WARN(
+          "No collection at path <%s> resolving references in "
+          "expression '%s' from collection '%s' on prim <%s>; "
+          "substituting empty expression",
+          ref.path.GetAsString().c_str(),
+          thisExpr.GetText().c_str(),
+          GetName().GetText(),
+          thisPrim.GetPath().GetAsString().c_str());
+      return SdfPathExpression::Nothing();
+    }
+
+    // Get the referenced collection expr fully resolved, and insert that.
+    return refCollection.ResolveCompleteMembershipExpression();
+  };
+
+  return thisExpr.ResolveReferences(resolveRefs);
+}
+
 UsdCollectionMembershipQuery UsdCollectionAPI::ComputeMembershipQuery() const
 {
   UsdCollectionMembershipQuery query;
@@ -480,6 +537,19 @@ void UsdCollectionAPI::ComputeMembershipQuery(UsdCollectionMembershipQuery *quer
 
   SdfPathSet chainedCollectionPaths{GetCollectionPath()};
   _ComputeMembershipQueryImpl(query, chainedCollectionPaths);
+
+  // Now embed the expression evaluator & the top-level expansion rule.
+  TfToken expRule;
+  GetExpansionRuleAttr().Get(&expRule);
+  if (expRule.IsEmpty()) {
+    expRule = UsdTokens->expandPrims;
+  }
+
+  PathExpansionRuleMap map = query->GetAsPathExpansionRuleMap();
+  SdfPathSet collections = query->GetIncludedCollections();
+
+  *query = UsdCollectionMembershipQuery(std::move(map), std::move(collections), expRule);
+  query->SetExpressionEvaluator({GetPrim().GetStage(), ResolveCompleteMembershipExpression()});
 }
 
 void UsdCollectionAPI::_ComputeMembershipQueryImpl(UsdCollectionMembershipQuery *query,

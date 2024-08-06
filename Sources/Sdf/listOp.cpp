@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/listOp.h"
@@ -34,9 +17,7 @@
 #include "Tf/token.h"
 #include "Tf/type.h"
 #include "Trace/traceImpl.h"
-#include <pxr/pxrns.h>
-
-#include <boost/optional.hpp>
+#include "pxr/pxrns.h"
 
 #include <ostream>
 
@@ -289,7 +270,7 @@ void SdfListOp<T>::ApplyOperations(ItemVector *vec, const ApplyCallback &cb) con
 }
 
 template<typename T>
-boost::optional<SdfListOp<T>> SdfListOp<T>::ApplyOperations(const SdfListOp<T> &inner) const
+std::optional<SdfListOp<T>> SdfListOp<T>::ApplyOperations(const SdfListOp<T> &inner) const
 {
   if (IsExplicit()) {
     // Explicit list-op replaces the result entirely.
@@ -361,7 +342,7 @@ boost::optional<SdfListOp<T>> SdfListOp<T>::ApplyOperations(const SdfListOp<T> &
   // and there is no way to express the relative order dependency
   // between 0 and 1.
   //
-  return boost::optional<SdfListOp<T>>();
+  return std::optional<SdfListOp<T>>();
 }
 
 template<class ItemType, class ListType, class MapType>
@@ -406,7 +387,7 @@ void SdfListOp<T>::_AddKeys(SdfListOpType op,
   TF_FOR_ALL(i, GetItems(op))
   {
     if (callback) {
-      if (boost::optional<T> item = callback(op, *i)) {
+      if (std::optional<T> item = callback(op, *i)) {
         // Only append if the item isn't already present.
         _InsertIfUnique(*item, result, search);
       }
@@ -426,7 +407,7 @@ void SdfListOp<T>::_PrependKeys(SdfListOpType op,
   const ItemVector &items = GetItems(op);
   if (callback) {
     for (auto i = items.rbegin(), iEnd = items.rend(); i != iEnd; ++i) {
-      if (boost::optional<T> mappedItem = callback(op, *i)) {
+      if (std::optional<T> mappedItem = callback(op, *i)) {
         _InsertOrMove(*mappedItem, result->begin(), result, search);
       }
     }
@@ -447,7 +428,7 @@ void SdfListOp<T>::_AppendKeys(SdfListOpType op,
   const ItemVector &items = GetItems(op);
   if (callback) {
     for (const T &item : items) {
-      if (boost::optional<T> mappedItem = callback(op, item)) {
+      if (std::optional<T> mappedItem = callback(op, item)) {
         _InsertOrMove(*mappedItem, result->end(), result, search);
       }
     }
@@ -468,7 +449,7 @@ void SdfListOp<T>::_DeleteKeys(SdfListOpType op,
   TF_FOR_ALL(i, GetItems(op))
   {
     if (callback) {
-      if (boost::optional<T> item = callback(op, *i)) {
+      if (std::optional<T> item = callback(op, *i)) {
         _RemoveIfPresent(*item, result, search);
       }
     }
@@ -490,7 +471,7 @@ void SdfListOp<T>::_ReorderKeys(SdfListOpType op,
   TF_FOR_ALL(i, GetItems(op))
   {
     if (callback) {
-      if (boost::optional<T> item = callback(op, *i)) {
+      if (std::optional<T> item = callback(op, *i)) {
         if (orderSet.insert(*item).second) {
           order.push_back(*item);
         }
@@ -546,10 +527,10 @@ static inline bool _ModifyCallbackHelper(const typename SdfListOp<T>::ModifyCall
   TfDenseHashSet<T, TfHash> existingSet;
 
   for (const T &item : *itemVector) {
-    boost::optional<T> modifiedItem = cb(item);
+    std::optional<T> modifiedItem = cb(item);
     if (removeDuplicates && modifiedItem) {
       if (!existingSet.insert(*modifiedItem).second) {
-        modifiedItem = boost::none;
+        modifiedItem = std::nullopt;
       }
     }
 

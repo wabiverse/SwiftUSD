@@ -1,25 +1,8 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef HD_MATERIAL_NETWORK_2_INTERFACE_H
 #define HD_MATERIAL_NETWORK_2_INTERFACE_H
@@ -27,7 +10,7 @@
 #include "Hd/api.h"
 #include "Hd/material.h"
 #include "Hd/materialNetworkInterface.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,9 +28,16 @@ class HdMaterialNetwork2Interface : public HdMaterialNetworkInterface {
   {
   }
 
+  HD_API
   SdfPath GetMaterialPrimPath() const override
   {
     return _materialPrimPath;
+  }
+
+  HD_API
+  std::string GetModelAssetName() const override
+  {
+    return std::string();
   }
 
   HD_API
@@ -69,6 +59,10 @@ class HdMaterialNetwork2Interface : public HdMaterialNetworkInterface {
   VtValue GetNodeParameterValue(const TfToken &nodeName, const TfToken &paramName) const override;
 
   HD_API
+  NodeParamData GetNodeParameterData(const TfToken &nodeName,
+                                     const TfToken &paramName) const override;
+
+  HD_API
   TfTokenVector GetNodeInputConnectionNames(const TfToken &nodeName) const override;
 
   HD_API
@@ -85,6 +79,11 @@ class HdMaterialNetwork2Interface : public HdMaterialNetworkInterface {
   void SetNodeParameterValue(const TfToken &nodeName,
                              const TfToken &paramName,
                              const VtValue &value) override;
+
+  HD_API
+  void SetNodeParameterData(const TfToken &nodeName,
+                            const TfToken &paramName,
+                            const NodeParamData &paramData) override;
 
   HD_API
   void DeleteNodeParameter(const TfToken &nodeName, const TfToken &paramName) override;

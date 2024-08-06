@@ -1,33 +1,17 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 ///
 /// \file Pcp/Utils.cpp
 
 #include "Pcp/utils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Pcp/expressionVariables.h"
+#include "Pcp/mapExpression.h"
 #include "Sdf/fileFormat.h"
 #include "Sdf/layer.h"
 #include "Sdf/variableExpression.h"
@@ -125,6 +109,14 @@ const SdfLayer::FileFormatArguments &Pcp_GetArgumentsForFileFormatTarget(
   return *localArgs;
 }
 
+void Pcp_StripFileFormatTarget(const std::string &target, SdfLayer::FileFormatArguments *args)
+{
+  auto targetIt = args->find(SdfFileFormatTokens->TargetArg);
+  if (targetIt != args->end() && targetIt->second == target) {
+    args->erase(targetIt);
+  }
+}
+
 std::pair<PcpNodeRef, PcpNodeRef> Pcp_FindStartingNodeOfClassHierarchy(const PcpNodeRef &n)
 {
   TF_VERIFY(PcpIsClassBasedArc(n.GetArcType()));
@@ -142,6 +134,58 @@ std::pair<PcpNodeRef, PcpNodeRef> Pcp_FindStartingNodeOfClassHierarchy(const Pcp
   }
 
   return std::make_pair(instanceNode, classNode);
+}
+
+std::pair<SdfPath, PcpNodeRef> Pcp_TranslatePathFromNodeToRootOrClosestNode(const PcpNodeRef &node,
+                                                                            const SdfPath &path)
+{
+  if (node.IsRootNode()) {
+    // If the given node is already the root node, nothing to do.
+    return std::make_pair(path, node);
+  }
+
+  // Start at the given node and path. We strip all variant selections
+  // from the path because namespace mappings never include them.
+  PcpNodeRef curNode = node;
+  SdfPath curPath = path.StripAllVariantSelections();
+
+  // First, try translating directly to the root node. If that fails,
+  // walk up from the given node to the root node, translating at each
+  // step until the translation fails.
+  if (SdfPath pathInRootNode = node.GetMapToRoot().MapSourceToTarget(curPath);
+      !pathInRootNode.IsEmpty())
+  {
+    curNode = node.GetRootNode();
+    curPath = std::move(pathInRootNode);
+  }
+  else {
+    while (!curNode.IsRootNode()) {
+      SdfPath pathInParentNode = curNode.GetMapToParent().MapSourceToTarget(curPath);
+      if (pathInParentNode.IsEmpty()) {
+        break;
+      }
+
+      curNode = curNode.GetParentNode();
+      curPath = std::move(pathInParentNode);
+    }
+  }
+
+  // If curNode's path contains a variant selection, do a prefix
+  // replacement to apply that selection to the translated path.
+  //
+  // We don't check curNode.GetArcType() == PcpArcTypeVariant
+  // because curNode may be the root node of a prim index that
+  // is being recursively computed to pick up ancestral opinions.
+  // In that case, curNode's "real" arc type once it's added to
+  // main prim index being computed isn't available here.
+  if (const SdfPath pathAtIntro = curNode.GetPathAtIntroduction();
+      pathAtIntro.ContainsPrimVariantSelection())
+  {
+
+    curPath = curPath.ReplacePrefix(pathAtIntro.StripAllVariantSelections(), pathAtIntro);
+  }
+
+  return std::make_pair(curPath, curNode);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

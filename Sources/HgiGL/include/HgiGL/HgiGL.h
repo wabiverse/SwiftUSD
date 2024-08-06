@@ -1,7 +1,7 @@
-#ifndef __PXR_IMAGING_HGI_GL_HGIGL_H__
-#define __PXR_IMAGING_HGI_GL_HGIGL_H__
+#ifndef __PXR_IMAGING_HGIGL_H__
+#define __PXR_IMAGING_HGIGL_H__
 
-// hgiGL.
+// HgiGL
 #include <HgiGL/api.h>
 #include <HgiGL/blitCmds.h>
 #include <HgiGL/buffer.h>
@@ -27,4 +27,4 @@
 #include <HgiGL/shaderSection.h>
 #include <HgiGL/texture.h>
 
-#endif /* __PXR_IMAGING_HGI_GL_HGIGL_H__ */
+#endif  // __PXR_IMAGING_HGIGL_H__

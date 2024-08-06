@@ -85,9 +85,8 @@
 #ifndef PXR_HALF_H
 #define PXR_HALF_H
 
-#include <pxr/pxrns.h>
-
 #include "Gf/api.h"
+#include "pxr/pxrns.h"
 
 #include <iosfwd>
 

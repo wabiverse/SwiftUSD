@@ -1,25 +1,8 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "UsdShade/shaderDefUtils.h"
 
@@ -307,20 +290,12 @@ static SdrShaderPropertyUniquePtr _CreateSdrShaderProperty(const ShaderProperty 
     }
   }
 
-  // If sdrUsdDefinitionType is not already set, we try to have it set in
-  // order to save the SdfValueTypeName set for this property. This makes sure
-  // ShaderProperty::GetAsSdfType and ShaderProperty::GetDefaultValueAsSdfType
-  // return appropriate result.
-  if (metadata.find(SdrPropertyMetadata->SdrUsdDefinitionType) == metadata.end()) {
-    // Note that currently we only have a usecase where bool properties are
-    // marked with sdrUsdDefinitionType, but this may be extended for other
-    // types in future, example Asset or AssetArray. When this happens, it
-    // would be good to break this logic in its own little helper function.
-    const SdfValueTypeName &sdfTypeName = shaderProperty.GetTypeName();
-    if (sdfTypeName == SdfValueTypeNames->Bool) {
-      metadata[SdrPropertyMetadata->SdrUsdDefinitionType] = sdfTypeName.GetType().GetTypeName();
-    }
-  }
+  // Since sdr types are a subset of SdfValueTypeNames, we save the original
+  // types defined in the usdShadeShaderDef representation in the
+  // SdrUsdDefinitionType metadata, which can then be used by
+  // SdrShaderProperty::GetTypeAsSdfType.
+  metadata[SdrPropertyMetadata->SdrUsdDefinitionType] =
+      shaderProperty.GetTypeName().GetAliasesAsTokens()[0].GetString();
 
   TfToken propertyType;
   size_t arraySize;

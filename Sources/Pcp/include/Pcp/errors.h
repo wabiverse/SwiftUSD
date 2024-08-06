@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_ERRORS_H
 #define PXR_USD_PCP_ERRORS_H
@@ -30,7 +13,7 @@
 #include "Sdf/layer.h"
 #include "Sdf/layerOffset.h"
 #include "Sdf/path.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <memory>
 #include <string>
@@ -45,6 +28,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 enum PcpErrorType {
   PcpErrorType_ArcCycle,
   PcpErrorType_ArcPermissionDenied,
+  PcpErrorType_ArcToProhibitedChild,
   PcpErrorType_IndexCapacityExceeded,
   PcpErrorType_ArcCapacityExceeded,
   PcpErrorType_ArcNamespaceDepthCapacityExceeded,
@@ -63,6 +47,9 @@ enum PcpErrorType {
   PcpErrorType_InvalidSublayerPath,
   PcpErrorType_InvalidVariantSelection,
   PcpErrorType_MutedAssetPath,
+  PcpErrorType_InvalidAuthoredRelocation,
+  PcpErrorType_InvalidConflictingRelocation,
+  PcpErrorType_InvalidSameTargetRelocations,
   PcpErrorType_OpinionAtRelocationSource,
   PcpErrorType_PrimPermissionDenied,
   PcpErrorType_PropertyPermissionDenied,
@@ -158,6 +145,41 @@ class PcpErrorArcPermissionDenied : public PcpErrorBase {
  private:
   /// Constructor is private. Use New() instead.
   PcpErrorArcPermissionDenied();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Forward declarations:
+class PcpErrorArcToProhibitedChild;
+typedef std::shared_ptr<PcpErrorArcToProhibitedChild> PcpErrorArcToProhibitedChildPtr;
+
+/// \class PcpErrorArcToProhibitedChild
+///
+/// Arcs that were not made between PcpNodes because the target is a prohibited
+/// child prim of its parent due to relocations.
+///
+class PcpErrorArcToProhibitedChild : public PcpErrorBase {
+ public:
+  /// Returns a new error object.
+  static PcpErrorArcToProhibitedChildPtr New();
+  /// Destructor.
+  PCP_API ~PcpErrorArcToProhibitedChild() override;
+  /// Converts error to string message.
+  PCP_API std::string ToString() const override;
+
+  /// The site where the invalid arc was expressed.
+  PcpSite site;
+  /// The target site of the invalid arc which is a prohibited child.
+  PcpSite targetSite;
+  /// The site of the node under targetSite that is a relocation source in its
+  /// layer stack.
+  PcpSite relocationSourceSite;
+  /// The type of arc.
+  PcpArcType arcType;
+
+ private:
+  /// Constructor is private. Use New() instead.
+  PcpErrorArcToProhibitedChild();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -649,6 +671,154 @@ class PcpErrorInvalidSublayerPath : public PcpErrorBase {
  private:
   /// Constructor is private. Use New() instead.
   PcpErrorInvalidSublayerPath();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Forward declarations:
+class PcpErrorRelocationBase;
+typedef std::shared_ptr<PcpErrorRelocationBase> PcpErrorRelocationBasePtr;
+
+/// \class PcpErrorRelocationBase
+///
+/// Base class for composition errors related to relocates.
+///
+class PcpErrorRelocationBase : public PcpErrorBase {
+ public:
+  /// Destructor.
+  PCP_API ~PcpErrorRelocationBase() override;
+
+ protected:
+  PcpErrorRelocationBase(PcpErrorType errorType);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Forward declarations:
+class PcpErrorInvalidAuthoredRelocation;
+typedef std::shared_ptr<PcpErrorInvalidAuthoredRelocation> PcpErrorInvalidAuthoredRelocationPtr;
+
+/// \class PcpErrorInvalidAuthoredRelocation
+///
+/// Invalid authored relocation found in a relocates field.
+///
+class PcpErrorInvalidAuthoredRelocation : public PcpErrorRelocationBase {
+ public:
+  /// Returns a new error object.
+  static PcpErrorInvalidAuthoredRelocationPtr New();
+  /// Destructor.
+  PCP_API ~PcpErrorInvalidAuthoredRelocation() override;
+  /// Converts error to string message.
+  PCP_API std::string ToString() const override;
+
+  /// The source path of the invalid relocation.
+  SdfPath sourcePath;
+  /// The target path of the invalid relocation.
+  SdfPath targetPath;
+  /// The layer containing the authored relocates.
+  SdfLayerHandle layer;
+  /// The path to the prim where the relocates is authored.
+  SdfPath owningPath;
+
+  /// Additional messages about the error.
+  std::string messages;
+
+ private:
+  PcpErrorInvalidAuthoredRelocation();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Forward declarations:
+class PcpErrorInvalidConflictingRelocation;
+typedef std::shared_ptr<PcpErrorInvalidConflictingRelocation>
+    PcpErrorInvalidConflictingRelocationPtr;
+
+/// \class PcpErrorInvalidConflictingRelocation
+///
+/// Relocation conflicts with another relocation in the layer stack.
+///
+class PcpErrorInvalidConflictingRelocation : public PcpErrorRelocationBase {
+ public:
+  /// Returns a new error object.
+  static PcpErrorInvalidConflictingRelocationPtr New();
+  /// Destructor.
+  PCP_API ~PcpErrorInvalidConflictingRelocation() override;
+  /// Converts error to string message.
+  PCP_API std::string ToString() const override;
+
+  /// The source path of the invalid relocation.
+  SdfPath sourcePath;
+  /// The target path of the invalid relocation.
+  SdfPath targetPath;
+  /// The layer containing the authored relocates.
+  SdfLayerHandle layer;
+  /// The path to the prim where the relocates is authored.
+  SdfPath owningPath;
+
+  /// The source path of the relocation this conflicts with.
+  SdfPath conflictSourcePath;
+  /// The target path of the relocation this conflicts with.
+  SdfPath conflictTargetPath;
+  /// The layer containing the authored relocation this conflicts with.
+  SdfLayerHandle conflictLayer;
+  /// The path to the prim where the relocation this conflicts with is authored.
+  SdfPath conflictOwningPath;
+
+  /// Enumeration of reasons a relocate can be in conflict with another
+  /// relocate.
+  enum class ConflictReason {
+    TargetIsConflictSource,
+    SourceIsConflictTarget,
+    TargetIsConflictSourceDescendant,
+    SourceIsConflictSourceDescendant
+  };
+
+  /// The reason the relocate is a conflict.
+  ConflictReason conflictReason;
+
+ private:
+  PcpErrorInvalidConflictingRelocation();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Forward declarations:
+class PcpErrorInvalidSameTargetRelocations;
+typedef std::shared_ptr<PcpErrorInvalidSameTargetRelocations>
+    PcpErrorInvalidSameTargetRelocationsPtr;
+
+/// \class PcpErrorInvalidSameTargetRelocations
+///
+/// Multiple relocations in the layer stack have the same target.
+///
+class PcpErrorInvalidSameTargetRelocations : public PcpErrorRelocationBase {
+ public:
+  /// Returns a new error object.
+  static PcpErrorInvalidSameTargetRelocationsPtr New();
+  /// Destructor.
+  PCP_API ~PcpErrorInvalidSameTargetRelocations() override;
+  /// Converts error to string message.
+  PCP_API std::string ToString() const override;
+
+  /// The target path of the multiple invalid relocations.
+  SdfPath targetPath;
+
+  /// Info about each relocate source that has the same target path.
+  struct RelocationSource {
+    /// The source path of the invalid relocation.
+    SdfPath sourcePath;
+    /// The layer containing the authored relocates.
+    SdfLayerHandle layer;
+    /// The path to the prim where the relocates is authored.
+    SdfPath owningPath;
+  };
+
+  /// The sources of all relocates that relocate to the target path.
+  std::vector<RelocationSource> sources;
+
+ private:
+  PcpErrorInvalidSameTargetRelocations();
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -42,4 +42,7 @@
 #include <UsdGeom/xformOp.h>
 #include <UsdGeom/xformable.h>
 
+#include <UsdGeom/capsule_1.h>
+#include <UsdGeom/cylinder_1.h>
+#include <UsdGeom/tetMesh.h>
 #endif  // __PXR_USD_USDGEOM_H__

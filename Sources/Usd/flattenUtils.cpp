@@ -1,29 +1,13 @@
 //
 // Copyright 2019 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Usd/flattenUtils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
+#include "Ar/resolver.h"
 #include "Ar/resolverContextBinder.h"
 #include "Pcp/composeSite.h"
 #include "Pcp/expressionVariables.h"
@@ -50,6 +34,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <optional>
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -77,6 +62,9 @@ template<typename T> VtValue _Reduce(const T &lhs, const T &rhs)
 // "Fix" a list op to only use composable features.
 template<typename T> SdfListOp<T> _FixListOp(SdfListOp<T> op)
 {
+  if (op.IsExplicit()) {
+    return op;
+  }
   std::vector<T> items;
   items = op.GetAppendedItems();
   for (const T &item : op.GetAddedItems()) {
@@ -90,18 +78,33 @@ template<typename T> SdfListOp<T> _FixListOp(SdfListOp<T> op)
   return op;
 }
 
+// List ops that use added or reordered items cannot, in general, be
+// composed into another listop. In those cases, we fall back to a
+// best-effort approximation by discarding reorders and converting
+// adds to appends.
+static void _FixListOpValue(VtValue *v)
+{
+#define FIX_LISTOP_TYPE(T) \
+  if (v->IsHolding<T>()) { \
+    *v = _FixListOp(v->UncheckedGet<T>()); \
+    return; \
+  }
+  FIX_LISTOP_TYPE(SdfIntListOp);
+  FIX_LISTOP_TYPE(SdfUIntListOp);
+  FIX_LISTOP_TYPE(SdfInt64ListOp);
+  FIX_LISTOP_TYPE(SdfUInt64ListOp);
+  FIX_LISTOP_TYPE(SdfTokenListOp);
+  FIX_LISTOP_TYPE(SdfStringListOp);
+  FIX_LISTOP_TYPE(SdfPathListOp);
+  FIX_LISTOP_TYPE(SdfPayloadListOp);
+  FIX_LISTOP_TYPE(SdfReferenceListOp);
+  FIX_LISTOP_TYPE(SdfUnregisteredValueListOp);
+}
+
 template<typename T> VtValue _Reduce(const SdfListOp<T> &lhs, const SdfListOp<T> &rhs)
 {
-  boost::optional<SdfListOp<T>> r = lhs.ApplyOperations(rhs);
-  if (r) {
-    return VtValue(*r);
-  }
-  // List ops that use added or reordered items cannot, in general, be
-  // composed into another listop. In those cases, we fall back to a
-  // best-effort approximation by discarding reorders and converting
-  // adds to appends.
-  r = _FixListOp(lhs).ApplyOperations(_FixListOp(rhs));
-  if (r) {
+  // We assume the caller has already applied _FixListOp()
+  if (std::optional<SdfListOp<T>> r = lhs.ApplyOperations(rhs)) {
     return VtValue(*r);
   }
   // The approximation used should always be composable,
@@ -124,6 +127,13 @@ template<> VtValue _Reduce(const SdfVariantSelectionMap &lhs, const SdfVariantSe
     result[entry.first] = entry.second;
   }
   return VtValue(result);
+}
+
+template<> VtValue _Reduce(const SdfRelocates &lhs, const SdfRelocates &rhs)
+{
+  SdfRelocates result(lhs);
+  result.insert(result.end(), rhs.begin(), rhs.end());
+  return VtValue::Take(result);
 }
 
 template<> VtValue _Reduce(const SdfSpecifier &lhs, const SdfSpecifier &rhs)
@@ -179,6 +189,7 @@ VtValue _Reduce(const VtValue &lhs, const VtValue &rhs, const TfToken &field)
   TYPE_DISPATCH(SdfReferenceListOp);
   TYPE_DISPATCH(SdfUnregisteredValueListOp);
   TYPE_DISPATCH(VtDictionary);
+  TYPE_DISPATCH(SdfRelocates);
   TYPE_DISPATCH(SdfTimeSampleMap);
   TYPE_DISPATCH(SdfVariantSelectionMap);
 #undef TYPE_DISPATCH
@@ -209,12 +220,12 @@ static void _ApplyLayerOffsetToClipInfo(const SdfLayerOffset &offset,
 }
 
 template<class RefOrPayloadType>
-static boost::optional<RefOrPayloadType> _ApplyLayerOffsetToRefOrPayload(
+static std::optional<RefOrPayloadType> _ApplyLayerOffsetToRefOrPayload(
     const SdfLayerOffset &offset, const RefOrPayloadType &refOrPayload)
 {
   RefOrPayloadType result = refOrPayload;
   result.SetLayerOffset(offset * refOrPayload.GetLayerOffset());
-  return boost::optional<RefOrPayloadType>(result);
+  return std::optional<RefOrPayloadType>(result);
 }
 
 // Apply layer offsets (time remapping) to time-keyed metadata.
@@ -268,14 +279,14 @@ using _ResolveAssetPathFn =
     std::function<std::string(const SdfLayerHandle &sourceLayer, const std::string &assetPath)>;
 
 template<class RefOrPayloadType>
-static boost::optional<RefOrPayloadType> _FixReferenceOrPayload(
+static std::optional<RefOrPayloadType> _FixReferenceOrPayload(
     const _ResolveAssetPathFn &resolveAssetPathFn,
     const SdfLayerHandle &sourceLayer,
     const RefOrPayloadType &refOrPayload)
 {
   RefOrPayloadType result = refOrPayload;
   result.SetAssetPath(resolveAssetPathFn(sourceLayer, refOrPayload.GetAssetPath()));
-  return boost::optional<RefOrPayloadType>(result);
+  return std::optional<RefOrPayloadType>(result);
 }
 
 static void _FixAssetPaths(const SdfLayerHandle &sourceLayer,
@@ -452,6 +463,8 @@ static VtValue _ReduceField(const PcpLayerStackRefPtr &layerStack,
     }
     // Fix asset paths.
     _FixAssetPaths(layers[i], field, resolveAssetPathFn, &layerVal);
+    // Fix any list ops
+    _FixListOpValue(&layerVal);
     val = _Reduce(val, layerVal, field);
   }
   return val;
@@ -737,8 +750,22 @@ std::string UsdFlattenLayerStackResolveAssetPath(const SdfLayerHandle &sourceLay
 {
   // Treat empty asset paths specially, since they cause coding errors in
   // SdfComputeAssetPathRelativeToLayer.
-  return assetPath.empty() ? assetPath :
-                             SdfComputeAssetPathRelativeToLayer(sourceLayer, assetPath);
+
+  if (assetPath.empty()) {
+    return assetPath;
+  }
+
+  // If anchoring has no effect on asset path, return it as-is. For additional
+  // details, please see comments in _MakeResolvedAssetPathsImpl in stage.cpp.
+  const std::string anchoredPath = SdfComputeAssetPathRelativeToLayer(sourceLayer, assetPath);
+
+  const std::string unanchoredPath = ArGetResolver().CreateIdentifier(assetPath);
+
+  if (unanchoredPath == anchoredPath) {
+    return assetPath;
+  }
+
+  return anchoredPath;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

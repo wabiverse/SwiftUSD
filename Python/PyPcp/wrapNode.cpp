@@ -1,30 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Pcp/node.h"
 #include "Pcp/node_Iterator.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/pyResultConversions.h"
 
@@ -53,55 +36,89 @@ static PcpNodeRefVector _GetChildren(const PcpNodeRef &node)
   return Pcp_GetChildren(node);
 }
 
+// Test function to retrieve an invalid PcpNodeRef in Python
+static PcpNodeRef _GetInvalidPcpNode()
+{
+  return {};
+}
+
 }  // anonymous namespace
+
+// We override __getattribute__ for PcpNode to check object validity and raise
+// an exception instead of crashing from Python.
+
+// Store the original __getattribute__ so we can dispatch to it after verifying
+// validity.
+static TfStaticData<TfPyObjWrapper> _object__getattribute__;
+
+// This function gets wrapped as __getattribute__ on PcpNodeRef.
+static object __getattribute__(object selfObj, const char *name)
+{
+  // Allow attribute lookups if the attribute name starts with '__', or if the
+  // node is valid.
+  if ((name[0] == '_' && name[1] == '_') || bool(extract<PcpNodeRef &>(selfObj)())) {
+    // Dispatch to object's __getattribute__.
+    return (*_object__getattribute__)(selfObj, name);
+  }
+  else {
+    // Otherwise raise a runtime error.
+    TfPyThrowRuntimeError(TfStringPrintf("Invalid access to %s", TfPyRepr(selfObj).c_str()));
+  }
+  // Unreachable.
+  return object();
+}
 
 void wrapNode()
 {
+
+  def("_GetInvalidPcpNode", &_GetInvalidPcpNode);
+
   typedef PcpNodeRef This;
 
-  scope s =
-      class_<This>("NodeRef", no_init)
+  class_<This> clsObj("NodeRef", no_init);
+  clsObj.add_property("site", &This::GetSite)
+      .add_property("path", make_function(&This::GetPath, return_value_policy<return_by_value>()))
+      .add_property("layerStack",
+                    make_function(&This::GetLayerStack, return_value_policy<return_by_value>()))
 
-          .add_property("site", &This::GetSite)
-          .add_property("path",
-                        make_function(&This::GetPath, return_value_policy<return_by_value>()))
-          .add_property(
-              "layerStack",
-              make_function(&This::GetLayerStack, return_value_policy<return_by_value>()))
+      .add_property("parent", &_GetParentNode)
+      .add_property("origin", &_GetOriginNode)
+      .add_property("children",
+                    make_function(&_GetChildren, return_value_policy<TfPySequenceToList>()))
 
-          .add_property("parent", &_GetParentNode)
-          .add_property("origin", &_GetOriginNode)
-          .add_property("children",
-                        make_function(&_GetChildren, return_value_policy<TfPySequenceToList>()))
+      .add_property("arcType", &This::GetArcType)
+      .add_property("mapToParent",
+                    make_function(&This::GetMapToParent, return_value_policy<return_by_value>()))
+      .add_property("mapToRoot",
+                    make_function(&This::GetMapToRoot, return_value_policy<return_by_value>()))
 
-          .add_property("arcType", &This::GetArcType)
-          .add_property(
-              "mapToParent",
-              make_function(&This::GetMapToParent, return_value_policy<return_by_value>()))
-          .add_property("mapToRoot",
-                        make_function(&This::GetMapToRoot, return_value_policy<return_by_value>()))
+      .add_property("siblingNumAtOrigin", &This::GetSiblingNumAtOrigin)
+      .add_property("namespaceDepth", &This::GetNamespaceDepth)
 
-          .add_property("siblingNumAtOrigin", &This::GetSiblingNumAtOrigin)
-          .add_property("namespaceDepth", &This::GetNamespaceDepth)
+      .add_property("hasSymmetry", &This::HasSymmetry)
+      .add_property("hasSpecs", &This::HasSpecs)
+      .add_property("isInert", &This::IsInert)
+      .add_property("isCulled", &This::IsCulled)
+      .add_property("isRestricted", &This::IsRestricted)
+      .add_property("permission", &This::GetPermission)
 
-          .add_property("hasSymmetry", &This::HasSymmetry)
-          .add_property("hasSpecs", &This::HasSpecs)
-          .add_property("isInert", &This::IsInert)
-          .add_property("isCulled", &This::IsCulled)
-          .add_property("isRestricted", &This::IsRestricted)
-          .add_property("permission", &This::GetPermission)
+      .def("GetRootNode", &_GetRootNode)
+      .def("GetOriginRootNode", &_GetOriginRootNode)
 
-          .def("GetRootNode", &_GetRootNode)
-          .def("GetOriginRootNode", &_GetOriginRootNode)
+      .def("IsRootNode", &This::IsRootNode)
+      .def("IsDueToAncestor", &This::IsDueToAncestor)
+      .def("GetDepthBelowIntroduction", &This::GetDepthBelowIntroduction)
+      .def("GetIntroPath", &This::GetIntroPath)
+      .def("GetPathAtIntroduction", &This::GetPathAtIntroduction)
 
-          .def("IsRootNode", &This::IsRootNode)
-          .def("IsDueToAncestor", &This::IsDueToAncestor)
-          .def("GetDepthBelowIntroduction", &This::GetDepthBelowIntroduction)
-          .def("GetIntroPath", &This::GetIntroPath)
-          .def("GetPathAtIntroduction", &This::GetPathAtIntroduction)
+      .def("CanContributeSpecs", &This::CanContributeSpecs)
+      .def("GetSpecContributionRestrictedDepth", &This::GetSpecContributionRestrictedDepth)
 
-          .def("CanContributeSpecs", &This::CanContributeSpecs)
+      .def(self == self)
+      .def(self != self)
+      .def(!self);
 
-          .def(self == self)
-          .def(self != self);
+  // Save existing __getattribute__ and replace.
+  *_object__getattribute__ = object(clsObj.attr("__getattribute__"));
+  clsObj.def("__getattribute__", __getattribute__);
 }

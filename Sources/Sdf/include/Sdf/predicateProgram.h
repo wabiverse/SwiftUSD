@@ -1,37 +1,19 @@
 //
 // Copyright 2023 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_PREDICATE_PROGRAM_H
 #define PXR_USD_SDF_PREDICATE_PROGRAM_H
 
 #include "Sdf/api.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/functionTraits.h"
 #include "Vt/value.h"
 
-#include "Sdf/invoke.hpp"
 #include "Sdf/predicateExpression.h"
 #include "Sdf/predicateLibrary.h"
 
@@ -64,6 +46,8 @@ SdfPredicateProgram<DomainType> SdfLinkPredicateExpression(
 ///
 template<class DomainType> class SdfPredicateProgram {
  public:
+  using PredicateFunction = typename SdfPredicateLibrary<DomainType>::PredicateFunction;
+
   friend SdfPredicateProgram SdfLinkPredicateExpression<DomainType>(
       SdfPredicateExpression const &expr, SdfPredicateLibrary<DomainType> const &lib);
 
@@ -74,12 +58,29 @@ template<class DomainType> class SdfPredicateProgram {
   }
 
   /// Run the predicate program on \p obj, and return the result.
-  bool operator()(DomainType obj) const
+  SdfPredicateFunctionResult operator()(DomainType const &obj) const
   {
-    bool result = false;
+    SdfPredicateFunctionResult result = SdfPredicateFunctionResult::MakeConstant(false);
     int nest = 0;
     auto funcIter = _funcs.cbegin();
     auto opIter = _ops.cbegin(), opEnd = _ops.cend();
+
+    // The current implementation favors short-circuiting over constance
+    // propagation.  It might be beneficial to avoid short-circuiting when
+    // constancy isn't known, in hopes of establishing constancy.  For
+    // example, if we have 'A or B', and 'A' evaluates to 'true' with
+    // MayVaryOverDescendants, we will skip evaluating B
+    // (short-circuit). This means we would miss the possibility of
+    // upgrading the constancy in case B returned 'true' with
+    // ConstantOverDescendants.  This isn't a simple switch to flip though;
+    // we'd have to do some code restructuring here.
+    //
+    // For posterity, the rules for propagating constancy are the following,
+    // where A and B are the truth-values, and c(A), c(B), are whether or
+    // not the constancy is ConstantOverDescendants for A, B, respectively:
+    //
+    // c(A  or B) =  (A and c(A)) or  (B and c(B)) or (c(A) and c(B))
+    // c(A and B) = (!A and c(A)) or (!B and c(B)) or (c(A) and c(B))
 
     // Helper for short-circuiting "and" and "or" operators.  Advance,
     // ignoring everything until we reach the next Close that brings us to
@@ -112,7 +113,7 @@ template<class DomainType> class SdfPredicateProgram {
     for (; opIter != opEnd; ++opIter) {
       switch (*opIter) {
         case Call:
-          result = static_cast<bool>((*funcIter++)(obj));
+          result.SetAndPropagateConstancy((*funcIter++)(obj));
           break;
         case Not:
           result = !result;
@@ -140,7 +141,7 @@ template<class DomainType> class SdfPredicateProgram {
  private:
   enum _Op { Call, Not, Open, Close, And, Or };
   std::vector<_Op> _ops;
-  std::vector<std::function<SdfPredicateFunctionResult(DomainType)>> _funcs;
+  std::vector<PredicateFunction> _funcs;
 };
 
 /// Link \p expr with \p lib and return a callable program that evaluates \p
@@ -216,7 +217,7 @@ SdfPredicateProgram<DomainType> SdfLinkPredicateExpression(
 
   if (!errs.empty()) {
     prog = {};
-    TF_RUNTIME_ERROR(errs.c_str());
+    TF_RUNTIME_ERROR(errs);
   }
   return prog;
 }

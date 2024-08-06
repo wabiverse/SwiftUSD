@@ -1,25 +1,8 @@
 //
 // Copyright 2019 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_SMALL_VECTOR_H
 #define PXR_BASE_TF_SMALL_VECTOR_H
@@ -27,7 +10,7 @@
 ///
 /// \file
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -45,9 +28,23 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Contains parts of the small vector implementation that do not depend on
 // *all* of TfSmallVector's template parameters.
 class TfSmallVectorBase {
+ protected:
+  // We present the public size_type and difference_type as std::size_t and
+  // std::ptrdiff_t to match std::vector, but internally we store size &
+  // capacity as uint32_t.
+  using _SizeMemberType = std::uint32_t;
+
+  // Union type containing local storage or a pointer to heap storage.
+  template<size_t Size, size_t Align, size_t NumLocal> union _DataUnion;
+
+  // Helper alias to produce the right _DataUnion instantiation for a given
+  // ValueType and NumLocal elements.
+  template<class ValueType, size_t NumLocal>
+  using _Data = _DataUnion<sizeof(ValueType), alignof(ValueType), NumLocal>;
+
  public:
-  using size_type = std::uint32_t;
-  using difference_type = std::int32_t;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
   // Returns the local capacity that may be used without increasing the size
   // of the TfSmallVector.  TfSmallVector<T, N> will never use more local
@@ -59,6 +56,14 @@ class TfSmallVectorBase {
   }
 
  protected:
+  // Enabler used to disambiguate the range-based constructor (begin, end)
+  // from the n-copies constructor (size_t n, value_type const &value)
+  // when the value_type is integral.
+  template<typename _ForwardIterator>
+  using _EnableIfForwardIterator = std::enable_if_t<
+      std::is_convertible_v<typename std::iterator_traits<_ForwardIterator>::iterator_category,
+                            std::forward_iterator_tag>>;
+
   // Invoke std::uninitialized_copy that either moves or copies entries,
   // depending on whether the type is move constructible or not.
   template<typename Iterator>
@@ -78,72 +83,41 @@ class TfSmallVectorBase {
   // The data storage, which is a union of both the local storage, as well
   // as a pointer, holding the address to the remote storage on the heap, if
   // used.
-  template<typename U, size_type M> union _Data {
+  template<size_t Size, size_t Align, size_t NumLocal> union _DataUnion {
    public:
-    U *GetLocalStorage()
+    // XXX: Could in principle assert in calls to GetLocalStorage() when
+    // HasLocal is false. Add dependency on tf/diagnostic.h?
+    static constexpr bool HasLocal = NumLocal != 0;
+
+    void *GetLocalStorage()
     {
-      return reinterpret_cast<U *>(_local);
+      return HasLocal ? _local : nullptr;
+    }
+    const void *GetLocalStorage() const
+    {
+      return HasLocal ? _local : nullptr;
     }
 
-    const U *GetLocalStorage() const
+    void *GetRemoteStorage()
     {
-      return reinterpret_cast<const U *>(_local);
+      return _remote;
     }
-
-    U *GetRemoteStorage()
+    const void *GetRemoteStorage() const
     {
       return _remote;
     }
 
-    const U *GetRemoteStorage() const
-    {
-      return _remote;
-    }
-
-    void SetRemoteStorage(U *p)
+    void SetRemoteStorage(void *p)
     {
       _remote = p;
     }
 
    private:
-    alignas(U) char _local[sizeof(U) * M];
-    U *_remote;
-  };
-
-  // For N == 0 the _Data class has been specialized to elide the local
-  // storage completely. This way we don't have to rely on compiler-specific
-  // support for 0-sized arrays.
-  template<typename U> union _Data<U, 0> {
-   public:
-    U *GetLocalStorage()
-    {
-      // XXX: Could assert here. Introduce dependency on Tf/diagnostic.h?
-      return nullptr;
-    }
-
-    const U *GetLocalStorage() const
-    {
-      // XXX: Could assert here. Introduce dependency on Tf/diagnostic.h?
-      return nullptr;
-    }
-
-    U *GetRemoteStorage()
-    {
-      return _remote;
-    }
-
-    const U *GetRemoteStorage() const
-    {
-      return _remote;
-    }
-
-    void SetRemoteStorage(U *p)
-    {
-      _remote = p;
-    }
-
-   private:
-    U *_remote;
+    // Pointer to heap storage.
+    void *_remote;
+    // Local storage -- min size is sizeof(_remote).
+    alignas(NumLocal == 0 ? std::alignment_of_v<void *> :
+                            Align) char _local[std::max<size_t>(Size * NumLocal, sizeof(_remote))];
   };
 };
 
@@ -181,7 +155,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   /// \name Relevant Typedefs.
   /// @{
 
-  using value_type = T;
+  typedef T value_type;
   typedef T &reference;
   typedef const T &const_reference;
 
@@ -247,7 +221,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
     // If rhs can not be stored locally, take rhs's remote storage and
     // reset rhs to empty.
     if (rhs.size() > N) {
-      _data.SetRemoteStorage(rhs._data.GetRemoteStorage());
+      _SetRemoteStorage(rhs._GetRemoteStorage());
       std::swap(_capacity, rhs._capacity);
     }
 
@@ -264,11 +238,6 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
 
   /// Construct a new vector from initializer list
   TfSmallVector(std::initializer_list<T> values) : TfSmallVector(values.begin(), values.end()) {}
-
-  template<typename _ForwardIterator>
-  using _EnableIfForwardIterator = typename std::enable_if<
-      std::is_convertible<typename std::iterator_traits<_ForwardIterator>::iterator_category,
-                          std::forward_iterator_tag>::value>::type;
 
   /// Creates a new vector containing copies of the data between
   /// \p first and \p last.
@@ -341,9 +310,9 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
     // Both this vector and rhs are stored remotely. Simply swap the
     // pointers, as well as size and capacity.
     else if (!_IsLocal() && !rhs._IsLocal()) {
-      value_type *tmp = _data.GetRemoteStorage();
-      _data.SetRemoteStorage(rhs._data.GetRemoteStorage());
-      rhs._data.SetRemoteStorage(tmp);
+      value_type *tmp = _GetRemoteStorage();
+      _SetRemoteStorage(rhs._GetRemoteStorage());
+      rhs._SetRemoteStorage(tmp);
 
       std::swap(_size, rhs._size);
       std::swap(_capacity, rhs._capacity);
@@ -366,13 +335,13 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
       // source will become the one with the remote storage, so those
       // entries will be essentially freed.
       for (size_type i = 0; i < local->size(); ++i) {
-        _MoveConstruct(remote->_data.GetLocalStorage() + i, &(*local)[i]);
+        _MoveConstruct(remote->_GetLocalStorage() + i, &(*local)[i]);
         (*local)[i].~value_type();
       }
 
       // Swap the remote storage into the vector which previously had the
       // local storage. It's been properly cleaned up now.
-      local->_data.SetRemoteStorage(remoteStorage);
+      local->_SetRemoteStorage(remoteStorage);
 
       // Swap sizes and capacities. Easy peasy.
       std::swap(remote->_size, local->_size);
@@ -413,7 +382,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
       return iterator(p);
     }
 
-    const size_type num = static_cast<unsigned int>(std::distance(p, q));
+    const size_type num = std::distance(p, q);
 
     // Move entries starting at last, down a few slots to starting a it.
     value_type *e = data() + size();
@@ -478,7 +447,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   void assign(ForwardIterator first, ForwardIterator last)
   {
     clear();
-    const size_type newSize = static_cast<unsigned int>(std::distance(first, last));
+    const size_type newSize = std::distance(first, last);
     reserve(newSize);
     std::uninitialized_copy(first, last, begin());
     _size = newSize;
@@ -571,7 +540,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
       // Destroy old data and set up this new buffer.
       _Destruct();
       _FreeStorage();
-      _data.SetRemoteStorage(newStorage);
+      _SetRemoteStorage(newStorage);
       _capacity = nextCapacity;
     }
     else {
@@ -633,7 +602,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   ///
   static constexpr size_type max_size()
   {
-    return std::numeric_limits<size_type>::max();
+    return std::numeric_limits<_SizeMemberType>::max();
   }
 
   /// Returns \c true if this vector is empty.
@@ -760,28 +729,28 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   ///
   reference back()
   {
-    return *(data() + size() - 1);
+    return data()[size() - 1];
   }
 
   /// Returns the last elements in the vector.
   ///
   const_reference back() const
   {
-    return *(data() + size() - 1);
+    return data()[size() - 1];
   }
 
   /// Access the specified element.
   ///
   reference operator[](size_type i)
   {
-    return *(data() + i);
+    return data()[i];
   }
 
   /// Access the specified element.
   ///
   const_reference operator[](size_type i) const
   {
-    return *(data() + i);
+    return data()[i];
   }
 
   /// Direct access to the underlying array.
@@ -813,6 +782,30 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   }
 
  private:
+  // Raw data access.
+  value_type *_GetLocalStorage()
+  {
+    return static_cast<value_type *>(_data.GetLocalStorage());
+  }
+  const value_type *_GetLocalStorage() const
+  {
+    return static_cast<const value_type *>(_data.GetLocalStorage());
+  }
+
+  value_type *_GetRemoteStorage()
+  {
+    return static_cast<value_type *>(_data.GetRemoteStorage());
+  }
+  const value_type *_GetRemoteStorage() const
+  {
+    return static_cast<const value_type *>(_data.GetRemoteStorage());
+  }
+
+  void _SetRemoteStorage(value_type *p)
+  {
+    _data.SetRemoteStorage(static_cast<void *>(p));
+  }
+
   // Returns true if the local storage is used.
   bool _IsLocal() const
   {
@@ -823,21 +816,21 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   // depending on the current capacity.
   value_type *_GetStorage()
   {
-    return _IsLocal() ? _data.GetLocalStorage() : _data.GetRemoteStorage();
+    return _IsLocal() ? _GetLocalStorage() : _GetRemoteStorage();
   }
 
   // Return a const pointer to the storage, which is either local or remote
   // depending on the current capacity.
   const value_type *_GetStorage() const
   {
-    return _IsLocal() ? _data.GetLocalStorage() : _data.GetRemoteStorage();
+    return _IsLocal() ? _GetLocalStorage() : _GetRemoteStorage();
   }
 
   // Free the remotely allocated storage.
   void _FreeStorage()
   {
     if (!_IsLocal()) {
-      free(_data.GetRemoteStorage());
+      free(_GetRemoteStorage());
     }
   }
 
@@ -861,21 +854,21 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   void _InitStorage(size_type size)
   {
     if (size > capacity()) {
-      _data.SetRemoteStorage(_Allocate(size));
+      _SetRemoteStorage(_Allocate(size));
       _capacity = size;
     }
     _size = size;
   }
 
   // Grow the storage to be able to accommodate newCapacity entries. This
-  // always allocates remotes storage.
+  // always allocates remote storage.
   void _GrowStorage(const size_type newCapacity)
   {
     value_type *newStorage = _Allocate(newCapacity);
     _UninitializedMove(begin(), end(), iterator(newStorage));
     _Destruct();
     _FreeStorage();
-    _data.SetRemoteStorage(newStorage);
+    _SetRemoteStorage(newStorage);
     _capacity = newCapacity;
   }
 
@@ -922,7 +915,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
       _Destruct();
       _FreeStorage();
 
-      _data.SetRemoteStorage(newStorage);
+      _SetRemoteStorage(newStorage);
       _capacity = newCapacity;
     }
 
@@ -950,11 +943,11 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   _Data<value_type, N> _data;
 
   // The current size of the vector, i.e. how many entries it contains.
-  size_type _size;
+  _SizeMemberType _size;
 
   // The current capacity of the vector, i.e. how big the currently allocated
   // storage space is.
-  size_type _capacity;
+  _SizeMemberType _capacity;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

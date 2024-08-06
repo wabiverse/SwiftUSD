@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Plug/plugin.h"
@@ -29,22 +12,18 @@
 #include "Tf/pyResultConversions.h"
 #include "Tf/pySingleton.h"
 #include "Tf/stringUtils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/python.hpp>
-#include <boost/range.hpp>
 
 #include <algorithm>
 #include <atomic>
 #include <functional>
 #include <string>
 #include <thread>
-#include <utility>
 #include <vector>
 
-using std::make_pair;
-using std::pair;
 using std::string;
 using std::vector;
 
@@ -116,13 +95,11 @@ struct SharedState : boost::noncopyable {
   std::atomic<size_t> nextAvailable;
 };
 
-template<class Range> string PluginNames(Range const &range)
+template<class It> string PluginNames(const It begin, const It end)
 {
   using std::distance;
-  vector<string> names(distance(boost::begin(range), boost::end(range)));
-  transform(boost::begin(range), boost::end(range), names.begin(), [](PlugPluginPtr const &plug) {
-    return plug->GetName();
-  });
+  vector<string> names(distance(begin, end));
+  transform(begin, end, names.begin(), [](PlugPluginPtr const &plug) { return plug->GetName(); });
   return TfStringJoin(names.begin(), names.end(), ", ");
 }
 
@@ -143,7 +120,7 @@ void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads, bool ve
   // Report any already loaded plugins as skipped.
   if (verbose && alreadyLoaded != plugins.end()) {
     printf("Skipping already-loaded plugins: %s\n",
-           PluginNames(make_pair(alreadyLoaded, plugins.end())).c_str());
+           PluginNames(alreadyLoaded, plugins.end()).c_str());
   }
 
   // Trim the already loaded plugins from the vector.
@@ -163,7 +140,9 @@ void _LoadPluginsConcurrently(PluginPredicateFn pred, size_t numThreads, bool ve
 
   // Report what we're doing.
   if (verbose) {
-    printf("Loading %zu plugins concurrently: %s\n", plugins.size(), PluginNames(plugins).c_str());
+    printf("Loading %zu plugins concurrently: %s\n",
+           plugins.size(),
+           PluginNames(std::cbegin(plugins), std::cend(plugins)).c_str());
   }
 
   // Establish shared state.

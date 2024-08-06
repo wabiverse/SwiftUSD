@@ -18,4 +18,10 @@
 #include <UsdUtils/stitchClips.h>
 #include <UsdUtils/timeCodeRange.h>
 
+#include <UsdUtils/assetLocalization.h>
+#include <UsdUtils/assetLocalizationDelegate.h>
+#include <UsdUtils/assetLocalizationPackage.h>
+#include <UsdUtils/localizeAsset.h>
+#include <UsdUtils/usdzPackage.h>
+#include <UsdUtils/userProcessingFunc.h>
 #endif  // __PXR_USD_USDUTILS_H__

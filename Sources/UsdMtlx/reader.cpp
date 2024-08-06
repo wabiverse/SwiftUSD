@@ -1,30 +1,13 @@
 //
 // Copyright 2018-2019 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "UsdMtlx/reader.h"
 #include "UsdMtlx/debugCodes.h"
 #include "UsdMtlx/utils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Ndr/declare.h"
 #include "Sdf/attributeSpec.h"
@@ -411,6 +394,38 @@ static NdrIdentifier _GetShaderId(const mx::ConstNodePtr &mtlxNode)
   return _GetShaderId(_GetNodeDef(mtlxNode));
 }
 
+static bool _SetColorSpace(const mx::ConstValueElementPtr &mxElem)
+{
+  const std::string &activeColorSpace = mxElem->getActiveColorSpace();
+  const std::string &defaultSourceColorSpace = mxElem->getDocument()->getActiveColorSpace();
+
+  // Only need to set the colorSpace on elements whose colorspace differs
+  // from the default source colorSpace.
+  return !activeColorSpace.empty() && activeColorSpace != defaultSourceColorSpace;
+}
+static bool _TypeSupportsColorSpace(const mx::ConstValueElementPtr &mxElem)
+{
+  // ColorSpaces are supported on
+  //  - inputs of type color3 or color4
+  //  - filename inputs on image nodes with color3 or color4 outputs
+  const std::string &type = mxElem->getType();
+  const bool colorInput = type == "color3" || type == "color4";
+
+  bool colorImageNode = false;
+  if (type == "filename") {
+    // verify the output is color3 or color4
+    mx::ConstNodeDefPtr parentNodeDef = _GetNodeDef(mxElem->getParent()->asA<mx::Node>());
+    if (parentNodeDef) {
+      for (const mx::OutputPtr &output : parentNodeDef->getOutputs()) {
+        const std::string &type = output->getType();
+        colorImageNode |= type == "color3" || type == "color4";
+      }
+    }
+  }
+
+  return colorInput || colorImageNode;
+}
+
 // Copy the value from a Material value element to a UsdShadeInput with a
 // Set() method taking any valid USD value type.
 static void _CopyValue(const UsdShadeInput &usd, const mx::ConstValueElementPtr &mtlx)
@@ -466,14 +481,9 @@ static void _CopyValue(const UsdShadeInput &usd, const mx::ConstValueElementPtr 
     }
   }
 
-  // Copy the active colorspace if it doesn't match the document and the
-  // type supports it.
-  auto &&colorspace = mtlx->getActiveColorSpace();
-  if (!colorspace.empty() && colorspace != mtlx->getDocument()->getActiveColorSpace()) {
-    auto &&type = mtlx->getType();
-    if (type.compare(0, 5, "color") == 0 || type == "filename") {
-      usd.GetAttr().SetColorSpace(TfToken(colorspace));
-    }
+  // Set the ColorSpace if needed.
+  if (_SetColorSpace(mtlx) && _TypeSupportsColorSpace(mtlx)) {
+    usd.GetAttr().SetColorSpace(TfToken(mtlx->getActiveColorSpace()));
   }
 }
 
@@ -835,8 +845,7 @@ void _NodeGraphBuilder::_AddNode(const mx::ConstNodePtr &mtlxNode, const UsdPrim
             usdParent.GetPath().GetText());
     // Nodegraphs associated with locally defined custom nodes are added
     // before reading materials, and therefore get-able here
-    auto nodeGraphPath = usdParent.GetParent().GetPath().AppendChild(
-        TfToken(mtlxNodeDef->getName()));
+    auto nodeGraphPath = usdParent.GetParent().GetPath().AppendChild(_MakeName(mtlxNodeDef));
     auto usdNodeGraph = UsdShadeNodeGraph::Get(usdStage, nodeGraphPath);
     connectable = usdNodeGraph.ConnectableAPI();
     _SetCoreUIAttributes(usdNodeGraph.GetPrim(), mtlxNode);
@@ -1416,7 +1425,8 @@ UsdShadeShader _Context::AddShaderNode(const mx::ConstNodePtr &mtlxShaderNode)
     mtlxNodeDef = _FindMatchingNodeDef(mtlxShaderNode,
                                        mtlxShaderNode->getCategory(),
                                        UsdMtlxGetVersion(mtlxShaderNode),
-                                       mtlxShaderNode->getTarget());
+                                       mtlxShaderNode->getTarget(),
+                                       mtlxShaderNode);
   }
   auto shaderId = _GetShaderId(mtlxNodeDef);
   if (shaderId.IsEmpty()) {
@@ -2401,12 +2411,12 @@ static void ReadLook(const mx::ConstLookPtr &mtlxLook,
 
 }  // anonymous namespace
 
-void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
+void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlxDoc,
                  const UsdStagePtr &stage,
                  const SdfPath &internalPath,
                  const SdfPath &externalPath)
 {
-  if (!mtlx) {
+  if (!mtlxDoc) {
     TF_CODING_ERROR("Invalid MaterialX document");
     return;
   }
@@ -2426,40 +2436,42 @@ void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
   _Context context(stage, internalPath);
 
   // Color management.
-  if (auto cms = _Attr(mtlx, names.cms)) {
+  if (auto cms = _Attr(mtlxDoc, names.cms)) {
     stage->SetColorManagementSystem(TfToken(cms));
   }
-  if (auto cmsconfig = _Attr(mtlx, names.cmsconfig)) {
+  if (auto cmsconfig = _Attr(mtlxDoc, names.cmsconfig)) {
     // XXX -- Is it okay to use the URI as is?
     stage->SetColorConfiguration(SdfAssetPath(cmsconfig));
   }
-  auto &&colorspace = mtlx->getActiveColorSpace();
+  auto &&colorspace = mtlxDoc->getActiveColorSpace();
   if (!colorspace.empty()) {
+    // XXX This information will be lost because layer metadata does not
+    // currently compose across a reference.
     VtDictionary dict;
     dict[SdfFieldKeys->ColorSpace.GetString()] = VtValue(colorspace);
     stage->SetMetadata(SdfFieldKeys->CustomLayerData, dict);
   }
 
   // Read in locally defined Custom Nodes defined with a nodegraph.
-  ReadNodeGraphsWithDefs(mtlx, context);
+  ReadNodeGraphsWithDefs(mtlxDoc, context);
 
   // Translate all materials.
-  ReadMaterials(mtlx, context);
+  ReadMaterials(mtlxDoc, context);
 
   // If there are no looks then we're done.
-  if (mtlx->getLooks().empty()) {
+  if (mtlxDoc->getLooks().empty()) {
     return;
   }
 
   // Collect the MaterialX variants.
-  context.AddVariants(mtlx);
+  context.AddVariants(mtlxDoc);
 
   // Translate all collections.
-  auto hasCollections = ReadCollections(mtlx, context);
+  auto hasCollections = ReadCollections(mtlxDoc, context);
 
   // Collect all of the material/variant assignments.
   VariantAssignmentsBuilder materialVariantAssignmentsBuilder;
-  for (auto &mtlxLook : mtlx->getLooks()) {
+  for (auto &mtlxLook : mtlxDoc->getLooks()) {
     // Get the variant assigns for the look and (recursively) its
     // inherited looks.
     VariantAssignments lookVariantAssigns;
@@ -2494,7 +2506,7 @@ void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
 
   // Create each look as a variant.
   auto lookVariantSet = root.GetVariantSets().AddVariantSet("LookVariant");
-  for (auto &mtlxMostDerivedLook : mtlx->getLooks()) {
+  for (auto &mtlxMostDerivedLook : mtlxDoc->getLooks()) {
     // We rely on inherited looks to exist in USD so we do
     // those first.
     for (auto &mtlxLook : _GetInheritanceStack(mtlxMostDerivedLook)) {
@@ -2529,11 +2541,11 @@ void UsdMtlxRead(const MaterialX::ConstDocumentPtr &mtlx,
   lookVariantSet.ClearVariantSelection();
 }
 
-void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr &mtlx,
+void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr &mtlxDoc,
                            const UsdStagePtr &stage,
                            const SdfPath &internalPath)
 {
-  if (!mtlx) {
+  if (!mtlxDoc) {
     TF_CODING_ERROR("Invalid MaterialX document");
     return;
   }
@@ -2548,8 +2560,8 @@ void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr &mtlx,
 
   _Context context(stage, internalPath);
 
-  ReadNodeGraphsWithDefs(mtlx, context);
-  ReadNodeGraphsWithoutDefs(mtlx, context);
+  ReadNodeGraphsWithDefs(mtlxDoc, context);
+  ReadNodeGraphsWithoutDefs(mtlxDoc, context);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

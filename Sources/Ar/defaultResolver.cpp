@@ -1,35 +1,19 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Ar/defaultResolver.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Ar/assetInfo.h"
 #include "Ar/defaultResolverContext.h"
 #include "Ar/defineResolver.h"
 #include "Ar/filesystemAsset.h"
 #include "Ar/filesystemWritableAsset.h"
+#include "Ar/notice.h"
 #include "Ar/resolverContext.h"
 #include "Ar/writableAsset.h"
 
@@ -86,31 +70,33 @@ static std::vector<std::string> _ParseSearchPaths(const std::string &pathStr)
   return TfStringTokenize(pathStr, ARCH_PATH_LIST_SEP);
 }
 
-static TfStaticData<std::vector<std::string>> _SearchPath;
-
-ArDefaultResolver::ArDefaultResolver()
-{
-  std::vector<std::string> searchPath = *_SearchPath;
-
-  const std::string envPath = TfGetenv("PXR_AR_DEFAULT_SEARCH_PATH");
-  if (!envPath.empty()) {
-    const std::vector<std::string> envSearchPath = _ParseSearchPaths(envPath);
-    searchPath.insert(searchPath.end(), envSearchPath.begin(), envSearchPath.end());
+struct _ArDefaultResolverFallbackContext {
+  _ArDefaultResolverFallbackContext()
+  {
+    const std::string envPath = TfGetenv("PXR_AR_DEFAULT_SEARCH_PATH");
+    if (!envPath.empty()) {
+      context = ArDefaultResolverContext(_ParseSearchPaths(envPath));
+    }
   }
 
-  _fallbackContext = ArDefaultResolverContext(searchPath);
-}
+  ArDefaultResolverContext context;
+};
 
-ArDefaultResolver::~ArDefaultResolver() {}
-
-const ArDefaultResolverContext ArDefaultResolver::GetFallbackContext() const
-{
-  return _fallbackContext;
-}
+static TfStaticData<_ArDefaultResolverFallbackContext> _DefaultPath;
 
 void ArDefaultResolver::SetDefaultSearchPath(const std::vector<std::string> &searchPath)
 {
-  *_SearchPath = searchPath;
+  ArDefaultResolverContext newFallback = ArDefaultResolverContext(searchPath);
+
+  if (newFallback == _DefaultPath->context) {
+    return;
+  }
+
+  _DefaultPath->context = std::move(newFallback);
+
+  ArNotice::ResolverChanged([](const ArResolverContext &ctx) {
+    return ctx.Get<ArDefaultResolverContext>() != nullptr;
+  }).Send();
 }
 
 std::string ArDefaultResolver::_CreateIdentifier(const std::string &assetPath,
@@ -159,9 +145,7 @@ std::string ArDefaultResolver::_CreateIdentifierForNewAsset(
   return TfNormPath(assetPath);
 }
 
-// static
-ArResolvedPath ArDefaultResolver::_ResolveAnchored(const std::string &anchorPath,
-                                                   const std::string &path)
+static ArResolvedPath _ResolveAnchored(const std::string &anchorPath, const std::string &path)
 {
   std::string resolvedPath = path;
   if (!anchorPath.empty()) {
@@ -199,7 +183,8 @@ ArResolvedPath ArDefaultResolver::_Resolve(const std::string &path) const
     // If that fails and the path is a search path, try to resolve
     // against each directory in the specified search paths.
     if (_IsSearchPath(path)) {
-      const ArDefaultResolverContext *contexts[2] = {_GetCurrentContextPtr(), &_fallbackContext};
+      const ArDefaultResolverContext *contexts[2] = {_GetCurrentContextPtr(),
+                                                     &_DefaultPath->context};
       for (const ArDefaultResolverContext *ctx : contexts) {
         if (ctx) {
           for (const auto &searchPath : ctx->GetSearchPath()) {
@@ -265,11 +250,6 @@ ArResolverContext ArDefaultResolver::_CreateDefaultContextForAsset(
   std::string assetDir = TfGetPathName(TfAbsPath(assetPath));
 
   return ArResolverContext(ArDefaultResolverContext(std::vector<std::string>(1, assetDir)));
-}
-
-const ArDefaultResolverContext *ArDefaultResolver::GetCurrentContextPtr() const
-{
-  return _GetCurrentContextPtr();
 }
 
 const ArDefaultResolverContext *ArDefaultResolver::_GetCurrentContextPtr() const

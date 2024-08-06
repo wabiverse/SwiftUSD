@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Vt/arrayPyBuffer.h"
@@ -29,7 +12,7 @@
 #include "Vt/types.h"
 #include "Vt/value.h"
 #include "Vt/wrapArray.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Gf/traits.h"
 
@@ -37,7 +20,6 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyUtils.h"
 
-#include <boost/preprocessor.hpp>
 #include <boost/python.hpp>
 
 #include <numeric>
@@ -334,7 +316,7 @@ template<class T> int Vt_getbuffer(PyObject *self, Py_buffer *view, int flags)
     view->format = NULL;
   }
   if ((flags & PyBUF_ND) == PyBUF_ND) {
-    view->ndim = static_cast<int>(wrapper->shape.size());
+    view->ndim = wrapper->shape.size();
     view->shape = wrapper->shape.data();
   }
   else {
@@ -599,17 +581,17 @@ boost::optional<VtArray<T>> VtArrayFromPyBuffer(TfPyObjWrapper const &obj, std::
   return result;
 }
 
-#define INSTANTIATE(r, unused, elem) \
+#define INSTANTIATE(unused, elem) \
   template boost::optional<VtArray<VT_TYPE(elem)>> VtArrayFromPyBuffer<VT_TYPE(elem)>( \
       TfPyObjWrapper const &obj, string *err);
-BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, ~, VT_ARRAY_PYBUFFER_TYPES)
+TF_PP_SEQ_FOR_EACH(INSTANTIATE, ~, VT_ARRAY_PYBUFFER_TYPES)
 #undef INSTANTIATE
 
 VT_API void Vt_AddBufferProtocolSupportToVtArrays()
 {
 
 // Add the buffer protocol support to every array type that we support it for.
-#define VT_ADD_BUFFER_PROTOCOL(r, unused, elem) \
+#define VT_ADD_BUFFER_PROTOCOL(unused, elem) \
   Vt_AddBufferProtocol<VtArray<VT_TYPE(elem)>>(); \
   VtValue::RegisterCast<TfPyObjWrapper, VtArray<VT_TYPE(elem)>>( \
       Vt_CastPyObjToArray<VT_TYPE(elem)>); \
@@ -618,7 +600,7 @@ VT_API void Vt_AddBufferProtocolSupportToVtArrays()
   boost::python::def(TF_PP_STRINGIZE(VT_TYPE_NAME(elem)) "ArrayFromBuffer", \
                      Vt_WrapArrayFromBuffer<VT_TYPE(elem)>);
 
-  BOOST_PP_SEQ_FOR_EACH(VT_ADD_BUFFER_PROTOCOL, ~, VT_ARRAY_PYBUFFER_TYPES)
+  TF_PP_SEQ_FOR_EACH(VT_ADD_BUFFER_PROTOCOL, ~, VT_ARRAY_PYBUFFER_TYPES)
 
 #undef VT_ADD_BUFFER_PROTOCOL
 }

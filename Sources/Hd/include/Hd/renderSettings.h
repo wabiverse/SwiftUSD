@@ -1,34 +1,18 @@
 //
 // Copyright 2022 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HD_RENDER_SETTINGS_H
 #define PXR_IMAGING_HD_RENDER_SETTINGS_H
 
 #include "Hd/api.h"
 #include "Hd/bprim.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Gf/range2f.h"
+#include "Gf/vec2d.h"
 #include "Gf/vec2f.h"
 #include "Gf/vec2i.h"
 #include "Vt/array.h"
@@ -74,8 +58,11 @@ class HdRenderSettings : public HdBprim {
     DirtyIncludedPurposes = 1 << 4,
     DirtyMaterialBindingPurposes = 1 << 5,
     DirtyRenderingColorSpace = 1 << 6,
+    DirtyShutterInterval = 1 << 7,
+    DirtyFrameNumber = 1 << 8,
     AllDirty = DirtyActive | DirtyNamespacedSettings | DirtyRenderProducts |
-               DirtyIncludedPurposes | DirtyMaterialBindingPurposes | DirtyRenderingColorSpace
+               DirtyIncludedPurposes | DirtyMaterialBindingPurposes | DirtyRenderingColorSpace |
+               DirtyShutterInterval | DirtyFrameNumber
   };
 
   // Parameters that may be queried and invalidated.
@@ -100,7 +87,7 @@ class HdRenderSettings : public HdBprim {
     // The name of the product, which uniquely identifies it.
     TfToken name;
     // The pixel resolution of the product.
-    GfVec2i resolution;
+    GfVec2i resolution = GfVec2i(0);
     // The render vars that the product is comprised of.
     std::vector<RenderVar> renderVars;
 
@@ -114,7 +101,7 @@ class HdRenderSettings : public HdBprim {
     // mismatches between the aperture and image.
     TfToken aspectRatioConformPolicy;
     // The camera aperture size as adjusted by aspectRatioConformPolicy.
-    GfVec2f apertureSize;
+    GfVec2f apertureSize = GfVec2f(0);
     // The data window, in NDC terms relative to the aperture.
     // (0,0) corresponds to bottom-left and (1,1) corresponds to
     // top-right.  Note that the data window can partially cover
@@ -125,6 +112,7 @@ class HdRenderSettings : public HdBprim {
     /// Settings overrides
     //
     bool disableMotionBlur;
+    bool disableDepthOfField;
     VtDictionary namespacedSettings;
   };
 
@@ -141,10 +129,10 @@ class HdRenderSettings : public HdBprim {
   bool IsActive() const;
 
   HD_API
-  const NamespacedSettings &GetNamespacedSettings() const;
+  bool IsValid() const;
 
   HD_API
-  unsigned int GetSettingsVersion() const;
+  const NamespacedSettings &GetNamespacedSettings() const;
 
   HD_API
   const RenderProducts &GetRenderProducts() const;
@@ -158,7 +146,9 @@ class HdRenderSettings : public HdBprim {
   HD_API
   const TfToken &GetRenderingColorSpace() const;
 
-  // XXX Add API to query AOV bindings.
+  // XXX Using VtValue in a std::optional (C++17) sense.
+  HD_API
+  const VtValue &GetShutterInterval() const;
 
   // ------------------------------------------------------------------------
   // Satisfying HdBprim
@@ -192,11 +182,11 @@ class HdRenderSettings : public HdBprim {
 
   bool _active;
   NamespacedSettings _namespacedSettings;
-  unsigned int _settingsVersion;
   RenderProducts _products;
   VtArray<TfToken> _includedPurposes;
   VtArray<TfToken> _materialBindingPurposes;
   TfToken _renderingColorSpace;
+  VtValue _vShutterInterval;
 };
 
 // VtValue requirements

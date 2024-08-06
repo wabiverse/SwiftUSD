@@ -1,25 +1,8 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/retainedDataSource.h"
 
@@ -123,7 +106,7 @@ class Hd_MappedRetainedContainerDataSource : public HdRetainedContainerDataSourc
     TfTokenVector result;
     result.reserve(_values.size());
 
-    for (const auto I : _values) {
+    for (const auto &I : _values) {
       result.push_back(I.first);
     }
     return result;
@@ -345,6 +328,10 @@ struct Hd_CreateTypedRetainedDataSourceVisitor {
     else if (v.IsHolding<SdfPathVector>()) {
       return HdRetainedTypedSampledDataSource<SdfPathVector>::New(v.UncheckedGet<SdfPathVector>());
     }
+    else if (v.IsHolding<SdfPathExpression>()) {
+      return HdRetainedTypedSampledDataSource<SdfPathExpression>::New(
+          v.UncheckedGet<SdfPathExpression>());
+    }
     else if (v.IsEmpty()) {
       return HdSampledDataSourceHandle(nullptr);
     }
@@ -377,6 +364,54 @@ HD_API HdRetainedTypedSampledDataSource<bool>::Handle HdRetainedTypedSampledData
         new HdRetainedTypedSampledDataSource<bool>(false));
     return ds;
   }
+}
+
+static HdSampledDataSourceHandle _MakeStaticCopy(HdSampledDataSourceHandle const &ds)
+{
+  return HdCreateTypedRetainedDataSource(ds->GetValue(0.0f));
+}
+
+static HdVectorDataSourceHandle _MakeStaticCopy(HdVectorDataSourceHandle const &ds)
+{
+  const size_t n = ds->GetNumElements();
+  std::vector<HdDataSourceBaseHandle> values;
+  values.reserve(n);
+  for (size_t i = 0; i < n; ++i) {
+    values.push_back(ds->GetElement(i));
+  }
+  return HdRetainedSmallVectorDataSource::New(n, values.data());
+}
+
+HdContainerDataSourceHandle HdMakeStaticCopy(HdContainerDataSourceHandle const &ds)
+{
+  if (!ds) {
+    return nullptr;
+  }
+  const TfTokenVector names = ds->GetNames();
+  std::vector<HdDataSourceBaseHandle> items;
+  items.reserve(names.size());
+  for (const TfToken &name : names) {
+    items.push_back(HdMakeStaticCopy(ds->Get(name)));
+  }
+  return HdRetainedContainerDataSource::New(names.size(), names.data(), items.data());
+}
+
+HdDataSourceBaseHandle HdMakeStaticCopy(HdDataSourceBaseHandle const &ds)
+{
+  if (!ds) {
+    return nullptr;
+  }
+  if (HdContainerDataSourceHandle const containerDs = HdContainerDataSource::Cast(ds)) {
+    return HdMakeStaticCopy(containerDs);
+  }
+  if (HdVectorDataSourceHandle const vectorDs = HdVectorDataSource::Cast(ds)) {
+    return _MakeStaticCopy(vectorDs);
+  }
+  if (HdSampledDataSourceHandle const sampledDs = HdSampledDataSource::Cast(ds)) {
+    return _MakeStaticCopy(sampledDs);
+  }
+  TF_CODING_ERROR("Unsupported data source type");
+  return nullptr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

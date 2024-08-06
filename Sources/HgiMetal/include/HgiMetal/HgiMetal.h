@@ -1,7 +1,7 @@
-#ifndef __PXR_IMAGING_HGI_METAL_HGIMETAL_H__
-#define __PXR_IMAGING_HGI_METAL_HGIMETAL_H__
+#ifndef __PXR_IMAGING_HGIMETAL_H__
+#define __PXR_IMAGING_HGIMETAL_H__
 
-// hgiMetal.
+// HgiMetal.
 #include <HgiMetal/api.h>
 #include <HgiMetal/blitCmds.h>
 #include <HgiMetal/buffer.h>
@@ -23,4 +23,4 @@
 #include <HgiMetal/stepFunctions.h>
 #include <HgiMetal/texture.h>
 
-#endif /* __PXR_IMAGING_HGI_METAL_HGIMETAL_H__ */
+#endif  // __PXR_IMAGING_HGIMETAL_H__

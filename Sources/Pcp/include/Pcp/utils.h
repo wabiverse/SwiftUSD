@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_UTILS_H
 #define PXR_USD_PCP_UTILS_H
@@ -29,7 +12,7 @@
 #include "Pcp/errors.h"
 #include "Pcp/node.h"
 #include "Sdf/layer.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <string>
 #include <unordered_set>
@@ -91,6 +74,10 @@ const SdfLayer::FileFormatArguments &Pcp_GetArgumentsForFileFormatTarget(
     const std::string &identifier,
     const SdfLayer::FileFormatArguments *defaultArgs,
     SdfLayer::FileFormatArguments *localArgs);
+
+// Removes the "target" argument from \p args if it exists and its value
+// is the same as \p target.
+void Pcp_StripFileFormatTarget(const std::string &target, SdfLayer::FileFormatArguments *args);
 
 // Find the starting node of the class hierarchy of which node n is a part.
 // This is the prim that starts the class chain, aka the 'instance' of the
@@ -178,6 +165,15 @@ const SdfLayer::FileFormatArguments &Pcp_GetArgumentsForFileFormatTarget(
 // instead of depth below introduction, G/C3 would have been
 // incorrectly excluded.
 std::pair<PcpNodeRef, PcpNodeRef> Pcp_FindStartingNodeOfClassHierarchy(const PcpNodeRef &n);
+
+// Translate the given path (which must be a prim or prim variant selection
+// path) from the namespace of the given node to the namespace of the root node
+// of the prim index that node belongs to. If that translation succeeds, returns
+// the translated path and the root node. If that translation fails, translate
+// the path to the ancestor node closest to the root node where the mapping is
+// successful and return the translated path and the ancestor node.
+std::pair<SdfPath, PcpNodeRef> Pcp_TranslatePathFromNodeToRootOrClosestNode(const PcpNodeRef &node,
+                                                                            const SdfPath &path);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -1,31 +1,14 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_PLUG_REGISTRY_H
 #define PXR_BASE_PLUG_REGISTRY_H
 
 #include "Plug/api.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Js/value.h"
 #include "Tf/declarePtrs.h"
@@ -36,8 +19,6 @@
 #include "Tf/type.h"
 #include "Tf/weakBase.h"
 #include "Tf/weakPtr.h"
-
-#include <Arch/swiftInterop.h>
 
 #include <mutex>
 #include <string>
@@ -67,8 +48,7 @@ class Plug_RegistrationMetadata;
 /// want to support plug-ins that implement image filters.  You can define
 /// an abstract base class for image filters that declares the API your
 /// application will require image filters to implement; perhaps something
-/// simple like \ref plug_cppcode_PlugRegistry1 "C++ Code Example 1" (Doxygen
-/// only).
+/// simple like \ref plug_cppcode_PlugRegistry1 "C++ Code Example 1" (Doxygen only).
 ///
 /// People writing custom filters would write a subclass of ImageFilter that
 /// overrides the two methods, implementing their own special filtering
@@ -231,8 +211,7 @@ class Plug_RegistrationMetadata;
 /// loading of a plugin will be deferred until an instance of a type
 /// is manufactured which requires the plugin.
 ///
-/// \section plug_MultipleSubclasses Multiple Subclasses of Multiple Plug-in
-/// Base Classes
+/// \section plug_MultipleSubclasses Multiple Subclasses of Multiple Plug-in Base Classes
 ///
 /// It is possible for a bundle to implement multiple subclasses
 /// for a plug-in base class if desired.  If you want to package half a dozen
@@ -354,12 +333,10 @@ class PlugRegistry : public TfWeakBase {
   PLUG_API
   PlugPluginPtrVector RegisterPlugins(const std::string &pathToPlugInfo);
 
-  using PlugPathsVector = std::vector<std::string>;
-
   /// Registers all plug-ins discovered in any of \a pathsToPlugInfo.  Sends
   /// PlugNotice::DidRegisterPlugins with any newly registered plugins.
   PLUG_API
-  PlugPluginPtrVector RegisterPlugins(const PlugPathsVector &pathsToPlugInfo);
+  PlugPluginPtrVector RegisterPlugins(const std::vector<std::string> &pathsToPlugInfo);
 
   /// Retrieve the \c TfType corresponding to the given \c name.  See the
   /// documentation for \c TfType::FindByName for more information.  Use this
@@ -475,7 +452,7 @@ class PlugRegistry : public TfWeakBase {
   TfHashSet<std::string, TfHash> _registeredPluginPaths;
 
   std::mutex _mutex;
-} SWIFT_IMMORTAL_REFERENCE;
+};
 
 PLUG_API_TEMPLATE_CLASS(TfSingleton<PlugRegistry>);
 

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "UsdGeom/pointInstancer.h"
 #include "Usd/schemaRegistry.h"
@@ -157,6 +140,22 @@ UsdAttribute UsdGeomPointInstancer::CreateOrientationsAttr(VtValue const &defaul
                                     writeSparsely);
 }
 
+UsdAttribute UsdGeomPointInstancer::GetOrientationsfAttr() const
+{
+  return GetPrim().GetAttribute(UsdGeomTokens->orientationsf);
+}
+
+UsdAttribute UsdGeomPointInstancer::CreateOrientationsfAttr(VtValue const &defaultValue,
+                                                            bool writeSparsely) const
+{
+  return UsdSchemaBase::_CreateAttr(UsdGeomTokens->orientationsf,
+                                    SdfValueTypeNames->QuatfArray,
+                                    /* custom = */ false,
+                                    SdfVariabilityVarying,
+                                    defaultValue,
+                                    writeSparsely);
+}
+
 UsdAttribute UsdGeomPointInstancer::GetScalesAttr() const
 {
   return GetPrim().GetAttribute(UsdGeomTokens->scales);
@@ -268,6 +267,7 @@ const TfTokenVector &UsdGeomPointInstancer::GetSchemaAttributeNames(bool include
       UsdGeomTokens->ids,
       UsdGeomTokens->positions,
       UsdGeomTokens->orientations,
+      UsdGeomTokens->orientationsf,
       UsdGeomTokens->scales,
       UsdGeomTokens->velocities,
       UsdGeomTokens->accelerations,
@@ -343,6 +343,34 @@ template<typename T> static SdfListOp<T> _CanonicalizeListOp(const SdfListOp<T> 
     r.SetDeletedItems(op.GetDeletedItems());
     return r;
   }
+}
+
+bool UsdGeomPointInstancer::UsesOrientationsf(UsdAttribute *rotationAttr) const
+{
+  *rotationAttr = GetOrientationsfAttr();
+  VtQuatfArray orientationsfTimeSamples;
+  rotationAttr->Get(&orientationsfTimeSamples, UsdTimeCode::EarliestTime());
+  if (!orientationsfTimeSamples.empty()) {
+    return true;
+  }
+  *rotationAttr = GetOrientationsAttr();
+  return false;
+}
+
+bool UsdGeomPointInstancer::UsesOrientationsf(TfToken *rotationToken) const
+{
+  VtQuatfArray orientationsfTimeSamples;
+  GetOrientationsfAttr().Get(&orientationsfTimeSamples, UsdTimeCode::EarliestTime());
+  if (!orientationsfTimeSamples.empty()) {
+    if (rotationToken) {
+      *rotationToken = UsdGeomTokens->orientationsf;
+    }
+    return true;
+  }
+  if (rotationToken) {
+    *rotationToken = UsdGeomTokens->orientations;
+  }
+  return false;
 }
 
 bool UsdGeomPointInstancerApplyNewStyleListOps()
@@ -687,12 +715,15 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
   return true;
 }
 
-bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
+/// Helper implementation for ComputeInstanceTransformsAtTimes
+template<class QuatType>
+bool UsdGeomPointInstancer::_DoComputeInstanceTransformsAtTimes(
     std::vector<VtArray<GfMatrix4d>> *xformsArray,
     const std::vector<UsdTimeCode> &times,
     const UsdTimeCode baseTime,
     const ProtoXformInclusion doProtoXforms,
-    const MaskApplication applyMask) const
+    const MaskApplication applyMask,
+    const UsdAttribute orientationsAttr) const
 {
   size_t numSamples = times.size();
   for (auto time : times) {
@@ -710,7 +741,7 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
   UsdTimeCode velocitiesSampleTime;
   VtVec3fArray accelerations;
   VtVec3fArray scales;
-  VtQuathArray orientations;
+  VtArray<QuatType> orientations;
   VtVec3fArray angularVelocities;
   UsdTimeCode angularVelocitiesSampleTime;
   SdfPathVector protoPaths;
@@ -740,7 +771,7 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
 
   UsdGeom_GetScales(GetScalesAttr(), baseTime, numInstances, &scales, GetPrim());
 
-  UsdGeom_GetOrientationsAndAngularVelocities(GetOrientationsAttr(),
+  UsdGeom_GetOrientationsAndAngularVelocities(orientationsAttr,
                                               GetAngularVelocitiesAttr(),
                                               baseTime,
                                               numInstances,
@@ -787,8 +818,8 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
         scales = interpolatedScales;
       }
 
-      VtQuathArray interpolatedOrientations;
-      if (GetOrientationsAttr().Get(&interpolatedOrientations, time) &&
+      VtArray<QuatType> interpolatedOrientations;
+      if (orientationsAttr.Get(&interpolatedOrientations, time) &&
           interpolatedOrientations.size() == numInstances)
       {
         orientations = interpolatedOrientations;
@@ -818,7 +849,27 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
   return true;
 }
 
-bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
+bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTimes(
+    std::vector<VtArray<GfMatrix4d>> *xformsArray,
+    const std::vector<UsdTimeCode> &times,
+    const UsdTimeCode baseTime,
+    const ProtoXformInclusion doProtoXforms,
+    const MaskApplication applyMask) const
+{
+  UsdAttribute orientationsAttr;
+  if (UsesOrientationsf(&orientationsAttr)) {
+    return _DoComputeInstanceTransformsAtTimes<GfQuatf>(
+        xformsArray, times, baseTime, doProtoXforms, applyMask, orientationsAttr);
+  }
+  else {
+    return _DoComputeInstanceTransformsAtTimes<GfQuath>(
+        xformsArray, times, baseTime, doProtoXforms, applyMask, orientationsAttr);
+  }
+}
+
+/// Helper implementation for ComputeInstanceTransformsAtTimes
+template<class QuatType>
+bool UsdGeomPointInstancer::_DoComputeInstanceTransformsAtTime(
     VtArray<GfMatrix4d> *xforms,
     UsdStageWeakPtr &stage,
     UsdTimeCode time,
@@ -828,12 +879,12 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
     UsdTimeCode velocitiesSampleTime,
     const VtVec3fArray &accelerations,
     const VtVec3fArray &scales,
-    const VtQuathArray &orientations,
+    const VtArray<QuatType> &orientations,
     const VtVec3fArray &angularVelocities,
     UsdTimeCode angularVelocitiesSampleTime,
     const SdfPathVector &protoPaths,
     const std::vector<bool> &mask,
-    float /* velocityScale */)
+    float /*velocityScale*/)
 {
   TRACE_FUNCTION();
 
@@ -934,6 +985,72 @@ bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
   }
 
   return ApplyMaskToArray(mask, xforms);
+}
+
+bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
+    VtArray<GfMatrix4d> *xforms,
+    UsdStageWeakPtr &stage,
+    UsdTimeCode time,
+    const VtIntArray &protoIndices,
+    const VtVec3fArray &positions,
+    const VtVec3fArray &velocities,
+    UsdTimeCode velocitiesSampleTime,
+    const VtVec3fArray &accelerations,
+    const VtVec3fArray &scales,
+    const VtQuatfArray &orientations,
+    const VtVec3fArray &angularVelocities,
+    UsdTimeCode angularVelocitiesSampleTime,
+    const SdfPathVector &protoPaths,
+    const std::vector<bool> &mask,
+    float /*velocityScale*/)
+{
+  return _DoComputeInstanceTransformsAtTime(xforms,
+                                            stage,
+                                            time,
+                                            protoIndices,
+                                            positions,
+                                            velocities,
+                                            velocitiesSampleTime,
+                                            accelerations,
+                                            scales,
+                                            orientations,
+                                            angularVelocities,
+                                            angularVelocitiesSampleTime,
+                                            protoPaths,
+                                            mask);
+}
+
+bool UsdGeomPointInstancer::ComputeInstanceTransformsAtTime(
+    VtArray<GfMatrix4d> *xforms,
+    UsdStageWeakPtr &stage,
+    UsdTimeCode time,
+    const VtIntArray &protoIndices,
+    const VtVec3fArray &positions,
+    const VtVec3fArray &velocities,
+    UsdTimeCode velocitiesSampleTime,
+    const VtVec3fArray &accelerations,
+    const VtVec3fArray &scales,
+    const VtQuathArray &orientations,
+    const VtVec3fArray &angularVelocities,
+    UsdTimeCode angularVelocitiesSampleTime,
+    const SdfPathVector &protoPaths,
+    const std::vector<bool> &mask,
+    float /*velocityScale*/)
+{
+  return _DoComputeInstanceTransformsAtTime(xforms,
+                                            stage,
+                                            time,
+                                            protoIndices,
+                                            positions,
+                                            velocities,
+                                            velocitiesSampleTime,
+                                            accelerations,
+                                            scales,
+                                            orientations,
+                                            angularVelocities,
+                                            angularVelocitiesSampleTime,
+                                            protoPaths,
+                                            mask);
 }
 
 bool UsdGeomPointInstancer::_ComputeExtentAtTimePreamble(UsdTimeCode baseTime,

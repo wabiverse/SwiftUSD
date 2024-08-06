@@ -1,25 +1,8 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Trace/jsonSerialization.h"
@@ -27,10 +10,12 @@
 #include "Js/json.h"
 #include "Js/utils.h"
 #include "Tf/stringUtils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Trace/eventData.h"
 #include "Trace/eventTreeBuilder.h"
+
+#include <optional>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -42,13 +27,13 @@ template<typename T>
 static typename std::enable_if<!std::is_same<T, JsObject>::value &&
                                    !std::is_same<T, JsArray>::value &&
                                    !std::is_same<T, std::string>::value,
-                               boost::optional<T>>::type
-_JsGet(const boost::optional<JsValue> &js)
+                               std::optional<T>>::type
+_JsGet(const std::optional<JsValue> &js)
 {
   if (js && js->Is<T>()) {
     return js->Get<T>();
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 template<typename T>
@@ -56,7 +41,7 @@ static
     typename std::enable_if<std::is_same<T, JsObject>::value || std::is_same<T, JsArray>::value ||
                                 std::is_same<T, std::string>::value,
                             const T *>::type
-    _JsGet(const boost::optional<JsValue> &js)
+    _JsGet(const std::optional<JsValue> &js)
 {
   if (js && js->Is<T>()) {
     return &js->Get<T>();
@@ -69,7 +54,7 @@ template<typename T,
                                                              std::is_same<T, JsArray>::value ||
                                                              std::is_same<T, std::string>::value,
                                                          const T *,
-                                                         boost::optional<T>>::type>
+                                                         std::optional<T>>::type>
 ReturnType _JsGetValue(const JsObject &js, const std::string &key)
 {
   return _JsGet<T>(JsFindValue(js, key));
@@ -227,10 +212,10 @@ void _TraceEventFromJSON(const JsValue &jsValue, EventListConstructionData &even
 
   const JsObject &js = jsValue.GetJsObject();
   const std::string *keyStr = _JsGetValue<std::string>(js, "key");
-  boost::optional<uint64_t> category = _JsGetValue<uint64_t>(js, "category");
+  std::optional<uint64_t> category = _JsGetValue<uint64_t>(js, "category");
   const std::string *typeStr = _JsGetValue<std::string>(js, "type");
-  boost::optional<double> tsMicroSeconds = _JsGetValue<double>(js, "ts");
-  boost::optional<TraceEvent::TimeStamp> ts;
+  std::optional<double> tsMicroSeconds = _JsGetValue<double>(js, "ts");
+  std::optional<TraceEvent::TimeStamp> ts;
   if (tsMicroSeconds) {
     ts = _MicrosecondsToTicks(*tsMicroSeconds);
   }
@@ -255,33 +240,27 @@ void _TraceEventFromJSON(const JsValue &jsValue, EventListConstructionData &even
         }
         break;
       case TraceEvent::EventType::Timespan: {
-        boost::optional<TraceEvent::TimeStamp> start = _JsGetValue<TraceEvent::TimeStamp>(js,
-                                                                                          "start");
-        boost::optional<TraceEvent::TimeStamp> end = _JsGetValue<TraceEvent::TimeStamp>(js, "end");
+        std::optional<TraceEvent::TimeStamp> start = _JsGetValue<TraceEvent::TimeStamp>(js,
+                                                                                        "start");
+        std::optional<TraceEvent::TimeStamp> end = _JsGetValue<TraceEvent::TimeStamp>(js, "end");
         if (start && end) {
           unorderedEvents.emplace_back(
               TraceEvent::Timespan, list.CacheKey(*keyStr), *start, *end, *category);
         }
       } break;
       case TraceEvent::EventType::CounterDelta: {
-        boost::optional<double> value = _JsGetValue<double>(js, "value");
+        std::optional<double> value = _JsGetValue<double>(js, "value");
         if (ts && value) {
-          TraceEvent event(TraceEvent::CounterDelta,
-                           list.CacheKey(*keyStr),
-                           *value,
-                           static_cast<unsigned int>(*category));
+          TraceEvent event(TraceEvent::CounterDelta, list.CacheKey(*keyStr), *value, *category);
           event.SetTimeStamp(*ts);
           unorderedEvents.emplace_back(std::move(event));
           ;
         }
       } break;
       case TraceEvent::EventType::CounterValue: {
-        boost::optional<double> value = _JsGetValue<double>(js, "value");
+        std::optional<double> value = _JsGetValue<double>(js, "value");
         if (ts && value) {
-          TraceEvent event(TraceEvent::CounterValue,
-                           list.CacheKey(*keyStr),
-                           *value,
-                           static_cast<unsigned int>(*category));
+          TraceEvent event(TraceEvent::CounterValue, list.CacheKey(*keyStr), *value, *category);
           event.SetTimeStamp(*ts);
           unorderedEvents.emplace_back(std::move(event));
           ;
@@ -289,39 +268,31 @@ void _TraceEventFromJSON(const JsValue &jsValue, EventListConstructionData &even
       } break;
       case TraceEvent::EventType::ScopeData:
         if (ts) {
-          if (boost::optional<JsValue> dataValue = JsFindValue(js, "data")) {
+          if (std::optional<JsValue> dataValue = JsFindValue(js, "data")) {
             if (dataValue->Is<bool>()) {
-              TraceEvent event(TraceEvent::Data,
-                               list.CacheKey(*keyStr),
-                               dataValue->Get<bool>(),
-                               static_cast<unsigned int>(*category));
+              TraceEvent event(
+                  TraceEvent::Data, list.CacheKey(*keyStr), dataValue->Get<bool>(), *category);
               event.SetTimeStamp(*ts);
               unorderedEvents.emplace_back(std::move(event));
               ;
             }
             else if (dataValue->Is<double>()) {
-              TraceEvent event(TraceEvent::Data,
-                               list.CacheKey(*keyStr),
-                               dataValue->Get<double>(),
-                               static_cast<unsigned int>(*category));
+              TraceEvent event(
+                  TraceEvent::Data, list.CacheKey(*keyStr), dataValue->Get<double>(), *category);
               event.SetTimeStamp(*ts);
               unorderedEvents.emplace_back(std::move(event));
               ;
             }
             else if (dataValue->Is<uint64_t>()) {
-              TraceEvent event(TraceEvent::Data,
-                               list.CacheKey(*keyStr),
-                               dataValue->Get<uint64_t>(),
-                               static_cast<unsigned int>(*category));
+              TraceEvent event(
+                  TraceEvent::Data, list.CacheKey(*keyStr), dataValue->Get<uint64_t>(), *category);
               event.SetTimeStamp(*ts);
               unorderedEvents.emplace_back(std::move(event));
               ;
             }
             else if (dataValue->Is<int64_t>()) {
-              TraceEvent event(TraceEvent::Data,
-                               list.CacheKey(*keyStr),
-                               dataValue->Get<int64_t>(),
-                               static_cast<unsigned int>(*category));
+              TraceEvent event(
+                  TraceEvent::Data, list.CacheKey(*keyStr), dataValue->Get<int64_t>(), *category);
               event.SetTimeStamp(*ts);
               unorderedEvents.emplace_back(std::move(event));
               ;
@@ -330,7 +301,7 @@ void _TraceEventFromJSON(const JsValue &jsValue, EventListConstructionData &even
               TraceEvent event(TraceEvent::Data,
                                list.CacheKey(*keyStr),
                                list.StoreData(dataValue->GetString().c_str()),
-                               static_cast<unsigned int>(*category));
+                               *category);
               event.SetTimeStamp(*ts);
               unorderedEvents.emplace_back(std::move(event));
               ;
@@ -447,7 +418,7 @@ static void _ImportChromeEvents(const JsArray &traceEvents, ChromeConstructionMa
       const std::string *tid = _JsGetValue<std::string>(*eventObj, "tid");
       // tid field might be an integer
       if (!tid) {
-        boost::optional<uint64_t> utid = _JsGetValue<uint64_t>(*eventObj, "tid");
+        std::optional<uint64_t> utid = _JsGetValue<uint64_t>(*eventObj, "tid");
         if (utid) {
           auto it = tidToNames.find(*utid);
           if (it == tidToNames.end()) {
@@ -457,17 +428,17 @@ static void _ImportChromeEvents(const JsArray &traceEvents, ChromeConstructionMa
         }
       }
 
-      boost::optional<double> ts = _JsGetValue<double>(*eventObj, "ts");
+      std::optional<double> ts = _JsGetValue<double>(*eventObj, "ts");
       // ts field might be an integer
       if (!ts) {
-        boost::optional<uint64_t> uts = _JsGetValue<uint64_t>(*eventObj, "ts");
+        std::optional<uint64_t> uts = _JsGetValue<uint64_t>(*eventObj, "ts");
         if (uts) {
           ts = *uts;
         }
       }
       const std::string *name = _JsGetValue<std::string>(*eventObj, "name");
       const std::string *ph = _JsGetValue<std::string>(*eventObj, "ph");
-      boost::optional<uint64_t> catId = _JsGetValue<uint64_t>(*eventObj, "libTraceCatId");
+      std::optional<uint64_t> catId = _JsGetValue<uint64_t>(*eventObj, "libTraceCatId");
 
       if (tid && ts && name && ph) {
         if (!catId) {
@@ -490,9 +461,9 @@ static void _ImportChromeEvents(const JsArray &traceEvents, ChromeConstructionMa
         }
         else if (*ph == "X") {
           // dur field might be a double or an int.
-          boost::optional<double> dur = _JsGetValue<double>(*eventObj, "dur");
+          std::optional<double> dur = _JsGetValue<double>(*eventObj, "dur");
           if (!dur) {
-            boost::optional<uint64_t> udur = _JsGetValue<uint64_t>(*eventObj, "dur");
+            std::optional<uint64_t> udur = _JsGetValue<uint64_t>(*eventObj, "dur");
             if (udur) {
               dur = *udur;
             }
@@ -501,7 +472,7 @@ static void _ImportChromeEvents(const JsArray &traceEvents, ChromeConstructionMa
           if (!dur) {
             // tdur field might be a double or an int.
             dur = _JsGetValue<double>(*eventObj, "tdur");
-            boost::optional<uint64_t> utdur = _JsGetValue<uint64_t>(*eventObj, "tdur");
+            std::optional<uint64_t> utdur = _JsGetValue<uint64_t>(*eventObj, "tdur");
             if (utdur) {
               dur = *utdur;
             }

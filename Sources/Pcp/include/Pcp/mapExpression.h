@@ -1,34 +1,17 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_MAP_EXPRESSION_H
 #define PXR_USD_PCP_MAP_EXPRESSION_H
 
 #include "Pcp/api.h"
 #include "Pcp/mapFunction.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
-#include <boost/intrusive_ptr.hpp>
+#include "Tf/delegatedCountPtr.h"
 
 #include <OneTBB/tbb/spin_mutex.h>
 
@@ -66,6 +49,8 @@ class PcpMapExpression {
 
   /// Default-construct a NULL expression.
   PcpMapExpression() noexcept = default;
+
+  ~PcpMapExpression() noexcept = default;
 
   /// Swap this expression with the other.
   void Swap(PcpMapExpression &other) noexcept
@@ -191,7 +176,7 @@ class PcpMapExpression {
   friend struct Pcp_VariableImpl;
 
   class _Node;
-  typedef boost::intrusive_ptr<_Node> _NodeRefPtr;
+  using _NodeRefPtr = TfDelegatedCountPtr<_Node>;
 
   explicit PcpMapExpression(const _NodeRefPtr &node) : _node(node) {}
 
@@ -201,6 +186,11 @@ class PcpMapExpression {
   class _Node {
     _Node(const _Node &) = delete;
     _Node &operator=(const _Node &) = delete;
+
+    // Ref-counting ops manage _refCount.
+    // Need to friend them here to have access to _refCount.
+    friend PCP_API void TfDelegatedCountIncrement(_Node *);
+    friend PCP_API void TfDelegatedCountDecrement(_Node *) noexcept;
 
    public:
     // The Key holds all the state needed to uniquely identify
@@ -256,11 +246,6 @@ class PcpMapExpression {
     // will always contains the root identity.
     static bool _ExpressionTreeAlwaysHasIdentity(const Key &key);
 
-    // Ref-counting ops manage _refCount.
-    // Need to friend them here to have access to _refCount.
-    friend PCP_API void intrusive_ptr_add_ref(_Node *);
-    friend PCP_API void intrusive_ptr_release(_Node *);
-
     // Registry of node instances, identified by Key.
     // Note: variable nodes are not tracked by the registry.
     struct _NodeMap;
@@ -275,8 +260,8 @@ class PcpMapExpression {
   };
 
   // Need to friend them here to have visibility to private class _Node.
-  friend PCP_API void intrusive_ptr_add_ref(_Node *);
-  friend PCP_API void intrusive_ptr_release(_Node *);
+  friend PCP_API void TfDelegatedCountIncrement(_Node *);
+  friend PCP_API void TfDelegatedCountDecrement(_Node *) noexcept;
 
   _NodeRefPtr _node;
 };

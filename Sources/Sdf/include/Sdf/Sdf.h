@@ -101,4 +101,8 @@
 #include <Sdf/variantSpec.h>
 #include <Sdf/vectorListEditor.h>
 
+#include <Sdf/pathParser.h>
+#include <Sdf/pathPattern.h>
+#include <Sdf/pathPatternParser.h>
+#include <Sdf/textParserHelpers.h>
 #endif  // __PXR_USD_SDF_H__

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_CHANGES_H
 #define PXR_USD_PCP_CHANGES_H
@@ -27,13 +10,14 @@
 /// \file pcp/changes.h
 
 #include "Pcp/api.h"
+#include "Pcp/errors.h"
 #include "Pcp/layerStackIdentifier.h"
 #include "Sdf/changeList.h"
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
 #include "Sdf/types.h"
 #include "Tf/declarePtrs.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <map>
 #include <set>
@@ -81,6 +65,7 @@ class PcpLayerStackChanges {
   SdfRelocatesMap newIncrementalRelocatesSourceToTarget;
   SdfRelocatesMap newIncrementalRelocatesTargetToSource;
   SdfPathVector newRelocatesPrimPaths;
+  PcpErrorVector newRelocatesErrors;
 
   /// Paths that are affected by the above relocation changes.
   SdfPathSet pathsAffectedByRelocationChanges;
@@ -226,17 +211,6 @@ class PcpChanges {
   PCP_API
   void DidUnmuteLayer(const PcpCache *cache, const std::string &layerId);
 
-  /// The sublayer tree changed.  This often, but doesn't always, imply that
-  /// anything and everything may have changed.  If clients want to indicate
-  /// that anything and everything may have changed they should call this
-  /// method and \c DidChangePrimGraph() with the absolute root path.
-  PCP_API
-  void DidChangeLayers(const PcpCache *cache);
-
-  /// The sublayer offsets changed.
-  PCP_API
-  void DidChangeLayerOffsets(const PcpCache *cache);
-
   /// The object at \p path changed significantly enough to require
   /// recomputing the entire prim or property index.  A significant change
   /// implies changes to every namespace descendant's index, specs, and
@@ -266,11 +240,6 @@ class PcpChanges {
   void DidChangeTargets(const PcpCache *cache,
                         const SdfPath &path,
                         PcpCacheChanges::TargetType targetType);
-
-  /// The relocates that affect prims and properties at and below
-  /// the given cache path have changed.
-  PCP_API
-  void DidChangeRelocates(const PcpCache *cache, const SdfPath &path);
 
   /// The composed object at \p oldPath was moved to \p newPath.  This
   /// implies every corresponding Sd change.  This object will subsume
@@ -326,9 +295,6 @@ class PcpChanges {
   // Internal data types for namespace edits from Sd.
   typedef std::map<SdfPath, SdfPath> _PathEditMap;
   typedef std::map<PcpCache *, _PathEditMap> _RenameChanges;
-
-  // Returns the PcpLayerStackChanges for the given cache's layer stack.
-  PcpLayerStackChanges &_GetLayerStackChanges(const PcpCache *cache);
 
   // Returns the PcpLayerStackChanges for the given layer stack.
   PcpLayerStackChanges &_GetLayerStackChanges(const PcpLayerStackPtr &);

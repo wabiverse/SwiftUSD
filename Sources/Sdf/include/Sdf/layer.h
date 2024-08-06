@@ -1,33 +1,17 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_LAYER_H
 #define PXR_USD_SDF_LAYER_H
 
 /// \file sdf/layer.h
 
+#include "Ar/ar.h"
 #include "Ar/assetInfo.h"
-#include "ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "Sdf/api.h"
 #include "Sdf/data.h"
 #include "Sdf/declareHandles.h"
@@ -42,15 +26,12 @@
 #include "Tf/declarePtrs.h"
 #include "Vt/value.h"
 #include "Work/dispatcher.h"
-#include <pxr/pxrns.h>
-
-#include <Arch/swiftInterop.h>
-
-#include <boost/optional.hpp>
+#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -84,6 +65,10 @@ struct Sdf_AssetInfo;
 /// the layer to a different location. You can use the GetIdentifier() method
 /// to get the layer's Id or GetRealPath() to get the resolved, full URI.
 ///
+/// Layer identifiers are UTF-8 encoded strings. A layer's file format is
+/// determined via the identifier's extension (as resolved by Ar) with [A-Z]
+/// (and no other characters) explicitly case folded.
+///
 /// Layers can have a timeCode range (startTimeCode and endTimeCode). This range
 /// represents the suggested playback range, but has no impact on the extent of
 /// the animation data that may be stored in the layer. The metadatum
@@ -96,7 +81,7 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
  public:
   /// Destructor
   SDF_API
-  ~SdfLayer() noexcept override;
+  virtual ~SdfLayer();
 
   /// Noncopyable
   SdfLayer(const SdfLayer &) = delete;
@@ -810,18 +795,31 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   void SetComment(const std::string &comment);
 
   /// Return the defaultPrim metadata for this layer.  This field
-  /// indicates the name of which root prim should be targeted by a reference
-  /// or payload to this layer that doesn't specify a prim path.
+  /// indicates the name or path of which prim should be targeted by a
+  /// reference or payload to this layer that doesn't specify a prim path.
   ///
   /// The default value is the empty token.
   SDF_API
   TfToken GetDefaultPrim() const;
 
-  /// Set the default prim metadata for this layer.  The root prim with this
-  /// name will be targeted by a reference or a payload to this layer that
-  /// doesn't specify a prim path.  Note that this must be a root prim
-  /// <b>name</b> not a path.  E.g. "rootPrim" rather than "/rootPrim".  See
-  /// GetDefaultPrim().
+  /// Return this layer's default prim metadata interpreted as an absolute
+  /// prim path regardless of whether it was authored as a root prim name or a
+  /// prim path. For example, if the authored default prim value is
+  /// "rootPrim", return </rootPrim>. If the authored default prim value is
+  /// "/path/to/non/root/prim", return </path/to/non/root/prim>. If the
+  /// authored default prim value cannot be interpreted as a prim path,
+  /// return the empty SdfPath.
+  ///
+  /// The default value is an empty path.
+  SDF_API
+  SdfPath GetDefaultPrimAsPath() const;
+
+  /// Set the default prim metadata for this layer.  The prim at this path
+  /// will be targeted by a reference or a payload to this layer that doesn't
+  /// specify a prim path.
+  /// Note that this can be a name if it refers to a root prim, or a path to
+  /// any prim in this layer. E.g. "rootPrim", "/path/to/non/root/prim" or
+  /// "/rootPrim".  See GetDefaultPrim().
   SDF_API
   void SetDefaultPrim(const TfToken &name);
 
@@ -868,9 +866,9 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   void ClearStartTimeCode();
 
   /// Returns the layer's end timeCode.
-  /// The start and end timeCode of a layer represent a suggested playback
-  /// range. However, time-varying content is not limited to the timeCode range
-  /// of the layer.
+  /// The start and end timeCode of a layer represent a suggested playback range.
+  /// However, time-varying content is not limited to the timeCode range of the
+  /// layer.
   ///
   /// The default value for endTimeCode is 0.
   SDF_API
@@ -1190,6 +1188,37 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   /// Sets the layer offset for the subLayer path at the given index.
   SDF_API
   void SetSubLayerOffset(const SdfLayerOffset &offset, int index);
+
+  /// @}
+  /// \name Relocates
+  /// @{
+
+  /// Get the list of relocates specified in this layer's metadata.
+  ///
+  /// Each individual relocate in the list is specified as a pair of
+  /// \c \SdfPath where the first is the source path of the relocate and the
+  /// second is target path.
+  ///
+  /// Note that is NOT a proxy object and cannot be used to edit the field in
+  /// place.
+  SDF_API
+  SdfRelocates GetRelocates() const;
+
+  /// Set the entire list of namespace relocations specified on this layer to
+  /// \p relocates.
+  SDF_API
+  void SetRelocates(const SdfRelocates &relocates);
+
+  /// Returns true if this layer's metadata has any relocates opinion,
+  /// including that there should be no relocates (i.e. an empty list).  An
+  /// empty list (no relocates) does not mean the same thing as a missing list
+  /// (no opinion).
+  SDF_API
+  bool HasRelocates() const;
+
+  /// Clears the layer relocates opinion in the layer's metadata.
+  SDF_API
+  void ClearRelocates();
 
   /// @}
 
@@ -1782,8 +1811,8 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   // users to export and save to any file name, regardless of extension.
   bool _WriteToFile(const std::string &newFileName,
                     const std::string &comment,
-                    SdfFileFormatConstPtr fileFormat = TfNullPtr,
-                    const FileFormatArguments &args = FileFormatArguments()) const;
+                    SdfFileFormatConstPtr fileFormat,
+                    const FileFormatArguments &args) const;
 
   // Swap contents of _data and data. This operation does not register
   // inverses or emit change notification.
@@ -1914,7 +1943,7 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
 
   // This is an optional<bool> that is only set once initialization
   // is complete, before _initializationComplete is set.
-  boost::optional<bool> _initializationWasSuccessful;
+  std::optional<bool> _initializationWasSuccessful;
 
   // remembers the last 'IsDirty' state.
   mutable bool _lastDirtyState;
@@ -1964,11 +1993,8 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   // Give layer state delegates access to our data as well as to
   // the various _Prim functions.
   friend class SdfLayerStateDelegateBase;
-} SWIFT_SHARED_REFERENCE(SdfLayerRetain, SdfLayerRelease);
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void SdfLayerRetain(PXR_NS::SdfLayer *);
-void SdfLayerRelease(PXR_NS::SdfLayer *);
 
 #endif  // PXR_USD_SDF_LAYER_H

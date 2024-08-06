@@ -1,25 +1,8 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HD_MATERIAL_NETWORK_INTERFACE_H
 #define PXR_IMAGING_HD_MATERIAL_NETWORK_INTERFACE_H
@@ -28,7 +11,7 @@
 #include "Tf/smallVector.h"
 #include "Tf/token.h"
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -51,6 +34,10 @@ class HdMaterialNetworkInterface {
 
   virtual SdfPath GetMaterialPrimPath() const = 0;
 
+  /// Returns the nearest enclosing model asset name, as described by
+  /// the model schema, or empty string if none is available.
+  virtual std::string GetModelAssetName() const = 0;
+
   virtual TfTokenVector GetNodeNames() const = 0;
   virtual TfToken GetNodeType(const TfToken &nodeName) const = 0;
 
@@ -66,6 +53,14 @@ class HdMaterialNetworkInterface {
 
   virtual VtValue GetNodeParameterValue(const TfToken &nodeName,
                                         const TfToken &paramName) const = 0;
+
+  struct NodeParamData {
+    VtValue value;
+    TfToken colorSpace;
+  };
+
+  virtual NodeParamData GetNodeParameterData(const TfToken &nodeName,
+                                             const TfToken &paramName) const = 0;
 
   virtual TfTokenVector GetNodeInputConnectionNames(const TfToken &nodeName) const = 0;
 
@@ -85,6 +80,10 @@ class HdMaterialNetworkInterface {
   virtual void SetNodeParameterValue(const TfToken &nodeName,
                                      const TfToken &paramName,
                                      const VtValue &value) = 0;
+
+  virtual void SetNodeParameterData(const TfToken &nodeName,
+                                    const TfToken &paramName,
+                                    const NodeParamData &paramData) = 0;
 
   virtual void DeleteNodeParameter(const TfToken &nodeName, const TfToken &paramName) = 0;
 

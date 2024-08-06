@@ -1,29 +1,14 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/materialNetwork2Interface.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (colorSpace));
 
 HdMaterialNode2 *HdMaterialNetwork2Interface::_GetNode(const TfToken &nodeName) const
 {
@@ -70,7 +55,7 @@ TfTokenVector HdMaterialNetwork2Interface::GetNodeNames() const
   TfTokenVector result;
   if (_materialNetwork) {
     result.reserve(_materialNetwork->nodes.size());
-    for (const auto nameNodePair : _materialNetwork->nodes) {
+    for (const auto &nameNodePair : _materialNetwork->nodes) {
       result.push_back(TfToken(nameNodePair.first.GetString()));
     }
   }
@@ -104,7 +89,7 @@ TfTokenVector HdMaterialNetwork2Interface::GetAuthoredNodeParameterNames(
   TfTokenVector result;
   if (HdMaterialNode2 *node = _GetNode(nodeName)) {
     result.reserve(node->parameters.size());
-    for (const auto nameValuePair : node->parameters) {
+    for (const auto &nameValuePair : node->parameters) {
       result.push_back(nameValuePair.first);
     }
   }
@@ -124,13 +109,33 @@ VtValue HdMaterialNetwork2Interface::GetNodeParameterValue(const TfToken &nodeNa
   return VtValue();
 }
 
+HdMaterialNetworkInterface::NodeParamData HdMaterialNetwork2Interface::GetNodeParameterData(
+    const TfToken &nodeName, const TfToken &paramName) const
+{
+  HdMaterialNetworkInterface::NodeParamData paramData;
+  if (HdMaterialNode2 *node = _GetNode(nodeName)) {
+    // Value
+    const auto vIt = node->parameters.find(paramName);
+    if (vIt != node->parameters.end()) {
+      paramData.value = vIt->second;
+    }
+    // ColorSpace
+    const TfToken colorSpaceParamName(SdfPath::JoinIdentifier(_tokens->colorSpace, paramName));
+    const auto csIt = node->parameters.find(colorSpaceParamName);
+    if (csIt != node->parameters.end()) {
+      paramData.colorSpace = csIt->second.Get<TfToken>();
+    }
+  }
+  return paramData;
+}
+
 TfTokenVector HdMaterialNetwork2Interface::GetNodeInputConnectionNames(
     const TfToken &nodeName) const
 {
   TfTokenVector result;
   if (HdMaterialNode2 *node = _GetNode(nodeName)) {
     result.reserve(node->inputConnections.size());
-    for (const auto nameConnectionsPair : node->inputConnections) {
+    for (const auto &nameConnectionsPair : node->inputConnections) {
       result.push_back(nameConnectionsPair.first);
     }
   }
@@ -176,6 +181,22 @@ void HdMaterialNetwork2Interface::SetNodeParameterValue(const TfToken &nodeName,
   }
 }
 
+void HdMaterialNetwork2Interface::SetNodeParameterData(const TfToken &nodeName,
+                                                       const TfToken &paramName,
+                                                       const NodeParamData &paramData)
+{
+  if (HdMaterialNode2 *node = _GetOrCreateNode(nodeName)) {
+    // Value
+    node->parameters[paramName] = paramData.value;
+
+    // ColorSpace
+    if (!paramData.colorSpace.IsEmpty()) {
+      const TfToken csParamName(SdfPath::JoinIdentifier(_tokens->colorSpace, paramName));
+      node->parameters[csParamName] = VtValue(paramData.colorSpace);
+    }
+  }
+}
+
 void HdMaterialNetwork2Interface::DeleteNodeParameter(const TfToken &nodeName,
                                                       const TfToken &paramName)
 {
@@ -211,7 +232,7 @@ TfTokenVector HdMaterialNetwork2Interface::GetTerminalNames() const
   TfTokenVector result;
   if (_materialNetwork) {
     result.reserve(_materialNetwork->terminals.size());
-    for (const auto nameConnectionPair : _materialNetwork->terminals) {
+    for (const auto &nameConnectionPair : _materialNetwork->terminals) {
       result.push_back(nameConnectionPair.first);
     }
   }

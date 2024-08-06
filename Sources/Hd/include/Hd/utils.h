@@ -1,35 +1,23 @@
 //
 // Copyright 2023 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #ifndef PXR_IMAGING_HD_UTILS_H
 #define PXR_IMAGING_HD_UTILS_H
 
+#include "CameraUtil/conformWindow.h"
 #include "Hd/api.h"
-#include <pxr/pxrns.h>
+#include "Hd/dataSource.h"
+#include "Hd/material.h"
+#include "pxr/pxrns.h"
 
+#include "Sdf/path.h"
 #include "Tf/declarePtrs.h"
 
+#include <iosfwd>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -38,7 +26,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 
-class SdfPath;
+class TfToken;
 
 namespace HdUtils {
 
@@ -125,6 +113,41 @@ template<typename T> class RenderInstanceTracker {
 ///
 HD_API
 bool HasActiveRenderSettingsPrim(const HdSceneIndexBaseRefPtr &si, SdfPath *primPath = nullptr);
+
+/// Retreives the current frame number from the input scene index \p si.
+/// Returns true if a data source for the associated locator was found
+/// with the result in \p frame, and false otherwise.
+///
+HD_API
+bool GetCurrentFrame(const HdSceneIndexBaseRefPtr &si, double *frame);
+
+/// Translate the given aspect ratio conform policy \p token into an equivalent
+/// CameraUtilConformWindowPolicy enum.
+///
+HD_API
+CameraUtilConformWindowPolicy ToConformWindowPolicy(const TfToken &token);
+
+/// Lexicographically sorts the scene index prims in the subtree rooted at
+/// \p rootPath and writes them out.
+///
+HD_API
+void PrintSceneIndex(std::ostream &out,
+                     const HdSceneIndexBaseRefPtr &si,
+                     const SdfPath &rootPath = SdfPath::AbsoluteRootPath());
+
+/// Convert the supplied HdMaterialNetworkMap to an HdMaterialNetworkSchema
+/// container data source.
+///
+HD_API
+HdContainerDataSourceHandle ConvertHdMaterialNetworkToHdMaterialNetworkSchema(
+    const HdMaterialNetworkMap &hdNetworkMap);
+
+/// Convert the supplied HdMaterialNetworkMap to an HdMaterialSchema
+/// container data source.
+///
+HD_API
+HdContainerDataSourceHandle ConvertHdMaterialNetworkToHdMaterialSchema(
+    const HdMaterialNetworkMap &hdNetworkMap);
 
 }  // namespace HdUtils
 

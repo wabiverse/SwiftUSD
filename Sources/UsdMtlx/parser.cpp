@@ -1,25 +1,8 @@
 //
 // Copyright 2018 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Ndr/debugCodes.h"
 #include "Ndr/node.h"
@@ -35,7 +18,7 @@
 #include "Tf/stringUtils.h"
 #include "UsdMtlx/utils.h"
 #include "UsdUtils/pipeline.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 namespace mx = MaterialX;
 
@@ -48,7 +31,7 @@ TF_DEFINE_PRIVATE_TOKENS(
 
     ((discoveryType, "mtlx"))((sourceType, ""))
 
-        (colorspace)(defaultgeomprop)(defaultinput)(doc)((enum_, "enum"))(
+        (defaultgeomprop)(defaultinput)(doc)((enum_, "enum"))(
             enumvalues)(nodecategory)(nodegroup)(target)(uifolder)(uimax)(uimin)(uiname)(uisoftmax)(uisoftmin)(uistep)(unit)(unittype)(UV0));
 
 // This environment variable lets users override the name of the primary
@@ -221,10 +204,12 @@ void ShaderBuilder::AddProperty(const mx::ConstTypedElementPtr &element,
     if (converted.valueTypeName) {
       type = converted.valueTypeName.GetAsToken();
       // Do not use GetAsToken for comparison as recommended in the API
-      if (converted.valueTypeName == SdfValueTypeNames->Bool) {
+      if (converted.valueTypeName == SdfValueTypeNames->Bool ||
+          converted.valueTypeName == SdfValueTypeNames->Matrix3d)
+      {
         defaultValue = UsdMtlxGetUsdValue(element, isOutput);
         metadata.emplace(SdrPropertyMetadata->SdrUsdDefinitionType,
-                         converted.valueTypeName.GetType().GetTypeName());
+                         converted.valueTypeName.GetAliasesAsTokens().front());
       }
     }
     else {
@@ -273,7 +258,7 @@ void ShaderBuilder::AddProperty(const mx::ConstTypedElementPtr &element,
 
   // Record the colorspace on inputs and outputs.
   if (isOutput || element->isA<mx::Input>()) {
-    const auto &colorspace = element->getAttribute(_tokens->colorspace);
+    const auto &colorspace = element->getColorSpace();
     if (!colorspace.empty() && colorspace != element->getParent()->getActiveColorSpace()) {
       metadata.emplace(SdrPropertyMetadata->Colorspace, colorspace);
     }
@@ -371,9 +356,9 @@ static void ParseMetadata(ShaderBuilder *builder,
 {
   const auto &value = element->getAttribute(attribute);
   if (!value.empty()) {
-    // Change the 'texture2d' role for stdlib MaterialX Texture nodes
-    // to 'texture' for Sdr.
-    if (key == SdrNodeMetadata->Role && value == "texture2d") {
+    // Change the 'texture2d' and 'texture3d' roles for stdlib MaterialX
+    // Texture nodes to 'texture' for Sdr.
+    if (key == SdrNodeMetadata->Role && (value == "texture2d" || value == "texture3d")) {
       builder->metadata[key] = "texture";
     }
     else {

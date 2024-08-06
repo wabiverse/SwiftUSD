@@ -74,4 +74,11 @@
 
 #include <Usd/stage.h>
 
+#include <Usd/collectionPredicateLibrary.h>
+#include <Usd/crateDataTypes.h>
+#include <Usd/namespaceEditor.h>
+#include <Usd/validationError.h>
+#include <Usd/validationRegistry.h>
+#include <Usd/validator.h>
+#include <Usd/validatorTokens.h>
 #endif  // __PXR_USD_USD_H__

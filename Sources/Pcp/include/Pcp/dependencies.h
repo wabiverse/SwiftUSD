@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_DEPENDENCIES_H
 #define PXR_USD_PCP_DEPENDENCIES_H
@@ -34,7 +17,7 @@
 #include "Pcp/types.h"
 #include "Sdf/layer.h"
 #include "Sdf/path.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <OneTBB/tbb/spin_mutex.h>
 
@@ -284,24 +267,29 @@ class Pcp_Dependencies {
   ConcurrentPopulationContext *_concurrentPopulationContext;
 };
 
-static inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
-                                                 const SdfLayerHandle &layer)
+inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node, const SdfLayerHandle &layer)
 {
   return node.GetLayerStack()->HasLayer(layer);
 }
 
-static inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
-                                                 const PcpLayerStackRefPtr &layerStack)
+inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
+                                          const PcpLayerStackRefPtr &layerStack)
+{
+  return node.GetLayerStack() == layerStack;
+}
+
+inline bool Pcp_NodeUsesLayerOrLayerStack(const PcpNodeRef &node,
+                                          const PcpLayerStackPtr &layerStack)
 {
   return node.GetLayerStack() == layerStack;
 }
 
 template<class FN, class LayerOrLayerStack>
-static bool Pcp_ForEachDependentNodeImpl(const SdfPath &sitePath,
-                                         const LayerOrLayerStack &layerOrLayerStack,
-                                         const SdfPath &depIndexPath,
-                                         const PcpCache &cache,
-                                         const FN &fn)
+bool Pcp_ForEachDependentNodeImpl(const SdfPath &sitePath,
+                                  const LayerOrLayerStack &layerOrLayerStack,
+                                  const SdfPath &depIndexPath,
+                                  const PcpCache &cache,
+                                  const FN &fn)
 {
   bool foundDep = false;
 
@@ -339,11 +327,11 @@ static bool Pcp_ForEachDependentNodeImpl(const SdfPath &sitePath,
 /// The \p nodeFn callback will be called with \p depIndexPath and the
 /// PcpNodeRef for each dependent node in the prim index.
 template<class FN, class LayerOrLayerStack>
-static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
-                                     const LayerOrLayerStack &layerOrLayerStack,
-                                     const SdfPath &depIndexPath,
-                                     const PcpCache &cache,
-                                     const FN &nodeFn)
+void Pcp_ForEachDependentNode(const SdfPath &sitePath,
+                              const LayerOrLayerStack &layerOrLayerStack,
+                              const SdfPath &depIndexPath,
+                              const PcpCache &cache,
+                              const FN &nodeFn)
 {
   const bool foundDep = Pcp_ForEachDependentNodeImpl(
       sitePath, layerOrLayerStack, depIndexPath, cache, nodeFn);
@@ -367,12 +355,12 @@ static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
 /// The \p culledDepFn will be called with \p depIndexPath and the
 /// PcpCulledDependency for each culled dependent node in the prim index.
 template<class NodeFn, class CulledDepFn>
-static void Pcp_ForEachDependentNode(const SdfPath &sitePath,
-                                     const PcpLayerStackRefPtr &layerStack,
-                                     const SdfPath &depIndexPath,
-                                     const PcpCache &cache,
-                                     const NodeFn &nodeFn,
-                                     const CulledDepFn &culledDepFn)
+void Pcp_ForEachDependentNode(const SdfPath &sitePath,
+                              const PcpLayerStackRefPtr &layerStack,
+                              const SdfPath &depIndexPath,
+                              const PcpCache &cache,
+                              const NodeFn &nodeFn,
+                              const CulledDepFn &culledDepFn)
 {
   bool foundDep = Pcp_ForEachDependentNodeImpl(sitePath, layerStack, depIndexPath, cache, nodeFn);
 

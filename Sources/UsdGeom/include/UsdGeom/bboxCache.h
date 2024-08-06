@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_GEOM_BBOX_CACHE_H
 #define PXR_USD_USD_GEOM_BBOX_CACHE_H
@@ -32,10 +15,9 @@
 #include "UsdGeom/pointInstancer.h"
 #include "UsdGeom/xformCache.h"
 #include "Work/dispatcher.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
-#include <boost/optional.hpp>
-#include <boost/shared_array.hpp>
+#include <optional>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -365,14 +347,14 @@ class UsdGeomBBoxCache {
   /// observe if a base time has been set.
   UsdTimeCode GetBaseTime() const
   {
-    return _baseTime.get_value_or(GetTime());
+    return _baseTime.value_or(GetTime());
   }
 
   /// Clear this cache's baseTime if one has been set.  After calling this,
   /// the cache will use its time as the baseTime value.
   void ClearBaseTime()
   {
-    _baseTime = boost::none;
+    _baseTime = std::nullopt;
   }
 
   /// Return true if this cache has a baseTime that's been explicitly set,
@@ -463,7 +445,7 @@ class UsdGeomBBoxCache {
   //
   // \p inverseComponentCtm is used to combine all the child bboxes in
   // component-relative space.
-  void _ResolvePrim(_BBoxTask *task,
+  void _ResolvePrim(const _BBoxTask *task,
                     const _PrimContext &prim,
                     const GfMatrix4d &inverseComponentCtm);
 
@@ -475,7 +457,7 @@ class UsdGeomBBoxCache {
 
     // Queries for attributes that need to be re-computed at each
     // time for this entry. This will be invalid for non-varying entries.
-    boost::shared_array<UsdAttributeQuery> queries;
+    std::shared_ptr<UsdAttributeQuery[]> queries;
 
     // Computed purpose info of the prim that's associated with the entry.
     // This data includes the prim's actual computed purpose as well as
@@ -557,7 +539,7 @@ class UsdGeomBBoxCache {
 
   WorkDispatcher _dispatcher;
   UsdTimeCode _time;
-  boost::optional<UsdTimeCode> _baseTime;
+  std::optional<UsdTimeCode> _baseTime;
   TfTokenVector _includedPurposes;
   UsdGeomXformCache _ctmCache;
   _PrimBBoxHashMap _bboxCache;

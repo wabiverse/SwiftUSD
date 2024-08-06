@@ -1,39 +1,22 @@
 //
 // Copyright 2022 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #ifndef PXR_IMAGING_HD_VECTOR_SCHEMA_H
 #define PXR_IMAGING_HD_VECTOR_SCHEMA_H
 
 #include "Hd/api.h"
+
 #include "Hd/dataSource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 // ----------------------------------------------------------------------------
 
-/// Vector schema classes represent a view of a vector data source
-/// which is returning untyped data sources.
+/// Base class wrapping a vector data source.
 ///
 class HdVectorSchema {
  public:
@@ -60,29 +43,32 @@ class HdVectorSchema {
   HD_API
   size_t GetNumElements() const;
 
+  using UnderlyingDataSource = HdVectorDataSource;
+
  protected:
+  template<typename T> typename T::Handle _GetTyped(const size_t element) const
+  {
+    return _vector ? T::Cast(_vector->GetElement(element)) : nullptr;
+  }
+
   HdVectorDataSourceHandle _vector;
 };
 
-/// Base class for vector schema classes that represent a view of
-/// a vector data source containing data source of a given type.
+/// Template class wrapping a vector data source whose children are
+/// data source of an expected type.
 ///
 template<typename T> class HdTypedVectorSchema : public HdVectorSchema {
  public:
-  using DataSource = HdTypedSampledDataSource<T>;
-  using DataSourceHandle = typename DataSource::Handle;
-
   HdTypedVectorSchema(HdVectorDataSourceHandle const &vector) : HdVectorSchema(vector) {}
 
-  DataSourceHandle GetElement(const size_t element) const
+  typename T::Handle GetElement(const size_t element) const
   {
-    return _vector ? DataSource::Cast(_vector->GetElement(element)) : nullptr;
+    return _GetTyped<T>(element);
   }
 };
 
-/// Base class for vector schema classes that represent a view of
-/// a vector data source containing container data sources conforming
-/// to a given HdSchema.
+/// Template class wrapping a vector data source whose children are
+/// container data source conforming to an expected schema.
 ///
 template<typename Schema> class HdSchemaBasedVectorSchema : public HdVectorSchema {
  public:
@@ -90,7 +76,8 @@ template<typename Schema> class HdSchemaBasedVectorSchema : public HdVectorSchem
 
   Schema GetElement(const size_t element) const
   {
-    return Schema(_vector ? HdContainerDataSource::Cast(_vector->GetElement(element)) : nullptr);
+    using DataSource = typename Schema::UnderlyingDataSource;
+    return Schema(_GetTyped<DataSource>(element));
   }
 };
 
