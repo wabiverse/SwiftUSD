@@ -281,9 +281,9 @@ void _ThrowParseError(const Input &in, const std::string &msg)
 // missing "}". This is because it recognizes everything up to the
 // illegal character as the variable and expects to find the
 // closing "}" after it. It'd be nice to fix this.
-struct VariableStart : string<'$', '{'> {};
+struct VariableStart : PXR_PEGTL_NAMESPACE::ascii::string<'$', '{'> {};
 
-struct VariableEnd : string<'}'> {};
+struct VariableEnd : PXR_PEGTL_NAMESPACE::ascii::string<'}'> {};
 
 template<class C> struct VariableName : identifier {};
 
@@ -312,9 +312,9 @@ struct QuotedStringChars : PXR_PEGTL_NAMESPACE::internal::plus<PXR_PEGTL_NAMESPA
                                // by different rules.
                                PXR_PEGTL_NAMESPACE::internal::seq<PXR_PEGTL_NAMESPACE::internal::not_at<PXR_PEGTL_NAMESPACE::internal::sor<VariableStart, one<QuoteChar>>>, any>>> {};
 
-template<char QuoteChar> struct QuotedStringStart : string<QuoteChar> {};
+template<char QuoteChar> struct QuotedStringStart : PXR_PEGTL_NAMESPACE::ascii::string<QuoteChar> {};
 
-template<char QuoteChar> struct QuotedStringEnd : string<QuoteChar> {};
+template<char QuoteChar> struct QuotedStringEnd : PXR_PEGTL_NAMESPACE::ascii::string<QuoteChar> {};
 
 template<char QuoteChar>
 struct QuotedStringBody : PXR_PEGTL_NAMESPACE::internal::star<PXR_PEGTL_NAMESPACE::internal::sor<QuotedStringVariable, QuotedStringChars<QuoteChar>>> {};
@@ -371,10 +371,10 @@ template<class Base> struct FunctionArgumentWrapper : public Base {};
 using FunctionArgument = FunctionArgumentWrapper<ExpressionBody>;
 
 // Function arguments are zero or more comma-separated arguments.
-struct FunctionArguments : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_NAMESPACE::internal::list<FunctionArgument, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
+struct FunctionArguments : PXR_PEGTL_NAMESPACE::internal::sor<list<FunctionArgument, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
 
 struct Function
-    : if_must<PXR_PEGTL_NAMESPACE::internal::seq<FunctionName, FunctionArgumentStart>, FunctionArguments, FunctionArgumentEnd> {};
+    : PXR_PEGTL_NAMESPACE::internal::if_must<PXR_PEGTL_NAMESPACE::internal::seq<FunctionName, FunctionArgumentStart>, FunctionArguments, FunctionArgumentEnd> {};
 
 // ----------------------------------------
 
@@ -389,15 +389,15 @@ struct ListEnd : one<']'> {};
 
 struct ListElement : public ScalarExpression {};
 
-struct ListElements : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_NAMESPACE::internal::list<ListElement, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
+struct ListElements : PXR_PEGTL_NAMESPACE::internal::sor<list<ListElement, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
 
 struct ListExpression : PXR_PEGTL_NAMESPACE::internal::if_must<ListStart, ListElements, ListEnd> {};
 
 // ----------------------------------------
 
-struct ExpressionStart : string<'`'> {};
+struct ExpressionStart : PXR_PEGTL_NAMESPACE::ascii::string<'`'> {};
 
-struct ExpressionEnd : string<'`'> {};
+struct ExpressionEnd : PXR_PEGTL_NAMESPACE::ascii::string<'`'> {};
 
 struct ExpressionBody : PXR_PEGTL_NAMESPACE::internal::sor<ScalarExpression, ListExpression> {};
 
