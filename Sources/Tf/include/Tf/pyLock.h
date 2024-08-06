@@ -9,7 +9,7 @@
 
 #include "pxr/pxrns.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #  include "Tf/pySafePython.h"
 
@@ -179,6 +179,6 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // When python is disabled, we stub this macro out to nothing.
 #  define TF_PY_ALLOW_THREADS_IN_SCOPE()
 
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_LOCK_H

@@ -9,6 +9,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/pyCall.h"
 #include "Tf/pyLock.h"
 #include "Tf/pyObjWrapper.h"
@@ -164,5 +166,7 @@ template<typename Ret, typename... Args> struct TfPyFunctionFromPython<Ret(Args.
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_FUNCTION_H

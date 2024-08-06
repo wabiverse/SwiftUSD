@@ -12,7 +12,7 @@
 #include "Arch/pragmas.h"
 #include "Tf/api.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 // Include this header first to pick up additional mitigations
 // for build issues when including Python.h
 #  include "Tf/pySafePython.h"
@@ -26,11 +26,11 @@
 #  include <iosfwd>
 #  include <memory>
 
-#else
+#else // !defined(PXR_PYTHON_SUPPORT_ENABLED) || !PXR_PYTHON_SUPPORT_ENABLED
 
 #  include <type_traits>
 
-#endif
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -74,7 +74,7 @@ class TfPyObjWrapperStub {
 /// provides, by virtue of deriving from boost::python::api::object_operators<T>.
 /// However it is important to note that callers must ensure the GIL is held
 /// before using these operators!
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 class TfPyObjWrapper : public boost::python::api::object_operators<TfPyObjWrapper> {
   typedef boost::python::object object;
 
@@ -142,11 +142,11 @@ static_assert(sizeof(TfPyObjWrapper) == sizeof(TfPyObjWrapperStub),
 static_assert(alignof(TfPyObjWrapper) == alignof(TfPyObjWrapperStub),
               "ABI break: Incompatible class alignments.");
 
-#else  // PXR_PYTHON_SUPPORT_ENABLED
+#else  // !defined(PXR_PYTHON_SUPPORT_ENABLED) || !PXR_PYTHON_SUPPORT_ENABLED
 
 class TfPyObjWrapper : TfPyObjWrapperStub {};
 
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

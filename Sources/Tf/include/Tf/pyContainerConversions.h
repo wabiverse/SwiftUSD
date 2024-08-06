@@ -21,6 +21,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/diagnostic.h"
 #include "Tf/iterator.h"
 #include "Tf/pyUtils.h"
@@ -385,5 +387,7 @@ template<class T> void TfPyRegisterStlSequencesFromPython()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_CONTAINER_CONVERSIONS_H

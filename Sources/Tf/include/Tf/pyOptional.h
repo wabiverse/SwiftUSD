@@ -11,6 +11,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/pyUtils.h"
 
 #if __has_include(<boost/python/converter/from_python.hpp>)
@@ -104,5 +106,7 @@ template<typename T> struct python_optional {
 }  // namespace TfPyOptional
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_OPTIONAL_H

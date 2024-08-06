@@ -12,6 +12,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/api.h"
 #include "Tf/errorMark.h"
 
@@ -94,5 +96,7 @@ template<typename Base = boost::python::default_call_policies> struct TfPyRaiseO
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_ERROR_H
