@@ -103,7 +103,6 @@
 #include "internal_compress.h"
 #include "internal_decompress.h"
 #include "internal_memory.h"
-
 #include "internal_coding.h"
 
 #include "openexr_compression.h"
@@ -114,104 +113,126 @@
 #include "internal_xdr.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
+
+#include "OpenEXRConfigInternal.h"
 
 #include "internal_dwa_helpers.h"
 
 /**************************************/
 
-exr_result_t internal_exr_apply_dwaa(exr_encode_pipeline_t *encode)
+exr_result_t
+internal_exr_apply_dwaa (exr_encode_pipeline_t* encode)
 {
-  exr_result_t rv;
-  DwaCompressor dwaa;
-  rv = internal_encode_alloc_buffer(encode,
-                                    EXR_TRANSCODE_BUFFER_SCRATCH1,
-                                    &(encode->scratch_buffer_1),
-                                    &(encode->scratch_alloc_size_1),
-                                    internal_exr_huf_compress_spare_bytes());
-  if (rv == EXR_ERR_SUCCESS) {
-    rv = DwaCompressor_construct(&dwaa, DEFLATE, encode, NULL);
+    exr_result_t  rv;
+    DwaCompressor dwaa;
+    rv = internal_encode_alloc_buffer (
+        encode,
+        EXR_TRANSCODE_BUFFER_SCRATCH1,
+        &(encode->scratch_buffer_1),
+        &(encode->scratch_alloc_size_1),
+        internal_exr_huf_compress_spare_bytes ());
     if (rv == EXR_ERR_SUCCESS)
-      rv = DwaCompressor_compress(&dwaa);
+    {
+        rv = DwaCompressor_construct (&dwaa, DEFLATE, encode, NULL);
+        if (rv == EXR_ERR_SUCCESS) rv = DwaCompressor_compress (&dwaa);
 
-    DwaCompressor_destroy(&dwaa);
-  }
+        DwaCompressor_destroy (&dwaa);
+    }
 
-  return rv;
+    return rv;
 }
 
 /**************************************/
 
-exr_result_t internal_exr_apply_dwab(exr_encode_pipeline_t *encode)
+exr_result_t
+internal_exr_apply_dwab (exr_encode_pipeline_t* encode)
 {
-  exr_result_t rv;
-  DwaCompressor dwab;
+    exr_result_t  rv;
+    DwaCompressor dwab;
 
-  rv = internal_encode_alloc_buffer(encode,
-                                    EXR_TRANSCODE_BUFFER_SCRATCH1,
-                                    &(encode->scratch_buffer_1),
-                                    &(encode->scratch_alloc_size_1),
-                                    internal_exr_huf_compress_spare_bytes());
-  if (rv == EXR_ERR_SUCCESS) {
-    rv = DwaCompressor_construct(&dwab, STATIC_HUFFMAN, encode, NULL);
+    rv = internal_encode_alloc_buffer (
+        encode,
+        EXR_TRANSCODE_BUFFER_SCRATCH1,
+        &(encode->scratch_buffer_1),
+        &(encode->scratch_alloc_size_1),
+        internal_exr_huf_compress_spare_bytes ());
     if (rv == EXR_ERR_SUCCESS)
-      rv = DwaCompressor_compress(&dwab);
+    {
+        rv = DwaCompressor_construct (&dwab, STATIC_HUFFMAN, encode, NULL);
+        if (rv == EXR_ERR_SUCCESS) rv = DwaCompressor_compress (&dwab);
 
-    DwaCompressor_destroy(&dwab);
-  }
+        DwaCompressor_destroy (&dwab);
+    }
 
-  return rv;
+    return rv;
 }
 
-exr_result_t internal_exr_undo_dwaa(exr_decode_pipeline_t *decode,
-                                    const void *compressed_data,
-                                    uint64_t comp_buf_size,
-                                    void *uncompressed_data,
-                                    uint64_t uncompressed_size)
+exr_result_t
+internal_exr_undo_dwaa (
+    exr_decode_pipeline_t* decode,
+    const void*            compressed_data,
+    uint64_t               comp_buf_size,
+    void*                  uncompressed_data,
+    uint64_t               uncompressed_size)
 {
-  exr_result_t rv;
-  DwaCompressor dwaa;
+    exr_result_t  rv;
+    DwaCompressor dwaa;
 
-  rv = internal_decode_alloc_buffer(decode,
-                                    EXR_TRANSCODE_BUFFER_SCRATCH1,
-                                    &(decode->scratch_buffer_1),
-                                    &(decode->scratch_alloc_size_1),
-                                    internal_exr_huf_decompress_spare_bytes());
-  if (rv == EXR_ERR_SUCCESS) {
-    rv = DwaCompressor_construct(&dwaa, STATIC_HUFFMAN, NULL, decode);
+    rv = internal_decode_alloc_buffer (
+        decode,
+        EXR_TRANSCODE_BUFFER_SCRATCH1,
+        &(decode->scratch_buffer_1),
+        &(decode->scratch_alloc_size_1),
+        internal_exr_huf_decompress_spare_bytes ());
     if (rv == EXR_ERR_SUCCESS)
-      rv = DwaCompressor_uncompress(
-          &dwaa, compressed_data, comp_buf_size, uncompressed_data, uncompressed_size);
+    {
+        rv = DwaCompressor_construct (&dwaa, STATIC_HUFFMAN, NULL, decode);
+        if (rv == EXR_ERR_SUCCESS)
+            rv = DwaCompressor_uncompress (
+                &dwaa,
+                compressed_data,
+                comp_buf_size,
+                uncompressed_data,
+                uncompressed_size);
 
-    DwaCompressor_destroy(&dwaa);
-  }
+        DwaCompressor_destroy (&dwaa);
+    }
 
-  return rv;
+    return rv;
 }
 
-exr_result_t internal_exr_undo_dwab(exr_decode_pipeline_t *decode,
-                                    const void *compressed_data,
-                                    uint64_t comp_buf_size,
-                                    void *uncompressed_data,
-                                    uint64_t uncompressed_size)
+exr_result_t
+internal_exr_undo_dwab (
+    exr_decode_pipeline_t* decode,
+    const void*            compressed_data,
+    uint64_t               comp_buf_size,
+    void*                  uncompressed_data,
+    uint64_t               uncompressed_size)
 {
-  exr_result_t rv;
-  DwaCompressor dwaa;
+    exr_result_t  rv;
+    DwaCompressor dwaa;
 
-  rv = internal_decode_alloc_buffer(decode,
-                                    EXR_TRANSCODE_BUFFER_SCRATCH1,
-                                    &(decode->scratch_buffer_1),
-                                    &(decode->scratch_alloc_size_1),
-                                    internal_exr_huf_decompress_spare_bytes());
-  if (rv == EXR_ERR_SUCCESS) {
-    rv = DwaCompressor_construct(&dwaa, STATIC_HUFFMAN, NULL, decode);
+    rv = internal_decode_alloc_buffer (
+        decode,
+        EXR_TRANSCODE_BUFFER_SCRATCH1,
+        &(decode->scratch_buffer_1),
+        &(decode->scratch_alloc_size_1),
+        internal_exr_huf_decompress_spare_bytes ());
     if (rv == EXR_ERR_SUCCESS)
-      rv = DwaCompressor_uncompress(
-          &dwaa, compressed_data, comp_buf_size, uncompressed_data, uncompressed_size);
+    {
+        rv = DwaCompressor_construct (&dwaa, STATIC_HUFFMAN, NULL, decode);
+        if (rv == EXR_ERR_SUCCESS)
+            rv = DwaCompressor_uncompress (
+                &dwaa,
+                compressed_data,
+                comp_buf_size,
+                uncompressed_data,
+                uncompressed_size);
 
-    DwaCompressor_destroy(&dwaa);
-  }
+        DwaCompressor_destroy (&dwaa);
+    }
 
-  return rv;
+    return rv;
 }

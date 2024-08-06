@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-/**
+/** 
  * @addtogroup InternalAttributeFunctions
  * @{
  */
@@ -25,17 +25,17 @@ extern "C" {
  *
  * @return 0 on success, error code otherwise
  */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_init(exr_context_t ctxt,
-                                                      exr_attr_string_vector_t *sv,
-                                                      int32_t nelt);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_init (
+    exr_context_t ctxt, exr_attr_string_vector_t* sv, int32_t nelt);
 
 /** @brief Frees memory for the channel list and all channels inside */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_destroy(exr_context_t ctxt,
-                                                         exr_attr_string_vector_t *sv);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_destroy (
+    exr_context_t ctxt, exr_attr_string_vector_t* sv);
 
-EXR_INTERNAL exr_result_t exr_attr_string_vector_copy(exr_context_t ctxt,
-                                                      exr_attr_string_vector_t *sv,
-                                                      const exr_attr_string_vector_t *src);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_copy (
+    exr_context_t                   ctxt,
+    exr_attr_string_vector_t*       sv,
+    const exr_attr_string_vector_t* src);
 
 /** @brief Allocates memory for a particular string within the list
  *
@@ -44,31 +44,39 @@ EXR_INTERNAL exr_result_t exr_attr_string_vector_copy(exr_context_t ctxt,
  * @param ctxt context for associated string vector (used for error reporting)
  * @param sv pointer to string vector. It should have been resized ahead of calling
  * @param idx index of the string to initialize
- * @param length desired size of string
+ * @param length desired size of string 
  *
  * @return 0 on success, error code otherwise
  */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_init_entry(exr_context_t ctxt,
-                                                            exr_attr_string_vector_t *sv,
-                                                            int32_t idx,
-                                                            int32_t length);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_init_entry (
+    exr_context_t             ctxt,
+    exr_attr_string_vector_t* sv,
+    int32_t                   idx,
+    int32_t                   length);
 
 /** @brief Set a string within the string vector */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_set_entry_with_length(
-    exr_context_t ctxt, exr_attr_string_vector_t *sv, int32_t idx, const char *s, int32_t length);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_set_entry_with_length (
+    exr_context_t             ctxt,
+    exr_attr_string_vector_t* sv,
+    int32_t                   idx,
+    const char*               s,
+    int32_t                   length);
 /** @brief Set a string within the string vector */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_set_entry(exr_context_t ctxt,
-                                                           exr_attr_string_vector_t *sv,
-                                                           int32_t idx,
-                                                           const char *s);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_set_entry (
+    exr_context_t             ctxt,
+    exr_attr_string_vector_t* sv,
+    int32_t                   idx,
+    const char*               s);
 
 /** @brief Append a string to the string vector */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_add_entry_with_length(
-    exr_context_t ctxt, exr_attr_string_vector_t *sv, const char *s, int32_t length);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_add_entry_with_length (
+    exr_context_t             ctxt,
+    exr_attr_string_vector_t* sv,
+    const char*               s,
+    int32_t                   length);
 /** @brief Append a string to the string vector */
-EXR_INTERNAL exr_result_t exr_attr_string_vector_add_entry(exr_context_t ctxt,
-                                                           exr_attr_string_vector_t *sv,
-                                                           const char *s);
+EXR_INTERNAL exr_result_t exr_attr_string_vector_add_entry (
+    exr_context_t ctxt, exr_attr_string_vector_t* sv, const char* s);
 
 /** @} */
 
