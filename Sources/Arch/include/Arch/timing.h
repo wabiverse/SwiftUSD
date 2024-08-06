@@ -13,7 +13,7 @@
 
 #include "Arch/api.h"
 #include "Arch/defines.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
 #include "pxr/pxrns.h"
 
 /// \addtogroup group_arch_SystemFunctions

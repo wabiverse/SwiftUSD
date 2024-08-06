@@ -11,7 +11,7 @@
 #include "Hdx/task.h"
 #include "Hgi/tokens.h"
 #include "Hgi/types.h"
-#include "HgiInterop/hgiInterop.h"
+#include "HgiInterop/hgiInteropImpl.h"
 #include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

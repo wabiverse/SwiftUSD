@@ -10,7 +10,7 @@
 #include "Tf/pyUtils.h"
 #include "pxr/pxrns.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 
 #include "Gf/vec2d.h"
 #include "Gf/vec2f.h"

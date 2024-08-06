@@ -9,7 +9,7 @@
 #include "pxr/pxrns.h"
 
 #include "Gf/interval.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Tf/diagnostic.h"
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"

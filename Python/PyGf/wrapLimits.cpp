@@ -6,7 +6,7 @@
 //
 #include <boost/python/scope.hpp>
 
-#include "Gf/limits.h"
+#include "Gf/gfLimits.h"
 #include "pxr/pxrns.h"
 
 using namespace boost::python;

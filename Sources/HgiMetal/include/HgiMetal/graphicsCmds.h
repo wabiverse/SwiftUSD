@@ -14,6 +14,7 @@
 #include "pxr/pxrns.h"
 #include <cstdint>
 
+#include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -143,7 +144,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
   HgiPrimitiveType _primitiveType;
   uint32_t _primitiveIndexSize;
   uint32_t _drawBufferBindingIndex;
-  NSString *_debugLabel;
+  NS::String *_debugLabel;
   bool _viewportSet;
   bool _scissorRectSet;
   bool _enableParallelEncoder;

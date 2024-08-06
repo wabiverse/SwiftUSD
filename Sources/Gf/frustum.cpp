@@ -7,7 +7,7 @@
 
 #include "Gf/frustum.h"
 #include "Gf/bbox3d.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/matrix4d.h"
 #include "Gf/ostreamHelpers.h"
 #include "Gf/plane.h"

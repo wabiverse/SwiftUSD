@@ -27,67 +27,67 @@ class HgiMetalConversions final {
   //
 
   HGIMETAL_API
-  static MTLPixelFormat GetPixelFormat(HgiFormat inFormat, HgiTextureUsage inUsage);
+  static MTL::PixelFormat GetPixelFormat(HgiFormat inFormat, HgiTextureUsage inUsage);
 
   HGIMETAL_API
-  static MTLVertexFormat GetVertexFormat(HgiFormat inFormat);
+  static MTL::VertexFormat GetVertexFormat(HgiFormat inFormat);
 
   HGIMETAL_API
-  static MTLCullMode GetCullMode(HgiCullMode cm);
+  static MTL::CullMode GetCullMode(HgiCullMode cm);
 
   HGIMETAL_API
-  static MTLTriangleFillMode GetPolygonMode(HgiPolygonMode pm);
+  static MTL::TriangleFillMode GetPolygonMode(HgiPolygonMode pm);
 
   HGIMETAL_API
-  static MTLBlendFactor GetBlendFactor(HgiBlendFactor bf);
+  static MTL::BlendFactor GetBlendFactor(HgiBlendFactor bf);
 
   HGIMETAL_API
-  static MTLBlendOperation GetBlendEquation(HgiBlendOp bo);
+  static MTL::BlendOperation GetBlendEquation(HgiBlendOp bo);
 
   HGIMETAL_API
-  static MTLWinding GetWinding(HgiWinding winding);
+  static MTL::Winding GetWinding(HgiWinding winding);
 
   HGIMETAL_API
-  static MTLLoadAction GetAttachmentLoadOp(HgiAttachmentLoadOp loadOp);
+  static MTL::LoadAction GetAttachmentLoadOp(HgiAttachmentLoadOp loadOp);
 
   HGIMETAL_API
-  static MTLStoreAction GetAttachmentStoreOp(HgiAttachmentStoreOp storeOp);
+  static MTL::StoreAction GetAttachmentStoreOp(HgiAttachmentStoreOp storeOp);
 
   HGIMETAL_API
-  static MTLCompareFunction GetCompareFunction(HgiCompareFunction cf);
+  static MTL::CompareFunction GetCompareFunction(HgiCompareFunction cf);
 
   HGIMETAL_API
-  static MTLStencilOperation GetStencilOp(HgiStencilOp op);
+  static MTL::StencilOperation GetStencilOp(HgiStencilOp op);
 
   HGIMETAL_API
-  static MTLTextureType GetTextureType(HgiTextureType tt);
+  static MTL::TextureType GetTextureType(HgiTextureType tt);
 
   HGIMETAL_API
-  static MTLSamplerAddressMode GetSamplerAddressMode(HgiSamplerAddressMode a);
+  static MTL::SamplerAddressMode GetSamplerAddressMode(HgiSamplerAddressMode a);
 
   HGIMETAL_API
-  static MTLSamplerMinMagFilter GetMinMagFilter(HgiSamplerFilter mf);
+  static MTL::SamplerMinMagFilter GetMinMagFilter(HgiSamplerFilter mf);
 
   HGIMETAL_API
-  static MTLSamplerMipFilter GetMipFilter(HgiMipFilter mf);
+  static MTL::SamplerMipFilter GetMipFilter(HgiMipFilter mf);
 
   HGIMETAL_API
-  static MTLSamplerBorderColor GetBorderColor(HgiBorderColor bc);
+  static MTL::SamplerBorderColor GetBorderColor(HgiBorderColor bc);
 
 #if (defined(__MAC_10_15) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15) || \
     __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
   HGIMETAL_API
-  static MTLTextureSwizzle GetComponentSwizzle(HgiComponentSwizzle);
+  static MTL::TextureSwizzle GetComponentSwizzle(HgiComponentSwizzle);
 #endif
 
   HGIMETAL_API
-  static MTLPrimitiveTopologyClass GetPrimitiveClass(HgiPrimitiveType pt);
+  static MTL::PrimitiveTopologyClass GetPrimitiveClass(HgiPrimitiveType pt);
 
   HGIMETAL_API
-  static MTLPrimitiveType GetPrimitiveType(HgiPrimitiveType pt);
+  static MTL::PrimitiveType GetPrimitiveType(HgiPrimitiveType pt);
 
   HGIMETAL_API
-  static MTLColorWriteMask GetColorWriteMask(HgiColorMask mask);
+  static MTL::ColorWriteMask GetColorWriteMask(HgiColorMask mask);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

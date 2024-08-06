@@ -6,7 +6,7 @@
 //
 
 #include "Arch/library.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "pxr/pxrns.h"
 
 #if defined(ARCH_OS_WINDOWS)

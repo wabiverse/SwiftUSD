@@ -11,7 +11,7 @@
 #include "Gf/range1d.h"
 #include "Gf/range1f.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/type.h"
 

@@ -29,7 +29,7 @@
 #include "Riley.h"
 #include "RixShadingUtils.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Tf/envSetting.h"
 
 #include <cmath>

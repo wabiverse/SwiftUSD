@@ -26,7 +26,7 @@
 
 #include "Ar/asset.h"
 #include "Arch/fileSystem.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "Sdf/allowed.h"
 #include "Sdf/data.h"
 #include "Sdf/fileIO_Common.h"
@@ -44,7 +44,7 @@
 
 #include "Trace/traceImpl.h"
 
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "Gf/matrix4d.h"
 #include "Tf/enum.h"
 #include "Tf/iterator.h"

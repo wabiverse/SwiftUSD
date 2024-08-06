@@ -15,7 +15,7 @@
 #include "evalUtils.h"
 
 #include "Gf/interval.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Trace/traceImpl.h"
 #include "Vt/value.h"
 

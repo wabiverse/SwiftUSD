@@ -7,7 +7,7 @@
 #ifndef PXR_USD_USD_INTERPOLATORS_H
 #define PXR_USD_USD_INTERPOLATORS_H
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Sdf/layer.h"
 #include "Usd/clipSet.h"
 #include "Usd/common.h"

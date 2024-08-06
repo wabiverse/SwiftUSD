@@ -10,7 +10,7 @@
 #include "Arch/demangle.h"
 #include "Arch/error.h"
 #include "Arch/export.h"
-#include "Arch/pxrmath.h"
+#include "Arch/math.h"
 #include "pxr/pxrns.h"
 
 #include <cstdint>

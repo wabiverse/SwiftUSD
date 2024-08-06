@@ -22,10 +22,13 @@
 // language governing permissions and limitations under the Apache License.
 //
 
+#include <Metal/Metal.hpp>
+
 #include "HgiMetal/shaderGenerator.h"
 #include "Hgi/tokens.h"
 #include "HgiMetal/resourceBindings.h"
 
+#include <sstream>
 #include <unordered_map>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -129,7 +132,7 @@ bool _GetBuiltinKeyword(HgiShaderFunctionParamDesc const &param, std::string *ke
       {HgiShaderKeywordTokens->hdPrimitiveID, "primitive_id"},
       {HgiShaderKeywordTokens->hdFrontFacing, "front_facing"},
       {HgiShaderKeywordTokens->hdPosition, "position"},
-      {HgiShaderKeywordTokens->hdBaryCoordNoPerspNV, "barycentric_coord"},
+      {HgiShaderKeywordTokens->hdBaryCoordNoPersp, "barycentric_coord"},
       {HgiShaderKeywordTokens->hdFragCoord, "position"}};
 
   // check if has a role

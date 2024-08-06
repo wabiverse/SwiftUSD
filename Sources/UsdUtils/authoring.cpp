@@ -7,7 +7,7 @@
 #include "UsdUtils/authoring.h"
 #include "pxr/pxrns.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Work/loops.h"
 
 #include "Sdf/layer.h"

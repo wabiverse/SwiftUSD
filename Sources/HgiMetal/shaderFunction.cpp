@@ -34,13 +34,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiMetalShaderFunction::HgiMetalShaderFunction(HgiMetal *hgi, HgiShaderFunctionDesc const &desc)
+HgiMetalShaderFunction::HgiMetalShaderFunctionHgiMetalShaderFunction(
+    HgiMetal *hgi, HgiShaderFunctionDesc const &desc)
     : HgiShaderFunction(desc), _shaderId(nil)
 {
   if (desc.shaderCode) {
-    MTL::Device *device = hgi->GetPrimaryDevice();
-
-    HgiMetalShaderGenerator shaderGenerator{desc, device};
+    HgiMetalShaderGenerator shaderGenerator(hgi, desc);
     shaderGenerator.Execute();
     const char *shaderCode = shaderGenerator.GetGeneratedShaderCode();
 

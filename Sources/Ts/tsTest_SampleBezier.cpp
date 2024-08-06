@@ -6,7 +6,7 @@
 //
 
 #include "Ts/tsTest_SampleBezier.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/vec2d.h"
 #include "pxr/pxrns.h"
 

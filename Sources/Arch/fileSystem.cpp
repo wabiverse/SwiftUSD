@@ -10,7 +10,7 @@
 #include "Arch/error.h"
 #include "Arch/export.h"
 #include "Arch/hints.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "Arch/vsnprintf.h"
 #include "pxr/pxrns.h"
 

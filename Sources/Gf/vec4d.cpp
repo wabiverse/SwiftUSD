@@ -10,7 +10,7 @@
 
 #include "Gf/vec4d.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/type.h"
 #include "pxr/pxrns.h"

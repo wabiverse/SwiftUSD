@@ -23,7 +23,7 @@
 //
 
 #include "Arch/error.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "pxr/pxr.h"
 
 #include <cstdio>

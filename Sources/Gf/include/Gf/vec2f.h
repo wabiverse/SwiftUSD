@@ -15,8 +15,8 @@
 /// \ingroup group_gf_LinearAlgebra
 
 #include "Gf/api.h"
-#include "Gf/limits.h"
-#include "Gf/math.h"
+#include "Gf/gfLimits.h"
+#include "Gf/gfMath.h"
 #include "Gf/traits.h"
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"

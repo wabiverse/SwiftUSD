@@ -8,7 +8,7 @@
 #ifndef PXR_BASE_TS_EVAL_CACHE_H
 #define PXR_BASE_TS_EVAL_CACHE_H
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Ts/keyFrameUtils.h"
 #include "Ts/mathUtils.h"
 #include "Ts/types.h"

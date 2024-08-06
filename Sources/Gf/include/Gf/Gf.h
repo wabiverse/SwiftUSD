@@ -47,12 +47,12 @@
 #include <Gf/ilmbase_half.h>
 #include <Gf/ilmbase_halfLimits.h>
 #include <Gf/interval.h>
-#include <Gf/limits.h>
+#include <Gf/gfLimits.h>
 #include <Gf/line.h>
 #include <Gf/line2d.h>
 #include <Gf/lineSeg.h>
 #include <Gf/lineSeg2d.h>
-#include <Gf/math.h>
+#include <Gf/gfMath.h>
 #include <Gf/matrix2d.h>
 #include <Gf/matrix2f.h>
 #include <Gf/matrix3d.h>
@@ -61,7 +61,6 @@
 #include <Gf/matrix4f.h>
 #include <Gf/matrixData.h>
 #include <Gf/multiInterval.h>
-#include <Gf/ostreamHelpers.h>
 #include <Gf/plane.h>
 #include <Gf/pyBufferUtils.h>
 #include <Gf/quatd.h>
@@ -96,9 +95,5 @@
 
 #include <Gf/color.h>
 #include <Gf/colorSpace.h>
-#include <Gf/colorSpace_data.h>
-#include <Gf/ilmbase_eLut.h>
-#include <Gf/ilmbase_toFloat.h>
-#include <Gf/nanocolor.h>
 #include <Gf/numericCast.h>
 #endif  // __PXR_BASE_GF_H__

@@ -15,7 +15,7 @@
 #include "Arch/systemInfo.h"
 #include "pxr/pxrns.h"
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-#  include "Arch/pxrinttypes.h"
+#  include "Arch/inttypes.h"
 #  include <sys/types.h>
 #  if !defined(ARCH_OS_IPHONE)
 #    include <sys/ptrace.h>

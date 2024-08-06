@@ -9,7 +9,7 @@
 #include "Gf/bbox3d.h"
 #include "Gf/line.h"
 #include "Gf/lineSeg.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/ostreamHelpers.h"
 #include "Gf/plane.h"
 #include "Gf/range3d.h"

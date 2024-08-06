@@ -8,7 +8,7 @@
 #include "HdSt/textureUtils.h"
 
 #include "Gf/half.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Trace/traceImpl.h"
 
 #include "Hgi/blitCmds.h"

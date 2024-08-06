@@ -11,7 +11,7 @@
 /// Hash functions.
 
 #include "Arch/api.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
 #include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

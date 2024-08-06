@@ -30,7 +30,7 @@
 #include <pxr/pxrns.h>
 
 #include "Tf/api.h"
-#include <Arch/pxrinttypes.h>
+#include <Arch/inttypes.h>
 #include <atomic>
 
 PXR_NAMESPACE_OPEN_SCOPE

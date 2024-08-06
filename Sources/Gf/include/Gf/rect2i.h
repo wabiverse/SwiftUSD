@@ -11,7 +11,7 @@
 /// \ingroup group_gf_LinearAlgebra
 
 #include "Gf/api.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/vec2i.h"
 #include "Tf/hash.h"
 #include "pxr/pxrns.h"

@@ -305,7 +305,7 @@ public enum Pxr: String, CaseIterable
         ensureCasing(for: &newInclude)
         pxrSrc = pxrSrc.replacingOccurrences(of: include, with: newInclude)
 
-        // fixes any conflicting headers (ex. Arch/errno.h -> Arch/pxrerrno.h)
+        // fixes any conflicting headers (ex. Arch/errno.h -> Arch/errno.h)
         ensureSourceFilename(in: target, for: &pxrSrc)
       }
 
@@ -376,10 +376,10 @@ public enum Pxr: String, CaseIterable
         if target.contains("Arch")
         {
           // since these names conflict with stdlib, we prefix them with pxr.
-          source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/pxrerrno.h")
-          source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/pxrinttypes.h")
-          source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/pxrmath.h")
-          source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/pxrregex.h")
+          source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/errno.h")
+          source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/inttypes.h")
+          source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/math.h")
+          source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/regex.h")
         }
       default:
         break
@@ -478,10 +478,10 @@ public enum Pxr: String, CaseIterable
       source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
       // since these names conflict with stdlib, we prefix them with pxr.
-      source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/pxrerrno.h")
-      source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/pxrinttypes.h")
-      source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/pxrmath.h")
-      source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/pxrregex.h")
+      source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/errno.h")
+      source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/inttypes.h")
+      source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/math.h")
+      source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/regex.h")
 
       /* ------ refbase ------------------- */
 
