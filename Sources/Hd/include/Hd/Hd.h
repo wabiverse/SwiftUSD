@@ -180,3 +180,26 @@
 #include <Hd/xformSchema.h>
 
 #endif  // __PXR_IMAGING_HD_HD_H__
+#ifndef __PXR_IMAGING_HD_H__
+#define __PXR_IMAGING_HD_H__
+
+// Hd
+#include <Hd/collectionExpressionEvaluator.h>
+#include <Hd/collectionPredicateLibrary.h>
+#include <Hd/collectionSchema.h>
+#include <Hd/collectionsSchema.h>
+#include <Hd/containerSchema.h>
+#include <Hd/dataSourceHash.h>
+#include <Hd/imageShader.h>
+#include <Hd/imageShaderSchema.h>
+#include <Hd/legacyGeomSubsetSceneIndex.h>
+#include <Hd/materialInterfaceMappingSchema.h>
+#include <Hd/materialNodeParameterSchema.h>
+#include <Hd/renderCapabilitiesSchema.h>
+#include <Hd/renderPassSchema.h>
+#include <Hd/sceneIndexUtil.h>
+#include <Hd/schemaTypeDefs.h>
+#include <Hd/systemMessages.h>
+#include <Hd/tetMeshSchema.h>
+#include <Hd/tetMeshTopologySchema.h>
+#endif  // __PXR_IMAGING_HD_H__

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file wrapPropertySpec.cpp
 
@@ -27,7 +10,7 @@
 #include "Sdf/primSpec.h"
 #include "Sdf/propertySpec.h"
 #include "Sdf/pySpec.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyPtrHelpers.h"
@@ -169,14 +152,11 @@ void wrapPropertySpec()
                     "The property's custom data.\n\n"
                     "The default value for custom data is an empty dictionary.\n\n"
                     "Custom data is for use by plugins or other non-tools supplied \n"
-                    "extensions that need to be able to store data attached to "
-                    "arbitrary\n"
-                    "scene objects.  Note that if the only objects you want to store "
-                    "data\n"
+                    "extensions that need to be able to store data attached to arbitrary\n"
+                    "scene objects.  Note that if the only objects you want to store data\n"
                     "on are prims, using custom attributes is probably a better choice.\n"
                     "But if you need to possibly store this data on attributes or \n"
-                    "relationships or as annotations on reference arcs, then custom "
-                    "data\n"
+                    "relationships or as annotations on reference arcs, then custom data\n"
                     "is an appropriate choice.")
 
       .add_property("assetInfo",

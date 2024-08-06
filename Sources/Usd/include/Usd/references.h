@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_REFERENCES_H
 #define PXR_USD_USD_REFERENCES_H
@@ -27,7 +10,7 @@
 #include "Usd/api.h"
 #include "Usd/common.h"
 #include "Usd/prim.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Sdf/declareHandles.h"
 #include "Sdf/path.h"
@@ -73,17 +56,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li The \c identifier component of a reference in the provided API
 /// can be a resolvable asset-path to some external layer, empty, in which case
 /// the reference targets the root layer of the LayerStack containing the
-/// referencing layer, or the identifier of an existing anonymous,
-/// in-memory-only SdfLayer.  Care should be exercised in the latter case:
-/// calling Export() on an anonymous layer to serialize it to a file will not
-/// attempt to replace any references to anonymous layers with references to
-/// file-backed layers.
+/// referencing layer, or the identifier of an existing anonymous, in-memory-only
+/// SdfLayer.  Care should be exercised in the latter case: calling Export() on
+/// an anonymous layer to serialize it to a file will not attempt to replace
+/// any references to anonymous layers with references to file-backed layers.
 ///
 /// \li Opinions brought in by reference on an ancestor prim are weaker than
 /// opinions brought in by references on a descendant prim.
 ///
-/// \subsection Usd_DefaultPrim_References Expressing references without prim
-/// paths
+/// \subsection Usd_DefaultPrim_References Expressing references without prim paths
 ///
 /// References may omit the target prim path if the referenced layer has the
 /// 'defaultPrim' metadata set.  In this case, the reference targets the
@@ -93,8 +74,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// One can also author defaultPrim directly on an SdfLayer - see
 /// SdfLayer::GetDefaultPrim(), SdfLayer::SetDefaultPrim().
 ///
-/// \subsection Usd_Internal_References Expressing "internal" references to the
-/// containing LayerStack
+/// \subsection Usd_Internal_References Expressing "internal" references to the containing
+/// LayerStack
 ///
 /// References may omit the identifier specifying the referenced layer.  This
 /// creates an "internal" reference. During composition, the referenced layer
@@ -180,9 +161,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   authored on /Class/B/Model in shot.usda instead because of the
 ///   inherit arc that was established on prim /A.
 ///
-/// \subsection Usd_Failing_References Reasons why adding a reference may fail,
-/// why adding a reference may succeed but still generate errors, and what it
-/// all means
+/// \subsection Usd_Failing_References Reasons why adding a reference may fail, why adding a
+/// reference may succeed but still generate errors, and what it all means
 ///
 /// AddReference() and SetReferences() can each fail for a number of
 /// reasons.  If one of the specified prim targets for one of the references

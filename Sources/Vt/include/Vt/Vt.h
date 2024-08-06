@@ -17,4 +17,5 @@
 #include <Vt/valueFromPython.h>
 #include <Vt/visitValue.h>
 
+#include <Vt/wrapArray.h>
 #endif  // __PXR_BASE_VT_H__

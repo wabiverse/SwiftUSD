@@ -1,99 +1,93 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/dataSourceMaterialNetworkInterface.h"
 #include "Hd/materialConnectionSchema.h"
 #include "Hd/materialNetworkSchema.h"
+#include "Hd/materialNodeParameterSchema.h"
 #include "Hd/materialNodeSchema.h"
 #include "Hd/retainedDataSource.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdContainerDataSourceHandle HdDataSourceMaterialNetworkInterface::_GetNode(
+TF_DEFINE_PRIVATE_TOKENS(_tokens,
+                         // See note in GetModelAssetName()
+                         (model)(assetName));
+
+std::string HdDataSourceMaterialNetworkInterface::GetModelAssetName() const
+{
+  // XXX If the model schema moves from UsdImaging back to HdModelSchema
+  // in the future, we could use that here.
+  if (_primContainer) {
+    if (HdContainerDataSourceHandle modelDs = HdContainerDataSource::Cast(
+            _primContainer->Get(_tokens->model)))
+    {
+      if (HdStringDataSourceHandle assetNameDs = HdStringDataSource::Cast(
+              modelDs->Get(_tokens->assetName)))
+      {
+        return assetNameDs->GetTypedValue(0.0f);
+      }
+    }
+  }
+  return std::string();
+}
+
+HdMaterialNodeSchema HdDataSourceMaterialNetworkInterface::_ResetIfNecessaryAndGetNode(
     const TfToken &nodeName) const
 {
   if (_deletedNodes.find(nodeName) != _deletedNodes.end()) {
-    return nullptr;
+    return HdMaterialNodeSchema(nullptr);
   }
 
   if (nodeName == _lastAccessedNodeName) {
-    return _lastAccessedNode;
+    return _lastAccessedNodeSchema;
   }
 
-  if (!_nodesContainer) {
-    _nodesContainer = HdMaterialNetworkSchema(_networkContainer).GetNodes();
+  if (!_nodesSchema) {
+    _nodesSchema = _networkSchema.GetNodes();
   }
 
   _lastAccessedNodeName = nodeName;
-  _lastAccessedNode = nullptr;
-  _lastAccessedNodeParameters = nullptr;
-  _lastAccessedNodeConnections = nullptr;
+  _lastAccessedNodeSchema = _nodesSchema.Get(nodeName);
+  _lastAccessedNodeParametersSchema = HdMaterialNodeParameterContainerSchema(nullptr);
+  _lastAccessedNodeConnectionsSchema = HdMaterialConnectionVectorContainerSchema(nullptr);
 
-  if (!_nodesContainer) {
-    return nullptr;
-  }
-
-  _lastAccessedNode = HdContainerDataSource::Cast(_nodesContainer->Get(nodeName));
-
-  return _lastAccessedNode;
+  return _lastAccessedNodeSchema;
 }
 
-HdContainerDataSourceHandle HdDataSourceMaterialNetworkInterface::_GetNodeParameters(
+HdMaterialNodeParameterContainerSchema HdDataSourceMaterialNetworkInterface::_GetNodeParameters(
     const TfToken &nodeName) const
 {
-  if (HdContainerDataSourceHandle node = _GetNode(nodeName)) {
-    if (_lastAccessedNodeParameters) {
-      return _lastAccessedNodeParameters;
-    }
-
-    _lastAccessedNodeParameters = HdMaterialNodeSchema(node).GetParameters();
-
-    return _lastAccessedNodeParameters;
+  HdMaterialNodeSchema node = _ResetIfNecessaryAndGetNode(nodeName);
+  if (_lastAccessedNodeParametersSchema) {
+    return _lastAccessedNodeParametersSchema;
   }
 
-  return nullptr;
+  _lastAccessedNodeParametersSchema = node.GetParameters();
+
+  return _lastAccessedNodeParametersSchema;
 }
 
-HdContainerDataSourceHandle HdDataSourceMaterialNetworkInterface::_GetNodeConnections(
-    const TfToken &nodeName) const
+HdMaterialConnectionVectorContainerSchema HdDataSourceMaterialNetworkInterface::
+    _GetNodeConnections(const TfToken &nodeName) const
 {
-  if (HdContainerDataSourceHandle node = _GetNode(nodeName)) {
-    if (_lastAccessedNodeConnections) {
-      return _lastAccessedNodeConnections;
-    }
-
-    _lastAccessedNodeConnections = HdMaterialNodeSchema(node).GetInputConnections();
-
-    return _lastAccessedNodeConnections;
+  HdMaterialNodeSchema node = _ResetIfNecessaryAndGetNode(nodeName);
+  if (_lastAccessedNodeConnectionsSchema) {
+    return _lastAccessedNodeConnectionsSchema;
   }
 
-  return nullptr;
+  _lastAccessedNodeConnectionsSchema = node.GetInputConnections();
+
+  return _lastAccessedNodeConnectionsSchema;
 }
 
 void HdDataSourceMaterialNetworkInterface::_SetOverride(const HdDataSourceLocator &loc,
                                                         const HdDataSourceBaseHandle &ds)
 {
-  _containerEditor.Set(loc, ds);
+  _networkEditor.Set(loc, ds);
   _existingOverrides[loc] = ds;
 
   static const HdDataSourceLocator nodesLocator(HdMaterialNetworkSchemaTokens->nodes);
@@ -111,15 +105,11 @@ void HdDataSourceMaterialNetworkInterface::_SetOverride(const HdDataSourceLocato
 
 TfTokenVector HdDataSourceMaterialNetworkInterface::GetNodeNames() const
 {
-  if (!_nodesContainer) {
-    _nodesContainer = HdMaterialNetworkSchema(_networkContainer).GetNodes();
+  if (!_nodesSchema) {
+    _nodesSchema = _networkSchema.GetNodes();
   }
 
-  if (!_nodesContainer) {
-    return {};
-  }
-
-  TfTokenVector result = _nodesContainer->GetNames();
+  TfTokenVector result = _nodesSchema.GetNames();
 
   if (!_deletedNodes.empty()) {
     std::unordered_set<TfToken, TfHash> nameSet;
@@ -153,11 +143,8 @@ TfToken HdDataSourceMaterialNetworkInterface::GetNodeType(const TfToken &nodeNam
     }
   }
 
-  HdMaterialNodeSchema node(_GetNode(nodeName));
-  if (node) {
-    if (HdTokenDataSourceHandle idDs = node.GetNodeIdentifier()) {
-      return idDs->GetTypedValue(0.0f);
-    }
+  if (HdTokenDataSourceHandle idDs = _ResetIfNecessaryAndGetNode(nodeName).GetNodeIdentifier()) {
+    return idDs->GetTypedValue(0.0f);
   }
 
   return TfToken();
@@ -166,11 +153,7 @@ TfToken HdDataSourceMaterialNetworkInterface::GetNodeType(const TfToken &nodeNam
 HdContainerDataSourceHandle HdDataSourceMaterialNetworkInterface::_GetNodeTypeInfo(
     const TfToken &nodeName) const
 {
-  HdContainerDataSourceHandle const node = _GetNode(nodeName);
-  if (!node) {
-    return nullptr;
-  }
-  return HdContainerDataSource::Cast(node->Get(HdMaterialNodeSchemaTokens->nodeTypeInfo));
+  return _ResetIfNecessaryAndGetNode(nodeName).GetNodeTypeInfo();
 }
 
 TfTokenVector HdDataSourceMaterialNetworkInterface::GetNodeTypeInfoKeys(
@@ -200,10 +183,7 @@ VtValue HdDataSourceMaterialNetworkInterface::GetNodeTypeInfoValue(const TfToken
 TfTokenVector HdDataSourceMaterialNetworkInterface::GetAuthoredNodeParameterNames(
     const TfToken &nodeName) const
 {
-  TfTokenVector result;
-  if (HdContainerDataSourceHandle params = _GetNodeParameters(nodeName)) {
-    result = params->GetNames();
-  }
+  TfTokenVector result = _GetNodeParameters(nodeName).GetNames();
 
   if (_overriddenNodes.find(nodeName) != _overriddenNodes.end()) {
     HdDataSourceLocator paramsLocator(
@@ -241,32 +221,74 @@ VtValue HdDataSourceMaterialNetworkInterface::GetNodeParameterValue(const TfToke
 
   const auto it = _existingOverrides.find(locator);
   if (it != _existingOverrides.end()) {
-    if (HdSampledDataSourceHandle sds = HdSampledDataSource::Cast(it->second)) {
-      return sds->GetValue(0.0f);
+    HdContainerDataSourceHandle param = HdContainerDataSource::Cast(it->second);
+    HdMaterialNodeParameterSchema paramSchema(param);
+    if (paramSchema) {
+      HdSampledDataSourceHandle paramValueDS = paramSchema.GetValue();
+      if (paramValueDS) {
+        return paramValueDS->GetValue(0);
+      }
     }
-    else {
-      // overridden with nullptr data source means deletion
-      return VtValue();
-    }
+    // overridden with nullptr data source means deletion
+    return VtValue();
   }
 
-  if (HdContainerDataSourceHandle params = _GetNodeParameters(nodeName)) {
-    if (HdSampledDataSourceHandle param = HdSampledDataSource::Cast(params->Get(paramName))) {
-      return param->GetValue(0.0f);
-    }
+  if (HdSampledDataSourceHandle paramValueDS =
+          _GetNodeParameters(nodeName).Get(paramName).GetValue())
+  {
+    return paramValueDS->GetValue(0);
   }
 
   return VtValue();
 }
 
+HdMaterialNetworkInterface::NodeParamData HdDataSourceMaterialNetworkInterface::
+    GetNodeParameterData(const TfToken &nodeName, const TfToken &paramName) const
+{
+  // check overrides for existing value
+  HdDataSourceLocator locator(HdMaterialNetworkSchemaTokens->nodes,
+                              nodeName,
+                              HdMaterialNodeSchemaTokens->parameters,
+                              paramName);
+
+  HdMaterialNetworkInterface::NodeParamData paramData;
+  const auto it = _existingOverrides.find(locator);
+  if (it != _existingOverrides.end()) {
+    HdContainerDataSourceHandle param = HdContainerDataSource::Cast(it->second);
+    HdMaterialNodeParameterSchema pSchema(param);
+    if (pSchema) {
+      HdSampledDataSourceHandle paramValueDS = pSchema.GetValue();
+      if (paramValueDS) {
+        paramData.value = paramValueDS->GetValue(0);
+      }
+      HdTokenDataSourceHandle colorSpaceDS = pSchema.GetColorSpace();
+      if (colorSpaceDS) {
+        paramData.colorSpace = colorSpaceDS->GetTypedValue(0);
+      }
+      return paramData;
+    }
+    // overridden with nullptr data source means deletion
+    return paramData;
+  }
+
+  if (HdMaterialNodeParameterSchema pSchema = _GetNodeParameters(nodeName).Get(paramName)) {
+    // Value
+    if (HdSampledDataSourceHandle paramValueDS = pSchema.GetValue()) {
+      paramData.value = paramValueDS->GetValue(0);
+    }
+    // ColorSpace
+    if (HdTokenDataSourceHandle colorSpaceDS = pSchema.GetColorSpace()) {
+      paramData.colorSpace = colorSpaceDS->GetTypedValue(0);
+    }
+  }
+
+  return paramData;
+}
+
 TfTokenVector HdDataSourceMaterialNetworkInterface::GetNodeInputConnectionNames(
     const TfToken &nodeName) const
 {
-  TfTokenVector result;
-
-  if (HdContainerDataSourceHandle inputs = _GetNodeConnections(nodeName)) {
-    result = inputs->GetNames();
-  }
+  TfTokenVector result = _GetNodeConnections(nodeName).GetNames();
 
   if (_overriddenNodes.find(nodeName) != _overriddenNodes.end()) {
     HdDataSourceLocator inputsLocator(HdMaterialNetworkSchemaTokens->nodes,
@@ -315,24 +337,18 @@ HdMaterialNetworkInterface::InputConnectionVector HdDataSourceMaterialNetworkInt
     }
   }
 
-  if (!connectionVectorDs) {
-    if (HdContainerDataSourceHandle inputs = _GetNodeConnections(nodeName)) {
-      connectionVectorDs = HdVectorDataSource::Cast(inputs->Get(inputName));
-    }
-  }
+  HdMaterialConnectionVectorSchema vectorSchema = connectionVectorDs ?
+                                                      HdMaterialConnectionVectorSchema(
+                                                          connectionVectorDs) :
+                                                      _GetNodeConnections(nodeName).Get(inputName);
 
-  if (!connectionVectorDs) {
-    return {};
-  }
-
-  size_t e = connectionVectorDs->GetNumElements();
+  const size_t n = vectorSchema.GetNumElements();
   InputConnectionVector result;
-  result.reserve(e);
-  for (size_t i = 0; i < e; ++i) {
-    HdMaterialConnectionSchema c(HdContainerDataSource::Cast(connectionVectorDs->GetElement(i)));
-    if (c) {
-      HdTokenDataSourceHandle nodeNameDs = c.GetUpstreamNodePath();
-      HdTokenDataSourceHandle outputNameDs = c.GetUpstreamNodeOutputName();
+  result.reserve(n);
+  for (size_t i = 0; i < n; ++i) {
+    if (HdMaterialConnectionSchema schema = vectorSchema.GetElement(i)) {
+      HdTokenDataSourceHandle nodeNameDs = schema.GetUpstreamNodePath();
+      HdTokenDataSourceHandle outputNameDs = schema.GetUpstreamNodeOutputName();
       if (nodeNameDs && outputNameDs) {
         result.push_back({nodeNameDs->GetTypedValue(0.0f), outputNameDs->GetTypedValue(0.0f)});
       }
@@ -346,7 +362,7 @@ void HdDataSourceMaterialNetworkInterface::DeleteNode(const TfToken &nodeName)
 {
   HdDataSourceLocator locator(HdMaterialNetworkSchemaTokens->nodes, nodeName);
 
-  _containerEditor.Set(locator, nullptr);
+  _networkEditor.Set(locator, nullptr);
   _deletedNodes.insert(nodeName);
 }
 
@@ -370,7 +386,29 @@ void HdDataSourceMaterialNetworkInterface::SetNodeParameterValue(const TfToken &
                               HdMaterialNodeSchemaTokens->parameters,
                               paramName);
 
-  HdDataSourceBaseHandle ds = HdRetainedSampledDataSource::New(value);
+  HdDataSourceBaseHandle ds = HdMaterialNodeParameterSchema::Builder()
+                                  .SetValue(HdRetainedTypedSampledDataSource<VtValue>::New(value))
+                                  .Build();
+  _SetOverride(locator, ds);
+}
+
+void HdDataSourceMaterialNetworkInterface::SetNodeParameterData(const TfToken &nodeName,
+                                                                const TfToken &paramName,
+                                                                const NodeParamData &paramData)
+{
+  HdDataSourceLocator locator(HdMaterialNetworkSchemaTokens->nodes,
+                              nodeName,
+                              HdMaterialNodeSchemaTokens->parameters,
+                              paramName);
+
+  HdDataSourceBaseHandle ds =
+      HdMaterialNodeParameterSchema::Builder()
+          .SetValue(HdRetainedTypedSampledDataSource<VtValue>::New(paramData.value))
+          .SetColorSpace(paramData.colorSpace.IsEmpty() ?
+                             nullptr /* colorSpace */
+                             :
+                             HdRetainedTypedSampledDataSource<TfToken>::New(paramData.colorSpace))
+          .Build();
   _SetOverride(locator, ds);
 }
 
@@ -422,14 +460,7 @@ void HdDataSourceMaterialNetworkInterface::DeleteNodeInputConnection(const TfTok
 
 TfTokenVector HdDataSourceMaterialNetworkInterface::GetTerminalNames() const
 {
-  TfTokenVector result;
-
-  HdContainerDataSourceHandle terminals =
-      HdMaterialNetworkSchema(_networkContainer).GetTerminals();
-
-  if (terminals) {
-    result = terminals->GetNames();
-  }
+  TfTokenVector result = _networkSchema.GetTerminals().GetNames();
 
   if (_terminalsOverridden) {
     static const HdDataSourceLocator terminalsLocator(HdMaterialNetworkSchemaTokens->terminals);
@@ -472,15 +503,10 @@ HdMaterialNetworkInterface::InputConnectionResult HdDataSourceMaterialNetworkInt
     }
   }
 
-  if (!container) {
-    HdContainerDataSourceHandle terminals =
-        HdMaterialNetworkSchema(_networkContainer).GetTerminals();
-    if (terminals) {
-      container = HdContainerDataSource::Cast(terminals->Get(terminalName));
-    }
-  }
+  HdMaterialConnectionSchema connectionSchema = container ? HdMaterialConnectionSchema(container) :
+                                                            _networkSchema.GetTerminals().Get(
+                                                                terminalName);
 
-  HdMaterialConnectionSchema connectionSchema(container);
   if (connectionSchema) {
     InputConnectionResult result = {true, {TfToken(), TfToken()}};
 
@@ -530,10 +556,10 @@ void HdDataSourceMaterialNetworkInterface::SetTerminalConnection(const TfToken &
 HdContainerDataSourceHandle HdDataSourceMaterialNetworkInterface::Finish()
 {
   if (_existingOverrides.empty()) {
-    return _networkContainer;
+    return _networkSchema.GetContainer();
   }
 
-  return _containerEditor.Finish();
+  return _networkEditor.Finish();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

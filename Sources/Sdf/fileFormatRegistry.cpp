@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 ///
 /// \file Sdf/fileFormatRegistry.cpp
@@ -33,7 +16,7 @@
 #include "Tf/scopeDescription.h"
 #include "Tf/staticTokens.h"
 #include "Trace/traceImpl.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <algorithm>
 #include <type_traits>
@@ -48,17 +31,6 @@ TF_DEFINE_PRIVATE_TOKENS(_PlugInfoKeyTokens,
                              (Primary, "primary"))((SupportsReading, "supportsReading"))(
                              (SupportsWriting, "supportsWriting"))((SupportsEditing,
                                                                     "supportsEditing")));
-
-// Locale-independent tolower only for ascii/utf-8 A-Z.
-static inline std::string _ToLower(std::string const &str)
-{
-  std::string lowered;
-  lowered.resize(str.size());
-  std::transform(str.begin(), str.end(), lowered.begin(), [](char ch) {
-    return ('A' <= ch && ch <= 'Z') ? ch - 'A' + 'a' : ch;
-  });
-  return lowered;
-}
 
 // Searches plugin meta data to determine if a capability is supported for the
 // file format type.  All capabilities are enabled by default (for backwards
@@ -131,7 +103,7 @@ Sdf_FileFormatRegistry::_InfoSharedPtr Sdf_FileFormatRegistry::_GetFormatInfo(co
   }
 
   // Convert to lowercase for lookup.
-  string ext = _ToLower(SdfFileFormat::GetFileExtension(s));
+  string ext = TfStringToLowerAscii(SdfFileFormat::GetFileExtension(s));
   if (ext.empty()) {
     TF_CODING_ERROR("Unable to determine extension for '%s'", s.c_str());
     return formatInfo;
@@ -210,8 +182,8 @@ TfToken Sdf_FileFormatRegistry::GetPrimaryFormatForExtension(const std::string &
 {
   _RegisterFormatPlugins();
 
-  // Convert to lowercase for lookup.
-  _ExtensionIndex::const_iterator it = _extensionIndex.find(_ToLower(ext));
+  // Case fold [A-Z] for lookup.
+  _ExtensionIndex::const_iterator it = _extensionIndex.find(TfStringToLowerAscii(ext));
   if (it != _extensionIndex.end()) {
     return it->second->formatId;
   }
@@ -347,11 +319,11 @@ void Sdf_FileFormatRegistry::_RegisterFormatPlugins()
       continue;
     }
 
-    // Convert 'extensions' to be all lower-case.
+    // Case fold [A-Z] all 'extensions'.
     std::transform(extensions.begin(),
                    extensions.end(),
                    extensions.begin(),
-                   [](std::string const &ext) { return _ToLower(ext); });
+                   [](std::string const &ext) { return TfStringToLowerAscii(ext); });
 
     // The 'target' entry does not need to be specified in every
     // file format's plugin info. If it is not, then the value will be
@@ -409,7 +381,7 @@ void Sdf_FileFormatRegistry::_RegisterFormatPlugins()
             "  target '%s'\n",
             target.c_str());
 
-    const TfToken formatIdToken(formatId);
+    const TfToken formatIdToken(formatId, TfToken::Immortal);
 
     _InfoSharedPtr &info = formatInfo[formatIdToken];
     if (info) {
@@ -417,7 +389,7 @@ void Sdf_FileFormatRegistry::_RegisterFormatPlugins()
       continue;
     }
     info = std::make_shared<_Info>(
-        formatIdToken, formatType, TfToken(target), plugin, capabilities);
+        formatIdToken, formatType, TfToken(target, TfToken::Immortal), plugin, capabilities);
 
     // Record the extensions that this file format plugin can handle.
     // Note that an extension may be supported by multiple file format

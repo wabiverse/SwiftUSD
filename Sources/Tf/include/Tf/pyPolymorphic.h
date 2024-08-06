@@ -1,32 +1,15 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_PY_POLYMORPHIC_H
 #define PXR_BASE_TF_PY_POLYMORPHIC_H
 
-/// \file Tf/pyPolymorphic.h
+/// \file tf/pyPolymorphic.h
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/pyOverride.h"
 
@@ -63,7 +46,7 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase, public boost::python:
     // the wrong result. instead, implement our own version which does
     // better
 
-    PyObject *m_self = boost::python::detail::wrapper_base_::get_owner(*this);
+    PyObject *m_self = detail::wrapper_base_::get_owner(*this);
     if (m_self) {
 
       // using pythons mro, get the attribute string that represents
@@ -105,7 +88,7 @@ struct TfPyPolymorphic : public TfType::PyPolymorphicBase, public boost::python:
     }
     PyErr_Clear();  // Don't leave an exception if there's no override.
 
-    return Override(handle<>(boost::python::detail::none()));
+    return Override(handle<>(detail::none()));
   }
 
   Override GetPureOverride(char const *func) const

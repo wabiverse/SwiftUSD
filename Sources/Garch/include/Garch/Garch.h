@@ -1,7 +1,7 @@
-#ifndef __PXR_IMAGING_GARCH_GARCH_H__
-#define __PXR_IMAGING_GARCH_GARCH_H__
+#ifndef __PXR_IMAGING_GARCH_H__
+#define __PXR_IMAGING_GARCH_H__
 
-// garch.
+// Garch.
 #include <Garch/api.h>
 #include <Garch/gl.h>
 #include <Garch/glApi.h>
@@ -20,4 +20,4 @@
 #  include <Garch/GarchWindows/glPlatformDebugWindowWindows.h>
 #endif /* defined(_WIN32) */
 
-#endif /* __PXR_IMAGING_GARCH_GARCH_H__ */
+#endif  // __PXR_IMAGING_GARCH_H__

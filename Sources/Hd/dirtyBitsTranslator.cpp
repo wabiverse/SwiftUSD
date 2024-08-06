@@ -1,25 +1,8 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/dirtyBitsTranslator.h"
 
@@ -30,6 +13,7 @@
 #include "Hd/coordSys.h"
 #include "Hd/extComputation.h"
 #include "Hd/field.h"
+#include "Hd/imageShader.h"
 #include "Hd/light.h"
 #include "Hd/material.h"
 #include "Hd/renderBuffer.h"
@@ -40,6 +24,7 @@
 #include "Hd/cameraSchema.h"
 #include "Hd/capsuleSchema.h"
 #include "Hd/categoriesSchema.h"
+#include "Hd/collectionsSchema.h"
 #include "Hd/coneSchema.h"
 #include "Hd/coordSysBindingSchema.h"
 #include "Hd/coordSysSchema.h"
@@ -53,7 +38,7 @@
 #include "Hd/extComputationSchema.h"
 #include "Hd/extentSchema.h"
 #include "Hd/geomSubsetSchema.h"
-#include "Hd/geomSubsetsSchema.h"
+#include "Hd/imageShaderSchema.h"
 #include "Hd/instanceCategoriesSchema.h"
 #include "Hd/instanceSchema.h"
 #include "Hd/instancedBySchema.h"
@@ -116,8 +101,7 @@ void HdDirtyBitsTranslator::RprimDirtyBitsToLocatorSet(TfToken const &primType,
 
   if (primType == HdPrimTypeTokens->basisCurves) {
     if (bits & HdChangeTracker::DirtyTopology) {
-      // could either be topology or geomsubsets
-      set->append(HdBasisCurvesSchema::GetDefaultLocator());
+      set->append(HdBasisCurvesTopologySchema::GetDefaultLocator());
     }
   }
 
@@ -187,7 +171,6 @@ void HdDirtyBitsTranslator::RprimDirtyBitsToLocatorSet(TfToken const &primType,
     }
 
     if (bits & HdChangeTracker::DirtyTopology) {
-      set->append(HdMeshSchema::GetGeomSubsetsLocator());
       set->append(HdMeshSchema::GetSubdivisionSchemeLocator());
     }
 
@@ -276,6 +259,8 @@ void HdDirtyBitsTranslator::SprimDirtyBitsToLocatorSet(TfToken const &primType,
     }
   }
   else if (HdPrimTypeIsLight(primType)
+           // Lights and light filters are handled similarly in emulation.
+           || primType == HdPrimTypeTokens->lightFilter
            // special case for mesh lights coming from emulated scene
            // for which the type will be mesh even though we are receiving
            // sprim-specific dirty bits.
@@ -296,6 +281,10 @@ void HdDirtyBitsTranslator::SprimDirtyBitsToLocatorSet(TfToken const &primType,
         set->append(HdPrimvarsSchema::GetDefaultLocator());
       }
       set->append(HdVisibilitySchema::GetDefaultLocator());
+
+      // Invalidate collections manufactured for light linking in
+      // emulation.
+      set->append(HdCollectionsSchema::GetDefaultLocator());
     }
     if (bits & HdLight::DirtyTransform) {
       set->append(HdXformSchema::GetDefaultLocator());
@@ -347,6 +336,23 @@ void HdDirtyBitsTranslator::SprimDirtyBitsToLocatorSet(TfToken const &primType,
     }
     if (bits & HdChangeTracker::DirtyVisibility) {
       set->append(HdVisibilitySchema::GetDefaultLocator());
+    }
+  }
+  else if (primType == HdPrimTypeTokens->imageShader) {
+    if (bits & HdImageShader::DirtyEnabled) {
+      set->append(HdImageShaderSchema::GetEnabledLocator());
+    }
+    if (bits & HdImageShader::DirtyPriority) {
+      set->append(HdImageShaderSchema::GetPriorityLocator());
+    }
+    if (bits & HdImageShader::DirtyFilePath) {
+      set->append(HdImageShaderSchema::GetFilePathLocator());
+    }
+    if (bits & HdImageShader::DirtyConstants) {
+      set->append(HdImageShaderSchema::GetConstantsLocator());
+    }
+    if (bits & HdImageShader::DirtyMaterialNetwork) {
+      set->append(HdImageShaderSchema::GetMaterialNetworkLocator());
     }
   }
   else {
@@ -420,6 +426,9 @@ void HdDirtyBitsTranslator::BprimDirtyBitsToLocatorSet(TfToken const &primType,
     if (bits & HdRenderSettings::DirtyActive) {
       set->append(HdRenderSettingsSchema::GetActiveLocator());
     }
+    if (bits & HdRenderSettings::DirtyFrameNumber) {
+      set->append(HdRenderSettingsSchema::GetFrameLocator());
+    }
     if (bits & HdRenderSettings::DirtyNamespacedSettings) {
       set->append(HdRenderSettingsSchema::GetNamespacedSettingsLocator());
     }
@@ -434,6 +443,9 @@ void HdDirtyBitsTranslator::BprimDirtyBitsToLocatorSet(TfToken const &primType,
     }
     if (bits & HdRenderSettings::DirtyRenderingColorSpace) {
       set->append(HdRenderSettingsSchema::GetRenderingColorSpaceLocator());
+    }
+    if (bits & HdRenderSettings::DirtyShutterInterval) {
+      set->append(HdRenderSettingsSchema::GetShutterIntervalLocator());
     }
   }
   else if (HdLegacyPrimTypeIsVolumeField(primType)) {
@@ -517,14 +529,7 @@ HdDirtyBits HdDirtyBitsTranslator::RprimLocatorSetToDirtyBits(TfToken const &pri
   // "basisCurvesTopology", setting us up to check for displayStyle.
   if (primType == HdPrimTypeTokens->basisCurves) {
 
-    // Locator (*): basisCurves > geomSubsets
-
-    if (_FindLocator(HdBasisCurvesSchema::GetGeomSubsetsLocator(), end, &it)) {
-      bits |= HdChangeTracker::DirtyTopology;
-    }
-
-    // Locator (*): basisCurves > geomSubsets
-
+    // Locator (*): basisCurves > topology
     if (_FindLocator(HdBasisCurvesTopologySchema::GetDefaultLocator(), end, &it)) {
       bits |= HdChangeTracker::DirtyTopology;
     }
@@ -638,12 +643,6 @@ HdDirtyBits HdDirtyBitsTranslator::RprimLocatorSetToDirtyBits(TfToken const &pri
 
     if (_FindLocator(HdMeshSchema::GetDoubleSidedLocator(), end, &it)) {
       bits |= HdChangeTracker::DirtyDoubleSided;
-    }
-
-    // Locator (*): mesh > geomSubsets
-
-    if (_FindLocator(HdMeshSchema::GetGeomSubsetsLocator(), end, &it)) {
-      bits |= HdChangeTracker::DirtyTopology;
     }
 
     // Locator (*): mesh > subdivisionScheme
@@ -770,12 +769,17 @@ HdDirtyBits HdDirtyBitsTranslator::SprimLocatorSetToDirtyBits(TfToken const &pri
       bits |= HdCamera::DirtyTransform;
     }
   }
-  else if (HdPrimTypeIsLight(primType)) {
+  else if (HdPrimTypeIsLight(primType)
+           // Lights and light filters are handled similarly in emulation.
+           || primType == HdPrimTypeTokens->lightFilter)
+  {
+
     if (_FindLocator(HdInstancedBySchema::GetDefaultLocator(), end, &it)) {
       bits |= HdLight::DirtyInstancer;
     }
     if (_FindLocator(HdLightSchema::GetDefaultLocator(), end, &it)) {
-      bits |= HdLight::DirtyParams | HdLight::DirtyShadowParams | HdLight::DirtyCollection;
+      bits |= HdLight::DirtyParams | HdLight::DirtyResource | HdLight::DirtyShadowParams |
+              HdLight::DirtyCollection;
     }
     if (_FindLocator(HdMaterialSchema::GetDefaultLocator(), end, &it)) {
       bits |= HdLight::DirtyResource;
@@ -846,6 +850,33 @@ HdDirtyBits HdDirtyBitsTranslator::SprimLocatorSetToDirtyBits(TfToken const &pri
     }
     if (_FindLocator(HdVisibilitySchema::GetDefaultLocator(), end, &it)) {
       bits |= HdChangeTracker::DirtyVisibility;
+    }
+  }
+  else if (primType == HdPrimTypeTokens->imageShader) {
+    if (_FindLocator(HdImageShaderSchema::GetDefaultLocator(), end, &it, false)) {
+      if (HdImageShaderSchema::GetDefaultLocator().HasPrefix(*it)) {
+        bits |= HdImageShader::AllDirty;
+      }
+      else {
+        do {
+          if (it->HasPrefix(HdImageShaderSchema::GetEnabledLocator())) {
+            bits |= HdImageShader::DirtyEnabled;
+          }
+          if (it->HasPrefix(HdImageShaderSchema::GetPriorityLocator())) {
+            bits |= HdImageShader::DirtyPriority;
+          }
+          if (it->HasPrefix(HdImageShaderSchema::GetFilePathLocator())) {
+            bits |= HdImageShader::DirtyFilePath;
+          }
+          if (it->HasPrefix(HdImageShaderSchema::GetConstantsLocator())) {
+            bits |= HdImageShader::DirtyConstants;
+          }
+          if (it->HasPrefix(HdImageShaderSchema::GetMaterialNetworkLocator())) {
+            bits |= HdImageShader::DirtyMaterialNetwork;
+          }
+          ++it;
+        } while (it != end && it->Intersects(HdImageShaderSchema::GetDefaultLocator()));
+      }
     }
   }
   else {
@@ -932,6 +963,9 @@ HdDirtyBits HdDirtyBitsTranslator::BprimLocatorSetToDirtyBits(TfToken const &pri
     if (_FindLocator(HdRenderSettingsSchema::GetActiveLocator(), end, &it)) {
       bits |= HdRenderSettings::DirtyActive;
     }
+    if (_FindLocator(HdRenderSettingsSchema::GetFrameLocator(), end, &it)) {
+      bits |= HdRenderSettings::DirtyFrameNumber;
+    }
     if (_FindLocator(HdRenderSettingsSchema::GetNamespacedSettingsLocator(), end, &it)) {
       bits |= HdRenderSettings::DirtyNamespacedSettings;
     }
@@ -946,6 +980,9 @@ HdDirtyBits HdDirtyBitsTranslator::BprimLocatorSetToDirtyBits(TfToken const &pri
     }
     if (_FindLocator(HdRenderSettingsSchema::GetRenderingColorSpaceLocator(), end, &it)) {
       bits |= HdRenderSettings::DirtyRenderingColorSpace;
+    }
+    if (_FindLocator(HdRenderSettingsSchema::GetShutterIntervalLocator(), end, &it)) {
+      bits |= HdRenderSettings::DirtyShutterInterval;
     }
   }
   else if (HdLegacyPrimTypeIsVolumeField(primType)) {

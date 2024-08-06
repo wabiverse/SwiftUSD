@@ -1,32 +1,16 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 //
 // FileIO_Common.cpp
 
 #include "Sdf/fileIO_Common.h"
 #include "Sdf/fileIO.h"
-#include <pxr/pxrns.h>
+#include "Sdf/pathExpression.h"
+#include "pxr/pxrns.h"
 
 #include "Tf/stringUtils.h"
 
@@ -145,6 +129,11 @@ static string _StringFromValue(const TfToken &s)
 static string _StringFromValue(const SdfAssetPath &assetPath)
 {
   return _StringFromAssetPath(assetPath.GetAssetPath());
+}
+
+static string _StringFromValue(const SdfPathExpression &pathExpr)
+{
+  return Sdf_FileIOUtility::Quote(pathExpr.GetText());
 }
 
 template<class T> static void _StringFromVtArray(string *valueStr, const VtArray<T> &valArray)
@@ -507,33 +496,50 @@ bool Sdf_FileIOUtility::WriteTimeSamples(Sdf_TextOutput &out,
   return true;
 }
 
+template<class RelocatesContainer>
+bool _WriteRelocates(Sdf_TextOutput &out,
+                     size_t indent,
+                     bool multiLine,
+                     const RelocatesContainer &relocates)
+{
+  Sdf_FileIOUtility::Write(out, indent, "relocates = %s", multiLine ? "{\n" : "{ ");
+  size_t itemCount = relocates.size();
+  TF_FOR_ALL(it, relocates)
+  {
+    Sdf_FileIOUtility::WriteSdfPath(out, indent + 1, it->first);
+    Sdf_FileIOUtility::Puts(out, 0, ": ");
+    Sdf_FileIOUtility::WriteSdfPath(out, 0, it->second);
+    if (--itemCount > 0) {
+      Sdf_FileIOUtility::Puts(out, 0, ", ");
+    }
+    if (multiLine) {
+      Sdf_FileIOUtility::Puts(out, 0, "\n");
+    }
+  }
+  if (multiLine) {
+    Sdf_FileIOUtility::Puts(out, indent, "}\n");
+  }
+  else {
+    Sdf_FileIOUtility::Puts(out, 0, " }");
+  }
+
+  return true;
+}
+
+bool Sdf_FileIOUtility::WriteRelocates(Sdf_TextOutput &out,
+                                       size_t indent,
+                                       bool multiLine,
+                                       const SdfRelocates &relocates)
+{
+  return _WriteRelocates(out, indent, multiLine, relocates);
+}
+
 bool Sdf_FileIOUtility::WriteRelocates(Sdf_TextOutput &out,
                                        size_t indent,
                                        bool multiLine,
                                        const SdfRelocatesMap &reloMap)
 {
-  Write(out, indent, "relocates = %s", multiLine ? "{\n" : "{ ");
-  size_t itemCount = reloMap.size();
-  TF_FOR_ALL(it, reloMap)
-  {
-    WriteSdfPath(out, indent + 1, it->first);
-    Puts(out, 0, ": ");
-    WriteSdfPath(out, 0, it->second);
-    if (--itemCount > 0) {
-      Puts(out, 0, ", ");
-    }
-    if (multiLine) {
-      Puts(out, 0, "\n");
-    }
-  }
-  if (multiLine) {
-    Puts(out, indent, "}\n");
-  }
-  else {
-    Puts(out, 0, " }");
-  }
-
-  return true;
+  return _WriteRelocates(out, indent, multiLine, reloMap);
 }
 
 void Sdf_FileIOUtility::_WriteDictionary(Sdf_TextOutput &out,
@@ -825,7 +831,8 @@ string Sdf_FileIOUtility::StringFromVtValue(const VtValue &value)
   string s;
   if (_StringFromVtValueHelper<string>(&s, value) ||
       _StringFromVtValueHelper<TfToken>(&s, value) ||
-      _StringFromVtValueHelper<SdfAssetPath>(&s, value))
+      _StringFromVtValueHelper<SdfAssetPath>(&s, value) ||
+      _StringFromVtValueHelper<SdfPathExpression>(&s, value))
   {
     return s;
   }

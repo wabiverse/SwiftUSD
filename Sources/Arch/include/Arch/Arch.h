@@ -37,4 +37,8 @@
 #include <Arch/virtualMemory.h>
 #include <Arch/vsnprintf.h>
 
+#include <Arch/errno.h>
+#include <Arch/inttypes.h>
+#include <Arch/math.h>
+#include <Arch/regex.h>
 #endif  // __PXR_BASE_ARCH_H__

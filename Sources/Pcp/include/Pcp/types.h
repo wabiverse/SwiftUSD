@@ -1,37 +1,17 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_TYPES_H
 #define PXR_USD_PCP_TYPES_H
 
-#include <pxr/pxrns.h>
-
-#include "Tf/pxrTslRobinMap/robin_set.h"
-
 #include "Pcp/api.h"
 #include "Pcp/site.h"
-
 #include "Sdf/layer.h"
+#include "Tf/pxrTslRobinMap/robin_set.h"
+#include "pxr/pxrns.h"
 
 #include <limits>
 #include <vector>
@@ -191,8 +171,7 @@ typedef std::vector<Pcp_CompressedSdSite> Pcp_CompressedSdSiteVector;
 // \typedef directive, it will warn and fail to produce an entry for
 // PcpVariantFallbackMap.  So we instead put the decl inline.
 /// \typedef PcpVariantFallbackMap
-/// typedef std::map<std::string, std::vector<std::string>>
-/// PcpVariantFallbackMap
+/// typedef std::map<std::string, std::vector<std::string>> PcpVariantFallbackMap
 ///
 /// A "map of lists" of fallbacks to attempt to use when evaluating
 /// variant sets that lack an authored selection.

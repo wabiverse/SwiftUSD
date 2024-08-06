@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hio/glslfx.h"
 #include "Hio/debugCodes.h"
@@ -27,21 +10,20 @@
 #include "Hio/glslfxConfig.h"
 
 #include "Ar/asset.h"
+#include "Ar/resolvedPath.h"
 #include "Ar/resolver.h"
-#include "ArTypes/resolvedPath.h"
 
 #include "Arch/systemInfo.h"
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
 #include "Tf/diagnostic.h"
 #include "Tf/fileUtils.h"
+#include "Tf/hash.h"
 #include "Tf/pathUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/staticTokens.h"
 #include "Tf/stl.h"
 #include "Tf/stringUtils.h"
-
-#include <boost/functional/hash.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -287,7 +269,7 @@ bool HioGlslfx::_ProcessInput(std::istream *input, _ParseContext &context)
     ++context.lineNo;
 
     // update hash
-    boost::hash_combine(_hash, context.currentLine);
+    _hash = TfHash::Combine(_hash, context.currentLine);
 
     if (context.lineNo > 1 && context.version < 0) {
       TF_RUNTIME_ERROR(

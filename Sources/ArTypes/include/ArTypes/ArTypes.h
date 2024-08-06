@@ -27,4 +27,4 @@
 #include <ArTypes/api.h>
 #include <ArTypes/resolvedPath.h>
 
-#endif /* __PXR_USD_AR_TYPES_H__ */
+#endif  //  __PXR_USD_AR_TYPES_H__

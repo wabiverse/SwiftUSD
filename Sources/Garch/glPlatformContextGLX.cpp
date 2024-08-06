@@ -1,40 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file glPlatformContext.cpp
 
-// Note: there may be cases in which you wish to build for GLX when you are
-// not on Linux, so we have left this optional define, `WITH_GLX` which will
-// override the platform detection and force the inclusion of GLX code.
-#if defined(__linux__) || defined(WITH_GLX)
-/* -----------------------------------------------------------------
- * to reduce the need to explicitly exclude platform specific source
- * from SwiftPM, we will just guard the compilation by its platform,
- * thus we can prefer the ease of including all sources in the build
- * which is far more maintainable, especially for package consumers.
- * ----------------------------------------------------------------- */
-#  include "Garch/glPlatformContext.h"
-#  include <boost/functional/hash.hpp>
+#include "Garch/glPlatformContext.h"
+#include "Tf/hash.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -66,11 +39,7 @@ bool GarchGLXContextState::operator==(const GarchGLXContextState &rhs) const
 
 size_t GarchGLXContextState::GetHash() const
 {
-  size_t result = 0;
-  boost::hash_combine(result, display);
-  boost::hash_combine(result, drawable);
-  boost::hash_combine(result, context);
-  return result;
+  return TfHash::Combine(display, drawable, context);
 }
 
 bool GarchGLXContextState::IsValid() const
@@ -101,5 +70,3 @@ GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif /* defined(__linux__) || defined(WITH_GLX) */

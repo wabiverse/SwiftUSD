@@ -1,40 +1,16 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Glf/testGLContext.h"
 
 #include "Tf/diagnostic.h"
 
-#if (defined(__linux__) || defined(_WIN32)) && __has_include(<GL/glx.h>)
-#  define WITH_TEST_GL_CONTEXT 1
-#  include <GL/glx.h>
-#else  // !defined(__linux__) && !defined(_WIN32) && !__has_include(<GL/glx.h>)
-#  define WITH_TEST_GL_CONTEXT 0
-#endif  // defined(__linux__) || defined(_WIN32) && __has_include(<GL/glx.h>)
+#include <GL/glx.h>
 
 #include <stdio.h>
-
-#if WITH_TEST_GL_CONTEXT
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -226,15 +202,10 @@ void GlfTestGLContext::_MakeCurrent()
 
 bool GlfTestGLContext::_IsSharing(GlfGLContextSharedPtr const &otherContext) const
 {
-#  ifdef MENV30
   GlfTestGLContextSharedPtr otherGlfTestGLContext = std::dynamic_pointer_cast<GlfTestGLContext>(
       otherContext);
   return (otherGlfTestGLContext &&
           Glf_TestGLContextPrivate::areSharing(_context, otherGlfTestGLContext->_context));
-#  else
-  TF_CODING_ERROR("Glf_TestGLContextPrivate::areSharing() is not supported outside of Presto.");
-  return false;
-#  endif
 }
 
 bool GlfTestGLContext::_IsEqual(GlfGLContextSharedPtr const &rhs) const
@@ -246,5 +217,3 @@ bool GlfTestGLContext::_IsEqual(GlfGLContextSharedPtr const &rhs) const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif  // WITH_TEST_GL_CONTEXT

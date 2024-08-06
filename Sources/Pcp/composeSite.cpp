@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Pcp/composeSite.h"
@@ -30,7 +13,7 @@
 #include "Sdf/layerUtils.h"
 #include "Sdf/listOp.h"
 #include "Sdf/primSpec.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <functional>
 
@@ -74,14 +57,14 @@ static void _PcpComposeSiteReferencesOrPayloads(
     PcpLayerStackRefPtr const &layerStack,
     SdfPath const &path,
     std::vector<RefOrPayloadType> *result,
-    PcpSourceArcInfoVector *info,
+    PcpArcInfoVector *info,
     std::unordered_set<std::string> *exprVarDependencies,
     PcpErrorVector *errors)
 {
   // Sdf provides no convenient way to annotate each element of the result.
   // So we use a map from element value to its annotation, which in this
-  // case is a PcpSourceArcInfo.
-  std::map<RefOrPayloadType, PcpSourceArcInfo> infoMap;
+  // case is a PcpArcInfo.
+  std::map<RefOrPayloadType, PcpArcInfo> infoMap;
 
   const SdfLayerRefPtrVector &layers = layerStack->GetLayers();
   SdfListOp<RefOrPayloadType> curListOp;
@@ -100,7 +83,7 @@ static void _PcpComposeSiteReferencesOrPayloads(
     curListOp.ApplyOperations(
         result,
         [&](SdfListOpType opType,
-            const RefOrPayloadType &refOrPayload) -> boost::optional<RefOrPayloadType> {
+            const RefOrPayloadType &refOrPayload) -> std::optional<RefOrPayloadType> {
           // Fill in the result reference or payload with the anchored
           // asset path instead of the authored asset path. This
           // ensures that references or payloads with the same
@@ -124,7 +107,7 @@ static void _PcpComposeSiteReferencesOrPayloads(
             // layer. If the empty result was due to an error, that
             // will have already been saved to the errors list above.
             if (authoredAssetPath.empty()) {
-              return boost::none;
+              return std::nullopt;
             }
 
             assetPath = SdfComputeAssetPathRelativeToLayer(layer, authoredAssetPath);
@@ -138,7 +121,10 @@ static void _PcpComposeSiteReferencesOrPayloads(
 
           _CopyCustomData(&result, refOrPayload);
           infoMap[result] = {
-              layer, layerOffset ? *layerOffset : SdfLayerOffset(), std::move(authoredAssetPath)};
+              layer,
+              layerOffset ? *layerOffset : SdfLayerOffset(),
+              std::move(authoredAssetPath),
+          };
           return result;
         });
   }
@@ -146,15 +132,17 @@ static void _PcpComposeSiteReferencesOrPayloads(
   // Fill in info.
   info->clear();
   info->reserve(result->size());
-  for (auto const &ref : *result) {
-    info->push_back(infoMap[ref]);
+  for (size_t i = 0; i < result->size(); i++) {
+    auto &infoStruct = infoMap[(*result)[i]];
+    infoStruct.arcNum = i;
+    info->push_back(std::move(infoStruct));
   }
 }
 
 void PcpComposeSiteReferences(PcpLayerStackRefPtr const &layerStack,
                               SdfPath const &path,
                               SdfReferenceVector *result,
-                              PcpSourceArcInfoVector *info,
+                              PcpArcInfoVector *info,
                               std::unordered_set<std::string> *stageVarDependencies,
                               PcpErrorVector *errors)
 {
@@ -165,7 +153,7 @@ void PcpComposeSiteReferences(PcpLayerStackRefPtr const &layerStack,
 void PcpComposeSitePayloads(PcpLayerStackRefPtr const &layerStack,
                             SdfPath const &path,
                             SdfPayloadVector *result,
-                            PcpSourceArcInfoVector *info,
+                            PcpArcInfoVector *info,
                             std::unordered_set<std::string> *stageVarDependencies,
                             PcpErrorVector *errors)
 {
@@ -242,12 +230,12 @@ static void _ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerSta
                                              const SdfPath &path,
                                              const TfToken &field,
                                              std::vector<ResultType> *result,
-                                             PcpSourceArcInfoVector *info)
+                                             PcpArcInfoVector *info)
 {
   // Map of result value to source arc info. The same value may appear in
   // multiple layers' list ops. This lets us make sure we find the strongest
   // layer that added the value.
-  std::map<ResultType, PcpSourceArcInfo> infoMap;
+  std::map<ResultType, PcpArcInfo> infoMap;
 
   SdfListOp<ResultType> listOp;
   TF_REVERSE_FOR_ALL(layer, layerStack->GetLayers())
@@ -257,7 +245,7 @@ static void _ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerSta
                              [&layer, &infoMap](SdfListOpType opType, const ResultType &path) {
                                // Just store the layer in the source arc info for the
                                // result. We don't need the other data.
-                               infoMap[path].layer = *layer;
+                               infoMap[path].sourceLayer = *layer;
                                return path;
                              });
     }
@@ -265,15 +253,17 @@ static void _ComposeSiteListOpWithSourceInfo(const PcpLayerStackRefPtr &layerSta
 
   // Construct the parallel array of source info to results.
   info->reserve(result->size());
-  for (const ResultType &path : *result) {
-    info->push_back(infoMap[path]);
+  for (size_t i = 0; i < result->size(); i++) {
+    auto &infoStruct = infoMap[(*result)[i]];
+    infoStruct.arcNum = i;
+    info->push_back(std::move(infoStruct));
   }
 }
 
 void PcpComposeSiteInherits(const PcpLayerStackRefPtr &layerStack,
                             const SdfPath &path,
                             SdfPathVector *result,
-                            PcpSourceArcInfoVector *info)
+                            PcpArcInfoVector *info)
 {
   static const TfToken field = SdfFieldKeys->InheritPaths;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
@@ -297,7 +287,7 @@ void PcpComposeSiteInherits(const PcpLayerStackRefPtr &layerStack,
 void PcpComposeSiteSpecializes(const PcpLayerStackRefPtr &layerStack,
                                const SdfPath &path,
                                SdfPathVector *result,
-                               PcpSourceArcInfoVector *info)
+                               PcpArcInfoVector *info)
 {
   static const TfToken field = SdfFieldKeys->Specializes;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
@@ -322,7 +312,7 @@ PCP_API
 void PcpComposeSiteVariantSets(PcpLayerStackRefPtr const &layerStack,
                                SdfPath const &path,
                                std::vector<std::string> *result,
-                               PcpSourceArcInfoVector *info)
+                               PcpArcInfoVector *info)
 {
   static const TfToken field = SdfFieldKeys->VariantSetNames;
   _ComposeSiteListOpWithSourceInfo(layerStack, path, field, result, info);
@@ -457,6 +447,16 @@ void PcpComposeSiteVariantSelections(PcpLayerStackRefPtr const &layerStack,
 
     result->insert(vselMap.begin(), vselMap.end());
   }
+}
+
+bool PcpComposeSiteHasVariantSelections(PcpLayerStackRefPtr const &layerStack, SdfPath const &path)
+{
+  for (auto const &layer : layerStack->GetLayers()) {
+    if (layer->HasField(path, SdfFieldKeys->VariantSelection)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void PcpComposeSiteChildNames(SdfLayerRefPtrVector const &layers,

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_MAP_FUNCTION_H
 #define PXR_USD_PCP_MAP_FUNCTION_H
@@ -27,7 +10,8 @@
 #include "Pcp/api.h"
 #include "Sdf/layerOffset.h"
 #include "Sdf/path.h"
-#include <pxr/pxrns.h>
+#include "Sdf/pathExpression.h"
+#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <memory>
@@ -153,6 +137,44 @@ class PcpMapFunction {
   PCP_API
   SdfPath MapTargetToSource(const SdfPath &path) const;
 
+  /// Map all path pattern prefix paths and expression reference paths in the
+  /// source namespace to the target.  For any references or patterns with
+  /// prefix paths that are not in the domain, replace with an
+  /// SdfPathPattern::Nothing() subexpression, to be simplified.
+  ///
+  /// For example, if the mapping specifies /Foo -> /World/Foo_1, and the
+  /// expression is '/Foo/Bar//Baz + /Something/Else//Entirely', the resulting
+  /// expression will be '/World/Foo_1/Bar//Baz', since the
+  /// /Something/Else prefix is outside the domain.
+  ///
+  /// If \p excludedPatterns and/or \p excludedReferences are supplied, they
+  /// are populated with those patterns & references that could not be
+  /// translated and were replaced with SdfPathPattern::Nothing().
+  PCP_API
+  SdfPathExpression MapSourceToTarget(
+      const SdfPathExpression &pathExpr,
+      std::vector<SdfPathExpression::PathPattern> *unmappedPatterns = nullptr,
+      std::vector<SdfPathExpression::ExpressionReference> *unmappedRefs = nullptr) const;
+
+  /// Map all path pattern prefix paths and expression reference paths in the
+  /// target namespace to the source.  For any references or patterns with
+  /// prefix paths that are not in the co-domain, replace with an
+  /// SdfPathPattern::Nothing() subexpression, to be simplified.
+  ///
+  /// For example, if the mapping specifies /World/Foo_1 -> /Foo, and the
+  /// expression is '/World/Foo_1/Bar//Baz + /World/Bar//', the resulting
+  /// expression will be '/Foo/Bar//Baz', since the /World/Bar prefix is
+  /// outside the co-domain.
+  ///
+  /// If \p excludedPatterns and/or \p excludedReferences are supplied, they
+  /// are populated with those patterns & references that could not be
+  /// translated and were replaced with SdfPathPattern::Nothing().
+  PCP_API
+  SdfPathExpression MapTargetToSource(
+      const SdfPathExpression &pathExpr,
+      std::vector<SdfPathExpression::PathPattern> *unmappedPatterns = nullptr,
+      std::vector<SdfPathExpression::ExpressionReference> *unmappedRefs = nullptr) const;
+
   /// Compose this map over the given map function.
   /// The result will represent the application of f followed by
   /// the application of this function.
@@ -197,6 +219,13 @@ class PcpMapFunction {
                  SdfLayerOffset offset,
                  bool hasRootIdentity);
 
+  PCP_API
+  SdfPathExpression _MapPathExpressionImpl(
+      bool invert,
+      const SdfPathExpression &pathExpr,
+      std::vector<SdfPathExpression::PathPattern> *unmappedPatterns,
+      std::vector<SdfPathExpression::ExpressionReference> *unmappedRefs) const;
+
  private:
   friend PcpMapFunction *Pcp_MakeIdentity();
 
@@ -205,7 +234,7 @@ class PcpMapFunction {
     _Data() {};
 
     _Data(PathPair const *begin, PathPair const *end, bool hasRootIdentity)
-        : numPairs(static_cast<int>(end - begin)), hasRootIdentity(hasRootIdentity)
+        : numPairs(end - begin), hasRootIdentity(hasRootIdentity)
     {
       if (numPairs == 0)
         return;

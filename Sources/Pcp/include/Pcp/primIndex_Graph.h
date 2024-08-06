@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_PCP_PRIM_INDEX_GRAPH_H
 #define PXR_USD_PCP_PRIM_INDEX_GRAPH_H
@@ -31,7 +14,7 @@
 #include "Pcp/node.h"
 #include "Pcp/types.h"
 #include "Sdf/types.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Arch/attributes.h"
 #include "Tf/declarePtrs.h"
@@ -93,6 +76,10 @@ class PcpPrimIndex_Graph : public TfSimpleRefBase {
   /// If the node is not in this graph, this returns the end index of the
   /// graph.
   size_t GetNodeIndexForNode(const PcpNodeRef &node) const;
+
+  /// Returns the indexes of the nodes that encompass the \p subtreeRootNode
+  /// and all of its descendants in strong-to-weak order.
+  std::pair<size_t, size_t> GetNodeIndexesForSubtreeRange(const PcpNodeRef &subtreeRootNode) const;
 
   /// Returns a node from the graph that uses the given site and can
   /// contribute specs, if one exists. If multiple nodes in the graph
@@ -219,6 +206,8 @@ class PcpPrimIndex_Graph : public TfSimpleRefBase {
   friend class PcpNodeRef_ChildrenReverseIterator;
   friend class PcpNodeRef_PrivateChildrenConstIterator;
   friend class PcpNodeRef_PrivateChildrenConstReverseIterator;
+  friend class PcpNodeRef_PrivateSubtreeConstIterator;
+  template<class T> friend class Pcp_TraversalCache;
 
   // NOTE: These accessors assume the consumer will be changing the node
   //       and may cause shared node data to be copied locally.
@@ -373,17 +362,22 @@ class PcpPrimIndex_Graph : public TfSimpleRefBase {
   // graph instances to be created.
   struct _UnsharedData {
     _UnsharedData() : hasSpecs(false), culled(false), isDueToAncestor(false) {}
-    explicit _UnsharedData(SdfPath const &p)
-        : sitePath(p), hasSpecs(false), culled(false), isDueToAncestor(false)
-    {
-    }
+    explicit _UnsharedData(SdfPath const &p) : _UnsharedData(SdfPath(p)) {}
     explicit _UnsharedData(SdfPath &&p)
-        : sitePath(std::move(p)), hasSpecs(false), culled(false), isDueToAncestor(false)
+        : sitePath(std::move(p)),
+          restrictionDepth(0),
+          hasSpecs(false),
+          culled(false),
+          isDueToAncestor(false)
     {
     }
 
     // The site path for a particular node.
     SdfPath sitePath;
+
+    // Absolute depth in namespace of this node at which it was
+    // restricted from contributing opinions.
+    uint16_t restrictionDepth;
 
     // Whether or not a particular node has any specs to contribute to the
     // composed prim.

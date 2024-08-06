@@ -1,25 +1,8 @@
 //
 // Copyright 2023 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_VARIABLE_EXPRESSION
 #define PXR_USD_SDF_VARIABLE_EXPRESSION
@@ -27,8 +10,9 @@
 /// \file sdf/variableExpression.h
 
 #include "Sdf/api.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
+#include "Vt/array.h"
 #include "Vt/dictionary.h"
 #include "Vt/value.h"
 
@@ -50,8 +34,7 @@ class Node;
 /// Variable expressions are written in a custom language and
 /// represented in scene description as a string surrounded by backticks (`).
 /// These expressions may refer to "expression variables", which are key-value
-/// pairs authored as layer metadata. For example, when evaluating an
-/// expression like:
+/// pairs provided by clients. For example, when evaluating an expression like:
 ///
 /// \code
 /// `"a_${NAME}_string"`
@@ -60,10 +43,19 @@ class Node;
 /// The "${NAME}" portion of the string with the value of expression variable
 /// "NAME".
 ///
-/// Higher levels of the system (e.g., composition) are responsible for
-/// examining fields that support variable expressions, evaluating them
-/// with the appropriate variables (via this class) and consuming the
-/// results.
+/// Expression variables may be any of these supported types:
+///
+/// - std::string
+/// - int64_t (int is accepted but coerced to int64_t)
+/// - bool
+/// - VtArrays containing any of the above types.
+/// - None (represented by an empty VtValue)
+///
+/// Expression variables are typically authored in scene description as layer
+/// metadata under the 'expressionVariables' field. Higher levels of the system
+/// (e.g., composition) are responsible for examining fields that support
+/// variable expressions, evaluating them with the appropriate variables (via
+/// this class) and consuming the results.
 ///
 /// See \ref Sdf_Page_VariableExpressions "Variable Expressions"
 /// or more information on the expression language and areas of the system
@@ -94,8 +86,11 @@ class SdfVariableExpression {
 
   /// Returns true if \p value holds a type that is supported by
   /// variable expressions, false otherwise. If this function returns
-  /// true, \p value may be authored into the expression variables
-  /// dictionary.
+  /// true, \p value may be used for an expression variable supplied to
+  /// the Evaluate function. \p value may also be authored into the
+  /// 'expressionVariables' dictionary, unless it is an empty VtValue
+  /// representing the None value. See class documentation for list of
+  /// supported types.
   SDF_API
   static bool IsValidVariableType(const VtValue &value);
 
@@ -121,6 +116,10 @@ class SdfVariableExpression {
   SDF_API
   const std::vector<std::string> &GetErrors() const;
 
+  /// \class EmptyList
+  /// A result value representing an empty list.
+  class EmptyList {};
+
   /// \class Result
   class Result {
    public:
@@ -128,6 +127,9 @@ class SdfVariableExpression {
     /// empty if the expression yielded no value. It may also be empty
     /// if errors occurred during evaluation. In this case, the errors
     /// field will be populated with error messages.
+    ///
+    /// If the value is not empty, it will contain one of the supported
+    /// types listed in the class documentation.
     VtValue value;
 
     /// Errors encountered while evaluating the expression.
@@ -149,6 +151,12 @@ class SdfVariableExpression {
   /// value. If an error occurs during evaluation, the value field
   /// in the Result object will be an empty VtValue and error messages
   /// will be added to the errors field.
+  ///
+  /// If the expression evaluates to an empty list, the value field
+  /// in the Result object will contain an EmptyList object instead
+  /// of an empty VtArray<T>, as the expression language does not
+  /// provide syntax for specifying the expected element types in
+  /// an empty list.
   ///
   /// If this object represents an invalid expression, calling this
   /// function will return a Result object with an empty value and the
@@ -172,10 +180,22 @@ class SdfVariableExpression {
   /// Result value will be set to an empty VtValue an error message
   /// indicating the unexpected type will be added to the Result's error
   /// list. Otherwise, the Result will be returned as-is.
+  ///
+  /// If the expression evaluates to an empty list and the ResultType
+  /// is a VtArray<T>, the value in the Result object will be an empty
+  /// VtArray<T>. This differs from Evaluate, which would return an
+  /// untyped EmptyList object instead.
+  ///
+  /// ResultType must be one of the supported types listed in the
+  /// class documentation.
   template<class ResultType> Result EvaluateTyped(const VtDictionary &variables) const
   {
     Result r = Evaluate(variables);
-    if (!r.value.IsEmpty() && !r.value.IsHolding<ResultType>()) {
+
+    if (VtIsArray<ResultType>::value && r.value.IsHolding<EmptyList>()) {
+      r.value = VtValue(ResultType());
+    }
+    else if (!r.value.IsEmpty() && !r.value.IsHolding<ResultType>()) {
       r.errors.push_back(_FormatUnexpectedTypeError(r.value, VtValue(ResultType())));
       r.value = VtValue();
     }
@@ -190,6 +210,18 @@ class SdfVariableExpression {
   std::shared_ptr<Sdf_VariableExpressionImpl::Node> _expression;
   std::string _expressionStr;
 };
+
+inline bool operator==(const SdfVariableExpression::EmptyList &,
+                       const SdfVariableExpression::EmptyList &)
+{
+  return true;
+}
+
+inline bool operator!=(const SdfVariableExpression::EmptyList &,
+                       const SdfVariableExpression::EmptyList &)
+{
+  return false;
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -1,32 +1,14 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 ///
 /// \file js/json.cpp
 
-#include <pxr/pxrns.h>
-
 #include "Js/json.h"
+#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"
@@ -49,13 +31,13 @@
   } \
   }
 
-#include "Js/rapidjson/allocators.h"
-#include "Js/rapidjson/document.h"
-#include "Js/rapidjson/error/en.h"
-#include "Js/rapidjson/error/error.h"
-#include "Js/rapidjson/ostreamwrapper.h"
-#include "Js/rapidjson/prettywriter.h"
-#include "Js/rapidjson/reader.h"
+#include "rapidjson/allocators.h"
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
+#include "rapidjson/ostreamwrapper.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/reader.h"
 
 namespace rj = RAPIDJSON_NAMESPACE;
 
@@ -264,7 +246,7 @@ JsValue JsParseString(const std::string &data, JsParseError *error)
           nlpos = i;
         }
       }
-      error->column = static_cast<unsigned int>(eoff - nlpos);
+      error->column = eoff - nlpos;
       error->reason = rj::GetParseError_En(result.Code());
     }
     return JsValue();
@@ -412,7 +394,7 @@ class Js_PolymorphicWriter : public Js_PolymorphicWriterInterface, public TWrite
   }
   bool String(const char *str, size_t length) override
   {
-    return Writer::String(str, static_cast<unsigned int>(length));
+    return Writer::String(str, length);
   }
   bool StartObject() override
   {
@@ -420,7 +402,7 @@ class Js_PolymorphicWriter : public Js_PolymorphicWriterInterface, public TWrite
   }
   bool Key(const char *str, size_t length) override
   {
-    return Writer::Key(str, static_cast<unsigned int>(length));
+    return Writer::Key(str, length);
   }
   bool EndObject() override
   {

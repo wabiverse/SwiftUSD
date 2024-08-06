@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_PATH_TABLE_H
 #define PXR_USD_SDF_PATH_TABLE_H
@@ -28,9 +11,7 @@
 #include "Sdf/path.h"
 #include "Tf/functionRef.h"
 #include "Tf/pointerAndBits.h"
-#include <pxr/pxrns.h>
-
-#include <boost/iterator/iterator_facade.hpp>
+#include "pxr/pxrns.h"
 
 #include <algorithm>
 #include <utility>
@@ -202,19 +183,56 @@ template<class MappedType> class SdfPathTable {
   // The iterator class, used to make both const and non-const
   // iterators.  Currently only forward traversal is supported.
   template<class, class> friend class Iterator;
-  template<class ValType, class EntryPtr>
-  class Iterator : public boost::iterator_facade<Iterator<ValType, EntryPtr>,
-                                                 ValType,
-                                                 boost::forward_traversal_tag> {
+  template<class ValType, class EntryPtr> class Iterator {
    public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = ValType;
+    using reference = ValType &;
+    using pointer = ValType *;
+    using difference_type = std::ptrdiff_t;
+
     /// The standard requires default construction but places practically no
     /// requirements on the semantics of default-constructed iterators.
-    Iterator() {}
+    Iterator() = default;
 
     /// Copy constructor (also allows for converting non-const to const).
     template<class OtherVal, class OtherEntryPtr>
     Iterator(Iterator<OtherVal, OtherEntryPtr> const &other) : _entry(other._entry)
     {
+    }
+
+    reference operator*() const
+    {
+      return dereference();
+    }
+    pointer operator->() const
+    {
+      return &(dereference());
+    }
+
+    Iterator &operator++()
+    {
+      increment();
+      return *this;
+    }
+
+    Iterator operator++(int)
+    {
+      Iterator result(*this);
+      increment();
+      return result;
+    }
+
+    template<class OtherVal, class OtherEntryPtr>
+    bool operator==(Iterator<OtherVal, OtherEntryPtr> const &other) const
+    {
+      return equal(other);
+    }
+
+    template<class OtherVal, class OtherEntryPtr>
+    bool operator!=(Iterator<OtherVal, OtherEntryPtr> const &other) const
+    {
+      return !equal(other);
     }
 
     /// Return an iterator \a e, defining a maximal range [\a *this, \a e)
@@ -250,15 +268,12 @@ template<class MappedType> class SdfPathTable {
     }
 
    protected:
-    friend class boost::iterator_core_access;
     friend class SdfPathTable;
     template<class, class> friend class Iterator;
 
     explicit Iterator(EntryPtr entry) : _entry(entry) {}
 
     // Fundamental functionality to implement the iterator.
-    // boost::iterator_facade will invoke these as necessary to implement
-    // the full iterator public interface.
 
     // Iterator increment.
     inline void increment()

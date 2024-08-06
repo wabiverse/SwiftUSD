@@ -1,32 +1,15 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file SpecType.cpp
 
 #include "Sdf/specType.h"
 #include "Sdf/schema.h"
 #include "Sdf/spec.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Arch/demangle.h"
 #include "Tf/bigRWMutex.h"
@@ -45,8 +28,8 @@
 #include <utility>
 #include <vector>
 
-// using std::make_pair;
-// using std::pair;
+using std::make_pair;
+using std::pair;
 using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -203,14 +186,12 @@ TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to)
 {
   const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
 
-  const SdfSpecType fromType = from.GetSpecType();
-  const SdfSchemaBase &schema = from.GetSchema();
-
-  const TfType &schemaType = TfType::Find(typeid(schema));
+  const TfType &schemaType = TfType::Find(typeid(from.GetSchema()));
   if (!TF_VERIFY(!schemaType.IsUnknown())) {
     return TfType();
   }
 
+  const SdfSpecType fromType = from.GetSpecType();
   const TfType &toType = TfType::Find(to);
 
   TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
@@ -253,8 +234,7 @@ bool Sdf_SpecType::CanCast(const SdfSpec &from, const std::type_info &to)
   const SdfSpecType fromType = from.GetSpecType();
   const TfType &toType = TfType::Find(to);
 
-  const auto &schema = from.GetSchema();
-  const TfType &fromSchemaType = TfType::Find(typeid(schema));
+  const TfType &fromSchemaType = TfType::Find(typeid(from.GetSchema()));
 
   TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
 

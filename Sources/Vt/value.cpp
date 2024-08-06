@@ -1,46 +1,29 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Vt/dictionary.h"
 #include "Vt/typeHeaders.h"
 #include "Vt/types.h"
 
 #include "Gf/math.h"
+#include "Gf/numericCast.h"
 #include "Tf/instantiateSingleton.h"
 #include "Tf/iterator.h"
 #include "Tf/mallocTag.h"
+#include "Tf/preprocessorUtilsLite.h"
 #include "Tf/singleton.h"
 #include "Tf/staticData.h"
 #include "Tf/token.h"
 
 #include <OneTBB/tbb/concurrent_unordered_map.h>
 #include <OneTBB/tbb/spin_mutex.h>
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/preprocessor.hpp>
 
 #include <cmath>
 #include <limits>
@@ -68,44 +51,11 @@ TF_REGISTRY_FUNCTION(TfType)
   TfType::Define<VtValue>();
 }
 
-template<typename From, typename To> static inline VtValue _BoostNumericCast(const From x)
+template<class From, class To> static VtValue _NumericCast(VtValue const &val)
 {
-  try {
-    return VtValue(boost::numeric_cast<To>(x));
-  }
-  catch (const boost::bad_numeric_cast &) {
-    return VtValue();
-  }
-}
-
-// If the To type has no infinity, simply use boost numeric_cast.
-template<typename From, typename To>
-static typename std::enable_if<!std::numeric_limits<To>::has_infinity, VtValue>::type _NumericCast(
-    VtValue const &val)
-{
-  return _BoostNumericCast<From, To>(val.UncheckedGet<From>());
-}
-
-// If the To type has infinity, we convert values larger than the largest
-// finite value that To can take to infinity.
-template<typename From, typename To>
-static typename std::enable_if<std::numeric_limits<To>::has_infinity, VtValue>::type _NumericCast(
-    VtValue const &val)
-{
-  const From x = val.UncheckedGet<From>();
-
-  // Use 'x == x' to check that x is not NaN.  NaNs don't compare equal to
-  // themselves.
-  if (x == x) {
-    if (x > std::numeric_limits<To>::max()) {
-      return VtValue(std::numeric_limits<To>::infinity());
-    }
-    if (x < -std::numeric_limits<To>::max()) {
-      return VtValue(-std::numeric_limits<To>::infinity());
-    }
-  }
-
-  return _BoostNumericCast<From, To>(x);
+  const From from = val.UncheckedGet<From>();
+  std::optional<To> opt = GfNumericCast<To>(from);
+  return opt ? VtValue(opt.value()) : VtValue();
 }
 
 template<class A, class B> static void _RegisterNumericCasts()
@@ -563,16 +513,16 @@ std::ostream &VtStreamOut(vector<VtValue> const &val, std::ostream &stream)
   return stream;
 }
 
-#define _VT_IMPLEMENT_ZERO_VALUE_FACTORY(r, unused, elem) \
+#define _VT_IMPLEMENT_ZERO_VALUE_FACTORY(unused, elem) \
   template<> Vt_DefaultValueHolder Vt_DefaultValueFactory<VT_TYPE(elem)>::Invoke() \
   { \
     return Vt_DefaultValueHolder::Create(VtZero<VT_TYPE(elem)>()); \
   } \
   template struct Vt_DefaultValueFactory<VT_TYPE(elem)>;
 
-BOOST_PP_SEQ_FOR_EACH(_VT_IMPLEMENT_ZERO_VALUE_FACTORY,
-                      unused,
-                      VT_VEC_VALUE_TYPES VT_MATRIX_VALUE_TYPES VT_QUATERNION_VALUE_TYPES
-                          VT_DUALQUATERNION_VALUE_TYPES)
+TF_PP_SEQ_FOR_EACH(_VT_IMPLEMENT_ZERO_VALUE_FACTORY,
+                   ~,
+                   VT_VEC_VALUE_TYPES VT_MATRIX_VALUE_TYPES VT_QUATERNION_VALUE_TYPES
+                       VT_DUALQUATERNION_VALUE_TYPES)
 
 PXR_NAMESPACE_CLOSE_SCOPE

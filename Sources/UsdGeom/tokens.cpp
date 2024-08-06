@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "UsdGeom/tokens.h"
 
@@ -57,6 +40,7 @@ UsdGeomTokensType::UsdGeomTokensType()
       curveVertexCounts("curveVertexCounts", TfToken::Immortal),
       default_("default", TfToken::Immortal),
       doubleSided("doubleSided", TfToken::Immortal),
+      edge("edge", TfToken::Immortal),
       edgeAndCorner("edgeAndCorner", TfToken::Immortal),
       edgeOnly("edgeOnly", TfToken::Immortal),
       elementSize("elementSize", TfToken::Immortal),
@@ -118,6 +102,7 @@ UsdGeomTokensType::UsdGeomTokensType()
       order("order", TfToken::Immortal),
       orientation("orientation", TfToken::Immortal),
       orientations("orientations", TfToken::Immortal),
+      orientationsf("orientationsf", TfToken::Immortal),
       origin("origin", TfToken::Immortal),
       orthographic("orthographic", TfToken::Immortal),
       partition("partition", TfToken::Immortal),
@@ -125,6 +110,7 @@ UsdGeomTokensType::UsdGeomTokensType()
       perspective("perspective", TfToken::Immortal),
       pinned("pinned", TfToken::Immortal),
       pivot("pivot", TfToken::Immortal),
+      point("point", TfToken::Immortal),
       points("points", TfToken::Immortal),
       pointWeights("pointWeights", TfToken::Immortal),
       positions("positions", TfToken::Immortal),
@@ -139,6 +125,8 @@ UsdGeomTokensType::UsdGeomTokensType()
       proxyVisibility("proxyVisibility", TfToken::Immortal),
       purpose("purpose", TfToken::Immortal),
       radius("radius", TfToken::Immortal),
+      radiusBottom("radiusBottom", TfToken::Immortal),
+      radiusTop("radiusTop", TfToken::Immortal),
       ranges("ranges", TfToken::Immortal),
       render("render", TfToken::Immortal),
       renderVisibility("renderVisibility", TfToken::Immortal),
@@ -151,7 +139,10 @@ UsdGeomTokensType::UsdGeomTokensType()
       smooth("smooth", TfToken::Immortal),
       stereoRole("stereoRole", TfToken::Immortal),
       subdivisionScheme("subdivisionScheme", TfToken::Immortal),
+      surfaceFaceVertexIndices("surfaceFaceVertexIndices", TfToken::Immortal),
       tangents("tangents", TfToken::Immortal),
+      tetrahedron("tetrahedron", TfToken::Immortal),
+      tetVertexIndices("tetVertexIndices", TfToken::Immortal),
       triangleSubdivisionRule("triangleSubdivisionRule", TfToken::Immortal),
       trimCurveCounts("trimCurve:counts", TfToken::Immortal),
       trimCurveKnots("trimCurve:knots", TfToken::Immortal),
@@ -192,10 +183,12 @@ UsdGeomTokensType::UsdGeomTokensType()
       Boundable("Boundable", TfToken::Immortal),
       Camera("Camera", TfToken::Immortal),
       Capsule("Capsule", TfToken::Immortal),
+      Capsule_1("Capsule_1", TfToken::Immortal),
       Cone("Cone", TfToken::Immortal),
       Cube("Cube", TfToken::Immortal),
       Curves("Curves", TfToken::Immortal),
       Cylinder("Cylinder", TfToken::Immortal),
+      Cylinder_1("Cylinder_1", TfToken::Immortal),
       GeomModelAPI("GeomModelAPI", TfToken::Immortal),
       GeomSubset("GeomSubset", TfToken::Immortal),
       Gprim("Gprim", TfToken::Immortal),
@@ -212,6 +205,7 @@ UsdGeomTokensType::UsdGeomTokensType()
       PrimvarsAPI("PrimvarsAPI", TfToken::Immortal),
       Scope("Scope", TfToken::Immortal),
       Sphere("Sphere", TfToken::Immortal),
+      TetMesh("TetMesh", TfToken::Immortal),
       VisibilityAPI("VisibilityAPI", TfToken::Immortal),
       Xform("Xform", TfToken::Immortal),
       Xformable("Xformable", TfToken::Immortal),
@@ -247,6 +241,7 @@ UsdGeomTokensType::UsdGeomTokensType()
                  curveVertexCounts,
                  default_,
                  doubleSided,
+                 edge,
                  edgeAndCorner,
                  edgeOnly,
                  elementSize,
@@ -308,6 +303,7 @@ UsdGeomTokensType::UsdGeomTokensType()
                  order,
                  orientation,
                  orientations,
+                 orientationsf,
                  origin,
                  orthographic,
                  partition,
@@ -315,6 +311,7 @@ UsdGeomTokensType::UsdGeomTokensType()
                  perspective,
                  pinned,
                  pivot,
+                 point,
                  points,
                  pointWeights,
                  positions,
@@ -329,6 +326,8 @@ UsdGeomTokensType::UsdGeomTokensType()
                  proxyVisibility,
                  purpose,
                  radius,
+                 radiusBottom,
+                 radiusTop,
                  ranges,
                  render,
                  renderVisibility,
@@ -341,7 +340,10 @@ UsdGeomTokensType::UsdGeomTokensType()
                  smooth,
                  stereoRole,
                  subdivisionScheme,
+                 surfaceFaceVertexIndices,
                  tangents,
+                 tetrahedron,
+                 tetVertexIndices,
                  triangleSubdivisionRule,
                  trimCurveCounts,
                  trimCurveKnots,
@@ -382,10 +384,12 @@ UsdGeomTokensType::UsdGeomTokensType()
                  Boundable,
                  Camera,
                  Capsule,
+                 Capsule_1,
                  Cone,
                  Cube,
                  Curves,
                  Cylinder,
+                 Cylinder_1,
                  GeomModelAPI,
                  GeomSubset,
                  Gprim,
@@ -402,6 +406,7 @@ UsdGeomTokensType::UsdGeomTokensType()
                  PrimvarsAPI,
                  Scope,
                  Sphere,
+                 TetMesh,
                  VisibilityAPI,
                  Xform,
                  Xformable,

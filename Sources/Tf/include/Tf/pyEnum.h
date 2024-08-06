@@ -1,33 +1,16 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_PY_ENUM_H
 #define PXR_BASE_TF_PY_ENUM_H
 
-/// \file Tf/pyEnum.h
+/// \file tf/pyEnum.h
 /// Provide facilities for wrapping enums for script.
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/api.h"
 #include "Tf/pyObjWrapper.h"
@@ -111,8 +94,8 @@ class Tf_PyEnumRegistry {
       // In the case of producing a TfEnum or an integer, any
       // registered enum type is fine.  In all other cases, the
       // enum types must match.
-      if (boost::is_same<T, TfEnum>::value ||
-          (boost::is_integral<T>::value && !boost::is_enum<T>::value))
+      if (std::is_same<T, TfEnum>::value ||
+          (std::is_integral<T>::value && !std::is_enum<T>::value))
         return i != o2e.end() ? obj : 0;
       else
         return (i != o2e.end() && i->second.IsA<T>()) ? obj : 0;
@@ -167,7 +150,7 @@ std::string Tf_PyEnumRepr(boost::python::object const &self);
 
 // Private base class for types which are instantiated and exposed to python
 // for each registered enum type.
-struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrapper> {
+struct Tf_PyEnumWrapper : public Tf_PyEnum {
   typedef Tf_PyEnumWrapper This;
 
   Tf_PyEnumWrapper(std::string const &n, TfEnum const &val) : name(n), value(val) {}
@@ -197,6 +180,11 @@ struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrap
     return lhs.value == rhs.value;
   }
 
+  friend bool operator!=(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
   friend bool operator<(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
   {
     // If same, not less.
@@ -207,6 +195,21 @@ struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrap
       return TfEnum::GetFullName(lhs.value) < TfEnum::GetFullName(rhs.value);
     // If types do match, numerically compare values.
     return lhs.GetValue() < rhs.GetValue();
+  }
+
+  friend bool operator>(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
+  {
+    return rhs < lhs;
+  }
+
+  friend bool operator<=(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
+  {
+    return !(lhs > rhs);
+  }
+
+  friend bool operator>=(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
+  {
+    return !(lhs < rhs);
   }
 
   //
@@ -226,11 +229,11 @@ struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrap
   }
   friend TfEnum operator|(Tf_PyEnumWrapper const &lhs, long rhs)
   {
-    return TfEnum(lhs.value.GetType(), static_cast<int>(lhs.value.GetValueAsInt() | rhs));
+    return TfEnum(lhs.value.GetType(), lhs.value.GetValueAsInt() | rhs);
   }
   friend TfEnum operator|(long lhs, Tf_PyEnumWrapper const &rhs)
   {
-    return TfEnum(rhs.value.GetType(), static_cast<int>(lhs | rhs.value.GetValueAsInt()));
+    return TfEnum(rhs.value.GetType(), lhs | rhs.value.GetValueAsInt());
   }
 
   friend TfEnum operator&(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
@@ -243,11 +246,11 @@ struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrap
   }
   friend TfEnum operator&(Tf_PyEnumWrapper const &lhs, long rhs)
   {
-    return TfEnum(lhs.value.GetType(), static_cast<int>(lhs.value.GetValueAsInt() & rhs));
+    return TfEnum(lhs.value.GetType(), lhs.value.GetValueAsInt() & rhs);
   }
   friend TfEnum operator&(long lhs, Tf_PyEnumWrapper const &rhs)
   {
-    return TfEnum(rhs.value.GetType(), static_cast<int>(lhs & rhs.value.GetValueAsInt()));
+    return TfEnum(rhs.value.GetType(), lhs & rhs.value.GetValueAsInt());
   }
 
   friend TfEnum operator^(Tf_PyEnumWrapper const &lhs, Tf_PyEnumWrapper const &rhs)
@@ -260,11 +263,11 @@ struct Tf_PyEnumWrapper : public Tf_PyEnum, boost::totally_ordered<Tf_PyEnumWrap
   }
   friend TfEnum operator^(Tf_PyEnumWrapper const &lhs, long rhs)
   {
-    return TfEnum(lhs.value.GetType(), static_cast<int>(lhs.value.GetValueAsInt() ^ rhs));
+    return TfEnum(lhs.value.GetType(), lhs.value.GetValueAsInt() ^ rhs);
   }
   friend TfEnum operator^(long lhs, Tf_PyEnumWrapper const &rhs)
   {
-    return TfEnum(rhs.value.GetType(), static_cast<int>(lhs ^ rhs.value.GetValueAsInt()));
+    return TfEnum(rhs.value.GetType(), lhs ^ rhs.value.GetValueAsInt());
   }
 
   friend TfEnum operator~(Tf_PyEnumWrapper const &rhs)

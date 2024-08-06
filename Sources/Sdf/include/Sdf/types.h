@@ -1,33 +1,14 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_TYPES_H
 #define PXR_USD_SDF_TYPES_H
 
 /// \file sdf/types.h
 /// Basic Sdf data types
-
-#include <pxr/pxrns.h>
 
 #include "Sdf/api.h"
 #include "Sdf/assetPath.h"
@@ -37,9 +18,11 @@
 #include "Sdf/pathExpression.h"
 #include "Sdf/timeCode.h"
 #include "Sdf/valueTypeName.h"
+#include "pxr/pxrns.h"
 
 #include "Arch/demangle.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
+#include "Arch/pragmas.h"
 #include "Gf/half.h"
 #include "Gf/matrix2d.h"
 #include "Gf/matrix3d.h"
@@ -68,9 +51,6 @@
 #include "Vt/dictionary.h"
 #include "Vt/value.h"
 
-#include <Arch/swiftInterop.h>
-
-#include <boost/preprocessor/seq/for_each.hpp>
 #include <iosfwd>
 #include <list>
 #include <map>
@@ -228,18 +208,24 @@ enum SdfAuthoringError {
 #define _SDF_UNITSLIST_TUPLES(tup) TF_PP_TUPLE_ELEM(1, tup)
 #define _SDF_UNITSLIST_ENUM(elem) TF_PP_CAT(TF_PP_CAT(Sdf, _SDF_UNITSLIST_CATEGORY(elem)), Unit)
 
-#define _SDF_DECLARE_UNIT_ENUMERANT(r, tag, elem) TF_PP_CAT(Sdf##tag##Unit, _SDF_UNIT_TAG(elem)),
+#define _SDF_DECLARE_UNIT_ENUMERANT(tag, elem) TF_PP_CAT(Sdf##tag##Unit, _SDF_UNIT_TAG(elem)),
 
 #define _SDF_DECLARE_UNIT_ENUM(elem) \
   enum _SDF_UNITSLIST_ENUM(elem) { \
-    BOOST_PP_SEQ_FOR_EACH( \
+    TF_PP_SEQ_FOR_EACH( \
         _SDF_DECLARE_UNIT_ENUMERANT, _SDF_UNITSLIST_CATEGORY(elem), _SDF_UNITSLIST_TUPLES(elem)) \
   };
 
 #define _SDF_FOR_EACH_UNITS_IMPL(macro, ...) TF_PP_FOR_EACH(macro, __VA_ARGS__)
 #define _SDF_FOR_EACH_UNITS(macro, args) _SDF_FOR_EACH_UNITS_IMPL(macro, TF_PP_EAT_PARENS(args))
 
+// On Windows this call to _SDF_FOR_EACH_UNITS generates a C4003 warning.
+// This is harmless, but we disable the warning here so that external
+// projects that include this header don't run into it as well.
+ARCH_PRAGMA_PUSH
+ARCH_PRAGMA_MACRO_TOO_FEW_ARGUMENTS
 _SDF_FOR_EACH_UNITS(_SDF_DECLARE_UNIT_ENUM, _SDF_UNITS)
+ARCH_PRAGMA_POP
 
 /// A map of mapper parameter names to parameter values.
 typedef std::map<std::string, VtValue> SdfMapperParametersMap;
@@ -255,6 +241,13 @@ typedef std::map<std::string, std::vector<std::string>> SdfVariantsMap;
 //        clients, so SdfPath::FastLessThan is explicitly omitted as
 //        the Compare template parameter.
 typedef std::map<SdfPath, SdfPath> SdfRelocatesMap;
+
+/// A single relocate specifying a source SdfPath and a target SdfPath for a
+/// relocation.
+typedef std::pair<SdfPath, SdfPath> SdfRelocate;
+
+/// A vector of relocation source path to target path pairs.
+typedef std::vector<SdfRelocate> SdfRelocates;
 
 /// A map from sample times to sample values.
 typedef std::map<double, VtValue> SdfTimeSampleMap;
@@ -340,7 +333,7 @@ template<int N> struct SdfValueTypeTraits<char[N]> {
   static const bool IsValueType = true;
 };
 
-#define SDF_DECLARE_VALUE_TYPE_TRAITS(r, unused, elem) \
+#define SDF_DECLARE_VALUE_TYPE_TRAITS(unused, elem) \
   template<> struct SdfValueTypeTraits<SDF_VALUE_CPP_TYPE(elem)> { \
     static const bool IsValueType = true; \
   }; \
@@ -348,7 +341,7 @@ template<int N> struct SdfValueTypeTraits<char[N]> {
     static const bool IsValueType = true; \
   };
 
-BOOST_PP_SEQ_FOR_EACH(SDF_DECLARE_VALUE_TYPE_TRAITS, ~, SDF_VALUE_TYPES);
+TF_PP_SEQ_FOR_EACH(SDF_DECLARE_VALUE_TYPE_TRAITS, ~, SDF_VALUE_TYPES);
 
 /// Convert \p dict to a valid metadata dictionary for scene description.  Valid
 /// metadata dictionaries have values that are any of SDF_VALUE_TYPES (or
@@ -399,6 +392,10 @@ std::ostream &operator<<(std::ostream &out, const SdfSpecifier &spec);
 /// Writes the string representation of \c SdfRelocatesMap to \a out.
 SDF_API
 std::ostream &operator<<(std::ostream &out, const SdfRelocatesMap &reloMap);
+
+/// Writes the string representation of \c SdfRelocates to \a out.
+SDF_API
+std::ostream &operator<<(std::ostream &out, const SdfRelocates &relocates);
 
 /// Writes the string representation of \c SdfTimeSampleMap to \a out.
 SDF_API
@@ -514,342 +511,10 @@ class Sdf_ValueTypeNamesType {
  private:
   friend const Sdf_ValueTypeNamesType *Sdf_InitializeValueTypeNames();
   Sdf_ValueTypeNamesType();
-} SWIFT_IMMORTAL_REFERENCE;
+};
 
 extern SDF_API TfStaticData<const Sdf_ValueTypeNamesType, Sdf_ValueTypeNamesType::_Init>
     SdfValueTypeNames;
-
-/**
- * Ugly monstrosity to allow us to look
- * up a SdfValueTypeName from a Swift enum.
- *
- * Swift magically turns enum values such as
- * "SdfValueTypeNameTypeFloat" to simply "float".
- */
-enum class SdfValueTypeNameType {
-  SdfValueTypeNameTypeBool,
-  SdfValueTypeNameTypeUChar,
-  SdfValueTypeNameTypeInt,
-  SdfValueTypeNameTypeUInt,
-  SdfValueTypeNameTypeInt64,
-  SdfValueTypeNameTypeUInt64,
-  SdfValueTypeNameTypeHalf,
-  SdfValueTypeNameTypeFloat,
-  SdfValueTypeNameTypeDouble,
-  SdfValueTypeNameTypeTimeCode,
-  SdfValueTypeNameTypeString,
-  SdfValueTypeNameTypeToken,
-  SdfValueTypeNameTypeAsset,
-  SdfValueTypeNameTypeInt2,
-  SdfValueTypeNameTypeInt3,
-  SdfValueTypeNameTypeInt4,
-  SdfValueTypeNameTypeHalf2,
-  SdfValueTypeNameTypeHalf3,
-  SdfValueTypeNameTypeHalf4,
-  SdfValueTypeNameTypeFloat2,
-  SdfValueTypeNameTypeFloat3,
-  SdfValueTypeNameTypeFloat4,
-  SdfValueTypeNameTypeDouble2,
-  SdfValueTypeNameTypeDouble3,
-  SdfValueTypeNameTypeDouble4,
-  SdfValueTypeNameTypePoint3h,
-  SdfValueTypeNameTypePoint3f,
-  SdfValueTypeNameTypePoint3d,
-  SdfValueTypeNameTypeVector3h,
-  SdfValueTypeNameTypeVector3f,
-  SdfValueTypeNameTypeVector3d,
-  SdfValueTypeNameTypeNormal3h,
-  SdfValueTypeNameTypeNormal3f,
-  SdfValueTypeNameTypeNormal3d,
-  SdfValueTypeNameTypeColor3h,
-  SdfValueTypeNameTypeColor3f,
-  SdfValueTypeNameTypeColor3d,
-  SdfValueTypeNameTypeColor4h,
-  SdfValueTypeNameTypeColor4f,
-  SdfValueTypeNameTypeColor4d,
-  SdfValueTypeNameTypeQuath,
-  SdfValueTypeNameTypeQuatf,
-  SdfValueTypeNameTypeQuatd,
-  SdfValueTypeNameTypeMatrix2d,
-  SdfValueTypeNameTypeMatrix3d,
-  SdfValueTypeNameTypeMatrix4d,
-  SdfValueTypeNameTypeFrame4d,
-  SdfValueTypeNameTypeTexCoord2h,
-  SdfValueTypeNameTypeTexCoord2f,
-  SdfValueTypeNameTypeTexCoord2d,
-  SdfValueTypeNameTypeTexCoord3h,
-  SdfValueTypeNameTypeTexCoord3f,
-  SdfValueTypeNameTypeTexCoord3d,
-  SdfValueTypeNameTypeOpaque,
-  SdfValueTypeNameTypeGroup,
-  SdfValueTypeNameTypePathExpression,
-  SdfValueTypeNameTypeBoolArray,
-  SdfValueTypeNameTypeUCharArray,
-  SdfValueTypeNameTypeIntArray,
-  SdfValueTypeNameTypeUIntArray,
-  SdfValueTypeNameTypeInt64Array,
-  SdfValueTypeNameTypeUInt64Array,
-  SdfValueTypeNameTypeHalfArray,
-  SdfValueTypeNameTypeFloatArray,
-  SdfValueTypeNameTypeDoubleArray,
-  SdfValueTypeNameTypeTimeCodeArray,
-  SdfValueTypeNameTypeStringArray,
-  SdfValueTypeNameTypeTokenArray,
-  SdfValueTypeNameTypeAssetArray,
-  SdfValueTypeNameTypeInt2Array,
-  SdfValueTypeNameTypeInt3Array,
-  SdfValueTypeNameTypeInt4Array,
-  SdfValueTypeNameTypeHalf2Array,
-  SdfValueTypeNameTypeHalf3Array,
-  SdfValueTypeNameTypeHalf4Array,
-  SdfValueTypeNameTypeFloat2Array,
-  SdfValueTypeNameTypeFloat3Array,
-  SdfValueTypeNameTypeFloat4Array,
-  SdfValueTypeNameTypeDouble2Array,
-  SdfValueTypeNameTypeDouble3Array,
-  SdfValueTypeNameTypeDouble4Array,
-  SdfValueTypeNameTypePoint3hArray,
-  SdfValueTypeNameTypePoint3fArray,
-  SdfValueTypeNameTypePoint3dArray,
-  SdfValueTypeNameTypeVector3hArray,
-  SdfValueTypeNameTypeVector3fArray,
-  SdfValueTypeNameTypeVector3dArray,
-  SdfValueTypeNameTypeNormal3hArray,
-  SdfValueTypeNameTypeNormal3fArray,
-  SdfValueTypeNameTypeNormal3dArray,
-  SdfValueTypeNameTypeColor3hArray,
-  SdfValueTypeNameTypeColor3fArray,
-  SdfValueTypeNameTypeColor3dArray,
-  SdfValueTypeNameTypeColor4hArray,
-  SdfValueTypeNameTypeColor4fArray,
-  SdfValueTypeNameTypeColor4dArray,
-  SdfValueTypeNameTypeQuathArray,
-  SdfValueTypeNameTypeQuatfArray,
-  SdfValueTypeNameTypeQuatdArray,
-  SdfValueTypeNameTypeMatrix2dArray,
-  SdfValueTypeNameTypeMatrix3dArray,
-  SdfValueTypeNameTypeMatrix4dArray,
-  SdfValueTypeNameTypeFrame4dArray
-};
-
-/**
- * Ugly monstrosity to allow us to look up a SdfValueTypeName from Swift using a
- * SdfValueTypeNameType enum, all of this because Swift hates the -> operator pointer
- * lookup on SdfValueTypeNames.
- */
-inline SdfValueTypeName SdfGetValueType(const SdfValueTypeNameType &type)
-{
-  switch (type) {
-    case SdfValueTypeNameType::SdfValueTypeNameTypeBool:
-      return SdfValueTypeNames->Bool;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUChar:
-      return SdfValueTypeNames->UChar;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt:
-      return SdfValueTypeNames->Int;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt:
-      return SdfValueTypeNames->UInt;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt64:
-      return SdfValueTypeNames->Int64;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt64:
-      return SdfValueTypeNames->UInt64;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf:
-      return SdfValueTypeNames->Half;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat:
-      return SdfValueTypeNames->Float;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble:
-      return SdfValueTypeNames->Double;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTimeCode:
-      return SdfValueTypeNames->TimeCode;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeString:
-      return SdfValueTypeNames->String;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeToken:
-      return SdfValueTypeNames->Token;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeAsset:
-      return SdfValueTypeNames->Asset;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt2:
-      return SdfValueTypeNames->Int2;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt3:
-      return SdfValueTypeNames->Int3;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt4:
-      return SdfValueTypeNames->Int4;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf2:
-      return SdfValueTypeNames->Half2;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf3:
-      return SdfValueTypeNames->Half3;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf4:
-      return SdfValueTypeNames->Half4;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat2:
-      return SdfValueTypeNames->Float2;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat3:
-      return SdfValueTypeNames->Float3;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat4:
-      return SdfValueTypeNames->Float4;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble2:
-      return SdfValueTypeNames->Double2;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble3:
-      return SdfValueTypeNames->Double3;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble4:
-      return SdfValueTypeNames->Double4;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3h:
-      return SdfValueTypeNames->Point3h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3f:
-      return SdfValueTypeNames->Point3f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3d:
-      return SdfValueTypeNames->Point3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3h:
-      return SdfValueTypeNames->Vector3h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3f:
-      return SdfValueTypeNames->Vector3f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3d:
-      return SdfValueTypeNames->Vector3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3h:
-      return SdfValueTypeNames->Normal3h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3f:
-      return SdfValueTypeNames->Normal3f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3d:
-      return SdfValueTypeNames->Normal3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3h:
-      return SdfValueTypeNames->Color3h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3f:
-      return SdfValueTypeNames->Color3f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3d:
-      return SdfValueTypeNames->Color3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4h:
-      return SdfValueTypeNames->Color4h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4f:
-      return SdfValueTypeNames->Color4f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4d:
-      return SdfValueTypeNames->Color4d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuath:
-      return SdfValueTypeNames->Quath;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatf:
-      return SdfValueTypeNames->Quatf;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatd:
-      return SdfValueTypeNames->Quatd;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix2d:
-      return SdfValueTypeNames->Matrix2d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix3d:
-      return SdfValueTypeNames->Matrix3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix4d:
-      return SdfValueTypeNames->Matrix4d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFrame4d:
-      return SdfValueTypeNames->Frame4d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2h:
-      return SdfValueTypeNames->TexCoord2h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2f:
-      return SdfValueTypeNames->TexCoord2f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord2d:
-      return SdfValueTypeNames->TexCoord2d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3h:
-      return SdfValueTypeNames->TexCoord3h;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3f:
-      return SdfValueTypeNames->TexCoord3f;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTexCoord3d:
-      return SdfValueTypeNames->TexCoord3d;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeOpaque:
-      return SdfValueTypeNames->Opaque;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeGroup:
-      return SdfValueTypeNames->Group;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePathExpression:
-      return SdfValueTypeNames->PathExpression;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeBoolArray:
-      return SdfValueTypeNames->BoolArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUCharArray:
-      return SdfValueTypeNames->UCharArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeIntArray:
-      return SdfValueTypeNames->IntArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUIntArray:
-      return SdfValueTypeNames->UIntArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt64Array:
-      return SdfValueTypeNames->Int64Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeUInt64Array:
-      return SdfValueTypeNames->UInt64Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalfArray:
-      return SdfValueTypeNames->HalfArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloatArray:
-      return SdfValueTypeNames->FloatArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDoubleArray:
-      return SdfValueTypeNames->DoubleArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTimeCodeArray:
-      return SdfValueTypeNames->TimeCodeArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeStringArray:
-      return SdfValueTypeNames->StringArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeTokenArray:
-      return SdfValueTypeNames->TokenArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeAssetArray:
-      return SdfValueTypeNames->AssetArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt2Array:
-      return SdfValueTypeNames->Int2Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt3Array:
-      return SdfValueTypeNames->Int3Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeInt4Array:
-      return SdfValueTypeNames->Int4Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf2Array:
-      return SdfValueTypeNames->Half2Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf3Array:
-      return SdfValueTypeNames->Half3Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeHalf4Array:
-      return SdfValueTypeNames->Half4Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat2Array:
-      return SdfValueTypeNames->Float2Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat3Array:
-      return SdfValueTypeNames->Float3Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFloat4Array:
-      return SdfValueTypeNames->Float4Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble2Array:
-      return SdfValueTypeNames->Double2Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble3Array:
-      return SdfValueTypeNames->Double3Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeDouble4Array:
-      return SdfValueTypeNames->Double4Array;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3hArray:
-      return SdfValueTypeNames->Point3hArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3fArray:
-      return SdfValueTypeNames->Point3fArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypePoint3dArray:
-      return SdfValueTypeNames->Point3dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3hArray:
-      return SdfValueTypeNames->Vector3hArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3fArray:
-      return SdfValueTypeNames->Vector3fArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeVector3dArray:
-      return SdfValueTypeNames->Vector3dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3hArray:
-      return SdfValueTypeNames->Normal3hArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3fArray:
-      return SdfValueTypeNames->Normal3fArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeNormal3dArray:
-      return SdfValueTypeNames->Normal3dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3hArray:
-      return SdfValueTypeNames->Color3hArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3fArray:
-      return SdfValueTypeNames->Color3fArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor3dArray:
-      return SdfValueTypeNames->Color3dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4hArray:
-      return SdfValueTypeNames->Color4hArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4fArray:
-      return SdfValueTypeNames->Color4fArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeColor4dArray:
-      return SdfValueTypeNames->Color4dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuathArray:
-      return SdfValueTypeNames->QuathArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatfArray:
-      return SdfValueTypeNames->QuatfArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeQuatdArray:
-      return SdfValueTypeNames->QuatdArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix2dArray:
-      return SdfValueTypeNames->Matrix2dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix3dArray:
-      return SdfValueTypeNames->Matrix3dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeMatrix4dArray:
-      return SdfValueTypeNames->Matrix4dArray;
-    case SdfValueTypeNameType::SdfValueTypeNameTypeFrame4dArray:
-      return SdfValueTypeNames->Frame4dArray;
-    default:
-      return SdfValueTypeNames->String;
-  }
-}
 
 /// \class SdfValueBlock
 /// A special value type that can be used to explicitly author an

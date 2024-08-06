@@ -1,55 +1,32 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_CRATE_FILE_H
 #define PXR_USD_USD_CRATE_FILE_H
 
 #include "Usd/crateData.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
-#include "Usd/crateValueInliners.h"
-#include "Usd/shared.h"
+#include "crateValueInliners.h"
+#include "shared.h"
 
-#include "Arch/fileSystem.h"
-
-#include "Tf/hash.h"
-#include "Tf/pxrTslRobinMap/robin_map.h"
-#include "Tf/token.h"
-
-#include "Vt/array.h"
-#include "Vt/value.h"
-
-#include "Work/dispatcher.h"
-
+#include "Ar/ar.h"
 #include "Ar/asset.h"
 #include "Ar/writableAsset.h"
-
+#include "Arch/fileSystem.h"
 #include "Sdf/assetPath.h"
 #include "Sdf/path.h"
 #include "Sdf/types.h"
-
-#include <boost/container/flat_map.hpp>
-#include <boost/intrusive_ptr.hpp>
+#include "Tf/delegatedCountPtr.h"
+#include "Tf/hash.h"
+#include "Tf/pxrTslRobinMap/robin_map.h"
+#include "Tf/token.h"
+#include "Vt/array.h"
+#include "Vt/value.h"
+#include "Work/dispatcher.h"
 
 #include <OneTBB/tbb/concurrent_unordered_set.h>
 #include <OneTBB/tbb/spin_rw_mutex.h>
@@ -322,8 +299,10 @@ enum class TypeEnum {
   // last.
   xx(TimeCode, 56, SdfTimeCode, true) xx(PathExpression, 57, SdfPathExpression, true)
 
+      xx(Relocates, 58, SdfRelocates, false)
+
 #undef xx
-      NumTypes
+          NumTypes
 };
 
 // Index base class.  Used to index various tables.  Deriving adds some
@@ -476,32 +455,23 @@ class CrateFile {
     class _Impl {
       friend class _FileMapping;
 
-      class tbb_hash {
-       public:
-        tbb_hash() {}
-
-        template<typename Key> std::size_t operator()(const Key &z) const
-        {
-          return TfHash::Combine(reinterpret_cast<uintptr_t>(z.GetAddr()), z.GetNumBytes());
-        }
-      };
-
       // This is a foreign data source for VtArray that refers into a
       // memory-mapped region, and shares in the lifetime of the mapping.
       struct ZeroCopySource : public Vt_ArrayForeignDataSource {
-        ZeroCopySource() = default;
-
-        ZeroCopySource(_Impl *m, void const *addr, size_t numBytes);
+        explicit ZeroCopySource(_Impl *m, void const *addr, size_t numBytes);
 
         bool operator==(ZeroCopySource const &other) const;
         bool operator!=(ZeroCopySource const &other) const
         {
           return !(*this == other);
         }
-        friend size_t tbb_hasher(ZeroCopySource const &z)
-        {
-          return TfHash::Combine(reinterpret_cast<uintptr_t>(z._addr), z._numBytes);
-        }
+
+        struct Hash {
+          inline size_t operator()(const ZeroCopySource &z) const
+          {
+            return TfHash::Combine(reinterpret_cast<uintptr_t>(z._addr), z._numBytes);
+          }
+        };
 
         // Return true if the refcount is nonzero.
         bool IsInUse() const
@@ -558,14 +528,14 @@ class CrateFile {
       // other code reading/writing the file.)
       void _DetachReferencedRanges();
 
-      // This class is managed by a combination of boost::intrusive_ptr
+      // This class is managed by a combination of TfDelegatedCountPtr
       // and manual reference counting -- see explicit calls to
-      // intrusive_ptr_add_ref/release in the .cpp file.
-      friend inline void intrusive_ptr_add_ref(_Impl const *m)
+      // TfDelegatedCount{Increment,Decrement} in the .cpp file.
+      friend inline void TfDelegatedCountIncrement(_Impl const *m) noexcept
       {
         m->_refCount.fetch_add(1, std::memory_order_relaxed);
       }
-      friend inline void intrusive_ptr_release(_Impl const *m)
+      friend inline void TfDelegatedCountDecrement(_Impl const *m) noexcept
       {
         if (m->_refCount.fetch_sub(1, std::memory_order_release) == 1) {
           std::atomic_thread_fence(std::memory_order_acquire);
@@ -577,7 +547,7 @@ class CrateFile {
       ArchConstFileMapping _mapping;
       char const *_start;
       int64_t _length;
-      tbb::concurrent_unordered_set<ZeroCopySource, tbb_hash> _outstandingRanges;
+      tbb::concurrent_unordered_set<ZeroCopySource, ZeroCopySource::Hash> _outstandingRanges;
     };
 
    public:
@@ -588,7 +558,7 @@ class CrateFile {
     explicit _FileMapping(ArchConstFileMapping &&mapping,
                           int64_t offset = 0,
                           int64_t length = -1) noexcept
-        : _impl(new _Impl(std::move(mapping), offset, length))
+        : _impl(TfDelegatedCountIncrementTag, new _Impl(std::move(mapping), offset, length))
     {
     }
 
@@ -647,7 +617,7 @@ class CrateFile {
     }
 
    private:
-    boost::intrusive_ptr<_Impl> _impl;
+    TfDelegatedCountPtr<_Impl> _impl;
   };
 
   ////////////////////////////////////////////////////////////////////////
@@ -972,10 +942,6 @@ class CrateFile {
     CrateFile *_crate;
   };
 
-  // Return true if this CrateFile object wasn't populated from a file, or if
-  // the given \p fileName is the file this object was populated from.
-  bool CanPackTo(string const &fileName) const;
-
   Packer StartPacking(string const &fileName);
 
   string const &GetAssetPath() const
@@ -1220,15 +1186,10 @@ class CrateFile {
 
   ////////////////////////////////////////////////////////////////////////
 
-  // Base class, to have a pointer type.
-  struct _ValueHandlerBase;
-  template<class, class = void> struct _ScalarValueHandlerBase;
-  template<class, class = void> struct _ArrayValueHandlerBase;
+  // Type-specific _ValueHandler<T> derives _ValueHandlerBase, just so we can
+  // have common pointers to specific instances.
+  struct _ValueHandlerBase {};
   template<class> struct _ValueHandler;
-
-  friend struct _ValueHandlerBase;
-  template<class, class> friend struct _ScalarValueHandlerBase;
-  template<class, class> friend struct _ArrayValueHandlerBase;
   template<class> friend struct _ValueHandler;
 
   template<class T> inline _ValueHandler<T> &_GetValueHandler();
@@ -1319,7 +1280,7 @@ class CrateFile {
   mutable tbb::spin_rw_mutex _sharedTimesMutex;
 
   // functions to write VtValues to file by type.
-  boost::container::flat_map<std::type_index, std::function<ValueRep(VtValue const &)>>
+  pxr_tsl::robin_map<std::type_index, std::function<ValueRep(VtValue const &)>>
       _packValueFunctions;
 
   // functions to read VtValues from file by type.
@@ -1358,9 +1319,7 @@ class CrateFile {
   ArAssetSharedPtr _assetSrc;
   const bool _detached;
 
-  std::string _assetPath;     // Empty if this file data is in-memory only.
-  std::string _fileReadFrom;  // The file this object was populate from, if it
-                              // was populated from a file.
+  std::string _assetPath;  // Empty if this file data is in-memory only.
 
   std::unique_ptr<char[]> _debugPageMap;  // Debug page access map, see
                                           // USDC_DUMP_PAGE_MAPS.

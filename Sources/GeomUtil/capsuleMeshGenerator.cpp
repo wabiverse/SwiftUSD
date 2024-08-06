@@ -1,32 +1,15 @@
 //
 // Copyright 2022 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "GeomUtil/capsuleMeshGenerator.h"
 
 #include "PxOsd/meshTopology.h"
 #include "PxOsd/tokens.h"
 
-#include "Arch/pxrmath.h"
+#include "Arch/math.h"
 #include "Vt/types.h"
 
 #include <array>
@@ -73,8 +56,6 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const typename PointType::ScalarType bottomRadius,
     const typename PointType::ScalarType topRadius,
     const typename PointType::ScalarType height,
-    const typename PointType::ScalarType bottomCapHeight,
-    const typename PointType::ScalarType topCapHeight,
     const typename PointType::ScalarType sweepDegrees,
     const _PointWriter<PointType> &ptWriter)
 {
@@ -100,17 +81,32 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     ringXY[radIdx][1] = sin(longAngle);
   }
 
+  ScalarType latitudeRange = 0.0;
+  if (bottomRadius != topRadius) {
+    // We're going to tesselate two spheres for the end caps. We need to
+    // calculate the latitude at which to clip the spheres, which we can
+    // derive from the line tangent to the two spheres.
+    // Consider the larger circle at (0,0) of radius r1 and the smaller
+    // at (0, height), of radius r2.
+    // Shrink both circles by r2 - i.e. one circle is reduced to a point.
+    const ScalarType rDiff = (bottomRadius - topRadius);
+
+    // Now, the latidude at which to clip the sphere is the angle of
+    // this point from the horizontal:
+    latitudeRange = atan(rDiff / height);
+  }
+
   // Bottom point:
-  ptWriter.Write(PointType(0.0, 0.0, -(bottomCapHeight + (0.5 * height))));
+  ptWriter.Write(PointType(0.0, 0.0, -(bottomRadius + (0.5 * height))));
 
   // Bottom hemisphere latitude rings:
   for (size_t axIdx = 1; axIdx < (numCapAxial + 1); ++axIdx) {
-    // Latitude range: (-0.5pi, 0]
-    const ScalarType latAngle = ((ScalarType(axIdx) / ScalarType(numCapAxial)) - 1.0) *
-                                (0.5 * M_PI);
+    // Latitude range: (-0.5pi, latitudeRange]
+    const ScalarType latAngle = GfLerp(
+        double(axIdx) / double(numCapAxial), ScalarType(-0.5 * M_PI), latitudeRange);
 
     const ScalarType radScale = cos(latAngle);
-    const ScalarType latitude = -(0.5 * height) + (bottomCapHeight * sin(latAngle));
+    const ScalarType latitude = -(0.5 * height) + (bottomRadius * sin(latAngle));
 
     for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
       ptWriter.Write(PointType(radScale * bottomRadius * ringXY[radIdx][0],
@@ -121,11 +117,12 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
 
   // Top hemisphere latitude rings:
   for (size_t axIdx = 0; axIdx < numCapAxial; ++axIdx) {
-    // Latitude range: [0, 0.5pi)
-    const ScalarType latAngle = (ScalarType(axIdx) / ScalarType(numCapAxial)) * (0.5 * M_PI);
+    // Latitude range: [latitudeRange, 0.5pi)
+    const ScalarType latAngle = GfLerp(
+        double(axIdx) / double(numCapAxial), latitudeRange, ScalarType(0.5 * M_PI));
 
     const ScalarType radScale = cos(latAngle);
-    const ScalarType latitude = (0.5 * height) + (topCapHeight * sin(latAngle));
+    const ScalarType latitude = (0.5 * height) + (topRadius * sin(latAngle));
 
     for (size_t radIdx = 0; radIdx < numRadialPoints; ++radIdx) {
       ptWriter.Write(PointType(radScale * topRadius * ringXY[radIdx][0],
@@ -135,7 +132,7 @@ void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
   }
 
   // Top point:
-  ptWriter.Write(PointType(0.0, 0.0, topCapHeight + (0.5 * height)));
+  ptWriter.Write(PointType(0.0, 0.0, topRadius + (0.5 * height)));
 }
 
 // Force-instantiate _GeneratePointsImpl for the supported point types.  Only
@@ -148,15 +145,11 @@ template GEOMUTIL_API void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const float,
     const float,
     const float,
-    const float,
-    const float,
     const GeomUtilCapsuleMeshGenerator::_PointWriter<GfVec3f> &);
 
 template GEOMUTIL_API void GeomUtilCapsuleMeshGenerator::_GeneratePointsImpl(
     const size_t,
     const size_t,
-    const double,
-    const double,
     const double,
     const double,
     const double,

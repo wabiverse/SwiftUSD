@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_SCHEMA_H
 #define PXR_USD_SDF_SCHEMA_H
@@ -28,7 +11,7 @@
 #include "Sdf/api.h"
 #include "Sdf/types.h"
 #include "Sdf/valueTypeName.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Plug/notice.h"
 #include "Tf/hash.h"
@@ -294,7 +277,11 @@ class SdfSchemaBase : public TfWeakBase {
   SDF_API
   static SdfAllowed IsValidRelationshipTargetPath(const SdfPath &path);
   SDF_API
-  static SdfAllowed IsValidRelocatesPath(const SdfPath &path);
+  static SdfAllowed IsValidRelocatesSourcePath(const SdfPath &path);
+  SDF_API
+  static SdfAllowed IsValidRelocatesTargetPath(const SdfPath &path);
+  SDF_API
+  static SdfAllowed IsValidRelocate(const SdfRelocate &relocate);
   SDF_API
   static SdfAllowed IsValidSpecializesPath(const SdfPath &path);
   SDF_API
@@ -573,8 +560,8 @@ SDF_API_TEMPLATE_CLASS(TfSingleton<SdfSchema>);
       (FramePrecision, "framePrecision"))((FramesPerSecond, "framesPerSecond"))( \
       (Hidden, "hidden"))((HasOwnedSubLayers, "hasOwnedSubLayers"))( \
       (InheritPaths, "inheritPaths"))((Instanceable, "instanceable"))((Kind, "kind"))( \
-      (PrimOrder, "primOrder"))((NoLoadHint, "noLoadHint"))((Owner, "owner"))( \
-      (Payload, "payload"))((Permission, "permission"))((Prefix, "prefix"))( \
+      (LayerRelocates, "layerRelocates"))((PrimOrder, "primOrder"))((NoLoadHint, "noLoadHint"))( \
+      (Owner, "owner"))((Payload, "payload"))((Permission, "permission"))((Prefix, "prefix"))( \
       (PrefixSubstitutions, "prefixSubstitutions"))((PropertyOrder, "propertyOrder"))( \
       (References, "references"))((Relocates, "relocates"))((SessionOwner, "sessionOwner"))( \
       (Specializes, "specializes"))((Specifier, "specifier"))((StartTimeCode, "startTimeCode"))( \

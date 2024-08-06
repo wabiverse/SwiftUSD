@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 ///
 /// \file Sdf/layer.cpp
@@ -48,13 +31,13 @@
 #include "Sdf/types.h"
 #include "Sdf/variantSetSpec.h"
 #include "Sdf/variantSpec.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Ar/resolver.h"
 #include "Ar/resolverContextBinder.h"
 #include "Ar/resolverScopedCache.h"
+#include "Arch/errno.h"
 #include "Arch/fileSystem.h"
-#include "Arch/pxrerrno.h"
 #include "Tf/debug.h"
 #include "Tf/envSetting.h"
 #include "Tf/fileUtils.h"
@@ -76,6 +59,7 @@
 #include <functional>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <set>
 #include <thread>
 #include <vector>
@@ -210,7 +194,7 @@ SdfLayer::SdfLayer(const SdfFileFormatConstPtr &fileFormat,
   _MarkCurrentStateAsClean();
 }
 
-SdfLayer::~SdfLayer() noexcept
+SdfLayer::~SdfLayer()
 {
   TF_PY_ALLOW_THREADS_IN_SCOPE();
 
@@ -238,7 +222,7 @@ SdfLayer::~SdfLayer() noexcept
   // Note that FindOrOpen may have already removed this layer from
   // the registry, so we count on this API not emitting errors in that
   // case.
-  _layerRegistry->Erase(_self);
+  _layerRegistry->Erase(_self, *(_self->_assetInfo));
 }
 
 const SdfFileFormatConstPtr &SdfLayer::GetFileFormat() const
@@ -295,7 +279,7 @@ bool SdfLayer::_WaitForInitializationAndCheckIfSuccessful()
   // The callers of this method are responsible for checking the result
   // and dropping any references they hold.  As a convenience to them,
   // we return the value here.
-  return _initializationWasSuccessful.get();
+  return _initializationWasSuccessful.value();
 }
 
 static bool _ModificationTimesEqual(const VtValue &v1, const VtValue &v2)
@@ -534,10 +518,9 @@ SdfLayerRefPtr SdfLayer::_CreateNew(SdfFileFormatConstPtr fileFormat,
   // based on the local path suffix,
   if (!fileFormat) {
     fileFormat = SdfFileFormat::FindByExtension(localPath, args);
-    if (!fileFormat) {
-      TF_CODING_ERROR("Cannot determine file format.");
+    // XXX: This should be a coding error, not a failed verify.
+    if (!TF_VERIFY(fileFormat))
       return TfNullPtr;
-    }
   }
 
   // Restrict creating package layers via the Sdf API. These layers
@@ -734,7 +717,7 @@ retry:
     if (layer) {
       // Layer is expiring and we have the write lock: erase it from the
       // registry.
-      _layerRegistry->Erase(layer);
+      _layerRegistry->Erase(layer, *layer->_assetInfo);
     }
   }
   else if (!hasWriteLock && retryAsWriter && !lock.upgrade_to_writer()) {
@@ -771,8 +754,7 @@ SdfLayerRefPtr SdfLayer::FindOrOpen(const string &identifier, const FileFormatAr
   }
 
   // First see if this layer is already present.
-  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(),
-                                          /*write=*/false);
+  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(), /*write=*/false);
   if (SdfLayerRefPtr layer = _TryToFindLayer(
           layerInfo.identifier, layerInfo.resolvedLayerPath, lock, /*retryAsWriter=*/true))
   {
@@ -1392,13 +1374,15 @@ void SdfLayer::_InitializeFromIdentifier(const string &identifier,
     _stateDelegate->_SetLayer(_self);
   }
 
-  // Update the layer registry before sending notices.
-  _layerRegistry->InsertOrUpdate(_self);
-
   // Only send a notice if the identifier has changed (this notice causes
   // mass invalidation. See http://bug/33217). If the old identifier was
   // empty, this is a newly constructed layer, so don't send the notice.
-  if (!oldIdentifier.empty()) {
+  if (oldIdentifier.empty()) {
+    _layerRegistry->Insert(_self, *_assetInfo);
+  }
+  else {
+    // NOTE: After the swap, newInfo actually stores the original info.
+    _layerRegistry->Update(_self, *newInfo, *_assetInfo);
     SdfChangeBlock block;
     if (oldIdentifier != GetIdentifier()) {
       Sdf_ChangeManager::Get().DidChangeLayerIdentifier(_self, oldIdentifier);
@@ -1482,6 +1466,15 @@ void SdfLayer::SetDefaultPrim(const TfToken &name)
 TfToken SdfLayer::GetDefaultPrim() const
 {
   return _GetValue<TfToken>(SdfFieldKeys->DefaultPrim);
+}
+
+SdfPath SdfLayer::GetDefaultPrimAsPath() const
+{
+  std::string pathString = _GetValue<TfToken>(SdfFieldKeys->DefaultPrim).GetString();
+  SdfPath path = SdfPath::IsValidPathString(pathString) ? SdfPath(pathString) : SdfPath();
+  return path.IsPrimPath() ?
+             path.IsAbsolutePath() ? path : path.MakeAbsolutePath(SdfPath::AbsoluteRootPath()) :
+             SdfPath();
 }
 
 void SdfLayer::ClearDefaultPrim()
@@ -1820,6 +1813,26 @@ void SdfLayer::SetSubLayerOffset(const SdfLayerOffset &offset, int index)
   offsets[index] = offset;
 
   SetField(SdfPath::AbsoluteRootPath(), SdfFieldKeys->SubLayerOffsets, VtValue(offsets));
+}
+
+SdfRelocates SdfLayer::GetRelocates() const
+{
+  return GetFieldAs<SdfRelocates>(SdfPath::AbsoluteRootPath(), SdfFieldKeys->LayerRelocates);
+}
+
+void SdfLayer::SetRelocates(const SdfRelocates &relocates)
+{
+  SetField(SdfPath::AbsoluteRootPath(), SdfFieldKeys->LayerRelocates, relocates);
+}
+
+bool SdfLayer::HasRelocates() const
+{
+  return HasField(SdfPath::AbsoluteRootPath(), SdfFieldKeys->LayerRelocates);
+}
+
+void SdfLayer::ClearRelocates()
+{
+  EraseField(SdfPath::AbsoluteRootPath(), SdfFieldKeys->LayerRelocates);
 }
 
 bool SdfLayer::_CanGetSpecAtPath(const SdfPath &path,
@@ -2316,7 +2329,7 @@ void SdfLayer::SetIdentifier(const string &identifier)
 void SdfLayer::UpdateAssetInfo()
 {
   TRACE_FUNCTION();
-  TF_DEBUG(SDF_LAYER).Msg("SdfLayer::UpdateAssetInfo()\n");
+  TF_DEBUG(SDF_LAYER).Msg("SdfLayer::UpdateAssetInfo('%s')\n", GetIdentifier().c_str());
 
   // Hold open a change block to defer identifier-did-change
   // notification until the mutex is unlocked.
@@ -2668,7 +2681,7 @@ bool SdfLayer::_ShouldNotify() const
 {
   // Only notify if this layer has been successfully initialized.
   // (If initialization is not yet complete, do not notify.)
-  return _initializationWasSuccessful.get_value_or(false);
+  return _initializationWasSuccessful.value_or(false);
 }
 
 void SdfLayer::Clear()
@@ -2746,7 +2759,8 @@ bool SdfLayer::IsEmpty() const
   // XXX: What about documentation/frames?  I don't
   // think these get composed or exposed through composition, so I don't think
   // they matter for the sake of this query.
-  return GetRootPrims().empty() && GetRootPrimOrder().empty() && GetSubLayerPaths().empty();
+  return GetRootPrims().empty() && GetRootPrimOrder().empty() && GetSubLayerPaths().empty() &&
+         GetRelocates().empty();
 }
 
 bool SdfLayer::StreamsData() const
@@ -2868,11 +2882,11 @@ bool SdfLayer::UpdateCompositionAssetDependency(const string &oldLayerPath,
   SdfSubLayerProxy subLayers = GetSubLayerPaths();
   size_t index = subLayers.Find(oldLayerPath);
   if (index != (size_t)-1) {
-    RemoveSubLayerPath(static_cast<int>(index));
+    RemoveSubLayerPath(index);
 
     // If new layer path given, do rename, otherwise it's a delete.
     if (!newLayerPath.empty()) {
-      InsertSubLayerPath(newLayerPath, static_cast<int>(index));
+      InsertSubLayerPath(newLayerPath, index);
     }
 
     return true;  // sublayers are unique, do no more...
@@ -2891,13 +2905,13 @@ std::set<std::string> SdfLayer::GetExternalAssetDependencies() const
 // ModifyItemEdits() callback that updates a reference's or payload's
 // asset path for SdfReferenceListEditor and SdfPayloadListEditor.
 template<class RefOrPayloadType>
-static boost::optional<RefOrPayloadType> _UpdateRefOrPayloadPath(
+static std::optional<RefOrPayloadType> _UpdateRefOrPayloadPath(
     const string &oldLayerPath, const string &newLayerPath, const RefOrPayloadType &refOrPayload)
 {
   if (refOrPayload.GetAssetPath() == oldLayerPath) {
     // Delete if new layer path is empty, otherwise rename.
     if (newLayerPath.empty()) {
-      return boost::optional<RefOrPayloadType>();
+      return std::optional<RefOrPayloadType>();
     }
     else {
       RefOrPayloadType updatedRefOrPayload = refOrPayload;
@@ -2943,8 +2957,7 @@ void SdfLayer::_UpdatePrimCompositionDependencyPaths(const SdfPrimSpecHandle &pr
 void SdfLayer::DumpLayerInfo()
 {
   TF_PY_ALLOW_THREADS_IN_SCOPE();
-  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(),
-                                          /*write=*/false);
+  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(), /*write=*/false);
   std::cerr << "Layer Registry Dump:" << std::endl << *_layerRegistry << std::endl;
 }
 
@@ -2959,8 +2972,7 @@ bool SdfLayer::WriteDataFile(const string &filename)
 set<SdfLayerHandle> SdfLayer::GetLoadedLayers()
 {
   TF_PY_ALLOW_THREADS_IN_SCOPE();
-  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(),
-                                          /*write=*/false);
+  tbb::queuing_rw_mutex::scoped_lock lock(_GetLayerRegistryMutex(), /*write=*/false);
   return _layerRegistry->GetLayers();
 }
 
@@ -3004,7 +3016,7 @@ SdfLayerRefPtr SdfLayer::_OpenLayerAndUnlockRegistry(Lock &lock,
   // initialization.  But now that the layer is in the registry, we release
   // the registry lock to avoid blocking progress of threads working with
   // other layers.
-  TF_VERIFY(_layerRegistry->FindByIdentifier(layer->GetIdentifier()) == layer,
+  TF_VERIFY(_layerRegistry->Find(layer->GetIdentifier(), layer->GetResolvedPath()) == layer,
             "Could not find %s",
             layer->GetIdentifier().c_str());
 
@@ -3585,7 +3597,13 @@ void SdfLayer::_SetData(const SdfAbstractDataPtr &newData, const SdfSchemaBase *
         if (!specDefinition->IsRequiredField(*field))
           _PrimSetField(path, *field, VtValue());
       }
-      _PrimDeleteSpec(*i, _IsInertSubtree(*i));
+
+      // Since we are deleting bottom up, we should only ever be
+      // considering prims which do not have children to determine
+      // inertness
+      _PrimDeleteSpec(
+          *i,
+          _IsInert(*i, true /*ignoreChildren*/, true /* requiredFieldOnlyPropertiesAreInert */));
     }
   }
 
@@ -3751,7 +3769,7 @@ void SdfLayer::_SetData(const SdfAbstractDataPtr &newData, const SdfSchemaBase *
     if (!updater.unrecognizedFields.empty()) {
       vector<string> fieldDescrs;
       fieldDescrs.reserve(updater.unrecognizedFields.size());
-      for (std::pair<TfToken, SdfPath> const &tokenPath : updater.unrecognizedFields) {
+      for (auto const &tokenPath : updater.unrecognizedFields) {
         fieldDescrs.push_back(TfStringPrintf("'%s' first seen at <%s>",
                                              tokenPath.first.GetText(),
                                              tokenPath.second.GetAsString().c_str()));
@@ -4311,12 +4329,16 @@ bool SdfLayer::_WriteToFile(const string &newFileName,
 {
   TRACE_FUNCTION();
 
-  TF_DESCRIBE_SCOPE("Writing layer @%s@", GetIdentifier().c_str());
-
   if (newFileName.empty())
     return false;
 
-  if ((newFileName == GetRealPath()) && !PermissionToSave()) {
+  // Save vs Export -- we consider it a Save when newFileName == this layer's
+  // resolved path (aka "GetRealPath()").
+  const bool isSave = newFileName == GetRealPath();
+
+  TF_DESCRIBE_SCOPE("%s layer @%s@", isSave ? "Saving" : "Exporting", GetIdentifier().c_str());
+
+  if (isSave && !PermissionToSave()) {
     TF_RUNTIME_ERROR("Cannot save layer @%s@, saving not allowed", newFileName.c_str());
     return false;
   }
@@ -4325,8 +4347,9 @@ bool SdfLayer::_WriteToFile(const string &newFileName,
   // file extension, else discover the file format from the file extension.
   if (!fileFormat) {
     const string ext = Sdf_GetExtension(newFileName);
-    if (!ext.empty())
+    if (!ext.empty()) {
       fileFormat = SdfFileFormat::FindByExtension(ext);
+    }
 
     if (!fileFormat) {
       // Some parts of the system generate temp files
@@ -4340,8 +4363,9 @@ bool SdfLayer::_WriteToFile(const string &newFileName,
   // Disallow saving or exporting package layers via the Sdf API.
   if (Sdf_IsPackageOrPackagedLayer(fileFormat, newFileName)) {
     TF_CODING_ERROR(
-        "Cannot save layer @%s@: writing %s %s layer "
+        "Cannot %s layer @%s@: writing %s %s layer "
         "is not allowed through this API.",
+        isSave ? "save" : "export",
         newFileName.c_str(),
         fileFormat->IsPackage() ? "package" : "packaged",
         fileFormat->GetFormatId().GetText());
@@ -4355,8 +4379,9 @@ bool SdfLayer::_WriteToFile(const string &newFileName,
 
   if (!fileFormat->SupportsWriting()) {
     TF_CODING_ERROR(
-        "Cannot save layer @%s@: %s file format does not"
+        "Cannot %s layer @%s@: %s file format does not"
         "support writing",
+        isSave ? "save" : "export",
         newFileName.c_str(),
         fileFormat->GetFormatId().GetText());
     return false;
@@ -4381,10 +4406,11 @@ bool SdfLayer::_WriteToFile(const string &newFileName,
     }
   }
 
-  bool ok = fileFormat->WriteToFile(*this, newFileName, comment, args);
+  bool ok = isSave ? fileFormat->SaveToFile(*this, newFileName, comment, args) :
+                     fileFormat->WriteToFile(*this, newFileName, comment, args);
 
   // If we wrote to the backing file then we're now clean.
-  if (ok && newFileName == GetRealPath()) {
+  if (ok && isSave) {
     _MarkCurrentStateAsClean();
   }
 
@@ -4448,19 +4474,3 @@ bool SdfLayer::_Save(bool force) const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-void SdfLayerRetain(PXR_NS::SdfLayer *layer)
-{
-#if DEBUG
-  printf("Called SdfLayerRetain()\n");
-#endif /* DEBUG */
-  // PXR_NS::SdfLayer *ref = layer;
-}
-
-void SdfLayerRelease(PXR_NS::SdfLayer *layer)
-{
-#if DEBUG
-  printf("Called SdfLayerRelease()\n");
-#endif /* DEBUG */
-  // layer = nullptr;
-}

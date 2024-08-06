@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef USDLUX_TOKENS_H
 #define USDLUX_TOKENS_H
@@ -36,7 +19,7 @@
 #include "Tf/staticData.h"
 #include "Tf/token.h"
 #include "UsdLux/api.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -63,11 +46,13 @@ struct UsdLuxTokensType {
   USDLUX_API UsdLuxTokensType();
   /// \brief "angular"
   ///
-  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr()
+  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr(), Possible value for
+  /// UsdLuxDomeLight_1::GetTextureFormatAttr()
   const TfToken angular;
   /// \brief "automatic"
   ///
-  /// Fallback value for UsdLuxDomeLight::GetTextureFormatAttr()
+  /// Fallback value for UsdLuxDomeLight::GetTextureFormatAttr(), Fallback value for
+  /// UsdLuxDomeLight_1::GetTextureFormatAttr()
   const TfToken automatic;
   /// \brief "collection:filterLink:includeRoot"
   ///
@@ -93,12 +78,9 @@ struct UsdLuxTokensType {
   const TfToken consumeAndHalt;
   /// \brief "cubeMapVerticalCross"
   ///
-  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr()
+  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr(), Possible value for
+  /// UsdLuxDomeLight_1::GetTextureFormatAttr()
   const TfToken cubeMapVerticalCross;
-  /// \brief "extent"
-  ///
-  /// UsdLuxPortalLight
-  const TfToken extent;
   /// \brief "filterLink"
   ///
   ///  This token represents the collection name to use with UsdCollectionAPI to represent
@@ -110,7 +92,7 @@ struct UsdLuxTokensType {
   const TfToken geometry;
   /// \brief "guideRadius"
   ///
-  /// UsdLuxDomeLight
+  /// UsdLuxDomeLight, UsdLuxDomeLight_1
   const TfToken guideRadius;
   /// \brief "ignore"
   ///
@@ -147,7 +129,7 @@ struct UsdLuxTokensType {
   const TfToken inputsExposure;
   /// \brief "inputs:height"
   ///
-  /// UsdLuxRectLight
+  /// UsdLuxRectLight, UsdLuxPortalLight
   const TfToken inputsHeight;
   /// \brief "inputs:intensity"
   ///
@@ -219,19 +201,20 @@ struct UsdLuxTokensType {
   const TfToken inputsSpecular;
   /// \brief "inputs:texture:file"
   ///
-  /// UsdLuxRectLight, UsdLuxDomeLight
+  /// UsdLuxRectLight, UsdLuxDomeLight, UsdLuxDomeLight_1
   const TfToken inputsTextureFile;
   /// \brief "inputs:texture:format"
   ///
-  /// UsdLuxDomeLight
+  /// UsdLuxDomeLight, UsdLuxDomeLight_1
   const TfToken inputsTextureFormat;
   /// \brief "inputs:width"
   ///
-  /// UsdLuxRectLight
+  /// UsdLuxRectLight, UsdLuxPortalLight
   const TfToken inputsWidth;
   /// \brief "latlong"
   ///
-  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr()
+  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr(), Possible value for
+  /// UsdLuxDomeLight_1::GetTextureFormatAttr()
   const TfToken latlong;
   /// \brief "light:filters"
   ///
@@ -262,7 +245,7 @@ struct UsdLuxTokensType {
   ///
   /// UsdLuxLightAPI, UsdLuxMeshLightAPI, UsdLuxVolumeLightAPI, UsdLuxDistantLight,
   /// UsdLuxDiskLight, UsdLuxRectLight, UsdLuxSphereLight, UsdLuxCylinderLight,
-  /// UsdLuxGeometryLight, UsdLuxDomeLight, UsdLuxPortalLight
+  /// UsdLuxGeometryLight, UsdLuxDomeLight, UsdLuxDomeLight_1, UsdLuxPortalLight
   const TfToken lightShaderId;
   /// \brief "materialGlowTintsLight"
   ///
@@ -276,7 +259,8 @@ struct UsdLuxTokensType {
   const TfToken MeshLight;
   /// \brief "mirroredBall"
   ///
-  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr()
+  /// Possible value for UsdLuxDomeLight::GetTextureFormatAttr(), Possible value for
+  /// UsdLuxDomeLight_1::GetTextureFormatAttr()
   const TfToken mirroredBall;
   /// \brief "noMaterialResponse"
   ///
@@ -287,10 +271,18 @@ struct UsdLuxTokensType {
   ///  This token represents the suffix for a UsdGeomXformOp used to orient a light with the
   ///  stage's up axis.
   const TfToken orientToStageUpAxis;
+  /// \brief "poleAxis"
+  ///
+  /// UsdLuxDomeLight_1
+  const TfToken poleAxis;
   /// \brief "portals"
   ///
-  /// UsdLuxDomeLight
+  /// UsdLuxDomeLight, UsdLuxDomeLight_1
   const TfToken portals;
+  /// \brief "scene"
+  ///
+  /// Fallback value for UsdLuxDomeLight_1::GetPoleAxisAttr()
+  const TfToken scene;
   /// \brief "shadowLink"
   ///
   ///  This token represents the collection name to use with UsdCollectionAPI to represent
@@ -308,6 +300,14 @@ struct UsdLuxTokensType {
   ///
   /// Fallback value for UsdLuxVolumeLightAPI schema attribute light:shaderId
   const TfToken VolumeLight;
+  /// \brief "Y"
+  ///
+  /// Possible value for UsdLuxDomeLight_1::GetPoleAxisAttr()
+  const TfToken Y;
+  /// \brief "Z"
+  ///
+  /// Possible value for UsdLuxDomeLight_1::GetPoleAxisAttr()
+  const TfToken Z;
   /// \brief "BoundableLightBase"
   ///
   /// Schema identifer and family for UsdLuxBoundableLightBase
@@ -329,9 +329,14 @@ struct UsdLuxTokensType {
   const TfToken DistantLight;
   /// \brief "DomeLight"
   ///
-  /// Schema identifer and family for UsdLuxDomeLight, Fallback value for UsdLuxDomeLight schema
-  /// attribute light:shaderId
+  /// Schema identifer and family for UsdLuxDomeLight, Schema family for UsdLuxDomeLight_1,
+  /// Fallback value for UsdLuxDomeLight schema attribute light:shaderId, Fallback value for
+  /// UsdLuxDomeLight_1 schema attribute light:shaderId
   const TfToken DomeLight;
+  /// \brief "DomeLight_1"
+  ///
+  /// Schema identifer for UsdLuxDomeLight_1
+  const TfToken DomeLight_1;
   /// \brief "GeometryLight"
   ///
   /// Schema identifer and family for UsdLuxGeometryLight, Fallback value for UsdLuxGeometryLight

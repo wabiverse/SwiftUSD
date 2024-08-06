@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file ChildrenUtils.cpp
 
@@ -37,7 +20,7 @@
 #include "Sdf/variantSpec.h"
 #include "Tf/diagnostic.h"
 #include "Tf/ostreamMethods.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -319,7 +302,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::InsertChild(const SdfLayerHandle &layer,
 
   // If the index is -1, insert the child at the end.
   if (index == -1) {
-    index = static_cast<int>(childNames.size());
+    index = childNames.size();
   }
 
   if ((size_t)index > childNames.size()) {
@@ -447,12 +430,11 @@ bool Sdf_ChildrenUtils<ChildPolicy>::MoveChildForBatchNamespaceEdit(
   FieldType oldKey((ChildPolicy::GetKey(value)));
   SdfPath oldParentPath = ChildPolicy::GetParentPath(value->GetPath());
   if (index == SdfNamespaceEdit::Same && oldParentPath == path) {
-    index = static_cast<int>(std::find(childNames.begin(), childNames.end(), oldKey) -
-                             childNames.begin());
+    index = std::find(childNames.begin(), childNames.end(), oldKey) - childNames.begin();
   }
   else if ((size_t)index > childNames.size()) {
     // This catches all negative indexes.
-    index = static_cast<int>(childNames.size());
+    index = childNames.size();
   }
 
   // Get the old sibling names and find the value.
@@ -472,7 +454,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::MoveChildForBatchNamespaceEdit(
     // If the name isn't changing then we can bail early if the
     // child isn't going to move.
     if (oldKey == newName) {
-      int oldIndex = static_cast<int>(oldNameIter - oldSiblingNames.begin());
+      int oldIndex = oldNameIter - oldSiblingNames.begin();
       if (oldIndex == index || oldIndex + 1 == index) {
         return true;
       }
@@ -581,7 +563,7 @@ bool Sdf_ChildrenUtils<ChildPolicy>::CanMoveChildForBatchNamespaceEdit(
 
   // If the index is AtEnd, insert the child at the end.
   if (index == SdfNamespaceEdit::AtEnd) {
-    index = static_cast<int>(childNames.size());
+    index = childNames.size();
   }
 
   // Any index not in the child name range other than Same is invalid.

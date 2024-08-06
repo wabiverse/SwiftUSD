@@ -1,34 +1,18 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/propertySpec.h"
 #include "Sdf/accessorHelpers.h"
 #include "Sdf/childrenUtils.h"
 #include "Sdf/layer.h"
+#include "Sdf/pathExpression.h"
 #include "Sdf/primSpec.h"
 #include "Sdf/schema.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/iterator.h"
 #include "Tf/staticData.h"
@@ -192,6 +176,33 @@ bool SdfPropertySpec::SetDefaultValue(const VtValue &defaultValue)
     // Otherwise check if defaultValue is castable to valueType
     VtValue value = VtValue::CastToTypeid(defaultValue, valueType.GetTypeid());
     if (!value.IsEmpty()) {
+      // If this value is a pathExpression, make all embedded paths
+      // absolute using this property's prim path as the anchor.
+      if (value.IsHolding<SdfPathExpression>() &&
+          !value.UncheckedGet<SdfPathExpression>().IsAbsolute())
+      {
+        value.UncheckedMutate<SdfPathExpression>(
+            [&](SdfPathExpression &expr) { expr = expr.MakeAbsolute(GetPath().GetPrimPath()); });
+      }
+      else if (value.IsHolding<VtArray<SdfPathExpression>>()) {
+        SdfPath const &anchor = GetPath().GetPrimPath();
+        value.UncheckedMutate<VtArray<SdfPathExpression>>(
+            [&](VtArray<SdfPathExpression> &exprArr) {
+              for (SdfPathExpression &expr : exprArr) {
+                expr = expr.MakeAbsolute(anchor);
+              }
+            });
+      }
+      /*
+      // If this value is a path (relationship default-values are paths),
+      // make it absolute using this property's prim path as the anchor.
+      else if (value.IsHolding<SdfPath>() &&
+               !value.UncheckedGet<SdfPath>().IsAbsolutePath()) {
+          value.UncheckedMutate<SdfPath>([&](SdfPath &path) {
+              path = path.MakeAbsolutePath(GetPath().GetPrimPath());
+          });
+      }
+      */
       return SetField(SdfFieldKeys->Default, value);
     }
     else if (defaultValue.IsHolding<SdfValueBlock>()) {

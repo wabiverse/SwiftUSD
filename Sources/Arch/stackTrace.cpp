@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Arch/stackTrace.h"
 #include "Arch/attributes.h"
@@ -30,7 +13,7 @@
 #include "Arch/error.h"
 #include "Arch/export.h"
 #include "Arch/pxrerrno.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 #if defined(ARCH_OS_WINDOWS)
 // Need to include Winsock2.h BEFORE windows.h - which is included in
 // fileSystem.h
@@ -409,7 +392,7 @@ char *asitoa(char *s, long x)
   // Write the minus sign.
   if (x < 0) {
     x = -x;
-    *s = '-';
+    *s++ = '-';
   }
 
   // Skip to the end and write the terminating NUL.
@@ -1023,7 +1006,7 @@ static void _ArchLogProcessStateHelper(bool isFatal,
   };
 
   const char *haltMsg = " terminated";
-  int labelSize = static_cast<int>(strlen(progname) + strlen(haltMsg));
+  int labelSize = strlen(progname) + strlen(haltMsg);
   int bannerSize = std::max<int>(80, labelSize + strlen("-- ") * 2);
 
   fputs("\n", stderr);
@@ -1334,7 +1317,7 @@ size_t ArchGetStackFrames(size_t maxdepth, size_t skip, uintptr_t *frames)
 {
   void *stack[MAX_STACK_DEPTH];
   size_t maxFrames = std::min<size_t>(MAX_STACK_DEPTH, maxdepth + skip);
-  const size_t frameCount = backtrace(stack, static_cast<int>(maxFrames));
+  const size_t frameCount = backtrace(stack, maxFrames);
   for (size_t frame = skip; frame != frameCount; ++frame) {
     *frames++ = reinterpret_cast<uintptr_t>(stack[frame]);
   }

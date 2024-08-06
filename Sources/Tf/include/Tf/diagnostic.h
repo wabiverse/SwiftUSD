@@ -1,30 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_DIAGNOSTIC_H
 #define PXR_BASE_TF_DIAGNOSTIC_H
 
-/// \file Tf/diagnostic.h
+/// \file tf/diagnostic.h
 /// \ingroup group_tf_Diagnostic
 /// Low-level utilities for informing users of various internal and external
 /// diagnostic conditions.
@@ -38,7 +21,7 @@
 #include "Arch/function.h"
 #include "Tf/api.h"
 #include "Tf/diagnosticLite.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #if defined(__cplusplus) || defined(doxygen)
 
@@ -75,9 +58,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This macro is a convenience.  It produces a TF_ERROR() with an error code
 /// indicating a coding error.  It takes a printf-like format specification or a
 /// std::string.  Generally, an error handling delegate will take action to turn
-/// this error into a python exception, and if it remains unhandled at the end
-/// of an application iteration will roll-back the undo stack to a
-/// last-known-good state.
+/// this error into a python exception, and if it remains unhandled at the end of
+/// an application iteration will roll-back the undo stack to a last-known-good
+/// state.
 ///
 /// This is safe to call in secondary threads.
 ///
@@ -91,8 +74,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// but using a specific error code is preferred over this.  It takes a
 /// printf-like format specification or a std::string.  Generally, an error
 /// handling delegate will take action to turn this error into a python
-/// exception, and if it remains unhandled at the end of an application
-/// iteration will roll-back the undo stack to a last-known-good state.
+/// exception, and if it remains unhandled at the end of an application iteration
+/// will roll-back the undo stack to a last-known-good state.
 ///
 /// This is safe to call in secondary threads.
 ///
@@ -191,8 +174,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// Aborts if the condition \c cond is not met.
 ///
-/// \param cond is any expression convertible to bool; if the condition
-/// evaluates to \c false, program execution ends with this call.
+/// \param cond is any expression convertible to bool; if the condition evaluates
+/// to \c false, program execution ends with this call.
 ///
 /// Note that the diagnostic message sent is the code \c cond, in the form of
 /// a string.  Unless the condition expression is self-explanatory, use
@@ -211,8 +194,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// The same as TF_AXIOM, but compiled only in dev builds.
 ///
-/// \param cond is any expression convertible to bool; if the condition
-/// evaluates to \c false, program execution ends with this call.
+/// \param cond is any expression convertible to bool; if the condition evaluates
+/// to \c false, program execution ends with this call.
 ///
 /// This macro has the same behavior as TF_AXIOM, but it is compiled only
 /// in dev builds. This version should only be used in code that is
@@ -274,8 +257,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Unmet conditions generate TF_CODING_ERRORs by default, but setting the
 /// environment variable TF_FATAL_VERIFY to 1 will make unmet conditions
-/// generate TF_FATAL_ERRORs instead and abort the program.  This is intended
-/// for testing.
+/// generate TF_FATAL_ERRORs instead and abort the program.  This is intended for
+/// testing.
 ///
 /// This is safe to call in secondary threads.
 ///
@@ -298,8 +281,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// may change in the future or vary across architectures.  For example,
 /// \code
 /// void YourClass::SomeMethod(int x) {
-///     cout << "Debugging info about function " << TF_FUNC_NAME() << "." <<
-///     endl;
+///     cout << "Debugging info about function " << TF_FUNC_NAME() << "." << endl;
 ///     ...
 /// }
 /// \endcode

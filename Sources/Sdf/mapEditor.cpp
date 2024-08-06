@@ -1,31 +1,14 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/mapEditor.h"
 #include "Sdf/path.h"
 #include "Sdf/schema.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/mallocTag.h"
@@ -39,9 +22,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Sdf_MapEditor<T>
 //
 
-template<class T> Sdf_MapEditor<T>::Sdf_MapEditor() {}
+template<class T> Sdf_MapEditor<T>::Sdf_MapEditor() = default;
 
-template<class T> Sdf_MapEditor<T>::~Sdf_MapEditor() {}
+template<class T> Sdf_MapEditor<T>::~Sdf_MapEditor() noexcept = default;
 
 //
 // Sdf_LsdMapEditor<T>
@@ -66,6 +49,8 @@ template<class T> class Sdf_LsdMapEditor : public Sdf_MapEditor<T> {
       }
     }
   }
+
+  virtual ~Sdf_LsdMapEditor() noexcept = default;
 
   virtual std::string GetLocation() const
   {
@@ -182,13 +167,8 @@ std::unique_ptr<Sdf_MapEditor<T>> Sdf_CreateMapEditor(const SdfSpecHandle &owner
   template std::unique_ptr<Sdf_MapEditor<MapType>> Sdf_CreateMapEditor(const SdfSpecHandle &, \
                                                                        const TfToken &);
 
-PXR_NAMESPACE_CLOSE_SCOPE
-
 #include "Sdf/types.h"
 #include "Vt/dictionary.h"
-
-PXR_NAMESPACE_OPEN_SCOPE
-
 SDF_INSTANTIATE_MAP_EDITOR(VtDictionary);
 SDF_INSTANTIATE_MAP_EDITOR(SdfVariantSelectionMap);
 SDF_INSTANTIATE_MAP_EDITOR(SdfRelocatesMap);

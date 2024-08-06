@@ -1,39 +1,20 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_DENSE_HASH_SET_H
 #define PXR_BASE_TF_DENSE_HASH_SET_H
 
-/// \file Tf/denseHashSet.h
+/// \file tf/denseHashSet.h
 
 #include "Arch/attributes.h"
 #include "Tf/hashmap.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <memory>
 #include <vector>
-
-#include <boost/iterator/iterator_facade.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -52,13 +33,7 @@ template<class Element,
          class HashFn,
          class EqualElement = std::equal_to<Element>,
          unsigned Threshold = 128>
-class ARCH_EMPTY_BASES TfDenseHashSet :
-    // Since sizeof(EqualElement) == 0 and sizeof(HashFn) == 0 in many cases
-    // we use the empty base optimization to not pay a size penalty.
-    // In C++20, explore using [[no_unique_address]] as an alternative
-    // way to get this optimization.
-    private HashFn,
-    private EqualElement {
+class TfDenseHashSet {
  public:
   typedef Element value_type;
 
@@ -90,18 +65,18 @@ class ARCH_EMPTY_BASES TfDenseHashSet :
   ///
   explicit TfDenseHashSet(const HashFn &hashFn = HashFn(),
                           const EqualElement &equalElement = EqualElement())
-      : HashFn(hashFn), EqualElement(equalElement)
   {
+    _hash() = hashFn;
+    _equ() = equalElement;
   }
 
   /// Copy Ctor.
   ///
-  TfDenseHashSet(const TfDenseHashSet &rhs)
-      : HashFn(rhs),
-        EqualElement(rhs),
-        _vector(rhs._vector),
-        _h(rhs._h ? std::make_unique<_HashMap>(*rhs._h) : nullptr)
+  TfDenseHashSet(const TfDenseHashSet &rhs) : _storage(rhs._storage)
   {
+    if (rhs._h) {
+      _h = std::make_unique<_HashMap>(*rhs._h);
+    }
   }
 
   /// Move Ctor.
@@ -182,10 +157,7 @@ class ARCH_EMPTY_BASES TfDenseHashSet :
   ///
   void swap(TfDenseHashSet &rhs)
   {
-    using std::swap;
-    swap(_hash(), rhs._hash());
-    swap(_equ(), rhs._equ());
-    _vector.swap(rhs._vector);
+    _storage.swap(rhs._storage);
     _h.swap(rhs._h);
   }
 
@@ -408,37 +380,37 @@ class ARCH_EMPTY_BASES TfDenseHashSet :
   // Helper to access the storage vector.
   _Vector &_vec()
   {
-    return _vector;
+    return _storage.vector;
   }
 
   // Helper to access the hash functor.
   HashFn &_hash()
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the equality functor.
   EqualElement &_equ()
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the storage vector.
   const _Vector &_vec() const
   {
-    return _vector;
+    return _storage.vector;
   }
 
   // Helper to access the hash functor.
   const HashFn &_hash() const
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the equality functor.
   const EqualElement &_equ() const
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to create the acceleration table if size dictates.
@@ -460,8 +432,30 @@ class ARCH_EMPTY_BASES TfDenseHashSet :
     }
   }
 
-  // Vector holding all elements
-  _Vector _vector;
+  // Since sizeof(EqualElement) == 0 and sizeof(HashFn) == 0 in many cases
+  // we use the empty base optimization to not pay a size penalty.
+  // In C++20, explore using [[no_unique_address]] as an alternative
+  // way to get this optimization.
+  struct ARCH_EMPTY_BASES _CompressedStorage : private EqualElement, private HashFn {
+    static_assert(!std::is_same<EqualElement, HashFn>::value,
+                  "EqualElement and HashFn must be distinct types.");
+    _CompressedStorage() = default;
+    _CompressedStorage(const EqualElement &equal, const HashFn &hashFn)
+        : EqualElement(equal), HashFn(hashFn)
+    {
+    }
+
+    void swap(_CompressedStorage &other)
+    {
+      using std::swap;
+      vector.swap(other.vector);
+      swap(static_cast<EqualElement &>(*this), static_cast<EqualElement &>(other));
+      swap(static_cast<HashFn &>(*this), static_cast<HashFn &>(other));
+    }
+    _Vector vector;
+    friend class TfDenseHashSet;
+  };
+  _CompressedStorage _storage;
 
   // Optional hash map that maps from keys to vector indices.
   std::unique_ptr<_HashMap> _h;

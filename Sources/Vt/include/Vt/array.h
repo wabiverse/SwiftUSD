@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_VT_ARRAY_H
 #define PXR_BASE_VT_ARRAY_H
@@ -31,14 +14,13 @@
 #include "Vt/streamOut.h"
 #include "Vt/traits.h"
 #include "Vt/types.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Arch/functionLite.h"
 #include "Arch/pragmas.h"
 #include "Tf/diagnostic.h"
 #include "Tf/mallocTag.h"
-
-#include <boost/iterator_adaptors.hpp>
+#include "Tf/preprocessorUtilsLite.h"
 
 #include <algorithm>
 #include <atomic>
@@ -198,8 +180,7 @@ class Vt_ArrayBase {
 ///
 /// \code
 /// int sum = 0;
-/// for (VtArray<int>::const_iterator i = a.cbegin(), end = a.cend(); i != end;
-/// ++i) {
+/// for (VtArray<int>::const_iterator i = a.cbegin(), end = a.cend(); i != end; ++i) {
 ///    sum += *i;
 /// }
 /// \endcode
@@ -1033,8 +1014,8 @@ template<typename ELEM> class VtArray : public Vt_ArrayBase {
 
 // Declare basic array instantiations as extern templates.  They are explicitly
 // instantiated in array.cpp.
-#define VT_ARRAY_EXTERN_TMPL(r, unused, elem) extern template class VtArray<VT_TYPE(elem)>;
-BOOST_PP_SEQ_FOR_EACH(VT_ARRAY_EXTERN_TMPL, ~, VT_SCALAR_VALUE_TYPES)
+#define VT_ARRAY_EXTERN_TMPL(unused, elem) VT_API_TEMPLATE_CLASS(VtArray<VT_TYPE(elem)>);
+TF_PP_SEQ_FOR_EACH(VT_ARRAY_EXTERN_TMPL, ~, VT_SCALAR_VALUE_TYPES)
 
 template<class HashState, class ELEM>
 inline std::enable_if_t<VtIsHashable<ELEM>()> TfHashAppend(HashState &h,

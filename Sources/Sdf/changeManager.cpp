@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/changeManager.h"
@@ -32,7 +15,9 @@
 #include "Tf/instantiateSingleton.h"
 #include "Tf/stackTrace.h"
 #include "Trace/traceImpl.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
+
+#include <atomic>
 
 using std::string;
 using std::vector;
@@ -175,7 +160,7 @@ void Sdf_ChangeManager::_SendNotices(_Data *data)
 
   // Obtain a serial number for this round of change processing.
   static std::atomic<size_t> &changeSerialNumber = _InitChangeSerialNumber();
-  size_t serialNumber = changeSerialNumber.fetch_add(1, std::memory_order_relaxed);
+  size_t serialNumber = changeSerialNumber.fetch_add(1);
 
   // Send global notice.
   SdfNotice::LayersDidChange(changes, serialNumber).Send();
@@ -268,25 +253,15 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
   // For now, this function adapts field-based changes into the
   // existing protocol.
 
+  bool sendInfoChange = false;
+
   if (field == FieldKeys->Default) {
     // Special case default first, since it's a commonly set field.
-    _GetListFor(changes, layer).DidChangeInfo(path, field, std::move(oldVal), newVal);
-  }
-  else if (field == FieldKeys->Variability || field == FieldKeys->Custom ||
-           field == FieldKeys->Specifier)
-  {
-
-    // These are all required fields. We only want to send notification
-    // that they are changing when both the old and new value are not
-    // empty. Otherwise, the change indicates that the spec is being
-    // created or removed, which will be handled through the Add/Remove
-    // change notification API.
-    if (!oldVal.IsEmpty() && !newVal.IsEmpty()) {
-      _GetListFor(changes, layer).DidChangeInfo(path, field, std::move(oldVal), newVal);
-    }
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->PrimOrder) {
     _GetListFor(changes, layer).DidReorderPrims(path);
+    sendInfoChange = true;
   }
   else if (field == ChildrenKeys->PrimChildren) {
     // XXX:OrderNotification:
@@ -312,24 +287,31 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
   }
   else if (field == FieldKeys->VariantSetNames || field == ChildrenKeys->VariantSetChildren) {
     _GetListFor(changes, layer).DidChangePrimVariantSets(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->InheritPaths) {
     _GetListFor(changes, layer).DidChangePrimInheritPaths(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->Specializes) {
     _GetListFor(changes, layer).DidChangePrimSpecializes(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->References) {
     _GetListFor(changes, layer).DidChangePrimReferences(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->TimeSamples) {
     _GetListFor(changes, layer).DidChangeAttributeTimeSamples(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->ConnectionPaths) {
     _GetListFor(changes, layer).DidChangeAttributeConnection(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->TargetPaths) {
     _GetListFor(changes, layer).DidChangeRelationshipTargets(path);
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->SubLayers) {
     std::vector<std::string> addedLayers, removedLayers;
@@ -371,6 +353,8 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
     {
       _GetListFor(changes, layer).DidChangeSublayerPaths(*it, SdfChangeList::SubLayerRemoved);
     }
+
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->SubLayerOffsets) {
     const SdfLayerOffsetVector oldOffsets = oldVal.GetWithDefault<SdfLayerOffsetVector>();
@@ -391,6 +375,8 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
         }
       }
     }
+
+    sendInfoChange = true;
   }
   else if (field == FieldKeys->TypeName) {
     if (path.IsMapperPath() || path.IsExpressionPath()) {
@@ -398,31 +384,8 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
       // the owning attribute connection.
       _GetListFor(changes, layer).DidChangeAttributeConnection(path.GetParentPath());
     }
-    else if (path.IsPrimPath()) {
-      // Prim typename changes are tricky because typename isn't
-      // marked as a required field, but can be set during prim spec
-      // construction. In this case, we don't want to send notification
-      // as the spec addition notice should suffice. We can identify
-      // this situation by the fact that the c'tor will have created a
-      // non-inert prim spec.
-      //
-      // If we're *not* in this case, we need to let the world know the
-      // typename has changed.
-      const SdfChangeList::Entry &entry = _GetListFor(changes, layer).GetEntry(path);
-      if (!entry.flags.didAddNonInertPrim) {
-        _GetListFor(changes, layer).DidChangeInfo(path, field, std::move(oldVal), newVal);
-      }
-    }
     else {
-      // Otherwise, this is a typename change on an attribute. Since
-      // typename is a required field in this case, the only time
-      // the old or new value will be empty is during the spec c'tor;
-      // during all other times, we need to send notification.
-      if (!oldVal.IsEmpty() && !newVal.IsEmpty() && !oldVal.Get<TfToken>().IsEmpty() &&
-          !newVal.Get<TfToken>().IsEmpty())
-      {
-        _GetListFor(changes, layer).DidChangeInfo(path, field, std::move(oldVal), newVal);
-      }
+      sendInfoChange = true;
     }
   }
   else if (field == FieldKeys->TimeCodesPerSecond &&
@@ -469,6 +432,10 @@ void Sdf_ChangeManager::DidChangeField(const SdfLayerHandle &layer,
     // should be safe for now to simply report all field names as info keys.
     // If this is problematic, we'll need to filter them down to the known
     // set.
+    sendInfoChange = true;
+  }
+
+  if (sendInfoChange) {
     _GetListFor(changes, layer).DidChangeInfo(path, field, std::move(oldVal), newVal);
   }
 }
@@ -510,8 +477,7 @@ void Sdf_ChangeManager::DidMoveSpec(const SdfLayerHandle &layer,
   else {
     // Reparent
     if (oldPath.IsPrimPath()) {
-      _GetListFor(changes, layer).DidRemovePrim(oldPath, /* inert = */ false);
-      _GetListFor(changes, layer).DidAddPrim(newPath, /* inert = */ false);
+      _GetListFor(changes, layer).DidMovePrim(oldPath, newPath);
     }
     else if (oldPath.IsPropertyPath()) {
       _GetListFor(changes, layer)

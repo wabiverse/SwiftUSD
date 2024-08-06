@@ -1,25 +1,8 @@
 //
 // Copyright 2020 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Garch/glApi.h"
 
@@ -33,8 +16,7 @@
 #include "HgiGL/resourceBindings.h"
 #include "HgiGL/shaderProgram.h"
 #include "HgiGL/texture.h"
-
-#include "Tf/diagnostic.h"
+#include "Tf/scopeDescription.h"
 #include "Trace/traceImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -759,8 +741,10 @@ HgiGLOpsFn HgiGLOps::BindFramebufferOp(HgiGLDevice *device, HgiGraphicsCmdsDesc 
 
     if (desc.depthTexture && depthAttachment.loadOp == HgiAttachmentLoadOpClear) {
       if (depthAttachment.usage & HgiTextureUsageBitsStencilTarget) {
-        glClearBufferfi(
-            GL_DEPTH_STENCIL, 0, depthAttachment.clearValue[0], depthAttachment.clearValue[1]);
+        glClearBufferfi(GL_DEPTH_STENCIL,
+                        0,
+                        depthAttachment.clearValue[0],
+                        static_cast<uint32_t>(depthAttachment.clearValue[1]));
       }
       else {
         glClearBufferfv(GL_DEPTH, 0, depthAttachment.clearValue.data());
@@ -800,6 +784,13 @@ HgiGLOpsFn HgiGLOps::GenerateMipMaps(HgiTextureHandle const &texture)
 
     HgiGLTexture *glTex = static_cast<HgiGLTexture *>(texture.Get());
     if (glTex && glTex->GetTextureId()) {
+      // Note: the texture ID doesn't mean much to the end user, but
+      // making these descriptions unique helps make it clear how much
+      // time is spent on each one.
+      TF_DESCRIBE_SCOPE("Generating mipmaps (id %zu: %s)",
+                        glTex->GetTextureId(),
+                        glTex->GetDescriptor().debugName.c_str());
+
       glGenerateTextureMipmap(glTex->GetTextureId());
       HGIGL_POST_PENDING_GL_ERRORS();
     }

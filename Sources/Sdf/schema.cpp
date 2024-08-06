@@ -1,31 +1,16 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/schema.h"
 #include "Sdf/layer.h"
 #include "Sdf/layerOffset.h"
 #include "Sdf/parserValueContext.h"
+#include "Sdf/pathExpression.h"
+#include "Sdf/pathParser.h"
 #include "Sdf/payload.h"
 #include "Sdf/reference.h"
 #include "Sdf/schemaTypeRegistration.h"
@@ -33,13 +18,14 @@
 #include "Sdf/types.h"
 #include "Sdf/valueTypeRegistry.h"
 #include "Sdf/variableExpression.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Plug/plugin.h"
 #include "Plug/registry.h"
 #include "Tf/diagnostic.h"
 #include "Tf/envSetting.h"
 #include "Tf/instantiateSingleton.h"
+#include "Tf/unicodeUtils.h"
 #include "Trace/traceImpl.h"
 #include "Vt/dictionary.h"
 
@@ -350,7 +336,9 @@ SDF_VALIDATE_WRAPPER(InheritPath, SdfPath);
 SDF_VALIDATE_WRAPPER(Payload, SdfPayload);
 SDF_VALIDATE_WRAPPER(Reference, SdfReference);
 SDF_VALIDATE_WRAPPER(RelationshipTargetPath, SdfPath);
-SDF_VALIDATE_WRAPPER(RelocatesPath, SdfPath);
+SDF_VALIDATE_WRAPPER(RelocatesSourcePath, SdfPath);
+SDF_VALIDATE_WRAPPER(RelocatesTargetPath, SdfPath);
+SDF_VALIDATE_WRAPPER(Relocate, SdfRelocate);
 SDF_VALIDATE_WRAPPER(SpecializesPath, SdfPath);
 SDF_VALIDATE_WRAPPER(SubLayer, std::string);
 SDF_VALIDATE_WRAPPER(VariantIdentifier, std::string);
@@ -416,6 +404,7 @@ static void _AddStandardTypesToRegistry(Sdf_ValueTypeRegistry *r)
   r->AddType(T("asset", SdfAssetPath()));
   r->AddType(T("opaque", SdfOpaqueValue()).NoArrays());
   r->AddType(T("group", SdfOpaqueValue()).NoArrays().Role(SdfValueRoleNames->Group));
+  r->AddType(T("pathExpression", SdfPathExpression()));
 
   // Compound types.
   r->AddType(T("double2", GfVec2d(0.0)).Dimensions(2));
@@ -696,9 +685,11 @@ void SdfSchemaBase::_RegisterStandardFields()
       .ReadOnly()
       .ListValueValidator(&_ValidateRelationshipTargetPath);
 
+  _DoRegisterField(SdfFieldKeys->LayerRelocates, SdfRelocates())
+      .ListValueValidator(&_ValidateRelocate);
   _DoRegisterField(SdfFieldKeys->Relocates, SdfRelocatesMap())
-      .MapKeyValidator(&_ValidateRelocatesPath)
-      .MapValueValidator(&_ValidateRelocatesPath);
+      .MapKeyValidator(&_ValidateRelocatesSourcePath)
+      .MapValueValidator(&_ValidateRelocatesTargetPath);
   _DoRegisterField(SdfFieldKeys->Specifier, SdfSpecifierOver);
   _DoRegisterField(SdfFieldKeys->StartFrame, 0.0);
   _DoRegisterField(SdfFieldKeys->StartTimeCode, 0.0);
@@ -772,6 +763,7 @@ void SdfSchemaBase::_RegisterStandardFields()
       .MetadataField(SdfFieldKeys->StartFrame)
 
       .Field(SdfChildrenKeys->PrimChildren)
+      .Field(SdfFieldKeys->LayerRelocates)
       .Field(SdfFieldKeys->PrimOrder)
       .Field(SdfFieldKeys->SubLayers)
       .Field(SdfFieldKeys->SubLayerOffsets);
@@ -1054,6 +1046,18 @@ SdfAllowed SdfSchemaBase::IsValidValue(const VtValue &value) const
       }
     }
   }
+  else if (value.IsHolding<SdfPathExpression>()) {
+    // Path expressions must be absolute, following requirements for other
+    // SdfPaths written to files (rel targets, attr connections, inherit
+    // paths, etc.)
+    SdfPathExpression const &pathExpr = value.UncheckedGet<SdfPathExpression>();
+    if (!pathExpr.IsAbsolute()) {
+      return SdfAllowed(
+          "pathExpression paths must be absolute paths "
+          "(\"" +
+          pathExpr.GetText() + "\")");
+    }
+  }
   else if (!FindType(value)) {
     return SdfAllowed(
         "Value does not have a valid scene description type "
@@ -1122,26 +1126,27 @@ SdfAllowed SdfSchemaBase::IsValidNamespacedIdentifier(const std::string &identif
 
 SdfAllowed SdfSchemaBase::IsValidVariantIdentifier(const std::string &identifier)
 {
-  // Allow [[:alnum:]_|\-]+ with an optional leading dot.
+  // use the path parser rules to determine validity of variant name
+  Sdf_PathParser::PPContext context;
+  bool result = false;
+  try {
+    result = Sdf_PathParser::PEGTL_NS::parse<
+        Sdf_PathParser::PEGTL_NS::must<Sdf_PathParser::VariantName,
+                                       Sdf_PathParser::PEGTL_NS::eof>>(
+        Sdf_PathParser::PEGTL_NS::string_input<>{identifier, ""}, context);
 
-  std::string::const_iterator first = identifier.begin();
-  std::string::const_iterator last = identifier.end();
-
-  // Allow optional leading dot.
-  if (first != last && *first == '.') {
-    ++first;
-  }
-
-  for (; first != last; ++first) {
-    char c = *first;
-    if (!(isalnum(c) || (c == '_') || (c == '|') || (c == '-'))) {
-      return SdfAllowed(
-          TfStringPrintf("\"%s\" is not a valid variant "
-                         "name due to '%c' at index %d",
-                         identifier.c_str(),
-                         c,
-                         (int)(first - identifier.begin())));
+    if (!result) {
+      return SdfAllowed(TfStringPrintf("\"%s\" is not a valid variant name", identifier.c_str()));
     }
+  }
+  catch (const Sdf_PathParser::PEGTL_NS::parse_error &e) {
+    return SdfAllowed(
+        TfStringPrintf("\"%s\" is not a valid variant "
+                       "name due to '%s'",
+                       identifier.c_str(),
+                       e.what()));
+
+    return false;
   }
 
   return true;
@@ -1162,7 +1167,7 @@ SdfAllowed SdfSchemaBase::IsValidVariantSelection(const std::string &sel)
   return IsValidVariantIdentifier(sel);
 }
 
-SdfAllowed SdfSchemaBase::IsValidRelocatesPath(const SdfPath &path)
+SdfAllowed SdfSchemaBase::IsValidRelocatesSourcePath(const SdfPath &path)
 {
   if (_PathContainsProhibitedVariantSelection(path)) {
     return SdfAllowed(
@@ -1176,6 +1181,27 @@ SdfAllowed SdfSchemaBase::IsValidRelocatesPath(const SdfPath &path)
   return true;
 }
 
+SdfAllowed SdfSchemaBase::IsValidRelocatesTargetPath(const SdfPath &path)
+{
+  // Relocates target paths are allowed to be empty but source paths are not.
+  if (path.IsEmpty()) {
+    return true;
+  }
+  return IsValidRelocatesSourcePath(path);
+}
+
+SdfAllowed SdfSchemaBase::IsValidRelocate(const SdfRelocate &relocate)
+{
+  if (SdfAllowed isValid = IsValidRelocatesSourcePath(relocate.first); !isValid) {
+    return isValid;
+  }
+  if (SdfAllowed isValid = IsValidRelocatesTargetPath(relocate.second); !isValid) {
+    return isValid;
+  }
+
+  return true;
+}
+
 SdfAllowed SdfSchemaBase::IsValidInheritPath(const SdfPath &path)
 {
   if (_PathContainsProhibitedVariantSelection(path)) {
@@ -1184,7 +1210,7 @@ SdfAllowed SdfSchemaBase::IsValidInheritPath(const SdfPath &path)
         "variant selections");
   }
   if (!(path.IsAbsolutePath() && path.IsPrimPath())) {
-    return SdfAllowed("Inherit paths must be an absolute prim path");
+    return SdfAllowed("Inherit paths must be absolute prim paths");
   }
   return true;
 }
@@ -1197,7 +1223,7 @@ SdfAllowed SdfSchemaBase::IsValidSpecializesPath(const SdfPath &path)
         "variant selections");
   }
   if (!(path.IsAbsolutePath() && path.IsPrimPath())) {
-    return SdfAllowed("Specializes paths must be absolute prim path");
+    return SdfAllowed("Specializes paths must be absolute prim paths");
   }
   return true;
 }
@@ -1709,6 +1735,7 @@ const Sdf_ValueTypeNamesType *Sdf_InitializeValueTypeNames()
   n->Asset = r.FindType("asset");
   n->Opaque = r.FindType("opaque");
   n->Group = r.FindType("group");
+  n->PathExpression = r.FindType("pathExpression");
   n->Int2 = r.FindType("int2");
   n->Int3 = r.FindType("int3");
   n->Int4 = r.FindType("int4");
@@ -1763,6 +1790,7 @@ const Sdf_ValueTypeNamesType *Sdf_InitializeValueTypeNames()
   n->StringArray = r.FindType("string[]");
   n->TokenArray = r.FindType("token[]");
   n->AssetArray = r.FindType("asset[]");
+  n->PathExpressionArray = r.FindType("pathExpression[]");
   n->Int2Array = r.FindType("int2[]");
   n->Int3Array = r.FindType("int3[]");
   n->Int4Array = r.FindType("int4[]");

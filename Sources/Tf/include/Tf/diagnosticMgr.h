@@ -1,51 +1,30 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_DIAGNOSTIC_MGR_H
 #define PXR_BASE_TF_DIAGNOSTIC_MGR_H
 
-/// \file Tf/diagnosticMgr.h
+/// \file tf/diagnosticMgr.h
 
-#include <pxr/pxrns.h>
-
+#include "Tf/api.h"
 #include "Tf/callContext.h"
 #include "Tf/debug.h"
-
 #include "Tf/diagnosticLite.h"
+#include "Tf/enum.h"
 #include "Tf/error.h"
 #include "Tf/singleton.h"
 #include "Tf/status.h"
 #include "Tf/stringUtils.h"
 #include "Tf/warning.h"
 #include "Tf/weakPtr.h"
-
-#include "Tf/api.h"
-#include "Tf/enum.h"
-
-#include "Arch/pxrinttypes.h"
+#include "pxr/pxrns.h"
 
 #include "Arch/attributes.h"
 #include "Arch/functionLite.h"
+#include "Arch/inttypes.h"
 
 #include <OneTBB/tbb/enumerable_thread_specific.h>
 #include <OneTBB/tbb/spin_rw_mutex.h>
@@ -276,9 +255,10 @@ class TfDiagnosticMgr : public TfWeakBase {
   ///
   /// If no delegates have been registered, or if none of the delegates abort
   /// the process, this method will print the error msg and abort the process.
-  [[noreturn]] TF_API void PostFatal(TfCallContext const &context,
-                                     TfEnum statusCode,
-                                     std::string const &msg) const;
+  [[noreturn]]
+  TF_API void PostFatal(TfCallContext const &context,
+                        TfEnum statusCode,
+                        std::string const &msg) const;
 
   /// Return true if an instance of TfErrorMark exists in the current thread
   /// of execution, false otherwise.
@@ -379,7 +359,8 @@ class TfDiagnosticMgr : public TfWeakBase {
         : _context(context), _statusCode(statusCode)
     {
     }
-    [[noreturn]] void Post(const std::string &str) const
+    [[noreturn]]
+    void Post(const std::string &str) const
     {
       This::GetInstance().PostFatal(_context, _statusCode, str);
     }

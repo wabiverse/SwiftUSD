@@ -1,36 +1,19 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 ///
 /// \file js/value.cpp
-
-#include <pxr/pxrns.h>
 
 #include "Js/value.h"
 #include "Tf/diagnostic.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
-#include <boost/variant.hpp>
+#include "pxr/pxrns.h"
+
+#include <variant>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -98,15 +81,14 @@ using Js_ArrayWrapper = Js_Wrapper<JsArray>;
 struct JsValue::_Holder {
   // The order these types are defined in the variant is important. See the
   // comments in the implementation of IsUInt64 for details.
-  typedef boost::variant<Js_ObjectWrapper,
-                         Js_ArrayWrapper,
-                         std::string,
-                         bool,
-                         int64_t,
-                         double,
-                         Js_Null,
-                         uint64_t>
-      Variant;
+  using Variant = std::variant<Js_ObjectWrapper,
+                               Js_ArrayWrapper,
+                               std::string,
+                               bool,
+                               int64_t,
+                               double,
+                               Js_Null,
+                               uint64_t>;
 
   _Holder() : value(Js_Null()), type(JsValue::NullType) {}
   _Holder(const JsObject &value) : value(Js_ObjectWrapper(value)), type(JsValue::ObjectType) {}
@@ -244,7 +226,7 @@ const JsObject &JsValue::GetJsObject() const
     return *_emptyObject;
   }
 
-  return boost::get<Js_ObjectWrapper>(_holder->value).Get();
+  return std::get<Js_ObjectWrapper>(_holder->value).Get();
 }
 
 const JsArray &JsValue::GetJsArray() const
@@ -257,7 +239,7 @@ const JsArray &JsValue::GetJsArray() const
     return *_emptyArray;
   }
 
-  return boost::get<Js_ArrayWrapper>(_holder->value).Get();
+  return std::get<Js_ArrayWrapper>(_holder->value).Get();
 }
 
 const std::string &JsValue::GetString() const
@@ -270,7 +252,7 @@ const std::string &JsValue::GetString() const
     return *_emptyString;
   }
 
-  return *boost::get<std::string>(&_holder->value);
+  return std::get<std::string>(_holder->value);
 }
 
 bool JsValue::GetBool() const
@@ -281,7 +263,7 @@ bool JsValue::GetBool() const
     return false;
   }
 
-  return boost::get<bool>(_holder->value);
+  return std::get<bool>(_holder->value);
 }
 
 int JsValue::GetInt() const
@@ -306,7 +288,7 @@ int64_t JsValue::GetInt64() const
   if (IsUInt64())
     return static_cast<int64_t>(GetUInt64());
 
-  return boost::get<int64_t>(_holder->value);
+  return std::get<int64_t>(_holder->value);
 }
 
 uint64_t JsValue::GetUInt64() const
@@ -320,7 +302,7 @@ uint64_t JsValue::GetUInt64() const
   if (!IsUInt64())
     return static_cast<uint64_t>(GetInt64());
 
-  return boost::get<uint64_t>(_holder->value);
+  return std::get<uint64_t>(_holder->value);
 }
 
 double JsValue::GetReal() const
@@ -335,7 +317,7 @@ double JsValue::GetReal() const
     return 0;
   }
 
-  return boost::get<double>(_holder->value);
+  return std::get<double>(_holder->value);
 }
 
 JsValue::Type JsValue::GetType() const
@@ -383,7 +365,7 @@ bool JsValue::IsUInt64() const
   // This relies on the position of Js_Null and uint64_t in the variant
   // type declaration, as well as the value of NullType in the Type enum.
   // This is how json_spirit itself determines whether the type is uint64_t.
-  return _holder->value.which() == (NullType + 1);
+  return _holder->value.index() == (NullType + 1);
 }
 
 bool JsValue::IsNull() const

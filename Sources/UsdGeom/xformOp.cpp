@@ -1,30 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "UsdGeom/xformOp.h"
 #include "Usd/prim.h"
 #include "UsdGeom/xformable.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Gf/matrix3d.h"
 #include "Gf/matrix4d.h"
@@ -43,24 +26,24 @@ TF_DEFINE_PUBLIC_TOKENS(UsdGeomXformOpTypes, USDGEOM_XFORM_OP_TYPES);
 TF_REGISTRY_FUNCTION(TfEnum)
 {
   // Type
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeInvalid, "");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeTranslate, "translate");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeScale, "scale");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateX, "rotateX");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateY, "rotateY");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateZ, "rotateZ");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateXYZ, "rotateXYZ");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateXZY, "rotateXZY");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateYXZ, "rotateYXZ");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateYZX, "rotateYZX");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateZXY, "rotateZXY");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeRotateZYX, "rotateZYX");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeOrient, "orient");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Type::TypeTransform, "transform");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeInvalid, "");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeTranslate, "translate");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeScale, "scale");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateX, "rotateX");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateY, "rotateY");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZ, "rotateZ");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateXYZ, "rotateXYZ");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateXZY, "rotateXZY");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateYXZ, "rotateYXZ");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateYZX, "rotateYZX");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZXY, "rotateZXY");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZYX, "rotateZYX");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeOrient, "orient");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeTransform, "transform");
 
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Precision::PrecisionDouble, "Double");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Precision::PrecisionFloat, "Float");
-  TF_ADD_ENUM_NAME(UsdGeomXformOp::Precision::PrecisionHalf, "Half");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::PrecisionDouble, "Double");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::PrecisionFloat, "Float");
+  TF_ADD_ENUM_NAME(UsdGeomXformOp::PrecisionHalf, "Half");
 };
 
 TF_DEFINE_PRIVATE_TOKENS(
@@ -102,7 +85,7 @@ static bool _IsInverseOp(TfToken const &opName)
 }
 
 UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp)
-    : _attr(attr), _opType(Type::TypeInvalid), _isInverseOp(isInverseOp)
+    : _attr(attr), _opType(TypeInvalid), _isInverseOp(isInverseOp)
 {
   if (!attr) {
     // Legal to construct an XformOp with invalid attr, however IsDefined()
@@ -140,19 +123,19 @@ void UsdGeomXformOp::_Init()
     end = start + strlen(start);
   }
   _opType = _GetOpTypeEnumFromCString(start, end - start);
-  if (_opType == Type::TypeInvalid) {
+  if (_opType == TypeInvalid) {
     TF_CODING_ERROR("Invalid xform opType token '%s'.", std::string(start, end).c_str());
   }
 }
 
 UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp, _ValidAttributeTagType)
-    : _attr(attr), _opType(Type::TypeInvalid), _isInverseOp(isInverseOp)
+    : _attr(attr), _opType(TypeInvalid), _isInverseOp(isInverseOp)
 {
   _Init();
 }
 
 UsdGeomXformOp::UsdGeomXformOp(UsdAttributeQuery &&query, bool isInverseOp, _ValidAttributeTagType)
-    : _attr(std::move(query)), _opType(Type::TypeInvalid), _isInverseOp(isInverseOp)
+    : _attr(std::move(query)), _opType(TypeInvalid), _isInverseOp(isInverseOp)
 {
   _Init();
 }
@@ -197,62 +180,62 @@ UsdGeomXformOp::Precision UsdGeomXformOp::GetPrecisionFromValueTypeName(
     const SdfValueTypeName &typeName)
 {
   if (typeName == SdfValueTypeNames->Matrix4d)
-    return Precision::PrecisionDouble;
+    return PrecisionDouble;
   else if (typeName == SdfValueTypeNames->Double3)
-    return Precision::PrecisionDouble;
+    return PrecisionDouble;
   else if (typeName == SdfValueTypeNames->Float3)
-    return Precision::PrecisionFloat;
+    return PrecisionFloat;
   else if (typeName == SdfValueTypeNames->Half3)
-    return Precision::PrecisionHalf;
+    return PrecisionHalf;
   else if (typeName == SdfValueTypeNames->Double)
-    return Precision::PrecisionDouble;
+    return PrecisionDouble;
   else if (typeName == SdfValueTypeNames->Float)
-    return Precision::PrecisionFloat;
+    return PrecisionFloat;
   else if (typeName == SdfValueTypeNames->Half)
-    return Precision::PrecisionHalf;
+    return PrecisionHalf;
   else if (typeName == SdfValueTypeNames->Quatd)
-    return Precision::PrecisionDouble;
+    return PrecisionDouble;
   else if (typeName == SdfValueTypeNames->Quatf)
-    return Precision::PrecisionFloat;
+    return PrecisionFloat;
   else if (typeName == SdfValueTypeNames->Quath)
-    return Precision::PrecisionHalf;
+    return PrecisionHalf;
 
   TF_CODING_ERROR("Invalid typeName '%s' specified.", typeName.GetAsToken().GetText());
   // Return default precision, which is double.
-  return Precision::PrecisionDouble;
+  return PrecisionDouble;
 }
 
 /* static */
 TfToken const &UsdGeomXformOp::GetOpTypeToken(UsdGeomXformOp::Type const opType)
 {
   switch (opType) {
-    case Type::TypeTransform:
+    case TypeTransform:
       return UsdGeomXformOpTypes->transform;
-    case Type::TypeTranslate:
+    case TypeTranslate:
       return UsdGeomXformOpTypes->translate;
-    case Type::TypeScale:
+    case TypeScale:
       return UsdGeomXformOpTypes->scale;
-    case Type::TypeRotateX:
+    case TypeRotateX:
       return UsdGeomXformOpTypes->rotateX;
-    case Type::TypeRotateY:
+    case TypeRotateY:
       return UsdGeomXformOpTypes->rotateY;
-    case Type::TypeRotateZ:
+    case TypeRotateZ:
       return UsdGeomXformOpTypes->rotateZ;
-    case Type::TypeRotateXYZ:
+    case TypeRotateXYZ:
       return UsdGeomXformOpTypes->rotateXYZ;
-    case Type::TypeRotateXZY:
+    case TypeRotateXZY:
       return UsdGeomXformOpTypes->rotateXZY;
-    case Type::TypeRotateYXZ:
+    case TypeRotateYXZ:
       return UsdGeomXformOpTypes->rotateYXZ;
-    case Type::TypeRotateYZX:
+    case TypeRotateYZX:
       return UsdGeomXformOpTypes->rotateYZX;
-    case Type::TypeRotateZXY:
+    case TypeRotateZXY:
       return UsdGeomXformOpTypes->rotateZXY;
-    case Type::TypeRotateZYX:
+    case TypeRotateZYX:
       return UsdGeomXformOpTypes->rotateZYX;
-    case Type::TypeOrient:
+    case TypeOrient:
       return UsdGeomXformOpTypes->orient;
-    case Type::TypeInvalid:
+    case TypeInvalid:
     default:
       static TfToken empty;
       return empty;
@@ -263,37 +246,37 @@ TfToken const &UsdGeomXformOp::GetOpTypeToken(UsdGeomXformOp::Type const opType)
 UsdGeomXformOp::Type UsdGeomXformOp::GetOpTypeEnum(TfToken const &opTypeToken)
 {
   if (opTypeToken == UsdGeomXformOpTypes->transform)
-    return Type::TypeTransform;
+    return TypeTransform;
   else if (opTypeToken == UsdGeomXformOpTypes->translate)
-    return Type::TypeTranslate;
+    return TypeTranslate;
   // RotateXYZ is expected to be more common than the remaining ops.
   else if (opTypeToken == UsdGeomXformOpTypes->rotateXYZ)
-    return Type::TypeRotateXYZ;
+    return TypeRotateXYZ;
   else if (opTypeToken == UsdGeomXformOpTypes->scale)
-    return Type::TypeScale;
+    return TypeScale;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateX)
-    return Type::TypeRotateX;
+    return TypeRotateX;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateY)
-    return Type::TypeRotateY;
+    return TypeRotateY;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateZ)
-    return Type::TypeRotateZ;
+    return TypeRotateZ;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateXZY)
-    return Type::TypeRotateXZY;
+    return TypeRotateXZY;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateYXZ)
-    return Type::TypeRotateYXZ;
+    return TypeRotateYXZ;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateYZX)
-    return Type::TypeRotateYZX;
+    return TypeRotateYZX;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateZXY)
-    return Type::TypeRotateZXY;
+    return TypeRotateZXY;
   else if (opTypeToken == UsdGeomXformOpTypes->rotateZYX)
-    return Type::TypeRotateZYX;
+    return TypeRotateZYX;
   else if (opTypeToken == UsdGeomXformOpTypes->orient)
-    return Type::TypeOrient;
+    return TypeOrient;
   else if (opTypeToken == "")
-    return Type::TypeInvalid;
+    return TypeInvalid;
 
   TF_CODING_ERROR("Invalid xform opType token '%s'.", opTypeToken.GetText());
-  return Type::TypeInvalid;
+  return TypeInvalid;
 }
 
 /* static */
@@ -304,35 +287,35 @@ UsdGeomXformOp::Type UsdGeomXformOp::_GetOpTypeEnumFromCString(char const *str, 
     return (strlen(name) == len) && (strncmp(name, str, len) == 0);
   };
   if (check("transform"))
-    return Type::TypeTransform;
+    return TypeTransform;
   else if (check("translate"))
-    return Type::TypeTranslate;
+    return TypeTranslate;
   else if (check("rotateXYZ"))
-    return Type::TypeRotateXYZ;
+    return TypeRotateXYZ;
   else if (check("scale"))
-    return Type::TypeScale;
+    return TypeScale;
   else if (check("rotateX"))
-    return Type::TypeRotateX;
+    return TypeRotateX;
   else if (check("rotateY"))
-    return Type::TypeRotateY;
+    return TypeRotateY;
   else if (check("rotateZ"))
-    return Type::TypeRotateZ;
+    return TypeRotateZ;
   else if (check("rotateXZY"))
-    return Type::TypeRotateXZY;
+    return TypeRotateXZY;
   else if (check("rotateYXZ"))
-    return Type::TypeRotateYXZ;
+    return TypeRotateYXZ;
   else if (check("rotateYZX"))
-    return Type::TypeRotateYZX;
+    return TypeRotateYZX;
   else if (check("rotateZXY"))
-    return Type::TypeRotateZXY;
+    return TypeRotateZXY;
   else if (check("rotateZYX"))
-    return Type::TypeRotateZYX;
+    return TypeRotateZYX;
   else if (check("orient"))
-    return Type::TypeOrient;
+    return TypeOrient;
   else if (check(""))
-    return Type::TypeInvalid;
+    return TypeInvalid;
   else
-    return Type::TypeInvalid;
+    return TypeInvalid;
 }
 
 /* static */
@@ -340,60 +323,60 @@ const SdfValueTypeName &UsdGeomXformOp::GetValueTypeName(const UsdGeomXformOp::T
                                                          const UsdGeomXformOp::Precision precision)
 {
   switch (opType) {
-    case Type::TypeTransform: {
+    case TypeTransform: {
       // Regardless of the requested precision, this must be Matrix4d,
       // because Matrix4f values are not supported in Sdf.
-      if (precision != Precision::PrecisionDouble)
+      if (precision != PrecisionDouble)
         TF_CODING_ERROR(
             "Matrix transformations can only be encoded in "
             "double precision. Overriding precision to double.");
       return SdfValueTypeNames->Matrix4d;
     }
-    case Type::TypeTranslate:
-    case Type::TypeScale:
-    case Type::TypeRotateXYZ:
-    case Type::TypeRotateXZY:
-    case Type::TypeRotateYXZ:
-    case Type::TypeRotateYZX:
-    case Type::TypeRotateZXY:
-    case Type::TypeRotateZYX: {
+    case TypeTranslate:
+    case TypeScale:
+    case TypeRotateXYZ:
+    case TypeRotateXZY:
+    case TypeRotateYXZ:
+    case TypeRotateYZX:
+    case TypeRotateZXY:
+    case TypeRotateZYX: {
       switch (precision) {
-        case Precision::PrecisionFloat:
+        case PrecisionFloat:
           return SdfValueTypeNames->Float3;
-        case Precision::PrecisionHalf:
+        case PrecisionHalf:
           return SdfValueTypeNames->Half3;
-        case Precision::PrecisionDouble:
+        case PrecisionDouble:
         default:
           return SdfValueTypeNames->Double3;
       }
     }
-    case Type::TypeRotateX:
-    case Type::TypeRotateY:
-    case Type::TypeRotateZ: {
+    case TypeRotateX:
+    case TypeRotateY:
+    case TypeRotateZ: {
       switch (precision) {
-        case Precision::PrecisionFloat:
+        case PrecisionFloat:
           return SdfValueTypeNames->Float;
-        case Precision::PrecisionHalf:
+        case PrecisionHalf:
           return SdfValueTypeNames->Half;
-        case Precision::PrecisionDouble:
+        case PrecisionDouble:
         default:
           return SdfValueTypeNames->Double;
       }
     }
 
-    case Type::TypeOrient: {
+    case TypeOrient: {
       switch (precision) {
-        case Precision::PrecisionFloat:
+        case PrecisionFloat:
           return SdfValueTypeNames->Quatf;
-        case Precision::PrecisionHalf:
+        case PrecisionHalf:
           return SdfValueTypeNames->Quath;
-        case Precision::PrecisionDouble:
+        case PrecisionDouble:
         default:
           return SdfValueTypeNames->Quatd;
       }
     }
 
-    case Type::TypeInvalid:
+    case TypeInvalid:
     default: {
       static SdfValueTypeName empty;
       return empty;
@@ -466,7 +449,7 @@ GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
                                           bool isInverseOp)
 {
   // This will be the most common case.
-  if (opType == Type::TypeTransform) {
+  if (opType == TypeTransform) {
     GfMatrix4d mat(1.);
     bool isMatrixVal = true;
     if (opVal.IsHolding<GfMatrix4d>()) {
@@ -519,13 +502,13 @@ GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
     if (isInverseOp)
       doubleVal = -doubleVal;
 
-    if (opType == Type::TypeRotateX) {
+    if (opType == TypeRotateX) {
       return GfMatrix4d(1.).SetRotate(GfRotation(GfVec3d::XAxis(), doubleVal));
     }
-    else if (opType == Type::TypeRotateY) {
+    else if (opType == TypeRotateY) {
       return GfMatrix4d(1.).SetRotate(GfRotation(GfVec3d::YAxis(), doubleVal));
     }
-    else if (opType == Type::TypeRotateZ) {
+    else if (opType == TypeRotateZ) {
       return GfMatrix4d(1.).SetRotate(GfRotation(GfVec3d::ZAxis(), doubleVal));
     }
   }
@@ -547,11 +530,11 @@ GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
 
   if (isVecVal) {
     switch (opType) {
-      case Type::TypeTranslate:
+      case TypeTranslate:
         if (isInverseOp)
           vec3dVal = -vec3dVal;
         return GfMatrix4d(1.).SetTranslate(vec3dVal);
-      case Type::TypeScale:
+      case TypeScale:
         if (isInverseOp) {
           vec3dVal = GfVec3d(1 / vec3dVal[0], 1 / vec3dVal[1], 1 / vec3dVal[2]);
         }
@@ -565,23 +548,23 @@ GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
         GfMatrix3d zRot(GfRotation(GfVec3d::ZAxis(), vec3dVal[2]));
         GfMatrix3d rotationMat(1.);
         switch (opType) {
-          case Type::TypeRotateXYZ:
+          case TypeRotateXYZ:
             // Inv(ABC) = Inv(C) * Inv(B) * Inv(A)
             rotationMat = !isInverseOp ? (xRot * yRot * zRot) : (zRot * yRot * xRot);
             break;
-          case Type::TypeRotateXZY:
+          case TypeRotateXZY:
             rotationMat = !isInverseOp ? (xRot * zRot * yRot) : (yRot * zRot * xRot);
             break;
-          case Type::TypeRotateYXZ:
+          case TypeRotateYXZ:
             rotationMat = !isInverseOp ? (yRot * xRot * zRot) : (zRot * xRot * yRot);
             break;
-          case Type::TypeRotateYZX:
+          case TypeRotateYZX:
             rotationMat = !isInverseOp ? (yRot * zRot * xRot) : (xRot * zRot * yRot);
             break;
-          case Type::TypeRotateZXY:
+          case TypeRotateZXY:
             rotationMat = !isInverseOp ? (zRot * xRot * yRot) : (yRot * xRot * zRot);
             break;
-          case Type::TypeRotateZYX:
+          case TypeRotateZYX:
             rotationMat = !isInverseOp ? (zRot * yRot * xRot) : (xRot * yRot * zRot);
             break;
           default:
@@ -597,7 +580,7 @@ GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
     }
   }
 
-  if (opType == Type::TypeOrient) {
+  if (opType == TypeOrient) {
     GfQuatd quatVal(0);
     if (opVal.IsHolding<GfQuatd>())
       quatVal = opVal.UncheckedGet<GfQuatd>();

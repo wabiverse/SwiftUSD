@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_GEOM_XFORM_OP_H
 #define PXR_USD_USD_GEOM_XFORM_OP_H
@@ -30,13 +13,12 @@
 #include "Usd/attributeQuery.h"
 #include "UsdGeom/api.h"
 #include "UsdGeom/tokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <string>
 #include <typeinfo>
+#include <variant>
 #include <vector>
-
-#include <boost/variant.hpp>
 
 #include "Tf/staticTokens.h"
 
@@ -99,7 +81,7 @@ TF_DECLARE_PUBLIC_TOKENS(UsdGeomXformOpTypes, USDGEOM_API, USDGEOM_XFORM_OP_TYPE
 class UsdGeomXformOp {
  public:
   /// Enumerates the set of all transformation operation types.
-  enum class Type {
+  enum Type {
     TypeInvalid,    ///< Represents an invalid xformOp.
     TypeTranslate,  ///< XYZ translation.
     TypeScale,      ///< XYZ scale.
@@ -123,7 +105,7 @@ class UsdGeomXformOp {
   };
 
   /// Precision with which the value of the tranformation operation is encoded.
-  enum class Precision {
+  enum Precision {
     PrecisionDouble,  ///< Double precision
     PrecisionFloat,   ///< Floating-point precision
     PrecisionHalf     ///< Half-float precision
@@ -304,7 +286,7 @@ class UsdGeomXformOp {
   /// op, and may become invalid in the face of further authoring.
   bool MightBeTimeVarying() const
   {
-    return boost::apply_visitor(_GetMightBeTimeVarying(), _attr);
+    return std::visit(_GetMightBeTimeVarying(), _attr);
   }
 
   // ---------------------------------------------------------------
@@ -322,7 +304,7 @@ class UsdGeomXformOp {
   /// Explicit UsdAttribute extractor
   UsdAttribute const &GetAttr() const
   {
-    return boost::apply_visitor(_GetAttr(), _attr);
+    return std::visit(_GetAttr(), _attr);
   }
 
   /// Return true if the wrapped UsdAttribute::IsDefined(), and in
@@ -393,7 +375,7 @@ class UsdGeomXformOp {
   ///
   template<typename T> bool Get(T *value, UsdTimeCode time = UsdTimeCode::Default()) const
   {
-    return boost::apply_visitor(_Get<T>(value, time), _attr);
+    return std::visit(_Get<T>(value, time), _attr);
   }
 
   /// Set the attribute value of the XformOp at \p time
@@ -421,20 +403,20 @@ class UsdGeomXformOp {
   /// is authored.
   bool GetTimeSamples(std::vector<double> *times) const
   {
-    return boost::apply_visitor(_GetTimeSamples(times), _attr);
+    return std::visit(_GetTimeSamples(times), _attr);
   }
 
   /// Populates the list of time samples within the given \p interval,
   /// at which the associated attribute is authored.
   bool GetTimeSamplesInInterval(const GfInterval &interval, std::vector<double> *times) const
   {
-    return boost::apply_visitor(_GetTimeSamplesInInterval(interval, times), _attr);
+    return std::visit(_GetTimeSamplesInInterval(interval, times), _attr);
   }
 
   /// Returns the number of time samples authored for this xformOp.
   size_t GetNumTimeSamples() const
   {
-    return boost::apply_visitor(_GetNumTimeSamples(), _attr);
+    return std::visit(_GetNumTimeSamples(), _attr);
   }
 
  private:
@@ -505,13 +487,13 @@ class UsdGeomXformOp {
   // Hence, access to the creation of an attribute query is restricted inside
   // a private member function named _CreateAttributeQuery().
   //
-  mutable boost::variant<UsdAttribute, UsdAttributeQuery> _attr;
+  mutable std::variant<UsdAttribute, UsdAttributeQuery> _attr;
 
   Type _opType;
   bool _isInverseOp;
 
   // Visitor for getting xformOp value.
-  template<class T> struct _Get : public boost::static_visitor<bool> {
+  template<class T> struct _Get {
     _Get(T *value_, UsdTimeCode time_ = UsdTimeCode::Default()) : value(value_), time(time_) {}
 
     bool operator()(const UsdAttribute &attr) const
@@ -529,7 +511,7 @@ class UsdGeomXformOp {
   };
 
   // Visitor for getting a const-reference to the UsdAttribute.
-  struct _GetAttr : public boost::static_visitor<const UsdAttribute &> {
+  struct _GetAttr {
 
     _GetAttr() {}
 
@@ -545,7 +527,7 @@ class UsdGeomXformOp {
   };
 
   // Visitor for getting all the time samples.
-  struct _GetTimeSamples : public boost::static_visitor<bool> {
+  struct _GetTimeSamples {
 
     _GetTimeSamples(std::vector<double> *times_) : times(times_) {}
 
@@ -563,7 +545,7 @@ class UsdGeomXformOp {
   };
 
   // Visitor for getting all the time samples within a given interval.
-  struct _GetTimeSamplesInInterval : public boost::static_visitor<bool> {
+  struct _GetTimeSamplesInInterval {
 
     _GetTimeSamplesInInterval(const GfInterval &interval_, std::vector<double> *times_)
         : interval(interval_), times(times_)
@@ -585,7 +567,7 @@ class UsdGeomXformOp {
   };
 
   // Visitor for getting the number of time samples.
-  struct _GetNumTimeSamples : public boost::static_visitor<size_t> {
+  struct _GetNumTimeSamples {
 
     _GetNumTimeSamples() {}
 
@@ -601,7 +583,7 @@ class UsdGeomXformOp {
   };
 
   // Visitor for determining whether the op might vary over time.
-  struct _GetMightBeTimeVarying : public boost::static_visitor<bool> {
+  struct _GetMightBeTimeVarying {
 
     _GetMightBeTimeVarying() {}
 

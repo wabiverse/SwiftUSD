@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/renderIndex.h"
 
@@ -32,6 +15,7 @@
 #include "Hd/enums.h"
 #include "Hd/extComputation.h"
 #include "Hd/instancer.h"
+#include "Hd/legacyGeomSubsetSceneIndex.h"
 #include "Hd/mesh.h"
 #include "Hd/perfLog.h"
 #include "Hd/points.h"
@@ -122,6 +106,8 @@ HdRenderIndex::HdRenderIndex(HdRenderDelegate *renderDelegate,
 
     _terminalSceneIndex = _mergingSceneIndex;
 
+    _terminalSceneIndex = HdLegacyGeomSubsetSceneIndex::New(_terminalSceneIndex);
+
     _terminalSceneIndex = HdSceneIndexAdapterSceneDelegate::AppendDefaultSceneFilters(
         _terminalSceneIndex, SdfPath::AbsoluteRootPath());
 
@@ -137,6 +123,8 @@ HdRenderIndex::HdRenderIndex(HdRenderDelegate *renderDelegate,
         _terminalSceneIndex, this, SdfPath::AbsoluteRootPath());
 
     _tracker._SetTargetSceneIndex(get_pointer(_emulationSceneIndex));
+
+    renderDelegate->SetTerminalSceneIndex(_terminalSceneIndex);
   }
 }
 
@@ -490,11 +478,16 @@ void HdRenderIndex::_Clear()
 
 void HdRenderIndex::_TrackDelegateTask(HdSceneDelegate *delegate,
                                        SdfPath const &taskId,
-                                       HdTaskSharedPtr const &task)
+                                       HdTaskCreateFnc taskCreateFnc)
 {
+  HD_TRACE_FUNCTION();
+  HF_MALLOC_TAG_FUNCTION();
+
   if (taskId == SdfPath()) {
     return;
   }
+
+  HdTaskSharedPtr task = taskCreateFnc(delegate, taskId);
   _tracker.TaskInserted(taskId, task->GetInitialDirtyBitsMask());
   _taskMap.emplace(taskId, _TaskInfo{delegate, task});
 }
@@ -762,7 +755,8 @@ void HdRenderIndex::_ConfigureReprs()
                                        HdCullStyleDontCare,
                                        HdMeshReprDescTokens->surfaceShader,
                                        /*flatShadingEnabled=*/false,
-                                       /*blendWireframeColor=*/true));
+                                       /*blendWireframeColor=*/true,
+                                       /*forceOpaqueEdges=*/false));
   HdMesh::ConfigureRepr(HdReprTokens->refined,
                         HdMeshReprDesc(HdMeshGeomStyleSurf,
                                        HdCullStyleDontCare,
@@ -780,7 +774,8 @@ void HdRenderIndex::_ConfigureReprs()
                                        HdCullStyleDontCare,
                                        HdMeshReprDescTokens->surfaceShader,
                                        /*flatShadingEnabled=*/false,
-                                       /*blendWireframeColor=*/true));
+                                       /*blendWireframeColor=*/true,
+                                       /*forceOpaqueEdges=*/false));
   HdMesh::ConfigureRepr(HdReprTokens->points,
                         HdMeshReprDesc(HdMeshGeomStylePoints,
                                        HdCullStyleNothing,
@@ -1244,11 +1239,24 @@ void HdRenderIndex::SyncAll(HdTaskSharedPtrVector *tasks, HdTaskContext *taskCon
 {
   HD_TRACE_FUNCTION();
 
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  // Render delegates driving prim updates from the scene index will expect
+  // an Update call; run this before legacy Hydra prim sync.
+  //
+
+  if (_IsEnabledSceneIndexEmulation()) {
+    _renderDelegate->Update();
+  }
+
+  //
+  ////////////////////////////////////////////////////////////////////////////
+
   HdRenderParam *renderParam = _renderDelegate->GetRenderParam();
 
-  _bprimIndex.SyncPrims(_tracker, _renderDelegate->GetRenderParam());
+  _bprimIndex.SyncPrims(_tracker, _renderDelegate->GetRenderParam(), _renderDelegate);
 
-  _sprimIndex.SyncPrims(_tracker, _renderDelegate->GetRenderParam());
+  _sprimIndex.SyncPrims(_tracker, _renderDelegate->GetRenderParam(), _renderDelegate);
 
   ////////////////////////////////////////////////////////////////////////////
   //

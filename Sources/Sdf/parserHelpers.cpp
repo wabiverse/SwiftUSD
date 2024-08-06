@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Sdf/parserHelpers.h"
@@ -49,7 +32,7 @@
 #include "Tf/stringUtils.h"
 #include "Vt/array.h"
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <algorithm>
 #include <map>
@@ -65,7 +48,7 @@ using std::vector;
 #define CHECK_BOUNDS(count, name) \
   if (index + count > vars.size()) { \
     TF_CODING_ERROR("Not enough values to parse value of type %s", name); \
-    throw boost::bad_get(); \
+    throw std::bad_variant_access(); \
   }
 
 inline void MakeScalarValueImpl(string *out, vector<Value> const &vars, size_t &index)
@@ -294,10 +277,16 @@ inline void MakeScalarValueImpl(SdfAssetPath *out, vector<Value> const &vars, si
   *out = vars[index++].Get<SdfAssetPath>();
 }
 
+inline void MakeScalarValueImpl(SdfPathExpression *out, vector<Value> const &vars, size_t &index)
+{
+  CHECK_BOUNDS(1, "pathExpression");
+  *out = SdfPathExpression(vars[index++].Get<std::string>());
+}
+
 inline void MakeScalarValueImpl(SdfOpaqueValue *out, vector<Value> const &vars, size_t &index)
 {
   TF_CODING_ERROR("Found authored opinion for opaque attribute");
-  throw boost::bad_get();
+  throw std::bad_variant_access();
 }
 
 template<typename T>
@@ -311,7 +300,7 @@ inline VtValue MakeScalarValueTemplate(vector<unsigned int> const &,
   try {
     MakeScalarValueImpl(&t, vars, index);
   }
-  catch (const boost::bad_get &) {
+  catch (const std::bad_variant_access &) {
     *errStrPtr = TfStringPrintf(
         "Failed to parse value (at sub-part %zd "
         "if there are multiple parts)",
@@ -344,7 +333,7 @@ inline VtValue MakeShapedValueTemplate(vector<unsigned int> const &shape,
       shapeIndex++;
     }
   }
-  catch (const boost::bad_get &) {
+  catch (const std::bad_variant_access &) {
     *errStrPtr = TfStringPrintf(
         "Failed to parse at element %zd "
         "(at sub-part %zd if there are "
@@ -415,6 +404,7 @@ TF_MAKE_STATIC_DATA(_ValueFactoryMap, _valueFactories)
   builder.add<SdfAssetPath>(SdfValueTypeNames->Asset);
   builder.add<SdfOpaqueValue>(SdfValueTypeNames->Opaque);
   builder.add<SdfOpaqueValue>(SdfValueTypeNames->Group);
+  builder.add<SdfPathExpression>(SdfValueTypeNames->PathExpression);
 
   builder.add<GfVec2i>(SdfValueTypeNames->Int2);
   builder.add<GfVec2h>(SdfValueTypeNames->Half2);
@@ -595,7 +585,7 @@ std::string Sdf_EvalQuotedString(const char *x,
   }
 
   if (numLines) {
-    *numLines = static_cast<unsigned int>(std::count(ret.begin(), ret.end(), '\n'));
+    *numLines = std::count(ret.begin(), ret.end(), '\n');
   }
 
   return ret;

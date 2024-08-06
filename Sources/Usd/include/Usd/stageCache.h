@@ -1,38 +1,17 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_STAGE_CACHE_H
 #define PXR_USD_USD_STAGE_CACHE_H
 
-#include <pxr/pxrns.h>
-
-#include "Arch/swiftInterop.h"
-#include "Tf/declarePtrs.h"
-
 #include "Sdf/declareHandles.h"
+#include "Tf/declarePtrs.h"
+#include "Tf/stringUtils.h"
 #include "Usd/api.h"
-
-#include <boost/lexical_cast.hpp>
+#include "pxr/pxrns.h"
 
 #include <memory>
 #include <mutex>
@@ -112,7 +91,12 @@ class UsdStageCache {
     /// been obtained by calling ToString() previously.
     static Id FromString(const std::string &s)
     {
-      return FromLongInt(boost::lexical_cast<long int>(s));
+      bool overflow = false;
+      const long int result = TfStringToLong(s, &overflow);
+      if (overflow) {
+        TF_CODING_ERROR("'%s' overflowed during conversion to int64_t.", s.c_str());
+      }
+      return FromLongInt(result);
     }
 
     /// Convert this Id to an integral representation.
@@ -124,7 +108,7 @@ class UsdStageCache {
     /// Convert this Id to a string representation.
     std::string ToString() const
     {
-      return boost::lexical_cast<std::string>(ToLongInt());
+      return TfStringify(ToLongInt());
     }
 
     /// Return true if this Id is valid.
@@ -397,7 +381,7 @@ class UsdStageCache {
   typedef struct Usd_StageCacheImpl _Impl;
   std::unique_ptr<_Impl> _impl;
   mutable std::mutex _mutex;
-} SWIFT_CONFORMS_TO_PROTOCOL(Swift.Sendable);
+};
 
 class UsdStageCacheRequest {
  public:

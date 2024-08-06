@@ -1,38 +1,20 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
-#include "Arch/pxrinttypes.h"
-#include "Arch/pxrmath.h"
+#include "Arch/inttypes.h"
+#include "Arch/math.h"
 #include "Arch/vsnprintf.h"
-
-#include "Tf/api.h"
 #include "Tf/diagnostic.h"
 #include "Tf/pathUtils.h"
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
+#include "Tf/tf.h"
 #include "Tf/token.h"
 
 #include <algorithm>
@@ -47,8 +29,8 @@
 #include <utility>
 #include <vector>
 
-#include "Tf/pxrDoubleConversion/double-conversion.h"
-#include "Tf/pxrDoubleConversion/utils.h"
+#include "pxrDoubleConversion/double-conversion.h"
+#include "pxrDoubleConversion/utils.h"
 
 #if defined(ARCH_OS_WINDOWS)
 #  include <Shlwapi.h>
@@ -794,7 +776,7 @@ bool TfDictionaryLessThan::_LessImpl(const string &lstr, const string &rstr) con
     return false;
   }
 
-  char l, r;
+  unsigned char l, r;
 
   while (true) {
     if (lcur == curEnd) {
@@ -803,7 +785,11 @@ bool TfDictionaryLessThan::_LessImpl(const string &lstr, const string &rstr) con
     }
     l = *lcur, r = *rcur;
     // If they are letters that differ disregarding case, we're done.
-    if (((l & ~0x20) != (r & ~0x20)) & bool(l & r & ~0x3f)) {
+    // but only if they are ASCII (i.e., the high bit is not set)
+    const bool bothAscii = l < 0x80 && r < 0x80;
+    const bool differsIgnoringCase = (l & ~0x20) != (r & ~0x20);
+    const bool inLetterZone = (l >= 0x40) && (r >= 0x40);
+    if (bothAscii && differsIgnoringCase && inLetterZone) {
       // Add 5 mod 32 makes '_' sort before all letters.
       return ((l + 5) & 31) < ((r + 5) & 31);
     }
@@ -1185,6 +1171,16 @@ std::string TfGetXmlEscapedString(const std::string &in)
   result = TfStringReplace(result, "'", "&apos;");
 
   return result;
+}
+
+std::string TfStringToLowerAscii(const std::string &source)
+{
+  std::string folded;
+  folded.resize(source.size());
+  std::transform(source.begin(), source.end(), folded.begin(), [](char ch) {
+    return ('A' <= ch && ch <= 'Z') ? ch - 'A' + 'a' : ch;
+  });
+  return folded;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

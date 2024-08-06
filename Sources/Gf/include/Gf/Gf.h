@@ -94,4 +94,11 @@
 #include <Gf/vec4h.h>
 #include <Gf/vec4i.h>
 
+#include <Gf/color.h>
+#include <Gf/colorSpace.h>
+#include <Gf/colorSpace_data.h>
+#include <Gf/ilmbase_eLut.h>
+#include <Gf/ilmbase_toFloat.h>
+#include <Gf/nanocolor.h>
+#include <Gf/numericCast.h>
 #endif  // __PXR_BASE_GF_H__

@@ -1,28 +1,11 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/type.h"
 
@@ -51,13 +34,12 @@
 #  include <locale>
 #endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-#include <boost/optional.hpp>
-
 #include <algorithm>
 #include <atomic>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <thread>
@@ -123,9 +105,9 @@ struct TfType::_TypeInfo {
   std::unique_ptr<TfType::FactoryBase> factory;
 
   // Map of derived type aliases to derived types.
-  boost::optional<NameToTypeMap> aliasToDerivedTypeMap;
+  std::optional<NameToTypeMap> aliasToDerivedTypeMap;
   // Reverse map of derived types to their aliases.
-  boost::optional<TypeToNamesMap> derivedTypeToAliasesMap;
+  std::optional<TypeToNamesMap> derivedTypeToAliasesMap;
 
   // Map of functions for converting to other types.
   // This map is keyed by type_info and not TfType because the TfTypes
@@ -1158,19 +1140,28 @@ string TfType::GetCanonicalTypeName(const std::type_info &t)
   TfAutoMallocTag2 tag("Tf", "TfType::GetCanonicalTypeName");
 
   using LookupMap = TfHashMap<std::type_index, std::string, std::hash<std::type_index>>;
-  static LookupMap lookupMap;
+
+  // XXX: Ugly hack alert.
+  //
+  // There has been one program that has been occasionally crashing when
+  // invoking the destructor of a static LookupMap. We've been unable to find
+  // the source of the crash but since the destructor was only run at program
+  // exit and failing to run it is harmless, we've chosen to avoid the
+  // destructor entirely and allow the cache of canonical type names to be a
+  // memory leak instead.
+  static LookupMap *const lookupMap = new LookupMap;
 
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
 
   const std::type_index typeIndex(t);
-  const LookupMap &map = lookupMap;
+  const LookupMap &map = *lookupMap;
   const LookupMap::const_iterator iter = map.find(typeIndex);
-  if (iter != lookupMap.end()) {
+  if (iter != map.end()) {
     return iter->second;
   }
 
   regLock.UpgradeToWriter();
-  return lookupMap.insert({typeIndex, ArchGetDemangled(t)}).first->second;
+  return lookupMap->insert({typeIndex, ArchGetDemangled(t)}).first->second;
 }
 
 void TfType::AddAlias(TfType base, const string &name) const
@@ -1202,6 +1193,47 @@ size_t TfType::GetSizeof() const
 {
   ScopedLock regLock(GetRegistryMutex(), /*write=*/false);
   return _info->sizeofType;
+}
+
+TfType const &TfType::_DeclareImpl(const std::type_info &thisTypeInfo,
+                                   const std::type_info **baseTypeInfos,
+                                   size_t numBaseTypes)
+{
+  TfAutoMallocTag2 tag2("Tf", "TfType::Declare");
+
+  // Declare base types.
+  std::vector<TfType> baseTfTypes;
+  baseTfTypes.reserve(numBaseTypes);
+  for (size_t i = 0; i != numBaseTypes; ++i) {
+    baseTfTypes.push_back(Declare(GetCanonicalTypeName(*baseTypeInfos[i])));
+  }
+
+  // Declare this type.
+  return Declare(GetCanonicalTypeName(thisTypeInfo), baseTfTypes);
+}
+
+TfType const &TfType::_DefineImpl(const std::type_info &thisTypeInfo,
+                                  const std::type_info **baseTypeInfos,
+                                  _CastFunction *castFunctions,
+                                  size_t numBaseTypes,
+                                  size_t sizeofThisType,
+                                  bool isPod,
+                                  bool isEnum)
+{
+  TfAutoMallocTag2 tag2("Tf", "TfType::Define");
+
+  // Declare this type.
+  TfType const &newType = _DeclareImpl(thisTypeInfo, baseTypeInfos, numBaseTypes);
+
+  // Record traits information about T.
+  newType._DefineCppType(thisTypeInfo, sizeofThisType, isPod, isEnum);
+
+  // Register casts.
+  for (size_t i = 0; i != numBaseTypes; ++i) {
+    newType._AddCppCastFunc(*baseTypeInfos[i], castFunctions[i]);
+  }
+
+  return newType;
 }
 
 TF_REGISTRY_FUNCTION(TfType)

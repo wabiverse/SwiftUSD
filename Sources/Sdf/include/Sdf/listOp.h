@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_LIST_OP_H
 #define PXR_USD_SDF_LIST_OP_H
@@ -27,14 +10,13 @@
 #include "Sdf/api.h"
 #include "Tf/hash.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
-
-#include <boost/optional/optional_fwd.hpp>
+#include "pxr/pxrns.h"
 
 #include <functional>
 #include <iosfwd>
 #include <list>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -181,7 +163,7 @@ template<typename T> class SdfListOp {
   SDF_API void ClearAndMakeExplicit();
 
   /// Callback type for ApplyOperations.
-  typedef std::function<boost::optional<ItemType>(SdfListOpType, const ItemType &)> ApplyCallback;
+  typedef std::function<std::optional<ItemType>(SdfListOpType, const ItemType &)> ApplyCallback;
 
   /// Applies edit operations to the given ItemVector.
   /// If supplied, \p cb will be called on each item in the operation vectors
@@ -202,10 +184,10 @@ template<typename T> class SdfListOp {
   /// the explicit, prepended, appended, and deleted portions of
   /// SdfListOp are closed under composition with ApplyOperations().
   SDF_API
-  boost::optional<SdfListOp<T>> ApplyOperations(const SdfListOp<T> &inner) const;
+  std::optional<SdfListOp<T>> ApplyOperations(const SdfListOp<T> &inner) const;
 
   /// Callback type for ModifyOperations.
-  typedef std::function<boost::optional<ItemType>(const ItemType &)> ModifyCallback;
+  typedef std::function<std::optional<ItemType>(const ItemType &)> ModifyCallback;
 
   /// Modifies operations specified in this object.
   /// \p callback is called for every item in all operation vectors.  If the
@@ -302,8 +284,8 @@ template<class T> void swap(SdfListOp<T> &x, SdfListOp<T> &y)
   x.Swap(y);
 }
 
-// Helper function for applying an ordering operation described by \p
-// orderVector to vector \p v.
+// Helper function for applying an ordering operation described by \p orderVector
+// to vector \p v.
 template<class ItemType>
 SDF_API void SdfApplyListOrdering(std::vector<ItemType> *v, const std::vector<ItemType> &order);
 

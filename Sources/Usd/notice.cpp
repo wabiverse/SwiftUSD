@@ -1,30 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Usd/notice.h"
 #include "Tf/stl.h"
 #include "Usd/stage.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -44,18 +27,18 @@ TF_REGISTRY_FUNCTION(TfType)
 
 UsdNotice::StageNotice::StageNotice(const UsdStageWeakPtr &stage) : _stage(stage) {}
 
-UsdNotice::StageNotice::~StageNotice() {}
+UsdNotice::StageNotice::~StageNotice() = default;
 
-UsdNotice::StageContentsChanged::~StageContentsChanged() {}
+UsdNotice::StageContentsChanged::~StageContentsChanged() = default;
 
-UsdNotice::StageEditTargetChanged::~StageEditTargetChanged() {}
+UsdNotice::StageEditTargetChanged::~StageEditTargetChanged() = default;
 
-UsdNotice::LayerMutingChanged::~LayerMutingChanged() {}
+UsdNotice::LayerMutingChanged::~LayerMutingChanged() = default;
 
 TfTokenVector UsdNotice::ObjectsChanged::PathRange::const_iterator::GetChangedFields() const
 {
   TfTokenVector fields;
-  for (const SdfChangeList::Entry *entry : base()->second) {
+  for (const SdfChangeList::Entry *entry : _underlyingIterator->second) {
     fields.reserve(fields.size() + entry->infoChanged.size());
     std::transform(entry->infoChanged.begin(),
                    entry->infoChanged.end(),
@@ -70,7 +53,7 @@ TfTokenVector UsdNotice::ObjectsChanged::PathRange::const_iterator::GetChangedFi
 
 bool UsdNotice::ObjectsChanged::PathRange::const_iterator::HasChangedFields() const
 {
-  for (const SdfChangeList::Entry *entry : base()->second) {
+  for (const SdfChangeList::Entry *entry : _underlyingIterator->second) {
     if (!entry->infoChanged.empty()) {
       return true;
     }
@@ -78,7 +61,20 @@ bool UsdNotice::ObjectsChanged::PathRange::const_iterator::HasChangedFields() co
   return false;
 }
 
-UsdNotice::ObjectsChanged::~ObjectsChanged() {}
+const UsdNotice::ObjectsChanged::_PathsToChangesMap &UsdNotice::ObjectsChanged::
+    _GetEmptyChangesMap()
+{
+  static const _PathsToChangesMap empty;
+  return empty;
+}
+
+UsdNotice::ObjectsChanged::ObjectsChanged(const UsdStageWeakPtr &stage,
+                                          const _PathsToChangesMap *resyncChanges)
+    : ObjectsChanged(stage, resyncChanges, &_GetEmptyChangesMap(), &_GetEmptyChangesMap())
+{
+}
+
+UsdNotice::ObjectsChanged::~ObjectsChanged() = default;
 
 bool UsdNotice::ObjectsChanged::ResyncedObject(const UsdObject &obj) const
 {
@@ -89,9 +85,14 @@ bool UsdNotice::ObjectsChanged::ResyncedObject(const UsdObject &obj) const
 
 bool UsdNotice::ObjectsChanged::ChangedInfoOnly(const UsdObject &obj) const
 {
+  return _infoChanges->find(obj.GetPath()) != _infoChanges->end();
+}
+
+bool UsdNotice::ObjectsChanged::ResolvedAssetPathsResynced(const UsdObject &obj) const
+{
   // XXX: We don't need the longest prefix here, we just need to know if
   // a prefix exists in the map.
-  return SdfPathFindLongestPrefix(*_infoChanges, obj.GetPath()) != _infoChanges->end();
+  return SdfPathFindLongestPrefix(*_assetPathChanges, obj.GetPath()) != _assetPathChanges->end();
 }
 
 UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::GetResyncedPaths() const
@@ -102,6 +103,12 @@ UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::GetResyncedPaths
 UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::GetChangedInfoOnlyPaths() const
 {
   return PathRange(_infoChanges);
+}
+
+UsdNotice::ObjectsChanged::PathRange UsdNotice::ObjectsChanged::
+    GetResolvedAssetPathsResyncedPaths() const
+{
+  return PathRange(_assetPathChanges);
 }
 
 TfTokenVector UsdNotice::ObjectsChanged::GetChangedFields(const UsdObject &obj) const

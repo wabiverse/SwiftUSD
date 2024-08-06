@@ -1,30 +1,13 @@
 //
 // Copyright 2022 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_VT_VISIT_VALUE_H
 #define PXR_BASE_VT_VISIT_VALUE_H
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Vt/value.h"
 
@@ -106,11 +89,11 @@ template<class Visitor> auto VtVisitValue(VtValue const &value, Visitor &&visito
   switch (value.GetKnownValueTypeIndex()) {
 
 // Cases for known types.
-#define VT_CASE_FOR_TYPE_INDEX(r, unused, i, elem) \
-  case i: \
+#define VT_CASE_FOR_TYPE_INDEX(unused, elem) \
+  case VtGetKnownValueTypeIndex<VT_TYPE(elem)>(): \
     return Vt_ValueVisitDetail::Visit<VT_TYPE(elem)>(value, std::forward<Visitor>(visitor), 0); \
     break;
-    BOOST_PP_SEQ_FOR_EACH_I(VT_CASE_FOR_TYPE_INDEX, ~, VT_VALUE_TYPES)
+    TF_PP_SEQ_FOR_EACH(VT_CASE_FOR_TYPE_INDEX, ~, VT_VALUE_TYPES)
 #undef VT_CASE_FOR_TYPE_INDEX
 
     default:

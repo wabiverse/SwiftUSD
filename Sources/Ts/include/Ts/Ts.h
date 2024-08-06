@@ -1,0 +1,30 @@
+#ifndef __PXR_BASE_TS_H__
+#define __PXR_BASE_TS_H__
+
+// Ts
+#include <Ts/api.h>
+#include <Ts/data.h>
+#include <Ts/diff.h>
+#include <Ts/evalCache.h>
+#include <Ts/evalUtils.h>
+#include <Ts/evaluator.h>
+#include <Ts/keyFrame.h>
+#include <Ts/keyFrameMap.h>
+#include <Ts/keyFrameUtils.h>
+#include <Ts/loopParams.h>
+#include <Ts/mathUtils.h>
+#include <Ts/simplify.h>
+#include <Ts/spline.h>
+#include <Ts/spline_KeyFrames.h>
+#include <Ts/tsTest_AnimXEvaluator.h>
+#include <Ts/tsTest_Evaluator.h>
+#include <Ts/tsTest_Museum.h>
+#include <Ts/tsTest_SampleBezier.h>
+#include <Ts/tsTest_SampleTimes.h>
+#include <Ts/tsTest_SplineData.h>
+#include <Ts/tsTest_TsEvaluator.h>
+#include <Ts/tsTest_Types.h>
+#include <Ts/typeRegistry.h>
+#include <Ts/types.h>
+#include <Ts/wrapUtils.h>
+#endif  // __PXR_BASE_TS_H__

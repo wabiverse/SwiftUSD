@@ -1,45 +1,26 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_LIST_PROXY_H
 #define PXR_USD_SDF_LIST_PROXY_H
 
 /// \file sdf/listProxy.h
 
-#include <pxr/pxrns.h>
-
 #include "Sdf/allowed.h"
 #include "Sdf/listEditor.h"
 #include "Sdf/listOp.h"
 #include "Sdf/path.h"
+#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
 #include "Tf/errorMark.h"
 #include "Tf/iterator.h"
 
-#include <boost/optional.hpp>
-
 #include <memory>
+#include <optional>
 #include <type_traits>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -58,6 +39,10 @@ template<class _TypePolicy> class SdfListProxy {
   typedef SdfListProxy<TypePolicy> This;
   typedef typename TypePolicy::value_type value_type;
   typedef std::vector<value_type> value_vector_type;
+
+  /// Returned from \ref Find when a value could not be located in the
+  /// list of operations.
+  static const size_t invalidIndex = -1;
 
  private:
   // Proxies an item in a list editor list.
@@ -165,8 +150,8 @@ template<class _TypePolicy> class SdfListProxy {
    public:
     using This = _Iterator<Owner, GetItem>;
     using iterator_category = std::random_access_iterator_tag;
+    using value_type = std::remove_cv_t<std::remove_reference_t<typename GetItem::result_type>>;
     using reference = typename GetItem::result_type;
-    using value_type = std::remove_cv_t<std::remove_reference_t<reference>>;
     using pointer = _PtrProxy;
     using difference_type = std::ptrdiff_t;
 
@@ -669,9 +654,11 @@ template<class _TypePolicy> class SdfListProxy {
     return (_Validate() ? _listEditor->Count(_op, value) : 0);
   }
 
+  /// Returns the index of \p value in the list of operations.  If \p value
+  /// is not found, then \ref invalidIndex is returned instead.
   size_t Find(const value_type &value) const
   {
-    return (_Validate() ? _listEditor->Find(_op, value) : size_t(-1));
+    return (_Validate() ? _listEditor->Find(_op, value) : invalidIndex);
   }
 
   void Insert(int index, const value_type &value)
@@ -685,7 +672,7 @@ template<class _TypePolicy> class SdfListProxy {
   void Remove(const value_type &value)
   {
     size_t index = Find(value);
-    if (index != size_t(-1)) {
+    if (index != invalidIndex) {
       Erase(index);
     }
     else {
@@ -732,10 +719,10 @@ template<class _TypePolicy> class SdfListProxy {
   /// Modify all edits in this list.
   ///
   /// \p callback must be a callable that accepts an argument of type
-  /// value_type and returns a boost::optional<value_type>.
+  /// value_type and returns a std::optional<value_type>.
   ///
   /// \p callback is called with every item in the list. If an invalid
-  /// boost::optional is returned, the item is removed. Otherwise it's
+  /// std::optional is returned, the item is removed. Otherwise it's
   /// replaced with the returned item. If a returned item matches an
   /// item that was previously returned, the returned item will be
   /// removed.

@@ -1,30 +1,13 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HD_SCENE_INDEX_OBSERVER_H
 #define PXR_IMAGING_HD_SCENE_INDEX_OBSERVER_H
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/declarePtrs.h"
 
@@ -73,7 +56,7 @@ class HdSceneIndexObserver : public TfWeakBase {
   struct RemovedPrimEntry {
     SdfPath primPath;
 
-    RemovedPrimEntry(const SdfPath &primPath = SdfPath()) : primPath(primPath) {}
+    RemovedPrimEntry(const SdfPath &primPath) : primPath(primPath) {}
   };
 
   using RemovedPrimEntries = TfSmallVector<RemovedPrimEntry, 16>;
@@ -89,8 +72,7 @@ class HdSceneIndexObserver : public TfWeakBase {
     SdfPath primPath;
     HdDataSourceLocatorSet dirtyLocators;
 
-    DirtiedPrimEntry(const SdfPath &primPath = SdfPath(),
-                     const HdDataSourceLocatorSet &dirtyLocators = HdDataSourceLocatorSet())
+    DirtiedPrimEntry(const SdfPath &primPath, const HdDataSourceLocatorSet &dirtyLocators)
         : primPath(primPath), dirtyLocators(dirtyLocators)
     {
     }
@@ -105,8 +87,7 @@ class HdSceneIndexObserver : public TfWeakBase {
   struct RenamedPrimEntry {
     SdfPath oldPrimPath;
     SdfPath newPrimPath;
-    RenamedPrimEntry(const SdfPath &oldPrimPath = SdfPath(),
-                     const SdfPath &newPrimPath = SdfPath())
+    RenamedPrimEntry(const SdfPath &oldPrimPath, const SdfPath &newPrimPath)
         : oldPrimPath(oldPrimPath), newPrimPath(newPrimPath)
     {
     }

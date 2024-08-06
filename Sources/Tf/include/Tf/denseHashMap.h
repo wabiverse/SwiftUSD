@@ -1,39 +1,20 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_BASE_TF_DENSE_HASH_MAP_H
 #define PXR_BASE_TF_DENSE_HASH_MAP_H
 
-/// \file Tf/denseHashMap.h
+/// \file tf/denseHashMap.h
 
 #include "Arch/attributes.h"
 #include "Tf/hashmap.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <memory>
 #include <vector>
-
-#include <boost/iterator/iterator_facade.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -54,13 +35,7 @@ template<class Key,
          class EqualKey = std::equal_to<Key>,
          unsigned Threshold = 128>
 
-class ARCH_EMPTY_BASES TfDenseHashMap :
-    // Since sizeof(EqualKey) == 0 and sizeof(HashFn) == 0 in many cases
-    // we use the empty base optimization to not pay a size penalty.
-    // In C++20, explore using [[no_unique_address]] as an alternative
-    // way to get this optimization.
-    private HashFn,
-    private EqualKey {
+class TfDenseHashMap {
  public:
   typedef std::pair<const Key, Data> value_type;
   typedef Key key_type;
@@ -138,17 +113,19 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
   //
   // Clearly not a good thing.
   //
-  // Therefore we use boost::iterator_facade to create an iterator that uses
-  // the map's value_type as externally visible type.
+  // Therefore we create an iterator that uses the map's value_type as
+  // externally visible type.
   //
-  template<class ElementType, class UnderlyingIterator>
-  class _IteratorBase
-      : public boost::iterator_facade<_IteratorBase<ElementType, UnderlyingIterator>,
-                                      ElementType,
-                                      boost::bidirectional_traversal_tag> {
+  template<class ElementType, class UnderlyingIterator> class _IteratorBase {
    public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = ElementType;
+    using reference = ElementType &;
+    using pointer = ElementType *;
+    using difference_type = typename UnderlyingIterator::difference_type;
+
     // Empty ctor.
-    _IteratorBase() {}
+    _IteratorBase() = default;
 
     // Allow conversion of an iterator to a const_iterator.
     template<class OtherIteratorType>
@@ -156,9 +133,53 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
     {
     }
 
+    reference operator*() const
+    {
+      return dereference();
+    }
+    pointer operator->() const
+    {
+      return &(dereference());
+    }
+
+    _IteratorBase &operator++()
+    {
+      increment();
+      return *this;
+    }
+
+    _IteratorBase &operator--()
+    {
+      decrement();
+      return *this;
+    }
+
+    _IteratorBase operator++(int)
+    {
+      _IteratorBase result(*this);
+      increment();
+      return result;
+    }
+
+    _IteratorBase operator--(int)
+    {
+      _IteratorBase result(*this);
+      decrement();
+      return result;
+    }
+
+    template<class OtherIteratorType> bool operator==(const OtherIteratorType &other) const
+    {
+      return equal(other);
+    }
+
+    template<class OtherIteratorType> bool operator!=(const OtherIteratorType &other) const
+    {
+      return !equal(other);
+    }
+
    private:
     friend class TfDenseHashMap;
-    friend class boost::iterator_core_access;
 
     // Ctor from an underlying iterator.
     _IteratorBase(const UnderlyingIterator &iter) : _iter(iter) {}
@@ -213,8 +234,9 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
   /// Ctor.
   ///
   explicit TfDenseHashMap(const HashFn &hashFn = HashFn(), const EqualKey &equalKey = EqualKey())
-      : HashFn(hashFn), EqualKey(equalKey)
   {
+    _hash() = hashFn;
+    _equ() = equalKey;
   }
 
   /// Construct with range.
@@ -233,14 +255,12 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
 
   /// Copy Ctor.
   ///
-  TfDenseHashMap(const TfDenseHashMap &rhs)
-      : HashFn(rhs),
-        EqualKey(rhs),
-        _vector(rhs._vector),
-        _h(rhs._h ? std::make_unique<_HashMap>(*rhs._h) : nullptr)
+  TfDenseHashMap(const TfDenseHashMap &rhs) : _storage(rhs._storage)
   {
+    if (rhs._h) {
+      _h = std::make_unique<_HashMap>(*rhs._h);
+    }
   }
-
   /// Move Ctor.
   ///
   TfDenseHashMap(TfDenseHashMap &&rhs) = default;
@@ -308,10 +328,7 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
   ///
   void swap(TfDenseHashMap &rhs)
   {
-    using std::swap;
-    swap(_hash(), rhs._hash());
-    swap(_equ(), rhs._equ());
-    _vector.swap(rhs._vector);
+    _storage.swap(rhs._storage);
     _h.swap(rhs._h);
   }
 
@@ -566,37 +583,37 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
   // Helper to access the storage vector.
   _Vector &_vec()
   {
-    return _vector;
+    return _storage.vector;
   }
 
   // Helper to access the hash functor.
   HashFn &_hash()
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the equality functor.
   EqualKey &_equ()
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the storage vector.
   const _Vector &_vec() const
   {
-    return _vector;
+    return _storage.vector;
   }
 
   // Helper to access the hash functor.
   const HashFn &_hash() const
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to access the equality functor.
   const EqualKey &_equ() const
   {
-    return *this;
+    return _storage;
   }
 
   // Helper to linear-search the vector for a key.
@@ -644,8 +661,30 @@ class ARCH_EMPTY_BASES TfDenseHashMap :
     }
   }
 
-  // Vector holding all elements
-  _Vector _vector;
+  // Since sizeof(EqualKey) == 0 and sizeof(HashFn) == 0 in many cases
+  // we use the empty base optimization to not pay a size penalty.
+  // In C++20, explore using [[no_unique_address]] as an alternative
+  // way to get this optimization.
+  struct ARCH_EMPTY_BASES _CompressedStorage : private EqualKey, private HashFn {
+    static_assert(!std::is_same<EqualKey, HashFn>::value,
+                  "EqualKey and HashFn must be distinct types.");
+    _CompressedStorage() = default;
+    _CompressedStorage(const EqualKey &equalKey, const HashFn &hashFn)
+        : EqualKey(equalKey), HashFn(hashFn)
+    {
+    }
+
+    void swap(_CompressedStorage &other)
+    {
+      using std::swap;
+      vector.swap(other.vector);
+      swap(static_cast<EqualKey &>(*this), static_cast<EqualKey &>(other));
+      swap(static_cast<HashFn &>(*this), static_cast<HashFn &>(other));
+    }
+    _Vector vector;
+    friend class TfDenseHashMap;
+  };
+  _CompressedStorage _storage;
 
   // Optional hash map that maps from keys to vector indices.
   std::unique_ptr<_HashMap> _h;

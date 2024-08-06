@@ -1,25 +1,8 @@
 //
 // Copyright 2021 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Hd/flatteningSceneIndex.h"
 #include "Hd/flattenedDataSourceProvider.h"
@@ -175,16 +158,27 @@ HdDataSourceBaseHandle _PrimLevelWrappingDataSource::Get(const TfToken &name)
     }
     const HdFlattenedDataSourceProvider::Context ctx(
         _flatteningSceneIndex, _primPath, name, _inputDataSource);
-    if (HdDataSourceBaseHandle const flattenedDs = providers[i]->GetFlattenedDataSource(ctx)) {
-      HdDataSourceBase::AtomicStore(dsAtomicHandle, flattenedDs);
-      return flattenedDs;
+    HdDataSourceBaseHandle flattenedDs = providers[i]->GetFlattenedDataSource(ctx);
+    if (!flattenedDs) {
+      // A nullptr means cache miss. To distinguish a cache miss from
+      // the flattened data source being null, we store a bool
+      // data source.
+      flattenedDs = HdRetainedTypedSampledDataSource<bool>::New(false);
     }
-    // A nullptr means cache miss. To distinguish a cache miss from
-    // the flattened data source being null, we store a bool
-    // data source.
-    HdDataSourceBase::AtomicStore(dsAtomicHandle,
-                                  HdRetainedTypedSampledDataSource<bool>::New(false));
-    return nullptr;
+
+    HdDataSourceBaseAtomicHandle existingDs;
+    // Make sure that we only set the flattened data source only once.
+    // Flattened data source can cache state and need to be invalidated.
+    //
+    // It would be bad if we return different flattened data sources
+    // on different calls and only invalidate the last one that was
+    // returned.
+    if (HdDataSourceBase::AtomicCompareExchange(dsAtomicHandle, existingDs, flattenedDs)) {
+      return HdContainerDataSource::Cast(flattenedDs);
+    }
+    else {
+      return HdContainerDataSource::Cast(existingDs);
+    }
   }
 
   if (_inputDataSource) {

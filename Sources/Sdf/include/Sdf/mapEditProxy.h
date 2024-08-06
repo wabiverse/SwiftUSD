@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_MAP_EDIT_PROXY_H
 #define PXR_USD_SDF_MAP_EDIT_PROXY_H
@@ -31,14 +14,12 @@
 #include "Sdf/declareHandles.h"
 #include "Sdf/mapEditor.h"
 #include "Sdf/spec.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/diagnostic.h"
+#include "Tf/iterator.h"
 #include "Tf/mallocTag.h"
 #include "Vt/value.h"  // for Vt_DefaultValueFactory
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/iterator/reverse_iterator.hpp>
-#include <boost/operators.hpp>
 #include <iterator>
 #include <utility>
 
@@ -113,7 +94,7 @@ template<class T> class SdfIdentityMapEditProxyValuePolicy {
 /// \sa SdfIdentityMapEditProxyValuePolicy
 ///
 template<class T, class _ValuePolicy = SdfIdentityMapEditProxyValuePolicy<T>>
-class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>, T> {
+class SdfMapEditProxy {
  public:
   typedef T Type;
   typedef _ValuePolicy ValuePolicy;
@@ -227,12 +208,29 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
     }
   };
 
-  template<class Owner, class I, class R>
-  class _Iterator
-      : public boost::
-            iterator_facade<_Iterator<Owner, I, R>, R, std::bidirectional_iterator_tag, R> {
+  template<class Owner, class I, class R> class _Iterator {
+    class _PtrProxy {
+     public:
+      std::add_pointer_t<R> operator->()
+      {
+        return std::addressof(_result);
+      }
+
+     private:
+      friend class _Iterator;
+      explicit _PtrProxy(const R &result) : _result(result) {}
+      R _result;
+    };
+
    public:
-    _Iterator() : _owner(NULL), _data(NULL) {}
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = R;
+    using reference = R;
+    using pointer =
+        std::conditional_t<std::is_lvalue_reference<R>::value, std::add_pointer_t<R>, _PtrProxy>;
+    using difference_type = std::ptrdiff_t;
+
+    _Iterator() = default;
 
     _Iterator(Owner owner, const Type *data, I i) : _owner(owner), _data(data), _pos(i)
     {
@@ -246,9 +244,69 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
       // Do nothing
     }
 
+    reference operator*() const
+    {
+      return dereference();
+    }
+
+    // In C++20, when pointer can be `void` and `operator->` elided,
+    // this conditional behavior may be deprecated. The `operator->`
+    // implementation is keyed off of whether the underlying pointer
+    // requires a proxy type
+    template<typename PointerType = pointer,
+             typename std::enable_if_t<std::is_pointer<PointerType>::value, int> = 0>
+    pointer operator->() const
+    {
+      return std::addressof(dereference());
+    }
+    template<typename PointerType = pointer,
+             typename std::enable_if_t<!std::is_pointer<PointerType>::value, int> = 0>
+    pointer operator->() const
+    {
+      return pointer(dereference());
+    }
+
     const I &base() const
     {
       return _pos;
+    }
+
+    _Iterator &operator++()
+    {
+      increment();
+      return *this;
+    }
+
+    _Iterator &operator--()
+    {
+      decrement();
+      return *this;
+    }
+
+    _Iterator operator++(int)
+    {
+      _Iterator result(*this);
+      increment();
+      return result;
+    }
+
+    _Iterator operator--(int)
+    {
+      _Iterator result(*this);
+      decrement();
+      return result;
+    }
+
+    template<class Owner2, class I2, class R2>
+    bool operator==(const _Iterator<Owner2, I2, R2> &other) const
+    {
+      return equal(other);
+    }
+
+    template<class Owner2, class I2, class R2>
+    bool operator!=(const _Iterator<Owner2, I2, R2> &other) const
+    {
+      return !equal(other);
     }
 
    private:
@@ -286,11 +344,10 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
     }
 
    private:
-    Owner _owner;
-    const Type *_data;
+    Owner _owner = nullptr;
+    const Type *_data = nullptr;
     I _pos;
 
-    friend class boost::iterator_core_access;
     template<class Owner2, class I2, class R2> friend class _Iterator;
   };
 
@@ -301,8 +358,8 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
   typedef ptrdiff_t difference_type;
   typedef _Iterator<This *, inner_iterator, _PairProxy> iterator;
   typedef _Iterator<const This *, const_inner_iterator, const value_type &> const_iterator;
-  typedef boost::reverse_iterator<iterator> reverse_iterator;
-  typedef boost::reverse_iterator<const_iterator> const_reverse_iterator;
+  typedef Tf_ProxyReferenceReverseIterator<iterator> reverse_iterator;
+  typedef Tf_ProxyReferenceReverseIterator<const_iterator> const_reverse_iterator;
 
   explicit SdfMapEditProxy(const SdfSpecHandle &owner, const TfToken &field)
       : _editor(Sdf_CreateMapEditor<T>(owner, field))
@@ -551,9 +608,26 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
     return _Validate() ? _CompareEqual(other) : false;
   }
 
+  bool operator!=(const Type &other) const
+  {
+    return !(*this == other);
+  }
+
+  friend bool operator==(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs == lhs;
+  }
+
+  friend bool operator!=(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs != lhs;
+  }
+
+  /// Invalid SdfMapEditProxy objects will compare less to an object
+  /// of their map type
   bool operator<(const Type &other) const
   {
-    return _Validate() ? _Compare(other) < 0 : false;
+    return !_Validate() || _Compare(other) < 0;
   }
 
   bool operator>(const Type &other) const
@@ -561,9 +635,44 @@ class SdfMapEditProxy : boost::totally_ordered<SdfMapEditProxy<T, _ValuePolicy>,
     return _Validate() ? _Compare(other) > 0 : false;
   }
 
+  bool operator>=(const Type &other) const
+  {
+    return !(*this < other);
+  }
+
+  bool operator<=(const Type &other) const
+  {
+    return !(*this > other);
+  }
+
+  friend bool operator<(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs > lhs;
+  }
+
+  friend bool operator>(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs < lhs;
+  }
+
+  friend bool operator<=(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs >= lhs;
+  }
+
+  friend bool operator>=(const Type &lhs, const SdfMapEditProxy &rhs)
+  {
+    return rhs <= lhs;
+  }
+
+  /// Comparison operator with another proxy
+  /// Two invalid proxy objects will compare equal.
   template<class U, class UVP> bool operator==(const SdfMapEditProxy<U, UVP> &other) const
   {
-    return _Validate() && other._Validate() ? _CompareEqual(*other._ConstData()) : false;
+    const bool isValid = _Validate();
+    const bool otherIsValid = other._Validate();
+
+    return isValid && otherIsValid ? _CompareEqual(*other._ConstData()) : isValid == otherIsValid;
   }
 
   template<class U, class UVP> bool operator!=(const SdfMapEditProxy<U, UVP> &other) const

@@ -1,29 +1,12 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Pcp/errors.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Tf/enum.h"
 #include "Tf/stringUtils.h"
@@ -53,6 +36,10 @@ TF_REGISTRY_FUNCTION(TfEnum)
   TF_ADD_ENUM_NAME(PcpErrorType_InvalidSublayerOwnership);
   TF_ADD_ENUM_NAME(PcpErrorType_InvalidSublayerPath);
   TF_ADD_ENUM_NAME(PcpErrorType_InvalidVariantSelection);
+  TF_ADD_ENUM_NAME(PcpErrorType_MutedAssetPath);
+  TF_ADD_ENUM_NAME(PcpErrorType_InvalidAuthoredRelocation);
+  TF_ADD_ENUM_NAME(PcpErrorType_InvalidConflictingRelocation);
+  TF_ADD_ENUM_NAME(PcpErrorType_InvalidSameTargetRelocations);
   TF_ADD_ENUM_NAME(PcpErrorType_OpinionAtRelocationSource);
   TF_ADD_ENUM_NAME(PcpErrorType_PrimPermissionDenied);
   TF_ADD_ENUM_NAME(PcpErrorType_PropertyPermissionDenied);
@@ -182,6 +169,54 @@ std::string PcpErrorArcPermissionDenied::ToString() const
       break;
   }
   msg += TfStringPrintf("%s\nwhich is private.", TfStringify(privateSite).c_str());
+  return msg;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PcpErrorArcToProhibitedChildPtr PcpErrorArcToProhibitedChild::New()
+{
+  return PcpErrorArcToProhibitedChildPtr(new PcpErrorArcToProhibitedChild);
+}
+
+PcpErrorArcToProhibitedChild::PcpErrorArcToProhibitedChild()
+    : PcpErrorBase(PcpErrorType_ArcToProhibitedChild)
+{
+}
+
+PcpErrorArcToProhibitedChild::~PcpErrorArcToProhibitedChild() {}
+
+// virtual
+std::string PcpErrorArcToProhibitedChild::ToString() const
+{
+  std::string msg = TfStringPrintf("%s\nCANNOT ", TfStringify(site).c_str());
+  switch (arcType) {
+    case PcpArcTypeInherit:
+      msg += "inherit from:\n";
+      break;
+    case PcpArcTypeRelocate:
+      msg += "be relocated from:\n";
+      break;
+    case PcpArcTypeVariant:
+      msg += "use variant:\n";
+      break;
+    case PcpArcTypeReference:
+      msg += "reference:\n";
+      break;
+    case PcpArcTypePayload:
+      msg += "get payload from:\n";
+      break;
+    default:
+      msg += "refer to:\n";
+      break;
+  }
+  msg += TfStringPrintf(
+      "%s\nwhich is a prohibited child of its parent "
+      "because it would require allowing opinions from the source of a "
+      "relocation at %s.",
+      TfStringify(targetSite).c_str(),
+      TfStringify(relocationSourceSite).c_str());
+
   return msg;
 }
 
@@ -588,6 +623,133 @@ std::string PcpErrorInvalidSublayerPath::ToString() const
       layer ? layer->GetIdentifier().c_str() : "<NULL>",
       messages.empty() ? "" : " -- ",
       messages.c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PcpErrorRelocationBase::PcpErrorRelocationBase(PcpErrorType errorType) : PcpErrorBase(errorType) {}
+
+PcpErrorRelocationBase::~PcpErrorRelocationBase() {}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PcpErrorInvalidAuthoredRelocationPtr PcpErrorInvalidAuthoredRelocation::New()
+{
+  return PcpErrorInvalidAuthoredRelocationPtr(new PcpErrorInvalidAuthoredRelocation);
+}
+
+PcpErrorInvalidAuthoredRelocation::PcpErrorInvalidAuthoredRelocation()
+    : PcpErrorRelocationBase(PcpErrorType_InvalidAuthoredRelocation)
+{
+}
+
+PcpErrorInvalidAuthoredRelocation::~PcpErrorInvalidAuthoredRelocation() {}
+
+// virtual
+std::string PcpErrorInvalidAuthoredRelocation::ToString() const
+{
+  return TfStringPrintf(
+      "Relocation from <%s> to <%s> authored at @%s@<%s> is "
+      "invalid and will be ignored: %s",
+      sourcePath.GetText(),
+      targetPath.GetText(),
+      layer->GetIdentifier().c_str(),
+      owningPath.GetText(),
+      messages.c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PcpErrorInvalidConflictingRelocationPtr PcpErrorInvalidConflictingRelocation::New()
+{
+  return PcpErrorInvalidConflictingRelocationPtr(new PcpErrorInvalidConflictingRelocation);
+}
+
+PcpErrorInvalidConflictingRelocation::PcpErrorInvalidConflictingRelocation()
+    : PcpErrorRelocationBase(PcpErrorType_InvalidConflictingRelocation)
+{
+}
+
+PcpErrorInvalidConflictingRelocation::~PcpErrorInvalidConflictingRelocation() {}
+
+// virtual
+std::string PcpErrorInvalidConflictingRelocation::ToString() const
+{
+  auto conflictReasonCstr = [](ConflictReason reason) {
+    switch (reason) {
+      case ConflictReason::TargetIsConflictSource:
+        return "The target of a relocate cannot be the source of "
+               "another relocate in the same layer stack.";
+      case ConflictReason::SourceIsConflictTarget:
+        return "The source of a relocate cannot be the target of "
+               "another relocate in the same layer stack.";
+      case ConflictReason::TargetIsConflictSourceDescendant:
+        return "The target of a relocate cannot be a descendant of "
+               "the source of another relocate.";
+      case ConflictReason::SourceIsConflictSourceDescendant:
+        return "The source of a relocate cannot be a descendant of "
+               "the source of another relocate.";
+    };
+    return "Invalid conflict reason.";
+  };
+
+  return TfStringPrintf(
+      "Relocation from <%s> to <%s> authored at @%s@<%s> "
+      "conflicts with another relocation from <%s> to <%s> "
+      "authored at @%s@<%s> and will be ignored: %s",
+      sourcePath.GetText(),
+      targetPath.GetText(),
+      layer->GetIdentifier().c_str(),
+      owningPath.GetText(),
+      conflictSourcePath.GetText(),
+      conflictTargetPath.GetText(),
+      conflictLayer->GetIdentifier().c_str(),
+      conflictOwningPath.GetText(),
+      conflictReasonCstr(conflictReason));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PcpErrorInvalidSameTargetRelocationsPtr PcpErrorInvalidSameTargetRelocations::New()
+{
+  return PcpErrorInvalidSameTargetRelocationsPtr(new PcpErrorInvalidSameTargetRelocations);
+}
+
+PcpErrorInvalidSameTargetRelocations::PcpErrorInvalidSameTargetRelocations()
+    : PcpErrorRelocationBase(PcpErrorType_InvalidSameTargetRelocations)
+{
+}
+
+PcpErrorInvalidSameTargetRelocations::~PcpErrorInvalidSameTargetRelocations() {}
+
+// virtual
+std::string PcpErrorInvalidSameTargetRelocations::ToString() const
+{
+  auto sourceToString = [](const RelocationSource &source) {
+    return TfStringPrintf("relocation from <%s> authored at @%s@<%s>",
+                          source.sourcePath.GetText(),
+                          source.layer->GetIdentifier().c_str(),
+                          source.owningPath.GetText());
+  };
+
+  auto sourceIt = sources.begin();
+  if (sourceIt == sources.end()) {
+    TF_CODING_ERROR("PcpErrorInvalidSameTargetRelocations must have sources");
+    return std::string();
+  }
+
+  std::string sourcesString = sourceToString(*sourceIt);
+  while (++sourceIt != sources.end()) {
+    sourcesString.append("; ");
+    sourcesString.append(sourceToString(*sourceIt));
+  }
+
+  return TfStringPrintf(
+      "The path <%s> is the target of multiple relocations "
+      "from different sources. The following relocates to "
+      "this target are invalid and will be ignored: %s.",
+      targetPath.GetText(),
+      sourcesString.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

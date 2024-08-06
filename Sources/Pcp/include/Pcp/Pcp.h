@@ -42,4 +42,6 @@
 #include <Pcp/types.h>
 #include <Pcp/utils.h>
 
+#include <Pcp/layerRelocatesEditBuilder.h>
+#include <Pcp/traversalCache.h>
 #endif  // __PXR_USD_PCP_H__

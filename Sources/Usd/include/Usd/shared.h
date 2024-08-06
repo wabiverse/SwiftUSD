@@ -1,35 +1,18 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_SHARED_H
 #define PXR_USD_USD_SHARED_H
 
+#include "Tf/delegatedCountPtr.h"
 #include "Tf/hash.h"
 #include "Usd/api.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <atomic>
-#include <boost/smart_ptr/intrusive_ptr.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -39,11 +22,11 @@ template<class T> struct Usd_Counted {
   explicit Usd_Counted(T const &data) : data(data), count(0) {}
   explicit Usd_Counted(T &&data) : data(std::move(data)), count(0) {}
 
-  friend inline void intrusive_ptr_add_ref(Usd_Counted const *c)
+  friend inline void TfDelegatedCountIncrement(Usd_Counted const *c)
   {
     c->count.fetch_add(1, std::memory_order_relaxed);
   }
-  friend inline void intrusive_ptr_release(Usd_Counted const *c)
+  friend inline void TfDelegatedCountDecrement(Usd_Counted const *c) noexcept
   {
     if (c->count.fetch_sub(1, std::memory_order_release) == 1) {
       std::atomic_thread_fence(std::memory_order_acquire);
@@ -62,11 +45,11 @@ constexpr Usd_EmptySharedTagType Usd_EmptySharedTag{};
 // can be used to do simple copy-on-write, etc.
 template<class T> struct Usd_Shared {
   // Construct a Usd_Shared with a value-initialized T instance.
-  Usd_Shared() : _held(new Usd_Counted<T>()) {}
+  Usd_Shared() : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>()) {}
   // Create a copy of \p obj.
-  explicit Usd_Shared(T const &obj) : _held(new Usd_Counted<T>(obj)) {}
+  explicit Usd_Shared(T const &obj) : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(obj)) {}
   // Move from \p obj.
-  explicit Usd_Shared(T &&obj) : _held(new Usd_Counted<T>(std::move(obj))) {}
+  explicit Usd_Shared(T &&obj) : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(std::move(obj))) {}
 
   // Create an empty shared, which may not be accessed via Get(),
   // GetMutable(), IsUnique(), Clone(), or MakeUnique().  This is useful when
@@ -93,7 +76,7 @@ template<class T> struct Usd_Shared {
   // Make a new copy of the held data and refer to it.
   void Clone()
   {
-    _held.reset(new Usd_Counted<T>(Get()));
+    _held = TfMakeDelegatedCountPtr<Usd_Counted<T>>(Get());
   }
   // Ensure this Usd_Shared instance has unique data.  Equivalent to:
   // \code
@@ -132,7 +115,7 @@ template<class T> struct Usd_Shared {
   }
 
  private:
-  boost::intrusive_ptr<Usd_Counted<T>> _held;
+  TfDelegatedCountPtr<Usd_Counted<T>> _held;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

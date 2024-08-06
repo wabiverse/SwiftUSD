@@ -1,29 +1,12 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Vt/value.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include "Vt/array.h"
 #include "Vt/typeHeaders.h"
@@ -32,16 +15,14 @@
 #include "Vt/wrapArray.h"
 
 #include "Arch/demangle.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
+#include "Tf/preprocessorUtilsLite.h"
 #include "Tf/pyContainerConversions.h"
 #include "Tf/pyFunction.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"
 #include "Tf/type.h"
-
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/preprocessor.hpp>
 
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>
@@ -113,6 +94,21 @@ struct Vt_ValueWrapper {
   VtValue const &GetValue() const
   {
     return _val;
+  }
+
+  bool operator==(const Vt_ValueWrapper &other)
+  {
+    return _val == other._val;
+  }
+
+  bool operator!=(const Vt_ValueWrapper &other)
+  {
+    return _val != other._val;
+  }
+
+  std::string GetAsString()
+  {
+    return TfStringPrintf("%s(%s)", _val.GetTypeName().c_str(), TfStringify(_val).c_str());
   }
 
  private:
@@ -190,15 +186,15 @@ struct Vt_ValueFromPython {
       long long val = PyLong_AsLongLong(obj_ptr);
       if (!PyErr_Occurred()) {
         if (std::numeric_limits<int>::min() <= val && val <= std::numeric_limits<int>::max()) {
-          new (storage) VtValue(boost::numeric_cast<int>(val));
+          new (storage) VtValue(int(val));
         }
         else if (std::numeric_limits<long>::min() <= val &&
                  val <= std::numeric_limits<long>::max())
         {
-          new (storage) VtValue(boost::numeric_cast<long>(val));
+          new (storage) VtValue(long(val));
         }
         else {
-          new (storage) VtValue(boost::numeric_cast<long long>(val));
+          new (storage) VtValue(val);
         }
         data->convertible = storage;
         return;
@@ -249,7 +245,7 @@ struct Vt_ValueFromPython {
 
 }  // anonymous namespace
 
-void wrapVtValue()
+void wrapValue()
 {
   def("_test_ValueTypeName", _test_ValueTypeName);
   def("_test_Ident", _test_Ident);
@@ -259,7 +255,11 @@ void wrapVtValue()
   Vt_ValueFromPython();
   Vt_ValueWrapperFromPython();
 
-  class_<Vt_ValueWrapper>("_ValueWrapper", no_init);
+  class_<Vt_ValueWrapper>("_ValueWrapper", no_init)
+      .def(self == self)
+      .def(self != self)
+      .def("__str__", &Vt_ValueWrapper::GetAsString)
+      .def("__repr__", &Vt_ValueWrapper::GetAsString);
 
   static char const *funcDocString =
       "%s(value) -> _ValueWrapper\n\n"
@@ -328,12 +328,12 @@ void wrapVtValue()
   // register conversion types in reverse order, because the extractor
   // iterates through the registered list backwards
   // Repetitively register conversions for each known class value type.
-#define REGISTER_VALUE_FROM_PYTHON(r, unused, elem) VtValueFromPythonLValue<VT_TYPE(elem)>();
-  BOOST_PP_SEQ_FOR_EACH(REGISTER_VALUE_FROM_PYTHON, ~, VT_ARRAY_VALUE_TYPES)
+#define REGISTER_VALUE_FROM_PYTHON(unused, elem) VtValueFromPythonLValue<VT_TYPE(elem)>();
+  TF_PP_SEQ_FOR_EACH(REGISTER_VALUE_FROM_PYTHON, ~, VT_ARRAY_VALUE_TYPES)
 #undef REGISTER_VALUE_FROM_PYTHON
 
-#define REGISTER_VALUE_FROM_PYTHON(r, unused, elem) VtValueFromPython<VT_TYPE(elem)>();
-  BOOST_PP_SEQ_FOR_EACH(
+#define REGISTER_VALUE_FROM_PYTHON(unused, elem) VtValueFromPython<VT_TYPE(elem)>();
+  TF_PP_SEQ_FOR_EACH(
       REGISTER_VALUE_FROM_PYTHON, ~, VT_SCALAR_CLASS_VALUE_TYPES VT_NONARRAY_VALUE_TYPES)
 #undef REGISTER_VALUE_FROM_PYTHON
 

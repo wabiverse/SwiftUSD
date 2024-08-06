@@ -1,38 +1,19 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
-#include <pxr/pxrns.h>
-
-#include <Tf/notice.h>
-#include <Tf/pyFunction.h>
-#include <Tf/pyIdentity.h>
-#include <Tf/pyNoticeWrapper.h>
-#include <Tf/pyPtrHelpers.h>
-#include <Tf/stringUtils.h>
-#include <Tf/type.h>
-
-#include "PyTf/pyWeakObject.h"
+#include "Tf/notice.h"
+#include "Tf/pyFunction.h"
+#include "Tf/pyIdentity.h"
+#include "Tf/pyNoticeWrapper.h"
+#include "Tf/pyPtrHelpers.h"
+#include "Tf/pyWeakObject.h"
+#include "Tf/stringUtils.h"
+#include "Tf/type.h"
+#include "pxr/pxrns.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/python/class.hpp>
@@ -226,9 +207,9 @@ void wrapNotice()
   scope notice = TfPyNoticeWrapper<TfNotice, TfNotice>::Wrap("Notice")
                      .def(init<>())
 
-                     // We register the method that takes any python object first, as this
-                     // is the last overload that will be tried.  Thus, it will only be
-                     // invoked if the python object is not already weak-pointable.
+                     // We register the method that takes any python object first, as this is
+                     // the last overload that will be tried.  Thus, it will only be invoked
+                     // if the python object is not already weak-pointable.
                      .def("Register",
                           Tf_PyNoticeInternal::RegisterWithPythonSender,
                           return_value_policy<manage_new_object>(),
@@ -265,18 +246,16 @@ void wrapNotice()
                           "")
                      .staticmethod("RegisterGlobally")
 
-                     // We register the method that takes any python object first, as this
-                     // is the last overload that will be tried.  Thus, it will only be
-                     // invoked if the python object is not already weak-pointable.
+                     // We register the method that takes any python object first, as this is
+                     // the last overload that will be tried.  Thus, it will only be invoked
+                     // if the python object is not already weak-pointable.
                      .def("Send",
                           &Tf_PyNoticeInternal::SendWithPythonSender,
                           "Send(sender) \n\n"
                           "sender : object \n\n"
-                          "Deliver the notice to interested listeners, returning the "
-                          "number "
+                          "Deliver the notice to interested listeners, returning the number "
                           "of interested listeners. "
-                          "This is the recommended form of Send.  It takes the sender as "
-                          "an "
+                          "This is the recommended form of Send.  It takes the sender as an "
                           "argument. "
                           "Listeners that registered for the given sender AND listeners "
                           "that registered globally will get the notice. ")
@@ -287,8 +266,7 @@ void wrapNotice()
                           "Deliver the notice to interested listeners.   "
                           "For most clients it is recommended to use the Send(sender) "
                           "version of "
-                          "Send() rather than this one.  Clients that use this form of "
-                          "Send "
+                          "Send() rather than this one.  Clients that use this form of Send "
                           "will prevent listeners from being able to register to receive "
                           "notices "
                           "based on the sender of the notice. "

@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_IMAGING_HD_BUFFER_ARRAY_H
 #define PXR_IMAGING_HD_BUFFER_ARRAY_H
@@ -27,10 +10,9 @@
 #include "Hd/api.h"
 #include "Hd/bufferSpec.h"
 #include "Hd/version.h"
-#include <pxr/pxrns.h>
-
 #include "Tf/token.h"
 #include "Vt/value.h"
+#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <memory>
@@ -44,38 +26,36 @@ using HdBufferArraySharedPtr = std::shared_ptr<class HdBufferArray>;
 using HdBufferArrayRangeSharedPtr = std::shared_ptr<HdBufferArrayRange>;
 using HdBufferArrayRangePtr = std::weak_ptr<HdBufferArrayRange>;
 
-/// \union HdBufferArrayUsageHint
+/// \enum HdBufferArrayUsageHintBits
 ///
-/// The union provides a set of flags that provide hints to the memory
-/// management system about the properties of a Buffer Array Range (BAR),
-/// so it can efficiently organize that memory.  For example,
-/// the memory manager should probably not aggregate BARs with different
-/// usage hints.
-///
-/// The union provides two members:
-///   - value: The combined set of flags
-///   - bits:  Access to individual flag bits
+/// Provides a set of flags that provide hints to the memory management system
+/// about the properties of a Buffer Array Range (BAR), so it can efficiently
+/// organize that memory.  For example, the memory manager should probably not
+/// aggregate BARs with different usage hints.
 ///
 /// The flag bits are:
 ///   - immutable: The BAR will not be modified once created and populated.
 ///   - sizeVarying: The number of elements in the BAR changes with time.
+///   - uniform: The BAR can be used as a uniform buffer.
+///   - storage: The BAR can be used as a shader storage buffer.
+///   - vertex: The BAR can be used as a vertex buffer.
+///   - index: The BAR can be used as an index buffer.
 ///
-/// Some flag bits may not make sense in combination
-/// (i.e. mutually exclusive to each other).  For example, it is logically
-/// impossible to be both immutable (i.e. not changing) and sizeVarying
-/// (changing).  However, these logically impossible combinations are
-/// not enforced and remain valid potential values.
+/// Some flag bits may not make sense in combination (i.e. mutually exclusive
+/// to each other).  For example, it is logically impossible to be both
+/// immutable (i.e. not changing) and sizeVarying (changing).  However, these
+/// logically impossible combinations are not enforced and remain valid
+/// potential values.
 ///
-union HdBufferArrayUsageHint {
-  struct _Bits {
-    uint32_t immutable : 1;
-    uint32_t sizeVarying : 1;
-    uint32_t pad : 30;
-  } bits;
-  uint32_t value;
-
-  HdBufferArrayUsageHint() : value(0) {}
+enum HdBufferArrayUsageHintBits : uint32_t {
+  HdBufferArrayUsageHintBitsImmutable = 1 << 0,
+  HdBufferArrayUsageHintBitsSizeVarying = 1 << 1,
+  HdBufferArrayUsageHintBitsUniform = 1 << 2,
+  HdBufferArrayUsageHintBitsStorage = 1 << 3,
+  HdBufferArrayUsageHintBitsVertex = 1 << 4,
+  HdBufferArrayUsageHintBitsIndex = 1 << 5,
 };
+using HdBufferArrayUsageHint = uint32_t;
 
 /// \class HdBufferArray
 ///
@@ -158,7 +138,7 @@ class HdBufferArray : public std::enable_shared_from_this<HdBufferArray> {
   /// Returns true if this buffer array is marked as immutable.
   bool IsImmutable() const
   {
-    return _usageHint.bits.immutable;
+    return _usageHint & HdBufferArrayUsageHintBitsImmutable;
   }
 
   /// Returns the usage hints for this buffer array.

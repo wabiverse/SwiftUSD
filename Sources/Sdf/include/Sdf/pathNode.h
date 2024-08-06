@@ -1,36 +1,18 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_SDF_PATH_NODE_H
 #define PXR_USD_SDF_PATH_NODE_H
 
 #include "Sdf/api.h"
+#include "Tf/delegatedCountPtr.h"
 #include "Tf/functionRef.h"
 #include "Tf/mallocTag.h"
 #include "Tf/token.h"
-#include <pxr/pxrns.h>
-
-#include <boost/intrusive_ptr.hpp>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -255,7 +237,7 @@ class Sdf_PathNode {
 
  protected:
   Sdf_PathNode(Sdf_PathNode const *parent, NodeType nodeType)
-      : _parent(parent),
+      : _parent(TfDelegatedCountIncrementTag, parent),
         _refCount(1),
         _elementCount(parent ? parent->_elementCount + 1 : 1),
         _nodeType(nodeType),
@@ -306,8 +288,8 @@ class Sdf_PathNode {
   friend struct Sdf_PathNodePrivateAccess;
 
   // Ref-counting ops manage _refCount.
-  friend void intrusive_ptr_add_ref(const Sdf_PathNode *);
-  friend void intrusive_ptr_release(const Sdf_PathNode *);
+  friend void TfDelegatedCountIncrement(const Sdf_PathNode *) noexcept;
+  friend void TfDelegatedCountDecrement(const Sdf_PathNode *) noexcept;
 
  private:
   static constexpr uint8_t _NodeTypeToFlags(NodeType nt)
@@ -762,11 +744,11 @@ inline TfToken Sdf_PathNode::GetElement() const
 /// Diagnostic output.
 SDF_API void Sdf_DumpPathStats();
 
-inline void intrusive_ptr_add_ref(const PXR_NS::Sdf_PathNode *p)
+inline void TfDelegatedCountIncrement(const PXR_NS::Sdf_PathNode *p) noexcept
 {
   p->_refCount.fetch_add(1, std::memory_order_relaxed);
 }
-inline void intrusive_ptr_release(const PXR_NS::Sdf_PathNode *p)
+inline void TfDelegatedCountDecrement(const PXR_NS::Sdf_PathNode *p) noexcept
 {
   if ((p->_refCount.fetch_sub(1) & PXR_NS::Sdf_PathNode::RefCountMask) == 1) {
     p->_Destroy();

@@ -1,30 +1,13 @@
 //
 // Copyright 2020 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #include "Garch/glApi.h"
 
 #include "Hgi/capabilities.h"
-#include "Hgi/hgiImpl.h"
+#include "Hgi/hgi.h"
 #include "Hgi/tokens.h"
 #include "HgiGL/conversions.h"
 #include "HgiGL/shaderGenerator.h"
@@ -391,8 +374,6 @@ void HgiGLShaderGenerator::_WriteInOuts(const HgiShaderFunctionParamDescVector &
       "gl_FragColor",
       "gl_FragDepth",
       "gl_PointSize",
-      "gl_ClipDistance",
-      "gl_CullDistance",
   };
 
   const static std::unordered_map<std::string, std::string> takenInParams{
@@ -412,7 +393,7 @@ void HgiGLShaderGenerator::_WriteInOuts(const HgiShaderFunctionParamDescVector &
       {HgiShaderKeywordTokens->hdLayer, "gl_Layer"},
       {HgiShaderKeywordTokens->hdViewportIndex, "gl_ViewportIndex"},
       {HgiShaderKeywordTokens->hdGlobalInvocationID, "gl_GlobalInvocationID"},
-      {HgiShaderKeywordTokens->hdBaryCoordNoPerspNV, "gl_BaryCoordNoPerspNV"},
+      {HgiShaderKeywordTokens->hdBaryCoordNoPersp, "gl_BaryCoordNoPerspNV"},
   };
 
   const bool in_qualifier = qualifier == "in";
@@ -427,16 +408,12 @@ void HgiGLShaderGenerator::_WriteInOuts(const HgiShaderFunctionParamDescVector &
       const std::string &role = param.role;
       auto const &keyword = takenInParams.find(role);
       if (keyword != takenInParams.end()) {
-        if (role == HgiShaderKeywordTokens->hdGlobalInvocationID) {
-          CreateShaderSection<HgiGLKeywordShaderSection>(paramName, param.type, keyword->second);
-        }
-        else if (role == HgiShaderKeywordTokens->hdVertexID) {
-          CreateShaderSection<HgiGLKeywordShaderSection>(paramName, param.type, keyword->second);
-        }
-        else if (role == HgiShaderKeywordTokens->hdInstanceID) {
-          CreateShaderSection<HgiGLKeywordShaderSection>(paramName, param.type, keyword->second);
-        }
-        else if (role == HgiShaderKeywordTokens->hdBaseInstance) {
+        if (role == HgiShaderKeywordTokens->hdGlobalInvocationID ||
+            role == HgiShaderKeywordTokens->hdVertexID ||
+            role == HgiShaderKeywordTokens->hdInstanceID ||
+            role == HgiShaderKeywordTokens->hdBaseInstance ||
+            role == HgiShaderKeywordTokens->hdBaryCoordNoPersp)
+        {
           CreateShaderSection<HgiGLKeywordShaderSection>(paramName, param.type, keyword->second);
         }
         continue;
@@ -474,14 +451,14 @@ void HgiGLShaderGenerator::_WriteInOutBlocks(
 {
   for (const HgiShaderFunctionParamBlockDesc &p : parameterBlocks) {
 
-    HgiGLShaderSectionPtrVector members;
+    HgiGLMemberShaderSectionPtrVector members;
     for (const HgiShaderFunctionParamBlockDesc::Member &member : p.members) {
 
       HgiGLMemberShaderSection *memberSection = CreateShaderSection<HgiGLMemberShaderSection>(
           member.name,
           member.type,
-          HgiInterpolationDefault,
-          HgiSamplingDefault,
+          member.interpolation,
+          member.sampling,
           HgiStorageDefault,
           HgiShaderSectionAttributeVector(),
           qualifier,

@@ -1,31 +1,13 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #include "Tf/envSetting.h"
 #include "Arch/env.h"
 #include "Arch/fileSystem.h"
-#include "Arch/swiftInterop.h"
 #include "Tf/api.h"
 #include "Tf/getenv.h"
 #include "Tf/hash.h"
@@ -35,136 +17,145 @@
 #include "Tf/singleton.h"
 #include "Tf/stl.h"
 #include "Tf/stringUtils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pyUtils.h"
 #endif  // PXR_PYTHON_SUPPORT_ENABLED
 
-#include <boost/variant/get.hpp>
-#include <boost/variant/variant.hpp>
 #include <mutex>
+#include <variant>
 
 using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-Tf_EnvSettingRegistry::Tf_EnvSettingRegistry()
-{
-  string fileName = TfGetenv("PIXAR_TF_ENV_SETTING_FILE", "");
-  if (FILE *fp = ArchOpenFile(fileName.c_str(), "r")) {
-    char buffer[1024];
+class Tf_EnvSettingRegistry {
+ public:
+  Tf_EnvSettingRegistry(const Tf_EnvSettingRegistry &) = delete;
+  Tf_EnvSettingRegistry &operator=(const Tf_EnvSettingRegistry &) = delete;
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
-    bool syncPython = TfPyIsInitialized();
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
-
-    int lineNo = 0;
-    auto emitError = [&fileName, &lineNo](char const *fmt, ...)
-    /*ARCH_PRINTF_FUNCTION(1, 2)*/ {
-      va_list ap;
-      va_start(ap, fmt);
-      fprintf(stderr,
-              "File '%s' (From PIXAR_TF_ENV_SETTING_FILE) "
-              "line %d: %s.\n",
-              fileName.c_str(),
-              lineNo,
-              TfVStringPrintf(fmt, ap).c_str());
-      va_end(ap);
-    };
-
-    while (fgets(buffer, sizeof(buffer), fp)) {
-      ++lineNo;
-      string line = string(buffer);
-      if (line.back() != '\n') {
-        emitError("line too long; ignored");
-        continue;
-      }
-
-      string trimmed = TfStringTrim(line);
-      if (trimmed.empty() || trimmed.front() == '#') {
-        continue;
-      }
-
-      size_t eqPos = trimmed.find('=');
-      if (eqPos == std::string::npos) {
-        emitError("no '=' found");
-        continue;
-      }
-
-      string key = TfStringTrim(trimmed.substr(0, eqPos));
-      string value = TfStringTrim(trimmed.substr(eqPos + 1));
-      if (key.empty()) {
-        emitError("empty key");
-        continue;
-      }
-
-      ArchSetEnv(key, value, /*overwrite=*/false);
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
-      if (syncPython && ArchGetEnv(key) == value) {
-        TfPySetenv(key, value);
-      }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
-    }
-
-    fclose(fp);
+  static Tf_EnvSettingRegistry &GetInstance()
+  {
+    return TfSingleton<Tf_EnvSettingRegistry>::GetInstance();
   }
 
-  _printAlerts = TfGetenvBool("TF_ENV_SETTING_ALERTS_ENABLED", true);
-  TfSingleton<Tf_EnvSettingRegistry>::SetInstanceConstructed(*this);
-  TfRegistryManager::GetInstance().SubscribeTo<Tf_EnvSettingRegistry>();
-}
-
-Tf_EnvSettingRegistry &Tf_EnvSettingRegistry::GetInstance()
-{
-  return TfSingleton<Tf_EnvSettingRegistry>::GetInstance();
-}
-
-template<typename U>
-bool Tf_EnvSettingRegistry::Define(string const &varName,
-                                   U const &value,
-                                   std::atomic<U *> *cachedValue)
-{
-
-  bool inserted = false;
+  Tf_EnvSettingRegistry()
   {
-    std::lock_guard<std::mutex> lock(_lock);
-    // Double check cachedValue now that we've acquired the registry
-    // lock.  It's entirely possible that another thread may have
-    // initialized our TfEnvSetting while we were waiting.
-    if (cachedValue->load()) {
-      // Only the caller that successfully set the value
-      // should print the alert.
+    string fileName = TfGetenv("PIXAR_TF_ENV_SETTING_FILE", "");
+    if (FILE *fp = ArchOpenFile(fileName.c_str(), "r")) {
+      char buffer[1024];
+
+#ifdef PXR_PYTHON_SUPPORT_ENABLED
+      bool syncPython = TfPyIsInitialized();
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+
+      int lineNo = 0;
+      auto emitError = [&fileName, &lineNo](char const *fmt, ...)
+      /*ARCH_PRINTF_FUNCTION(1, 2)*/ {
+        va_list ap;
+        va_start(ap, fmt);
+        fprintf(stderr,
+                "File '%s' (From PIXAR_TF_ENV_SETTING_FILE) "
+                "line %d: %s.\n",
+                fileName.c_str(),
+                lineNo,
+                TfVStringPrintf(fmt, ap).c_str());
+        va_end(ap);
+      };
+
+      while (fgets(buffer, sizeof(buffer), fp)) {
+        ++lineNo;
+        string line = string(buffer);
+        if (line.back() != '\n') {
+          emitError("line too long; ignored");
+          continue;
+        }
+
+        string trimmed = TfStringTrim(line);
+        if (trimmed.empty() || trimmed.front() == '#') {
+          continue;
+        }
+
+        size_t eqPos = trimmed.find('=');
+        if (eqPos == std::string::npos) {
+          emitError("no '=' found");
+          continue;
+        }
+
+        string key = TfStringTrim(trimmed.substr(0, eqPos));
+        string value = TfStringTrim(trimmed.substr(eqPos + 1));
+        if (key.empty()) {
+          emitError("empty key");
+          continue;
+        }
+
+        ArchSetEnv(key, value, /*overwrite=*/false);
+#ifdef PXR_PYTHON_SUPPORT_ENABLED
+        if (syncPython && ArchGetEnv(key) == value) {
+          TfPySetenv(key, value);
+        }
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
+      }
+
+      fclose(fp);
+    }
+
+    _printAlerts = TfGetenvBool("TF_ENV_SETTING_ALERTS_ENABLED", true);
+    TfSingleton<Tf_EnvSettingRegistry>::SetInstanceConstructed(*this);
+    TfRegistryManager::GetInstance().SubscribeTo<Tf_EnvSettingRegistry>();
+  }
+
+  using VariantType = std::variant<int, bool, std::string>;
+
+  template<typename U>
+  bool Define(string const &varName, U const &value, std::atomic<U *> *cachedValue)
+  {
+
+    bool inserted = false;
+    {
+      std::lock_guard<std::mutex> lock(_lock);
+      // Double check cachedValue now that we've acquired the registry
+      // lock.  It's entirely possible that another thread may have
+      // initialized our TfEnvSetting while we were waiting.
+      if (cachedValue->load()) {
+        // Only the caller that successfully set the value
+        // should print the alert.
+        return false;
+      }
+
+      TfHashMap<string, VariantType, TfHash>::iterator it;
+      std::tie(it, inserted) = _valuesByName.insert({varName, value});
+
+      U *entryPointer = std::get_if<U>(std::addressof(it->second));
+      cachedValue->store(entryPointer);
+    }
+
+    if (!inserted) {
+      TF_CODING_ERROR(
+          "Multiple definitions of TfEnvSetting variable "
+          "detected.  This is usually due to software "
+          "misconfiguration.  Contact the build team for "
+          "assistance.  (duplicate '%s')",
+          varName.c_str());
       return false;
     }
-
-    TfHashMap<string, VariantType, TfHash>::iterator it;
-    std::tie(it, inserted) = _valuesByName.insert({varName, value});
-
-    U *entryPointer = boost::get<U>(&(it->second));
-    cachedValue->store(entryPointer);
+    else {
+      return _printAlerts;
+    }
   }
 
-  if (!inserted) {
-    TF_CODING_ERROR(
-        "Multiple definitions of TfEnvSetting variable "
-        "detected.  This is usually due to software "
-        "misconfiguration.  Contact the build team for "
-        "assistance.  (duplicate '%s')",
-        varName.c_str());
-    return false;
+  VariantType const *LookupByName(string const &name) const
+  {
+    std::lock_guard<std::mutex> lock(_lock);
+    return TfMapLookupPtr(_valuesByName, name);
   }
-  else {
-    return _printAlerts;
-  }
-}
 
-Tf_EnvSettingRegistry::VariantType const *Tf_EnvSettingRegistry::LookupByName(
-    string const &name) const
-{
-  std::lock_guard<std::mutex> lock(_lock);
-  return TfMapLookupPtr(_valuesByName, name);
-}
+ private:
+  mutable std::mutex _lock;
+  TfHashMap<string, VariantType, TfHash> _valuesByName;
+  bool _printAlerts;
+};
 
 TF_INSTANTIATE_SINGLETON(Tf_EnvSettingRegistry);
 
@@ -229,7 +220,7 @@ template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<int> *);
 template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<string> *);
 
 TF_API
-boost::variant<int, bool, std::string> const *Tf_GetEnvSettingByName(std::string const &name)
+std::variant<int, bool, std::string> const *Tf_GetEnvSettingByName(std::string const &name)
 {
   return Tf_EnvSettingRegistry::GetInstance().LookupByName(name);
 }

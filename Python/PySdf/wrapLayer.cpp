@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file wrapLayer.cpp
 
@@ -36,7 +19,7 @@
 #include "Tf/pyPtrHelpers.h"
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <boost/python.hpp>
 #include <boost/python/overloads.hpp>
@@ -663,6 +646,7 @@ void wrapLayer()
                         &This::GetDefaultPrim,
                         &This::SetDefaultPrim,
                         "The layer's default reference target token.")
+          .def("GetDefaultPrimAsPath", &This::GetDefaultPrimAsPath)
           .def("HasDefaultPrim", &This::HasDefaultPrim)
           .def("ClearDefaultPrim", &This::ClearDefaultPrim)
 
@@ -687,8 +671,7 @@ void wrapLayer()
                         &This::SetStartTimeCode,
                         "The start timeCode of this layer.\n\n"
                         "The start timeCode of a layer is not a hard limit, but is \n"
-                        "more of a hint.  A layer's time-varying content is not limited "
-                        "to \n"
+                        "more of a hint.  A layer's time-varying content is not limited to \n"
                         "the timeCode range of the layer.")
 
           .def("HasStartTimeCode", &This::HasStartTimeCode)
@@ -699,8 +682,7 @@ void wrapLayer()
                         &This::SetEndTimeCode,
                         "The end timeCode of this layer.\n\n"
                         "The end timeCode of a layer is not a hard limit, but is \n"
-                        "more of a hint. A layer's time-varying content is not limited "
-                        "to\n"
+                        "more of a hint. A layer's time-varying content is not limited to\n"
                         "the timeCode range of the layer.")
 
           .def("HasEndTimeCode", &This::HasEndTimeCode)
@@ -781,17 +763,18 @@ void wrapLayer()
                         &This::GetSubLayerPaths,
                         &This::SetSubLayerPaths,
                         "The sublayer paths of this layer, as a list.  Although this "
-                        "property is claimed to be read only, you can modify the "
-                        "contents "
+                        "property is claimed to be read only, you can modify the contents "
                         "of this list.")
 
           .add_property("subLayerOffsets",
                         &_WrapGetSubLayerOffsets,
                         "The sublayer offsets of this layer, as a list.  Although this "
-                        "property is claimed to be read only, you can modify the "
-                        "contents "
-                        "of this list by assigning new layer offsets to specific "
-                        "indices.")
+                        "property is claimed to be read only, you can modify the contents "
+                        "of this list by assigning new layer offsets to specific indices.")
+
+          .add_property("relocates", &This::GetRelocates, &This::SetRelocates)
+          .def("HasRelocates", &This::HasRelocates)
+          .def("ClearRelocates", &This::ClearRelocates)
 
           .def("GetLoadedLayers",
                make_function(&This::GetLoadedLayers, return_value_policy<TfPySequenceToList>()),
@@ -818,8 +801,7 @@ void wrapLayer()
 
           .def("DumpLayerInfo",
                &This::DumpLayerInfo,
-               "Debug helper to examine content of the current layer registry "
-               "and\n"
+               "Debug helper to examine content of the current layer registry and\n"
                "the asset/real path of all layers in the registry.")
           .staticmethod("DumpLayerInfo")
 
@@ -849,8 +831,7 @@ void wrapLayer()
 
           .add_property("permissionToEdit",
                         &This::PermissionToEdit,
-                        "Return true if permitted to be edited (modified), "
-                        "false otherwise.\n")
+                        "Return true if permitted to be edited (modified), false otherwise.\n")
 
           .def("ApplyRootPrimOrder",
                &_ApplyRootPrimOrder,
@@ -868,6 +849,7 @@ void wrapLayer()
           .setattr("FramesPerSecondKey", SdfFieldKeys->FramesPerSecond)
           .setattr("FramePrecisionKey", SdfFieldKeys->FramePrecision)
           .setattr("OwnerKey", SdfFieldKeys->Owner)
+          .setattr("LayerRelocatesKey", SdfFieldKeys->LayerRelocates)
           .setattr("SessionOwnerKey", SdfFieldKeys->SessionOwner)
           .setattr("TimeCodesPerSecondKey", SdfFieldKeys->TimeCodesPerSecond)
 

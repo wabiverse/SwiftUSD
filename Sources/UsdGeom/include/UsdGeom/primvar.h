@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 #ifndef PXR_USD_USD_GEOM_PRIMVAR_H
 #define PXR_USD_USD_GEOM_PRIMVAR_H
@@ -27,7 +10,7 @@
 #include "Usd/attribute.h"
 #include "UsdGeom/api.h"
 #include "UsdGeom/tokens.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #include <atomic>
 #include <string>
@@ -636,7 +619,8 @@ class UsdGeomPrimvar {
   USDGEOM_API
   bool ComputeFlattened(VtValue *value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
-  /// Computes the flattened value of \p attrValue given \p indices.
+  /// Computes the flattened value of \p attrValue given \p indices, assuming
+  /// an elementSize of 1.
   ///
   /// This method is a static convenience function that performs the main
   /// work of ComputeFlattened above without needing an instance of a
@@ -650,6 +634,24 @@ class UsdGeomPrimvar {
   static bool ComputeFlattened(VtValue *value,
                                const VtValue &attrVal,
                                const VtIntArray &indices,
+                               std::string *errString);
+
+  /// Computes the flattened value of \p attrValue given \p indices and
+  /// \p elementSize.
+  ///
+  /// This method is a static convenience function that performs the main
+  /// work of ComputeFlattened above without needing an instance of a
+  /// UsdGeomPrimvar.
+  ///
+  /// Returns \c false if the value contained in \p attrVal is not a supported
+  /// type for flattening. Otherwise returns \c true.  The output
+  /// \p errString variable may be populated with an error string if an error
+  /// is encountered during flattening.
+  USDGEOM_API
+  static bool ComputeFlattened(VtValue *value,
+                               const VtValue &attrVal,
+                               const VtIntArray &indices,
+                               int elementSize,
                                std::string *errString);
 
   /// @}
@@ -784,6 +786,7 @@ class UsdGeomPrimvar {
   template<typename ScalarType>
   static bool _ComputeFlattenedHelper(const VtArray<ScalarType> &authored,
                                       const VtIntArray &indices,
+                                      int elementSize,
                                       VtArray<ScalarType> *value,
                                       std::string *errString);
 
@@ -792,6 +795,7 @@ class UsdGeomPrimvar {
   template<typename ArrayType>
   static bool _ComputeFlattenedArray(const VtValue &attrVal,
                                      const VtIntArray &indices,
+                                     int elementSize,
                                      VtValue *value,
                                      std::string *errString);
 
@@ -847,7 +851,7 @@ bool UsdGeomPrimvar::ComputeFlattened(VtArray<ScalarType> *value, UsdTimeCode ti
     return false;
 
   std::string errString;
-  bool res = _ComputeFlattenedHelper(authored, indices, value, &errString);
+  bool res = _ComputeFlattenedHelper(authored, indices, GetElementSize(), value, &errString);
   if (!errString.empty()) {
     TF_WARN("For primvar %s: %s", UsdDescribe(_attr).c_str(), errString.c_str());
   }
@@ -857,44 +861,56 @@ bool UsdGeomPrimvar::ComputeFlattened(VtArray<ScalarType> *value, UsdTimeCode ti
 template<typename ScalarType>
 bool UsdGeomPrimvar::_ComputeFlattenedHelper(const VtArray<ScalarType> &authored,
                                              const VtIntArray &indices,
+                                             int elementSize,
                                              VtArray<ScalarType> *value,
                                              std::string *errString)
 {
-  value->resize(indices.size());
+  TF_VERIFY(elementSize >= 1);
+  value->resize(indices.size() * elementSize);
   bool success = true;
 
   std::vector<size_t> invalidIndexPositions;
   for (size_t i = 0; i < indices.size(); i++) {
-    int index = indices[i];
-    if (index >= 0 && (size_t)index < authored.size()) {
-      (*value)[i] = authored[index];
-    }
-    else {
+    if (indices[i] < 0 || static_cast<size_t>((indices[i] + 1) * elementSize) > authored.size()) {
       invalidIndexPositions.push_back(i);
       success = false;
+      continue;
+    }
+
+    const size_t indicesIdx = indices[i] * elementSize;
+    const size_t valuesIdx = i * elementSize;
+    for (size_t j = 0; j < static_cast<size_t>(elementSize); j++) {
+      size_t index = indicesIdx + j;
+      (*value)[valuesIdx + j] = authored[index];
     }
   }
 
-  if (!invalidIndexPositions.empty()) {
-    std::vector<std::string> invalidPositionsStrVec;
+  if (!invalidIndexPositions.empty() && errString) {
+    *errString = TfStringPrintf(
+        "Found %ld invalid indices into authored array of size %ld with"
+        " element size of %i:",
+        invalidIndexPositions.size(),
+        authored.size(),
+        elementSize);
+
     // Print a maximum of 5 invalid index positions.
     size_t numElementsToPrint = std::min(invalidIndexPositions.size(), size_t(5));
-    invalidPositionsStrVec.reserve(numElementsToPrint);
     for (size_t i = 0; i < numElementsToPrint; ++i) {
-      invalidPositionsStrVec.push_back(TfStringify(invalidIndexPositions[i]));
-    }
+      int invalidIndex = indices[invalidIndexPositions[i]];
+      int authoredStartIndex = invalidIndex * elementSize;
 
-    if (errString) {
-      *errString = TfStringPrintf(
-          "Found %ld invalid indices at positions [%s%s] that are out of "
-          "range [0,%ld).",
-          invalidIndexPositions.size(),
-          TfStringJoin(invalidPositionsStrVec, ", ").c_str(),
-          invalidIndexPositions.size() > 5 ? ", ..." : "",
-          authored.size());
+      *errString += TfStringPrintf(
+          "\n\t Invalid index %i at position %ld refers to %s of the"
+          " authored array, which is out of bounds",
+          invalidIndex,
+          invalidIndexPositions[i],
+          elementSize == 1 ? TfStringPrintf("index %i", authoredStartIndex).c_str() :
+                             TfStringPrintf("indices [%i,...,%i]",
+                                            authoredStartIndex,
+                                            authoredStartIndex + elementSize - 1)
+                                 .c_str());
     }
   }
-
   return success;
 }
 

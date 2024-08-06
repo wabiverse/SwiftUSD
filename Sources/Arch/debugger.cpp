@@ -1,25 +1,8 @@
 //
 // Copyright 2016 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-//
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 /// \file debugger.cpp
 
@@ -30,9 +13,13 @@
 #include "Arch/export.h"
 #include "Arch/stackTrace.h"
 #include "Arch/systemInfo.h"
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 #  include "Arch/pxrinttypes.h"
+#  include <sys/types.h>
+#  if !defined(ARCH_OS_IPHONE)
+#    include <sys/ptrace.h>
+#  endif
 #  include <csignal>
 #  include <cstdio>
 #  include <cstdlib>
@@ -40,19 +27,7 @@
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <string>
-#  if !defined(ARCH_OS_IOS)
-/**
- * These headers should not be included
- * for these devices (iPhone, Vision, TV, Watch):
- *   1. These includes from these paths fail.
- *   2. If taken from an alternative path prefix,
- *      apple will reject app store submissions
- *      from any app that includes these symbols.
- */
-#    include <sys/ptrace.h>
-#  endif /* !defined(ARCH_OS_IOS) */
 #  include <sys/stat.h>
-#  include <sys/types.h>
 #  include <sys/wait.h>
 #  include <unistd.h>
 #endif
@@ -446,8 +421,7 @@ static bool Arch_DebuggerAttach()
   //   ARCH_DEBUGGER="totalview -pid %p %e"
   //
   // You can alternatively use:
-  //   ARCH_DEBUGGER="totalview -e 'dset TV::dll_read_loader_symbols_only *'
-  //   -pid %p %e"
+  //   ARCH_DEBUGGER="totalview -e 'dset TV::dll_read_loader_symbols_only *' -pid %p %e"
   // to prevent TotalView from loading all debug symbols immediately.
   // You can achieve the same in gdb using the .gdbinit file or another
   // file with the -x option.
@@ -459,8 +433,8 @@ static bool Arch_DebuggerAttach()
   // there's no obvious indication that the program has stopped.
   //
   // To attach to lldb on Darwin:
-  //   ARCH_DEBUGGER='osascript -e "tell application \"Terminal\"" -e "activate"
-  //   -e "set newTab to do script(\"lldb -p %p\")" -e "end tell"'
+  //   ARCH_DEBUGGER='osascript -e "tell application \"Terminal\"" -e "activate" -e "set newTab to
+  //   do script(\"lldb -p %p\")" -e "end tell"'
   // This will bring up lldb in a (new) terminal window.  If your system
   // has System Integrity Protection then this won't work but there's a
   // workaround:  make a copy of Terminal (in /Applications/Utilities);
@@ -495,7 +469,7 @@ static bool Arch_DebuggerAttach()
 ARCH_HIDDEN
 void Arch_InitDebuggerAttach()
 {
-#if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN) || defined(__APPLE__)
+#if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
   // Maximum length of a pid written as a decimal.  It's okay for this
   // to be greater than that.
   static const size_t _decimalPidLength = 20;
@@ -540,12 +514,8 @@ void Arch_InitDebuggerAttach()
     char *a = _archDebuggerAttachArgs[2];
     for (char *i = e; *i; ++i) {
       if (i[0] == '%' && i[1] == 'p') {
-// Write the process id.
-#  if defined(__APPLE__)
-        snprintf(a, n + 1, "%d", (int)getpid());
-#  else  /* ARCH_OS_LINUX || ARCH_OS_WINDOWS */
+        // Write the process id.
         sprintf(a, "%d", (int)getpid());
-#  endif /* defined(__APPLE__) */
 
         // Skip past the written process id.
         while (*a) {
