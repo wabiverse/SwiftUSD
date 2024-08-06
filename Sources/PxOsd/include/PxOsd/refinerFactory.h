@@ -14,7 +14,7 @@
 #include "Vt/array.h"
 #include "pxr/pxrns.h"
 
-#include <opensubdiv/far/topologyRefiner.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefiner.h>
 
 #include <memory>
 #include <vector>

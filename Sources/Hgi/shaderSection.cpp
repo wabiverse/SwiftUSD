@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "shaderSection.h"
+#include "Hgi/shaderSection.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

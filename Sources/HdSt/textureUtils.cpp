@@ -14,7 +14,7 @@
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/capabilities.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/texture.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

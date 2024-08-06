@@ -10,7 +10,7 @@
 #include "HdSt/textureIdentifier.h"
 #include "HdSt/textureUtils.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/texture.h"
 #include "Hgi/types.h"
 

@@ -28,12 +28,12 @@
 #include "Hdx/renderSetupTask.h"
 #include "Hdx/selectionTracker.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Glf/simpleLight.h"
 #include "Glf/simpleMaterial.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Sdf/path.h"
 #include "Usd/timeCode.h"

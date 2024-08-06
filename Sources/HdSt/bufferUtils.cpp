@@ -10,7 +10,7 @@
 
 #include "Hgi/blitCmds.h"
 #include "Hgi/blitCmdsOps.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Gf/matrix4d.h"
 #include "Gf/matrix4f.h"

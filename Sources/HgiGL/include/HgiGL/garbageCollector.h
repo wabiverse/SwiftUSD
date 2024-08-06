@@ -10,7 +10,7 @@
 #include "Tf/diagnostic.h"
 #include "pxr/pxrns.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "HgiGL/api.h"
 
 #include <mutex>

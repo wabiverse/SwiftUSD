@@ -7,7 +7,7 @@
 #ifndef PXR_IMAGING_HGI_METAL_TEXTURE_H
 #define PXR_IMAGING_HGI_METAL_TEXTURE_H
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 #include "Hgi/texture.h"
 #include "HgiMetal/api.h"
@@ -36,7 +36,7 @@ class HgiMetalTexture final : public HgiTexture {
 
   /// Returns the handle to the Metal texture.
   HGIMETAL_API
-  id<MTLTexture> GetTextureId() const;
+  MTL::Texture* GetTextureId() const;
 
   /// This function does not do anything. At the moment there is no need for
   /// explicit layout transitions for the Metal backend. Hence this function
@@ -58,7 +58,7 @@ class HgiMetalTexture final : public HgiTexture {
   HgiMetalTexture &operator=(const HgiMetalTexture &) = delete;
   HgiMetalTexture(const HgiMetalTexture &) = delete;
 
-  id<MTLTexture> _textureId;
+  MTL::Texture* _textureId;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

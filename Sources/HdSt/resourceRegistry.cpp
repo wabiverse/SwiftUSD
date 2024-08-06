@@ -21,7 +21,7 @@
 
 #include "Hgi/capabilities.h"
 #include "Hgi/computeCmdsDesc.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hio/glslfx.h"
 
 #include "Tf/envSetting.h"

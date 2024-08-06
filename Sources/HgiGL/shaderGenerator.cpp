@@ -7,7 +7,7 @@
 #include "Garch/glApi.h"
 
 #include "Hgi/capabilities.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "HgiGL/conversions.h"
 #include "HgiGL/shaderGenerator.h"

@@ -15,7 +15,7 @@
 #include "Hgi/blitCmdsOps.h"
 #include "Hgi/buffer.h"
 #include "Hgi/capabilities.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Arch/hash.h"
 #include "Tf/diagnostic.h"

@@ -151,7 +151,7 @@ class HgiTexture {
   /// There is no safety provided in using this. If you by accident pass a
   /// HgiMetal resource into an OpenGL call, bad things may happen.
   /// In OpenGL this returns the GLuint resource name.
-  /// In Metal this returns the id<MTLTexture> as uint64_t.
+  /// In Metal this returns the MTL::Texture* as uint64_t.
   /// In Vulkan this returns the VkImage as uint64_t.
   /// In DX12 this returns the ID3D12Resource pointer as uint64_t.
   HGI_API

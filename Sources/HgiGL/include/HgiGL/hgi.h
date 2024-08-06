@@ -7,7 +7,7 @@
 #ifndef PXR_IMAGING_HGI_GL_HGI_H
 #define PXR_IMAGING_HGI_GL_HGI_H
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "HgiGL/api.h"
 #include "HgiGL/capabilities.h"

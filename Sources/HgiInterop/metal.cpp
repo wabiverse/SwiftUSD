@@ -22,7 +22,7 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#if PXR_METAL_SUPPORT_ENABLED
+#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 
 #  include "Garch/glApi.h"
 
@@ -983,4 +983,4 @@ void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif /* PXR_METAL_SUPPORT_ENABLED */
+#endif /* defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED */

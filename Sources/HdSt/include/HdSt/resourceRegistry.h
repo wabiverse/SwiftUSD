@@ -14,7 +14,7 @@
 #include "HdSt/bufferArrayRegistry.h"
 #include "HdSt/enums.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Hd/bufferArrayRange.h"
 #include "Hd/bufferSource.h"

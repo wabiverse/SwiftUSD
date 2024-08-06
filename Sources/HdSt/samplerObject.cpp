@@ -12,7 +12,7 @@
 #include "HdSt/textureObject.h"
 #include "HdSt/udimTextureObject.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -60,16 +60,16 @@ class HgiMetalResourceBindings final : public HgiResourceBindings {
   /// Binds the resources to GPU.
   HGIMETAL_API
   void BindResources(HgiMetal *hgi,
-                     id<MTLRenderCommandEncoder> renderEncoder,
-                     id<MTLBuffer> argBuffer);
+                     MTL::RenderCommandEncoder* renderEncoder,
+                     MTL::Buffer* argBuffer);
 
   HGIMETAL_API
   void BindResources(HgiMetal *hgi,
-                     id<MTLComputeCommandEncoder> computeEncoder,
-                     id<MTLBuffer> argBuffer);
+                     MTL::ComputeCommandEncoder* computeEncoder,
+                     MTL::Buffer* argBuffer);
 
   HGIMETAL_API
-  static void SetConstantValues(id<MTLBuffer> argumentBuffer,
+  static void SetConstantValues(MTL::Buffer* argumentBuffer,
                                 HgiShaderStage stages,
                                 uint32_t bindIndex,
                                 uint32_t byteSize,

@@ -35,7 +35,7 @@
 #include "Hd/perfLog.h"
 #include "Hd/tokens.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "Glf/diagnostic.h"

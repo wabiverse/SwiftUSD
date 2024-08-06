@@ -77,8 +77,8 @@ class HgiMetalBlitCmds final : public HgiBlitCmds {
   void _CreateEncoder();
 
   HgiMetal *_hgi;
-  id<MTLCommandBuffer> _commandBuffer;
-  id<MTLBlitCommandEncoder> _blitEncoder;
+  MTL::CommandBuffer* _commandBuffer;
+  MTL::BlitCommandEncoder* _blitEncoder;
   NSString *_label;
   bool _secondaryCommandBuffer;
 

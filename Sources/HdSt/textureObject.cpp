@@ -20,7 +20,7 @@
 #include "HdSt/udimTextureObject.h"
 
 #include "Hgi/blitCmds.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 #include "Hio/fieldTextureData.h"
 

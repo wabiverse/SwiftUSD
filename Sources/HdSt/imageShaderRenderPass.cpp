@@ -19,7 +19,7 @@
 #include "Hgi/capabilities.h"
 #include "Hgi/graphicsCmds.h"
 #include "Hgi/graphicsCmdsDesc.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

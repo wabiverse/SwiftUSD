@@ -33,7 +33,7 @@
 #include "Hdx/taskController.h"
 #include "Hdx/tokens.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 #include "Tf/envSetting.h"

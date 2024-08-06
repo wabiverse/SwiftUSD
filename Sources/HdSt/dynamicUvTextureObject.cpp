@@ -12,7 +12,7 @@
 #include "HdSt/subtextureIdentifier.h"
 #include "HdSt/textureHandleRegistry.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
