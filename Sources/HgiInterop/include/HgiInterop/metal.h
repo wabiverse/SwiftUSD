@@ -7,10 +7,13 @@
 #ifndef PXR_IMAGING_HGIINTEROP_HGIINTEROPMETAL_H
 #define PXR_IMAGING_HGIINTEROP_HGIINTEROPMETAL_H
 
+#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+
 #include "Garch/glApi.h"
 
-#include <AppKit/AppKit.h>
-#include <Metal/Metal.h>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+#include <OpenGL/OpenGL.hpp>
 
 #include "Gf/vec4i.h"
 #include "Hgi/texture.h"
@@ -83,25 +86,28 @@ class HgiInteropMetal final {
 
   HgiMetal *_hgiMetal;
 
-  id<MTLDevice> _device;
+  MTL::Device* _device;
 
-  id<MTLTexture> _mtlAliasedColorTexture;
-  id<MTLTexture> _mtlAliasedDepthRegularFloatTexture;
+  MTL::Texture* _mtlAliasedColorTexture;
+  MTL::Texture* _mtlAliasedDepthRegularFloatTexture;
 
-  id<MTLLibrary> _defaultLibrary;
-  id<MTLFunction> _computeDepthCopyProgram;
-  id<MTLFunction> _computeColorCopyProgram;
-  id<MTLComputePipelineState> _computePipelineStateColor;
-  id<MTLComputePipelineState> _computePipelineStateDepth;
+  MTL::Library* _defaultLibrary;
+  MTL::Function* _computeDepthCopyProgram;
+  MTL::Function* _computeColorCopyProgram;
+  MTL::ComputePipelineState* _computePipelineStateColor;
+  MTL::ComputePipelineState* _computePipelineStateDepth;
 
+#if 0
+  // wabi: Add these into the CXX Apple headers.
   CVPixelBufferRef _pixelBuffer;
   CVPixelBufferRef _depthBuffer;
+#endif
   uint32_t _glColorTexture;
   uint32_t _glDepthTexture;
 
   ShaderContext _shaderProgramContext[ShaderContextCount];
 
-  NSOpenGLContext *_currentOpenGLContext;
+  NSGL::OpenGLContext *_currentOpenGLContext;
 
   int32_t _restoreDrawFbo;
   int32_t _restoreVao;
@@ -129,5 +135,7 @@ class HgiInteropMetal final {
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 
 #endif

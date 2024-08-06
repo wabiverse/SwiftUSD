@@ -4,6 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+
 #include "Garch/glApi.h"
 
 #include "Hgi/blitCmdsOps.h"
@@ -383,3 +385,5 @@ void HgiInteropVulkan::CompositeToInterop(HgiTextureHandle const &color,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED

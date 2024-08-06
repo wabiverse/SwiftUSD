@@ -7,7 +7,7 @@
 #ifndef PXR_IMAGING_HGIVULKAN_HGI_H
 #define PXR_IMAGING_HGIVULKAN_HGI_H
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "pxr/pxrns.h"
 

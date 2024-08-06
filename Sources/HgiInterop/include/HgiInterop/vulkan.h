@@ -7,6 +7,8 @@
 #ifndef PXR_IMAGING_HGIINTEROP_HGIINTEROPVULKAN_H
 #define PXR_IMAGING_HGIINTEROP_HGIINTEROPVULKAN_H
 
+#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+
 #include "Gf/vec4i.h"
 #include "Hgi/texture.h"
 #include "HgiInterop/api.h"
@@ -55,5 +57,7 @@ class HgiInteropVulkan final {
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
 
 #endif

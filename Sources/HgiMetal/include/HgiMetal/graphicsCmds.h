@@ -14,7 +14,7 @@
 #include "pxr/pxrns.h"
 #include <cstdint>
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -95,7 +95,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
   void EnableParallelEncoder(bool enable);
 
   // Needs to be accessible from the Metal IndirectCommandEncoder
-  id<MTLRenderCommandEncoder> GetEncoder(uint32_t encoderIndex = 0);
+  MTL::RenderCommandEncoder* GetEncoder(uint32_t encoderIndex = 0);
 
  protected:
   friend class HgiMetal;
@@ -113,7 +113,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
 
   uint32_t _GetNumEncoders();
   void _SetNumberParallelEncoders(uint32_t numEncoders);
-  void _SetCachedEncoderState(id<MTLRenderCommandEncoder> encoder);
+  void _SetCachedEncoderState(MTL::RenderCommandEncoder* encoder);
   mutable std::mutex _encoderLock;
 
   void _CreateArgumentBuffer();
@@ -130,15 +130,15 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
 
     HgiMetalResourceBindings *resourceBindings;
     HgiMetalGraphicsPipeline *graphicsPipeline;
-    id<MTLBuffer> argumentBuffer;
+    MTL::Buffer* argumentBuffer;
     HgiVertexBufferBindingVector vertexBindings;
   } _CachedEncState;
 
   HgiMetal *_hgi;
   MTLRenderPassDescriptor *_renderPassDescriptor;
-  id<MTLParallelRenderCommandEncoder> _parallelEncoder;
-  std::vector<id<MTLRenderCommandEncoder>> _encoders;
-  id<MTLBuffer> _argumentBuffer;
+  MTL::ParallelRenderCommandEncoder* _parallelEncoder;
+  std::vector<MTL::RenderCommandEncoder*> _encoders;
+  MTL::Buffer* _argumentBuffer;
   HgiGraphicsCmdsDesc _descriptor;
   HgiPrimitiveType _primitiveType;
   uint32_t _primitiveIndexSize;

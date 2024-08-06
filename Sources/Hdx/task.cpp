@@ -6,7 +6,7 @@
 //
 #include "Hdx/task.h"
 #include "Hdx/tokens.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

@@ -12,7 +12,7 @@
 #include "PxOsd/tokens.h"
 #include "Tf/diagnostic.h"
 
-#include <opensubdiv/far/topologyRefinerFactory.h>
+#include <OpenSubdiv/OSDAdaptiveTopologyRefinerFactory.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

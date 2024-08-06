@@ -11,7 +11,7 @@
 
 #include "HgiMetal/api.h"
 
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -41,7 +41,7 @@ class HgiMetalShaderFunction final : public HgiShaderFunction {
 
   /// Returns the metal resource id of the shader.
   HGIMETAL_API
-  id<MTLFunction> GetShaderId() const;
+  MTL::Function* GetShaderId() const;
 
  protected:
   friend class HgiMetal;
@@ -57,7 +57,7 @@ class HgiMetalShaderFunction final : public HgiShaderFunction {
  private:
   std::string _errors;
 
-  id<MTLFunction> _shaderId;
+  MTL::Function* _shaderId;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

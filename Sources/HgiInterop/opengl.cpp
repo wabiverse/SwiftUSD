@@ -6,7 +6,7 @@
 //
 #include "Garch/glApi.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/texture.h"
 #include "HgiInterop/opengl.h"
 #include "Vt/value.h"

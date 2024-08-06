@@ -99,7 +99,7 @@ class HgiSampler {
   /// There is no safety provided in using this. If you by accident pass a
   /// HgiMetal resource into an OpenGL call, bad things may happen.
   /// In OpenGL this returns the GLuint resource name.
-  /// In Metal this returns the id<MTLSamplerState> as uint64_t.
+  /// In Metal this returns the MTL::SamplerState* as uint64_t.
   /// In Vulkan this returns the VkSampler as uint64_t.
   HGI_API
   virtual uint64_t GetRawResource() const = 0;

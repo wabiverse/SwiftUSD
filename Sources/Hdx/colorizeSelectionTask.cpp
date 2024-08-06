@@ -14,7 +14,7 @@
 #include "Hdx/selectionTracker.h"
 #include "Hdx/tokens.h"
 
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

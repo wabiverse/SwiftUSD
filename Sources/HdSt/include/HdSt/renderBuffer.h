@@ -12,7 +12,7 @@
 #include "HdSt/api.h"
 #include "HdSt/textureUtils.h"
 #include "Hgi/enums.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/texture.h"
 #include "pxr/pxrns.h"
 

@@ -23,7 +23,7 @@
 
 #include "Hgi/computeCmds.h"
 #include "Hgi/computePipeline.h"
-#include "Hgi/hgi.h"
+#include "Hgi/hgiImpl.h"
 #include "Hgi/shaderProgram.h"
 #include "Hgi/tokens.h"
 

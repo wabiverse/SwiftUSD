@@ -11,7 +11,7 @@
 #include "Hgi/types.h"
 #include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
-#include <Metal/Metal.h>
+#include <Metal/Metal.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
