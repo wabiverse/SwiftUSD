@@ -5,6 +5,7 @@
 // https://openusd.org/license.
 //
 /// \file glPlatformContext.cpp
+#if defined(__linux__)
 
 #include "Garch/glPlatformContext.h"
 #include "Tf/hash.h"
@@ -70,3 +71,5 @@ GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(__linux__)
