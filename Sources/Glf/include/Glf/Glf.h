@@ -16,7 +16,6 @@
 #include <Glf/simpleLightingContext.h>
 #include <Glf/simpleMaterial.h>
 #include <Glf/simpleShadowArray.h>
-#include <Glf/testGLContext.h>
 #include <Glf/texture.h>
 #include <Glf/uniformBlock.h>
 #include <Glf/utils.h>
