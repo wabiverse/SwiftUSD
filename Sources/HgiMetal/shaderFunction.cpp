@@ -34,7 +34,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HgiMetalShaderFunction::HgiMetalShaderFunctionHgiMetalShaderFunction(
+HgiMetalShaderFunction::HgiMetalShaderFunction(
     HgiMetal *hgi, HgiShaderFunctionDesc const &desc)
     : HgiShaderFunction(desc), _shaderId(nil)
 {

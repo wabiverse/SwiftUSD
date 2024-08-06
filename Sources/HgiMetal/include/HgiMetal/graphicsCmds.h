@@ -126,8 +126,8 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
 
     void ResetCachedEncoderState();
 
-    MTLViewport viewport;
-    MTLScissorRect scissorRect;
+    MTL::Viewport viewport;
+    MTL::ScissorRect scissorRect;
 
     HgiMetalResourceBindings *resourceBindings;
     HgiMetalGraphicsPipeline *graphicsPipeline;
@@ -136,7 +136,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
   } _CachedEncState;
 
   HgiMetal *_hgi;
-  MTLRenderPassDescriptor *_renderPassDescriptor;
+  MTL::RenderPassDescriptor *_renderPassDescriptor;
   MTL::ParallelRenderCommandEncoder* _parallelEncoder;
   std::vector<MTL::RenderCommandEncoder*> _encoders;
   MTL::Buffer* _argumentBuffer;
