@@ -12,7 +12,8 @@
 #include "HgiMetal/stepFunctions.h"
 #include "pxr/pxrns.h"
 
-#import <Metal/Metal.hpp>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 
 #include <map>
 #include <mutex>

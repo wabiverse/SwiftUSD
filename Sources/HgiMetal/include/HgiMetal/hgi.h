@@ -14,10 +14,13 @@
 #include "HgiMetal/indirectCommandEncoder.h"
 #include "pxr/pxrns.h"
 
-#import <Metal/Metal.hpp>
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
 #include <stack>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
 
 enum { APIVersion_Metal1_0 = 0, APIVersion_Metal2_0, APIVersion_Metal3_0 };
 
@@ -38,6 +41,9 @@ class HgiMetal final : public Hgi {
 
   HGIMETAL_API
   ~HgiMetal() override;
+
+  HGIMETAL_API
+  static HgiMetalPtr CreateHgi();
 
   HGIMETAL_API
   bool IsBackendSupported() const override;
@@ -212,8 +218,7 @@ class HgiMetal final : public Hgi {
   int _frameDepth;
   bool _workToFlush;
 
-  struct AutoReleasePool;
-  std::unique_ptr<AutoReleasePool> _pool;
+  NS::AutoreleasePool* _pool;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

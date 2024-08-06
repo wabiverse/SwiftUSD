@@ -25,6 +25,7 @@
 #include <Metal/Metal.hpp>
 
 #include "Hgi/tokens.h"
+#include "HgiMetal/hgi.h"
 #include "HgiMetal/resourceBindings.h"
 #include "HgiMetal/shaderGenerator.h"
 
@@ -45,6 +46,37 @@ SectionType *HgiMetalShaderGenerator::CreateShaderSection(T &&...t)
 }
 
 namespace {
+
+// Convert the enums to the interpolation/sampling string in MSL.
+std::string _GetInterpolationString(HgiInterpolationType interpolation, HgiSamplingType sampling)
+{
+  if (interpolation == HgiInterpolationFlat) {
+    return "flat";
+  }
+  else if (interpolation == HgiInterpolationNoPerspective) {
+    if (sampling == HgiSamplingCentroid) {
+      return "centroid_no_perspective";
+    }
+    else if (sampling == HgiSamplingSample) {
+      return "sample_no_perspective";
+    }
+    else {
+      return "center_no_perspective";
+    }
+  }
+  else {
+    if (sampling == HgiSamplingCentroid) {
+      return "centroid_perspective";
+    }
+    else if (sampling == HgiSamplingSample) {
+      return "sample_perspective";
+    }
+    else {
+      // Default behavior is "center_perspective"
+      return "";
+    }
+  }
+}
 
 // This is a conversion layer from descriptors into shader sections
 // In purity we don't want the shader generator to know how to
