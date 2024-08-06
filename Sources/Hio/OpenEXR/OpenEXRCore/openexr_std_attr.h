@@ -14,7 +14,7 @@ extern "C" {
 
 /** @file */
 
-/**
+/** 
  * @defgroup Standard attributes
  * @brief These are a group of attributes which are not strictly required,
  * but have common definitions and should be preferred for representing
@@ -26,8 +26,6 @@ extern "C" {
 chromaticities
 whiteLuminance
 adoptedNeutral
-renderingTransform
-lookModTransform
 xDensity
 owner
 comments
@@ -50,7 +48,6 @@ worldToCamera
 worldToNDC
 deepImageState
 originalDataWindow
-dwaCompressionLevel
 */
 
 /** @} */
