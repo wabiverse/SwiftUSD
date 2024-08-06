@@ -1,9 +1,10 @@
-#ifndef __PXR_IMAGING_HD_HD_H__
-#define __PXR_IMAGING_HD_HD_H__
+#ifndef __PXR_IMAGING_HD_H__
+#define __PXR_IMAGING_HD_H__
 
-// hd
-#include <Hd/aov.h>
+// Hd
 #include <Hd/api.h>
+
+#include <Hd/aov.h>
 #include <Hd/basisCurves.h>
 #include <Hd/basisCurvesSchema.h>
 #include <Hd/basisCurvesTopology.h>
@@ -163,10 +164,6 @@
 #include <Hd/tokens.h>
 #include <Hd/topology.h>
 #include <Hd/types.h>
-#include <Hd/unitTestDelegate.h>
-#include <Hd/unitTestHelper.h>
-#include <Hd/unitTestNullRenderDelegate.h>
-#include <Hd/unitTestNullRenderPass.h>
 #include <Hd/utils.h>
 #include <Hd/vectorSchema.h>
 #include <Hd/vectorSchemaTypeDefs.h>
@@ -178,12 +175,6 @@
 #include <Hd/volumeFieldSchema.h>
 #include <Hd/vtBufferSource.h>
 #include <Hd/xformSchema.h>
-
-#endif  // __PXR_IMAGING_HD_HD_H__
-#ifndef __PXR_IMAGING_HD_H__
-#define __PXR_IMAGING_HD_H__
-
-// Hd
 #include <Hd/collectionExpressionEvaluator.h>
 #include <Hd/collectionPredicateLibrary.h>
 #include <Hd/collectionSchema.h>
@@ -202,4 +193,5 @@
 #include <Hd/systemMessages.h>
 #include <Hd/tetMeshSchema.h>
 #include <Hd/tetMeshTopologySchema.h>
+
 #endif  // __PXR_IMAGING_HD_H__
