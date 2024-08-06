@@ -10,7 +10,7 @@
 
 #include "pxr/pxrns.h"
 
-#include "Pegtl/pegtl.hpp"
+#include "Pegtl/Pegtl.hpp"
 #include "Sdf/predicateExpressionParser.h"
 
 #include <memory>

@@ -10,8 +10,8 @@
 #include "Sdf/debugCodes.h"
 #include "Sdf/variableExpressionImpl.h"
 
-#include "Pegtl/pegtl.hpp"
-#include "Pegtl/pegtl/contrib/trace.hpp"
+#include "Pegtl/Pegtl.hpp"
+#include "Pegtl/trace.hpp"
 #include "Tf/stringUtils.h"
 
 #include <tuple>
