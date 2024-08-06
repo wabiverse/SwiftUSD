@@ -22,11 +22,11 @@
 // language governing permissions and limitations under the Apache License.
 //
 
-#include "pxr/pxr.h"
+#include "pxr/pxrns.h"
 
-#include "pxr/base/tf/diagnostic.h"
+#include "Tf/diagnostic.h"
 
-#include "../integerCoding.h"
+#include "Usd/integerCoding.h"
 
 #include <cstdlib>
 #include <string>

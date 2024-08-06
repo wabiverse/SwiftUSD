@@ -5,8 +5,8 @@
 // https://openusd.org/license.
 //
 
-#include "crateFile.h"
-#include "integerCoding.h"
+#include "Usd/crateFile.h"
+#include "Usd/integerCoding.h"
 #include "pxr/pxrns.h"
 
 #include "Ar/asset.h"
