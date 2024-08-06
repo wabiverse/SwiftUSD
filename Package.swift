@@ -428,7 +428,7 @@ let package = Package(
         .target(name: "Arch")
       ],
       cxxSettings: [
-        .headerSearchPath("include/Pegtl")
+        .headerSearchPath("include/Pegtl"),
         .define("MFB_PACKAGE_NAME", to: "Pegtl"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Pegtl"),
         .define("MFB_PACKAGE_MODULE", to: "Pegtl"),
