@@ -101,7 +101,7 @@ struct analyze_traits<Name, internal::if_apply<Rule, Actions...>>
 
 template<typename Name, typename Cond, typename Then, typename Else>
 struct analyze_traits<Name, internal::if_then_else<Cond, Then, Else>>
-    : analyze_traits<Name, typename sor<internal::seq<Cond, Then>, Else>::rule_t> {};
+    : analyze_traits<Name, typename internal::sor<internal::seq<Cond, Then>, Else>::rule_t> {};
 
 template<typename Name, char... Cs>
 struct analyze_traits<Name, internal::istring<Cs...>>
@@ -133,7 +133,7 @@ struct analyze_traits<Name, internal::ranges<Peek, Cs...>> : analyze_any_traits<
 
 template<typename Name, typename Head, typename... Rules>
 struct analyze_traits<Name, internal::rematch<Head, Rules...>>
-    : analyze_traits<Name, typename sor<Head, sor<internal::seq<Rules, any>...>>::rule_t>  // TODO: Correct
+    : analyze_traits<Name, typename internal::sor<Head, internal::sor<internal::seq<Rules, any>...>>::rule_t>  // TODO: Correct
                                                                                  // (enough)?
 {};
 
@@ -184,7 +184,7 @@ struct analyze_traits<Name, internal::until<Cond>> : analyze_traits<Name, typena
 
 template<typename Name, typename Cond, typename... Rules>
 struct analyze_traits<Name, internal::until<Cond, Rules...>>
-    : analyze_traits<Name, typename internal::seq<star<Rules...>, Cond>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<internal::star<Rules...>, Cond>::rule_t> {};
 
 #if defined(__cpp_exceptions)
 template<typename Name, typename Cond, typename... Rules>

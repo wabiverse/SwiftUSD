@@ -287,7 +287,7 @@ struct VariableEnd : string<'}'> {};
 
 template<class C> struct VariableName : identifier {};
 
-template<class C> struct VariableImpl : if_must<VariableStart, VariableName<C>, VariableEnd> {
+template<class C> struct VariableImpl : PXR_PEGTL_NAMESPACE::internal::if_must<VariableStart, VariableName<C>, VariableEnd> {
   using Name = VariableName<C>;
 };
 
@@ -304,23 +304,23 @@ template<char QuoteChar> struct QuotedStringEscapedChar : one<'`', '$', '\\', Qu
 
 // Sequence of allowed characters in a quoted string.
 template<char QuoteChar>
-struct QuotedStringChars : plus<sor<
+struct QuotedStringChars : PXR_PEGTL_NAMESPACE::internal::plus<PXR_PEGTL_NAMESPACE::internal::sor<
                                // An escaped character.
-                               seq<one<'\\'>, QuotedStringEscapedChar<QuoteChar>>,
+                               PXR_PEGTL_NAMESPACE::internal::seq<one<'\\'>, QuotedStringEscapedChar<QuoteChar>>,
                                // Any other characters that aren't the start of a stage
                                // variable or the quote character, since those are handled
                                // by different rules.
-                               seq<not_at<sor<VariableStart, one<QuoteChar>>>, any>>> {};
+                               PXR_PEGTL_NAMESPACE::internal::seq<PXR_PEGTL_NAMESPACE::internal::not_at<PXR_PEGTL_NAMESPACE::internal::sor<VariableStart, one<QuoteChar>>>, any>>> {};
 
 template<char QuoteChar> struct QuotedStringStart : string<QuoteChar> {};
 
 template<char QuoteChar> struct QuotedStringEnd : string<QuoteChar> {};
 
 template<char QuoteChar>
-struct QuotedStringBody : star<sor<QuotedStringVariable, QuotedStringChars<QuoteChar>>> {};
+struct QuotedStringBody : PXR_PEGTL_NAMESPACE::internal::star<PXR_PEGTL_NAMESPACE::internal::sor<QuotedStringVariable, QuotedStringChars<QuoteChar>>> {};
 
 template<char QuoteChar>
-struct QuotedString : if_must<QuotedStringStart<QuoteChar>,
+struct QuotedString : PXR_PEGTL_NAMESPACE::internal::if_must<QuotedStringStart<QuoteChar>,
                               QuotedStringBody<QuoteChar>,
                               QuotedStringEnd<QuoteChar>> {
   using Start = QuotedStringStart<QuoteChar>;
@@ -333,7 +333,7 @@ using SingleQuotedString = QuotedString<'\''>;
 
 // ----------------------------------------
 
-struct Integer : seq<opt<one<'-'>>, plus<ascii::digit>> {};
+struct Integer : PXR_PEGTL_NAMESPACE::internal::seq<PXR_PEGTL_NAMESPACE::internal::opt<one<'-'>>, PXR_PEGTL_NAMESPACE::internal::plus<ascii::digit>> {};
 
 // ----------------------------------------
 
@@ -341,15 +341,15 @@ struct Integer : seq<opt<one<'-'>>, plus<ascii::digit>> {};
 // are the representations used in the two primary languages supported
 // by USD -- C++ and Python -- and that correspondence may make it easier
 // for users working in those languages while writing expressions.
-struct BooleanTrue : sor<PXR_PEGTL_KEYWORD("True"), PXR_PEGTL_KEYWORD("true")> {};
+struct BooleanTrue : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_KEYWORD("True"), PXR_PEGTL_KEYWORD("true")> {};
 
-struct BooleanFalse : sor<PXR_PEGTL_KEYWORD("False"), PXR_PEGTL_KEYWORD("false")> {};
+struct BooleanFalse : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_KEYWORD("False"), PXR_PEGTL_KEYWORD("false")> {};
 
-struct Boolean : sor<BooleanTrue, BooleanFalse> {};
+struct Boolean : PXR_PEGTL_NAMESPACE::internal::sor<BooleanTrue, BooleanFalse> {};
 
 // ----------------------------------------
 
-struct None : sor<PXR_PEGTL_KEYWORD("None"), PXR_PEGTL_KEYWORD("none")> {};
+struct None : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_KEYWORD("None"), PXR_PEGTL_KEYWORD("none")> {};
 
 // ----------------------------------------
 
@@ -358,9 +358,9 @@ struct ExpressionBody;
 
 struct FunctionName : identifier {};
 
-struct FunctionArgumentStart : pad<one<'('>, one<' '>> {};
+struct FunctionArgumentStart : PXR_PEGTL_NAMESPACE::internal::pad<one<'('>, one<' '>> {};
 
-struct FunctionArgumentEnd : pad<one<')'>, one<' '>> {};
+struct FunctionArgumentEnd : PXR_PEGTL_NAMESPACE::internal::pad<one<')'>, one<' '>> {};
 
 // A function argument can be any valid expression. We can't directly
 // derive from ExpressionBody because doing so would require ExpressionBody
@@ -371,15 +371,15 @@ template<class Base> struct FunctionArgumentWrapper : public Base {};
 using FunctionArgument = FunctionArgumentWrapper<ExpressionBody>;
 
 // Function arguments are zero or more comma-separated arguments.
-struct FunctionArguments : sor<list<FunctionArgument, one<','>, one<' '>>, star<one<' '>>> {};
+struct FunctionArguments : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_NAMESPACE::internal::list<FunctionArgument, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
 
 struct Function
-    : if_must<seq<FunctionName, FunctionArgumentStart>, FunctionArguments, FunctionArgumentEnd> {};
+    : if_must<PXR_PEGTL_NAMESPACE::internal::seq<FunctionName, FunctionArgumentStart>, FunctionArguments, FunctionArgumentEnd> {};
 
 // ----------------------------------------
 
 struct ScalarExpression
-    : sor<Variable, DoubleQuotedString, SingleQuotedString, Integer, Boolean, None, Function> {};
+    : PXR_PEGTL_NAMESPACE::internal::sor<Variable, DoubleQuotedString, SingleQuotedString, Integer, Boolean, None, Function> {};
 
 // ----------------------------------------
 
@@ -389,9 +389,9 @@ struct ListEnd : one<']'> {};
 
 struct ListElement : public ScalarExpression {};
 
-struct ListElements : sor<list<ListElement, one<','>, one<' '>>, star<one<' '>>> {};
+struct ListElements : PXR_PEGTL_NAMESPACE::internal::sor<PXR_PEGTL_NAMESPACE::internal::list<ListElement, one<','>, one<' '>>, PXR_PEGTL_NAMESPACE::internal::star<one<' '>>> {};
 
-struct ListExpression : if_must<ListStart, ListElements, ListEnd> {};
+struct ListExpression : PXR_PEGTL_NAMESPACE::internal::if_must<ListStart, ListElements, ListEnd> {};
 
 // ----------------------------------------
 
@@ -399,9 +399,9 @@ struct ExpressionStart : string<'`'> {};
 
 struct ExpressionEnd : string<'`'> {};
 
-struct ExpressionBody : sor<ScalarExpression, ListExpression> {};
+struct ExpressionBody : PXR_PEGTL_NAMESPACE::internal::sor<ScalarExpression, ListExpression> {};
 
-struct Expression : must<ExpressionStart, ExpressionBody, ExpressionEnd> {};
+struct Expression : PXR_PEGTL_NAMESPACE::internal::must<ExpressionStart, ExpressionBody, ExpressionEnd> {};
 
 // Parser actions ---------------------------------------------
 // Objects that define the actions to take when a parsing rule
