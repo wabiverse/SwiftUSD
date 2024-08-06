@@ -11,6 +11,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Arch/attributes.h"
 #include "Tf/api.h"
 #include "Tf/preprocessorUtilsLite.h"
@@ -120,3 +122,5 @@ extern "C" ARCH_EXPORT PyObject *TF_PP_CAT(PyInit_lib, MFB_PACKAGE_NAME)()
 #define TF_WRAP(x) \
   ARCH_HIDDEN void wrap##x(); \
   wrap##x()
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

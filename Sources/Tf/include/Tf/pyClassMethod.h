@@ -9,6 +9,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #if __has_include(<boost/python/class.hpp>)
 #include <boost/python/class.hpp>
 #include <boost/python/def_visitor.hpp>
@@ -78,5 +80,7 @@ struct _TfPyClassMethod : def_visitor<_TfPyClassMethod> {
 typedef Tf_PyClassMethod::_TfPyClassMethod TfPyClassMethod;
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_CLASS_METHOD_H

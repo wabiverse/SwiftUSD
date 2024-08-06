@@ -16,6 +16,10 @@
 #  define TF_MAX_ARITY 7
 #endif  // TF_MAX_ARITY
 
+#include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/api.h"
 #include "Tf/diagnostic.h"
 #include "Tf/functionTraits.h"
@@ -25,7 +29,6 @@
 #include "Tf/refPtr.h"
 #include "Tf/stringUtils.h"
 #include "Tf/weakPtr.h"
-#include "pxr/pxrns.h"
 
 #include "Arch/demangle.h"
 
@@ -598,5 +601,7 @@ struct NewCtorWithClassReference<R(ClsRef, Args...)> : CtorBase<R(ClsRef, Args..
 }  // namespace Tf_MakePyConstructor
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_MAKE_PY_CONSTRUCTOR_H

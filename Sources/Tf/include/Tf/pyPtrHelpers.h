@@ -12,6 +12,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/pyIdentity.h"
 #include "Tf/pyObjectFinder.h"
 #include "Tf/wrapTypeHelpers.h"
@@ -406,5 +408,7 @@ struct TfPyWeakPtr : Tf_PyDefHelpers::WeakPtr {};
 struct TfPyRefAndWeakPtr : Tf_PyDefHelpers::RefAndWeakPtr {};
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_PTR_HELPERS_H

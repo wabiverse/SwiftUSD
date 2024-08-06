@@ -7,6 +7,10 @@
 #ifndef PXR_BASE_TF_PY_NOTICE_WRAPPER_H
 #define PXR_BASE_TF_PY_NOTICE_WRAPPER_H
 
+#include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/notice.h"
 #include "Tf/pyLock.h"
 #include "Tf/pyObjectFinder.h"
@@ -14,7 +18,6 @@
 #include "Tf/stringUtils.h"
 #include "Tf/type.h"
 #include "Tf/wrapTypeHelpers.h"
-#include "pxr/pxrns.h"
 
 #if __has_include(<boost/python/bases.hpp>)
 #include <boost/python/bases.hpp>
@@ -139,5 +142,7 @@ struct TfPyNoticeWrapper : public NoticeType, public TfPyNoticeWrapperBase {
   }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_NOTICE_WRAPPER_H

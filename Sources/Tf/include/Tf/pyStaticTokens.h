@@ -12,6 +12,8 @@
 
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <locale>
 
 #include "Tf/preprocessorUtilsLite.h"
@@ -85,5 +87,7 @@ class _TfPyWrapStaticToken {
   TF_PP_SEQ_FOR_EACH(_TF_PY_TOKENS_WRAP_ATTR_ELEMENT, key, seq)
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_STATIC_TOKENS_H

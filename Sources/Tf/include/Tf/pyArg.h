@@ -7,8 +7,11 @@
 #ifndef PXR_BASE_TF_PY_ARG_H
 #define PXR_BASE_TF_PY_ARG_H
 
-#include "Tf/api.h"
 #include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
+#include "Tf/api.h"
 
 #if __has_include(<boost/python/dict.hpp>)
 #include <boost/python/dict.hpp>
@@ -92,5 +95,7 @@ std::string TfPyCreateFunctionDocString(const std::string &functionName,
                                         const std::string &description = std::string());
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_PY_ARG_H
