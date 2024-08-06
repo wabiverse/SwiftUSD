@@ -29,22 +29,22 @@ template<typename Rule> struct normal {
   static constexpr bool enable = internal::enable_control<Rule>;
 
   template<typename ParseInput, typename... States>
-  static void start(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
+  static void start(const ParseInput & /*unused*/, States &&...) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void success(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
+  static void success(const ParseInput & /*unused*/, States &&...) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  static void failure(const ParseInput & /*unused*/, States &&.*unused*/) noexcept
+  static void failure(const ParseInput & /*unused*/, States &&...) noexcept
   {
   }
 
   template<typename ParseInput, typename... States>
-  [[noreturn]] static void raise(const ParseInput &in, States &&.*unused*/)
+  [[noreturn]] static void raise(const ParseInput &in, States &&...)
   {
 #if defined(__cpp_exceptions)
     throw parse_error("parse error matching " + std::string(demangle<Rule>()), in);

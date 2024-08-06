@@ -53,7 +53,7 @@ template<typename Rule,
          typename ParseInput,
          typename... States>
 [[nodiscard]] static auto match_no_control(ParseInput &in,
-                                           States &&.*unused*/) -> decltype(Rule::match(in))
+                                           States &&...) -> decltype(Rule::match(in))
 {
   return Rule::match(in);
 }

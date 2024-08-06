@@ -138,7 +138,7 @@ struct chunk_size {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, std::size_t &size, States &&.*unused*/)
+  [[nodiscard]] static bool match(ParseInput &in, std::size_t &size, States &&...)
   {
     size = 0;
     std::size_t i = 0;
@@ -186,7 +186,7 @@ struct chunk_data {
            class Control,
            typename ParseInput,
            typename... States>
-  [[nodiscard]] static bool match(ParseInput &in, const std::size_t size, States &&.*unused*/)
+  [[nodiscard]] static bool match(ParseInput &in, const std::size_t size, States &&...)
   {
     if (in.size(size) >= size) {
       in.bump(size);

@@ -106,7 +106,7 @@ template<typename Cond> struct raw_string_until<Cond> {
            typename... States>
   [[nodiscard]] static bool match(ParseInput &in,
                                   const std::size_t &marker_size,
-                                  States &&.*unused*/)
+                                  States &&...)
   {
     auto m = in.template mark<M>();
 

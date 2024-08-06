@@ -93,7 +93,7 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void start(const ParseInput & /*unused*/, States &&.*unused*/)
+  void start(const ParseInput & /*unused*/, States &&...)
   {
     std::cerr << '#' << std::setw(indent() - 1) << ++m_count << TracerTraits::ansi_rule
               << demangle<Rule>() << TracerTraits::ansi_reset << '\n';
@@ -101,7 +101,7 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void success(const ParseInput &in, States &&.*unused*/)
+  void success(const ParseInput &in, States &&...)
   {
     const auto prev = m_stack.back();
     m_stack.pop_back();
@@ -116,7 +116,7 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void failure(const ParseInput &in, States &&.*unused*/)
+  void failure(const ParseInput &in, States &&...)
   {
     const auto prev = m_stack.back();
     m_stack.pop_back();
@@ -131,7 +131,7 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void raise(const ParseInput & /*unused*/, States &&.*unused*/)
+  void raise(const ParseInput & /*unused*/, States &&...)
   {
     std::cerr << std::setw(indent()) << ' ' << TracerTraits::ansi_raise << "raise"
               << TracerTraits::ansi_reset << ' ' << TracerTraits::ansi_rule << demangle<Rule>()
@@ -139,7 +139,7 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void unwind(const ParseInput &in, States &&.*unused*/)
+  void unwind(const ParseInput &in, States &&...)
   {
     const auto prev = m_stack.back();
     m_stack.pop_back();
@@ -154,14 +154,14 @@ template<typename TracerTraits> struct tracer {
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void apply(const ParseInput & /*unused*/, States &&.*unused*/)
+  void apply(const ParseInput & /*unused*/, States &&...)
   {
     std::cerr << std::setw(static_cast<int>(indent() - TracerTraits::indent_increment)) << ' '
               << TracerTraits::ansi_apply << "apply" << TracerTraits::ansi_reset << '\n';
   }
 
   template<typename Rule, typename ParseInput, typename... States>
-  void apply0(const ParseInput & /*unused*/, States &&.*unused*/)
+  void apply0(const ParseInput & /*unused*/, States &&...)
   {
     std::cerr << std::setw(static_cast<int>(indent() - TracerTraits::indent_increment)) << ' '
               << TracerTraits::ansi_apply << "apply0" << TracerTraits::ansi_reset << '\n';
