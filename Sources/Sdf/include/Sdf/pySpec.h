@@ -64,7 +64,7 @@
 #include "Sdf/declareHandles.h"
 #include "Tf/diagnostic.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include <string>
 #include <type_traits>

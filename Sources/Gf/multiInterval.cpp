@@ -8,7 +8,7 @@
 #include "Gf/multiInterval.h"
 #include "Gf/ostreamHelpers.h"
 #include "Tf/iterator.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/type.h"
 #include "pxr/pxrns.h"
 

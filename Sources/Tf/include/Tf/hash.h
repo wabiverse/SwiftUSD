@@ -11,7 +11,7 @@
 /// \ingroup group_tf_String
 
 #include "Tf/api.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "pxr/pxrns.h"
 
 #include <cstring>

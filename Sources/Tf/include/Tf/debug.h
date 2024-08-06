@@ -18,7 +18,7 @@
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/registryManager.h"
 #include "Tf/stopwatch.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "pxr/pxrns.h"
 
 #include <atomic>

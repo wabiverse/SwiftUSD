@@ -18,7 +18,7 @@
 #include "Tf/pxrTslRobinMap/robin_set.h"
 #include "Tf/stl.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include "Arch/attributes.h"
 #include "Arch/debugger.h"

@@ -15,7 +15,7 @@
 #include "Vt/value.h"
 #include "pxr/pxrns.h"
 
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 
 #include <type_traits>
 

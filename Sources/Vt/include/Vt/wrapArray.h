@@ -29,7 +29,7 @@
 #include "Tf/pyUtils.h"
 #include "Tf/span.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/wrapTypeHelpers.h"
 
 #include <boost/python/class.hpp>

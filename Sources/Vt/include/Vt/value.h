@@ -24,7 +24,7 @@
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/safeTypeCompare.h"
 #include "Tf/stringUtils.h"
-#include "Tf/tf.h"
+#include "Tf/tfImpl.h"
 #include "Tf/type.h"
 
 #include "Vt/api.h"
