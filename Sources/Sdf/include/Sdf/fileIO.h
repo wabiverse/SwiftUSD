@@ -9,7 +9,7 @@
 
 #include "pxr/pxrns.h"
 
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 
 #include "Ar/writableAsset.h"
 #include "Tf/diagnosticLite.h"

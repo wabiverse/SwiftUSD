@@ -6,7 +6,7 @@
 //
 
 #include "Plugin/sdrOsl/oslParser.h"
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/asset.h"
 #include "Ar/resolvedPath.h"
 #include "Ar/resolver.h"

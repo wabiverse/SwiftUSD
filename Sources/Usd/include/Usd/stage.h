@@ -24,7 +24,7 @@
 #include "Tf/hashmap.h"
 #include "Tf/weakBase.h"
 
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/notice.h"
 #include "Pcp/cache.h"
 #include "Sdf/declareHandles.h"

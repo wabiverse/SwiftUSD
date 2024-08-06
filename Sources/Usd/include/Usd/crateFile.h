@@ -13,7 +13,7 @@
 #include "crateValueInliners.h"
 #include "shared.h"
 
-#include "Ar/ar.h"
+#include "Ar/arImpl.h"
 #include "Ar/asset.h"
 #include "Ar/writableAsset.h"
 #include "Arch/fileSystem.h"
