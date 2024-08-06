@@ -15,6 +15,10 @@
 #include "lf_eol.hpp"
 
 namespace PXR_PEGTL_NAMESPACE {
+namespace internal {
+struct eol {};
+} // namespace internal
+
 inline namespace ascii {
 // this is both a rule and a pseudo-namespace for eol::cr, ...
 struct eol : internal::eol {
