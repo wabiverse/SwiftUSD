@@ -56,6 +56,10 @@ let package = Package(
       targets: ["Work"]
     ),
     .library(
+      name: "Pegtl",
+      targets: ["Pegtl"]
+    ),
+    .library(
       name: "Plug",
       targets: ["Plug"]
     ),
@@ -419,6 +423,21 @@ let package = Package(
     ),
 
     .target(
+      name: "Pegtl",
+      dependencies: [
+        .target(name: "Arch")
+      ],
+      cxxSettings: [
+        .headerSearchPath("include/Pegtl")
+        .define("MFB_PACKAGE_NAME", to: "Pegtl"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Pegtl"),
+        .define("MFB_PACKAGE_MODULE", to: "Pegtl"),
+        .define("PEGTL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
       name: "Plug",
       dependencies: [
         .target(name: "Arch"),
@@ -514,6 +533,7 @@ let package = Package(
         .target(name: "Work"),
         .target(name: "Vt"),
         .target(name: "Ar"),
+        .target(name: "Pegtl"),
       ],
       resources: [
         .process("Resources")
@@ -1466,6 +1486,7 @@ let package = Package(
         .target(name: "Trace"),
         .target(name: "Vt"),
         .target(name: "Work"),
+        .target(name: "Pegtl"),
         .target(name: "Plug"),
         // ----------- usd. ------
         .target(name: "ArPrototypes"),
