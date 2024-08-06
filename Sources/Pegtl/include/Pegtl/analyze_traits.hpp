@@ -50,7 +50,7 @@ template<typename... Rules> struct analyze_sor_traits {
 
 template<typename Name, template<typename...> class Action, typename... Rules>
 struct analyze_traits<Name, internal::action<Action, Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name, typename Peek>
 struct analyze_traits<Name, internal::any<Peek>> : analyze_any_traits<> {};
@@ -63,7 +63,7 @@ struct analyze_traits<Name, internal::apply0<Actions...>> : analyze_opt_traits<>
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::at<Rules...>>
-    : analyze_traits<Name, typename opt<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::opt<Rules...>::rule_t> {};
 
 template<typename Name> struct analyze_traits<Name, internal::bof> : analyze_opt_traits<> {};
 
@@ -75,17 +75,17 @@ struct analyze_traits<Name, internal::bytes<Cnt>>
 
 template<typename Name, template<typename...> class Control, typename... Rules>
 struct analyze_traits<Name, internal::control<Control, Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::disable<Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name> struct analyze_traits<Name, internal::discard> : analyze_opt_traits<> {};
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::enable<Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name> struct analyze_traits<Name, internal::eof> : analyze_opt_traits<> {};
 
@@ -101,7 +101,7 @@ struct analyze_traits<Name, internal::if_apply<Rule, Actions...>>
 
 template<typename Name, typename Cond, typename Then, typename Else>
 struct analyze_traits<Name, internal::if_then_else<Cond, Then, Else>>
-    : analyze_traits<Name, typename sor<seq<Cond, Then>, Else>::rule_t> {};
+    : analyze_traits<Name, typename sor<internal::seq<Cond, Then>, Else>::rule_t> {};
 
 template<typename Name, char... Cs>
 struct analyze_traits<Name, internal::istring<Cs...>>
@@ -109,7 +109,7 @@ struct analyze_traits<Name, internal::istring<Cs...>>
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::not_at<Rules...>>
-    : analyze_traits<Name, typename opt<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::opt<Rules...>::rule_t> {};
 
 template<typename Name, internal::result_on_found R, typename Peek, typename Peek::data_t... Cs>
 struct analyze_traits<Name, internal::one<R, Peek, Cs...>> : analyze_any_traits<> {};
@@ -119,7 +119,7 @@ struct analyze_traits<Name, internal::opt<Rule, Rules...>> : analyze_opt_traits<
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::plus<Rules...>>
-    : analyze_traits<Name, typename seq<Rules..., opt<Name>>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules..., internal::opt<Name>>::rule_t> {};
 
 template<typename Name,
          internal::result_on_found R,
@@ -133,7 +133,7 @@ struct analyze_traits<Name, internal::ranges<Peek, Cs...>> : analyze_any_traits<
 
 template<typename Name, typename Head, typename... Rules>
 struct analyze_traits<Name, internal::rematch<Head, Rules...>>
-    : analyze_traits<Name, typename sor<Head, sor<seq<Rules, any>...>>::rule_t>  // TODO: Correct
+    : analyze_traits<Name, typename sor<Head, sor<internal::seq<Rules, any>...>>::rule_t>  // TODO: Correct
                                                                                  // (enough)?
 {};
 
@@ -141,19 +141,19 @@ template<typename Name, unsigned Cnt, typename... Rules>
 struct analyze_traits<Name, internal::rep<Cnt, Rules...>>
     : analyze_traits<Name,
                      std::conditional_t<(Cnt != 0),
-                                        typename seq<Rules...>::rule_t,
-                                        typename opt<Rules...>::rule_t>> {};
+                                        typename internal::seq<Rules...>::rule_t,
+                                        typename internal::opt<Rules...>::rule_t>> {};
 
 template<typename Name, unsigned Min, unsigned Max, typename... Rules>
 struct analyze_traits<Name, internal::rep_min_max<Min, Max, Rules...>>
     : analyze_traits<Name,
                      std::conditional_t<(Min != 0),
-                                        typename seq<Rules...>::rule_t,
-                                        typename opt<Rules...>::rule_t>> {};
+                                        typename internal::seq<Rules...>::rule_t,
+                                        typename internal::opt<Rules...>::rule_t>> {};
 
 template<typename Name, unsigned Max, typename... Rules>
 struct analyze_traits<Name, internal::rep_opt<Max, Rules...>>
-    : analyze_traits<Name, typename opt<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::opt<Rules...>::rule_t> {};
 
 template<typename Name, unsigned Amount>
 struct analyze_traits<Name, internal::require<Amount>> : analyze_opt_traits<> {};
@@ -166,11 +166,11 @@ struct analyze_traits<Name, internal::sor<Rule, Rules...>> : analyze_sor_traits<
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::star<Rules...>>
-    : analyze_traits<Name, typename opt<Rules..., Name>::rule_t> {};
+    : analyze_traits<Name, typename internal::opt<Rules..., Name>::rule_t> {};
 
 template<typename Name, typename State, typename... Rules>
 struct analyze_traits<Name, internal::state<State, Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name, char... Cs>
 struct analyze_traits<Name, internal::string<Cs...>>
@@ -184,27 +184,27 @@ struct analyze_traits<Name, internal::until<Cond>> : analyze_traits<Name, typena
 
 template<typename Name, typename Cond, typename... Rules>
 struct analyze_traits<Name, internal::until<Cond, Rules...>>
-    : analyze_traits<Name, typename seq<star<Rules...>, Cond>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<star<Rules...>, Cond>::rule_t> {};
 
 #if defined(__cpp_exceptions)
 template<typename Name, typename Cond, typename... Rules>
 struct analyze_traits<Name, internal::if_must<true, Cond, Rules...>>
-    : analyze_traits<Name, typename opt<Cond, Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::opt<Cond, Rules...>::rule_t> {};
 
 template<typename Name, typename Cond, typename... Rules>
 struct analyze_traits<Name, internal::if_must<false, Cond, Rules...>>
-    : analyze_traits<Name, typename seq<Cond, Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Cond, Rules...>::rule_t> {};
 
 template<typename Name, typename... Rules>
 struct analyze_traits<Name, internal::must<Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 
 template<typename Name, typename T>
 struct analyze_traits<Name, internal::raise<T>> : analyze_any_traits<> {};
 
 template<typename Name, typename Exception, typename... Rules>
 struct analyze_traits<Name, internal::try_catch_type<Exception, Rules...>>
-    : analyze_traits<Name, typename seq<Rules...>::rule_t> {};
+    : analyze_traits<Name, typename internal::seq<Rules...>::rule_t> {};
 #endif
 
 }  // namespace PXR_PEGTL_NAMESPACE

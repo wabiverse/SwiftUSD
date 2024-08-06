@@ -14,7 +14,7 @@
 #include "Tf/diagnostic.h"
 #include "Vt/value.h"
 
-#include "Pegtl/pegtl.hpp"
+#include "Pegtl/Pegtl.hpp"
 
 #include <memory>
 

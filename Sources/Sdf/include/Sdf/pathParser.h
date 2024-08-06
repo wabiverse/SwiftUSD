@@ -12,7 +12,7 @@
 #include "Tf/unicodeUtils.h"
 #include "pxr/pxrns.h"
 
-#include "Pegtl/pegtl.hpp"
+#include "Pegtl/Pegtl.hpp"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
