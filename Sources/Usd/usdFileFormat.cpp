@@ -19,7 +19,7 @@
 #include "Tf/registryManager.h"
 #include "Tf/type.h"
 
-#include "crateData.h"
+#include "Usd/crateData.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
