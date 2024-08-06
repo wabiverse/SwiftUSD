@@ -11,6 +11,9 @@
 #include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
 
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiMetal;
@@ -79,7 +82,7 @@ class HgiMetalBlitCmds final : public HgiBlitCmds {
   HgiMetal *_hgi;
   MTL::CommandBuffer* _commandBuffer;
   MTL::BlitCommandEncoder* _blitEncoder;
-  NSString *_label;
+  NS::String *_label;
   bool _secondaryCommandBuffer;
 
   // BlitCmds is used only one frame so storing multi-frame state on BlitCmds

@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE

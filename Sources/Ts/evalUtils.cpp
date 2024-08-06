@@ -11,7 +11,7 @@
 #include "Ts/keyFrameUtils.h"
 
 #include "Gf/interval.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Tf/diagnostic.h"
 
 #include <limits>

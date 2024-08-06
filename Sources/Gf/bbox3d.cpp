@@ -6,7 +6,7 @@
 //
 
 #include "Gf/bbox3d.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/ostreamHelpers.h"
 #include "pxr/pxrns.h"
 

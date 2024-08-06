@@ -12,7 +12,7 @@
 /// Architecture-specific math function calls.
 
 #include "Arch/defines.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
 #include "pxr/pxrns.h"
 
 #if defined(ARCH_COMPILER_MSVC)

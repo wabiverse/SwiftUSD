@@ -362,6 +362,8 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
+        .headerSearchPath("include/Gf"),
+        .headerSearchPath("include/Gf/nc"),
         .define("MFB_PACKAGE_NAME", to: "Gf"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Gf"),
         .define("MFB_PACKAGE_MODULE", to: "Gf"),

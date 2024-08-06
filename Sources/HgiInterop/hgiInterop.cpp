@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "HgiInterop/hgiInterop.h"
+#include "HgiInterop/hgiInteropImpl.h"
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 

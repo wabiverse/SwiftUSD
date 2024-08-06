@@ -23,7 +23,7 @@
 //
 #include "pxr/base/tf/pathUtils.h"
 #include "Arch/defines.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "Arch/systemInfo.h"
 #include "pxr/base/tf/diagnosticLite.h"
 #include "pxr/base/tf/fileUtils.h"

@@ -9,7 +9,7 @@
 #include "pxr/pxrns.h"
 
 #include "Arch/demangle.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Tf/enum.h"
 #include "Tf/iterator.h"
 #include "Tf/stl.h"

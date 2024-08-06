@@ -6,7 +6,7 @@
 //
 
 #include "Gf/line2d.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "pxr/pxrns.h"
 
 #include "Tf/type.h"

@@ -11,6 +11,9 @@
 
 #include "HgiMetal/api.h"
 
+#include <Foundation/Foundation.hpp>
+#include <Metal/Metal.hpp>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiMetal;
@@ -41,7 +44,7 @@ class HgiMetalSampler final : public HgiSampler {
 
  private:
   MTL::SamplerState* _samplerId;
-  NSString *_label;
+  NS::String *_label;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

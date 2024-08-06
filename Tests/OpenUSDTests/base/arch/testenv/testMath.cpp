@@ -23,7 +23,7 @@
 //
 
 #include "Arch/error.h"
-#include "Arch/pxrmath.h"
+#include "Arch/math.h"
 #include "pxr/pxr.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE

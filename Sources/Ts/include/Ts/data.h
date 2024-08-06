@@ -9,7 +9,7 @@
 #define PXR_BASE_TS_DATA_H
 
 #include "Arch/demangle.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Tf/diagnostic.h"
 #include "Ts/api.h"
 #include "Ts/evalCache.h"

@@ -6,7 +6,7 @@
 //
 
 #include "Arch/defines.h"
-#include "Arch/pxrregex.h"
+#include "Arch/regex.h"
 #include "pxr/pxrns.h"
 #if defined(ARCH_OS_WINDOWS)
 #  include <cstring>

@@ -6,7 +6,7 @@
 //
 #include "UsdSkel/blendShapeQuery.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Work/loops.h"
 #include "Work/reduce.h"
 

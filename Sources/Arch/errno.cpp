@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "pxr/pxrns.h"
 #include <cerrno>
 #include <cstring>

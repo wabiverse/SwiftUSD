@@ -5,7 +5,7 @@
 // https://openusd.org/license.
 //
 #include "UsdLux/blackbody.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

@@ -7,7 +7,7 @@
 #ifndef PXR_IMAGING_HD_TIME_SAMPLE_ARRAY_H
 #define PXR_IMAGING_HD_TIME_SAMPLE_ARRAY_H
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/quatf.h"
 #include "Hd/api.h"
 #include "Hd/version.h"

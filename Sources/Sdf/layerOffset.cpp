@@ -8,7 +8,7 @@
 /// LayerOffset.cpp
 
 #include "Sdf/layerOffset.h"
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Sdf/timeCode.h"
 #include "pxr/pxrns.h"
 

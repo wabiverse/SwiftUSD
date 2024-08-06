@@ -16,8 +16,8 @@
 
 #include "Gf/api.h"
 #include "Gf/half.h"
-#include "Gf/limits.h"
-#include "Gf/math.h"
+#include "Gf/gfLimits.h"
+#include "Gf/gfMath.h"
 #include "Gf/traits.h"
 #include "Tf/diagnostic.h"
 #include "Tf/hash.h"

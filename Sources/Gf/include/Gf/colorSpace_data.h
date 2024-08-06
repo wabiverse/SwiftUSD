@@ -5,6 +5,10 @@
 // https://openusd.org/license.
 //
 
+#include <pxr/pxrns.h>
+
+#include "nc/nanocolor.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct GfColorSpace::_Data {

@@ -8,7 +8,7 @@
 #include "Gf/gamma.h"
 #include "pxr/pxrns.h"
 
-#include "Gf/math.h"
+#include "Gf/gfMath.h"
 #include "Gf/vec3d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4d.h"

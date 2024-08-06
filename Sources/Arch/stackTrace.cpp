@@ -12,7 +12,7 @@
 #include "Arch/env.h"
 #include "Arch/error.h"
 #include "Arch/export.h"
-#include "Arch/pxrerrno.h"
+#include "Arch/errno.h"
 #include "pxr/pxrns.h"
 #if defined(ARCH_OS_WINDOWS)
 // Need to include Winsock2.h BEFORE windows.h - which is included in
@@ -20,7 +20,7 @@
 #  include <Winsock2.h>
 #endif
 #include "Arch/fileSystem.h"
-#include "Arch/pxrinttypes.h"
+#include "Arch/inttypes.h"
 #include "Arch/symbols.h"
 #include "Arch/vsnprintf.h"
 #if defined(ARCH_OS_WINDOWS)
