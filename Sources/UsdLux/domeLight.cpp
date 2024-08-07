@@ -183,7 +183,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 void UsdLuxDomeLight::OrientToStageUpAxis() const
 {
   if (UsdGeomGetStageUpAxis(GetPrim().GetStage()) == UsdGeomTokens->z) {
-    UsdGeomXformOp::Type const opType = UsdGeomXformOp::TypeRotateX;
+    UsdGeomXformOp::Type const opType = UsdGeomXformOp::Type::TypeRotateX;
     TfToken const &opSuffix = UsdLuxTokens->orientToStageUpAxis;
     TfToken const opName = UsdGeomXformOp::GetOpName(opType, opSuffix);
     bool resetsXformStack;
@@ -193,7 +193,7 @@ void UsdLuxDomeLight::OrientToStageUpAxis() const
         return;
       }
     }
-    AddXformOp(opType, UsdGeomXformOp::PrecisionFloat, opSuffix).Set(90.0f);
+    AddXformOp(opType, UsdGeomXformOp::Precision::PrecisionFloat, opSuffix).Set(90.0f);
   }
 }
 

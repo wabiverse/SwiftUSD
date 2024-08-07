@@ -446,7 +446,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   USDGEOM_API
   UsdGeomXformOp AddXformOp(
       UsdGeomXformOp::Type const opType,
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionDouble,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -480,7 +480,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddTranslateOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionDouble,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -498,7 +498,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddScaleOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -516,7 +516,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddRotateXOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -534,7 +534,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddRotateYOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -551,7 +551,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddRotateZOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -569,7 +569,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateXYZOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -588,7 +588,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateXZYOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -607,7 +607,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateYXZOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -626,7 +626,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateYZXOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -645,7 +645,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateZXYOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -664,7 +664,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp(), \ref usdGeom_rotationPackingOrder "note on angle packing order"
   USDGEOM_API
   UsdGeomXformOp AddRotateZYXOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -682,7 +682,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddOrientOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionFloat,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
@@ -704,7 +704,7 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// in Sdf.
   USDGEOM_API
   UsdGeomXformOp AddTransformOp(
-      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::PrecisionDouble,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 

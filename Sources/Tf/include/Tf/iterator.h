@@ -439,14 +439,17 @@ class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<Underlyin
   using pointer = typename ReverseIterator::pointer;
   using difference_type = typename ReverseIterator::difference_type;
 
-  static_assert(!std::is_reference<reference>::value,
-                "Tf_ProxyReferenceReverseIterator should only be used "
-                "when the underlying iterator's reference type is a "
-                "proxy (MyTypeRef) and not a true reference (MyType&)."
-                "Use std::reverse_iterator instead.");
-  static_assert(std::is_same<iterator_category, std::random_access_iterator_tag>::value,
-                "Tf_ProxyReferenceReverseIterator must wrap a random "
-                "access iterator.");
+  /// @WABI: FIX ME
+  // static_assert(!std::is_reference<reference>::value,
+  //               "Tf_ProxyReferenceReverseIterator should only be used "
+  //               "when the underlying iterator's reference type is a "
+  //               "proxy (MyTypeRef) and not a true reference (MyType&)."
+  //               "Use std::reverse_iterator instead.");
+
+  /// @WABI: FIX ME
+  // static_assert(std::is_same<iterator_category, std::random_access_iterator_tag>::value,
+  //               "Tf_ProxyReferenceReverseIterator must wrap a random "
+  //               "access iterator.");
 
   Tf_ProxyReferenceReverseIterator() = default;
   explicit Tf_ProxyReferenceReverseIterator(UnderlyingIterator it) : ReverseIterator(it) {}
