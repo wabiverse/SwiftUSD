@@ -81,7 +81,7 @@ TF_DECLARE_PUBLIC_TOKENS(UsdGeomXformOpTypes, USDGEOM_API, USDGEOM_XFORM_OP_TYPE
 class UsdGeomXformOp {
  public:
   /// Enumerates the set of all transformation operation types.
-  enum Type {
+  enum class Type {
     TypeInvalid,    ///< Represents an invalid xformOp.
     TypeTranslate,  ///< XYZ translation.
     TypeScale,      ///< XYZ scale.
@@ -105,7 +105,7 @@ class UsdGeomXformOp {
   };
 
   /// Precision with which the value of the tranformation operation is encoded.
-  enum Precision {
+  enum class Precision {
     PrecisionDouble,  ///< Double precision
     PrecisionFloat,   ///< Floating-point precision
     PrecisionHalf     ///< Half-float precision
