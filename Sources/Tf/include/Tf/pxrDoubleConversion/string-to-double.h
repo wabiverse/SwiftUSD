@@ -28,7 +28,7 @@
 #ifndef DOUBLE_CONVERSION_STRING_TO_DOUBLE_H_
 #define DOUBLE_CONVERSION_STRING_TO_DOUBLE_H_
 
-#include "utils.h"
+#include "Tf/pxrDoubleConversion/utils.h"
 
 #include "pxr/pxrns.h"
 
@@ -171,16 +171,15 @@ class StringToDoubleConverter {
   StringToDoubleConverter(int flags,
                           double empty_string_value,
                           double junk_string_value,
-                          const char *infinity_symbol,
-                          const char *nan_symbol,
+                          const char* infinity_symbol,
+                          const char* nan_symbol,
                           uc16 separator = kNoSeparator)
       : flags_(flags),
         empty_string_value_(empty_string_value),
         junk_string_value_(junk_string_value),
         infinity_symbol_(infinity_symbol),
         nan_symbol_(nan_symbol),
-        separator_(separator)
-  {
+        separator_(separator) {
   }
 
   // Performs the conversion.
@@ -188,40 +187,52 @@ class StringToDoubleConverter {
   // of characters that have been processed to read the number.
   // Spaces than are processed with ALLOW_{LEADING|TRAILING}_SPACES are included
   // in the 'processed_characters_count'. Trailing junk is never included.
-  double StringToDouble(const char *buffer, int length, int *processed_characters_count) const;
+  double StringToDouble(const char* buffer,
+                        int length,
+                        int* processed_characters_count) const;
 
   // Same as StringToDouble above but for 16 bit characters.
-  double StringToDouble(const uc16 *buffer, int length, int *processed_characters_count) const;
+  double StringToDouble(const uc16* buffer,
+                        int length,
+                        int* processed_characters_count) const;
 
   // Same as StringToDouble but reads a float.
   // Note that this is not equivalent to static_cast<float>(StringToDouble(...))
   // due to potential double-rounding.
-  float StringToFloat(const char *buffer, int length, int *processed_characters_count) const;
+  float StringToFloat(const char* buffer,
+                      int length,
+                      int* processed_characters_count) const;
 
   // Same as StringToFloat above but for 16 bit characters.
-  float StringToFloat(const uc16 *buffer, int length, int *processed_characters_count) const;
+  float StringToFloat(const uc16* buffer,
+                      int length,
+                      int* processed_characters_count) const;
 
   // Same as StringToDouble for T = double, and StringToFloat for T = float.
-  template<typename T>
-  T StringTo(const char *buffer, int length, int *processed_characters_count) const;
+  template <typename T>
+  T StringTo(const char* buffer,
+             int length,
+             int* processed_characters_count) const;
 
   // Same as StringTo above but for 16 bit characters.
-  template<typename T>
-  T StringTo(const uc16 *buffer, int length, int *processed_characters_count) const;
+  template <typename T>
+  T StringTo(const uc16* buffer,
+             int length,
+             int* processed_characters_count) const;
 
  private:
   const int flags_;
   const double empty_string_value_;
   const double junk_string_value_;
-  const char *const infinity_symbol_;
-  const char *const nan_symbol_;
+  const char* const infinity_symbol_;
+  const char* const nan_symbol_;
   const uc16 separator_;
 
-  template<class Iterator>
+  template <class Iterator>
   double StringToIeee(Iterator start_pointer,
                       int length,
                       bool read_as_double,
-                      int *processed_characters_count) const;
+                      int* processed_characters_count) const;
 
   DOUBLE_CONVERSION_DISALLOW_IMPLICIT_CONSTRUCTORS(StringToDoubleConverter);
 };

@@ -4,6 +4,8 @@
 #ifndef PXR_PEGTL_INTERNAL_FILE_MAPPER_POSIX_HPP
 #define PXR_PEGTL_INTERNAL_FILE_MAPPER_POSIX_HPP
 
+#if !defined(_WIN32)
+
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -155,5 +157,7 @@ namespace PXR_PEGTL_NAMESPACE::internal
    };
 
 }  // namespace PXR_PEGTL_NAMESPACE::internal
+
+#endif // !defined(_WIN32)
 
 #endif

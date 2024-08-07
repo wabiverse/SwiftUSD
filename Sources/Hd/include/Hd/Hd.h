@@ -59,7 +59,6 @@
 #include <Hd/flatNormals.h>
 #include <Hd/flattenedDataSourceProvider.h>
 #include <Hd/flattenedDataSourceProviders.h>
-#include <Hd/flattenedMaterialBindingsDataSourceProvider.h>
 #include <Hd/flattenedOverlayDataSourceProvider.h>
 #include <Hd/flattenedPrimvarsDataSourceProvider.h>
 #include <Hd/flattenedPurposeDataSourceProvider.h>

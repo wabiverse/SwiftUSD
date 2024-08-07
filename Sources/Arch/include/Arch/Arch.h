@@ -22,6 +22,7 @@
 #include <Arch/error.h>
 #include <Arch/export.h>
 #include <Arch/fileSystem.h>
+#include <Arch/function.h>
 #include <Arch/functionLite.h>
 #include <Arch/hash.h>
 #include <Arch/hints.h>

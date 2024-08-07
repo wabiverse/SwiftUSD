@@ -5,6 +5,7 @@
 #include <Hgi/api.h>
 #include <Hgi/attachmentDesc.h>
 #include <Hgi/blitCmds.h>
+#include <Hgi/blitCmdsOps.h>
 #include <Hgi/buffer.h>
 #include <Hgi/capabilities.h>
 #include <Hgi/cmds.h>
@@ -18,6 +19,7 @@
 #include <Hgi/graphicsPipeline.h>
 #include <Hgi/handle.h>
 #include <Hgi/hgiImpl.h>
+#include <Hgi/indirectCommandEncoder.h>
 #include <Hgi/resourceBindings.h>
 #include <Hgi/sampler.h>
 #include <Hgi/shaderFunction.h>

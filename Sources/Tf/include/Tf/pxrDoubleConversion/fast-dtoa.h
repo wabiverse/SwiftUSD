@@ -30,7 +30,7 @@
 
 #include "Tf/pxrDoubleConversion/utils.h"
 
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -84,8 +84,8 @@ bool FastDtoa(double d,
               FastDtoaMode mode,
               int requested_digits,
               Vector<char> buffer,
-              int *length,
-              int *decimal_point);
+              int* length,
+              int* decimal_point);
 
 }  // namespace pxr_double_conversion
 

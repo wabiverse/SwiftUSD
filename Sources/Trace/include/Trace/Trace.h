@@ -3,6 +3,9 @@
 #define __PXR_BASE_TRACE_H__
 
 // Trace
+#include <Trace/api.h>
+
+#include <Trace/aggregateNode.h>
 #include <Trace/aggregateTreeBuilder.h>
 #include <Trace/category.h>
 #include <Trace/collection.h>

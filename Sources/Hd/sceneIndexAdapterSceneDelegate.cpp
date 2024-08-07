@@ -108,7 +108,7 @@
 
 #include "pxr/pxrns.h"
 
-#include "tbb/concurrent_unordered_set.h"
+#include <OneTBB/tbb/concurrent_unordered_set.h>
 
 #include <algorithm>
 #include <cstddef>
