@@ -4,6 +4,8 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+#ifndef PXR_BASE_TF_PY_EXCEPTION_STATE_H
+#define PXR_BASE_TF_PY_EXCEPTION_STATE_H
 
 #include "pxr/pxrns.h"
 
@@ -70,3 +72,5 @@ struct TfPyExceptionState {
 #endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif /* PXR_BASE_TF_PY_EXCEPTION_STATE_H */

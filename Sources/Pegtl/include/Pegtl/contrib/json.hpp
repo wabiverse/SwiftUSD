@@ -36,7 +36,7 @@ namespace PXR_PEGTL_NAMESPACE::json
    struct int_ : sor< one< '0' >, plus< digit > > {};  // NOLINT(readability-identifier-naming)
    struct number : seq< opt< one< '-' > >, int_, opt< frac >, opt< exp > > {};
 
-   struct xdigit : pegtl::xdigit {};
+   struct xdigit : PXR_PEGTL_NAMESPACE::xdigit {};
    struct unicode : list< seq< one< 'u' >, rep< 4, xdigit > >, one< '\\' > > {};
    struct escaped_char : one< '"', '\\', '/', 'b', 'f', 'n', 'r', 't' > {};
    struct escaped : sor< escaped_char, unicode > {};

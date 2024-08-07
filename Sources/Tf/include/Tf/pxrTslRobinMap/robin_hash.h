@@ -42,7 +42,7 @@
 #include "robin_growth_policy.h"
 
 // Pixar modification, modify namespace for isolation.
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

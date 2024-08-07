@@ -38,7 +38,7 @@
 #include "Vt/types.h"
 #include "Vt/value.h"
 
-#include "tbb/concurrent_unordered_map.h"
+#include <OneTBB/tbb/concurrent_unordered_map.h>
 #include <shared_mutex>
 
 PXR_NAMESPACE_OPEN_SCOPE

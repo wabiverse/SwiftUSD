@@ -36,7 +36,7 @@
 #include <stdexcept>
 
 // Pixar modification, modify namespace for isolation.
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 #ifdef PXR_TSL_DEBUG
 #  define pxr_tsl_rh_assert(expr) assert(expr)

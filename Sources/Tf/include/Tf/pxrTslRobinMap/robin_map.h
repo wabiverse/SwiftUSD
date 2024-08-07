@@ -34,7 +34,7 @@
 #include "robin_hash.h"
 
 // Pixar modification, modify namespace for isolation.
-#include <pxr/pxrns.h>
+#include "pxr/pxrns.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -58,13 +58,12 @@ namespace pxr_tsl {
  * values. It can improve the performance during lookups if the `KeyEqual`
  * function takes time (if it engenders a cache-miss for example) as we then
  * compare the stored hashes before comparing the keys. When
- * `pxr_tsl::rh::power_of_two_growth_policy` is used as `GrowthPolicy`, it may
- * also speed-up the rehash process as we can avoid to recalculate the hash.
- * When it is detected that storing the hash will not incur any memory penalty
- * due to alignment (i.e.
- * `sizeof(pxr_tsl::detail_robin_hash::bucket_entry<ValueType, true>) ==
- * sizeof(pxr_tsl::detail_robin_hash::bucket_entry<ValueType, false>)`) and
- * `pxr_tsl::rh::power_of_two_growth_policy` is used, the hash will be stored
+ * `pxr_tsl::rh::power_of_two_growth_policy` is used as `GrowthPolicy`, it may also
+ * speed-up the rehash process as we can avoid to recalculate the hash. When it
+ * is detected that storing the hash will not incur any memory penalty due to
+ * alignment (i.e. `sizeof(pxr_tsl::detail_robin_hash::bucket_entry<ValueType,
+ * true>) == sizeof(pxr_tsl::detail_robin_hash::bucket_entry<ValueType, false>)`)
+ * and `pxr_tsl::rh::power_of_two_growth_policy` is used, the hash will be stored
  * even if `StoreHash` is false so that we can speed-up the rehash (but it will
  * not be used on lookups unless `StoreHash` is true).
  *
@@ -73,8 +72,8 @@ namespace pxr_tsl {
  * `pxr_tsl::rh::power_of_two_growth_policy`. This policy keeps the number of
  * buckets to a power of two and uses a mask to map the hash to a bucket instead
  * of the slow modulo. Other growth policies are available and you may define
- * your own growth policy, check `pxr_tsl::rh::power_of_two_growth_policy` for
- * the interface.
+ * your own growth policy, check `pxr_tsl::rh::power_of_two_growth_policy` for the
+ * interface.
  *
  * `std::pair<Key, T>` must be swappable.
  *

@@ -5,7 +5,7 @@
 #ifndef PXR_PEGTL_CONTRIB_PEG_HPP
 #define PXR_PEGTL_CONTRIB_PEG_HPP
 
-#include <tao/pegtl.hpp>
+#include <Pegtl/Pegtl.hpp>
 
 namespace PXR_PEGTL_NAMESPACE::peg
 {
