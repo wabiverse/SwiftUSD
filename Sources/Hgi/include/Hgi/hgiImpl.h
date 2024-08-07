@@ -11,6 +11,8 @@
 #include "Tf/type.h"
 #include "pxr/pxrns.h"
 
+#include "Arch/swiftInterop.h"
+
 #include "Hgi/api.h"
 #include "Hgi/blitCmds.h"
 #include "Hgi/buffer.h"
@@ -328,7 +330,7 @@ class Hgi {
   Hgi(const Hgi &) = delete;
 
   std::atomic<uint64_t> _uniqueIdCounter;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 ///
 /// Hgi factory for plugin system

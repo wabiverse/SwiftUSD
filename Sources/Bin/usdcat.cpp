@@ -198,7 +198,7 @@ static int UsdCat(const Args &args)
       }
     }
     else if (args.flattenLayerStack) {
-      stage = UsdStage::Open(input, UsdStage::LoadNone);
+      stage = UsdStage::Open(input, UsdStage::InitialLoadSet::LoadNone);
       if (stage) {
         layer = UsdUtilsFlattenLayerStack(stage);
       }

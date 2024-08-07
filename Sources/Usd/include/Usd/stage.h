@@ -39,6 +39,8 @@
 #include <OneTBB/tbb/concurrent_vector.h>
 #include <OneTBB/tbb/spin_rw_mutex.h>
 
+#include <Arch/swiftInterop.h>
+
 #include <functional>
 #include <memory>
 #include <optional>
@@ -143,7 +145,7 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   ///
   /// Specifies the initial set of prims to load when opening a UsdStage.
   ///
-  enum InitialLoadSet {
+  enum class InitialLoadSet {
     LoadAll,  ///< Load all loadable prims
     LoadNone  ///< Load no loadable prims
   };
@@ -171,23 +173,23 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// layer's repository path if the layer has one, otherwise its resolved
   /// path.
   USD_API
-  static UsdStageRefPtr CreateNew(const std::string &identifier, InitialLoadSet load = LoadAll);
+  static UsdStageRefPtr CreateNew(const std::string &identifier, InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateNew(const std::string &identifier,
                                   const SdfLayerHandle &sessionLayer,
-                                  InitialLoadSet load = LoadAll);
+                                  InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateNew(const std::string &identifier,
                                   const SdfLayerHandle &sessionLayer,
                                   const ArResolverContext &pathResolverContext,
-                                  InitialLoadSet load = LoadAll);
+                                  InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateNew(const std::string &identifier,
                                   const ArResolverContext &pathResolverContext,
-                                  InitialLoadSet load = LoadAll);
+                                  InitialLoadSet load = InitialLoadSet::LoadAll);
 
   /// Creates a new stage only in memory, analogous to creating an
   /// anonymous SdfLayer.
@@ -207,27 +209,27 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// stage without a session layer, pass TfNullPtr (or None in python) as the
   /// \p sessionLayer argument.
   USD_API
-  static UsdStageRefPtr CreateInMemory(InitialLoadSet load = LoadAll);
+  static UsdStageRefPtr CreateInMemory(InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateInMemory(const std::string &identifier,
-                                       InitialLoadSet load = LoadAll);
+                                       InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateInMemory(const std::string &identifier,
                                        const ArResolverContext &pathResolverContext,
-                                       InitialLoadSet load = LoadAll);
+                                       InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateInMemory(const std::string &identifier,
                                        const SdfLayerHandle &sessionLayer,
-                                       InitialLoadSet load = LoadAll);
+                                       InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateInMemory(const std::string &identifier,
                                        const SdfLayerHandle &sessionLayer,
                                        const ArResolverContext &pathResolverContext,
-                                       InitialLoadSet load = LoadAll);
+                                       InitialLoadSet load = InitialLoadSet::LoadAll);
 
   /// Attempt to find a matching existing stage in a cache if
   /// UsdStageCacheContext objects exist on the stack. Failing that, create a
@@ -245,12 +247,12 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// calling ArResolver::CreateDefaultContextForAsset with the layer's
   /// repository path if the layer has one, otherwise its resolved path.
   USD_API
-  static UsdStageRefPtr Open(const std::string &filePath, InitialLoadSet load = LoadAll);
+  static UsdStageRefPtr Open(const std::string &filePath, InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const std::string &filePath,
                              const ArResolverContext &pathResolverContext,
-                             InitialLoadSet load = LoadAll);
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
 
   /// Create a new stage and recursively compose prims defined within and
   /// referenced by the layer at \p filePath which must already exist, subject
@@ -272,13 +274,13 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   USD_API
   static UsdStageRefPtr OpenMasked(const std::string &filePath,
                                    UsdStagePopulationMask const &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr OpenMasked(const std::string &filePath,
                                    const ArResolverContext &pathResolverContext,
                                    UsdStagePopulationMask const &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
 
   /// Open a stage rooted at \p rootLayer.
   ///
@@ -309,23 +311,23 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// require that the stage have no session layer, you must explicitly
   /// specify TfNullPtr (or None in python) for the sessionLayer argument.
   USD_API
-  static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer, InitialLoadSet load = LoadAll);
+  static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer, InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer,
                              const SdfLayerHandle &sessionLayer,
-                             InitialLoadSet load = LoadAll);
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer,
                              const ArResolverContext &pathResolverContext,
-                             InitialLoadSet load = LoadAll);
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer,
                              const SdfLayerHandle &sessionLayer,
                              const ArResolverContext &pathResolverContext,
-                             InitialLoadSet load = LoadAll);
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
 
   /// Open a stage rooted at \p rootLayer and with limited population subject
   /// to \p mask.
@@ -350,26 +352,26 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   USD_API
   static UsdStageRefPtr OpenMasked(const SdfLayerHandle &rootLayer,
                                    const UsdStagePopulationMask &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr OpenMasked(const SdfLayerHandle &rootLayer,
                                    const SdfLayerHandle &sessionLayer,
                                    const UsdStagePopulationMask &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr OpenMasked(const SdfLayerHandle &rootLayer,
                                    const ArResolverContext &pathResolverContext,
                                    const UsdStagePopulationMask &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr OpenMasked(const SdfLayerHandle &rootLayer,
                                    const SdfLayerHandle &sessionLayer,
                                    const ArResolverContext &pathResolverContext,
                                    const UsdStagePopulationMask &mask,
-                                   InitialLoadSet load = LoadAll);
+                                   InitialLoadSet load = InitialLoadSet::LoadAll);
 
   USD_API
   virtual ~UsdStage() noexcept;
@@ -1564,6 +1566,10 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   USD_API
   std::vector<UsdPrim> GetPrototypes() const;
 
+  /// Implementation detail, internal function utilized by swift.
+  USD_API
+  UsdStagePtr getPtr() const;
+
   /// @}
 
  private:
@@ -2293,7 +2299,7 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   friend struct Usd_AttrGetUntypedValueHelper;
   template<class RefsOrPayloadsEditorType, class RefsOrPayloadsProxyType>
   friend struct Usd_ListEditImpl;
-};
+} SWIFT_SHARED_REFERENCE(UsdStageRetain, UsdStageRelease);
 
 // UsdObject's typed metadata query relies on this specialization being
 // externally visible and exporting the primary template does not
@@ -2421,5 +2427,8 @@ typename std::enable_if<UsdStage::_IsEditTargetMappable<T>::value, bool>::type U
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void UsdStageRetain(PXR_NS::UsdStage *);
+void UsdStageRelease(PXR_NS::UsdStage *);
 
 #endif  // PXR_USD_USD_STAGE_H

@@ -33,7 +33,7 @@ UsdStageRefPtr UsdUtilsComputeUsdStageStats(const std::string &rootLayerPath, Vt
     startMem = TfMallocTag::GetTotalBytes() / (1024.0 * 1024.0);
   }
 
-  UsdStageRefPtr stage = UsdStage::Open(rootLayerPath, UsdStage::LoadAll);
+  UsdStageRefPtr stage = UsdStage::Open(rootLayerPath, UsdStage::InitialLoadSet::LoadAll);
   if (!stage)
     return nullptr;
 

@@ -4474,3 +4474,19 @@ bool SdfLayer::_Save(bool force) const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void SdfLayerRetain(PXR_NS::SdfLayer *layer)
+{
+#if DEBUG
+  printf("Called SdfLayerRetain()\n");
+#endif /* DEBUG */
+  // PXR_NS::SdfLayer *ref = layer;
+}
+
+void SdfLayerRelease(PXR_NS::SdfLayer *layer)
+{
+#if DEBUG
+  printf("Called SdfLayerRelease()\n");
+#endif /* DEBUG */
+  // layer = nullptr;
+}

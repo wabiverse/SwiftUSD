@@ -15,10 +15,10 @@
 /// \file pxr/pxr.h
 
 #define PXR_MAJOR_VERSION 0
-#define PXR_MINOR_VERSION 23
-#define PXR_PATCH_VERSION 11
+#define PXR_MINOR_VERSION 24
+#define PXR_PATCH_VERSION 8
 
-#define PXR_VERSION 2311
+#define PXR_VERSION 2408
 
 #define PXR_USE_NAMESPACES 1
 
@@ -29,7 +29,7 @@
 
 /* ------ swift usd. ------ */
 
-#  define SWIFTUSD_EVOLUTION 43
+#  define SWIFTUSD_EVOLUTION 0
 #  define PXR_INTERNAL_NS Pixar
 
 /* ------------------------ */

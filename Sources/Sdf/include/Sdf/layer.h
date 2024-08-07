@@ -28,6 +28,8 @@
 #include "Work/dispatcher.h"
 #include "pxr/pxrns.h"
 
+#include <Arch/swiftInterop.h>
+
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -1993,8 +1995,11 @@ class SdfLayer : public TfRefBase, public TfWeakBase {
   // Give layer state delegates access to our data as well as to
   // the various _Prim functions.
   friend class SdfLayerStateDelegateBase;
-};
+} SWIFT_SHARED_REFERENCE(SdfLayerRetain, SdfLayerRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void SdfLayerRetain(PXR_NS::SdfLayer *);
+void SdfLayerRelease(PXR_NS::SdfLayer *);
 
 #endif  // PXR_USD_SDF_LAYER_H

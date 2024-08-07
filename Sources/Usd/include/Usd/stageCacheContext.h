@@ -11,6 +11,8 @@
 #include "Usd/api.h"
 #include "pxr/pxrns.h"
 
+#include "Arch/swiftInterop.h"
+
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -118,6 +120,21 @@ TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
   /// for writing (with UsdBlockStageCacheWrites).
   explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType) : _blockType(blockType) {}
 
+  /// Bind a cache for calls to UsdStage::Open() to read from and write to.
+  /// For constructing UsdStageCacheContext in Swift. Swift programmers, if
+  /// if you are reading this, this is an implementation detail, please instead
+  /// call the following in your swift code:
+  ///
+  /// ```swift
+  /// var stageCache = UsdStageCache()
+  /// let context = UsdStageCacheContext.bind(cache: &stageCache)
+  /// ```
+  ///
+  static UsdStageCacheContext *CreateCache(UsdStageCache &cache)
+  {
+    return new UsdStageCacheContext(cache);
+  }
+
  private:
   friend class UsdStage;
 
@@ -132,7 +149,7 @@ TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
   };
   bool _isReadOnlyCache;
   UsdStageCacheContextBlockType _blockType;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

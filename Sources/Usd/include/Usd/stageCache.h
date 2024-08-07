@@ -7,11 +7,14 @@
 #ifndef PXR_USD_USD_STAGE_CACHE_H
 #define PXR_USD_USD_STAGE_CACHE_H
 
+#include "pxr/pxrns.h"
+
+#include "Arch/swiftInterop.h"
+
 #include "Sdf/declareHandles.h"
 #include "Tf/declarePtrs.h"
 #include "Tf/stringUtils.h"
 #include "Usd/api.h"
-#include "pxr/pxrns.h"
 
 #include <memory>
 #include <mutex>
@@ -381,7 +384,7 @@ class UsdStageCache {
   typedef struct Usd_StageCacheImpl _Impl;
   std::unique_ptr<_Impl> _impl;
   mutable std::mutex _mutex;
-};
+} SWIFT_CONFORMS_TO_PROTOCOL(Swift.Sendable);
 
 class UsdStageCacheRequest {
  public:

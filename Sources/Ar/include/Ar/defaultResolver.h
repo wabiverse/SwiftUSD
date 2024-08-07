@@ -15,6 +15,8 @@
 #include "Ar/resolver.h"
 #include "pxr/pxrns.h"
 
+#include <Arch/swiftInterop.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -123,7 +125,7 @@ class ArDefaultResolver : public ArResolver {
   const ArDefaultResolverContext *_GetCurrentContextPtr() const;
 
   ArResolverContext _defaultContext;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

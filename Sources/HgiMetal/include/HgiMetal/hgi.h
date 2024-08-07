@@ -7,6 +7,8 @@
 #ifndef PXR_IMAGING_HGI_METAL_HGIMETAL_H
 #define PXR_IMAGING_HGI_METAL_HGIMETAL_H
 
+#include "Arch/swiftInterop.h"
+
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "HgiMetal/api.h"
@@ -219,7 +221,7 @@ class HgiMetal final : public Hgi {
   bool _workToFlush;
 
   NS::AutoreleasePool* _pool;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

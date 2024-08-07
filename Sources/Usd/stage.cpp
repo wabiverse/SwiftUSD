@@ -396,8 +396,8 @@ class Usd_AssetPathContext {
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-  TF_ADD_ENUM_NAME(UsdStage::LoadAll, "Load all loadable prims");
-  TF_ADD_ENUM_NAME(UsdStage::LoadNone, "Load no loadable prims");
+  TF_ADD_ENUM_NAME(UsdStage::InitialLoadSet::LoadAll, "Load all loadable prims");
+  TF_ADD_ENUM_NAME(UsdStage::InitialLoadSet::LoadNone, "Load no loadable prims");
 }
 
 static ArResolverContext _CreatePathResolverContext(const SdfLayerHandle &layer)
@@ -696,6 +696,11 @@ void UsdStage::_Close()
   // WorkSwapDestroyAsync(_layersAndNoticeKeys);
 }
 
+UsdStagePtr UsdStage::getPtr() const
+{
+  return TfCreateWeakPtr(const_cast<UsdStage *>(this));
+}
+
 namespace {
 
 // A predicate we pass to PcpCache::ComputePrimIndexesInParallel() to avoid
@@ -774,8 +779,8 @@ UsdStageRefPtr UsdStage::_InstantiateStage(const SdfLayerRefPtr &rootLayer,
   ArResolverScopedCache resolverCache;
 
   // Set the stage's load rules.
-  stage->_loadRules = (load == LoadAll) ? UsdStageLoadRules::LoadAll() :
-                                          UsdStageLoadRules::LoadNone();
+  stage->_loadRules = (load == InitialLoadSet::LoadAll) ? UsdStageLoadRules::LoadAll() :
+                                                          UsdStageLoadRules::LoadNone();
 
   Usd_InstanceChanges instanceChanges;
   const SdfPath &absoluteRootPath = SdfPath::AbsoluteRootPath();
@@ -9227,3 +9232,19 @@ template USD_API bool UsdStage::_SetMetadataImpl(const UsdObject &,
                                                  const SdfAbstractDataConstValue &);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void UsdStageRetain(PXR_NS::UsdStage *stage)
+{
+#if DEBUG_MEMORY_MANAGEMENT
+  printf("Called UsdStageRetain()\n");
+#endif /* DEBUG_MEMORY_MANAGEMENT */
+  // PXR_NS::UsdStage *ref = stage;
+}
+
+void UsdStageRelease(PXR_NS::UsdStage *stage)
+{
+#if DEBUG_MEMORY_MANAGEMENT
+  printf("Called UsdStageRelease()\n");
+#endif /* DEBUG_MEMORY_MANAGEMENT */
+  // stage = nullptr;
+}

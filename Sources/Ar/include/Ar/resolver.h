@@ -16,6 +16,8 @@
 #include "Ar/timestamp.h"
 #include "pxr/pxrns.h"
 
+#include <Arch/swiftInterop.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -791,7 +793,7 @@ class ArResolver {
   // been bound via BindContext in their implementations.
   AR_API
   const ArResolverContext *_GetInternallyManagedCurrentContext() const;
-};
+} SWIFT_CONFORMS_TO_PROTOCOL(ArPrototypes.ArResolvable) SWIFT_IMMORTAL_REFERENCE;
 
 /// Returns the configured asset resolver.
 ///
