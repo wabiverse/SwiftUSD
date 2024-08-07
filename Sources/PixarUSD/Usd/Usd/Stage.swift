@@ -366,7 +366,7 @@ public extension Usd.Stage
    * This is equivalent to ``Usd.PrimRange.stage()``. */
   func traverse() -> [Usd.Prim]
   {
-    let it = Usd.PrimRange.Stage(getPtr())
+    let it = Usd.PrimRange.Stage(getPtr(), .init())
 
     return IteratorSequence(it).map { $0 }
   }
