@@ -56,7 +56,7 @@ class HdSceneIndexObserver : public TfWeakBase {
   struct RemovedPrimEntry {
     SdfPath primPath;
 
-    RemovedPrimEntry(const SdfPath &primPath) : primPath(primPath) {}
+    RemovedPrimEntry(const SdfPath &primPath = SdfPath()) : primPath(primPath) {}
   };
 
   using RemovedPrimEntries = TfSmallVector<RemovedPrimEntry, 16>;
@@ -72,7 +72,8 @@ class HdSceneIndexObserver : public TfWeakBase {
     SdfPath primPath;
     HdDataSourceLocatorSet dirtyLocators;
 
-    DirtiedPrimEntry(const SdfPath &primPath, const HdDataSourceLocatorSet &dirtyLocators)
+    DirtiedPrimEntry(const SdfPath &primPath = SdfPath(),
+                     const HdDataSourceLocatorSet &dirtyLocators = HdDataSourceLocatorSet())
         : primPath(primPath), dirtyLocators(dirtyLocators)
     {
     }
@@ -87,7 +88,8 @@ class HdSceneIndexObserver : public TfWeakBase {
   struct RenamedPrimEntry {
     SdfPath oldPrimPath;
     SdfPath newPrimPath;
-    RenamedPrimEntry(const SdfPath &oldPrimPath, const SdfPath &newPrimPath)
+    RenamedPrimEntry(const SdfPath &oldPrimPath = SdfPath(),
+                     const SdfPath &newPrimPath = SdfPath())
         : oldPrimPath(oldPrimPath), newPrimPath(newPrimPath)
     {
     }

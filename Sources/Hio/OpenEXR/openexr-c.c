@@ -14,10 +14,16 @@
 // defined but not referenced or exported.
 ARCH_PRAGMA_UNUSED_FUNCTION
 
-#include "OpenEXRCoreUnity.h"
+#include "openexr-c.h"
 
 #include <ctype.h>
 #include <math.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "OpenEXRCore/internal_coding.h"
 
 // re-export the statically hidden exr_ functions as required
 // for visibility from C++

@@ -18,6 +18,7 @@
 #include "Arch/demangle.h"
 #include "Arch/hints.h"
 #include "Arch/pragmas.h"
+#include "Arch/swiftInterop.h"
 #include "Tf/anyUniquePtr.h"
 #include "Tf/delegatedCountPtr.h"
 #include "Tf/pointerAndBits.h"
@@ -1581,7 +1582,7 @@ class VtValue {
 
   _Storage _storage;
   TfPointerAndBits<const _TypeInfo> _info;
-};
+} SWIFT_SELF_CONTAINED;
 
 #ifndef doxygen
 

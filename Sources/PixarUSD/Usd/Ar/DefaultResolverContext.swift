@@ -14,19 +14,3 @@ import Ar
 import Foundation
 
 public typealias ArDefaultResolverContext = Pixar.ArDefaultResolverContext
-
-public extension ArDefaultResolverContext
-{
-  private borrowing func GetSearchPathCopy() -> ArDefaultResolverContext.SearchPaths
-  {
-    __GetSearchPathUnsafe().pointee
-  }
-
-  var searchPath: [String]
-  {
-    GetSearchPathCopy().map
-    {
-      String($0)
-    }
-  }
-}

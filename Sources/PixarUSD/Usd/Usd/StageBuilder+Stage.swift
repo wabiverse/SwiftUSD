@@ -110,12 +110,12 @@ public struct USDStage
    * directly.
    *
    * This is equivalent to ``Usd.PrimRange.stage()``. */
-  public func traverse() -> [Usd.Prim]
-  {
-    let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
+  // public func traverse() -> [Usd.Prim]
+  // {
+  //   let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
 
-    return IteratorSequence(it).map { $0 }
-  }
+  //   return IteratorSequence(it).map { $0 }
+  // }
 
   /**
    * Sets the documentation string for this layer. */

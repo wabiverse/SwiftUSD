@@ -18,6 +18,8 @@
 #include "Vt/traits.h"
 #include "pxr/pxrns.h"
 
+#include <Arch/swiftInterop.h>
+
 #include <algorithm>
 #include <iterator>
 #include <set>
@@ -1142,7 +1144,7 @@ class SdfPathAncestorsRange {
 
  private:
   SdfPath _path;
-};
+} SWIFT_CONFORMS_TO_PROTOCOL(Cxx.CxxRandomAccessCollection);
 
 // Overload hash_value for SdfPath.  Used by things like boost::hash.
 inline size_t hash_value(SdfPath const &path)

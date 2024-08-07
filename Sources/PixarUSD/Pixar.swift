@@ -24,7 +24,7 @@ public extension Pixar
    * Pixar USD version, as well as the evolution iteration of the ``PixarUSD``
    * SwiftPM package, which is setup as follows:
    * - ``PXR_MINOR_VERSION``.``PXR_PATCH_VERSION``.``SWIFTUSD_EVOLUTION`` */
-  static let version = "\(PXR_MINOR_VERSION).\(PXR_PATCH_VERSION).\(SWIFTUSD_EVOLUTION)"
+  static let version = "24.08.\(SWIFTUSD_EVOLUTION)"
 }
 
 /* --- xxx --- */

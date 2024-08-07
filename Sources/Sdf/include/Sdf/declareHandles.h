@@ -18,6 +18,8 @@
 #include "Tf/weakPtrFacade.h"
 #include "pxr/pxrns.h"
 
+#include <Arch/swiftInterop.h>
+
 #include <set>
 #include <type_traits>
 #include <typeinfo>
@@ -158,7 +160,7 @@ template<class T> class SdfHandle {
   SpecType _spec;
 
   template<class U> friend class SdfHandle;
-};
+} SWIFT_UNSAFE_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

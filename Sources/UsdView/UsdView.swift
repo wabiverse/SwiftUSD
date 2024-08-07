@@ -171,7 +171,7 @@ struct UsdView: PixarApp
 
     /* ------------------------------------ */
 
-    Msg.logger.log(level: .info, "UsdView launched.")
+    Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
 
     /* ------------------------------------ */
   }
