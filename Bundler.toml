@@ -9,3 +9,4 @@ icon = 'usdview.png'
 
 [apps.UsdView.plist]
 commit = '$(COMMIT_HASH)'
+CFBundleDocumentTypes = [ { type = "dict", value = { CFBundleTypeExtensions = [ 'usd', 'usda', 'usdc', 'usdz' ], CFBundleTypeIconFile = 'AppIcon.icns', CFBundleTypeName = 'Universal Scene Description File', CFBundleTypeRole = 'Editor', LSIsAppleDefaultForType = true, LSItemContentTypes = [ 'com.pixar.universal-scene-description', 'com.pixar.universal-scene-description-mobile', 'com.pixar.usd.ascii', 'com.pixar.usd.crate' ], CFBundleTypeIconSystemGenerated = true } } ]
