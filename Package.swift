@@ -253,10 +253,11 @@ let package = Package(
     ),
   ],
   dependencies: [
+    // prepare for SwiftCrossUI, for a cross-platform UsdView.
+    // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.7"),
-    .package(url: "https://github.com/furby-tm/swift-bundler", from: "2.0.9"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
-    .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+    .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
@@ -2554,7 +2555,7 @@ struct Galah
 
   static func enableGalah()
   {
-    galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.0")]
+    galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.1")]
     galahSettings = [.interoperabilityMode(.Cxx), .define("WITH_GALAH")]
     galahTargetDeps = [.target(name: "PixarUSD"), .product(name: "GalahInterpreter", package: "galah")]
   }
