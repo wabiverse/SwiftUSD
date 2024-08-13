@@ -211,6 +211,91 @@ enum Creator
 }
 ```
 
+<br/>
+
+# **UsdView (Under Development)**
+
+  The **UsdView** application in this project is written entirely in **Swift**, and serves as a living example of both **Swift/C++** interop
+  and creating **cross platform UI** applications in **Swift** (utilizing [**SwiftCrossUI**](https://github.com/stackotter/swift-cross-ui)).
+
+  ### Linux
+
+  > [!IMPORTANT]
+  > The [**bundler**](https://github.com/stackotter/swift-bundler.git) is currently in development to support bundling apps on **Linux**, until then please follow these instructions to run **UsdView** on **Linux**:
+
+<div align="center">
+
+  <div align="left">
+
+  ```pwsh
+  git clone https://github.com/wabiverse/SwiftUSD
+  cd SwiftUSD
+
+  swift run -c release UsdView
+  ```
+
+  </div>
+
+</div>
+
+  ### Apple Devices (macOS, visionOS, iOS)
+
+  > [!TIP]
+  > Install the [**bundler**](https://github.com/stackotter/swift-bundler.git) locally by running the following commands in your terminal:
+
+<div align="center">
+
+  <div align="left">
+
+  ```pwsh
+  git clone https://github.com/stackotter/swift-bundler
+  cd swift-bundler
+
+  swift build -c release
+  sudo cp .build/release/swift-bundler /usr/local/bin/
+  ```
+
+  </div>
+
+
+  <div align="left">
+
+  Finally, to run and bundle **UsdView** or any other app (such as your own!) with the bundler installed locally, run the following commands:
+  ```pwsh
+  git clone https://github.com/wabiverse/SwiftUSD
+  cd SwiftUSD
+  ```
+
+  #### **macOS**
+
+  Run and bundle **UsdView** on **macOS**.
+  ```pwsh
+  swift bundler run -c release UsdView
+  ```
+
+  #### **visionOS** or **iOS**
+
+  Run and bundle **UsdView** on **visionOS** or **iOS**.
+  ```pwsh
+  # list available iOS and visionOS simulators.
+  swift bundler simulators
+
+  # boot a simulator from the list.
+  swift bundler simulators boot [id-of-device]
+
+  # if you booted a visionOS device.
+  swift bundler run -p visionOSSimulator -c release UsdView
+
+  # if you booted a iOS device.
+  swift bundler run -p iOSSimulator -c release UsdView
+  ```
+
+  </div>
+
+</div>
+
+<br/>
+
 # **OH SH!**
 You can even run it in a tiny script, no package necessary, the comments next to the import
 statements describe the git sources to pull from, and everything transitively linked will come flying

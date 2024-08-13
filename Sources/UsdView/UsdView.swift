@@ -52,8 +52,14 @@ struct UsdView: PixarApp
       Pixar.Bundler.shared.setup(.resources, installPlugins: false)
     #endif
 
-    #if canImport(PyBundle)
-      /* embed & init python. */
+    #if canImport(PyBundle) && DEBUG
+      /*
+        embed & init python.
+        TODO: for some reason python
+        crashes release builds, figure
+        out why (its likely improper
+        resource bundle paths).
+      */
       PyBundler.shared.pyInit()
       PyBundler.shared.pyInfo()
     #endif /* canImport(PyBundle) */
