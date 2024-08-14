@@ -255,7 +255,7 @@ let package = Package(
   dependencies: [
     // prepare for SwiftCrossUI, for a cross-platform UsdView.
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.7"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.8"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
