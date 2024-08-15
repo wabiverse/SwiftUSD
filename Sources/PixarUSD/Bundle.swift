@@ -666,7 +666,7 @@ public extension Pixar.Bundler
       your machine by entering the following commands in your terminal:
 
       \("$".red) \("git".yellow) clone \("https://github.com/stackotter/swift-bundler".lightWhite)
-      \("$".red) \("cd".yellow) clone swift-bundler
+      \("$".red) \("cd".yellow) swift-bundler
 
       \("$".red) \("swift".yellow) build \("-c".lightWhite) release
       \("$".red) sudo \("cp".yellow) .build/release/swift-bundler /usr/local/bin/
