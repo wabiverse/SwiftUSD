@@ -662,18 +662,20 @@ public extension Pixar.Bundler
 
       ----------------------------------------------------------------------------------------
 
-      The recommended method of running your app is to add swift bundler to the swift package
-      by adding the following code to your package \("dependencies".yellow) array:
+      The recommended method of bundling and running your app is to install swift bundler on 
+      your machine by entering the following commands in your terminal:
 
-      \("dependencies: [".green)
-      \("  .package(url: \"https://github.com/furby-tm/swift-bundler\", from: \"2.0.9\")".green)
-      \("]".green)
+      \("$".red) \("git".yellow) clone \("https://github.com/stackotter/swift-bundler".lightWhite)
+      \("$".red) \("cd".yellow) clone swift-bundler
+
+      \("$".red) \("swift".yellow) build \("-c".lightWhite) release
+      \("$".red) sudo \("cp".yellow) .build/release/swift-bundler /usr/local/bin/
 
       ----------------------------------------------------------------------------------------
 
-      Then, instead of running \("swift run".yellow), use swift bundler's package plugin command:
+      Then, instead of running \("swift run".yellow), use swift bundler's run command:
 
-      \("$".red) \("swift".yellow) package \("--disable-sandbox".lightWhite) plugin bundler run \("-p".lightWhite) \("macOS".magenta) \("MyApp".yellow)
+      \("$".red) \("swift".yellow) bundler run \("-c".lightWhite) release \("-p".lightWhite) \("macOS".magenta) \("MyApp".yellow)
 
       \("NOTE:".magenta) Ensure that you replace \("MyApp".yellow) to the name of your executable target,
       and change the platform (\("-p".lightWhite) \("macOS".magenta)) depending on the intended platform.
