@@ -9,6 +9,8 @@
 
 #include "Tf/pyNoticeWrapper.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 using namespace boost::python;
 
 using std::map;
@@ -38,3 +40,5 @@ TfStaticData<map<string, Tf_PyNoticeObjectGenerator::MakeObjectFunc>>
     Tf_PyNoticeObjectGenerator::_generators;
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

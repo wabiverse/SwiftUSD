@@ -22,6 +22,8 @@
 
 #include <vector>
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class Vt_ValueFromPythonRegistry
@@ -139,5 +141,7 @@ template<class T> void VtValueFromPythonLValue()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_VT_VALUE_FROM_PYTHON_H

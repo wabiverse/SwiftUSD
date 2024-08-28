@@ -207,7 +207,7 @@ bool UsdSkelAnimMapper::Remap(const Container &source,
   }
   else if (_IsOrdered()) {
 
-    size_t copyCount = std::min(source.size(), targetArraySize - _offset * elementSize);
+    size_t copyCount = (std::min)(source.size(), targetArraySize - _offset * elementSize);
     std::copy(source.cdata(), source.cdata() + copyCount, target->data() + _offset * elementSize);
   }
   else {
@@ -215,7 +215,7 @@ bool UsdSkelAnimMapper::Remap(const Container &source,
     const _ValueType *sourceData = source.cdata();
 
     _ValueType *targetData = target->data();
-    size_t copyCount = std::min(source.size() / elementSize, _indexMap.size());
+    size_t copyCount = (std::min)(source.size() / elementSize, _indexMap.size());
 
     const int *indexMap = _indexMap.data();
 

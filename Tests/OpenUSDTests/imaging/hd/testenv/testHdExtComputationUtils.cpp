@@ -123,7 +123,7 @@ class ExtComputationTestDelegate : public HdUnitTestDelegate {
                                            float *sampleTimes,
                                            VtValue *sampleValues) override
   {
-    const size_t numSamples = std::min(size_t(4), maxSampleCount);
+    const size_t numSamples = (std::min)(size_t(4), maxSampleCount);
 
     // The two inputs have different sample times (0,1,2,3 and 0,2,4,6).
     if (computationId == compB && input == input1) {

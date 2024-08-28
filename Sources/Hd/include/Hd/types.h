@@ -148,13 +148,13 @@ typedef uint32_t HdDirtyBits;
 // GL Spec 2.3.5.2 (signed case, eq 2.4)
 inline int HdConvertFloatToFixed(float v, int b)
 {
-  return int(std::round(std::min(std::max(v, -1.0f), 1.0f) * (float(1 << (b - 1)) - 1.0f)));
+  return int(std::round((std::min)((std::max)(v, -1.0f), 1.0f) * (float(1 << (b - 1)) - 1.0f)));
 }
 
 // GL Spec 2.3.5.1 (signed case, eq 2.2)
 inline float HdConvertFixedToFloat(int v, int b)
 {
-  return float(std::max(-1.0f, (v / (float(1 << (b - 1)) - 1.0f))));
+  return float((std::max)(-1.0f, (v / (float(1 << (b - 1)) - 1.0f))));
 }
 
 ///

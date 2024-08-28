@@ -322,7 +322,7 @@ void HdEmbree_TestGLDrawing::_RescaleDepth(float *buffer, int size)
   // Normalize everything in the buffer to be in the range [0,1].
   float maxDepth = 0.0f;
   for (int i = 0; i < size; ++i) {
-    maxDepth = std::max(buffer[i], maxDepth);
+    maxDepth = (std::max)(buffer[i], maxDepth);
   }
   if (maxDepth == 0.0f) {
     return;

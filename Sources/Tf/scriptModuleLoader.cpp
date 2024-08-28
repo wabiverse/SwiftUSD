@@ -18,6 +18,8 @@
 #include "Tf/staticData.h"
 #include "Tf/stringUtils.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Arch/fileSystem.h"
 
 #include <boost/python/borrowed.hpp>
@@ -413,3 +415,5 @@ void TfScriptModuleLoader::_TopologicalSort(vector<TfToken> *result) const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

@@ -208,7 +208,7 @@ void Bignum::AddBignum(const Bignum& other) {
     carry = sum >> kBigitSize;
     ++bigit_pos;
   }
-  used_bigits_ = static_cast<int16_t>(std::max(bigit_pos, static_cast<int>(used_bigits_)));
+  used_bigits_ = static_cast<int16_t>((std::max)(bigit_pos, static_cast<int>(used_bigits_)));
   DOUBLE_CONVERSION_ASSERT(IsClamped());
 }
 

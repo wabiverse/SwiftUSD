@@ -126,8 +126,8 @@ bool HgiGLMeetsMinimumRequirements()
     // GL_VERSION = "4.5.0 <vendor> <version>"
     //              "4.1 <vendor-os-ver> <version>"
     //              "4.1 <vendor-os-ver>"
-    int major = std::max(0, std::min(9, *(dot - 1) - '0'));
-    int minor = std::max(0, std::min(9, *(dot + 1) - '0'));
+    int major = (std::max)(0, (std::min)(9, *(dot - 1) - '0'));
+    int minor = (std::max)(0, (std::min)(9, *(dot + 1) - '0'));
     glVersion = major * 100 + minor * 10;
   }
 
@@ -141,7 +141,7 @@ void HgiGLObjectLabel(const uint32_t identifier, const uint32_t name, const std:
 
   glObjectLabel(identifier,
                 name,
-                std::min(label.size(),
+                (std::min)(label.size(),
                          size_t(maxLength - 1)),  // Account for 0-terminator.
                 label.c_str());
 }

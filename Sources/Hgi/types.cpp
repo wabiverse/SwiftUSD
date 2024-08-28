@@ -163,7 +163,7 @@ size_t HgiGetDataSize(const HgiFormat format, const GfVec3i &dimensions)
   size_t blockWidth, blockHeight;
   const size_t bpt = HgiGetDataSizeOfFormat(format, &blockWidth, &blockHeight);
   return ((dimensions[0] + blockWidth - 1) / blockWidth) *
-         ((dimensions[1] + blockHeight - 1) / blockHeight) * std::max(1, dimensions[2]) * bpt;
+         ((dimensions[1] + blockHeight - 1) / blockHeight) * (std::max)(1, dimensions[2]) * bpt;
 }
 
 HgiFormat HgiGetComponentBaseFormat(const HgiFormat f)
@@ -226,7 +226,7 @@ HgiFormat HgiGetComponentBaseFormat(const HgiFormat f)
 
 uint16_t _ComputeNumMipLevels(const GfVec3i &dimensions)
 {
-  const int dim = std::max({dimensions[0], dimensions[1], dimensions[2]});
+  const int dim = (std::max)({dimensions[0], dimensions[1], dimensions[2]});
 
   for (uint16_t i = 1; i < 8 * sizeof(int) - 1; i++) {
     const int powerTwo = 1 << i;
@@ -267,9 +267,9 @@ std::vector<HgiMipInfo> HgiGetMipInfos(const HgiFormat format,
       break;
     }
 
-    size[0] = std::max(size[0] / 2, 1);
-    size[1] = std::max(size[1] / 2, 1);
-    size[2] = std::max(size[2] / 2, 1);
+    size[0] = (std::max)(size[0] / 2, 1);
+    size[1] = (std::max)(size[1] / 2, 1);
+    size[2] = (std::max)(size[2] / 2, 1);
   }
 
   return result;

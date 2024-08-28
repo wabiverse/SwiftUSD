@@ -49,6 +49,8 @@
 #include "Sdf/api.h"
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/def_visitor.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/errors.hpp>
@@ -463,5 +465,7 @@ template<typename R, typename... Args> struct NewCtor<R(Args...)> : CtorBase<R(A
 }  // namespace Sdf_PySpecDetail
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_USD_SDF_PY_SPEC_H

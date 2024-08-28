@@ -19,6 +19,8 @@
 #include "Arch/systemInfo.h"
 #include "Arch/threads.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/pySafePython.h"
 #include <atomic>
 #include <boost/python.hpp>
@@ -190,3 +192,5 @@ boost::python::handle<> TfPyRunFile(const std::string &filename,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

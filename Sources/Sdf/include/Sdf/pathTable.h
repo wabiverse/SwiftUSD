@@ -880,7 +880,7 @@ template<class MappedType> class SdfPathTable {
 
     // Allocate a new bucket list of twice the size.  Minimum nonzero number
     // of buckets is 8.
-    _mask = std::max(size_t(7), (_mask << 1) + 1);
+    _mask = (std::max)(size_t(7), (_mask << 1) + 1);
     _BucketVec newBuckets(_mask + 1);
 
     // Move items to a new bucket list

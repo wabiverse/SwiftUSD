@@ -14,6 +14,8 @@
 #include "Tf/pyInterpreter.h"
 #include "Tf/stringUtils.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python.hpp>
 
 #include <vector>
@@ -86,3 +88,5 @@ bool Tf_PyInvokeImpl(const std::string &moduleName,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

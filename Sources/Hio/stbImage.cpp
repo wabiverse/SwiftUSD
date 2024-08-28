@@ -543,10 +543,10 @@ namespace {
 static uint8_t _Quantize(float value)
 {
   static constexpr int min = 0;
-  static constexpr int max = std::numeric_limits<uint8_t>::max();
+  static constexpr int max = (std::numeric_limits<uint8_t>::max)();
 
   const int result = min + std::floor((max - min) * value + 0.499999f);
-  return std::min(max, std::max(min, result));
+  return (std::min)(max, (std::max)(min, result));
 }
 
 template<typename T>

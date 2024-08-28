@@ -56,7 +56,7 @@ class Sdf_IdRegistryImpl {
     TfAutoMallocTag2 tag("Sdf", "Sdf_IdentityRegistry::Identify");
     rawId = new Sdf_Identity(this, path);
     _ids[path] = rawId;
-    _deadThreshold = std::max(_MinDeadThreshold, _ids.size() / 8);
+    _deadThreshold = (std::max)(_MinDeadThreshold, _ids.size() / 8);
     return Sdf_IdentityRefPtr(TfDelegatedCountIncrementTag, rawId);
   }
 
@@ -76,7 +76,7 @@ class Sdf_IdRegistryImpl {
           ++iter;
         }
       }
-      _deadThreshold = std::max(_MinDeadThreshold, _ids.size() / 8);
+      _deadThreshold = (std::max)(_MinDeadThreshold, _ids.size() / 8);
     }
   }
 

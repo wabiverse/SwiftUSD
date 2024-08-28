@@ -326,7 +326,7 @@ void HgiVulkanShaderGenerator::_WriteBuffers(const HgiShaderFunctionBufferDescVe
     // In Vulkan, buffers and textures cannot have the same binding index.
     // Start textures right after the last buffer.
     // See HgiVulkanResourceBindings for details.
-    _textureBindIndexStart = std::max(_textureBindIndexStart, bindIndex + 1);
+    _textureBindIndexStart = (std::max)(_textureBindIndexStart, bindIndex + 1);
   }
 }
 

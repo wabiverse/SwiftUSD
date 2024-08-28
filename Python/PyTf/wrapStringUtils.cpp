@@ -80,17 +80,17 @@ static long _StringToLong(char const *str)
 
 static unsigned long _GetULongMax()
 {
-  return std::numeric_limits<unsigned long>::max();
+  return (std::numeric_limits<unsigned long>::max)();
 }
 
 static long _GetLongMax()
 {
-  return std::numeric_limits<long>::max();
+  return (std::numeric_limits<long>::max)();
 }
 
 static long _GetLongMin()
 {
-  return std::numeric_limits<long>::min();
+  return (std::numeric_limits<long>::min)();
 }
 
 }  // anonymous namespace

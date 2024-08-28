@@ -72,8 +72,8 @@ int main(int argc, char const *argv[])
   js.WriteKeyValue("null", nullptr);
   js.WriteKeyValue("int", -1);
   js.WriteKeyValue("uint", static_cast<unsigned int>(42));
-  js.WriteKeyValue("int64", std::numeric_limits<int64_t>::min());
-  js.WriteKeyValue("uint64", std::numeric_limits<uint64_t>::max());
+  js.WriteKeyValue("int64", (std::numeric_limits<int64_t>::min)());
+  js.WriteKeyValue("uint64", (std::numeric_limits<uint64_t>::max)());
   js.WriteKeyValue("double", std::numeric_limits<double>::epsilon());
   js.WriteKeyValue("string", "Some string");
   js.WriteKey("array");
@@ -82,8 +82,8 @@ int main(int argc, char const *argv[])
   js.WriteValue(nullptr);
   js.WriteValue(-1);
   js.WriteValue(static_cast<unsigned int>(42));
-  js.WriteValue(std::numeric_limits<int64_t>::min());
-  js.WriteValue(std::numeric_limits<uint64_t>::max());
+  js.WriteValue((std::numeric_limits<int64_t>::min)());
+  js.WriteValue((std::numeric_limits<uint64_t>::max)());
   js.WriteValue(std::numeric_limits<double>::epsilon());
   js.WriteValue("Some string");
   js.EndArray();
@@ -99,9 +99,9 @@ int main(int argc, char const *argv[])
                  "uint",
                  static_cast<unsigned int>(42),
                  "int64",
-                 std::numeric_limits<int64_t>::min(),
+                 (std::numeric_limits<int64_t>::min)(),
                  "uint64",
-                 std::numeric_limits<uint64_t>::max(),
+                 (std::numeric_limits<uint64_t>::max)(),
                  "double",
                  std::numeric_limits<double>::epsilon(),
                  "string",
@@ -113,8 +113,8 @@ int main(int argc, char const *argv[])
                    js.WriteValue(nullptr);
                    js.WriteValue(-1);
                    js.WriteValue(static_cast<unsigned int>(42));
-                   js.WriteValue(std::numeric_limits<int64_t>::min());
-                   js.WriteValue(std::numeric_limits<uint64_t>::max());
+                   js.WriteValue((std::numeric_limits<int64_t>::min)());
+                   js.WriteValue((std::numeric_limits<uint64_t>::max)());
                    js.WriteValue(std::numeric_limits<double>::epsilon());
                    js.WriteValue("Some string");
                    js.EndArray();

@@ -470,16 +470,16 @@ size_t _ComputeApproximateNumPointsForShapes(const std::vector<VtIntArray> &indi
       [&indicesPerBlendShape](size_t start, size_t end, int init) {
         for (size_t i = start; i < end; ++i) {
           for (int index : indicesPerBlendShape[i]) {
-            init = std::max(init, index);
+            init = (std::max)(init, index);
           }
         }
         return init;
       },
-      [](int lhs, int rhs) { return std::max(lhs, rhs); });
+      [](int lhs, int rhs) { return (std::max)(lhs, rhs); });
 
   // Also take the sizes of sub-shapes into account, for non-indexed shapes.
   for (const auto &offsets : offsetsPerSubShape) {
-    maxIndex = std::max(maxIndex, static_cast<int>(offsets.size()));
+    maxIndex = (std::max)(maxIndex, static_cast<int>(offsets.size()));
   }
   return maxIndex > 0 ? maxIndex + 1 : 0;
 }

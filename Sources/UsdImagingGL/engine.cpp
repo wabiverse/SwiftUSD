@@ -1542,7 +1542,7 @@ static int _GetRefineLevel(float c)
   int refineLevel = 0;
 
   // to avoid floating point inaccuracy (e.g. 1.3 > 1.3f)
-  c = std::min(c + 0.01f, 2.0f);
+  c = (std::min)(c + 0.01f, 2.0f);
 
   if (1.0f <= c && c < 1.1f) {
     refineLevel = 0;

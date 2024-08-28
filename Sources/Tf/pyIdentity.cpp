@@ -16,6 +16,8 @@
 #include <mutex>
 #include <vector>
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 // Compile-time option to help debug identity issues.
 // #define DEBUG_IDENTITY
 
@@ -389,3 +391,5 @@ void Tf_PyOwnershipRefBaseUniqueChanged(TfRefBase const *refBase, bool isNowUniq
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

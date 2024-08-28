@@ -17,9 +17,9 @@
 
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
-#if __has_include(<boost/python/dict.hpp>)
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #include <boost/python/dict.hpp>
-#endif // __has_include(<boost/python/dict.hpp>)
+
 #include <locale>
 
 #include "Tf/hashmap.h"
@@ -125,5 +125,7 @@ class TfScriptModuleLoader : public TfWeakBase {
 TF_API_TEMPLATE_CLASS(TfSingleton<TfScriptModuleLoader>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_SCRIPT_MODULE_LOADER_H

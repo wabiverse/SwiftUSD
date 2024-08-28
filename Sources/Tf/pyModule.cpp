@@ -24,6 +24,8 @@
 #include "Tf/stringUtils.h"
 #include "Tf/token.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/dict.hpp>
 #include <boost/python/docstring_options.hpp>
 #include <boost/python/extract.hpp>
@@ -402,3 +404,5 @@ void Tf_PyInitWrapModule(void (*wrapModule)(),
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

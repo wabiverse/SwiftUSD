@@ -97,7 +97,7 @@ static const SdfValueTypeName &_GetUVTypeName()
 
 static size_t _GetNumOgawaStreams()
 {
-  return std::min(TfGetEnvSetting(USD_ABC_NUM_OGAWA_STREAMS),
+  return (std::min)(TfGetEnvSetting(USD_ABC_NUM_OGAWA_STREAMS),
                   static_cast<int>(WorkGetConcurrencyLimit()));
 }
 
@@ -1596,7 +1596,7 @@ template<typename T> size_t _GetNumSamples(const T &object)
   if (!object.isConstant())
     return nSamples;
 
-  return std::min(nSamples, size_t(1));
+  return (std::min)(nSamples, size_t(1));
 }
 
 /// Fill sample times from an object with getTimeSampling() and

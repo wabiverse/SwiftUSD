@@ -145,7 +145,7 @@ int HdMeshTopology::GetNumPoints() const
   int const *vertsPtr = verts.cdata();
   for (int i = 0; i < numIndices; ++i) {
     // find the max vertex index in face verts
-    numPoints = std::max(numPoints, vertsPtr[i]);
+    numPoints = (std::max)(numPoints, vertsPtr[i]);
   }
   // numPoints = max vertex index + 1
   return numPoints + 1;

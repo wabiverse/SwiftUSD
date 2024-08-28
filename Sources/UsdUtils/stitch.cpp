@@ -187,14 +187,14 @@ static bool _MergeValueFn(SdfSpecType specType,
     double srcStartCode, dstStartCode;
     TF_VERIFY(srcLayer->HasField(srcPath, field, &srcStartCode));
     TF_VERIFY(dstLayer->HasField(dstPath, field, &dstStartCode));
-    *valueToCopy = VtValue(std::min(srcStartCode, dstStartCode));
+    *valueToCopy = VtValue((std::min)(srcStartCode, dstStartCode));
     return true;
   }
   else if (field == SdfFieldKeys->EndTimeCode) {
     double srcEndCode, dstEndCode;
     TF_VERIFY(srcLayer->HasField(srcPath, field, &srcEndCode));
     TF_VERIFY(dstLayer->HasField(dstPath, field, &dstEndCode));
-    *valueToCopy = VtValue(std::max(srcEndCode, dstEndCode));
+    *valueToCopy = VtValue((std::max)(srcEndCode, dstEndCode));
     return true;
   }
 

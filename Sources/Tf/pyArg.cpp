@@ -11,6 +11,8 @@
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/slice.hpp>
@@ -60,7 +62,7 @@ std::pair<tuple, dict> TfPyProcessOptionalArgs(const tuple &args,
 
   rval.second = kwargs;
 
-  for (unsigned int i = 0; i < std::min(numArgs, numExpectedArgs); ++i) {
+  for (unsigned int i = 0; i < (std::min)(numArgs, numExpectedArgs); ++i) {
     const string &argName = expectedArgs[i].GetName();
     if (rval.second.has_key(argName)) {
       TfPyThrowTypeError(
@@ -124,3 +126,5 @@ string TfPyCreateFunctionDocString(const string &functionName,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

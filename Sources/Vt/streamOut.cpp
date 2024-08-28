@@ -11,10 +11,10 @@
 #include "Vt/types.h"
 #include "pxr/pxrns.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pyObjWrapper.h"
 #  include "Tf/pyUtils.h"
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #include <numeric>
 #include <ostream>
@@ -112,11 +112,11 @@ void VtStreamOutArray(std::ostream &out,
   _StreamArrayRecursive(out, *shapeData, streamNextElem, lastDimSize, 0);
 }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 std::ostream &VtStreamOut(TfPyObjWrapper const &obj, std::ostream &stream)
 {
   return stream << TfPyObjectRepr(obj.Get());
 }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE

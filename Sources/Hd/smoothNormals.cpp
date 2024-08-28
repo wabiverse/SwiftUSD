@@ -63,7 +63,7 @@ VtArray<DstType> _ComputeSmoothNormals(int numPoints,
   // to be safe.
   // numPoints of input pointer could be different from the number of points
   // in adjacency table.
-  numPoints = std::min(numPoints, numAdjPoints);
+  numPoints = (std::min)(numPoints, numAdjPoints);
 
   VtArray<DstType> normals(numPoints);
 

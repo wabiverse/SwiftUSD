@@ -107,7 +107,7 @@ void HdStInstancer::_SyncPrimvars(HdSceneDelegate *sceneDelegate, HdDirtyBits *d
             source->GetNumElements(),
             _instancePrimvarNumElements,
             instancerId.GetText());
-        _instancePrimvarNumElements = std::min(numElements, _instancePrimvarNumElements);
+        _instancePrimvarNumElements = (std::min)(numElements, _instancePrimvarNumElements);
       }
 
       sources.push_back(source);

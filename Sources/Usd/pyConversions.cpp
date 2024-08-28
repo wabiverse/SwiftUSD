@@ -21,6 +21,8 @@
 #include "Tf/pyLock.h"
 #include "Tf/pyUtils.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/object.hpp>
 #include <string>
 
@@ -159,3 +161,5 @@ bool UsdPythonToMetadataValue(const TfToken &key,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

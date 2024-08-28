@@ -249,7 +249,7 @@ struct Tf_TokenRegistry {
           // whole table like this on every insertion.  By waiting a
           // bit we avoid these situations at the cost of the
           // occasional "unnecessary" rehash.
-          set.insertsUntilSweepCheck = std::max(
+          set.insertsUntilSweepCheck = (std::max)(
               _MinInsertsUntilSweepCheck,
               static_cast<size_t>(set.reps.bucket_count() *
                                   float(set.reps.max_load_factor() - set.reps.load_factor())));

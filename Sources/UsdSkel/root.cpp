@@ -167,7 +167,7 @@ static bool _ComputeExtent(const UsdGeomBoundable &boundable,
 
         float skelPadding = skinningQuery.ComputeExtentsPadding(skelRestXforms,
                                                                 UsdGeomBoundable(skinnedPrim));
-        padding = std::max(padding, skelPadding);
+        padding = (std::max)(padding, skelPadding);
       }
     }
 

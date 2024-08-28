@@ -20,6 +20,8 @@
 #include "Arch/defines.h"
 #include "Tf/registryManager.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 
@@ -405,3 +407,5 @@ void Tf_PyObjectError(bool printError)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

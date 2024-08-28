@@ -6,7 +6,6 @@
 #include <Vt/array.h>
 #include <Vt/arrayPyBuffer.h>
 #include <Vt/dictionary.h>
-#include <Vt/functions.h>
 #include <Vt/hash.h>
 #include <Vt/pyOperators.h>
 #include <Vt/streamOut.h>

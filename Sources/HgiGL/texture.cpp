@@ -232,7 +232,7 @@ HgiGLTexture::HgiGLTexture(HgiTextureDesc const &desc)
       // Upload each (available) mip
       const std::vector<HgiMipInfo> mipInfos = HgiGetMipInfos(
           desc.format, desc.dimensions, desc.layerCount, desc.pixelsByteSize);
-      const size_t mipLevels = std::min(mipInfos.size(), size_t(desc.mipLevels));
+      const size_t mipLevels = (std::min)(mipInfos.size(), size_t(desc.mipLevels));
       const char *const initialData = reinterpret_cast<const char *>(desc.initialData);
 
       for (size_t mip = 0; mip < mipLevels; mip++) {

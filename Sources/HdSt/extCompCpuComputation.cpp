@@ -17,7 +17,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const size_t HdStExtCompCpuComputation::INVALID_OUTPUT_INDEX = std::numeric_limits<size_t>::max();
+const size_t HdStExtCompCpuComputation::INVALID_OUTPUT_INDEX = (std::numeric_limits<size_t>::max)();
 
 HdStExtCompCpuComputation::HdStExtCompCpuComputation(
     const SdfPath &id,

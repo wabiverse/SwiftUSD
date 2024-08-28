@@ -11,7 +11,7 @@
 
 #include <cstdint>
 #if defined(ARCH_OS_WINDOWS)
-#  include <Memoryapi.h>
+// #  include <Memoryapi.h>
 #  include <Windows.h>
 #else  // Assume POSIX
 #  include <sys/mman.h>

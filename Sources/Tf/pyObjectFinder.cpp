@@ -12,6 +12,8 @@
 #include "Tf/staticData.h"
 #include "Tf/typeInfoMap.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 using std::type_info;
 
 using namespace boost::python;
@@ -39,3 +41,5 @@ object Tf_FindPythonObject(void const *objPtr, std::type_info const &type)
 Tf_PyObjectFinderBase::~Tf_PyObjectFinderBase() {}
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

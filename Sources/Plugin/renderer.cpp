@@ -489,8 +489,8 @@ void HdEmbreeRenderer::_RenderTiles(HdRenderThread *renderThread, size_t tileSta
     const unsigned int y0 = tileY * tileSize + minY;
     // Clamp to data window, in case tileSize doesn't
     // neatly divide its with and height.
-    const unsigned int x1 = std::min(x0 + tileSize, maxX);
-    const unsigned int y1 = std::min(y0 + tileSize, maxY);
+    const unsigned int x1 = (std::min)(x0 + tileSize, maxX);
+    const unsigned int y1 = (std::min)(y0 + tileSize, maxY);
 
     // Loop over pixels casting rays.
     for (unsigned int y = y0; y < y1; ++y) {
@@ -863,9 +863,9 @@ GfVec4f HdEmbreeRenderer::_ComputeColor(RTCRayHit const &rayHit,
 
   // Clamp colors to [0,1].
   GfVec4f output;
-  output[0] = std::max(0.0f, std::min(1.0f, finalColor[0]));
-  output[1] = std::max(0.0f, std::min(1.0f, finalColor[1]));
-  output[2] = std::max(0.0f, std::min(1.0f, finalColor[2]));
+  output[0] = (std::max)(0.0f, (std::min)(1.0f, finalColor[0]));
+  output[1] = (std::max)(0.0f, (std::min)(1.0f, finalColor[1]));
+  output[2] = (std::max)(0.0f, (std::min)(1.0f, finalColor[2]));
   output[3] = 1.0f;
   return output;
 }

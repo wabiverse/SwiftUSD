@@ -137,7 +137,7 @@ HdStVBOSimpleMemoryManager::_SimpleBufferArray::_SimpleBufferArray(
   TF_FOR_ALL(it, GetResources())
   {
     HdStBufferResourceSharedPtr const &bres = it->second;
-    _maxBytesPerElement = std::max(_maxBytesPerElement,
+    _maxBytesPerElement = (std::max)(_maxBytesPerElement,
                                    HdDataSizeOfTupleType(bres->GetTupleType()));
   }
 
@@ -265,7 +265,7 @@ void HdStVBOSimpleMemoryManager::_SimpleBufferArray::Reallocate(
     size_t bufferSize = bytesPerElement * numElements;
 
     // Clamp for 0-sized buffers, Metal doesn't support them.
-    bufferSize = std::max(bufferSize, static_cast<size_t>(256));
+    bufferSize = (std::max)(bufferSize, static_cast<size_t>(256));
 
     HgiBufferHandle oldBuf = bres->GetHandle();
     HgiBufferHandle newBuf;
@@ -293,7 +293,7 @@ void HdStVBOSimpleMemoryManager::_SimpleBufferArray::Reallocate(
     //
     int oldSize = range->GetCapacity();
     int newSize = range->GetNumElements();
-    size_t copySize = std::min(oldSize, newSize) * bytesPerElement;
+    size_t copySize = (std::min)(oldSize, newSize) * bytesPerElement;
     if (copySize > 0 && oldBuf) {
       HD_PERF_COUNTER_INCR(HdStPerfTokens->copyBufferGpuToGpu);
 

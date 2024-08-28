@@ -291,8 +291,8 @@ HdVec2dDataSourceHandle _ComputeUnionedCameraShutterInterval(
         initialized = true;
       }
       else {
-        result[0] = std::min(result[0], camShutter[0]);
-        result[1] = std::max(result[1], camShutter[1]);
+        result[0] = (std::min)(result[0], camShutter[0]);
+        result[1] = (std::max)(result[1], camShutter[1]);
       }
     }
   }

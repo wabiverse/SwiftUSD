@@ -25,7 +25,7 @@ UsdStagePopulationMask UsdStagePopulationMask::Union(UsdStagePopulationMask cons
 {
   UsdStagePopulationMask result;
 
-  result._paths.reserve(std::min(l._paths.size(), r._paths.size()));
+  result._paths.reserve((std::min)(l._paths.size(), r._paths.size()));
 
   auto lcur = l._paths.begin(), lend = l._paths.end();
   auto rcur = r._paths.begin(), rend = r._paths.end();
@@ -90,7 +90,7 @@ UsdStagePopulationMask UsdStagePopulationMask::Intersection(UsdStagePopulationMa
 {
   UsdStagePopulationMask result;
 
-  result._paths.reserve(std::min(l._paths.size(), r._paths.size()));
+  result._paths.reserve((std::min)(l._paths.size(), r._paths.size()));
 
   auto lcur = l._paths.begin(), lend = l._paths.end();
   auto rcur = r._paths.begin(), rend = r._paths.end();

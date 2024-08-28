@@ -73,8 +73,8 @@ void HgiGLCapabilities::_LoadCapabilities()
     // GL_VERSION = "4.5.0 <vendor> <version>"
     //              "4.1 <vendor-os-ver> <version>"
     //              "4.1 <vendor-os-ver>"
-    int major = std::max(0, std::min(9, *(dot - 1) - '0'));
-    int minor = std::max(0, std::min(9, *(dot + 1) - '0'));
+    int major = (std::max)(0, (std::min)(9, *(dot - 1) - '0'));
+    int minor = (std::max)(0, (std::min)(9, *(dot + 1) - '0'));
     _glVersion = major * 100 + minor * 10;
   }
 
@@ -87,8 +87,8 @@ void HgiGLCapabilities::_LoadCapabilities()
     {
       // GL_SHADING_LANGUAGE_VERSION = "4.10"
       //                               "4.50 <vendor>"
-      int major = std::max(0, std::min(9, *(dot - 1) - '0'));
-      int minor = std::max(0, std::min(9, *(dot + 1) - '0'));
+      int major = (std::max)(0, (std::min)(9, *(dot - 1) - '0'));
+      int minor = (std::max)(0, (std::min)(9, *(dot + 1) - '0'));
       _glslVersion = major * 100 + minor * 10;
     }
   }
@@ -162,7 +162,7 @@ void HgiGLCapabilities::_LoadCapabilities()
   // For debugging and unit testing
   if (TfGetEnvSetting(HGIGL_GLSL_VERSION) > 0) {
     // GLSL version override
-    _glslVersion = std::min(_glslVersion, TfGetEnvSetting(HGIGL_GLSL_VERSION));
+    _glslVersion = (std::min)(_glslVersion, TfGetEnvSetting(HGIGL_GLSL_VERSION));
   }
 
   _SetFlag(HgiDeviceCapabilitiesBitsMultiDrawIndirect, multiDrawIndirectEnabled);

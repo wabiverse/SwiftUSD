@@ -91,8 +91,8 @@ void GlfContextCaps::_LoadCaps()
     // GL_VERSION = "4.5.0 <vendor> <version>"
     //              "4.1 <vendor-os-ver> <version>"
     //              "4.1 <vendor-os-ver>"
-    int major = std::max(0, std::min(9, *(dot - 1) - '0'));
-    int minor = std::max(0, std::min(9, *(dot + 1) - '0'));
+    int major = (std::max)(0, (std::min)(9, *(dot - 1) - '0'));
+    int minor = (std::max)(0, (std::min)(9, *(dot + 1) - '0'));
     glVersion = major * 100 + minor * 10;
   }
 

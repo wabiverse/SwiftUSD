@@ -33,7 +33,7 @@ namespace PXR_PEGTL_NAMESPACE
             : m_in( in_in ),
               m_end( in_in.end() )
          {
-            m_in.private_set_end( m_in.begin() + std::min( m_in.size(), Maximum ) );
+            m_in.private_set_end( m_in.begin() + (std::min)( m_in.size(), Maximum ) );
          }
 
          bytes_guard( bytes_guard&& ) = delete;

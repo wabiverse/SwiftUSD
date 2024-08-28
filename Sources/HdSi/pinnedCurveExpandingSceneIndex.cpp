@@ -457,7 +457,7 @@ class _PrimvarDataSource : public HdContainerDataSource {
 
       // Note: We treat cv = 2 or 3 as a single segment requiring 2
       // authored varying values.
-      const size_t nSegs = std::max(_curveVertexCounts[cId] - 4, 0) + 1;
+      const size_t nSegs = (std::max)(_curveVertexCounts[cId] - 4, 0) + 1;
       const size_t nVarying = nSegs + 1;
       varyingCount = nVarying;
     }

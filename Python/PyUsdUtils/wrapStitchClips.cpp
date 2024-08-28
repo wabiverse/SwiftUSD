@@ -39,7 +39,7 @@ bool _ConvertStitchClips(const SdfLayerHandle &resultLayer,
                          const object pyClipSet)
 {
   const auto clipSet = _ConvertWithDefault(pyClipSet, UsdClipsAPISetNames->default_);
-  constexpr double dmax = std::numeric_limits<double>::max();
+  constexpr double dmax = (std::numeric_limits<double>::max)();
   return UsdUtilsStitchClips(resultLayer,
                              clipLayerFiles,
                              clipPath,
@@ -74,7 +74,7 @@ bool _ConvertStitchClipTemplate(const SdfLayerHandle &resultLayer,
 {
   const auto clipSet = _ConvertWithDefault(pyClipSet, UsdClipsAPISetNames->default_);
   const auto activeOffset = _ConvertWithDefault(pyActiveOffset,
-                                                std::numeric_limits<double>::max());
+                                                (std::numeric_limits<double>::max)());
   const auto interpolateMissingClipValues = _ConvertWithDefault(pyInterpolateMissingClipValues,
                                                                 false);
   return UsdUtilsStitchClipsTemplate(resultLayer,

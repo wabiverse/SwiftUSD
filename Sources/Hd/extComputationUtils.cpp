@@ -83,7 +83,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 {
   std::sort(times->begin(), times->end());
   times->erase(std::unique(times->begin(), times->end()), times->end());
-  times->resize(std::min(times->size(), maxSampleCount));
+  times->resize((std::min)(times->size(), maxSampleCount));
 }
 
 /* static */ bool HdExtComputationUtils::_InvokeComputation(HdSceneDelegate &sceneDelegate,

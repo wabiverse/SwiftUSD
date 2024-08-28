@@ -117,7 +117,7 @@ struct HdDisplayStyle {
                  bool occludedSelectionShowsThrough_ = false,
                  bool pointsShadingEnabled_ = false,
                  bool materialIsFinal_ = false)
-      : refineLevel(std::max(0, refineLevel_)),
+      : refineLevel((std::max)(0, refineLevel_)),
         flatShadingEnabled(flatShading),
         displacementEnabled(displacement),
         occludedSelectionShowsThrough(occludedSelectionShowsThrough_),

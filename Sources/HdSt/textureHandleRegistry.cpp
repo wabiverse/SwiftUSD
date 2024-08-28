@@ -198,7 +198,7 @@ void HdSt_TextureHandleRegistry::_ComputeMemoryRequest(HdStTextureObjectSharedPt
   // handles.
   for (HdStTextureHandlePtr const &handlePtr : *handles) {
     if (HdStTextureHandleSharedPtr const handle = handlePtr.lock()) {
-      maxRequest = std::max(maxRequest, handle->GetMemoryRequest());
+      maxRequest = (std::max)(maxRequest, handle->GetMemoryRequest());
       hasHandle = true;
     }
   }

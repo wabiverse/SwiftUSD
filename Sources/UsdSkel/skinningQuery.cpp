@@ -487,8 +487,8 @@ float UsdSkelSkinningQuery::ComputeExtentsPadding(const VtArray<Matrix4> &skelRe
 
       float padding = 0.0f;
       for (int i = 0; i < 3; ++i) {
-        padding = std::max(padding, minDiff[i]);
-        padding = std::max(padding, maxDiff[i]);
+        padding = (std::max)(padding, minDiff[i]);
+        padding = (std::max)(padding, maxDiff[i]);
       }
       return padding;
     }

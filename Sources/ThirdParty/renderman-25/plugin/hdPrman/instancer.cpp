@@ -524,7 +524,7 @@ void HdPrmanInstancer::_SyncTransforms(HdDirtyBits *dirtyBits)
         scale = scales.Resample(t);
       }
 
-      size_t size = std::max({ixf.size(), trans.size(), rot.size(), scale.size()});
+      size_t size = (std::max)({ixf.size(), trans.size(), rot.size(), scale.size()});
 
       // Concatenate transformations.
       VtMatrix4dArray &ma = _sa.values[i];
@@ -1288,7 +1288,7 @@ void HdPrmanInstancer::_ComposePrototypeData(
 
   // Make at least one set, even when there are no prototype ids,
   // to cover analytic lights.
-  const size_t count = std::max(size_t(1), protoIds.size());
+  const size_t count = (std::max)(size_t(1), protoIds.size());
 
   protoParams.resize(count);
   protoFlats.resize(count);

@@ -185,11 +185,11 @@ struct Vt_ValueFromPython {
       // long or unsigned long long or fail, depending on range.
       long long val = PyLong_AsLongLong(obj_ptr);
       if (!PyErr_Occurred()) {
-        if (std::numeric_limits<int>::min() <= val && val <= std::numeric_limits<int>::max()) {
+        if ((std::numeric_limits<int>::min)() <= val && val <= (std::numeric_limits<int>::max)()) {
           new (storage) VtValue(int(val));
         }
-        else if (std::numeric_limits<long>::min() <= val &&
-                 val <= std::numeric_limits<long>::max())
+        else if ((std::numeric_limits<long>::min)() <= val &&
+                 val <= (std::numeric_limits<long>::max)())
         {
           new (storage) VtValue(long(val));
         }

@@ -230,7 +230,7 @@ inline bool TopologyRefinerFactory<PXR_NS::Converter>::resizeComponentTopology(
     setNumBaseFaceVertices(refiner, face, nverts);
 
     for (int vert = 0; vert < nverts; ++vert) {
-      maxVertIndex = std::max(maxVertIndex, vertIndices[vert]);
+      maxVertIndex = (std::max)(maxVertIndex, vertIndices[vert]);
     }
     vertIndices += nverts;
   }
@@ -310,7 +310,7 @@ inline bool TopologyRefinerFactory<PXR_NS::Converter>::assignComponentTags(
   }
   for (size_t i = 0, cindex = 0, sindex = 0; i < numCreaseSets; ++i) {
 
-    size_t numSegments = std::max(int(creaseLengths[i]) - 1, 0);
+    size_t numSegments = (std::max)(int(creaseLengths[i]) - 1, 0);
 
     OpenSubdiv::Far::TopologyLevel const &level = refiner.GetLevel(0);
     for (size_t j = 0; j < numSegments; ++j) {
@@ -345,7 +345,7 @@ inline bool TopologyRefinerFactory<PXR_NS::Converter>::assignComponentTags(
                   converter.name.GetText());
         }
         else {
-          setBaseEdgeSharpness(refiner, edge, std::max(0.0f, creaseWeights[sindex]));
+          setBaseEdgeSharpness(refiner, edge, (std::max)(0.0f, creaseWeights[sindex]));
         }
       }
 
@@ -375,7 +375,7 @@ inline bool TopologyRefinerFactory<PXR_NS::Converter>::assignComponentTags(
   for (size_t i = 0; i < numCorners; ++i) {
     int vert = cornerIndices[i];
     if (vert >= 0 && vert < refiner.GetLevel(0).GetNumVertices()) {
-      setBaseVertexSharpness(refiner, vert, std::max(0.0f, cornerWeights[i]));
+      setBaseVertexSharpness(refiner, vert, (std::max)(0.0f, cornerWeights[i]));
     }
     else {
       TF_WARN("Set vertex sharpness cannot find vertex (%d) (%s)", vert, converter.name.GetText());
@@ -421,7 +421,7 @@ bool TopologyRefinerFactory<PXR_NS::Converter>::assignFaceVaryingTopology(
     // find fvardata size
     int maxIndex = -1;
     for (size_t j = 0; j < fvIndices.size(); ++j) {
-      maxIndex = std::max(maxIndex, fvIndices[j]);
+      maxIndex = (std::max)(maxIndex, fvIndices[j]);
     }
 
     size_t nfaces = getNumBaseFaces(refiner);

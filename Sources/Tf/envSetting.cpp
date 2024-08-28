@@ -19,9 +19,9 @@
 #include "Tf/stringUtils.h"
 #include "pxr/pxrns.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pyUtils.h"
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #include <mutex>
 #include <variant>
@@ -46,9 +46,9 @@ class Tf_EnvSettingRegistry {
     if (FILE *fp = ArchOpenFile(fileName.c_str(), "r")) {
       char buffer[1024];
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       bool syncPython = TfPyIsInitialized();
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
       int lineNo = 0;
       auto emitError = [&fileName, &lineNo](char const *fmt, ...)
@@ -91,11 +91,11 @@ class Tf_EnvSettingRegistry {
         }
 
         ArchSetEnv(key, value, /*overwrite=*/false);
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
         if (syncPython && ArchGetEnv(key) == value) {
           TfPySetenv(key, value);
         }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       }
 
       fclose(fp);

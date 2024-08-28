@@ -13,6 +13,8 @@
 
 using std::string;
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Tf_PySingleton {
@@ -41,3 +43,5 @@ Tf_PySingleton::Visitor TfPySingleton(string const &reprPrefix)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

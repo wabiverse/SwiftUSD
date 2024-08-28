@@ -839,10 +839,10 @@ HdxPickResult::HdxPickResult(int const *primIds,
       _subRect(subRect)
 {
   // Clamp _subRect [x,y,w,h] to render buffer [0,0,w,h]
-  _subRect[0] = std::max(0, _subRect[0]);
-  _subRect[1] = std::max(0, _subRect[1]);
-  _subRect[2] = std::min(_bufferSize[0] - _subRect[0], _subRect[2]);
-  _subRect[3] = std::min(_bufferSize[1] - _subRect[1], _subRect[3]);
+  _subRect[0] = (std::max)(0, _subRect[0]);
+  _subRect[1] = (std::max)(0, _subRect[1]);
+  _subRect[2] = (std::min)(_bufferSize[0] - _subRect[0], _subRect[2]);
+  _subRect[3] = (std::min)(_bufferSize[1] - _subRect[1], _subRect[3]);
 
   _eyeToWorld = viewMatrix.GetInverse();
   _ndcToWorld = (viewMatrix * projectionMatrix).GetInverse();
@@ -1235,7 +1235,7 @@ void HdxPickResult::ResolveNearestToCenter(HdxPickHitVector *allHits) const
         }
         // Skip pixels we've already visited and jump to the boundary
         if (!(ww == w || ww == width - w - 1) && hh == h) {
-          hh = std::max(hh, height - h - 2);
+          hh = (std::max)(hh, height - h - 2);
         }
       }
     }

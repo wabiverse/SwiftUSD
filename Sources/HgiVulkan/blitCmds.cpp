@@ -179,7 +179,7 @@ void HgiVulkanBlitCmds::CopyTextureCpuToGpu(HgiTextureCpuToGpuOp const &copyOp)
       TF_VERIFY(dst && dstTexture->GetStagingBuffer());
 
       dst += mipInfo.byteOffset;
-      const size_t size = std::min(copyOp.bufferByteSize, 1 * mipInfo.byteSizePerLayer);
+      const size_t size = (std::min)(copyOp.bufferByteSize, 1 * mipInfo.byteSizePerLayer);
       memcpy(dst, copyOp.cpuSourceBuffer, size);
     }
   }
@@ -529,16 +529,16 @@ void HgiVulkanBlitCmds::GenerateMipMaps(HgiTextureHandle const &texture)
     imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageBlit.srcSubresource.layerCount = 1;
     imageBlit.srcSubresource.mipLevel = i - 1;
-    imageBlit.srcOffsets[1].x = std::max(width >> (i - 1), 1);
-    imageBlit.srcOffsets[1].y = std::max(height >> (i - 1), 1);
+    imageBlit.srcOffsets[1].x = (std::max)(width >> (i - 1), 1);
+    imageBlit.srcOffsets[1].y = (std::max)(height >> (i - 1), 1);
     imageBlit.srcOffsets[1].z = 1;
 
     // Destination
     imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageBlit.dstSubresource.layerCount = 1;
     imageBlit.dstSubresource.mipLevel = i;
-    imageBlit.dstOffsets[1].x = std::max(width >> i, 1);
-    imageBlit.dstOffsets[1].y = std::max(height >> i, 1);
+    imageBlit.dstOffsets[1].x = (std::max)(width >> i, 1);
+    imageBlit.dstOffsets[1].y = (std::max)(height >> i, 1);
     imageBlit.dstOffsets[1].z = 1;
 
     // Transition current mip level to image blit destination

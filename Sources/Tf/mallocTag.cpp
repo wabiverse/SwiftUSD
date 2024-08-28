@@ -589,7 +589,7 @@ inline void Tf_MallocGlobalData::_RegisterBlock(const void *block,
   node->_callSite->_totalBytes.fetch_add(blockSize, std::memory_order_relaxed);
 
   int64_t newTotal = _totalBytes.fetch_add(blockSize, std::memory_order_relaxed) + blockSize;
-  _maxTotalBytes.store(std::max(newTotal, _maxTotalBytes.load(std::memory_order_relaxed)),
+  _maxTotalBytes.store((std::max)(newTotal, _maxTotalBytes.load(std::memory_order_relaxed)),
                        std::memory_order_relaxed);
 
   node->_numAllocations++;

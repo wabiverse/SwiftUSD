@@ -428,8 +428,8 @@ void HdxVisualizeAovTask::_UpdateMinMaxDepth(HgiTextureHandle const &inputAovTex
     const size_t width = textureDesc.dimensions[0];
     const size_t height = textureDesc.dimensions[1];
     float const *ptr = reinterpret_cast<float const *>(buffer.get());
-    float min = std::numeric_limits<float>::max();
-    float max = std::numeric_limits<float>::min();
+    float min = (std::numeric_limits<float>::max)();
+    float max = (std::numeric_limits<float>::min)();
     for (size_t ii = 0; ii < width * height; ii++) {
       float const &val = ptr[ii];
       if (val < min) {

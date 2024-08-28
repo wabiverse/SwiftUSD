@@ -1031,7 +1031,7 @@ static HdBufferSourceSharedPtr _GetBitmaskEncodedVisibilityBuffer(VtIntArray inv
   size_t numBitsPerUInt = std::numeric_limits<uint32_t>::digits;  // i.e, 32
   size_t numUIntsNeeded = ceil(numTotalIndices / (float)numBitsPerUInt);
   // Initialize all bits to 1 (visible)
-  VtArray<uint32_t> visibility(numUIntsNeeded, std::numeric_limits<uint32_t>::max());
+  VtArray<uint32_t> visibility(numUIntsNeeded, (std::numeric_limits<uint32_t>::max)());
 
   for (VtIntArray::const_iterator i = invisibleIndices.begin(), end = invisibleIndices.end();
        i != end;

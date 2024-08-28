@@ -241,7 +241,7 @@ char const *_ComputeAndLockScopeDescriptionStackMsg()
   // *stacks*, like number of threads -- not stack depth.
   constexpr size_t MaxStackEntries = 1024;
   _StackRegistry::_StackEntry *entries[MaxStackEntries];
-  size_t numEntries = std::min(MaxStackEntries, reg._stacks.size());
+  size_t numEntries = (std::min)(MaxStackEntries, reg._stacks.size());
   for (size_t i = 0; i != numEntries; ++i) {
     entries[i] = &reg._stacks[i];
   }

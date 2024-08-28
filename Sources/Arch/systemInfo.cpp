@@ -77,7 +77,7 @@ static std::string _DynamicSizedRead(size_t initialSize,
   // Repeatedly invoke the callback with our buffer until it's big enough.
   size_t size = initialSize;
   while (!callback(buffer.get(), &size)) {
-    if (size == std::numeric_limits<size_t>::max()) {
+    if (size == (std::numeric_limits<size_t>::max)()) {
       // callback is never going to succeed.
       return std::string();
     }
@@ -102,7 +102,7 @@ std::string ArchGetExecutablePath()
       ARCH_WARNING(
           "Unable to read /proc/self/exe to obtain "
           "executable path");
-      *size = std::numeric_limits<size_t>::max();
+      *size = (std::numeric_limits<size_t>::max)();
       return false;
     }
     else if (static_cast<size_t>(n) >= *size) {
@@ -148,7 +148,7 @@ std::string ArchGetExecutablePath()
       ARCH_WARNING(
           "Unable to read GetModuleFileName() to obtain "
           "executable path");
-      *size = std::numeric_limits<size_t>::max();
+      *size = (std::numeric_limits<size_t>::max)();
       return false;
     }
     else if (n >= nSize) {

@@ -184,7 +184,7 @@ float _ComputeSampleDistance(const GfBBox3d &bbox)
   const GfMatrix4d &m = bbox.GetMatrix();
 
   // Take minimum of lengths of images of the x-, y-, and z-vector.
-  return sqrt(std::min(
+  return sqrt((std::min)(
       {_SqrLengthThreeVector(m[0]), _SqrLengthThreeVector(m[1]), _SqrLengthThreeVector(m[2])}));
 }
 
@@ -210,7 +210,7 @@ std::pair<GfBBox3d, float> _ComputeBBoxAndSampleDistance(
     {
       const GfBBox3d &fieldBbox = fieldTex->GetBoundingBox();
       bbox = GfBBox3d::Combine(bbox, fieldBbox);
-      sampleDistance = std::min(sampleDistance, _ComputeSampleDistance(fieldBbox));
+      sampleDistance = (std::min)(sampleDistance, _ComputeSampleDistance(fieldBbox));
     }
   }
 

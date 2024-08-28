@@ -1666,7 +1666,7 @@ size_t UsdImagingInstanceAdapter::SamplePrimvar(UsdPrim const &usdPrim,
   std::sort(timeSamples.begin(), timeSamples.end());
   timeSamples.erase(std::unique(timeSamples.begin(), timeSamples.end()), timeSamples.end());
   size_t numSamples = timeSamples.size();
-  size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+  size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
 
   for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
     sampleTimes[i] = timeSamples[i] - time.GetValue();
@@ -2366,7 +2366,7 @@ struct UsdImagingInstanceAdapter::_GetScenePrimPathsFn {
       return false;
     }
 
-    if (instanceIndices[instanceIdxShifted] != std::numeric_limits<int>::max()) {
+    if (instanceIndices[instanceIdxShifted] != (std::numeric_limits<int>::max)()) {
       SdfPathVector instanceChain;
       // To get the correct prim-in-prototype, we need to add the
       // prototype path to the instance chain.  However, there's a case in
@@ -2438,7 +2438,7 @@ SdfPathVector UsdImagingInstanceAdapter::GetScenePrimPaths(
     SdfPathVector result;
 
     if (!instanceIndices.empty()) {
-      int minIdx = std::numeric_limits<int>::max();
+      int minIdx = (std::numeric_limits<int>::max)();
       int maxIdx = 0;
       int validIndices = 0;
 
@@ -2450,8 +2450,8 @@ SdfPathVector UsdImagingInstanceAdapter::GetScenePrimPaths(
         // skip invalid indices
         if (instanceIndex < indices.size()) {
           int remappedIndex = indices[instanceIndex];
-          minIdx = std::min(minIdx, remappedIndex);
-          maxIdx = std::max(maxIdx, remappedIndex);
+          minIdx = (std::min)(minIdx, remappedIndex);
+          maxIdx = (std::max)(maxIdx, remappedIndex);
           ++validIndices;
         }
       }
@@ -2465,7 +2465,7 @@ SdfPathVector UsdImagingInstanceAdapter::GetScenePrimPaths(
         // For each valid requested index provide a mapping into the result vector
         // Indices in the map set to std::numeric_limits<int>::max()
         // are not being requested.
-        std::vector<int> requestedIndicesMap(maxIdx - minIdx + 1, std::numeric_limits<int>::max());
+        std::vector<int> requestedIndicesMap(maxIdx - minIdx + 1, (std::numeric_limits<int>::max)());
 
         // set bits for all valid requested indices to true
         for (size_t i = 0; i < instanceIndices.size(); i++) {
@@ -2500,18 +2500,18 @@ SdfPathVector UsdImagingInstanceAdapter::GetScenePrimPaths(
     SdfPathVector result;
 
     if (!instanceIndices.empty()) {
-      int minIdx = std::numeric_limits<int>::max();
+      int minIdx = (std::numeric_limits<int>::max)();
       int maxIdx = 0;
 
       // determine the requested index range
       for (size_t i = 0; i < instanceIndices.size(); i++) {
         int idx = instanceIndices[i];
-        minIdx = std::min(minIdx, idx);
-        maxIdx = std::max(maxIdx, idx);
+        minIdx = (std::min)(minIdx, idx);
+        maxIdx = (std::max)(maxIdx, idx);
       }
 
       // for each requested index provide a mapping into the result vector
-      std::vector<int> requestedIndicesMap(maxIdx - minIdx + 1, std::numeric_limits<int>::max());
+      std::vector<int> requestedIndicesMap(maxIdx - minIdx + 1, (std::numeric_limits<int>::max)());
 
       // set bits for all requested indices to true
       for (size_t i = 0; i < instanceIndices.size(); i++) {

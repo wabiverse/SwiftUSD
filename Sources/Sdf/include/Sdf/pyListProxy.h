@@ -17,6 +17,9 @@
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"
 #include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python.hpp>
 #include <boost/python/slice.hpp>
 #include <stdexcept>
@@ -255,5 +258,7 @@ template<class T> class SdfPyWrapListProxy {
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_USD_SDF_PY_LIST_PROXY_H

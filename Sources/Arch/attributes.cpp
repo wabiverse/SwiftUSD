@@ -4,6 +4,7 @@
 // https://openusd.org/license.
 //
 
+#include "Arch/defines.h"
 #include "Arch/attributes.h"
 #include "Arch/error.h"
 #include "pxr/pxrns.h"

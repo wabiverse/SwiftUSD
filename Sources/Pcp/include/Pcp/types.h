@@ -192,7 +192,7 @@ using PcpTokenSet = pxr_tsl::robin_set<TfToken, TfToken::HashFunctor>;
 #if defined(doxygen)
 constexpr size_t PCP_INVALID_INDEX = unspecified;
 #else
-constexpr size_t PCP_INVALID_INDEX = std::numeric_limits<size_t>::max();
+constexpr size_t PCP_INVALID_INDEX = (std::numeric_limits<size_t>::max)();
 #endif
 
 PXR_NAMESPACE_CLOSE_SCOPE

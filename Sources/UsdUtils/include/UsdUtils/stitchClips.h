@@ -104,8 +104,8 @@ USDUTILS_API
 bool UsdUtilsStitchClips(const SdfLayerHandle &resultLayer,
                          const std::vector<std::string> &clipLayerFiles,
                          const SdfPath &clipPath,
-                         const double startTimeCode = std::numeric_limits<double>::max(),
-                         const double endTimeCode = std::numeric_limits<double>::max(),
+                         const double startTimeCode = (std::numeric_limits<double>::max)(),
+                         const double endTimeCode = (std::numeric_limits<double>::max)(),
                          const bool interpolateMissingClipValues = false,
                          const TfToken &clipSet = UsdClipsAPISetNames->default_);
 
@@ -201,7 +201,7 @@ bool UsdUtilsStitchClipsTemplate(const SdfLayerHandle &resultLayer,
                                  const double startTime,
                                  const double endTime,
                                  const double stride,
-                                 const double activeOffset = std::numeric_limits<double>::max(),
+                                 const double activeOffset = (std::numeric_limits<double>::max)(),
                                  const bool interpolateMissingClipValues = false,
                                  const TfToken &clipSet = UsdClipsAPISetNames->default_);
 

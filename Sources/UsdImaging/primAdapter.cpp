@@ -444,7 +444,7 @@ size_t UsdImagingPrimAdapter::SamplePrimvar(UsdPrim const &usdPrim,
       // XXX: We should add caching to the transform computation if this shows
       // up in profiling, but all of our current caches are cleared on time
       // change so we'd need to write a new structure.
-      size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+      size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
 
       if (sampleIndices) {
         for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
@@ -492,7 +492,7 @@ size_t UsdImagingPrimAdapter::SamplePrimvar(UsdPrim const &usdPrim,
       // XXX: We should add caching to the transform computation if this
       // shows up in profiling, but all of our current caches are cleared
       // on time change so we'd need to write a new structure.
-      size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+      size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
       for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
         sampleTimes[i] = timeSamples[i] - time.GetValue();
         attr.Get(&sampleValues[i], timeSamples[i]);
@@ -1260,7 +1260,7 @@ size_t UsdImagingPrimAdapter::SampleTransform(UsdPrim const &prim,
   // XXX: We should add caching to the transform computation if this shows
   // up in profiling, but all of our current caches are cleared on time
   // change so we'd need to write a new structure.
-  size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+  size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
   for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
     sampleTimes[i] = timeSamples[i] - time.GetValue();
     sampleValues[i] = UsdImaging_XfStrategy::ComputeTransform(prim,

@@ -784,7 +784,7 @@ void _ApplyPackedBlendShapes(const TfSpan<const GfVec4f> &offsets,
                              const TfSpan<const float> &weights,
                              TfSpan<GfVec3f> points)
 {
-  const size_t end = std::min(ranges.size(), points.size());
+  const size_t end = (std::min)(ranges.size(), points.size());
   for (size_t i = 0; i < end; ++i) {
     const GfVec2i range = ranges[i];
 
@@ -1689,7 +1689,7 @@ static size_t _UnionTimeSamples(GfInterval const &interval,
   std::sort(timeSamples->begin(), timeSamples->end());
   timeSamples->erase(std::unique(timeSamples->begin(), timeSamples->end()), timeSamples->end());
 
-  return std::min(maxNumSamples, timeSamples->size());
+  return (std::min)(maxNumSamples, timeSamples->size());
 }
 
 static void _InitIdentityXforms(UsdSkelSkeletonQuery const &skelQuery,
@@ -1758,7 +1758,7 @@ size_t UsdSkelImagingSkeletonAdapter::_SampleExtComputationInputForSkinningCompu
     const size_t numSamples = adapter->SampleTransform(
         prim, skinnedPrimCachePath, time, maxSampleCount, sampleTimes, sampleXforms.data());
 
-    const size_t numEvaluatedSamples = std::min(numSamples, maxSampleCount);
+    const size_t numEvaluatedSamples = (std::min)(numSamples, maxSampleCount);
     for (size_t i = 0; i < numEvaluatedSamples; ++i) {
       sampleValues[i] = VtValue(sampleXforms[i].GetInverse());
     }
@@ -1888,7 +1888,7 @@ size_t UsdSkelImagingSkeletonAdapter::_SampleExtComputationInputForSkinningCompu
       const size_t numSamples = adapter->SampleTransform(
           skelPrim, skelCachePath, time, maxSampleCount, sampleTimes, sampleXforms.data());
 
-      const size_t numEvaluatedSamples = std::min(numSamples, maxSampleCount);
+      const size_t numEvaluatedSamples = (std::min)(numSamples, maxSampleCount);
       for (size_t i = 0; i < numEvaluatedSamples; ++i) {
         sampleValues[i] = VtValue(sampleXforms[i]);
       }

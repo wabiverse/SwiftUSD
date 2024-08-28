@@ -21,6 +21,9 @@
 #include "Tf/pyResultConversions.h"
 #include "Tf/pyUtils.h"
 #include "Tf/stringUtils.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -223,5 +226,7 @@ template<class T> class SdfPyWrapListEditorProxy {
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_USD_SDF_PY_LIST_EDITOR_PROXY_H

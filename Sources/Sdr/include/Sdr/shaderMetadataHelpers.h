@@ -50,7 +50,7 @@ TfToken TokenVal(const TfToken &key,
 SDR_API
 int IntVal(const TfToken &key,
            const NdrTokenMap &metadata,
-           int defaultValue = std::numeric_limits<int>::max());
+           int defaultValue = (std::numeric_limits<int>::max)());
 
 /// Extracts a vector of strings from the given metadatum. An empty vector
 /// is returned if the metadatum does not exist.

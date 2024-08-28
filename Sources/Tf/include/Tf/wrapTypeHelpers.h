@@ -13,10 +13,9 @@
 #include "Tf/pyObjWrapper.h"
 #include "Tf/type.h"
 
-#if __has_include(<boost/python/class.hpp>)
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #include <boost/python/class.hpp>
 #include <boost/python/def_visitor.hpp>
-#endif // __has_include(<boost/python/class.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -66,5 +65,7 @@ struct TfTypePythonClass : public TfType_WrapHelpers::_PythonClass {};
 TF_API TfType TfType_DefinePythonTypeAndBases(const boost::python::object &classObj);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_TF_WRAP_TYPE_HELPERS_H

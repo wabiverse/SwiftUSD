@@ -23,7 +23,7 @@ namespace {
 
 template<typename T> constexpr T _OpaqueAlpha()
 {
-  return std::numeric_limits<T>::is_integer ? std::numeric_limits<T>::max() : T(1);
+  return std::numeric_limits<T>::is_integer ? (std::numeric_limits<T>::max)() : T(1);
 }
 
 template<typename T>
@@ -112,7 +112,7 @@ void _PremultiplyAlpha(const void *const src, const size_t numTexels, void *cons
   T *const typedDst = reinterpret_cast<T *>(dst);
 
   // Perform all operations using floats.
-  constexpr float max = static_cast<float>(std::numeric_limits<T>::max());
+  constexpr float max = static_cast<float>((std::numeric_limits<T>::max)());
 
   for (size_t i = 0; i < numTexels; i++) {
     const float alpha = static_cast<float>(typedSrc[4 * i + 3]) / max;
@@ -361,8 +361,8 @@ std::vector<HioImageSharedPtr> HdStTextureUtils::GetAllMipImages(
   constexpr int maxMipReads = 32;
   std::vector<HioImageSharedPtr> result;
 
-  unsigned int prevWidth = std::numeric_limits<unsigned int>::max();
-  unsigned int prevHeight = std::numeric_limits<unsigned int>::max();
+  unsigned int prevWidth = (std::numeric_limits<unsigned int>::max)();
+  unsigned int prevHeight = (std::numeric_limits<unsigned int>::max)();
 
   // Ignoring image->GetNumMipLevels() since it can be unreliable.
   for (int mip = 0; mip < maxMipReads; ++mip) {

@@ -16,12 +16,12 @@
 #include "Tf/hash.h"
 #include "Tf/safeTypeCompare.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
 #  include "Tf/pyLock.h"
 #  include <locale>
-#endif
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/pyObjWrapper.h"
 
@@ -266,7 +266,7 @@ class ArResolverContext {
 
     virtual TfPyObjWrapper GetPythonObj() const
     {
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       TfPyLock lock;
       return boost::python::object(_context);
 #else
@@ -283,7 +283,7 @@ class ArResolverContext {
     h.Append(context->Hash());
   }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   friend class Ar_ResolverContextPythonAccess;
 #endif
 

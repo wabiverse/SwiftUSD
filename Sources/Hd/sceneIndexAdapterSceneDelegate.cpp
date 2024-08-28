@@ -2066,7 +2066,7 @@ size_t HdSceneIndexAdapterSceneDelegate::_SamplePrimvar(SdfPath const &id,
   // scene delegate.
   if (prim.dataSource->Get(HdSceneIndexEmulationTokens->sceneDelegate)) {
     valueSource->GetContributingSampleTimesForInterval(
-        std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), &times);
+        std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)(), &times);
 
     // XXX fallback to include a single sample
     if (times.empty()) {
@@ -2177,7 +2177,7 @@ size_t HdSceneIndexAdapterSceneDelegate::SampleTransform(SdfPath const &id,
   // scene delegate.
   if (prim.dataSource->Get(HdSceneIndexEmulationTokens->sceneDelegate)) {
     matrixSource->GetContributingSampleTimesForInterval(
-        std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), &times);
+        std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)(), &times);
   }
   else {
     matrixSource->GetContributingSampleTimesForInterval(startTime, endTime, &times);
@@ -2419,7 +2419,7 @@ size_t HdSceneIndexAdapterSceneDelegate::SampleExtComputationInput(SdfPath const
   // scene delegate.
   if (prim.dataSource->Get(HdSceneIndexEmulationTokens->sceneDelegate)) {
     valueDs->GetContributingSampleTimesForInterval(
-        std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), &times);
+        std::numeric_limits<float>::lowest(), (std::numeric_limits<float>::max)(), &times);
   }
   else {
     valueDs->GetContributingSampleTimesForInterval(startTime, endTime, &times);

@@ -444,7 +444,7 @@ void HdMeshUtil::ComputeQuadInfo(HdQuadInfo *quadInfo) const
     numAdditionalPoints += (nv + 1);
 
     // remember max numvert for making gpu-friendly table
-    maxNumVert = std::max(maxNumVert, nv);
+    maxNumVert = (std::max)(maxNumVert, nv);
   }
   quadInfo->numAdditionalPoints = numAdditionalPoints;
   quadInfo->maxNumVert = maxNumVert;

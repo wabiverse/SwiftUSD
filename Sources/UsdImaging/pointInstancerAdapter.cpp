@@ -1623,7 +1623,7 @@ size_t UsdImagingPointInstancerAdapter::SampleInstancerTransform(UsdPrim const &
     numSamples = _GatherAuthoredTransformTimeSamples(
         parentInstancerUsdPrim, interval, &timeSamples);
 
-    size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+    size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
     for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
       sampleTimes[i] = timeSamples[i] - time.GetValue();
       sampleValues[i] = adapter->GetRelativeInstancerTransform(
@@ -1634,7 +1634,7 @@ size_t UsdImagingPointInstancerAdapter::SampleInstancerTransform(UsdPrim const &
     numSamples = _GatherAuthoredTransformTimeSamples(
         _GetPrim(instancerPath), interval, &timeSamples);
 
-    size_t numSamplesToEvaluate = std::min(maxNumSamples, numSamples);
+    size_t numSamplesToEvaluate = (std::min)(maxNumSamples, numSamples);
     for (size_t i = 0; i < numSamplesToEvaluate; ++i) {
       sampleTimes[i] = timeSamples[i] - time.GetValue();
       sampleValues[i] = GetRelativeInstancerTransform(

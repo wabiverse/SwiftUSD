@@ -206,7 +206,7 @@ class _FaceVertexCountsDataSource : public HdIntArrayDataSource {
     int uVertexCount, vVertexCount;
     std::tie(uVertexCount, vVertexCount) = _GetUVVertexCounts(_primDataSource, shutterOffset);
 
-    const size_t numFaces = std::max(0, uVertexCount - 1) * std::max(0, vVertexCount - 1);
+    const size_t numFaces = (std::max)(0, uVertexCount - 1) * (std::max)(0, vVertexCount - 1);
 
     return VtIntArray(numFaces, 4);
   }
@@ -243,7 +243,7 @@ class _FaceVertexIndicesDataSource : public HdIntArrayDataSource {
     int uVertexCount, vVertexCount;
     std::tie(uVertexCount, vVertexCount) = _GetUVVertexCounts(_primDataSource, shutterOffset);
 
-    const size_t numFaces = std::max(0, uVertexCount - 1) * std::max(0, vVertexCount - 1);
+    const size_t numFaces = (std::max)(0, uVertexCount - 1) * (std::max)(0, vVertexCount - 1);
     const size_t numIndices = 4 * numFaces;
 
     VtIntArray result(numIndices);

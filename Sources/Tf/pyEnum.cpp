@@ -13,6 +13,8 @@
 #include "Tf/mallocTag.h"
 #include "Tf/pyWrapContext.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(Tf_PyEnumRegistry);
@@ -140,3 +142,5 @@ void Tf_PyEnumRegistry::RegisterValue(TfEnum const &e, object const &obj)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

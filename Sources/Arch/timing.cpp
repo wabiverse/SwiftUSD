@@ -174,7 +174,7 @@ static int64_t Arch_ComputeTickQuantum()
     for (int i = 0; i != std::extent<decltype(times)>::value - 1; ++i) {
       times[i] = times[i + 1] - times[i];
     }
-    currMin = std::min(currMin, *std::min_element(std::begin(times), std::prev(std::end(times))));
+    currMin = (std::min)(currMin, *std::min_element(std::begin(times), std::prev(std::end(times))));
   }
   return static_cast<int64_t>(currMin);
 }
@@ -230,7 +230,7 @@ uint64_t Arch_MeasureExecutionTime(uint64_t maxTicks,
   // Run 10 times upfront to estimate how many runs to include in each sample.
   uint64_t estTicksPer = ~0;
   for (int i = 10; i--;) {
-    estTicksPer = std::min(estTicksPer, measureN(1));
+    estTicksPer = (std::min)(estTicksPer, measureN(1));
   }
 
   // We want the tick quantum noise to -> 0.1% or less of the total time.
@@ -279,7 +279,7 @@ uint64_t Arch_MeasureExecutionTime(uint64_t maxTicks,
       break;
     }
     // Otherwise update best median, and resample.
-    bestMedian = std::min(bestMedian, sampleTimes[NumSamples / 2]);
+    bestMedian = (std::min)(bestMedian, sampleTimes[NumSamples / 2]);
     // Replace the slowest 1/3...
     for (int i = (NumSamples - NumSamples / 3); i != NumSamples; ++i) {
       sampleTimes[i] = measureSample();

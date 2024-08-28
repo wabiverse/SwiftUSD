@@ -322,7 +322,7 @@ PcpMapFunction PcpMapFunction::Create(const PathMap &sourceToTarget, const SdfLa
   // Validate the arguments.
   {
     // Make sure we don't exhaust the representable range.
-    const _Data::PairCount maxPairCount = std::numeric_limits<_Data::PairCount>::max();
+    const _Data::PairCount maxPairCount = (std::numeric_limits<_Data::PairCount>::max)();
     if (sourceToTarget.size() > maxPairCount) {
       TF_RUNTIME_ERROR(
           "Cannot construct a PcpMapFunction with %zu "

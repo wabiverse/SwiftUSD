@@ -445,7 +445,7 @@ bool UsdAppUtilsFrameRecorder::Record(const UsdStagePtr &stage,
       // Allow render thread to progress before invoking Render again.
       std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
       // Increase the sleep time up to a max of 100 ms
-      sleepTime = std::min(100u, sleepTime + 5);
+      sleepTime = (std::min)(100u, sleepTime + 5);
     }
   };
 

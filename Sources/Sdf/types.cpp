@@ -58,7 +58,7 @@ TF_REGISTRY_FUNCTION(TfType)
 #define _SDF_UNIT_MAX_UNITS_IMPL(seq) TF_PP_SEQ_SIZE(seq),
 #define _SDF_UNIT_MAX_UNITS_OP(elem) _SDF_UNIT_MAX_UNITS_IMPL(TF_PP_TUPLE_ELEM(1, elem))
 
-constexpr size_t _Sdf_UnitMaxUnits = std::max(
+constexpr size_t _Sdf_UnitMaxUnits = (std::max)(
     {_SDF_FOR_EACH_UNITS(_SDF_UNIT_MAX_UNITS_OP, _SDF_UNITS)});
 
 // Compute the number of unit enums
@@ -470,7 +470,7 @@ static bool _ValueVectorToAnyVtArray(VtValue *value,
   return true;
 }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 using _PySeqToVtArrayFn = bool (*)(VtValue *,
                                    std::vector<std::string> *,
@@ -606,7 +606,7 @@ static bool _PyObjToAnyVtArray(VtValue *value,
   return true;
 }
 
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 static bool _ConvertToValidMetadataDictValueInternal(VtValue *value,
                                                      std::vector<std::string> *errMsgs,
@@ -628,11 +628,11 @@ static bool _ConvertToValidMetadataDictValueInternal(VtValue *value,
   else if (value->IsHolding<std::vector<VtValue>>()) {
     allValid &= _ValueVectorToAnyVtArray(value, errMsgs, keyPath);
   }
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   else if (value->IsHolding<TfPyObjWrapper>()) {
     allValid &= _PyObjToAnyVtArray(value, errMsgs, keyPath);
   }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   else if (!SdfValueHasValidType(*value)) {
     allValid = false;
     *value = VtValue();

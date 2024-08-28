@@ -29,9 +29,9 @@
 #include "Tf/type.h"
 #include "Trace/traceImpl.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pyInterpreter.h"
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #include <memory>
 #include <mutex>
@@ -61,9 +61,9 @@ static std::mutex _classMapMutex;
 constexpr char const *PlugPlugin::_GetPluginTypeDisplayName(_Type type)
 {
   return type == LibraryType ? "shared library" :
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
          type == PythonType ? "python module" :
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
          type == ResourceType ? "resource" :
                                 "<invalid enum value>";
 }
@@ -144,13 +144,13 @@ pair<PlugPluginPtr, bool> PlugPlugin::_NewDynamicLibraryPlugin(
       metadata, LibraryType, metadata.libraryPath, _allPluginsByDynamicLibraryName.Get());
 }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 pair<PlugPluginPtr, bool> PlugPlugin::_NewPythonModulePlugin(
     const Plug_RegistrationMetadata &metadata)
 {
   return _NewPlugin(metadata, PythonType, metadata.pluginPath, _allPluginsByModuleName.Get());
 }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 std::pair<PlugPluginPtr, bool> PlugPlugin::_NewResourcePlugin(
     const Plug_RegistrationMetadata &metadata)
@@ -206,7 +206,7 @@ bool PlugPlugin::_Load()
 
   bool isLoaded = true;
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   if (IsPythonModule()) {
     TRACE_FUNCTION_SCOPE("python import");
     string cmd = TfStringPrintf("import %s\n", _name.c_str());
@@ -216,7 +216,7 @@ bool PlugPlugin::_Load()
     }
 #else
   if (false) {
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   }
   else if (!IsResource()) {
     // This plugin's library path may be empty if the plugin isn't
@@ -348,12 +348,12 @@ bool PlugPlugin::IsLoaded() const
   return _isLoaded;
 }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 bool PlugPlugin::IsPythonModule() const
 {
   return _type == PythonType;
 }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 bool PlugPlugin::IsResource() const
 {

@@ -109,7 +109,7 @@ class Sdf_TextOutput {
     // chunks.
     while (strLength != 0) {
       const size_t numAvail = BUFFER_SIZE - _bufferPos;
-      const size_t numToCopy = std::min(numAvail, strLength);
+      const size_t numToCopy = (std::min)(numAvail, strLength);
       memcpy(_buffer.get() + _bufferPos, str, numToCopy);
 
       _bufferPos += numToCopy;

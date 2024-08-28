@@ -508,7 +508,7 @@ static void testArray()
 
     VtIntArray ia;
     try {
-      ia.resize(std::numeric_limits<size_t>::max());
+      ia.resize((std::numeric_limits<size_t>::max)());
       TF_FATAL_ERROR("Did not throw std::bad_alloc");
     }
     catch (std::bad_alloc const &) {
@@ -517,7 +517,7 @@ static void testArray()
 
     VtDoubleArray da;
     try {
-      da.reserve(std::numeric_limits<size_t>::max() / 2);
+      da.reserve((std::numeric_limits<size_t>::max)() / 2);
       TF_FATAL_ERROR("Did not throw std::bad_alloc");
     }
     catch (std::bad_alloc const &) {

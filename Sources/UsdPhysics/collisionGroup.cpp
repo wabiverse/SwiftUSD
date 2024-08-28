@@ -192,8 +192,8 @@ bool UsdPhysicsCollisionGroup::CollisionGroupTable::IsCollisionEnabled(
   // - both idxA and idxB are by definition >=0
   // - are < the group size.
   if (idxA < _groups.size() && idxB < _groups.size()) {
-    const unsigned int minGroup = std::min(idxA, idxB);
-    const unsigned int maxGroup = std::max(idxA, idxB);
+    const unsigned int minGroup = (std::min)(idxA, idxB);
+    const unsigned int maxGroup = (std::max)(idxA, idxB);
     const unsigned int tableIndex = _GetCollisionTableIndex(minGroup, maxGroup, _groups.size());
     return _enabled[tableIndex];
   }
@@ -289,8 +289,8 @@ UsdPhysicsCollisionGroup::CollisionGroupTable UsdPhysicsCollisionGroup::ComputeC
       // filteredTargets should be disabled
       for (unsigned int groupBIdx : filteredGroupIndices) {
         // Disable aIdx -v- bIdx
-        const unsigned int minGroup = std::min(groupAIdx, groupBIdx);
-        const unsigned int maxGroup = std::max(groupAIdx, groupBIdx);
+        const unsigned int minGroup = (std::min)(groupAIdx, groupBIdx);
+        const unsigned int maxGroup = (std::max)(groupAIdx, groupBIdx);
         const unsigned int tableIndex = _GetCollisionTableIndex(minGroup, maxGroup, nextPrimId);
         mergedTable[tableIndex] = false;
       }
@@ -303,8 +303,8 @@ UsdPhysicsCollisionGroup::CollisionGroupTable UsdPhysicsCollisionGroup::ComputeC
       for (unsigned int groupBIdx = 0; groupBIdx < nextPrimId; groupBIdx++) {
         if (requestedGroups.find(groupBIdx) == requestedGroups.end()) {
           // Disable aIdx -v- bIdx
-          const unsigned int minGroup = std::min(groupAIdx, groupBIdx);
-          const unsigned int maxGroup = std::max(groupAIdx, groupBIdx);
+          const unsigned int minGroup = (std::min)(groupAIdx, groupBIdx);
+          const unsigned int maxGroup = (std::max)(groupAIdx, groupBIdx);
           const unsigned int tableIndex = _GetCollisionTableIndex(minGroup, maxGroup, nextPrimId);
           mergedTable[tableIndex] = false;
         }
@@ -332,8 +332,8 @@ UsdPhysicsCollisionGroup::CollisionGroupTable UsdPhysicsCollisionGroup::ComputeC
       bool enabledInMergeTable = mergedTable[mergedTableIndex];
 
       // And use that to populate the output table:
-      const unsigned int minGroup = std::min(iA, iB);
-      const unsigned int maxGroup = std::max(iA, iB);
+      const unsigned int minGroup = (std::min)(iA, iB);
+      const unsigned int maxGroup = (std::max)(iA, iB);
       const unsigned int tableIndex = _GetCollisionTableIndex(
           minGroup, maxGroup, allSceneGroups.size());
       res._enabled[tableIndex] = enabledInMergeTable;

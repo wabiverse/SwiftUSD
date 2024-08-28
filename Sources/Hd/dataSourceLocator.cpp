@@ -180,7 +180,7 @@ bool HdDataSourceLocator::HasPrefix(const HdDataSourceLocator &prefix) const
 
 HdDataSourceLocator HdDataSourceLocator::GetCommonPrefix(const HdDataSourceLocator &other) const
 {
-  const size_t maxPossibleLen = std::min(_tokens.size(), other._tokens.size());
+  const size_t maxPossibleLen = (std::min)(_tokens.size(), other._tokens.size());
   size_t i = 0;
   for (; i < maxPossibleLen; ++i) {
     if (_tokens[i] != other._tokens[i]) {
@@ -193,7 +193,7 @@ HdDataSourceLocator HdDataSourceLocator::GetCommonPrefix(const HdDataSourceLocat
 
 bool HdDataSourceLocator::Intersects(const HdDataSourceLocator &other) const
 {
-  const size_t commonLength = std::min(other._tokens.size(), _tokens.size());
+  const size_t commonLength = (std::min)(other._tokens.size(), _tokens.size());
   for (size_t i = 0; i < commonLength; ++i) {
     if (other._tokens[i] != _tokens[i]) {
       return false;
@@ -235,7 +235,7 @@ bool HdDataSourceLocator::operator<(const HdDataSourceLocator &rhs) const
 {
   const size_t lhslen = _tokens.size();
   const size_t rhslen = rhs._tokens.size();
-  const size_t len = std::min(lhslen, rhslen);
+  const size_t len = (std::min)(lhslen, rhslen);
 
   for (size_t i = 0; i < len; ++i) {
     if (_tokens[i] < rhs._tokens[i]) {
@@ -306,7 +306,7 @@ static bool _LessThanNotPrefix(const HdDataSourceLocator &a, const HdDataSourceL
 
   const size_t lhslen = a.GetElementCount();
   const size_t rhslen = b.GetElementCount();
-  const size_t len = std::min(lhslen, rhslen);
+  const size_t len = (std::min)(lhslen, rhslen);
 
   for (size_t i = 0; i < len; ++i) {
     if (a.GetElement(i) < b.GetElement(i)) {

@@ -596,7 +596,7 @@ void HdPrmanInstancer::_SyncTransforms(HdDirtyBits *dirtyBits)
         scale = scales.Resample(t);
       }
 
-      size_t size = std::max({ixf.size(), trans.size(), rot.size(), scale.size()});
+      size_t size = (std::max)({ixf.size(), trans.size(), rot.size(), scale.size()});
 
       // Concatenate transformations.
       VtMatrix4dArray &ma = _sa.values[i];

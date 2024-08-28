@@ -149,12 +149,12 @@ HdStVBOMemoryManager::_StripedBufferArray::_StripedBufferArray(
   }
 
   // VBO Memory Manage supports an effectivly limitless set of ranges
-  _SetMaxNumRanges(std::numeric_limits<size_t>::max());
+  _SetMaxNumRanges((std::numeric_limits<size_t>::max)());
 
   // compute max bytes / elements
   TF_FOR_ALL(it, GetResources())
   {
-    _maxBytesPerElement = std::max(_maxBytesPerElement,
+    _maxBytesPerElement = (std::max)(_maxBytesPerElement,
                                    HdDataSizeOfTupleType(it->second->GetTupleType()));
   }
 
@@ -358,7 +358,7 @@ void HdStVBOMemoryManager::_StripedBufferArray::Reallocate(
         //
         int oldSize = range->GetCapacity();
         int newSize = range->GetNumElements();
-        ptrdiff_t copySize = std::min(oldSize, newSize) * bytesPerElement;
+        ptrdiff_t copySize = (std::min)(oldSize, newSize) * bytesPerElement;
         int oldOffset = range->GetElementOffset();
         if (copySize > 0) {
           ptrdiff_t readOffset = oldOffset * bytesPerElement;

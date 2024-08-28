@@ -12,6 +12,8 @@
 #include "Vt/array.h"
 #include "pxr/pxrns.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/optional.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -36,5 +38,7 @@ boost::optional<VtArray<T>> VtArrayFromPyBuffer(TfPyObjWrapper const &obj,
       (GfDualQuatf, DualQuatf))((GfDualQuatd, DualQuatd))
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_VT_ARRAY_PY_BUFFER_H

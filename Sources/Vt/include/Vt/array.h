@@ -557,7 +557,7 @@ template<typename ELEM> class VtArray : public Vt_ArrayBase {
   {
     // The number of value_type elements that can be fit into maximum size_t
     // bytes minus the size of _ControlBlock.
-    return (std::numeric_limits<size_t>::max() - sizeof(_ControlBlock)) / sizeof(value_type);
+    return ((std::numeric_limits<size_t>::max)() - sizeof(_ControlBlock)) / sizeof(value_type);
   }
 
   /// Return true if this array contains no elements, false otherwise.
@@ -967,7 +967,7 @@ template<typename ELEM> class VtArray : public Vt_ArrayBase {
     // value and let new() throw.
     size_t numBytes = (capacity <= max_size()) ?
                           sizeof(_ControlBlock) + capacity * sizeof(value_type) :
-                          std::numeric_limits<size_t>::max();
+                          (std::numeric_limits<size_t>::max)();
     void *data = ::operator new(numBytes);
     // Placement-new a control block.
     ::new (data) _ControlBlock(/*count=*/1, capacity);

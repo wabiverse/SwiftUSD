@@ -38,7 +38,7 @@ extern "C" avifResult avifIsCompliant(const uint8_t *data, size_t size)
     // Setting made-up file name (letter by letter).
     topReader.myBox.syms.push_back({"filename", static_cast<int64_t>(sym), 8});
   }
-  AVIF_CHECKERR(size <= std::numeric_limits<int>::max(), AVIF_RESULT_INVALID_ARGUMENT);
+  AVIF_CHECKERR(size <= (std::numeric_limits<int>::max)(), AVIF_RESULT_INVALID_ARGUMENT);
   topReader.br = {const_cast<uint8_t *>(data), static_cast<int>(size)};
   topReader.myBox.original = const_cast<uint8_t *>(data);
   topReader.myBox.position = 0;

@@ -57,11 +57,11 @@ template<> class numeric_limits<PXR_NS::pxr_half::half> {
  public:
   static const bool is_specialized = true;
 
-  static half min() throw()
+  static half (min)() throw()
   {
     return PXR_HALF_NRM_MIN;
   }
-  static half max() throw()
+  static half (max)() throw()
   {
     return PXR_HALF_MAX;
   }

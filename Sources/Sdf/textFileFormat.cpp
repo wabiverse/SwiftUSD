@@ -94,7 +94,7 @@ bool _CanReadImpl(const std::shared_ptr<ArAsset> &asset, const std::string &cook
 
   char aLine[512];
 
-  size_t numToRead = std::min(sizeof(aLine), cookie.length());
+  size_t numToRead = (std::min)(sizeof(aLine), cookie.length());
   if (asset->Read(aLine, numToRead, /* offset = */ 0) != numToRead) {
     return false;
   }

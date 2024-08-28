@@ -206,7 +206,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 static bool _ComputeExtentMax(
     double height, double radiusTop, double radiusBottom, const TfToken &axis, GfVec3f *max)
 {
-  const double radiusForBox = std::max(radiusTop, radiusBottom);
+  const double radiusForBox = (std::max)(radiusTop, radiusBottom);
   if (axis == UsdGeomTokens->x) {
     *max = GfVec3f(height * 0.5, radiusForBox, radiusForBox);
   }

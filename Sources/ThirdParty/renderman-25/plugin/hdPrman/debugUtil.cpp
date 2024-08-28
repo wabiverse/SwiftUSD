@@ -51,7 +51,7 @@ std::string MatrixToString(const GfMatrix4d &mat, const int indent, const int pr
   int width[4] = {0, 0, 0, 0};
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
-      width[i] = std::max(width[i], 3 + precision + (int)log10(abs(mat[i][j])));
+      width[i] = (std::max)(width[i], 3 + precision + (int)log10(abs(mat[i][j])));
     }
   }
 
@@ -91,7 +91,7 @@ std::string MatrixToString(const RtMatrix4x4 &mat, const int indent, const int p
   int width[4] = {0, 0, 0, 0};
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
-      width[i] = std::max(width[i], 3 + precision + (int)log10(abs(mat.m[i][j])));
+      width[i] = (std::max)(width[i], 3 + precision + (int)log10(abs(mat.m[i][j])));
     }
   }
 

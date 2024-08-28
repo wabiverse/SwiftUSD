@@ -176,7 +176,7 @@ static inline size_t _ComputeAlignment(HdTupleType tupleType)
 
   // Matrices are treated as an array of vec4s, so the
   // max num components we are looking at is 4
-  size_t alignComponents = std::min(numComponents, size_t(4));
+  size_t alignComponents = (std::min)(numComponents, size_t(4));
 
   // single elements and vec2's are allowed, but
   // vec3's get rounded up to vec4's
@@ -242,7 +242,7 @@ HdStInterleavedMemoryManager::_StripedInterleavedBuffer::_StripedInterleavedBuff
 
     // We need to save the max alignment size for later because the
     // stride for our struct needs to be aligned to this
-    structAlignment = std::max(size_t(structAlignment), alignment);
+    structAlignment = (std::max)(size_t(structAlignment), alignment);
 
     _stride += HdDataSizeOfTupleType(it->tupleType);
 
@@ -464,7 +464,7 @@ void HdStInterleavedMemoryManager::_StripedInterleavedBuffer::Reallocate(
 
         int const oldSize = range->GetCapacity();
         int const newSize = range->GetNumElements();
-        ptrdiff_t copySize = _stride * std::min(oldSize, newSize);
+        ptrdiff_t copySize = _stride * (std::min)(oldSize, newSize);
 
         relocator.AddRange(readOffset, writeOffset, copySize);
       }

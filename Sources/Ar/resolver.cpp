@@ -1118,7 +1118,7 @@ class _DispatchingResolver final : public ArResolver {
                                            std::make_shared<_Resolver>(resolverInfo);
 
       for (std::string &uriScheme : uriSchemes) {
-        maxSchemeLength = std::max(uriScheme.length(), maxSchemeLength);
+        maxSchemeLength = (std::max)(uriScheme.length(), maxSchemeLength);
         uriResolvers.emplace(std::move(uriScheme), uriResolver);
       };
     }
@@ -1210,7 +1210,7 @@ class _DispatchingResolver final : public ArResolver {
     // Search for the first ":" character delimiting a URI/IRI scheme in
     // the given asset path. As an optimization, we only search the
     // first _maxURISchemeLength + 1 (to accommodate the ":") characters.
-    const size_t numSearchChars = std::min(assetPath.length(), _maxURISchemeLength + 1);
+    const size_t numSearchChars = (std::min)(assetPath.length(), _maxURISchemeLength + 1);
 
     auto endIt = assetPath.begin() + numSearchChars;
     auto delimIt = std::find(assetPath.begin(), endIt, ':');

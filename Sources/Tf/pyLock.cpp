@@ -7,7 +7,7 @@
 
 #include "pxr/pxrns.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #  include "Tf/diagnosticLite.h"
 #  include "Tf/pyLock.h"
@@ -118,4 +118,4 @@ TfPyEnsureGILUnlockedObj::TfPyEnsureGILUnlockedObj() : _lock(TfPyLock::_Construc
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

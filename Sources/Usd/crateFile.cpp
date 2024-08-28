@@ -705,8 +705,8 @@ template<class FileMappingPtr> struct _MmapStream {
 
       char const *beginAddr = mapStartPage + firstChunk * chunkBytes;
       char const *endAddr = mapStartPage +
-                            std::min(_mapping->GetLength() + (mapStart - mapStartPage),
-                                     (lastChunk + 1) * chunkBytes);
+                            (std::min)(_mapping->GetLength() + (mapStart - mapStartPage),
+                                      (lastChunk + 1) * chunkBytes);
 
       ArchMemAdvise(reinterpret_cast<void *>(const_cast<char *>(beginAddr)),
                     endAddr - beginAddr,
@@ -892,7 +892,7 @@ class CrateFile::_BufferedOutput {
     // Write and flush as needed.
     while (nBytes) {
       int64_t available = BufferCap - (_filePos - _bufferPos);
-      int64_t numToWrite = std::min(available, nBytes);
+      int64_t numToWrite = (std::min)(available, nBytes);
 
       _WriteToBuffer(bytes, numToWrite);
 
@@ -1947,7 +1947,7 @@ static inline
 
   // Check to see if all the floats are exactly represented as integers.
   auto isIntegral = [](T fp) {
-    constexpr int32_t max = std::numeric_limits<int32_t>::max();
+    constexpr int32_t max = (std::numeric_limits<int32_t>::max)();
     constexpr int32_t min = std::numeric_limits<int32_t>::lowest();
     return min <= fp && fp <= max && static_cast<T>(static_cast<int32_t>(fp)) == fp;
   };
@@ -1971,7 +1971,7 @@ static inline
   vector<T> lut;
   // Ensure that we give up soon enough if it doesn't seem like building a
   // lookup table will be profitable.  Check the first 1024 elements at most.
-  unsigned int maxLutSize = std::min<size_t>(array.size() / 4, 1024);
+  unsigned int maxLutSize = (std::min<size_t>)(array.size() / 4, 1024);
   vector<uint32_t> indexes;
   for (auto elem : array) {
     auto iter = std::find(lut.begin(), lut.end(), elem);

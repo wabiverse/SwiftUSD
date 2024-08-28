@@ -376,12 +376,12 @@ static bool _GetEdgesFromPrim(const UsdGeomImageable &geom,
     for (int i = 0; i < count - 1; ++i) {
       int pointA = faceVertexIndices[fviIndex];
       int pointB = faceVertexIndices[fviIndex + 1];
-      edgesOnPrim.insert(GfVec2i(std::min(pointA, pointB), std::max(pointA, pointB)));
+      edgesOnPrim.insert(GfVec2i((std::min)(pointA, pointB), (std::max)(pointA, pointB)));
       fviIndex++;
     }
     int pointA = faceVertexIndices[fviIndex];
     int pointB = faceVertexIndices[fviIndex - (count - 1)];
-    edgesOnPrim.insert(GfVec2i(std::min(pointA, pointB), std::max(pointA, pointB)));
+    edgesOnPrim.insert(GfVec2i((std::min)(pointA, pointB), (std::max)(pointA, pointB)));
     fviIndex++;
   }
   return true;
@@ -505,7 +505,7 @@ VtVec2iArray UsdGeomSubset::_GetEdges(const UsdTimeCode t) const
   for (size_t i = 0; i < indicesAttr.size() / 2; ++i) {
     int pointA = indicesAttr[2 * i];
     int pointB = indicesAttr[2 * i + 1];
-    subsetIndices.emplace_back(GfVec2i(std::min(pointA, pointB), std::max(pointA, pointB)));
+    subsetIndices.emplace_back(GfVec2i((std::min)(pointA, pointB), (std::max)(pointA, pointB)));
   }
 
   return subsetIndices;
@@ -564,7 +564,7 @@ VtIntArray UsdGeomSubset::GetUnassignedIndices(
         result.reserve(elementCount - assignedIndices.size());
       }
       else {
-        result.reserve(std::min(elementCount, (lastAssigned + 1) - assignedIndices.size()));
+        result.reserve((std::min)(elementCount, (lastAssigned + 1) - assignedIndices.size()));
       }
       std::set_difference(allIndices.begin(),
                           allIndices.end(),
@@ -644,7 +644,7 @@ VtIntArray UsdGeomSubset::GetUnassignedIndices(
       result.reserve(elementCount - assignedIndices.size());
     }
     else {
-      result.reserve(std::min(elementCount, (lastAssigned + 1) - assignedIndices.size()));
+      result.reserve((std::min)(elementCount, (lastAssigned + 1) - assignedIndices.size()));
     }
     std::set_difference(allIndices.begin(),
                         allIndices.end(),

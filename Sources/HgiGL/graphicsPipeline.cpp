@@ -70,7 +70,7 @@ void HgiGLGraphicsPipeline::BindPipeline()
           // Set the divisor such that the attribute index will
           // advance only according to the base instance at the
           // start of each draw in a multi-draw command.
-          glVertexArrayBindingDivisor(_vao, vbo.bindingIndex, std::numeric_limits<GLint>::max());
+          glVertexArrayBindingDivisor(_vao, vbo.bindingIndex, (std::numeric_limits<GLint>::max)());
         }
       }
     }

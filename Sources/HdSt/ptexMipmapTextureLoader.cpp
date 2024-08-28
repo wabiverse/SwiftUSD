@@ -28,7 +28,7 @@ void HdStPtexMipmapTextureLoader::Block::guttering(HdStPtexMipmapTextureLoader *
                                                    int bpp,
                                                    int stride)
 {
-  int lineBufferSize = std::max(wid, hei) * bpp;
+  int lineBufferSize = (std::max)(wid, hei) * bpp;
   unsigned char *lineBuffer = new unsigned char[lineBufferSize];
 
   int numEdges = ptex->meshType() == Ptex::mt_triangle ? 3 : 4;
@@ -165,7 +165,7 @@ void HdStPtexMipmapTextureLoader::Block::Generate(HdStPtexMipmapTextureLoader *l
 
   // but if the base size is already less than limit, we'd like to pick it
   // instead of nothing.
-  limit = std::min(std::min(limit, ulog2_), vlog2_);
+  limit = (std::min)((std::min)(limit, ulog2_), vlog2_);
 
   while (ulog2_ >= limit && vlog2_ >= limit && (maxLevels == -1 || level <= maxLevels)) {
     if (level % 2 == 1)
@@ -359,7 +359,7 @@ class HdStPtexMipmapTextureLoader::CornerIterator {
     int8_t r = (int8_t)(_currentInfo.isSubface() ? _reslog2 - 1 : _reslog2);
 
     // limit to the maximum ptex resolution
-    r = std::min(std::min(r, _currentInfo.res.ulog2), _currentInfo.res.vlog2);
+    r = (std::min)((std::min)(r, _currentInfo.res.ulog2), _currentInfo.res.vlog2);
     Ptex::Res res(r, r);
     int uv[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
     int u = uv[_currentEdge][0] * (res.u() - 1);
@@ -490,7 +490,7 @@ HdStPtexMipmapTextureLoader::HdStPtexMipmapTextureLoader(
     _blocks[i].index = i;
     if (seamlessMipmap) {
       // need to squarize ptex face
-      unsigned char s = std::min(faceInfo.res.ulog2, faceInfo.res.vlog2);
+      unsigned char s = (std::min)(faceInfo.res.ulog2, faceInfo.res.vlog2);
       _blocks[i].SetSize(s, s, _maxLevels != 0);
     }
     else {
@@ -740,8 +740,8 @@ bool HdStPtexMipmapTextureLoader::getCornerPixel(
     if (adjface != -1 && !_ptex->getFaceInfo(adjface).isSubface()) {
       int adjedge = fi.adjedge(edge);
 
-      Ptex::Res res(std::min((int)_blocks[adjface].ulog2, reslog2 + 1),
-                    std::min((int)_blocks[adjface].vlog2, reslog2 + 1));
+      Ptex::Res res((std::min)((int)_blocks[adjface].ulog2, reslog2 + 1),
+                    (std::min)((int)_blocks[adjface].vlog2, reslog2 + 1));
 
       int uv[2] = {0, 0};
       if (adjedge == 0) {
@@ -783,8 +783,8 @@ bool HdStPtexMipmapTextureLoader::getCornerPixel(
     int adjface = fi.adjface(0);
     if (adjface != -1 && !_ptex->getFaceInfo(adjface).isSubface()) {
       int adjedge = fi.adjedge(0);
-      Ptex::Res res(std::min((int)_blocks[adjface].ulog2, reslog2 + 1),
-                    std::min((int)_blocks[adjface].vlog2, reslog2 + 1));
+      Ptex::Res res((std::min)((int)_blocks[adjface].ulog2, reslog2 + 1),
+                    (std::min)((int)_blocks[adjface].vlog2, reslog2 + 1));
 
       int uv[2] = {0, 0};
       if (adjedge == 0) {
@@ -858,7 +858,7 @@ int HdStPtexMipmapTextureLoader::getLevelDiff(int face, int edge)
     int res = _blocks[it.GetCurrentFace()].ulog2;
     if (it.IsSubface())
       ++res;
-    maxDiff = std::max(maxDiff, baseRes - res);
+    maxDiff = (std::max)(maxDiff, baseRes - res);
   }
   return maxDiff;
 }
@@ -930,9 +930,9 @@ void HdStPtexMipmapTextureLoader::optimizePacking(int maxNumPages, size_t target
   uint16_t smallestBlockWidth = blocks.size() > 0 ? blocks.front()->width : 0;
   uint16_t smallestBlockHeight = blocks.size() > 0 ? blocks.front()->width : 0;
   for (BlockPtrList::iterator it = blocks.begin(); it != blocks.end(); ++it) {
-    smallestBlockTexels = std::min(smallestBlockTexels, (size_t)(*it)->GetNumTexels());
-    smallestBlockWidth = std::min(smallestBlockWidth, (*it)->width);
-    smallestBlockHeight = std::min(smallestBlockHeight, (*it)->height);
+    smallestBlockTexels = (std::min)(smallestBlockTexels, (size_t)(*it)->GetNumTexels());
+    smallestBlockWidth = (std::min)(smallestBlockWidth, (*it)->width);
+    smallestBlockHeight = (std::min)(smallestBlockHeight, (*it)->height);
   }
 
   // compute page size ---------------------------------------------
@@ -943,8 +943,8 @@ void HdStPtexMipmapTextureLoader::optimizePacking(int maxNumPages, size_t target
     // being packed.
     int w = 0, h = 0;
     for (BlockPtrList::iterator it = blocks.begin(); it != blocks.end(); ++it) {
-      w = std::max(w, (int)(*it)->width);
-      h = std::max(h, (int)(*it)->height);
+      w = (std::max)(w, (int)(*it)->width);
+      h = (std::max)(h, (int)(*it)->height);
     }
 
     // grow the pagesize to make sure the optimization will not exceed
@@ -965,13 +965,13 @@ void HdStPtexMipmapTextureLoader::optimizePacking(int maxNumPages, size_t target
     int estimatedNumPages = (int)numTexels / w / h;
 
     // if expecting too many pages, increase page size
-    int pageLimit = std::max(1, maxNumPages / 2);
+    int pageLimit = (std::max)(1, maxNumPages / 2);
     if (estimatedNumPages > pageLimit) {
-      w = std::min(w * (estimatedNumPages / pageLimit), maxPageSize);
+      w = (std::min)(w * (estimatedNumPages / pageLimit), maxPageSize);
       estimatedNumPages = (int)numTexels / w / h;
     }
     if (estimatedNumPages > pageLimit) {
-      h = std::min(h * (estimatedNumPages / pageLimit), maxPageSize);
+      h = (std::min)(h * (estimatedNumPages / pageLimit), maxPageSize);
     }
 
     _pageWidth = w;

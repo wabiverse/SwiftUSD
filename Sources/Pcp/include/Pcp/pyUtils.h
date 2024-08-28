@@ -7,6 +7,8 @@
 #ifndef PXR_USD_PCP_PY_UTILS_H
 #define PXR_USD_PCP_PY_UTILS_H
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/dict.hpp>
 
 #include "Pcp/api.h"
@@ -24,5 +26,7 @@ bool PcpVariantFallbackMapFromPython(const boost::python::dict &dict,
                                      PcpVariantFallbackMap *result);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_USD_PCP_PY_UTILS_H

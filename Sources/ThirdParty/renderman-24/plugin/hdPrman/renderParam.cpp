@@ -2307,7 +2307,7 @@ void HdPrman_RenderParam::Begin(HdPrmanRenderDelegate *renderDelegate)
 
     // Set thread limit for Renderman. Leave a few threads for app.
     static const unsigned appThreads = 4;
-    unsigned nThreads = std::max(WorkGetConcurrencyLimit() - appThreads, 1u);
+    unsigned nThreads = (std::max)(WorkGetConcurrencyLimit() - appThreads, 1u);
     // Check the environment
     unsigned nThreadsEnv = TfGetEnvSetting(HD_PRMAN_NTHREADS);
     if (nThreadsEnv > 0) {

@@ -16,6 +16,8 @@
 
 #include "Gf/traits.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/pyLock.h"
 #include "Tf/pyUtils.h"
@@ -606,3 +608,5 @@ VT_API void Vt_AddBufferProtocolSupportToVtArrays()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

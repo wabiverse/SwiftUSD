@@ -453,7 +453,7 @@ double _ResamplingAdjustment(const int nativeLength, const double scale)
   // so the sampling points you need are at
   // {-3.9, -2.6, -1.3, 0, 1.3, 2.6, 3.9}, so actually 7 points in total.
   //
-  return nativeLength / double(std::max(1, maxNumberOfSamples - 2));
+  return nativeLength / double((std::max)(1, maxNumberOfSamples - 2));
 }
 
 }  // end anonymous namespace
@@ -487,7 +487,7 @@ bool HioOpenVDB_TextureData::Read()
   const int nativeWidth = nativeDim.x();
   const int nativeHeight = nativeDim.y();
   // Following convention to set depth to 1 for an empty texture.
-  const int nativeDepth = std::max(1, nativeDim.z());
+  const int nativeDepth = (std::max)(1, nativeDim.z());
 
   const size_t nativeSize = nativeTreeBoundingBox.volume() * bytesPerPixel;
 
@@ -513,7 +513,7 @@ bool HioOpenVDB_TextureData::Read()
 
     // There will be additional samples near the boundary
     // of the original voluem, so scale down a bit more.
-    const double scale = std::min({_ResamplingAdjustment(nativeWidth, approxScale),
+    const double scale = (std::min)({_ResamplingAdjustment(nativeWidth, approxScale),
                                    _ResamplingAdjustment(nativeHeight, approxScale),
                                    _ResamplingAdjustment(nativeDepth, approxScale)});
 

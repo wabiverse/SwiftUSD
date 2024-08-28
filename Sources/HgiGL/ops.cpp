@@ -823,7 +823,7 @@ HgiGLOpsFn HgiGLOps::ResolveFramebuffer(HgiGLDevice *device,
     if (graphicsCmds.depthResolveTexture) {
       mask |= GL_DEPTH_BUFFER_BIT;
       dim = graphicsCmds.depthResolveTexture->GetDescriptor().dimensions;
-      numResolvesRequired = std::max<size_t>(1, numResolvesRequired);
+      numResolvesRequired = (std::max<size_t>)(1, numResolvesRequired);
     }
 
     // glBlitFramebuffer transfers the contents of the read buffer in the

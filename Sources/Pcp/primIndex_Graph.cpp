@@ -601,7 +601,7 @@ void PcpPrimIndex_Graph::_DetachSharedNodePoolForNewNodes(size_t numAddedNodes)
     // If numAddedNodes is -1, that means the caller doesn't know how many
     // nodes will be added -- just increase the size by 25% in that case.
     if (numAddedNodes == size_t(-1)) {
-      numAddedNodes = std::max(size_t(1), nodesSize / 4);
+      numAddedNodes = (std::max)(size_t(1), nodesSize / 4);
     }
     newNodes->reserve(nodesSize + numAddedNodes);
     newNodes->insert(newNodes->begin(), _nodes->begin(), _nodes->end());

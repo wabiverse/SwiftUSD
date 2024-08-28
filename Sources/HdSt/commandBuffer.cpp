@@ -489,7 +489,7 @@ void HdStCommandBuffer::SyncDrawItemVisibility(unsigned visChangeCount)
       _drawItemInstances.size() / N + 1, [&visCounts, this, N](size_t start, size_t end) {
         TRACE_SCOPE("SetVis");
         start *= N;
-        end = std::min(end * N, _drawItemInstances.size());
+        end = (std::min)(end * N, _drawItemInstances.size());
         size_t &count = visCounts.local();
         for (size_t i = start; i < end; ++i) {
           HdStDrawItem const *item = _drawItemInstances[i].GetDrawItem();

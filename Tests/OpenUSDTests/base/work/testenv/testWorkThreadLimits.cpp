@@ -116,11 +116,11 @@ static void _TestArguments(const int envVal)
 
   // n = -1 means numCores - 1, with a minimum of 1
   WorkSetConcurrencyLimitArgument(-1);
-  TF_AXIOM(WorkGetConcurrencyLimit() == _ExpectedLimit(envVal, std::max(1, numCores - 1)));
+  TF_AXIOM(WorkGetConcurrencyLimit() == _ExpectedLimit(envVal, (std::max)(1, numCores - 1)));
 
   // n = -3 means numCores - 3, with a minimum of 1
   WorkSetConcurrencyLimitArgument(-3);
-  TF_AXIOM(WorkGetConcurrencyLimit() == _ExpectedLimit(envVal, std::max(1, numCores - 3)));
+  TF_AXIOM(WorkGetConcurrencyLimit() == _ExpectedLimit(envVal, (std::max)(1, numCores - 3)));
 
   // n = -numCores means 1 (no threading)
   WorkSetConcurrencyLimitArgument(-numCores);

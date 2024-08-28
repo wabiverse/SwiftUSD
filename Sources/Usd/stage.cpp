@@ -4693,7 +4693,7 @@ void UsdStage::_ComposePrimIndexesInParallel(const std::vector<SdfPath> &primInd
     constexpr size_t maxPaths = 16;
     std::vector<SdfPath> dbgPaths(primIndexPaths.begin(),
                                   primIndexPaths.begin() +
-                                      std::min(maxPaths, primIndexPaths.size()));
+                                      (std::min)(maxPaths, primIndexPaths.size()));
     string msg = TfStringPrintf(
         "Composing prim indexes: %s%s\n",
         TfStringify(dbgPaths).c_str(),

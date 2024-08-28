@@ -9,6 +9,8 @@
 #include "Tf/instantiateSingleton.h"
 #include "Tf/pyWeakObject.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/class.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -128,3 +130,5 @@ Tf_PyWeakObject::Tf_PyWeakObject(boost::python::object const &obj)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

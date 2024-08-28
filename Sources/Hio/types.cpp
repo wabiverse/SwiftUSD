@@ -352,7 +352,7 @@ size_t HioGetDataSize(const HioFormat hioFormat, const GfVec3i &dimensions)
 
   size_t numPixels = ((dimensions[0] + blockWidth - 1) / blockWidth) *
                      ((dimensions[1] + blockHeight - 1) / blockHeight);
-  return numPixels * bytesPerPixel * std::max(1, dimensions[2]);
+  return numPixels * bytesPerPixel * (std::max)(1, dimensions[2]);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

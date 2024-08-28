@@ -32,6 +32,8 @@
 #include "Tf/tfImpl.h"
 #include "Tf/wrapTypeHelpers.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>
 #include <boost/python/def.hpp>
@@ -559,5 +561,7 @@ template<class Elem> void VtRegisterValueCastsFromPythonSequencesToArray()
 #define VT_WRAP_ARRAY(unused, elem) VtWrapArray<VtArray<VT_TYPE(elem)>>();
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_BASE_VT_WRAP_ARRAY_H

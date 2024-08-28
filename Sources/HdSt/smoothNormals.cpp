@@ -363,7 +363,7 @@ void HdSt_SmoothNormalsComputationGPU::Execute(HdBufferArrayRangeSharedPtr const
   const int numDestPoints = range->GetNumElements();
   const int numSrcPoints = _vertexAdjacencyBuilder->GetVertexAdjacency()->GetNumPoints();
 
-  const int numPoints = std::min(numSrcPoints, numDestPoints);
+  const int numPoints = (std::min)(numSrcPoints, numDestPoints);
   uniform.indexEnd = numPoints;
 
   Hgi *hgi = hdStResourceRegistry->GetHgi();

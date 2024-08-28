@@ -499,11 +499,11 @@ Plug_RegistrationMetadata::Plug_RegistrationMetadata(const JsValue &value,
       if (typeName == "library") {
         type = LibraryType;
       }
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       else if (typeName == "python") {
         type = PythonType;
       }
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       else if (typeName == "resource") {
         type = ResourceType;
       }

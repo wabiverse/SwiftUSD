@@ -23,7 +23,7 @@ constexpr size_t _GetMaxAlign()
 void TraceDataBuffer::Allocator::AllocateBlock(const size_t align, const size_t desiredSize)
 {
   const size_t maxAlign = _GetMaxAlign();
-  const size_t blockSize = std::max(align > maxAlign ? (align + desiredSize) : desiredSize,
+  const size_t blockSize = (std::max)(align > maxAlign ? (align + desiredSize) : desiredSize,
                                     _desiredBlockSize);
   BlockPtr block(new Byte[blockSize]);
   _next = block.get();

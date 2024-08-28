@@ -10,6 +10,8 @@
 #include "Tf/pyErrorInternal.h"
 #include "Tf/pyLock.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/extract.hpp>
 #include <boost/python/object.hpp>
 
@@ -83,3 +85,5 @@ string TfPyExceptionState::GetExceptionString() const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

@@ -177,7 +177,7 @@ void PcpNodeRef::_RecordRestrictionDepth(_Restricted isRestricted)
     // XXX:
     // This should result in a "capacity exceeded" composition error
     // instead of just a warning.
-    if (auto maxDepth = std::numeric_limits<std::decay_t<decltype(currDepth)>>::max();
+    if (auto maxDepth = (std::numeric_limits<std::decay_t<decltype(currDepth)>>::max)();
         newDepth > maxDepth)
     {
       TF_WARN("Maximum restriction namespace depth exceeded");

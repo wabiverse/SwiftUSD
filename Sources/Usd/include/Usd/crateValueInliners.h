@@ -25,7 +25,7 @@ namespace Usd_CrateValueInliners {
 template<class Src, class Dst> inline bool _IsExactlyRepresented(Src const &src, Dst *dst)
 {
   Src min = static_cast<Src>(std::numeric_limits<Dst>::lowest());
-  Src max = static_cast<Src>(std::numeric_limits<Dst>::max());
+  Src max = static_cast<Src>((std::numeric_limits<Dst>::max)());
   if (min <= src && src <= max && static_cast<Src>(static_cast<Dst>(src)) == src) {
     *dst = static_cast<Dst>(src);
     return true;

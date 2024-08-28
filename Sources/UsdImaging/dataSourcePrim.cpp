@@ -247,7 +247,7 @@ TfTokenVector UsdImagingDataSourceExtentsHint::GetNames()
 
   const size_t n0 = _extentDs->GetTypedValue(0.0f).size() / 2;
   const size_t n1 = orderedPurposes.size();
-  const size_t n = std::min(n0, n1);
+  const size_t n = (std::min)(n0, n1);
 
   return TfTokenVector(orderedPurposes.begin(), orderedPurposes.begin() + n);
 }
@@ -262,7 +262,7 @@ HdDataSourceBaseHandle UsdImagingDataSourceExtentsHint::Get(const TfToken &name)
 
   const size_t n0 = _extentDs->GetTypedValue(0.0f).size() / 2;
   const size_t n1 = orderedPurposes.size();
-  const size_t n = std::min(n0, n1);
+  const size_t n = (std::min)(n0, n1);
 
   for (size_t i = 0; i < n; i++) {
     if (name == orderedPurposes[i]) {

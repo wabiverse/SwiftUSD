@@ -729,7 +729,7 @@ HgiMetalShaderSectionPtrVector ShaderStageData::AccumulateBufferBindings(
   std::vector<const HgiShaderFunctionBufferDesc *> slots(32, nullptr);
   for (size_t i = 0; i < buffers.size(); i++) {
     uint32_t bindIndex = buffers[i].bindIndex;
-    maxBindIndex = std::max(maxBindIndex, bindIndex);
+    maxBindIndex = (std::max)(maxBindIndex, bindIndex);
     if (maxBindIndex >= slots.size()) {
       slots.resize(slots.size() + 32, nullptr);
     }

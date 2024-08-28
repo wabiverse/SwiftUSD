@@ -894,7 +894,7 @@ bool UsdGeomPrimvar::_ComputeFlattenedHelper(const VtArray<ScalarType> &authored
         elementSize);
 
     // Print a maximum of 5 invalid index positions.
-    size_t numElementsToPrint = std::min(invalidIndexPositions.size(), size_t(5));
+    size_t numElementsToPrint = (std::min)(invalidIndexPositions.size(), size_t(5));
     for (size_t i = 0; i < numElementsToPrint; ++i) {
       int invalidIndex = indices[invalidIndexPositions[i]];
       int authoredStartIndex = invalidIndex * elementSize;

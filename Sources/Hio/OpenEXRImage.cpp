@@ -379,7 +379,7 @@ bool Hio_OpenEXRImage::ReadCropped(int const cropTop,
 
   // ensure there's enough memory for the greater of input and output channel
   // count, for in place conversions.
-  int maxChannelCount = std::max(fileChannelCount, outChannelCount);
+  int maxChannelCount = (std::max)(fileChannelCount, outChannelCount);
   std::vector<GfHalf> halfInputBuffer;
   if (inputIsHalf) {
     halfInputBuffer.resize(fileWidth * fileHeight * maxChannelCount);

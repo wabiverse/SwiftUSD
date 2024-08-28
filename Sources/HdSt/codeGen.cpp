@@ -4065,7 +4065,7 @@ void HdSt_CodeGen::_GenerateDrawingCoord(bool const shaderDrawParametersEnabled,
     if (_metaData->drawingCoordIBinding.binding.IsValid()) {
       _EmitDeclaration(&_resAttrib,
                        _metaData->drawingCoordIBinding,
-                       /*arraySize=*/std::max(1, _metaData->instancerNumLevels));
+                       /*arraySize=*/(std::max)(1, _metaData->instancerNumLevels));
     }
   }
 

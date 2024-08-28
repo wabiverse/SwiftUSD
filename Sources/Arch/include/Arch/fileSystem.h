@@ -34,7 +34,7 @@
 #  include <unistd.h>
 #elif defined(ARCH_OS_WINDOWS)
 #  include <io.h>
-#  include <stringapiset.h>
+// #  include <stringapiset.h>
 #  include <windows.h>
 #endif
 

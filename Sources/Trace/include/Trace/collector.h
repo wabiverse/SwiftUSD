@@ -93,7 +93,7 @@ class TraceCollector : public TfWeakBase {
     }
   };
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   /// Returns whether automatic tracing of all python scopes is enabled.
   bool IsPythonTracingEnabled() const
   {
@@ -102,7 +102,7 @@ class TraceCollector : public TfWeakBase {
 
   /// Set whether automatic tracing of all python scopes is enabled.
   TRACE_API void SetPythonTracingEnabled(bool enabled);
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
   /// Return the overhead cost to measure a scope.
   TRACE_API TimeStamp GetScopeOverhead() const;
@@ -427,10 +427,10 @@ class TraceCollector : public TfWeakBase {
 
   TRACE_API void _MeasureScopeOverhead();
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   // Callback function registered as a python tracing function.
   void _PyTracingCallback(const TfPyTraceInfo &info);
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
   // Implementation for small data that can stored inlined with the event.
   template<typename T,
@@ -545,10 +545,10 @@ class TraceCollector : public TfWeakBase {
       _events.load(std::memory_order_acquire)->EmplaceBack(std::forward<Args>(args)...);
     }
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
     void PushPyScope(const Key &key, bool enabled);
     void PopPyScope(bool enabled);
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
     // These methods can be called from threads at the same time as the
     // other methods.
@@ -607,13 +607,13 @@ class TraceCollector : public TfWeakBase {
   // These members are unused if Python support is disabled. However, we
   // leave them in place and just mark them unused to provide ABI
   // compatibility between USD builds with and without Python enabled.
-#ifndef PXR_PYTHON_SUPPORT_ENABLED
+#if !defined(PXR_PYTHON_SUPPORT_ENABLED) || !PXR_PYTHON_SUPPORT_ENABLED
   ARCH_PRAGMA_PUSH
   ARCH_PRAGMA_UNUSED_PRIVATE_FIELD
 #endif
   std::atomic<int> _isPythonTracingEnabled;
   TfPyTraceFnId _pyTraceFnId;
-#ifndef PXR_PYTHON_SUPPORT_ENABLED
+#if !defined(PXR_PYTHON_SUPPORT_ENABLED) || !PXR_PYTHON_SUPPORT_ENABLED
   ARCH_PRAGMA_POP
 #endif
 };

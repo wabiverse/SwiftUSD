@@ -36,12 +36,12 @@ void TraceEventNode::SetBeginAndEndTimesFromChildren()
     return;
   }
 
-  _beginTime = std::numeric_limits<TimeStamp>::max();
-  _endTime = std::numeric_limits<TimeStamp>::min();
+  _beginTime = (std::numeric_limits<TimeStamp>::max)();
+  _endTime = (std::numeric_limits<TimeStamp>::min)();
 
   for (const TraceEventNodeRefPtr &c : _children) {
-    _beginTime = std::min(_beginTime, c->GetBeginTime());
-    _endTime = std::max(_endTime, c->GetEndTime());
+    _beginTime = (std::min)(_beginTime, c->GetBeginTime());
+    _endTime = (std::max)(_endTime, c->GetEndTime());
   }
 }
 

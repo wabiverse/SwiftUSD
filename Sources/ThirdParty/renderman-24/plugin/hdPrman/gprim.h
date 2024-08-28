@@ -218,7 +218,7 @@ void HdPrman_Gprim<BASE>::Sync(HdSceneDelegate *sceneDelegate,
 
     // Adjust _prototypeIds array.
     const size_t oldCount = _prototypeIds.size();
-    const size_t newCount = std::max((size_t)1, geomSubsets.size());
+    const size_t newCount = (std::max)((size_t)1, geomSubsets.size());
     if (newCount != oldCount) {
       for (const auto &oldPrototypeId : _prototypeIds) {
         if (oldPrototypeId != riley::GeometryPrototypeId::InvalidId()) {

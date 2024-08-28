@@ -169,7 +169,7 @@ class _VelocityHelper {
     if (_name == HdInstancerTokens->instanceRotations ||
         _GetAccelerations(sampleTime).size() >= sourceValue.GetArraySize())
     {
-      const int n = std::max(3, _GetNonlinearSampleCount()) - 1;
+      const int n = (std::max)(3, _GetNonlinearSampleCount()) - 1;
       for (int k = 1; k < n; ++k) {
         outSampleTimes->insert(outSampleTimes->end() - 1,
                                startTime + float(k) / float(n) * (endTime - startTime));

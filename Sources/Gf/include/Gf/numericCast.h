@@ -85,11 +85,11 @@ std::optional<To> GfNumericCast(From from, GfNumericCastFailureType *failType = 
   // int -> int.
   if constexpr (std::is_integral_v<From> && std::is_integral_v<To>) {
     // Range check integer to integer.
-    if (GfIntegerCompareLess(from, ToLimits::min())) {
+    if (GfIntegerCompareLess(from, (ToLimits::min)())) {
       setFail(GfNumericCastNegOverflow);
       return {};
     }
-    if (GfIntegerCompareLess(ToLimits::max(), from)) {
+    if (GfIntegerCompareLess((ToLimits::max)(), from)) {
       setFail(GfNumericCastPosOverflow);
       return {};
     }
@@ -117,7 +117,7 @@ std::optional<To> GfNumericCast(From from, GfNumericCastFailureType *failType = 
     // int32_t, say.  In that case we get a range like (-inf, inf), meaning
     // that all finite halfs are in-range.
     From low = static_cast<From>(ToLimits::lowest()) - static_cast<From>(1);
-    From high = static_cast<From>(ToLimits::max()) + static_cast<From>(1);
+    From high = static_cast<From>((ToLimits::max)()) + static_cast<From>(1);
 
     if (from <= low) {
       setFail(GfNumericCastNegOverflow);

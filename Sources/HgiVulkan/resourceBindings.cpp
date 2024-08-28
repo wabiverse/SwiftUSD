@@ -114,7 +114,7 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(HgiVulkanDevice *device,
     d.pImmutableSamplers = nullptr;
     bindings.push_back(std::move(d));
 
-    textureBindIndexStart = std::max(textureBindIndexStart, b.bindingIndex + 1);
+    textureBindIndexStart = (std::max)(textureBindIndexStart, b.bindingIndex + 1);
   }
 
   // Textures
@@ -144,7 +144,7 @@ HgiVulkanResourceBindings::HgiVulkanResourceBindings(HgiVulkanDevice *device,
     // Instead of removing them we set a minimum of 1. An empty poolSize
     // will not let us create the pool, which prevents us from creating
     // the descriptorSets.
-    poolSizes[i].descriptorCount = std::max(poolSizes[i].descriptorCount, 1u);
+    poolSizes[i].descriptorCount = (std::max)(poolSizes[i].descriptorCount, 1u);
   }
 
   VkDescriptorPoolCreateInfo pool_info = {};

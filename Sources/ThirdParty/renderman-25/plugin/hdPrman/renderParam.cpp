@@ -1798,7 +1798,7 @@ void HdPrman_RenderParam::Begin(HdPrmanRenderDelegate *renderDelegate)
     // Note: This option is listed as ri:limits:threads under PxrOptionsAPI.
     {
       static const unsigned appThreads = 4;
-      unsigned nThreads = std::max(WorkGetConcurrencyLimit() - appThreads, 1u);
+      unsigned nThreads = (std::max)(WorkGetConcurrencyLimit() - appThreads, 1u);
       // Check the environment
       const unsigned nThreadsEnv = TfGetEnvSetting(HD_PRMAN_NTHREADS);
       if (nThreadsEnv > 0) {

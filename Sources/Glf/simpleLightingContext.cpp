@@ -486,7 +486,7 @@ void GlfSimpleLightingContext::SetStateFromOpenGL()
   material.SetEmission(GfVec4f(color));
   glGetMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
   // clamp to 0.0001, since pow(0,0) is undefined in GLSL.
-  shininess = std::max(0.0001f, shininess);
+  shininess = (std::max)(0.0001f, shininess);
   material.SetShininess(shininess);
 
   SetMaterial(material);

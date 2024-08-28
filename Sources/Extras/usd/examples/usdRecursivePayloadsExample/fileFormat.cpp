@@ -80,7 +80,7 @@ struct _Params {
     extractor.Extract(UsdRecursivePayloadsExampleFileFormatTokens->Depth, &depth);
     // Treat negative values as zero so we have consistent parameter values
     // when there's no recursive layer content to generate.
-    depth = std::max(0, depth);
+    depth = (std::max)(0, depth);
     if (depth < 1) {
       return;
     }
@@ -89,7 +89,7 @@ struct _Params {
     // depth. We clamp this value to be positive so there's always at least
     // one prim generated at each depth.
     extractor.Extract(UsdRecursivePayloadsExampleFileFormatTokens->Num, &num);
-    num = std::max(1, num);
+    num = (std::max)(1, num);
 
     // Radius and height are only needed when depth is 2 or higher as they
     // are used to layout the recursively generated prims and depth 1 just

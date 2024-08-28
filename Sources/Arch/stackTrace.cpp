@@ -1007,7 +1007,7 @@ static void _ArchLogProcessStateHelper(bool isFatal,
 
   const char *haltMsg = " terminated";
   int labelSize = strlen(progname) + strlen(haltMsg);
-  int bannerSize = std::max<int>(80, labelSize + strlen("-- ") * 2);
+  int bannerSize = (std::max<int>)(80, labelSize + strlen("-- ") * 2);
 
   fputs("\n", stderr);
   int numLeadingDashes = (bannerSize - labelSize) / 2 - 1;
@@ -1219,7 +1219,7 @@ void ArchPrintStackTrace(ostream &oss, const std::string &programName, const std
 #if defined(ARCH_OS_DARWIN)
 
   _LogStackTraceToOutputIterator(
-      ostream_iterator<string>(oss), numeric_limits<size_t>::max(), true);
+      ostream_iterator<string>(oss), (numeric_limits<size_t>::max)(), true);
 
 #else
 
@@ -1304,7 +1304,7 @@ size_t ArchGetStackFrames(size_t maxdepth, size_t skip, uintptr_t *frames)
 {
   void *stack[MAX_STACK_DEPTH];
   size_t frameCount = CaptureStackBackTrace(skip, MAX_STACK_DEPTH, stack, NULL);
-  frameCount = std::min(frameCount, maxdepth);
+  frameCount = (std::min)(frameCount, maxdepth);
   for (size_t frame = 0; frame != frameCount; ++frame) {
     frames[frame] = reinterpret_cast<uintptr_t>(stack[frame]);
   }

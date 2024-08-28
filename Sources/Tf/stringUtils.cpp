@@ -102,7 +102,7 @@ template<class Int>
 static std::enable_if_t<std::is_signed<Int>::value, Int> _StringToNegative(const char *p,
                                                                            bool *outOfRange)
 {
-  const Int M = std::numeric_limits<Int>::min();
+  const Int M = (std::numeric_limits<Int>::min)();
   Int result = 0;
   while (*p >= '0' && *p <= '9') {
     Int digit = (*p++ - '0');
@@ -128,7 +128,7 @@ static std::enable_if_t<std::is_signed<Int>::value, Int> _StringToNegative(const
 template<class Int> static Int _StringToPositive(const char *p, bool *outOfRange)
 {
   const Int R = 10;
-  const Int M = std::numeric_limits<Int>::max();
+  const Int M = (std::numeric_limits<Int>::max)();
   Int result = 0;
   while (*p >= '0' && *p <= '9') {
     Int digit = (*p++ - '0');
@@ -767,7 +767,7 @@ bool TfDictionaryLessThan::_LessImpl(const string &lstr, const string &rstr) con
   size_t lsize = lstr.size(), rsize = rstr.size();
   auto lend = lcur + lsize, rend = rcur + rsize;
 
-  auto curEnd = lcur + std::min(lsize, rsize);
+  auto curEnd = lcur + (std::min)(lsize, rsize);
 
   // Find the next differing byte in the strings.
   std::tie(lcur, rcur) = Mismatch(lcur, curEnd, rcur);
@@ -854,7 +854,7 @@ bool TfDictionaryLessThan::_LessImpl(const string &lstr, const string &rstr) con
         // Otherwise values are equal and we continue.  Reset curEnd to
         // account for leading-zero count differences.
         lcur = lDigEnd, rcur = rDigEnd;
-        curEnd = lcur + std::min(std::distance(lcur, lend), std::distance(rcur, rend));
+        curEnd = lcur + (std::min)(std::distance(lcur, lend), std::distance(rcur, rend));
       }
       else if (IsDigit(l) | IsDigit(r)) {
         if (lcur == lstr.c_str()) {
@@ -892,7 +892,7 @@ bool TfDictionaryLessThan::_LessImpl(const string &lstr, const string &rstr) con
   // there's no difference, or it is either both numerals (one of them zero)
   // or different-case letters.
   std::tie(lcur, rcur) = Mismatch(
-      lstr.c_str(), lstr.c_str() + std::min(lstr.size(), rstr.size()), rstr.c_str());
+      lstr.c_str(), lstr.c_str() + (std::min)(lstr.size(), rstr.size()), rstr.c_str());
 
   l = *lcur, r = *rcur;
   return (r == '0') | ((l != '0') & (l < r));

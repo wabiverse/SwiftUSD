@@ -503,7 +503,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
 
     const long numNewElems = std::distance(first, last);
     const size_type neededCapacity = size() + numNewElems;
-    const size_type nextCapacity = std::max(_NextCapacity(), neededCapacity);
+    const size_type nextCapacity = (std::max)(_NextCapacity(), neededCapacity);
 
     // Insertions at the end would be handled correctly by the code below
     // without this special case.  However, insert(end(), f, l) is an
@@ -555,7 +555,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
       // needs to be placed in uninitialized storage.
 
       const long numMoveElems = std::distance(pos, end());
-      const long numUninitMoves = std::min(numNewElems, numMoveElems);
+      const long numUninitMoves = (std::min)(numNewElems, numMoveElems);
       const long numInitMoves = numMoveElems - numUninitMoves;
       const long numUninitNews = numNewElems - numUninitMoves;
       const long numInitNews = numNewElems - numUninitNews;
@@ -602,7 +602,7 @@ template<typename T, uint32_t N> class TfSmallVector : public TfSmallVectorBase 
   ///
   static constexpr size_type max_size()
   {
-    return std::numeric_limits<_SizeMemberType>::max();
+    return (std::numeric_limits<_SizeMemberType>::max)();
   }
 
   /// Returns \c true if this vector is empty.

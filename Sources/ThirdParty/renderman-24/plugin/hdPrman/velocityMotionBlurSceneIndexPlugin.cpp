@@ -329,7 +329,7 @@ std::pair<HdSampledDataSource::Time, HdSampledDataSource::Time> _PrimvarValueDat
 {
 
   if (std::numeric_limits<Time>::lowest() < startTime &&
-      endTime < std::numeric_limits<Time>::max())
+      endTime < (std::numeric_limits<Time>::max)())
   {
     // Client gives us a valid shutter interval. Use it.
     return {startTime, endTime};
@@ -388,7 +388,7 @@ bool _PrimvarValueDataSource::_GetSamplesDeformBlur(const Time startTime,
 
   // Can't do anything if given a meaningless shutter interval.
   if (!(std::numeric_limits<Time>::lowest() < startTime &&
-        endTime < std::numeric_limits<Time>::max()))
+        endTime < (std::numeric_limits<Time>::max)()))
   {
     static std::once_flag flag;
     std::call_once(flag, []() {

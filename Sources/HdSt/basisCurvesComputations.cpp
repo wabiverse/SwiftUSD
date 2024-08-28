@@ -75,8 +75,8 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildLinesIndexArray()
     for (size_t lineNum = 0; lineNum < lineCount; ++lineNum) {
       const GfVec2i &line = indices[lineNum];
 
-      int i0 = std::min(line[0], maxIndex);
-      int i1 = std::min(line[1], maxIndex);
+      int i0 = (std::min)(line[0], maxIndex);
+      int i1 = (std::min)(line[1], maxIndex);
 
       int v0 = curveIndices[i0];
       int v1 = curveIndices[i1];
@@ -151,8 +151,8 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildLineSegmentIndexArray()
     for (size_t lineNum = 0; lineNum < lineCount; ++lineNum) {
       const GfVec2i &line = indices[lineNum];
 
-      int i0 = std::min(line[0], maxIndex);
-      int i1 = std::min(line[1], maxIndex);
+      int i0 = (std::min)(line[0], maxIndex);
+      int i1 = (std::min)(line[1], maxIndex);
 
       int v0 = curveIndices[i0];
       int v1 = curveIndices[i1];
@@ -262,8 +262,8 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildCubicIndexArray()
     if (start) {
       const int v0 = startIndex;
       const int endIndex = v0 + cvCount - 1;
-      const int v1 = std::min(v0 + 1, endIndex);
-      const int v2 = std::min(v0 + 2, endIndex);
+      const int v1 = (std::min)(v0 + 1, endIndex);
+      const int v2 = (std::min)(v0 + 2, endIndex);
 
       if (basis == HdTokens->bspline) {
         indices.push_back(GfVec4i(v0, v0, v0, v1));
@@ -299,8 +299,8 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildCubicIndexArray()
     // segments for pinned (non-periodic) curves.
     // (this should match the logic in
     //  HdBasisCurvesTopology::CalculateNeededNumberOfVaryingControlPoints)
-    const int numSegs = periodic ? std::max<int>(count / vStep, 1) :
-                                   (std::max<int>((count - 4), 0) / vStep) + 1;
+    const int numSegs = periodic ? (std::max<int>)(count / vStep, 1) :
+                                   ((std::max<int>)((count - 4), 0) / vStep) + 1;
 
     if (pinned) {
       addPinnedSegment(vertexIndex, curveIndex, count, /*start =*/true);
@@ -315,7 +315,7 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildCubicIndexArray()
         // If there are not enough verts to round out the segment
         // just repeat the last vert.
         seg[v] = periodic ? vertexIndex + ((offset + v) % count) :
-                            vertexIndex + std::min(offset + v, (count - 1));
+                            vertexIndex + (std::min)(offset + v, (count - 1));
       }
       indices.push_back(seg);
       primIndices.push_back(curveIndex);
@@ -344,10 +344,10 @@ HdSt_BasisCurvesIndexBuilderComputation::_BuildCubicIndexArray()
     for (size_t lineNum = 0; lineNum < lineCount; ++lineNum) {
       const GfVec4i &line = indices[lineNum];
 
-      int i0 = std::min(line[0], maxIndex);
-      int i1 = std::min(line[1], maxIndex);
-      int i2 = std::min(line[2], maxIndex);
-      int i3 = std::min(line[3], maxIndex);
+      int i0 = (std::min)(line[0], maxIndex);
+      int i1 = (std::min)(line[1], maxIndex);
+      int i2 = (std::min)(line[2], maxIndex);
+      int i3 = (std::min)(line[3], maxIndex);
 
       int v0 = curveIndices[i0];
       int v1 = curveIndices[i1];

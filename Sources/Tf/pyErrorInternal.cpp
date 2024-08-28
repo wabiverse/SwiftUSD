@@ -12,6 +12,8 @@
 #include "Tf/enum.h"
 #include "Tf/registryManager.h"
 
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
 #include <boost/python/handle.hpp>
 #include <boost/python/object.hpp>
 
@@ -46,3 +48,5 @@ TfPyExceptionStateScope::~TfPyExceptionStateScope()
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED

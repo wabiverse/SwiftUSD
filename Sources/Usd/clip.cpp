@@ -274,8 +274,8 @@ bool Usd_Clip::_GetBracketingTimeSamplesForPathFromClipLayer(const SdfPath &path
         const InternalTime timeInClip = translatingLower ? lowerInClip : upperInClip;
         auto &translated = translatingLower ? translatedLower : translatedUpper;
 
-        const InternalTime lower = std::min(map1.internalTime, map2.internalTime);
-        const InternalTime upper = std::max(map1.internalTime, map2.internalTime);
+        const InternalTime lower = (std::min)(map1.internalTime, map2.internalTime);
+        const InternalTime upper = (std::max)(map1.internalTime, map2.internalTime);
 
         if (lower <= timeInClip && timeInClip <= upper) {
           if (map1.internalTime != map2.internalTime) {
@@ -460,8 +460,8 @@ void Usd_Clip::_ListTimeSamplesForPathFromClipLayer(const SdfPath &path,
         continue;
       }
 
-      if (std::min(m1.internalTime, m2.internalTime) <= t &&
-          t <= std::max(m1.internalTime, m2.internalTime))
+      if ((std::min)(m1.internalTime, m2.internalTime) <= t &&
+          t <= (std::max)(m1.internalTime, m2.internalTime))
       {
         if (m1.internalTime == m2.internalTime) {
           if (clipTimeInterval.Contains(m1.externalTime)) {

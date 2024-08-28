@@ -263,13 +263,13 @@ VtVec4fArray HdxSelectionTracker::GetSelectedPointColors(const HdRenderIndex *co
 // Helper methods to fill the selection buffer
 static std::pair<int, int> _GetMinMax(std::vector<VtIntArray> const &vecIndices)
 {
-  int min = std::numeric_limits<int>::max();
+  int min = (std::numeric_limits<int>::max)();
   int max = std::numeric_limits<int>::lowest();
 
   for (VtIntArray const &indices : vecIndices) {
     for (int const &id : indices) {
-      min = std::min(min, id);
-      max = std::max(max, id);
+      min = (std::min)(min, id);
+      max = (std::max)(max, id);
     }
   }
 
@@ -402,7 +402,7 @@ bool HdxSelectionTracker::_GetSelectionOffsets(HdSelectionSharedPtr const &selec
   size_t const N = 1000;
   WorkParallelForN(numPrims / N + 1,
                    [&ids, index, N, &selectedPrims](size_t begin, size_t end) mutable {
-                     end = std::min(end * N, ids.size());
+                     end = (std::min)(end * N, ids.size());
                      begin = begin * N;
                      for (size_t i = begin; i < end; i++) {
                        if (auto const &rprim = index->GetRprim(selectedPrims[i])) {
@@ -417,13 +417,13 @@ bool HdxSelectionTracker::_GetSelectionOffsets(HdSelectionSharedPtr const &selec
 
   // Note that numeric_limits<float>::min for is surprising, so using lowest()
   // here instead. Doing this for <int> here to avoid copy and paste bugs.
-  int min = std::numeric_limits<int>::max(), max = std::numeric_limits<int>::lowest();
+  int min = (std::numeric_limits<int>::max)(), max = std::numeric_limits<int>::lowest();
 
   for (int id : ids) {
     if (id == INVALID)
       continue;
-    min = std::min(id, min);
-    max = std::max(id, max);
+    min = (std::min)(id, min);
+    max = (std::max)(id, max);
   }
 
   if (max < min) {

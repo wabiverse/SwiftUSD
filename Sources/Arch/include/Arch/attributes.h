@@ -13,8 +13,13 @@
 /// This file allows you to define architecture-specific or compiler-specific
 /// options to be used outside lib/arch.
 
+#include "Arch/defines.h"
 #include "Arch/export.h"
 #include "pxr/pxrns.h"
+
+#if defined(ARCH_OS_WINDOWS)
+#  include "Arch/api.h"
+#endif // defined(ARCH_OS_WINDOWS)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -257,8 +262,6 @@ struct Arch_ConstructorEntry {
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#  include "Arch/api.h"
-
 // Entry for a constructor/destructor in the custom section.
 __declspec(align(16)) struct Arch_ConstructorEntry {
   typedef void(__cdecl *Type)(void);
@@ -267,7 +270,7 @@ __declspec(align(16)) struct Arch_ConstructorEntry {
   unsigned int priority : 8;  // Priority of function
 };
 
-// Declare the special sections.
+// // Declare the special sections.
 #  pragma section(".pxrctor", read)
 #  pragma section(".pxrdtor", read)
 

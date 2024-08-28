@@ -1141,7 +1141,7 @@ void HdSt_ResourceBinder::BindBuffer(TfToken const &name,
 
       // set the divisor to uint-max so that the same base value is used
       // for all instances.
-      glVertexAttribDivisor(loc, std::numeric_limits<GLint>::max());
+      glVertexAttribDivisor(loc, (std::numeric_limits<GLint>::max)());
       glEnableVertexAttribArray(loc);
       break;
     case HdStBinding::DRAW_INDEX_INSTANCE_ARRAY:
@@ -1153,7 +1153,7 @@ void HdSt_ResourceBinder::BindBuffer(TfToken const &name,
         glVertexAttribIPointer(loc, 1, GL_INT, buffer->GetStride(), offsetPtr);
         // set the divisor to uint-max so that the same base value is used
         // for all instances.
-        glVertexAttribDivisor(loc, std::numeric_limits<GLint>::max());
+        glVertexAttribDivisor(loc, (std::numeric_limits<GLint>::max)());
         glEnableVertexAttribArray(loc);
         ++loc;
       }

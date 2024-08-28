@@ -112,7 +112,7 @@ void GlfBindingMap::_AddActiveAttributeBindings(GLuint program)
 
   GLint maxNameLength = 0;
   glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxNameLength);
-  maxNameLength = std::max(maxNameLength, 100);
+  maxNameLength = (std::max)(maxNameLength, 100);
   GLint size;
   GLenum type;
   char *name = new char[maxNameLength];

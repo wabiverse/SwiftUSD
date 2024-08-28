@@ -102,7 +102,7 @@ template<class T> struct Vt_ValueStoredType {
 VT_VALUE_SET_STORED_TYPE(char const *, std::string);
 VT_VALUE_SET_STORED_TYPE(char *, std::string);
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 VT_VALUE_SET_STORED_TYPE(boost::python::object, TfPyObjWrapper);
 #endif  // PXR_PYTHON_SUPPORT_ENABLED
 
@@ -485,13 +485,13 @@ class VtValue {
     }
     static TfPyObjWrapper GetPyObj(T const &obj)
     {
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       ProxiedType const &p = VtGetProxiedObject(obj);
       TfPyLock lock;
       return boost::python::api::object(p);
 #else
       return {};
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
     }
     static std::ostream &StreamOut(T const &obj, std::ostream &out)
     {
@@ -556,13 +556,13 @@ class VtValue {
     }
     static TfPyObjWrapper GetPyObj(ErasedProxy const &obj)
     {
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
       VtValue const *val = VtGetErasedProxiedVtValue(obj);
       TfPyLock lock;
       return boost::python::api::object(*val);
 #else
       return {};
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
     }
     static std::ostream &StreamOut(ErasedProxy const &obj, std::ostream &out)
     {

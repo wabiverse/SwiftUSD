@@ -196,7 +196,7 @@ void HdxSimpleLightTask::Sync(HdSceneDelegate *delegate,
   // clear() is guaranteed by spec to not change the capacity of the
   // vector.
 
-  size_t targetCapacity = std::min(_numLightIds, _maxLights);
+  size_t targetCapacity = (std::min)(_numLightIds, _maxLights);
 
   _glfSimpleLights.clear();
   if (targetCapacity != _glfSimpleLights.capacity()) {

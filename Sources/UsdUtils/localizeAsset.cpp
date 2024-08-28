@@ -78,7 +78,7 @@ class UsdUtils_LocalizedAssetBuilder : public UsdUtils_AssetLocalizationPackage 
     size_t dataRemaining = sourceAsset->GetSize();
 
     while (dataRemaining > 0) {
-      size_t chunkSize = std::min(dataRemaining, COPY_BUFFER_SIZE);
+      size_t chunkSize = (std::min)(dataRemaining, COPY_BUFFER_SIZE);
 
       sourceAsset->Read(buffer, chunkSize, 0);
       destAsset->Write(buffer, chunkSize, 0);

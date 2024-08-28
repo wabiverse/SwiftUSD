@@ -206,7 +206,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 static bool _ComputeExtentMax(
     double height, double radiusTop, double radiusBottom, const TfToken &axis, GfVec3f *max)
 {
-  const double radiusForBox = std::max(radiusTop, radiusBottom);
+  const double radiusForBox = (std::max)(radiusTop, radiusBottom);
 
   // The height is increased by the capsule's radius from the hemispheres on
   // either side of the capsule.

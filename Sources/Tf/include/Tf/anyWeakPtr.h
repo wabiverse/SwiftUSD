@@ -17,9 +17,9 @@
 #include "Tf/weakPtr.h"
 #include "pxr/pxrns.h"
 
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 #  include "Tf/pyUtils.h"
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #include "Tf/pyObjWrapper.h"
 
@@ -144,7 +144,7 @@ class TfAnyWeakPtr {
   }
 
  private:
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   // This grants friend access to a function in the wrapper file for this
   // class.  This lets the wrapper reach down into an AnyWeakPtr to get a
   // boost::python wrapped object corresponding to the held type.  This
@@ -153,7 +153,7 @@ class TfAnyWeakPtr {
 
   TF_API
   boost::python::api::object _GetPythonObject() const;
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
   template<class WeakPtr>
   friend WeakPtr TfAnyWeakPtrDynamicCast(const TfAnyWeakPtr &anyWeak, WeakPtr *);
@@ -258,11 +258,11 @@ template<class Ptr> TfAnyWeakPtr::_PointerHolder<Ptr>::operator bool() const
 
 template<class Ptr> TfPyObjWrapper TfAnyWeakPtr::_PointerHolder<Ptr>::GetPythonObject() const
 {
-#ifdef PXR_PYTHON_SUPPORT_ENABLED
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
   return TfPyObject(_ptr);
 #else
   return {};
-#endif  // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 }
 template<class Ptr> const std::type_info &TfAnyWeakPtr::_PointerHolder<Ptr>::GetTypeInfo() const
 {

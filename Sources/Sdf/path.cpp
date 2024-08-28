@@ -349,7 +349,7 @@ void SdfPath::GetPrefixes(SdfPathVector *prefixes, size_t numPrefixes) const
 TfSpan<SdfPath> SdfPath::GetPrefixes(TfSpan<SdfPath> prefixes) const
 {
   // We can fill up to prefixes.size() elements.
-  size_t numPrefixes = std::min(prefixes.size(), GetPathElementCount());
+  size_t numPrefixes = (std::min)(prefixes.size(), GetPathElementCount());
   // If we are not filling the whole span, cut it to the subspan we will fill.
   if (numPrefixes < prefixes.size()) {
     prefixes = prefixes.first(numPrefixes);

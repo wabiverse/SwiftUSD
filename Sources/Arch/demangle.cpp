@@ -21,7 +21,7 @@ using std::string;
 #  define _AT_LEAST_GCC_THREE_ONE_OR_CLANG
 #endif
 
-#if defined(_AT_LEAST_GCC_THREE_ONE_OR_CLANG)
+#if defined(_AT_LEAST_GCC_THREE_ONE_OR_CLANG) && !defined(ARCH_OS_WINDOWS)
 #  include <cxxabi.h>
 #endif
 
@@ -124,7 +124,7 @@ static void _StripPxrInternalNamespace(string *name)
 
 #endif
 
-#if defined(_AT_LEAST_GCC_THREE_ONE_OR_CLANG)
+#if defined(_AT_LEAST_GCC_THREE_ONE_OR_CLANG) && !defined(ARCH_OS_WINDOWS)
 
 /*
  * This routine doesn't work when you get to gcc3.4.
@@ -256,7 +256,7 @@ void Arch_DemangleFunctionName(string *mangledFunctionName)
   ArchDemangle(mangledFunctionName);
 }
 
-#endif  // _AT_LEAST_GCC_THREE_ONE_OR_CLANG
+#endif  // _AT_LEAST_GCC_THREE_ONE_OR_CLANG && !defined(ARCH_OS_WINDOWS)
 
 string ArchGetDemangled(const string &typeName)
 {

@@ -158,7 +158,7 @@ HgiVulkanTexture::HgiVulkanTexture(HgiVulkan *hgi,
   //
   if (desc.initialData && desc.pixelsByteSize > 0) {
     HgiBufferDesc stageDesc;
-    stageDesc.byteSize = std::min(GetByteSizeOfResource(), desc.pixelsByteSize);
+    stageDesc.byteSize = (std::min)(GetByteSizeOfResource(), desc.pixelsByteSize);
     stageDesc.initialData = desc.initialData;
     HgiVulkanBuffer *stagingBuffer = HgiVulkanBuffer::CreateStagingBuffer(_device, stageDesc);
 
@@ -360,7 +360,7 @@ void HgiVulkanTexture::CopyBufferToTexture(HgiVulkanCommandBuffer *cb,
                                                           _descriptor.layerCount,
                                                           srcBuffer->GetDescriptor().byteSize);
 
-  const size_t mipLevels = std::min(mipInfos.size(), size_t(_descriptor.mipLevels));
+  const size_t mipLevels = (std::min)(mipInfos.size(), size_t(_descriptor.mipLevels));
 
   for (size_t mip = 0; mip < mipLevels; mip++) {
     // Skip this mip if it isn't a mipLevel we want to copy

@@ -523,7 +523,7 @@ Hgi *HdStRenderDelegate::GetHgi()
 
 void HdStRenderDelegate::_ApplyTextureSettings()
 {
-  const float memInMb = std::max(
+  const float memInMb = (std::max)(
       0.0f,
       GetRenderSetting<float>(HdStRenderSettingsTokens->volumeMaxTextureMemoryPerField,
                               HdStVolume::defaultMaxTextureMemoryPerField));

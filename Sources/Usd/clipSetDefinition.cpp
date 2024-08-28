@@ -25,7 +25,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // offset is an optional metadata in template clips, this value is
 // used to signify that it was not specified.
-constexpr double _DefaultClipOffsetValue = std::numeric_limits<double>::max();
+constexpr double _DefaultClipOffsetValue = (std::numeric_limits<double>::max)();
 
 // ------------------------------------------------------------
 
@@ -158,8 +158,8 @@ static void _DeriveClipInfo(const std::string &templateAssetPath,
   auto basename = TfGetBaseName(templateLayerPath);
   auto tokenizedBasename = TfStringTokenize(basename, ".");
 
-  size_t integerHashSectionIndex = std::numeric_limits<size_t>::max();
-  size_t decimalHashSectionIndex = std::numeric_limits<size_t>::max();
+  size_t integerHashSectionIndex = (std::numeric_limits<size_t>::max)();
+  size_t decimalHashSectionIndex = (std::numeric_limits<size_t>::max)();
 
   size_t numIntegerHashes = 0;
   size_t numDecimalHashes = 0;
@@ -171,7 +171,7 @@ static void _DeriveClipInfo(const std::string &templateAssetPath,
   // how much padding the user is requesting in their template string
   for (const auto &token : tokenizedBasename) {
     if (std::all_of(token.begin(), token.end(), [](const char &c) { return c == '#'; })) {
-      if (integerHashSectionIndex == std::numeric_limits<size_t>::max()) {
+      if (integerHashSectionIndex == (std::numeric_limits<size_t>::max)()) {
         numIntegerHashes = token.size();
         integerHashSectionIndex = tokenIndex;
       }
@@ -356,7 +356,7 @@ static void _ResolveClipSetsInNode(const PcpNodeRef &node, std::map<std::string,
   // Do an initial scan to see if any of the layers have a 'clips'
   // metadata field. If none do, we can bail out early without looking
   // for any other metadata.
-  size_t weakestLayerWithClips = std::numeric_limits<size_t>::max();
+  size_t weakestLayerWithClips = (std::numeric_limits<size_t>::max)();
   for (size_t i = layers.size(); i-- != 0;) {
     const SdfLayerRefPtr &layer = layers[i];
     if (layer->HasField(primPath, UsdTokens->clips)) {
@@ -365,7 +365,7 @@ static void _ResolveClipSetsInNode(const PcpNodeRef &node, std::map<std::string,
     }
   }
 
-  if (weakestLayerWithClips == std::numeric_limits<size_t>::max()) {
+  if (weakestLayerWithClips == (std::numeric_limits<size_t>::max)()) {
     return;
   }
 

@@ -255,7 +255,7 @@ let package = Package(
   dependencies: [
     // prepare for SwiftCrossUI, for a cross-platform UsdView.
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.7.8"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.1"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
@@ -322,6 +322,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Arch"),
         .define("ARCH_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("ARCH_COMPILER_MSVC", .when(platforms: [.windows])),
       ]
     ),
 
@@ -547,6 +548,7 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Sdf"),
         .define("SDF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("YY_NO_UNISTD_H", .when(platforms: [.windows]))
       ]
     ),
 
@@ -1507,7 +1509,7 @@ let package = Package(
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
         .target(name: "UsdHydra"),
-        .target(name: "UsdAbc"),
+        .target(name: "UsdAbc", condition: .when(platforms: Arch.OS.nix.platform)),
         .target(name: "UsdDraco"),
         .target(name: "UsdMedia"),
         .target(name: "UsdMtlx"),

@@ -191,8 +191,8 @@ void HdxPickFromRenderBufferTask::Execute(HdTaskContext *ctx)
   GfVec3d corner0 = pickNdcToRenderBuffer.Transform(GfVec3d(-1, -1, -1));
   GfVec3d corner1 = pickNdcToRenderBuffer.Transform(GfVec3d(1, 1, -1));
   // Once transformed, find the minimum and maximum bounds of these points.
-  GfVec2d pickMin = GfVec2d(std::min(corner0[0], corner1[0]), std::min(corner0[1], corner1[1]));
-  GfVec2d pickMax = GfVec2d(std::max(corner0[0], corner1[0]), std::max(corner0[1], corner1[1]));
+  GfVec2d pickMin = GfVec2d((std::min)(corner0[0], corner1[0]), (std::min)(corner0[1], corner1[1]));
+  GfVec2d pickMax = GfVec2d((std::max)(corner0[0], corner1[0]), (std::max)(corner0[1], corner1[1]));
   // Since we're turning these into integer indices, round away from the
   // center; otherwise, we'll miss relevant pixels.
   pickMin = GfVec2d(floor(pickMin[0]), floor(pickMin[1]));

@@ -186,8 +186,8 @@ void GlfSimpleShadowArray::EndCapture(size_t index)
 
     glReadPixels(0, 0, storage.width, storage.height, GL_DEPTH_COMPONENT, GL_FLOAT, storage.data);
 
-    GLfloat minValue = std::numeric_limits<float>::max();
-    GLfloat maxValue = -std::numeric_limits<float>::max();
+    GLfloat minValue = (std::numeric_limits<float>::max)();
+    GLfloat maxValue = -(std::numeric_limits<float>::max)();
     for (int i = 0; i < numPixels; ++i) {
       const GLfloat pixelValue = pixelData[i];
       if (pixelValue < minValue) {

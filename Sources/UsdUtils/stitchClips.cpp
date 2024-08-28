@@ -49,7 +49,7 @@ using _ClipFileVector = std::vector<std::string>;
 
 // constants
 // ------------------------------------------------------------------------
-constexpr double TIME_MAX = std::numeric_limits<double>::max();
+constexpr double TIME_MAX = (std::numeric_limits<double>::max)();
 
 // We insert the topology layer as the strongest
 constexpr size_t TOPOLOGY_SUBLAYER_STRENGTH = 0;
@@ -941,7 +941,7 @@ bool UsdUtilsStitchClipsTemplate(const SdfLayerHandle &resultLayer,
   clipSetDict[UsdClipsAPIInfoKeys->templateEndTime] = endTime;
   clipSetDict[UsdClipsAPIInfoKeys->templateStride] = stride;
   clipSetDict[UsdClipsAPIInfoKeys->manifestAssetPath] = SdfAssetPath(manifestId);
-  if (activeOffset != std::numeric_limits<double>::max()) {
+  if (activeOffset != (std::numeric_limits<double>::max)()) {
     clipSetDict[UsdClipsAPIInfoKeys->templateActiveOffset] = activeOffset;
   }
   if (interpolateMissingClipValues) {
