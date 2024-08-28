@@ -11,6 +11,8 @@
 #include "Sdf/assetPath.h"
 #include "Sdf/types.h"
 
+#include "Tf/registryManager.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
