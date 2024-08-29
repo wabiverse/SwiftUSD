@@ -7,13 +7,13 @@
 #ifndef PXR_USD_PCP_PY_UTILS_H
 #define PXR_USD_PCP_PY_UTILS_H
 
-#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
-#include <boost/python/dict.hpp>
-
 #include "Pcp/api.h"
 #include "Pcp/types.h"
 #include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
+#include <boost/python/dict.hpp>
 
 #include <string>
 
