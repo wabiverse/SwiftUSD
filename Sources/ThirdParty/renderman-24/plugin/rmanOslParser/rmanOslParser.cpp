@@ -25,7 +25,7 @@
 #include "rmanOslParser/rmanOslParser.h"
 #include "Ar/asset.h"
 #include "Ar/resolver.h"
-#include "ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "Arch/fileSystem.h"
 #include "Gf/matrix4d.h"
 #include "Gf/vec2f.h"

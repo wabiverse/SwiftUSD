@@ -1,5 +1,5 @@
 {
-  "originHash" : "d32fd9c511216b338177b37fe2e21979e475f0fc36e6a510fef9673bf8be52f2",
+  "originHash" : "e4e06ebc65ac5b519ab5d704432f88e17051eda32260f2845a0d6affe5566af1",
   "pins" : [
     {
       "identity" : "galah",
@@ -15,35 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "revision" : "73fcb0d3b3e83e9e1b83d54338cf1d58251053a4",
-        "version" : "1.8.1"
-      }
-    },
-    {
-      "identity" : "metaversepythonframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaversePythonFramework",
-      "state" : {
-        "revision" : "e2f4ba867b7e287a283a27a0005ab64deef14279",
-        "version" : "3.11.7"
-      }
-    },
-    {
-      "identity" : "metaversevulkanframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
-      "state" : {
-        "revision" : "13c7061599c61a4959c558d8ec1836e5b32b640b",
-        "version" : "1.26.2"
-      }
-    },
-    {
-      "identity" : "pythonkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pvieito/PythonKit.git",
-      "state" : {
-        "revision" : "43647b36cacb99558e57ef98e97ef598f91d1164",
-        "version" : "0.5.0"
+        "revision" : "d4f1ef5ef4ed6dfdbbb8b7fc64cb201b0c356d92",
+        "version" : "1.8.3"
       }
     },
     {

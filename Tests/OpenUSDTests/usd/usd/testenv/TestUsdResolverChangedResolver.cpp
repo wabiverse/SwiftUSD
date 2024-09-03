@@ -25,7 +25,7 @@
 
 #include "TestUsdResolverChangedResolver.h"
 
-#include "pxr/usd/ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "pxr/usd/ar/defineResolver.h"
 #include "pxr/usd/ar/defineResolverContext.h"
 #include "pxr/usd/ar/filesystemAsset.h"

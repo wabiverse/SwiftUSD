@@ -27,7 +27,7 @@
 #include "Arch/systemInfo.h"
 #include "pxr/base/tf/diagnostic.h"
 #include "pxr/base/tf/fileUtils.h"
-#include "pxr/usd/ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "pxr/usd/ar/asset.h"
 #include "pxr/usd/ar/defaultResolver.h"
 #include "pxr/usd/ar/filesystemAsset.h"

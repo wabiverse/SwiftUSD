@@ -24,7 +24,7 @@
 
 #include "pxr/pxr.h"
 
-#include "pxr/usd/ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "pxr/usd/ar/asset.h"
 #include "pxr/usd/ar/resolver.h"
 

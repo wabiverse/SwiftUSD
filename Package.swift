@@ -66,7 +66,7 @@ let package = Package(
     // ------------ Pixar.Usd -----
     .library(
       name: "Ar",
-      targets: ["ArTypes", "ArPrototypes", "Ar"]
+      targets: ["Ar"]
     ),
     .library(
       name: "Kind",
@@ -255,7 +255,7 @@ let package = Package(
   dependencies: [
     // prepare for SwiftCrossUI, for a cross-platform UsdView.
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.1"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
@@ -460,38 +460,8 @@ let package = Package(
     ),
 
     .target(
-      name: "ArTypes",
-      dependencies: [
-        .target(name: "Arch"),
-        .target(name: "Tf"),
-        .target(name: "Js"),
-        .target(name: "Plug"),
-        .target(name: "Vt"),
-      ],
-      cxxSettings: [
-        .define("MFB_PACKAGE_NAME", to: "Ar"),
-        .define("MFB_ALT_PACKAGE_NAME", to: "Ar"),
-        .define("MFB_PACKAGE_MODULE", to: "Ar"),
-        .define("AR_EXPORTS", to: "1"),
-        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-      ]
-    ),
-
-    .target(
-      name: "ArPrototypes",
-      dependencies: [
-        .target(name: "ArTypes")
-      ],
-      swiftSettings: [
-        .interoperabilityMode(.Cxx)
-      ]
-    ),
-
-    .target(
       name: "Ar",
       dependencies: [
-        .target(name: "ArPrototypes"),
-        .target(name: "ArTypes"),
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Js"),
@@ -1495,8 +1465,6 @@ let package = Package(
         .target(name: "Pegtl"),
         .target(name: "Plug"),
         // ----------- usd. ------
-        .target(name: "ArPrototypes"),
-        .target(name: "ArTypes"),
         .target(name: "Ar"),
         .target(name: "Kind"),
         .target(name: "Sdf"),

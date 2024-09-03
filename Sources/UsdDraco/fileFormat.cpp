@@ -27,7 +27,7 @@
 
 #include "Ar/asset.h"
 #include "Ar/resolver.h"
-#include "ArTypes/resolvedPath.h"
+#include "Ar/resolvedPath.h"
 #include "Sdf/layer.h"
 #include "Tf/fileUtils.h"
 #include "Tf/registryManager.h"

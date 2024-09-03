@@ -11,10 +11,12 @@
 /// Macros for creating Python bindings for objects used with
 /// ArResolverContext.
 
-#include <boost/python/implicit.hpp>
-
 #include "Ar/resolverContext.h"
 #include "pxr/pxrns.h"
+
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
+#include <boost/python/implicit.hpp>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,5 +36,7 @@ template<class Context> void ArWrapResolverContextForPython()
 #endif  // doxygen
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif

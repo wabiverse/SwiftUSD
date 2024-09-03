@@ -11,10 +11,9 @@
  * ---------------------------------------------------------------- */
 
 import Ar
-import ArPrototypes
 
-public typealias ArResolver = ArResolvable & Pixar.ArResolver
-public typealias ArDefaultResolver = ArResolvable & Pixar.ArDefaultResolver
+public typealias ArResolver = Pixar.ArResolver
+public typealias ArDefaultResolver = Pixar.ArDefaultResolver
 
 /**
  * # ``Ar``

@@ -10,7 +10,6 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import ArPrototypes
 import Foundation
 import PixarUSD
 
