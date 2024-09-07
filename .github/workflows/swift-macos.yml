@@ -11,9 +11,6 @@ jobs:
         swift: ["5.10"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: ${{ matrix.swift }}
       - uses: actions/checkout@v4
       - name: 📦 Build
         run: swift build -c release --target UsdView
