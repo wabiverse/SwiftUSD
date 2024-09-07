@@ -29,12 +29,12 @@ import PixarUSD
   class HDMTLRenderer: NSObject, MTKViewDelegate
   {
     let hgi: Pixar.HgiMetalPtr
-    let driver: HdDriver
 
     init?(device _: MTLDevice)
     {
       hgi = HgiMetal.createHgi()
-      driver = HdDriver(name: .renderDriver, driver: VtValue(hgi))
+
+      let driver = HdDriver(name: .renderDriver, driver: VtValue(hgi))
     }
 
     func info()

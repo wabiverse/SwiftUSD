@@ -63,7 +63,7 @@
 // 56 -> 57: Changing SetOverrideWindowPolicy to std::optional on
 //           HdRenderPassState, HdxPickFromRenderBufferTaskParams,
 //           HdxTaskController and UsdImagingGLEngine.
-// 57 -> 58: Introducing hdsi/version.h
+// 57 -> 58: Introducing version.h
 // 58 -> 59: HdGeomSubsetsSchema::GetIds() renamed to
 //           HdGeomSubsetsSchema::GetGeomSubsetNames().
 // 59 -> 60: Introduced HdRenderDelegate::GetCapabilities().

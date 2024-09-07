@@ -14,7 +14,7 @@
 #include "pxr/pxrns.h"
 #include <MaterialX/MXCoreDocument.h>
 #include <MaterialX/MXFormatUtil.h>
-#include <MaterialXGenShader/Shader.h>
+#include <MaterialX/MXGenShader.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

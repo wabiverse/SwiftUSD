@@ -1,0 +1,14 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                 "ShaderResources": "shaders"
+            },
+            "LibraryPath": "",
+            "Name": "Hdx",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
+            "Type": "library"
+        }
+    ]
+}

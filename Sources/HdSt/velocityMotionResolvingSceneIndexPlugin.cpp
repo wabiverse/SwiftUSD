@@ -28,7 +28,7 @@
 #include "Hd/sceneIndexObserver.h"
 #include "Hd/sceneIndexPlugin.h"
 #include "Hd/sceneIndexPluginRegistry.h"
-#include "Hdsi/velocityMotionResolvingSceneIndex.h"
+#include "HdSi/velocityMotionResolvingSceneIndex.h"
 
 #include "Tf/registryManager.h"
 #include "Tf/staticTokens.h"

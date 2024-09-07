@@ -7,7 +7,7 @@
 #include "HdSt/materialPrimvarTransferSceneIndexPlugin.h"
 
 #include "Hd/sceneIndexPluginRegistry.h"
-#include "Hdsi/materialPrimvarTransferSceneIndex.h"
+#include "HdSi/materialPrimvarTransferSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

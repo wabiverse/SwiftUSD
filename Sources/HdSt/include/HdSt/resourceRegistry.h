@@ -29,7 +29,7 @@
 #include <memory>
 
 #ifdef PXR_MATERIALX_SUPPORT_ENABLED
-#  include <MaterialXCore/Library.h>
+#  include <MaterialX/MXCoreLibrary.h>
 MATERIALX_NAMESPACE_BEGIN
 using ShaderPtr = std::shared_ptr<class Shader>;
 MATERIALX_NAMESPACE_END

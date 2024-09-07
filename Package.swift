@@ -178,6 +178,26 @@ let package = Package(
       targets: ["Hd"]
     ),
     .library(
+      name: "HdAr",
+      targets: ["HdAr"]
+    ),
+    .library(
+      name: "HdMtlx",
+      targets: ["HdMtlx"]
+    ),
+    .library(
+      name: "HdSi",
+      targets: ["HdSi"]
+    ),
+    .library(
+      name: "HdSt",
+      targets: ["HdSt"]
+    ),
+    .library(
+      name: "Hdx",
+      targets: ["Hdx"]
+    ),
+    .library(
       name: "Garch",
       targets: ["Garch"]
     ),
@@ -217,6 +237,14 @@ let package = Package(
     .library(
       name: "UsdShaders",
       targets: ["UsdShaders"]
+    ),
+    .library(
+      name: "UsdImaging",
+      targets: ["UsdImaging"]
+    ),
+    .library(
+      name: "UsdImagingGL",
+      targets: ["UsdImagingGL"]
     ),
     // ----------------- Apps -----
     .executable(
@@ -1308,6 +1336,7 @@ let package = Package(
         .target(name: "Hio"),
       ],
       resources: [
+        .copy("shaders"),
         .process("Resources")
       ],
       cxxSettings: [
@@ -1333,6 +1362,209 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "GeomUtil"),
         .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
         .define("GEOMUTIL_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "HdSi",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+        .target(name: "Sdf"),
+        .target(name: "CameraUtil"),
+        .target(name: "GeomUtil"),
+        .target(name: "Hf"),
+        .target(name: "Hd"),
+        .target(name: "PxOsd"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HdSi"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HdSi"),
+        .define("MFB_PACKAGE_MODULE", to: "HdSi"),
+        .define("HDSI_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "HdMtlx",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Gf"),
+        .target(name: "Hd"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "UsdMtlx")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HdMtlx"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HdMtlx"),
+        .define("MFB_PACKAGE_MODULE", to: "HdMtlx"),
+        .define("HDMTLX_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "HdSt",
+      dependencies: [
+        .target(name: "Hio"),
+        .target(name: "Garch"),
+        .target(name: "Glf"),
+        .target(name: "Hd"),
+        .target(name: "HdSi"),
+        .target(name: "HgiGL"),
+        .target(name: "HgiInterop"),
+        .target(name: "Sdr"),
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Trace"),
+        .target(name: "HdMtlx"),
+      ],
+      resources: [
+        .copy("shaders"),
+        .copy("textures"),
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HdSt"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HdSt"),
+        .define("MFB_PACKAGE_MODULE", to: "HdSt"),
+        .define("HDST_EXPORTS", to: "1"),
+        .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "Hdx",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Work"),
+        .target(name: "Sdf"),
+        .target(name: "Garch"),
+        .target(name: "Glf"),
+        .target(name: "PxOsd"),
+        .target(name: "Hd"),
+        .target(name: "HdSt"),
+        .target(name: "Hgi"),
+        .target(name: "HgiInterop"),
+        .target(name: "CameraUtil"),
+      ],
+      resources: [
+        .copy("shaders"),
+        .copy("textures"),
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "Hdx"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "Hdx"),
+        .define("MFB_PACKAGE_MODULE", to: "Hdx"),
+        .define("HDX_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "HdAr",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Hd"),
+        .target(name: "Ar"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HdAr"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HdAr"),
+        .define("MFB_PACKAGE_MODULE", to: "HdAr"),
+        .define("HDAR_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdImaging",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "GeomUtil"),
+        .target(name: "Hd"),
+        .target(name: "HdAr"),
+        .target(name: "Hio"),
+        .target(name: "PxOsd"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdLux"),
+        .target(name: "UsdRender"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdVol"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdImaging"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdImaging"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdImaging"),
+        .define("USDIMAGING_EXPORTS", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "UsdImagingGL",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Vt"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Work"),
+        .target(name: "Hio"),
+        .target(name: "Garch"),
+        .target(name: "Glf"),
+        .target(name: "Hd"),
+        .target(name: "HdSi"),
+        .target(name: "Hdx"),
+        .target(name: "Hgi"),
+        .target(name: "PxOsd"),
+        .target(name: "Ar"),
+        .target(name: "Sdf"),
+        .target(name: "Sdr"),
+        .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdHydra"),
+        .target(name: "UsdShade"),
+        .target(name: "UsdImaging"),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "UsdImagingGL"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "UsdImagingGL"),
+        .define("MFB_PACKAGE_MODULE", to: "UsdImagingGL"),
+        .define("USDIMAGINGGL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
@@ -1491,20 +1723,27 @@ let package = Package(
         .target(name: "UsdVol"),
         // ------- imaging. ------
         .target(name: "CameraUtil"),
-        .target(name: "Hf"),
-        .target(name: "PxOsd"),
-        .target(name: "Hd"),
         .target(name: "Garch"),
+        .target(name: "GeomUtil"),
+        .target(name: "Glf"),
+        .target(name: "Hf"),
+        .target(name: "Hd"),
+        .target(name: "HdAr"),
+        .target(name: "HdMtlx"),
+        .target(name: "HdSi"),
+        .target(name: "HdSt"),
+        .target(name: "Hdx"),
         .target(name: "Hgi"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
         .target(name: "HgiGL"),
         .target(name: "HgiInterop"),
         .target(name: "Hio"),
-        .target(name: "Glf"),
-        .target(name: "GeomUtil"),
+        .target(name: "PxOsd"),
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
+        .target(name: "UsdImaging"),
+        .target(name: "UsdImagingGL"),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------

@@ -1,0 +1,12 @@
+{
+    "Plugins": [
+        {
+            "Info" : {},
+            "LibraryPath": "",
+            "Name": "UsdImagingGL",
+            "ResourcePath": "Contents/Resources",
+            "Root": "../..",
+            "Type": "library"
+        }
+    ]
+}

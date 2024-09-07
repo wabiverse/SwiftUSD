@@ -7,7 +7,7 @@
 #define PXR_IMAGING_HDSI_MATERIAL_BINDING_RESOLVING_SCENE_INDEX_H
 
 #include "Hd/filteringSceneIndex.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 
 #include "pxr/pxrns.h"
 

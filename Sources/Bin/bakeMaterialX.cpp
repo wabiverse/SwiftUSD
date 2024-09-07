@@ -22,9 +22,9 @@
 #include <MaterialX/MXCoreDocument.h>
 #include <MaterialX/MXFormatUtil.h>
 #include <MaterialX/MXFormatXmlIo.h>
-#include <MaterialXCore/Generated.h>
-#include <MaterialXCore/Node.h>
-#include <MaterialXRenderGlsl/TextureBaker.h>
+#include <MaterialX/MXCoreGenerated.h>
+#include <MaterialX/MXCoreNode.h>
+#include <MaterialX/MXRenderGlslTextureBaker.h>
 
 #include <fstream>
 

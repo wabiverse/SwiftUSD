@@ -28,7 +28,7 @@
 #include "Hd/filteringSceneIndex.h"
 #include "Hd/sceneIndex.h"
 #include "Hd/sceneIndexObserver.h"
-#include "Hdsi/api.h"
+#include "HdSi/api.h"
 
 #include "Sdf/path.h"
 

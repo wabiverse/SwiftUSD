@@ -9,7 +9,7 @@
 #include "Hd/retainedDataSource.h"
 #include "Hd/sceneIndexPluginRegistry.h"
 #include "Hd/tokens.h"
-#include "Hdsi/tetMeshConversionSceneIndex.h"
+#include "HdSi/tetMeshConversionSceneIndex.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 

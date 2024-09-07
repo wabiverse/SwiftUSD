@@ -14,7 +14,7 @@
 #include "Hd/material.h"
 #include "UsdShade/material.h"
 
-#include <MaterialXCore/Library.h>
+#include <MaterialX/MXCoreLibrary.h>
 
 #include "Tf/declarePtrs.h"
 #include <string>

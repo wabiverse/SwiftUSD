@@ -159,12 +159,28 @@ public extension Bundle
   static let hgiGL = Bundle(path: "\(pxrRoot)/SwiftUSD_HgiGL\(ext)")
 
   /**
+   * Where ``HdSt`` application bundle resources are located. */
+  static let hdSt = Bundle(path: "\(pxrRoot)/SwiftUSD_HdSt\(ext)")
+
+  /**
+   * Where ``Hdx`` application bundle resources are located. */
+  static let hdx = Bundle(path: "\(pxrRoot)/SwiftUSD_Hdx\(ext)")
+
+  /**
    * Where ``Hio`` application bundle resources are located. */
   static let hio = Bundle(path: "\(pxrRoot)/SwiftUSD_Hio\(ext)")
 
   /**
    * Where ``Glf`` application bundle resources are located. */
   static let glf = Bundle(path: "\(pxrRoot)/SwiftUSD_Glf\(ext)")
+
+  /**
+   * Where ``UsdImaging`` application bundle resources are located. */
+  static let usdImaging = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdImaging\(ext)")
+
+  /**
+   * Where ``UsdImagingGL`` application bundle resources are located. */
+  static let usdImagingGL = Bundle(path: "\(pxrRoot)/SwiftUSD_UsdImagingGL\(ext)")
 
   /**
    * Where ``Tf`` python bundle resources are located. */
@@ -424,8 +440,12 @@ public enum BundleFramework: CaseIterable
   case hgiMetal
   case hgiVulkan
   case hgiGL
+  case hdSt
+  case hdx
   case hio
   case glf
+  case usdImaging
+  case usdImagingGL
 
   public var resourcePath: String?
   {
@@ -456,8 +476,12 @@ public enum BundleFramework: CaseIterable
       case .hgiMetal: Bundle.hgiMetal?.resourcePath
       case .hgiVulkan: Bundle.hgiVulkan?.resourcePath
       case .hgiGL: Bundle.hgiGL?.resourcePath
+      case .hdSt: Bundle.hdSt?.resourcePath
+      case .hdx: Bundle.hdx?.resourcePath
       case .hio: Bundle.hio?.resourcePath
       case .glf: Bundle.glf?.resourcePath
+      case .usdImaging: Bundle.usdImaging?.resourcePath
+      case .usdImagingGL: Bundle.usdImagingGL?.resourcePath
     }
   }
 }

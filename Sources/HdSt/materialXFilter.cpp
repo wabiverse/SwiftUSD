@@ -23,10 +23,10 @@
 
 #include "Tf/diagnostic.h"
 
-#include <MaterialXGenShader/DefaultColorManagementSystem.h>
-#include <MaterialXGenShader/Util.h>
-#include <MaterialXRender/LightHandler.h>
-#include <MaterialXRender/Util.h>
+#include <MaterialX/MXGenShaderDefaultColorManagementSystem.h>
+#include <MaterialX/MXGenShaderUtil.h>
+#include <MaterialX/MXRenderLightHandler.h>
+#include <MaterialX/MXRenderUtil.h>
 
 namespace mx = MaterialX;
 

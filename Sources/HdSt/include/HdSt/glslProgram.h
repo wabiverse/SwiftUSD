@@ -7,12 +7,15 @@
 #ifndef PXR_IMAGING_HD_ST_GLSL_PROGRAM_H
 #define PXR_IMAGING_HD_ST_GLSL_PROGRAM_H
 
+#include "pxr/pxrns.h"
+
 #include "Hd/version.h"
 #include "HdSt/api.h"
 #include "Hgi/buffer.h"
 #include "Hgi/enums.h"
 #include "Hgi/shaderProgram.h"
-#include "pxr/pxrns.h"
+
+#include "Tf/token.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
