@@ -7,7 +7,7 @@ jobs:
     name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14]
+        os: [self-hosted]
         swift: ["5.10"]
     runs-on: ${{ matrix.os }}
     steps:
