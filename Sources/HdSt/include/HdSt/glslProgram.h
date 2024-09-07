@@ -17,6 +17,8 @@
 
 #include "Tf/token.h"
 
+#include <functional>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdStResourceRegistry;
