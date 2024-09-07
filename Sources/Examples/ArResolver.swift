@@ -23,11 +23,11 @@ final class CustomResolver: ArDefaultResolver
   {
     Msg.logger.info("resolving path: \(path)")
 
-    let asset = _Resolve(path)
-    if !asset.empty()
-    {
-      return asset
-    }
+    // let asset = _Resolve(path)
+    // if !asset.empty()
+    // {
+    //   return asset
+    // }
 
     return .init()
   }
