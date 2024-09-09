@@ -5,7 +5,9 @@
 // https://openusd.org/license.
 //
 
-#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#include "Arch/defines.h"
+
+#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED && defined(ARCH_OS_OSX)
 
 #include "Garch/glApi.h"
 
