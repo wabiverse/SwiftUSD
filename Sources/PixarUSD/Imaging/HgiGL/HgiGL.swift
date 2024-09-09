@@ -10,7 +10,9 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+#if canImport(HgiGL)
 import HgiGL
 
 public enum HgiGL
 {}
+#endif // canImport(HgiGL)
