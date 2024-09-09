@@ -1468,7 +1468,7 @@ let package = Package(
         .target(name: "Glf"),
         .target(name: "PxOsd"),
         .target(name: "Hd"),
-        .target(name: "HdSt"),
+        .target(name: "HdSt", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "Hgi"),
         .target(name: "HgiInterop"),
         .target(name: "CameraUtil"),
@@ -1555,7 +1555,7 @@ let package = Package(
         .target(name: "Glf"),
         .target(name: "Hd"),
         .target(name: "HdSi"),
-        .target(name: "Hdx"),
+        .target(name: "Hdx", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "Hgi"),
         .target(name: "PxOsd"),
         .target(name: "Ar"),
@@ -1741,8 +1741,8 @@ let package = Package(
         .target(name: "HdAr"),
         .target(name: "HdMtlx"),
         .target(name: "HdSi"),
-        .target(name: "HdSt"),
-        .target(name: "Hdx"),
+        .target(name: "HdSt", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
+        .target(name: "Hdx", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "Hgi"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
@@ -1753,7 +1753,7 @@ let package = Package(
         // --- usd imaging. ------
         .target(name: "UsdShaders"),
         .target(name: "UsdImaging"),
-        .target(name: "UsdImagingGL"),
+        .target(name: "UsdImagingGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
