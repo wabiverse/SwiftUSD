@@ -37,6 +37,9 @@ class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
   HgiMetalIndirectCommandEncoder(Hgi *hgi);
 
   HGIMETAL_API
+  ~HgiMetalIndirectCommandEncoder() override;
+
+  HGIMETAL_API
   HgiIndirectCommandsUniquePtr EncodeDraw(HgiComputeCmds *computeCmds,
                                           HgiGraphicsPipelineHandle const &pipeline,
                                           HgiResourceBindingsHandle const &resourceBindings,

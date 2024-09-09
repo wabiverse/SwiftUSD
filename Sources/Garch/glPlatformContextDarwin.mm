@@ -7,21 +7,20 @@
 #include "Arch/defines.h"
 
 #if defined(__APPLE__)
-#  import <Foundation/Foundation.h>
-#  if defined(ARCH_OS_IPHONE)
-#    import <GLKit/GLKit.h>
-#  else // !defined(ARCH_OS_IPHONE)
-#    import <AppKit/NSOpenGL.h>
-#  endif // defined(ARCH_OS_IPHONE)
-
 #  include "pxr/pxrns.h"
 #  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
-
-#  ifdef ARCH_OS_IPHONE
-typedef EAGLContext NSGLContext;
-#  else
+#  import <Foundation/Foundation.h>
+#  if defined(PXR_GL_SUPPORT_ENABLED)
+#    if defined(ARCH_OS_OSX)
+#      import <AppKit/NSOpenGL.h>
 typedef NSOpenGLContext NSGLContext;
-#  endif
+#    elif defined(ARCH_OS_IPHONE)
+#      import <UIKit/UIKit.h>
+typedef EAGLContext NSGLContext;
+#    endif // defined(ARCH_OS_IPHONE)
+#  else // !defined(PXR_GL_SUPPORT_ENABLED)
+typedef void* NSGLContext;
+#  endif // defined(PXR_GL_SUPPORT_ENABLED)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -29,7 +28,11 @@ class GarchNSGLContextState::Detail
 {
 public:
     Detail() {
+#if defined(PXR_GL_SUPPORT_ENABLED)
         context = [NSGLContext currentContext];
+#else
+        context = nil;
+#endif
     }
     Detail(NullState) {
         context = nil;
@@ -80,18 +83,26 @@ GarchNSGLContextState::IsValid() const
 void
 GarchNSGLContextState::MakeCurrent()
 {
-#if ARCH_OS_IPHONE
+#if defined(PXR_GL_SUPPORT_ENABLED)
+#  if defined(ARCH_OS_IPHONE)
     [EAGLContext setCurrentContext:_detail->context];
-#else
+#  else // !defined(ARCH_OS_IPHONE)
     [_detail->context makeCurrentContext];
-#endif
+#  endif // defined(ARCH_OS_IPHONE)
+#endif // defined(PXR_GL_SUPPORT_ENABLED)
 }
 
 /// Make no context current.
 void
 GarchNSGLContextState::DoneCurrent()
 {
+#if defined(PXR_GL_SUPPORT_ENABLED)
+#  if defined(ARCH_OS_IPHONE)
+    [EAGLContext setCurrentContext:nil];
+#  else // !defined(ARCH_OS_IPHONE)
     [NSGLContext clearCurrentContext];
+#  endif // defined(ARCH_OS_IPHONE)
+#endif
 }
 
 GarchGLPlatformContextState
@@ -103,6 +114,7 @@ GarchGetNullGLPlatformContextState()
 void *
 GarchSelectCoreProfileMacVisual()
 {
+#if defined(ARCH_OS_OSX)
     NSOpenGLPixelFormatAttribute attribs[10];
     int c = 0;
 
@@ -112,6 +124,9 @@ GarchSelectCoreProfileMacVisual()
     attribs[c++] = 0;
 
     return (__bridge void*)[[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
+#else // !defined(ARCH_OS_OSX)
+    return NULL;
+#endif // defined(ARCH_OS_OSX)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

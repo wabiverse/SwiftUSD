@@ -24,22 +24,26 @@
 #endif
 
 #if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
-#  include "HgiInterop/metal.h"
 #  include "HgiMetal/hgi.h"
-#endif
+#  if defined(ARCH_OS_OSX)
+#    include "HgiInterop/metal.h"
+#  endif // defined(ARCH_OS_OSX)
+#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct HgiInteropImpl {
 #if defined(PXR_GL_SUPPORT_ENABLED)
   std::unique_ptr<HgiInteropOpenGL> _openGLToOpenGL;
-#endif
+#endif // defined(PXR_GL_SUPPORT_ENABLED)
 #if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
   std::unique_ptr<HgiInteropVulkan> _vulkanToOpenGL;
-#endif
+#endif // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
 #if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#  if !defined(ARCH_OS_IPHONE)
   std::unique_ptr<HgiInteropMetal> _metalToOpenGL;
-#endif
+#  endif // !defined(ARCH_OS_IPHONE)
+#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 };
 
 HgiInterop::HgiInterop() : _hgiInteropImpl(std::make_unique<HgiInteropImpl>()) {}
@@ -60,7 +64,7 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
     return;
   }
 
-#if defined(PXR_GL_SUPPORT_ENABLED)
+#if defined(PXR_GL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
   if (srcApi == HgiTokens->OpenGL) {
     // Transfer OpenGL textures to OpenGL application
     if (!_hgiInteropImpl->_openGLToOpenGL) {
@@ -86,7 +90,7 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
   }
 #endif
 
-#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#if (defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
   if (srcApi == HgiTokens->Metal) {
     // Transfer Metal textures to OpenGL application
     // XXX: It's possible that if we use the same HgiInterop with a

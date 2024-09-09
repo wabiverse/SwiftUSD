@@ -1,0 +1,16 @@
+name: Swift (visionOS 2)
+
+on: [push]
+
+jobs:
+  build:
+    name: Swift ${{ matrix.swift }} on visionOS
+    strategy:
+      matrix:
+        os: [self-hosted]
+        swift: ["5.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📦 Build
+        run: swift bundler bundle -c release -p visionOSSimulator UsdView

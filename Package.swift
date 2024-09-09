@@ -1158,6 +1158,7 @@ let package = Package(
         .target(name: "Tf"),
       ],
       cxxSettings: [
+        .define("PXR_GL_SUPPORT_ENABLED", .when(platforms: Arch.OS.noembeddedapple.platform)),
         .define("MFB_PACKAGE_NAME", to: "Garch"),
         .define("MFB_ALT_PACKAGE_NAME", to: "Garch"),
         .define("MFB_PACKAGE_MODULE", to: "Garch"),
@@ -1166,6 +1167,7 @@ let package = Package(
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
+        .linkedFramework("UIKit", .when(platforms: Arch.OS.embeddedapple.platform)),
         .linkedLibrary("glut", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GL", .when(platforms: Arch.OS.linux.platform)),
         .linkedLibrary("GLU", .when(platforms: Arch.OS.linux.platform)),
@@ -1221,8 +1223,10 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       linkerSettings: [
+        .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
         .linkedFramework("Metal", .when(platforms: Arch.OS.apple.platform)),
         .linkedFramework("AppKit", .when(platforms: [.macOS])),
+        .linkedFramework("UIKit", .when(platforms: Arch.OS.embeddedapple.platform)),
       ]
     ),
 
@@ -1280,7 +1284,7 @@ let package = Package(
         .target(name: "Hgi"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
-        .target(name: "HgiGL"),
+        .target(name: "HgiGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
       ],
       cxxSettings: [
         .define("MFB_PACKAGE_NAME", to: "HgiInterop"),
@@ -1293,6 +1297,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ],
       linkerSettings: [
+        .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
         .linkedFramework("CoreVideo", .when(platforms: Arch.OS.apple.platform))
       ]
     ),
@@ -1345,6 +1350,9 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Glf"),
         .define("GLF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ],
+      linkerSettings: [
+        .linkedFramework("OpenGL", .when(platforms: [.macOS])),
       ]
     ),
 
@@ -1421,7 +1429,7 @@ let package = Package(
         .target(name: "Glf"),
         .target(name: "Hd"),
         .target(name: "HdSi"),
-        .target(name: "HgiGL"),
+        .target(name: "HgiGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "HgiInterop"),
         .target(name: "Sdr"),
         .target(name: "Arch"),
@@ -1736,7 +1744,7 @@ let package = Package(
         .target(name: "Hgi"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         // .target(name: "HgiVulkan", condition: .when(platforms: Arch.OS.linux.platform)),
-        .target(name: "HgiGL"),
+        .target(name: "HgiGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "HgiInterop"),
         .target(name: "Hio"),
         .target(name: "PxOsd"),
@@ -1810,6 +1818,10 @@ enum Arch
     case applewindows
     /// everything not apple (linux + windows).
     case linwin
+    /// only embedded apple devices.
+    case embeddedapple
+    /// everything not embedded apple devices.
+    case noembeddedapple
 
     public var platform: [Platform]
     {
@@ -1822,6 +1834,8 @@ enum Arch
         case .nix: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .linux, .android, .openbsd]
         case .applewindows: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .windows]
         case .linwin: [.linux, .android, .openbsd, .windows]
+        case .embeddedapple: [.iOS, .visionOS, .tvOS, .watchOS]
+        case .noembeddedapple: [.macOS, .linux, .android, .openbsd, .windows]
       }
     }
 

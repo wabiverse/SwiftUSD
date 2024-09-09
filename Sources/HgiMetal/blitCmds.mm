@@ -209,7 +209,7 @@ HgiMetalBlitCmds::CopyTextureCpuToGpu(
     
     mtlDesc.mipmapLevelCount = dstTexDesc.mipLevels;
     mtlDesc.arrayLength = dstTexDesc.layerCount;
-    mtlDesc.resourceOptions = MTLResourceStorageModeManaged;
+    mtlDesc.resourceOptions = _hgi->GetCapabilities()->preferredStorageMode;
     mtlDesc.sampleCount = 1;
     if (dstTexDesc.type == HgiTextureType3D) {
         mtlDesc.depth = depth;
@@ -389,10 +389,12 @@ HgiMetalBlitCmds::CopyBufferGpuToCpu(HgiBufferGpuToCpuOp const& copyOp)
 
     _CreateEncoder();
 
+#if defined(ARCH_OS_OSX)
     if ([metalBuffer->GetBufferId() storageMode] == MTLStorageModeManaged) {
         [_blitEncoder performSelector:@selector(synchronizeResource:)
                            withObject:metalBuffer->GetBufferId()];
     }
+#endif // defined(ARCH_OS_OSX)
 
     // Offset into the dst buffer
     char* dst = ((char*) copyOp.cpuDestinationBuffer) +
@@ -470,13 +472,28 @@ _HgiTextureCanBeFiltered(HgiTextureDesc const &descriptor)
     return false;
 }
 
+static const std::set<MTLPixelFormat> unfilterableIosFormats =
+{
+        {MTLPixelFormatRGBA32Float}
+};
+
+bool
+IsFilterable(MTLPixelFormat format)
+{
+#if defined(ARCH_OS_IPHONE)
+    return unfilterableIosFormats.find(format) == unfilterableIosFormats.end();
+#else // !defined(ARCH_OS_IPHONE)
+    return true;
+#endif // defined(ARCH_OS_IPHONE)
+}
+
 void
 HgiMetalBlitCmds::GenerateMipMaps(HgiTextureHandle const& texture)
 {
     HgiMetalTexture* metalTex = static_cast<HgiMetalTexture*>(texture.Get());
 
     if (metalTex) {
-        if (_HgiTextureCanBeFiltered(metalTex->GetDescriptor())) {
+        if (_HgiTextureCanBeFiltered(metalTex->GetDescriptor()) && IsFilterable(metalTex->GetTextureId().pixelFormat)) {
             _CreateEncoder();
             [_blitEncoder generateMipmapsForTexture:metalTex->GetTextureId()];
         }
