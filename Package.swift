@@ -1194,6 +1194,7 @@ let package = Package(
         .define("HGI_EXPORTS", to: "1"),
         // enable when swift supports std.unique_ptr
         .define("SWIFT_HAS_UNIQUE_PTR", to: "0"),
+        .define("PXR_GL_SUPPORT_ENABLED", .when(platforms: Arch.OS.noembeddedapple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
@@ -1291,6 +1292,7 @@ let package = Package(
         .define("MFB_ALT_PACKAGE_NAME", to: "HgiInterop"),
         .define("MFB_PACKAGE_MODULE", to: "HgiInterop"),
         .define("HGIINTEROP_EXPORTS", to: "1"),
+        .define("PXR_GL_SUPPORT_ENABLED", .when(platforms: Arch.OS.noembeddedapple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.apple.platform)),
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),

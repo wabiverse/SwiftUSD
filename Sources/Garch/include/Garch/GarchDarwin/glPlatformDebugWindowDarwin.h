@@ -26,7 +26,7 @@
 
 #include "Arch/defines.h"
 
-#if defined(__APPLE__) && defined(ARCH_OS_OSX)
+#if defined(__APPLE__)
 
 #  include <pxr/pxrns.h>
 
