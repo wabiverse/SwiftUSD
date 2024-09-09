@@ -361,6 +361,8 @@ void HgiMetalBlitCmds::CopyBufferCpuToGpu(
         memcpy(dst + dstOffset, src, copyOp.byteSize);
     }
 
+#if defined(ARCH_OS_OSX)
+    // didModifyRange is unavailable for iOS and visionOS.
     if (!sharedBuffer &&
         [metalBuffer->GetBufferId()
              respondsToSelector:@selector(didModifyRange:)]) {
@@ -372,6 +374,7 @@ void HgiMetalBlitCmds::CopyBufferCpuToGpu(
         [resource didModifyRange:range];
         ARCH_PRAGMA_POP
     }
+#endif // defined(ARCH_OS_OSX)
 }
 
 void
