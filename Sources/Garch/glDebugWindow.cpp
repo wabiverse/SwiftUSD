@@ -10,14 +10,20 @@
 #include "Garch/glPlatformDebugContext.h"
 
 #if defined(ARCH_OS_LINUX)
-#  include "Garch/glPlatformDebugWindowGLX.h"
-#elif defined(ARCH_OS_DARWIN)
-#  include "Garch/glPlatformDebugWindowDarwin.h"
+#  include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
+#elif defined(ARCH_OS_DARWIN) && defined(ARCH_OS_OSX)
+#  include "Garch/GarchDarwin/glPlatformDebugWindowDarwin.h"
 #elif defined(ARCH_OS_WINDOWS)
-#  include "Garch/glPlatformDebugWindowWindows.h"
+#  include "Garch/GarchWindows/glPlatformDebugWindowWindows.h"
 #endif
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+#if defined(ARCH_OS_DARWIN) && !defined(ARCH_OS_OSX)
+
+/* nothing to implement for non-macOS darwin platforms. */
+
+#else
 
 GarchGLDebugWindow::GarchGLDebugWindow(const char *title, int width, int height)
     : _title(title), _width(width), _height(height)
@@ -75,5 +81,7 @@ void GarchGLDebugWindow::OnMouseRelease(int button, int x, int y, int modKeys) {
 
 /* virtual */
 void GarchGLDebugWindow::OnMouseMove(int x, int y, int modKeys) {}
+
+#endif
 
 PXR_NAMESPACE_CLOSE_SCOPE

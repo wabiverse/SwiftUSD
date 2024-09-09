@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/widgetShader.glslfx
+--- #import $TOOLS/HdSt/shaders/widgetShader.glslfx
 
 ---
 --- The fallback widget shader is used as a replacement shader if the

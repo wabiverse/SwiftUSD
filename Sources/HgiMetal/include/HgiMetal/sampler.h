@@ -11,9 +11,6 @@
 
 #include "HgiMetal/api.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HgiMetal;
@@ -35,7 +32,7 @@ class HgiMetalSampler final : public HgiSampler {
   uint64_t GetRawResource() const override;
 
   HGIMETAL_API
-  MTL::SamplerState* GetSamplerId() const;
+  id<MTLSamplerState> GetSamplerId() const;
 
  private:
   HgiMetalSampler() = delete;
@@ -43,8 +40,8 @@ class HgiMetalSampler final : public HgiSampler {
   HgiMetalSampler(const HgiMetalSampler &) = delete;
 
  private:
-  MTL::SamplerState* _samplerId;
-  NS::String *_label;
+  id<MTLSamplerState> _samplerId;
+  NSString *_label;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

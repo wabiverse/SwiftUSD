@@ -6,7 +6,7 @@
 //
 #if defined(__linux__)
 
-#include "Garch/glPlatformDebugWindowGLX.h"
+#include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
 #include "Garch/glDebugWindow.h"
 #include "Garch/glPlatformDebugContext.h"
 

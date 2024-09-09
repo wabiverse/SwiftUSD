@@ -30,17 +30,17 @@ class HgiMetalComputePipeline final : public HgiComputePipeline {
 
   /// Apply pipeline state
   HGIMETAL_API
-  void BindPipeline(MTL::ComputeCommandEncoder* computeEncoder);
+  void BindPipeline(id<MTLComputeCommandEncoder> computeEncoder);
 
   HGIMETAL_API
-  MTL::ComputePipelineState* GetMetalPipelineState();
+  id<MTLComputePipelineState> GetMetalPipelineState();
 
  private:
   HgiMetalComputePipeline() = delete;
   HgiMetalComputePipeline &operator=(const HgiMetalComputePipeline &) = delete;
   HgiMetalComputePipeline(const HgiMetalComputePipeline &) = delete;
 
-  MTL::ComputePipelineState* _computePipelineState;
+  id<MTLComputePipelineState> _computePipelineState;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

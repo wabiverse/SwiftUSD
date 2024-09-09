@@ -115,7 +115,7 @@ std::string HdSt_ShaderKey::GetGlslfxString() const
   ss << "-- glslfx version 0.1\n";
 
   if (!GetGlslfxFilename().IsEmpty())
-    ss << "#import $TOOLS/hdSt/shaders/" << GetGlslfxFilename().GetText() << "\n";
+    ss << "#import $TOOLS/HdSt/shaders/" << GetGlslfxFilename().GetText() << "\n";
 
   ss << "-- configuration\n"
      << "{\"techniques\": {\"default\": {\n";

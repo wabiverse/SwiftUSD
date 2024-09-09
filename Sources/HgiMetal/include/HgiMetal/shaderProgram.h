@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include <Metal/Metal.hpp>
+#include <Metal/Metal.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -26,7 +26,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HgiMetalShaderProgram final : public HgiShaderProgram {
  public:
   HGIMETAL_API
-  ~HgiMetalShaderProgram() noexcept override;
+  ~HgiMetalShaderProgram() override;
 
   HGIMETAL_API
   bool IsValid() const override;
@@ -44,31 +44,31 @@ class HgiMetalShaderProgram final : public HgiShaderProgram {
   uint64_t GetRawResource() const override;
 
   HGIMETAL_API
-  MTL::Function* GetVertexFunction() const
+  id<MTLFunction> GetVertexFunction() const
   {
     return _vertexFunction;
   }
 
   HGIMETAL_API
-  MTL::Function* GetFragmentFunction() const
+  id<MTLFunction> GetFragmentFunction() const
   {
     return _fragmentFunction;
   }
 
   HGIMETAL_API
-  MTL::Function* GetComputeFunction() const
+  id<MTLFunction> GetComputeFunction() const
   {
     return _computeFunction;
   }
 
   HGIMETAL_API
-  MTL::Function* GetPostTessVertexFunction() const
+  id<MTLFunction> GetPostTessVertexFunction() const
   {
     return _postTessVertexFunction;
   }
 
   HGIMETAL_API
-  MTL::Function* GetPostTessControlFunction() const
+  id<MTLFunction> GetPostTessControlFunction() const
   {
     return _postTessControlFunction;
   }
@@ -87,11 +87,11 @@ class HgiMetalShaderProgram final : public HgiShaderProgram {
  private:
   std::string _errors;
 
-  MTL::Function* _vertexFunction;
-  MTL::Function* _fragmentFunction;
-  MTL::Function* _computeFunction;
-  MTL::Function* _postTessVertexFunction;
-  MTL::Function* _postTessControlFunction;
+  id<MTLFunction> _vertexFunction;
+  id<MTLFunction> _fragmentFunction;
+  id<MTLFunction> _computeFunction;
+  id<MTLFunction> _postTessVertexFunction;
+  id<MTLFunction> _postTessControlFunction;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

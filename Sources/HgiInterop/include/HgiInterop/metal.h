@@ -11,9 +11,13 @@
 
 #include "Garch/glApi.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <OpenGL/OpenGL.hpp>
+#include <Metal/Metal.h>
+
+#if defined(ARCH_OS_IPHONE)
+#  include <GLKit/GLKit.h>
+#else // !defined(ARCH_OS_IPHONE)
+#  include <AppKit/AppKit.h>
+#endif // defined(ARCH_OS_IPHONE)
 
 #include "Gf/vec4i.h"
 #include "Hgi/texture.h"
@@ -86,28 +90,25 @@ class HgiInteropMetal final {
 
   HgiMetal *_hgiMetal;
 
-  MTL::Device* _device;
+  id<MTLDevice> _device;
 
-  MTL::Texture* _mtlAliasedColorTexture;
-  MTL::Texture* _mtlAliasedDepthRegularFloatTexture;
+  id<MTLTexture> _mtlAliasedColorTexture;
+  id<MTLTexture> _mtlAliasedDepthRegularFloatTexture;
 
-  MTL::Library* _defaultLibrary;
-  MTL::Function* _computeDepthCopyProgram;
-  MTL::Function* _computeColorCopyProgram;
-  MTL::ComputePipelineState* _computePipelineStateColor;
-  MTL::ComputePipelineState* _computePipelineStateDepth;
+  id<MTLLibrary> _defaultLibrary;
+  id<MTLFunction> _computeDepthCopyProgram;
+  id<MTLFunction> _computeColorCopyProgram;
+  id<MTLComputePipelineState> _computePipelineStateColor;
+  id<MTLComputePipelineState> _computePipelineStateDepth;
 
-#if 0
-  // wabi: Add these into the CXX Apple headers.
   CVPixelBufferRef _pixelBuffer;
   CVPixelBufferRef _depthBuffer;
-#endif
   uint32_t _glColorTexture;
   uint32_t _glDepthTexture;
 
   ShaderContext _shaderProgramContext[ShaderContextCount];
 
-  NSGL::OpenGLContext *_currentOpenGLContext;
+  NSOpenGLContext* _currentOpenGLContext;
 
   int32_t _restoreDrawFbo;
   int32_t _restoreVao;

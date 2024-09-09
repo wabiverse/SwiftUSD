@@ -4,6 +4,13 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
+
+// annoyingly, swift gets confused if cpp and objc are in the same
+// directory, and treats objc includes as cpp includes, which causes
+// a great deal of problems when trying to include for example Metal,
+// so we duplicate this file and compile only the mm one for all apple
+// platforms.
+#if !defined(__APPLE__)
 #include "HgiInterop/hgiInteropImpl.h"
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
@@ -98,3 +105,5 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // !defined(__APPLE__)

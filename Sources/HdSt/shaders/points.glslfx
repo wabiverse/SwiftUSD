@@ -8,11 +8,11 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/points.glslfx
+--- #import $TOOLS/HdSt/shaders/points.glslfx
 
-#import $TOOLS/hdSt/shaders/instancing.glslfx
-#import $TOOLS/hdSt/shaders/terminals.glslfx
-#import $TOOLS/hdSt/shaders/pointId.glslfx
+#import $TOOLS/HdSt/shaders/instancing.glslfx
+#import $TOOLS/HdSt/shaders/terminals.glslfx
+#import $TOOLS/HdSt/shaders/pointId.glslfx
 
 --- --------------------------------------------------------------------------
 -- layout Point.Vertex

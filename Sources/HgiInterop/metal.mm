@@ -1,61 +1,36 @@
 //
 // Copyright 2020 Pixar
 //
-// Licensed under the Apache License, Version 2.0 (the "Apache License")
-// with the following modification; you may not use this file except in
-// compliance with the Apache License and the following modification to it:
-// Section 6. Trademarks. is deleted and replaced with:
-//
-// 6. Trademarks. This License does not grant permission to use the trade
-//    names, trademarks, service marks, or product names of the Licensor
-//    and its affiliates, except as required to comply with Section 4(c) of
-//    the License and to reproduce the content of the NOTICE file.
-
-// You may obtain a copy of the Apache License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the Apache License with the above modification is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied. See the Apache License for the specific
-// language governing permissions and limitations under the Apache License.
+// Licensed under the terms set forth in the LICENSE.txt file available at
+// https://openusd.org/license.
 //
 
 #if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 
-#  include "Garch/glApi.h"
+#include "Garch/glApi.h"
 
-#  include "HgiInterop/metal.h"
+#include "HgiInterop/metal.h"
 
-#  include "HgiMetal/capabilities.h"
-#  include "HgiMetal/diagnostic.h"
-#  include "HgiMetal/hgi.h"
+#include "HgiMetal/capabilities.h"
+#include "HgiMetal/diagnostic.h"
+#include "HgiMetal/hgi.h"
 
-#  include "Tf/diagnostic.h"
-#  include "Vt/value.h"
-
-#  include <Foundation/Foundation.hpp>
-#  include <Metal/Metal.hpp>
-#  include <MetalFX/MetalFX.hpp>
-#  include <OpenGL/OpenGL.hpp>
-#  include <QuartzCore/QuartzCore.hpp>
+#include "Tf/diagnostic.h"
+#include "Vt/value.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-struct Vertex {
-  float position[2];
-  float uv[2];
-};
-}  // namespace
+    struct Vertex {
+        float position[2];
+        float uv[2];
+    };
+}
 
-static bool _ProcessGLErrors(bool silent = false)
+static bool
+_ProcessGLErrors(bool silent = false)
 {
-  bool foundError = false;
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
+    bool foundError = false;
     GLenum error;
     // Protect from doing infinite looping when glGetError
     // is called from an invalid context.
@@ -77,17 +52,15 @@ static bool _ProcessGLErrors(bool silent = false)
             TF_WARN("%s", errorMessage.str().c_str());
         }
     }
-#  endif  // 0
-
-  return foundError;
+    return foundError;
 }
 
-static GLuint _compileShader(GLchar const *const shaderSource, GLenum shaderType)
+static GLuint
+_compileShader(
+    GLchar const* const shaderSource, GLenum shaderType)
 {
-  GLint status;
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
+    GLint status;
+    
     // Determine if GLSL version 140 is supported by this context.
     //  We'll use this info to generate a GLSL shader source string
     //  with the proper version preprocessor string prepended
@@ -131,15 +104,11 @@ static GLuint _compileShader(GLchar const *const shaderSource, GLenum shaderType
     }
     
     return s;
-#  endif  // 0
-  return status;
 }
 
-static void _OutputShaderLog(GLuint program)
+static void
+_OutputShaderLog(GLuint program)
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     GLint maxLength = 2048;
     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
     if (maxLength)
@@ -152,17 +121,14 @@ static void _OutputShaderLog(GLuint program)
             "Failed to link GL program for Metal/GL interop:\n%s", errorLog);
         free(errorLog);
     }
-
-#  endif  // 0
 }
 
-void HgiInteropMetal::_CreateShaderContext(int32_t vertexSource,
-                                           int32_t fragmentSource,
-                                           ShaderContext &shader)
+void
+HgiInteropMetal::_CreateShaderContext(
+    int32_t vertexSource,
+    int32_t fragmentSource,
+    ShaderContext &shader) 
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     GLuint program;
     
     program = glCreateProgram();
@@ -223,23 +189,19 @@ void HgiInteropMetal::_CreateShaderContext(int32_t vertexSource,
 
     glBindVertexArray(0);
     glUseProgram(0);
-
-#  endif  // 0
 }
 
-HgiInteropMetal::HgiInteropMetal(Hgi *hgi) : _hgiMetal(nullptr)
+HgiInteropMetal::HgiInteropMetal(Hgi* hgi)
+    : _hgiMetal(nullptr)
 {
-  _hgiMetal = static_cast<HgiMetal *>(hgi);
-  _device = _hgiMetal->GetPrimaryDevice();
+    _hgiMetal = static_cast<HgiMetal*>(hgi);
+    _device = _hgiMetal->GetPrimaryDevice();
 
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
-    NS::Error *error = nil;
+    NSError *error = NULL;
     
     GarchGLApiLoad();
     
-    _currentOpenGLContext = NSGL::OpenGLContext::currentContext();
+    _currentOpenGLContext = [NSOpenGLContext currentContext];
     
     _ProcessGLErrors(true);
     _CaptureOpenGlState();
@@ -346,8 +308,8 @@ HgiInteropMetal::HgiInteropMetal(Hgi *hgi) : _hgiMetal(nullptr)
     error = NULL;
 
     // Load all the default shader files
-    NS::String *shaderSource = NS::String::string(
-        "#include <metal_stdlib>\n"
+    NSString *shaderSource =
+        @"#include <metal_stdlib>\n"
         "#include <simd/simd.h>\n"
         "\n"
         "using namespace metal;\n"
@@ -381,110 +343,94 @@ HgiInteropMetal::HgiInteropMetal(Hgi *hgi) : _hgiMetal(nullptr)
         "    if(gid.x >= texOut.get_width() || gid.y >= texOut.get_height())\n"
         "        return;\n"
         "    texOut.write(texIn.read(gid), gid);\n"
-        "}\n", NS::UTF8StringEncoding);
+        "}\n";
 
-    MTL::CompileOptions *options = MTL::CompileOptions::alloc()->init();
-    options->setFastMathEnabled(true);
+    MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
+    options.fastMathEnabled = YES;
         
-    _defaultLibrary = _device->newLibrary(shaderSource, options, &error);
+    _defaultLibrary = [_device newLibraryWithSource:shaderSource
+                                            options:options
+                                              error:&error];
     
     if (!_defaultLibrary) {
-        NS::String *errStr = error->localizedDescription();
+        NSString *errStr = [error localizedDescription];
         TF_FATAL_CODING_ERROR(
-          "Failed to create interop pipeline state: %s",
-          errStr->utf8String()
-        );
+            "Failed to create interop pipeline state: %s",
+            [errStr UTF8String]);
     }
     
     // Load the fragment program into the library
-    _computeDepthCopyProgram = _defaultLibrary->newFunction(NS::String::string("copyDepth", NS::UTF8StringEncoding));
-    _computeColorCopyProgram = _defaultLibrary->newFunction(NS::String::string("copyColour", NS::UTF8StringEncoding));
-    
-    options->release();
+    _computeDepthCopyProgram =
+        [_defaultLibrary newFunctionWithName:@"copyDepth"];
+    _computeColorCopyProgram =
+        [_defaultLibrary newFunctionWithName:@"copyColour"];
+
+#if !__has_feature(objc_arc)
+    [options release];
+#endif // !__has_feature(objc_arc)
     options = nil;
+
     
-    MTL::AutoreleasedComputePipelineReflection* reflData = 0;
+    MTLAutoreleasedComputePipelineReflection* reflData = 0;
     
-    MTL::ComputePipelineDescriptor *computePipelineStateDescriptor = MTL::ComputePipelineDescriptor::alloc()->init();
+    MTLComputePipelineDescriptor *computePipelineStateDescriptor =
+        [[MTLComputePipelineDescriptor alloc] init];
     
-    computePipelineStateDescriptor->setComputeFunction(_computeDepthCopyProgram);
+    computePipelineStateDescriptor.computeFunction = _computeDepthCopyProgram;
     HGIMETAL_DEBUG_LABEL(computePipelineStateDescriptor, "Interop depth blit");
     
     // Create a new Compute pipeline state object
-    _computePipelineStateDepth = _device->newComputePipelineState(computePipelineStateDescriptor, MTL::PipelineOptionNone, reflData, &error);
+    _computePipelineStateDepth = [_device
+        newComputePipelineStateWithDescriptor:computePipelineStateDescriptor
+                                      options:MTLPipelineOptionNone
+                                   reflection:reflData
+                                        error:&error];
 
     if (!_computePipelineStateDepth) {
-        NS::String *errStr = error->localizedDescription();
+        NSString *errStr = [error localizedDescription];
         TF_FATAL_CODING_ERROR(
-          "Failed to create compute pipeline state, error %s",
-          errStr->utf8String()
-        );
+            "Failed to create compute pipeline state, error %s",
+            [errStr UTF8String]);
     }
         
-    computePipelineStateDescriptor->setComputeFunction(_computeColorCopyProgram);
+    computePipelineStateDescriptor.computeFunction = _computeColorCopyProgram;
     HGIMETAL_DEBUG_LABEL(computePipelineStateDescriptor, "Interop color blit");
     
     // Create a new Compute pipeline state object
-    _computePipelineStateColor = _device->newComputePipelineState(computePipelineStateDescriptor, MTL::PipelineOptionNone, reflData, &error);
-    computePipelineStateDescriptor->release();
+    _computePipelineStateColor = [_device
+        newComputePipelineStateWithDescriptor:computePipelineStateDescriptor
+                                      options:MTLPipelineOptionNone
+                                   reflection:reflData
+                                        error:&error];
+#if !__has_feature(objc_arc)
+    [computePipelineStateDescriptor release];
+#endif // !__has_feature(objc_arc)
 
     if (!_computePipelineStateColor) {
-        NS::String *errStr = error->localizedDescription();
+        NSString *errStr = [error localizedDescription];
         TF_FATAL_CODING_ERROR(
-          "Failed to create compute pipeline state, error %s",
-          errStr->utf8String()
-        );
+            "Failed to create compute pipeline state, error %s",
+            [errStr UTF8String]);
     }
 
-    CVReturn cvret;
-
-    // Create the texture caches
-    cvret = CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, _device, nil, &_cvmtlTextureCache);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR("Failed to create a Metal texture cache for Metal/GL interop");
-    }
-
-    _cvmtlColorTexture = nil;
-    _cvmtlDepthTexture = nil;
-    
     _mtlAliasedColorTexture = nil;
     _mtlAliasedDepthRegularFloatTexture = nil;
+    _pixelBuffer = nil;
+    _depthBuffer = nil;
+    _glColorTexture = 0;
+    _glDepthTexture = 0;
     
-    CGLContextObj glctx = _currentOpenGLContext->CGLContextObj();
-    CGLPixelFormatObj glPixelFormat = NSGL::OpenGLContext::currentContext()->pixelFormat()->CGLPixelFormatObj();
-    cvret = CVOpenGLTextureCacheCreate(kCFAllocatorDefault, nil, (__bridge CGLContextObj _Nonnull)(glctx),
-                                       glPixelFormat, nil, &_cvglTextureCache);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR("Failed to create an OpenGL texture cache for Metal/GL interop");
-    }
-
     _SetAttachmentSize(256, 256);
-
-#  endif  // 0
 }
 
 HgiInteropMetal::~HgiInteropMetal()
 {
-  _FreeTransientTextureCacheRefs();
-
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-    if (_cvglTextureCache) {
-        CFRelease(_cvglTextureCache);
-        _cvglTextureCache = nil;
-    }
-    if (_cvmtlTextureCache) {
-        CFRelease(_cvmtlTextureCache);
-        _cvmtlTextureCache = nil;
-    }
-#  endif  // 0
+	_FreeTransientTextureCacheRefs();
 }
 
-void HgiInteropMetal::_FreeTransientTextureCacheRefs()
+void
+HgiInteropMetal::_FreeTransientTextureCacheRefs()
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     if (_glColorTexture) {
         glDeleteTextures(1, &_glColorTexture);
         _glColorTexture = 0;
@@ -495,78 +441,65 @@ void HgiInteropMetal::_FreeTransientTextureCacheRefs()
     }
     
     if (_mtlAliasedColorTexture) {
-        _mtlAliasedColorTexture->release();
+#if !__has_feature(objc_arc)
+        [_mtlAliasedColorTexture release];
+#endif // !__has_feature(objc_arc)
         _mtlAliasedColorTexture = nil;
     }
     if (_mtlAliasedDepthRegularFloatTexture) {
-        _mtlAliasedDepthRegularFloatTexture->release();
+#if !__has_feature(objc_arc)
+        [_mtlAliasedDepthRegularFloatTexture release];
+#endif // !__has_feature(objc_arc)
         _mtlAliasedDepthRegularFloatTexture = nil;
     }
 
-    _cvmtlColorTexture = nil;
-    _cvmtlDepthTexture = nil;
-
-    _cvglColorTexture = nil;
-    _cvglDepthTexture = nil;
-
-    if (_pixelBuffer) {
-        CFRelease(_pixelBuffer);
-        _pixelBuffer = nil;
-    }
-    if (_depthBuffer) {
-        CFRelease(_depthBuffer);
-        _depthBuffer = nil;
-    }
-
-#  endif  // 0
+    CVPixelBufferRelease(_pixelBuffer);
+    _pixelBuffer = nil;
+    CVPixelBufferRelease(_depthBuffer);
+    _depthBuffer = nil;
 }
 
-void HgiInteropMetal::_ValidateGLContext()
+void
+HgiInteropMetal::_ValidateGLContext()
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
-    if (_currentOpenGLContext != NSGL::OpenGLContext::currentContext()) {
+    if (_currentOpenGLContext != [NSOpenGLContext currentContext]) {
         TF_FATAL_CODING_ERROR(
-          "Current OpenGL context does not match that when HgiInteropMetal "
-          "was created"
-        );
+            "Current OpenGL context does not match that when HgiInteropMetal "
+            "was created");
     }
-
-#  endif  // 0
 }
 
-void HgiInteropMetal::_SetAttachmentSize(int width, int height)
+void
+HgiInteropMetal::_SetAttachmentSize(int width, int height)
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     if (_mtlAliasedColorTexture != nil) {
-        if (_mtlAliasedColorTexture->width() == width &&
-            _mtlAliasedColorTexture->height() == height) {
+        if (_mtlAliasedColorTexture.width == width &&
+            _mtlAliasedColorTexture.height == height) {
             return;
         }
     }
     
+    // Ensure previous buffers are currently not in use by the GPU
+    _hgiMetal->CommitPrimaryCommandBuffer(
+        HgiMetal::CommitCommandBuffer_WaitUntilCompleted);
+    
     _ValidateGLContext();
 
-    NS::Dictionary* cvBufferProperties = NS::Dictionary::dictionary(
-        (NS::String *)NS::Object::bridgingCast(kCVPixelBufferOpenGLCompatibilityKey) : (true),
-        (NS::String *)NS::Object::bridgingCast(kCVPixelBufferMetalCompatibilityKey) : (true),
-    );
+    NSDictionary* cvBufferProperties = @{
+        (__bridge NSString*)kCVPixelBufferOpenGLCompatibilityKey : @(TRUE),
+        (__bridge NSString*)kCVPixelBufferMetalCompatibilityKey : @(TRUE),
+    };
     
     _FreeTransientTextureCacheRefs();
-    
-    CVReturn cvret;
 
     // Create the IOSurface backed pixel buffers to hold the color and depth
-    // data in OpenGL
+    // data in OpenGL and Metal
     CVPixelBufferCreate(
         kCFAllocatorDefault,
         width,
         height,
         kCVPixelFormatType_64RGBAHalf,
-        NS::Object::bridgingCast(cvBufferProperties),
+        (__bridge CFDictionaryRef)cvBufferProperties,
         &_pixelBuffer);
     
     CVPixelBufferCreate(
@@ -574,93 +507,65 @@ void HgiInteropMetal::_SetAttachmentSize(int width, int height)
         width,
         height,
         kCVPixelFormatType_32BGRA,
-        NS::Object::bridgingCast(cvBufferProperties),
+        (__bridge CFDictionaryRef)cvBufferProperties,
         &_depthBuffer);
+
+    IOSurfaceRef pixelIOSurface = CVPixelBufferGetIOSurface(_pixelBuffer);
+    IOSurfaceRef depthIOSurface = CVPixelBufferGetIOSurface(_depthBuffer);
+
+    CGLContextObj glctx = [_currentOpenGLContext CGLContextObj];
     
-    // Create the OpenGL texture for the color buffer
-    cvret = CVOpenGLTextureCacheCreateTextureFromImage(
-        kCFAllocatorDefault,
-        _cvglTextureCache,
-        _pixelBuffer,
-        nil,
-        &_cvglColorTexture);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR(
-            "Failed to create the shared OpenGL color texture "
-            "for Metal/GL interop");
-    }
-    _glColorTexture = CVOpenGLTextureGetName(_cvglColorTexture);
+    // Create the GL texture for the color buffer
+    glGenTextures(1, &_glColorTexture);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _glColorTexture);
+    int err = CGLTexImageIOSurface2D(glctx, GL_TEXTURE_RECTANGLE,
+                                     GL_RGBA16F,
+                                     width, height,
+                                     GL_RGBA, GL_HALF_FLOAT,
+                                     pixelIOSurface, 0);
+
+    // Create the GL texture for the depth buffer
+    glGenTextures(1, &_glDepthTexture);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _glDepthTexture);
+    err |= CGLTexImageIOSurface2D(glctx, GL_TEXTURE_RECTANGLE,
+                                  GL_RGBA, /* Internal format */
+                                  width, height, /* width, height */
+                                  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
+                                  depthIOSurface, 0);
+
+    glBindTexture(GL_TEXTURE_RECTANGLE, 0);
     
-    // Create the OpenGL texture for the depth buffer
-    cvret = CVOpenGLTextureCacheCreateTextureFromImage(
-       kCFAllocatorDefault,
-       _cvglTextureCache,
-       _depthBuffer,
-       nil,
-       &_cvglDepthTexture);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR(
-            "Failed to create the shared OpenGL depth texture "
-            "for Metal/GL interop");
+    if (err != kCGLNoError) {
+        TF_CODING_ERROR(
+            "Failed to create OpenGL textures from IOSurfaces");
+        return;
     }
-    _glDepthTexture = CVOpenGLTextureGetName(_cvglDepthTexture);
     
-    // Create the metal texture for the color buffer
-    NS::Dictionary* metalTextureProperties = NS::Dictionary::dictionary(
-        (NS::String *)NS::Object::bridgingCast(kCVMetalTextureCacheMaximumTextureAgeKey) : 0,
-    );
-    cvret = CVMetalTextureCacheCreateTextureFromImage(
-        kCFAllocatorDefault,
-        _cvmtlTextureCache,
-        _pixelBuffer,
-        NS::Object::bridgingCast(metalTextureProperties),
-        MTL::PixelFormatRGBA16Float,
-        width,
-        height,
-        0,
-        &_cvmtlColorTexture);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR(
-            "Failed to create the shared Metal color texture "
-            "for Metal/GL interop");
-    }
-    _mtlAliasedColorTexture = CVMetalTextureGetTexture(_cvmtlColorTexture);
+    MTLTextureDescriptor *mtlDesc =
+        [MTLTextureDescriptor
+         texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA16Float
+                                      width:width
+                                     height:height
+                                  mipmapped:NO];
+    mtlDesc.usage = MTLTextureUsageShaderWrite;
+    
+    // Create the Metal texture for the color buffer
+    _mtlAliasedColorTexture =
+        [_device newTextureWithDescriptor:mtlDesc
+                                iosurface:pixelIOSurface
+                                    plane:0];
     
     // Create the Metal texture for the depth buffer
-    cvret = CVMetalTextureCacheCreateTextureFromImage(
-        kCFAllocatorDefault,
-        _cvmtlTextureCache,
-        _depthBuffer,
-        NS::Object::bridgingCast(metalTextureProperties),
-        MTL::PixelFormatBGRA8Unorm,
-        width,
-        height,
-        0,
-        &_cvmtlDepthTexture);
-    if (cvret != kCVReturnSuccess) {
-        TF_FATAL_CODING_ERROR(
-            "Failed to create the shared Metal depth texture "
-            "for Metal/GL interop");
-    }
+    mtlDesc.pixelFormat = MTLPixelFormatBGRA8Unorm;
     _mtlAliasedDepthRegularFloatTexture =
-        CVMetalTextureGetTexture(_cvmtlDepthTexture);
-
-    MTL::TextureDescriptor *depthTexDescriptor = MTL::TextureDescriptor::texture2DDescriptor(MTL::PixelFormatR32Float, width, height, false);
-    depthTexDescriptor->setUsage(MTL::TextureUsageShaderRead | MTL::TextureUsageShaderWrite);
-    depthTexDescriptor->setResourceOptions(MTL::ResourceCPUCacheModeDefaultCache | MTL::ResourceStorageModePrivate);
-    
-    // Flush the caches
-    CVOpenGLTextureCacheFlush(_cvglTextureCache, 0);
-    CVMetalTextureCacheFlush(_cvmtlTextureCache, 0);
-
-#  endif  // 0
+        [_device newTextureWithDescriptor:mtlDesc
+                                iosurface:depthIOSurface
+                                    plane:0];
 }
 
-void HgiInteropMetal::_CaptureOpenGlState()
+void
+HgiInteropMetal::_CaptureOpenGlState()
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &_restoreDrawFbo);
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &_restoreVao);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &_restoreVbo);
@@ -711,15 +616,11 @@ void HgiInteropMetal::_CaptureOpenGlState()
     }
     
     glGetIntegerv(GL_CURRENT_PROGRAM, &_restoreProgram);
-
-#  endif  // 0
 }
 
-void HgiInteropMetal::_RestoreOpenGlState()
+void
+HgiInteropMetal::_RestoreOpenGlState()
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     if (_restoreAlphaToCoverage) {
         glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     } else {
@@ -786,17 +687,13 @@ void HgiInteropMetal::_RestoreOpenGlState()
     glUseProgram(_restoreProgram);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _restoreDrawFbo);
-
-#  endif  // 0
 }
 
-void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
-                                    GfVec4i const &compRegion,
-                                    int shaderIndex)
+void
+HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
+                               GfVec4i const &compRegion,
+                               int shaderIndex)
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     // Clear GL error state
     _ProcessGLErrors(true);
 
@@ -807,7 +704,8 @@ void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
                               framebuffer.UncheckedGet<uint32_t>());
         } else {
-            TF_CODING_ERROR("dstFramebuffer must hold uint32_t when targeting OpenGL");
+            TF_CODING_ERROR(
+                "dstFramebuffer must hold uint32_t when targeting OpenGL");
         }
     }
     
@@ -861,8 +759,8 @@ void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
     }
 
     glUniform2f(shader.blitTexSizeUniform,
-                _mtlAliasedColorTexture->width(),
-                _mtlAliasedColorTexture->height());
+                _mtlAliasedColorTexture.width,
+                _mtlAliasedColorTexture.height);
     
     // Region of the framebuffer over which to composite.
     glViewport(compRegion[0], compRegion[1], compRegion[2], compRegion[3]);
@@ -871,18 +769,15 @@ void HgiInteropMetal::_BlitToOpenGL(VtValue const &framebuffer,
 
     _RestoreOpenGlState();
     glFlush();
-
-#  endif  // 0
 }
 
-void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
-                                         HgiTextureHandle const &depth,
-                                         VtValue const &framebuffer,
-                                         GfVec4i const &compRegion)
+void
+HgiInteropMetal::CompositeToInterop(
+    HgiTextureHandle const &color,
+    HgiTextureHandle const &depth,
+    VtValue const &framebuffer,
+    GfVec4i const &compRegion)
 {
-#  if 0
-    // XXX: Add these into the CXX Apple headers.
-
     if (!ARCH_UNLIKELY(color)) {
         TF_CODING_ERROR("No valid color texture provided");
         return;
@@ -902,23 +797,26 @@ void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
 
     _SetAttachmentSize(width, height);
 
-    MTL::Texture *colorTexture = nil;
-    MTL::Texture *depthTexture = nil;
+    id<MTLTexture> colorTexture = nil;
+    id<MTLTexture> depthTexture = nil;
     if (color) {
-        colorTexture = NS::Object::bridgingCast(color->GetRawResource());
+        colorTexture = ((__bridge id<MTLTexture>)reinterpret_cast<void *>(color->GetRawResource()));
     }
     if (depth) {
-        depthTexture = NS::Object::bridgingCast(depth->GetRawResource());
+        depthTexture = ((__bridge id<MTLTexture>)reinterpret_cast<void *>(depth->GetRawResource()));
     }
 
-    MTL::CommandBuffer *commandBuffer = _hgiMetal->GetPrimaryCommandBuffer();
+    id<MTLCommandBuffer> commandBuffer = _hgiMetal->GetPrimaryCommandBuffer();
     
-    MTL::ComputeCommandEncoder *computeEncoder = nil;
-    if (_hgiMetal->GetCapabilities()->IsSet(HgiDeviceCapabilitiesBitsConcurrentDispatch)) {
-        computeEncoder = commandBuffer->computeCommandEncoder(MTL::DispatchTypeConcurrent);
+    id<MTLComputeCommandEncoder> computeEncoder;
+    
+    if (_hgiMetal->GetCapabilities()->
+                        IsSet(HgiDeviceCapabilitiesBitsConcurrentDispatch)) {
+        computeEncoder = [commandBuffer
+         computeCommandEncoderWithDispatchType:MTLDispatchTypeConcurrent];
     }
     else {
-        computeEncoder = commandBuffer->computeCommandEncoder();
+        computeEncoder = [commandBuffer computeCommandEncoder];
     }
 
     int glShaderIndex = -1;
@@ -926,40 +824,54 @@ void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
     // Depth
     //
     if (depthTexture) {
-        NS::UInteger exeWidth = _computePipelineStateDepth->threadExecutionWidth();
-        NS::UInteger maxThreadsPerThreadgroup = _computePipelineStateDepth->maxTotalThreadsPerThreadgroup();
+        NSUInteger exeWidth = [_computePipelineStateDepth threadExecutionWidth];
+        NSUInteger maxThreadsPerThreadgroup =
+            [_computePipelineStateDepth maxTotalThreadsPerThreadgroup];
 
-        MTL::Size threadgroupCount = MTL::Size::Make(exeWidth, maxThreadsPerThreadgroup / exeWidth, 1);
-        MTL::Size threadsPerGrid   = MTL::Size::Make((_mtlAliasedDepthRegularFloatTexture->width() + (threadgroupCount.width - 1)) / threadgroupCount.width,
-                                                     (_mtlAliasedDepthRegularFloatTexture->height() + (threadgroupCount.height - 1)) / threadgroupCount.height,
-                                                     1);
+        MTLSize threadgroupCount = MTLSizeMake(exeWidth,
+            maxThreadsPerThreadgroup / exeWidth, 1);
+        MTLSize threadsPerGrid   = MTLSizeMake(
+            (_mtlAliasedDepthRegularFloatTexture.width +
+                (threadgroupCount.width - 1)) / threadgroupCount.width,
+            (_mtlAliasedDepthRegularFloatTexture.height +
+                (threadgroupCount.height - 1)) / threadgroupCount.height,
+            1);
 
-        computeEncoder->setComputePipelineState(_computePipelineStateDepth);
-        computeEncoder->setTexture(depthTexture, 0);
-        computeEncoder->setTexture(_mtlAliasedDepthRegularFloatTexture, 1);
-        computeEncoder->dispatchThreadgroups(threadsPerGrid, threadgroupCount);
+        [computeEncoder setComputePipelineState:_computePipelineStateDepth];
+        [computeEncoder setTexture:depthTexture atIndex:0];
+        [computeEncoder setTexture:_mtlAliasedDepthRegularFloatTexture
+                           atIndex:1];
+        
+        [computeEncoder dispatchThreadgroups:threadsPerGrid
+                       threadsPerThreadgroup:threadgroupCount];
     }
     
     //
     // Color
     //
     if (colorTexture) {
-        NS::UInteger exeWidth = _computePipelineStateColor->threadExecutionWidth();
-        NS::UInteger maxThreadsPerThreadgroup = _computePipelineStateColor->maxTotalThreadsPerThreadgroup();
+        NSUInteger exeWidth = [_computePipelineStateColor threadExecutionWidth];
+        NSUInteger maxThreadsPerThreadgroup =
+            [_computePipelineStateColor maxTotalThreadsPerThreadgroup];
 
-        MTL::Size threadgroupCount = MTL::Size::Make(exeWidth, maxThreadsPerThreadgroup / exeWidth, 1);
-        MTL::Size threadsPerGrid   = MTL::Size::Make(
-            (_mtlAliasedColorTexture->width() + (threadgroupCount.width - 1)) / threadgroupCount.width,
-            (_mtlAliasedColorTexture->height() + (threadgroupCount.height - 1)) / threadgroupCount.height,
-        );
+        MTLSize threadgroupCount = MTLSizeMake(exeWidth,
+            maxThreadsPerThreadgroup / exeWidth, 1);
+        MTLSize threadsPerGrid   = MTLSizeMake(
+            (_mtlAliasedColorTexture.width +
+                (threadgroupCount.width - 1)) / threadgroupCount.width,
+            (_mtlAliasedColorTexture.height +
+                (threadgroupCount.height - 1)) / threadgroupCount.height,
+            1);
 
-        computeEncoder->setComputePipelineState(_computePipelineStateColor);
-        computeEncoder->setTexture(colorTexture, 0);
-        computeEncoder->setTexture(_mtlAliasedColorTexture, 1);
-        computeEncoder->dispatchThreadgroups(threadsPerGrid, threadgroupCount);
+        [computeEncoder setComputePipelineState:_computePipelineStateColor];
+        [computeEncoder setTexture:colorTexture atIndex:0];
+        [computeEncoder setTexture:_mtlAliasedColorTexture atIndex:1];
+        
+        [computeEncoder dispatchThreadgroups:threadsPerGrid
+                       threadsPerThreadgroup:threadgroupCount];
     }
 
-    computeEncoder->endEncoding();
+    [computeEncoder endEncoding];
     
     if (depthTexture && colorTexture) {
         glShaderIndex = ShaderContextColorDepth;
@@ -970,15 +882,14 @@ void HgiInteropMetal::CompositeToInterop(HgiTextureHandle const &color,
 
     // We wait until the work is scheduled for execution so that future OpenGL
     // calls are guaranteed to happen after the Metal work encoded above
-    _hgiMetal->CommitPrimaryCommandBuffer(HgiMetal::CommitCommandBuffer_WaitUntilScheduled);
+    _hgiMetal->CommitPrimaryCommandBuffer(
+        HgiMetal::CommitCommandBuffer_WaitUntilScheduled);
 
     if (glShaderIndex != -1) {
         _BlitToOpenGL(framebuffer, compRegion, glShaderIndex);
 
         _ProcessGLErrors();
     }
-
-#  endif  // 0
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

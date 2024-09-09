@@ -8,7 +8,7 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/imageShader.glslfx
+--- #import $TOOLS/HdSt/shaders/imageShader.glslfx
 
 -- configuration
 {

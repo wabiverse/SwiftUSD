@@ -1,7 +1,7 @@
 -- glslfx version 0.1
 
 --- This is what an import might look like.
---- #import $TOOLS/hd/shaders/fallbackSurface.glslfx
+--- #import $TOOLS/Hd/shaders/fallbackSurface.glslfx
 
 -- configuration
 {

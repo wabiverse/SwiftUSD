@@ -8,9 +8,9 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/pointId.glslfx
+--- #import $TOOLS/HdSt/shaders/pointId.glslfx
 
-#import $TOOLS/hdx/shaders/selection.glslfx
+#import $TOOLS/Hdx/shaders/selection.glslfx
 
 --- --------------------------------------------------------------------------
 -- glsl PointId.Vertex.None

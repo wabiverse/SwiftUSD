@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <Metal/Metal.hpp>
+#include <Metal/Metal.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -76,10 +76,10 @@ class HgiMetalStepFunctions {
   void Bind(HgiVertexBufferBindingVector const &bindings);
 
   HGIMETAL_API
-  void SetVertexBufferOffsets(MTL::RenderCommandEncoder* encoder, uint32_t baseInstance);
+  void SetVertexBufferOffsets(id<MTLRenderCommandEncoder> encoder, uint32_t baseInstance);
 
   HGIMETAL_API
-  void SetPatchBaseOffsets(MTL::RenderCommandEncoder* encoder, uint32_t baseInstance);
+  void SetPatchBaseOffsets(id<MTLRenderCommandEncoder> encoder, uint32_t baseInstance);
 
   HGIMETAL_API
   HgiMetalStepFunctionDescVector const &GetPatchBaseDescs() const

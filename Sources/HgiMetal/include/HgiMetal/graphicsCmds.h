@@ -14,8 +14,7 @@
 #include "pxr/pxrns.h"
 #include <cstdint>
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
+#include <Metal/Metal.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -96,7 +95,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
   void EnableParallelEncoder(bool enable);
 
   // Needs to be accessible from the Metal IndirectCommandEncoder
-  MTL::RenderCommandEncoder* GetEncoder(uint32_t encoderIndex = 0);
+  id<MTLRenderCommandEncoder> GetEncoder(uint32_t encoderIndex = 0);
 
  protected:
   friend class HgiMetal;
@@ -114,7 +113,7 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
 
   uint32_t _GetNumEncoders();
   void _SetNumberParallelEncoders(uint32_t numEncoders);
-  void _SetCachedEncoderState(MTL::RenderCommandEncoder* encoder);
+  void _SetCachedEncoderState(id<MTLRenderCommandEncoder> encoder);
   mutable std::mutex _encoderLock;
 
   void _CreateArgumentBuffer();
@@ -126,25 +125,25 @@ class HgiMetalGraphicsCmds final : public HgiGraphicsCmds {
 
     void ResetCachedEncoderState();
 
-    MTL::Viewport viewport;
-    MTL::ScissorRect scissorRect;
+    MTLViewport viewport;
+    MTLScissorRect scissorRect;
 
     HgiMetalResourceBindings *resourceBindings;
     HgiMetalGraphicsPipeline *graphicsPipeline;
-    MTL::Buffer* argumentBuffer;
+    id<MTLBuffer> argumentBuffer;
     HgiVertexBufferBindingVector vertexBindings;
   } _CachedEncState;
 
   HgiMetal *_hgi;
-  MTL::RenderPassDescriptor *_renderPassDescriptor;
-  MTL::ParallelRenderCommandEncoder* _parallelEncoder;
-  std::vector<MTL::RenderCommandEncoder*> _encoders;
-  MTL::Buffer* _argumentBuffer;
+  MTLRenderPassDescriptor *_renderPassDescriptor;
+  id<MTLParallelRenderCommandEncoder> _parallelEncoder;
+  std::vector<id<MTLRenderCommandEncoder>> _encoders;
+  id<MTLBuffer> _argumentBuffer;
   HgiGraphicsCmdsDesc _descriptor;
   HgiPrimitiveType _primitiveType;
   uint32_t _primitiveIndexSize;
   uint32_t _drawBufferBindingIndex;
-  NS::String *_debugLabel;
+  NSString *_debugLabel;
   bool _viewportSet;
   bool _scissorRectSet;
   bool _enableParallelEncoder;

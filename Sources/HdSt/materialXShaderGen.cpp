@@ -133,7 +133,7 @@ void HdStMaterialXShaderGen<Base>::_EmitGlslfxHeader(mx::ShaderStage &mxStage) c
   Base::emitLineBreak(mxStage);
   Base::emitComment("File Generated with HdStMaterialXShaderGen.", mxStage);
   Base::emitLineBreak(mxStage);
-  Base::emitString("#import $TOOLS/hdSt/shaders/surfaceHelpers.glslfx\n", mxStage);
+  Base::emitString("#import $TOOLS/HdSt/shaders/surfaceHelpers.glslfx\n", mxStage);
   Base::emitLineBreak(mxStage);
   Base::emitString(R"(-- configuration)"
                    "\n"

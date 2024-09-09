@@ -11,7 +11,7 @@
 #include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
 
-#include <Metal/Metal.hpp>
+#include <Metal/Metal.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -62,16 +62,16 @@ class HgiMetalResourceBindings final : public HgiResourceBindings {
   /// Binds the resources to GPU.
   HGIMETAL_API
   void BindResources(HgiMetal *hgi,
-                     MTL::RenderCommandEncoder* renderEncoder,
-                     MTL::Buffer* argBuffer);
+                     id<MTLRenderCommandEncoder> renderEncoder,
+                     id<MTLBuffer> argBuffer);
 
   HGIMETAL_API
   void BindResources(HgiMetal *hgi,
-                     MTL::ComputeCommandEncoder* computeEncoder,
-                     MTL::Buffer* argBuffer);
+                     id<MTLComputeCommandEncoder> computeEncoder,
+                     id<MTLBuffer> argBuffer);
 
   HGIMETAL_API
-  static void SetConstantValues(MTL::Buffer* argumentBuffer,
+  static void SetConstantValues(id<MTLBuffer> argumentBuffer,
                                 HgiShaderStage stages,
                                 uint32_t bindIndex,
                                 uint32_t byteSize,

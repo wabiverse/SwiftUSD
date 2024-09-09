@@ -10,7 +10,8 @@
 #include "Hgi/capabilities.h"
 #include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
-#include <Metal/Metal.hpp>
+
+#include <Metal/Metal.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -30,7 +31,7 @@ class HgiMetalCapabilities final : public HgiCapabilities {
   HGIMETAL_API
   int GetShaderVersion() const override;
 
-  MTL::ResourceOptions defaultStorageMode;
+  MTLResourceOptions defaultStorageMode;
   bool hasVertexMemoryBarrier;
   bool useParallelEncoder;
   bool requiresIndirectDrawFix;
@@ -40,7 +41,7 @@ class HgiMetalCapabilities final : public HgiCapabilities {
   friend class HgiMetal;
 
   HGIMETAL_API
-  HgiMetalCapabilities(MTL::Device* device);
+  HgiMetalCapabilities(id<MTLDevice> device);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

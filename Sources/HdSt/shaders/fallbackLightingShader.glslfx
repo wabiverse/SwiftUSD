@@ -8,9 +8,9 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/fallbackLightingShader.glslfx
+--- #import $TOOLS/HdSt/shaders/fallbackLightingShader.glslfx
 
-#import $TOOLS/hdSt/shaders/fallbackLighting.glslfx
+#import $TOOLS/HdSt/shaders/fallbackLighting.glslfx
 
 -- configuration
 {

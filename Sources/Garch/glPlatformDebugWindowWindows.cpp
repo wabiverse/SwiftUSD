@@ -6,7 +6,7 @@
 //
 #if defined(_WIN32)
 
-#include "Garch/glPlatformDebugWindowWindows.h"
+#include "Garch/GarchWindows/glPlatformDebugWindowWindows.h"
 #include "Arch/defines.h"
 #include "Garch/glDebugWindow.h"
 #include "Tf/diagnostic.h"

@@ -7,14 +7,12 @@
 #ifndef PXR_IMAGING_HGI_METAL_PIPELINE_H
 #define PXR_IMAGING_HGI_METAL_PIPELINE_H
 
-#include "Hgi/graphicsCmdsDesc.h"
-#include "Hgi/graphicsPipeline.h"
 #include "pxr/pxrns.h"
 
-#include "HgiMetal/api.h"
+#include "Hgi/graphicsCmdsDesc.h"
+#include "Hgi/graphicsPipeline.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
+#include "HgiMetal/api.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -34,7 +32,7 @@ class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline {
 
   /// Apply pipeline state
   HGIMETAL_API
-  void BindPipeline(MTL::RenderCommandEncoder* renderEncoder);
+  void BindPipeline(id<MTLRenderCommandEncoder> renderEncoder);
 
  private:
   HgiMetalGraphicsPipeline() = delete;
@@ -45,10 +43,10 @@ class HgiMetalGraphicsPipeline final : public HgiGraphicsPipeline {
   void _CreateDepthStencilState(HgiMetal *hgi);
   void _CreateRenderPipelineState(HgiMetal *hgi);
 
-  MTL::VertexDescriptor *_vertexDescriptor;
-  MTL::DepthStencilState* _depthStencilState;
-  MTL::RenderPipelineState* _renderPipelineState;
-  MTL::Buffer* _constantTessFactors;
+  MTLVertexDescriptor *_vertexDescriptor;
+  id<MTLDepthStencilState> _depthStencilState;
+  id<MTLRenderPipelineState> _renderPipelineState;
+  id<MTLBuffer> _constantTessFactors;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

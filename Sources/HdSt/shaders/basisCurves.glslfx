@@ -8,12 +8,12 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/basisCurves.glslfx
+--- #import $TOOLS/HdSt/shaders/basisCurves.glslfx
 
-#import $TOOLS/hdSt/shaders/instancing.glslfx
-#import $TOOLS/hdSt/shaders/terminals.glslfx
-#import $TOOLS/hdSt/shaders/pointId.glslfx
-#import $TOOLS/hdSt/shaders/visibility.glslfx
+#import $TOOLS/HdSt/shaders/instancing.glslfx
+#import $TOOLS/HdSt/shaders/terminals.glslfx
+#import $TOOLS/HdSt/shaders/pointId.glslfx
+#import $TOOLS/HdSt/shaders/visibility.glslfx
 
 // Known issues:
 // * The direction of the 'v' post tessellation is inconsistent between 

@@ -6,7 +6,7 @@
 //
 #if defined(_WIN32)
 
-#include "Garch/glPlatformContextWindows.h"
+#include "Garch/GarchWindows/glPlatformContextWindows.h"
 #include "Tf/hash.h"
 
 #include <Windows.h>

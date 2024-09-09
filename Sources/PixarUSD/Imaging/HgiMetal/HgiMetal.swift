@@ -29,12 +29,12 @@
       Int(GetAPIVersion())
     }
 
-    private borrowing func GetPrimaryDeviceCopy() -> MTL.Device
+    private borrowing func GetPrimaryDeviceCopy() -> MTLDevice
     {
       GetPrimaryDevice()
     }
 
-    var device: MTL.Device
+    var device: MTLDevice
     {
       GetPrimaryDeviceCopy()
     }
@@ -47,7 +47,7 @@
       pointee.apiVersion
     }
 
-    var device: MTL.Device
+    var device: MTLDevice
     {
       pointee.device
     }

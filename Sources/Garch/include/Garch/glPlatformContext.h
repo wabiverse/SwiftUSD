@@ -17,15 +17,15 @@
 
 #if defined(ARCH_OS_LINUX)
 
-#  include "Garch/glPlatformContextGLX.h"
+#  include "Garch/GarchGLX/glPlatformContextGLX.h"
 
 #elif defined(ARCH_OS_DARWIN)
 
-#  include "Garch/glPlatformContextDarwin.h"
+#  include "Garch/GarchDarwin/glPlatformContextDarwin.h"
 
 #elif defined(ARCH_OS_WINDOWS)
 
-#  include "Garch/glPlatformContextWindows.h"
+#  include "Garch/GarchWindows/glPlatformContextWindows.h"
 
 #else
 

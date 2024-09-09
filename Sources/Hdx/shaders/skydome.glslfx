@@ -7,7 +7,7 @@
 // https://openusd.org/license.
 //
 
-#import $TOOLS/hdSt/shaders/surfaceHelpers.glslfx
+#import $TOOLS/HdSt/shaders/surfaceHelpers.glslfx
 
 -- configuration
 {

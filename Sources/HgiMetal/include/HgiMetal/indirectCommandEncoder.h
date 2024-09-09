@@ -12,8 +12,7 @@
 #include "HgiMetal/stepFunctions.h"
 #include "pxr/pxrns.h"
 
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
+#import <Metal/Metal.h>
 
 #include <map>
 #include <mutex>
@@ -68,9 +67,9 @@ class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
   HgiMetalIndirectCommandEncoder(const HgiMetalIndirectCommandEncoder &) = delete;
 
   struct FunctionState {
-    MTL::Function* function;
-    MTL::ComputePipelineState* pipelineState;
-    MTL::ArgumentEncoder* argumentEncoder;
+    id<MTLFunction> function;
+    id<MTLComputePipelineState> pipelineState;
+    id<MTLArgumentEncoder> argumentEncoder;
   };
 
   HGIMETAL_API
@@ -88,21 +87,21 @@ class HgiMetalIndirectCommandEncoder final : public HgiIndirectCommandEncoder {
                                            uint32_t patchBaseVertexByteOffset);
 
   HGIMETAL_API
-  MTL::IndirectCommandBuffer* _AllocateCommandBuffer(uint32_t drawCount);
+  id<MTLIndirectCommandBuffer> _AllocateCommandBuffer(uint32_t drawCount);
 
   HGIMETAL_API
-  MTL::Buffer* _AllocateArgumentBuffer(uint32_t encodedLength);
+  id<MTLBuffer> _AllocateArgumentBuffer(uint32_t encodedLength);
 
   HgiMetal *_hgi;
-  MTL::Device* _device;
-  MTL::Library* _library;
+  id<MTLDevice> _device;
+  id<MTLLibrary> _library;
   std::vector<FunctionState> _functions;
-  MTL::ResourceOptions _bufferStorageMode;
-  MTL::Buffer* _triangleTessFactors;
-  MTL::Buffer* _quadTessFactors;
+  MTLResourceOptions _bufferStorageMode;
+  id<MTLBuffer> _triangleTessFactors;
+  id<MTLBuffer> _quadTessFactors;
 
-  using FreeCommandBuffers = std::multimap<uint32_t, MTL::IndirectCommandBuffer*>;
-  using FreeArgumentBuffers = std::multimap<uint32_t, MTL::Buffer*>;
+  using FreeCommandBuffers = std::multimap<uint32_t, id<MTLIndirectCommandBuffer>>;
+  using FreeArgumentBuffers = std::multimap<uint32_t, id<MTLBuffer>>;
 
   std::mutex _poolMutex;
   FreeCommandBuffers _commandBufferPool;

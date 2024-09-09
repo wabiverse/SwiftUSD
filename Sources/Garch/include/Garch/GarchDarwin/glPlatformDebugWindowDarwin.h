@@ -24,7 +24,9 @@
 #ifndef PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_DARWIN_H
 #define PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_DARWIN_H
 
-#if defined(__APPLE__)
+#include "Arch/defines.h"
+
+#if defined(__APPLE__) && defined(ARCH_OS_OSX)
 
 #  include <pxr/pxrns.h>
 
@@ -48,6 +50,6 @@ class Garch_GLPlatformDebugWindow {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // defined(__APPLE__)
+#endif  // defined(__APPLE__) && defined(ARCH_OS_OSX)
 
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_DARWIN_H

@@ -8,16 +8,16 @@
 //
 
 --- This is what an import might look like.
---- #import $TOOLS/hdSt/shaders/mesh.glslfx
+--- #import $TOOLS/HdSt/shaders/mesh.glslfx
 
-#import $TOOLS/hdSt/shaders/instancing.glslfx
-#import $TOOLS/hdSt/shaders/meshFaceCull.glslfx
-#import $TOOLS/hdSt/shaders/meshNormal.glslfx
-#import $TOOLS/hdSt/shaders/meshWire.glslfx
-#import $TOOLS/hdSt/shaders/terminals.glslfx
-#import $TOOLS/hdSt/shaders/edgeId.glslfx
-#import $TOOLS/hdSt/shaders/pointId.glslfx
-#import $TOOLS/hdSt/shaders/visibility.glslfx
+#import $TOOLS/HdSt/shaders/instancing.glslfx
+#import $TOOLS/HdSt/shaders/meshFaceCull.glslfx
+#import $TOOLS/HdSt/shaders/meshNormal.glslfx
+#import $TOOLS/HdSt/shaders/meshWire.glslfx
+#import $TOOLS/HdSt/shaders/terminals.glslfx
+#import $TOOLS/HdSt/shaders/edgeId.glslfx
+#import $TOOLS/HdSt/shaders/pointId.glslfx
+#import $TOOLS/HdSt/shaders/visibility.glslfx
 
 --- --------------------------------------------------------------------------
 -- layout Mesh.Vertex
