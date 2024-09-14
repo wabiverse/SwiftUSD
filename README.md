@@ -49,7 +49,7 @@
   </a>
 </h4>
 
-<image align=top src="https://www.dropbox.com/scl/fi/cmqz171jkketkvpyojtbx/swiftyusd.png?rlkey=rosui4p7dv410eqvztmynhz56&raw=1">
+<image align=top src="https://github.com/user-attachments/assets/ad0a019c-17fd-422f-9145-b88aad3f9f06">
 
 > [!IMPORTANT]
 > #### Supporting SwiftUSD ❤️
