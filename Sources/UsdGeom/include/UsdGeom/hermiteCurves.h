@@ -207,8 +207,10 @@ class UsdGeomHermiteCurves : public UsdGeomCurves {
     ///
     /// If points and tangents are not the same size, an empty container
     /// is created.
-    PointAndTangentArrays(const VtVec3fArray &points, const VtVec3fArray &tangents)
-        : _points(points), _tangents(tangents)
+    explicit PointAndTangentArrays(const VtVec3fArray &points, 
+                                   const VtVec3fArray &tangents)
+      : _points(points), 
+        _tangents(tangents)
     {
       if (_points.size() != _tangents.size()) {
         TF_RUNTIME_ERROR("Points and tangents must be the same size.");
@@ -254,11 +256,11 @@ class UsdGeomHermiteCurves : public UsdGeomCurves {
       return _tangents;
     }
 
-    bool operator==(const PointAndTangentArrays &other)
+    bool operator==(const PointAndTangentArrays &other) const
     {
       return (GetPoints() == other.GetPoints()) && (GetTangents() == other.GetTangents());
     }
-    bool operator!=(const PointAndTangentArrays &other)
+    bool operator!=(const PointAndTangentArrays &other) const
     {
       return !((*this) == other);
     }

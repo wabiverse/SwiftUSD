@@ -43,10 +43,11 @@ UsdImagingDelegate::_HdPrimInfo *UsdImagingIndexProxy::_AddHdPrimInfo(
     }
   }
 
+  auto& adapterToInsertType = *(adapterToInsert.get());
   TF_DEBUG(USDIMAGING_CHANGES)
       .Msg("[Add HdPrim Info] <%s> adapter=%s\n",
            cachePath.GetText(),
-           TfType::GetCanonicalTypeName(typeid(*(adapterToInsert.get()))).c_str());
+           TfType::GetCanonicalTypeName(typeid(adapterToInsertType)).c_str());
 
   // Currently, we don't support more than one adapter dependency per usd
   // prim, but we could relax this restriction if it's useful.
@@ -250,10 +251,11 @@ void UsdImagingIndexProxy::InsertInstancer(SdfPath const &cachePath,
     primInfo->dirtyBits = HdChangeTracker::AllDirty;
     _delegate->_dirtyCachePaths.insert(cachePath);
 
+    auto& adapterType = (*adapter);
     TF_DEBUG(USDIMAGING_INSTANCER)
         .Msg("[Instancer Inserted] %s, adapter = %s\n",
              cachePath.GetText(),
-             adapter ? TfType::GetCanonicalTypeName(typeid(*adapter)).c_str() : "none");
+             adapter ? TfType::GetCanonicalTypeName(typeid(adapterType)).c_str() : "none");
 
     _AddTask(cachePath);
   }

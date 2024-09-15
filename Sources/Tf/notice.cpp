@@ -62,7 +62,8 @@ size_t TfNotice::_Send(const TfWeakBase *s,
 {
   // Look up the notice type using the static type_info.
   // This is faster than TfType::Find().
-  TfType noticeType = TfType::Find(typeid(*this));
+  auto& thisType = (*this);
+  TfType noticeType = TfType::Find(typeid(thisType));
 
   return Tf_NoticeRegistry::_GetInstance()._Send(*this, noticeType, s, senderUniqueId, senderType);
 }

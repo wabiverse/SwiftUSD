@@ -350,7 +350,7 @@ SdfPropertySpecHandle UsdPrimDefinition::_FindOrCreatePropertySpecForComposition
   // we create a new layer for this prim definition to write its composed
   // properties.
   if (_composedPropertyLayer) {
-    if (destProp = _composedPropertyLayer->GetPropertyAtPath(primPath.AppendProperty(propName))) {
+    if ((destProp = _composedPropertyLayer->GetPropertyAtPath(primPath.AppendProperty(propName)))) {
       return destProp;
     }
   }

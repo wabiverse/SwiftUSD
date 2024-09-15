@@ -187,7 +187,8 @@ std::string HdSceneIndexBase::GetDisplayName() const
     return _displayName;
   }
 
-  return ArchGetDemangled(typeid(*this).name());
+  auto& thisType = (*this);
+  return ArchGetDemangled(typeid(thisType).name());
 }
 
 void HdSceneIndexBase::SetDisplayName(const std::string &n)

@@ -79,9 +79,10 @@
 #  define ARCH_HAS_GNU_STL_EXTENSIONS
 #endif
 
-// The current version of Apple clang does not support the thread_local
-// keyword.
-#if !(defined(ARCH_OS_DARWIN) && defined(ARCH_COMPILER_CLANG))
+// The current version of Apple clang does not support the thread_local keyword.
+// WABI: always enabled thread_local, removed the all darwin platform disabling:
+// !(defined(ARCH_OS_DARWIN) && defined(ARCH_COMPILER_CLANG))
+#if 1
 #  define ARCH_HAS_THREAD_LOCAL
 #endif
 

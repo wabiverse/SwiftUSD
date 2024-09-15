@@ -73,7 +73,7 @@ class UsdImagingTetMeshAdapter : public UsdImagingGprimAdapter {
   void TrackVariability(UsdPrim const &prim,
                         SdfPath const &cachePath,
                         HdDirtyBits *timeVaryingBits,
-                        UsdImagingInstancerContext const *instancerContext = nullptr) const;
+                        UsdImagingInstancerContext const *instancerContext = nullptr) const override;
 
   // ---------------------------------------------------------------------- //
   /// \name Change Processing

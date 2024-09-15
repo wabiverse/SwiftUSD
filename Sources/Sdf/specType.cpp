@@ -185,8 +185,9 @@ static bool _CanCast(const Sdf_SpecTypeInfo &specTypeInfo,
 TfType Sdf_SpecType::Cast(const SdfSpec &from, const std::type_info &to)
 {
   const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
-
-  const TfType &schemaType = TfType::Find(typeid(from.GetSchema()));
+  
+  const auto& needle = from.GetSchema();
+  const TfType &schemaType = TfType::Find(typeid(needle));
   if (!TF_VERIFY(!schemaType.IsUnknown())) {
     return TfType();
   }
@@ -234,7 +235,8 @@ bool Sdf_SpecType::CanCast(const SdfSpec &from, const std::type_info &to)
   const SdfSpecType fromType = from.GetSpecType();
   const TfType &toType = TfType::Find(to);
 
-  const TfType &fromSchemaType = TfType::Find(typeid(from.GetSchema()));
+  const auto& needle = from.GetSchema();
+  const TfType &fromSchemaType = TfType::Find(typeid(needle));
 
   TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
 
