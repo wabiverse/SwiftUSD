@@ -34,7 +34,11 @@ import PixarUSD
       var device: MTLDevice!
 
       var stage: UsdStageRefPtr
-      var engine: UsdImagingGL.EngineSharedPtr
+
+      #if canImport(UsdImagingGL)
+        /// UsdImagingGL is not available on iOS.
+        var engine: UsdImagingGL.EngineSharedPtr
+      #endif // canImport(UsdImagingGL)
 
       public init(metalView: MTKView)
       {
@@ -43,13 +47,17 @@ import PixarUSD
         stage = Usd.Stage.createInMemory()
 
         let driver = HdDriver(name: .renderDriver, driver: hgi.value)
-        engine = UsdImagingGL.Engine.createEngine(
-          rootPath: stage.getPseudoRoot().getPath(),
-          excludedPaths: Sdf.PathVector(),
-          invisedPaths: Sdf.PathVector(),
-          sceneDelegateId: Sdf.Path.absoluteRootPath(),
-          driver: driver
-        )
+
+        #if canImport(UsdImagingGL)
+          // UsdImagingGL is not available on iOS.
+          engine = UsdImagingGL.Engine.createEngine(
+            rootPath: stage.getPseudoRoot().getPath(),
+            excludedPaths: Sdf.PathVector(),
+            invisedPaths: Sdf.PathVector(),
+            sceneDelegateId: Sdf.Path.absoluteRootPath(),
+            driver: driver
+          )
+        #endif // canImport(UsdImagingGL)
 
         metalView.device = hgi.device
       }
@@ -59,8 +67,11 @@ import PixarUSD
         self.init(metalView: MTKView())
         self.stage = stage
 
-        engine.setEnablePresentation(false)
-        engine.setRenderer(aov: .color)
+        #if canImport(UsdImagingGL)
+          // UsdImagingGL is not available on iOS.
+          engine.setEnablePresentation(false)
+          engine.setRenderer(aov: .color)
+        #endif // canImport(UsdImagingGL)
       }
 
       public func info()
