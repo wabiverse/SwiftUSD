@@ -251,11 +251,10 @@ void UsdImagingIndexProxy::InsertInstancer(SdfPath const &cachePath,
     primInfo->dirtyBits = HdChangeTracker::AllDirty;
     _delegate->_dirtyCachePaths.insert(cachePath);
 
-    auto& adapterType = (*adapter);
     TF_DEBUG(USDIMAGING_INSTANCER)
         .Msg("[Instancer Inserted] %s, adapter = %s\n",
              cachePath.GetText(),
-             adapter ? TfType::GetCanonicalTypeName(typeid(adapterType)).c_str() : "none");
+             adapter ? TfType::GetCanonicalTypeName(typeid(*adapter)).c_str() : "none");
 
     _AddTask(cachePath);
   }

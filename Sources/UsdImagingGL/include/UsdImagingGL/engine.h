@@ -65,6 +65,7 @@ TF_DECLARE_REF_PTRS(HdsiSceneGlobalsSceneIndex);
 TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 
 using UsdStageWeakPtr = TfWeakPtr<class UsdStage>;
+using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
 namespace UsdImagingGLEngine_Impl {
 using _AppSceneIndicesSharedPtr = std::shared_ptr<struct _AppSceneIndices>;

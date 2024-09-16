@@ -40,7 +40,7 @@ import PixarUSD
 struct UsdView: PixarApp
 {
   #if canImport(Metal) && !os(visionOS)
-    let hydra: HDMTLRenderer
+    let hydra: Hydra.MTLRenderer
   #endif /* canImport(Metal) && !os(visionOS) */
 
   public init()
@@ -65,7 +65,7 @@ struct UsdView: PixarApp
     #endif /* canImport(PyBundle) */
 
     #if canImport(Metal) && !os(visionOS)
-      hydra = HDMTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
+      hydra = Hydra.MTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
     #endif /* canImport(Metal) && !os(visionOS) */
 
     #if canImport(SwiftUI)
