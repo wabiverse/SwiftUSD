@@ -76,6 +76,11 @@ class HgiInterop final {
                      VtValue const &dstFramebuffer,
                      GfVec4i const &dstRegion);
 
+#if defined(ARCH_OS_DARWIN)
+  HGIINTEROP_API
+  static Hgi *GetHgiFromMetalDriver(VtValue const &hdDriver);
+#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+
  private:
   HgiInterop &operator=(const HgiInterop &) = delete;
   HgiInterop(const HgiInterop &) = delete;

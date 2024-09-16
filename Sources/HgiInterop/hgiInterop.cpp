@@ -104,6 +104,18 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
   TF_CODING_ERROR("Unsupported source Hgi backend: %s", srcApi.GetText());
 }
 
+#if defined(ARCH_OS_DARWIN)
+// static.
+Hgi* HgiInterop::GetHgiFromMetalDriver(VtValue const &hdDriver)
+{
+  if (hdDriver.IsHolding<HgiMetal *>()) {
+    return hdDriver.UncheckedGet<HgiMetal *>();
+  }
+
+  return nullptr;
+}
+#endif // defined(ARCH_OS_DARWIN)
+
 PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif // !defined(__APPLE__)

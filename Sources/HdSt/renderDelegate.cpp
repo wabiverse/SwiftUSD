@@ -37,6 +37,7 @@
 
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
+#include "HgiInterop/hgiInteropImpl.h"
 
 #include "Glf/diagnostic.h"
 #include "Hio/glslfx.h"
@@ -213,8 +214,12 @@ void HdStRenderDelegate::SetDrivers(HdDriverVector const &drivers)
       break;
     }
 #if defined(ARCH_OS_DARWIN)
-    if (GetHgiFromMetalDriver(hdDriver)) {
-      break;
+    if (hdDriver->name == HgiTokens->renderDriver) {
+      Hgi *hgiMetal = HgiInterop::GetHgiFromMetalDriver(hdDriver->driver);
+      if (hgiMetal) {
+        _hgi = hgiMetal;
+        break;
+      }
     }
 #endif
   }

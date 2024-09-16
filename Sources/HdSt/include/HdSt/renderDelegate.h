@@ -48,11 +48,6 @@ class HdStRenderDelegate final : public HdRenderDelegate {
   HDST_API
   void SetDrivers(HdDriverVector const &drivers) override;
 
-#if defined(ARCH_OS_DARWIN)
-  HDST_API
-  bool GetHgiFromMetalDriver(HdDriver *hdDriver);
-#endif // defined(ARCH_OS_DARWIN)
-
   HDST_API
   HdRenderParam *GetRenderParam() const override;
 
