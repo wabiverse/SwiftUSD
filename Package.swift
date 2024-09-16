@@ -1437,7 +1437,6 @@ let package = Package(
         .target(name: "Hd"),
         .target(name: "HdSi"),
         .target(name: "HgiGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
-        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         .target(name: "HgiInterop"),
         .target(name: "Sdr"),
         .target(name: "Arch"),
