@@ -10,6 +10,8 @@
 #ifndef PXR_USD_IMAGING_USD_IMAGING_GL_ENGINE_H
 #define PXR_USD_IMAGING_USD_IMAGING_GL_ENGINE_H
 
+#include "Arch/swiftInterop.h"
+
 #include "UsdImaging/version.h"
 #include "UsdImagingGL/api.h"
 #include "UsdImagingGL/version.h"
@@ -141,6 +143,32 @@ class UsdImagingGLEngine {
 
   USDIMAGINGGL_API
   ~UsdImagingGLEngine();
+
+  /// @}
+
+  // ---------------------------------------------------------------------
+  /// \name Swift Creation
+  /// @{
+  // ---------------------------------------------------------------------
+
+  USDIMAGINGGL_API
+  static UsdImagingGLEngineSharedPtr CreateEngine(const Parameters &params);
+
+  USDIMAGINGGL_API
+  static UsdImagingGLEngineSharedPtr CreateEngine(const HdDriver &driver = HdDriver(),
+                                                  const TfToken &rendererPluginId = TfToken(),
+                                                  bool gpuEnabled = true);
+
+  USDIMAGINGGL_API
+  static UsdImagingGLEngineSharedPtr CreateEngine(const SdfPath &rootPath,
+                                                  const SdfPathVector &excludedPaths,
+                                                  const SdfPathVector &invisedPaths = SdfPathVector(),
+                                                  const SdfPath &sceneDelegateID = SdfPath::AbsoluteRootPath(),
+                                                  const HdDriver &driver = HdDriver(),
+                                                  const TfToken &rendererPluginId = TfToken(),
+                                                  bool gpuEnabled = true,
+                                                  bool displayUnloadedPrimsWithBounds = false,
+                                                  bool allowAsynchronousSceneProcessing = false);
 
   /// @}
 
@@ -775,7 +803,7 @@ class UsdImagingGLEngine {
   std::unique_ptr<HdEngine> _engine;
 
   bool _allowAsynchronousSceneProcessing = false;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

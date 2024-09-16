@@ -39,6 +39,8 @@ import PixarUSD
 @main
 struct UsdView: PixarApp
 {
+  let stage: UsdStageRefPtr
+
   #if canImport(Metal) && !os(visionOS)
     let hydra: Hydra.MTLRenderer
   #endif /* canImport(Metal) && !os(visionOS) */
@@ -64,8 +66,10 @@ struct UsdView: PixarApp
       PyBundler.shared.pyInfo()
     #endif /* canImport(PyBundle) */
 
+    stage = Usd.Stage.createNew("\(documentsDirPath())/HelloPixarUSD", ext: .usda)
+
     #if canImport(Metal) && !os(visionOS)
-      hydra = Hydra.MTLRenderer(device: MTLCreateSystemDefaultDevice()!)!
+      hydra = Hydra.MTLRenderer(stage: stage)
     #endif /* canImport(Metal) && !os(visionOS) */
 
     #if canImport(SwiftUI)
@@ -108,8 +112,6 @@ struct UsdView: PixarApp
     /* ----- Imperative api example. ----- */
 
     /* Create stage with a sphere, capsule, cylinder, cube, and cone on a transform. */
-
-    let stage = Usd.Stage.createNew("\(documentsDirPath())/HelloPixarUSD", ext: .usda)
 
     let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
     xform.addXformOp(type: .translate).set(GfVec3d(0.0, 5.0, 0.0))

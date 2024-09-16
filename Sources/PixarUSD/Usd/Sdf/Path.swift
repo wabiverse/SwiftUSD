@@ -28,6 +28,21 @@ public extension Sdf.Path
     self.init(std.string(path))
   }
 
+  static func emptyPath() -> Sdf.Path
+  {
+    Sdf.Path.EmptyPath().pointee
+  }
+
+  static func absoluteRootPath() -> Sdf.Path
+  {
+    Sdf.Path.AbsoluteRootPath().pointee
+  }
+
+  static func reflexiveRelativePath() -> Sdf.Path
+  {
+    Sdf.Path.ReflexiveRelativePath().pointee
+  }
+
   private borrowing func GetNameCopy() -> std.string
   {
     __GetNameUnsafe().pointee

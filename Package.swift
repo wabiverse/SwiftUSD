@@ -194,6 +194,10 @@ let package = Package(
       targets: ["HdSt"]
     ),
     .library(
+      name: "HdStorm",
+      targets: ["HdStorm"]
+    ),
+    .library(
       name: "Hdx",
       targets: ["Hdx"]
     ),
@@ -1209,6 +1213,7 @@ let package = Package(
         .target(name: "Tf"),
         .target(name: "Trace"),
         .target(name: "Hgi"),
+        .target(name: "Vt"),
       ],
       resources: [
         .process("Resources")
@@ -1432,6 +1437,7 @@ let package = Package(
         .target(name: "Hd"),
         .target(name: "HdSi"),
         .target(name: "HgiGL", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
+        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),
         .target(name: "HgiInterop"),
         .target(name: "Sdr"),
         .target(name: "Arch"),
@@ -1450,6 +1456,30 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HdSt"),
         .define("HDST_EXPORTS", to: "1"),
         .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+      ]
+    ),
+
+    .target(
+      name: "HdStorm",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Plug"),
+        .target(name: "Trace"),
+        .target(name: "Vt"),
+        .target(name: "Work"),
+        .target(name: "Hd"),
+        .target(name: "HdSt", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
+      ],
+      resources: [
+        .process("Resources")
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "HdStorm"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "HdStorm"),
+        .define("MFB_PACKAGE_MODULE", to: "HdStorm"),
+        .define("HDSTORM_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
       ]
     ),
@@ -1742,6 +1772,7 @@ let package = Package(
         .target(name: "HdMtlx"),
         .target(name: "HdSi"),
         .target(name: "HdSt", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
+        .target(name: "HdStorm", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "Hdx", condition: .when(platforms: Arch.OS.noembeddedapple.platform)),
         .target(name: "Hgi"),
         .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform)),

@@ -31,26 +31,36 @@ import PixarUSD
     class MTLRenderer: NSObject, MTKViewDelegate
     {
       let hgi: Pixar.HgiMetalPtr
-      // let engine: UsdImagingGLEngineSharedPtr
-      // let stage: UsdStageRefPtr
+      var device: MTLDevice!
 
-      public init?(device _: MTLDevice)
+      var stage: UsdStageRefPtr
+      var engine: UsdImagingGL.EngineSharedPtr
+
+      public init(metalView: MTKView)
       {
         hgi = HgiMetal.createHgi()
+        device = hgi.device
+        stage = Usd.Stage.createInMemory()
 
-        // let excludedPaths = SdfPathVector()
-        let driver = HdDriver(name: .renderDriver, driver: VtValue(hgi))
+        let driver = HdDriver(name: .renderDriver, driver: hgi.value)
+        engine = UsdImagingGL.Engine.createEngine(
+          rootPath: stage.getPseudoRoot().getPath(),
+          excludedPaths: Sdf.PathVector(),
+          invisedPaths: Sdf.PathVector(),
+          sceneDelegateId: Sdf.Path.absoluteRootPath(),
+          driver: driver
+        )
 
-        // engine.reset(UsdImagingGLEngineSharedPtr(
-        //   stage.getPseudoRoot().getPath(),
-        //   excludedPaths,
-        //   SdfPathVector(),
-        //   SdfPath.AbsoluteRootPath(),
-        //   driver
-        // ))
+        metalView.device = hgi.device
+      }
 
-        // engine.SetEnablePresentation(false)
-        // engine.SetRendererAov(false)
+      public convenience init(stage: UsdStageRefPtr)
+      {
+        self.init(metalView: MTKView())
+        self.stage = stage
+
+        engine.setEnablePresentation(false)
+        engine.setRenderer(aov: .color)
       }
 
       public func info()

@@ -212,6 +212,11 @@ void HdStRenderDelegate::SetDrivers(HdDriverVector const &drivers)
       _hgi = hdDriver->driver.UncheckedGet<Hgi *>();
       break;
     }
+#if defined(ARCH_OS_DARWIN)
+    if (GetHgiFromMetalDriver(hdDriver)) {
+      break;
+    }
+#endif
   }
 
   TF_VERIFY(_hgi, "HdSt requires Hgi HdDriver");

@@ -183,6 +183,56 @@ UsdImagingGLEngine::UsdImagingGLEngine(const SdfPath &rootPath,
   }
 }
 
+// static.
+UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const Parameters &params)
+{
+  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+
+  engine.reset(new UsdImagingGLEngine(params));
+
+  return engine;
+}
+
+// static.
+UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const HdDriver &driver,
+                                                             const TfToken &rendererPluginId,
+                                                             const bool gpuEnabled)
+{
+  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+
+  engine.reset(new UsdImagingGLEngine(driver, rendererPluginId, gpuEnabled));
+
+  return engine;
+}
+
+// static.
+UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const SdfPath &rootPath,
+                                                             const SdfPathVector &excludedPaths,
+                                                             const SdfPathVector &invisedPaths,
+                                                             const SdfPath &sceneDelegateID,
+                                                             const HdDriver &driver,
+                                                             const TfToken &rendererPluginId,
+                                                             const bool gpuEnabled,
+                                                             const bool displayUnloadedPrimsWithBounds,
+                                                             const bool allowAsynchronousSceneProcessing)
+{
+  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+
+  engine.reset(new UsdImagingGLEngine(
+    rootPath,
+    excludedPaths,
+    invisedPaths,
+    sceneDelegateID,
+    driver,
+    rendererPluginId,
+    gpuEnabled,
+    displayUnloadedPrimsWithBounds,
+    allowAsynchronousSceneProcessing
+  ));
+
+  return engine;
+}
+
 void UsdImagingGLEngine::_DestroyHydraObjects()
 {
   // Destroy objects in opposite order of construction.

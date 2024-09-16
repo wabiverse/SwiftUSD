@@ -10,9 +10,13 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(UsdImagingGLEngine)
-  import UsdImagingGLEngine
+import CxxStdlib
+import Foundation
+import Sdf
 
-  public enum UsdImagingGLEngine
-  {}
-#endif // canImport(UsdImagingGLEngine)
+public typealias SdfPathVector = Pixar.SdfPathVector
+
+public extension Sdf
+{
+  typealias PathVector = SdfPathVector
+}

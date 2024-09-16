@@ -38,6 +38,11 @@
     {
       GetPrimaryDeviceCopy()
     }
+
+    func getValue(_ ptr: Pixar.HgiMetalPtr) -> VtValue
+    {
+      GetValue(ptr)
+    }
   }
 
   public extension Pixar.HgiMetalPtr
@@ -50,6 +55,11 @@
     var device: MTLDevice
     {
       pointee.device
+    }
+
+    var value: VtValue
+    {
+      pointee.getValue(self)
     }
   }
 #endif /* canImport(Metal) */

@@ -14,6 +14,7 @@
 #include "HgiMetal/api.h"
 #include "HgiMetal/capabilities.h"
 #include "HgiMetal/indirectCommandEncoder.h"
+#include "Vt/value.h"
 #include "pxr/pxrns.h"
 
 #import <Metal/Metal.h>
@@ -45,6 +46,9 @@ class HgiMetal final : public Hgi {
 
   HGIMETAL_API
   static HgiMetalPtr CreateHgi();
+
+  HGIMETAL_API
+  VtValue GetValue(HgiMetalPtr ptr) const;
 
   HGIMETAL_API
   bool IsBackendSupported() const override;

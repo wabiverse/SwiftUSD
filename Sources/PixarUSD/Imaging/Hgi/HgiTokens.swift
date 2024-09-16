@@ -38,13 +38,21 @@ public extension Hgi
    * the static ``Hgi`` tokens. */
   enum Tokens: CaseIterable
   {
+    case taskDriver
     case renderDriver
+    case openGL
+    case metal
+    case vulkan
 
     public var token: Tf.Token
     {
       switch self
       {
+        case .taskDriver: StaticData.shared.tokens.taskDriver
         case .renderDriver: StaticData.shared.tokens.renderDriver
+        case .openGL: StaticData.shared.tokens.OpenGL
+        case .metal: StaticData.shared.tokens.Metal
+        case .vulkan: StaticData.shared.tokens.Vulkan
       }
     }
   }

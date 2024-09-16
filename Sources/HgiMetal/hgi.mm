@@ -168,6 +168,11 @@ HgiMetalPtr HgiMetal::CreateHgi()
   return hgi;
 }
 
+VtValue HgiMetal::GetValue(HgiMetalPtr ptr) const
+{
+  return VtValue(ptr.get());
+}
+
 bool
 HgiMetal::IsBackendSupported() const
 {

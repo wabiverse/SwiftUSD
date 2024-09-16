@@ -163,6 +163,10 @@ public extension Bundle
   static let hdSt = Bundle(path: "\(pxrRoot)/SwiftUSD_HdSt\(ext)")
 
   /**
+   * Where ``HdStorm`` application bundle resources are located. */
+  static let hdStorm = Bundle(path: "\(pxrRoot)/SwiftUSD_HdStorm\(ext)")
+
+  /**
    * Where ``Hdx`` application bundle resources are located. */
   static let hdx = Bundle(path: "\(pxrRoot)/SwiftUSD_Hdx\(ext)")
 
@@ -441,6 +445,7 @@ public enum BundleFramework: CaseIterable
   case hgiVulkan
   case hgiGL
   case hdSt
+  case hdStorm
   case hdx
   case hio
   case glf
@@ -477,6 +482,7 @@ public enum BundleFramework: CaseIterable
       case .hgiVulkan: Bundle.hgiVulkan?.resourcePath
       case .hgiGL: Bundle.hgiGL?.resourcePath
       case .hdSt: Bundle.hdSt?.resourcePath
+      case .hdStorm: Bundle.hdStorm?.resourcePath
       case .hdx: Bundle.hdx?.resourcePath
       case .hio: Bundle.hio?.resourcePath
       case .glf: Bundle.glf?.resourcePath

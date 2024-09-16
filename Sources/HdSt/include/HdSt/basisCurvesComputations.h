@@ -240,7 +240,7 @@ class HdSt_BasisCurvesPrimvarInterpolaterComputation : public HdComputedBufferSo
           << "(need " << numVertsExpected << ", got " << authoredSize << "), using fallback value "
           << _fallbackValue << " for rendering.";
 
-        TF_WARN(s.str());
+        TF_WARN("%s", s.str().c_str());
       }
     }
     else if (_interpolation == HdInterpolationVarying) {
@@ -277,7 +277,7 @@ class HdSt_BasisCurvesPrimvarInterpolaterComputation : public HdComputedBufferSo
           << "(need " << numVaryingExpected << ", got " << authoredSize
           << "), using fallback value " << _fallbackValue << " for rendering.";
 
-        TF_WARN(s.str());
+        TF_WARN("%s", s.str().c_str());
       }
     }
 

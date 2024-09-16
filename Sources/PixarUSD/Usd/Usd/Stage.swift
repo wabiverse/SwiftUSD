@@ -171,13 +171,64 @@ public extension Usd.Stage
   }
 
   /**
+   * Creates a new stage only in memory, analogous to creating an anonymous
+   * ``Pixar/Sdf/Layer``.
+   *
+   * If `pathResolverContext` is provided it will be bound when creating the
+   * root layer at `identifier` and whenever asset path resolution is done
+   * for this stage, regardless of what other context may be bound at that
+   * time. Otherwise Usd will create the root layer with no context bound,
+   * then create a context for all future asset path resolution for the stage
+   * by calling ``ArResolver/createDefaultContext``.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. see ``InitialLoadingSet`` for more
+   * options.
+   *
+   * Invoking an overload that does not take a `sessionLayer` argument will
+   * create a stage with an anonymous in-memory session layer.  To create a
+   * stage without a session layer, pass `Tf/NullPtr` (or None in python) as
+   * the `sessionLayer` argument. */
+  @discardableResult
+  static func createInMemory(load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  {
+    Usd.Stage.CreateInMemory(load.rawValue)
+  }
+
+  /**
+   * Creates a new stage only in memory, analogous to creating an anonymous
+   * ``Pixar/Sdf/Layer``.
+   *
+   * If `pathResolverContext` is provided it will be bound when creating the
+   * root layer at `identifier` and whenever asset path resolution is done
+   * for this stage, regardless of what other context may be bound at that
+   * time. Otherwise Usd will create the root layer with no context bound,
+   * then create a context for all future asset path resolution for the stage
+   * by calling ``ArResolver/createDefaultContext``.
+   *
+   * The initial set of prims to load on the stage can be specified
+   * using the `load` parameter. see ``InitialLoadingSet`` for more
+   * options.
+   *
+   * Invoking an overload that does not take a `sessionLayer` argument will
+   * create a stage with an anonymous in-memory session layer.  To create a
+   * stage without a session layer, pass `Tf/NullPtr` (or None in python) as
+   * the `sessionLayer` argument. */
+  @discardableResult
+  static func createInMemory(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  {
+    Usd.Stage.CreateInMemory(std.string(identifier), load.rawValue)
+  }
+
+  /**
    * Attempt to find a matching existing stage in a cache if
    * ``UsdStageCacheContext`` objects exist on the stack. Failing that, create
    * a new stage and recursively compose prims defined within and referenced by
    * the layer at `filePath`, which must already exist.
    *
    * The initial set of prims to load on the stage can be specified
-   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   * using the `load` parameter. see ``InitialLoadingSet`` for more
+   * options.
    *
    * If `pathResolverContext` is provided it will be bound when opening the
    * root layer at `filePath` and whenever asset path resolution is done for
@@ -199,7 +250,8 @@ public extension Usd.Stage
    * the layer at `filePath`, which must already exist.
    *
    * The initial set of prims to load on the stage can be specified
-   * using the `load` parameter. ``UsdStage.InitialLoadingSet``.
+   * using the `load` parameter. see ``InitialLoadingSet`` for more
+   * options.
    *
    * If `pathResolverContext` is provided it will be bound when opening the
    * root layer at `filePath` and whenever asset path resolution is done for
