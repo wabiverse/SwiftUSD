@@ -304,8 +304,8 @@ GfFrustum GfCamera::GetFrustum() const
   const GfRange1d clippingRange(_clippingRange.GetMin(), _clippingRange.GetMax());
 
   const GfFrustum::ProjectionType projection = _projection == Orthographic ?
-                                                   GfFrustum::Orthographic :
-                                                   GfFrustum::Perspective;
+                                                   GfFrustum::ProjectionType::ProjectionTypeOrthographic :
+                                                   GfFrustum::ProjectionType::ProjectionTypePerspective;
 
   return GfFrustum(_transform, window, clippingRange, projection);
 }

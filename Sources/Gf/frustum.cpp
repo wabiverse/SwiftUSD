@@ -33,8 +33,8 @@ TF_REGISTRY_FUNCTION(TfType)
 
 TF_REGISTRY_FUNCTION(TfEnum)
 {
-  TF_ADD_ENUM_NAME(GfFrustum::Orthographic);
-  TF_ADD_ENUM_NAME(GfFrustum::Perspective);
+  TF_ADD_ENUM_NAME(GfFrustum::ProjectionType::ProjectionTypeOrthographic);
+  TF_ADD_ENUM_NAME(GfFrustum::ProjectionType::ProjectionTypePerspective);
 }
 
 GfFrustum::GfFrustum()
@@ -42,7 +42,7 @@ GfFrustum::GfFrustum()
       _window(GfVec2d(-1.0, -1.0), GfVec2d(1.0, 1.0)),
       _nearFar(1.0, 10.0),
       _viewDistance(5.0),
-      _projectionType(GfFrustum::Perspective),
+      _projectionType(GfFrustum::ProjectionType::ProjectionTypePerspective),
       _planes(nullptr)
 {
   _rotation.SetIdentity();
@@ -97,7 +97,7 @@ void GfFrustum::SetPerspective(double fieldOfView,
                                double nearDistance,
                                double farDistance)
 {
-  _projectionType = GfFrustum::Perspective;
+  _projectionType = GfFrustum::ProjectionType::ProjectionTypePerspective;
 
   double yDist = 1.0;
   double xDist = 1.0;
@@ -142,7 +142,7 @@ bool GfFrustum::GetPerspective(bool isFovVertical,
                                double *nearDistance,
                                double *farDistance) const
 {
-  if (_projectionType != GfFrustum::Perspective)
+  if (_projectionType != GfFrustum::ProjectionType::ProjectionTypePerspective)
     return false;
 
   GfVec2d winSize = _window.GetSize();
@@ -165,7 +165,7 @@ double GfFrustum::GetFOV(bool isFovVertical /* = false */)
 {
   double result = 0.0;
 
-  if (GetProjectionType() == GfFrustum::Perspective) {
+  if (GetProjectionType() == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     double aspectRatio;
     double nearDistance;
     double farDistance;
@@ -179,7 +179,7 @@ double GfFrustum::GetFOV(bool isFovVertical /* = false */)
 void GfFrustum::SetOrthographic(
     double left, double right, double bottom, double top, double nearPlane, double farPlane)
 {
-  _projectionType = GfFrustum::Orthographic;
+  _projectionType = GfFrustum::ProjectionType::ProjectionTypeOrthographic;
 
   _window.SetMin(GfVec2d(left, bottom));
   _window.SetMax(GfVec2d(right, top));
@@ -196,7 +196,7 @@ bool GfFrustum::GetOrthographic(double *left,
                                 double *nearPlane,
                                 double *farPlane) const
 {
-  if (_projectionType != GfFrustum::Orthographic)
+  if (_projectionType != GfFrustum::ProjectionType::ProjectionTypeOrthographic)
     return false;
 
   *left = _window.GetMin()[0];
@@ -218,7 +218,7 @@ void GfFrustum::FitToSphere(const GfVec3d &center, double radius, double slack)
   // and top) coordinates of the frustum as necessary.
   //
 
-  if (_projectionType == GfFrustum::Orthographic) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypeOrthographic) {
     // Set the distance so the viewpoint is outside the sphere.
     _viewDistance = radius + slack;
     // Set the camera window to enclose the sphere.
@@ -454,7 +454,7 @@ GfFrustum &GfFrustum::Transform(const GfMatrix4d &matrix)
   // y coordinates can be directly used to construct the new
   // transformed reference plane.  Skip the scaling step for an
   // orthographic projection, though.
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     leftBottom /= scale;
     rightTop /= scale;
   }
@@ -534,7 +534,7 @@ GfMatrix4d GfFrustum::ComputeProjectionMatrix() const
   const double tb = t - b;
   const double fn = f - n;
 
-  if (_projectionType == GfFrustum::Orthographic) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypeOrthographic) {
     matrix[0][0] = 2.0 / rl;
     matrix[1][1] = 2.0 / tb;
     matrix[2][2] = -2.0 / fn;
@@ -583,7 +583,7 @@ vector<GfVec3d> GfFrustum::ComputeCorners() const
   vector<GfVec3d> corners;
   corners.reserve(8);
 
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     // Compute the eye-space corners of the near-plane and
     // far-plane frustum rectangles using similar triangles. The
     // reference plane in which the window rectangle is defined is
@@ -631,7 +631,7 @@ vector<GfVec3d> GfFrustum::ComputeCornersAtDistance(double d) const
   vector<GfVec3d> corners;
   corners.reserve(4);
 
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     // Similar to ComputeCorners
     corners.push_back(GfVec3d(d * winMin[0], d * winMin[1], -d));
     corners.push_back(GfVec3d(d * winMax[0], d * winMin[1], -d));
@@ -682,7 +682,7 @@ GfFrustum GfFrustum::ComputeNarrowedFrustum(const GfVec3d &worldPoint, const GfV
   }
 
   GfVec2d windowPoint(camSpacePoint[0], camSpacePoint[1]);
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     // project the camera space point to the reference plane (-1 to 1)
     // XXX Note: If we ever allow reference plane depth to be other
     // than 1.0, we'll need to revisit this.
@@ -732,7 +732,7 @@ static GfRay _ComputeUntransformedRay(GfFrustum::ProjectionType projectionType,
   // direction (toward the point on the window).
   GfVec3d pos;
   GfVec3d dir;
-  if (projectionType == GfFrustum::Perspective) {
+  if (projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     // Note that the ray is starting at the origin and not
     // the near plane.
     pos = GfVec3d(0);
@@ -776,7 +776,7 @@ GfRay GfFrustum::ComputeRay(const GfVec3d &worldSpacePos) const
   // direction (toward the point camSpaceToPos).
   GfVec3d pos;
   GfVec3d dir;
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     pos = GfVec3d(0);
     dir = camSpaceToPos.GetNormalized();
   }
@@ -802,7 +802,7 @@ GfRay GfFrustum::ComputePickRay(const GfVec3d &worldSpacePos) const
   // direction (toward the point camSpaceToPos).
   GfVec3d pos;
   GfVec3d dir;
-  if (_projectionType == Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
     pos = GfVec3d(0);
     dir = camSpaceToPos.GetNormalized();
   }
@@ -1071,7 +1071,7 @@ void GfFrustum::_CalculateFrustumPlanes() const
   // corners of the near-plane frustum rectangle to define the 4
   // planes forming the left, right, top, and bottom sides of the
   // frustum.
-  if (_projectionType == GfFrustum::Perspective) {
+  if (_projectionType == GfFrustum::ProjectionType::ProjectionTypePerspective) {
 
     //
     // Get the eye-space viewpoint (the origin) and the four corners

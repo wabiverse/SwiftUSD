@@ -72,9 +72,9 @@ class GfFrustum {
  public:
   /// This enum is used to determine the type of projection represented by a
   /// frustum.
-  enum ProjectionType {
-    Orthographic,  ///< Orthographic projection
-    Perspective,   ///< Perspective projection
+  enum class ProjectionType {
+    ProjectionTypeOrthographic,  ///< Orthographic projection
+    ProjectionTypePerspective,   ///< Perspective projection
   };
 
   /// This constructor creates an instance with default viewing parameters:
@@ -84,7 +84,7 @@ class GfFrustum {
   /// \li The window is -1 to +1 in both dimensions.
   /// \li The near/far interval is (1, 10).
   /// \li The view distance is 5.0.
-  /// \li The projection type is \c GfFrustum::Perspective.
+  /// \li The projection type is \c GfFrustum::ProjectionType::ProjectionTypePerspective.
   GF_API GfFrustum();
 
   /// Copy constructor.
@@ -320,7 +320,7 @@ class GfFrustum {
 
   /// Sets up the frustum in a manner similar to \c gluPerspective().
   ///
-  /// It sets the projection type to \c GfFrustum::Perspective and sets the
+  /// It sets the projection type to \c GfFrustum::ProjectionType::ProjectionTypePerspective and sets the
   /// window specification so that the resulting symmetric frustum encloses
   /// an angle of \p fieldOfViewHeight degrees in the vertical direction,
   /// with \p aspectRatio used to figure the angle in the horizontal
@@ -342,7 +342,7 @@ class GfFrustum {
 
   /// Sets up the frustum in a manner similar to gluPerspective().
   ///
-  /// It sets the projection type to \c GfFrustum::Perspective and
+  /// It sets the projection type to \c GfFrustum::ProjectionType::ProjectionTypePerspective and
   /// sets the window specification so that:
   ///
   /// If \a isFovVertical is true, the resulting symmetric frustum encloses
@@ -395,7 +395,7 @@ class GfFrustum {
   /// The displayed fov is a function of the focal length or FOV avar. The
   /// frustum's fov may be different due to things like lens breathing.
   ///
-  /// If the frustum is not of type \c GfFrustum::Perspective, the returned
+  /// If the frustum is not of type \c GfFrustum::ProjectionType::ProjectionTypePerspective, the returned
   /// FOV will be 0.0.
   ///
   /// \note The default value for \c isFovVertical is false so calling \c
@@ -405,7 +405,7 @@ class GfFrustum {
 
   /// Sets up the frustum in a manner similar to \c glOrtho().
   ///
-  /// Sets the projection to \c GfFrustum::Orthographic and sets the window
+  /// Sets the projection to \c GfFrustum::ProjectionType::ProjectionTypeOrthographic and sets the window
   /// and near/far specifications based on the given values.
   GF_API
   void SetOrthographic(
