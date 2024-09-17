@@ -25,7 +25,7 @@ public enum Hydra
     {
       self.stage = stage
 
-      #if canImport(HgiMetal) && canImport(UsdImagingGL)
+      #if !os(Linux) && !os(Windows) && !os(Android) && canImport(HgiMetal) && canImport(UsdImagingGL)
         engine = Hydra.MTLRenderer(stage: stage)
       #elseif canImport(HgiGL) && canImport(UsdImagingGL)
         engine = Hydra.GLRenderer(stage: stage)
