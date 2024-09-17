@@ -7,11 +7,14 @@
 #ifndef PXR_IMAGING_HGIGL_DEVICE_H
 #define PXR_IMAGING_HGIGL_DEVICE_H
 
+#include "pxr/pxrns.h"
+
+#include "Arch/swiftInterop.h"
+
 #include "Hgi/graphicsCmdsDesc.h"
 #include "HgiGL/api.h"
 #include "HgiGL/contextArena.h"
 #include "HgiGL/hgi.h"
-#include "pxr/pxrns.h"
 
 #include <fstream>
 #include <ostream>
@@ -64,7 +67,7 @@ class HgiGLDevice final {
   // The default arena is used in the absence of a user provided arena.
   HgiGLContextArena _defaultArena;
   HgiGLContextArena *_activeArena;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

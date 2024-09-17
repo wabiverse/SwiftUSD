@@ -76,10 +76,19 @@ class HgiInterop final {
                      VtValue const &dstFramebuffer,
                      GfVec4i const &dstRegion);
 
-#if defined(ARCH_OS_DARWIN)
+  /// Retrieve an Hgi, from a VtValue, typically from a client's HdDriver.
+  /// This is especially useful for programming languages such as Swift, where
+  /// the Hgi base class cannot be utilized, so clients must interface with the
+  /// platform specific Hgi (such as HgiGL, HgiMetal, and HgiVulkan). As such,
+  /// we cannot rely on inquiring or retrieving the base (Hgi) class from VtValue,
+  /// typically done by calling: `IsHolding<Hgi *>()` since platform Hgis created
+  /// by client (Swift code in this case) can only be retrieved by their respective
+  /// platform-specific Hgis (ex: `IsHolding<HgiGL *>()`, `IsHolding<HgiMetal *>()`)
+  /// which this function encapsulates for all the different Hgi backends, if you
+  /// ever require checking whether a `VtValue.IsHolding<Hgi *>()`, or casting this
+  /// VtValue back to the base Hgi class, you should utilize this function instead.
   HGIINTEROP_API
-  static Hgi *GetHgiFromMetalDriver(VtValue const &hdDriver);
-#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+  static Hgi *GetHgiFromDriver(VtValue const &hdDriver);
 
  private:
   HgiInterop &operator=(const HgiInterop &) = delete;

@@ -11,39 +11,41 @@
 // so we duplicate this file and compile only the mm one for all apple
 // platforms.
 #if defined(__APPLE__)
-#include "HgiInterop/hgiInteropImpl.h"
-#include "Hgi/hgiImpl.h"
-#include "Hgi/tokens.h"
+#  include "Hgi/hgiImpl.h"
+#  include "Hgi/tokens.h"
+#  include "HgiInterop/hgiInteropImpl.h"
 
-#if defined(PXR_GL_SUPPORT_ENABLED)
-#  include "HgiInterop/opengl.h"
-#endif
+#  if defined(PXR_GL_SUPPORT_ENABLED)
+#    include "HgiInterop/opengl.h"
+#    include "HgiGL/hgi.h"
+#  endif
 
-#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
-#  include "HgiInterop/vulkan.h"
-#endif
+#  if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+#    include "HgiInterop/vulkan.h"
+#    include "HgiVulkan/hgi.h"
+#  endif
 
-#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
-#  include "HgiMetal/hgi.h"
-#  if defined(ARCH_OS_OSX)
-#    include "HgiInterop/metal.h"
-#  endif // defined(ARCH_OS_OSX)
-#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#  if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#    include "HgiMetal/hgi.h"
+#    if defined(ARCH_OS_OSX)
+#      include "HgiInterop/metal.h"
+#    endif  // defined(ARCH_OS_OSX)
+#  endif    // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 struct HgiInteropImpl {
-#if defined(PXR_GL_SUPPORT_ENABLED)
+#  if defined(PXR_GL_SUPPORT_ENABLED)
   std::unique_ptr<HgiInteropOpenGL> _openGLToOpenGL;
-#endif // defined(PXR_GL_SUPPORT_ENABLED)
-#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+#  endif  // defined(PXR_GL_SUPPORT_ENABLED)
+#  if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
   std::unique_ptr<HgiInteropVulkan> _vulkanToOpenGL;
-#endif // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
-#if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
-#  if !defined(ARCH_OS_IPHONE)
+#  endif  // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+#  if defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#    if !defined(ARCH_OS_IPHONE)
   std::unique_ptr<HgiInteropMetal> _metalToOpenGL;
-#  endif // !defined(ARCH_OS_IPHONE)
-#endif // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#    endif  // !defined(ARCH_OS_IPHONE)
+#  endif    // defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
 };
 
 HgiInterop::HgiInterop() : _hgiInteropImpl(std::make_unique<HgiInteropImpl>()) {}
@@ -64,7 +66,7 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
     return;
   }
 
-#if defined(PXR_GL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
+#  if defined(PXR_GL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
   if (srcApi == HgiTokens->OpenGL) {
     // Transfer OpenGL textures to OpenGL application
     if (!_hgiInteropImpl->_openGLToOpenGL) {
@@ -73,9 +75,9 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
     return _hgiInteropImpl->_openGLToOpenGL->CompositeToInterop(
         srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-#endif
+#  endif
 
-#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+#  if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
   if (srcApi == HgiTokens->Vulkan) {
     // Transfer Vulkan textures to OpenGL application
     // XXX: It's possible that if we use the same HgiInterop with a
@@ -88,9 +90,9 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
     return _hgiInteropImpl->_vulkanToOpenGL->CompositeToInterop(
         srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-#endif
+#  endif
 
-#if (defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
+#  if (defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED) && !defined(ARCH_OS_IPHONE)
   if (srcApi == HgiTokens->Metal) {
     // Transfer Metal textures to OpenGL application
     // XXX: It's possible that if we use the same HgiInterop with a
@@ -103,23 +105,42 @@ void HgiInterop::TransferToApp(Hgi *srcHgi,
     return _hgiInteropImpl->_metalToOpenGL->CompositeToInterop(
         srcColor, srcDepth, dstFramebuffer, dstRegion);
   }
-#endif
+#  endif
 
   TF_CODING_ERROR("Unsupported source Hgi backend: %s", srcApi.GetText());
 }
 
-#if defined(ARCH_OS_DARWIN)
 // static.
-Hgi* HgiInterop::GetHgiFromMetalDriver(VtValue const &hdDriver)
+Hgi* HgiInterop::GetHgiFromDriver(VtValue const &hdDriver)
 {
+  /* keep sorted, in order of preferred hgi per platform.
+   * which is metal above all else on darwin, followed by
+   * vulkan over opengl on windows and linux, and finally
+   * we fallback to the base hgi class, in the case that
+   * none of the specific platform hgis were passed in. */
+
+#if  defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
   if (hdDriver.IsHolding<HgiMetal *>()) {
     return hdDriver.UncheckedGet<HgiMetal *>();
+  }
+#endif //  defined(PXR_METAL_SUPPORT_ENABLED) && PXR_METAL_SUPPORT_ENABLED
+#if defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+  if (hdDriver.IsHolding<HgiVulkan *>()) {
+    return hdDriver.UncheckedGet<HgiVulkan *>();
+  }
+#endif // defined(PXR_VULKAN_SUPPORT_ENABLED) && PXR_VULKAN_SUPPORT_ENABLED
+#if defined(PXR_GL_SUPPORT_ENABLED)
+  if (hdDriver.IsHolding<HgiGL *>()) {
+    return hdDriver.UncheckedGet<HgiGL *>();
+  }
+#endif // defined(PXR_GL_SUPPORT_ENABLED)
+  if (hdDriver.IsHolding<Hgi *>()) {
+    return hdDriver.UncheckedGet<Hgi *>();
   }
 
   return nullptr;
 }
-#endif // defined(ARCH_OS_DARWIN)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__APPLE__)
+#endif  // defined(__APPLE__)

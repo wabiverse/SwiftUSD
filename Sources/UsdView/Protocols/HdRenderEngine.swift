@@ -10,45 +10,16 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(HgiGL)
-  import HgiGL
+import Foundation
+import PixarUSD
 
-  public enum HgiGL
-  {
-    public static func createHgi() -> Pixar.HgiGLPtr
-    {
-      Pixar.HgiGL.CreateHgi()
-    }
-  }
+public protocol HdRenderEngine
+{
+  var stage: UsdStageRefPtr { get set }
 
-  public extension Pixar.HgiGL
-  {
-    private borrowing func GetPrimaryDeviceCopy() -> Pixar.HgiGLDevice
-    {
-      GetPrimaryDevice()
-    }
+  init(stage: UsdStageRefPtr)
 
-    var device: Pixar.HgiGLDevice
-    {
-      GetPrimaryDeviceCopy()
-    }
+  func info()
 
-    func getValue(_ ptr: Pixar.HgiGLPtr) -> VtValue
-    {
-      GetValue(ptr)
-    }
-  }
-
-  public extension Pixar.HgiGLPtr
-  {
-    var device: Pixar.HgiGLDevice
-    {
-      pointee.device
-    }
-
-    var value: VtValue
-    {
-      pointee.getValue(self)
-    }
-  }
-#endif /* canImport(HgiGL) */
+  func draw()
+}

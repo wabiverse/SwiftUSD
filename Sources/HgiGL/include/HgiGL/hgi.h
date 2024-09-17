@@ -7,12 +7,17 @@
 #ifndef PXR_IMAGING_HGI_GL_HGI_H
 #define PXR_IMAGING_HGI_GL_HGI_H
 
+#include "pxr/pxrns.h"
+
+#include "Arch/swiftInterop.h"
+
 #include "Hgi/hgiImpl.h"
 #include "Hgi/tokens.h"
 #include "HgiGL/api.h"
 #include "HgiGL/capabilities.h"
 #include "HgiGL/garbageCollector.h"
-#include "pxr/pxrns.h"
+
+#include "Vt/value.h"
 
 #include <functional>
 #include <memory>
@@ -25,6 +30,7 @@ class HgiGLDevice;
 using HgiGLOpsFn = std::function<void(void)>;
 using HgiGLOpsVector = std::vector<HgiGLOpsFn>;
 using HgiGLContextArenaHandle = HgiHandle<class HgiGLContextArena>;
+using HgiGLPtr = std::shared_ptr<class HgiGL>;
 
 /// \class HgiGL
 ///
@@ -58,6 +64,12 @@ class HgiGL final : public Hgi {
 
   HGIGL_API
   ~HgiGL() override;
+
+  HGIGL_API
+  static HgiGLPtr CreateHgi();
+
+  HGIGL_API
+  VtValue GetValue(HgiGLPtr ptr) const;
 
   /// ------------------------------------------------------------------------
   /// Virtual API
@@ -194,7 +206,7 @@ class HgiGL final : public Hgi {
   std::unique_ptr<HgiGLCapabilities> _capabilities;
   HgiGLGarbageCollector _garbageCollector;
   int _frameDepth;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 /// ----------------------------------------------------------------------------
 /// API Version & History

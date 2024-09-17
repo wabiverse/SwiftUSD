@@ -1266,6 +1266,7 @@ let package = Package(
         .target(name: "Trace"),
         .target(name: "Garch"),
         .target(name: "Hgi"),
+        .target(name: "Vt"),
       ],
       resources: [
         .process("Resources")

@@ -209,19 +209,13 @@ void HdStRenderDelegate::SetDrivers(HdDriverVector const &drivers)
 
   // For Storm we want to use the Hgi driver, so extract it.
   for (HdDriver *hdDriver : drivers) {
-    if (hdDriver->name == HgiTokens->renderDriver && hdDriver->driver.IsHolding<Hgi *>()) {
-      _hgi = hdDriver->driver.UncheckedGet<Hgi *>();
-      break;
-    }
-#if defined(ARCH_OS_DARWIN)
     if (hdDriver->name == HgiTokens->renderDriver) {
-      Hgi *hgiMetal = HgiInterop::GetHgiFromMetalDriver(hdDriver->driver);
-      if (hgiMetal) {
-        _hgi = hgiMetal;
+      Hgi *platformHgi = HgiInterop::GetHgiFromDriver(hdDriver->driver);
+      if (platformHgi) {
+        _hgi = platformHgi;
         break;
       }
     }
-#endif
   }
 
   TF_VERIFY(_hgi, "HdSt requires Hgi HdDriver");

@@ -10,45 +10,38 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(HgiGL)
-  import HgiGL
+import Foundation
+import PixarUSD
 
-  public enum HgiGL
+public enum Hydra
+{
+  public class RenderEngine: HdRenderEngine
   {
-    public static func createHgi() -> Pixar.HgiGLPtr
+    public var stage: UsdStageRefPtr
+
+    public var engine: any HdRenderEngine
+
+    public required init(stage: UsdStageRefPtr)
     {
-      Pixar.HgiGL.CreateHgi()
+      self.stage = stage
+
+      #if canImport(HgiMetal) && canImport(UsdImagingGL)
+        engine = Hydra.MTLRenderer(stage: stage)
+      #elseif canImport(HgiGL) && canImport(UsdImagingGL)
+        engine = Hydra.GLRenderer(stage: stage)
+      #else
+        engine = Hydra.NORenderer(stage: stage)
+      #endif
+    }
+
+    public func info()
+    {
+      engine.info()
+    }
+
+    public func draw()
+    {
+      engine.draw()
     }
   }
-
-  public extension Pixar.HgiGL
-  {
-    private borrowing func GetPrimaryDeviceCopy() -> Pixar.HgiGLDevice
-    {
-      GetPrimaryDevice()
-    }
-
-    var device: Pixar.HgiGLDevice
-    {
-      GetPrimaryDeviceCopy()
-    }
-
-    func getValue(_ ptr: Pixar.HgiGLPtr) -> VtValue
-    {
-      GetValue(ptr)
-    }
-  }
-
-  public extension Pixar.HgiGLPtr
-  {
-    var device: Pixar.HgiGLDevice
-    {
-      pointee.device
-    }
-
-    var value: VtValue
-    {
-      pointee.getValue(self)
-    }
-  }
-#endif /* canImport(HgiGL) */
+}

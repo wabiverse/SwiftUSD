@@ -28,12 +28,12 @@ import PixarUSD
      * allowing it to be set as a ``MTKView`` object's delegate to
      * provide a drawing method to a ``MTKView`` object and respond
      * to rendering events. */
-    class MTLRenderer: NSObject, MTKViewDelegate
+    class MTLRenderer: NSObject, MTKViewDelegate, HdRenderEngine
     {
       let hgi: Pixar.HgiMetalPtr
       var device: MTLDevice!
 
-      var stage: UsdStageRefPtr
+      public var stage: UsdStageRefPtr
 
       #if canImport(UsdImagingGL)
         /// UsdImagingGL is not available on iOS.
@@ -62,7 +62,7 @@ import PixarUSD
         metalView.device = hgi.device
       }
 
-      public convenience init(stage: UsdStageRefPtr)
+      public required convenience init(stage: UsdStageRefPtr)
       {
         self.init(metalView: MTKView())
         self.stage = stage
@@ -84,6 +84,9 @@ import PixarUSD
       {
         print("drawableSizeWillChange", size)
       }
+
+      public func draw()
+      {}
 
       public func draw(in _: MTKView)
       {}

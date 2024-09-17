@@ -68,6 +68,21 @@ HgiGL::~HgiGL()
   delete _device;
 }
 
+// static.
+HgiGLPtr HgiGL::CreateHgi()
+{
+  HgiGLPtr hgi = std::make_shared<HgiGL>();
+
+  hgi.reset(dynamic_cast<HgiGL *>(Hgi::GetPlatformDefaultHgi()));
+
+  return hgi;
+}
+
+VtValue HgiGL::GetValue(HgiGLPtr ptr) const
+{
+  return VtValue(ptr.get());
+}
+
 bool HgiGL::IsBackendSupported() const
 {
   // Want OpenGL 4.5 or higher.
