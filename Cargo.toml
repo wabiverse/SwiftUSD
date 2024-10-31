@@ -1,6 +1,6 @@
 [package]
 name = "rust-usd"
-version = "24.8.3"
+version = "24.8.7"
 edition = "2021"
 publish = []
 
