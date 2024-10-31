@@ -17,4 +17,4 @@ jobs:
           tag: 5.10-RELEASE
       - uses: actions/checkout@v4
       - name: 📦 Build
-        run: swift build -c release --target UsdView
+        run: swift build -c debug --target UsdView

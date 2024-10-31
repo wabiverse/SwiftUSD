@@ -287,7 +287,7 @@ let package = Package(
   dependencies: [
     // prepare for SwiftCrossUI, for a cross-platform UsdView.
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.4"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.5"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
     .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
@@ -302,6 +302,8 @@ let package = Package(
       publicHeadersPath: "include",
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -354,6 +356,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Arch"),
         .define("ARCH_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
         .define("ARCH_COMPILER_MSVC", .when(platforms: [.windows])),
       ]
     ),
@@ -370,6 +374,8 @@ let package = Package(
         .define("TF_EXPORTS", to: "1"),
         .headerSearchPath("include/Tf"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -386,6 +392,8 @@ let package = Package(
         .define("JS_EXPORTS", to: "1"),
         .headerSearchPath("include/Js"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -403,6 +411,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Gf"),
         .define("GF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -422,6 +432,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Trace"),
         .define("TRACE_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -439,6 +451,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Vt"),
         .define("VT_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -455,6 +469,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Work"),
         .define("WORK_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -470,6 +486,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Pegtl"),
         .define("PEGTL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -488,6 +506,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Plug"),
         .define("PLUG_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -509,6 +529,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Ar"),
         .define("AR_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -525,6 +547,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Kind"),
         .define("KIND_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -550,6 +574,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Sdf"),
         .define("SDF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
         .define("YY_NO_UNISTD_H", .when(platforms: [.windows]))
       ]
     ),
@@ -571,6 +597,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Pcp"),
         .define("PCP_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -599,6 +627,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Usd"),
         .define("USD_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -622,6 +652,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Ndr"),
         .define("NDR_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -641,6 +673,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Sdr"),
         .define("SDR_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -669,6 +703,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdGeom"),
         .define("USDGEOM_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -693,6 +729,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdShade"),
         .define("USDSHADE_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -715,6 +753,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdShaders"),
         .define("USDSHADERS_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -742,6 +782,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdLux"),
         .define("USDLUX_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -765,6 +807,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdHydra"),
         .define("USDHYDRA_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -789,6 +833,8 @@ let package = Package(
         .define("SDROSL_EXPORTS", to: "1"),
         .define("PXR_OSL_SUPPORT_ENABLED", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -813,6 +859,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdAbc"),
         .define("USDABC_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -836,6 +884,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdDraco"),
         .define("USDDRACO_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -857,6 +907,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdMedia"),
         .define("USDMEDIA_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -887,6 +939,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdMtlx"),
         .define("USDMTLX_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -913,6 +967,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdPhysics"),
         .define("USDPHYSICS_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -933,6 +989,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdProc"),
         .define("USDPROC_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -956,6 +1014,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdRender"),
         .define("USDRENDER_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -980,6 +1040,8 @@ let package = Package(
         .define("USDRI_EXPORTS", to: "1"),
         .headerSearchPath("include/UsdRi"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1006,6 +1068,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdSkel"),
         .define("USDSKEL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1026,6 +1090,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdUI"),
         .define("USDUI_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1053,6 +1119,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdUtils"),
         .define("USDUTILS_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1078,6 +1146,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdVol"),
         .define("USDVOL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1094,6 +1164,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "CameraUtil"),
         .define("CAMERAUTIL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1110,6 +1182,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Hf"),
         .define("HF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1126,6 +1200,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "PxOsd"),
         .define("PXOSD_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1152,6 +1228,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Hd"),
         .define("HD_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1168,6 +1246,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Garch"),
         .define("GARCH_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
@@ -1203,6 +1283,8 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1227,6 +1309,8 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
@@ -1277,6 +1361,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HgiGL"),
         .define("HGIGL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1303,6 +1389,8 @@ let package = Package(
         .define("PXR_METAL_SUPPORT_ENABLED", to: "0", .when(platforms: Arch.OS.linwin.platform)),
         .define("PXR_VULKAN_SUPPORT_ENABLED", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("Foundation", .when(platforms: Arch.OS.apple.platform)),
@@ -1331,6 +1419,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Hio"),
         .define("HIO_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1358,6 +1448,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Glf"),
         .define("GLF_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
@@ -1379,6 +1471,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "GeomUtil"),
         .define("GEOMUTIL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1404,6 +1498,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HdSi"),
         .define("HDSI_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1426,6 +1522,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HdMtlx"),
         .define("HDMTLX_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1457,6 +1555,8 @@ let package = Package(
         .define("HDST_EXPORTS", to: "1"),
         .define("PXR_MATERIALX_SUPPORT_ENABLED", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1481,6 +1581,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HdStorm"),
         .define("HDSTORM_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1514,6 +1616,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "Hdx"),
         .define("HDX_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1531,6 +1635,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "HdAr"),
         .define("HDAR_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1567,6 +1673,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdImaging"),
         .define("USDIMAGING_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1606,6 +1714,8 @@ let package = Package(
         .define("MFB_PACKAGE_MODULE", to: "UsdImagingGL"),
         .define("USDIMAGINGGL_EXPORTS", to: "1"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1616,6 +1726,8 @@ let package = Package(
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
@@ -1640,6 +1752,8 @@ let package = Package(
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .enableUpcomingFeature("BareSlashRegexLiterals"),
@@ -1793,6 +1907,8 @@ let package = Package(
         // enable to debug swift retain/release calls.
         .define("DEBUG_MEMORY_MANAGEMENT", to: "0"),
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         // enable to debug bundled (python, plugins, resources).
@@ -1806,6 +1922,8 @@ let package = Package(
       dependencies: galahTargetDeps,
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: galahSettings
     ),
@@ -1817,6 +1935,8 @@ let package = Package(
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
