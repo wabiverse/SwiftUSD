@@ -69,8 +69,8 @@ struct TfPyExceptionState {
   boost::python::handle<> _type, _value, _trace;
 };
 
-#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
-
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif /* PXR_BASE_TF_PY_EXCEPTION_STATE_H */
