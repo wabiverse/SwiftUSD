@@ -16,7 +16,17 @@
 // incompatible macro definitions in pyport.h on macOS.
 #include <locale>
 
-#include <any>
+#if defined(_WIN32) || defined(__ANDROID__)
+# include <any/any.hpp>
+
+namespace std
+{
+  using namespace linb;
+}
+#else // !defined(_WIN32) && !defined(__ANDROID__)
+# include <any>
+#endif // defined(_WIN32) || defined(__ANDROID__)
+
 #include <string>
 
 // Follow up changes should more tightly scope these to just where it's needed

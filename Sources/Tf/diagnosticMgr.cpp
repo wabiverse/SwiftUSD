@@ -28,7 +28,17 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include <any>
+#if defined(_WIN32) || defined(__ANDROID__)
+# include <any/any.hpp>
+
+namespace std
+{
+  using namespace linb;
+}
+#else // !defined(_WIN32) && !defined(__ANDROID__)
+# include <any>
+#endif // defined(_WIN32) || defined(__ANDROID__)
+
 #include <memory>
 #include <thread>
 

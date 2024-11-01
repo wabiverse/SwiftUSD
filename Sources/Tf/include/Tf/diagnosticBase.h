@@ -21,7 +21,17 @@
 #include "Arch/function.h"
 #include "Arch/inttypes.h"
 
-#include <any>
+#if defined(_WIN32) || defined(__ANDROID__)
+# include <any/any.hpp>
+
+namespace std
+{
+  using namespace linb;
+}
+#else // !defined(_WIN32) && !defined(__ANDROID__)
+# include <any>
+#endif // defined(_WIN32) || defined(__ANDROID__)
+
 #include <cstdarg>
 #include <string>
 
