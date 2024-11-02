@@ -1,5 +1,5 @@
 {
-  "originHash" : "f4e8f15f64f4bae409a33132730b93e0edc7eb1353af28b9c1b8b488b3936c10",
+  "originHash" : "6e3e50a0855063f6b72de8ec03edca91c02e96570b715103296cfac4203713b2",
   "pins" : [
     {
       "identity" : "galah",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "9d829bdd244676ef77b2bd219093c59a6315adaf",
         "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "icu",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/icu.git",
+      "state" : {
+        "revision" : "156397c5079b709c9e871d27794284dc4905a794",
+        "version" : "76.1.0"
       }
     },
     {
