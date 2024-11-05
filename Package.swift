@@ -1865,7 +1865,7 @@ let package = Package(
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
         .target(name: "UsdHydra"),
-        .target(name: "UsdAbc"),
+        .target(name: "UsdAbc", condition: .when(platforms: Arch.OS.nix.platform)),
         .target(name: "UsdDraco"),
         .target(name: "UsdMedia"),
         .target(name: "UsdMtlx"),

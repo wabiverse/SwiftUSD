@@ -10,7 +10,9 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import UsdAbc
+#if !os(Windows)
+  import UsdAbc
+#endif
 
 public enum UsdAbc
 {}
