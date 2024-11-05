@@ -10,9 +10,13 @@
 #include "Usd/object.h"
 #include "pxr/pxrns.h"
 
-#include <boost/python/converter/to_python_function_type.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/type_id.hpp>
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
+
+#if __has_include(<boost/python/converter/to_python_function_type.hpp>)
+# include <boost/python/converter/to_python_function_type.hpp>
+# include <boost/python/def_visitor.hpp>
+# include <boost/python/type_id.hpp>
+#endif // __has_include(<boost/python/converter/to_python_function_type.hpp>)
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -65,5 +69,7 @@ struct Usd_ObjectSubclass : boost::python::def_visitor<Usd_ObjectSubclass> {
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED
 
 #endif  // PXR_USD_USD_WRAP_UTILS_H
