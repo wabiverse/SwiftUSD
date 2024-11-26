@@ -1,13 +1,13 @@
 {
-  "originHash" : "8e75c74fd8727ced26846f65be09f3de4e97a586f165f75940d1d7ddf9c58a52",
+  "originHash" : "21cbc0f391f463cfbf378f6036ed39a293d9181556bbd2a39c6f8e29b96f56a2",
   "pins" : [
     {
       "identity" : "galah",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/galah.git",
       "state" : {
-        "revision" : "9d829bdd244676ef77b2bd219093c59a6315adaf",
-        "version" : "1.0.1"
+        "revision" : "49cd69c9af968c034b345e39956ad458ce9bd27d",
+        "version" : "1.0.2"
       }
     },
     {
@@ -76,16 +76,16 @@
     {
       "identity" : "swift-docc-plugin",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-docc-plugin",
+      "location" : "https://github.com/swiftlang/swift-docc-plugin",
       "state" : {
-        "revision" : "26ac5758409154cc448d7ab82389c520fa8a8247",
-        "version" : "1.3.0"
+        "revision" : "85e4bb4e1cd62cec64a4b8e769dcefdf0c5b9d64",
+        "version" : "1.4.3"
       }
     },
     {
       "identity" : "swift-docc-symbolkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-docc-symbolkit",
+      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
       "state" : {
         "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
         "version" : "1.0.0"
@@ -105,17 +105,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stackotter/swift-macro-toolkit",
       "state" : {
-        "revision" : "687075e7bf976e121d083e922a07c7a9350ca85d",
-        "version" : "0.4.0"
+        "revision" : "e706aa98bc28f82677923f7b8f560bba6f90fac2",
+        "version" : "0.6.0"
       }
     },
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "2bc86522d115234d1f588efe2bcb4ce4be8f8b82",
-        "version" : "510.0.3"
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
       }
     },
     {

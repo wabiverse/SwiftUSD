@@ -289,10 +289,10 @@ let package = Package(
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.5"),
+    .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
+    .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
-    .package(url: "https://github.com/apple/swift-syntax.git", from: "510.0.3"),
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
-    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
     .package(url: "https://github.com/mxcl/Version.git", from: "2.0.0"),
   ] + galahDeps,
@@ -2933,7 +2933,7 @@ struct Galah
 
   static func enableGalah()
   {
-    galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.1")]
+    galahDeps = [.package(url: "https://github.com/wabiverse/galah.git", from: "1.0.2")]
     galahSettings = [.interoperabilityMode(.Cxx), .define("WITH_GALAH")]
     galahTargetDeps = [.target(name: "PixarUSD"), .product(name: "GalahInterpreter", package: "galah")]
   }
