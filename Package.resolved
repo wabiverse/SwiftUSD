@@ -1,5 +1,5 @@
 {
-  "originHash" : "9b417822d1fa9e757fb8d1e51dbbdd82d21c4aa7cf1a47d5cb6ce4e6de79273f",
+  "originHash" : "1af3a7c5ccc3cad0e6d8f1e74a87f258ce1200775134124095520c4baf0ddbed",
   "pins" : [
     {
       "identity" : "galah",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "revision" : "abfc7bf55b48ecc7053d6d6244b364c33f252844",
-        "version" : "1.8.6"
+        "revision" : "2a39a3fb7b6cded055c46b69faa89387338eb7c1",
+        "version" : "1.8.7"
       }
     },
     {
