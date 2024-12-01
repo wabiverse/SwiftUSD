@@ -16,6 +16,7 @@ jobs:
         run: |
           curl -o swift-bundler -L https://github.com/wabiverse/wabi-swift-bundler/releases/download/v3.0.0/swift-bundler
           chmod +x ./swift-bundler
-          cp ./swift-bundler /usr/local/bin
+          sudo cp ./swift-bundler /usr/local/bin/
+          rm ./swift-bundler
       - name: 📦 Build & Bundle
-        run: ./swift-bundler bundle -c release --xcodebuild
+        run: swift bundler bundle -c release --xcodebuild
