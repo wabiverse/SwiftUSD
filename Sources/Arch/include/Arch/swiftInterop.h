@@ -209,6 +209,28 @@
   __attribute__((swift_attr("mutating")))
 #endif /* SWIFT_MUTATING */
 
+#if !defined(SWIFT_UNCHECKED_SENDABLE)
+/// Specifies that a specific c++ type such class or struct should be imported as type marked 
+/// as `@unchecked Sendable` type in swift. If this annotation is used, the type is therefore allowed to
+/// use safely across async contexts.
+///
+/// For example 
+/// ```
+///   class SWIFT_UNCHECKED_SENDABLE CustomUserType
+///   { ... } 
+/// ``` 
+/// Will be imported as `struct CustomUserType: @unchecked Sendable`
+#define SWIFT_UNCHECKED_SENDABLE \
+  __attribute__((swift_attr("@Sendable")))
+#endif /* SWIFT_UNCHECKED_SENDABLE */
+
+#if !defined(SWIFT_NONCOPYABLE)
+/// Specifies that a specific c++ type such class or struct should be imported
+/// as a non-copyable Swift value type.
+#define SWIFT_NONCOPYABLE \
+  __attribute__((swift_attr("~Copyable")))
+#endif /* SWIFT_NONCOPYABLE */
+
 #else /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
 // Empty defines for compilers that don't support `attribute(swift_attr)`.
@@ -248,6 +270,14 @@
 #if !defined(SWIFT_MUTATING)
 #define SWIFT_MUTATING
 #endif // SWIFT_MUTATING
+
+#if !defined(SWIFT_UNCHECKED_SENDABLE)
+#define SWIFT_UNCHECKED_SENDABLE
+#endif // SWIFT_UNCHECKED_SENDABLE
+
+#if !defined(SWIFT_NONCOPYABLE)
+#define SWIFT_NONCOPYABLE
+#endif // SWIFT_NONCOPYABLE
 
 #endif /* !_CXX_INTEROP_HAS_ATTRIBUTE */
 
