@@ -21,7 +21,7 @@ void wrapUsdSpecializes()
   class_<UsdSpecializes>("Specializes", no_init)
       .def("AddSpecialize",
            &UsdSpecializes::AddSpecialize,
-           (arg("primPath"), arg("position") = UsdListPositionBackOfPrependList))
+           (arg("primPath"), arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("RemoveSpecialize", &UsdSpecializes::RemoveSpecialize, arg("primPath"))
       .def("ClearSpecializes", &UsdSpecializes::ClearSpecializes)
       .def("SetSpecializes", &UsdSpecializes::SetSpecializes)

@@ -22,7 +22,7 @@ void wrapUsdInherits()
   class_<UsdInherits>("Inherits", no_init)
       .def("AddInherit",
            &UsdInherits::AddInherit,
-           (arg("primPath"), arg("position") = UsdListPositionBackOfPrependList))
+           (arg("primPath"), arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("RemoveInherit", &UsdInherits::RemoveInherit, arg("primPath"))
       .def("ClearInherits", &UsdInherits::ClearInherits)
       .def("SetInherits", &UsdInherits::SetInherits)

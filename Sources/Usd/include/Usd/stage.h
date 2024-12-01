@@ -173,7 +173,8 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// layer's repository path if the layer has one, otherwise its resolved
   /// path.
   USD_API
-  static UsdStageRefPtr CreateNew(const std::string &identifier, InitialLoadSet load = InitialLoadSet::LoadAll);
+  static UsdStageRefPtr CreateNew(const std::string &identifier,
+                                  InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr CreateNew(const std::string &identifier,
@@ -247,7 +248,8 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// calling ArResolver::CreateDefaultContextForAsset with the layer's
   /// repository path if the layer has one, otherwise its resolved path.
   USD_API
-  static UsdStageRefPtr Open(const std::string &filePath, InitialLoadSet load = InitialLoadSet::LoadAll);
+  static UsdStageRefPtr Open(const std::string &filePath,
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const std::string &filePath,
@@ -311,7 +313,8 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   /// require that the stage have no session layer, you must explicitly
   /// specify TfNullPtr (or None in python) for the sessionLayer argument.
   USD_API
-  static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer, InitialLoadSet load = InitialLoadSet::LoadAll);
+  static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer,
+                             InitialLoadSet load = InitialLoadSet::LoadAll);
   /// \overload
   USD_API
   static UsdStageRefPtr Open(const SdfLayerHandle &rootLayer,
@@ -535,14 +538,15 @@ class UsdStage : public TfRefBase, public TfWeakBase {
 
   /// Modify this stage's load rules to load the prim at \p path, its
   /// ancestors, and all of its descendants if \p policy is
-  /// UsdLoadWithDescendants.  If \p policy is UsdLoadWithoutDescendants, then
-  /// payloads on descendant prims are not loaded.
+  /// UsdLoadPolicy::UsdLoadPolicyWithDescendants.  If \p policy is
+  /// UsdLoadPolicy::UsdLoadPolicyWithoutDescendants, then payloads on descendant prims are not
+  /// loaded.
   ///
   /// See \ref Usd_workingSetManagement "Working Set Management" for more
   /// information.
   USD_API
   UsdPrim Load(const SdfPath &path = SdfPath::AbsoluteRootPath(),
-               UsdLoadPolicy policy = UsdLoadWithDescendants);
+               UsdLoadPolicy policy = UsdLoadPolicy::UsdLoadPolicyWithDescendants);
 
   /// Modify this stage's load rules to unload the prim and its descendants
   /// specified by \p path.
@@ -566,7 +570,7 @@ class UsdStage : public TfRefBase, public TfWeakBase {
   USD_API
   void LoadAndUnload(const SdfPathSet &loadSet,
                      const SdfPathSet &unloadSet,
-                     UsdLoadPolicy policy = UsdLoadWithDescendants);
+                     UsdLoadPolicy policy = UsdLoadPolicy::UsdLoadPolicyWithDescendants);
 
   /// Returns a set of all loaded paths.
   ///

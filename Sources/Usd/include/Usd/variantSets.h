@@ -56,7 +56,7 @@ class UsdVariantSet {
   /// \endcode
   USD_API
   bool AddVariant(const std::string &variantName,
-                  UsdListPosition position = UsdListPositionBackOfPrependList);
+                  UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// Return the composed variant names for this VariantSet, ordered
   /// lexicographically.
@@ -217,7 +217,7 @@ class UsdVariantSets {
   /// without necessarily populating it with variants.
   USD_API
   UsdVariantSet AddVariantSet(const std::string &variantSetName,
-                              UsdListPosition position = UsdListPositionBackOfPrependList);
+                              UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   // TODO: don't we want remove and reorder, clear, etc. also?
 

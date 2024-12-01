@@ -193,19 +193,19 @@ void Usd_InsertListItem(PROXY proxy,
   typename PROXY::ListProxy list(/* unused */ SdfListOpTypeExplicit);
   bool atFront = false;
   switch (position) {
-    case UsdListPositionBackOfPrependList:
+    case UsdListPosition::UsdListPositionBackOfPrependList:
       list = proxy.GetPrependedItems();
       atFront = false;
       break;
-    case UsdListPositionFrontOfPrependList:
+    case UsdListPosition::UsdListPositionFrontOfPrependList:
       list = proxy.GetPrependedItems();
       atFront = true;
       break;
-    case UsdListPositionBackOfAppendList:
+    case UsdListPosition::UsdListPositionBackOfAppendList:
       list = proxy.GetAppendedItems();
       atFront = false;
       break;
-    case UsdListPositionFrontOfAppendList:
+    case UsdListPosition::UsdListPositionFrontOfAppendList:
       list = proxy.GetAppendedItems();
       atFront = true;
       break;

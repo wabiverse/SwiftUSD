@@ -517,7 +517,7 @@ class UsdAttribute : public UsdProperty {
   /// semantics, which we will document soon
   USD_API
   bool AddConnection(const SdfPath &source,
-                     UsdListPosition position = UsdListPositionBackOfPrependList) const;
+                     UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList) const;
 
   /// Removes \p target from the list of targets.
   ///

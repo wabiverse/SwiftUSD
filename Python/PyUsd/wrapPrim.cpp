@@ -492,10 +492,10 @@ void wrapUsdPrim()
       .def("ClearChildrenReorder", &UsdPrim::ClearChildrenReorder)
 
       .def("GetParent", &UsdPrim::GetParent)
-      .def("GetNextSibling", (UsdPrim(UsdPrim::*)() const) & UsdPrim::GetNextSibling)
+      .def("GetNextSibling", (UsdPrim(UsdPrim::*)() const)&UsdPrim::GetNextSibling)
       .def("GetFilteredNextSibling",
-           (UsdPrim(UsdPrim::*)(const Usd_PrimFlagsPredicate &) const) &
-               UsdPrim::GetFilteredNextSibling)
+           (UsdPrim(UsdPrim::*)(const Usd_PrimFlagsPredicate &)
+                const)&UsdPrim::GetFilteredNextSibling)
       .def("IsPseudoRoot", &UsdPrim::IsPseudoRoot)
 
       .def("HasVariantSets", &UsdPrim::HasVariantSets)
@@ -508,8 +508,8 @@ void wrapUsdPrim()
 
       .def("CreateAttribute",
            (UsdAttribute(UsdPrim::*)(
-               const TfToken &, const SdfValueTypeName &, bool, SdfVariability) const) &
-               UsdPrim::CreateAttribute,
+               const TfToken &, const SdfValueTypeName &, bool, SdfVariability)
+                const)&UsdPrim::CreateAttribute,
            (arg("name"),
             arg("typeName"),
             arg("custom") = true,
@@ -517,8 +517,8 @@ void wrapUsdPrim()
 
       .def("CreateAttribute",
            (UsdAttribute(UsdPrim::*)(
-               const vector<string> &, const SdfValueTypeName &, bool, SdfVariability) const) &
-               UsdPrim::CreateAttribute,
+               const vector<string> &, const SdfValueTypeName &, bool, SdfVariability)
+                const)&UsdPrim::CreateAttribute,
            (arg("nameElts"),
             arg("typeName"),
             arg("custom") = true,
@@ -543,13 +543,12 @@ void wrapUsdPrim()
             arg("recurseOnSources") = false))
 
       .def("CreateRelationship",
-           (UsdRelationship(UsdPrim::*)(const TfToken &, bool) const) &
-               UsdPrim::CreateRelationship,
+           (UsdRelationship(UsdPrim::*)(const TfToken &, bool) const)&UsdPrim::CreateRelationship,
            (arg("name"), arg("custom") = true))
 
       .def("CreateRelationship",
-           (UsdRelationship(UsdPrim::*)(const vector<string> &, bool) const) &
-               UsdPrim::CreateRelationship,
+           (UsdRelationship(UsdPrim::*)(const vector<string> &, bool)
+                const)&UsdPrim::CreateRelationship,
            (arg("nameElts"), arg("custom") = true))
 
       .def("GetRelationships",
@@ -587,7 +586,7 @@ void wrapUsdPrim()
       .def("GetPayloads", &UsdPrim::GetPayloads)
       .def("HasAuthoredPayloads", &UsdPrim::HasAuthoredPayloads)
 
-      .def("Load", &UsdPrim::Load, (arg("policy") = UsdLoadWithDescendants))
+      .def("Load", &UsdPrim::Load, (arg("policy") = UsdLoadPolicy::UsdLoadPolicyWithDescendants))
       .def("Unload", &UsdPrim::Unload)
 
       .def("GetReferences", &UsdPrim::GetReferences)

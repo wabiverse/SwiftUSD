@@ -106,6 +106,11 @@ extension Usd.Prim: Prim
     GetPath()
   }
 
+  public func getReferences() -> Usd.References
+  {
+    GetReferences()
+  }
+
   private borrowing func GetNameCopy() -> Tf.Token
   {
     __GetNameUnsafe().pointee

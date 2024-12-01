@@ -58,7 +58,7 @@ void wrapUsdRelationship()
       .def("__repr__", __repr__)
       .def("AddTarget",
            &UsdRelationship::AddTarget,
-           (arg("target"), arg("position") = UsdListPositionBackOfPrependList))
+           (arg("target"), arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("RemoveTarget", &UsdRelationship::RemoveTarget, arg("target"))
       .def("SetTargets", &UsdRelationship::SetTargets, arg("targets"))
       .def("ClearTargets", &UsdRelationship::ClearTargets, arg("removeSpec"))

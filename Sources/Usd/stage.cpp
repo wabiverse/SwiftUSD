@@ -2186,7 +2186,7 @@ void UsdStage::_DiscoverPayloads(const SdfPath &rootPath,
         }
       };
 
-  if (policy == UsdLoadWithDescendants) {
+  if (policy == UsdLoadPolicy::UsdLoadPolicyWithDescendants) {
     if (UsdPrim root = GetPrimAtPath(rootPath)) {
       UsdPrimRange children = UsdPrimRange(root,
                                            UsdTraverseInstanceProxies(UsdPrimAllPrimsPredicate));
@@ -2242,8 +2242,10 @@ void UsdStage::LoadAndUnload(const SdfPathSet &loadSet,
     if (unloadSet.empty()) {
       // Check the loadSet to see if we're already in the desired state.
       for (SdfPath const &path : loadSet) {
-        if ((policy == UsdLoadWithDescendants && !_loadRules.IsLoadedWithAllDescendants(path)) ||
-            (policy == UsdLoadWithoutDescendants && !_loadRules.IsLoadedWithNoDescendants(path)))
+        if ((policy == UsdLoadPolicy::UsdLoadPolicyWithDescendants &&
+             !_loadRules.IsLoadedWithAllDescendants(path)) ||
+            (policy == UsdLoadPolicy::UsdLoadPolicyWithoutDescendants &&
+             !_loadRules.IsLoadedWithNoDescendants(path)))
         {
           isNoOp = false;
           break;
@@ -2414,7 +2416,7 @@ SdfPathSet UsdStage::FindLoadable(const SdfPath &rootPath)
 
   SdfPathSet loadable;
   _DiscoverPayloads(path,
-                    UsdLoadWithDescendants,
+                    UsdLoadPolicy::UsdLoadPolicyWithDescendants,
                     nullptr,
                     /* unloadedOnly = */ false,
                     &loadable);

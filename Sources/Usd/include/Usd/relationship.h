@@ -133,7 +133,7 @@ class UsdRelationship : public UsdProperty {
   /// semantics, which we will document soon
   USD_API
   bool AddTarget(const SdfPath &target,
-                 UsdListPosition position = UsdListPositionBackOfPrependList) const;
+                 UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList) const;
 
   /// Removes \p target from the list of targets.
   ///

@@ -7,8 +7,8 @@ jobs:
     name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
-        swift: ["5.10"]
+        os: [macos-15]
+        swift: ["6.0.2"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

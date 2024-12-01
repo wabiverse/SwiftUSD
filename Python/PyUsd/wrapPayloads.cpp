@@ -21,7 +21,7 @@ void wrapUsdPayloads()
   class_<UsdPayloads>("Payloads", no_init)
       .def("AddPayload",
            (bool(UsdPayloads::*)(const SdfPayload &, UsdListPosition)) & UsdPayloads::AddPayload,
-           (arg("payload"), arg("position") = UsdListPositionBackOfPrependList))
+           (arg("payload"), arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("AddPayload",
            (bool(UsdPayloads::*)(
                const string &, const SdfPath &, const SdfLayerOffset &, UsdListPosition)) &
@@ -29,18 +29,18 @@ void wrapUsdPayloads()
            (arg("assetPath"),
             arg("primPath"),
             arg("layerOffset") = SdfLayerOffset(),
-            arg("position") = UsdListPositionBackOfPrependList))
+            arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("AddPayload",
            (bool(UsdPayloads::*)(const string &, const SdfLayerOffset &, UsdListPosition)) &
                UsdPayloads::AddPayload,
            (arg("assetPath"),
             arg("layerOffset") = SdfLayerOffset(),
-            arg("position") = UsdListPositionBackOfPrependList))
+            arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
       .def("AddInternalPayload",
            &UsdPayloads::AddInternalPayload,
            (arg("primPath"),
             arg("layerOffset") = SdfLayerOffset(),
-            arg("position") = UsdListPositionBackOfPrependList))
+            arg("position") = UsdListPosition::UsdListPositionBackOfPrependList))
 
       .def("RemovePayload", &UsdPayloads::RemovePayload, arg("payload"))
       .def("ClearPayloads", &UsdPayloads::ClearPayloads)

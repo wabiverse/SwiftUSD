@@ -62,10 +62,10 @@ void UsdStageLoadRules::LoadAndUnload(const SdfPathSet &loadSet,
     Unload(path);
   }
   for (SdfPath const &path : loadSet) {
-    if (policy == UsdLoadWithDescendants) {
+    if (policy == UsdLoadPolicy::UsdLoadPolicyWithDescendants) {
       LoadWithDescendants(path);
     }
-    else if (policy == UsdLoadWithoutDescendants) {
+    else if (policy == UsdLoadPolicy::UsdLoadPolicyWithoutDescendants) {
       LoadWithoutDescendants(path);
     }
   }

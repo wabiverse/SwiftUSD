@@ -210,28 +210,28 @@ class UsdReferences {
   /// composition of listOps.
   USD_API
   bool AddReference(const SdfReference &ref,
-                    UsdListPosition position = UsdListPositionBackOfPrependList);
+                    UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// \overload
   USD_API
   bool AddReference(const std::string &identifier,
                     const SdfPath &primPath,
                     const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                    UsdListPosition position = UsdListPositionBackOfPrependList);
+                    UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// \overload
   /// \sa \ref Usd_DefaultPrim_References "References Without Prim Paths"
   USD_API
   bool AddReference(const std::string &identifier,
                     const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                    UsdListPosition position = UsdListPositionBackOfPrependList);
+                    UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// Add an internal reference to the specified prim.
   /// \sa \ref Usd_Internal_References "Internal References"
   USD_API
   bool AddInternalReference(const SdfPath &primPath,
                             const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                            UsdListPosition position = UsdListPositionBackOfPrependList);
+                            UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// Removes the specified reference from the references listOp at the
   /// current EditTarget.  This does not necessarily eliminate the

@@ -385,6 +385,26 @@ public extension Usd.Stage
   }
 
   /**
+   * Set the default prim layer metadata in this stage's root layer.
+   *
+   * This is shorthand for:
+   * ```swift
+   * stage.getRootLayer().setDefaultPrim(prim.getName())
+   * ```
+   *
+   * If prim is a root prim, otherwise
+   * ```swift
+   * stage.getRootLayer().setDefaultPrim(prim.getPath().getAsToken())
+   * ```
+   *
+   * Note that this function always authors to the stage's root layer.
+   * To author to a different layer, use the `SdfLayer.setDefaultPrim()` API. */
+  func setDefaultPrim(_ prim: Usd.Prim)
+  {
+    SetDefaultPrim(prim)
+  }
+
+  /**
    * Return this stage's root layer. */
   func getRootLayer() -> SdfLayerHandle
   {
@@ -444,6 +464,17 @@ public extension Usd.Stage
   func reload()
   {
     Reload()
+  }
+
+  /**
+   * Modify this stage's load rules to load the prim at `path`, its
+   * ancestors, and all of its descendants if `policy` is `.withDescendants`.
+   *
+   * If `policy` is `.withoutDescendants`, then payloads on descendant prims are not loaded. */
+  func load(path: Sdf.Path = Sdf.Path.absoluteRootPath(), 
+            policy: Pixar.UsdLoadPolicy = .withDescendants) -> Usd.Prim
+  {
+    Load(path, policy)
   }
 
   /**
@@ -642,6 +673,26 @@ public extension Usd.StageRefPtr
   }
 
   /**
+   * Set the default prim layer metadata in this stage's root layer.
+   *
+   * This is shorthand for:
+   * ```swift
+   * stage.getRootLayer().setDefaultPrim(prim.getName())
+   * ```
+   *
+   * If prim is a root prim, otherwise
+   * ```swift
+   * stage.getRootLayer().setDefaultPrim(prim.getPath().getAsToken())
+   * ```
+   *
+   * Note that this function always authors to the stage's root layer.
+   * To author to a different layer, use the `SdfLayer.setDefaultPrim()` API. */
+  func setDefaultPrim(_ prim: Usd.Prim)
+  {
+    pointee.setDefaultPrim(prim)
+  }
+
+  /**
    * Return this stage's root layer. */
   func getRootLayer() -> SdfLayerHandle
   {
@@ -690,6 +741,17 @@ public extension Usd.StageRefPtr
   func reload()
   {
     pointee.reload()
+  }
+
+  /**
+   * Modify this stage's load rules to load the prim at `path`, its
+   * ancestors, and all of its descendants if `policy` is `.withDescendants`.
+   *
+   * If `policy` is `.withoutDescendants`, then payloads on descendant prims are not loaded. */
+  func load(path: Sdf.Path = Sdf.Path.absoluteRootPath(), 
+            policy: Pixar.UsdLoadPolicy = .withDescendants) -> Usd.Prim
+  {
+    pointee.load(path: path, policy: policy)
   }
 
   /**

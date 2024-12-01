@@ -41,7 +41,7 @@ class UsdInherits {
   /// in the position specified by \p position.
   USD_API
   bool AddInherit(const SdfPath &primPath,
-                  UsdListPosition position = UsdListPositionBackOfPrependList);
+                  UsdListPosition position = UsdListPosition::UsdListPositionBackOfPrependList);
 
   /// Removes the specified path from the inheritPaths listOp at the
   /// current EditTarget.

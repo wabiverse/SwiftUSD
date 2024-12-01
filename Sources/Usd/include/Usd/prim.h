@@ -1911,12 +1911,12 @@ class UsdPrim : public UsdObject {
   bool HasAuthoredPayloads() const;
 
   /// Load this prim, all its ancestors, and by default all its descendants.
-  /// If \p loadPolicy is UsdLoadWithoutDescendants, then load only this prim
+  /// If \p loadPolicy is UsdLoadPolicy::UsdLoadPolicyWithoutDescendants, then load only this prim
   /// and its ancestors.
   ///
   /// See UsdStage::Load for additional details.
   USD_API
-  void Load(UsdLoadPolicy policy = UsdLoadWithDescendants) const;
+  void Load(UsdLoadPolicy policy = UsdLoadPolicy::UsdLoadPolicyWithDescendants) const;
 
   /// Unloads this prim and all its descendants.
   ///

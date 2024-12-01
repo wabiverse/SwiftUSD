@@ -149,10 +149,10 @@ bool UsdShadeConnectableAPI::ConnectToSource(UsdAttribute const &shadingAttr,
     return shadingAttr.SetConnections(SdfPathVector{sourceAttr.GetPath()});
   }
   else if (mod == ConnectionModification::Prepend) {
-    return shadingAttr.AddConnection(sourceAttr.GetPath(), UsdListPositionFrontOfPrependList);
+    return shadingAttr.AddConnection(sourceAttr.GetPath(), UsdListPosition::UsdListPositionFrontOfPrependList);
   }
   else if (mod == ConnectionModification::Append) {
-    return shadingAttr.AddConnection(sourceAttr.GetPath(), UsdListPositionBackOfAppendList);
+    return shadingAttr.AddConnection(sourceAttr.GetPath(), UsdListPosition::UsdListPositionBackOfAppendList);
   }
 
   return false;
