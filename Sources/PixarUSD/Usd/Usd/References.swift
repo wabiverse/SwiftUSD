@@ -23,11 +23,13 @@ public extension Usd
 
 public extension Usd.References
 {
+  @discardableResult
   mutating func addReference(_ ref: Sdf.Reference, position: Pixar.UsdListPosition = .backOfPrependList) -> Bool
   {
     AddReference(ref, position)
   }
 
+  @discardableResult
   mutating func addReference(assetPath: String,
                              primPath: Sdf.Path,
                              layerOffset: Sdf.LayerOffset = Sdf.LayerOffset(),
@@ -36,6 +38,7 @@ public extension Usd.References
     AddReference(std.string(assetPath), primPath, layerOffset, position)
   }
 
+  @discardableResult
   mutating func addReference(assetPath: String,
                              layerOffset: Sdf.LayerOffset = Sdf.LayerOffset(),
                              position: Pixar.UsdListPosition = .backOfPrependList) -> Bool

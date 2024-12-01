@@ -471,6 +471,7 @@ public extension Usd.Stage
    * ancestors, and all of its descendants if `policy` is `.withDescendants`.
    *
    * If `policy` is `.withoutDescendants`, then payloads on descendant prims are not loaded. */
+  @discardableResult
   func load(path: Sdf.Path = Sdf.Path.absoluteRootPath(), 
             policy: Pixar.UsdLoadPolicy = .withDescendants) -> Usd.Prim
   {
@@ -748,6 +749,7 @@ public extension Usd.StageRefPtr
    * ancestors, and all of its descendants if `policy` is `.withDescendants`.
    *
    * If `policy` is `.withoutDescendants`, then payloads on descendant prims are not loaded. */
+  @discardableResult
   func load(path: Sdf.Path = Sdf.Path.absoluteRootPath(), 
             policy: Pixar.UsdLoadPolicy = .withDescendants) -> Usd.Prim
   {
