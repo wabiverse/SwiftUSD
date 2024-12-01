@@ -7,10 +7,15 @@ jobs:
     name: Swift ${{ matrix.swift }} on iOS
     strategy:
       matrix:
-        os: [self-hosted]
+        os: [macos-latest]
         swift: ["5.10"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: 📦 Build
-        run: swift bundler bundle -c release -p iOSSimulator UsdView
+      - name: 🦦 Install Swift Bundler
+        run: |
+          curl -o swift-bundler -L https://github.com/wabiverse/wabi-swift-bundler/releases/download/v3.0.0/swift-bundler
+          chmod +x ./swift-bundler
+          cp ./swift-bundler /usr/local/bin
+      - name: 📦 Build & Bundle
+        run: ./swift-bundler bundle -c release -p iOSSimulator UsdView
