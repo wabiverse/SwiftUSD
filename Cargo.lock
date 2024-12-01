@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "rust-usd"
-version = "24.8.10"
+version = "24.8.11"
 dependencies = [
  "swift-bridge",
  "swift-bridge-build",
