@@ -326,7 +326,6 @@ let package = Package(
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
-        .product(name: "CosmoGraph", package: "MetaverseKit"),
         /* ---------- Apple only libs. ---------- */
         .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         /* ---------- Console logging. ---------- */

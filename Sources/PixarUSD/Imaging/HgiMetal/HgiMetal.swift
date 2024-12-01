@@ -11,7 +11,7 @@
  * ---------------------------------------------------------------- */
 
 #if canImport(Metal)
-  import CosmoGraph
+  import Metal
   import HgiMetal
 
   public enum HgiMetal
