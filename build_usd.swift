@@ -10,23 +10,26 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import SwiftSyntax
-import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
+import Foundation
+import SwiftBundlerBuilders
 
-public struct StringifyMacro: ExpressionMacro
+@main
+public struct OpenUSDBuilder: Builder 
 {
-  public static func expansion(
-    of node: some FreestandingMacroExpansionSyntax,
-    in _: some MacroExpansionContext
-  ) -> ExprSyntax
+  public static func build(_ context: some BuilderContext) throws -> BuilderResult
   {
-    guard let argument = node.arguments.first?.expression
-    else
-    {
-      fatalError("compiler bug: the macro does not have any arguments")
-    }
+    try context.run(
+      "/usr/bin/python3", [
+        "build_scripts/build_usd.py",
+        "--build-shared",
+        "--no-python", 
+        "--no-imaging", 
+        "--no-usdview",
+        "--build-variant", "release",
+        context.buildDirectory.path
+      ]
+    )
 
-    return "\(literal: argument.description)"
+    return .init()
   }
 }

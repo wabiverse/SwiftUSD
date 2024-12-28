@@ -1,12 +1,90 @@
 format_version = 2
 
+[projects.default]
+source = 'git(https://github.com/PixarAnimationStudios/OpenUSD.git)'
+revision = 'release'
+
+[projects.default.products]
+usd_ar = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_arch = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_gf = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_js = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_kind = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_ndr = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_pcp = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_pegtl = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_plug = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_sdf = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_sdr = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_tf = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_trace = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_ts = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usd = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdGeom = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdHydra = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdLux = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdMedia = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdMtlx = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdPhysics = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdProc = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdRender = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdRi = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdSemantics = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdShade = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdSkel = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdUI = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdUtils = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_usdVol = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_vt = { type = 'dynamicLibrary', output_directory = 'lib' }
+usd_work = { type = 'dynamicLibrary', output_directory = 'lib' }
+
+[projects.default.builder]
+name = 'build_usd.swift'
+type = 'wholeProject'
+api_source = 'git(https://github.com/stackotter/swift-bundler.git)'
+api = 'revision(main)'
+
 [apps.UsdView]
 identifier = 'foundation.wabi.UsdView'
 product = 'UsdView'
 version = '1.0.0'
 category = 'public.app-category.graphics-design'
 icon = 'usdview.png'
+dependencies = [
+  'usd_ar',
+  'usd_arch',
+  'usd_gf',
+  'usd_js',
+  'usd_kind',
+  'usd_ndr',
+  'usd_pcp',
+  'usd_pegtl',
+  'usd_plug',
+  'usd_sdf',
+  'usd_sdr',
+  'usd_tf',
+  'usd_trace',
+  'usd_ts',
+  'usd_usd',
+  'usd_usdGeom',
+  'usd_usdHydra',
+  'usd_usdLux',
+  'usd_usdMedia',
+  'usd_usdMtlx',
+  'usd_usdPhysics',
+  'usd_usdProc',
+  'usd_usdRender',
+  'usd_usdRi',
+  'usd_usdSemantics',
+  'usd_usdShade',
+  'usd_usdSkel',
+  'usd_usdUI',
+  'usd_usdUtils',
+  'usd_usdVol',
+  'usd_vt',
+  'usd_work'
+]
 
 [apps.UsdView.plist]
 commit = '$(COMMIT_HASH)'
-CFBundleDocumentTypes = [ { type = "dict", value = { CFBundleTypeExtensions = [ 'usd', 'usda', 'usdc', 'usdz' ], CFBundleTypeIconFile = 'AppIcon.icns', CFBundleTypeName = 'Universal Scene Description File', CFBundleTypeRole = 'Editor', LSIsAppleDefaultForType = true, LSItemContentTypes = [ 'com.pixar.universal-scene-description', 'com.pixar.universal-scene-description-mobile', 'com.pixar.usd.ascii', 'com.pixar.usd.crate' ], CFBundleTypeIconSystemGenerated = true } } ]
+CFBundleDocumentTypes = [ { type = 'dict', value = { CFBundleTypeExtensions = [ 'usd', 'usda', 'usdc', 'usdz' ], CFBundleTypeIconFile = 'AppIcon.icns', CFBundleTypeName = 'Universal Scene Description File', CFBundleTypeRole = 'Editor', LSIsAppleDefaultForType = true, LSItemContentTypes = [ 'com.pixar.universal-scene-description', 'com.pixar.universal-scene-description-mobile', 'com.pixar.usd.ascii', 'com.pixar.usd.crate' ], CFBundleTypeIconSystemGenerated = true } } ]
