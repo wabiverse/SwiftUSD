@@ -11,29 +11,8 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
 
-public extension Hydra
+public extension Bundle
 {
-  /**
-   * ``NORenderer``
-   *
-   * ## Overview
-   *
-   * The Hydra Engine (``Hd``) no-op renderer for the ``UsdView``
-   * application. Note: This renders nothing. */
-  class NORenderer
-  {
-    public var stage: UsdStageRefPtr
-
-    public required init(stage: UsdStageRefPtr)
-    {
-      self.stage = stage
-    }
-
-    public func info()
-    {
-      Msg.logger.log(level: .info, "Created HGI -> None.")
-    }
-  }
+  static let usdview = Bundle.module
 }

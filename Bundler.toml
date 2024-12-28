@@ -1,5 +1,17 @@
 format_version = 2
 
+[projects.UsdView]
+source = 'git(https://github.com/wabiverse/SwiftUSD.git)'
+revision = 'main'
+
+[projects.UsdView.products.UsdView]
+type = 'executable'
+
+[projects.UsdView.builder]
+name = 'Package.swift'
+type = 'wholeProject'
+api = 'revision(main)'
+
 [apps.UsdView]
 identifier = 'foundation.wabi.UsdView'
 product = 'UsdView'

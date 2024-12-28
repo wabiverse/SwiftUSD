@@ -10,30 +10,13 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import Foundation
-import PixarUSD
+#if canImport(UsdImagingGL)
+  import UsdImagingGL
 
-public extension Hydra
-{
-  /**
-   * ``NORenderer``
-   *
-   * ## Overview
-   *
-   * The Hydra Engine (``Hd``) no-op renderer for the ``UsdView``
-   * application. Note: This renders nothing. */
-  class NORenderer
+  public typealias UsdImagingGLRenderParams = Pixar.UsdImagingGLRenderParams
+
+  public extension UsdImagingGL
   {
-    public var stage: UsdStageRefPtr
-
-    public required init(stage: UsdStageRefPtr)
-    {
-      self.stage = stage
-    }
-
-    public func info()
-    {
-      Msg.logger.log(level: .info, "Created HGI -> None.")
-    }
+    typealias RenderParams = UsdImagingGLRenderParams
   }
-}
+#endif // canImport(UsdImagingGL)

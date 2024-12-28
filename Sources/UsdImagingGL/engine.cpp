@@ -184,6 +184,16 @@ UsdImagingGLEngine::UsdImagingGLEngine(const SdfPath &rootPath,
 }
 
 // static.
+UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine()
+{
+  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+
+  engine.reset(new UsdImagingGLEngine());
+
+  return engine;
+}
+
+// static.
 UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const Parameters &params)
 {
   UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();

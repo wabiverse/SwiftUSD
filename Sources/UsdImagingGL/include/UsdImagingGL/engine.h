@@ -152,6 +152,9 @@ class UsdImagingGLEngine {
   // ---------------------------------------------------------------------
 
   USDIMAGINGGL_API
+  static UsdImagingGLEngineSharedPtr CreateEngine();
+
+  USDIMAGINGGL_API
   static UsdImagingGLEngineSharedPtr CreateEngine(const Parameters &params);
 
   USDIMAGINGGL_API

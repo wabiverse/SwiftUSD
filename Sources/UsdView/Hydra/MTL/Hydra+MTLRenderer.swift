@@ -18,78 +18,69 @@ import PixarUSD
 
   public extension Hydra
   {
-    /**
-     * ``MTLRenderer``
-     *
-     * ## Overview
-     *
-     * The Hydra Engine (``Hd``) Metal renderer for the ``UsdView``
-     * application conforms to the ``MTKViewDelegate`` protocol,
-     * allowing it to be set as a ``MTKView`` object's delegate to
-     * provide a drawing method to a ``MTKView`` object and respond
-     * to rendering events. */
-    class MTLRenderer: NSObject, MTKViewDelegate, HdRenderEngine
+    class MTLRenderer: NSObject, MTKViewDelegate
     {
-      let hgi: Pixar.HgiMetalPtr
-      var device: MTLDevice!
+      private let device: MTLDevice
+      private let commandQueue: MTLCommandQueue
+      private var pipelineState: MTLRenderPipelineState?
 
-      public var stage: UsdStageRefPtr
-
-      #if canImport(UsdImagingGL)
-        /// UsdImagingGL is not available on iOS.
-        var engine: UsdImagingGL.EngineSharedPtr
-      #endif // canImport(UsdImagingGL)
-
-      public init(metalView: MTKView)
+      init?(device: MTLDevice)
       {
-        hgi = HgiMetal.createHgi()
-        device = hgi.device
-        stage = Usd.Stage.createInMemory()
+        self.device = device
 
-        let driver = HdDriver(name: .renderDriver, driver: hgi.value)
+        guard let commandQueue = device.makeCommandQueue()
+        else { return nil }
 
-        #if canImport(UsdImagingGL)
-          // UsdImagingGL is not available on iOS.
-          engine = UsdImagingGL.Engine.createEngine(
-            rootPath: stage.getPseudoRoot().getPath(),
-            excludedPaths: Sdf.PathVector(),
-            invisedPaths: Sdf.PathVector(),
-            sceneDelegateId: Sdf.Path.absoluteRootPath(),
-            driver: driver
+        self.commandQueue = commandQueue
+        super.init()
+
+        setupPipeline()
+      }
+
+      private func setupPipeline()
+      {
+        let library = try! device.makeDefaultLibrary(bundle: .usdview)
+        let vertexFunction = library.makeFunction(name: "vertex_main")
+        let fragmentFunction = library.makeFunction(name: "fragment_main")
+
+        let pipelineDescriptor = MTLRenderPipelineDescriptor()
+        pipelineDescriptor.vertexFunction = vertexFunction
+        pipelineDescriptor.fragmentFunction = fragmentFunction
+        pipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+
+        pipelineState = try? device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+      }
+
+      public func mtkView(_: MTKView, drawableSizeWillChange _: CGSize)
+      {}
+
+      public func draw(in view: MTKView)
+      {
+        guard
+          let drawable = view.currentDrawable,
+          let renderPassDescriptor = view.currentRenderPassDescriptor,
+          let pipelineState
+        else { return }
+
+        let commandBuffer = commandQueue.makeCommandBuffer()
+        let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+
+        renderEncoder?.setRenderPipelineState(pipelineState)
+        renderEncoder?.setViewport(
+          MTLViewport(
+            originX: 0.0,
+            originY: 0.0,
+            width: Double(view.drawableSize.width),
+            height: Double(view.drawableSize.height),
+            znear: -1.0,
+            zfar: 1.0
           )
-        #endif // canImport(UsdImagingGL)
+        )
+        renderEncoder?.endEncoding()
 
-        metalView.device = hgi.device
+        commandBuffer?.present(drawable)
+        commandBuffer?.commit()
       }
-
-      public required convenience init(stage: UsdStageRefPtr)
-      {
-        self.init(metalView: MTKView())
-        self.stage = stage
-
-        #if canImport(UsdImagingGL)
-          // UsdImagingGL is not available on iOS.
-          engine.setEnablePresentation(false)
-          engine.setRenderer(aov: .color)
-        #endif // canImport(UsdImagingGL)
-      }
-
-      public func info()
-      {
-        Msg.logger.log(level: .info, "Created HGI -> Metal API v\(hgi.apiVersion).")
-        Msg.logger.log(level: .info, "GPU Architecture -> \(hgi.device.architecture.name)")
-      }
-
-      public func mtkView(_: MTKView, drawableSizeWillChange size: CGSize)
-      {
-        print("drawableSizeWillChange", size)
-      }
-
-      public func draw()
-      {}
-
-      public func draw(in _: MTKView)
-      {}
     }
   }
 #endif // canImport(Metal) && !os(visionOS)

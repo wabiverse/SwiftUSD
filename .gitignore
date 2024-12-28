@@ -6,3 +6,4 @@
 .swiftpm
 generated
 target
+.index-build

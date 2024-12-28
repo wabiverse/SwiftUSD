@@ -15,33 +15,28 @@ import PixarUSD
 
 public enum Hydra
 {
-  public class RenderEngine: HdRenderEngine
+  public class RenderEngine
   {
     public var stage: UsdStageRefPtr
-
-    public var engine: any HdRenderEngine
+    public var engine: UsdImagingGL.EngineSharedPtr
 
     public required init(stage: UsdStageRefPtr)
     {
       self.stage = stage
-
-      #if !os(Linux) && !os(Windows) && !os(Android) && canImport(HgiMetal) && canImport(UsdImagingGL)
-        engine = Hydra.MTLRenderer(stage: stage)
-      #elseif canImport(HgiGL) && canImport(UsdImagingGL)
-        engine = Hydra.GLRenderer(stage: stage)
-      #else
-        engine = Hydra.NORenderer(stage: stage)
-      #endif
+      engine = UsdImagingGL.Engine.createEngine()
     }
 
-    public func info()
+    public func render()
     {
-      engine.info()
-    }
+      var params = UsdImagingGL.RenderParams()
+      params.frame = Usd.TimeCode.Default()
+      params.clearColor = .init(0.1, 0.1, 0.1, 1.0)
+      params.enableIdRender = false
+      params.showGuides = false
+      params.showRender = true
+      params.showProxy = false
 
-    public func draw()
-    {
-      engine.draw()
+      engine.render(root: stage.getPseudoRoot(), params: params)
     }
   }
 }

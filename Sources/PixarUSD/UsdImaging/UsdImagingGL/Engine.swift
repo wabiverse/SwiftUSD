@@ -24,6 +24,11 @@
 
   public extension UsdImagingGL.Engine
   {
+    static func createEngine() -> UsdImagingGL.EngineSharedPtr
+    {
+      UsdImagingGL.Engine.CreateEngine()
+    }
+    
     static func createEngine(params: Parameters) -> UsdImagingGL.EngineSharedPtr
     {
       UsdImagingGL.Engine.CreateEngine(params)
@@ -68,6 +73,11 @@
     {
       SetRendererAov(aov.token)
     }
+
+    func render(root: Usd.Prim, params: UsdImagingGL.RenderParams)
+    {
+      Render(root, params)
+    }
   }
 
   public extension UsdImagingGL.EngineSharedPtr
@@ -80,6 +90,11 @@
     func setRenderer(aov token: Hd.AovTokens)
     {
       pointee.setRenderer(aov: token)
+    }
+
+    func render(root prim: Usd.Prim, params: UsdImagingGL.RenderParams)
+    {
+      pointee.render(root: prim, params: params)
     }
   }
 #endif // canImport(UsdImagingGLEngine)
