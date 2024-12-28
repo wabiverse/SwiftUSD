@@ -1219,6 +1219,7 @@ let package = Package(
         .target(name: "CameraUtil"),
         .target(name: "Hf"),
         .target(name: "PxOsd"),
+        .target(name: "HgiInterop"),
       ],
       resources: [
         .process("Resources"),

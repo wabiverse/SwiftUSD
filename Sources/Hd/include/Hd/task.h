@@ -14,6 +14,8 @@
 
 #include "Hd/sceneDelegate.h"
 
+#include "HgiInterop/hgiInteropImpl.h"
+
 #include "Sdf/path.h"
 #include "Tf/hashmap.h"
 #include "Vt/dictionary.h"
@@ -232,8 +234,9 @@ template<class T> T HdTask::_GetDriver(HdTaskContext const *ctx, TfToken const &
       HdDriverVector const &drivers = value.UncheckedGet<HdDriverVector>();
       for (HdDriver *hdDriver : drivers) {
         if (hdDriver->name == driverName) {
-          if (hdDriver->driver.IsHolding<T>()) {
-            return hdDriver->driver.UncheckedGet<T>();
+          Hgi *platformHgi = HgiInterop::GetHgiFromDriver(hdDriver->driver);
+          if (platformHgi) {
+            return platformHgi;
           }
         }
       }
