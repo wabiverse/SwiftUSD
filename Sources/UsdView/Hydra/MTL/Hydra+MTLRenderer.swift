@@ -21,17 +21,17 @@ import PixarUSD
     class MTLRenderer: NSObject, MTKViewDelegate
     {
       private let device: MTLDevice
-      private let commandQueue: MTLCommandQueue
+      //private let commandQueue: MTLCommandQueue
       private var pipelineState: MTLRenderPipelineState?
 
       init?(device: MTLDevice)
       {
         self.device = device
 
-        guard let commandQueue = device.makeCommandQueue()
-        else { return nil }
+        // guard let commandQueue = device.makeCommandQueue()
+        // else { return nil }
 
-        self.commandQueue = commandQueue
+        // self.commandQueue = commandQueue
         super.init()
 
         setupPipeline()
@@ -56,16 +56,21 @@ import PixarUSD
 
       public func draw(in view: MTKView)
       {
-        guard
-          let drawable = view.currentDrawable,
-          let renderPassDescriptor = view.currentRenderPassDescriptor,
-          let pipelineState
-        else { return }
+        guard let drawable = view.currentDrawable else { return }
+        let renderPassDescriptor = view.currentRenderPassDescriptor
+        
+        let commandQueue = view.device?.makeCommandQueue()
+        let commandBuffer = commandQueue?.makeCommandBuffer()
 
-        let commandBuffer = commandQueue.makeCommandBuffer()
-        let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+        var renderEncoder: (any MTLRenderCommandEncoder)? = nil
+        if let renderPassDescriptor {
+          renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+        }
 
-        renderEncoder?.setRenderPipelineState(pipelineState)
+        if let pipelineState { 
+          renderEncoder?.setRenderPipelineState(pipelineState)
+        }
+
         renderEncoder?.setViewport(
           MTLViewport(
             originX: 0.0,

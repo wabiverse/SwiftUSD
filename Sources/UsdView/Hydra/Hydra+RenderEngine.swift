@@ -18,19 +18,32 @@ public enum Hydra
   public class RenderEngine
   {
     public var stage: UsdStageRefPtr
-    public var engine: UsdImagingGL.EngineSharedPtr
+
+    private let hgi: Pixar.HgiMetalPtr
+    private let engine: UsdImagingGL.EngineSharedPtr
 
     public required init(stage: UsdStageRefPtr)
     {
       self.stage = stage
-      engine = UsdImagingGL.Engine.createEngine()
+
+      hgi = HgiMetal.createHgi()
+      let driver = HdDriver(name: .renderDriver, driver: hgi.value)
+
+      engine = UsdImagingGL.Engine.createEngine(
+        rootPath: stage.getPseudoRoot().getPath(),
+        excludedPaths: Sdf.PathVector(),
+        invisedPaths: Sdf.PathVector(),
+        sceneDelegateId: Sdf.Path.absoluteRootPath(),
+        driver: driver
+      )
     }
 
-    public func render()
+    public func render(rgba: (Double, Double, Double, Double))
     {
       var params = UsdImagingGL.RenderParams()
+
       params.frame = Usd.TimeCode.Default()
-      params.clearColor = .init(0.1, 0.1, 0.1, 1.0)
+      params.clearColor = .init(Float(rgba.0), Float(rgba.1), Float(rgba.2), Float(rgba.3))
       params.enableIdRender = false
       params.showGuides = false
       params.showRender = true

@@ -38,11 +38,14 @@ import PixarUSD
         private let device: MTLDevice!
         private let renderer: MTLRenderer!
 
-        public init(hydra: Hydra.RenderEngine, device: MTLDevice, renderer: MTLRenderer)
+        var rgba: (Double, Double, Double, Double)
+
+        public init(hydra: Hydra.RenderEngine, device: MTLDevice, renderer: MTLRenderer, rgba: (Double, Double, Double, Double))
         {
           self.hydra = hydra
           self.device = device
           self.renderer = renderer
+          self.rgba = rgba
         }
 
         public func makeCoordinator() -> Coordinator
@@ -55,6 +58,7 @@ import PixarUSD
           let metalView = context.coordinator.metalView
           metalView.device = device
           metalView.delegate = renderer
+          metalView.clearColor = MTLClearColorMake(rgba.0, rgba.1, rgba.2, rgba.3)
           metalView.apply(context.environment)
 
           context.coordinator.setNeedsDisplayTrigger = context.environment.setNeedsDisplayTrigger
@@ -62,15 +66,12 @@ import PixarUSD
           return metalView
         }
 
-        public func updateNSView(_: MTKView, context: Context)
+        public func updateNSView(_ view: MTKView, context: Context)
         {
-          context.coordinator.metalView.apply(context.environment)
-          context.coordinator.setNeedsDisplayTrigger = context.environment.setNeedsDisplayTrigger
+          view.clearColor = MTLClearColorMake(rgba.0, rgba.1, rgba.2, rgba.3)
 
-          renderer.draw(in: context.coordinator.metalView)
-          hydra.render()
-
-          print("UPDATE VIEW")
+          renderer.draw(in: view)
+          hydra.render(rgba: rgba)
         }
 
         public class Coordinator

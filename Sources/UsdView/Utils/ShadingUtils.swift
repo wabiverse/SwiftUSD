@@ -62,3 +62,34 @@ public func matDef(_ stage: UsdStageRefPtr, color: ShadeColor = ShadeColor.white
 
   return material
 }
+
+#if canImport(SwiftUI)
+  import SwiftUI
+
+  extension UsdView
+  {
+    func startColorAnimation()
+    {
+      Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true)
+      { _ in
+        hue += 0.01
+        if hue > 1.0 { hue = 0.0 }
+        rgba = hueToRGBA(hue: hue)
+      }
+    }
+
+    func hueToRGBA(hue: Double) -> (Double, Double, Double, Double)
+    {
+      let color = Color(hue: hue, saturation: 1.0, brightness: 1.0)
+      var red: Double = 0, green: Double = 0, blue: Double = 0, alpha: Double = 0
+      if let components = color.cgColor?.components, components.count >= 3
+      {
+        red = components[0]
+        green = components[1]
+        blue = components[2]
+        alpha = Double(color.cgColor?.alpha ?? 1.0)
+      }
+      return (red, green, blue, alpha)
+    }
+  }
+#endif // canImport(SwiftUI)

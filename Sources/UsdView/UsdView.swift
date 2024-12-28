@@ -15,6 +15,7 @@ import PixarUSD
 
 #if canImport(SwiftUI)
   import SwiftUI
+
   public protocol PixarApp: App
   {}
 #else
@@ -38,6 +39,10 @@ struct UsdView: PixarApp
   /// the hydra rendering engine.
   let engine: Hydra.RenderEngine
 
+  /// give it a color spectrum...
+  @State var rgba = (0.1, 0.1, 0.1, 1.0)
+  @State var hue = 0.0
+
   public init()
   {
     // register all usd plugins & resources.
@@ -59,8 +64,14 @@ struct UsdView: PixarApp
       {
         VStack
         {
-          Hydra.Viewport(engine: engine)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+          Hydra.Viewport(engine: engine, rgba: rgba)
+            .ignoresSafeArea()
+        }
+        .onAppear
+        {
+          #if canImport(SwiftUI)
+            startColorAnimation()
+          #endif // canImport(SwiftUI)
         }
       }
     }
