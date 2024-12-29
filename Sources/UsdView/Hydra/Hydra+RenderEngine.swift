@@ -57,7 +57,7 @@ public enum Hydra
       // Viewport setup.
       let viewport = Gf.Vec4d(0, 0, viewSize.width, viewSize.height)
       engine.pointee.SetRenderViewport(viewport)
-      engine.pointee.SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy.init(0))
+      engine.pointee.SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(0))
 
       var params = UsdImagingGL.RenderParams()
       params.frame = Usd.TimeCode(timeCode)
