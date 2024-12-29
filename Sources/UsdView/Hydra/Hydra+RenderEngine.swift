@@ -50,9 +50,9 @@ public enum Hydra
       params.frame = Usd.TimeCode.Default()
       params.clearColor = .init(Float(rgba.0), Float(rgba.1), Float(rgba.2), Float(rgba.3))
       params.enableIdRender = false
-      params.showGuides = false
+      params.showGuides = true
       params.showRender = true
-      params.showProxy = false
+      params.showProxy = true
 
       engine.render(root: stage.getPseudoRoot(), params: params)
     }

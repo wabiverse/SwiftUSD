@@ -21,8 +21,15 @@ import PixarUSD
     class MTLRenderer: NSObject, MTKViewDelegate
     {
       private let device: MTLDevice
+      private var hydra: Hydra.RenderEngine?
       //private let commandQueue: MTLCommandQueue
       private var pipelineState: MTLRenderPipelineState?
+
+      convenience init(device: MTLDevice, hydra: Hydra.RenderEngine)
+      {
+        self.init(device: device)!
+        self.hydra = hydra
+      }
 
       init?(device: MTLDevice)
       {
@@ -57,15 +64,11 @@ import PixarUSD
       public func draw(in view: MTKView)
       {
         guard let drawable = view.currentDrawable else { return }
-        let renderPassDescriptor = view.currentRenderPassDescriptor
+        guard let renderPassDescriptor = view.currentRenderPassDescriptor else { return }
         
         let commandQueue = view.device?.makeCommandQueue()
         let commandBuffer = commandQueue?.makeCommandBuffer()
-
-        var renderEncoder: (any MTLRenderCommandEncoder)? = nil
-        if let renderPassDescriptor {
-          renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
-        }
+        let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
 
         if let pipelineState { 
           renderEncoder?.setRenderPipelineState(pipelineState)
@@ -81,8 +84,10 @@ import PixarUSD
             zfar: 1.0
           )
         )
-        renderEncoder?.endEncoding()
 
+        hydra?.render(rgba: (0.1, 0.1, 0.1, 1.0))
+
+        renderEncoder?.endEncoding()
         commandBuffer?.present(drawable)
         commandBuffer?.commit()
       }

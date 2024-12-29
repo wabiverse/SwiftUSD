@@ -18,6 +18,7 @@ import SwiftSyntaxMacros
 struct PixarMacrosPlugin: CompilerPlugin
 {
   let providingMacros: [Macro.Type] = [
-    PixarXformableMacro.self
+    PixarXformableMacro.self,
+    PixarPrimMacro.self
   ]
 }

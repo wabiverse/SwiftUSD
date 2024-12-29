@@ -10,30 +10,25 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CxxStdlib
-import Usd
+import Foundation
+import SwiftCompilerPlugin
+import SwiftSyntax
+import SwiftSyntaxBuilder
+import SwiftSyntaxMacros
 
-public typealias UsdAttribute = Pixar.UsdAttribute
-
-public extension Usd
+public struct PixarPrimMacro: MemberMacro
 {
-  typealias Attribute = UsdAttribute
-}
-
-public extension Usd.Attribute
-{
-  func set(doc: String)
+  public static func expansion(of _: SwiftSyntax.AttributeSyntax,
+                               providingMembersOf _: some SwiftSyntax.DeclGroupSyntax,
+                               in _: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax]
   {
-    SetDocumentation(std.string(doc))
-  }
+    let decl: DeclSyntax = """
+      public func getAttribute(_ name: Tf.Token) -> Usd.Attribute
+      {
+        GetAttribute(name)
+      }
+      """
 
-  func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(std.string(value), time)
-  }
-
-  func set(_ value: Sdf.AssetPath, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(value, time)
+    return [decl]
   }
 }

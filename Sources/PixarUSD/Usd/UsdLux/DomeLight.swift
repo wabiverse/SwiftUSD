@@ -33,4 +33,14 @@ extension UsdLux.DomeLight: GeomXformable
   {
     UsdLux.DomeLight.define(stage, path: .init(path))
   }
+
+  public func getTextureFileAttr() -> Usd.Attribute
+  {
+    GetTextureFileAttr()
+  }
+
+  public func createTextureFileAttr(defaultValue: Vt.Value = Vt.Value(), writeSparsely: Bool = false) -> Usd.Attribute
+  {
+    CreateTextureFileAttr(defaultValue, writeSparsely)
+  }
 }

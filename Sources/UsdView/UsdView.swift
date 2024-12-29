@@ -49,47 +49,27 @@ struct UsdView: PixarApp
     registerPlugins()
 
     // create a new usd stage.
-    stage = Usd.Stage.createNew("\(documentsDirPath())/HelloPixarUSD", ext: .usda)
+    stage = UsdView.createScene()
 
     // setup hydra to render the usd stage.
     engine = Hydra.RenderEngine(stage: stage)
 
-    runDemo()
+    Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
   }
 
-  #if canImport(SwiftUI)
-    var body: some Scene
+  var body: some Scene
+  {
+    WindowGroup("UsdView", id: "usdview")
     {
-      WindowGroup("UsdView", id: "usdview")
+      VStack
       {
-        VStack
-        {
-          Hydra.Viewport(engine: engine, rgba: rgba)
-            .ignoresSafeArea()
-        }
-        .onAppear
-        {
-          #if canImport(SwiftUI)
-            startColorAnimation()
-          #endif // canImport(SwiftUI)
-        }
+        Hydra.Viewport(engine: engine, rgba: rgba)
+          .ignoresSafeArea()
+      }
+      .onAppear
+      {
+        startColorAnimation()
       }
     }
-  #else
-    static func main()
-    {
-      let app = UsdView()
-    }
-  #endif
-
-  func runDemo()
-  {
-    // create usd scene.
-    createScene()
-
-    // declarative usd scene.
-    declareScene()
-
-    Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
   }
 }

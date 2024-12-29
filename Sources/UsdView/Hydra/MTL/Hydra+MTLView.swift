@@ -68,10 +68,7 @@ import PixarUSD
 
         public func updateNSView(_ view: MTKView, context: Context)
         {
-          // view.clearColor = MTLClearColorMake(rgba.0, rgba.1, rgba.2, rgba.3)
-
           renderer.draw(in: view)
-          hydra.render(rgba: rgba)
         }
 
         public class Coordinator

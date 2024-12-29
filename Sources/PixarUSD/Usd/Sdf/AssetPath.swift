@@ -11,29 +11,20 @@
  * ---------------------------------------------------------------- */
 
 import CxxStdlib
-import Usd
+import Foundation
+import Sdf
 
-public typealias UsdAttribute = Pixar.UsdAttribute
+public typealias SdfAssetPath = Pixar.SdfAssetPath
 
-public extension Usd
+public extension Sdf
 {
-  typealias Attribute = UsdAttribute
+  typealias AssetPath = SdfAssetPath
 }
 
-public extension Usd.Attribute
+public extension Sdf.AssetPath
 {
-  func set(doc: String)
+  init(_ path: String)
   {
-    SetDocumentation(std.string(doc))
-  }
-
-  func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(std.string(value), time)
-  }
-
-  func set(_ value: Sdf.AssetPath, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(value, time)
+    self.init(std.string(path))
   }
 }

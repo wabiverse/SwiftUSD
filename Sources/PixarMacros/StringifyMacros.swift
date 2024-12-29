@@ -21,7 +21,7 @@ public struct StringifyMacro: ExpressionMacro
     in _: some MacroExpansionContext
   ) -> ExprSyntax
   {
-    guard let argument = node.argumentList.first?.expression
+    guard let argument = node.arguments.first?.expression
     else
     {
       fatalError("compiler bug: the macro does not have any arguments")

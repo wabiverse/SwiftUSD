@@ -10,30 +10,12 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CxxStdlib
 import Usd
 
-public typealias UsdAttribute = Pixar.UsdAttribute
+@attached(member, names: arbitrary, conformances: PrimRepresentable)
+public macro Prim() = #externalMacro(module: "PixarMacros", type: "PixarPrimMacro")
 
-public extension Usd
+public protocol PrimRepresentable
 {
-  typealias Attribute = UsdAttribute
-}
-
-public extension Usd.Attribute
-{
-  func set(doc: String)
-  {
-    SetDocumentation(std.string(doc))
-  }
-
-  func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(std.string(value), time)
-  }
-
-  func set(_ value: Sdf.AssetPath, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
-  {
-    Set(value, time)
-  }
+  func getAttribute(_ name: Tf.Token) -> Usd.Attribute
 }
