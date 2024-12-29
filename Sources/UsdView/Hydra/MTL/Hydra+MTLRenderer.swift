@@ -22,8 +22,10 @@ import PixarUSD
     {
       private let device: MTLDevice
       private var hydra: Hydra.RenderEngine?
-      //private let commandQueue: MTLCommandQueue
+      /// private let commandQueue: MTLCommandQueue
       private var pipelineState: MTLRenderPipelineState?
+
+      private var inFlightSemaphore = DispatchSemaphore(value: 1)
 
       convenience init(device: MTLDevice, hydra: Hydra.RenderEngine)
       {
@@ -41,7 +43,7 @@ import PixarUSD
         // self.commandQueue = commandQueue
         super.init()
 
-        setupPipeline()
+        loadMetal()
       }
 
       private func setupPipeline()
@@ -63,33 +65,120 @@ import PixarUSD
 
       public func draw(in view: MTKView)
       {
-        guard let drawable = view.currentDrawable else { return }
-        guard let renderPassDescriptor = view.currentRenderPassDescriptor else { return }
-        
-        let commandQueue = view.device?.makeCommandQueue()
-        let commandBuffer = commandQueue?.makeCommandBuffer()
-        let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+        drawFrame(in: view, timeCode: 0.0)
+      }
 
-        if let pipelineState { 
-          renderEncoder?.setRenderPipelineState(pipelineState)
+      /// draw the scene, and blit the result to the view.
+      func drawFrame(in view: MTKView, timeCode: Double) -> Bool
+      {
+        guard let hgi = hydra?.getHgi() else { return false }
+
+        // start the next frame.
+        _ = inFlightSemaphore.wait(timeout: .distantFuture)
+        defer { inFlightSemaphore.signal() }
+
+        hgi.pointee.StartFrame()
+
+        // draw the scene using Hydra, and recast the result to a MTLTexture.
+        let viewSize = view.drawableSize
+        guard
+          let hgiTexture = hydra?.render(at: timeCode, viewSize: viewSize),
+          let metalTexture = hgiTexture.GetId() as? MTLTexture,
+          let commandBuffer = hgi.pointee.GetPrimaryCommandBuffer()
+        else { return false }
+
+        // copy the rendered texture to the view.
+        blitToView(view, commandBuffer: commandBuffer, texture: metalTexture)
+
+        // tell Hydra to commit the command buffer and complete the work.
+        hgi.pointee.CommitPrimaryCommandBuffer()
+        hgi.pointee.EndFrame()
+
+        return true
+      }
+
+      /// copies the texture to the view with a shader.
+      public func blitToView(_ view: MTKView, commandBuffer: MTLCommandBuffer, texture: MTLTexture)
+      {
+        guard let renderPassDescriptor = view.currentRenderPassDescriptor
+        else
+        {
+          return
         }
 
-        renderEncoder?.setViewport(
-          MTLViewport(
-            originX: 0.0,
-            originY: 0.0,
-            width: Double(view.drawableSize.width),
-            height: Double(view.drawableSize.height),
-            znear: 0.0,
-            zfar: 1.0
-          )
-        )
+        // Create a render command encoder to encode the copy command.
+        guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+        else
+        {
+          return
+        }
 
-        hydra?.render(rgba: (0.1, 0.1, 0.1, 1.0))
+        // Blit the texture to the view.
+        renderEncoder.pushDebugGroup("FinalBlit")
+        renderEncoder.setFragmentTexture(texture, index: 0)
+        if let pipelineState
+        {
+          renderEncoder.setRenderPipelineState(pipelineState)
+        }
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        renderEncoder.popDebugGroup()
 
-        renderEncoder?.endEncoding()
-        commandBuffer?.present(drawable)
-        commandBuffer?.commit()
+        // Finish encoding the copy command.
+        renderEncoder.endEncoding()
+        if let drawable = view.currentDrawable
+        {
+          commandBuffer.present(drawable)
+        }
+      }
+
+      /// Prepares the Metal objects for copying to the view.
+      private func loadMetal()
+      {
+        do
+        {
+          let defaultLibrary = try device.makeDefaultLibrary(bundle: .usdview)
+
+          guard let vertexFunction = defaultLibrary.makeFunction(name: "vtxBlit")
+          else
+          {
+            print("Failed to create vertex function.")
+            return
+          }
+
+          guard let fragmentFunction = defaultLibrary.makeFunction(name: "fragBlitLinear")
+          else
+          {
+            print("Failed to create fragment function.")
+            return
+          }
+
+          // Set up the pipeline state descriptor.
+          let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
+          pipelineStateDescriptor.rasterSampleCount = 1
+          pipelineStateDescriptor.vertexFunction = vertexFunction
+          pipelineStateDescriptor.fragmentFunction = fragmentFunction
+          pipelineStateDescriptor.depthAttachmentPixelFormat = .invalid
+
+          // Configure the color attachment for blending.
+          if let colorAttachment = pipelineStateDescriptor.colorAttachments[0]
+          {
+            colorAttachment.pixelFormat = .bgra8Unorm
+            colorAttachment.isBlendingEnabled = true
+            colorAttachment.rgbBlendOperation = .add
+            colorAttachment.alphaBlendOperation = .add
+            colorAttachment.sourceRGBBlendFactor = .one
+            colorAttachment.sourceAlphaBlendFactor = .one
+            colorAttachment.destinationRGBBlendFactor = .oneMinusSourceAlpha
+            colorAttachment.destinationAlphaBlendFactor = .zero
+          }
+
+          // Create the pipeline state object.
+          pipelineState = try device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
+        }
+        catch
+        {
+          print("Failed to create pipeline state: \(error.localizedDescription)")
+        }
       }
     }
   }

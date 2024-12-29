@@ -27,11 +27,13 @@ public extension Usd.Attribute
     SetDocumentation(std.string(doc))
   }
 
+  @discardableResult
   func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(std.string(value), time)
   }
 
+  @discardableResult
   func set(_ value: Sdf.AssetPath, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
     Set(value, time)

@@ -43,23 +43,54 @@ public enum Hydra
       )
     }
 
-    public func render(rgba: (Double, Double, Double, Double))
+    public func render(at timeCode: Double, viewSize: CGSize) -> Pixar.HgiTextureHandle
     {
-      var params = UsdImagingGL.RenderParams()
+      // Draws the scene using Hydra.
+      // Camera projection setup.
+      // let cameraTransform = viewCamera.getTransform()
+      // let cameraParams = viewCamera.getShaderParams()
+      // let frustum = computeFrustum(cameraTransform: cameraTransform, viewSize: viewSize, params: cameraParams)
+      // let modelViewMatrix = frustum.computeViewMatrix()
+      // let projMatrix = frustum.computeProjectionMatrix()
+      // engine.setCameraState(modelViewMatrix: modelViewMatrix, projMatrix: projMatrix)
 
-      params.frame = Usd.TimeCode.Default()
-      params.clearColor = .init(Float(rgba.0), Float(rgba.1), Float(rgba.2), Float(rgba.3))
+      // Viewport setup.
+      let viewport = Gf.Vec4d(0, 0, viewSize.width, viewSize.height)
+      engine.pointee.SetRenderViewport(viewport)
+      engine.pointee.SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy.init(0))
+
+      var params = UsdImagingGL.RenderParams()
+      params.frame = Usd.TimeCode(timeCode)
+      params.clearColor = .init(Float(0.2), Float(0.2), Float(0.2), Float(1.0))
       params.enableIdRender = false
       params.showGuides = true
       params.showRender = true
       params.showProxy = true
 
+      // Light and material setup.
+      // let lights = computeLights(cameraTransform: cameraTransform)
+      // engine.setLightingState(lights: lights, material: material, sceneAmbient: sceneAmbient)
+
+      // Render the frame.
       engine.render(root: stage.getPseudoRoot(), params: params)
+
+      // Return the color output.
+      return engine.pointee.GetAovTexture(Hd.AovTokens.color.token)
     }
 
     public var hydraDevice: MTLDevice
     {
       hgi.device
+    }
+
+    public func getHgi() -> Pixar.HgiMetalPtr
+    {
+      hgi
+    }
+
+    public func getEngine() -> UsdImagingGL.EngineSharedPtr
+    {
+      engine
     }
   }
 }

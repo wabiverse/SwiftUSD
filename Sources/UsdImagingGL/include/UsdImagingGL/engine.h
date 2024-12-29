@@ -452,7 +452,7 @@ class UsdImagingGLEngine {
 
   /// Returns an AOV texture handle for the given token.
   USDIMAGINGGL_API
-  HgiTextureHandle GetAovTexture(TfToken const &name) const;
+  HgiTextureHandle GetAovTexture(TfToken const &name) const SWIFT_RETURNS_INDEPENDENT_VALUE;
 
   /// Returns the AOV render buffer for the given token.
   USDIMAGINGGL_API
