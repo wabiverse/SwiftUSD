@@ -746,6 +746,7 @@ let package = Package(
         .target(name: "UsdShade"),
       ],
       resources: [
+        .copy("shaders"),
         .process("Resources")
       ],
       cxxSettings: [
@@ -800,6 +801,7 @@ let package = Package(
         .target(name: "UsdShade"),
       ],
       resources: [
+        .copy("shaders"),
         .process("Resources")
       ],
       cxxSettings: [
