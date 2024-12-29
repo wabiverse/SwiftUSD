@@ -77,7 +77,7 @@ import PixarUSD
             originY: 0.0,
             width: Double(view.drawableSize.width),
             height: Double(view.drawableSize.height),
-            znear: -1.0,
+            znear: 0.0,
             zfar: 1.0
           )
         )
