@@ -13,6 +13,11 @@
 import Foundation
 import PixarUSD
 
+#if canImport(Metal) && !os(visionOS)
+  import Metal
+  import MetalKit
+#endif // canImport(Metal) && !os(visionOS)
+
 public enum Hydra
 {
   public class RenderEngine
@@ -50,6 +55,11 @@ public enum Hydra
       params.showProxy = false
 
       engine.render(root: stage.getPseudoRoot(), params: params)
+    }
+
+    public var hydraDevice: MTLDevice
+    {
+      hgi.device
     }
   }
 }

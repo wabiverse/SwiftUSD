@@ -36,9 +36,8 @@ public extension Hydra.Viewport
   init(engine: Hydra.RenderEngine, rgba: (Double, Double, Double, Double))
   {
     #if canImport(Metal) && !os(visionOS)
-      let device = MTLCreateSystemDefaultDevice()!
-      let renderer = Hydra.MTLRenderer(device: device)!
-      self.init(hydra: engine, device: device, renderer: renderer, rgba: rgba)
+      let renderer = Hydra.MTLRenderer(device: engine.hydraDevice)!
+      self.init(hydra: engine, renderer: renderer, rgba: rgba)
     #endif // canImport(Metal) && !os(visionOS)
   }
 }

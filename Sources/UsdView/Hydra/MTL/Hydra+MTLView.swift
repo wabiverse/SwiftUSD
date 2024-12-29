@@ -40,10 +40,10 @@ import PixarUSD
 
         var rgba: (Double, Double, Double, Double)
 
-        public init(hydra: Hydra.RenderEngine, device: MTLDevice, renderer: MTLRenderer, rgba: (Double, Double, Double, Double))
+        public init(hydra: Hydra.RenderEngine, renderer: MTLRenderer, rgba: (Double, Double, Double, Double))
         {
           self.hydra = hydra
-          self.device = device
+          self.device = hydra.hydraDevice
           self.renderer = renderer
           self.rgba = rgba
         }
