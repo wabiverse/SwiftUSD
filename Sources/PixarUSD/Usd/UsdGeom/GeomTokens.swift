@@ -66,6 +66,11 @@ public extension UsdGeom
     case primvarsAPI
     case geomModelAPI
     case visibilityAPI
+    case x
+    case y
+    case z
+    case default_
+    case proxy
 
     public var token: Tf.Token
     {
@@ -99,6 +104,11 @@ public extension UsdGeom
         case .primvarsAPI: StaticData.shared.tokens.PrimvarsAPI
         case .geomModelAPI: StaticData.shared.tokens.GeomModelAPI
         case .visibilityAPI: StaticData.shared.tokens.VisibilityAPI
+        case .x: StaticData.shared.tokens.x
+        case .y: StaticData.shared.tokens.y
+        case .z: StaticData.shared.tokens.z
+        case .default_: StaticData.shared.tokens.default_
+        case .proxy: StaticData.shared.tokens.proxy
       }
     }
   }

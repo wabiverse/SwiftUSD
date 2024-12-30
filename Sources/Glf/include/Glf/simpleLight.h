@@ -9,19 +9,21 @@
 
 /// \file glf/simpleLight.h
 
+#include "pxr/pxrns.h"
+#include "Glf/api.h"
+
 #include "Gf/matrix4d.h"
 #include "Gf/vec3f.h"
 #include "Gf/vec4f.h"
-#include "Glf/api.h"
-#include "Sdf/assetPath.h"
 #include "Sdf/path.h"
-#include "pxr/pxrns.h"
+#include "Sdf/assetPath.h"
 
 #include "Tf/token.h"
 #include "Vt/array.h"
 #include "Vt/dictionary.h"
 
 #include <string>
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -168,6 +170,8 @@ class GlfSimpleLight final {
   GLF_API
   bool operator!=(GlfSimpleLight const &other) const;
 
+  using LightVector = std::vector<GlfSimpleLight>;
+
  private:
   GLF_API
   friend std::ostream &operator<<(std::ostream &out, const GlfSimpleLight &v);
@@ -208,11 +212,36 @@ class GlfSimpleLight final {
 GLF_API
 std::ostream &operator<<(std::ostream &out, const GlfSimpleLight &v);
 
-typedef std::vector<class GlfSimpleLight> GlfSimpleLightVector;
+using GlfSimpleLightVector = std::vector<GlfSimpleLight>;
 
 // VtValue requirements
 GLF_API
 std::ostream &operator<<(std::ostream &out, const GlfSimpleLightVector &pv);
+
+class GlfSimpleLightCollector
+{
+ public:
+  GLF_API
+  GlfSimpleLightCollector();
+
+  GLF_API
+  ~GlfSimpleLightCollector() = default;
+
+  GLF_API
+  void Clear();
+
+  GLF_API
+  void AddLight(GlfSimpleLight const &light);
+
+  GLF_API
+  void AddLight(GlfSimpleLight &&light);
+
+  GLF_API
+  GlfSimpleLightVector GetLights() const;
+
+ private:
+  GlfSimpleLightVector _lights;
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

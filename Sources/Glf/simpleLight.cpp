@@ -318,4 +318,28 @@ std::ostream &operator<<(std::ostream &out, const GlfSimpleLightVector &pv)
   return out;
 }
 
+GlfSimpleLightCollector::GlfSimpleLightCollector()
+  : _lights()
+{}
+
+void GlfSimpleLightCollector::Clear()
+{
+  _lights.clear();
+}
+
+void GlfSimpleLightCollector::AddLight(GlfSimpleLight const &light)
+{
+  _lights.push_back(light);
+}
+
+void GlfSimpleLightCollector::AddLight(GlfSimpleLight &&light)
+{
+  _lights.push_back(std::move(light));
+}
+
+GlfSimpleLightVector GlfSimpleLightCollector::GetLights() const
+{
+  return _lights;
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE

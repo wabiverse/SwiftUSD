@@ -27,7 +27,10 @@ extension UsdView
     let hdr = Sdf.AssetPath("\(Bundle.hdx!.resourcePath!)/textures/StinsonBeach.hdr")
     domeLight.createTextureFileAttr().set(hdr)
 
-    UsdGeom.Xform.define(stage, path: "/Geometry")
+    let xform = UsdGeom.Xform.define(stage, path: "/Geometry")
+    xform.addXformOp(type: .translate).set(GfVec3d(0.0, 0.0, 0.0))
+    xform.addXformOp(type: .scale, precision: .float).set(GfVec3f(1, 1, 1))
+
     let sphere = UsdGeom.Sphere.define(stage, path: "/Geometry/Sphere")
 
     /* Create a colored material for the sphere prim. */

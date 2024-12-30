@@ -69,6 +69,10 @@ import PixarUSD
 
           metalView.device = device
           metalView.delegate = renderer
+          metalView.colorPixelFormat = .bgra8Unorm
+          metalView.sampleCount = 1
+          metalView.layer?.backgroundColor = NSColor.clear.cgColor
+          metalView.layer?.isOpaque = false
 
           metalView.becomeFirstResponder()
           return metalView
