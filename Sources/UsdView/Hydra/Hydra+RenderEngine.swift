@@ -41,6 +41,9 @@ public enum Hydra
         sceneDelegateId: Sdf.Path.absoluteRootPath(),
         driver: driver
       )
+
+      engine.setEnablePresentation(false)
+      engine.setRenderer(aov: .color)
     }
 
     public func render(at timeCode: Double, viewSize: CGSize) -> Pixar.HgiTextureHandle

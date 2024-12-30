@@ -9,6 +9,8 @@
 
 #include <Metal/Metal.h>
 
+#include "Arch/swiftInterop.h"
+
 #include "Hgi/texture.h"
 #include "HgiMetal/api.h"
 #include "pxr/pxrns.h"
@@ -59,7 +61,7 @@ class HgiMetalTexture final : public HgiTexture {
   HgiMetalTexture(const HgiMetalTexture &) = delete;
 
   id<MTLTexture> _textureId;
-};
+} SWIFT_IMMORTAL_REFERENCE;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

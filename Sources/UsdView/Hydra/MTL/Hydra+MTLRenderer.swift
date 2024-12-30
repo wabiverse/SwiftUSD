@@ -24,7 +24,7 @@ import PixarUSD
       private var hydra: Hydra.RenderEngine?
       private var pipelineState: MTLRenderPipelineState?
 
-      private var inFlightSemaphore = DispatchSemaphore(value: 1)
+      private var inFlightSemaphore = DispatchSemaphore(value: 3)
 
       convenience init(device: MTLDevice, hydra: Hydra.RenderEngine)
       {
@@ -87,6 +87,11 @@ import PixarUSD
 
       public func draw(in view: MTKView)
       {
+        view.drawableSize = CGSize(
+          width: (view.frame.size.width > 0) ? view.frame.size.width : 400, 
+          height: (view.frame.size.height > 0) ? view.frame.size.height : 300
+        )
+
         drawFrame(in: view, timeCode: 0.0)
       }
 
@@ -109,7 +114,7 @@ import PixarUSD
         let viewSize = view.drawableSize
         guard
           let hgiTexture = hydra?.render(at: timeCode, viewSize: viewSize),
-          let metalTexture = hgiTexture.GetId() as? MTLTexture,
+          let metalTexture = getMetalTexture(from: hgiTexture),
           let commandBuffer = hgi.pointee.GetPrimaryCommandBuffer()
         else { Msg.logger.error("HYDRA: Failed to draw the scene."); return false }
 
@@ -153,6 +158,24 @@ import PixarUSD
         {
           commandBuffer.present(drawable)
         }
+      }
+
+      public func getMetalTexture(from hgiTexture: Pixar.HgiTextureHandle) -> MTLTexture?
+      {
+        // get the hgi texture handle.
+        guard let hgiTex = hgiTexture.Get()
+        else { Msg.logger.error("HYDRA: Failed to retrieve the hgi texture."); return nil }
+
+        // get the raw pointer from the hgi handle.
+        let rawPtr = UnsafeRawPointer(hgiTex)
+
+        // get the hgi texture from the raw pointer.
+        let texPtr: Pixar.HgiMetalTexture = Unmanaged.fromOpaque(rawPtr).takeUnretainedValue()
+
+        // get the metal texture from the hgi texture.
+        let metalTexture = texPtr.GetTextureId()
+
+        return metalTexture
       }
     }
   }

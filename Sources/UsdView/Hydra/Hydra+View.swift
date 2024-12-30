@@ -33,11 +33,11 @@ public extension Hydra
 
 public extension Hydra.Viewport
 {
-  init(engine: Hydra.RenderEngine, rgba: (Double, Double, Double, Double))
+  init(engine: Hydra.RenderEngine)
   {
     #if canImport(Metal) && !os(visionOS)
       let renderer = Hydra.MTLRenderer(device: engine.hydraDevice, hydra: engine)
-      self.init(hydra: engine, renderer: renderer, rgba: rgba)
+      self.init(hydra: engine, renderer: renderer)
     #endif // canImport(Metal) && !os(visionOS)
   }
 }

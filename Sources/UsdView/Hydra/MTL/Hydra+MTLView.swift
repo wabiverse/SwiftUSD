@@ -38,35 +38,43 @@ import PixarUSD
         private let device: MTLDevice!
         private let renderer: MTLRenderer!
 
-        var rgba: (Double, Double, Double, Double)
-
-        public init(hydra: Hydra.RenderEngine, renderer: MTLRenderer, rgba: (Double, Double, Double, Double))
+        public init(hydra: Hydra.RenderEngine, renderer: MTLRenderer)
         {
           self.hydra = hydra
-          self.device = hydra.hydraDevice
+          device = hydra.hydraDevice
           self.renderer = renderer
-          self.rgba = rgba
         }
 
         public func makeCoordinator() -> Coordinator
         {
-          Coordinator()
+          let mtkView = MTKView()
+          mtkView.isPaused = false
+          mtkView.framebufferOnly = true
+          if let mode = CGDisplayCopyDisplayMode(CGMainDisplayID())
+          {
+            mtkView.preferredFramesPerSecond = Int(mode.refreshRate)
+          }
+          else
+          {
+            mtkView.preferredFramesPerSecond = 60
+          }
+          mtkView.drawableSize = mtkView.frame.size
+
+          return Coordinator(mtkView: mtkView)
         }
 
         public func makeNSView(context: Context) -> MTKView
         {
           let metalView = context.coordinator.metalView
+
           metalView.device = device
           metalView.delegate = renderer
-          metalView.clearColor = MTLClearColorMake(rgba.0, rgba.1, rgba.2, rgba.3)
-          metalView.apply(context.environment)
 
-          context.coordinator.setNeedsDisplayTrigger = context.environment.setNeedsDisplayTrigger
-
+          metalView.becomeFirstResponder()
           return metalView
         }
 
-        public func updateNSView(_ view: MTKView, context: Context)
+        public func updateNSView(_ view: MTKView, context _: Context)
         {
           renderer.draw(in: view)
         }
@@ -74,12 +82,13 @@ import PixarUSD
         public class Coordinator
         {
           private var cancellable: AnyCancellable?
-          public var metalView: MTKView = .init(frame: .zero)
+          public var metalView: MTKView
 
-          public init()
+          public init(mtkView: MTKView)
           {
             cancellable = nil
             setNeedsDisplayTrigger = nil
+            metalView = mtkView
           }
 
           public var setNeedsDisplayTrigger: SetNeedsDisplayTrigger?

@@ -39,10 +39,6 @@ struct UsdView: PixarApp
   /// the hydra rendering engine.
   let engine: Hydra.RenderEngine
 
-  /// give it a color spectrum...
-  @State var rgba = (0.1, 0.1, 0.1, 1.0)
-  @State var hue = 0.0
-
   public init()
   {
     // register all usd plugins & resources.
@@ -61,15 +57,7 @@ struct UsdView: PixarApp
   {
     WindowGroup("UsdView", id: "usdview")
     {
-      VStack
-      {
-        Hydra.Viewport(engine: engine, rgba: rgba)
-          .ignoresSafeArea()
-      }
-      .onAppear
-      {
-        startColorAnimation()
-      }
+      Hydra.Viewport(engine: engine)
     }
   }
 }
