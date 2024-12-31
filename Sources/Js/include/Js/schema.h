@@ -58,10 +58,10 @@ RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #ifdef __clang__
-RAPIDJSON_DIAG_OFF(weak - vtables)
-RAPIDJSON_DIAG_OFF(exit - time - destructors)
-RAPIDJSON_DIAG_OFF(c++ 98 - compat - pedantic)
-RAPIDJSON_DIAG_OFF(variadic - macros)
+RAPIDJSON_DIAG_OFF(weak-vtables)
+RAPIDJSON_DIAG_OFF(exit-time-destructors)
+RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
+RAPIDJSON_DIAG_OFF(variadic-macros)
 #elif defined(_MSC_VER)
 RAPIDJSON_DIAG_OFF(4512)  // assignment operator could not be generated
 #endif

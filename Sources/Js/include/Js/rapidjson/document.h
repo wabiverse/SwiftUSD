@@ -31,8 +31,8 @@
 RAPIDJSON_DIAG_PUSH
 #ifdef __clang__
 RAPIDJSON_DIAG_OFF(padded)
-RAPIDJSON_DIAG_OFF(switch - enum)
-RAPIDJSON_DIAG_OFF(c++ 98 - compat)
+RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(c++98-compat)
 #elif defined(_MSC_VER)
 RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4244)  // conversion from kXxxFlags to 'uint16_t', possible loss of data

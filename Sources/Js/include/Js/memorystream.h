@@ -19,8 +19,8 @@
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(unreachable - code)
-RAPIDJSON_DIAG_OFF(missing - noreturn)
+RAPIDJSON_DIAG_OFF(unreachable-code)
+RAPIDJSON_DIAG_OFF(missing-noreturn)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN

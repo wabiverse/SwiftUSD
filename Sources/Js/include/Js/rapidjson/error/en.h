@@ -19,8 +19,8 @@
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(switch - enum)
-RAPIDJSON_DIAG_OFF(covered - switch - default)
+RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(covered-switch-default)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
