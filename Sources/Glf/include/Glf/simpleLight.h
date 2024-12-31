@@ -228,16 +228,16 @@ class GlfSimpleLightCollector
   ~GlfSimpleLightCollector() = default;
 
   GLF_API
-  void Clear();
+  void clear();
 
   GLF_API
-  void AddLight(GlfSimpleLight const &light);
+  void addLight(GlfSimpleLight const &light);
 
   GLF_API
-  void AddLight(GlfSimpleLight &&light);
+  void addLight(GlfSimpleLight &&light);
 
   GLF_API
-  GlfSimpleLightVector GetLights() const;
+  GlfSimpleLightVector getLights() const;
 
  private:
   GlfSimpleLightVector _lights;

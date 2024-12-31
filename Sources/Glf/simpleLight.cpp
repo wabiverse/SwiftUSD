@@ -322,22 +322,22 @@ GlfSimpleLightCollector::GlfSimpleLightCollector()
   : _lights()
 {}
 
-void GlfSimpleLightCollector::Clear()
+void GlfSimpleLightCollector::clear()
 {
   _lights.clear();
 }
 
-void GlfSimpleLightCollector::AddLight(GlfSimpleLight const &light)
+void GlfSimpleLightCollector::addLight(GlfSimpleLight const &light)
 {
   _lights.push_back(light);
 }
 
-void GlfSimpleLightCollector::AddLight(GlfSimpleLight &&light)
+void GlfSimpleLightCollector::addLight(GlfSimpleLight &&light)
 {
   _lights.push_back(std::move(light));
 }
 
-GlfSimpleLightVector GlfSimpleLightCollector::GetLights() const
+GlfSimpleLightVector GlfSimpleLightCollector::getLights() const
 {
   return _lights;
 }
