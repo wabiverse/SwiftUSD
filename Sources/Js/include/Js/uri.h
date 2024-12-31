@@ -19,7 +19,7 @@
 
 #if defined(__clang__)
 RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(c++ 98 - compat)
+RAPIDJSON_DIAG_OFF(c++98-compat)
 #elif defined(_MSC_VER)
 RAPIDJSON_DIAG_OFF(4512)  // assignment operator could not be generated
 #endif
