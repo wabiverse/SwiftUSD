@@ -28,7 +28,7 @@
     {
       UsdImagingGL.Engine.CreateEngine()
     }
-    
+
     static func createEngine(params: Parameters) -> UsdImagingGL.EngineSharedPtr
     {
       UsdImagingGL.Engine.CreateEngine(params)
@@ -69,14 +69,55 @@
       SetEnablePresentation(value)
     }
 
-    func setRenderer(aov: Hd.AovTokens)
+    func setRendererAov(_ aovName: Hd.AovTokens)
     {
-      SetRendererAov(aov.token)
+      SetRendererAov(aovName.token)
     }
 
-    func render(root: Usd.Prim, params: UsdImagingGL.RenderParams)
+    func render(rootPrim: Usd.Prim, params: UsdImagingGL.RenderParams)
     {
-      Render(root, params)
+      Render(rootPrim, params)
+    }
+
+    func setCameraState(modelViewMatrix: Gf.Matrix4d, projectionMatrix: Gf.Matrix4d)
+    {
+      SetCameraState(modelViewMatrix, projectionMatrix)
+    }
+
+    func setRenderViewport(_ viewport: Gf.Vec4d)
+    {
+      SetRenderViewport(viewport)
+    }
+
+    enum CameraUtilWindowConformPolicy
+    {
+      case matchVertically
+      case matchHorizontally
+      case fit
+      case crop
+      case dontConform
+    }
+
+    func setWindowPolicy(_ policy: CameraUtilWindowConformPolicy)
+    {
+      switch policy
+      {
+        case .matchVertically: SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(0))
+        case .matchHorizontally: SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(1))
+        case .fit: SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(2))
+        case .crop: SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(3))
+        case .dontConform: SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(4))
+      }
+    }
+
+    func setLightingState(lights: Pixar.GlfSimpleLightVector, material: Pixar.GlfSimpleMaterial, sceneAmbient: Pixar.GfVec4f)
+    {
+      SetLightingState(lights, material, sceneAmbient)
+    }
+
+    func getAovTexture(_ aovName: Hd.AovTokens) -> Pixar.HgiTextureHandle
+    {
+      GetAovTexture(aovName.token)
     }
   }
 
@@ -87,14 +128,39 @@
       pointee.setEnablePresentation(value)
     }
 
-    func setRenderer(aov token: Hd.AovTokens)
+    func setRendererAov(_ aovName: Hd.AovTokens)
     {
-      pointee.setRenderer(aov: token)
+      pointee.setRendererAov(aovName)
     }
 
-    func render(root prim: Usd.Prim, params: UsdImagingGL.RenderParams)
+    func render(rootPrim: Usd.Prim, params: UsdImagingGL.RenderParams)
     {
-      pointee.render(root: prim, params: params)
+      pointee.render(rootPrim: rootPrim, params: params)
+    }
+
+    func setCameraState(modelViewMatrix: Gf.Matrix4d, projectionMatrix: Gf.Matrix4d)
+    {
+      pointee.setCameraState(modelViewMatrix: modelViewMatrix, projectionMatrix: projectionMatrix)
+    }
+
+    func setRenderViewport(_ viewport: Gf.Vec4d)
+    {
+      pointee.setRenderViewport(viewport)
+    }
+
+    func setWindowPolicy(_ policy: UsdImagingGL.Engine.CameraUtilWindowConformPolicy)
+    {
+      self.pointee.setWindowPolicy(policy)
+    }
+
+    func setLightingState(lights: Pixar.GlfSimpleLightVector, material: Pixar.GlfSimpleMaterial, sceneAmbient: Pixar.GfVec4f)
+    {
+      pointee.setLightingState(lights: lights, material: material, sceneAmbient: sceneAmbient)
+    }
+
+    func getAovTexture(_ aovName: Hd.AovTokens) -> Pixar.HgiTextureHandle
+    {
+      pointee.getAovTexture(aovName)
     }
   }
 #endif // canImport(UsdImagingGLEngine)

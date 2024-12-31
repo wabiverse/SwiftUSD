@@ -54,7 +54,7 @@ import PixarUSD
           )
 
           engine.setEnablePresentation(false)
-          engine.setRenderer(aov: .color)
+          engine.setRendererAov(.color)
         #endif // canImport(UsdImagingGL)
       }
 

@@ -249,4 +249,14 @@ public extension Gf.Frustum
   {
     GetProjectionType()
   }
+
+  func computeViewMatrix() -> Gf.Matrix4d
+  {
+    ComputeViewMatrix()
+  }
+
+  func computeProjectionMatrix() -> Gf.Matrix4d
+  {
+    ComputeProjectionMatrix()
+  }
 }

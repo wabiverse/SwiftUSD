@@ -49,3 +49,8 @@ public extension Hdx
     }
   }
 }
+
+public extension Tf.Token
+{
+  static let sRGB = Hdx.ColorCorrectionTokens.sRGB.token
+}

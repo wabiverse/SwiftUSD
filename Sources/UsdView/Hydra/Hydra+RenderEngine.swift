@@ -50,7 +50,7 @@ public enum Hydra
       )
 
       engine.setEnablePresentation(false)
-      engine.setRenderer(aov: .color)
+      engine.setRendererAov(.color)
 
       viewCamera = Hydra.Camera(isZUp: Hydra.RenderEngine.isZUp(for: stage))
       setupCamera()
@@ -63,33 +63,33 @@ public enum Hydra
       let cameraTransform = viewCamera.getTransform()
       let cameraParams = viewCamera.getShaderParams()
       let frustum = computeFrustum(cameraTransform: cameraTransform, viewSize: viewSize, cameraParams: cameraParams)
-      let modelViewMatrix = frustum.ComputeViewMatrix()
-      let projMatrix = frustum.ComputeProjectionMatrix()
-      engine.pointee.SetCameraState(modelViewMatrix, projMatrix)
+      let viewMatrix = frustum.computeViewMatrix()
+      let projMatrix = frustum.computeProjectionMatrix()
+      engine.setCameraState(modelViewMatrix: viewMatrix, projectionMatrix: projMatrix)
 
       // viewport setup.
       let viewport = Gf.Vec4d(0, 0, viewSize.width, viewSize.height)
-      engine.pointee.SetRenderViewport(viewport)
-      engine.pointee.SetWindowPolicy(Pixar.CameraUtilConformWindowPolicy(0))
+      engine.setRenderViewport(viewport)
+      engine.setWindowPolicy(.matchHorizontally)
 
       // light and material setup.
       let lights = computeLights(cameraTransform: cameraTransform)
-      engine.pointee.SetLightingState(lights.GetLights(), material, sceneAmbient)
+      engine.setLightingState(lights: lights.getLights(), material: material, sceneAmbient: sceneAmbient)
 
       var params = UsdImagingGL.RenderParams()
       params.frame = Usd.TimeCode(timeCode)
-      params.clearColor = .init(Float(0.0), Float(0.0), Float(0.0), Float(0.0))
-      params.colorCorrectionMode = Hdx.ColorCorrectionTokens.sRGB.token
+      params.clearColor = .init(0.0, 0.0, 0.0, 0.0)
+      params.colorCorrectionMode = .sRGB
       params.enableIdRender = false
       params.showGuides = true
       params.showRender = true
       params.showProxy = true
 
       // render the frame.
-      engine.render(root: stage.getPseudoRoot(), params: params)
+      engine.render(rootPrim: stage.getPseudoRoot(), params: params)
 
       // return the color output.
-      return engine.pointee.GetAovTexture(Hd.AovTokens.color.token)
+      return engine.getAovTexture(.color)
     }
 
     public func setupCamera()
@@ -127,7 +127,7 @@ public enum Hydra
     func computeLights(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLightCollector
     {
       var lights = Pixar.GlfSimpleLightCollector()
-      lights.AddLight(computeCameraLight(cameraTransform: cameraTransform))
+      lights.addLight(computeCameraLight(cameraTransform: cameraTransform))
 
       return lights
     }
