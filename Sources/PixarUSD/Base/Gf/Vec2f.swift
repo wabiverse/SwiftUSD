@@ -125,7 +125,7 @@ extension Gf.Vec2f: Scalar
   ///
   /// The original length of the vector is returned.
   /// See also: `Gf.normalize()`.
-  public mutating func normalize(_ eps: Float) -> Float
+  public mutating func normalize(eps: Float = Float(GF_MIN_VECTOR_LENGTH)) -> Float
   {
     Normalize(eps)
   }
@@ -134,7 +134,7 @@ extension Gf.Vec2f: Scalar
   /// vector after undergoing normalization. If the length of the
   /// vector is smaller than argument **eps**, then the vector is
   /// set to the value of `self / eps`.
-  public func getNormalized(_ eps: Float) -> Self
+  public func getNormalized(eps: Float = Float(GF_MIN_VECTOR_LENGTH)) -> Self
   {
     GetNormalized(eps)
   }

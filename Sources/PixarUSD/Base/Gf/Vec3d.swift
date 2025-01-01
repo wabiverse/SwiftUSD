@@ -128,7 +128,7 @@ extension Gf.Vec3d: Scalar
   ///
   /// The original length of the vector is returned.
   /// See also: `Gf.normalize()`.
-  public mutating func normalize(_ eps: Double) -> Double
+  public mutating func normalize(eps: Double = GF_MIN_VECTOR_LENGTH) -> Double
   {
     Normalize(eps)
   }
@@ -137,7 +137,7 @@ extension Gf.Vec3d: Scalar
   /// vector after undergoing normalization. If the length of the
   /// vector is smaller than argument **eps**, then the vector is
   /// set to the value of `self / eps`.
-  public func getNormalized(_ eps: Double) -> Self
+  public func getNormalized(eps: Double = GF_MIN_VECTOR_LENGTH) -> Self
   {
     GetNormalized(eps)
   }
@@ -185,5 +185,125 @@ extension Gf.Vec3d: SIMD
     self.init()
 
     self.simd = simd
+  }
+}
+
+public extension Gf
+{
+  /// Returns component-wise multiplication of two vectors.
+  /// - Parameter v1: A vector to multiply.
+  /// - Parameter v2: A second vector to multiply with.
+  ///
+  /// - Returns: The component-wise multiplication of the two vectors.
+  @inlinable
+  static func compMult(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Gf.Vec3d
+  {
+    Pixar.GfCompMult(v1, v2)
+  }
+
+  /// Returns component-wise division of two vectors.
+  /// - Parameter v1: A vector to divide.
+  /// - Parameter v2: A second vector to divide by.
+  ///
+  /// - Returns: The component-wise division of the two vectors.
+  @inlinable
+  static func compDiv(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Gf.Vec3d
+  {
+    Pixar.GfCompDiv(v1, v2)
+  }
+
+  /// Returns the dot (inner) product of two vectors.
+  /// - Parameter v1: A vector to multiply.
+  /// - Parameter v2: A second vector to multiply with.
+  ///
+  /// - Returns: The dot product of the two vectors.
+  @inlinable
+  static func dot(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Double
+  {
+    Pixar.GfDot(v1, v2)
+  }
+
+  /// Returns the geometric length of a vector.
+  /// - Parameter v: The vector to measure.
+  ///
+  /// - Returns: The geometric length of the vector.
+  @inlinable
+  static func getLength(_ v: Gf.Vec3d) -> Double
+  {
+    Pixar.GfGetLength(v)
+  }
+
+  /// Normalizes the vector in place to unit length, returning the length before
+  /// normalization. If the length of the vector is smaller than `eps` then the
+  /// vector is set to vector/eps, the original length of the vector is returned.
+  /// - Parameter v: The vector to normalize.
+  /// - Parameter eps: The length of the vector.
+  ///
+  /// - Returns: The length of the vector.
+  @inlinable
+  static func normalize(_ v: inout Gf.Vec3d, eps: Double = GF_MIN_VECTOR_LENGTH) -> Double
+  {
+    Pixar.GfNormalize(&v, eps)
+  }
+
+  /// Returns a normalized (unit-length) vector with the same direction as the given
+  /// vector. If the length of this vector is smaller than `eps`, the vector divided
+  /// by `eps` is returned.
+  /// - Parameter v: The vector to normalize.
+  /// - Parameter eps: The length of the vector.
+  ///
+  /// - Returns: The normalized vector.
+  @inlinable
+  static func getNormalized(_ v: Gf.Vec3d, eps: Double = GF_MIN_VECTOR_LENGTH) -> Gf.Vec3d
+  {
+    Pixar.GfGetNormalized(v, eps)
+  }
+
+  /// Returns the projection of vector `v1` onto vector `v2`.
+  /// That is `v2 * (v1 * v2)`.
+  /// - Parameter v1: The vector to project.
+  /// - Parameter v2: The vector to project onto.
+  ///
+  /// - Returns: The projection of `v1` onto `v2`.
+  @inlinable
+  static func getProjection(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Gf.Vec3d
+  {
+    Pixar.GfGetProjection(v1, v2)
+  }
+
+  /// Returns the orthogonal complement of vector `v1` onto vector `v2`.
+  /// That is `v1 - v1.getProjection(v2)`.
+  /// - Parameter v1: The vector to project.
+  /// - Parameter v2: The vector to project onto.
+  ///
+  /// - Returns: The orthogonal complement of `v1` onto `v2`.
+  @inlinable
+  static func getComplement(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Gf.Vec3d
+  {
+    Pixar.GfGetComplement(v1, v2)
+  }
+
+  /// Tests for equality within a given `tolerance`, returning `true` if the
+  /// length of the difference vector is **less than** or **equal to** `tolerance`.
+  /// - Parameter v1: The first vector to compare.
+  /// - Parameter v2: The second vector to compare.
+  /// - Parameter tolerance: The tolerance to use.
+  ///
+  /// - Returns: `true` if the vectors are equal within the tolerance.
+  @inlinable
+  static func isClose(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d, within tolerance: Double) -> Bool
+  {
+    Pixar.GfIsClose(v1, v2, tolerance)
+  }
+
+  /// Returns the cross product of two vectors.
+  /// - Parameter v1: The first vector.
+  /// - Parameter v2: The second vector.
+  ///
+  /// - Returns: The cross product of the two vectors.
+  @inlinable
+  static func cross(_ v1: Gf.Vec3d, _ v2: Gf.Vec3d) -> Gf.Vec3d
+  {
+    Pixar.GfCross(v1, v2)
   }
 }

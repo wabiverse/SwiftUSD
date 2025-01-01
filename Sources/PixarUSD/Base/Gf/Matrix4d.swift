@@ -39,19 +39,33 @@ extension Gf.Matrix4d: Scalar
   /// Axis count of the vector.
   public typealias AxisCount = Axis16
 
-  public func getRow(_ index: Int) -> Gf.Vec4d
+  /// Sets a row of the matrix from a ```Gf.Vec4d```.
+  public mutating func setRow(at rowIndex: Int, to value: Gf.Vec4d)
   {
-    GetRow(Int32(index))
+    SetRow(Int32(rowIndex), value)
   }
 
-  public func getColumn(_ index: Int) -> Gf.Vec4d
+  /// Sets a column of the matrix from a ```Gf.Vec4d```.
+  public mutating func setColumn(at columnIndex: Int, to value: Gf.Vec4d)
   {
-    GetColumn(Int32(index))
+    SetColumn(Int32(columnIndex), value)
   }
 
-  /// Sets the matrix from 16 independent \c double values,
-  /// specified in row-major order. For example, parameter \e m10 specifies
-  /// the value in row 1 and column 0.
+  /// Gets a row of the matrix as a ```Gf.Vec4```.
+  public func getRow(at rowIndex: Int) -> Gf.Vec4d
+  {
+    GetRow(Int32(rowIndex))
+  }
+
+  /// Gets a column of the matrix as a ```Gf.Vec4```.
+  public func getColumn(at columnIndex: Int) -> Gf.Vec4d
+  {
+    GetColumn(Int32(columnIndex))
+  }
+
+  /// Sets the matrix from 16 independent `Double` values,
+  /// specified in row-major order. For example, parameter
+  /// `m10` specifies the value in row 1 and column 0.
   public mutating func set(_ m00: Double, _ m01: Double, _ m02: Double, _ m03: Double, _ m10: Double,
                            _ m11: Double, _ m12: Double, _ m13: Double, _ m20: Double, _ m21: Double,
                            _ m22: Double, _ m23: Double, _ m30: Double, _ m31: Double, _ m32: Double,
@@ -63,7 +77,7 @@ extension Gf.Matrix4d: Scalar
         m33).pointee
   }
 
-  /// Get the elements of this Matrix as an array.
+  /// Get the elements of this matrix as an array.
   public func getArray() -> [ScalarType]
   {
     let buffer = UnsafeBufferPointer(start: GetArray(), count: GfMatrix4d.scalarCount)
@@ -92,12 +106,24 @@ extension Gf.Matrix4d: Scalar
     GetOrthonormalized(warn)
   }
 
-  /// Returns an iterator over this scalar.
+  /// Returns an iterator over this matrix's elements as scalars.
   ///
-  /// Since this type can return its own iterator, it conforms
-  /// this scalar to a sequence to enable many useful operations,
-  /// like for-in looping and the contains method, without much
-  /// effort.
+  /// This allows you to perform scalar operations like iterating
+  /// through each element with a for-in loop or performing functional
+  /// transformations.
+  ///
+  /// Example:
+  /// ```swift
+  /// let matrix: Gf.Matrix4d = ...
+  /// for scalar in matrix {
+  ///   print(scalar) // Accesses each scalar element of the matrix
+  /// }
+  /// ```
+  ///
+  /// The iterator yields the elements in row-major order:
+  /// Row 0, Column 0 -> Row 0, Column 1 -> ... -> Row 3, Column 3
+  ///
+  /// - Returns: A `ScalarIterator` instance that conforms to `IteratorProtocol`.
   public func makeIterator() -> ScalarIterator<Self>
   {
     ScalarIterator(self)
@@ -112,11 +138,22 @@ extension Gf.Matrix4d: SIMD
 
   public var scalarCount: Int { 16 }
 
+  /// Accesses or modifies the element at the specified index in the matrix.
+  ///
+  /// This subscript provides direct access to the elements of the matrix as a
+  /// flat sequence of values. It operates on the underlying storage of the matrix,
+  /// which is organized as a contiguous array of scalars. The index must be within
+  /// the range `0..<scalarCount`, where `scalarCount` is always 16 for a `Gf.Matrix4d`.
+  ///
+  /// - Parameter index: The index of the element to access. Must be in the range `0..<scalarCount`.
+  ///
+  /// - Returns: The scalar value at the specified index.
+  /// - Note: This subscript is used for direct access to individual elements, typically in lower-level or SIMD operations.
   public subscript(index: Int) -> Self.Scalar
   {
     get
     {
-      getArray()[index]
+      data()[index]
     }
 
     set
@@ -125,6 +162,84 @@ extension Gf.Matrix4d: SIMD
     }
   }
 
+  /// Accesses the specified row as a `Gf.Vec4d`.
+  ///
+  /// **Data Access**: Row-major order.
+  ///
+  /// - Parameter row: The zero-based index of the row to access.
+  ///
+  /// - Returns: A 4D vector representing the specified row.
+  /// - Complexity: O(1) for both `get` and `set`.
+  ///
+  /// Example:
+  /// ```swift
+  /// let row0 = matrix[0] // Access the first row as a Gf.Vec4d
+  /// ```
+  public subscript(row: Int) -> Gf.Vec4d
+  {
+    get
+    {
+      getRow(at: row)
+    }
+    set
+    {
+      setRow(at: row, to: newValue)
+    }
+  }
+
+  /// Accesses an individual element of the matrix by its row and column indices.
+  ///
+  /// This subscript provides intuitive two-dimensional access to the matrix
+  /// elements using row and column indices.
+  ///
+  /// **Index Mapping**:
+  /// - Row 0, Column 0 corresponds to the first element
+  /// - Row 1, Column 2 corresponds to the 6th element
+  ///
+  /// - Parameter row: The zero-based index of the row (0...3).
+  /// - Parameter column: The zero-based index of the column (0...3).
+  ///
+  /// - Returns: The scalar value at the specified row and column.
+  ///
+  /// Example:
+  /// ```swift
+  /// var matrix: Gf.Matrix4d = ...
+  /// let value = matrix[1, 2] // Access the element at Row 1, Column 2
+  /// matrix[2, 0] = 3.0 // Sets the element at Row 2, Column 0
+  /// ```
+  public subscript(row: Int, column: Int) -> Scalar
+  {
+    get
+    {
+      // Get the row, then access the column of that row.
+      getRow(at: row)[column]
+    }
+    set
+    {
+      // Get the row, modify the column, and then set the updated row.
+      var rowValues = getRow(at: row)
+      rowValues[column] = newValue
+      setRow(at: row, to: rowValues)
+    }
+  }
+
+  /// Returns the matrix data as a `SIMD16` vector for optimized computation.
+  ///
+  /// The `simd` property combines the 16 scalar components of the 4x4 matrix
+  /// into a `SIMD16` structure, enabling high-performance operations when using
+  /// SIMD instructions.
+  ///
+  /// **Data Ordering**: Row-major order.
+  /// ```
+  /// // Access the SIMD representation of a Gf.Matrix4d
+  /// let simdMatrix = matrix.simd
+  /// ```
+  ///
+  /// Setting this property updates the underlying matrix elements.
+  /// ```swift
+  /// var matrix: Gf.Matrix4d = ...
+  /// matrix.simd = SIMD16(...) // Updates matrix elements in row-major order
+  /// ```
   public var simd: SIMD16<Scalar>
   {
     get
@@ -150,25 +265,30 @@ extension Gf.Matrix4d: SIMD
     }
     set
     {
-      dataMutating()[0] = Scalar(newValue[0])
-      dataMutating()[1] = Scalar(newValue[1])
-      dataMutating()[2] = Scalar(newValue[2])
-      dataMutating()[3] = Scalar(newValue[3])
-      dataMutating()[4] = Scalar(newValue[4])
-      dataMutating()[5] = Scalar(newValue[5])
-      dataMutating()[6] = Scalar(newValue[6])
-      dataMutating()[7] = Scalar(newValue[7])
-      dataMutating()[8] = Scalar(newValue[8])
-      dataMutating()[9] = Scalar(newValue[9])
-      dataMutating()[10] = Scalar(newValue[10])
-      dataMutating()[11] = Scalar(newValue[11])
-      dataMutating()[12] = Scalar(newValue[12])
-      dataMutating()[13] = Scalar(newValue[13])
-      dataMutating()[14] = Scalar(newValue[14])
-      dataMutating()[15] = Scalar(newValue[15])
+      for i in 0 ..< 16
+      {
+        dataMutating()[i] = Scalar(newValue[i])
+      }
     }
   }
 
+  /// Initializes a `Gf.Matrix4d` from a SIMD16 vector.
+  ///
+  /// The `init` method allows creating a matrix directly from a
+  /// `SIMD16` vector. The vector's elements are used to populate
+  /// the matrix in row-major order:
+  /// - Elements 0-3 -> Row 0
+  /// - Elements 4-7 -> Row 1
+  /// - Elements 8-11 -> Row 2
+  /// - Elements 12-15 -> Row 3
+  ///
+  /// - Parameter simd: A `SIMD16` vector containing the 16 scalar elements.
+  ///
+  /// Example:
+  /// ```swift
+  /// let simd = SIMD16<Double>(0, 1, 2, ..., 15)
+  /// let matrix = Gf.Matrix4d(simd)
+  /// ```
   public init(_ simd: SIMD16<Scalar>)
   {
     self.init()
