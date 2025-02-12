@@ -22,7 +22,7 @@ public extension Hydra
    *
    * The Hydra Engine (``Hd``) no-op renderer for the ``UsdView``
    * application. Note: This renders nothing. */
-  class NORenderer
+  class NORenderer: HdRenderEngine
   {
     public var stage: UsdStageRefPtr
 
@@ -35,5 +35,8 @@ public extension Hydra
     {
       Msg.logger.log(level: .info, "Created HGI -> None.")
     }
+
+    public func draw()
+    {}
   }
 }

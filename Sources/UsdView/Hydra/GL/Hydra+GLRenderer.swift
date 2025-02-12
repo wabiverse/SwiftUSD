@@ -24,7 +24,7 @@ import PixarUSD
      *
      * The Hydra Engine (``Hd``) OpenGL renderer for the ``UsdView``
      * application. */
-    class GLRenderer
+    class GLRenderer: HdRenderEngine
     {
       let hgi: Pixar.HgiGLPtr
       var device: Pixar.HgiGLDevice!
@@ -45,6 +45,7 @@ import PixarUSD
         let driver = HdDriver(name: .renderDriver, driver: hgi.value)
 
         #if canImport(UsdImagingGL)
+          // UsdImagingGL is not available on iOS.
           engine = UsdImagingGL.Engine.createEngine(
             rootPath: stage.getPseudoRoot().getPath(),
             excludedPaths: Sdf.PathVector(),
@@ -54,7 +55,7 @@ import PixarUSD
           )
 
           engine.setEnablePresentation(false)
-          engine.setRendererAov(.color)
+          engine.setRenderer(aov: .color)
         #endif // canImport(UsdImagingGL)
       }
 
@@ -62,6 +63,9 @@ import PixarUSD
       {
         Msg.logger.log(level: .info, "Created HGI -> OpenGL.")
       }
+
+      public func draw()
+      {}
     }
   }
 #endif // canImport(HgiGL)

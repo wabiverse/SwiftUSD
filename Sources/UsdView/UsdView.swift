@@ -15,7 +15,6 @@ import PixarUSD
 
 #if canImport(SwiftUI)
   import SwiftUI
-
   public protocol PixarApp: App
   {}
 #else
@@ -37,7 +36,7 @@ struct UsdView: PixarApp
   /// the active usd stage.
   let stage: UsdStageRefPtr
   /// the hydra rendering engine.
-  let engine: Hydra.RenderEngine
+  let hydra: Hydra.RenderEngine
 
   public init()
   {
@@ -45,19 +44,48 @@ struct UsdView: PixarApp
     registerPlugins()
 
     // create a new usd stage.
-    stage = UsdView.createScene()
+    stage = Usd.Stage.createNew("\(documentsDirPath())/HelloPixarUSD", ext: .usda)
 
     // setup hydra to render the usd stage.
-    engine = Hydra.RenderEngine(stage: stage)
+    hydra = Hydra.RenderEngine(stage: stage)
 
-    Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
+    runDemo()
   }
 
-  var body: some Scene
-  {
-    WindowGroup("UsdView", id: "usdview")
+  #if canImport(SwiftUI)
+    var body: some Scene
     {
-      Hydra.Viewport(engine: engine)
+      WindowGroup("UsdView", id: "usdview")
+      {
+        VStack
+        {
+          Text("UsdView Under Construction...")
+            .font(.system(size: 24, weight: .black))
+            .padding()
+        }
+      }
     }
+  #else
+    static func main()
+    {
+      let app = UsdView()
+    }
+  #endif
+
+  func runDemo()
+  {
+    // show hydra gpu info.
+    hydra.info()
+
+    // create usd scene.
+    createScene()
+
+    // declarative usd scene
+    // (using swiftui-like api).
+    declareScene()
+
+    Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
+
+    // complete.
   }
 }
