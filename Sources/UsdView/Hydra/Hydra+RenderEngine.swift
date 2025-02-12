@@ -118,8 +118,7 @@ public enum Hydra
     {
       let cameraPosition = Pixar.GfVec3f(cameraTransform.ExtractTranslation())
 
-      var light = Pixar.GlfSimpleLight(.init(0.0, 0.0, 0.0, 1.0))
-      light.SetPosition(Pixar.GfVec4f(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
+      let light = Pixar.GlfSimpleLightCollector.createLight(.init(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
 
       return light
     }
@@ -242,7 +241,7 @@ public enum Hydra
 
     static func isZUp(for stage: UsdStageRefPtr) -> Bool
     {
-      Pixar.UsdGeomGetStageUpAxis(stage.pointee.getPtr()) == UsdGeom.Tokens.z.token
+      Pixar.UsdGeomGetStageUpAxis(stage.pointee.getPtr()) == .z
     }
   }
 }

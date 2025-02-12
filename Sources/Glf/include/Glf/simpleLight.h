@@ -231,6 +231,9 @@ class GlfSimpleLightCollector
   void clear();
 
   GLF_API
+  static GlfSimpleLight createLight(const GfVec4f &position);
+
+  GLF_API
   void addLight(GlfSimpleLight const &light);
 
   GLF_API

@@ -327,6 +327,14 @@ void GlfSimpleLightCollector::clear()
   _lights.clear();
 }
 
+// static
+GlfSimpleLight GlfSimpleLightCollector::createLight(const GfVec4f &position)
+{
+  GlfSimpleLight simpleLight;
+  simpleLight.SetPosition(position);
+  return simpleLight;
+}
+
 void GlfSimpleLightCollector::addLight(GlfSimpleLight const &light)
 {
   _lights.push_back(light);

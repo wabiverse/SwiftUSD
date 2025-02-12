@@ -113,3 +113,8 @@ public extension UsdGeom
     }
   }
 }
+
+public extension Tf.Token
+{
+  static let z = UsdGeom.Tokens.z.token
+}

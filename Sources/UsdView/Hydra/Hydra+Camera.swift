@@ -50,12 +50,14 @@ public extension Hydra
       let gfRotation = getRotation()
       var cameraTransform = GfMatrix4d(1.0)
 
-      var gfMatrix = GfMatrix4d()
+      var gfMatrix1 = GfMatrix4d()
+      var gfMatrix2 = GfMatrix4d()
+      var gfMatrix3 = GfMatrix4d()
 
       cameraTransform =
-        gfMatrix.SetTranslate(Pixar.GfVec3d(0.0, 0.0, params.distance)).pointee *
-        gfMatrix.SetRotate(gfRotation).pointee *
-        gfMatrix.SetTranslate(params.focus).pointee
+        gfMatrix1.SetTranslate(Pixar.GfVec3d(0.0, 0.0, params.distance)).pointee *
+        gfMatrix2.SetRotate(gfRotation).pointee *
+        gfMatrix3.SetTranslate(params.focus).pointee
 
       return cameraTransform
     }
