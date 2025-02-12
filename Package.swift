@@ -1728,9 +1728,9 @@ let package = Package(
       dependencies: [
         .target(name: "PixarUSD"),
       ],
-      resources: [
-        .process("Resources")
-      ],
+      // resources: [
+      //   .process("Resources")
+      // ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
