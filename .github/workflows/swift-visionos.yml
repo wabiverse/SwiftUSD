@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: 🦦 Install Swift Bundler
         run: |
-          curl -o swift-bundler -L https://github.com/wabiverse/wabi-swift-bundler/releases/download/v3.0.2/swift-bundler
+          curl -o swift-bundler -L https://github.com/wabiverse/wabi-swift-bundler/releases/download/v3.0.3/swift-bundler
           chmod +x ./swift-bundler
           sudo cp ./swift-bundler /usr/local/bin/
           rm ./swift-bundler
