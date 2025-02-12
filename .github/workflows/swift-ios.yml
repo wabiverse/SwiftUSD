@@ -19,4 +19,4 @@ jobs:
           sudo cp ./swift-bundler /usr/local/bin/
           rm ./swift-bundler
       - name: 📦 Build & Bundle
-        run: swift bundler bundle -c release -p iOSSimulator UsdView
+        run: swift bundler bundle -c release --arch arm64 -p iOSSimulator UsdView
