@@ -15,6 +15,7 @@
 #include "Tf/diagnostic.h"
 #include "pxr/pxrns.h"
 
+#include <stdint.h>
 #include <ostream>
 #include <string>
 #include <string_view>
