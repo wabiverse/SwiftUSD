@@ -25,9 +25,9 @@ public enum Hydra
     {
       self.stage = stage
 
-      #if !os(Linux) && !os(Windows) && !os(Android) && canImport(HgiMetal) && canImport(UsdImagingGL)
+      #if os(macOS) || os(iOS) // todo: visionOS, tvOS, watchOS
         engine = Hydra.MTLRenderer(stage: stage)
-      #elseif canImport(HgiGL) && canImport(UsdImagingGL)
+      #elseif os(Linux) || os(Windows) || os(Android)
         engine = Hydra.GLRenderer(stage: stage)
       #else
         engine = Hydra.NORenderer(stage: stage)
