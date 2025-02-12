@@ -17,6 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: 👨‍💻 Install CxxStdlib
         run: sudo apt install libstdc++-12-dev
+      - name: 🗜️ Install DEFLATE
+        run: sudo apt install libdeflate-dev
       - name: 📙 Install BZ2
         run: sudo apt install libbz2-dev
       - name: 📓 Install ZLib
