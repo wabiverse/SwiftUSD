@@ -70,7 +70,7 @@ import PixarUSD
         #if canImport(UsdImagingGL)
           // UsdImagingGL is not available on iOS.
           engine.setEnablePresentation(false)
-          engine.setRenderer(aov: .color)
+          engine.setRendererAov(.color)
         #endif // canImport(UsdImagingGL)
       }
 
