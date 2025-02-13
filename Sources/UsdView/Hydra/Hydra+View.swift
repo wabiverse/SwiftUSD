@@ -13,27 +13,29 @@
 import Foundation
 import PixarUSD
 
+#if canImport(Metal) && !os(visionOS)
+  import Metal
+  import MetalKit
+#endif // canImport(Metal) && !os(visionOS)
+
 public extension Hydra
 {
-  /**
-   * ``NORenderer``
-   *
-   * ## Overview
-   *
-   * The Hydra Engine (``Hd``) no-op renderer for the ``UsdView``
-   * application. Note: This renders nothing. */
-  class NORenderer
+  #if os(macOS) || os(iOS)
+    typealias Viewport = Hydra.MTLView
+  #elseif os(visionOS) || os(tvOS) || os(watchOS)
+    typealias Viewport = UIViewRepresentable
+  #else
+    struct Viewport {}
+  #endif // canImport(Metal) && !os(visionOS)
+}
+
+public extension Hydra.Viewport
+{
+  init(engine: Hydra.RenderEngine)
   {
-    public var stage: UsdStageRefPtr
-
-    public required init(stage: UsdStageRefPtr)
-    {
-      self.stage = stage
-    }
-
-    public func info()
-    {
-      Msg.logger.log(level: .info, "Created HGI -> None.")
-    }
+    #if canImport(Metal) && !os(visionOS)
+      let renderer = Hydra.MTLRenderer(device: engine.hydraDevice, hydra: engine)
+      self.init(hydra: engine, renderer: renderer)
+    #endif // canImport(Metal) && !os(visionOS)
   }
 }

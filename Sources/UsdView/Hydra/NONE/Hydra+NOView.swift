@@ -13,13 +13,11 @@
 import Foundation
 import PixarUSD
 
-public protocol HdRenderEngine
+public extension Hydra
 {
-  var stage: UsdStageRefPtr { get set }
-
-  init(stage: UsdStageRefPtr)
-
-  func info()
-
-  func draw()
+  struct NOView
+  {
+    public init()
+    {}
+  }
 }

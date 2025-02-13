@@ -32,11 +32,6 @@ enum USDExamples
     // custom ar resolver examples.
     ArResolverExamples.run()
 
-    // galah interpreter embedding examples.
-    #if WITH_GALAH
-      GalahInterpreterExamples.run()
-    #endif /* WITH_GALAH */
-
     // python interpreter embedding examples.
     PythonInterpreterExamples.run()
 

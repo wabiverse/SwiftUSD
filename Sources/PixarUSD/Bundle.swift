@@ -30,13 +30,11 @@ import Rainbow
       Msg.logger.log(level: .info, "Bundle path: \(resourcePath ?? "")")
     }
 
-    private let fileManager = FileManager.default
-
     public var resourcePath: String?
 
     public init?(path: String)
     {
-      if fileManager.fileExists(atPath: path, isDirectory: nil)
+      if FileManager.default.fileExists(atPath: path, isDirectory: nil)
       {
         resourcePath = path
       }
@@ -338,16 +336,12 @@ public enum BundleKind
 
 public extension Pixar
 {
-  struct Bundler
+  final class Bundler: Sendable
   {
-    let fileManager: FileManager
-
-    public static let shared: Bundler = .init()
+    public static let shared = Bundler()
 
     private init()
-    {
-      fileManager = FileManager.default
-    }
+    {}
 
     public func setup(_ kind: BundleKind, installPlugins: Bool = false)
     {
@@ -372,7 +366,7 @@ public extension Pixar
       { path in
 
         #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-          let doInstallPlugs = installPlugins || (!path.contains(".app") && !fileManager.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil))
+          let doInstallPlugs = installPlugins || (!path.contains(".app") && !FileManager.default.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil))
         #else /* os(Linux) */
           let doInstallPlugs = true
         #endif /* os(Linux) */
@@ -585,16 +579,16 @@ public extension Pixar.Bundler
     }
 
     let dest = strip(path) + "/Contents/Resources"
-    let srcEnum = fileManager.enumerator(atPath: path)
+    let srcEnum = FileManager.default.enumerator(atPath: path)
 
     do
     {
-      if fileManager.fileExists(atPath: strip(path) + "/Contents", isDirectory: nil)
+      if FileManager.default.fileExists(atPath: strip(path) + "/Contents", isDirectory: nil)
       {
-        try fileManager.removeItem(atPath: strip(path) + "/Contents")
+        try FileManager.default.removeItem(atPath: strip(path) + "/Contents")
       }
 
-      try fileManager.createDirectory(atPath: dest, withIntermediateDirectories: true)
+      try FileManager.default.createDirectory(atPath: dest, withIntermediateDirectories: true)
 
       while let file = srcEnum?.nextObject() as? String
       {
@@ -610,8 +604,7 @@ public extension Pixar.Bundler
           Msg.logger.log(level: .info, "Moving resource: \(sourceFile) -> \(destFile)")
         #endif /* DEBUG_PIXAR_BUNDLE */
 
-        try fileManager.moveItem(atPath: sourceFile,
-                                 toPath: destFile)
+        try FileManager.default.moveItem(atPath: sourceFile, toPath: destFile)
       }
     }
     catch
