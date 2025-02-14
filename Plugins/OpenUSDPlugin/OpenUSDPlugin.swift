@@ -20,18 +20,16 @@ struct OpenUSDPlugin: CommandPlugin
   {
     let openusd = try context.tool(named: "OpenUSD")
 
-    try run(command: openusd.path, with: arguments)
+    try run(command: openusd.url, with: arguments)
   }
 }
 
 extension OpenUSDPlugin
 {
   /// Run a command with the given arguments.
-  func run(command: Path, with arguments: [String]) throws
+  func run(command: URL, with arguments: [String]) throws
   {
-    let exec = URL(fileURLWithPath: command.string)
-
-    let process = try Process.run(exec, arguments: arguments)
+    let process = try Process.run(command, arguments: arguments)
     process.waitUntilExit()
 
     // Check whether the subprocess invocation was successful.

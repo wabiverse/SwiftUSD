@@ -21,7 +21,7 @@ struct UsdGenSchemaPlugin: CommandPlugin
   {
     let genSchema = try context.tool(named: "UsdGenSchema")
 
-    try run(command: genSchema.path, with: arguments)
+    try run(command: genSchema.url, with: arguments)
   }
 }
 
@@ -35,7 +35,7 @@ struct UsdGenSchemaPlugin: CommandPlugin
     {
       let genSchema = try context.tool(named: "UsdGenSchema")
 
-      try run(command: genSchema.path, with: arguments)
+      try run(command: genSchema.url, with: arguments)
     }
   }
 #endif
@@ -43,11 +43,9 @@ struct UsdGenSchemaPlugin: CommandPlugin
 extension UsdGenSchemaPlugin
 {
   /// Run a command with the given arguments.
-  func run(command: Path, with arguments: [String]) throws
+  func run(command: URL, with arguments: [String]) throws
   {
-    let exec = URL(fileURLWithPath: command.string)
-
-    let process = try Process.run(exec, arguments: arguments)
+    let process = try Process.run(command, arguments: arguments)
     process.waitUntilExit()
 
     // Check whether the subprocess invocation was successful.
