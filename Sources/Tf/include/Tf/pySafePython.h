@@ -24,9 +24,9 @@
 ARCH_PRAGMA_PUSH_MACRO(slots)
 #undef slots
 
-#if __has_include(<boost/python/detail/wrap_python.hpp>)
+#if __has_include(<boost/python/detail/wrap_python.hpp>) && __has_include(<pyconfig.h>)
 #include <boost/python/detail/wrap_python.hpp>
-#endif // __has_include(<boost/python/detail/wrap_python.hpp>)
+#endif // __has_include(<boost/python/detail/wrap_python.hpp>) && __has_include(<pyconfig.h>)
 
 ARCH_PRAGMA_POP_MACRO(slots)
 
