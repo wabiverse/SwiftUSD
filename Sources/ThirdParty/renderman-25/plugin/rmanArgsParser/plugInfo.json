@@ -1,19 +1,19 @@
 {
-    "Plugins": [
-        {
-            "Type": "library",
-            "Name": "rmanArgsParser",
-            "Root": "../..",
-            "LibraryPath": "",
-            "ResourcePath": "Contents/Resources",
-            "Info": {
-                "Types": {
-                    "RmanArgsParserPlugin" : {
-                        "bases": ["NdrParserPlugin"],
-                        "displayName": "RenderMan .args Node Parser"
-                    }
-                }
-            }
+  "Plugins": [
+    {
+      "Type": "library",
+      "Name": "rmanArgsParser",
+      "Root": ".",
+      "LibraryPath": "",
+      "ResourcePath": ".",
+      "Info": {
+        "Types": {
+          "RmanArgsParserPlugin": {
+            "bases": ["NdrParserPlugin"],
+            "displayName": "RenderMan .args Node Parser"
+          }
         }
-    ]
+      }
+    }
+  ]
 }

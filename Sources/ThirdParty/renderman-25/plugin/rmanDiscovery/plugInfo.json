@@ -1,19 +1,19 @@
 {
-    "Plugins": [
-        {
-            "Info": {
-                "Types": {
-                    "RmanDiscoveryPlugin" : {
-                        "bases": ["NdrDiscoveryPlugin"],
-                        "displayName": "RenderMan .args/.osl Discovery"
-                    }
-                }
-            },
-            "LibraryPath": "", 
-            "Name": "rmanDiscovery", 
-            "ResourcePath": "Contents/Resources", 
-            "Root": "../..", 
-            "Type": "library"
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "RmanDiscoveryPlugin": {
+            "bases": ["NdrDiscoveryPlugin"],
+            "displayName": "RenderMan .args/.osl Discovery"
+          }
         }
-    ]
+      },
+      "LibraryPath": "",
+      "Name": "rmanDiscovery",
+      "ResourcePath": ".",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
 }

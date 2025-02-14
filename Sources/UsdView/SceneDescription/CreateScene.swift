@@ -26,12 +26,7 @@ extension UsdView
     let domeLight = UsdLux.DomeLight.define(stage, path: "/World/DefaultDomeLight")
 
     if let hdxResources = Bundle.hdx?.resourcePath {
-      let hdrFile = "textures/StinsonBeach.hdr"
-
-      var tex = "\(hdxResources)/\(hdrFile)"
-      if !FileManager.default.fileExists(atPath: tex) {
-        tex = "\(hdxResources)/Contents/Resources/\(hdrFile)"
-      }
+      var tex = "\(hdxResources)/textures/StinsonBeach.hdr"
 
       if FileManager.default.fileExists(atPath: tex) {
         let hdrAsset = Sdf.AssetPath(tex)

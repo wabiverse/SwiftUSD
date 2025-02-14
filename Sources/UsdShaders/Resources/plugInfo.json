@@ -1,20 +1,20 @@
 {
-    "Plugins": [
-        {
-            "Info": {
-                "Types": {
-                    "UsdShadersDiscoveryPlugin" : {
-                        "bases": ["NdrDiscoveryPlugin"],
-                        "displayName": "USD-based shader definition discovery plugin."
-                    }
-                },
-                "ShaderResources": "shaders"
-            },
-            "LibraryPath": "",
-            "Name": "UsdShaders",
-            "ResourcePath": "Contents/Resources",
-            "Root": "../..",
-            "Type": "library"
-        }
-    ]
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "UsdShadersDiscoveryPlugin": {
+            "bases": ["NdrDiscoveryPlugin"],
+            "displayName": "USD-based shader definition discovery plugin."
+          }
+        },
+        "ShaderResources": "shaders"
+      },
+      "LibraryPath": "",
+      "Name": "UsdShaders",
+      "ResourcePath": ".",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
 }

@@ -1,21 +1,21 @@
 {
-    "Plugins": [
-        {
-            "Info": {
-                "Types": {
-                    "NdrDiscoveryPlugin": {},
-                    "_NdrFilesystemDiscoveryPlugin" : {
-                        "bases": ["NdrDiscoveryPlugin"],
-                        "displayName": "Filesystem Discovery"
-                    },
-                    "NdrParserPlugin": {}
-                }
-            },
-            "LibraryPath": "",
-            "Name": "Ndr",
-            "ResourcePath": "Contents/Resources",
-            "Root": "../..",
-            "Type": "library"
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "NdrDiscoveryPlugin": {},
+          "_NdrFilesystemDiscoveryPlugin": {
+            "bases": ["NdrDiscoveryPlugin"],
+            "displayName": "Filesystem Discovery"
+          },
+          "NdrParserPlugin": {}
         }
-    ]
+      },
+      "LibraryPath": "",
+      "Name": "Ndr",
+      "ResourcePath": ".",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
 }

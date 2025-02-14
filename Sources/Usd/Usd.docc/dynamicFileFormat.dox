@@ -78,8 +78,8 @@ protected:
             },
             "LibraryPath": "",
             "Name": "myDynamicFileFormat",
-            "ResourcePath": "Contents/Resources",
-            "Root": "../..",
+            "ResourcePath": ".",
+            "Root": ".",
             "Type": "library"
         }
     ]

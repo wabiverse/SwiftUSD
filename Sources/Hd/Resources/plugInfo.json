@@ -1,12 +1,12 @@
 {
-    "Plugins": [
-        {
-            "Info": {},
-            "LibraryPath": "",
-            "Name": "Hd",
-            "ResourcePath": "Contents/Resources",
-            "Root": "../..",
-            "Type": "library"
-        }
-    ]
+  "Plugins": [
+    {
+      "Info": {},
+      "LibraryPath": "",
+      "Name": "Hd",
+      "ResourcePath": ".",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
 }

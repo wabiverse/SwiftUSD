@@ -354,9 +354,6 @@ public extension Pixar
 
     private func resourcesInit(installPlugins: Bool)
     {
-      /* ?. Toggle app bundling help in console. */
-      var showHelp = false
-
       /* 1. find all resource paths (ex. Usd/Contents/Resources) */
       let resources = BundleFramework.allCases.compactMap(\.resourcePath)
 
@@ -365,44 +362,11 @@ public extension Pixar
       _ = resources.map
       { path in
 
-        #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-          let doInstallPlugs = installPlugins || (!path.contains(".app") && !FileManager.default.fileExists(atPath: path.replacingOccurrences(of: "/Contents/Resources", with: "") + "/Contents/Resources", isDirectory: nil))
-        #else /* os(Linux) */
-          let doInstallPlugs = true
-        #endif /* os(Linux) */
+        #if DEBUG_PIXAR_BUNDLE
+          Msg.logger.log(level: .info, "Adding usd resource -> \(shortenedPath(from: path).trailing)")
+        #endif /* DEBUG_PIXAR_BUNDLE */
 
-        /* Check for the existence of usd plugins, if they do not exist, we install them automatically. */
-        if doInstallPlugs
-        {
-          /* Tell user what we are doing. */
-          showHelp = true
-
-          /* Automatically install the plugin. */
-          let installedPlug = installPlug(at: path)
-
-          #if DEBUG_PIXAR_BUNDLE
-            Msg.logger.log(level: .info, "Adding usd resource -> \(shortenedPath(from: installedPlug).trailing)")
-          #endif /* DEBUG_PIXAR_BUNDLE */
-
-          plugPaths.push_back(std.string(installedPlug))
-        }
-        else
-        {
-          #if DEBUG_PIXAR_BUNDLE
-            Msg.logger.log(level: .info, "Adding usd resource -> \(shortenedPath(from: path).trailing)")
-          #endif /* DEBUG_PIXAR_BUNDLE */
-
-          plugPaths.push_back(std.string(path))
-        }
-      }
-
-      if showHelp
-      {
-        showBundleHelp(
-          with: resources.map { shortenedPath(from: $0).trailing },
-          searched: shortenedPath(from: resources.first ?? "").leading
-        )
-        showHelp = false
+        plugPaths.push_back(std.string(path))
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */
@@ -578,7 +542,7 @@ public extension Pixar.Bundler
       path.replacingOccurrences(of: "/Contents/Resources", with: "")
     }
 
-    let dest = strip(path) + "/Contents/Resources"
+    var dest = strip(path) + "/Contents/Resources"
     let srcEnum = FileManager.default.enumerator(atPath: path)
 
     do
@@ -588,12 +552,15 @@ public extension Pixar.Bundler
         try FileManager.default.removeItem(atPath: strip(path) + "/Contents")
       }
 
-      try FileManager.default.createDirectory(atPath: dest, withIntermediateDirectories: true)
+      let plugRoot = getAppSupportDirectory() + "/SwiftUSD_" + dest.split(separator: "/SwiftUSD_").dropFirst().joined(separator: "")
+      dest = plugRoot
+
+      try FileManager.default.createDirectory(atPath: plugRoot, withIntermediateDirectories: true)
 
       while let file = srcEnum?.nextObject() as? String
       {
         let sourceFile = path.appending("/\(file)")
-        let destFile = dest.appending("/\(file)")
+        let destFile = plugRoot.appending("/\(file)")
 
         if sourceFile.contains("Contents")
         {
@@ -604,7 +571,11 @@ public extension Pixar.Bundler
           Msg.logger.log(level: .info, "Moving resource: \(sourceFile) -> \(destFile)")
         #endif /* DEBUG_PIXAR_BUNDLE */
 
-        try FileManager.default.moveItem(atPath: sourceFile, toPath: destFile)
+        let pluginFile = URL(fileURLWithPath: sourceFile)
+        if pluginFile.startAccessingSecurityScopedResource() {
+          defer { pluginFile.stopAccessingSecurityScopedResource() }
+          try FileManager.default.moveItem(atPath: sourceFile, toPath: destFile) 
+        }
       }
     }
     catch
@@ -613,6 +584,16 @@ public extension Pixar.Bundler
     }
 
     return dest
+  }
+
+  private func getAppSupportDirectory() -> String
+  {
+    #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
+      let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+      return paths[0].path
+    #else
+      return "."
+    #endif
   }
 }
 

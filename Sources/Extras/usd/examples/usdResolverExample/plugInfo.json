@@ -1,20 +1,20 @@
 {
-    "Plugins": [
-        {
-            "Info": {
-                "Types": {
-                    "UsdResolverExampleResolver": {
-                        "bases": ["ArResolver"],
-                        "uriSchemes": ["asset"],
-                        "implementsContexts" : true
-                    }
-                }
-            },
-            "LibraryPath": "",
-            "Name": "usdResolverExample",
-            "ResourcePath": "Contents/Resources",
-            "Root": "../..",
-            "Type": "library"
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "UsdResolverExampleResolver": {
+            "bases": ["ArResolver"],
+            "uriSchemes": ["asset"],
+            "implementsContexts": true
+          }
         }
-    ]
+      },
+      "LibraryPath": "",
+      "Name": "usdResolverExample",
+      "ResourcePath": ".",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
 }
