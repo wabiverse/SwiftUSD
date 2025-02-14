@@ -81,11 +81,7 @@ using namespace PXR_INTERNAL_NS;
 
 #endif  // PXR_USE_NAMESPACES
 
-#if defined(__linux__) || defined(__APPLE__)
-#  define PXR_PYTHON_SUPPORT_ENABLED 1
-#else // !defined(__linux__) & !defined(__APPLE__)
-#  define PXR_PYTHON_SUPPORT_ENABLED 0
-#endif // defined(__linux__) || defined(__APPLE__)
+#define PXR_PYTHON_SUPPORT_ENABLED 0
 
 #if 1
 #  define PXR_PREFER_SAFETY_OVER_SPEED 1

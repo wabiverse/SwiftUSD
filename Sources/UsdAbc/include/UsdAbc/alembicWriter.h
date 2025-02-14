@@ -28,7 +28,6 @@
 
 #include "Tf/declarePtrs.h"
 #include "Tf/staticTokens.h"
-#include <boost/noncopyable.hpp>
 #include <memory>
 #include <pxr/pxrns.h>
 #include <set>
@@ -45,9 +44,11 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfAbstractData);
 ///
 /// An alembic writer suitable for an SdfAbstractData.
 ///
-class UsdAbc_AlembicDataWriter : boost::noncopyable {
+class UsdAbc_AlembicDataWriter {
  public:
   UsdAbc_AlembicDataWriter();
+  UsdAbc_AlembicDataWriter(const UsdAbc_AlembicDataWriter &) = delete;
+  UsdAbc_AlembicDataWriter &operator=(const UsdAbc_AlembicDataWriter &) = delete;
   ~UsdAbc_AlembicDataWriter();
 
   bool Open(const std::string &filePath, const std::string &comment);

@@ -280,7 +280,7 @@ let package = Package(
     // prepare for SwiftCrossUI, for a cross-platform UsdView.
     // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.8.9"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", branch: "main"),
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
@@ -307,7 +307,6 @@ let package = Package(
         .target(name: "pxr"),
         /* ------------ VFX Platform. ----------- */
         .product(name: "MetaTBB", package: "MetaverseKit"),
-        .product(name: "PyBind11", package: "MetaverseKit", condition: .when(platforms: Arch.OS.nix.platform)),
         .product(name: "MaterialX", package: "MetaverseKit"),
         .product(name: "Alembic", package: "MetaverseKit"),
         .product(name: "OpenColorIO", package: "MetaverseKit"),
@@ -323,12 +322,12 @@ let package = Package(
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow")
-      ] + Arch.OS.dependency(.boost),
+      ],
       publicHeadersPath: "include",
       cxxSettings: [
         /* ---------- Turn everything on. ---------- */
         .define("PXR_USE_NAMESPACES", to: "1"),
-        .define("PXR_PYTHON_SUPPORT_ENABLED", to: "1", .when(platforms: Arch.OS.nix.platform)),
+        .define("PXR_PYTHON_SUPPORT_ENABLED", to: "0"),
         .define("PXR_PREFER_SAFETY_OVER_SPEED", to: "1"),
         .define("PXR_OCIO_PLUGIN_ENABLED", to: "1"),
         .define("PXR_OIIO_PLUGIN_ENABLED", to: "1"),
@@ -1862,7 +1861,7 @@ let package = Package(
         .target(name: "UsdShade"),
         .target(name: "UsdLux"),
         .target(name: "UsdHydra"),
-        .target(name: "UsdAbc", condition: .when(platforms: Arch.OS.nix.platform)),
+        .target(name: "UsdAbc"),
         .target(name: "UsdDraco"),
         .target(name: "UsdMedia"),
         .target(name: "UsdMtlx"),
@@ -1910,7 +1909,6 @@ let package = Package(
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
       ],
       swiftSettings: [
-        // enable to debug bundled (python, plugins, resources).
         .define("DEBUG_PIXAR_BUNDLE"),
         .interoperabilityMode(.Cxx),
       ]
@@ -1992,39 +1990,6 @@ enum Arch
         case .linwin: [.linux, .android, .openbsd, .windows]
         case .embeddedapple: [.iOS, .visionOS, .tvOS, .watchOS]
         case .noembeddedapple: [.macOS, .linux, .android, .openbsd, .windows]
-      }
-    }
-
-    public static func dependency(_ dependency: Dependency) -> [Target.Dependency]
-    {
-      #if os(macOS) || os(visionOS) || os(iOS) || os(tvOS) || os(watchOS)
-        [dependency.product(for: .apple)].compactMap { $0 }
-      #elseif os(Linux) || os(Android) || os(OpenBSD) || os(FreeBSD)
-        [dependency.product(for: .linux)].compactMap { $0 }
-      #elseif os(Windows) || os(Cygwin)
-        [dependency.product(for: .windows)].compactMap { $0 }
-      #elseif os(WASI)
-        [dependency.product(for: .web)].compactMap { $0 }
-      #else
-        []
-      #endif
-    }
-
-    enum Dependency
-    {
-      case boost
-
-      public func product(for os: OS) -> Target.Dependency?
-      {
-        switch self
-        {
-          case .boost:
-            switch os
-            {
-              case .apple: .product(name: "Boost", package: "MetaverseKit")
-              default: nil
-            }
-        }
       }
     }
   }

@@ -36,7 +36,6 @@
 #include "Tf/registryManager.h"
 #include "Tf/staticData.h"
 
-#include <boost/assign.hpp>
 #include <ostream>
 
 PXR_NAMESPACE_OPEN_SCOPE

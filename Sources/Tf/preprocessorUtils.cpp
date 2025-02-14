@@ -23,7 +23,7 @@
 //
 #include "Tf/preprocessorUtils.h"
 
-#if !defined(ARCH_OS_WINDOWS)
+#if __has_include(<boost/preprocessor/arithmetic/inc.hpp>)
 
 #  include <boost/preprocessor/arithmetic/sub.hpp>
 #  include <boost/preprocessor/cat.hpp>
