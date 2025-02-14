@@ -17,7 +17,7 @@ import PixarUSD
   import Combine
   import SwiftUI
 
-  #if os(iOS)
+  #if os(iOS) || os(visionOS)
     import Metal
     import MetalKit
 

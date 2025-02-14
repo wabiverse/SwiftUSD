@@ -12,7 +12,7 @@
 
 import Foundation
 import PixarUSD
-#if canImport(Metal) && !os(visionOS)
+#if canImport(Metal)
   import Metal
   import MetalKit
 
@@ -26,9 +26,9 @@ import PixarUSD
 
       private var inFlightSemaphore = DispatchSemaphore(value: 1)
 
-      convenience init(device: MTLDevice, hydra: Hydra.RenderEngine)
+      convenience init(hydra: Hydra.RenderEngine)
       {
-        self.init(device: device)!
+        self.init(device: hydra.hydraDevice)!
         self.hydra = hydra
       }
 
@@ -181,4 +181,4 @@ import PixarUSD
       }
     }
   }
-#endif // canImport(Metal) && !os(visionOS)
+#endif // canImport(Metal)

@@ -13,29 +13,29 @@
 import Foundation
 import PixarUSD
 
-#if canImport(Metal) && !os(visionOS)
+#if canImport(Metal)
   import Metal
   import MetalKit
-#endif // canImport(Metal) && !os(visionOS)
+#endif // canImport(Metal)
 
 public extension Hydra
 {
-  #if os(macOS) || os(iOS)
+  #if os(macOS) || os(iOS) || os(visionOS)
     typealias Viewport = Hydra.MTLView
-  #elseif os(visionOS) || os(tvOS) || os(watchOS)
+  #elseif os(tvOS) || os(watchOS)
     typealias Viewport = UIViewRepresentable
   #else
     struct Viewport {}
-  #endif // canImport(Metal) && !os(visionOS)
+  #endif // os(macOS) || os(iOS) || os(visionOS)
 }
 
 public extension Hydra.Viewport
 {
   init(engine: Hydra.RenderEngine)
   {
-    #if canImport(Metal) && !os(visionOS)
-      let renderer = Hydra.MTLRenderer(device: engine.hydraDevice, hydra: engine)
+    #if canImport(Metal)
+      let renderer = Hydra.MTLRenderer(hydra: engine)
       self.init(hydra: engine, renderer: renderer)
-    #endif // canImport(Metal) && !os(visionOS)
+    #endif // canImport(Metal)
   }
 }

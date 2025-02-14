@@ -13,10 +13,10 @@
 import Foundation
 import PixarUSD
 
-#if canImport(Metal) && !os(visionOS)
+#if canImport(Metal)
   import Metal
   import MetalKit
-#endif // canImport(Metal) && !os(visionOS)
+#endif // canImport(Metal)
 
 public enum Hydra
 {
@@ -24,7 +24,10 @@ public enum Hydra
   {
     public var stage: UsdStageRefPtr
 
+#if canImport(Metal)
     private let hgi: Pixar.HgiMetalPtr
+#endif // canImport(Metal)
+
     private let engine: UsdImagingGL.EngineSharedPtr
     private var viewCamera: Hydra.Camera
 
@@ -38,8 +41,12 @@ public enum Hydra
     {
       self.stage = stage
 
+#if canImport(Metal)
       hgi = HgiMetal.createHgi()
       let driver = HdDriver(name: .renderDriver, driver: hgi.value)
+#else // !canImport(Metal)
+      let driver = HdDriver()
+#endif // canImport(Metal)
 
       engine = UsdImagingGL.Engine.createEngine(
         rootPath: stage.getPseudoRoot().getPath(),
@@ -224,6 +231,7 @@ public enum Hydra
       return frustum
     }
 
+#if canImport(Metal)
     public var hydraDevice: MTLDevice
     {
       hgi.device
@@ -233,6 +241,7 @@ public enum Hydra
     {
       hgi
     }
+#endif // canImport(Metal)
 
     public func getEngine() -> UsdImagingGL.EngineSharedPtr
     {
