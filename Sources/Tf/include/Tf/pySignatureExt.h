@@ -7,7 +7,7 @@
 #ifndef PXR_BASE_TF_PY_SIGNATURE_EXT_H
 #define PXR_BASE_TF_PY_SIGNATURE_EXT_H
 
-#if __has_include(<boost/mpl/vector.hpp>)
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/mpl/vector.hpp>)
 
 #include <boost/mpl/vector.hpp>
 
@@ -50,6 +50,6 @@ auto get_signature(Ret (TheCls::*)(Args...) const &, void * = nullptr)
 
 #include <boost/python/signature.hpp>
 
-#endif // __has_include(<boost/mpl/vector.hpp>)
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/mpl/vector.hpp>)
 
 #endif  // PXR_BASE_TF_PY_SIGNATURE_EXT_H

@@ -23,7 +23,7 @@
 //
 #include "Tf/preprocessorUtils.h"
 
-#if __has_include(<boost/preprocessor/arithmetic/inc.hpp>)
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/preprocessor/arithmetic/inc.hpp>)
 
 #  include <boost/preprocessor/arithmetic/sub.hpp>
 #  include <boost/preprocessor/cat.hpp>
