@@ -24,9 +24,9 @@
 ARCH_PRAGMA_PUSH_MACRO(slots)
 #undef slots
 
-#if __has_include(<boost/python/detail/wrap_python.hpp>) && __has_include(<pyconfig.h>)
-#include <boost/python/detail/wrap_python.hpp>
-#endif // __has_include(<boost/python/detail/wrap_python.hpp>) && __has_include(<pyconfig.h>)
+#if defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/python/detail/wrap_python.hpp>)
+# include <boost/python/detail/wrap_python.hpp>
+#endif // defined(PXR_PYTHON_SUPPORT_ENABLED) && PXR_PYTHON_SUPPORT_ENABLED && __has_include(<boost/python/detail/wrap_python.hpp>)
 
 ARCH_PRAGMA_POP_MACRO(slots)
 
