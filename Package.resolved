@@ -1,5 +1,5 @@
 {
-  "originHash" : "574e70c31d2f9e918e37ad66f2b3778e74a498b10fbcf408505b90a3b7d2c027",
+  "originHash" : "3abc8be558cfafce9b6bfe2e4459c53be9490bc02aa0976397031b7ca60ab377",
   "pins" : [
     {
       "identity" : "icu",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "branch" : "main",
-        "revision" : "8cf6729a950092be3d3d627964731c3b974531b8"
+        "revision" : "e23651486710c0a442c70adc709acdf91c0c74ff",
+        "version" : "1.9.0"
       }
     },
     {

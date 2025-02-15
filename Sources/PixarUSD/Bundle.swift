@@ -20,28 +20,22 @@ import Rainbow
   /**
    * On Linux there is no ``Foundation.Bundle``, so we create one.
    */
-  public struct Bundle
+  public final class Bundle: Sendable
   {
     public static let main = Bundle()
+
+    public let resourcePath: String?
+
     private init()
     {
       resourcePath = "/" + Arch.getExecutablePath().split(separator: "/").dropLast().joined(separator: "/")
-
       Msg.logger.log(level: .info, "Bundle path: \(resourcePath ?? "")")
     }
 
-    public var resourcePath: String?
-
     public init?(path: String)
     {
-      if FileManager.default.fileExists(atPath: path, isDirectory: nil)
-      {
-        resourcePath = path
-      }
-      else
-      {
-        return nil
-      }
+      guard FileManager.default.fileExists(atPath: path, isDirectory: nil) else { return nil }
+      resourcePath = path
     }
   }
 #endif /* os(Linux) */
