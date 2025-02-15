@@ -45,7 +45,7 @@ public enum Hydra
       hgi = HgiMetal.createHgi()
       let driver = HdDriver(name: .renderDriver, driver: hgi.value)
 #else // !canImport(Metal)
-      let driver = HdDriver()
+      let driver = HdDriver(name: Tf.Token(), driver: Vt.Value())
 #endif // canImport(Metal)
 
       engine = UsdImagingGL.Engine.createEngine(

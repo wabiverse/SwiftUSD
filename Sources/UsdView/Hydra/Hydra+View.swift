@@ -28,7 +28,7 @@ public extension Hydra
   #else // os(Linux) || os(Windows)
     struct Viewport: View
     {
-      var body: some View {
+      public var body: some View {
         Text("Hello World.")
       }
     }
