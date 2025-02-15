@@ -31,5 +31,7 @@ jobs:
         run: sudo apt install libboost-all-dev
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
+      - name: 💻 Install GTK
+        run: sudo apt install libgtk-4-dev clang
       - name: 📦 Build
         run: swift build -c release --target UsdView
