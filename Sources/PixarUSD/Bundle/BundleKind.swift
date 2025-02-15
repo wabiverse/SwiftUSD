@@ -11,24 +11,8 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
 
-/// register all usd plugins & resources with plug registry,
-/// automatically install the plugins and resources if they
-/// cannot be found.
-public func registerPlugins()
+public enum BundleKind
 {
-  /* Setup all usd resources (python, plugins, resources). */
-  Pixar.Bundler.shared.setup(.resources)
-}
-
-/// path to a user's documents directory.
-public func documentsDirPath() -> String
-{
-  #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0].path
-  #else
-    return "."
-  #endif
+  case resources
 }

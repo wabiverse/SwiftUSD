@@ -10,25 +10,31 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import Arch
+import CxxStdlib
 import Foundation
-import PixarUSD
+import Rainbow
 
-/// register all usd plugins & resources with plug registry,
-/// automatically install the plugins and resources if they
-/// cannot be found.
-public func registerPlugins()
-{
-  /* Setup all usd resources (python, plugins, resources). */
-  Pixar.Bundler.shared.setup(.resources)
-}
+#if os(Linux)
+  /**
+   * On Linux there is no ``Foundation.Bundle``, so we create one.
+   */
+  public final class Bundle: Sendable
+  {
+    public static let main = Bundle()
 
-/// path to a user's documents directory.
-public func documentsDirPath() -> String
-{
-  #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0].path
-  #else
-    return "."
-  #endif
-}
+    public let resourcePath: String?
+
+    private init()
+    {
+      resourcePath = "/" + Arch.getExecutablePath().split(separator: "/").dropLast().joined(separator: "/")
+      Msg.logger.log(level: .info, "Bundle path: \(resourcePath ?? "")")
+    }
+
+    public init?(path: String)
+    {
+      guard FileManager.default.fileExists(atPath: path, isDirectory: nil) else { return nil }
+      resourcePath = path
+    }
+  }
+#endif /* os(Linux) */
