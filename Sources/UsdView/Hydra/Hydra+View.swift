@@ -12,6 +12,7 @@
 
 import Foundation
 import PixarUSD
+import SwiftCrossUI
 
 #if canImport(Metal)
   import Metal
@@ -24,8 +25,13 @@ public extension Hydra
     typealias Viewport = Hydra.MTLView
   #elseif os(tvOS) || os(watchOS)
     typealias Viewport = UIViewRepresentable
-  #else
-    struct Viewport {}
+  #else // os(Linux) || os(Windows)
+    struct Viewport: View
+    {
+      var body: some View {
+        Text("Hello World.")
+      }
+    }
   #endif // os(macOS) || os(iOS) || os(visionOS)
 }
 

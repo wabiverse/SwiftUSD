@@ -13,13 +13,14 @@
 import Foundation
 import PixarUSD
 
-#if canImport(SwiftUI)
-  import Combine
-  import SwiftUI
+#if canImport(SwiftCrossUI)
+  import SwiftCrossUI
 
   #if os(iOS) || os(visionOS)
+    import Combine
     import Metal
     import MetalKit
+    import UIKitBackend
 
     public extension Hydra
     {
@@ -56,7 +57,7 @@ import PixarUSD
           return Coordinator(mtkView: mtkView)
         }
 
-        public func makeUIView(context: Context) -> MTKView
+        public func makeUIView(context: UIViewRepresentableContext<Coordinator>) -> MTKView
         {
           let metalView = context.coordinator.metalView
 
@@ -71,7 +72,7 @@ import PixarUSD
           return metalView
         }
 
-        public func updateUIView(_ view: MTKView, context _: Context)
+        public func updateUIView(_ view: MTKView, context _: UIViewRepresentableContext<Coordinator>)
         {
           renderer.draw(in: view)
         }

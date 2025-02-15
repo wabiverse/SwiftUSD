@@ -12,16 +12,7 @@
 
 import Foundation
 import PixarUSD
-
-#if canImport(SwiftUI)
-  import SwiftUI
-
-  public protocol PixarApp: App
-  {}
-#else
-  public protocol PixarApp
-  {}
-#endif
+import SwiftCrossUI
 
 /**
  * ``UsdView``
@@ -32,8 +23,10 @@ import PixarUSD
  * the purposes of demonstrating the usage of USD,
  * from the Swift programming language. */
 @main
-struct UsdView: PixarApp
+struct UsdView: App
 {
+  typealias Backend = PlatformBackend
+
   /// the active usd stage.
   let stage: UsdStageRefPtr
   /// the hydra rendering engine.
@@ -42,7 +35,7 @@ struct UsdView: PixarApp
   public init()
   {
     // register all usd plugins & resources.
-    registerPlugins()
+    Pixar.Bundler.shared.setup(.resources)
 
     // create a new usd stage.
     stage = UsdView.createScene()
@@ -55,7 +48,7 @@ struct UsdView: PixarApp
 
   var body: some Scene
   {
-    WindowGroup("UsdView", id: "usdview")
+    WindowGroup("UsdView")
     {
       Hydra.Viewport(engine: engine)
     }

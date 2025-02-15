@@ -11,15 +11,23 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import PixarUSD
+// #if os(Linux) || os(Windows)
+//   import SwiftCrossUI
+// #endif
+import SwiftCrossUI
 
-/// path to a user's documents directory.
-public func documentsDirPath() -> String
-{
-  #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
-    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    return paths[0].path
-  #else
-    return "."
-  #endif
-}
+/* setup the platform backend. */
+
+#if os(Linux)
+  import GtkBackend
+  public typealias PlatformBackend = GtkBackend
+#elseif os(Windows)
+  import WinUIBackend
+  public typealias PlatformBackend = WinUIBackend
+#elseif os(macOS)
+  import AppKitBackend
+  public typealias PlatformBackend = AppKitBackend
+#else
+  import UIKitBackend
+  public typealias PlatformBackend = UIKitBackend
+#endif

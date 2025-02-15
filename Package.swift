@@ -277,10 +277,9 @@ let package = Package(
     ),
   ],
   dependencies: [
-    // prepare for SwiftCrossUI, for a cross-platform UsdView.
-    // .package(url: "https://github.com/stackotter/swift-cross-ui", revision: "5c5d8c8"),
+    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "c5981ed"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", from: "1.9.0"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", branch: "main"),
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
@@ -1718,6 +1717,11 @@ let package = Package(
       name: "UsdView",
       dependencies: [
         .target(name: "PixarUSD"),
+        .product(name: "SwiftCrossUI", package: "swift-cross-ui"),
+        .product(name: "AppKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.macOS])),
+        .product(name: "UIKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .watchOS])),
+        .product(name: "GtkBackend", package: "swift-cross-ui", condition: .when(platforms: [.linux])),
+        // .product(name: "WinUIBackend", package: "swift-cross-ui", condition: .when(platforms: [.windows])),
       ],
       resources: [
         .process("Resources")
