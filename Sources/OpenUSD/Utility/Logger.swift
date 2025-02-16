@@ -14,9 +14,6 @@ import Foundation
 import Logging
 import Rainbow
 
-/// The standard error stream used for logging errors.
-var standardError = FileHandle.standardError
-
 /// Swift Bundler's basic log handler.
 struct Handler: LogHandler
 {
@@ -31,6 +28,9 @@ struct Handler: LogHandler
 
   func log(level: Logger.Level, message: Logger.Message, metadata _: Logger.Metadata?, source _: String, file _: String, function _: String, line _: UInt)
   {
+    /// The standard error stream used for logging errors.
+    var standardError = FileHandle.standardError
+
     let output = "\(level.coloring(level.rawValue + ":")) \(message)"
 
     switch level
@@ -44,7 +44,7 @@ struct Handler: LogHandler
 }
 
 /// The global logger.
-var log = Logger(label: "OpenUSD")
+let log = Logger(label: "OpenUSD")
 { _ in
   Handler()
 }
