@@ -28,9 +28,6 @@ enum USDExamples
     // custom ar resolver examples.
     ArResolverExamples.run()
 
-    // python interpreter embedding examples.
-    PythonInterpreterExamples.run()
-
     // scene description examples.
     SceneDescriptionExamples.run()
 
