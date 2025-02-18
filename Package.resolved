@@ -1,5 +1,5 @@
 {
-  "originHash" : "35f355cf71a66e4bb76f82485e8ff46d4e2422f327423b219d652e953b7845f4",
+  "originHash" : "6605b6bd7b6638aae6d337a5fb5938fe0243119e4f40cb0905f65dafb53b5bf3",
   "pins" : [
     {
       "identity" : "icu",
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/swift-cross-ui",
       "state" : {
-        "branch" : "c5981ed",
-        "revision" : "c5981edad491143d79c7d36996ffea033c702fd6"
+        "branch" : "796b79f",
+        "revision" : "796b79ff0991f54c6ae0c8cbfd8958558433d233"
       }
     },
     {

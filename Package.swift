@@ -277,7 +277,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "c5981ed"),
+    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "796b79f"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", branch: "main"),
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
@@ -1721,8 +1721,7 @@ let package = Package(
         .product(name: "AppKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.macOS])),
         .product(name: "UIKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .watchOS])),
         .product(name: "GtkBackend", package: "swift-cross-ui", condition: .when(platforms: [.linux])),
-        // .product(name: "WinUIBackend", package: "swift-cross-ui", condition: .when(platforms: [.windows])),
-      ],
+      ] + Arch.OS.winUIBackend,
       resources: [
         .process("Resources")
       ],
@@ -1995,6 +1994,18 @@ enum Arch
         case .embeddedapple: [.iOS, .visionOS, .tvOS, .watchOS]
         case .noembeddedapple: [.macOS, .linux, .android, .openbsd, .windows]
       }
+    }
+
+    /// because the winui backend is finicky on other platforms.
+    public static var winUIBackend: [Target.Dependency]
+    {
+      #if os(Windows)
+      [
+        .product(name: "WinUIBackend", package: "swift-cross-ui", condition: .when(platforms: [.windows]))
+      ]
+      #else
+      []
+      #endif
     }
   }
 }
