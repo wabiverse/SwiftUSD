@@ -1,5 +1,5 @@
 {
-  "originHash" : "6605b6bd7b6638aae6d337a5fb5938fe0243119e4f40cb0905f65dafb53b5bf3",
+  "originHash" : "54777aaefdc6888a8f3d996386999b84b68943d563265d343a5a021f0d684e61",
   "pins" : [
     {
       "identity" : "icu",
@@ -29,12 +29,21 @@
       }
     },
     {
+      "identity" : "libwebp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/the-swift-collective/libwebp",
+      "state" : {
+        "revision" : "5f745a17b9a5c2a4283f17c2cde4517610ab5f99",
+        "version" : "1.4.1"
+      }
+    },
+    {
       "identity" : "metaversekit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "branch" : "main",
-        "revision" : "0434bf2bd815156ca8900a3442c95a315bc0fe58"
+        "branch" : "14bf2eb",
+        "revision" : "14bf2ebcb677ee095e4ce0f67b6284b8a0751cf8"
       }
     },
     {
@@ -69,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/swift-cross-ui",
       "state" : {
-        "branch" : "796b79f",
-        "revision" : "796b79ff0991f54c6ae0c8cbfd8958558433d233"
+        "branch" : "420c95c",
+        "revision" : "420c95c39df08a8b6f1ecae9f8d126ddce1111d2"
       }
     },
     {
@@ -105,17 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stackotter/swift-image-formats",
       "state" : {
-        "revision" : "05a0169a2a5e9365a058e9aa13da5937be6e2586",
-        "version" : "0.3.1"
-      }
-    },
-    {
-      "identity" : "swift-libwebp",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stackotter/swift-libwebp",
-      "state" : {
-        "branch" : "61dc378",
-        "revision" : "61dc3787c764022ad2f5ab4f9994a569afe86f9f"
+        "revision" : "697bd8aa62bef7d74a1383454e3534a527769e41",
+        "version" : "0.3.2"
       }
     },
     {

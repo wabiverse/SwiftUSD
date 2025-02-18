@@ -277,9 +277,9 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "796b79f"),
+    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "420c95c"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", branch: "main"),
+    .package(url: "https://github.com/wabiverse/MetaverseKit", revision: "14bf2eb"),
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
@@ -2000,11 +2000,11 @@ enum Arch
     public static var winUIBackend: [Target.Dependency]
     {
       #if os(Windows)
-      [
-        .product(name: "WinUIBackend", package: "swift-cross-ui", condition: .when(platforms: [.windows]))
-      ]
+        [
+          .product(name: "WinUIBackend", package: "swift-cross-ui", condition: .when(platforms: [.windows]))
+        ]
       #else
-      []
+        []
       #endif
     }
   }
