@@ -1,5 +1,5 @@
 {
-  "originHash" : "54777aaefdc6888a8f3d996386999b84b68943d563265d343a5a021f0d684e61",
+  "originHash" : "9bdabe019d701c4eecc8f74ed1df8467f1a98cec2f219ed51704472b01dfa2e0",
   "pins" : [
     {
       "identity" : "icu",
@@ -42,17 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/MetaverseKit",
       "state" : {
-        "branch" : "14bf2eb",
-        "revision" : "14bf2ebcb677ee095e4ce0f67b6284b8a0751cf8"
-      }
-    },
-    {
-      "identity" : "metaversevulkanframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
-      "state" : {
-        "revision" : "13c7061599c61a4959c558d8ec1836e5b32b640b",
-        "version" : "1.26.2"
+        "branch" : "6e909df",
+        "revision" : "6e909df14486cb002ba778efadbf345917854da8"
       }
     },
     {
@@ -67,10 +58,10 @@
     {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "0fbc8848e389af3bb55c182bc19ca9d5dc2f255b",
-        "version" : "1.4.0"
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
       }
     },
     {
@@ -123,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
-        "version" : "1.6.1"
+        "revision" : "96a2f8a0fa41e9e09af4585e2724c4e825410b91",
+        "version" : "1.6.2"
       }
     },
     {
@@ -186,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/Version.git",
       "state" : {
-        "revision" : "1fe824b80d89201652e7eca7c9252269a1d85e25",
-        "version" : "2.0.1"
+        "revision" : "303a0f916772545e1e8667d3104f83be708a723c",
+        "version" : "2.1.0"
       }
     },
     {
