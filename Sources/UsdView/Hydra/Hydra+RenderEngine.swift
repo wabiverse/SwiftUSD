@@ -16,6 +16,8 @@ import PixarUSD
 #if canImport(Metal)
   import Metal
   import MetalKit
+#else // !canImport(Metal)
+  import HgiGL
 #endif // canImport(Metal)
 
 public enum Hydra
@@ -26,6 +28,8 @@ public enum Hydra
 
 #if canImport(Metal)
     private let hgi: Pixar.HgiMetalPtr
+#else // !canImport(Metal)
+    private let hgi: Pixar.HgiGLPtr
 #endif // canImport(Metal)
 
     private let engine: UsdImagingGL.EngineSharedPtr
@@ -45,7 +49,8 @@ public enum Hydra
       hgi = HgiMetal.createHgi()
       let driver = HdDriver(name: .renderDriver, driver: hgi.value)
 #else // !canImport(Metal)
-      let driver = HdDriver(name: Tf.Token(), driver: Vt.Value())
+      hgi = HgiGL.createHgi()
+      let driver = HdDriver(name: .renderDriver, driver: hgi.value)
 #endif // canImport(Metal)
 
       engine = UsdImagingGL.Engine.createEngine(
@@ -238,6 +243,11 @@ public enum Hydra
     }
 
     public func getHgi() -> Pixar.HgiMetalPtr
+    {
+      hgi
+    }
+#else // !canImport(Metal)
+    public func getHgi() -> Pixar.HgiGLPtr
     {
       hgi
     }
