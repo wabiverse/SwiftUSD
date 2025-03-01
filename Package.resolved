@@ -1,5 +1,5 @@
 {
-  "originHash" : "9bdabe019d701c4eecc8f74ed1df8467f1a98cec2f219ed51704472b01dfa2e0",
+  "originHash" : "e2304d617463fb9ef0b40aacdc1365fe832568243db0ad30594925fcc88687db",
   "pins" : [
     {
       "identity" : "icu",
@@ -47,6 +47,15 @@
       }
     },
     {
+      "identity" : "metaversevulkanframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wabiverse/MetaverseVulkanFramework",
+      "state" : {
+        "revision" : "13c7061599c61a4959c558d8ec1836e5b32b640b",
+        "version" : "1.26.2"
+      }
+    },
+    {
       "identity" : "rainbow",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Rainbow.git",
@@ -69,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wabiverse/swift-cross-ui",
       "state" : {
-        "branch" : "420c95c",
-        "revision" : "420c95c39df08a8b6f1ecae9f8d126ddce1111d2"
+        "branch" : "2208de3",
+        "revision" : "2208de31cca30f9b2cbc35d1973050fb9b85f80f"
       }
     },
     {
