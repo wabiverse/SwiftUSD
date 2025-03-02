@@ -277,7 +277,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "f377e83"),
+    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "f4cf5ef"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", revision: "6e909df"),
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
