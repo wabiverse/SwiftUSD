@@ -247,19 +247,19 @@ let package = Package(
       name: "UsdView",
       targets: ["UsdView"]
     ),
-    // .executable(
-    //   name: "OpenUSD",
-    //   targets: ["OpenUSD"]
-    // ),
+    .executable(
+      name: "OpenUSD",
+      targets: ["OpenUSD"]
+    ),
     .executable(
       name: "Examples",
       targets: ["Examples"]
     ),
     // -------- Swift Plugins -----
-    // .plugin(
-    //   name: "OpenUSDPlugin",
-    //   targets: ["OpenUSDPlugin"]
-    // ),
+    .plugin(
+      name: "OpenUSDPlugin",
+      targets: ["OpenUSDPlugin"]
+    ),
     .plugin(
       name: "UsdGenSchemaPlugin",
       targets: ["UsdGenSchemaPlugin"]
@@ -277,14 +277,14 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/wabiverse/swift-cross-ui", revision: "1a887c2"),
+    .package(url: "https://github.com/moreSwift/swift-cross-ui", branch: "main"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
     .package(url: "https://github.com/wabiverse/MetaverseKit", revision: "6e909df"),
-    .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
+    .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
-    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
-    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.4.0"),
-    .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.4"),
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.1"),
+    .package(url: "https://github.com/onevcat/Rainbow.git", from: "4.0.0"),
     .package(url: "https://github.com/mxcl/Version.git", from: "2.0.0"),
   ],
   targets: [
@@ -1735,55 +1735,56 @@ let package = Package(
       ]
     ),
 
-    // .executableTarget(
-    //   name: "OpenUSD",
-    //   dependencies: [
-    //     .product(name: "Version", package: "Version"),
-    //     .product(name: "ArgumentParser", package: "swift-argument-parser"),
-    //     .product(name: "Logging", package: "swift-log"),
-    //     .product(name: "Rainbow", package: "Rainbow")
-    //   ],
-    //   resources: [
-    //     // usd source files that need modifications to work with swift are maintained out of these
-    //     // directories, if a usd source file from upstream pixar is matching any of the respective
-    //     // target/filename(.h|.cpp) patterns within any of these resource directories, the contents
-    //     // of each of the matching upstream pixar files will have their contents replaced with each
-    //     // of the respective source code files found in any of these directories.
-    //     .copy("Resources/Work")
-    //   ],
-    //   cxxSettings: [
-    //     .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
-    //     .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
-    //     .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
-    //   ],
-    //   swiftSettings: [
-    //     .enableUpcomingFeature("BareSlashRegexLiterals"),
-    //   ]
-    // ),
+    .executableTarget(
+       name: "OpenUSD",
+       dependencies: [
+         .product(name: "Version", package: "Version"),
+         .product(name: "ArgumentParser", package: "swift-argument-parser"),
+         .product(name: "Logging", package: "swift-log"),
+         .product(name: "Rainbow", package: "Rainbow")
+       ],
+       resources: [
+         // usd source files that need modifications to work with swift are maintained out of these
+         // directories, if a usd source file from upstream pixar is matching any of the respective
+         // target/filename(.h|.cpp) patterns within any of these resource directories, the contents
+         // of each of the matching upstream pixar files will have their contents replaced with each
+         // of the respective source code files found in any of these directories.
+         .copy("Resources/Work")
+       ],
+       cxxSettings: [
+         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+       ],
+       swiftSettings: [
+         // already enabled in Swift 6+.
+         // .enableUpcomingFeature("BareSlashRegexLiterals"),
+       ]
+     ),
 
-    // .plugin(
-    //   name: "OpenUSDPlugin",
-    //   capability: .command(
-    //     intent: .custom(verb: "openusd", description: """
-    //       Update the version of USD in the current package,
-    //       this will fetch the latest version of USD from the
-    //       Pixar USD repository and update this packages source
-    //       code to the latest version.
-    //       """),
-    //     permissions: [
-    //       .allowNetworkConnections(
-    //         scope: .all(),
-    //         reason: "Updating USD requires network access."
-    //       ),
-    //       .writeToPackageDirectory(
-    //         reason: "Updating USD requires write access."
-    //       ),
-    //     ]
-    //   ),
-    //   dependencies: [
-    //     .target(name: "OpenUSD")
-    //   ]
-    // ),
+     .plugin(
+       name: "OpenUSDPlugin",
+       capability: .command(
+         intent: .custom(verb: "openusd", description: """
+           Update the version of USD in the current package,
+           this will fetch the latest version of USD from the
+           Pixar USD repository and update this packages source
+           code to the latest version.
+           """),
+         permissions: [
+           .allowNetworkConnections(
+             scope: .all(),
+             reason: "Updating USD requires network access."
+           ),
+           .writeToPackageDirectory(
+             reason: "Updating USD requires write access."
+           ),
+         ]
+       ),
+       dependencies: [
+         .target(name: "OpenUSD")
+       ]
+     ),
 
     .plugin(
       name: "UsdGenSchemaPlugin",

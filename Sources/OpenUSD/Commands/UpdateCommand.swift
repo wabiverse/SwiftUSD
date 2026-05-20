@@ -17,9 +17,9 @@ import Foundation
  * The subcommand for changing the pixar
  * usd version for a specified package.
  */
-struct UpdateCommand: AsyncCommand
+struct UpdateCommand: AsyncParsableCommand
 {
-  static var configuration = CommandConfiguration(
+  static let configuration = CommandConfiguration(
     commandName: "update",
     abstract: "Update the OpenUSD version in the current package."
   )

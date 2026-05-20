@@ -64,13 +64,13 @@ import PixarUSD
           return Coordinator(mtkView: mtkView)
         }
 
-        public func makeNSView(context: NSViewRepresentableContext<Coordinator>) -> MTKView
+        public func makeNSView(context: NSViewRepresentableContext<Self>) -> MTKView
         {
           let metalView = context.coordinator.metalView
 
           metalView.device = device
           metalView.delegate = renderer
-          metalView.colorPixelFormat = .bgra8Unorm
+          metalView.colorPixelFormat = MTLPixelFormat.bgra8Unorm
           metalView.sampleCount = 1
           metalView.layer?.backgroundColor = NSColor.clear.cgColor
           metalView.layer?.isOpaque = false
@@ -79,7 +79,7 @@ import PixarUSD
           return metalView
         }
 
-        public func updateNSView(_ view: MTKView, context _: NSViewRepresentableContext<Coordinator>)
+        public func updateNSView(_ view: MTKView, context _: NSViewRepresentableContext<Self>)
         {
           renderer.draw(in: view)
         }

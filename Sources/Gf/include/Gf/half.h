@@ -25,12 +25,12 @@ using GfHalf = pxr_half::half;
 
 namespace pxr_half {
 /// Overload hash_value for half.
-inline size_t hash_value(const half h)
+inline std::size_t hash_value(const half h)
 {
   return h.bits();
 }
 // Explicitly delete hashing via implicit conversion of half to float
-size_t hash_value(float) = delete;
+std::size_t hash_value(float) = delete;
 }  // namespace pxr_half
 
 template<> struct GfIsFloatingPoint<GfHalf> : public std::integral_constant<bool, true> {};

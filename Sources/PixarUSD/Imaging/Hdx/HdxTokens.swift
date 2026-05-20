@@ -17,7 +17,7 @@ private extension Hdx
   /**
    * Private struct to hold the static
    * data for the Hdx library. */
-  struct StaticData
+  struct StaticData: @unchecked Sendable
   {
     static let shared = StaticData()
     private init()
@@ -52,5 +52,5 @@ public extension Hdx
 
 public extension Tf.Token
 {
-  static let sRGB = Hdx.ColorCorrectionTokens.sRGB.token
+  nonisolated(unsafe) static let sRGB = Hdx.ColorCorrectionTokens.sRGB.token
 }

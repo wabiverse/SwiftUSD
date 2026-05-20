@@ -14,8 +14,33 @@ import Foundation
 
 /// All processes that have been created using `Process.create(_:arguments:directory:pipe:)`.
 ///
-/// If the program is killed, all processes in this array are terminated before the program exits.
-var processes: [Process] = []
+/// If the program is killed, all processes in this registry are terminated before the program exits.
+let processes = ProcessRegistry()
+
+final class ProcessRegistry: @unchecked Sendable
+{
+  private let lock = NSLock()
+  private var storage: [Process] = []
+
+  func append(_ process: Process)
+  {
+    lock.withLock
+    {
+      storage.append(process)
+    }
+  }
+
+  func terminateAll()
+  {
+    lock.withLock
+    {
+      for process in storage
+      {
+        process.terminate()
+      }
+    }
+  }
+}
 
 extension Process
 {

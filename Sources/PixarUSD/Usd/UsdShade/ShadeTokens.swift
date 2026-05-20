@@ -17,7 +17,7 @@ public extension UsdShade
   /**
    * Private struct to hold the static
    * data for the UsdShade library. */
-  private struct StaticData
+  private struct StaticData: @unchecked Sendable
   {
     static let shared = StaticData()
     private init()

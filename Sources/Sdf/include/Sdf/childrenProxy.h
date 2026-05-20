@@ -51,12 +51,6 @@ template<class _View> class SdfChildrenProxy {
       return *_pos;
     }
 
-    template<class U> _ValueProxy &operator=(const U &x)
-    {
-      _owner->_Set(*_pos, x);
-      return *this;
-    }
-
     bool operator==(const mapped_type &other) const
     {
       return *_pos == other;
