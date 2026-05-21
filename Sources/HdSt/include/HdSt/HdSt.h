@@ -67,8 +67,8 @@
 #include <HdSt/materialNetworkShader.h>
 #include <HdSt/materialParam.h>
 #include <HdSt/materialPrimvarTransferSceneIndexPlugin.h>
-// #include <HdSt/materialXFilter.h>
-// #include <HdSt/materialXShaderGen.h>
+#include <HdSt/materialXFilter.h>
+#include <HdSt/materialXShaderGen.h>
 #include <HdSt/mesh.h>
 #include <HdSt/meshShaderKey.h>
 #include <HdSt/meshTopology.h>

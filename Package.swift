@@ -279,7 +279,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/moreSwift/swift-cross-ui", branch: "main"),
     .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
-    .package(url: "https://github.com/wabiverse/MetaverseKit", revision: "6e909df"),
+    .package(url: "https://github.com/furbytm/MetaverseKit", from: "2.0.1"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.4"),
@@ -316,8 +316,6 @@ let package = Package(
         .product(name: "Ptex", package: "MetaverseKit"),
         .product(name: "Draco", package: "MetaverseKit"),
         .product(name: "Eigen", package: "MetaverseKit"),
-        /* ---------- Apple only libs. ---------- */
-        .product(name: "Apple", package: "MetaverseKit", condition: .when(platforms: Arch.OS.apple.platform)),
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
         .product(name: "Rainbow", package: "Rainbow")

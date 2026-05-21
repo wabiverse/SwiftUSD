@@ -1,5 +1,5 @@
 {
-  "originHash" : "ec3959b760ad3a06e522d781d024430e0751715cbc287ec7aeee45a244deb667",
+  "originHash" : "f9d8b157ff3128497df7bc2af3dc479c1585c3477e8aa26981408e280e700e98",
   "pins" : [
     {
       "identity" : "androidkit",
@@ -49,10 +49,10 @@
     {
       "identity" : "metaversekit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/wabiverse/MetaverseKit",
+      "location" : "https://github.com/furbytm/MetaverseKit",
       "state" : {
-        "branch" : "6e909df",
-        "revision" : "6e909df14486cb002ba778efadbf345917854da8"
+        "revision" : "582851004b4333ee9b568b63444812a76f52dbec",
+        "version" : "2.0.1"
       }
     },
     {
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-docc-plugin",
       "state" : {
-        "revision" : "85e4bb4e1cd62cec64a4b8e769dcefdf0c5b9d64",
-        "version" : "1.4.3"
+        "revision" : "647c708be89f834fa6a6d4945442793a77ddf5b6",
+        "version" : "1.5.0"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "5073617dac96330a486245e4c0179cb0a6fd2256",
-        "version" : "1.12.0"
+        "revision" : "a012e0ad8a8a72de92b0e008c81a9b793f70e73a",
+        "version" : "1.12.1"
       }
     },
     {
@@ -285,17 +285,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/Version.git",
       "state" : {
-        "revision" : "303a0f916772545e1e8667d3104f83be708a723c",
-        "version" : "2.1.0"
+        "revision" : "3043fcd2a50375db76d89ff206a612471833d1c2",
+        "version" : "2.2.1"
       }
     },
     {
       "identity" : "zlib",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/the-swift-collective/zlib.git",
+      "location" : "https://github.com/the-swift-collective/zlib",
       "state" : {
-        "revision" : "f35d438c14187cb369dfd82603c3427dc66fbed5",
-        "version" : "1.3.1"
+        "revision" : "f1d153b90420f9fcc6ef916cd67ea96f0e68d137",
+        "version" : "1.3.2"
       }
     }
   ],
