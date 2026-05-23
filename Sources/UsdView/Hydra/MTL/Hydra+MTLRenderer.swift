@@ -96,7 +96,7 @@ import PixarUSD
       }
 
       /// draw the scene, and blit the result to the view.
-      @MainActor
+      @MainActor @discardableResult
       func drawFrame(in view: MTKView, timeCode: Double) -> Bool
       {
         guard let hgi = hydra?.getHgi()
