@@ -17,10 +17,10 @@ import PixarUSD
   import SwiftCrossUI
 
   #if os(macOS)
+    import AppKitBackend
     import Combine
     import Metal
     import MetalKit
-    import AppKitBackend
 
     public extension Hydra
     {
@@ -49,8 +49,11 @@ import PixarUSD
         public func makeCoordinator() -> Coordinator
         {
           let mtkView = MTKView()
-          mtkView.isPaused = false
-          mtkView.framebufferOnly = true
+          mtkView.isPaused = false // driven by display link
+          mtkView.framebufferOnly = false // we're using the drawable in our own render pass
+          mtkView.enableSetNeedsDisplay = false // don't wait for setNeedsDisplay
+          mtkView.presentsWithTransaction = true // sync presentation with our command buffer
+
           if let mode = CGDisplayCopyDisplayMode(CGMainDisplayID())
           {
             mtkView.preferredFramesPerSecond = Int(mode.refreshRate)
@@ -59,7 +62,6 @@ import PixarUSD
           {
             mtkView.preferredFramesPerSecond = 60
           }
-          mtkView.drawableSize = mtkView.frame.size
 
           return Coordinator(mtkView: mtkView)
         }
@@ -79,10 +81,8 @@ import PixarUSD
           return metalView
         }
 
-        public func updateNSView(_ view: MTKView, context _: NSViewRepresentableContext<Self>)
-        {
-          renderer.draw(in: view)
-        }
+        public func updateNSView(_: MTKView, context _: NSViewRepresentableContext<Self>)
+        {}
 
         public class Coordinator
         {
@@ -98,4 +98,4 @@ import PixarUSD
       }
     }
   #endif // os(macOS)
-#endif // canImport(SwiftUI)
+#endif // canImport(SwiftCrossUI)
