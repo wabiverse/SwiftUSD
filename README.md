@@ -51,8 +51,8 @@
 </div>
 
 A Swift-native, cross-platform framework for building OpenUSD applications - bringing the USD ecosystem to Android,
-Linux, and Windows through syntactically pleasing Swift OpenUSD APIs, a composable Hydra viewport, native UI, and
-real-time workflows. Unbound from any single vendor's GPU or platform.
+Linux, Windows, and Apple platforms through syntactically pleasing Swift OpenUSD APIs, a composable Hydra viewport,
+native UI, and real-time workflows. Unbound from any single vendor's GPU or platform.
 
 
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
