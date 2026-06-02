@@ -9,17 +9,10 @@
 
 <div align="center">
 
-<h1 align="center">
-    <a href="https://wabi.foundation/pixarusd/documentation/pixarusd#gh-light-mode-only">
-      <img width="350" src="swiftlymetaversingwordslight.svg">
-    </a>
-    <a href="https://wabi.foundation/pixarusd/documentation/pixarusd#gh-dark-mode-only">
-      <img width="350" src="swiftlymetaversingwordsdark.svg">
-    </a>
-</h1>
+### SwiftUSD
 
 <p align="center">
-  <i align="center">Pixar's universal scene description for <b>swift</b> and the open source <b>metaverse</b>.</i>
+  <i align="center">A <b>Swift-native</b>, <b>cross-platform framework</b> for building <b>OpenUSD</b> applications.</i>
 </p>
 
 </div>
@@ -41,7 +34,7 @@
   <a href="https://github.com/wabiverse/SwiftUSD/graphs/contributors">
     <img src="https://img.shields.io/github/contributors-anon/wabiverse/SwiftUSD?color=8A2BE2&style=flat-square" alt="contributors" style="height: 20px;">
   </a>
-  <a href="https://discord.gg/bfW4NyKpuA">
+  <a href="https://discord.gg/#">
     <img src="https://img.shields.io/badge/discord-7289da.svg?style=flat-square&logo=discord" alt="discord" style="height: 20px;">
   </a>
   <a href="https://openusd.org/release/index.html">
@@ -51,29 +44,16 @@
 
 <image align=top src="https://github.com/user-attachments/assets/ad0a019c-17fd-422f-9145-b88aad3f9f06">
 
-> [!IMPORTANT]
-> #### Supporting SwiftUSD ❤️
-> If you find **SwiftUSD** useful, please consider supporting me by [becoming a sponsor](https://github.com/sponsors/wabiverse). I spend a tremendous amount of time dedicating my life to open source projects, and each sponsorship helps me focus more time on making quality tools and software for the community.
-
-<br/>
-
 <div align="center">
 
-# Swifting the Metaverse
+# Building OpenUSD Apps in Swift
 
 </div>
 
-<div align="center">
+A Swift-native, cross-platform framework for building OpenUSD applications - bringing the USD ecosystem to Android,
+Linux, and Windows through syntactically pleasing Swift OpenUSD APIs, a composable Hydra viewport, native UI, and
+real-time workflows. Unbound from any single vendor's GPU or platform.
 
-# <img width="350" src="https://www.dropbox.com/scl/fi/96fxs64ap4aaq9f7vp0yf/swiftusdcropped.png?rlkey=wvgzfodi8skub1svqf1w4g07g&raw=1">
-
-</div>
-
-Universal Scene Description (**USD**) is an efficient, scalable system for
-authoring, reading, and streaming time-sampled scene description for
-interchange between graphics applications.
-
-For more details, please visit the web site [here](http://openusd.org).
 
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
@@ -89,7 +69,7 @@ dependencies: [
 import PackageDescription
 
 let package = Package(
-  name: "MyMetaversePackage",
+  name: "MySwiftPackage",
   platforms: [
     .macOS(.v14),
     .visionOS(.v1),
@@ -100,12 +80,12 @@ let package = Package(
   // --- 📦 Package Products. ---
   products: [
     .library(
-      name: "MyMetaverseLibrary",
-      targets: ["MyMetaverseLibrary"]
+      name: "MySwiftLibrary",
+      targets: ["MySwiftLibrary"]
     ),
     .executable(
-      name: "MyMetaverseApp",
-      targets: ["MyMetaverseApp"]
+      name: "MySwiftApp",
+      targets: ["MySwiftApp"]
     ),
   ],
   dependencies: [
@@ -114,7 +94,7 @@ let package = Package(
   targets: [
     /* 📕 For library products... */
     .target(
-      name: "MyMetaverseLibrary",
+      name: "MySwiftLibrary",
       dependencies: [
         /* add pixar usd as a library dependency. */
         .product(name: "PixarUSD", package: "SwiftUSD"),
@@ -133,7 +113,7 @@ let package = Package(
 
     /* 📗 Or executable products... */
     .executableTarget(
-      name: "MyMetaverseApp",
+      name: "MySwiftApp",
       dependencies: [
         /* add pixar usd as an executable dependency. */
         .product(name: "PixarUSD", package: "SwiftUSD"),
@@ -307,19 +287,29 @@ enum Creator
 
 </div>
 
+  ### Android Devices
+  
+<div align="center">
+
+  <div align="left">
+
+  Run and bundle **UsdView** on **Android**.
+  ```pwsh
+  # list available Android simulators.
+  swift bundler simulators
+
+  # boot a simulator from the list.
+  swift bundler simulators boot [id-of-device]
+
+  # if you booted a Android device.
+  swift bundler run --simulator "Pixel_10_Pro" -c release UsdView
+  ```
+
+  </div>
+
+</div>
+
 <br/>
-
-# **OH SH!**
-You can even run it in a tiny script, no package necessary, the comments next to the import
-statements describe the git sources to pull from, and everything transitively linked will come flying
-on in - checkout [**swift-sh**](https://github.com/mxcl/swift-sh)!
-
-> [!IMPORTANT]
-> You will need to use the **Wabi** [**fork of swift-sh**](https://github.com/wabiverse/swift-sh)
-> in order for this to work with **Swift 5.9** cxx interop.
-
-
-![image](https://www.dropbox.com/scl/fi/66ohshzkx6jg0ym69znqw/297358393-1ee63339-b0b3-4f50-920b-9f6beb7cc227.png?rlkey=3i8cr6qjwnjrc36qycjkcz291&raw=1)
 
 
 
@@ -332,5 +322,4 @@ on in - checkout [**swift-sh**](https://github.com/mxcl/swift-sh)!
 
 <hr/>
 
-###### *if you can `mmap` a **pixel**, you can `mmap` a **metaverse**.*
 ###### SwiftUSD is licensed under the terms of the [Tomorrow Open Source Technology 1.0 License](https://openusd.org/license).
