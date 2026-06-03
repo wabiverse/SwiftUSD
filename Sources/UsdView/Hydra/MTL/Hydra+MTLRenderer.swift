@@ -168,7 +168,11 @@ public extension Hydra
       renderEncoder.popDebugGroup()
       renderEncoder.endEncoding()
 
-      commandBuffer.present(drawable, afterMinimumDuration: 1.0 / Double(view.preferredFramesPerSecond))
+      #if os(macOS)
+        commandBuffer.present(drawable, afterMinimumDuration: 1.0 / Double(view.preferredFramesPerSecond))
+      #else // !os(macOS)
+        commandBuffer.present(drawable, atTime: 1.0 / Double(view.preferredFramesPerSecond))
+      #endif // os(macOS)
     }
 
     public func getMetalTexture(from hgiTexture: Pixar.HgiTextureHandle) -> MTLTexture?

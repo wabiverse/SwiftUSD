@@ -53,7 +53,9 @@ public extension Hydra
       mtkView.framebufferOnly = false // we're using the drawable in our own render pass
       mtkView.enableSetNeedsDisplay = false // don't wait for setNeedsDisplay
       mtkView.presentsWithTransaction = true // sync presentation with our command buffer
-      mtkView.preferredFramesPerSecond = UIScreen.main.maximumFramesPerSecond
+      #if !os(visionOS)
+        mtkView.preferredFramesPerSecond = UIScreen.main.maximumFramesPerSecond
+      #endif // !os(visionOS)
 
       return Coordinator(mtkView: mtkView)
     }
