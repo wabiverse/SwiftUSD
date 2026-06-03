@@ -17,7 +17,7 @@ private extension UsdGeom
   /**
    * Private struct to hold the static
    * data for the UsdGeom library. */
-  struct StaticData
+  struct StaticData: @unchecked Sendable
   {
     static let shared = StaticData()
     private init()
@@ -116,5 +116,5 @@ public extension UsdGeom
 
 public extension Tf.Token
 {
-  static let z = UsdGeom.Tokens.z.token
+  nonisolated(unsafe) static let z = UsdGeom.Tokens.z.token
 }

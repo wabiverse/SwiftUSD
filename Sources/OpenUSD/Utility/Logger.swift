@@ -44,7 +44,7 @@ struct Handler: LogHandler
 }
 
 /// The global logger.
-let log = Logger(label: "OpenUSD")
+nonisolated(unsafe) var log = Logger(label: "OpenUSD")
 { _ in
   Handler()
 }

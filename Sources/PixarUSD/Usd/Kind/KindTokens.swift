@@ -17,7 +17,7 @@ private extension Kind
   /**
    * Private struct to hold the static
    * data for the Kind library. */
-  struct StaticData
+  struct StaticData: @unchecked Sendable
   {
     static let shared = StaticData()
     private init()

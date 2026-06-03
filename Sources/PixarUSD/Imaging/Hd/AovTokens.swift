@@ -17,7 +17,7 @@ private extension Hd
   /**
    * Private struct to hold the static
    * data for the Hd library's AOV tokens. */
-  struct AovStaticData
+  struct AovStaticData: @unchecked Sendable
   {
     static let shared = AovStaticData()
     private init()
