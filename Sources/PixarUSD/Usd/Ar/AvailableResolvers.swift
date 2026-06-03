@@ -28,10 +28,11 @@ public extension Ar
       all().empty() == false
     else { return [] }
 
-    return Array(all()).map
-    {
-      // return list of all type names.
-      String($0.GetTypeName().pointee)
+    var result: [String] = []
+    for item in all() {
+      result.append(String(item.GetTypeName().pointee))
     }
+    
+    return result
   }
 }
