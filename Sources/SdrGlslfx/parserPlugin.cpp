@@ -4,7 +4,7 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#include "Plugin/sdrGlslfx/parserPlugin.h"
+#include "SdrGlslfx/parserPlugin.h"
 
 #include "Ar/resolver.h"
 #include "Gf/matrix4d.h"

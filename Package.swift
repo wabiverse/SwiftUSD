@@ -101,6 +101,10 @@ let package = Package(
       targets: ["UsdHydra"]
     ),
     .library(
+      name: "SdrGlslfx",
+      targets: ["SdrGlslfx"]
+    ),
+    .library(
       name: "SdrOsl",
       targets: ["SdrOsl"]
     ),
@@ -803,6 +807,28 @@ let package = Package(
       ]
     ),
 
+    .target(
+      name: "SdrGlslfx",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Ar"),
+        .target(name: "Tf"),
+        .target(name: "Gf"),
+        .target(name: "Hio"),
+        .target(name: "Sdr"),
+        .target(name: "Ndr"),
+        .target(name: "Vt"),
+      ],
+      cxxSettings: [
+        .define("MFB_PACKAGE_NAME", to: "SdrGlslfx"),
+        .define("MFB_ALT_PACKAGE_NAME", to: "SdrGlslfx"),
+        .define("MFB_PACKAGE_MODULE", to: "SdrGlslfx"),
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+    
     .target(
       name: "SdrOsl",
       dependencies: [
@@ -1858,6 +1884,7 @@ let package = Package(
         .target(name: "Usd"),
         .target(name: "Ndr"),
         .target(name: "Sdr"),
+        .target(name: "SdrGlslfx"),
         .target(name: "SdrOsl"),
         .target(name: "UsdGeom"),
         .target(name: "UsdShade"),

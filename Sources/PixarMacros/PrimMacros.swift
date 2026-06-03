@@ -20,6 +20,7 @@ public struct PixarPrimMacro: MemberMacro
 {
   public static func expansion(of _: SwiftSyntax.AttributeSyntax,
                                providingMembersOf _: some SwiftSyntax.DeclGroupSyntax,
+                               conformingTo _: [SwiftSyntax.TypeSyntax],
                                in _: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax]
   {
     let decl: DeclSyntax = """

@@ -16,9 +16,12 @@
 #include "Tf/pathUtils.h"
 #include "Tf/staticTokens.h"
 #include "Tf/stringUtils.h"
+#include "UsdMtlx/parserPlugin.h"
 #include "UsdMtlx/utils.h"
 #include "UsdUtils/pipeline.h"
 #include "pxr/pxrns.h"
+
+#include <string>
 
 namespace mx = MaterialX;
 
@@ -491,17 +494,6 @@ static void ParseElement(ShaderBuilder *builder, const mx::ConstNodeDefPtr &node
 }
 
 }  // anonymous namespace
-
-/// Parses nodes in MaterialX files.
-class UsdMtlxParserPlugin : public NdrParserPlugin {
- public:
-  UsdMtlxParserPlugin() = default;
-  ~UsdMtlxParserPlugin() override = default;
-
-  NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult &discoveryResult) override;
-  const NdrTokenVec &GetDiscoveryTypes() const override;
-  const TfToken &GetSourceType() const override;
-};
 
 NdrNodeUniquePtr UsdMtlxParserPlugin::Parse(const NdrNodeDiscoveryResult &discoveryResult)
 {
