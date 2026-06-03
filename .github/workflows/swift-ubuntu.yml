@@ -29,6 +29,8 @@ jobs:
         run: sudo apt install freeglut3-dev
       - name: 🚀 Install Boost
         run: sudo apt install libboost-all-dev
+      - name: 🔥 Refresh Index
+        run: sudo apt update && sudo apt install -y liblzma-dev
       - name: 🖥️ Install X11
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
