@@ -351,6 +351,7 @@ let package = Package(
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
         .define("ARCH_COMPILER_MSVC", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -878,6 +879,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -903,6 +905,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ]
     ),
 
@@ -1753,6 +1756,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
@@ -1936,6 +1940,7 @@ let package = Package(
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
         .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
         .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+        .define("NOMINMAX", .when(platforms: [.windows])),
       ],
       swiftSettings: [
         .define("DEBUG_PIXAR_BUNDLE"),
