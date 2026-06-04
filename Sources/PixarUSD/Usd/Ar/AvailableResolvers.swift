@@ -29,10 +29,11 @@ public extension Ar
     else { return [] }
 
     var result: [String] = []
-    for item in all() {
-      result.append(String(item.GetTypeName().pointee))
+    let resolvers = all()
+    for i in 0..<Int(resolvers.size()) {
+      result.append(String(resolvers[i].GetTypeName().pointee))
     }
-    
+
     return result
   }
 }

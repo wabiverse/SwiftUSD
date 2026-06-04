@@ -29,42 +29,42 @@ public struct PixarXformableMacro: MemberMacro
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddXformOp(type, precision, suffix, invert)
+        self.AddXformOp(type, precision, suffix, invert) as UsdGeomXformOp
       }
 
       public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
                                  suffix: Tf.Token = Tf.Token(),
                                  invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddTranslateOp(precision, suffix, invert)
+        self.AddTranslateOp(precision, suffix, invert) as UsdGeomXformOp
       }
 
       public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddScaleOp(precision, suffix, invert)
+        self.AddScaleOp(precision, suffix, invert) as UsdGeomXformOp
       }
 
       public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddRotateXOp(precision, suffix, invert)
+        self.AddRotateXOp(precision, suffix, invert) as UsdGeomXformOp
       }
 
       public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddRotateYOp(precision, suffix, invert)
+        self.AddRotateYOp(precision, suffix, invert) as UsdGeomXformOp
       }
 
       public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self.AddRotateZOp(precision, suffix, invert)
+        self.AddRotateZOp(precision, suffix, invert) as UsdGeomXformOp
       }
       """
 
