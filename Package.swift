@@ -282,7 +282,6 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/moreSwift/swift-cross-ui", from: "0.7.0"),
-    .package(url: "https://github.com/wabiverse/icu.git", from: "76.1.2"),
     .package(url: "https://github.com/furbytm/MetaverseKit", from: "2.0.1"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
@@ -470,8 +469,7 @@ let package = Package(
     .target(
       name: "Pegtl",
       dependencies: [
-        .target(name: "Arch"),
-        .product(name: "icuin", package: "icu", condition: .when(platforms: [.windows])),
+        .target(name: "Arch")
       ],
       cxxSettings: [
         .headerSearchPath("include/Pegtl"),
