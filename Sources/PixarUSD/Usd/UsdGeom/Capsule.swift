@@ -23,13 +23,13 @@ public extension UsdGeom
 extension UsdGeom.Capsule: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdGeom.Capsule
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Capsule
   {
-    UsdGeom.Capsule.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Capsule.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdGeom.Capsule
+  public static func define(_ stage: UsdStage, path: String) -> UsdGeom.Capsule
   {
     UsdGeom.Capsule.define(stage, path: .init(path))
   }

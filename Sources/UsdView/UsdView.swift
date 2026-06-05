@@ -28,7 +28,7 @@ struct UsdView: App
   typealias Backend = PlatformBackend
 
   /// the active usd stage.
-  let stage: UsdStageRefPtr
+  let stage: UsdStage
   /// the hydra rendering engine.
   let engine: Hydra.RenderEngine
 

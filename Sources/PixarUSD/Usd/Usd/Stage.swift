@@ -136,9 +136,11 @@ public extension Usd.Stage
    * layer's repository path if the layer has one, otherwise its resolved
    * path. */
   @discardableResult
-  static func createNew(_ identifier: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func createNew(_ identifier: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
+    )
   }
 
   /**
@@ -165,9 +167,11 @@ public extension Usd.Stage
    * layer's repository path if the layer has one, otherwise its resolved
    * path. */
   @discardableResult
-  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+    )
   }
 
   /**
@@ -190,9 +194,11 @@ public extension Usd.Stage
    * stage without a session layer, pass `Tf/NullPtr` (or None in python) as
    * the `sessionLayer` argument. */
   @discardableResult
-  static func createInMemory(load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func createInMemory(load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.CreateInMemory(load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.CreateInMemory(load.rawValue)
+    )
   }
 
   /**
@@ -215,9 +221,11 @@ public extension Usd.Stage
    * stage without a session layer, pass `Tf/NullPtr` (or None in python) as
    * the `sessionLayer` argument. */
   @discardableResult
-  static func createInMemory(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func createInMemory(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.CreateInMemory(std.string(identifier), load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.CreateInMemory(std.string(identifier), load.rawValue)
+    )
   }
 
   /**
@@ -238,9 +246,11 @@ public extension Usd.Stage
    * ``ArResolver.CreateDefaultContextForAsset()`` with the layer's repository
    * path if the layer has one, otherwise its resolved path. */
   @discardableResult
-  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func open(_ filePath: String, load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.Open(std.string(filePath), load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.Open(std.string(filePath), load.rawValue)
+    )
   }
 
   /**
@@ -261,9 +271,11 @@ public extension Usd.Stage
    * ``ArResolver.CreateDefaultContextForAsset()`` with the layer's repository
    * path if the layer has one, otherwise its resolved path. */
   @discardableResult
-  static func open(_ filePath: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStageRefPtr
+  static func open(_ filePath: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStage
   {
-    Usd.Stage.Open(std.string("\(filePath).\(ext.rawValue)"), load.rawValue)
+    Overlay.Dereference(
+      Usd.Stage.Open(std.string("\(filePath).\(ext.rawValue)"), load.rawValue)
+    )
   }
 
   /**

@@ -64,13 +64,13 @@ public extension Hydra
 
     public func getRotation() -> Pixar.GfRotation
     {
-      var gfRotation = Pixar.GfRotation(Pixar.GfVec3d.ZAxis(), params.rotation[2]) *
-        Pixar.GfRotation(Pixar.GfVec3d.XAxis(), params.rotation[0]) *
-        Pixar.GfRotation(Pixar.GfVec3d.YAxis(), params.rotation[1])
+      var gfRotation = Pixar.GfRotation(Pixar.GfVec3d.ZAxis(), params.rotation[2])
+      gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.XAxis(), params.rotation[0])
+      gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.YAxis(), params.rotation[1])
 
       if isZUp
       {
-        gfRotation = gfRotation * Pixar.GfRotation(Pixar.GfVec3d.XAxis(), 90.0)
+        gfRotation *= Pixar.GfRotation(Pixar.GfVec3d.XAxis(), 90.0)
       }
 
       return gfRotation

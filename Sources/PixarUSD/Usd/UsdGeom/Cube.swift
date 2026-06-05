@@ -23,13 +23,13 @@ public extension UsdGeom
 extension UsdGeom.Cube: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cube
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Cube
   {
-    UsdGeom.Cube.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Cube.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cube
+  public static func define(_ stage: UsdStage, path: String) -> UsdGeom.Cube
   {
     UsdGeom.Cube.define(stage, path: .init(path))
   }

@@ -1093,11 +1093,25 @@ template<class T> class TfRefPtr {
   {
     _Counter::AddRef(_refBase);
   }
+  
+  static void _AddRefStatic(TfRefBase* _refBase)
+  {
+    _Counter::AddRef(_refBase);
+  }
 
   void _RemoveRef(const TfRefBase *ptr) const
   {
     if (_Counter::RemoveRef(ptr)) {
       Tf_RefPtrTracker_LastRef(this, reinterpret_cast<DataType *>(const_cast<TfRefBase *>(ptr)));
+      delete ptr;
+    }
+  }
+  
+  static void _RemoveRefStatic(const TfRefBase* ptr)
+  {
+    if (_Counter::RemoveRef(ptr)) {
+      Tf_RefPtrTracker_LastRef(nullptr,
+                               reinterpret_cast<T*>(const_cast<TfRefBase*>(ptr)));
       delete ptr;
     }
   }
@@ -1112,6 +1126,7 @@ template<class T> class TfRefPtr {
   template<class U> friend TfRefPtr<U> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<U> const &);
 #endif
   friend class TfWeakBase;
+  friend class Tf_RetainReleaseHelper;
 };
 
 #if !defined(doxygen)

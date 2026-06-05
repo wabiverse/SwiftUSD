@@ -23,13 +23,13 @@ public extension UsdGeom
 extension UsdGeom.Camera: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Camera
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Camera
   {
-    UsdGeom.Camera.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Camera.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Camera
+  public static func define(_ stage: UsdStage, path: String) -> UsdGeom.Camera
   {
     UsdGeom.Camera.define(stage, path: .init(path))
   }

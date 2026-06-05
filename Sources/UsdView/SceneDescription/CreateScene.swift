@@ -17,7 +17,7 @@ extension UsdView
 {
   /**
    * Create a basic usd scene. */
-  static func createScene() -> UsdStageRefPtr
+  static func createScene() -> UsdStage
   {
     /* Create stage with a dome light & sphere on a transform. */
 

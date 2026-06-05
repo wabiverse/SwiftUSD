@@ -22,12 +22,12 @@ public extension UsdGeom
 @Xformable
 extension UsdGeom.Curves: GeomXformable
 {
-  public static func get(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Curves
+  public static func get(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Curves
   {
-    UsdGeom.Curves.Get(stage.pointee.getPtr(), path)
+    UsdGeom.Curves.Get(Overlay.TfWeakPtr(stage), path)
   }
 
-  public static func get(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Curves
+  public static func get(_ stage: UsdStage, path: String) -> UsdGeom.Curves
   {
     UsdGeom.Curves.get(stage, path: .init(path))
   }

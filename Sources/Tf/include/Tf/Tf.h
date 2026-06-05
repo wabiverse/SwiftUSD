@@ -54,6 +54,9 @@
 #include <Tf/pointerAndBits.h>
 #include <Tf/preprocessorUtils.h>
 #include <Tf/preprocessorUtilsLite.h>
+
+#include <Tf/retainReleaseHelper.h>
+
 // #include <Tf/pxrCLI11/CLI11.h>
 // #include <Tf/pxrDoubleConversion/bignum-dtoa.h>
 // #include <Tf/pxrDoubleConversion/bignum.h>

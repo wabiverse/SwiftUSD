@@ -22,13 +22,13 @@ public extension UsdShade
 public extension UsdShade.Shader
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdShade.Shader
+  static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdShade.Shader
   {
-    UsdShade.Shader.Define(stage.pointee.getPtr(), path)
+    UsdShade.Shader.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdShade.Shader
+  static func define(_ stage: UsdStage, path: String) -> UsdShade.Shader
   {
     UsdShade.Shader.define(stage, path: .init(path))
   }

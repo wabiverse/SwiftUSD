@@ -23,13 +23,13 @@ public extension UsdLux
 extension UsdLux.RectLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.RectLight
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdLux.RectLight
   {
-    UsdLux.RectLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.RectLight.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.RectLight
+  public static func define(_ stage: UsdStage, path: String) -> UsdLux.RectLight
   {
     UsdLux.RectLight.define(stage, path: .init(path))
   }

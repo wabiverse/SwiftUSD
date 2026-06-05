@@ -29,14 +29,14 @@ import PixarUSD
       let hgi: Pixar.HgiGLPtr
       var device: Pixar.HgiGLDevice!
 
-      public var stage: UsdStageRefPtr
+      public var stage: UsdStage
 
       #if canImport(UsdImagingGL)
         /// UsdImagingGL is not available on iOS.
         var engine: UsdImagingGL.EngineSharedPtr
       #endif // canImport(UsdImagingGL)
 
-      public required init(stage: UsdStageRefPtr)
+      public required init(stage: UsdStage)
       {
         hgi = HgiGL.createHgi()
         device = hgi.device

@@ -23,13 +23,13 @@ public extension UsdLux
 extension UsdLux.PortalLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.PortalLight
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdLux.PortalLight
   {
-    UsdLux.PortalLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.PortalLight.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.PortalLight
+  public static func define(_ stage: UsdStage, path: String) -> UsdLux.PortalLight
   {
     UsdLux.PortalLight.define(stage, path: .init(path))
   }

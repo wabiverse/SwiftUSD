@@ -23,13 +23,13 @@ public extension UsdGeom
 extension UsdGeom.Cylinder: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Cylinder
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Cylinder
   {
-    UsdGeom.Cylinder.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Cylinder.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Cylinder
+  public static func define(_ stage: UsdStage, path: String) -> UsdGeom.Cylinder
   {
     UsdGeom.Cylinder.define(stage, path: .init(path))
   }

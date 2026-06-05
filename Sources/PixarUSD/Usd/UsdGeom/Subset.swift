@@ -22,13 +22,13 @@ public extension UsdGeom
 public extension UsdGeom.Subset
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Subset
+  static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Subset
   {
-    UsdGeom.Subset.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Subset.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Subset
+  static func define(_ stage: UsdStage, path: String) -> UsdGeom.Subset
   {
     UsdGeom.Subset.define(stage, path: .init(path))
   }

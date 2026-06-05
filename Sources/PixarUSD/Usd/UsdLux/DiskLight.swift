@@ -23,13 +23,13 @@ public extension UsdLux
 extension UsdLux.DiskLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdLux.DiskLight
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdLux.DiskLight
   {
-    UsdLux.DiskLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.DiskLight.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdLux.DiskLight
+  public static func define(_ stage: UsdStage, path: String) -> UsdLux.DiskLight
   {
     UsdLux.DiskLight.define(stage, path: .init(path))
   }

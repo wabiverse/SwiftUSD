@@ -246,6 +246,10 @@ let package = Package(
       name: "UsdImagingGL",
       targets: ["UsdImagingGL"]
     ),
+    .library(
+      name: "USDOverlays",
+      targets: ["USDOverlays"]
+    ),
     // ----------------- Apps -----
     .executable(
       name: "UsdView",
@@ -1866,6 +1870,20 @@ let package = Package(
     // ),
 
     .target(
+      name: "USDOverlays",
+      dependencies: [
+        .target(name: "Arch"),
+        .target(name: "Tf"),
+        .target(name: "Usd"),
+      ],
+      cxxSettings: [
+        .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),
+        .define("_ALLOW_KEYWORD_MACROS", to: "1", .when(platforms: [.windows])),
+        .define("static_assert(_conditional, ...)", to: "", .when(platforms: [.windows])),
+      ]
+    ),
+    
+    .target(
       name: "PixarUSD",
       dependencies: [
         // ---------- base. ------
@@ -1931,6 +1949,7 @@ let package = Package(
         // -------- macros. ------
         .target(name: "PixarMacros"),
         // -----------------------
+        .target(name: "USDOverlays"),
       ],
       cxxSettings: [
         // enable to debug swift retain/release calls.

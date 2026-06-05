@@ -24,7 +24,7 @@ public enum Hydra
 {
   public class RenderEngine
   {
-    public var stage: UsdStageRefPtr
+    public var stage: UsdStage
 
 #if canImport(Metal)
     private let hgi: Pixar.HgiMetalPtr
@@ -41,7 +41,7 @@ public enum Hydra
     private var material = Pixar.GlfSimpleMaterial()
     private var sceneAmbient = Pixar.GfVec4f(0.01, 0.01, 0.01, 1.0)
 
-    public required init(stage: UsdStageRefPtr)
+    public required init(stage: UsdStage)
     {
       self.stage = stage
 
@@ -186,9 +186,9 @@ public enum Hydra
 
       let useExtentHints = true
       var timeCode = UsdTimeCode.Default()
-      if stage.pointee.HasAuthoredTimeCodeRange()
+      if stage.HasAuthoredTimeCodeRange()
       {
-        timeCode = UsdTimeCode(stage.pointee.GetStartTimeCode())
+        timeCode = UsdTimeCode(stage.GetStartTimeCode())
       }
 
       let bboxCache = Pixar.UsdGeomBBoxCache(timeCode, purposes, useExtentHints, false)
@@ -258,9 +258,9 @@ public enum Hydra
       engine
     }
 
-    static func isZUp(for stage: UsdStageRefPtr) -> Bool
+    static func isZUp(for stage: UsdStage) -> Bool
     {
-      Pixar.UsdGeomGetStageUpAxis(stage.pointee.getPtr()) == .z
+      Pixar.UsdGeomGetStageUpAxis(Overlay.TfWeakPtr(stage)) == .z
     }
   }
 }

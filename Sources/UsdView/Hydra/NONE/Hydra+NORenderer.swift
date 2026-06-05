@@ -24,9 +24,9 @@ public extension Hydra
    * application. Note: This renders nothing. */
   class NORenderer
   {
-    public var stage: UsdStageRefPtr
+    public var stage: UsdStage
 
-    public required init(stage: UsdStageRefPtr)
+    public required init(stage: UsdStage)
     {
       self.stage = stage
     }

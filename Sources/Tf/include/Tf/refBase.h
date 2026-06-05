@@ -127,6 +127,8 @@ class TfRefBase {
   friend struct Tf_RefPtr_Counter;
 
   template<typename T> friend TfRefPtr<T> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &);
+  
+  friend class Tf_RetainReleaseHelper;
 };
 
 /// \class TfSimpleRefBase

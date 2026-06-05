@@ -20,10 +20,15 @@ public typealias UsdStageCacheContext = Pixar.UsdStageCacheContext
 
 public extension UsdStageCache
 {
-  func contains(_ stage: UsdStageRefPtr) -> Bool
-  {
-    Contains(stage)
-  }
+  // func contains(_ stage: UsdStage) -> Bool
+  // {
+  //   Contains(Overlay.TfWeakPtr(stage))
+  // }
+  //
+  // func getId(for stage: UsdStage) -> Int
+  // {
+  //   GetId(Overlay.TfWeakPtr(stage)).ToLongInt()
+  // }
 }
 
 public extension UsdStageCacheContext

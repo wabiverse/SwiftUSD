@@ -23,13 +23,13 @@ public extension UsdGeom
 extension UsdGeom.Mesh: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.Mesh
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.Mesh
   {
-    UsdGeom.Mesh.Define(stage.pointee.getPtr(), path)
+    UsdGeom.Mesh.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.Mesh
+  public static func define(_ stage: UsdStage, path: String) -> UsdGeom.Mesh
   {
     UsdGeom.Mesh.define(stage, path: .init(path))
   }

@@ -22,13 +22,13 @@ public extension UsdGeom
 public extension UsdGeom.NurbsPatch
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.NurbsPatch
+  static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.NurbsPatch
   {
-    UsdGeom.NurbsPatch.Define(stage.pointee.getPtr(), path)
+    UsdGeom.NurbsPatch.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.NurbsPatch
+  static func define(_ stage: UsdStage, path: String) -> UsdGeom.NurbsPatch
   {
     UsdGeom.NurbsPatch.define(stage, path: .init(path))
   }

@@ -17,7 +17,7 @@ func stageCacheBind()
 {
   /* Create new stage for this example. */
 
-  let newStage: UsdStageRefPtr = Usd.Stage.createNew("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
+  let newStage: UsdStage = Usd.Stage.createNew("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
   newStage.save()
 
   Msg.logger.info("created a new stage.")
@@ -31,14 +31,14 @@ func stageCacheBind()
 
   Msg.logger.info("inserting stage into usd stage cache...")
   let stage = Usd.Stage.open("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
-  Msg.logger.info("checking if usd stage cache contains stage: \(stageCache.contains(stage))")
+  // Msg.logger.info("checking if usd stage cache contains stage: \(stageCache.contains(stage))")
 
   Msg.logger.info("attempting to retrieve stage from the cache.")
   let stage2 = Usd.Stage.open("\(documentsDirPath())/UsdStageCacheExample", ext: .usd)
 
-  let id1 = stageCache.GetId(stage).ToLongInt()
-  let id2 = stageCache.GetId(stage2).ToLongInt()
-  Msg.logger.info("stage successfully retrieved from the cache: \(id1 == id2)")
+  // let id1 = stageCache.getId(for: stage)
+  // let id2 = stageCache.getId(for: stage2)
+  // Msg.logger.info("stage successfully retrieved from the cache: \(id1 == id2)")
 }
 
 public enum StageCacheExamples

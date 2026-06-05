@@ -23,13 +23,13 @@ public extension UsdLux
 extension UsdLux.GeometryLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdLux.GeometryLight
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdLux.GeometryLight
   {
-    UsdLux.GeometryLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.GeometryLight.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdLux.GeometryLight
+  public static func define(_ stage: UsdStage, path: String) -> UsdLux.GeometryLight
   {
     UsdLux.GeometryLight.define(stage, path: .init(path))
   }

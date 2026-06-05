@@ -22,13 +22,13 @@ public extension UsdGeom
 public extension UsdGeom.BasisCurves
 {
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: Sdf.Path) -> UsdGeom.BasisCurves
+  static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdGeom.BasisCurves
   {
-    UsdGeom.BasisCurves.Define(stage.pointee.getPtr(), path)
+    UsdGeom.BasisCurves.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  static func define(_ stage: Usd.StageRefPtr, path: String) -> UsdGeom.BasisCurves
+  static func define(_ stage: UsdStage, path: String) -> UsdGeom.BasisCurves
   {
     UsdGeom.BasisCurves.define(stage, path: .init(path))
   }

@@ -23,13 +23,13 @@ public extension UsdLux
 extension UsdLux.CylinderLight: GeomXformable
 {
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: Sdf.Path) -> UsdLux.CylinderLight
+  public static func define(_ stage: UsdStage, path: Sdf.Path) -> UsdLux.CylinderLight
   {
-    UsdLux.CylinderLight.Define(stage.pointee.getPtr(), path)
+    UsdLux.CylinderLight.Define(Overlay.TfWeakPtr(stage), path)
   }
 
   @discardableResult
-  public static func define(_ stage: UsdStageRefPtr, path: String) -> UsdLux.CylinderLight
+  public static func define(_ stage: UsdStage, path: String) -> UsdLux.CylinderLight
   {
     UsdLux.CylinderLight.define(stage, path: .init(path))
   }

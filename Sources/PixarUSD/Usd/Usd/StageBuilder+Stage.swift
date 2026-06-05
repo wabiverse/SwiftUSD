@@ -38,7 +38,7 @@ import Usd
  * ``` */
 public struct USDStage
 {
-  public var stage: UsdStageRefPtr
+  public var stage: UsdStage
   public var prims: [USDPrim]
 
   public init(_ identifier: String,
