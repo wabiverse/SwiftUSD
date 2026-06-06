@@ -325,7 +325,7 @@ let package = Package(
         .product(name: "Eigen", package: "MetaverseKit"),
         /* ---------- Console logging. ---------- */
         .product(name: "Logging", package: "swift-log"),
-        .product(name: "Rainbow", package: "Rainbow")
+        .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.noandroid.platform)),
       ],
       publicHeadersPath: "include",
       cxxSettings: [
@@ -1771,7 +1771,7 @@ let package = Package(
          .product(name: "Version", package: "Version"),
          .product(name: "ArgumentParser", package: "swift-argument-parser"),
          .product(name: "Logging", package: "swift-log"),
-         .product(name: "Rainbow", package: "Rainbow")
+         .product(name: "Rainbow", package: "Rainbow", condition: .when(platforms: Arch.OS.noandroid.platform)),
        ],
        resources: [
          // usd source files that need modifications to work with swift are maintained out of these
@@ -2027,6 +2027,10 @@ enum Arch
     case embeddedapple
     /// everything not embedded apple devices.
     case noembeddedapple
+    /// android devices (Google Pixel, etc).
+    case android
+    /// everything not android devices.
+    case noandroid
 
     public var platform: [Platform]
     {
@@ -2041,6 +2045,8 @@ enum Arch
         case .linwin: [.linux, .android, .openbsd, .windows]
         case .embeddedapple: [.iOS, .visionOS, .tvOS, .watchOS]
         case .noembeddedapple: [.macOS, .linux, .android, .openbsd, .windows]
+        case .android: [.android]
+        case .noandroid: [.macOS, .iOS, .visionOS, .tvOS, .watchOS, .linux, .openbsd, .windows]
       }
     }
 
