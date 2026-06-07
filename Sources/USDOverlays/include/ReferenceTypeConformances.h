@@ -48,9 +48,16 @@ inline void __retain__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase* _Nonnull x) {
 inline void __release__ZN3Pixar9TfRefBaseE(Pixar::TfRefBase* _Nonnull x) {
     Pixar::Tf_RetainReleaseHelper::release(x);
 }
-Pixar::TfRefBase * _Nullable _fromRawPointer__ZN3Pixar9TfRefBaseE(void* _Nullable)
-    SWIFT_RETURNS_RETAINED
-    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._fromRawPointer(_:));
+// NOTE: deliberately not declaring `_fromRawPointer__ZN3Pixar9TfRefBaseE` here.
+// `TfRefBase` is an abstract intrusive-refcount base (not itself annotated
+// `SWIFT_SHARED_REFERENCE` - only its concrete `TfRefPtr`-managed subclasses,
+// like `UsdStage` below, are), so a `SWIFT_RETURNS_RETAINED` thunk returning
+// `TfRefBase *` fails Clang's Sema check ("not returning a SWIFT_SHARED_REFERENCE
+// type") - fatally so on Debug builds. Its definition was already commented out
+// in ReferenceTypeConformances.cpp; this just removes the orphaned declaration.
+//  Pixar::TfRefBase * _Nullable _fromRawPointer__ZN3Pixar9TfRefBaseE(void* _Nullable)
+//    SWIFT_RETURNS_RETAINED
+//    SWIFT_NAME(__SwiftUSD_Typedef___ZN3Pixar9TfRefBaseE._fromRawPointer(_:));
 
 typedef Pixar::UsdStage __SwiftUSDImportAsMemberTypedef___ZN3pxr8UsdStageE;
 
