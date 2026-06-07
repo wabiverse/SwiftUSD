@@ -2526,6 +2526,8 @@ void HdStMesh::_UpdateDrawItemGeometricShader(HdSceneDelegate *sceneDelegate,
 
   bool const hasMetalTessellation = resourceRegistry->GetHgi()->GetCapabilities()->IsSet(
       HgiDeviceCapabilitiesBitsMetalTessellation);
+  bool const isMetalBackend = resourceRegistry->GetHgi()->GetCapabilities()->IsSet(
+      HgiDeviceCapabilitiesBitsMetalBackend);
 
   // create a shaderKey and set to the geometric shader.
   HdSt_MeshShaderKey shaderKey(primType,
@@ -2539,6 +2541,7 @@ void HdStMesh::_UpdateDrawItemGeometricShader(HdSceneDelegate *sceneDelegate,
                                _doubleSided || desc.doubleSided,
                                hasBuiltinBarycentrics,
                                hasMetalTessellation,
+                               isMetalBackend,
                                hasCustomDisplacement,
                                hasPerFaceInterpolation,
                                hasTopologicalVisibility,

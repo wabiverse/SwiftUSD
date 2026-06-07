@@ -138,6 +138,7 @@ HdSt_MeshShaderKey::HdSt_MeshShaderKey(HdSt_GeometricShader::PrimitiveType primi
                                        bool doubleSided,
                                        bool hasBuiltinBarycentrics,
                                        bool hasMetalTessellation,
+                                       bool isMetalBackend,
                                        bool hasCustomDisplacement,
                                        bool hasPerFaceInterpolation,
                                        bool hasTopologicalVisibility,
@@ -329,7 +330,10 @@ HdSt_MeshShaderKey::HdSt_MeshShaderKey(HdSt_GeometricShader::PrimitiveType primi
   bool const ptvsStageEnabled = !PTVS[0].IsEmpty();
 
   // tessellation control shader
-  if (isPrimTypePatches && !ptvsStageEnabled) {
+  // only fall back to GL-style TCS/TES when NOT on a Metal backend.
+  // Metal uses PTCS/PTVS instead; on Metal without tessellation (e.g. simulator),
+  // there is no valid fallback - skip tessellation entirely.
+  if (isPrimTypePatches && !ptvsStageEnabled && !isMetalBackend) {
     TCS[0] = _tokens->instancing;
     TCS[1] = _tokens->mainPatchCommonTCS;
     TCS[2] = isPrimTypePatchesBSpline ? _tokens->mainBSplineQuadTCS :
@@ -384,7 +388,8 @@ HdSt_MeshShaderKey::HdSt_MeshShaderKey(HdSt_GeometricShader::PrimitiveType primi
   GS[gsIndex] = TfToken();
 
   // Optimization : See if we can skip the geometry shader.
-  bool const canSkipGS = ptvsStageEnabled ||
+  // Metal has no GL-style geometry shader stage - always skip it on Metal.
+  bool const canSkipGS = ptvsStageEnabled || isMetalBackend ||
                          // Whether we can skip executing the displacement shading terminal
                          (!hasCustomDisplacement && (normalsSource != NormalSourceLimit) &&
                           (normalsSource != NormalSourceFlatGeometric)

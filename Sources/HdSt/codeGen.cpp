@@ -1606,6 +1606,8 @@ HdStGLSLProgramSharedPtr HdSt_CodeGen::Compile(HdStResourceRegistry *const regis
       HgiDeviceCapabilitiesBitsBuiltinBarycentrics);
   const bool metalTessellationEnabled = capabilities->IsSet(
       HgiDeviceCapabilitiesBitsMetalTessellation);
+  const bool isMetalBackend = capabilities->IsSet(
+      HgiDeviceCapabilitiesBitsMetalBackend);
   const bool requiresBasePrimitiveOffset = capabilities->IsSet(
       HgiDeviceCapabilitiesBitsBasePrimitiveOffset);
   const bool requiresPrimitiveIdEmulation = capabilities->IsSet(
@@ -1631,11 +1633,14 @@ HdStGLSLProgramSharedPtr HdSt_CodeGen::Compile(HdStResourceRegistry *const regis
   std::string computeShader = _geometricShader->GetSource(HdShaderTokens->computeShader);
 
   _hasVS = (!vertexShader.empty());
-  _hasTCS = (!tessControlShader.empty());
-  _hasTES = (!tessEvalShader.empty());
+  // GL-style TCS/TES stages are not valid on Metal backends.
+  _hasTCS = (!tessControlShader.empty()) && !isMetalBackend;
+  _hasTES = (!tessEvalShader.empty()) && !isMetalBackend;
   _hasPTCS = (!postTessControlShader.empty()) && metalTessellationEnabled;
   _hasPTVS = (!postTessVertexShader.empty()) && metalTessellationEnabled;
-  _hasGS = (!geometryShader.empty()) && !metalTessellationEnabled;
+  // Metal has no geometry shader stage at all - disable GS regardless of
+  // whether Metal tessellation is supported (covers simulator too).
+  _hasGS = (!geometryShader.empty()) && !isMetalBackend;
   _hasFS = (!fragmentShader.empty());
   _hasCS = (!computeShader.empty());
 

@@ -147,7 +147,8 @@ HdSt_BasisCurvesShaderKey::HdSt_BasisCurvesShaderKey(TfToken const &type,
                                                      TfToken shadingTerminal,
                                                      bool hasAuthoredTopologicalVisibility,
                                                      bool pointsShadingEnabled,
-                                                     bool hasMetalTessellation)
+                                                     bool hasMetalTessellation,
+                                                     bool isMetalBackend)
     : useMetalTessellation(false), glslfx(_tokens->baseGLSLFX)
 {
   bool drawThick = (drawStyle == HdSt_BasisCurvesShaderKey::HALFTUBE) ||
@@ -440,6 +441,14 @@ HdSt_BasisCurvesShaderKey::HdSt_BasisCurvesShaderKey(TfToken const &type,
     VS[0] = TfToken();
     TCS[0] = TfToken();
     TES[0] = TfToken();
+  }
+  else if (isMetalBackend) {
+    // Metal without tessellation support (e.g. simulator) - GL-style TCS/TES
+    // cannot compile on Metal, so clear all tessellation stages.
+    TCS[0] = TfToken();
+    TES[0] = TfToken();
+    PTCS[0] = TfToken();
+    PTVS[0] = TfToken();
   }
   else {
     PTCS[0] = TfToken();

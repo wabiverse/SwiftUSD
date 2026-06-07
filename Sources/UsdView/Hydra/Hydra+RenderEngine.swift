@@ -85,12 +85,12 @@ public enum Hydra
       engine.setWindowPolicy(.matchHorizontally)
 
       // light and material setup.
-      // var lights = computeLights(cameraTransform: cameraTransform)
-      // engine.setLightingState(lights: .init(), material: material, sceneAmbient: sceneAmbient)
+      let lights = computeLights(cameraTransform: cameraTransform)
+      engine.setLightingState(lights: lights, material: material, sceneAmbient: sceneAmbient)
 
       var params = UsdImagingGL.RenderParams()
       params.frame = Usd.TimeCode(timeCode)
-      params.clearColor = .init(0.0, 0.0, 0.0, 0.0)
+      params.clearColor = .init(0.0, 0.0, 0.0, 1.0)
       params.colorCorrectionMode = .sRGB
       params.enableIdRender = false
       params.showGuides = true
@@ -126,22 +126,21 @@ public enum Hydra
     }
 
     /// creates a light source located at the camera position.
-    // func computeCameraLight(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLight
-    // {
-    //   let cameraPosition = Pixar.GfVec3f(cameraTransform.ExtractTranslation())
+    func computeCameraLight(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLight
+    {
+      let cameraPosition = Pixar.GfVec3f(cameraTransform.ExtractTranslation())
 
-    //   let light = Pixar.GlfSimpleLightCollector.createLight(Pixar.GfVec4f(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
+      let light = Pixar.GlfSimpleLightCollector.createLight(Pixar.GfVec4f(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
 
-    //   return light
-    // }
+      return light
+    }
 
-    // func computeLights(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLightCollector
-    // {
-    //   var lights = Pixar.GlfSimpleLightCollector()
-    //   lights.addLight(computeCameraLight(cameraTransform: cameraTransform))
-
-    //   return lights
-    // }
+    func computeLights(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLightVector
+    {
+      var lightsVec = Pixar.GlfSimpleLightVector()
+      lightsVec.push_back(computeCameraLight(cameraTransform: cameraTransform))
+      return lightsVec
+    }
 
     func setupMaterial()
     {

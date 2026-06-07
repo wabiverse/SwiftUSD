@@ -78,6 +78,7 @@ enum HgiDeviceCapabilitiesBits : HgiBits {
   HgiDeviceCapabilitiesBitsBasePrimitiveOffset = 1 << 15,
   HgiDeviceCapabilitiesBitsPrimitiveIdEmulation = 1 << 16,
   HgiDeviceCapabilitiesBitsIndirectCommandBuffers = 1 << 17,
+  HgiDeviceCapabilitiesBitsMetalBackend = 1 << 18
 };
 
 using HgiDeviceCapabilities = HgiBits;

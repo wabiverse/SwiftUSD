@@ -46,11 +46,20 @@ struct UsdView: App
     Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
   }
 
+  @State private var prims: [PrimEntry] = []
+  @State private var selectedPath: String? = nil
+
   var body: some Scene
   {
-    WindowGroup("UsdView")
-    {
-      Hydra.Viewport(engine: engine)
+    WindowGroup("UsdView") {
+      HStack(spacing: 0) {
+        PrimBrowserView(prims: prims, selectedPath: $selectedPath)
+          .frame(width: 320)
+
+        Hydra.Viewport(engine: engine)
+      }
+      .colorScheme(.dark)
+      .onAppear { prims = PrimEntry.from(stage: stage) }
     }
   }
 }

@@ -59,7 +59,8 @@ struct HdSt_BasisCurvesShaderKey : public HdSt_ShaderKey {
                             TfToken shadingTerminal,
                             bool hasAuthoredTopologicalVisibility,
                             bool pointsShadingEnabled,
-                            bool hasMetalTessellation);
+                            bool hasMetalTessellation,
+                            bool isMetalBackend);
 
   ~HdSt_BasisCurvesShaderKey();
 

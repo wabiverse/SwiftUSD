@@ -91,7 +91,19 @@ HgiMetalCapabilities::HgiMetalCapabilities(id<MTLDevice> device)
 
     _SetFlag(HgiDeviceCapabilitiesBitsCppShaderPadding, true);
     
-    _SetFlag(HgiDeviceCapabilitiesBitsMetalTessellation, true);
+    _SetFlag(HgiDeviceCapabilitiesBitsMetalBackend, true);
+  
+    bool metalTessellation = true; // supported on all macOS Metal devices
+    #if TARGET_OS_SIMULATOR
+      metalTessellation = false;
+    #elif defined(ARCH_OS_IPHONE)
+      if (@available(iOS 12.0, *)) {
+        metalTessellation = [device supportsFamily:MTLGPUFamilyApple4]; // A11+
+      } else {
+        metalTessellation = false;
+      }
+    #endif
+    _SetFlag(HgiDeviceCapabilitiesBitsMetalTessellation, metalTessellation);
 
     _SetFlag(HgiDeviceCapabilitiesBitsMultiDrawIndirect, true);
     

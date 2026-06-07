@@ -69,7 +69,7 @@ public extension Hydra
       metalView.colorPixelFormat = MTLPixelFormat.bgra8Unorm
       metalView.sampleCount = 1
       metalView.layer.backgroundColor = UIColor.clear.cgColor
-      metalView.layer.isOpaque = false
+      metalView.layer.isOpaque = true
 
       metalView.becomeFirstResponder()
       return metalView

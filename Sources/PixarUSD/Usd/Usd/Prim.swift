@@ -82,6 +82,18 @@ public extension Usd
   typealias StageWeakPtr = UsdStageWeakPtr
 }
 
+extension Usd.Prim: Hashable
+{
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(name)
+  }
+  
+  public static func == (lhs: Pixar.UsdPrim, rhs: Pixar.UsdPrim) -> Bool
+  {
+    lhs.name == rhs.name
+  }
+}
+
 extension Usd.Prim: Prim
 {
   /**
@@ -96,6 +108,11 @@ extension Usd.Prim: Prim
     SetActive(active)
   }
 
+  public func isActive() -> Bool
+  {
+    IsActive()
+  }
+  
   public func getStage() -> UsdStageWeakPtr
   {
     GetStage()

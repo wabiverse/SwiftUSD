@@ -317,6 +317,8 @@ void HdStBasisCurves::_UpdateDrawItemGeometricShader(HdSceneDelegate *sceneDeleg
 
   bool const hasMetalTessellation = resourceRegistry->GetHgi()->GetCapabilities()->IsSet(
       HgiDeviceCapabilitiesBitsMetalTessellation);
+  bool const isMetalBackend = resourceRegistry->GetHgi()->GetCapabilities()->IsSet(
+      HgiDeviceCapabilitiesBitsMetalBackend);
 
   HdSt_BasisCurvesShaderKey shaderKey(curveType,
                                       curveBasis,
@@ -327,7 +329,8 @@ void HdStBasisCurves::_UpdateDrawItemGeometricShader(HdSceneDelegate *sceneDeleg
                                       shadingTerminal,
                                       hasAuthoredTopologicalVisiblity,
                                       _pointsShadingEnabled,
-                                      hasMetalTessellation);
+                                      hasMetalTessellation,
+                                      isMetalBackend);
 
   TF_DEBUG(HD_RPRIM_UPDATED)
       .Msg("HdStBasisCurves(%s) - Shader Key PrimType: %s\n ",

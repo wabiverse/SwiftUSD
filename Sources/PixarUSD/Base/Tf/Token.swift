@@ -10,6 +10,7 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
+import Foundation
 import CxxStdlib
 
 // import Tf
@@ -52,6 +53,14 @@ extension TfToken: Equatable
   public static func == (lhs: TfToken, rhs: TfToken) -> Bool
   {
     lhs.Hash() == rhs.Hash()
+  }
+}
+
+extension TfToken: Hashable
+{
+  public func hash(into hasher: inout Hasher)
+  {
+    hasher.combine(Hash())
   }
 }
 
