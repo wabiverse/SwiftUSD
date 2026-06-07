@@ -237,7 +237,7 @@ struct PrimBrowserRow: View
     HStack(spacing: 0)
     {
       Spacer()
-        .frame(width: CGFloat(entry.depth) * indentStep + 6)
+        .frame(width: CGFloat(entry.depth) * indentStep + CGFloat(6))
 
       Text(entry.hasChildren ? (isCollapsed ? "▸" : "▾") : "")
         .font(.system(size: 9, weight: .bold))
