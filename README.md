@@ -54,7 +54,6 @@ A Swift-native, cross-platform framework for building OpenUSD applications - bri
 Linux, Windows, and Apple platforms through syntactically pleasing Swift OpenUSD APIs, a composable Hydra viewport,
 native UI, and real-time workflows. Unbound from any single vendor's GPU or platform.
 
-
 ##### To use Pixar's USD in swift, add SwiftUSD as a package dependency in your project's Package.swift file.
 ```swift
 dependencies: [
@@ -208,7 +207,7 @@ enum Creator
 
 # **UsdView (Under Development)**
 
-<img width="846" height="721" alt="603307416-28fb95df-b10a-4d8c-a216-b6bf5020e9b7" src="https://github.com/user-attachments/assets/c12c0b48-a4bd-4176-af3a-332be41681de" />
+<img width="1012" height="669" alt="Screenshot_2026-06-06_at_8 44 04_PM" src="https://github.com/user-attachments/assets/a42f5611-a841-470a-8eb0-d304cbfc65f6" />
 
   The **UsdView** application in this project is written entirely in **Swift**, and serves as a living example of both **Swift/C++** interop
   and creating **cross platform UI** applications in **Swift** (utilizing [**SwiftCrossUI**](https://github.com/stackotter/swift-cross-ui)).
