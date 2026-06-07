@@ -236,8 +236,10 @@ struct PrimBrowserRow: View
 
     HStack(spacing: 0)
     {
-      Spacer()
-        .frame(width: Double(CGFloat(entry.depth) * indentStep + CGFloat(6)))
+        // TODO(@furbytm): remove `height: nil` once this upstream layout bug
+        // is fixed: https://github.com/moreSwift/swift-cross-ui/issues/626
+        Spacer()
+          .frame(width: Double(CGFloat(entry.depth) * indentStep + CGFloat(6)), height: nil)
 
       Text(entry.hasChildren ? (isCollapsed ? "▸" : "▾") : "")
         .font(.system(size: 9, weight: .bold))
@@ -247,15 +249,19 @@ struct PrimBrowserRow: View
         {
           if entry.hasChildren { onToggleDisclosure() }
         }
-
-      Spacer().frame(width: 5)
+      
+      // TODO(@furbytm): remove `height: nil` once this upstream layout bug
+      // is fixed: https://github.com/moreSwift/swift-cross-ui/issues/626
+      Spacer().frame(width: 5, height: nil)
 
       Text(glyph.symbol)
         .font(.system(size: 10, weight: .semibold))
         .foregroundColor(glyph.tint.opacity(isSelected ? 1.0 : 0.8))
         .frame(width: 16, height: rowHeight, alignment: .center)
-
-      Spacer().frame(width: 4)
+      
+      // TODO(@furbytm): remove `height: nil` once this upstream layout bug
+      // is fixed: https://github.com/moreSwift/swift-cross-ui/issues/626
+      Spacer().frame(width: 4, height: nil)
 
       HStack(spacing: 0)
       {

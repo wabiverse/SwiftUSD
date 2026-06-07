@@ -49,12 +49,24 @@ struct UsdView: App
   @State private var prims: [PrimEntry] = []
   @State private var selectedPath: String? = nil
 
+  /// Side-by-side on screens (where there's width to spare), stacked
+  /// top-to-bottom on mobile (where portrait layouts favor a vertical split).
+  #if os(iOS) || os(Android)
+    private typealias SplitPane<Content: View> = VStack<Content>
+  #else
+    private typealias SplitPane<Content: View> = HStack<Content>
+  #endif
+
   var body: some Scene
   {
     WindowGroup("UsdView") {
-      HStack(spacing: 0) {
+      SplitPane(spacing: 0) {
         PrimBrowserView(prims: prims, selectedPath: $selectedPath)
-          .frame(width: 320)
+          #if os(iOS) || os(Android)
+            .frame(height: 200)
+          #else
+            .frame(width: 320)
+          #endif
 
         Hydra.Viewport(engine: engine)
       }
