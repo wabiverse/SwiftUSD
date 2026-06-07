@@ -48,7 +48,7 @@ import PixarUSD
 
         public func makeCoordinator() -> Coordinator
         {
-          let mtkView = MTKView()
+          let mtkView = HydraMTKView()
           mtkView.isPaused = false // driven by display link
           mtkView.framebufferOnly = false // we're using the drawable in our own render pass
           mtkView.enableSetNeedsDisplay = false // don't wait for setNeedsDisplay
@@ -77,6 +77,10 @@ import PixarUSD
           metalView.layer?.backgroundColor = NSColor.clear.cgColor
           metalView.layer?.isOpaque = false
 
+          // hand the view a (weak) reference to the
+          // engine whose camera it should drive.
+          metalView.hydra = hydra
+
           metalView.becomeFirstResponder()
           return metalView
         }
@@ -87,13 +91,47 @@ import PixarUSD
         public class Coordinator
         {
           private var cancellable: AnyCancellable?
-          public var metalView: MTKView
+          public var metalView: HydraMTKView
 
-          public init(mtkView: MTKView)
+          public init(mtkView: HydraMTKView)
           {
             cancellable = nil
             metalView = mtkView
           }
+        }
+      }
+
+      /// A `MTKView` that turns mouse/trackpad input on the viewport directly
+      /// into orbit (tumble) and dolly (zoom) adjustments on the Hydra view
+      /// camera.
+      final class HydraMTKView: MTKView
+      {
+        /// Weak: the view drives the engine's camera, but doesn't own the engine.
+        weak var hydra: Hydra.RenderEngine?
+
+        public override var acceptsFirstResponder: Bool { true }
+
+        public override func mouseDragged(with event: NSEvent)
+        {
+          hydra?.orbit(
+            deltaYaw: Double(event.deltaX) * 0.4,
+            deltaPitch: Double(event.deltaY) * 0.4
+          )
+        }
+
+        public override func scrollWheel(with event: NSEvent)
+        {
+          // two finger trackpad scroll (or a mouse wheel): scrolling up
+          // (positive `scrollingDeltaY`) dollies inward, toward the subject -
+          // matching the pinch-to-zoom direction in `magnify` below.
+          hydra?.dolly(by: -Double(event.scrollingDeltaY) * 0.01)
+        }
+
+        public override func magnify(with event: NSEvent)
+        {
+          // trackpad pinch: `magnification` is a small fractional delta per
+          // tick (spreading fingers apart is positive = zoom in = move closer).
+          hydra?.dolly(by: -event.magnification)
         }
       }
     }

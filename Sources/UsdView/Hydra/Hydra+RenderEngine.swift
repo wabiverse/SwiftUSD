@@ -125,6 +125,21 @@ public enum Hydra
       viewCamera.standardFocalLength = 18.0
     }
 
+    /// Orbits ("tumbles") the view camera around its focus point - the classic
+    /// click-and-drag navigation gesture.
+    public func orbit(deltaYaw: Double, deltaPitch: Double)
+    {
+      viewCamera.params.rotation[1] += deltaYaw
+      viewCamera.params.rotation[0] += deltaPitch
+    }
+
+    /// Dollies the view camera toward/away from its focus point by a relative
+    /// `factor` (e.g. `-0.05` moves it 5% closer, `+0.05` moves it 5% further).
+    public func dolly(by factor: Double)
+    {
+      viewCamera.params.distance = max(0.01, viewCamera.params.distance * (1.0 + factor))
+    }
+
     /// creates a light source located at the camera position.
     func computeCameraLight(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLight
     {
