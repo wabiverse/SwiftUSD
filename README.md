@@ -207,7 +207,12 @@ enum Creator
 
 # **UsdView (Under Development)**
 
-<img width="1012" height="669" alt="Screenshot_2026-06-06_at_8 44 04_PM" src="https://github.com/user-attachments/assets/a42f5611-a841-470a-8eb0-d304cbfc65f6" />
+<table>
+  <tr>
+    <td><img width="1012" height="669" alt="Screenshot_2026-06-06_at_8 44 04_PM" src="https://github.com/user-attachments/assets/a42f5611-a841-470a-8eb0-d304cbfc65f6" /></td>
+    <td><img width="585" height="1266" alt="usdview_on_ios" src="https://github.com/user-attachments/assets/7a5716e4-78ff-44bf-89df-892fe33297d4" /></td>
+  </tr>
+</table>
 
   The **UsdView** application in this project is written entirely in **Swift**, and serves as a living example of both **Swift/C++** interop
   and creating **cross platform UI** applications in **Swift** (utilizing [**SwiftCrossUI**](https://github.com/stackotter/swift-cross-ui)).
