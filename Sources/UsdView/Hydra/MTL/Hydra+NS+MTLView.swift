@@ -109,14 +109,39 @@ import PixarUSD
         /// Weak: the view drives the engine's camera, but doesn't own the engine.
         weak var hydra: Hydra.RenderEngine?
 
+        /// smoothed per-event orbit velocity.
+        private var dragVelocity: (yaw: Double, pitch: Double) = (0.0, 0.0)
+
         public override var acceptsFirstResponder: Bool { true }
+
+        public override func mouseDown(with event: NSEvent)
+        {
+          // a fresh click always wins over an in-flight coast.
+          hydra?.stopFlick()
+          dragVelocity = (0.0, 0.0)
+        }
 
         public override func mouseDragged(with event: NSEvent)
         {
-          hydra?.orbit(
-            deltaYaw: Double(event.deltaX) * 0.4,
-            deltaPitch: Double(event.deltaY) * 0.4
-          )
+          hydra?.stopFlick()
+
+          let deltaYaw = Double(event.deltaX) * 0.4
+          let deltaPitch = Double(event.deltaY) * 0.4
+
+          hydra?.orbit(deltaYaw: deltaYaw, deltaPitch: deltaPitch)
+
+          // weighting recent deltas more heavily means the release
+          // velocity reflects how the drag was actually moving, not
+          // just a single (possibly noisy) final event.
+          dragVelocity.yaw = dragVelocity.yaw * 0.7 + deltaYaw * 0.3
+          dragVelocity.pitch = dragVelocity.pitch * 0.7 + deltaPitch * 0.3
+        }
+
+        public override func mouseUp(with event: NSEvent)
+        {
+          // let the release velocity keep the viewport tumbling until it gradually
+          // coasts to a stop.
+          hydra?.flick(deltaYaw: dragVelocity.yaw, deltaPitch: dragVelocity.pitch)
         }
 
         public override func scrollWheel(with event: NSEvent)

@@ -48,7 +48,7 @@ public extension Hydra
 
     public func makeCoordinator() -> Coordinator
     {
-      let mtkView = MTKView()
+      let mtkView = HydraMTKView()
       mtkView.isPaused = false // driven by display link
       mtkView.framebufferOnly = false // we're using the drawable in our own render pass
       mtkView.enableSetNeedsDisplay = false // don't wait for setNeedsDisplay
@@ -71,6 +71,10 @@ public extension Hydra
       metalView.layer.backgroundColor = UIColor.clear.cgColor
       metalView.layer.isOpaque = true
 
+      // hand the view a (weak) reference to the
+      // engine whose camera it should drive.
+      metalView.hydra = hydra
+
       metalView.becomeFirstResponder()
       return metalView
     }
@@ -81,13 +85,91 @@ public extension Hydra
     public class Coordinator
     {
       private var cancellable: AnyCancellable?
-      public var metalView: MTKView
+      public var metalView: HydraMTKView
 
-      public init(mtkView: MTKView)
+      public init(mtkView: HydraMTKView)
       {
         cancellable = nil
         metalView = mtkView
       }
+    }
+  }
+
+  /// A `MTKView` that turns touch input on the viewport directly
+  /// into orbit (tumble) and dolly (zoom) adjustments on the Hydra view
+  /// camera.
+  final class HydraMTKView: MTKView
+  {
+    /// Weak: the view drives the engine's camera, but doesn't own the engine.
+    weak var hydra: Hydra.RenderEngine?
+
+    public override var canBecomeFirstResponder: Bool { true }
+
+    public override init(frame frameRect: CGRect, device: MTLDevice?)
+    {
+      super.init(frame: frameRect, device: device)
+      setupGestureRecognizers()
+    }
+
+    public required init(coder: NSCoder)
+    {
+      super.init(coder: coder)
+      setupGestureRecognizers()
+    }
+
+    private func setupGestureRecognizers()
+    {
+      addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
+      addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:))))
+    }
+
+    private func handlePan(_ gesture: UIPanGestureRecognizer)
+    {
+      switch gesture.state
+      {
+      case .began:
+        // a fresh drag always wins over an in-flight coast.
+        hydra?.stopFlick()
+
+      case .changed:
+        // one-finger drag across the viewport: translate the per-tick delta
+        // into the same yaw/pitch orbit the macOS `mouseDragged` handler uses,
+        // then reset the translation so each callback reports a fresh delta.
+        let delta = gesture.translation(in: self)
+
+        hydra?.orbit(
+          deltaYaw: Double(delta.x) * 0.4,
+          deltaPitch: Double(delta.y) * 0.4
+        )
+
+        gesture.setTranslation(.zero, in: self)
+
+      case .ended, .cancelled:
+        // click-and-flick: `velocity` is points/second, so scale it down
+        // to the per-tick delta `flick` (and `orbit`) expect at the coast
+        // timer's ~60Hz rate, then let the release speed keep the viewport
+        // tumbling until it gradually coasts to a stop.
+        let velocity = gesture.velocity(in: self)
+        let perTick = 1.0 / 60.0
+
+        hydra?.flick(
+          deltaYaw: Double(velocity.x) * perTick * 0.4,
+          deltaPitch: Double(velocity.y) * perTick * 0.4
+        )
+
+      default:
+        break
+      }
+    }
+
+    private func handlePinch(_ gesture: UIPinchGestureRecognizer)
+    {
+      // two-finger pinch: `scale` is cumulative relative to the
+      // gesture's start - reset it each callback so `dolly` only
+      // ever sees the incremental change.
+      hydra?.dolly(by: -(gesture.scale - 1.0))
+
+      gesture.scale = 1.0
     }
   }
 }

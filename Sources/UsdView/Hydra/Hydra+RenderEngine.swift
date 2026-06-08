@@ -22,7 +22,7 @@ import PixarUSD
 
 public enum Hydra
 {
-  public class RenderEngine
+  public class RenderEngine: @unchecked Sendable
   {
     public var stage: UsdStage
 
@@ -40,6 +40,15 @@ public enum Hydra
 
     private var material = Pixar.GlfSimpleMaterial()
     private var sceneAmbient = Pixar.GfVec4f(0.01, 0.01, 0.01, 1.0)
+
+    /// "click-and-flick" coast: keeps orbiting at a decaying velocity after the drag ends,
+    /// then settles to a stop (see `flick(deltaYaw:deltaPitch:)`).
+    private var flickTimer: Timer?
+    private var flickVelocity: (yaw: Double, pitch: Double) = (0.0, 0.0)
+
+    private static let flickInterval: TimeInterval = 1.0 / 60.0
+    private static let flickDamping = 0.94
+    private static let flickThreshold = 0.01
 
     public required init(stage: UsdStage)
     {
@@ -138,6 +147,48 @@ public enum Hydra
     public func dolly(by factor: Double)
     {
       viewCamera.params.distance = max(0.01, viewCamera.params.distance * (1.0 + factor))
+    }
+
+    /// "click-and-flick": releases the orbit drag with `deltaYaw`/`deltaPitch`
+    /// and lets it keep tumbling on its own, decaying that velocity every tick until it
+    /// settles to a stop, giving the inertial "coast" you'd expect from a flick gesture.
+    /// calling this again (or `stopFlick()`) cancels any coast already in flight.
+    public func flick(deltaYaw: Double, deltaPitch: Double)
+    {
+      stopFlick()
+
+      guard abs(deltaYaw) > Self.flickThreshold || abs(deltaPitch) > Self.flickThreshold
+      else { return }
+
+      flickVelocity = (deltaYaw, deltaPitch)
+
+      let timer = Timer(timeInterval: Self.flickInterval, repeats: true)
+      { [weak self] timer in
+        guard let self else { timer.invalidate(); return }
+
+        orbit(deltaYaw: flickVelocity.yaw, deltaPitch: flickVelocity.pitch)
+
+        flickVelocity.yaw *= Self.flickDamping
+        flickVelocity.pitch *= Self.flickDamping
+
+        if abs(flickVelocity.yaw) < Self.flickThreshold, abs(flickVelocity.pitch) < Self.flickThreshold
+        {
+          stopFlick()
+        }
+      }
+
+      // `.common` keeps the coast ticking even while a tracking loop
+      // (e.g. window resize, scroll) would otherwise starve `.default`.
+      RunLoop.current.add(timer, forMode: .common)
+      flickTimer = timer
+    }
+
+    /// cancels any in-flight `flick` coast (e.g. when a fresh drag begins).
+    public func stopFlick()
+    {
+      flickTimer?.invalidate()
+      flickTimer = nil
+      flickVelocity = (0.0, 0.0)
     }
 
     /// creates a light source located at the camera position.

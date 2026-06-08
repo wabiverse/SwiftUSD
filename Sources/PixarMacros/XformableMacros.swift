@@ -24,47 +24,52 @@ public struct PixarXformableMacro: MemberMacro
                                in _: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax]
   {
     let decl: DeclSyntax = """
+      public func getPrim() -> Usd.Prim
+      {
+        self.GetPrim()
+      }
+      
       public func addXformOp(type: UsdGeomXformOp.`Type`,
                              precision: UsdGeomXformOp.Precision = .double,
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddXformOp(type, precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddXformOp(type, precision, suffix, invert)
       }
 
       public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
                                  suffix: Tf.Token = Tf.Token(),
                                  invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddTranslateOp(precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddTranslateOp(precision, suffix, invert)
       }
 
       public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddScaleOp(precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddScaleOp(precision, suffix, invert)
       }
 
       public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddRotateXOp(precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddRotateXOp(precision, suffix, invert)
       }
 
       public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddRotateYOp(precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddRotateYOp(precision, suffix, invert)
       }
 
       public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        UsdGeomXformable(self.GetPrim()).AddRotateZOp(precision, suffix, invert)
+        UsdGeomXformable(self.getPrim()).AddRotateZOp(precision, suffix, invert)
       }
       """
 

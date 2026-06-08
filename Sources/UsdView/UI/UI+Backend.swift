@@ -11,9 +11,6 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-// #if os(Linux) || os(Windows)
-//   import SwiftCrossUI
-// #endif
 import SwiftCrossUI
 
 /* setup the platform backend. */

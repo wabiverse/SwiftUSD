@@ -19,9 +19,12 @@ import SwiftCrossUI
  *
  * ## Overview
  *
- * A ``UsdView`` application written in Swift for
- * the purposes of demonstrating the usage of USD,
- * from the Swift programming language. */
+ * A "run everywhere" USD viewer, written entirely in Swift.
+ *
+ * ``UsdView`` pairs **Hydra** - Pixar's USD imaging engine - with
+ * **SwiftCrossUI** to bring one SwiftUI-style codebase to every platform
+ * Swift reaches: macOS, iOS, visionOS, Linux, Windows, and Android. Browsing,
+ * inspecting, and orbiting USD stages with platform native UI everywhere. */
 @main
 struct UsdView: App
 {
