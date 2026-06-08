@@ -151,13 +151,13 @@ public struct PrimBrowserView: View
   {
     nonisolated(unsafe) let bridgedStage = stage
 
-    Task.detached(priority: .userInitiated) {
-      let roots = PrimEntry.roots(of: bridgedStage)
+    Task {
+      let roots = await Task.detached(priority: .userInitiated) {
+        PrimEntry.roots(of: bridgedStage)
+      }.value
 
-      await MainActor.run {
-        guard prims.isEmpty else { return }
-        prims = roots
-      }
+      guard prims.isEmpty else { return }
+      prims = roots
     }
   }
 
@@ -193,22 +193,22 @@ public struct PrimBrowserView: View
 
     nonisolated(unsafe) let bridgedStage = stage
 
-    Task.detached(priority: .userInitiated) {
-      let children = PrimEntry.children(of: entry, in: bridgedStage)
+    Task {
+      let children = await Task.detached(priority: .userInitiated) {
+        PrimEntry.children(of: entry, in: bridgedStage)
+      }.value
 
-      await MainActor.run {
-        loadingPaths.remove(entry.path)
+      loadingPaths.remove(entry.path)
 
-        // the row list may have shifted - or `entry` may have been
-        // collapsed again - while this fetch was in flight, so relocate
-        // it rather than trusting a now possibly stale index.
-        guard let index = prims.firstIndex(where: { $0.path == entry.path }),
-              !expandedPaths.contains(entry.path)
-        else { return }
+      // the row list may have shifted - or `entry` may have been
+      // collapsed again - while this fetch was in flight, so relocate
+      // it rather than trusting a now possibly stale index.
+      guard let index = prims.firstIndex(where: { $0.path == entry.path }),
+            !expandedPaths.contains(entry.path)
+      else { return }
 
-        prims.insert(contentsOf: children, at: index + 1)
-        expandedPaths.insert(entry.path)
-      }
+      prims.insert(contentsOf: children, at: index + 1)
+      expandedPaths.insert(entry.path)
     }
   }
 }
