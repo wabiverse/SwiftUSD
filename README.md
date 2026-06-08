@@ -218,8 +218,10 @@ enum Creator
   </tr>
 </table>
 
-  The **UsdView** application in this project is written entirely in **Swift**, and serves as a living example of both **Swift/C++** interop
-  and creating **cross platform UI** applications in **Swift** (utilizing [**SwiftCrossUI**](https://github.com/stackotter/swift-cross-ui)).
+  A "run everywhere" USD viewer, written entirely in Swift. UsdView pairs **Hydra** - Pixar's USD imaging engine - with
+  [**SwiftCrossUI**](https://github.com/stackotter/swift-cross-ui) to bring one SwiftUI-style codebase to every platform
+  Swift reaches: macOS, iOS, visionOS, Linux, Windows, and Android. Browsing, inspecting, and orbiting USD stages with
+  platform native UI everywhere.
 
   ### Linux
 
