@@ -122,7 +122,8 @@ public extension Hydra
       addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
       addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:))))
     }
-
+    
+    @objc
     private func handlePan(_ gesture: UIPanGestureRecognizer)
     {
       switch gesture.state
@@ -162,6 +163,7 @@ public extension Hydra
       }
     }
 
+    @objc
     private func handlePinch(_ gesture: UIPinchGestureRecognizer)
     {
       // two-finger pinch: `scale` is cumulative relative to the

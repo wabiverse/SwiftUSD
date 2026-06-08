@@ -18,7 +18,7 @@ import Rainbow
 
 public final class Msg
 {
-  public static let logger = Logger(label: "foundation.wabi.metaverse")
+  public static let logger = Logger(label: "foundation.wabi.openusd")
 
   private init()
   {}
