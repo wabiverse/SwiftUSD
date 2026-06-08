@@ -17,8 +17,8 @@ import SwiftCrossUI
 
 // MARK: - Prim Entry
 
-/// A single row in the prim browser, derived from a traversed USD prim.
-public struct PrimEntry: Identifiable, Hashable
+/// A single row in the prim browser, derived from a USD prim.
+public struct PrimEntry: Identifiable, Hashable, Sendable
 {
   public var id: String { path }
 
@@ -30,42 +30,35 @@ public struct PrimEntry: Identifiable, Hashable
   public let typeName: String
   /// Hierarchy nesting depth: root children = 0, their children = 1, …
   public let depth: Int
-  /// Whether the prim has any children in the traversal list.
+  /// Whether the prim has any *direct* children - a cheap structural check,
+  /// not a subtree walk, so it's safe to compute eagerly for every row.
   public let hasChildren: Bool
   /// Whether the prim is visible or not.
   public let isVisible: Bool
 
-  /// Traverse `stage` once and produce a flat, depth-ordered list of entries.
-  public static func from(stage: UsdStage) -> [PrimEntry]
+  init(prim: any Prim, depth: Int)
   {
-    let prims = Array(stage.traverse())
+    path = prim.path.string
+    name = prim.name.string
+    typeName = prim.typeName.isEmpty ? "-" : prim.typeName.string
+    self.depth = depth
+    hasChildren = !prim.children.isEmpty
+    isVisible = prim.isActive()
+  }
 
-    // Which paths have at least one child?
-    var childSet: Set<String> = []
-    for prim in prims
-    {
-      let p = prim.path.string
-      if let lastSlash = p.lastIndex(of: "/")
-      {
-        let parent = String(p[p.startIndex ..< lastSlash])
-        if !parent.isEmpty { childSet.insert(parent) }
-      }
-    }
+  /// the top-level rows shown when a stage first loads: direct children of
+  /// the pseudo-root, at depth 0. everything below stays unmaterialized
+  /// until its disclosure triangle is opened.
+  public static func roots(of stage: UsdStage) -> [PrimEntry]
+  {
+    stage.getPseudoRoot().children.map { PrimEntry(prim: $0, depth: 0) }
+  }
 
-    return prims.map
-    { prim in
-      let p = prim.path.string
-      // depth = number of "/" separators minus the leading root slash
-      let depth = max(0, p.filter { $0 == "/" }.count - 1)
-      return PrimEntry(
-        path: p,
-        name: prim.name.string,
-        typeName: prim.typeName.isEmpty ? "-" : prim.typeName.string,
-        depth: depth,
-        hasChildren: childSet.contains(p),
-        isVisible: prim.isActive()
-      )
-    }
+  /// `entry`'s direct children, ready to splice into the row list right after it - the unit of lazy loading:
+  /// expanding a node fetches *only* its immediate children, never the whole subtree beneath it.
+  public static func children(of entry: PrimEntry, in stage: UsdStage) -> [PrimEntry]
+  {
+    stage.getPrim(at: entry.path).children.map { PrimEntry(prim: $0, depth: entry.depth + 1) }
   }
 }
 
@@ -76,45 +69,39 @@ public struct PrimEntry: Identifiable, Hashable
 /// Shows a scrollable table of prims with "Prim Name / Type / Vis" columns.
 public struct PrimBrowserView: View
 {
-  public let prims: [PrimEntry]
+  public let stage: UsdStage
   @Binding public var selectedPath: String?
 
-  /// Paths whose children are currently hidden.
-  @State private var collapsedPaths: Set<String> = []
+  /// The currently visible rows, in display order - grown or shrunk in place
+  /// as groups are expanded/collapsed.
+  @State private var prims: [PrimEntry] = []
+  /// Paths whose children are currently materialized into `prims`.
+  @State private var expandedPaths: Set<String> = []
+  /// Paths whose children are being fetched on a background task - lets the
+  /// disclosure glyph show a transient state instead of looking unresponsive,
+  /// and keeps a second tap from kicking off a redundant fetch.
+  @State private var loadingPaths: Set<String> = []
 
   private let typeColWidth: CGFloat = 84
   private let visColWidth:  CGFloat = 32
 
-  /// `prims`, minus any whose nearest collapsed ancestor hides them.
-  /// The collapsed prim itself always stays visible so it can be re-expanded.
-  private var visiblePrims: [PrimEntry]
+  public init(stage: UsdStage, selectedPath: Binding<String?>)
   {
-    guard !collapsedPaths.isEmpty else { return prims }
-
-    return prims.filter
-    { entry in
-      for collapsed in collapsedPaths
-      {
-        if entry.path != collapsed, entry.path.hasPrefix(collapsed + "/")
-        {
-          return false
-        }
-      }
-      return true
-    }
+    self.stage = stage
+    _selectedPath = selectedPath
   }
 
-  private struct VisibleRow: Identifiable, Hashable
+  private struct Row: Identifiable, Hashable
   {
     let entry: PrimEntry
     let isAlternate: Bool
     var id: String { entry.id }
   }
 
-  private var visibleRows: [VisibleRow]
+  private var rows: [Row]
   {
-    visiblePrims.enumerated().map { offset, entry in
-      VisibleRow(entry: entry, isAlternate: offset % 2 == 1)
+    prims.enumerated().map { offset, entry in
+      Row(entry: entry, isAlternate: offset % 2 == 1)
     }
   }
 
@@ -131,16 +118,17 @@ public struct PrimBrowserView: View
 
       ScrollView {
         VStack(spacing: 0) {
-          ForEach(visibleRows) { row in
+          ForEach(rows) { row in
             VStack(spacing: 0) {
               PrimBrowserRow(
                 entry: row.entry,
                 isSelected: selectedPath == row.entry.path,
-                isCollapsed: collapsedPaths.contains(row.entry.path),
+                isExpanded: expandedPaths.contains(row.entry.path),
+                isLoading: loadingPaths.contains(row.entry.path),
                 isAlternate: row.isAlternate,
                 typeColWidth: typeColWidth,
                 visColWidth:  visColWidth,
-                onToggleDisclosure: { toggleCollapsed(row.entry.path) },
+                onToggleDisclosure: { toggleExpanded(row.entry) },
                 onSelect: { selectedPath = row.entry.path }
               )
 
@@ -150,17 +138,77 @@ public struct PrimBrowserView: View
         }
       }
     }
+    .onAppear {
+      guard prims.isEmpty else { return }
+      loadRoots()
+    }
   }
 
-  private func toggleCollapsed(_ path: String)
+  /// fetches the stage's root rows on a background task and splices them in
+  /// once ready - the launch-time counterpart to `loadChildren`, both off
+  /// of the main thread so neither path can stall the UI thread.
+  private func loadRoots()
   {
-    if collapsedPaths.contains(path)
+    nonisolated(unsafe) let bridgedStage = stage
+
+    Task.detached(priority: .userInitiated) {
+      let roots = PrimEntry.roots(of: bridgedStage)
+
+      await MainActor.run {
+        guard prims.isEmpty else { return }
+        prims = roots
+      }
+    }
+  }
+
+  /// expands or collapses `entry` in place, materializing or discarding
+  /// exactly the rows nested under it.
+  private func toggleExpanded(_ entry: PrimEntry)
+  {
+    if expandedPaths.contains(entry.path)
     {
-      collapsedPaths.remove(path)
+      // collapsing only touches rows already sitting in memory - cheap
+      // enough to stay synchronous and keep the UI feeling instantaneous.
+      guard let index = prims.firstIndex(where: { $0.path == entry.path }) else { return }
+
+      let prefix = entry.path + "/"
+      let subtreeEnd = prims[(index + 1)...].firstIndex { !$0.path.hasPrefix(prefix) } ?? prims.count
+
+      expandedPaths.subtract(prims[(index + 1) ..< subtreeEnd].map(\.path))
+      expandedPaths.remove(entry.path)
+      prims.removeSubrange((index + 1) ..< subtreeEnd)
     }
     else
     {
-      collapsedPaths.insert(path)
+      loadChildren(of: entry)
+    }
+  }
+
+  /// fetches `entry`'s direct children off the main thread and splices them
+  /// in once they're ready.
+  private func loadChildren(of entry: PrimEntry)
+  {
+    guard !loadingPaths.contains(entry.path) else { return }
+    loadingPaths.insert(entry.path)
+
+    nonisolated(unsafe) let bridgedStage = stage
+
+    Task.detached(priority: .userInitiated) {
+      let children = PrimEntry.children(of: entry, in: bridgedStage)
+
+      await MainActor.run {
+        loadingPaths.remove(entry.path)
+
+        // the row list may have shifted - or `entry` may have been
+        // collapsed again - while this fetch was in flight, so relocate
+        // it rather than trusting a now possibly stale index.
+        guard let index = prims.firstIndex(where: { $0.path == entry.path }),
+              !expandedPaths.contains(entry.path)
+        else { return }
+
+        prims.insert(contentsOf: children, at: index + 1)
+        expandedPaths.insert(entry.path)
+      }
     }
   }
 }
@@ -209,7 +257,8 @@ struct PrimBrowserRow: View
 {
   let entry:        PrimEntry
   let isSelected:   Bool
-  let isCollapsed:  Bool
+  let isExpanded:   Bool
+  let isLoading:    Bool
   let isAlternate:  Bool
   let typeColWidth: CGFloat
   let visColWidth:  CGFloat
@@ -241,10 +290,14 @@ struct PrimBrowserRow: View
         Spacer()
           .frame(width: Double(CGFloat(entry.depth) * indentStep + CGFloat(6)), height: nil)
 
-      Text(entry.hasChildren ? (isCollapsed ? "▸" : "▾") : "")
+      Text(isLoading ? "…" : (entry.hasChildren ? (isExpanded ? "▾" : "▸") : ""))
         .font(.system(size: 9, weight: .bold))
         .frame(width: 12, height: rowHeight, alignment: .center)
-        .foregroundColor(entry.hasChildren ? Color.purple.opacity(0.85) : Color.clear)
+        .foregroundColor(
+          isLoading
+            ? Color.purple.opacity(0.5)
+            : (entry.hasChildren ? Color.purple.opacity(0.85) : Color.clear)
+        )
         .onTapGesture
         {
           if entry.hasChildren { onToggleDisclosure() }

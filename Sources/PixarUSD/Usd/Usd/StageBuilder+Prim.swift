@@ -20,6 +20,14 @@ public protocol Prim
   var name: Tf.Token { get }
 
   var children: [any Prim] { get }
+  
+  var typeName: Tf.Token { get }
+  
+  func isActive() -> Bool
+  
+  func set(active: Bool)
+  
+  func set(doc: String)
 }
 
 /**

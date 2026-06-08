@@ -49,7 +49,6 @@ struct UsdView: App
     Msg.logger.log(level: .info, "UsdView launched | USD v\(Pixar.version).")
   }
 
-  @State private var prims: [PrimEntry] = []
   @State private var selectedPath: String? = nil
 
   /// Side-by-side on screens (where there's width to spare), stacked
@@ -64,7 +63,7 @@ struct UsdView: App
   {
     WindowGroup("UsdView") {
       SplitPane(spacing: 0) {
-        PrimBrowserView(prims: prims, selectedPath: $selectedPath)
+        PrimBrowserView(stage: stage, selectedPath: $selectedPath)
           #if os(iOS) || os(Android)
             .frame(height: 200)
           #else
@@ -73,8 +72,12 @@ struct UsdView: App
 
         Hydra.Viewport(engine: engine)
       }
+      #if os(iOS) || os(Android)
+        .frame(minHeight: 400)
+      #else
+        .frame(minWidth: 520)
+      #endif
       .colorScheme(.dark)
-      .onAppear { prims = PrimEntry.from(stage: stage) }
     }
   }
 }
