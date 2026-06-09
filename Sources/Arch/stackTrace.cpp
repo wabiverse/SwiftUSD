@@ -613,7 +613,14 @@ static int nonLockingLinux__execve(const char *file, char *const argv[], char *c
 static int nonLockingExecv(const char *path, char *const argv[])
 {
 #  if defined(ARCH_OS_LINUX)
+#    if defined(__ANDROID__)
+  // Android bionic does not expose __environ; use the POSIX ::environ instead.
+  // (Declared in <unistd.h> on bionic; use ::environ to name the global explicitly
+  // since this function is inside an anonymous namespace.)
+  return nonLockingLinux__execve(path, argv, ::environ);
+#    else
   return nonLockingLinux__execve(path, argv, __environ);
+#    endif
 #  else
   return execv(path, argv);
 #  endif

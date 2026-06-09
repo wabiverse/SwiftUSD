@@ -12,7 +12,21 @@
 
 import Foundation
 import Logging
-import Rainbow
+#if !os(Android)
+  import Rainbow
+#else
+  // Rainbow is not available on Android; provide no-op color stubs so the
+  // rest of Logging.swift compiles unchanged on all platforms.
+  private extension String {
+    var blue: String { self }
+    var cyan: String { self }
+    var yellow: String { self }
+    var magenta: String { self }
+    var green: String { self }
+    var red: String { self }
+    var lightWhite: String { self }
+  }
+#endif
 
 /* --- xxx --- */
 

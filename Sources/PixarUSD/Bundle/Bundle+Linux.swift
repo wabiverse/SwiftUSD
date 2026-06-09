@@ -13,7 +13,9 @@
 import Arch
 import CxxStdlib
 import Foundation
-import Rainbow
+#if !os(Android)
+  import Rainbow
+#endif
 
 #if os(Linux)
   /**

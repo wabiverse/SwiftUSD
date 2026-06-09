@@ -4,7 +4,39 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#if defined(__linux__)
+#if defined(__ANDROID__)
+
+#include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
+#include "Garch/glDebugWindow.h"
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+// Android has no X11 event loop - these are intentional no-op stubs.
+// GL context management on Android is driven by the Android runtime
+// (GLSurfaceView / ANativeActivity), not by Garch's debug window.
+
+Garch_GLPlatformDebugWindow::Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w)
+    : _running(false), _callback(w),
+      _display(EGL_NO_DISPLAY), _window(EGL_NO_SURFACE), _glContext(EGL_NO_CONTEXT)
+{
+}
+
+void Garch_GLPlatformDebugWindow::Init(const char *, int, int, int)
+{
+}
+
+void Garch_GLPlatformDebugWindow::Run()
+{
+}
+
+void Garch_GLPlatformDebugWindow::ExitApp()
+{
+  _running = false;
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#elif defined(__linux__)
 
 #include "Garch/GarchGLX/glPlatformDebugWindowGLX.h"
 #include "Garch/glDebugWindow.h"
@@ -212,4 +244,4 @@ void Garch_GLPlatformDebugWindow::ExitApp()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__linux__)
+#endif // defined(__ANDROID__) || defined(__linux__)

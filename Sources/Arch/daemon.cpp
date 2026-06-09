@@ -38,7 +38,14 @@ int ArchCloseAllFiles(int nExcept, const int *exceptFds)
   status = getrlimit(RLIMIT_NOFILE, &limits);
 
   if (limits.rlim_cur == RLIM_INFINITY) {
+#  if defined(NOFILE)
     maxfd = NOFILE;
+#  else
+    // Android bionic (and some Linux configs) don't define NOFILE.
+    // sysconf(_SC_OPEN_MAX) is the POSIX-portable equivalent.
+    maxfd = (int)sysconf(_SC_OPEN_MAX);
+    if (maxfd < 0) maxfd = 256;
+#  endif
   }
   else {
     maxfd = (int)limits.rlim_cur;

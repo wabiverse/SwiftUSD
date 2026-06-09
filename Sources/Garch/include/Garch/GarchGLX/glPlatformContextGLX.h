@@ -24,7 +24,51 @@
 #ifndef PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H
 #define PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H
 
-#if defined(__linux__)
+#if defined(__ANDROID__)
+
+#  include <EGL/egl.h>
+#  include <pxr/pxrns.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class GarchGLXContextState {
+ public:
+  /// Construct with the current state.
+  GarchGLXContextState();
+
+  /// Construct with the given state.
+  GarchGLXContextState(EGLDisplay, EGLSurface, EGLContext);
+
+  /// Compare for equality.
+  bool operator==(const GarchGLXContextState &rhs) const;
+
+  /// Returns a hash value for the state.
+  size_t GetHash() const;
+
+  /// Returns \c true if the context state is valid.
+  bool IsValid() const;
+
+  /// Make the context current.
+  void MakeCurrent();
+
+  /// Make no context current.
+  static void DoneCurrent();
+
+ public:
+  EGLDisplay display;
+  EGLSurface drawable;
+  EGLContext context;
+
+ private:
+  bool _defaultCtor;
+};
+
+// Hide the platform specific type name behind a common name.
+typedef GarchGLXContextState GarchGLPlatformContextState;
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#elif defined(__linux__)
 
 #  include <GL/glx.h>
 #  include <pxr/pxrns.h>
@@ -68,6 +112,6 @@ typedef GarchGLXContextState GarchGLPlatformContextState;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // defined(__linux__)
+#endif  // defined(__ANDROID__) || defined(__linux__)
 
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_CONTEXT_GLX_H

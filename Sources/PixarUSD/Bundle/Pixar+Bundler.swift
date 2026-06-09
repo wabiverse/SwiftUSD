@@ -14,13 +14,26 @@ import Arch
 import CxxStdlib
 import Foundation
 import Plug
-import Rainbow
+#if !os(Android)
+  import Rainbow
+#endif
 
 public extension Pixar
 {
   final class Bundler: Sendable
   {
     public static let shared = Bundler()
+
+    /**
+     * On Android the app files directory must be set before calling
+     * ``setup(_:)``.  Read ``/proc/self/cmdline`` to get the package name
+     * and derive the path, e.g. ``/data/data/foundation.wabi.usdview/files``.
+     *
+     * This property is written once from the main thread in ``UsdView.init()``
+     * and read once shortly after on the same thread, so unsynchronised access
+     * is safe in practice.
+     */
+    public nonisolated(unsafe) static var androidFilesDir: String = ""
 
     private init()
     {}
@@ -30,7 +43,11 @@ public extension Pixar
       switch kind
       {
         case .resources:
-          resourcesInit()
+          #if os(Android)
+            resourcesInitAndroid()
+          #else
+            resourcesInit()
+          #endif
       }
     }
 

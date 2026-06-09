@@ -30,7 +30,33 @@ bool GarchGLPlatformDebugContext::IsEnabledCoreProfile()
 PXR_NAMESPACE_CLOSE_SCOPE
 
 ////////////////////////////////////////////////////////////
-#if defined(ARCH_OS_LINUX)
+#if defined(__ANDROID__)
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+// Android has no GLX/X11 debug context support.
+// GL context management on Android is driven by EGL via the Android runtime.
+class GarchGLPlatformDebugContextPrivate {
+ public:
+  GarchGLPlatformDebugContextPrivate(int majorVersion,
+                                     int minorVersion,
+                                     bool coreProfile,
+                                     bool directRendering)
+  {
+  }
+  ~GarchGLPlatformDebugContextPrivate() {}
+
+  void MakeCurrent() {}
+};
+
+void *GarchSelectCoreProfileMacVisual()
+{
+  return nullptr;
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#elif defined(ARCH_OS_LINUX)
 
 #  include <GL/glx.h>
 #  include <GL/glxtokens.h>
@@ -133,7 +159,7 @@ void *GarchSelectCoreProfileMacVisual()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // ARCH_OS_LINUX
+#endif  // defined(__ANDROID__) ... defined(ARCH_OS_LINUX)
 
 ////////////////////////////////////////////////////////////
 

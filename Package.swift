@@ -285,8 +285,8 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/moreSwift/swift-cross-ui", from: "0.7.0"),
-    .package(url: "https://github.com/furbytm/MetaverseKit", from: "2.0.1"),
+    .package(url: "https://github.com/moreSwift/swift-cross-ui.git", branch: "main"),
+    .package(url: "https://github.com/furbytm/MetaverseKit.git", from: "2.0.3"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.4"),
@@ -1275,12 +1275,17 @@ let package = Package(
       linkerSettings: [
         .linkedFramework("OpenGL", .when(platforms: [.macOS])),
         .linkedFramework("UIKit", .when(platforms: Arch.OS.embeddedapple.platform)),
-        .linkedLibrary("glut", .when(platforms: Arch.OS.linux.platform)),
-        .linkedLibrary("GL", .when(platforms: Arch.OS.linux.platform)),
-        .linkedLibrary("GLU", .when(platforms: Arch.OS.linux.platform)),
-        .linkedLibrary("m", .when(platforms: Arch.OS.linux.platform)),
-        .linkedLibrary("X11", .when(platforms: Arch.OS.linux.platform)),
-        .linkedLibrary("Xt", .when(platforms: Arch.OS.linux.platform)),
+        // Desktop GL/X11 — Linux/OpenBSD only; Android uses EGL + GLESv3 instead.
+        .linkedLibrary("glut", .when(platforms: [.linux, .openbsd])),
+        .linkedLibrary("GL", .when(platforms: [.linux, .openbsd])),
+        .linkedLibrary("GLU", .when(platforms: [.linux, .openbsd])),
+        .linkedLibrary("m", .when(platforms: [.linux, .openbsd])),
+        .linkedLibrary("X11", .when(platforms: [.linux, .openbsd])),
+        .linkedLibrary("Xt", .when(platforms: [.linux, .openbsd])),
+        // Android GL context/ES runtime + Vulkan (API 28+).
+        .linkedLibrary("EGL", .when(platforms: [.android])),
+        .linkedLibrary("GLESv3", .when(platforms: [.android])),
+        .linkedLibrary("vulkan", .when(platforms: [.android])),
         .linkedLibrary("opengl32", .when(platforms: Arch.OS.windows.platform)),
       ]
     ),
@@ -1750,7 +1755,7 @@ let package = Package(
         .product(name: "AppKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.macOS])),
         .product(name: "UIKitBackend", package: "swift-cross-ui", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .watchOS])),
         .product(name: "GtkBackend", package: "swift-cross-ui", condition: .when(platforms: [.linux])),
-      ] + Arch.OS.winUIBackend,
+      ] + Arch.OS.winUIBackend + Arch.OS.androidBackend,
       resources: [
         .process("Resources")
       ],
@@ -2000,6 +2005,32 @@ let package = Package(
 
 /* --- xxx --- */
 
+let invokedByXcode: Bool
+#if os(macOS)
+  import Darwin
+
+  let ppid = getppid()
+  let PROC_PIDPATHINFO_MAXSIZE = 4096
+  let pathBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: PROC_PIDPATHINFO_MAXSIZE)
+  proc_pidpath(ppid, UnsafeMutableRawPointer(pathBuffer), UInt32(PROC_PIDPATHINFO_MAXSIZE))
+  let parentProcessPath = String(cString: pathBuffer)
+  let parentProcessName = URL(fileURLWithPath: parentProcessPath).lastPathComponent
+  invokedByXcode = parentProcessName == "xcodebuild" || parentProcessName == "Xcode"
+#else
+  invokedByXcode = false
+#endif
+
+let env = ProcessInfo.processInfo.environment
+let androidBackendSupported: Bool
+#if compiler(>=6.2)
+  // xcodebuild can't handle non-Apple platform conditional dependencies for some weird
+  // reason, so we have to remove AndroidBackend when we detect that we're being built
+  // by xcodebuild.
+  androidBackendSupported = !invokedByXcode
+#else
+  androidBackendSupported = false
+#endif
+
 /** ------------------------------------------------
  * Just to tidy up the package configuration above,
  * we define some helper functions and types below.
@@ -2050,6 +2081,13 @@ enum Arch
       }
     }
 
+    public static var androidBackend: [Target.Dependency]
+    {
+      androidBackendSupported
+        ? [.product(name: "AndroidBackend", package: "swift-cross-ui", condition: .when(platforms: [.android]))]
+        : []
+    }
+    
     /// because the winui backend is finicky on other platforms.
     public static var winUIBackend: [Target.Dependency]
     {

@@ -19,6 +19,12 @@ public func documentsDirPath() -> String
   #if os(macOS) || os(iOS) || os(visionOS) || os(tvOS) || os(watchOS)
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     return paths[0].path
+  #elseif os(Android)
+    // On Android, the working directory is `/` (no write permission).
+    // Use the app's private files directory, which is already set by
+    // UsdView.init() before createScene() is called.
+    let filesDir = Pixar.Bundler.androidFilesDir
+    return filesDir.isEmpty ? "/data/local/tmp" : filesDir
   #else
     return "."
   #endif

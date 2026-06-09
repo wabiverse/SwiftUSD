@@ -1,5 +1,5 @@
 {
-  "originHash" : "73e5d4480dec1514e75cb668ac44e30fda7d8382408f10450f81840fd573827b",
+  "originHash" : "6cd48cf200bfd73362508e9dbcbda1f33fbf3e204aa7167f36db71c35d414e72",
   "pins" : [
     {
       "identity" : "jpeg",
@@ -31,10 +31,10 @@
     {
       "identity" : "metaversekit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/furbytm/MetaverseKit",
+      "location" : "https://github.com/furbytm/MetaverseKit.git",
       "state" : {
-        "revision" : "582851004b4333ee9b568b63444812a76f52dbec",
-        "version" : "2.0.1"
+        "revision" : "6e5ebeb1c4f3b4c9032d30f83b09f799acf13988",
+        "version" : "2.0.3"
       }
     },
     {
@@ -67,10 +67,10 @@
     {
       "identity" : "swift-cross-ui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/moreSwift/swift-cross-ui",
+      "location" : "https://github.com/moreSwift/swift-cross-ui.git",
       "state" : {
-        "revision" : "355284163826c717e6754de0d9fe2677bd001d18",
-        "version" : "0.7.0"
+        "branch" : "main",
+        "revision" : "14b66cc089b76b967c6b2c36c6ec410099193ba1"
       }
     },
     {

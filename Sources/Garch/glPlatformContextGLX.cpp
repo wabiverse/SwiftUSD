@@ -5,7 +5,77 @@
 // https://openusd.org/license.
 //
 /// \file glPlatformContext.cpp
-#if defined(__linux__)
+#if defined(__ANDROID__)
+
+#include "Garch/glPlatformContext.h"
+#include "Tf/hash.h"
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+//
+// GarchGLXContextState (EGL-backed on Android)
+//
+
+GarchGLXContextState::GarchGLXContextState()
+    : display(eglGetCurrentDisplay()),
+      drawable(eglGetCurrentSurface(EGL_DRAW)),
+      context(eglGetCurrentContext()),
+      _defaultCtor(true)
+{
+  // Do nothing
+}
+
+GarchGLXContextState::GarchGLXContextState(EGLDisplay display_,
+                                           EGLSurface drawable_,
+                                           EGLContext context_)
+    : display(display_), drawable(drawable_), context(context_), _defaultCtor(false)
+{
+  // Do nothing
+}
+
+bool GarchGLXContextState::operator==(const GarchGLXContextState &rhs) const
+{
+  return display == rhs.display && drawable == rhs.drawable && context == rhs.context;
+}
+
+size_t GarchGLXContextState::GetHash() const
+{
+  return TfHash::Combine(display, drawable, context);
+}
+
+bool GarchGLXContextState::IsValid() const
+{
+  return display != EGL_NO_DISPLAY &&
+         drawable != EGL_NO_SURFACE &&
+         context  != EGL_NO_CONTEXT;
+}
+
+void GarchGLXContextState::MakeCurrent()
+{
+  if (IsValid()) {
+    eglMakeCurrent(display, drawable, drawable, context);
+  }
+  else if (_defaultCtor) {
+    DoneCurrent();
+  }
+}
+
+void GarchGLXContextState::DoneCurrent()
+{
+  EGLDisplay dpy = eglGetCurrentDisplay();
+  if (dpy != EGL_NO_DISPLAY) {
+    eglMakeCurrent(dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+  }
+}
+
+GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
+{
+  return GarchGLXContextState(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#elif defined(__linux__)
 
 #include "Garch/glPlatformContext.h"
 #include "Tf/hash.h"
@@ -72,4 +142,4 @@ GarchGLPlatformContextState GarchGetNullGLPlatformContextState()
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__linux__)
+#endif // defined(__ANDROID__) || defined(__linux__)

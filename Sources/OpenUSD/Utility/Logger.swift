@@ -12,7 +12,9 @@
 
 import Foundation
 import Logging
-import Rainbow
+#if !os(Android)
+  import Rainbow
+#endif
 
 /// Swift Bundler's basic log handler.
 struct Handler: LogHandler

@@ -24,7 +24,40 @@
 #ifndef PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H
 #define PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H
 
-#if defined(__linux__)
+#if defined(__ANDROID__)
+
+#  include "Tf/declarePtrs.h"
+#  include <EGL/egl.h>
+#  include <pxr/pxrns.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class GarchGLDebugWindow;
+TF_DECLARE_WEAK_AND_REF_PTRS(GarchGLPlatformDebugContext);
+
+/// \class Garch_GLPlatformDebugWindow
+/// Android stub - debug windows use the EGL context provided by the
+/// Android runtime; there is no X11 windowing system to drive directly.
+class Garch_GLPlatformDebugWindow {
+ public:
+  Garch_GLPlatformDebugWindow(GarchGLDebugWindow *w);
+
+  void Init(const char *title, int width, int height, int nSamples = 1);
+  void Run();
+  void ExitApp();
+
+ private:
+  bool _running;
+  GarchGLDebugWindow *_callback;
+  EGLDisplay _display;
+  EGLSurface _window;
+  EGLContext _glContext;
+  GarchGLPlatformDebugContextRefPtr _glDebugContext;
+};
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#elif defined(__linux__)
 
 #  include "Tf/declarePtrs.h"
 #  include <GL/glx.h>
@@ -57,6 +90,6 @@ class Garch_GLPlatformDebugWindow {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif  // defined(__linux__)
+#endif  // defined(__ANDROID__) || defined(__linux__)
 
 #endif  // PXR_IMAGING_GARCH_GL_PLATFORM_DEBUG_WINDOW_GLX_H

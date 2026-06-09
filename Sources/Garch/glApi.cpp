@@ -3131,6 +3131,10 @@ PFNGLSIGNALVKSEMAPHORENVPROC glSignalVkSemaphoreNV = NULL;
 PFNGLSIGNALVKFENCENVPROC glSignalVkFenceNV = NULL;
 
 static void *libHandle = NULL;
+#if defined(__ANDROID__)
+// Keep the EGL library handle alive so eglGetProcAddress stays valid.
+static void *eglLibHandle = NULL;
+#endif
 #if !defined(ARCH_OS_DARWIN)
 typedef void *(*PFNGETPROCADDRESS)(const char *);
 PFNGETPROCADDRESS libGetProcAddress = NULL;
@@ -3146,6 +3150,20 @@ static bool loadLibrary()
   libHandle = ArchLibraryOpen(
       "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL",
       RTLD_LAZY | RTLD_LOCAL);
+#elif defined(__ANDROID__)
+  // Android provides OpenGL ES via EGL.  Use libEGL for the proc-address
+  // resolver (eglGetProcAddress) and libGLESv2/v3 for the actual symbols.
+  // Neither call requires an active EGL context.
+  eglLibHandle = ArchLibraryOpen("libEGL.so", RTLD_LAZY | RTLD_GLOBAL);
+  if (eglLibHandle) {
+    libGetProcAddress = (PFNGETPROCADDRESS)ArchLibraryGetSymbolAddress(
+        eglLibHandle, "eglGetProcAddress");
+  }
+  // Try GLES 3 first, fall back to GLES 2.
+  libHandle = ArchLibraryOpen("libGLESv3.so", RTLD_LAZY | RTLD_LOCAL);
+  if (!libHandle) {
+    libHandle = ArchLibraryOpen("libGLESv2.so", RTLD_LAZY | RTLD_LOCAL);
+  }
 #elif defined(ARCH_OS_LINUX)
   libHandle = ArchLibraryOpen("libGL.so.1", RTLD_LAZY | RTLD_LOCAL);
   libGetProcAddress = (PFNGETPROCADDRESS)ArchLibraryGetSymbolAddress(libHandle,
@@ -3163,6 +3181,12 @@ static void unloadLibrary()
     ArchLibraryClose(libHandle);
     libHandle = NULL;
   }
+#if defined(__ANDROID__)
+  if (eglLibHandle != NULL) {
+    ArchLibraryClose(eglLibHandle);
+    eglLibHandle = NULL;
+  }
+#endif
 }
 
 static void *loadFunction(const char *name)
@@ -3171,7 +3195,9 @@ static void *loadFunction(const char *name)
   assert(libHandle != NULL);
 
 #if !defined(ARCH_OS_DARWIN)
-  result = libGetProcAddress(name);
+  if (libGetProcAddress) {
+    result = libGetProcAddress(name);
+  }
   if (result == NULL) {
     result = ArchLibraryGetSymbolAddress(libHandle, name);
   }
@@ -3199,6 +3225,19 @@ static bool loadSymbols()
   glGetStringi = (PFNGLGETSTRINGIPROC)loadFunction("glGetStringi");
 
   GLint major = 0, minor = 0;
+
+#if defined(__ANDROID__)
+  // On Android the EGL context may not be current when GarchGLApiLoad() is
+  // first called (e.g. during app init before any surface is created).
+  // Calling glGetString / glGetIntegerv without a current context is
+  // undefined behaviour on some drivers.  Skip the context-dependent queries
+  // here; HgiGLCapabilities will re-query once a context is active.
+  // Use GLES 3.1 as a safe baseline – guaranteed on Android 5.0+ / ANGLE.
+  major = 3;
+  minor = 1;
+  std::vector<const char *> extensions;
+  // (extension enumeration deferred until a GL context is current)
+#else  // !defined(__ANDROID__)
 
   // direct version query is supported only for versions 3.x and greater
   const char *versionStr = (const char *)glGetString(GL_VERSION);
@@ -3247,6 +3286,7 @@ static bool loadSymbols()
       }
     }
   }
+#endif  // !defined(__ANDROID__)
 
   GARCH_GL_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
   GARCH_GL_VERSION_1_1 = (major == 1 && minor >= 1) || major > 1;
