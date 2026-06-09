@@ -2005,32 +2005,6 @@ let package = Package(
 
 /* --- xxx --- */
 
-let invokedByXcode: Bool
-#if os(macOS)
-  import Darwin
-
-  let ppid = getppid()
-  let PROC_PIDPATHINFO_MAXSIZE = 4096
-  let pathBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: PROC_PIDPATHINFO_MAXSIZE)
-  proc_pidpath(ppid, UnsafeMutableRawPointer(pathBuffer), UInt32(PROC_PIDPATHINFO_MAXSIZE))
-  let parentProcessPath = String(cString: pathBuffer)
-  let parentProcessName = URL(fileURLWithPath: parentProcessPath).lastPathComponent
-  invokedByXcode = parentProcessName == "xcodebuild" || parentProcessName == "Xcode"
-#else
-  invokedByXcode = false
-#endif
-
-let env = ProcessInfo.processInfo.environment
-let androidBackendSupported: Bool
-#if compiler(>=6.2)
-  // xcodebuild can't handle non-Apple platform conditional dependencies for some weird
-  // reason, so we have to remove AndroidBackend when we detect that we're being built
-  // by xcodebuild.
-  androidBackendSupported = !invokedByXcode
-#else
-  androidBackendSupported = false
-#endif
-
 /** ------------------------------------------------
  * Just to tidy up the package configuration above,
  * we define some helper functions and types below.
@@ -2083,9 +2057,11 @@ enum Arch
 
     public static var androidBackend: [Target.Dependency]
     {
-      androidBackendSupported
-        ? [.product(name: "AndroidBackend", package: "swift-cross-ui", condition: .when(platforms: [.android]))]
-        : []
+      if ProcessInfo.processInfo.environment["SWIFTUSD_ANDROID_SUPPORT_ENABLED"] == "1" {
+        return [.product(name: "AndroidBackend", package: "swift-cross-ui", condition: .when(platforms: [.android]))]
+      } else {
+        return []
+      }
     }
     
     /// because the winui backend is finicky on other platforms.

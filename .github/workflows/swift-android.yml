@@ -43,6 +43,7 @@ jobs:
       SWIFT_RELEASE: swift-6.3-DEVELOPMENT-SNAPSHOT-2026-05-01-a
       SWIFT_ANDROID_SDK_CHECKSUM: 27a0e63264d1b8512522d3a07407ae3d2774eb07d28279ef58e96d1dc2ab720d
       SWIFT_BUNDLER_REVISION: e6909f16ae8b06dc956ba09a3cee1c4863c165bd
+      SWIFTUSD_ANDROID_SUPPORT_ENABLED: 1
     steps:
     - name: Setup Xcode 16.3 (Swift 6.1)
       uses: maxim-lobanov/setup-xcode@v1.6.0
