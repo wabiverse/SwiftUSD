@@ -18,6 +18,9 @@
 </div>
 
 <h4 align="center">
+  <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-android.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-android.yml?style=flat-square&label=android&labelColor=3DDC84&logoColor=FFFFFF&logo=android">
+  </a>
   <a href="https://github.com/wabiverse/SwiftUSD/actions/workflows/swift-ubuntu.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/wabiverse/SwiftUSD/swift-ubuntu.yml?style=flat-square&label=ubuntu%20&labelColor=E95420&logoColor=FFFFFF&logo=ubuntu">
   </a>
@@ -314,7 +317,7 @@ enum Creator
   swift bundler simulators boot [id-of-device]
 
   # if you booted a Android device.
-  swift bundler run --simulator "Pixel_10_Pro" -c release UsdView
+  SWIFTUSD_ANDROID_SUPPORT_ENABLED=1 swift bundler run --simulator "Pixel_10_Pro" -c release UsdView
   ```
 
   </div>
