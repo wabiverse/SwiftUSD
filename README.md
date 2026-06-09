@@ -328,7 +328,7 @@ enum Creator
 <br>
 
 > [!NOTE]
-> Swift is an open source programming language that is fully supported across **Linux** and [**Swift on Server**](https://www.swift.org/server/), the entire **Apple** family of devices: **macOS**, **visionOS**, **iOS**, **tvOS**, **watchOS**, as well as support for **Microsoft Windows**. To learn more about Swift, please visit [swift.org](https://www.swift.org).
+> Swift is an open source programming language that is fully supported across [**Android**](https://www.swift.org/documentation/articles/swift-sdk-for-android-getting-started.html), **Linux** and [**Swift on Server**](https://www.swift.org/server/), the entire **Apple** family of devices: **macOS**, **visionOS**, **iOS**, **tvOS**, **watchOS**, as well as support for **Microsoft Windows**. To learn more about Swift, please visit [swift.org](https://www.swift.org).
 
 <br>
 
