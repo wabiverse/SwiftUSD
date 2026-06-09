@@ -157,12 +157,12 @@ public enum Hydra
     {
       stopFlick()
 
-      guard abs(deltaYaw) > Self.flickThreshold || abs(deltaPitch) > Self.flickThreshold
+      guard deltaYaw.magnitude > Self.flickThreshold || deltaPitch.magnitude > Self.flickThreshold
       else { return }
 
       flickVelocity = (deltaYaw, deltaPitch)
 
-      let timer = Foundation.Timer(timeInterval: Self.flickInterval, repeats: true)
+      let timer = Foundation.Timer(timeInterval: Self.flickInterval as TimeInterval, repeats: true)
       { [weak self] timer in
         guard let self else { timer.invalidate(); return }
 
@@ -171,7 +171,7 @@ public enum Hydra
         flickVelocity.yaw *= Self.flickDamping
         flickVelocity.pitch *= Self.flickDamping
 
-        if abs(flickVelocity.yaw) < Self.flickThreshold, abs(flickVelocity.pitch) < Self.flickThreshold
+        if flickVelocity.yaw.magnitude < Self.flickThreshold, flickVelocity.pitch.magnitude < Self.flickThreshold
         {
           stopFlick()
         }
