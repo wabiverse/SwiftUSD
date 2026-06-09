@@ -15,7 +15,10 @@ import SwiftCrossUI
 
 /* setup the platform backend. */
 
-#if os(Linux)
+#if os(Android)
+  import AndroidBackend
+  public typealias PlatformBackend = AndroidBackend
+#elseif os(Linux)
   import GtkBackend
   public typealias PlatformBackend = GtkBackend
 #elseif os(Windows)
