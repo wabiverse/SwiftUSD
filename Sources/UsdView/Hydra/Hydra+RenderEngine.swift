@@ -43,12 +43,12 @@ public enum Hydra
 
     /// "click-and-flick" coast: keeps orbiting at a decaying velocity after the drag ends,
     /// then settles to a stop (see `flick(deltaYaw:deltaPitch:)`).
-    private var flickTimer: Timer?
+    private var flickTimer: Foundation.Timer?
     private var flickVelocity: (yaw: Double, pitch: Double) = (0.0, 0.0)
 
     private static let flickInterval: TimeInterval = 1.0 / 60.0
-    private static let flickDamping = 0.94
-    private static let flickThreshold = 0.01
+    private static let flickDamping: Double = 0.94
+    private static let flickThreshold: Double = 0.01
 
     public required init(stage: UsdStage)
     {
@@ -162,7 +162,7 @@ public enum Hydra
 
       flickVelocity = (deltaYaw, deltaPitch)
 
-      let timer = Timer(timeInterval: Self.flickInterval, repeats: true)
+      let timer = Foundation.Timer(timeInterval: Self.flickInterval, repeats: true)
       { [weak self] timer in
         guard let self else { timer.invalidate(); return }
 
