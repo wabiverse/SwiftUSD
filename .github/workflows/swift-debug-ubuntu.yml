@@ -40,5 +40,7 @@ jobs:
           echo "### Disabled Tests" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux." >> $GITHUB_STEP_SUMMARY
+      - name: 🔥 Delete `CxxStdlib.swiftmodule`
+        run: sudo rm -rf /opt/hostedtoolcache/swift-Ubuntu/6.2.1/x64/usr/lib/swift/linux/CxxStdlib.swiftmodule/x86_64-unknown-linux-gnu.swiftmodule
       - name: 🎬 Run
         run: swift run UsdView
