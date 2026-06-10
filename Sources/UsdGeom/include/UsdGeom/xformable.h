@@ -449,6 +449,13 @@ class UsdGeomXformable : public UsdGeomImageable {
       UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
+  
+  USDGEOM_API
+  UsdGeomXformOp _AddXformOp(
+      UsdGeomXformOp::Type const opType,
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
 
   /// Get an affine transformation from the local stack represented by this
   /// Xformable. This will return an invalid op if there is no transform operation
@@ -483,6 +490,12 @@ class UsdGeomXformable : public UsdGeomImageable {
       UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
+  
+  USDGEOM_API
+  UsdGeomXformOp _AddTranslateOp(
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionDouble,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
 
   /// Get a translate operation from the local stack represented by this
   /// xformable.
@@ -501,6 +514,12 @@ class UsdGeomXformable : public UsdGeomImageable {
       UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
+  
+  USDGEOM_API
+  UsdGeomXformOp _AddScaleOp(
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
 
   /// Get a scale operation from the local stack represented by this
   /// xformable.
@@ -516,6 +535,12 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddRotateXOp(
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
+  
+  USDGEOM_API
+  UsdGeomXformOp _AddRotateXOp(
       UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
@@ -538,6 +563,12 @@ class UsdGeomXformable : public UsdGeomImageable {
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;
 
+  USDGEOM_API
+  UsdGeomXformOp _AddRotateYOp(
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
+
   /// Get a rotation about the Y-axis from the local stack represented by
   /// this xformable.
   ///
@@ -551,6 +582,12 @@ class UsdGeomXformable : public UsdGeomImageable {
   /// \sa AddXformOp()
   USDGEOM_API
   UsdGeomXformOp AddRotateZOp(
+      UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
+      TfToken const &opSuffix = TfToken(),
+      bool isInverseOp = false) const;
+
+  USDGEOM_API
+  UsdGeomXformOp _AddRotateZOp(
       UsdGeomXformOp::Precision const precision = UsdGeomXformOp::Precision::PrecisionFloat,
       TfToken const &opSuffix = TfToken(),
       bool isInverseOp = false) const;

@@ -19,6 +19,7 @@ public extension UsdLux
   typealias DomeLight = UsdLuxDomeLight
 }
 
+@Xformable
 extension UsdLux.DomeLight: GeomXformable
 {
   @discardableResult
@@ -42,49 +43,4 @@ extension UsdLux.DomeLight: GeomXformable
   {
     CreateTextureFileAttr(defaultValue, writeSparsely)
   }
-
-
-  public func addXformOp(type: UsdGeomXformOp.`Type`,
-                         precision: UsdGeomXformOp.Precision = .double,
-                         suffix: Tf.Token = Tf.Token(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddXformOp(type, precision, suffix, invert)
-  }
-
-  public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
-                             suffix: Tf.Token = Tf.Token(),
-                             invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddTranslateOp(precision, suffix, invert)
-  }
-
-  public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
-                         suffix: Tf.Token = Tf.Token(),
-                         invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddScaleOp(precision, suffix, invert)
-  }
-
-  public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Tf.Token = Tf.Token(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddRotateXOp(precision, suffix, invert)
-  }
-
-  public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Tf.Token = Tf.Token(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddRotateYOp(precision, suffix, invert)
-  }
-
-  public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
-                           suffix: Tf.Token = Tf.Token(),
-                           invert: Bool = false) -> UsdGeomXformOp
-  {
-    self.AddRotateZOp(precision, suffix, invert)
-  }
-
 }
