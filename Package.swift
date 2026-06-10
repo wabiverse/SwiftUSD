@@ -1880,6 +1880,8 @@ let package = Package(
         .target(name: "Arch"),
         .target(name: "Tf"),
         .target(name: "Usd"),
+        .target(name: "UsdGeom"),
+        .target(name: "UsdLux"),
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),

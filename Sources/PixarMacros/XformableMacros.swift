@@ -29,42 +29,42 @@ public struct PixarXformableMacro: MemberMacro
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddXformOp(type, precision, suffix, invert)
+        Overlay.addXformOp(self, type, precision, suffix, invert)
       }
 
       public func addTranslateOp(precision: UsdGeomXformOp.Precision = .double,
                                  suffix: Tf.Token = Tf.Token(),
                                  invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddTranslateOp(precision, suffix, invert)
+        Overlay.addTranslateOp(self, precision, suffix, invert)
       }
 
       public func addScaleOp(precision: UsdGeomXformOp.Precision = .float,
                              suffix: Tf.Token = Tf.Token(),
                              invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddScaleOp(precision, suffix, invert)
+        Overlay.addScaleOp(self, precision, suffix, invert)
       }
 
       public func addRotateXOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddRotateXOp(precision, suffix, invert)
+        Overlay.addRotateXOp(self, precision, suffix, invert)
       }
 
       public func addRotateYOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddRotateYOp(precision, suffix, invert)
+        Overlay.addRotateYOp(self, precision, suffix, invert)
       }
 
       public func addRotateZOp(precision: UsdGeomXformOp.Precision = .float,
                                suffix: Tf.Token = Tf.Token(),
                                invert: Bool = false) -> UsdGeomXformOp
       {
-        self._AddRotateZOp(precision, suffix, invert)
+        Overlay.addRotateZOp(self, precision, suffix, invert)
       }
       """
 

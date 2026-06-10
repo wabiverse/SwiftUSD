@@ -277,49 +277,6 @@ UsdGeomXformOp UsdGeomXformable::GetRotateZOp(TfToken const &opSuffix, bool isIn
   return GetXformOp(UsdGeomXformOp::Type::TypeRotateZ, opSuffix, isInverseOp);
 }
 
-UsdGeomXformOp UsdGeomXformable::_AddXformOp(UsdGeomXformOp::Type const opType,
-                                             UsdGeomXformOp::Precision const precision,
-                                             TfToken const &opSuffix,
-                                             bool isInverseOp) const
-{
-  return AddXformOp(opType, precision, opSuffix, isInverseOp);
-}
-
-UsdGeomXformOp UsdGeomXformable::_AddTranslateOp(UsdGeomXformOp::Precision const precision,
-                                                 TfToken const &opSuffix,
-                                                 bool isInverseOp) const
-{
-  return AddTranslateOp(precision, opSuffix, isInverseOp);
-}
-
-UsdGeomXformOp UsdGeomXformable::_AddScaleOp(UsdGeomXformOp::Precision const precision,
-                                             TfToken const &opSuffix,
-                                             bool isInverseOp) const
-{
-  return AddScaleOp(precision, opSuffix, isInverseOp);
-}
-
-UsdGeomXformOp UsdGeomXformable::_AddRotateXOp(UsdGeomXformOp::Precision const precision,
-                                               TfToken const &opSuffix,
-                                               bool isInverseOp) const
-{
-  return AddRotateXOp(precision, opSuffix, isInverseOp);
-}
-
-UsdGeomXformOp UsdGeomXformable::_AddRotateYOp(UsdGeomXformOp::Precision const precision,
-                                               TfToken const &opSuffix,
-                                               bool isInverseOp) const
-{
-  return AddRotateYOp(precision, opSuffix, isInverseOp);
-}
-
-UsdGeomXformOp UsdGeomXformable::_AddRotateZOp(UsdGeomXformOp::Precision const precision,
-                                               TfToken const &opSuffix,
-                                               bool isInverseOp) const
-{
-  return AddRotateZOp(precision, opSuffix, isInverseOp);
-}
-
 UsdGeomXformOp UsdGeomXformable::AddRotateXYZOp(UsdGeomXformOp::Precision const precision,
                                                 TfToken const &opSuffix,
                                                 bool isInverseOp) const
