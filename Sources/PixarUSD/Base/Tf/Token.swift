@@ -73,7 +73,7 @@ public extension TfToken
 
   init(_ value: String)
   {
-    self.init(value.withCString { std.string($0) })
+    self = value.withCString { Overlay.MakeToken($0) }
   }
 
   var string: String

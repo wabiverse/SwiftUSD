@@ -100,7 +100,7 @@ extension Usd.Prim: Prim
    * Sets the documentation string for this layer. */
   public func set(doc: String)
   {
-    SetDocumentation(doc.withCString { std.string($0) })
+    doc.withCString { Overlay.SetDocumentation(self, $0) }
   }
 
   public func set(active: Bool)

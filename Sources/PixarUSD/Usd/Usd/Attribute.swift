@@ -24,13 +24,13 @@ public extension Usd.Attribute
 {
   func set(doc: String)
   {
-    SetDocumentation(doc.withCString { std.string($0) })
+    doc.withCString { Overlay.SetDocumentation(self, $0) }
   }
 
   @discardableResult
   func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
-    Set(value.withCString { std.string($0) }, time)
+    value.withCString { Overlay.SetAttributeString(self, $0, time) }
   }
 
   @discardableResult

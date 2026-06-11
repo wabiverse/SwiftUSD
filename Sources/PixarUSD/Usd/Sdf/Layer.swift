@@ -28,7 +28,7 @@ public extension SdfLayerHandle
    * Sets the documentation string for this layer. */
   func set(doc: String)
   {
-    pointee.SetDocumentation(doc.withCString { std.string($0) })
+    doc.withCString { Overlay.SetDocumentation(self, $0) }
   }
 
   /**

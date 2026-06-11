@@ -1879,9 +1879,13 @@ let package = Package(
       dependencies: [
         .target(name: "Arch"),
         .target(name: "Tf"),
+        .target(name: "Plug"),
+        .target(name: "Vt"),
+        .target(name: "Sdf"),
         .target(name: "Usd"),
         .target(name: "UsdGeom"),
         .target(name: "UsdLux"),
+        .target(name: "UsdShade"),
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),

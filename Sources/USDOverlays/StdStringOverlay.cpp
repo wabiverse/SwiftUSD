@@ -1,0 +1,92 @@
+/* ----------------------------------------------------------------
+ * :: :  O  P  E  N  U  S  D  :                            ::
+ * ----------------------------------------------------------------
+ * Licensed under the terms set forth in the LICENSE.txt file, this
+ * file is available at https://openusd.org/license.
+ *
+ *                   Copyright (C) 2016 Pixar. All Rights Reserved.
+ *                              Copyright (C) 2024 Wabi Foundation.
+ * ----------------------------------------------------------------
+ *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
+ * ---------------------------------------------------------------- */
+
+#include "StdStringOverlay.h"
+
+namespace Overlay
+{
+  Pixar::TfToken MakeToken(const char *value)
+  {
+    return Pixar::TfToken(value);
+  }
+
+  Pixar::SdfPath MakePath(const char *path)
+  {
+    return Pixar::SdfPath(std::string(path));
+  }
+
+  Pixar::SdfAssetPath MakeAssetPath(const char *path)
+  {
+    return Pixar::SdfAssetPath(std::string(path));
+  }
+
+  Pixar::SdfReference MakeReference(const char *assetPath, const Pixar::SdfPath &primPath, const Pixar::SdfLayerOffset &layerOffset, const Pixar::VtDictionary &customData)
+  {
+    return Pixar::SdfReference(std::string(assetPath), primPath, layerOffset, customData);
+  }
+
+  void SetDocumentation(const Pixar::SdfLayerHandle &layer, const char *doc)
+  {
+    layer->SetDocumentation(std::string(doc));
+  }
+
+  void SetDocumentation(const Pixar::UsdPrim &prim, const char *doc)
+  {
+    prim.SetDocumentation(std::string(doc));
+  }
+
+  void SetDocumentation(const Pixar::UsdAttribute &attr, const char *doc)
+  {
+    attr.SetDocumentation(std::string(doc));
+  }
+
+  bool SetAttributeString(const Pixar::UsdAttribute &attr, const char *value, const Pixar::UsdTimeCode &time)
+  {
+    return attr.Set(std::string(value), time);
+  }
+
+  Pixar::UsdStageRefPtr CreateNewStage(const char *identifier, Pixar::UsdStage::InitialLoadSet load)
+  {
+    return Pixar::UsdStage::CreateNew(std::string(identifier), load);
+  }
+
+  Pixar::UsdStageRefPtr CreateInMemoryStage(const char *identifier, Pixar::UsdStage::InitialLoadSet load)
+  {
+    return Pixar::UsdStage::CreateInMemory(std::string(identifier), load);
+  }
+
+  Pixar::UsdStageRefPtr OpenStage(const char *filePath, Pixar::UsdStage::InitialLoadSet load)
+  {
+    return Pixar::UsdStage::Open(std::string(filePath), load);
+  }
+
+  bool AddReference(Pixar::UsdReferences references, const char *assetPath, const Pixar::SdfPath &primPath, const Pixar::SdfLayerOffset &layerOffset, Pixar::UsdListPosition position)
+  {
+    return references.AddReference(std::string(assetPath), primPath, layerOffset, position);
+  }
+
+  bool AddReference(Pixar::UsdReferences references, const char *assetPath, const Pixar::SdfLayerOffset &layerOffset, Pixar::UsdListPosition position)
+  {
+    return references.AddReference(std::string(assetPath), layerOffset, position);
+  }
+
+  Pixar::UsdAttribute CreateIdAttr(const Pixar::UsdShadeShader &shader, const char *defaultValue, bool writeSparsely)
+  {
+    return shader.CreateIdAttr(Pixar::VtValue(std::string(defaultValue)), writeSparsely);
+  }
+
+  Pixar::PlugRegistry::PlugPathsVector PushBackPath(Pixar::PlugRegistry::PlugPathsVector paths, const char *path)
+  {
+    paths.push_back(std::string(path));
+    return paths;
+  }
+} // namespace Overlay

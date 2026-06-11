@@ -28,11 +28,6 @@ public extension Sdf.Reference
        layerOffset: Sdf.LayerOffset = Sdf.LayerOffset(),
        customData: Vt.Dictionary = Vt.Dictionary())
   {
-    self = Sdf.Reference(
-      assetPath.withCString { std.string($0) },
-      primPath,
-      layerOffset,
-      customData
-    )
+    self = assetPath.withCString { Overlay.MakeReference($0, primPath, layerOffset, customData) }
   }
 }

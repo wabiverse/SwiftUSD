@@ -25,7 +25,7 @@ public extension Sdf.Path
 {
   init(_ path: String)
   {
-    self.init(path.withCString { std.string($0) })
+    self = path.withCString { Overlay.MakePath($0) }
   }
 
   static func emptyPath() -> Sdf.Path

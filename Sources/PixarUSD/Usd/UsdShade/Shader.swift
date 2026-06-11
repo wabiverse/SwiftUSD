@@ -42,7 +42,7 @@ public extension UsdShade.Shader
   @discardableResult
   func createIdAttr(_ defaultValue: String, writeSparsely: Bool = false) -> Usd.Attribute
   {
-    CreateIdAttr(VtValue(defaultValue.withCString { std.string($0) }), writeSparsely)
+    defaultValue.withCString { Overlay.CreateIdAttr(self, $0, writeSparsely) }
   }
 
   /**
