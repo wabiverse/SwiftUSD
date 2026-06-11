@@ -36,4 +36,4 @@ jobs:
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
       - name: 📦 Build
-        run: swift build -c release -Xswiftc -disable-batch-mode --target UsdView
+        run: swift build -c release --target UsdView

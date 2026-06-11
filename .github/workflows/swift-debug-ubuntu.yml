@@ -41,4 +41,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Pre Swift 5.10 toolchains do not support Cxx Interop enabled testing targets on Linux." >> $GITHUB_STEP_SUMMARY
       - name: 🎬 Run
-        run: swift run -Xswiftc -disable-batch-mode UsdView
+        run: swift run UsdView
