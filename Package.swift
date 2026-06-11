@@ -285,7 +285,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/moreSwift/swift-cross-ui.git", branch: "main"),
+    .package(url: "https://github.com/furbytm/swift-cross-ui.git", from: "0.7.2"),
     .package(url: "https://github.com/furbytm/MetaverseKit.git", from: "2.0.3"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "601.0.0"..<"604.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
