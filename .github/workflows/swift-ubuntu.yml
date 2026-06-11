@@ -35,7 +35,5 @@ jobs:
         run: sudo apt install libxcursor-dev libxt-dev libxi-dev libxinerama-dev libxrandr-dev
       - name: 💻 Install GTK
         run: sudo apt install libgtk-4-dev clang
-      - name: 🔥 Delete `CxxStdlib.swiftmodule`
-        run: sudo rm -rf /opt/hostedtoolcache/swift-Ubuntu/6.2.1/x64/usr/lib/swift/linux/CxxStdlib.swiftmodule/x86_64-unknown-linux-gnu.swiftmodule
       - name: 📦 Build
-        run: swift build -c release --target UsdView
+        run: swift build -c release -Xswiftc -disable-batch-mode --target UsdView
