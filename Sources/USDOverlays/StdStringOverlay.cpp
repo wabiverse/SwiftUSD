@@ -19,6 +19,11 @@ namespace Overlay
     return Pixar::TfToken(value);
   }
 
+  const Pixar::TfType &FindTypeByName(const char *name)
+  {
+    return Pixar::TfType::FindByName(std::string(name));
+  }
+
   Pixar::SdfPath MakePath(const char *path)
   {
     return Pixar::SdfPath(std::string(path));
@@ -88,5 +93,51 @@ namespace Overlay
   {
     paths.push_back(std::string(path));
     return paths;
+  }
+
+  const char *GetPathText(const Pixar::SdfPath &path)
+  {
+    return path.GetText();
+  }
+
+  const char *GetPathNameText(const Pixar::SdfPath &path)
+  {
+    return path.GetName().c_str();
+  }
+
+  const char *GetTokenText(const Pixar::TfToken &token)
+  {
+    return token.GetText();
+  }
+
+  const char *GetResolvedPathText(const Pixar::ArResolvedPath &path)
+  {
+    return path.GetPathString().c_str();
+  }
+
+  const char *ExportStageToString(const Pixar::UsdStage &stage, bool addSourceFileComment)
+  {
+    static thread_local std::string buf;
+    stage.ExportToString(&buf, addSourceFileComment);
+    return buf.c_str();
+  }
+
+  const char *GetTypeName(const Pixar::TfType &type)
+  {
+    return type.GetTypeName().c_str();
+  }
+
+  const char *GetCwd()
+  {
+    static thread_local std::string buf;
+    buf = Pixar::ArchGetCwd();
+    return buf.c_str();
+  }
+
+  const char *GetExecutablePath()
+  {
+    static thread_local std::string buf;
+    buf = Pixar::ArchGetExecutablePath();
+    return buf.c_str();
   }
 } // namespace Overlay

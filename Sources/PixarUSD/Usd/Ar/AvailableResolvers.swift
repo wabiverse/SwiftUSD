@@ -17,7 +17,7 @@ public extension Ar
   static func getAllResolvers() -> [String]
   {
     // 1. we get the base type.
-    let base = Pixar.TfType.FindByName("ArResolver")
+    let base = Overlay.FindTypeByName("ArResolver")
 
     guard
       // 2. we verify the base type is valid.
@@ -31,7 +31,7 @@ public extension Ar
     var result: [String] = []
     let resolvers = all()
     for i in 0..<Int(resolvers.size()) {
-      result.append(String(resolvers[i].GetTypeName().pointee))
+      result.append(String(cString: Overlay.GetTypeName(resolvers[i])))
     }
 
     return result

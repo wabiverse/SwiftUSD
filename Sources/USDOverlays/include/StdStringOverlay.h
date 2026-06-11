@@ -13,6 +13,8 @@
 #ifndef SWIFTUSD_SWIFTOVERLAY_STD_STRING_OVERLAY_H
 #define SWIFTUSD_SWIFTOVERLAY_STD_STRING_OVERLAY_H
 
+#include "Ar/resolvedPath.h"
+#include "Arch/systemInfo.h"
 #include "Plug/registry.h"
 #include "Sdf/assetPath.h"
 #include "Sdf/layer.h"
@@ -20,6 +22,7 @@
 #include "Sdf/path.h"
 #include "Sdf/reference.h"
 #include "Tf/token.h"
+#include "Tf/type.h"
 #include "Usd/attribute.h"
 #include "Usd/common.h"
 #include "Usd/object.h"
@@ -44,6 +47,8 @@ namespace Overlay
 {
   Pixar::TfToken MakeToken(const char *value);
 
+  const Pixar::TfType &FindTypeByName(const char *name);
+
   Pixar::SdfPath MakePath(const char *path);
   Pixar::SdfAssetPath MakeAssetPath(const char *path);
   Pixar::SdfReference MakeReference(const char *assetPath, const Pixar::SdfPath &primPath, const Pixar::SdfLayerOffset &layerOffset, const Pixar::VtDictionary &customData);
@@ -64,6 +69,20 @@ namespace Overlay
   Pixar::UsdAttribute CreateIdAttr(const Pixar::UsdShadeShader &shader, const char *defaultValue, bool writeSparsely);
 
   Pixar::PlugRegistry::PlugPathsVector PushBackPath(Pixar::PlugRegistry::PlugPathsVector paths, const char *path);
+
+  /// The reverse direction (`std::string` -> Swift `String`) is just as broken
+  /// as the forward direction: `String.init(_ cxxString: std.string)` triggers
+  /// the same deserialization failure. So every `std::string` returning getter
+  /// is wrapped here too, exposing it as a `const char *` that Swift converts
+  /// via `String(cString:)` (a plain Swift API, not `CxxStdlib`).
+  const char *GetPathText(const Pixar::SdfPath &path);
+  const char *GetPathNameText(const Pixar::SdfPath &path);
+  const char *GetTokenText(const Pixar::TfToken &token);
+  const char *GetResolvedPathText(const Pixar::ArResolvedPath &path);
+  const char *ExportStageToString(const Pixar::UsdStage &stage, bool addSourceFileComment);
+  const char *GetTypeName(const Pixar::TfType &type);
+  const char *GetCwd();
+  const char *GetExecutablePath();
 } // namespace Overlay
 
 #endif // SWIFTUSD_SWIFTOVERLAY_STD_STRING_OVERLAY_H

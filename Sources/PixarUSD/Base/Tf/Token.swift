@@ -11,7 +11,6 @@
  * ---------------------------------------------------------------- */
 
 import Foundation
-import CxxStdlib
 
 // import Tf
 import Plug
@@ -66,11 +65,6 @@ extension TfToken: Hashable
 
 public extension TfToken
 {
-  private borrowing func GetStringCopy() -> std.string
-  {
-    __GetStringUnsafe().pointee
-  }
-
   init(_ value: String)
   {
     self = value.withCString { Overlay.MakeToken($0) }
@@ -78,7 +72,7 @@ public extension TfToken
 
   var string: String
   {
-    String(GetStringCopy())
+    String(cString: Overlay.GetTokenText(self))
   }
 
   var isEmpty: Bool

@@ -17,13 +17,8 @@ public typealias ArResolvedPath = Pixar.ArResolvedPath
 
 public extension ArResolvedPath
 {
-  private borrowing func GetPathStringCopy() -> std.string
-  {
-    __GetPathStringUnsafe().pointee
-  }
-
   var path: String
   {
-    String(GetPathStringCopy())
+    String(cString: Overlay.GetResolvedPathText(self))
   }
 }

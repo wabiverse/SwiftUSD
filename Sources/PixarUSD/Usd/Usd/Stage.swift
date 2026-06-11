@@ -10,7 +10,6 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CxxStdlib
 import Foundation
 import Sdf
 import Usd
@@ -558,9 +557,6 @@ public extension Usd.Stage
 
   func exportToString(_ result: inout String, addSourceFileComment: Bool = true)
   {
-    var str = std.string()
-    ExportToString(&str, addSourceFileComment)
-
-    result = String(str)
+    result = String(cString: Overlay.ExportStageToString(self, addSourceFileComment))
   }
 }

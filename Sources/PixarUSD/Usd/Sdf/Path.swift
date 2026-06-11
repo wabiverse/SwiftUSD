@@ -10,7 +10,6 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-import CxxStdlib
 import Foundation
 import Sdf
 
@@ -43,14 +42,9 @@ public extension Sdf.Path
     Sdf.Path.ReflexiveRelativePath().pointee
   }
 
-  private borrowing func GetNameCopy() -> std.string
-  {
-    __GetNameUnsafe().pointee
-  }
-
   func getAsString() -> String
   {
-    String(GetAsString())
+    String(cString: Overlay.GetPathText(self))
   }
 
   func append(path: Sdf.Path) -> Sdf.Path
@@ -60,11 +54,11 @@ public extension Sdf.Path
 
   var string: String
   {
-    String(GetAsString())
+    String(cString: Overlay.GetPathText(self))
   }
 
   var name: String
   {
-    String(GetNameCopy())
+    String(cString: Overlay.GetPathNameText(self))
   }
 }

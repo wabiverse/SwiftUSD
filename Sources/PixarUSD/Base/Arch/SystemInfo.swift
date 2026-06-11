@@ -21,13 +21,13 @@ public extension Arch
   /// Return current working directory as a string.
   static func getCwd() -> String
   {
-    String(Pixar.ArchGetCwd())
+    String(cString: Overlay.GetCwd())
   }
 
   /// Return the path to the program's executable.
   static func getExecutablePath() -> String
   {
-    String(Pixar.ArchGetExecutablePath())
+    String(cString: Overlay.GetExecutablePath())
   }
 
   /// Return the system's memory page size. Safe to assume power-of-two.
