@@ -65,7 +65,7 @@ public extension Pixar
           Msg.logger.log(level: .info, "Adding usd resource -> \(path)")
         #endif /* DEBUG_PIXAR_BUNDLE */
 
-        plugPaths.push_back(std.string(path))
+        plugPaths.push_back(path.withCString { std.string($0) })
       }
 
       /* 3. registers all plugins discovered in any plugPaths. */

@@ -73,7 +73,7 @@ public extension TfToken
 
   init(_ value: String)
   {
-    self.init(std.string(value))
+    self.init(value.withCString { std.string($0) })
   }
 
   var string: String

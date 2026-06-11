@@ -25,6 +25,6 @@ public extension Sdf.AssetPath
 {
   init(_ path: String)
   {
-    self.init(std.string(path))
+    self.init(path.withCString { std.string($0) })
   }
 }

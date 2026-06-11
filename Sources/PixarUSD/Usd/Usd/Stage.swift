@@ -139,7 +139,7 @@ public extension Usd.Stage
   static func createNew(_ identifier: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStage
   {
     Overlay.Dereference(
-      Usd.Stage.CreateNew(std.string("\(identifier).\(ext.rawValue)"), load.rawValue)
+      Usd.Stage.CreateNew("\(identifier).\(ext.rawValue)".withCString { std.string($0) }, load.rawValue)
     )
   }
 
@@ -170,7 +170,7 @@ public extension Usd.Stage
   static func createNew(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStage
   {
     Overlay.Dereference(
-      Usd.Stage.CreateNew(std.string(identifier), load.rawValue)
+      Usd.Stage.CreateNew(identifier.withCString { std.string($0) }, load.rawValue)
     )
   }
 
@@ -224,7 +224,7 @@ public extension Usd.Stage
   static func createInMemory(_ identifier: String, load: InitialLoadingSet = .all) -> UsdStage
   {
     Overlay.Dereference(
-      Usd.Stage.CreateInMemory(std.string(identifier), load.rawValue)
+      Usd.Stage.CreateInMemory(identifier.withCString { std.string($0) }, load.rawValue)
     )
   }
 
@@ -249,7 +249,7 @@ public extension Usd.Stage
   static func open(_ filePath: String, load: InitialLoadingSet = .all) -> UsdStage
   {
     Overlay.Dereference(
-      Usd.Stage.Open(std.string(filePath), load.rawValue)
+      Usd.Stage.Open(filePath.withCString { std.string($0) }, load.rawValue)
     )
   }
 
@@ -274,7 +274,7 @@ public extension Usd.Stage
   static func open(_ filePath: String, ext: USDStage.FileExt, load: InitialLoadingSet = .all) -> UsdStage
   {
     Overlay.Dereference(
-      Usd.Stage.Open(std.string("\(filePath).\(ext.rawValue)"), load.rawValue)
+      Usd.Stage.Open("\(filePath).\(ext.rawValue)".withCString { std.string($0) }, load.rawValue)
     )
   }
 

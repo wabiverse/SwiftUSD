@@ -35,7 +35,7 @@ public extension Usd.References
                              layerOffset: Sdf.LayerOffset = Sdf.LayerOffset(),
                              position: Pixar.UsdListPosition = .backOfPrependList) -> Bool
   {
-    AddReference(std.string(assetPath), primPath, layerOffset, position)
+    AddReference(assetPath.withCString { std.string($0) }, primPath, layerOffset, position)
   }
 
   @discardableResult
@@ -43,6 +43,6 @@ public extension Usd.References
                              layerOffset: Sdf.LayerOffset = Sdf.LayerOffset(),
                              position: Pixar.UsdListPosition = .backOfPrependList) -> Bool
   {
-    AddReference(std.string(assetPath), layerOffset, position)
+    AddReference(assetPath.withCString { std.string($0) }, layerOffset, position)
   }
 }

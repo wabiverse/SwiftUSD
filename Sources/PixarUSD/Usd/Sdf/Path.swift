@@ -25,7 +25,7 @@ public extension Sdf.Path
 {
   init(_ path: String)
   {
-    self.init(std.string(path))
+    self.init(path.withCString { std.string($0) })
   }
 
   static func emptyPath() -> Sdf.Path

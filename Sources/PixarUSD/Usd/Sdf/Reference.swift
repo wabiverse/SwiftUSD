@@ -29,7 +29,7 @@ public extension Sdf.Reference
        customData: Vt.Dictionary = Vt.Dictionary())
   {
     self = Sdf.Reference(
-      std.string(assetPath),
+      assetPath.withCString { std.string($0) },
       primPath,
       layerOffset,
       customData

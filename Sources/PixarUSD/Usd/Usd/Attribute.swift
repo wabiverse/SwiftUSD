@@ -24,13 +24,13 @@ public extension Usd.Attribute
 {
   func set(doc: String)
   {
-    SetDocumentation(std.string(doc))
+    SetDocumentation(doc.withCString { std.string($0) })
   }
 
   @discardableResult
   func set(_ value: String, time: UsdTimeCode = UsdTimeCode.Default()) -> Bool
   {
-    Set(std.string(value), time)
+    Set(value.withCString { std.string($0) }, time)
   }
 
   @discardableResult

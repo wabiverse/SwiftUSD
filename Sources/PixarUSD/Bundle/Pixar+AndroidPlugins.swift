@@ -94,7 +94,7 @@
       for (dirname, _) in Pixar.Bundler.embeddedPluginInfo
       {
         let dirPath = pxrRoot + "/" + dirname
-        plugPaths.push_back(std.string(dirPath))
+        plugPaths.push_back(dirPath.withCString { std.string($0) })
       }
 
       Pixar.PlugRegistry.GetInstance().RegisterPlugins(plugPaths)
