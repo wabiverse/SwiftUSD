@@ -94,8 +94,8 @@ public enum Hydra
       engine.setWindowPolicy(.matchHorizontally)
 
       // light and material setup.
-      let lights = computeLights(cameraTransform: cameraTransform)
-      engine.setLightingState(lights: lights, material: material, sceneAmbient: sceneAmbient)
+      // let lights = computeLights(cameraTransform: cameraTransform)
+      // engine.setLightingState(lights: lights, material: material, sceneAmbient: sceneAmbient)
 
       var params = UsdImagingGL.RenderParams()
       params.frame = Usd.TimeCode(timeCode)
@@ -192,21 +192,23 @@ public enum Hydra
     }
 
     /// creates a light source located at the camera position.
-    func computeCameraLight(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLight
-    {
-      let cameraPosition = Pixar.GfVec3f(cameraTransform.ExtractTranslation())
+    //  func computeCameraLight(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLight
+    //  {
+    //    let cameraPosition = Pixar.GfVec3f(cameraTransform.ExtractTranslation())
+    //
+    //    let light = Pixar.GlfSimpleLightCollector.createLight(Pixar.GfVec4f(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
+    //
+    //    return light
+    //  }
 
-      let light = Pixar.GlfSimpleLightCollector.createLight(Pixar.GfVec4f(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1))
-
-      return light
-    }
-
-    func computeLights(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLightVector
-    {
-      var lightsVec = Pixar.GlfSimpleLightVector()
-      lightsVec.push_back(computeCameraLight(cameraTransform: cameraTransform))
-      return lightsVec
-    }
+    // func computeLights(cameraTransform: Gf.Matrix4d) -> Pixar.GlfSimpleLightVector
+    // {
+    //   error: swift result not found (c:@N@std@S@allocator>#C)
+    //
+    //   var lightsVec = Pixar.GlfSimpleLightVector()
+    //   lightsVec.push_back(computeCameraLight(cameraTransform: cameraTransform))
+    //   return lightsVec
+    // }
 
     func setupMaterial()
     {
