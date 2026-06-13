@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------
- * :: :  M  E  T  A  V  E  R  S  E  :                            ::
+ * :: :  O  P  E  N  U  S  D  :                                  ::
  * ----------------------------------------------------------------
  * Licensed under the terms set forth in the LICENSE.txt file, this
  * file is available at https://openusd.org/license.
  *
- *                                        Copyright (C) 2016 Pixar.
- *         Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
+ *                   Copyright (C) 2016 Pixar. All Rights Reserved.
+ *                              Copyright (C) 2024 Wabi Foundation.
  * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
@@ -51,32 +51,16 @@ struct UsdView: App
 
   @State private var selectedPath: String? = nil
 
-  /// Side-by-side on screens (where there's width to spare), stacked
-  /// top-to-bottom on mobile (where portrait layouts favor a vertical split).
-  #if os(iOS) || os(Android)
-    private typealias SplitPane<Content: View> = VStack<Content>
-  #else
-    private typealias SplitPane<Content: View> = HStack<Content>
-  #endif
-
   var body: some Scene
   {
     WindowGroup("UsdView") {
       SplitPane(spacing: 0) {
         PrimBrowserView(stage: stage, selectedPath: $selectedPath)
-          #if os(iOS) || os(Android)
-            .frame(height: 200)
-          #else
-            .frame(width: 320)
-          #endif
+          .sidebarFrame()
 
         Hydra.Viewport(engine: engine)
       }
-      #if os(iOS) || os(Android)
-        .frame(minHeight: 400)
-      #else
-        .frame(minWidth: 520)
-      #endif
+      .splitPaneMinSize()
       .colorScheme(.dark)
     }
   }

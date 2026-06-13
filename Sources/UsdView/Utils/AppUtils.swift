@@ -12,6 +12,52 @@
 
 import Foundation
 import PixarUSD
+import SwiftCrossUI
+
+/// `true` on platforms where vertical space is at a premium and panels
+/// should stack instead of sitting side-by-side (iOS, Android).
+public let isCompactLayout: Bool = {
+  #if os(iOS) || os(Android)
+    true
+  #else
+    false
+  #endif
+}()
+
+public extension View
+{
+  /// Sizes a sidebar pane: a fixed height on compact layouts (where panes
+  /// stack vertically), or a fixed width otherwise (where panes sit
+  /// side-by-side).
+  @ViewBuilder
+  func sidebarFrame() -> some View
+  {
+    if isCompactLayout
+    {
+      frame(height: 200)
+    }
+    else
+    {
+      frame(width: 320)
+    }
+  }
+
+  /// Gives a split pane a sensible minimum size: enough height to be usable
+  /// when stacked vertically on compact layouts, or enough width when laid
+  /// out side-by-side.
+  @ViewBuilder
+  func splitPaneMinSize() -> some View
+  {
+    if isCompactLayout
+    {
+      frame(minHeight: 400)
+    }
+    else
+    {
+      frame(minWidth: 520)
+    }
+  }
+}
 
 /// path to a user's documents directory.
 public func documentsDirPath() -> String
