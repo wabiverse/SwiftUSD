@@ -46,6 +46,7 @@
 #include "Tf/ostreamMethods.h"
 #include "Tf/pathUtils.h"
 #include "Tf/pyLock.h"
+#include "Tf/retainReleaseHelper.h"
 #include "Tf/scopeDescription.h"
 #include "Tf/stackTrace.h"
 #include "Tf/staticData.h"
@@ -4477,16 +4478,10 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 void SdfLayerRetain(PXR_NS::SdfLayer *layer)
 {
-#if DEBUG
-  printf("Called SdfLayerRetain()\n");
-#endif /* DEBUG */
-  // PXR_NS::SdfLayer *ref = layer;
+  Pixar::Tf_RetainReleaseHelper::retain(layer);
 }
 
 void SdfLayerRelease(PXR_NS::SdfLayer *layer)
 {
-#if DEBUG
-  printf("Called SdfLayerRelease()\n");
-#endif /* DEBUG */
-  // layer = nullptr;
+  Pixar::Tf_RetainReleaseHelper::release(layer);
 }

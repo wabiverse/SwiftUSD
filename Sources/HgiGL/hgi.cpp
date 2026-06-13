@@ -27,6 +27,7 @@
 
 #include "Tf/envSetting.h"
 #include "Tf/registryManager.h"
+#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Tf/type.h"
 
 #include <mutex>
@@ -69,18 +70,13 @@ HgiGL::~HgiGL()
 }
 
 // static.
-HgiGLPtr HgiGL::CreateHgi()
+HgiGL *HgiGL::CreateHgi()
 {
-  HgiGLPtr hgi = std::make_shared<HgiGL>();
+  std::shared_ptr<HgiGL> hgi = std::make_shared<HgiGL>();
 
   hgi.reset(dynamic_cast<HgiGL *>(Hgi::GetPlatformDefaultHgi()));
 
-  return hgi;
-}
-
-VtValue HgiGL::GetValue(HgiGLPtr ptr) const
-{
-  return VtValue(ptr.get());
+  return Tf_SharedPtrRetainReleaseHelper<HgiGL>::Register(hgi);
 }
 
 bool HgiGL::IsBackendSupported() const
@@ -309,3 +305,13 @@ bool HgiGL::_SubmitCmds(HgiCmds *cmds, HgiSubmitWaitType wait)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiGLRetain(PXR_NS::HgiGL *hgi)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiGL>::Retain(hgi);
+}
+
+void HgiGLRelease(PXR_NS::HgiGL *hgi)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiGL>::Release(hgi);
+}

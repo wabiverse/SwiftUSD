@@ -12,56 +12,49 @@
 
 import Foundation
 import PixarUSD
-#if canImport(HgiGL)
-  import HgiGL
+import HgiGL
 
-  public extension Hydra
+public extension Hydra
+{
+  /**
+   * ``GLRenderer``
+   *
+   * ## Overview
+   *
+   * The Hydra Engine (``Hd``) OpenGL renderer for the ``UsdView``
+   * application. */
+  class GLRenderer
   {
-    /**
-     * ``GLRenderer``
-     *
-     * ## Overview
-     *
-     * The Hydra Engine (``Hd``) OpenGL renderer for the ``UsdView``
-     * application. */
-    class GLRenderer
+    let hgi: Pixar.HgiGL
+    var device: Pixar.HgiGLDevice!
+
+    public var stage: UsdStage
+
+    var engine: UsdImagingGL.Engine
+
+    public required init(stage: UsdStage)
     {
-      let hgi: Pixar.HgiGLPtr
-      var device: Pixar.HgiGLDevice!
+      hgi = HgiGL.createHgi()
+      device = hgi.device
+      self.stage = stage
 
-      public var stage: UsdStage
+      let driver = HdDriver(name: .renderDriver, driver: hgi.value)
 
-      #if canImport(UsdImagingGL)
-        /// UsdImagingGL is not available on iOS.
-        var engine: UsdImagingGL.EngineSharedPtr
-      #endif // canImport(UsdImagingGL)
+      engine = UsdImagingGL.Engine.createEngine(
+        rootPath: stage.getPseudoRoot().getPath(),
+        excludedPaths: Sdf.PathVector(),
+        invisedPaths: Sdf.PathVector(),
+        sceneDelegateId: Sdf.Path.absoluteRootPath(),
+        driver: driver
+      )
 
-      public required init(stage: UsdStage)
-      {
-        hgi = HgiGL.createHgi()
-        device = hgi.device
-        self.stage = stage
+      engine.setEnablePresentation(false)
+      engine.setRendererAov(.color)
+    }
 
-        let driver = HdDriver(name: .renderDriver, driver: hgi.value)
-
-        #if canImport(UsdImagingGL)
-          engine = UsdImagingGL.Engine.createEngine(
-            rootPath: stage.getPseudoRoot().getPath(),
-            excludedPaths: Sdf.PathVector(),
-            invisedPaths: Sdf.PathVector(),
-            sceneDelegateId: Sdf.Path.absoluteRootPath(),
-            driver: driver
-          )
-
-          engine.setEnablePresentation(false)
-          engine.setRendererAov(.color)
-        #endif // canImport(UsdImagingGL)
-      }
-
-      public func info()
-      {
-        Msg.logger.log(level: .info, "Created HGI -> OpenGL.")
-      }
+    public func info()
+    {
+      Msg.logger.log(level: .info, "Created HGI -> OpenGL.")
     }
   }
-#endif // canImport(HgiGL)
+}

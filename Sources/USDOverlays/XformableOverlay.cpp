@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------
- * :: :  O  P  E  N  U  S  D  :                            ::
+ * :: :  O  P  E  N  U  S  D  :                                  ::
  * ----------------------------------------------------------------
  * Licensed under the terms set forth in the LICENSE.txt file, this
  * file is available at https://openusd.org/license.

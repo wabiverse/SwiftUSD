@@ -38,6 +38,7 @@
 
 #include "Tf/envSetting.h"
 #include "Tf/getenv.h"
+#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Tf/staticData.h"
 #include "Tf/stl.h"
 
@@ -184,49 +185,49 @@ UsdImagingGLEngine::UsdImagingGLEngine(const SdfPath &rootPath,
 }
 
 // static.
-UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine()
+UsdImagingGLEngine *UsdImagingGLEngine::CreateEngine()
 {
-  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+  std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
 
   engine.reset(new UsdImagingGLEngine());
 
-  return engine;
+  return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
 }
 
 // static.
-UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const Parameters &params)
+UsdImagingGLEngine *UsdImagingGLEngine::CreateEngine(const Parameters &params)
 {
-  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+  std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
 
   engine.reset(new UsdImagingGLEngine(params));
 
-  return engine;
+  return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
 }
 
 // static.
-UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const HdDriver &driver,
-                                                             const TfToken &rendererPluginId,
-                                                             const bool gpuEnabled)
+UsdImagingGLEngine *UsdImagingGLEngine::CreateEngine(const HdDriver &driver,
+                                                      const TfToken &rendererPluginId,
+                                                      const bool gpuEnabled)
 {
-  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+  std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
 
   engine.reset(new UsdImagingGLEngine(driver, rendererPluginId, gpuEnabled));
 
-  return engine;
+  return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
 }
 
 // static.
-UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const SdfPath &rootPath,
-                                                             const SdfPathVector &excludedPaths,
-                                                             const SdfPathVector &invisedPaths,
-                                                             const SdfPath &sceneDelegateID,
-                                                             const HdDriver &driver,
-                                                             const TfToken &rendererPluginId,
-                                                             const bool gpuEnabled,
-                                                             const bool displayUnloadedPrimsWithBounds,
-                                                             const bool allowAsynchronousSceneProcessing)
+UsdImagingGLEngine *UsdImagingGLEngine::CreateEngine(const SdfPath &rootPath,
+                                                      const SdfPathVector &excludedPaths,
+                                                      const SdfPathVector &invisedPaths,
+                                                      const SdfPath &sceneDelegateID,
+                                                      const HdDriver &driver,
+                                                      const TfToken &rendererPluginId,
+                                                      const bool gpuEnabled,
+                                                      const bool displayUnloadedPrimsWithBounds,
+                                                      const bool allowAsynchronousSceneProcessing)
 {
-  UsdImagingGLEngineSharedPtr engine = std::make_shared<UsdImagingGLEngine>();
+  std::shared_ptr<UsdImagingGLEngine> engine = std::make_shared<UsdImagingGLEngine>();
 
   engine.reset(new UsdImagingGLEngine(
     rootPath,
@@ -240,7 +241,7 @@ UsdImagingGLEngineSharedPtr UsdImagingGLEngine::CreateEngine(const SdfPath &root
     allowAsynchronousSceneProcessing
   ));
 
-  return engine;
+  return Tf_SharedPtrRetainReleaseHelper<UsdImagingGLEngine>::Register(engine);
 }
 
 void UsdImagingGLEngine::_DestroyHydraObjects()
@@ -1908,3 +1909,13 @@ bool UsdImagingGLEngine::PollForAsynchronousUpdates() const
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void UsdImagingGLEngineRetain(PXR_NS::UsdImagingGLEngine *engine)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Retain(engine);
+}
+
+void UsdImagingGLEngineRelease(PXR_NS::UsdImagingGLEngine *engine)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::UsdImagingGLEngine>::Release(engine);
+}

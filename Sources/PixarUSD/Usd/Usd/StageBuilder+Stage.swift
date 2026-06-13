@@ -93,31 +93,6 @@ public struct USDStage
   }
 
   /**
-   * Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
-   *
-   * Returns a ``Usd.PrimRange`` , which allows low-latency traversal, with the
-   * ability to prune subtrees from traversal. It is python iterable, so in its simplest form,
-   * one can do:
-   * ```swift
-   * for prim in stage.traverse()
-   * {
-   *   print(prim.GetPath())
-   * }
-   * ```
-   *
-   * If either a pre-and-post-order traversal or, a traversal rooted at
-   * a particular prim is desired, construct a ``Usd.PrimRange``
-   * directly.
-   *
-   * This is equivalent to ``Usd.PrimRange.stage()``. */
-  // public func traverse() -> [Usd.Prim]
-  // {
-  //   let it = Usd.PrimRange.Stage(stage.pointee.getPtr())
-
-  //   return IteratorSequence(it).map { $0 }
-  // }
-
-  /**
    * Sets the documentation string for this layer. */
   @discardableResult
   public func set(doc: String) -> USDStage

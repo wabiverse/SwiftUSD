@@ -16,7 +16,7 @@
 
   public enum HgiMetal
   {
-    public static func createHgi() -> Pixar.HgiMetalPtr
+    public static func createHgi() -> Pixar.HgiMetal
     {
       Pixar.HgiMetal.CreateHgi()
     }
@@ -39,27 +39,9 @@
       GetPrimaryDeviceCopy()
     }
 
-    func getValue(_ ptr: Pixar.HgiMetalPtr) -> VtValue
-    {
-      GetValue(ptr)
-    }
-  }
-
-  public extension Pixar.HgiMetalPtr
-  {
-    var apiVersion: Int
-    {
-      pointee.apiVersion
-    }
-
-    var device: MTLDevice
-    {
-      pointee.device
-    }
-
     var value: VtValue
     {
-      pointee.getValue(self)
+      Overlay.GetValue(self)
     }
   }
 #endif /* canImport(Metal) */

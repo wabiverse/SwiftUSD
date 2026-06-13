@@ -27,6 +27,7 @@
 
 #include "Tf/getenv.h"
 #include "Tf/registryManager.h"
+#include "Tf/sharedPtrRetainReleaseHelper.h"
 #include "Tf/type.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -159,18 +160,13 @@ HgiMetal::~HgiMetal()
     }
 }
 
-HgiMetalPtr HgiMetal::CreateHgi()
+HgiMetal *HgiMetal::CreateHgi()
 {
-  HgiMetalPtr hgi = std::make_shared<HgiMetal>();
+  std::shared_ptr<HgiMetal> hgi = std::make_shared<HgiMetal>();
 
   hgi.reset(dynamic_cast<HgiMetal *>(Hgi::GetPlatformDefaultHgi()));
 
-  return hgi;
-}
-
-VtValue HgiMetal::GetValue(HgiMetalPtr ptr) const
-{
-  return VtValue(ptr.get());
+  return Tf_SharedPtrRetainReleaseHelper<HgiMetal>::Register(hgi);
 }
 
 bool
@@ -566,3 +562,13 @@ HgiMetal::_SubmitCmds(HgiCmds* cmds, HgiSubmitWaitType wait)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiMetalRetain(PXR_NS::HgiMetal *hgi)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiMetal>::Retain(hgi);
+}
+
+void HgiMetalRelease(PXR_NS::HgiMetal *hgi)
+{
+  Pixar::Tf_SharedPtrRetainReleaseHelper<Pixar::HgiMetal>::Release(hgi);
+}

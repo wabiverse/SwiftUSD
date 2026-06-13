@@ -1886,6 +1886,8 @@ let package = Package(
         .target(name: "UsdGeom"),
         .target(name: "UsdLux"),
         .target(name: "UsdShade"),
+        .target(name: "HgiGL"),
+        .target(name: "HgiMetal", condition: .when(platforms: Arch.OS.apple.platform))
       ],
       cxxSettings: [
         .define("_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH", .when(platforms: [.windows])),

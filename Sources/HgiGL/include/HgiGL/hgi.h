@@ -30,7 +30,6 @@ class HgiGLDevice;
 using HgiGLOpsFn = std::function<void(void)>;
 using HgiGLOpsVector = std::vector<HgiGLOpsFn>;
 using HgiGLContextArenaHandle = HgiHandle<class HgiGLContextArena>;
-using HgiGLPtr = std::shared_ptr<class HgiGL>;
 
 /// \class HgiGL
 ///
@@ -66,10 +65,7 @@ class HgiGL final : public Hgi {
   ~HgiGL() override;
 
   HGIGL_API
-  static HgiGLPtr CreateHgi();
-
-  HGIGL_API
-  VtValue GetValue(HgiGLPtr ptr) const;
+  static HgiGL *CreateHgi() SWIFT_RETURNS_RETAINED;
 
   /// ------------------------------------------------------------------------
   /// Virtual API
@@ -206,7 +202,7 @@ class HgiGL final : public Hgi {
   std::unique_ptr<HgiGLCapabilities> _capabilities;
   HgiGLGarbageCollector _garbageCollector;
   int _frameDepth;
-} SWIFT_IMMORTAL_REFERENCE;
+} SWIFT_SHARED_REFERENCE(HgiGLRetain, HgiGLRelease);
 
 /// ----------------------------------------------------------------------------
 /// API Version & History
@@ -216,5 +212,8 @@ class HgiGL final : public Hgi {
 #define HGIGL_API_VERSION 2
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiGLRetain(PXR_NS::HgiGL *);
+void HgiGLRelease(PXR_NS::HgiGL *);
 
 #endif

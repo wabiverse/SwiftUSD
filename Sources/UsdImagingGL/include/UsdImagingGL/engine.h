@@ -67,7 +67,6 @@ TF_DECLARE_REF_PTRS(HdsiSceneGlobalsSceneIndex);
 TF_DECLARE_REF_PTRS(HdSceneIndexBase);
 
 using UsdStageWeakPtr = TfWeakPtr<class UsdStage>;
-using UsdImagingGLEngineSharedPtr = std::shared_ptr<class UsdImagingGLEngine>;
 
 namespace UsdImagingGLEngine_Impl {
 using _AppSceneIndicesSharedPtr = std::shared_ptr<struct _AppSceneIndices>;
@@ -152,26 +151,26 @@ class UsdImagingGLEngine {
   // ---------------------------------------------------------------------
 
   USDIMAGINGGL_API
-  static UsdImagingGLEngineSharedPtr CreateEngine();
+  static UsdImagingGLEngine *CreateEngine() SWIFT_RETURNS_RETAINED;
 
   USDIMAGINGGL_API
-  static UsdImagingGLEngineSharedPtr CreateEngine(const Parameters &params);
+  static UsdImagingGLEngine *CreateEngine(const Parameters &params) SWIFT_RETURNS_RETAINED;
 
   USDIMAGINGGL_API
-  static UsdImagingGLEngineSharedPtr CreateEngine(const HdDriver &driver = HdDriver(),
-                                                  const TfToken &rendererPluginId = TfToken(),
-                                                  bool gpuEnabled = true);
+  static UsdImagingGLEngine *CreateEngine(const HdDriver &driver = HdDriver(),
+                                          const TfToken &rendererPluginId = TfToken(),
+                                          bool gpuEnabled = true) SWIFT_RETURNS_RETAINED;
 
   USDIMAGINGGL_API
-  static UsdImagingGLEngineSharedPtr CreateEngine(const SdfPath &rootPath,
-                                                  const SdfPathVector &excludedPaths,
-                                                  const SdfPathVector &invisedPaths = SdfPathVector(),
-                                                  const SdfPath &sceneDelegateID = SdfPath::AbsoluteRootPath(),
-                                                  const HdDriver &driver = HdDriver(),
-                                                  const TfToken &rendererPluginId = TfToken(),
-                                                  bool gpuEnabled = true,
-                                                  bool displayUnloadedPrimsWithBounds = false,
-                                                  bool allowAsynchronousSceneProcessing = false);
+  static UsdImagingGLEngine *CreateEngine(const SdfPath &rootPath,
+                                          const SdfPathVector &excludedPaths,
+                                          const SdfPathVector &invisedPaths = SdfPathVector(),
+                                          const SdfPath &sceneDelegateID = SdfPath::AbsoluteRootPath(),
+                                          const HdDriver &driver = HdDriver(),
+                                          const TfToken &rendererPluginId = TfToken(),
+                                          bool gpuEnabled = true,
+                                          bool displayUnloadedPrimsWithBounds = false,
+                                          bool allowAsynchronousSceneProcessing = false) SWIFT_RETURNS_RETAINED;
 
   /// @}
 
@@ -806,8 +805,11 @@ class UsdImagingGLEngine {
   std::unique_ptr<HdEngine> _engine;
 
   bool _allowAsynchronousSceneProcessing = false;
-} SWIFT_IMMORTAL_REFERENCE;
+} SWIFT_SHARED_REFERENCE(UsdImagingGLEngineRetain, UsdImagingGLEngineRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void UsdImagingGLEngineRetain(PXR_NS::UsdImagingGLEngine *);
+void UsdImagingGLEngineRelease(PXR_NS::UsdImagingGLEngine *);
 
 #endif  // PXR_USD_IMAGING_USD_IMAGING_GL_ENGINE_H

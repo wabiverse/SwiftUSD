@@ -22,8 +22,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-using HgiMetalPtr = std::shared_ptr<class HgiMetal>;
-
 enum { APIVersion_Metal1_0 = 0, APIVersion_Metal2_0, APIVersion_Metal3_0 };
 
 /// \class HgiMetal
@@ -45,10 +43,7 @@ class HgiMetal final : public Hgi {
   ~HgiMetal() override;
 
   HGIMETAL_API
-  static HgiMetalPtr CreateHgi();
-
-  HGIMETAL_API
-  VtValue GetValue(HgiMetalPtr ptr) const;
+  static HgiMetal *CreateHgi() SWIFT_RETURNS_RETAINED;
 
   HGIMETAL_API
   bool IsBackendSupported() const override;
@@ -225,8 +220,11 @@ class HgiMetal final : public Hgi {
 
   struct AutoReleasePool;
   std::unique_ptr<AutoReleasePool> _pool;
-} SWIFT_IMMORTAL_REFERENCE;
+} SWIFT_SHARED_REFERENCE(HgiMetalRetain, HgiMetalRelease);
 
 PXR_NAMESPACE_CLOSE_SCOPE
+
+void HgiMetalRetain(PXR_NS::HgiMetal *);
+void HgiMetalRelease(PXR_NS::HgiMetal *);
 
 #endif

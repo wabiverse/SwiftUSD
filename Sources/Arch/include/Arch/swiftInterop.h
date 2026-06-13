@@ -127,6 +127,20 @@
   __attribute__((swift_attr(_CXX_INTEROP_STRINGIFY(release:_release))))
 #endif /* SWIFT_SHARED_REFERENCE */
 
+#if !defined(SWIFT_RETURNS_RETAINED)
+/// Specifies that a C++ function returning a `SWIFT_SHARED_REFERENCE` type
+/// transfers a +1 reference to its caller, so Swift must not perform an
+/// additional `retain` on the returned value.
+#define SWIFT_RETURNS_RETAINED __attribute__((swift_attr("returns_retained"))) __attribute__((cf_returns_retained))
+#endif /* SWIFT_RETURNS_RETAINED */
+
+#if !defined(SWIFT_RETURNS_UNRETAINED)
+/// Specifies that a C++ function returning a `SWIFT_SHARED_REFERENCE` type
+/// returns a +0 (borrowed) reference, so Swift must perform a `retain` on
+/// the returned value to take ownership of it.
+#define SWIFT_RETURNS_UNRETAINED __attribute__((swift_attr("returns_unretained"))) __attribute__((cf_returns_not_retained))
+#endif /* SWIFT_RETURNS_UNRETAINED */
+
 #if !defined(SWIFT_IMMORTAL_REFERENCE)
 /// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
 /// is presumed to be immortal, i.e. the reference to such object is presumed to

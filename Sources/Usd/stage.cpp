@@ -71,6 +71,7 @@
 #include "Tf/preprocessorUtilsLite.h"
 #include "Tf/pyLock.h"
 #include "Tf/registryManager.h"
+#include "Tf/retainReleaseHelper.h"
 #include "Tf/scoped.h"
 #include "Tf/span.h"
 #include "Tf/stl.h"
@@ -9237,16 +9238,10 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 void UsdStageRetain(PXR_NS::UsdStage *stage)
 {
-#if DEBUG_MEMORY_MANAGEMENT
-  printf("Called UsdStageRetain()\n");
-#endif /* DEBUG_MEMORY_MANAGEMENT */
-  // PXR_NS::UsdStage *ref = stage;
+  Pixar::Tf_RetainReleaseHelper::retain(stage);
 }
 
 void UsdStageRelease(PXR_NS::UsdStage *stage)
 {
-#if DEBUG_MEMORY_MANAGEMENT
-  printf("Called UsdStageRelease()\n");
-#endif /* DEBUG_MEMORY_MANAGEMENT */
-  // stage = nullptr;
+  Pixar::Tf_RetainReleaseHelper::release(stage);
 }

@@ -10,45 +10,30 @@
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
 
-#if canImport(HgiGL)
-  import HgiGL
+import HgiGL
 
-  public enum HgiGL
+public enum HgiGL
+{
+  public static func createHgi() -> Pixar.HgiGL
   {
-    public static func createHgi() -> Pixar.HgiGLPtr
-    {
-      Pixar.HgiGL.CreateHgi()
-    }
+    Pixar.HgiGL.CreateHgi()
+  }
+}
+
+public extension Pixar.HgiGL
+{
+  private borrowing func GetPrimaryDeviceCopy() -> Pixar.HgiGLDevice
+  {
+    GetPrimaryDevice()
   }
 
-  public extension Pixar.HgiGL
+  var device: Pixar.HgiGLDevice
   {
-    private borrowing func GetPrimaryDeviceCopy() -> Pixar.HgiGLDevice
-    {
-      GetPrimaryDevice()
-    }
-
-    var device: Pixar.HgiGLDevice
-    {
-      GetPrimaryDeviceCopy()
-    }
-
-    func getValue(_ ptr: Pixar.HgiGLPtr) -> VtValue
-    {
-      GetValue(ptr)
-    }
+    GetPrimaryDeviceCopy()
   }
 
-  public extension Pixar.HgiGLPtr
+  var value: VtValue
   {
-    var device: Pixar.HgiGLDevice
-    {
-      pointee.device
-    }
-
-    var value: VtValue
-    {
-      pointee.getValue(self)
-    }
+    Overlay.GetValue(self)
   }
-#endif /* canImport(HgiGL) */
+}

@@ -27,12 +27,12 @@ public enum Hydra
     public var stage: UsdStage
 
 #if canImport(Metal)
-    private let hgi: Pixar.HgiMetalPtr
+    private let hgi: Pixar.HgiMetal
 #else // !canImport(Metal)
-    private let hgi: Pixar.HgiGLPtr
+    private let hgi: Pixar.HgiGL
 #endif // canImport(Metal)
 
-    private let engine: UsdImagingGL.EngineSharedPtr
+    private let engine: UsdImagingGL.Engine
     private var viewCamera: Hydra.Camera
 
     private var worldCenter: Pixar.GfVec3d = .init(0.0, 0.0, 0.0)
@@ -309,18 +309,18 @@ public enum Hydra
       hgi.device
     }
 
-    public func getHgi() -> Pixar.HgiMetalPtr
+    public func getHgi() -> Pixar.HgiMetal
     {
       hgi
     }
 #else // !canImport(Metal)
-    public func getHgi() -> Pixar.HgiGLPtr
+    public func getHgi() -> Pixar.HgiGL
     {
       hgi
     }
 #endif // canImport(Metal)
 
-    public func getEngine() -> UsdImagingGL.EngineSharedPtr
+    public func getEngine() -> UsdImagingGL.Engine
     {
       engine
     }

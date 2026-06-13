@@ -113,7 +113,7 @@ public extension Hydra
       guard let hgi = hydra?.getHgi()
       else { inFlightSemaphore.signal(); return false }
 
-      hgi.pointee.StartFrame()
+      hgi.StartFrame()
 
       let viewSize = view.drawableSize
       guard
@@ -122,8 +122,8 @@ public extension Hydra
       else { inFlightSemaphore.signal(); return false }
 
       // let hgi finish completely before we touch the drawable
-      hgi.pointee.CommitPrimaryCommandBuffer()
-      hgi.pointee.EndFrame()
+      hgi.CommitPrimaryCommandBuffer()
+      hgi.EndFrame()
 
       // get a fresh drawable only after hgi is done
       guard
