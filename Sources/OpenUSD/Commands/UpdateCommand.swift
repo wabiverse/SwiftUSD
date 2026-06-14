@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------
- * :: :  M  E  T  A  V  E  R  S  E  :                            ::
+ * :: :  O  P  E  N  U  S  D  :                                  ::
  * ----------------------------------------------------------------
  * Licensed under the terms set forth in the LICENSE.txt file, this
  * file is available at https://openusd.org/license.
  *
- *                                        Copyright (C) 2016 Pixar.
- *         Copyright (C) 2024 Wabi Foundation. All Rights Reserved.
+ *                   Copyright (C) 2016 Pixar. All Rights Reserved.
+ *                              Copyright (C) 2024 Wabi Foundation.
  * ----------------------------------------------------------------
  *  . x x x . o o o . x x x . : : : .    o  x  o    . : : : .
  * ---------------------------------------------------------------- */
@@ -17,7 +17,7 @@ import Foundation
  * The subcommand for changing the pixar
  * usd version for a specified package.
  */
-struct UpdateCommand: AsyncParsableCommand
+struct UpdateCommand: AsyncCommand
 {
   static let configuration = CommandConfiguration(
     commandName: "update",
@@ -79,7 +79,7 @@ struct UpdateCommand: AsyncParsableCommand
     }
 
     // Output the time elapsed and app bundle location
-    log.info("done in \(elapsed.secondsString). usd source updated at '\(pkgDir)'.")
+    log.info("done in \(elapsed.secondsString). openusd source updated at '\(pkgDir)'.")
   }
 }
 
@@ -387,60 +387,70 @@ public enum Pxr: String, CaseIterable
   }
 
   /**
-   * Ensure the casing is correct for the given target.
+   * Canonical upper-camel-case Swift target names for every Pixar library
+   * whose casing isn't just "first letter capitalized", keyed by the
+   * lowercased target name. For example `usdImagingGL` becomes
+   * `Usdimaginggl` after `.capitalized`, but the Swift target is
+   * `UsdImagingGL`.
+   *
+   * When Pixar adds a new library with internal capitalization, add it here.
+   */
+  private static let targetCasing: [String: String] = [
+    "camerautil": "CameraUtil",
+    "geomutil": "GeomUtil",
+    "hdar": "HdAr",
+    "hdgp": "HdGp",
+    "hdmtlx": "HdMtlx",
+    "hdsi": "HdSi",
+    "hdst": "HdSt",
+    "hdstorm": "HdStorm",
+    "hgigl": "HgiGL",
+    "hgiinterop": "HgiInterop",
+    "hgimetal": "HgiMetal",
+    "hgivulkan": "HgiVulkan",
+    "hioopenvdb": "HioOpenVDB",
+    "pxosd": "PxOsd",
+    "sdrglslfx": "SdrGlslfx",
+    "sdrosl": "SdrOsl",
+    "usdabc": "UsdAbc",
+    "usdapputils": "UsdAppUtils",
+    "usddraco": "UsdDraco",
+    "usdgeom": "UsdGeom",
+    "usdhydra": "UsdHydra",
+    "usdimaging": "UsdImaging",
+    "usdimaginggl": "UsdImagingGL",
+    "usdlux": "UsdLux",
+    "usdmedia": "UsdMedia",
+    "usdmtlx": "UsdMtlx",
+    "usdphysics": "UsdPhysics",
+    "usdproc": "UsdProc",
+    "usdprocimaging": "UsdProcImaging",
+    "usdrender": "UsdRender",
+    "usdri": "UsdRi",
+    "usdripxrimaging": "UsdRiPxrImaging",
+    "usdsemantics": "UsdSemantics",
+    "usdshade": "UsdShade",
+    "usdshaders": "UsdShaders",
+    "usdskel": "UsdSkel",
+    "usdskelimaging": "UsdSkelImaging",
+    "usdui": "UsdUI",
+    "usdutils": "UsdUtils",
+    "usdviewq": "UsdViewQ",
+    "usdvol": "UsdVol",
+    "usdvolimaging": "UsdVolImaging",
+  ]
+
+  /**
+   * Ensure the casing is correct for the given target, e.g. `Usdimaginggl`
+   * becomes `UsdImagingGL`. Targets that are already correctly cased after
+   * `.capitalized` (e.g. `Tf`, `Hd`) simply aren't in `targetCasing` and are
+   * left untouched.
    */
   private func ensureCasing(for target: inout String)
   {
-    for suffix in ["imaging", "app", "utils", "st", "physics", "mtlx", "gp", "proc", "vol", "skel", "util", "media"]
+    if let canonical = Pxr.targetCasing[target.lowercased()]
     {
-      if target.contains(suffix)
-      {
-        target = target.replacingOccurrences(of: suffix, with: suffix.capitalized)
-      }
-    }
-
-    if target.contains("Geom")
-    {
-      target = target.replacingOccurrences(of: "util", with: "Util")
-    }
-
-    if target.contains("Hgi")
-    {
-      target = target.replacingOccurrences(of: "metal", with: "Metal")
-      target = target.replacingOccurrences(of: "gl", with: "GL")
-      target = target.replacingOccurrences(of: "vulkan", with: "Vulkan")
-      target = target.replacingOccurrences(of: "interop", with: "Interop")
-    }
-
-    if target.contains("Hio")
-    {
-      target = target.replacingOccurrences(of: "open", with: "Open")
-      target = target.replacingOccurrences(of: "vdb", with: "VDB")
-    }
-
-    if target.contains("Px")
-    {
-      target = target.replacingOccurrences(of: "osd", with: "Osd")
-    }
-
-    if target.contains("Usd")
-    {
-      target = target.replacingOccurrences(of: "geom", with: "Geom")
-      target = target.replacingOccurrences(of: "lux", with: "Lux")
-      target = target.replacingOccurrences(of: "ri", with: "Ri")
-      target = target.replacingOccurrences(of: "pxr", with: "Pxr")
-      target = target.replacingOccurrences(of: "gl", with: "GL")
-      target = target.replacingOccurrences(of: "render", with: "Render")
-      target = target.replacingOccurrences(of: "hydra", with: "Hydra")
-      target = target.replacingOccurrences(of: "viewq", with: "ViewQ")
-      target = target.replacingOccurrences(of: "shade", with: "Shade")
-      target = target.replacingOccurrences(of: "ui", with: "UI")
-    }
-
-    if target.contains("Hd")
-    {
-      target = target.replacingOccurrences(of: "ar", with: "Ar")
-      target = target.replacingOccurrences(of: "si", with: "Si")
+      target = canonical
     }
   }
 
@@ -477,12 +487,6 @@ public enum Pxr: String, CaseIterable
 
       source = source.replacingOccurrences(of: "pxr/pxr.h", with: "pxr/pxrns.h")
 
-      // since these names conflict with stdlib, we prefix them with pxr.
-      source = source.replacingOccurrences(of: "Arch/errno.h", with: "Arch/errno.h")
-      source = source.replacingOccurrences(of: "Arch/inttypes.h", with: "Arch/inttypes.h")
-      source = source.replacingOccurrences(of: "Arch/math.h", with: "Arch/math.h")
-      source = source.replacingOccurrences(of: "Arch/regex.h", with: "Arch/regex.h")
-
       /* ------ refbase ------------------- */
 
       source = source.replacingOccurrences(of: "virtual ~SdfLayer();", with: "virtual ~SdfLayer() noexcept;")
@@ -498,9 +502,6 @@ public enum Pxr: String, CaseIterable
       // modern versions of tbb no longer have atomic, get it from std.
       source = source.replacingOccurrences(of: "<tbb/atomic.h>", with: "<atomic>")
       source = source.replacingOccurrences(of: "tbb::atomic", with: "std::atomic")
-      // not a safe assumption, migration to modern tbb requires slightly more intricate changes.
-      // source = source.replacingOccurrences(of: "fetch_and_decrement()", with: "fetch_sub(1)")
-      // source = source.replacingOccurrences(of: "fetch_and_increment()", with: "fetch_add(1)")
       // modern versions of tbb no longer have mutex, get it from std.
       source = source.replacingOccurrences(of: "<tbb/mutex.h>", with: "<mutex>")
       source = source.replacingOccurrences(of: "tbb::mutex", with: "std::mutex")
